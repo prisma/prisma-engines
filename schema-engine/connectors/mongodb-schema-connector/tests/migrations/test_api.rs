@@ -3,7 +3,7 @@ use enumflags2::BitFlags;
 use futures::TryStreamExt;
 use mongodb_schema_connector::MongoDbSchemaConnector;
 use psl::{parser_database::SourceFile, PreviewFeature};
-use schema_connector::{ConnectorParams, DiffTarget, SchemaConnector};
+use schema_connector::{ConnectorParams, SchemaConnector};
 use std::{
     collections::BTreeMap,
     fmt::Write as _,
@@ -179,25 +179,18 @@ pub(crate) fn test_scenario(scenario_name: &str) {
         db.drop().await.unwrap();
         apply_state(&db, state).await;
 
-        let from = connector
-            .database_schema_from_diff_target(DiffTarget::Database, None, None)
-            .await
-            .unwrap();
+        let from = connector.schema_from_database(None).await.unwrap();
         let to = connector
-            .database_schema_from_diff_target(
-                DiffTarget::Datamodel(vec![("schema.prisma".to_string(), schema.clone())]),
-                None,
-                None,
-            )
-            .await
+            .schema_dialect()
+            .schema_from_datamodel(vec![("schema.prisma".to_string(), schema.clone())])
             .unwrap();
-        let migration = connector.diff(from, to);
+        let migration = connector.schema_dialect().diff(from, to);
 
         connector.apply_migration(&migration).await.unwrap();
 
         let state = get_state(&db).await;
 
-        let mut rendered_migration = connector.migration_summary(&migration);
+        let mut rendered_migration = connector.schema_dialect().migration_summary(&migration);
         rendered_migration.push_str("\n------\n\n");
         rendered_migration.push_str(&serde_json::to_string_pretty(&state).unwrap());
         rendered_migration.push('\n');
@@ -225,24 +218,17 @@ Snapshot comparison failed. Run the test again with UPDATE_EXPECT=1 in the envir
         }
 
         // Check that the migration is idempotent.
-        let from = connector
-            .database_schema_from_diff_target(DiffTarget::Database, None, None)
-            .await
-            .unwrap();
+        let from = connector.schema_from_database(None).await.unwrap();
         let to = connector
-            .database_schema_from_diff_target(
-                DiffTarget::Datamodel(vec![("schema.prisma".to_string(), schema.clone())]),
-                None,
-                None,
-            )
-            .await
+            .schema_dialect()
+            .schema_from_datamodel(vec![("schema.prisma".to_string(), schema.clone())])
             .unwrap();
-        let migration = connector.diff(from, to);
+        let migration = connector.schema_dialect().diff(from, to);
 
         assert!(
-            connector.migration_is_empty(&migration),
+            connector.schema_dialect().migration_is_empty(&migration),
             "Expected an empty migration when applying the same schema, got:\n{}",
-            connector.migration_summary(&migration)
+            connector.schema_dialect().migration_summary(&migration)
         );
     })
 }

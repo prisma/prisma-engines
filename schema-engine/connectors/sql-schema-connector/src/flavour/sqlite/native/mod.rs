@@ -10,6 +10,8 @@ use sqlx_sqlite::SqliteColumn;
 use std::sync::Mutex;
 use user_facing_errors::schema_engine::ApplyMigrationError;
 
+use crate::flavour::validate_connection_infos_do_not_match;
+
 pub(super) type State = crate::flavour::State<Params, Connection>;
 
 pub(super) struct Params {
@@ -19,6 +21,10 @@ pub(super) struct Params {
 
 impl Params {
     pub fn new(connector_params: ConnectorParams) -> ConnectorResult<Self> {
+        if let Some(shadow_db_url) = &connector_params.shadow_database_connection_string {
+            validate_connection_infos_do_not_match(&connector_params.connection_string, shadow_db_url)?;
+        }
+
         let quaint::connector::SqliteParams { file_path, .. } =
             quaint::connector::SqliteParams::try_from(connector_params.connection_string.as_str())
                 .map_err(ConnectorError::url_parse_error)?;
@@ -28,6 +34,13 @@ impl Params {
             file_path,
         })
     }
+
+    pub fn new_inmem(preview_features: psl::PreviewFeatures) -> Self {
+        Self {
+            connector_params: ConnectorParams::new(":memory:".to_owned(), preview_features, None),
+            file_path: ":memory:".to_string(),
+        }
+    }
 }
 
 pub(super) struct Connection(Mutex<rusqlite::Connection>);
@@ -36,6 +49,12 @@ impl Connection {
     pub fn new(params: &Params) -> ConnectorResult<Self> {
         Ok(Self(Mutex::new(
             rusqlite::Connection::open(&params.file_path).map_err(convert_error)?,
+        )))
+    }
+
+    pub fn new_inmem() -> ConnectorResult<Self> {
+        Ok(Self(Mutex::new(
+            rusqlite::Connection::open_in_memory().map_err(convert_error)?,
         )))
     }
 
@@ -172,15 +191,10 @@ impl Connection {
 
         super::acquire_lock(self).await
     }
-
-    pub async fn dispose(&self) -> ConnectorResult<()> {
-        // nothing to do, the `drop` will handle cleanup
-        Ok(())
-    }
 }
 
-pub async fn new_shadow_db(_state: &State) -> ConnectorResult<Connection> {
-    Ok(Connection(Mutex::new(rusqlite::Connection::open_in_memory().unwrap())))
+pub fn new_shadow_db() -> ConnectorResult<Connection> {
+    Connection::new_inmem()
 }
 
 pub(super) async fn create_database(state: &State) -> ConnectorResult<String> {
@@ -277,6 +291,26 @@ pub(super) fn set_preview_features(state: &mut State, preview_features: enumflag
             params.connector_params.preview_features = preview_features
         }
     }
+}
+
+pub(super) fn get_preview_features(state: &State) -> psl::PreviewFeatures {
+    state
+        .params()
+        .map(|p| p.connector_params.preview_features)
+        .unwrap_or_default()
+}
+
+pub(super) fn get_shadow_db_url(state: &State) -> Option<&str> {
+    state
+        .params()?
+        .connector_params
+        .shadow_database_connection_string
+        .as_deref()
+}
+
+pub(super) async fn dispose(_state: &State) -> ConnectorResult<()> {
+    // Nothing to on dispose, the connection is disposed in Drop
+    Ok(())
 }
 
 fn convert_error(err: rusqlite::Error) -> ConnectorError {

@@ -104,7 +104,7 @@ impl SqlSchemaConnector {
         let steps = &migration.steps;
         let schemas = migration.schemas();
         let mut plan = DestructiveCheckPlan::new();
-        let checker = self.flavour().destructive_change_checker();
+        let checker = self.sql_dialect().destructive_change_checker();
 
         for (step_index, step) in steps.iter().enumerate() {
             match step {
@@ -288,7 +288,7 @@ impl DestructiveChangeChecker for SqlSchemaConnector {
         migration: &'a Migration,
     ) -> BoxFuture<'a, ConnectorResult<DestructiveChangeDiagnostics>> {
         let plan = self.plan(migration.downcast_ref());
-        Box::pin(async move { plan.execute(self.flavour.as_mut()).await })
+        Box::pin(async move { plan.execute(self.inner.as_mut()).await })
     }
 
     fn pure_check(&self, migration: &Migration) -> DestructiveChangeDiagnostics {

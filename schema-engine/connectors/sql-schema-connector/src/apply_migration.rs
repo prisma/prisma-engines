@@ -2,21 +2,21 @@ use crate::{
     migration_pair::MigrationPair,
     sql_migration::{SqlMigration, SqlMigrationStep},
     sql_renderer::SqlRenderer,
-    SqlConnectorFlavour, SqlSchemaConnector,
+    SqlConnector, SqlSchemaConnector,
 };
 use schema_connector::{ConnectorResult, DestructiveChangeDiagnostics, Migration};
 use sql_schema_describer::SqlSchema;
 use tracing_futures::Instrument;
 
-#[tracing::instrument(skip(flavour, migration))]
+#[tracing::instrument(skip(connector, migration))]
 pub(crate) async fn apply_migration(
     migration: &Migration,
-    flavour: &mut (dyn SqlConnectorFlavour + Send + Sync),
+    connector: &mut (dyn SqlConnector + Send + Sync),
 ) -> ConnectorResult<u32> {
     let migration: &SqlMigration = migration.downcast_ref();
     tracing::debug!("{} steps to execute", migration.steps.len());
 
-    let renderer = flavour.renderer();
+    let renderer = connector.dialect().renderer();
 
     for step in &migration.steps {
         for sql_string in render_raw_sql(
@@ -26,7 +26,7 @@ pub(crate) async fn apply_migration(
         ) {
             assert!(!sql_string.is_empty());
             let span = tracing::info_span!("migration_step", ?step);
-            flavour.raw_cmd(&sql_string).instrument(span).await?;
+            connector.raw_cmd(&sql_string).instrument(span).await?;
         }
     }
 
@@ -120,8 +120,8 @@ pub(crate) async fn apply_script(
         .host
         .print(&format!("Applying migration `{migration_name}`\n"))
         .await?;
-    connector.flavour.scan_migration_script(script);
-    connector.flavour.apply_migration_script(migration_name, script).await
+    connector.inner.dialect().scan_migration_script(script);
+    connector.inner.apply_migration_script(migration_name, script).await
 }
 
 fn render_raw_sql(

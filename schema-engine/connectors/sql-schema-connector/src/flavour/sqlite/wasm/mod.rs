@@ -1,29 +1,21 @@
 //! All the quaint-wrangling for the sqlite connector should happen here.
 
 use crate::BitFlags;
-use crate::ConnectorParams;
 use psl::PreviewFeature;
 use quaint::connector::ExternalConnector;
-use quaint::connector::ExternalConnectorFactory;
 use schema_connector::{ConnectorError, ConnectorResult};
 use sql_schema_describer::SqlSchema;
 use std::sync::Arc;
 
 pub(super) struct State {
     connection: Connection,
-    factory: Arc<dyn ExternalConnectorFactory>,
     preview_features: BitFlags<PreviewFeature>,
 }
 
 impl State {
-    pub fn new(
-        adapter: Arc<dyn ExternalConnector>,
-        factory: Arc<dyn ExternalConnectorFactory>,
-        preview_features: BitFlags<PreviewFeature>,
-    ) -> Self {
+    pub fn new(adapter: Arc<dyn ExternalConnector>, preview_features: BitFlags<PreviewFeature>) -> Self {
         Self {
             preview_features,
-            factory,
             connection: Connection { adapter },
         }
     }
@@ -92,19 +84,15 @@ impl Connection {
             .map_err(convert_error)
     }
 
-    pub async fn dispose(&self) -> ConnectorResult<()> {
+    async fn dispose(&self) -> ConnectorResult<()> {
         self.adapter.dispose().await.map_err(convert_error)
     }
 }
 
-pub async fn new_shadow_db(state: &State) -> ConnectorResult<Connection> {
-    let adapter = state
-        .factory
-        .connect_to_shadow_db()
-        .await
-        .ok_or_else(|| ConnectorError::from_msg("Invalid SQLite adapter: missing connectToShadowDb".to_owned()))?
-        .map_err(convert_error)?;
-    Ok(Connection { adapter })
+pub fn new_shadow_db() -> ConnectorResult<Connection> {
+    Err(ConnectorError::from_msg(
+        "SQLite shadow DB must be provided through an external factory".to_owned(),
+    ))
 }
 
 pub(super) async fn create_database(_state: &State) -> ConnectorResult<String> {
@@ -131,6 +119,18 @@ pub(super) fn get_connection_and_params(state: &mut State) -> ConnectorResult<(&
 
 pub(super) fn set_preview_features(state: &mut State, features: BitFlags<PreviewFeature>) {
     state.preview_features = features;
+}
+
+pub(super) fn get_preview_features(state: &State) -> psl::PreviewFeatures {
+    state.preview_features
+}
+
+pub(super) fn get_shadow_db_url(_state: &State) -> Option<&str> {
+    None
+}
+
+pub(super) async fn dispose(state: &State) -> ConnectorResult<()> {
+    state.connection.dispose().await
 }
 
 fn convert_error(err: quaint::error::Error) -> ConnectorError {

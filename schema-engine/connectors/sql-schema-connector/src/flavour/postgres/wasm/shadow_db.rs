@@ -1,32 +1,36 @@
-use crate::flavour::postgres::{sql_schema_from_migrations_and_db, PostgresProvider};
-use schema_connector::Namespaces;
+use crate::flavour::postgres::{sql_schema_from_migrations_and_db, PostgresConnector, PostgresProvider};
 use schema_connector::{migrations_directory::MigrationDirectory, ConnectorResult};
+use schema_connector::{ConnectorError, Namespaces, UsingExternalShadowDb};
 use sql_schema_describer::SqlSchema;
 
 pub async fn sql_schema_from_migration_history(
-    state: &mut super::State,
+    connector: &mut PostgresConnector,
     _provider: PostgresProvider,
     migrations: &[MigrationDirectory],
-    _shadow_database_connection_string: Option<String>,
     namespaces: Option<Namespaces>,
+    external_shadow_db: UsingExternalShadowDb,
 ) -> ConnectorResult<SqlSchema> {
-    let conn = state.new_shadow_db().await?;
+    let schema = connector.schema_name().to_owned();
+    let circumstances = connector.state.circumstances;
+    let preview_features = connector.state.preview_features;
 
-    let schema = super::get_default_schema(state).to_owned();
-    let result = sql_schema_from_migrations_and_db(
-        &conn,
-        &super::Params,
-        schema,
-        migrations,
-        namespaces,
-        state.circumstances,
-        state.preview_features,
-    )
-    .await;
-    // dispose the shadow database connection regardless of the result
-    conn.dispose()
+    if matches!(external_shadow_db, UsingExternalShadowDb::No) {
+        return Err(ConnectorError::from_msg(
+            "PostgreSQL shadow DB must be provided through an external factory".to_owned(),
+        ));
+    }
+
+    connector
+        .with_connection(|conn, params| {
+            sql_schema_from_migrations_and_db(
+                &conn,
+                params,
+                schema,
+                migrations,
+                namespaces,
+                circumstances,
+                preview_features,
+            )
+        })
         .await
-        .map_err(super::quaint_error_mapper(&super::Params))?;
-
-    result
 }

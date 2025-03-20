@@ -2,7 +2,7 @@ use super::{
     check::Check, database_inspection_results::DatabaseInspectionResults,
     unexecutable_step_check::UnexecutableStepCheck, warning_check::SqlMigrationWarningCheck,
 };
-use crate::flavour::SqlConnectorFlavour;
+use crate::flavour::SqlConnector;
 use schema_connector::{
     ConnectorError, ConnectorResult, DestructiveChangeDiagnostics, MigrationWarning, UnexecutableMigration,
 };
@@ -40,20 +40,20 @@ impl DestructiveCheckPlan {
     /// errors.
     ///
     /// For example, dropping a table that has 0 rows can be considered safe.
-    #[tracing::instrument(skip(flavour), level = "debug")]
+    #[tracing::instrument(skip(connector), level = "debug")]
     pub(super) async fn execute(
         &self,
-        flavour: &mut (dyn SqlConnectorFlavour + Send + Sync),
+        connector: &mut (dyn SqlConnector + Send + Sync),
     ) -> ConnectorResult<DestructiveChangeDiagnostics> {
         let mut results = DatabaseInspectionResults::default();
 
         let inspection = async {
             for (unexecutable, _idx) in &self.unexecutable_migrations {
-                self.inspect_for_check(unexecutable, flavour, &mut results).await?;
+                self.inspect_for_check(unexecutable, connector, &mut results).await?;
             }
 
             for (warning, _idx) in &self.warnings {
-                self.inspect_for_check(warning, flavour, &mut results).await?;
+                self.inspect_for_check(warning, connector, &mut results).await?;
             }
 
             Ok::<(), ConnectorError>(())
@@ -92,20 +92,20 @@ impl DestructiveCheckPlan {
     pub(super) async fn inspect_for_check(
         &self,
         check: &(dyn Check + Send + Sync + 'static),
-        flavour: &mut (dyn SqlConnectorFlavour + Send + Sync),
+        connector: &mut (dyn SqlConnector + Send + Sync),
         results: &mut DatabaseInspectionResults,
     ) -> ConnectorResult<()> {
-        let mut checker = flavour.destructive_change_checker();
+        let mut checker = connector.dialect().destructive_change_checker();
         if let Some(table) = check.needed_table_row_count() {
             if results.get_row_count(&table).is_none() {
-                let count = checker.count_rows_in_table(flavour, &table).await?;
+                let count = checker.count_rows_in_table(connector, &table).await?;
                 results.set_row_count(table.to_owned(), count)
             }
         }
 
         if let Some(column) = check.needed_column_value_count() {
             if let (_, None) = results.get_row_and_non_null_value_count(&column) {
-                let count = checker.count_values_in_column(flavour, &column).await?;
+                let count = checker.count_values_in_column(connector, &column).await?;
                 results.set_value_count(column, count);
             }
         }

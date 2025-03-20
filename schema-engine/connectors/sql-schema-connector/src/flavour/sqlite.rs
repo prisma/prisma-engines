@@ -13,7 +13,7 @@ use native as imp;
 use wasm as imp;
 
 use crate::{
-    flavour::SqlConnectorFlavour,
+    flavour::SqlConnector,
     sql_destructive_change_checker::destructive_change_checker_flavour::sqlite::SqliteDestructiveChangeCheckerFlavour,
     sql_renderer::{sqlite_renderer::SqliteRenderer, SqlRenderer},
     sql_schema_calculator::sql_schema_calculator_flavour::sqlite::SqliteSchemaCalculatorFlavour,
@@ -22,62 +22,18 @@ use crate::{
 use indoc::indoc;
 use schema_connector::{
     migrations_directory::MigrationDirectory, BoxFuture, ConnectorError, ConnectorResult, Namespaces,
+    UsingExternalShadowDb,
 };
 use sql_schema_describer::{sqlite::SqlSchemaDescriber, DescriberErrorKind, SqlSchema};
 
+use super::SqlDialect;
+
 type State = imp::State;
 
-pub(crate) struct SqliteFlavour {
-    state: State,
-}
+#[derive(Debug, Default)]
+pub struct SqliteDialect;
 
-impl SqliteFlavour {
-    fn with_connection<'a, F, O, C>(&'a mut self, f: C) -> BoxFuture<'a, ConnectorResult<O>>
-    where
-        O: 'a + Send,
-        C: (FnOnce(&'a imp::Connection, &'a imp::Params) -> F) + Send + Sync + 'a,
-        F: Future<Output = ConnectorResult<O>> + Send + 'a,
-    {
-        Box::pin(async move {
-            let (connection, params) = imp::get_connection_and_params(&mut self.state)?;
-            f(connection, params).await
-        })
-    }
-}
-
-#[cfg(feature = "sqlite-native")]
-impl Default for SqliteFlavour {
-    fn default() -> Self {
-        Self { state: State::Initial }
-    }
-}
-
-impl SqliteFlavour {
-    #[cfg(not(feature = "sqlite-native"))]
-    pub(crate) fn new_external(
-        adapter: std::sync::Arc<dyn quaint::connector::ExternalConnector>,
-        factory: std::sync::Arc<dyn quaint::connector::ExternalConnectorFactory>,
-    ) -> Self {
-        Self {
-            state: State::new(adapter, factory, Default::default()),
-        }
-    }
-
-    #[cfg(feature = "sqlite-native")]
-    pub fn new_with_params(params: schema_connector::ConnectorParams) -> ConnectorResult<Self> {
-        Ok(Self {
-            state: State::WithParams(imp::Params::new(params)?),
-        })
-    }
-}
-
-impl std::fmt::Debug for SqliteFlavour {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.write_str("<SQLite connector>")
-    }
-}
-
-impl SqlConnectorFlavour for SqliteFlavour {
+impl SqlDialect for SqliteDialect {
     fn renderer(&self) -> Box<dyn SqlRenderer> {
         Box::new(SqliteRenderer)
     }
@@ -94,6 +50,101 @@ impl SqlConnectorFlavour for SqliteFlavour {
         &self,
     ) -> Box<dyn crate::sql_destructive_change_checker::DestructiveChangeCheckerFlavour> {
         Box::new(SqliteDestructiveChangeCheckerFlavour)
+    }
+
+    fn datamodel_connector(&self) -> &'static dyn psl::datamodel_connector::Connector {
+        psl::builtin_connectors::SQLITE
+    }
+
+    #[cfg(feature = "sqlite-native")]
+    fn new_shadow_db(
+        &self,
+        url: String,
+        preview_features: psl::PreviewFeatures,
+    ) -> BoxFuture<'_, ConnectorResult<Box<dyn SqlConnector>>> {
+        let params = schema_connector::ConnectorParams::new(url, preview_features, None);
+        Box::pin(async move { Ok(Box::new(SqliteConnector::new_with_params(params)?) as Box<dyn SqlConnector>) })
+    }
+
+    #[cfg(not(feature = "sqlite-native"))]
+    fn new_shadow_db(
+        &self,
+        factory: std::sync::Arc<dyn quaint::connector::ExternalConnectorFactory>,
+    ) -> BoxFuture<'_, ConnectorResult<Box<dyn SqlConnector>>> {
+        Box::pin(async move {
+            let adapter = factory
+                .connect_to_shadow_db()
+                .await
+                .ok_or_else(|| ConnectorError::from_msg("Provided adapter does not support shadow databases".into()))?
+                .map_err(|e| ConnectorError::from_source(e, "Failed to connect to the shadow database"))?;
+            Ok(Box::new(SqliteConnector::new_external(adapter)) as Box<dyn SqlConnector>)
+        })
+    }
+}
+
+pub(crate) struct SqliteConnector {
+    state: State,
+}
+
+impl SqliteConnector {
+    fn with_connection<'a, F, O, C>(&'a mut self, f: C) -> BoxFuture<'a, ConnectorResult<O>>
+    where
+        O: 'a + Send,
+        C: (FnOnce(&'a imp::Connection, &'a imp::Params) -> F) + Send + Sync + 'a,
+        F: Future<Output = ConnectorResult<O>> + Send + 'a,
+    {
+        Box::pin(async move {
+            let (connection, params) = imp::get_connection_and_params(&mut self.state)?;
+            f(connection, params).await
+        })
+    }
+}
+
+#[cfg(feature = "sqlite-native")]
+impl Default for SqliteConnector {
+    fn default() -> Self {
+        Self { state: State::Initial }
+    }
+}
+
+impl SqliteConnector {
+    #[cfg(not(feature = "sqlite-native"))]
+    pub(crate) fn new_external(adapter: std::sync::Arc<dyn quaint::connector::ExternalConnector>) -> Self {
+        Self {
+            state: State::new(adapter, Default::default()),
+        }
+    }
+
+    #[cfg(feature = "sqlite-native")]
+    pub fn new_with_params(params: schema_connector::ConnectorParams) -> ConnectorResult<Self> {
+        Ok(Self {
+            state: State::WithParams(imp::Params::new(params)?),
+        })
+    }
+
+    #[cfg(feature = "sqlite-native")]
+    pub fn new_inmem(preview_features: psl::PreviewFeatures) -> ConnectorResult<Self> {
+        let params = imp::Params::new_inmem(preview_features);
+        let connection = imp::Connection::new_inmem()?;
+        Ok(Self {
+            state: State::Connected(params, connection),
+        })
+    }
+}
+
+impl std::fmt::Debug for SqliteConnector {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str("<SQLite connector>")
+    }
+}
+
+impl SqlConnector for SqliteConnector {
+    fn dialect(&self) -> Box<dyn SqlDialect> {
+        Box::new(SqliteDialect)
+    }
+
+    fn shadow_db_url(&self) -> Option<&str> {
+        imp::get_shadow_db_url(&self.state)
     }
 
     fn acquire_lock(&mut self) -> BoxFuture<'_, ConnectorResult<()>> {
@@ -153,10 +204,6 @@ impl SqlConnectorFlavour for SqliteFlavour {
         "#};
 
         self.raw_cmd(sql)
-    }
-
-    fn datamodel_connector(&self) -> &'static dyn psl::datamodel_connector::Connector {
-        psl::builtin_connectors::SQLITE
     }
 
     fn describe_schema(&mut self, _namespaces: Option<Namespaces>) -> BoxFuture<'_, ConnectorResult<SqlSchema>> {
@@ -293,12 +340,16 @@ impl SqlConnectorFlavour for SqliteFlavour {
         imp::set_preview_features(&mut self.state, preview_features)
     }
 
+    fn preview_features(&self) -> psl::PreviewFeatures {
+        imp::get_preview_features(&self.state)
+    }
+
     #[tracing::instrument(skip(self, migrations))]
     fn sql_schema_from_migration_history<'a>(
         &'a mut self,
         migrations: &'a [MigrationDirectory],
-        _shadow_database_connection_string: Option<String>,
         _namespaces: Option<Namespaces>,
+        external_shadow_db: UsingExternalShadowDb,
     ) -> BoxFuture<'a, ConnectorResult<SqlSchema>> {
         async fn apply_migrations_and_describe(
             connection: &imp::Connection,
@@ -321,12 +372,17 @@ impl SqlConnectorFlavour for SqliteFlavour {
         }
 
         Box::pin(async move {
-            tracing::debug!("Applying migrations to temporary in-memory SQLite database.");
-            let shadow_db_conn = imp::new_shadow_db(&self.state).await?;
-            let result = apply_migrations_and_describe(&shadow_db_conn, migrations).await;
-            // dispose the shadow database connection regardless of the result
-            shadow_db_conn.dispose().await?;
-            result
+            match external_shadow_db {
+                UsingExternalShadowDb::Yes => {
+                    let (conn, _) = imp::get_connection_and_params(&mut self.state)?;
+                    apply_migrations_and_describe(conn, migrations).await
+                }
+                UsingExternalShadowDb::No => {
+                    tracing::debug!("Applying migrations to temporary in-memory SQLite database.");
+                    let conn = imp::new_shadow_db()?;
+                    apply_migrations_and_describe(&conn, migrations).await
+                }
+            }
         })
     }
 
@@ -336,6 +392,10 @@ impl SqlConnectorFlavour for SqliteFlavour {
 
     fn search_path(&self) -> &str {
         "main"
+    }
+
+    fn dispose(&self) -> BoxFuture<'_, ConnectorResult<()>> {
+        Box::pin(async move { imp::dispose(&self.state).await })
     }
 }
 

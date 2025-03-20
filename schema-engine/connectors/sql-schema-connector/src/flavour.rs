@@ -15,27 +15,27 @@ pub mod postgres;
 pub mod sqlite;
 
 #[cfg(feature = "mssql")]
-pub(crate) use mssql::MssqlFlavour;
+pub(crate) use mssql::MssqlConnector;
 
 #[cfg(feature = "mysql")]
-pub(crate) use mysql::MysqlFlavour;
+pub(crate) use mysql::MysqlConnector;
 
 #[cfg(any(feature = "postgresql", feature = "cockroachdb"))]
-pub(crate) use postgres::PostgresFlavour;
+pub(crate) use postgres::PostgresConnector;
 
 #[cfg(feature = "sqlite")]
-pub(crate) use sqlite::SqliteFlavour;
+pub(crate) use sqlite::SqliteConnector;
 
 use crate::{
     sql_destructive_change_checker::DestructiveChangeCheckerFlavour, sql_renderer::SqlRenderer,
     sql_schema_calculator::SqlSchemaCalculatorFlavour, sql_schema_differ::SqlSchemaDifferFlavour,
 };
 use enumflags2::BitFlags;
-use psl::{PreviewFeature, ValidatedSchema};
+use psl::{PreviewFeature, PreviewFeatures, ValidatedSchema};
 use quaint::prelude::{ConnectionInfo, Table};
 use schema_connector::{
     migrations_directory::MigrationDirectory, BoxFuture, ConnectorError, ConnectorResult, IntrospectionContext,
-    MigrationRecord, Namespaces, PersistenceNotInitializedError,
+    MigrationRecord, Namespaces, PersistenceNotInitializedError, UsingExternalShadowDb,
 };
 use sql_schema_describer::SqlSchema;
 use std::fmt::Debug;
@@ -105,11 +105,62 @@ where
     }
 }
 
-pub(crate) trait SqlConnectorFlavour: Send + Sync + Debug {
+pub(crate) trait SqlDialect: Send + Sync + 'static {
     fn renderer(&self) -> Box<dyn SqlRenderer>;
     fn schema_differ(&self) -> Box<dyn SqlSchemaDifferFlavour>;
     fn schema_calculator(&self) -> Box<dyn SqlSchemaCalculatorFlavour>;
     fn destructive_change_checker(&self) -> Box<dyn DestructiveChangeCheckerFlavour>;
+
+    /// Check a schema for preview features not implemented in migrate/introspection.
+    fn check_schema_features(&self, _schema: &psl::ValidatedSchema) -> ConnectorResult<()> {
+        Ok(())
+    }
+
+    /// The datamodel connector corresponding to the flavour
+    fn datamodel_connector(&self) -> &'static dyn psl::datamodel_connector::Connector;
+
+    /// Return an empty database schema. This happens in the flavour, because we need
+    /// SqlSchema::connector_data to be set.
+    fn empty_database_schema(&self) -> SqlSchema {
+        SqlSchema::default()
+    }
+
+    /// Optionally scan a migration script that could have been altered by users and emit warnings.
+    fn scan_migration_script(&self, _script: &str) {}
+
+    /// Table to store applied migrations.
+    fn migrations_table(&self) -> Table<'static> {
+        crate::MIGRATIONS_TABLE_NAME.into()
+    }
+
+    #[cfg(any(
+        feature = "mssql-native",
+        feature = "mysql-native",
+        feature = "postgresql-native",
+        feature = "sqlite-native"
+    ))]
+    fn new_shadow_db(
+        &self,
+        url: String,
+        preview_features: PreviewFeatures,
+    ) -> BoxFuture<'_, ConnectorResult<Box<dyn SqlConnector>>>;
+
+    #[cfg(not(any(
+        feature = "mssql-native",
+        feature = "mysql-native",
+        feature = "postgresql-native",
+        feature = "sqlite-native"
+    )))]
+    fn new_shadow_db(
+        &self,
+        factory: std::sync::Arc<dyn quaint::connector::ExternalConnectorFactory>,
+    ) -> BoxFuture<'_, ConnectorResult<Box<dyn SqlConnector>>>;
+}
+
+pub(crate) trait SqlConnector: Send + Sync + Debug {
+    fn dialect(&self) -> Box<dyn SqlDialect>;
+
+    fn shadow_db_url(&self) -> Option<&str>;
 
     fn acquire_lock(&mut self) -> BoxFuture<'_, ConnectorResult<()>>;
 
@@ -126,11 +177,6 @@ pub(crate) trait SqlConnectorFlavour: Send + Sync + Debug {
         None
     }
 
-    /// Check a schema for preview features not implemented in migrate/introspection.
-    fn check_schema_features(&self, _schema: &psl::ValidatedSchema) -> ConnectorResult<()> {
-        Ok(())
-    }
-
     /// See MigrationConnector::connector_type()
     fn connector_type(&self) -> &'static str;
 
@@ -139,9 +185,6 @@ pub(crate) trait SqlConnectorFlavour: Send + Sync + Debug {
 
     /// Initialize the `_prisma_migrations` table.
     fn create_migrations_table(&mut self) -> BoxFuture<'_, ConnectorResult<()>>;
-
-    /// The datamodel connector corresponding to the flavour
-    fn datamodel_connector(&self) -> &'static dyn psl::datamodel_connector::Connector;
 
     fn describe_schema(&mut self, namespaces: Option<Namespaces>) -> BoxFuture<'_, ConnectorResult<SqlSchema>>;
 
@@ -154,12 +197,6 @@ pub(crate) trait SqlConnectorFlavour: Send + Sync + Debug {
     /// List all visible tables in the given namespaces,
     /// including the search path.
     fn table_names(&mut self, namespaces: Option<Namespaces>) -> BoxFuture<'_, ConnectorResult<Vec<String>>>;
-
-    /// Return an empty database schema. This happens in the flavour, because we need
-    /// SqlSchema::connector_data to be set.
-    fn empty_database_schema(&self) -> SqlSchema {
-        SqlSchema::default()
-    }
 
     /// Check a connection to make sure it is usable by the schema engine.
     /// This can include some set up on the database, like ensuring that the
@@ -185,7 +222,7 @@ pub(crate) trait SqlConnectorFlavour: Send + Sync + Debug {
     ) -> BoxFuture<'_, ConnectorResult<Result<Vec<MigrationRecord>, PersistenceNotInitializedError>>> {
         use quaint::prelude::*;
         Box::pin(async move {
-            let select = Select::from_table(self.migrations_table())
+            let select = Select::from_table(self.dialect().migrations_table())
                 .column("id")
                 .column("checksum")
                 .column("finished_at")
@@ -265,17 +302,14 @@ pub(crate) trait SqlConnectorFlavour: Send + Sync + Debug {
     /// Drop the database and recreate it empty.
     fn reset(&mut self, namespaces: Option<Namespaces>) -> BoxFuture<'_, ConnectorResult<()>>;
 
-    /// Optionally scan a migration script that could have been altered by users and emit warnings.
-    fn scan_migration_script(&self, _script: &str) {}
-
     /// Apply the given migration history to a shadow database, and return
     /// the final introspected SQL schema. The third parameter is an optional shadow database url
     /// in case there is one at this point of the command, but not earlier in set_params().
     fn sql_schema_from_migration_history<'a>(
         &'a mut self,
         migrations: &'a [MigrationDirectory],
-        shadow_database_url: Option<String>,
         namespaces: Option<Namespaces>,
+        external_shadow_db: UsingExternalShadowDb,
     ) -> BoxFuture<'a, ConnectorResult<SqlSchema>>;
 
     /// Sets the preview features. This is currently useful for MultiSchema, as we want to
@@ -283,16 +317,15 @@ pub(crate) trait SqlConnectorFlavour: Send + Sync + Debug {
     /// the schema.
     /// WARNING: This may silently not do anything if the connector is in the initial state.
     /// If this is ever a problem, considering returning an indicator of success.
-    fn set_preview_features(&mut self, preview_features: BitFlags<psl::PreviewFeature>);
+    fn set_preview_features(&mut self, preview_features: PreviewFeatures);
 
-    /// Table to store applied migrations.
-    fn migrations_table(&self) -> Table<'static> {
-        crate::MIGRATIONS_TABLE_NAME.into()
-    }
+    fn preview_features(&self) -> PreviewFeatures;
 
     fn version(&mut self) -> BoxFuture<'_, ConnectorResult<Option<String>>>;
 
     fn search_path(&self) -> &str;
+
+    fn dispose(&self) -> BoxFuture<'_, ConnectorResult<()>>;
 }
 
 // Utility function shared by multiple flavours to compare shadow database and main connection.

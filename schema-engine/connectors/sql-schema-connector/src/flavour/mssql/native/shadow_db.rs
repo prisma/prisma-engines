@@ -1,10 +1,10 @@
-use crate::flavour::{MssqlFlavour, SqlConnectorFlavour};
+use crate::flavour::{MssqlConnector, SqlConnector};
 use schema_connector::{migrations_directory::MigrationDirectory, ConnectorResult, Namespaces};
 use sql_schema_describer::SqlSchema;
 
 pub async fn sql_schema_from_migrations_history(
     migrations: &[MigrationDirectory],
-    mut shadow_db: MssqlFlavour,
+    shadow_db: &mut MssqlConnector,
     namespaces: Option<Namespaces>,
 ) -> ConnectorResult<SqlSchema> {
     for migration in migrations {

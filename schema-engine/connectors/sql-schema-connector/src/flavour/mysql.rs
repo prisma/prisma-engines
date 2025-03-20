@@ -11,7 +11,7 @@ use native::{shadow_db, Connection};
 use wasm::{shadow_db, Connection};
 
 use crate::{
-    error::SystemDatabase, flavour::SqlConnectorFlavour,
+    error::SystemDatabase, flavour::SqlConnector,
     sql_destructive_change_checker::destructive_change_checker_flavour::mysql::MysqlDestructiveChangeCheckerFlavour,
     sql_renderer::mysql_renderer::MysqlRenderer,
     sql_schema_calculator::sql_schema_calculator_flavour::mysql::MysqlSchemaCalculatorFlavour,
@@ -24,11 +24,14 @@ use quaint::connector::MysqlUrl;
 use regex::{Regex, RegexSet};
 use schema_connector::{
     migrations_directory::MigrationDirectory, BoxFuture, ConnectorError, ConnectorParams, ConnectorResult, Namespaces,
+    UsingExternalShadowDb,
 };
 use sql_schema_describer::SqlSchema;
 use std::{future, sync::LazyLock};
 use url::Url;
 use versions::Versioning;
+
+use super::SqlDialect;
 
 const ADVISORY_LOCK_TIMEOUT: std::time::Duration = std::time::Duration::from_secs(10);
 static QUALIFIED_NAME_RE: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"`[^ ]+`\.`[^ ]+`").unwrap());
@@ -42,6 +45,10 @@ struct Params {
 
 impl Params {
     fn new(connector_params: ConnectorParams) -> ConnectorResult<Self> {
+        if let Some(shadow_db_url) = &connector_params.shadow_database_connection_string {
+            super::validate_connection_infos_do_not_match(&connector_params.connection_string, shadow_db_url)?;
+        }
+
         let url = connector_params
             .connection_string
             .parse()
@@ -51,25 +58,82 @@ impl Params {
     }
 }
 
-pub(crate) struct MysqlFlavour {
+#[derive(Debug, Default)]
+pub struct MysqlDialect {
+    circumstances: BitFlags<Circumstances>,
+}
+
+impl MysqlDialect {
+    fn new(circumstances: BitFlags<Circumstances>) -> Self {
+        Self { circumstances }
+    }
+}
+
+impl SqlDialect for MysqlDialect {
+    fn renderer(&self) -> Box<dyn crate::sql_renderer::SqlRenderer> {
+        Box::new(MysqlRenderer)
+    }
+
+    fn schema_differ(&self) -> Box<dyn crate::sql_schema_differ::SqlSchemaDifferFlavour> {
+        Box::new(MysqlSchemaDifferFlavour::new(self.circumstances))
+    }
+
+    fn schema_calculator(&self) -> Box<dyn crate::sql_schema_calculator::SqlSchemaCalculatorFlavour> {
+        Box::new(MysqlSchemaCalculatorFlavour)
+    }
+
+    fn destructive_change_checker(
+        &self,
+    ) -> Box<dyn crate::sql_destructive_change_checker::DestructiveChangeCheckerFlavour> {
+        Box::new(MysqlDestructiveChangeCheckerFlavour)
+    }
+
+    fn datamodel_connector(&self) -> &'static dyn datamodel_connector::Connector {
+        psl::builtin_connectors::MYSQL
+    }
+
+    fn scan_migration_script(&self, script: &str) {
+        scan_migration_script_impl(script)
+    }
+
+    #[cfg(feature = "mysql-native")]
+    fn new_shadow_db(
+        &self,
+        url: String,
+        preview_features: psl::PreviewFeatures,
+    ) -> BoxFuture<'_, ConnectorResult<Box<dyn SqlConnector>>> {
+        let params = ConnectorParams::new(url, preview_features, None);
+        Box::pin(async move { Ok(Box::new(MysqlConnector::new_with_params(params)?) as Box<dyn SqlConnector>) })
+    }
+
+    #[cfg(not(feature = "mysql-native"))]
+    fn new_shadow_db(
+        &self,
+        factory: Arc<dyn ExternalConnectorFactory>,
+    ) -> BoxFuture<'_, ConnectorResult<Box<dyn SqlConnector>>> {
+        todo!("MySQL WASM shadow database not supported yet")
+    }
+}
+
+pub(crate) struct MysqlConnector {
     state: State,
 }
 
-impl Default for MysqlFlavour {
+impl Default for MysqlConnector {
     fn default() -> Self {
         Self { state: State::Initial }
     }
 }
 
-impl std::fmt::Debug for MysqlFlavour {
+impl std::fmt::Debug for MysqlConnector {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_struct("MysqlFlavour").finish()
     }
 }
 
-impl MysqlFlavour {
+impl MysqlConnector {
     pub fn new_with_params(params: ConnectorParams) -> ConnectorResult<Self> {
-        Ok(MysqlFlavour {
+        Ok(MysqlConnector {
             state: State::WithParams(Params::new(params)?),
         })
     }
@@ -90,23 +154,17 @@ impl MysqlFlavour {
     }
 }
 
-impl SqlConnectorFlavour for MysqlFlavour {
-    fn renderer(&self) -> Box<dyn crate::sql_renderer::SqlRenderer> {
-        Box::new(MysqlRenderer)
+impl SqlConnector for MysqlConnector {
+    fn dialect(&self) -> Box<dyn SqlDialect> {
+        Box::new(MysqlDialect::new(self.circumstances()))
     }
 
-    fn schema_differ(&self) -> Box<dyn crate::sql_schema_differ::SqlSchemaDifferFlavour> {
-        Box::new(MysqlSchemaDifferFlavour::new(self.circumstances()))
-    }
-
-    fn schema_calculator(&self) -> Box<dyn crate::sql_schema_calculator::SqlSchemaCalculatorFlavour> {
-        Box::new(MysqlSchemaCalculatorFlavour)
-    }
-
-    fn destructive_change_checker(
-        &self,
-    ) -> Box<dyn crate::sql_destructive_change_checker::DestructiveChangeCheckerFlavour> {
-        Box::new(MysqlDestructiveChangeCheckerFlavour)
+    fn shadow_db_url(&self) -> Option<&str> {
+        self.state
+            .params()?
+            .connector_params
+            .shadow_database_connection_string
+            .as_deref()
     }
 
     fn acquire_lock(&mut self) -> BoxFuture<'_, ConnectorResult<()>> {
@@ -130,10 +188,6 @@ impl SqlConnectorFlavour for MysqlFlavour {
 
     fn connector_type(&self) -> &'static str {
         "mysql"
-    }
-
-    fn datamodel_connector(&self) -> &'static dyn datamodel_connector::Connector {
-        psl::builtin_connectors::MYSQL
     }
 
     fn describe_schema(&mut self, _namespaces: Option<Namespaces>) -> BoxFuture<'_, ConnectorResult<SqlSchema>> {
@@ -321,50 +375,26 @@ impl SqlConnectorFlavour for MysqlFlavour {
         })
     }
 
-    fn scan_migration_script(&self, script: &str) {
-        scan_migration_script_impl(script)
-    }
-
     #[tracing::instrument(skip(self, migrations))]
     fn sql_schema_from_migration_history<'a>(
         &'a mut self,
         migrations: &'a [MigrationDirectory],
-        shadow_database_connection_string: Option<String>,
         namespaces: Option<Namespaces>,
+        external_shadow_db: UsingExternalShadowDb,
     ) -> BoxFuture<'a, ConnectorResult<SqlSchema>> {
-        let shadow_database_connection_string = shadow_database_connection_string.or_else(|| {
-            self.state
-                .params()
-                .and_then(|p| p.connector_params.shadow_database_connection_string.clone())
-        });
-
-        match shadow_database_connection_string {
-            Some(shadow_database_connection_string) => Box::pin(async move {
-                if let Some(params) = self.state.params() {
-                    super::validate_connection_infos_do_not_match(
-                        &shadow_database_connection_string,
-                        &params.connector_params.connection_string,
-                    )?;
-                }
-
-                let preview_features = self
-                    .state
-                    .params()
-                    .map(|cp| cp.connector_params.preview_features)
-                    .unwrap_or_default();
-                let connector_params = ConnectorParams::new(shadow_database_connection_string, preview_features, None);
-                let mut shadow_database = MysqlFlavour::new_with_params(connector_params)?;
-
-                shadow_database.ensure_connection_validity().await?;
+        match external_shadow_db {
+            UsingExternalShadowDb::Yes => Box::pin(async move {
+                self.ensure_connection_validity().await?;
 
                 tracing::info!("Connecting to user-provided shadow database.");
-                if shadow_database.reset(None).await.is_err() {
-                    crate::best_effort_reset(&mut shadow_database, namespaces).await?;
+                if self.reset(None).await.is_err() {
+                    crate::best_effort_reset(self, namespaces).await?;
                 }
 
-                shadow_db::sql_schema_from_migrations_history(migrations, shadow_database).await
+                shadow_db::sql_schema_from_migrations_history(migrations, self).await
             }),
-            None => {
+
+            UsingExternalShadowDb::No => {
                 with_connection(&mut self.state, move |params, _circumstances, conn| async move {
                     let shadow_database_name = crate::new_shadow_database_name();
 
@@ -382,11 +412,11 @@ impl SqlConnectorFlavour for MysqlFlavour {
                     let preview_features = params.connector_params.preview_features;
                     let connector_params =
                         ConnectorParams::new(shadow_database_url.to_string(), preview_features, None);
-                    let shadow_database = MysqlFlavour::new_with_params(connector_params)?;
+                    let mut shadow_database = MysqlConnector::new_with_params(connector_params)?;
                     // We go through the whole process without early return, then clean up
                     // the shadow database, and only then return the result. This avoids
                     // leaving shadow databases behind in case of e.g. faulty migrations.
-                    let ret = shadow_db::sql_schema_from_migrations_history(migrations, shadow_database).await;
+                    let ret = shadow_db::sql_schema_from_migrations_history(migrations, &mut shadow_database).await;
 
                     let drop_database = format!("DROP DATABASE IF EXISTS `{shadow_database_name}`");
                     conn.raw_cmd(&drop_database, &params.url).await?;
@@ -410,6 +440,13 @@ impl SqlConnectorFlavour for MysqlFlavour {
         }
     }
 
+    fn preview_features(&self) -> psl::PreviewFeatures {
+        self.state
+            .params()
+            .map(|p| p.connector_params.preview_features)
+            .unwrap_or_default()
+    }
+
     fn version(&mut self) -> BoxFuture<'_, ConnectorResult<Option<String>>> {
         with_connection(&mut self.state, |params, _, connection| async {
             connection.version(&params.url).await
@@ -427,6 +464,11 @@ impl SqlConnectorFlavour for MysqlFlavour {
         with_connection(&mut self.state, move |conn_params, circumstances, conn| {
             conn.describe_query(sql, &conn_params.url, circumstances)
         })
+    }
+
+    fn dispose(&self) -> BoxFuture<'_, ConnectorResult<()>> {
+        // Nothing to on dispose, the connection is disposed in Drop
+        Box::pin(async move { Ok(()) })
     }
 }
 
@@ -580,7 +622,7 @@ mod tests {
         let url = "mysql://myname:mypassword@myserver:8765/mydbname";
 
         let connector_params = ConnectorParams::new(url.to_owned(), Default::default(), None);
-        let flavour = MysqlFlavour::new_with_params(connector_params).unwrap();
+        let flavour = MysqlConnector::new_with_params(connector_params).unwrap();
         let debugged = format!("{flavour:?}");
 
         let words = &["myname", "mypassword", "myserver", "8765", "mydbname"];

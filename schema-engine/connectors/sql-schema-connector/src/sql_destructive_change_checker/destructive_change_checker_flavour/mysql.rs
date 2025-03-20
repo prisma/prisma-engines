@@ -1,6 +1,6 @@
 use super::DestructiveChangeCheckerFlavour;
 use crate::{
-    flavour::SqlConnectorFlavour,
+    flavour::SqlConnector,
     migration_pair::MigrationPair,
     sql_destructive_change_checker::{
         check::{Column, Table},
@@ -139,7 +139,7 @@ impl DestructiveChangeCheckerFlavour for MysqlDestructiveChangeCheckerFlavour {
 
     fn count_rows_in_table<'a>(
         &'a mut self,
-        connector: &'a mut dyn SqlConnectorFlavour,
+        connector: &'a mut dyn SqlConnector,
         table: &'a Table,
     ) -> BoxFuture<'a, ConnectorResult<i64>> {
         // TODO(MultiSchema): replace this when implementing MySQL.
@@ -154,7 +154,7 @@ impl DestructiveChangeCheckerFlavour for MysqlDestructiveChangeCheckerFlavour {
 
     fn count_values_in_column<'a>(
         &'a mut self,
-        connector: &'a mut dyn SqlConnectorFlavour,
+        connector: &'a mut dyn SqlConnector,
         column: &'a Column,
     ) -> BoxFuture<'a, ConnectorResult<i64>> {
         // TODO(MultiSchema): replace this when implementing MySQL.
@@ -177,7 +177,7 @@ impl DestructiveChangeCheckerFlavour for MysqlDestructiveChangeCheckerFlavour {
 /// Vitess_, schema changes are asynchronous, they can take time to take effect. That causes
 /// failures in destructive change checks. Trying again later, in this case, works.
 async fn query_with_backoff(
-    flavour: &mut dyn SqlConnectorFlavour,
+    flavour: &mut dyn SqlConnector,
     query: &str,
 ) -> ConnectorResult<quaint::prelude::ResultSet> {
     let delay = std::time::Duration::from_millis(400);

@@ -1,53 +1,32 @@
-use crate::flavour::postgres::{sql_schema_from_migrations_and_db, Circumstances, MigratePostgresUrl};
-use crate::flavour::{validate_connection_infos_do_not_match, PostgresFlavour, SqlConnectorFlavour};
+use crate::flavour::postgres::{sql_schema_from_migrations_and_db, MigratePostgresUrl};
+use crate::flavour::{PostgresConnector, SqlConnector};
 use schema_connector::{migrations_directory::MigrationDirectory, ConnectorResult};
-use schema_connector::{ConnectorError, ConnectorParams, Namespaces};
+use schema_connector::{ConnectorError, ConnectorParams, Namespaces, UsingExternalShadowDb};
 use sql_schema_describer::SqlSchema;
 use url::Url;
 
 use super::{Connection, PostgresProvider};
 
 pub async fn sql_schema_from_migration_history(
-    state: &mut super::State,
+    connector: &mut PostgresConnector,
     provider: PostgresProvider,
     migrations: &[MigrationDirectory],
-    shadow_database_connection_string: Option<String>,
     namespaces: Option<Namespaces>,
+    external_shadow_db: UsingExternalShadowDb,
 ) -> ConnectorResult<SqlSchema> {
-    let shadow_database_connection_string = shadow_database_connection_string.or_else(|| {
-        state
-            .params()
-            .and_then(|p| p.connector_params.shadow_database_connection_string.clone())
-    });
+    let is_vanilla_postgres = provider == PostgresProvider::PostgreSql && !connector.is_cockroachdb();
 
-    let is_vanilla_postgres = provider == PostgresProvider::PostgreSql
-        && super::get_circumstances(state).is_none_or(|c| !c.contains(Circumstances::IsCockroachDb));
-
-    match shadow_database_connection_string {
-        Some(shadow_database_connection_string) => {
-            if let Some(params) = state.params() {
-                validate_connection_infos_do_not_match(
-                    &shadow_database_connection_string,
-                    &params.connector_params.connection_string,
-                )?;
-            }
-
-            let preview_features = state
-                .params()
-                .map(|p| p.connector_params.preview_features)
-                .unwrap_or_default();
-            let connector_params = ConnectorParams::new(shadow_database_connection_string, preview_features, None);
-            let mut shadow_database = PostgresFlavour::new_with_params(connector_params)?;
-
+    match external_shadow_db {
+        UsingExternalShadowDb::Yes => {
             tracing::info!("Connecting to user-provided shadow database.");
-            shadow_database.ensure_connection_validity().await?;
+            connector.ensure_connection_validity().await?;
 
-            if shadow_database.reset(namespaces.clone()).await.is_err() {
-                crate::best_effort_reset(&mut shadow_database, namespaces.clone()).await?;
+            if connector.reset(namespaces.clone()).await.is_err() {
+                crate::best_effort_reset(connector, namespaces.clone()).await?;
             }
 
-            let circumstances = shadow_database.circumstances().unwrap_or_default();
-            shadow_database
+            let circumstances = connector.circumstances().unwrap_or_default();
+            connector
                 .with_connection(|conn, params| {
                     sql_schema_from_migrations_and_db(
                         conn,
@@ -61,8 +40,8 @@ pub async fn sql_schema_from_migration_history(
                 })
                 .await
         }
-        None => {
-            let (main_connection, params) = super::get_connection_and_params(state, provider).await?;
+        UsingExternalShadowDb::No => {
+            let (main_connection, params) = super::get_connection_and_params(&mut connector.state, provider).await?;
             let shadow_database_name = crate::new_shadow_database_name();
 
             {
@@ -89,7 +68,7 @@ pub async fn sql_schema_from_migration_history(
 
             let preview_features = params.connector_params.preview_features;
             let connector_params = ConnectorParams::new(shadow_database_url.to_string(), preview_features, None);
-            let mut shadow_database = PostgresFlavour::new_with_params(connector_params)?;
+            let mut shadow_database = PostgresConnector::new_with_params(connector_params)?;
             tracing::debug!("Connecting to shadow database `{}`", shadow_database_name);
             shadow_database.ensure_connection_validity().await?;
 
@@ -128,6 +107,12 @@ pub async fn sql_schema_from_migration_history(
             ret
         }
     }
+
+    // match shadow_database_connection_string {
+    //     Some(shadow_database_connection_string) => {}
+    //     None => {
+
+    // }
 }
 
 /// Drop a database using `WITH (FORCE)` syntax.

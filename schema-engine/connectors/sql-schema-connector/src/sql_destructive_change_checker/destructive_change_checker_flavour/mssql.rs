@@ -1,6 +1,6 @@
 use super::DestructiveChangeCheckerFlavour;
 use crate::{
-    flavour::SqlConnectorFlavour,
+    flavour::SqlConnector,
     migration_pair::MigrationPair,
     sql_destructive_change_checker::{
         check::{Column, Table},
@@ -140,7 +140,7 @@ impl DestructiveChangeCheckerFlavour for MssqlDestructiveChangeCheckerFlavour {
 
     fn count_rows_in_table<'a>(
         &'a mut self,
-        connector: &'a mut dyn SqlConnectorFlavour,
+        connector: &'a mut dyn SqlConnector,
         table: &'a Table,
     ) -> BoxFuture<'a, ConnectorResult<i64>> {
         Box::pin(async move {
@@ -155,7 +155,7 @@ impl DestructiveChangeCheckerFlavour for MssqlDestructiveChangeCheckerFlavour {
 
     fn count_values_in_column<'a>(
         &'a mut self,
-        connector: &'a mut dyn SqlConnectorFlavour,
+        connector: &'a mut dyn SqlConnector,
         column: &'a Column,
     ) -> BoxFuture<'a, ConnectorResult<i64>> {
         Box::pin(async move {

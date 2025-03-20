@@ -16,7 +16,7 @@ use crate::{
     sql_destructive_change_checker::destructive_change_checker_flavour::postgres::PostgresDestructiveChangeCheckerFlavour,
     sql_renderer::postgres_renderer::PostgresRenderer,
     sql_schema_calculator::sql_schema_calculator_flavour::postgres::PostgresSchemaCalculatorFlavour,
-    sql_schema_differ::sql_schema_differ_flavour::postgres::PostgresSchemaDifferFlavour, SqlConnectorFlavour,
+    sql_schema_differ::sql_schema_differ_flavour::postgres::PostgresSchemaDifferFlavour, SqlConnector,
 };
 use enumflags2::BitFlags;
 use indoc::indoc;
@@ -26,6 +26,7 @@ use quaint::{
 };
 use schema_connector::{
     migrations_directory::MigrationDirectory, BoxFuture, ConnectorError, ConnectorResult, Namespaces,
+    UsingExternalShadowDb,
 };
 use sql_schema_describer::{postgres::PostgresSchemaExt, SqlSchema};
 use std::{
@@ -36,6 +37,8 @@ use std::{
     time,
 };
 use url::Url;
+
+use super::SqlDialect;
 
 const ADVISORY_LOCK_TIMEOUT: time::Duration = time::Duration::from_secs(10);
 
@@ -121,13 +124,91 @@ pub(crate) enum PostgresProvider {
     Unspecified,
 }
 
-pub(crate) struct PostgresFlavour {
+#[derive(Debug, Default)]
+pub struct PostgresDialect {
+    circumstances: BitFlags<Circumstances>,
+}
+
+impl PostgresDialect {
+    fn new(circumstances: BitFlags<Circumstances>) -> Self {
+        Self { circumstances }
+    }
+
+    pub fn cockroach() -> Self {
+        Self::new(Circumstances::IsCockroachDb.into())
+    }
+
+    fn is_cockroachdb(&self) -> bool {
+        self.circumstances.contains(Circumstances::IsCockroachDb)
+    }
+}
+
+impl SqlDialect for PostgresDialect {
+    fn renderer(&self) -> Box<dyn crate::sql_renderer::SqlRenderer> {
+        Box::new(PostgresRenderer::new(self.is_cockroachdb()))
+    }
+
+    fn schema_differ(&self) -> Box<dyn crate::sql_schema_differ::SqlSchemaDifferFlavour> {
+        Box::new(PostgresSchemaDifferFlavour::new(self.circumstances))
+    }
+
+    fn schema_calculator(&self) -> Box<dyn crate::sql_schema_calculator::SqlSchemaCalculatorFlavour> {
+        Box::new(PostgresSchemaCalculatorFlavour::new(self.circumstances))
+    }
+
+    fn destructive_change_checker(
+        &self,
+    ) -> Box<dyn crate::sql_destructive_change_checker::DestructiveChangeCheckerFlavour> {
+        Box::new(PostgresDestructiveChangeCheckerFlavour::new(self.circumstances))
+    }
+
+    fn datamodel_connector(&self) -> &'static dyn psl::datamodel_connector::Connector {
+        if self.is_cockroachdb() {
+            psl::builtin_connectors::COCKROACH
+        } else {
+            psl::builtin_connectors::POSTGRES
+        }
+    }
+
+    fn empty_database_schema(&self) -> SqlSchema {
+        let mut schema = SqlSchema::default();
+        schema.set_connector_data(Box::<sql_schema_describer::postgres::PostgresSchemaExt>::default());
+        schema
+    }
+
+    #[cfg(feature = "postgresql-native")]
+    fn new_shadow_db(
+        &self,
+        url: String,
+        preview_features: psl::PreviewFeatures,
+    ) -> BoxFuture<'_, ConnectorResult<Box<dyn SqlConnector>>> {
+        let params = schema_connector::ConnectorParams::new(url, preview_features, None);
+        Box::pin(async move { Ok(Box::new(PostgresConnector::new_with_params(params)?) as Box<dyn SqlConnector>) })
+    }
+
+    #[cfg(not(feature = "postgresql-native"))]
+    fn new_shadow_db(
+        &self,
+        factory: std::sync::Arc<dyn quaint::connector::ExternalConnectorFactory>,
+    ) -> BoxFuture<'_, ConnectorResult<Box<dyn SqlConnector>>> {
+        Box::pin(async move {
+            let adapter = factory
+                .connect_to_shadow_db()
+                .await
+                .ok_or_else(|| ConnectorError::from_msg("Provided adapter does not support shadow databases".into()))?
+                .map_err(|e| ConnectorError::from_source(e, "Failed to connect to the shadow database"))?;
+            Ok(Box::new(PostgresConnector::new_external(adapter).await?) as Box<dyn SqlConnector>)
+        })
+    }
+}
+
+pub(crate) struct PostgresConnector {
     state: State,
     provider: PostgresProvider,
 }
 
 #[cfg(feature = "postgresql-native")]
-impl Default for PostgresFlavour {
+impl Default for PostgresConnector {
     fn default() -> Self {
         Self {
             state: State::Initial,
@@ -136,21 +217,20 @@ impl Default for PostgresFlavour {
     }
 }
 
-impl std::fmt::Debug for PostgresFlavour {
+impl std::fmt::Debug for PostgresConnector {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.write_str("<PostgreSQL connector>")
     }
 }
 
-impl PostgresFlavour {
+impl PostgresConnector {
     #[cfg(not(feature = "postgresql-native"))]
     pub(crate) async fn new_external(
         adapter: std::sync::Arc<dyn quaint::connector::ExternalConnector>,
-        factory: std::sync::Arc<dyn quaint::connector::ExternalConnectorFactory>,
     ) -> ConnectorResult<Self> {
         let provider = PostgresProvider::Unspecified;
-        Ok(PostgresFlavour {
-            state: State::new(adapter, factory, provider, Default::default()).await?,
+        Ok(PostgresConnector {
+            state: State::new(adapter, provider, Default::default()).await?,
             provider,
         })
     }
@@ -215,29 +295,13 @@ impl PostgresFlavour {
     }
 }
 
-impl SqlConnectorFlavour for PostgresFlavour {
-    fn renderer(&self) -> Box<dyn crate::sql_renderer::SqlRenderer> {
-        Box::new(PostgresRenderer::new(self.is_cockroachdb()))
+impl SqlConnector for PostgresConnector {
+    fn dialect(&self) -> Box<dyn SqlDialect> {
+        Box::new(PostgresDialect::new(self.circumstances().unwrap_or_default()))
     }
 
-    fn schema_differ(&self) -> Box<dyn crate::sql_schema_differ::SqlSchemaDifferFlavour> {
-        Box::new(PostgresSchemaDifferFlavour::new(
-            self.circumstances().unwrap_or_default(),
-        ))
-    }
-
-    fn schema_calculator(&self) -> Box<dyn crate::sql_schema_calculator::SqlSchemaCalculatorFlavour> {
-        Box::new(PostgresSchemaCalculatorFlavour::new(
-            self.circumstances().unwrap_or_default(),
-        ))
-    }
-
-    fn destructive_change_checker(
-        &self,
-    ) -> Box<dyn crate::sql_destructive_change_checker::DestructiveChangeCheckerFlavour> {
-        Box::new(PostgresDestructiveChangeCheckerFlavour::new(
-            self.circumstances().unwrap_or_default(),
-        ))
+    fn shadow_db_url(&self) -> Option<&str> {
+        imp::get_shadow_db_url(&self.state)
     }
 
     fn acquire_lock(&mut self) -> BoxFuture<'_, ConnectorResult<()>> {
@@ -297,14 +361,6 @@ impl SqlConnectorFlavour for PostgresFlavour {
 
             Ok(table_names)
         })
-    }
-
-    fn datamodel_connector(&self) -> &'static dyn psl::datamodel_connector::Connector {
-        if self.is_cockroachdb() {
-            psl::builtin_connectors::COCKROACH
-        } else {
-            psl::builtin_connectors::POSTGRES
-        }
     }
 
     fn describe_schema(&mut self, namespaces: Option<Namespaces>) -> BoxFuture<'_, ConnectorResult<SqlSchema>> {
@@ -408,12 +464,6 @@ impl SqlConnectorFlavour for PostgresFlavour {
         self.raw_cmd("DROP TABLE _prisma_migrations")
     }
 
-    fn empty_database_schema(&self) -> SqlSchema {
-        let mut schema = SqlSchema::default();
-        schema.set_connector_data(Box::<sql_schema_describer::postgres::PostgresSchemaExt>::default());
-        schema
-    }
-
     fn ensure_connection_validity(&mut self) -> BoxFuture<'_, ConnectorResult<()>> {
         self.with_connection(|_, _| future::ready(Ok(())))
     }
@@ -456,19 +506,23 @@ impl SqlConnectorFlavour for PostgresFlavour {
         imp::set_preview_features(&mut self.state, preview_features)
     }
 
+    fn preview_features(&self) -> psl::PreviewFeatures {
+        imp::get_preview_features(&self.state)
+    }
+
     #[tracing::instrument(skip(self, migrations))]
     fn sql_schema_from_migration_history<'a>(
         &'a mut self,
         migrations: &'a [MigrationDirectory],
-        shadow_database_connection_string: Option<String>,
         namespaces: Option<Namespaces>,
+        external_shadow_db: UsingExternalShadowDb,
     ) -> BoxFuture<'a, ConnectorResult<SqlSchema>> {
         Box::pin(imp::shadow_db::sql_schema_from_migration_history(
-            &mut self.state,
+            self,
             self.provider,
             migrations,
-            shadow_database_connection_string,
             namespaces,
+            external_shadow_db,
         ))
     }
 
@@ -480,6 +534,10 @@ impl SqlConnectorFlavour for PostgresFlavour {
 
     fn search_path(&self) -> &str {
         self.schema_name()
+    }
+
+    fn dispose(&self) -> BoxFuture<'_, ConnectorResult<()>> {
+        Box::pin(async move { imp::dispose(&self.state).await })
     }
 }
 
@@ -682,7 +740,7 @@ mod tests {
         let url = "postgresql://myname:mypassword@myserver:8765/mydbname";
 
         let params = ConnectorParams::new(url.to_owned(), Default::default(), None);
-        let flavour = PostgresFlavour::new_with_params(params).unwrap();
+        let flavour = PostgresConnector::new_with_params(params).unwrap();
         let debugged = format!("{flavour:?}");
 
         let words = &["myname", "mypassword", "myserver", "8765", "mydbname"];

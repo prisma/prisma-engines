@@ -15,7 +15,7 @@ use super::{
     DestructiveCheckPlan,
 };
 use crate::{
-    migration_pair::MigrationPair, sql_migration::AlterColumn, sql_schema_differ::ColumnChanges, SqlConnectorFlavour,
+    migration_pair::MigrationPair, sql_migration::AlterColumn, sql_schema_differ::ColumnChanges, SqlConnector,
 };
 use schema_connector::{BoxFuture, ConnectorError, ConnectorResult};
 use sql_schema_describer::walkers::TableColumnWalker;
@@ -42,13 +42,13 @@ pub(crate) trait DestructiveChangeCheckerFlavour: Send + Sync {
 
     fn count_rows_in_table<'a>(
         &'a mut self,
-        connector: &'a mut dyn SqlConnectorFlavour,
+        connector: &'a mut dyn SqlConnector,
         table: &'a Table,
     ) -> BoxFuture<'a, ConnectorResult<i64>>;
 
     fn count_values_in_column<'a>(
         &'a mut self,
-        connector: &'a mut dyn SqlConnectorFlavour,
+        connector: &'a mut dyn SqlConnector,
         column: &'a Column,
     ) -> BoxFuture<'a, ConnectorResult<i64>>;
 }

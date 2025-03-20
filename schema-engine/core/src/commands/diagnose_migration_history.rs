@@ -2,7 +2,7 @@ use crate::CoreResult;
 use json_rpc::types::MigrationList;
 use schema_connector::{
     migrations_directory::{error_on_changed_provider, list_migrations, MigrationDirectory},
-    ConnectorError, DiffTarget, MigrationRecord, Namespaces, PersistenceNotInitializedError, SchemaConnector,
+    ConnectorError, MigrationRecord, Namespaces, PersistenceNotInitializedError, SchemaConnector,
 };
 use serde::{Deserialize, Serialize};
 
@@ -131,20 +131,20 @@ pub async fn diagnose_migration_history(
             // TODO(MultiSchema): this should probably fill the following namespaces from the CLI since there is
             // no schema to grab the namespaces off, in the case of MultiSchema.
             let from = connector
-                .database_schema_from_diff_target(DiffTarget::Migrations(&applied_migrations), None, namespaces.clone())
+                .schema_from_migrations(&applied_migrations, namespaces.clone())
                 .await;
-            let to = connector
-                .database_schema_from_diff_target(DiffTarget::Database, None, namespaces.clone())
-                .await;
-            let drift = match from.and_then(|from| to.map(|to| connector.diff(from, to))).map(|mig| {
-                if connector.migration_is_empty(&mig) {
-                    None
-                } else {
-                    Some(mig)
-                }
-            }) {
+            let to = connector.schema_from_database(namespaces.clone()).await;
+            let drift = match from
+                .and_then(|from| to.map(|to| connector.schema_dialect().diff(from, to)))
+                .map(|mig| {
+                    if connector.schema_dialect().migration_is_empty(&mig) {
+                        None
+                    } else {
+                        Some(mig)
+                    }
+                }) {
                 Ok(Some(drift)) => Some(DriftDiagnostic::DriftDetected {
-                    summary: connector.migration_summary(&drift),
+                    summary: connector.schema_dialect().migration_summary(&drift),
                 }),
                 Err(error) => Some(DriftDiagnostic::MigrationFailedToApply { error }),
                 _ => None,

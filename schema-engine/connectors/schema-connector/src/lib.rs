@@ -21,7 +21,7 @@ pub mod migrations_directory;
 pub mod warnings;
 
 pub use crate::namespaces::Namespaces;
-pub use crate::schema_connector::SchemaConnector;
+pub use crate::schema_connector::{SchemaConnector, SchemaDialect, SchemaFromMigrationsTarget, UsingExternalShadowDb};
 pub use connector_host::{ConnectorHost, EmptyHost};
 pub use connector_params::ConnectorParams;
 pub use database_schema::DatabaseSchema;

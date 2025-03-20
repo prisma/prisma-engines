@@ -1,5 +1,5 @@
 use crate::{json_rpc::types::*, CoreResult, SchemaContainerExt};
-use schema_connector::{migrations_directory::*, DiffTarget, SchemaConnector};
+use schema_connector::{migrations_directory::*, SchemaConnector};
 
 /// Development command for migrations. Evaluate the data loss induced by the
 /// next migration the engine would generate on the main database.
@@ -15,21 +15,19 @@ pub async fn evaluate_data_loss(
 
     let migrations_from_directory = list_migrations(input.migrations_list.migration_directories);
 
-    let to = connector
-        .database_schema_from_diff_target(DiffTarget::Datamodel(sources), None, None)
-        .await?;
+    let to = connector.schema_dialect().schema_from_datamodel(sources)?;
 
-    let namespaces = connector.extract_namespaces(&to);
+    let namespaces = connector.schema_dialect().extract_namespaces(&to);
 
     // TODO(MultiSchema): we may need to do something similar to
     // namespaces_and_preview_features_from_diff_targets here as well,
     // particulalry if it's not correctly setting the preview features flags.
     let from = connector
-        .database_schema_from_diff_target(DiffTarget::Migrations(&migrations_from_directory), None, namespaces)
+        .schema_from_migrations(&migrations_from_directory, namespaces)
         .await?;
-    let migration = connector.diff(from, to);
+    let migration = connector.schema_dialect().diff(from, to);
 
-    let migration_steps = connector.migration_len(&migration) as u32;
+    let migration_steps = connector.schema_dialect().migration_len(&migration) as u32;
     let diagnostics = connector.destructive_change_checker().check(&migration).await?;
 
     let warnings = diagnostics

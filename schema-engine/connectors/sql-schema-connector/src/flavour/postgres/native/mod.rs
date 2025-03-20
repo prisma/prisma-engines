@@ -19,7 +19,7 @@ use user_facing_errors::{
     UserFacingError,
 };
 
-use crate::sql_renderer::IteratorJoin;
+use crate::{flavour::validate_connection_infos_do_not_match, sql_renderer::IteratorJoin};
 
 use super::{Circumstances, MigratePostgresUrl, PostgresProvider, ADVISORY_LOCK_TIMEOUT};
 
@@ -33,6 +33,10 @@ pub(super) struct Params {
 
 impl Params {
     pub fn new(connector_params: ConnectorParams) -> ConnectorResult<Self> {
+        if let Some(shadow_db_url) = &connector_params.shadow_database_connection_string {
+            validate_connection_infos_do_not_match(&connector_params.connection_string, shadow_db_url)?;
+        }
+
         let mut url: Url = connector_params
             .connection_string
             .parse()
@@ -323,6 +327,19 @@ pub(super) fn set_preview_features(state: &mut State, preview_features: BitFlags
             params.connector_params.preview_features = preview_features
         }
     }
+}
+
+pub(super) fn get_shadow_db_url(state: &State) -> Option<&str> {
+    state
+        .params()?
+        .connector_params
+        .shadow_database_connection_string
+        .as_deref()
+}
+
+pub(super) async fn dispose(_state: &State) -> ConnectorResult<()> {
+    // Nothing to on dispose, the connection is disposed in Drop
+    Ok(())
 }
 
 pub(super) fn quaint_error_mapper(params: &Params) -> impl Fn(quaint::error::Error) -> ConnectorError + use<'_> {

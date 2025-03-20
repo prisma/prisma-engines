@@ -10,11 +10,11 @@ impl MongoDbSchemaConnector {
     pub(crate) async fn apply_migration_impl(&self, migration: &Migration) -> ConnectorResult<u32> {
         let db = self.client().await?.database();
 
-        if !self.migration_is_empty(migration) {
+        if !self.schema_dialect().migration_is_empty(migration) {
             self.host
                 .print(&format!(
                     "Applying the following changes:\n\n{}\n",
-                    self.migration_summary(migration)
+                    self.schema_dialect().migration_summary(migration)
                 ))
                 .await?;
         }

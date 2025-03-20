@@ -3,15 +3,14 @@
 pub(super) mod shadow_db;
 
 use crate::flavour::postgres::{Circumstances, PostgresProvider, ADVISORY_LOCK_TIMEOUT};
-use crate::{BitFlags, ConnectorParams};
+use crate::BitFlags;
 use psl::PreviewFeature;
-use quaint::connector::{ExternalConnector, ExternalConnectorFactory};
+use quaint::connector::ExternalConnector;
 use schema_connector::{ConnectorError, ConnectorResult};
 use std::sync::Arc;
 
 pub(super) struct State {
     connection: Connection,
-    factory: Arc<dyn ExternalConnectorFactory>,
     schema_name: String,
     circumstances: BitFlags<Circumstances>,
     preview_features: BitFlags<PreviewFeature>,
@@ -22,7 +21,6 @@ pub(super) struct Params;
 impl State {
     pub async fn new(
         adapter: Arc<dyn ExternalConnector>,
-        factory: Arc<dyn ExternalConnectorFactory>,
         provider: PostgresProvider,
         preview_features: BitFlags<PreviewFeature>,
     ) -> ConnectorResult<Self> {
@@ -36,21 +34,10 @@ impl State {
         let circumstances = super::setup_connection(&connection, &Params, provider, &schema_name).await?;
         Ok(Self {
             connection,
-            factory,
             schema_name,
             circumstances,
             preview_features,
         })
-    }
-
-    pub async fn new_shadow_db(&self) -> ConnectorResult<Connection> {
-        let adapter = self
-            .factory
-            .connect_to_shadow_db()
-            .await
-            .ok_or_else(|| ConnectorError::from_msg("Invalid Postgres adapter: missing connectToShadowDb".to_owned()))?
-            .map_err(|err| quaint_error_mapper(&Params)(err).into_shadow_db_creation_error())?;
-        Ok(Connection { adapter })
     }
 }
 
@@ -103,8 +90,8 @@ impl Connection {
             .map_err(|err| ConnectorError::from_source(err, "external connector error"))
     }
 
-    pub async fn dispose(&self) -> quaint::Result<()> {
-        self.adapter.dispose().await
+    async fn dispose(&self) -> ConnectorResult<()> {
+        self.adapter.dispose().await.map_err(quaint_error_mapper(&Params))
     }
 }
 
@@ -144,6 +131,14 @@ pub(super) fn get_preview_features(state: &State) -> BitFlags<PreviewFeature> {
 
 pub(super) fn set_preview_features(state: &mut State, features: BitFlags<PreviewFeature>) {
     state.preview_features = features;
+}
+
+pub(super) fn get_shadow_db_url(_state: &State) -> Option<&str> {
+    None
+}
+
+pub(super) async fn dispose(state: &State) -> ConnectorResult<()> {
+    state.connection.dispose().await
 }
 
 pub(super) fn quaint_error_mapper(_params: &Params) -> impl Fn(quaint::error::Error) -> ConnectorError {

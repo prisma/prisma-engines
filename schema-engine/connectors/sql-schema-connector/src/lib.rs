@@ -18,9 +18,9 @@ mod sql_schema_differ;
 
 use database_schema::SqlDatabaseSchema;
 use enumflags2::BitFlags;
-use flavour::SqlConnectorFlavour;
+use flavour::{SqlConnector, SqlDialect};
 use migration_pair::MigrationPair;
-use psl::{datamodel_connector::NativeTypeInstance, parser_database::ScalarType, ValidatedSchema};
+use psl::{datamodel_connector::NativeTypeInstance, parser_database::ScalarType, SourceFile, ValidatedSchema};
 use quaint::connector::DescribedQuery;
 use schema_connector::{migrations_directory::MigrationDirectory, *};
 use sql_doc_parser::{parse_sql_doc, sanitize_sql};
@@ -30,9 +30,149 @@ use std::{future, sync::Arc};
 
 const MIGRATIONS_TABLE_NAME: &str = "_prisma_migrations";
 
+/// A SQL schema dialect.
+pub struct SqlSchemaDialect {
+    dialect: Box<dyn SqlDialect>,
+}
+
+impl SqlSchemaDialect {
+    /// Creates a CockroachDB schema dialect with the default settings.
+    #[cfg(feature = "postgresql")]
+    pub fn cockroach() -> Self {
+        Self::new(Box::new(flavour::postgres::PostgresDialect::cockroach()))
+    }
+
+    /// Creates a PostgreSQL schema dialect with the default settings.
+    #[cfg(feature = "postgresql")]
+    pub fn postgres() -> Self {
+        Self::new(Box::new(flavour::postgres::PostgresDialect::default()))
+    }
+
+    /// Creates a MySQL schema dialect with the default settings.
+    #[cfg(feature = "mysql")]
+    pub fn mysql() -> Self {
+        Self::new(Box::new(flavour::mysql::MysqlDialect::default()))
+    }
+
+    /// Creates a SQLite schema dialect with the default settings.
+    #[cfg(feature = "sqlite")]
+    pub fn sqlite() -> Self {
+        Self::new(Box::new(flavour::sqlite::SqliteDialect))
+    }
+
+    /// Creates a SQL Server schema dialect with the default settings.
+    #[cfg(feature = "mssql")]
+    pub fn mssql() -> Self {
+        Self::new(Box::new(flavour::mssql::MssqlDialect::default()))
+    }
+
+    fn new(flavour: Box<dyn SqlDialect>) -> Self {
+        Self { dialect: flavour }
+    }
+}
+
+impl SchemaDialect for SqlSchemaDialect {
+    #[tracing::instrument(skip(self, from, to))]
+    fn diff(&self, from: DatabaseSchema, to: DatabaseSchema) -> Migration {
+        let previous = SqlDatabaseSchema::from_erased(from);
+        let next = SqlDatabaseSchema::from_erased(to);
+        let steps =
+            sql_schema_differ::calculate_steps(MigrationPair::new(&previous, &next), &*self.dialect.schema_differ());
+        tracing::debug!(?steps, "Inferred migration steps.");
+
+        Migration::new(SqlMigration {
+            before: previous.describer_schema,
+            after: next.describer_schema,
+            steps,
+        })
+    }
+
+    fn empty_database_schema(&self) -> DatabaseSchema {
+        DatabaseSchema::new(SqlDatabaseSchema::from(self.dialect.empty_database_schema()))
+    }
+
+    fn migration_file_extension(&self) -> &'static str {
+        "sql"
+    }
+
+    fn migration_len(&self, migration: &Migration) -> usize {
+        migration.downcast_ref::<SqlMigration>().steps.len()
+    }
+
+    fn render_script(
+        &self,
+        migration: &Migration,
+        diagnostics: &DestructiveChangeDiagnostics,
+    ) -> ConnectorResult<String> {
+        apply_migration::render_script(migration, diagnostics, &*self.dialect.renderer())
+    }
+
+    fn migration_summary(&self, migration: &Migration) -> String {
+        migration.downcast_ref::<SqlMigration>().drift_summary()
+    }
+
+    fn extract_namespaces(&self, schema: &DatabaseSchema) -> Option<Namespaces> {
+        let sql_schema: &SqlDatabaseSchema = schema.downcast_ref();
+        Namespaces::from_vec(
+            &mut sql_schema
+                .describer_schema
+                .walk_namespaces()
+                .map(|nw| String::from(nw.name()))
+                .collect::<Vec<String>>(),
+        )
+    }
+
+    fn schema_from_datamodel(&self, sources: Vec<(String, SourceFile)>) -> ConnectorResult<DatabaseSchema> {
+        let schema = psl::parse_schema_multi(&sources).map_err(ConnectorError::new_schema_parser_error)?;
+        self.dialect.check_schema_features(&schema)?;
+        let calculator = self.dialect.schema_calculator();
+        Ok(sql_schema_calculator::calculate_sql_schema(&schema, &*calculator).into())
+    }
+
+    fn schema_from_migrations_with_target<'a>(
+        &'a self,
+        migrations: &'a [MigrationDirectory],
+        namespaces: Option<Namespaces>,
+        target: SchemaFromMigrationsTarget,
+    ) -> BoxFuture<'a, ConnectorResult<DatabaseSchema>> {
+        Box::pin(async move {
+            let mut connector = match target {
+                #[cfg(not(any(
+                    feature = "mssql-native",
+                    feature = "mysql-native",
+                    feature = "postgresql-native",
+                    feature = "sqlite-native"
+                )))]
+                SchemaFromMigrationsTarget::ExternalAdapter(factory) => self.dialect.new_shadow_db(factory).await?,
+                #[cfg(any(
+                    feature = "mssql-native",
+                    feature = "mysql-native",
+                    feature = "postgresql-native",
+                    feature = "sqlite-native"
+                ))]
+                SchemaFromMigrationsTarget::ShadowDbUrl {
+                    shadow_db_url,
+                    preview_features,
+                } => self.dialect.new_shadow_db(shadow_db_url, preview_features).await?,
+                _ => {
+                    return Err(ConnectorError::from_msg(
+                        "Received an unsupported shadow database target".to_owned(),
+                    ))
+                }
+            };
+            let schema = connector
+                .sql_schema_from_migration_history(migrations, namespaces, UsingExternalShadowDb::Yes)
+                .await;
+            // dispose of the connector regardless of the result
+            connector.dispose().await?;
+            Ok(DatabaseSchema::new(SqlDatabaseSchema::from(schema?)))
+        })
+    }
+}
+
 /// The top-level SQL migration connector.
 pub struct SqlSchemaConnector {
-    flavour: Box<dyn SqlConnectorFlavour + Send + Sync + 'static>,
+    inner: Box<dyn SqlConnector + Send + Sync + 'static>,
     host: Arc<dyn ConnectorHost>,
 }
 
@@ -41,22 +181,18 @@ impl SqlSchemaConnector {
     #[cfg(all(feature = "postgresql", not(feature = "postgresql-native")))]
     pub async fn new_postgres_external(
         adapter: Arc<dyn quaint::connector::ExternalConnector>,
-        factory: Arc<dyn quaint::connector::ExternalConnectorFactory>,
     ) -> ConnectorResult<Self> {
         Ok(SqlSchemaConnector {
-            flavour: Box::new(flavour::PostgresFlavour::new_external(adapter, factory).await?),
+            inner: Box::new(flavour::PostgresConnector::new_external(adapter).await?),
             host: Arc::new(EmptyHost),
         })
     }
 
     /// Initialize an external SQLite migration connector.
     #[cfg(all(feature = "sqlite", not(feature = "sqlite-native")))]
-    pub fn new_sqlite_external(
-        adapter: Arc<dyn quaint::connector::ExternalConnector>,
-        factory: Arc<dyn quaint::connector::ExternalConnectorFactory>,
-    ) -> Self {
+    pub fn new_sqlite_external(adapter: Arc<dyn quaint::connector::ExternalConnector>) -> Self {
         SqlSchemaConnector {
-            flavour: Box::new(flavour::SqliteFlavour::new_external(adapter, factory)),
+            inner: Box::new(flavour::SqliteConnector::new_external(adapter)),
             host: Arc::new(EmptyHost),
         }
     }
@@ -65,7 +201,7 @@ impl SqlSchemaConnector {
     #[cfg(feature = "postgresql-native")]
     pub fn new_postgres(params: ConnectorParams) -> ConnectorResult<Self> {
         Ok(SqlSchemaConnector {
-            flavour: Box::new(flavour::PostgresFlavour::new_postgres(params)?),
+            inner: Box::new(flavour::PostgresConnector::new_postgres(params)?),
             host: Arc::new(EmptyHost),
         })
     }
@@ -74,7 +210,7 @@ impl SqlSchemaConnector {
     #[cfg(feature = "cockroachdb-native")]
     pub fn new_cockroach(params: ConnectorParams) -> ConnectorResult<Self> {
         Ok(SqlSchemaConnector {
-            flavour: Box::new(flavour::PostgresFlavour::new_cockroach(params)?),
+            inner: Box::new(flavour::PostgresConnector::new_cockroach(params)?),
             host: Arc::new(EmptyHost),
         })
     }
@@ -86,7 +222,7 @@ impl SqlSchemaConnector {
     #[cfg(any(feature = "postgresql-native", feature = "cockroachdb-native"))]
     pub fn new_postgres_like(params: ConnectorParams) -> ConnectorResult<Self> {
         Ok(SqlSchemaConnector {
-            flavour: Box::new(flavour::PostgresFlavour::new_with_params(params)?),
+            inner: Box::new(flavour::PostgresConnector::new_with_params(params)?),
             host: Arc::new(EmptyHost),
         })
     }
@@ -95,7 +231,16 @@ impl SqlSchemaConnector {
     #[cfg(feature = "sqlite-native")]
     pub fn new_sqlite(params: ConnectorParams) -> ConnectorResult<Self> {
         Ok(SqlSchemaConnector {
-            flavour: Box::new(flavour::SqliteFlavour::new_with_params(params)?),
+            inner: Box::new(flavour::SqliteConnector::new_with_params(params)?),
+            host: Arc::new(EmptyHost),
+        })
+    }
+
+    /// Initialize a SQLite migration connector.
+    #[cfg(feature = "sqlite-native")]
+    pub fn new_sqlite_inmem(preview_features: psl::PreviewFeatures) -> ConnectorResult<Self> {
+        Ok(SqlSchemaConnector {
+            inner: Box::new(flavour::SqliteConnector::new_inmem(preview_features)?),
             host: Arc::new(EmptyHost),
         })
     }
@@ -104,7 +249,7 @@ impl SqlSchemaConnector {
     #[cfg(feature = "mysql-native")]
     pub fn new_mysql(params: ConnectorParams) -> ConnectorResult<Self> {
         Ok(SqlSchemaConnector {
-            flavour: Box::new(flavour::MysqlFlavour::new_with_params(params)?),
+            inner: Box::new(flavour::MysqlConnector::new_with_params(params)?),
             host: Arc::new(EmptyHost),
         })
     }
@@ -113,7 +258,7 @@ impl SqlSchemaConnector {
     #[cfg(feature = "mssql-native")]
     pub fn new_mssql(params: ConnectorParams) -> ConnectorResult<Self> {
         Ok(SqlSchemaConnector {
-            flavour: Box::new(flavour::MssqlFlavour::new_with_params(params)?),
+            inner: Box::new(flavour::MssqlConnector::new_with_params(params)?),
             host: Arc::new(EmptyHost),
         })
     }
@@ -121,45 +266,46 @@ impl SqlSchemaConnector {
     /// Create a new uninitialized MySQL migration connector.
     #[cfg(feature = "mysql-native")]
     pub fn new_uninitialized_mysql() -> Self {
-        Self::new_uninitialized_flavour::<flavour::MysqlFlavour>()
+        Self::new_uninitialized_connector::<flavour::MysqlConnector>()
     }
 
     /// Create a new uninitialized MSSQL migration connector.
     #[cfg(feature = "mssql-native")]
     pub fn new_uninitialized_mssql() -> Self {
-        Self::new_uninitialized_flavour::<flavour::MssqlFlavour>()
+        Self::new_uninitialized_connector::<flavour::MssqlConnector>()
     }
 
     /// Create a new uninitialized SQLite migration connector.
     #[cfg(feature = "sqlite-native")]
     pub fn new_uninitialized_sqlite() -> Self {
-        Self::new_uninitialized_flavour::<flavour::SqliteFlavour>()
+        Self::new_uninitialized_connector::<flavour::SqliteConnector>()
     }
 
     /// Create a new uninitialized PostgreSQL migration connector.
     #[cfg(feature = "postgresql-native")]
     pub fn new_uninitialized_postgres() -> Self {
-        Self::new_uninitialized_flavour::<flavour::PostgresFlavour>()
+        Self::new_uninitialized_connector::<flavour::PostgresConnector>()
     }
 
     /// Create a new uninitialized CockroachDB migration connector.
     #[cfg(feature = "cockroachdb-native")]
     pub fn new_uninitialized_cockroachdb() -> Self {
         Self {
-            flavour: Box::new(flavour::PostgresFlavour::new_uninitialized_cockroach()),
+            inner: Box::new(flavour::PostgresConnector::new_uninitialized_cockroach()),
             host: Arc::new(EmptyHost),
         }
     }
 
-    fn new_uninitialized_flavour<Flavour: SqlConnectorFlavour + Default + 'static>() -> Self {
+    fn new_uninitialized_connector<Connector: SqlConnector + Default + 'static>() -> Self {
         Self {
-            flavour: Box::new(Flavour::default()),
+            inner: Box::new(Connector::default()),
             host: Arc::new(EmptyHost),
         }
     }
 
-    fn flavour(&self) -> &(dyn SqlConnectorFlavour + Send + Sync) {
-        self.flavour.as_ref()
+    /// Returns the SQL dialect used by the connector.
+    fn sql_dialect(&self) -> Box<dyn SqlDialect> {
+        self.inner.dialect()
     }
 
     /// Made public for tests.
@@ -167,7 +313,7 @@ impl SqlSchemaConnector {
         &mut self,
         namespaces: Option<Namespaces>,
     ) -> BoxFuture<'_, ConnectorResult<sql::SqlSchema>> {
-        self.flavour.describe_schema(namespaces)
+        self.inner.describe_schema(namespaces)
     }
 
     /// For tests
@@ -176,7 +322,7 @@ impl SqlSchemaConnector {
         sql: &str,
         params: &[quaint::prelude::Value<'_>],
     ) -> ConnectorResult<quaint::prelude::ResultSet> {
-        self.flavour.query_raw(sql, params).await
+        self.inner.query_raw(sql, params).await
     }
 
     /// For tests
@@ -184,60 +330,39 @@ impl SqlSchemaConnector {
         &mut self,
         query: impl Into<quaint::ast::Query<'_>>,
     ) -> ConnectorResult<quaint::prelude::ResultSet> {
-        self.flavour.query(query.into()).await
+        self.inner.query(query.into()).await
     }
 
     /// For tests
     pub async fn raw_cmd(&mut self, sql: &str) -> ConnectorResult<()> {
-        self.flavour.raw_cmd(sql).await
-    }
-
-    async fn db_schema_from_diff_target(
-        &mut self,
-        target: DiffTarget<'_>,
-        shadow_database_connection_string: Option<String>,
-        namespaces: Option<Namespaces>,
-    ) -> ConnectorResult<SqlDatabaseSchema> {
-        match target {
-            DiffTarget::Datamodel(sources) => {
-                let schema = psl::parse_schema_multi(&sources).map_err(ConnectorError::new_schema_parser_error)?;
-
-                self.flavour.check_schema_features(&schema)?;
-                Ok(sql_schema_calculator::calculate_sql_schema(
-                    &schema,
-                    &*self.flavour.schema_calculator(),
-                ))
-            }
-            DiffTarget::Migrations(migrations) => self
-                .flavour
-                .sql_schema_from_migration_history(migrations, shadow_database_connection_string, namespaces)
-                .await
-                .map(From::from),
-            DiffTarget::Database => self.flavour.describe_schema(namespaces).await.map(From::from),
-            DiffTarget::Empty => Ok(self.flavour.empty_database_schema().into()),
-        }
+        self.inner.raw_cmd(sql).await
     }
 
     /// Returns the native types that can be used to represent the given scalar type.
     pub fn scalar_type_for_native_type(&self, native_type: &NativeTypeInstance) -> ScalarType {
-        self.flavour
+        self.inner
+            .dialect()
             .datamodel_connector()
             .scalar_type_for_native_type(native_type)
     }
 }
 
 impl SchemaConnector for SqlSchemaConnector {
+    fn schema_dialect(&self) -> Box<dyn SchemaDialect> {
+        Box::new(SqlSchemaDialect::new(self.inner.dialect()))
+    }
+
     // TODO: this only seems to be used in `sql-migration-tests`.
     fn set_host(&mut self, host: Arc<dyn schema_connector::ConnectorHost>) {
         self.host = host;
     }
 
     fn set_preview_features(&mut self, preview_features: BitFlags<psl::PreviewFeature>) {
-        self.flavour.set_preview_features(preview_features)
+        self.inner.set_preview_features(preview_features)
     }
 
     fn connector_type(&self) -> &'static str {
-        self.flavour.connector_type()
+        self.inner.connector_type()
     }
 
     fn acquire_lock(&mut self) -> BoxFuture<'_, ConnectorResult<()>> {
@@ -254,23 +379,19 @@ impl SchemaConnector for SqlSchemaConnector {
             );
             return Box::pin(future::ready(Ok(())));
         }
-        Box::pin(self.flavour.acquire_lock())
+        Box::pin(self.inner.acquire_lock())
     }
 
     fn apply_migration<'a>(&'a mut self, migration: &'a Migration) -> BoxFuture<'a, ConnectorResult<u32>> {
-        Box::pin(apply_migration::apply_migration(migration, self.flavour.as_mut()))
+        Box::pin(apply_migration::apply_migration(migration, self.inner.as_mut()))
     }
 
     fn apply_script<'a>(&'a mut self, migration_name: &'a str, script: &'a str) -> BoxFuture<'a, ConnectorResult<()>> {
         Box::pin(apply_migration::apply_script(migration_name, script, self))
     }
 
-    fn empty_database_schema(&self) -> DatabaseSchema {
-        DatabaseSchema::new(SqlDatabaseSchema::from(self.flavour.empty_database_schema()))
-    }
-
     fn ensure_connection_validity(&mut self) -> BoxFuture<'_, ConnectorResult<()>> {
-        self.flavour.ensure_connection_validity()
+        self.inner.ensure_connection_validity()
     }
 
     // TODO: this only seems to be used in `sql-migration-tests`.
@@ -280,7 +401,7 @@ impl SchemaConnector for SqlSchemaConnector {
 
     fn version(&mut self) -> BoxFuture<'_, ConnectorResult<String>> {
         Box::pin(async {
-            self.flavour
+            self.inner
                 .version()
                 .await
                 .map(|version| version.unwrap_or_else(|| "Database version information not available.".to_owned()))
@@ -288,43 +409,54 @@ impl SchemaConnector for SqlSchemaConnector {
     }
 
     fn create_database(&mut self) -> BoxFuture<'_, ConnectorResult<String>> {
-        self.flavour.create_database()
+        self.inner.create_database()
     }
 
-    fn database_schema_from_diff_target<'a>(
+    fn schema_from_database(
+        &mut self,
+        namespaces: Option<Namespaces>,
+    ) -> BoxFuture<'_, ConnectorResult<DatabaseSchema>> {
+        Box::pin(async move {
+            self.inner
+                .describe_schema(namespaces)
+                .await
+                .map(SqlDatabaseSchema::from)
+                .map(DatabaseSchema::new)
+        })
+    }
+
+    fn schema_from_migrations<'a>(
         &'a mut self,
-        diff_target: DiffTarget<'a>,
-        shadow_database_connection_string: Option<String>,
+        migrations: &'a [MigrationDirectory],
         namespaces: Option<Namespaces>,
     ) -> BoxFuture<'a, ConnectorResult<DatabaseSchema>> {
         Box::pin(async move {
-            self.db_schema_from_diff_target(diff_target, shadow_database_connection_string, namespaces)
-                .await
-                .map(From::from)
+            match self.inner.shadow_db_url() {
+                Some(url) => {
+                    let target = SchemaFromMigrationsTarget::ShadowDbUrl {
+                        shadow_db_url: url.to_owned(),
+                        preview_features: self.inner.preview_features(),
+                    };
+                    self.schema_dialect()
+                        .schema_from_migrations_with_target(migrations, namespaces, target)
+                        .await
+                }
+                None => self
+                    .inner
+                    .sql_schema_from_migration_history(migrations, namespaces, UsingExternalShadowDb::No)
+                    .await
+                    .map(SqlDatabaseSchema::from)
+                    .map(DatabaseSchema::new),
+            }
         })
     }
 
     fn db_execute(&mut self, script: String) -> BoxFuture<'_, ConnectorResult<()>> {
-        Box::pin(async move { self.flavour.raw_cmd(&script).await })
-    }
-
-    #[tracing::instrument(skip(self, from, to))]
-    fn diff(&self, from: DatabaseSchema, to: DatabaseSchema) -> Migration {
-        let previous = SqlDatabaseSchema::from_erased(from);
-        let next = SqlDatabaseSchema::from_erased(to);
-        let steps =
-            sql_schema_differ::calculate_steps(MigrationPair::new(&previous, &next), &*self.flavour.schema_differ());
-        tracing::debug!(?steps, "Inferred migration steps.");
-
-        Migration::new(SqlMigration {
-            before: previous.describer_schema,
-            after: next.describer_schema,
-            steps,
-        })
+        Box::pin(async move { self.inner.raw_cmd(&script).await })
     }
 
     fn drop_database(&mut self) -> BoxFuture<'_, ConnectorResult<()>> {
-        self.flavour.drop_database()
+        self.inner.drop_database()
     }
 
     fn introspect<'a>(
@@ -338,42 +470,22 @@ impl SchemaConnector for SqlSchemaConnector {
             };
 
             let namespaces = Namespaces::from_vec(&mut namespace_names);
-            let sql_schema = self.flavour.introspect(namespaces, ctx).await?;
-            let search_path = self.flavour.search_path();
+            let sql_schema = self.inner.introspect(namespaces, ctx).await?;
+            let search_path = self.inner.search_path();
             let datamodel = introspection::datamodel_calculator::calculate(&sql_schema, ctx, search_path);
 
             Ok(datamodel)
         })
     }
 
-    fn migration_file_extension(&self) -> &'static str {
-        "sql"
-    }
-
-    fn migration_len(&self, migration: &Migration) -> usize {
-        migration.downcast_ref::<SqlMigration>().steps.len()
-    }
-
-    fn render_script(
-        &self,
-        migration: &Migration,
-        diagnostics: &DestructiveChangeDiagnostics,
-    ) -> ConnectorResult<String> {
-        apply_migration::render_script(migration, diagnostics, &*self.flavour().renderer())
-    }
-
     fn reset(&mut self, soft: bool, namespaces: Option<Namespaces>) -> BoxFuture<'_, ConnectorResult<()>> {
         Box::pin(async move {
-            if soft || self.flavour.reset(namespaces.clone()).await.is_err() {
-                best_effort_reset(self.flavour.as_mut(), namespaces).await?;
+            if soft || self.inner.reset(namespaces.clone()).await.is_err() {
+                best_effort_reset(self.inner.as_mut(), namespaces).await?;
             }
 
             Ok(())
         })
-    }
-
-    fn migration_summary(&self, migration: &Migration) -> String {
-        migration.downcast_ref::<SqlMigration>().drift_summary()
     }
 
     /// Optionally check that the features implied by the provided datamodel are all compatible with
@@ -382,7 +494,7 @@ impl SchemaConnector for SqlSchemaConnector {
         &self,
         datamodel: &ValidatedSchema,
     ) -> Option<user_facing_errors::common::DatabaseVersionIncompatibility> {
-        self.flavour.check_database_version_compatibility(datamodel)
+        self.inner.check_database_version_compatibility(datamodel)
     }
 
     fn destructive_change_checker(&mut self) -> &mut dyn DestructiveChangeChecker {
@@ -400,22 +512,9 @@ impl SchemaConnector for SqlSchemaConnector {
         namespaces: Option<Namespaces>,
     ) -> BoxFuture<'a, ConnectorResult<()>> {
         Box::pin(async move {
-            self.flavour
-                .sql_schema_from_migration_history(migrations, None, namespaces)
-                .await?;
+            self.schema_from_migrations(migrations, namespaces).await?;
             Ok(())
         })
-    }
-
-    fn extract_namespaces(&self, schema: &DatabaseSchema) -> Option<Namespaces> {
-        let sql_schema: &SqlDatabaseSchema = schema.downcast_ref();
-        Namespaces::from_vec(
-            &mut sql_schema
-                .describer_schema
-                .walk_namespaces()
-                .map(|nw| String::from(nw.name()))
-                .collect::<Vec<String>>(),
-        )
     }
 
     fn introspect_sql(
@@ -428,7 +527,7 @@ impl SchemaConnector for SqlSchemaConnector {
                 parameters,
                 columns,
                 enum_names,
-            } = self.flavour.describe_query(&sanitized_sql).await?;
+            } = self.inner.describe_query(&sanitized_sql).await?;
             let enum_names = enum_names.unwrap_or_default();
             let sql_source = input.source.clone();
             let parsed_doc = parse_sql_doc(&sql_source, enum_names.as_slice())?;
@@ -474,31 +573,31 @@ fn new_shadow_database_name() -> String {
 
 /// Try to reset the database to an empty state. This should only be used
 /// when we don't have the permissions to do a full reset.
-#[tracing::instrument(skip(flavour))]
+#[tracing::instrument(skip(connector))]
 async fn best_effort_reset(
-    flavour: &mut (dyn SqlConnectorFlavour + Send + Sync),
+    connector: &mut (dyn SqlConnector + Send + Sync),
     namespaces: Option<Namespaces>,
 ) -> ConnectorResult<()> {
-    best_effort_reset_impl(flavour, namespaces)
+    best_effort_reset_impl(connector, namespaces)
         .await
         .map_err(|err| err.into_soft_reset_failed_error())
 }
 
 async fn best_effort_reset_impl(
-    flavour: &mut (dyn SqlConnectorFlavour + Send + Sync),
+    connector: &mut (dyn SqlConnector + Send + Sync),
     namespaces: Option<Namespaces>,
 ) -> ConnectorResult<()> {
     tracing::info!("Attempting best_effort_reset");
 
-    let source_schema = flavour.describe_schema(namespaces).await?;
-    let target_schema = flavour.empty_database_schema();
+    let source_schema = connector.describe_schema(namespaces).await?;
+    let target_schema = connector.dialect().empty_database_schema();
     let mut steps = Vec::new();
 
     // We drop views here, not in the normal migration process to not
     // accidentally drop something we can't describe in the data model.
     let drop_views = source_schema
         .view_walkers()
-        .filter(|view| !flavour.schema_differ().view_should_be_ignored(view.name()))
+        .filter(|view| !connector.dialect().schema_differ().view_should_be_ignored(view.name()))
         .map(|vw| DropView::new(vw.id))
         .map(SqlMigrationStep::DropView);
 
@@ -507,7 +606,7 @@ async fn best_effort_reset_impl(
     let diffables: MigrationPair<SqlDatabaseSchema> = MigrationPair::new(source_schema, target_schema).map(From::from);
     steps.extend(sql_schema_differ::calculate_steps(
         diffables.as_ref(),
-        &*flavour.schema_differ(),
+        &*connector.dialect().schema_differ(),
     ));
     let (source_schema, target_schema) = diffables.map(|s| s.describer_schema).into_tuple();
 
@@ -526,7 +625,7 @@ async fn best_effort_reset_impl(
     };
 
     if migration.before.table_walker(crate::MIGRATIONS_TABLE_NAME).is_some() {
-        flavour.drop_migrations_table().await?;
+        connector.drop_migrations_table().await?;
     }
 
     if migration.steps.is_empty() {
@@ -536,10 +635,10 @@ async fn best_effort_reset_impl(
     let migration = apply_migration::render_script(
         &Migration::new(migration),
         &DestructiveChangeDiagnostics::default(),
-        &*flavour.renderer(),
+        &*connector.dialect().renderer(),
     )?;
 
-    flavour.raw_cmd(&migration).await?;
+    connector.raw_cmd(&migration).await?;
 
     Ok(())
 }
