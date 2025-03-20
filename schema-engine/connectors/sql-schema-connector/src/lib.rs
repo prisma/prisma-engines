@@ -39,31 +39,31 @@ impl SqlSchemaDialect {
     /// Creates a CockroachDB schema dialect with the default settings.
     #[cfg(feature = "postgresql")]
     pub fn cockroach() -> Self {
-        Self::new(Box::new(flavour::postgres::PostgresDialect::cockroach()))
+        Self::new(Box::new(flavour::PostgresDialect::cockroach()))
     }
 
     /// Creates a PostgreSQL schema dialect with the default settings.
     #[cfg(feature = "postgresql")]
     pub fn postgres() -> Self {
-        Self::new(Box::new(flavour::postgres::PostgresDialect::default()))
+        Self::new(Box::new(flavour::PostgresDialect::default()))
     }
 
     /// Creates a MySQL schema dialect with the default settings.
     #[cfg(feature = "mysql")]
     pub fn mysql() -> Self {
-        Self::new(Box::new(flavour::mysql::MysqlDialect::default()))
+        Self::new(Box::new(flavour::MysqlDialect::default()))
     }
 
     /// Creates a SQLite schema dialect with the default settings.
     #[cfg(feature = "sqlite")]
     pub fn sqlite() -> Self {
-        Self::new(Box::new(flavour::sqlite::SqliteDialect))
+        Self::new(Box::new(flavour::SqliteDialect))
     }
 
     /// Creates a SQL Server schema dialect with the default settings.
     #[cfg(feature = "mssql")]
     pub fn mssql() -> Self {
-        Self::new(Box::new(flavour::mssql::MssqlDialect::default()))
+        Self::new(Box::new(flavour::MssqlDialect::default()))
     }
 
     fn new(flavour: Box<dyn SqlDialect>) -> Self {

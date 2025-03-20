@@ -3,28 +3,28 @@
 //! detail of the SQL connector.
 
 #[cfg(feature = "mssql")]
-pub mod mssql;
+mod mssql;
 
 #[cfg(feature = "mysql")]
-pub mod mysql;
+mod mysql;
 
 #[cfg(any(feature = "postgresql", feature = "cockroachdb"))]
-pub mod postgres;
+mod postgres;
 
 #[cfg(feature = "sqlite")]
-pub mod sqlite;
+mod sqlite;
 
 #[cfg(feature = "mssql")]
-pub(crate) use mssql::MssqlConnector;
+pub(crate) use mssql::{MssqlConnector, MssqlDialect};
 
 #[cfg(feature = "mysql")]
-pub(crate) use mysql::MysqlConnector;
+pub(crate) use mysql::{MysqlConnector, MysqlDialect};
 
 #[cfg(any(feature = "postgresql", feature = "cockroachdb"))]
-pub(crate) use postgres::PostgresConnector;
+pub(crate) use postgres::{PostgresConnector, PostgresDialect};
 
 #[cfg(feature = "sqlite")]
-pub(crate) use sqlite::SqliteConnector;
+pub(crate) use sqlite::{SqliteConnector, SqliteDialect};
 
 use crate::{
     sql_destructive_change_checker::DestructiveChangeCheckerFlavour, sql_renderer::SqlRenderer,
