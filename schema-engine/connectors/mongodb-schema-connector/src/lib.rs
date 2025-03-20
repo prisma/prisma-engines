@@ -21,7 +21,7 @@ use schema_connector::{migrations_directory::MigrationDirectory, *};
 use std::{future, sync::Arc};
 use tokio::sync::OnceCell;
 
-pub struct MongoDbSchemaFlavour;
+pub struct MongoDbSchemaDialect;
 
 /// The top-level MongoDB migration connector.
 pub struct MongoDbSchemaConnector {
@@ -62,7 +62,7 @@ impl MongoDbSchemaConnector {
     }
 }
 
-impl SchemaDialect for MongoDbSchemaFlavour {
+impl SchemaDialect for MongoDbSchemaDialect {
     fn diff(&self, from: DatabaseSchema, to: DatabaseSchema) -> Migration {
         let from: Box<MongoSchema> = from.downcast();
         let to: Box<MongoSchema> = to.downcast();
@@ -116,7 +116,7 @@ impl SchemaDialect for MongoDbSchemaFlavour {
 
 impl SchemaConnector for MongoDbSchemaConnector {
     fn schema_dialect(&self) -> Box<dyn SchemaDialect> {
-        Box::new(MongoDbSchemaFlavour)
+        Box::new(MongoDbSchemaDialect)
     }
 
     fn host(&self) -> &Arc<dyn ConnectorHost> {

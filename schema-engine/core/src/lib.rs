@@ -21,7 +21,7 @@ use json_rpc::types::{SchemaContainer, SchemasContainer, SchemasWithConfigDir};
 pub use schema_connector;
 
 use enumflags2::BitFlags;
-use mongodb_schema_connector::{MongoDbSchemaConnector, MongoDbSchemaFlavour};
+use mongodb_schema_connector::{MongoDbSchemaConnector, MongoDbSchemaDialect};
 use psl::{
     builtin_connectors::*, datamodel_connector::Flavour, parser_database::SourceFile, Datasource, PreviewFeature,
     ValidatedSchema,
@@ -158,7 +158,7 @@ fn dialect_for_provider(provider: &str) -> CoreResult<Box<dyn schema_connector::
     if let Some(connector) = BUILTIN_CONNECTORS.iter().find(|c| c.is_provider(provider)) {
         match connector.flavour() {
             Flavour::Cockroach => Ok(Box::new(SqlSchemaDialect::cockroach())),
-            Flavour::Mongo => Ok(Box::new(MongoDbSchemaFlavour)),
+            Flavour::Mongo => Ok(Box::new(MongoDbSchemaDialect)),
             Flavour::Sqlserver => Ok(Box::new(SqlSchemaDialect::mssql())),
             Flavour::Mysql => Ok(Box::new(SqlSchemaDialect::mysql())),
             Flavour::Postgres => Ok(Box::new(SqlSchemaDialect::postgres())),
