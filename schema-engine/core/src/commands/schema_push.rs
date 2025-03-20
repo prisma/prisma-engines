@@ -23,6 +23,9 @@ pub async fn schema_push(input: SchemaPushInput, connector: &mut dyn SchemaConne
         .schema_from_database(namespaces)
         .instrument(tracing::info_span!("Calculate from database"))
         .await?;
+    // Retrieving the dialect again, needed right now because the internal state machine might
+    // change its circumstances. Can be removed with the state machine.
+    let dialect = connector.schema_dialect();
     let database_migration = dialect.diff(from, to);
 
     tracing::debug!(migration = dialect.migration_summary(&database_migration).as_str());
