@@ -546,6 +546,9 @@ impl SqlConnector for MssqlConnector {
                         shadow_db::sql_schema_from_migrations_history(migrations, &mut shadow_database, namespaces)
                             .await;
 
+                    // Drop the shadow database before cleaning up from the main connection.
+                    drop(shadow_database);
+
                     clean_up_shadow_database(&shadow_database_name, main_connection, params).await?;
                     ret
                 })

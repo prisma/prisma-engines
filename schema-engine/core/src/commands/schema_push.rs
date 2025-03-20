@@ -12,7 +12,12 @@ pub async fn schema_push(input: SchemaPushInput, connector: &mut dyn SchemaConne
         return Err(ConnectorError::user_facing(err));
     };
 
+    // The `ensure_connection_validity` call is currently needed to infer the correct
+    // circumstances from the connector. It can be removed once we get rid of the
+    // connector state machines.
+    connector.ensure_connection_validity().await?;
     let dialect = connector.schema_dialect();
+
     let to = dialect.schema_from_datamodel(sources)?;
     let namespaces = dialect.extract_namespaces(&to);
 
@@ -23,9 +28,6 @@ pub async fn schema_push(input: SchemaPushInput, connector: &mut dyn SchemaConne
         .schema_from_database(namespaces)
         .instrument(tracing::info_span!("Calculate from database"))
         .await?;
-    // Retrieving the dialect again, needed right now because the internal state machine might
-    // change its circumstances. Can be removed with the state machine.
-    let dialect = connector.schema_dialect();
     let database_migration = dialect.diff(from, to);
 
     tracing::debug!(migration = dialect.migration_summary(&database_migration).as_str());
