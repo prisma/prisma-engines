@@ -109,12 +109,6 @@ pub async fn sql_schema_from_migration_history(
             ret
         }
     }
-
-    // match shadow_database_connection_string {
-    //     Some(shadow_database_connection_string) => {}
-    //     None => {
-
-    // }
 }
 
 /// Drop a database using `WITH (FORCE)` syntax.
