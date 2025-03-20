@@ -389,7 +389,7 @@ impl SqlConnector for SqliteConnector {
     }
 
     fn dispose(&self) -> BoxFuture<'_, ConnectorResult<()>> {
-        Box::pin(async move { imp::dispose(&self.state).await })
+        Box::pin(imp::dispose(&self.state))
     }
 }
 

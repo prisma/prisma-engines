@@ -143,7 +143,7 @@ impl SchemaDialect for SqlSchemaDialect {
                     feature = "postgresql-native",
                     feature = "sqlite-native"
                 )))]
-                ExternalShadowDatabase::ExternalAdapter(factory) => self.dialect.connect_to_shadow_db(factory).await?,
+                ExternalShadowDatabase::DriverAdapter(factory) => self.dialect.connect_to_shadow_db(factory).await?,
                 #[cfg(any(
                     feature = "mssql-native",
                     feature = "mysql-native",
@@ -151,11 +151,11 @@ impl SchemaDialect for SqlSchemaDialect {
                     feature = "sqlite-native"
                 ))]
                 ExternalShadowDatabase::ConnectionString {
-                    connection_string: shadow_db_url,
+                    connection_string,
                     preview_features,
                 } => {
                     self.dialect
-                        .connect_to_shadow_db(shadow_db_url, preview_features)
+                        .connect_to_shadow_db(connection_string, preview_features)
                         .await?
                 }
                 _ => {
@@ -396,9 +396,9 @@ impl SchemaConnector for SqlSchemaConnector {
     ) -> BoxFuture<'a, ConnectorResult<DatabaseSchema>> {
         Box::pin(async move {
             match self.inner.shadow_db_url() {
-                Some(url) => {
+                Some(connection_string) => {
                     let target = ExternalShadowDatabase::ConnectionString {
-                        connection_string: url.to_owned(),
+                        connection_string: connection_string.to_owned(),
                         preview_features: self.inner.preview_features(),
                     };
                     self.schema_dialect()

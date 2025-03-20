@@ -359,7 +359,7 @@ fn quaint_error_to_connector_error(error: quaint::error::Error, connection_info:
 /// A flag that indicates whether the connector is using an external shadow database.
 #[derive(Debug)]
 pub enum UsingExternalShadowDb {
-    /// We're using an external shadow database (such as a custom shadow database connection string
+    /// We're using an external shadow database (such as a custom-provided connection string
     /// or a JavaScript adapter). This indicates that it can be safely written to for schema
     /// calculation purposes.
     Yes,

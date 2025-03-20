@@ -178,10 +178,10 @@ pub trait SchemaConnector: Send + Sync + 'static {
     }
 }
 
-/// The target shadow database to be used for schema operations.
+/// An external shadow database to be used for schema operations.
 pub enum ExternalShadowDatabase {
-    /// An external connector factory.
-    ExternalAdapter(Arc<dyn ExternalConnectorFactory>),
+    /// A driver adapter factory.
+    DriverAdapter(Arc<dyn ExternalConnectorFactory>),
     /// A shadow database connection string and preview features.
     ConnectionString {
         /// The shadow database connection string.
