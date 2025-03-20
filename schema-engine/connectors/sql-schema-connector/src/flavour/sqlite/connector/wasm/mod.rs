@@ -89,7 +89,7 @@ impl Connection {
     }
 }
 
-pub fn new_shadow_db() -> ConnectorResult<Connection> {
+pub fn connect_to_shadow_db() -> ConnectorResult<Connection> {
     Err(ConnectorError::from_msg(
         "SQLite shadow DB must be provided through an external factory".to_owned(),
     ))

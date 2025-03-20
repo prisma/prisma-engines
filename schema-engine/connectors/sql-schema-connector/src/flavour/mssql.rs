@@ -102,7 +102,7 @@ impl SqlDialect for MssqlDialect {
     }
 
     #[cfg(feature = "mssql-native")]
-    fn new_shadow_db(
+    fn connect_to_shadow_db(
         &self,
         url: String,
         preview_features: psl::PreviewFeatures,
@@ -112,7 +112,7 @@ impl SqlDialect for MssqlDialect {
     }
 
     #[cfg(not(feature = "mssql-native"))]
-    fn new_shadow_db(
+    fn connect_to_shadow_db(
         &self,
         factory: Arc<dyn ExternalConnectorFactory>,
     ) -> BoxFuture<'_, ConnectorResult<Box<dyn SqlConnector>>> {
@@ -495,6 +495,7 @@ impl SqlConnector for MssqlConnector {
         match external_shadow_db {
             UsingExternalShadowDb::Yes => Box::pin(async move {
                 self.ensure_connection_validity().await?;
+                tracing::info!("Connected to an external shadow database.");
 
                 if self.reset(namespaces.clone()).await.is_err() {
                     crate::best_effort_reset(self, namespaces.clone()).await?;
@@ -502,6 +503,8 @@ impl SqlConnector for MssqlConnector {
 
                 shadow_db::sql_schema_from_migrations_history(migrations, self, namespaces).await
             }),
+
+            // If we're not using an external shadow database, one must be created manually.
             UsingExternalShadowDb::No => {
                 with_connection(&mut self.state, move |params, main_connection| async move {
                     let shadow_database_name = crate::new_shadow_database_name();

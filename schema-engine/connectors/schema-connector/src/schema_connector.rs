@@ -9,7 +9,7 @@ use crate::{
     IntrospectSqlQueryOutput, IntrospectionContext, IntrospectionResult, Migration, MigrationPersistence, Namespaces,
 };
 
-/// The schema dialect of a particular database.
+/// The dialect for schema operations on a particular database.
 pub trait SchemaDialect: Send + Sync + 'static {
     /// Create a migration by comparing two database schemas.
     fn diff(&self, from: DatabaseSchema, to: DatabaseSchema) -> Migration;
@@ -45,15 +45,17 @@ pub trait SchemaDialect: Send + Sync + 'static {
     /// An empty database schema (for diffing).
     fn empty_database_schema(&self) -> DatabaseSchema;
 
-    /// Create database schema from a datamodel.
+    /// Create a database schema from datamodel source files.
     fn schema_from_datamodel(&self, sources: Vec<(String, SourceFile)>) -> ConnectorResult<DatabaseSchema>;
 
-    /// Create a shadow database schema for this dialect.
+    /// Create a database schema from migrations with a specific target shadow database.
+    /// When MultiSchema is enabled, the namespaces are required for diffing anything other than a
+    /// prisma schema, because that information is otherwise unavailable.
     fn schema_from_migrations_with_target<'a>(
         &'a self,
         migrations: &'a [MigrationDirectory],
         namespaces: Option<Namespaces>,
-        target: SchemaFromMigrationsTarget,
+        target: ExternalShadowDatabase,
     ) -> BoxFuture<'a, ConnectorResult<DatabaseSchema>>;
 }
 
@@ -126,17 +128,14 @@ pub trait SchemaConnector: Send + Sync + 'static {
     /// See [DestructiveChangeChecker](trait.DestructiveChangeChecker.html).
     fn destructive_change_checker(&mut self) -> &mut dyn DestructiveChangeChecker;
 
-    /// Read a schema for diffing. The shadow database connection string is strictly optional, you
-    /// don't need to pass it if a shadow database url was passed in params, or if it can be
-    /// inferred from context, or if it isn't necessary for the task at hand.
-    /// When MultiSchema is enabled, the namespaces are required for diffing anything other than a
-    /// prisma schema, because that information is otherwise unavailable.
+    /// Create a database schema from what's currently in the database.
     fn schema_from_database(
         &mut self,
         namespaces: Option<Namespaces>,
     ) -> BoxFuture<'_, ConnectorResult<DatabaseSchema>>;
 
-    /// Create a shadow database schema using this connector.
+    /// Create a database schema from migrations using the shadow database configured in the
+    /// connector.
     fn schema_from_migrations<'a>(
         &'a mut self,
         migrations: &'a [MigrationDirectory],
@@ -162,7 +161,7 @@ pub trait SchemaConnector: Send + Sync + 'static {
         namespaces: Option<Namespaces>,
     ) -> BoxFuture<'a, ConnectorResult<()>>;
 
-    /// Create a database schema from a diff target.
+    /// Read a schema for diffing.
     fn schema_from_diff_target<'a>(
         &'a mut self,
         diff_target: DiffTarget<'a>,
@@ -179,24 +178,24 @@ pub trait SchemaConnector: Send + Sync + 'static {
     }
 }
 
-/// A target connector for a schema from migration diff.
-pub enum SchemaFromMigrationsTarget {
-    /// External connector factory.
+/// The target shadow database to be used for schema operations.
+pub enum ExternalShadowDatabase {
+    /// An external connector factory.
     ExternalAdapter(Arc<dyn ExternalConnectorFactory>),
-    /// Shadow database URL.
-    ShadowDbUrl {
-        /// The shadow database URL.
-        shadow_db_url: String,
+    /// A shadow database connection string and preview features.
+    ConnectionString {
+        /// The shadow database connection string.
+        connection_string: String,
         /// The preview features.
         preview_features: PreviewFeatures,
     },
 }
 
-/// Specifies whether to create a new shadow database.
+/// The setting that indicates whether we're using an external shadow database.
 #[derive(Debug)]
 pub enum UsingExternalShadowDb {
-    /// Do not create a new shadow database, use the current one.
+    /// We're using an external shadow database.
     Yes,
-    /// Create a new shadow database and use it.
+    /// We're not using an external shadow database, one must be created manually.
     No,
 }

@@ -193,7 +193,7 @@ impl Connection {
     }
 }
 
-pub fn new_shadow_db() -> ConnectorResult<Connection> {
+pub fn connect_to_shadow_db() -> ConnectorResult<Connection> {
     Connection::new_inmem()
 }
 

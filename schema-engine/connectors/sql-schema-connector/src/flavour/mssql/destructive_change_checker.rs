@@ -17,7 +17,7 @@ use crate::{
 use schema_connector::{BoxFuture, ConnectorResult};
 use sql_schema_describer::walkers::TableColumnWalker;
 
-#[derive(Debug, Default)]
+#[derive(Debug)]
 pub struct MssqlDestructiveChangeCheckerFlavour {
     schema_name: String,
 }

@@ -18,8 +18,8 @@ pub async fn sql_schema_from_migration_history(
 
     match external_shadow_db {
         UsingExternalShadowDb::Yes => {
-            tracing::info!("Connecting to user-provided shadow database.");
             connector.ensure_connection_validity().await?;
+            tracing::info!("Connected to an external shadow database.");
 
             if connector.reset(namespaces.clone()).await.is_err() {
                 crate::best_effort_reset(connector, namespaces.clone()).await?;
@@ -40,6 +40,8 @@ pub async fn sql_schema_from_migration_history(
                 })
                 .await
         }
+
+        // If we're not using an external shadow database, one must be created manually.
         UsingExternalShadowDb::No => {
             let (main_connection, params) = super::get_connection_and_params(&mut connector.state, provider).await?;
             let shadow_database_name = crate::new_shadow_database_name();

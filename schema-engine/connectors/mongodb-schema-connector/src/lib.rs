@@ -99,7 +99,7 @@ impl SchemaDialect for MongoDbSchemaDialect {
         &'a self,
         _migrations: &'a [MigrationDirectory],
         _namespaces: Option<Namespaces>,
-        _target: SchemaFromMigrationsTarget,
+        _target: ExternalShadowDatabase,
     ) -> BoxFuture<'a, ConnectorResult<DatabaseSchema>> {
         Box::pin(async { Err(unsupported_command_error()) })
     }

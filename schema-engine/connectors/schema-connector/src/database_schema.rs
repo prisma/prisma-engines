@@ -4,7 +4,6 @@ pub struct DatabaseSchema(Box<dyn std::any::Any + Send + Sync>);
 impl DatabaseSchema {
     /// Type-erase a migration.
     pub fn new<T: 'static + Send + Sync>(migration: T) -> Self {
-        println!("{}", std::any::type_name_of_val(&migration));
         DatabaseSchema(Box::new(migration))
     }
 

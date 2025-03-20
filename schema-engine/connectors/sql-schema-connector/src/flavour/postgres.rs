@@ -170,7 +170,7 @@ impl SqlDialect for PostgresDialect {
     }
 
     #[cfg(feature = "postgresql-native")]
-    fn new_shadow_db(
+    fn connect_to_shadow_db(
         &self,
         url: String,
         preview_features: psl::PreviewFeatures,
@@ -182,7 +182,7 @@ impl SqlDialect for PostgresDialect {
     }
 
     #[cfg(not(feature = "postgresql-native"))]
-    fn new_shadow_db(
+    fn connect_to_shadow_db(
         &self,
         factory: std::sync::Arc<dyn quaint::connector::ExternalConnectorFactory>,
     ) -> BoxFuture<'_, ConnectorResult<Box<dyn SqlConnector>>> {

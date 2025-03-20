@@ -49,7 +49,7 @@ impl SqlDialect for SqliteDialect {
     }
 
     #[cfg(feature = "sqlite-native")]
-    fn new_shadow_db(
+    fn connect_to_shadow_db(
         &self,
         url: String,
         preview_features: psl::PreviewFeatures,
@@ -59,7 +59,7 @@ impl SqlDialect for SqliteDialect {
     }
 
     #[cfg(not(feature = "sqlite-native"))]
-    fn new_shadow_db(
+    fn connect_to_shadow_db(
         &self,
         factory: std::sync::Arc<dyn quaint::connector::ExternalConnectorFactory>,
     ) -> BoxFuture<'_, ConnectorResult<Box<dyn SqlConnector>>> {
@@ -367,11 +367,14 @@ impl SqlConnector for SqliteConnector {
             match external_shadow_db {
                 UsingExternalShadowDb::Yes => {
                     let (conn, _) = imp::get_connection_and_params(&mut self.state)?;
+                    tracing::info!("Connected to an external shadow database.");
                     apply_migrations_and_describe(conn, migrations).await
                 }
+
+                // If we're not using an external shadow database, one must be created manually.
                 UsingExternalShadowDb::No => {
                     tracing::debug!("Applying migrations to temporary in-memory SQLite database.");
-                    let conn = imp::new_shadow_db()?;
+                    let conn = imp::connect_to_shadow_db()?;
                     apply_migrations_and_describe(&conn, migrations).await
                 }
             }

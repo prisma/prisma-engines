@@ -133,7 +133,7 @@ impl SchemaDialect for SqlSchemaDialect {
         &'a self,
         migrations: &'a [MigrationDirectory],
         namespaces: Option<Namespaces>,
-        target: SchemaFromMigrationsTarget,
+        target: ExternalShadowDatabase,
     ) -> BoxFuture<'a, ConnectorResult<DatabaseSchema>> {
         Box::pin(async move {
             let mut connector = match target {
@@ -143,17 +143,21 @@ impl SchemaDialect for SqlSchemaDialect {
                     feature = "postgresql-native",
                     feature = "sqlite-native"
                 )))]
-                SchemaFromMigrationsTarget::ExternalAdapter(factory) => self.dialect.new_shadow_db(factory).await?,
+                ExternalShadowDatabase::ExternalAdapter(factory) => self.dialect.connect_to_shadow_db(factory).await?,
                 #[cfg(any(
                     feature = "mssql-native",
                     feature = "mysql-native",
                     feature = "postgresql-native",
                     feature = "sqlite-native"
                 ))]
-                SchemaFromMigrationsTarget::ShadowDbUrl {
-                    shadow_db_url,
+                ExternalShadowDatabase::ConnectionString {
+                    connection_string: shadow_db_url,
                     preview_features,
-                } => self.dialect.new_shadow_db(shadow_db_url, preview_features).await?,
+                } => {
+                    self.dialect
+                        .connect_to_shadow_db(shadow_db_url, preview_features)
+                        .await?
+                }
                 _ => {
                     return Err(ConnectorError::from_msg(
                         "Received an unsupported shadow database target".to_owned(),
@@ -393,8 +397,8 @@ impl SchemaConnector for SqlSchemaConnector {
         Box::pin(async move {
             match self.inner.shadow_db_url() {
                 Some(url) => {
-                    let target = SchemaFromMigrationsTarget::ShadowDbUrl {
-                        shadow_db_url: url.to_owned(),
+                    let target = ExternalShadowDatabase::ConnectionString {
+                        connection_string: url.to_owned(),
                         preview_features: self.inner.preview_features(),
                     };
                     self.schema_dialect()

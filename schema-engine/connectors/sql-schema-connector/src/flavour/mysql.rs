@@ -4,8 +4,8 @@ mod renderer;
 mod schema_calculator;
 mod schema_differ;
 
+use super::SqlDialect;
 use crate::{error::SystemDatabase, flavour::SqlConnector};
-#[cfg(feature = "mysql-native")]
 use connector::{shadow_db, Connection};
 use destructive_change_checker::MysqlDestructiveChangeCheckerFlavour;
 use enumflags2::BitFlags;
@@ -24,10 +24,6 @@ use sql_schema_describer::SqlSchema;
 use std::{future, sync::LazyLock};
 use url::Url;
 use versions::Versioning;
-#[cfg(not(feature = "mysql-native"))]
-use wasm::{shadow_db, Connection};
-
-use super::SqlDialect;
 
 const ADVISORY_LOCK_TIMEOUT: std::time::Duration = std::time::Duration::from_secs(10);
 static QUALIFIED_NAME_RE: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"`[^ ]+`\.`[^ ]+`").unwrap());
@@ -93,7 +89,7 @@ impl SqlDialect for MysqlDialect {
     }
 
     #[cfg(feature = "mysql-native")]
-    fn new_shadow_db(
+    fn connect_to_shadow_db(
         &self,
         url: String,
         preview_features: psl::PreviewFeatures,
@@ -103,7 +99,7 @@ impl SqlDialect for MysqlDialect {
     }
 
     #[cfg(not(feature = "mysql-native"))]
-    fn new_shadow_db(
+    fn connect_to_shadow_db(
         &self,
         factory: Arc<dyn ExternalConnectorFactory>,
     ) -> BoxFuture<'_, ConnectorResult<Box<dyn SqlConnector>>> {
@@ -375,8 +371,8 @@ impl SqlConnector for MysqlConnector {
         match external_shadow_db {
             UsingExternalShadowDb::Yes => Box::pin(async move {
                 self.ensure_connection_validity().await?;
+                tracing::info!("Connected to an external shadow database.");
 
-                tracing::info!("Connecting to user-provided shadow database.");
                 if self.reset(None).await.is_err() {
                     crate::best_effort_reset(self, namespaces).await?;
                 }
@@ -384,6 +380,7 @@ impl SqlConnector for MysqlConnector {
                 shadow_db::sql_schema_from_migrations_history(migrations, self).await
             }),
 
+            // If we're not using an external shadow database, one must be created manually.
             UsingExternalShadowDb::No => {
                 with_connection(&mut self.state, move |params, _circumstances, conn| async move {
                     let shadow_database_name = crate::new_shadow_database_name();

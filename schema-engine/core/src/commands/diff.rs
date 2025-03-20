@@ -8,8 +8,7 @@ use crate::{
 use enumflags2::BitFlags;
 use json_rpc::types::MigrationList;
 use schema_connector::{
-    ConnectorError, ConnectorHost, DatabaseSchema, Namespaces, SchemaConnector, SchemaDialect,
-    SchemaFromMigrationsTarget,
+    ConnectorError, ConnectorHost, DatabaseSchema, ExternalShadowDatabase, Namespaces, SchemaConnector, SchemaDialect,
 };
 use sql_schema_connector::SqlSchemaConnector;
 
@@ -180,8 +179,8 @@ async fn json_rpc_diff_target_to_dialect(
                         .schema_from_migrations_with_target(
                             &directories,
                             namespaces,
-                            SchemaFromMigrationsTarget::ShadowDbUrl {
-                                shadow_db_url: shadow_database_url.to_owned(),
+                            ExternalShadowDatabase::ConnectionString {
+                                connection_string: shadow_database_url.to_owned(),
                                 preview_features,
                             },
                         )
