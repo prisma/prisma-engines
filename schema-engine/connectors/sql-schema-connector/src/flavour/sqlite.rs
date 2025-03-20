@@ -12,13 +12,12 @@ use renderer::SqliteRenderer;
 use schema_calculator::SqliteSchemaCalculatorFlavour;
 use schema_connector::{
     migrations_directory::MigrationDirectory, BoxFuture, ConnectorError, ConnectorResult, Namespaces,
-    UsingExternalShadowDb,
 };
 use schema_differ::SqliteSchemaDifferFlavour;
 use sql_schema_describer::{sqlite::SqlSchemaDescriber, DescriberErrorKind, SqlSchema};
 use std::future::Future;
 
-use super::SqlDialect;
+use super::{SqlDialect, UsingExternalShadowDb};
 
 type State = imp::State;
 

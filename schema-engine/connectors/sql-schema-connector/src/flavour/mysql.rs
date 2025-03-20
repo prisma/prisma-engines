@@ -4,7 +4,7 @@ mod renderer;
 mod schema_calculator;
 mod schema_differ;
 
-use super::SqlDialect;
+use super::{SqlDialect, UsingExternalShadowDb};
 use crate::{error::SystemDatabase, flavour::SqlConnector};
 use connector::{shadow_db, Connection};
 use destructive_change_checker::MysqlDestructiveChangeCheckerFlavour;
@@ -17,7 +17,6 @@ use renderer::MysqlRenderer;
 use schema_calculator::MysqlSchemaCalculatorFlavour;
 use schema_connector::{
     migrations_directory::MigrationDirectory, BoxFuture, ConnectorError, ConnectorParams, ConnectorResult, Namespaces,
-    UsingExternalShadowDb,
 };
 use schema_differ::MysqlSchemaDifferFlavour;
 use sql_schema_describer::SqlSchema;
@@ -113,7 +112,7 @@ pub(crate) struct MysqlConnector {
 
 impl std::fmt::Debug for MysqlConnector {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.debug_struct("MysqlFlavour").finish()
+        f.debug_struct("MysqlConnector").finish()
     }
 }
 
@@ -609,8 +608,8 @@ mod tests {
         let url = "mysql://myname:mypassword@myserver:8765/mydbname";
 
         let connector_params = ConnectorParams::new(url.to_owned(), Default::default(), None);
-        let flavour = MysqlConnector::new_with_params(connector_params).unwrap();
-        let debugged = format!("{flavour:?}");
+        let connector = MysqlConnector::new_with_params(connector_params).unwrap();
+        let debugged = format!("{connector:?}");
 
         let words = &["myname", "mypassword", "myserver", "8765", "mydbname"];
 

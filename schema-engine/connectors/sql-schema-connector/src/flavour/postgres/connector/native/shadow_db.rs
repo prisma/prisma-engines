@@ -1,7 +1,7 @@
 use crate::flavour::postgres::{sql_schema_from_migrations_and_db, MigratePostgresUrl};
-use crate::flavour::{PostgresConnector, SqlConnector};
+use crate::flavour::{PostgresConnector, SqlConnector, UsingExternalShadowDb};
 use schema_connector::{migrations_directory::MigrationDirectory, ConnectorResult};
-use schema_connector::{ConnectorError, ConnectorParams, Namespaces, UsingExternalShadowDb};
+use schema_connector::{ConnectorError, ConnectorParams, Namespaces};
 use sql_schema_describer::SqlSchema;
 use url::Url;
 

@@ -18,7 +18,7 @@ mod sql_schema_differ;
 
 use database_schema::SqlDatabaseSchema;
 use enumflags2::BitFlags;
-use flavour::{SqlConnector, SqlDialect};
+use flavour::{SqlConnector, SqlDialect, UsingExternalShadowDb};
 use migration_pair::MigrationPair;
 use psl::{datamodel_connector::NativeTypeInstance, parser_database::ScalarType, SourceFile, ValidatedSchema};
 use quaint::connector::DescribedQuery;

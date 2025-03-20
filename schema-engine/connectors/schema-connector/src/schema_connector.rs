@@ -190,12 +190,3 @@ pub enum ExternalShadowDatabase {
         preview_features: PreviewFeatures,
     },
 }
-
-/// The setting that indicates whether we're using an external shadow database.
-#[derive(Debug)]
-pub enum UsingExternalShadowDb {
-    /// We're using an external shadow database.
-    Yes,
-    /// We're not using an external shadow database, one must be created manually.
-    No,
-}

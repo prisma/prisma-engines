@@ -17,7 +17,6 @@ use renderer::PostgresRenderer;
 use schema_calculator::PostgresSchemaCalculatorFlavour;
 use schema_connector::{
     migrations_directory::MigrationDirectory, BoxFuture, ConnectorError, ConnectorResult, Namespaces,
-    UsingExternalShadowDb,
 };
 use schema_differ::PostgresSchemaDifferFlavour;
 use sql_schema_describer::{postgres::PostgresSchemaExt, SqlSchema};
@@ -31,7 +30,7 @@ use std::{
 use url::Url;
 use user_facing_errors::schema_engine::DatabaseSchemaInconsistent;
 
-use super::{SqlConnector, SqlDialect};
+use super::{SqlConnector, SqlDialect, UsingExternalShadowDb};
 
 const ADVISORY_LOCK_TIMEOUT: time::Duration = time::Duration::from_secs(10);
 
@@ -718,8 +717,8 @@ mod tests {
         let url = "postgresql://myname:mypassword@myserver:8765/mydbname";
 
         let params = ConnectorParams::new(url.to_owned(), Default::default(), None);
-        let flavour = PostgresConnector::new_with_params(params).unwrap();
-        let debugged = format!("{flavour:?}");
+        let connector = PostgresConnector::new_with_params(params).unwrap();
+        let debugged = format!("{connector:?}");
 
         let words = &["myname", "mypassword", "myserver", "8765", "mydbname"];
 

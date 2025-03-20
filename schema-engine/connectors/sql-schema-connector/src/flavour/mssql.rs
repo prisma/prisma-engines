@@ -17,13 +17,12 @@ use renderer::MssqlRenderer;
 use schema_calculator::MssqlSchemaCalculatorFlavour;
 use schema_connector::{
     migrations_directory::MigrationDirectory, BoxFuture, ConnectorError, ConnectorParams, ConnectorResult, Namespaces,
-    UsingExternalShadowDb,
 };
 use schema_differ::MssqlSchemaDifferFlavour;
 use sql_schema_describer::SqlSchema;
 use std::{future, str::FromStr};
 
-use super::SqlDialect;
+use super::{SqlDialect, UsingExternalShadowDb};
 
 const DEFAULT_SCHEMA_NAME: &str = "dbo";
 

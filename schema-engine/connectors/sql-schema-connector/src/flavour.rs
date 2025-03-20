@@ -35,7 +35,7 @@ use psl::{PreviewFeature, PreviewFeatures, ValidatedSchema};
 use quaint::prelude::{ConnectionInfo, Table};
 use schema_connector::{
     migrations_directory::MigrationDirectory, BoxFuture, ConnectorError, ConnectorResult, IntrospectionContext,
-    MigrationRecord, Namespaces, PersistenceNotInitializedError, UsingExternalShadowDb,
+    MigrationRecord, Namespaces, PersistenceNotInitializedError,
 };
 use sql_schema_describer::SqlSchema;
 use std::fmt::Debug;
@@ -116,11 +116,10 @@ pub(crate) trait SqlDialect: Send + Sync + 'static {
         Ok(())
     }
 
-    /// The datamodel connector corresponding to the flavour
+    /// The datamodel connector corresponding to the dialect.
     fn datamodel_connector(&self) -> &'static dyn psl::datamodel_connector::Connector;
 
-    /// Return an empty database schema. This happens in the flavour, because we need
-    /// SqlSchema::connector_data to be set.
+    /// Return an empty database schema.
     fn empty_database_schema(&self) -> SqlSchema {
         SqlSchema::default()
     }
@@ -328,7 +327,7 @@ pub(crate) trait SqlConnector: Send + Sync + Debug {
     fn dispose(&self) -> BoxFuture<'_, ConnectorResult<()>>;
 }
 
-// Utility function shared by multiple flavours to compare shadow database and main connection.
+// Utility function shared by multiple dialects to compare shadow database and main connection.
 fn validate_connection_infos_do_not_match(previous: &str, next: &str) -> ConnectorResult<()> {
     if previous == next {
         Err(ConnectorError::from_msg("The shadow database you configured appears to be the same as the main database. Please specify another shadow database.".into()))
@@ -355,4 +354,16 @@ fn quaint_error_to_connector_error(error: quaint::error::Error, connection_info:
             ConnectorError::from_msg(msg)
         }
     }
+}
+
+/// A flag that indicates whether the connector is using an external shadow database.
+#[derive(Debug)]
+pub enum UsingExternalShadowDb {
+    /// We're using an external shadow database (such as a custom shadow database connection string
+    /// or a JavaScript adapter). This indicates that it can be safely written to for schema
+    /// calculation purposes.
+    Yes,
+    /// We're not using an external shadow database. When this is the case, the connector must
+    /// create a new temporary database for schema calculation purposes.
+    No,
 }
