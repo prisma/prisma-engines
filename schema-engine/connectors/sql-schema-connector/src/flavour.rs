@@ -302,8 +302,8 @@ pub(crate) trait SqlConnector: Send + Sync + Debug {
     fn reset(&mut self, namespaces: Option<Namespaces>) -> BoxFuture<'_, ConnectorResult<()>>;
 
     /// Apply the given migration history to a shadow database, and return
-    /// the final introspected SQL schema. The third parameter is an optional shadow database url
-    /// in case there is one at this point of the command, but not earlier in set_params().
+    /// the final introspected SQL schema. The third parameter specifies whether an external
+    /// shadow database is being used - if not, we need to create a temporary one.
     fn sql_schema_from_migration_history<'a>(
         &'a mut self,
         migrations: &'a [MigrationDirectory],

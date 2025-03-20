@@ -174,8 +174,6 @@ impl SqlDialect for PostgresDialect {
         url: String,
         preview_features: psl::PreviewFeatures,
     ) -> BoxFuture<'_, ConnectorResult<Box<dyn SqlConnector>>> {
-        use super::SqlConnector;
-
         let params = schema_connector::ConnectorParams::new(url, preview_features, None);
         Box::pin(async move { Ok(Box::new(PostgresConnector::new_with_params(params)?) as Box<dyn SqlConnector>) })
     }
