@@ -21,18 +21,18 @@ pub(crate) struct DestructiveCheckPlan {
 }
 
 impl DestructiveCheckPlan {
-    pub(super) fn new() -> Self {
+    pub fn new() -> Self {
         DestructiveCheckPlan {
             warnings: Vec::new(),
             unexecutable_migrations: Vec::new(),
         }
     }
 
-    pub(super) fn push_warning(&mut self, warning: SqlMigrationWarningCheck, step_index: usize) {
+    pub fn push_warning(&mut self, warning: SqlMigrationWarningCheck, step_index: usize) {
         self.warnings.push((warning, step_index))
     }
 
-    pub(super) fn push_unexecutable(&mut self, unexecutable_migration: UnexecutableStepCheck, step_index: usize) {
+    pub fn push_unexecutable(&mut self, unexecutable_migration: UnexecutableStepCheck, step_index: usize) {
         self.unexecutable_migrations.push((unexecutable_migration, step_index))
     }
 
@@ -41,7 +41,7 @@ impl DestructiveCheckPlan {
     ///
     /// For example, dropping a table that has 0 rows can be considered safe.
     #[tracing::instrument(skip(connector), level = "debug")]
-    pub(super) async fn execute(
+    pub async fn execute(
         &self,
         connector: &mut (dyn SqlConnector + Send + Sync),
     ) -> ConnectorResult<DestructiveChangeDiagnostics> {
@@ -89,7 +89,7 @@ impl DestructiveCheckPlan {
     }
 
     /// Perform the database inspection for a given [`Check`](trait.Check.html).
-    pub(super) async fn inspect_for_check(
+    pub async fn inspect_for_check(
         &self,
         check: &(dyn Check + Send + Sync + 'static),
         connector: &mut (dyn SqlConnector + Send + Sync),
@@ -118,7 +118,7 @@ impl DestructiveCheckPlan {
     /// database we cannot check directly. For example when we want to emit
     /// warnings about the production database, when creating a migration in
     /// development.
-    pub(super) fn pure_check(&self) -> DestructiveChangeDiagnostics {
+    pub fn pure_check(&self) -> DestructiveChangeDiagnostics {
         let results = DatabaseInspectionResults::default();
         let mut diagnostics = DestructiveChangeDiagnostics::new();
 

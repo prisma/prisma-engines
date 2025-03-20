@@ -28,7 +28,7 @@ pub(crate) struct DifferDatabase<'a> {
     /// (table_idx, column_idx) -> ColumnChanges
     column_changes: HashMap<MigrationPair<TableColumnId>, column::ColumnChanges>,
     /// Postgres extension name -> extension indexes.
-    pub(super) extensions: HashMap<&'a str, MigrationPair<Option<ExtensionId>>>,
+    pub(crate) extensions: HashMap<&'a str, MigrationPair<Option<ExtensionId>>>,
     /// Tables that will need to be completely redefined (dropped and recreated) for the migration
     /// to succeed. It needs to be crate public because it is set from the flavour.
     pub(crate) tables_to_redefine: BTreeSet<MigrationPair<TableId>>,

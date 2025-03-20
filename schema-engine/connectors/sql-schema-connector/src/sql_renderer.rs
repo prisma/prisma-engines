@@ -10,21 +10,8 @@
 
 mod common;
 
-#[cfg(feature = "mssql")]
-pub mod mssql_renderer;
+pub(crate) use common::*;
 
-#[cfg(feature = "mysql")]
-pub mod mysql_renderer;
-
-#[cfg(any(feature = "postgresql", feature = "cockroachdb"))]
-pub mod postgres_renderer;
-
-#[cfg(feature = "sqlite")]
-pub mod sqlite_renderer;
-
-pub(crate) use common::IteratorJoin;
-
-use self::common::{Quoted, QuotedWithPrefix};
 use crate::{
     migration_pair::MigrationPair,
     sql_migration::{

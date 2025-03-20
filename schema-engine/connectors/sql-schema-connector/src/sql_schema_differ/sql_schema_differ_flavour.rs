@@ -5,18 +5,6 @@ use sql_schema_describer::{
     TableColumnId,
 };
 
-#[cfg(feature = "mssql")]
-pub mod mssql;
-
-#[cfg(feature = "mysql")]
-pub mod mysql;
-
-#[cfg(any(feature = "postgresql", feature = "cockroachdb"))]
-pub mod postgres;
-
-#[cfg(feature = "sqlite")]
-pub mod sqlite;
-
 /// Trait to specialize SQL schema diffing (resulting in migration steps) by SQL backend.
 pub(crate) trait SqlSchemaDifferFlavour {
     fn can_alter_primary_keys(&self) -> bool {

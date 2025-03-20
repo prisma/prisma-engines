@@ -1,15 +1,3 @@
-#[cfg(feature = "mssql")]
-pub mod mssql;
-
-#[cfg(feature = "mysql")]
-pub mod mysql;
-
-#[cfg(any(feature = "postgresql", feature = "cockroachdb"))]
-pub mod postgres;
-
-#[cfg(feature = "sqlite")]
-pub mod sqlite;
-
 use super::{
     check::{Column, Table},
     DestructiveCheckPlan,
@@ -54,7 +42,7 @@ pub(crate) trait DestructiveChangeCheckerFlavour: Send + Sync {
 }
 
 /// Display a column type for warnings/errors.
-fn display_column_type(
+pub(crate) fn display_column_type(
     column: sql_schema_describer::walkers::TableColumnWalker<'_>,
     connector: &dyn psl::datamodel_connector::Connector,
 ) -> String {
@@ -64,7 +52,7 @@ fn display_column_type(
     }
 }
 
-fn extract_table_rows_count(table: &Table, result_set: quaint::prelude::ResultSet) -> ConnectorResult<i64> {
+pub(crate) fn extract_table_rows_count(table: &Table, result_set: quaint::prelude::ResultSet) -> ConnectorResult<i64> {
     result_set
         .first()
         .ok_or_else(|| {
@@ -83,7 +71,7 @@ fn extract_table_rows_count(table: &Table, result_set: quaint::prelude::ResultSe
         })
 }
 
-fn extract_column_values_count(result_set: quaint::prelude::ResultSet) -> ConnectorResult<i64> {
+pub(crate) fn extract_column_values_count(result_set: quaint::prelude::ResultSet) -> ConnectorResult<i64> {
     result_set
         .first()
         .as_ref()

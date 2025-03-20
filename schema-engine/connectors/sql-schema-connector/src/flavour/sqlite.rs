@@ -1,30 +1,22 @@
-#[cfg(feature = "sqlite-native")]
-mod native;
+mod connector;
+mod destructive_change_checker;
+mod renderer;
+mod schema_calculator;
+mod schema_differ;
 
-#[cfg(not(feature = "sqlite-native"))]
-mod wasm;
-
-use std::future::Future;
-
-#[cfg(feature = "sqlite-native")]
-use native as imp;
-
-#[cfg(not(feature = "sqlite-native"))]
-use wasm as imp;
-
-use crate::{
-    flavour::SqlConnector,
-    sql_destructive_change_checker::destructive_change_checker_flavour::sqlite::SqliteDestructiveChangeCheckerFlavour,
-    sql_renderer::{sqlite_renderer::SqliteRenderer, SqlRenderer},
-    sql_schema_calculator::sql_schema_calculator_flavour::sqlite::SqliteSchemaCalculatorFlavour,
-    sql_schema_differ::sql_schema_differ_flavour::sqlite::SqliteSchemaDifferFlavour,
-};
+use crate::{flavour::SqlConnector, sql_renderer::SqlRenderer};
+use connector as imp;
+use destructive_change_checker::SqliteDestructiveChangeCheckerFlavour;
 use indoc::indoc;
+use renderer::SqliteRenderer;
+use schema_calculator::SqliteSchemaCalculatorFlavour;
 use schema_connector::{
     migrations_directory::MigrationDirectory, BoxFuture, ConnectorError, ConnectorResult, Namespaces,
     UsingExternalShadowDb,
 };
+use schema_differ::SqliteSchemaDifferFlavour;
 use sql_schema_describer::{sqlite::SqlSchemaDescriber, DescriberErrorKind, SqlSchema};
+use std::future::Future;
 
 use super::SqlDialect;
 
@@ -240,13 +232,13 @@ impl SqlConnector for SqliteConnector {
                 Ok(result) => result,
                 Err(err) => {
                     #[cfg(feature = "sqlite-native")]
-                    if let Some(native::rusqlite::Error::SqliteFailure(
-                        native::rusqlite::ffi::Error {
+                    if let Some(imp::rusqlite::Error::SqliteFailure(
+                        imp::rusqlite::ffi::Error {
                             extended_code: 1, // table not found
                             ..
                         },
                         _,
-                    )) = err.source_as::<native::rusqlite::Error>()
+                    )) = err.source_as::<imp::rusqlite::Error>()
                     {
                         return Ok(Err(schema_connector::PersistenceNotInitializedError));
                     }

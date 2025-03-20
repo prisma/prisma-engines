@@ -1,31 +1,25 @@
-#[cfg(feature = "mssql-native")]
-mod native;
+mod connector;
+mod destructive_change_checker;
+mod renderer;
+mod schema_calculator;
+mod schema_differ;
 
-#[cfg(not(feature = "mssql-native"))]
-mod wasm;
-
-#[cfg(feature = "mssql-native")]
-use native::{generic_apply_migration_script, shadow_db, Connection};
-
-#[cfg(not(feature = "mssql-native"))]
-use wasm::{generic_apply_migration_script, shadow_db, Connection};
-
-use crate::{
-    sql_destructive_change_checker::{
-        self, destructive_change_checker_flavour::mssql::MssqlDestructiveChangeCheckerFlavour,
-    },
-    sql_renderer::{mssql_renderer::MssqlRenderer, SqlRenderer},
-    sql_schema_calculator::sql_schema_calculator_flavour::mssql::MssqlSchemaCalculatorFlavour,
-    sql_schema_differ::sql_schema_differ_flavour::mssql::MssqlSchemaDifferFlavour,
-    SqlConnector,
-};
+use crate::{sql_destructive_change_checker, sql_renderer::SqlRenderer, SqlConnector};
 use connection_string::JdbcString;
+#[cfg(feature = "mssql-native")]
+use connector::{generic_apply_migration_script, shadow_db, Connection};
+#[cfg(not(feature = "mssql-native"))]
+use connector::{generic_apply_migration_script, shadow_db, Connection};
+use destructive_change_checker::MssqlDestructiveChangeCheckerFlavour;
 use indoc::formatdoc;
 use quaint::{connector::MssqlUrl, prelude::Table};
+use renderer::MssqlRenderer;
+use schema_calculator::MssqlSchemaCalculatorFlavour;
 use schema_connector::{
     migrations_directory::MigrationDirectory, BoxFuture, ConnectorError, ConnectorParams, ConnectorResult, Namespaces,
     UsingExternalShadowDb,
 };
+use schema_differ::MssqlSchemaDifferFlavour;
 use sql_schema_describer::SqlSchema;
 use std::{future, str::FromStr};
 

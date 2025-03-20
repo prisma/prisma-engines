@@ -1,15 +1,3 @@
-#[cfg(feature = "mssql")]
-pub mod mssql;
-
-#[cfg(feature = "mysql")]
-pub mod mysql;
-
-#[cfg(any(feature = "postgresql", feature = "cockroachdb"))]
-pub mod postgres;
-
-#[cfg(feature = "sqlite")]
-pub mod sqlite;
-
 use psl::parser_database::{ast::FieldArity, walkers::*};
 use sql_schema_describer::{self as sql, ColumnArity, ColumnType, ColumnTypeFamily};
 

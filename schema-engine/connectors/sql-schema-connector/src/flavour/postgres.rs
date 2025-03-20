@@ -1,33 +1,25 @@
-#[cfg(feature = "postgresql-native")]
-mod native;
+mod connector;
+mod destructive_change_checker;
+mod renderer;
+mod schema_calculator;
+mod schema_differ;
 
-#[cfg(not(feature = "postgresql-native"))]
-mod wasm;
-
-#[cfg(feature = "postgresql-native")]
-use native as imp;
-
-use psl::PreviewFeature;
-use user_facing_errors::schema_engine::DatabaseSchemaInconsistent;
-#[cfg(not(feature = "postgresql-native"))]
-use wasm as imp;
-
-use crate::{
-    sql_destructive_change_checker::destructive_change_checker_flavour::postgres::PostgresDestructiveChangeCheckerFlavour,
-    sql_renderer::postgres_renderer::PostgresRenderer,
-    sql_schema_calculator::sql_schema_calculator_flavour::postgres::PostgresSchemaCalculatorFlavour,
-    sql_schema_differ::sql_schema_differ_flavour::postgres::PostgresSchemaDifferFlavour, SqlConnector,
-};
+use connector as imp;
+use destructive_change_checker::PostgresDestructiveChangeCheckerFlavour;
 use enumflags2::BitFlags;
 use indoc::indoc;
+use psl::PreviewFeature;
 use quaint::{
     connector::{PostgresUrl, PostgresWebSocketUrl},
     Value,
 };
+use renderer::PostgresRenderer;
+use schema_calculator::PostgresSchemaCalculatorFlavour;
 use schema_connector::{
     migrations_directory::MigrationDirectory, BoxFuture, ConnectorError, ConnectorResult, Namespaces,
     UsingExternalShadowDb,
 };
+use schema_differ::PostgresSchemaDifferFlavour;
 use sql_schema_describer::{postgres::PostgresSchemaExt, SqlSchema};
 use std::{
     borrow::Cow,
@@ -37,8 +29,9 @@ use std::{
     time,
 };
 use url::Url;
+use user_facing_errors::schema_engine::DatabaseSchemaInconsistent;
 
-use super::SqlDialect;
+use super::{SqlConnector, SqlDialect};
 
 const ADVISORY_LOCK_TIMEOUT: time::Duration = time::Duration::from_secs(10);
 
@@ -182,6 +175,8 @@ impl SqlDialect for PostgresDialect {
         url: String,
         preview_features: psl::PreviewFeatures,
     ) -> BoxFuture<'_, ConnectorResult<Box<dyn SqlConnector>>> {
+        use super::SqlConnector;
+
         let params = schema_connector::ConnectorParams::new(url, preview_features, None);
         Box::pin(async move { Ok(Box::new(PostgresConnector::new_with_params(params)?) as Box<dyn SqlConnector>) })
     }

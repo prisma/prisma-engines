@@ -14,12 +14,12 @@
 //! - Render the final user-facing messages based on the plan and the gathered
 //!   information.
 
-mod check;
+pub(crate) mod check;
 mod database_inspection_results;
 pub mod destructive_change_checker_flavour;
-mod destructive_check_plan;
-mod unexecutable_step_check;
-mod warning_check;
+pub(crate) mod destructive_check_plan;
+pub(crate) mod unexecutable_step_check;
+pub(crate) mod warning_check;
 
 pub(crate) use destructive_change_checker_flavour::DestructiveChangeCheckerFlavour;
 

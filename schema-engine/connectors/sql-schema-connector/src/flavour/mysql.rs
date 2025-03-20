@@ -1,35 +1,31 @@
+mod connector;
+mod destructive_change_checker;
+mod renderer;
+mod schema_calculator;
+mod schema_differ;
+
+use crate::{error::SystemDatabase, flavour::SqlConnector};
 #[cfg(feature = "mysql-native")]
-mod native;
-
-#[cfg(not(feature = "mysql-native"))]
-mod wasm;
-
-#[cfg(feature = "mysql-native")]
-use native::{shadow_db, Connection};
-
-#[cfg(not(feature = "mysql-native"))]
-use wasm::{shadow_db, Connection};
-
-use crate::{
-    error::SystemDatabase, flavour::SqlConnector,
-    sql_destructive_change_checker::destructive_change_checker_flavour::mysql::MysqlDestructiveChangeCheckerFlavour,
-    sql_renderer::mysql_renderer::MysqlRenderer,
-    sql_schema_calculator::sql_schema_calculator_flavour::mysql::MysqlSchemaCalculatorFlavour,
-    sql_schema_differ::sql_schema_differ_flavour::mysql::MysqlSchemaDifferFlavour,
-};
+use connector::{shadow_db, Connection};
+use destructive_change_checker::MysqlDestructiveChangeCheckerFlavour;
 use enumflags2::BitFlags;
 use indoc::indoc;
 use psl::{datamodel_connector, parser_database::ScalarType, ValidatedSchema};
 use quaint::connector::MysqlUrl;
 use regex::{Regex, RegexSet};
+use renderer::MysqlRenderer;
+use schema_calculator::MysqlSchemaCalculatorFlavour;
 use schema_connector::{
     migrations_directory::MigrationDirectory, BoxFuture, ConnectorError, ConnectorParams, ConnectorResult, Namespaces,
     UsingExternalShadowDb,
 };
+use schema_differ::MysqlSchemaDifferFlavour;
 use sql_schema_describer::SqlSchema;
 use std::{future, sync::LazyLock};
 use url::Url;
 use versions::Versioning;
+#[cfg(not(feature = "mysql-native"))]
+use wasm::{shadow_db, Connection};
 
 use super::SqlDialect;
 

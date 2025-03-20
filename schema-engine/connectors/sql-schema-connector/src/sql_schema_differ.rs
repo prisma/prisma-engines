@@ -1,9 +1,9 @@
-mod column;
-mod differ_database;
+pub(crate) mod column;
+pub(crate) mod differ_database;
 mod enums;
 mod index;
 pub mod sql_schema_differ_flavour;
-mod table;
+pub(crate) mod table;
 
 pub(crate) use column::{ColumnChange, ColumnChanges};
 pub(crate) use sql_schema_differ_flavour::SqlSchemaDifferFlavour;
@@ -569,7 +569,7 @@ fn is_prisma_implicit_m2m_fk(fk: ForeignKeyWalker<'_>) -> bool {
     table.column("A").is_some() && table.column("B").is_some()
 }
 
-fn all_match<T: PartialEq>(a: impl ExactSizeIterator<Item = T>, b: impl ExactSizeIterator<Item = T>) -> bool {
+pub fn all_match<T: PartialEq>(a: impl ExactSizeIterator<Item = T>, b: impl ExactSizeIterator<Item = T>) -> bool {
     a.len() == b.len() && a.zip(b).all(|(a, b)| a == b)
 }
 

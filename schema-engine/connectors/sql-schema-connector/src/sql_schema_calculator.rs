@@ -590,12 +590,12 @@ fn column_arity(arity: ast::FieldArity) -> sql::ColumnArity {
 }
 
 pub(crate) struct Context<'a> {
-    datamodel: &'a ValidatedSchema,
-    schema: &'a mut SqlDatabaseSchema,
-    flavour: &'a dyn SqlSchemaCalculatorFlavour,
-    schemas: HashMap<&'a str, sql::NamespaceId>,
-    model_id_to_table_id: HashMap<db::ModelId, sql::TableId>,
-    enum_ids: HashMap<db::EnumId, sql::EnumId>,
+    pub datamodel: &'a ValidatedSchema,
+    pub schema: &'a mut SqlDatabaseSchema,
+    pub flavour: &'a dyn SqlSchemaCalculatorFlavour,
+    pub schemas: HashMap<&'a str, sql::NamespaceId>,
+    pub model_id_to_table_id: HashMap<db::ModelId, sql::TableId>,
+    pub enum_ids: HashMap<db::EnumId, sql::EnumId>,
 }
 
 impl Context<'_> {
