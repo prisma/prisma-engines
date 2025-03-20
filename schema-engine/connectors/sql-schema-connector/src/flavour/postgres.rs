@@ -244,15 +244,16 @@ impl PostgresConnector {
         })
     }
 
-    fn circumstances(&self) -> Option<BitFlags<Circumstances>> {
-        imp::get_circumstances(&self.state)
+    fn circumstances(&self) -> BitFlags<Circumstances> {
+        let mut circumstances = imp::get_circumstances(&self.state).unwrap_or_default();
+        if self.provider == PostgresProvider::CockroachDb {
+            circumstances |= Circumstances::IsCockroachDb;
+        }
+        circumstances
     }
 
     pub(crate) fn is_cockroachdb(&self) -> bool {
-        self.provider == PostgresProvider::CockroachDb
-            || self
-                .circumstances()
-                .is_some_and(|c| c.contains(Circumstances::IsCockroachDb))
+        self.provider == PostgresProvider::CockroachDb || self.circumstances().contains(Circumstances::IsCockroachDb)
     }
 
     fn schema_name(&self) -> &str {
@@ -274,7 +275,7 @@ impl PostgresConnector {
 
 impl SqlConnector for PostgresConnector {
     fn dialect(&self) -> Box<dyn SqlDialect> {
-        Box::new(PostgresDialect::new(self.circumstances().unwrap_or_default()))
+        Box::new(PostgresDialect::new(self.circumstances()))
     }
 
     fn shadow_db_url(&self) -> Option<&str> {

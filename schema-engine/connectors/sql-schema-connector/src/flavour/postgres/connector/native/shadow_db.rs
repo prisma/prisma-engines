@@ -25,7 +25,7 @@ pub async fn sql_schema_from_migration_history(
                 crate::best_effort_reset(connector, namespaces.clone()).await?;
             }
 
-            let circumstances = connector.circumstances().unwrap_or_default();
+            let circumstances = connector.circumstances();
             connector
                 .with_connection(|conn, params| {
                     sql_schema_from_migrations_and_db(
@@ -77,7 +77,7 @@ pub async fn sql_schema_from_migration_history(
             // We go through the whole process without early return, then clean up
             // the shadow database, and only then return the result. This avoids
             // leaving shadow databases behind in case of e.g. faulty migrations.
-            let circumstances = shadow_database.circumstances().unwrap_or_default();
+            let circumstances = shadow_database.circumstances();
             let ret = shadow_database
                 .with_connection(|conn, params| {
                     sql_schema_from_migrations_and_db(
