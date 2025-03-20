@@ -4,7 +4,7 @@ CONFIG_PATH = ./query-engine/connector-test-kit-rs/test-configs
 CONFIG_FILE = .test_config
 SCHEMA_EXAMPLES_PATH = ./query-engine/example_schemas
 DEV_SCHEMA_FILE = dev_datamodel.prisma
-DRIVER_ADAPTERS_BRANCH ?= main
+PRISMA_BRANCH ?= main
 ENGINE_SIZE_OUTPUT ?= /dev/stdout
 QE_WASM_VERSION ?= 0.0.0
 SCHEMA_WASM_VERSION ?= 0.0.0
@@ -452,8 +452,8 @@ ensure-prisma-present:
 		  echo "⚠️ ../prisma diverges from prisma/prisma main branch. Test results might diverge from those in CI ⚠️ "; \
 		fi \
 	else \
-		echo "git clone --depth=1 https://github.com/prisma/prisma.git --branch=$(DRIVER_ADAPTERS_BRANCH) ../prisma"; \
-		git clone --depth=1 https://github.com/prisma/prisma.git --branch=$(DRIVER_ADAPTERS_BRANCH) "../prisma" && echo "Prisma repository has been cloned to ../prisma"; \
+		echo "git clone --depth=1 https://github.com/prisma/prisma.git --branch=$(PRISMA_BRANCH) ../prisma"; \
+		git clone --depth=1 https://github.com/prisma/prisma.git --branch=$(PRISMA_BRANCH) "../prisma" && echo "Prisma repository has been cloned to ../prisma"; \
 	fi;
 
 qe:
