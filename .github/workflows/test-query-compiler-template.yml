@@ -13,8 +13,13 @@ on:
         required: true
 
 jobs:
+  select_prisma_branch:
+    name: Select the Prisma branch to use
+    uses: ./.github/workflows/select-prisma-branch.yml
+
   query-compiler-wasm-tests:
     name: '${{ matrix.partition }}'
+    needs: select_prisma_branch
 
     strategy:
       fail-fast: false
@@ -68,16 +73,13 @@ jobs:
         with:
           key: docker-${{ inputs.setup_task }}-${{hashFiles('docker-compose.yaml')}}
 
-      - name: Extract Branch Name
-        id: extract-branch
+      - name: Set Prisma branch
+        id: set-prisma-branch
         run: |
-          echo "Extracting branch name from: $(git show -s --format=%s)"
-          branch="$(git show -s --format=%s | grep -o "DRIVER_ADAPTERS_BRANCH=[^ ]*" | cut -f2 -d=)"
-          echo "branch=$branch"
-          if [ -n "$branch" ]; then
-            echo "Using $branch branch of driver adapters"
-            echo "DRIVER_ADAPTERS_BRANCH=$branch" >> "$GITHUB_ENV"
-          fi
+          PRISMA_BRANCH="${{ needs.select_prisma_branch.outputs.prismaBranch }}"
+          test -n "$PRISMA_BRANCH"
+          echo "PRISMA_BRANCH=$PRISMA_BRANCH" >> "$GITHUB_ENV"
+          echo "Using Prisma branch: $PRISMA_BRANCH"
 
       - uses: ./.github/workflows/include/rust-wasm-setup
       - uses: taiki-e/install-action@nextest

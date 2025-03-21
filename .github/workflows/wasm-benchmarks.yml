@@ -15,7 +15,14 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  select_prisma_branch:
+    name: Select the Prisma branch to use
+    uses: ./.github/workflows/select-prisma-branch.yml
+
   benchmarks:
+    name: "Benchmarks"
+    needs: select_prisma_branch
+
     runs-on: ubuntu-latest
     env: # Set environment variables for the whole job
       PROFILE: release
@@ -52,15 +59,13 @@ jobs:
         with:
           key: docker-pg-bench-${{hashFiles('docker-compose.yaml')}}
 
-      - name: Extract Branch Name
+      - name: Set Prisma branch
+        id: set-prisma-branch
         run: |
-          echo "Extracting branch name from: $(git show -s --format=%s)"
-          branch="$(git show -s --format=%s | grep -o "DRIVER_ADAPTERS_BRANCH=[^ ]*" | cut -f2 -d=)"
-          echo "branch=$branch"
-          if [ -n "$branch" ]; then
-            echo "Using $branch branch of driver adapters"
-            echo "DRIVER_ADAPTERS_BRANCH=$branch" >> "$GITHUB_ENV"
-          fi
+          PRISMA_BRANCH="${{ needs.select_prisma_branch.outputs.prismaBranch }}"
+          test -n "$PRISMA_BRANCH"
+          echo "PRISMA_BRANCH=$PRISMA_BRANCH" >> "$GITHUB_ENV"
+          echo "Using Prisma branch: $PRISMA_BRANCH"
 
       - name: Setup benchmark
         run: make setup-pg-bench

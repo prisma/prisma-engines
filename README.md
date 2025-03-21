@@ -246,11 +246,13 @@ Locally, each time you run `DRIVER_ADAPTER=$adapter make test-qe` tests will run
 
 In CI, tho', we need to denote which branch of prisma/prisma we want to use for tests. In CI, there's no working copy of prisma/prisma before tests run.
 The CI jobs clones prisma/prisma `main` branch by default, which doesn't include your local changes. To test in integration, we can tell CI to use the branch of prisma/prisma containing
-the changes in adapters. To do it, you can use a simple convention in commit messages. Like this:
+the changes in adapters. To do it, add the following tag to your PR's description on a separate line:
 
 ```
-git commit -m "DRIVER_ADAPTERS_BRANCH=prisma-branch-with-changes-in-adapters [...]"
+/prisma-branch your/branch
 ```
+
+Replace `your/branch` with the name of your branch in the `prisma` repository.
 
 GitHub actions will then pick up the branch name and use it to clone that branch's code of prisma/prisma, and build the driver adapters code from there.
 
