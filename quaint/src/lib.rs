@@ -123,10 +123,11 @@ pub mod error;
 pub mod pooled;
 pub mod prelude;
 pub mod single;
-#[cfg(test)]
-mod tests;
 pub mod visitor;
 
 pub use ast::{Value, ValueType};
 
 pub type Result<T> = std::result::Result<T, error::Error>;
+
+#[cfg(test)]
+mod tests;
