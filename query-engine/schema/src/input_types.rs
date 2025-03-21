@@ -75,8 +75,8 @@ impl<'a> InputObjectType<'a> {
         self.container.as_ref()
     }
 
-    pub fn set_container(&mut self, container: ParentContainer) {
-        self.container = Some(container);
+    pub fn set_container(&mut self, container: impl Into<ParentContainer>) {
+        self.container = Some(container.into());
     }
 
     pub fn find_field(&self, name: &str) -> Option<&InputField<'a>> {

@@ -60,7 +60,7 @@ impl DataInputFieldMapper for CreateDataInputFieldMapper {
 
         let cloned_rf = rf.clone();
         let mut input_object = init_input_object_type(ident);
-        input_object.set_container(rf.model().into());
+        input_object.set_container(rf.model());
         input_object.set_fields(move || {
             let rf = &cloned_rf;
             let mut fields = vec![];
@@ -138,7 +138,7 @@ fn composite_create_envelope_object_type(ctx: &'_ QuerySchema, cf: CompositeFiel
     let cf_is_required = cf.is_required();
 
     let mut input_object = init_input_object_type(ident);
-    input_object.set_container(cf.typ().into());
+    input_object.set_container(cf.typ());
     input_object.require_exactly_one_field();
     input_object.set_tag(ObjectTag::CompositeEnvelope);
     input_object.set_fields(move || {

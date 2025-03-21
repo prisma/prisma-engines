@@ -101,7 +101,7 @@ impl DataInputFieldMapper for UpdateDataInputFieldMapper {
         let rf_name = rf.name().to_owned();
 
         let mut input_object = init_input_object_type(ident);
-        input_object.set_container(rf.related_model().into());
+        input_object.set_container(rf.related_model());
         input_object.set_fields(move || {
             let mut fields = vec![];
 
@@ -201,7 +201,7 @@ fn composite_update_envelope_object_type(ctx: &'_ QuerySchema, cf: CompositeFiel
     let ident = Identifier::new_prisma(IdentifierType::CompositeUpdateEnvelopeInput(cf.typ(), cf.arity()));
 
     let mut input_object = init_input_object_type(ident);
-    input_object.set_container(cf.typ().into());
+    input_object.set_container(cf.typ());
     input_object.require_exactly_one_field();
     input_object.set_tag(ObjectTag::CompositeEnvelope);
     input_object.set_fields(move || {
@@ -224,7 +224,7 @@ fn composite_update_object_type(ctx: &'_ QuerySchema, cf: CompositeFieldRef) -> 
     let ident = Identifier::new_prisma(IdentifierType::CompositeUpdateInput(cf.typ()));
 
     let mut input_object = init_input_object_type(ident);
-    input_object.set_container(cf.typ().into());
+    input_object.set_container(cf.typ());
     input_object.set_min_fields(1);
     input_object.set_fields(move || {
         let mapper = UpdateDataInputFieldMapper::new_checked();
@@ -287,7 +287,7 @@ fn composite_upsert_object_type(ctx: &'_ QuerySchema, cf: CompositeFieldRef) -> 
     let ident = Identifier::new_prisma(IdentifierType::CompositeUpsertObjectInput(cf.typ()));
 
     let mut input_object = init_input_object_type(ident);
-    input_object.set_container(cf.typ().into());
+    input_object.set_container(cf.typ());
     input_object.set_tag(ObjectTag::CompositeEnvelope);
     input_object.set_fields(move || {
         let update_object_type = composite_update_object_type(ctx, cf.clone());
@@ -314,7 +314,7 @@ fn composite_update_many_object_type(ctx: &'_ QuerySchema, cf: CompositeFieldRef
     let ident = Identifier::new_prisma(IdentifierType::CompositeUpdateManyInput(cf.typ()));
 
     let mut input_object = init_input_object_type(ident);
-    input_object.set_container(cf.typ().into());
+    input_object.set_container(cf.typ());
     input_object.set_tag(ObjectTag::CompositeEnvelope);
     input_object.set_fields(move || {
         let where_object_type = objects::filter_objects::where_object_type(ctx, cf.typ().into());
@@ -333,7 +333,7 @@ fn composite_delete_many_object_type(ctx: &'_ QuerySchema, cf: CompositeFieldRef
     let ident = Identifier::new_prisma(IdentifierType::CompositeDeleteManyInput(cf.typ()));
 
     let mut input_object = init_input_object_type(ident);
-    input_object.set_container(cf.typ().into());
+    input_object.set_container(cf.typ());
     input_object.set_tag(ObjectTag::CompositeEnvelope);
     input_object.set_fields(move || {
         let where_object_type = objects::filter_objects::where_object_type(ctx, cf.typ().into());
