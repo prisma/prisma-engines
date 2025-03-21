@@ -95,6 +95,7 @@ pub(crate) fn create_many_object_type(
     ));
 
     let mut input_object = init_input_object_type(ident);
+    input_object.set_container(model.clone());
     input_object.set_fields(move || {
         let mut filtered_fields = filter_create_many_fields(ctx, &model, parent_field.clone());
         let field_mapper = CreateDataInputFieldMapper::new_checked();

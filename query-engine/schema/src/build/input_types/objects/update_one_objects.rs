@@ -25,6 +25,7 @@ fn checked_update_one_input_type(
     ));
 
     let mut input_object = init_input_object_type(ident);
+    input_object.set_container(model.clone());
     input_object.set_fields(move || {
         let mut filtered_fields = filter_checked_update_fields(ctx, &model, parent_field.as_ref());
         let field_mapper = UpdateDataInputFieldMapper::new_checked();
@@ -45,6 +46,7 @@ fn unchecked_update_one_input_type(
     ));
 
     let mut input_object = init_input_object_type(ident);
+    input_object.set_container(model.clone());
     input_object.set_fields(move || {
         let mut filtered_fields = filter_unchecked_update_fields(ctx, &model, parent_field.as_ref());
         let field_mapper = UpdateDataInputFieldMapper::new_unchecked();
@@ -171,6 +173,7 @@ pub(crate) fn update_one_where_combination_object<'a>(
     let where_input_object = filter_objects::where_unique_object_type(ctx, related_model);
 
     let mut input_object = init_input_object_type(ident);
+    input_object.set_container(parent_field.related_model());
     input_object.set_fields(move || {
         vec![
             simple_input_field(args::WHERE, InputType::object(where_input_object.clone()), None),
@@ -192,6 +195,7 @@ pub(crate) fn update_to_one_rel_where_combination_object<'a>(
     ));
 
     let mut input_object = init_input_object_type(ident);
+    input_object.set_container(parent_field.related_model());
     input_object.set_tag(ObjectTag::NestedToOneUpdateEnvelope);
     input_object.set_fields(move || {
         let related_model = parent_field.related_model();
