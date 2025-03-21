@@ -513,7 +513,8 @@ mod tests {
                     {
                       "name": "AWhereInput",
                       "meta": {
-                        "source": "A"
+                        "source": "A",
+                        "grouping": "A"
                       },
                       "constraints": {
                         "maxNumFields": null,
@@ -630,6 +631,9 @@ mod tests {
                     },
                     {
                       "name": "AOrderByWithRelationInput",
+                      "meta": {
+                        "grouping": "A"
+                      },
                       "constraints": {
                         "maxNumFields": 1,
                         "minNumFields": 0
@@ -679,7 +683,8 @@ mod tests {
                     {
                       "name": "AWhereUniqueInput",
                       "meta": {
-                        "source": "A"
+                        "source": "A",
+                        "grouping": "A"
                       },
                       "constraints": {
                         "maxNumFields": null,
@@ -788,6 +793,9 @@ mod tests {
                     },
                     {
                       "name": "AOrderByWithAggregationInput",
+                      "meta": {
+                        "grouping": "A"
+                      },
                       "constraints": {
                         "maxNumFields": 1,
                         "minNumFields": 0
@@ -863,7 +871,8 @@ mod tests {
                     {
                       "name": "AScalarWhereWithAggregatesInput",
                       "meta": {
-                        "source": "A"
+                        "source": "A",
+                        "grouping": "A"
                       },
                       "constraints": {
                         "maxNumFields": null,
@@ -962,7 +971,8 @@ mod tests {
                     {
                       "name": "BWhereInput",
                       "meta": {
-                        "source": "B"
+                        "source": "B",
+                        "grouping": "B"
                       },
                       "constraints": {
                         "maxNumFields": null,
@@ -1066,6 +1076,9 @@ mod tests {
                     },
                     {
                       "name": "BOrderByWithRelationInput",
+                      "meta": {
+                        "grouping": "B"
+                      },
                       "constraints": {
                         "maxNumFields": 1,
                         "minNumFields": 0
@@ -1102,7 +1115,8 @@ mod tests {
                     {
                       "name": "BWhereUniqueInput",
                       "meta": {
-                        "source": "B"
+                        "source": "B",
+                        "grouping": "B"
                       },
                       "constraints": {
                         "maxNumFields": null,
@@ -1203,6 +1217,9 @@ mod tests {
                     },
                     {
                       "name": "BOrderByWithAggregationInput",
+                      "meta": {
+                        "grouping": "B"
+                      },
                       "constraints": {
                         "maxNumFields": 1,
                         "minNumFields": 0
@@ -1265,7 +1282,8 @@ mod tests {
                     {
                       "name": "BScalarWhereWithAggregatesInput",
                       "meta": {
-                        "source": "B"
+                        "source": "B",
+                        "grouping": "B"
                       },
                       "constraints": {
                         "maxNumFields": null,
@@ -1345,6 +1363,9 @@ mod tests {
                     },
                     {
                       "name": "ACreateInput",
+                      "meta": {
+                        "grouping": "A"
+                      },
                       "constraints": {
                         "maxNumFields": null,
                         "minNumFields": null
@@ -1379,6 +1400,9 @@ mod tests {
                     },
                     {
                       "name": "AUncheckedCreateInput",
+                      "meta": {
+                        "grouping": "A"
+                      },
                       "constraints": {
                         "maxNumFields": null,
                         "minNumFields": null
@@ -1412,6 +1436,9 @@ mod tests {
                     },
                     {
                       "name": "AUpdateInput",
+                      "meta": {
+                        "grouping": "A"
+                      },
                       "constraints": {
                         "maxNumFields": null,
                         "minNumFields": null
@@ -1452,6 +1479,9 @@ mod tests {
                     },
                     {
                       "name": "AUncheckedUpdateInput",
+                      "meta": {
+                        "grouping": "A"
+                      },
                       "constraints": {
                         "maxNumFields": null,
                         "minNumFields": null
@@ -1497,6 +1527,9 @@ mod tests {
                     },
                     {
                       "name": "ACreateManyInput",
+                      "meta": {
+                        "grouping": "A"
+                      },
                       "constraints": {
                         "maxNumFields": null,
                         "minNumFields": null
@@ -1530,6 +1563,9 @@ mod tests {
                     },
                     {
                       "name": "AUpdateManyMutationInput",
+                      "meta": {
+                        "grouping": "A"
+                      },
                       "constraints": {
                         "maxNumFields": null,
                         "minNumFields": null
@@ -1557,6 +1593,9 @@ mod tests {
                     },
                     {
                       "name": "AUncheckedUpdateManyInput",
+                      "meta": {
+                        "grouping": "A"
+                      },
                       "constraints": {
                         "maxNumFields": null,
                         "minNumFields": null
@@ -1602,6 +1641,9 @@ mod tests {
                     },
                     {
                       "name": "BCreateInput",
+                      "meta": {
+                        "grouping": "B"
+                      },
                       "constraints": {
                         "maxNumFields": null,
                         "minNumFields": null
@@ -1636,6 +1678,9 @@ mod tests {
                     },
                     {
                       "name": "BUncheckedCreateInput",
+                      "meta": {
+                        "grouping": "B"
+                      },
                       "constraints": {
                         "maxNumFields": null,
                         "minNumFields": null
@@ -1670,6 +1715,9 @@ mod tests {
                     },
                     {
                       "name": "BUpdateInput",
+                      "meta": {
+                        "grouping": "B"
+                      },
                       "constraints": {
                         "maxNumFields": null,
                         "minNumFields": null
@@ -1710,6 +1758,9 @@ mod tests {
                     },
                     {
                       "name": "BUncheckedUpdateInput",
+                      "meta": {
+                        "grouping": "B"
+                      },
                       "constraints": {
                         "maxNumFields": null,
                         "minNumFields": null
@@ -1750,6 +1801,9 @@ mod tests {
                     },
                     {
                       "name": "BCreateManyInput",
+                      "meta": {
+                        "grouping": "B"
+                      },
                       "constraints": {
                         "maxNumFields": null,
                         "minNumFields": null
@@ -1771,6 +1825,9 @@ mod tests {
                     },
                     {
                       "name": "BUpdateManyMutationInput",
+                      "meta": {
+                        "grouping": "B"
+                      },
                       "constraints": {
                         "maxNumFields": null,
                         "minNumFields": null
@@ -1798,6 +1855,9 @@ mod tests {
                     },
                     {
                       "name": "BUncheckedUpdateManyInput",
+                      "meta": {
+                        "grouping": "B"
+                      },
                       "constraints": {
                         "maxNumFields": null,
                         "minNumFields": null
@@ -2045,6 +2105,9 @@ mod tests {
                     },
                     {
                       "name": "BScalarRelationFilter",
+                      "meta": {
+                        "grouping": "B"
+                      },
                       "constraints": {
                         "maxNumFields": null,
                         "minNumFields": null
@@ -2080,6 +2143,9 @@ mod tests {
                     },
                     {
                       "name": "ACountOrderByAggregateInput",
+                      "meta": {
+                        "grouping": "A"
+                      },
                       "constraints": {
                         "maxNumFields": 1,
                         "minNumFields": 1
@@ -2115,6 +2181,9 @@ mod tests {
                     },
                     {
                       "name": "AMaxOrderByAggregateInput",
+                      "meta": {
+                        "grouping": "A"
+                      },
                       "constraints": {
                         "maxNumFields": 1,
                         "minNumFields": 1
@@ -2150,6 +2219,9 @@ mod tests {
                     },
                     {
                       "name": "AMinOrderByAggregateInput",
+                      "meta": {
+                        "grouping": "A"
+                      },
                       "constraints": {
                         "maxNumFields": 1,
                         "minNumFields": 1
@@ -2444,6 +2516,9 @@ mod tests {
                     },
                     {
                       "name": "ANullableScalarRelationFilter",
+                      "meta": {
+                        "grouping": "A"
+                      },
                       "constraints": {
                         "maxNumFields": null,
                         "minNumFields": null
@@ -2489,6 +2564,9 @@ mod tests {
                     },
                     {
                       "name": "BCountOrderByAggregateInput",
+                      "meta": {
+                        "grouping": "B"
+                      },
                       "constraints": {
                         "maxNumFields": 1,
                         "minNumFields": 1
@@ -2511,6 +2589,9 @@ mod tests {
                     },
                     {
                       "name": "BMaxOrderByAggregateInput",
+                      "meta": {
+                        "grouping": "B"
+                      },
                       "constraints": {
                         "maxNumFields": 1,
                         "minNumFields": 1
@@ -2533,6 +2614,9 @@ mod tests {
                     },
                     {
                       "name": "BMinOrderByAggregateInput",
+                      "meta": {
+                        "grouping": "B"
+                      },
                       "constraints": {
                         "maxNumFields": 1,
                         "minNumFields": 1
@@ -2555,6 +2639,9 @@ mod tests {
                     },
                     {
                       "name": "BCreateNestedOneWithoutAInput",
+                      "meta": {
+                        "grouping": "B"
+                      },
                       "constraints": {
                         "maxNumFields": null,
                         "minNumFields": null
@@ -2609,6 +2696,9 @@ mod tests {
                     },
                     {
                       "name": "StringFieldUpdateOperationsInput",
+                      "meta": {
+                        "grouping": "A"
+                      },
                       "constraints": {
                         "maxNumFields": 1,
                         "minNumFields": 1
@@ -2630,6 +2720,9 @@ mod tests {
                     },
                     {
                       "name": "BUpdateOneRequiredWithoutANestedInput",
+                      "meta": {
+                        "grouping": "B"
+                      },
                       "constraints": {
                         "maxNumFields": null,
                         "minNumFields": null
@@ -2722,6 +2815,9 @@ mod tests {
                     },
                     {
                       "name": "ACreateNestedOneWithoutBInput",
+                      "meta": {
+                        "grouping": "A"
+                      },
                       "constraints": {
                         "maxNumFields": null,
                         "minNumFields": null
@@ -2776,6 +2872,9 @@ mod tests {
                     },
                     {
                       "name": "AUncheckedCreateNestedOneWithoutBInput",
+                      "meta": {
+                        "grouping": "A"
+                      },
                       "constraints": {
                         "maxNumFields": null,
                         "minNumFields": null
@@ -2830,6 +2929,9 @@ mod tests {
                     },
                     {
                       "name": "AUpdateOneWithoutBNestedInput",
+                      "meta": {
+                        "grouping": "A"
+                      },
                       "constraints": {
                         "maxNumFields": null,
                         "minNumFields": null
@@ -2958,6 +3060,9 @@ mod tests {
                     },
                     {
                       "name": "AUncheckedUpdateOneWithoutBNestedInput",
+                      "meta": {
+                        "grouping": "A"
+                      },
                       "constraints": {
                         "maxNumFields": null,
                         "minNumFields": null
@@ -3692,6 +3797,9 @@ mod tests {
                     },
                     {
                       "name": "BCreateWithoutAInput",
+                      "meta": {
+                        "grouping": "B"
+                      },
                       "constraints": {
                         "maxNumFields": null,
                         "minNumFields": null
@@ -3713,6 +3821,9 @@ mod tests {
                     },
                     {
                       "name": "BUncheckedCreateWithoutAInput",
+                      "meta": {
+                        "grouping": "B"
+                      },
                       "constraints": {
                         "maxNumFields": null,
                         "minNumFields": null
@@ -3734,6 +3845,9 @@ mod tests {
                     },
                     {
                       "name": "BCreateOrConnectWithoutAInput",
+                      "meta": {
+                        "grouping": "B"
+                      },
                       "constraints": {
                         "maxNumFields": null,
                         "minNumFields": null
@@ -3775,6 +3889,9 @@ mod tests {
                     },
                     {
                       "name": "BUpsertWithoutAInput",
+                      "meta": {
+                        "grouping": "B"
+                      },
                       "constraints": {
                         "maxNumFields": null,
                         "minNumFields": null
@@ -3835,6 +3952,9 @@ mod tests {
                     },
                     {
                       "name": "BUpdateToOneWithWhereWithoutAInput",
+                      "meta": {
+                        "grouping": "B"
+                      },
                       "constraints": {
                         "maxNumFields": null,
                         "minNumFields": null
@@ -3876,6 +3996,9 @@ mod tests {
                     },
                     {
                       "name": "BUpdateWithoutAInput",
+                      "meta": {
+                        "grouping": "B"
+                      },
                       "constraints": {
                         "maxNumFields": null,
                         "minNumFields": null
@@ -3903,6 +4026,9 @@ mod tests {
                     },
                     {
                       "name": "BUncheckedUpdateWithoutAInput",
+                      "meta": {
+                        "grouping": "B"
+                      },
                       "constraints": {
                         "maxNumFields": null,
                         "minNumFields": null
@@ -3930,6 +4056,9 @@ mod tests {
                     },
                     {
                       "name": "ACreateWithoutBInput",
+                      "meta": {
+                        "grouping": "A"
+                      },
                       "constraints": {
                         "maxNumFields": null,
                         "minNumFields": null
@@ -3951,6 +4080,9 @@ mod tests {
                     },
                     {
                       "name": "AUncheckedCreateWithoutBInput",
+                      "meta": {
+                        "grouping": "A"
+                      },
                       "constraints": {
                         "maxNumFields": null,
                         "minNumFields": null
@@ -3972,6 +4104,9 @@ mod tests {
                     },
                     {
                       "name": "ACreateOrConnectWithoutBInput",
+                      "meta": {
+                        "grouping": "A"
+                      },
                       "constraints": {
                         "maxNumFields": null,
                         "minNumFields": null
@@ -4013,6 +4148,9 @@ mod tests {
                     },
                     {
                       "name": "AUpsertWithoutBInput",
+                      "meta": {
+                        "grouping": "A"
+                      },
                       "constraints": {
                         "maxNumFields": null,
                         "minNumFields": null
@@ -4073,6 +4211,9 @@ mod tests {
                     },
                     {
                       "name": "AUpdateToOneWithWhereWithoutBInput",
+                      "meta": {
+                        "grouping": "A"
+                      },
                       "constraints": {
                         "maxNumFields": null,
                         "minNumFields": null
@@ -4114,6 +4255,9 @@ mod tests {
                     },
                     {
                       "name": "AUpdateWithoutBInput",
+                      "meta": {
+                        "grouping": "A"
+                      },
                       "constraints": {
                         "maxNumFields": null,
                         "minNumFields": null
@@ -4141,6 +4285,9 @@ mod tests {
                     },
                     {
                       "name": "AUncheckedUpdateWithoutBInput",
+                      "meta": {
+                        "grouping": "A"
+                      },
                       "constraints": {
                         "maxNumFields": null,
                         "minNumFields": null

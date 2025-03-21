@@ -65,6 +65,7 @@ fn to_many_relation_filter_object(ctx: &'_ QuerySchema, rf: RelationFieldRef) ->
     let ident = Identifier::new_prisma(IdentifierType::ToManyRelationFilterInput(rf.related_model()));
 
     let mut object = init_input_object_type(ident);
+    object.set_container(rf.related_model());
     object.set_tag(ObjectTag::RelationEnvelope);
 
     object.set_fields(move || {
@@ -82,6 +83,7 @@ fn to_one_relation_filter_object(ctx: &'_ QuerySchema, rf: RelationFieldRef) -> 
     let ident = Identifier::new_prisma(IdentifierType::ToOneRelationFilterInput(rf.related_model(), rf.arity()));
 
     let mut object = init_input_object_type(ident);
+    object.set_container(rf.related_model());
     object.set_tag(ObjectTag::RelationEnvelope);
     object.set_fields(move || {
         let related_input_type = filter_objects::where_object_type(ctx, rf.related_model().into());
@@ -109,6 +111,7 @@ fn to_one_composite_filter_object(ctx: &'_ QuerySchema, cf: CompositeFieldRef) -
 
     let mut object = init_input_object_type(ident);
     object.require_exactly_one_field();
+    object.set_container(cf.typ());
     object.set_tag(ObjectTag::CompositeEnvelope);
 
     object.set_fields(move || {
@@ -141,6 +144,7 @@ fn to_many_composite_filter_object(ctx: &'_ QuerySchema, cf: CompositeFieldRef) 
 
     let mut object = init_input_object_type(ident);
     object.require_exactly_one_field();
+    object.set_container(cf.typ());
     object.set_tag(ObjectTag::CompositeEnvelope);
     object.set_fields(move || {
         let composite_where_object = filter_objects::where_object_type(ctx, cf.typ().into());
@@ -178,6 +182,7 @@ fn scalar_list_filter_type(ctx: &'_ QuerySchema, sf: ScalarFieldRef) -> InputObj
 
     let mut object = init_input_object_type(ident);
     object.require_exactly_one_field();
+    object.set_container(sf.container());
     object.set_fields(move || {
         let mapped_nonlist_type = map_scalar_input_type(ctx, sf.type_identifier(), false);
         let mapped_list_type = InputType::list(mapped_nonlist_type.clone());

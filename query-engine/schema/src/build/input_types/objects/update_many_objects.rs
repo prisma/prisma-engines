@@ -18,6 +18,7 @@ pub(crate) fn checked_update_many_input_type(ctx: &'_ QuerySchema, model: Model)
     let ident = Identifier::new_prisma(IdentifierType::CheckedUpdateManyInput(model.clone()));
 
     let mut input_object = init_input_object_type(ident);
+    input_object.set_container(model.clone());
     input_object.set_fields(move || {
         let mut filtered_fields = update_one_objects::filter_checked_update_fields(ctx, &model, None)
             .filter(|field| matches!(field, ModelField::Scalar(_) | ModelField::Composite(_)));
@@ -40,6 +41,7 @@ pub(crate) fn unchecked_update_many_input_type(
     ));
 
     let mut input_object = init_input_object_type(ident);
+    input_object.set_container(model.clone());
     input_object.set_fields(move || {
         let mut filtered_fields =
             update_one_objects::filter_unchecked_update_fields(ctx, &model, parent_field.as_ref())
@@ -62,6 +64,7 @@ pub(crate) fn update_many_where_combination_object(
     ));
 
     let mut input_object = init_input_object_type(ident);
+    input_object.set_container(parent_field.related_model());
     input_object.set_fields(move || {
         let related_model = parent_field.related_model();
         let where_input_object = filter_objects::scalar_filter_object_type(ctx, related_model.clone(), false);

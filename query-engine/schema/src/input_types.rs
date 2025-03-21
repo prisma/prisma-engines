@@ -12,6 +12,7 @@ pub struct InputObjectType<'a> {
     pub constraints: InputObjectTypeConstraints<'a>,
     pub(crate) fields: InputObjectFields<'a>,
     pub(crate) tag: Option<ObjectTag<'a>>,
+    pub(crate) container: Option<ParentContainer>,
 }
 
 impl PartialEq for InputObjectType<'_> {
@@ -52,6 +53,7 @@ impl Debug for InputObjectType<'_> {
             .field("identifier", &self.identifier)
             .field("constraints", &self.constraints)
             .field("fields", &"#Input Fields Cell#")
+            .field("container", &self.container)
             .finish()
     }
 }
@@ -67,6 +69,14 @@ impl<'a> InputObjectType<'a> {
 
     pub fn tag(&self) -> Option<&ObjectTag<'a>> {
         self.tag.as_ref()
+    }
+
+    pub fn container(&self) -> Option<&ParentContainer> {
+        self.container.as_ref()
+    }
+
+    pub fn set_container(&mut self, container: impl Into<ParentContainer>) {
+        self.container = Some(container.into());
     }
 
     pub fn find_field(&self, name: &str) -> Option<&InputField<'a>> {
