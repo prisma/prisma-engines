@@ -2,16 +2,6 @@ use super::*;
 use query_structure::{walkers, DefaultKind};
 use std::{borrow::Cow, sync::LazyLock};
 
-/// Input object type convenience wrapper function.
-pub(crate) fn input_object_type<'a>(
-    ident: Identifier,
-    fields: impl FnOnce() -> Vec<InputField<'a>> + Send + Sync + 'a,
-) -> InputObjectType<'a> {
-    let mut object_type = init_input_object_type(ident);
-    object_type.set_fields(fields);
-    object_type
-}
-
 /// Input object type initializer for cases where only the name is known, and fields are computed later.
 pub(crate) fn init_input_object_type<'a>(ident: Identifier) -> InputObjectType<'a> {
     InputObjectType {

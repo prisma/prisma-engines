@@ -40,10 +40,10 @@ impl DataInputFieldMapper for CreateDataInputFieldMapper {
         let cloned_typ = typ.clone();
         let ident = Identifier::new_prisma(IdentifierType::CreateOneScalarList(sf.clone()));
 
-        let mut input_object = input_object_type(ident, move || {
-            vec![simple_input_field(operations::SET, cloned_typ.clone(), None)]
-        });
+        let mut input_object = init_input_object_type(ident);
+        input_object.set_container(sf.container());
         input_object.require_exactly_one_field();
+        input_object.set_fields(move || vec![simple_input_field(operations::SET, cloned_typ.clone(), None)]);
 
         let input_type = InputType::object(input_object);
 
@@ -60,7 +60,7 @@ impl DataInputFieldMapper for CreateDataInputFieldMapper {
 
         let cloned_rf = rf.clone();
         let mut input_object = init_input_object_type(ident);
-        input_object.set_container(rf.model());
+        input_object.set_container(rf.related_model());
         input_object.set_fields(move || {
             let rf = &cloned_rf;
             let mut fields = vec![];
@@ -162,10 +162,13 @@ pub(crate) fn composite_create_object_type(ctx: &'_ QuerySchema, cf: CompositeFi
     // It's called "Create" input because it's used across multiple create-type operations, not only "set".
     let ident = Identifier::new_prisma(IdentifierType::CompositeCreateInput(cf.typ()));
 
-    input_object_type(ident, move || {
+    let mut input_object = init_input_object_type(ident);
+    input_object.set_container(cf.container());
+    input_object.set_fields(move || {
         let mapper = CreateDataInputFieldMapper::new_checked();
         let typ = cf.typ();
         let mut fields = typ.fields();
         mapper.map_all(ctx, &mut fields)
-    })
+    });
+    input_object
 }

@@ -235,6 +235,7 @@ pub(crate) fn composite_equality_object(ctx: &'_ QuerySchema, cf: CompositeField
     let ident = Identifier::new_prisma(format!("{}ObjectEqualityInput", cf.typ().name()));
 
     let mut input_object = init_input_object_type(ident);
+    input_object.set_container(cf.container());
     input_object.set_fields(move || {
         let mut fields = vec![];
 

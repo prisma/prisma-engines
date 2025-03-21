@@ -72,7 +72,9 @@ impl DataInputFieldMapper for UpdateDataInputFieldMapper {
         let ident = Identifier::new_prisma(IdentifierType::ScalarListUpdateInput(sf.clone()));
         let type_identifier = sf.type_identifier();
 
-        let mut input_object = input_object_type(ident, move || {
+        let mut input_object = init_input_object_type(ident);
+        input_object.set_container(sf.container());
+        input_object.set_fields(move || {
             let mut object_fields = vec![simple_input_field(operations::SET, list_input_type.clone(), None).optional()];
 
             if ctx.has_capability(ConnectorCapability::ScalarLists)
@@ -165,6 +167,7 @@ fn update_operations_object_type<'a>(
     ));
 
     let mut obj = init_input_object_type(ident);
+    obj.set_container(sf.container());
     obj.require_exactly_one_field();
     obj.set_fields(move || {
         let typ = map_scalar_input_type_for_field(ctx, &sf);
