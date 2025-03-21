@@ -10,6 +10,7 @@ pub(crate) fn scalar_filter_object_type(
     let ident = Identifier::new_prisma(IdentifierType::ScalarFilterInput(model.clone(), include_aggregates));
 
     let mut input_object = init_input_object_type(ident);
+    input_object.set_container(model.clone().into());
     input_object.set_tag(ObjectTag::WhereInputType(ParentContainer::Model(model.clone())));
     input_object.set_fields(move || {
         let object_type = InputType::object(scalar_filter_object_type(ctx, model.clone(), include_aggregates));
@@ -45,6 +46,7 @@ pub(crate) fn where_object_type(ctx: &'_ QuerySchema, container: ParentContainer
     let ident = Identifier::new_prisma(IdentifierType::WhereInput(container.clone()));
 
     let mut input_object = init_input_object_type(ident);
+    input_object.set_container(container.clone().into());
     input_object.set_tag(ObjectTag::WhereInputType(container.clone()));
     input_object.set_fields(move || {
         let object_type = InputType::object(where_object_type(ctx, container.clone()));
@@ -80,6 +82,7 @@ pub(crate) fn where_unique_object_type(ctx: &'_ QuerySchema, model: Model) -> In
     let ident = Identifier::new_prisma(IdentifierType::WhereUniqueInput(model.clone()));
 
     let mut input_object = init_input_object_type(ident);
+    input_object.set_container(model.clone().into());
     input_object.set_tag(ObjectTag::WhereInputType(ParentContainer::Model(model.clone())));
 
     // Concatenated list of uniques/@@unique/@@id fields on which the input type constraints should be applied (that at least one of them is set).
@@ -210,6 +213,7 @@ fn compound_field_unique_object_type<'a>(
     ));
 
     let mut input_object = init_input_object_type(ident);
+    input_object.set_container(model.clone().into());
     input_object.set_fields(move || {
         from_fields
             .clone()

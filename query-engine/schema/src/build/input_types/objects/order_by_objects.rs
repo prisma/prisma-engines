@@ -47,6 +47,7 @@ pub(crate) fn order_by_object_type(
     ));
 
     let mut input_object = init_input_object_type(ident);
+    input_object.set_container(container.clone().into());
     input_object.require_at_most_one_field();
     input_object.set_fields(move || {
         // Basic orderBy fields.
@@ -202,6 +203,7 @@ fn order_by_object_type_aggregate<'a>(
     ));
 
     let mut input_object = init_input_object_type(ident);
+    input_object.set_container(container.clone().into());
     input_object.require_exactly_one_field();
     input_object.set_fields(move || {
         let sort_order_enum = InputType::Enum(sort_order_enum());
@@ -216,7 +218,8 @@ fn order_by_object_type_aggregate<'a>(
 
 fn order_by_to_many_aggregate_object_type<'a>(container: &ParentContainer) -> InputObjectType<'a> {
     let ident = Identifier::new_prisma(IdentifierType::OrderByToManyAggregateInput(container.clone()));
-    let mut input_object = init_input_object_type(ident);
+    let mut input_object: InputObjectType<'_> = init_input_object_type(ident);
+    input_object.set_container(container.clone().into());
     input_object.require_exactly_one_field();
     input_object.set_fields(|| {
         let sort_order_enum = InputType::Enum(sort_order_enum());
@@ -250,6 +253,7 @@ fn order_by_object_type_text_search<'a>(
     let ident = Identifier::new_prisma(IdentifierType::OrderByRelevanceInput(container.clone()));
 
     let mut input_object = init_input_object_type(ident);
+    input_object.set_container(container.clone().into());
     input_object.set_fields(move || {
         let fields_enum_type = InputType::enum_type(order_by_relevance_enum(
             container.clone(),

@@ -27,6 +27,7 @@ fn nested_upsert_list_input_object(
     let ident = Identifier::new_prisma(IdentifierType::NestedUpsertManyInput(parent_field.related_field()));
 
     let mut input_object = init_input_object_type(ident);
+    input_object.set_container(parent_field.related_model().into());
     input_object.set_fields(move || {
         vec![
             input_field(args::WHERE, vec![InputType::object(where_object.clone())], None),
@@ -48,7 +49,9 @@ fn nested_upsert_nonlist_input_object(
 
     let ident = Identifier::new_prisma(IdentifierType::NestedUpsertOneInput(parent_field.related_field()));
 
-    Some(input_object_type(ident, move || {
+    let mut input_object = init_input_object_type(ident);
+    input_object.set_container(related_model.clone().into());
+    input_object.set_fields(move || {
         let update_types =
             update_one_objects::update_one_input_types(ctx, related_model.clone(), Some(parent_field.clone()));
 
@@ -59,5 +62,6 @@ fn nested_upsert_nonlist_input_object(
         ];
 
         fields
-    }))
+    });
+    Some(input_object)
 }

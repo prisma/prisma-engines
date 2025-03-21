@@ -68,6 +68,7 @@ fn checked_create_input_type(
     ));
 
     let mut input_object = init_input_object_type(ident);
+    input_object.set_container(model.clone().into());
     input_object.set_fields(move || {
         let mut filtered_fields = filter_checked_create_fields(&model, parent_field.clone());
         let field_mapper = CreateDataInputFieldMapper::new_checked();
@@ -94,6 +95,7 @@ fn unchecked_create_input_type(
     ));
 
     let mut input_object = init_input_object_type(ident);
+    input_object.set_container(model.clone().into());
     input_object.set_fields(move || {
         let mut filtered_fields = filter_unchecked_create_fields(&model, parent_field.as_ref());
         let field_mapper = CreateDataInputFieldMapper::new_unchecked();

@@ -19,6 +19,7 @@ pub(crate) fn init_input_object_type<'a>(ident: Identifier) -> InputObjectType<'
         constraints: InputObjectTypeConstraints::default(),
         fields: None,
         tag: None,
+        container: None,
     }
 }
 
