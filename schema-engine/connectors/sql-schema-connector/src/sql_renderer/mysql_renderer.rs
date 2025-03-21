@@ -110,6 +110,7 @@ impl SqlRenderer for MysqlFlavour {
 
         for change in changes {
             match change {
+                TableChange::RenameTo => unreachable!("No Renaming Tables on Mysql"),
                 TableChange::DropPrimaryKey => lines.push(sql_ddl::mysql::AlterTableClause::DropPrimaryKey.to_string()),
                 TableChange::RenamePrimaryKey => unreachable!("No Renaming Primary Keys on Mysql"),
                 TableChange::AddPrimaryKey => lines.push(format!(

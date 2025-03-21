@@ -503,3 +503,35 @@ fn adding_a_primary_key_must_work(api: TestApi) {
     api.assert_schema()
         .assert_table("Test", |t| t.assert_pk(|pk| pk.assert_constraint_name("Test_pkey")));
 }
+
+#[test_connector]
+fn renaming_table_must_work(api: TestApi) {
+    let id = if api.is_sqlite() || api.is_mysql() {
+        ""
+    } else {
+        r#"(map: "custom_id")"#
+    };
+
+    let dm1 = format!(
+        r#"
+        model A {{
+            id    Int @id{id}
+            other Int
+        }}
+    "#
+    );
+    api.schema_push_w_datasource(dm1).send().assert_green();
+
+    let dm2 = format!(
+        r#"
+        model B {{
+            id    Int @id{id}
+            other Int
+        }}
+    "#
+    );
+    api.schema_push_w_datasource(dm2).send().assert_green();
+
+    api.assert_schema().assert_has_no_table("A");
+    api.assert_schema().assert_has_table("B");
+}

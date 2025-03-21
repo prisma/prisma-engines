@@ -41,6 +41,10 @@ impl SqlSchemaDifferFlavour for PostgresFlavour {
         self.is_cockroachdb()
     }
 
+    fn can_rename_tables(&self) -> bool {
+        true
+    }
+
     fn can_rename_foreign_key(&self) -> bool {
         true
     }

@@ -151,6 +151,7 @@ impl SqlSchemaConnector {
                             }
                             TableChange::AddPrimaryKey { .. } => (),
                             TableChange::RenamePrimaryKey { .. } => (),
+                            TableChange::RenameTo { .. } => (),
                         }
                     }
                 }
