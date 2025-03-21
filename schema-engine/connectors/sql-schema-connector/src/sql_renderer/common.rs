@@ -1,7 +1,7 @@
 use sql_schema_describer::{walkers::TableColumnWalker, *};
 use std::fmt::{Display, Write as _};
 
-pub(super) const SQL_INDENTATION: &str = "    ";
+pub(crate) const SQL_INDENTATION: &str = "    ";
 
 /// A quoted identifier with an optional schema prefix.
 #[derive(Clone, Copy)]
@@ -89,7 +89,7 @@ where
     }
 }
 
-pub(crate) fn render_nullability(column: TableColumnWalker<'_>) -> &'static str {
+pub fn render_nullability(column: TableColumnWalker<'_>) -> &'static str {
     if column.arity().is_required() {
         " NOT NULL"
     } else {
@@ -97,7 +97,7 @@ pub(crate) fn render_nullability(column: TableColumnWalker<'_>) -> &'static str 
     }
 }
 
-pub(crate) fn render_referential_action(action: ForeignKeyAction) -> &'static str {
+pub fn render_referential_action(action: ForeignKeyAction) -> &'static str {
     match action {
         ForeignKeyAction::NoAction => "NO ACTION",
         ForeignKeyAction::Restrict => "RESTRICT",
@@ -107,7 +107,7 @@ pub(crate) fn render_referential_action(action: ForeignKeyAction) -> &'static st
     }
 }
 
-pub(crate) fn format_hex(bytes: &[u8], out: &mut String) {
+pub fn format_hex(bytes: &[u8], out: &mut String) {
     use std::fmt::Write as _;
 
     out.reserve(bytes.len() * 2);
@@ -144,12 +144,12 @@ where
 }
 
 #[derive(Default)]
-pub(super) struct StepRenderer {
+pub(crate) struct StepRenderer {
     stmts: Vec<String>,
 }
 
 impl StepRenderer {
-    pub(super) fn render_statement(&mut self, f: &mut dyn FnMut(&mut StatementRenderer)) {
+    pub fn render_statement(&mut self, f: &mut dyn FnMut(&mut StatementRenderer)) {
         let mut stmt_renderer = Default::default();
         f(&mut stmt_renderer);
         self.stmts.push(stmt_renderer.statement);
@@ -157,12 +157,12 @@ impl StepRenderer {
 }
 
 #[derive(Default)]
-pub(super) struct StatementRenderer {
+pub(crate) struct StatementRenderer {
     statement: String,
 }
 
 impl StatementRenderer {
-    pub(super) fn join<I, T>(&mut self, separator: &str, iter: I)
+    pub fn join<I, T>(&mut self, separator: &str, iter: I)
     where
         I: Iterator<Item = T>,
         T: std::fmt::Display,
@@ -176,16 +176,16 @@ impl StatementRenderer {
         }
     }
 
-    pub(super) fn push_str(&mut self, s: &str) {
+    pub fn push_str(&mut self, s: &str) {
         self.statement.push_str(s)
     }
 
-    pub(super) fn push_display(&mut self, d: &dyn std::fmt::Display) {
+    pub fn push_display(&mut self, d: &dyn std::fmt::Display) {
         std::fmt::Write::write_fmt(&mut self.statement, format_args!("{d}")).unwrap();
     }
 }
 
-pub(super) fn render_step(f: &mut dyn FnMut(&mut StepRenderer)) -> Vec<String> {
+pub fn render_step(f: &mut dyn FnMut(&mut StepRenderer)) -> Vec<String> {
     let mut renderer = Default::default();
     f(&mut renderer);
     renderer.stmts

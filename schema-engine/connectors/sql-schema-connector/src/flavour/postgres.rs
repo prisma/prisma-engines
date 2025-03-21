@@ -1,27 +1,24 @@
-#[cfg(feature = "postgresql-native")]
-mod native;
+mod connector;
+mod destructive_change_checker;
+mod renderer;
+mod schema_calculator;
+mod schema_differ;
 
-#[cfg(not(feature = "postgresql-native"))]
-mod wasm;
-
-#[cfg(feature = "postgresql-native")]
-use native as imp;
-
-use psl::PreviewFeature;
-use user_facing_errors::schema_engine::DatabaseSchemaInconsistent;
-#[cfg(not(feature = "postgresql-native"))]
-use wasm as imp;
-
-use crate::SqlFlavour;
+use connector as imp;
+use destructive_change_checker::PostgresDestructiveChangeCheckerFlavour;
 use enumflags2::BitFlags;
 use indoc::indoc;
+use psl::PreviewFeature;
 use quaint::{
     connector::{PostgresUrl, PostgresWebSocketUrl},
     Value,
 };
+use renderer::PostgresRenderer;
+use schema_calculator::PostgresSchemaCalculatorFlavour;
 use schema_connector::{
     migrations_directory::MigrationDirectory, BoxFuture, ConnectorError, ConnectorResult, Namespaces,
 };
+use schema_differ::PostgresSchemaDifferFlavour;
 use sql_schema_describer::{postgres::PostgresSchemaExt, SqlSchema};
 use std::{
     borrow::Cow,
@@ -31,6 +28,9 @@ use std::{
     time,
 };
 use url::Url;
+use user_facing_errors::schema_engine::DatabaseSchemaInconsistent;
+
+use super::{SqlConnector, SqlDialect, UsingExternalShadowDb};
 
 const ADVISORY_LOCK_TIMEOUT: time::Duration = time::Duration::from_secs(10);
 
@@ -116,46 +116,105 @@ pub(crate) enum PostgresProvider {
     Unspecified,
 }
 
-pub(crate) struct PostgresFlavour {
+#[derive(Debug, Default)]
+pub struct PostgresDialect {
+    circumstances: BitFlags<Circumstances>,
+}
+
+impl PostgresDialect {
+    fn new(circumstances: BitFlags<Circumstances>) -> Self {
+        Self { circumstances }
+    }
+
+    pub fn cockroach() -> Self {
+        Self::new(Circumstances::IsCockroachDb.into())
+    }
+
+    fn is_cockroachdb(&self) -> bool {
+        self.circumstances.contains(Circumstances::IsCockroachDb)
+    }
+}
+
+impl SqlDialect for PostgresDialect {
+    fn renderer(&self) -> Box<dyn crate::sql_renderer::SqlRenderer> {
+        Box::new(PostgresRenderer::new(self.is_cockroachdb()))
+    }
+
+    fn schema_differ(&self) -> Box<dyn crate::sql_schema_differ::SqlSchemaDifferFlavour> {
+        Box::new(PostgresSchemaDifferFlavour::new(self.circumstances))
+    }
+
+    fn schema_calculator(&self) -> Box<dyn crate::sql_schema_calculator::SqlSchemaCalculatorFlavour> {
+        Box::new(PostgresSchemaCalculatorFlavour::new(self.circumstances))
+    }
+
+    fn destructive_change_checker(
+        &self,
+    ) -> Box<dyn crate::sql_destructive_change_checker::DestructiveChangeCheckerFlavour> {
+        Box::new(PostgresDestructiveChangeCheckerFlavour::new(self.circumstances))
+    }
+
+    fn datamodel_connector(&self) -> &'static dyn psl::datamodel_connector::Connector {
+        if self.is_cockroachdb() {
+            psl::builtin_connectors::COCKROACH
+        } else {
+            psl::builtin_connectors::POSTGRES
+        }
+    }
+
+    fn empty_database_schema(&self) -> SqlSchema {
+        let mut schema = SqlSchema::default();
+        schema.set_connector_data(Box::<sql_schema_describer::postgres::PostgresSchemaExt>::default());
+        schema
+    }
+
+    #[cfg(feature = "postgresql-native")]
+    fn connect_to_shadow_db(
+        &self,
+        url: String,
+        preview_features: psl::PreviewFeatures,
+    ) -> BoxFuture<'_, ConnectorResult<Box<dyn SqlConnector>>> {
+        let params = schema_connector::ConnectorParams::new(url, preview_features, None);
+        Box::pin(async move { Ok(Box::new(PostgresConnector::new_with_params(params)?) as Box<dyn SqlConnector>) })
+    }
+
+    #[cfg(not(feature = "postgresql-native"))]
+    fn connect_to_shadow_db(
+        &self,
+        factory: std::sync::Arc<dyn quaint::connector::ExternalConnectorFactory>,
+    ) -> BoxFuture<'_, ConnectorResult<Box<dyn SqlConnector>>> {
+        Box::pin(async move {
+            let adapter = factory
+                .connect_to_shadow_db()
+                .await
+                .ok_or_else(|| ConnectorError::from_msg("Provided adapter does not support shadow databases".into()))?
+                .map_err(|e| ConnectorError::from_source(e, "Failed to connect to the shadow database"))?;
+            Ok(Box::new(PostgresConnector::new_external(adapter).await?) as Box<dyn SqlConnector>)
+        })
+    }
+}
+
+pub(crate) struct PostgresConnector {
     state: State,
     provider: PostgresProvider,
 }
 
-#[cfg(feature = "postgresql-native")]
-impl Default for PostgresFlavour {
-    fn default() -> Self {
-        Self {
-            state: State::Initial,
-            provider: PostgresProvider::Unspecified,
-        }
-    }
-}
-
-impl std::fmt::Debug for PostgresFlavour {
+impl std::fmt::Debug for PostgresConnector {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.write_str("<PostgreSQL connector>")
     }
 }
 
-impl PostgresFlavour {
+impl PostgresConnector {
     #[cfg(not(feature = "postgresql-native"))]
     pub(crate) async fn new_external(
         adapter: std::sync::Arc<dyn quaint::connector::ExternalConnector>,
-        factory: std::sync::Arc<dyn quaint::connector::ExternalConnectorFactory>,
     ) -> ConnectorResult<Self> {
         let provider = PostgresProvider::Unspecified;
-        Ok(PostgresFlavour {
-            state: State::new(adapter, factory, provider, Default::default()).await?,
+        Ok(PostgresConnector {
+            state: State::new(adapter, provider, Default::default()).await?,
             provider,
         })
-    }
-
-    #[cfg(feature = "cockroachdb-native")]
-    pub(crate) fn new_uninitialized_cockroach() -> Self {
-        Self {
-            state: State::Initial,
-            provider: PostgresProvider::CockroachDb,
-        }
     }
 
     #[cfg(feature = "postgresql-native")]
@@ -182,15 +241,16 @@ impl PostgresFlavour {
         })
     }
 
-    fn circumstances(&self) -> Option<BitFlags<Circumstances>> {
-        imp::get_circumstances(&self.state)
+    fn circumstances(&self) -> BitFlags<Circumstances> {
+        let mut circumstances = imp::get_circumstances(&self.state).unwrap_or_default();
+        if self.provider == PostgresProvider::CockroachDb {
+            circumstances |= Circumstances::IsCockroachDb;
+        }
+        circumstances
     }
 
     pub(crate) fn is_cockroachdb(&self) -> bool {
-        self.provider == PostgresProvider::CockroachDb
-            || self
-                .circumstances()
-                .is_some_and(|c| c.contains(Circumstances::IsCockroachDb))
+        self.circumstances().contains(Circumstances::IsCockroachDb)
     }
 
     fn schema_name(&self) -> &str {
@@ -210,7 +270,15 @@ impl PostgresFlavour {
     }
 }
 
-impl SqlFlavour for PostgresFlavour {
+impl SqlConnector for PostgresConnector {
+    fn dialect(&self) -> Box<dyn SqlDialect> {
+        Box::new(PostgresDialect::new(self.circumstances()))
+    }
+
+    fn shadow_db_url(&self) -> Option<&str> {
+        imp::get_shadow_db_url(&self.state)
+    }
+
     fn acquire_lock(&mut self) -> BoxFuture<'_, ConnectorResult<()>> {
         // They do not support advisory locking:
         // https://github.com/cockroachdb/cockroach/issues/13546
@@ -268,14 +336,6 @@ impl SqlFlavour for PostgresFlavour {
 
             Ok(table_names)
         })
-    }
-
-    fn datamodel_connector(&self) -> &'static dyn psl::datamodel_connector::Connector {
-        if self.is_cockroachdb() {
-            psl::builtin_connectors::COCKROACH
-        } else {
-            psl::builtin_connectors::POSTGRES
-        }
     }
 
     fn describe_schema(&mut self, namespaces: Option<Namespaces>) -> BoxFuture<'_, ConnectorResult<SqlSchema>> {
@@ -379,12 +439,6 @@ impl SqlFlavour for PostgresFlavour {
         self.raw_cmd("DROP TABLE _prisma_migrations")
     }
 
-    fn empty_database_schema(&self) -> SqlSchema {
-        let mut schema = SqlSchema::default();
-        schema.set_connector_data(Box::<sql_schema_describer::postgres::PostgresSchemaExt>::default());
-        schema
-    }
-
     fn ensure_connection_validity(&mut self) -> BoxFuture<'_, ConnectorResult<()>> {
         self.with_connection(|_, _| future::ready(Ok(())))
     }
@@ -427,19 +481,23 @@ impl SqlFlavour for PostgresFlavour {
         imp::set_preview_features(&mut self.state, preview_features)
     }
 
+    fn preview_features(&self) -> psl::PreviewFeatures {
+        imp::get_preview_features(&self.state)
+    }
+
     #[tracing::instrument(skip(self, migrations))]
     fn sql_schema_from_migration_history<'a>(
         &'a mut self,
         migrations: &'a [MigrationDirectory],
-        shadow_database_connection_string: Option<String>,
         namespaces: Option<Namespaces>,
+        external_shadow_db: UsingExternalShadowDb,
     ) -> BoxFuture<'a, ConnectorResult<SqlSchema>> {
         Box::pin(imp::shadow_db::sql_schema_from_migration_history(
-            &mut self.state,
+            self,
             self.provider,
             migrations,
-            shadow_database_connection_string,
             namespaces,
+            external_shadow_db,
         ))
     }
 
@@ -451,6 +509,10 @@ impl SqlFlavour for PostgresFlavour {
 
     fn search_path(&self) -> &str {
         self.schema_name()
+    }
+
+    fn dispose(&self) -> BoxFuture<'_, ConnectorResult<()>> {
+        Box::pin(imp::dispose(&self.state))
     }
 }
 
@@ -653,8 +715,8 @@ mod tests {
         let url = "postgresql://myname:mypassword@myserver:8765/mydbname";
 
         let params = ConnectorParams::new(url.to_owned(), Default::default(), None);
-        let flavour = PostgresFlavour::new_with_params(params).unwrap();
-        let debugged = format!("{flavour:?}");
+        let connector = PostgresConnector::new_with_params(params).unwrap();
+        let debugged = format!("{connector:?}");
 
         let words = &["myname", "mypassword", "myserver", "8765", "mydbname"];
 

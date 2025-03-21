@@ -1,24 +1,30 @@
-#[cfg(feature = "mssql-native")]
-mod native;
+mod connector;
+mod destructive_change_checker;
+mod renderer;
+mod schema_calculator;
+mod schema_differ;
 
-#[cfg(not(feature = "mssql-native"))]
-mod wasm;
-
-#[cfg(feature = "mssql-native")]
-use native::{generic_apply_migration_script, shadow_db, Connection};
-
-#[cfg(not(feature = "mssql-native"))]
-use wasm::{generic_apply_migration_script, shadow_db, Connection};
-
-use crate::SqlFlavour;
+use crate::{sql_destructive_change_checker, sql_renderer::SqlRenderer, SqlConnector};
 use connection_string::JdbcString;
+#[cfg(feature = "mssql-native")]
+use connector::{generic_apply_migration_script, shadow_db, Connection};
+#[cfg(not(feature = "mssql-native"))]
+use connector::{generic_apply_migration_script, shadow_db, Connection};
+use destructive_change_checker::MssqlDestructiveChangeCheckerFlavour;
 use indoc::formatdoc;
 use quaint::{connector::MssqlUrl, prelude::Table};
+use renderer::MssqlRenderer;
+use schema_calculator::MssqlSchemaCalculatorFlavour;
 use schema_connector::{
     migrations_directory::MigrationDirectory, BoxFuture, ConnectorError, ConnectorParams, ConnectorResult, Namespaces,
 };
+use schema_differ::MssqlSchemaDifferFlavour;
 use sql_schema_describer::SqlSchema;
 use std::{future, str::FromStr};
+
+use super::{SqlDialect, UsingExternalShadowDb};
+
+const DEFAULT_SCHEMA_NAME: &str = "dbo";
 
 type State = super::State<Params, Connection>;
 
@@ -29,6 +35,10 @@ struct Params {
 
 impl Params {
     fn new(connector_params: ConnectorParams) -> ConnectorResult<Self> {
+        if let Some(shadow_db_url) = &connector_params.shadow_database_connection_string {
+            super::validate_connection_infos_do_not_match(&connector_params.connection_string, shadow_db_url)?;
+        }
+
         let url = MssqlUrl::new(&connector_params.connection_string).map_err(ConnectorError::url_parse_error)?;
         Ok(Self { connector_params, url })
     }
@@ -38,23 +48,88 @@ impl Params {
     }
 }
 
-pub(crate) struct MssqlFlavour {
-    state: State,
+#[derive(Debug)]
+pub struct MssqlDialect {
+    schema_name: String,
 }
 
-impl Default for MssqlFlavour {
-    fn default() -> Self {
-        Self { state: State::Initial }
+impl MssqlDialect {
+    fn new(schema_name: String) -> Self {
+        Self { schema_name }
+    }
+
+    fn schema_name(&self) -> &str {
+        &self.schema_name
     }
 }
 
-impl std::fmt::Debug for MssqlFlavour {
+impl Default for MssqlDialect {
+    fn default() -> Self {
+        Self::new(DEFAULT_SCHEMA_NAME.to_string())
+    }
+}
+
+impl SqlDialect for MssqlDialect {
+    fn renderer(&self) -> Box<dyn SqlRenderer> {
+        Box::new(MssqlRenderer::new(self.schema_name().to_owned()))
+    }
+
+    fn schema_differ(&self) -> Box<dyn crate::sql_schema_differ::SqlSchemaDifferFlavour> {
+        Box::new(MssqlSchemaDifferFlavour)
+    }
+
+    fn schema_calculator(&self) -> Box<dyn crate::sql_schema_calculator::SqlSchemaCalculatorFlavour> {
+        Box::new(MssqlSchemaCalculatorFlavour)
+    }
+
+    fn destructive_change_checker(&self) -> Box<dyn sql_destructive_change_checker::DestructiveChangeCheckerFlavour> {
+        Box::new(MssqlDestructiveChangeCheckerFlavour::new(self.schema_name().to_owned()))
+    }
+
+    fn datamodel_connector(&self) -> &'static dyn psl::datamodel_connector::Connector {
+        psl::builtin_connectors::MSSQL
+    }
+
+    fn migrations_table(&self) -> Table<'static> {
+        (self.schema_name().to_owned(), crate::MIGRATIONS_TABLE_NAME.to_owned()).into()
+    }
+
+    fn empty_database_schema(&self) -> SqlSchema {
+        let mut schema = SqlSchema::default();
+        schema.set_connector_data(Box::<sql_schema_describer::mssql::MssqlSchemaExt>::default());
+        schema
+    }
+
+    #[cfg(feature = "mssql-native")]
+    fn connect_to_shadow_db(
+        &self,
+        url: String,
+        preview_features: psl::PreviewFeatures,
+    ) -> BoxFuture<'_, ConnectorResult<Box<dyn SqlConnector>>> {
+        let params = ConnectorParams::new(url, preview_features, None);
+        Box::pin(async move { Ok(Box::new(MssqlConnector::new_with_params(params)?) as Box<dyn SqlConnector>) })
+    }
+
+    #[cfg(not(feature = "mssql-native"))]
+    fn connect_to_shadow_db(
+        &self,
+        factory: Arc<dyn ExternalConnectorFactory>,
+    ) -> BoxFuture<'_, ConnectorResult<Box<dyn SqlConnector>>> {
+        todo!("MSSQL WASM shadow database not supported yet")
+    }
+}
+
+pub(crate) struct MssqlConnector {
+    state: State,
+}
+
+impl std::fmt::Debug for MssqlConnector {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_struct("MssqlFlavour").field("url", &"<REDACTED>").finish()
     }
 }
 
-impl MssqlFlavour {
+impl MssqlConnector {
     pub fn new_with_params(params: ConnectorParams) -> ConnectorResult<Self> {
         Ok(Self {
             state: State::WithParams(Params::new(params)?),
@@ -62,7 +137,10 @@ impl MssqlFlavour {
     }
 
     pub(crate) fn schema_name(&self) -> &str {
-        self.state.params().map(|p| p.url.schema()).unwrap_or("dbo")
+        self.state
+            .params()
+            .map(|p| p.url.schema())
+            .unwrap_or(DEFAULT_SCHEMA_NAME)
     }
 
     /// Get the url as a JDBC string, extract the database name, and re-encode the string.
@@ -76,7 +154,19 @@ impl MssqlFlavour {
     }
 }
 
-impl SqlFlavour for MssqlFlavour {
+impl SqlConnector for MssqlConnector {
+    fn dialect(&self) -> Box<dyn SqlDialect> {
+        Box::new(MssqlDialect::new(self.schema_name().to_owned()))
+    }
+
+    fn shadow_db_url(&self) -> Option<&str> {
+        self.state
+            .params()?
+            .connector_params
+            .shadow_database_connection_string
+            .as_deref()
+    }
+
     fn acquire_lock(&mut self) -> BoxFuture<'_, ConnectorResult<()>> {
         // see
         // https://docs.microsoft.com/en-us/sql/relational-databases/system-stored-procedures/sp-getapplock-transact-sql?view=sql-server-ver15
@@ -97,18 +187,10 @@ impl SqlFlavour for MssqlFlavour {
         })
     }
 
-    fn datamodel_connector(&self) -> &'static dyn psl::datamodel_connector::Connector {
-        psl::builtin_connectors::MSSQL
-    }
-
     fn describe_schema(&mut self, namespaces: Option<Namespaces>) -> BoxFuture<'_, ConnectorResult<SqlSchema>> {
         with_connection(&mut self.state, |params, connection| async move {
             connection.describe_schema(params, namespaces).await
         })
-    }
-
-    fn migrations_table(&self) -> Table<'static> {
-        (self.schema_name().to_owned(), crate::MIGRATIONS_TABLE_NAME.to_owned()).into()
     }
 
     fn connector_type(&self) -> &'static str {
@@ -128,11 +210,7 @@ impl SqlFlavour for MssqlFlavour {
                     &query,
                     &Params {
                         url: MssqlUrl::new(&master_uri).unwrap(),
-                        connector_params: ConnectorParams {
-                            connection_string: master_uri.clone(),
-                            preview_features: Default::default(),
-                            shadow_database_connection_string: None,
-                        },
+                        connector_params: ConnectorParams::new(master_uri, Default::default(), None),
                     },
                 )
                 .await?;
@@ -140,7 +218,7 @@ impl SqlFlavour for MssqlFlavour {
             let mut conn = Connection::new(&params.connector_params.connection_string).await?;
 
             // dbo is created automatically
-            if params.url.schema() != "dbo" {
+            if params.url.schema() != DEFAULT_SCHEMA_NAME {
                 let query = format!("CREATE SCHEMA {}", params.url.schema());
                 conn.raw_cmd(&query, params).await?;
             }
@@ -191,11 +269,7 @@ impl SqlFlavour for MssqlFlavour {
             conn.raw_cmd(
                 &query,
                 &Params {
-                    connector_params: ConnectorParams {
-                        connection_string: master_uri.clone(),
-                        preview_features: Default::default(),
-                        shadow_database_connection_string: None,
-                    },
+                    connector_params: ConnectorParams::new(master_uri.clone(), Default::default(), None),
                     url: MssqlUrl::new(&master_uri).unwrap(),
                 },
             )
@@ -383,12 +457,6 @@ impl SqlFlavour for MssqlFlavour {
         })
     }
 
-    fn empty_database_schema(&self) -> SqlSchema {
-        let mut schema = SqlSchema::default();
-        schema.set_connector_data(Box::<sql_schema_describer::mssql::MssqlSchemaExt>::default());
-        schema
-    }
-
     fn ensure_connection_validity(&mut self) -> BoxFuture<'_, ConnectorResult<()>> {
         self.raw_cmd("SELECT 1")
     }
@@ -410,85 +478,80 @@ impl SqlFlavour for MssqlFlavour {
         }
     }
 
+    fn preview_features(&self) -> psl::PreviewFeatures {
+        self.state
+            .params()
+            .map(|p| p.connector_params.preview_features)
+            .unwrap_or_default()
+    }
+
     fn sql_schema_from_migration_history<'a>(
         &'a mut self,
         migrations: &'a [MigrationDirectory],
-        shadow_database_connection_string: Option<String>,
         namespaces: Option<Namespaces>,
+        external_shadow_db: UsingExternalShadowDb,
     ) -> BoxFuture<'a, ConnectorResult<SqlSchema>> {
-        let shadow_database_connection_string = shadow_database_connection_string.or_else(|| {
-            self.state
-                .params()
-                .and_then(|p| p.connector_params.shadow_database_connection_string.clone())
-        });
+        match external_shadow_db {
+            UsingExternalShadowDb::Yes => Box::pin(async move {
+                self.ensure_connection_validity().await?;
+                tracing::info!("Connected to an external shadow database.");
 
-        if let Some(shadow_database_connection_string) = shadow_database_connection_string {
-            Box::pin(async move {
-                if let Some(params) = self.state.params() {
-                    super::validate_connection_infos_do_not_match(
-                        &shadow_database_connection_string,
-                        &params.connector_params.connection_string,
-                    )?;
+                if self.reset(namespaces.clone()).await.is_err() {
+                    crate::best_effort_reset(self, namespaces.clone()).await?;
                 }
 
-                let preview_features = self
-                    .state
-                    .params()
-                    .map(|cp| cp.connector_params.preview_features)
-                    .unwrap_or_default();
-                let connector_params = ConnectorParams::new(shadow_database_connection_string, preview_features, None);
-                let mut shadow_database = MssqlFlavour::new_with_params(connector_params)?;
+                shadow_db::sql_schema_from_migrations_history(migrations, self, namespaces).await
+            }),
 
-                shadow_database.ensure_connection_validity().await?;
+            // If we're not using an external shadow database, one must be created manually.
+            UsingExternalShadowDb::No => {
+                with_connection(&mut self.state, move |params, main_connection| async move {
+                    let shadow_database_name = crate::new_shadow_database_name();
+                    // See https://github.com/prisma/prisma/issues/6371 for the rationale on
+                    // this conditional.
+                    if params.is_running_on_azure_sql() {
+                        return Err(ConnectorError::user_facing(
+                            user_facing_errors::schema_engine::AzureMssqlShadowDb,
+                        ));
+                    }
 
-                if shadow_database.reset(namespaces.clone()).await.is_err() {
-                    crate::best_effort_reset(&mut shadow_database, namespaces.clone()).await?;
-                }
+                    let create_database = format!("CREATE DATABASE [{shadow_database_name}]");
 
-                shadow_db::sql_schema_from_migrations_history(migrations, shadow_database, namespaces).await
-            })
-        } else {
-            with_connection(&mut self.state, move |params, main_connection| async move {
-                let shadow_database_name = crate::new_shadow_database_name();
-                // See https://github.com/prisma/prisma/issues/6371 for the rationale on
-                // this conditional.
-                if params.is_running_on_azure_sql() {
-                    return Err(ConnectorError::user_facing(
-                        user_facing_errors::schema_engine::AzureMssqlShadowDb,
-                    ));
-                }
+                    main_connection
+                        .raw_cmd(&create_database, params)
+                        .await
+                        .map_err(|err| err.into_shadow_db_creation_error())?;
 
-                let create_database = format!("CREATE DATABASE [{shadow_database_name}]");
+                    let connection_string = format!("jdbc:{}", params.connector_params.connection_string);
+                    let mut jdbc_string: JdbcString = connection_string.parse().unwrap();
+                    jdbc_string
+                        .properties_mut()
+                        .insert("database".into(), shadow_database_name.to_owned());
+                    let host = jdbc_string.server_name();
 
-                main_connection
-                    .raw_cmd(&create_database, params)
-                    .await
-                    .map_err(|err| err.into_shadow_db_creation_error())?;
+                    let jdbc_string = jdbc_string.to_string();
 
-                let connection_string = format!("jdbc:{}", params.connector_params.connection_string);
-                let mut jdbc_string: JdbcString = connection_string.parse().unwrap();
-                jdbc_string
-                    .properties_mut()
-                    .insert("database".into(), shadow_database_name.to_owned());
-                let host = jdbc_string.server_name();
+                    tracing::debug!("Connecting to shadow database at {}", host.unwrap_or("localhost"));
 
-                let jdbc_string = jdbc_string.to_string();
+                    let connector_params =
+                        ConnectorParams::new(jdbc_string, params.connector_params.preview_features, None);
+                    let mut shadow_database = MssqlConnector::new_with_params(connector_params.clone())?;
 
-                tracing::debug!("Connecting to shadow database at {}", host.unwrap_or("localhost"));
+                    // We go through the whole process without early return, then clean up
+                    // the shadow database, and only then return the result. This avoids
+                    // leaving shadow databases behind in case of e.g. faulty
+                    // migrations.
+                    let ret =
+                        shadow_db::sql_schema_from_migrations_history(migrations, &mut shadow_database, namespaces)
+                            .await;
 
-                let connector_params =
-                    ConnectorParams::new(jdbc_string, params.connector_params.preview_features, None);
-                let shadow_database = MssqlFlavour::new_with_params(connector_params.clone())?;
+                    // Drop the shadow database before cleaning up from the main connection.
+                    drop(shadow_database);
 
-                // We go through the whole process without early return, then clean up
-                // the shadow database, and only then return the result. This avoids
-                // leaving shadow databases behind in case of e.g. faulty
-                // migrations.
-                let ret = shadow_db::sql_schema_from_migrations_history(migrations, shadow_database, namespaces).await;
-
-                clean_up_shadow_database(&shadow_database_name, main_connection, params).await?;
-                ret
-            })
+                    clean_up_shadow_database(&shadow_database_name, main_connection, params).await?;
+                    ret
+                })
+            }
         }
     }
 
@@ -507,6 +570,11 @@ impl SqlFlavour for MssqlFlavour {
         _sql: &str,
     ) -> BoxFuture<'a, ConnectorResult<quaint::connector::DescribedQuery>> {
         unimplemented!("SQL Server does not support describe_query yet.")
+    }
+
+    fn dispose(&self) -> BoxFuture<'_, ConnectorResult<()>> {
+        // Nothing to on dispose, the connection is disposed in Drop
+        Box::pin(async move { Ok(()) })
     }
 }
 
@@ -547,7 +615,7 @@ mod tests {
         let url = "sqlserver://myserver:8765;database=master;schema=mydbname;user=SA;password=<mypassword>;trustServerCertificate=true;socket_timeout=60;isolationLevel=READ UNCOMMITTED";
 
         let params = ConnectorParams::new(url.to_owned(), Default::default(), None);
-        let flavour = MssqlFlavour::new_with_params(params).unwrap();
+        let flavour = MssqlConnector::new_with_params(params).unwrap();
         let debugged = format!("{flavour:?}");
 
         let words = &["myname", "mypassword", "myserver", "8765", "mydbname"];

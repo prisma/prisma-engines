@@ -21,13 +21,13 @@ use json_rpc::types::{SchemaContainer, SchemasContainer, SchemasWithConfigDir};
 pub use schema_connector;
 
 use enumflags2::BitFlags;
-use mongodb_schema_connector::MongoDbSchemaConnector;
+use mongodb_schema_connector::{MongoDbSchemaConnector, MongoDbSchemaDialect};
 use psl::{
     builtin_connectors::*, datamodel_connector::Flavour, parser_database::SourceFile, Datasource, PreviewFeature,
     ValidatedSchema,
 };
 use schema_connector::ConnectorParams;
-use sql_schema_connector::SqlSchemaConnector;
+use sql_schema_connector::{SqlSchemaConnector, SqlSchemaDialect};
 use std::{env, path::Path};
 use user_facing_errors::common::InvalidConnectionString;
 
@@ -90,9 +90,7 @@ fn connector_for_connection_string(
 }
 
 /// Same as schema_to_connector, but it will only read the provider, not the connector params.
-fn schema_to_connector_unchecked(
-    files: &[(String, SourceFile)],
-) -> CoreResult<Box<dyn schema_connector::SchemaConnector>> {
+fn schema_to_dialect(files: &[(String, SourceFile)]) -> CoreResult<Box<dyn schema_connector::SchemaDialect>> {
     let (_, config) = psl::parse_configuration_multi_file(files)
         .map_err(|(files, err)| CoreError::new_schema_parser_error(files.render_diagnostics(&err)))?;
 
@@ -109,9 +107,10 @@ fn schema_to_connector_unchecked(
             preview_features,
             shadow_database_connection_string: source.load_shadow_database_url().ok().flatten(),
         };
-        connector_for_provider(source.active_provider, connector_params)
+        let conn = connector_for_provider(source.active_provider, connector_params)?;
+        Ok(conn.schema_dialect())
     } else {
-        uninitialized_connector_for_provider(source.active_provider)
+        dialect_for_provider(source.active_provider)
     }
 }
 
@@ -155,15 +154,15 @@ fn connector_for_provider(
     }
 }
 
-fn uninitialized_connector_for_provider(provider: &str) -> CoreResult<Box<dyn schema_connector::SchemaConnector>> {
+fn dialect_for_provider(provider: &str) -> CoreResult<Box<dyn schema_connector::SchemaDialect>> {
     if let Some(connector) = BUILTIN_CONNECTORS.iter().find(|c| c.is_provider(provider)) {
         match connector.flavour() {
-            Flavour::Cockroach => Ok(Box::new(SqlSchemaConnector::new_uninitialized_cockroachdb())),
-            Flavour::Mongo => Ok(Box::new(MongoDbSchemaConnector::new_uninitialized())),
-            Flavour::Sqlserver => Ok(Box::new(SqlSchemaConnector::new_uninitialized_mssql())),
-            Flavour::Mysql => Ok(Box::new(SqlSchemaConnector::new_uninitialized_mysql())),
-            Flavour::Postgres => Ok(Box::new(SqlSchemaConnector::new_uninitialized_postgres())),
-            Flavour::Sqlite => Ok(Box::new(SqlSchemaConnector::new_uninitialized_sqlite())),
+            Flavour::Cockroach => Ok(Box::new(SqlSchemaDialect::cockroach())),
+            Flavour::Mongo => Ok(Box::new(MongoDbSchemaDialect)),
+            Flavour::Sqlserver => Ok(Box::new(SqlSchemaDialect::mssql())),
+            Flavour::Mysql => Ok(Box::new(SqlSchemaDialect::mysql())),
+            Flavour::Postgres => Ok(Box::new(SqlSchemaDialect::postgres())),
+            Flavour::Sqlite => Ok(Box::new(SqlSchemaDialect::sqlite())),
         }
     } else {
         Err(CoreError::from_msg(format!(

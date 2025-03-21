@@ -25,7 +25,7 @@ pub struct Column {
 /// This trait should be implemented by warning and unexecutable migration types. It lets them
 /// describe what data they need from the current state of the database to be as accurate and
 /// informative as possible.
-pub(super) trait Check {
+pub(crate) trait Check {
     /// Indicates that the row count for the table with the returned name should be inspected.
     fn needed_table_row_count(&self) -> Option<Table> {
         None

@@ -9,12 +9,13 @@ use schema_connector::{ConnectorResult, Migration, SchemaConnector};
 impl MongoDbSchemaConnector {
     pub(crate) async fn apply_migration_impl(&self, migration: &Migration) -> ConnectorResult<u32> {
         let db = self.client().await?.database();
+        let dialect = self.schema_dialect();
 
-        if !self.migration_is_empty(migration) {
+        if !dialect.migration_is_empty(migration) {
             self.host
                 .print(&format!(
                     "Applying the following changes:\n\n{}\n",
-                    self.migration_summary(migration)
+                    dialect.migration_summary(migration)
                 ))
                 .await?;
         }

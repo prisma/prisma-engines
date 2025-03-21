@@ -17,7 +17,7 @@ use quaint::{
     prelude::{ConnectionInfo, NativeConnectionInfo, Queryable, ResultSet},
     single::Quaint,
 };
-use schema_core::schema_connector::{ConnectorParams, SchemaConnector};
+use schema_core::schema_connector::{ConnectorParams, ConnectorResult, SchemaConnector};
 use sql_schema_connector::SqlSchemaConnector;
 use tempfile::TempDir;
 use test_setup::{DatasourceBlock, TestApiArgs};
@@ -186,6 +186,16 @@ impl TestApi {
         connection_string: String,
         shadow_database_connection_string: Option<String>,
     ) -> EngineTestApi {
+        self.new_engine_with_connection_strings_or_err(connection_string, shadow_database_connection_string)
+            .unwrap()
+    }
+
+    /// Instantiate a new migration with the provided connection string or return an error.
+    pub fn new_engine_with_connection_strings_or_err(
+        &self,
+        connection_string: String,
+        shadow_database_connection_string: Option<String>,
+    ) -> ConnectorResult<EngineTestApi> {
         let connection_info = ConnectionInfo::from_url(&connection_string).unwrap();
 
         let params = ConnectorParams {
@@ -197,13 +207,13 @@ impl TestApi {
         let connector = match &connection_info {
             ConnectionInfo::Native(NativeConnectionInfo::Postgres(_)) => {
                 if self.args.provider() == "cockroachdb" {
-                    SqlSchemaConnector::new_cockroach(params).unwrap()
+                    SqlSchemaConnector::new_cockroach(params)?
                 } else {
-                    SqlSchemaConnector::new_postgres(params).unwrap()
+                    SqlSchemaConnector::new_postgres(params)?
                 }
             }
-            ConnectionInfo::Native(NativeConnectionInfo::Mysql(_)) => SqlSchemaConnector::new_mysql(params).unwrap(),
-            ConnectionInfo::Native(NativeConnectionInfo::Mssql(_)) => SqlSchemaConnector::new_mssql(params).unwrap(),
+            ConnectionInfo::Native(NativeConnectionInfo::Mysql(_)) => SqlSchemaConnector::new_mysql(params)?,
+            ConnectionInfo::Native(NativeConnectionInfo::Mssql(_)) => SqlSchemaConnector::new_mssql(params)?,
             ConnectionInfo::Native(NativeConnectionInfo::Sqlite { .. }) => {
                 SqlSchemaConnector::new_sqlite(params).unwrap()
             }
@@ -212,13 +222,13 @@ impl TestApi {
             }
         };
 
-        EngineTestApi {
+        Ok(EngineTestApi {
             connector,
             connection_info,
             tags: self.args.tags(),
             namespaces: self.args.namespaces(),
             max_ddl_refresh_delay: self.args.max_ddl_refresh_delay(),
-        }
+        })
     }
 
     fn tags(&self) -> BitFlags<Tags> {

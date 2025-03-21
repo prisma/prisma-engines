@@ -4,7 +4,7 @@ use super::{
 };
 
 #[derive(Debug)]
-pub(super) enum SqlMigrationWarningCheck {
+pub(crate) enum SqlMigrationWarningCheck {
     DropAndRecreateColumn {
         table: String,
         namespace: Option<String>,

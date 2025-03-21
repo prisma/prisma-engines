@@ -1,31 +1,83 @@
-#[cfg(feature = "sqlite-native")]
-mod native;
+mod connector;
+mod destructive_change_checker;
+mod renderer;
+mod schema_calculator;
+mod schema_differ;
 
-#[cfg(not(feature = "sqlite-native"))]
-mod wasm;
-
-use std::future::Future;
-
-#[cfg(feature = "sqlite-native")]
-use native as imp;
-
-#[cfg(not(feature = "sqlite-native"))]
-use wasm as imp;
-
-use crate::flavour::SqlFlavour;
+use crate::{flavour::SqlConnector, sql_renderer::SqlRenderer};
+use connector as imp;
+use destructive_change_checker::SqliteDestructiveChangeCheckerFlavour;
 use indoc::indoc;
+use renderer::SqliteRenderer;
+use schema_calculator::SqliteSchemaCalculatorFlavour;
 use schema_connector::{
     migrations_directory::MigrationDirectory, BoxFuture, ConnectorError, ConnectorResult, Namespaces,
 };
+use schema_differ::SqliteSchemaDifferFlavour;
 use sql_schema_describer::{sqlite::SqlSchemaDescriber, DescriberErrorKind, SqlSchema};
+use std::future::Future;
+
+use super::{SqlDialect, UsingExternalShadowDb};
 
 type State = imp::State;
 
-pub(crate) struct SqliteFlavour {
+#[derive(Debug, Default)]
+pub struct SqliteDialect;
+
+impl SqlDialect for SqliteDialect {
+    fn renderer(&self) -> Box<dyn SqlRenderer> {
+        Box::new(SqliteRenderer)
+    }
+
+    fn schema_differ(&self) -> Box<dyn crate::sql_schema_differ::SqlSchemaDifferFlavour> {
+        Box::new(SqliteSchemaDifferFlavour)
+    }
+
+    fn schema_calculator(&self) -> Box<dyn crate::sql_schema_calculator::SqlSchemaCalculatorFlavour> {
+        Box::new(SqliteSchemaCalculatorFlavour)
+    }
+
+    fn destructive_change_checker(
+        &self,
+    ) -> Box<dyn crate::sql_destructive_change_checker::DestructiveChangeCheckerFlavour> {
+        Box::new(SqliteDestructiveChangeCheckerFlavour)
+    }
+
+    fn datamodel_connector(&self) -> &'static dyn psl::datamodel_connector::Connector {
+        psl::builtin_connectors::SQLITE
+    }
+
+    #[cfg(feature = "sqlite-native")]
+    fn connect_to_shadow_db(
+        &self,
+        url: String,
+        preview_features: psl::PreviewFeatures,
+    ) -> BoxFuture<'_, ConnectorResult<Box<dyn SqlConnector>>> {
+        let params = schema_connector::ConnectorParams::new(url, preview_features, None);
+        Box::pin(async move { Ok(Box::new(SqliteConnector::new_with_params(params)?) as Box<dyn SqlConnector>) })
+    }
+
+    #[cfg(not(feature = "sqlite-native"))]
+    fn connect_to_shadow_db(
+        &self,
+        factory: std::sync::Arc<dyn quaint::connector::ExternalConnectorFactory>,
+    ) -> BoxFuture<'_, ConnectorResult<Box<dyn SqlConnector>>> {
+        Box::pin(async move {
+            let adapter = factory
+                .connect_to_shadow_db()
+                .await
+                .ok_or_else(|| ConnectorError::from_msg("Provided adapter does not support shadow databases".into()))?
+                .map_err(|e| ConnectorError::from_source(e, "Failed to connect to the shadow database"))?;
+            Ok(Box::new(SqliteConnector::new_external(adapter)) as Box<dyn SqlConnector>)
+        })
+    }
+}
+
+pub(crate) struct SqliteConnector {
     state: State,
 }
 
-impl SqliteFlavour {
+impl SqliteConnector {
     fn with_connection<'a, F, O, C>(&'a mut self, f: C) -> BoxFuture<'a, ConnectorResult<O>>
     where
         O: 'a + Send,
@@ -40,20 +92,17 @@ impl SqliteFlavour {
 }
 
 #[cfg(feature = "sqlite-native")]
-impl Default for SqliteFlavour {
+impl Default for SqliteConnector {
     fn default() -> Self {
         Self { state: State::Initial }
     }
 }
 
-impl SqliteFlavour {
+impl SqliteConnector {
     #[cfg(not(feature = "sqlite-native"))]
-    pub(crate) fn new_external(
-        adapter: std::sync::Arc<dyn quaint::connector::ExternalConnector>,
-        factory: std::sync::Arc<dyn quaint::connector::ExternalConnectorFactory>,
-    ) -> Self {
+    pub(crate) fn new_external(adapter: std::sync::Arc<dyn quaint::connector::ExternalConnector>) -> Self {
         Self {
-            state: State::new(adapter, factory, Default::default()),
+            state: State::new(adapter, Default::default()),
         }
     }
 
@@ -63,15 +112,32 @@ impl SqliteFlavour {
             state: State::WithParams(imp::Params::new(params)?),
         })
     }
+
+    #[cfg(feature = "sqlite-native")]
+    pub fn new_inmem(preview_features: psl::PreviewFeatures) -> ConnectorResult<Self> {
+        let params = imp::Params::new_inmem(preview_features);
+        let connection = imp::Connection::new_inmem()?;
+        Ok(Self {
+            state: State::Connected(params, connection),
+        })
+    }
 }
 
-impl std::fmt::Debug for SqliteFlavour {
+impl std::fmt::Debug for SqliteConnector {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.write_str("<SQLite connector>")
     }
 }
 
-impl SqlFlavour for SqliteFlavour {
+impl SqlConnector for SqliteConnector {
+    fn dialect(&self) -> Box<dyn SqlDialect> {
+        Box::new(SqliteDialect)
+    }
+
+    fn shadow_db_url(&self) -> Option<&str> {
+        imp::get_shadow_db_url(&self.state)
+    }
+
     fn acquire_lock(&mut self) -> BoxFuture<'_, ConnectorResult<()>> {
         self.raw_cmd("PRAGMA main.locking_mode=EXCLUSIVE")
     }
@@ -131,10 +197,6 @@ impl SqlFlavour for SqliteFlavour {
         self.raw_cmd(sql)
     }
 
-    fn datamodel_connector(&self) -> &'static dyn psl::datamodel_connector::Connector {
-        psl::builtin_connectors::SQLITE
-    }
-
     fn describe_schema(&mut self, _namespaces: Option<Namespaces>) -> BoxFuture<'_, ConnectorResult<SqlSchema>> {
         self.with_connection(|conn, _| describe_schema(conn))
     }
@@ -169,13 +231,13 @@ impl SqlFlavour for SqliteFlavour {
                 Ok(result) => result,
                 Err(err) => {
                     #[cfg(feature = "sqlite-native")]
-                    if let Some(native::rusqlite::Error::SqliteFailure(
-                        native::rusqlite::ffi::Error {
+                    if let Some(imp::rusqlite::Error::SqliteFailure(
+                        imp::rusqlite::ffi::Error {
                             extended_code: 1, // table not found
                             ..
                         },
                         _,
-                    )) = err.source_as::<native::rusqlite::Error>()
+                    )) = err.source_as::<imp::rusqlite::Error>()
                     {
                         return Ok(Err(schema_connector::PersistenceNotInitializedError));
                     }
@@ -269,12 +331,16 @@ impl SqlFlavour for SqliteFlavour {
         imp::set_preview_features(&mut self.state, preview_features)
     }
 
+    fn preview_features(&self) -> psl::PreviewFeatures {
+        imp::get_preview_features(&self.state)
+    }
+
     #[tracing::instrument(skip(self, migrations))]
     fn sql_schema_from_migration_history<'a>(
         &'a mut self,
         migrations: &'a [MigrationDirectory],
-        _shadow_database_connection_string: Option<String>,
         _namespaces: Option<Namespaces>,
+        external_shadow_db: UsingExternalShadowDb,
     ) -> BoxFuture<'a, ConnectorResult<SqlSchema>> {
         async fn apply_migrations_and_describe(
             connection: &imp::Connection,
@@ -297,12 +363,20 @@ impl SqlFlavour for SqliteFlavour {
         }
 
         Box::pin(async move {
-            tracing::debug!("Applying migrations to temporary in-memory SQLite database.");
-            let shadow_db_conn = imp::new_shadow_db(&self.state).await?;
-            let result = apply_migrations_and_describe(&shadow_db_conn, migrations).await;
-            // dispose the shadow database connection regardless of the result
-            shadow_db_conn.dispose().await?;
-            result
+            match external_shadow_db {
+                UsingExternalShadowDb::Yes => {
+                    let (conn, _) = imp::get_connection_and_params(&mut self.state)?;
+                    tracing::info!("Connected to an external shadow database.");
+                    apply_migrations_and_describe(conn, migrations).await
+                }
+
+                // If we're not using an external shadow database, one must be created manually.
+                UsingExternalShadowDb::No => {
+                    tracing::debug!("Applying migrations to temporary in-memory SQLite database.");
+                    let conn = imp::connect_to_shadow_db()?;
+                    apply_migrations_and_describe(&conn, migrations).await
+                }
+            }
         })
     }
 
@@ -312,6 +386,10 @@ impl SqlFlavour for SqliteFlavour {
 
     fn search_path(&self) -> &str {
         "main"
+    }
+
+    fn dispose(&self) -> BoxFuture<'_, ConnectorResult<()>> {
+        Box::pin(imp::dispose(&self.state))
     }
 }
 

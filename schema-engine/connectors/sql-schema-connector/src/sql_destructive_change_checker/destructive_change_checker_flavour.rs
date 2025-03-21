@@ -1,25 +1,15 @@
-#[cfg(feature = "mssql")]
-mod mssql;
-
-#[cfg(feature = "mysql")]
-mod mysql;
-
-#[cfg(any(feature = "postgresql", feature = "cockroachdb"))]
-mod postgres;
-
-#[cfg(feature = "sqlite")]
-mod sqlite;
-
 use super::{
     check::{Column, Table},
     DestructiveCheckPlan,
 };
-use crate::{migration_pair::MigrationPair, sql_migration::AlterColumn, sql_schema_differ::ColumnChanges};
+use crate::{
+    migration_pair::MigrationPair, sql_migration::AlterColumn, sql_schema_differ::ColumnChanges, SqlConnector,
+};
 use schema_connector::{BoxFuture, ConnectorError, ConnectorResult};
 use sql_schema_describer::walkers::TableColumnWalker;
 
 /// Flavour-specific destructive change checks and queries.
-pub(crate) trait DestructiveChangeCheckerFlavour {
+pub(crate) trait DestructiveChangeCheckerFlavour: Send + Sync {
     /// Check for potential destructive or unexecutable alter column steps.
     fn check_alter_column(
         &self,
@@ -38,13 +28,21 @@ pub(crate) trait DestructiveChangeCheckerFlavour {
         step_index: usize,
     );
 
-    fn count_rows_in_table<'a>(&'a mut self, table: &'a Table) -> BoxFuture<'a, ConnectorResult<i64>>;
+    fn count_rows_in_table<'a>(
+        &'a mut self,
+        connector: &'a mut dyn SqlConnector,
+        table: &'a Table,
+    ) -> BoxFuture<'a, ConnectorResult<i64>>;
 
-    fn count_values_in_column<'a>(&'a mut self, column: &'a Column) -> BoxFuture<'a, ConnectorResult<i64>>;
+    fn count_values_in_column<'a>(
+        &'a mut self,
+        connector: &'a mut dyn SqlConnector,
+        column: &'a Column,
+    ) -> BoxFuture<'a, ConnectorResult<i64>>;
 }
 
 /// Display a column type for warnings/errors.
-fn display_column_type(
+pub(crate) fn display_column_type(
     column: sql_schema_describer::walkers::TableColumnWalker<'_>,
     connector: &dyn psl::datamodel_connector::Connector,
 ) -> String {
@@ -54,7 +52,7 @@ fn display_column_type(
     }
 }
 
-fn extract_table_rows_count(table: &Table, result_set: quaint::prelude::ResultSet) -> ConnectorResult<i64> {
+pub(crate) fn extract_table_rows_count(table: &Table, result_set: quaint::prelude::ResultSet) -> ConnectorResult<i64> {
     result_set
         .first()
         .ok_or_else(|| {
@@ -73,7 +71,7 @@ fn extract_table_rows_count(table: &Table, result_set: quaint::prelude::ResultSe
         })
 }
 
-fn extract_column_values_count(result_set: quaint::prelude::ResultSet) -> ConnectorResult<i64> {
+pub(crate) fn extract_column_values_count(result_set: quaint::prelude::ResultSet) -> ConnectorResult<i64> {
     result_set
         .first()
         .as_ref()

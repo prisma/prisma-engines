@@ -1,9 +1,14 @@
-use crate::{flavour::SqlFlavour, migration_pair::MigrationPair};
+use crate::migration_pair::MigrationPair;
 use enumflags2::BitFlags;
 
 use sql_schema_describer::{walkers::TableColumnWalker, DefaultKind, PrismaValue};
 
-pub(crate) fn all_changes(cols: MigrationPair<TableColumnWalker<'_>>, flavour: &dyn SqlFlavour) -> ColumnChanges {
+use super::SqlSchemaDifferFlavour;
+
+pub(crate) fn all_changes(
+    cols: MigrationPair<TableColumnWalker<'_>>,
+    flavour: &dyn SqlSchemaDifferFlavour,
+) -> ColumnChanges {
     let mut changes = BitFlags::empty();
     let type_change = flavour.column_type_change(cols);
 
@@ -29,7 +34,7 @@ pub(crate) fn all_changes(cols: MigrationPair<TableColumnWalker<'_>>, flavour: &
 /// There are workarounds to cope with current migration and introspection limitations.
 ///
 /// - We bail on a number of cases that are too complex to deal with right now or underspecified.
-fn defaults_match(cols: MigrationPair<TableColumnWalker<'_>>, flavour: &dyn SqlFlavour) -> bool {
+fn defaults_match(cols: MigrationPair<TableColumnWalker<'_>>, flavour: &dyn SqlSchemaDifferFlavour) -> bool {
     // JSON defaults on MySQL should be ignored.
     if flavour.should_ignore_json_defaults()
         && (cols.previous.column_type_family().is_json() || cols.next.column_type_family().is_json())
@@ -130,7 +135,7 @@ fn json_defaults_match(previous: &str, next: &str) -> bool {
         .unwrap_or(true)
 }
 
-fn list_defaults_match(prev: &[PrismaValue], next: &[PrismaValue], flavour: &dyn SqlFlavour) -> bool {
+fn list_defaults_match(prev: &[PrismaValue], next: &[PrismaValue], flavour: &dyn SqlSchemaDifferFlavour) -> bool {
     if prev.len() != next.len() {
         return false;
     }

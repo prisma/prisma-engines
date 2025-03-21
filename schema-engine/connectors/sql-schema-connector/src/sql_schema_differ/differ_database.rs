@@ -1,5 +1,5 @@
-use super::{column, enums::EnumDiffer, table::TableDiffer};
-use crate::{flavour::SqlFlavour, migration_pair::MigrationPair, SqlDatabaseSchema};
+use super::{column, enums::EnumDiffer, table::TableDiffer, SqlSchemaDifferFlavour};
+use crate::{migration_pair::MigrationPair, SqlDatabaseSchema};
 use indexmap::IndexMap;
 use sql_schema_describer::{
     postgres::{ExtensionId, ExtensionWalker, PostgresSchemaExt},
@@ -15,7 +15,7 @@ use std::{
 type Table<'a> = (Option<Cow<'a, str>>, Cow<'a, str>);
 
 pub(crate) struct DifferDatabase<'a> {
-    pub(super) flavour: &'a dyn SqlFlavour,
+    pub(super) flavour: &'a dyn SqlSchemaDifferFlavour,
     /// The schemas being diffed
     pub(crate) schemas: MigrationPair<&'a SqlDatabaseSchema>,
     /// Namespace name -> namespace indexes.
@@ -28,14 +28,14 @@ pub(crate) struct DifferDatabase<'a> {
     /// (table_idx, column_idx) -> ColumnChanges
     column_changes: HashMap<MigrationPair<TableColumnId>, column::ColumnChanges>,
     /// Postgres extension name -> extension indexes.
-    pub(super) extensions: HashMap<&'a str, MigrationPair<Option<ExtensionId>>>,
+    pub(crate) extensions: HashMap<&'a str, MigrationPair<Option<ExtensionId>>>,
     /// Tables that will need to be completely redefined (dropped and recreated) for the migration
     /// to succeed. It needs to be crate public because it is set from the flavour.
     pub(crate) tables_to_redefine: BTreeSet<MigrationPair<TableId>>,
 }
 
 impl<'a> DifferDatabase<'a> {
-    pub(crate) fn new(schemas: MigrationPair<&'a SqlDatabaseSchema>, flavour: &'a dyn SqlFlavour) -> Self {
+    pub(crate) fn new(schemas: MigrationPair<&'a SqlDatabaseSchema>, flavour: &'a dyn SqlSchemaDifferFlavour) -> Self {
         let namespace_count_lb = std::cmp::max(
             schemas.previous.describer_schema.namespaces_count(),
             schemas.next.describer_schema.namespaces_count(),
