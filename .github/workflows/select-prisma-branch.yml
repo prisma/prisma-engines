@@ -29,7 +29,7 @@ jobs:
             github.event.pull_request.author_association == 'CONTRIBUTOR'
           )
         run: |
-          BRANCH_NAME=$(echo "$PR_BODY" | sed -n 's|.*\/prisma-branch \([^[:space:]]*\).*|\1|p' | head -n 1)
+          BRANCH_NAME=$(echo "$PR_BODY" | sed -n 's|.*\/prisma-branch \([^[:space:]]\+\).*|\1|p' | head -n 1)
           if [ -n "$BRANCH_NAME" ] && [ "$BRANCH_NAME" != "main" ]; then
             echo "PRISMA_BRANCH=$BRANCH_NAME" >> "$GITHUB_ENV"
           fi
