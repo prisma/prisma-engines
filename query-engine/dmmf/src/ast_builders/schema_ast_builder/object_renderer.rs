@@ -41,7 +41,7 @@ impl<'a> DmmfObjectRenderer<'a> {
                     ObjectTag::WhereInputType(c) => Some(c.name()),
                     _ => None,
                 }),
-                grouping: container.and_then(|c| Some(c.name())),
+                grouping: container.map(|c| c.name()),
             }),
         };
 
