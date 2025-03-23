@@ -14,12 +14,12 @@
 //! - Render the final user-facing messages based on the plan and the gathered
 //!   information.
 
-mod check;
+pub(crate) mod check;
 mod database_inspection_results;
-mod destructive_change_checker_flavour;
-mod destructive_check_plan;
-mod unexecutable_step_check;
-mod warning_check;
+pub mod destructive_change_checker_flavour;
+pub(crate) mod destructive_check_plan;
+pub(crate) mod unexecutable_step_check;
+pub(crate) mod warning_check;
 
 pub(crate) use destructive_change_checker_flavour::DestructiveChangeCheckerFlavour;
 
@@ -104,6 +104,7 @@ impl SqlSchemaConnector {
         let steps = &migration.steps;
         let schemas = migration.schemas();
         let mut plan = DestructiveCheckPlan::new();
+        let checker = self.sql_dialect().destructive_change_checker();
 
         for (step_index, step) in steps.iter().enumerate() {
             match step {
@@ -125,8 +126,7 @@ impl SqlSchemaConnector {
                             TableChange::AlterColumn(alter_column) => {
                                 let columns = schemas.walk(alter_column.column_id);
 
-                                self.flavour()
-                                    .check_alter_column(alter_column, &columns, &mut plan, step_index)
+                                checker.check_alter_column(alter_column, &columns, &mut plan, step_index)
                             }
                             TableChange::AddColumn {
                                 column_id,
@@ -146,8 +146,7 @@ impl SqlSchemaConnector {
                             TableChange::DropAndRecreateColumn { column_id, changes } => {
                                 let columns = schemas.walk(*column_id);
 
-                                self.flavour
-                                    .check_drop_and_recreate_column(&columns, changes, &mut plan, step_index)
+                                checker.check_drop_and_recreate_column(&columns, changes, &mut plan, step_index)
                             }
                             TableChange::AddPrimaryKey { .. } => (),
                             TableChange::RenamePrimaryKey { .. } => (),
@@ -289,7 +288,7 @@ impl DestructiveChangeChecker for SqlSchemaConnector {
         migration: &'a Migration,
     ) -> BoxFuture<'a, ConnectorResult<DestructiveChangeDiagnostics>> {
         let plan = self.plan(migration.downcast_ref());
-        Box::pin(async move { plan.execute(self.flavour.as_mut()).await })
+        Box::pin(async move { plan.execute(self.inner.as_mut()).await })
     }
 
     fn pure_check(&self, migration: &Migration) -> DestructiveChangeDiagnostics {

@@ -1,5 +1,5 @@
 use crate::{json_rpc::types::*, parse_schema_multi, CoreResult, SchemaContainerExt};
-use schema_connector::{ConnectorError, DiffTarget, SchemaConnector};
+use schema_connector::{ConnectorError, SchemaConnector};
 use tracing_futures::Instrument;
 
 /// Command to bring the local database in sync with the prisma schema, without
@@ -12,23 +12,25 @@ pub async fn schema_push(input: SchemaPushInput, connector: &mut dyn SchemaConne
         return Err(ConnectorError::user_facing(err));
     };
 
-    let to = connector
-        .database_schema_from_diff_target(DiffTarget::Datamodel(sources), None, None)
-        .instrument(tracing::info_span!("Calculate `to`"))
-        .await?;
+    // The `ensure_connection_validity` call is currently needed to infer the correct
+    // circumstances from the connector. It can be removed once we get rid of the
+    // connector state machines.
+    connector.ensure_connection_validity().await?;
+    let dialect = connector.schema_dialect();
 
-    let namespaces = connector.extract_namespaces(&to);
+    let to = dialect.schema_from_datamodel(sources)?;
+    let namespaces = dialect.extract_namespaces(&to);
 
     // TODO(MultiSchema): we may need to do something similar to
     // namespaces_and_preview_features_from_diff_targets here as well,
     // particulalry if it's not correctly setting the preview features flags.
     let from = connector
-        .database_schema_from_diff_target(DiffTarget::Database, None, namespaces)
-        .instrument(tracing::info_span!("Calculate `from`"))
+        .schema_from_database(namespaces)
+        .instrument(tracing::info_span!("Calculate from database"))
         .await?;
-    let database_migration = connector.diff(from, to);
+    let database_migration = dialect.diff(from, to);
 
-    tracing::debug!(migration = connector.migration_summary(&database_migration).as_str());
+    tracing::debug!(migration = dialect.migration_summary(&database_migration).as_str());
 
     let checks = connector
         .destructive_change_checker()

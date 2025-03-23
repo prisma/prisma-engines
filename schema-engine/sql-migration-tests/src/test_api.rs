@@ -343,13 +343,11 @@ impl TestApi {
         to: DiffTarget<'_>,
         namespaces: Option<Namespaces>,
     ) -> String {
-        let from = tok(self
-            .connector
-            .database_schema_from_diff_target(from, None, namespaces.clone()))
-        .unwrap();
-        let to = tok(self.connector.database_schema_from_diff_target(to, None, namespaces)).unwrap();
-        let migration = self.connector.diff(from, to);
-        self.connector.render_script(&migration, &Default::default()).unwrap()
+        let from = tok(self.connector.schema_from_diff_target(from, namespaces.clone())).unwrap();
+        let to = tok(self.connector.schema_from_diff_target(to, namespaces)).unwrap();
+        let dialect = self.connector.schema_dialect();
+        let migration = dialect.diff(from, to);
+        dialect.render_script(&migration, &Default::default()).unwrap()
     }
 
     pub fn normalize_identifier<'a>(&self, identifier: &'a str) -> Cow<'a, str> {

@@ -10,21 +10,8 @@
 
 mod common;
 
-#[cfg(feature = "mssql")]
-mod mssql_renderer;
+pub(crate) use common::*;
 
-#[cfg(feature = "mysql")]
-mod mysql_renderer;
-
-#[cfg(any(feature = "postgresql", feature = "cockroachdb"))]
-mod postgres_renderer;
-
-#[cfg(feature = "sqlite")]
-mod sqlite_renderer;
-
-pub(crate) use common::IteratorJoin;
-
-use self::common::{Quoted, QuotedWithPrefix};
 use crate::{
     migration_pair::MigrationPair,
     sql_migration::{
@@ -37,7 +24,7 @@ use sql_schema_describer::{
     SqlSchema,
 };
 
-pub(crate) trait SqlRenderer {
+pub(crate) trait SqlRenderer: Send + Sync {
     fn quote<'a>(&self, name: &'a str) -> Quoted<&'a str>;
 
     fn render_add_foreign_key(&self, foreign_key: ForeignKeyWalker<'_>) -> String;
