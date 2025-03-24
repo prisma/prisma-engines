@@ -1,10 +1,12 @@
 #![allow(dead_code)]
 #![allow(unused_variables)]
 
-use driver_adapters::JsObject;
+use driver_adapters::{adapter_factory_from_js, JsObject};
+use json_rpc::types::*;
 use psl::{ConnectorRegistry, ValidatedSchema};
-use quaint::connector::ExternalConnector;
+use quaint::connector::ExternalConnectorFactory;
 use serde::Deserialize;
+use sql_schema_connector::SqlSchemaConnector;
 use std::sync::Arc;
 use tsify_next::Tsify;
 use wasm_bindgen::prelude::wasm_bindgen;
@@ -46,33 +48,25 @@ fn register_panic_hook() {
 /// The main query engine used by JS
 #[wasm_bindgen]
 pub struct SchemaEngine {
-    schema: ValidatedSchema,
-    adapter: Arc<dyn ExternalConnector>,
-}
-
-#[derive(Deserialize, Tsify)]
-#[tsify(from_wasm_abi)]
-pub struct SchemaEngineParams {
-    // TODO: support multiple datamodels
-    datamodel: String,
+    adapter_factory: Arc<dyn ExternalConnectorFactory>,
+    sql_schema_connector: SqlSchemaConnector,
 }
 
 #[wasm_bindgen]
 impl SchemaEngine {
     #[wasm_bindgen(constructor)]
-    pub fn new(params: SchemaEngineParams, adapter: JsObject) -> Result<SchemaEngine, wasm_bindgen::JsError> {
-        let SchemaEngineParams { datamodel, .. } = params;
+    pub async fn new(adapter: JsObject) -> Result<SchemaEngine, wasm_bindgen::JsError> {
+        let adapter_factory = Arc::new(adapter_factory_from_js(adapter));
+        let adapter = Arc::new(adapter_factory.connect().await?);
 
-        // Note: if we used `psl::validate`, we'd add ~1MB to the Wasm artifact (before gzip).
-        let schema = psl::parse_without_validation(datamodel.into(), CONNECTOR_REGISTRY);
-        let js_queryable = Arc::new(driver_adapters::queryable_from_js(adapter));
+        let sql_schema_connector = SqlSchemaConnector::new_from_external(adapter).await?;
 
         tracing::info!(git_hash = env!("GIT_HASH"), "Starting schema-engine-wasm");
         register_panic_hook();
 
         Ok(Self {
-            schema,
-            adapter: js_queryable,
+            adapter_factory,
+            sql_schema_connector,
         })
     }
 
@@ -80,17 +74,5 @@ impl SchemaEngine {
     #[wasm_bindgen(js_name = "debugPanic")]
     pub fn debug_panic(&self) {
         panic!("This is the debugPanic artificial panic")
-    }
-
-    /// Return the database version as a string.
-    #[wasm_bindgen]
-    pub async fn version(&self) -> Result<Option<String>, wasm_bindgen::JsError> {
-        Err(wasm_bindgen::JsError::new("Not yet available."))
-    }
-
-    /// Reset a database to an empty state (no data, no schema).
-    #[wasm_bindgen]
-    pub async fn reset(&self) -> Result<(), wasm_bindgen::JsError> {
-        Err(wasm_bindgen::JsError::new("Not yet available."))
     }
 }
