@@ -13,9 +13,14 @@ pub async fn schema_push(input: SchemaPushInput, connector: &mut dyn SchemaConne
     };
 
     // The `ensure_connection_validity` call is currently needed to infer the correct
-    // circumstances from the connector. It can be removed once we get rid of the
-    // connector state machines.
-    connector.ensure_connection_validity().await?;
+    // circumstances from the connector. This is necessary because otherwise the state machine
+    // we use for native drivers doesn't get initialized and some features like CockroachDB
+    // detection do not work.
+    // The error is intentionally ignored because it interferes with some tests ('schemaPush ›
+    // should succeed if SQLite database file is missing' in prisma/prisma).
+    //
+    // TODO: We should remove this call once the state machines are no longer used.
+    let _ = connector.ensure_connection_validity().await;
     let dialect = connector.schema_dialect();
 
     let to = dialect.schema_from_datamodel(sources)?;
