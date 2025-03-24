@@ -114,6 +114,10 @@ impl AdapterFactoryProxy {
             None => None,
         }
     }
+
+    pub fn provider(&self) -> &str {
+        &self.provider
+    }
 }
 
 // TypeScript: DriverAdapter

@@ -52,6 +52,10 @@ pub struct SchemaEngine {
     sql_schema_connector: SqlSchemaConnector,
 }
 
+// 1. One SchemaEngine object that reads 1 schema only and exposes methods that actually make use of such schema
+// 2. A bunch of free functions (e.g., diff, version) that either don't rely on any schema,
+//    or accept multiple schemas as input.
+
 #[wasm_bindgen]
 impl SchemaEngine {
     #[wasm_bindgen(constructor)]

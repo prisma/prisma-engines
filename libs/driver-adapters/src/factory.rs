@@ -53,6 +53,10 @@ impl ExternalConnectorFactory for JsAdapterFactory {
             result.map(|queryable| Arc::new(JsQueryableDropGuard::new(queryable)) as Arc<dyn ExternalConnector>)
         })
     }
+
+    fn provider(&self) -> &str {
+        self.inner.provider()
+    }
 }
 
 /// A wrapper around `JsQueryable` that ensures that the dispose method is called after use.

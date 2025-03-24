@@ -447,6 +447,7 @@ impl SchemaConnector for SqlSchemaConnector {
             let namespaces = Namespaces::from_vec(&mut namespace_names);
             let sql_schema = self.inner.introspect(namespaces, ctx).await?;
             let search_path = self.inner.search_path();
+
             let datamodel = introspection::datamodel_calculator::calculate(&sql_schema, ctx, search_path);
 
             Ok(datamodel)

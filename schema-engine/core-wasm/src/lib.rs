@@ -4,10 +4,7 @@
 
 //! The top-level library crate for `schema-engine-wasm`.
 
-mod api;
-mod core_error;
 mod state;
-mod types;
 
 // Inspired by request_handlers::load_executor::ConnectorKind
 pub enum ConnectorKind<'a> {

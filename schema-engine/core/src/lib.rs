@@ -8,15 +8,15 @@ pub use json_rpc;
 
 // exposed for tests
 #[doc(hidden)]
-pub mod commands;
+pub use ::commands;
 
-mod api;
 mod core_error;
 mod rpc;
 mod state;
 mod timings;
 
-pub use self::{api::GenericApi, core_error::*, rpc::rpc_api, timings::TimingsLayer};
+pub use self::{rpc::rpc_api, timings::TimingsLayer};
+use ::commands::{core_error::*, GenericApi};
 use json_rpc::types::{SchemaContainer, SchemasContainer, SchemasWithConfigDir};
 pub use schema_connector;
 
@@ -24,16 +24,11 @@ use enumflags2::BitFlags;
 use mongodb_schema_connector::{MongoDbSchemaConnector, MongoDbSchemaDialect};
 use psl::{
     builtin_connectors::*, datamodel_connector::Flavour, parser_database::SourceFile, Datasource, PreviewFeature,
-    ValidatedSchema,
 };
 use schema_connector::ConnectorParams;
 use sql_schema_connector::{SqlSchemaConnector, SqlSchemaDialect};
 use std::{env, path::Path};
 use user_facing_errors::common::InvalidConnectionString;
-
-fn parse_schema_multi(files: &[(String, SourceFile)]) -> CoreResult<ValidatedSchema> {
-    psl::parse_schema_multi(files).map_err(CoreError::new_schema_parser_error)
-}
 
 fn connector_for_connection_string(
     connection_string: String,
@@ -175,7 +170,7 @@ fn dialect_for_provider(provider: &str) -> CoreResult<Box<dyn schema_connector::
 pub fn schema_api(
     datamodel: Option<String>,
     host: Option<std::sync::Arc<dyn schema_connector::ConnectorHost>>,
-) -> CoreResult<Box<dyn api::GenericApi>> {
+) -> CoreResult<Box<dyn GenericApi>> {
     // Eagerly load the default schema, for validation errors.
     if let Some(datamodel) = &datamodel {
         parse_configuration(datamodel)?;

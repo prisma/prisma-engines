@@ -87,4 +87,5 @@ pub trait ExternalConnector: TransactionCapable {
 pub trait ExternalConnectorFactory: Send + Sync {
     async fn connect(&self) -> crate::Result<Arc<dyn ExternalConnector>>;
     async fn connect_to_shadow_db(&self) -> Option<crate::Result<Arc<dyn ExternalConnector>>>;
+    fn provider(&self) -> &str;
 }

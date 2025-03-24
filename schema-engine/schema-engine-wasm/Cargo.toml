@@ -14,9 +14,9 @@ workspace = true
 [features]
 # useful for local intellisense, as long as `all-native` is disabled in `schema-engine-cli`
 # default = ["sqlite"]
-sqlite = ["driver-adapters/sqlite", "psl/sqlite", "sql-schema-connector/sqlite"]
-postgresql = ["driver-adapters/postgresql", "psl/postgresql", "sql-schema-connector/postgresql"]
-mysql = ["driver-adapters/mysql", "psl/mysql", "sql-schema-connector/mysql"]
+sqlite = ["driver-adapters/sqlite", "psl/sqlite", "sql-schema-connector/sqlite", "commands/sqlite"]
+postgresql = ["driver-adapters/postgresql", "psl/postgresql", "sql-schema-connector/postgresql", "commands/postgresql"]
+mysql = ["driver-adapters/mysql", "psl/mysql", "sql-schema-connector/mysql", "commands/mysql"]
 
 [dependencies]
 psl.workspace = true
@@ -24,8 +24,7 @@ quaint.workspace = true
 tracing.workspace = true
 sql-schema-connector = { workspace = true }
 json-rpc = { path = "../json-rpc-api", package = "json-rpc-api" }
-# Disabled for now, as it breaks the Wasm build
-# schema-core = { workspace = true }
+commands = { path = "../commands", package = "schema-commands" }
 
 js-sys.workspace = true
 serde.workspace = true

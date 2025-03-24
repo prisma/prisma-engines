@@ -2,6 +2,7 @@
 resolver = "2"
 members = [
     "schema-engine/cli",
+    "schema-engine/commands",
     "schema-engine/core",
     "schema-engine/connectors/*",
     "schema-engine/datamodel-renderer",

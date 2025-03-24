@@ -12,6 +12,7 @@ pub async fn apply_migrations(
     connector: &mut dyn SchemaConnector,
     namespaces: Option<Namespaces>,
 ) -> CoreResult<ApplyMigrationsOutput> {
+    // TODO: this might break in wasm32
     let start = Instant::now();
 
     error_on_changed_provider(&input.migrations_list.lockfile, connector.connector_type())?;

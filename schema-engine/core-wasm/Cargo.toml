@@ -4,6 +4,7 @@ name = "schema-core-wasm"
 version = "0.1.0"
 
 [dependencies]
+commands = { path = "../commands", package = "schema-commands" }
 psl = { workspace = true, features = ["all"] }
 schema-connector.workspace = true
 

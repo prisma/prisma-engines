@@ -1,0 +1,46 @@
+[package]
+edition = "2024"
+name = "schema-commands"
+version = "0.1.0"
+
+[features]
+postgresql = ["psl/postgresql", "schema-connector/postgresql", "sql-schema-connector/postgresql"]
+postgresql-native = ["postgresql"]
+sqlite = ["psl/sqlite", "schema-connector/sqlite", "sql-schema-connector/sqlite"]
+sqlite-native = ["sqlite"]
+mysql = ["psl/mysql", "schema-connector/mysql", "sql-schema-connector/mysql"]
+mysql-native = ["mysql"]
+mssql = ["psl/mssql", "schema-connector/mssql", "sql-schema-connector/mssql"]
+mssql-native = ["mssql"]
+cockroachdb = ["psl/cockroachdb", "schema-connector/cockroachdb", "sql-schema-connector/cockroachdb"]
+cockroachdb-native = ["cockroachdb"]
+all-native = [
+    "postgresql-native",
+    "sqlite-native",
+    "mysql-native",
+    "mssql-native",
+    "cockroachdb-native",
+    "schema-connector/all-native",
+    "sql-schema-connector/all-native",
+    "user-facing-errors/all-native",
+]
+
+[dependencies]
+crosstarget-utils.workspace = true
+psl.workspace = true
+schema-connector.workspace = true
+sql-schema-connector.workspace = true # TODO: remove
+user-facing-errors = { workspace = true }
+
+json-rpc = { path = "../json-rpc-api", package = "json-rpc-api" }
+async-trait.workspace = true
+chrono.workspace = true
+enumflags2.workspace = true
+jsonrpc-core.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+tokio.workspace = true
+tracing.workspace = true
+tracing-subscriber.workspace = true
+tracing-futures.workspace = true
+url.workspace = true
