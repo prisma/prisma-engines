@@ -43,9 +43,9 @@ class QueryPipeline {
 
       const results = transaction
         ? await this.executeTransactionalBatch(
-            batch,
-            parseIsolationLevel(transaction.isolationLevel),
-          )
+          batch,
+          parseIsolationLevel(transaction.isolationLevel),
+        )
         : await this.executeIndependentBatch(batch)
 
       debug('🟢 Batch query results: ', results)
@@ -86,8 +86,11 @@ class QueryPipeline {
 
     debug('🟢 Query plan: ', util.inspect(queryPlan, false, null, true))
 
+    const transactionManager = this.transactionManager
+
     const interpreter = new QueryInterpreter({
       queryable,
+      transactionManager,
       placeholderValues: {},
       onQuery: (event) => {
         this.logs.push(JSON.stringify(event))

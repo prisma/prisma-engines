@@ -194,7 +194,7 @@ pub struct QueryGraph {
 
     finalized: bool,
 
-    /// For now a stupid marker if the query graph needs to be run inside a
+    /// For now a simple marker if the query graph needs to be run inside a
     /// transaction. Should happen if any of the queries is writing data.
     needs_transaction: bool,
 
@@ -334,7 +334,7 @@ impl QueryGraph {
     }
 
     /// If true, the graph should be executed inside of a transaction.
-    pub(crate) fn needs_transaction(&self) -> bool {
+    pub fn needs_transaction(&self) -> bool {
         self.needs_transaction
     }
 

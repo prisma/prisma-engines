@@ -77,6 +77,9 @@ pub enum Expression {
     /// Get a field from a record or records. If the argument is a list of records,
     /// returns a list of values of this field.
     MapField { field: String, records: Box<Expression> },
+
+    /// Run the query inside a transaction
+    Transaction(Box<Expression>),
 }
 
 #[derive(Debug, Clone)]
@@ -137,6 +140,7 @@ impl Expression {
             Expression::Required(expression) => expression.r#type(),
             Expression::Join { parent, .. } => parent.r#type(),
             Expression::MapField { records, .. } => records.r#type(),
+            Expression::Transaction(expression) => expression.r#type(),
         }
     }
 }
