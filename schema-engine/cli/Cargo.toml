@@ -3,14 +3,16 @@ name = "schema-engine-cli"
 version = "0.1.0"
 edition = "2021"
 
+[features]
+default = ["all-native"]
+
+all-native = ["schema-connector/all-native", "user-facing-errors/all-native", "quaint/all-native"]
+vendored-openssl = ["schema-core/vendored-openssl"]
+
 [dependencies]
-schema-connector = { workspace = true, features = [
-    "all-native",
-] }
+schema-connector.workspace = true
 schema-core.workspace = true
-user-facing-errors = { workspace = true, features = [
-    "all-native",
-] }
+user-facing-errors.workspace = true
 panic-utils.workspace = true
 
 base64.workspace = true
@@ -36,7 +38,7 @@ url.workspace = true
 indoc.workspace = true
 connection-string.workspace = true
 expect-test.workspace = true
-quaint = { workspace = true, features = ["all-native"] }
+quaint.workspace = true
 
 [build-dependencies]
 build-utils.workspace = true
@@ -44,6 +46,3 @@ build-utils.workspace = true
 [[bin]]
 name = "schema-engine"
 path = "src/main.rs"
-
-[features]
-vendored-openssl = ["schema-core/vendored-openssl"]
