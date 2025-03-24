@@ -1,13 +1,5 @@
 new::disconnect::disconnect_security::must_honor_connect_scope_m2m
 new::disconnect::disconnect_security::must_honor_connect_scope_one2m
-new::interactive_tx::interactive_tx::basic_commit_workflow
-new::interactive_tx::interactive_tx::basic_rollback_workflow
-new::interactive_tx::interactive_tx::batch_queries_failure
-new::interactive_tx::interactive_tx::no_auto_rollback
-new::interactive_tx::interactive_tx::raw_queries
-new::interactive_tx::interactive_tx::tx_expiration_cycle
-new::interactive_tx::interactive_tx::tx_expiration_failure_cycle
-new::interactive_tx::itx_isolation::invalid_isolation
 new::multi_schema::multi_schema::create_and_get_many_relations
 new::multi_schema::multi_schema::create_and_get_many_to_many_relations
 new::multi_schema::multi_schema::crud_relations
