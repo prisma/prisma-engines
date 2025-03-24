@@ -278,6 +278,10 @@ impl std::fmt::Debug for JsQueryable {
 
 #[async_trait]
 impl ExternalConnector for JsQueryable {
+    fn provider(&self) -> AdapterProvider {
+        self.inner.provider
+    }
+
     async fn execute_script(&self, script: &str) -> quaint::Result<()> {
         self.driver_proxy.execute_script(script.to_owned()).await
     }

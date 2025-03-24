@@ -82,6 +82,10 @@ impl Drop for JsQueryableDropGuard {
 
 #[async_trait]
 impl ExternalConnector for JsQueryableDropGuard {
+    fn provider(&self) -> quaint::connector::AdapterProvider {
+        self.inner.provider()
+    }
+
     async fn execute_script(&self, script: &str) -> quaint::Result<()> {
         self.inner.execute_script(script).await
     }
