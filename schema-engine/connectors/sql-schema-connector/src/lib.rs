@@ -181,6 +181,19 @@ pub struct SqlSchemaConnector {
 }
 
 impl SqlSchemaConnector {
+    /// Initialise an external migration connector.
+    pub async fn new_from_external(adapter: Arc<dyn quaint::connector::ExternalConnector>) -> ConnectorResult<Self> {
+        use quaint::connector::AdapterProvider;
+
+        match adapter.provider() {
+            #[cfg(feature = "postgresql")]
+            AdapterProvider::Postgres => Self::new_postgres_external(adapter).await,
+            #[cfg(feature = "sqlite")]
+            AdapterProvider::Sqlite => Ok(Self::new_sqlite_external(adapter).await),
+            _ => panic!("Unsupported adapter provider: {:?}", adapter.provider()),
+        }
+    }
+
     /// Initialize an external PostgreSQL migration connector.
     #[cfg(all(feature = "postgresql", not(feature = "postgresql-native")))]
     pub async fn new_postgres_external(
@@ -194,7 +207,7 @@ impl SqlSchemaConnector {
 
     /// Initialize an external SQLite migration connector.
     #[cfg(all(feature = "sqlite", not(feature = "sqlite-native")))]
-    pub fn new_sqlite_external(adapter: Arc<dyn quaint::connector::ExternalConnector>) -> Self {
+    pub async fn new_sqlite_external(adapter: Arc<dyn quaint::connector::ExternalConnector>) -> Self {
         SqlSchemaConnector {
             inner: Box::new(flavour::SqliteConnector::new_external(adapter)),
             host: Arc::new(EmptyHost),
