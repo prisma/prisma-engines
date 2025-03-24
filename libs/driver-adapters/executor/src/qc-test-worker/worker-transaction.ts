@@ -32,7 +32,7 @@ export function parseIsolationLevel(
       // We don't validate the isolation level on the RPC schema level because some tests
       // rely on sending invalid isolation levels to test error handling, and those invalid
       // levels must be forwarded to the query engine as-is in `testd-qe.ts`.
-      throw new Error(`Unknown isolation level: ${level}`)
+      throw new Error(`Invalid isolation level \`${level}\``)
   }
 }
 
