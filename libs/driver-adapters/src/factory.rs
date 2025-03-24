@@ -35,6 +35,11 @@ impl JsAdapterFactory {
     }
 }
 
+pub fn adapter_factory_from_js(driver: JsObject) -> JsAdapterFactory {
+    let adapter_factory_proxy = AdapterFactoryProxy::new(&driver).unwrap();
+    JsAdapterFactory::new(adapter_factory_proxy)
+}
+
 #[async_trait]
 impl ExternalConnectorFactory for JsAdapterFactory {
     async fn connect(&self) -> quaint::Result<Arc<dyn ExternalConnector>> {

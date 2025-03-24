@@ -34,6 +34,9 @@ pub(crate) struct AdapterFactoryProxy {
 
     /// Retrieve a queryable instance for a shadow database.
     connect_to_shadow_db: Option<AdapterMethod<(), JsQueryable>>,
+
+    /// Return the provider for this driver.
+    pub(crate) provider: String,
 }
 
 /// This is a JS proxy for accessing the methods specific to top level
@@ -92,13 +95,12 @@ impl CommonProxy {
 
 impl AdapterFactoryProxy {
     pub fn new(object: &JsObject) -> JsResult<Self> {
-        let connect: AdapterMethod<(), JsQueryable> = get_named_property(object, "connect")?;
-        let connect_to_shadow_db: Option<AdapterMethod<(), JsQueryable>> =
-            get_optional_named_property(object, "connectToShadowDb")?;
+        let provider: JsString = get_named_property(object, "provider")?;
 
         Ok(Self {
-            connect,
-            connect_to_shadow_db,
+            connect: get_named_property(object, "connect")?,
+            connect_to_shadow_db: get_optional_named_property(object, "connectToShadowDb")?,
+            provider: to_rust_str(provider)?,
         })
     }
 
