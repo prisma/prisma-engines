@@ -13,7 +13,7 @@ workspace = true
 
 [features]
 # useful for local intellisense, as long as `all-native` is disabled in `schema-engine-cli`
-# default = ["sqlite"]
+# default = ["sqlite"]
 sqlite = ["driver-adapters/sqlite", "psl/sqlite", "sql-schema-connector/sqlite", "commands/sqlite"]
 postgresql = ["driver-adapters/postgresql", "psl/postgresql", "sql-schema-connector/postgresql", "commands/postgresql"]
 mysql = ["driver-adapters/mysql", "psl/mysql", "sql-schema-connector/mysql", "commands/mysql"]
@@ -22,6 +22,7 @@ mysql = ["driver-adapters/mysql", "psl/mysql", "sql-schema-connector/mysql", "co
 psl.workspace = true
 quaint.workspace = true
 tracing.workspace = true
+tracing-futures.workspace = true
 sql-schema-connector = { workspace = true }
 json-rpc = { path = "../json-rpc-api", package = "json-rpc-api" }
 commands = { path = "../commands", package = "schema-commands" }

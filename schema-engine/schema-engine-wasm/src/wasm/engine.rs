@@ -1,14 +1,18 @@
 #![allow(dead_code)]
 #![allow(unused_variables)]
 
+use commands::{
+    schema_connector::{self, ConnectorError, IntrospectionResult, Namespaces, SchemaConnector},
+    CoreError,
+};
 use driver_adapters::{adapter_factory_from_js, JsObject};
 use json_rpc::types::*;
-use psl::{ConnectorRegistry, ValidatedSchema};
+use psl::{parser_database::SourceFile, ConnectorRegistry, PreviewFeature};
 use quaint::connector::ExternalConnectorFactory;
-use serde::Deserialize;
 use sql_schema_connector::SqlSchemaConnector;
+use std::path::PathBuf;
 use std::sync::Arc;
-use tsify_next::Tsify;
+use tracing_futures::Instrument;
 use wasm_bindgen::prelude::wasm_bindgen;
 
 const CONNECTOR_REGISTRY: ConnectorRegistry<'_> = &[
@@ -48,8 +52,14 @@ fn register_panic_hook() {
 /// The main query engine used by JS
 #[wasm_bindgen]
 pub struct SchemaEngine {
+    /// The adapter factory parsed from JS.
     adapter_factory: Arc<dyn ExternalConnectorFactory>,
+
+    /// The SQL schema connector induced by the adapter.
     sql_schema_connector: SqlSchemaConnector,
+
+    /// The inferred database namespaces (used for the `multiSchema` preview feature).
+    namespaces: Option<Namespaces>,
 }
 
 // 1. One SchemaEngine object that reads 1 schema only and exposes methods that actually make use of such schema
@@ -62,8 +72,10 @@ impl SchemaEngine {
     pub async fn new(adapter: JsObject) -> Result<SchemaEngine, wasm_bindgen::JsError> {
         let adapter_factory = Arc::new(adapter_factory_from_js(adapter));
         let adapter = Arc::new(adapter_factory.connect().await?);
-
         let sql_schema_connector = SqlSchemaConnector::new_from_external(adapter).await?;
+
+        // TODO: retrieve the namespaces from JS, and forward them here.
+        let namespaces: Option<Namespaces> = None;
 
         tracing::info!(git_hash = env!("GIT_HASH"), "Starting schema-engine-wasm");
         register_panic_hook();
@@ -71,12 +83,285 @@ impl SchemaEngine {
         Ok(Self {
             adapter_factory,
             sql_schema_connector,
+            namespaces,
         })
+    }
+
+    fn namespaces(&self) -> Option<Namespaces> {
+        self.namespaces.clone()
     }
 
     /// Debugging method that only panics, for tests.
     #[wasm_bindgen(js_name = "debugPanic")]
     pub fn debug_panic(&self) {
         panic!("This is the debugPanic artificial panic")
+    }
+
+    /// Return the database version as a string.
+    #[wasm_bindgen]
+    pub async fn version(
+        &mut self,
+        // Note: custom params can currently be passed to the CLI's equivalent of this method
+        // as a connection string or a list of PSL schemas.
+        // This is incompatible with Driver Adapters.
+        _params: Option<GetDatabaseVersionInput>,
+    ) -> Result<Option<String>, wasm_bindgen::JsError> {
+        let version = self.sql_schema_connector.version().await?;
+        Ok(Some(version))
+    }
+
+    /// Apply all the unapplied migrations from the migrations folder.
+    #[wasm_bindgen(js_name = "applyMigrations")]
+    pub async fn apply_migrations(
+        &mut self,
+        input: ApplyMigrationsInput,
+    ) -> Result<ApplyMigrationsOutput, wasm_bindgen::JsError> {
+        let namespaces = self.namespaces();
+        let result = commands::apply_migrations(input, &mut self.sql_schema_connector, namespaces)
+            .instrument(tracing::info_span!("ApplyMigrations"))
+            .await?;
+        Ok(result)
+    }
+
+    /// Create the database referenced by Prisma schema that was used to initialize the connector.
+    #[wasm_bindgen(js_name = "createDatabase")]
+    pub async fn create_database(
+        &mut self,
+        params: CreateDatabaseParams,
+    ) -> Result<CreateDatabaseResult, wasm_bindgen::JsError> {
+        let database_name = SchemaConnector::create_database(&mut self.sql_schema_connector).await?;
+        Ok(CreateDatabaseResult { database_name })
+    }
+
+    /// Generate a new migration, based on the provided schema and existing migrations history.
+    #[wasm_bindgen(js_name = "createMigration")]
+    pub async fn create_migration(
+        &mut self,
+        input: CreateMigrationInput,
+    ) -> Result<CreateMigrationOutput, wasm_bindgen::JsError> {
+        let span = tracing::info_span!(
+            "CreateMigration",
+            migration_name = input.migration_name.as_str(),
+            draft = input.draft,
+        );
+        let result = commands::create_migration(input, &mut self.sql_schema_connector)
+            .instrument(span)
+            .await?;
+        Ok(result)
+    }
+
+    /// Send a raw command to the database.
+    #[wasm_bindgen(js_name = "dbExecute")]
+    pub async fn db_execute(&mut self, params: DbExecuteParams) -> Result<(), wasm_bindgen::JsError> {
+        let result = self.sql_schema_connector.db_execute(params.script).await?;
+        Ok(result)
+    }
+
+    /// Tells the CLI what to do in `migrate dev`.
+    #[wasm_bindgen(js_name = "devDiagnostic")]
+    pub async fn dev_diagnostic(
+        &mut self,
+        input: DevDiagnosticInput,
+    ) -> Result<DevDiagnosticOutput, wasm_bindgen::JsError> {
+        let namespaces = self.namespaces();
+        let result = commands::dev_diagnostic(input, namespaces, &mut self.sql_schema_connector)
+            .instrument(tracing::info_span!("DevDiagnostic"))
+            .await?;
+        Ok(result)
+    }
+
+    /// Create a migration between any two sources of database schemas.
+    #[wasm_bindgen]
+    pub async fn diff(&self, params: DiffParams) -> Result<DiffResult, wasm_bindgen::JsError> {
+        Err(wasm_bindgen::JsError::new("Not yet available."))
+    }
+
+    /// Looks at the migrations folder and the database, and returns a bunch of useful information.
+    #[wasm_bindgen(js_name = "diagnoseMigrationHistory")]
+    pub async fn diagnose_migration_history(
+        &self,
+        input: DiagnoseMigrationHistoryInput,
+    ) -> Result<DiagnoseMigrationHistoryOutput, wasm_bindgen::JsError> {
+        /// TODO: restore once type inconsistencies are resolved.
+        /// The types should be `commands::DiagnoseMigrationHistory*` instead of
+        /// those coming from `json_rpc::types`.
+        Err(wasm_bindgen::JsError::new("Not yet available."))
+    }
+
+    /// Make sure the connection to the database is established and valid.
+    /// Connectors can choose to connect lazily, but this method should force
+    /// them to connect.
+    #[wasm_bindgen(js_name = "ensureConnectionValidity")]
+    pub async fn ensure_connection_validity(
+        &mut self,
+        params: EnsureConnectionValidityParams,
+    ) -> Result<EnsureConnectionValidityResult, wasm_bindgen::JsError> {
+        SchemaConnector::ensure_connection_validity(&mut self.sql_schema_connector).await?;
+        Ok(EnsureConnectionValidityResult {})
+    }
+
+    /// Evaluate the consequences of running the next migration we would generate, given the current state of a Prisma schema.
+    #[wasm_bindgen(js_name = "evaluateDataLoss")]
+    pub async fn evaluate_data_loss(
+        &mut self,
+        input: EvaluateDataLossInput,
+    ) -> Result<EvaluateDataLossOutput, wasm_bindgen::JsError> {
+        let result = commands::evaluate_data_loss(input, &mut self.sql_schema_connector)
+            .instrument(tracing::info_span!("EvaluateDataLoss"))
+            .await?;
+        Ok(result)
+    }
+
+    /// Introspect the database schema.
+    #[wasm_bindgen]
+    pub async fn introspect(&mut self, params: IntrospectParams) -> Result<IntrospectResult, wasm_bindgen::JsError> {
+        tracing::info!("{:?}", params.schema);
+        let source_files = params.schema.to_psl_input();
+
+        let has_some_namespaces = params.namespaces.is_some();
+        let composite_type_depth = From::from(params.composite_type_depth);
+
+        let ctx = if params.force {
+            let previous_schema = psl::validate_multi_file(&source_files);
+
+            schema_connector::IntrospectionContext::new_config_only(
+                previous_schema,
+                composite_type_depth,
+                params.namespaces,
+                PathBuf::new().join(&params.base_directory_path),
+            )
+        } else {
+            let previous_schema = psl::parse_schema_multi(&source_files)
+                .map_err(|e| ConnectorError::new_schema_parser_error(e).into_js_error())?;
+
+            schema_connector::IntrospectionContext::new(
+                previous_schema,
+                composite_type_depth,
+                params.namespaces,
+                PathBuf::new().join(&params.base_directory_path),
+            )
+        };
+
+        if !ctx
+            .configuration()
+            .preview_features()
+            .contains(PreviewFeature::MultiSchema)
+            && has_some_namespaces
+        {
+            let msg =
+                "The preview feature `multiSchema` must be enabled before using --schemas command line parameter.";
+
+            return Err(CoreError::from_msg(msg.to_string()).into_js_error());
+        }
+
+        let IntrospectionResult {
+            datamodels,
+            views,
+            warnings,
+            is_empty,
+        } = self.sql_schema_connector.introspect(&ctx).await?;
+
+        if is_empty {
+            Err(ConnectorError::into_introspection_result_empty_error().into_js_error())
+        } else {
+            let views = views.map(|v| {
+                v.into_iter()
+                    .map(|view| IntrospectionView {
+                        schema: view.schema,
+                        name: view.name,
+                        definition: view.definition,
+                    })
+                    .collect()
+            });
+
+            Ok(IntrospectResult {
+                schema: SchemasContainer {
+                    files: datamodels
+                        .into_iter()
+                        .map(|(path, content)| SchemaContainer { path, content })
+                        .collect(),
+                },
+                views,
+                warnings,
+            })
+        }
+    }
+
+    /// Introspects a SQL query and returns types information
+    #[wasm_bindgen(js_name = "introspectSql")]
+    pub async fn introspect_sql(
+        &self,
+        input: IntrospectSqlParams,
+    ) -> Result<IntrospectSqlResult, wasm_bindgen::JsError> {
+        // `typedSql` requires custom sqlx implementations for `sqlite`.
+        Err(wasm_bindgen::JsError::new("Not yet available."))
+    }
+
+    /// Mark a migration from the migrations folder as applied, without actually applying it.
+    #[wasm_bindgen(js_name = "markMigrationApplied")]
+    pub async fn mark_migration_applied(
+        &mut self,
+        input: MarkMigrationAppliedInput,
+    ) -> Result<MarkMigrationAppliedOutput, wasm_bindgen::JsError> {
+        let span = tracing::info_span!("MarkMigrationApplied", migration_name = input.migration_name.as_str());
+        let result = commands::mark_migration_applied(input, &mut self.sql_schema_connector)
+            .instrument(span)
+            .await?;
+        Ok(result)
+    }
+
+    /// Mark a migration as rolled back.
+    #[wasm_bindgen(js_name = "markMigrationRolledBack")]
+    pub async fn mark_migration_rolled_back(
+        &mut self,
+        input: MarkMigrationRolledBackInput,
+    ) -> Result<MarkMigrationRolledBackOutput, wasm_bindgen::JsError> {
+        let span = tracing::info_span!(
+            "MarkMigrationRolledBack",
+            migration_name = input.migration_name.as_str()
+        );
+        let result = commands::mark_migration_rolled_back(input, &mut self.sql_schema_connector)
+            .instrument(span)
+            .await?;
+        Ok(result)
+    }
+
+    /// Reset a database to an empty state (no data, no schema).
+    #[wasm_bindgen]
+    pub async fn reset(&mut self) -> Result<(), wasm_bindgen::JsError> {
+        tracing::debug!("Resetting the database.");
+        let namespaces = self.namespaces();
+
+        let result = SchemaConnector::reset(&mut self.sql_schema_connector, false, namespaces)
+            .instrument(tracing::info_span!("Reset"))
+            .await?;
+        Ok(result)
+    }
+
+    /// The command behind `prisma db push`.
+    #[wasm_bindgen(js_name = "schemaPush")]
+    pub async fn schema_push(&mut self, input: SchemaPushInput) -> Result<SchemaPushOutput, wasm_bindgen::JsError> {
+        let result = commands::schema_push(input, &mut self.sql_schema_connector)
+            .instrument(tracing::info_span!("SchemaPush"))
+            .await?;
+        Ok(result)
+    }
+}
+
+trait SchemaContainerExt {
+    fn to_psl_input(self) -> Vec<(String, SourceFile)>;
+}
+
+impl SchemaContainerExt for SchemasContainer {
+    fn to_psl_input(self) -> Vec<(String, SourceFile)> {
+        self.files.to_psl_input()
+    }
+}
+
+impl SchemaContainerExt for Vec<SchemaContainer> {
+    fn to_psl_input(self) -> Vec<(String, SourceFile)> {
+        self.into_iter()
+            .map(|container| (container.path, SourceFile::from(container.content)))
+            .collect()
     }
 }

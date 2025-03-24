@@ -326,6 +326,7 @@ impl GenericApi for EngineState {
         .await
     }
 
+    // TODO: move to `schema-commands`?
     async fn introspect(&self, params: IntrospectParams) -> CoreResult<IntrospectResult> {
         tracing::info!("{:?}", params.schema);
         let source_files = params.schema.to_psl_input();

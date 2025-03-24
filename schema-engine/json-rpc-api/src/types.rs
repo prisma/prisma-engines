@@ -14,6 +14,7 @@ use tsify_next::Tsify;
 /// Information about a migration lockfile.
 #[derive(Debug, Serialize, Deserialize)]
 #[cfg_attr(target_arch = "wasm32", derive(Tsify))]
+#[cfg_attr(target_arch = "wasm32", tsify(from_wasm_abi, into_wasm_abi))]
 pub struct MigrationLockfile {
     /// Relative path to the lockfile from base directory.
     /// E.g., `./migration_lock.toml`.
@@ -26,6 +27,7 @@ pub struct MigrationLockfile {
 /// A list of migration directories with related information.
 #[derive(Debug, Serialize, Deserialize)]
 #[cfg_attr(target_arch = "wasm32", derive(Tsify))]
+#[cfg_attr(target_arch = "wasm32", tsify(from_wasm_abi, into_wasm_abi))]
 #[serde(rename_all = "camelCase")]
 pub struct MigrationList {
     /// Absolute path to the base directory of Prisma migrations.
@@ -42,6 +44,7 @@ pub struct MigrationList {
 /// An object with a `url` field.
 #[derive(Debug, Serialize, Deserialize)]
 #[cfg_attr(target_arch = "wasm32", derive(Tsify))]
+#[cfg_attr(target_arch = "wasm32", tsify(from_wasm_abi, into_wasm_abi))]
 pub struct UrlContainer {
     /// The URL string.
     pub url: String,
@@ -50,6 +53,7 @@ pub struct UrlContainer {
 /// A container that holds the path and the content of a Prisma schema file.
 #[derive(Debug, Serialize, Deserialize)]
 #[cfg_attr(target_arch = "wasm32", derive(Tsify))]
+#[cfg_attr(target_arch = "wasm32", tsify(from_wasm_abi, into_wasm_abi))]
 pub struct SchemaContainer {
     /// The content of the Prisma schema file.
     pub content: String,
@@ -61,6 +65,7 @@ pub struct SchemaContainer {
 /// A container that holds multiple Prisma schema files.
 #[derive(Debug, Serialize, Deserialize)]
 #[cfg_attr(target_arch = "wasm32", derive(Tsify))]
+#[cfg_attr(target_arch = "wasm32", tsify(from_wasm_abi, into_wasm_abi))]
 pub struct SchemasContainer {
     /// List of schema files.
     pub files: Vec<SchemaContainer>,
@@ -69,6 +74,7 @@ pub struct SchemasContainer {
 /// A list of Prisma schema files with a config directory.
 #[derive(Debug, Serialize, Deserialize)]
 #[cfg_attr(target_arch = "wasm32", derive(Tsify))]
+#[cfg_attr(target_arch = "wasm32", tsify(from_wasm_abi, into_wasm_abi))]
 #[serde(rename_all = "camelCase")]
 pub struct SchemasWithConfigDir {
     /// A list of Prisma schema files.
@@ -82,6 +88,7 @@ pub struct SchemasWithConfigDir {
 /// connection string. See variants.
 #[derive(Debug, Serialize, Deserialize)]
 #[cfg_attr(target_arch = "wasm32", derive(Tsify))]
+#[cfg_attr(target_arch = "wasm32", tsify(from_wasm_abi, into_wasm_abi))]
 #[serde(tag = "tag")]
 pub enum DatasourceParam {
     /// Prisma schema as input
@@ -94,6 +101,7 @@ pub enum DatasourceParam {
 /// A supported source for a database schema to diff in the `diff` command.
 #[derive(Debug, Serialize, Deserialize)]
 #[cfg_attr(target_arch = "wasm32", derive(Tsify))]
+#[cfg_attr(target_arch = "wasm32", tsify(from_wasm_abi, into_wasm_abi))]
 #[serde(tag = "tag", rename_all = "camelCase")]
 pub enum DiffTarget {
     /// An empty schema.
@@ -122,6 +130,7 @@ pub enum DiffTarget {
 /// database migration history in relation to the migrations directory.
 #[derive(Debug, Serialize, Deserialize)]
 #[cfg_attr(target_arch = "wasm32", derive(Tsify))]
+#[cfg_attr(target_arch = "wasm32", tsify(from_wasm_abi, into_wasm_abi))]
 #[serde(tag = "tag")]
 pub enum HistoryDiagnostic {
     /// Migrations directory is behind the database.
@@ -138,11 +147,13 @@ pub enum HistoryDiagnostic {
 /// Fields for the DatabaseIsBehind variant.
 #[derive(Debug, Serialize, Deserialize)]
 #[cfg_attr(target_arch = "wasm32", derive(Tsify))]
+#[cfg_attr(target_arch = "wasm32", tsify(from_wasm_abi, into_wasm_abi))]
 pub struct DatabaseIsBehindFields {}
 
 /// The location of the live database to connect to.
 #[derive(Debug, Serialize, Deserialize)]
 #[cfg_attr(target_arch = "wasm32", derive(Tsify))]
+#[cfg_attr(target_arch = "wasm32", tsify(from_wasm_abi, into_wasm_abi))]
 #[serde(tag = "tag", rename_all = "camelCase")]
 pub enum DbExecuteDatasourceType {
     /// Prisma schema files and content to take the datasource URL from.
@@ -155,6 +166,7 @@ pub enum DbExecuteDatasourceType {
 /// A suggested action for the CLI `migrate dev` command.
 #[derive(Debug, Serialize, Deserialize)]
 #[cfg_attr(target_arch = "wasm32", derive(Tsify))]
+#[cfg_attr(target_arch = "wasm32", tsify(from_wasm_abi, into_wasm_abi))]
 #[serde(tag = "tag", rename_all = "camelCase")]
 pub enum DevAction {
     /// Reset the database.
@@ -167,6 +179,7 @@ pub enum DevAction {
 /// Reset action fields.
 #[derive(Debug, Serialize, Deserialize)]
 #[cfg_attr(target_arch = "wasm32", derive(Tsify))]
+#[cfg_attr(target_arch = "wasm32", tsify(from_wasm_abi, into_wasm_abi))]
 pub struct DevActionReset {
     /// Why do we need to reset?
     pub reason: String,
@@ -177,8 +190,9 @@ pub struct DevActionReset {
 // Apply Migrations
 
 /// The input to the `applyMigrations` command.
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Deserialize)]
 #[cfg_attr(target_arch = "wasm32", derive(Tsify))]
+#[cfg_attr(target_arch = "wasm32", tsify(from_wasm_abi))]
 #[serde(rename_all = "camelCase")]
 pub struct ApplyMigrationsInput {
     /// The list of migrations, already loaded from disk.
@@ -188,6 +202,7 @@ pub struct ApplyMigrationsInput {
 /// The output of the `applyMigrations` command.
 #[derive(Debug, Serialize, Deserialize)]
 #[cfg_attr(target_arch = "wasm32", derive(Tsify))]
+#[cfg_attr(target_arch = "wasm32", tsify(from_wasm_abi, into_wasm_abi))]
 #[serde(rename_all = "camelCase")]
 pub struct ApplyMigrationsOutput {
     /// The names of the migrations that were just applied. Empty if no migration was applied.
@@ -197,16 +212,18 @@ pub struct ApplyMigrationsOutput {
 // Create Database
 
 /// The type of params for the `createDatabase` method.
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Deserialize)]
 #[cfg_attr(target_arch = "wasm32", derive(Tsify))]
+#[cfg_attr(target_arch = "wasm32", tsify(from_wasm_abi))]
 pub struct CreateDatabaseParams {
     /// The datasource parameter.
     pub datasource: DatasourceParam,
 }
 
 /// The result for the `createDatabase` method.
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize)]
 #[cfg_attr(target_arch = "wasm32", derive(Tsify))]
+#[cfg_attr(target_arch = "wasm32", tsify(into_wasm_abi))]
 #[serde(rename_all = "camelCase")]
 pub struct CreateDatabaseResult {
     /// The name of the created database.
@@ -216,8 +233,9 @@ pub struct CreateDatabaseResult {
 // Create Migration
 
 /// The input to the `createMigration` command.
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Deserialize)]
 #[cfg_attr(target_arch = "wasm32", derive(Tsify))]
+#[cfg_attr(target_arch = "wasm32", tsify(from_wasm_abi))]
 #[serde(rename_all = "camelCase")]
 pub struct CreateMigrationInput {
     /// If true, always generate a migration, but do not apply.
@@ -234,8 +252,9 @@ pub struct CreateMigrationInput {
 }
 
 /// The output of the `createMigration` command.
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize)]
 #[cfg_attr(target_arch = "wasm32", derive(Tsify))]
+#[cfg_attr(target_arch = "wasm32", tsify(into_wasm_abi))]
 #[serde(rename_all = "camelCase")]
 pub struct CreateMigrationOutput {
     /// The active connector type used.
@@ -260,6 +279,7 @@ pub struct CreateMigrationOutput {
 /// The type of params accepted by dbExecute.
 #[derive(Debug, Serialize, Deserialize)]
 #[cfg_attr(target_arch = "wasm32", derive(Tsify))]
+#[cfg_attr(target_arch = "wasm32", tsify(from_wasm_abi, into_wasm_abi))]
 #[serde(rename_all = "camelCase")]
 pub struct DbExecuteParams {
     /// The location of the live database to connect to.
@@ -272,6 +292,7 @@ pub struct DbExecuteParams {
 /// The type of results returned by dbExecute.
 #[derive(Debug, Serialize, Deserialize)]
 #[cfg_attr(target_arch = "wasm32", derive(Tsify))]
+#[cfg_attr(target_arch = "wasm32", tsify(from_wasm_abi, into_wasm_abi))]
 pub struct DbExecuteResult {}
 
 // Debug Panic
@@ -279,18 +300,21 @@ pub struct DbExecuteResult {}
 /// Request for debug panic.
 #[derive(Debug, Serialize, Deserialize)]
 #[cfg_attr(target_arch = "wasm32", derive(Tsify))]
+#[cfg_attr(target_arch = "wasm32", tsify(from_wasm_abi, into_wasm_abi))]
 pub struct DebugPanicInput {}
 
 /// Response for debug panic.
 #[derive(Debug, Serialize, Deserialize)]
 #[cfg_attr(target_arch = "wasm32", derive(Tsify))]
+#[cfg_attr(target_arch = "wasm32", tsify(from_wasm_abi, into_wasm_abi))]
 pub struct DebugPanicOutput {}
 
 // Dev Diagnostic
 
 /// The request type for `devDiagnostic`.
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Deserialize)]
 #[cfg_attr(target_arch = "wasm32", derive(Tsify))]
+#[cfg_attr(target_arch = "wasm32", tsify(from_wasm_abi))]
 #[serde(rename_all = "camelCase")]
 pub struct DevDiagnosticInput {
     /// The list of migrations, already loaded from disk.
@@ -298,8 +322,9 @@ pub struct DevDiagnosticInput {
 }
 
 /// The response type for `devDiagnostic`.
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize)]
 #[cfg_attr(target_arch = "wasm32", derive(Tsify))]
+#[cfg_attr(target_arch = "wasm32", tsify(into_wasm_abi))]
 pub struct DevDiagnosticOutput {
     /// The suggested course of action for the CLI.
     pub action: DevAction,
@@ -310,6 +335,7 @@ pub struct DevDiagnosticOutput {
 /// The request params for the `diagnoseMigrationHistory` method.
 #[derive(Debug, Serialize, Deserialize)]
 #[cfg_attr(target_arch = "wasm32", derive(Tsify))]
+#[cfg_attr(target_arch = "wasm32", tsify(from_wasm_abi, into_wasm_abi))]
 #[serde(rename_all = "camelCase")]
 pub struct DiagnoseMigrationHistoryInput {
     /// The list of migrations, already loaded from disk.
@@ -322,6 +348,7 @@ pub struct DiagnoseMigrationHistoryInput {
 /// The result type for `diagnoseMigrationHistory` responses.
 #[derive(Debug, Serialize, Deserialize)]
 #[cfg_attr(target_arch = "wasm32", derive(Tsify))]
+#[cfg_attr(target_arch = "wasm32", tsify(from_wasm_abi, into_wasm_abi))]
 #[serde(rename_all = "camelCase")]
 pub struct DiagnoseMigrationHistoryOutput {
     /// The names of the migrations for which the checksum of the script in the
@@ -346,6 +373,7 @@ pub struct DiagnoseMigrationHistoryOutput {
 /// The type of params for the `diff` method.
 #[derive(Debug, Serialize, Deserialize)]
 #[cfg_attr(target_arch = "wasm32", derive(Tsify))]
+#[cfg_attr(target_arch = "wasm32", tsify(from_wasm_abi, into_wasm_abi))]
 #[serde(rename_all = "camelCase")]
 pub struct DiffParams {
     /// The source of the schema to consider as a _starting point_.
@@ -376,6 +404,7 @@ pub struct DiffParams {
 /// The result type for the `diff` method.
 #[derive(Debug, Serialize, Deserialize)]
 #[cfg_attr(target_arch = "wasm32", derive(Tsify))]
+#[cfg_attr(target_arch = "wasm32", tsify(from_wasm_abi, into_wasm_abi))]
 #[serde(rename_all = "camelCase")]
 pub struct DiffResult {
     /// The exit code that the CLI should return.
@@ -385,8 +414,9 @@ pub struct DiffResult {
 // Introspect SQL
 
 /// Params type for the introspectSql method.
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Deserialize)]
 #[cfg_attr(target_arch = "wasm32", derive(Tsify))]
+#[cfg_attr(target_arch = "wasm32", tsify(from_wasm_abi))]
 pub struct IntrospectSqlParams {
     /// The database URL.
     pub url: String,
@@ -395,16 +425,18 @@ pub struct IntrospectSqlParams {
 }
 
 /// Result type for the introspectSql method.
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize)]
 #[cfg_attr(target_arch = "wasm32", derive(Tsify))]
+#[cfg_attr(target_arch = "wasm32", tsify(into_wasm_abi))]
 pub struct IntrospectSqlResult {
     /// The introspected queries.
     pub queries: Vec<SqlQueryOutput>,
 }
 
 /// Input for a single SQL query.
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Deserialize)]
 #[cfg_attr(target_arch = "wasm32", derive(Tsify))]
+#[cfg_attr(target_arch = "wasm32", tsify(from_wasm_abi))]
 pub struct SqlQueryInput {
     /// The name of the query.
     pub name: String,
@@ -413,8 +445,9 @@ pub struct SqlQueryInput {
 }
 
 /// Output for a single SQL query.
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize)]
 #[cfg_attr(target_arch = "wasm32", derive(Tsify))]
+#[cfg_attr(target_arch = "wasm32", tsify(into_wasm_abi))]
 #[serde(rename_all = "camelCase")]
 pub struct SqlQueryOutput {
     /// The name of the query.
@@ -430,8 +463,9 @@ pub struct SqlQueryOutput {
 }
 
 /// Information about a SQL query parameter.
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize)]
 #[cfg_attr(target_arch = "wasm32", derive(Tsify))]
+#[cfg_attr(target_arch = "wasm32", tsify(into_wasm_abi))]
 pub struct SqlQueryParameterOutput {
     /// Parameter name.
     pub name: String,
@@ -444,8 +478,9 @@ pub struct SqlQueryParameterOutput {
 }
 
 /// Information about a SQL query result column.
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize)]
 #[cfg_attr(target_arch = "wasm32", derive(Tsify))]
+#[cfg_attr(target_arch = "wasm32", tsify(into_wasm_abi))]
 pub struct SqlQueryColumnOutput {
     /// Column name.
     pub name: String,
@@ -460,6 +495,7 @@ pub struct SqlQueryColumnOutput {
 /// Introspect the database (db pull)
 #[derive(Debug, Serialize, Deserialize)]
 #[cfg_attr(target_arch = "wasm32", derive(Tsify))]
+#[cfg_attr(target_arch = "wasm32", tsify(from_wasm_abi, into_wasm_abi))]
 #[serde(rename_all = "camelCase")]
 pub struct IntrospectParams {
     /// Prisma schema files.
@@ -477,6 +513,7 @@ pub struct IntrospectParams {
 /// Result type for the introspect method.
 #[derive(Debug, Serialize, Deserialize)]
 #[cfg_attr(target_arch = "wasm32", derive(Tsify))]
+#[cfg_attr(target_arch = "wasm32", tsify(from_wasm_abi, into_wasm_abi))]
 pub struct IntrospectResult {
     /// The introspected schema.
     pub schema: SchemasContainer,
@@ -489,6 +526,7 @@ pub struct IntrospectResult {
 /// Information about a database view.
 #[derive(Debug, Serialize, Deserialize)]
 #[cfg_attr(target_arch = "wasm32", derive(Tsify))]
+#[cfg_attr(target_arch = "wasm32", tsify(from_wasm_abi, into_wasm_abi))]
 pub struct IntrospectionView {
     /// The view definition.
     pub definition: String,
@@ -501,8 +539,9 @@ pub struct IntrospectionView {
 // Get Database Version
 
 /// Get the database version for error reporting.
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Deserialize)]
 #[cfg_attr(target_arch = "wasm32", derive(Tsify))]
+#[cfg_attr(target_arch = "wasm32", tsify(from_wasm_abi))]
 pub struct GetDatabaseVersionInput {
     /// The datasource parameter.
     pub datasource: DatasourceParam,
@@ -511,6 +550,7 @@ pub struct GetDatabaseVersionInput {
 /// Output for the getDatabaseVersion method.
 #[derive(Debug, Serialize, Deserialize)]
 #[cfg_attr(target_arch = "wasm32", derive(Tsify))]
+#[cfg_attr(target_arch = "wasm32", tsify(from_wasm_abi, into_wasm_abi))]
 pub struct GetDatabaseVersionOutput {
     /// The database version.
     pub version: String,
@@ -528,8 +568,9 @@ pub struct GetDatabaseVersionOutput {
 ///
 /// **Note**: the engine currently assumes the main database schema is up-to-date
 /// with the migration history.
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Deserialize)]
 #[cfg_attr(target_arch = "wasm32", derive(Tsify))]
+#[cfg_attr(target_arch = "wasm32", tsify(from_wasm_abi))]
 #[serde(rename_all = "camelCase")]
 pub struct EvaluateDataLossInput {
     /// The list of migrations, already loaded from disk.
@@ -539,8 +580,9 @@ pub struct EvaluateDataLossInput {
 }
 
 /// The output of the `evaluateDataLoss` command.
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize)]
 #[cfg_attr(target_arch = "wasm32", derive(Tsify))]
+#[cfg_attr(target_arch = "wasm32", tsify(into_wasm_abi))]
 #[serde(rename_all = "camelCase")]
 pub struct EvaluateDataLossOutput {
     /// The number migration steps that would be generated. If this is empty, we
@@ -559,6 +601,7 @@ pub struct EvaluateDataLossOutput {
 /// A data loss warning or an unexecutable migration error, associated with the step that triggered it.
 #[derive(Debug, Serialize, Deserialize)]
 #[cfg_attr(target_arch = "wasm32", derive(Tsify))]
+#[cfg_attr(target_arch = "wasm32", tsify(from_wasm_abi, into_wasm_abi))]
 #[serde(rename_all = "camelCase")]
 pub struct MigrationFeedback {
     /// The human-readable message.
@@ -570,16 +613,18 @@ pub struct MigrationFeedback {
 // Ensure Connection Validity
 
 /// Make sure the schema engine can connect to the database from the Prisma schema.
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Deserialize)]
 #[cfg_attr(target_arch = "wasm32", derive(Tsify))]
+#[cfg_attr(target_arch = "wasm32", tsify(from_wasm_abi))]
 pub struct EnsureConnectionValidityParams {
     /// The datasource parameter.
     pub datasource: DatasourceParam,
 }
 
 /// Result type for the ensureConnectionValidity method.
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize)]
 #[cfg_attr(target_arch = "wasm32", derive(Tsify))]
+#[cfg_attr(target_arch = "wasm32", tsify(into_wasm_abi))]
 pub struct EnsureConnectionValidityResult {}
 
 // Mark Migration Applied
@@ -593,8 +638,9 @@ pub struct EnsureConnectionValidityResult {}
 /// - The migration is not in the table. We will create a new entry in the migrations table. The
 ///   `started_at` and `finished_at` will be the same.
 /// - If it is already applied, we return a user-facing error.
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Deserialize)]
 #[cfg_attr(target_arch = "wasm32", derive(Tsify))]
+#[cfg_attr(target_arch = "wasm32", tsify(from_wasm_abi))]
 #[serde(rename_all = "camelCase")]
 pub struct MarkMigrationAppliedInput {
     /// The name of the migration to mark applied.
@@ -605,16 +651,18 @@ pub struct MarkMigrationAppliedInput {
 }
 
 /// The output of the `markMigrationApplied` command.
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize)]
 #[cfg_attr(target_arch = "wasm32", derive(Tsify))]
+#[cfg_attr(target_arch = "wasm32", tsify(into_wasm_abi))]
 pub struct MarkMigrationAppliedOutput {}
 
 // Mark Migration Rolled Back
 
 /// Mark an existing failed migration as rolled back in the migrations table. It
 /// will still be there, but ignored for all purposes except as audit trail.
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Deserialize)]
 #[cfg_attr(target_arch = "wasm32", derive(Tsify))]
+#[cfg_attr(target_arch = "wasm32", tsify(from_wasm_abi))]
 #[serde(rename_all = "camelCase")]
 pub struct MarkMigrationRolledBackInput {
     /// The name of the migration to mark rolled back.
@@ -622,27 +670,31 @@ pub struct MarkMigrationRolledBackInput {
 }
 
 /// The output of the `markMigrationRolledBack` command.
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize)]
 #[cfg_attr(target_arch = "wasm32", derive(Tsify))]
+#[cfg_attr(target_arch = "wasm32", tsify(into_wasm_abi))]
 pub struct MarkMigrationRolledBackOutput {}
 
 // Reset
 
 /// The input to the `reset` command.
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Deserialize)]
 #[cfg_attr(target_arch = "wasm32", derive(Tsify))]
+#[cfg_attr(target_arch = "wasm32", tsify(from_wasm_abi))]
 pub struct ResetInput {}
 
 /// The output of the `reset` command.
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize)]
 #[cfg_attr(target_arch = "wasm32", derive(Tsify))]
+#[cfg_attr(target_arch = "wasm32", tsify(into_wasm_abi))]
 pub struct ResetOutput {}
 
 // Schema Push
 
 /// Request params for the `schemaPush` method.
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Deserialize)]
 #[cfg_attr(target_arch = "wasm32", derive(Tsify))]
+#[cfg_attr(target_arch = "wasm32", tsify(from_wasm_abi))]
 pub struct SchemaPushInput {
     /// Push the schema ignoring destructive change warnings.
     pub force: bool,
@@ -652,8 +704,9 @@ pub struct SchemaPushInput {
 }
 
 /// Response result for the `schemaPush` method.
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize)]
 #[cfg_attr(target_arch = "wasm32", derive(Tsify))]
+#[cfg_attr(target_arch = "wasm32", tsify(into_wasm_abi))]
 #[serde(rename_all = "camelCase")]
 pub struct SchemaPushOutput {
     /// How many migration steps were executed.

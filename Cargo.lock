@@ -4752,6 +4752,7 @@ dependencies = [
  "tracing",
  "tracing-error",
  "user-facing-errors",
+ "wasm-bindgen",
 ]
 
 [[package]]
@@ -4821,6 +4822,7 @@ dependencies = [
  "serde",
  "sql-schema-connector",
  "tracing",
+ "tracing-futures",
  "tsify-next",
  "wasm-bindgen",
  "wasm-bindgen-futures",
