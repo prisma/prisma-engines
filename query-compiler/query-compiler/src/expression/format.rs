@@ -254,11 +254,13 @@ where
             .append(self.expression(records).parens())
     }
 
-    fn transaction(&'a self, body: &'a Expression) -> DocBuilder<'a, PrettyPrinter<'a, D>, ColorSpec> {
-        self.text("transaction")
-            .annotate(color_kw())
+    fn transaction(&'a self, expr: &'a Expression) -> DocBuilder<'a, PrettyPrinter<'a, D>, ColorSpec> {
+        self.keyword("transaction")
+            .append(self.line())
             .append(self.softline())
-            .append(self.expression(body).indent(1).braces())
+            .append(self.softline())
+            .append(self.softline())
+            .append(self.expression(expr).align())
     }
 }
 

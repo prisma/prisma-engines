@@ -5,43 +5,38 @@ expression: pretty
 input_file: query-compiler/query-compiler/tests/data/create-m2m.json
 snapshot_kind: text
 ---
-transaction { let 0 = unique (query «INSERT INTO "public"."User" ("email")
-                                     VALUES ($1) RETURNING "public"."User"."id"»
-                              params [const(String("user.1737556027349@prisma.io"))])
-              in let 0$id = mapField id (get 0)
-                 in let 1 = unique (query «INSERT INTO "public"."Post"
-                                           ("title","userId") VALUES ($1,$2)
-                                           RETURNING "public"."Post"."id"»
-                                    params [const(String("How to make an omelette")),
-                                            var(0$id as Int)])
-                    in let 2 = unique (query «INSERT INTO "public"."Category"
-                                              ("name") VALUES ($1) RETURNING
-                                              "public"."Category"."id"»
-                                       params [const(String("cooking"))])
-                       in let 1$id = mapField id (get 1);
-                              2$id = mapField id (get 2)
-                          in execute «INSERT INTO "public"."_CategoryToPost"
-                                      ("B","A") VALUES ($1,$2) ON CONFLICT DO
-                                      NOTHING»
-                             params [var(1$id as Int), var(2$id as Int)];
-                 let 4 = let 0$id = mapField id (get 0)
-                     in let @parent = unique (query «SELECT
-                                                     "public"."User"."id",
-                                                     "public"."User"."email"
-                                                     FROM "public"."User" WHERE
-                                                     "public"."User"."id" = $1
-                                                     LIMIT $2 OFFSET $3»
-                                              params [var(0$id as Int),
-                                                      const(BigInt(1)),
-                                                      const(BigInt(0))])
-                        in let @parent$id = mapField id (get @parent)
-                           in join (get @parent)
-                              with (query «SELECT "public"."Post"."id",
-                                           "public"."Post"."title",
-                                           "public"."Post"."userId" FROM
-                                           "public"."Post" WHERE
-                                           "public"."Post"."userId" = $1 OFFSET
-                                           $2»
-                                    params [var(@parent$id as Int),
-                                            const(BigInt(0))]) on left.(id) = right.(userId) as posts
-                 in get 4}
+transaction
+   let 0 = unique (query «INSERT INTO "public"."User" ("email") VALUES ($1)
+                          RETURNING "public"."User"."id"»
+                   params [const(String("user.1737556027349@prisma.io"))])
+   in let 0$id = mapField id (get 0)
+      in let 1 = unique (query «INSERT INTO "public"."Post" ("title","userId")
+                                VALUES ($1,$2) RETURNING "public"."Post"."id"»
+                         params [const(String("How to make an omelette")),
+                                 var(0$id as Int)])
+         in let 2 = unique (query «INSERT INTO "public"."Category" ("name")
+                                   VALUES ($1) RETURNING
+                                   "public"."Category"."id"»
+                            params [const(String("cooking"))])
+            in let 1$id = mapField id (get 1);
+                   2$id = mapField id (get 2)
+               in execute «INSERT INTO "public"."_CategoryToPost" ("B","A")
+                           VALUES ($1,$2) ON CONFLICT DO NOTHING»
+                  params [var(1$id as Int), var(2$id as Int)];
+      let 4 = let 0$id = mapField id (get 0)
+          in let @parent = unique (query «SELECT "public"."User"."id",
+                                          "public"."User"."email" FROM
+                                          "public"."User" WHERE
+                                          "public"."User"."id" = $1 LIMIT $2
+                                          OFFSET $3»
+                                   params [var(0$id as Int), const(BigInt(1)),
+                                           const(BigInt(0))])
+             in let @parent$id = mapField id (get @parent)
+                in join (get @parent)
+                   with (query «SELECT "public"."Post"."id",
+                                "public"."Post"."title",
+                                "public"."Post"."userId" FROM "public"."Post"
+                                WHERE "public"."Post"."userId" = $1 OFFSET $2»
+                         params [var(@parent$id as Int),
+                                 const(BigInt(0))]) on left.(id) = right.(userId) as posts
+      in get 4

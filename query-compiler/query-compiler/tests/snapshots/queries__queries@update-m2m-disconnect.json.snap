@@ -5,25 +5,30 @@ expression: pretty
 input_file: query-compiler/query-compiler/tests/data/update-m2m-disconnect.json
 snapshot_kind: text
 ---
-let 0 = unique (query «SELECT "public"."Post"."id", "public"."Post"."title",
-                       "public"."Post"."userId" FROM "public"."Post" WHERE
-                       ("public"."Post"."id" = $1 AND 1=1) LIMIT $2 OFFSET $3»
-                params [const(BigInt(1)), const(BigInt(1)), const(BigInt(0))])
-in let 0$id = mapField id (get 0)
-   in let 1 = query «SELECT "t1"."id", "t0"."B" AS "CategoryToPost@Post" FROM
-                     "public"."_CategoryToPost" AS "t0" INNER JOIN
-                     "public"."Category" AS "t1" ON "t0"."A" = "t1"."id" WHERE
-                     ("t1"."id" = $1 AND 1=1)»
-              params [const(BigInt(1))]
-      in let 0$id = mapField id (get 0);
-             1$id = mapField id (get 1)
-         in execute «DELETE FROM "public"."_CategoryToPost" WHERE
-                     ("public"."_CategoryToPost"."B" = ($1) AND
-                     "public"."_CategoryToPost"."A" IN [$2])»
-            params [var(0$id as Int), var(1$id as Int)];
-   let 3 = let 0$id = mapField id (get 0)
-       in unique (query «SELECT "public"."Post"."id", "public"."Post"."title",
-                         "public"."Post"."userId" FROM "public"."Post" WHERE
-                         "public"."Post"."id" = $1 LIMIT $2 OFFSET $3»
-                  params [var(0$id as Int), const(BigInt(1)), const(BigInt(0))])
-   in get 3
+transaction
+   let 0 = unique (query «SELECT "public"."Post"."id", "public"."Post"."title",
+                          "public"."Post"."userId" FROM "public"."Post" WHERE
+                          ("public"."Post"."id" = $1 AND 1=1) LIMIT $2 OFFSET
+                          $3»
+                   params [const(BigInt(1)), const(BigInt(1)),
+                           const(BigInt(0))])
+   in let 0$id = mapField id (get 0)
+      in let 1 = query «SELECT "t1"."id", "t0"."B" AS "CategoryToPost@Post" FROM
+                        "public"."_CategoryToPost" AS "t0" INNER JOIN
+                        "public"."Category" AS "t1" ON "t0"."A" = "t1"."id"
+                        WHERE ("t1"."id" = $1 AND 1=1)»
+                 params [const(BigInt(1))]
+         in let 0$id = mapField id (get 0);
+                1$id = mapField id (get 1)
+            in execute «DELETE FROM "public"."_CategoryToPost" WHERE
+                        ("public"."_CategoryToPost"."B" = ($1) AND
+                        "public"."_CategoryToPost"."A" IN [$2])»
+               params [var(0$id as Int), var(1$id as Int)];
+      let 3 = let 0$id = mapField id (get 0)
+          in unique (query «SELECT "public"."Post"."id",
+                            "public"."Post"."title", "public"."Post"."userId"
+                            FROM "public"."Post" WHERE "public"."Post"."id" = $1
+                            LIMIT $2 OFFSET $3»
+                     params [var(0$id as Int), const(BigInt(1)),
+                             const(BigInt(0))])
+      in get 3
