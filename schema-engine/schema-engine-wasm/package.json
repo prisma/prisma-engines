@@ -1,5 +1,13 @@
 {
   "name": "@prisma/schema-engine-wasm",
   "version": "0.0.0",
-  "type": "module"
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": "./schema_engine.js",
+      "require": "./schema_engine.js",
+      "types": "./schema_engine.d.ts"
+    }
+  },
+  "types": "./schema_engine.d.ts"
 }
