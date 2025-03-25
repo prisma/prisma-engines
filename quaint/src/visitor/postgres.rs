@@ -71,7 +71,7 @@ impl<'a> Visitor<'a> for Postgres<'a> {
     }
 
     fn write(&mut self, value: impl fmt::Display) -> visitor::Result {
-        self.query_template.write_string_chunk(value);
+        self.query_template.write_string_chunk(value.to_string());
         Ok(())
     }
 
