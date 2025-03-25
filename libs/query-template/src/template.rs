@@ -1,11 +1,9 @@
 use crate::fragment::Fragment;
 use crate::placeholder::PlaceholderFormat;
-use serde::Serialize;
 use std::fmt;
 use std::fmt::Debug;
 
-#[derive(Debug, Serialize)]
-#[serde(rename_all = "camelCase")]
+#[derive(Debug)]
 pub struct QueryTemplate<P> {
     pub fragments: Vec<Fragment>,
     pub parameters: Vec<P>,
@@ -13,11 +11,11 @@ pub struct QueryTemplate<P> {
 }
 
 impl<P> QueryTemplate<P> {
-    pub fn new(placeholder: PlaceholderFormat) -> Self {
+    pub fn new(placeholder_format: PlaceholderFormat) -> Self {
         QueryTemplate {
             fragments: Vec::new(),
             parameters: Vec::new(),
-            placeholder_format: placeholder,
+            placeholder_format,
         }
     }
 

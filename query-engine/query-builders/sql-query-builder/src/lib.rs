@@ -63,7 +63,7 @@ impl<'a, V> SqlQueryBuilder<'a, V> {
 
         Ok(DbQuery::TemplateSql {
             fragments: template.fragments,
-            placeholder: template.placeholder_format,
+            placeholder_format: template.placeholder_format,
             params,
         })
     }

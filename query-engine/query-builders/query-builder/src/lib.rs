@@ -150,8 +150,8 @@ pub enum DbQuery {
     },
     TemplateSql {
         fragments: Vec<Fragment>,
-        placeholder: PlaceholderFormat,
         params: Vec<PrismaValue>,
+        placeholder_format: PlaceholderFormat,
     },
 }
 
