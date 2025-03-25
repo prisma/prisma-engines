@@ -42,6 +42,7 @@ pub struct MigrationList {
 }
 
 /// An object with a `url` field.
+/// @deprecated
 #[derive(Debug, Serialize, Deserialize)]
 #[cfg_attr(target_arch = "wasm32", derive(Tsify))]
 #[cfg_attr(target_arch = "wasm32", tsify(from_wasm_abi, into_wasm_abi))]
@@ -409,6 +410,12 @@ pub struct DiffParams {
 pub struct DiffResult {
     /// The exit code that the CLI should return.
     pub exit_code: u32,
+
+    /// The diff script, if `script` was set to true in [`DiffParams`](DiffParams),
+    /// or a human-readable migration summary otherwise.
+    /// This is meant to be printed to the stdout by the caller.
+    /// Note: in `schema-engine-cli`, this is None.
+    pub stdout: Option<String>,
 }
 
 // Introspect SQL
@@ -539,6 +546,7 @@ pub struct IntrospectionView {
 // Get Database Version
 
 /// Get the database version for error reporting.
+/// @deprecated
 #[derive(Debug, Deserialize)]
 #[cfg_attr(target_arch = "wasm32", derive(Tsify))]
 #[cfg_attr(target_arch = "wasm32", tsify(from_wasm_abi))]

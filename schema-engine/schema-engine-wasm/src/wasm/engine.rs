@@ -3,7 +3,7 @@
 
 use commands::{
     schema_connector::{self, ConnectorError, IntrospectionResult, Namespaces, SchemaConnector},
-    CoreError,
+    CoreError, SchemaContainerExt,
 };
 use driver_adapters::{adapter_factory_from_js, JsObject};
 use json_rpc::types::*;
@@ -56,7 +56,7 @@ pub struct SchemaEngine {
     adapter_factory: Arc<dyn ExternalConnectorFactory>,
 
     /// The SQL schema connector induced by the adapter.
-    sql_schema_connector: SqlSchemaConnector,
+    connector: SqlSchemaConnector,
 
     /// The inferred database namespaces (used for the `multiSchema` preview feature).
     namespaces: Option<Namespaces>,
@@ -70,19 +70,20 @@ pub struct SchemaEngine {
 impl SchemaEngine {
     #[wasm_bindgen(constructor)]
     pub async fn new(adapter: JsObject) -> Result<SchemaEngine, wasm_bindgen::JsError> {
+        register_panic_hook();
+
         let adapter_factory = Arc::new(adapter_factory_from_js(adapter));
         let adapter = Arc::new(adapter_factory.connect().await?);
-        let sql_schema_connector = SqlSchemaConnector::new_from_external(adapter).await?;
+        let connector = SqlSchemaConnector::new_from_external(adapter).await?;
 
         // TODO: retrieve the namespaces from JS, and forward them here.
         let namespaces: Option<Namespaces> = None;
 
         tracing::info!(git_hash = env!("GIT_HASH"), "Starting schema-engine-wasm");
-        register_panic_hook();
 
         Ok(Self {
             adapter_factory,
-            sql_schema_connector,
+            connector,
             namespaces,
         })
     }
@@ -106,7 +107,7 @@ impl SchemaEngine {
         // This is incompatible with Driver Adapters.
         _params: Option<GetDatabaseVersionInput>,
     ) -> Result<Option<String>, wasm_bindgen::JsError> {
-        let version = self.sql_schema_connector.version().await?;
+        let version = self.connector.version().await?;
         Ok(Some(version))
     }
 
@@ -117,20 +118,10 @@ impl SchemaEngine {
         input: ApplyMigrationsInput,
     ) -> Result<ApplyMigrationsOutput, wasm_bindgen::JsError> {
         let namespaces = self.namespaces();
-        let result = commands::apply_migrations(input, &mut self.sql_schema_connector, namespaces)
+        let result = commands::apply_migrations(input, &mut self.connector, namespaces)
             .instrument(tracing::info_span!("ApplyMigrations"))
             .await?;
         Ok(result)
-    }
-
-    /// Create the database referenced by Prisma schema that was used to initialize the connector.
-    #[wasm_bindgen(js_name = "createDatabase")]
-    pub async fn create_database(
-        &mut self,
-        params: CreateDatabaseParams,
-    ) -> Result<CreateDatabaseResult, wasm_bindgen::JsError> {
-        let database_name = SchemaConnector::create_database(&mut self.sql_schema_connector).await?;
-        Ok(CreateDatabaseResult { database_name })
     }
 
     /// Generate a new migration, based on the provided schema and existing migrations history.
@@ -144,7 +135,7 @@ impl SchemaEngine {
             migration_name = input.migration_name.as_str(),
             draft = input.draft,
         );
-        let result = commands::create_migration(input, &mut self.sql_schema_connector)
+        let result = commands::create_migration(input, &mut self.connector)
             .instrument(span)
             .await?;
         Ok(result)
@@ -153,7 +144,7 @@ impl SchemaEngine {
     /// Send a raw command to the database.
     #[wasm_bindgen(js_name = "dbExecute")]
     pub async fn db_execute(&mut self, params: DbExecuteParams) -> Result<(), wasm_bindgen::JsError> {
-        let result = self.sql_schema_connector.db_execute(params.script).await?;
+        let result = self.connector.db_execute(params.script).await?;
         Ok(result)
     }
 
@@ -164,7 +155,7 @@ impl SchemaEngine {
         input: DevDiagnosticInput,
     ) -> Result<DevDiagnosticOutput, wasm_bindgen::JsError> {
         let namespaces = self.namespaces();
-        let result = commands::dev_diagnostic(input, namespaces, &mut self.sql_schema_connector)
+        let result = commands::dev_diagnostic(input, namespaces, &mut self.connector)
             .instrument(tracing::info_span!("DevDiagnostic"))
             .await?;
         Ok(result)
@@ -172,8 +163,11 @@ impl SchemaEngine {
 
     /// Create a migration between any two sources of database schemas.
     #[wasm_bindgen]
-    pub async fn diff(&self, params: DiffParams) -> Result<DiffResult, wasm_bindgen::JsError> {
-        Err(wasm_bindgen::JsError::new("Not yet available."))
+    pub async fn diff(&mut self, params: DiffParams) -> Result<DiffResult, wasm_bindgen::JsError> {
+        let result = commands::diff(params, &mut self.connector)
+            .instrument(tracing::info_span!("Diff"))
+            .await?;
+        Ok(result)
     }
 
     /// Looks at the migrations folder and the database, and returns a bunch of useful information.
@@ -182,9 +176,9 @@ impl SchemaEngine {
         &self,
         input: DiagnoseMigrationHistoryInput,
     ) -> Result<DiagnoseMigrationHistoryOutput, wasm_bindgen::JsError> {
-        /// TODO: restore once type inconsistencies are resolved.
-        /// The types should be `commands::DiagnoseMigrationHistory*` instead of
-        /// those coming from `json_rpc::types`.
+        // TODO: restore once type inconsistencies are resolved.
+        // The types should be `commands::DiagnoseMigrationHistory*` instead of
+        // those coming from `json_rpc::types`.
         Err(wasm_bindgen::JsError::new("Not yet available."))
     }
 
@@ -196,7 +190,7 @@ impl SchemaEngine {
         &mut self,
         params: EnsureConnectionValidityParams,
     ) -> Result<EnsureConnectionValidityResult, wasm_bindgen::JsError> {
-        SchemaConnector::ensure_connection_validity(&mut self.sql_schema_connector).await?;
+        SchemaConnector::ensure_connection_validity(&mut self.connector).await?;
         Ok(EnsureConnectionValidityResult {})
     }
 
@@ -206,7 +200,7 @@ impl SchemaEngine {
         &mut self,
         input: EvaluateDataLossInput,
     ) -> Result<EvaluateDataLossOutput, wasm_bindgen::JsError> {
-        let result = commands::evaluate_data_loss(input, &mut self.sql_schema_connector)
+        let result = commands::evaluate_data_loss(input, &mut self.connector)
             .instrument(tracing::info_span!("EvaluateDataLoss"))
             .await?;
         Ok(result)
@@ -259,7 +253,7 @@ impl SchemaEngine {
             views,
             warnings,
             is_empty,
-        } = self.sql_schema_connector.introspect(&ctx).await?;
+        } = self.connector.introspect(&ctx).await?;
 
         if is_empty {
             Err(ConnectorError::into_introspection_result_empty_error().into_js_error())
@@ -287,14 +281,45 @@ impl SchemaEngine {
         }
     }
 
-    /// Introspects a SQL query and returns types information
+    /// Introspects a SQL query and returns types information.
+    /// Note: this will fail on SQLite, as it requires Wasm-compatible sqlx implementation.
     #[wasm_bindgen(js_name = "introspectSql")]
     pub async fn introspect_sql(
-        &self,
-        input: IntrospectSqlParams,
+        &mut self,
+        params: IntrospectSqlParams,
     ) -> Result<IntrospectSqlResult, wasm_bindgen::JsError> {
-        // `typedSql` requires custom sqlx implementations for `sqlite`.
-        Err(wasm_bindgen::JsError::new("Not yet available."))
+        let res = commands::introspect_sql(params, &mut self.connector).await?;
+
+        Ok(IntrospectSqlResult {
+            queries: res
+                .queries
+                .into_iter()
+                .map(|q| SqlQueryOutput {
+                    name: q.name,
+                    source: q.source,
+                    documentation: q.documentation,
+                    parameters: q
+                        .parameters
+                        .into_iter()
+                        .map(|p| SqlQueryParameterOutput {
+                            name: p.name,
+                            typ: p.typ,
+                            documentation: p.documentation,
+                            nullable: p.nullable,
+                        })
+                        .collect(),
+                    result_columns: q
+                        .result_columns
+                        .into_iter()
+                        .map(|c| SqlQueryColumnOutput {
+                            name: c.name,
+                            typ: c.typ,
+                            nullable: c.nullable,
+                        })
+                        .collect(),
+                })
+                .collect(),
+        })
     }
 
     /// Mark a migration from the migrations folder as applied, without actually applying it.
@@ -304,7 +329,7 @@ impl SchemaEngine {
         input: MarkMigrationAppliedInput,
     ) -> Result<MarkMigrationAppliedOutput, wasm_bindgen::JsError> {
         let span = tracing::info_span!("MarkMigrationApplied", migration_name = input.migration_name.as_str());
-        let result = commands::mark_migration_applied(input, &mut self.sql_schema_connector)
+        let result = commands::mark_migration_applied(input, &mut self.connector)
             .instrument(span)
             .await?;
         Ok(result)
@@ -320,7 +345,7 @@ impl SchemaEngine {
             "MarkMigrationRolledBack",
             migration_name = input.migration_name.as_str()
         );
-        let result = commands::mark_migration_rolled_back(input, &mut self.sql_schema_connector)
+        let result = commands::mark_migration_rolled_back(input, &mut self.connector)
             .instrument(span)
             .await?;
         Ok(result)
@@ -332,7 +357,7 @@ impl SchemaEngine {
         tracing::debug!("Resetting the database.");
         let namespaces = self.namespaces();
 
-        let result = SchemaConnector::reset(&mut self.sql_schema_connector, false, namespaces)
+        let result = SchemaConnector::reset(&mut self.connector, false, namespaces)
             .instrument(tracing::info_span!("Reset"))
             .await?;
         Ok(result)
@@ -341,27 +366,9 @@ impl SchemaEngine {
     /// The command behind `prisma db push`.
     #[wasm_bindgen(js_name = "schemaPush")]
     pub async fn schema_push(&mut self, input: SchemaPushInput) -> Result<SchemaPushOutput, wasm_bindgen::JsError> {
-        let result = commands::schema_push(input, &mut self.sql_schema_connector)
+        let result = commands::schema_push(input, &mut self.connector)
             .instrument(tracing::info_span!("SchemaPush"))
             .await?;
         Ok(result)
-    }
-}
-
-trait SchemaContainerExt {
-    fn to_psl_input(self) -> Vec<(String, SourceFile)>;
-}
-
-impl SchemaContainerExt for SchemasContainer {
-    fn to_psl_input(self) -> Vec<(String, SourceFile)> {
-        self.files.to_psl_input()
-    }
-}
-
-impl SchemaContainerExt for Vec<SchemaContainer> {
-    fn to_psl_input(self) -> Vec<(String, SourceFile)> {
-        self.into_iter()
-            .map(|container| (container.path, SourceFile::from(container.content)))
-            .collect()
     }
 }

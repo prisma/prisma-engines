@@ -12,7 +12,7 @@ use schema_connector::{
 };
 use sql_schema_connector::SqlSchemaConnector;
 
-pub async fn diff(params: DiffParams, host: Arc<dyn ConnectorHost>) -> CoreResult<DiffResult> {
+pub async fn diff_cli(params: DiffParams, host: Arc<dyn ConnectorHost>) -> CoreResult<DiffResult> {
     // In order to properly handle MultiSchema, we need to make sure the preview feature is
     // correctly set, and we need to grab the namespaces from the Schema, if any.
     // Note that currently, we union all namespaces and preview features. This may not be correct.
@@ -60,19 +60,19 @@ pub async fn diff(params: DiffParams, host: Arc<dyn ConnectorHost>) -> CoreResul
 
     let migration = dialect.diff(from, to);
 
-    if params.script {
-        let mut script_string = dialect.render_script(&migration, &Default::default())?;
-        if !script_string.ends_with('\n') {
-            script_string.push('\n');
-        }
-        host.print(&script_string).await?;
+    let mut stdout = if params.script {
+        let script_string = dialect.render_script(&migration, &Default::default())?;
+        script_string
     } else {
-        let mut summary = dialect.migration_summary(&migration);
-        if !summary.ends_with('\n') {
-            summary.push('\n');
-        }
-        host.print(&summary).await?;
+        let summary = dialect.migration_summary(&migration);
+        summary
+    };
+
+    if !stdout.ends_with('\n') {
+        stdout.push('\n');
     }
+
+    host.print(&stdout).await?;
 
     let exit_code = if params.exit_code == Some(true) && !dialect.migration_is_empty(&migration) {
         2
@@ -80,7 +80,10 @@ pub async fn diff(params: DiffParams, host: Arc<dyn ConnectorHost>) -> CoreResul
         0
     };
 
-    Ok(DiffResult { exit_code })
+    Ok(DiffResult {
+        exit_code,
+        stdout: None,
+    })
 }
 
 // Grab the preview features and namespaces. Normally, we can only grab these from Schema files,
@@ -98,12 +101,12 @@ fn namespaces_and_preview_features_from_diff_targets(
             DiffTarget::SchemaDatasource(schemas) => {
                 let sources = (&schemas.files).to_psl_input();
 
-                extract_namespaces(&sources, &mut namespaces, &mut preview_features);
+                ::commands::extract_namespaces(&sources, &mut namespaces, &mut preview_features);
             }
             DiffTarget::SchemaDatamodel(schemas) => {
                 let sources = (&schemas.files).to_psl_input();
 
-                extract_namespaces(&sources, &mut namespaces, &mut preview_features);
+                ::commands::extract_namespaces(&sources, &mut namespaces, &mut preview_features);
             }
         }
     }
@@ -111,31 +114,10 @@ fn namespaces_and_preview_features_from_diff_targets(
     Ok((Namespaces::from_vec(&mut namespaces), preview_features))
 }
 
-fn extract_namespaces(
-    files: &[(String, psl::SourceFile)],
-    namespaces: &mut Vec<String>,
-    preview_features: &mut BitFlags<psl::PreviewFeature>,
-) {
-    let validated_schema = psl::validate_multi_file(files);
-
-    for (namespace, _span) in validated_schema
-        .configuration
-        .datasources
-        .iter()
-        .flat_map(|ds| ds.namespaces.iter())
-    {
-        namespaces.push(namespace.clone());
-    }
-
-    for generator in &validated_schema.configuration.generators {
-        *preview_features |= generator.preview_features.unwrap_or_default();
-    }
-}
-
 // `None` in case the target is empty
 async fn json_rpc_diff_target_to_dialect(
     target: &DiffTarget,
-    shadow_database_url: Option<&str>,
+    shadow_database_url: Option<&str>, // TODO: delete the parameter
     namespaces: Option<Namespaces>,
     preview_features: BitFlags<psl::PreviewFeature>,
 ) -> CoreResult<Option<(Box<dyn SchemaDialect>, DatabaseSchema)>> {
@@ -144,6 +126,10 @@ async fn json_rpc_diff_target_to_dialect(
         DiffTarget::SchemaDatasource(schemas) => {
             let config_dir = std::path::Path::new(&schemas.config_dir);
             let sources: Vec<_> = schemas.to_psl_input();
+
+            // actually, just use the given `connector`. Verify that the provider is the same
+            // as the one assumed by the connector.
+
             let mut connector = crate::schema_to_connector(&sources, Some(config_dir))?;
             connector.ensure_connection_validity().await?;
             connector.set_preview_features(preview_features);
@@ -157,6 +143,8 @@ async fn json_rpc_diff_target_to_dialect(
             Ok(Some((dialect, schema)))
         }
         DiffTarget::Url(UrlContainer { url }) => {
+            // this will not be supported
+
             let mut connector = crate::connector_for_connection_string(url.clone(), None, BitFlags::empty())?;
             connector.ensure_connection_validity().await?;
             connector.set_preview_features(preview_features);
@@ -171,7 +159,7 @@ async fn json_rpc_diff_target_to_dialect(
             let provider = schema_connector::migrations_directory::read_provider_from_lock_file(lockfile);
             match (provider.as_deref(), shadow_database_url) {
                 (Some(provider), Some(shadow_database_url)) => {
-                    let dialect = crate::dialect_for_provider(provider)?;
+                    let dialect = ::commands::dialect_for_provider(provider)?;
                     let directories =
                         schema_connector::migrations_directory::list_migrations(migration_directories.clone());
 
@@ -188,6 +176,7 @@ async fn json_rpc_diff_target_to_dialect(
                     Ok(Some((dialect, schema)))
                 }
                 (Some("sqlite"), None) => {
+                    // TODO: we don't need this branch
                     let mut connector = SqlSchemaConnector::new_sqlite_inmem(preview_features)?;
                     let directories =
                         schema_connector::migrations_directory::list_migrations(migration_directories.clone());

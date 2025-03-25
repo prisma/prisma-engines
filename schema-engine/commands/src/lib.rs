@@ -4,7 +4,9 @@
 
 //! The top-level library crate for the schema engine.
 
+use enumflags2::BitFlags;
 pub use json_rpc;
+use sql_schema_connector::SqlSchemaDialect;
 
 // exposed for tests
 #[doc(hidden)]
@@ -20,13 +22,61 @@ pub use commands::*;
 use json_rpc::types::{SchemaContainer, SchemasContainer, SchemasWithConfigDir};
 pub use schema_connector;
 
-use psl::{ValidatedSchema, parser_database::SourceFile};
+use psl::{
+    ValidatedSchema, builtin_connectors::BUILTIN_CONNECTORS, datamodel_connector::Flavour, parser_database::SourceFile,
+};
+
+/// Creates the [`SqlSchemaDialect`](SqlSchemaDialect) matching the given provider.
+pub fn dialect_for_provider(provider: &str) -> CoreResult<Box<dyn schema_connector::SchemaDialect>> {
+    let error = Err(CoreError::from_msg(format!(
+        "`{provider}` is not a supported connector."
+    )));
+
+    if let Some(connector) = BUILTIN_CONNECTORS.iter().find(|c| c.is_provider(provider)) {
+        match connector.flavour() {
+            Flavour::Cockroach => Ok(Box::new(SqlSchemaDialect::cockroach())),
+            Flavour::Postgres => Ok(Box::new(SqlSchemaDialect::postgres())),
+            Flavour::Sqlite => Ok(Box::new(SqlSchemaDialect::sqlite())),
+
+            // TODO: enable these in Prisma 6.7.0
+            Flavour::Mongo => error,
+            Flavour::Sqlserver => error,
+            Flavour::Mysql => error,
+        }
+    } else {
+        error
+    }
+}
+
+/// Extracts the database namespaces from the given schema files.
+pub fn extract_namespaces(
+    files: &[(String, psl::SourceFile)],
+    namespaces: &mut Vec<String>,
+    preview_features: &mut BitFlags<psl::PreviewFeature>,
+) {
+    let validated_schema = psl::validate_multi_file(files);
+
+    for (namespace, _span) in validated_schema
+        .configuration
+        .datasources
+        .iter()
+        .flat_map(|ds| ds.namespaces.iter())
+    {
+        namespaces.push(namespace.clone());
+    }
+
+    for generator in &validated_schema.configuration.generators {
+        *preview_features |= generator.preview_features.unwrap_or_default();
+    }
+}
 
 fn parse_schema_multi(files: &[(String, SourceFile)]) -> CoreResult<ValidatedSchema> {
     psl::parse_schema_multi(files).map_err(CoreError::new_schema_parser_error)
 }
 
-trait SchemaContainerExt {
+/// Wrapper trait for `SchemaContainer` and related types.
+pub trait SchemaContainerExt {
+    /// Converts self into a suitable input for the PSL parser.
     fn to_psl_input(self) -> Vec<(String, SourceFile)>;
 }
 

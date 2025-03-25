@@ -4,11 +4,12 @@
 
 //! The top-level library crate for the schema engine.
 
-pub use json_rpc;
-
 // exposed for tests
 #[doc(hidden)]
-pub use ::commands;
+pub mod commands;
+
+pub use ::commands::{CoreError, CoreResult, GenericApi};
+pub use json_rpc;
 
 mod core_error;
 mod rpc;
@@ -16,17 +17,16 @@ mod state;
 mod timings;
 
 pub use self::{rpc::rpc_api, timings::TimingsLayer};
-use ::commands::{core_error::*, GenericApi};
 use json_rpc::types::{SchemaContainer, SchemasContainer, SchemasWithConfigDir};
 pub use schema_connector;
 
 use enumflags2::BitFlags;
-use mongodb_schema_connector::{MongoDbSchemaConnector, MongoDbSchemaDialect};
+use mongodb_schema_connector::MongoDbSchemaConnector;
 use psl::{
     builtin_connectors::*, datamodel_connector::Flavour, parser_database::SourceFile, Datasource, PreviewFeature,
 };
 use schema_connector::ConnectorParams;
-use sql_schema_connector::{SqlSchemaConnector, SqlSchemaDialect};
+use sql_schema_connector::SqlSchemaConnector;
 use std::{env, path::Path};
 use user_facing_errors::common::InvalidConnectionString;
 
@@ -97,6 +97,7 @@ fn schema_to_dialect(files: &[(String, SourceFile)]) -> CoreResult<Box<dyn schem
         .ok_or_else(|| CoreError::from_msg("There is no datasource in the schema.".into()))?;
 
     if let Ok(connection_string) = source.load_direct_url(|key| env::var(key).ok()) {
+        // TODO: remove conditional branch in Prisma 7.
         let connector_params = ConnectorParams {
             connection_string,
             preview_features,
@@ -105,7 +106,7 @@ fn schema_to_dialect(files: &[(String, SourceFile)]) -> CoreResult<Box<dyn schem
         let conn = connector_for_provider(source.active_provider, connector_params)?;
         Ok(conn.schema_dialect())
     } else {
-        dialect_for_provider(source.active_provider)
+        ::commands::dialect_for_provider(source.active_provider)
     }
 }
 
@@ -141,23 +142,6 @@ fn connector_for_provider(
             Flavour::Mysql => Ok(Box::new(SqlSchemaConnector::new_mysql(params)?)),
             Flavour::Postgres => Ok(Box::new(SqlSchemaConnector::new_postgres(params)?)),
             Flavour::Sqlite => Ok(Box::new(SqlSchemaConnector::new_sqlite(params)?)),
-        }
-    } else {
-        Err(CoreError::from_msg(format!(
-            "`{provider}` is not a supported connector."
-        )))
-    }
-}
-
-fn dialect_for_provider(provider: &str) -> CoreResult<Box<dyn schema_connector::SchemaDialect>> {
-    if let Some(connector) = BUILTIN_CONNECTORS.iter().find(|c| c.is_provider(provider)) {
-        match connector.flavour() {
-            Flavour::Cockroach => Ok(Box::new(SqlSchemaDialect::cockroach())),
-            Flavour::Mongo => Ok(Box::new(MongoDbSchemaDialect)),
-            Flavour::Sqlserver => Ok(Box::new(SqlSchemaDialect::mssql())),
-            Flavour::Mysql => Ok(Box::new(SqlSchemaDialect::mysql())),
-            Flavour::Postgres => Ok(Box::new(SqlSchemaDialect::postgres())),
-            Flavour::Sqlite => Ok(Box::new(SqlSchemaDialect::sqlite())),
         }
     } else {
         Err(CoreError::from_msg(format!(
