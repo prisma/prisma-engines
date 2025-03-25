@@ -1,12 +1,12 @@
 import path from 'node:path'
 import * as S from '@effect/schema/Schema'
 import { PrismaD1 } from '@prisma/adapter-d1'
-import { SqlDriverAdapter } from '@prisma/driver-adapter-utils'
+import type { SqlDriverAdapter, SqlMigrationAwareDriverAdapterFactory } from '@prisma/driver-adapter-utils'
 import { getPlatformProxy } from 'wrangler'
 import type { D1Database, D1Result } from '@cloudflare/workers-types'
 
 import { __dirname, runBatch } from '../utils'
-import type { ConnectParams, DriverAdaptersManager } from './index'
+import type { DriverAdaptersManager, SetupDriverAdaptersInput } from './index'
 import type { DriverAdapterTag, EnvForAdapter } from '../types'
 import { D1Tables } from '../types/d1'
 
@@ -14,8 +14,8 @@ const TAG = 'd1' as const satisfies DriverAdapterTag
 type TAG = typeof TAG
 
 export class D1Manager implements DriverAdaptersManager {
-  #driver: D1Database
   #dispose: () => Promise<void>
+  #factory: SqlMigrationAwareDriverAdapterFactory
   #adapter?: SqlDriverAdapter
 
   private constructor(
@@ -23,11 +23,11 @@ export class D1Manager implements DriverAdaptersManager {
     driver: D1Database,
     dispose: () => Promise<void>,
   ) {
-    this.#driver = driver
+    this.#factory = new PrismaD1(driver)
     this.#dispose = dispose
   }
 
-  static async setup(env: EnvForAdapter<TAG>, migrationScript?: string) {
+  static async setup(env: EnvForAdapter<TAG>, { migrationScript }: SetupDriverAdaptersInput) {
     const { env: cfBindings, dispose } = await getPlatformProxy<{
       D1_DATABASE: D1Database
     }>({
@@ -49,9 +49,12 @@ export class D1Manager implements DriverAdaptersManager {
     return new D1Manager(env, D1_DATABASE, dispose)
   }
 
-  async connect({}: ConnectParams) {
-    const factory = new PrismaD1(this.#driver)
-    this.#adapter = await factory.connect()
+  factory() {
+    return this.#factory
+  }
+
+  async connect() {
+    this.#adapter = await this.#factory.connect()
     return this.#adapter
   }
 
