@@ -167,30 +167,34 @@ impl DbQuery {
 impl fmt::Display for DbQuery {
     /// Should only be used for debugging, unit testing and playground CLI output.
     /// The placeholder syntax does not attempt to match any actual SQL flavour.
-    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
-        fn format_fragments(f: &mut Formatter<'_>, fragments: &Vec<Fragment>) -> fmt::Result {
-            let mut number = 1;
-            for fragment in fragments {
-                match fragment {
-                    Fragment::StringChunk(s) => {
-                        write!(f, "{}", s)?;
-                    }
-                    Fragment::Parameter => {
-                        write!(f, "${number}")?;
-                        number += 1;
-                    }
-                    Fragment::ParameterTuple => {
-                        write!(f, "[${number}]")?;
-                        number += 1;
-                    }
-                };
-            }
-            Ok(())
-        }
-
+    fn fmt(&self, formatter: &mut Formatter<'_>) -> fmt::Result {
         match self {
-            DbQuery::RawSql { sql, .. } => write!(f, "{}", sql),
-            DbQuery::TemplateSql { fragments, .. } => format_fragments(f, fragments),
+            DbQuery::RawSql { sql, .. } => {
+                write!(formatter, "{}", sql)?;
+            }
+            DbQuery::TemplateSql { fragments, .. } => {
+                let placeholder_format = PlaceholderFormat {
+                    prefix: "$",
+                    has_numbering: true,
+                };
+                let mut number = 1;
+                for fragment in fragments {
+                    match fragment {
+                        Fragment::StringChunk(s) => {
+                            write!(formatter, "{}", s)?;
+                        }
+                        Fragment::Parameter => {
+                            placeholder_format.fmt(formatter, &mut number)?;
+                        }
+                        Fragment::ParameterTuple => {
+                            write!(formatter, "[")?;
+                            placeholder_format.fmt(formatter, &mut number)?;
+                            write!(formatter, "]")?;
+                        }
+                    };
+                }
+            }
         }
+        Ok(())
     }
 }

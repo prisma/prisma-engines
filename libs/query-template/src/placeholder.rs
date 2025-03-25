@@ -17,10 +17,10 @@ impl PlaceholderFormat {
         }
     }
 
-    pub fn fmt(&self, f: &mut fmt::Formatter<'_>, placeholder_number: &mut i32) -> fmt::Result {
-        f.write_str(self.prefix)?;
+    pub fn fmt(&self, formatter: &mut fmt::Formatter<'_>, placeholder_number: &mut i32) -> fmt::Result {
+        formatter.write_str(self.prefix)?;
         if self.has_numbering {
-            f.write_str(placeholder_number.to_string().as_str())?;
+            formatter.write_str(placeholder_number.to_string().as_str())?;
             *placeholder_number += 1;
         }
         Ok(())
