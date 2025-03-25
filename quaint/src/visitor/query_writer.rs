@@ -1,16 +1,15 @@
 use crate::Value;
 use query_template::{Fragment, QueryTemplate};
-use std::fmt;
 use std::fmt::Display;
 
 pub(crate) trait QueryWriter {
-    fn write_string_chunk<D: fmt::Display>(&mut self, s: D);
+    fn write_string_chunk(&mut self, value: impl Display);
     fn write_parameter(&mut self);
     fn write_parameter_tuple(&mut self);
 }
 
 impl QueryWriter for QueryTemplate<Value<'_>> {
-    fn write_string_chunk<D: Display>(&mut self, value: D) {
+    fn write_string_chunk(&mut self, value: impl Display) {
         match self.fragments.last_mut() {
             Some(Fragment::StringChunk(chunk)) => {
                 chunk.push_str(&value.to_string());

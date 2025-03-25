@@ -11,18 +11,6 @@ pub struct Expression<'a> {
     pub(crate) alias: Option<Cow<'a, str>>,
 }
 
-impl Expression<'_> {
-    pub fn to_parameterized_row(self) -> Self {
-        match self.kind {
-            ExpressionKind::Parameterized(value) => Expression {
-                kind: ExpressionKind::ParameterizedRow(value.clone()),
-                alias: self.alias,
-            },
-            _ => self,
-        }
-    }
-}
-
 impl<'a> Expression<'a> {
     /// The type of the expression, dictates how it's implemented in the query.
     pub fn kind(&self) -> &ExpressionKind<'a> {
@@ -213,6 +201,16 @@ impl<'a> Expression<'a> {
                 (expr, ctes)
             }
             _ => (self, Vec::new()),
+        }
+    }
+
+    pub fn into_parameterized_row(self) -> Self {
+        match self.kind {
+            ExpressionKind::Parameterized(value) => Expression {
+                kind: ExpressionKind::ParameterizedRow(value),
+                alias: self.alias,
+            },
+            _ => self,
         }
     }
 }

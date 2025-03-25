@@ -28,7 +28,6 @@ pub use self::postgres::Postgres;
 pub use self::sqlite::Sqlite;
 
 use crate::ast::*;
-use crate::error::Error;
 use query_template::QueryTemplate;
 use std::{borrow::Cow, fmt};
 
@@ -68,14 +67,19 @@ pub trait Visitor<'a> {
     /// ```
     fn build<Q>(query: Q) -> crate::Result<(String, Vec<Value<'a>>)>
     where
-        Q: Into<Query<'a>>;
+        Q: Into<Query<'a>>,
+    {
+        let template = Self::build_template(query)?;
+        let sql = template.to_sql()?;
+        Ok((sql, template.parameters))
+    }
 
-    fn build_template<Q>(query: Q) -> std::result::Result<QueryTemplate<Value<'a>>, Error>
+    fn build_template<Q>(query: Q) -> crate::Result<QueryTemplate<Value<'a>>>
     where
         Q: Into<Query<'a>>;
 
     /// Write to the query.
-    fn write<D: fmt::Display>(&mut self, s: D) -> Result;
+    fn write(&mut self, s: impl fmt::Display) -> Result;
 
     /// A point to modify an incoming query to make it compatible with the
     /// underlying database.

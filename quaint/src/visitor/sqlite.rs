@@ -82,16 +82,7 @@ impl<'a> Visitor<'a> for Sqlite<'a> {
     const C_BACKTICK_CLOSE: &'static str = "`";
     const C_WILDCARD: &'static str = "%";
 
-    fn build<Q>(query: Q) -> crate::Result<(String, Vec<Value<'a>>)>
-    where
-        Q: Into<Query<'a>>,
-    {
-        let template = <Sqlite<'a> as Visitor>::build_template(query)?;
-        let sql = template.to_sql()?;
-        Ok((sql, template.parameters))
-    }
-
-    fn build_template<Q>(query: Q) -> Result<QueryTemplate<Value<'a>>, Error>
+    fn build_template<Q>(query: Q) -> crate::Result<QueryTemplate<Value<'a>>>
     where
         Q: Into<Query<'a>>,
     {
@@ -107,7 +98,7 @@ impl<'a> Visitor<'a> for Sqlite<'a> {
         Ok(this.query_template)
     }
 
-    fn write<D: fmt::Display>(&mut self, value: D) -> visitor::Result {
+    fn write(&mut self, value: impl fmt::Display) -> visitor::Result {
         self.query_template.write_string_chunk(value);
         Ok(())
     }
