@@ -20,7 +20,7 @@ impl PlaceholderFormat {
     pub fn fmt(&self, formatter: &mut fmt::Formatter<'_>, placeholder_number: &mut i32) -> fmt::Result {
         formatter.write_str(self.prefix)?;
         if self.has_numbering {
-            formatter.write_str(placeholder_number.to_string().as_str())?;
+            write!(formatter, "{placeholder_number}")?;
             *placeholder_number += 1;
         }
         Ok(())
