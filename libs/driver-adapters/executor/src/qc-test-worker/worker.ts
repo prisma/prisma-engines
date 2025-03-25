@@ -2,7 +2,7 @@ import {Schema as S} from '@effect/schema'
 import type {ConnectionInfo, SqlDriverAdapter} from '@prisma/driver-adapter-utils'
 import {DriverAdaptersManager} from '../driver-adapters-manager'
 import * as qc from '../query-compiler'
-import {TransactionManager} from '@prisma/client-engine-runtime'
+import {TransactionManager, type TransactionOptions} from '@prisma/client-engine-runtime'
 import {parentPort} from 'worker_threads'
 import {
     CommitTxParams,
@@ -161,6 +161,11 @@ async function initializeSchema(
 
     const transactionManager = new TransactionManager({
         driverAdapter: adapter,
+        transactionOptions: {
+            maxWait: 30,
+            timeout: 30,
+            isolationLevel: 'SERIALIZABLE'
+        } satisfies TransactionOptions,
     })
 
     state = {
