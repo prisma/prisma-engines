@@ -144,10 +144,9 @@ impl fmt::Display for RelationLink {
 #[derive(Debug, Serialize)]
 #[serde(tag = "type", rename_all = "camelCase")]
 pub enum DbQuery {
-    RawSql {
-        sql: String,
-        params: Vec<PrismaValue>,
-    },
+    #[serde(rename_all = "camelCase")]
+    RawSql { sql: String, params: Vec<PrismaValue> },
+    #[serde(rename_all = "camelCase")]
     TemplateSql {
         fragments: Vec<Fragment>,
         params: Vec<PrismaValue>,
