@@ -46,12 +46,10 @@ async function main(): Promise<void> {
     }
   `;
 
-  const driverAdapterManager = await setupDriverAdaptersManager(env);
+  const driverAdapterManager = await setupDriverAdaptersManager(env, { url });
 
-  const { compiler: compiler, adapter } = await initQC({
-    env,
+  const { compiler: compiler } = await initQC({
     driverAdapterManager,
-    url,
     schema,
   });
 
@@ -75,19 +73,15 @@ async function main(): Promise<void> {
 }
 
 type InitQueryCompilerParams = {
-  env: Env;
   driverAdapterManager: DriverAdaptersManager;
-  url: string;
   schema: string;
 };
 
 async function initQC({
-  env,
   driverAdapterManager,
-  url,
   schema,
 }: InitQueryCompilerParams) {
-  const adapter = await driverAdapterManager.connect({ url });
+  const adapter = await driverAdapterManager.connect();
   const errorCapturingAdapter = bindAdapter(adapter);
 
   let connectionInfo: ConnectionInfo = {};
