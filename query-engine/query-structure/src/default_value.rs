@@ -69,8 +69,7 @@ impl DefaultKind {
         }
     }
 
-    /// Returns either a copy of the contained single value or produces a new
-    /// value as defined by the expression.
+    /// Returns either a copy of the contained single value or a non-evaluated generator call.
     pub fn get(&self) -> Option<PrismaValue> {
         match self {
             DefaultKind::Single(ref v) => Some(v.clone()),
@@ -83,6 +82,9 @@ impl DefaultKind {
         }
     }
 
+    /// Returns either a copy of the contained single value or produces a new
+    /// value as defined by the expression.
+    #[cfg(feature = "default_generators")]
     pub fn get_evaluated(&self) -> Option<PrismaValue> {
         match self {
             DefaultKind::Single(ref v) => Some(v.clone()),
