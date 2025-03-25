@@ -7,19 +7,18 @@ use commands::{
 };
 use driver_adapters::{adapter_factory_from_js, JsObject};
 use json_rpc::types::*;
-use psl::{parser_database::SourceFile, ConnectorRegistry, PreviewFeature};
+use psl::{ConnectorRegistry, PreviewFeature};
 use quaint::connector::ExternalConnectorFactory;
 use sql_schema_connector::SqlSchemaConnector;
 use std::path::PathBuf;
 use std::sync::Arc;
+use std::time::Instant;
 use tracing_futures::Instrument;
 use wasm_bindgen::prelude::wasm_bindgen;
 
 const CONNECTOR_REGISTRY: ConnectorRegistry<'_> = &[
     #[cfg(feature = "postgresql")]
     psl::builtin_connectors::POSTGRES,
-    #[cfg(feature = "mysql")]
-    psl::builtin_connectors::MYSQL,
     #[cfg(feature = "sqlite")]
     psl::builtin_connectors::SQLITE,
 ];
@@ -49,6 +48,12 @@ fn register_panic_hook() {
     });
 }
 
+/// The version of the @prisma/schema-engine-wasm.
+#[wasm_bindgen]
+pub fn version() -> String {
+    env!("GIT_HASH").to_string()
+}
+
 /// The main query engine used by JS
 #[wasm_bindgen]
 pub struct SchemaEngine {
@@ -61,10 +66,6 @@ pub struct SchemaEngine {
     /// The inferred database namespaces (used for the `multiSchema` preview feature).
     namespaces: Option<Namespaces>,
 }
-
-// 1. One SchemaEngine object that reads 1 schema only and exposes methods that actually make use of such schema
-// 2. A bunch of free functions (e.g., diff, version) that either don't rely on any schema,
-//    or accept multiple schemas as input.
 
 #[wasm_bindgen]
 impl SchemaEngine {
@@ -90,6 +91,12 @@ impl SchemaEngine {
 
     fn namespaces(&self) -> Option<Namespaces> {
         self.namespaces.clone()
+    }
+
+    #[wasm_bindgen]
+    pub fn instant() -> u64 {
+        let start = Instant::now();
+        Instant::now().duration_since(start).as_millis() as u64
     }
 
     /// Debugging method that only panics, for tests.
@@ -144,8 +151,8 @@ impl SchemaEngine {
     /// Send a raw command to the database.
     #[wasm_bindgen(js_name = "dbExecute")]
     pub async fn db_execute(&mut self, params: DbExecuteParams) -> Result<(), wasm_bindgen::JsError> {
-        let result = self.connector.db_execute(params.script).await?;
-        Ok(result)
+        self.connector.db_execute(params.script).await?;
+        Ok(())
     }
 
     /// Tells the CLI what to do in `migrate dev`.
@@ -360,10 +367,10 @@ impl SchemaEngine {
         tracing::debug!("Resetting the database.");
         let namespaces = self.namespaces();
 
-        let result = SchemaConnector::reset(&mut self.connector, false, namespaces)
+        SchemaConnector::reset(&mut self.connector, false, namespaces)
             .instrument(tracing::info_span!("Reset"))
             .await?;
-        Ok(result)
+        Ok(())
     }
 
     /// The command behind `prisma db push`.

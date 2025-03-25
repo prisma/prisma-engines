@@ -61,11 +61,9 @@ pub async fn diff_cli(params: DiffParams, host: Arc<dyn ConnectorHost>) -> CoreR
     let migration = dialect.diff(from, to);
 
     let mut stdout = if params.script {
-        let script_string = dialect.render_script(&migration, &Default::default())?;
-        script_string
+        dialect.render_script(&migration, &Default::default())?
     } else {
-        let summary = dialect.migration_summary(&migration);
-        summary
+        dialect.migration_summary(&migration)
     };
 
     if !stdout.ends_with('\n') {

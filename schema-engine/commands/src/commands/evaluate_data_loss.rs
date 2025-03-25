@@ -1,5 +1,5 @@
-use crate::{json_rpc::types::*, CoreResult, SchemaContainerExt};
-use schema_connector::{migrations_directory::*, SchemaConnector};
+use crate::{CoreResult, SchemaContainerExt, json_rpc::types::*};
+use schema_connector::{SchemaConnector, migrations_directory::*};
 
 /// Development command for migrations. Evaluate the data loss induced by the
 /// next migration the engine would generate on the main database.

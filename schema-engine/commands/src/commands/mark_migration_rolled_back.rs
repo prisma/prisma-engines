@@ -1,4 +1,4 @@
-use crate::{json_rpc::types::*, CoreError, CoreResult};
+use crate::{CoreError, CoreResult, json_rpc::types::*};
 use schema_connector::SchemaConnector;
 use user_facing_errors::schema_engine::{CannotRollBackSucceededMigration, CannotRollBackUnappliedMigration};
 

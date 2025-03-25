@@ -16,7 +16,6 @@ workspace = true
 # default = ["sqlite"]
 sqlite = ["driver-adapters/sqlite", "psl/sqlite", "sql-schema-connector/sqlite", "commands/sqlite"]
 postgresql = ["driver-adapters/postgresql", "psl/postgresql", "sql-schema-connector/postgresql", "commands/postgresql"]
-mysql = ["driver-adapters/mysql", "psl/mysql", "sql-schema-connector/mysql", "commands/mysql"]
 
 [dependencies]
 psl.workspace = true

@@ -33,13 +33,13 @@ pub struct DiagnoseMigrationHistoryOutput {
     pub has_migrations_table: bool,
 }
 
-impl Into<json_rpc::types::DiagnoseMigrationHistoryOutput> for DiagnoseMigrationHistoryOutput {
-    fn into(self) -> json_rpc::types::DiagnoseMigrationHistoryOutput {
+impl From<DiagnoseMigrationHistoryOutput> for json_rpc::types::DiagnoseMigrationHistoryOutput {
+    fn from(val: DiagnoseMigrationHistoryOutput) -> json_rpc::types::DiagnoseMigrationHistoryOutput {
         json_rpc::types::DiagnoseMigrationHistoryOutput {
-            history: self.history.map(|history| history.into()),
-            failed_migration_names: self.failed_migration_names,
-            edited_migration_names: self.edited_migration_names,
-            has_migrations_table: self.has_migrations_table,
+            history: val.history,
+            failed_migration_names: val.failed_migration_names,
+            edited_migration_names: val.edited_migration_names,
+            has_migrations_table: val.has_migrations_table,
         }
     }
 }

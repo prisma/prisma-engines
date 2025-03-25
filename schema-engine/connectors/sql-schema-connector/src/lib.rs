@@ -1,6 +1,7 @@
 //! The SQL migration connector.
 
 #![deny(rust_2018_idioms, unsafe_code, missing_docs)]
+#![cfg_attr(target_arch = "wasm32", allow(dead_code))]
 
 mod apply_migration;
 mod database_schema;

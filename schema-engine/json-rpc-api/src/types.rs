@@ -566,9 +566,9 @@ pub struct IntrospectionView {
 
 /// Get the database version for error reporting.
 /// @deprecated
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 #[cfg_attr(target_arch = "wasm32", derive(Tsify))]
-#[cfg_attr(target_arch = "wasm32", tsify(from_wasm_abi))]
+#[cfg_attr(target_arch = "wasm32", tsify(from_wasm_abi, into_wasm_abi))]
 pub struct GetDatabaseVersionInput {
     /// The datasource parameter.
     pub datasource: DatasourceParam,

@@ -100,7 +100,7 @@ impl SqlDialect for MysqlDialect {
     #[cfg(not(feature = "mysql-native"))]
     fn connect_to_shadow_db(
         &self,
-        factory: std::sync::Arc<dyn quaint::connector::ExternalConnectorFactory>,
+        _factory: std::sync::Arc<dyn quaint::connector::ExternalConnectorFactory>,
     ) -> BoxFuture<'_, ConnectorResult<Box<dyn SqlConnector>>> {
         todo!("MySQL WASM shadow database not supported yet")
     }

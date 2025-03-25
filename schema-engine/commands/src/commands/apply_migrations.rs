@@ -1,7 +1,7 @@
-use crate::{json_rpc::types::*, CoreError, CoreResult};
+use crate::{CoreError, CoreResult, json_rpc::types::*};
 use schema_connector::{
-    migrations_directory::{error_on_changed_provider, list_migrations, MigrationDirectory},
     ConnectorError, MigrationRecord, Namespaces, PersistenceNotInitializedError, SchemaConnector,
+    migrations_directory::{MigrationDirectory, error_on_changed_provider, list_migrations},
 };
 use std::time::Instant;
 use tracing::Instrument;

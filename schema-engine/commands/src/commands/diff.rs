@@ -61,11 +61,9 @@ pub async fn diff(params: DiffParams, connector: &mut dyn SchemaConnector) -> Co
     let migration = dialect.diff(from, to);
 
     let mut stdout = if params.script {
-        let script_string = dialect.render_script(&migration, &Default::default())?;
-        script_string
+        dialect.render_script(&migration, &Default::default())?
     } else {
-        let summary = dialect.migration_summary(&migration);
-        summary
+        dialect.migration_summary(&migration)
     };
 
     if !stdout.ends_with('\n') {
@@ -121,7 +119,7 @@ async fn diff_target_to_dialect(
 ) -> CoreResult<Option<(Box<dyn SchemaDialect>, DatabaseSchema)>> {
     match target {
         DiffTarget::Empty => Ok(None),
-        DiffTarget::SchemaDatasource(schemas) => {
+        DiffTarget::SchemaDatasource(_schemas) => {
             // TODO: verify that the provider is the same as the one assumed by the connector:
             // Note: let's simplify the parsed `provider` value before doing this.
             // ```

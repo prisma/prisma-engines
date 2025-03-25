@@ -1,4 +1,4 @@
-use crate::{json_rpc::types::*, parse_schema_multi, CoreResult, SchemaContainerExt};
+use crate::{CoreResult, SchemaContainerExt, json_rpc::types::*, parse_schema_multi};
 use schema_connector::{ConnectorError, SchemaConnector};
 use tracing_futures::Instrument;
 

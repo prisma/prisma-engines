@@ -4,7 +4,7 @@ mod native;
 pub use native::*;
 
 #[cfg(not(feature = "mysql-native"))]
-mod wasm;
+pub mod wasm;
 #[cfg(not(feature = "mysql-native"))]
 pub use wasm::*;
 

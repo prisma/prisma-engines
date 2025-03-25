@@ -1,6 +1,6 @@
-use crate::{json_rpc::types::*, CoreError, CoreResult, SchemaContainerExt};
+use crate::{CoreError, CoreResult, SchemaContainerExt, json_rpc::types::*};
 use crosstarget_utils::time::format_utc_now;
-use schema_connector::{migrations_directory::*, SchemaConnector};
+use schema_connector::{SchemaConnector, migrations_directory::*};
 use user_facing_errors::schema_engine::MigrationNameTooLong;
 
 /// Create a directory name for a new migration.

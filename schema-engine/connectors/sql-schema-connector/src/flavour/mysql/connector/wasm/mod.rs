@@ -1,4 +1,5 @@
 //! All the quaint-wrangling for the mysql connector should happen here.
+#![cfg_attr(target_arch = "wasm32", allow(unused_imports))]
 
 pub(super) mod shadow_db;
 
@@ -9,10 +10,10 @@ use sql_schema_describer::{mysql as describer, DescriberErrorKind, SqlSchema};
 use user_facing_errors::schema_engine::ApplyMigrationError;
 
 // TODO: use ExternalConnector here.
-pub(super) struct Connection();
+pub struct Connection();
 
 impl Connection {
-    pub(super) async fn new(url: url::Url) -> ConnectorResult<Self> {
+    pub(super) async fn new(_url: url::Url) -> ConnectorResult<Self> {
         // TODO: establish a connection, gather the version string,
         // determine whether it is a CockroachDB instance or not.
         panic!("[sql-schema-connector::flavour::mysql::wasm] Not implemented");
@@ -21,8 +22,8 @@ impl Connection {
     #[tracing::instrument(skip(self, circumstances, params))]
     pub(super) async fn describe_schema(
         &mut self,
-        circumstances: BitFlags<super::Circumstances>,
-        params: &super::Params,
+        _circumstances: BitFlags<super::Circumstances>,
+        _params: &super::Params,
     ) -> ConnectorResult<SqlSchema> {
         panic!("[sql-schema-connector::flavour::mysql::wasm] Not implemented");
     }
@@ -32,7 +33,7 @@ impl Connection {
         panic!("[sql-schema-connector::flavour::mysql::wasm] Not implemented");
     }
 
-    pub(super) async fn version(&mut self, url: &MysqlUrl) -> ConnectorResult<Option<String>> {
+    pub(super) async fn version(&mut self, _url: &MysqlUrl) -> ConnectorResult<Option<String>> {
         tracing::debug!(query_type = "version");
         panic!("[sql-schema-connector::flavour::mysql::wasm] Not implemented");
     }
@@ -50,7 +51,7 @@ impl Connection {
     pub(super) async fn query_raw(
         &mut self,
         sql: &str,
-        params: &[quaint::prelude::Value<'_>],
+        _params: &[quaint::prelude::Value<'_>],
         _url: &MysqlUrl,
     ) -> ConnectorResult<quaint::prelude::ResultSet> {
         tracing::debug!(query_type = "query_raw", sql);
@@ -61,7 +62,7 @@ impl Connection {
         &mut self,
         sql: &str,
         _url: &MysqlUrl,
-        circumstances: BitFlags<super::Circumstances>,
+        _circumstances: BitFlags<super::Circumstances>,
     ) -> ConnectorResult<quaint::connector::DescribedQuery> {
         tracing::debug!(query_type = "describe_query", sql);
         panic!("[sql-schema-connector::flavour::mysql::wasm] Not implemented");
@@ -69,9 +70,9 @@ impl Connection {
 
     pub(super) async fn apply_migration_script(
         &mut self,
-        migration_name: &str,
-        script: &str,
-        circumstances: BitFlags<super::Circumstances>,
+        _migration_name: &str,
+        _script: &str,
+        _circumstances: BitFlags<super::Circumstances>,
     ) -> ConnectorResult<()> {
         tracing::debug!(query_type = "raw_cmd", script);
         panic!("[sql-schema-connector::flavour::mysql::wasm] Not implemented");
