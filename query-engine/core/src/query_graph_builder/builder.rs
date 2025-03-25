@@ -48,6 +48,8 @@ impl<'a> QueryGraphBuilder<'a> {
         }
     }
 
+    /// Disables eager evaluation of default values of columns. Instead of passing through
+    /// evaluated defaults, they are passed through as reified generator calls.
     pub fn without_eager_default_evaluation(mut self) -> Self {
         self.eager_default_evaluation = false;
         self
