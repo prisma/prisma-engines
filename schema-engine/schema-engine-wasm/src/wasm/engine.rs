@@ -12,7 +12,6 @@ use quaint::connector::ExternalConnectorFactory;
 use sql_schema_connector::SqlSchemaConnector;
 use std::path::PathBuf;
 use std::sync::Arc;
-use std::time::Instant;
 use tracing_futures::Instrument;
 use wasm_bindgen::prelude::wasm_bindgen;
 
@@ -91,12 +90,6 @@ impl SchemaEngine {
 
     fn namespaces(&self) -> Option<Namespaces> {
         self.namespaces.clone()
-    }
-
-    #[wasm_bindgen]
-    pub fn instant() -> u64 {
-        let start = Instant::now();
-        Instant::now().duration_since(start).as_millis() as u64
     }
 
     /// Debugging method that only panics, for tests.
