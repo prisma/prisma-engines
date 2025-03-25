@@ -402,8 +402,8 @@ impl<'a> Visitor<'a> for Mssql<'a> {
             // https://docs.microsoft.com/en-us/sql/t-sql/functions/cast-and-convert-transact-sql?redirectedfrom=MSDN&view=sql-server-ver15#xml-styles
             ValueType::Xml(cow) => cow.map(|cow| self.write(format!("CONVERT(XML, N'{cow}', 3)"))),
 
-            ValueType::Var(name, _) => Some(Err(
-                Error::builder(ErrorKind::VarAsRawValue(name.clone().into_owned())).build()
+            ValueType::Opaque(opaque) => Some(Err(
+                Error::builder(ErrorKind::OpaqueAsRawValue(opaque.to_string())).build()
             )),
         };
 

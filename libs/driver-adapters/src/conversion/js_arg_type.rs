@@ -89,6 +89,6 @@ pub fn value_to_js_arg_type(value: &quaint::Value) -> JSArgType {
         quaint::ValueType::DateTime(_) => JSArgType::DateTime,
         quaint::ValueType::Date(_) => JSArgType::Date,
         quaint::ValueType::Time(_) => JSArgType::Time,
-        quaint::ValueType::Var(_, _) => unreachable!(),
+        quaint::ValueType::Opaque(_) => unreachable!(),
     }
 }

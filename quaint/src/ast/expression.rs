@@ -538,7 +538,7 @@ fn extract_single_var_row(expr: Expression) -> Expression {
         val @ Expression {
             kind:
                 ExpressionKind::Parameterized(Value {
-                    typed: ValueType::Var(_, _),
+                    typed: ValueType::Opaque(_),
                     ..
                 }),
             ..

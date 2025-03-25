@@ -4,7 +4,7 @@ use itertools::{Either, Itertools};
 use query::translate_query;
 use query_builder::QueryBuilder;
 use query_core::{EdgeRef, Node, NodeRef, Query, QueryGraph, QueryGraphBuilderError, QueryGraphDependency};
-use query_structure::{PlaceholderType, PrismaValue, SelectedField, SelectionResult};
+use query_structure::{PrismaValue, PrismaValueType, SelectedField, SelectionResult};
 use thiserror::Error;
 
 use super::expression::{Binding, Expression};
@@ -92,7 +92,7 @@ impl<'a, 'b> NodeTranslator<'a, 'b> {
                                 field.clone(),
                                 PrismaValue::Placeholder {
                                     name: generate_projected_dependency_name(self.graph.edge_source(edge), field),
-                                    r#type: PlaceholderType::Any,
+                                    r#type: PrismaValueType::Any,
                                 },
                             )
                         })

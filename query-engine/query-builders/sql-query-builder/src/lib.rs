@@ -13,6 +13,7 @@ pub mod read;
 pub mod select;
 mod sql_trace;
 pub mod update;
+pub mod value;
 pub mod write;
 
 use std::{collections::HashMap, marker::PhantomData};

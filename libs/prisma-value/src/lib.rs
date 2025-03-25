@@ -51,12 +51,19 @@ pub enum PrismaValue {
     #[serde(serialize_with = "serialize_placeholder")]
     Placeholder {
         name: String,
-        r#type: PlaceholderType,
+        r#type: PrismaValueType,
+    },
+
+    #[serde(serialize_with = "serialize_generator_call")]
+    GeneratorCall {
+        name: String,
+        args: Vec<Self>,
+        return_type: PrismaValueType,
     },
 }
 
 #[derive(Debug, Clone, Eq, PartialEq, Hash, Serialize, Deserialize, PartialOrd, Ord)]
-pub enum PlaceholderType {
+pub enum PrismaValueType {
     Any,
     String,
     Int,
@@ -65,25 +72,25 @@ pub enum PlaceholderType {
     Boolean,
     Decimal,
     Date,
-    Array(Box<PlaceholderType>),
+    Array(Box<PrismaValueType>),
     Object,
     Bytes,
 }
 
-impl std::fmt::Display for PlaceholderType {
+impl std::fmt::Display for PrismaValueType {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            PlaceholderType::Any => write!(f, "Any"),
-            PlaceholderType::String => write!(f, "String"),
-            PlaceholderType::Int => write!(f, "Int"),
-            PlaceholderType::BigInt => write!(f, "BigInt"),
-            PlaceholderType::Float => write!(f, "Float"),
-            PlaceholderType::Boolean => write!(f, "Boolean"),
-            PlaceholderType::Decimal => write!(f, "Decimal"),
-            PlaceholderType::Date => write!(f, "Date"),
-            PlaceholderType::Array(t) => write!(f, "Array<{t}>"),
-            PlaceholderType::Object => write!(f, "Object"),
-            PlaceholderType::Bytes => write!(f, "Bytes"),
+            PrismaValueType::Any => write!(f, "Any"),
+            PrismaValueType::String => write!(f, "String"),
+            PrismaValueType::Int => write!(f, "Int"),
+            PrismaValueType::BigInt => write!(f, "BigInt"),
+            PrismaValueType::Float => write!(f, "Float"),
+            PrismaValueType::Boolean => write!(f, "Boolean"),
+            PrismaValueType::Decimal => write!(f, "Decimal"),
+            PrismaValueType::Date => write!(f, "Date"),
+            PrismaValueType::Array(t) => write!(f, "Array<{t}>"),
+            PrismaValueType::Object => write!(f, "Object"),
+            PrismaValueType::Bytes => write!(f, "Bytes"),
         }
     }
 }
@@ -194,7 +201,7 @@ impl TryFrom<serde_json::Value> for PrismaValue {
 
                     Ok(PrismaValue::Placeholder {
                         name,
-                        r#type: PlaceholderType::Any, // parsing the type is not implemented yet
+                        r#type: PrismaValueType::Any, // parsing the type is not implemented yet
                     })
                 }
 
@@ -259,7 +266,7 @@ where
     map.end()
 }
 
-fn serialize_placeholder<S>(name: &str, r#type: &PlaceholderType, serializer: S) -> Result<S::Ok, S::Error>
+fn serialize_placeholder<S>(name: &str, r#type: &PrismaValueType, serializer: S) -> Result<S::Ok, S::Error>
 where
     S: Serializer,
 {
@@ -271,6 +278,30 @@ where
         &json!({
             "name": name,
             "type": r#type.to_string(),
+        }),
+    )?;
+
+    map.end()
+}
+
+fn serialize_generator_call<S>(
+    name: &str,
+    args: &[PrismaValue],
+    return_type: &PrismaValueType,
+    serializer: S,
+) -> Result<S::Ok, S::Error>
+where
+    S: Serializer,
+{
+    let mut map = serializer.serialize_map(Some(2))?;
+
+    map.serialize_entry("prisma__type", "generatorCall")?;
+    map.serialize_entry(
+        "prisma__value",
+        &json!({
+            "name": name,
+            "args": args,
+            "returnType": return_type,
         }),
     )?;
 
@@ -382,7 +413,7 @@ impl PrismaValue {
         PrismaValue::DateTime(parse_datetime(datetime).unwrap())
     }
 
-    pub fn placeholder(name: String, r#type: PlaceholderType) -> PrismaValue {
+    pub fn placeholder(name: String, r#type: PrismaValueType) -> PrismaValue {
         PrismaValue::Placeholder { name, r#type }
     }
 
@@ -430,6 +461,16 @@ impl fmt::Display for PrismaValue {
                 write!(f, "{{ {joined} }}")
             }
             PrismaValue::Placeholder { name, r#type } => write!(f, "var({name}: {type})"),
+            PrismaValue::GeneratorCall { name, args, .. } => {
+                write!(f, "{name}(")?;
+                for (i, arg) in args.iter().enumerate() {
+                    if i > 0 {
+                        write!(f, ", ")?;
+                    }
+                    write!(f, "{arg}")?;
+                }
+                write!(f, ")")
+            }
         }
     }
 }

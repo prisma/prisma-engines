@@ -242,11 +242,11 @@ pub enum ErrorKind {
     #[error("External error id#{}", _0)]
     ExternalError(i32),
 
-    #[error("Variable '{0}' used as raw value in query. Variables must be used as parameters.")]
-    VarAsRawValue(String),
+    #[error("Opaque parameter '{0}' used as raw value in query.")]
+    OpaqueAsRawValue(String),
 
-    #[error("Attempted to execute a query that contains unbound variable '{0}' in parameters.")]
-    RanQueryWithVarParam(String),
+    #[error("Attempted to execute a query that contains an opaque parameter '{0}'.")]
+    RanQueryWithOpaqueParam(String),
 }
 
 #[cfg(not(target_arch = "wasm32"))]

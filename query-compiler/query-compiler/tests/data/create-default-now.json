@@ -1,0 +1,12 @@
+{
+  "modelName": "UserWithDate",
+  "action": "createOne",
+  "query": {
+    "arguments": {
+      "data": { "email": "user.1@prisma.io" }
+    },
+    "selection": {
+      "$scalars": true
+    }
+  }
+}

@@ -123,7 +123,7 @@ fn add_inmemory_join(
                 .map(|field| {
                     let placeholder = PrismaValue::placeholder(
                         format!("@parent${}", field.name()),
-                        field.type_identifier().to_placeholder_type(),
+                        field.type_identifier().to_prisma_type(),
                     );
                     if parent.r#type().is_list() {
                         ScalarCondition::InTemplate(ConditionValue::value(placeholder))

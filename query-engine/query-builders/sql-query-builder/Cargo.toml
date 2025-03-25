@@ -19,3 +19,4 @@ serde_json.workspace = true
 
 [features]
 relation_joins = ["query-builder/relation_joins"]
+default_generators = ["query-structure/default_generators"]
