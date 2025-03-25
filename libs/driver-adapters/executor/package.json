@@ -14,7 +14,7 @@
     "build:qc": "tsup ./src/qc-test-runner.ts ./src/qc-test-worker/worker.ts --format esm --dts",
     "test:qe": "node --import tsx ./src/testd-qe.ts",
     "test:qc": "node --import tsx ./src/testd-qc.ts",
-    "demo:se": "node --import tsx ./src/demo-se.ts",
+    "demo:se": "node --experimental-wasm-modules --import tsx ./src/demo-se.ts",
     "demo:qc": "node --import tsx ./src/demo-qc.ts",
     "clean:d1": "rm -rf ../../connector-test-kit-rs/query-engine-tests/.wrangler"
   },
