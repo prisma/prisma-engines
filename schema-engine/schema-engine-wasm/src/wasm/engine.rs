@@ -173,13 +173,16 @@ impl SchemaEngine {
     /// Looks at the migrations folder and the database, and returns a bunch of useful information.
     #[wasm_bindgen(js_name = "diagnoseMigrationHistory")]
     pub async fn diagnose_migration_history(
-        &self,
+        &mut self,
         input: DiagnoseMigrationHistoryInput,
     ) -> Result<DiagnoseMigrationHistoryOutput, wasm_bindgen::JsError> {
-        // TODO: restore once type inconsistencies are resolved.
-        // The types should be `commands::DiagnoseMigrationHistory*` instead of
-        // those coming from `json_rpc::types`.
-        Err(wasm_bindgen::JsError::new("Not yet available."))
+        let namespaces = self.namespaces();
+        let result: DiagnoseMigrationHistoryOutput =
+            commands::diagnose_migration_history(input, namespaces, &mut self.connector)
+                .instrument(tracing::info_span!("DiagnoseMigrationHistory"))
+                .await?
+                .into();
+        Ok(result)
     }
 
     /// Make sure the connection to the database is established and valid.

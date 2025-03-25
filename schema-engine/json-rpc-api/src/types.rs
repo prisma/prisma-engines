@@ -129,20 +129,39 @@ pub enum DiffTarget {
 
 /// A diagnostic returned by `diagnoseMigrationHistory` when looking at the
 /// database migration history in relation to the migrations directory.
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, PartialEq, Serialize)]
 #[cfg_attr(target_arch = "wasm32", derive(Tsify))]
-#[cfg_attr(target_arch = "wasm32", tsify(from_wasm_abi, into_wasm_abi))]
-#[serde(tag = "tag")]
+#[cfg_attr(target_arch = "wasm32", tsify(into_wasm_abi))]
+#[serde(tag = "diagnostic", rename_all = "camelCase")]
 pub enum HistoryDiagnostic {
-    /// Migrations directory is behind the database.
-    MigrationsDirectoryIsBehind,
-
-    /// Histories diverge.
-    HistoriesDiverge,
-
-    /// There are migrations in the migrations directory that have not been applied to
-    /// the database yet.
-    DatabaseIsBehind(DatabaseIsBehindFields),
+    /// There are migrations in the migrations directory that have not been
+    /// applied to the database yet.
+    #[serde(rename_all = "camelCase")]
+    DatabaseIsBehind {
+        /// The names of the migrations.
+        unapplied_migration_names: Vec<String>,
+    },
+    /// Migrations have been applied to the database that are not in the
+    /// migrations directory.
+    #[serde(rename_all = "camelCase")]
+    MigrationsDirectoryIsBehind {
+        /// The names of the migrations.
+        unpersisted_migration_names: Vec<String>,
+    },
+    /// The migrations table history and the migrations directory history are
+    /// not the same. This currently ignores the ordering of migrations.
+    #[serde(rename_all = "camelCase")]
+    HistoriesDiverge {
+        /// The last migration that is present both in the migrations directory
+        /// and the migrations table.
+        last_common_migration_name: Option<String>,
+        /// The names of the migrations that are present in the migrations table
+        /// but not in the migrations directory.
+        unpersisted_migration_names: Vec<String>,
+        /// The names of the migrations that are present in the migrations
+        /// directory but have not been applied to the database.
+        unapplied_migration_names: Vec<String>,
+    },
 }
 
 /// Fields for the DatabaseIsBehind variant.
@@ -347,9 +366,9 @@ pub struct DiagnoseMigrationHistoryInput {
 }
 
 /// The result type for `diagnoseMigrationHistory` responses.
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize)]
 #[cfg_attr(target_arch = "wasm32", derive(Tsify))]
-#[cfg_attr(target_arch = "wasm32", tsify(from_wasm_abi, into_wasm_abi))]
+#[cfg_attr(target_arch = "wasm32", tsify(into_wasm_abi))]
 #[serde(rename_all = "camelCase")]
 pub struct DiagnoseMigrationHistoryOutput {
     /// The names of the migrations for which the checksum of the script in the

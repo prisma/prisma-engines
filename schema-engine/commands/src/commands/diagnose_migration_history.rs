@@ -1,20 +1,10 @@
 use crate::CoreResult;
-use json_rpc::types::MigrationList;
+pub use json_rpc::types::{DiagnoseMigrationHistoryInput, HistoryDiagnostic};
 use schema_connector::{
-    migrations_directory::{error_on_changed_provider, list_migrations, MigrationDirectory},
     ConnectorError, MigrationRecord, Namespaces, PersistenceNotInitializedError, SchemaConnector,
+    migrations_directory::{MigrationDirectory, error_on_changed_provider, list_migrations},
 };
-use serde::{Deserialize, Serialize};
-
-/// The input to the `DiagnoseMigrationHistory` command.
-#[derive(Deserialize, Debug)]
-#[serde(rename_all = "camelCase")]
-pub struct DiagnoseMigrationHistoryInput {
-    /// The list of migrations, already loaded from disk.
-    pub migrations_list: MigrationList,
-    /// Whether creating shadow/temporary databases is allowed.
-    pub opt_in_to_shadow_database: bool,
-}
+use serde::Serialize;
 
 /// The output of the `DiagnoseMigrationHistory` command.
 #[derive(Serialize, Debug)]
@@ -41,6 +31,17 @@ pub struct DiagnoseMigrationHistoryOutput {
     pub error_in_unapplied_migration: Option<ConnectorError>,
     /// Is the migrations table initialized in the database.
     pub has_migrations_table: bool,
+}
+
+impl Into<json_rpc::types::DiagnoseMigrationHistoryOutput> for DiagnoseMigrationHistoryOutput {
+    fn into(self) -> json_rpc::types::DiagnoseMigrationHistoryOutput {
+        json_rpc::types::DiagnoseMigrationHistoryOutput {
+            history: self.history.map(|history| history.into()),
+            failed_migration_names: self.failed_migration_names,
+            edited_migration_names: self.edited_migration_names,
+            has_migrations_table: self.has_migrations_table,
+        }
+    }
 }
 
 impl DiagnoseMigrationHistoryOutput {
@@ -247,41 +248,6 @@ impl<'a> Diagnostics<'a> {
             }),
         }
     }
-}
-
-/// A diagnostic returned by `diagnoseMigrationHistory` when looking at the
-/// database migration history in relation to the migrations directory.
-#[derive(Debug, PartialEq, Serialize)]
-#[serde(tag = "diagnostic", rename_all = "camelCase")]
-pub enum HistoryDiagnostic {
-    /// There are migrations in the migrations directory that have not been
-    /// applied to the database yet.
-    #[serde(rename_all = "camelCase")]
-    DatabaseIsBehind {
-        /// The names of the migrations.
-        unapplied_migration_names: Vec<String>,
-    },
-    /// Migrations have been applied to the database that are not in the
-    /// migrations directory.
-    #[serde(rename_all = "camelCase")]
-    MigrationsDirectoryIsBehind {
-        /// The names of the migrations.
-        unpersisted_migration_names: Vec<String>,
-    },
-    /// The migrations table history and the migrations directory history are
-    /// not the same. This currently ignores the ordering of migrations.
-    #[serde(rename_all = "camelCase")]
-    HistoriesDiverge {
-        /// The last migration that is present both in the migrations directory
-        /// and the migrations table.
-        last_common_migration_name: Option<String>,
-        /// The names of the migrations that are present in the migrations table
-        /// but not in the migrations directory.
-        unpersisted_migration_names: Vec<String>,
-        /// The names of the migrations that are present in the migrations
-        /// directory but have not been applied to the database.
-        unapplied_migration_names: Vec<String>,
-    },
 }
 
 /// A diagnostic returned by `diagnoseMigrationHistory` when trying to determine
