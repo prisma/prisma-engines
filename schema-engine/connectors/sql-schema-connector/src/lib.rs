@@ -184,6 +184,9 @@ pub struct SqlSchemaConnector {
 impl SqlSchemaConnector {
     /// Initialise an external migration connector.
     pub async fn new_from_external(adapter: Arc<dyn quaint::connector::ExternalConnector>) -> ConnectorResult<Self> {
+        // TODO: store `adapter.adapter_name` in an `Option<String>` field on the connector.
+        // Use that to intercept calls to d1 (`@prisma/adapter-d1`, `@prisma/adapter-d1-http`),
+        // and change the behaviour of problematic methods, like `version()`.
         match adapter.provider() {
             #[cfg(all(feature = "postgresql", not(feature = "postgresql-native")))]
             quaint::connector::AdapterProvider::Postgres => Self::new_postgres_external(adapter).await,

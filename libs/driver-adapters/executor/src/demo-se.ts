@@ -1,5 +1,5 @@
 import * as S from '@effect/schema/Schema'
-import { bindAdapterFactory } from '@prisma/driver-adapter-utils'
+import { bindSqlAdapterFactory } from '@prisma/driver-adapter-utils'
 import process from 'node:process'
 
 import type { DriverAdaptersManager } from './driver-adapters-manager'
@@ -16,7 +16,7 @@ import { getWasmError, isWasmPanic, WasmPanicRegistry } from './wasm-panic-regis
 globalThis.PRISMA_WASM_PANIC_REGISTRY = new WasmPanicRegistry()
 
 /**
- * Example run: `EXTERNAL_TEST_EXECUTOR="Wasm" DRIVER_ADAPTER="pg" pnpm demo:se`
+ * Example run: `EXTERNAL_TEST_EXECUTOR="Wasm" DRIVER_ADAPTER="d1" pnpm demo:se`
  */
 async function main(): Promise<void> {
   const env = S.decodeUnknownSync(Env)(process.env)
@@ -65,6 +65,9 @@ async function main(): Promise<void> {
 
   {
     console.log('[version]')
+
+    // Note: this fails on Cloudflare D1:
+    // `D1_ERROR: not authorized to use function: sqlite_version at offset 7: SQLITE_ERROR`
     const version = await engine.version()
     console.dir({ version }, { depth: null })
   }
@@ -135,7 +138,7 @@ async function initSE({
   driverAdapterManager,
 }: InitSchemaEngineParams) {
   const adapterFactory = driverAdapterManager.factory()
-  const errorCapturingAdapterFactory = bindAdapterFactory(adapterFactory)
+  const errorCapturingAdapterFactory = bindSqlAdapterFactory(adapterFactory)
   const engineInstance = await se.initSchemaEngine(
     errorCapturingAdapterFactory,
   )
@@ -162,6 +165,15 @@ process.on('uncaughtException', (error: Error) => {
 
 process.on('unhandledRejection', (error: Error) => {
   console.log('[unhandledRejection]')
+
+  if (isWasmPanic(error)) {
+    const { message, stack } = getWasmError(globalThis.PRISMA_WASM_PANIC_REGISTRY, error)
+
+    console.error('[WasmPanic]', { message, stack })
+  } else {
+    console.error('[Error]', error)
+  }
+
   process.exit(2)
 })
 

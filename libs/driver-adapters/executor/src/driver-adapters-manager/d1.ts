@@ -82,7 +82,10 @@ async function migrateReset(D1_DATABASE: D1Database) {
     rawTables,
   ).filter(
     (item) =>
-      !['_cf_KV', 'sqlite_schema', 'sqlite_sequence'].includes(item.name),
+      !(['sqlite_schema', 'sqlite_sequence'].includes(item.name)
+      // excludes `_cf_KV`, `_cf_METADATA`, etc.
+      // Related to https://github.com/drizzle-team/drizzle-orm/issues/3728#issuecomment-2740994190.
+      || /^(_cf_[A-Z]+).*$/.test(item.name)),
   )
 
   // This may sometimes fail with `D1_ERROR: no such table: sqlite_sequence`,
@@ -92,7 +95,7 @@ async function migrateReset(D1_DATABASE: D1Database) {
   // whenever a normal table that contains an AUTOINCREMENT column is created".
   try {
     await D1_DATABASE.prepare(`DELETE FROM "sqlite_sequence";`).run()
-  } catch (_) {
+  } catch (e) {
     // Ignore the error, as the table may not exist.
     console.warn(
       'Failed to reset sqlite_sequence table, but continuing with the reset.',
