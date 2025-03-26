@@ -20,43 +20,34 @@ pub async fn diff(params: DiffParams, connector: &mut dyn SchemaConnector) -> Co
     let (namespaces, preview_features) =
         namespaces_and_preview_features_from_diff_targets(&[&params.from, &params.to])?;
 
-    let from = diff_target_to_dialect(
+    let (conn_from, schema_from) = diff_target_to_dialect(
         &params.from,
         params.shadow_database_url.as_deref(),
         connector,
         namespaces.clone(),
         preview_features,
     )
-    .await?;
-    let to = diff_target_to_dialect(
+    .await?
+    .unzip();
+
+    let (conn_to, schema_to) = diff_target_to_dialect(
         &params.to,
         params.shadow_database_url.as_deref(),
         connector,
         namespaces,
         preview_features,
     )
-    .await?;
+    .await?
+    .unzip();
+
+    let dialect = conn_from
+        .or(conn_to)
+        .ok_or_else(|| ConnectorError::from_msg("Could not determine the connector to use for diffing.".to_owned()))?;
 
     // The `from` connector takes precedence, because if we think of diffs as migrations, `from` is
     // the target where the migration would be applied.
-    //
-    // TODO: make sure the connectors are the same in from and to.
-    let (dialect, from, to) = match (from, to) {
-        (Some((connector, from)), Some((_, to))) => (connector, from, to),
-        (Some((connector, from)), None) => {
-            let to = connector.empty_database_schema();
-            (connector, from, to)
-        }
-        (None, Some((connector, to))) => {
-            let from = connector.empty_database_schema();
-            (connector, from, to)
-        }
-        (None, None) => {
-            return Err(ConnectorError::from_msg(
-                "Could not determine the connector to use for diffing.".to_owned(),
-            ));
-        }
-    };
+    let from = schema_from.unwrap_or_else(|| dialect.empty_database_schema());
+    let to = schema_to.unwrap_or_else(|| dialect.empty_database_schema());
 
     let migration = dialect.diff(from, to);
 
