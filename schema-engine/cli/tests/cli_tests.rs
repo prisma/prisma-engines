@@ -9,9 +9,9 @@ use std::{
     process::{Child, Command, Output},
 };
 use test_macros::test_connector;
-use test_setup::{runtime::run_with_thread_local_runtime as tok, BitFlags, Tags, TestApiArgs};
+use test_setup::{BitFlags, Tags, TestApiArgs, runtime::run_with_thread_local_runtime as tok};
 use url::Url;
-use user_facing_errors::{common::DatabaseDoesNotExist, UserFacingError};
+use user_facing_errors::{UserFacingError, common::DatabaseDoesNotExist};
 
 fn schema_engine_bin_path() -> &'static str {
     env!("CARGO_BIN_EXE_schema-engine")
