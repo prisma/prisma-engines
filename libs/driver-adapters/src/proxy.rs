@@ -9,7 +9,7 @@ use crate::{
 
 use futures::Future;
 use prisma_metrics::gauge;
-use quaint::connector::IsolationLevel;
+use quaint::connector::{AdapterProvider, IsolationLevel};
 use std::sync::atomic::{AtomicBool, Ordering};
 
 /// Proxy is a struct wrapping a javascript object that exhibits basic primitives for
@@ -36,7 +36,7 @@ pub(crate) struct AdapterFactoryProxy {
     connect_to_shadow_db: Option<AdapterMethod<(), JsQueryable>>,
 
     /// Return the provider for this driver.
-    pub(crate) provider: String,
+    pub(crate) provider: AdapterProvider,
 }
 
 /// This is a JS proxy for accessing the methods specific to top level
@@ -96,11 +96,12 @@ impl CommonProxy {
 impl AdapterFactoryProxy {
     pub fn new(object: &JsObject) -> JsResult<Self> {
         let provider: JsString = get_named_property(object, "provider")?;
+        let provider: AdapterProvider = to_rust_str(provider)?.parse().unwrap();
 
         Ok(Self {
             connect: get_named_property(object, "connect")?,
             connect_to_shadow_db: get_optional_named_property(object, "connectToShadowDb")?,
-            provider: to_rust_str(provider)?,
+            provider,
         })
     }
 
@@ -115,8 +116,8 @@ impl AdapterFactoryProxy {
         }
     }
 
-    pub fn provider(&self) -> &str {
-        &self.provider
+    pub fn provider(&self) -> AdapterProvider {
+        self.provider
     }
 }
 

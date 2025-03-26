@@ -5,7 +5,9 @@ use std::sync::{
 
 use async_trait::async_trait;
 use quaint::{
-    connector::{DescribedQuery, ExternalConnector, ExternalConnectorFactory, IsolationLevel, Transaction},
+    connector::{
+        AdapterProvider, DescribedQuery, ExternalConnector, ExternalConnectorFactory, IsolationLevel, Transaction,
+    },
     prelude::{
         ExternalConnectionInfo, Query as QuaintQuery, Queryable as QuaintQueryable, ResultSet, TransactionCapable,
     },
@@ -54,7 +56,7 @@ impl ExternalConnectorFactory for JsAdapterFactory {
         })
     }
 
-    fn provider(&self) -> &str {
+    fn provider(&self) -> AdapterProvider {
         self.inner.provider()
     }
 }
