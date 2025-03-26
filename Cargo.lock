@@ -4724,6 +4724,7 @@ dependencies = [
  "enumflags2",
  "json-rpc-api",
  "jsonrpc-core",
+ "mongodb-schema-connector",
  "psl",
  "schema-connector",
  "serde",
