@@ -911,9 +911,3 @@ writes::uniques_and_node_selectors::relation_uniques::compound_uniq_rel_field::c
 writes::uniques_and_node_selectors::relation_uniques::compound_uniq_rel_field::compound_uniq_rel_field::compound_uniq_with_1_m_multi_rel
 writes::uniques_and_node_selectors::relation_uniques::compound_uniq_rel_field::compound_uniq_rel_field::compound_uniq_with_1_m_single_rel
 writes::uniques_and_node_selectors::setting_node_selector_to_null::node_sel_to_null::where_val_to_null
-writes::ids::uuid_create_graphql::uuid_create_graphql::create_cuid_v1_and_retrieve_it_should_work
-writes::ids::uuid_create_graphql::uuid_create_graphql::create_cuid_v2_and_retrieve_it_should_work
-writes::ids::uuid_create_graphql::uuid_create_graphql::create_ulid_and_retrieve_it_should_work
-writes::ids::uuid_create_graphql::uuid_create_graphql::create_uuid_v7_and_retrieve_it_should_work
-writes::ids::nanoid::nanoid::create_nanoid_id_with_length_should_work
-writes::ids::nanoid::nanoid::create_base_nanoid_id_should_work
