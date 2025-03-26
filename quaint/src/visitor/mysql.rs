@@ -1,16 +1,17 @@
+use crate::visitor::query_writer::QueryWriter;
 use crate::{
     ast::*,
     error::{Error, ErrorKind},
     visitor::{self, Visitor},
 };
-use std::fmt::{self, Write};
+use query_template::{PlaceholderFormat, QueryTemplate};
+use std::fmt;
 
 /// A visitor to generate queries for the MySQL database.
 ///
 /// The returned parameter values can be used directly with the mysql crate.
 pub struct Mysql<'a> {
-    query: String,
-    parameters: Vec<Value<'a>>,
+    query_template: QueryTemplate<Value<'a>>,
     /// The table a deleting or updating query is acting on.
     target_table: Option<Table<'a>>,
 }
@@ -132,24 +133,27 @@ impl<'a> Visitor<'a> for Mysql<'a> {
     const C_BACKTICK_CLOSE: &'static str = "`";
     const C_WILDCARD: &'static str = "%";
 
-    fn build<Q>(query: Q) -> crate::Result<(String, Vec<Value<'a>>)>
+    fn build_template<Q>(query: Q) -> crate::Result<QueryTemplate<Value<'a>>>
     where
         Q: Into<Query<'a>>,
     {
         let query = query.into();
-        let mut mysql = Mysql {
-            query: String::with_capacity(4096),
-            parameters: Vec::with_capacity(128),
+
+        let mut this = Mysql {
+            query_template: QueryTemplate::new(PlaceholderFormat {
+                prefix: "?",
+                has_numbering: false,
+            }),
             target_table: get_target_table(&query),
         };
 
-        Mysql::visit_query(&mut mysql, query)?;
+        Mysql::visit_query(&mut this, query)?;
 
-        Ok((mysql.query, mysql.parameters))
+        Ok(this.query_template)
     }
 
-    fn write<D: fmt::Display>(&mut self, s: D) -> visitor::Result {
-        write!(&mut self.query, "{s}")?;
+    fn write(&mut self, value: impl fmt::Display) -> visitor::Result {
+        self.query_template.write_string_chunk(value.to_string());
         Ok(())
     }
 
@@ -313,12 +317,19 @@ impl<'a> Visitor<'a> for Mysql<'a> {
         }
     }
 
-    fn parameter_substitution(&mut self) -> visitor::Result {
-        self.write("?")
+    fn add_parameter(&mut self, value: Value<'a>) {
+        self.query_template.parameters.push(value);
     }
 
-    fn add_parameter(&mut self, value: Value<'a>) {
-        self.parameters.push(value);
+    fn parameter_substitution(&mut self) -> visitor::Result {
+        self.query_template.write_parameter();
+        Ok(())
+    }
+
+    fn visit_parameterized_row(&mut self, value: Value<'a>) -> visitor::Result {
+        self.query_template.write_parameter_tuple();
+        self.query_template.parameters.push(value);
+        Ok(())
     }
 
     fn visit_limit_and_offset(&mut self, limit: Option<Value<'a>>, offset: Option<Value<'a>>) -> visitor::Result {

@@ -54,12 +54,19 @@ impl<'a, V> SqlQueryBuilder<'a, V> {
     where
         V: Visitor<'a>,
     {
-        let (sql, params) = V::build(query)?;
-        let params = params
+        let template = V::build_template(query)?;
+
+        let params = template
+            .parameters
             .into_iter()
             .map(convert::quaint_value_to_prisma_value)
             .collect::<Vec<_>>();
-        Ok(DbQuery::new(sql, params))
+
+        Ok(DbQuery::TemplateSql {
+            fragments: template.fragments,
+            placeholder_format: template.placeholder_format,
+            params,
+        })
     }
 }
 
@@ -308,7 +315,7 @@ impl<'a, V: Visitor<'a>> QueryBuilder for SqlQueryBuilder<'a, V> {
         // Unwrapping query & params is safe since it's already passed the query parsing stage
         let query = inputs.remove("query").unwrap().into_string().unwrap();
         let params = inputs.remove("parameters").unwrap().into_list().unwrap();
-        Ok(DbQuery::new(query, params))
+        Ok(DbQuery::RawSql { sql: query, params })
     }
 }
 

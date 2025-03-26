@@ -930,18 +930,12 @@ pub(crate) fn default_scalar_filter(
         }
         ScalarCondition::InTemplate(ConditionValue::Value(value)) => {
             let sql_value = convert_first_value(fields, value, alias, ctx);
-            comparable.in_selection(sql_value.decorate(
-                Some("prisma-comma-repeatable-start"),
-                Some("prisma-comma-repeatable-end"),
-            ))
+            comparable.in_selection(sql_value.into_parameterized_row())
         }
         ScalarCondition::InTemplate(ConditionValue::FieldRef(_)) => todo!(),
         ScalarCondition::NotInTemplate(ConditionValue::Value(value)) => {
             let sql_value = convert_first_value(fields, value, alias, ctx);
-            comparable.not_in_selection(sql_value.decorate(
-                Some("prisma-comma-repeatable-start"),
-                Some("prisma-comma-repeatable-end"),
-            ))
+            comparable.not_in_selection(sql_value.into_parameterized_row())
         }
         ScalarCondition::NotInTemplate(ConditionValue::FieldRef(_)) => todo!(),
         ScalarCondition::Search(value, _) => {
@@ -1129,21 +1123,13 @@ fn insensitive_scalar_filter(
         ScalarCondition::InTemplate(ConditionValue::Value(value)) => {
             let comparable = Expression::from(lower(comparable));
             let sql_value = convert_first_value(fields, value, alias, ctx);
-
-            comparable.in_selection(sql_value.decorate(
-                Some("prisma-comma-repeatable-start"),
-                Some("prisma-comma-repeatable-end"),
-            ))
+            comparable.in_selection(sql_value.into_parameterized_row())
         }
         ScalarCondition::InTemplate(ConditionValue::FieldRef(_)) => todo!(),
         ScalarCondition::NotInTemplate(ConditionValue::Value(value)) => {
             let comparable = Expression::from(lower(comparable));
             let sql_value = convert_first_value(fields, value, alias, ctx);
-
-            comparable.in_selection(sql_value.decorate(
-                Some("prisma-comma-repeatable-start"),
-                Some("prisma-comma-repeatable-end"),
-            ))
+            comparable.in_selection(sql_value.into_parameterized_row())
         }
         ScalarCondition::NotInTemplate(ConditionValue::FieldRef(_)) => todo!(),
         ScalarCondition::Search(value, _) => {
