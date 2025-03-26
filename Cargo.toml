@@ -32,6 +32,7 @@ members = [
     "query-compiler/query-compiler-playground",
     "query-compiler/query-compiler-wasm",
     "query-compiler/query-engine-tests-todo",
+    "libs/query-template",
     "libs/*",
     "prisma-fmt",
     "prisma-schema-wasm",
@@ -194,6 +195,7 @@ test-macros.path = "./libs/test-macros"
 query-engine-common.path = "./libs/query-engine-common"
 driver-adapters.path = "./libs/driver-adapters"
 sql-ddl.path = "./libs/sql-ddl"
+query-template.path = "libs/query-template"
 
 psl.path = "./psl/psl"
 psl-core.path = "./psl/psl-core"
