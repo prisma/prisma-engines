@@ -27,7 +27,7 @@ impl<P> QueryTemplate<P> {
         for fragment in &self.fragments {
             match fragment {
                 Fragment::StringChunk(chunk) => sql.push_str(chunk),
-                Fragment::Parameter => self.placeholder_format.write(&mut sql, &mut placeholder_number),
+                Fragment::Parameter => self.placeholder_format.write(&mut sql, &mut placeholder_number)?,
                 Fragment::ParameterTuple => return Err(fmt::Error), // Unsupported in Query Engine
             };
         }
@@ -45,10 +45,10 @@ impl<P> fmt::Display for QueryTemplate<P> {
         for fragment in &self.fragments {
             match fragment {
                 Fragment::StringChunk(chunk) => write!(f, "{chunk}")?,
-                Fragment::Parameter => self.placeholder_format.fmt(f, &mut placeholder_number)?,
+                Fragment::Parameter => self.placeholder_format.write(f, &mut placeholder_number)?,
                 Fragment::ParameterTuple => {
                     f.write_str("[")?;
-                    self.placeholder_format.fmt(f, &mut placeholder_number)?;
+                    self.placeholder_format.write(f, &mut placeholder_number)?;
                     f.write_str("]")?;
                 }
             }

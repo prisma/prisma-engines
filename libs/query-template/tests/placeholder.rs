@@ -10,12 +10,12 @@ fn placeholder_formatting_numbered() {
         has_numbering: true,
     };
 
-    numbered.write(&mut sql, &mut n);
+    numbered.write(&mut sql, &mut n).unwrap();
     assert_eq!(sql, "$P1");
 
     sql.push(',');
 
-    numbered.write(&mut sql, &mut n);
+    numbered.write(&mut sql, &mut n).unwrap();
     assert_eq!(sql, "$P1,$P2");
 
     assert_eq!(n, 3);
@@ -31,12 +31,12 @@ fn placeholder_formatting_unnumbered() {
         has_numbering: false,
     };
 
-    unnumbered.write(&mut sql, &mut n);
+    unnumbered.write(&mut sql, &mut n).unwrap();
     assert_eq!(sql, "?");
 
     sql.push(',');
 
-    unnumbered.write(&mut sql, &mut n);
+    unnumbered.write(&mut sql, &mut n).unwrap();
     assert_eq!(sql, "?,?");
 
     assert_eq!(n, 1);

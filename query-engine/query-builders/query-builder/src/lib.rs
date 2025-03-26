@@ -183,11 +183,11 @@ impl fmt::Display for DbQuery {
                             write!(formatter, "{}", s)?;
                         }
                         Fragment::Parameter => {
-                            placeholder_format.fmt(formatter, &mut number)?;
+                            placeholder_format.write(formatter, &mut number)?;
                         }
                         Fragment::ParameterTuple => {
                             write!(formatter, "[")?;
-                            placeholder_format.fmt(formatter, &mut number)?;
+                            placeholder_format.write(formatter, &mut number)?;
                             write!(formatter, "]")?;
                         }
                     };
