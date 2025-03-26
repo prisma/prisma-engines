@@ -28,23 +28,37 @@ use psl::{
 
 /// Creates the [`SqlSchemaDialect`](SqlSchemaDialect) matching the given provider.
 pub fn dialect_for_provider(provider: &str) -> CoreResult<Box<dyn schema_connector::SchemaDialect>> {
-    let error = Err(CoreError::from_msg(format!(
-        "`{provider}` is not a supported connector."
-    )));
+    let error = || {
+        Err(CoreError::from_msg(format!(
+            "`{provider}` is not a supported connector."
+        )))
+    };
 
     if let Some(connector) = BUILTIN_CONNECTORS.iter().find(|c| c.is_provider(provider)) {
         match connector.flavour() {
-            Flavour::Cockroach => Ok(Box::new(SqlSchemaDialect::cockroach())),
-            Flavour::Postgres => Ok(Box::new(SqlSchemaDialect::postgres())),
+            #[cfg(feature = "sqlite")]
             Flavour::Sqlite => Ok(Box::new(SqlSchemaDialect::sqlite())),
 
-            // TODO: enable these in Prisma 6.7.0
-            Flavour::Mongo => error,
-            Flavour::Sqlserver => error,
-            Flavour::Mysql => error,
+            #[cfg(feature = "postgresql")]
+            Flavour::Postgres => Ok(Box::new(SqlSchemaDialect::postgres())),
+
+            #[cfg(feature = "postgresql")]
+            Flavour::Cockroach => Ok(Box::new(SqlSchemaDialect::cockroach())),
+
+            #[cfg(feature = "mongodb")]
+            Flavour::Mongo => Ok(Box::new(mongodb_schema_connector::MongoDbSchemaDialect)),
+
+            #[cfg(feature = "mssql")]
+            Flavour::Sqlserver => Ok(Box::new(SqlSchemaDialect::mssql())),
+
+            #[cfg(feature = "mysql")]
+            Flavour::Mysql => Ok(Box::new(SqlSchemaDialect::mysql())),
+
+            #[allow(unreachable_patterns)]
+            _ => error(),
         }
     } else {
-        error
+        error()
     }
 }
 

@@ -14,12 +14,15 @@ mssql = ["psl/mssql", "schema-connector/mssql", "sql-schema-connector/mssql"]
 mssql-native = ["mssql"]
 cockroachdb = ["psl/cockroachdb", "schema-connector/cockroachdb", "sql-schema-connector/cockroachdb"]
 cockroachdb-native = ["cockroachdb"]
+mongodb = ["mongodb-schema-connector"]
+mongodb-native = ["mongodb"]
 all-native = [
     "postgresql-native",
     "sqlite-native",
     "mysql-native",
     "mssql-native",
     "cockroachdb-native",
+    "mongodb-native",
     "schema-connector/all-native",
     "sql-schema-connector/all-native",
     "user-facing-errors/all-native",
@@ -29,7 +32,9 @@ all-native = [
 crosstarget-utils.workspace = true
 psl.workspace = true
 schema-connector.workspace = true
-sql-schema-connector.workspace = true # TODO: remove
+sql-schema-connector.workspace = true
+mongodb-schema-connector = { workspace = true, optional = true }
+
 user-facing-errors = { workspace = true }
 
 json-rpc = { path = "../json-rpc-api", package = "json-rpc-api" }

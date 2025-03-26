@@ -7,10 +7,12 @@
 set -euo pipefail
 
 CURRENT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
-REPO_ROOT="$( cd "$( dirname "$CURRENT_DIR/../../../" )" >/dev/null 2>&1 && pwd )"
 OUT_VERSION="${1:-"0.0.0"}"
 OUT_FOLDER="${2:-"schema-engine/schema-engine-wasm/pkg"}"
 OUT_TARGET="bundler"
+REPO_ROOT="$( cd "$( dirname "$CURRENT_DIR/../../../" )" >/dev/null 2>&1 && pwd )"
+WASM_CONNECTORS="sqlite,postgresql"
+
 # wasm-opt pass
 WASM_OPT_ARGS=(
     "-Os"                                 # execute size-focused optimization passes (-Oz actually increases size by 1KB)
@@ -63,7 +65,7 @@ build() {
     CARGO_PROFILE_RELEASE_OPT_LEVEL="s" cargo build \
         -p schema-engine-wasm \
         --profile "$WASM_BUILD_PROFILE" \
-        --features "sqlite,postgresql" \
+        --features "$WASM_CONNECTORS" \
         --target wasm32-unknown-unknown
 
     local IN_FILE="$CARGO_TARGET_DIR/wasm32-unknown-unknown/$WASM_TARGET_SUBDIR/schema_engine_wasm.wasm"
