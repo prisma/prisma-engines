@@ -161,9 +161,10 @@ async function initializeSchema(
 
     const transactionManager = new TransactionManager({
         driverAdapter: adapter,
+        // Transaction timeouts matching `TransactionManager.test.ts` in the `prisma` repo
         transactionOptions: {
-            maxWait: 30,
-            timeout: 30,
+            maxWait: 200,
+            timeout: 500,
             isolationLevel: 'SERIALIZABLE'
         } satisfies TransactionOptions,
     })
