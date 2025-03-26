@@ -154,6 +154,7 @@ async fn diff_target_to_dialect(
                     let directories =
                         schema_connector::migrations_directory::list_migrations(migration_directories.clone());
 
+                    // TODO: enable Driver Adapter for shadow database, using the AdapterFactory.
                     let schema = dialect
                         .schema_from_migrations_with_target(
                             &directories,
