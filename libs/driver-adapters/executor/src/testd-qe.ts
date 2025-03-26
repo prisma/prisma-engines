@@ -84,7 +84,7 @@ async function handleRequest(
 
       const driverAdapterManager = await setupDriverAdaptersManager(
         env,
-        migrationScript,
+        { url, migrationScript },
       )
 
       const { engine, adapter } = await initQe({
@@ -250,7 +250,7 @@ async function initQe({
     throw new Error('query compiler tests must be run using testd-qc.ts')
   }
 
-  const adapter = await driverAdapterManager.connect({ url })
+  const adapter = await driverAdapterManager.connect()
   const errorCapturingAdapter = bindAdapter(adapter)
   const engineInstance = await qe.initQueryEngine(
     env.EXTERNAL_TEST_EXECUTOR,

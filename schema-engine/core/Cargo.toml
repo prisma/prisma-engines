@@ -17,6 +17,9 @@ user-facing-errors = { workspace = true, features = [
     "quaint",
 ] }
 
+commands = { path = "../commands", package = "schema-commands", features = [
+    "all-native",
+] }
 json-rpc = { path = "../json-rpc-api", package = "json-rpc-api" }
 async-trait.workspace = true
 chrono.workspace = true

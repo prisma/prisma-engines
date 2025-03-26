@@ -25,7 +25,7 @@ pub async fn sql_schema_from_migration_history(
     connector
         .with_connection(|conn, params| {
             sql_schema_from_migrations_and_db(
-                &conn,
+                conn,
                 params,
                 schema,
                 migrations,

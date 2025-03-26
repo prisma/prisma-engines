@@ -1,9 +1,9 @@
-use crate::{json_rpc::types::*, CoreError, CoreResult};
+use crate::{CoreError, CoreResult, json_rpc::types::*};
+use crosstarget_utils::time::ElapsedTimeCounter;
 use schema_connector::{
-    migrations_directory::{error_on_changed_provider, list_migrations, MigrationDirectory},
     ConnectorError, MigrationRecord, Namespaces, PersistenceNotInitializedError, SchemaConnector,
+    migrations_directory::{MigrationDirectory, error_on_changed_provider, list_migrations},
 };
-use std::time::Instant;
 use tracing::Instrument;
 use user_facing_errors::schema_engine::FoundFailedMigrations;
 
@@ -12,7 +12,7 @@ pub async fn apply_migrations(
     connector: &mut dyn SchemaConnector,
     namespaces: Option<Namespaces>,
 ) -> CoreResult<ApplyMigrationsOutput> {
-    let start = Instant::now();
+    let start = ElapsedTimeCounter::start();
 
     error_on_changed_provider(&input.migrations_list.lockfile, connector.connector_type())?;
     let migrations_from_filesystem = list_migrations(input.migrations_list.migration_directories);
@@ -40,7 +40,7 @@ pub async fn apply_migrations(
         })
         .collect();
 
-    let analysis_duration_ms = Instant::now().duration_since(start).as_millis() as u64;
+    let analysis_duration_ms = start.elapsed_time().as_millis() as u64;
     tracing::info!(analysis_duration_ms, "Analysis run in {}ms", analysis_duration_ms,);
 
     let mut applied_migration_names: Vec<String> = Vec::with_capacity(unapplied_migrations.len());

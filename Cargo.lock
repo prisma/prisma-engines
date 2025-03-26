@@ -4724,6 +4724,30 @@ dependencies = [
 ]
 
 [[package]]
+name = "schema-commands"
+version = "0.1.0"
+dependencies = [
+ "async-trait",
+ "chrono",
+ "crosstarget-utils",
+ "enumflags2",
+ "json-rpc-api",
+ "jsonrpc-core",
+ "mongodb-schema-connector",
+ "psl",
+ "schema-connector",
+ "serde",
+ "serde_json",
+ "sql-schema-connector",
+ "tokio",
+ "tracing",
+ "tracing-futures",
+ "tracing-subscriber",
+ "url",
+ "user-facing-errors",
+]
+
+[[package]]
 name = "schema-connector"
 version = "0.1.0"
 dependencies = [
@@ -4738,6 +4762,7 @@ dependencies = [
  "tracing",
  "tracing-error",
  "user-facing-errors",
+ "wasm-bindgen",
 ]
 
 [[package]]
@@ -4752,6 +4777,7 @@ dependencies = [
  "jsonrpc-core",
  "mongodb-schema-connector",
  "psl",
+ "schema-commands",
  "schema-connector",
  "serde",
  "serde_json",
@@ -4799,10 +4825,14 @@ dependencies = [
  "build-utils",
  "driver-adapters",
  "js-sys",
+ "json-rpc-api",
  "psl",
  "quaint",
+ "schema-commands",
  "serde",
+ "sql-schema-connector",
  "tracing",
+ "tracing-futures",
  "tsify-next",
  "wasm-bindgen",
  "wasm-bindgen-futures",

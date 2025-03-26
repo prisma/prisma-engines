@@ -1,6 +1,6 @@
 use quaint::{prelude::Queryable, single::Quaint};
 use schema_core::{
-    commands::diff,
+    commands::diff_cli,
     json_rpc::types::{DiffTarget, SchemasContainer, SchemasWithConfigDir},
     schema_connector::SchemaConnector,
 };
@@ -451,7 +451,7 @@ fn from_empty_to_migrations_directory(mut api: TestApi) {
     };
 
     let host = Arc::new(TestConnectorHost::default());
-    tok(diff(params, host.clone())).unwrap();
+    tok(diff_cli(params, host.clone())).unwrap();
 
     let expected_printed_messages = expect![[r#"
         [

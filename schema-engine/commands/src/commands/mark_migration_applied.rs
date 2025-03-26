@@ -1,7 +1,7 @@
-use crate::{json_rpc::types::*, CoreError, CoreResult};
+use crate::{CoreError, CoreResult, json_rpc::types::*};
 use schema_connector::{
-    migrations_directory::{error_on_changed_provider, MigrationDirectory},
     SchemaConnector,
+    migrations_directory::{MigrationDirectory, error_on_changed_provider},
 };
 use user_facing_errors::schema_engine::{MigrationAlreadyApplied, MigrationToMarkAppliedNotFound};
 

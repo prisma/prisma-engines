@@ -1,6 +1,7 @@
 //! The SQL migration connector.
 
 #![deny(rust_2018_idioms, unsafe_code, missing_docs)]
+#![cfg_attr(target_arch = "wasm32", allow(dead_code))]
 
 mod apply_migration;
 mod database_schema;
@@ -181,6 +182,21 @@ pub struct SqlSchemaConnector {
 }
 
 impl SqlSchemaConnector {
+    /// Initialise an external migration connector.
+    pub async fn new_from_external(adapter: Arc<dyn quaint::connector::ExternalConnector>) -> ConnectorResult<Self> {
+        // TODO: store `adapter.adapter_name` in an `Option<String>` field on the connector.
+        // Use that to intercept calls to d1 (`@prisma/adapter-d1`, `@prisma/adapter-d1-http`),
+        // and change the behaviour of problematic methods, like `version()`.
+        match adapter.provider() {
+            #[cfg(all(feature = "postgresql", not(feature = "postgresql-native")))]
+            quaint::connector::AdapterProvider::Postgres => Self::new_postgres_external(adapter).await,
+            #[cfg(all(feature = "sqlite", not(feature = "sqlite-native")))]
+            quaint::connector::AdapterProvider::Sqlite => Ok(Self::new_sqlite_external(adapter).await),
+            #[allow(unreachable_patterns)]
+            _ => panic!("Unsupported adapter provider: {:?}", adapter.provider()),
+        }
+    }
+
     /// Initialize an external PostgreSQL migration connector.
     #[cfg(all(feature = "postgresql", not(feature = "postgresql-native")))]
     pub async fn new_postgres_external(
@@ -194,7 +210,7 @@ impl SqlSchemaConnector {
 
     /// Initialize an external SQLite migration connector.
     #[cfg(all(feature = "sqlite", not(feature = "sqlite-native")))]
-    pub fn new_sqlite_external(adapter: Arc<dyn quaint::connector::ExternalConnector>) -> Self {
+    pub async fn new_sqlite_external(adapter: Arc<dyn quaint::connector::ExternalConnector>) -> Self {
         SqlSchemaConnector {
             inner: Box::new(flavour::SqliteConnector::new_external(adapter)),
             host: Arc::new(EmptyHost),
@@ -436,6 +452,7 @@ impl SchemaConnector for SqlSchemaConnector {
             let namespaces = Namespaces::from_vec(&mut namespace_names);
             let sql_schema = self.inner.introspect(namespaces, ctx).await?;
             let search_path = self.inner.search_path();
+
             let datamodel = introspection::datamodel_calculator::calculate(&sql_schema, ctx, search_path);
 
             Ok(datamodel)

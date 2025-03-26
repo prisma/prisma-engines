@@ -150,7 +150,7 @@ async function initializeSchema(
 
     const driverAdapterManager = await setupDriverAdaptersManager(
         env,
-        migrationScript,
+        { url, migrationScript },
     )
 
     const {compiler, adapter} = await initQueryCompiler({
@@ -185,10 +185,9 @@ type InitQueryCompilerParams = {
 
 async function initQueryCompiler({
                                      driverAdapterManager,
-                                     url,
                                      schema,
                                  }: InitQueryCompilerParams) {
-    const adapter = await driverAdapterManager.connect({url})
+    const adapter = await driverAdapterManager.connect()
 
     let connectionInfo: ConnectionInfo = {}
     if (adapter.getConnectionInfo) {

@@ -1,12 +1,12 @@
 import path from 'node:path'
 import * as S from '@effect/schema/Schema'
 import { PrismaD1 } from '@prisma/adapter-d1'
-import { SqlDriverAdapter } from '@prisma/driver-adapter-utils'
+import type { SqlDriverAdapter, SqlMigrationAwareDriverAdapterFactory } from '@prisma/driver-adapter-utils'
 import { getPlatformProxy } from 'wrangler'
 import type { D1Database, D1Result } from '@cloudflare/workers-types'
 
 import { __dirname, runBatch } from '../utils'
-import type { ConnectParams, DriverAdaptersManager } from './index'
+import type { DriverAdaptersManager, SetupDriverAdaptersInput } from './index'
 import type { DriverAdapterTag, EnvForAdapter } from '../types'
 import { D1Tables } from '../types/d1'
 
@@ -14,8 +14,8 @@ const TAG = 'd1' as const satisfies DriverAdapterTag
 type TAG = typeof TAG
 
 export class D1Manager implements DriverAdaptersManager {
-  #driver: D1Database
   #dispose: () => Promise<void>
+  #factory: SqlMigrationAwareDriverAdapterFactory
   #adapter?: SqlDriverAdapter
 
   private constructor(
@@ -23,11 +23,11 @@ export class D1Manager implements DriverAdaptersManager {
     driver: D1Database,
     dispose: () => Promise<void>,
   ) {
-    this.#driver = driver
+    this.#factory = new PrismaD1(driver)
     this.#dispose = dispose
   }
 
-  static async setup(env: EnvForAdapter<TAG>, migrationScript?: string) {
+  static async setup(env: EnvForAdapter<TAG>, { migrationScript }: SetupDriverAdaptersInput) {
     const { env: cfBindings, dispose } = await getPlatformProxy<{
       D1_DATABASE: D1Database
     }>({
@@ -49,9 +49,12 @@ export class D1Manager implements DriverAdaptersManager {
     return new D1Manager(env, D1_DATABASE, dispose)
   }
 
-  async connect({}: ConnectParams) {
-    const factory = new PrismaD1(this.#driver)
-    this.#adapter = await factory.connect()
+  factory() {
+    return this.#factory
+  }
+
+  async connect() {
+    this.#adapter = await this.#factory.connect()
     return this.#adapter
   }
 
@@ -79,7 +82,10 @@ async function migrateReset(D1_DATABASE: D1Database) {
     rawTables,
   ).filter(
     (item) =>
-      !['_cf_KV', 'sqlite_schema', 'sqlite_sequence'].includes(item.name),
+      !(['sqlite_schema', 'sqlite_sequence'].includes(item.name)
+      // excludes `_cf_KV`, `_cf_METADATA`, etc.
+      // Related to https://github.com/drizzle-team/drizzle-orm/issues/3728#issuecomment-2740994190.
+      || /^(_cf_[A-Z]+).*$/.test(item.name)),
   )
 
   // This may sometimes fail with `D1_ERROR: no such table: sqlite_sequence`,
@@ -89,7 +95,7 @@ async function migrateReset(D1_DATABASE: D1Database) {
   // whenever a normal table that contains an AUTOINCREMENT column is created".
   try {
     await D1_DATABASE.prepare(`DELETE FROM "sqlite_sequence";`).run()
-  } catch (_) {
+  } catch (e) {
     // Ignore the error, as the table may not exist.
     console.warn(
       'Failed to reset sqlite_sequence table, but continuing with the reset.',

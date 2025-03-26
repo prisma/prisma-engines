@@ -5,7 +5,9 @@ use std::sync::{
 
 use async_trait::async_trait;
 use quaint::{
-    connector::{DescribedQuery, ExternalConnector, ExternalConnectorFactory, IsolationLevel, Transaction},
+    connector::{
+        AdapterProvider, DescribedQuery, ExternalConnector, ExternalConnectorFactory, IsolationLevel, Transaction,
+    },
     prelude::{
         ExternalConnectionInfo, Query as QuaintQuery, Queryable as QuaintQueryable, ResultSet, TransactionCapable,
     },
@@ -35,6 +37,11 @@ impl JsAdapterFactory {
     }
 }
 
+pub fn adapter_factory_from_js(driver: JsObject) -> JsAdapterFactory {
+    let adapter_factory_proxy = AdapterFactoryProxy::new(&driver).unwrap();
+    JsAdapterFactory::new(adapter_factory_proxy)
+}
+
 #[async_trait]
 impl ExternalConnectorFactory for JsAdapterFactory {
     async fn connect(&self) -> quaint::Result<Arc<dyn ExternalConnector>> {
@@ -47,6 +54,10 @@ impl ExternalConnectorFactory for JsAdapterFactory {
         self.connect_to_shadow_db().await.map(|result| {
             result.map(|queryable| Arc::new(JsQueryableDropGuard::new(queryable)) as Arc<dyn ExternalConnector>)
         })
+    }
+
+    fn provider(&self) -> AdapterProvider {
+        self.inner.provider()
     }
 }
 
@@ -77,6 +88,10 @@ impl Drop for JsQueryableDropGuard {
 
 #[async_trait]
 impl ExternalConnector for JsQueryableDropGuard {
+    fn provider(&self) -> quaint::connector::AdapterProvider {
+        self.inner.provider()
+    }
+
     async fn execute_script(&self, script: &str) -> quaint::Result<()> {
         self.inner.execute_script(script).await
     }

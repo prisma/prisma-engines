@@ -1,3 +1,5 @@
+#![cfg_attr(target_arch = "wasm32", allow(unused_imports))]
+
 #[cfg(feature = "postgresql-native")]
 mod native;
 #[cfg(feature = "postgresql-native")]
