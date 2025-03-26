@@ -81,7 +81,7 @@ integrate-qe-wasm:
 
 build-se-wasm:
 	cd schema-engine/schema-engine-wasm && \
-	./build.sh $(QE_WASM_VERSION) schema-engine/schema-engine-wasm/pkg
+	./build.sh $(SCHEMA_ENGINE_WASM_VERSION) schema-engine/schema-engine-wasm/pkg
 
 build-qc-wasm:
 	cd query-compiler/query-compiler-wasm && \
