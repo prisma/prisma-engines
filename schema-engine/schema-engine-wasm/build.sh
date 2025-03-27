@@ -76,7 +76,7 @@ build() {
 
     echo "ℹ️  Updating TypeScript definitions for \`schema_engine_bg.wasm\`"
     cp "$OUT_FOLDER/schema_engine.d.ts" "$OUT_FOLDER/schema_engine_bg.d.ts"
-    echo "\nexport const __wbindgen_start: () => void;" >> "$OUT_FOLDER/schema_engine_bg.d.ts"
+    printf "\nexport const __wbindgen_start: () => void;" >> "$OUT_FOLDER/schema_engine_bg.d.ts"
 
     if ! command -v wasm2wat &> /dev/null; then
         echo "Skipping wasm2wat, as it is not installed."
