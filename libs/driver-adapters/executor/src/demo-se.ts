@@ -4,7 +4,7 @@ import process from 'node:process'
 
 import type { DriverAdaptersManager } from './driver-adapters-manager'
 import { Env } from './types'
-import * as se from './schema-engine-wasm-nodejs'
+import * as se from './schema-engine-wasm-module'
 import { setupDriverAdaptersManager } from './setup'
 import { getWasmError, isWasmPanic, WasmPanicRegistry } from './wasm-panic-registry'
 

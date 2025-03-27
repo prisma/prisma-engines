@@ -42,6 +42,8 @@ See [`./build.sh`](./build.sh) for more details.
 Using Node.js 20.9.0:
 
 ```bash
-❯ node -e "const { version } = await import('@prisma/schema-engine-wasm'); console.log(version())" 
-be55204b41e1041f71e247fe0af67399bd34653d
+❯ node --experimental-wasm-modules -e "const { version } = await import('@prisma/schema-engine-wasm'); console.log(version())" 
+(node:4977) ExperimentalWarning: Importing WebAssembly modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+4411ab2a4b97a8109bf19c2678742abde9ed60a4
 ```

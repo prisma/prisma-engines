@@ -2,4 +2,3 @@ node_modules
 pnpm-debug.log
 dist/
 ./db.sqlite
-.wrangler/

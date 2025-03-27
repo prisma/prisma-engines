@@ -1,6 +1,7 @@
 {
   "name": "@prisma/schema-engine-wasm",
   "version": "0.0.0",
+  "type": "module",
   "description": "WebAssembly bindings for the Prisma Schema Engine, which handles migrations and introspections",
   "repository": {
     "type": "git",
@@ -17,6 +18,11 @@
       "import": "./schema_engine.js",
       "require": "./schema_engine.js",
       "types": "./schema_engine.d.ts"
+    },
+    "./schema_engine_bg": {
+      "import": "./schema_engine_bg.js",
+      "require": "./schema_engine_bg.js",
+      "types": "./schema_engine_bg.d.ts"
     }
   },
   "types": "./schema_engine.d.ts"
