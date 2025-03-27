@@ -13,17 +13,16 @@ pub enum AdapterD1 {
 
 #[cfg_attr(target_arch = "wasm32", derive(serde::Deserialize))]
 #[derive(Debug, Eq, PartialEq, Copy, Clone)]
+/// The name of the adapter.
+/// We only want to keep track of first-class adapters maintained by Prisma, and among those,
+/// only the ones whose queries require special handling compared to the ones generated via `quaint`.
 pub enum AdapterName {
     D1(AdapterD1),
-    LibSQL,
-    NeonWS,
-    Pg,
-    PlanetScale,
     Unknown,
 }
 
 impl FromStr for AdapterName {
-    type Err = String;
+    type Err = ();
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         // strip `@prisma/adapter-` prefix from the string
@@ -31,11 +30,7 @@ impl FromStr for AdapterName {
             match name {
                 "d1" => Ok(Self::D1(AdapterD1::Env)),
                 "d1-http" => Ok(Self::D1(AdapterD1::HTTP)),
-                "libsql" => Ok(Self::LibSQL),
-                "neon-ws" => Ok(Self::NeonWS),
-                "pg" => Ok(Self::Pg),
-                "planetscale" => Ok(Self::PlanetScale),
-                _ => Err(format!("Unrecognised Prisma Driver Adapter name: {:?}", name)),
+                _ => Ok(Self::Unknown),
             }
         } else {
             Ok(Self::Unknown)
