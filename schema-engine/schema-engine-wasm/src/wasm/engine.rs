@@ -107,9 +107,9 @@ impl SchemaEngine {
         // as a connection string or a list of PSL schemas.
         // This is incompatible with Driver Adapters.
         _params: Option<GetDatabaseVersionInput>,
-    ) -> Result<Option<String>, JsValue> {
+    ) -> Result<String, JsValue> {
         let version = self.connector.version().await?;
-        Ok(Some(version))
+        Ok(version)
     }
 
     /// Apply all the unapplied migrations from the migrations folder.
