@@ -8,7 +8,8 @@ import type { State } from './worker'
 import { debug } from '../utils'
 import {
   QueryInterpreter,
-  TransactionManager,
+  type QueryInterpreterTransactionManager,
+  type TransactionManager,
 } from '@prisma/client-engine-runtime'
 import { QueryCompiler } from '../query-compiler'
 import { parseIsolationLevel } from './worker-transaction'
@@ -87,11 +88,12 @@ class QueryPipeline {
 
     debug('🟢 Query plan: ', util.inspect(queryPlan, false, null, true))
 
-    const transactionManager = this.transactionManager
+    const qiTransactionManager = (
+      allowTransaction ? { enabled: true, manager: this.transactionManager } : { enabled: false }
+    ) satisfies QueryInterpreterTransactionManager
 
     const interpreter = new QueryInterpreter({
-      transactionManager,
-      allowTransaction: allowTransaction,
+      transactionManager: qiTransactionManager,
       placeholderValues: {},
       onQuery: (event) => {
         this.logs.push(JSON.stringify(event))
