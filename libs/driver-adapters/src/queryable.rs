@@ -36,8 +36,8 @@ pub(crate) struct JsBaseQueryable {
 
 impl JsBaseQueryable {
     pub(crate) fn new(proxy: CommonProxy) -> Self {
-        let provider: AdapterProvider = proxy.provider;
-        let adapter_name = proxy.adapter_name.clone();
+        let provider = proxy.provider;
+        let adapter_name = proxy.adapter_name;
         let db_system_name = provider.db_system_name();
         Self {
             proxy,
