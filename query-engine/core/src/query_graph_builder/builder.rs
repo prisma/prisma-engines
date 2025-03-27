@@ -31,6 +31,7 @@ static PRISMA_DOT_PATH: LazyLock<Option<String>> = LazyLock::new(|| {
 
 pub struct QueryGraphBuilder<'a> {
     query_schema: &'a QuerySchema,
+    eager_default_evaluation: bool,
 }
 
 impl fmt::Debug for QueryGraphBuilder<'_> {
@@ -41,7 +42,17 @@ impl fmt::Debug for QueryGraphBuilder<'_> {
 
 impl<'a> QueryGraphBuilder<'a> {
     pub fn new(query_schema: &'a QuerySchema) -> Self {
-        Self { query_schema }
+        Self {
+            query_schema,
+            eager_default_evaluation: true,
+        }
+    }
+
+    /// Disables eager evaluation of default values of columns. Instead of passing through
+    /// evaluated defaults, they are passed through as reified generator calls.
+    pub fn without_eager_default_evaluation(mut self) -> Self {
+        self.eager_default_evaluation = false;
+        self
     }
 
     /// Maps an operation to a query.
@@ -64,13 +75,12 @@ impl<'a> QueryGraphBuilder<'a> {
         root_object_fields: &dyn Fn(&str) -> Option<OutputField<'a>>,
     ) -> QueryGraphBuilderResult<(QueryGraph, IrSerializer<'a>)> {
         let mut selections = vec![selection];
-        let mut parsed_object = QueryDocumentParser::new(crate::executor::get_request_now()).parse(
-            &selections,
-            None,
-            &root_object,
-            root_object_fields,
-            self.query_schema,
-        )?;
+        let parser = if self.eager_default_evaluation {
+            QueryDocumentParser::with_eager_default_evaluation()
+        } else {
+            QueryDocumentParser::without_eager_default_evaluation()
+        };
+        let mut parsed_object = parser.parse(&selections, None, &root_object, root_object_fields, self.query_schema)?;
 
         // Because we're processing root objects, there can only be one query / mutation.
         let field_pair = parsed_object.fields.pop().unwrap();

@@ -9,16 +9,25 @@ use std::{borrow::Cow, convert::TryFrom, rc::Rc, str::FromStr};
 use user_facing_errors::query_engine::validation::ValidationError;
 use uuid::Uuid;
 
-pub(crate) struct QueryDocumentParser {
-    /// NOW() default value that's reused for all NOW() defaults on a single query
-    default_now: PrismaValue,
+pub(crate) enum QueryDocumentParser {
+    WithEagerDefaultEvaluation {
+        /// NOW() default value that's reused for all NOW() defaults on a single query
+        default_now: PrismaValue,
+    },
+    WithoutEagerDefaultEvaluation,
 }
 
 type ResolveField<'a, 'b> = &'b dyn Fn(&str) -> Option<OutputField<'a>>;
 
 impl QueryDocumentParser {
-    pub(crate) fn new(default_now: PrismaValue) -> Self {
-        QueryDocumentParser { default_now }
+    pub(crate) fn with_eager_default_evaluation() -> Self {
+        QueryDocumentParser::WithEagerDefaultEvaluation {
+            default_now: crate::executor::get_request_now(),
+        }
+    }
+
+    pub(crate) fn without_eager_default_evaluation() -> Self {
+        QueryDocumentParser::WithoutEagerDefaultEvaluation
     }
 
     // Public entry point to parsing the query document (as denoted by `selections`) against the `schema_object`.
@@ -233,8 +242,11 @@ impl QueryDocumentParser {
         query_schema: &'a QuerySchema,
     ) -> QueryParserResult<ParsedInputValue<'a>> {
         // TODO: make query parsing aware of whether we are using the query compiler,
-        // and disallow placeholders in the query document if we are not.
+        // and disallow placeholders and generator calls in the query document if we are not.
         if let ArgumentValue::Scalar(pv @ PrismaValue::Placeholder { .. }) = &value {
+            return Ok(ParsedInputValue::Single(pv.clone()));
+        }
+        if let ArgumentValue::Scalar(pv @ PrismaValue::GeneratorCall { .. }) = &value {
             return Ok(ParsedInputValue::Single(pv.clone()));
         }
 
@@ -682,11 +694,16 @@ impl QueryDocumentParser {
                 // If it's not optional and has no default, a required field has not been provided.
                 match &field.default_value {
                     Some(default_value) => {
-                        let default_pv = match &default_value {
-                            DefaultKind::Expression(ref expr) if matches!(expr.generator(), ValueGeneratorFn::Now) => {
-                                self.default_now.clone()
-                            }
-                            _ => default_value.get()?,
+                        let default_pv = match self {
+                            Self::WithEagerDefaultEvaluation { default_now } => match default_value {
+                                DefaultKind::Expression(ref expr)
+                                    if matches!(expr.generator(), ValueGeneratorFn::Now) =>
+                                {
+                                    default_now.clone()
+                                }
+                                _ => default_value.get_evaluated()?,
+                            },
+                            Self::WithoutEagerDefaultEvaluation => default_value.get()?,
                         };
 
                         match self.parse_input_value(
@@ -917,6 +934,7 @@ pub(crate) mod conversions {
             PrismaValue::BigInt(_) => "BigInt".to_string(),
             PrismaValue::Bytes(_) => "Bytes".to_string(),
             PrismaValue::Placeholder { r#type, .. } => r#type.to_string(),
+            PrismaValue::GeneratorCall { return_type, .. } => return_type.to_string(),
         }
     }
 

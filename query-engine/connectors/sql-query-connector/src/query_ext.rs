@@ -1,11 +1,11 @@
 use crate::ser_raw::SerializedResultSet;
 use crate::{error::*, SqlRow, ToSqlRow};
 use async_trait::async_trait;
-use chrono::Utc;
 use futures::future::FutureExt;
 use itertools::Itertools;
 use quaint::{ast::*, connector::Queryable};
 use query_structure::*;
+use sql_query_builder::value::{GeneratorCall, Placeholder};
 use sql_query_builder::{column_metadata, AsColumns, AsTable, ColumnMetadata, Context, FilterBuilder, SqlTraceComment};
 use std::{collections::HashMap, panic::AssertUnwindSafe};
 use tracing::info_span;
@@ -44,7 +44,10 @@ impl<Q: Queryable + ?Sized> QueryExt for Q {
         // Unwrapping query & params is safe since it's already passed the query parsing stage
         let query = inputs.remove("query").unwrap().into_string().unwrap();
         let params = inputs.remove("parameters").unwrap().into_list().unwrap();
-        let params = params.into_iter().map(convert_lossy).collect_vec();
+        let params = params
+            .into_iter()
+            .map(convert_prisma_value_to_quaint_lossy)
+            .collect_vec();
         let result_set = AssertUnwindSafe(self.query_raw_typed(&query, &params))
             .catch_unwind()
             .await??;
@@ -61,7 +64,10 @@ impl<Q: Queryable + ?Sized> QueryExt for Q {
         // Unwrapping query & params is safe since it's already passed the query parsing stage
         let query = inputs.remove("query").unwrap().into_string().unwrap();
         let params = inputs.remove("parameters").unwrap().into_list().unwrap();
-        let params = params.into_iter().map(convert_lossy).collect_vec();
+        let params = params
+            .into_iter()
+            .map(convert_prisma_value_to_quaint_lossy)
+            .collect_vec();
         let changes = AssertUnwindSafe(self.execute_raw_typed(&query, &params))
             .catch_unwind()
             .await??;
@@ -196,37 +202,47 @@ pub(crate) trait QueryExt {
 
 /// Attempts to convert a PrismaValue to a database value without any additional type information.
 /// Can't reliably map Null values.
-fn convert_lossy<'a>(pv: PrismaValue) -> Value<'a> {
+pub fn convert_prisma_value_to_quaint_lossy<'a>(pv: PrismaValue) -> Value<'a> {
     match pv {
         PrismaValue::String(s) => s.into(),
         PrismaValue::Float(f) => f.into(),
         PrismaValue::Boolean(b) => b.into(),
-        PrismaValue::DateTime(d) => d.with_timezone(&Utc).into(),
+        PrismaValue::DateTime(d) => d.with_timezone(&chrono::Utc).into(),
         PrismaValue::Enum(e) => e.into(),
         PrismaValue::Int(i) => i.into(),
         PrismaValue::BigInt(i) => i.into(),
         PrismaValue::Uuid(u) => u.to_string().into(),
-        PrismaValue::List(l) => Value::array(l.into_iter().map(convert_lossy)),
+        PrismaValue::List(l) => Value::array(l.into_iter().map(convert_prisma_value_to_quaint_lossy)),
         PrismaValue::Json(s) => Value::json(serde_json::from_str(&s).unwrap()),
         PrismaValue::Bytes(b) => Value::bytes(b),
         PrismaValue::Null => Value::null_int32(), // Can't tell which type the null is supposed to be.
         PrismaValue::Object(_) => unimplemented!(),
-        PrismaValue::Placeholder { name, r#type } => Value::var(name, convert_placeholder_type_to_var_type(&r#type)),
+        PrismaValue::Placeholder { name, r#type } => {
+            Value::opaque(Placeholder::new(name), convert_prisma_type_to_opaque_type(&r#type))
+        }
+        PrismaValue::GeneratorCall {
+            name,
+            args,
+            return_type,
+        } => Value::opaque(
+            GeneratorCall::new(name, args),
+            convert_prisma_type_to_opaque_type(&return_type),
+        ),
     }
 }
 
-fn convert_placeholder_type_to_var_type(pt: &PlaceholderType) -> VarType {
+pub fn convert_prisma_type_to_opaque_type(pt: &PrismaValueType) -> OpaqueType {
     match pt {
-        PlaceholderType::Any => VarType::Unknown,
-        PlaceholderType::String => VarType::Text,
-        PlaceholderType::Int => VarType::Int32,
-        PlaceholderType::BigInt => VarType::Int64,
-        PlaceholderType::Float => VarType::Numeric,
-        PlaceholderType::Boolean => VarType::Boolean,
-        PlaceholderType::Decimal => VarType::Numeric,
-        PlaceholderType::Date => VarType::DateTime,
-        PlaceholderType::Array(t) => VarType::Array(Box::new(convert_placeholder_type_to_var_type(t))),
-        PlaceholderType::Object => VarType::Json,
-        PlaceholderType::Bytes => VarType::Bytes,
+        PrismaValueType::Any => OpaqueType::Unknown,
+        PrismaValueType::String => OpaqueType::Text,
+        PrismaValueType::Int => OpaqueType::Int32,
+        PrismaValueType::BigInt => OpaqueType::Int64,
+        PrismaValueType::Float => OpaqueType::Numeric,
+        PrismaValueType::Boolean => OpaqueType::Boolean,
+        PrismaValueType::Decimal => OpaqueType::Numeric,
+        PrismaValueType::Date => OpaqueType::DateTime,
+        PrismaValueType::Array(t) => OpaqueType::Array(Box::new(convert_prisma_type_to_opaque_type(t))),
+        PrismaValueType::Object => OpaqueType::Json,
+        PrismaValueType::Bytes => OpaqueType::Bytes,
     }
 }

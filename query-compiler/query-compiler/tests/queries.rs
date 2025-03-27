@@ -36,7 +36,10 @@ fn queries() {
             panic!("expected single query");
         };
 
-        let (graph, _serializer) = QueryGraphBuilder::new(&query_schema).build(query).unwrap();
+        let (graph, _serializer) = QueryGraphBuilder::new(&query_schema)
+            .without_eager_default_evaluation()
+            .build(query)
+            .unwrap();
 
         let ctx = Context::new(&connection_info, None);
         let builder = SqlQueryBuilder::<Postgres<'_>>::new(ctx);

@@ -308,8 +308,8 @@ impl ToSql for Value<'_> {
                 })
                 .map(|dt| ToSqlOutput::from(dt.and_utc().timestamp_millis())),
 
-            ValueType::Var(name, _) => Err(RusqlError::ToSqlConversionFailure(Box::new(
-                Error::builder(ErrorKind::RanQueryWithVarParam(name.clone().into_owned())).build(),
+            ValueType::Opaque(opaque) => Err(RusqlError::ToSqlConversionFailure(Box::new(
+                Error::builder(ErrorKind::RanQueryWithOpaqueParam(opaque.to_string())).build(),
             )))?,
         };
 

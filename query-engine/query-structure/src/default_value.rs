@@ -1,4 +1,4 @@
-use prisma_value::PrismaValue;
+use prisma_value::{PrismaValue, PrismaValueType};
 use std::fmt;
 
 /// Represents a default specified on a field.
@@ -69,13 +69,26 @@ impl DefaultKind {
         }
     }
 
-    /// Returns either a copy of the contained single value or produces a new
-    /// value as defined by the expression.
-    #[cfg(feature = "default_generators")]
+    /// Returns either a copy of the contained single value or a non-evaluated generator call.
     pub fn get(&self) -> Option<PrismaValue> {
         match self {
             DefaultKind::Single(ref v) => Some(v.clone()),
-            DefaultKind::Expression(ref g) => g.generate(),
+            DefaultKind::Expression(g) if g.is_dbgenerated() || g.is_autoincrement() => None,
+            DefaultKind::Expression(g) => Some(PrismaValue::GeneratorCall {
+                name: g.name.clone(),
+                args: g.args.clone(),
+                return_type: g.return_type().unwrap_or(PrismaValueType::Any),
+            }),
+        }
+    }
+
+    /// Returns either a copy of the contained single value or produces a new
+    /// value as defined by the expression.
+    #[cfg(feature = "default_generators")]
+    pub fn get_evaluated(&self) -> Option<PrismaValue> {
+        match self {
+            DefaultKind::Single(ref v) => Some(v.clone()),
+            DefaultKind::Expression(g) => g.generate(),
         }
     }
 }
@@ -246,6 +259,10 @@ impl ValueGenerator {
     pub fn is_autoincrement(&self) -> bool {
         self.name == "autoincrement" || self.name == "sequence"
     }
+
+    pub fn return_type(&self) -> Option<PrismaValueType> {
+        self.generator.return_type()
+    }
 }
 
 #[derive(Clone, Copy, PartialEq)]
@@ -293,9 +310,7 @@ impl ValueGeneratorFn {
             Self::Ulid => Some(Self::generate_ulid()),
             Self::Nanoid(length) => Some(Self::generate_nanoid(length)),
             Self::Now => Some(Self::generate_now()),
-            Self::Autoincrement => None,
-            Self::DbGenerated => None,
-            Self::Auto => None,
+            Self::Autoincrement | Self::DbGenerated | Self::Auto => None,
         }
     }
 
@@ -335,6 +350,17 @@ impl ValueGeneratorFn {
     #[cfg(feature = "default_generators")]
     fn generate_now() -> PrismaValue {
         PrismaValue::DateTime(chrono::Utc::now().into())
+    }
+
+    pub fn return_type(&self) -> Option<PrismaValueType> {
+        match self {
+            ValueGeneratorFn::Uuid(_)
+            | ValueGeneratorFn::Cuid(_)
+            | ValueGeneratorFn::Ulid
+            | ValueGeneratorFn::Nanoid(_) => Some(PrismaValueType::String),
+            ValueGeneratorFn::Now => Some(PrismaValueType::Date),
+            _ => None,
+        }
     }
 }
 

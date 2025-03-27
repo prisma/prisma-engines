@@ -6,7 +6,9 @@ use bigdecimal::{BigDecimal, FromPrimitive, ToPrimitive};
 use chrono::{DateTime, NaiveDate, NaiveTime, Utc};
 
 use serde_json::{Number, Value as JsonValue};
+use std::any::Any;
 use std::fmt::Display;
+use std::sync::Arc;
 use std::{
     borrow::{Borrow, Cow},
     convert::TryFrom,
@@ -226,9 +228,9 @@ impl<'a> Value<'a> {
         ValueType::xml(value).into_value()
     }
 
-    /// Creates a new variable.
-    pub fn var(name: impl Into<Cow<'a, str>>, ty: VarType) -> Self {
-        ValueType::var(name, ty).into_value()
+    /// Creates a new opaque value.
+    pub fn opaque<V: Opaque>(opaque: V, ty: OpaqueType) -> Self {
+        ValueType::opaque(opaque, ty).into_value()
     }
 
     /// `true` if the `Value` is null.
@@ -559,12 +561,74 @@ pub enum ValueType<'a> {
     Date(Option<NaiveDate>),
     /// A time value.
     Time(Option<NaiveTime>),
-    /// A variable that doesn't have a value assigned yet.
-    Var(Cow<'a, str>, VarType),
+    /// An opaque value.
+    Opaque(OpaqueValue),
+}
+
+/// An opaque value. It can be used to pass query parameters that are not directly representable
+/// by quaint values.
+#[derive(Debug, Clone)]
+pub struct OpaqueValue {
+    value: Arc<dyn Opaque>,
+    typ: OpaqueType,
+}
+
+impl OpaqueValue {
+    /// Creates a new opaque value.
+    pub fn new<V: Opaque>(value: V, typ: OpaqueType) -> Self {
+        Self {
+            value: Arc::new(value),
+            typ,
+        }
+    }
+
+    /// Returns the type of the opaque value.
+    pub fn typ(&self) -> &OpaqueType {
+        &self.typ
+    }
+
+    /// Attempts to downcast the opaque value to a reference of type `T`.
+    pub fn downcast_ref<T: Opaque>(&self) -> Option<&T> {
+        self.value.as_any().downcast_ref()
+    }
+}
+
+impl PartialEq for OpaqueValue {
+    fn eq(&self, other: &OpaqueValue) -> bool {
+        self.value.opaque_eq(other.value.as_ref())
+    }
+}
+
+impl fmt::Display for OpaqueValue {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{} as {}", self.value, self.typ)
+    }
+}
+
+/// A trait for opaque values, it is implemented automatically for any types that implement
+/// [`Any`], [`Send`], [`Sync`], [`fmt::Debug`], and [`fmt::Display`].
+pub trait Opaque: Any + Send + Sync + fmt::Debug + fmt::Display {
+    /// Produces a reference typed as `dyn Any`.
+    fn as_any(&self) -> &dyn Any;
+    /// Compares two opaque values for equality.
+    fn opaque_eq(&self, other: &dyn Opaque) -> bool;
+}
+
+impl<T> Opaque for T
+where
+    T: Any + PartialEq + Send + Sync + fmt::Debug + fmt::Display,
+{
+    fn as_any(&self) -> &dyn Any {
+        self
+    }
+
+    fn opaque_eq(&self, other: &dyn Opaque) -> bool {
+        other.as_any().downcast_ref().is_some_and(|a| self.eq(a))
+    }
 }
 
 #[derive(Debug, Clone, PartialEq)]
-pub enum VarType {
+pub enum OpaqueType {
     Unknown,
     Int32,
     Int64,
@@ -575,7 +639,7 @@ pub enum VarType {
     Bytes,
     Boolean,
     Char,
-    Array(Box<VarType>),
+    Array(Box<OpaqueType>),
     Numeric,
     Json,
     Xml,
@@ -585,31 +649,31 @@ pub enum VarType {
     Time,
 }
 
-impl fmt::Display for VarType {
+impl fmt::Display for OpaqueType {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            VarType::Unknown => write!(f, "Unknown"),
-            VarType::Int32 => write!(f, "Int32"),
-            VarType::Int64 => write!(f, "Int64"),
-            VarType::Float => write!(f, "Float"),
-            VarType::Double => write!(f, "Double"),
-            VarType::Text => write!(f, "Text"),
-            VarType::Enum => write!(f, "Enum"),
-            VarType::Bytes => write!(f, "Bytes"),
-            VarType::Boolean => write!(f, "Boolean"),
-            VarType::Char => write!(f, "Char"),
-            VarType::Array(t) => {
+            OpaqueType::Unknown => write!(f, "Unknown"),
+            OpaqueType::Int32 => write!(f, "Int32"),
+            OpaqueType::Int64 => write!(f, "Int64"),
+            OpaqueType::Float => write!(f, "Float"),
+            OpaqueType::Double => write!(f, "Double"),
+            OpaqueType::Text => write!(f, "Text"),
+            OpaqueType::Enum => write!(f, "Enum"),
+            OpaqueType::Bytes => write!(f, "Bytes"),
+            OpaqueType::Boolean => write!(f, "Boolean"),
+            OpaqueType::Char => write!(f, "Char"),
+            OpaqueType::Array(t) => {
                 write!(f, "Array<")?;
                 t.fmt(f)?;
                 write!(f, ">")
             }
-            VarType::Numeric => write!(f, "Numeric"),
-            VarType::Json => write!(f, "Json"),
-            VarType::Xml => write!(f, "Xml"),
-            VarType::Uuid => write!(f, "Uuid"),
-            VarType::DateTime => write!(f, "DateTime"),
-            VarType::Date => write!(f, "Date"),
-            VarType::Time => write!(f, "Time"),
+            OpaqueType::Numeric => write!(f, "Numeric"),
+            OpaqueType::Json => write!(f, "Json"),
+            OpaqueType::Xml => write!(f, "Xml"),
+            OpaqueType::Uuid => write!(f, "Uuid"),
+            OpaqueType::DateTime => write!(f, "DateTime"),
+            OpaqueType::Date => write!(f, "Date"),
+            OpaqueType::Time => write!(f, "Time"),
         }
     }
 }
@@ -678,7 +742,7 @@ impl fmt::Display for ValueType<'_> {
             ValueType::DateTime(val) => val.map(|v| write!(f, "\"{v}\"")),
             ValueType::Date(val) => val.map(|v| write!(f, "\"{v}\"")),
             ValueType::Time(val) => val.map(|v| write!(f, "\"{v}\"")),
-            ValueType::Var(name, ty) => Some(write!(f, "${name} as {ty}")),
+            ValueType::Opaque(opaque) => Some(write!(f, "${opaque}")),
         };
 
         match res {
@@ -737,7 +801,7 @@ impl<'a> From<ValueType<'a>> for serde_json::Value {
             ValueType::DateTime(dt) => dt.map(|dt| serde_json::Value::String(dt.to_rfc3339())),
             ValueType::Date(date) => date.map(|date| serde_json::Value::String(format!("{date}"))),
             ValueType::Time(time) => time.map(|time| serde_json::Value::String(format!("{time}"))),
-            ValueType::Var(_, _) => todo!(),
+            ValueType::Opaque(_) => todo!(),
         };
 
         match res {
@@ -891,9 +955,9 @@ impl<'a> ValueType<'a> {
         Self::Xml(Some(value.into()))
     }
 
-    /// Creates a new variable.
-    pub fn var(name: impl Into<Cow<'a, str>>, ty: VarType) -> Self {
-        Self::Var(name.into(), ty)
+    /// Creates a new opaque value.
+    pub fn opaque<V: Opaque>(opaque: V, ty: OpaqueType) -> Self {
+        Self::Opaque(OpaqueValue::new(opaque, ty))
     }
 
     /// `true` if the `Value` is null.
@@ -917,7 +981,7 @@ impl<'a> ValueType<'a> {
             Self::Date(d) => d.is_none(),
             Self::Time(t) => t.is_none(),
             Self::Json(json) => json.is_none(),
-            Self::Var(_, _) => false,
+            Self::Opaque(_) => false,
         }
     }
 

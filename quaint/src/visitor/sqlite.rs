@@ -149,8 +149,8 @@ impl<'a> Visitor<'a> for Sqlite<'a> {
             ValueType::Time(time) => time.map(|time| self.write(format!("'{time}'"))),
             ValueType::Xml(cow) => cow.as_ref().map(|cow| self.write(format!("'{cow}'"))),
 
-            ValueType::Var(name, _) => Some(Err(
-                Error::builder(ErrorKind::VarAsRawValue(name.clone().into_owned())).build()
+            ValueType::Opaque(opaque) => Some(Err(
+                Error::builder(ErrorKind::OpaqueAsRawValue(opaque.to_string())).build()
             )),
         };
 

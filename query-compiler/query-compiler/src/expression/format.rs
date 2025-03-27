@@ -118,11 +118,14 @@ where
                     .append(self.keyword("as"))
                     .append(self.space())
                     .append(match r#type {
-                        query_structure::PlaceholderType::Array(inner) => format!("{inner:?}[]"),
+                        query_structure::PrismaValueType::Array(inner) => format!("{inner:?}[]"),
                         _ => format!("{type:?}"),
                     })
                     .parens(),
             ),
+            PrismaValue::GeneratorCall { name, args, .. } => self
+                .var_name(name)
+                .append(self.tuple(args.iter().map(|arg| self.value(arg)))),
             PrismaValue::List(values) => self.list(values),
             _ => self
                 .keyword("const")

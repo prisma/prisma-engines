@@ -53,5 +53,5 @@ pub use select::{DistinctType, Select};
 pub use table::*;
 pub use union::Union;
 pub use update::*;
-pub use values::{IntoRaw, Raw, Value, ValueType, Values, VarType};
+pub use values::{IntoRaw, OpaqueType, Raw, Value, ValueType, Values};
 pub(crate) use values::{NativeColumnType, Params};
