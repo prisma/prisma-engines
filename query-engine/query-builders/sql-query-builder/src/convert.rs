@@ -78,7 +78,7 @@ pub(crate) fn quaint_value_to_prisma_value(value: quaint::Value<'_>) -> PrismaVa
                     return_type: opaque_type_to_prisma_type(opaque.typ()),
                 }
             } else {
-                unreachable!("invalid opaque value")
+                panic!("Received an unsupported opaque value")
             }
         }
     }

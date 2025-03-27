@@ -116,7 +116,7 @@ pub fn to_prisma_value<'a, T: Into<ValueType<'a>>>(qv: T) -> crate::Result<Prism
                     return_type: opaque_type_to_prisma_type(opaque.typ()),
                 }
             } else {
-                unreachable!("invalid opaque value")
+                panic!("Received an unsupported opaque value")
             }
         }
     };
