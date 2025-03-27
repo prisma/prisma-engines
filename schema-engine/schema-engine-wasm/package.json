@@ -19,7 +19,7 @@
       "require": "./schema_engine.js",
       "types": "./schema_engine.d.ts"
     },
-    "./manual": {
+    "./schema_engine_bg": {
       "import": "./schema_engine_bg.js",
       "require": "./schema_engine_bg.js",
       "types": "./schema_engine_bg.d.ts"
