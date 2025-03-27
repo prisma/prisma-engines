@@ -95,7 +95,7 @@ impl QueryCompiler {
         Ok(serde_json::to_string(&plan)?)
     }
 
-    #[wasm_bindgen]
+    #[wasm_bindgen(js_name = compileBatch)]
     pub fn compile_batch(&self, request: String) -> Result<BatchResponse, wasm_bindgen::JsError> {
         let request = RequestBody::try_from_str(&request, self.protocol)?;
         match request.into_doc(&self.schema)? {
@@ -134,6 +134,7 @@ pub enum BatchResponse {
     Multi {
         plans: Vec<Expression>,
     },
+    #[serde(rename_all = "camelCase")]
     Compacted {
         plan: Expression,
         arguments: Vec<HashMap<String, ArgumentValue>>,
