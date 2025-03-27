@@ -13,8 +13,8 @@ model User {
   posts Post[]
 }
 
-model UserWithDate {
-  id        Int      @id @default(autoincrement())
+model UserWithGenerators {
+  id        String   @id @default(uuid(7))
   email     String   @unique
   createdAt DateTime @default(now())
 }

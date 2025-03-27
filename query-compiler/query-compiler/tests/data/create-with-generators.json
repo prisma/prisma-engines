@@ -1,5 +1,5 @@
 {
-  "modelName": "UserWithDate",
+  "modelName": "UserWithGenerators",
   "action": "createOne",
   "query": {
     "arguments": {
