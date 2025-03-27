@@ -6,7 +6,8 @@ use std::sync::{
 use async_trait::async_trait;
 use quaint::{
     connector::{
-        AdapterProvider, DescribedQuery, ExternalConnector, ExternalConnectorFactory, IsolationLevel, Transaction,
+        AdapterName, AdapterProvider, DescribedQuery, ExternalConnector, ExternalConnectorFactory, IsolationLevel,
+        Transaction,
     },
     prelude::{
         ExternalConnectionInfo, Query as QuaintQuery, Queryable as QuaintQueryable, ResultSet, TransactionCapable,
@@ -44,6 +45,10 @@ pub fn adapter_factory_from_js(driver: JsObject) -> JsAdapterFactory {
 
 #[async_trait]
 impl ExternalConnectorFactory for JsAdapterFactory {
+    fn adapter_name(&self) -> quaint::connector::AdapterName {
+        self.inner.adapter_name()
+    }
+
     async fn connect(&self) -> quaint::Result<Arc<dyn ExternalConnector>> {
         self.connect()
             .await
@@ -88,7 +93,11 @@ impl Drop for JsQueryableDropGuard {
 
 #[async_trait]
 impl ExternalConnector for JsQueryableDropGuard {
-    fn provider(&self) -> quaint::connector::AdapterProvider {
+    fn adapter_name(&self) -> AdapterName {
+        self.inner.adapter_name()
+    }
+
+    fn provider(&self) -> AdapterProvider {
         self.inner.provider()
     }
 

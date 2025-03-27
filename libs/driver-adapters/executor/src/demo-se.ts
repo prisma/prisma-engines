@@ -65,9 +65,6 @@ async function main(): Promise<void> {
 
   {
     console.log('[version]')
-
-    // Note: this fails on Cloudflare D1:
-    // `D1_ERROR: not authorized to use function: sqlite_version at offset 7: SQLITE_ERROR`
     const version = await engine.version()
     console.dir({ version }, { depth: null })
   }

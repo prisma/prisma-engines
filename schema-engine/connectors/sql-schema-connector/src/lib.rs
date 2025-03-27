@@ -22,7 +22,7 @@ use enumflags2::BitFlags;
 use flavour::{SqlConnector, SqlDialect, UsingExternalShadowDb};
 use migration_pair::MigrationPair;
 use psl::{datamodel_connector::NativeTypeInstance, parser_database::ScalarType, SourceFile, ValidatedSchema};
-use quaint::connector::DescribedQuery;
+use quaint::connector::{AdapterName, DescribedQuery};
 use schema_connector::{migrations_directory::MigrationDirectory, *};
 use sql_doc_parser::{parse_sql_doc, sanitize_sql};
 use sql_migration::{DropUserDefinedType, DropView, SqlMigration, SqlMigrationStep};
@@ -177,6 +177,7 @@ impl SchemaDialect for SqlSchemaDialect {
 
 /// The top-level SQL migration connector.
 pub struct SqlSchemaConnector {
+    adapter_name: Option<AdapterName>,
     inner: Box<dyn SqlConnector + Send + Sync + 'static>,
     host: Arc<dyn ConnectorHost>,
 }
@@ -184,9 +185,6 @@ pub struct SqlSchemaConnector {
 impl SqlSchemaConnector {
     /// Initialise an external migration connector.
     pub async fn new_from_external(adapter: Arc<dyn quaint::connector::ExternalConnector>) -> ConnectorResult<Self> {
-        // TODO: store `adapter.adapter_name` in an `Option<String>` field on the connector.
-        // Use that to intercept calls to d1 (`@prisma/adapter-d1`, `@prisma/adapter-d1-http`),
-        // and change the behaviour of problematic methods, like `version()`.
         match adapter.provider() {
             #[cfg(all(feature = "postgresql", not(feature = "postgresql-native")))]
             quaint::connector::AdapterProvider::Postgres => Self::new_postgres_external(adapter).await,
@@ -202,7 +200,9 @@ impl SqlSchemaConnector {
     pub async fn new_postgres_external(
         adapter: Arc<dyn quaint::connector::ExternalConnector>,
     ) -> ConnectorResult<Self> {
+        let adapter_name = adapter.adapter_name();
         Ok(SqlSchemaConnector {
+            adapter_name: Some(adapter_name),
             inner: Box::new(flavour::PostgresConnector::new_external(adapter).await?),
             host: Arc::new(EmptyHost),
         })
@@ -211,7 +211,9 @@ impl SqlSchemaConnector {
     /// Initialize an external SQLite migration connector.
     #[cfg(all(feature = "sqlite", not(feature = "sqlite-native")))]
     pub async fn new_sqlite_external(adapter: Arc<dyn quaint::connector::ExternalConnector>) -> Self {
+        let adapter_name = adapter.adapter_name();
         SqlSchemaConnector {
+            adapter_name: Some(adapter_name),
             inner: Box::new(flavour::SqliteConnector::new_external(adapter)),
             host: Arc::new(EmptyHost),
         }
@@ -223,6 +225,7 @@ impl SqlSchemaConnector {
         Ok(SqlSchemaConnector {
             inner: Box::new(flavour::PostgresConnector::new_postgres(params)?),
             host: Arc::new(EmptyHost),
+            adapter_name: None,
         })
     }
 
@@ -232,6 +235,7 @@ impl SqlSchemaConnector {
         Ok(SqlSchemaConnector {
             inner: Box::new(flavour::PostgresConnector::new_cockroach(params)?),
             host: Arc::new(EmptyHost),
+            adapter_name: None,
         })
     }
 
@@ -244,6 +248,7 @@ impl SqlSchemaConnector {
         Ok(SqlSchemaConnector {
             inner: Box::new(flavour::PostgresConnector::new_with_params(params)?),
             host: Arc::new(EmptyHost),
+            adapter_name: None,
         })
     }
 
@@ -253,6 +258,7 @@ impl SqlSchemaConnector {
         Ok(SqlSchemaConnector {
             inner: Box::new(flavour::SqliteConnector::new_with_params(params)?),
             host: Arc::new(EmptyHost),
+            adapter_name: None,
         })
     }
 
@@ -262,6 +268,7 @@ impl SqlSchemaConnector {
         Ok(SqlSchemaConnector {
             inner: Box::new(flavour::SqliteConnector::new_inmem(preview_features)?),
             host: Arc::new(EmptyHost),
+            adapter_name: None,
         })
     }
 
@@ -271,6 +278,7 @@ impl SqlSchemaConnector {
         Ok(SqlSchemaConnector {
             inner: Box::new(flavour::MysqlConnector::new_with_params(params)?),
             host: Arc::new(EmptyHost),
+            adapter_name: None,
         })
     }
 
@@ -280,6 +288,7 @@ impl SqlSchemaConnector {
         Ok(SqlSchemaConnector {
             inner: Box::new(flavour::MssqlConnector::new_with_params(params)?),
             host: Arc::new(EmptyHost),
+            adapter_name: None,
         })
     }
 
@@ -381,10 +390,17 @@ impl SchemaConnector for SqlSchemaConnector {
 
     fn version(&mut self) -> BoxFuture<'_, ConnectorResult<String>> {
         Box::pin(async {
-            self.inner
-                .version()
-                .await
-                .map(|version| version.unwrap_or_else(|| "Database version information not available.".to_owned()))
+            match self.adapter_name {
+                // Cloudflare D1 doesn't allow querying the version.
+                // We thus return a hardcoded string to avoid the error
+                // `not authorized to use function: sqlite_version at offset`.
+                Some(AdapterName::D1(..)) => Ok("cf-d1".to_owned()),
+                _ => {
+                    self.inner.version().await.map(|version| {
+                        version.unwrap_or_else(|| "Database version information not available.".to_owned())
+                    })
+                }
+            }
         })
     }
 
