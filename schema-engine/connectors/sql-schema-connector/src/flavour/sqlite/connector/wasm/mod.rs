@@ -2,7 +2,7 @@
 
 use crate::BitFlags;
 use psl::PreviewFeature;
-use quaint::connector::ExternalConnector;
+use quaint::connector::{AdapterName, ExternalConnector};
 use schema_connector::{ConnectorError, ConnectorResult};
 use sql_schema_describer::SqlSchema;
 use std::sync::Arc;
@@ -53,7 +53,13 @@ impl Connection {
     }
 
     pub async fn version(&self) -> ConnectorResult<Option<String>> {
-        self.adapter.version().await.map_err(convert_error)
+        match self.adapter.adapter_name() {
+            // Cloudflare D1 doesn't allow querying the version.
+            // We thus return a hardcoded string to avoid the error
+            // `not authorized to use function: sqlite_version at offset`.
+            AdapterName::D1(..) => Ok(Some("cf-d1".to_owned())),
+            _ => self.adapter.version().await.map_err(convert_error),
+        }
     }
 
     pub async fn describe_query(
