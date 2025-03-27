@@ -46,6 +46,10 @@ pub struct DmmfInputTypeConstraints {
 pub struct DmmfInputTypeMeta {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub source: Option<String>,
+    /// Used by the generator to group input types roughly by model.
+    /// Note that it is not strictly the model name but can also be a composite type name or empty for generic input types.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub grouping: Option<String>,
 }
 
 #[derive(Debug, Serialize)]
