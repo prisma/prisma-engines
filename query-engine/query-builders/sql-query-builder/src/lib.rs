@@ -30,6 +30,7 @@ use query_structure::{
 
 pub use column_metadata::ColumnMetadata;
 pub use context::Context;
+pub use convert::opaque_type_to_prisma_type;
 pub use filter::FilterBuilder;
 pub use model_extensions::{AsColumn, AsColumns, AsTable, RelationFieldExt, SelectionResultExt};
 use read::alias_with_prisma_name;

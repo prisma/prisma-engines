@@ -1,10 +1,12 @@
 use crate::row::{sanitize_f32, sanitize_f64};
 use bigdecimal::{BigDecimal, FromPrimitive};
 use chrono::{DateTime, NaiveDate, Utc};
-use prisma_value::PrismaValueType;
-use quaint::{ast::OpaqueType, ValueType};
+use quaint::ValueType;
 use query_structure::PrismaValue;
-use sql_query_builder::value::{GeneratorCall, Placeholder};
+use sql_query_builder::{
+    opaque_type_to_prisma_type,
+    value::{GeneratorCall, Placeholder},
+};
 
 pub fn to_prisma_value<'a, T: Into<ValueType<'a>>>(qv: T) -> crate::Result<PrismaValue> {
     let val = match qv.into() {
@@ -120,27 +122,4 @@ pub fn to_prisma_value<'a, T: Into<ValueType<'a>>>(qv: T) -> crate::Result<Prism
     };
 
     Ok(val)
-}
-
-fn opaque_type_to_prisma_type(typ: &OpaqueType) -> PrismaValueType {
-    match typ {
-        OpaqueType::Unknown => PrismaValueType::Any,
-        OpaqueType::Int32 => PrismaValueType::Int,
-        OpaqueType::Int64 => PrismaValueType::BigInt,
-        OpaqueType::Float => PrismaValueType::Float,
-        OpaqueType::Double => PrismaValueType::Float,
-        OpaqueType::Text => PrismaValueType::String,
-        OpaqueType::Enum => PrismaValueType::String,
-        OpaqueType::Bytes => PrismaValueType::Bytes,
-        OpaqueType::Boolean => PrismaValueType::Boolean,
-        OpaqueType::Char => PrismaValueType::String,
-        OpaqueType::Array(t) => PrismaValueType::Array(Box::new(opaque_type_to_prisma_type(t))),
-        OpaqueType::Numeric => PrismaValueType::Decimal,
-        OpaqueType::Json => PrismaValueType::Object,
-        OpaqueType::Xml => PrismaValueType::String,
-        OpaqueType::Uuid => PrismaValueType::String,
-        OpaqueType::DateTime => PrismaValueType::Date,
-        OpaqueType::Date => PrismaValueType::Date,
-        OpaqueType::Time => PrismaValueType::Date,
-    }
 }

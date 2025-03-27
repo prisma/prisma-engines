@@ -84,7 +84,7 @@ pub(crate) fn quaint_value_to_prisma_value(value: quaint::Value<'_>) -> PrismaVa
     }
 }
 
-fn opaque_type_to_prisma_type(vt: &OpaqueType) -> PrismaValueType {
+pub fn opaque_type_to_prisma_type(vt: &OpaqueType) -> PrismaValueType {
     match vt {
         OpaqueType::Unknown => PrismaValueType::Any,
         OpaqueType::Int32 => PrismaValueType::Int,
@@ -97,7 +97,7 @@ fn opaque_type_to_prisma_type(vt: &OpaqueType) -> PrismaValueType {
         OpaqueType::Boolean => PrismaValueType::Boolean,
         OpaqueType::Char => PrismaValueType::String,
         OpaqueType::Array(t) => PrismaValueType::Array(Box::new(opaque_type_to_prisma_type(t))),
-        OpaqueType::Numeric => PrismaValueType::Float,
+        OpaqueType::Numeric => PrismaValueType::Decimal,
         OpaqueType::Json => PrismaValueType::Object,
         OpaqueType::Xml => PrismaValueType::String,
         OpaqueType::Uuid => PrismaValueType::String,
