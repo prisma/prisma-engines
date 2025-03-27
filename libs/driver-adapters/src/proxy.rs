@@ -9,7 +9,7 @@ use crate::{
 
 use futures::Future;
 use prisma_metrics::gauge;
-use quaint::connector::IsolationLevel;
+use quaint::connector::{AdapterName, AdapterProvider, IsolationLevel};
 use std::sync::atomic::{AtomicBool, Ordering};
 
 /// Proxy is a struct wrapping a javascript object that exhibits basic primitives for
@@ -24,7 +24,10 @@ pub(crate) struct CommonProxy {
     execute_raw: AdapterMethod<Query, u32>,
 
     /// Return the provider for this driver.
-    pub(crate) provider: String,
+    pub(crate) provider: AdapterProvider,
+
+    /// Return the adapter name for this driver.
+    pub(crate) adapter_name: AdapterName,
 }
 
 /// This is a JS proxy for accessing methods on the adapter factory.
@@ -34,6 +37,12 @@ pub(crate) struct AdapterFactoryProxy {
 
     /// Retrieve a queryable instance for a shadow database.
     connect_to_shadow_db: Option<AdapterMethod<(), JsQueryable>>,
+
+    /// Return the provider for this driver.
+    pub(crate) provider: AdapterProvider,
+
+    /// Return the adapter name for this driver.
+    pub(crate) adapter_name: AdapterName,
 }
 
 /// This is a JS proxy for accessing the methods specific to top level
@@ -73,11 +82,16 @@ pub(crate) struct TransactionProxy {
 impl CommonProxy {
     pub fn new(object: &JsObject) -> JsResult<Self> {
         let provider: JsString = get_named_property(object, "provider")?;
+        let provider: AdapterProvider = to_rust_str(provider)?.parse().unwrap();
+
+        let adapter_name: JsString = get_named_property(object, "adapterName")?;
+        let adapter_name: AdapterName = to_rust_str(adapter_name)?.parse().unwrap();
 
         Ok(Self {
             query_raw: get_named_property(object, "queryRaw")?,
             execute_raw: get_named_property(object, "executeRaw")?,
-            provider: to_rust_str(provider)?,
+            provider,
+            adapter_name,
         })
     }
 
@@ -92,13 +106,17 @@ impl CommonProxy {
 
 impl AdapterFactoryProxy {
     pub fn new(object: &JsObject) -> JsResult<Self> {
-        let connect: AdapterMethod<(), JsQueryable> = get_named_property(object, "connect")?;
-        let connect_to_shadow_db: Option<AdapterMethod<(), JsQueryable>> =
-            get_optional_named_property(object, "connectToShadowDb")?;
+        let provider: JsString = get_named_property(object, "provider")?;
+        let provider: AdapterProvider = to_rust_str(provider)?.parse().unwrap();
+
+        let adapter_name: JsString = get_named_property(object, "adapterName")?;
+        let adapter_name: AdapterName = to_rust_str(adapter_name)?.parse().unwrap();
 
         Ok(Self {
-            connect,
-            connect_to_shadow_db,
+            adapter_name,
+            connect: get_named_property(object, "connect")?,
+            connect_to_shadow_db: get_optional_named_property(object, "connectToShadowDb")?,
+            provider,
         })
     }
 
@@ -111,6 +129,14 @@ impl AdapterFactoryProxy {
             Some(method) => Some(UnsafeFuture(method.call_as_async(())).await),
             None => None,
         }
+    }
+
+    pub fn adapter_name(&self) -> AdapterName {
+        self.adapter_name
+    }
+
+    pub fn provider(&self) -> AdapterProvider {
+        self.provider
     }
 }
 

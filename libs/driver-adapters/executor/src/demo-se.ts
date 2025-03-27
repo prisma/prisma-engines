@@ -1,14 +1,22 @@
 import * as S from '@effect/schema/Schema'
-import { bindAdapter } from '@prisma/driver-adapter-utils'
+import { bindSqlAdapterFactory } from '@prisma/driver-adapter-utils'
+import process from 'node:process'
 
 import type { DriverAdaptersManager } from './driver-adapters-manager'
 import { Env } from './types'
-import * as se from './schema-engine'
-import { err } from './utils'
+import * as se from './schema-engine-wasm-module'
 import { setupDriverAdaptersManager } from './setup'
+import { getWasmError, isWasmPanic, WasmPanicRegistry } from './wasm-panic-registry'
 
 /**
- * Example run: `DRIVER_ADAPTER="libsql" pnpm demo:se`
+ * Set up a global registry for Wasm panics.
+ * This allows us to retrieve the panic message from the Wasm panic hook,
+ * which is not possible otherwise.
+ */
+globalThis.PRISMA_WASM_PANIC_REGISTRY = new WasmPanicRegistry()
+
+/**
+ * Example run: `EXTERNAL_TEST_EXECUTOR="Wasm" DRIVER_ADAPTER="d1" pnpm demo:se`
  */
 async function main(): Promise<void> {
   const env = S.decodeUnknownSync(Env)(process.env)
@@ -18,7 +26,7 @@ async function main(): Promise<void> {
    * Static input for demo purposes.
    */
 
-  const url = 'file:./db.sqlite'
+  const url = process.env.TEST_DATABASE_URL!
 
   const schema = /* prisma */ `
     generator client {
@@ -26,8 +34,8 @@ async function main(): Promise<void> {
     }
 
     datasource db {
-      provider = "sqlite"
-      url      = "file:./db.sqlite"
+      provider = "postgresql"
+      url      = "${url}"
     }
 
     model User {
@@ -48,46 +56,122 @@ async function main(): Promise<void> {
 
   const driverAdapterManager = await setupDriverAdaptersManager(
     env,
+    { url },
   )
 
-  const { engine, adapter } = await initSE({
-    env,
+  const { engine } = await initSE({
     driverAdapterManager,
-    url,
-    schema,
   })
 
-  console.log('[adapter]', adapter)
+  {
+    console.log('[version]')
+    const version = await engine.version()
+    console.dir({ version }, { depth: null })
+  }
 
-  // TODO: use `engine`.
+  {
+    console.log('[ensureConnectionValidity]')
+    const result = await engine.ensureConnectionValidity({
+      datasource: {
+        tag: 'Schema',
+        files: [
+          {
+            content: schema,
+            path: 'schema.prisma',
+          },
+        ],
+      }
+    })
+    console.dir({ result }, { depth: null })
+  }
+
+  {
+    console.log('[diff]')
+    const diffResult = await engine.diff({
+      from: {
+        tag: 'empty',
+      },
+      to: {
+        tag: 'schemaDatamodel',
+        files: [
+          {
+            content: schema,
+            path: 'schema.prisma',
+          }
+        ],
+      },
+      exitCode: undefined,
+      shadowDatabaseUrl: undefined,
+      script: true,
+    })
+    console.dir({ diffResult }, { depth: null })
+  }
+
+  {
+    console.log('[introspect]')
+    const introspectResult = await engine.introspect({
+      schema: {
+        files: [
+          {
+            content: schema,
+            path: 'schema.prisma',
+          }
+        ],
+      },
+      baseDirectoryPath: process.cwd(),
+      compositeTypeDepth: 0,
+      force: false,
+      namespaces: undefined,
+    })
+    console.dir(introspectResult, { depth: null })
+  }
 }
 
-type InitQueryEngineParams = {
-  env: Env
+type InitSchemaEngineParams = {
   driverAdapterManager: DriverAdaptersManager
-  url: string
-  schema: string
 }
 
 async function initSE({
-  env,
   driverAdapterManager,
-  url,
-  schema,
-}: InitQueryEngineParams) {
-  const adapter = await driverAdapterManager.connect({ url })
-  const errorCapturingAdapter = bindAdapter(adapter)
+}: InitSchemaEngineParams) {
+  const adapterFactory = driverAdapterManager.factory()
+  const errorCapturingAdapterFactory = bindSqlAdapterFactory(adapterFactory)
   const engineInstance = await se.initSchemaEngine(
-    {
-      datamodel: schema,
-    },
-    adapter,
+    errorCapturingAdapterFactory,
   )
 
   return {
     engine: engineInstance,
-    adapter: errorCapturingAdapter,
+    adapterFactory: errorCapturingAdapterFactory,
   }
 }
 
-main().catch(err)
+process.on('uncaughtException', (error: Error) => {
+  console.log('[uncaughtException]')
+
+  if (isWasmPanic(error)) {
+    const { message, stack } = getWasmError(globalThis.PRISMA_WASM_PANIC_REGISTRY, error)
+
+    console.error('[WasmPanic]', { message, stack })
+  } else {
+    console.error('[Error]', error)
+  }
+
+  process.exit(1)
+})
+
+process.on('unhandledRejection', (error: Error) => {
+  console.log('[unhandledRejection]')
+
+  if (isWasmPanic(error)) {
+    const { message, stack } = getWasmError(globalThis.PRISMA_WASM_PANIC_REGISTRY, error)
+
+    console.error('[WasmPanic]', { message, stack })
+  } else {
+    console.error('[Error]', error)
+  }
+
+  process.exit(2)
+})
+
+main()

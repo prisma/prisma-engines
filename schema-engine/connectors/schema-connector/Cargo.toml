@@ -37,3 +37,4 @@ json-rpc = { path = "../../json-rpc-api", package = "json-rpc-api" }
 sha2.workspace = true
 tracing.workspace = true
 tracing-error.workspace = true
+wasm-bindgen.workspace = true

@@ -19,7 +19,7 @@ use quaint::{
     Value,
 };
 use schema_core::{
-    commands::diff,
+    commands::diff_cli,
     schema_connector::{BoxFuture, ConnectorHost, ConnectorResult, DiffTarget, MigrationPersistence, SchemaConnector},
 };
 use sql_schema_connector::SqlSchemaConnector;
@@ -139,7 +139,7 @@ impl TestApi {
     }
 
     pub fn diff(&self, params: DiffParams) -> ConnectorResult<DiffResult> {
-        test_setup::runtime::run_with_thread_local_runtime(diff(params, self.connector.host().clone()))
+        test_setup::runtime::run_with_thread_local_runtime(diff_cli(params, self.connector.host().clone()))
     }
 
     pub fn dump_table(&mut self, table_name: &str) -> ResultSet {

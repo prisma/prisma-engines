@@ -81,7 +81,7 @@ integrate-qe-wasm:
 
 build-se-wasm:
 	cd schema-engine/schema-engine-wasm && \
-	./build.sh $(QE_WASM_VERSION) schema-engine/schema-engine-wasm/pkg
+	./build.sh $(SCHEMA_ENGINE_WASM_VERSION) schema-engine/schema-engine-wasm/pkg
 
 build-qc-wasm:
 	cd query-compiler/query-compiler-wasm && \
@@ -180,7 +180,7 @@ dev-libsql-wasm: build-qe-wasm build-driver-adapters-kit-qe
 test-libsql-wasm: dev-libsql-wasm test-qe-st
 test-driver-adapter-libsql-wasm: test-libsql-wasm
 
-dev-d1: build-qe-wasm build-driver-adapters-kit-qe
+dev-d1: build-qe-wasm build-se-wasm build-driver-adapters-kit-qe
 	cp $(CONFIG_PATH)/cloudflare-d1 $(CONFIG_FILE)
 
 test-d1: dev-d1 test-qe-st

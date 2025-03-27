@@ -1,3 +1,5 @@
+#![cfg_attr(target_arch = "wasm32", allow(unused_imports))]
+
 #[cfg(feature = "sqlite-native")]
 mod native;
 #[cfg(feature = "sqlite-native")]

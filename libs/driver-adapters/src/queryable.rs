@@ -6,7 +6,7 @@ use super::conversion;
 use crate::send_future::UnsafeFuture;
 use async_trait::async_trait;
 use futures::Future;
-use quaint::connector::{DescribedQuery, ExternalConnectionInfo, ExternalConnector};
+use quaint::connector::{AdapterName, DescribedQuery, ExternalConnectionInfo, ExternalConnector};
 use quaint::{
     connector::{metrics, IsolationLevel, Transaction},
     prelude::{Query as QuaintQuery, Queryable as QuaintQueryable, ResultSet, TransactionCapable},
@@ -30,15 +30,18 @@ use tracing::{info_span, Instrument};
 pub(crate) struct JsBaseQueryable {
     pub(crate) proxy: CommonProxy,
     pub provider: AdapterProvider,
+    pub adapter_name: AdapterName,
     pub(crate) db_system_name: &'static str,
 }
 
 impl JsBaseQueryable {
     pub(crate) fn new(proxy: CommonProxy) -> Self {
-        let provider: AdapterProvider = proxy.provider.parse().unwrap();
+        let provider = proxy.provider;
+        let adapter_name = proxy.adapter_name;
         let db_system_name = provider.db_system_name();
         Self {
             proxy,
+            adapter_name,
             provider,
             db_system_name,
         }
@@ -278,6 +281,14 @@ impl std::fmt::Debug for JsQueryable {
 
 #[async_trait]
 impl ExternalConnector for JsQueryable {
+    fn adapter_name(&self) -> AdapterName {
+        self.inner.adapter_name
+    }
+
+    fn provider(&self) -> AdapterProvider {
+        self.inner.provider
+    }
+
     async fn execute_script(&self, script: &str) -> quaint::Result<()> {
         self.driver_proxy.execute_script(script.to_owned()).await
     }

@@ -216,6 +216,29 @@ impl ConnectorError {
     }
 }
 
+impl ConnectorError {
+    /// Convert this error into a `wasm_bindgen::JsError` for use in WebAssembly contexts.
+    ///
+    /// This preserves the error message, error code (if available), and context information
+    /// from the original error.
+    pub fn into_js_error(self) -> wasm_bindgen::JsError {
+        // Get the full error display representation
+        let error_string = self.to_string();
+
+        // Include known error information if available
+        if let Some(known_error) = self.known_error() {
+            let message = format!(
+                "Error code: {}\nMessage: {}\nDetails: {}",
+                known_error.error_code, known_error.message, error_string
+            );
+            return wasm_bindgen::JsError::new(&message);
+        }
+
+        // Fall back to just the error string
+        wasm_bindgen::JsError::new(&error_string)
+    }
+}
+
 impl From<KnownError> for ConnectorError {
     fn from(err: KnownError) -> Self {
         ConnectorError(Box::new(ConnectorErrorImpl {

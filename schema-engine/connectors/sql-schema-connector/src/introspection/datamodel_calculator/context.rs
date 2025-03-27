@@ -44,6 +44,8 @@ impl<'a> DatamodelCalculatorContext<'a> {
             SqlFamily::Sqlite => Box::new(flavour::SqliteIntrospectionFlavour),
             #[cfg(feature = "mssql")]
             SqlFamily::Mssql => Box::new(flavour::SqlServerIntrospectionFlavour),
+            #[allow(unreachable_patterns)]
+            _ => unimplemented!("Unsupported SQL family: {:?}", ctx.sql_family()),
         };
 
         let mut ctx = DatamodelCalculatorContext {

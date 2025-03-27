@@ -49,7 +49,7 @@ impl From<DriverAdapterError> for QuaintError {
     }
 }
 
-pub use factory::JsAdapterFactory;
+pub use factory::{adapter_factory_from_js, JsAdapterFactory};
 pub use queryable::{queryable_from_js, JsQueryable};
 pub(crate) use transaction::JsTransaction;
 pub use types::AdapterProvider;
