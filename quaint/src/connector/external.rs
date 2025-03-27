@@ -6,6 +6,40 @@ use super::{SqlFamily, TransactionCapable};
 
 #[cfg_attr(target_arch = "wasm32", derive(serde::Deserialize))]
 #[derive(Debug, Eq, PartialEq, Copy, Clone)]
+pub enum AdapterD1 {
+    Env,
+    HTTP,
+}
+
+#[cfg_attr(target_arch = "wasm32", derive(serde::Deserialize))]
+#[derive(Debug, Eq, PartialEq, Copy, Clone)]
+/// The name of the adapter.
+/// We only want to keep track of first-class adapters maintained by Prisma, and among those,
+/// only the ones whose queries require special handling compared to the ones generated via `quaint`.
+pub enum AdapterName {
+    D1(AdapterD1),
+    Unknown,
+}
+
+impl FromStr for AdapterName {
+    type Err = ();
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        // strip `@prisma/adapter-` prefix from the string
+        if let Some(name) = s.strip_prefix("@prisma/adapter-") {
+            match name {
+                "d1" => Ok(Self::D1(AdapterD1::Env)),
+                "d1-http" => Ok(Self::D1(AdapterD1::HTTP)),
+                _ => Ok(Self::Unknown),
+            }
+        } else {
+            Ok(Self::Unknown)
+        }
+    }
+}
+
+#[cfg_attr(target_arch = "wasm32", derive(serde::Deserialize))]
+#[derive(Debug, Eq, PartialEq, Copy, Clone)]
 pub enum AdapterProvider {
     #[cfg(feature = "mysql")]
     Mysql,
@@ -77,6 +111,7 @@ impl ExternalConnectionInfo {
 
 #[async_trait]
 pub trait ExternalConnector: TransactionCapable {
+    fn adapter_name(&self) -> AdapterName;
     fn provider(&self) -> AdapterProvider;
     async fn get_connection_info(&self) -> crate::Result<ExternalConnectionInfo>;
     async fn execute_script(&self, script: &str) -> crate::Result<()>;
@@ -85,6 +120,7 @@ pub trait ExternalConnector: TransactionCapable {
 
 #[async_trait]
 pub trait ExternalConnectorFactory: Send + Sync {
+    fn adapter_name(&self) -> AdapterName;
     fn provider(&self) -> AdapterProvider;
     async fn connect(&self) -> crate::Result<Arc<dyn ExternalConnector>>;
     async fn connect_to_shadow_db(&self) -> Option<crate::Result<Arc<dyn ExternalConnector>>>;
