@@ -66,7 +66,7 @@ class QueryPipeline {
         )
       }
 
-      const result = await this.executeQuery(queryable, query)
+      const result = await this.executeQuery(queryable, query, !txId)
 
       debug('🟢 Query result: ', result)
 
@@ -77,6 +77,7 @@ class QueryPipeline {
   private async executeQuery(
     queryable: SqlQueryable,
     query: JsonProtocolQuery,
+    allowTransaction: boolean,
   ) {
     const queryPlanString = withLocalPanicHandler(() =>
       this.compiler.compile(JSON.stringify(query)),
@@ -89,20 +90,20 @@ class QueryPipeline {
     const transactionManager = this.transactionManager
 
     const interpreter = new QueryInterpreter({
-      queryable,
       transactionManager,
+      allowTransaction: allowTransaction,
       placeholderValues: {},
       onQuery: (event) => {
         this.logs.push(JSON.stringify(event))
       },
     })
 
-    return interpreter.run(queryPlan)
+    return interpreter.run(queryPlan, queryable)
   }
 
   private async executeIndependentBatch(queries: readonly JsonProtocolQuery[]) {
     return Promise.all(
-      queries.map((query) => this.executeQuery(this.driverAdapter, query)),
+      queries.map((query) => this.executeQuery(this.driverAdapter, query, true)),
     )
   }
 
@@ -114,7 +115,7 @@ class QueryPipeline {
       isolationLevel,
     })
 
-    const queryable = this.transactionManager.getTransaction(
+    const transaction = this.transactionManager.getTransaction(
       txInfo,
       'batch transaction query',
     )
@@ -123,7 +124,7 @@ class QueryPipeline {
       const results: unknown[] = []
 
       for (const query of queries) {
-        const result = await this.executeQuery(queryable, query)
+        const result = await this.executeQuery(transaction, query, false)
         results.push(result)
       }
 
