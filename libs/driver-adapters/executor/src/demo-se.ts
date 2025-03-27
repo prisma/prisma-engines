@@ -100,8 +100,8 @@ async function main(): Promise<void> {
           }
         ],
       },
-      exitCode: undefined,
-      shadowDatabaseUrl: undefined,
+      exitCode: null,
+      shadowDatabaseUrl: null,
       script: true,
     })
     console.dir({ diffResult }, { depth: null })
@@ -121,7 +121,7 @@ async function main(): Promise<void> {
       baseDirectoryPath: process.cwd(),
       compositeTypeDepth: 0,
       force: false,
-      namespaces: undefined,
+      namespaces: null,
     })
     console.dir(introspectResult, { depth: null })
   }

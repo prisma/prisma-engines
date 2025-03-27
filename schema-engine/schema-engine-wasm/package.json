@@ -18,6 +18,11 @@
       "import": "./schema_engine.js",
       "require": "./schema_engine.js",
       "types": "./schema_engine.d.ts"
+    },
+    "./manual": {
+      "import": "./schema_engine_bg.js",
+      "require": "./schema_engine_bg.js",
+      "types": "./schema_engine_bg.d.ts"
     }
   },
   "types": "./schema_engine.d.ts"
