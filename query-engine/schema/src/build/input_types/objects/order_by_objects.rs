@@ -218,7 +218,7 @@ fn order_by_object_type_aggregate<'a>(
 
 fn order_by_to_many_aggregate_object_type<'a>(container: &ParentContainer) -> InputObjectType<'a> {
     let ident = Identifier::new_prisma(IdentifierType::OrderByToManyAggregateInput(container.clone()));
-    let mut input_object: InputObjectType<'_> = init_input_object_type(ident);
+    let mut input_object = init_input_object_type(ident);
     input_object.set_container(container.clone());
     input_object.require_exactly_one_field();
     input_object.set_fields(|| {
