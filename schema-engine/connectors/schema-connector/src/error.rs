@@ -1,6 +1,7 @@
 //! The migration connector ConnectorError type.
 
 use crate::migrations_directory::ReadMigrationScriptError;
+use js_sys::Reflect;
 use std::{
     error::Error as StdError,
     fmt::{Debug, Display, Write},
@@ -10,6 +11,7 @@ use tracing_error::SpanTrace;
 use user_facing_errors::{
     common::SchemaParserError, schema_engine::MigrationFileNotFound, KnownError, UserFacingError,
 };
+use wasm_bindgen::JsValue;
 
 /// The general error reporting type for migration connectors.
 #[derive(Clone)]
@@ -221,21 +223,36 @@ impl ConnectorError {
     ///
     /// This preserves the error message, error code (if available), and context information
     /// from the original error.
-    pub fn into_js_error(self) -> wasm_bindgen::JsError {
-        // Get the full error display representation
-        let error_string = self.to_string();
+    pub fn into_js_error(self) -> JsValue {
+        let error_name = "SchemaConnectorError";
 
         // Include known error information if available
         if let Some(known_error) = self.known_error() {
-            let message = format!(
-                "Error code: {}\nMessage: {}\nDetails: {}",
-                known_error.error_code, known_error.message, error_string
+            let error = js_sys::Error::new(&known_error.message);
+            error.set_name(error_name);
+
+            let obj = JsValue::from(error);
+
+            _ = Reflect::set(
+                &obj,
+                &JsValue::from("code"),
+                &JsValue::from(known_error.error_code.to_string()),
             );
-            return wasm_bindgen::JsError::new(&message);
+            return obj;
         }
 
-        // Fall back to just the error string
-        wasm_bindgen::JsError::new(&error_string)
+        // Get the full error display representation, and use it as a fallback
+        let error_string = self.to_string();
+        let error = js_sys::Error::new(&error_string);
+        error.set_name(error_name);
+
+        JsValue::from(error)
+    }
+}
+
+impl From<ConnectorError> for JsValue {
+    fn from(err: ConnectorError) -> JsValue {
+        err.into_js_error()
     }
 }
 

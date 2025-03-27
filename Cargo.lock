@@ -4753,6 +4753,7 @@ version = "0.1.0"
 dependencies = [
  "chrono",
  "enumflags2",
+ "js-sys",
  "json-rpc-api",
  "psl",
  "quaint",
