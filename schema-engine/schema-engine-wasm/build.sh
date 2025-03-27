@@ -9,7 +9,7 @@ set -euo pipefail
 CURRENT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 OUT_VERSION="${1:-"0.0.0"}"
 OUT_FOLDER="${2:-"schema-engine/schema-engine-wasm/pkg"}"
-OUT_TARGET="bundler"
+OUT_TARGET="nodejs"
 REPO_ROOT="$( cd "$( dirname "$CURRENT_DIR/../../../" )" >/dev/null 2>&1 && pwd )"
 WASM_CONNECTORS="sqlite,postgresql"
 
