@@ -5,7 +5,7 @@ use napi_derive::napi;
 use prisma_metrics::{MetricFormat, WithMetricsInstrumentation};
 use psl::PreviewFeature;
 use quaint::{connector::ExternalConnector, prelude::ConnectionInfo};
-use query_core::{protocol::EngineProtocol, relation_load_strategy, schema, TransactionOptions, TxId};
+use query_core::{protocol::EngineProtocol, relation_load_strategy, schema, QueryDocument, TransactionOptions, TxId};
 use query_engine_common::{
     engine::{
         map_known_error, stringify_env_values, ConnectedEngine, ConnectedEngineNative, ConstructorOptions,
@@ -364,9 +364,12 @@ impl QueryEngine {
             let engine = inner.as_engine()?;
 
             let request = RequestBody::try_from_str(&request, engine.engine_protocol())?;
-            let query_doc = request
+            let QueryDocument::Single(op) = request
                 .into_doc(engine.query_schema())
-                .map_err(|err| napi::Error::from_reason(err.to_string()))?;
+                .map_err(|err| napi::Error::from_reason(err.to_string()))?
+            else {
+                return Err(napi::Error::from_reason("Unexpected batch request".to_string()));
+            };
 
             let connection_info = match self.connector_mode {
                 ConnectorMode::Js { ref adapter } => ConnectionInfo::External(
@@ -382,7 +385,7 @@ impl QueryEngine {
                 }
             };
 
-            let plan = query_compiler::compile(engine.query_schema(), query_doc, &connection_info)
+            let plan = query_compiler::compile(engine.query_schema(), op, &connection_info)
                 .map_err(|err| napi::Error::from_reason(err.to_string()))?;
 
             let response = if human_readable {

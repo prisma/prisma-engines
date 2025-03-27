@@ -8,12 +8,12 @@ use quaint::{
     prelude::{ConnectionInfo, SqlFamily},
     visitor,
 };
-use query_core::{QueryGraphBuilderError, schema::QuerySchema};
+use query_core::{Operation, QueryGraphBuilderError, schema::QuerySchema};
 use sql_query_builder::{Context, SqlQueryBuilder};
 use thiserror::Error;
 pub use translate::{TranslateError, translate};
 
-use query_core::{QueryDocument, QueryGraphBuilder};
+use query_core::QueryGraphBuilder;
 
 #[derive(Debug, Error)]
 pub enum CompileError {
@@ -29,13 +29,9 @@ pub enum CompileError {
 
 pub fn compile(
     query_schema: &Arc<QuerySchema>,
-    query_doc: QueryDocument,
+    query: Operation,
     connection_info: &ConnectionInfo,
 ) -> Result<Expression, CompileError> {
-    let QueryDocument::Single(query) = query_doc else {
-        return Err(CompileError::UnsupportedRequest);
-    };
-
     let ctx = Context::new(connection_info, None);
     let (graph, _serializer) = QueryGraphBuilder::new(query_schema)
         .without_eager_default_evaluation()

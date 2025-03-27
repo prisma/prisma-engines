@@ -1,9 +1,10 @@
 use psl::ConnectorRegistry;
 use quaint::connector::ConnectionInfo;
-use query_core::protocol::EngineProtocol;
+use query_compiler::Expression;
+use query_core::{ArgumentValue, BatchDocument, QueryDocument, protocol::EngineProtocol};
 use request_handlers::RequestBody;
-use serde::Deserialize;
-use std::sync::Arc;
+use serde::{Deserialize, Serialize};
+use std::{collections::HashMap, sync::Arc};
 use tsify_next::Tsify;
 use wasm_bindgen::prelude::wasm_bindgen;
 
@@ -87,8 +88,57 @@ impl QueryCompiler {
     #[wasm_bindgen]
     pub fn compile(&self, request: String) -> Result<String, wasm_bindgen::JsError> {
         let request = RequestBody::try_from_str(&request, self.protocol)?;
-        let query_doc = request.into_doc(&self.schema)?;
-        let plan = query_compiler::compile(&self.schema, query_doc, &self.connection_info)?;
+        let QueryDocument::Single(op) = request.into_doc(&self.schema)? else {
+            return Err(wasm_bindgen::JsError::new("Unexpected batch request"));
+        };
+        let plan = query_compiler::compile(&self.schema, op, &self.connection_info)?;
         Ok(serde_json::to_string(&plan)?)
     }
+
+    #[wasm_bindgen]
+    pub fn compile_batch(&self, request: String) -> Result<BatchResponse, wasm_bindgen::JsError> {
+        let request = RequestBody::try_from_str(&request, self.protocol)?;
+        match request.into_doc(&self.schema)? {
+            QueryDocument::Single(op) => {
+                let plan = query_compiler::compile(&self.schema, op, &self.connection_info)?;
+                Ok(BatchResponse::Multi { plans: vec![plan] })
+            }
+            QueryDocument::Multi(batch) => match batch.compact(&self.schema) {
+                BatchDocument::Multi(operations, _) => {
+                    let plans = operations
+                        .into_iter()
+                        .map(|op| query_compiler::compile(&self.schema, op, &self.connection_info))
+                        .collect::<Result<Vec<_>, _>>()?;
+                    Ok(BatchResponse::Multi { plans })
+                }
+                BatchDocument::Compact(compacted) => {
+                    let expect_non_empty = compacted.throw_on_empty();
+                    let plan = query_compiler::compile(&self.schema, compacted.operation, &self.connection_info)?;
+                    Ok(BatchResponse::Compacted {
+                        plan,
+                        arguments: compacted.arguments,
+                        nested_selection: compacted.nested_selection,
+                        keys: compacted.keys,
+                        expect_non_empty,
+                    })
+                }
+            },
+        }
+    }
+}
+
+#[derive(Serialize, Tsify)]
+#[serde(tag = "type", rename_all = "camelCase")]
+#[tsify(into_wasm_abi)]
+pub enum BatchResponse {
+    Multi {
+        plans: Vec<Expression>,
+    },
+    Compacted {
+        plan: Expression,
+        arguments: Vec<HashMap<String, ArgumentValue>>,
+        nested_selection: Vec<String>,
+        keys: Vec<String>,
+        expect_non_empty: bool,
+    },
 }
