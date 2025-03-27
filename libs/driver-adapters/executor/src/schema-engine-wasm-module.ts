@@ -13,5 +13,5 @@ export type QueryLogCallback = (log: string) => void
 export async function initSchemaEngine(
   adapterFactory: ErrorCapturingSqlDriverAdapterFactory,
 ): Promise<SchemaEngine> {
-  return new SchemaEngine(adapterFactory)
+  return await SchemaEngine.new(adapterFactory)
 }

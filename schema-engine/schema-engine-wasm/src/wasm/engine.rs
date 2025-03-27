@@ -68,7 +68,8 @@ pub struct SchemaEngine {
 
 #[wasm_bindgen]
 impl SchemaEngine {
-    #[wasm_bindgen(constructor)]
+    // Note: we shouldn't mark this as a constructor, due to https://github.com/rustwasm/wasm-bindgen/issues/3976.
+    #[wasm_bindgen]
     pub async fn new(adapter: JsObject) -> Result<SchemaEngine, wasm_bindgen::JsError> {
         register_panic_hook();
 
