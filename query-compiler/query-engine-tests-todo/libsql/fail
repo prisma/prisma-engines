@@ -994,6 +994,7 @@ writes::top_level_mutations::upsert::upsert::no_create_required_val_null
 writes::top_level_mutations::upsert::upsert::only_update_if_uniq_field_change
 writes::top_level_mutations::upsert::upsert::only_update_if_update_changes_nothing
 writes::top_level_mutations::upsert::upsert::should_update_if_uniq_already_exists
+writes::top_level_mutations::upsert::upsert::update_shorthand_already_exists
 writes::top_level_mutations::upsert::upsert::upsert_apply_number_ops_for_float
 writes::top_level_mutations::upsert::upsert::upsert_apply_number_ops_for_int
 writes::top_level_mutations::upsert::upsert::upsert_called_twice_does_nothing
