@@ -8,7 +8,8 @@ import type { State } from './worker'
 import { debug } from '../utils'
 import {
   QueryInterpreter,
-  TransactionManager,
+  type QueryInterpreterTransactionManager,
+  type TransactionManager,
 } from '@prisma/client-engine-runtime'
 import { QueryCompiler } from '../query-compiler'
 import { parseIsolationLevel } from './worker-transaction'
@@ -43,9 +44,9 @@ class QueryPipeline {
 
       const results = transaction
         ? await this.executeTransactionalBatch(
-            batch,
-            parseIsolationLevel(transaction.isolationLevel),
-          )
+          batch,
+          parseIsolationLevel(transaction.isolationLevel),
+        )
         : await this.executeIndependentBatch(batch)
 
       debug('🟢 Batch query results: ', results)
@@ -66,7 +67,7 @@ class QueryPipeline {
         )
       }
 
-      const result = await this.executeQuery(queryable, query)
+      const result = await this.executeQuery(queryable, query, !txId)
 
       debug('🟢 Query result: ', result)
 
@@ -77,6 +78,7 @@ class QueryPipeline {
   private async executeQuery(
     queryable: SqlQueryable,
     query: JsonProtocolQuery,
+    allowTransaction: boolean,
   ) {
     const queryPlanString = withLocalPanicHandler(() =>
       this.compiler.compile(JSON.stringify(query)),
@@ -86,20 +88,24 @@ class QueryPipeline {
 
     debug('🟢 Query plan: ', util.inspect(queryPlan, false, null, true))
 
+    const qiTransactionManager = (
+      allowTransaction ? { enabled: true, manager: this.transactionManager } : { enabled: false }
+    ) satisfies QueryInterpreterTransactionManager
+
     const interpreter = new QueryInterpreter({
-      queryable,
+      transactionManager: qiTransactionManager,
       placeholderValues: {},
       onQuery: (event) => {
         this.logs.push(JSON.stringify(event))
       },
     })
 
-    return interpreter.run(queryPlan)
+    return interpreter.run(queryPlan, queryable)
   }
 
   private async executeIndependentBatch(queries: readonly JsonProtocolQuery[]) {
     return Promise.all(
-      queries.map((query) => this.executeQuery(this.driverAdapter, query)),
+      queries.map((query) => this.executeQuery(this.driverAdapter, query, true)),
     )
   }
 
@@ -111,7 +117,7 @@ class QueryPipeline {
       isolationLevel,
     })
 
-    const queryable = this.transactionManager.getTransaction(
+    const transaction = this.transactionManager.getTransaction(
       txInfo,
       'batch transaction query',
     )
@@ -120,7 +126,7 @@ class QueryPipeline {
       const results: unknown[] = []
 
       for (const query of queries) {
-        const result = await this.executeQuery(queryable, query)
+        const result = await this.executeQuery(transaction, query, false)
         results.push(result)
       }
 

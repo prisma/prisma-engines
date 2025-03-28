@@ -1,13 +1,13 @@
 mod query;
 
+use super::expression::{Binding, Expression};
+use crate::Expression::Transaction;
 use itertools::{Either, Itertools};
 use query::translate_query;
 use query_builder::QueryBuilder;
 use query_core::{EdgeRef, Node, NodeRef, Query, QueryGraph, QueryGraphBuilderError, QueryGraphDependency};
 use query_structure::{PrismaValue, PrismaValueType, SelectedField, SelectionResult};
 use thiserror::Error;
-
-use super::expression::{Binding, Expression};
 
 #[derive(Debug, Error)]
 pub enum TranslateError {
@@ -24,12 +24,18 @@ pub enum TranslateError {
 pub type TranslateResult<T> = Result<T, TranslateError>;
 
 pub fn translate(mut graph: QueryGraph, builder: &dyn QueryBuilder) -> TranslateResult<Expression> {
-    graph
+    let root = graph
         .root_nodes()
         .into_iter()
         .map(|node| NodeTranslator::new(&mut graph, node, &[], builder).translate())
         .collect::<TranslateResult<Vec<_>>>()
-        .map(Expression::Seq)
+        .map(Expression::Seq)?;
+
+    if graph.needs_transaction() {
+        return Ok(Transaction(Box::new(root)));
+    }
+
+    Ok(root)
 }
 
 struct NodeTranslator<'a, 'b> {

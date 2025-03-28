@@ -55,6 +55,7 @@ where
             Expression::Required(expression) => self.unary_function("required", expression),
             Expression::Join { parent, children } => self.join(parent, children),
             Expression::MapField { field, records } => self.map_field(field, records),
+            Expression::Transaction(expression) => self.transaction(expression),
         }
     }
 
@@ -251,6 +252,15 @@ where
             .append(self.field_name(field))
             .append(self.space())
             .append(self.expression(records).parens())
+    }
+
+    fn transaction(&'a self, expr: &'a Expression) -> DocBuilder<'a, PrettyPrinter<'a, D>, ColorSpec> {
+        self.keyword("transaction")
+            .append(self.line())
+            .append(self.softline())
+            .append(self.softline())
+            .append(self.softline())
+            .append(self.expression(expr).align())
     }
 }
 
