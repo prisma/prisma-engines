@@ -34,12 +34,16 @@ impl<'a> DmmfObjectRenderer<'a> {
             rendered_fields.push(render_input_field(field, ctx));
         }
 
-        let meta = input_object.tag().and_then(|tag| match tag {
-            ObjectTag::WhereInputType(container) => Some(DmmfInputTypeMeta {
-                source: Some(container.name()),
+        let meta = match (input_object.tag(), input_object.container()) {
+            (None, None) => None,
+            (tag, container) => Some(DmmfInputTypeMeta {
+                source: tag.and_then(|tag| match tag {
+                    ObjectTag::WhereInputType(c) => Some(c.name()),
+                    _ => None,
+                }),
+                grouping: container.map(|c| c.name()),
             }),
-            _ => None,
-        });
+        };
 
         let input_type = DmmfInputType {
             name: input_object.identifier.name(),

@@ -1,7 +1,9 @@
 use bigdecimal::{BigDecimal, FromPrimitive};
 use chrono::{DateTime, NaiveDate, Utc};
-use prisma_value::{PlaceholderType, PrismaValue};
-use quaint::ast::VarType;
+use prisma_value::{PrismaValue, PrismaValueType};
+use quaint::ast::OpaqueType;
+
+use crate::value::{GeneratorCall, Placeholder};
 
 pub(crate) fn quaint_value_to_prisma_value(value: quaint::Value<'_>) -> PrismaValue {
     match value.typed {
@@ -63,32 +65,44 @@ pub(crate) fn quaint_value_to_prisma_value(value: quaint::Value<'_>) -> PrismaVa
             PrismaValue::DateTime(dt.into())
         }
         quaint::ValueType::Time(None) => PrismaValue::Null,
-        quaint::ValueType::Var(name, vt) => PrismaValue::Placeholder {
-            name: name.into_owned(),
-            r#type: var_type_to_placeholder_type(&vt),
-        },
+        quaint::ValueType::Opaque(opaque) => {
+            if let Some(placeholder) = opaque.downcast_ref::<Placeholder>() {
+                PrismaValue::Placeholder {
+                    name: placeholder.name().to_owned(),
+                    r#type: opaque_type_to_prisma_type(opaque.typ()),
+                }
+            } else if let Some(call) = opaque.downcast_ref::<GeneratorCall>() {
+                PrismaValue::GeneratorCall {
+                    name: call.name().to_owned(),
+                    args: call.args().to_vec(),
+                    return_type: opaque_type_to_prisma_type(opaque.typ()),
+                }
+            } else {
+                panic!("Received an unsupported opaque value")
+            }
+        }
     }
 }
 
-fn var_type_to_placeholder_type(vt: &VarType) -> PlaceholderType {
+pub fn opaque_type_to_prisma_type(vt: &OpaqueType) -> PrismaValueType {
     match vt {
-        VarType::Unknown => PlaceholderType::Any,
-        VarType::Int32 => PlaceholderType::Int,
-        VarType::Int64 => PlaceholderType::BigInt,
-        VarType::Float => PlaceholderType::Float,
-        VarType::Double => PlaceholderType::Float,
-        VarType::Text => PlaceholderType::String,
-        VarType::Enum => PlaceholderType::String,
-        VarType::Bytes => PlaceholderType::Bytes,
-        VarType::Boolean => PlaceholderType::Boolean,
-        VarType::Char => PlaceholderType::String,
-        VarType::Array(t) => PlaceholderType::Array(Box::new(var_type_to_placeholder_type(t))),
-        VarType::Numeric => PlaceholderType::Float,
-        VarType::Json => PlaceholderType::Object,
-        VarType::Xml => PlaceholderType::String,
-        VarType::Uuid => PlaceholderType::String,
-        VarType::DateTime => PlaceholderType::Date,
-        VarType::Date => PlaceholderType::Date,
-        VarType::Time => PlaceholderType::Date,
+        OpaqueType::Unknown => PrismaValueType::Any,
+        OpaqueType::Int32 => PrismaValueType::Int,
+        OpaqueType::Int64 => PrismaValueType::BigInt,
+        OpaqueType::Float => PrismaValueType::Float,
+        OpaqueType::Double => PrismaValueType::Float,
+        OpaqueType::Text => PrismaValueType::String,
+        OpaqueType::Enum => PrismaValueType::String,
+        OpaqueType::Bytes => PrismaValueType::Bytes,
+        OpaqueType::Boolean => PrismaValueType::Boolean,
+        OpaqueType::Char => PrismaValueType::String,
+        OpaqueType::Array(t) => PrismaValueType::Array(Box::new(opaque_type_to_prisma_type(t))),
+        OpaqueType::Numeric => PrismaValueType::Decimal,
+        OpaqueType::Json => PrismaValueType::Object,
+        OpaqueType::Xml => PrismaValueType::String,
+        OpaqueType::Uuid => PrismaValueType::String,
+        OpaqueType::DateTime => PrismaValueType::Date,
+        OpaqueType::Date => PrismaValueType::Date,
+        OpaqueType::Time => PrismaValueType::Date,
     }
 }

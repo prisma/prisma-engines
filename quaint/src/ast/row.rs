@@ -1,5 +1,5 @@
 use super::compare::JsonType;
-use crate::ast::{Comparable, Compare, Expression};
+use crate::ast::{Comparable, Compare, Expression, ExpressionKind};
 use std::borrow::Cow;
 
 /// A collection of values surrounded by parentheses.
@@ -52,6 +52,22 @@ impl<'a> Row<'a> {
         }
 
         columns
+    }
+
+    pub fn to_parameterized_row(self) -> Expression<'a> {
+        let item = self
+            .values
+            .first()
+            .expect("The Row must have a single Parameterized item");
+
+        match item.kind() {
+            ExpressionKind::Parameterized(value) => Expression {
+                kind: ExpressionKind::ParameterizedRow(value.clone()),
+                alias: item.alias.clone(),
+            },
+
+            _ => unreachable!("The Row must have a single Parameterized item"),
+        }
     }
 }
 

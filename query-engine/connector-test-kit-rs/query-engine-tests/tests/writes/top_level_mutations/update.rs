@@ -4,6 +4,8 @@ use query_engine_tests::*;
 mod update {
     use indoc::indoc;
     use query_engine_tests::{assert_error, run_query, run_query_json, TROUBLE_CHARS};
+    use std::time::Duration;
+    use tokio::time::sleep;
 
     fn schema_1() -> String {
         let schema = indoc! {
@@ -312,6 +314,9 @@ mod update {
     #[connector_test(schema(schema_4))]
     async fn update_updated_at_datetime(runner: Runner) -> TestResult<()> {
         create_row(&runner, r#"{ id: 1, field: "test"}"#).await?;
+
+        // We have to wait a bit to avoid test flakiness due to the finite precision of the clock
+        sleep(Duration::from_millis(50)).await;
 
         let res = run_query_json!(
             &runner,

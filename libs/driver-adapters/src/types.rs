@@ -11,61 +11,9 @@ use quaint::connector::{ColumnType as QuaintColumnType, ExternalConnectionInfo, 
 use tsify_next::Tsify;
 
 use crate::conversion::{JSArg, JSArgType};
+pub use quaint::connector::external::AdapterProvider;
 use serde::{Deserialize, Serialize};
 use serde_repr::{Deserialize_repr, Serialize_repr};
-
-#[cfg_attr(target_arch = "wasm32", derive(Deserialize))]
-#[derive(Debug, Eq, PartialEq, Clone)]
-pub enum AdapterProvider {
-    #[cfg(feature = "mysql")]
-    Mysql,
-    #[cfg(feature = "postgresql")]
-    Postgres,
-    #[cfg(feature = "sqlite")]
-    Sqlite,
-}
-
-impl AdapterProvider {
-    pub fn db_system_name(&self) -> &'static str {
-        match self {
-            #[cfg(feature = "mysql")]
-            Self::Mysql => "mysql",
-            #[cfg(feature = "postgresql")]
-            Self::Postgres => "postgresql",
-            #[cfg(feature = "sqlite")]
-            Self::Sqlite => "sqlite",
-        }
-    }
-}
-
-impl FromStr for AdapterProvider {
-    type Err = String;
-
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s {
-            #[cfg(feature = "postgresql")]
-            "postgres" => Ok(Self::Postgres),
-            #[cfg(feature = "mysql")]
-            "mysql" => Ok(Self::Mysql),
-            #[cfg(feature = "sqlite")]
-            "sqlite" => Ok(Self::Sqlite),
-            _ => Err(format!("Unsupported adapter flavour: {:?}", s)),
-        }
-    }
-}
-
-impl From<&AdapterProvider> for SqlFamily {
-    fn from(value: &AdapterProvider) -> Self {
-        match value {
-            #[cfg(feature = "mysql")]
-            AdapterProvider::Mysql => SqlFamily::Mysql,
-            #[cfg(feature = "postgresql")]
-            AdapterProvider::Postgres => SqlFamily::Postgres,
-            #[cfg(feature = "sqlite")]
-            AdapterProvider::Sqlite => SqlFamily::Sqlite,
-        }
-    }
-}
 
 #[cfg_attr(not(target_arch = "wasm32"), napi_derive::napi(object))]
 #[cfg_attr(target_arch = "wasm32", derive(Deserialize))]
@@ -125,7 +73,7 @@ impl JsConnectionInfo {
 #[cfg_attr(target_arch = "wasm32", derive(Deserialize))]
 #[cfg_attr(target_arch = "wasm32", serde(rename_all = "camelCase"))]
 #[derive(Debug)]
-pub struct JSResultSet {
+pub struct JsResultSet {
     pub column_types: Vec<ColumnType>,
     pub column_names: Vec<String>,
     // Note this might be encoded differently for performance reasons
@@ -133,7 +81,7 @@ pub struct JSResultSet {
     pub last_insert_id: Option<String>,
 }
 
-impl JSResultSet {
+impl JsResultSet {
     pub fn len(&self) -> usize {
         self.rows.len()
     }

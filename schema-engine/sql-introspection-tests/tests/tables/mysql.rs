@@ -111,7 +111,7 @@ async fn a_table_with_length_prefixed_index(api: &mut TestApi) -> TestResult {
             `a`  TEXT NOT NULL,
             `b`  TEXT NOT NULL
         );
-        
+
         CREATE INDEX A_a_b_idx ON `A` (a(30), b(20));
     "#};
 
@@ -140,7 +140,7 @@ async fn a_table_with_non_length_prefixed_index(api: &mut TestApi) -> TestResult
             `a`  VARCHAR(190) NOT NULL,
             `b`  VARCHAR(192) NOT NULL
         );
-        
+
         CREATE INDEX A_a_idx ON `A` (a);
         CREATE INDEX A_b_idx ON `A` (b(191));
     "#};
@@ -171,7 +171,7 @@ async fn a_table_with_descending_index(api: &mut TestApi) -> TestResult {
             `a`  INT NOT NULL,
             `b`  INT NOT NULL
         );
-        
+
         CREATE INDEX A_a_b_idx ON `A` (a ASC, b DESC);
     "#};
 
@@ -200,7 +200,7 @@ async fn a_table_with_descending_unique(api: &mut TestApi) -> TestResult {
             `a`  INT NOT NULL,
             `b`  INT NOT NULL
         );
-        
+
         CREATE UNIQUE INDEX A_a_b_key ON `A` (a ASC, b DESC);
     "#};
 
@@ -229,7 +229,7 @@ async fn a_table_with_fulltext_index(api: &mut TestApi) -> TestResult {
             `a`  VARCHAR(255) NOT NULL,
             `b`  TEXT         NOT NULL
         );
-        
+
         CREATE FULLTEXT INDEX A_a_b_idx ON `A` (a, b);
     "#};
 
@@ -258,7 +258,7 @@ async fn a_table_with_fulltext_index_with_custom_name(api: &mut TestApi) -> Test
             `a`  VARCHAR(255) NOT NULL,
             `b`  TEXT         NOT NULL
         );
-        
+
         CREATE FULLTEXT INDEX custom_name ON `A` (a, b);
     "#};
 
@@ -378,8 +378,7 @@ async fn missing_select_rights(api: &mut TestApi) -> TestResult {
         shadow_database_connection_string: None,
     };
 
-    let mut conn = SqlSchemaConnector::new_mysql();
-    conn.set_params(params).unwrap();
+    let mut conn = SqlSchemaConnector::new_mysql(params).unwrap();
 
     let datasource = formatdoc!(
         r#"

@@ -1,19 +1,9 @@
-#[cfg(feature = "mssql")]
-mod mssql;
-
-#[cfg(feature = "mysql")]
-mod mysql;
-
-#[cfg(any(feature = "postgresql", feature = "cockroachdb"))]
-mod postgres;
-
-#[cfg(feature = "sqlite")]
-mod sqlite;
-
 use psl::parser_database::{ast::FieldArity, walkers::*};
 use sql_schema_describer::{self as sql, ColumnArity, ColumnType, ColumnTypeFamily};
 
 pub(crate) trait SqlSchemaCalculatorFlavour {
+    fn datamodel_connector(&self) -> &dyn psl::datamodel_connector::Connector;
+
     fn calculate_enums(&self, _ctx: &mut super::Context<'_>) {}
 
     fn column_type_for_enum(&self, _enm: EnumWalker<'_>, _ctx: &super::Context<'_>) -> Option<sql::ColumnTypeFamily> {

@@ -1,21 +1,19 @@
+use crate::visitor::query_writer::QueryWriter;
 use crate::{
     ast::*,
     error::{Error, ErrorKind},
     visitor::{self, Visitor},
 };
 use itertools::Itertools;
-use std::{
-    fmt::{self, Write},
-    ops::Deref,
-};
+use query_template::{PlaceholderFormat, QueryTemplate};
+use std::{fmt, ops::Deref};
 
 /// A visitor to generate queries for the PostgreSQL database.
 ///
 /// The returned parameter values implement the `ToSql` trait from postgres and
 /// can be used directly with the database.
 pub struct Postgres<'a> {
-    query: String,
-    parameters: Vec<Value<'a>>,
+    query_template: QueryTemplate<Value<'a>>,
 }
 
 impl<'a> Postgres<'a> {
@@ -56,32 +54,40 @@ impl<'a> Visitor<'a> for Postgres<'a> {
     const C_BACKTICK_CLOSE: &'static str = "\"";
     const C_WILDCARD: &'static str = "%";
 
-    fn build<Q>(query: Q) -> crate::Result<(String, Vec<Value<'a>>)>
+    fn build_template<Q>(query: Q) -> crate::Result<QueryTemplate<Value<'a>>>
     where
         Q: Into<Query<'a>>,
     {
-        let mut postgres = Postgres {
-            query: String::with_capacity(4096),
-            parameters: Vec::with_capacity(128),
+        let mut this = Postgres {
+            query_template: QueryTemplate::new(PlaceholderFormat {
+                prefix: "$",
+                has_numbering: true,
+            }),
         };
 
-        Postgres::visit_query(&mut postgres, query.into())?;
+        Postgres::visit_query(&mut this, query.into())?;
 
-        Ok((postgres.query, postgres.parameters))
+        Ok(this.query_template)
     }
 
-    fn write<D: fmt::Display>(&mut self, s: D) -> visitor::Result {
-        write!(&mut self.query, "{s}")?;
+    fn write(&mut self, value: impl fmt::Display) -> visitor::Result {
+        self.query_template.write_string_chunk(value.to_string());
         Ok(())
     }
 
     fn add_parameter(&mut self, value: Value<'a>) {
-        self.parameters.push(value);
+        self.query_template.parameters.push(value);
     }
 
     fn parameter_substitution(&mut self) -> visitor::Result {
-        self.write("$")?;
-        self.write(self.parameters.len())
+        self.query_template.write_parameter();
+        Ok(())
+    }
+
+    fn visit_parameterized_row(&mut self, value: Value<'a>) -> visitor::Result {
+        self.query_template.write_parameter_tuple();
+        self.query_template.parameters.push(value);
+        Ok(())
     }
 
     fn visit_parameterized_enum(&mut self, variant: EnumVariant<'a>, name: Option<EnumName<'a>>) -> visitor::Result {
@@ -264,8 +270,8 @@ impl<'a> Visitor<'a> for Postgres<'a> {
             ValueType::Date(date) => date.map(|date| self.write(format!("'{date}'"))),
             ValueType::Time(time) => time.map(|time| self.write(format!("'{time}'"))),
 
-            ValueType::Var(name, _) => Some(Err(
-                Error::builder(ErrorKind::VarAsRawValue(name.clone().into_owned())).build()
+            ValueType::Opaque(opaque) => Some(Err(
+                Error::builder(ErrorKind::OpaqueAsRawValue(opaque.to_string())).build()
             )),
         };
 

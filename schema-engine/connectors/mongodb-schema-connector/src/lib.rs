@@ -21,6 +21,8 @@ use schema_connector::{migrations_directory::MigrationDirectory, *};
 use std::{future, sync::Arc};
 use tokio::sync::OnceCell;
 
+pub struct MongoDbSchemaDialect;
+
 /// The top-level MongoDB migration connector.
 pub struct MongoDbSchemaConnector {
     connection_string: String,
@@ -49,37 +51,63 @@ impl MongoDbSchemaConnector {
 
         Ok(client)
     }
+}
 
-    async fn mongodb_schema_from_diff_target(&self, target: DiffTarget<'_>) -> ConnectorResult<MongoSchema> {
-        match target {
-            DiffTarget::Datamodel(sources) => {
-                let validated_schema =
-                    psl::parse_schema_multi(&sources).map_err(ConnectorError::new_schema_parser_error)?;
+impl SchemaDialect for MongoDbSchemaDialect {
+    fn diff(&self, from: DatabaseSchema, to: DatabaseSchema) -> Migration {
+        let from: Box<MongoSchema> = from.downcast();
+        let to: Box<MongoSchema> = to.downcast();
+        Migration::new(differ::diff(from, to))
+    }
 
-                Ok(schema_calculator::calculate(&validated_schema))
-            }
-            DiffTarget::Database => self.client().await?.describe().await,
-            DiffTarget::Migrations(_) => Err(unsupported_command_error()),
-            DiffTarget::Empty => Ok(MongoSchema::default()),
-        }
+    fn migration_file_extension(&self) -> &'static str {
+        unreachable!("migration_file_extension")
+    }
+
+    fn migration_len(&self, migration: &Migration) -> usize {
+        migration.downcast_ref::<MongoDbMigration>().steps.len()
+    }
+
+    fn migration_summary(&self, migration: &Migration) -> String {
+        migration.downcast_ref::<MongoDbMigration>().summary()
+    }
+
+    fn render_script(
+        &self,
+        _migration: &Migration,
+        _diagnostics: &DestructiveChangeDiagnostics,
+    ) -> ConnectorResult<String> {
+        Err(ConnectorError::from_msg(
+            "Rendering to a script is not supported on MongoDB.".to_owned(),
+        ))
+    }
+
+    fn extract_namespaces(&self, _schema: &DatabaseSchema) -> Option<Namespaces> {
+        None
+    }
+
+    fn empty_database_schema(&self) -> DatabaseSchema {
+        DatabaseSchema::new(MongoSchema::default())
+    }
+
+    fn schema_from_datamodel(&self, sources: Vec<(String, psl::SourceFile)>) -> ConnectorResult<DatabaseSchema> {
+        let validated_schema = psl::parse_schema_multi(&sources).map_err(ConnectorError::new_schema_parser_error)?;
+        Ok(DatabaseSchema::new(schema_calculator::calculate(&validated_schema)))
+    }
+
+    fn schema_from_migrations_with_target<'a>(
+        &'a self,
+        _migrations: &'a [MigrationDirectory],
+        _namespaces: Option<Namespaces>,
+        _target: ExternalShadowDatabase,
+    ) -> BoxFuture<'a, ConnectorResult<DatabaseSchema>> {
+        Box::pin(async { Err(unsupported_command_error()) })
     }
 }
 
 impl SchemaConnector for MongoDbSchemaConnector {
-    fn connection_string(&self) -> Option<&str> {
-        Some(&self.connection_string)
-    }
-
-    fn database_schema_from_diff_target<'a>(
-        &'a mut self,
-        diff_target: DiffTarget<'a>,
-        _shadow_database_connection_string: Option<String>,
-        _namespaces: Option<Namespaces>,
-    ) -> BoxFuture<'a, ConnectorResult<DatabaseSchema>> {
-        Box::pin(async {
-            let schema = self.mongodb_schema_from_diff_target(diff_target).await?;
-            Ok(DatabaseSchema::new(schema))
-        })
+    fn schema_dialect(&self) -> Box<dyn SchemaDialect> {
+        Box::new(MongoDbSchemaDialect)
     }
 
     fn host(&self) -> &Arc<dyn ConnectorHost> {
@@ -112,10 +140,6 @@ impl SchemaConnector for MongoDbSchemaConnector {
         ))))
     }
 
-    fn empty_database_schema(&self) -> DatabaseSchema {
-        DatabaseSchema::new(MongoSchema::default())
-    }
-
     fn ensure_connection_validity(&mut self) -> BoxFuture<'_, ConnectorResult<()>> {
         Box::pin(future::ready(Ok(())))
     }
@@ -124,26 +148,8 @@ impl SchemaConnector for MongoDbSchemaConnector {
         Box::pin(future::ready(Ok("4 or 5".to_owned())))
     }
 
-    fn diff(&self, from: DatabaseSchema, to: DatabaseSchema) -> Migration {
-        let from: Box<MongoSchema> = from.downcast();
-        let to: Box<MongoSchema> = to.downcast();
-        Migration::new(differ::diff(from, to))
-    }
-
     fn drop_database(&mut self) -> BoxFuture<'_, ConnectorResult<()>> {
         Box::pin(async { self.client().await?.drop_database().await })
-    }
-
-    fn migration_file_extension(&self) -> &'static str {
-        unreachable!("migration_file_extension")
-    }
-
-    fn migration_len(&self, migration: &Migration) -> usize {
-        migration.downcast_ref::<MongoDbMigration>().steps.len()
-    }
-
-    fn migration_summary(&self, migration: &Migration) -> String {
-        migration.downcast_ref::<MongoDbMigration>().summary()
     }
 
     fn reset(
@@ -180,22 +186,6 @@ impl SchemaConnector for MongoDbSchemaConnector {
         })
     }
 
-    fn render_script(
-        &self,
-        _migration: &Migration,
-        _diagnostics: &DestructiveChangeDiagnostics,
-    ) -> ConnectorResult<String> {
-        Err(ConnectorError::from_msg(
-            "Rendering to a script is not supported on MongoDB.".to_owned(),
-        ))
-    }
-
-    fn set_params(&mut self, params: ConnectorParams) -> ConnectorResult<()> {
-        self.connection_string = params.connection_string;
-        self.preview_features = params.preview_features;
-        Ok(())
-    }
-
     fn set_preview_features(&mut self, preview_features: BitFlags<psl::PreviewFeature>) {
         self.preview_features = preview_features;
     }
@@ -212,15 +202,26 @@ impl SchemaConnector for MongoDbSchemaConnector {
         Box::pin(future::ready(Ok(())))
     }
 
-    fn extract_namespaces(&self, _schema: &DatabaseSchema) -> Option<Namespaces> {
-        None
-    }
-
     fn introspect_sql(
         &mut self,
         _input: IntrospectSqlQueryInput,
     ) -> BoxFuture<'_, ConnectorResult<IntrospectSqlQueryOutput>> {
         unreachable!()
+    }
+
+    fn schema_from_database(
+        &mut self,
+        _namespaces: Option<Namespaces>,
+    ) -> BoxFuture<'_, ConnectorResult<DatabaseSchema>> {
+        Box::pin(async { self.client().await?.describe().await.map(DatabaseSchema::new) })
+    }
+
+    fn schema_from_migrations<'a>(
+        &'a mut self,
+        _migrations: &'a [MigrationDirectory],
+        _namespaces: Option<Namespaces>,
+    ) -> BoxFuture<'a, ConnectorResult<DatabaseSchema>> {
+        Box::pin(async { Err(unsupported_command_error()) })
     }
 }
 

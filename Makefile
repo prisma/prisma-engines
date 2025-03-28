@@ -4,7 +4,7 @@ CONFIG_PATH = ./query-engine/connector-test-kit-rs/test-configs
 CONFIG_FILE = .test_config
 SCHEMA_EXAMPLES_PATH = ./query-engine/example_schemas
 DEV_SCHEMA_FILE = dev_datamodel.prisma
-DRIVER_ADAPTERS_BRANCH ?= main
+PRISMA_BRANCH ?= main
 ENGINE_SIZE_OUTPUT ?= /dev/stdout
 QE_WASM_VERSION ?= 0.0.0
 SCHEMA_WASM_VERSION ?= 0.0.0
@@ -81,7 +81,7 @@ integrate-qe-wasm:
 
 build-se-wasm:
 	cd schema-engine/schema-engine-wasm && \
-	./build.sh $(QE_WASM_VERSION) schema-engine/schema-engine-wasm/pkg
+	./build.sh $(SCHEMA_ENGINE_WASM_VERSION) schema-engine/schema-engine-wasm/pkg
 
 build-qc-wasm:
 	cd query-compiler/query-compiler-wasm && \
@@ -180,7 +180,7 @@ dev-libsql-wasm: build-qe-wasm build-driver-adapters-kit-qe
 test-libsql-wasm: dev-libsql-wasm test-qe-st
 test-driver-adapter-libsql-wasm: test-libsql-wasm
 
-dev-d1: build-qe-wasm build-driver-adapters-kit-qe
+dev-d1: build-qe-wasm build-se-wasm build-driver-adapters-kit-qe
 	cp $(CONFIG_PATH)/cloudflare-d1 $(CONFIG_FILE)
 
 test-d1: dev-d1 test-qe-st
@@ -452,13 +452,9 @@ ensure-prisma-present:
 		  echo "⚠️ ../prisma diverges from prisma/prisma main branch. Test results might diverge from those in CI ⚠️ "; \
 		fi \
 	else \
-		echo "git clone --depth=1 https://github.com/prisma/prisma.git --branch=$(DRIVER_ADAPTERS_BRANCH) ../prisma"; \
-		git clone --depth=1 https://github.com/prisma/prisma.git --branch=$(DRIVER_ADAPTERS_BRANCH) "../prisma" && echo "Prisma repository has been cloned to ../prisma"; \
+		echo "git clone --depth=1 https://github.com/prisma/prisma.git --branch=$(PRISMA_BRANCH) ../prisma"; \
+		git clone --depth=1 https://github.com/prisma/prisma.git --branch=$(PRISMA_BRANCH) "../prisma" && echo "Prisma repository has been cloned to ../prisma"; \
 	fi;
-
-# Quick schema validation of whatever you have in the dev_datamodel.prisma file.
-validate:
-	cargo run --bin test-cli -- validate-datamodel dev_datamodel.prisma
 
 qe:
 	cargo run --bin query-engine -- --engine-protocol json --enable-raw-queries --enable-metrics --enable-open-telemetry --enable-telemetry-in-response
@@ -468,17 +464,6 @@ qe-graphql:
 
 qe-dmmf:
 	cargo run --bin query-engine -- cli dmmf > dmmf.json
-
-push-schema:
-	cargo run --bin test-cli -- schema-push $(DEV_SCHEMA_FILE) --force
-
-qe-dev-chinook-sqlite:
-	cp $(SCHEMA_EXAMPLES_PATH)/chinook_sqlite.prisma $(DEV_SCHEMA_FILE)
-
-qe-dev-chinook-postgres10: start-postgres10
-	cp $(SCHEMA_EXAMPLES_PATH)/chinook_postgres10.prisma $(DEV_SCHEMA_FILE)
-	sleep 5
-	make push-schema
 
 qe-dev-mongo_4_4: start-mongodb_4_4
 	cp $(SCHEMA_EXAMPLES_PATH)/generic_mongo4.prisma $(DEV_SCHEMA_FILE)

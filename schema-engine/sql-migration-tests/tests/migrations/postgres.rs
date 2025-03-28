@@ -214,8 +214,7 @@ fn postgres_apply_migrations_errors_give_precise_location(api: TestApi) {
             contents.push_str(migration);
         })
         .into_output()
-        .generated_migration_name
-        .unwrap();
+        .generated_migration_name;
 
     let err = api
         .apply_migrations(&migrations_directory)
@@ -270,8 +269,7 @@ fn postgres_apply_migrations_errors_give_precise_location_at_the_beginning_of_fi
             contents.push_str(migration);
         })
         .into_output()
-        .generated_migration_name
-        .unwrap();
+        .generated_migration_name;
 
     let err = api
         .apply_migrations(&migrations_directory)

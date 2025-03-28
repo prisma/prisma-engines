@@ -13,6 +13,7 @@ pub mod read;
 pub mod select;
 mod sql_trace;
 pub mod update;
+pub mod value;
 pub mod write;
 
 use std::{collections::HashMap, marker::PhantomData};
@@ -29,6 +30,7 @@ use query_structure::{
 
 pub use column_metadata::ColumnMetadata;
 pub use context::Context;
+pub use convert::opaque_type_to_prisma_type;
 pub use filter::FilterBuilder;
 pub use model_extensions::{AsColumn, AsColumns, AsTable, RelationFieldExt, SelectionResultExt};
 use read::alias_with_prisma_name;
@@ -53,12 +55,19 @@ impl<'a, V> SqlQueryBuilder<'a, V> {
     where
         V: Visitor<'a>,
     {
-        let (sql, params) = V::build(query)?;
-        let params = params
+        let template = V::build_template(query)?;
+
+        let params = template
+            .parameters
             .into_iter()
             .map(convert::quaint_value_to_prisma_value)
             .collect::<Vec<_>>();
-        Ok(DbQuery::new(sql, params))
+
+        Ok(DbQuery::TemplateSql {
+            fragments: template.fragments,
+            placeholder_format: template.placeholder_format,
+            params,
+        })
     }
 }
 
@@ -307,7 +316,7 @@ impl<'a, V: Visitor<'a>> QueryBuilder for SqlQueryBuilder<'a, V> {
         // Unwrapping query & params is safe since it's already passed the query parsing stage
         let query = inputs.remove("query").unwrap().into_string().unwrap();
         let params = inputs.remove("parameters").unwrap().into_list().unwrap();
-        Ok(DbQuery::new(query, params))
+        Ok(DbQuery::RawSql { sql: query, params })
     }
 }
 

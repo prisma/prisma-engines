@@ -17,7 +17,7 @@ use quaint::{
     prelude::{ConnectionInfo, NativeConnectionInfo, Queryable, ResultSet},
     single::Quaint,
 };
-use schema_core::schema_connector::{ConnectorParams, SchemaConnector};
+use schema_core::schema_connector::{ConnectorParams, ConnectorResult, SchemaConnector};
 use sql_schema_connector::SqlSchemaConnector;
 use tempfile::TempDir;
 use test_setup::{DatasourceBlock, TestApiArgs};
@@ -50,8 +50,7 @@ impl TestApi {
                 preview_features,
                 shadow_database_connection_string: args.shadow_database_url().map(String::from),
             };
-            let mut conn = SqlSchemaConnector::new_mysql();
-            conn.set_params(params).unwrap();
+            let mut conn = SqlSchemaConnector::new_mysql(params).unwrap();
             tok(conn.reset(false, None)).unwrap();
 
             (
@@ -187,6 +186,16 @@ impl TestApi {
         connection_string: String,
         shadow_database_connection_string: Option<String>,
     ) -> EngineTestApi {
+        self.new_engine_with_connection_strings_or_err(connection_string, shadow_database_connection_string)
+            .unwrap()
+    }
+
+    /// Instantiate a new migration with the provided connection string or return an error.
+    pub fn new_engine_with_connection_strings_or_err(
+        &self,
+        connection_string: String,
+        shadow_database_connection_string: Option<String>,
+    ) -> ConnectorResult<EngineTestApi> {
         let connection_info = ConnectionInfo::from_url(&connection_string).unwrap();
 
         let params = ConnectorParams {
@@ -195,30 +204,31 @@ impl TestApi {
             shadow_database_connection_string,
         };
 
-        let mut connector = match &connection_info {
+        let connector = match &connection_info {
             ConnectionInfo::Native(NativeConnectionInfo::Postgres(_)) => {
                 if self.args.provider() == "cockroachdb" {
-                    SqlSchemaConnector::new_cockroach()
+                    SqlSchemaConnector::new_cockroach(params)?
                 } else {
-                    SqlSchemaConnector::new_postgres()
+                    SqlSchemaConnector::new_postgres(params)?
                 }
             }
-            ConnectionInfo::Native(NativeConnectionInfo::Mysql(_)) => SqlSchemaConnector::new_mysql(),
-            ConnectionInfo::Native(NativeConnectionInfo::Mssql(_)) => SqlSchemaConnector::new_mssql(),
-            ConnectionInfo::Native(NativeConnectionInfo::Sqlite { .. }) => SqlSchemaConnector::new_sqlite(),
+            ConnectionInfo::Native(NativeConnectionInfo::Mysql(_)) => SqlSchemaConnector::new_mysql(params)?,
+            ConnectionInfo::Native(NativeConnectionInfo::Mssql(_)) => SqlSchemaConnector::new_mssql(params)?,
+            ConnectionInfo::Native(NativeConnectionInfo::Sqlite { .. }) => {
+                SqlSchemaConnector::new_sqlite(params).unwrap()
+            }
             ConnectionInfo::Native(NativeConnectionInfo::InMemorySqlite { .. }) | ConnectionInfo::External(_) => {
                 unreachable!()
             }
         };
-        connector.set_params(params).unwrap();
 
-        EngineTestApi {
+        Ok(EngineTestApi {
             connector,
             connection_info,
             tags: self.args.tags(),
             namespaces: self.args.namespaces(),
             max_ddl_refresh_delay: self.args.max_ddl_refresh_delay(),
-        }
+        })
     }
 
     fn tags(&self) -> BitFlags<Tags> {

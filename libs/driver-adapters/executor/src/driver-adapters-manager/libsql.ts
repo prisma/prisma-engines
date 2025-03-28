@@ -1,28 +1,36 @@
 import { PrismaLibSQL } from '@prisma/adapter-libsql'
-import { libSql } from '@prisma/bundled-js-drivers'
-import { DriverAdapter } from '@prisma/driver-adapter-utils'
-import type { ConnectParams, DriverAdaptersManager } from './index'
+import type { SqlDriverAdapter, SqlMigrationAwareDriverAdapterFactory } from '@prisma/driver-adapter-utils'
+import type { DriverAdaptersManager, SetupDriverAdaptersInput } from './index'
 import type { DriverAdapterTag, EnvForAdapter } from '../types'
 
 const TAG = 'libsql' as const satisfies DriverAdapterTag
 type TAG = typeof TAG
 
 export class LibSQLManager implements DriverAdaptersManager {
-  #driver?: libSql.Client
-  #adapter?: DriverAdapter
+  #factory: SqlMigrationAwareDriverAdapterFactory
+  #adapter?: SqlDriverAdapter
 
-  private constructor(private env: EnvForAdapter<TAG>) {}
-
-  static async setup(env: EnvForAdapter<TAG>) {
-    return new LibSQLManager(env)
+  private constructor(private env: EnvForAdapter<TAG>, { url }: SetupDriverAdaptersInput) {
+    this.#factory = new PrismaLibSQL({
+      url,
+      intMode: 'bigint',
+    })
   }
 
-  async connect({ url }: ConnectParams) {
-    this.#driver = libSql.createClient({ url, intMode: 'bigint' })
-    this.#adapter = new PrismaLibSQL(this.#driver) as DriverAdapter
+  static async setup(env: EnvForAdapter<TAG>, input: SetupDriverAdaptersInput) {
+    return new LibSQLManager(env, input)
+  }
 
+  factory() {
+    return this.#factory
+  }
+
+  async connect() {
+    this.#adapter = await this.#factory.connect()
     return this.#adapter
   }
 
-  async teardown() {}
+  async teardown() {
+    await this.#adapter?.dispose()
+  }
 }

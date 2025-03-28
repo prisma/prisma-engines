@@ -69,8 +69,8 @@ pub fn conv_params(params: &[Value<'_>]) -> crate::Result<my::Params> {
                     )
                 }),
 
-                ValueType::Var(name, _) => {
-                    Err(Error::builder(ErrorKind::RanQueryWithVarParam(name.clone().into_owned())).build())?
+                ValueType::Opaque(opaque) => {
+                    Err(Error::builder(ErrorKind::RanQueryWithOpaqueParam(opaque.to_string())).build())?
                 }
             };
 

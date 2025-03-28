@@ -1,6 +1,6 @@
 use connection_string::JdbcString;
 use quaint::{prelude::*, single::Quaint};
-use schema_core::schema_connector::{ConnectorError, ConnectorResult};
+use schema_core::schema_connector::{ConnectorError, ConnectorParams, ConnectorResult};
 use std::str::FromStr;
 
 pub(crate) async fn mssql_setup(url: String, prisma_schema: &str, db_schemas: &[&str]) -> ConnectorResult<()> {
@@ -39,6 +39,7 @@ pub(crate) async fn mssql_setup(url: String, prisma_schema: &str, db_schemas: &[
             .unwrap();
     }
 
-    let mut connector = sql_schema_connector::SqlSchemaConnector::new_mssql();
-    crate::diff_and_apply(prisma_schema, url, &mut connector).await
+    let params = ConnectorParams::new(url, Default::default(), None);
+    let mut connector = sql_schema_connector::SqlSchemaConnector::new_mssql(params)?;
+    crate::diff_and_apply(prisma_schema, &mut connector).await
 }

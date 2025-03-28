@@ -1,15 +1,14 @@
 use crate::proxy::{CommonProxy, DriverProxy};
 use crate::types::{AdapterProvider, Query};
-use crate::JsObject;
+use crate::{JsObject, JsResult};
 
 use super::conversion;
 use crate::send_future::UnsafeFuture;
 use async_trait::async_trait;
 use futures::Future;
-use quaint::connector::{DescribedQuery, ExternalConnectionInfo, ExternalConnector};
+use quaint::connector::{AdapterName, DescribedQuery, ExternalConnectionInfo, ExternalConnector};
 use quaint::{
     connector::{metrics, IsolationLevel, Transaction},
-    error::{Error, ErrorKind},
     prelude::{Query as QuaintQuery, Queryable as QuaintQueryable, ResultSet, TransactionCapable},
     visitor::{self, Visitor},
 };
@@ -31,15 +30,18 @@ use tracing::{info_span, Instrument};
 pub(crate) struct JsBaseQueryable {
     pub(crate) proxy: CommonProxy,
     pub provider: AdapterProvider,
+    pub adapter_name: AdapterName,
     pub(crate) db_system_name: &'static str,
 }
 
 impl JsBaseQueryable {
     pub(crate) fn new(proxy: CommonProxy) -> Self {
-        let provider: AdapterProvider = proxy.provider.parse().unwrap();
+        let provider = proxy.provider;
+        let adapter_name = proxy.adapter_name;
         let db_system_name = provider.db_system_name();
         Self {
             proxy,
+            adapter_name,
             provider,
             db_system_name,
         }
@@ -159,18 +161,6 @@ impl QuaintQueryable for JsBaseQueryable {
     /// Sets the transaction isolation level to given value.
     /// Implementers have to make sure that the passed isolation level is valid for the underlying database.
     async fn set_tx_isolation_level(&self, isolation_level: IsolationLevel) -> quaint::Result<()> {
-        if matches!(isolation_level, IsolationLevel::Snapshot) {
-            return Err(Error::builder(ErrorKind::invalid_isolation_level(&isolation_level)).build());
-        }
-
-        #[cfg(feature = "sqlite")]
-        if self.provider == AdapterProvider::Sqlite {
-            return match isolation_level {
-                IsolationLevel::Serializable => Ok(()),
-                _ => Err(Error::builder(ErrorKind::invalid_isolation_level(&isolation_level)).build()),
-            };
-        }
-
         self.raw_cmd(&format!("SET TRANSACTION ISOLATION LEVEL {isolation_level}"))
             .await
     }
@@ -291,10 +281,26 @@ impl std::fmt::Debug for JsQueryable {
 
 #[async_trait]
 impl ExternalConnector for JsQueryable {
+    fn adapter_name(&self) -> AdapterName {
+        self.inner.adapter_name
+    }
+
+    fn provider(&self) -> AdapterProvider {
+        self.inner.provider
+    }
+
+    async fn execute_script(&self, script: &str) -> quaint::Result<()> {
+        self.driver_proxy.execute_script(script.to_owned()).await
+    }
+
     async fn get_connection_info(&self) -> quaint::Result<ExternalConnectionInfo> {
         let conn_info = self.driver_proxy.get_connection_info().await?;
 
         Ok(conn_info.into_external_connection_info(&self.inner.provider))
+    }
+
+    async fn dispose(&self) -> quaint::Result<()> {
+        self.driver_proxy.dispose().await
     }
 }
 
@@ -354,44 +360,13 @@ impl JsQueryable {
         &'a self,
         isolation: Option<IsolationLevel>,
     ) -> quaint::Result<Box<dyn Transaction + 'a>> {
-        // 1. Obtain a transaction context from the driver.
-        //    Any command run on this context is guaranteed to be part of the same session
-        //    as the transaction spawned from it.
-        let tx_ctx = self.driver_proxy.transaction_context().await?;
-
-        let requires_isolation_first = tx_ctx.requires_isolation_first();
-
-        // 2. Set the isolation level (if specified) if the provider requires it to be set before
-        //    creating the transaction.
-        if requires_isolation_first {
-            if let Some(isolation) = isolation {
-                tx_ctx.set_tx_isolation_level(isolation).await?;
-            }
-        }
-
-        // 3. Spawn a transaction from the context.
-        let tx = tx_ctx.start_transaction().await?;
-
-        let begin_stmt = tx.begin_statement();
-        let tx_opts = tx.options();
-
-        if tx_opts.use_phantom_query {
-            let begin_stmt = JsBaseQueryable::phantom_query_message(begin_stmt);
-            tx.raw_phantom_cmd(begin_stmt.as_str()).await?;
-        } else {
-            tx.raw_cmd(begin_stmt).await?;
-        }
-
-        // 4. Set the isolation level (if specified) if we didn't do it before.
-        if !requires_isolation_first {
-            if let Some(isolation) = isolation {
-                tx.set_tx_isolation_level(isolation).await?;
-            }
-        }
-
+        let tx = self.driver_proxy.start_transaction(isolation).await?;
         self.server_reset_query(tx.as_ref()).await?;
-
         Ok(tx)
+    }
+
+    pub fn dispose_non_blocking(&self) {
+        self.driver_proxy.dispose_non_blocking();
     }
 }
 
@@ -405,12 +380,61 @@ impl TransactionCapable for JsQueryable {
     }
 }
 
-pub fn from_js(driver: JsObject) -> JsQueryable {
+pub fn queryable_from_js(driver: JsObject) -> JsQueryable {
     let common = CommonProxy::new(&driver).unwrap();
     let driver_proxy = DriverProxy::new(&driver).unwrap();
 
     JsQueryable {
         inner: JsBaseQueryable::new(common),
         driver_proxy,
+    }
+}
+
+#[cfg(target_arch = "wasm32")]
+impl super::wasm::FromJsValue for JsBaseQueryable {
+    fn from_js_value(value: wasm_bindgen::prelude::JsValue) -> JsResult<Self> {
+        use wasm_bindgen::JsCast;
+
+        let object = value.dyn_into::<JsObject>()?;
+        let common_proxy = CommonProxy::new(&object)?;
+        Ok(Self::new(common_proxy))
+    }
+}
+
+#[cfg(not(target_arch = "wasm32"))]
+impl ::napi::bindgen_prelude::FromNapiValue for JsBaseQueryable {
+    unsafe fn from_napi_value(env: napi::sys::napi_env, napi_val: napi::sys::napi_value) -> JsResult<Self> {
+        let object = JsObject::from_napi_value(env, napi_val)?;
+        let common_proxy = CommonProxy::new(&object)?;
+        Ok(Self::new(common_proxy))
+    }
+}
+
+#[cfg(target_arch = "wasm32")]
+impl super::wasm::FromJsValue for JsQueryable {
+    fn from_js_value(value: wasm_bindgen::prelude::JsValue) -> JsResult<Self> {
+        use wasm_bindgen::JsCast;
+
+        let object = value.dyn_into::<JsObject>()?;
+        let common_proxy = CommonProxy::new(&object)?;
+        let driver_proxy = DriverProxy::new(&object)?;
+        Ok(Self {
+            inner: JsBaseQueryable::new(common_proxy),
+            driver_proxy,
+        })
+    }
+}
+
+#[cfg(not(target_arch = "wasm32"))]
+impl ::napi::bindgen_prelude::FromNapiValue for JsQueryable {
+    unsafe fn from_napi_value(env: napi::sys::napi_env, napi_val: napi::sys::napi_value) -> JsResult<Self> {
+        let object = JsObject::from_napi_value(env, napi_val)?;
+        let common_proxy = CommonProxy::new(&object)?;
+        let driver_proxy = DriverProxy::new(&object)?;
+
+        Ok(Self {
+            inner: JsBaseQueryable::new(common_proxy),
+            driver_proxy,
+        })
     }
 }

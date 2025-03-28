@@ -83,8 +83,7 @@ fn run_single_migration_test(test_file_path: &str, test_function_name: &'static 
             preview_features: Default::default(),
             shadow_database_connection_string: None,
         };
-        let mut conn = SqlSchemaConnector::new_mysql();
-        conn.set_params(params).unwrap();
+        let mut conn = SqlSchemaConnector::new_mysql(params).unwrap();
         tok(conn.reset(false, None)).unwrap();
         test_api_args.database_url().to_owned()
     } else if tags.contains(Tags::Mysql) {

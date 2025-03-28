@@ -3,7 +3,7 @@
 //! Why this rather than using connectors directly? We must be able to use the schema engine
 //! without a valid schema or database connection for commands like createDatabase and diff.
 
-use crate::{api::GenericApi, commands, parse_configuration_multi, CoreError, CoreResult, SchemaContainerExt};
+use crate::{commands, parse_configuration_multi, CoreError, CoreResult, GenericApi, SchemaContainerExt};
 use enumflags2::BitFlags;
 use json_rpc::types::*;
 use psl::{parser_database::SourceFile, PreviewFeature};
@@ -221,7 +221,7 @@ impl GenericApi for EngineState {
 
         self.with_default_connector(Box::new(move |connector| {
             Box::pin(
-                commands::apply_migrations(input, connector, namespaces)
+                ::commands::apply_migrations(input, connector, namespaces)
                     .instrument(tracing::info_span!("ApplyMigrations")),
             )
         }))
@@ -280,7 +280,7 @@ impl GenericApi for EngineState {
     }
 
     async fn diff(&self, params: DiffParams) -> CoreResult<DiffResult> {
-        crate::commands::diff(params, self.host.clone()).await
+        commands::diff_cli(params, self.host.clone()).await
     }
 
     async fn drop_database(&self, url: String) -> CoreResult<()> {
@@ -326,6 +326,7 @@ impl GenericApi for EngineState {
         .await
     }
 
+    // TODO: move to `schema-commands`?
     async fn introspect(&self, params: IntrospectParams) -> CoreResult<IntrospectResult> {
         tracing::info!("{:?}", params.schema);
         let source_files = params.schema.to_psl_input();
@@ -449,21 +450,6 @@ impl GenericApi for EngineState {
             }),
         )
         .await
-    }
-
-    async fn list_migration_directories(
-        &self,
-        input: ListMigrationDirectoriesInput,
-    ) -> CoreResult<ListMigrationDirectoriesOutput> {
-        let migrations_from_filesystem =
-            schema_connector::migrations_directory::list_migrations(Path::new(&input.migrations_directory_path))?;
-
-        let migrations = migrations_from_filesystem
-            .iter()
-            .map(|migration| migration.migration_name().to_string())
-            .collect();
-
-        Ok(ListMigrationDirectoriesOutput { migrations })
     }
 
     async fn mark_migration_applied(&self, input: MarkMigrationAppliedInput) -> CoreResult<MarkMigrationAppliedOutput> {

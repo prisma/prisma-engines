@@ -1,13 +1,15 @@
+use crate::queryable::JsQueryable;
+use crate::send_future::UnsafeFuture;
 use crate::types::JsConnectionInfo;
-pub use crate::types::{JSResultSet, Query, TransactionOptions};
+pub use crate::types::{JsResultSet, Query, TransactionOptions};
 use crate::{
     from_js_value, get_named_property, get_optional_named_property, to_rust_str, AdapterMethod, JsObject, JsResult,
     JsString, JsTransaction,
 };
-use crate::{send_future::UnsafeFuture, transaction::JsTransactionContext};
 
 use futures::Future;
 use prisma_metrics::gauge;
+use quaint::connector::{AdapterName, AdapterProvider, IsolationLevel};
 use std::sync::atomic::{AtomicBool, Ordering};
 
 /// Proxy is a struct wrapping a javascript object that exhibits basic primitives for
@@ -15,32 +17,49 @@ use std::sync::atomic::{AtomicBool, Ordering};
 /// to invoke the code within the node runtime that implements the client connector.
 pub(crate) struct CommonProxy {
     /// Execute a query given as SQL, interpolating the given parameters.
-    query_raw: AdapterMethod<Query, JSResultSet>,
+    query_raw: AdapterMethod<Query, JsResultSet>,
 
     /// Execute a query given as SQL, interpolating the given parameters and
     /// returning the number of affected rows.
     execute_raw: AdapterMethod<Query, u32>,
 
     /// Return the provider for this driver.
-    pub(crate) provider: String,
+    pub(crate) provider: AdapterProvider,
+
+    /// Return the adapter name for this driver.
+    pub(crate) adapter_name: AdapterName,
+}
+
+/// This is a JS proxy for accessing methods on the adapter factory.
+pub(crate) struct AdapterFactoryProxy {
+    /// Retrieve a queryable instance.
+    connect: AdapterMethod<(), JsQueryable>,
+
+    /// Retrieve a queryable instance for a shadow database.
+    connect_to_shadow_db: Option<AdapterMethod<(), JsQueryable>>,
+
+    /// Return the provider for this driver.
+    pub(crate) provider: AdapterProvider,
+
+    /// Return the adapter name for this driver.
+    pub(crate) adapter_name: AdapterName,
 }
 
 /// This is a JS proxy for accessing the methods specific to top level
 /// JS driver objects
 pub(crate) struct DriverProxy {
+    /// Execute a script composed of multiple statements. This is usually analogous to the output
+    /// of `prisma migrate diff --script`.
+    execute_script: AdapterMethod<String, ()>,
+
     /// Retrieve driver-specific info, such as the maximum number of query parameters
     get_connection_info: Option<AdapterMethod<(), JsConnectionInfo>>,
 
-    /// Provide a transaction context, in which raw commands are guaranteed to be executed in
-    /// the same scope as a future transaction, which can be spawned by via
-    /// [`driver_adapters::transaction::JsTransactionContext::start_transaction`].
-    /// This was first introduced for supporting Isolation Levels in PlanetScale.
-    transaction_context: AdapterMethod<(), JsTransactionContext>,
-}
+    /// Start a new transaction.
+    start_transaction: AdapterMethod<Option<String>, JsTransaction>,
 
-/// This is a JS proxy for accessing the methods specific to JS transaction contexts.
-pub(crate) struct TransactionContextProxy {
-    start_transaction: AdapterMethod<(), JsTransaction>,
+    /// Dispose of the underlying driver.
+    dispose: AdapterMethod<(), ()>,
 }
 
 /// This a JS proxy for accessing the methods, specific
@@ -63,15 +82,20 @@ pub(crate) struct TransactionProxy {
 impl CommonProxy {
     pub fn new(object: &JsObject) -> JsResult<Self> {
         let provider: JsString = get_named_property(object, "provider")?;
+        let provider: AdapterProvider = to_rust_str(provider)?.parse().unwrap();
+
+        let adapter_name: JsString = get_named_property(object, "adapterName")?;
+        let adapter_name: AdapterName = to_rust_str(adapter_name)?.parse().unwrap();
 
         Ok(Self {
             query_raw: get_named_property(object, "queryRaw")?,
             execute_raw: get_named_property(object, "executeRaw")?,
-            provider: to_rust_str(provider)?,
+            provider,
+            adapter_name,
         })
     }
 
-    pub async fn query_raw(&self, params: Query) -> quaint::Result<JSResultSet> {
+    pub async fn query_raw(&self, params: Query) -> quaint::Result<JsResultSet> {
         self.query_raw.call_as_async(params).await
     }
 
@@ -80,13 +104,76 @@ impl CommonProxy {
     }
 }
 
+impl AdapterFactoryProxy {
+    pub fn new(object: &JsObject) -> JsResult<Self> {
+        let provider: JsString = get_named_property(object, "provider")?;
+        let provider: AdapterProvider = to_rust_str(provider)?.parse().unwrap();
+
+        let adapter_name: JsString = get_named_property(object, "adapterName")?;
+        let adapter_name: AdapterName = to_rust_str(adapter_name)?.parse().unwrap();
+
+        Ok(Self {
+            adapter_name,
+            connect: get_named_property(object, "connect")?,
+            connect_to_shadow_db: get_optional_named_property(object, "connectToShadowDb")?,
+            provider,
+        })
+    }
+
+    pub async fn connect(&self) -> quaint::Result<JsQueryable> {
+        UnsafeFuture(self.connect.call_as_async(())).await
+    }
+
+    pub async fn connect_to_shadow_db(&self) -> Option<quaint::Result<JsQueryable>> {
+        match &self.connect_to_shadow_db {
+            Some(method) => Some(UnsafeFuture(method.call_as_async(())).await),
+            None => None,
+        }
+    }
+
+    pub fn adapter_name(&self) -> AdapterName {
+        self.adapter_name
+    }
+
+    pub fn provider(&self) -> AdapterProvider {
+        self.provider
+    }
+}
+
 // TypeScript: DriverAdapter
 impl DriverProxy {
     pub fn new(object: &JsObject) -> JsResult<Self> {
         Ok(Self {
+            execute_script: get_named_property(object, "executeScript")?,
+            start_transaction: get_named_property(object, "startTransaction")?,
             get_connection_info: get_optional_named_property(object, "getConnectionInfo")?,
-            transaction_context: get_named_property(object, "transactionContext")?,
+            dispose: get_named_property(object, "dispose")?,
         })
+    }
+
+    pub async fn execute_script(&self, script: String) -> quaint::Result<()> {
+        UnsafeFuture(self.execute_script.call_as_async(script)).await
+    }
+
+    async fn start_transaction_inner(&self, isolation: Option<IsolationLevel>) -> quaint::Result<Box<JsTransaction>> {
+        let tx = self
+            .start_transaction
+            .call_as_async(isolation.map(|lvl| lvl.to_string()))
+            .await?;
+
+        // Decrement for this gauge is done in JsTransaction::commit/JsTransaction::rollback
+        // Previously, it was done in JsTransaction::new, similar to the native Transaction.
+        // However, correct Dispatcher is lost there and increment does not register, so we moved
+        // it here instead.
+        gauge!("prisma_client_queries_active").increment(1.0);
+        Ok(Box::new(tx))
+    }
+
+    pub fn start_transaction(
+        &self,
+        isolation: Option<IsolationLevel>,
+    ) -> impl Future<Output = quaint::Result<Box<JsTransaction>>> + '_ {
+        UnsafeFuture(self.start_transaction_inner(isolation))
     }
 
     pub async fn get_connection_info(&self) -> quaint::Result<JsConnectionInfo> {
@@ -100,33 +187,12 @@ impl DriverProxy {
         .await
     }
 
-    pub async fn transaction_context(&self) -> quaint::Result<JsTransactionContext> {
-        let ctx = self.transaction_context.call_as_async(()).await?;
-
-        Ok(ctx)
-    }
-}
-
-impl TransactionContextProxy {
-    pub fn new(object: &JsObject) -> JsResult<Self> {
-        let start_transaction = get_named_property(object, "startTransaction")?;
-
-        Ok(Self { start_transaction })
+    pub async fn dispose(&self) -> quaint::Result<()> {
+        UnsafeFuture(self.dispose.call_as_async(())).await
     }
 
-    async fn start_transaction_inner(&self) -> quaint::Result<Box<JsTransaction>> {
-        let tx = self.start_transaction.call_as_async(()).await?;
-
-        // Decrement for this gauge is done in JsTransaction::commit/JsTransaction::rollback
-        // Previously, it was done in JsTransaction::new, similar to the native Transaction.
-        // However, correct Dispatcher is lost there and increment does not register, so we moved
-        // it here instead.
-        gauge!("prisma_client_queries_active").increment(1.0);
-        Ok(Box::new(tx))
-    }
-
-    pub fn start_transaction(&self) -> impl Future<Output = quaint::Result<Box<JsTransaction>>> + '_ {
-        UnsafeFuture(self.start_transaction_inner())
+    pub fn dispose_non_blocking(&self) {
+        self.dispose.call_non_blocking(());
     }
 }
 
@@ -212,7 +278,6 @@ macro_rules! impl_send_sync_on_wasm {
 // Assume the proxy object will not be sent to service workers, we can unsafe impl Send + Sync.
 impl_send_sync_on_wasm!(TransactionProxy);
 impl_send_sync_on_wasm!(JsTransaction);
-impl_send_sync_on_wasm!(TransactionContextProxy);
-impl_send_sync_on_wasm!(JsTransactionContext);
 impl_send_sync_on_wasm!(DriverProxy);
 impl_send_sync_on_wasm!(CommonProxy);
+impl_send_sync_on_wasm!(AdapterFactoryProxy);

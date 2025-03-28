@@ -1,28 +1,75 @@
 use std::sync::Arc;
 
-use enumflags2::BitFlags;
-use psl::ValidatedSchema;
+use psl::{PreviewFeatures, SourceFile, ValidatedSchema};
+use quaint::connector::ExternalConnectorFactory;
 
 use crate::{
-    migrations_directory::MigrationDirectory, BoxFuture, ConnectorHost, ConnectorParams, ConnectorResult,
-    DatabaseSchema, DestructiveChangeChecker, DestructiveChangeDiagnostics, DiffTarget, IntrospectSqlQueryInput,
+    migrations_directory::MigrationDirectory, BoxFuture, ConnectorHost, ConnectorResult, DatabaseSchema,
+    DestructiveChangeChecker, DestructiveChangeDiagnostics, DiffTarget, IntrospectSqlQueryInput,
     IntrospectSqlQueryOutput, IntrospectionContext, IntrospectionResult, Migration, MigrationPersistence, Namespaces,
 };
+
+/// The dialect for schema operations on a particular database.
+pub trait SchemaDialect: Send + Sync + 'static {
+    /// Create a migration by comparing two database schemas.
+    fn diff(&self, from: DatabaseSchema, to: DatabaseSchema) -> Migration;
+
+    /// Render the migration to a runnable script.
+    ///
+    /// This should always return with `Ok` in normal circumstances. The result is currently only
+    /// used to signal when the connector does not support rendering to a script.
+    fn render_script(
+        &self,
+        migration: &Migration,
+        diagnostics: &DestructiveChangeDiagnostics,
+    ) -> ConnectorResult<String>;
+
+    /// The file extension for generated migration files.
+    fn migration_file_extension(&self) -> &'static str;
+
+    /// Return whether the migration is empty.
+    fn migration_is_empty(&self, migration: &Migration) -> bool {
+        self.migration_len(migration) == 0
+    }
+
+    /// Return the number of steps in the migration.
+    /// Invariant: migration_is_empty() == true iff migration_len() == 0.
+    fn migration_len(&self, migration: &Migration) -> usize;
+
+    /// Render a human-readable drift summary for the migration.
+    fn migration_summary(&self, migration: &Migration) -> String;
+
+    /// Extract the namespaces from a Sql database schema (it will return None for mongodb).
+    fn extract_namespaces(&self, schema: &DatabaseSchema) -> Option<Namespaces>;
+
+    /// An empty database schema (for diffing).
+    fn empty_database_schema(&self) -> DatabaseSchema;
+
+    /// Create a database schema from datamodel source files.
+    fn schema_from_datamodel(&self, sources: Vec<(String, SourceFile)>) -> ConnectorResult<DatabaseSchema>;
+
+    /// Create a database schema from migrations with a specific target shadow database.
+    /// When MultiSchema is enabled, the namespaces are required for diffing anything other than a
+    /// prisma schema, because that information is otherwise unavailable.
+    fn schema_from_migrations_with_target<'a>(
+        &'a self,
+        migrations: &'a [MigrationDirectory],
+        namespaces: Option<Namespaces>,
+        target: ExternalShadowDatabase,
+    ) -> BoxFuture<'a, ConnectorResult<DatabaseSchema>>;
+}
 
 /// The top-level trait for connectors. This is the abstraction the schema engine core relies on to
 /// interface with different database backends.
 pub trait SchemaConnector: Send + Sync + 'static {
-    // Setup methods
+    /// Return the schema dialect of the connector.
+    fn schema_dialect(&self) -> Box<dyn SchemaDialect>;
 
     /// Accept a new ConnectorHost.
     fn set_host(&mut self, host: Arc<dyn ConnectorHost>);
 
-    /// Accept and validate new ConnectorParams. This should fail if it is called twice on the same
-    /// connector.
-    fn set_params(&mut self, params: ConnectorParams) -> ConnectorResult<()>;
-
     /// Accept a new set of enabled preview features.
-    fn set_preview_features(&mut self, preview_features: BitFlags<psl::PreviewFeature>);
+    fn set_preview_features(&mut self, preview_features: PreviewFeatures);
 
     // Connector methods
 
@@ -40,23 +87,14 @@ pub trait SchemaConnector: Send + Sync + 'static {
     /// the connector name. The SQL connector for example can return "postgresql", "mysql" or "sqlite".
     fn connector_type(&self) -> &'static str;
 
-    /// Return the connection string that was used to initialize this connector in set_params().
-    fn connection_string(&self) -> Option<&str>;
-
     /// Create the database referenced by Prisma schema that was used to initialize the connector.
     fn create_database(&mut self) -> BoxFuture<'_, ConnectorResult<String>>;
 
     /// Send a command to the database directly.
     fn db_execute(&mut self, script: String) -> BoxFuture<'_, ConnectorResult<()>>;
 
-    /// Create a migration by comparing two database schemas.
-    fn diff(&self, from: DatabaseSchema, to: DatabaseSchema) -> Migration;
-
     /// Drop the database referenced by Prisma schema that was used to initialize the connector.
     fn drop_database(&mut self) -> BoxFuture<'_, ConnectorResult<()>>;
-
-    /// An empty database schema (for diffing).
-    fn empty_database_schema(&self) -> DatabaseSchema;
 
     /// Make sure the connection to the database is established and valid.
     /// Connectors can choose to connect lazily, but this method should force
@@ -68,16 +106,6 @@ pub trait SchemaConnector: Send + Sync + 'static {
 
     /// The version of the underlying database.
     fn version(&mut self) -> BoxFuture<'_, ConnectorResult<String>>;
-
-    /// Render the migration to a runnable script.
-    ///
-    /// This should always return with `Ok` in normal circumstances. The result is currently only
-    /// used to signal when the connector does not support rendering to a script.
-    fn render_script(
-        &self,
-        migration: &Migration,
-        diagnostics: &DestructiveChangeDiagnostics,
-    ) -> ConnectorResult<String>;
 
     /// Drop all database state.
     ///
@@ -94,36 +122,23 @@ pub trait SchemaConnector: Send + Sync + 'static {
         None
     }
 
-    /// The file extension for generated migration files.
-    fn migration_file_extension(&self) -> &'static str;
-
-    /// Return whether the migration is empty.
-    fn migration_is_empty(&self, migration: &Migration) -> bool {
-        self.migration_len(migration) == 0
-    }
-
-    /// Return the number of steps in the migration.
-    /// Invariant: migration_is_empty() == true iff migration_len() == 0.
-    fn migration_len(&self, migration: &Migration) -> usize;
-
     /// See [MigrationPersistence](trait.MigrationPersistence.html).
     fn migration_persistence(&mut self) -> &mut dyn MigrationPersistence;
-
-    /// Render a human-readable drift summary for the migration.
-    fn migration_summary(&self, migration: &Migration) -> String;
 
     /// See [DestructiveChangeChecker](trait.DestructiveChangeChecker.html).
     fn destructive_change_checker(&mut self) -> &mut dyn DestructiveChangeChecker;
 
-    /// Read a schema for diffing. The shadow database connection string is strictly optional, you
-    /// don't need to pass it if a shadow database url was passed in params, or if it can be
-    /// inferred from context, or if it isn't necessary for the task at hand.
-    /// When MultiSchema is enabled, the namespaces are required for diffing anything other than a
-    /// prisma schema, because that information is otherwise unavailable.
-    fn database_schema_from_diff_target<'a>(
+    /// Create a database schema from what's currently in the database.
+    fn schema_from_database(
+        &mut self,
+        namespaces: Option<Namespaces>,
+    ) -> BoxFuture<'_, ConnectorResult<DatabaseSchema>>;
+
+    /// Create a database schema from migrations using the shadow database configured in the
+    /// connector.
+    fn schema_from_migrations<'a>(
         &'a mut self,
-        target: DiffTarget<'a>,
-        shadow_database_connection_string: Option<String>,
+        migrations: &'a [MigrationDirectory],
         namespaces: Option<Namespaces>,
     ) -> BoxFuture<'a, ConnectorResult<DatabaseSchema>>;
 
@@ -146,6 +161,32 @@ pub trait SchemaConnector: Send + Sync + 'static {
         namespaces: Option<Namespaces>,
     ) -> BoxFuture<'a, ConnectorResult<()>>;
 
-    /// Extract the namespaces from a Sql database schema (it will return None for mongodb).
-    fn extract_namespaces(&self, schema: &DatabaseSchema) -> Option<Namespaces>;
+    /// Read a schema for diffing.
+    fn schema_from_diff_target<'a>(
+        &'a mut self,
+        diff_target: DiffTarget<'a>,
+        namespaces: Option<Namespaces>,
+    ) -> BoxFuture<'a, ConnectorResult<DatabaseSchema>> {
+        Box::pin(async move {
+            match diff_target {
+                DiffTarget::Datamodel(sources) => self.schema_dialect().schema_from_datamodel(sources),
+                DiffTarget::Migrations(migrations) => self.schema_from_migrations(migrations, namespaces).await,
+                DiffTarget::Database => self.schema_from_database(namespaces).await,
+                DiffTarget::Empty => Ok(self.schema_dialect().empty_database_schema()),
+            }
+        })
+    }
+}
+
+/// An external shadow database to be used for schema operations.
+pub enum ExternalShadowDatabase {
+    /// A driver adapter factory.
+    DriverAdapter(Arc<dyn ExternalConnectorFactory>),
+    /// A shadow database connection string and preview features.
+    ConnectionString {
+        /// The shadow database connection string.
+        connection_string: String,
+        /// The preview features.
+        preview_features: PreviewFeatures,
+    },
 }

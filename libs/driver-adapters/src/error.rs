@@ -42,10 +42,15 @@ pub struct SqliteErrorDef {
 /// Wrapper for JS-side errors
 pub(crate) enum DriverAdapterError {
     /// Unexpected JS exception
-    GenericJs { id: i32 },
+    GenericJs {
+        id: i32,
+    },
     UnsupportedNativeDataType {
         #[serde(rename = "type")]
         native_type: String,
+    },
+    InvalidIsolationLevel {
+        level: String,
     },
     #[cfg(feature = "postgresql")]
     #[serde(rename = "postgres")]

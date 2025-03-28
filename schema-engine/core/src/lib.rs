@@ -4,19 +4,19 @@
 
 //! The top-level library crate for the schema engine.
 
-pub use json_rpc;
-
 // exposed for tests
 #[doc(hidden)]
 pub mod commands;
 
-mod api;
+pub use ::commands::{CoreError, CoreResult, GenericApi};
+pub use json_rpc;
+
 mod core_error;
 mod rpc;
 mod state;
 mod timings;
 
-pub use self::{api::GenericApi, core_error::*, rpc::rpc_api, timings::TimingsLayer};
+pub use self::{rpc::rpc_api, timings::TimingsLayer};
 use json_rpc::types::{SchemaContainer, SchemasContainer, SchemasWithConfigDir};
 pub use schema_connector;
 
@@ -24,16 +24,11 @@ use enumflags2::BitFlags;
 use mongodb_schema_connector::MongoDbSchemaConnector;
 use psl::{
     builtin_connectors::*, datamodel_connector::Flavour, parser_database::SourceFile, Datasource, PreviewFeature,
-    ValidatedSchema,
 };
 use schema_connector::ConnectorParams;
 use sql_schema_connector::SqlSchemaConnector;
 use std::{env, path::Path};
 use user_facing_errors::common::InvalidConnectionString;
-
-fn parse_schema_multi(files: &[(String, SourceFile)]) -> CoreResult<ValidatedSchema> {
-    psl::parse_schema_multi(files).map_err(CoreError::new_schema_parser_error)
-}
 
 fn connector_for_connection_string(
     connection_string: String,
@@ -47,9 +42,7 @@ fn connector_for_connection_string(
                 preview_features,
                 shadow_database_connection_string,
             };
-            let mut connector = SqlSchemaConnector::new_postgres_like();
-            connector.set_params(params)?;
-            Ok(Box::new(connector))
+            Ok(Box::new(SqlSchemaConnector::new_postgres_like(params)?))
         }
         Some("file") => {
             let params = ConnectorParams {
@@ -57,9 +50,7 @@ fn connector_for_connection_string(
                 preview_features,
                 shadow_database_connection_string,
             };
-            let mut connector = SqlSchemaConnector::new_sqlite();
-            connector.set_params(params)?;
-            Ok(Box::new(connector))
+            Ok(Box::new(SqlSchemaConnector::new_sqlite(params)?))
         }
         Some("mysql") => {
             let params = ConnectorParams {
@@ -67,9 +58,7 @@ fn connector_for_connection_string(
                 preview_features,
                 shadow_database_connection_string,
             };
-            let mut connector = SqlSchemaConnector::new_mysql();
-            connector.set_params(params)?;
-            Ok(Box::new(connector))
+            Ok(Box::new(SqlSchemaConnector::new_mysql(params)?))
         }
         Some("sqlserver") => {
             let params = ConnectorParams {
@@ -77,9 +66,7 @@ fn connector_for_connection_string(
                 preview_features,
                 shadow_database_connection_string,
             };
-            let mut connector = SqlSchemaConnector::new_mssql();
-            connector.set_params(params)?;
-            Ok(Box::new(connector))
+            Ok(Box::new(SqlSchemaConnector::new_mssql(params)?))
         }
         Some("mongodb+srv") | Some("mongodb") => {
             let params = ConnectorParams {
@@ -98,9 +85,7 @@ fn connector_for_connection_string(
 }
 
 /// Same as schema_to_connector, but it will only read the provider, not the connector params.
-fn schema_to_connector_unchecked(
-    files: &[(String, SourceFile)],
-) -> CoreResult<Box<dyn schema_connector::SchemaConnector>> {
+fn schema_to_dialect(files: &[(String, SourceFile)]) -> CoreResult<Box<dyn schema_connector::SchemaDialect>> {
     let (_, config) = psl::parse_configuration_multi_file(files)
         .map_err(|(files, err)| CoreError::new_schema_parser_error(files.render_diagnostics(&err)))?;
 
@@ -111,17 +96,18 @@ fn schema_to_connector_unchecked(
         .next()
         .ok_or_else(|| CoreError::from_msg("There is no datasource in the schema.".into()))?;
 
-    let mut connector = connector_for_provider(source.active_provider)?;
-
     if let Ok(connection_string) = source.load_direct_url(|key| env::var(key).ok()) {
-        connector.set_params(ConnectorParams {
+        // TODO: remove conditional branch in Prisma 7.
+        let connector_params = ConnectorParams {
             connection_string,
             preview_features,
             shadow_database_connection_string: source.load_shadow_database_url().ok().flatten(),
-        })?;
+        };
+        let conn = connector_for_provider(source.active_provider, connector_params)?;
+        Ok(conn.schema_dialect())
+    } else {
+        ::commands::dialect_for_provider(source.active_provider)
     }
-
-    Ok(connector)
 }
 
 /// Go from a schema to a connector
@@ -141,25 +127,21 @@ fn schema_to_connector(
         shadow_database_connection_string: shadow_database_url,
     };
 
-    let mut connector = connector_for_provider(source.active_provider)?;
-    connector.set_params(params)?;
-
-    Ok(connector)
+    connector_for_provider(source.active_provider, params)
 }
 
-fn connector_for_provider(provider: &str) -> CoreResult<Box<dyn schema_connector::SchemaConnector>> {
+fn connector_for_provider(
+    provider: &str,
+    params: ConnectorParams,
+) -> CoreResult<Box<dyn schema_connector::SchemaConnector>> {
     if let Some(connector) = BUILTIN_CONNECTORS.iter().find(|c| c.is_provider(provider)) {
         match connector.flavour() {
-            Flavour::Cockroach => Ok(Box::new(SqlSchemaConnector::new_cockroach())),
-            Flavour::Mongo => Ok(Box::new(MongoDbSchemaConnector::new(ConnectorParams {
-                connection_string: String::new(),
-                preview_features: Default::default(),
-                shadow_database_connection_string: None,
-            }))),
-            Flavour::Sqlserver => Ok(Box::new(SqlSchemaConnector::new_mssql())),
-            Flavour::Mysql => Ok(Box::new(SqlSchemaConnector::new_mysql())),
-            Flavour::Postgres => Ok(Box::new(SqlSchemaConnector::new_postgres())),
-            Flavour::Sqlite => Ok(Box::new(SqlSchemaConnector::new_sqlite())),
+            Flavour::Cockroach => Ok(Box::new(SqlSchemaConnector::new_cockroach(params)?)),
+            Flavour::Mongo => Ok(Box::new(MongoDbSchemaConnector::new(params))),
+            Flavour::Sqlserver => Ok(Box::new(SqlSchemaConnector::new_mssql(params)?)),
+            Flavour::Mysql => Ok(Box::new(SqlSchemaConnector::new_mysql(params)?)),
+            Flavour::Postgres => Ok(Box::new(SqlSchemaConnector::new_postgres(params)?)),
+            Flavour::Sqlite => Ok(Box::new(SqlSchemaConnector::new_sqlite(params)?)),
         }
     } else {
         Err(CoreError::from_msg(format!(
@@ -172,7 +154,7 @@ fn connector_for_provider(provider: &str) -> CoreResult<Box<dyn schema_connector
 pub fn schema_api(
     datamodel: Option<String>,
     host: Option<std::sync::Arc<dyn schema_connector::ConnectorHost>>,
-) -> CoreResult<Box<dyn api::GenericApi>> {
+) -> CoreResult<Box<dyn GenericApi>> {
     // Eagerly load the default schema, for validation errors.
     if let Some(datamodel) = &datamodel {
         parse_configuration(datamodel)?;

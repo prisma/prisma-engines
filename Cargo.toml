@@ -2,6 +2,7 @@
 resolver = "2"
 members = [
     "schema-engine/cli",
+    "schema-engine/commands",
     "schema-engine/core",
     "schema-engine/connectors/*",
     "schema-engine/datamodel-renderer",
@@ -32,6 +33,7 @@ members = [
     "query-compiler/query-compiler-playground",
     "query-compiler/query-compiler-wasm",
     "query-compiler/query-engine-tests-todo",
+    "libs/query-template",
     "libs/*",
     "prisma-fmt",
     "prisma-schema-wasm",
@@ -114,7 +116,7 @@ rand = "0.8"
 regex = "1"
 reqwest = "0.11"
 rusqlite = "0.32"
-sha2 = "0.9"
+sha2 = "0.10"
 serde = { version = "1", features = ["derive"] }
 serde_json = { version = "1", features = [
     "float_roundtrip",
@@ -194,6 +196,7 @@ test-macros.path = "./libs/test-macros"
 query-engine-common.path = "./libs/query-engine-common"
 driver-adapters.path = "./libs/driver-adapters"
 sql-ddl.path = "./libs/sql-ddl"
+query-template.path = "libs/query-template"
 
 psl.path = "./psl/psl"
 psl-core.path = "./psl/psl-core"

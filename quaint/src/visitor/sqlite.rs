@@ -4,15 +4,16 @@ use crate::{
     visitor::{self, Visitor},
 };
 
-use std::fmt::{self, Write};
+use crate::visitor::query_writer::QueryWriter;
+use query_template::{PlaceholderFormat, QueryTemplate};
+use std::fmt;
 
 /// A visitor to generate queries for the SQLite database.
 ///
 /// The returned parameter values implement the `ToSql` trait from rusqlite and
 /// can be used directly with the database.
 pub struct Sqlite<'a> {
-    query: String,
-    parameters: Vec<Value<'a>>,
+    query_template: QueryTemplate<Value<'a>>,
 }
 
 impl<'a> Sqlite<'a> {
@@ -81,22 +82,24 @@ impl<'a> Visitor<'a> for Sqlite<'a> {
     const C_BACKTICK_CLOSE: &'static str = "`";
     const C_WILDCARD: &'static str = "%";
 
-    fn build<Q>(query: Q) -> crate::Result<(String, Vec<Value<'a>>)>
+    fn build_template<Q>(query: Q) -> crate::Result<QueryTemplate<Value<'a>>>
     where
         Q: Into<Query<'a>>,
     {
-        let mut sqlite = Sqlite {
-            query: String::with_capacity(4096),
-            parameters: Vec::with_capacity(128),
+        let mut this = Sqlite {
+            query_template: QueryTemplate::new(PlaceholderFormat {
+                prefix: "?",
+                has_numbering: false,
+            }),
         };
 
-        Sqlite::visit_query(&mut sqlite, query.into())?;
+        Sqlite::visit_query(&mut this, query.into())?;
 
-        Ok((sqlite.query, sqlite.parameters))
+        Ok(this.query_template)
     }
 
-    fn write<D: fmt::Display>(&mut self, s: D) -> visitor::Result {
-        write!(&mut self.query, "{s}")?;
+    fn write(&mut self, value: impl fmt::Display) -> visitor::Result {
+        self.query_template.write_string_chunk(value.to_string());
         Ok(())
     }
 
@@ -146,8 +149,8 @@ impl<'a> Visitor<'a> for Sqlite<'a> {
             ValueType::Time(time) => time.map(|time| self.write(format!("'{time}'"))),
             ValueType::Xml(cow) => cow.as_ref().map(|cow| self.write(format!("'{cow}'"))),
 
-            ValueType::Var(name, _) => Some(Err(
-                Error::builder(ErrorKind::VarAsRawValue(name.clone().into_owned())).build()
+            ValueType::Opaque(opaque) => Some(Err(
+                Error::builder(ErrorKind::OpaqueAsRawValue(opaque.to_string())).build()
             )),
         };
 
@@ -240,12 +243,19 @@ impl<'a> Visitor<'a> for Sqlite<'a> {
         Ok(())
     }
 
-    fn parameter_substitution(&mut self) -> visitor::Result {
-        self.write("?")
+    fn add_parameter(&mut self, value: Value<'a>) {
+        self.query_template.parameters.push(value);
     }
 
-    fn add_parameter(&mut self, value: Value<'a>) {
-        self.parameters.push(value);
+    fn parameter_substitution(&mut self) -> visitor::Result {
+        self.query_template.write_parameter();
+        Ok(())
+    }
+
+    fn visit_parameterized_row(&mut self, value: Value<'a>) -> visitor::Result {
+        self.query_template.write_parameter_tuple();
+        self.query_template.parameters.push(value);
+        Ok(())
     }
 
     fn visit_limit_and_offset(&mut self, limit: Option<Value<'a>>, offset: Option<Value<'a>>) -> visitor::Result {

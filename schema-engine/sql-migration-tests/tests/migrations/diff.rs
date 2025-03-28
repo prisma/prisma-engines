@@ -1,10 +1,13 @@
 use quaint::{prelude::Queryable, single::Quaint};
 use schema_core::{
-    commands::diff,
-    json_rpc::types::{DiffTarget, PathContainer, SchemasContainer, SchemasWithConfigDir},
+    commands::diff_cli,
+    json_rpc::types::{DiffTarget, SchemasContainer, SchemasWithConfigDir},
     schema_connector::SchemaConnector,
 };
-use sql_migration_tests::{test_api::*, utils::to_schema_containers};
+use sql_migration_tests::{
+    test_api::*,
+    utils::{list_migrations, to_schema_containers},
+};
 use std::sync::Arc;
 
 #[test_connector(tags(Sqlite, Mysql, Postgres, CockroachDb, Mssql))]
@@ -437,18 +440,18 @@ fn from_empty_to_migrations_directory(mut api: TestApi) {
     )
     .unwrap();
 
+    let migrations_list = list_migrations(&base_dir.into_path()).unwrap();
+
     let params = DiffParams {
         exit_code: None,
         from: DiffTarget::Empty,
-        to: DiffTarget::Migrations(PathContainer {
-            path: base_dir.path().to_string_lossy().into_owned(),
-        }),
+        to: DiffTarget::Migrations(migrations_list),
         script: true,
         shadow_database_url: Some(api.connection_string().to_owned()),
     };
 
     let host = Arc::new(TestConnectorHost::default());
-    tok(diff(params, host.clone())).unwrap();
+    tok(diff_cli(params, host.clone())).unwrap();
 
     let expected_printed_messages = expect![[r#"
         [
@@ -478,12 +481,12 @@ fn from_empty_to_migrations_folder_without_shadow_db_url_must_error(mut api: Tes
     )
     .unwrap();
 
+    let migrations_list = list_migrations(&base_dir.into_path()).unwrap();
+
     let params = DiffParams {
         exit_code: None,
         from: DiffTarget::Empty,
-        to: DiffTarget::Migrations(PathContainer {
-            path: base_dir.path().to_string_lossy().into_owned(),
-        }),
+        to: DiffTarget::Migrations(migrations_list),
         script: true,
         shadow_database_url: None, // TODO: ?
     };
@@ -768,24 +771,21 @@ fn diffing_mongo_schemas_to_script_returns_a_nice_error() {
 fn diff_sqlite_migration_directories() {
     let base_dir = tempfile::tempdir().unwrap();
     let base_dir_2 = tempfile::tempdir().unwrap();
-    let base_dir_str = base_dir.path().to_str().unwrap();
-    let base_dir_str_2 = base_dir_2.path().to_str().unwrap();
 
     let migrations_lock_path = base_dir.path().join("migration_lock.toml");
     std::fs::write(migrations_lock_path, "provider = \"sqlite\"").unwrap();
     let migrations_lock_path = base_dir_2.path().join("migration_lock.toml");
     std::fs::write(migrations_lock_path, "provider = \"sqlite\"").unwrap();
 
+    let migrations_list = list_migrations(&base_dir.into_path()).unwrap();
+    let migrations_list_2 = list_migrations(&base_dir_2.into_path()).unwrap();
+
     let params = DiffParams {
         exit_code: None,
-        from: DiffTarget::Migrations(PathContainer {
-            path: base_dir_str.to_owned(),
-        }),
+        from: DiffTarget::Migrations(migrations_list),
         script: true,
         shadow_database_url: None,
-        to: DiffTarget::Migrations(PathContainer {
-            path: base_dir_str_2.to_owned(),
-        }),
+        to: DiffTarget::Migrations(migrations_list_2),
     };
 
     tok(schema_core::schema_api(None, None).unwrap().diff(params)).unwrap();

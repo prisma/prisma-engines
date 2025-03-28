@@ -1,9 +1,9 @@
-mod column;
-mod differ_database;
+pub(crate) mod column;
+pub(crate) mod differ_database;
 mod enums;
 mod index;
-mod sql_schema_differ_flavour;
-mod table;
+pub mod sql_schema_differ_flavour;
+pub(crate) mod table;
 
 pub(crate) use column::{ColumnChange, ColumnChanges};
 pub(crate) use sql_schema_differ_flavour::SqlSchemaDifferFlavour;
@@ -13,7 +13,6 @@ use crate::{
     database_schema::SqlDatabaseSchema,
     migration_pair::MigrationPair,
     sql_migration::{self, AlterColumn, AlterTable, RedefineTable, SqlMigrationStep, TableChange},
-    SqlFlavour,
 };
 use column::ColumnTypeChange;
 use sql_schema_describer::{walkers::ForeignKeyWalker, IndexId, TableColumnId, Walker};
@@ -22,7 +21,7 @@ use table::TableDiffer;
 
 pub(crate) fn calculate_steps(
     schemas: MigrationPair<&SqlDatabaseSchema>,
-    flavour: &dyn SqlFlavour,
+    flavour: &dyn SqlSchemaDifferFlavour,
 ) -> Vec<SqlMigrationStep> {
     let db = DifferDatabase::new(schemas, flavour);
     let mut steps: Vec<SqlMigrationStep> = Vec::new();
@@ -570,7 +569,7 @@ fn is_prisma_implicit_m2m_fk(fk: ForeignKeyWalker<'_>) -> bool {
     table.column("A").is_some() && table.column("B").is_some()
 }
 
-fn all_match<T: PartialEq>(a: impl ExactSizeIterator<Item = T>, b: impl ExactSizeIterator<Item = T>) -> bool {
+pub fn all_match<T: PartialEq>(a: impl ExactSizeIterator<Item = T>, b: impl ExactSizeIterator<Item = T>) -> bool {
     a.len() == b.len() && a.zip(b).all(|(a, b)| a == b)
 }
 

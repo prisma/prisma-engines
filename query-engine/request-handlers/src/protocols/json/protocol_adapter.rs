@@ -6,7 +6,7 @@ use query_core::{
     schema::{ObjectType, OutputField, QuerySchema},
     ArgumentValue, Operation, Selection,
 };
-use query_structure::{decode_bytes, parse_datetime, prelude::ParentContainer, Field, PlaceholderType, PrismaValue};
+use query_structure::{decode_bytes, parse_datetime, prelude::ParentContainer, Field, PrismaValue, PrismaValueType};
 use serde_json::Value as JsonValue;
 use std::str::FromStr;
 
@@ -252,7 +252,7 @@ impl<'a> JsonProtocolAdapter<'a> {
 
                     let placeholder = PrismaValue::Placeholder {
                         name,
-                        r#type: PlaceholderType::Any,
+                        r#type: PrismaValueType::Any,
                     };
 
                     Ok(ArgumentValue::Scalar(placeholder))

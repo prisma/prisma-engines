@@ -1,12 +1,12 @@
 import path from 'node:path'
 import * as S from '@effect/schema/Schema'
 import { PrismaD1 } from '@prisma/adapter-d1'
-import { DriverAdapter } from '@prisma/driver-adapter-utils'
+import type { SqlDriverAdapter, SqlMigrationAwareDriverAdapterFactory } from '@prisma/driver-adapter-utils'
 import { getPlatformProxy } from 'wrangler'
 import type { D1Database, D1Result } from '@cloudflare/workers-types'
 
 import { __dirname, runBatch } from '../utils'
-import type { ConnectParams, DriverAdaptersManager } from './index'
+import type { DriverAdaptersManager, SetupDriverAdaptersInput } from './index'
 import type { DriverAdapterTag, EnvForAdapter } from '../types'
 import { D1Tables } from '../types/d1'
 
@@ -14,18 +14,24 @@ const TAG = 'd1' as const satisfies DriverAdapterTag
 type TAG = typeof TAG
 
 export class D1Manager implements DriverAdaptersManager {
-  #driver: D1Database
   #dispose: () => Promise<void>
-  #adapter?: DriverAdapter
+  #factory: SqlMigrationAwareDriverAdapterFactory
+  #adapter?: SqlDriverAdapter
 
-  private constructor(private env: EnvForAdapter<TAG>, driver: D1Database, dispose: () => Promise<void>) {
-    this.#driver = driver
+  private constructor(
+    private env: EnvForAdapter<TAG>,
+    driver: D1Database,
+    dispose: () => Promise<void>,
+  ) {
+    this.#factory = new PrismaD1(driver)
     this.#dispose = dispose
   }
 
-  static async setup(env: EnvForAdapter<TAG>, migrationScript?: string) {
-    const { env: cfBindings, dispose } = await getPlatformProxy<{ D1_DATABASE: D1Database }>({
-      configPath: path.join(__dirname, "../wrangler.toml"),
+  static async setup(env: EnvForAdapter<TAG>, { migrationScript }: SetupDriverAdaptersInput) {
+    const { env: cfBindings, dispose } = await getPlatformProxy<{
+      D1_DATABASE: D1Database
+    }>({
+      configPath: path.join(__dirname, '../wrangler.toml'),
     })
 
     const { D1_DATABASE } = cfBindings
@@ -43,8 +49,12 @@ export class D1Manager implements DriverAdaptersManager {
     return new D1Manager(env, D1_DATABASE, dispose)
   }
 
-  async connect({}: ConnectParams) {
-    this.#adapter = new PrismaD1(this.#driver)
+  factory() {
+    return this.#factory
+  }
+
+  async connect() {
+    this.#adapter = await this.#factory.connect()
     return this.#adapter
   }
 
@@ -58,15 +68,25 @@ async function migrateDiff(D1_DATABASE: D1Database, migrationScript: string) {
   // `D1_ERROR: A prepared SQL statement must contain only one statement.`
   // We thus need to run each statement separately, splitting the script by `;`.
   const sqlStatements = migrationScript.split(';')
-  const preparedStatements = sqlStatements.map((sqlStatement) => D1_DATABASE.prepare(sqlStatement))
+  const preparedStatements = sqlStatements.map((sqlStatement) =>
+    D1_DATABASE.prepare(sqlStatement),
+  )
   await runBatch(D1_DATABASE, preparedStatements)
 }
 
 async function migrateReset(D1_DATABASE: D1Database) {
-  let { results: rawTables } = ((await D1_DATABASE.prepare(`PRAGMA main.table_list;`).run()) as D1Result)
-  let tables = S
-    .decodeUnknownSync(D1Tables, { onExcessProperty: 'preserve' })(rawTables)
-    .filter((item) => !['_cf_KV', 'sqlite_schema', 'sqlite_sequence'].includes(item.name))
+  let { results: rawTables } = (await D1_DATABASE.prepare(
+    `PRAGMA main.table_list;`,
+  ).run()) as D1Result
+  let tables = S.decodeUnknownSync(D1Tables, { onExcessProperty: 'preserve' })(
+    rawTables,
+  ).filter(
+    (item) =>
+      !(['sqlite_schema', 'sqlite_sequence'].includes(item.name)
+      // excludes `_cf_KV`, `_cf_METADATA`, etc.
+      // Related to https://github.com/drizzle-team/drizzle-orm/issues/3728#issuecomment-2740994190.
+      || /^(_cf_[A-Z]+).*$/.test(item.name)),
+  )
 
   // This may sometimes fail with `D1_ERROR: no such table: sqlite_sequence`,
   // so it needs to be outside of the batch transaction.
@@ -75,9 +95,11 @@ async function migrateReset(D1_DATABASE: D1Database) {
   // whenever a normal table that contains an AUTOINCREMENT column is created".
   try {
     await D1_DATABASE.prepare(`DELETE FROM "sqlite_sequence";`).run()
-  } catch (_) {
+  } catch (e) {
     // Ignore the error, as the table may not exist.
-    console.warn('Failed to reset sqlite_sequence table, but continuing with the reset.')
+    console.warn(
+      'Failed to reset sqlite_sequence table, but continuing with the reset.',
+    )
   }
 
   const batch = [] as string[]
@@ -96,7 +118,7 @@ async function migrateReset(D1_DATABASE: D1Database) {
 
   const statements = batch.map((sql) => D1_DATABASE.prepare(sql))
   const batchResult = await runBatch(D1_DATABASE, statements)
-  
+
   for (const { error } of batchResult) {
     if (error) {
       console.error('Error in batch: %O', error)

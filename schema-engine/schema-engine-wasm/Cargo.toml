@@ -12,14 +12,19 @@ name = "schema_engine_wasm"
 workspace = true
 
 [features]
-sqlite = ["driver-adapters/sqlite", "psl/sqlite"]
-postgresql = ["driver-adapters/postgresql", "psl/postgresql"]
-mysql = ["driver-adapters/mysql", "psl/mysql"]
+# useful for local intellisense, as long as `all-native` is disabled in `schema-engine-cli`
+# default = ["sqlite"]
+sqlite = ["driver-adapters/sqlite", "psl/sqlite", "sql-schema-connector/sqlite", "commands/sqlite"]
+postgresql = ["driver-adapters/postgresql", "psl/postgresql", "sql-schema-connector/postgresql", "commands/postgresql"]
 
 [dependencies]
 psl.workspace = true
 quaint.workspace = true
 tracing.workspace = true
+tracing-futures.workspace = true
+sql-schema-connector = { workspace = true }
+json-rpc = { path = "../json-rpc-api", package = "json-rpc-api" }
+commands = { path = "../commands", package = "schema-commands" }
 
 js-sys.workspace = true
 serde.workspace = true

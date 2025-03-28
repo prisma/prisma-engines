@@ -3,6 +3,10 @@ use bigdecimal::{BigDecimal, FromPrimitive};
 use chrono::{DateTime, NaiveDate, Utc};
 use quaint::ValueType;
 use query_structure::PrismaValue;
+use sql_query_builder::{
+    opaque_type_to_prisma_type,
+    value::{GeneratorCall, Placeholder},
+};
 
 pub fn to_prisma_value<'a, T: Into<ValueType<'a>>>(qv: T) -> crate::Result<PrismaValue> {
     let val = match qv.into() {
@@ -99,34 +103,23 @@ pub fn to_prisma_value<'a, T: Into<ValueType<'a>>>(qv: T) -> crate::Result<Prism
             .map(|s| PrismaValue::String(s.into_owned()))
             .unwrap_or(PrismaValue::Null),
 
-        ValueType::Var(name, vt) => PrismaValue::Placeholder {
-            name: name.into_owned(),
-            r#type: var_type_to_prisma_type(&vt),
-        },
+        ValueType::Opaque(opaque) => {
+            if let Some(placeholder) = opaque.downcast_ref::<Placeholder>() {
+                PrismaValue::Placeholder {
+                    name: placeholder.name().to_owned(),
+                    r#type: opaque_type_to_prisma_type(opaque.typ()),
+                }
+            } else if let Some(call) = opaque.downcast_ref::<GeneratorCall>() {
+                PrismaValue::GeneratorCall {
+                    name: call.name().to_owned(),
+                    args: call.args().to_vec(),
+                    return_type: opaque_type_to_prisma_type(opaque.typ()),
+                }
+            } else {
+                panic!("Received an unsupported opaque value")
+            }
+        }
     };
 
     Ok(val)
-}
-
-fn var_type_to_prisma_type(vt: &quaint::ast::VarType) -> prisma_value::PlaceholderType {
-    match vt {
-        quaint::ast::VarType::Unknown => prisma_value::PlaceholderType::Any,
-        quaint::ast::VarType::Int32 => prisma_value::PlaceholderType::Int,
-        quaint::ast::VarType::Int64 => prisma_value::PlaceholderType::BigInt,
-        quaint::ast::VarType::Float => prisma_value::PlaceholderType::Float,
-        quaint::ast::VarType::Double => prisma_value::PlaceholderType::Float,
-        quaint::ast::VarType::Text => prisma_value::PlaceholderType::String,
-        quaint::ast::VarType::Enum => prisma_value::PlaceholderType::String,
-        quaint::ast::VarType::Bytes => prisma_value::PlaceholderType::Bytes,
-        quaint::ast::VarType::Boolean => prisma_value::PlaceholderType::Boolean,
-        quaint::ast::VarType::Char => prisma_value::PlaceholderType::String,
-        quaint::ast::VarType::Array(t) => prisma_value::PlaceholderType::Array(Box::new(var_type_to_prisma_type(t))),
-        quaint::ast::VarType::Numeric => prisma_value::PlaceholderType::Decimal,
-        quaint::ast::VarType::Json => prisma_value::PlaceholderType::Object,
-        quaint::ast::VarType::Xml => prisma_value::PlaceholderType::String,
-        quaint::ast::VarType::Uuid => prisma_value::PlaceholderType::String,
-        quaint::ast::VarType::DateTime => prisma_value::PlaceholderType::Date,
-        quaint::ast::VarType::Date => prisma_value::PlaceholderType::Date,
-        quaint::ast::VarType::Time => prisma_value::PlaceholderType::Date,
-    }
 }

@@ -121,14 +121,13 @@ fn shadow_db_url_must_not_match_main_url(api: TestApi) {
 
     // URLs match -> error
     {
-        let mut engine = api.new_engine_with_connection_strings(
-            api.connection_string().to_owned(),
-            Some(api.connection_string().to_owned()),
-        );
-
-        let err = engine
-            .create_migration("01init", schema, &migrations_directory)
-            .send_unwrap_err()
+        let err = api
+            .new_engine_with_connection_strings_or_err(
+                api.connection_string().to_owned(),
+                Some(api.connection_string().to_owned()),
+            )
+            .err()
+            .unwrap()
             .to_string();
 
         assert!(err.contains("The shadow database you configured appears to be the same as the main database. Please specify another shadow database."));

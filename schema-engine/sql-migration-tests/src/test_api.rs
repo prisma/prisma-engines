@@ -19,7 +19,7 @@ use quaint::{
     Value,
 };
 use schema_core::{
-    commands::diff,
+    commands::diff_cli,
     schema_connector::{BoxFuture, ConnectorHost, ConnectorResult, DiffTarget, MigrationPersistence, SchemaConnector},
 };
 use sql_schema_connector::SqlSchemaConnector;
@@ -52,6 +52,11 @@ pub struct TestApi {
 }
 
 impl TestApi {
+    pub fn from_connector(connector: SqlSchemaConnector, args: TestApiArgs) -> Self {
+        let root = RootTestApi::new(args);
+        TestApi { root, connector }
+    }
+
     /// Initializer, called by the test macros.
     pub fn new(args: TestApiArgs) -> Self {
         let root = RootTestApi::new(args);
@@ -92,7 +97,7 @@ impl TestApi {
         self.connection_info().schema_name().to_owned()
     }
 
-    /// Plan a `createMigration` command
+    /// Plan a `createMigration` command.
     pub fn create_migration<'a>(
         &'a mut self,
         name: &'a str,
@@ -134,7 +139,7 @@ impl TestApi {
     }
 
     pub fn diff(&self, params: DiffParams) -> ConnectorResult<DiffResult> {
-        test_setup::runtime::run_with_thread_local_runtime(diff(params, self.connector.host().clone()))
+        test_setup::runtime::run_with_thread_local_runtime(diff_cli(params, self.connector.host().clone()))
     }
 
     pub fn dump_table(&mut self, table_name: &str) -> ResultSet {
@@ -287,13 +292,6 @@ impl TestApi {
         }
     }
 
-    pub fn list_migration_directories<'a>(
-        &'a mut self,
-        migrations_directory: &'a TempDir,
-    ) -> ListMigrationDirectories<'a> {
-        ListMigrationDirectories::new(migrations_directory)
-    }
-
     pub fn lower_cases_table_names(&self) -> bool {
         self.root.lower_cases_table_names()
     }
@@ -345,13 +343,11 @@ impl TestApi {
         to: DiffTarget<'_>,
         namespaces: Option<Namespaces>,
     ) -> String {
-        let from = tok(self
-            .connector
-            .database_schema_from_diff_target(from, None, namespaces.clone()))
-        .unwrap();
-        let to = tok(self.connector.database_schema_from_diff_target(to, None, namespaces)).unwrap();
-        let migration = self.connector.diff(from, to);
-        self.connector.render_script(&migration, &Default::default()).unwrap()
+        let from = tok(self.connector.schema_from_diff_target(from, namespaces.clone())).unwrap();
+        let to = tok(self.connector.schema_from_diff_target(to, namespaces)).unwrap();
+        let dialect = self.connector.schema_dialect();
+        let migration = dialect.diff(from, to);
+        dialect.render_script(&migration, &Default::default()).unwrap()
     }
 
     pub fn normalize_identifier<'a>(&self, identifier: &'a str) -> Cow<'a, str> {

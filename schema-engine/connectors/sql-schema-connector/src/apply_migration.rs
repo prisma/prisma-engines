@@ -1,36 +1,43 @@
 use crate::{
     migration_pair::MigrationPair,
     sql_migration::{SqlMigration, SqlMigrationStep},
-    SqlFlavour, SqlSchemaConnector,
+    sql_renderer::SqlRenderer,
+    SqlConnector, SqlSchemaConnector,
 };
 use schema_connector::{ConnectorResult, DestructiveChangeDiagnostics, Migration};
 use sql_schema_describer::SqlSchema;
 use tracing_futures::Instrument;
 
-#[tracing::instrument(skip(flavour, migration))]
+#[tracing::instrument(skip(connector, migration))]
 pub(crate) async fn apply_migration(
     migration: &Migration,
-    flavour: &mut (dyn SqlFlavour + Send + Sync),
+    connector: &mut (dyn SqlConnector + Send + Sync),
 ) -> ConnectorResult<u32> {
     let migration: &SqlMigration = migration.downcast_ref();
     tracing::debug!("{} steps to execute", migration.steps.len());
 
+    let renderer = connector.dialect().renderer();
+
     for step in &migration.steps {
-        for sql_string in render_raw_sql(step, flavour, MigrationPair::new(&migration.before, &migration.after)) {
+        for sql_string in render_raw_sql(
+            step,
+            &*renderer,
+            MigrationPair::new(&migration.before, &migration.after),
+        ) {
             assert!(!sql_string.is_empty());
             let span = tracing::info_span!("migration_step", ?step);
-            flavour.raw_cmd(&sql_string).instrument(span).await?;
+            connector.raw_cmd(&sql_string).instrument(span).await?;
         }
     }
 
     Ok(migration.steps.len() as u32)
 }
 
-#[tracing::instrument(skip(migration, flavour))]
+#[tracing::instrument(skip(migration, renderer))]
 pub(crate) fn render_script(
     migration: &Migration,
     diagnostics: &DestructiveChangeDiagnostics,
-    flavour: &(dyn SqlFlavour + Send + Sync),
+    renderer: &dyn SqlRenderer,
 ) -> ConnectorResult<String> {
     let migration: &SqlMigration = migration.downcast_ref();
     if migration.steps.is_empty() {
@@ -64,14 +71,14 @@ pub(crate) fn render_script(
     // some steps don't render anything.
     let mut is_first_step = true;
 
-    if let Some(begin) = flavour.render_begin_transaction() {
+    if let Some(begin) = renderer.render_begin_transaction() {
         script.push_str(begin);
         script.push('\n');
     }
 
     for step in &migration.steps {
         let statements: Vec<String> =
-            render_raw_sql(step, flavour, MigrationPair::new(&migration.before, &migration.after));
+            render_raw_sql(step, renderer, MigrationPair::new(&migration.before, &migration.after));
 
         if !statements.is_empty() {
             if is_first_step {
@@ -95,7 +102,7 @@ pub(crate) fn render_script(
         }
     }
 
-    if let Some(commit) = flavour.render_commit_transaction() {
+    if let Some(commit) = renderer.render_commit_transaction() {
         script.push('\n');
         script.push_str(commit);
     }
@@ -113,13 +120,13 @@ pub(crate) async fn apply_script(
         .host
         .print(&format!("Applying migration `{migration_name}`\n"))
         .await?;
-    connector.flavour.scan_migration_script(script);
-    connector.flavour.apply_migration_script(migration_name, script).await
+    connector.inner.dialect().scan_migration_script(script);
+    connector.inner.apply_migration_script(migration_name, script).await
 }
 
 fn render_raw_sql(
     step: &SqlMigrationStep,
-    renderer: &(dyn SqlFlavour + Send + Sync),
+    renderer: &dyn SqlRenderer,
     schemas: MigrationPair<&SqlSchema>,
 ) -> Vec<String> {
     match step {

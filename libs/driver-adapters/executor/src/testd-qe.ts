@@ -1,6 +1,9 @@
 import * as readline from 'node:readline'
 import * as S from '@effect/schema/Schema'
-import { bindAdapter, ErrorCapturingDriverAdapter } from '@prisma/driver-adapter-utils'
+import {
+  bindAdapter,
+  ErrorCapturingSqlDriverAdapter,
+} from '@prisma/driver-adapter-utils'
 
 import type { DriverAdaptersManager } from './driver-adapters-manager'
 import { Env, jsonRpc } from './types'
@@ -51,7 +54,7 @@ const state: Record<
   {
     engine: qe.QueryEngine
     driverAdapterManager: DriverAdaptersManager
-    adapter: ErrorCapturingDriverAdapter | null
+    adapter: ErrorCapturingSqlDriverAdapter | null
     logs: string[]
   }
 > = {}
@@ -62,7 +65,9 @@ async function handleRequest(
 ): Promise<unknown> {
   if (method !== 'initializeSchema') {
     if (state[params.schemaId] === undefined) {
-      throw new Error(`Schema with id ${params.schemaId} is not initialized. Please call 'initializeSchema' first.`)
+      throw new Error(
+        `Schema with id ${params.schemaId} is not initialized. Please call 'initializeSchema' first.`,
+      )
     }
   }
 
@@ -79,7 +84,7 @@ async function handleRequest(
 
       const driverAdapterManager = await setupDriverAdaptersManager(
         env,
-        migrationScript,
+        { url, migrationScript },
       )
 
       const { engine, adapter } = await initQe({
@@ -99,7 +104,9 @@ async function handleRequest(
       }
 
       if (adapter && adapter.getConnectionInfo) {
-        const maxBindValuesResult = adapter.getConnectionInfo().map((info) => info.maxBindValues)
+        const maxBindValuesResult = adapter
+          .getConnectionInfo()
+          .map((info) => info.maxBindValues)
         if (maxBindValuesResult.ok) {
           return { maxBindValues: maxBindValuesResult.value }
         }
@@ -111,7 +118,12 @@ async function handleRequest(
       debug('Got `query`', params)
       const { query, schemaId, txId } = params
       const engine = state[schemaId].engine
-      const result = await engine.query(JSON.stringify(query), '', txId ?? undefined, nextRequestId())
+      const result = await engine.query(
+        JSON.stringify(query),
+        '',
+        txId ?? undefined,
+        nextRequestId(),
+      )
 
       const parsedResult = JSON.parse(result)
       if (parsedResult.errors) {
@@ -153,7 +165,11 @@ async function handleRequest(
     case 'commitTx': {
       debug('Got `commitTx', params)
       const { schemaId, txId } = params
-      const result = await state[schemaId].engine.commitTransaction(txId, '{}', nextRequestId())
+      const result = await state[schemaId].engine.commitTransaction(
+        txId,
+        '{}',
+        nextRequestId(),
+      )
       return JSON.parse(result)
     }
 
@@ -234,7 +250,7 @@ async function initQe({
     throw new Error('query compiler tests must be run using testd-qc.ts')
   }
 
-  const adapter = await driverAdapterManager.connect({ url })
+  const adapter = await driverAdapterManager.connect()
   const errorCapturingAdapter = bindAdapter(adapter)
   const engineInstance = await qe.initQueryEngine(
     env.EXTERNAL_TEST_EXECUTOR,

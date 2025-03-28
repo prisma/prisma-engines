@@ -4,7 +4,7 @@ use indoc::indoc;
 use sql_migration_tests::test_api::*;
 
 #[test_connector]
-fn basic_create_migration_works(api: TestApi) {
+fn basic_create_migration_works(mut api: TestApi) {
     let dm = api.datamodel_with_provider(
         r#"
         model Cat {

@@ -3,7 +3,7 @@ mod relation;
 mod scalar;
 
 pub use composite::*;
-use prisma_value::PlaceholderType;
+use prisma_value::PrismaValueType;
 pub use relation::*;
 pub use scalar::*;
 
@@ -180,20 +180,20 @@ impl TypeIdentifier {
         }
     }
 
-    pub fn to_placeholder_type(&self) -> PlaceholderType {
+    pub fn to_prisma_type(&self) -> PrismaValueType {
         match self {
-            TypeIdentifier::String => PlaceholderType::String,
-            TypeIdentifier::Int => PlaceholderType::Int,
-            TypeIdentifier::BigInt => PlaceholderType::BigInt,
-            TypeIdentifier::Float => PlaceholderType::Float,
-            TypeIdentifier::Decimal => PlaceholderType::Decimal,
-            TypeIdentifier::Boolean => PlaceholderType::Boolean,
-            TypeIdentifier::Enum(_) => PlaceholderType::String,
-            TypeIdentifier::UUID => PlaceholderType::String,
-            TypeIdentifier::Json => PlaceholderType::Object,
-            TypeIdentifier::DateTime => PlaceholderType::Date,
-            TypeIdentifier::Bytes => PlaceholderType::Bytes,
-            TypeIdentifier::Unsupported => PlaceholderType::Any,
+            TypeIdentifier::String => PrismaValueType::String,
+            TypeIdentifier::Int => PrismaValueType::Int,
+            TypeIdentifier::BigInt => PrismaValueType::BigInt,
+            TypeIdentifier::Float => PrismaValueType::Float,
+            TypeIdentifier::Decimal => PrismaValueType::Decimal,
+            TypeIdentifier::Boolean => PrismaValueType::Boolean,
+            TypeIdentifier::Enum(_) => PrismaValueType::String,
+            TypeIdentifier::UUID => PrismaValueType::String,
+            TypeIdentifier::Json => PrismaValueType::Object,
+            TypeIdentifier::DateTime => PrismaValueType::Date,
+            TypeIdentifier::Bytes => PrismaValueType::Bytes,
+            TypeIdentifier::Unsupported => PrismaValueType::Any,
         }
     }
 

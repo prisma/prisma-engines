@@ -9,6 +9,7 @@
 
 pub(crate) mod conversion;
 pub(crate) mod error;
+pub(crate) mod factory;
 pub(crate) mod proxy;
 pub(crate) mod queryable;
 pub(crate) mod send_future;
@@ -33,6 +34,9 @@ impl From<DriverAdapterError> for QuaintError {
                 })
                 .build()
             }
+            DriverAdapterError::InvalidIsolationLevel { level } => {
+                QuaintError::builder(ErrorKind::InvalidIsolationLevel(level)).build()
+            }
             DriverAdapterError::GenericJs { id } => QuaintError::external_error(id),
             #[cfg(feature = "postgresql")]
             DriverAdapterError::Postgres(e) => e.into(),
@@ -45,7 +49,8 @@ impl From<DriverAdapterError> for QuaintError {
     }
 }
 
-pub use queryable::from_js;
+pub use factory::{adapter_factory_from_js, JsAdapterFactory};
+pub use queryable::{queryable_from_js, JsQueryable};
 pub(crate) use transaction::JsTransaction;
 pub use types::AdapterProvider;
 
