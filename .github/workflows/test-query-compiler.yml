@@ -28,6 +28,10 @@ jobs:
             setup_task: dev-pg-qc
             ignored_tests_list: query-compiler/query-engine-tests-todo/pg/skip
             should_fail_tests_list: query-compiler/query-engine-tests-todo/pg/fail
+          - name: libsql
+            setup_task: dev-libsql-qc
+            ignored_tests_list: query-compiler/query-engine-tests-todo/libsql/skip
+            should_fail_tests_list: query-compiler/query-engine-tests-todo/libsql/fail
     name: ${{ matrix.adapter.name }}
     uses: ./.github/workflows/test-query-compiler-template.yml
     with:
