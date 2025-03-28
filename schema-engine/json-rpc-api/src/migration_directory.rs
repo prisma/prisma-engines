@@ -1,4 +1,4 @@
-use crate::js_result::JSResult;
+use crate::js_result::JsResult;
 use serde::{Deserialize, Serialize};
 
 #[cfg(target_arch = "wasm32")]
@@ -13,7 +13,7 @@ pub struct MigrationFile {
     pub path: String,
 
     /// Content of the migration file or error if it couldn't be read.
-    pub content: JSResult<String, String>,
+    pub content: JsResult<String, String>,
 }
 
 /// Information about a migration directory.

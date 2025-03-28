@@ -1,7 +1,7 @@
 //! API type definitions used by the JSON-RPC methods.
 
 pub use crate::{
-    js_result::JSResult,
+    js_result::JsResult,
     migration_directory::{MigrationDirectory, MigrationFile},
 };
 use serde::{Deserialize, Serialize};
@@ -278,6 +278,7 @@ pub struct CreateMigrationInput {
 #[serde(rename_all = "camelCase")]
 pub struct CreateMigrationOutput {
     /// The active connector type used.
+    #[cfg_attr(target_arch = "wasm32", tsify(type = "'sqlite' | 'postgresql' | 'cockroachdb'"))]
     pub connector_type: String,
 
     /// The generated name of migration directory, which the caller must use to create the new directory.
@@ -572,15 +573,6 @@ pub struct IntrospectionView {
 pub struct GetDatabaseVersionInput {
     /// The datasource parameter.
     pub datasource: DatasourceParam,
-}
-
-/// Output for the getDatabaseVersion method.
-#[derive(Debug, Serialize, Deserialize)]
-#[cfg_attr(target_arch = "wasm32", derive(Tsify))]
-#[cfg_attr(target_arch = "wasm32", tsify(missing_as_null, from_wasm_abi, into_wasm_abi))]
-pub struct GetDatabaseVersionOutput {
-    /// The database version.
-    pub version: String,
 }
 
 // Evaluate Data Loss
