@@ -380,7 +380,7 @@ mod json {
 
         insta::assert_snapshot!(
           run_query!(&runner, r#"{ findManyTestModel { child { json_list } } }"#),
-          @r###"{"data":{"findManyTestModel":[{"child":{"json_list":["1","2"]}},{"child":{"json_list":["{}"]}},{"child":{"json_list":["\"hello\"","\"world\""]}},{"child":{"json_list":[]}}]}}"###
+          @r###"{"data":{"findManyTestModel":[{"child":{"json_list":["1","2"]}},{"child":{"json_list":["{}"]}},{"child":{"json_list":["\"hello\"","\"world\""]}},{"child":{"json_list":null}}]}}"###
         );
 
         Ok(())
