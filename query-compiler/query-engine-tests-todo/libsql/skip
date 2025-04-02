@@ -239,3 +239,7 @@ writes::top_level_mutations::create_many_and_return::json_create_many::create_ma
 
 writes::top_level_mutations::create_many::create_many::basic_create_many_shorthand
 writes::top_level_mutations::create_many::create_many::create_many_map_behavior
+
+### Frozen
+
+new::regressions::prisma_engines_4286::sqlite::close_tx_on_error
