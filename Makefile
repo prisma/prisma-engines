@@ -170,7 +170,12 @@ dev-react-native:
 dev-libsql-js: build-qe-napi build-driver-adapters-kit-qe
 	cp $(CONFIG_PATH)/libsql-js $(CONFIG_FILE)
 
+dev-libsql-qc: build-qc-wasm build-driver-adapters-kit-qc
+	cp $(CONFIG_PATH)/libsql-qc $(CONFIG_FILE)
+
 test-libsql-js: dev-libsql-js test-qe-st
+
+test-libsql-qc: dev-libsql-qc test-qe-st
 
 test-driver-adapter-libsql: test-libsql-js
 
