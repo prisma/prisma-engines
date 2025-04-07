@@ -143,7 +143,7 @@ impl SqlConnector for SqliteConnector {
     }
 
     fn acquire_lock(&mut self) -> BoxFuture<'_, ConnectorResult<()>> {
-        self.raw_cmd("PRAGMA main.locking_mode=EXCLUSIVE")
+        self.with_connection(|conn, _| acquire_lock(conn))
     }
 
     fn connector_type(&self) -> &'static str {
