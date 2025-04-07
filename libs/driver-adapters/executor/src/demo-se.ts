@@ -153,6 +153,12 @@ async function main(): Promise<void> {
     })
     console.dir(introspectResult, { depth: null })
   }
+
+  {
+    console.log('[reset]')
+    const result = await engine.reset()
+    console.dir({ result }, { depth: null })
+  }
 }
 
 type InitSchemaEngineParams = {

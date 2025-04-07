@@ -33,6 +33,10 @@ impl Connection {
         &self.adapter
     }
 
+    pub fn adapter_name(&self) -> Option<AdapterName> {
+        Some(self.adapter.adapter_name())
+    }
+
     pub async fn raw_cmd(&self, sql: &str) -> ConnectorResult<()> {
         tracing::debug!(query_type = "raw_cmd", sql);
         self.adapter.raw_cmd(sql).await.map_err(convert_error)

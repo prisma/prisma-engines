@@ -15,10 +15,7 @@ use schema_connector::{
     migrations_directory::MigrationDirectory, BoxFuture, ConnectorError, ConnectorResult, Namespaces,
 };
 use schema_differ::SqliteSchemaDifferFlavour;
-use sql_schema_describer::{
-    sqlite::{Connection, SqlSchemaDescriber},
-    DescriberErrorKind, SqlSchema,
-};
+use sql_schema_describer::{sqlite::SqlSchemaDescriber, DescriberErrorKind, SqlSchema};
 use std::future::Future;
 
 use super::{SqlDialect, UsingExternalShadowDb};
@@ -398,11 +395,15 @@ impl SqlConnector for SqliteConnector {
 }
 
 async fn acquire_lock(connection: &imp::Connection) -> ConnectorResult<()> {
-    if let Some(AdapterName::D1(_) | AdapterName::LibSQL) = connection.as_connector().adapter_name() {
+    let adapter_name = connection.adapter_name();
+    let sql = "PRAGMA main.locking_mode=EXCLUSIVE";
+    tracing::info!(sql, adapter_name = ?adapter_name, query_type = "acquire_lock");
+
+    if let Some(AdapterName::D1(_) | AdapterName::LibSQL) = adapter_name {
         return Ok(());
     };
 
-    connection.raw_cmd("PRAGMA main.locking_mode=EXCLUSIVE").await
+    connection.raw_cmd(sql).await
 }
 
 async fn describe_schema(connection: &imp::Connection) -> ConnectorResult<SqlSchema> {

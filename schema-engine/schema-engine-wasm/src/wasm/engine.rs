@@ -351,7 +351,7 @@ impl SchemaEngine {
     /// Reset a database to an empty state (no data, no schema).
     #[wasm_bindgen]
     pub async fn reset(&mut self) -> Result<(), JsValue> {
-        tracing::debug!("Resetting the database.");
+        tracing::info!("Resetting the database.");
         let namespaces = self.namespaces();
 
         SchemaConnector::reset(&mut self.connector, false, namespaces)
