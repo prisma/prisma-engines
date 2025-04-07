@@ -288,7 +288,7 @@ pub struct CreateMigrationOutput {
     /// It will be null if:
     /// 1. The migration we generate would be empty, **AND**
     /// 2. the `draft` param was not true, because in that case the engine would still generate an empty
-    ///     migration script.
+    ///    migration script.
     pub migration_script: Option<String>,
 
     /// The file extension for generated migration files.

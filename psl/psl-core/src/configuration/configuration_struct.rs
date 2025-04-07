@@ -89,10 +89,8 @@ impl Configuration {
             }
 
             if let Some(direct_url) = &datasource.direct_url {
-                let result = match super::from_url(direct_url, env) {
-                    Err(_) => None, // ignore errors because we don't really need direct_url in QE
-                    Ok(res) => Some(res),
-                };
+                // ignore errors because we don't really need direct_url in QE
+                let result = super::from_url(direct_url, env).ok();
 
                 datasource.direct_url = Some(crate::StringFromEnvVar {
                     from_env_var: direct_url.from_env_var.clone(),

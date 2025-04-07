@@ -96,7 +96,7 @@ impl From<tiberius::error::Error> for Error {
                     .message()
                     .split(". ")
                     .nth(1)
-                    .and_then(|s| s.split(' ').last())
+                    .and_then(|s| s.split(' ').next_back())
                     .and_then(|s| s.split('\'').nth(1))
                     .map(ToString::to_string)
                     .map(DatabaseConstraint::Index)

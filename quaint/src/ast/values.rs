@@ -1237,13 +1237,7 @@ impl<'a> ValueType<'a> {
         T: TryFrom<Value<'a>>,
     {
         match self {
-            Self::Array(Some(vec)) => {
-                let rslt: Result<Vec<_>, _> = vec.into_iter().map(T::try_from).collect();
-                match rslt {
-                    Err(_) => None,
-                    Ok(values) => Some(values),
-                }
-            }
+            Self::Array(Some(vec)) => vec.into_iter().map(T::try_from).collect::<Result<Vec<_>, _>>().ok(),
             _ => None,
         }
     }
@@ -1254,13 +1248,12 @@ impl<'a> ValueType<'a> {
         T: TryFrom<Value<'a>>,
     {
         match self {
-            Self::Array(Some(vec)) => {
-                let rslt: Result<Vec<_>, _> = vec.clone().into_iter().map(T::try_from).collect();
-                match rslt {
-                    Err(_) => None,
-                    Ok(values) => Some(values),
-                }
-            }
+            Self::Array(Some(vec)) => vec
+                .clone()
+                .into_iter()
+                .map(T::try_from)
+                .collect::<Result<Vec<_>, _>>()
+                .ok(),
             _ => None,
         }
     }

@@ -36,7 +36,7 @@ impl From<SqliteError> for Error {
                     .split(": ")
                     .nth(1)
                     .map(|s| s.split(", "))
-                    .map(|i| i.flat_map(|s| s.split('.').last()))
+                    .map(|i| i.flat_map(|s| s.split('.').next_back()))
                     .map(DatabaseConstraint::fields)
                     .unwrap_or(DatabaseConstraint::CannotParse);
 
@@ -57,7 +57,7 @@ impl From<SqliteError> for Error {
                     .split(": ")
                     .nth(1)
                     .map(|s| s.split(", "))
-                    .map(|i| i.flat_map(|s| s.split('.').last()))
+                    .map(|i| i.flat_map(|s| s.split('.').next_back()))
                     .map(DatabaseConstraint::fields)
                     .unwrap_or(DatabaseConstraint::CannotParse);
 
