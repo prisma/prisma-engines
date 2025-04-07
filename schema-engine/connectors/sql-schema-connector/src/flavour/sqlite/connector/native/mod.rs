@@ -2,9 +2,7 @@
 
 pub(crate) use quaint::connector::rusqlite;
 
-use quaint::connector::{
-    AdapterName, ColumnType, DescribedColumn, DescribedParameter, ExternalConnector, GetRow, ToColumnNames,
-};
+use quaint::connector::{AdapterName, ColumnType, DescribedColumn, DescribedParameter, GetRow, ToColumnNames};
 use schema_connector::{BoxFuture, ConnectorError, ConnectorParams, ConnectorResult};
 use sql_schema_describer::SqlSchema;
 use sqlx_core::{column::Column, type_info::TypeInfo};

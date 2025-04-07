@@ -74,6 +74,7 @@ pub async fn diagnose_migration_history(
     error_on_changed_provider(&input.migrations_list.lockfile, connector.connector_type())?;
     let migrations_from_filesystem = list_migrations(input.migrations_list.migration_directories);
 
+    // TODO: check if it still breaks with an error after this statement
     let (migrations_from_database, has_migrations_table) =
         match connector.migration_persistence().list_migrations().await? {
             Ok(migrations) => (migrations, true),

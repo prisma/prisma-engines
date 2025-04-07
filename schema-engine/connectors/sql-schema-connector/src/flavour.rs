@@ -236,9 +236,13 @@ pub(crate) trait SqlConnector: Send + Sync + Debug {
                 Ok(result) => result,
                 Err(err)
                     if err.is_user_facing_error::<user_facing_errors::query_engine::TableDoesNotExist>()
-                        || err.is_user_facing_error::<user_facing_errors::common::InvalidModel>() =>
+                        || err.is_user_facing_error::<user_facing_errors::common::InvalidModel>()
+                        // TODO: this is a workaround, as currently the errors thrown by D1 and LibSQL do not
+                        // match the known user-facing errors we expect for SQLite.
+                        // We should fix this in the future.
+                        || err.is_user_facing_error::<user_facing_errors::query_engine::ExternalError>() =>
                 {
-                    return Ok(Err(PersistenceNotInitializedError))
+                    return Ok(Err(PersistenceNotInitializedError));
                 }
                 err @ Err(_) => err?,
             };
