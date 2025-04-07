@@ -589,7 +589,7 @@ impl OpaqueValue {
 
     /// Attempts to downcast the opaque value to a reference of type `T`.
     pub fn downcast_ref<T: Opaque>(&self) -> Option<&T> {
-        <dyn Any>::downcast_ref(&self.value)
+        <dyn Any>::downcast_ref(self.value.as_ref())
     }
 }
 
