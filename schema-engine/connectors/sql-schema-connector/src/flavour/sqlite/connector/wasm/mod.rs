@@ -22,34 +22,6 @@ impl State {
     }
 }
 
-#[derive(Debug, Clone, PartialEq)]
-pub struct SqlTable {
-    pub schema: String,
-    pub name: String,
-    pub r#type: SqlTableType,
-}
-
-#[derive(Debug, Clone, PartialEq)]
-pub enum SqlTableType {
-    Table,
-    View,
-    Shadow,
-    Virtual,
-    Unknown,
-}
-
-impl SqlTableType {
-    fn from_str(s: &str) -> Self {
-        match s {
-            "table" => SqlTableType::Table,
-            "view" => SqlTableType::View,
-            "shadow" => SqlTableType::Shadow,
-            "virtual" => SqlTableType::Virtual,
-            _ => SqlTableType::Unknown,
-        }
-    }
-}
-
 pub struct Params;
 
 pub struct Connection {
