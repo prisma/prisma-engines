@@ -1,11 +1,13 @@
 #![allow(dead_code)]
 #![allow(unused_variables)]
 
+use super::logger::init_logger;
 use commands::{
     schema_connector::{self, ConnectorError, IntrospectionResult, Namespaces, SchemaConnector},
     CoreError, SchemaContainerExt,
 };
 use driver_adapters::{adapter_factory_from_js, JsObject};
+use js_sys::Function as JsFunction;
 use json_rpc::types::*;
 use psl::{ConnectorRegistry, PreviewFeature};
 use quaint::connector::ExternalConnectorFactory;
@@ -70,8 +72,11 @@ pub struct SchemaEngine {
 impl SchemaEngine {
     // Note: we shouldn't mark this as a constructor, due to https://github.com/rustwasm/wasm-bindgen/issues/3976.
     #[wasm_bindgen]
-    pub async fn new(adapter: JsObject) -> Result<SchemaEngine, JsError> {
+    pub async fn new(callback: JsFunction, adapter: JsObject) -> Result<SchemaEngine, JsError> {
         register_panic_hook();
+
+        // Forward every `tracing` log to the given JS callback.
+        init_logger(callback);
 
         let adapter_factory = Arc::new(adapter_factory_from_js(adapter));
         let adapter = Arc::new(adapter_factory.connect().await?);
