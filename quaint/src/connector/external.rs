@@ -20,6 +20,7 @@ pub enum AdapterD1 {
 /// TODO: we could add here Neon as well, so we could exclude / expose Neon's auth tables in the future.
 pub enum AdapterName {
     D1(AdapterD1),
+    LibSQL,
     Unknown,
 }
 
@@ -32,6 +33,7 @@ impl FromStr for AdapterName {
             match name {
                 "d1" => Ok(Self::D1(AdapterD1::Env)),
                 "d1-http" => Ok(Self::D1(AdapterD1::HTTP)),
+                "libsql" => Ok(Self::LibSQL),
                 _ => Ok(Self::Unknown),
             }
         } else {
