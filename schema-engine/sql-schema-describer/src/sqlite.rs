@@ -9,16 +9,17 @@ use either::Either;
 use indexmap::IndexMap;
 use quaint::{
     ast::{Value, ValueType},
+    connector::AdapterName,
     prelude::{Queryable, ResultRow},
 };
 use std::{
-    any::type_name,
+    any::{type_name, Any},
     borrow::Cow,
     collections::BTreeMap,
     convert::TryInto,
     fmt::Debug,
     path::Path,
-    sync::{Arc, LazyLock},
+    sync::{Arc, LazyLock, OnceLock},
 };
 use tracing::trace;
 
@@ -32,6 +33,10 @@ pub trait Connection {
         sql: &'a str,
         params: &'a [quaint::prelude::Value<'a>],
     ) -> quaint::Result<quaint::prelude::ResultSet>;
+
+    fn adapter_name(&self) -> Option<AdapterName> {
+        None
+    }
 }
 
 #[async_trait::async_trait]
@@ -46,13 +51,17 @@ impl Connection for quaint::single::Quaint {
 }
 
 #[async_trait::async_trait]
-impl<Q: Queryable + ?Sized> Connection for Arc<Q> {
+impl<Q: Queryable + Any + ?Sized> Connection for Arc<Q> {
     async fn query_raw<'a>(
         &'a self,
         sql: &'a str,
         params: &'a [quaint::prelude::Value<'a>],
     ) -> quaint::Result<quaint::prelude::ResultSet> {
         quaint::prelude::Queryable::query_raw(&**self, sql, params).await
+    }
+
+    fn adapter_name(&self) -> Option<AdapterName> {
+        self.as_external_connector().map(|adapter| adapter.adapter_name())
     }
 }
 
@@ -137,7 +146,7 @@ impl<'a> SqlSchemaDescriber<'a> {
 
                 (name, r#type, definition)
             })
-            .filter(|(table_name, _, _)| !is_table_ignored(table_name));
+            .filter(|(table_name, _, _)| !is_table_ignored(table_name, self.conn.adapter_name()));
 
         let mut map = IndexMap::default();
 
@@ -580,9 +589,30 @@ fn unquote_sqlite_string_default(s: &str) -> Cow<'_, str> {
     }
 }
 
+// Create a OnceLock to hold the compiled Regex
+static CLOUDFLARE_D1_IGNORED_TABLES_REGEX: OnceLock<Regex> = OnceLock::new();
+
+// Cloudflare D1 specific tables, excludes `_cf_KV`, `_cf_METADATA`, etc.
+fn get_cloudflare_d1_ignored_tables_regex() -> &'static Regex {
+    CLOUDFLARE_D1_IGNORED_TABLES_REGEX.get_or_init(|| Regex::new(r"^(_cf_[A-Z]+).*$").expect("Failed to compile regex"))
+}
+
 /// Returns whether a table is one of the SQLite system tables or a Cloudflare D1 specific table.
-fn is_table_ignored(table_name: &str) -> bool {
-    SQLITE_IGNORED_TABLES.iter().any(|table| table_name == *table)
+fn is_table_ignored(table_name: &str, _adapter_name: Option<AdapterName>) -> bool {
+    let early_result = SQLITE_IGNORED_TABLES.iter().any(|table| table_name == *table);
+
+    // TODO: remove the constant `is_cloudflare_d1 = true` and replace it with the following once we
+    // get rid of `--local-d1`, `--to-local-d1`, `--from-local-d1` flags in the CLI.
+    // ```
+    // let is_cloudflare_d1 = matches!(adapter_name, Some(AdapterName::D1(_)));
+    // ```
+    let is_cloudflare_d1 = true;
+
+    if is_cloudflare_d1 {
+        early_result || get_cloudflare_d1_ignored_tables_regex().is_match(table_name)
+    } else {
+        early_result
+    }
 }
 
 /// See https://www.sqlite.org/fileformat2.html
@@ -594,8 +624,6 @@ const SQLITE_IGNORED_TABLES: &[&str] = &[
     "sqlite_stat2",
     "sqlite_stat3",
     "sqlite_stat4",
-    // Cloudflare D1 specific tables
-    "_cf_KV",
     // This is the default but can be configured by the user
     "d1_migrations",
 ];
