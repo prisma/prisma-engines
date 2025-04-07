@@ -28,6 +28,7 @@ all-native = [
 ]
 
 [dependencies]
+crosstarget-utils.workspace = true
 psl.workspace = true
 quaint.workspace = true
 tokio = { workspace = true, features = ["macros", "sync", "io-util", "time"] }
