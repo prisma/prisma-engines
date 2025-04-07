@@ -8,13 +8,17 @@ use crate::{flavour::SqlConnector, sql_renderer::SqlRenderer};
 use connector as imp;
 use destructive_change_checker::SqliteDestructiveChangeCheckerFlavour;
 use indoc::indoc;
+use quaint::connector::AdapterName;
 use renderer::SqliteRenderer;
 use schema_calculator::SqliteSchemaCalculatorFlavour;
 use schema_connector::{
     migrations_directory::MigrationDirectory, BoxFuture, ConnectorError, ConnectorResult, Namespaces,
 };
 use schema_differ::SqliteSchemaDifferFlavour;
-use sql_schema_describer::{sqlite::SqlSchemaDescriber, DescriberErrorKind, SqlSchema};
+use sql_schema_describer::{
+    sqlite::{Connection, SqlSchemaDescriber},
+    DescriberErrorKind, SqlSchema,
+};
 use std::future::Future;
 
 use super::{SqlDialect, UsingExternalShadowDb};
@@ -394,6 +398,10 @@ impl SqlConnector for SqliteConnector {
 }
 
 async fn acquire_lock(connection: &imp::Connection) -> ConnectorResult<()> {
+    if let Some(AdapterName::D1(_) | AdapterName::LibSQL) = connection.as_connector().adapter_name() {
+        return Ok(());
+    };
+
     connection.raw_cmd("PRAGMA main.locking_mode=EXCLUSIVE").await
 }
 
