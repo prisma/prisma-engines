@@ -61,6 +61,9 @@ async function main(): Promise<void> {
 
   const { engine } = await initSE({
     driverAdapterManager,
+    options: {
+      datamodels: [[schema, 'schema.prisma']],
+    },
   })
 
   {
@@ -68,6 +71,21 @@ async function main(): Promise<void> {
     const version = await engine.version()
     console.dir({ version }, { depth: null })
   }
+
+  // {
+  //   console.log('[devDiagnostic]')
+  //   const result = await engine.devDiagnostic({
+  //     migrationsList: {
+  //       baseDir: process.cwd(),
+  //       lockfile: {
+  //         path: 'migrations_lock.toml',
+  //         content: null,
+  //       },
+  //       migrationDirectories: [],
+  //     },
+  //   })
+  //   console.dir({ result }, { depth: null })
+  // }
 
   {
     console.log('[ensureConnectionValidity]')
@@ -163,10 +181,12 @@ async function main(): Promise<void> {
 
 type InitSchemaEngineParams = {
   driverAdapterManager: DriverAdaptersManager
+  options: se.ConstructorOptions
 }
 
 async function initSE({
   driverAdapterManager,
+  options,
 }: InitSchemaEngineParams) {
   const adapterFactory = driverAdapterManager.factory()
   const errorCapturingAdapterFactory = bindSqlAdapterFactory(adapterFactory)
@@ -177,6 +197,7 @@ async function initSE({
   }
 
   const engineInstance = await se.initSchemaEngine(
+    options,
     debug,
     errorCapturingAdapterFactory,
   )

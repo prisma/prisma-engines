@@ -5,14 +5,15 @@ import type { ErrorCapturingSqlDriverAdapterFactory } from '@prisma/driver-adapt
  * Still, it's the easiest to use the wasm Schema Engine in this sandbox,
  * with type-safe bindings out of the box.
  */
-import { SchemaEngine } from '@prisma/schema-engine-wasm'
+import { SchemaEngine, type ConstructorOptions } from '@prisma/schema-engine-wasm'
 import { __dirname } from './utils'
 
-export type QueryLogCallback = (log: string) => void
+export { type ConstructorOptions } from '@prisma/schema-engine-wasm'
 
 export async function initSchemaEngine(
+  options: ConstructorOptions,
   debug: (log: string) => void,
   adapterFactory: ErrorCapturingSqlDriverAdapterFactory,
 ): Promise<SchemaEngine> {
-  return await SchemaEngine.new(debug, adapterFactory)
+  return await SchemaEngine.new(options, debug, adapterFactory)
 }

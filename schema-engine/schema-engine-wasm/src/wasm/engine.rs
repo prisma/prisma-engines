@@ -9,12 +9,14 @@ use commands::{
 use driver_adapters::{adapter_factory_from_js, JsObject};
 use js_sys::Function as JsFunction;
 use json_rpc::types::*;
-use psl::{ConnectorRegistry, PreviewFeature};
+use psl::{ConnectorRegistry, PreviewFeature, SourceFile, ValidatedSchema};
 use quaint::connector::ExternalConnectorFactory;
+use serde::Deserialize;
 use sql_schema_connector::SqlSchemaConnector;
 use std::path::PathBuf;
 use std::sync::Arc;
 use tracing_futures::Instrument;
+use tsify_next::Tsify;
 use wasm_bindgen::prelude::{wasm_bindgen, JsError, JsValue};
 
 const CONNECTOR_REGISTRY: ConnectorRegistry<'_> = &[
@@ -55,6 +57,15 @@ pub fn version() -> String {
     env!("GIT_HASH").to_string()
 }
 
+/// Parameters defining the construction of an engine.
+#[derive(Debug, Deserialize, Tsify)]
+#[tsify(from_wasm_abi)]
+#[serde(rename_all = "camelCase")]
+pub struct ConstructorOptions {
+    /// The initial datamodels to use.
+    datamodels: Option<Vec<(String, String)>>,
+}
+
 /// The main query engine used by JS
 #[wasm_bindgen]
 pub struct SchemaEngine {
@@ -64,6 +75,9 @@ pub struct SchemaEngine {
     /// The SQL schema connector induced by the adapter.
     connector: SqlSchemaConnector,
 
+    /// The initial datamodel.
+    initial_datamodel: Option<ValidatedSchema>,
+
     /// The inferred database namespaces (used for the `multiSchema` preview feature).
     namespaces: Option<Namespaces>,
 }
@@ -72,24 +86,46 @@ pub struct SchemaEngine {
 impl SchemaEngine {
     // Note: we shouldn't mark this as a constructor, due to https://github.com/rustwasm/wasm-bindgen/issues/3976.
     #[wasm_bindgen]
-    pub async fn new(callback: JsFunction, adapter: JsObject) -> Result<SchemaEngine, JsError> {
+    pub async fn new(
+        options: ConstructorOptions,
+        callback: JsFunction,
+        adapter: JsObject,
+    ) -> Result<SchemaEngine, JsError> {
         register_panic_hook();
 
         // Forward every `tracing` log to the given JS callback.
         init_logger(callback);
 
+        let ConstructorOptions {
+            datamodels: initial_datamodels,
+        } = options;
+
         let adapter_factory = Arc::new(adapter_factory_from_js(adapter));
         let adapter = Arc::new(adapter_factory.connect().await?);
         let connector = SqlSchemaConnector::new_from_external(adapter).await?;
 
-        // TODO: retrieve the namespaces from JS, and forward them here.
-        let namespaces: Option<Namespaces> = None;
+        let initial_datamodels: Option<Vec<_>> = initial_datamodels.map(|schemas| {
+            schemas
+                .into_iter()
+                .map(|(name, schema)| (name, SourceFile::from(schema)))
+                .collect()
+        });
+        let initial_datamodel = initial_datamodels.as_deref().map(psl::validate_multi_file);
+
+        let namespaces: Option<Namespaces> = initial_datamodel
+            .as_ref()
+            .and_then(|schema| schema.configuration.datasources.first())
+            .and_then(|ds| {
+                let mut names = ds.namespaces.iter().map(|(ns, _)| ns.to_owned()).collect();
+                Namespaces::from_vec(&mut names)
+            });
 
         tracing::info!(git_hash = env!("GIT_HASH"), "Starting schema-engine-wasm");
 
         Ok(Self {
             adapter_factory,
             connector,
+            initial_datamodel,
             namespaces,
         })
     }
