@@ -589,7 +589,7 @@ impl OpaqueValue {
 
     /// Attempts to downcast the opaque value to a reference of type `T`.
     pub fn downcast_ref<T: Opaque>(&self) -> Option<&T> {
-        self.value.as_any().downcast_ref()
+        <dyn Any>::downcast_ref(&self.value)
     }
 }
 
@@ -608,8 +608,6 @@ impl fmt::Display for OpaqueValue {
 /// A trait for opaque values, it is implemented automatically for any types that implement
 /// [`Any`], [`Send`], [`Sync`], [`fmt::Debug`], and [`fmt::Display`].
 pub trait Opaque: Any + Send + Sync + fmt::Debug + fmt::Display {
-    /// Produces a reference typed as `dyn Any`.
-    fn as_any(&self) -> &dyn Any;
     /// Compares two opaque values for equality.
     fn opaque_eq(&self, other: &dyn Opaque) -> bool;
 }
@@ -618,12 +616,8 @@ impl<T> Opaque for T
 where
     T: Any + PartialEq + Send + Sync + fmt::Debug + fmt::Display,
 {
-    fn as_any(&self) -> &dyn Any {
-        self
-    }
-
     fn opaque_eq(&self, other: &dyn Opaque) -> bool {
-        other.as_any().downcast_ref().is_some_and(|a| self.eq(a))
+        <dyn Any>::downcast_ref(other).is_some_and(|a| self.eq(a))
     }
 }
 
