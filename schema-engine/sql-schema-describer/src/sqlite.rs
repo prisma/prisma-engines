@@ -13,7 +13,7 @@ use quaint::{
     prelude::{Queryable, ResultRow},
 };
 use std::{
-    any::{type_name, Any},
+    any::type_name,
     borrow::Cow,
     collections::BTreeMap,
     convert::TryInto,
@@ -51,7 +51,7 @@ impl Connection for quaint::single::Quaint {
 }
 
 #[async_trait::async_trait]
-impl<Q: Queryable + Any + ?Sized> Connection for Arc<Q> {
+impl<Q: Queryable + ?Sized> Connection for Arc<Q> {
     async fn query_raw<'a>(
         &'a self,
         sql: &'a str,
