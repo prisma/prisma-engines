@@ -16,6 +16,8 @@ pub enum AdapterD1 {
 /// The name of the adapter.
 /// We only want to keep track of first-class adapters maintained by Prisma, and among those,
 /// only the ones whose queries require special handling compared to the ones generated via `quaint`.
+///
+/// TODO: we could add here Neon as well, so we could exclude / expose Neon's auth tables in the future.
 pub enum AdapterName {
     D1(AdapterD1),
     Unknown,
@@ -116,6 +118,14 @@ pub trait ExternalConnector: TransactionCapable {
     async fn get_connection_info(&self) -> crate::Result<ExternalConnectionInfo>;
     async fn execute_script(&self, script: &str) -> crate::Result<()>;
     async fn dispose(&self) -> crate::Result<()>;
+
+    /// Returns a reference to self as an ExternalConnector.
+    fn as_external_connector(&self) -> Option<&dyn ExternalConnector>
+    where
+        Self: Sized,
+    {
+        Some(self)
+    }
 }
 
 #[async_trait]
