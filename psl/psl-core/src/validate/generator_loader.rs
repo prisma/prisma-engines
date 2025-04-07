@@ -1,7 +1,7 @@
 use crate::{
     ast::WithSpan,
     common::{FeatureMapWithProvider, PreviewFeature, RenamedFeature},
-    configuration::{Generator, GeneratorConfigValue, StringFromEnvVar},
+    configuration::{Generator, GeneratorConfigValue, GeneratorWrapper, StringFromEnvVar},
     diagnostics::*,
 };
 use enumflags2::BitFlags;
@@ -20,15 +20,14 @@ const PREVIEW_FEATURES_KEY: &str = "previewFeatures";
 const ENGINE_TYPE_KEY: &str = "engineType";
 
 /// Load and validate Generators defined in an AST.
-pub(crate) fn load_generators_from_ast(
-    ast_schema: &ast::SchemaAst,
+pub(crate) fn load_generators_from_ast<'a>(
+    ast_schema: &'a ast::SchemaAst,
     diagnostics: &mut Diagnostics,
-    feature_map_with_provider: &FeatureMapWithProvider<'_>,
-) -> Vec<Generator> {
-    let mut generators: Vec<Generator> = Vec::new();
+) -> Vec<GeneratorWrapper<'a>> {
+    let mut generators: Vec<GeneratorWrapper<'a>> = Vec::new();
 
     for gen in ast_schema.generators() {
-        if let Some(generator) = lift_generator(gen, diagnostics, feature_map_with_provider) {
+        if let Some(generator) = lift_generator(gen, diagnostics) {
             generators.push(generator);
         }
     }
@@ -36,11 +35,10 @@ pub(crate) fn load_generators_from_ast(
     generators
 }
 
-fn lift_generator(
-    ast_generator: &ast::GeneratorConfig,
+fn lift_generator<'a>(
+    ast_generator: &'a ast::GeneratorConfig,
     diagnostics: &mut Diagnostics,
-    feature_map_with_provider: &FeatureMapWithProvider<'_>,
-) -> Option<Generator> {
+) -> Option<GeneratorWrapper<'a>> {
     let generator_name = ast_generator.name.name.as_str();
     let mut args = ast_generator
         .properties
@@ -94,10 +92,9 @@ fn lift_generator(
         .and_then(|arg| coerce_array(arg, &StringFromEnvVar::coerce, diagnostics))
         .unwrap_or_default();
 
-    let preview_features = args
+    let raw_preview_features = args
         .remove(PREVIEW_FEATURES_KEY)
-        .and_then(|v| coerce_array(v, &coerce::string, diagnostics).map(|arr| (arr, v.span())))
-        .map(|(arr, span)| parse_and_validate_preview_features(arr, feature_map_with_provider, span, diagnostics));
+        .and_then(|v| coerce_array(v, &coerce::string, diagnostics).map(|arr| (arr, v.span())));
 
     let config = args
         .into_iter()
@@ -109,19 +106,24 @@ fn lift_generator(
         })
         .collect::<Option<_>>()?;
 
-    Some(Generator {
+    let generator_without_preview_features = Generator {
         name: ast_generator.name.name.clone(),
         provider,
         output,
         binary_targets,
-        preview_features,
+        preview_features: None,
         config,
         documentation: ast_generator.documentation().map(String::from),
         span: ast_generator.span,
+    };
+
+    Some(GeneratorWrapper {
+        generator: generator_without_preview_features,
+        raw_preview_features,
     })
 }
 
-fn parse_and_validate_preview_features(
+pub(crate) fn parse_and_validate_preview_features(
     preview_features: Vec<&str>,
     feature_map_with_provider: &FeatureMapWithProvider<'_>,
     span: ast::Span,

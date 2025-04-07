@@ -28,6 +28,7 @@ pub use diagnostics;
 pub use parser_database::{self, generators, is_reserved_type_name};
 pub use schema_ast;
 pub use set_config_dir::set_config_dir;
+use validate::generator_loader::parse_and_validate_preview_features;
 
 use self::validate::{datasource_loader, generator_loader};
 use diagnostics::Diagnostics;
@@ -171,7 +172,18 @@ fn validate_configuration(
     diagnostics: &mut Diagnostics,
     connectors: ConnectorRegistry<'_>,
 ) -> Configuration {
-    let datasources = datasource_loader::load_datasources_from_ast(schema_ast, diagnostics, connectors);
+    let generator_wrappers = generator_loader::load_generators_from_ast(schema_ast, diagnostics);
+
+    // TODO: set `is_using_driver_adapters` to the `true` constant for Prisma 7.0.0.
+    let is_using_driver_adapters = generator_wrappers.iter().any(|generator_wrapper| {
+        generator_wrapper.raw_preview_features.as_ref().is_some_and(|(arr, _)| {
+            arr.iter()
+                .any(|feature| *feature == PreviewFeature::DriverAdapters.to_string())
+        })
+    });
+
+    let datasources =
+        datasource_loader::load_datasources_from_ast(schema_ast, diagnostics, connectors, is_using_driver_adapters);
 
     // We need to know the active provider to determine which features are active.
     // This was originally introduced because the `fullTextSearch` preview feature will hit GA stage
@@ -182,7 +194,29 @@ fn validate_configuration(
         .map(FeatureMapWithProvider::new)
         .unwrap_or_else(|| (*ALL_PREVIEW_FEATURES).clone());
 
-    let generators = generator_loader::load_generators_from_ast(schema_ast, diagnostics, &feature_map_with_provider);
+    let preview_features: Vec<_> = generator_wrappers
+        .iter()
+        .map(|generator| {
+            generator.raw_preview_features.as_ref().and_then(|(arr, span)| {
+                Some(parse_and_validate_preview_features(
+                    arr.clone(),
+                    &feature_map_with_provider,
+                    span.clone(),
+                    diagnostics,
+                ))
+            })
+        })
+        .collect();
+
+    let generators = generator_wrappers
+        .into_iter()
+        .zip(preview_features)
+        .map(|(generator, preview_features)| {
+            let mut generator = generator.generator;
+            generator.preview_features = preview_features;
+            generator
+        })
+        .collect::<Vec<_>>();
 
     Configuration::new(generators, datasources, diagnostics.warnings().to_owned())
 }

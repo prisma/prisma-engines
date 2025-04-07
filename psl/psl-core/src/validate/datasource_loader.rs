@@ -27,11 +27,12 @@ pub(crate) fn load_datasources_from_ast(
     ast_schema: &ast::SchemaAst,
     diagnostics: &mut Diagnostics,
     connectors: crate::ConnectorRegistry<'_>,
+    is_using_driver_adapters: bool,
 ) -> Vec<Datasource> {
     let mut sources = Vec::new();
 
     for src in ast_schema.sources() {
-        if let Some(source) = lift_datasource(src, diagnostics, connectors) {
+        if let Some(source) = lift_datasource(src, diagnostics, connectors, is_using_driver_adapters) {
             sources.push(source);
         }
     }
@@ -53,6 +54,7 @@ fn lift_datasource(
     ast_source: &ast::SourceConfig,
     diagnostics: &mut Diagnostics,
     connectors: crate::ConnectorRegistry<'_>,
+    is_using_driver_adapters: bool,
 ) -> Option<Datasource> {
     let source_name = ast_source.name();
     let mut args: HashMap<_, (_, &Expression)> = ast_source
@@ -126,42 +128,87 @@ fn lift_datasource(
             }
         };
 
+    // TODO (Prisma 6.6.0): We've only introduced end-to-end Driver Adapters usage in SQLite so far, where users can define
+    // a Driver Adapter for both Prisma Client and Schema Engine. We want to forbid defining `datasource.url` and
+    // `datasource.shadowDatabaseUrl` when `previewFeatures = ["driverAdapters"]`.
+    // In the future, we'll roll out support for PostgreSQL and other database providers as well.
+    // Once that's the case, we should update the logic here.
+    let is_using_driver_adapters = is_using_driver_adapters && vec!["sqlite"].contains(&active_connector.name());
+
     let relation_mode = get_relation_mode(&mut args, ast_source, diagnostics, active_connector);
 
     let connector_data = active_connector.parse_datasource_properties(&mut args, diagnostics);
 
     let (url, url_span) = match args.remove(URL_KEY) {
-        Some((_span, url_arg)) => (StringFromEnvVar::coerce(url_arg, diagnostics)?, url_arg.span()),
+        Some((span, url_arg)) => {
+            if is_using_driver_adapters {
+                diagnostics.push_error(DatamodelError::new_source_argument_deprecated(
+                    URL_KEY,
+                    source_name,
+                    span,
+                ));
+                return None;
+            } else {
+                (StringFromEnvVar::coerce(url_arg, diagnostics)?, url_arg.span())
+            }
+        }
 
         None => {
-            diagnostics.push_error(DatamodelError::new_source_argument_not_found_error(
-                URL_KEY,
-                source_name,
-                ast_source.span,
-            ));
+            if is_using_driver_adapters {
+                (StringFromEnvVar::new_literal("<invalid>".to_owned()), ast_source.span())
+            } else {
+                diagnostics.push_error(DatamodelError::new_source_argument_not_found_error(
+                    URL_KEY,
+                    source_name,
+                    ast_source.span,
+                ));
 
-            return None;
+                return None;
+            }
         }
     };
 
-    let shadow_database_url = match args.remove(SHADOW_DATABASE_URL_KEY) {
-        Some((_span, shadow_db_url_arg)) => match StringFromEnvVar::coerce(shadow_db_url_arg, diagnostics) {
-            Some(shadow_db_url) => Some(shadow_db_url)
-                .filter(|s| !s.as_literal().map(|literal| literal.is_empty()).unwrap_or(false))
-                .map(|url| (url, shadow_db_url_arg.span())),
-            None => None,
-        },
+    let shadow_database_url = if is_using_driver_adapters {
+        if let Some((span, _)) = args.remove(SHADOW_DATABASE_URL_KEY) {
+            diagnostics.push_error(DatamodelError::new_source_argument_deprecated(
+                SHADOW_DATABASE_URL_KEY,
+                source_name,
+                span,
+            ));
+        }
 
-        _ => None,
+        None
+    } else {
+        match args.remove(SHADOW_DATABASE_URL_KEY) {
+            Some((_span, shadow_db_url_arg)) => match StringFromEnvVar::coerce(shadow_db_url_arg, diagnostics) {
+                Some(shadow_db_url) => Some(shadow_db_url)
+                    .filter(|s| !s.as_literal().map(|literal| literal.is_empty()).unwrap_or(false))
+                    .map(|url| (url, shadow_db_url_arg.span())),
+                None => None,
+            },
+
+            _ => None,
+        }
     };
 
-    let (direct_url, direct_url_span) = match args.remove(DIRECT_URL_KEY) {
-        Some((_, direct_url)) => (
-            StringFromEnvVar::coerce(direct_url, diagnostics),
-            Some(direct_url.span()),
-        ),
+    let (direct_url, direct_url_span) = if is_using_driver_adapters {
+        if let Some((span, _)) = args.remove(DIRECT_URL_KEY) {
+            diagnostics.push_error(DatamodelError::new_source_argument_deprecated(
+                DIRECT_URL_KEY,
+                source_name,
+                span,
+            ));
+        }
 
-        None => (None, None),
+        (None, None)
+    } else {
+        match args.remove(DIRECT_URL_KEY) {
+            Some((_, direct_url)) => (
+                StringFromEnvVar::coerce(direct_url, diagnostics),
+                Some(direct_url.span()),
+            ),
+            None => (None, None),
+        }
     };
 
     if let Some((shadow_url, _)) = &shadow_database_url {
