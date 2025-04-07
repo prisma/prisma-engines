@@ -1,10 +1,11 @@
 //! All the quaint-wrangling for the sqlite connector should happen here.
 
+use crate::flavour::sqlite::SqlSchemaDescriber;
 use crate::BitFlags;
 use psl::PreviewFeature;
 use quaint::connector::{AdapterName, ExternalConnector};
 use schema_connector::{ConnectorError, ConnectorResult};
-use sql_schema_describer::SqlSchema;
+use sql_schema_describer::{DescriberErrorKind, SqlSchema};
 use std::sync::Arc;
 
 pub struct State {
@@ -17,6 +18,34 @@ impl State {
         Self {
             preview_features,
             connection: Connection { adapter },
+        }
+    }
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct SqlTable {
+    pub schema: String,
+    pub name: String,
+    pub r#type: SqlTableType,
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub enum SqlTableType {
+    Table,
+    View,
+    Shadow,
+    Virtual,
+    Unknown,
+}
+
+impl SqlTableType {
+    fn from_str(s: &str) -> Self {
+        match s {
+            "table" => SqlTableType::Table,
+            "view" => SqlTableType::View,
+            "shadow" => SqlTableType::Shadow,
+            "virtual" => SqlTableType::Virtual,
+            _ => SqlTableType::Unknown,
         }
     }
 }
@@ -76,16 +105,46 @@ impl Connection {
     }
 
     pub async fn reset(&self, _params: &Params) -> ConnectorResult<()> {
+        let mut schema = SqlSchema::default();
+        let container_ids = SqlSchemaDescriber::new(self.as_connector())
+            .get_table_names(&mut schema)
+            .await
+            .map_err(|err| match err.into_kind() {
+                DescriberErrorKind::QuaintError(err) => {
+                    ConnectorError::from_source(err, "Error describing the database.")
+                }
+                DescriberErrorKind::CrossSchemaReference { .. } => {
+                    unreachable!("No schemas on SQLite")
+                }
+            })?;
+
+        let table_ids: Vec<_> = container_ids
+            .iter()
+            .filter_map(|(name, id)| id.left().map(|id| (name.as_str(), id)))
+            .collect();
+
+        let truncate_sql = table_ids
+            .iter()
+            .map(|(table_name, _)| format!("DELETE FROM {}", table_name))
+            .collect::<Vec<_>>()
+            .join("; ");
+
+        // Avoid executing a query if there are no tables to truncate.
+        // This prevents a "No SQL statements detected" error.
+        if table_ids.is_empty() {
+            return Ok(());
+        }
+
+        tracing::debug!(query_type = "reset", truncate_sql);
+
         self.adapter
-            .execute_script(
+            .execute_script(&format!(
                 r#"
-            PRAGMA writable_schema = 1;
-            DELETE FROM sqlite_master;
-            PRAGMA writable_schema = 0;
-            VACUUM;
-            PRAGMA integrity_check;
-            "#,
-            )
+                    PRAGMA defer_foreign_keys = 1;
+                    {}
+                "#,
+                truncate_sql.as_str(),
+            ))
             .await
             .map_err(convert_error)
     }
