@@ -11,7 +11,8 @@ import { __dirname } from './utils'
 export type QueryLogCallback = (log: string) => void
 
 export async function initSchemaEngine(
+  debug: (log: string) => void,
   adapterFactory: ErrorCapturingSqlDriverAdapterFactory,
 ): Promise<SchemaEngine> {
-  return await SchemaEngine.new(adapterFactory)
+  return await SchemaEngine.new(debug, adapterFactory)
 }

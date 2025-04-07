@@ -34,7 +34,7 @@ async function main(): Promise<void> {
     }
 
     datasource db {
-      provider = "postgresql"
+      provider = "sqlite"
       url      = "${url}"
     }
 
@@ -86,7 +86,35 @@ async function main(): Promise<void> {
   }
 
   {
-    console.log('[diff]')
+    console.log('[reset]')
+    const result = await engine.reset()
+    console.dir({ result }, { depth: null })
+  }
+
+  {
+    console.log('[db push]')
+    const result = await engine.schemaPush({
+      schema: {
+        files: [
+          {
+            content: schema,
+            path: 'schema.prisma',
+          }
+        ],
+      },
+      force: false,
+    })
+    console.dir({ result }, { depth: null })
+  }
+
+  {
+    console.log('[reset]')
+    const result = await engine.reset()
+    console.dir({ result }, { depth: null })
+  }
+
+  {
+    console.log('[diff from empty to schemaDatamodel]')
     const diffResult = await engine.diff({
       from: {
         tag: 'empty',
@@ -136,7 +164,14 @@ async function initSE({
 }: InitSchemaEngineParams) {
   const adapterFactory = driverAdapterManager.factory()
   const errorCapturingAdapterFactory = bindSqlAdapterFactory(adapterFactory)
+
+  const debug = (log: string) => {
+    console.log('[debug]')
+    console.dir(JSON.parse(log), { depth: null })
+  }
+
   const engineInstance = await se.initSchemaEngine(
+    debug,
     errorCapturingAdapterFactory,
   )
 
