@@ -95,6 +95,15 @@ impl SchemaDialect for MongoDbSchemaDialect {
         Ok(DatabaseSchema::new(schema_calculator::calculate(&validated_schema)))
     }
 
+    fn validate_migrations_with_target<'a>(
+        &'a mut self,
+        _migrations: &'a [MigrationDirectory],
+        _namespaces: Option<Namespaces>,
+        _target: ExternalShadowDatabase,
+    ) -> BoxFuture<'a, ConnectorResult<()>> {
+        Box::pin(future::ready(Ok(())))
+    }
+
     fn schema_from_migrations_with_target<'a>(
         &'a self,
         _migrations: &'a [MigrationDirectory],

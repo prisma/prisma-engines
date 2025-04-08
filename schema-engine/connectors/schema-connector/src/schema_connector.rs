@@ -48,6 +48,14 @@ pub trait SchemaDialect: Send + Sync + 'static {
     /// Create a database schema from datamodel source files.
     fn schema_from_datamodel(&self, sources: Vec<(String, SourceFile)>) -> ConnectorResult<DatabaseSchema>;
 
+    /// If possible, check that the passed in migrations apply cleanly.
+    fn validate_migrations_with_target<'a>(
+        &'a mut self,
+        _migrations: &'a [MigrationDirectory],
+        namespaces: Option<Namespaces>,
+        target: ExternalShadowDatabase,
+    ) -> BoxFuture<'a, ConnectorResult<()>>;
+
     /// Create a database schema from migrations with a specific target shadow database.
     /// When MultiSchema is enabled, the namespaces are required for diffing anything other than a
     /// prisma schema, because that information is otherwise unavailable.
@@ -178,6 +186,7 @@ pub trait SchemaConnector: Send + Sync + 'static {
     }
 }
 
+#[derive(Clone)]
 /// An external shadow database to be used for schema operations.
 pub enum ExternalShadowDatabase {
     /// A driver adapter factory.

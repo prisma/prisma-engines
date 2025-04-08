@@ -78,11 +78,37 @@ impl SystemTimeError {
 
 impl std::error::Error for SystemTimeError {}
 
+struct JsFutureTimeoutWrapper {
+    future: JsFuture,
+}
+
+impl Future for JsFutureTimeoutWrapper {
+    type Output = Result<JsValue, JsValue>;
+
+    fn poll(self: std::pin::Pin<&mut Self>, cx: &mut std::task::Context<'_>) -> std::task::Poll<Self::Output> {
+        // Pin the internal future and delegate polling to it.
+        // SAFETY: We are the only owner of this future, so it is safe to get a mutable reference.
+        unsafe {
+            let this = self.get_unchecked_mut();
+            let future = std::pin::Pin::new_unchecked(&mut this.future);
+            future.poll(cx)
+        }
+    }
+}
+
+impl JsFutureTimeoutWrapper {
+    fn new(future: JsFuture) -> Self {
+        Self { future }
+    }
+}
+
+unsafe impl Send for JsFutureTimeoutWrapper {}
+
 pub async fn sleep(duration: Duration) {
-    let _ = JsFuture::from(Promise::new(&mut |resolve, _reject| {
+    let js_future = JsFuture::from(Promise::new(&mut |resolve, _reject| {
         set_timeout(&resolve, duration.as_millis() as u32);
-    }))
-    .await;
+    }));
+    let _ = JsFutureTimeoutWrapper::new(js_future).await;
 }
 
 pub async fn timeout<F>(duration: Duration, future: F) -> Result<F::Output, TimeoutError>

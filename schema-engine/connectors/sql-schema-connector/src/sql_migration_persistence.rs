@@ -8,7 +8,10 @@ use uuid::Uuid;
 
 impl MigrationPersistence for SqlSchemaConnector {
     fn baseline_initialize(&mut self) -> BoxFuture<'_, ConnectorResult<()>> {
-        self.inner.create_migrations_table()
+        Box::pin(async move {
+            self.inner.create_migrations_table().await?;
+            Ok(())
+        })
     }
 
     #[tracing::instrument(skip(self))]

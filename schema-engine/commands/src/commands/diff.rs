@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use crate::{
     CoreError, SchemaContainerExt,
     core_error::CoreResult,
@@ -7,11 +9,16 @@ use crate::{
 use enumflags2::BitFlags;
 use json_rpc::types::MigrationList;
 use psl::SourceFile;
+use quaint::connector::ExternalConnectorFactory;
 use schema_connector::{
     ConnectorError, DatabaseSchema, ExternalShadowDatabase, Namespaces, SchemaConnector, SchemaDialect,
 };
 
-pub async fn diff(params: DiffParams, connector: &mut dyn SchemaConnector) -> CoreResult<DiffResult> {
+pub async fn diff(
+    params: DiffParams,
+    connector: &mut dyn SchemaConnector,
+    adapter_factory: Arc<dyn ExternalConnectorFactory>,
+) -> CoreResult<DiffResult> {
     // In order to properly handle MultiSchema, we need to make sure the preview feature is
     // correctly set, and we need to grab the namespaces from the Schema, if any.
     // Note that currently, we union all namespaces and preview features. This may not be correct.
@@ -22,23 +29,18 @@ pub async fn diff(params: DiffParams, connector: &mut dyn SchemaConnector) -> Co
 
     let (conn_from, schema_from) = diff_target_to_dialect(
         &params.from,
-        params.shadow_database_url.as_deref(),
         connector,
+        adapter_factory.clone(),
         namespaces.clone(),
         preview_features,
     )
     .await?
     .unzip();
 
-    let (conn_to, schema_to) = diff_target_to_dialect(
-        &params.to,
-        params.shadow_database_url.as_deref(),
-        connector,
-        namespaces,
-        preview_features,
-    )
-    .await?
-    .unzip();
+    let (conn_to, schema_to) =
+        diff_target_to_dialect(&params.to, connector, adapter_factory, namespaces, preview_features)
+            .await?
+            .unzip();
 
     let dialect = conn_from
         .or(conn_to)
@@ -103,8 +105,8 @@ fn namespaces_and_preview_features_from_diff_targets(
 
 async fn diff_target_to_dialect(
     target: &DiffTarget,
-    shadow_database_url: Option<&str>,
     connector: &mut dyn SchemaConnector,
+    adapter_factory: Arc<dyn ExternalConnectorFactory>,
     namespaces: Option<Namespaces>,
     preview_features: BitFlags<psl::PreviewFeature>,
 ) -> CoreResult<Option<(Box<dyn SchemaDialect>, DatabaseSchema)>> {
@@ -139,8 +141,8 @@ async fn diff_target_to_dialect(
             ..
         }) => {
             let provider = schema_connector::migrations_directory::read_provider_from_lock_file(lockfile);
-            match (provider.as_deref(), shadow_database_url) {
-                (Some(provider), Some(shadow_database_url)) => {
+            match provider.as_deref() {
+                Some(provider) => {
                     let dialect = dialect_for_provider(provider)?;
                     let directories =
                         schema_connector::migrations_directory::list_migrations(migration_directories.clone());
@@ -150,18 +152,12 @@ async fn diff_target_to_dialect(
                         .schema_from_migrations_with_target(
                             &directories,
                             namespaces,
-                            ExternalShadowDatabase::ConnectionString {
-                                connection_string: shadow_database_url.to_owned(),
-                                preview_features,
-                            },
+                            ExternalShadowDatabase::DriverAdapter(adapter_factory),
                         )
                         .await?;
                     Ok(Some((dialect, schema)))
                 }
-                (Some(_), None) => Err(ConnectorError::from_msg(
-                    "You must pass the --shadow-database-url if you want to diff a migrations directory.".to_owned(),
-                )),
-                (None, _) => Err(ConnectorError::from_msg(
+                None => Err(ConnectorError::from_msg(
                     "Could not determine the connector from the migrations directory (missing migration_lock.toml)."
                         .to_owned(),
                 )),
