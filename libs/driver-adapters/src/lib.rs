@@ -17,7 +17,7 @@ pub(crate) mod transaction;
 pub(crate) mod types;
 
 use crate::error::DriverAdapterError;
-use quaint::error::{Error as QuaintError, ErrorKind};
+use quaint::error::{DatabaseConstraint, Error as QuaintError, ErrorKind};
 
 #[cfg(target_arch = "wasm32")]
 pub(crate) use wasm::result::AdapterResult;
@@ -36,6 +36,53 @@ impl From<DriverAdapterError> for QuaintError {
             }
             DriverAdapterError::InvalidIsolationLevel { level } => {
                 QuaintError::builder(ErrorKind::InvalidIsolationLevel(level)).build()
+            }
+            DriverAdapterError::LengthMismatch { column } => {
+                QuaintError::builder(ErrorKind::LengthMismatch { column: column.into() }).build()
+            }
+            DriverAdapterError::UniqueConstraintViolation { fields } => {
+                QuaintError::builder(ErrorKind::UniqueConstraintViolation {
+                    constraint: DatabaseConstraint::Fields(fields),
+                })
+                .build()
+            }
+            DriverAdapterError::NullConstraintViolation { fields } => {
+                QuaintError::builder(ErrorKind::NullConstraintViolation {
+                    constraint: DatabaseConstraint::Fields(fields),
+                })
+                .build()
+            }
+            DriverAdapterError::ForeignKeyConstraintViolation { constraint } => {
+                let constraint = match constraint {
+                    error::DriverAdapterConstraint::Fields(fields) => DatabaseConstraint::Fields(fields),
+                    error::DriverAdapterConstraint::Index(index) => DatabaseConstraint::Index(index),
+                    error::DriverAdapterConstraint::ForeignKey => DatabaseConstraint::ForeignKey,
+                };
+                QuaintError::builder(ErrorKind::ForeignKeyConstraintViolation { constraint }).build()
+            }
+            DriverAdapterError::DatabaseDoesNotExist { db } => {
+                QuaintError::builder(ErrorKind::DatabaseDoesNotExist { db_name: db.into() }).build()
+            }
+            DriverAdapterError::DatabaseAlreadyExists { db } => {
+                QuaintError::builder(ErrorKind::DatabaseAlreadyExists { db_name: db.into() }).build()
+            }
+            DriverAdapterError::DatabaseAccessDenied { db } => {
+                QuaintError::builder(ErrorKind::DatabaseAccessDenied { db_name: db.into() }).build()
+            }
+            DriverAdapterError::AuthenticationFailed { user } => {
+                QuaintError::builder(ErrorKind::AuthenticationFailed { user: user.into() }).build()
+            }
+            DriverAdapterError::TransactionWriteConflict => {
+                QuaintError::builder(ErrorKind::TransactionWriteConflict).build()
+            }
+            DriverAdapterError::TableDoesNotExist { table } => {
+                QuaintError::builder(ErrorKind::TableDoesNotExist { table: table.into() }).build()
+            }
+            DriverAdapterError::ColumnNotFound { column } => {
+                QuaintError::builder(ErrorKind::ColumnNotFound { column: column.into() }).build()
+            }
+            DriverAdapterError::TooManyConnections { cause } => {
+                QuaintError::builder(ErrorKind::TooManyConnections(cause.into())).build()
             }
             DriverAdapterError::GenericJs { id } => QuaintError::external_error(id),
             #[cfg(feature = "postgresql")]
