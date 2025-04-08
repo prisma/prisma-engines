@@ -175,5 +175,10 @@ pub async fn dispose(state: &State) -> ConnectorResult<()> {
 }
 
 fn convert_error(err: quaint::error::Error) -> ConnectorError {
-    ConnectorError::from_source(err, "external connector error")
+    match err.kind() {
+        quaint::error::ErrorKind::ExternalError(id) => {
+            ConnectorError::user_facing(user_facing_errors::query_engine::ExternalError { id: *id })
+        }
+        _ => ConnectorError::from_source(err, "Error executing SQLite query."),
+    }
 }
