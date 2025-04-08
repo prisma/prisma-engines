@@ -5,9 +5,9 @@ on:
       - main
   pull_request:
     paths-ignore:
+      - '.github/**'
       - '!.github/workflows/test-query-compiler.yml'
       - '!.github/workflows/test-query-compiler-template.yml'
-      - '.github/**'
       - '.buildkite/**'
       - '*.md'
       - 'LICENSE'
