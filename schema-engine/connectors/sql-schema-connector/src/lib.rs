@@ -130,6 +130,20 @@ impl SchemaDialect for SqlSchemaDialect {
         Ok(sql_schema_calculator::calculate_sql_schema(&schema, &*calculator).into())
     }
 
+    #[tracing::instrument(skip(self, migrations, target))]
+    fn validate_migrations_with_target<'a>(
+        &'a mut self,
+        migrations: &'a [MigrationDirectory],
+        namespaces: Option<Namespaces>,
+        target: ExternalShadowDatabase,
+    ) -> BoxFuture<'a, ConnectorResult<()>> {
+        Box::pin(async move {
+            self.schema_from_migrations_with_target(migrations, namespaces, target)
+                .await?;
+            Ok(())
+        })
+    }
+
     fn schema_from_migrations_with_target<'a>(
         &'a self,
         migrations: &'a [MigrationDirectory],
