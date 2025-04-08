@@ -55,7 +55,7 @@ pub(crate) fn pretty_print(
         offending,
         suffix
     )?;
-    if offending.len() == 0 {
+    if offending.is_empty() {
         let spacing = " ".repeat(start_in_line);
         writeln!(
             f,

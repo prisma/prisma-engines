@@ -191,7 +191,7 @@ impl<'a, 'b> NodeTranslator<'a, 'b> {
                 expr: Box::new(Expression::Get {
                     name: result_binding_names
                         .into_iter()
-                        .last()
+                        .next_back()
                         .expect("no binding for result node"),
                 }),
             })

@@ -28,7 +28,7 @@ impl From<MysqlError> for Error {
                     .split_whitespace()
                     .last()
                     .and_then(|s| s.split('\'').nth(1))
-                    .and_then(|s| s.split('.').last())
+                    .and_then(|s| s.split('.').next_back())
                     .map(ToString::to_string)
                     .map(DatabaseConstraint::Index)
                     .unwrap_or(DatabaseConstraint::CannotParse);
@@ -174,7 +174,7 @@ impl From<MysqlError> for Error {
                     .split_whitespace()
                     .nth(1)
                     .and_then(|s| s.split('\'').nth(1))
-                    .and_then(|s| s.split('.').last())
+                    .and_then(|s| s.split('.').next_back())
                     .into();
 
                 let kind = ErrorKind::TableDoesNotExist { table };
