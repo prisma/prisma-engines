@@ -34,7 +34,6 @@ psl.workspace = true
 schema-connector.workspace = true
 sql-schema-connector.workspace = true
 mongodb-schema-connector = { workspace = true, optional = true }
-wasm-rs-dbg.workspace = true
 quaint.workspace = true
 
 user-facing-errors = { workspace = true }

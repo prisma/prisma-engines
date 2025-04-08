@@ -494,7 +494,6 @@ impl SchemaConnector for SqlSchemaConnector {
     }
 
     fn migration_persistence(&mut self) -> &mut dyn MigrationPersistence {
-        wasm_rs_dbg::dbg!("Calling connector.migration_persistence()");
         self
     }
 

@@ -38,7 +38,6 @@ serde.workspace = true
 tsify-next.workspace = true
 wasm-bindgen.workspace = true
 wasm-bindgen-futures.workspace = true
-wasm-rs-dbg.workspace = true
 driver-adapters.workspace = true
 
 [build-dependencies]

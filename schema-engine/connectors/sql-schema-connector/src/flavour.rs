@@ -232,29 +232,23 @@ pub(crate) trait SqlConnector: Send + Sync + Debug {
                 .column("applied_steps_count")
                 .order_by("started_at".ascend());
 
-            wasm_rs_dbg::dbg!("Querying migrations table, which may not exist yet...");
             let rows = match self.query(select.into()).await {
-                Ok(result) => {
-                    wasm_rs_dbg::dbg!("_prisma_migrations table found, continuing.");
-                    result
-                }
+                Ok(result) => result,
                 Err(err)
                     if err.is_user_facing_error::<user_facing_errors::query_engine::TableDoesNotExist>()
                         || err.is_user_facing_error::<user_facing_errors::common::InvalidModel>() =>
                 {
-                    wasm_rs_dbg::dbg!("Error [1] loading migrations table: {:?}", &err);
                     return Ok(Err(PersistenceNotInitializedError));
                 }
-                Err(err_internal) => {
-                    // TODO: this is a workaround, as currently the errors thrown by D1 and LibSQL do not
-                    // match the known user-facing errors we expect for SQLite.
+                Err(_) => {
+                    // TODO: this is a workaround, as currently the errors thrown by Driver Adapters do not
+                    // match the known user-facing errors we expect.
                     // We should fix this in the future.
                     //
-                    // We should actually yield:
+                    // This used to actually yield:
                     // ```
                     // err @ Err(_) => err?
                     // ```
-                    wasm_rs_dbg::dbg!("Error [2] loading migrations table: {:?}", &err_internal);
                     return Ok(Err(PersistenceNotInitializedError));
                 }
             };

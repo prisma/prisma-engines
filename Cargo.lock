@@ -4746,7 +4746,6 @@ dependencies = [
  "tracing-subscriber",
  "url",
  "user-facing-errors",
- "wasm-rs-dbg",
 ]
 
 [[package]]
@@ -4842,7 +4841,6 @@ dependencies = [
  "tsify-next",
  "wasm-bindgen",
  "wasm-bindgen-futures",
- "wasm-rs-dbg",
 ]
 
 [[package]]
@@ -5335,7 +5333,6 @@ dependencies = [
  "user-facing-errors",
  "uuid",
  "versions",
- "wasm-rs-dbg",
 ]
 
 [[package]]
