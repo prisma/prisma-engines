@@ -2,7 +2,7 @@
 
 pub(crate) use quaint::connector::rusqlite;
 
-use quaint::connector::{ColumnType, DescribedColumn, DescribedParameter, GetRow, ToColumnNames};
+use quaint::connector::{AdapterName, ColumnType, DescribedColumn, DescribedParameter, GetRow, ToColumnNames};
 use schema_connector::{BoxFuture, ConnectorError, ConnectorParams, ConnectorResult};
 use sql_schema_describer::SqlSchema;
 use sqlx_core::{column::Column, type_info::TypeInfo};
@@ -60,6 +60,10 @@ impl Connection {
 
     pub fn as_connector(&self) -> &Mutex<rusqlite::Connection> {
         &self.0
+    }
+
+    pub fn adapter_name(&self) -> Option<AdapterName> {
+        None
     }
 
     pub async fn raw_cmd(&self, sql: &str) -> ConnectorResult<()> {

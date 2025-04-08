@@ -15,10 +15,7 @@ use schema_connector::{
     migrations_directory::MigrationDirectory, BoxFuture, ConnectorError, ConnectorResult, Namespaces,
 };
 use schema_differ::SqliteSchemaDifferFlavour;
-use sql_schema_describer::{
-    sqlite::{Connection, SqlSchemaDescriber},
-    DescriberErrorKind, SqlSchema,
-};
+use sql_schema_describer::{sqlite::SqlSchemaDescriber, DescriberErrorKind, SqlSchema};
 use std::future::Future;
 
 use super::{SqlDialect, UsingExternalShadowDb};
@@ -143,7 +140,7 @@ impl SqlConnector for SqliteConnector {
     }
 
     fn acquire_lock(&mut self) -> BoxFuture<'_, ConnectorResult<()>> {
-        self.raw_cmd("PRAGMA main.locking_mode=EXCLUSIVE")
+        self.with_connection(|conn, _| acquire_lock(conn))
     }
 
     fn connector_type(&self) -> &'static str {
@@ -230,9 +227,11 @@ impl SqlConnector for SqliteConnector {
             FROM `_prisma_migrations`
             ORDER BY `started_at` ASC
         "#};
+
         self.with_connection(|conn, _| async {
             let rows = match conn.query_raw(SQL, &[]).await {
                 Ok(result) => result,
+                #[allow(unused_variables)]
                 Err(err) => {
                     #[cfg(feature = "sqlite-native")]
                     if let Some(imp::rusqlite::Error::SqliteFailure(
@@ -245,7 +244,16 @@ impl SqlConnector for SqliteConnector {
                     {
                         return Ok(Err(schema_connector::PersistenceNotInitializedError));
                     }
-                    return Err(err);
+
+                    // TODO: this is a workaround, as currently the errors thrown by D1 and LibSQL do not
+                    // match the known user-facing errors we expect for SQLite.
+                    // We should fix this in the future.
+                    //
+                    // We used to actually yield:
+                    // ```
+                    // return Err(err)
+                    // ```
+                    return Ok(Err(schema_connector::PersistenceNotInitializedError));
                 }
             };
 
@@ -398,11 +406,15 @@ impl SqlConnector for SqliteConnector {
 }
 
 async fn acquire_lock(connection: &imp::Connection) -> ConnectorResult<()> {
-    if let Some(AdapterName::D1(_) | AdapterName::LibSQL) = connection.as_connector().adapter_name() {
+    let adapter_name = connection.adapter_name();
+    let sql = "PRAGMA main.locking_mode=EXCLUSIVE";
+    tracing::info!(sql, adapter_name = ?adapter_name, query_type = "acquire_lock");
+
+    if let Some(AdapterName::D1(_) | AdapterName::LibSQL) = adapter_name {
         return Ok(());
     };
 
-    connection.raw_cmd("PRAGMA main.locking_mode=EXCLUSIVE").await
+    connection.raw_cmd(sql).await
 }
 
 async fn describe_schema(connection: &imp::Connection) -> ConnectorResult<SqlSchema> {

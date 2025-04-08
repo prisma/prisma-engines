@@ -129,7 +129,7 @@ impl<'a> SqlSchemaDescriber<'a> {
         Ok(names)
     }
 
-    async fn get_table_names(
+    pub async fn get_table_names(
         &self,
         schema: &mut SqlSchema,
     ) -> DescriberResult<IndexMap<String, Either<TableId, ViewId>>> {

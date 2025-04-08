@@ -4735,6 +4735,7 @@ dependencies = [
  "jsonrpc-core",
  "mongodb-schema-connector",
  "psl",
+ "quaint",
  "schema-connector",
  "serde",
  "serde_json",
@@ -4824,6 +4825,7 @@ name = "schema-engine-wasm"
 version = "0.1.0"
 dependencies = [
  "build-utils",
+ "crosstarget-utils",
  "driver-adapters",
  "js-sys",
  "json-rpc-api",
@@ -4833,11 +4835,12 @@ dependencies = [
  "serde",
  "sql-schema-connector",
  "tracing",
+ "tracing-error",
  "tracing-futures",
+ "tracing-subscriber",
  "tsify-next",
  "wasm-bindgen",
  "wasm-bindgen-futures",
- "wasm-rs-dbg",
 ]
 
 [[package]]
@@ -5303,6 +5306,7 @@ version = "0.1.0"
 dependencies = [
  "chrono",
  "connection-string",
+ "crosstarget-utils",
  "datamodel-renderer",
  "either",
  "enumflags2",

@@ -18,10 +18,17 @@ sqlite = ["driver-adapters/sqlite", "psl/sqlite", "sql-schema-connector/sqlite",
 postgresql = ["driver-adapters/postgresql", "psl/postgresql", "sql-schema-connector/postgresql", "commands/postgresql"]
 
 [dependencies]
+crosstarget-utils.workspace = true
 psl.workspace = true
 quaint.workspace = true
 tracing.workspace = true
 tracing-futures.workspace = true
+tracing-subscriber = { workspace = true, features = [
+    "fmt",
+    "json",
+    "time",
+] }
+tracing-error.workspace = true
 sql-schema-connector = { workspace = true }
 json-rpc = { path = "../json-rpc-api", package = "json-rpc-api" }
 commands = { path = "../commands", package = "schema-commands" }
@@ -31,7 +38,6 @@ serde.workspace = true
 tsify-next.workspace = true
 wasm-bindgen.workspace = true
 wasm-bindgen-futures.workspace = true
-wasm-rs-dbg.workspace = true
 driver-adapters.workspace = true
 
 [build-dependencies]

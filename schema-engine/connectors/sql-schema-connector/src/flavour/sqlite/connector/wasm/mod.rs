@@ -1,10 +1,15 @@
 //! All the quaint-wrangling for the sqlite connector should happen here.
 
+use crate::flavour::quaint_error_to_connector_error;
+use crate::flavour::sqlite::SqlSchemaDescriber;
 use crate::BitFlags;
 use psl::PreviewFeature;
-use quaint::connector::{AdapterName, ExternalConnector};
+use quaint::{
+    connector::{AdapterName, ConnectionInfo, ExternalConnectionInfo, ExternalConnector},
+    prelude::SqlFamily,
+};
 use schema_connector::{ConnectorError, ConnectorResult};
-use sql_schema_describer::SqlSchema;
+use sql_schema_describer::{DescriberErrorKind, SqlSchema};
 use std::sync::Arc;
 
 pub struct State {
@@ -30,6 +35,10 @@ pub struct Connection {
 impl Connection {
     pub fn as_connector(&self) -> &Arc<dyn ExternalConnector> {
         &self.adapter
+    }
+
+    pub fn adapter_name(&self) -> Option<AdapterName> {
+        Some(self.adapter.adapter_name())
     }
 
     pub async fn raw_cmd(&self, sql: &str) -> ConnectorResult<()> {
@@ -76,16 +85,46 @@ impl Connection {
     }
 
     pub async fn reset(&self, _params: &Params) -> ConnectorResult<()> {
+        let mut schema = SqlSchema::default();
+        let container_ids = SqlSchemaDescriber::new(self.as_connector())
+            .get_table_names(&mut schema)
+            .await
+            .map_err(|err| match err.into_kind() {
+                DescriberErrorKind::QuaintError(err) => {
+                    ConnectorError::from_source(err, "Error describing the database.")
+                }
+                DescriberErrorKind::CrossSchemaReference { .. } => {
+                    unreachable!("No schemas on SQLite")
+                }
+            })?;
+
+        let table_ids: Vec<_> = container_ids
+            .iter()
+            .filter_map(|(name, id)| id.left().map(|id| (name.as_str(), id)))
+            .collect();
+
+        let truncate_sql = table_ids
+            .iter()
+            .map(|(table_name, _)| format!("DELETE FROM {}", table_name))
+            .collect::<Vec<_>>()
+            .join("; ");
+
+        // Avoid executing a query if there are no tables to truncate.
+        // This prevents a "No SQL statements detected" error.
+        if table_ids.is_empty() {
+            return Ok(());
+        }
+
+        tracing::debug!(query_type = "reset", truncate_sql);
+
         self.adapter
-            .execute_script(
+            .execute_script(&format!(
                 r#"
-            PRAGMA writable_schema = 1;
-            DELETE FROM sqlite_master;
-            PRAGMA writable_schema = 0;
-            VACUUM;
-            PRAGMA integrity_check;
-            "#,
-            )
+                    PRAGMA defer_foreign_keys = 1;
+                    {}
+                "#,
+                truncate_sql.as_str(),
+            ))
             .await
             .map_err(convert_error)
     }
@@ -140,5 +179,13 @@ pub async fn dispose(state: &State) -> ConnectorResult<()> {
 }
 
 fn convert_error(err: quaint::error::Error) -> ConnectorError {
-    ConnectorError::from_source(err, "external connector error")
+    // TODO: the values of `ExternalConnectionInfo` are not even checked by `quaint_error_to_connector_error`.
+    // @malec had tried getting rid of this, but it would end up being an annoyingly large PR with very little benefit.
+    let connection_info = ConnectionInfo::External(ExternalConnectionInfo {
+        max_bind_values: None,
+        sql_family: SqlFamily::Sqlite,
+        schema_name: "main".to_owned(),
+    });
+
+    quaint_error_to_connector_error(err, &connection_info)
 }

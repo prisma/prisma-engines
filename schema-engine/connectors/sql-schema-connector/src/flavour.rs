@@ -238,9 +238,19 @@ pub(crate) trait SqlConnector: Send + Sync + Debug {
                     if err.is_user_facing_error::<user_facing_errors::query_engine::TableDoesNotExist>()
                         || err.is_user_facing_error::<user_facing_errors::common::InvalidModel>() =>
                 {
-                    return Ok(Err(PersistenceNotInitializedError))
+                    return Ok(Err(PersistenceNotInitializedError));
                 }
-                err @ Err(_) => err?,
+                Err(_) => {
+                    // TODO: this is a workaround, as currently the errors thrown by Driver Adapters do not
+                    // match the known user-facing errors we expect.
+                    // We should fix this in the future.
+                    //
+                    // This used to actually yield:
+                    // ```
+                    // err @ Err(_) => err?
+                    // ```
+                    return Ok(Err(PersistenceNotInitializedError));
+                }
             };
 
             let rows = rows
@@ -343,7 +353,10 @@ fn normalize_sql_schema(sql_schema: &mut SqlSchema, preview_features: BitFlags<P
     }
 }
 
-fn quaint_error_to_connector_error(error: quaint::error::Error, connection_info: &ConnectionInfo) -> ConnectorError {
+pub(crate) fn quaint_error_to_connector_error(
+    error: quaint::error::Error,
+    connection_info: &ConnectionInfo,
+) -> ConnectorError {
     match user_facing_errors::quaint::render_quaint_error(error.kind(), connection_info) {
         Some(user_facing_error) => user_facing_error.into(),
         None => {

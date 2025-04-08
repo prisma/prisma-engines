@@ -34,7 +34,7 @@ async function main(): Promise<void> {
     }
 
     datasource db {
-      provider = "postgresql"
+      provider = "sqlite"
       url      = "${url}"
     }
 
@@ -61,6 +61,9 @@ async function main(): Promise<void> {
 
   const { engine } = await initSE({
     driverAdapterManager,
+    options: {
+      datamodels: [[schema, 'schema.prisma']],
+    },
   })
 
   {
@@ -68,6 +71,21 @@ async function main(): Promise<void> {
     const version = await engine.version()
     console.dir({ version }, { depth: null })
   }
+
+  // {
+  //   console.log('[devDiagnostic]')
+  //   const result = await engine.devDiagnostic({
+  //     migrationsList: {
+  //       baseDir: process.cwd(),
+  //       lockfile: {
+  //         path: 'migrations_lock.toml',
+  //         content: null,
+  //       },
+  //       migrationDirectories: [],
+  //     },
+  //   })
+  //   console.dir({ result }, { depth: null })
+  // }
 
   {
     console.log('[ensureConnectionValidity]')
@@ -86,7 +104,35 @@ async function main(): Promise<void> {
   }
 
   {
-    console.log('[diff]')
+    console.log('[reset]')
+    const result = await engine.reset()
+    console.dir({ result }, { depth: null })
+  }
+
+  {
+    console.log('[db push]')
+    const result = await engine.schemaPush({
+      schema: {
+        files: [
+          {
+            content: schema,
+            path: 'schema.prisma',
+          }
+        ],
+      },
+      force: false,
+    })
+    console.dir({ result }, { depth: null })
+  }
+
+  {
+    console.log('[reset]')
+    const result = await engine.reset()
+    console.dir({ result }, { depth: null })
+  }
+
+  {
+    console.log('[diff from empty to schemaDatamodel]')
     const diffResult = await engine.diff({
       from: {
         tag: 'empty',
@@ -125,18 +171,34 @@ async function main(): Promise<void> {
     })
     console.dir(introspectResult, { depth: null })
   }
+
+  {
+    console.log('[reset]')
+    const result = await engine.reset()
+    console.dir({ result }, { depth: null })
+  }
 }
 
 type InitSchemaEngineParams = {
   driverAdapterManager: DriverAdaptersManager
+  options: se.ConstructorOptions
 }
 
 async function initSE({
   driverAdapterManager,
+  options,
 }: InitSchemaEngineParams) {
   const adapterFactory = driverAdapterManager.factory()
   const errorCapturingAdapterFactory = bindSqlAdapterFactory(adapterFactory)
+
+  const debug = (log: string) => {
+    console.log('[debug]')
+    console.dir(JSON.parse(log), { depth: null })
+  }
+
   const engineInstance = await se.initSchemaEngine(
+    options,
+    debug,
     errorCapturingAdapterFactory,
   )
 

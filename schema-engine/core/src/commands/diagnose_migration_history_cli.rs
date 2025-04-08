@@ -1,78 +1,18 @@
-use std::sync::Arc;
-
 use crate::CoreResult;
+use commands::{DiagnoseMigrationHistoryOutput, DriftDiagnostic};
 pub use json_rpc::types::{DiagnoseMigrationHistoryInput, HistoryDiagnostic};
-use quaint::connector::ExternalConnectorFactory;
 use schema_connector::{
-    ConnectorError, ExternalShadowDatabase, MigrationRecord, Namespaces, PersistenceNotInitializedError,
-    SchemaConnector,
-    migrations_directory::{MigrationDirectory, error_on_changed_provider, list_migrations},
+    migrations_directory::{error_on_changed_provider, list_migrations, MigrationDirectory},
+    ConnectorError, MigrationRecord, Namespaces, PersistenceNotInitializedError, SchemaConnector,
 };
-use serde::Serialize;
-
-/// The output of the `DiagnoseMigrationHistory` command.
-#[derive(Serialize, Debug)]
-#[serde(rename_all = "camelCase")]
-pub struct DiagnoseMigrationHistoryOutput {
-    /// Whether drift between the expected schema and the dev database could be
-    /// detected. `None` if the dev database has the expected schema.
-    #[serde(skip)]
-    pub drift: Option<DriftDiagnostic>,
-    /// The current status of the migration history of the database relative to
-    /// migrations directory. `None` if they are in sync and up to date.
-    pub history: Option<HistoryDiagnostic>,
-    /// The names of the migrations that are currently in a failed state in the
-    /// database.
-    pub failed_migration_names: Vec<String>,
-    /// The names of the migrations for which the checksum of the script in the
-    /// migration directory does not match the checksum of the applied migration
-    /// in the database.
-    pub edited_migration_names: Vec<String>,
-    /// An optional error encountered when applying a migration that is not
-    /// applied in the main database to the shadow database. We do this to
-    /// validate that unapplied migrations are at least minimally valid.
-    #[serde(skip)]
-    pub error_in_unapplied_migration: Option<ConnectorError>,
-    /// Is the migrations table initialized in the database.
-    pub has_migrations_table: bool,
-}
-
-impl From<DiagnoseMigrationHistoryOutput> for json_rpc::types::DiagnoseMigrationHistoryOutput {
-    fn from(val: DiagnoseMigrationHistoryOutput) -> json_rpc::types::DiagnoseMigrationHistoryOutput {
-        json_rpc::types::DiagnoseMigrationHistoryOutput {
-            history: val.history,
-            failed_migration_names: val.failed_migration_names,
-            edited_migration_names: val.edited_migration_names,
-            has_migrations_table: val.has_migrations_table,
-        }
-    }
-}
-
-impl DiagnoseMigrationHistoryOutput {
-    /// True if no problem was found
-    pub fn is_empty(&self) -> bool {
-        matches!(
-            self,
-            DiagnoseMigrationHistoryOutput {
-                drift,
-                history,
-                has_migrations_table: _,
-                failed_migration_names,
-                edited_migration_names,
-                error_in_unapplied_migration,
-            } if drift.is_none() && history.is_none() && failed_migration_names.is_empty() && edited_migration_names.is_empty() && error_in_unapplied_migration.is_none()
-        )
-    }
-}
 
 /// Read the contents of the migrations directory and the migrations table, and
 /// returns their relative statuses. At this stage, the schema engine only
 /// reads, it does not write to the dev database nor the migrations directory.
-pub async fn diagnose_migration_history(
+pub async fn diagnose_migration_history_cli(
     input: DiagnoseMigrationHistoryInput,
     namespaces: Option<Namespaces>,
     connector: &mut dyn SchemaConnector,
-    adapter_factory: Arc<dyn ExternalConnectorFactory>,
 ) -> CoreResult<DiagnoseMigrationHistoryOutput> {
     tracing::debug!("Diagnosing migration history");
 
@@ -134,13 +74,11 @@ pub async fn diagnose_migration_history(
 
     let (drift, error_in_unapplied_migration) = {
         if input.opt_in_to_shadow_database {
-            let mut dialect = connector.schema_dialect();
-            let target = ExternalShadowDatabase::DriverAdapter(adapter_factory);
+            let dialect = connector.schema_dialect();
             // TODO(MultiSchema): this should probably fill the following namespaces from the CLI since there is
             // no schema to grab the namespaces off, in the case of MultiSchema.
             let from = connector
-                .schema_dialect()
-                .schema_from_migrations_with_target(&applied_migrations, namespaces.clone(), target.clone())
+                .schema_from_migrations(&applied_migrations, namespaces.clone())
                 .await;
             let to = connector.schema_from_database(namespaces.clone()).await;
             let drift = match from.and_then(|from| to.map(|to| dialect.diff(from, to))).map(|mig| {
@@ -161,8 +99,8 @@ pub async fn diagnose_migration_history(
             {
                 // TODO(MultiSchema): Not entirely sure passing no namespaces here is correct. Probably should
                 // also grab this as a CLI argument.
-                dialect
-                    .validate_migrations_with_target(&migrations_from_filesystem, namespaces, target)
+                connector
+                    .validate_migrations(&migrations_from_filesystem, namespaces)
                     .await
                     .err()
             } else {
@@ -253,34 +191,6 @@ impl<'a> Diagnostics<'a> {
                 unpersisted_migration_names: self.db_migration_names(),
                 unapplied_migration_names: self.fs_migration_names(),
             }),
-        }
-    }
-}
-
-/// A diagnostic returned by `diagnoseMigrationHistory` when trying to determine
-/// whether the development database has the expected schema at its stage in
-/// history.
-#[derive(Debug)]
-pub enum DriftDiagnostic {
-    /// The database schema of the current database does not match what would be
-    /// expected at its stage in the migration history.
-    DriftDetected {
-        /// The human-readable contents of the drift.
-        summary: String,
-    },
-    /// When a migration fails to apply cleanly to a shadow database.
-    MigrationFailedToApply {
-        /// The full error.
-        error: ConnectorError,
-    },
-}
-
-impl DriftDiagnostic {
-    /// For tests.
-    pub fn unwrap_drift_detected(self) -> String {
-        match self {
-            DriftDiagnostic::DriftDetected { summary } => summary,
-            other => panic!("unwrap_drift_detected on {other:?}"),
         }
     }
 }

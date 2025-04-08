@@ -60,6 +60,7 @@ where
             .map_err(into_quaint_error)?;
 
         let return_value = future.await.map_err(into_quaint_error)?;
+
         Self::js_result_into_quaint_result(return_value)
     }
 

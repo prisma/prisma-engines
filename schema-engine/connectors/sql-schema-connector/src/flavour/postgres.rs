@@ -291,12 +291,12 @@ impl SqlConnector for PostgresConnector {
 
             // 72707369 is a unique number we chose to identify Migrate. It does not
             // have any meaning, but it should not be used by any other tool.
-            tokio::time::timeout(
+            crosstarget_utils::time::timeout(
                 ADVISORY_LOCK_TIMEOUT,
                 connection.raw_cmd("SELECT pg_advisory_lock(72707369)"),
             )
             .await
-            .map_err(|_elapsed| imp::timeout_error(params))?
+            .map_err(|_timeout_error| imp::timeout_error(params))?
             .map_err(imp::quaint_error_mapper(params))?;
 
             Ok(())

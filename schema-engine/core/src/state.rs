@@ -271,7 +271,7 @@ impl GenericApi for EngineState {
         let namespaces = self.namespaces();
         self.with_default_connector(Box::new(move |connector| {
             Box::pin(async move {
-                commands::dev_diagnostic(input, namespaces, connector)
+                commands::dev_diagnostic_cli(input, namespaces, connector)
                     .instrument(tracing::info_span!("DevDiagnostic"))
                     .await
             })
@@ -295,7 +295,7 @@ impl GenericApi for EngineState {
         let namespaces = self.namespaces();
         self.with_default_connector(Box::new(move |connector| {
             Box::pin(async move {
-                commands::diagnose_migration_history(input, namespaces, connector)
+                commands::diagnose_migration_history_cli(input, namespaces, connector)
                     .instrument(tracing::info_span!("DiagnoseMigrationHistory"))
                     .await
             })

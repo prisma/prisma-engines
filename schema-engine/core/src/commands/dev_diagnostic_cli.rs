@@ -1,19 +1,15 @@
-use std::sync::Arc;
-
-use super::{DiagnoseMigrationHistoryOutput, DriftDiagnostic, HistoryDiagnostic, diagnose_migration_history};
+use super::{diagnose_migration_history_cli, DiagnoseMigrationHistoryOutput, DriftDiagnostic, HistoryDiagnostic};
 use crate::json_rpc::types::{
     DevAction, DevActionReset, DevDiagnosticInput, DevDiagnosticOutput, DiagnoseMigrationHistoryInput,
 };
-use quaint::connector::ExternalConnectorFactory;
-use schema_connector::{ConnectorResult, Namespaces, SchemaConnector, migrations_directory};
+use schema_connector::{migrations_directory, ConnectorResult, Namespaces, SchemaConnector};
 
 /// Method called at the beginning of `migrate dev` to decide the course of
 /// action based on the current state of the workspace.
-pub async fn dev_diagnostic(
+pub async fn dev_diagnostic_cli(
     input: DevDiagnosticInput,
     namespaces: Option<Namespaces>,
     connector: &mut dyn SchemaConnector,
-    adapter_factory: Arc<dyn ExternalConnectorFactory>,
 ) -> ConnectorResult<DevDiagnosticOutput> {
     migrations_directory::error_on_changed_provider(&input.migrations_list.lockfile, connector.connector_type())?;
 
@@ -23,7 +19,7 @@ pub async fn dev_diagnostic(
     };
 
     let diagnose_migration_history_output =
-        diagnose_migration_history(diagnose_input, namespaces, connector, adapter_factory).await?;
+        diagnose_migration_history_cli(diagnose_input, namespaces, connector).await?;
 
     check_for_broken_migrations(&diagnose_migration_history_output)?;
 
