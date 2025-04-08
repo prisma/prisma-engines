@@ -1,9 +1,13 @@
 //! All the quaint-wrangling for the sqlite connector should happen here.
 
+use crate::flavour::quaint_error_to_connector_error;
 use crate::flavour::sqlite::SqlSchemaDescriber;
 use crate::BitFlags;
 use psl::PreviewFeature;
-use quaint::connector::{AdapterName, ExternalConnector};
+use quaint::{
+    connector::{AdapterName, ConnectionInfo, ExternalConnectionInfo, ExternalConnector},
+    prelude::SqlFamily,
+};
 use schema_connector::{ConnectorError, ConnectorResult};
 use sql_schema_describer::{DescriberErrorKind, SqlSchema};
 use std::sync::Arc;
@@ -175,10 +179,13 @@ pub async fn dispose(state: &State) -> ConnectorResult<()> {
 }
 
 fn convert_error(err: quaint::error::Error) -> ConnectorError {
-    match err.kind() {
-        quaint::error::ErrorKind::ExternalError(id) => {
-            ConnectorError::user_facing(user_facing_errors::query_engine::ExternalError { id: *id })
-        }
-        _ => ConnectorError::from_source(err, "Error executing SQLite query."),
-    }
+    // TODO: the values of `ExternalConnectionInfo` are not even checked by `quaint_error_to_connector_error`.
+    // @malec had tried getting rid of this, but it would end up being an annoyingly large PR with very little benefit.
+    let connection_info = ConnectionInfo::External(ExternalConnectionInfo {
+        max_bind_values: None,
+        sql_family: SqlFamily::Sqlite,
+        schema_name: "main".to_owned(),
+    });
+
+    quaint_error_to_connector_error(err, &connection_info)
 }

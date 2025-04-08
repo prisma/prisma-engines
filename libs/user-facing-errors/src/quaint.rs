@@ -192,33 +192,10 @@ pub fn render_quaint_error(kind: &ErrorKind, connection_info: &ConnectionInfo) -
             }
             _ => unreachable!(),
         },
-
-        (ErrorKind::TableDoesNotExist { .. }, ConnectionInfo::External(_)) => default_value,
-        #[cfg(any(feature = "mssql-native", feature = "mysql-native", feature = "postgresql-native"))]
-        (ErrorKind::TableDoesNotExist { table: model }, _) => match connection_info {
-            #[cfg(feature = "postgresql-native")]
-            ConnectionInfo::Native(NativeConnectionInfo::Postgres(_)) => Some(KnownError::new(common::InvalidModel {
-                model: format!("{model}"),
-                kind: common::ModelKind::Table,
-            })),
-            #[cfg(feature = "postgresql-native")]
-            ConnectionInfo::Native(NativeConnectionInfo::Mysql(_)) => Some(KnownError::new(common::InvalidModel {
-                model: format!("{model}"),
-                kind: common::ModelKind::Table,
-            })),
-            ConnectionInfo::Native(NativeConnectionInfo::Sqlite { .. }) => {
-                Some(KnownError::new(common::InvalidModel {
-                    model: format!("{model}"),
-                    kind: common::ModelKind::Table,
-                }))
-            }
-            ConnectionInfo::Native(NativeConnectionInfo::Mssql(_)) => Some(KnownError::new(common::InvalidModel {
-                model: format!("{model}"),
-                kind: common::ModelKind::Table,
-            })),
-            _ => unreachable!(),
-        },
-
+        (ErrorKind::TableDoesNotExist { table: model }, _) => Some(KnownError::new(common::InvalidModel {
+            model: format!("{model}"),
+            kind: common::ModelKind::Table,
+        })),
         (ErrorKind::UniqueConstraintViolation { constraint }, _) => {
             Some(KnownError::new(query_engine::UniqueKeyViolation {
                 constraint: constraint.into(),
