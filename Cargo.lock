@@ -4735,6 +4735,7 @@ dependencies = [
  "jsonrpc-core",
  "mongodb-schema-connector",
  "psl",
+ "quaint",
  "schema-connector",
  "serde",
  "serde_json",
@@ -4745,6 +4746,7 @@ dependencies = [
  "tracing-subscriber",
  "url",
  "user-facing-errors",
+ "wasm-rs-dbg",
 ]
 
 [[package]]
@@ -5333,6 +5335,7 @@ dependencies = [
  "user-facing-errors",
  "uuid",
  "versions",
+ "wasm-rs-dbg",
 ]
 
 [[package]]

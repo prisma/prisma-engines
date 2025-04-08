@@ -12,6 +12,7 @@ postgresql = ["quaint/postgresql"]
 workspace = true
 
 [dependencies]
+wasm-rs-dbg.workspace = true
 async-trait.workspace = true
 futures.workspace = true
 panic-utils.workspace = true

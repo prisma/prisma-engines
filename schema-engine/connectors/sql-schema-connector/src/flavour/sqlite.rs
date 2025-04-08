@@ -227,9 +227,14 @@ impl SqlConnector for SqliteConnector {
             FROM `_prisma_migrations`
             ORDER BY `started_at` ASC
         "#};
+
+        wasm_rs_dbg::dbg!("Querying migrations table, which may not exist yet...");
         self.with_connection(|conn, _| async {
             let rows = match conn.query_raw(SQL, &[]).await {
-                Ok(result) => result,
+                Ok(result) => {
+                    wasm_rs_dbg::dbg!("_prisma_migrations table found, continuing.");
+                    result
+                }
                 Err(err) => {
                     #[cfg(feature = "sqlite-native")]
                     if let Some(imp::rusqlite::Error::SqliteFailure(
@@ -240,9 +245,20 @@ impl SqlConnector for SqliteConnector {
                         _,
                     )) = err.source_as::<imp::rusqlite::Error>()
                     {
+                        wasm_rs_dbg::dbg!("Error [1] loading migrations table: {:?}", &err);
                         return Ok(Err(schema_connector::PersistenceNotInitializedError));
                     }
-                    return Err(err);
+
+                    // TODO: this is a workaround, as currently the errors thrown by D1 and LibSQL do not
+                    // match the known user-facing errors we expect for SQLite.
+                    // We should fix this in the future.
+                    //
+                    // We should actually yield:
+                    // ```
+                    // return Err(err)
+                    // ```
+                    wasm_rs_dbg::dbg!("Error [2] loading migrations table: {:?}", &err);
+                    return Ok(Err(schema_connector::PersistenceNotInitializedError));
                 }
             };
 

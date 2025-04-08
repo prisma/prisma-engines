@@ -1,6 +1,6 @@
 use schema_core::{
     commands::DiagnoseMigrationHistoryOutput,
-    commands::{diagnose_migration_history, DiagnoseMigrationHistoryInput},
+    commands::{diagnose_migration_history_cli, DiagnoseMigrationHistoryInput},
     schema_connector::SchemaConnector,
     CoreError, CoreResult,
 };
@@ -32,7 +32,7 @@ impl<'a> DiagnoseMigrationHistory<'a> {
 
     pub async fn send(self) -> CoreResult<DiagnoseMigrationHistoryAssertions<'a>> {
         let migrations_list = utils::list_migrations(self.migrations_directory.path()).unwrap();
-        let output = diagnose_migration_history(
+        let output = diagnose_migration_history_cli(
             DiagnoseMigrationHistoryInput {
                 migrations_list,
                 opt_in_to_shadow_database: self.opt_in_to_shadow_database,

@@ -138,6 +138,7 @@ impl MigrationPersistence for SqlSchemaConnector {
     fn list_migrations(
         &mut self,
     ) -> BoxFuture<'_, ConnectorResult<Result<Vec<MigrationRecord>, PersistenceNotInitializedError>>> {
+        wasm_rs_dbg::dbg!("Calling self.inner.load_migrations_table()");
         self.inner.load_migrations_table()
     }
 }

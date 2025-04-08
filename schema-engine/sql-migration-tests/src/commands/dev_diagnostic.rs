@@ -1,5 +1,5 @@
 use schema_core::{
-    commands::dev_diagnostic, json_rpc::types::*, schema_connector::SchemaConnector, CoreError, CoreResult,
+    commands::dev_diagnostic_cli, json_rpc::types::*, schema_connector::SchemaConnector, CoreError, CoreResult,
 };
 use tempfile::TempDir;
 
@@ -21,7 +21,7 @@ impl<'a> DevDiagnostic<'a> {
 
     fn send_impl(self) -> CoreResult<DevDiagnosticAssertions<'a>> {
         let migrations_list = utils::list_migrations(self.migrations_directory.path()).unwrap();
-        let fut = dev_diagnostic(DevDiagnosticInput { migrations_list }, None, self.api);
+        let fut = dev_diagnostic_cli(DevDiagnosticInput { migrations_list }, None, self.api);
         let output = test_setup::runtime::run_with_thread_local_runtime(fut)?;
         Ok(DevDiagnosticAssertions {
             output,

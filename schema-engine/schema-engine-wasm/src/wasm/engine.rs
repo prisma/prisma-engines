@@ -188,7 +188,7 @@ impl SchemaEngine {
     #[wasm_bindgen(js_name = "devDiagnostic")]
     pub async fn dev_diagnostic(&mut self, input: DevDiagnosticInput) -> Result<DevDiagnosticOutput, JsValue> {
         let namespaces = self.namespaces();
-        let result = commands::dev_diagnostic(input, namespaces, &mut self.connector)
+        let result = commands::dev_diagnostic(input, namespaces, &mut self.connector, self.adapter_factory.clone())
             .instrument(tracing::info_span!("DevDiagnostic"))
             .await?;
         Ok(result)
@@ -197,7 +197,7 @@ impl SchemaEngine {
     /// Create a migration between any two sources of database schemas.
     #[wasm_bindgen]
     pub async fn diff(&mut self, params: DiffParams) -> Result<DiffResult, JsValue> {
-        let result = commands::diff(params, &mut self.connector)
+        let result = commands::diff(params, &mut self.connector, self.adapter_factory.clone())
             .instrument(tracing::info_span!("Diff"))
             .await?;
         Ok(result)
@@ -211,7 +211,7 @@ impl SchemaEngine {
     ) -> Result<DiagnoseMigrationHistoryOutput, JsValue> {
         let namespaces = self.namespaces();
         let result: DiagnoseMigrationHistoryOutput =
-            commands::diagnose_migration_history(input, namespaces, &mut self.connector)
+            commands::diagnose_migration_history(input, namespaces, &mut self.connector, self.adapter_factory.clone())
                 .instrument(tracing::info_span!("DiagnoseMigrationHistory"))
                 .await?
                 .into();

@@ -409,6 +409,7 @@ pub struct DiffParams {
     ///
     /// This is only necessary when one of `from` or `to` is referencing a migrations
     /// directory as a source for the schema.
+    /// @deprecated.
     pub shadow_database_url: Option<String>,
 
     /// By default, the response will contain a human-readable diff. If you want an
