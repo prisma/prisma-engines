@@ -5,7 +5,7 @@ pub mod shadow_db;
 use crate::flavour::postgres::{Circumstances, PostgresProvider, ADVISORY_LOCK_TIMEOUT};
 use crate::BitFlags;
 use psl::PreviewFeature;
-use quaint::connector::ExternalConnector;
+use quaint::connector::{ExternalConnector, Queryable};
 use schema_connector::{ConnectorError, ConnectorResult};
 use std::sync::Arc;
 
@@ -46,8 +46,8 @@ pub struct Connection {
 }
 
 impl Connection {
-    pub fn as_connector(&self) -> &Arc<dyn ExternalConnector> {
-        &self.adapter
+    pub fn as_connector(&self) -> &dyn Queryable {
+        &*self.adapter
     }
 
     // Query methods return quaint::Result directly to let the caller decide how to convert

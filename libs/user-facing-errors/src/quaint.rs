@@ -142,7 +142,7 @@ pub fn render_quaint_error(kind: &ErrorKind, connection_info: &ConnectionInfo) -
             _ => unreachable!(),
         },
 
-        (ErrorKind::SocketTimeout { .. }, ConnectionInfo::External(_)) => default_value,
+        (ErrorKind::SocketTimeout, ConnectionInfo::External(_)) => default_value,
         #[cfg(any(feature = "mssql-native", feature = "mysql-native", feature = "postgresql-native", feature = "sqlite-native"))]
         (ErrorKind::SocketTimeout, _) => match connection_info {
             ConnectionInfo::Native(NativeConnectionInfo::Postgres(url)) => {

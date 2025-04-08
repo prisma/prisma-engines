@@ -84,12 +84,12 @@ impl SqlRenderer for SqliteRenderer {
                         column_definition = col_sql,
                     ));
                 }
-                TableChange::AddPrimaryKey { .. } => unreachable!("AddPrimaryKey on SQLite"),
+                TableChange::AddPrimaryKey => unreachable!("AddPrimaryKey on SQLite"),
                 TableChange::AlterColumn(_) => unreachable!("AlterColumn on SQLite"),
                 TableChange::DropAndRecreateColumn { .. } => unreachable!("DropAndRecreateColumn on SQLite"),
                 TableChange::DropColumn { .. } => unreachable!("DropColumn on SQLite"),
-                TableChange::DropPrimaryKey { .. } => unreachable!("DropPrimaryKey on SQLite"),
-                TableChange::RenamePrimaryKey { .. } => unreachable!("AddPrimaryKey on SQLite"),
+                TableChange::DropPrimaryKey => unreachable!("DropPrimaryKey on SQLite"),
+                TableChange::RenamePrimaryKey => unreachable!("AddPrimaryKey on SQLite"),
             };
         }
 

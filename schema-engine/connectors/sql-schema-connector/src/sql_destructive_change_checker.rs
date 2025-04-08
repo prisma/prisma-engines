@@ -136,7 +136,7 @@ impl SqlSchemaConnector {
 
                                 self.check_add_column(&column, *has_virtual_default, &mut plan, step_index)
                             }
-                            TableChange::DropPrimaryKey { .. } => plan.push_warning(
+                            TableChange::DropPrimaryKey => plan.push_warning(
                                 SqlMigrationWarningCheck::PrimaryKeyChange {
                                     table: tables.previous.name().to_owned(),
                                     namespace: tables.previous.namespace().map(str::to_owned),
@@ -148,8 +148,8 @@ impl SqlSchemaConnector {
 
                                 checker.check_drop_and_recreate_column(&columns, changes, &mut plan, step_index)
                             }
-                            TableChange::AddPrimaryKey { .. } => (),
-                            TableChange::RenamePrimaryKey { .. } => (),
+                            TableChange::AddPrimaryKey => (),
+                            TableChange::RenamePrimaryKey => (),
                         }
                     }
                 }
