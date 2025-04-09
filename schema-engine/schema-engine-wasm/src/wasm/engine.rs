@@ -1,6 +1,3 @@
-#![allow(dead_code)]
-#![allow(unused_variables)]
-
 use super::logger::init_logger;
 use commands::{
     schema_connector::{self, ConnectorError, IntrospectionResult, Namespaces, SchemaConnector},
@@ -9,7 +6,7 @@ use commands::{
 use driver_adapters::{adapter_factory_from_js, JsObject};
 use js_sys::Function as JsFunction;
 use json_rpc::types::*;
-use psl::{ConnectorRegistry, PreviewFeature, SourceFile, ValidatedSchema};
+use psl::{PreviewFeature, SourceFile};
 use quaint::connector::ExternalConnectorFactory;
 use serde::Deserialize;
 use sql_schema_connector::SqlSchemaConnector;
@@ -18,13 +15,6 @@ use std::sync::Arc;
 use tracing_futures::Instrument;
 use tsify_next::Tsify;
 use wasm_bindgen::prelude::{wasm_bindgen, JsError, JsValue};
-
-const CONNECTOR_REGISTRY: ConnectorRegistry<'_> = &[
-    #[cfg(feature = "postgresql")]
-    psl::builtin_connectors::POSTGRES,
-    #[cfg(feature = "sqlite")]
-    psl::builtin_connectors::SQLITE,
-];
 
 #[wasm_bindgen]
 extern "C" {
@@ -75,9 +65,6 @@ pub struct SchemaEngine {
     /// The SQL schema connector induced by the adapter.
     connector: SqlSchemaConnector,
 
-    /// The initial datamodel.
-    initial_datamodel: Option<ValidatedSchema>,
-
     /// The inferred database namespaces (used for the `multiSchema` preview feature).
     namespaces: Option<Namespaces>,
 }
@@ -125,7 +112,6 @@ impl SchemaEngine {
         Ok(Self {
             adapter_factory,
             connector,
-            initial_datamodel,
             namespaces,
         })
     }
@@ -224,7 +210,7 @@ impl SchemaEngine {
     #[wasm_bindgen(js_name = "ensureConnectionValidity")]
     pub async fn ensure_connection_validity(
         &mut self,
-        params: EnsureConnectionValidityParams,
+        _params: EnsureConnectionValidityParams,
     ) -> Result<EnsureConnectionValidityResult, JsValue> {
         SchemaConnector::ensure_connection_validity(&mut self.connector).await?;
         Ok(EnsureConnectionValidityResult {})
