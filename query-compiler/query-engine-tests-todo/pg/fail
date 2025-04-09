@@ -35,15 +35,9 @@ new::ref_actions::on_delete::restrict::one2one_opt::delete_parent_diff_id_name
 new::ref_actions::on_delete::restrict::one2one_opt::delete_parent_failure
 new::ref_actions::on_delete::restrict::one2one_req::delete_parent_failure
 new::ref_actions::on_delete::set_default::one2many_opt::delete_parent
-new::ref_actions::on_delete::set_default::one2many_opt::delete_parent_no_exist_fail
 new::ref_actions::on_delete::set_default::one2many_req::delete_parent
-new::ref_actions::on_delete::set_default::one2many_req::delete_parent_fail
-new::ref_actions::on_delete::set_default::one2many_req::delete_parent_no_exist_fail
 new::ref_actions::on_delete::set_default::one2one_opt::delete_parent
-new::ref_actions::on_delete::set_default::one2one_opt::delete_parent_no_exist_fail
 new::ref_actions::on_delete::set_default::one2one_req::delete_parent
-new::ref_actions::on_delete::set_default::one2one_req::delete_parent_fail
-new::ref_actions::on_delete::set_default::one2one_req::delete_parent_no_exist_fail
 new::ref_actions::on_delete::set_null::one2many_opt::delete_parent
 new::ref_actions::on_delete::set_null::one2many_opt::prisma_17255
 new::ref_actions::on_delete::set_null::one2one_opt::delete_parent
@@ -74,15 +68,9 @@ new::ref_actions::on_update::restrict::one2one_req::update_many_parent_failure
 new::ref_actions::on_update::restrict::one2one_req::update_parent_failure
 new::ref_actions::on_update::restrict::one2one_req::upsert_parent_failure
 new::ref_actions::on_update::set_default::one2many_opt::update_parent
-new::ref_actions::on_update::set_default::one2many_opt::update_parent_no_exist_fail
 new::ref_actions::on_update::set_default::one2many_req::update_parent
-new::ref_actions::on_update::set_default::one2many_req::update_parent_fail
-new::ref_actions::on_update::set_default::one2many_req::update_parent_no_exist_fail
 new::ref_actions::on_update::set_default::one2one_opt::update_parent
-new::ref_actions::on_update::set_default::one2one_opt::update_parent_no_exist_fail
 new::ref_actions::on_update::set_default::one2one_req::update_parent
-new::ref_actions::on_update::set_default::one2one_req::update_parent_fail
-new::ref_actions::on_update::set_default::one2one_req::update_parent_no_exist_fail
 new::ref_actions::on_update::set_null::one2many_opt::update_compound_parent
 new::ref_actions::on_update::set_null::one2many_opt::update_many_parent
 new::ref_actions::on_update::set_null::one2many_opt::update_parent
@@ -527,7 +515,6 @@ queries::views::views::sorted_read
 raw::sql::casts::casts::prisma_9949
 raw::sql::casts::casts::query_date_casts
 raw::sql::errors::raw_errors::list_param_for_scalar_column_should_not_panic_pg_js
-raw::sql::errors::raw_errors::unsupported_columns
 raw::sql::input_coercion::input_coercion::decimal_input_correctly_coerced
 raw::sql::input_coercion::input_coercion::scalar_input_correctly_coerced
 raw::sql::scalar_list::scalar_list::empty_scalar_lists
@@ -536,7 +523,6 @@ raw::sql::scalar_list::scalar_list::null_only_scalar_lists
 raw::sql::scalar_list::scalar_list::null_scalar_lists
 raw::sql::scalar_list::scalar_list::prisma_11339
 raw::sql::typed_output::typed_output::all_scalars_pg
-raw::sql::typed_output::typed_output::unknown_type_pg
 writes::data_types::bigint::bigint::using_bigint_field
 writes::data_types::bytes::bytes::byte_id_coercion
 writes::data_types::bytes::bytes::using_bytes_field
@@ -734,7 +720,6 @@ writes::nested_mutations::not_using_schema_base::nested_connect_or_create::conne
 writes::nested_mutations::not_using_schema_base::nested_create_many::nested_create_many::allow_create_large_number_records
 writes::nested_mutations::not_using_schema_base::nested_create_many::nested_create_many::create_many_on_create
 writes::nested_mutations::not_using_schema_base::nested_create_many::nested_create_many::create_many_shorthand_on_create
-writes::nested_mutations::not_using_schema_base::nested_create_many::nested_create_many::nested_createmany_fail_dups
 writes::nested_mutations::not_using_schema_base::nested_create_many::nested_create_many::no_error_on_dups_when_skip_dups
 writes::nested_mutations::not_using_schema_base::nested_update_inside_update::update_inside_update::deep_nested_mutation_exec_all_muts
 writes::nested_mutations::not_using_schema_base::nested_update_inside_update::update_inside_update::m2m_reject_null_in_uniq
@@ -770,7 +755,6 @@ writes::top_level_mutations::create::create::create_with_opt_rel_omitted
 writes::top_level_mutations::create::create::fail_if_string_dont_match_enum_val
 writes::top_level_mutations::create::create::fail_when_datetime_invalid
 writes::top_level_mutations::create::create::fail_when_int_invalid
-writes::top_level_mutations::create::create::gracefully_fails_when_uniq_violation
 writes::top_level_mutations::create::create::reject_opt_rel_set_to_null
 writes::top_level_mutations::create::create::return_enums_passed_as_strings
 writes::top_level_mutations::create::create::return_item_empty_str
@@ -781,7 +765,6 @@ writes::top_level_mutations::create::json_create::create_json_adv
 writes::top_level_mutations::create::json_create::create_json_errors
 writes::top_level_mutations::create::mapped_create::mapped_name_with_space_does_not_break_returning
 writes::top_level_mutations::create_list::create_list::create_not_accept_null_in_set
-writes::top_level_mutations::create_many::create_many::create_many_error_dups
 writes::top_level_mutations::create_many::json_create_many::create_many_json_errors
 writes::top_level_mutations::create_many_and_return::create_many::basic_create_many
 writes::top_level_mutations::create_many_and_return::create_many::basic_create_many_shorthand
@@ -790,7 +773,6 @@ writes::top_level_mutations::create_many_and_return::create_many::create_many_11
 writes::top_level_mutations::create_many_and_return::create_many::create_many_1m_inline_rel_read_works
 writes::top_level_mutations::create_many_and_return::create_many::create_many_1m_non_inline_rel_read_fails
 writes::top_level_mutations::create_many_and_return::create_many::create_many_by_shape
-writes::top_level_mutations::create_many_and_return::create_many::create_many_error_dups
 writes::top_level_mutations::create_many_and_return::create_many::create_many_m2m_rel_read_fails
 writes::top_level_mutations::create_many_and_return::create_many::create_many_map_behavior
 writes::top_level_mutations::create_many_and_return::create_many::create_many_no_error_skip_dup
