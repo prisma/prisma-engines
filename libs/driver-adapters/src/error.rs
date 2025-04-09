@@ -52,6 +52,41 @@ pub(crate) enum DriverAdapterError {
     InvalidIsolationLevel {
         level: String,
     },
+    LengthMismatch {
+        column: Option<String>,
+    },
+    UniqueConstraintViolation {
+        fields: Vec<String>,
+    },
+    NullConstraintViolation {
+        fields: Vec<String>,
+    },
+    ForeignKeyConstraintViolation {
+        constraint: DriverAdapterConstraint,
+    },
+    DatabaseDoesNotExist {
+        db: Option<String>,
+    },
+    DatabaseAlreadyExists {
+        db: Option<String>,
+    },
+    DatabaseAccessDenied {
+        db: Option<String>,
+    },
+    AuthenticationFailed {
+        user: Option<String>,
+    },
+    TransactionWriteConflict,
+
+    TableDoesNotExist {
+        table: Option<String>,
+    },
+    ColumnNotFound {
+        column: Option<String>,
+    },
+    TooManyConnections {
+        cause: String,
+    },
     #[cfg(feature = "postgresql")]
     #[serde(rename = "postgres")]
     Postgres(#[serde(with = "PostgresErrorDef")] PostgresError),
@@ -61,4 +96,12 @@ pub(crate) enum DriverAdapterError {
     #[cfg(feature = "sqlite")]
     #[serde(rename = "sqlite")]
     Sqlite(#[serde(with = "SqliteErrorDef")] SqliteError),
+}
+
+#[derive(Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub(crate) enum DriverAdapterConstraint {
+    Fields(Vec<String>),
+    Index(String),
+    ForeignKey,
 }

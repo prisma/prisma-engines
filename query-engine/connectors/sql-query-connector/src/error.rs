@@ -65,7 +65,11 @@ impl From<quaint::error::Error> for RawError {
     fn from(e: quaint::error::Error) -> Self {
         let default_value: RawError = Self::Database {
             code: e.original_code().map(ToString::to_string),
-            message: e.original_message().map(ToString::to_string),
+            message: Some(
+                e.original_message()
+                    .map(ToString::to_string)
+                    .unwrap_or_else(|| e.to_string()),
+            ),
         };
 
         match e.kind() {
