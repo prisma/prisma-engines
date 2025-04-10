@@ -379,7 +379,7 @@ fn run_connector_test_impl(
             Either::Right(test_fn(runner))
         };
 
-        if let Err(err) = test_future
+        if let Err(err) = tokio::time::timeout(std::time::Duration::from_secs(180), test_future)
             .with_subscriber(test_tracing_subscriber(ENV_LOG_LEVEL.to_string(), log_tx))
             .with_recorder(recorder)
             .await
