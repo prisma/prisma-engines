@@ -167,13 +167,6 @@ dev-sqlite:
 dev-react-native:
 	cp $(CONFIG_PATH)/react-native $(CONFIG_FILE)
 
-dev-libsql-js: build-qe-napi build-driver-adapters-kit-qe
-	cp $(CONFIG_PATH)/libsql-js $(CONFIG_FILE)
-
-test-libsql-js: dev-libsql-js test-qe-st
-
-test-driver-adapter-libsql: test-libsql-js
-
 dev-libsql-wasm: build-qe-wasm build-driver-adapters-kit-qe
 	cp $(CONFIG_PATH)/libsql-wasm $(CONFIG_FILE)
 
@@ -216,13 +209,6 @@ start-postgres13:
 dev-postgres13: start-postgres13
 	cp $(CONFIG_PATH)/postgres13 $(CONFIG_FILE)
 
-start-pg-js: start-postgres13
-
-dev-pg-js: start-pg-js build-qe-napi build-driver-adapters-kit-qe
-	cp $(CONFIG_PATH)/pg-js $(CONFIG_FILE)
-
-test-pg-js: dev-pg-js test-qe-st
-
 dev-pg-wasm: start-pg-js build-qe-wasm build-driver-adapters-kit-qe
 	cp $(CONFIG_PATH)/pg-wasm $(CONFIG_FILE)
 
@@ -246,14 +232,6 @@ run-bench:
 	node --experimental-wasm-modules libs/driver-adapters/executor/dist/bench.mjs
 
 bench-pg-js: setup-pg-bench run-bench
-
-start-neon-js:
-	docker compose -f docker-compose.yml up --wait -d --remove-orphans neon-proxy
-
-dev-neon-js: start-neon-js build-qe-napi build-driver-adapters-kit-qe
-	cp $(CONFIG_PATH)/neon-js $(CONFIG_FILE)
-
-test-neon-js: dev-neon-js test-qe-st
 
 dev-neon-wasm: start-neon-js build-qe-wasm build-driver-adapters-kit-qe
 	cp $(CONFIG_PATH)/neon-wasm $(CONFIG_FILE)
@@ -399,14 +377,6 @@ start-vitess_8_0:
 
 dev-vitess_8_0: start-vitess_8_0
 	cp $(CONFIG_PATH)/vitess_8_0 $(CONFIG_FILE)
-
-start-planetscale-js:
-	docker compose -f docker-compose.yml up -d --remove-orphans planetscale-proxy
-
-dev-planetscale-js: start-planetscale-js build-qe-napi build-driver-adapters-kit-qe
-	cp $(CONFIG_PATH)/planetscale-js $(CONFIG_FILE)
-
-test-planetscale-js: dev-planetscale-js test-qe-st
 
 dev-planetscale-wasm: start-planetscale-js build-qe-wasm build-driver-adapters-kit-qe
 	cp $(CONFIG_PATH)/planetscale-wasm $(CONFIG_FILE)
