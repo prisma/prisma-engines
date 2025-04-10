@@ -30,9 +30,6 @@ use std::convert::TryFrom;
 
 use super::ExternalConnectionInfo;
 
-#[cfg(native)]
-use super::NativeConnectionInfo;
-
 /// General information about a SQL connection.
 #[derive(Debug, Clone)]
 #[cfg_attr(target_arch = "wasm32", repr(transparent))]
@@ -355,6 +352,53 @@ impl ConnectionInfo {
             #[cfg(feature = "mysql-native")]
             ConnectionInfo::Native(NativeConnectionInfo::Mysql(m)) => m.version(),
             _ => None,
+        }
+    }
+
+    pub fn as_native(&self) -> Option<&NativeConnectionInfo> {
+        match self {
+            #[cfg(any(
+                feature = "sqlite-native",
+                feature = "mysql-native",
+                feature = "postgresql-native",
+                feature = "mssql-native"
+            ))]
+            ConnectionInfo::Native(native) => Some(native),
+            _ => None,
+        }
+    }
+}
+
+/// General information about a SQL connection, provided by native Rust drivers.
+#[derive(Debug, Clone)]
+pub enum NativeConnectionInfo {
+    /// A PostgreSQL connection URL.
+    #[cfg(feature = "postgresql-native")]
+    Postgres(PostgresUrl),
+    /// A MySQL connection URL.
+    #[cfg(feature = "mysql-native")]
+    Mysql(MysqlUrl),
+    /// A SQL Server connection URL.
+    #[cfg(feature = "mssql-native")]
+    Mssql(MssqlUrl),
+    /// A SQLite connection URL.
+    #[cfg(feature = "sqlite-native")]
+    Sqlite {
+        /// The filesystem path of the SQLite database.
+        file_path: String,
+        /// The name the database is bound to - Always "main"
+        db_name: String,
+    },
+    #[cfg(feature = "sqlite-native")]
+    InMemorySqlite { db_name: String },
+}
+
+impl NativeConnectionInfo {
+    #[allow(unused)]
+    pub fn set_version(&mut self, version: Option<String>) {
+        #[cfg(feature = "mysql-native")]
+        if let NativeConnectionInfo::Mysql(c) = self {
+            c.set_version(version);
         }
     }
 }

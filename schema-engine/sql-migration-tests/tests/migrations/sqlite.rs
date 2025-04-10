@@ -215,7 +215,7 @@ fn introspecting_a_non_existing_db_fails() {
     .unwrap_err();
 
     let expected = expect![[r#"
-        Database `definitelies-does-not-exist.sqlite` does not exist at `/tmp/definitelies-does-not-exist.sqlite`.
+        Database `definitelies-does-not-exist.sqlite` does not exist
     "#]];
     expected.assert_eq(&err.to_string());
 }

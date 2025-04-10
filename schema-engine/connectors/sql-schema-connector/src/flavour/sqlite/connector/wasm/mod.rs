@@ -179,13 +179,5 @@ pub async fn dispose(state: &State) -> ConnectorResult<()> {
 }
 
 fn convert_error(err: quaint::error::Error) -> ConnectorError {
-    // TODO: the values of `ExternalConnectionInfo` are not even checked by `quaint_error_to_connector_error`.
-    // @malec had tried getting rid of this, but it would end up being an annoyingly large PR with very little benefit.
-    let connection_info = ConnectionInfo::External(ExternalConnectionInfo {
-        max_bind_values: None,
-        sql_family: SqlFamily::Sqlite,
-        schema_name: "main".to_owned(),
-    });
-
-    quaint_error_to_connector_error(err, &connection_info)
+    quaint_error_to_connector_error(err, None)
 }

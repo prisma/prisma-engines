@@ -81,14 +81,6 @@ impl MigratePostgresUrl {
         Ok(Self(postgres_url))
     }
 
-    pub(super) fn host(&self) -> &str {
-        self.0.host()
-    }
-
-    pub(super) fn port(&self) -> u16 {
-        self.0.port()
-    }
-
     pub(super) fn dbname(&self) -> &str {
         self.0.dbname()
     }
@@ -296,7 +288,11 @@ impl SqlConnector for PostgresConnector {
                 connection.raw_cmd("SELECT pg_advisory_lock(72707369)"),
             )
             .await
-            .map_err(|_timeout_error| imp::timeout_error(params))?
+            .map_err(|_| ConnectorError::user_facing(user_facing_errors::common::DatabaseTimeout {
+                context: format!(
+                    "Timed out trying to acquire a postgres advisory lock (SELECT pg_advisory_lock(72707369)). Timeout: {}ms. See https://pris.ly/d/migrate-advisory-locking for details.", ADVISORY_LOCK_TIMEOUT.as_millis()
+                ),
+            }))?
             .map_err(imp::quaint_error_mapper(params))?;
 
             Ok(())

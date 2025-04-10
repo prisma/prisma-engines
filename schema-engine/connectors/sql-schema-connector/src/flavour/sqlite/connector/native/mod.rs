@@ -237,12 +237,11 @@ pub async fn ensure_connection_validity(state: &mut State) -> ConnectorResult<()
     match std::fs::metadata(path) {
         Ok(_) => Ok(()),
         Err(error) if error.kind() == std::io::ErrorKind::NotFound => Err(ConnectorError::user_facing(
-            user_facing_errors::common::DatabaseDoesNotExist::Sqlite {
-                database_file_name: path
+            user_facing_errors::common::DatabaseDoesNotExist {
+                database_name: path
                     .file_name()
                     .map(|osstr| osstr.to_string_lossy().into_owned())
                     .unwrap_or_else(|| params.file_path.clone()),
-                database_file_path: params.file_path.clone(),
             },
         )),
         Err(err) => Err(ConnectorError::from_source(err, "Failed to open SQLite database.")),
@@ -254,12 +253,11 @@ pub async fn introspect(state: &mut State) -> ConnectorResult<SqlSchema> {
         let path = std::path::Path::new(&params.file_path);
         if std::fs::metadata(path).is_err() {
             return Err(ConnectorError::user_facing(
-                user_facing_errors::common::DatabaseDoesNotExist::Sqlite {
-                    database_file_name: path
+                user_facing_errors::common::DatabaseDoesNotExist {
+                    database_name: path
                         .file_name()
                         .map(|name| name.to_string_lossy().into_owned())
                         .unwrap_or_default(),
-                    database_file_path: params.file_path.clone(),
                 },
             ));
         }

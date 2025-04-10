@@ -21,7 +21,7 @@ impl ConnectorError {
         let user_facing_error = match &kind {
             ErrorKind::NullConstraintViolation { constraint } => Some(KnownError::new(
                 user_facing_errors::query_engine::NullConstraintViolation {
-                    constraint: constraint.to_owned(),
+                    constraint: constraint.clone(),
                 },
             )),
             ErrorKind::TableDoesNotExist { table } => {
@@ -42,15 +42,8 @@ impl ConnectorError {
                 }))
             }
             ErrorKind::ForeignKeyConstraintViolation { constraint } => {
-                let field_name = match constraint {
-                    DatabaseConstraint::Fields(fields) => fields.join(","),
-                    DatabaseConstraint::Index(index) => format!("{index} (index)"),
-                    DatabaseConstraint::ForeignKey => "foreign key".to_string(),
-                    DatabaseConstraint::CannotParse => "(not available)".to_string(),
-                };
-
                 Some(KnownError::new(user_facing_errors::query_engine::ForeignKeyViolation {
-                    field_name,
+                    constraint: constraint.clone(),
                 }))
             }
             ErrorKind::ConversionError(message) => Some(KnownError::new(

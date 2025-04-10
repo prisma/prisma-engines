@@ -218,7 +218,10 @@ pub enum SqlError {
 }
 
 impl SqlError {
-    pub(crate) fn into_connector_error(self, connection_info: &quaint::prelude::ConnectionInfo) -> ConnectorError {
+    pub(crate) fn into_connector_error(
+        self,
+        connection_info: Option<&quaint::prelude::NativeConnectionInfo>,
+    ) -> ConnectorError {
         match self {
             SqlError::UniqueConstraintViolation { constraint } => {
                 ConnectorError::from_kind(ErrorKind::UniqueConstraintViolation { constraint })

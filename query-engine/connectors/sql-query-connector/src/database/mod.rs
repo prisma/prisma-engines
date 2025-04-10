@@ -67,5 +67,6 @@ async fn catch<O>(
     connection_info: &quaint::prelude::ConnectionInfo,
     fut: impl std::future::Future<Output = Result<O, crate::SqlError>>,
 ) -> Result<O, ConnectorError> {
-    fut.await.map_err(|err| err.into_connector_error(connection_info))
+    fut.await
+        .map_err(|err| err.into_connector_error(connection_info.as_native()))
 }

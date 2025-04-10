@@ -43,7 +43,7 @@ impl FromSource for PostgreSql {
 
         let mut builder = Quaint::builder_with_tracing(url, tracing_enabled)
             .map_err(SqlError::from)
-            .map_err(|sql_error| sql_error.into_connector_error(&err_conn_info))?;
+            .map_err(|sql_error| sql_error.into_connector_error(err_conn_info.as_native()))?;
 
         let flavour = if COCKROACH.is_provider(source.active_provider) {
             PostgresFlavour::Cockroach

@@ -45,7 +45,7 @@ impl FromSource for Sqlite {
 
         let params = SqliteParams::try_from(database_str)
             .map_err(SqlError::from)
-            .map_err(|sql_error| sql_error.into_connector_error(&connection_info))?;
+            .map_err(|sql_error| sql_error.into_connector_error(connection_info.as_native()))?;
 
         let file_path = params.file_path;
         let url = database_str.split('?').next();
@@ -56,7 +56,7 @@ impl FromSource for Sqlite {
 
         let mut builder = Quaint::builder(database_str)
             .map_err(SqlError::from)
-            .map_err(|sql_error| sql_error.into_connector_error(&connection_info))?;
+            .map_err(|sql_error| sql_error.into_connector_error(connection_info.as_native()))?;
 
         builder.health_check_interval(Duration::from_secs(15));
         builder.test_on_check_out(true);
@@ -75,7 +75,7 @@ fn invalid_file_path_error(file_path: &str, connection_info: &ConnectionInfo) ->
     SqlError::ConnectionError(QuaintKind::DatabaseUrlIsInvalid(format!(
         "\"{file_path}\" is not a valid sqlite file path"
     )))
-    .into_connector_error(connection_info)
+    .into_connector_error(connection_info.as_native())
 }
 
 #[async_trait]
