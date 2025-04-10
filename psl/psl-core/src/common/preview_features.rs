@@ -157,7 +157,6 @@ impl<'a> FeatureMapWithProvider<'a> {
                  | MultiSchema
                  | NativeDistinct
                  | PostgresqlExtensions
-                 | PrismaSchemaFolder
                  | RelationJoins
                  | StrictUndefinedChecks
                  | Views
@@ -214,6 +213,7 @@ impl<'a> FeatureMapWithProvider<'a> {
                 | OrderByAggregateGroup
                 | OrderByNulls
                 | OrderByRelation
+                | PrismaSchemaFolder
                 | ReferentialActions
                 | ReferentialIntegrity
                 | SelectRelationCount
