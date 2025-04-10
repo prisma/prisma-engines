@@ -38,13 +38,8 @@ jobs:
           key: ${{ runner.os }}-cargo-${{ matrix.features }}
 
       - name: Start Databases
-        run: docker compose -f docker-compose.yml up -d
+        run: docker compose -f docker-compose.yml up -d --wait
         working-directory: ./quaint
-
-      - name: Sleep for 20s
-        uses: juliangruber/sleep-action@v2
-        with:
-          time: 20s
 
       - name: Run tests
         run: cargo test ${{ matrix.features }}
