@@ -47,15 +47,13 @@ fn authentication_failure_must_return_a_known_error_on_postgres(api: TestApi) {
     let error = tok(connection_error(dm));
 
     let user = db_url.username();
-    let host = db_url.host().unwrap().to_string();
 
     let json_error = serde_json::to_value(error.to_user_facing()).unwrap();
     let expected = json!({
         "is_panic": false,
-        "message": format!("Authentication failed against database server at `{host}`, the provided database credentials for `postgres` are not valid.\n\nPlease make sure to provide valid database credentials for the database server at `{host}`."),
+        "message": format!("Authentication failed against database server, the provided database credentials for `postgres` are not valid.\n\nPlease make sure to provide valid database credentials for the database server at the configured address."),
         "meta": {
             "database_user": user,
-            "database_host": host,
         },
         "error_code": "P1000"
     });
@@ -81,15 +79,13 @@ fn authentication_failure_must_return_a_known_error_on_mysql(api: TestApi) {
     let error = tok(connection_error(dm));
 
     let user = url.username();
-    let host = url.host().unwrap().to_string();
 
     let json_error = serde_json::to_value(error.to_user_facing()).unwrap();
     let expected = json!({
         "is_panic": false,
-        "message": format!("Authentication failed against database server at `{host}`, the provided database credentials for `{user}` are not valid.\n\nPlease make sure to provide valid database credentials for the database server at `{host}`."),
+        "message": format!("Authentication failed against database server, the provided database credentials for `{user}` are not valid.\n\nPlease make sure to provide valid database credentials for the database server at the configured address."),
         "meta": {
             "database_user": user,
-            "database_host": host,
         },
         "error_code": "P1000"
     });
@@ -100,7 +96,6 @@ fn authentication_failure_must_return_a_known_error_on_mysql(api: TestApi) {
 #[test_connector(tags(Mssql))]
 fn authentication_failure_must_return_a_known_error_on_mssql(api: TestApi) {
     let mut url = JdbcString::from_str(&format!("jdbc:{}", api.connection_string())).unwrap();
-    let host = url.server_name().unwrap().to_string();
     let properties = url.properties_mut();
     let user = properties.get("user").cloned().unwrap();
 
@@ -121,10 +116,9 @@ fn authentication_failure_must_return_a_known_error_on_mssql(api: TestApi) {
     let json_error = serde_json::to_value(error.to_user_facing()).unwrap();
     let expected = json!({
         "is_panic": false,
-        "message": format!("Authentication failed against database server at `{host}`, the provided database credentials for `{user}` are not valid.\n\nPlease make sure to provide valid database credentials for the database server at `{host}`."),
+        "message": format!("Authentication failed against database server, the provided database credentials for `{user}` are not valid.\n\nPlease make sure to provide valid database credentials for the database server at the configured address.."),
         "meta": {
             "database_user": user,
-            "database_host": host,
         },
         "error_code": "P1000"
     });
@@ -225,11 +219,9 @@ fn database_does_not_exist_must_return_a_proper_error(api: TestApi) {
     let json_error = serde_json::to_value(error.to_user_facing()).unwrap();
     let expected = json!({
         "is_panic": false,
-        "message": format!("Database `{database_name}` does not exist on the database server at `{database_host}:{database_port}`.", database_name = database_name, database_host = url.host().unwrap(), database_port = url.port().unwrap()),
+        "message": format!("Database `{database_name}` does not exist on the database server.", database_name = database_name),
         "meta": {
             "database_name": database_name,
-            "database_host": url.host().unwrap().to_string(),
-            "database_port": url.port().unwrap(),
         },
         "error_code": "P1003"
     });
