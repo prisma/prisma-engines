@@ -219,7 +219,7 @@ fn database_does_not_exist_must_return_a_proper_error(api: TestApi) {
     let json_error = serde_json::to_value(error.to_user_facing()).unwrap();
     let expected = json!({
         "is_panic": false,
-        "message": format!("Database `{database_name}` does not exist on the database server.", database_name = database_name),
+        "message": format!("Database `{database_name}` does not exist", database_name = database_name),
         "meta": {
             "database_name": database_name,
         },

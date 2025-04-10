@@ -994,7 +994,7 @@ fn diff_with_exit_code_and_non_empty_diff_returns_two() {
 #[test]
 fn diff_with_non_existing_sqlite_database_from_url() {
     let expected = expect![[r#"
-        Database `db.sqlite` does not exist.
+        Database `db.sqlite` does not exist
     "#]];
     let tmpdir = tempfile::tempdir().unwrap();
 
@@ -1018,7 +1018,7 @@ fn diff_with_non_existing_sqlite_database_from_url() {
 #[test]
 fn diff_with_non_existing_sqlite_database_from_datasource() {
     let expected = expect![[r#"
-        Database `assume.sqlite` does not exist.
+        Database `assume.sqlite` does not exist
     "#]];
 
     let schema = r#"
