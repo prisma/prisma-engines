@@ -101,7 +101,6 @@ mod order_by_dependent_pag {
             | Sqlite(_)
             | MySql(_)
             | CockroachDb(_)
-            | Vitess(Some(VitessVersion::PlanetscaleJsNapi))
             | Vitess(Some(VitessVersion::PlanetscaleJsWasm)) => vec![r#"{"data":{"findManyModelA":[{"id":1,"b":{"id":1}},{"id":2,"b":{"id":2}}]}}"#],
             _ => vec![r#"{"data":{"findManyModelA":[{"id":1,"b":{"id":1}},{"id":2,"b":{"id":2}},{"id":3,"b":null}]}}"#]
         );
@@ -175,7 +174,6 @@ mod order_by_dependent_pag {
             | Sqlite(_)
             | MySql(_)
             | CockroachDb(_)
-            | Vitess(Some(VitessVersion::PlanetscaleJsNapi))
             | Vitess(Some(VitessVersion::PlanetscaleJsWasm)) => vec![r#"{"data":{"findManyModelA":[{"id":1,"b":{"c":{"id":1}}}]}}"#],
             _ => vec![r#"{"data":{"findManyModelA":[{"id":1,"b":{"c":{"id":1}}},{"id":2,"b":{"c":null}},{"id":3,"b":null}]}}"#]
         );
@@ -262,7 +260,6 @@ mod order_by_dependent_pag {
             | Sqlite(_)
             | MySql(_)
             | CockroachDb(_)
-            | Vitess(Some(VitessVersion::PlanetscaleJsNapi))
             | Vitess(Some(VitessVersion::PlanetscaleJsWasm)) => vec![r#"{"data":{"findManyModelA":[{"id":1,"b":{"c":{"a":{"id":3}}}},{"id":2,"b":{"c":{"a":{"id":4}}}}]}}"#],
             _ => vec![r#"{"data":{"findManyModelA":[{"id":1,"b":{"c":{"a":{"id":3}}}},{"id":2,"b":{"c":{"a":{"id":4}}}},{"id":3,"b":null},{"id":4,"b":null}]}}"#]
         );

@@ -3,9 +3,9 @@ use query_engine_tests::test_suite;
 #[test_suite(
     schema(generic),
     exclude(
-        Vitess("planetscale.js", "planetscale.js.wasm"),
-        Postgres("neon.js", "pg.js", "neon.js.wasm", "pg.js.wasm"),
-        Sqlite("libsql.js", "libsql.js.wasm", "cfd1", "react-native")
+        Vitess("planetscale.js.wasm"),
+        Postgres("neon.js.wasm", "pg.js.wasm"),
+        Sqlite("libsql.js.wasm", "cfd1", "react-native")
     )
 )]
 mod metrics {
