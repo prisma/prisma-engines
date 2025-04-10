@@ -290,7 +290,7 @@ impl SqlConnector for PostgresConnector {
             .await
             .map_err(|_| ConnectorError::user_facing(user_facing_errors::common::DatabaseTimeout {
                 context: format!(
-                    "Timed out trying to acquire a postgres advisory lock (SELECT pg_advisory_lock(72707369)). Elapsed: {}ms. See https://pris.ly/d/migrate-advisory-locking for details.", ADVISORY_LOCK_TIMEOUT.as_millis()
+                    "Timed out trying to acquire a postgres advisory lock (SELECT pg_advisory_lock(72707369)). Timeout: {}ms. See https://pris.ly/d/migrate-advisory-locking for details.", ADVISORY_LOCK_TIMEOUT.as_millis()
                 ),
             }))?
             .map_err(imp::quaint_error_mapper(params))?;
