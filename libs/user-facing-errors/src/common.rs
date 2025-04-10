@@ -181,6 +181,6 @@ mod tests {
             database_name: "dev.db".into(),
         };
 
-        assert_eq!(sqlite_err.message(), "Database `dev.db` does not exist.");
+        assert_eq!(sqlite_err.message(), "Database `dev.db` does not exist");
     }
 }
