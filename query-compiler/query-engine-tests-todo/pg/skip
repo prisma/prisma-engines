@@ -12,6 +12,7 @@ new::interactive_tx::itx_isolation::basic_serializable
 new::interactive_tx::itx_isolation::casing_doesnt_matter
 new::interactive_tx::itx_isolation::high_concurrency
 new::interactive_tx::itx_isolation::spacing_doesnt_matter
+new::regressions::prisma_11750::prisma_11750::test_itx_concurrent_updates_multi_thread
 new::regressions::prisma_11750::prisma_11750::test_itx_concurrent_updates_single_thread
 
 ### Flaky tests
