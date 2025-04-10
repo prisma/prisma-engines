@@ -20,6 +20,7 @@ concurrency:
 
 jobs:
   postgres:
+    if: github.event_name == 'push' || (github.event_name == 'pull_request' && matrix.database.version == '16')
     strategy:
       fail-fast: false
       matrix:
@@ -49,6 +50,7 @@ jobs:
       single_threaded: true
 
   mysql:
+    if: github.event_name == 'push' || (github.event_name == 'pull_request' && matrix.database.version == '8')
     strategy:
       fail-fast: false
       matrix:
@@ -76,6 +78,7 @@ jobs:
       single_threaded: true
 
   cockroachdb:
+    if: github.event_name == 'push'
     strategy:
       fail-fast: false
       matrix:
@@ -95,6 +98,7 @@ jobs:
       connector: "cockroachdb"
 
   mongodb:
+    if: github.event_name == 'push' || (github.event_name == 'pull_request' && matrix.database.version == '5')
     strategy:
       fail-fast: false
       matrix:
@@ -116,6 +120,7 @@ jobs:
       relation_load_strategy: '["query"]'
 
   mssql:
+    if: github.event_name == 'push' || (github.event_name == 'pull_request' && matrix.database.version == '2022')
     strategy:
       fail-fast: false
       matrix:
