@@ -3,6 +3,7 @@
 pub mod shadow_db;
 
 use crate::flavour::postgres::{Circumstances, PostgresProvider, ADVISORY_LOCK_TIMEOUT};
+use crate::flavour::quaint_error_to_connector_error;
 use crate::BitFlags;
 use psl::PreviewFeature;
 use quaint::connector::{ExternalConnector, Queryable};
@@ -142,15 +143,5 @@ pub async fn dispose(state: &State) -> ConnectorResult<()> {
 }
 
 pub fn quaint_error_mapper(_params: &Params) -> impl Fn(quaint::error::Error) -> ConnectorError {
-    |err| ConnectorError::from_source(err, "external connector error")
-}
-
-pub fn timeout_error(_params: &Params) -> ConnectorError {
-    ConnectorError::user_facing(user_facing_errors::common::DatabaseTimeout {
-        database_host: "<driver-adapter-host>".to_string(),
-        database_port: "<driver-adapter-port>".to_string(),
-        context: format!(
-            "Timed out trying to acquire a postgres advisory lock (SELECT pg_advisory_lock(72707369)). Elapsed: {}ms. See https://pris.ly/d/migrate-advisory-locking for details.", ADVISORY_LOCK_TIMEOUT.as_millis()
-        ),
-    })
+    |err| quaint_error_to_connector_error(err, None)
 }

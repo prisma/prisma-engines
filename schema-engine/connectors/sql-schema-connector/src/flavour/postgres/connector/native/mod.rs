@@ -9,7 +9,7 @@ use indoc::indoc;
 use psl::PreviewFeature;
 use quaint::{
     connector::{self, tokio_postgres::error::ErrorPosition, MakeTlsConnectorManager, PostgresUrl},
-    prelude::{ConnectionInfo, Queryable},
+    prelude::{NativeConnectionInfo, Queryable},
 };
 use schema_connector::{ConnectorError, ConnectorParams, ConnectorResult};
 use url::Url;
@@ -21,7 +21,7 @@ use user_facing_errors::{
 
 use crate::{flavour::validate_connection_infos_do_not_match, sql_renderer::IteratorJoin};
 
-use super::{Circumstances, MigratePostgresUrl, PostgresProvider, ADVISORY_LOCK_TIMEOUT};
+use super::{Circumstances, MigratePostgresUrl, PostgresProvider};
 
 pub type State = crate::flavour::State<Params, (BitFlags<Circumstances>, Connection)>;
 
@@ -343,17 +343,7 @@ pub async fn dispose(_state: &State) -> ConnectorResult<()> {
 }
 
 pub fn quaint_error_mapper(params: &Params) -> impl Fn(quaint::error::Error) -> ConnectorError + use<'_> {
-    |err| crate::flavour::quaint_error_to_connector_error(err, &ConnectionInfo::Native(params.url.clone().into()))
-}
-
-pub fn timeout_error(params: &Params) -> ConnectorError {
-    ConnectorError::user_facing(user_facing_errors::common::DatabaseTimeout {
-        database_host: params.url.host().to_owned(),
-        database_port: params.url.port().to_string(),
-        context: format!(
-            "Timed out trying to acquire a postgres advisory lock (SELECT pg_advisory_lock(72707369)). Elapsed: {}ms. See https://pris.ly/d/migrate-advisory-locking for details.", ADVISORY_LOCK_TIMEOUT.as_millis()
-        ),
-    })
+    |err| crate::flavour::quaint_error_to_connector_error(err, Some(&NativeConnectionInfo::from(params.url.clone())))
 }
 
 /// Try to connect as an admin to a postgres database. We try to pick a default database from which
