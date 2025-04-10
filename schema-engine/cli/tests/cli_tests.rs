@@ -327,14 +327,11 @@ fn database_already_exists_must_return_a_proper_error(api: TestApi) {
     let output = api.run(&["--datasource", &connection_string, "create-database"]);
     assert_eq!(output.status.code(), Some(1));
 
-    let (host, port) = {
-        let url = Url::parse(&connection_string).unwrap();
-        (url.host().unwrap().to_string(), url.port().unwrap())
-    };
-
     let stderr = String::from_utf8_lossy(&output.stderr);
     assert!(stderr.contains(r#""error_code":"P1009""#));
-    assert!(stderr.contains(&format!("Database `database_already_exists_must_return_a_proper_error` already exists on the database server at `{host}:{port}`")));
+    assert!(stderr.contains(&format!(
+        "Database `database_already_exists_must_return_a_proper_error` already exists on the database server"
+    )));
 }
 
 #[test_connector(tags(Postgres))]

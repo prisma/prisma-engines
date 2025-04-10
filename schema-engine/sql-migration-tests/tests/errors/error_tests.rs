@@ -116,7 +116,7 @@ fn authentication_failure_must_return_a_known_error_on_mssql(api: TestApi) {
     let json_error = serde_json::to_value(error.to_user_facing()).unwrap();
     let expected = json!({
         "is_panic": false,
-        "message": format!("Authentication failed against database server, the provided database credentials for `{user}` are not valid.\n\nPlease make sure to provide valid database credentials for the database server at the configured address.."),
+        "message": format!("Authentication failed against database server, the provided database credentials for `{user}` are not valid.\n\nPlease make sure to provide valid database credentials for the database server at the configured address."),
         "meta": {
             "database_user": user,
         },
@@ -198,7 +198,7 @@ fn unreachable_database_must_return_a_proper_error_on_postgres(api: TestApi) {
     assert_eq!(json_error, expected);
 }
 
-#[test_connector(tags(Mysql))]
+#[test_connector(tags(Mysql), exclude(Vitess))]
 fn database_does_not_exist_must_return_a_proper_error(api: TestApi) {
     let mut url: Url = api.connection_string().parse().unwrap();
     let database_name = "notmydatabase";
@@ -220,6 +220,37 @@ fn database_does_not_exist_must_return_a_proper_error(api: TestApi) {
     let expected = json!({
         "is_panic": false,
         "message": format!("Database `{database_name}` does not exist", database_name = database_name),
+        "meta": {
+            "database_name": database_name,
+        },
+        "error_code": "P1003"
+    });
+
+    assert_eq!(json_error, expected);
+}
+
+#[test_connector(tags(Vitess))]
+fn database_does_not_exist_must_return_a_proper_error_in_vitess(api: TestApi) {
+    let mut url: Url = api.connection_string().parse().unwrap();
+    let database_name = "notmydatabase";
+
+    url.set_path(&format!("/{database_name}"));
+
+    let dm = format!(
+        r#"
+            datasource db {{
+              provider = "mysql"
+              url      = "{url}"
+            }}
+        "#
+    );
+
+    let error = tok(connection_error(dm));
+
+    let json_error = serde_json::to_value(error.to_user_facing()).unwrap();
+    let expected = json!({
+        "is_panic": false,
+        "message": "Database `(not available)` does not exist",
         "meta": {
             "database_name": database_name,
         },
