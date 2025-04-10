@@ -1,8 +1,5 @@
 import * as util from 'node:util'
-import {
-  SqlQueryable,
-  IsolationLevel,
-} from '@prisma/driver-adapter-utils'
+import { SqlQueryable, IsolationLevel } from '@prisma/driver-adapter-utils'
 import { JsonProtocolQuery, QueryParams } from '../types/jsonRpc'
 import type { State } from './worker'
 import { debug } from '../utils'
@@ -10,6 +7,7 @@ import {
   QueryInterpreter,
   type QueryInterpreterTransactionManager,
   type TransactionManager,
+  UserFacingError,
 } from '@prisma/client-engine-runtime'
 import { QueryCompiler } from '../query-compiler'
 import { parseIsolationLevel } from './worker-transaction'
@@ -44,9 +42,9 @@ class QueryPipeline {
 
       const results = transaction
         ? await this.executeTransactionalBatch(
-          batch,
-          parseIsolationLevel(transaction.isolationLevel),
-        )
+            batch,
+            parseIsolationLevel(transaction.isolationLevel),
+          )
         : await this.executeIndependentBatch(batch)
 
       debug('🟢 Batch query results: ', results)
@@ -67,11 +65,20 @@ class QueryPipeline {
         )
       }
 
-      const result = await this.executeQuery(queryable, query, !txId)
+      try {
+        const result = await this.executeQuery(queryable, query, !txId)
 
-      debug('🟢 Query result: ', result)
+        debug('🟢 Query result: ', result)
 
-      return JSON.stringify(getResponseInQeFormat(query, result))
+        return JSON.stringify(getResponseInQeFormat(query, result))
+      } catch (error) {
+        if (error instanceof UserFacingError) {
+          return JSON.stringify({
+            errors: [error.toQueryResponseErrorObject()],
+          })
+        }
+        throw error
+      }
     }
   }
 
@@ -89,7 +96,9 @@ class QueryPipeline {
     debug('🟢 Query plan: ', util.inspect(queryPlan, false, null, true))
 
     const qiTransactionManager = (
-      allowTransaction ? { enabled: true, manager: this.transactionManager } : { enabled: false }
+      allowTransaction
+        ? { enabled: true, manager: this.transactionManager }
+        : { enabled: false }
     ) satisfies QueryInterpreterTransactionManager
 
     const interpreter = new QueryInterpreter({
@@ -105,7 +114,9 @@ class QueryPipeline {
 
   private async executeIndependentBatch(queries: readonly JsonProtocolQuery[]) {
     return Promise.all(
-      queries.map((query) => this.executeQuery(this.driverAdapter, query, true)),
+      queries.map((query) =>
+        this.executeQuery(this.driverAdapter, query, true),
+      ),
     )
   }
 
