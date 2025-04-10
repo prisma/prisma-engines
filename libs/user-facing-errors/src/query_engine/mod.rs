@@ -68,7 +68,7 @@ pub struct UniqueKeyViolation {
 }
 
 #[derive(Debug, UserFacingError, Serialize)]
-#[user_facing(code = "P2003", message = "Foreign key violated on the {constraint}")]
+#[user_facing(code = "P2003", message = "Foreign key constraint violated on the {constraint}")]
 pub struct ForeignKeyViolation {
     pub constraint: DatabaseConstraint,
 }

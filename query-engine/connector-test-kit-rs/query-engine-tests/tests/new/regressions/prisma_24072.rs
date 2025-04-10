@@ -43,10 +43,10 @@ mod prisma_24072 {
           &runner,
           "mutation { deleteOneParent(where: { id: 1 }) { id }}",
           2003,
-          CockroachDb(_) | Postgres(_) | SqlServer(_) | Vitess(_) => "Foreign key violated on the constraint: `Child_parent_id_fkey`",
-          MySql(_) => "Foreign key violated on the fields: (`parent_id`)",
-          Sqlite(_) => "Foreign key violated on the foreign key",
-          _ => "Foreign key violated"
+          CockroachDb(_) | Postgres(_) | SqlServer(_) | Vitess(_) => "Foreign key constraint violated on the constraint: `Child_parent_id_fkey`",
+          MySql(_) => "Foreign key constraint violated on the fields: (`parent_id`)",
+          Sqlite(_) => "Foreign key constraint violated on the foreign key",
+          _ => "Foreign key constraint violated"
         );
 
         Ok(())

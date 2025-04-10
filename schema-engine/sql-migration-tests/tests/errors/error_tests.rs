@@ -252,7 +252,7 @@ fn database_does_not_exist_must_return_a_proper_error_in_vitess(api: TestApi) {
         "is_panic": false,
         "message": "Database `(not available)` does not exist",
         "meta": {
-            "database_name": database_name,
+            "database_name": "(not available)",
         },
         "error_code": "P1003"
     });

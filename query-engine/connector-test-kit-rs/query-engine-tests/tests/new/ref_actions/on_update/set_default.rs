@@ -79,7 +79,7 @@ mod one2one_req {
             &runner,
             r#"mutation { updateOneParent(where: { id: 1 }, data: { uniq: "u1" }) { id }}"#,
             2003,
-            "Foreign key violated"
+            "Foreign key constraint violated"
         );
 
         Ok(())
@@ -182,7 +182,7 @@ mod one2one_opt {
             &runner,
             r#"mutation { updateOneParent(where: { id: 1 } data: { uniq: "u1" }) { id }}"#,
             2003,
-            "Foreign key violated"
+            "Foreign key constraint violated"
         );
 
         Ok(())
@@ -287,7 +287,7 @@ mod one2many_req {
             &runner,
             r#"mutation { updateOneParent(where: { id: 1 }, data: { uniq: "u1" }) { id }}"#,
             2003,
-            "Foreign key violated"
+            "Foreign key constraint violated"
         );
 
         Ok(())
@@ -390,7 +390,7 @@ mod one2many_opt {
             &runner,
             r#"mutation { updateOneParent(where: { id: 1 }, data: { uniq: "u1" }) { id }}"#,
             2003,
-            "Foreign key violated"
+            "Foreign key constraint violated"
         );
 
         Ok(())
