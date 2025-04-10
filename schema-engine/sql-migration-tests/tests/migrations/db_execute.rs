@@ -149,7 +149,7 @@ fn db_execute_drop_database_that_doesnt_exist_error(api: TestApi) {
 
     let error = result.unwrap_err().to_string();
     let expectation = expect![[r#"
-        Database `thisisadatabaseweassumedoesntexist` does not exist on the database server at `localhost:5434`.
+        Database `thisisadatabaseweassumedoesntexist` does not exist
     "#]];
     expectation.assert_eq(&error);
 }
