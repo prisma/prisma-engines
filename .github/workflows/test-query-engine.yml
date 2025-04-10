@@ -20,27 +20,35 @@ concurrency:
 
 jobs:
   postgres:
-    if: github.event_name == 'push' || (github.event_name == 'pull_request' && matrix.database.version == '16')
+    if: github.event_name == 'push' || (github.event_name == 'pull_request' && matrix.run_on_pr)
     strategy:
       fail-fast: false
       matrix:
         database:
           - name: "postgres16"
             version: "16"
+            run_on_pr: true
           - name: "postgres15"
             version: "15"
+            run_on_pr: false
           - name: "postgres14"
             version: "14"
+            run_on_pr: false
           - name: "postgres13"
             version: "13"
+            run_on_pr: false
           - name: "postgres12"
             version: "12"
+            run_on_pr: false
           - name: "postgres11"
             version: "11"
+            run_on_pr: false
           - name: "postgres10"
             version: "10"
+            run_on_pr: false
           - name: "postgres9"
             version: "9"
+            run_on_pr: false
     uses: ./.github/workflows/test-query-engine-template.yml
     name: postgres ${{ matrix.database.version }}
     with:
@@ -50,24 +58,27 @@ jobs:
       single_threaded: true
 
   mysql:
-    if: github.event_name == 'push' || (github.event_name == 'pull_request' && matrix.database.version == '8')
+    if: github.event_name == 'push' || (github.event_name == 'pull_request' && matrix.run_on_pr)
     strategy:
       fail-fast: false
       matrix:
         database:
-          - name: "mysql_5_6"
-            version: "5.6"
-            relation_load_strategy: '["query"]'
-          - name: "mysql_5_7"
-            version: "5.7"
-            relation_load_strategy: '["query"]'
           - name: "mysql_8"
             version: "8"
             relation_load_strategy: '["join", "query"]'
+            run_on_pr: true
+          - name: "mysql_5_7"
+            version: "5.7"
+            relation_load_strategy: '["query"]'
+            run_on_pr: false
+          - name: "mysql_5_6"
+            version: "5.6"
+            relation_load_strategy: '["query"]'
+            run_on_pr: false
           - name: "mysql_mariadb"
             version: "mariadb"
             relation_load_strategy: '["query"]'
-
+            run_on_pr: false
     uses: ./.github/workflows/test-query-engine-template.yml
     name: mysql ${{ matrix.database.version }}
     with:
@@ -78,7 +89,7 @@ jobs:
       single_threaded: true
 
   cockroachdb:
-    if: github.event_name == 'push'
+    if: github.event_name == 'push' || (github.event_name == 'pull_request' && matrix.run_on_pr)
     strategy:
       fail-fast: false
       matrix:
@@ -86,10 +97,13 @@ jobs:
           - name: "cockroach_23_1"
             connector: "cockroachdb"
             version: "23.1"
+            run_on_pr: false
           - name: "cockroach_22_2"
             version: "22.2"
+            run_on_pr: false
           - name: "cockroach_22_1_0"
             version: "22.1"
+            run_on_pr: false
     uses: ./.github/workflows/test-query-engine-template.yml
     name: cockroachdb ${{ matrix.database.version }}
     with:
@@ -98,18 +112,21 @@ jobs:
       connector: "cockroachdb"
 
   mongodb:
-    if: github.event_name == 'push' || (github.event_name == 'pull_request' && matrix.database.version == '5')
+    if: github.event_name == 'push' || (github.event_name == 'pull_request' && matrix.run_on_pr)
     strategy:
       fail-fast: false
       matrix:
         database:
-          - name: "mongodb_4_2"
-            version: "4.2"
+          - name: "mongodb_5"
+            version: "5"
+            connector: "mongodb"
+            run_on_pr: true
           - name: "mongodb_4_4"
             version: "4.4"
-          - name: "mongodb_5"
-            connector: "mongodb"
-            version: "5"
+            run_on_pr: false
+          - name: "mongodb_4_2"
+            version: "4.2"
+            run_on_pr: false
     uses: ./.github/workflows/test-query-engine-template.yml
     name: mongodb ${{ matrix.database.version }}
     with:
@@ -120,15 +137,21 @@ jobs:
       relation_load_strategy: '["query"]'
 
   mssql:
-    if: github.event_name == 'push' || (github.event_name == 'pull_request' && matrix.database.version == '2022')
+    if: github.event_name == 'push' || (github.event_name == 'pull_request' && matrix.run_on_pr)
     strategy:
       fail-fast: false
       matrix:
         database:
           - name: "mssql_2022"
             version: "2022"
+            run_on_pr: true
           - name: "mssql_2019"
             version: "2019"
+            run_on_pr: false
+          - name: "mssql_2017"
+            version: "2017"
+            ubuntu: "20.04"
+            run_on_pr: false
     uses: ./.github/workflows/test-query-engine-template.yml
     name: mssql ${{ matrix.database.version }}
     with:
