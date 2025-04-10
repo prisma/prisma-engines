@@ -329,6 +329,7 @@ impl ConnectorVersion {
                 | Self::Vitess(Some(VitessVersion::PlanetscaleJsWasm))
                 | Self::Sqlite(Some(SqliteVersion::LibsqlJsWasm))
                 | Self::Sqlite(Some(SqliteVersion::CloudflareD1))
+                | Self::Sqlite(Some(SqliteVersion::BetterSQLite3))
         )
     }
 }

@@ -35,6 +35,7 @@ pub enum SqliteVersion {
     LibsqlJsNapi,
     LibsqlJsWasm,
     CloudflareD1,
+    BetterSQLite3,
 }
 
 impl Display for SqliteVersion {
@@ -45,6 +46,7 @@ impl Display for SqliteVersion {
             SqliteVersion::LibsqlJsNapi => f.write_str("libsql.js"),
             SqliteVersion::LibsqlJsWasm => f.write_str("libsql.js.wasm"),
             SqliteVersion::CloudflareD1 => f.write_str("cfd1"),
+            SqliteVersion::BetterSQLite3 => f.write_str("better-sqlite3"),
         }
     }
 }
@@ -59,6 +61,7 @@ impl TryFrom<&str> for SqliteVersion {
             "libsql.js.wasm" => Self::LibsqlJsWasm,
             "react-native" => Self::ReactNative,
             "cfd1" => Self::CloudflareD1,
+            "better-sqlite3" => Self::BetterSQLite3,
             _ => return Err(TestError::parse_error(format!("Unknown SQLite version `{s}`"))),
         };
         Ok(version)

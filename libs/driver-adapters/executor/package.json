@@ -24,6 +24,7 @@
   "license": "Apache-2.0",
   "dependencies": {
     "@effect/schema": "0.64.20",
+    "@prisma/adapter-better-sqlite3": "workspace:*",
     "@prisma/adapter-d1": "workspace:*",
     "@prisma/adapter-libsql": "workspace:*",
     "@prisma/adapter-neon": "workspace:*",
