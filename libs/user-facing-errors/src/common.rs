@@ -77,7 +77,7 @@ pub struct DatabaseOperationTimeout {
 #[derive(Debug, UserFacingError, Serialize)]
 #[user_facing(
     code = "P1009",
-    message = "Database `{database_name}` already exists on the database server`"
+    message = "Database `{database_name}` already exists on the database server"
 )]
 pub struct DatabaseAlreadyExists {
     /// Database name, append `database_schema_name` when applicable
