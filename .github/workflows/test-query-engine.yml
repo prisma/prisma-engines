@@ -175,7 +175,6 @@ jobs:
       fail-fast: false
       matrix:
         adapter:
-
           - name: 'planetscale (wasm)'
             setup_task: 'dev-planetscale-wasm'
           - name: 'pg (wasm)'
@@ -186,6 +185,8 @@ jobs:
             setup_task: 'dev-libsql-wasm'
           - name: 'd1 (wasm)'
             setup_task: 'dev-d1'
+          - name: 'better-sqlite3 (wasm)'
+            setup_task: 'dev-better-sqlite3'
     name: ${{ matrix.adapter.name }}
     uses: ./.github/workflows/test-driver-adapters-template.yml
     with:
