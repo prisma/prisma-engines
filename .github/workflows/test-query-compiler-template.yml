@@ -1,4 +1,3 @@
-name: 'QC: integration tests'
 on:
   workflow_call:
     inputs:
@@ -47,6 +46,7 @@ jobs:
         with:
           # using head ref rather than merge branch to get original commit message
           ref: ${{ github.event.pull_request.head.sha }}
+
       - name: 'Setup Node.js'
         uses: actions/setup-node@v4
         with:

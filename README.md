@@ -234,11 +234,11 @@ Run `cargo test` in the repository root.
 
 ### Testing driver adapters
 
-Please refer to the [Testing driver adapters](./query-engine/connector-test-kit-rs/README.md#testing-driver-adapters) section in the connector-test-kit-rs README.
+Please refer to the [Testing driver adapters](./query-engine/connector-test-kit-rs/README.md) section in the connector-test-kit-rs README.
 
 **ℹ️ Important note on developing features that require changes to the both the query engine, and driver adapters code**
 
-As explained in [Testing driver adapters](./query-engine/connector-test-kit-rs/README.md#testing-driver-adapters), running `DRIVER_ADAPTER=$adapter make qe-test`
+As explained in [Testing driver adapters](./query-engine/connector-test-kit-rs/README.md), running `DRIVER_ADAPTER=$adapter make qe-test`
 will ensure you have prisma checked out in your filesystem in the same directory as prisma-engines. This is needed because the driver adapters code is symlinked in prisma-engines.
 
 When working on a feature or bugfix spanning adapters code and query-engine code, you will need to open sibling PRs in `prisma/prisma` and `prisma/prisma-engines` respectively.

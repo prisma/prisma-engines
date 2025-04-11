@@ -1,5 +1,3 @@
-name: 'QE: integration template'
-run-name: ${{ inputs.connector }}
 on:
   workflow_call:
     inputs:
@@ -51,9 +49,11 @@ jobs:
     runs-on: 'ubuntu-${{ inputs.ubuntu }}'
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions-rust-lang/setup-rust-toolchain@v1
         with:
           cache-key: 'ubuntu-${{ inputs.ubuntu }}'
+
       - uses: taiki-e/install-action@nextest
 
       - name: Login to Docker Hub

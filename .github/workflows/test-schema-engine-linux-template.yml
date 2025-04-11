@@ -1,0 +1,135 @@
+on:
+  workflow_call:
+    inputs:
+      database_name:
+        required: true
+        type: string
+      database_url:
+        required: true
+        type: string
+      ubuntu:
+        required: true
+        type: string
+      is_vitess:
+        required: false
+        type: boolean
+        default: false
+      single_threaded:
+        required: false
+        type: boolean
+        default: false
+      shadow_database_url:
+        required: false
+        type: string
+
+jobs:
+  tests:
+    name: ${{ inputs.database_name }}
+    runs-on: ubuntu-${{ inputs.ubuntu }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          cache-key: ubuntu-${{ inputs.ubuntu }}
+
+      - uses: taiki-e/install-action@nextest
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        continue-on-error: true
+        env:
+          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+          DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+        if: "${{ env.DOCKERHUB_USERNAME != '' && env.DOCKERHUB_TOKEN != '' }}"
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Cache Docker images.
+        uses: ScribeMD/docker-cache@0.5.0
+        with:
+          key: docker-${{ inputs.database_name }}-${{ hashFiles('docker-compose.yaml') }}
+
+      #
+      # Multithreaded tests
+      #
+      - name: 'Start ${{ inputs.database_name }}'
+        run: make start-${{ inputs.database_name }}
+
+      - run: cargo nextest run -p sql-introspection-tests
+        if: ${{ !inputs.single_threaded }}
+        env:
+          CLICOLOR_FORCE: 1
+          TEST_DATABASE_URL: ${{ inputs.database_url }}
+
+      - run: cargo nextest run -p sql-schema-describer --features all-native
+        if: ${{ !inputs.single_threaded }}
+        env:
+          CLICOLOR_FORCE: 1
+          TEST_DATABASE_URL: ${{ inputs.database_url }}
+
+      - run: cargo nextest run -p sql-migration-tests
+        if: ${{ !inputs.single_threaded }}
+        env:
+          CLICOLOR_FORCE: 1
+          TEST_DATABASE_URL: ${{ inputs.database_url }}
+
+      - run: cargo nextest run -p schema-engine-cli
+        if: ${{ !inputs.single_threaded }}
+        env:
+          CLICOLOR_FORCE: 1
+          TEST_DATABASE_URL: ${{ inputs.database_url }}
+
+      #
+      # Vitess tests
+      #
+      - run: cargo nextest run -p sql-introspection-tests --test-threads=1
+        if: ${{ inputs.is_vitess }}
+        env:
+          CLICOLOR_FORCE: 1
+          TEST_DATABASE_URL: ${{ inputs.database_url }}
+          TEST_SHADOW_DATABASE_URL: ${{ inputs.shadow_database_url }}
+
+      - run: cargo nextest run -p sql-migration-tests --test-threads=1
+        if: ${{ inputs.is_vitess }}
+        env:
+          CLICOLOR_FORCE: 1
+          TEST_DATABASE_URL: ${{ inputs.database_url }}
+          TEST_SHADOW_DATABASE_URL: ${{ inputs.shadow_database_url }}
+          RUST_LOG: debug
+
+      - run: cargo nextest run -p schema-engine-cli --test-threads=1
+        if: ${{ inputs.is_vitess }}
+        env:
+          CLICOLOR_FORCE: 1
+          TEST_DATABASE_URL: ${{ inputs.database_url }}
+          TEST_SHADOW_DATABASE_URL: ${{ inputs.shadow_database_url }}
+
+      #
+      # Single threaded tests (excluding Vitess)
+      #
+      - run: cargo nextest run -p sql-schema-describer --features all-native --test-threads=1
+        if: ${{ !inputs.is_vitess && inputs.single_threaded }}
+        env:
+          CLICOLOR_FORCE: 1
+          TEST_DATABASE_URL: ${{ inputs.database_url }}
+
+      - run: cargo nextest run -p sql-introspection-tests --test-threads=1
+        if: ${{ !inputs.is_vitess && inputs.single_threaded }}
+        env:
+          CLICOLOR_FORCE: 1
+          TEST_DATABASE_URL: ${{ inputs.database_url }}
+
+      - run: cargo nextest run -p sql-migration-tests --test-threads=1
+        if: ${{ !inputs.is_vitess && inputs.single_threaded }}
+        env:
+          CLICOLOR_FORCE: 1
+          TEST_DATABASE_URL: ${{ inputs.database_url }}
+          RUST_LOG: debug
+
+      - run: cargo nextest run -p schema-engine-cli --test-threads=1
+        if: ${{ !inputs.is_vitess && inputs.single_threaded }}
+        env:
+          CLICOLOR_FORCE: 1
+          TEST_DATABASE_URL: ${{ inputs.database_url }}
