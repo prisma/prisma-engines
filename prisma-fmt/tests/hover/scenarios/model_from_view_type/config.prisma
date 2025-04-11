@@ -1,6 +1,6 @@
 generator js {
     provider        = "prisma-client-js"
-    previewFeatures = ["views", "prismaSchemaFolder"]
+    previewFeatures = ["views"]
 }
 
 datasource db {
