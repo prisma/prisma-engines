@@ -1,16 +1,16 @@
-name: "All crates: unit tests"
+name: 'All crates: unit tests'
 on:
   push:
     branches:
       - main
   pull_request:
     paths-ignore:
-      - ".github/**"
-      - "!.github/workflows/test-unit-tests.yml"
-      - ".buildkite/**"
-      - "*.md"
-      - "LICENSE"
-      - "CODEOWNERS"
+      - '.github/**'
+      - '!.github/workflows/test-unit-tests.yml'
+      - '.buildkite/**'
+      - '*.md'
+      - 'LICENSE'
+      - 'CODEOWNERS'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}

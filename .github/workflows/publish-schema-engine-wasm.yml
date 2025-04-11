@@ -9,14 +9,14 @@ on:
     inputs:
       packageVersion:
         required: true
-        description: "New @prisma/schema-engine-wasm package version"
+        description: 'New @prisma/schema-engine-wasm package version'
       enginesHash:
         required: true
-        description: "prisma-engines commit to build"
+        description: 'prisma-engines commit to build'
       npmDistTag:
         required: true
-        default: "latest"
-        description: "npm dist-tag (e.g. latest or integration)"
+        default: 'latest'
+        description: 'npm dist-tag (e.g. latest or integration)'
 
 jobs:
   build:
@@ -41,7 +41,7 @@ jobs:
       - name: Install Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "20.x"
+          node-version: '20.x'
 
       - name: Set up NPM token for publishing
         run: echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
@@ -60,7 +60,7 @@ jobs:
         if: ${{ failure() }}
         uses: rtCamp/action-slack-notify@v2.3.2
         env:
-          SLACK_TITLE: "Building and publishing @prisma/schema-engine-wasm failed :x:"
-          SLACK_COLOR: "#FF0000"
+          SLACK_TITLE: 'Building and publishing @prisma/schema-engine-wasm failed :x:'
+          SLACK_COLOR: '#FF0000'
           SLACK_CHANNEL: feed-prisma-schema-engine-wasm-publish-failures
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_WASM_FAILING }}

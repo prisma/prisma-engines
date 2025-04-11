@@ -1,16 +1,16 @@
-name: "QE: Codespeed benchmarks"
+name: 'QE: Codespeed benchmarks'
 on:
   push:
     branches:
       - main
   pull_request:
     paths-ignore:
-      - ".github/**"
-      - "!.github/workflows/benchmark.yml"
-      - ".buildkite/**"
-      - "*.md"
-      - "LICENSE"
-      - "CODEOWNERS"
+      - '.github/**'
+      - '!.github/workflows/benchmark.yml'
+      - '.buildkite/**'
+      - '*.md'
+      - 'LICENSE'
+      - 'CODEOWNERS'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -26,10 +26,10 @@ jobs:
       - name: Install cargo-codspeed
         run: cargo install --locked cargo-codspeed
 
-      - name: "Build the benchmark targets: schema"
+      - name: 'Build the benchmark targets: schema'
         run: cargo codspeed build -p schema --features all_connectors
 
-      - name: "Build the benchmark targets: request-handlers"
+      - name: 'Build the benchmark targets: request-handlers'
         run: cargo codspeed build -p request-handlers --features all
 
       - name: Run the benchmarks
