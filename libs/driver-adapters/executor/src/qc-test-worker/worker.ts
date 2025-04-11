@@ -2,7 +2,7 @@ import {Schema as S} from '@effect/schema'
 import type {ConnectionInfo, SqlDriverAdapter} from '@prisma/driver-adapter-utils'
 import {DriverAdaptersManager} from '../driver-adapters-manager'
 import * as qc from '../query-compiler'
-import {TransactionManager, type TransactionOptions} from '@prisma/client-engine-runtime'
+import {noopTracingHelper, TransactionManager, type TransactionOptions} from '@prisma/client-engine-runtime'
 import {parentPort} from 'worker_threads'
 import {
     CommitTxParams,
@@ -167,6 +167,7 @@ async function initializeSchema(
             timeout: 500,
             isolationLevel: 'SERIALIZABLE'
         } satisfies TransactionOptions,
+        tracingHelper: noopTracingHelper,
     })
 
     state = {
