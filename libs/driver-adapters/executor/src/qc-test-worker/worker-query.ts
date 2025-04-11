@@ -4,6 +4,7 @@ import { JsonProtocolQuery, QueryParams } from '../types/jsonRpc'
 import type { State } from './worker'
 import { debug } from '../utils'
 import {
+  noopTracingHelper,
   QueryInterpreter,
   type QueryInterpreterTransactionManager,
   type TransactionManager,
@@ -107,6 +108,7 @@ class QueryPipeline {
       onQuery: (event) => {
         this.logs.push(JSON.stringify(event))
       },
+      tracingHelper: noopTracingHelper,
     })
 
     return interpreter.run(queryPlan, queryable)
