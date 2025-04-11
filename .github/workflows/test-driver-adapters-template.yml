@@ -1,4 +1,4 @@
-name: "QE: driver-adapter integration tests"
+name: 'QE: driver-adapter integration tests'
 on:
   workflow_call:
     inputs:
@@ -12,25 +12,25 @@ jobs:
     uses: ./.github/workflows/select-prisma-branch.yml
 
   rust-query-engine-tests:
-    name: "${{ matrix.partition }}"
+    name: '${{ matrix.partition }}'
     needs: select_prisma_branch
 
     strategy:
       fail-fast: false
       matrix:
-        node_version: ["20"]
-        partition: ["1/4", "2/4", "3/4", "4/4"]
+        node_version: ['20']
+        partition: ['1/4', '2/4', '3/4', '4/4']
     env:
-      LOG_LEVEL: "info" # Set to "debug" to trace the query engine and node process running the driver adapter
-      LOG_QUERIES: "y"
-      RUST_LOG: "info"
-      RUST_LOG_FORMAT: "devel"
-      RUST_BACKTRACE: "1"
-      CLICOLOR_FORCE: "1"
-      CLOSED_TX_CLEANUP: "2"
-      SIMPLE_TEST_MODE: "1"
-      QUERY_BATCH_SIZE: "10"
-      WASM_BUILD_PROFILE: "profiling" # Include debug info for proper backtraces
+      LOG_LEVEL: 'info' # Set to "debug" to trace the query engine and node process running the driver adapter
+      LOG_QUERIES: 'y'
+      RUST_LOG: 'info'
+      RUST_LOG_FORMAT: 'devel'
+      RUST_BACKTRACE: '1'
+      CLICOLOR_FORCE: '1'
+      CLOSED_TX_CLEANUP: '2'
+      SIMPLE_TEST_MODE: '1'
+      QUERY_BATCH_SIZE: '10'
+      WASM_BUILD_PROFILE: 'profiling' # Include debug info for proper backtraces
       WORKSPACE_ROOT: ${{ github.workspace }}
 
     runs-on: ubuntu-latest
@@ -39,17 +39,17 @@ jobs:
         with:
           # using head ref rather than merge branch to get original commit message
           ref: ${{ github.event.pull_request.head.sha }}
-      - name: "Setup Node.js"
+      - name: 'Setup Node.js'
         uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node_version }}
 
-      - name: "Setup pnpm"
+      - name: 'Setup pnpm'
         uses: pnpm/action-setup@v4.0.0
         with:
           version: 9
 
-      - name: "Login to Docker Hub"
+      - name: 'Login to Docker Hub'
         uses: docker/login-action@v3
         continue-on-error: true
         env:
@@ -81,7 +81,7 @@ jobs:
           SETUP_TASK: ${{ inputs.setup_task }}
         run: make "$SETUP_TASK"
 
-      - name: "Run tests"
+      - name: 'Run tests'
         env:
           PARTITION: ${{ matrix.partition }}
         run: cargo nextest run --package query-engine-tests --test-threads=1 --partition hash:"$PARTITION"

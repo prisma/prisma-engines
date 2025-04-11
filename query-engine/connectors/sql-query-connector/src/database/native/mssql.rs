@@ -42,7 +42,7 @@ impl FromSource for Mssql {
 
         let mut builder = Quaint::builder(database_str)
             .map_err(SqlError::from)
-            .map_err(|sql_error| sql_error.into_connector_error(&connection_info))?;
+            .map_err(|sql_error| sql_error.into_connector_error(connection_info.as_native()))?;
 
         builder.health_check_interval(Duration::from_secs(15));
         builder.test_on_check_out(true);

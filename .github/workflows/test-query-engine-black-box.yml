@@ -1,16 +1,16 @@
-name: "QE: black-box tests"
+name: 'QE: black-box tests'
 on:
   push:
     branches:
       - main
   pull_request:
     paths-ignore:
-      - "!.github/workflows/test-query-engine-black-box.yml"
-      - ".github/**"
-      - ".buildkite/**"
-      - "*.md"
-      - "LICENSE"
-      - "CODEOWNERS"
+      - '!.github/workflows/test-query-engine-black-box.yml'
+      - '.github/**'
+      - '.buildkite/**'
+      - '*.md'
+      - 'LICENSE'
+      - 'CODEOWNERS'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -22,23 +22,23 @@ jobs:
       fail-fast: false
       matrix:
         database:
-          - name: "postgres16"
+          - name: 'postgres16'
             single_threaded: false
-            connector: "postgres"
+            connector: 'postgres'
             # Arbitrary PostgreSQL version
             # we opted for the most recent one, there is no need to have a matrix
-            version: "16"
+            version: '16'
 
     env:
-      LOG_LEVEL: "info"
-      LOG_QUERIES: "y"
-      RUST_LOG_FORMAT: "devel"
-      RUST_BACKTRACE: "1"
-      CLICOLOR_FORCE: "1"
-      CLOSED_TX_CLEANUP: "2"
-      SIMPLE_TEST_MODE: "1"
-      QUERY_BATCH_SIZE: "10"
-      TEST_RUNNER: "direct"
+      LOG_LEVEL: 'info'
+      LOG_QUERIES: 'y'
+      RUST_LOG_FORMAT: 'devel'
+      RUST_BACKTRACE: '1'
+      CLICOLOR_FORCE: '1'
+      CLOSED_TX_CLEANUP: '2'
+      SIMPLE_TEST_MODE: '1'
+      QUERY_BATCH_SIZE: '10'
+      TEST_RUNNER: 'direct'
       TEST_CONNECTOR: ${{ matrix.database.connector }}
       TEST_CONNECTOR_VERSION: ${{ matrix.database.version }}
 
@@ -62,7 +62,7 @@ jobs:
         with:
           key: docker-${{ matrix.database.name }}-${{hashFiles('docker-compose.yaml')}}
 
-      - name: "Start ${{ matrix.database.name }} (${{ matrix.engine_protocol }})"
+      - name: 'Start ${{ matrix.database.name }} (${{ matrix.engine_protocol }})'
         run: make start-${{ matrix.database.name }}
 
       - uses: actions-rust-lang/setup-rust-toolchain@v1

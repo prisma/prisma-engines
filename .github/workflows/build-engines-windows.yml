@@ -3,17 +3,17 @@ on:
   workflow_dispatch:
     inputs:
       commit:
-        description: "Commit on the given branch to build"
+        description: 'Commit on the given branch to build'
         required: true
 
 jobs:
   build:
     # Do not change `name`, prisma-engines Buildkite build job depends on this name ending with the commit
-    name: "Windows engines build on branch ${{ github.event.ref }} for commit ${{ github.event.inputs.commit }}"
+    name: 'Windows engines build on branch ${{ github.event.ref }} for commit ${{ github.event.inputs.commit }}'
     env:
       SQLITE_MAX_VARIABLE_NUMBER: 250000
       SQLITE_MAX_EXPR_DEPTH: 10000
-      RUSTFLAGS: "-C target-feature=+crt-static"
+      RUSTFLAGS: '-C target-feature=+crt-static'
     runs-on: windows-latest
 
     steps:

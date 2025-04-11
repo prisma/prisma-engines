@@ -32,7 +32,7 @@ use crate::{
 };
 use enumflags2::BitFlags;
 use psl::{PreviewFeature, PreviewFeatures, ValidatedSchema};
-use quaint::prelude::{ConnectionInfo, Table};
+use quaint::prelude::{NativeConnectionInfo, Table};
 use schema_connector::{
     migrations_directory::MigrationDirectory, BoxFuture, ConnectorError, ConnectorResult, IntrospectionContext,
     MigrationRecord, Namespaces, PersistenceNotInitializedError,
@@ -355,7 +355,7 @@ fn normalize_sql_schema(sql_schema: &mut SqlSchema, preview_features: BitFlags<P
 
 pub(crate) fn quaint_error_to_connector_error(
     error: quaint::error::Error,
-    connection_info: &ConnectionInfo,
+    connection_info: Option<&NativeConnectionInfo>,
 ) -> ConnectorError {
     match user_facing_errors::quaint::render_quaint_error(error.kind(), connection_info) {
         Some(user_facing_error) => user_facing_error.into(),

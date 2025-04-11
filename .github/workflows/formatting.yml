@@ -1,16 +1,16 @@
-name: "All crates: linting"
+name: 'All crates: linting'
 on:
   push:
     branches:
       - main
   pull_request:
     paths-ignore:
-      - ".github/**"
-      - "!.github/workflows/formatting.yml"
-      - ".buildkite/**"
-      - "*.md"
-      - "LICENSE"
-      - "CODEOWNERS"
+      - '.github/**'
+      - '!.github/workflows/formatting.yml'
+      - '.buildkite/**'
+      - '*.md'
+      - 'LICENSE'
+      - 'CODEOWNERS'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}

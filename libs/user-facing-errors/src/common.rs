@@ -7,17 +7,14 @@ use user_facing_error_macros::*;
 #[user_facing(
     code = "P1000",
     message = "\
-Authentication failed against database server at `{database_host}`, the provided database credentials for `{database_user}` are not valid.
+Authentication failed against database server, the provided database credentials for `{database_user}` are not valid.
 
-Please make sure to provide valid database credentials for the database server at `{database_host}`."
+Please make sure to provide valid database credentials for the database server at the configured address."
 )]
 // **Notes**: Might vary for different data source, For example, SQLite has no concept of user accounts, and instead relies on the file system for all database permissions. This makes enforcing storage quotas difficult and enforcing user permissions impossible.
 pub struct IncorrectDatabaseCredentials {
-    /// Database host URI
-    pub database_user: String,
-
     /// Database user name
-    pub database_host: String,
+    pub database_user: String,
 }
 
 #[derive(Debug, UserFacingError, Serialize)]
@@ -40,123 +37,57 @@ pub struct DatabaseNotReachable {
 #[user_facing(
     code = "P1002",
     message = "\
-The database server at `{database_host}:{database_port}` was reached but timed out.
+The database server was reached but timed out.
 
 Please try again.
 
-Please make sure your database server is running at `{database_host}:{database_port}`.
+Please make sure your database server is running at the configured address.
 
 Context: {context}
 "
 )]
 pub struct DatabaseTimeout {
-    /// Database host URI
-    pub database_host: String,
-
-    /// Database port
-    pub database_port: String,
-
     /// Extra context
     pub context: String,
 }
 
 #[derive(Debug, Serialize)]
-#[serde(untagged)]
-pub enum DatabaseDoesNotExist {
-    Sqlite {
-        database_file_name: String,
-        database_file_path: String,
-    },
-    Postgres {
-        database_name: String,
-        database_host: String,
-        database_port: u16,
-    },
-    Mysql {
-        database_name: String,
-        database_host: String,
-        database_port: u16,
-    },
-
-    Mssql {
-        database_name: String,
-        database_host: String,
-        database_port: u16,
-    },
+pub struct DatabaseDoesNotExist {
+    pub database_name: String,
 }
 
 impl UserFacingError for DatabaseDoesNotExist {
     const ERROR_CODE: &'static str = "P1003";
 
     fn message(&self) -> String {
-        match self {
-            DatabaseDoesNotExist::Sqlite {
-                database_file_name,
-                database_file_path,
-            } => format!(
-                "Database `{database_file_name}` does not exist at `{database_file_path}`."
-            ),
-            DatabaseDoesNotExist::Postgres {
-                database_name,
-                database_host,
-                database_port,
-            } => format!(
-                "Database `{database_name}` does not exist on the database server at `{database_host}:{database_port}`.",
-            ),
-            DatabaseDoesNotExist::Mysql {
-                database_name,
-                database_host,
-                database_port,
-            } => format!(
-                "Database `{database_name}` does not exist on the database server at `{database_host}:{database_port}`.",
-            ),
-            DatabaseDoesNotExist::Mssql {
-                database_name,
-                database_host,
-                database_port,
-            } => format!(
-                "Database `{database_name}` does not exist on the database server at `{database_host}:{database_port}`.",
-            ),
-        }
+        format!("Database `{}` does not exist", self.database_name)
     }
 }
 
 #[derive(Debug, UserFacingError, Serialize)]
-#[user_facing(code = "P1008", message = "Operations timed out after `{time}`. Context: {context}")]
+#[user_facing(
+    code = "P1008",
+    message = "Socket timeout (the database failed to respond to a query within the configured timeout{extra_hint})."
+)]
 pub struct DatabaseOperationTimeout {
-    /// Operation time in s or ms (if <1000ms)
-    pub time: String,
-
-    /// Extra context
-    pub context: String,
+    /// Extra hint
+    pub extra_hint: String,
 }
 
 #[derive(Debug, UserFacingError, Serialize)]
 #[user_facing(
     code = "P1009",
-    message = "Database `{database_name}` already exists on the database server at `{database_host}:{database_port}`"
+    message = "Database `{database_name}` already exists on the database server`"
 )]
 pub struct DatabaseAlreadyExists {
     /// Database name, append `database_schema_name` when applicable
     /// `database_schema_name`: Database schema name (For Postgres for example)
     pub database_name: String,
-
-    /// Database host URI
-    pub database_host: String,
-
-    /// Database port
-    pub database_port: u16,
 }
 
 #[derive(Debug, UserFacingError, Serialize)]
-#[user_facing(
-    code = "P1010",
-    message = "User `{database_user}` was denied access on the database `{database_name}`"
-)]
+#[user_facing(code = "P1010", message = "User was denied access on the database `{database_name}`")]
 pub struct DatabaseAccessDenied {
-    /// Database user name
-    pub database_user: String,
-
     /// Database name, append `database_schema_name` when applicable
     /// `database_schema_name`: Database schema name (For Postgres for example)
     pub database_name: String,
@@ -246,25 +177,10 @@ mod tests {
 
     #[test]
     fn database_does_not_exist_formats_properly() {
-        let sqlite_err = DatabaseDoesNotExist::Sqlite {
-            database_file_path: "/tmp/dev.db".into(),
-            database_file_name: "dev.db".into(),
+        let sqlite_err = DatabaseDoesNotExist {
+            database_name: "dev.db".into(),
         };
 
-        assert_eq!(
-            sqlite_err.message(),
-            "Database `dev.db` does not exist at `/tmp/dev.db`."
-        );
-
-        let mysql_err = DatabaseDoesNotExist::Mysql {
-            database_name: "root".into(),
-            database_host: "localhost".into(),
-            database_port: 8888,
-        };
-
-        assert_eq!(
-            mysql_err.message(),
-            "Database `root` does not exist on the database server at `localhost:8888`."
-        );
+        assert_eq!(sqlite_err.message(), "Database `dev.db` does not exist");
     }
 }

@@ -1,4 +1,4 @@
-name: "QE: integration template"
+name: 'QE: integration template'
 run-name: ${{ inputs.connector }}
 on:
   workflow_call:
@@ -22,28 +22,27 @@ on:
         type: string
         default: '["join", "query"]'
 
-
 jobs:
   rust-query-engine-tests:
-    name: "${{ matrix.engine_protocol }} ${{ matrix.relation_load_strategy }} ${{ matrix.partition }}"
+    name: '${{ matrix.engine_protocol }} ${{ matrix.relation_load_strategy }} ${{ matrix.partition }}'
 
     strategy:
       fail-fast: false
       matrix:
         engine_protocol: [graphql, json]
         relation_load_strategy: ${{ fromJson(inputs.relation_load_strategy) }}
-        partition: ["1/4", "2/4", "3/4", "4/4"]
+        partition: ['1/4', '2/4', '3/4', '4/4']
 
     env:
-      LOG_LEVEL: "info"
-      LOG_QUERIES: "y"
-      RUST_LOG_FORMAT: "devel"
-      RUST_BACKTRACE: "1"
-      CLICOLOR_FORCE: "1"
-      CLOSED_TX_CLEANUP: "2"
-      SIMPLE_TEST_MODE: "1"
-      QUERY_BATCH_SIZE: "10"
-      TEST_RUNNER: "direct"
+      LOG_LEVEL: 'info'
+      LOG_QUERIES: 'y'
+      RUST_LOG_FORMAT: 'devel'
+      RUST_BACKTRACE: '1'
+      CLICOLOR_FORCE: '1'
+      CLOSED_TX_CLEANUP: '2'
+      SIMPLE_TEST_MODE: '1'
+      QUERY_BATCH_SIZE: '10'
+      TEST_RUNNER: 'direct'
       TEST_CONNECTOR: ${{ inputs.connector }}
       TEST_CONNECTOR_VERSION: ${{ inputs.version }}
       PRISMA_ENGINE_PROTOCOL: ${{ matrix.engine_protocol }}
@@ -73,7 +72,7 @@ jobs:
         with:
           key: docker-${{ inputs.name }}-${{hashFiles('docker-compose.yaml')}}
 
-      - name: "Start ${{ inputs.name }} (${{ matrix.engine_protocol }})"
+      - name: 'Start ${{ inputs.name }} (${{ matrix.engine_protocol }})'
         run: make start-${{ inputs.name }}
 
       - run: export WORKSPACE_ROOT=$(pwd) && cargo nextest run -p query-engine-tests --partition hash:${{ matrix.partition }} --test-threads=1

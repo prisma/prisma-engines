@@ -5,13 +5,13 @@ on:
       - main
   pull_request:
     paths-ignore:
-      - "!.github/workflows/build-prisma-schema-wasm.yml"
-      - "!.github/workflows/include/rust-wasm-setup/action.yml"
-      - ".github/**"
-      - ".buildkite/**"
-      - "*.md"
-      - "LICENSE"
-      - "CODEOWNERS"
+      - '!.github/workflows/build-prisma-schema-wasm.yml'
+      - '!.github/workflows/include/rust-wasm-setup/action.yml'
+      - '.github/**'
+      - '.buildkite/**'
+      - '*.md'
+      - 'LICENSE'
+      - 'CODEOWNERS'
 
 jobs:
   build:

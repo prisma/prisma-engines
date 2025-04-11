@@ -56,7 +56,7 @@ where
             Some(level) => {
                 let transformed = IsolationLevel::from_str(&level)
                     .map_err(SqlError::from)
-                    .map_err(|err| err.into_connector_error(connection_info))?;
+                    .map_err(|err| err.into_connector_error(connection_info.as_native()))?;
 
                 Some(transformed)
             }
