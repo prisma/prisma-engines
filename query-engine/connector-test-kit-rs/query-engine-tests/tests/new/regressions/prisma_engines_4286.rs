@@ -1,6 +1,6 @@
 use query_engine_tests::*;
 
-#[test_suite(schema(generic), only(Sqlite("libsql.js")))]
+#[test_suite(schema(generic), only(Sqlite("libsql.js.wasm")))]
 mod sqlite {
     #[connector_test]
     async fn close_tx_on_error(runner: Runner) -> TestResult<()> {

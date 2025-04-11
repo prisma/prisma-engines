@@ -36,10 +36,7 @@ mod raw_errors {
 
     #[connector_test(
         only(Postgres, Sqlite),
-        exclude(
-            Postgres("neon.js", "pg.js", "neon.js.wasm", "pg.js.wasm"),
-            Sqlite("libsql.js", "libsql.js.wasm", "cfd1")
-        )
+        exclude(Postgres("neon.js.wasm", "pg.js.wasm"), Sqlite("libsql.js.wasm", "cfd1"))
     )]
     async fn invalid_parameter_count(runner: Runner) -> TestResult<()> {
         assert_error!(
@@ -58,7 +55,7 @@ mod raw_errors {
     #[connector_test(
         schema(common_nullable_types),
         only(Postgres),
-        exclude(Postgres("neon.js", "pg.js", "neon.js.wasm", "pg.js.wasm"))
+        exclude(Postgres("neon.js.wasm", "pg.js.wasm"))
     )]
     async fn list_param_for_scalar_column_should_not_panic_quaint(runner: Runner) -> TestResult<()> {
         assert_error!(
@@ -74,10 +71,7 @@ mod raw_errors {
         Ok(())
     }
 
-    #[connector_test(
-        schema(common_nullable_types),
-        only(Postgres("neon.js", "neon.js.wasm", "pg.js", "pg.js.wasm"))
-    )]
+    #[connector_test(schema(common_nullable_types), only(Postgres("neon.js.wasm", "pg.js.wasm")))]
     async fn list_param_for_scalar_column_should_not_panic_pg_js(runner: Runner) -> TestResult<()> {
         assert_error!(
             runner,

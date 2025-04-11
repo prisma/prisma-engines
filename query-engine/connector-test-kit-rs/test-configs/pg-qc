@@ -1,6 +1,6 @@
 {
     "connector": "postgres",
-    "version": "pg.js",
+    "version": "pg.js.wasm",
     "driver_adapter": "pg",
     "external_test_executor": "QueryCompiler"
 }

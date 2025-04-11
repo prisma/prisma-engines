@@ -175,14 +175,7 @@ jobs:
       fail-fast: false
       matrix:
         adapter:
-          - name: 'planetscale (napi)'
-            setup_task: 'dev-planetscale-js'
-          - name: 'pg (napi)'
-            setup_task: 'dev-pg-js'
-          - name: 'neon (napi)'
-            setup_task: 'dev-neon-js'
-          - name: 'libsql (napi)'
-            setup_task: 'dev-libsql-js'
+
           - name: 'planetscale (wasm)'
             setup_task: 'dev-planetscale-wasm'
           - name: 'pg (wasm)'
