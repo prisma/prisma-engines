@@ -243,7 +243,7 @@ mod scalar_relations {
     #[connector_test(
         schema(schema_scalar_lists),
         capabilities(ScalarLists),
-        exclude(Postgres("pg.js", "neon.js", "pg.js.wasm", "neon.js.wasm"))
+        exclude(Postgres("pg.js.wasm", "neon.js.wasm"))
     )]
     async fn scalar_lists(runner: Runner) -> TestResult<()> {
         create_child(

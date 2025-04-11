@@ -199,12 +199,7 @@ mod max_integer {
     #[connector_test(
         schema(overflow_pg),
         only(Postgres),
-        exclude(
-            Postgres("neon.js"),
-            Postgres("pg.js"),
-            Postgres("neon.js.wasm"),
-            Postgres("pg.js.wasm")
-        )
+        exclude(Postgres("neon.js.wasm"), Postgres("pg.js.wasm"))
     )]
     async fn unfitted_int_should_fail_pg_quaint(runner: Runner) -> TestResult<()> {
         // int
@@ -253,7 +248,7 @@ mod max_integer {
     }
 
     // The driver adapter for neon provides different error messages on overflow
-    #[connector_test(schema(overflow_pg), only(Postgres("neon.js"), Postgres("pg.js")))]
+    #[connector_test(schema(overflow_pg), only(Postgres("neon.js.wasm"), Postgres("pg.js.wasm")))]
     async fn unfitted_int_should_fail_pg_js(runner: Runner) -> TestResult<()> {
         // int
         assert_error!(

@@ -24,11 +24,7 @@ mod conversion_error {
         schema.to_owned()
     }
 
-    #[connector_test(
-        schema(schema_int),
-        only(Sqlite),
-        exclude(Sqlite("libsql.js"), Sqlite("libsql.js.wasm"))
-    )]
+    #[connector_test(schema(schema_int), only(Sqlite), exclude(Sqlite("libsql.js.wasm")))]
     async fn convert_to_int_sqlite_quaint(runner: Runner) -> TestResult<()> {
         create_test_data(&runner).await?;
 
@@ -42,7 +38,7 @@ mod conversion_error {
         Ok(())
     }
 
-    #[connector_test(schema(schema_int), only(Sqlite("libsql.js"), Sqlite("libsql.js.wasm")))]
+    #[connector_test(schema(schema_int), only(Sqlite("libsql.js.wasm")))]
     async fn convert_to_int_sqlite_js(runner: Runner) -> TestResult<()> {
         create_test_data(&runner).await?;
 
@@ -56,11 +52,7 @@ mod conversion_error {
         Ok(())
     }
 
-    #[connector_test(
-        schema(schema_bigint),
-        only(Sqlite),
-        exclude(Sqlite("libsql.js"), Sqlite("libsql.js.wasm"))
-    )]
+    #[connector_test(schema(schema_bigint), only(Sqlite), exclude(Sqlite("libsql.js.wasm")))]
     async fn convert_to_bigint_sqlite_quaint(runner: Runner) -> TestResult<()> {
         create_test_data(&runner).await?;
 
@@ -74,7 +66,7 @@ mod conversion_error {
         Ok(())
     }
 
-    #[connector_test(schema(schema_bigint), only(Sqlite("libsql.js"), Sqlite("libsql.js.wasm")))]
+    #[connector_test(schema(schema_bigint), only(Sqlite("libsql.js.wasm")))]
     async fn convert_to_bigint_sqlite_js(runner: Runner) -> TestResult<()> {
         create_test_data(&runner).await?;
 

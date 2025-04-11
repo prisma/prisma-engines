@@ -56,7 +56,6 @@ mod byoid {
 
         let error_target = match runner.connector_version() {
             query_engine_tests::ConnectorVersion::MySql(_)
-            | query_engine_tests::ConnectorVersion::Vitess(Some(query_tests_setup::VitessVersion::PlanetscaleJsNapi))
             | query_engine_tests::ConnectorVersion::Vitess(Some(query_tests_setup::VitessVersion::PlanetscaleJsWasm)) => {
                 "constraint: `PRIMARY`"
             }
@@ -88,7 +87,6 @@ mod byoid {
 
         let error_target = match runner.connector_version() {
             query_engine_tests::ConnectorVersion::MySql(_)
-            | query_engine_tests::ConnectorVersion::Vitess(Some(query_tests_setup::VitessVersion::PlanetscaleJsNapi))
             | query_engine_tests::ConnectorVersion::Vitess(Some(query_tests_setup::VitessVersion::PlanetscaleJsWasm)) => {
                 "constraint: `PRIMARY`"
             }
@@ -150,7 +148,6 @@ mod byoid {
 
         let error_target = match runner.connector_version() {
             query_engine_tests::ConnectorVersion::MySql(_)
-            | query_engine_tests::ConnectorVersion::Vitess(Some(query_tests_setup::VitessVersion::PlanetscaleJsNapi))
             | query_engine_tests::ConnectorVersion::Vitess(Some(query_tests_setup::VitessVersion::PlanetscaleJsWasm)) => {
                 "constraint: `PRIMARY`"
             }
@@ -182,7 +179,6 @@ mod byoid {
 
         let error_target = match runner.connector_version() {
             query_engine_tests::ConnectorVersion::MySql(_)
-            | query_engine_tests::ConnectorVersion::Vitess(Some(query_tests_setup::VitessVersion::PlanetscaleJsNapi))
             | query_engine_tests::ConnectorVersion::Vitess(Some(query_tests_setup::VitessVersion::PlanetscaleJsWasm)) => {
                 "constraint: `PRIMARY`"
             }

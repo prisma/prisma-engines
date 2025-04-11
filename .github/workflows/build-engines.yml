@@ -6,27 +6,27 @@ on:
   push:
     branches:
       - main
-      - "*.*.x"
-      - "integration/*"
+      - '*.*.x'
+      - 'integration/*'
     paths-ignore:
-      - "!.github/workflows/build-engines*"
-      - ".github/**"
-      - ".buildkite/**"
-      - "*.md"
-      - "LICENSE"
-      - "CODEOWNERS"
+      - '!.github/workflows/build-engines*'
+      - '.github/**'
+      - '.buildkite/**'
+      - '*.md'
+      - 'LICENSE'
+      - 'CODEOWNERS'
   workflow_dispatch:
   pull_request:
     paths-ignore:
-      - ".github/**"
-      - "!.github/workflows/build-engines*"
-      - "*.md"
-      - "LICENSE"
-      - "CODEOWNERS"
+      - '.github/**'
+      - '!.github/workflows/build-engines*'
+      - '*.md'
+      - 'LICENSE'
+      - 'CODEOWNERS'
 
 jobs:
   is-release-necessary:
-    name: "Decide if a release of the engines artifacts is necessary"
+    name: 'Decide if a release of the engines artifacts is necessary'
     runs-on: ubuntu-22.04
     outputs:
       release: ${{ steps.decision.outputs.release }}
@@ -56,7 +56,7 @@ jobs:
           END_OF_COMMIT_MESSAGE
           echo "Commit message contains [integration]: ${{ contains(steps.commit-msg.outputs.commit-msg, '[integration]') }}"
 
-      - name: "Check if commit message conatains `[integration]` and the PR author has permissions to trigger the workflow"
+      - name: 'Check if commit message conatains `[integration]` and the PR author has permissions to trigger the workflow'
         id: check-commit-message
         # See https://docs.github.com/en/graphql/reference/enums
         # https://michaelheap.com/github-actions-check-permission/
@@ -181,7 +181,7 @@ jobs:
       commit: ${{ github.sha }}
 
   release-artifacts:
-    name: "Release artifacts from branch ${{ github.head_ref || github.ref_name }} for commit ${{ github.sha }}"
+    name: 'Release artifacts from branch ${{ github.head_ref || github.ref_name }} for commit ${{ github.sha }}'
     runs-on: ubuntu-22.04
     concurrency:
       group: ${{ github.sha }}
@@ -192,9 +192,9 @@ jobs:
       - build-react-native
       - build-windows
     env:
-      BUCKET_NAME: "prisma-builds"
+      BUCKET_NAME: 'prisma-builds'
       PRISMA_ENGINES_COMMIT_SHA: ${{ github.sha }}
-      DESTINATION_TARGET_PATH: "s3://prisma-builds/all_commits/${{ github.sha }}"
+      DESTINATION_TARGET_PATH: 's3://prisma-builds/all_commits/${{ github.sha }}'
 
     steps:
       # Because we need the scripts
@@ -212,22 +212,22 @@ jobs:
           # run-id: 9526334324
           # github-token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: "R2: Check if artifacts were already built and uploaded before via `.finished` file"
+      - name: 'R2: Check if artifacts were already built and uploaded before via `.finished` file'
         env:
-          FILE_PATH: "all_commits/${{ github.sha }}/.finished"
-          FILE_PATH_LEGACY: "all_commits/${{ github.sha }}/rhel-openssl-1.1.x/.finished"
-          AWS_DEFAULT_REGION: "auto"
+          FILE_PATH: 'all_commits/${{ github.sha }}/.finished'
+          FILE_PATH_LEGACY: 'all_commits/${{ github.sha }}/rhel-openssl-1.1.x/.finished'
+          AWS_DEFAULT_REGION: 'auto'
           AWS_ACCESS_KEY_ID: ${{ vars.R2_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
           AWS_ENDPOINT_URL_S3: ${{ vars.R2_ENDPOINT }}
         working-directory: .github/workflows/utils
         run: bash checkFinishedMarker.sh
 
-      - name: "S3: Check if artifacts were already built and uploaded before via `.finished` file"
+      - name: 'S3: Check if artifacts were already built and uploaded before via `.finished` file'
         env:
-          FILE_PATH: "all_commits/${{ github.sha }}/.finished"
-          FILE_PATH_LEGACY: "all_commits/${{ github.sha }}/rhel-openssl-1.1.x/.finished"
-          AWS_DEFAULT_REGION: "eu-west-1"
+          FILE_PATH: 'all_commits/${{ github.sha }}/.finished'
+          FILE_PATH_LEGACY: 'all_commits/${{ github.sha }}/rhel-openssl-1.1.x/.finished'
+          AWS_DEFAULT_REGION: 'eu-west-1'
           AWS_ACCESS_KEY_ID: ${{ vars.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         working-directory: .github/workflows/utils
@@ -235,7 +235,7 @@ jobs:
 
       - name: Display structure of downloaded files
         run: ls -Rl engines-artifacts
-        
+
       - name: Duplicate engines for vendored OpenSSL targets
         working-directory: engines-artifacts
         run: |
@@ -257,7 +257,7 @@ jobs:
           zip -r react-native/binaries.zip ios android
           rm -rf ios android
 
-      - name: "Create compressed engine files (.gz)"
+      - name: 'Create compressed engine files (.gz)'
         working-directory: engines-artifacts
         run: |
           set -eu
@@ -269,7 +269,7 @@ jobs:
 
           ls -Rl .
 
-      - name: "Create SHA256 checksum files (.sha256)."
+      - name: 'Create SHA256 checksum files (.sha256).'
         working-directory: engines-artifacts
         run: |
           set -eu
@@ -295,7 +295,7 @@ jobs:
         run: gpg -K
 
       # next to each file (excluding .sha256 files)
-      - name: "Create a GPG detached signature (.sig)"
+      - name: 'Create a GPG detached signature (.sig)'
         working-directory: engines-artifacts
         run: |
           set -eu
@@ -306,18 +306,18 @@ jobs:
 
           ls -Rl .
 
-      - name: "Cloudflare R2: Upload to bucket and verify uploaded files then create `.finished` file"
+      - name: 'Cloudflare R2: Upload to bucket and verify uploaded files then create `.finished` file'
         # https://docs.aws.amazon.com/cli/v1/userguide/cli-configure-envvars.html
         env:
-          AWS_DEFAULT_REGION: "auto"
+          AWS_DEFAULT_REGION: 'auto'
           AWS_ACCESS_KEY_ID: ${{ vars.R2_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
           AWS_ENDPOINT_URL_S3: ${{ vars.R2_ENDPOINT }}
         run: bash .github/workflows/utils/uploadAndVerify.sh engines-artifacts-for-r2
 
-      - name: "AWS S3: Upload to bucket and verify uploaded files then create `.finished` file"
+      - name: 'AWS S3: Upload to bucket and verify uploaded files then create `.finished` file'
         env:
-          AWS_DEFAULT_REGION: "eu-west-1"
+          AWS_DEFAULT_REGION: 'eu-west-1'
           AWS_ACCESS_KEY_ID: ${{ vars.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         run: bash .github/workflows/utils/uploadAndVerify.sh engines-artifacts-for-s3

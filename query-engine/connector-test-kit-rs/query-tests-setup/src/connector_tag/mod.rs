@@ -102,9 +102,7 @@ pub(crate) fn connection_string(
                 Some(PostgresVersion::V12) if is_ci => {
                     format!("postgresql://postgres:prisma@test-db-postgres-12:5432/{database}")
                 }
-                Some(PostgresVersion::V13) | Some(PostgresVersion::NeonJsNapi) | Some(PostgresVersion::PgJsNapi)
-                    if is_ci =>
-                {
+                Some(PostgresVersion::V13) if is_ci => {
                     format!("postgresql://postgres:prisma@test-db-postgres-13:5432/{database}")
                 }
                 Some(PostgresVersion::V14) if is_ci => {
@@ -121,11 +119,7 @@ pub(crate) fn connection_string(
                 Some(PostgresVersion::V10) => format!("postgresql://postgres:prisma@127.0.0.1:5432/{database}"),
                 Some(PostgresVersion::V11) => format!("postgresql://postgres:prisma@127.0.0.1:5433/{database}"),
                 Some(PostgresVersion::V12) => format!("postgresql://postgres:prisma@127.0.0.1:5434/{database}"),
-                Some(PostgresVersion::V13)
-                | Some(PostgresVersion::NeonJsNapi)
-                | Some(PostgresVersion::PgJsNapi)
-                | Some(PostgresVersion::PgJsWasm)
-                | Some(PostgresVersion::NeonJsWasm) => {
+                Some(PostgresVersion::V13) | Some(PostgresVersion::PgJsWasm) | Some(PostgresVersion::NeonJsWasm) => {
                     format!("postgresql://postgres:prisma@127.0.0.1:5435/{database}")
                 }
                 Some(PostgresVersion::V14) => format!("postgresql://postgres:prisma@127.0.0.1:5437/{database}"),
@@ -211,7 +205,7 @@ pub(crate) fn connection_string(
         }
 
         ConnectorVersion::Vitess(Some(VitessVersion::V8_0)) => "mysql://root@localhost:33807/test".into(),
-        ConnectorVersion::Vitess(Some(VitessVersion::PlanetscaleJsNapi | VitessVersion::PlanetscaleJsWasm)) => {
+        ConnectorVersion::Vitess(Some(VitessVersion::PlanetscaleJsWasm)) => {
             format!("mysql://root@127.0.0.1:3310/{database}")
         }
 
@@ -441,10 +435,10 @@ mod tests {
     #[rustfmt::skip]
     fn test_should_run() {
         let only = vec![("postgres", None)];
-        let exclude = vec![("postgres", Some("neon.js"))];
+        let exclude = vec![("postgres", Some("neon.js.wasm"))];
         let postgres = &PostgresConnectorTag as ConnectorTag;
-        let neon = ConnectorVersion::Postgres(Some(PostgresVersion::NeonJsNapi));
-        let pg = ConnectorVersion::Postgres(Some(PostgresVersion::PgJsNapi));
+        let neon = ConnectorVersion::Postgres(Some(PostgresVersion::NeonJsWasm));
+        let pg = ConnectorVersion::Postgres(Some(PostgresVersion::PgJsWasm));
 
         assert!(!super::should_run(&postgres, &neon, &only, &exclude, Default::default()));
         assert!(super::should_run(&postgres, &pg, &only, &exclude, Default::default()));
@@ -456,7 +450,7 @@ mod tests {
         let only = vec![("postgres", None)];
         let exclude = vec![("postgres", None)];
         let postgres = &PostgresConnectorTag as ConnectorTag;
-        let neon = ConnectorVersion::Postgres(Some(PostgresVersion::NeonJsNapi));
+        let neon = ConnectorVersion::Postgres(Some(PostgresVersion::NeonJsWasm));
 
         super::should_run(&postgres, &neon, &only, &exclude, Default::default());
     }
@@ -464,10 +458,10 @@ mod tests {
     #[test]
     #[should_panic]
     fn test_should_run_wrong_definition_wider_exclusion() {
-        let only = vec![("postgres", Some("neon.js"))];
+        let only = vec![("postgres", Some("neon.js.wasm"))];
         let exclude = vec![("postgres", None)];
         let postgres = &PostgresConnectorTag as ConnectorTag;
-        let neon = ConnectorVersion::Postgres(Some(PostgresVersion::NeonJsNapi));
+        let neon = ConnectorVersion::Postgres(Some(PostgresVersion::NeonJsWasm));
 
         super::should_run(&postgres, &neon, &only, &exclude, Default::default());
     }

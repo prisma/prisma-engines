@@ -212,9 +212,9 @@ mod json {
     #[connector_test(
         schema(json_opt),
         exclude(
-            Vitess("planetscale.js", "planetscale.js.wasm"),
-            Postgres("neon.js", "pg.js", "neon.js.wasm", "pg.js.wasm"),
-            Sqlite("libsql.js", "libsql.js.wasm", "cfd1"),
+            Vitess("planetscale.js.wasm"),
+            Postgres("neon.js.wasm", "pg.js.wasm"),
+            Sqlite("libsql.js.wasm", "cfd1"),
             MySQL(5.6)
         )
     )]

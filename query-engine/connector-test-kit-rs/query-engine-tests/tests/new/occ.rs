@@ -127,12 +127,7 @@ mod occ {
     // ```
     #[connector_test(
         schema(occ_simple),
-        exclude(
-            MongoDB,
-            CockroachDb,
-            Vitess("planetscale.js", "planetscale.js.wasm"),
-            Sqlite("cfd1")
-        )
+        exclude(MongoDB, CockroachDb, Vitess("planetscale.js.wasm"), Sqlite("cfd1"))
     )]
     async fn occ_update_many_test(runner: Runner) -> TestResult<()> {
         let runner = Arc::new(runner);
@@ -148,10 +143,7 @@ mod occ {
         Ok(())
     }
 
-    #[connector_test(
-        schema(occ_simple),
-        exclude(CockroachDb, Vitess("planetscale.js", "planetscale.js.wasm"))
-    )]
+    #[connector_test(schema(occ_simple), exclude(CockroachDb, Vitess("planetscale.js.wasm")))]
     async fn occ_update_test(runner: Runner) -> TestResult<()> {
         let runner = Arc::new(runner);
 
@@ -182,7 +174,7 @@ mod occ {
         Ok(())
     }
 
-    #[connector_test(schema(occ_simple), exclude(Vitess("planetscale.js", "planetscale.js.wasm")))]
+    #[connector_test(schema(occ_simple), exclude(Vitess("planetscale.js.wasm")))]
     async fn occ_delete_test(runner: Runner) -> TestResult<()> {
         let runner = Arc::new(runner);
 
