@@ -1,18 +1,18 @@
-name: "SE: integration tests"
+name: 'SE: integration tests'
 on:
   push:
     branches:
       - main
   pull_request:
     paths-ignore:
-      - ".github/**"
-      - "!.github/workflows/test-schema-engine.yml"
-      - ".buildkite/**"
-      - "*.md"
-      - "LICENSE"
-      - "CODEOWNERS"
+      - '.github/**'
+      - '!.github/workflows/test-schema-engine.yml'
+      - '.buildkite/**'
+      - '*.md'
+      - 'LICENSE'
+      - 'CODEOWNERS'
       # Specific
-      - "query-engine/**"
+      - 'query-engine/**'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -20,17 +20,17 @@ concurrency:
 
 jobs:
   test-mongodb-schema-connector:
-    name: "${{ matrix.database.name }}"
+    name: '${{ matrix.database.name }}'
     strategy:
       fail-fast: false
       matrix:
         database:
-          - name: "mongodb42"
-            url: "mongodb://prisma:prisma@localhost:27016/?authSource=admin&retryWrites=true"
-          - name: "mongodb44"
-            url: "mongodb://prisma:prisma@localhost:27017/?authSource=admin&retryWrites=true"
-          - name: "mongodb5"
-            url: "mongodb://prisma:prisma@localhost:27018/?authSource=admin&retryWrites=true"
+          - name: 'mongodb42'
+            url: 'mongodb://prisma:prisma@localhost:27016/?authSource=admin&retryWrites=true'
+          - name: 'mongodb44'
+            url: 'mongodb://prisma:prisma@localhost:27017/?authSource=admin&retryWrites=true'
+          - name: 'mongodb5'
+            url: 'mongodb://prisma:prisma@localhost:27018/?authSource=admin&retryWrites=true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -49,7 +49,7 @@ jobs:
         with:
           key: docker-${{ matrix.database.name }}-${{hashFiles('docker-compose.yaml')}}
 
-      - name: "Start ${{ matrix.database.name }}"
+      - name: 'Start ${{ matrix.database.name }}'
         run: make start-${{ matrix.database.name }}-single
 
       - run: cargo nextest run -p mongodb-schema-connector
@@ -58,7 +58,7 @@ jobs:
           TEST_DATABASE_URL: ${{ matrix.database.url }}
 
   test-linux:
-    name: "${{ matrix.database.name }}"
+    name: '${{ matrix.database.name }}'
 
     strategy:
       fail-fast: false
@@ -67,44 +67,44 @@ jobs:
           - '24.04'
         database:
           - name: mssql_2019
-            url: "sqlserver://localhost:1433;database=master;user=SA;password=<YourStrong@Passw0rd>;trustServerCertificate=true;socket_timeout=60;isolationLevel=READ UNCOMMITTED"
+            url: 'sqlserver://localhost:1433;database=master;user=SA;password=<YourStrong@Passw0rd>;trustServerCertificate=true;socket_timeout=60;isolationLevel=READ UNCOMMITTED'
           - name: mssql_2022
-            url: "sqlserver://localhost:1435;database=master;user=SA;password=<YourStrong@Passw0rd>;trustServerCertificate=true;socket_timeout=60;isolationLevel=READ UNCOMMITTED"
+            url: 'sqlserver://localhost:1435;database=master;user=SA;password=<YourStrong@Passw0rd>;trustServerCertificate=true;socket_timeout=60;isolationLevel=READ UNCOMMITTED'
           - name: mysql_5_6
-            url: "mysql://root:prisma@localhost:3309"
+            url: 'mysql://root:prisma@localhost:3309'
           - name: mysql_5_7
-            url: "mysql://root:prisma@localhost:3306"
+            url: 'mysql://root:prisma@localhost:3306'
           - name: mysql_8
-            url: "mysql://root:prisma@localhost:3307"
+            url: 'mysql://root:prisma@localhost:3307'
           - name: mysql_mariadb
-            url: "mysql://root:prisma@localhost:3308"
+            url: 'mysql://root:prisma@localhost:3308'
           - name: postgres9
-            url: "postgresql://postgres:prisma@localhost:5431"
+            url: 'postgresql://postgres:prisma@localhost:5431'
           - name: postgres10
-            url: "postgresql://postgres:prisma@localhost:5432"
+            url: 'postgresql://postgres:prisma@localhost:5432'
           - name: postgres11
-            url: "postgresql://postgres:prisma@localhost:5433"
+            url: 'postgresql://postgres:prisma@localhost:5433'
           - name: postgres12
-            url: "postgresql://postgres:prisma@localhost:5434"
+            url: 'postgresql://postgres:prisma@localhost:5434'
           - name: postgres13
-            url: "postgresql://postgres:prisma@localhost:5435"
+            url: 'postgresql://postgres:prisma@localhost:5435'
           - name: postgres14
-            url: "postgresql://postgres:prisma@localhost:5437"
+            url: 'postgresql://postgres:prisma@localhost:5437'
           - name: postgres15
-            url: "postgresql://postgres:prisma@localhost:5438"
+            url: 'postgresql://postgres:prisma@localhost:5438'
           - name: postgres16
-            url: "postgresql://postgres:prisma@localhost:5439"
+            url: 'postgresql://postgres:prisma@localhost:5439'
           - name: cockroach_23_1
-            url: "postgresql://prisma@localhost:26260"
+            url: 'postgresql://prisma@localhost:26260'
           - name: cockroach_22_2
-            url: "postgresql://prisma@localhost:26259"
+            url: 'postgresql://prisma@localhost:26259'
           - name: cockroach_22_1_0
-            url: "postgresql://prisma@localhost:26257"
+            url: 'postgresql://prisma@localhost:26257'
           - name: sqlite
             url: sqlite
           - name: vitess_8_0
-            url: "mysql://root:prisma@localhost:33807/test"
-            shadow_database_url: "mysql://root:prisma@localhost:33808/shadow"
+            url: 'mysql://root:prisma@localhost:33807/test'
+            shadow_database_url: 'mysql://root:prisma@localhost:33808/shadow'
             is_vitess: true
             single_threaded: true
 
@@ -132,7 +132,7 @@ jobs:
         with:
           key: docker-${{ matrix.database.name }}-${{hashFiles('docker-compose.yaml')}}
 
-      - name: "Start ${{ matrix.database.name }}"
+      - name: 'Start ${{ matrix.database.name }}'
         run: make start-${{ matrix.database.name }}
 
       - run: cargo nextest run -p sql-introspection-tests
@@ -217,10 +217,10 @@ jobs:
       fail-fast: false
       matrix:
         db:
-          - name: "mysql-lts"
-            url: "mysql://root@localhost:3306?connect_timeout=20&socket_timeout=60"
-          - name: "mariadb"
-            url: "mysql://root@localhost:3306?connect_timeout=20&socket_timeout=60"
+          - name: 'mysql-lts'
+            url: 'mysql://root@localhost:3306?connect_timeout=20&socket_timeout=60'
+          - name: 'mariadb'
+            url: 'mysql://root@localhost:3306?connect_timeout=20&socket_timeout=60'
         rust:
           - stable
         os:
@@ -228,7 +228,7 @@ jobs:
 
     runs-on: ${{ matrix.os }}
 
-    name: "${{ matrix.db.name }} on Windows"
+    name: '${{ matrix.db.name }} on Windows'
 
     steps:
       - uses: actions/checkout@v4
