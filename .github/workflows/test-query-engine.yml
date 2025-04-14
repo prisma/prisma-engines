@@ -26,7 +26,7 @@ jobs:
         database:
           - name: 'postgres16'
             version: '16'
-    name: ${{ matrix.database.name }}
+    name: 'Postgres v${{ matrix.database.version}}'
     uses: ./.github/workflows/test-query-engine-template.yml
     with:
       name: ${{ matrix.database.name }}
@@ -54,7 +54,7 @@ jobs:
             version: '10'
           - name: 'postgres9'
             version: '9'
-    name: ${{ matrix.database.name }}
+    name: 'Postgres Old v${{ matrix.database.version}}'
     uses: ./.github/workflows/test-query-engine-template.yml
     with:
       name: ${{ matrix.database.name }}
@@ -70,7 +70,7 @@ jobs:
           - name: 'mysql_8'
             version: '8'
             relation_load_strategy: '["join", "query"]'
-    name: ${{ matrix.database.name }}
+    name: 'MySQL v${{ matrix.database.version}}'
     uses: ./.github/workflows/test-query-engine-template.yml
     with:
       name: ${{ matrix.database.name }}
@@ -94,7 +94,7 @@ jobs:
           - name: 'mysql_mariadb'
             version: 'mariadb'
             relation_load_strategy: '["query"]'
-    name: ${{ matrix.database.name }}
+    name: 'MySQL Old v${{ matrix.database.version}}'
     uses: ./.github/workflows/test-query-engine-template.yml
     with:
       name: ${{ matrix.database.name }}
@@ -115,7 +115,7 @@ jobs:
             version: '22.2'
           - name: 'cockroach_22_1_0'
             version: '22.1'
-    name: ${{ matrix.database.name }}
+    name: 'CockroachDB v${{ matrix.database.version}}'
     uses: ./.github/workflows/test-query-engine-template.yml
     with:
       name: ${{ matrix.database.name }}
@@ -130,7 +130,7 @@ jobs:
           - name: 'mongodb_5'
             version: '5'
             connector: 'mongodb'
-    name: ${{ matrix.database.name }}
+    name: 'MongoDB v${{ matrix.database.version}}'
     uses: ./.github/workflows/test-query-engine-template.yml
     with:
       name: ${{ matrix.database.name }}
@@ -149,7 +149,7 @@ jobs:
             version: '4.4'
           - name: 'mongodb_4_2'
             version: '4.2'
-    name: ${{ matrix.database.name }}
+    name: 'MongoDB Old v${{ matrix.database.version}}'
     uses: ./.github/workflows/test-query-engine-template.yml
     with:
       name: ${{ matrix.database.name }}
@@ -166,7 +166,7 @@ jobs:
           - name: 'mssql_2022'
             version: '2022'
             ubuntu: '24.04'
-    name: ${{ matrix.database.name }}
+    name: 'MSSQL v${{ matrix.database.version}}'
     uses: ./.github/workflows/test-query-engine-template.yml
     with:
       name: ${{ matrix.database.name }}
@@ -184,10 +184,7 @@ jobs:
           - name: 'mssql_2019'
             version: '2019'
             ubuntu: '24.04'
-          - name: 'mssql_2017'
-            version: '2017'
-            ubuntu: '20.04'
-    name: ${{ matrix.database.name }}
+    name: 'MSSQL Old v${{ matrix.database.version}}'
     uses: ./.github/workflows/test-query-engine-template.yml
     with:
       name: ${{ matrix.database.name }}

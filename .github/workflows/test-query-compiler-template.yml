@@ -1,3 +1,4 @@
+name: 'QC: integration tests'
 on:
   workflow_call:
     inputs:

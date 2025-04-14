@@ -1,5 +1,3 @@
-run-name: '${{ inputs.crate }} on ${{ inputs.os }}'
-
 on:
   workflow_call:
     inputs:
@@ -12,7 +10,7 @@ on:
 
 jobs:
   test-crate-compilation:
-    name: '${{ inputs.crate }} on ${{ inputs.os }}'
+    name: 'compile ${{ inputs.crate }} @ ${{ inputs.os }}'
     runs-on: ${{ inputs.os }}
     steps:
       - uses: actions/checkout@v4
