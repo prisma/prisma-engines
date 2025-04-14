@@ -825,7 +825,6 @@ writes::top_level_mutations::create_many_and_return::create_many::create_many_by
 writes::top_level_mutations::create_many_and_return::create_many::create_many_m2m_rel_read_fails
 writes::top_level_mutations::create_many_and_return::create_many::create_many_map_behavior
 writes::top_level_mutations::create_many_and_return::create_many::create_many_self_rel_read_fails
-writes::top_level_mutations::create_many_and_return::create_many::large_num_records_horizontal
 writes::top_level_mutations::create_many_and_return::json_create_many::create_many_json_errors
 writes::top_level_mutations::default_value::default_value::int_field
 writes::top_level_mutations::default_value::default_value::non_list_field
