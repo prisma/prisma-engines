@@ -41,6 +41,7 @@ jobs:
       TEST_RUNNER: 'direct'
       TEST_CONNECTOR: ${{ matrix.database.connector }}
       TEST_CONNECTOR_VERSION: ${{ matrix.database.version }}
+      WORKSPACE_ROOT: ${{ github.workspace }}
 
     runs-on: ubuntu-latest
     steps:
@@ -67,10 +68,10 @@ jobs:
 
       - uses: actions-rust-lang/setup-rust-toolchain@v1
 
-      - run: export WORKSPACE_ROOT=$(pwd) && cargo build --package query-engine
+      - run: cargo build --package query-engine
         env:
           CLICOLOR_FORCE: 1
 
-      - run: export WORKSPACE_ROOT=$(pwd) && cargo test --package black-box-tests -- --test-threads=1
+      - run: cargo test --package black-box-tests -- --test-threads=1
         env:
           CLICOLOR_FORCE: 1
