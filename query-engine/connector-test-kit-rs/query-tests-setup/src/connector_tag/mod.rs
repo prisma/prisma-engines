@@ -170,7 +170,8 @@ pub(crate) fn connection_string(
             None => unreachable!("A versioned connector must have a concrete version to run."),
         },
         ConnectorVersion::Sqlite(_) => {
-            let workspace_root = std::env::var("WORKSPACE_ROOT")
+            let workspace_root = std::env::var("RAMDISK")
+                .or_else(|_| std::env::var("WORKSPACE_ROOT"))
                 .unwrap_or_else(|_| ".".to_owned())
                 .trim_end_matches('/')
                 .to_owned();
