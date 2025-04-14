@@ -177,7 +177,7 @@ pub(crate) fn connection_string(
 
             fs::create_dir_all(format!("{workspace_root}/db")).ok();
 
-            format!("file://{workspace_root}/db/{database}.db")
+            format!("file:{workspace_root}/db/{database}.db")
         }
         ConnectorVersion::CockroachDb(v) => {
             // Use the same database and schema name for CockroachDB - unfortunately CockroachDB
