@@ -28,8 +28,11 @@ pub struct GeneratorCall {
 }
 
 impl GeneratorCall {
-    pub fn new(name: String, args: Vec<PrismaValue>) -> Self {
-        Self { name, args }
+    pub fn new(name: impl Into<String>, args: Vec<PrismaValue>) -> Self {
+        Self {
+            name: name.into(),
+            args,
+        }
     }
 
     pub fn name(&self) -> &str {

@@ -18,9 +18,11 @@ pub mod write;
 
 use std::{collections::HashMap, marker::PhantomData};
 
+use prisma_value::PrismaValue;
 use quaint::{
-    ast::{Column, Comparable, ConditionTree, Query, Row, Values},
+    ast::{Column, Comparable, ConditionTree, ExpressionKind, Insert, OnConflict, OpaqueType, Query, Row, Values},
     visitor::Visitor,
+    Value,
 };
 use query_builder::{DbQuery, QueryBuilder};
 use query_structure::{
@@ -35,6 +37,7 @@ pub use filter::FilterBuilder;
 pub use model_extensions::{AsColumn, AsColumns, AsTable, RelationFieldExt, SelectionResultExt};
 use read::alias_with_prisma_name;
 pub use sql_trace::SqlTraceComment;
+use value::GeneratorCall;
 
 const PARAMETER_LIMIT: usize = 2000;
 
@@ -260,10 +263,22 @@ impl<'a, V: Visitor<'a>> QueryBuilder for SqlQueryBuilder<'a, V> {
     fn build_m2m_connect(
         &self,
         field: RelationField,
-        parent_id: &SelectionResult,
-        child_ids: &[SelectionResult],
+        parent: PrismaValue,
+        child: PrismaValue,
     ) -> Result<DbQuery, Box<dyn std::error::Error + Send + Sync>> {
-        let query = write::create_relation_table_records(&field, parent_id, child_ids, &self.context);
+        let relation = field.relation();
+
+        let parent_column = field.related_field().m2m_column(&self.context);
+        let child_column = field.m2m_column(&self.context);
+
+        // parent and child can refer to arrays, so we need a product of the two
+        let call = GeneratorCall::new("product", vec![parent, child]);
+        let insert = Insert::expression_into(
+            relation.as_table(&self.context),
+            vec![parent_column, child_column],
+            ExpressionKind::Parameterized(Value::opaque(call, OpaqueType::Unknown)),
+        );
+        let query = insert.on_conflict(OnConflict::DoNothing);
         self.convert_query(query)
     }
 

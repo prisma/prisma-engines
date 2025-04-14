@@ -5,6 +5,7 @@ pub(crate) trait QueryWriter {
     fn write_string_chunk(&mut self, value: String);
     fn write_parameter(&mut self);
     fn write_parameter_tuple(&mut self);
+    fn write_parameter_tuple_list(&mut self);
 }
 
 impl QueryWriter for QueryTemplate<Value<'_>> {
@@ -25,5 +26,9 @@ impl QueryWriter for QueryTemplate<Value<'_>> {
 
     fn write_parameter_tuple(&mut self) {
         self.fragments.push(Fragment::ParameterTuple);
+    }
+
+    fn write_parameter_tuple_list(&mut self) {
+        self.fragments.push(Fragment::ParameterTupleList);
     }
 }

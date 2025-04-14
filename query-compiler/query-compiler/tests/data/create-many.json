@@ -1,0 +1,19 @@
+{
+  "modelName": "User",
+  "action": "createMany",
+  "query": {
+    "arguments": {
+      "data": [
+        {
+          "email": "user.1737556028164@prisma.io"
+        },
+        {
+          "email": "user.1737556028165@prisma.io"
+        }
+      ]
+    },
+    "selection": {
+      "$scalars": true
+    }
+  }
+}

@@ -164,10 +164,17 @@ function getResponseInQeFormat(query: JsonProtocolQuery, result: unknown) {
 }
 
 function getFullOperationName(query: JsonProtocolQuery): string {
-  if (query.modelName) {
-    return query.action + query.modelName
-  } else {
-    return query.action
+  switch (query.action) {
+    case 'createManyAndReturn':
+      return `createMany${query.modelName}AndReturn`
+    case 'updateManyAndReturn':
+      return `updateMany${query.modelName}AndReturn`
+    default:
+      if (query.modelName) {
+        return query.action + query.modelName
+      } else {
+        return query.action
+      }
   }
 }
 
