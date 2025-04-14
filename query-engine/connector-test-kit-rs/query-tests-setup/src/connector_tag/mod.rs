@@ -23,7 +23,7 @@ pub(crate) use vitess::*;
 use crate::{datamodel_rendering::DatamodelRenderer, BoxFuture, TestConfig, TestError, CONFIG};
 use psl::datamodel_connector::ConnectorCapabilities;
 use quaint::prelude::SqlFamily;
-use std::{convert::TryFrom, fmt};
+use std::{convert::TryFrom, fmt, fs};
 
 pub trait ConnectorTagInterface {
     fn raw_execute<'a>(&'a self, query: &'a str, connection_url: &'a str) -> BoxFuture<'a, Result<(), TestError>>;
@@ -174,6 +174,8 @@ pub(crate) fn connection_string(
                 .unwrap_or_else(|_| ".".to_owned())
                 .trim_end_matches('/')
                 .to_owned();
+
+            fs::create_dir_all(format!("{workspace_root}/db")).ok();
 
             format!("file://{workspace_root}/db/{database}.db")
         }

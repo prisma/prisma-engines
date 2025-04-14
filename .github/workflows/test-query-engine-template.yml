@@ -45,6 +45,7 @@ jobs:
       TEST_CONNECTOR_VERSION: ${{ inputs.version }}
       PRISMA_ENGINE_PROTOCOL: ${{ matrix.engine_protocol }}
       PRISMA_RELATION_LOAD_STRATEGY: ${{ matrix.relation_load_strategy }}
+      WORKSPACE_ROOT: ${{ github.workspace }}
 
     runs-on: 'ubuntu-${{ inputs.ubuntu }}'
     steps:
@@ -75,12 +76,12 @@ jobs:
       - name: 'Start ${{ inputs.name }} (${{ matrix.engine_protocol }})'
         run: make start-${{ inputs.name }}
 
-      - run: export WORKSPACE_ROOT=$(pwd) && cargo nextest run -p query-engine-tests --partition hash:${{ matrix.partition }} --test-threads=1
+      - run: cargo nextest run -p query-engine-tests --partition hash:${{ matrix.partition }} --test-threads=1
         if: ${{ inputs.single_threaded }}
         env:
           CLICOLOR_FORCE: 1
 
-      - run: export WORKSPACE_ROOT=$(pwd) && cargo nextest run -p query-engine-tests --partition hash:${{ matrix.partition }} --test-threads=8
+      - run: cargo nextest run -p query-engine-tests --partition hash:${{ matrix.partition }} --test-threads=8
         if: ${{ !inputs.single_threaded }}
         env:
           CLICOLOR_FORCE: 1
