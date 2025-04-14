@@ -2,7 +2,7 @@ use indoc::indoc;
 use query_engine_tests::*;
 
 #[test_suite(only(SqlServer))]
-mod string {
+mod mssql_string {
     fn schema_string() -> String {
         let schema = indoc! {
             r#"

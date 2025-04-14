@@ -1,9 +1,15 @@
 use super::*;
+use crate::ensure_db_names::UniqueTestDatabaseNames;
 use darling::{ast::NestedMeta, FromMeta};
+use once_cell::sync::Lazy;
 use proc_macro::TokenStream;
 use proc_macro2::{Ident, Span};
 use quote::quote;
+use std::sync::Arc;
 use syn::{parse_macro_input, ItemFn};
+
+static UNIQUE_TEST_DATABASE_NAMES: Lazy<Arc<UniqueTestDatabaseNames>> =
+    Lazy::new(|| Arc::new(UniqueTestDatabaseNames::new()));
 
 pub fn connector_test_impl(attr: TokenStream, input: TokenStream) -> TokenStream {
     let attributes_meta = match NestedMeta::parse_meta_list(attr.into()) {
@@ -59,6 +65,8 @@ pub fn connector_test_impl(attr: TokenStream, input: TokenStream) -> TokenStream
     let test_database_name = format!("{suite_name}_{test_name}");
     let capabilities = args.capabilities.idents;
 
+    UNIQUE_TEST_DATABASE_NAMES.ensure_unique(&test_database_name, &suite_name, &test_name);
+
     let referential_override = match args.relation_mode.or(args.referential_integrity) {
         Some(ref_override) => {
             let wat = ref_override.to_string();
@@ -83,7 +91,7 @@ pub fn connector_test_impl(attr: TokenStream, input: TokenStream) -> TokenStream
                 &[#(#db_extensions),*],
                 #referential_override,
                 #runner_fn_ident,
-                #test_fn_ident_string
+                #test_fn_ident_string,
             );
         }
 
