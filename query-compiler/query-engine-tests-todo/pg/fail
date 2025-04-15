@@ -2,7 +2,6 @@ new::disconnect::disconnect_security::must_honor_connect_scope_m2m
 new::disconnect::disconnect_security::must_honor_connect_scope_one2m
 new::interactive_tx::interactive_tx::basic_rollback_workflow
 new::interactive_tx::interactive_tx::batch_queries_failure
-new::interactive_tx::interactive_tx::no_auto_rollback
 new::interactive_tx::interactive_tx::raw_queries
 new::interactive_tx::interactive_tx::tx_expiration_cycle
 new::interactive_tx::interactive_tx::tx_expiration_failure_cycle
@@ -440,7 +439,6 @@ queries::filters::self_relation_regression::sr_regression::all_categories
 queries::filters::self_relation_regression::sr_regression::inverted_subcat
 queries::filters::self_relation_regression::sr_regression::root_categories
 queries::filters::self_relation_regression::sr_regression::subcat_scalar
-queries::filters::uuid_filters::uuid_filter_spec::contains_filter_is_rejected
 queries::order_and_pagination::nested_multi_order_pagination::paging_one2m_stable_order::cursor_child_3
 queries::order_and_pagination::nested_multi_order_pagination::paging_one2m_stable_order::take_first_child_each_parent
 queries::order_and_pagination::nested_multi_order_pagination::paging_one2m_stable_order::take_last_child_each_parent
@@ -543,7 +541,6 @@ queries::order_and_pagination::order_by_dependent_pagination::order_by_dependent
 queries::order_and_pagination::order_by_mutation::order_by_mutation::order_by_not_selected
 queries::order_and_pagination::order_by_nulls::order_by_nulls::nulls_first_cursor
 queries::order_and_pagination::order_by_nulls::order_by_nulls::nulls_last_cursor
-queries::order_and_pagination::order_by_nulls::order_by_nulls::nulls_on_list_field_should_fail
 queries::order_and_pagination::order_by_nulls::order_by_nulls::ordering_by_nulls_should_be_optional
 queries::order_and_pagination::order_by_nulls::order_by_nulls::two_fields_nulls_first
 queries::order_and_pagination::order_by_nulls::order_by_nulls::two_fields_nulls_last
@@ -629,7 +626,6 @@ writes::data_types::scalar_list::base::basic_types::behave_like_regular_val_for_
 writes::data_types::scalar_list::base::basic_types::create_mut_return_items_with_empty_lists
 writes::data_types::scalar_list::base::basic_types::create_mut_work_with_list_vals
 writes::data_types::scalar_list::base::basic_types::set_base
-writes::data_types::scalar_list::base::basic_types::update_mut_empty_scalar_should_fail
 writes::data_types::scalar_list::base::basic_types::update_mut_push_empty_enum_array
 writes::data_types::scalar_list::base::basic_types::update_mut_push_empty_scalar_list
 writes::data_types::scalar_list::decimal::decimal::behave_like_regular_val_for_create_and_update

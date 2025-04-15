@@ -5,6 +5,7 @@ new::interactive_tx::interactive_tx::commit_after_rollback
 new::interactive_tx::interactive_tx::double_commit
 new::interactive_tx::interactive_tx::double_rollback
 new::interactive_tx::interactive_tx::multiple_tx
+new::interactive_tx::interactive_tx::no_auto_rollback
 new::interactive_tx::interactive_tx::rollback_after_commit
 new::interactive_tx::interactive_tx::write_conflict
 new::interactive_tx::itx_isolation::basic_serializable
