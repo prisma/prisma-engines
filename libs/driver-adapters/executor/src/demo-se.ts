@@ -6,7 +6,11 @@ import type { DriverAdaptersManager } from './driver-adapters-manager'
 import { Env } from './types'
 import * as se from './schema-engine-wasm-module'
 import { setupDriverAdaptersManager } from './setup'
-import { getWasmError, isWasmPanic, WasmPanicRegistry } from './wasm-panic-registry'
+import {
+  getWasmError,
+  isWasmPanic,
+  WasmPanicRegistry,
+} from './wasm-panic-registry'
 
 /**
  * Set up a global registry for Wasm panics.
@@ -54,10 +58,7 @@ async function main(): Promise<void> {
     }
   `
 
-  const driverAdapterManager = await setupDriverAdaptersManager(
-    env,
-    { url },
-  )
+  const driverAdapterManager = await setupDriverAdaptersManager(env, { url })
 
   const { engine } = await initSE({
     driverAdapterManager,
@@ -98,7 +99,7 @@ async function main(): Promise<void> {
             path: 'schema.prisma',
           },
         ],
-      }
+      },
     })
     console.dir({ result }, { depth: null })
   }
@@ -117,7 +118,7 @@ async function main(): Promise<void> {
           {
             content: schema,
             path: 'schema.prisma',
-          }
+          },
         ],
       },
       force: false,
@@ -143,7 +144,7 @@ async function main(): Promise<void> {
           {
             content: schema,
             path: 'schema.prisma',
-          }
+          },
         ],
       },
       exitCode: null,
@@ -161,7 +162,7 @@ async function main(): Promise<void> {
           {
             content: schema,
             path: 'schema.prisma',
-          }
+          },
         ],
       },
       baseDirectoryPath: process.cwd(),
@@ -212,7 +213,10 @@ process.on('uncaughtException', (error: Error) => {
   console.log('[uncaughtException]')
 
   if (isWasmPanic(error)) {
-    const { message, stack } = getWasmError(globalThis.PRISMA_WASM_PANIC_REGISTRY, error)
+    const { message, stack } = getWasmError(
+      globalThis.PRISMA_WASM_PANIC_REGISTRY,
+      error,
+    )
 
     console.error('[WasmPanic]', { message, stack })
   } else {
@@ -226,7 +230,10 @@ process.on('unhandledRejection', (error: Error) => {
   console.log('[unhandledRejection]')
 
   if (isWasmPanic(error)) {
-    const { message, stack } = getWasmError(globalThis.PRISMA_WASM_PANIC_REGISTRY, error)
+    const { message, stack } = getWasmError(
+      globalThis.PRISMA_WASM_PANIC_REGISTRY,
+      error,
+    )
 
     console.error('[WasmPanic]', { message, stack })
   } else {

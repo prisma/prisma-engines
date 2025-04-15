@@ -4,7 +4,7 @@ const DriverAdapterConfig = S.struct({
   proxy_url: S.string.pipe(
     S.nonEmpty({
       message: () => '`proxy_url` must not be empty',
-    })
+    }),
   ),
 })
 
@@ -12,7 +12,7 @@ const DriverAdapterConfigFromString = S.transform(
   S.string,
   DriverAdapterConfig,
   (str) => JSON.parse(str),
-  (config) => JSON.stringify(config)
+  (config) => JSON.stringify(config),
 )
 
 const EnvPlanetScale = S.struct({
@@ -30,7 +30,7 @@ export const MobileAdapterConfig = S.struct({
   MOBILE_EMULATOR_URL: S.string.pipe(
     S.nonEmpty({
       message: () => '`MOBILE_EMULATOR_URL` must not be empty',
-    })
+    }),
   ),
 })
 
@@ -42,7 +42,7 @@ export const Env = S.extend(
     EnvNeonWS,
     S.struct({
       DRIVER_ADAPTER: S.literal('pg', 'libsql', 'd1', 'better-sqlite3'),
-    })
+    }),
   ),
   S.union(
     MobileAdapterConfig,
@@ -50,8 +50,8 @@ export const Env = S.extend(
       EXTERNAL_TEST_EXECUTOR: S.optional(ExternalTestExecutor, {
         default: () => 'Napi',
       }),
-    })
-  )
+    }),
+  ),
 )
 
 export type Env = S.Schema.Type<typeof Env>

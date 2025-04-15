@@ -1,4 +1,7 @@
-import type { SqlDriverAdapter, SqlDriverAdapterFactory } from '@prisma/driver-adapter-utils'
+import type {
+  SqlDriverAdapter,
+  SqlDriverAdapterFactory,
+} from '@prisma/driver-adapter-utils'
 
 export type SetupDriverAdaptersInput = {
   /**

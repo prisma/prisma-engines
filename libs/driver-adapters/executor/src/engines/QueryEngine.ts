@@ -2,7 +2,10 @@ import { JsonBatchQuery, JsonQuery } from './JsonProtocol'
 import * as Transaction from './Transaction'
 
 // Events
-export type QueryEngineEvent = QueryEngineLogEvent | QueryEngineQueryEvent | QueryEnginePanicEvent
+export type QueryEngineEvent =
+  | QueryEngineLogEvent
+  | QueryEngineQueryEvent
+  | QueryEnginePanicEvent
 
 export type QueryEngineLogEvent = {
   level: string
@@ -74,7 +77,9 @@ export type QueryEngineResult<T> = {
   elapsed: number
 }
 
-export type QueryEngineBatchRequest = QueryEngineBatchGraphQLRequest | JsonBatchQuery
+export type QueryEngineBatchRequest =
+  | QueryEngineBatchGraphQLRequest
+  | JsonBatchQuery
 
 export type QueryEngineBatchGraphQLRequest = {
   batch: QueryEngineRequest[]

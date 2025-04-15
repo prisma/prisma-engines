@@ -1,5 +1,8 @@
 import { PrismaLibSQL } from '@prisma/adapter-libsql'
-import type { SqlDriverAdapter, SqlMigrationAwareDriverAdapterFactory } from '@prisma/driver-adapter-utils'
+import type {
+  SqlDriverAdapter,
+  SqlMigrationAwareDriverAdapterFactory,
+} from '@prisma/driver-adapter-utils'
 import type { DriverAdaptersManager, SetupDriverAdaptersInput } from './index'
 import type { DriverAdapterTag, EnvForAdapter } from '../types'
 
@@ -10,7 +13,10 @@ export class LibSQLManager implements DriverAdaptersManager {
   #factory: SqlMigrationAwareDriverAdapterFactory
   #adapter?: SqlDriverAdapter
 
-  private constructor(private env: EnvForAdapter<TAG>, { url }: SetupDriverAdaptersInput) {
+  private constructor(
+    private env: EnvForAdapter<TAG>,
+    { url }: SetupDriverAdaptersInput,
+  ) {
     this.#factory = new PrismaLibSQL({
       url,
       intMode: 'bigint',

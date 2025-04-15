@@ -15,7 +15,7 @@ export class BetterSQLite3Manager implements DriverAdaptersManager {
 
   private constructor(
     private env: EnvForAdapter<TAG>,
-    { url }: SetupDriverAdaptersInput
+    { url }: SetupDriverAdaptersInput,
   ) {
     this.#factory = new PrismaBetterSQLite3({
       url,

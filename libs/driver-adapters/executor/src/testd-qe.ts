@@ -82,10 +82,10 @@ async function handleRequest(
         logs.push(log)
       }
 
-      const driverAdapterManager = await setupDriverAdaptersManager(
-        env,
-        { url, migrationScript },
-      )
+      const driverAdapterManager = await setupDriverAdaptersManager(env, {
+        url,
+        migrationScript,
+      })
 
       const { engine, adapter } = await initQe({
         env,

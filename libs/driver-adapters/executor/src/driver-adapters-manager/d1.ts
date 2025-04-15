@@ -1,7 +1,10 @@
 import path from 'node:path'
 import * as S from '@effect/schema/Schema'
 import { PrismaD1 } from '@prisma/adapter-d1'
-import type { SqlDriverAdapter, SqlMigrationAwareDriverAdapterFactory } from '@prisma/driver-adapter-utils'
+import type {
+  SqlDriverAdapter,
+  SqlMigrationAwareDriverAdapterFactory,
+} from '@prisma/driver-adapter-utils'
 import { getPlatformProxy } from 'wrangler'
 import type { D1Database, D1Result } from '@cloudflare/workers-types'
 
@@ -27,7 +30,10 @@ export class D1Manager implements DriverAdaptersManager {
     this.#dispose = dispose
   }
 
-  static async setup(env: EnvForAdapter<TAG>, { migrationScript }: SetupDriverAdaptersInput) {
+  static async setup(
+    env: EnvForAdapter<TAG>,
+    { migrationScript }: SetupDriverAdaptersInput,
+  ) {
     const { env: cfBindings, dispose } = await getPlatformProxy<{
       D1_DATABASE: D1Database
     }>({
@@ -82,10 +88,12 @@ async function migrateReset(D1_DATABASE: D1Database) {
     rawTables,
   ).filter(
     (item) =>
-      !(['sqlite_schema', 'sqlite_sequence'].includes(item.name)
-      // excludes `_cf_KV`, `_cf_METADATA`, etc.
-      // Related to https://github.com/drizzle-team/drizzle-orm/issues/3728#issuecomment-2740994190.
-      || /^(_cf_[A-Z]+).*$/.test(item.name)),
+      !(
+        ['sqlite_schema', 'sqlite_sequence'].includes(item.name) ||
+        // excludes `_cf_KV`, `_cf_METADATA`, etc.
+        // Related to https://github.com/drizzle-team/drizzle-orm/issues/3728#issuecomment-2740994190.
+        /^(_cf_[A-Z]+).*$/.test(item.name)
+      ),
   )
 
   // This may sometimes fail with `D1_ERROR: no such table: sqlite_sequence`,

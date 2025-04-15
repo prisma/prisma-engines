@@ -11,19 +11,13 @@ type ParsedTwiggyEntry = {
   original: TwiggyEntry
 }
 
-function parseEntry({ name, ...rest }: TwiggyEntry): ParsedTwiggyEntry | undefined {
-  const sections = [
-    'data',
-    'type',
-    'global',
-    'table',
-    'elem',
-    'memory',
-  ]
-  
-  if (
-    sections.some(section => name.startsWith(`${section}[`))
-  ) {
+function parseEntry({
+  name,
+  ...rest
+}: TwiggyEntry): ParsedTwiggyEntry | undefined {
+  const sections = ['data', 'type', 'global', 'table', 'elem', 'memory']
+
+  if (sections.some((section) => name.startsWith(`${section}[`))) {
     let sectionName = name.split('[')[0]
     sectionName = `(section) ${sectionName}[..] `
 
@@ -35,8 +29,8 @@ function parseEntry({ name, ...rest }: TwiggyEntry): ParsedTwiggyEntry | undefin
       },
     }
   }
-  
-  const prefixesToAvoid = [        
+
+  const prefixesToAvoid = [
     // exported functions
     'queryengine_',
     'getBuildTimeInfo',
@@ -50,11 +44,7 @@ function parseEntry({ name, ...rest }: TwiggyEntry): ParsedTwiggyEntry | undefin
     'import ',
   ]
 
-  const substringsToAvoid = [
-    'section headers',
-    'custom section',
-    'wasm magic'
-  ]
+  const substringsToAvoid = ['section headers', 'custom section', 'wasm magic']
 
   const stringsToAvoid = [
     // memory utilities
@@ -63,11 +53,11 @@ function parseEntry({ name, ...rest }: TwiggyEntry): ParsedTwiggyEntry | undefin
     'memcpy',
     'memcmp',
   ]
-  
+
   if (
-    prefixesToAvoid.some(prefix => name.startsWith(prefix))
-    || substringsToAvoid.some(substring => name.includes(substring))
-    || stringsToAvoid.includes(name)
+    prefixesToAvoid.some((prefix) => name.startsWith(prefix)) ||
+    substringsToAvoid.some((substring) => name.includes(substring)) ||
+    stringsToAvoid.includes(name)
   ) {
     return undefined
   }
@@ -101,16 +91,25 @@ function parseEntry({ name, ...rest }: TwiggyEntry): ParsedTwiggyEntry | undefin
 // - crate: the name of the crate
 // - bytes: the number of bytes the crate occupies
 // - frequency: the number of times the crate is referenced
-function printAsMarkdown(twiggyMap: TwiggyMap, { CRATE_NAME_PADDING }: { CRATE_NAME_PADDING: number }) {
+function printAsMarkdown(
+  twiggyMap: TwiggyMap,
+  { CRATE_NAME_PADDING }: { CRATE_NAME_PADDING: number },
+) {
   const BYTE_SIZE_PADDING = 8
   const PERCENT_SIZE_PADDING = 8
   const FREQUENCY_PADDING = 10
 
-  console.log(`| ${'crate'.padStart(CRATE_NAME_PADDING)} | ${'size(KB)'.padEnd(BYTE_SIZE_PADDING)} | ${'size(%)'.padEnd(PERCENT_SIZE_PADDING)} | ${'frequency'.padEnd(FREQUENCY_PADDING)} |`)
-  console.log(`| ${'-'.repeat(CRATE_NAME_PADDING - 1)}: | :${'-'.repeat(BYTE_SIZE_PADDING - 1)} | :${'-'.repeat(PERCENT_SIZE_PADDING - 1)} | :${'-'.repeat(FREQUENCY_PADDING - 1)} |`)
+  console.log(
+    `| ${'crate'.padStart(CRATE_NAME_PADDING)} | ${'size(KB)'.padEnd(BYTE_SIZE_PADDING)} | ${'size(%)'.padEnd(PERCENT_SIZE_PADDING)} | ${'frequency'.padEnd(FREQUENCY_PADDING)} |`,
+  )
+  console.log(
+    `| ${'-'.repeat(CRATE_NAME_PADDING - 1)}: | :${'-'.repeat(BYTE_SIZE_PADDING - 1)} | :${'-'.repeat(PERCENT_SIZE_PADDING - 1)} | :${'-'.repeat(FREQUENCY_PADDING - 1)} |`,
+  )
 
   for (const [crate, { size, percent, entries }] of twiggyMap.entries()) {
-    console.log(`| ${crate.padStart(CRATE_NAME_PADDING)} | ${size.toFixed(1).padStart(BYTE_SIZE_PADDING)} | ${(percent.toFixed(3)+"%").padStart(PERCENT_SIZE_PADDING) } | ${entries.length.toString().padStart(FREQUENCY_PADDING)} |`)
+    console.log(
+      `| ${crate.padStart(CRATE_NAME_PADDING)} | ${size.toFixed(1).padStart(BYTE_SIZE_PADDING)} | ${(percent.toFixed(3) + '%').padStart(PERCENT_SIZE_PADDING)} | ${entries.length.toString().padStart(FREQUENCY_PADDING)} |`,
+    )
   }
 }
 
@@ -120,10 +119,7 @@ type TwiggyMapValue = {
   entries: ParsedTwiggyEntry[]
 }
 
-type TwiggyMap = Map<
-  ParsedTwiggyEntry['crate'],
-  TwiggyMapValue
->
+type TwiggyMap = Map<ParsedTwiggyEntry['crate'], TwiggyMapValue>
 
 function analyseDeps(twiggyData: TwiggyEntry[]): TwiggyMap {
   const BYTES_IN_KB = 1024.0
@@ -139,7 +135,7 @@ function analyseDeps(twiggyData: TwiggyEntry[]): TwiggyMap {
       const currEntry = acc.get(crate)
 
       if (currEntry) {
-        currEntry.size += (original.shallow_size / BYTES_IN_KB)
+        currEntry.size += original.shallow_size / BYTES_IN_KB
         currEntry.percent += original.shallow_size_percent
         currEntry.entries.push(item)
       } else {
@@ -156,7 +152,7 @@ function analyseDeps(twiggyData: TwiggyEntry[]): TwiggyMap {
   // sort the map values by space occupied, descending
   // (maps maintain insertion order)
   const sortedTwiggyMap = new Map(
-    [...twiggyMap.entries()].sort((a, b) => b[1].size - a[1].size)
+    [...twiggyMap.entries()].sort((a, b) => b[1].size - a[1].size),
   )
 
   return sortedTwiggyMap
@@ -164,7 +160,7 @@ function analyseDeps(twiggyData: TwiggyEntry[]): TwiggyMap {
 
 function main() {
   const sortedTwiggyMap = analyseDeps(twiggyData as TwiggyEntry[])
-  
+
   // visual adjustment for the "crate" column in the markdown table
   const CRATE_NAME_PADDING = 24
 
