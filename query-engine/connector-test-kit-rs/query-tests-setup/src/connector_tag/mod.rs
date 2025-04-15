@@ -23,7 +23,7 @@ pub(crate) use vitess::*;
 use crate::{datamodel_rendering::DatamodelRenderer, BoxFuture, TestConfig, TestError, CONFIG};
 use psl::datamodel_connector::ConnectorCapabilities;
 use quaint::prelude::SqlFamily;
-use std::{convert::TryFrom, fmt};
+use std::{convert::TryFrom, fmt, fs};
 
 pub trait ConnectorTagInterface {
     fn raw_execute<'a>(&'a self, query: &'a str, connection_url: &'a str) -> BoxFuture<'a, Result<(), TestError>>;
@@ -170,12 +170,16 @@ pub(crate) fn connection_string(
             None => unreachable!("A versioned connector must have a concrete version to run."),
         },
         ConnectorVersion::Sqlite(_) => {
-            let workspace_root = std::env::var("WORKSPACE_ROOT")
+            let working_dir = std::env::var("RAMDISK")
+                .or_else(|_| std::env::var("WORKSPACE_ROOT"))
                 .unwrap_or_else(|_| ".".to_owned())
                 .trim_end_matches('/')
                 .to_owned();
 
-            format!("file://{workspace_root}/db/{database}.db")
+            let db_dir = format!("{working_dir}/db");
+            fs::create_dir_all(&db_dir).ok();
+
+            format!("file:{db_dir}/{database}.db")
         }
         ConnectorVersion::CockroachDb(v) => {
             // Use the same database and schema name for CockroachDB - unfortunately CockroachDB

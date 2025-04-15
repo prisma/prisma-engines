@@ -1,7 +1,7 @@
 use query_engine_tests::*;
 
 #[test_suite(capabilities(CreateMany, InsertReturning))]
-mod create_many {
+mod create_many_and_return {
     use indoc::indoc;
     use query_engine_tests::{assert_error, run_query};
 
@@ -122,7 +122,7 @@ mod create_many {
 
     // Covers: AutoIncrement ID working with basic autonincrement functionality.
     #[connector_test(schema(schema_2_cockroachdb), only(CockroachDb))]
-    async fn basic_create_many_autoincrement_cockroachdb(runner: Runner) -> TestResult<()> {
+    async fn basic_create_many_autoinc_cockroachdb(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(&runner, r#"mutation {
             createManyTestAndReturn(data: [
@@ -775,7 +775,7 @@ mod create_many {
     exclude(MySql(5.6)),
     capabilities(Json, AdvancedJsonNullability, CreateMany, InsertReturning)
 )]
-mod json_create_many {
+mod json_create_many_and_return {
     use query_engine_tests::{assert_error, run_query};
 
     #[connector_test]

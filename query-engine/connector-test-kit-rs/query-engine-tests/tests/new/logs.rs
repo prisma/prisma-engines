@@ -6,7 +6,7 @@ use query_engine_tests::*;
         MongoDb,
         Vitess("planetscale.js.wasm"),
         Postgres("neon.js.wasm", "pg.js.wasm"),
-        Sqlite("libsql.js.wasm", "cfd1", "react-native")
+        Sqlite("libsql.js.wasm", "cfd1", "react-native", "better-sqlite3")
     )
 )]
 mod logs {

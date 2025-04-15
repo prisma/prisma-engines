@@ -36,7 +36,10 @@ mod raw_errors {
 
     #[connector_test(
         only(Postgres, Sqlite),
-        exclude(Postgres("neon.js.wasm", "pg.js.wasm"), Sqlite("libsql.js.wasm", "cfd1"))
+        exclude(
+            Postgres("neon.js.wasm", "pg.js.wasm"),
+            Sqlite("libsql.js.wasm", "cfd1", "better-sqlite3")
+        )
     )]
     async fn invalid_parameter_count(runner: Runner) -> TestResult<()> {
         assert_error!(
