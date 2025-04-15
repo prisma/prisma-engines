@@ -1,3 +1,0 @@
-THIS WILL BE REMOVED BEFORE THE PR IS MERGED
-
-Needed this file to trigger the tests on CI.

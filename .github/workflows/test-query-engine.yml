@@ -5,10 +5,10 @@ on:
       - main
   pull_request:
     paths-ignore:
+      - '.github/**'
       - '!.github/workflows/test-query-engine.yml'
       - '!.github/workflows/test-query-engine-template.yml'
       - '!.github/workflows/include/rust-wasm-setup/action.yml'
-      - '.github/**'
       - '.buildkite/**'
       - '*.md'
       - 'LICENSE'
