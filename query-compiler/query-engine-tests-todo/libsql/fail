@@ -672,8 +672,6 @@ writes::nested_mutations::already_converted::nested_delete_inside_upsert::delete
 writes::nested_mutations::already_converted::nested_delete_inside_upsert::delete_inside_upsert::p1_c1_should_work
 writes::nested_mutations::already_converted::nested_delete_inside_upsert::delete_inside_upsert::p1_cm_by_id_and_filters_should_work
 writes::nested_mutations::already_converted::nested_delete_inside_upsert::delete_inside_upsert::p1_cm_should_work
-writes::nested_mutations::already_converted::nested_delete_inside_upsert::delete_inside_upsert::p1_req_cm_by_filter_should_error
-writes::nested_mutations::already_converted::nested_delete_inside_upsert::delete_inside_upsert::p1_req_cm_should_error
 writes::nested_mutations::already_converted::nested_delete_inside_upsert::delete_inside_upsert::pm_c1_by_id_and_filter_should_work
 writes::nested_mutations::already_converted::nested_delete_inside_upsert::delete_inside_upsert::pm_c1_error_if_filters_dont_match
 writes::nested_mutations::already_converted::nested_delete_inside_upsert::delete_inside_upsert::pm_c1_error_if_not_connected

@@ -338,7 +338,6 @@ queries::filters::insensitive_filters::insensitive::list_containment_ops
 queries::filters::insensitive_filters::insensitive::neg_string_matchers
 queries::filters::insensitive_filters::insensitive::numeric_matchers
 queries::filters::insensitive_filters::insensitive::string_matchers
-queries::filters::json::json::req_json_null_filters
 queries::filters::json_filters::json_filters::multi_filtering
 queries::filters::json_filters::json_filters::multi_filtering_pg_json
 queries::filters::json_filters::json_filters::no_path_without_filter
@@ -548,7 +547,6 @@ queries::order_and_pagination::order_by_nulls::order_by_nulls::nulls_on_list_fie
 queries::order_and_pagination::order_by_nulls::order_by_nulls::ordering_by_nulls_should_be_optional
 queries::order_and_pagination::order_by_nulls::order_by_nulls::two_fields_nulls_first
 queries::order_and_pagination::order_by_nulls::order_by_nulls::two_fields_nulls_last
-queries::order_and_pagination::order_by_relevance::order_by_relevance_without_index::on_unknown_field
 queries::order_and_pagination::pagination::pagination::cursor_on_unique
 queries::order_and_pagination::pagination::pagination::cursor_take_skip_multiple_unstable_order
 queries::order_and_pagination::relation_filter_ordering::rel_filter_ordering::rel_filters
@@ -615,7 +613,6 @@ writes::data_types::datetime::datetime::datetime::before_1970
 writes::data_types::datetime::datetime::datetime::date_after_1970
 writes::data_types::datetime::datetime::datetime::ms_in_date_after_1970
 writes::data_types::datetime::datetime::datetime::ms_in_date_before_1970
-writes::data_types::datetime::updated_at_should_change::updated_at::upsert_should_change_updated_at
 writes::data_types::datetime::where_and_datetime::where_and_datetime::test_1
 writes::data_types::datetime::where_and_datetime::where_and_datetime::test_2
 writes::data_types::datetime::where_and_update::where_and_update::update_unique_val
@@ -629,7 +626,6 @@ writes::data_types::native_types::postgres::postgres::native_int_types
 writes::data_types::native_types::postgres::postgres::native_other_types
 writes::data_types::native_types::postgres::postgres::native_string
 writes::data_types::scalar_list::base::basic_types::behave_like_regular_val_for_create_and_update
-writes::data_types::scalar_list::base::basic_types::create_mut_empty_scalar_should_fail
 writes::data_types::scalar_list::base::basic_types::create_mut_return_items_with_empty_lists
 writes::data_types::scalar_list::base::basic_types::create_mut_work_with_list_vals
 writes::data_types::scalar_list::base::basic_types::set_base
@@ -763,8 +759,6 @@ writes::nested_mutations::already_converted::nested_delete_inside_upsert::delete
 writes::nested_mutations::already_converted::nested_delete_inside_upsert::delete_inside_upsert::p1_c1_should_work
 writes::nested_mutations::already_converted::nested_delete_inside_upsert::delete_inside_upsert::p1_cm_by_id_and_filters_should_work
 writes::nested_mutations::already_converted::nested_delete_inside_upsert::delete_inside_upsert::p1_cm_should_work
-writes::nested_mutations::already_converted::nested_delete_inside_upsert::delete_inside_upsert::p1_req_cm_by_filter_should_error
-writes::nested_mutations::already_converted::nested_delete_inside_upsert::delete_inside_upsert::p1_req_cm_should_error
 writes::nested_mutations::already_converted::nested_delete_inside_upsert::delete_inside_upsert::pm_c1_by_id_and_filter_should_work
 writes::nested_mutations::already_converted::nested_delete_inside_upsert::delete_inside_upsert::pm_c1_error_if_filters_dont_match
 writes::nested_mutations::already_converted::nested_delete_inside_upsert::delete_inside_upsert::pm_c1_error_if_not_connected
