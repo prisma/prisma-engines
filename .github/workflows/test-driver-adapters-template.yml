@@ -31,6 +31,7 @@ jobs:
       SIMPLE_TEST_MODE: '1'
       QUERY_BATCH_SIZE: '10'
       WASM_BUILD_PROFILE: 'profiling' # Include debug info for proper backtraces
+      RAMDISK: '/mnt/ramdisk'
       WORKSPACE_ROOT: ${{ github.workspace }}
 
     runs-on: ubuntu-latest
@@ -39,6 +40,12 @@ jobs:
         with:
           # using head ref rather than merge branch to get original commit message
           ref: ${{ github.event.pull_request.head.sha }}
+
+      - name: Create ramdisk
+        run: |
+          sudo mkdir ${{ env.RAMDISK }}
+          sudo mount -t tmpfs -o size=2G tmpfs /mnt/ramdisk
+          echo "Ramdisk (2GB): /mnt/ramdisk"
 
       - name: 'Setup Node.js'
         uses: actions/setup-node@v4
