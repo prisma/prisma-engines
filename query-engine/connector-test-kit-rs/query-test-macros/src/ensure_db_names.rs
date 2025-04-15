@@ -37,7 +37,7 @@ impl UniqueTestDatabaseNames {
             }
 
             Err(_) => {
-                // Ignore poisoned RwLock, when another thread has already panicked.
+                // Ignore poisoned Mutex, when another thread has already panicked.
                 // This prevents spamming the error output.
             }
         }
