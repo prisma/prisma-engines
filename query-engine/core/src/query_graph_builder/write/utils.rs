@@ -51,6 +51,29 @@ where
     Query::Read(read_query)
 }
 
+/// Produces a non-failing read query that fetches the requested selection of a record for a given filterable.
+pub(crate) fn read_id_infallible<T>(model: Model, selection: FieldSelection, filter: T) -> Query
+where
+    T: Into<Filter>,
+{
+    let selected_fields = get_selected_fields(&model, selection);
+    let filter: Filter = filter.into();
+
+    let read_query = ReadQuery::RecordQuery(RecordQuery {
+        name: "read_ids_infallible".into(), // this name only eases debugging
+        alias: None,
+        model: model.clone(),
+        filter: Some(filter),
+        selected_fields,
+        nested: vec![],
+        selection_order: vec![],
+        options: QueryOptions::none(),
+        relation_load_strategy: query_structure::RelationLoadStrategy::Query,
+    });
+
+    Query::Read(read_query)
+}
+
 fn get_selected_fields(model: &Model, selection: FieldSelection) -> FieldSelection {
     // Always fetch the primary identifier as well.
     let primary_model_id = model.primary_identifier();

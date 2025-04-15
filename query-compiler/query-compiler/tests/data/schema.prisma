@@ -13,6 +13,13 @@ model User {
   posts Post[]
 }
 
+model Employee {
+  id        Int        @id @default(autoincrement())
+  manager   Employee?  @relation(name: "EmployeeManager", fields: [managerId], references: [id])
+  managerId Int?
+  managed   Employee[] @relation(name: "EmployeeManager")
+}
+
 model UserWithGenerators {
   id        String   @id @default(uuid(7))
   email     String   @unique
