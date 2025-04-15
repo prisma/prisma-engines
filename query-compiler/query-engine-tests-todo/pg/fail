@@ -99,7 +99,6 @@ new::regressions::prisma_13097::prisma_13097::group_by_boolean_array
 new::regressions::prisma_13097::prisma_13097::group_by_enum_array
 new::regressions::prisma_13158::prisma_1358::insert_mixed_int_float_array_in_execute_raw
 new::regressions::prisma_14001::prisma_14001::pascal_cased_field_names_work_in_aggregations
-new::regressions::prisma_14696::prisma_14696::create_does_not_panic
 new::regressions::prisma_15177::prisma_15177::repro
 new::regressions::prisma_21182::regression::query_with_normalized_dependencies
 new::regressions::prisma_21369::prisma_21369::select_null_works
@@ -238,9 +237,6 @@ queries::batching::transactional_batch::transactional::raw_mix
 queries::batching::transactional_batch::transactional::two_query_for_batch
 queries::batching::transactional_batch::transactional::two_success
 queries::batching::transactional_batch::transactional::valid_isolation_level
-queries::chunking::chunking::asc_in_ordering
-queries::chunking::chunking::desc_in_ordering
-queries::chunking::chunking::in_more_items
 queries::chunking::chunking::order_by_aggregation_should_fail
 queries::chunking::chunking::order_by_relevance_should_fail
 queries::chunking::chunking::reproductions::issue_23743
