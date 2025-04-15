@@ -176,7 +176,7 @@ pub(crate) fn connection_string(
                 .trim_end_matches('/')
                 .to_owned();
 
-            let db_dir = format!("{}/db", working_dir);
+            let db_dir = format!("{working_dir}/db");
             fs::create_dir_all(&db_dir).ok();
 
             format!("file:{db_dir}/{database}.db")
