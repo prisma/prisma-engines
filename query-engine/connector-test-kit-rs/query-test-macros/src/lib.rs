@@ -3,6 +3,7 @@ extern crate proc_macro;
 mod args;
 mod attr_map;
 mod connector_test;
+mod ensure_db_names;
 mod relation_link_test;
 mod test_suite;
 

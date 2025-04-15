@@ -2,7 +2,7 @@ use indoc::indoc;
 use query_engine_tests::*;
 
 #[test_suite(only(Postgres, CockroachDb))]
-mod datetime {
+mod postgres_datetime {
     fn schema_date() -> String {
         let schema = indoc! {
             r#"model Parent {
@@ -73,7 +73,7 @@ mod datetime {
 }
 
 #[test_suite(only(Postgres))]
-mod decimal {
+mod postgres_decimal {
     fn schema_decimal() -> String {
         let schema = indoc! {
             r#"
@@ -135,7 +135,7 @@ mod decimal {
 }
 
 #[test_suite(only(Postgres))]
-mod string {
+mod postgres_string {
     fn schema_string() -> String {
         let schema = indoc! {
             r#"
@@ -216,7 +216,7 @@ mod string {
     schema(schema),
     only(Postgres("9", "10", "11", "12", "13", "14", "15", "pg.js.wasm", "neon.js.wasm"))
 )]
-mod others {
+mod postgres_others {
     fn schema_other_types() -> String {
         let schema = indoc! {
             r#"

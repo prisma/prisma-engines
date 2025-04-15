@@ -170,14 +170,16 @@ pub(crate) fn connection_string(
             None => unreachable!("A versioned connector must have a concrete version to run."),
         },
         ConnectorVersion::Sqlite(_) => {
-            let workspace_root = std::env::var("WORKSPACE_ROOT")
+            let working_dir = std::env::var("RAMDISK")
+                .or_else(|_| std::env::var("WORKSPACE_ROOT"))
                 .unwrap_or_else(|_| ".".to_owned())
                 .trim_end_matches('/')
                 .to_owned();
 
-            fs::create_dir_all(format!("{workspace_root}/db")).ok();
+            let db_dir = format!("{working_dir}/db");
+            fs::create_dir_all(&db_dir).ok();
 
-            format!("file:{workspace_root}/db/{database}.db")
+            format!("file:{db_dir}/{database}.db")
         }
         ConnectorVersion::CockroachDb(v) => {
             // Use the same database and schema name for CockroachDB - unfortunately CockroachDB

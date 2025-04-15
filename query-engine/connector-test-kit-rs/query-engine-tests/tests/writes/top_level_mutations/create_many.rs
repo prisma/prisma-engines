@@ -101,7 +101,7 @@ mod create_many {
 
     // Covers: AutoIncrement ID working with basic autonincrement functionality.
     #[connector_test(schema(schema_2_cockroachdb), only(CockroachDb))]
-    async fn basic_create_many_autoincrement_cockroachdb(runner: Runner) -> TestResult<()> {
+    async fn basic_create_many_autoinc_cockroachdb(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(&runner, r#"mutation {
             createManyTest(data: [
