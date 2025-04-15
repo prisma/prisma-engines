@@ -88,9 +88,18 @@ class QueryPipeline {
     query: JsonProtocolQuery,
     allowTransaction: boolean,
   ) {
-    const queryPlanString = withLocalPanicHandler(() =>
-      this.compiler.compile(JSON.stringify(query)),
-    )
+    let queryPlanString: string
+    try {
+      queryPlanString = withLocalPanicHandler(() =>
+        this.compiler.compile(JSON.stringify(query)),
+      )
+    } catch (error) {
+      if (typeof error.message === 'string' && typeof error.code === 'string') {
+        throw new UserFacingError(error.message, error.code, error.meta)
+      } else {
+        throw error
+      }
+    }
 
     const queryPlan = JSON.parse(queryPlanString)
 
