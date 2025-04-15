@@ -71,7 +71,7 @@ mod datetime {
 }
 
 #[test_suite(only(Mysql("8")))]
-mod decimal {
+mod mysql_decimal {
     fn schema_decimal() -> String {
         let schema = indoc! {
             r#"
@@ -131,7 +131,7 @@ mod decimal {
 }
 
 #[test_suite(only(Mysql("8")))]
-mod string {
+mod mysql_string {
     fn schema_string() -> String {
         let schema = indoc! {
             r#"
@@ -206,7 +206,7 @@ mod string {
 }
 
 #[test_suite(only(MySql("8")))]
-mod bytes {
+mod mysql_bytes {
     fn schema_bytes() -> String {
         let schema = indoc! {
             r#"
