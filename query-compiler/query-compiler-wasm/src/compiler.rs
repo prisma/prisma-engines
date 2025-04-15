@@ -1,8 +1,8 @@
 use psl::ConnectorRegistry;
 use quaint::connector::ConnectionInfo;
-use query_compiler::Expression;
-use query_core::{ArgumentValue, BatchDocument, QueryDocument, protocol::EngineProtocol};
-use request_handlers::RequestBody;
+use query_compiler::{CompileError, Expression, TranslateError};
+use query_core::{ArgumentValue, BatchDocument, QueryDocument, QueryGraphBuilderError, protocol::EngineProtocol};
+use request_handlers::{HandlerError, RequestBody};
 use serde::{Deserialize, Serialize};
 use std::{collections::HashMap, sync::Arc};
 use tsify_next::Tsify;
@@ -86,17 +86,17 @@ impl QueryCompiler {
     }
 
     #[wasm_bindgen]
-    pub fn compile(&self, request: String) -> Result<String, wasm_bindgen::JsError> {
+    pub fn compile(&self, request: String) -> Result<String, JsCompileError> {
         let request = RequestBody::try_from_str(&request, self.protocol)?;
         let QueryDocument::Single(op) = request.into_doc(&self.schema)? else {
-            return Err(wasm_bindgen::JsError::new("Unexpected batch request"));
+            return Err(JsCompileError::plain("Unexpected batch request"));
         };
         let plan = query_compiler::compile(&self.schema, op, &self.connection_info)?;
         Ok(serde_json::to_string(&plan)?)
     }
 
     #[wasm_bindgen(js_name = compileBatch)]
-    pub fn compile_batch(&self, request: String) -> Result<BatchResponse, wasm_bindgen::JsError> {
+    pub fn compile_batch(&self, request: String) -> Result<BatchResponse, JsCompileError> {
         let request = RequestBody::try_from_str(&request, self.protocol)?;
         match request.into_doc(&self.schema)? {
             QueryDocument::Single(op) => {
@@ -142,4 +142,62 @@ pub enum BatchResponse {
         keys: Vec<String>,
         expect_non_empty: bool,
     },
+}
+
+#[derive(Serialize, Tsify)]
+#[tsify(into_wasm_abi)]
+pub struct JsCompileError {
+    message: String,
+    code: Option<String>,
+    meta: Option<serde_json::Value>,
+}
+
+impl JsCompileError {
+    pub fn plain(message: impl Into<String>) -> Self {
+        JsCompileError {
+            message: message.into(),
+            code: None,
+            meta: None,
+        }
+    }
+}
+
+impl From<CompileError> for JsCompileError {
+    fn from(value: CompileError) -> Self {
+        match value {
+            CompileError::GraphBuildError(QueryGraphBuilderError::QueryParserError(error))
+            | CompileError::TranslateError(TranslateError::GraphBuildError(
+                QueryGraphBuilderError::QueryParserError(error),
+            )) => JsCompileError {
+                message: error.message().into(),
+                code: Some(error.kind().code().into()),
+                meta: error.meta().cloned(),
+            },
+            _ => JsCompileError {
+                message: value.to_string(),
+                code: None,
+                meta: None,
+            },
+        }
+    }
+}
+
+impl From<serde_json::Error> for JsCompileError {
+    fn from(error: serde_json::Error) -> Self {
+        JsCompileError {
+            message: format!("JSON Error: {error}"),
+            code: None,
+            meta: None,
+        }
+    }
+}
+
+impl From<HandlerError> for JsCompileError {
+    fn from(error: HandlerError) -> Self {
+        JsCompileError {
+            message: format!("{error}"),
+            code: None,
+            meta: None,
+        }
+    }
 }

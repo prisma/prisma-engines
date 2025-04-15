@@ -16,6 +16,20 @@ pub struct ValidationError {
     meta: Option<serde_json::Value>,
 }
 
+impl ValidationError {
+    pub fn kind(&self) -> &ValidationErrorKind {
+        &self.kind
+    }
+
+    pub fn message(&self) -> &str {
+        &self.message
+    }
+
+    pub fn meta(&self) -> Option<&serde_json::Value> {
+        self.meta.as_ref()
+    }
+}
+
 impl fmt::Display for ValidationError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.write_str(&self.message)
@@ -32,7 +46,7 @@ pub enum ValidationErrorKind {
     InvalidArgumentType,
     ///See [`ValidationError::invalid_argument_value`]
     InvalidArgumentValue,
-    /// See [`ValidationError::some_fields_missing`]    
+    /// See [`ValidationError::some_fields_missing`]
     SomeFieldsMissing,
     /// See [`ValidationError::too_many_fields_given`]
     TooManyFieldsGiven,
@@ -61,7 +75,7 @@ impl ValidationErrorKind {
     /// codes when subscribing to error events. Otherwise, we could be introducing a breaking change.
     ///
     /// [r]: https://www.prisma.io/docs/reference/api-reference/error-reference
-    fn code(&self) -> &'static str {
+    pub fn code(&self) -> &'static str {
         match self {
             ValidationErrorKind::RequiredArgumentMissing => "P2012",
             _ => "P2009",

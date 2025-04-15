@@ -1,0 +1,14 @@
+{
+  "modelName": "Employee",
+  "action": "updateOne",
+  "query": {
+    "arguments": {
+      "where": { "id": 1 },
+      "data": { "manager": { "connect": { "id": 2 } } }
+    },
+    "selection": {
+      "$composites": true,
+      "$scalars": true
+    }
+  }
+}

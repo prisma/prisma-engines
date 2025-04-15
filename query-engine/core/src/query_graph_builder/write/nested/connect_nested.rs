@@ -160,7 +160,7 @@ fn handle_one_to_many(
     let child_link = parent_relation_field.related_field().linking_fields();
 
     if parent_relation_field.relation_is_inlined_in_parent() {
-        let read_query = utils::read_ids_infallible(child_model.clone(), child_link.clone(), child_filter);
+        let read_query = utils::read_id_infallible(child_model.clone(), child_link.clone(), child_filter);
         let read_children_node = graph.create_node(read_query);
         let relation_name = parent_relation_field.relation().name();
         let parent_model_name = parent_relation_field.model().name().to_owned();
@@ -373,7 +373,7 @@ fn handle_one_to_one_parent_update(
     let relation_inlined_parent = parent_relation_field.relation_is_inlined_in_parent();
     let relation_inlined_child = !relation_inlined_parent;
 
-    let read_query = utils::read_ids_infallible(child_model.clone(), child_linking_fields.clone(), filter);
+    let read_query = utils::read_id_infallible(child_model.clone(), child_linking_fields.clone(), filter);
     let read_new_child_node = graph.create_node(read_query);
 
     // We always start with the read node in a nested connect 1:1 scenario.
@@ -544,7 +544,7 @@ fn handle_one_to_one_parent_create(
     let relation_inlined_parent = parent_relation_field.relation_is_inlined_in_parent();
     let relation_inlined_child = !relation_inlined_parent;
 
-    let read_query = utils::read_ids_infallible(child_model.clone(), child_linking_fields.clone(), filter);
+    let read_query = utils::read_id_infallible(child_model.clone(), child_linking_fields.clone(), filter);
     let read_new_child_node = graph.create_node(read_query);
 
     // We always start with the read node in a nested connect 1:1 scenario.
