@@ -54,7 +54,8 @@ jobs:
       - name: 'Start ${{ matrix.database.name }}'
         run: make start-${{ matrix.database.name }}-single
 
-      - run: cargo nextest run -p mongodb-schema-connector
+      # MongoDB tests MUST run single threaded
+      - run: cargo nextest run -p mongodb-schema-connector --test-threads=1
         env:
           CLICOLOR_FORCE: 1
           TEST_DATABASE_URL: ${{ matrix.database.url }}
@@ -173,6 +174,6 @@ jobs:
           sudo sc start MySQL
 
       - name: Run tests
-        run: cargo nextest run -p sql-migration-tests
+        run: cargo nextest run -p sql-migration-tests --test-threads=8
         env:
           TEST_DATABASE_URL: ${{ matrix.database.url }}

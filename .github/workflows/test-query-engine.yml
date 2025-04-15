@@ -35,7 +35,7 @@ jobs:
       single_threaded: false
 
   postgres-push:
-    if: github.event_name == 'push'
+#    if: github.event_name == 'push'
     strategy:
       fail-fast: false
       matrix:
@@ -80,7 +80,7 @@ jobs:
       relation_load_strategy: ${{ matrix.database.relation_load_strategy }}
 
   mysql-push:
-    if: github.event_name == 'push'
+#    if: github.event_name == 'push'
     strategy:
       fail-fast: false
       matrix:
@@ -104,7 +104,7 @@ jobs:
       relation_load_strategy: ${{ matrix.database.relation_load_strategy }}
 
   cockroachdb-push:
-    if: github.event_name == 'push'
+#    if: github.event_name == 'push'
     strategy:
       fail-fast: false
       matrix:
@@ -136,12 +136,13 @@ jobs:
     with:
       name: ${{ matrix.database.name }}
       version: ${{ matrix.database.version }}
+      # MongoDB tests MUST run single threaded
+      single_threaded: true
       connector: 'mongodb'
-      single_threaded: false
       relation_load_strategy: '["query"]'
 
   mongodb-push:
-    if: github.event_name == 'push'
+#    if: github.event_name == 'push'
     strategy:
       fail-fast: false
       matrix:
@@ -155,8 +156,9 @@ jobs:
     with:
       name: ${{ matrix.database.name }}
       version: ${{ matrix.database.version }}
+      # MongoDB tests MUST run single threaded
+      single_threaded: true
       connector: 'mongodb'
-      single_threaded: false
       relation_load_strategy: '["query"]'
 
   mssql:
@@ -178,7 +180,7 @@ jobs:
       relation_load_strategy: '["query"]'
 
   mssql-push:
-    if: github.event_name == 'push'
+#    if: github.event_name == 'push'
     strategy:
       fail-fast: false
       matrix:

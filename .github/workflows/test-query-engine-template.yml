@@ -24,6 +24,8 @@ jobs:
   rust-query-engine-tests:
     name: '${{ matrix.engine_protocol }} ${{ matrix.relation_load_strategy }} ${{ matrix.partition }}'
 
+    timeout-minutes: 60
+
     strategy:
       fail-fast: false
       matrix:
@@ -82,6 +84,16 @@ jobs:
 
       - name: 'Start ${{ inputs.name }} (${{ matrix.engine_protocol }})'
         run: make start-${{ inputs.name }}
+
+      - name: Use custom Nextest config if it exists
+        run: |
+          CUSTOM_NEXTEST_CONFIG=".config/nextest.$TEST_CONNECTOR.toml"
+          if [[ -e "$CUSTOM_NEXTEST_CONFIG" ]]; then
+            echo "Using custom Nextest config: $CUSTOM_NEXTEST_CONFIG"
+            mv -f "$CUSTOM_NEXTEST_CONFIG" .config/nextest.toml
+          else
+            echo 'Using common Nextest config: .config/nextest.toml'
+          fi
 
       - run: cargo nextest run -p query-engine-tests --partition hash:${{ matrix.partition }} --test-threads=1
         if: ${{ inputs.single_threaded }}

@@ -1,14 +1,10 @@
 use super::*;
-use crate::ensure_db_names::UniqueTestDatabaseNames;
+use crate::ensure_db_names::UNIQUE_TEST_DATABASE_NAMES;
 use darling::{ast::NestedMeta, FromMeta};
 use proc_macro::TokenStream;
 use proc_macro2::{Ident, Span};
 use quote::quote;
-use std::sync::{Arc, LazyLock};
 use syn::{parse_macro_input, ItemFn};
-
-static UNIQUE_TEST_DATABASE_NAMES: LazyLock<Arc<UniqueTestDatabaseNames>> =
-    LazyLock::new(|| Arc::new(UniqueTestDatabaseNames::new()));
 
 pub fn connector_test_impl(attr: TokenStream, input: TokenStream) -> TokenStream {
     let attributes_meta = match NestedMeta::parse_meta_list(attr.into()) {
