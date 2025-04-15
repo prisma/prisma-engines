@@ -82,8 +82,8 @@ pub trait QueryBuilder {
     fn build_m2m_connect(
         &self,
         field: RelationField,
-        parent_id: &SelectionResult,
-        child_ids: &[SelectionResult],
+        parent: PrismaValue,
+        child: PrismaValue,
     ) -> Result<DbQuery, Box<dyn std::error::Error + Send + Sync>>;
 
     fn build_m2m_disconnect(
@@ -189,6 +189,11 @@ impl fmt::Display for DbQuery {
                             write!(formatter, "[")?;
                             placeholder_format.write(formatter, &mut number)?;
                             write!(formatter, "]")?;
+                        }
+                        Fragment::ParameterTupleList => {
+                            write!(formatter, "[(")?;
+                            placeholder_format.write(formatter, &mut number)?;
+                            write!(formatter, ")]")?;
                         }
                     };
                 }

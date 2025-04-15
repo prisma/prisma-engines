@@ -173,6 +173,26 @@ impl<'a> Visitor<'a> for Sqlite<'a> {
 
         match insert.values {
             Expression {
+                kind: ExpressionKind::Parameterized(row),
+                ..
+            } => {
+                let columns = insert.columns.len();
+
+                self.write(" (")?;
+                for (i, c) in insert.columns.into_iter().enumerate() {
+                    self.visit_column(c.name.into_owned().into())?;
+
+                    if i < (columns - 1) {
+                        self.write(", ")?;
+                    }
+                }
+
+                self.write(")")?;
+                self.write(" VALUES ")?;
+                self.query_template.write_parameter_tuple_list();
+                self.query_template.parameters.push(row);
+            }
+            Expression {
                 kind: ExpressionKind::Row(row),
                 ..
             } => {

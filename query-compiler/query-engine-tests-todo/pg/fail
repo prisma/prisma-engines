@@ -875,17 +875,10 @@ writes::top_level_mutations::create::create::return_item_non_null_attrs_then_exp
 writes::top_level_mutations::create::json_create::create_json_adv
 writes::top_level_mutations::create::mapped_create::mapped_name_with_space_does_not_break_returning
 writes::top_level_mutations::create_list::create_list::create_not_accept_null_in_set
-writes::top_level_mutations::create_many_and_return::create_many_and_return::basic_create_many
-writes::top_level_mutations::create_many_and_return::create_many_and_return::basic_create_many_autoincrement
 writes::top_level_mutations::create_many_and_return::create_many_and_return::basic_create_many_shorthand
 writes::top_level_mutations::create_many_and_return::create_many_and_return::create_many_11_inline_rel_read_works
 writes::top_level_mutations::create_many_and_return::create_many_and_return::create_many_1m_inline_rel_read_works
-writes::top_level_mutations::create_many_and_return::create_many_and_return::create_many_by_shape
-writes::top_level_mutations::create_many_and_return::create_many_and_return::create_many_defaults_nulls
 writes::top_level_mutations::create_many_and_return::create_many_and_return::create_many_map_behavior
-writes::top_level_mutations::create_many_and_return::create_many_and_return::create_many_no_error_skip_dup
-writes::top_level_mutations::create_many_and_return::create_many_and_return::large_num_records_horizontal
-writes::top_level_mutations::create_many_and_return::json_create_many_and_return::create_many_json_adv
 writes::top_level_mutations::default_value::default_value::enum_field
 writes::top_level_mutations::default_value::default_value::int_field
 writes::top_level_mutations::default_value::default_value::non_list_field
@@ -899,7 +892,6 @@ writes::top_level_mutations::delete::delete::should_fail_non_existent_value_non_
 writes::top_level_mutations::delete_many::delete_many::nested_delete_many
 writes::top_level_mutations::delete_many::delete_many::should_delete_using_or
 writes::top_level_mutations::delete_many::delete_many::should_fail_with_negative_limit
-writes::top_level_mutations::delete_many_relations::delete_many_rels::p1_c1_no_children
 writes::top_level_mutations::delete_many_relations::delete_many_rels::pm_cm
 writes::top_level_mutations::delete_many_relations::delete_many_rels::pm_cm_other_relations
 writes::top_level_mutations::delete_mutation_relations::delete_mutation_relations::p1_c1
@@ -947,7 +939,6 @@ writes::top_level_mutations::update_many_and_return::update_many_and_return::app
 writes::top_level_mutations::update_many_and_return::update_many_and_return::apply_number_ops_for_int
 writes::top_level_mutations::update_many_and_return::update_many_and_return::update_all_items_if_where_empty
 writes::top_level_mutations::update_many_and_return::update_many_and_return::update_many_11_inline_rel_read_works
-writes::top_level_mutations::update_many_and_return::update_many_and_return::update_many_1m_inline_rel_read_works
 writes::top_level_mutations::update_many_and_return::update_many_and_return::update_recs_matching_where
 writes::top_level_mutations::update_many_and_return::update_many_and_return::update_recs_matching_where_shorthands
 writes::top_level_mutations::upsert::upsert::create_if_not_exist_with_default_val

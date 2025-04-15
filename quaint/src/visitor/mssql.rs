@@ -482,6 +482,21 @@ impl<'a> Visitor<'a> for Mssql<'a> {
 
         match insert.values {
             Expression {
+                kind: ExpressionKind::Parameterized(row),
+                ..
+            } => {
+                self.write(" ")?;
+                self.visit_row(Row::from(insert.columns))?;
+
+                if let Some(ref returning) = insert.returning {
+                    self.visit_returning(returning.clone())?;
+                }
+
+                self.write(" VALUES ")?;
+                self.query_template.write_parameter_tuple_list();
+                self.query_template.parameters.push(row);
+            }
+            Expression {
                 kind: ExpressionKind::Row(row),
                 ..
             } => {

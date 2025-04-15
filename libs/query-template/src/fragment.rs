@@ -6,4 +6,5 @@ pub enum Fragment {
     StringChunk(String),
     Parameter,
     ParameterTuple,
+    ParameterTupleList,
 }
