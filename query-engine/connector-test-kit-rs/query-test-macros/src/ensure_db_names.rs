@@ -16,9 +16,9 @@ impl UniqueTestDatabaseNames {
 
     pub fn ensure_unique(
         self: &UniqueTestDatabaseNames,
-        test_database_name: &String,
-        suite_name: &String,
-        test_name: &String,
+        test_database_name: &str,
+        suite_name: &str,
+        test_name: &str,
     ) {
         match self.names.lock() {
             Ok(mut names) => {
