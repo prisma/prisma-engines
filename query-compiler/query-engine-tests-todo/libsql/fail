@@ -802,7 +802,6 @@ writes::top_level_mutations::delete::delete::should_fail_non_existent_value_non_
 writes::top_level_mutations::delete_many::delete_many::nested_delete_many
 writes::top_level_mutations::delete_many::delete_many::should_delete_using_or
 writes::top_level_mutations::delete_many::delete_many::should_fail_with_negative_limit
-writes::top_level_mutations::delete_many_relations::delete_many_rels::p1_c1_no_children
 writes::top_level_mutations::delete_many_relations::delete_many_rels::pm_cm
 writes::top_level_mutations::delete_many_relations::delete_many_rels::pm_cm_other_relations
 writes::top_level_mutations::delete_mutation_relations::delete_mutation_relations::p1_c1
