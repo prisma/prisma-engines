@@ -43,4 +43,4 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: '22'
-      - run: npx prettier@3 --write '**/*.ts'
+      - run: npx prettier@3 --check '**/*.ts'
