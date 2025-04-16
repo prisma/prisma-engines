@@ -5,10 +5,10 @@ on:
       - main
   pull_request:
     paths-ignore:
+      - '.github/**'
       - '!.github/workflows/test-query-engine.yml'
       - '!.github/workflows/test-query-engine-template.yml'
       - '!.github/workflows/include/rust-wasm-setup/action.yml'
-      - '.github/**'
       - '.buildkite/**'
       - '*.md'
       - 'LICENSE'
@@ -32,7 +32,7 @@ jobs:
       name: ${{ matrix.database.name }}
       version: ${{ matrix.database.version }}
       connector: 'postgres'
-      single_threaded: true
+      single_threaded: false
 
   postgres-push:
     if: github.event_name == 'push'
@@ -60,7 +60,7 @@ jobs:
       name: ${{ matrix.database.name }}
       version: ${{ matrix.database.version }}
       connector: 'postgres'
-      single_threaded: true
+      single_threaded: false
 
   mysql:
     strategy:
@@ -76,8 +76,8 @@ jobs:
       name: ${{ matrix.database.name }}
       version: ${{ matrix.database.version }}
       connector: 'mysql'
+      single_threaded: false
       relation_load_strategy: ${{ matrix.database.relation_load_strategy }}
-      single_threaded: true
 
   mysql-push:
     if: github.event_name == 'push'
@@ -100,8 +100,8 @@ jobs:
       name: ${{ matrix.database.name }}
       version: ${{ matrix.database.version }}
       connector: 'mysql'
+      single_threaded: false
       relation_load_strategy: ${{ matrix.database.relation_load_strategy }}
-      single_threaded: true
 
   cockroachdb-push:
     if: github.event_name == 'push'
@@ -121,6 +121,7 @@ jobs:
       name: ${{ matrix.database.name }}
       version: ${{ matrix.database.version }}
       connector: 'cockroachdb'
+      single_threaded: false
 
   mongodb:
     strategy:
@@ -135,8 +136,8 @@ jobs:
     with:
       name: ${{ matrix.database.name }}
       version: ${{ matrix.database.version }}
-      single_threaded: true
       connector: 'mongodb'
+      single_threaded: false
       relation_load_strategy: '["query"]'
 
   mongodb-push:
@@ -154,8 +155,8 @@ jobs:
     with:
       name: ${{ matrix.database.name }}
       version: ${{ matrix.database.version }}
-      single_threaded: true
       connector: 'mongodb'
+      single_threaded: false
       relation_load_strategy: '["query"]'
 
   mssql:
@@ -173,6 +174,7 @@ jobs:
       version: ${{ matrix.database.version }}
       ubuntu: ${{ matrix.database.ubuntu }}
       connector: 'sqlserver'
+      single_threaded: false
       relation_load_strategy: '["query"]'
 
   mssql-push:
@@ -191,6 +193,7 @@ jobs:
       version: ${{ matrix.database.version }}
       ubuntu: ${{ matrix.database.ubuntu }}
       connector: 'sqlserver'
+      single_threaded: false
       relation_load_strategy: '["query"]'
 
   sqlite:
@@ -200,6 +203,7 @@ jobs:
       name: 'sqlite'
       version: 3
       connector: 'sqlite'
+      single_threaded: false
       relation_load_strategy: '["query"]'
 
   driver_adapters:

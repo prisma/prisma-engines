@@ -24,6 +24,7 @@ new::interactive_tx::interactive_tx::basic_commit_workflow
 new::interactive_tx::interactive_tx::commit_after_rollback
 new::regressions::prisma_12572::prisma_12572::all_generated_timestamps_are_the_same
 writes::top_level_mutations::create_many_and_return::create_many_and_return::large_num_records_vertical
+writes::top_level_mutations::delete_many_relations::delete_many_rels::p1_c1_no_children
 writes::top_level_mutations::update_many_and_return::update_many_and_return::update_many_11_non_inline_rel_read_fails
 writes::top_level_mutations::update_many_and_return::update_many_and_return::update_many_1m_non_inline_rel_read_fails
 
