@@ -13,32 +13,32 @@ import { BetterSQLite3Manager } from './driver-adapters-manager/better-sqlite3'
 
 export async function setupDriverAdaptersManager(
   env: Env,
-  input: SetupDriverAdaptersInput
+  input: SetupDriverAdaptersInput,
 ): Promise<DriverAdaptersManager> {
   return match(env)
     .with(
       { DRIVER_ADAPTER: 'pg' },
-      async (env) => await PgManager.setup(env, input)
+      async (env) => await PgManager.setup(env, input),
     )
     .with(
       { DRIVER_ADAPTER: 'neon:ws' },
-      async (env) => await NeonWsManager.setup(env, input)
+      async (env) => await NeonWsManager.setup(env, input),
     )
     .with(
       { DRIVER_ADAPTER: 'libsql' },
-      async (env) => await LibSQLManager.setup(env, input)
+      async (env) => await LibSQLManager.setup(env, input),
     )
     .with(
       { DRIVER_ADAPTER: 'planetscale' },
-      async (env) => await PlanetScaleManager.setup(env, input)
+      async (env) => await PlanetScaleManager.setup(env, input),
     )
     .with(
       { DRIVER_ADAPTER: 'd1' },
-      async (env) => await D1Manager.setup(env, input)
+      async (env) => await D1Manager.setup(env, input),
     )
     .with(
       { DRIVER_ADAPTER: 'better-sqlite3' },
-      async (env) => await BetterSQLite3Manager.setup(env, input)
+      async (env) => await BetterSQLite3Manager.setup(env, input),
     )
     .exhaustive()
 }

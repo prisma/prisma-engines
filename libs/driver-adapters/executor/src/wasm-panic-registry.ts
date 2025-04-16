@@ -26,9 +26,15 @@ export function isWasmPanic(error: Error): error is WasmPanic {
 /**
  * Extracts the error message and stack trace from a Wasm panic.
  */
-export function getWasmError(wasmPanicRegistry: WasmPanicRegistry, error: WasmPanic) {
+export function getWasmError(
+  wasmPanicRegistry: WasmPanicRegistry,
+  error: WasmPanic,
+) {
   const message: string = wasmPanicRegistry.get()
-  const stack = [message, ...(error.stack || 'NO_BACKTRACE').split('\n').slice(1)].join('\n')
+  const stack = [
+    message,
+    ...(error.stack || 'NO_BACKTRACE').split('\n').slice(1),
+  ].join('\n')
 
   return { message, stack }
 }

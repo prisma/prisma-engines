@@ -10,17 +10,11 @@ const initializedModules = new Set<SqlQueryable['provider']>()
 export async function getSchemaEngineForProvider(
   provider: SqlQueryable['provider'],
 ) {
-  const engine = await import(
-    `${relativePath}/schema_engine_bg.js`
-  )
+  const engine = await import(`${relativePath}/schema_engine_bg.js`)
 
   if (!initializedModules.has(provider)) {
     const bytes = await fs.readFile(
-      path.resolve(
-        __dirname,
-        relativePath,
-        'schema_engine_bg.wasm',
-      ),
+      path.resolve(__dirname, relativePath, 'schema_engine_bg.wasm'),
     )
 
     const module = new WebAssembly.Module(bytes)

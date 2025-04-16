@@ -1,6 +1,9 @@
 import { PrismaNeon } from '@prisma/adapter-neon'
 import { neon } from '@prisma/bundled-js-drivers'
-import type { SqlDriverAdapter, SqlDriverAdapterFactory } from '@prisma/driver-adapter-utils'
+import type {
+  SqlDriverAdapter,
+  SqlDriverAdapterFactory,
+} from '@prisma/driver-adapter-utils'
 import { WebSocket } from 'ws'
 import { postgresSchemaName, postgresOptions } from '../utils'
 import type { DriverAdaptersManager, SetupDriverAdaptersInput } from './index'
@@ -13,7 +16,10 @@ export class NeonWsManager implements DriverAdaptersManager {
   #factory: SqlDriverAdapterFactory
   #adapter?: SqlDriverAdapter
 
-  private constructor(private env: EnvForAdapter<TAG>, { url }: SetupDriverAdaptersInput) {
+  private constructor(
+    private env: EnvForAdapter<TAG>,
+    { url }: SetupDriverAdaptersInput,
+  ) {
     const schemaName = postgresSchemaName(url)
     this.#factory = new PrismaNeon(postgresOptions(url), {
       schema: schemaName,
