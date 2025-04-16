@@ -2,6 +2,7 @@ mod query;
 
 use super::expression::{Binding, Expression};
 use crate::Expression::Transaction;
+use crate::data_mapper::map_result_structure;
 use itertools::{Either, Itertools};
 use query::translate_query;
 use query_builder::QueryBuilder;
@@ -24,12 +25,23 @@ pub enum TranslateError {
 pub type TranslateResult<T> = Result<T, TranslateError>;
 
 pub fn translate(mut graph: QueryGraph, builder: &dyn QueryBuilder) -> TranslateResult<Expression> {
+    let structure = map_result_structure(&graph);
+
     let root = graph
         .root_nodes()
         .into_iter()
         .map(|node| NodeTranslator::new(&mut graph, node, &[], builder).translate())
         .collect::<TranslateResult<Vec<_>>>()
         .map(Expression::Seq)?;
+
+    let root = if let Some(structure) = structure {
+        Expression::DataMap {
+            expr: Box::new(root),
+            structure,
+        }
+    } else {
+        root
+    };
 
     if graph.needs_transaction() {
         return Ok(Transaction(Box::new(root)));

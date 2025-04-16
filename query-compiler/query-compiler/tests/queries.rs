@@ -1,13 +1,13 @@
-use std::{fs, sync::Arc};
-
 use quaint::{
     prelude::{ConnectionInfo, ExternalConnectionInfo, SqlFamily},
     visitor::Postgres,
 };
-use query_core::{QueryDocument, QueryGraphBuilder};
+use query_core::{QueryDocument, QueryGraphBuilder, ToGraphviz};
 use query_structure::psl;
 use request_handlers::{JsonBody, JsonSingleQuery, RequestBody};
 use sql_query_builder::{Context, SqlQueryBuilder};
+use std::path::PathBuf;
+use std::{fs, sync::Arc};
 
 #[test]
 fn queries() {
@@ -40,6 +40,18 @@ fn queries() {
             .without_eager_default_evaluation()
             .build(query)
             .unwrap();
+
+        let dot = graph.to_graphviz();
+        let dot_path = PathBuf::from(
+            path.to_str()
+                .unwrap()
+                .replace("/tests/data/", "/tests/graphs/")
+                .replace(".json", ".dot"),
+        );
+        if let Some(parent) = dot_path.parent() {
+            fs::create_dir_all(parent).unwrap();
+        }
+        fs::write(dot_path, dot).unwrap();
 
         let ctx = Context::new(&connection_info, None);
         let builder = SqlQueryBuilder::<Postgres<'_>>::new(ctx);

@@ -1,0 +1,26 @@
+---
+source: query-compiler/query-compiler/tests/queries.rs
+assertion_line: 58
+expression: pretty
+input_file: query-compiler/query-compiler/tests/data/query-o2m-in-memory-join.json
+snapshot_kind: text
+---
+dataMap
+   id: Int [id]
+   email: String [email]
+   activations: 
+      issued: Date [issued]
+      secret: String [secret]
+      done: Boolean [done]
+let @parent = query «SELECT "public"."User"."id", "public"."User"."email" FROM
+                     "public"."User" WHERE 1=1 OFFSET $1»
+              params [const(BigInt(0))]
+in let @parent$id = mapField id (get @parent)
+   in join (get @parent)
+      with (query «SELECT "public"."Activation"."id",
+                   "public"."Activation"."issued",
+                   "public"."Activation"."secret", "public"."Activation"."done",
+                   "public"."Activation"."userId" FROM "public"."Activation"
+                   WHERE "public"."Activation"."userId" IN [$1] OFFSET $2»
+            params [var(@parent$id as Int),
+                    const(BigInt(0))]) on left.(id) = right.(userId) as activations

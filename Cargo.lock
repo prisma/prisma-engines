@@ -3770,8 +3770,10 @@ dependencies = [
 name = "query-compiler"
 version = "0.1.0"
 dependencies = [
+ "indexmap 2.2.2",
  "insta",
  "itertools 0.13.0",
+ "log",
  "pretty",
  "psl",
  "quaint",

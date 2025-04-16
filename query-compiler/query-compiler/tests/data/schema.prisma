@@ -8,9 +8,10 @@ datasource db {
 }
 
 model User {
-  id    Int    @id @default(autoincrement())
-  email String @unique
-  posts Post[]
+  id          Int          @id @default(autoincrement())
+  email       String       @unique
+  posts       Post[]
+  activations Activation[]
 }
 
 model Employee {
@@ -53,4 +54,13 @@ model ChildOfModelWithCompositeId {
   parent  ParentModelWithCompositeId @relation(fields: [parentA, parentB], references: [a, b])
   parentA Int
   parentB Int
+}
+
+model Activation {
+  id     Int      @id @default(autoincrement())
+  issued DateTime @default(now())
+  secret String
+  done   Boolean
+  userId Int
+  user   User     @relation(fields: [userId], references: [id])
 }

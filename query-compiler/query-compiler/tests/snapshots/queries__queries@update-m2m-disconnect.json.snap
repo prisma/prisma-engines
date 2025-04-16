@@ -1,11 +1,15 @@
 ---
 source: query-compiler/query-compiler/tests/queries.rs
-assertion_line: 46
+assertion_line: 49
 expression: pretty
 input_file: query-compiler/query-compiler/tests/data/update-m2m-disconnect.json
 snapshot_kind: text
 ---
 transaction
+   dataMap
+      id: Int [id]
+      title: String [title]
+      userId: Int [userId]
    let 0 = unique (query «SELECT "public"."Post"."id", "public"."Post"."title",
                           "public"."Post"."userId" FROM "public"."Post" WHERE
                           ("public"."Post"."id" = $1 AND 1=1) LIMIT $2 OFFSET

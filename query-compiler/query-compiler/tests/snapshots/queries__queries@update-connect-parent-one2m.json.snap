@@ -1,9 +1,14 @@
 ---
 source: query-compiler/query-compiler/tests/queries.rs
+assertion_line: 49
 expression: pretty
 input_file: query-compiler/query-compiler/tests/data/update-connect-parent-one2m.json
+snapshot_kind: text
 ---
 transaction
+   dataMap
+      id: Int [id]
+      managerId: Int [managerId]
    let 1 = unique (query «SELECT "public"."Employee"."id" FROM
                           "public"."Employee" WHERE ("public"."Employee"."id" =
                           $1 AND 1=1) LIMIT $2 OFFSET $3»
