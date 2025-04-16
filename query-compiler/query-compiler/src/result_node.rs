@@ -1,8 +1,7 @@
+use indexmap::IndexMap;
 use indexmap::map::Entry;
-use indexmap::{Equivalent, IndexMap};
 use query_structure::PrismaValueType;
 use serde::Serialize;
-use std::hash::Hash;
 
 #[derive(Debug, Serialize)]
 #[serde(tag = "type", rename_all = "camelCase")]
@@ -30,24 +29,6 @@ impl ResultNode {
     pub fn add_field(&mut self, key: impl Into<String>, node: ResultNode) -> Option<ResultNode> {
         match self {
             ResultNode::Object { fields } => fields.insert(key.into(), node),
-            ResultNode::Value { .. } => {
-                panic!("Cannot add fields to a value");
-            }
-        }
-    }
-
-    pub fn get_field(&self, key: impl Equivalent<String> + Hash) -> Option<&ResultNode> {
-        match self {
-            ResultNode::Object { fields } => fields.get(&key),
-            ResultNode::Value { .. } => {
-                panic!("Cannot add fields to a value");
-            }
-        }
-    }
-
-    pub fn get_mut_field(&mut self, key: impl Equivalent<String> + Hash) -> Option<&mut ResultNode> {
-        match self {
-            ResultNode::Object { fields } => fields.get_mut(&key),
             ResultNode::Value { .. } => {
                 panic!("Cannot add fields to a value");
             }
