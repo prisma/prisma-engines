@@ -1,11 +1,11 @@
+use super::{Binding, DbQuery, Expression, JoinExpression};
+use crate::result_node::ResultNode;
 use pretty::{
     DocAllocator, DocBuilder,
     termcolor::{Color, ColorSpec},
 };
 use query_structure::PrismaValue;
 use std::borrow::Cow;
-
-use super::{Binding, DbQuery, Expression, JoinExpression};
 
 fn color_kw() -> ColorSpec {
     ColorSpec::new().set_fg(Some(Color::Blue)).clone()
@@ -56,6 +56,7 @@ where
             Expression::Join { parent, children } => self.join(parent, children),
             Expression::MapField { field, records } => self.map_field(field, records),
             Expression::Transaction(expression) => self.transaction(expression),
+            Expression::DataMap { expr, structure } => self.data_map(expr, structure),
         }
     }
 
@@ -261,6 +262,18 @@ where
             .append(self.softline())
             .append(self.softline())
             .append(self.expression(expr).align())
+    }
+
+    fn data_map(
+        &'a self,
+        expr: &'a Box<Expression>,
+        structure: &'a ResultNode,
+    ) -> DocBuilder<'a, PrettyPrinter<'a, D>, ColorSpec> {
+        self.keyword("dataMap")
+            .append(self.softline())
+            .append(self.text(format!("{structure:?}")))
+            .append(self.line())
+            .append(self.expression(expr).align()) // TODO!!!
     }
 }
 

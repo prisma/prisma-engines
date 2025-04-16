@@ -15,6 +15,7 @@ thiserror.workspace = true
 serde.workspace = true
 itertools.workspace = true
 pretty = { workspace = true, features = ["termcolor"] }
+indexmap = { workspace = true, features = ["serde"] }
 
 [dev-dependencies]
 insta = { workspace = true, features = ["glob"] }

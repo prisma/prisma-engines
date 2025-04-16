@@ -1,4 +1,7 @@
+pub mod compiled_query;
+mod data_mapper;
 pub mod expression;
+pub mod result_node;
 pub mod translate;
 
 use std::sync::Arc;
@@ -13,6 +16,8 @@ use sql_query_builder::{Context, SqlQueryBuilder};
 use thiserror::Error;
 pub use translate::{TranslateError, translate};
 
+use crate::compiled_query::CompiledQuery;
+use crate::data_mapper::map_result_structure;
 use query_core::QueryGraphBuilder;
 
 #[derive(Debug, Error)]
@@ -36,6 +41,7 @@ pub fn compile(
     let (graph, _serializer) = QueryGraphBuilder::new(query_schema)
         .without_eager_default_evaluation()
         .build(query)?;
+
     let res: Result<Expression, TranslateError> = match connection_info.sql_family() {
         #[cfg(feature = "postgresql")]
         SqlFamily::Postgres => translate(graph, &SqlQueryBuilder::<visitor::Postgres<'_>>::new(ctx)),

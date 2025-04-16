@@ -1,11 +1,13 @@
 ---
 source: query-compiler/query-compiler/tests/queries.rs
-assertion_line: 46
+assertion_line: 49
 expression: pretty
 input_file: query-compiler/query-compiler/tests/data/create-nested-connect.json
 snapshot_kind: text
 ---
 transaction
+   dataMap
+   Object { fields: {"id": Value { db_name: "id", result_type: Int }, "email": Value { db_name: "email", result_type: String }} }
    let 0 = unique (query «INSERT INTO "public"."User" ("email") VALUES ($1)
                           RETURNING "public"."User"."id"»
                    params [const(String("user.1737556028164@prisma.io"))])
