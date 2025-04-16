@@ -269,11 +269,31 @@ where
         expr: &'a Box<Expression>,
         structure: &'a ResultNode,
     ) -> DocBuilder<'a, PrettyPrinter<'a, D>, ColorSpec> {
-        self.keyword("dataMap")
-            .append(self.softline())
-            .append(self.text(format!("{structure:?}")))
-            .append(self.line())
-            .append(self.expression(expr).align()) // TODO!!!
+        let doc = self.keyword("dataMap");
+        let doc = self.data_map_node(doc, structure, "");
+        doc.append(self.expression(expr).align())
+    }
+
+    fn data_map_node(
+        &'a self,
+        doc: DocBuilder<'a, PrettyPrinter<'a, D>, ColorSpec>,
+        node: &ResultNode,
+        indent: &str,
+    ) -> DocBuilder<'a, PrettyPrinter<'a, D>, ColorSpec> {
+        match node {
+            ResultNode::Object { fields } => {
+                let mut builder = doc.append(self.line());
+                let indent = &format!("{indent}   ");
+                for (name, field) in fields {
+                    builder = builder.append(self.text(format!("{indent}{name}: ")));
+                    builder = self.data_map_node(builder, field, indent);
+                }
+                builder
+            }
+            ResultNode::Value { db_name, result_type } => doc
+                .append(self.text(format!("{result_type} [{db_name}]")))
+                .append(self.line()),
+        }
     }
 }
 

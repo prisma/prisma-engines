@@ -1,9 +1,8 @@
+use indexmap::map::Entry;
 use indexmap::{Equivalent, IndexMap};
 use query_structure::PrismaValueType;
 use serde::Serialize;
-use std::borrow::Borrow;
 use std::hash::Hash;
-use indexmap::map::Entry;
 
 #[derive(Debug, Serialize)]
 #[serde(tag = "type", rename_all = "camelCase")]

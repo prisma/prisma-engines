@@ -7,7 +7,8 @@ snapshot_kind: text
 ---
 transaction
    dataMap
-   Object { fields: {"id": Value { db_name: "id", result_type: Int }, "email": Value { db_name: "email", result_type: String }} }
+      id: Int [id]
+      email: String [email]
    let 0 = unique (query «SELECT "public"."User"."id", "public"."User"."email"
                           FROM "public"."User" WHERE ("public"."User"."email" =
                           $1 AND 1=1) LIMIT $2 OFFSET $3»

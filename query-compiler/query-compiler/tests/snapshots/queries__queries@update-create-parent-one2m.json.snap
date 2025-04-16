@@ -7,7 +7,8 @@ snapshot_kind: text
 ---
 transaction
    dataMap
-   Object { fields: {"id": Value { db_name: "id", result_type: Int }, "managerId": Value { db_name: "managerId", result_type: Int }} }
+      id: Int [id]
+      managerId: Int [managerId]
    let 1 = unique (query «INSERT INTO "public"."Employee" ("id") VALUES ($1)
                           RETURNING "public"."Employee"."id"»
                    params [const(BigInt(2))])

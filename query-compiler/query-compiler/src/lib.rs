@@ -16,8 +16,6 @@ use sql_query_builder::{Context, SqlQueryBuilder};
 use thiserror::Error;
 pub use translate::{TranslateError, translate};
 
-use crate::compiled_query::CompiledQuery;
-use crate::data_mapper::map_result_structure;
 use query_core::QueryGraphBuilder;
 
 #[derive(Debug, Error)]
