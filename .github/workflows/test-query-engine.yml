@@ -32,7 +32,7 @@ jobs:
       name: ${{ matrix.database.name }}
       version: ${{ matrix.database.version }}
       connector: 'postgres'
-      single_threaded: false
+      threads: 8
 
   postgres-push:
 #    if: github.event_name == 'push'
@@ -60,7 +60,7 @@ jobs:
       name: ${{ matrix.database.name }}
       version: ${{ matrix.database.version }}
       connector: 'postgres'
-      single_threaded: false
+      threads: 8
 
   mysql:
     strategy:
@@ -76,7 +76,7 @@ jobs:
       name: ${{ matrix.database.name }}
       version: ${{ matrix.database.version }}
       connector: 'mysql'
-      single_threaded: false
+      threads: 8
       relation_load_strategy: ${{ matrix.database.relation_load_strategy }}
 
   mysql-push:
@@ -100,7 +100,10 @@ jobs:
       name: ${{ matrix.database.name }}
       version: ${{ matrix.database.version }}
       connector: 'mysql'
-      single_threaded: false
+      # Reason for single threaded test: `test_itx_concurrent_updates_single_thread`
+      # This test fails with: `Query core error: Error in connector: Error creating a database connection. (Error in the underlying connector)`
+      # It does NOT happen on MySQL 8, only on the older versions.
+      threads: 1
       relation_load_strategy: ${{ matrix.database.relation_load_strategy }}
 
   cockroachdb-push:
@@ -121,7 +124,7 @@ jobs:
       name: ${{ matrix.database.name }}
       version: ${{ matrix.database.version }}
       connector: 'cockroachdb'
-      single_threaded: false
+      threads: 4
 
   mongodb:
     strategy:
@@ -137,7 +140,7 @@ jobs:
       name: ${{ matrix.database.name }}
       version: ${{ matrix.database.version }}
       # MongoDB tests MUST run single threaded
-      single_threaded: true
+      threads: 1
       connector: 'mongodb'
       relation_load_strategy: '["query"]'
 
@@ -157,7 +160,7 @@ jobs:
       name: ${{ matrix.database.name }}
       version: ${{ matrix.database.version }}
       # MongoDB tests MUST run single threaded
-      single_threaded: true
+      threads: 1
       connector: 'mongodb'
       relation_load_strategy: '["query"]'
 
@@ -176,7 +179,7 @@ jobs:
       version: ${{ matrix.database.version }}
       ubuntu: ${{ matrix.database.ubuntu }}
       connector: 'sqlserver'
-      single_threaded: false
+      threads: 8
       relation_load_strategy: '["query"]'
 
   mssql-push:
@@ -195,7 +198,7 @@ jobs:
       version: ${{ matrix.database.version }}
       ubuntu: ${{ matrix.database.ubuntu }}
       connector: 'sqlserver'
-      single_threaded: false
+      threads: 8
       relation_load_strategy: '["query"]'
 
   sqlite:
@@ -205,7 +208,7 @@ jobs:
       name: 'sqlite'
       version: 3
       connector: 'sqlite'
-      single_threaded: false
+      threads: 8
       relation_load_strategy: '["query"]'
 
   driver_adapters:

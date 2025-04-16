@@ -13,9 +13,9 @@ on:
       ubuntu:
         type: string
         default: 'latest'
-      single_threaded:
-        type: boolean
-        default: false
+      threads:
+        type: number
+        default: 1
       relation_load_strategy:
         type: string
         default: '["join", "query"]'
@@ -95,12 +95,6 @@ jobs:
             echo 'Using common Nextest config: .config/nextest.toml'
           fi
 
-      - run: cargo nextest run -p query-engine-tests --partition hash:${{ matrix.partition }} --test-threads=1
-        if: ${{ inputs.single_threaded }}
-        env:
-          CLICOLOR_FORCE: 1
-
-      - run: cargo nextest run -p query-engine-tests --partition hash:${{ matrix.partition }} --test-threads=8
-        if: ${{ !inputs.single_threaded }}
+      - run: cargo nextest run -p query-engine-tests --partition hash:${{ matrix.partition }} --test-threads=${{ inputs.threads }}
         env:
           CLICOLOR_FORCE: 1
