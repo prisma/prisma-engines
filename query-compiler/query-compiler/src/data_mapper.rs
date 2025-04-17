@@ -1,16 +1,18 @@
 use crate::result_node::ResultNode;
 use itertools::Itertools;
+use log::warn;
 use query_core::{
     CreateManyRecordsFields, DeleteRecordFields, Node, Query, QueryGraph, ReadQuery, UpdateManyRecordsFields,
     UpdateRecord, WriteQuery,
 };
-use query_structure::{AggregationSelection, FieldSelection, SelectedField};
+use query_structure::{AggregationSelection, FieldSelection, SelectedField, TypeIdentifier};
+use std::any::type_name;
 use std::collections::HashMap;
 
 pub fn map_result_structure(graph: &QueryGraph) -> Option<ResultNode> {
     for idx in graph.result_nodes() {
-        let maybe_node = graph.node_content(&idx);
-        if let Some(node) = maybe_node {
+        let node = graph.node_content(&idx);
+        if let Some(node) = node {
             if let Node::Query(query) = node {
                 return map_query(query);
             }
@@ -18,8 +20,8 @@ pub fn map_result_structure(graph: &QueryGraph) -> Option<ResultNode> {
     }
 
     for idx in graph.root_nodes() {
-        let maybe_node = graph.node_content(&idx);
-        if let Some(node) = maybe_node {
+        let node = graph.node_content(&idx);
+        if let Some(node) = node {
             if let Node::Query(query) = node {
                 return map_query(query);
             }
@@ -128,32 +130,51 @@ fn get_result_node_for_aggregation(
     selectors: &Vec<AggregationSelection>,
     selection_order: &Vec<(String, Option<Vec<String>>)>,
 ) -> Option<ResultNode> {
-    /*
-       let mut node = ResultNode::new_object();
-       let selector_map = selectors.iter().map(|s| (s.))
+    let mut node = ResultNode::new_object();
 
-       for selector in selectors {
+    let mut selector_type_map = HashMap::<String, TypeIdentifier>::new();
+    for selector in selectors {
+        for identifier in selector.identifiers() {
+            // println!(
+            //     "selector_type_map[{name}] = {type_name:?}",
+            //     name = identifier.0,
+            //     type_name = identifier.1.to_prisma_type()
+            // );
+            selector_type_map.insert(identifier.0, identifier.1);
+        }
+    }
 
-       }
+    //println!("selection_order = {selection_order:?}");
+    for (nested_name, field_names) in selection_order {
+        if let Some(field_names) = field_names {
+            let mut agg_node = ResultNode::new_object();
 
-       selectors.iter().map(|s| {
-           match s {
-               AggregationSelection::Field(_) => {}
-               AggregationSelection::Count { .. } => {}
-               AggregationSelection::Average(_) => {}
-               AggregationSelection::Sum(_) => {}
-               AggregationSelection::Min(_) => {}
-               AggregationSelection::Max(_) => {}
-           }
-       })
+            for field_name in field_names {
+                let result_type = if field_name == "_all" {
+                    selector_type_map.get("all")
+                } else {
+                    selector_type_map.get(field_name)
+                };
 
+                let db_name = format!("{nested_name}.{field_name}");
+                if let Some(result_type) = result_type {
+                    agg_node.add_field(
+                        field_name,
+                        ResultNode::Value {
+                            db_name,
+                            result_type: result_type.to_prisma_type(),
+                        },
+                    );
+                } else {
+                    warn!("Unknown type for aggregate field: {db_name}");
+                }
+            }
 
-       match selected_fields {
-           None => None,
-           Some(sf) => get_result_node(&sf.fields, &sf.order, Some(&sf.nested)),
-       }
-    */
-    None
+            node.add_field(nested_name, agg_node);
+        }
+    }
+
+    Some(node)
 }
 
 fn get_result_node_for_create_many(selected_fields: &Option<CreateManyRecordsFields>) -> Option<ResultNode> {
