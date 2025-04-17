@@ -1,4 +1,5 @@
 # Timeout
+new::interactive_tx::interactive_tx::basic_rollback_workflow
 new::interactive_tx::interactive_tx::batch_queries_rollback
 new::interactive_tx::interactive_tx::batch_queries_success
 new::interactive_tx::interactive_tx::commit_after_rollback

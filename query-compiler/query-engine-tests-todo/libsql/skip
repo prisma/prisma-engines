@@ -1,4 +1,12 @@
 # Timeout
+new::interactive_tx::interactive_tx::basic_commit_workflow
+new::interactive_tx::interactive_tx::basic_rollback_workflow
+new::interactive_tx::interactive_tx::commit_after_rollback
+new::interactive_tx::interactive_tx::double_commit
+new::interactive_tx::interactive_tx::double_rollback
+new::interactive_tx::interactive_tx::no_auto_rollback
+new::interactive_tx::interactive_tx::rollback_after_commit
+new::interactive_tx::itx_isolation::basic_serializable
 new::interactive_tx::itx_isolation::casing_doesnt_matter
 new::regressions::prisma_engines_4286::sqlite::close_tx_on_error
 queries::filters::composite::combination::to_many_relation::to_many_rel::to_to_one_com_to_to_many_com
