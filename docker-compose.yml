@@ -302,7 +302,7 @@ services:
       MYSQL_ROOT_PASSWORD: prisma
       MYSQL_DATABASE: prisma
     ports:
-      - '3308:3306'
+      - '3311:3306'
     networks:
       - databases
     tmpfs: /var/lib/mariadb
