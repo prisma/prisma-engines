@@ -1,4 +1,5 @@
 use crate::result_node::ResultNode;
+use itertools::Itertools;
 use query_core::{
     CreateManyRecordsFields, DeleteRecordFields, Node, Query, QueryGraph, ReadQuery, UpdateManyRecordsFields,
     UpdateRecord, WriteQuery,
@@ -15,6 +16,16 @@ pub fn map_result_structure(graph: &QueryGraph) -> Option<ResultNode> {
             }
         }
     }
+
+    for idx in graph.root_nodes() {
+        let maybe_node = graph.node_content(&idx);
+        if let Some(node) = maybe_node {
+            if let Node::Query(query) = node {
+                return map_query(query);
+            }
+        }
+    }
+
     None
 }
 
@@ -58,7 +69,7 @@ fn map_write_query(query: &WriteQuery) -> Option<ResultNode> {
 fn get_result_node(
     field_selection: &FieldSelection,
     selection_order: &Vec<String>,
-    nested: Option<&Vec<ReadQuery>>,
+    nested_queries: Option<&Vec<ReadQuery>>,
 ) -> Option<ResultNode> {
     let field_map = field_selection
         .selections()
@@ -97,6 +108,19 @@ fn get_result_node(
         }
     }
 
+    if let Some(nested_queries) = nested_queries {
+        for nested_query in nested_queries {
+            //println!("{}", nested_query.to_graphviz());
+            let nested_node = map_read_query(nested_query);
+            if let Some(nested_node) = nested_node {
+                //node.update(&nested_node);
+                //println!("{nested_node:?}");
+                let nested_query_name = nested_query.get_alias_or_name();
+                node.add_field(nested_query_name, nested_node);
+            }
+        }
+    }
+
     Some(node)
 }
 
@@ -104,31 +128,31 @@ fn get_result_node_for_aggregation(
     selectors: &Vec<AggregationSelection>,
     selection_order: &Vec<(String, Option<Vec<String>>)>,
 ) -> Option<ResultNode> {
-/*    
-    let mut node = ResultNode::new_object();
-    let selector_map = selectors.iter().map(|s| (s.))
+    /*
+       let mut node = ResultNode::new_object();
+       let selector_map = selectors.iter().map(|s| (s.))
 
-    for selector in selectors {
-        
-    }
-    
-    selectors.iter().map(|s| {
-        match s {
-            AggregationSelection::Field(_) => {}
-            AggregationSelection::Count { .. } => {}
-            AggregationSelection::Average(_) => {}
-            AggregationSelection::Sum(_) => {}
-            AggregationSelection::Min(_) => {}
-            AggregationSelection::Max(_) => {}
-        }
-    })
-    
-    
-    match selected_fields {
-        None => None,
-        Some(sf) => get_result_node(&sf.fields, &sf.order, Some(&sf.nested)),
-    }
- */
+       for selector in selectors {
+
+       }
+
+       selectors.iter().map(|s| {
+           match s {
+               AggregationSelection::Field(_) => {}
+               AggregationSelection::Count { .. } => {}
+               AggregationSelection::Average(_) => {}
+               AggregationSelection::Sum(_) => {}
+               AggregationSelection::Min(_) => {}
+               AggregationSelection::Max(_) => {}
+           }
+       })
+
+
+       match selected_fields {
+           None => None,
+           Some(sf) => get_result_node(&sf.fields, &sf.order, Some(&sf.nested)),
+       }
+    */
     None
 }
 
