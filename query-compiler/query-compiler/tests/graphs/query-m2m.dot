@@ -1,0 +1,4 @@
+digraph {
+    0 [label="RecordQuery(name: 'findUniquePost', selection: FieldSelection { fields: [Post.id, Post.title, Post.userId] })\l", fillcolor=red, style=filled, shape=rectangle, fontcolor=white]
+
+}

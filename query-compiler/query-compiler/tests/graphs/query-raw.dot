@@ -1,0 +1,4 @@
+digraph {
+    0 [label="QueryRaw: {\l    \"parameters\": List(\l        [\l            Int(\l                1,\l            ),\l        ],\l    ),\l    \"query\": String(\l        \"SELECT * FROM User WHERE id = $1\",\l    ),\l}\l", fillcolor=red, style=filled, shape=rectangle, fontcolor=white]
+
+}
