@@ -12,7 +12,7 @@ use std::{fs, sync::Arc};
 #[test]
 fn queries() {
     fs::create_dir_all("graphs").unwrap();
-    
+
     insta::glob!("data/*.json", |path| {
         let schema_string = include_str!("data/schema.prisma");
         let schema = psl::validate(schema_string.into());

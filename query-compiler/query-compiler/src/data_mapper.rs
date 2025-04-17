@@ -106,9 +106,7 @@ fn get_result_node(
                 SelectedField::Virtual(f) => {
                     let prisma_type = f.type_identifier_with_arity().0.to_prisma_type();
                     let serialized_name = f.serialized_name();
-                    let child = node
-                        .get_entry(serialized_name.0)
-                        .or_insert_with(ResultNode::new_object);
+                    let child = node.get_entry(serialized_name.0).or_insert_with(ResultNode::new_object);
                     child.add_field(serialized_name.1, ResultNode::new_value(f.db_alias(), prisma_type));
                 }
             },
