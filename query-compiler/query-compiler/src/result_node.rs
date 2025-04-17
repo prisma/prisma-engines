@@ -7,9 +7,7 @@ use serde::Serialize;
 #[serde(tag = "type", rename_all = "camelCase")]
 pub enum ResultNode {
     #[serde(rename_all = "camelCase")]
-    Object {
-        fields: IndexMap<String, ResultNode>,
-    },
+    Object { fields: IndexMap<String, ResultNode> },
     #[serde(rename_all = "camelCase")]
     Value {
         db_name: String,
