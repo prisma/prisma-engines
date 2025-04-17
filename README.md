@@ -206,6 +206,8 @@ database connector you want to test. The commands set up a container (if needed)
 and write the `.test_config` file, which is picked up by the integration
 tests:
 
+- `make dev-mariadb`: MariaDB 10
+- `make dev-mariadb11`: MariaDB 11
 - `make dev-mysql`: MySQL 5.7
 - `make dev-mysql8`: MySQL 8
 - `make dev-postgres`: PostgreSQL 10
