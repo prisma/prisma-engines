@@ -12,11 +12,6 @@ use std::{fs, sync::Arc};
 #[test]
 fn queries() {
     insta::glob!("data/*.json", |path| {
-        // !!!
-        // if !path.to_str().unwrap().contains("aggregate-join.json") {
-        //     return;
-        // }
-
         let schema_string = include_str!("data/schema.prisma");
         let schema = psl::validate(schema_string.into());
 
