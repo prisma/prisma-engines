@@ -1,14 +1,11 @@
 use crate::result_node::ResultNode;
-use itertools::Itertools;
 use log::warn;
 use query_core::{
     CreateManyRecordsFields, DeleteRecordFields, Node, Query, QueryGraph, ReadQuery, UpdateManyRecordsFields,
     UpdateRecord, WriteQuery,
 };
 use query_structure::{AggregationSelection, FieldSelection, SelectedField, TypeIdentifier};
-use std::any::type_name;
 use std::collections::HashMap;
-use std::fmt::Debug;
 
 pub fn map_result_structure(graph: &QueryGraph) -> Option<ResultNode> {
     for idx in graph.result_nodes() {

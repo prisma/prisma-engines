@@ -6,9 +6,11 @@ use serde::Serialize;
 #[derive(Debug, Serialize)]
 #[serde(tag = "type", rename_all = "camelCase")]
 pub enum ResultNode {
+    #[serde(rename_all = "camelCase")]
     Object {
         fields: IndexMap<String, ResultNode>,
     },
+    #[serde(rename_all = "camelCase")]
     Value {
         db_name: String,
         result_type: PrismaValueType,
