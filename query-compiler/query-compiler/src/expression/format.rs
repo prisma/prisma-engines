@@ -266,7 +266,7 @@ where
 
     fn data_map(
         &'a self,
-        expr: &'a Box<Expression>,
+        expr: &'a Expression,
         structure: &'a ResultNode,
     ) -> DocBuilder<'a, PrettyPrinter<'a, D>, ColorSpec> {
         let doc = self.keyword("dataMap");

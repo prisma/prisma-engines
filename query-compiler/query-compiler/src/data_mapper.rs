@@ -10,19 +10,15 @@ use std::collections::HashMap;
 pub fn map_result_structure(graph: &QueryGraph) -> Option<ResultNode> {
     for idx in graph.result_nodes() {
         let node = graph.node_content(&idx);
-        if let Some(node) = node {
-            if let Node::Query(query) = node {
-                return map_query(query);
-            }
+        if let Some(Node::Query(query)) = node {
+            return map_query(query);
         }
     }
 
     for idx in graph.root_nodes() {
         let node = graph.node_content(&idx);
-        if let Some(node) = node {
-            if let Node::Query(query) = node {
-                return map_query(query);
-            }
+        if let Some(Node::Query(query)) = node {
+            return map_query(query);
         }
     }
 
@@ -71,7 +67,6 @@ fn get_result_node(
     selection_order: &Vec<String>,
     nested_queries: Option<&Vec<ReadQuery>>,
 ) -> Option<ResultNode> {
-    // !!!
     // println!("field_selection: {field_selection:?}");
     // println!("selection_order: {selection_order:?}");
     // println!("nested_queries: {nested_queries:?}");
@@ -113,7 +108,7 @@ fn get_result_node(
                     let serialized_name = f.serialized_name();
                     let child = node
                         .get_entry(serialized_name.0)
-                        .or_insert_with(|| ResultNode::new_object());
+                        .or_insert_with(ResultNode::new_object);
                     child.add_field(serialized_name.1, ResultNode::new_value(f.db_alias(), prisma_type));
                 }
             },
