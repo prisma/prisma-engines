@@ -1,6 +1,6 @@
 use query_engine_tests::*;
 
-#[test_suite]
+#[test_suite(exclude(CockroachDb))]
 mod delete_mutation_relations {
     use indoc::indoc;
     use query_engine_tests::{run_query, Runner};

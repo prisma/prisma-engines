@@ -1,4 +1,5 @@
 use super::*;
+use crate::ensure_db_names::UNIQUE_TEST_DATABASE_NAMES;
 use darling::{ast::NestedMeta, FromMeta};
 use proc_macro::TokenStream;
 use proc_macro2::{Ident, Span};
@@ -55,6 +56,9 @@ pub fn relation_link_test_impl(attr: TokenStream, input: TokenStream) -> TokenSt
     let test_name = test_fn_ident.to_string();
     let suite_name = args.suite.expect("A test must have a test suite.");
     let required_capabilities = &args.capabilities.idents;
+
+    let test_database_name = format!("{suite_name}_{test_name}_#");
+    UNIQUE_TEST_DATABASE_NAMES.ensure_unique(&test_database_name, &suite_name, &test_name);
 
     let ts = quote! {
         #[test]

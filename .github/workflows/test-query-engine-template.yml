@@ -13,9 +13,9 @@ on:
       ubuntu:
         type: string
         default: 'latest'
-      single_threaded:
-        type: boolean
-        default: false
+      threads:
+        type: number
+        default: 1
       relation_load_strategy:
         type: string
         default: '["join", "query"]'
@@ -23,6 +23,8 @@ on:
 jobs:
   rust-query-engine-tests:
     name: '${{ matrix.engine_protocol }} ${{ matrix.relation_load_strategy }} ${{ matrix.partition }}'
+
+    timeout-minutes: 60
 
     strategy:
       fail-fast: false
@@ -83,12 +85,16 @@ jobs:
       - name: 'Start ${{ inputs.name }} (${{ matrix.engine_protocol }})'
         run: make start-${{ inputs.name }}
 
-      - run: cargo nextest run -p query-engine-tests --partition hash:${{ matrix.partition }} --test-threads=1
-        if: ${{ inputs.single_threaded }}
-        env:
-          CLICOLOR_FORCE: 1
+      - name: Use custom Nextest config if it exists
+        run: |
+          CUSTOM_NEXTEST_CONFIG=".config/nextest.$TEST_CONNECTOR.toml"
+          if [[ -e "$CUSTOM_NEXTEST_CONFIG" ]]; then
+            echo "Using custom Nextest config: $CUSTOM_NEXTEST_CONFIG"
+            mv -f "$CUSTOM_NEXTEST_CONFIG" .config/nextest.toml
+          else
+            echo 'Using common Nextest config: .config/nextest.toml'
+          fi
 
-      - run: cargo nextest run -p query-engine-tests --partition hash:${{ matrix.partition }} --test-threads=8
-        if: ${{ !inputs.single_threaded }}
+      - run: cargo nextest run -p query-engine-tests --partition hash:${{ matrix.partition }} --test-threads=${{ inputs.threads }}
         env:
           CLICOLOR_FORCE: 1

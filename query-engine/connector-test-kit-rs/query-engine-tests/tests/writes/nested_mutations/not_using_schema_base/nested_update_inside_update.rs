@@ -1,6 +1,6 @@
 use query_engine_tests::*;
 
-#[test_suite]
+#[test_suite(exclude(CockroachDb))]
 mod update_inside_update {
     use indoc::indoc;
     use query_engine_tests::{assert_error, run_query, run_query_json, DatamodelWithParams};

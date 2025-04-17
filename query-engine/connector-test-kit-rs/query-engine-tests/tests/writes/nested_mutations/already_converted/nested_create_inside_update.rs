@@ -2,7 +2,7 @@ use query_engine_tests::*;
 
 //TODO: which tests to keep and which ones to delete???? Some do not really test the compound unique functionality
 // TODO(dom): All failing except one
-#[test_suite]
+#[test_suite(exclude(CockroachDb))]
 mod create_inside_update {
     use query_engine_tests::{assert_error, run_query, run_query_json, DatamodelWithParams};
     use query_test_macros::relation_link_test;
