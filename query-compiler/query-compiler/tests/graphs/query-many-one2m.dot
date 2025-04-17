@@ -1,4 +1,0 @@
-digraph {
-    0 [label="ManyRecordsQuery(name: 'findManyPost', model: 'Post', selection: FieldSelection { fields: [Post.id, Post.title, Post.userId] })\l", fillcolor=red, style=filled, shape=rectangle, fontcolor=white]
-
-}
