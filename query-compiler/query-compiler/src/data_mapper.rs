@@ -97,7 +97,7 @@ fn get_result_node(
                 }
                 SelectedField::Composite(_) => todo!("MongoDB specific"),
                 SelectedField::Relation(f) => {
-                    let nested_selection = FieldSelection::new(f.selections.iter().map(|f| f.clone()).collect());
+                    let nested_selection = FieldSelection::new(f.selections.iter().cloned().collect());
                     let nested_node = get_result_node(&nested_selection, &f.result_fields, None);
                     if let Some(nested_node) = nested_node {
                         node.add_field(f.field.name(), nested_node);
