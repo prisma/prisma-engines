@@ -8,6 +8,7 @@ use query_core::{
 use query_structure::{AggregationSelection, FieldSelection, SelectedField, TypeIdentifier};
 use std::any::type_name;
 use std::collections::HashMap;
+use std::fmt::Debug;
 
 pub fn map_result_structure(graph: &QueryGraph) -> Option<ResultNode> {
     for idx in graph.result_nodes() {
@@ -73,10 +74,22 @@ fn get_result_node(
     selection_order: &Vec<String>,
     nested_queries: Option<&Vec<ReadQuery>>,
 ) -> Option<ResultNode> {
+    // !!!
+    // println!("field_selection: {field_selection:?}");
+    // println!("selection_order: {selection_order:?}");
+    // println!("nested_queries: {nested_queries:?}");
+
+    // TODO: aggregate-join issue:
+    // selection_order contains "_count"
+    // but the field_map has: "_aggr_count_activations":
+    // Virtual(RelationCount(RelationField("User.activations"), None)), "id": Scalar(ScalarField("User.id"))
+    // There is no nested_queries in this case.
+
     let field_map = field_selection
         .selections()
         .map(|fs| (fs.prisma_name(), fs))
         .collect::<HashMap<_, _>>();
+    // println!("field_map: {field_map:?}");
 
     let mut node = ResultNode::new_object();
     for prisma_name in selection_order {
@@ -112,11 +125,11 @@ fn get_result_node(
 
     if let Some(nested_queries) = nested_queries {
         for nested_query in nested_queries {
-            //println!("{}", nested_query.to_graphviz());
+            // println!("nested_query: {nested_query:?}");
             let nested_node = map_read_query(nested_query);
             if let Some(nested_node) = nested_node {
                 //node.update(&nested_node);
-                //println!("{nested_node:?}");
+                // println!("nested_node: {nested_node:?}");
                 let nested_query_name = nested_query.get_alias_or_name();
                 node.add_field(nested_query_name, nested_node);
             }
