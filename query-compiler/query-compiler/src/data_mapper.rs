@@ -159,17 +159,16 @@ fn get_result_node_for_aggregation(
                     selector_type_map.get(field_name)
                 };
 
-                let db_name = format!("{nested_name}.{field_name}");
                 if let Some(result_type) = result_type {
                     agg_node.add_field(
                         field_name,
                         ResultNode::Value {
-                            db_name,
+                            db_name: field_name.into(),
                             result_type: result_type.to_prisma_type(),
                         },
                     );
                 } else {
-                    warn!("Unknown type for aggregate field: {db_name}");
+                    warn!("Unknown type for aggregate field: {field_name}");
                 }
             }
 
