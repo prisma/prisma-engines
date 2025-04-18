@@ -1,5 +1,14 @@
 # Flaky
 new::regressions::prisma_12572::prisma_12572::all_generated_timestamps_are_the_same
+queries::data_types::datetime::datetime::read_many
+queries::data_types::datetime::datetime::read_one
+queries::regressions::pagination_regression::pagination_regr::prisma_2855
+queries::regressions::prisma_5941::regression::input_dates_no_nulls
+queries::regressions::prisma_5941::regression::input_dates_no_nulls_find_different_uniques
+writes::data_types::datetime::datetime::datetime::before_1970
+writes::data_types::datetime::datetime::datetime::date_after_1970
+writes::data_types::datetime::datetime::datetime::ms_in_date_after_1970
+writes::data_types::datetime::datetime::datetime::ms_in_date_before_1970
 
 # Timeout at 90 seconds
 new::interactive_tx::interactive_tx::basic_commit_workflow

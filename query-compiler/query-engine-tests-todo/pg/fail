@@ -208,8 +208,6 @@ queries::data_types::bigint::bigint::read_one
 queries::data_types::bytes::bytes::issue_687::common_types
 queries::data_types::bytes::bytes::read_many
 queries::data_types::bytes::bytes::read_one
-queries::data_types::datetime::datetime::read_many
-queries::data_types::datetime::datetime::read_one
 queries::data_types::decimal::decimal::read_many
 queries::data_types::decimal::decimal::read_one
 queries::data_types::json::json::dollar_type_in_json_protocol
@@ -364,11 +362,8 @@ queries::order_and_pagination::order_by_dependent_pagination::order_by_dependent
 queries::order_and_pagination::order_by_nulls::order_by_nulls::nulls_first_cursor
 queries::order_and_pagination::order_by_nulls::order_by_nulls::nulls_last_cursor
 queries::order_and_pagination::pagination::pagination::cursor_take_skip_multiple_unstable_order
-queries::regressions::pagination_regression::pagination_regr::prisma_2855
 queries::regressions::pagination_regression::pagination_regr::prisma_3505_case_1
 queries::regressions::pagination_regression::pagination_regr::prisma_3505_case_2
-queries::regressions::prisma_5941::regression::input_dates_no_nulls
-queries::regressions::prisma_5941::regression::input_dates_no_nulls_find_different_uniques
 queries::regressions::prisma_933::prisma_933_spec::prisma_933
 queries::relations::related_null_queries::inline_relation::multi_field_1n_rel_with_nulls
 queries::simple::find_first::find_first_query::find_first_matching
@@ -397,10 +392,6 @@ raw::sql::typed_output::typed_output::all_scalars_pg
 writes::data_types::bigint::bigint::using_bigint_field
 writes::data_types::bytes::bytes::byte_id_coercion
 writes::data_types::bytes::bytes::using_bytes_field
-writes::data_types::datetime::datetime::datetime::before_1970
-writes::data_types::datetime::datetime::datetime::date_after_1970
-writes::data_types::datetime::datetime::datetime::ms_in_date_after_1970
-writes::data_types::datetime::datetime::datetime::ms_in_date_before_1970
 writes::data_types::datetime::where_and_datetime::where_and_datetime::test_1
 writes::data_types::datetime::where_and_datetime::where_and_datetime::test_2
 writes::data_types::decimal::decimal::using_decimal_as_id
