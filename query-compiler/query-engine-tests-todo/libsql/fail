@@ -1,6 +1,4 @@
 new::cursor::bigint_cursor::bigint_id_must_work
-new::disconnect::disconnect_security::must_honor_connect_scope_m2m
-new::disconnect::disconnect_security::must_honor_connect_scope_one2m
 new::native_upsert::native_upsert::should_not_if_has_nested_select
 new::native_upsert::native_upsert::should_not_if_missing_update
 new::native_upsert::native_upsert::should_not_use_if_where_and_create_different
@@ -80,10 +78,8 @@ new::regressions::prisma_7434::not_in_chunking::not_in_batch_filter
 new::regressions::prisma_8265::mongodb::nested_update_many_timestamps
 new::regressions::team_orm_927::count_before_relation::find_many
 new::regressions::team_orm_927::count_before_relation::find_unique
-queries::aggregation::avg::aggregation_avg::avg_no_records
 queries::aggregation::avg::aggregation_avg::avg_some_records
 queries::aggregation::avg::aggregation_avg::avg_with_all_sorts_of_query_args
-queries::aggregation::avg::decimal_aggregation_avg::avg_no_records
 queries::aggregation::avg::decimal_aggregation_avg::avg_some_records
 queries::aggregation::avg::decimal_aggregation_avg::avg_with_all_sorts_of_query_args
 queries::aggregation::combination_spec::combinations::no_records
@@ -93,10 +89,6 @@ queries::aggregation::combination_spec::combinations::with_query_args
 queries::aggregation::combination_spec::decimal_combinations::no_records
 queries::aggregation::combination_spec::decimal_combinations::some_records
 queries::aggregation::combination_spec::decimal_combinations::with_query_args
-queries::aggregation::count::aggregation_count::count_empty_result
-queries::aggregation::count::aggregation_count::count_no_records
-queries::aggregation::count::aggregation_count::count_nullable_fields
-queries::aggregation::count::aggregation_count::count_with_all_sorts_of_query_args
 queries::aggregation::group_by::aggregation_group_by::group_by_by_args_order_by
 queries::aggregation::group_by::aggregation_group_by::group_by_mismatch_by_args_query_sel
 queries::aggregation::group_by::aggregation_group_by::group_by_multiple_ordering
@@ -147,16 +139,12 @@ queries::aggregation::max::aggregation_max::max_with_all_sorts_of_query_args
 queries::aggregation::max::decimal_aggregation_max::max_no_records
 queries::aggregation::max::decimal_aggregation_max::max_some_records
 queries::aggregation::max::decimal_aggregation_max::max_with_all_sorts_of_query_args
-queries::aggregation::min::aggregation_min::min_no_records
 queries::aggregation::min::aggregation_min::min_some_records
 queries::aggregation::min::aggregation_min::min_with_all_sorts_of_query_args
-queries::aggregation::min::decimal_aggregation_min::min_no_records
 queries::aggregation::min::decimal_aggregation_min::min_some_records
 queries::aggregation::min::decimal_aggregation_min::min_with_all_sorts_of_query_args
-queries::aggregation::sum::aggregation_sum::sum_no_records
 queries::aggregation::sum::aggregation_sum::sum_some_records
 queries::aggregation::sum::aggregation_sum::sum_with_all_sorts_of_query_args
-queries::aggregation::sum::decimal_aggregation_sum::sum_no_records
 queries::aggregation::sum::decimal_aggregation_sum::sum_some_records
 queries::aggregation::sum::decimal_aggregation_sum::sum_with_all_sorts_of_query_args
 queries::aggregation::uniq_count_relation::uniq_count_rel::count_one2m_m2m

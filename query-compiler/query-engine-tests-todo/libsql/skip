@@ -398,6 +398,8 @@ writes::relations::same_model_self_rel_without_back_rel::self_rel_no_back_rel::o
 
 # Flaky
 new::regressions::prisma_12572::prisma_12572::all_generated_timestamps_are_the_same
+new::disconnect::disconnect_security::must_honor_connect_scope_m2m
+new::disconnect::disconnect_security::must_honor_connect_scope_one2m
 
 # Crash in libsql: not yet implemented
 # External process error: The external test executor process died

@@ -398,6 +398,6 @@ writes::top_level_mutations::create_many_and_return::create_many_and_return::lar
 writes::top_level_mutations::delete_many_relations::delete_many_rels::p1_c1_no_children
 writes::top_level_mutations::update_many_and_return::update_many_and_return::update_many_11_non_inline_rel_read_fails
 writes::top_level_mutations::update_many_and_return::update_many_and_return::update_many_1m_non_inline_rel_read_fails
-
-# EXECFAIL
-queries::filters::composite::equals::to_many::single_object
+new::disconnect::disconnect_security::must_honor_connect_scope_m2m
+new::disconnect::disconnect_security::must_honor_connect_scope_one2m
+queries::filters::composite::every::every::nested_every

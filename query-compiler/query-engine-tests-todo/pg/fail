@@ -1,5 +1,3 @@
-new::disconnect::disconnect_security::must_honor_connect_scope_m2m
-new::disconnect::disconnect_security::must_honor_connect_scope_one2m
 new::multi_schema::multi_schema::create_and_get_many_to_many_relations
 new::multi_schema::multi_schema::crud_relations
 new::multi_schema::multi_schema::crud_simple
