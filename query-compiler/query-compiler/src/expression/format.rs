@@ -1,11 +1,11 @@
+use super::{Binding, DbQuery, Expression, JoinExpression};
+use crate::result_node::ResultNode;
 use pretty::{
     DocAllocator, DocBuilder,
     termcolor::{Color, ColorSpec},
 };
 use query_structure::PrismaValue;
 use std::borrow::Cow;
-
-use super::{Binding, DbQuery, Expression, JoinExpression};
 
 fn color_kw() -> ColorSpec {
     ColorSpec::new().set_fg(Some(Color::Blue)).clone()
@@ -56,6 +56,7 @@ where
             Expression::Join { parent, children } => self.join(parent, children),
             Expression::MapField { field, records } => self.map_field(field, records),
             Expression::Transaction(expression) => self.transaction(expression),
+            Expression::DataMap { expr, structure } => self.data_map(expr, structure),
         }
     }
 
@@ -261,6 +262,38 @@ where
             .append(self.softline())
             .append(self.softline())
             .append(self.expression(expr).align())
+    }
+
+    fn data_map(
+        &'a self,
+        expr: &'a Expression,
+        structure: &'a ResultNode,
+    ) -> DocBuilder<'a, PrettyPrinter<'a, D>, ColorSpec> {
+        let doc = self.keyword("dataMap");
+        let doc = self.data_map_node(doc, structure, "");
+        doc.append(self.expression(expr).align())
+    }
+
+    fn data_map_node(
+        &'a self,
+        doc: DocBuilder<'a, PrettyPrinter<'a, D>, ColorSpec>,
+        node: &ResultNode,
+        indent: &str,
+    ) -> DocBuilder<'a, PrettyPrinter<'a, D>, ColorSpec> {
+        match node {
+            ResultNode::Object { fields } => {
+                let indent = &format!("{indent}   ");
+                let mut builder = doc.append(self.line());
+                for (name, field) in fields {
+                    builder = builder.append(self.text(format!("{indent}{name}: ")));
+                    builder = self.data_map_node(builder, field, indent);
+                }
+                builder
+            }
+            ResultNode::Value { db_name, result_type } => doc
+                .append(self.text(format!("{result_type} [{db_name}]")))
+                .append(self.line()),
+        }
     }
 }
 
