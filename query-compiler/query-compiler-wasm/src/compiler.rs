@@ -5,7 +5,7 @@ use query_core::{ArgumentValue, BatchDocument, QueryDocument, QueryGraphBuilderE
 use request_handlers::{HandlerError, RequestBody};
 use serde::{Deserialize, Serialize};
 use std::{collections::HashMap, sync::Arc};
-use tsify_next::Tsify;
+use tsify::Tsify;
 use wasm_bindgen::prelude::wasm_bindgen;
 
 use crate::params::{AdapterProvider, JsConnectionInfo};

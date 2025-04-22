@@ -2,7 +2,7 @@ use crate::js_result::JsResult;
 use serde::{Deserialize, Serialize};
 
 #[cfg(target_arch = "wasm32")]
-use tsify_next::Tsify;
+use tsify::Tsify;
 
 /// Information about a migration file within a migration directory.
 #[derive(Debug, Clone, Serialize, Deserialize)]

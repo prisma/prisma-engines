@@ -7,7 +7,7 @@ pub use crate::{
 use serde::{Deserialize, Serialize};
 
 #[cfg(target_arch = "wasm32")]
-use tsify_next::Tsify;
+use tsify::Tsify;
 
 // ---- Common type definitions ----
 

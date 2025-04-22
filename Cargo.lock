@@ -1171,7 +1171,7 @@ dependencies = [
  "tokio",
  "tracing",
  "tracing-core",
- "tsify-next",
+ "tsify",
  "uuid",
  "wasm-bindgen",
  "wasm-bindgen-futures",
@@ -2225,7 +2225,7 @@ version = "0.1.0"
 dependencies = [
  "heck 0.4.1",
  "serde",
- "tsify-next",
+ "tsify",
  "wasm-bindgen",
 ]
 
@@ -3818,7 +3818,7 @@ dependencies = [
  "serde",
  "serde_json",
  "tracing",
- "tsify-next",
+ "tsify",
  "wasm-bindgen",
  "wasm-rs-dbg",
 ]
@@ -3970,7 +3970,7 @@ dependencies = [
  "tracing",
  "tracing-futures",
  "tracing-subscriber",
- "tsify-next",
+ "tsify",
  "url",
  "user-facing-errors",
  "wasm-bindgen",
@@ -4068,7 +4068,7 @@ dependencies = [
  "tracing",
  "tracing-futures",
  "tracing-subscriber",
- "tsify-next",
+ "tsify",
  "url",
  "user-facing-errors",
  "wasm-bindgen",
@@ -4838,7 +4838,7 @@ dependencies = [
  "tracing-error",
  "tracing-futures",
  "tracing-subscriber",
- "tsify-next",
+ "tsify",
  "wasm-bindgen",
  "wasm-bindgen-futures",
 ]
@@ -6042,22 +6042,22 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3528ecfd12c466c6f163363caf2d02a71161dd5e1cc6ae7b34207ea2d42d81ed"
 
 [[package]]
-name = "tsify-next"
-version = "0.5.6"
+name = "tsify"
+version = "0.5.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7d0f2208feeb5f7a6edb15a2389c14cd42480ef6417318316bb866da5806a61d"
+checksum = "b2ec91b85e6c6592ed28636cb1dd1fac377ecbbeb170ff1d79f97aac5e38926d"
 dependencies = [
  "serde",
  "serde-wasm-bindgen",
- "tsify-next-macros",
+ "tsify-macros",
  "wasm-bindgen",
 ]
 
 [[package]]
-name = "tsify-next-macros"
-version = "0.5.6"
+name = "tsify-macros"
+version = "0.5.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f81253930d0d388a3ab8fa4ae56da9973ab171ef833d1be2e9080fc3ce502bd6"
+checksum = "9a324606929ad11628a19206d7853807481dcaecd6c08be70a235930b8241955"
 dependencies = [
  "proc-macro2",
  "quote",
