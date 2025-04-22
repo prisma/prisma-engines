@@ -6,7 +6,6 @@ use query_core::{QueryDocument, QueryGraphBuilder, ToGraphviz};
 use query_structure::psl;
 use request_handlers::{JsonBody, JsonSingleQuery, RequestBody};
 use sql_query_builder::{Context, SqlQueryBuilder};
-use std::path::PathBuf;
 use std::{fs, sync::Arc};
 
 #[test]
