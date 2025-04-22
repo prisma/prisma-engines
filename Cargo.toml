@@ -87,7 +87,11 @@ metrics = "0.23.0"
 metrics-util = "0.17.0"
 metrics-exporter-prometheus = { version = "0.15.3", default-features = false }
 mobc = "0.8"
-mongodb = { git = "https://github.com/prisma/mongo-rust-driver.git", branch = "RUST-1994/happy-eyeballs", features = ["zstd-compression", "zlib-compression", "snappy-compression"  ]}
+mongodb = { git = "https://github.com/prisma/mongo-rust-driver.git", branch = "RUST-1994/happy-eyeballs", features = [
+    "zstd-compression",
+    "zlib-compression",
+    "snappy-compression",
+] }
 mysql_async = { git = "https://github.com/prisma/mysql_async", branch = "vendored-openssl" }
 names = { version = "0.11", default-features = false }
 nanoid = "0.4"
@@ -143,7 +147,7 @@ tracing-core = "0.1"
 tracing-error = "0.2"
 tracing-subscriber = "0.3"
 tracing-futures = "0.2"
-tsify-next = { version = "0.5", default-features = false, features = ["js"] }
+tsify = { version = "0.5", default-features = false, features = ["js"] }
 thiserror = "2"
 url = "2"
 ulid = "1"

@@ -13,7 +13,7 @@ use sql_schema_connector::SqlSchemaConnector;
 use std::path::PathBuf;
 use std::sync::Arc;
 use tracing_futures::Instrument;
-use tsify_next::Tsify;
+use tsify::Tsify;
 use wasm_bindgen::prelude::{wasm_bindgen, JsError, JsValue};
 
 #[wasm_bindgen]

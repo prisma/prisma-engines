@@ -123,7 +123,7 @@ pub(crate) use wasm::*;
 mod arch {
     pub(crate) use js_sys::JsString;
     use std::str::FromStr;
-    use tsify_next::Tsify;
+    use tsify::Tsify;
 
     pub(crate) fn get_named_property<T>(object: &super::wasm::JsObjectExtern, name: &str) -> JsResult<T>
     where
