@@ -42,15 +42,10 @@ fn queries() {
             .unwrap();
 
         let dot = graph.to_graphviz();
-        let dot_path = PathBuf::from(
-            path.to_str()
-                .unwrap()
-                .replace("/tests/data/", "/tests/graphs/")
-                .replace(".json", ".dot"),
-        );
-        if let Some(parent) = dot_path.parent() {
-            fs::create_dir_all(parent).unwrap();
-        }
+        let tests_path = path.parent().unwrap().parent().unwrap();
+        let graphs_path = tests_path.join("graphs");
+        let dot_path = graphs_path.join(path.file_name().unwrap()).with_extension("dot");
+        fs::create_dir_all(graphs_path).unwrap();
         fs::write(dot_path, dot).unwrap();
 
         let ctx = Context::new(&connection_info, None);
