@@ -27,8 +27,10 @@ pub type TranslateResult<T> = Result<T, TranslateError>;
 pub fn translate(mut graph: QueryGraph, builder: &dyn QueryBuilder) -> TranslateResult<Expression> {
     let structure = map_result_structure(&graph);
 
-    let root = graph
-        .root_nodes()
+    // Must collect the root nodes first, because the following iteration is mutating the graph
+    let root_nodes: Vec<NodeRef> = graph.root_nodes().collect();
+
+    let root = root_nodes
         .into_iter()
         .map(|node| NodeTranslator::new(&mut graph, node, &[], builder).translate())
         .collect::<TranslateResult<Vec<_>>>()
@@ -194,7 +196,7 @@ impl<'a, 'b> NodeTranslator<'a, 'b> {
             })
             .collect::<TranslateResult<Vec<_>>>()?;
 
-        let result_nodes = self.graph.result_nodes();
+        let result_nodes: Vec<NodeRef> = self.graph.result_nodes().collect();
         let result_binding_names = bindings.iter().map(|b| b.name.clone()).collect::<Vec<_>>();
 
         if result_nodes.len() == 1 {

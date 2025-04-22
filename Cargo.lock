@@ -3773,7 +3773,6 @@ dependencies = [
  "indexmap 2.2.2",
  "insta",
  "itertools 0.13.0",
- "log",
  "pretty",
  "psl",
  "quaint",

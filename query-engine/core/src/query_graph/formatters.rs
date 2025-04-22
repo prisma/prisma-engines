@@ -2,12 +2,13 @@ use super::*;
 use std::fmt::{self, Display};
 
 pub fn format(graph: &QueryGraph) -> String {
+    let root_nodes: Vec<NodeRef> = graph.root_nodes().collect();
     format!(
         "---- Query Graph ----\nResult Nodes: {}\nMarked Nodes: {}\nRoot Nodes: {}\n\n{}\n----------------------",
         fmt_raw_indices(&graph.result_nodes),
         fmt_node_tuples(&graph.marked_node_pairs),
-        fmt_node_list(&graph.root_nodes()),
-        stringify_nodes(graph, graph.root_nodes(), &mut Vec::new()).join("\n\n")
+        fmt_node_list(&root_nodes),
+        stringify_nodes(graph, root_nodes, &mut Vec::new()).join("\n\n")
     )
 }
 

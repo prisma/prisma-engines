@@ -17,10 +17,10 @@ pub enum ReadQuery {
 impl ReadQuery {
     pub fn get_alias_or_name(&self) -> &str {
         match self {
-            ReadQuery::RecordQuery(q) => q.alias.as_deref().unwrap_or(q.name.as_ref()),
-            ReadQuery::ManyRecordsQuery(q) => q.alias.as_deref().unwrap_or(q.name.as_ref()),
-            ReadQuery::RelatedRecordsQuery(q) => q.alias.as_deref().unwrap_or(q.name.as_ref()),
-            ReadQuery::AggregateRecordsQuery(q) => q.alias.as_deref().unwrap_or(q.name.as_ref()),
+            ReadQuery::RecordQuery(q) => q.alias.as_deref().unwrap_or(&q.name),
+            ReadQuery::ManyRecordsQuery(q) => q.alias.as_deref().unwrap_or(&q.name),
+            ReadQuery::RelatedRecordsQuery(q) => q.alias.as_deref().unwrap_or(&q.name),
+            ReadQuery::AggregateRecordsQuery(q) => q.alias.as_deref().unwrap_or(&q.name),
         }
     }
 

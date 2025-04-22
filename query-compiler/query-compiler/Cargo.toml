@@ -16,7 +16,6 @@ serde.workspace = true
 itertools.workspace = true
 pretty = { workspace = true, features = ["termcolor"] }
 indexmap = { workspace = true, features = ["serde"] }
-log = "0.4.27"
 
 [dev-dependencies]
 insta = { workspace = true, features = ["glob"] }

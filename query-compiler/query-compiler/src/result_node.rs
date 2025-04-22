@@ -30,16 +30,16 @@ impl ResultNode {
         match self {
             ResultNode::Object { fields } => fields.insert(key.into(), node),
             ResultNode::Value { .. } => {
-                panic!("Cannot add fields to a value");
+                panic!("Only object nodes can be indexed");
             }
         }
     }
 
-    pub fn get_entry(&mut self, key: impl Into<String>) -> Entry<'_, String, ResultNode> {
+    pub fn entry(&mut self, key: impl Into<String>) -> Entry<'_, String, ResultNode> {
         match self {
             ResultNode::Object { fields } => fields.entry(key.into()),
             ResultNode::Value { .. } => {
-                panic!("Cannot add fields to a value");
+                panic!("Only object nodes can be indexed");
             }
         }
     }
