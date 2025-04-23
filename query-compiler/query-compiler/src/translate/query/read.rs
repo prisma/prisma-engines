@@ -38,6 +38,12 @@ pub(crate) fn translate_read_query(query: ReadQuery, builder: &dyn QueryBuilder)
         ReadQuery::ManyRecordsQuery(mrq) => {
             let selected_fields = mrq.selected_fields.without_relations().into_virtuals_last();
             let needs_reversed_order = mrq.args.needs_reversed_order();
+            let take_one = mrq.args.take_one;
+
+            // It would be better take make this state unrepresentable
+            if mrq.args.take != Some(1) {
+                panic!("Inconsistent take_one, take != 1");
+            }
 
             // TODO: we ignore chunking for now
             let query = builder
@@ -52,10 +58,16 @@ pub(crate) fn translate_read_query(query: ReadQuery, builder: &dyn QueryBuilder)
                 expr
             };
 
-            if mrq.nested.is_empty() {
+            let expr = if mrq.nested.is_empty() {
                 expr
             } else {
                 add_inmemory_join(expr, mrq.nested, builder)?
+            };
+
+            if take_one {
+                Expression::Unique(Box::new(expr))
+            } else {
+                expr
             }
         }
 

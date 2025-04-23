@@ -27,6 +27,7 @@ fn try_limit_to_one(mut query: ReadQuery) -> QueryGraphBuilderResult<ReadQuery> 
     Ok(match query {
         ReadQuery::ManyRecordsQuery(ref mut m) if m.args.take.is_none() => {
             m.args.take = Some(1);
+            m.args.take_one = true;
             query
         }
         _ => query,
