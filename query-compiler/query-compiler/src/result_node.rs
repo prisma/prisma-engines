@@ -4,7 +4,7 @@ use query_structure::PrismaValueType;
 use serde::Serialize;
 
 #[derive(Debug, Serialize)]
-#[serde(tag = "type", rename_all = "camelCase")]
+#[serde(tag = "type")]
 pub enum ResultNode {
     #[serde(rename_all = "camelCase")]
     Object { fields: IndexMap<String, ResultNode> },
