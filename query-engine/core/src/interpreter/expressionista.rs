@@ -16,8 +16,10 @@ struct IfNodeAcc {
 
 impl Expressionista {
     pub fn translate(mut graph: QueryGraph) -> InterpretationResult<Expression> {
-        graph
-            .root_nodes()
+        // Must collect the root nodes first, because the following iteration is mutating the graph
+        let root_nodes: Vec<NodeRef> = graph.root_nodes().collect();
+
+        root_nodes
             .into_iter()
             .map(|root_node| Self::build_expression(&mut graph, &root_node, vec![]))
             .collect::<InterpretationResult<Vec<Expression>>>()
@@ -416,7 +418,7 @@ impl Expressionista {
             .collect::<InterpretationResult<Vec<Binding>>>()?;
 
         let result_binding_names = bindings.iter().map(|b| b.name.clone()).collect();
-        let result_nodes = graph.result_nodes();
+        let result_nodes: Vec<NodeRef> = graph.result_nodes().collect();
 
         if result_nodes.len() == 1 {
             let mut exprs: VecDeque<Expression> = bindings

@@ -250,11 +250,8 @@ impl QueryGraph {
         Ok(())
     }
 
-    pub fn result_nodes(&self) -> Vec<NodeRef> {
-        self.result_nodes
-            .iter()
-            .map(|node_ix| NodeRef { node_ix: *node_ix })
-            .collect()
+    pub fn result_nodes(&self) -> impl Iterator<Item = NodeRef> + '_ {
+        self.result_nodes.iter().map(|node_ix| NodeRef { node_ix: *node_ix })
     }
 
     /// Adds a result node to the graph.
@@ -288,17 +285,14 @@ impl QueryGraph {
 
     /// Returns all root nodes of the graph.
     /// A root node is defined by having no incoming edges.
-    pub fn root_nodes(&self) -> Vec<NodeRef> {
-        self.graph
-            .node_indices()
-            .filter_map(|node_ix| {
-                if self.graph.edges_directed(node_ix, Direction::Incoming).next().is_some() {
-                    None
-                } else {
-                    Some(NodeRef { node_ix })
-                }
-            })
-            .collect()
+    pub fn root_nodes(&self) -> impl Iterator<Item = NodeRef> + '_ {
+        self.graph.node_indices().filter_map(|node_ix| {
+            if self.graph.edges_directed(node_ix, Direction::Incoming).next().is_some() {
+                None
+            } else {
+                Some(NodeRef { node_ix })
+            }
+        })
     }
 
     /// Creates a node with content `t` and adds it to the graph.
@@ -962,11 +956,7 @@ impl ToGraphviz for QueryGraph {
                         idx.index(),
                         label_from_node(node)
                     )
-                } else if self
-                    .root_nodes()
-                    .iter()
-                    .any(|root_node| root_node == &NodeRef { node_ix: idx })
-                {
+                } else if self.root_nodes().any(|root_node| root_node == NodeRef { node_ix: idx }) {
                     format!(
                         "    {} [label=\"{}\", fillcolor=red, style=filled, shape=rectangle, fontcolor=white]",
                         idx.index(),

@@ -1,8 +1,14 @@
 ---
 source: query-compiler/query-compiler/tests/queries.rs
+assertion_line: 49
 expression: pretty
 input_file: query-compiler/query-compiler/tests/data/create-with-generators.json
+snapshot_kind: text
 ---
+dataMap
+   id: String [id]
+   email: String [email]
+   createdAt: Date [createdAt]
 unique (query «INSERT INTO "public"."UserWithGenerators"
                ("id","email","createdAt") VALUES ($1,$2,$3) RETURNING
                "public"."UserWithGenerators"."id",

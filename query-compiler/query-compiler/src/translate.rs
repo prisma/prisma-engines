@@ -2,6 +2,7 @@ mod query;
 
 use super::expression::{Binding, Expression};
 use crate::Expression::Transaction;
+use crate::data_mapper::map_result_structure;
 use itertools::{Either, Itertools};
 use query::translate_query;
 use query_builder::QueryBuilder;
@@ -24,12 +25,25 @@ pub enum TranslateError {
 pub type TranslateResult<T> = Result<T, TranslateError>;
 
 pub fn translate(mut graph: QueryGraph, builder: &dyn QueryBuilder) -> TranslateResult<Expression> {
-    let root = graph
-        .root_nodes()
+    let structure = map_result_structure(&graph);
+
+    // Must collect the root nodes first, because the following iteration is mutating the graph
+    let root_nodes: Vec<NodeRef> = graph.root_nodes().collect();
+
+    let root = root_nodes
         .into_iter()
         .map(|node| NodeTranslator::new(&mut graph, node, &[], builder).translate())
         .collect::<TranslateResult<Vec<_>>>()
         .map(Expression::Seq)?;
+
+    let root = if let Some(structure) = structure {
+        Expression::DataMap {
+            expr: Box::new(root),
+            structure,
+        }
+    } else {
+        root
+    };
 
     if graph.needs_transaction() {
         return Ok(Transaction(Box::new(root)));
@@ -182,7 +196,7 @@ impl<'a, 'b> NodeTranslator<'a, 'b> {
             })
             .collect::<TranslateResult<Vec<_>>>()?;
 
-        let result_nodes = self.graph.result_nodes();
+        let result_nodes: Vec<NodeRef> = self.graph.result_nodes().collect();
         let result_binding_names = bindings.iter().map(|b| b.name.clone()).collect::<Vec<_>>();
 
         if result_nodes.len() == 1 {

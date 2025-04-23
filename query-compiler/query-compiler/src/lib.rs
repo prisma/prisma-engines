@@ -1,4 +1,6 @@
+mod data_mapper;
 pub mod expression;
+pub mod result_node;
 pub mod translate;
 
 use std::sync::Arc;
@@ -36,6 +38,7 @@ pub fn compile(
     let (graph, _serializer) = QueryGraphBuilder::new(query_schema)
         .without_eager_default_evaluation()
         .build(query)?;
+
     let res: Result<Expression, TranslateError> = match connection_info.sql_family() {
         #[cfg(feature = "postgresql")]
         SqlFamily::Postgres => translate(graph, &SqlQueryBuilder::<visitor::Postgres<'_>>::new(ctx)),

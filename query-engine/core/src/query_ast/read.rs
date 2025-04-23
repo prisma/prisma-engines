@@ -15,6 +15,15 @@ pub enum ReadQuery {
 }
 
 impl ReadQuery {
+    pub fn get_alias_or_name(&self) -> &str {
+        match self {
+            ReadQuery::RecordQuery(q) => q.alias.as_deref().unwrap_or(&q.name),
+            ReadQuery::ManyRecordsQuery(q) => q.alias.as_deref().unwrap_or(&q.name),
+            ReadQuery::RelatedRecordsQuery(q) => q.alias.as_deref().unwrap_or(&q.name),
+            ReadQuery::AggregateRecordsQuery(q) => q.alias.as_deref().unwrap_or(&q.name),
+        }
+    }
+
     /// Checks whether or not the field selection of this query satisfies the inputted field selection.
     pub fn satisfies(&self, expected: &FieldSelection) -> bool {
         self.returns().map(|sel| sel.is_superset_of(expected)).unwrap_or(false)

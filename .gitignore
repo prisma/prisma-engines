@@ -58,3 +58,4 @@ package-lock.json
 
 # Folder with GraphViz representation of query graphs.
 .query_graphs
+query-compiler/query-compiler/tests/graphs/*.dot

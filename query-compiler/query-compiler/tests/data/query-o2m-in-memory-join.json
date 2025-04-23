@@ -1,0 +1,19 @@
+{
+  "modelName": "User",
+  "action": "findMany",
+  "query": {
+    "arguments": {},
+    "selection": {
+      "id": true,
+      "email": true,
+      "activations": {
+        "arguments": {},
+        "selection": {
+          "issued": true,
+          "secret": true,
+          "done": true
+        }
+      }
+    }
+  }
+}

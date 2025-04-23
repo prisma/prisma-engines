@@ -63,6 +63,7 @@ pub enum PrismaValue {
 }
 
 #[derive(Debug, Clone, Eq, PartialEq, Hash, Serialize, Deserialize, PartialOrd, Ord)]
+#[serde(tag = "type", content = "inner")]
 pub enum PrismaValueType {
     Any,
     String,

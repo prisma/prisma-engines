@@ -1,0 +1,18 @@
+---
+source: query-compiler/query-compiler/tests/queries.rs
+assertion_line: 58
+expression: pretty
+input_file: query-compiler/query-compiler/tests/data/aggregate-join.json
+snapshot_kind: text
+---
+dataMap
+   email: String [email]
+query «SELECT "public"."User"."id", "public"."User"."email",
+       COALESCE("aggr_selection_0_Activation"."_aggr_count_activations", 0) AS
+       "_aggr_count_activations" FROM "public"."User" LEFT JOIN (SELECT
+       "public"."Activation"."userId", COUNT(*) AS "_aggr_count_activations"
+       FROM "public"."Activation" WHERE 1=1 GROUP BY
+       "public"."Activation"."userId") AS "aggr_selection_0_Activation" ON
+       ("public"."User"."id" = "aggr_selection_0_Activation"."userId") WHERE 1=1
+       OFFSET $1»
+params [const(BigInt(0))]

@@ -1,3 +1,4 @@
+use crate::result_node::ResultNode;
 use query_builder::DbQuery;
 use serde::Serialize;
 
@@ -80,6 +81,12 @@ pub enum Expression {
 
     /// Run the query inside a transaction
     Transaction(Box<Expression>),
+
+    /// Data mapping
+    DataMap {
+        expr: Box<Expression>,
+        structure: ResultNode,
+    },
 }
 
 #[derive(Debug, Clone)]
@@ -141,6 +148,7 @@ impl Expression {
             Expression::Join { parent, .. } => parent.r#type(),
             Expression::MapField { records, .. } => records.r#type(),
             Expression::Transaction(expression) => expression.r#type(),
+            Expression::DataMap { expr, .. } => expr.r#type(),
         }
     }
 }
