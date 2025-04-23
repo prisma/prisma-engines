@@ -449,7 +449,7 @@ impl<'a> SelectBuilderExt<'a> for Select<'a> {
     }
 
     fn with_pagination(self, args: &QueryArguments, override_empty_take: Option<i64>) -> Select<'a> {
-        let take = match args.take_abs() {
+        let take = match args.take.abs() {
             Some(_) if args.requires_inmemory_pagination_with_joins() => override_empty_take,
             Some(take) => Some(take),
             None => override_empty_take,
