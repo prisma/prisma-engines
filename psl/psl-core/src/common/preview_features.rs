@@ -73,6 +73,7 @@ features!(
     OrderByNulls,
     OrderByRelation,
     PostgresqlExtensions,
+    QueryCompiler,
     ReferentialActions,
     ReferentialIntegrity,
     SelectRelationCount,
@@ -85,7 +86,7 @@ features!(
     PrismaSchemaFolder,
     OmitApi,
     TypedSql,
-    StrictUndefinedChecks
+    StrictUndefinedChecks,
 );
 
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
@@ -157,6 +158,7 @@ impl<'a> FeatureMapWithProvider<'a> {
                  | MultiSchema
                  | NativeDistinct
                  | PostgresqlExtensions
+                 | QueryCompiler
                  | RelationJoins
                  | StrictUndefinedChecks
                  | Views
