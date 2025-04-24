@@ -85,7 +85,7 @@ where
             _ => Either::Right(self),
         };
 
-        let iter = match args.take_abs() {
+        let iter = match args.take.abs() {
             Some(take) if args.requires_inmemory_pagination_with_joins() => Either::Left(iter.take(take as usize)),
             _ => Either::Right(iter),
         };

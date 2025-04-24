@@ -69,7 +69,7 @@ impl SelectDefinition for QueryArguments {
         let cursor_condition = cursor_condition::build(&self, model, &order_by_definitions, ctx);
         let aggregation_joins = nested_aggregations::build(virtual_selections, ctx);
 
-        let limit = if self.ignore_take { None } else { self.take_abs() };
+        let limit = if self.ignore_take { None } else { self.take.abs() };
         let skip = if self.ignore_skip { 0 } else { self.skip.unwrap_or(0) };
 
         let (filter, filter_joins) = self

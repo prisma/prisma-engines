@@ -8,7 +8,7 @@ use query_builder::{QueryArgumentsExt, QueryBuilder, RelationLink};
 use query_core::{AggregateRecordsQuery, FilteredQuery, ReadQuery, RelatedRecordsQuery};
 use query_structure::{
     ConditionValue, FieldSelection, Filter, PrismaValue, QueryArguments, QueryMode, RelationField, ScalarCondition,
-    ScalarFilter, ScalarProjection,
+    ScalarFilter, ScalarProjection, Take,
 };
 
 pub(crate) fn translate_read_query(query: ReadQuery, builder: &dyn QueryBuilder) -> TranslateResult<Expression> {
@@ -20,7 +20,7 @@ pub(crate) fn translate_read_query(query: ReadQuery, builder: &dyn QueryBuilder)
                 rq.model.clone(),
                 rq.filter.expect("ReadOne query should always have filter set"),
             ))
-            .with_take(Some(1));
+            .with_take(Take::One);
             let query = builder
                 .build_get_records(&rq.model, args, &selected_fields)
                 .map_err(TranslateError::QueryBuildFailure)?;
@@ -38,6 +38,7 @@ pub(crate) fn translate_read_query(query: ReadQuery, builder: &dyn QueryBuilder)
         ReadQuery::ManyRecordsQuery(mrq) => {
             let selected_fields = mrq.selected_fields.without_relations().into_virtuals_last();
             let needs_reversed_order = mrq.args.needs_reversed_order();
+            let take = mrq.args.take;
 
             // TODO: we ignore chunking for now
             let query = builder
@@ -52,10 +53,15 @@ pub(crate) fn translate_read_query(query: ReadQuery, builder: &dyn QueryBuilder)
                 expr
             };
 
-            if mrq.nested.is_empty() {
+            let expr = if mrq.nested.is_empty() {
                 expr
             } else {
                 add_inmemory_join(expr, mrq.nested, builder)?
+            };
+
+            match take {
+                Take::One => Expression::Unique(Box::new(expr)),
+                _ => expr,
             }
         }
 
@@ -240,7 +246,11 @@ fn build_read_one2m_query(
     }
 
     let to_one_relation = !field.arity().is_list();
-    let args = if to_one_relation { args.with_take(Some(1)) } else { args };
+    let args = if to_one_relation {
+        args.with_take(Take::Some(1))
+    } else {
+        args
+    };
     let query = builder
         .build_get_records(&field.related_model(), args, selected_fields)
         .map_err(TranslateError::QueryBuildFailure)?;

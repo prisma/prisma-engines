@@ -24,7 +24,10 @@ pub fn extract_query_args(
                 }),
 
                 args::TAKE => Ok(QueryArguments {
-                    take: arg.value.try_into()?,
+                    take: {
+                        let n: Option<i64> = arg.value.try_into()?;
+                        n.into()
+                    },
                     ..result
                 }),
 

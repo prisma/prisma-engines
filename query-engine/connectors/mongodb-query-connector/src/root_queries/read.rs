@@ -53,13 +53,13 @@ pub async fn get_many_records(
 ) -> crate::Result<ManyRecords> {
     let coll = database.collection(model.db_name());
 
-    let reverse_order = query_arguments.take.map(|t| t < 0).unwrap_or(false);
+    let reverse_order = query_arguments.take.is_reversed();
     let field_names: Vec<_> = selected_fields.db_names().collect();
 
     let meta_mapping = output_meta::from_selected_fields(selected_fields);
     let mut records = ManyRecords::new(field_names.clone());
 
-    if let Some(0) = query_arguments.take {
+    if let Take::Some(0) = query_arguments.take {
         return Ok(records);
     };
 

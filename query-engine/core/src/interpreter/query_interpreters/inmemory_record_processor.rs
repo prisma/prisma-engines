@@ -37,7 +37,7 @@ impl InMemoryRecordProcessor {
     /// Checks whether or not we need to take records going backwards in the record list,
     /// which requires reversing the list of records at some point.
     fn needs_reversed_order(&self) -> bool {
-        self.take.map(|t| t < 0).unwrap_or(false)
+        self.take.is_reversed()
     }
 
     pub(crate) fn apply(&self, mut records: ManyRecords) -> ManyRecords {
@@ -181,7 +181,7 @@ impl InMemoryRecordProcessor {
                 None => true,
                 Some(skip) => current_count > skip,
             };
-            let is_within_take_range = match self.take_abs() {
+            let is_within_take_range = match self.take.abs() {
                 None => true,
                 Some(take) => current_count <= take + self.skip.unwrap_or(0),
             };
@@ -193,6 +193,6 @@ impl InMemoryRecordProcessor {
     }
 
     fn must_apply_pagination(&self) -> bool {
-        self.take.or(self.skip).is_some() || self.cursor.is_some()
+        self.take.is_some() || self.skip.is_some() || self.cursor.is_some()
     }
 }
