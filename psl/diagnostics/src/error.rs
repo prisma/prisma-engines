@@ -68,13 +68,6 @@ impl DatamodelError {
         )
     }
 
-    pub fn new_source_argument_deprecated(argument_name: &str, source_name: &str, span: Span) -> DatamodelError {
-        let message = format!(
-            "Argument \"{argument_name}\" is deprecated in data source block \"{source_name}\", because you're using Driver Adapters."
-        );
-        Self::new(message, span)
-    }
-
     pub fn new_generator_argument_not_found_error(
         argument_name: &str,
         generator_name: &str,
