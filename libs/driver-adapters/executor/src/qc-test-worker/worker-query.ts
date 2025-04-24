@@ -232,6 +232,7 @@ function serializeRawQueryResult(
   }
 }
 
+// maps JS column types to their Rust equivalents in order to satisfy assertions in tests
 function serializeColumnType(columnType: ColumnType): string {
   switch (columnType) {
     case ColumnTypeEnum.Int32:
