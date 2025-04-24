@@ -128,9 +128,10 @@ fn lift_datasource(
             }
         };
 
-    // TODO (Prisma 6.6.0): We've only introduced end-to-end Driver Adapters usage in SQLite so far, where users can define
-    // a Driver Adapter for both Prisma Client and Schema Engine. We want to forbid defining `datasource.url` and
-    // `datasource.shadowDatabaseUrl` when `previewFeatures = ["driverAdapters"]`.
+    // TODO (since Prisma 6.6.0 until 7.0.0 / Driver Adapters GA):
+    // We've only introduced end-to-end Driver Adapters usage in SQLite so far, where users can define a Driver Adapter for both
+    // Prisma Client and Schema Engine. We want to allow leaving `datasource.url` empty in that case.
+    // We however cannot forbid it as we don't know if the user is actually using Driver Adapters at runtime and in the CLI yet!
     // In the future, we'll roll out support for PostgreSQL and other database providers as well.
     // Once that's the case, we should update the logic here.
     let is_using_driver_adapters = is_using_driver_adapters && vec!["sqlite"].contains(&active_connector.name());
@@ -140,18 +141,7 @@ fn lift_datasource(
     let connector_data = active_connector.parse_datasource_properties(&mut args, diagnostics);
 
     let (url, url_span) = match args.remove(URL_KEY) {
-        Some((span, url_arg)) => {
-            if is_using_driver_adapters {
-                diagnostics.push_error(DatamodelError::new_source_argument_deprecated(
-                    URL_KEY,
-                    source_name,
-                    span,
-                ));
-                return None;
-            } else {
-                (StringFromEnvVar::coerce(url_arg, diagnostics)?, url_arg.span())
-            }
-        }
+        Some((_span, url_arg)) => (StringFromEnvVar::coerce(url_arg, diagnostics)?, url_arg.span()),
 
         None => {
             if is_using_driver_adapters {
@@ -168,47 +158,24 @@ fn lift_datasource(
         }
     };
 
-    let shadow_database_url = if is_using_driver_adapters {
-        if let Some((span, _)) = args.remove(SHADOW_DATABASE_URL_KEY) {
-            diagnostics.push_error(DatamodelError::new_source_argument_deprecated(
-                SHADOW_DATABASE_URL_KEY,
-                source_name,
-                span,
-            ));
-        }
+    let shadow_database_url = match args.remove(SHADOW_DATABASE_URL_KEY) {
+        Some((_span, shadow_db_url_arg)) => match StringFromEnvVar::coerce(shadow_db_url_arg, diagnostics) {
+            Some(shadow_db_url) => Some(shadow_db_url)
+                .filter(|s| !s.as_literal().map(|literal| literal.is_empty()).unwrap_or(false))
+                .map(|url| (url, shadow_db_url_arg.span())),
+            None => None,
+        },
 
-        None
-    } else {
-        match args.remove(SHADOW_DATABASE_URL_KEY) {
-            Some((_span, shadow_db_url_arg)) => match StringFromEnvVar::coerce(shadow_db_url_arg, diagnostics) {
-                Some(shadow_db_url) => Some(shadow_db_url)
-                    .filter(|s| !s.as_literal().map(|literal| literal.is_empty()).unwrap_or(false))
-                    .map(|url| (url, shadow_db_url_arg.span())),
-                None => None,
-            },
-
-            _ => None,
-        }
+        _ => None,
     };
 
-    let (direct_url, direct_url_span) = if is_using_driver_adapters {
-        if let Some((span, _)) = args.remove(DIRECT_URL_KEY) {
-            diagnostics.push_error(DatamodelError::new_source_argument_deprecated(
-                DIRECT_URL_KEY,
-                source_name,
-                span,
-            ));
-        }
+    let (direct_url, direct_url_span) = match args.remove(DIRECT_URL_KEY) {
+        Some((_, direct_url)) => (
+            StringFromEnvVar::coerce(direct_url, diagnostics),
+            Some(direct_url.span()),
+        ),
 
-        (None, None)
-    } else {
-        match args.remove(DIRECT_URL_KEY) {
-            Some((_, direct_url)) => (
-                StringFromEnvVar::coerce(direct_url, diagnostics),
-                Some(direct_url.span()),
-            ),
-            None => (None, None),
-        }
+        None => (None, None),
     };
 
     if let Some((shadow_url, _)) = &shadow_database_url {
