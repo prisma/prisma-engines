@@ -51,9 +51,9 @@ class QueryPipeline {
 
       const results = transaction
         ? await this.executeTransactionalBatch(
-            batch,
-            parseIsolationLevel(transaction.isolationLevel),
-          )
+          batch,
+          parseIsolationLevel(transaction.isolationLevel),
+        )
         : await this.executeIndependentBatch(batch)
 
       debug('🟢 Batch query results: ', results)
@@ -65,7 +65,7 @@ class QueryPipeline {
       })
     } else {
       const queryable = txId
-        ? this.transactionManager.getTransaction({ id: txId }, query.action)
+        ? this.transactionManager.getTransaction({ id: txId }, 'query')
         : this.driverAdapter
 
       if (!queryable) {
@@ -131,9 +131,9 @@ class QueryPipeline {
     // workaround needed due to raw SQL tests being written against unserialized results
     const interpreter = isPlainRawQuery(queryPlan)
       ? new QueryInterpreter({
-          ...interpreterOpts,
-          serializer: serializeRawQueryResult,
-        })
+        ...interpreterOpts,
+        serializer: serializeRawQueryResult,
+      })
       : QueryInterpreter.forSql(interpreterOpts)
 
     return interpreter.run(queryPlan, queryable)
@@ -159,7 +159,7 @@ class QueryPipeline {
 
     const transaction = this.transactionManager.getTransaction(
       txInfo,
-      'batch transaction query',
+      'batch query',
     )
 
     try {

@@ -123,6 +123,8 @@ parentPort.on('message', async (rawMsg: unknown) => {
     response = {}
   }
 
+  debug('worker response:', JSON.stringify(response))
+
   msg.responsePort.postMessage(response)
 })
 
