@@ -71,12 +71,6 @@ impl WithSpan for Generator {
     }
 }
 
-#[derive(Debug, Clone)]
-pub struct GeneratorWrapper<'a> {
-    pub generator: Generator,
-    pub raw_preview_features: Option<(Vec<&'a str>, Span)>,
-}
-
 pub fn mcf_preview_features<S>(feats: &Option<BitFlags<PreviewFeature>>, s: S) -> Result<S::Ok, S::Error>
 where
     S: Serializer,

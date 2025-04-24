@@ -134,7 +134,7 @@ fn lift_datasource(
     // We however cannot forbid it as we don't know if the user is actually using Driver Adapters at runtime and in the CLI yet!
     // In the future, we'll roll out support for PostgreSQL and other database providers as well.
     // Once that's the case, we should update the logic here.
-    let is_using_driver_adapters = is_using_driver_adapters && vec!["sqlite"].contains(&active_connector.name());
+    let is_using_driver_adapters = is_using_driver_adapters && ["sqlite"].contains(&active_connector.name());
 
     let relation_mode = get_relation_mode(&mut args, ast_source, diagnostics, active_connector);
 

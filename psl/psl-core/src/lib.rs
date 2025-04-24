@@ -25,14 +25,14 @@ pub use crate::{
     reformat::{reformat, reformat_multiple, reformat_validated_schema_into_single},
 };
 pub use diagnostics;
-pub use parser_database::{self, generators, is_reserved_type_name};
+pub use parser_database::{self, coerce, coerce_array, generators, is_reserved_type_name};
 pub use schema_ast;
 pub use set_config_dir::set_config_dir;
-use validate::generator_loader::parse_and_validate_preview_features;
 
 use self::validate::{datasource_loader, generator_loader};
 use diagnostics::Diagnostics;
 use parser_database::{ast, Files, ParserDatabase, SourceFile};
+use schema_ast::ast::WithName;
 
 /// The collection of all available connectors.
 pub type ConnectorRegistry<'a> = &'a [&'static dyn datamodel_connector::Connector];
@@ -172,15 +172,8 @@ fn validate_configuration(
     diagnostics: &mut Diagnostics,
     connectors: ConnectorRegistry<'_>,
 ) -> Configuration {
-    let generator_wrappers = generator_loader::load_generators_from_ast(schema_ast, diagnostics);
-
     // TODO: set `is_using_driver_adapters` to the `true` constant for Prisma 7.0.0.
-    let is_using_driver_adapters = generator_wrappers.iter().any(|generator_wrapper| {
-        generator_wrapper.raw_preview_features.as_ref().is_some_and(|(arr, _)| {
-            arr.iter()
-                .any(|feature| *feature == PreviewFeature::DriverAdapters.to_string())
-        })
-    });
+    let is_using_driver_adapters = has_preview_feature_driver_adapters(schema_ast);
 
     let datasources =
         datasource_loader::load_datasources_from_ast(schema_ast, diagnostics, connectors, is_using_driver_adapters);
@@ -194,29 +187,27 @@ fn validate_configuration(
         .map(FeatureMapWithProvider::new)
         .unwrap_or_else(|| (*ALL_PREVIEW_FEATURES).clone());
 
-    let preview_features: Vec<_> = generator_wrappers
-        .iter()
-        .map(|generator| {
-            generator.raw_preview_features.as_ref().and_then(|(arr, span)| {
-                Some(parse_and_validate_preview_features(
-                    arr.clone(),
-                    &feature_map_with_provider,
-                    span.clone(),
-                    diagnostics,
-                ))
-            })
-        })
-        .collect();
-
-    let generators = generator_wrappers
-        .into_iter()
-        .zip(preview_features)
-        .map(|(generator, preview_features)| {
-            let mut generator = generator.generator;
-            generator.preview_features = preview_features;
-            generator
-        })
-        .collect::<Vec<_>>();
+    let generators = generator_loader::load_generators_from_ast(schema_ast, diagnostics, &feature_map_with_provider);
 
     Configuration::new(generators, datasources, diagnostics.warnings().to_owned())
+}
+
+fn has_preview_feature_driver_adapters(schema_ast: &ast::SchemaAst) -> bool {
+    // Out of band check for `previewFeatures` because we need to know about the driver adapter feature before we parse the datasource block.
+    // But we also need to parse the datasource block before the full generator block parsing.
+    // So we ignore the diagnostics from the `previewFeatures` parsing as that will be properly validated down the line.
+    let mut ignored_diagnostics = Diagnostics::new();
+    schema_ast.generators().any(|generator| {
+        generator
+            .properties
+            .iter()
+            .find(|prop| prop.name() == "previewFeatures")
+            .and_then(|prop| prop.value.as_ref())
+            .and_then(|v| coerce_array(v, &coerce::string, &mut ignored_diagnostics))
+            .is_some_and(|value| {
+                value
+                    .iter()
+                    .any(|item| *item == PreviewFeature::DriverAdapters.to_string())
+            })
+    })
 }
