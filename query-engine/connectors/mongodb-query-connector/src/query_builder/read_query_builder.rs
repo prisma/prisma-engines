@@ -467,13 +467,7 @@ fn take(take: Take, ignore: bool) -> Option<i64> {
         match take {
             Take::All => None,
             Take::One => Some(1),
-            Take::Some(n) => {
-                if n < 0 {
-                    Some(-n)
-                } else {
-                    Some(n)
-                }
-            }
+            Take::Some(n) => Some(n.abs()),
         }
     }
 }

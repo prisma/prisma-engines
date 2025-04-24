@@ -48,7 +48,7 @@ impl Take {
         match self {
             Take::All => None,
             Take::One => Some(1),
-            Take::Some(n) => Some(if n < 0 { -n } else { n }),
+            Take::Some(n) => Some(n.abs()),
         }
     }
 
