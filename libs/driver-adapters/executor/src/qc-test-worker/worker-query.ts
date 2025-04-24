@@ -152,6 +152,8 @@ class QueryPipeline {
     isolationLevel?: IsolationLevel,
   ) {
     const txInfo = await this.transactionManager.startTransaction({
+      maxWait: 200,
+      timeout: 500,
       isolationLevel,
     })
 
@@ -162,7 +164,6 @@ class QueryPipeline {
 
     try {
       const results: unknown[] = []
-
       for (const query of queries) {
         const result = await this.executeQuery(transaction, query, false)
         results.push(result)
