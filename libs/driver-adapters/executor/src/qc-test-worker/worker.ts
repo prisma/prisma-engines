@@ -115,6 +115,14 @@ parentPort.on('message', async (rawMsg: unknown) => {
     return
   }
 
+  // The Rust side expects `TransactionEndResponse::Ok(Empty)`,
+  // where `Empty` is `struct Empty {}` as an empty response.
+  // Without this conversion the test cases don't receive the
+  // response at all, rendering them frozen.
+  if (response === undefined) {
+    response = {}
+  }
+
   msg.responsePort.postMessage(response)
 })
 
@@ -197,10 +205,7 @@ type InitQueryCompilerParams = {
   schema: string
 }
 
-async function initQueryCompiler({
-  driverAdapterManager,
-  schema,
-}: InitQueryCompilerParams) {
+async function initQueryCompiler({ driverAdapterManager, schema }: InitQueryCompilerParams) {
   const adapter = await driverAdapterManager.connect()
 
   let connectionInfo: ConnectionInfo = {}
