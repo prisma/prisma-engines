@@ -24,10 +24,6 @@ impl ValidationError {
     pub fn message(&self) -> &str {
         &self.message
     }
-
-    pub fn meta(&self) -> Option<&serde_json::Value> {
-        self.meta.as_ref()
-    }
 }
 
 impl fmt::Display for ValidationError {

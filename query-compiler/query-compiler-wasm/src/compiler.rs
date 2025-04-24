@@ -129,7 +129,7 @@ impl QueryCompiler {
 
 #[derive(Serialize, Tsify)]
 #[serde(tag = "type", rename_all = "camelCase")]
-#[tsify(into_wasm_abi)]
+#[tsify(into_wasm_abi, hashmap_as_object)]
 pub enum BatchResponse {
     Multi {
         plans: Vec<Expression>,
@@ -145,7 +145,7 @@ pub enum BatchResponse {
 }
 
 #[derive(Serialize, Tsify)]
-#[tsify(into_wasm_abi)]
+#[tsify(into_wasm_abi, hashmap_as_object)]
 pub struct JsCompileError {
     message: String,
     code: Option<String>,
@@ -171,7 +171,7 @@ impl From<CompileError> for JsCompileError {
             )) => JsCompileError {
                 message: error.message().into(),
                 code: Some(error.kind().code().into()),
-                meta: error.meta().cloned(),
+                meta: serde_json::to_value(&error).ok(),
             },
             _ => JsCompileError {
                 message: value.to_string(),
