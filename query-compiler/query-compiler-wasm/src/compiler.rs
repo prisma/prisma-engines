@@ -166,7 +166,7 @@ impl JsCompileError {
 
     pub fn user_facing<E: UserFacingError>(error: E) -> Self {
         JsCompileError {
-            message: error.message().into(),
+            message: error.message(),
             code: Some(E::ERROR_CODE.into()),
             meta: serde_json::to_value(&error).ok(),
         }
