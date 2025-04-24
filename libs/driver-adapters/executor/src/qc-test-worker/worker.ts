@@ -107,12 +107,8 @@ parentPort.on('message', async (rawMsg: unknown) => {
   try {
     response = await dispatchMessage(msg)
   } catch (error) {
-    if (!(error instanceof Error)) {
-      // TODO: we should have a nicer mapping for driver adapter errors
-      error = new Error(JSON.stringify(error))
-    }
-    msg.responsePort.postMessage(error)
-    return
+    // TODO: we should have a nicer mapping for driver adapter errors
+    response = error instanceof Error ? error : new Error(JSON.stringify(error))
   }
 
   // The Rust side expects `TransactionEndResponse::Ok(Empty)`,
