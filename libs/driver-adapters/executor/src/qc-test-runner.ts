@@ -11,7 +11,7 @@ import type { Message } from './qc-test-worker/worker'
 
 async function main(): Promise<void> {
   const env = S.decodeUnknownSync(Env)(process.env)
-  console.log('[env]', env)
+  // console.log('[env]', env)
 
   const iface = readline.createInterface({
     input: process.stdin,
