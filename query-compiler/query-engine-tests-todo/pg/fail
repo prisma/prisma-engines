@@ -77,7 +77,6 @@ new::regressions::prisma_13097::prisma_13097::group_by_enum_array
 new::regressions::prisma_13158::prisma_1358::insert_mixed_int_float_array_in_execute_raw
 new::regressions::prisma_14696::prisma_14696::create_does_not_panic
 new::regressions::prisma_21182::regression::query_with_normalized_dependencies
-new::regressions::prisma_21369::prisma_21369::select_null_works
 new::regressions::prisma_21901::prisma_21901::test
 new::regressions::prisma_22971::prisma_22971::test_22971
 new::regressions::prisma_5952::regression::decimal_find_different_uniques
@@ -372,11 +371,8 @@ raw::sql::casts::casts::query_date_casts
 raw::sql::errors::raw_errors::list_param_for_scalar_column_should_not_panic_pg_js
 raw::sql::input_coercion::input_coercion::decimal_input_correctly_coerced
 raw::sql::input_coercion::input_coercion::scalar_input_correctly_coerced
-raw::sql::scalar_list::scalar_list::empty_scalar_lists
 raw::sql::scalar_list::scalar_list::null_native_type_lists
-raw::sql::scalar_list::scalar_list::null_only_scalar_lists
 raw::sql::scalar_list::scalar_list::null_scalar_lists
-raw::sql::scalar_list::scalar_list::prisma_11339
 raw::sql::typed_output::typed_output::all_scalars_pg
 writes::data_types::bigint::bigint::using_bigint_field
 writes::data_types::bytes::bytes::byte_id_coercion
