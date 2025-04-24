@@ -3820,6 +3820,7 @@ dependencies = [
  "serde_json",
  "tracing",
  "tsify",
+ "user-facing-errors",
  "wasm-bindgen",
  "wasm-rs-dbg",
 ]

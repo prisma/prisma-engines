@@ -53,9 +53,9 @@ impl std::error::Error for QueryGraphBuilderError {}
 
 #[derive(Debug)]
 pub struct RelationViolation {
-    pub(crate) relation_name: String,
-    pub(crate) model_a_name: String,
-    pub(crate) model_b_name: String,
+    pub relation_name: String,
+    pub model_a_name: String,
+    pub model_b_name: String,
 }
 
 impl From<RelationFieldRef> for RelationViolation {
