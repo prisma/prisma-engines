@@ -80,8 +80,6 @@ new::ref_actions::on_update::set_null::one2one_opt::update_parent_recurse_set_nu
 new::ref_actions::on_update::set_null::one2one_opt::upsert_parent
 new::regressions::max_integer::max_integer::unfitted_int_should_fail
 new::regressions::max_integer::max_integer::unfitted_int_should_fail_pg_js
-new::regressions::prisma_11750::prisma_11750::test_itx_concurrent_updates_multi_thread
-new::regressions::prisma_11750::prisma_11750::test_itx_concurrent_updates_single_thread
 new::regressions::prisma_13097::prisma_13097::group_by_boolean_array
 new::regressions::prisma_13097::prisma_13097::group_by_enum_array
 new::regressions::prisma_13158::prisma_1358::insert_mixed_int_float_array_in_execute_raw

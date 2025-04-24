@@ -20,7 +20,7 @@ async-trait.workspace = true
 nom.workspace = true
 itertools.workspace = true
 regex.workspace = true
-serde.workspace = true
+serde = { workspace = true, features = ["derive"] }
 tracing.workspace = true
 tracing-futures.workspace = true
 tracing-subscriber.workspace = true
