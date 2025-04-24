@@ -2,8 +2,6 @@ new::cursor::bigint_cursor::bigint_id_must_work
 new::disconnect::disconnect_security::must_honor_connect_scope_m2m
 new::disconnect::disconnect_security::must_honor_connect_scope_one2m
 new::multi_schema::multi_schema::create_and_get_many_to_many_relations
-new::multi_schema::multi_schema::crud_relations
-new::multi_schema::multi_schema::crud_simple
 new::multi_schema::multi_schema::implicit_m2m_simple
 new::native_upsert::native_upsert::should_not_if_has_nested_select
 new::native_upsert::native_upsert::should_not_if_missing_update
@@ -74,7 +72,6 @@ new::regressions::max_integer::max_integer::unfitted_int_should_fail
 new::regressions::max_integer::max_integer::unfitted_int_should_fail_pg_js
 new::regressions::prisma_11750::prisma_11750::test_itx_concurrent_updates_multi_thread
 new::regressions::prisma_11750::prisma_11750::test_itx_concurrent_updates_single_thread
-new::regressions::prisma_13089::prisma_13097::filtering_with_dollar_values
 new::regressions::prisma_13097::prisma_13097::group_by_boolean_array
 new::regressions::prisma_13097::prisma_13097::group_by_enum_array
 new::regressions::prisma_13158::prisma_1358::insert_mixed_int_float_array_in_execute_raw
@@ -92,7 +89,6 @@ new::regressions::team_orm_927::count_before_relation::find_unique
 new::relation_load_strategy::relation_load_strategy::test_create_lateral_join
 new::relation_load_strategy::relation_load_strategy::test_delete_lateral_join
 new::relation_load_strategy::relation_load_strategy::test_find_first_lateral_join
-new::relation_load_strategy::relation_load_strategy::test_find_first_lateral_query
 new::relation_load_strategy::relation_load_strategy::test_find_first_or_throw_lateral_join
 new::relation_load_strategy::relation_load_strategy::test_find_first_or_throw_lateral_query
 new::relation_load_strategy::relation_load_strategy::test_find_many_lateral_join
@@ -245,9 +241,6 @@ queries::filters::filter_regression::fr_m_to_n::work_with_nulls
 queries::filters::json_filters::json_filters::multi_filtering
 queries::filters::json_filters::json_filters::multi_filtering_pg_json
 queries::filters::json_filters::json_filters::no_path_without_filter
-queries::filters::json_filters::json_filters::string_begins_with_does_not_error
-queries::filters::json_filters::json_filters::string_contains_does_not_error
-queries::filters::json_filters::json_filters::string_ends_with_does_not_error
 queries::filters::many_relation::many_relation::m2m_join_relation_1level
 queries::filters::many_relation::many_relation::prisma_25103
 queries::filters::many_relation::many_relation::simple_scalar_filter
@@ -364,7 +357,6 @@ queries::regressions::pagination_regression::pagination_regr::prisma_3505_case_2
 queries::regressions::prisma_933::prisma_933_spec::prisma_933
 queries::relations::related_null_queries::inline_relation::multi_field_1n_rel_with_nulls
 queries::simple::find_first::find_first_query::find_first_matching
-queries::simple::find_first::find_first_query::find_first_not_matching
 queries::simple::find_first_or_throw::find_first_or_throw_query::find_first_or_throw_matching
 queries::simple::find_first_or_throw::find_first_or_throw_query::find_first_or_throw_not_matching
 queries::simple::find_unique_or_throw::find_unique_or_throw::find_unique_or_throw_when_record_is_found

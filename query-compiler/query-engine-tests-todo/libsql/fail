@@ -66,7 +66,6 @@ new::ref_actions::on_update::set_null::one2one_opt::update_parent_recurse_restri
 new::ref_actions::on_update::set_null::one2one_opt::update_parent_recurse_set_null
 new::ref_actions::on_update::set_null::one2one_opt::upsert_parent
 new::regressions::max_integer::max_integer::unfitted_int_should_fail
-new::regressions::prisma_13089::prisma_13097::filtering_with_dollar_values
 new::regressions::prisma_14696::prisma_14696::create_does_not_panic
 new::regressions::prisma_15204::conversion_error::convert_to_bigint_sqlite_js
 new::regressions::prisma_15204::conversion_error::convert_to_int_sqlite_js
@@ -213,9 +212,6 @@ queries::filters::field_reference::relation_filter::relation_filter::many_to_man
 queries::filters::filter_regression::fr_m_to_n::work_with_nulls
 queries::filters::filter_unwrap::filter_unwrap::many_filter
 queries::filters::json_filters::json_filters::no_path_without_filter
-queries::filters::json_filters::json_filters::string_begins_with_does_not_error
-queries::filters::json_filters::json_filters::string_contains_does_not_error
-queries::filters::json_filters::json_filters::string_ends_with_does_not_error
 queries::filters::many_relation::many_relation::m2m_join_relation_1level
 queries::filters::many_relation::many_relation::prisma_25103
 queries::filters::many_relation::many_relation::simple_scalar_filter
@@ -333,7 +329,6 @@ queries::regressions::prisma_933::prisma_933_spec::prisma_933
 queries::relations::inline_relation::inline_rel::scalar_field_back_relation
 queries::relations::related_null_queries::inline_relation::multi_field_1n_rel_with_nulls
 queries::simple::find_first::find_first_query::find_first_matching
-queries::simple::find_first::find_first_query::find_first_not_matching
 queries::simple::find_first_or_throw::find_first_or_throw_query::find_first_or_throw_matching
 queries::simple::find_first_or_throw::find_first_or_throw_query::find_first_or_throw_not_matching
 queries::simple::find_unique_or_throw::find_unique_or_throw::find_unique_or_throw_when_record_is_found
