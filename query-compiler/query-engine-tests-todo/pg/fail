@@ -190,9 +190,6 @@ queries::batching::transactional_batch::transactional::invalid_isolation_level
 queries::batching::transactional_batch::transactional::one_query
 queries::batching::transactional_batch::transactional::one_success_one_fail
 queries::batching::transactional_batch::transactional::raw_mix
-queries::batching::transactional_batch::transactional::two_query_for_batch
-queries::batching::transactional_batch::transactional::two_success
-queries::batching::transactional_batch::transactional::valid_isolation_level
 queries::chunking::chunking::order_by_aggregation_should_fail
 queries::chunking::chunking::order_by_relevance_should_fail
 queries::data_types::bigint::bigint::read_many
