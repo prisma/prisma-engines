@@ -203,7 +203,10 @@ type InitQueryCompilerParams = {
   schema: string
 }
 
-async function initQueryCompiler({ driverAdapterManager, schema }: InitQueryCompilerParams) {
+async function initQueryCompiler({
+  driverAdapterManager,
+  schema,
+}: InitQueryCompilerParams) {
   const adapter = await driverAdapterManager.connect()
 
   let connectionInfo: ConnectionInfo = {}
