@@ -1,6 +1,16 @@
 new::cursor::bigint_cursor::bigint_id_must_work
 new::disconnect::disconnect_security::must_honor_connect_scope_m2m
 new::disconnect::disconnect_security::must_honor_connect_scope_one2m
+new::interactive_tx::interactive_tx::batch_queries_failure
+new::interactive_tx::interactive_tx::batch_queries_rollback
+new::interactive_tx::interactive_tx::batch_queries_success
+new::interactive_tx::interactive_tx::commit_after_rollback
+new::interactive_tx::interactive_tx::double_commit
+new::interactive_tx::interactive_tx::double_rollback
+new::interactive_tx::interactive_tx::raw_queries
+new::interactive_tx::interactive_tx::rollback_after_commit
+new::interactive_tx::interactive_tx::tx_expiration_cycle
+new::interactive_tx::interactive_tx::tx_expiration_failure_cycle
 new::multi_schema::multi_schema::create_and_get_many_to_many_relations
 new::multi_schema::multi_schema::implicit_m2m_simple
 new::native_upsert::native_upsert::should_not_if_has_nested_select
@@ -70,6 +80,8 @@ new::ref_actions::on_update::set_null::one2one_opt::update_parent_recurse_set_nu
 new::ref_actions::on_update::set_null::one2one_opt::upsert_parent
 new::regressions::max_integer::max_integer::unfitted_int_should_fail
 new::regressions::max_integer::max_integer::unfitted_int_should_fail_pg_js
+new::regressions::prisma_11750::prisma_11750::test_itx_concurrent_updates_multi_thread
+new::regressions::prisma_11750::prisma_11750::test_itx_concurrent_updates_single_thread
 new::regressions::prisma_13097::prisma_13097::group_by_boolean_array
 new::regressions::prisma_13097::prisma_13097::group_by_enum_array
 new::regressions::prisma_13158::prisma_1358::insert_mixed_int_float_array_in_execute_raw
