@@ -27,11 +27,12 @@ pub(crate) fn load_datasources_from_ast(
     ast_schema: &ast::SchemaAst,
     diagnostics: &mut Diagnostics,
     connectors: crate::ConnectorRegistry<'_>,
+    is_using_driver_adapters: bool,
 ) -> Vec<Datasource> {
     let mut sources = Vec::new();
 
     for src in ast_schema.sources() {
-        if let Some(source) = lift_datasource(src, diagnostics, connectors) {
+        if let Some(source) = lift_datasource(src, diagnostics, connectors, is_using_driver_adapters) {
             sources.push(source);
         }
     }
@@ -53,6 +54,7 @@ fn lift_datasource(
     ast_source: &ast::SourceConfig,
     diagnostics: &mut Diagnostics,
     connectors: crate::ConnectorRegistry<'_>,
+    is_using_driver_adapters: bool,
 ) -> Option<Datasource> {
     let source_name = ast_source.name();
     let mut args: HashMap<_, (_, &Expression)> = ast_source
@@ -126,6 +128,14 @@ fn lift_datasource(
             }
         };
 
+    // TODO (since Prisma 6.6.0 until 7.0.0 / Driver Adapters GA):
+    // We've only introduced end-to-end Driver Adapters usage in SQLite so far, where users can define a Driver Adapter for both
+    // Prisma Client and Schema Engine. We want to allow leaving `datasource.url` empty in that case.
+    // We however cannot forbid it as we don't know if the user is actually using Driver Adapters at runtime and in the CLI yet!
+    // In the future, we'll roll out support for PostgreSQL and other database providers as well.
+    // Once that's the case, we should update the logic here.
+    let is_using_driver_adapters = is_using_driver_adapters && ["sqlite"].contains(&active_connector.name());
+
     let relation_mode = get_relation_mode(&mut args, ast_source, diagnostics, active_connector);
 
     let connector_data = active_connector.parse_datasource_properties(&mut args, diagnostics);
@@ -134,13 +144,17 @@ fn lift_datasource(
         Some((_span, url_arg)) => (StringFromEnvVar::coerce(url_arg, diagnostics)?, url_arg.span()),
 
         None => {
-            diagnostics.push_error(DatamodelError::new_source_argument_not_found_error(
-                URL_KEY,
-                source_name,
-                ast_source.span,
-            ));
+            if is_using_driver_adapters {
+                (StringFromEnvVar::new_literal("<invalid>".to_owned()), ast_source.span())
+            } else {
+                diagnostics.push_error(DatamodelError::new_source_argument_not_found_error(
+                    URL_KEY,
+                    source_name,
+                    ast_source.span,
+                ));
 
-            return None;
+                return None;
+            }
         }
     };
 
