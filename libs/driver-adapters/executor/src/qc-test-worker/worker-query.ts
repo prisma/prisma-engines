@@ -65,7 +65,7 @@ class QueryPipeline {
       })
     } else {
       const queryable = txId
-        ? this.transactionManager.getTransaction({ id: txId }, query.action)
+        ? this.transactionManager.getTransaction({ id: txId }, 'query')
         : this.driverAdapter
 
       if (!queryable) {
@@ -159,7 +159,7 @@ class QueryPipeline {
 
     const transaction = this.transactionManager.getTransaction(
       txInfo,
-      'batch transaction query',
+      'batch query',
     )
 
     try {

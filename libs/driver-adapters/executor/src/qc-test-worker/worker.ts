@@ -107,13 +107,19 @@ parentPort.on('message', async (rawMsg: unknown) => {
   try {
     response = await dispatchMessage(msg)
   } catch (error) {
-    if (!(error instanceof Error)) {
-      // TODO: we should have a nicer mapping for driver adapter errors
-      error = new Error(JSON.stringify(error))
-    }
-    msg.responsePort.postMessage(error)
-    return
+    // TODO: we should have a nicer mapping for driver adapter errors
+    response = error instanceof Error ? error : new Error(JSON.stringify(error))
   }
+
+  // The Rust side expects `TransactionEndResponse::Ok(Empty)`,
+  // where `Empty` is `struct Empty {}` as an empty response.
+  // Without this conversion the test cases don't receive the
+  // response at all, rendering them frozen.
+  if (response === undefined) {
+    response = {}
+  }
+
+  debug('worker response:', JSON.stringify(response))
 
   msg.responsePort.postMessage(response)
 })

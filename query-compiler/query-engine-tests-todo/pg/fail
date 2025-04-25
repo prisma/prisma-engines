@@ -1,6 +1,16 @@
 new::cursor::bigint_cursor::bigint_id_must_work
 new::disconnect::disconnect_security::must_honor_connect_scope_m2m
 new::disconnect::disconnect_security::must_honor_connect_scope_one2m
+new::interactive_tx::interactive_tx::batch_queries_failure
+new::interactive_tx::interactive_tx::batch_queries_rollback
+new::interactive_tx::interactive_tx::batch_queries_success
+new::interactive_tx::interactive_tx::commit_after_rollback
+new::interactive_tx::interactive_tx::double_commit
+new::interactive_tx::interactive_tx::double_rollback
+new::interactive_tx::interactive_tx::raw_queries
+new::interactive_tx::interactive_tx::rollback_after_commit
+new::interactive_tx::interactive_tx::tx_expiration_cycle
+new::interactive_tx::interactive_tx::tx_expiration_failure_cycle
 new::multi_schema::multi_schema::create_and_get_many_to_many_relations
 new::multi_schema::multi_schema::implicit_m2m_simple
 new::native_upsert::native_upsert::should_not_if_has_nested_select
