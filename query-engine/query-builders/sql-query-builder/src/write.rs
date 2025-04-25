@@ -1,6 +1,6 @@
 use crate::limit::wrap_with_limit_subquery_if_needed;
-use crate::FilterBuilder;
 use crate::{model_extensions::*, sql_trace::SqlTraceComment, Context};
+use crate::{update, FilterBuilder};
 use itertools::Itertools;
 use quaint::ast::*;
 use query_structure::*;
@@ -229,6 +229,27 @@ fn projection_into_columns(
     ctx: &Context<'_>,
 ) -> impl Iterator<Item = Column<'static>> {
     selected_fields.as_columns(ctx).map(|c| c.set_is_selected(true))
+}
+
+pub fn generate_update_statements(
+    model: &Model,
+    record_filter: RecordFilter,
+    args: WriteArgs,
+    selected_fields: Option<&ModelProjection>,
+    limit: Option<usize>,
+    ctx: &Context<'_>,
+) -> Vec<Query<'static>> {
+    match record_filter.selectors {
+        Some(ids) => {
+            let filter = record_filter.filter.clone();
+            let slice = &ids[..limit.unwrap_or(ids.len()).min(ids.len())];
+            update::update_many_from_ids_and_filter(model, filter, slice, args, selected_fields, ctx)
+        }
+        None => {
+            let query = update::update_many_from_filter(model, record_filter.filter, args, selected_fields, limit, ctx);
+            vec![query]
+        }
+    }
 }
 
 /// Generates deletes for multiple records, defined in the `RecordFilter`.
