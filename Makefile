@@ -178,6 +178,11 @@ dev-libsql-qc: build-qc-wasm build-driver-adapters-kit-qc
 
 test-libsql-qc: dev-libsql-qc test-qe-st
 
+dev-better-sqlite3-qc: build-qc-wasm build-driver-adapters-kit-qc
+	cp $(CONFIG_PATH)/better-sqlite3-qc $(CONFIG_FILE)
+
+test-better-sqlite3-qc: dev-better-sqlite3-qc test-qe-st
+
 dev-d1: build-qe-wasm build-se-wasm build-driver-adapters-kit-qe
 	cp $(CONFIG_PATH)/cloudflare-d1 $(CONFIG_FILE)
 
@@ -189,6 +194,12 @@ dev-better-sqlite3: build-qe-wasm build-se-wasm build-driver-adapters-kit-qe
 
 test-better-sqlite3: dev-better-sqlite3 test-qe-st
 test-driver-adapter-better-sqlite3: test-better-sqlite3
+
+dev-sqlite3: build-qe-wasm build-se-wasm build-driver-adapters-kit-qe
+	cp $(CONFIG_PATH)/sqlite3 $(CONFIG_FILE)
+
+test-sqlite3: dev-sqlite3 test-qe-st
+test-driver-adapter-sqlite3: test-sqlite3
 
 start-postgres9:
 	docker compose -f docker-compose.yml up --wait -d --remove-orphans postgres9
