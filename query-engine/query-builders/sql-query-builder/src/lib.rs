@@ -18,7 +18,7 @@ pub mod write;
 
 use std::{collections::HashMap, marker::PhantomData};
 
-use itertools::Itertools;
+use itertools::{Either, Itertools};
 use prisma_value::PrismaValue;
 use quaint::{
     ast::{Column, Comparable, ConditionTree, ExpressionKind, Insert, OnConflict, OpaqueType, Query, Row, Values},
@@ -361,9 +361,19 @@ pub fn in_conditions<'a>(
     results: impl IntoIterator<Item = &'a SelectionResult>,
     ctx: &Context<'_>,
 ) -> ConditionTree<'static> {
+    let iter = match results.into_iter().exactly_one() {
+        Ok(result) if matches!(&result.pairs[..], [(_, PrismaValue::Placeholder { .. })]) => {
+            return Row::from(columns.to_vec())
+                .in_selection(ExpressionKind::ParameterizedRow(result.db_values(ctx).pop().unwrap()))
+                .into()
+        }
+        // fall back to the default behavior in other cases
+        Ok(item) => Either::Left(std::iter::once(item)),
+        Err(items) => Either::Right(items),
+    };
     let mut values = Values::empty();
 
-    for result in results.into_iter() {
+    for result in iter {
         let vals: Vec<_> = result.db_values(ctx);
         values.push(vals)
     }

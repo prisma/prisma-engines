@@ -857,14 +857,7 @@ pub trait Visitor<'a> {
 
                     self.visit_expression(col)?;
                     self.write(" IN ")?;
-
-                    match &vals.values[..] {
-                        [Expression {
-                            kind: ExpressionKind::Parameterized(value),
-                            ..
-                        }] => self.visit_parameterized_row(value.clone()),
-                        _ => self.visit_row(vals),
-                    }
+                    self.visit_row(vals)
                 }
 
                 // No need to do `IN` if right side is only one value,
