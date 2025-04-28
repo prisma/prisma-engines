@@ -407,7 +407,6 @@ writes::regressions::if_node_siblig_dep_regression::if_node_sibling::test
 writes::regressions::prisma_11731::connect_or_create::one2one_inlined_child
 writes::regressions::prisma_11731::connect_or_create::one2one_inlined_parent
 writes::relations::rel_graphql::rel_graphql::one2one_rel_allow_one_item_per_side
-writes::unchecked_writes::unchecked_nested_update_many::unchecked_nested_um::allow_write_autoinc_id
 writes::unchecked_writes::unchecked_update_spec::unchecked_update::allow_write_non_inline_rels
 writes::uniques_and_node_selectors::multi_field_uniq_mutation::multi_field_uniq_mut::nested_connect_one2one_rel
 writes::uniques_and_node_selectors::multi_field_uniq_mutation::multi_field_uniq_mut::nested_set_multi_field_uniq
