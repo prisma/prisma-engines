@@ -77,7 +77,7 @@ class QueryPipeline {
       try {
         const result = await this.executeQuery(queryable, query, !txId)
 
-        debug('🟢 Query result: ', result)
+        debug('🟢 Query result: ', util.inspect(result, false, null, true))
 
         return JSON.stringify(getResponseInQeFormat(query, result))
       } catch (error) {
