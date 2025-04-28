@@ -8,7 +8,7 @@ use query_builder::{QueryArgumentsExt, QueryBuilder, RelationLink};
 use query_core::{AggregateRecordsQuery, FilteredQuery, QueryGraphBuilderError, ReadQuery, RelatedRecordsQuery};
 use query_structure::{
     ConditionValue, FieldSelection, Filter, IntoFilter, PrismaValue, QueryArguments, QueryMode, RelationField,
-    ScalarCondition, ScalarFilter, ScalarProjection, Take,
+    ScalarCondition, ScalarFilter, ScalarProjection, SelectionResult, Take,
 };
 
 pub(crate) fn translate_read_query(query: ReadQuery, builder: &dyn QueryBuilder) -> TranslateResult<Expression> {
@@ -168,34 +168,24 @@ fn add_inmemory_join(
 }
 
 fn build_read_related_records(
-    mut rrq: RelatedRecordsQuery,
+    rrq: RelatedRecordsQuery,
     conditions: Option<Vec<ScalarCondition>>,
     builder: &dyn QueryBuilder,
 ) -> TranslateResult<(Expression, JoinFields)> {
     let selected_fields = rrq.selected_fields.without_relations().into_virtuals_last();
     let needs_reversed_order = rrq.args.needs_reversed_order();
-    let child_linking_fields = rrq.parent_field.related_field().linking_fields();
-
-    if let Some(results) = rrq.parent_results {
-        let links = results
-            .into_iter()
-            .map(|result| child_linking_fields.assimilate(result))
-            .collect::<Result<Vec<_>, _>>()
-            .map_err(QueryGraphBuilderError::from)?;
-
-        let filter = rrq
-            .args
-            .filter
-            .take()
-            .into_iter()
-            .fold(links.filter(), |acc, filter| Filter::and(vec![acc, filter]));
-        rrq.args.filter = Some(filter);
-    }
 
     let (mut child_query, join_on) = if rrq.parent_field.relation().is_many_to_many() {
         build_read_m2m_query(rrq.parent_field, conditions, rrq.args, &selected_fields, builder)?
     } else {
-        build_read_one2m_query(rrq.parent_field, conditions, rrq.args, &selected_fields, builder)?
+        build_read_one2m_query(
+            rrq.parent_field,
+            conditions,
+            rrq.args,
+            rrq.parent_results,
+            &selected_fields,
+            builder,
+        )?
     };
 
     if needs_reversed_order {
@@ -240,11 +230,28 @@ fn build_read_one2m_query(
     field: RelationField,
     conditions: Option<Vec<ScalarCondition>>,
     mut args: QueryArguments,
+    parent_results: Option<Vec<SelectionResult>>,
     selected_fields: &FieldSelection,
     builder: &dyn QueryBuilder,
 ) -> TranslateResult<(Expression, JoinFields)> {
     let related_scalars = field.related_field().left_scalars();
     let join_fields = related_scalars.iter().map(|sf| sf.name().to_owned()).collect();
+
+    if let Some(results) = parent_results {
+        let linking_fields = field.related_field().linking_fields();
+        let links = results
+            .into_iter()
+            .map(|result| linking_fields.assimilate(result))
+            .collect::<Result<Vec<_>, _>>()
+            .map_err(QueryGraphBuilderError::from)?;
+
+        let filter = args
+            .filter
+            .take()
+            .into_iter()
+            .fold(links.filter(), |acc, filter| Filter::and(vec![acc, filter]));
+        args.filter = Some(filter);
+    }
 
     // TODO: we ignore chunking for now
     if let Some(conditions) = conditions {
