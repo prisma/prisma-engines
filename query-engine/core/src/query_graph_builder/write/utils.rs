@@ -6,8 +6,8 @@ use crate::{
 use indexmap::IndexMap;
 use psl::parser_database::ReferentialAction;
 use query_structure::{
-    DatasourceFieldName, FieldSelection, Filter, IntoFilter, Model, PrismaValue, RecordFilter, RelationFieldRef,
-    SelectionResult, WriteArgs, WriteOperation,
+    DatasourceFieldName, FieldSelection, Filter, Model, PrismaValue, RecordFilter, RelationFieldRef, SelectionResult,
+    WriteArgs, WriteOperation,
 };
 use schema::QuerySchema;
 
@@ -124,8 +124,11 @@ where
     let parent_linking_fields = parent_relation_field.linking_fields();
     let selection = parent_model_id.merge(parent_linking_fields);
     let child_model = parent_relation_field.related_model();
-    let child_linking_fields = parent_relation_field.related_field().linking_fields();
-    let selected_fields = get_selected_fields(&parent_relation_field.related_model(), child_linking_fields.clone());
+
+    let selected_fields = get_selected_fields(
+        &parent_relation_field.related_model(),
+        parent_relation_field.related_field().linking_fields(),
+    );
 
     let read_children_node = graph.create_node(Query::Read(ReadQuery::RelatedRecordsQuery(RelatedRecordsQuery {
         name: "find_children_by_parent".to_owned(),
@@ -143,20 +146,9 @@ where
         &read_children_node,
         QueryGraphDependency::ProjectedDataDependency(
             selection,
-            Box::new(move |mut read_children_node, selections| {
+            Box::new(|mut read_children_node, selections| {
                 if let Node::Query(Query::Read(ReadQuery::RelatedRecordsQuery(ref mut rq))) = read_children_node {
-                    let links = selections
-                        .into_iter()
-                        .map(|result| child_linking_fields.assimilate(result))
-                        .collect::<Result<Vec<_>, _>>()?;
-
-                    let filter = rq
-                        .args
-                        .filter
-                        .take()
-                        .into_iter()
-                        .fold(links.filter(), |acc, filter| Filter::and(vec![acc, filter]));
-                    rq.args.filter = Some(filter);
+                    rq.parent_results = Some(selections);
                 };
 
                 Ok(read_children_node)
