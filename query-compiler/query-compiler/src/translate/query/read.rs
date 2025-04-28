@@ -181,7 +181,7 @@ fn build_read_related_records(
             .into_iter()
             .map(|result| child_linking_fields.assimilate(result))
             .collect::<Result<Vec<_>, _>>()
-            .map_err(|err| QueryGraphBuilderError::from(err))?;
+            .map_err(QueryGraphBuilderError::from)?;
 
         let filter = rrq
             .args
