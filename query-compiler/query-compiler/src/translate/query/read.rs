@@ -239,17 +239,14 @@ fn build_read_one2m_query(
     let join_fields = related_scalars.iter().map(|sf| sf.name().to_owned()).collect();
 
     if let Some(results) = parent_results {
-        let parent_model_id = field.model().primary_identifier();
-        let child_linking_fields = field.related_field().linking_fields();
+        let parent_link_id = field.linking_fields();
+        let child_link_id = field.related_field().linking_fields();
 
         let links = results
             .into_iter()
             .map(|result| {
-                let parent_link = result
-                    .split_into(slice::from_ref(&parent_model_id))
-                    .pop()
-                    .expect("parent link should exist");
-                child_linking_fields.assimilate(parent_link)
+                let parent_link = result.split_into(slice::from_ref(&parent_link_id)).pop().unwrap();
+                child_link_id.assimilate(parent_link)
             })
             .collect::<Result<Vec<_>, _>>()
             .map_err(QueryGraphBuilderError::from)?;
