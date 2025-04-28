@@ -5,10 +5,10 @@ use crate::{
 };
 use itertools::Itertools;
 use query_builder::{QueryArgumentsExt, QueryBuilder, RelationLink};
-use query_core::{AggregateRecordsQuery, FilteredQuery, ReadQuery, RelatedRecordsQuery};
+use query_core::{AggregateRecordsQuery, FilteredQuery, QueryGraphBuilderError, ReadQuery, RelatedRecordsQuery};
 use query_structure::{
-    ConditionValue, FieldSelection, Filter, PrismaValue, QueryArguments, QueryMode, RelationField, ScalarCondition,
-    ScalarFilter, ScalarProjection, Take,
+    ConditionValue, FieldSelection, Filter, IntoFilter, PrismaValue, QueryArguments, QueryMode, RelationField,
+    ScalarCondition, ScalarFilter, ScalarProjection, SelectionResult, Take,
 };
 
 pub(crate) fn translate_read_query(query: ReadQuery, builder: &dyn QueryBuilder) -> TranslateResult<Expression> {
@@ -168,12 +168,29 @@ fn add_inmemory_join(
 }
 
 fn build_read_related_records(
-    rrq: RelatedRecordsQuery,
+    mut rrq: RelatedRecordsQuery,
     conditions: Option<Vec<ScalarCondition>>,
     builder: &dyn QueryBuilder,
 ) -> TranslateResult<(Expression, JoinFields)> {
     let selected_fields = rrq.selected_fields.without_relations().into_virtuals_last();
     let needs_reversed_order = rrq.args.needs_reversed_order();
+    let child_linking_fields = rrq.parent_field.related_field().linking_fields();
+
+    if let Some(results) = rrq.parent_results {
+        let links = results
+            .into_iter()
+            .map(|result| child_linking_fields.assimilate(result))
+            .collect::<Result<Vec<_>, _>>()
+            .map_err(|err| QueryGraphBuilderError::from(err))?;
+
+        let filter = rrq
+            .args
+            .filter
+            .take()
+            .into_iter()
+            .fold(links.filter(), |acc, filter| Filter::and(vec![acc, filter]));
+        rrq.args.filter = Some(filter);
+    }
 
     let (mut child_query, join_on) = if rrq.parent_field.relation().is_many_to_many() {
         build_read_m2m_query(rrq.parent_field, conditions, rrq.args, &selected_fields, builder)?
