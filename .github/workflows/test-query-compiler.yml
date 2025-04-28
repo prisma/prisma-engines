@@ -32,6 +32,10 @@ jobs:
             setup_task: dev-libsql-qc
             ignored_tests_list: query-compiler/query-engine-tests-todo/libsql/skip
             should_fail_tests_list: query-compiler/query-engine-tests-todo/libsql/fail
+          - name: sqlite
+            setup_task: dev-better-sqlite3-qc
+            ignored_tests_list: query-compiler/query-engine-tests-todo/better-sqlite3/skip
+            should_fail_tests_list: query-compiler/query-engine-tests-todo/better-sqlite3/fail
     name: ${{ matrix.adapter.name }}
     uses: ./.github/workflows/test-query-compiler-template.yml
     with:

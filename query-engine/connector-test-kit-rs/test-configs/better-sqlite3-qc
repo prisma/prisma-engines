@@ -1,0 +1,6 @@
+{
+    "connector": "sqlite",
+    "version": "better-sqlite3",
+    "driver_adapter": "better-sqlite3",
+    "external_test_executor": "QueryCompiler"
+}
