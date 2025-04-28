@@ -30,7 +30,6 @@ new::ref_actions::on_delete::restrict::one2one_opt::delete_parent
 new::ref_actions::on_delete::restrict::one2one_opt::delete_parent_failure
 new::ref_actions::on_delete::restrict::one2one_req::delete_parent_failure
 new::ref_actions::on_delete::set_null::one2many_opt::delete_parent
-new::ref_actions::on_delete::set_null::one2many_opt::prisma_17255
 new::ref_actions::on_delete::set_null::one2one_opt::delete_parent
 new::ref_actions::on_delete::set_null::one2one_opt::delete_parent_diff_id_name
 new::ref_actions::on_delete::set_null::one2one_opt::delete_parent_recurse_set_null
@@ -63,7 +62,6 @@ new::ref_actions::on_update::set_null::one2many_opt::update_compound_parent
 new::ref_actions::on_update::set_null::one2many_opt::update_many_parent
 new::ref_actions::on_update::set_null::one2many_opt::update_parent
 new::ref_actions::on_update::set_null::one2many_opt::update_parent_compound_recurse
-new::ref_actions::on_update::set_null::one2many_opt::update_parent_nested
 new::ref_actions::on_update::set_null::one2many_opt::update_parent_no_recursion
 new::ref_actions::on_update::set_null::one2many_opt::update_parent_recurse_restrict_failure
 new::ref_actions::on_update::set_null::one2many_opt::update_parent_recurse_set_null
@@ -82,7 +80,6 @@ new::regressions::prisma_13097::prisma_13097::group_by_boolean_array
 new::regressions::prisma_13097::prisma_13097::group_by_enum_array
 new::regressions::prisma_13158::prisma_1358::insert_mixed_int_float_array_in_execute_raw
 new::regressions::prisma_14696::prisma_14696::create_does_not_panic
-new::regressions::prisma_21182::regression::query_with_normalized_dependencies
 new::regressions::prisma_21901::prisma_21901::test
 new::regressions::prisma_22971::prisma_22971::test_22971
 new::regressions::prisma_5952::regression::decimal_find_different_uniques
@@ -411,7 +408,6 @@ writes::regressions::prisma_11731::connect_or_create::one2one_inlined_child
 writes::regressions::prisma_11731::connect_or_create::one2one_inlined_parent
 writes::relations::rel_graphql::rel_graphql::one2one_rel_allow_one_item_per_side
 writes::unchecked_writes::unchecked_nested_update_many::unchecked_nested_um::allow_write_autoinc_id
-writes::unchecked_writes::unchecked_nested_update_many::unchecked_nested_um::allow_write_non_prent_inline_rel_sclrs
 writes::unchecked_writes::unchecked_update_spec::unchecked_update::allow_write_non_inline_rels
 writes::uniques_and_node_selectors::multi_field_uniq_mutation::multi_field_uniq_mut::nested_connect_one2one_rel
 writes::uniques_and_node_selectors::multi_field_uniq_mutation::multi_field_uniq_mut::nested_set_multi_field_uniq
