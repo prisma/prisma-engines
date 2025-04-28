@@ -10,6 +10,7 @@ use query_structure::{
     ConditionValue, FieldSelection, Filter, IntoFilter, PrismaValue, QueryArguments, QueryMode, RelationField,
     ScalarCondition, ScalarFilter, ScalarProjection, SelectionResult, Take,
 };
+use std::slice;
 
 pub(crate) fn translate_read_query(query: ReadQuery, builder: &dyn QueryBuilder) -> TranslateResult<Expression> {
     Ok(match query {
@@ -238,10 +239,18 @@ fn build_read_one2m_query(
     let join_fields = related_scalars.iter().map(|sf| sf.name().to_owned()).collect();
 
     if let Some(results) = parent_results {
-        let linking_fields = field.related_field().linking_fields();
+        let parent_model_id = field.model().primary_identifier();
+        let child_linking_fields = field.related_field().linking_fields();
+
         let links = results
             .into_iter()
-            .map(|result| linking_fields.assimilate(result))
+            .map(|result| {
+                let parent_link = result
+                    .split_into(slice::from_ref(&parent_model_id))
+                    .pop()
+                    .expect("parent link should exist");
+                child_linking_fields.assimilate(parent_link)
+            })
             .collect::<Result<Vec<_>, _>>()
             .map_err(QueryGraphBuilderError::from)?;
 
