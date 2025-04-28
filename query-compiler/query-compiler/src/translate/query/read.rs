@@ -8,7 +8,7 @@ use query_builder::{QueryArgumentsExt, QueryBuilder, RelationLink};
 use query_core::{AggregateRecordsQuery, FilteredQuery, QueryGraphBuilderError, ReadQuery, RelatedRecordsQuery};
 use query_structure::{
     ConditionValue, FieldSelection, Filter, IntoFilter, PrismaValue, QueryArguments, QueryMode, RelationField,
-    ScalarCondition, ScalarFilter, ScalarProjection, SelectionResult, Take,
+    ScalarCondition, ScalarFilter, ScalarProjection, Take,
 };
 
 pub(crate) fn translate_read_query(query: ReadQuery, builder: &dyn QueryBuilder) -> TranslateResult<Expression> {
