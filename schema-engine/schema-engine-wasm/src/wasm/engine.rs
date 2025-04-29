@@ -12,7 +12,8 @@ use serde::Deserialize;
 use sql_schema_connector::SqlSchemaConnector;
 use std::path::PathBuf;
 use std::sync::Arc;
-use tracing_futures::Instrument;
+use tracing::Dispatch;
+use tracing_futures::{Instrument, WithSubscriber};
 use tsify::Tsify;
 use wasm_bindgen::prelude::{wasm_bindgen, JsError, JsValue};
 
@@ -67,6 +68,9 @@ pub struct SchemaEngine {
 
     /// The inferred database namespaces (used for the `multiSchema` preview feature).
     namespaces: Option<Namespaces>,
+
+    /// The dispatcher for tracing.
+    dispatch: Dispatch,
 }
 
 #[wasm_bindgen]
@@ -81,39 +85,45 @@ impl SchemaEngine {
         register_panic_hook();
 
         // Forward every `tracing` log to the given JS callback.
-        init_logger(callback);
+        let dispatch = init_logger(callback);
+        let cloned_dispatch = dispatch.clone();
 
-        let ConstructorOptions {
-            datamodels: initial_datamodels,
-        } = options;
+        async move {
+            let ConstructorOptions {
+                datamodels: initial_datamodels,
+            } = options;
 
-        let adapter_factory = Arc::new(adapter_factory_from_js(adapter));
-        let adapter = Arc::new(adapter_factory.connect().await?);
-        let connector = SqlSchemaConnector::new_from_external(adapter).await?;
+            let adapter_factory = Arc::new(adapter_factory_from_js(adapter));
+            let adapter = Arc::new(adapter_factory.connect().await?);
+            let connector = SqlSchemaConnector::new_from_external(adapter).await?;
 
-        let initial_datamodels: Option<Vec<_>> = initial_datamodels.map(|schemas| {
-            schemas
-                .into_iter()
-                .map(|(name, schema)| (name, SourceFile::from(schema)))
-                .collect()
-        });
-        let initial_datamodel = initial_datamodels.as_deref().map(psl::validate_multi_file);
-
-        let namespaces: Option<Namespaces> = initial_datamodel
-            .as_ref()
-            .and_then(|schema| schema.configuration.datasources.first())
-            .and_then(|ds| {
-                let mut names = ds.namespaces.iter().map(|(ns, _)| ns.to_owned()).collect();
-                Namespaces::from_vec(&mut names)
+            let initial_datamodels: Option<Vec<_>> = initial_datamodels.map(|schemas| {
+                schemas
+                    .into_iter()
+                    .map(|(name, schema)| (name, SourceFile::from(schema)))
+                    .collect()
             });
+            let initial_datamodel = initial_datamodels.as_deref().map(psl::validate_multi_file);
 
-        tracing::info!(git_hash = env!("GIT_HASH"), "Starting schema-engine-wasm");
+            let namespaces: Option<Namespaces> = initial_datamodel
+                .as_ref()
+                .and_then(|schema| schema.configuration.datasources.first())
+                .and_then(|ds| {
+                    let mut names = ds.namespaces.iter().map(|(ns, _)| ns.to_owned()).collect();
+                    Namespaces::from_vec(&mut names)
+                });
 
-        Ok(Self {
-            adapter_factory,
-            connector,
-            namespaces,
-        })
+            tracing::info!(git_hash = env!("GIT_HASH"), "Starting schema-engine-wasm");
+
+            Ok(Self {
+                adapter_factory,
+                connector,
+                namespaces,
+                dispatch,
+            })
+        }
+        .with_subscriber(cloned_dispatch)
+        .await
     }
 
     fn namespaces(&self) -> Option<Namespaces> {
@@ -135,58 +145,83 @@ impl SchemaEngine {
         // This is incompatible with Driver Adapters.
         _params: Option<GetDatabaseVersionInput>,
     ) -> Result<String, JsValue> {
-        let version = self.connector.version().await?;
+        let dispatch = self.dispatch.clone();
+        let version = self.connector.version().with_subscriber(dispatch).await?;
         Ok(version)
     }
 
     /// Apply all the unapplied migrations from the migrations folder.
     #[wasm_bindgen(js_name = "applyMigrations")]
     pub async fn apply_migrations(&mut self, input: ApplyMigrationsInput) -> Result<ApplyMigrationsOutput, JsValue> {
-        let namespaces = self.namespaces();
-        let result = commands::apply_migrations(input, &mut self.connector, namespaces)
-            .instrument(tracing::info_span!("ApplyMigrations"))
-            .await?;
-        Ok(result)
+        let dispatch = self.dispatch.clone();
+        async move {
+            let namespaces = self.namespaces();
+            let result = commands::apply_migrations(input, &mut self.connector, namespaces)
+                .instrument(tracing::info_span!("ApplyMigrations"))
+                .await?;
+            Ok(result)
+        }
+        .with_subscriber(dispatch)
+        .await
     }
 
     /// Generate a new migration, based on the provided schema and existing migrations history.
     #[wasm_bindgen(js_name = "createMigration")]
     pub async fn create_migration(&mut self, input: CreateMigrationInput) -> Result<CreateMigrationOutput, JsValue> {
-        let span = tracing::info_span!(
-            "CreateMigration",
-            migration_name = input.migration_name.as_str(),
-            draft = input.draft,
-        );
-        let result = commands::create_migration(input, &mut self.connector)
-            .instrument(span)
-            .await?;
-        Ok(result)
+        let dispatch = self.dispatch.clone();
+        async move {
+            let span = tracing::info_span!(
+                "CreateMigration",
+                migration_name = input.migration_name.as_str(),
+                draft = input.draft,
+            );
+            let result = commands::create_migration(input, &mut self.connector)
+                .instrument(span)
+                .await?;
+            Ok(result)
+        }
+        .with_subscriber(dispatch)
+        .await
     }
 
     /// Send a raw command to the database.
     #[wasm_bindgen(js_name = "dbExecute")]
     pub async fn db_execute(&mut self, params: DbExecuteParams) -> Result<(), JsValue> {
-        self.connector.db_execute(params.script).await?;
+        let dispatch = self.dispatch.clone();
+        self.connector
+            .db_execute(params.script)
+            .with_subscriber(dispatch)
+            .await?;
         Ok(())
     }
 
     /// Tells the CLI what to do in `migrate dev`.
     #[wasm_bindgen(js_name = "devDiagnostic")]
     pub async fn dev_diagnostic(&mut self, input: DevDiagnosticInput) -> Result<DevDiagnosticOutput, JsValue> {
-        let namespaces = self.namespaces();
-        let result = commands::dev_diagnostic(input, namespaces, &mut self.connector, self.adapter_factory.clone())
-            .instrument(tracing::info_span!("DevDiagnostic"))
-            .await?;
-        Ok(result)
+        let dispatch = self.dispatch.clone();
+        async move {
+            let namespaces = self.namespaces();
+            let result = commands::dev_diagnostic(input, namespaces, &mut self.connector, self.adapter_factory.clone())
+                .instrument(tracing::info_span!("DevDiagnostic"))
+                .await?;
+            Ok(result)
+        }
+        .with_subscriber(dispatch)
+        .await
     }
 
     /// Create a migration between any two sources of database schemas.
     #[wasm_bindgen]
     pub async fn diff(&mut self, params: DiffParams) -> Result<DiffResult, JsValue> {
-        let result = commands::diff(params, &mut self.connector, self.adapter_factory.clone())
-            .instrument(tracing::info_span!("Diff"))
-            .await?;
-        Ok(result)
+        let dispatch = self.dispatch.clone();
+        async move {
+            let result = commands::diff(params, &mut self.connector, self.adapter_factory.clone())
+                .instrument(tracing::info_span!("Diff"))
+                .await?;
+            Ok(result)
+        }
+        .with_subscriber(dispatch)
+        .await
     }
 
     /// Looks at the migrations folder and the database, and returns a bunch of useful information.
@@ -195,13 +230,22 @@ impl SchemaEngine {
         &mut self,
         input: DiagnoseMigrationHistoryInput,
     ) -> Result<DiagnoseMigrationHistoryOutput, JsValue> {
-        let namespaces = self.namespaces();
-        let result: DiagnoseMigrationHistoryOutput =
-            commands::diagnose_migration_history(input, namespaces, &mut self.connector, self.adapter_factory.clone())
-                .instrument(tracing::info_span!("DiagnoseMigrationHistory"))
-                .await?
-                .into();
-        Ok(result)
+        let dispatch = self.dispatch.clone();
+        async move {
+            let namespaces = self.namespaces();
+            let result: DiagnoseMigrationHistoryOutput = commands::diagnose_migration_history(
+                input,
+                namespaces,
+                &mut self.connector,
+                self.adapter_factory.clone(),
+            )
+            .instrument(tracing::info_span!("DiagnoseMigrationHistory"))
+            .await?
+            .into();
+            Ok(result)
+        }
+        .with_subscriber(dispatch)
+        .await
     }
 
     /// Make sure the connection to the database is established and valid.
@@ -212,7 +256,10 @@ impl SchemaEngine {
         &mut self,
         _params: EnsureConnectionValidityParams,
     ) -> Result<EnsureConnectionValidityResult, JsValue> {
-        SchemaConnector::ensure_connection_validity(&mut self.connector).await?;
+        let dispatch = self.dispatch.clone();
+        SchemaConnector::ensure_connection_validity(&mut self.connector)
+            .with_subscriber(dispatch)
+            .await?;
         Ok(EnsureConnectionValidityResult {})
     }
 
@@ -222,92 +269,106 @@ impl SchemaEngine {
         &mut self,
         input: EvaluateDataLossInput,
     ) -> Result<EvaluateDataLossOutput, JsValue> {
-        let result = commands::evaluate_data_loss(input, &mut self.connector)
-            .instrument(tracing::info_span!("EvaluateDataLoss"))
-            .await?;
-        Ok(result)
+        let dispatch = self.dispatch.clone();
+        async move {
+            let result = commands::evaluate_data_loss(input, &mut self.connector)
+                .instrument(tracing::info_span!("EvaluateDataLoss"))
+                .await?;
+            Ok(result)
+        }
+        .with_subscriber(dispatch)
+        .await
     }
 
     /// Introspect the database schema.
     #[wasm_bindgen]
     pub async fn introspect(&mut self, params: IntrospectParams) -> Result<IntrospectResult, JsValue> {
-        tracing::info!("{:?}", params.schema);
-        let source_files = params.schema.to_psl_input();
+        let dispatch = self.dispatch.clone();
+        async move {
+            tracing::info!("{:?}", params.schema);
+            let source_files = params.schema.to_psl_input();
 
-        let has_some_namespaces = params.namespaces.is_some();
-        let composite_type_depth = From::from(params.composite_type_depth);
+            let has_some_namespaces = params.namespaces.is_some();
+            let composite_type_depth = From::from(params.composite_type_depth);
 
-        let ctx = if params.force {
-            let previous_schema = psl::validate_multi_file(&source_files);
+            let ctx = if params.force {
+                let previous_schema = psl::validate_multi_file(&source_files);
 
-            schema_connector::IntrospectionContext::new_config_only(
-                previous_schema,
-                composite_type_depth,
-                params.namespaces,
-                PathBuf::new().join(&params.base_directory_path),
-            )
-        } else {
-            let previous_schema = psl::parse_schema_multi(&source_files)
-                .map_err(|e| ConnectorError::new_schema_parser_error(e).into_js_error())?;
+                schema_connector::IntrospectionContext::new_config_only(
+                    previous_schema,
+                    composite_type_depth,
+                    params.namespaces,
+                    PathBuf::new().join(&params.base_directory_path),
+                )
+            } else {
+                let previous_schema = psl::parse_schema_multi(&source_files)
+                    .map_err(|e| ConnectorError::new_schema_parser_error(e).into_js_error())?;
 
-            schema_connector::IntrospectionContext::new(
-                previous_schema,
-                composite_type_depth,
-                params.namespaces,
-                PathBuf::new().join(&params.base_directory_path),
-            )
-        };
+                schema_connector::IntrospectionContext::new(
+                    previous_schema,
+                    composite_type_depth,
+                    params.namespaces,
+                    PathBuf::new().join(&params.base_directory_path),
+                )
+            };
 
-        if !ctx
-            .configuration()
-            .preview_features()
-            .contains(PreviewFeature::MultiSchema)
-            && has_some_namespaces
-        {
-            let msg =
-                "The preview feature `multiSchema` must be enabled before using --schemas command line parameter.";
+            if !ctx
+                .configuration()
+                .preview_features()
+                .contains(PreviewFeature::MultiSchema)
+                && has_some_namespaces
+            {
+                let msg =
+                    "The preview feature `multiSchema` must be enabled before using --schemas command line parameter.";
 
-            return Err(CoreError::from_msg(msg.to_string()).into());
-        }
+                return Err(CoreError::from_msg(msg.to_string()).into());
+            }
 
-        let IntrospectionResult {
-            datamodels,
-            views,
-            warnings,
-            is_empty,
-        } = self.connector.introspect(&ctx).await?;
-
-        if is_empty {
-            Err(ConnectorError::into_introspection_result_empty_error().into())
-        } else {
-            let views = views.map(|v| {
-                v.into_iter()
-                    .map(|view| IntrospectionView {
-                        schema: view.schema,
-                        name: view.name,
-                        definition: view.definition,
-                    })
-                    .collect()
-            });
-
-            Ok(IntrospectResult {
-                schema: SchemasContainer {
-                    files: datamodels
-                        .into_iter()
-                        .map(|(path, content)| SchemaContainer { path, content })
-                        .collect(),
-                },
+            let IntrospectionResult {
+                datamodels,
                 views,
                 warnings,
-            })
+                is_empty,
+            } = self.connector.introspect(&ctx).await?;
+
+            if is_empty {
+                Err(ConnectorError::into_introspection_result_empty_error().into())
+            } else {
+                let views = views.map(|v| {
+                    v.into_iter()
+                        .map(|view| IntrospectionView {
+                            schema: view.schema,
+                            name: view.name,
+                            definition: view.definition,
+                        })
+                        .collect()
+                });
+
+                Ok(IntrospectResult {
+                    schema: SchemasContainer {
+                        files: datamodels
+                            .into_iter()
+                            .map(|(path, content)| SchemaContainer { path, content })
+                            .collect(),
+                    },
+                    views,
+                    warnings,
+                })
+            }
         }
+        .with_subscriber(dispatch)
+        .await
     }
 
     /// Introspects a SQL query and returns types information.
     /// Note: this will fail on SQLite, as it requires Wasm-compatible sqlx implementation.
     #[wasm_bindgen(js_name = "introspectSql")]
     pub async fn introspect_sql(&mut self, params: IntrospectSqlParams) -> Result<IntrospectSqlResult, JsValue> {
-        let res = commands::introspect_sql(params, &mut self.connector).await?;
+        let dispatch = self.dispatch.clone();
+
+        let res = commands::introspect_sql(params, &mut self.connector)
+            .with_subscriber(dispatch)
+            .await?;
 
         Ok(IntrospectSqlResult {
             queries: res
@@ -347,11 +408,16 @@ impl SchemaEngine {
         &mut self,
         input: MarkMigrationAppliedInput,
     ) -> Result<MarkMigrationAppliedOutput, JsValue> {
-        let span = tracing::info_span!("MarkMigrationApplied", migration_name = input.migration_name.as_str());
-        let result = commands::mark_migration_applied(input, &mut self.connector)
-            .instrument(span)
-            .await?;
-        Ok(result)
+        let dispatch = self.dispatch.clone();
+        async move {
+            let span = tracing::info_span!("MarkMigrationApplied", migration_name = input.migration_name.as_str());
+            let result = commands::mark_migration_applied(input, &mut self.connector)
+                .instrument(span)
+                .await?;
+            Ok(result)
+        }
+        .with_subscriber(dispatch)
+        .await
     }
 
     /// Mark a migration as rolled back.
@@ -360,34 +426,49 @@ impl SchemaEngine {
         &mut self,
         input: MarkMigrationRolledBackInput,
     ) -> Result<MarkMigrationRolledBackOutput, JsValue> {
-        let span = tracing::info_span!(
-            "MarkMigrationRolledBack",
-            migration_name = input.migration_name.as_str()
-        );
-        let result = commands::mark_migration_rolled_back(input, &mut self.connector)
-            .instrument(span)
-            .await?;
-        Ok(result)
+        let dispatch = self.dispatch.clone();
+        async move {
+            let span = tracing::info_span!(
+                "MarkMigrationRolledBack",
+                migration_name = input.migration_name.as_str()
+            );
+            let result = commands::mark_migration_rolled_back(input, &mut self.connector)
+                .instrument(span)
+                .await?;
+            Ok(result)
+        }
+        .with_subscriber(dispatch)
+        .await
     }
 
     /// Reset a database to an empty state (no data, no schema).
     #[wasm_bindgen]
     pub async fn reset(&mut self) -> Result<(), JsValue> {
-        tracing::info!("Resetting the database.");
-        let namespaces = self.namespaces();
+        let dispatch = self.dispatch.clone();
+        async move {
+            tracing::info!("Resetting the database.");
+            let namespaces = self.namespaces();
 
-        SchemaConnector::reset(&mut self.connector, false, namespaces)
-            .instrument(tracing::info_span!("Reset"))
-            .await?;
-        Ok(())
+            SchemaConnector::reset(&mut self.connector, false, namespaces)
+                .instrument(tracing::info_span!("Reset"))
+                .await?;
+            Ok(())
+        }
+        .with_subscriber(dispatch)
+        .await
     }
 
     /// The command behind `prisma db push`.
     #[wasm_bindgen(js_name = "schemaPush")]
     pub async fn schema_push(&mut self, input: SchemaPushInput) -> Result<SchemaPushOutput, JsValue> {
-        let result = commands::schema_push(input, &mut self.connector)
-            .instrument(tracing::info_span!("SchemaPush"))
-            .await?;
-        Ok(result)
+        let dispatch = self.dispatch.clone();
+        async move {
+            let result = commands::schema_push(input, &mut self.connector)
+                .instrument(tracing::info_span!("SchemaPush"))
+                .await?;
+            Ok(result)
+        }
+        .with_subscriber(dispatch)
+        .await
     }
 }
