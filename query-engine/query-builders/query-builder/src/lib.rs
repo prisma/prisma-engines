@@ -60,10 +60,10 @@ pub trait QueryBuilder {
         selected_fields: Option<&FieldSelection>,
     ) -> Result<DbQuery, Box<dyn std::error::Error + Send + Sync>>;
 
-    fn build_updates_from_filter(
+    fn build_updates(
         &self,
         model: &Model,
-        filter: Filter,
+        record_filter: RecordFilter,
         args: WriteArgs,
         selected_fields: Option<&FieldSelection>,
         limit: Option<usize>,

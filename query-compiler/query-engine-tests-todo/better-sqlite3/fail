@@ -1,5 +1,4 @@
 new::cursor::bigint_cursor::bigint_id_must_work
-new::disconnect::disconnect_security::must_honor_connect_scope_one2m
 new::interactive_tx::interactive_tx::batch_queries_failure
 new::interactive_tx::interactive_tx::commit_after_rollback
 new::interactive_tx::interactive_tx::double_commit
@@ -25,7 +24,6 @@ new::ref_actions::on_delete::restrict::one2one_opt::delete_parent
 new::ref_actions::on_delete::restrict::one2one_opt::delete_parent_failure
 new::ref_actions::on_delete::restrict::one2one_req::delete_parent_failure
 new::ref_actions::on_delete::set_null::one2many_opt::delete_parent
-new::ref_actions::on_delete::set_null::one2many_opt::prisma_17255
 new::ref_actions::on_delete::set_null::one2one_opt::delete_parent
 new::ref_actions::on_delete::set_null::one2one_opt::delete_parent_diff_id_name
 new::ref_actions::on_delete::set_null::one2one_opt::delete_parent_recurse_set_null
@@ -58,7 +56,6 @@ new::ref_actions::on_update::set_null::one2many_opt::update_compound_parent
 new::ref_actions::on_update::set_null::one2many_opt::update_many_parent
 new::ref_actions::on_update::set_null::one2many_opt::update_parent
 new::ref_actions::on_update::set_null::one2many_opt::update_parent_compound_recurse
-new::ref_actions::on_update::set_null::one2many_opt::update_parent_nested
 new::ref_actions::on_update::set_null::one2many_opt::update_parent_no_recursion
 new::ref_actions::on_update::set_null::one2many_opt::update_parent_recurse_restrict_failure
 new::ref_actions::on_update::set_null::one2many_opt::update_parent_recurse_set_null
@@ -75,12 +72,10 @@ new::regressions::max_integer::max_integer::unfitted_int_should_fail
 new::regressions::prisma_14696::prisma_14696::create_does_not_panic
 new::regressions::prisma_15204::conversion_error::convert_to_bigint_sqlite_js
 new::regressions::prisma_15204::conversion_error::convert_to_int_sqlite_js
-new::regressions::prisma_21182::regression::query_with_normalized_dependencies
 new::regressions::prisma_22971::prisma_22971::test_22971
 new::regressions::prisma_5952::regression::decimal_find_different_uniques
 new::regressions::prisma_5952::regression::decimal_find_different_uniques_unquoted
 new::regressions::prisma_7434::not_in_chunking::not_in_batch_filter
-new::regressions::prisma_8265::mongodb::nested_update_many_timestamps
 new::regressions::team_orm_927::count_before_relation::find_many
 new::regressions::team_orm_927::count_before_relation::find_unique
 queries::aggregation::avg::aggregation_avg::avg_some_records
@@ -338,7 +333,6 @@ writes::top_level_mutations::create_many_and_return::json_create_many_and_return
 writes::top_level_mutations::delete::delete::delete_fails_if_filter_dont_match
 writes::top_level_mutations::delete::delete::should_fail_non_exist_id
 writes::top_level_mutations::delete::delete::should_fail_non_existent_value_non_id_uniq_field
-writes::top_level_mutations::delete_many::delete_many::nested_delete_many
 writes::top_level_mutations::non_embedded_upsert::non_embedded_upsert::execute_nested_create_of_correct_branch
 writes::top_level_mutations::non_embedded_upsert::non_embedded_upsert::nested_connect_in_correct_create_branch
 writes::top_level_mutations::non_embedded_upsert::non_embedded_upsert::nested_connect_in_correct_update_branch
@@ -360,11 +354,8 @@ writes::top_level_mutations::upsert::upsert::should_update_if_uniq_already_exist
 writes::top_level_mutations::upsert::upsert::upsert_apply_number_ops_for_float
 writes::top_level_mutations::upsert::upsert::upsert_called_twice_does_nothing
 writes::top_level_mutations::upsert::upsert::upsert_fails_if_filter_dont_match
-writes::unchecked_writes::unchecked_nested_update_many::unchecked_nested_um::allow_write_non_prent_inline_rel_sclrs
 writes::unchecked_writes::unchecked_update_spec::unchecked_update::allow_write_non_inline_rels
 writes::uniques_and_node_selectors::multi_field_uniq_mutation::multi_field_uniq_mut::nested_connect_one2one_rel
-writes::uniques_and_node_selectors::multi_field_uniq_mutation::multi_field_uniq_mut::nested_delete_multi_field_uniq
-writes::uniques_and_node_selectors::multi_field_uniq_mutation::multi_field_uniq_mut::nested_disconnect_multi_field_uniq
 writes::uniques_and_node_selectors::multi_field_uniq_mutation::multi_field_uniq_mut::nested_set_multi_field_uniq
 writes::uniques_and_node_selectors::multi_field_uniq_mutation::multi_field_uniq_mut::nested_update_multi_uniq_field
 writes::uniques_and_node_selectors::multi_field_uniq_mutation::multi_field_uniq_mut::nested_upsert_multi_field_uniq

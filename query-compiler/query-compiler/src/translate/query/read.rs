@@ -5,11 +5,12 @@ use crate::{
 };
 use itertools::Itertools;
 use query_builder::{QueryArgumentsExt, QueryBuilder, RelationLink};
-use query_core::{AggregateRecordsQuery, FilteredQuery, ReadQuery, RelatedRecordsQuery};
+use query_core::{AggregateRecordsQuery, FilteredQuery, QueryGraphBuilderError, ReadQuery, RelatedRecordsQuery};
 use query_structure::{
-    ConditionValue, FieldSelection, Filter, PrismaValue, QueryArguments, QueryMode, RelationField, ScalarCondition,
-    ScalarFilter, ScalarProjection, Take,
+    ConditionValue, FieldSelection, Filter, IntoFilter, PrismaValue, QueryArguments, QueryMode, RelationField,
+    ScalarCondition, ScalarFilter, ScalarProjection, SelectionResult, Take,
 };
+use std::slice;
 
 pub(crate) fn translate_read_query(query: ReadQuery, builder: &dyn QueryBuilder) -> TranslateResult<Expression> {
     Ok(match query {
@@ -178,7 +179,14 @@ fn build_read_related_records(
     let (mut child_query, join_on) = if rrq.parent_field.relation().is_many_to_many() {
         build_read_m2m_query(rrq.parent_field, conditions, rrq.args, &selected_fields, builder)?
     } else {
-        build_read_one2m_query(rrq.parent_field, conditions, rrq.args, &selected_fields, builder)?
+        build_read_one2m_query(
+            rrq.parent_field,
+            conditions,
+            rrq.args,
+            rrq.parent_results,
+            &selected_fields,
+            builder,
+        )?
     };
 
     if needs_reversed_order {
@@ -223,11 +231,33 @@ fn build_read_one2m_query(
     field: RelationField,
     conditions: Option<Vec<ScalarCondition>>,
     mut args: QueryArguments,
+    parent_results: Option<Vec<SelectionResult>>,
     selected_fields: &FieldSelection,
     builder: &dyn QueryBuilder,
 ) -> TranslateResult<(Expression, JoinFields)> {
     let related_scalars = field.related_field().left_scalars();
     let join_fields = related_scalars.iter().map(|sf| sf.name().to_owned()).collect();
+
+    if let Some(results) = parent_results {
+        let parent_link_id = field.linking_fields();
+        let child_link_id = field.related_field().linking_fields();
+
+        let links = results
+            .into_iter()
+            .map(|result| {
+                let parent_link = result.split_into(slice::from_ref(&parent_link_id)).pop().unwrap();
+                child_link_id.assimilate(parent_link)
+            })
+            .collect::<Result<Vec<_>, _>>()
+            .map_err(QueryGraphBuilderError::from)?;
+
+        let filter = args
+            .filter
+            .take()
+            .into_iter()
+            .fold(links.filter(), |acc, filter| Filter::and(vec![acc, filter]));
+        args.filter = Some(filter);
+    }
 
     // TODO: we ignore chunking for now
     if let Some(conditions) = conditions {
