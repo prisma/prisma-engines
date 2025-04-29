@@ -3,7 +3,7 @@ use crate::{
     query_graph::{Node, NodeRef, QueryGraph, QueryGraphDependency},
     QueryGraphBuilderError, QueryGraphBuilderResult,
 };
-use query_structure::RelationFieldRef;
+use query_structure::{PrismaValue, RelationFieldRef, SelectionResult};
 
 /// Only for many to many relations.
 ///
@@ -87,7 +87,13 @@ pub(crate) fn connect_records_node(
             Box::new(move |mut connect_node, child_ids| {
                 let len = child_ids.len();
 
-                if len != expected_connects {
+                if !matches!(
+                    &child_ids[..],
+                    // if the child IDs are a placeholder we have to check them during interpretation
+                    [SelectionResult{ pairs }]
+                        if matches!(&pairs[..], [(_, PrismaValue::Placeholder {..})])
+                ) && len != expected_connects
+                {
                     return Err(QueryGraphBuilderError::RecordNotFound(format!(
                         "Expected {expected_connects} records to be connected, found only {len}.",
                     )));
