@@ -10,7 +10,6 @@ new::interactive_tx::interactive_tx::rollback_after_commit
 new::interactive_tx::interactive_tx::tx_expiration_cycle
 new::interactive_tx::interactive_tx::tx_expiration_failure_cycle
 new::multi_schema::multi_schema::create_and_get_many_to_many_relations
-new::multi_schema::multi_schema::implicit_m2m_simple
 new::native_upsert::native_upsert::should_not_if_has_nested_select
 new::native_upsert::native_upsert::should_not_if_missing_update
 new::native_upsert::native_upsert::should_not_use_if_where_and_create_different

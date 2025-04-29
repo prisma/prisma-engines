@@ -341,8 +341,6 @@ writes::top_level_mutations::delete::delete::delete_fails_if_filter_dont_match
 writes::top_level_mutations::delete::delete::should_fail_non_exist_id
 writes::top_level_mutations::delete::delete::should_fail_non_existent_value_non_id_uniq_field
 writes::top_level_mutations::delete_many::delete_many::nested_delete_many
-writes::top_level_mutations::delete_many_relations::delete_many_rels::pm_cm
-writes::top_level_mutations::delete_mutation_relations::delete_mutation_relations::pm_cm_other_relations_2
 writes::top_level_mutations::non_embedded_upsert::non_embedded_upsert::execute_nested_create_of_correct_branch
 writes::top_level_mutations::non_embedded_upsert::non_embedded_upsert::nested_connect_in_correct_create_branch
 writes::top_level_mutations::non_embedded_upsert::non_embedded_upsert::nested_connect_in_correct_update_branch
