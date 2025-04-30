@@ -14,6 +14,7 @@ if ! [ -d "$VENV_DIR" ]; then
 
   pushd "$SCRIPT_DIR"
   python3 -m venv .venv
+  # shellcheck source=/dev/null
   . "$VENV_DIR/bin/activate"
   pip3 install -r "$SCRIPT_DIR/requirements.txt"
   popd
@@ -22,5 +23,6 @@ if ! [ -d "$VENV_DIR" ]; then
   echo ''
 fi
 
+# shellcheck source=/dev/null
 . "$VENV_DIR/bin/activate"
 python3 "$SCRIPT_DIR/cluster.py" "$@"
