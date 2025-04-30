@@ -432,6 +432,30 @@ impl PrismaValue {
             None
         }
     }
+
+    pub fn r#type(&self) -> PrismaValueType {
+        match self {
+            PrismaValue::String(_) => PrismaValueType::String,
+            PrismaValue::Boolean(_) => PrismaValueType::Boolean,
+            PrismaValue::Enum(_) => PrismaValueType::String,
+            PrismaValue::Int(_) => PrismaValueType::Int,
+            PrismaValue::Uuid(_) => PrismaValueType::String,
+            PrismaValue::List(values) => values
+                .iter()
+                .map(PrismaValue::r#type)
+                .reduce(|prev, next| if prev == next { prev } else { PrismaValueType::Any })
+                .unwrap_or(PrismaValueType::Any),
+            PrismaValue::Json(_) => PrismaValueType::Object,
+            PrismaValue::Object(_) => PrismaValueType::Object,
+            PrismaValue::Null => PrismaValueType::Any,
+            PrismaValue::DateTime(_) => PrismaValueType::Date,
+            PrismaValue::Float(_) => PrismaValueType::Float,
+            PrismaValue::BigInt(_) => PrismaValueType::BigInt,
+            PrismaValue::Bytes(_) => PrismaValueType::Bytes,
+            PrismaValue::Placeholder { r#type, .. } => r#type.clone(),
+            PrismaValue::GeneratorCall { return_type, .. } => return_type.clone(),
+        }
+    }
 }
 
 impl fmt::Display for PrismaValue {

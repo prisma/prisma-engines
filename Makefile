@@ -87,6 +87,10 @@ build-qc-wasm:
 	cd query-compiler/query-compiler-wasm && \
 	./build.sh $(QE_WASM_VERSION) query-compiler/query-compiler-wasm/pkg
 
+integrate-qc-wasm:
+	cd query-compiler/query-compiler-wasm && \
+	./build.sh $(QE_WASM_VERSION) ../prisma/packages/client/node_modules/@prisma/query-compiler-wasm
+
 build-schema-wasm:
 	@printf '%s\n' "🛠️  Building the Rust crate"
 	cargo build --profile $(PROFILE) --target=wasm32-unknown-unknown -p prisma-schema-build

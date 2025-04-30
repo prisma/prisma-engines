@@ -2,14 +2,13 @@ use query_structure::{
     AggregationSelection, FieldSelection, Filter, Model, PrismaValue, QueryArguments, RecordFilter, RelationField,
     ScalarCondition, ScalarField, SelectionResult, WriteArgs,
 };
-use serde::Serialize;
-use std::fmt::Formatter;
 use std::{collections::HashMap, fmt};
 
+mod db_query;
 mod query_arguments_ext;
 
+pub use db_query::DbQuery;
 pub use query_arguments_ext::QueryArgumentsExt;
-use query_template::{Fragment, PlaceholderFormat};
 
 pub trait QueryBuilder {
     fn build_get_records(
@@ -138,67 +137,5 @@ impl RelationLink {
 impl fmt::Display for RelationLink {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "{}@{}", self.field.relation().name(), self.field.model().name())
-    }
-}
-
-#[derive(Debug, Serialize)]
-#[serde(tag = "type", rename_all = "camelCase")]
-pub enum DbQuery {
-    #[serde(rename_all = "camelCase")]
-    RawSql { sql: String, params: Vec<PrismaValue> },
-    #[serde(rename_all = "camelCase")]
-    TemplateSql {
-        fragments: Vec<Fragment>,
-        params: Vec<PrismaValue>,
-        placeholder_format: PlaceholderFormat,
-    },
-}
-
-impl DbQuery {
-    pub fn params(&self) -> &Vec<PrismaValue> {
-        match self {
-            DbQuery::RawSql { params, .. } => params,
-            DbQuery::TemplateSql { params, .. } => params,
-        }
-    }
-}
-
-impl fmt::Display for DbQuery {
-    /// Should only be used for debugging, unit testing and playground CLI output.
-    /// The placeholder syntax does not attempt to match any actual SQL flavour.
-    fn fmt(&self, formatter: &mut Formatter<'_>) -> fmt::Result {
-        match self {
-            DbQuery::RawSql { sql, .. } => {
-                write!(formatter, "{}", sql)?;
-            }
-            DbQuery::TemplateSql { fragments, .. } => {
-                let placeholder_format = PlaceholderFormat {
-                    prefix: "$",
-                    has_numbering: true,
-                };
-                let mut number = 1;
-                for fragment in fragments {
-                    match fragment {
-                        Fragment::StringChunk(s) => {
-                            write!(formatter, "{}", s)?;
-                        }
-                        Fragment::Parameter => {
-                            placeholder_format.write(formatter, &mut number)?;
-                        }
-                        Fragment::ParameterTuple => {
-                            write!(formatter, "[")?;
-                            placeholder_format.write(formatter, &mut number)?;
-                            write!(formatter, "]")?;
-                        }
-                        Fragment::ParameterTupleList => {
-                            write!(formatter, "[(")?;
-                            placeholder_format.write(formatter, &mut number)?;
-                            write!(formatter, ")]")?;
-                        }
-                    };
-                }
-            }
-        }
-        Ok(())
     }
 }
