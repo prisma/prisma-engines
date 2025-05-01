@@ -39,6 +39,7 @@ COMMON_LINES = (
     'at <PATH>:<DEC>:<DEC>',
     'at .<PATH>:<DEC>:<DEC>',
     'request; method="initializeSchema" params',
+    '[<TIMESTAMP> INFO tokio_postgres::connection] NOTICE:',
 )
 
 RX_BLOCK_START = re.compile(
@@ -118,6 +119,46 @@ def clean_line(line: str) -> str:
     line = re.sub(r'-{3,}', '<SEP>', line)  # Separators
     line = re.sub(r'[ \t]{2,}', ' ', line)  # Repeated spaces and tabs, but not newlines
     return line.strip()
+
+
+def plot_clusters_2d(reduced: np.ndarray, labels: np.ndarray):
+    for label in set(labels):
+        if label < 0:
+            continue
+        mask = labels == label
+        cluster_label = f"Cluster {label}"
+        plt.scatter(
+            reduced[mask, 0],
+            reduced[mask, 1],
+            label=cluster_label,
+            alpha=0.6
+        )
+
+    plt.xlabel('X')
+    plt.ylabel('Y')
+
+
+def plot_clusters_3d(reduced: np.ndarray, labels: np.ndarray):
+    assert Axes3D, '3D projection requires Axes3D to be imported'
+    ax = plt.axes(projection='3d')
+
+    for label in set(labels):
+        if label < 0:
+            continue
+        mask = labels == label
+        cluster_label = f"Cluster {label}"
+        ax.scatter(
+            reduced[mask, 0],
+            reduced[mask, 1],
+            reduced[mask, 2],
+            label=cluster_label,
+            alpha=0.6
+        )
+
+    ax.set_xlabel('X')
+    ax.set_ylabel('Y')
+    # noinspection PyUnresolvedReferences
+    ax.set_zlabel('Z')
 
 
 class TestFailureClustering:
@@ -224,54 +265,14 @@ class TestFailureClustering:
         plt.figure(figsize=(16, 16))
 
         if self.options.manifold_dimension == 2:
-            self.plot_clusters_2d(reduced, labels)
+            plot_clusters_2d(reduced, labels)
         else:
-            self.plot_clusters_3d(reduced, labels)
+            plot_clusters_3d(reduced, labels)
 
         plt.title("Test error clustering (t-SNE + DBSCAN)")
         plt.tight_layout()
         plt.savefig(plot_path)
         plt.close()
-
-    @staticmethod
-    def plot_clusters_2d(reduced: np.ndarray, labels: np.ndarray):
-        for label in set(labels):
-            if label < 0:
-                continue
-            mask = labels == label
-            cluster_label = f"Cluster {label}"
-            plt.scatter(
-                reduced[mask, 0],
-                reduced[mask, 1],
-                label=cluster_label,
-                alpha=0.6
-            )
-
-        plt.xlabel('X')
-        plt.ylabel('Y')
-
-    @staticmethod
-    def plot_clusters_3d(reduced: np.ndarray, labels: np.ndarray):
-        assert Axes3D, '3D projection requires Axes3D to be imported'
-        ax = plt.axes(projection='3d')
-
-        for label in set(labels):
-            if label < 0:
-                continue
-            mask = labels == label
-            cluster_label = f"Cluster {label}"
-            ax.scatter(
-                reduced[mask, 0],
-                reduced[mask, 1],
-                reduced[mask, 2],
-                label=cluster_label,
-                alpha=0.6
-            )
-
-        ax.set_xlabel('X')
-        ax.set_ylabel('Y')
-        # noinspection PyUnresolvedReferences
-        ax.set_zlabel('Z')
 
     def write_markdown(self, md_path: str):
         # Iterate the clusters in decreasing order of test counts
