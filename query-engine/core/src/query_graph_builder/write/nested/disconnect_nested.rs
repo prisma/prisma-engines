@@ -215,6 +215,7 @@ fn handle_one_to_x(
 
                 Ok(update_node)
             }),
+            None,
         ),
     )?;
 

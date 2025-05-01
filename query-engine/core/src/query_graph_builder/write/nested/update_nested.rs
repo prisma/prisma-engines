@@ -1,5 +1,6 @@
 use super::*;
 use crate::query_graph_builder::write::update::UpdateManyRecordNodeOptionals;
+use crate::DataExpectation;
 use crate::{
     query_ast::*,
     query_graph::{Node, NodeRef, QueryGraph, QueryGraphDependency},
@@ -91,21 +92,13 @@ pub fn nested_update(
         let update_node = update::update_record_node(graph, query_schema, filter, child_model.clone(), data_map, None)?;
         let child_model_identifier = parent_relation_field.related_model().primary_identifier();
 
-        let relation_name = parent_relation_field.relation().name().to_owned();
-        let child_model_name = child_model.name().to_owned();
-
         graph.create_edge(
             &find_child_records_node,
             &update_node,
             QueryGraphDependency::ProjectedDataDependency(
                 child_model_identifier.clone(),
                 Box::new(move |mut update_node, mut child_ids| {
-                    let child_id = match child_ids.pop() {
-                        Some(pid) => Ok(pid),
-                        None => Err(QueryGraphBuilderError::RecordNotFound(format!(
-                            "No '{child_model_name}' record was found for a nested update on relation '{relation_name}'."
-                        ))),
-                    }?;
+                    let child_id = child_ids.pop().expect("child id should be present");
 
                     if let Node::Query(Query::Write(WriteQuery::UpdateRecord(ref mut ur))) = update_node {
                         ur.set_selectors(vec![child_id]);
@@ -113,6 +106,13 @@ pub fn nested_update(
 
                     Ok(update_node)
                 }),
+                Some(DataExpectation::non_empty_rows(
+                    MissingRelatedRecord::builder()
+                        .model(child_model.clone())
+                        .relation(parent_relation_field.relation())
+                        .operation(DataOperation::NestedUpdate)
+                        .build(),
+                )),
             ),
         )?;
 
@@ -169,6 +169,7 @@ pub fn nested_update_many(
 
                     Ok(update_many_node)
                 }),
+                None,
             ),
         )?;
     }

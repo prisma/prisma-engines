@@ -32,6 +32,7 @@ tokio = { workspace = true, features = ["macros", "rt", "time"] }
 tracing = { workspace = true, features = ["attributes"] }
 tracing-futures.workspace = true
 tracing-subscriber = { workspace = true, features = ["env-filter"] }
+typed-builder.workspace = true
 user-facing-errors.workspace = true
 uuid.workspace = true
 cuid.workspace = true

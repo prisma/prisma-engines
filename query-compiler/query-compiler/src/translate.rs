@@ -104,7 +104,7 @@ impl<'a, 'b> NodeTranslator<'a, 'b> {
         for edge in self.parent_edges {
             match self.graph.pluck_edge(edge) {
                 QueryGraphDependency::ExecutionOrder => {}
-                QueryGraphDependency::ProjectedDataDependency(selection, f) => {
+                QueryGraphDependency::ProjectedDataDependency(selection, f, _) => {
                     let fields = selection
                         .selections()
                         .map(|field| {
@@ -225,7 +225,8 @@ impl<'a, 'b> NodeTranslator<'a, 'b> {
             .incoming_edges(&node)
             .into_iter()
             .flat_map(|edge| {
-                let Some(QueryGraphDependency::ProjectedDataDependency(selection, _)) = self.graph.edge_content(&edge)
+                let Some(QueryGraphDependency::ProjectedDataDependency(selection, _, _)) =
+                    self.graph.edge_content(&edge)
                 else {
                     return Either::Left(std::iter::empty());
                 };

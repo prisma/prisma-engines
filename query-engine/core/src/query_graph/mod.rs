@@ -7,8 +7,8 @@ pub(crate) use error::*;
 use psl::datamodel_connector::{ConnectorCapabilities, ConnectorCapability};
 
 use crate::{
-    interpreter::ExpressionResult, FilteredQuery, ManyRecordsQuery, Query, QueryGraphBuilderResult, QueryOptions,
-    ReadQuery,
+    interpreter::ExpressionResult, FilteredQuery, ManyRecordsQuery, Query, QueryGraphBuilderError,
+    QueryGraphBuilderResult, QueryOptions, ReadQuery,
 };
 use guard::*;
 use itertools::Itertools;
@@ -151,13 +151,74 @@ pub enum QueryGraphDependency {
     /// Important note: As opposed to `DataDependency`, this dependency guarantees that if the closure is called, the source result contains at least the requested selection.
     /// To achieve that, the query graph is post-processed in the `finalize` and reloads are injected at points where a selection is not fulfilled.
     /// See `insert_reloads` for more information.
-    ProjectedDataDependency(FieldSelection, ProjectedDataDependencyFn), // [Composites] todo rename
+    ProjectedDataDependency(FieldSelection, ProjectedDataDependencyFn, Option<DataExpectation>), // [Composites] todo rename
 
     /// Only valid in the context of a `If` control flow node.
     Then,
 
     /// Only valid in the context of a `If` control flow node.
     Else,
+}
+
+/// An expectation for a data dependency.
+pub struct DataExpectation {
+    rules: Vec<DataRule>,
+    error: Box<dyn DataDependencyError>,
+}
+
+impl DataExpectation {
+    pub fn non_empty_rows(error: impl DataDependencyError + 'static) -> Self {
+        Self {
+            rules: vec![DataRule::ExpectRowCountNeq(0)],
+            error: Box::new(error),
+        }
+    }
+
+    pub fn empty_rows(error: impl DataDependencyError + 'static) -> Self {
+        Self {
+            rules: vec![DataRule::ExpectRowCountEq(0)],
+            error: Box::new(error),
+        }
+    }
+
+    pub fn exact_row_count(expected: usize, error: impl DataDependencyError + 'static) -> Self {
+        Self {
+            rules: vec![DataRule::ExpectRowCountEq(expected)],
+            error: Box::new(error),
+        }
+    }
+
+    pub fn check(&self, results: &[SelectionResult]) -> Result<(), QueryGraphBuilderError> {
+        for rule in &self.rules {
+            match rule {
+                DataRule::ExpectRowCountEq(expected) => {
+                    if results.len() != *expected {
+                        return Err(self.error.to_runtime_error(results));
+                    }
+                }
+                DataRule::ExpectRowCountNeq(expected) => {
+                    if results.len() == *expected {
+                        return Err(self.error.to_runtime_error(results));
+                    }
+                }
+            }
+        }
+        Ok(())
+    }
+}
+
+/// An rule a data dependency needs to fulfill to be considered valid.
+#[derive(Debug)]
+pub enum DataRule {
+    /// Expect the data dependency to contain an exact number of rows.
+    ExpectRowCountEq(usize),
+    /// Expect the data dependency to contain a number of rows that is not equal to the given value.
+    ExpectRowCountNeq(usize),
+}
+
+pub trait DataDependencyError: Send + Sync {
+    fn id(&self) -> &'static str;
+    fn to_runtime_error(&self, results: &[SelectionResult]) -> QueryGraphBuilderError;
 }
 
 /// A graph representing an abstract view of queries and their execution dependencies.
@@ -674,7 +735,7 @@ impl QueryGraph {
             let dependencies: Vec<FieldSelection> = out_edges
                 .into_iter()
                 .filter_map(|edge| match self.edge_content(&edge).unwrap() {
-                    QueryGraphDependency::ProjectedDataDependency(ref requested_selection, _) => {
+                    QueryGraphDependency::ProjectedDataDependency(ref requested_selection, _, _) => {
                         Some(requested_selection.clone())
                     }
                     _ => None,
@@ -688,7 +749,7 @@ impl QueryGraph {
             let incoming_dep_edge = in_edges.into_iter().find(|edge| {
                 matches!(
                     self.edge_content(edge),
-                    Some(QueryGraphDependency::ProjectedDataDependency(_, _))
+                    Some(QueryGraphDependency::ProjectedDataDependency(_, _, _))
                 )
             });
 
@@ -699,13 +760,13 @@ impl QueryGraph {
                     .remove_edge(incoming_edge)
                     .expect("Expected edges between marked nodes to be non-empty.");
 
-                if let QueryGraphDependency::ProjectedDataDependency(existing, transformer) = content {
+                if let QueryGraphDependency::ProjectedDataDependency(existing, transformer, expectation) = content {
                     let merged_dependencies = dependencies.merge(existing);
 
                     self.create_edge(
                         &source,
                         &target,
-                        QueryGraphDependency::ProjectedDataDependency(merged_dependencies, transformer),
+                        QueryGraphDependency::ProjectedDataDependency(merged_dependencies, transformer, expectation),
                     )?;
                 }
             }
@@ -809,6 +870,7 @@ impl QueryGraph {
 
                         Ok(reload_node)
                     }),
+                    None,
                 ),
             )?;
 
@@ -915,7 +977,7 @@ impl QueryGraph {
                     let unsatisfied_dependencies: Vec<_> = edges
                         .into_iter()
                         .filter_map(|edge| match self.edge_content(&edge).unwrap() {
-                            QueryGraphDependency::ProjectedDataDependency(ref requested_selection, _)
+                            QueryGraphDependency::ProjectedDataDependency(ref requested_selection, _, _)
                                 if !q.satisfies(requested_selection) =>
                             {
                                 Some(requested_selection.clone())

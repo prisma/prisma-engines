@@ -99,28 +99,32 @@ fn handle_many_to_many(
     });
 
     let disconnect_node = graph.create_node(Query::Write(disconnect));
-    let relation_name = parent_relation_field.relation().name();
-    let parent_model_name = parent_relation_field.model().name().to_owned();
 
     // Edge from parent to disconnect
     graph.create_edge(
-         parent_node,
-         &disconnect_node,
-         QueryGraphDependency::ProjectedDataDependency(parent_model_identifier, Box::new(move |mut disconnect_node, mut parent_ids| {
-             let parent_id = match parent_ids.pop() {
-                 Some(pid) => Ok(pid),
-                 None => Err(QueryGraphBuilderError::RecordNotFound(format!(
-                    "No '{parent_model_name}' records (needed to disconnect existing child records) were found for a nested set on many-to-many relation '{relation_name}'."
-                ))),
-             }?;
+        parent_node,
+        &disconnect_node,
+        QueryGraphDependency::ProjectedDataDependency(
+            parent_model_identifier,
+            Box::new(move |mut disconnect_node, mut parent_ids| {
+                let parent_id = parent_ids.pop().expect("parent id should be present");
 
-             if let Node::Query(Query::Write(WriteQuery::DisconnectRecords(ref mut c))) = disconnect_node {
-                 c.parent_id = Some(parent_id);
-             }
+                if let Node::Query(Query::Write(WriteQuery::DisconnectRecords(ref mut c))) = disconnect_node {
+                    c.parent_id = Some(parent_id);
+                }
 
-             Ok(disconnect_node)
-         })),
-     )?;
+                Ok(disconnect_node)
+            }),
+            Some(DataExpectation::non_empty_rows(
+                MissingRelatedRecord::builder()
+                    .model(parent_relation_field.model())
+                    .relation(parent_relation_field.relation())
+                    .needed_for(DependentOperation::DisconnectRecords)
+                    .operation(DataOperation::NestedSet)
+                    .build(),
+            )),
+        ),
+    )?;
 
     // Edge from read to disconnect.
     graph.create_edge(
@@ -136,6 +140,7 @@ fn handle_many_to_many(
 
                 Ok(disconnect_node)
             }),
+            None,
         ),
     )?;
 
@@ -237,6 +242,7 @@ fn handle_one_to_many(
 
                 Ok(diff_node)
             }),
+            None,
         ),
     )?;
 
@@ -253,6 +259,7 @@ fn handle_one_to_many(
 
                 Ok(diff_node)
             }),
+            None,
         ),
     )?;
 
@@ -275,9 +282,6 @@ fn handle_one_to_many(
         })),
     )?;
 
-    let relation_name = parent_relation_field.relation().name();
-    let parent_model_name = parent_relation_field.model().name().to_owned();
-
     // Connect to the if node, the parent node (for the inlining ID) and the diff node (to get the IDs to update)
     graph.create_edge(&connect_if_node, &update_connect_node, QueryGraphDependency::Then)?;
     graph.create_edge(
@@ -286,12 +290,7 @@ fn handle_one_to_many(
         QueryGraphDependency::ProjectedDataDependency(
             parent_link,
             Box::new(move |mut update_connect_node, mut parent_links| {
-                let parent_link = match parent_links.pop() {
-                    Some(link) => Ok(link),
-                    None => Err(QueryGraphBuilderError::RecordNotFound(format!(
-                        "No '{parent_model_name}' records were found for a nested set on many-to-many relation '{relation_name}'."
-                    ))),
-                }?;
+                let parent_link = parent_links.pop().expect("parent link should be present");
 
                 if let Node::Query(Query::Write(ref mut wq)) = update_connect_node {
                     wq.inject_result_into_args(child_link.assimilate(parent_link)?);
@@ -299,6 +298,13 @@ fn handle_one_to_many(
 
                 Ok(update_connect_node)
             }),
+            Some(DataExpectation::non_empty_rows(
+                MissingRelatedRecord::builder()
+                    .model(parent_relation_field.model())
+                    .relation(parent_relation_field.relation())
+                    .operation(DataOperation::NestedSet)
+                    .build(),
+            )),
         ),
     )?;
 

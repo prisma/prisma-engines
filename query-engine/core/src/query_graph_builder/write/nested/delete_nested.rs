@@ -2,7 +2,7 @@ use super::*;
 use crate::{
     query_ast::*,
     query_graph::{Node, NodeRef, QueryGraph, QueryGraphDependency},
-    ParsedInputMap, ParsedInputValue,
+    DataExpectation, ParsedInputMap, ParsedInputValue,
 };
 use query_structure::{Filter, Model, PrismaValue, RecordFilter, RelationFieldRef};
 use std::convert::TryInto;
@@ -54,30 +54,26 @@ pub fn nested_delete(
             utils::insert_emulated_on_delete(graph, query_schema, child_model, &find_child_records_node)?;
         utils::create_execution_order_edges(graph, dependencies, delete_many_node)?;
 
-        let relation_name = parent_relation_field.relation().name();
-        let parent_name = parent_relation_field.model().name().to_owned();
-        let child_name = child_model.name().to_owned();
-
         graph.create_edge(
             &find_child_records_node,
             &delete_many_node,
             QueryGraphDependency::ProjectedDataDependency(
                 child_model_identifier,
                 Box::new(move |mut delete_many_node, child_ids| {
-                    if child_ids.len() != filter_len {
-                        return Err(QueryGraphBuilderError::RecordsNotConnected {
-                            relation_name,
-                            parent_name,
-                            child_name,
-                        });
-                    }
-
                     if let Node::Query(Query::Write(WriteQuery::DeleteManyRecords(ref mut dmr))) = delete_many_node {
                         dmr.record_filter = child_ids.into();
                     }
 
                     Ok(delete_many_node)
                 }),
+                Some(DataExpectation::exact_row_count(
+                    filter_len,
+                    RecordsNotConnected::builder()
+                        .child(child_model.clone())
+                        .parent(parent_relation_field.model())
+                        .relation(parent_relation_field.relation())
+                        .build(),
+                )),
             ),
         )?;
     } else {
@@ -107,21 +103,13 @@ pub fn nested_delete(
                 utils::insert_emulated_on_delete(graph, query_schema, child_model, &find_child_records_node)?;
             utils::create_execution_order_edges(graph, dependencies, delete_record_node)?;
 
-            let relation_name = parent_relation_field.relation().name();
-            let child_model_name = child_model.name().to_owned();
-
             graph.create_edge(
                 &find_child_records_node,
                 &delete_record_node,
                 QueryGraphDependency::ProjectedDataDependency(
                     child_model_identifier,
                     Box::new(move |mut delete_record_node, mut child_ids| {
-                        let child_id = match child_ids.pop() {
-                            Some(pid) => Ok(pid),
-                            None => Err(QueryGraphBuilderError::RecordNotFound(format!(
-                                "No '{child_model_name}' record was found for a nested delete on relation '{relation_name}'."
-                            ))),
-                        }?;
+                        let child_id = child_ids.pop().expect("child id should be present");
 
                         if let Node::Query(Query::Write(WriteQuery::DeleteRecord(ref mut dq))) = delete_record_node {
                             dq.set_selectors(vec![child_id]);
@@ -129,6 +117,13 @@ pub fn nested_delete(
 
                         Ok(delete_record_node)
                     }),
+                    Some(DataExpectation::non_empty_rows(
+                        MissingRelatedRecord::builder()
+                            .model(child_model.clone())
+                            .relation(parent_relation_field.relation())
+                            .operation(DataOperation::NestedDelete)
+                            .build(),
+                    )),
                 ),
             )?;
         }
@@ -177,6 +172,7 @@ pub fn nested_delete_many(
 
                     Ok(delete_many_node)
                 }),
+                None,
             ),
         )?;
     }

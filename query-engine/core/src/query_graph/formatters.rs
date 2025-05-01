@@ -108,7 +108,7 @@ impl Display for QueryGraphDependency {
         match self {
             Self::ExecutionOrder => write!(f, "ExecutionOrder"),
             Self::DataDependency(_) => write!(f, "ParentResult"),
-            Self::ProjectedDataDependency(selection, _) => {
+            Self::ProjectedDataDependency(selection, _, _) => {
                 write!(
                     f,
                     "ProjectedDataDependency ({:?})",

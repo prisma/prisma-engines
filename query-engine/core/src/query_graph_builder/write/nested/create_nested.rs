@@ -3,7 +3,7 @@ use crate::{
     query_ast::*,
     query_graph::{Node, NodeRef, QueryGraph, QueryGraphDependency},
     write::write_args_parser::WriteArgsParser,
-    ParsedInputList, ParsedInputValue,
+    DataExpectation, ParsedInputList, ParsedInputValue,
 };
 use psl::datamodel_connector::ConnectorCapability;
 use query_structure::{Filter, IntoFilter, Model, RelationFieldRef};
@@ -128,27 +128,32 @@ fn handle_one_to_many_bulk(
     let parent_link = parent_relation_field.linking_fields();
     let child_link = parent_relation_field.related_field().linking_fields();
 
-    let relation_name = parent_relation_field.relation().name().to_owned();
-    let parent_model_name = parent_relation_field.model().name().to_owned();
-    let child_model_name = parent_relation_field.related_model().name().to_owned();
-
     graph.create_edge(
         &parent_node,
         &child_node,
-        QueryGraphDependency::ProjectedDataDependency(parent_link, Box::new(move |mut create_node, mut parent_links| {
-            let parent_link = match parent_links.pop() {
-                Some(link) => Ok(link),
-                None => Err(QueryGraphBuilderError::RecordNotFound(format!(
-                    "No '{parent_model_name}' record (needed to inline the relation on '{child_model_name}' record) was found for a nested create on one-to-many relation '{relation_name}'."
-                ))),
-            }?;
+        QueryGraphDependency::ProjectedDataDependency(
+            parent_link,
+            Box::new(move |mut create_node, mut parent_links| {
+                let parent_link = parent_links.pop().expect("parent link should be present");
 
-            if let Node::Query(Query::Write(ref mut wq)) = create_node {
-                wq.inject_result_into_args(child_link.assimilate(parent_link)?);
-            }
+                if let Node::Query(Query::Write(ref mut wq)) = create_node {
+                    wq.inject_result_into_args(child_link.assimilate(parent_link)?);
+                }
 
-            Ok(create_node)
-        })))?;
+                Ok(create_node)
+            }),
+            Some(DataExpectation::non_empty_rows(
+                MissingRelatedRecord::builder()
+                    .model(parent_relation_field.model())
+                    .relation(parent_relation_field.relation())
+                    .needed_for(DependentOperation::InlineRelation(
+                        parent_relation_field.related_model(),
+                    ))
+                    .operation(DataOperation::NestedCreate)
+                    .build(),
+            )),
+        ),
+    )?;
 
     Ok(())
 }
@@ -281,55 +286,60 @@ fn handle_one_to_many(
         let parent_link = parent_relation_field.linking_fields();
         let child_link = parent_relation_field.related_field().linking_fields();
 
-        let relation_name = parent_relation_field.relation().name();
-        let parent_model_name = parent_relation_field.model().name().to_owned();
-        let child_model_name = parent_relation_field.related_model().name().to_owned();
-
         // We extract the child linking fields in the edge, because after the swap, the child is the new parent.
         graph.create_edge(
             &parent_node,
             &child_node,
-            QueryGraphDependency::ProjectedDataDependency(child_link, Box::new(move |mut parent_node, mut child_links| {
-                let child_link = match child_links.pop() {
-                    Some(link) => Ok(link),
-                    None => Err(QueryGraphBuilderError::RecordNotFound(format!(
-                        "No '{child_model_name}' record (needed to inline the relation on '{parent_model_name}' record) was found for a nested create on one-to-many relation '{relation_name}'."
-                    ))),
-                }?;
+            QueryGraphDependency::ProjectedDataDependency(
+                child_link,
+                Box::new(move |mut parent_node, mut child_links| {
+                    let child_link = child_links.pop().expect("child link should be present");
 
-                if let Node::Query(Query::Write(ref mut wq)) = parent_node {
-                    wq.inject_result_into_args(parent_link.assimilate(child_link)?);
-                }
+                    if let Node::Query(Query::Write(ref mut wq)) = parent_node {
+                        wq.inject_result_into_args(parent_link.assimilate(child_link)?);
+                    }
 
-                Ok(parent_node)
-            })),
+                    Ok(parent_node)
+                }),
+                Some(DataExpectation::non_empty_rows(
+                    MissingRelatedRecord::builder()
+                        .model(parent_relation_field.related_model())
+                        .relation(parent_relation_field.relation())
+                        .needed_for(DependentOperation::InlineRelation(parent_relation_field.model()))
+                        .operation(DataOperation::NestedCreate)
+                        .build(),
+                )),
+            ),
         )?;
     } else {
         for create_node in create_nodes {
             let parent_link = parent_relation_field.linking_fields();
             let child_link = parent_relation_field.related_field().linking_fields();
 
-            let relation_name = parent_relation_field.relation().name().to_owned();
-            let parent_model_name = parent_relation_field.model().name().to_owned();
-            let child_model_name = parent_relation_field.related_model().name().to_owned();
-
             graph.create_edge(
                 &parent_node,
                 &create_node,
-                QueryGraphDependency::ProjectedDataDependency(parent_link, Box::new(move |mut create_node, mut parent_links| {
-                    let parent_link = match parent_links.pop() {
-                        Some(link) => Ok(link),
-                        None => Err(QueryGraphBuilderError::RecordNotFound(format!(
-                            "No '{parent_model_name}' record (needed to inline the relation on '{child_model_name}' record) was found for a nested create on one-to-many relation '{relation_name}'."
-                        ))),
-                    }?;
+                QueryGraphDependency::ProjectedDataDependency(
+                    parent_link,
+                    Box::new(move |mut create_node, mut parent_links| {
+                        let parent_link = parent_links.pop().expect("parent link should be present");
 
-                    if let Node::Query(Query::Write(ref mut wq)) = create_node {
-                        wq.inject_result_into_args(child_link.assimilate(parent_link)?);
-                    }
+                        if let Node::Query(Query::Write(ref mut wq)) = create_node {
+                            wq.inject_result_into_args(child_link.assimilate(parent_link)?);
+                        }
 
-                    Ok(create_node)
-                })))?;
+                        Ok(create_node)
+                    }),
+                    Some(DataExpectation::non_empty_rows(
+                        MissingRelatedRecord::builder()
+                            .model(parent_relation_field.model())
+                            .relation(parent_relation_field.relation())
+                            .needed_for(DependentOperation::InlineRelation(parent_relation_field.model()))
+                            .operation(DataOperation::NestedCreate)
+                            .build(),
+                    )),
+                ),
+            )?;
         }
     };
 
@@ -472,28 +482,30 @@ fn handle_one_to_one(
         )
     };
 
-    let relation_name = parent_relation_field.relation().name();
-    let parent_model_name = extractor_model.name().to_owned();
-    let child_model_name = assimilator_model.name().to_owned();
-
     graph.create_edge(
         &parent_node,
         &create_node,
-        QueryGraphDependency::ProjectedDataDependency(extractor, Box::new(move |mut child_node, mut links| {
-            let link = match links.pop() {
-                Some(link) => Ok(link),
-                None => Err(QueryGraphBuilderError::RecordNotFound(format!(
-                    "No '{parent_model_name}' record (needed to inline the relation with create on '{child_model_name}' record) was found for a nested create on one-to-one relation '{relation_name}'."
-                ))),
-            }?;
+        QueryGraphDependency::ProjectedDataDependency(
+            extractor,
+            Box::new(move |mut child_node, mut links| {
+                let link = links.pop().expect("link should be present");
 
-            // We ONLY inject for creates here. Check end of doc comment for explanation.
-            if let Node::Query(Query::Write(ref mut q @ WriteQuery::CreateRecord(_))) = child_node {
-                q.inject_result_into_args(assimilator.assimilate(link)?);
-            }
+                // We ONLY inject for creates here. Check end of doc comment for explanation.
+                if let Node::Query(Query::Write(ref mut q @ WriteQuery::CreateRecord(_))) = child_node {
+                    q.inject_result_into_args(assimilator.assimilate(link)?);
+                }
 
-            Ok(child_node)
-        })),
+                Ok(child_node)
+            }),
+            Some(DataExpectation::non_empty_rows(
+                MissingRelatedRecord::builder()
+                    .model(extractor_model)
+                    .relation(parent_relation_field.relation())
+                    .needed_for(DependentOperation::CreateInlinedRelation(assimilator_model))
+                    .operation(DataOperation::NestedCreate)
+                    .build(),
+            )),
+        ),
     )?;
 
     // Relation is inlined on the Parent and a non-create.
@@ -501,54 +513,60 @@ fn handle_one_to_one(
     // For explanation see end of doc comment.
     if relation_inlined_parent && !parent_is_create {
         let parent_model = parent_relation_field.model();
-        let relation_name = parent_relation_field.relation().name();
-        let parent_model_name = parent_model.name().to_owned();
-        let child_model_name = parent_relation_field.related_model().name().to_owned();
-        let update_node = utils::update_records_node_placeholder(graph, Filter::empty(), parent_model);
+        let update_node = utils::update_records_node_placeholder(graph, Filter::empty(), parent_model.clone());
         let parent_link = parent_relation_field.linking_fields();
 
         graph.create_edge(
             &create_node,
             &update_node,
-            QueryGraphDependency::ProjectedDataDependency(child_link, Box::new(move |mut update_node, mut child_links| {
-                let child_link = match child_links.pop() {
-                    Some(link) => Ok(link),
-                    None => Err(QueryGraphBuilderError::RecordNotFound(format!(
-                        "No '{child_model_name}' record (needed to inline the relation with an update on '{parent_model_name}' record) was found for a nested create on one-to-one relation '{relation_name}'."
-                    ))),
-                }?;
+            QueryGraphDependency::ProjectedDataDependency(
+                child_link,
+                Box::new(move |mut update_node, mut child_links| {
+                    let child_link = child_links.pop().expect("child link should be present");
 
-                if let Node::Query(Query::Write(ref mut wq)) = update_node {
-                    wq.inject_result_into_args(parent_link.assimilate(child_link)?);
-                }
+                    if let Node::Query(Query::Write(ref mut wq)) = update_node {
+                        wq.inject_result_into_args(parent_link.assimilate(child_link)?);
+                    }
 
-                Ok(update_node)
-            })),
-         )?;
-
-        let parent_model_identifier = parent_relation_field.model().primary_identifier();
-        let relation_name = parent_relation_field.relation().name();
-        let parent_model_name = parent_relation_field.model().name().to_owned();
+                    Ok(update_node)
+                }),
+                Some(DataExpectation::non_empty_rows(
+                    MissingRelatedRecord::builder()
+                        .model(parent_model)
+                        .relation(parent_relation_field.relation())
+                        .needed_for(DependentOperation::UpdateInlinedRelation(
+                            parent_relation_field.related_model(),
+                        ))
+                        .operation(DataOperation::NestedCreate)
+                        .build(),
+                )),
+            ),
+        )?;
 
         graph.create_edge(
             &parent_node,
             &update_node,
-            QueryGraphDependency::ProjectedDataDependency(parent_model_identifier, Box::new(move |mut update_node, mut parent_ids| {
-                let parent_id = match parent_ids.pop() {
-                    Some(pid) => Ok(pid),
-                    None => Err(QueryGraphBuilderError::RecordNotFound(format!(
-                        "No '{}' record (needed to update the relation on '{}' record) was found for a nested create on one-to-one relation '{}'.",
-                        &parent_model_name, parent_model_name, relation_name
-                    ))),
-                }?;
+            QueryGraphDependency::ProjectedDataDependency(
+                parent_relation_field.model().primary_identifier(),
+                Box::new(move |mut update_node, mut parent_ids| {
+                    let parent_id = parent_ids.pop().expect("parent id should be present");
 
-                if let Node::Query(Query::Write(ref mut wq)) = update_node {
-                    wq.add_filter(parent_id.filter());
-                }
+                    if let Node::Query(Query::Write(ref mut wq)) = update_node {
+                        wq.add_filter(parent_id.filter());
+                    }
 
-                Ok(update_node)
-            })),
-         )?;
+                    Ok(update_node)
+                }),
+                Some(DataExpectation::non_empty_rows(
+                    MissingRelatedRecord::builder()
+                        .model(parent_relation_field.model())
+                        .relation(parent_relation_field.relation())
+                        .needed_for(DependentOperation::UpdateInlinedRelation(parent_relation_field.model()))
+                        .operation(DataOperation::NestedCreate)
+                        .build(),
+                )),
+            ),
+        )?;
     }
 
     Ok(())

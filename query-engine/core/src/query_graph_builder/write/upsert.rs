@@ -2,7 +2,7 @@ use super::{write_args_parser::WriteArgsParser, *};
 use crate::{
     query_ast::*,
     query_graph::{Flow, Node, QueryGraph, QueryGraphDependency},
-    ParsedField, ParsedInputMap, ParsedInputValue, ParsedObject,
+    DataExpectation, ParsedField, ParsedInputMap, ParsedInputValue, ParsedObject,
 };
 use query_structure::{IntoFilter, Model};
 use schema::QuerySchema;
@@ -132,6 +132,7 @@ pub(crate) fn upsert_record(
                     Ok(if_node)
                 }
             }),
+            None,
         ),
     )?;
 
@@ -169,6 +170,7 @@ pub(crate) fn upsert_record(
 
                 Ok(update_node)
             }),
+            None,
         ),
     )?;
 
@@ -178,12 +180,7 @@ pub(crate) fn upsert_record(
         QueryGraphDependency::ProjectedDataDependency(
             model_id.clone(),
             Box::new(move |mut read_node_update, mut parent_ids| {
-                let parent_id = match parent_ids.pop() {
-                    Some(pid) => Ok(pid),
-                    None => Err(QueryGraphBuilderError::AssertionError(
-                        "Expected a valid parent ID to be present for create follow-up for upsert query.".to_string(),
-                    )),
-                }?;
+                let parent_id = parent_ids.pop().expect("parent id should be present");
 
                 if let Node::Query(Query::Read(ReadQuery::RecordQuery(ref mut rq))) = read_node_update {
                     rq.add_filter(parent_id.filter());
@@ -191,6 +188,9 @@ pub(crate) fn upsert_record(
 
                 Ok(read_node_update)
             }),
+            Some(DataExpectation::non_empty_rows(
+                MissingRecord::builder().operation(DataOperation::Upsert).build(),
+            )),
         ),
     )?;
 
@@ -200,12 +200,7 @@ pub(crate) fn upsert_record(
         QueryGraphDependency::ProjectedDataDependency(
             model_id,
             Box::new(move |mut read_node_create, mut parent_ids| {
-                let parent_id = match parent_ids.pop() {
-                    Some(pid) => Ok(pid),
-                    None => Err(QueryGraphBuilderError::AssertionError(
-                        "Expected a valid parent ID to be present for update follow-up for upsert query.".to_string(),
-                    )),
-                }?;
+                let parent_id = parent_ids.pop().expect("parent id should be present");
 
                 if let Node::Query(Query::Read(ReadQuery::RecordQuery(ref mut rq))) = read_node_create {
                     rq.add_filter(parent_id.filter());
@@ -213,6 +208,9 @@ pub(crate) fn upsert_record(
 
                 Ok(read_node_create)
             }),
+            Some(DataExpectation::non_empty_rows(
+                MissingRecord::builder().operation(DataOperation::Upsert).build(),
+            )),
         ),
     )?;
 

@@ -355,9 +355,14 @@ impl Expressionista {
                                     }?;
 
                                     let res = match dependency {
-                                        QueryGraphDependency::ProjectedDataDependency(selection, f) => binding
-                                            .as_selection_results(&selection)
-                                            .and_then(|parent_selections| Ok(f(node, parent_selections)?)),
+                                        QueryGraphDependency::ProjectedDataDependency(selection, f, expectation) => {
+                                            binding.as_selection_results(&selection).and_then(|parent_selections| {
+                                                if let Some(expectation) = expectation {
+                                                    expectation.check(&parent_selections)?;
+                                                }
+                                                Ok(f(node, parent_selections)?)
+                                            })
+                                        }
 
                                         QueryGraphDependency::DataDependency(f) => Ok(f(node, binding)?),
 
@@ -391,7 +396,7 @@ impl Expressionista {
                     let parent_binding_name = graph.edge_source(&edge).id();
                     Some((parent_binding_name, x))
                 }
-                x @ QueryGraphDependency::ProjectedDataDependency(_, _) => {
+                x @ QueryGraphDependency::ProjectedDataDependency(_, _, _) => {
                     let parent_binding_name = graph.edge_source(&edge).id();
                     Some((parent_binding_name, x))
                 }

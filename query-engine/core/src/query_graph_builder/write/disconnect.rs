@@ -1,7 +1,7 @@
 use crate::{
     query_ast::*,
     query_graph::{Node, NodeRef, QueryGraph, QueryGraphDependency},
-    QueryGraphBuilderError, QueryGraphBuilderResult,
+    DataExpectation, DataOperation, MissingRelatedRecord, QueryGraphBuilderResult,
 };
 use query_structure::RelationFieldRef;
 
@@ -50,7 +50,6 @@ pub(crate) fn disconnect_records_node(
     });
 
     let disconnect_node = graph.create_node(Query::Write(disconnect));
-    let relation_name = parent_relation_field.relation().name();
 
     // Edge from parent to disconnect.
     graph.create_edge(
@@ -59,12 +58,7 @@ pub(crate) fn disconnect_records_node(
         QueryGraphDependency::ProjectedDataDependency(
             parent_model_id,
             Box::new(move |mut disconnect_node, mut parent_ids| {
-                let parent_id = match parent_ids.pop() {
-                    Some(pid) => Ok(pid),
-                    None => Err(QueryGraphBuilderError::RecordNotFound(format!(
-                        "No parent record was found for a nested disconnect on relation '{relation_name}'."
-                    ))),
-                }?;
+                let parent_id = parent_ids.pop().expect("parent id should be present");
 
                 if let Node::Query(Query::Write(WriteQuery::DisconnectRecords(ref mut c))) = disconnect_node {
                     c.parent_id = Some(parent_id);
@@ -72,6 +66,13 @@ pub(crate) fn disconnect_records_node(
 
                 Ok(disconnect_node)
             }),
+            Some(DataExpectation::non_empty_rows(
+                MissingRelatedRecord::builder()
+                    .model(parent_relation_field.model())
+                    .relation(parent_relation_field.relation())
+                    .operation(DataOperation::Disconnect)
+                    .build(),
+            )),
         ),
     )?;
 
@@ -88,6 +89,7 @@ pub(crate) fn disconnect_records_node(
 
                 Ok(disconnect_node)
             }),
+            None,
         ),
     )?;
 
