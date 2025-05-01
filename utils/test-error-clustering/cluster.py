@@ -1,12 +1,13 @@
+import re
 import sys
 import json
-import re
-from collections import defaultdict, Counter
+from collections import defaultdict
 from dataclasses import dataclass
-from math import ceil, sqrt
-from typing import List, Dict, Optional
+from enum import Enum
+from typing import List, Dict, Optional, Iterable
 
 import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
 import numpy as np
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.manifold import TSNE
@@ -15,10 +16,11 @@ from sklearn.cluster import DBSCAN
 
 @dataclass
 class ClusteringOptions:
-    representative_output_count: int = 1  # How many representative outputs to show per cluster
+    max_representative_outputs: int = 3  # Show at most this many representative outputs per cluster
+    manifold_dimension: int = 2  # Dimension of the clustering space, target dimension of the t-SNE algorithm
     dbscan_epsilon: float = 3.0  # Higher value produces less clusters
-    log_cleaned_stdout: bool = False  # Helps debugging the cleanup method
-    plot_clusters: bool = True
+    show_cleaned_stdout: bool = True  # Helps debugging the cleanup method
+    plot_clusters: bool = True  # Plots the clusters, works only if manifold_dimension is 2 or 3
 
 
 @dataclass
@@ -28,30 +30,106 @@ class TestResult:
     clean_output: str
 
 
+COMMON_LINES = (
+    '<SEP>',
+    'Used datamodel:',
+    'Some details are omitted',
+    'Test failed due to an error',
+    'stack backtrace:',
+    'at <PATH>:<DEC>:<DEC>',
+    'at .<PATH>:<DEC>:<DEC>',
+    'request; method="initializeSchema" params',
+)
+
+RX_BLOCK_START = re.compile(
+    r'''^(
+        datasource\s+\w+\s*\{
+        |generator\s+\w+\s*\{
+        |model\s+\w+\s*\{
+    )$''',
+    re.VERBOSE
+)
+assert RX_BLOCK_START.match("datasource test {")
+assert RX_BLOCK_START.match("datasource test{")
+assert RX_BLOCK_START.match("generator client {")
+assert RX_BLOCK_START.match("generator client{")
+assert RX_BLOCK_START.match("model User {")
+assert RX_BLOCK_START.match("model User{")
+
+RX_PANIC_START = re.compile(r"^(thread '[\w:]+' panicked at .*?<PATH>:<DEC>:<DEC>|<DEC>: rust_begin_unwind).*$")
+assert RX_PANIC_START.match(
+    r"thread 'writes::top_level_mutations::non_embedded_upsert::non_embedded_upsert::nested_delete_in_update' panicked at query-engine<PATH>:<DEC>:<DEC>:")
+
+
+class Mode(Enum):
+    keep = 'keep'
+    star = 'star'
+    panic = 'panic'
+    block = 'block'
+
+
+def clean_doc(lines: Iterable[str]) -> Iterable[str]:
+    mode: Mode = Mode.keep
+    for line in lines:
+        line = clean_line(line)
+
+        if not line or any(common in line for common in COMMON_LINES):
+            continue
+
+        if mode == Mode.star:
+            if line.startswith('*'):
+                continue
+            else:
+                mode = Mode.keep
+
+        if mode == Mode.panic:
+            if line.startswith('<DEC>: '):
+                continue
+            else:
+                mode = Mode.keep
+
+        if mode == Mode.block:
+            if line == '}':
+                mode = Mode.keep
+            continue
+
+        if line == '* Test run information:':
+            mode = Mode.star
+        elif RX_PANIC_START.match(line):
+            mode = Mode.panic
+        elif RX_BLOCK_START.match(line):
+            mode = Mode.block
+        else:
+            yield line
+
+
+def clean_line(line: str) -> str:
+    line = re.sub(r'\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z?', '<TIMESTAMP>', line)  # Timestamps
+    line = re.sub(r'\d{4}-\d{2}-\d{2}', '<DATE>', line)  # Timestamps
+    line = re.sub(r'\d{2}:\d{2}:\d{2}', '<TIME>', line)  # Timestamps
+    line = re.sub(r'/[\w/.-]+', '<PATH>', line)  # Unix file paths
+    line = re.sub(r'\\[\w\\.-]+', '<PATH>', line)  # Windows file paths
+    line = re.sub(r'\b[0-9a-fA-F\-]{8,}\b', '<ID>', line)  # IDs
+    line = re.sub(r'\b[0-9a-fA-F]{8,}\b', '<HEX>', line)  # Hex numbers, addresses
+    line = re.sub(r'\b\d+\b', '<DEC>', line)  # Decimal numbers
+    line = re.sub(r'\b[+\-]?\d+\.\d+([eE][+\-]?\d+)?\b', '<FLOAT>', line)  # Floating point numbers
+    line = re.sub(r'={3,}', '<SEP>', line)  # Separators
+    line = re.sub(r'\*{3,}', '<SEP>', line)  # Separators
+    line = re.sub(r'-{3,}', '<SEP>', line)  # Separators
+    line = re.sub(r'[ \t]{2,}', ' ', line)  # Repeated spaces and tabs, but not newlines
+    return line.strip()
+
+
 class TestFailureClustering:
     def __init__(self, options: ClusteringOptions):
         self.options = options
         self.tests: List[TestResult] = []
         self.clusters: Dict[int, list[TestResult]] = defaultdict(list)
+        self.not_clustered: int = 0
 
-    def clean_test_output(self, text: str) -> str:
-        """Cleans dynamic parts like timestamps, IDs, file paths from the test output"""
-        text = re.sub(r'\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}', '<TIMESTAMP>', text)  # Timestamps
-        text = re.sub(r'\d{4}-\d{2}-\d{2}', '<DATE>', text)  # Timestamps
-        text = re.sub(r'\d{2}:\d{2}:\d{2}', '<TIME>', text)  # Timestamps
-        text = re.sub(r'/[\w/.-]+', '<PATH>', text)  # Unix file paths
-        text = re.sub(r'\\[\w\\.-]+', '<PATH>', text)  # Windows file paths
-        text = re.sub(r'[0-9a-fA-F\-]{36}', '<UID>', text)  # UIDs
-        text = re.sub(r'[0-9a-fA-F]{4,}', '<HEX>', text)  # Hex numbers, addresses
-        text = re.sub(r':\d+', ':<LINE>', text)  # Line numbers
-        text = re.sub(r'\d{2,}', '<DEC>', text)  # Decimal numbers
-        text = re.sub(r'[+\-]?\d+\.\d+', '<FLOAT>', text)  # Floating point numbers
-        text = re.sub(r'={3,}', '===', text)  # Separators
-        text = re.sub(r'\*{3,}', '***', text)  # Separators
-        text = re.sub(r'-{3,}', '---', text)  # Separators
-        text = re.sub(r'[ \t]{2,}', ' ', text)  # Repeated spaces and tabs, but not newlines
-        text = re.sub(r'\n{2,}', '\n', text)  # Repeated newlines
-        return text.strip()
+        assert self.options.max_representative_outputs >= 1
+        assert self.options.manifold_dimension >= 2
+        assert self.options.dbscan_epsilon > 0
 
     def run(self, jsonl_path: str):
         self.read_test_results(jsonl_path)
@@ -66,7 +144,7 @@ class TestFailureClustering:
         self.write_failed_tests(fail_path)
 
     def read_test_results(self, jsonl_path: str):
-        with open(jsonl_path, 'r', encoding='utf-8') as f:
+        with open(jsonl_path, 'rt', encoding='utf-8') as f:
             for line in f:
                 line = line.strip()
                 if not line.startswith('{') or not line.endswith('}'):
@@ -89,7 +167,13 @@ class TestFailureClustering:
                     continue
 
                 name = name.split('$')[-1].split('#')[0]
-                cleaned_stdout = self.clean_test_output(stdout)
+                cleaned_stdout = '\n'.join(clean_doc(stdout.split('\n')))
+
+                cleaned_stdout = cleaned_stdout.replace(name, '<TESTCASE>')
+
+                if not cleaned_stdout.strip():
+                    print(f'WARNING: Test output got completely removed by the cleanup: {name}')
+                    continue
 
                 self.tests.append(TestResult(
                     name=name,
@@ -107,21 +191,26 @@ class TestFailureClustering:
             return
 
         # Vectorize the test outputs based on term frequencies
-        vectorizer = TfidfVectorizer(max_features=8192)
-        vectors = vectorizer.fit_transform(test.clean_output for test in self.tests)
+        vectorizer = TfidfVectorizer(analyzer=lambda doc: doc.strip().splitlines(), max_features=8192)
+        documents = [test.clean_output for test in self.tests]
+        vectors = vectorizer.fit_transform(documents).toarray()
+        count, terms = vectors.shape
 
         # Reduce to 2 dimensions using t-SNE
-        tsne = TSNE(n_components=2, random_state=42, perplexity=int(ceil(sqrt(count))))
-        reduced = tsne.fit_transform(vectors.toarray())
+        tsne = TSNE(n_components=self.options.manifold_dimension, random_state=42, perplexity=min(count - 1, 50))
+        reduced = tsne.fit_transform(vectors)
 
         # Cluster using DBSCAN
         dbscan = DBSCAN(eps=self.options.dbscan_epsilon, min_samples=2)
         labels = dbscan.fit_predict(reduced)
+        self.not_clustered = np.sum(labels == -1)
 
         # Organize tests by clusters
         for label, test in zip(labels, self.tests):
             if label < 0:
-                # Ignore noisy sample (see the doc of dbscan.fit_predict)
+                # Ignore noisy samples (see the doc of dbscan.fit_predict),
+                # these test errors are rare, therefore they are too much
+                # outside the other clusters. They should be handled later.
                 continue
             self.clusters[label].append(test)
 
@@ -129,23 +218,65 @@ class TestFailureClustering:
         self.plot_clusters(plot_path, reduced, labels)
 
     def plot_clusters(self, plot_path: Optional[str], reduced: np.ndarray, labels: np.ndarray):
-        if not plot_path:
+        if not plot_path or self.options.manifold_dimension not in (2, 3):
             return
 
-        plt.figure(figsize=(12, 8))
+        plt.figure(figsize=(16, 16))
+
+        if self.options.manifold_dimension == 2:
+            self.plot_clusters_2d(reduced, labels)
+        else:
+            self.plot_clusters_3d(reduced, labels)
+
+        plt.title("Test error clustering (t-SNE + DBSCAN)")
+        plt.tight_layout()
+        plt.savefig(plot_path)
+        plt.close()
+
+    @staticmethod
+    def plot_clusters_2d(reduced: np.ndarray, labels: np.ndarray):
         for label in set(labels):
             if label < 0:
                 continue
             mask = labels == label
-            plt.scatter(reduced[mask, 0], reduced[mask, 1], label=f"Cluster {label}", alpha=0.6)
+            cluster_label = f"Cluster {label}"
+            plt.scatter(
+                reduced[mask, 0],
+                reduced[mask, 1],
+                label=cluster_label,
+                alpha=0.6
+            )
 
-        plt.title("Test error clustering (t-SNE + DBSCAN)")
-        plt.savefig(plot_path)
+        plt.xlabel('X')
+        plt.ylabel('Y')
+
+    @staticmethod
+    def plot_clusters_3d(reduced: np.ndarray, labels: np.ndarray):
+        assert Axes3D, '3D projection requires Axes3D to be imported'
+        ax = plt.axes(projection='3d')
+
+        for label in set(labels):
+            if label < 0:
+                continue
+            mask = labels == label
+            cluster_label = f"Cluster {label}"
+            ax.scatter(
+                reduced[mask, 0],
+                reduced[mask, 1],
+                reduced[mask, 2],
+                label=cluster_label,
+                alpha=0.6
+            )
+
+        ax.set_xlabel('X')
+        ax.set_ylabel('Y')
+        # noinspection PyUnresolvedReferences
+        ax.set_zlabel('Z')
 
     def write_markdown(self, md_path: str):
         # Iterate the clusters in decreasing order of test counts
         sorted_clusters = sorted(self.clusters.items(), key=lambda x: len(x[1]), reverse=True)
-        with open(md_path, 'w', encoding='utf-8') as f:
+        with open(md_path, 'wt', encoding='utf-8') as f:
             for cluster_no, (cluster_id, tests) in enumerate(sorted_clusters, 1):
 
                 # Format the cluster as Markdown
@@ -155,37 +286,43 @@ class TestFailureClustering:
                     print(f'- {name}', file=f)
                 print(file=f)
 
-                if self.options.representative_output_count < 1:
+                if self.options.max_representative_outputs < 1:
                     continue
 
-                # Find the most common test output inside the cluster
-                frequencies = Counter(t.clean_output for t in tests)
-                top_n = [doc for doc, _ in frequencies.most_common(self.options.representative_output_count)]
-                original_outputs = {t.clean_output: t.output for t in tests}
+                # Sort the tests inside the cluster by frequency of the normalized output,
+                test_groups = defaultdict(list)
+                for test in tests:
+                    test_groups[test.clean_output].append(test)
+                sorted_docs = sorted(test_groups, key=lambda d: len(test_groups[d]), reverse=True)
 
                 # Provide the top N representative log outputs as collapsed blocks
-                for i, cleaned_doc in enumerate(top_n):
+                for i, doc in enumerate(sorted_docs[:self.options.max_representative_outputs]):
+                    test_group = test_groups[doc]
+                    test = test_group[0]
                     print('<details>', file=f)
-                    print('<summary>', file=f)
-                    print(f"Representative output {1 + i}", file=f)
-                    print('</summary>', file=f)
+                    print(f"<summary>{1 + i}: {test.name} ({len(test_group)})</summary>", file=f)
                     print(file=f)
+                    if self.options.show_cleaned_stdout:
+                        print('```js', file=f)
+                        print(test.clean_output.replace('```', '`~`~`'), file=f)
+                        print('```', file=f)
+                        print(file=f)
+                        print('<details>', file=f)
+                        print('<summary>Full log</summary>', file=f)
+                        print(file=f)
                     print('```js', file=f)
-                    print(original_outputs[cleaned_doc].replace('```', '`~`~`'), file=f)
+                    print(test.output.replace('```', '`~`~`'), file=f)
                     print('```', file=f)
                     print(file=f)
-                    if self.options.log_cleaned_stdout:
-                        print(f'### Cleaned', file=f)
-                        print('```js', file=f)
-                        print(cleaned_doc.replace('```', '`~`~`'), file=f)
-                        print('```', file=f)
+                    if self.options.show_cleaned_stdout:
+                        print('</details>', file=f)
                         print(file=f)
                     print('</details>', file=f)
                     print(file=f)
                 print(file=f)
 
     def write_failed_tests(self, fail_path):
-        with open(fail_path, 'w') as f:
+        with open(fail_path, 'wt', encoding='utf-8') as f:
             for name in sorted(set(test.name for test in self.tests)):
                 print(name, file=f)
 
@@ -194,11 +331,21 @@ def main():
     if len(sys.argv) < 2:
         print(f'Usage: {sys.argv[0]} <test-results.jsonl>')
         sys.exit(1)
+
     jsonl_path = sys.argv[1]
 
     options = ClusteringOptions()
     clustering = TestFailureClustering(options)
     clustering.run(jsonl_path)
+
+    test_count = len(clustering.tests)
+    cluster_count = len(clustering.clusters)
+    not_clustered = clustering.not_clustered
+    not_clustered_pct = 100.0 * not_clustered / test_count
+
+    print(f'Failed tests: {test_count}')
+    print(f'Clusters: {cluster_count}')
+    print(f'Not clustered: {not_clustered} ({not_clustered_pct:.2f}%)')
 
 
 if __name__ == "__main__":
