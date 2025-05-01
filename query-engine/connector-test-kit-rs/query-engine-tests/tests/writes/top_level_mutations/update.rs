@@ -304,7 +304,7 @@ mod update {
             }
           }"#,
           2025,
-          "An operation failed because it depends on one or more records that were required but not found. Record to update not found."
+          "An operation failed because it depends on one or more records that were required but not found. No record was found for an update."
         );
 
         Ok(())
@@ -698,7 +698,7 @@ mod update {
                   }
                 }"#,
             2025,
-            "An operation failed because it depends on one or more records that were required but not found. Record to update not found."
+            "An operation failed because it depends on one or more records that were required but not found. No record was found for an update."
         );
 
         Ok(())

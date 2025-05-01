@@ -207,7 +207,7 @@ impl DataExpectation {
     }
 }
 
-/// An rule a data dependency needs to fulfill to be considered valid.
+/// A rule a data dependency needs to fulfill to be considered valid.
 #[derive(Debug)]
 pub enum DataRule {
     /// Expect the data dependency to contain an exact number of rows.
