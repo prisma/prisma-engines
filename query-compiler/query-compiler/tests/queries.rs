@@ -1,3 +1,4 @@
+use insta::glob;
 use quaint::{
     prelude::{ConnectionInfo, ExternalConnectionInfo, SqlFamily},
     visitor::Postgres,
@@ -10,7 +11,7 @@ use std::{fs, sync::Arc};
 
 #[test]
 fn queries() {
-    insta::glob!("data/*.json", |path| {
+    glob!("data/*.json", |path| {
         let schema_string = include_str!("data/schema.prisma");
         let schema = psl::validate(schema_string.into());
 
@@ -31,13 +32,13 @@ fn queries() {
         let request = RequestBody::Json(JsonBody::Single(query));
         let doc = request.into_doc(&query_schema).unwrap();
 
-        let QueryDocument::Single(query) = doc else {
+        let QueryDocument::Single(operation) = doc else {
             panic!("expected single query");
         };
 
         let (graph, _serializer) = QueryGraphBuilder::new(&query_schema)
             .without_eager_default_evaluation()
-            .build(query)
+            .build(operation)
             .unwrap();
 
         let dot = graph.to_graphviz();
