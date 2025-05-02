@@ -315,19 +315,18 @@ where
             .append(self.line())
             .append(
                 self.intersperse(
-                    rules.iter().map(|rule| match rule {
-                        DataRule::RowCountEq(count) => self
-                            .softline()
-                            .append(self.text("rowCountEq"))
-                            .append(self.softline())
-                            .append(self.text(count.to_string()))
-                            .append(self.line()),
-                        DataRule::RowCountNeq(count) => self
-                            .softline()
-                            .append(self.text("rowCountNeq"))
-                            .append(self.softline())
-                            .append(self.text(count.to_string()))
-                            .append(self.line()),
+                    rules.iter().map(|rule| {
+                        let rendered_rule = match rule {
+                            DataRule::RowCountEq(count) => self
+                                .text("rowCountEq")
+                                .append(self.softline())
+                                .append(self.text(count.to_string())),
+                            DataRule::RowCountNeq(count) => self
+                                .text("rowCountNeq")
+                                .append(self.softline())
+                                .append(self.text(count.to_string())),
+                        };
+                        self.softline().append(rendered_rule).append(self.line())
                     }),
                     self.text(",").append(self.line()),
                 )

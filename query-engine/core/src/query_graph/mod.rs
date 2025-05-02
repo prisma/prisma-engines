@@ -6,6 +6,7 @@ mod transformers;
 pub(crate) use error::*;
 use psl::datamodel_connector::{ConnectorCapabilities, ConnectorCapability};
 use serde::Serialize;
+use smallvec::{smallvec, SmallVec};
 
 use crate::{
     interpreter::ExpressionResult, FilteredQuery, ManyRecordsQuery, Query, QueryGraphBuilderError,
@@ -163,28 +164,28 @@ pub enum QueryGraphDependency {
 
 /// An expectation for a data dependency.
 pub struct DataExpectation {
-    rules: Vec<DataRule>,
+    rules: SmallVec<[DataRule; 1]>,
     error: Box<dyn DataDependencyError>,
 }
 
 impl DataExpectation {
     pub fn non_empty_rows(error: impl DataDependencyError + 'static) -> Self {
         Self {
-            rules: vec![DataRule::RowCountNeq(0)],
+            rules: smallvec![DataRule::RowCountNeq(0)],
             error: Box::new(error),
         }
     }
 
     pub fn empty_rows(error: impl DataDependencyError + 'static) -> Self {
         Self {
-            rules: vec![DataRule::RowCountEq(0)],
+            rules: smallvec![DataRule::RowCountEq(0)],
             error: Box::new(error),
         }
     }
 
     pub fn exact_row_count(expected: usize, error: impl DataDependencyError + 'static) -> Self {
         Self {
-            rules: vec![DataRule::RowCountEq(expected)],
+            rules: smallvec![DataRule::RowCountEq(expected)],
             error: Box::new(error),
         }
     }
