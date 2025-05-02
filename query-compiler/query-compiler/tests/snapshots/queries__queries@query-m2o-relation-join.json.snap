@@ -1,0 +1,28 @@
+---
+source: query-compiler/query-compiler/tests/queries.rs
+assertion_line: 58
+expression: pretty
+input_file: query-compiler/query-compiler/tests/data/query-m2o-in-memory-join.json
+snapshot_kind: text
+---
+dataMap
+   issued: Date [issued]
+   secret: String [secret]
+   done: Boolean [done]
+   user: 
+      id: Int [id]
+      email: String [email]
+let @parent = query «SELECT "public"."Activation"."id",
+                     "public"."Activation"."issued",
+                     "public"."Activation"."secret",
+                     "public"."Activation"."done",
+                     "public"."Activation"."userId" FROM "public"."Activation"
+                     WHERE 1=1 OFFSET $1»
+              params [const(BigInt(0))]
+in let @parent$userId = mapField userId (get @parent)
+   in join (get @parent)
+      with (unique (query «SELECT "public"."User"."id", "public"."User"."email"
+                           FROM "public"."User" WHERE "public"."User"."id" IN
+                           [$1] LIMIT $2 OFFSET $3»
+                    params [var(@parent$userId as Int), const(BigInt(1)),
+                            const(BigInt(0))])) on left.(userId) = right.(id) as user
