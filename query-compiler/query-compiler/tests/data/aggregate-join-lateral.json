@@ -3,7 +3,7 @@
   "action": "findMany",
   "query": {
     "arguments": {
-      "relationLoadStrategy": "query"
+      "relationLoadStrategy": "join"
     },
     "selection": {
       "email": true,
