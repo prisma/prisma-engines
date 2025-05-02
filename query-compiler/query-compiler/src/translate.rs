@@ -234,10 +234,7 @@ impl<'a, 'b> NodeTranslator<'a, 'b> {
                 let source = self.graph.edge_source(&edge);
 
                 Either::Right(selection.selections().map(move |field| {
-                    let expr = Expression::MapField {
-                        field: field.prisma_name().into_owned(),
-                        records: Box::new(Expression::Get { name: source.id() }),
-                    };
+                    let expr = Expression::Get { name: source.id() };
                     let expr = match expectation {
                         Some(expectation) => Expression::Validate {
                             expr: expr.into(),
@@ -247,7 +244,13 @@ impl<'a, 'b> NodeTranslator<'a, 'b> {
                         },
                         None => expr,
                     };
-                    Binding::new(generate_projected_dependency_name(source, field), expr)
+                    Binding::new(
+                        generate_projected_dependency_name(source, field),
+                        Expression::MapField {
+                            field: field.prisma_name().into_owned(),
+                            records: Box::new(expr),
+                        },
+                    )
                 }))
             })
             .collect::<Vec<_>>();
