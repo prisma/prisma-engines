@@ -152,8 +152,7 @@ impl<'a> FeatureMapWithProvider<'a> {
         // Generator preview features (alphabetically sorted)
         let feature_map: FeatureMap = FeatureMap {
             active: enumflags2::make_bitflags!(PreviewFeature::{
-                Deno
-                 | DriverAdapters
+                 DriverAdapters
                  | Metrics
                  | MultiSchema
                  | NativeDistinct
@@ -193,6 +192,7 @@ impl<'a> FeatureMapWithProvider<'a> {
                 | ConnectOrCreate
                 | CreateMany
                 | DataProxy
+                | Deno
                 | Distinct
                 | ExtendedIndexes
                 | ExtendedWhereUnique
