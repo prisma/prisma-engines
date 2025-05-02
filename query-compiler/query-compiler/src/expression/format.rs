@@ -4,6 +4,7 @@ use pretty::{
     DocAllocator, DocBuilder,
     termcolor::{Color, ColorSpec},
 };
+use query_core::DataRule;
 use query_structure::PrismaValue;
 use std::borrow::Cow;
 
@@ -57,6 +58,12 @@ where
             Expression::MapField { field, records } => self.map_field(field, records),
             Expression::Transaction(expression) => self.transaction(expression),
             Expression::DataMap { expr, structure } => self.data_map(expr, structure),
+            Expression::Validate {
+                expr,
+                rules,
+                error_identifier,
+                ..
+            } => self.validate(expr, rules, error_identifier),
         }
     }
 
@@ -294,6 +301,42 @@ where
                 .append(self.text(format!("{result_type} [{db_name}]")))
                 .append(self.line()),
         }
+    }
+
+    fn validate(
+        &'a self,
+        expr: &'a Expression,
+        rules: &'a [DataRule],
+        id: &'a str,
+    ) -> DocBuilder<'a, PrettyPrinter<'a, D>, ColorSpec> {
+        self.keyword("validate")
+            .append(self.softline())
+            .append(self.expression(expr).align().parens())
+            .append(self.line())
+            .append(
+                self.intersperse(
+                    rules.iter().map(|rule| match rule {
+                        DataRule::RowCountEq(count) => self
+                            .softline()
+                            .append(self.text("rowCountEq"))
+                            .append(self.softline())
+                            .append(self.text(count.to_string()))
+                            .append(self.line()),
+                        DataRule::RowCountNeq(count) => self
+                            .softline()
+                            .append(self.text("rowCountNeq"))
+                            .append(self.softline())
+                            .append(self.text(count.to_string()))
+                            .append(self.line()),
+                    }),
+                    self.text(",").append(self.line()),
+                )
+                .brackets(),
+            )
+            .append(self.softline())
+            .append(self.keyword("orRaise"))
+            .append(self.softline())
+            .append(self.text(format!("{id:?}")))
     }
 }
 

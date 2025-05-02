@@ -119,8 +119,8 @@ pub fn nested_delete(
                     }),
                     Some(DataExpectation::non_empty_rows(
                         MissingRelatedRecord::builder()
-                            .model(child_model.clone())
-                            .relation(parent_relation_field.relation())
+                            .model(child_model)
+                            .relation(&parent_relation_field.relation())
                             .operation(DataOperation::NestedDelete)
                             .build(),
                     )),

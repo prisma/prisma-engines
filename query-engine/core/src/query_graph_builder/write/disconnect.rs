@@ -68,8 +68,8 @@ pub(crate) fn disconnect_records_node(
             }),
             Some(DataExpectation::non_empty_rows(
                 MissingRelatedRecord::builder()
-                    .model(parent_relation_field.model())
-                    .relation(parent_relation_field.relation())
+                    .model(&parent_relation_field.model())
+                    .relation(&parent_relation_field.relation())
                     .operation(DataOperation::Disconnect)
                     .build(),
             )),

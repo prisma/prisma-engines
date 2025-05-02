@@ -1,8 +1,9 @@
 use std::fmt;
 
 use crate::{DataDependencyError, QueryGraphError};
+use bon::bon;
 use query_structure::{DomainError, Model, Relation, RelationFieldRef, SelectionResult};
-use typed_builder::TypedBuilder;
+use serde::Serialize;
 use user_facing_errors::query_engine::validation::ValidationError;
 
 #[derive(Debug)]
@@ -54,11 +55,12 @@ impl std::fmt::Display for QueryGraphBuilderError {
 
 impl std::error::Error for QueryGraphBuilderError {}
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct RelationViolation {
-    pub relation_name: String,
-    pub model_a_name: String,
-    pub model_b_name: String,
+    pub relation: String,
+    pub model_a: String,
+    pub model_b: String,
 }
 
 impl From<RelationFieldRef> for RelationViolation {
@@ -70,13 +72,12 @@ impl From<RelationFieldRef> for RelationViolation {
 impl From<&RelationFieldRef> for RelationViolation {
     fn from(rf: &RelationFieldRef) -> Self {
         let relation = rf.relation();
-        let relation_name = relation.name();
         let [model_a_name, model_b_name] = relation.walker().models().map(|m| rf.dm.walk(m).name().to_owned());
 
         Self {
-            relation_name,
-            model_a_name,
-            model_b_name,
+            relation: relation.name(),
+            model_a: model_a_name,
+            model_b: model_b_name,
         }
     }
 }
@@ -99,18 +100,6 @@ impl From<QueryGraphError> for QueryGraphBuilderError {
     }
 }
 
-impl fmt::Display for RelationViolation {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let Self {
-            relation_name,
-            model_a_name,
-            model_b_name,
-        } = self;
-
-        write!(f, "The change you are trying to make would violate the required relation '{relation_name}' between the `{model_a_name}` and `{model_b_name}` models.")
-    }
-}
-
 impl DataDependencyError for RelationViolation {
     fn id(&self) -> &'static str {
         "RELATION_VIOLATION"
@@ -119,61 +108,23 @@ impl DataDependencyError for RelationViolation {
     fn to_runtime_error(&self, _results: &[SelectionResult]) -> QueryGraphBuilderError {
         QueryGraphBuilderError::RelationViolation(self.clone())
     }
-}
 
-#[derive(Debug, TypedBuilder)]
-pub(crate) struct MissingRelatedRecord {
-    model: Model,
-    relation: Relation,
-    operation: DataOperation,
-    #[builder(default, setter(strip_option))]
-    needed_for: Option<DependentOperation>,
-}
-
-impl fmt::Display for MissingRelatedRecord {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let Self {
-            model,
-            relation,
-            operation,
-            needed_for,
-        } = &self;
-
-        write!(f, "No '{model}' record", model = model.name())?;
-
-        if let Some(needed_for) = needed_for {
-            write!(f, " (needed to {})", needed_for)?;
-        }
-
-        write!(f, " was found for {operation} on ")?;
-
-        if relation.is_one_to_one() {
-            write!(f, "one-to-one")?;
-        } else if relation.is_one_to_many() {
-            write!(f, "one-to-many")?;
-        } else {
-            write!(f, "many-to-many")?;
-        }
-
-        write!(f, " relation '{relation}'.", relation = relation.name())?;
-
-        Ok(())
+    fn context(&self) -> serde_json::Value {
+        serde_json::to_value(self).unwrap()
     }
 }
 
-impl DataDependencyError for MissingRelatedRecord {
-    fn id(&self) -> &'static str {
-        "MISSING_RELATED_RECORD"
-    }
-
-    fn to_runtime_error(&self, _results: &[SelectionResult]) -> QueryGraphBuilderError {
-        QueryGraphBuilderError::RecordNotFound(self.to_string())
-    }
-}
-
-#[derive(Debug, TypedBuilder)]
+#[derive(Debug, Serialize)]
 pub(crate) struct MissingRecord {
     operation: DataOperation,
+}
+
+#[bon]
+impl MissingRecord {
+    #[builder]
+    pub fn new(operation: DataOperation) -> Self {
+        Self { operation }
+    }
 }
 
 impl fmt::Display for MissingRecord {
@@ -191,11 +142,96 @@ impl DataDependencyError for MissingRecord {
     fn to_runtime_error(&self, _results: &[SelectionResult]) -> QueryGraphBuilderError {
         QueryGraphBuilderError::RecordNotFound(self.to_string())
     }
+
+    fn context(&self) -> serde_json::Value {
+        serde_json::to_value(self).unwrap()
+    }
 }
 
-#[derive(Debug, TypedBuilder)]
+#[derive(Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub(crate) struct MissingRelatedRecord {
+    model: String,
+    relation: String,
+    relation_type: RelationType,
+    operation: DataOperation,
+    needed_for: Option<DependentOperation>,
+}
+
+#[bon]
+impl MissingRelatedRecord {
+    #[builder]
+    pub fn new(
+        model: &Model,
+        relation: &Relation,
+        operation: DataOperation,
+        needed_for: Option<DependentOperation>,
+    ) -> Self {
+        Self {
+            model: model.name().to_owned(),
+            relation: relation.name(),
+            relation_type: if relation.is_one_to_one() {
+                RelationType::OneToOne
+            } else if relation.is_one_to_many() {
+                RelationType::OneToMany
+            } else {
+                RelationType::ManyToMany
+            },
+            operation,
+            needed_for,
+        }
+    }
+}
+
+impl fmt::Display for MissingRelatedRecord {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let Self {
+            model,
+            relation,
+            relation_type,
+            operation,
+            needed_for,
+        } = &self;
+
+        write!(f, "No '{model}' record")?;
+        if let Some(needed_for) = needed_for {
+            write!(f, " (needed to {needed_for})")?;
+        }
+        write!(
+            f,
+            " was found for {operation} on {relation_type} relation '{relation}'."
+        )?;
+
+        Ok(())
+    }
+}
+
+impl DataDependencyError for MissingRelatedRecord {
+    fn id(&self) -> &'static str {
+        "MISSING_RELATED_RECORD"
+    }
+
+    fn to_runtime_error(&self, _results: &[SelectionResult]) -> QueryGraphBuilderError {
+        QueryGraphBuilderError::RecordNotFound(self.to_string())
+    }
+
+    fn context(&self) -> serde_json::Value {
+        serde_json::to_value(self).unwrap()
+    }
+}
+
+#[derive(Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
 pub(crate) struct IncompleteConnectInput {
-    expected: usize,
+    expected_rows: usize,
+}
+
+#[bon]
+impl IncompleteConnectInput {
+    #[builder]
+    pub fn new(expected_rows: usize) -> Self {
+        Self { expected_rows }
+    }
 }
 
 impl DataDependencyError for IncompleteConnectInput {
@@ -204,19 +240,35 @@ impl DataDependencyError for IncompleteConnectInput {
     }
 
     fn to_runtime_error(&self, results: &[SelectionResult]) -> QueryGraphBuilderError {
-        let Self { expected } = self;
+        let Self { expected_rows } = self;
         QueryGraphBuilderError::RecordNotFound(format!(
-            "Expected {expected} records to be connected, found only {actual}.",
+            "Expected {expected_rows} records to be connected, found only {actual}.",
             actual = results.len()
         ))
     }
+
+    fn context(&self) -> serde_json::Value {
+        serde_json::to_value(self).unwrap()
+    }
 }
 
-#[derive(Debug, TypedBuilder)]
+#[derive(Debug, Serialize)]
 pub(crate) struct RecordsNotConnected {
-    relation: Relation,
-    parent: Model,
-    child: Model,
+    relation: String,
+    parent: String,
+    child: String,
+}
+
+#[bon]
+impl RecordsNotConnected {
+    #[builder]
+    pub fn new(relation: Relation, parent: Model, child: Model) -> Self {
+        Self {
+            relation: relation.name(),
+            parent: parent.name().into(),
+            child: child.name().into(),
+        }
+    }
 }
 
 impl DataDependencyError for RecordsNotConnected {
@@ -226,14 +278,19 @@ impl DataDependencyError for RecordsNotConnected {
 
     fn to_runtime_error(&self, _results: &[SelectionResult]) -> QueryGraphBuilderError {
         QueryGraphBuilderError::RecordsNotConnected {
-            relation_name: self.relation.name(),
-            parent_name: self.parent.name().into(),
-            child_name: self.child.name().into(),
+            relation_name: self.relation.clone(),
+            parent_name: self.parent.clone(),
+            child_name: self.child.clone(),
         }
+    }
+
+    fn context(&self) -> serde_json::Value {
+        serde_json::to_value(self).unwrap()
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Serialize)]
+#[serde(into = "String")]
 pub(crate) enum DataOperation {
     Query,
     Update,
@@ -269,15 +326,62 @@ impl fmt::Display for DataOperation {
     }
 }
 
-#[derive(Debug)]
+impl From<DataOperation> for String {
+    fn from(operation: DataOperation) -> Self {
+        operation.to_string()
+    }
+}
+
+#[derive(Debug, Clone, Serialize)]
+#[serde(into = "String")]
 pub(crate) enum DependentOperation {
     NestedUpdate,
     DisconnectRecords,
-    FindRecords(Model),
-    InlineRelation(Model),
-    UpdateInlinedRelation(Model),
-    CreateInlinedRelation(Model),
-    ConnectOrCreateInlinedRelation(Model),
+    FindRecords { model: String },
+    InlineRelation { model: String },
+    UpdateInlinedRelation { model: String },
+    CreateInlinedRelation { model: String },
+    ConnectOrCreateInlinedRelation { model: String },
+}
+
+impl DependentOperation {
+    pub fn nested_update() -> Self {
+        Self::NestedUpdate
+    }
+
+    pub fn disconnect_records() -> Self {
+        Self::DisconnectRecords
+    }
+
+    pub fn find_records(model: &Model) -> Self {
+        Self::FindRecords {
+            model: model.name().to_owned(),
+        }
+    }
+
+    pub fn inline_relation(model: &Model) -> Self {
+        Self::InlineRelation {
+            model: model.name().to_owned(),
+        }
+    }
+
+    pub fn update_inlined_relation(model: &Model) -> Self {
+        Self::UpdateInlinedRelation {
+            model: model.name().to_owned(),
+        }
+    }
+
+    pub fn create_inlined_relation(model: &Model) -> Self {
+        Self::CreateInlinedRelation {
+            model: model.name().to_owned(),
+        }
+    }
+
+    pub fn connect_or_create_inlined_relation(model: &Model) -> Self {
+        Self::ConnectOrCreateInlinedRelation {
+            model: model.name().to_owned(),
+        }
+    }
 }
 
 impl fmt::Display for DependentOperation {
@@ -285,17 +389,47 @@ impl fmt::Display for DependentOperation {
         match self {
             Self::NestedUpdate => write!(f, "perform a nested update"),
             Self::DisconnectRecords => write!(f, "disconnect existing child records"),
-            Self::FindRecords(model) => write!(f, "find '{}' record(s)", model.name()),
-            Self::InlineRelation(model) => write!(f, "inline the relation on '{}' record(s)", model.name()),
-            Self::UpdateInlinedRelation(model) => {
-                write!(f, "update inlined relation for '{}' record(s)", model.name())
+            Self::FindRecords { model } => write!(f, "find '{model}' record(s)"),
+            Self::InlineRelation { model } => write!(f, "inline the relation on '{model}' record(s)"),
+            Self::UpdateInlinedRelation { model } => {
+                write!(f, "update inlined relation for '{model}' record(s)")
             }
-            Self::CreateInlinedRelation(model) => {
-                write!(f, "create inlined relation for '{}' record(s)", model.name())
+            Self::CreateInlinedRelation { model } => {
+                write!(f, "create inlined relation for '{model}' record(s)")
             }
-            Self::ConnectOrCreateInlinedRelation(model) => {
-                write!(f, "create or connect inlined relation for '{}' record(s)", model.name())
+            Self::ConnectOrCreateInlinedRelation { model } => {
+                write!(f, "create or connect inlined relation for '{model}' record(s)")
             }
         }
+    }
+}
+
+impl From<DependentOperation> for String {
+    fn from(operation: DependentOperation) -> Self {
+        operation.to_string()
+    }
+}
+
+#[derive(Debug, Clone, Serialize)]
+#[serde(into = "String")]
+enum RelationType {
+    OneToOne,
+    OneToMany,
+    ManyToMany,
+}
+
+impl fmt::Display for RelationType {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            RelationType::OneToOne => write!(f, "one-to-one"),
+            RelationType::OneToMany => write!(f, "one-to-many"),
+            RelationType::ManyToMany => write!(f, "many-to-many"),
+        }
+    }
+}
+
+impl From<RelationType> for String {
+    fn from(relation_type: RelationType) -> Self {
+        relation_type.to_string()
     }
 }

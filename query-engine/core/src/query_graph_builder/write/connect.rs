@@ -94,7 +94,9 @@ pub(crate) fn connect_records_node(
             }),
             Some(DataExpectation::exact_row_count(
                 expected_connects,
-                IncompleteConnectInput::builder().expected(expected_connects).build(),
+                IncompleteConnectInput::builder()
+                    .expected_rows(expected_connects)
+                    .build(),
             )),
         ),
     )?;

@@ -5,6 +5,7 @@ mod transformers;
 
 pub(crate) use error::*;
 use psl::datamodel_connector::{ConnectorCapabilities, ConnectorCapability};
+use serde::Serialize;
 
 use crate::{
     interpreter::ExpressionResult, FilteredQuery, ManyRecordsQuery, Query, QueryGraphBuilderError,
@@ -169,34 +170,42 @@ pub struct DataExpectation {
 impl DataExpectation {
     pub fn non_empty_rows(error: impl DataDependencyError + 'static) -> Self {
         Self {
-            rules: vec![DataRule::ExpectRowCountNeq(0)],
+            rules: vec![DataRule::RowCountNeq(0)],
             error: Box::new(error),
         }
     }
 
     pub fn empty_rows(error: impl DataDependencyError + 'static) -> Self {
         Self {
-            rules: vec![DataRule::ExpectRowCountEq(0)],
+            rules: vec![DataRule::RowCountEq(0)],
             error: Box::new(error),
         }
     }
 
     pub fn exact_row_count(expected: usize, error: impl DataDependencyError + 'static) -> Self {
         Self {
-            rules: vec![DataRule::ExpectRowCountEq(expected)],
+            rules: vec![DataRule::RowCountEq(expected)],
             error: Box::new(error),
         }
+    }
+
+    pub fn rules(&self) -> &[DataRule] {
+        &self.rules
+    }
+
+    pub fn error(&self) -> &dyn DataDependencyError {
+        &*self.error
     }
 
     pub fn check(&self, results: &[SelectionResult]) -> Result<(), QueryGraphBuilderError> {
         for rule in &self.rules {
             match rule {
-                DataRule::ExpectRowCountEq(expected) => {
+                DataRule::RowCountEq(expected) => {
                     if results.len() != *expected {
                         return Err(self.error.to_runtime_error(results));
                     }
                 }
-                DataRule::ExpectRowCountNeq(expected) => {
+                DataRule::RowCountNeq(expected) => {
                     if results.len() == *expected {
                         return Err(self.error.to_runtime_error(results));
                     }
@@ -208,17 +217,23 @@ impl DataExpectation {
 }
 
 /// A rule a data dependency needs to fulfill to be considered valid.
-#[derive(Debug)]
+#[derive(Debug, Clone, Serialize)]
+#[serde(tag = "type", content = "args", rename_all = "camelCase")]
 pub enum DataRule {
     /// Expect the data dependency to contain an exact number of rows.
-    ExpectRowCountEq(usize),
+    RowCountEq(usize),
     /// Expect the data dependency to contain a number of rows that is not equal to the given value.
-    ExpectRowCountNeq(usize),
+    RowCountNeq(usize),
 }
 
+/// An error that can occur during data dependency validation.
 pub trait DataDependencyError: Send + Sync {
+    /// A unique identifier for the error.
     fn id(&self) -> &'static str;
+    /// Converts the error into a runtime query engine error.
     fn to_runtime_error(&self, results: &[SelectionResult]) -> QueryGraphBuilderError;
+    /// Context with additional information used to provide more context for the error.
+    fn context(&self) -> serde_json::Value;
 }
 
 /// A graph representing an abstract view of queries and their execution dependencies.

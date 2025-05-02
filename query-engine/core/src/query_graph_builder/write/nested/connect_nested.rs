@@ -182,9 +182,9 @@ fn handle_one_to_many(
                 }),
                 Some(DataExpectation::non_empty_rows(
                     MissingRelatedRecord::builder()
-                        .model(child_model.clone())
-                        .relation(parent_relation_field.relation())
-                        .needed_for(DependentOperation::InlineRelation(parent_relation_field.model()))
+                        .model(child_model)
+                        .relation(&parent_relation_field.relation())
+                        .needed_for(DependentOperation::inline_relation(&parent_relation_field.model()))
                         .operation(DataOperation::NestedConnect)
                         .build(),
                 )),
@@ -211,9 +211,9 @@ fn handle_one_to_many(
                 }),
                 Some(DataExpectation::non_empty_rows(
                     MissingRelatedRecord::builder()
-                        .model(parent_relation_field.model())
-                        .relation(parent_relation_field.relation())
-                        .needed_for(DependentOperation::InlineRelation(child_model.clone()))
+                        .model(&parent_relation_field.model())
+                        .relation(&parent_relation_field.relation())
+                        .needed_for(DependentOperation::inline_relation(child_model))
                         .operation(DataOperation::NestedConnect)
                         .build(),
                 )),
@@ -430,8 +430,8 @@ fn handle_one_to_one_parent_update(
                 }),
                 Some(DataExpectation::non_empty_rows(
                     MissingRelatedRecord::builder()
-                        .model(child_model.clone())
-                        .relation(parent_relation_field.relation())
+                        .model(&child_model.clone())
+                        .relation(&parent_relation_field.relation())
                         .operation(DataOperation::NestedConnect)
                         .build(),
                 )),
@@ -459,9 +459,9 @@ fn handle_one_to_one_parent_update(
                 }),
                 Some(DataExpectation::non_empty_rows(
                     MissingRelatedRecord::builder()
-                        .model(parent_relation_field.model())
-                        .relation(parent_relation_field.relation())
-                        .needed_for(DependentOperation::UpdateInlinedRelation(child_model.clone()))
+                        .model(&parent_relation_field.model())
+                        .relation(&parent_relation_field.relation())
+                        .needed_for(DependentOperation::update_inlined_relation(child_model))
                         .operation(DataOperation::NestedConnect)
                         .build(),
                 )),
@@ -490,9 +490,9 @@ fn handle_one_to_one_parent_update(
                 }),
                 Some(DataExpectation::non_empty_rows(
                     MissingRelatedRecord::builder()
-                        .model(parent_model.clone())
-                        .relation(parent_relation_field.relation())
-                        .needed_for(DependentOperation::UpdateInlinedRelation(child_model.clone()))
+                        .model(&parent_model)
+                        .relation(&parent_relation_field.relation())
+                        .needed_for(DependentOperation::update_inlined_relation(child_model))
                         .operation(DataOperation::NestedConnect)
                         .build(),
                 )),
@@ -522,9 +522,9 @@ fn handle_one_to_one_parent_update(
                 }),
                 Some(DataExpectation::non_empty_rows(
                     MissingRelatedRecord::builder()
-                        .model(parent_model)
-                        .relation(parent_relation_field.relation())
-                        .needed_for(DependentOperation::UpdateInlinedRelation(child_model.clone()))
+                        .model(&parent_model)
+                        .relation(&parent_relation_field.relation())
+                        .needed_for(DependentOperation::update_inlined_relation(child_model))
                         .operation(DataOperation::NestedConnect)
                         .build(),
                 )),
@@ -581,10 +581,10 @@ fn handle_one_to_one_parent_create(
             }),
             Some(DataExpectation::non_empty_rows(
                 MissingRelatedRecord::builder()
-                    .model(child_model.clone())
-                    .relation(parent_relation_field.relation())
-                    .needed_for(DependentOperation::ConnectOrCreateInlinedRelation(
-                        parent_relation_field.model(),
+                    .model(child_model)
+                    .relation(&parent_relation_field.relation())
+                    .needed_for(DependentOperation::connect_or_create_inlined_relation(
+                        &parent_relation_field.model(),
                     ))
                     .operation(DataOperation::NestedConnect)
                     .build(),
@@ -616,8 +616,8 @@ fn handle_one_to_one_parent_create(
                 }),
                 Some(DataExpectation::non_empty_rows(
                     MissingRelatedRecord::builder()
-                        .model(child_model.clone())
-                        .relation(parent_relation_field.relation())
+                        .model(child_model)
+                        .relation(&parent_relation_field.relation())
                         .operation(DataOperation::NestedConnect)
                         .build(),
                 )),
@@ -647,9 +647,9 @@ fn handle_one_to_one_parent_create(
              }),
              Some(DataExpectation::non_empty_rows(
                  MissingRelatedRecord::builder()
-                     .model(parent_relation_field.model())
-                     .relation(parent_relation_field.relation())
-                     .needed_for(DependentOperation::UpdateInlinedRelation(child_model.clone()))
+                     .model(&parent_relation_field.model())
+                     .relation(&parent_relation_field.relation())
+                     .needed_for(DependentOperation::update_inlined_relation(child_model))
                      .operation(DataOperation::NestedConnect)
                      .build(),
              ))),

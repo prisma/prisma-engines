@@ -193,13 +193,13 @@ impl From<CompileError> for JsCompileError {
                     object_name,
                 }),
                 QueryGraphBuilderError::RelationViolation(RelationViolation {
-                    relation_name,
-                    model_a_name,
-                    model_b_name,
+                    relation,
+                    model_a,
+                    model_b,
                 }) => JsCompileError::user_facing(user_facing_errors::query_engine::RelationViolation {
-                    relation_name,
-                    model_a_name,
-                    model_b_name,
+                    relation_name: relation,
+                    model_a_name: model_a,
+                    model_b_name: model_b,
                 }),
                 QueryGraphBuilderError::InputError(details) => {
                     JsCompileError::user_facing(user_facing_errors::query_engine::InputError { details })

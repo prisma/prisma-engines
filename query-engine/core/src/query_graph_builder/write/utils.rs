@@ -188,8 +188,8 @@ pub fn insert_1to1_idempotent_connect_checks(
             }),
             Some(DataExpectation::non_empty_rows(
                 MissingRelatedRecord::builder()
-                    .model(child_model.clone())
-                    .relation(parent_relation_field.relation())
+                    .model(&child_model.clone())
+                    .relation(&parent_relation_field.relation())
                     .operation(DataOperation::NestedConnect)
                     .build(),
             )),
@@ -362,8 +362,8 @@ pub fn insert_existing_1to1_related_model_checks(
             }),
             Some(DataExpectation::non_empty_rows(
                 MissingRelatedRecord::builder()
-                    .model(parent_relation_field.model())
-                    .relation(parent_relation_field.relation())
+                    .model(&parent_relation_field.model())
+                    .relation(&parent_relation_field.relation())
                     .operation(DataOperation::NestedConnect)
                     .build(),
             )),

@@ -117,9 +117,9 @@ fn handle_many_to_many(
             }),
             Some(DataExpectation::non_empty_rows(
                 MissingRelatedRecord::builder()
-                    .model(parent_relation_field.model())
-                    .relation(parent_relation_field.relation())
-                    .needed_for(DependentOperation::DisconnectRecords)
+                    .model(&parent_relation_field.model())
+                    .relation(&parent_relation_field.relation())
+                    .needed_for(DependentOperation::disconnect_records())
                     .operation(DataOperation::NestedSet)
                     .build(),
             )),
@@ -300,8 +300,8 @@ fn handle_one_to_many(
             }),
             Some(DataExpectation::non_empty_rows(
                 MissingRelatedRecord::builder()
-                    .model(parent_relation_field.model())
-                    .relation(parent_relation_field.relation())
+                    .model(&parent_relation_field.model())
+                    .relation(&parent_relation_field.relation())
                     .operation(DataOperation::NestedSet)
                     .build(),
             )),

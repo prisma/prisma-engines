@@ -1,5 +1,6 @@
 use crate::result_node::ResultNode;
 use query_builder::DbQuery;
+use query_core::DataRule;
 use serde::Serialize;
 
 mod format;
@@ -87,6 +88,13 @@ pub enum Expression {
         expr: Box<Expression>,
         structure: ResultNode,
     },
+
+    Validate {
+        expr: Box<Expression>,
+        rules: Vec<DataRule>,
+        error_identifier: &'static str,
+        context: serde_json::Value,
+    },
 }
 
 #[derive(Debug, Clone)]
@@ -149,6 +157,7 @@ impl Expression {
             Expression::MapField { records, .. } => records.r#type(),
             Expression::Transaction(expression) => expression.r#type(),
             Expression::DataMap { expr, .. } => expr.r#type(),
+            Expression::Validate { expr, .. } => expr.r#type(),
         }
     }
 }

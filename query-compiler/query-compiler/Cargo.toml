@@ -8,6 +8,7 @@ query-structure.workspace = true
 query-builder.workspace = true
 query-core.workspace = true
 # we should drop sql-query-builder and quaint once we properly abstract over Mongo
+serde_json.workspace = true
 sql-query-builder = { workspace = true, features = ["relation_joins"]}
 quaint.workspace = true
 
@@ -19,7 +20,6 @@ indexmap = { workspace = true, features = ["serde"] }
 
 [dev-dependencies]
 insta = { workspace = true, features = ["glob"] }
-serde_json.workspace = true
 request-handlers.workspace = true
 # pull all connectors for testing
 psl = { workspace = true, features = ["sqlite", "mysql", "postgresql", "mssql"] }

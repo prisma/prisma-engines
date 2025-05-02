@@ -178,9 +178,9 @@ pub fn nested_upsert(
                 }),
                 Some(DataExpectation::non_empty_rows(
                     MissingRelatedRecord::builder()
-                        .model(child_model.clone())
-                        .relation(parent_relation_field.relation())
-                        .needed_for(DependentOperation::NestedUpdate)
+                        .model(&child_model)
+                        .relation(&parent_relation_field.relation())
+                        .needed_for(DependentOperation::nested_update())
                         .operation(DataOperation::NestedUpsert)
                         .build(),
                 )),
@@ -236,9 +236,9 @@ pub fn nested_upsert(
                     }),
                     Some(DataExpectation::non_empty_rows(
                         MissingRelatedRecord::builder()
-                            .model(parent_model.clone())
-                            .relation(parent_relation_field.relation())
-                            .needed_for(DependentOperation::UpdateInlinedRelation(parent_model))
+                            .model(&parent_model)
+                            .relation(&parent_relation_field.relation())
+                            .needed_for(DependentOperation::update_inlined_relation(&parent_model))
                             .operation(DataOperation::NestedUpsert)
                             .build(),
                     )),
@@ -268,10 +268,10 @@ pub fn nested_upsert(
                     Ok(update_node)
                 }),  Some(DataExpectation::non_empty_rows(
                     MissingRelatedRecord::builder()
-                        .model(parent_relation_field.related_model())
-                        .relation(parent_relation_field.relation())
-                        .needed_for(DependentOperation::UpdateInlinedRelation(
-                            parent_relation_field.model(),
+                        .model(&parent_relation_field.related_model())
+                        .relation(&parent_relation_field.relation())
+                        .needed_for(DependentOperation::update_inlined_relation(
+                            &parent_relation_field.model(),
                         ))
                         .operation(DataOperation::NestedUpsert)
                         .build(),
@@ -296,10 +296,10 @@ pub fn nested_upsert(
                     }),
                     Some(DataExpectation::non_empty_rows(
                         MissingRelatedRecord::builder()
-                            .model(parent_relation_field.model())
-                            .relation(parent_relation_field.relation())
-                            .needed_for(DependentOperation::UpdateInlinedRelation(
-                                parent_relation_field.related_model(),
+                            .model(&parent_relation_field.model())
+                            .relation(&parent_relation_field.relation())
+                            .needed_for(DependentOperation::update_inlined_relation(
+                                &parent_relation_field.related_model(),
                             ))
                             .operation(DataOperation::NestedUpsert)
                             .build(),
