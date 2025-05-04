@@ -288,7 +288,6 @@ queries::relations::related_null_queries::inline_relation::multi_field_1n_rel_wi
 queries::simple::find_first::find_first_query::find_first_matching
 queries::simple::find_first_or_throw::find_first_or_throw_query::find_first_or_throw_matching
 queries::simple::find_first_or_throw::find_first_or_throw_query::find_first_or_throw_not_matching
-queries::simple::find_unique_or_throw::find_unique_or_throw::find_unique_or_throw_when_record_is_found
 queries::simple::find_unique_or_throw::find_unique_or_throw::no_result_find_unique_by_id
 queries::simple::find_unique_or_throw::find_unique_or_throw::no_result_find_unique_by_multi_unique
 queries::simple::find_unique_or_throw::find_unique_or_throw::no_result_find_unique_by_single_unique
