@@ -57,7 +57,7 @@ mod prisma_4146 {
         let updated_at = &updated_at["data"]["createOneToken"]["updatedAt"].to_string();
 
         // We have to wait a bit to avoid test flakiness due to the finite precision of the clock
-        sleep(Duration::from_millis(50)).await;
+        sleep(Duration::from_millis(1000)).await;
 
         let tokens = run_query!(
             &runner,

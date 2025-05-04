@@ -40,7 +40,7 @@ mod non_embed_updated_at {
         );
 
         // We have to wait a bit to avoid test flakiness due to the finite precision of the clock
-        sleep(Duration::from_millis(50)).await;
+        sleep(Duration::from_millis(1000)).await;
 
         let updated = run_query_json!(
             runner,
@@ -74,7 +74,7 @@ mod non_embed_updated_at {
         let updated_at = &res["data"]["createOneTop"]["bottom"]["updatedAt"];
 
         // We have to wait a bit to avoid test flakiness due to the finite precision of the clock
-        sleep(Duration::from_millis(50)).await;
+        sleep(Duration::from_millis(1000)).await;
 
         let res_2 = run_query_json!(
             &runner,
