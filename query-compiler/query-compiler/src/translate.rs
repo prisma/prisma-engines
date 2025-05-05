@@ -125,6 +125,8 @@ impl<'a, 'b> NodeTranslator<'a, 'b> {
                 }
                 // TODO: implement data dependencies and if/else
                 QueryGraphDependency::DataDependency(_) => todo!(),
+                QueryGraphDependency::DiffLeftDataDependency(_) => todo!(),
+                QueryGraphDependency::DiffRightDataDependency(_) => todo!(),
                 QueryGraphDependency::Then => todo!(),
                 QueryGraphDependency::Else => todo!(),
             };

@@ -976,9 +976,8 @@ fn one_to_one_inlined_child(
         graph.create_edge(
             &diff_node,
             &if_node,
-            QueryGraphDependency::DataDependency(Box::new(move |if_node, result| {
-                let diff_result = result.as_diff_result().unwrap();
-                let should_disconnect = !diff_result.left.is_empty();
+            QueryGraphDependency::DiffLeftDataDependency(Box::new(move |if_node, diff_left_result| {
+                let should_disconnect = !diff_left_result.is_empty();
 
                 if let Node::Flow(Flow::If(_)) = if_node {
                     Ok(Node::Flow(Flow::If(Box::new(move || should_disconnect))))

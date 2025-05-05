@@ -270,9 +270,8 @@ fn handle_one_to_many(
     graph.create_edge(
         &diff_node,
         &connect_if_node,
-        QueryGraphDependency::DataDependency(Box::new(move |connect_if_node, result| {
-            let diff_result = result.as_diff_result().unwrap();
-            let should_connect = !diff_result.left.is_empty();
+        QueryGraphDependency::DiffLeftDataDependency(Box::new(move |connect_if_node, diff_left_result| {
+            let should_connect = !diff_left_result.is_empty();
 
             if let Node::Flow(Flow::If(_)) = connect_if_node {
                 Ok(Node::Flow(Flow::If(Box::new(move || should_connect))))
@@ -311,11 +310,9 @@ fn handle_one_to_many(
     graph.create_edge(
         &diff_node,
         &update_connect_node,
-        QueryGraphDependency::DataDependency(Box::new(move |mut update_connect_node, result| {
-            let diff_result = result.as_diff_result().unwrap();
-
+        QueryGraphDependency::DiffLeftDataDependency(Box::new(move |mut update_connect_node, diff_left_result| {
             if let Node::Query(Query::Write(WriteQuery::UpdateManyRecords(ref mut ur))) = update_connect_node {
-                ur.record_filter = diff_result.left.clone().into();
+                ur.record_filter = diff_left_result.to_vec().into();
             }
 
             Ok(update_connect_node)
@@ -332,9 +329,8 @@ fn handle_one_to_many(
     graph.create_edge(
         &diff_node,
         &disconnect_if_node,
-        QueryGraphDependency::DataDependency(Box::new(move |node, result| {
-            let diff_result = result.as_diff_result().unwrap();
-            let should_connect = !diff_result.right.is_empty();
+        QueryGraphDependency::DiffRightDataDependency(Box::new(move |node, diff_right_result| {
+            let should_connect = !diff_right_result.is_empty();
 
             if should_connect && child_side_required {
                 return Err(QueryGraphBuilderError::RelationViolation(rf.into()));
@@ -353,11 +349,9 @@ fn handle_one_to_many(
     graph.create_edge(
         &diff_node,
         &update_disconnect_node,
-        QueryGraphDependency::DataDependency(Box::new(move |mut node, result| {
-            let diff_result = result.as_diff_result().unwrap();
-
+        QueryGraphDependency::DiffRightDataDependency(Box::new(move |mut node, diff_right_result| {
             if let Node::Query(Query::Write(WriteQuery::UpdateManyRecords(ref mut ur))) = node {
-                ur.record_filter = diff_result.right.clone().into();
+                ur.record_filter = diff_right_result.to_vec().into();
             }
 
             if let Node::Query(Query::Write(ref mut wq)) = node {

@@ -366,6 +366,14 @@ impl Expressionista {
 
                                         QueryGraphDependency::DataDependency(f) => Ok(f(node, binding)?),
 
+                                        QueryGraphDependency::DiffLeftDataDependency(f) => {
+                                            Ok(f(node, &binding.as_diff_result()?.left)?)
+                                        }
+
+                                        QueryGraphDependency::DiffRightDataDependency(f) => {
+                                            Ok(f(node, &binding.as_diff_result()?.right)?)
+                                        }
+
                                         _ => unreachable!(),
                                     };
 
@@ -392,11 +400,10 @@ impl Expressionista {
         parent_edges
             .into_iter()
             .filter_map(|edge| match graph.pluck_edge(&edge) {
-                x @ QueryGraphDependency::DataDependency(_) => {
-                    let parent_binding_name = graph.edge_source(&edge).id();
-                    Some((parent_binding_name, x))
-                }
-                x @ QueryGraphDependency::ProjectedDataDependency(_, _, _) => {
+                x @ (QueryGraphDependency::DataDependency(_)
+                | QueryGraphDependency::ProjectedDataDependency(_, _, _)
+                | QueryGraphDependency::DiffLeftDataDependency(_)
+                | QueryGraphDependency::DiffRightDataDependency(_)) => {
                     let parent_binding_name = graph.edge_source(&edge).id();
                     Some((parent_binding_name, x))
                 }

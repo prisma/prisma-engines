@@ -135,6 +135,9 @@ pub(crate) type ProjectedDataDependencyFn =
 pub(crate) type DataDependencyFn =
     Box<dyn FnOnce(Node, &ExpressionResult) -> QueryGraphBuilderResult<Node> + Send + Sync + 'static>;
 
+pub(crate) type DiffDataDependencyFn =
+    Box<dyn FnOnce(Node, &[SelectionResult]) -> QueryGraphBuilderResult<Node> + Send + Sync + 'static>;
+
 /// Stored on the edges of the QueryGraph, a QueryGraphDependency contains information on how children are connected to their parents,
 /// expressing for example the need for additional information from the parent to be able to execute at runtime.
 pub enum QueryGraphDependency {
@@ -154,6 +157,14 @@ pub enum QueryGraphDependency {
     /// To achieve that, the query graph is post-processed in the `finalize` and reloads are injected at points where a selection is not fulfilled.
     /// See `insert_reloads` for more information.
     ProjectedDataDependency(FieldSelection, ProjectedDataDependencyFn, Option<DataExpectation>), // [Composites] todo rename
+
+    /// Specialized version of `DataDependency` that accepts the the difference
+    /// between the left and right side of a parent diff operation.
+    DiffLeftDataDependency(DiffDataDependencyFn),
+
+    /// Specialized version of `DataDependency` that accepts the the difference
+    /// between the right and left side of a parent diff operation.
+    DiffRightDataDependency(DiffDataDependencyFn),
 
     /// Only valid in the context of a `If` control flow node.
     Then,
