@@ -95,6 +95,22 @@ pub enum Expression {
         error_identifier: &'static str,
         context: serde_json::Value,
     },
+
+    /// Creates a pair of expressions for diffing.
+    DiffPair {
+        left: Box<Expression>,
+        right: Box<Expression>,
+    },
+
+    /// Lazily calculates or extracts the previously calculated difference
+    /// between the left and right parts of a pair of expressions. The argument
+    /// must be an `Expression::DiffPair`.
+    DiffLeft(Box<Expression>),
+
+    /// Lazily calculates or extracts the previously calculated difference
+    /// between the right and left parts of a pair of expressions. The argument
+    /// must be an `Expression::DiffPair`.
+    DiffRight(Box<Expression>),
 }
 
 #[derive(Debug, Clone)]
@@ -103,6 +119,7 @@ pub enum ExpressionType {
     Record,
     List(Box<ExpressionType>),
     Dynamic,
+    Pair(Box<ExpressionType>, Box<ExpressionType>),
 }
 
 impl ExpressionType {
@@ -158,6 +175,17 @@ impl Expression {
             Expression::Transaction(expression) => expression.r#type(),
             Expression::DataMap { expr, .. } => expr.r#type(),
             Expression::Validate { expr, .. } => expr.r#type(),
+            Expression::DiffPair { left, right } => {
+                ExpressionType::Pair(Box::new(left.r#type()), Box::new(right.r#type()))
+            }
+            Expression::DiffLeft(inner) => match inner.r#type() {
+                ExpressionType::Pair(left, _) => *left,
+                _ => panic!("DiffLeft argument must be a DiffPair"),
+            },
+            Expression::DiffRight(inner) => match inner.r#type() {
+                ExpressionType::Pair(_, right) => *right,
+                _ => panic!("DiffRight argument must be a DiffPair"),
+            },
         }
     }
 }

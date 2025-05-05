@@ -1,12 +1,16 @@
 mod query;
 
+use std::collections::HashSet;
+
 use super::expression::{Binding, Expression};
 use crate::Expression::Transaction;
 use crate::data_mapper::map_result_structure;
-use itertools::{Either, Itertools};
+use itertools::{Either, ExactlyOneError, Itertools};
 use query::translate_query;
 use query_builder::QueryBuilder;
-use query_core::{EdgeRef, Node, NodeRef, Query, QueryGraph, QueryGraphBuilderError, QueryGraphDependency};
+use query_core::{
+    Computation, EdgeRef, Node, NodeRef, Query, QueryGraph, QueryGraphBuilderError, QueryGraphDependency,
+};
 use query_structure::{PrismaValue, PrismaValueType, SelectedField, SelectionResult};
 use thiserror::Error;
 
@@ -20,6 +24,15 @@ pub enum TranslateError {
 
     #[error("query graph build error: {0}")]
     GraphBuildError(#[from] QueryGraphBuilderError),
+
+    #[error("unexpected selection results for diffing in the query graph: {0}")]
+    UnexpectedSelectionResultsInDiff(#[from] ExactlyOneError<<HashSet<SelectionResult> as IntoIterator>::IntoIter>),
+
+    #[error("expected selection to contain placeholders, got a constant")]
+    UnexpectedConstantValueInSelection,
+
+    #[error("expected selection to contain fields, got none")]
+    UnexpectedEmptySelection,
 }
 
 pub type TranslateResult<T> = Result<T, TranslateError>;
@@ -85,11 +98,44 @@ impl<'a, 'b> NodeTranslator<'a, 'b> {
             Node::Query(_) => self.translate_query(),
             // might be worth having Expression::Unit for this?
             Node::Empty => Ok(Expression::Seq(vec![])),
+            Node::Computation(Computation::Diff(_)) => self.translate_diff(),
             n => unimplemented!("{:?}", std::mem::discriminant(n)),
         }
     }
 
     fn translate_query(&mut self) -> TranslateResult<Expression> {
+        self.translate_node(&|node| {
+            let query: Query = node.try_into().expect("current node must be query");
+            translate_query(query, self.query_builder)
+        })
+    }
+
+    fn translate_diff(&mut self) -> TranslateResult<Expression> {
+        self.translate_node(&|node| {
+            let Node::Computation(Computation::Diff(diff)) = node else {
+                panic!("current node must be diff")
+            };
+
+            let extract_binding = |selections: HashSet<SelectionResult>| -> TranslateResult<_> {
+                let selection = selections.into_iter().exactly_one()?;
+
+                let name = match selection.pairs().map(|(_, pv)| pv.placeholder_name()).next() {
+                    Some(Some(name)) => name.to_owned(),
+                    Some(None) => return Err(TranslateError::UnexpectedConstantValueInSelection),
+                    None => return Err(TranslateError::UnexpectedEmptySelection),
+                };
+
+                Ok(Expression::Get { name })
+            };
+
+            Ok(Expression::DiffPair {
+                left: Box::new(extract_binding(diff.left)?),
+                right: Box::new(extract_binding(diff.right)?),
+            })
+        })
+    }
+
+    fn translate_node(&mut self, process: &dyn Fn(Node) -> TranslateResult<Expression>) -> TranslateResult<Expression> {
         self.graph.mark_visited(&self.node);
 
         // Don't recurse into children if the current node is already a result node.
@@ -123,17 +169,16 @@ impl<'a, 'b> NodeTranslator<'a, 'b> {
                     // need to be re-implemented
                     node = f(node, vec![SelectionResult::new(fields)])?;
                 }
-                // TODO: implement data dependencies and if/else
-                QueryGraphDependency::DataDependency(_) => todo!(),
                 QueryGraphDependency::DiffLeftDataDependency(_) => todo!(),
                 QueryGraphDependency::DiffRightDataDependency(_) => todo!(),
+                // TODO: implement data dependencies and if/else
+                QueryGraphDependency::DataDependency(_) => todo!(),
                 QueryGraphDependency::Then => todo!(),
                 QueryGraphDependency::Else => todo!(),
             };
         }
 
-        let query: Query = node.try_into().expect("current node must be query");
-        let expr = translate_query(query, self.query_builder)?;
+        let expr = process(node)?;
 
         if !children.is_empty() {
             Ok(Expression::Let {
@@ -227,33 +272,47 @@ impl<'a, 'b> NodeTranslator<'a, 'b> {
             .incoming_edges(&node)
             .into_iter()
             .flat_map(|edge| {
-                let Some(QueryGraphDependency::ProjectedDataDependency(selection, _, expectation)) =
-                    self.graph.edge_content(&edge)
-                else {
-                    return Either::Left(std::iter::empty());
-                };
-
                 let source = self.graph.edge_source(&edge);
 
-                Either::Right(selection.selections().map(move |field| {
-                    let expr = Expression::Get { name: source.id() };
-                    let expr = match expectation {
-                        Some(expectation) => Expression::Validate {
-                            expr: expr.into(),
-                            rules: expectation.rules().to_vec(),
-                            error_identifier: expectation.error().id(),
-                            context: expectation.error().context(),
-                        },
-                        None => expr,
-                    };
-                    Binding::new(
-                        generate_projected_dependency_name(source, field),
-                        Expression::MapField {
-                            field: field.prisma_name().into_owned(),
-                            records: Box::new(expr),
-                        },
-                    )
-                }))
+                match self.graph.edge_content(&edge) {
+                    Some(QueryGraphDependency::ProjectedDataDependency(selection, _, expectation)) => {
+                        Either::Left(selection.selections().map(move |field| {
+                            let expr = Expression::Get { name: source.id() };
+                            let expr = match expectation {
+                                Some(expectation) => Expression::Validate {
+                                    expr: expr.into(),
+                                    rules: expectation.rules().to_vec(),
+                                    error_identifier: expectation.error().id(),
+                                    context: expectation.error().context(),
+                                },
+                                None => expr,
+                            };
+                            Binding::new(
+                                generate_projected_dependency_name(source, field),
+                                Expression::MapField {
+                                    field: field.prisma_name().into_owned(),
+                                    records: Box::new(expr),
+                                },
+                            )
+                        }))
+                    }
+
+                    Some(QueryGraphDependency::DiffLeftDataDependency(_)) => {
+                        Either::Right(Either::Left(std::iter::once(Binding::new(
+                            generate_diff_left_binding_name(source),
+                            Expression::DiffLeft(Box::new(Expression::Get { name: source.id() })),
+                        ))))
+                    }
+
+                    Some(QueryGraphDependency::DiffRightDataDependency(_)) => {
+                        Either::Right(Either::Left(std::iter::once(Binding::new(
+                            generate_diff_right_binding_name(source),
+                            Expression::DiffRight(Box::new(Expression::Get { name: source.id() })),
+                        ))))
+                    }
+
+                    _ => Either::Right(Either::Right(std::iter::empty())),
+                }
             })
             .collect::<Vec<_>>();
 
@@ -261,7 +320,6 @@ impl<'a, 'b> NodeTranslator<'a, 'b> {
         let edges = self.graph.incoming_edges(&node);
         let expr = NodeTranslator::new(self.graph, node, &edges, self.query_builder).translate()?;
 
-        // we insert a MapField expression if the edge was a projected data dependency
         if !bindings.is_empty() {
             Ok(Expression::Let {
                 bindings,
@@ -275,4 +333,12 @@ impl<'a, 'b> NodeTranslator<'a, 'b> {
 
 fn generate_projected_dependency_name(source: NodeRef, field: &SelectedField) -> String {
     format!("{}${}", source.id(), field.prisma_name())
+}
+
+fn generate_diff_left_binding_name(source: NodeRef) -> String {
+    format!("{}$diff$left", source.id())
+}
+
+fn generate_diff_right_binding_name(source: NodeRef) -> String {
+    format!("{}$diff$right", source.id())
 }

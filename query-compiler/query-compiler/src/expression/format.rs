@@ -64,6 +64,9 @@ where
                 error_identifier,
                 ..
             } => self.validate(expr, rules, error_identifier),
+            Expression::DiffPair { left, right } => self.diff_pair(left, right),
+            Expression::DiffLeft(pair) => self.diff_left(pair),
+            Expression::DiffRight(pair) => self.diff_right(pair),
         }
     }
 
@@ -336,6 +339,29 @@ where
             .append(self.keyword("orRaise"))
             .append(self.softline())
             .append(self.text(format!("{id:?}")))
+    }
+
+    fn diff_pair(
+        &'a self,
+        left: &'a Expression,
+        right: &'a Expression,
+    ) -> DocBuilder<'a, PrettyPrinter<'a, D>, ColorSpec> {
+        self.text("diffPair").annotate(color_fn()).append(self.space()).append(
+            self.expression(left)
+                .append(self.text(","))
+                .append(self.softline())
+                .append(self.expression(right))
+                .align()
+                .parens(),
+        )
+    }
+
+    fn diff_left(&'a self, pair: &'a Expression) -> DocBuilder<'a, PrettyPrinter<'a, D>, ColorSpec> {
+        self.unary_function("diffLeft", pair)
+    }
+
+    fn diff_right(&'a self, pair: &'a Expression) -> DocBuilder<'a, PrettyPrinter<'a, D>, ColorSpec> {
+        self.unary_function("diffRight", pair)
     }
 }
 
