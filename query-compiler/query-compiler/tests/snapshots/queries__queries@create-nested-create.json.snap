@@ -1,9 +1,7 @@
 ---
 source: query-compiler/query-compiler/tests/queries.rs
-assertion_line: 58
 expression: pretty
 input_file: query-compiler/query-compiler/tests/data/create-nested-create.json
-snapshot_kind: text
 ---
 transaction
    dataMap
@@ -16,13 +14,17 @@ transaction
    let 0 = unique (query «INSERT INTO "public"."User" ("email") VALUES ($1)
                           RETURNING "public"."User"."id"»
                    params [const(String("user.1737556027349@prisma.io"))])
-   in let 0$id = mapField id (get 0)
+   in let 0$id = mapField id (validate (get 0)
+          [ rowCountNeq 0
+          ] orRaise "MISSING_RELATED_RECORD")
       in sum (execute «INSERT INTO "public"."Post" ("title","userId") VALUES
                        ($1,$2), ($3,$4)»
               params [const(String("How to make an omelette")),
                       var(0$id as Int), const(String("How to eat an omelette")),
                       var(0$id as Int)]);
-      let 2 = let 0$id = mapField id (get 0)
+      let 2 = let 0$id = mapField id (validate (get 0)
+                  [ rowCountNeq 0
+                  ] orRaise "MISSING_RECORD")
           in let @parent = unique (query «SELECT "public"."User"."id",
                                           "public"."User"."email" FROM
                                           "public"."User" WHERE

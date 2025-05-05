@@ -139,7 +139,7 @@ mod delete_inside_upsert {
               }}
             }}"#),
             2025,
-            "An operation failed because it depends on one or more records that were required but not found. No 'Child' record was found for a nested delete on relation 'ChildToParent'."
+            "An operation failed because it depends on one or more records that were required but not found. No 'Child' record was found for a nested delete on one-to-one relation 'ChildToParent'."
         );
 
         Ok(())
@@ -189,7 +189,7 @@ mod delete_inside_upsert {
                   }}
                 }}"#),
                 2025,
-                "An operation failed because it depends on one or more records that were required but not found. No 'Child' record was found for a nested delete on relation 'ChildToParent'."
+                "An operation failed because it depends on one or more records that were required but not found. No 'Child' record was found for a nested delete on one-to-one relation 'ChildToParent'."
             );
 
         Ok(())
@@ -514,7 +514,7 @@ mod delete_inside_upsert {
               }}
             }}"#),
             2025,
-            "An operation failed because it depends on one or more records that were required but not found. No 'Child' record was found for a nested delete on relation 'ChildToParent'."
+            "An operation failed because it depends on one or more records that were required but not found. No 'Child' record was found for a nested delete on one-to-one relation 'ChildToParent'."
         );
 
         Ok(())
@@ -564,7 +564,7 @@ mod delete_inside_upsert {
                   }}
                 }}"#),
                 2025,
-                "An operation failed because it depends on one or more records that were required but not found. No 'Child' record was found for a nested delete on relation 'ChildToParent'."
+                "An operation failed because it depends on one or more records that were required but not found. No 'Child' record was found for a nested delete on one-to-one relation 'ChildToParent'."
             );
 
         Ok(())

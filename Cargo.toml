@@ -54,6 +54,7 @@ base64 = "0.22"
 bigdecimal = "0.3"
 bitflags = "2"
 bit-vec = "0.6"
+bon = "3"
 bson = "2"
 bytes = "1"
 byteorder = { version = "1", default-features = false }
@@ -129,6 +130,7 @@ serde_json = { version = "1", features = [
 ] }
 serde_repr = "0.1"
 serde-wasm-bindgen = "0.6"
+smallvec = "1"
 strip-ansi-escapes = "0.1"
 structopt = "0.3"
 sqlformat = "0.2"

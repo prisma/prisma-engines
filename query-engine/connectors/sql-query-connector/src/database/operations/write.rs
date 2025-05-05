@@ -336,7 +336,7 @@ pub(crate) async fn delete_record(
 
     let mut result_iter = result_set.into_iter();
     let result_row = result_iter.next().ok_or(SqlError::RecordDoesNotExist {
-        cause: "Record to delete does not exist.".to_owned(),
+        cause: "No record was found for a delete.".to_owned(),
     })?;
     debug_assert!(result_iter.next().is_none(), "Filter returned more than one row. This is a bug because we must always require `id` in filters for `deleteOne` mutations");
 

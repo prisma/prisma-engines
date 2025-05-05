@@ -138,7 +138,7 @@ mod update_inside_update {
               }}
             }}"#),
             2025,
-            "An operation failed because it depends on one or more records that were required but not found. No 'Child' record was found for a nested update on relation 'ChildToParent'."
+            "An operation failed because it depends on one or more records that were required but not found. No 'Child' record was found for a nested update on one-to-many relation 'ChildToParent'."
         );
 
         Ok(())
@@ -180,7 +180,7 @@ mod update_inside_update {
               }}
             }}"#),
             2025,
-            "An operation failed because it depends on one or more records that were required but not found. No 'Child' record was found for a nested update on relation 'ChildToParent'."
+            "An operation failed because it depends on one or more records that were required but not found. No 'Child' record was found for a nested update on one-to-many relation 'ChildToParent'."
         );
 
         Ok(())
@@ -326,7 +326,7 @@ mod update_inside_update {
               }}
             }}"#),
             2025,
-            "An operation failed because it depends on one or more records that were required but not found. No 'Child' record was found for a nested update on relation 'ChildToParent'."
+            "An operation failed because it depends on one or more records that were required but not found. No 'Child' record was found for a nested update on one-to-many relation 'ChildToParent'."
         );
 
         Ok(())
@@ -373,7 +373,7 @@ mod update_inside_update {
               }}
             }}"#),
             2025,
-            "An operation failed because it depends on one or more records that were required but not found. No 'Child' record was found for a nested update on relation 'ChildToParent'."
+            "An operation failed because it depends on one or more records that were required but not found. No 'Child' record was found for a nested update on one-to-many relation 'ChildToParent'."
         );
 
         Ok(())
@@ -517,7 +517,7 @@ mod update_inside_update {
               }}
             }}"#),
             2025,
-            "An operation failed because it depends on one or more records that were required but not found. No 'Child' record was found for a nested update on relation 'ChildToParent'."
+            "An operation failed because it depends on one or more records that were required but not found. No 'Child' record was found for a nested update on many-to-many relation 'ChildToParent'."
         );
 
         Ok(())
@@ -564,7 +564,7 @@ mod update_inside_update {
               }}
             }}"#),
             2025,
-            "An operation failed because it depends on one or more records that were required but not found. No 'Child' record was found for a nested update on relation 'ChildToParent'."
+            "An operation failed because it depends on one or more records that were required but not found. No 'Child' record was found for a nested update on many-to-many relation 'ChildToParent'."
         );
 
         Ok(())
@@ -639,7 +639,7 @@ mod update_inside_update {
               }}
             }}"#),
             2025,
-            "An operation failed because it depends on one or more records that were required but not found. No 'Todo' record was found for a nested update on relation 'NoteToTodo'."
+            "An operation failed because it depends on one or more records that were required but not found. No 'Todo' record was found for a nested update on many-to-many relation 'NoteToTodo'."
             // No Node for the model Todo with value DOES NOT EXIST for id found.
         );
 
@@ -698,7 +698,7 @@ mod update_inside_update {
             }}
           }}"#),
           2025,
-          "An operation failed because it depends on one or more records that were required but not found. No 'Todo' record was found for a nested update on relation 'NoteToTodo'."
+          "An operation failed because it depends on one or more records that were required but not found. No 'Todo' record was found for a nested update on many-to-many relation 'NoteToTodo'."
       );
 
         Ok(())

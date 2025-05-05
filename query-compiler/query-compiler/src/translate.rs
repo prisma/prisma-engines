@@ -104,7 +104,7 @@ impl<'a, 'b> NodeTranslator<'a, 'b> {
         for edge in self.parent_edges {
             match self.graph.pluck_edge(edge) {
                 QueryGraphDependency::ExecutionOrder => {}
-                QueryGraphDependency::ProjectedDataDependency(selection, f) => {
+                QueryGraphDependency::ProjectedDataDependency(selection, f, _) => {
                     let fields = selection
                         .selections()
                         .map(|field| {
@@ -225,7 +225,8 @@ impl<'a, 'b> NodeTranslator<'a, 'b> {
             .incoming_edges(&node)
             .into_iter()
             .flat_map(|edge| {
-                let Some(QueryGraphDependency::ProjectedDataDependency(selection, _)) = self.graph.edge_content(&edge)
+                let Some(QueryGraphDependency::ProjectedDataDependency(selection, _, expectation)) =
+                    self.graph.edge_content(&edge)
                 else {
                     return Either::Left(std::iter::empty());
                 };
@@ -233,11 +234,21 @@ impl<'a, 'b> NodeTranslator<'a, 'b> {
                 let source = self.graph.edge_source(&edge);
 
                 Either::Right(selection.selections().map(move |field| {
+                    let expr = Expression::Get { name: source.id() };
+                    let expr = match expectation {
+                        Some(expectation) => Expression::Validate {
+                            expr: expr.into(),
+                            rules: expectation.rules().to_vec(),
+                            error_identifier: expectation.error().id(),
+                            context: expectation.error().context(),
+                        },
+                        None => expr,
+                    };
                     Binding::new(
                         generate_projected_dependency_name(source, field),
                         Expression::MapField {
                             field: field.prisma_name().into_owned(),
-                            records: Box::new(Expression::Get { name: source.id() }),
+                            records: Box::new(expr),
                         },
                     )
                 }))

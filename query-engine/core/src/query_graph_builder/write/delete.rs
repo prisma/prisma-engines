@@ -1,5 +1,6 @@
 use super::*;
 use crate::query_graph_builder::write::limit::validate_limit;
+use crate::DataExpectation;
 use crate::{
     query_ast::*,
     query_graph::{Node, QueryGraph, QueryGraphDependency},
@@ -81,15 +82,10 @@ pub(crate) fn delete_record(
             // is just checking if any records matched the filter.
             QueryGraphDependency::ProjectedDataDependency(
                 model.primary_identifier(),
-                Box::new(|delete_node, parent_ids| {
-                    if !parent_ids.is_empty() {
-                        Ok(delete_node)
-                    } else {
-                        Err(QueryGraphBuilderError::RecordNotFound(
-                            "Record to delete does not exist.".to_owned(),
-                        ))
-                    }
-                }),
+                Box::new(|delete_node, _| Ok(delete_node)),
+                Some(DataExpectation::non_empty_rows(
+                    MissingRecord::builder().operation(DataOperation::Delete).build(),
+                )),
             ),
         )?;
 
@@ -145,6 +141,7 @@ pub fn delete_many_records(
 
                     Ok(delete_many_node)
                 }),
+                None,
             ),
         )?;
     }

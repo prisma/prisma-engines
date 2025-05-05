@@ -1,9 +1,7 @@
 ---
 source: query-compiler/query-compiler/tests/queries.rs
-assertion_line: 58
 expression: pretty
 input_file: query-compiler/query-compiler/tests/data/update-connect.json
-snapshot_kind: text
 ---
 transaction
    dataMap
@@ -18,12 +16,16 @@ transaction
                           $1 AND 1=1) LIMIT $2 OFFSET $3»
                    params [const(String("user.1737556028164@prisma.io")),
                            const(BigInt(1)), const(BigInt(0))])
-   in let 0$id = mapField id (get 0)
+   in let 0$id = mapField id (validate (get 0)
+          [ rowCountNeq 0
+          ] orRaise "MISSING_RELATED_RECORD")
       in let 1 = sum (execute «UPDATE "public"."Post" SET "userId" = $1 WHERE
                                ("public"."Post"."id" = $2 AND 1=1)»
                       params [var(0$id as Int), const(BigInt(11))])
          in ;
-      let 3 = let 0$id = mapField id (get 0)
+      let 3 = let 0$id = mapField id (validate (get 0)
+                  [ rowCountNeq 0
+                  ] orRaise "MISSING_RECORD")
           in let @parent = unique (query «SELECT "public"."User"."id",
                                           "public"."User"."email" FROM
                                           "public"."User" WHERE

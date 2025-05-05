@@ -295,7 +295,7 @@ pub async fn delete_record(
     })
     .await?
     .ok_or(MongoError::RecordDoesNotExist {
-        cause: "Record to delete does not exist.".to_owned(),
+        cause: "No record was found for a delete.".to_owned(),
     })?;
 
     let meta_mapping = output_meta::from_selected_fields(&selected_fields);

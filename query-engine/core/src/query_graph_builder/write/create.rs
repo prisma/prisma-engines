@@ -2,7 +2,7 @@ use super::*;
 use crate::{
     query_ast::*,
     query_graph::{Node, NodeRef, QueryGraph, QueryGraphDependency},
-    ArgumentListLookup, ParsedField, ParsedInputList, ParsedInputMap,
+    ArgumentListLookup, DataExpectation, ParsedField, ParsedInputList, ParsedInputMap,
 };
 use psl::{datamodel_connector::ConnectorCapability, parser_database::RelationFieldId};
 use query_structure::{IntoFilter, Model, WriteArgs, Zipper};
@@ -42,12 +42,7 @@ pub(crate) fn create_record(
             QueryGraphDependency::ProjectedDataDependency(
                 model.primary_identifier(),
                 Box::new(move |mut read_node, mut parent_ids| {
-                    let parent_id = match parent_ids.pop() {
-                        Some(pid) => Ok(pid),
-                        None => Err(QueryGraphBuilderError::AssertionError(
-                            "Expected a valid parent ID to be present for create follow-up read query.".to_string(),
-                        )),
-                    }?;
+                    let parent_id = parent_ids.pop().expect("parent id should be present");
 
                     if let Node::Query(Query::Read(ReadQuery::RecordQuery(ref mut rq))) = read_node {
                         rq.add_filter(parent_id.filter());
@@ -55,6 +50,9 @@ pub(crate) fn create_record(
 
                     Ok(read_node)
                 }),
+                Some(DataExpectation::non_empty_rows(
+                    MissingRecord::builder().operation(DataOperation::Query).build(),
+                )),
             ),
         )?;
     }
