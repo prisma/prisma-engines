@@ -118,6 +118,8 @@ impl Display for QueryGraphDependency {
                         .collect::<Vec<_>>()
                 )
             }
+            Self::DiffLeftDataDependency(_) => write!(f, "DiffLeftResult"),
+            Self::DiffRightDataDependency(_) => write!(f, "DiffRightResult"),
             Self::Then => write!(f, "Then"),
             Self::Else => write!(f, "Else"),
         }
