@@ -14,16 +14,3 @@ impl NodeInputField<Vec<SelectionResult>> for UpdateRecordFilterInput {
         }
     }
 }
-
-#[derive(Debug)]
-pub(crate) struct UpdateManyRecordsFilterInput;
-
-impl NodeInputField<Vec<SelectionResult>> for UpdateManyRecordsFilterInput {
-    fn node_input_field<'a>(&self, node: &'a mut crate::Node) -> &'a mut Vec<SelectionResult> {
-        if let Node::Query(Query::Write(WriteQuery::UpdateManyRecords(ref mut ur))) = node {
-            ur.record_filter.selectors.get_or_insert_default()
-        } else {
-            panic!("UpdateManyRecordsFilterInput can only be used with UpdateManyRecords node")
-        }
-    }
-}

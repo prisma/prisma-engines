@@ -1,11 +1,11 @@
 use super::*;
-use crate::fields::{UpdateManyRecordsFilterInput, UpdateRecordFilterInput};
+use crate::fields::UpdateRecordFilterInput;
 use crate::query_graph_builder::write::update::UpdateManyRecordNodeOptionals;
 use crate::{
     query_graph::{NodeRef, QueryGraph, QueryGraphDependency},
     ParsedInputValue,
 };
-use crate::{DataExpectation, DataSink};
+use crate::{DataExpectation, DataSink, Node, Query, WriteQuery};
 use query_structure::{Filter, Model, RelationFieldRef};
 use schema::constants::args;
 use std::convert::TryInto;
@@ -151,9 +151,16 @@ pub fn nested_update_many(
         graph.create_edge(
             &find_child_records_node,
             &update_many_node,
-            QueryGraphDependency::ProjectedDataSinkDependency(
+            QueryGraphDependency::ProjectedDataDependency(
                 child_model_identifier.clone(),
-                DataSink::AllRows(&UpdateManyRecordsFilterInput),
+                Box::new(move |mut update_many_node, child_ids| {
+                    if let Node::Query(Query::Write(WriteQuery::UpdateManyRecords(ref mut ur))) = update_many_node {
+                        // ur.set_filter(Filter::and(vec![ur.filter.clone(), child_ids.filter()]));
+                        ur.record_filter = child_ids.into();
+                    }
+
+                    Ok(update_many_node)
+                }),
                 None,
             ),
         )?;
