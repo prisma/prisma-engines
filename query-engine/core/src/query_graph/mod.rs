@@ -158,11 +158,11 @@ pub enum QueryGraphDependency {
     /// See `insert_reloads` for more information.
     ProjectedDataDependency(FieldSelection, ProjectedDataDependencyFn, Option<DataExpectation>), // [Composites] todo rename
 
-    /// Specialized version of `DataDependency` that accepts the the difference
+    /// Specialized version of `DataDependency` that accepts the difference
     /// between the left and right side of a parent diff operation.
     DiffLeftDataDependency(DiffDataDependencyFn),
 
-    /// Specialized version of `DataDependency` that accepts the the difference
+    /// Specialized version of `DataDependency` that accepts the difference
     /// between the right and left side of a parent diff operation.
     DiffRightDataDependency(DiffDataDependencyFn),
 
