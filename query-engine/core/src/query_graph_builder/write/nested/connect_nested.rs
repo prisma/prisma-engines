@@ -624,36 +624,30 @@ fn handle_one_to_one_parent_create(
             ),
         )?;
 
-        let relation_name = parent_relation_field.relation().name();
-        let parent_model_name = parent_relation_field.model().name().to_owned();
-        let child_model_name = child_model.name().to_owned();
-
         graph.create_edge(
-             &parent_node,
-             &update_children_node,
-             QueryGraphDependency::ProjectedDataDependency(parent_linking_fields, Box::new(move |mut update_children_node, mut parent_links| {
-                 let parent_link = match parent_links.pop() {
-                     Some(link) => Ok(link),
-                     None => Err(QueryGraphBuilderError::RecordNotFound(format!(
-                        "No '{parent_model_name}' record (needed to update inlined relation on '{child_model_name}') was found for a nested connect on one-to-one relation '{relation_name}'."
-                    ))),
-                 }?;
+            &parent_node,
+            &update_children_node,
+            QueryGraphDependency::ProjectedDataDependency(
+                parent_linking_fields,
+                Box::new(move |mut update_children_node, mut parent_links| {
+                    let parent_link = parent_links.pop().expect("parent link should be present");
 
-                 if let Node::Query(Query::Write(ref mut wq)) = update_children_node {
-                     wq.inject_result_into_args(child_linking_fields.assimilate(parent_link)?);
-                 }
+                    if let Node::Query(Query::Write(ref mut wq)) = update_children_node {
+                        wq.inject_result_into_args(child_linking_fields.assimilate(parent_link)?);
+                    }
 
-                 Ok(update_children_node)
-             }),
-             Some(DataExpectation::non_empty_rows(
-                 MissingRelatedRecord::builder()
-                     .model(&parent_relation_field.model())
-                     .relation(&parent_relation_field.relation())
-                     .needed_for(DependentOperation::update_inlined_relation(child_model))
-                     .operation(DataOperation::NestedConnect)
-                     .build(),
-             ))),
-         )?;
+                    Ok(update_children_node)
+                }),
+                Some(DataExpectation::non_empty_rows(
+                    MissingRelatedRecord::builder()
+                        .model(&parent_relation_field.model())
+                        .relation(&parent_relation_field.relation())
+                        .needed_for(DependentOperation::update_inlined_relation(child_model))
+                        .operation(DataOperation::NestedConnect)
+                        .build(),
+                )),
+            ),
+        )?;
     }
 
     Ok(())

@@ -118,6 +118,16 @@ impl Display for QueryGraphDependency {
                         .collect::<Vec<_>>()
                 )
             }
+            Self::ProjectedDataSinkDependency(selection, _, _) => {
+                write!(
+                    f,
+                    "ProjectedDataSinkDependency ({:?})",
+                    selection
+                        .selections()
+                        .map(|f| format!("{}.{}", f.container().name(), f.prisma_name()))
+                        .collect::<Vec<_>>()
+                )
+            }
             Self::DiffLeftDataDependency(_) => write!(f, "DiffLeftResult"),
             Self::DiffRightDataDependency(_) => write!(f, "DiffRightResult"),
             Self::Then => write!(f, "Then"),

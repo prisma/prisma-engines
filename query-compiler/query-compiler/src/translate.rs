@@ -6,8 +6,8 @@ use crate::data_mapper::map_result_structure;
 use itertools::{Either, Itertools};
 use query::translate_query;
 use query_builder::QueryBuilder;
-use query_core::{EdgeRef, Node, NodeRef, Query, QueryGraph, QueryGraphBuilderError, QueryGraphDependency};
-use query_structure::{PrismaValue, PrismaValueType, SelectedField, SelectionResult};
+use query_core::{DataSink, EdgeRef, Node, NodeRef, Query, QueryGraph, QueryGraphBuilderError, QueryGraphDependency};
+use query_structure::{FieldSelection, PrismaValue, PrismaValueType, SelectedField, SelectionResult};
 use thiserror::Error;
 
 #[derive(Debug, Error)]
@@ -76,6 +76,7 @@ impl<'a, 'b> NodeTranslator<'a, 'b> {
     }
 
     fn translate(&mut self) -> TranslateResult<Expression> {
+        self.graph.mark_visited(&self.node);
         let node = self
             .graph
             .node_content(&self.node)
@@ -84,14 +85,15 @@ impl<'a, 'b> NodeTranslator<'a, 'b> {
         match node {
             Node::Query(_) => self.translate_query(),
             // might be worth having Expression::Unit for this?
-            Node::Empty => Ok(Expression::Seq(vec![])),
+            Node::Empty => {
+                let children = self.translate_children()?;
+                Ok(Expression::Seq(children))
+            }
             n => unimplemented!("{:?}", std::mem::discriminant(n)),
         }
     }
 
-    fn translate_query(&mut self) -> TranslateResult<Expression> {
-        self.graph.mark_visited(&self.node);
-
+    fn translate_children(&mut self) -> TranslateResult<Vec<Expression>> {
         // Don't recurse into children if the current node is already a result node.
         let children = if !self.graph.is_result_node(&self.node) {
             self.process_children()?
@@ -99,29 +101,36 @@ impl<'a, 'b> NodeTranslator<'a, 'b> {
             Vec::new()
         };
 
+        Ok(children)
+    }
+
+    fn translate_query(&mut self) -> TranslateResult<Expression> {
+        let children = self.translate_children()?;
+
         let mut node = self.graph.pluck_node(&self.node);
 
         for edge in self.parent_edges {
             match self.graph.pluck_edge(edge) {
                 QueryGraphDependency::ExecutionOrder => {}
                 QueryGraphDependency::ProjectedDataDependency(selection, f, _) => {
-                    let fields = selection
-                        .selections()
-                        .map(|field| {
-                            (
-                                field.clone(),
-                                PrismaValue::Placeholder {
-                                    name: generate_projected_dependency_name(self.graph.edge_source(edge), field),
-                                    r#type: PrismaValueType::Any,
-                                },
-                            )
-                        })
-                        .collect_vec();
+                    let fields = self.process_edge_selections(edge, selection);
 
                     // TODO: there are cases where we look at the number of results in some
                     // dependencies, these won't work with the current implementation and will
                     // need to be re-implemented
                     node = f(node, vec![SelectionResult::new(fields)])?;
+                }
+                QueryGraphDependency::ProjectedDataSinkDependency(selection, sink, _) => {
+                    let fields = self.process_edge_selections(edge, selection);
+
+                    match sink {
+                        DataSink::AllRows(field) | DataSink::SingleRowArray(field) => {
+                            *field.node_input_field(&mut node) = vec![SelectionResult::new(fields)];
+                        }
+                        DataSink::SingleRow(field) => {
+                            *field.node_input_field(&mut node) = SelectionResult::new(fields);
+                        }
+                    }
                 }
                 // TODO: implement data dependencies and if/else
                 QueryGraphDependency::DataDependency(_) => todo!(),
@@ -227,11 +236,23 @@ impl<'a, 'b> NodeTranslator<'a, 'b> {
             .incoming_edges(&node)
             .into_iter()
             .flat_map(|edge| {
-                let Some(QueryGraphDependency::ProjectedDataDependency(selection, _, expectation)) =
-                    self.graph.edge_content(&edge)
+                let edge_content = self.graph.edge_content(&edge);
+                let Some(
+                    QueryGraphDependency::ProjectedDataDependency(selection, _, expectation)
+                    | QueryGraphDependency::ProjectedDataSinkDependency(selection, _, expectation),
+                ) = edge_content
                 else {
                     return Either::Left(std::iter::empty());
                 };
+
+                let requires_unique = matches!(
+                    edge_content,
+                    Some(QueryGraphDependency::ProjectedDataSinkDependency(
+                        _,
+                        DataSink::SingleRow(_),
+                        _
+                    ))
+                );
 
                 let source = self.graph.edge_source(&edge);
 
@@ -246,6 +267,12 @@ impl<'a, 'b> NodeTranslator<'a, 'b> {
                         },
                         None => expr,
                     };
+                    let expr = if requires_unique {
+                        Expression::Unique(expr.into())
+                    } else {
+                        expr
+                    };
+
                     Binding::new(
                         generate_projected_dependency_name(source, field),
                         Expression::MapField {
@@ -270,6 +297,25 @@ impl<'a, 'b> NodeTranslator<'a, 'b> {
         } else {
             Ok(expr)
         }
+    }
+
+    fn process_edge_selections(
+        &mut self,
+        edge: &EdgeRef,
+        selection: FieldSelection,
+    ) -> Vec<(SelectedField, PrismaValue)> {
+        selection
+            .selections()
+            .map(|field| {
+                (
+                    field.clone(),
+                    PrismaValue::Placeholder {
+                        name: generate_projected_dependency_name(self.graph.edge_source(edge), field),
+                        r#type: PrismaValueType::Any,
+                    },
+                )
+            })
+            .collect_vec()
     }
 }
 

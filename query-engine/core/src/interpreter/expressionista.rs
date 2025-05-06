@@ -346,7 +346,7 @@ impl Expressionista {
                         let node: InterpretationResult<Node> =
                             parent_id_deps
                                 .into_iter()
-                                .try_fold(node, |node, (parent_binding_name, dependency)| {
+                                .try_fold(node, |mut node, (parent_binding_name, dependency)| {
                                     let binding = match env.get(&parent_binding_name) {
                                         Some(binding) => Ok(binding),
                                         None => Err(InterpreterError::EnvVarNotFound(format!(
@@ -363,6 +363,36 @@ impl Expressionista {
                                                 Ok(f(node, parent_selections)?)
                                             })
                                         }
+
+                                        QueryGraphDependency::ProjectedDataSinkDependency(
+                                            selection,
+                                            sink,
+                                            expectation,
+                                        ) => binding.as_selection_results(&selection).and_then(
+                                            |mut parent_selections| {
+                                                if let Some(expectation) = expectation {
+                                                    expectation.check(&parent_selections)?;
+                                                }
+                                                match sink {
+                                                    DataSink::AllRows(field) => {
+                                                        *field.node_input_field(&mut node) = parent_selections
+                                                    }
+                                                    DataSink::SingleRow(field) => {
+                                                        let row = parent_selections.pop().expect(
+                                                            "parent selection should be present after validation",
+                                                        );
+                                                        *field.node_input_field(&mut node) = row;
+                                                    }
+                                                    DataSink::SingleRowArray(field) => {
+                                                        let row = parent_selections.pop().expect(
+                                                            "parent selection should be present after validation",
+                                                        );
+                                                        *field.node_input_field(&mut node) = vec![row];
+                                                    }
+                                                }
+                                                Ok(node)
+                                            },
+                                        ),
 
                                         QueryGraphDependency::DataDependency(f) => Ok(f(node, binding)?),
 
@@ -402,6 +432,7 @@ impl Expressionista {
             .filter_map(|edge| match graph.pluck_edge(&edge) {
                 x @ (QueryGraphDependency::DataDependency(_)
                 | QueryGraphDependency::ProjectedDataDependency(_, _, _)
+                | QueryGraphDependency::ProjectedDataSinkDependency(_, _, _)
                 | QueryGraphDependency::DiffLeftDataDependency(_)
                 | QueryGraphDependency::DiffRightDataDependency(_)) => {
                     let parent_binding_name = graph.edge_source(&edge).id();
