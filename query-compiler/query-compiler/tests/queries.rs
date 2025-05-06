@@ -43,7 +43,7 @@ fn queries() {
             .without_eager_default_evaluation()
             .build(operation);
 
-        let pair = match result {
+        let (graph, _) = match result {
             Ok(result) => result,
             Err(err) => {
                 println!("FAILED: {test_name}");
@@ -51,9 +51,6 @@ fn queries() {
                 panic!("FAILED: {test_name}");
             }
         };
-
-        let graph = pair.0;
-        let _serializer = pair.1;
 
         let dot = graph.to_graphviz();
         let tests_path = path.parent().unwrap().parent().unwrap();
