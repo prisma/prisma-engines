@@ -245,37 +245,32 @@ pub fn nested_upsert(
                 ),
             )?;
 
-            let parent_model_name = parent_relation_field.model().name().to_owned();
-            let child_model_name = parent_relation_field.related_model().name().to_owned();
-            let relation_name = parent_relation_field.relation().name().to_owned();
-
             // Edge to retrieve the child ID to inject
             graph.create_edge(
                 &create_node,
                 &update_node,
-                QueryGraphDependency::ProjectedDataDependency(child_link.clone(), Box::new(move |mut update_node, mut child_links| {
-                    let child_link = match child_links.pop() {
-                        Some(link) => Ok(link),
-                        None => Err(QueryGraphBuilderError::RecordNotFound(format!(
-                            "No '{child_model_name}' record (needed to update inlined relation on '{parent_model_name}') was found for a nested upsert on relation '{relation_name}'."
-                        ))),
-                    }?;
+                QueryGraphDependency::ProjectedDataDependency(
+                    child_link.clone(),
+                    Box::new(move |mut update_node, mut child_links| {
+                        let child_link = child_links.pop().expect("child link should be present");
 
-                    if let Node::Query(Query::Write(ref mut wq)) = update_node {
-                        wq.inject_result_into_args(parent_link.assimilate(child_link)?);
-                    }
+                        if let Node::Query(Query::Write(ref mut wq)) = update_node {
+                            wq.inject_result_into_args(parent_link.assimilate(child_link)?);
+                        }
 
-                    Ok(update_node)
-                }),  Some(DataExpectation::non_empty_rows(
-                    MissingRelatedRecord::builder()
-                        .model(&parent_relation_field.related_model())
-                        .relation(&parent_relation_field.relation())
-                        .needed_for(DependentOperation::update_inlined_relation(
-                            &parent_relation_field.model(),
-                        ))
-                        .operation(DataOperation::NestedUpsert)
-                        .build(),
-                ))),
+                        Ok(update_node)
+                    }),
+                    Some(DataExpectation::non_empty_rows(
+                        MissingRelatedRecord::builder()
+                            .model(&parent_relation_field.related_model())
+                            .relation(&parent_relation_field.relation())
+                            .needed_for(DependentOperation::update_inlined_relation(
+                                &parent_relation_field.model(),
+                            ))
+                            .operation(DataOperation::NestedUpsert)
+                            .build(),
+                    )),
+                ),
             )?;
         } else {
             // Inlined on child

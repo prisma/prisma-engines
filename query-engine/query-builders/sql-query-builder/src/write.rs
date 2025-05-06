@@ -239,14 +239,14 @@ pub fn generate_update_statements(
     limit: Option<usize>,
     ctx: &Context<'_>,
 ) -> Vec<Query<'static>> {
-    match record_filter.selectors {
+    let RecordFilter { filter, selectors } = record_filter;
+    match selectors {
         Some(ids) => {
-            let filter = record_filter.filter.clone();
             let slice = &ids[..limit.unwrap_or(ids.len()).min(ids.len())];
             update::update_many_from_ids_and_filter(model, filter, slice, args, selected_fields, ctx)
         }
         None => {
-            let query = update::update_many_from_filter(model, record_filter.filter, args, selected_fields, limit, ctx);
+            let query = update::update_many_from_filter(model, filter, args, selected_fields, limit, ctx);
             vec![query]
         }
     }

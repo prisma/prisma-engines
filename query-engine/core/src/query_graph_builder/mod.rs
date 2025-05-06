@@ -4,6 +4,7 @@ mod builder;
 mod error;
 mod extractors;
 
+pub(crate) mod fields;
 pub(crate) mod read;
 pub(crate) mod write;
 pub(crate) use extractors::*;

@@ -158,6 +158,8 @@ pub enum QueryGraphDependency {
     /// See `insert_reloads` for more information.
     ProjectedDataDependency(FieldSelection, ProjectedDataDependencyFn, Option<DataExpectation>), // [Composites] todo rename
 
+    ProjectedDataSinkDependency(FieldSelection, DataSink, Option<DataExpectation>),
+
     /// Specialized version of `DataDependency` that accepts the the difference
     /// between the left and right side of a parent diff operation.
     DiffLeftDataDependency(DiffDataDependencyFn),
@@ -171,6 +173,16 @@ pub enum QueryGraphDependency {
 
     /// Only valid in the context of a `If` control flow node.
     Else,
+}
+
+pub enum DataSink {
+    AllRows(&'static dyn NodeInputField<Vec<SelectionResult>>),
+    SingleRow(&'static dyn NodeInputField<SelectionResult>),
+    SingleRowArray(&'static dyn NodeInputField<Vec<SelectionResult>>),
+}
+
+pub trait NodeInputField<R>: Send + Sync {
+    fn node_input_field<'a>(&self, node: &'a mut Node) -> &'a mut R;
 }
 
 /// An expectation for a data dependency.
