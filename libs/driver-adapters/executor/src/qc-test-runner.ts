@@ -49,6 +49,40 @@ const state: Record<
   }
 > = {}
 
+const workerPool = new (class WorkerPool {
+  #freeWorkers: Worker[] = []
+
+  getWorker(): Worker {
+    const freeWorker = this.#freeWorkers.pop()
+
+    if (freeWorker) {
+      return freeWorker
+    }
+
+    const newWorker = new Worker(
+      new URL('qc-test-worker/worker.js', import.meta.url),
+    )
+
+    newWorker.on('exit', (code) => {
+      console.error(`Worker exited with code ${code}`)
+      this.#notifyDestroyed(newWorker)
+    })
+
+    return newWorker
+  }
+
+  releaseWorker(worker: Worker): void {
+    this.#freeWorkers.push(worker)
+  }
+
+  #notifyDestroyed(worker: Worker): void {
+    const index = this.#freeWorkers.findIndex((w) => w === worker)
+    if (index !== -1) {
+      this.#freeWorkers.splice(index, 1)
+    }
+  }
+})()
+
 async function handleRequest(
   { method, params }: jsonRpc.Request,
   env: Env,
@@ -71,9 +105,7 @@ async function handleRequest(
     case 'initializeSchema': {
       debug('Got `initializeSchema`', params)
 
-      const worker = new Worker(
-        new URL('qc-test-worker/worker.js', import.meta.url),
-      )
+      const worker = workerPool.getWorker()
 
       worker.unref()
 
@@ -135,13 +167,11 @@ async function handleRequest(
     case 'teardown': {
       debug('Got `teardown`', params)
 
-      try {
-        await messageWorker(schemaState.worker, {
-          type: 'teardown',
-        })
-      } finally {
-        await schemaState.worker.terminate()
-      }
+      await messageWorker(schemaState.worker, {
+        type: 'teardown',
+      })
+
+      workerPool.releaseWorker(schemaState.worker)
 
       return {}
     }
