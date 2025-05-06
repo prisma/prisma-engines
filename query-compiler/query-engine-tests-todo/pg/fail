@@ -1,4 +1,3 @@
-new::cursor::bigint_cursor::bigint_id_must_work
 new::interactive_tx::interactive_tx::batch_queries_failure
 new::interactive_tx::interactive_tx::batch_queries_rollback
 new::interactive_tx::interactive_tx::commit_after_rollback
@@ -77,7 +76,6 @@ new::regressions::max_integer::max_integer::unfitted_int_should_fail_pg_js
 new::regressions::prisma_13097::prisma_13097::group_by_boolean_array
 new::regressions::prisma_13097::prisma_13097::group_by_enum_array
 new::regressions::prisma_13158::prisma_1358::insert_mixed_int_float_array_in_execute_raw
-new::regressions::prisma_14696::prisma_14696::create_does_not_panic
 new::regressions::prisma_21901::prisma_21901::test
 new::regressions::prisma_22971::prisma_22971::test_22971
 new::regressions::prisma_5952::regression::decimal_find_different_uniques
@@ -155,7 +153,6 @@ queries::aggregation::max::aggregation_max::max_with_all_sorts_of_query_args
 queries::aggregation::max::decimal_aggregation_max::max_no_records
 queries::aggregation::max::decimal_aggregation_max::max_some_records
 queries::aggregation::max::decimal_aggregation_max::max_with_all_sorts_of_query_args
-queries::aggregation::min::aggregation_min::min_some_records
 queries::aggregation::min::aggregation_min::min_with_all_sorts_of_query_args
 queries::aggregation::min::decimal_aggregation_min::min_some_records
 queries::aggregation::min::decimal_aggregation_min::min_with_all_sorts_of_query_args
@@ -174,7 +171,6 @@ queries::aggregation::uniq_count_relation::uniq_count_rel::no_rel_records
 queries::batching::select_one_compound::compound_batch::should_only_batch_if_possible_list
 queries::batching::select_one_compound::compound_batch::should_only_batch_if_possible_list_boolean
 queries::batching::select_one_compound::compound_batch::two_success_sel_set_reorder
-queries::batching::select_one_singular::singular_batch::batch_bigint_id
 queries::batching::select_one_singular::singular_batch::relation_traversal
 queries::batching::select_one_singular::singular_batch::relation_traversal_filtered
 queries::batching::select_one_singular::singular_batch::relation_traversal_filtered_diff
@@ -187,8 +183,6 @@ queries::batching::transactional_batch::transactional::one_success_one_fail
 queries::batching::transactional_batch::transactional::raw_mix
 queries::chunking::chunking::order_by_aggregation_should_fail
 queries::chunking::chunking::order_by_relevance_should_fail
-queries::data_types::bigint::bigint::read_many
-queries::data_types::bigint::bigint::read_one
 queries::data_types::bytes::bytes::issue_687::common_types
 queries::data_types::bytes::bytes::read_many
 queries::data_types::bytes::bytes::read_one
@@ -324,18 +318,15 @@ queries::simple::find_unique_or_throw::find_unique_or_throw::no_result_find_uniq
 queries::simple::find_unique_or_throw::find_unique_or_throw::no_result_find_unique_by_multi_unique
 queries::simple::find_unique_or_throw::find_unique_or_throw::no_result_find_unique_by_single_unique
 queries::simple::json_result::json_as_result::test_when_distinct_result_is_json
-queries::simple::m2m::m2m::m2m_sharing_same_row
 queries::simple::m2m::m2m::repro_16390
 queries::views::views::sorted_read
 raw::sql::casts::casts::prisma_9949
 raw::sql::casts::casts::query_date_casts
 raw::sql::errors::raw_errors::list_param_for_scalar_column_should_not_panic_pg_js
 raw::sql::input_coercion::input_coercion::decimal_input_correctly_coerced
-raw::sql::input_coercion::input_coercion::scalar_input_correctly_coerced
 raw::sql::scalar_list::scalar_list::null_native_type_lists
 raw::sql::scalar_list::scalar_list::null_scalar_lists
 raw::sql::typed_output::typed_output::all_scalars_pg
-writes::data_types::bigint::bigint::using_bigint_field
 writes::data_types::bytes::bytes::byte_id_coercion
 writes::data_types::bytes::bytes::using_bytes_field
 writes::data_types::datetime::where_and_datetime::where_and_datetime::test_1
@@ -345,7 +336,6 @@ writes::data_types::decimal::decimal::using_decimal_field
 writes::data_types::json::json::json_float_accuracy
 writes::data_types::native_types::postgres::postgres::native_date
 writes::data_types::native_types::postgres::postgres::native_decimal_types
-writes::data_types::native_types::postgres::postgres::native_int_types
 writes::data_types::native_types::postgres::postgres::native_other_types
 writes::data_types::scalar_list::base::basic_types::behave_like_regular_val_for_create_and_update
 writes::data_types::scalar_list::base::basic_types::create_mut_return_items_with_empty_lists

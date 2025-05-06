@@ -1,4 +1,3 @@
-new::cursor::bigint_cursor::bigint_id_must_work
 new::interactive_tx::interactive_tx::batch_queries_failure
 new::interactive_tx::interactive_tx::batch_queries_rollback
 new::interactive_tx::interactive_tx::batch_queries_success
@@ -71,7 +70,6 @@ new::ref_actions::on_update::set_null::one2one_opt::update_parent_recurse_restri
 new::ref_actions::on_update::set_null::one2one_opt::update_parent_recurse_set_null
 new::ref_actions::on_update::set_null::one2one_opt::upsert_parent
 new::regressions::max_integer::max_integer::unfitted_int_should_fail
-new::regressions::prisma_14696::prisma_14696::create_does_not_panic
 new::regressions::prisma_15204::conversion_error::convert_to_bigint_sqlite_js
 new::regressions::prisma_15204::conversion_error::convert_to_int_sqlite_js
 new::regressions::prisma_22971::prisma_22971::test_22971
@@ -137,7 +135,6 @@ queries::aggregation::max::aggregation_max::max_with_all_sorts_of_query_args
 queries::aggregation::max::decimal_aggregation_max::max_no_records
 queries::aggregation::max::decimal_aggregation_max::max_some_records
 queries::aggregation::max::decimal_aggregation_max::max_with_all_sorts_of_query_args
-queries::aggregation::min::aggregation_min::min_some_records
 queries::aggregation::min::aggregation_min::min_with_all_sorts_of_query_args
 queries::aggregation::min::decimal_aggregation_min::min_some_records
 queries::aggregation::min::decimal_aggregation_min::min_with_all_sorts_of_query_args
@@ -154,7 +151,6 @@ queries::aggregation::uniq_count_relation::uniq_count_rel::count_with_take
 queries::aggregation::uniq_count_relation::uniq_count_rel::nested_count_one2m_m2m
 queries::aggregation::uniq_count_relation::uniq_count_rel::no_rel_records
 queries::batching::select_one_compound::compound_batch::two_success_sel_set_reorder
-queries::batching::select_one_singular::singular_batch::batch_bigint_id
 queries::batching::select_one_singular::singular_batch::relation_traversal
 queries::batching::select_one_singular::singular_batch::relation_traversal_filtered
 queries::batching::select_one_singular::singular_batch::relation_traversal_filtered_diff
@@ -165,8 +161,6 @@ queries::batching::transactional_batch::transactional::invalid_isolation_level
 queries::batching::transactional_batch::transactional::one_query
 queries::batching::transactional_batch::transactional::one_success_one_fail
 queries::chunking::chunking::order_by_aggregation_should_fail
-queries::data_types::bigint::bigint::read_many
-queries::data_types::bigint::bigint::read_one
 queries::data_types::decimal::decimal::read_many
 queries::data_types::decimal::decimal::read_one
 queries::data_types::enum_type::enum_type::read_one_invalid_sqlite
@@ -299,10 +293,8 @@ queries::simple::find_unique_or_throw::find_unique_or_throw::no_result_find_uniq
 queries::simple::find_unique_or_throw::find_unique_or_throw::no_result_find_unique_by_multi_unique
 queries::simple::find_unique_or_throw::find_unique_or_throw::no_result_find_unique_by_single_unique
 queries::simple::json_result::json_as_result::test_when_distinct_result_is_json
-queries::simple::m2m::m2m::m2m_sharing_same_row
 queries::views::views::sorted_read
 raw::sql::typed_output::typed_output::all_scalars_sqlite
-writes::data_types::bigint::bigint::using_bigint_field
 writes::data_types::decimal::decimal::using_decimal_as_id
 writes::ids::byoid::byoid::nested_upsert_should_work_1
 writes::ids::byoid::byoid::nested_upsert_should_work_2

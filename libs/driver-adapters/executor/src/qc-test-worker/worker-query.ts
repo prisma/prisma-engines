@@ -58,7 +58,7 @@ class QueryPipeline {
 
       debug('🟢 Batch query results: ', results)
 
-      return JSON.stringify({
+      return bigIntSafeJsonStringify({
         batchResult: batch.map((query, index) =>
           getResponseInQeFormat(query, results[index]),
         ),
@@ -79,10 +79,10 @@ class QueryPipeline {
 
         debug('🟢 Query result: ', util.inspect(result, false, null, true))
 
-        return JSON.stringify(getResponseInQeFormat(query, result))
+        return bigIntSafeJsonStringify(getResponseInQeFormat(query, result))
       } catch (error) {
         if (error instanceof UserFacingError) {
-          return JSON.stringify({
+          return bigIntSafeJsonStringify({
             errors: [error.toQueryResponseErrorObject()],
           })
         }
@@ -99,7 +99,7 @@ class QueryPipeline {
     let queryPlanString: string
     try {
       queryPlanString = withLocalPanicHandler(() =>
-        this.compiler.compile(JSON.stringify(query)),
+        this.compiler.compile(bigIntSafeJsonStringify(query)),
       )
     } catch (error) {
       if (typeof error.message === 'string' && typeof error.code === 'string') {
@@ -123,7 +123,7 @@ class QueryPipeline {
       transactionManager: qiTransactionManager,
       placeholderValues: {},
       onQuery: (event: QueryEvent) => {
-        this.logs.push(JSON.stringify(event))
+        this.logs.push(bigIntSafeJsonStringify(event))
       },
       tracingHelper: noopTracingHelper,
     }
@@ -221,6 +221,15 @@ function isPlainRawQuery(plan: QueryPlanNode): boolean {
     default:
       return false
   }
+}
+
+function bigIntSafeJsonStringify(obj: unknown): string {
+  return JSON.stringify(obj, (_key, val) => {
+    if (typeof val === 'bigint') {
+      return val.toString()
+    }
+    return val
+  })
 }
 
 function serializeRawQueryResult(
