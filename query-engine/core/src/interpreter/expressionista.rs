@@ -432,6 +432,7 @@ impl Expressionista {
             .filter_map(|edge| match graph.pluck_edge(&edge) {
                 x @ (QueryGraphDependency::DataDependency(_)
                 | QueryGraphDependency::ProjectedDataDependency(_, _, _)
+                | QueryGraphDependency::ProjectedDataSinkDependency(_, _, _)
                 | QueryGraphDependency::DiffLeftDataDependency(_)
                 | QueryGraphDependency::DiffRightDataDependency(_)) => {
                     let parent_binding_name = graph.edge_source(&edge).id();
