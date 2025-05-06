@@ -121,7 +121,7 @@ impl Display for QueryGraphDependency {
             Self::ProjectedDataSinkDependency(selection, _, _) => {
                 write!(
                     f,
-                    "StaticProjectedDataDependency ({:?})",
+                    "ProjectedDataSinkDependency ({:?})",
                     selection
                         .selections()
                         .map(|f| format!("{}.{}", f.container().name(), f.prisma_name()))
