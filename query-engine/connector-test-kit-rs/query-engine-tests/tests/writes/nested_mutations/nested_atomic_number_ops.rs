@@ -356,7 +356,7 @@ mod atomic_number_ops {
         );
         insta::assert_snapshot!(
           query_nested_number_ops(&runner, 2, "optFloat", "multiply", "2").await?,
-          @r###"{"optFloat":11.0}"###
+          @r###"{"optFloat":11}"###
         );
 
         // Divide
@@ -424,7 +424,7 @@ mod atomic_number_ops {
         );
         insta::assert_snapshot!(
           query_nested_number_ops(&runner, 2, "optFloat", "multiply", "2").await?,
-          @r###"{"optFloat":11.0}"###
+          @r###"{"optFloat":11}"###
         );
 
         // Divide

@@ -80,7 +80,7 @@ mod combinations {
                 }
               }
             "# }),
-            @r###"{"data":{"aggregateItem":{"_count":{"_all":2},"_sum":{"float":10.0,"int":15},"_avg":{"float":5.0,"int":7.5},"_min":{"float":4.5,"int":5},"_max":{"float":5.5,"int":10}}}}"###
+            @r###"{"data":{"aggregateItem":{"_count":{"_all":2},"_sum":{"float":10,"int":15},"_avg":{"float":5,"int":7.5},"_min":{"float":4.5,"int":5},"_max":{"float":5.5,"int":10}}}}"###
         );
 
         Ok(())
@@ -118,7 +118,7 @@ mod combinations {
                 }
               }
             "# }),
-            @r###"{"data":{"aggregateItem":{"_count":{"_all":2},"_sum":{"float":10.0,"int":15},"_avg":{"float":5.0,"int":7.5},"_min":{"float":4.5,"int":5},"_max":{"float":5.5,"int":10}}}}"###
+            @r###"{"data":{"aggregateItem":{"_count":{"_all":2},"_sum":{"float":10,"int":15},"_avg":{"float":5,"int":7.5},"_min":{"float":4.5,"int":5},"_max":{"float":5.5,"int":10}}}}"###
         );
 
         insta::assert_snapshot!(
@@ -145,7 +145,7 @@ mod combinations {
                 }
               }
             "# }),
-            @r###"{"data":{"aggregateItem":{"_count":{"_all":4},"_sum":{"float":11.5,"int":18},"_avg":{"float":2.875,"int":4.5},"_min":{"float":0.0,"int":1},"_max":{"float":5.5,"int":10}}}}"###
+            @r###"{"data":{"aggregateItem":{"_count":{"_all":4},"_sum":{"float":11.5,"int":18},"_avg":{"float":2.875,"int":4.5},"_min":{"float":0,"int":1},"_max":{"float":5.5,"int":10}}}}"###
         );
 
         insta::assert_snapshot!(
@@ -172,7 +172,7 @@ mod combinations {
                 }
               }
             "# }),
-            @r###"{"data":{"aggregateItem":{"_count":{"_all":4},"_sum":{"float":11.5,"int":18},"_avg":{"float":2.875,"int":4.5},"_min":{"float":0.0,"int":1},"_max":{"float":5.5,"int":10}}}}"###
+            @r###"{"data":{"aggregateItem":{"_count":{"_all":4},"_sum":{"float":11.5,"int":18},"_avg":{"float":2.875,"int":4.5},"_min":{"float":0,"int":1},"_max":{"float":5.5,"int":10}}}}"###
         );
 
         insta::assert_snapshot!(
@@ -199,7 +199,7 @@ mod combinations {
                 }
               }
             "# }),
-            @r###"{"data":{"aggregateItem":{"_count":{"_all":2},"_sum":{"float":1.5,"int":3},"_avg":{"float":0.75,"int":1.5},"_min":{"float":0.0,"int":1},"_max":{"float":1.5,"int":2}}}}"###
+            @r###"{"data":{"aggregateItem":{"_count":{"_all":2},"_sum":{"float":1.5,"int":3},"_avg":{"float":0.75,"int":1.5},"_min":{"float":0,"int":1},"_max":{"float":1.5,"int":2}}}}"###
         );
 
         insta::assert_snapshot!(
@@ -226,7 +226,7 @@ mod combinations {
                 }
               }
             "# }),
-            @r###"{"data":{"aggregateItem":{"_count":{"_all":2},"_sum":{"float":1.5,"int":3},"_avg":{"float":0.75,"int":1.5},"_min":{"float":0.0,"int":1},"_max":{"float":1.5,"int":2}}}}"###
+            @r###"{"data":{"aggregateItem":{"_count":{"_all":2},"_sum":{"float":1.5,"int":3},"_avg":{"float":0.75,"int":1.5},"_min":{"float":0,"int":1},"_max":{"float":1.5,"int":2}}}}"###
         );
 
         insta::assert_snapshot!(
@@ -253,7 +253,7 @@ mod combinations {
                 }
               }
             "# }),
-            @r###"{"data":{"aggregateItem":{"_count":{"_all":2},"_sum":{"float":1.5,"int":3},"_avg":{"float":0.75,"int":1.5},"_min":{"float":0.0,"int":1},"_max":{"float":1.5,"int":2}}}}"###
+            @r###"{"data":{"aggregateItem":{"_count":{"_all":2},"_sum":{"float":1.5,"int":3},"_avg":{"float":0.75,"int":1.5},"_min":{"float":0,"int":1},"_max":{"float":1.5,"int":2}}}}"###
         );
 
         Ok(())

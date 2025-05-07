@@ -527,7 +527,7 @@ mod update {
         );
         insta::assert_snapshot!(
           query_number_operation(&runner, "2", "optFloat", "multiply", "2").await?,
-          @r###"{"data":{"updateOneTestModel":{"optFloat":11.0}}}"###
+          @r###"{"data":{"updateOneTestModel":{"optFloat":11}}}"###
         );
 
         // Divide
@@ -595,7 +595,7 @@ mod update {
         );
         insta::assert_snapshot!(
           query_number_operation(&runner, "2", "optFloat", "multiply", "2").await?,
-          @r###"{"data":{"updateOneTestModel":{"optFloat":11.0}}}"###
+          @r###"{"data":{"updateOneTestModel":{"optFloat":11}}}"###
         );
 
         // Divide

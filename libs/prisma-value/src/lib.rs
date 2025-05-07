@@ -244,7 +244,19 @@ fn serialize_decimal<S>(decimal: &BigDecimal, serializer: S) -> Result<S::Ok, S:
 where
     S: Serializer,
 {
-    decimal.to_string().parse::<f64>().unwrap().serialize(serializer)
+    const JS_MAX_SAFE_INTEGER: u64 = (1u64 << 53) - 1;
+
+    // convert decimals to integers when possible to avoid '.0' formatting
+    if let Some(d) = decimal
+        .is_integer()
+        .then(|| decimal.to_u64())
+        .flatten()
+        .filter(|&n| n <= JS_MAX_SAFE_INTEGER)
+    {
+        d.serialize(serializer)
+    } else {
+        decimal.to_string().parse::<f64>().unwrap().serialize(serializer)
+    }
 }
 
 fn deserialize_decimal<'de, D>(deserializer: D) -> Result<BigDecimal, D::Error>

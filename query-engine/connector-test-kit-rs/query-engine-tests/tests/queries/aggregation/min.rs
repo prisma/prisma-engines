@@ -44,27 +44,27 @@ mod aggregation_min {
 
         insta::assert_snapshot!(
             run_query!(&runner, "query { aggregateTestModel(take: 5) { _min { int bInt float string } } }"),
-            @r###"{"data":{"aggregateTestModel":{"_min":{"int":1,"bInt":"1","float":0.0,"string":"2"}}}}"###
+            @r###"{"data":{"aggregateTestModel":{"_min":{"int":1,"bInt":"1","float":0,"string":"2"}}}}"###
         );
 
         insta::assert_snapshot!(
             run_query!(&runner, "query { aggregateTestModel(take: -5) { _min { int bInt float string } } }"),
-            @r###"{"data":{"aggregateTestModel":{"_min":{"int":1,"bInt":"1","float":0.0,"string":"2"}}}}"###
+            @r###"{"data":{"aggregateTestModel":{"_min":{"int":1,"bInt":"1","float":0,"string":"2"}}}}"###
         );
 
         insta::assert_snapshot!(
             run_query!(&runner, r#"query { aggregateTestModel(where: { id: { gt: 2 }}) { _min { int bInt float string } } }"#),
-            @r###"{"data":{"aggregateTestModel":{"_min":{"int":1,"bInt":"1","float":0.0,"string":"g"}}}}"###
+            @r###"{"data":{"aggregateTestModel":{"_min":{"int":1,"bInt":"1","float":0,"string":"g"}}}}"###
         );
 
         insta::assert_snapshot!(
             run_query!(&runner, "query { aggregateTestModel(skip: 2) { _min { int bInt float string } } }"),
-            @r###"{"data":{"aggregateTestModel":{"_min":{"int":1,"bInt":"1","float":0.0,"string":"g"}}}}"###
+            @r###"{"data":{"aggregateTestModel":{"_min":{"int":1,"bInt":"1","float":0,"string":"g"}}}}"###
         );
 
         insta::assert_snapshot!(
             run_query!(&runner, r#"query { aggregateTestModel(cursor: { id: 3 }) { _min { int bInt float string } } }"#),
-            @r###"{"data":{"aggregateTestModel":{"_min":{"int":1,"bInt":"1","float":0.0,"string":"g"}}}}"###
+            @r###"{"data":{"aggregateTestModel":{"_min":{"int":1,"bInt":"1","float":0,"string":"g"}}}}"###
         );
 
         Ok(())
