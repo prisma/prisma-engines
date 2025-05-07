@@ -100,6 +100,7 @@ queries::aggregation::group_by::aggregation_group_by::group_by_scalar_filters
 queries::aggregation::group_by::aggregation_group_by::group_by_some_records
 queries::aggregation::group_by::aggregation_group_by::group_by_take_skip
 queries::aggregation::group_by_having::aggr_group_by_having::having_count_non_numerical_field
+queries::aggregation::group_by_having::aggr_group_by_having::having_count_scalar_filter
 queries::aggregation::group_by_having::aggr_group_by_having::having_max_scalar_filter
 queries::aggregation::group_by_having::aggr_group_by_having::having_min_scalar_filter
 queries::aggregation::group_by_having::aggr_group_by_having::having_sum_scalar_filter
