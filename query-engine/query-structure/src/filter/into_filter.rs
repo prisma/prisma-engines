@@ -29,11 +29,12 @@ impl IntoFilter for SelectionResult {
 
 impl IntoFilter for Vec<SelectionResult> {
     fn filter(self) -> Filter {
-        if let Ok([(SelectedField::Scalar(sf), value @ PrismaValue::Placeholder { .. })]) =
-            self.iter().exactly_one().map(|res| &res.pairs[..])
-        {
-            return sf.is_in_template(value.clone());
-        };
+        if let Some(pairs) = self.iter().exactly_one().ok().and_then(extract_placeholder_fields) {
+            return Filter::and(pairs.into_iter().fold(vec![], |mut acc, (sf, val)| {
+                acc.push(sf.is_in_template(val.clone()));
+                acc
+            }));
+        }
 
         let filters = self.into_iter().fold(vec![], |mut acc, id| {
             acc.push(id.filter());
@@ -41,5 +42,25 @@ impl IntoFilter for Vec<SelectionResult> {
         });
 
         Filter::or(filters)
+    }
+}
+
+fn extract_placeholder_fields(res: &SelectionResult) -> Option<Vec<(&ScalarFieldRef, &PrismaValue)>> {
+    let pairs = res
+        .pairs
+        .iter()
+        .map(|pair| {
+            if let (SelectedField::Scalar(sf), value @ PrismaValue::Placeholder { .. }) = pair {
+                Some((sf, value))
+            } else {
+                None
+            }
+        })
+        .while_some()
+        .collect_vec();
+    if pairs.len() == res.pairs.len() {
+        Some(pairs)
+    } else {
+        None
     }
 }
