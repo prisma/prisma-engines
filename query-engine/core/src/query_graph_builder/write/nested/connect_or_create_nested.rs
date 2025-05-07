@@ -1,8 +1,9 @@
 use super::*;
 use crate::{
+    inputs::{LeftSideDiffInput, RightSideDiffInput},
     query_ast::*,
     query_graph::{Flow, Node, NodeRef, QueryGraph, QueryGraphDependency},
-    Computation, DataExpectation, ParsedInputMap, ParsedInputValue,
+    Computation, DataExpectation, DataSink, ParsedInputMap, ParsedInputValue,
 };
 use query_structure::{Filter, IntoFilter, Model, RelationFieldRef, SelectionResult};
 use schema::constants::args;
@@ -936,21 +937,15 @@ fn one_to_one_inlined_child(
         // Edge: If node -> read old child node
         graph.create_edge(&if_node, &read_old_child_node, QueryGraphDependency::Then)?;
 
-        let diff_node = graph.create_node(Node::Computation(Computation::empty_diff()));
+        let diff_node = graph.create_node(Node::Computation(Computation::empty_diff_left_to_right()));
 
         // Edge: Read old child node -> diff node
         graph.create_edge(
             &read_new_child_node,
             &diff_node,
-            QueryGraphDependency::ProjectedDataDependency(
+            QueryGraphDependency::ProjectedDataSinkDependency(
                 child_model_identifier.clone(),
-                Box::new(move |mut diff_node, child_ids| {
-                    if let Node::Computation(Computation::Diff(ref mut diff)) = diff_node {
-                        diff.left = child_ids.into_iter().collect();
-                    }
-
-                    Ok(diff_node)
-                }),
+                DataSink::AllRows(&LeftSideDiffInput),
                 None,
             ),
         )?;
@@ -959,15 +954,9 @@ fn one_to_one_inlined_child(
         graph.create_edge(
             &read_old_child_node,
             &diff_node,
-            QueryGraphDependency::ProjectedDataDependency(
+            QueryGraphDependency::ProjectedDataSinkDependency(
                 child_model_identifier.clone(),
-                Box::new(move |mut diff_node, child_ids| {
-                    if let Node::Computation(Computation::Diff(ref mut diff)) = diff_node {
-                        diff.right = child_ids.into_iter().collect();
-                    }
-
-                    Ok(diff_node)
-                }),
+                DataSink::AllRows(&RightSideDiffInput),
                 None,
             ),
         )?;
@@ -976,15 +965,19 @@ fn one_to_one_inlined_child(
         graph.create_edge(
             &diff_node,
             &if_node,
-            QueryGraphDependency::DiffLeftDataDependency(Box::new(move |if_node, diff_left_result| {
-                let should_disconnect = !diff_left_result.is_empty();
+            QueryGraphDependency::ProjectedDataDependency(
+                child_model_identifier.clone(),
+                Box::new(move |if_node, diff_result| {
+                    let should_disconnect = !diff_result.is_empty();
 
-                if let Node::Flow(Flow::If(_)) = if_node {
-                    Ok(Node::Flow(Flow::If(Box::new(move || should_disconnect))))
-                } else {
-                    unreachable!()
-                }
-            })),
+                    if let Node::Flow(Flow::If(_)) = if_node {
+                        Ok(Node::Flow(Flow::If(Box::new(move || should_disconnect))))
+                    } else {
+                        unreachable!()
+                    }
+                }),
+                None,
+            ),
         )?;
 
         // update old child, set link to null

@@ -19,31 +19,8 @@ pub enum ExpressionResult {
     /// A fixed result returned in the query graph.
     FixedResult(Vec<SelectionResult>),
 
-    /// A result from a computation in the query graph.
-    Computation(ComputationResult),
-
     /// An empty result
     Empty,
-}
-
-#[derive(Debug, Clone)]
-pub enum ComputationResult {
-    Diff(DiffResult),
-}
-
-/// Diff of two identifier vectors A and B:
-/// `left` contains all elements that are in A but not in B.
-/// `right` contains all elements that are in B but not in A.
-#[derive(Debug, Clone)]
-pub struct DiffResult {
-    pub left: Vec<SelectionResult>,
-    pub right: Vec<SelectionResult>,
-}
-
-impl DiffResult {
-    pub fn is_empty(&self) -> bool {
-        self.left.is_empty() && self.right.is_empty()
-    }
 }
 
 impl ExpressionResult {
@@ -111,17 +88,6 @@ impl ExpressionResult {
 
         converted.ok_or_else(|| {
             InterpreterError::InterpretationError("Unable to convert result into a query result".to_owned(), None)
-        })
-    }
-
-    pub fn as_diff_result(&self) -> InterpretationResult<&DiffResult> {
-        let converted = match self {
-            Self::Computation(ComputationResult::Diff(ref d)) => Some(d),
-            _ => None,
-        };
-
-        converted.ok_or_else(|| {
-            InterpreterError::InterpretationError("Unable to convert result into a computation result".to_owned(), None)
         })
     }
 }

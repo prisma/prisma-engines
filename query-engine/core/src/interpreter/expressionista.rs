@@ -1,8 +1,9 @@
-use super::{
-    expression::*, ComputationResult, DiffResult, Env, ExpressionResult, InterpretationResult, InterpreterError,
-};
+use super::{expression::*, Env, ExpressionResult, InterpretationResult, InterpreterError};
 use crate::{query_graph::*, Query};
-use std::{collections::VecDeque, convert::TryInto};
+use std::{
+    collections::{HashSet, VecDeque},
+    convert::TryInto,
+};
 
 pub(crate) struct Expressionista;
 
@@ -168,17 +169,28 @@ impl Expressionista {
         let into_expr = Box::new(move |node: Node| {
             Ok(Expression::Func {
                 func: Box::new(move |_| match node {
-                    Node::Computation(Computation::Diff(DiffNode { left, right })) => {
-                        let left_diff = left.difference(&right);
-                        let right_diff = right.difference(&left);
+                    Node::Computation(Computation::DiffLeftToRight(DiffNode { left, right })) => {
+                        let left: HashSet<_> = left.into_iter().collect();
+                        let right: HashSet<_> = right.into_iter().collect();
+
+                        let diff = left.difference(&right);
 
                         Ok(Expression::Return {
-                            result: Box::new(ExpressionResult::Computation(ComputationResult::Diff(DiffResult {
-                                left: left_diff.into_iter().cloned().collect(),
-                                right: right_diff.into_iter().cloned().collect(),
-                            }))),
+                            result: Box::new(ExpressionResult::FixedResult(diff.cloned().collect())),
                         })
                     }
+
+                    Node::Computation(Computation::DiffRightToLeft(DiffNode { left, right })) => {
+                        let left: HashSet<_> = left.into_iter().collect();
+                        let right: HashSet<_> = right.into_iter().collect();
+
+                        let diff = right.difference(&left);
+
+                        Ok(Expression::Return {
+                            result: Box::new(ExpressionResult::FixedResult(diff.cloned().collect())),
+                        })
+                    }
+
                     _ => unreachable!(),
                 }),
             })
@@ -396,14 +408,6 @@ impl Expressionista {
 
                                         QueryGraphDependency::DataDependency(f) => Ok(f(node, binding)?),
 
-                                        QueryGraphDependency::DiffLeftDataDependency(f) => {
-                                            Ok(f(node, &binding.as_diff_result()?.left)?)
-                                        }
-
-                                        QueryGraphDependency::DiffRightDataDependency(f) => {
-                                            Ok(f(node, &binding.as_diff_result()?.right)?)
-                                        }
-
                                         _ => unreachable!(),
                                     };
 
@@ -432,9 +436,7 @@ impl Expressionista {
             .filter_map(|edge| match graph.pluck_edge(&edge) {
                 x @ (QueryGraphDependency::DataDependency(_)
                 | QueryGraphDependency::ProjectedDataDependency(_, _, _)
-                | QueryGraphDependency::ProjectedDataSinkDependency(_, _, _)
-                | QueryGraphDependency::DiffLeftDataDependency(_)
-                | QueryGraphDependency::DiffRightDataDependency(_)) => {
+                | QueryGraphDependency::ProjectedDataSinkDependency(_, _, _)) => {
                     let parent_binding_name = graph.edge_source(&edge).id();
                     Some((parent_binding_name, x))
                 }

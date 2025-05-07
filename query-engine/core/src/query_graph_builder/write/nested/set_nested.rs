@@ -1,5 +1,10 @@
 use super::*;
-use crate::{query_ast::*, query_graph::*, ParsedInputValue};
+use crate::{
+    inputs::{LeftSideDiffInput, RightSideDiffInput},
+    query_ast::*,
+    query_graph::*,
+    ParsedInputValue,
+};
 use itertools::Itertools;
 use query_structure::{Filter, Model, RelationFieldRef, SelectionResult};
 use std::convert::TryInto;
@@ -225,23 +230,27 @@ fn handle_one_to_many(
 
     let read_new_query = utils::read_ids_infallible(child_model.clone(), child_model_identifier.clone(), filter);
     let read_new_node = graph.create_node(read_new_query);
-    let diff_node = graph.create_node(Node::Computation(Computation::empty_diff()));
+    let diff_left_to_right_node = graph.create_node(Node::Computation(Computation::empty_diff_left_to_right()));
+    let diff_right_to_left_node = graph.create_node(Node::Computation(Computation::empty_diff_right_to_left()));
 
     graph.create_edge(&read_old_node, &read_new_node, QueryGraphDependency::ExecutionOrder)?;
 
     // The new IDs that are not yet connected will be on the `left` side of the diff.
     graph.create_edge(
         &read_new_node,
-        &diff_node,
-        QueryGraphDependency::ProjectedDataDependency(
+        &diff_left_to_right_node,
+        QueryGraphDependency::ProjectedDataSinkDependency(
             child_model_identifier.clone(),
-            Box::new(move |mut diff_node, child_ids| {
-                if let Node::Computation(Computation::Diff(ref mut diff)) = diff_node {
-                    diff.left = child_ids.into_iter().collect();
-                }
-
-                Ok(diff_node)
-            }),
+            DataSink::AllRows(&LeftSideDiffInput),
+            None,
+        ),
+    )?;
+    graph.create_edge(
+        &read_new_node,
+        &diff_right_to_left_node,
+        QueryGraphDependency::ProjectedDataSinkDependency(
+            child_model_identifier.clone(),
+            DataSink::AllRows(&LeftSideDiffInput),
             None,
         ),
     )?;
@@ -249,16 +258,19 @@ fn handle_one_to_many(
     // The old IDs that must be disconnected will be on the `right` side of the diff.
     graph.create_edge(
         &read_old_node,
-        &diff_node,
-        QueryGraphDependency::ProjectedDataDependency(
-            child_model_identifier,
-            Box::new(move |mut diff_node, child_ids| {
-                if let Node::Computation(Computation::Diff(ref mut diff)) = diff_node {
-                    diff.right = child_ids.into_iter().collect();
-                }
-
-                Ok(diff_node)
-            }),
+        &diff_left_to_right_node,
+        QueryGraphDependency::ProjectedDataSinkDependency(
+            child_model_identifier.clone(),
+            DataSink::AllRows(&RightSideDiffInput),
+            None,
+        ),
+    )?;
+    graph.create_edge(
+        &read_old_node,
+        &diff_right_to_left_node,
+        QueryGraphDependency::ProjectedDataSinkDependency(
+            child_model_identifier.clone(),
+            DataSink::AllRows(&RightSideDiffInput),
             None,
         ),
     )?;
@@ -268,17 +280,21 @@ fn handle_one_to_many(
     let update_connect_node = utils::update_records_node_placeholder(graph, Filter::empty(), child_model.clone());
 
     graph.create_edge(
-        &diff_node,
+        &diff_left_to_right_node,
         &connect_if_node,
-        QueryGraphDependency::DiffLeftDataDependency(Box::new(move |connect_if_node, diff_left_result| {
-            let should_connect = !diff_left_result.is_empty();
+        QueryGraphDependency::ProjectedDataDependency(
+            child_model_identifier.clone(),
+            Box::new(move |connect_if_node, diff_left_result| {
+                let should_connect = !diff_left_result.is_empty();
 
-            if let Node::Flow(Flow::If(_)) = connect_if_node {
-                Ok(Node::Flow(Flow::If(Box::new(move || should_connect))))
-            } else {
-                unreachable!()
-            }
-        })),
+                if let Node::Flow(Flow::If(_)) = connect_if_node {
+                    Ok(Node::Flow(Flow::If(Box::new(move || should_connect))))
+                } else {
+                    unreachable!()
+                }
+            }),
+            None,
+        ),
     )?;
 
     // Connect to the if node, the parent node (for the inlining ID) and the diff node (to get the IDs to update)
@@ -308,15 +324,19 @@ fn handle_one_to_many(
     )?;
 
     graph.create_edge(
-        &diff_node,
+        &diff_left_to_right_node,
         &update_connect_node,
-        QueryGraphDependency::DiffLeftDataDependency(Box::new(move |mut update_connect_node, diff_left_result| {
-            if let Node::Query(Query::Write(WriteQuery::UpdateManyRecords(ref mut ur))) = update_connect_node {
-                ur.record_filter = diff_left_result.to_vec().into();
-            }
+        QueryGraphDependency::ProjectedDataDependency(
+            child_model_identifier.clone(),
+            Box::new(move |mut update_connect_node, diff_left_result| {
+                if let Node::Query(Query::Write(WriteQuery::UpdateManyRecords(ref mut ur))) = update_connect_node {
+                    ur.record_filter = diff_left_result.to_vec().into();
+                }
 
-            Ok(update_connect_node)
-        })),
+                Ok(update_connect_node)
+            }),
+            None,
+        ),
     )?;
 
     // Update (disconnect) case: Check right diff IDs.
@@ -327,39 +347,43 @@ fn handle_one_to_many(
     let rf = parent_relation_field.clone();
 
     graph.create_edge(
-        &diff_node,
+        &diff_right_to_left_node,
         &disconnect_if_node,
-        QueryGraphDependency::DiffRightDataDependency(Box::new(move |node, diff_right_result| {
-            let should_connect = !diff_right_result.is_empty();
+        QueryGraphDependency::ProjectedDataDependency(
+            child_model_identifier.clone(),
+            Box::new(move |node, diff_right_result| {
+                let should_connect = !diff_right_result.is_empty();
 
-            if should_connect && child_side_required {
-                return Err(QueryGraphBuilderError::RelationViolation(rf.into()));
-            }
-
-            if let Node::Flow(Flow::If(_)) = node {
-                Ok(Node::Flow(Flow::If(Box::new(move || should_connect))))
-            } else {
-                unreachable!()
-            }
-        })),
+                if let Node::Flow(Flow::If(_)) = node {
+                    Ok(Node::Flow(Flow::If(Box::new(move || should_connect))))
+                } else {
+                    unreachable!()
+                }
+            }),
+            child_side_required.then(|| DataExpectation::empty_rows(RelationViolation::from(rf))),
+        ),
     )?;
 
     // Connect to the if node and the diff node (to get the IDs to update)
     graph.create_edge(&disconnect_if_node, &update_disconnect_node, QueryGraphDependency::Then)?;
     graph.create_edge(
-        &diff_node,
+        &diff_right_to_left_node,
         &update_disconnect_node,
-        QueryGraphDependency::DiffRightDataDependency(Box::new(move |mut node, diff_right_result| {
-            if let Node::Query(Query::Write(WriteQuery::UpdateManyRecords(ref mut ur))) = node {
-                ur.record_filter = diff_right_result.to_vec().into();
-            }
+        QueryGraphDependency::ProjectedDataDependency(
+            child_model_identifier,
+            Box::new(move |mut node, diff_right_result| {
+                if let Node::Query(Query::Write(WriteQuery::UpdateManyRecords(ref mut ur))) = node {
+                    ur.record_filter = diff_right_result.to_vec().into();
+                }
 
-            if let Node::Query(Query::Write(ref mut wq)) = node {
-                wq.inject_result_into_args(empty_child_link);
-            }
+                if let Node::Query(Query::Write(ref mut wq)) = node {
+                    wq.inject_result_into_args(empty_child_link);
+                }
 
-            Ok(node)
-        })),
+                Ok(node)
+            }),
+            None,
+        ),
     )?;
 
     Ok(())

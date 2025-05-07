@@ -64,7 +64,8 @@ impl Display for Flow {
 impl Display for Computation {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            Self::Diff(_) => write!(f, "Diff"),
+            Self::DiffLeftToRight(_) => write!(f, "DiffLeftToRight"),
+            Self::DiffRightToLeft(_) => write!(f, "DiffRightToLeft"),
         }
     }
 }
@@ -128,8 +129,6 @@ impl Display for QueryGraphDependency {
                         .collect::<Vec<_>>()
                 )
             }
-            Self::DiffLeftDataDependency(_) => write!(f, "DiffLeftResult"),
-            Self::DiffRightDataDependency(_) => write!(f, "DiffRightResult"),
             Self::Then => write!(f, "Then"),
             Self::Else => write!(f, "Else"),
         }
