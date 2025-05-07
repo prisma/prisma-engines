@@ -37,6 +37,7 @@ new::ref_actions::on_update::restrict::one2many_opt::upsert_parent_failure
 new::ref_actions::on_update::restrict::one2many_req::update_parent
 new::ref_actions::on_update::restrict::one2many_req::upsert_parent_failure
 new::ref_actions::on_update::restrict::one2one_req::upsert_parent_failure
+new::ref_actions::on_update::restrict::one2one_opt::upsert_parent_failure
 new::ref_actions::on_update::set_null::one2many_opt::update_many_parent
 new::ref_actions::on_update::set_null::one2many_opt::update_parent_compound_recurse
 new::ref_actions::on_update::set_null::one2many_opt::upsert_parent
@@ -301,8 +302,6 @@ raw::sql::scalar_list::scalar_list::null_scalar_lists
 raw::sql::typed_output::typed_output::all_scalars_pg
 writes::data_types::bytes::bytes::byte_id_coercion
 writes::data_types::bytes::bytes::using_bytes_field
-writes::data_types::datetime::where_and_datetime::where_and_datetime::test_1
-writes::data_types::datetime::where_and_datetime::where_and_datetime::test_2
 writes::data_types::decimal::decimal::using_decimal_as_id
 writes::data_types::decimal::decimal::using_decimal_field
 writes::data_types::json::json::json_float_accuracy

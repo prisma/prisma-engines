@@ -17,7 +17,6 @@ new::ref_actions::on_delete::cascade::one2many_req::delete_parent
 new::ref_actions::on_delete::cascade::one2one_opt::delete_parent
 new::ref_actions::on_delete::cascade::one2one_opt::delete_parent_diff_id_name
 new::ref_actions::on_delete::cascade::one2one_req::delete_parent
-new::ref_actions::on_delete::restrict::one2many_opt::delete_parent
 new::ref_actions::on_delete::restrict::one2many_opt::delete_parent_failure
 new::ref_actions::on_delete::restrict::one2many_req::delete_parent_failure
 new::ref_actions::on_delete::restrict::one2one_opt::delete_parent_failure
@@ -34,6 +33,7 @@ new::ref_actions::on_update::restrict::one2many_opt::update_parent
 new::ref_actions::on_update::restrict::one2many_opt::upsert_parent_failure
 new::ref_actions::on_update::restrict::one2many_req::update_parent
 new::ref_actions::on_update::restrict::one2many_req::upsert_parent_failure
+new::ref_actions::on_update::restrict::one2one_opt::upsert_parent_failure
 new::ref_actions::on_update::restrict::one2one_req::upsert_parent_failure
 new::ref_actions::on_update::set_null::one2many_opt::update_many_parent
 new::ref_actions::on_update::set_null::one2many_opt::update_parent_compound_recurse
