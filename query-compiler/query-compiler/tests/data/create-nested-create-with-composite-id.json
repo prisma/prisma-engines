@@ -3,6 +3,7 @@
   "action": "createOne",
   "query": {
     "arguments": {
+      "relationLoadStrategy": "query",
       "data": {
         "a": 1,
         "b": 1,

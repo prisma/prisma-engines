@@ -3,6 +3,7 @@
   "action": "upsertOne",
   "query": {
     "arguments": {
+      "relationLoadStrategy": "query",
       "where": { "email": "user.1@prisma.io" },
       "update": { "email": "user.2@prisma.io" },
       "create": { "email": "user.1@prisma.io" }

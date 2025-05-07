@@ -3,14 +3,17 @@
   "action": "findMany",
   "query": {
     "arguments": {
-      "relationLoadStrategy": "query"
+      "relationLoadStrategy": "join"
     },
     "selection": {
+      "id": true,
       "email": true,
-      "_count": {
+      "activations": {
         "arguments": {},
         "selection": {
-          "activations": true
+          "issued": true,
+          "secret": true,
+          "done": true
         }
       }
     }

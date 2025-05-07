@@ -2,7 +2,9 @@
   "modelName": "Activation",
   "action": "findMany",
   "query": {
-    "arguments": {},
+    "arguments": {
+      "relationLoadStrategy": "query"
+    },
     "selection": {
       "issued": true,
       "secret": true,

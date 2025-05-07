@@ -134,13 +134,13 @@ pub fn get_records<'a, T>(
     model: &Model,
     columns: impl Iterator<Item = Column<'static>>,
     virtual_selections: impl IntoIterator<Item = &'a VirtualSelection>,
-    query: T,
+    query_arguments: T,
     ctx: &Context<'_>,
 ) -> Select<'static>
 where
     T: SelectDefinition,
 {
-    let (select, additional_selection_set) = query.into_select(model, virtual_selections, ctx);
+    let (select, additional_selection_set) = query_arguments.into_select(model, virtual_selections, ctx);
     let select = columns.fold(select, |acc, col| acc.column(col));
 
     let select = select.add_traceparent(ctx.traceparent);

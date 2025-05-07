@@ -189,12 +189,17 @@ function getResponseInQeFormat(query: JsonProtocolQuery, result: unknown) {
   }
 }
 
+// FIXME: Any missing case cause problems like getting "findFirstOrThrowUser" instead of "findFirstUserOrThrow"
 function getFullOperationName(query: JsonProtocolQuery): string {
   switch (query.action) {
     case 'createManyAndReturn':
       return `createMany${query.modelName}AndReturn`
     case 'updateManyAndReturn':
       return `updateMany${query.modelName}AndReturn`
+    case 'findFirstOrThrow':
+      return `findFirst${query.modelName}OrThrow`
+    case 'findUniqueOrThrow':
+      return `findUnique${query.modelName}OrThrow`
     default:
       if (query.modelName) {
         return query.action + query.modelName

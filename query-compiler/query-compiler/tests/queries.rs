@@ -1,3 +1,4 @@
+use insta::glob;
 use quaint::{
     prelude::{ConnectionInfo, ExternalConnectionInfo, SqlFamily},
     visitor::Postgres,
@@ -10,7 +11,10 @@ use std::{fs, sync::Arc};
 
 #[test]
 fn queries() {
-    insta::glob!("data/*.json", |path| {
+    glob!("data/*.json", |path| {
+        let test_name = path.file_name().unwrap().to_str().unwrap();
+        println!("RUNNING: {test_name}");
+
         let schema_string = include_str!("data/schema.prisma");
         let schema = psl::validate(schema_string.into());
 
@@ -31,14 +35,22 @@ fn queries() {
         let request = RequestBody::Json(JsonBody::Single(query));
         let doc = request.into_doc(&query_schema).unwrap();
 
-        let QueryDocument::Single(query) = doc else {
+        let QueryDocument::Single(operation) = doc else {
             panic!("expected single query");
         };
 
-        let (graph, _serializer) = QueryGraphBuilder::new(&query_schema)
+        let result = QueryGraphBuilder::new(&query_schema)
             .without_eager_default_evaluation()
-            .build(query)
-            .unwrap();
+            .build(operation);
+
+        let (graph, _) = match result {
+            Ok(result) => result,
+            Err(err) => {
+                println!("FAILED: {test_name}");
+                println!("ERROR: {err:?}");
+                panic!("FAILED: {test_name}");
+            }
+        };
 
         let dot = graph.to_graphviz();
         let tests_path = path.parent().unwrap().parent().unwrap();

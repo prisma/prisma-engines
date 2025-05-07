@@ -3,6 +3,7 @@
   "action": "createOne",
   "query": {
     "arguments": {
+      "relationLoadStrategy": "query",
       "data": {
         "email": "user.1737556027349@prisma.io",
         "posts": {

@@ -316,7 +316,7 @@ mod update {
         create_row(&runner, r#"{ id: 1, field: "test"}"#).await?;
 
         // We have to wait a bit to avoid test flakiness due to the finite precision of the clock
-        sleep(Duration::from_millis(50)).await;
+        sleep(Duration::from_millis(1000)).await;
 
         let res = run_query_json!(
             &runner,

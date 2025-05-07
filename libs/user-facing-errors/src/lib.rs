@@ -119,8 +119,9 @@ impl Error {
         }
     }
 
-    /// Construct a new UnknownError from a [`PanicHookInfo`] in a panic hook. [`UnknownError`]s
-    /// created with this constructor will have a proper, useful backtrace.
+    /// Construct a new UnknownError from a [`std::panic::PanicHookInfo`] in a
+    /// panic hook. [`UnknownError`]s created with this constructor will have a
+    /// proper, useful backtrace.
     pub fn new_in_panic_hook(panic_info: &std::panic::PanicHookInfo<'_>) -> Self {
         let message = panic_utils::downcast_ref_to_string(panic_info.payload()).unwrap_or("<unknown panic>");
 

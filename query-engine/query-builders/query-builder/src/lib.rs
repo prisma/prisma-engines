@@ -1,6 +1,6 @@
 use query_structure::{
     AggregationSelection, FieldSelection, Filter, Model, PrismaValue, QueryArguments, RecordFilter, RelationField,
-    ScalarCondition, ScalarField, SelectionResult, WriteArgs,
+    RelationLoadStrategy, ScalarCondition, ScalarField, SelectionResult, WriteArgs,
 };
 use serde::Serialize;
 use std::fmt::Formatter;
@@ -17,6 +17,7 @@ pub trait QueryBuilder {
         model: &Model,
         query_arguments: QueryArguments,
         selected_fields: &FieldSelection,
+        relation_load_strategy: RelationLoadStrategy,
     ) -> Result<DbQuery, Box<dyn std::error::Error + Send + Sync>>;
 
     /// Retrieve related records through an M2M relation.

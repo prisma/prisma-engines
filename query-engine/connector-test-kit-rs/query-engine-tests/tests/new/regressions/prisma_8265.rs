@@ -47,7 +47,7 @@ mod mongodb {
         let updated_at = &resp["data"]["createOneOrder"]["order_lines"][0]["updated_at"];
 
         // We have to wait a bit to avoid test flakiness due to the finite precision of the clock
-        sleep(Duration::from_millis(50)).await;
+        sleep(Duration::from_millis(1000)).await;
 
         let updated = run_query_json!(
             runner,

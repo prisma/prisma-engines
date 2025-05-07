@@ -261,8 +261,9 @@ pub(crate) fn get_relation_load_strategy(
 ) -> QueryGraphBuilderResult<RelationLoadStrategy> {
     static DEFAULT_RELATION_LOAD_STRATEGY: LazyLock<Option<RelationLoadStrategy>> = LazyLock::new(|| {
         std::env::var("PRISMA_RELATION_LOAD_STRATEGY")
-            .map(|e| e.as_str().try_into().unwrap())
+            .map(|var| var.as_str().try_into().unwrap())
             .ok()
+            .or_else(|| option_env!("PRISMA_RELATION_LOAD_STRATEGY").map(|var| var.try_into().unwrap()))
     });
 
     match query_schema.join_strategy_support() {

@@ -50,7 +50,7 @@ mod updated_at {
         let updated_at = &res["data"]["createOneTop"]["updatedAt"];
 
         // We have to wait a bit to avoid test flakiness due to the finite precision of the clock
-        sleep(Duration::from_millis(50)).await;
+        sleep(Duration::from_millis(1000)).await;
 
         let res_2 = run_query_json!(
             &runner,
@@ -80,7 +80,7 @@ mod updated_at {
         let updated_at = &res["data"]["createOneTop"]["updatedAt"];
 
         // We have to wait a bit to avoid test flakiness due to the finite precision of the clock
-        sleep(Duration::from_millis(50)).await;
+        sleep(Duration::from_millis(1000)).await;
 
         let res_2 = run_query_json!(
             &runner,
@@ -123,7 +123,7 @@ mod updated_at {
         );
 
         // We have to wait a bit to avoid test flakiness due to the finite precision of the clock
-        sleep(Duration::from_millis(50)).await;
+        sleep(Duration::from_millis(1000)).await;
 
         let res_2 = run_query_json!(
             &runner,
@@ -150,7 +150,7 @@ mod updated_at {
         let updated_at = &res["data"]["createOneList"]["updatedAt"];
 
         // We have to wait a bit to avoid test flakiness due to the finite precision of the clock
-        sleep(Duration::from_millis(50)).await;
+        sleep(Duration::from_millis(1000)).await;
 
         let res_2 = run_query_json!(
             &runner,
