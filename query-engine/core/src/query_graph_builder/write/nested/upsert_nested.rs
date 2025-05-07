@@ -1,11 +1,12 @@
 use super::*;
+use crate::inputs::IfInput;
 use crate::query_graph_builder::write::utils::coerce_vec;
-use crate::DataExpectation;
 use crate::{
     query_ast::*,
     query_graph::{Flow, Node, NodeRef, QueryGraph, QueryGraphDependency},
     ParsedInputMap, ParsedInputValue,
 };
+use crate::{DataExpectation, DataSink};
 use query_structure::{Filter, RelationFieldRef};
 use schema::constants::args;
 use std::convert::TryInto;
@@ -135,7 +136,7 @@ pub fn nested_upsert(
         let read_children_node =
             utils::insert_find_children_by_parent_node(graph, &parent_node, parent_relation_field, filter.clone())?;
 
-        let if_node = graph.create_node(Flow::default_if());
+        let if_node = graph.create_node(Flow::if_non_empty());
         let create_node =
             create::create_record_node(graph, query_schema, child_model.clone(), create_input.try_into()?)?;
         let update_node = update::update_record_node(
@@ -150,15 +151,9 @@ pub fn nested_upsert(
         graph.create_edge(
             &read_children_node,
             &if_node,
-            QueryGraphDependency::ProjectedDataDependency(
+            QueryGraphDependency::ProjectedDataSinkDependency(
                 child_model_identifier.clone(),
-                Box::new(|if_node, child_ids| {
-                    if let Node::Flow(Flow::If(_)) = if_node {
-                        Ok(Node::Flow(Flow::If(Box::new(move || !child_ids.is_empty()))))
-                    } else {
-                        Ok(if_node)
-                    }
-                }),
+                DataSink::AllRows(&IfInput),
                 None,
             ),
         )?;

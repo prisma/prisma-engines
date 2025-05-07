@@ -55,8 +55,8 @@ fn stringify_nodes(graph: &QueryGraph, nodes: Vec<NodeRef>, seen_nodes: &mut Vec
 impl Display for Flow {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            Self::If(_) => write!(f, "(If (condition func)"),
-            Self::Return(_) => write!(f, "(return results)"),
+            Self::If { rule, .. } => write!(f, "If {rule:?}"),
+            Self::Return(_) => write!(f, "Return"),
         }
     }
 }

@@ -1,5 +1,5 @@
 use crate::{
-    inputs::{LeftSideDiffInput, RightSideDiffInput},
+    inputs::{IfInput, LeftSideDiffInput, RightSideDiffInput},
     query_ast::*,
     query_graph::{Flow, Node, NodeRef, QueryGraph, QueryGraphDependency},
     Computation, DataExpectation, DataOperation, DataSink, MissingRelatedRecord, ParsedInputValue,
@@ -202,24 +202,12 @@ pub fn insert_1to1_idempotent_connect_checks(
             None,
         ),
     )?;
-    let if_node = graph.create_node(Flow::default_if());
+    let if_node = graph.create_node(Flow::if_non_empty());
 
     graph.create_edge(
         &diff_node,
         &if_node,
-        QueryGraphDependency::ProjectedDataDependency(
-            child_model_identifier,
-            Box::new(move |if_node, diff_result| {
-                let should_connect = !diff_result.is_empty();
-
-                if let Node::Flow(Flow::If(_)) = if_node {
-                    Ok(Node::Flow(Flow::If(Box::new(move || should_connect))))
-                } else {
-                    unreachable!()
-                }
-            }),
-            None,
-        ),
+        QueryGraphDependency::ProjectedDataSinkDependency(child_model_identifier, DataSink::AllRows(&IfInput), None),
     )?;
     let empty_node = graph.create_node(Node::Empty);
 
@@ -305,23 +293,19 @@ pub fn insert_existing_1to1_related_model_checks(
         insert_find_children_by_parent_node(graph, parent_node, parent_relation_field, Filter::empty())?;
 
     let update_existing_child = update_records_node_placeholder(graph, Filter::empty(), child_model);
-    let if_node = graph.create_node(Flow::default_if());
+
+    let if_node = graph.create_node(if relation_inlined_parent {
+        Flow::if_false()
+    } else {
+        Flow::if_non_empty()
+    });
 
     graph.create_edge(
         &read_existing_children,
         &if_node,
-        QueryGraphDependency::ProjectedDataDependency(
+        QueryGraphDependency::ProjectedDataSinkDependency(
             child_model_identifier.clone(),
-            Box::new(move |if_node, child_ids| {
-                if let Node::Flow(Flow::If(_)) = if_node {
-                    // If the relation is inlined in the parent, we need to update the old parent and null out the relation (i.e. "disconnect").
-                    Ok(Node::Flow(Flow::If(Box::new(move || {
-                        !relation_inlined_parent && !child_ids.is_empty()
-                    }))))
-                } else {
-                    unreachable!()
-                }
-            }),
+            DataSink::AllRows(&IfInput),
             // If the other side ("child") requires the connection, we need to make sure that there isn't a child already connected
             // to the parent, as that would violate the other childs relation side.
             if child_side_required {
