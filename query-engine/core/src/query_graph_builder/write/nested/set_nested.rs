@@ -1,6 +1,6 @@
 use super::*;
 use crate::{
-    inputs::{LeftSideDiffInput, RightSideDiffInput},
+    inputs::{IfInput, LeftSideDiffInput, RightSideDiffInput},
     query_ast::*,
     query_graph::*,
     ParsedInputValue,
@@ -276,23 +276,15 @@ fn handle_one_to_many(
     )?;
 
     // Update (connect) case: Check left diff IDs
-    let connect_if_node = graph.create_node(Node::Flow(Flow::default_if()));
+    let connect_if_node = graph.create_node(Node::Flow(Flow::if_non_empty()));
     let update_connect_node = utils::update_records_node_placeholder(graph, Filter::empty(), child_model.clone());
 
     graph.create_edge(
         &diff_left_to_right_node,
         &connect_if_node,
-        QueryGraphDependency::ProjectedDataDependency(
+        QueryGraphDependency::ProjectedDataSinkDependency(
             child_model_identifier.clone(),
-            Box::new(move |connect_if_node, diff_left_result| {
-                let should_connect = !diff_left_result.is_empty();
-
-                if let Node::Flow(Flow::If(_)) = connect_if_node {
-                    Ok(Node::Flow(Flow::If(Box::new(move || should_connect))))
-                } else {
-                    unreachable!()
-                }
-            }),
+            DataSink::AllRows(&IfInput),
             None,
         ),
     )?;
@@ -340,7 +332,7 @@ fn handle_one_to_many(
     )?;
 
     // Update (disconnect) case: Check right diff IDs.
-    let disconnect_if_node = graph.create_node(Node::Flow(Flow::default_if()));
+    let disconnect_if_node = graph.create_node(Node::Flow(Flow::if_non_empty()));
     let update_disconnect_node = utils::update_records_node_placeholder(graph, Filter::empty(), child_model);
 
     let child_side_required = parent_relation_field.related_field().is_required();
@@ -349,17 +341,9 @@ fn handle_one_to_many(
     graph.create_edge(
         &diff_right_to_left_node,
         &disconnect_if_node,
-        QueryGraphDependency::ProjectedDataDependency(
+        QueryGraphDependency::ProjectedDataSinkDependency(
             child_model_identifier.clone(),
-            Box::new(move |node, diff_right_result| {
-                let should_connect = !diff_right_result.is_empty();
-
-                if let Node::Flow(Flow::If(_)) = node {
-                    Ok(Node::Flow(Flow::If(Box::new(move || should_connect))))
-                } else {
-                    unreachable!()
-                }
-            }),
+            DataSink::AllRows(&IfInput),
             child_side_required.then(|| DataExpectation::empty_rows(RelationViolation::from(rf))),
         ),
     )?;

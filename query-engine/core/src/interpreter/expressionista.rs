@@ -221,7 +221,7 @@ impl Expressionista {
         graph.mark_visited(node);
 
         match graph.node_content(node).unwrap() {
-            Node::Flow(Flow::If(_)) => Self::translate_if_node(graph, node, parent_edges),
+            Node::Flow(Flow::If { .. }) => Self::translate_if_node(graph, node, parent_edges),
             Node::Flow(Flow::Return(_)) => Self::translate_return_node(graph, node, parent_edges),
             _ => unreachable!(),
         }
@@ -265,9 +265,9 @@ impl Expressionista {
         let into_expr = Box::new(move |node: Node| {
             let flow: Flow = node.try_into()?;
 
-            if let Flow::If(cond_fn) = flow {
+            if let Flow::If { rule, data } = flow {
                 let if_expr = Expression::If {
-                    func: cond_fn,
+                    func: Box::new(move || rule.matches_data(&data)),
                     then: vec![then_expr],
                     else_: else_expr,
                 };

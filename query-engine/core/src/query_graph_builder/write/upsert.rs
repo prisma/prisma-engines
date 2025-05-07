@@ -1,8 +1,9 @@
 use super::{write_args_parser::WriteArgsParser, *};
 use crate::{
+    inputs::IfInput,
     query_ast::*,
     query_graph::{Flow, Node, QueryGraph, QueryGraphDependency},
-    DataExpectation, ParsedField, ParsedInputMap, ParsedInputValue, ParsedObject,
+    DataExpectation, DataSink, ParsedField, ParsedInputMap, ParsedInputValue, ParsedObject,
 };
 use query_structure::{IntoFilter, Model};
 use schema::QuerySchema;
@@ -117,23 +118,12 @@ pub(crate) fn upsert_record(
     graph.add_result_node(&read_node_create);
     graph.add_result_node(&read_node_update);
 
-    let if_node = graph.create_node(Flow::default_if());
+    let if_node = graph.create_node(Flow::if_non_empty());
 
     graph.create_edge(
         &read_parent_records_node,
         &if_node,
-        QueryGraphDependency::ProjectedDataDependency(
-            model_id.clone(),
-            Box::new(|if_node, parent_ids| {
-                if let Node::Flow(Flow::If(_)) = if_node {
-                    // Todo: This looks super unnecessary
-                    Ok(Node::Flow(Flow::If(Box::new(move || !parent_ids.is_empty()))))
-                } else {
-                    Ok(if_node)
-                }
-            }),
-            None,
-        ),
+        QueryGraphDependency::ProjectedDataSinkDependency(model_id.clone(), DataSink::AllRows(&IfInput), None),
     )?;
 
     // In case the connector doesn't support referential integrity, we add a subtree to the graph that emulates the ON_UPDATE referential action.
