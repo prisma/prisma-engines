@@ -1,6 +1,5 @@
-use itertools::{Either, Itertools};
+use itertools::Itertools;
 use prisma_value::PrismaValue;
-use std::iter;
 
 use super::*;
 
@@ -30,14 +29,13 @@ impl IntoFilter for SelectionResult {
 
 impl IntoFilter for Vec<SelectionResult> {
     fn filter(self) -> Filter {
-        let one = self.into_iter().exactly_one();
         if let Ok([(SelectedField::Scalar(sf), value @ PrismaValue::Placeholder { .. })]) =
-            one.as_ref().map(|res| &res.pairs[..])
+            self.iter().exactly_one().map(|res| &res.pairs[..])
         {
             return sf.is_in_template(value.clone());
         };
 
-        let filters = Either::from(one.map(iter::once)).fold(vec![], |mut acc, id| {
+        let filters = self.into_iter().fold(vec![], |mut acc, id| {
             acc.push(id.filter());
             acc
         });
