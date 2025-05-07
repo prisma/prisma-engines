@@ -1,8 +1,9 @@
 use crate::{
+    inputs::{LeftSideDiffInput, RightSideDiffInput},
     query_ast::*,
     query_graph::{Flow, Node, NodeRef, QueryGraph, QueryGraphDependency},
-    Computation, DataExpectation, DataOperation, MissingRelatedRecord, ParsedInputValue, QueryGraphBuilderResult,
-    RelationViolation,
+    Computation, DataExpectation, DataOperation, DataSink, MissingRelatedRecord, ParsedInputValue,
+    QueryGraphBuilderResult, RelationViolation,
 };
 use indexmap::IndexMap;
 use psl::parser_database::ReferentialAction;
@@ -172,20 +173,14 @@ pub fn insert_1to1_idempotent_connect_checks(
     let child_model = parent_relation_field.related_model();
     let child_model_identifier = child_model.primary_identifier();
 
-    let diff_node = graph.create_node(Node::Computation(Computation::empty_diff()));
+    let diff_node = graph.create_node(Node::Computation(Computation::empty_diff_left_to_right()));
 
     graph.create_edge(
         read_new_child_node,
         &diff_node,
-        QueryGraphDependency::ProjectedDataDependency(
+        QueryGraphDependency::ProjectedDataSinkDependency(
             child_model_identifier.clone(),
-            Box::new(move |mut diff_node, child_ids| {
-                if let Node::Computation(Computation::Diff(ref mut diff)) = diff_node {
-                    diff.right = child_ids.into_iter().collect();
-                }
-
-                Ok(diff_node)
-            }),
+            DataSink::AllRows(&LeftSideDiffInput),
             Some(DataExpectation::non_empty_rows(
                 MissingRelatedRecord::builder()
                     .model(&child_model.clone())
@@ -201,15 +196,9 @@ pub fn insert_1to1_idempotent_connect_checks(
     graph.create_edge(
         &read_old_child_node,
         &diff_node,
-        QueryGraphDependency::ProjectedDataDependency(
-            child_model_identifier,
-            Box::new(move |mut diff_node, child_ids| {
-                if let Node::Computation(Computation::Diff(ref mut diff)) = diff_node {
-                    diff.left = child_ids.into_iter().collect();
-                }
-
-                Ok(diff_node)
-            }),
+        QueryGraphDependency::ProjectedDataSinkDependency(
+            child_model_identifier.clone(),
+            DataSink::AllRows(&RightSideDiffInput),
             None,
         ),
     )?;
@@ -218,16 +207,19 @@ pub fn insert_1to1_idempotent_connect_checks(
     graph.create_edge(
         &diff_node,
         &if_node,
-        QueryGraphDependency::DataDependency(Box::new(move |if_node, result| {
-            let diff_result = result.as_diff_result().unwrap();
-            let should_connect = !diff_result.is_empty();
+        QueryGraphDependency::ProjectedDataDependency(
+            child_model_identifier,
+            Box::new(move |if_node, diff_result| {
+                let should_connect = !diff_result.is_empty();
 
-            if let Node::Flow(Flow::If(_)) = if_node {
-                Ok(Node::Flow(Flow::If(Box::new(move || should_connect))))
-            } else {
-                unreachable!()
-            }
-        })),
+                if let Node::Flow(Flow::If(_)) = if_node {
+                    Ok(Node::Flow(Flow::If(Box::new(move || should_connect))))
+                } else {
+                    unreachable!()
+                }
+            }),
+            None,
+        ),
     )?;
     let empty_node = graph.create_node(Node::Empty);
 

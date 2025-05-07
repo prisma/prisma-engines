@@ -20,7 +20,7 @@ use petgraph::{
     *,
 };
 use query_structure::{FieldSelection, IntoFilter, QueryArguments, SelectionResult};
-use std::{collections::HashSet, fmt};
+use std::fmt;
 
 pub type QueryGraphResult<T> = std::result::Result<T, QueryGraphError>;
 
@@ -88,21 +88,24 @@ impl Flow {
 
 // Current limitation: We need to narrow it down to ID diffs for Hash and EQ.
 pub enum Computation {
-    Diff(DiffNode),
+    DiffLeftToRight(DiffNode),
+    DiffRightToLeft(DiffNode),
 }
 
 impl Computation {
-    pub fn empty_diff() -> Self {
-        Self::Diff(DiffNode {
-            left: HashSet::new(),
-            right: HashSet::new(),
-        })
+    pub fn empty_diff_left_to_right() -> Self {
+        Self::DiffLeftToRight(DiffNode::default())
+    }
+
+    pub fn empty_diff_right_to_left() -> Self {
+        Self::DiffRightToLeft(DiffNode::default())
     }
 }
 
+#[derive(Default)]
 pub struct DiffNode {
-    pub left: HashSet<SelectionResult>,
-    pub right: HashSet<SelectionResult>,
+    pub left: Vec<SelectionResult>,
+    pub right: Vec<SelectionResult>,
 }
 
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone, Copy)]
@@ -135,9 +138,6 @@ pub(crate) type ProjectedDataDependencyFn =
 pub(crate) type DataDependencyFn =
     Box<dyn FnOnce(Node, &ExpressionResult) -> QueryGraphBuilderResult<Node> + Send + Sync + 'static>;
 
-pub(crate) type DiffDataDependencyFn =
-    Box<dyn FnOnce(Node, &[SelectionResult]) -> QueryGraphBuilderResult<Node> + Send + Sync + 'static>;
-
 /// Stored on the edges of the QueryGraph, a QueryGraphDependency contains information on how children are connected to their parents,
 /// expressing for example the need for additional information from the parent to be able to execute at runtime.
 pub enum QueryGraphDependency {
@@ -159,14 +159,6 @@ pub enum QueryGraphDependency {
     ProjectedDataDependency(FieldSelection, ProjectedDataDependencyFn, Option<DataExpectation>), // [Composites] todo rename
 
     ProjectedDataSinkDependency(FieldSelection, DataSink, Option<DataExpectation>),
-
-    /// Specialized version of `DataDependency` that accepts the the difference
-    /// between the left and right side of a parent diff operation.
-    DiffLeftDataDependency(DiffDataDependencyFn),
-
-    /// Specialized version of `DataDependency` that accepts the the difference
-    /// between the right and left side of a parent diff operation.
-    DiffRightDataDependency(DiffDataDependencyFn),
 
     /// Only valid in the context of a `If` control flow node.
     Then,
