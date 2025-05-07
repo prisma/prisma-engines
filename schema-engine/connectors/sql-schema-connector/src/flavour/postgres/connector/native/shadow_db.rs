@@ -1,4 +1,4 @@
-use crate::flavour::postgres::{sql_schema_from_migrations_and_db, MigratePostgresUrl};
+use crate::flavour::postgres::{sql_schema_from_migrations_and_db, MigratePostgresUrl, PpgParams};
 use crate::flavour::{PostgresConnector, SqlConnector, UsingExternalShadowDb};
 use schema_connector::{migrations_directory::MigrationDirectory, ConnectorResult};
 use schema_connector::{ConnectorError, ConnectorParams, Namespaces};
@@ -60,10 +60,10 @@ pub async fn sql_schema_from_migration_history(
                 .parse()
                 .map_err(ConnectorError::url_parse_error)?;
 
-            if shadow_database_url.scheme() == MigratePostgresUrl::WEBSOCKET_SCHEME {
+            if shadow_database_url.scheme() == MigratePostgresUrl::PRISMA_POSTGRES_SCHEME {
                 shadow_database_url
                     .query_pairs_mut()
-                    .append_pair(MigratePostgresUrl::DBNAME_PARAM, &shadow_database_name);
+                    .append_pair(PpgParams::DB_NAME_PARAM, &shadow_database_name);
             } else {
                 shadow_database_url.set_path(&format!("/{shadow_database_name}"));
             }
