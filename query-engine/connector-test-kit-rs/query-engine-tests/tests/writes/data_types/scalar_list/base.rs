@@ -151,7 +151,7 @@ mod basic_types {
               bytes
             }
           }"#),
-          @r###"{"data":{"updateOneScalarModel":{"strings":["updated","now","future","more","items"],"ints":[14,15,16,17],"floats":[1.2345678,2.0,3.0,4.0],"booleans":[false,false,true,true,false,true],"enums":["A","B","A"],"dateTimes":["2019-07-31T23:59:01.000Z","2019-07-31T23:59:01.000Z","2019-07-31T23:59:01.000Z","2019-07-31T23:59:01.000Z"],"bytes":["dGVzdA==","dGVzdA==","dGVzdA==","dGVzdA=="]}}}"###
+          @r###"{"data":{"updateOneScalarModel":{"strings":["updated","now","future","more","items"],"ints":[14,15,16,17],"floats":[1.2345678,2,3,4],"booleans":[false,false,true,true,false,true],"enums":["A","B","A"],"dateTimes":["2019-07-31T23:59:01.000Z","2019-07-31T23:59:01.000Z","2019-07-31T23:59:01.000Z","2019-07-31T23:59:01.000Z"],"bytes":["dGVzdA==","dGVzdA==","dGVzdA==","dGVzdA=="]}}}"###
         );
 
         Ok(())
@@ -327,7 +327,7 @@ mod basic_types {
               bytes
             }
           }"#),
-          @r###"{"data":{"updateOneScalarModel":{"strings":["present","future"],"ints":[14,15],"floats":[1.0,2.0],"booleans":[false,true],"dateTimes":["2019-07-31T23:59:01.000Z","2019-07-31T23:59:02.000Z"],"bytes":["dGVzdA==","dGVzdA=="]}}}"###
+          @r###"{"data":{"updateOneScalarModel":{"strings":["present","future"],"ints":[14,15],"floats":[1,2],"booleans":[false,true],"dateTimes":["2019-07-31T23:59:01.000Z","2019-07-31T23:59:02.000Z"],"bytes":["dGVzdA==","dGVzdA=="]}}}"###
         );
 
         Ok(())
