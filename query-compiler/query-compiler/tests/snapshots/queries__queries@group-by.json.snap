@@ -5,10 +5,10 @@ input_file: query-compiler/query-compiler/tests/data/group-by.json
 ---
 dataMap
    _count: 
-      all: Int [all]
       id: Int [id]
       title: Int [title]
       userId: Int [userId]
+      _all: Int [_all]
 query «SELECT COUNT("public"."Post"."id") AS "_count.id",
        COUNT("public"."Post"."title") AS "_count.title",
        COUNT("public"."Post"."userId") AS "_count.userId", COUNT(*) AS

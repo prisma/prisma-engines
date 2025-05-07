@@ -128,9 +128,14 @@ fn get_result_node_for_aggregation(
     for (underscore_name, name, typ) in selectors
         .iter()
         .flat_map(|sel| {
-            sel.identifiers()
-                .into_iter()
-                .map(|(name, typ, _)| (aggregate_underscore_name(sel), name, typ))
+            sel.identifiers().into_iter().map(move |(name, typ, _)| {
+                let name = if matches!(&sel, AggregationSelection::Count { all: true, .. }) && name == "all" {
+                    "_all".to_owned()
+                } else {
+                    name
+                };
+                (aggregate_underscore_name(sel), name, typ)
+            })
         })
         .sorted_by_key(|(underscore_name, name, _)| ordered_set.get_index_of(&(*underscore_name, name.as_str())))
     {
