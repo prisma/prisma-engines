@@ -39,7 +39,7 @@ pub(crate) fn update_record(
     )?;
 
     if query_schema.relation_mode().is_prisma() {
-        let read_parent_node = graph.create_node(utils::read_ids_infallible(
+        let read_parent_node = graph.create_node(utils::read_id_infallible(
             model.clone(),
             model.primary_identifier(),
             filter,
