@@ -128,7 +128,7 @@ mod basic_types {
               bytes
             }
           }"#),
-          @r###"{"data":{"updateOneScalarModel":{"strings":["updated","now","future"],"ints":[14,15],"floats":[1.2345678,2.0],"booleans":[false,false,true,true],"enums":["A"],"dateTimes":["2019-07-31T23:59:01.000Z","2019-07-31T23:59:01.000Z"],"bytes":["dGVzdA==","dGVzdA=="]}}}"###
+          @r###"{"data":{"updateOneScalarModel":{"strings":["updated","now","future"],"ints":[14,15],"floats":[1.2345678,2],"booleans":[false,false,true,true],"enums":["A"],"dateTimes":["2019-07-31T23:59:01.000Z","2019-07-31T23:59:01.000Z"],"bytes":["dGVzdA==","dGVzdA=="]}}}"###
         );
 
         insta::assert_snapshot!(
@@ -260,10 +260,10 @@ mod basic_types {
 
         insta::assert_snapshot!(
           run_query!(&runner, r#"mutation {
-            updateOneScalarModel(where: { id: 1 }, data: {              
-              enums:     { push: A }              
-            }) {             
-              enums              
+            updateOneScalarModel(where: { id: 1 }, data: {
+              enums:     { push: A }
+            }) {
+              enums
             }
           }"#),
           @r###"{"data":{"updateOneScalarModel":{"enums":["A"]}}}"###
@@ -271,10 +271,10 @@ mod basic_types {
 
         insta::assert_snapshot!(
           run_query!(&runner, r#"mutation {
-            updateOneScalarModel(where: { id: 2 }, data: {              
-              enums:     { push: [A, B] }              
-            }) {           
-              enums              
+            updateOneScalarModel(where: { id: 2 }, data: {
+              enums:     { push: [A, B] }
+            }) {
+              enums
             }
           }"#),
           @r###"{"data":{"updateOneScalarModel":{"enums":["A","B"]}}}"###
@@ -294,19 +294,19 @@ mod basic_types {
               strings:   { push: "future" }
               ints:      { push: 15 }
               floats:    { push: 2 }
-              booleans:  { push: true }              
+              booleans:  { push: true }
               dateTimes: { push: "2019-07-31T23:59:01.000Z" }
               bytes:     { push: "dGVzdA==" }
             }) {
               strings
               ints
               floats
-              booleans              
+              booleans
               dateTimes
               bytes
             }
           }"#),
-          @r###"{"data":{"updateOneScalarModel":{"strings":["future"],"ints":[15],"floats":[2.0],"booleans":[true],"dateTimes":["2019-07-31T23:59:01.000Z"],"bytes":["dGVzdA=="]}}}"###
+          @r###"{"data":{"updateOneScalarModel":{"strings":["future"],"ints":[15],"floats":[2],"booleans":[true],"dateTimes":["2019-07-31T23:59:01.000Z"],"bytes":["dGVzdA=="]}}}"###
         );
 
         insta::assert_snapshot!(
@@ -315,14 +315,14 @@ mod basic_types {
               strings:   { push: ["present", "future"] }
               ints:      { push: [14, 15] }
               floats:    { push: [1, 2] }
-              booleans:  { push: [false, true] }              
+              booleans:  { push: [false, true] }
               dateTimes: { push: ["2019-07-31T23:59:01.000Z", "2019-07-31T23:59:02.000Z"] }
               bytes:     { push: ["dGVzdA==", "dGVzdA=="] }
             }) {
               strings
               ints
               floats
-              booleans              
+              booleans
               dateTimes
               bytes
             }
