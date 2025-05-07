@@ -175,13 +175,14 @@ pub enum QueryGraphDependency {
     Else,
 }
 
+#[derive(Debug)]
 pub enum DataSink {
     AllRows(&'static dyn NodeInputField<Vec<SelectionResult>>),
     SingleRow(&'static dyn NodeInputField<SelectionResult>),
     SingleRowArray(&'static dyn NodeInputField<Vec<SelectionResult>>),
 }
 
-pub trait NodeInputField<R>: Send + Sync {
+pub trait NodeInputField<R>: Send + Sync + std::fmt::Debug {
     fn node_input_field<'a>(&self, node: &'a mut Node) -> &'a mut R;
 }
 

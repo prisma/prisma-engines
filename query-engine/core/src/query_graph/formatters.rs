@@ -118,10 +118,10 @@ impl Display for QueryGraphDependency {
                         .collect::<Vec<_>>()
                 )
             }
-            Self::ProjectedDataSinkDependency(selection, _, _) => {
+            Self::ProjectedDataSinkDependency(selection, sink, _) => {
                 write!(
                     f,
-                    "ProjectedDataSinkDependency ({:?})",
+                    "ProjectedDataSinkDependency({sink:?}) {:?}",
                     selection
                         .selections()
                         .map(|f| format!("{}.{}", f.container().name(), f.prisma_name()))
