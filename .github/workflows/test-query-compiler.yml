@@ -51,3 +51,4 @@ jobs:
       setup_task: ${{ matrix.adapter.setup_task }}
       ignored_tests_list: ${{ matrix.adapter.ignored_tests_list }}
       should_fail_tests_list: ${{ matrix.adapter.should_fail_tests_list }}
+      relation_load_strategy: ${{ matrix.adapter.relation_load_strategy }}
