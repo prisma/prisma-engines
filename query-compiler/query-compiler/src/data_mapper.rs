@@ -5,7 +5,7 @@ use query_core::{
     CreateManyRecordsFields, DeleteRecordFields, Node, Query, QueryGraph, ReadQuery, UpdateManyRecordsFields,
     UpdateRecord, WriteQuery, schema::constants::aggregations,
 };
-use query_structure::{AggregationSelection, FieldSelection, SelectedField, TypeIdentifier};
+use query_structure::{AggregationSelection, FieldSelection, SelectedField};
 use std::collections::HashMap;
 
 pub fn map_result_structure(graph: &QueryGraph) -> Option<ResultNode> {
