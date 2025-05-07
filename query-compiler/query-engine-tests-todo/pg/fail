@@ -19,7 +19,6 @@ new::ref_actions::on_delete::cascade::one2many_req::delete_parent
 new::ref_actions::on_delete::cascade::one2one_opt::delete_parent
 new::ref_actions::on_delete::cascade::one2one_opt::delete_parent_diff_id_name
 new::ref_actions::on_delete::cascade::one2one_req::delete_parent
-new::ref_actions::on_delete::restrict::one2many_opt::delete_parent
 new::ref_actions::on_delete::restrict::one2many_opt::delete_parent_failure
 new::ref_actions::on_delete::restrict::one2many_req::delete_parent_failure
 new::ref_actions::on_delete::restrict::one2one_opt::delete_parent_failure
