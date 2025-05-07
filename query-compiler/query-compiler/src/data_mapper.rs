@@ -1,9 +1,11 @@
 use crate::result_node::ResultNode;
+use indexmap::IndexSet;
+use itertools::Itertools;
 use query_core::{
     CreateManyRecordsFields, DeleteRecordFields, Node, Query, QueryGraph, ReadQuery, UpdateManyRecordsFields,
-    UpdateRecord, WriteQuery,
+    UpdateRecord, WriteQuery, schema::constants::aggregations,
 };
-use query_structure::{AggregationSelection, FieldSelection, SelectedField, TypeIdentifier};
+use query_structure::{AggregationSelection, FieldSelection, SelectedField};
 use std::collections::HashMap;
 
 pub fn map_result_structure(graph: &QueryGraph) -> Option<ResultNode> {
@@ -106,47 +108,59 @@ fn get_result_node(
 }
 
 fn get_result_node_for_aggregation(
-    selectors: &Vec<AggregationSelection>,
-    selection_order: &Vec<(String, Option<Vec<String>>)>,
+    selectors: &[AggregationSelection],
+    selection_order: &[(String, Option<Vec<String>>)],
 ) -> Option<ResultNode> {
-    let mut node = ResultNode::new_object();
+    let mut ordered_set = IndexSet::new();
 
-    let mut selector_type_map = HashMap::<String, TypeIdentifier>::new();
-    for selector in selectors {
-        for identifier in selector.identifiers() {
-            selector_type_map.insert(identifier.0, identifier.1);
+    for (key, nested) in selection_order {
+        if let Some(nested) = nested {
+            for nested_key in nested {
+                ordered_set.insert((Some(key.as_str()), nested_key.as_str()));
+            }
+        } else {
+            ordered_set.insert((None, key.as_str()));
         }
     }
 
-    for (nested_name, field_names) in selection_order {
-        if let Some(field_names) = field_names {
-            let mut agg_node = ResultNode::new_object();
+    let mut node = ResultNode::new_object();
 
-            for field_name in field_names {
-                let result_type = if field_name == "_all" {
-                    selector_type_map.get("all")
+    for (underscore_name, name, typ) in selectors
+        .iter()
+        .flat_map(|sel| {
+            sel.identifiers().into_iter().map(move |(name, typ, _)| {
+                let name = if matches!(&sel, AggregationSelection::Count { all: true, .. }) && name == "all" {
+                    "_all".to_owned()
                 } else {
-                    selector_type_map.get(field_name)
+                    name
                 };
-
-                if let Some(result_type) = result_type {
-                    agg_node.add_field(
-                        field_name,
-                        ResultNode::Value {
-                            db_name: field_name.into(),
-                            result_type: result_type.to_prisma_type(),
-                        },
-                    );
-                } else {
-                    panic!("Unknown type for aggregate field: {field_name}");
-                }
-            }
-
-            node.add_field(nested_name, agg_node);
+                (aggregate_underscore_name(sel), name, typ)
+            })
+        })
+        .sorted_by_key(|(underscore_name, name, _)| ordered_set.get_index_of(&(*underscore_name, name.as_str())))
+    {
+        let value = ResultNode::new_value(name.clone(), typ.to_prisma_type());
+        if let Some(undescore_name) = underscore_name {
+            node.entry(undescore_name)
+                .or_insert_with(ResultNode::new_object)
+                .add_field(name, value);
+        } else {
+            node.add_field(name, value);
         }
     }
 
     Some(node)
+}
+
+fn aggregate_underscore_name(sel: &AggregationSelection) -> Option<&'static str> {
+    match sel {
+        AggregationSelection::Field(_) => None,
+        AggregationSelection::Count { .. } => Some(aggregations::UNDERSCORE_COUNT),
+        AggregationSelection::Average(_) => Some(aggregations::UNDERSCORE_AVG),
+        AggregationSelection::Sum(_) => Some(aggregations::UNDERSCORE_SUM),
+        AggregationSelection::Min(_) => Some(aggregations::UNDERSCORE_MIN),
+        AggregationSelection::Max(_) => Some(aggregations::UNDERSCORE_MAX),
+    }
 }
 
 fn get_result_node_for_create_many(selected_fields: Option<&CreateManyRecordsFields>) -> Option<ResultNode> {

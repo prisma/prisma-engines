@@ -82,10 +82,16 @@ pub(crate) fn translate_read_query(query: ReadQuery, builder: &dyn QueryBuilder)
             group_by,
             having,
         }) => {
+            let has_group_by = !group_by.is_empty();
             let query = builder
                 .build_aggregate(&model, args, &selectors, group_by, having)
                 .map_err(TranslateError::QueryBuildFailure)?;
-            Expression::Unique(Box::new(Expression::Query(query)))
+            let expr = Expression::Query(query);
+            if has_group_by {
+                expr
+            } else {
+                Expression::Unique(expr.into())
+            }
         }
     })
 }

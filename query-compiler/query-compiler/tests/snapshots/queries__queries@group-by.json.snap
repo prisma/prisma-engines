@@ -1,9 +1,7 @@
 ---
 source: query-compiler/query-compiler/tests/queries.rs
-assertion_line: 61
 expression: pretty
 input_file: query-compiler/query-compiler/tests/data/group-by.json
-snapshot_kind: text
 ---
 dataMap
    _count: 
@@ -11,10 +9,9 @@ dataMap
       title: Int [title]
       userId: Int [userId]
       _all: Int [_all]
-unique (query «SELECT COUNT("public"."Post"."id") AS "_count.id",
-               COUNT("public"."Post"."title") AS "_count.title",
-               COUNT("public"."Post"."userId") AS "_count.userId", COUNT(*) AS
-               "_count._all" FROM "public"."Post" WHERE
-               "public"."Post"."title"::text LIKE $1 GROUP BY
-               "public"."Post"."title" OFFSET $2»
-        params [const(String("%something%")), const(BigInt(0))])
+query «SELECT COUNT("public"."Post"."id") AS "_count.id",
+       COUNT("public"."Post"."title") AS "_count.title",
+       COUNT("public"."Post"."userId") AS "_count.userId", COUNT(*) AS
+       "_count._all" FROM "public"."Post" WHERE "public"."Post"."title"::text
+       LIKE $1 GROUP BY "public"."Post"."title" OFFSET $2»
+params [const(String("%something%")), const(BigInt(0))]
