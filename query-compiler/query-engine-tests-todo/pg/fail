@@ -76,9 +76,6 @@ queries::aggregation::combination_spec::decimal_combinations::some_records
 queries::aggregation::combination_spec::decimal_combinations::with_query_args
 queries::aggregation::group_by::aggregation_group_by::group_by_ordering_sum_aggregation
 queries::aggregation::group_by::aggregation_group_by::regression_21789
-queries::aggregation::group_by_having::aggr_group_by_having::having_max_scalar_filter
-queries::aggregation::group_by_having::aggr_group_by_having::having_min_scalar_filter
-queries::aggregation::group_by_having::aggr_group_by_having::having_sum_scalar_filter
 queries::aggregation::group_by_having::decimal_aggregation_group_by_having::having_avg_scalar_filter
 queries::aggregation::group_by_having::decimal_aggregation_group_by_having::having_max_scalar_filter
 queries::aggregation::group_by_having::decimal_aggregation_group_by_having::having_min_scalar_filter
