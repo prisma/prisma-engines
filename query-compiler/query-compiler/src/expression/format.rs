@@ -325,6 +325,7 @@ where
                                 .text("rowCountNeq")
                                 .append(self.softline())
                                 .append(self.text(count.to_string())),
+                            DataRule::Never => self.text("never"),
                         };
                         self.softline().append(rendered_rule).append(self.line())
                     }),

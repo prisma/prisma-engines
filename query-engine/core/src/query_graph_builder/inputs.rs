@@ -1,6 +1,6 @@
 use query_structure::SelectionResult;
 
-use crate::{Computation, Node, NodeInputField, Query, WriteQuery};
+use crate::{Computation, Flow, Node, NodeInputField, Query, WriteQuery};
 
 #[derive(Debug)]
 pub(crate) struct UpdateRecordFilterInput;
@@ -54,6 +54,19 @@ impl NodeInputField<Vec<SelectionResult>> for RightSideDiffInput {
             &mut diff_node.right
         } else {
             panic!("RightSideDiffInput can only be used with DiffLeftToRight or DiffRightToLeft node")
+        }
+    }
+}
+
+#[derive(Debug)]
+pub(crate) struct IfInput;
+
+impl NodeInputField<Vec<SelectionResult>> for IfInput {
+    fn node_input_field<'a>(&self, node: &'a mut Node) -> &'a mut Vec<SelectionResult> {
+        if let Node::Flow(Flow::If { data, .. }) = node {
+            data
+        } else {
+            panic!("IfInput can only be used with If node")
         }
     }
 }

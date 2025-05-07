@@ -74,15 +74,25 @@ impl From<Flow> for Node {
 pub enum Flow {
     /// Expresses a conditional control flow in the graph.
     /// Possible outgoing edges are `then` and `else`, each at most once, with `then` required to be present.
-    If(Box<dyn FnOnce() -> bool + Send + Sync + 'static>),
+    If { rule: DataRule, data: Vec<SelectionResult> },
 
     /// Returns a fixed set of results at runtime.
     Return(Option<Vec<SelectionResult>>),
 }
 
 impl Flow {
-    pub fn default_if() -> Self {
-        Self::If(Box::new(|| true))
+    pub fn if_non_empty() -> Self {
+        Self::If {
+            rule: DataRule::RowCountNeq(0),
+            data: Vec::new(),
+        }
+    }
+
+    pub fn if_false() -> Self {
+        Self::If {
+            rule: DataRule::Never,
+            data: Vec::new(),
+        }
     }
 }
 
@@ -216,17 +226,8 @@ impl DataExpectation {
 
     pub fn check(&self, results: &[SelectionResult]) -> Result<(), QueryGraphBuilderError> {
         for rule in &self.rules {
-            match rule {
-                DataRule::RowCountEq(expected) => {
-                    if results.len() != *expected {
-                        return Err(self.error.to_runtime_error(results));
-                    }
-                }
-                DataRule::RowCountNeq(expected) => {
-                    if results.len() == *expected {
-                        return Err(self.error.to_runtime_error(results));
-                    }
-                }
+            if !rule.matches_data(results) {
+                return Err(self.error.to_runtime_error(results));
             }
         }
         Ok(())
@@ -241,6 +242,18 @@ pub enum DataRule {
     RowCountEq(usize),
     /// Expect the data dependency to contain a number of rows that is not equal to the given value.
     RowCountNeq(usize),
+    /// Expect the edge to not be taken and never match any data.
+    Never,
+}
+
+impl DataRule {
+    pub fn matches_data(&self, results: &[SelectionResult]) -> bool {
+        match self {
+            Self::RowCountEq(expected) => results.len() == *expected,
+            Self::RowCountNeq(expected) => results.len() != *expected,
+            Self::Never => false,
+        }
+    }
 }
 
 /// An error that can occur during data dependency validation.
@@ -628,7 +641,7 @@ impl QueryGraph {
                     .expect("Expected marked nodes to be non-empty.")
                 {
                     // Exception rule: Only swap `Then` and `Else` edges.
-                    Node::Flow(Flow::If(_)) => {
+                    Node::Flow(Flow::If { .. }) => {
                         if matches!(
                             self.edge_content(&parent_edge),
                             Some(QueryGraphDependency::Then) | Some(QueryGraphDependency::Else)
@@ -710,7 +723,7 @@ impl QueryGraph {
         for node_ix in self.graph.node_indices() {
             let node = NodeRef { node_ix };
 
-            if let Node::Flow(Flow::If(_)) = self.node_content(&node).unwrap() {
+            if let Node::Flow(Flow::If { .. }) = self.node_content(&node).unwrap() {
                 let parents = self.incoming_edges(&node);
 
                 for parent_edge in parents {
