@@ -21,12 +21,14 @@ transaction
              in let 2 = let 0$id = mapField id (validate (get 0)
                             [ rowCountNeq 0
                             ] orRaise "MISSING_RECORD")
-                    in unique (query «SELECT "public"."Employee"."id",
-                                      "public"."Employee"."managerId" FROM
-                                      "public"."Employee" WHERE
-                                      "public"."Employee"."id" = $1 LIMIT $2
-                                      OFFSET $3»
-                               params [var(0$id as Int), const(BigInt(1)),
-                                       const(BigInt(0))])
+                    in let 2 = unique (query «SELECT "public"."Employee"."id",
+                                              "public"."Employee"."managerId"
+                                              FROM "public"."Employee" WHERE
+                                              "public"."Employee"."id" = $1
+                                              LIMIT $2 OFFSET $3»
+                                       params [var(0$id as Int),
+                                               const(BigInt(1)),
+                                               const(BigInt(0))])
+                       in get 2
                 in get 2
       in get 0

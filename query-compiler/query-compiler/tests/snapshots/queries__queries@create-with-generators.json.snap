@@ -1,17 +1,17 @@
 ---
 source: query-compiler/query-compiler/tests/queries.rs
-assertion_line: 49
 expression: pretty
 input_file: query-compiler/query-compiler/tests/data/create-with-generators.json
-snapshot_kind: text
 ---
 dataMap
    id: String [id]
    email: String [email]
    createdAt: Date [createdAt]
-unique (query «INSERT INTO "public"."UserWithGenerators"
-               ("id","email","createdAt") VALUES ($1,$2,$3) RETURNING
-               "public"."UserWithGenerators"."id",
-               "public"."UserWithGenerators"."email",
-               "public"."UserWithGenerators"."createdAt"»
-        params [uuid(const(Int(7))), const(String("user.1@prisma.io")), now()])
+let 0 = unique (query «INSERT INTO "public"."UserWithGenerators"
+                       ("id","email","createdAt") VALUES ($1,$2,$3) RETURNING
+                       "public"."UserWithGenerators"."id",
+                       "public"."UserWithGenerators"."email",
+                       "public"."UserWithGenerators"."createdAt"»
+                params [uuid(const(Int(7))), const(String("user.1@prisma.io")),
+                        now()])
+in get 0

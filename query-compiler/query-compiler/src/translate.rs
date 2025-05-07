@@ -94,13 +94,10 @@ impl<'a, 'b> NodeTranslator<'a, 'b> {
     }
 
     fn translate_children(&mut self) -> TranslateResult<Vec<Expression>> {
-        // Don't recurse into children if the current node is already a result node.
-        let children = if !self.graph.is_result_node(&self.node) {
-            self.process_children()?
-        } else {
-            Vec::new()
-        };
-
+        let mut children = self.process_children()?;
+        if self.graph.is_result_node(&self.node) {
+            children.push(Expression::Get { name: self.node.id() });
+        }
         Ok(children)
     }
 

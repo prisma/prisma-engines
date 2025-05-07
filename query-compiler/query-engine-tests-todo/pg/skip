@@ -1,3 +1,8 @@
+# Behaviour depends on the timezone
+raw::sql::input_coercion::input_coercion::scalar_input_correctly_coerced
+writes::data_types::datetime::where_and_datetime::where_and_datetime::test_1
+writes::data_types::datetime::where_and_datetime::where_and_datetime::test_2
+
 # Slow, likely timing out, maybe deadlock
 new::regressions::prisma_11750::prisma_11750::test_itx_concurrent_updates_multi_thread
 new::regressions::prisma_11750::prisma_11750::test_itx_concurrent_updates_single_thread
