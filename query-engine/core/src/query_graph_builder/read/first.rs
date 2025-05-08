@@ -24,11 +24,17 @@ pub(crate) fn find_first_or_throw(
 
 #[inline]
 fn try_limit_to_one(mut query: ReadQuery) -> QueryGraphBuilderResult<ReadQuery> {
-    Ok(match query {
-        ReadQuery::ManyRecordsQuery(ref mut m) if m.args.take.is_all() => {
-            m.args.take = Take::One;
-            query
+    match query {
+        ReadQuery::ManyRecordsQuery(ref mut m) => {
+            if matches!(m.args.take, Take::All | Take::Some(1)) {
+                m.args.take = Take::One;
+            } else {
+                return Err(QueryGraphBuilderError::InputError(
+                    "The 'findFirst' operation cannot be used with a 'take' argument that isn't 1".into(),
+                ));
+            }
+            Ok(query)
         }
-        _ => query,
-    })
+        _ => Ok(query),
+    }
 }

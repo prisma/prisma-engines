@@ -186,7 +186,7 @@ impl<'a> RequestHandler<'a> {
                             }
                             None if throw_on_empty => responses.insert_error(GQLError::from_user_facing_error(
                                 user_facing_errors::query_engine::RecordRequiredButNotFound {
-                                    cause: "Expected a record, found none.".to_owned(),
+                                    cause: "No record was found for a query.".to_owned(),
                                 }
                                 .into(),
                             )),

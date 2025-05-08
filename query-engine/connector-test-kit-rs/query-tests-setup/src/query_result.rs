@@ -274,12 +274,12 @@ mod tests {
       {
          "errors":[
             {
-               "error":"An operation failed because it depends on one or more records that were required but not found. Expected a record, found none.",
+               "error":"An operation failed because it depends on one or more records that were required but not found. No record was found for a query.",
                "user_facing_error":{
                   "is_panic":false,
-                  "message":"An operation failed because it depends on one or more records that were required but not found. Expected a record, found none.",
+                  "message":"An operation failed because it depends on one or more records that were required but not found. No record was found for a query.",
                   "meta":{
-                     "cause":"Expected a record, found none."
+                     "cause":"No record was found for a query."
                   },
                   "error_code":"P2025"
                }
@@ -301,8 +301,8 @@ mod tests {
                     SimpleGqlResponse {
                         data: serde_json::Value::Null,
                         errors: vec![GQLError::from_user_facing_error(user_facing_errors::KnownError {
-                            message: "An operation failed because it depends on one or more records that were required but not found. Expected a record, found none.".to_string(),
-                            meta: json!({"cause": "Expected a record, found none."}),
+                            message: "An operation failed because it depends on one or more records that were required but not found. No record was found for a query.".to_string(),
+                            meta: json!({"cause": "No record was found for a query."}),
                             error_code: std::borrow::Cow::from("P2025"),
                         }.into())],
                         extensions: None,
