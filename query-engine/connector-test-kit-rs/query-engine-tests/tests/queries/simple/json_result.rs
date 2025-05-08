@@ -11,9 +11,12 @@ mod json_as_result {
             .await?
             .assert_success();
 
-        assert_query!(
-            runner,
-            "query {findFirstTestModel(distinct: [json]) {json}}",
+        assert_eq!(
+            runner
+                .query("query {findFirstTestModel(distinct: [json]) {json}}")
+                .await?
+                .to_string()
+                .replace(" ", ""), // ignore whitespace in the JSON string
             r#"{"data":{"findFirstTestModel":{"json":"{\"foo\":1}"}}}"#
         );
 
