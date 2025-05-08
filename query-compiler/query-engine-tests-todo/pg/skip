@@ -61,7 +61,6 @@ writes::top_level_mutations::non_embedded_upsert::non_embedded_upsert::nested_de
 writes::top_level_mutations::non_embedded_upsert::non_embedded_upsert::nested_disconnect_in_update
 writes::top_level_mutations::update::update::update_an_item
 writes::top_level_mutations::update::update::update_fail_uniq_field_inexistant_value
-writes::top_level_mutations::update::update::update_fails_if_filter_dont_match
 writes::top_level_mutations::update::update::update_with_shorthand_notation
 writes::top_level_mutations::update::update::updated_created_at_mutable_with_update
 writes::top_level_mutations::update_many_and_return::update_many_and_return::update_many_11_inline_rel_read_works

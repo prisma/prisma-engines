@@ -88,7 +88,6 @@ queries::chunking::chunking::order_by_aggregation_should_fail
 queries::data_types::enum_type::enum_type::read_one_invalid_sqlite
 queries::data_types::json::json::dollar_type_in_json_protocol
 queries::data_types::json::json::nested_dollar_type_in_json_protocol
-queries::data_types::json::json::read_plain_float
 queries::data_types::through_relation::scalar_relations::common_types
 queries::distinct::distinct::empty_database
 queries::distinct::distinct::nested_distinct
@@ -196,10 +195,7 @@ queries::order_and_pagination::pagination::pagination::cursor_take_skip_multiple
 queries::regressions::pagination_regression::pagination_regr::prisma_3505_case_1
 queries::relations::inline_relation::inline_rel::scalar_field_back_relation
 queries::relations::related_null_queries::inline_relation::multi_field_1n_rel_with_nulls
-queries::simple::find_first_or_throw::find_first_or_throw_query::find_first_or_throw_not_matching
-queries::simple::find_unique_or_throw::find_unique_or_throw::no_result_find_unique_by_id
-queries::simple::find_unique_or_throw::find_unique_or_throw::no_result_find_unique_by_multi_unique
-queries::simple::find_unique_or_throw::find_unique_or_throw::no_result_find_unique_by_single_unique
+queries::simple::json_result::json_as_result::test_when_distinct_result_is_json
 queries::views::views::sorted_read
 raw::sql::typed_output::typed_output::all_scalars_sqlite
 writes::ids::byoid::byoid::nested_upsert_should_work_1
@@ -238,7 +234,6 @@ writes::top_level_mutations::non_embedded_upsert::non_embedded_upsert::nested_co
 writes::top_level_mutations::non_embedded_upsert::non_embedded_upsert::nested_delete_in_update
 writes::top_level_mutations::non_embedded_upsert::non_embedded_upsert::nested_disconnect_in_update
 writes::top_level_mutations::update::update::update_fail_uniq_field_inexistant_value
-writes::top_level_mutations::update::update::update_fails_if_filter_dont_match
 writes::top_level_mutations::update_many_and_return::update_many_and_return::update_many_11_inline_rel_read_works
 writes::top_level_mutations::upsert::upsert::only_update_if_uniq_field_change
 writes::top_level_mutations::upsert::upsert::only_update_if_update_changes_nothing

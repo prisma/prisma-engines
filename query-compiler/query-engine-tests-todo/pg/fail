@@ -3,7 +3,6 @@ new::interactive_tx::interactive_tx::batch_queries_rollback
 new::interactive_tx::interactive_tx::commit_after_rollback
 new::interactive_tx::interactive_tx::double_commit
 new::interactive_tx::interactive_tx::double_rollback
-new::interactive_tx::interactive_tx::raw_queries
 new::interactive_tx::interactive_tx::rollback_after_commit
 new::interactive_tx::interactive_tx::tx_expiration_cycle
 new::interactive_tx::interactive_tx::tx_expiration_failure_cycle
@@ -41,7 +40,6 @@ new::relation_load_strategy::relation_load_strategy::test_find_first_or_throw_la
 new::relation_load_strategy::relation_load_strategy::test_find_many_lateral_join
 new::relation_load_strategy::relation_load_strategy::test_find_unique_lateral_join
 new::relation_load_strategy::relation_load_strategy::test_find_unique_or_throw_lateral_join
-new::relation_load_strategy::relation_load_strategy::test_find_unique_or_throw_lateral_query
 new::relation_load_strategy::relation_load_strategy::test_update_lateral_join
 new::relation_load_strategy::relation_load_strategy::test_upsert_lateral_join
 new::relation_load_strategy::relation_load_strategy::test_upsert_lateral_query
@@ -95,15 +93,12 @@ queries::batching::transactional_batch::transactional::batch_request_idx
 queries::batching::transactional_batch::transactional::invalid_isolation_level
 queries::batching::transactional_batch::transactional::one_query
 queries::batching::transactional_batch::transactional::one_success_one_fail
-queries::batching::transactional_batch::transactional::raw_mix
 queries::chunking::chunking::order_by_aggregation_should_fail
 queries::chunking::chunking::order_by_relevance_should_fail
 queries::data_types::json::json::dollar_type_in_json_protocol
 queries::data_types::json::json::json_list
 queries::data_types::json::json::nested_dollar_type_in_json_protocol
-queries::data_types::json::json::read_plain_float
 queries::data_types::native::postgres::postgres_datetime::dt_native
-queries::data_types::native::postgres::postgres_decimal::native_decimal_types
 queries::data_types::native::postgres::postgres_others::native_other_types
 queries::data_types::through_relation::scalar_relations::common_types
 queries::distinct::distinct::nested_distinct
@@ -208,10 +203,6 @@ queries::order_and_pagination::pagination::pagination::cursor_take_skip_multiple
 queries::regressions::pagination_regression::pagination_regr::prisma_3505_case_1
 queries::regressions::pagination_regression::pagination_regr::prisma_3505_case_2
 queries::relations::related_null_queries::inline_relation::multi_field_1n_rel_with_nulls
-queries::simple::find_first_or_throw::find_first_or_throw_query::find_first_or_throw_not_matching
-queries::simple::find_unique_or_throw::find_unique_or_throw::no_result_find_unique_by_id
-queries::simple::find_unique_or_throw::find_unique_or_throw::no_result_find_unique_by_multi_unique
-queries::simple::find_unique_or_throw::find_unique_or_throw::no_result_find_unique_by_single_unique
 queries::simple::m2m::m2m::repro_16390
 queries::views::views::sorted_read
 raw::sql::errors::raw_errors::list_param_for_scalar_column_should_not_panic_pg_js
