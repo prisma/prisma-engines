@@ -42,6 +42,10 @@ COMMON_LINES = (
     '[<TIMESTAMP> INFO tokio_postgres::connection] NOTICE:',
 )
 
+DO_NOT_CLEAN = (
+    'PanicError:',
+)
+
 RX_BLOCK_START = re.compile(
     r'''^(
         datasource\s+\w+\s*\{
@@ -72,7 +76,10 @@ class Mode(Enum):
 def clean_doc(lines: Iterable[str]) -> Iterable[str]:
     mode: Mode = Mode.keep
     for line in lines:
-        line = clean_line(line)
+        line = line.strip()
+
+        if not any(substring in line for substring in DO_NOT_CLEAN):
+            line = clean_line(line)
 
         if not line or any(common in line for common in COMMON_LINES):
             continue
@@ -118,7 +125,7 @@ def clean_line(line: str) -> str:
     line = re.sub(r'\*{3,}', '<SEP>', line)  # Separators
     line = re.sub(r'-{3,}', '<SEP>', line)  # Separators
     line = re.sub(r'[ \t]{2,}', ' ', line)  # Repeated spaces and tabs, but not newlines
-    return line.strip()
+    return line
 
 
 def plot_clusters_2d(reduced: np.ndarray, labels: np.ndarray):
@@ -342,7 +349,7 @@ def main():
     test_count = len(clustering.tests)
     cluster_count = len(clustering.clusters)
     not_clustered = clustering.not_clustered
-    not_clustered_pct = 100.0 * not_clustered / test_count
+    not_clustered_pct = 100.0 * not_clustered / test_count if test_count else 0.0
 
     print(f'Failed tests: {test_count}')
     print(f'Clusters: {cluster_count}')
