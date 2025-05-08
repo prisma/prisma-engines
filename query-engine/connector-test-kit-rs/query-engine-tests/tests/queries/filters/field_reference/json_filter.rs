@@ -26,12 +26,12 @@ mod json_filter {
         );
 
         insta::assert_snapshot!(
-          run_query!(&runner, r#"{
+          runner.query(r#"{
           findManyTestModel {
               id
               json
           }
-        }"#),
+        }"#).await?.to_string().replace(" ", ""), // ignore whitespace in the JSON string
           @r###"{"data":{"findManyTestModel":[{"id":1,"json":"{\"a\":null}"}]}}"###
         );
 

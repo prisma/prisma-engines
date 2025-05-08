@@ -10,7 +10,7 @@ mod scalar_relations {
 
               children Child[]
             }
-            
+
             model Child {
               #id(childId, Int, @id)
 
@@ -60,7 +60,7 @@ mod scalar_relations {
 
             children Child[]
           }
-          
+
           model Child {
             #id(childId, Int, @id)
 
@@ -89,12 +89,14 @@ mod scalar_relations {
         .await?;
 
         insta::assert_snapshot!(
-          run_query!(&runner, r#"{ findManyParent(orderBy: { id: asc }) { id children { childId json } } }"#),
+          runner.query(r#"{ findManyParent(orderBy: { id: asc }) { id children { childId json } } }"#)
+            .await?.to_string().replace(" ", ""), // ignore whitespace in the JSON string
           @r###"{"data":{"findManyParent":[{"id":1,"children":[{"childId":1,"json":"1"},{"childId":2,"json":"{}"},{"childId":3,"json":"{\"a\":\"b\"}"},{"childId":4,"json":"[]"},{"childId":5,"json":"[1,-1,true,{\"a\":\"b\"}]"}]}]}}"###
         );
 
         insta::assert_snapshot!(
-          run_query!(&runner, r#"{ findUniqueParent(where: { id: 1 }) { id children { childId json } } }"#),
+          runner.query(r#"{ findUniqueParent(where: { id: 1 }) { id children { childId json } } }"#)
+            .await?.to_string().replace(" ", ""), // ignore whitespace in the JSON string
           @r###"{"data":{"findUniqueParent":{"id":1,"children":[{"childId":1,"json":"1"},{"childId":2,"json":"{}"},{"childId":3,"json":"{\"a\":\"b\"}"},{"childId":4,"json":"[]"},{"childId":5,"json":"[1,-1,true,{\"a\":\"b\"}]"}]}}}"###
         );
 
@@ -108,7 +110,7 @@ mod scalar_relations {
 
                 children Child[]
               }
-              
+
               model Child {
                 #id(childId, Int, @id)
 
@@ -160,7 +162,7 @@ mod scalar_relations {
 
               children Child[]
             }
-            
+
             model Child {
               #id(childId, Int, @id)
 
@@ -215,7 +217,7 @@ mod scalar_relations {
 
             children Child[]
           }
-          
+
           model Child {
             #id(childId, Int, @id)
 
@@ -283,7 +285,7 @@ mod scalar_relations {
 
             children Child[]
           }
-          
+
           model Child {
             #id(childId, Int, @id)
 

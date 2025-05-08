@@ -90,7 +90,6 @@ queries::chunking::chunking::order_by_aggregation_should_fail
 queries::data_types::enum_type::enum_type::read_one_invalid_sqlite
 queries::data_types::json::json::dollar_type_in_json_protocol
 queries::data_types::json::json::nested_dollar_type_in_json_protocol
-queries::data_types::json::json::read_many
 queries::data_types::json::json::read_plain_float
 queries::data_types::through_relation::scalar_relations::common_types
 queries::distinct::distinct::empty_database
@@ -203,7 +202,6 @@ queries::simple::find_first_or_throw::find_first_or_throw_query::find_first_or_t
 queries::simple::find_unique_or_throw::find_unique_or_throw::no_result_find_unique_by_id
 queries::simple::find_unique_or_throw::find_unique_or_throw::no_result_find_unique_by_multi_unique
 queries::simple::find_unique_or_throw::find_unique_or_throw::no_result_find_unique_by_single_unique
-queries::simple::json_result::json_as_result::test_when_distinct_result_is_json
 queries::views::views::sorted_read
 raw::sql::typed_output::typed_output::all_scalars_sqlite
 writes::ids::byoid::byoid::nested_upsert_should_work_1
