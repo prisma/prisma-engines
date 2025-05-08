@@ -152,7 +152,7 @@ mod aggr_group_by_having {
                   }
                 }"#
             ),
-            @r###"{"data":{"groupByTestModel":[{"string":"group1","_sum":{"float":16.0,"int":16}}]}}"###
+            @r###"{"data":{"groupByTestModel":[{"string":"group1","_sum":{"float":16,"int":16}}]}}"###
         );
 
         match_connector_result!(
@@ -170,8 +170,8 @@ mod aggr_group_by_having {
           }"#,
           // On MongoDB, having sum returns 0 where there are inexistant element
           // Contrary to SQL which returns NULL and therefore excludes group3
-          MongoDb(_) => vec![r#"{"data":{"groupByTestModel":[{"string":"group2","_sum":{"float":5.0,"int":5}},{"string":"group3","_sum":{"float":0.0,"int":0}}]}}"#],
-          _ => vec![r#"{"data":{"groupByTestModel":[{"string":"group2","_sum":{"float":5.0,"int":5}}]}}"#]
+          MongoDb(_) => vec![r#"{"data":{"groupByTestModel":[{"string":"group2","_sum":{"float":5,"int":5}},{"string":"group3","_sum":{"float":0,"int":0}}]}}"#],
+          _ => vec![r#"{"data":{"groupByTestModel":[{"string":"group2","_sum":{"float":5,"int":5}}]}}"#]
         );
 
         // Group 1 and 2 returned
@@ -190,7 +190,7 @@ mod aggr_group_by_having {
                   }
                 }"#
             ),
-            @r###"{"data":{"groupByTestModel":[{"string":"group1","_sum":{"float":16.0,"int":16}},{"string":"group2","_sum":{"float":5.0,"int":5}}]}}"###
+            @r###"{"data":{"groupByTestModel":[{"string":"group1","_sum":{"float":16,"int":16}},{"string":"group2","_sum":{"float":5,"int":5}}]}}"###
         );
 
         Ok(())
@@ -221,7 +221,7 @@ mod aggr_group_by_having {
                   }
                 }"#
             ),
-            @r###"{"data":{"groupByTestModel":[{"string":"group1","_min":{"float":0.0,"int":0}},{"string":"group2","_min":{"float":0.0,"int":0}}]}}"###
+            @r###"{"data":{"groupByTestModel":[{"string":"group1","_min":{"float":0,"int":0}},{"string":"group2","_min":{"float":0,"int":0}}]}}"###
         );
 
         match_connector_result!(
@@ -258,7 +258,7 @@ mod aggr_group_by_having {
                   }
                 }"#
             ),
-            @r###"{"data":{"groupByTestModel":[{"string":"group1","_min":{"float":0.0,"int":0}},{"string":"group2","_min":{"float":0.0,"int":0}}]}}"###
+            @r###"{"data":{"groupByTestModel":[{"string":"group1","_min":{"float":0,"int":0}},{"string":"group2","_min":{"float":0,"int":0}}]}}"###
         );
 
         Ok(())
@@ -289,7 +289,7 @@ mod aggr_group_by_having {
                   }
                 }"#
             ),
-            @r###"{"data":{"groupByTestModel":[{"string":"group1","_max":{"float":10.0,"int":10}},{"string":"group2","_max":{"float":10.0,"int":10}}]}}"###
+            @r###"{"data":{"groupByTestModel":[{"string":"group1","_max":{"float":10,"int":10}},{"string":"group2","_max":{"float":10,"int":10}}]}}"###
         );
 
         match_connector_result!(
@@ -326,7 +326,7 @@ mod aggr_group_by_having {
                   }
                 }"#
             ),
-            @r###"{"data":{"groupByTestModel":[{"string":"group1","_max":{"float":10.0,"int":10}},{"string":"group2","_max":{"float":10.0,"int":10}}]}}"###
+            @r###"{"data":{"groupByTestModel":[{"string":"group1","_max":{"float":10,"int":10}},{"string":"group2","_max":{"float":10,"int":10}}]}}"###
         );
 
         Ok(())

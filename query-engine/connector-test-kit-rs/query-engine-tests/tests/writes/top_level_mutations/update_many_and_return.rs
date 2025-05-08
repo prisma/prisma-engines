@@ -212,12 +212,12 @@ mod update_many_and_return {
 
         insta::assert_snapshot!(
           query_number_operation(&runner, "optFloat", "decrement", "1.1").await?,
-          @r###"[{"optFloat":null},{"optFloat":2.0},{"optFloat":3.1}]"###
+          @r###"[{"optFloat":null},{"optFloat":2},{"optFloat":3.1}]"###
         );
 
         insta::assert_snapshot!(
           query_number_operation(&runner, "optFloat", "multiply", "5.5").await?,
-          @r###"[{"optFloat":null},{"optFloat":11.0},{"optFloat":17.05}]"###
+          @r###"[{"optFloat":null},{"optFloat":11},{"optFloat":17.05}]"###
         );
 
         insta::assert_snapshot!(
@@ -227,7 +227,7 @@ mod update_many_and_return {
 
         insta::assert_snapshot!(
           query_number_operation(&runner, "optFloat", "set", "5").await?,
-          @r###"[{"optFloat":5.0},{"optFloat":5.0},{"optFloat":5.0}]"###
+          @r###"[{"optFloat":5},{"optFloat":5},{"optFloat":5}]"###
         );
 
         insta::assert_snapshot!(

@@ -213,7 +213,7 @@ mod casts {
 
         insta::assert_snapshot!(
           run_query!(&runner, r#"{ findManyEmployee { title, salary, fte, fteAlternate } }"#),
-          @r###"{"data":{"findManyEmployee":[{"title":"Test Person Number 1","salary":"45000","fte":1.0,"fteAlternate":1.0}]}}"###
+          @r###"{"data":{"findManyEmployee":[{"title":"Test Person Number 1","salary":"45000","fte":1,"fteAlternate":1}]}}"###
         );
 
         Ok(())
