@@ -32,33 +32,37 @@ transaction
                   0$b = mapField b (validate (get 0)
                   [ rowCountNeq 0
                   ] orRaise "MISSING_RECORD")
-          in let @parent = unique (query «SELECT
-                                          "public"."ParentModelWithCompositeId"."a",
-                                          "public"."ParentModelWithCompositeId"."b"
-                                          FROM
-                                          "public"."ParentModelWithCompositeId"
-                                          WHERE
-                                          ("public"."ParentModelWithCompositeId"."a"
-                                          = $1 AND
-                                          "public"."ParentModelWithCompositeId"."b"
-                                          = $2) LIMIT $3 OFFSET $4»
-                                   params [var(0$a as Int), var(0$b as Int),
-                                           const(BigInt(1)), const(BigInt(0))])
-             in let @parent$a = mapField a (get @parent);
-                    @parent$b = mapField b (get @parent)
-                in join (get @parent)
-                   with (query «SELECT
-                                "public"."ChildOfModelWithCompositeId"."id",
-                                "public"."ChildOfModelWithCompositeId"."parentA",
-                                "public"."ChildOfModelWithCompositeId"."parentB"
-                                FROM "public"."ChildOfModelWithCompositeId"
-                                WHERE
-                                ("public"."ChildOfModelWithCompositeId"."parentA"
-                                = $1 OR
-                                "public"."ChildOfModelWithCompositeId"."parentB"
-                                = $2) OFFSET $3»
-                         params [var(@parent$a as Int), var(@parent$b as Int),
-                                 const(BigInt(0))]) on left.(a,
-                                                             b) = right.(parentA,
-                                                                         parentB) as children
+          in let 2 = let @parent = unique (query «SELECT
+                                                  "public"."ParentModelWithCompositeId"."a",
+                                                  "public"."ParentModelWithCompositeId"."b"
+                                                  FROM
+                                                  "public"."ParentModelWithCompositeId"
+                                                  WHERE
+                                                  ("public"."ParentModelWithCompositeId"."a"
+                                                  = $1 AND
+                                                  "public"."ParentModelWithCompositeId"."b"
+                                                  = $2) LIMIT $3 OFFSET $4»
+                                           params [var(0$a as Int),
+                                                   var(0$b as Int),
+                                                   const(BigInt(1)),
+                                                   const(BigInt(0))])
+                 in let @parent$a = mapField a (get @parent);
+                        @parent$b = mapField b (get @parent)
+                    in join (get @parent)
+                       with (query «SELECT
+                                    "public"."ChildOfModelWithCompositeId"."id",
+                                    "public"."ChildOfModelWithCompositeId"."parentA",
+                                    "public"."ChildOfModelWithCompositeId"."parentB"
+                                    FROM "public"."ChildOfModelWithCompositeId"
+                                    WHERE
+                                    ("public"."ChildOfModelWithCompositeId"."parentA"
+                                    = $1 OR
+                                    "public"."ChildOfModelWithCompositeId"."parentB"
+                                    = $2) OFFSET $3»
+                             params [var(@parent$a as Int),
+                                     var(@parent$b as Int),
+                                     const(BigInt(0))]) on left.(a,
+                                                                 b) = right.(parentA,
+                                                                             parentB) as children
+             in get 2
       in get 2
