@@ -32,13 +32,10 @@ pub type TxResult = Result<(), user_facing_errors::Error>;
 pub(crate) type Executor = Box<dyn QueryExecutor + Send + Sync>;
 
 #[derive(Deserialize, Debug)]
-struct Empty {}
-
-#[derive(Deserialize, Debug)]
 #[serde(untagged)]
 enum TransactionEndResponse {
     Error(user_facing_errors::Error),
-    Ok(Empty),
+    Ok(()),
 }
 
 impl From<TransactionEndResponse> for TxResult {
@@ -100,17 +97,15 @@ impl<'a> qe_setup::ExternalInitializer<'a> for ExternalExecutorInitializer<'a> {
         migration_script: String,
     ) -> Result<qe_setup::InitResult, Box<dyn std::error::Error + Send + Sync>> {
         let migration_script = Some(migration_script);
-        let init_result = executor_process_request("initializeSchema", json!({ "schemaId": self.schema_id, "schema": self.schema, "url": self.url, "migrationScript": migration_script })).await?;
-        Ok(init_result)
+        executor_process_request("initializeSchema", json!({ "schemaId": self.schema_id, "schema": self.schema, "url": self.url, "migrationScript": migration_script })).await
     }
 
     async fn init(&self) -> Result<qe_setup::InitResult, Box<dyn std::error::Error + Send + Sync>> {
-        let init_result = executor_process_request(
+        executor_process_request(
             "initializeSchema",
             json!({ "schemaId": self.schema_id, "schema": self.schema, "url": self.url }),
         )
-        .await?;
-        Ok(init_result)
+        .await
     }
 
     fn url(&self) -> &'a str {
@@ -154,7 +149,10 @@ impl ExternalExecutor {
             json!({ "schemaId": self.schema_id, "query": json_query, "txId": current_tx_id.map(ToString::to_string) }),
         )
         .await?;
+        
+        tracing::debug!("ExternalExecutor: query result: {}", response_str);
         let response: QueryResult = serde_json::from_str(&response_str).unwrap();
+
         Ok(response)
     }
 
@@ -162,38 +160,33 @@ impl ExternalExecutor {
         &self,
         tx_opts: TransactionOptions,
     ) -> Result<StartTransactionResponse, Box<dyn std::error::Error + Send + Sync>> {
-        let response: StartTransactionResponse =
-            executor_process_request("startTx", json!({ "schemaId": self.schema_id, "options": tx_opts })).await?;
-        Ok(response)
+        executor_process_request("startTx", json!({ "schemaId": self.schema_id, "options": tx_opts })).await
     }
 
     pub(self) async fn commit_tx(
         &self,
         tx_id: TxId,
     ) -> Result<TransactionEndResponse, Box<dyn std::error::Error + Send + Sync>> {
-        let response: TransactionEndResponse = executor_process_request(
+        executor_process_request(
             "commitTx",
             json!({ "schemaId": self.schema_id, "txId": tx_id.to_string() }),
         )
-        .await?;
-        Ok(response)
+        .await
     }
 
     pub(self) async fn rollback_tx(
         &self,
         tx_id: TxId,
     ) -> Result<TransactionEndResponse, Box<dyn std::error::Error + Send + Sync>> {
-        let response: TransactionEndResponse = executor_process_request(
+        executor_process_request(
             "rollbackTx",
             json!({ "schemaId": self.schema_id, "txId": tx_id.to_string() }),
         )
-        .await?;
-        Ok(response)
+        .await
     }
 
     pub(crate) async fn get_logs(&self) -> Result<Vec<String>, Box<dyn std::error::Error + Send + Sync>> {
-        let response: Vec<String> = executor_process_request("getLogs", json!({ "schemaId": self.schema_id })).await?;
-        Ok(response)
+        executor_process_request("getLogs", json!({ "schemaId": self.schema_id })).await
     }
 }
 
