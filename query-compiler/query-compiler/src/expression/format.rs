@@ -44,7 +44,7 @@ where
     pub fn expression(&'a self, expression: &'a Expression) -> DocBuilder<'a, PrettyPrinter<'a, D>, ColorSpec> {
         match expression {
             Expression::Seq(vec) => self.seq(vec),
-            Expression::Get { name } => self.get(name),
+            Expression::Get { name, .. } => self.get(name),
             Expression::Let { bindings, expr } => self.r#let(bindings, expr),
             Expression::GetFirstNonEmpty { names } => self.get_first_non_empty(names),
             Expression::Query(db_query) => self.query("query", db_query),
@@ -64,6 +64,13 @@ where
                 error_identifier,
                 ..
             } => self.validate(expr, rules, error_identifier),
+            Expression::If {
+                value,
+                rule,
+                then,
+                r#else,
+            } => self.r#if(value, rule, then, r#else),
+            Expression::Unit => self.keyword("()"),
         }
     }
 
@@ -337,6 +344,31 @@ where
             .append(self.keyword("orRaise"))
             .append(self.softline())
             .append(self.text(format!("{id:?}")))
+    }
+
+    fn r#if(
+        &'a self,
+        value: &'a Expression,
+        rule: &'a DataRule,
+        then: &'a Expression,
+        r#else: &'a Expression,
+    ) -> DocBuilder<'a, PrettyPrinter<'a, D>, ColorSpec> {
+        self.keyword("if")
+            .append(self.softline())
+            .append(
+                self.text(rule.to_string())
+                    .append(self.softline())
+                    .append(self.expression(value).parens().align())
+                    .parens(),
+            )
+            .append(self.line())
+            .append(self.keyword("then"))
+            .append(self.softline())
+            .append(self.expression(then).align())
+            .append(self.line())
+            .append(self.keyword("else"))
+            .append(self.softline())
+            .append(self.expression(r#else).align())
     }
 }
 

@@ -1,0 +1,44 @@
+{
+  "modelName": "Post",
+  "action": "createOne",
+  "query": {
+    "arguments": {
+      "data": {
+        "title": "Quantum Topological Embeddings of Mycorrhizal Networks: A Fractal Analysis of Phyllotaxic Algorithms in Non-Euclidean Plant Informatic",
+        "user": {
+          "connectOrCreate": {
+            "where": {
+              "email": "john@example.com"
+            },
+            "create": {
+              "email": "john@example.com"
+            }
+          }
+        },
+        "categories": {
+          "connectOrCreate": {
+            "where": {
+              "id": 10
+            },
+            "create": {
+              "id": 10,
+              "name": "Mushrooms"
+            }
+          }
+        }
+      }
+    },
+    "selection": {
+      "$composites": true,
+      "$scalars": true,
+      "user": {
+        "arguments": {},
+        "selection": { "$composites": true, "$scalars": true }
+      },
+      "categories": {
+        "arguments": {},
+        "selection": { "$composites": true, "$scalars": true }
+      }
+    }
+  }
+}

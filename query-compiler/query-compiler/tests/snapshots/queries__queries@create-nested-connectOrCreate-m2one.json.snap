@@ -1,0 +1,65 @@
+---
+source: query-compiler/query-compiler/tests/queries.rs
+expression: pretty
+input_file: query-compiler/query-compiler/tests/data/create-nested-connectOrCreate-m2one.json
+---
+transaction
+   dataMap
+      id: Int [id]
+      title: String [title]
+      userId: Int [userId]
+      user: 
+         id: Int [id]
+         email: String [email]
+   let 1 = query «SELECT "public"."User"."id" FROM "public"."User" WHERE
+                  ("public"."User"."email" = $1 AND 1=1) OFFSET $2»
+           params [const(String("john@example.com")), const(BigInt(0))]
+   in let 2 = let 2 = if (rowCountNeq 0 (get 1))
+                  then get 1
+                  else let 3 = unique (query «INSERT INTO "public"."User"
+                                              ("email") VALUES ($1) RETURNING
+                                              "public"."User"."id"»
+                                       params [const(String("john@example.com"))])
+                       in get 3
+          in let 0 = let 2$id = mapField id (get 2)
+                 in let 0 = unique (query «INSERT INTO "public"."Post"
+                                           ("title","userId") VALUES ($1,$2)
+                                           RETURNING "public"."Post"."id"»
+                                    params [const(String("How to wakesurf on crude oil")),
+                                            var(2$id as Int)])
+                    in let 6 = let 0 = validate (get 0)
+                                   [ rowCountNeq 0
+                                   ] orRaise "MISSING_RECORD";
+                                   0$id = mapField id (get 0)
+                           in let 6 = let @parent = unique (query «SELECT
+                                                                   "public"."Post"."id",
+                                                                   "public"."Post"."title",
+                                                                   "public"."Post"."userId"
+                                                                   FROM
+                                                                   "public"."Post"
+                                                                   WHERE
+                                                                   "public"."Post"."id"
+                                                                   = $1 LIMIT $2
+                                                                   OFFSET $3»
+                                                            params [var(0$id as Int),
+                                                                    const(BigInt(1)),
+                                                                    const(BigInt(0))])
+                                  in let @parent$userId =
+                                         mapField userId (get @parent)
+                                     in join (get @parent)
+                                        with (unique (query «SELECT
+                                                             "public"."User"."id",
+                                                             "public"."User"."email"
+                                                             FROM
+                                                             "public"."User"
+                                                             WHERE
+                                                             "public"."User"."id"
+                                                             = $1 LIMIT $2
+                                                             OFFSET $3»
+                                                      params [var(@parent$userId as Int),
+                                                              const(BigInt(1)),
+                                                              const(BigInt(0))])) on left.(userId) = right.(id) as user
+                              in get 6
+                       in get 6
+             in get 0
+      in get 2

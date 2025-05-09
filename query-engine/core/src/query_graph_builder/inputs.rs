@@ -70,3 +70,16 @@ impl NodeInputField<Vec<SelectionResult>> for IfInput {
         }
     }
 }
+
+#[derive(Debug)]
+pub(crate) struct ReturnInput;
+
+impl NodeInputField<Vec<SelectionResult>> for ReturnInput {
+    fn node_input_field<'a>(&self, node: &'a mut Node) -> &'a mut Vec<SelectionResult> {
+        if let Node::Flow(Flow::Return(data)) = node {
+            data
+        } else {
+            panic!("ReturnInput can only be used with Return node")
+        }
+    }
+}
