@@ -235,7 +235,7 @@ function bigIntSafeJsonStringify(obj: unknown): string {
     if (typeof val === 'bigint') {
       return val.toString()
     } else if (val instanceof Uint8Array) {
-      return Buffer.from(val).toString()
+      return Buffer.from(val).toString('base64')
     }
     return val
   })
