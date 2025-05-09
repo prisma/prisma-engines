@@ -354,7 +354,12 @@ impl PostgresNativeUrl {
                     let as_int = v
                         .parse()
                         .map_err(|_| Error::builder(ErrorKind::InvalidConnectionArguments).build())?;
-                    socket_timeout = Some(Duration::from_secs(as_int));
+
+                    if as_int == 0 {
+                        socket_timeout = None;
+                    } else {
+                        socket_timeout = Some(Duration::from_secs(as_int));
+                    }
                 }
                 "connect_timeout" => {
                     let as_int = v
