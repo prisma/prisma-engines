@@ -1,6 +1,6 @@
 use super::*;
 use crate::{
-    inputs::{IfInput, LeftSideDiffInput, RightSideDiffInput},
+    inputs::{IfInput, LeftSideDiffInput, ReturnInput, RightSideDiffInput},
     query_ast::*,
     query_graph::{Flow, Node, NodeRef, QueryGraph, QueryGraphDependency},
     Computation, DataExpectation, DataSink, ParsedInputMap, ParsedInputValue,
@@ -410,8 +410,8 @@ fn one_to_many_inlined_parent(
 
     let if_node = graph.create_node(Flow::if_non_empty());
     let create_node = create::create_record_node(graph, query_schema, child_model.clone(), create_map)?;
-    let return_existing = graph.create_node(Flow::Return(None));
-    let return_create = graph.create_node(Flow::Return(None));
+    let return_existing = graph.create_node(Flow::Return(Vec::new()));
+    let return_create = graph.create_node(Flow::Return(Vec::new()));
 
     graph.create_edge(
         &read_node,
@@ -446,33 +446,13 @@ fn one_to_many_inlined_parent(
     graph.create_edge(
         &read_node,
         &return_existing,
-        QueryGraphDependency::ProjectedDataDependency(
-            child_link.clone(),
-            Box::new(move |return_node, child_ids| {
-                if let Node::Flow(Flow::Return(_)) = return_node {
-                    Ok(Node::Flow(Flow::Return(Some(child_ids))))
-                } else {
-                    Ok(return_node)
-                }
-            }),
-            None,
-        ),
+        QueryGraphDependency::ProjectedDataSinkDependency(child_link.clone(), DataSink::AllRows(&ReturnInput), None),
     )?;
 
     graph.create_edge(
         &create_node,
         &return_create,
-        QueryGraphDependency::ProjectedDataDependency(
-            child_link,
-            Box::new(move |return_node, child_ids| {
-                if let Node::Flow(Flow::Return(_)) = return_node {
-                    Ok(Node::Flow(Flow::Return(Some(child_ids))))
-                } else {
-                    Ok(return_node)
-                }
-            }),
-            None,
-        ),
+        QueryGraphDependency::ProjectedDataSinkDependency(child_link, DataSink::AllRows(&ReturnInput), None),
     )?;
 
     Ok(())
@@ -570,8 +550,8 @@ fn one_to_one_inlined_parent(
 
     let if_node = graph.create_node(Flow::if_non_empty());
     let create_node = create::create_record_node(graph, query_schema, child_model.clone(), create_data)?;
-    let return_existing = graph.create_node(Flow::Return(None));
-    let return_create = graph.create_node(Flow::Return(None));
+    let return_existing = graph.create_node(Flow::Return(Vec::new()));
+    let return_create = graph.create_node(Flow::Return(Vec::new()));
 
     graph.create_edge(
         &read_node,
@@ -597,17 +577,7 @@ fn one_to_one_inlined_parent(
     graph.create_edge(
         &read_node,
         &return_existing,
-        QueryGraphDependency::ProjectedDataDependency(
-            child_link.clone(),
-            Box::new(move |return_node, child_ids| {
-                if let Node::Flow(Flow::Return(_)) = return_node {
-                    Ok(Node::Flow(Flow::Return(Some(child_ids))))
-                } else {
-                    Ok(return_node)
-                }
-            }),
-            None,
-        ),
+        QueryGraphDependency::ProjectedDataSinkDependency(child_link.clone(), DataSink::AllRows(&ReturnInput), None),
     )?;
 
     // Else branch handling
@@ -615,17 +585,7 @@ fn one_to_one_inlined_parent(
     graph.create_edge(
         &create_node,
         &return_create,
-        QueryGraphDependency::ProjectedDataDependency(
-            child_link.clone(),
-            Box::new(move |return_node, child_ids| {
-                if let Node::Flow(Flow::Return(_)) = return_node {
-                    Ok(Node::Flow(Flow::Return(Some(child_ids))))
-                } else {
-                    Ok(return_node)
-                }
-            }),
-            None,
-        ),
+        QueryGraphDependency::ProjectedDataSinkDependency(child_link.clone(), DataSink::AllRows(&ReturnInput), None),
     )?;
 
     if utils::node_is_create(graph, &parent_node) {

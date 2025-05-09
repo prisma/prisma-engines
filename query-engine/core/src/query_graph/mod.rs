@@ -3,7 +3,9 @@ mod formatters;
 mod guard;
 mod transformers;
 
-pub(crate) use error::*;
+use std::fmt;
+
+pub use error::*;
 use psl::datamodel_connector::{ConnectorCapabilities, ConnectorCapability};
 use serde::Serialize;
 use smallvec::{smallvec, SmallVec};
@@ -20,7 +22,6 @@ use petgraph::{
     *,
 };
 use query_structure::{FieldSelection, IntoFilter, QueryArguments, SelectionResult};
-use std::fmt;
 
 pub type QueryGraphResult<T> = std::result::Result<T, QueryGraphError>;
 
@@ -77,7 +78,7 @@ pub enum Flow {
     If { rule: DataRule, data: Vec<SelectionResult> },
 
     /// Returns a fixed set of results at runtime.
-    Return(Option<Vec<SelectionResult>>),
+    Return(Vec<SelectionResult>),
 }
 
 impl Flow {
@@ -184,7 +185,7 @@ pub enum DataSink {
     SingleRowArray(&'static dyn NodeInputField<Vec<SelectionResult>>),
 }
 
-pub trait NodeInputField<R>: Send + Sync + std::fmt::Debug {
+pub trait NodeInputField<R>: Send + Sync + fmt::Debug {
     fn node_input_field<'a>(&self, node: &'a mut Node) -> &'a mut R;
 }
 
@@ -252,6 +253,16 @@ impl DataRule {
             Self::RowCountEq(expected) => results.len() == *expected,
             Self::RowCountNeq(expected) => results.len() != *expected,
             Self::Never => false,
+        }
+    }
+}
+
+impl fmt::Display for DataRule {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Self::RowCountEq(expected) => write!(f, "rowCountEq {expected}"),
+            Self::RowCountNeq(expected) => write!(f, "rowCountNeq {expected}"),
+            Self::Never => write!(f, "never"),
         }
     }
 }
@@ -477,8 +488,16 @@ impl QueryGraph {
 
     /// Removes the edge from the graph but leaves the graph intact by keeping the empty
     /// edge in the graph by plucking the content of the edge, but not the edge itself.
+    /// Panics if the edge has been already been taken or plucked.
     pub fn pluck_edge(&mut self, edge: &EdgeRef) -> QueryGraphDependency {
         self.graph.edge_weight_mut(edge.edge_ix).unwrap().unset()
+    }
+
+    /// Removes the edge from the graph but leaves the graph intact by keeping the empty
+    /// edge in the graph by taking the content of the edge, but not the edge itself.
+    /// Returns `None` if the edge has been already taken or plucked.
+    pub fn take_edge(&mut self, edge: &EdgeRef) -> Option<QueryGraphDependency> {
+        self.graph.edge_weight_mut(edge.edge_ix).unwrap().take()
     }
 
     /// Removes the node from the graph but leaves the graph intact by keeping the empty
@@ -495,18 +514,19 @@ impl QueryGraph {
 
     /// Checks if `child` is a direct child of `parent`.
     ///
-    /// Criteria for a direct child (either):
-    /// - Every node that only has `parent` as their parent.
-    /// - In case of multiple parents, _all_ parents have already been visited before.
+    /// Criteria for a direct child:
+    /// - The edge has not been plucked or taken.
+    /// - `parent` is this node's parent.
+    /// - In case of multiple parents, all other parents have already been visited before.
     pub fn is_direct_child(&self, parent: &NodeRef, child: &NodeRef) -> bool {
         self.incoming_edges(child).into_iter().all(|edge| {
             let other_parent = self.edge_source(&edge);
 
-            if &other_parent != parent {
-                self.visited.contains(&other_parent.node_ix)
-            } else {
-                true
+            if self.edge_content(&edge).is_none() {
+                return false;
             }
+
+            &other_parent == parent || self.visited.contains(&other_parent.node_ix)
         })
     }
 
@@ -1069,7 +1089,13 @@ pub trait ToGraphviz {
 
 impl ToGraphviz for QueryGraph {
     fn to_graphviz(&self) -> String {
-        let label_from_node = |node: &Node| node.to_graphviz().replace('\"', "\\\"").replace('\n', "\\l") + "\\l";
+        let label_from_node = |idx: usize, node: &Node| {
+            format!(
+                "(n{})\\n{}\\l",
+                idx,
+                node.to_graphviz().replace('\"', "\\\"").replace('\n', "\\l")
+            )
+        };
 
         let nodes = self
             .graph
@@ -1080,19 +1106,19 @@ impl ToGraphviz for QueryGraph {
                     format!(
                         "    {} [label=\"{}\", fillcolor=blue, style=filled, shape=rectangle, fontcolor=white]",
                         idx.index(),
-                        label_from_node(node)
+                        label_from_node(idx.index(), node)
                     )
                 } else if self.root_nodes().any(|root_node| root_node == NodeRef { node_ix: idx }) {
                     format!(
                         "    {} [label=\"{}\", fillcolor=red, style=filled, shape=rectangle, fontcolor=white]",
                         idx.index(),
-                        label_from_node(node)
+                        label_from_node(idx.index(), node)
                     )
                 } else {
                     format!(
                         "    {} [label=\"{}\", shape=rectangle]",
                         idx.index(),
-                        label_from_node(node)
+                        label_from_node(idx.index(), node)
                     )
                 }
             })
@@ -1106,9 +1132,10 @@ impl ToGraphviz for QueryGraph {
                 let edge_content = self.graph.edge_weight(idx).unwrap().borrow().unwrap();
 
                 format!(
-                    "    {} -> {} [label=\"{}\"]",
+                    "    {} -> {} [label=\"(e{}) {}\"]",
                     self.graph.to_index(edge.source()),
                     self.graph.to_index(edge.target()),
+                    idx.index(),
                     edge_content.to_string().replace('\"', "\\\"")
                 )
             })

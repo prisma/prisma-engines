@@ -1,5 +1,5 @@
 use crate::{
-    inputs::{IfInput, LeftSideDiffInput, RightSideDiffInput},
+    inputs::{IfInput, LeftSideDiffInput, ReturnInput, RightSideDiffInput},
     query_ast::*,
     query_graph::{Flow, Node, NodeRef, QueryGraph, QueryGraphDependency},
     Computation, DataExpectation, DataOperation, DataSink, MissingRelatedRecord, ParsedInputValue,
@@ -938,20 +938,14 @@ pub fn insert_emulated_on_update_with_intermediary_node(
     let internal_model = &model_to_update.dm;
     let relation_fields = internal_model.fields_pointing_to_model(model_to_update);
 
-    let join_node = graph.create_node(Flow::Return(None));
+    let join_node = graph.create_node(Flow::Return(Vec::new()));
 
     graph.create_edge(
         parent_node,
         &join_node,
-        QueryGraphDependency::ProjectedDataDependency(
+        QueryGraphDependency::ProjectedDataSinkDependency(
             model_to_update.primary_identifier(),
-            Box::new(move |return_node, parent_ids| {
-                if let Node::Flow(Flow::Return(_)) = return_node {
-                    Ok(Node::Flow(Flow::Return(Some(parent_ids))))
-                } else {
-                    Ok(return_node)
-                }
-            }),
+            DataSink::AllRows(&ReturnInput),
             None,
         ),
     )?;
