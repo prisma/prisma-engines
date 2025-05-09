@@ -184,7 +184,10 @@ class QueryPipeline {
 function getResponseInQeFormat(query: JsonProtocolQuery, result: unknown) {
   return {
     data: {
-      [getFullOperationName(query)]: getOperationResultInQeFormat(result),
+      [getFullOperationName(query)]:
+        query.action !== 'queryRaw' && query.action !== 'executeRaw'
+          ? getOperationResultInQeFormat(result)
+          : result,
     },
   }
 }
@@ -195,6 +198,10 @@ function getFullOperationName(query: JsonProtocolQuery): string {
       return `createMany${query.modelName}AndReturn`
     case 'updateManyAndReturn':
       return `updateMany${query.modelName}AndReturn`
+    case 'findFirstOrThrow':
+      return `findFirst${query.modelName}OrThrow`
+    case 'findUniqueOrThrow':
+      return `findUnique${query.modelName}OrThrow`
     default:
       if (query.modelName) {
         return query.action + query.modelName
@@ -227,6 +234,8 @@ function bigIntSafeJsonStringify(obj: unknown): string {
   return JSON.stringify(obj, (_key, val) => {
     if (typeof val === 'bigint') {
       return val.toString()
+    } else if (val instanceof Uint8Array) {
+      return Buffer.from(val).toString('base64')
     }
     return val
   })

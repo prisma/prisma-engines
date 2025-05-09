@@ -54,7 +54,7 @@ mod json {
                 let res = run_query!(runner, r#"{ findManyTestModel { json } }"#);
 
                 insta::assert_snapshot!(
-                  res,
+                  res.replace(" ", ""), // ignore whitespace in the JSON string
                   @r###"{"data":{"findManyTestModel":[{"json":"{}"},{"json":"{\"a\":\"b\"}"},{"json":"1"},{"json":"1.5"},{"json":"\"hello\""},{"json":"[1,\"a\",{\"b\":true}]"},{"json":"true"}]}}"###
                 );
             }
@@ -74,7 +74,7 @@ mod json {
                     .await?;
 
                 insta::assert_snapshot!(
-                  res.to_string(),
+                  res.to_string().replace(" ", ""), // ignore whitespace in the JSON string
                   @r###"{"data":{"findManyTestModel":[{"json":{"$type":"Json","value":"{}"}},{"json":{"$type":"Json","value":"{\"a\":\"b\"}"}},{"json":{"$type":"Json","value":"1"}},{"json":{"$type":"Json","value":"1.5"}},{"json":{"$type":"Json","value":"\"hello\""}},{"json":{"$type":"Json","value":"[1,\"a\",{\"b\":true}]"}},{"json":{"$type":"Json","value":"true"}}]}}"###
                 );
             }

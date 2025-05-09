@@ -301,7 +301,7 @@ pub(crate) fn process_nested<'conn>(
 // Custom error built for findXOrThrow queries, when a record is not found and it needs to throw an error
 #[inline]
 fn record_not_found() -> InterpretationResult<QueryResult> {
-    let cause = String::from("Expected a record, found none.");
+    let cause = String::from("No record was found for a query.");
     Err(ConnectorError {
         user_facing_error: Some(KnownError::new(
             user_facing_errors::query_engine::RecordRequiredButNotFound { cause: cause.clone() },

@@ -254,12 +254,7 @@ impl<'a, 'b> NodeTranslator<'a, 'b> {
                 Either::Right(selection.selections().map(move |field| {
                     let expr = Expression::Get { name: source.id() };
                     let expr = match expectation {
-                        Some(expectation) => Expression::Validate {
-                            expr: expr.into(),
-                            rules: expectation.rules().to_vec(),
-                            error_identifier: expectation.error().id(),
-                            context: expectation.error().context(),
-                        },
+                        Some(expectation) => Expression::validate_expectation(expectation, expr),
                         None => expr,
                     };
                     let expr = if requires_unique {

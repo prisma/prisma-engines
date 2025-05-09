@@ -223,7 +223,17 @@ fn serialize_bytes<S>(bytes: &[u8], serializer: S) -> Result<S::Ok, S::Error>
 where
     S: Serializer,
 {
-    encode_bytes(bytes).serialize(serializer)
+    let mut map = serializer.serialize_map(Some(2))?;
+
+    map.serialize_entry("prisma__type", "bytes")?;
+    map.serialize_entry(
+        "prisma__value",
+        &json!({
+            "base64Encoded": encode_bytes(bytes),
+        }),
+    )?;
+
+    map.end()
 }
 
 fn serialize_null<S>(serializer: S) -> Result<S::Ok, S::Error>

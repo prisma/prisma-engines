@@ -5,7 +5,7 @@ use query_core::{
     CreateManyRecordsFields, DeleteRecordFields, Node, Query, QueryGraph, ReadQuery, UpdateManyRecordsFields,
     UpdateRecord, WriteQuery, schema::constants::aggregations,
 };
-use query_structure::{AggregationSelection, FieldSelection, SelectedField};
+use query_structure::{AggregationSelection, FieldSelection, PrismaValueType, SelectedField};
 use std::collections::HashMap;
 
 pub fn map_result_structure(graph: &QueryGraph) -> Option<ResultNode> {
@@ -70,7 +70,12 @@ fn get_result_node(
     for prisma_name in selection_order {
         match field_map.get(prisma_name.as_str()) {
             Some(sf @ SelectedField::Scalar(f)) => {
-                let prisma_type = f.type_identifier_with_arity().0.to_prisma_type();
+                let (typ, arity) = f.type_identifier_with_arity();
+                let prisma_type = if arity.is_list() {
+                    PrismaValueType::Array(typ.to_prisma_type().into())
+                } else {
+                    typ.to_prisma_type()
+                };
                 node.add_field(
                     prisma_name,
                     ResultNode::new_value(sf.db_name().into_owned(), prisma_type),
