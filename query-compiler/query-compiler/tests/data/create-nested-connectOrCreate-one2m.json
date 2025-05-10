@@ -1,0 +1,39 @@
+{
+  "modelName": "Post",
+  "action": "createOne",
+  "query": {
+    "arguments": {
+      "data": {
+        "title": "How to get rich quick and not go to jail",
+        "user": {
+          "connect": {
+            "id": 1
+          }
+        },
+        "categories": {
+          "connectOrCreate": {
+            "where": {
+              "id": 10
+            },
+            "create": {
+              "id": 10,
+              "name": "JavaScript"
+            }
+          }
+        }
+      }
+    },
+    "selection": {
+      "$composites": true,
+      "$scalars": true,
+      "user": {
+        "arguments": {},
+        "selection": { "$composites": true, "$scalars": true }
+      },
+      "categories": {
+        "arguments": {},
+        "selection": { "$composites": true, "$scalars": true }
+      }
+    }
+  }
+}

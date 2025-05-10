@@ -18,6 +18,10 @@ impl<T> Guard<T> {
         }
     }
 
+    pub fn take(&mut self) -> Option<T> {
+        self.content.take()
+    }
+
     pub fn borrow(&self) -> Option<&T> {
         self.content.as_ref()
     }
