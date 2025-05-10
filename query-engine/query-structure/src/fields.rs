@@ -40,10 +40,11 @@ impl<'a> Fields<'a> {
             .walk(self.model.id)
             .scalar_fields()
             .filter(|sf| {
-                !matches!(
-                    sf.scalar_field_type(),
-                    ScalarFieldType::CompositeType(_) | ScalarFieldType::Unsupported(_)
-                )
+                !sf.is_ignored()
+                    && !matches!(
+                        sf.scalar_field_type(),
+                        ScalarFieldType::CompositeType(_) | ScalarFieldType::Unsupported(_)
+                    )
             })
             .map(|rf| self.model.dm.clone().zip(ScalarFieldId::InModel(rf.id)))
     }
@@ -62,7 +63,7 @@ impl<'a> Fields<'a> {
             .dm
             .walk(self.model.id)
             .scalar_fields()
-            .filter(|sf| sf.scalar_field_type().as_composite_type().is_some())
+            .filter(|sf| sf.scalar_field_type().as_composite_type().is_some() && !sf.is_ignored())
             .map(|sf| self.model.dm.clone().zip(CompositeFieldId::InModel(sf.id)))
             .collect()
     }
