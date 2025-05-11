@@ -132,7 +132,7 @@ impl MigratePostgresUrl {
                 let params = PpgParams::parse_from(&url)?;
                 let api_key_param = params.api_key()?;
 
-                let api_key_json = URL_SAFE_NO_PAD
+                let api_key_json = BASE64_URL_SAFE_NO_PAD
                     .decode(api_key_param)
                     .map_err(ConnectorError::url_parse_error)?;
 
