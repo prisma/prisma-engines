@@ -1,9 +1,11 @@
+mod connection_string;
 mod connector;
 mod destructive_change_checker;
 mod renderer;
 mod schema_calculator;
 mod schema_differ;
 
+use base64::prelude::*;
 use connector as imp;
 use destructive_change_checker::PostgresDestructiveChangeCheckerFlavour;
 use enumflags2::BitFlags;
@@ -19,6 +21,7 @@ use schema_connector::{
     migrations_directory::MigrationDirectory, BoxFuture, ConnectorError, ConnectorResult, Namespaces,
 };
 use schema_differ::PostgresSchemaDifferFlavour;
+use serde::Deserialize;
 use sql_schema_describer::{postgres::PostgresSchemaExt, SqlSchema};
 use std::{
     borrow::Cow,
@@ -54,19 +57,23 @@ static MIGRATE_WS_BASE_URL: LazyLock<Cow<'static, str>> = LazyLock::new(|| {
 
 #[derive(Default)]
 struct PpgParams<'a> {
+    /// `api_key` parameter in the Prisma Postgres URL.
+    ///
+    /// In remote Prisma Postgres URLs, this parameter is used to authenticate the connection.
+    ///
+    /// In local Prisma Postgres URLs, this parameter is a base64-encoded JSON
+    /// object that contains data necessary for local PPg emulation. Schema
+    /// engine decodes it to extract the connection string to the underlying
+    /// PostgreSQL database to perform migrations.
     api_key: Option<Cow<'a, str>>,
-    db_name: Option<Cow<'a, str>>,
-    db_user: Option<Cow<'a, str>>,
-    db_pass: Option<Cow<'a, str>>,
-    db_port: Option<u16>,
+
+    /// Database name override. Used for creating shadow databases with remote Prisma Postgres.
+    db_name_override: Option<Cow<'a, str>>,
 }
 
 impl<'a> PpgParams<'a> {
     const API_KEY_PARAM: &'static str = "api_key";
     const DB_NAME_PARAM: &'static str = "dbname";
-    const DB_USER_PARAM: &'static str = "dbuser";
-    const DB_PASS_PARAM: &'static str = "dbpass";
-    const DB_PORT_PARAM: &'static str = "dbport";
 
     fn parse_from(url: &'a Url) -> Result<Self, ConnectorError> {
         let mut params = Self::default();
@@ -74,31 +81,38 @@ impl<'a> PpgParams<'a> {
         for (name, value) in url.query_pairs() {
             match name.as_ref() {
                 Self::API_KEY_PARAM => params.api_key = Some(value),
-                Self::DB_NAME_PARAM => params.db_name = Some(value),
-                Self::DB_USER_PARAM => params.db_user = Some(value),
-                Self::DB_PASS_PARAM => params.db_pass = Some(value),
-                Self::DB_PORT_PARAM => {
-                    params.db_port = Some(value.parse().map_err(|err| {
-                        ConnectorError::url_parse_error(format!(
-                            "Provided `{}` query string parameter is invalid: {}",
-                            Self::DB_PORT_PARAM,
-                            err
-                        ))
-                    })?)
-                }
+                Self::DB_NAME_PARAM => params.db_name_override = Some(value),
                 _ => {}
             }
         }
 
         Ok(params)
     }
+
+    fn api_key(&self) -> ConnectorResult<&str> {
+        self.api_key
+            .as_deref()
+            .ok_or_else(|| Self::required_param_error(Self::API_KEY_PARAM))
+    }
+
+    fn db_name_override(&self) -> Option<&str> {
+        self.db_name_override.as_deref()
+    }
+
+    fn required_param_error(param_name: &str) -> ConnectorError {
+        ConnectorError::url_parse_error(format!(
+            "Required `{}` query string parameter was not provided in a connection URL",
+            param_name
+        ))
+    }
 }
 
-fn required_param_error(param_name: &str) -> ConnectorError {
-    ConnectorError::url_parse_error(format!(
-        "Required `{}` query string parameter was not provided in a connection URL",
-        param_name
-    ))
+/// The contents of the JSON payload in the `api_key` query string parameter
+/// in local PPg connection string.
+#[derive(Deserialize)]
+#[serde(rename_all = "camelCase")]
+struct LocalPpgApiKey<'a> {
+    database_url: &'a str,
 }
 
 impl MigratePostgresUrl {
@@ -116,30 +130,18 @@ impl MigratePostgresUrl {
             // Local Prisma Postgres
             Self::PRISMA_POSTGRES_SCHEME if is_localhost => {
                 let params = PpgParams::parse_from(&url)?;
+                let api_key_param = params.api_key()?;
 
-                let db_name = params
-                    .db_name
-                    .ok_or_else(|| required_param_error(PpgParams::DB_NAME_PARAM))?;
+                let api_key_json = BASE64_STANDARD
+                    .decode(api_key_param)
+                    .map_err(ConnectorError::url_parse_error)?;
 
-                let db_user = params
-                    .db_user
-                    .ok_or_else(|| required_param_error(PpgParams::DB_USER_PARAM))?;
+                let api_key_value: LocalPpgApiKey<'_> =
+                    serde_json::from_slice(&api_key_json).map_err(ConnectorError::url_parse_error)?;
 
-                let db_port = params
-                    .db_port
-                    .ok_or_else(|| required_param_error(PpgParams::DB_PORT_PARAM))?;
+                let database_url = connection_string::parse(api_key_value.database_url)?;
 
-                let mut tcp_url = Url::parse(&format!(
-                    "postgresql://{db_user}@{}:{db_port}/{db_name}",
-                    url.host_str().unwrap_or_default(),
-                ))
-                .map_err(ConnectorError::url_parse_error)?;
-
-                if let Some(db_pass) = params.db_pass {
-                    tcp_url.set_password(Some(&db_pass)).expect("could not set a password");
-                }
-
-                PostgresUrl::new_native(tcp_url).map_err(ConnectorError::url_parse_error)?
+                PostgresUrl::new_native(database_url).map_err(ConnectorError::url_parse_error)?
             }
 
             // Remote Prisma Postgres
@@ -147,14 +149,10 @@ impl MigratePostgresUrl {
                 let params = PpgParams::parse_from(&url).map_err(ConnectorError::url_parse_error)?;
                 let ws_url = Url::from_str(&MIGRATE_WS_BASE_URL).map_err(ConnectorError::url_parse_error)?;
 
-                let api_key = params
-                    .api_key
-                    .ok_or_else(|| required_param_error(PpgParams::API_KEY_PARAM))?;
+                let mut ws_url = PostgresWebSocketUrl::new(ws_url, params.api_key()?.to_owned());
 
-                let mut ws_url = PostgresWebSocketUrl::new(ws_url, api_key.into_owned());
-
-                if let Some(dbname_override) = params.db_name {
-                    ws_url.override_db_name(dbname_override.into_owned());
+                if let Some(dbname_override) = params.db_name_override() {
+                    ws_url.override_db_name(dbname_override.to_owned());
                 }
 
                 PostgresUrl::WebSocket(ws_url)
