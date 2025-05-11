@@ -5,7 +5,6 @@ mod renderer;
 mod schema_calculator;
 mod schema_differ;
 
-use base64::engine::general_purpose::URL_SAFE_NO_PAD;
 use base64::prelude::*;
 use connector as imp;
 use destructive_change_checker::PostgresDestructiveChangeCheckerFlavour;
