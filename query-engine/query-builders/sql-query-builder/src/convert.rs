@@ -1,11 +1,14 @@
 use bigdecimal::{BigDecimal, FromPrimitive};
-use chrono::{DateTime, NaiveDate, Utc};
 use prisma_value::{PrismaValue, PrismaValueType};
-use quaint::ast::OpaqueType;
+use quaint::{ast::OpaqueType, prelude::SqlFamily};
 
 use crate::value::{GeneratorCall, Placeholder};
 
-pub(crate) fn quaint_value_to_prisma_value(value: quaint::Value<'_>) -> PrismaValue {
+const DATETIME_FORMAT: &str = "%Y-%m-%d %H:%M:%S%.f";
+const DATE_FORMAT: &str = "%Y-%m-%d";
+const TIME_FORMAT: &str = "%H:%M:%S%.f";
+
+pub(crate) fn quaint_value_to_prisma_value(value: quaint::Value<'_>, family: SqlFamily) -> PrismaValue {
     match value.typed {
         quaint::ValueType::Int32(Some(i)) => PrismaValue::Int(i.into()),
         quaint::ValueType::Int32(None) => PrismaValue::Null,
@@ -30,7 +33,7 @@ pub(crate) fn quaint_value_to_prisma_value(value: quaint::Value<'_>) -> PrismaVa
         quaint::ValueType::EnumArray(Some(es), _) => PrismaValue::List(
             es.into_iter()
                 .map(|e| e.into_text())
-                .map(quaint_value_to_prisma_value)
+                .map(|v| quaint_value_to_prisma_value(v, family))
                 .collect(),
         ),
         quaint::ValueType::EnumArray(None, _) => PrismaValue::Null,
@@ -41,7 +44,7 @@ pub(crate) fn quaint_value_to_prisma_value(value: quaint::Value<'_>) -> PrismaVa
         quaint::ValueType::Char(Some(c)) => PrismaValue::String(c.to_string()),
         quaint::ValueType::Char(None) => PrismaValue::Null,
         quaint::ValueType::Array(Some(a)) => {
-            PrismaValue::List(a.into_iter().map(quaint_value_to_prisma_value).collect())
+            PrismaValue::List(a.into_iter().map(|v| quaint_value_to_prisma_value(v, family)).collect())
         }
         quaint::ValueType::Array(None) => PrismaValue::Null,
         quaint::ValueType::Numeric(Some(bd)) => PrismaValue::Float(bd),
@@ -52,17 +55,31 @@ pub(crate) fn quaint_value_to_prisma_value(value: quaint::Value<'_>) -> PrismaVa
         quaint::ValueType::Xml(None) => PrismaValue::Null,
         quaint::ValueType::Uuid(Some(u)) => PrismaValue::Uuid(u),
         quaint::ValueType::Uuid(None) => PrismaValue::Null,
-        quaint::ValueType::DateTime(Some(dt)) => PrismaValue::DateTime(dt.into()),
+        quaint::ValueType::DateTime(Some(dt)) => match value.native_column_type.as_deref() {
+            Some("DATE") if family.is_postgres() => PrismaValue::String(dt.date_naive().to_string()),
+            Some("TIME") if family.is_postgres() => PrismaValue::String(dt.time().to_string()),
+            Some("TIMETZ") if family.is_postgres() => PrismaValue::String(dt.time().format(TIME_FORMAT).to_string()),
+            Some(_) if family.is_postgres() => PrismaValue::String(dt.naive_utc().to_string()),
+
+            Some(_) if family.is_mysql() => PrismaValue::String(dt.format(DATETIME_FORMAT).to_string()),
+
+            _ => PrismaValue::String(dt.to_rfc3339()),
+        },
         quaint::ValueType::DateTime(None) => PrismaValue::Null,
         quaint::ValueType::Date(Some(d)) => {
-            let dt = DateTime::<Utc>::from_naive_utc_and_offset(d.and_hms_opt(0, 0, 0).unwrap(), Utc);
-            PrismaValue::DateTime(dt.into())
+            if family.is_mysql() {
+                PrismaValue::String(d.format(DATE_FORMAT).to_string())
+            } else {
+                PrismaValue::String(d.to_string())
+            }
         }
         quaint::ValueType::Date(None) => PrismaValue::Null,
         quaint::ValueType::Time(Some(t)) => {
-            let d = NaiveDate::from_ymd_opt(1970, 1, 1).unwrap();
-            let dt = DateTime::<Utc>::from_naive_utc_and_offset(d.and_time(t), Utc);
-            PrismaValue::DateTime(dt.into())
+            if family.is_mysql() {
+                PrismaValue::String(t.format(TIME_FORMAT).to_string())
+            } else {
+                PrismaValue::String(t.to_string())
+            }
         }
         quaint::ValueType::Time(None) => PrismaValue::Null,
         quaint::ValueType::Opaque(opaque) => {

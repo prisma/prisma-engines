@@ -2,6 +2,7 @@ pub mod arithmetic;
 
 mod error;
 mod raw_json;
+mod tagged;
 
 use base64::prelude::*;
 use bigdecimal::{BigDecimal, FromPrimitive, ToPrimitive};
@@ -15,6 +16,8 @@ use uuid::Uuid;
 
 pub use error::ConversionFailure;
 pub use raw_json::RawJson;
+pub use tagged::TaggedPrismaValue;
+
 pub type PrismaValueResult<T> = std::result::Result<T, ConversionFailure>;
 pub type PrismaListValue = Vec<PrismaValue>;
 
@@ -223,17 +226,7 @@ fn serialize_bytes<S>(bytes: &[u8], serializer: S) -> Result<S::Ok, S::Error>
 where
     S: Serializer,
 {
-    let mut map = serializer.serialize_map(Some(2))?;
-
-    map.serialize_entry("prisma__type", "bytes")?;
-    map.serialize_entry(
-        "prisma__value",
-        &json!({
-            "base64Encoded": encode_bytes(bytes),
-        }),
-    )?;
-
-    map.end()
+    encode_bytes(bytes).serialize(serializer)
 }
 
 fn serialize_null<S>(serializer: S) -> Result<S::Ok, S::Error>
@@ -280,13 +273,7 @@ fn serialize_object<S>(obj: &Vec<(String, PrismaValue)>, serializer: S) -> Resul
 where
     S: Serializer,
 {
-    let mut map = serializer.serialize_map(Some(obj.len()))?;
-
-    for (k, v) in obj {
-        map.serialize_entry(k, v)?;
-    }
-
-    map.end()
+    serializer.collect_map(obj.iter().map(|(k, v)| (k, v)))
 }
 
 fn serialize_placeholder<S>(name: &str, r#type: &PrismaValueType, serializer: S) -> Result<S::Ok, S::Error>
@@ -453,6 +440,10 @@ impl PrismaValue {
         } else {
             None
         }
+    }
+
+    pub fn as_tagged(&self) -> TaggedPrismaValue<'_> {
+        TaggedPrismaValue::from(self)
     }
 }
 

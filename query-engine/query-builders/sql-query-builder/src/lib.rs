@@ -64,7 +64,7 @@ impl<'a, V> SqlQueryBuilder<'a, V> {
         let params = template
             .parameters
             .into_iter()
-            .map(convert::quaint_value_to_prisma_value)
+            .map(|v| convert::quaint_value_to_prisma_value(v, self.context.sql_family()))
             .collect::<Vec<_>>();
 
         Ok(DbQuery::TemplateSql {
