@@ -212,10 +212,6 @@ raw::sql::typed_output::typed_output::all_scalars_pg
 writes::data_types::decimal::decimal::using_decimal_field
 writes::data_types::native_types::postgres::postgres::native_date
 writes::data_types::native_types::postgres::postgres::native_other_types
-writes::data_types::scalar_list::defaults::json::basic_write
-writes::data_types::scalar_list::json::json::behave_like_regular_val_for_create_and_update
-writes::data_types::scalar_list::json::json::create_mut_work_with_list_vals
-writes::data_types::scalar_list::json::json::update_mut_push_empty_scalar_list
 writes::ids::byoid::byoid::nested_upsert_should_work_1
 writes::ids::byoid::byoid::nested_upsert_should_work_2
 writes::ids::byoid::byoid::upsert_should_work_1
