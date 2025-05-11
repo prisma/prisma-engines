@@ -269,7 +269,7 @@ where
     deserializer.deserialize_f64(BigDecimalVisitor)
 }
 
-fn serialize_object<S>(obj: &Vec<(String, PrismaValue)>, serializer: S) -> Result<S::Ok, S::Error>
+fn serialize_object<S>(obj: &[(String, PrismaValue)], serializer: S) -> Result<S::Ok, S::Error>
 where
     S: Serializer,
 {
