@@ -44,7 +44,6 @@ new::relation_load_strategy::relation_load_strategy::test_update_lateral_join
 new::relation_load_strategy::relation_load_strategy::test_upsert_lateral_join
 new::relation_load_strategy::relation_load_strategy::test_upsert_lateral_query
 queries::aggregation::group_by::aggregation_group_by::group_by_ordering_sum_aggregation
-queries::aggregation::group_by::aggregation_group_by::regression_21789
 queries::aggregation::many_count_relation::many_count_rel::count_m_n_self_rel
 queries::aggregation::many_count_relation::many_count_rel::count_one2m_compound_ids
 queries::aggregation::many_count_relation::many_count_rel::count_one2m_dup_child_id
