@@ -92,6 +92,13 @@ impl PostgresUrl {
         }
     }
 
+    pub fn is_localhost(&self) -> bool {
+        match self {
+            Self::Native(native_url) => native_url.is_localhost(),
+            Self::WebSocket(ws_url) => ws_url.is_localhost(),
+        }
+    }
+
     pub fn port(&self) -> u16 {
         match self {
             Self::Native(native_url) => native_url.port(),
@@ -180,6 +187,10 @@ impl PostgresNativeUrl {
             }
             (None, Some(host), _) => host,
         }
+    }
+
+    pub fn is_localhost(&self) -> bool {
+        is_url_localhost(&self.url)
     }
 
     /// Name of the database connected. Defaults to `postgres`.
@@ -530,11 +541,23 @@ impl PostgresWebSocketUrl {
         self.url.host_str().unwrap_or("localhost")
     }
 
+    pub fn is_localhost(&self) -> bool {
+        is_url_localhost(&self.url)
+    }
+
     pub fn port(&self) -> u16 {
         self.url.port().unwrap_or(80)
     }
 }
 
+pub fn is_url_localhost(url: &Url) -> bool {
+    match url.host() {
+        Some(Host::Domain(host)) => host == "localhost",
+        Some(Host::Ipv4(ipv4_addr)) => ipv4_addr.is_loopback(),
+        Some(Host::Ipv6(ipv6_addr)) => ipv6_addr.is_loopback(),
+        _ => false,
+    }
+}
 #[cfg(test)]
 mod tests {
     use super::*;

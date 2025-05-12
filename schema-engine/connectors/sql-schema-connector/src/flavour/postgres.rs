@@ -12,7 +12,7 @@ use enumflags2::BitFlags;
 use indoc::indoc;
 use psl::PreviewFeature;
 use quaint::{
-    connector::{PostgresUrl, PostgresWebSocketUrl},
+    connector::{is_url_localhost, PostgresUrl, PostgresWebSocketUrl},
     Value,
 };
 use renderer::PostgresRenderer;
@@ -30,7 +30,7 @@ use std::{
     sync::LazyLock,
     time,
 };
-use url::{Host, Url};
+use url::Url;
 use user_facing_errors::schema_engine::DatabaseSchemaInconsistent;
 
 use super::{SqlConnector, SqlDialect, UsingExternalShadowDb};
@@ -95,6 +95,24 @@ impl<'a> PpgParams<'a> {
             .ok_or_else(|| Self::required_param_error(Self::API_KEY_PARAM))
     }
 
+    pub fn local_database_url(&self) -> ConnectorResult<Url> {
+        self.with_local_api_key(|key| connection_string::parse(key.database_url))
+    }
+
+    pub fn local_shadow_database_url(&self) -> ConnectorResult<Url> {
+        self.with_local_api_key(|key| connection_string::parse(key.shadow_database_url))
+    }
+
+    fn with_local_api_key<A>(&self, f: impl Fn(LocalPpgApiKey<'_>) -> ConnectorResult<A>) -> ConnectorResult<A> {
+        let api_key_param = self.api_key()?;
+        let api_key_json = BASE64_URL_SAFE_NO_PAD
+            .decode(api_key_param)
+            .map_err(ConnectorError::url_parse_error)?;
+        let api_key: LocalPpgApiKey<'_> =
+            serde_json::from_slice(&api_key_json).map_err(ConnectorError::url_parse_error)?;
+        f(api_key)
+    }
+
     fn db_name_override(&self) -> Option<&str> {
         self.db_name_override.as_deref()
     }
@@ -113,39 +131,23 @@ impl<'a> PpgParams<'a> {
 #[serde(rename_all = "camelCase")]
 struct LocalPpgApiKey<'a> {
     database_url: &'a str,
+    shadow_database_url: &'a str,
 }
 
 impl MigratePostgresUrl {
     const PRISMA_POSTGRES_SCHEME: &'static str = "prisma+postgres";
 
     fn new(url: Url) -> ConnectorResult<Self> {
-        let is_localhost = match url.host() {
-            Some(Host::Domain("localhost")) => true,
-            Some(Host::Ipv4(ipv4_addr)) => ipv4_addr.is_loopback(),
-            Some(Host::Ipv6(ipv6_addr)) => ipv6_addr.is_loopback(),
-            _ => false,
-        };
-
         let postgres_url = match url.scheme() {
             // Local Prisma Postgres
-            Self::PRISMA_POSTGRES_SCHEME if is_localhost => {
+            Self::PRISMA_POSTGRES_SCHEME if is_url_localhost(&url) => {
                 let params = PpgParams::parse_from(&url)?;
-                let api_key_param = params.api_key()?;
-
-                let api_key_json = BASE64_URL_SAFE_NO_PAD
-                    .decode(api_key_param)
-                    .map_err(ConnectorError::url_parse_error)?;
-
-                let api_key_value: LocalPpgApiKey<'_> =
-                    serde_json::from_slice(&api_key_json).map_err(ConnectorError::url_parse_error)?;
-
-                let database_url = connection_string::parse(api_key_value.database_url)?;
-
+                let database_url = params.local_database_url()?;
                 PostgresUrl::new_native(database_url).map_err(ConnectorError::url_parse_error)?
             }
 
             // Remote Prisma Postgres
-            Self::PRISMA_POSTGRES_SCHEME if !is_localhost => {
+            Self::PRISMA_POSTGRES_SCHEME => {
                 let params = PpgParams::parse_from(&url).map_err(ConnectorError::url_parse_error)?;
                 let ws_url = Url::from_str(&MIGRATE_WS_BASE_URL).map_err(ConnectorError::url_parse_error)?;
 
