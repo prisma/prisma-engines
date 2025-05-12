@@ -242,7 +242,7 @@ pub fn aggregate(
 
             AggregationSelection::Max(fields) => fields.iter().fold(select, |select, next_field| {
                 select.value(
-                    alias.apply(
+                    alias.with_prefix(UNDERSCORE_MAX).apply(
                         max(Column::from(next_field.db_name().to_owned())
                             .set_is_enum(next_field.type_identifier().is_enum())
                             .set_is_selected(true)),
@@ -389,11 +389,11 @@ impl AliasGenerator for NoAlias {
 }
 
 #[derive(Debug, Default, Clone, Copy)]
-struct PrismaNameAlias;
+struct DbNameAlias;
 
-impl AliasGenerator for PrismaNameAlias {
+impl AliasGenerator for DbNameAlias {
     fn generate(&self, field: &ScalarField) -> Option<String> {
-        Some(field.name().to_owned())
+        Some(field.db_name().to_owned())
     }
 }
 
@@ -410,9 +410,9 @@ where
     }
 }
 
-/// Alias generator that uses the prisma name of the field.
-pub fn alias_with_prisma_name() -> impl AliasGenerator {
-    PrismaNameAlias
+/// Alias generator that uses the database name of the field.
+pub fn alias_with_db_name() -> impl AliasGenerator {
+    DbNameAlias
 }
 
 /// Alias generator that does not generate any aliases.

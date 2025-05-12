@@ -390,7 +390,7 @@ async fn plain_aggregate(
     let idents: Vec<_> = selections
         .iter()
         .flat_map(|aggregator| aggregator.identifiers())
-        .map(|(_, ident, arity)| (ident, arity))
+        .map(|ident| (ident.typ, ident.arity))
         .collect();
 
     let meta = column_metadata::create_anonymous(&idents);
@@ -417,7 +417,7 @@ async fn group_by_aggregate(
     let idents: Vec<_> = selections
         .iter()
         .flat_map(|aggregator| aggregator.identifiers())
-        .map(|(_, ident, arity)| (ident, arity))
+        .map(|ident| (ident.typ, ident.arity))
         .collect();
 
     let meta = column_metadata::create_anonymous(&idents);
