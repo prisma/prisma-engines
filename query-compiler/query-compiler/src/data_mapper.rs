@@ -130,21 +130,22 @@ fn get_result_node_for_aggregation(
 
     let mut node = ResultNode::new_object();
 
-    for (underscore_name, name, typ) in selectors
+    for (underscore_name, name, db_name, typ) in selectors
         .iter()
         .flat_map(|sel| {
-            sel.identifiers().into_iter().map(move |(name, typ, _)| {
-                let name = if matches!(&sel, AggregationSelection::Count { all: true, .. }) && name == "all" {
-                    "_all".to_owned()
-                } else {
-                    name
-                };
-                (aggregate_underscore_name(sel), name, typ)
+            sel.identifiers().into_iter().map(move |ident| {
+                let (name, db_name) =
+                    if matches!(&sel, AggregationSelection::Count { all: true, .. }) && ident.name == "all" {
+                        ("_all", "_all")
+                    } else {
+                        (ident.name, ident.db_name)
+                    };
+                (aggregate_underscore_name(sel), name, db_name, ident.typ)
             })
         })
-        .sorted_by_key(|(underscore_name, name, _)| ordered_set.get_index_of(&(*underscore_name, name.as_str())))
+        .sorted_by_key(|(underscore_name, name, _, _)| ordered_set.get_index_of(&(*underscore_name, *name)))
     {
-        let value = ResultNode::new_value(name.clone(), typ.to_prisma_type());
+        let value = ResultNode::new_value(db_name.into(), typ.to_prisma_type());
         if let Some(undescore_name) = underscore_name {
             node.entry(undescore_name)
                 .or_insert_with(ResultNode::new_object)

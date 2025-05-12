@@ -1,3 +1,6 @@
+use std::slice;
+
+use itertools::Either;
 use psl::schema_ast::ast::FieldArity;
 
 use crate::{ScalarFieldRef, TypeIdentifier};
@@ -29,42 +32,49 @@ pub enum AggregationSelection {
 
 impl AggregationSelection {
     /// Returns (field_db_name, TypeIdentifier, FieldArity)
-    pub fn identifiers(&self) -> Vec<(String, TypeIdentifier, FieldArity)> {
+    pub fn identifiers(&self) -> impl Iterator<Item = SelectionIdenfitier<'_>> {
         match self {
-            AggregationSelection::Field(field) => {
-                vec![(field.db_name().to_owned(), field.type_identifier(), field.arity())]
-            }
+            AggregationSelection::Field(field) => Either::Left(Self::map_field_types(slice::from_ref(field), |t| t)),
+            AggregationSelection::Average(fields) => Either::Left(Self::map_field_types(fields, |t| match t {
+                TypeIdentifier::Decimal => TypeIdentifier::Decimal,
+                _ => TypeIdentifier::Float,
+            })),
+            AggregationSelection::Sum(fields) => Either::Left(Self::map_field_types(fields, |t| t)),
+            AggregationSelection::Min(fields) => Either::Left(Self::map_field_types(fields, |t| t)),
+            AggregationSelection::Max(fields) => Either::Left(Self::map_field_types(fields, |t| t)),
 
             AggregationSelection::Count { all, fields } => {
-                let mut mapped = Self::map_field_types(fields, Some(TypeIdentifier::Int));
-
+                let mapped = Self::map_field_types(fields, |_| TypeIdentifier::Int);
                 if *all {
-                    mapped.push(("all".to_owned(), TypeIdentifier::Int, FieldArity::Required));
+                    Either::Right(mapped.chain([SelectionIdenfitier {
+                        name: "all",
+                        db_name: "all",
+                        typ: TypeIdentifier::Int,
+                        arity: FieldArity::Required,
+                    }]))
+                } else {
+                    Either::Left(mapped)
                 }
-
-                mapped
             }
-
-            AggregationSelection::Average(fields) => Self::map_field_types(fields, Some(TypeIdentifier::Float)),
-            AggregationSelection::Sum(fields) => Self::map_field_types(fields, None),
-            AggregationSelection::Min(fields) => Self::map_field_types(fields, None),
-            AggregationSelection::Max(fields) => Self::map_field_types(fields, None),
         }
     }
 
     fn map_field_types(
         fields: &[ScalarFieldRef],
-        fixed_type: Option<TypeIdentifier>,
-    ) -> Vec<(String, TypeIdentifier, FieldArity)> {
-        fields
-            .iter()
-            .map(|f| {
-                (
-                    f.db_name().to_owned(),
-                    fixed_type.unwrap_or_else(|| f.type_identifier()),
-                    FieldArity::Required,
-                )
-            })
-            .collect()
+        mapper: fn(TypeIdentifier) -> TypeIdentifier,
+    ) -> impl Iterator<Item = SelectionIdenfitier<'_>> {
+        fields.iter().map(move |f| SelectionIdenfitier {
+            name: f.name(),
+            db_name: f.db_name(),
+            typ: mapper(f.type_identifier()),
+            arity: f.arity(),
+        })
     }
+}
+
+pub struct SelectionIdenfitier<'a> {
+    pub name: &'a str,
+    pub db_name: &'a str,
+    pub typ: TypeIdentifier,
+    pub arity: FieldArity,
 }
