@@ -133,7 +133,7 @@ fn get_result_node_for_aggregation(
     for (underscore_name, name, db_name, typ) in selectors
         .iter()
         .flat_map(|sel| {
-            sel.identifiers().into_iter().map(move |ident| {
+            sel.identifiers().map(move |ident| {
                 let (name, db_name) =
                     if matches!(&sel, AggregationSelection::Count { all: true, .. }) && ident.name == "all" {
                         ("_all", "_all")
