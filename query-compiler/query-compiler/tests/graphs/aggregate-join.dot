@@ -1,0 +1,4 @@
+digraph {
+    0 [label="ManyRecordsQuery(name: 'findManyUser', model: 'User', selection: FieldSelection { fields: [User.id, User.email, User._count.activations] })\l", fillcolor=red, style=filled, shape=rectangle, fontcolor=white]
+
+}

@@ -1,0 +1,5 @@
+digraph {
+    0 [label="UpdateRecord(model: User, selection: Some(\l    FieldSelection {\l        selections: [\l            Scalar(\l                ScalarField(\l                    \"User.id\",\l                ),\l            ),\l            Scalar(\l                ScalarField(\l                    \"User.email\",\l                ),\l            ),\l        ],\l    },\l))\l", fillcolor=blue, style=filled, shape=rectangle, fontcolor=white]
+    1 [label="Empty\l", shape=rectangle]
+    0 -> 1 [label="ProjectedDataDependency ([\"User.id\"])"]
+}

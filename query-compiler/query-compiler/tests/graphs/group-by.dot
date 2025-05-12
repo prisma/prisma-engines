@@ -1,0 +1,4 @@
+digraph {
+    0 [label="AggregateRecordsQuery: groupByPost\l", fillcolor=red, style=filled, shape=rectangle, fontcolor=white]
+
+}

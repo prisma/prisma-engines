@@ -445,6 +445,14 @@ impl PrismaValue {
     pub fn as_tagged(&self) -> TaggedPrismaValue<'_> {
         TaggedPrismaValue::from(self)
     }
+
+    pub fn placeholder_name(&self) -> Option<&str> {
+        if let Self::Placeholder { name, .. } = self {
+            Some(name)
+        } else {
+            None
+        }
+    }
 }
 
 impl fmt::Display for PrismaValue {

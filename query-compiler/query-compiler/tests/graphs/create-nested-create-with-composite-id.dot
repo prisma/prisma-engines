@@ -1,0 +1,7 @@
+digraph {
+    0 [label="CreateRecord(model: ParentModelWithCompositeId, args: WriteArgs {\l    request_now: DateTime(\l        2025-05-07T13:20:19.446458+00:00,\l    ),\l    args: {\l        DatasourceFieldName(\l            \"a\",\l        ): Scalar(\l            Set(\l                Int(\l                    1,\l                ),\l            ),\l        ),\l        DatasourceFieldName(\l            \"b\",\l        ): Scalar(\l            Set(\l                Int(\l                    1,\l                ),\l            ),\l        ),\l    },\l})\l", fillcolor=red, style=filled, shape=rectangle, fontcolor=white]
+    1 [label="CreateManyRecord(model: ChildOfModelWithCompositeId, selected_fields: None)\l", shape=rectangle]
+    2 [label="RecordQuery(name: 'createOneParentModelWithCompositeId', selection: FieldSelection { fields: [ParentModelWithCompositeId.a, ParentModelWithCompositeId.b] })\l", fillcolor=blue, style=filled, shape=rectangle, fontcolor=white]
+    0 -> 1 [label="ProjectedDataDependency ([\"ParentModelWithCompositeId.a\", \"ParentModelWithCompositeId.b\"])"]
+    0 -> 2 [label="ProjectedDataDependency ([\"ParentModelWithCompositeId.a\", \"ParentModelWithCompositeId.b\"])"]
+}
