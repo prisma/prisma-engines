@@ -410,7 +410,7 @@ where
     }
 }
 
-/// Alias generator that uses the prisma name of the field.
+/// Alias generator that uses the database name of the field.
 pub fn alias_with_db_name() -> impl AliasGenerator {
     DbNameAlias
 }
