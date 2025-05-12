@@ -47,6 +47,7 @@ pub(crate) fn quaint_value_to_prisma_value(value: quaint::Value<'_>, family: Sql
             PrismaValue::List(a.into_iter().map(|v| quaint_value_to_prisma_value(v, family)).collect())
         }
         quaint::ValueType::Array(None) => PrismaValue::Null,
+        quaint::ValueType::Numeric(Some(bd)) if !family.is_sqlite() => PrismaValue::String(bd.to_string()),
         quaint::ValueType::Numeric(Some(bd)) => PrismaValue::Float(bd),
         quaint::ValueType::Numeric(None) => PrismaValue::Null,
         quaint::ValueType::Json(Some(j)) => PrismaValue::Json(j.to_string()),
