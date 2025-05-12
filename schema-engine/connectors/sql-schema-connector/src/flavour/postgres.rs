@@ -61,7 +61,7 @@ struct PpgParams<'a> {
     ///
     /// In remote Prisma Postgres URLs, this parameter is used to authenticate the connection.
     ///
-    /// In local Prisma Postgres URLs, this parameter is a base64-encoded JSON
+    /// In local Prisma Postgres URLs, this parameter is a base64url-encoded JSON
     /// object that contains data necessary for local PPg emulation. Schema
     /// engine decodes it to extract the connection string to the underlying
     /// PostgreSQL database to perform migrations.
@@ -132,7 +132,7 @@ impl MigratePostgresUrl {
                 let params = PpgParams::parse_from(&url)?;
                 let api_key_param = params.api_key()?;
 
-                let api_key_json = BASE64_STANDARD
+                let api_key_json = BASE64_URL_SAFE_NO_PAD
                     .decode(api_key_param)
                     .map_err(ConnectorError::url_parse_error)?;
 
