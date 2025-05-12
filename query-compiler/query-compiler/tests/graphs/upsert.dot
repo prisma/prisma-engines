@@ -1,4 +1,0 @@
-digraph {
-    0 [label="Upsert(model: User\l", fillcolor=red, style=filled, shape=rectangle, fontcolor=white]
-
-}

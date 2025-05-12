@@ -1,7 +1,0 @@
-digraph {
-    0 [label="UpdateRecord(model: Employee, selection: Some(\l    FieldSelection {\l        selections: [\l            Scalar(\l                ScalarField(\l                    \"Employee.id\",\l                ),\l            ),\l            Scalar(\l                ScalarField(\l                    \"Employee.managerId\",\l                ),\l            ),\l        ],\l    },\l))\l", shape=rectangle]
-    1 [label="RecordQuery(name: 'read_ids_infallible', selection: FieldSelection { fields: [Employee.id] })\l", fillcolor=red, style=filled, shape=rectangle, fontcolor=white]
-    2 [label="RecordQuery(name: 'updateOneEmployee', selection: FieldSelection { fields: [Employee.id, Employee.managerId] })\l", fillcolor=blue, style=filled, shape=rectangle, fontcolor=white]
-    1 -> 0 [label="ProjectedDataDependency ([\"Employee.id\"])"]
-    0 -> 2 [label="ProjectedDataDependency ([\"Employee.id\"])"]
-}

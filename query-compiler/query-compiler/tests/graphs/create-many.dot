@@ -1,4 +1,0 @@
-digraph {
-    0 [label="CreateManyRecord(model: User, selected_fields: None)\l", fillcolor=red, style=filled, shape=rectangle, fontcolor=white]
-
-}

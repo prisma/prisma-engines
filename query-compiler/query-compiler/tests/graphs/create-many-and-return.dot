@@ -1,4 +1,0 @@
-digraph {
-    0 [label="CreateManyRecord(model: User, selected_fields: Some(\l    CreateManyRecordsFields {\l        fields: FieldSelection {\l            selections: [\l                Scalar(\l                    ScalarField(\l                        \"User.id\",\l                    ),\l                ),\l                Scalar(\l                    ScalarField(\l                        \"User.email\",\l                    ),\l                ),\l            ],\l        },\l        order: [\l            \"id\",\l            \"email\",\l        ],\l        nested: [],\l    },\l))\l", fillcolor=red, style=filled, shape=rectangle, fontcolor=white]
-
-}

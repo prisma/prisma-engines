@@ -1,4 +1,0 @@
-digraph {
-    0 [label="DeleteManyRecords: Post\l", fillcolor=blue, style=filled, shape=rectangle, fontcolor=white]
-
-}

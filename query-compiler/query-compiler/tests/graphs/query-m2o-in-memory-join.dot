@@ -1,4 +1,0 @@
-digraph {
-    0 [label="ManyRecordsQuery(name: 'findManyActivation', model: 'Activation', selection: FieldSelection { fields: [Activation.id, Activation.issued, Activation.secret, Activation.done, Activation.userId] })\l", fillcolor=red, style=filled, shape=rectangle, fontcolor=white]
-
-}

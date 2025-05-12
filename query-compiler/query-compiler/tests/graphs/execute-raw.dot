@@ -1,4 +1,0 @@
-digraph {
-    0 [label="ExecuteRaw: {\l    \"parameters\": List(\l        [\l            String(\l                \"user.1737556027349@prisma.io\",\l            ),\l        ],\l    ),\l    \"query\": String(\l        \"INSERT INTO User (email) VALUES ($1)\",\l    ),\l}\l", fillcolor=red, style=filled, shape=rectangle, fontcolor=white]
-
-}
