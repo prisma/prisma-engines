@@ -10,8 +10,8 @@ let 0 = unique (query «UPDATE "public"."User" SET "email" = $1 WHERE
                        "public"."User"."id", "public"."User"."email"»
                 params [const(String("user.2737556028164@prisma.io")),
                         const(String("user.1737556028164@prisma.io"))])
-in let 0$id = mapField id (validate (get 0)
+in let 0 = validate (get 0)
        [ rowCountNeq 0
-       ] orRaise "MISSING_RECORD")
-   in ;
+       ] orRaise "MISSING_RECORD"
+   in ();
    get 0

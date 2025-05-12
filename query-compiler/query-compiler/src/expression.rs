@@ -89,20 +89,33 @@ pub enum Expression {
         structure: ResultNode,
     },
 
+    /// Validates the expression according to the data rule and throws an error if it doesn't match.
     Validate {
         expr: Box<Expression>,
         rules: Vec<DataRule>,
         error_identifier: &'static str,
         context: serde_json::Value,
     },
+
+    /// Checks if `value` satisifies the `rule`, and executes `then` if it does, or `r#else` if it doesn't.
+    If {
+        value: Box<Expression>,
+        rule: DataRule,
+        then: Box<Expression>,
+        r#else: Box<Expression>,
+    },
+
+    /// Unit value.
+    Unit,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Serialize)]
 pub enum ExpressionType {
     Scalar,
     Record,
     List(Box<ExpressionType>),
     Dynamic,
+    Unit,
 }
 
 impl ExpressionType {
@@ -158,6 +171,16 @@ impl Expression {
             Expression::Transaction(expression) => expression.r#type(),
             Expression::DataMap { expr, .. } => expr.r#type(),
             Expression::Validate { expr, .. } => expr.r#type(),
+            Expression::If { then, r#else, .. } => {
+                let then_type = then.r#type();
+                let else_type = r#else.r#type();
+                if then_type == else_type {
+                    then_type
+                } else {
+                    ExpressionType::Dynamic
+                }
+            }
+            Expression::Unit => ExpressionType::Unit,
         }
     }
 

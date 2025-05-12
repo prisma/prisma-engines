@@ -16,22 +16,20 @@ transaction
                           "public"."ParentModelWithCompositeId"."a",
                           "public"."ParentModelWithCompositeId"."b"»
                    params [const(BigInt(1)), const(BigInt(1))])
-   in let 0$a = mapField a (validate (get 0)
+   in let 0 = validate (get 0)
           [ rowCountNeq 0
-          ] orRaise "MISSING_RELATED_RECORD");
-          0$b = mapField b (validate (get 0)
-          [ rowCountNeq 0
-          ] orRaise "MISSING_RELATED_RECORD")
+          ] orRaise "MISSING_RELATED_RECORD";
+          0$a = mapField a (get 0);
+          0$b = mapField b (get 0)
       in sum (execute «INSERT INTO "public"."ChildOfModelWithCompositeId"
                        ("id","parentA","parentB") VALUES ($1,$2,$3), ($4,$5,$6)»
               params [const(BigInt(1)), var(0$a as Int), var(0$b as Int),
                       const(BigInt(2)), var(0$a as Int), var(0$b as Int)]);
-      let 2 = let 0$a = mapField a (validate (get 0)
+      let 2 = let 0 = validate (get 0)
                   [ rowCountNeq 0
-                  ] orRaise "MISSING_RECORD");
-                  0$b = mapField b (validate (get 0)
-                  [ rowCountNeq 0
-                  ] orRaise "MISSING_RECORD")
+                  ] orRaise "MISSING_RECORD";
+                  0$a = mapField a (get 0);
+                  0$b = mapField b (get 0)
           in let 2 = let @parent = unique (query «SELECT
                                                   "public"."ParentModelWithCompositeId"."a",
                                                   "public"."ParentModelWithCompositeId"."b"

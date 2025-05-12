@@ -305,12 +305,9 @@ impl Expressionista {
             let flow: Flow = node.try_into()?;
 
             if let Flow::Return(result) = flow {
-                let result = match result {
-                    Some(r) => Box::new(ExpressionResult::FixedResult(r)),
-                    None => Box::new(ExpressionResult::Empty),
-                };
-
-                Ok(Expression::Return { result })
+                Ok(Expression::Return {
+                    result: ExpressionResult::FixedResult(result).into(),
+                })
             } else {
                 unreachable!()
             }

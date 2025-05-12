@@ -1,0 +1,100 @@
+---
+source: query-compiler/query-compiler/tests/queries.rs
+expression: pretty
+input_file: query-compiler/query-compiler/tests/data/create-nested-connectOrCreate-one2m.json
+---
+transaction
+   dataMap
+      id: Int [id]
+      title: String [title]
+      userId: Int [userId]
+      user: 
+         id: Int [id]
+         email: String [email]
+      categories: 
+         id: Int [id]
+         name: String [name]
+   let 1 = unique (query «SELECT "public"."User"."id" FROM "public"."User" WHERE
+                          ("public"."User"."id" = $1 AND 1=1) LIMIT $2 OFFSET
+                          $3»
+                   params [const(BigInt(1)), const(BigInt(1)),
+                           const(BigInt(0))])
+   in let 0 = let 1 = validate (get 1)
+                  [ rowCountNeq 0
+                  ] orRaise "MISSING_RELATED_RECORD";
+                  1$id = mapField id (get 1)
+          in let 0 = unique (query «INSERT INTO "public"."Post"
+                                    ("title","userId") VALUES ($1,$2) RETURNING
+                                    "public"."Post"."id"»
+                             params [const(String("How to get rich quick and not go to jail")),
+                                     var(1$id as Int)])
+             in let 2 = query «SELECT "public"."Category"."id" FROM
+                               "public"."Category" WHERE
+                               ("public"."Category"."id" = $1 AND 1=1) OFFSET
+                               $2»
+                        params [const(BigInt(10)), const(BigInt(0))]
+                in if (rowCountNeq 0 (get 2))
+                   then let 0$id = mapField id (get 0);
+                            2 = validate (get 2)
+                            [ rowCountEq 1
+                            ] orRaise "INCOMPLETE_CONNECT_INPUT";
+                            2$id = mapField id (get 2)
+                        in execute «INSERT INTO "public"."_CategoryToPost"
+                                    ("B","A") VALUES [($1)] ON CONFLICT DO
+                                    NOTHING»
+                           params [product(var(0$id as Any), var(2$id as Any))]
+                   else let 3 = unique (query «INSERT INTO "public"."Category"
+                                               ("id","name") VALUES ($1,$2)
+                                               RETURNING
+                                               "public"."Category"."id"»
+                                        params [const(BigInt(10)),
+                                                const(String("JavaScript"))])
+                        in let 0$id = mapField id (get 0);
+                               3 = validate (get 3)
+                               [ rowCountEq 1
+                               ] orRaise "INCOMPLETE_CONNECT_INPUT";
+                               3$id = mapField id (get 3)
+                           in execute «INSERT INTO "public"."_CategoryToPost"
+                                       ("B","A") VALUES [($1)] ON CONFLICT DO
+                                       NOTHING»
+                              params [product(var(0$id as Any),
+                                              var(3$id as Any))];
+                let 7 = let 0 = validate (get 0)
+                            [ rowCountNeq 0
+                            ] orRaise "MISSING_RECORD";
+                            0$id = mapField id (get 0)
+                    in let 7 = let @parent = unique (query «SELECT
+                                                            "public"."Post"."id",
+                                                            "public"."Post"."title",
+                                                            "public"."Post"."userId"
+                                                            FROM "public"."Post"
+                                                            WHERE
+                                                            "public"."Post"."id"
+                                                            = $1 LIMIT $2 OFFSET
+                                                            $3»
+                                                     params [var(0$id as Int),
+                                                             const(BigInt(1)),
+                                                             const(BigInt(0))])
+                           in let @parent$id = mapField id (get @parent);
+                                  @parent$userId = mapField userId (get @parent)
+                              in join (get @parent)
+                                 with (unique (query «SELECT
+                                                      "public"."User"."id",
+                                                      "public"."User"."email"
+                                                      FROM "public"."User" WHERE
+                                                      "public"."User"."id" = $1
+                                                      LIMIT $2 OFFSET $3»
+                                               params [var(@parent$userId as Int),
+                                                       const(BigInt(1)),
+                                                       const(BigInt(0))])) on left.(userId) = right.(id) as user,
+                                      (query «SELECT "t1"."id", "t1"."name",
+                                              "t0"."B" AS "CategoryToPost@Post"
+                                              FROM "public"."_CategoryToPost" AS
+                                              "t0" INNER JOIN
+                                              "public"."Category" AS "t1" ON
+                                              "t0"."A" = "t1"."id" WHERE
+                                              "t0"."B" = $1»
+                                       params [var(@parent$id as Int)]) on left.(id) = right.(CategoryToPost@Post) as categories
+                       in get 7
+                in get 7
+      in get 0
