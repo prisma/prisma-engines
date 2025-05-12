@@ -43,7 +43,7 @@ mod find_first_or_throw_query {
           &runner,
           "query { findFirstTestModelOrThrow(where: { id: 6 }) { id }}",
           2025,
-          "An operation failed because it depends on one or more records that were required but not found. Expected a record, found none."
+          "An operation failed because it depends on one or more records that were required but not found. No record was found for a query."
         );
 
         Ok(())

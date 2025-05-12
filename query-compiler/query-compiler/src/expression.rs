@@ -1,6 +1,6 @@
 use crate::result_node::ResultNode;
 use query_builder::DbQuery;
-use query_core::DataRule;
+use query_core::{DataExpectation, DataRule};
 use serde::Serialize;
 
 mod format;
@@ -158,6 +158,15 @@ impl Expression {
             Expression::Transaction(expression) => expression.r#type(),
             Expression::DataMap { expr, .. } => expr.r#type(),
             Expression::Validate { expr, .. } => expr.r#type(),
+        }
+    }
+
+    pub fn validate_expectation(expectation: &DataExpectation, expr: Expression) -> Expression {
+        Expression::Validate {
+            expr: expr.into(),
+            rules: expectation.rules().to_vec(),
+            error_identifier: expectation.error().id(),
+            context: expectation.error().context(),
         }
     }
 }

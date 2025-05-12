@@ -1,6 +1,6 @@
 use query_structure::{
     AggregationSelection, FieldSelection, Filter, Model, PrismaValue, QueryArguments, RecordFilter, RelationField,
-    ScalarCondition, ScalarField, SelectionResult, WriteArgs,
+    ScalarCondition, ScalarField, SelectionResult, TaggedPrismaValue, WriteArgs,
 };
 use serde::Serialize;
 use std::fmt::Formatter;
@@ -145,10 +145,15 @@ impl fmt::Display for RelationLink {
 #[serde(tag = "type", rename_all = "camelCase")]
 pub enum DbQuery {
     #[serde(rename_all = "camelCase")]
-    RawSql { sql: String, params: Vec<PrismaValue> },
+    RawSql {
+        sql: String,
+        #[serde(serialize_with = "serialize_params")]
+        params: Vec<PrismaValue>,
+    },
     #[serde(rename_all = "camelCase")]
     TemplateSql {
         fragments: Vec<Fragment>,
+        #[serde(serialize_with = "serialize_params")]
         params: Vec<PrismaValue>,
         placeholder_format: PlaceholderFormat,
     },
@@ -201,4 +206,11 @@ impl fmt::Display for DbQuery {
         }
         Ok(())
     }
+}
+
+fn serialize_params<S>(obj: &[PrismaValue], serializer: S) -> Result<S::Ok, S::Error>
+where
+    S: serde::Serializer,
+{
+    serializer.collect_seq(obj.iter().map(TaggedPrismaValue::from))
 }

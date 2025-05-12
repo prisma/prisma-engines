@@ -41,13 +41,10 @@ writes::nested_mutations::not_using_schema_base::nested_update_inside_update::up
 writes::nested_mutations::not_using_schema_base::nested_update_inside_update::update_inside_update::m2m_reject_null_in_uniq
 writes::top_level_mutations::create::create::create_should_work
 writes::top_level_mutations::create::create::create_with_datetime_ident
-writes::top_level_mutations::create::json_create::create_json_adv
 writes::top_level_mutations::create_list::create_list::create_not_accept_null_in_set
-writes::top_level_mutations::create_many::json_create_many::create_many_json_adv
 writes::top_level_mutations::create_many_and_return::create_many_and_return::create_many_11_inline_rel_read_works
 writes::top_level_mutations::create_many_and_return::create_many_and_return::create_many_1m_inline_rel_read_works
 writes::top_level_mutations::create_many_and_return::create_many_and_return::create_many_map_behavior
-writes::top_level_mutations::create_many_and_return::json_create_many_and_return::create_many_json_adv
 writes::top_level_mutations::default_value::default_value::remapped_enum_field
 writes::top_level_mutations::default_value::default_value::updated_at_created_at
 writes::top_level_mutations::delete::delete::delete_fails_if_filter_dont_match
@@ -62,13 +59,9 @@ writes::top_level_mutations::non_embedded_upsert::non_embedded_upsert::nested_co
 writes::top_level_mutations::non_embedded_upsert::non_embedded_upsert::nested_connect_in_update
 writes::top_level_mutations::non_embedded_upsert::non_embedded_upsert::nested_delete_in_update
 writes::top_level_mutations::non_embedded_upsert::non_embedded_upsert::nested_disconnect_in_update
-writes::top_level_mutations::update::json_update::update_json_adv
 writes::top_level_mutations::update::update::update_an_item
-writes::top_level_mutations::update::update::update_fail_uniq_field_inexistant_value
-writes::top_level_mutations::update::update::update_fails_if_filter_dont_match
 writes::top_level_mutations::update::update::update_with_shorthand_notation
 writes::top_level_mutations::update::update::updated_created_at_mutable_with_update
-writes::top_level_mutations::update_many_and_return::json_update_many_and_return::update_json_adv
 writes::top_level_mutations::update_many_and_return::update_many_and_return::update_many_11_inline_rel_read_works
 writes::top_level_mutations::upsert::upsert::only_update_if_uniq_field_change
 writes::top_level_mutations::upsert::upsert::only_update_if_update_changes_nothing

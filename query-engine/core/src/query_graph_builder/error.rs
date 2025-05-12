@@ -115,7 +115,7 @@ impl DataDependencyError for RelationViolation {
 }
 
 #[derive(Debug, Serialize)]
-pub(crate) struct MissingRecord {
+pub struct MissingRecord {
     operation: DataOperation,
 }
 
@@ -291,7 +291,7 @@ impl DataDependencyError for RecordsNotConnected {
 
 #[derive(Debug, Clone, Serialize)]
 #[serde(into = "String")]
-pub(crate) enum DataOperation {
+pub enum DataOperation {
     Query,
     Update,
     Upsert,
