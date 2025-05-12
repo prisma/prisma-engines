@@ -1,16 +1,16 @@
 mod query;
 
 use super::expression::{Binding, Expression};
-use crate::Expression::Transaction;
 use crate::data_mapper::map_result_structure;
+use crate::{Expression::Transaction, selection::SelectionResults};
 use itertools::{Either, Itertools};
 use query::translate_query;
 use query_builder::QueryBuilder;
 use query_core::{
-    DataSink, EdgeRef, Flow, Node, NodeRef, Query, QueryGraph, QueryGraphBuilderError, QueryGraphDependency,
-    QueryGraphError,
+    Computation, DataSink, EdgeRef, Flow, Node, NodeRef, Query, QueryGraph, QueryGraphBuilderError,
+    QueryGraphDependency, QueryGraphError,
 };
-use query_structure::{FieldSelection, PrismaValue, PrismaValueType, SelectedField, SelectionResult};
+use query_structure::{FieldSelection, Placeholder, PrismaValue, PrismaValueType, SelectedField, SelectionResult};
 use thiserror::Error;
 
 #[derive(Debug, Error)]
@@ -96,7 +96,8 @@ impl<'a, 'b> NodeTranslator<'a, 'b> {
             }
             Node::Flow(Flow::If { .. }) => self.translate_if(),
             Node::Flow(Flow::Return(_)) => self.translate_return(),
-            Node::Computation(_) => unimplemented!("Node::Computation"),
+            Node::Computation(Computation::DiffLeftToRight(_)) => self.translate_diff_left_to_right(),
+            Node::Computation(Computation::DiffRightToLeft(_)) => self.translate_diff_right_to_left(),
         }
     }
 
@@ -191,18 +192,9 @@ impl<'a, 'b> NodeTranslator<'a, 'b> {
             panic!("current node must be Flow::If");
         };
 
-        let selection_result = data.into_iter().exactly_one().expect("only one row expected");
-        let binding_name = selection_result
-            .pairs()
-            .next()
-            .expect("at least one field must be present")
-            .1
-            .placeholder_name()
-            .expect("value must be placeholder");
-
         let expr = Expression::If {
             value: Expression::Get {
-                name: binding_name.to_owned(),
+                name: SelectionResults::new(data).into_placeholder()?.name,
             }
             .into(),
             rule,
@@ -223,17 +215,56 @@ impl<'a, 'b> NodeTranslator<'a, 'b> {
             panic!("current node must be Flow::Return");
         };
 
-        let selection_result = data.into_iter().exactly_one().expect("only one row expected");
-        let binding_name = selection_result
-            .pairs()
-            .next()
-            .expect("at least one field must be present")
-            .1
-            .placeholder_name()
-            .expect("value must be placeholder");
-
         let expr = Expression::Get {
-            name: binding_name.to_owned(),
+            name: SelectionResults::new(data).into_placeholder()?.name,
+        };
+
+        Ok(self.wrap_children_with_expr(expr, children))
+    }
+
+    fn translate_diff_left_to_right(&mut self) -> TranslateResult<Expression> {
+        let children = self.translate_children()?;
+
+        let node = self.graph.pluck_node(&self.node);
+        let node = self.transform_node(node)?;
+
+        let Node::Computation(Computation::DiffLeftToRight(diff)) = node else {
+            panic!("current node must be Computation::DiffLeftToRight");
+        };
+
+        let expr = Expression::Diff {
+            from: Expression::Get {
+                name: SelectionResults::new(diff.left).into_placeholder()?.name,
+            }
+            .into(),
+            to: Expression::Get {
+                name: SelectionResults::new(diff.right).into_placeholder()?.name,
+            }
+            .into(),
+        };
+
+        Ok(self.wrap_children_with_expr(expr, children))
+    }
+
+    fn translate_diff_right_to_left(&mut self) -> TranslateResult<Expression> {
+        let children = self.translate_children()?;
+
+        let node = self.graph.pluck_node(&self.node);
+        let node = self.transform_node(node)?;
+
+        let Node::Computation(Computation::DiffRightToLeft(diff)) = node else {
+            panic!("current node must be Computation::DiffRightToLeft");
+        };
+
+        let expr = Expression::Diff {
+            from: Expression::Get {
+                name: SelectionResults::new(diff.right).into_placeholder()?.name,
+            }
+            .into(),
+            to: Expression::Get {
+                name: SelectionResults::new(diff.left).into_placeholder()?.name,
+            }
+            .into(),
         };
 
         Ok(self.wrap_children_with_expr(expr, children))
@@ -438,14 +469,14 @@ impl<'a, 'b> NodeTranslator<'a, 'b> {
             .map(|field| {
                 (
                     field.clone(),
-                    PrismaValue::Placeholder {
+                    PrismaValue::Placeholder(Placeholder {
                         name: if bindings_refer_to_fields {
                             generate_projected_dependency_name(self.graph.edge_source(edge), field)
                         } else {
                             self.graph.edge_source(edge).id()
                         },
                         r#type: PrismaValueType::Any,
-                    },
+                    }),
                 )
             })
             .collect_vec()

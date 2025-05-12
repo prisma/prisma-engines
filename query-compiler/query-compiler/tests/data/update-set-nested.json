@@ -1,0 +1,18 @@
+{
+  "modelName": "User",
+  "action": "updateOne",
+  "query": {
+    "arguments": {
+      "where": { "email": "user.1737556028164@prisma.io" },
+      "data": { "posts": { "set": [{ "id": 11 }, { "id": 12 }] } }
+    },
+    "selection": {
+      "$composites": true,
+      "$scalars": true,
+      "posts": {
+        "arguments": {},
+        "selection": { "$composites": true, "$scalars": true }
+      }
+    }
+  }
+}

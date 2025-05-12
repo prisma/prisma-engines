@@ -5,7 +5,7 @@ use pretty::{
     termcolor::{Color, ColorSpec},
 };
 use query_core::DataRule;
-use query_structure::PrismaValue;
+use query_structure::{Placeholder, PrismaValue};
 use std::borrow::Cow;
 
 fn color_kw() -> ColorSpec {
@@ -71,6 +71,7 @@ where
                 r#else,
             } => self.r#if(value, rule, then, r#else),
             Expression::Unit => self.keyword("()"),
+            Expression::Diff { from, to } => self.diff(from, to),
         }
     }
 
@@ -128,7 +129,7 @@ where
 
     fn value(&'a self, value: &'a PrismaValue) -> DocBuilder<'a, PrettyPrinter<'a, D>, ColorSpec> {
         match value {
-            PrismaValue::Placeholder { name, r#type } => self.keyword("var").append(
+            PrismaValue::Placeholder(Placeholder { name, r#type }) => self.keyword("var").append(
                 self.var_name(name)
                     .append(self.space())
                     .append(self.keyword("as"))
@@ -152,12 +153,15 @@ where
     fn function(
         &'a self,
         name: &'static str,
-        args: &'a [Expression],
+        args: impl IntoIterator<Item = &'a Expression>,
     ) -> DocBuilder<'a, PrettyPrinter<'a, D>, ColorSpec> {
-        self.text(name).annotate(color_fn()).append(self.space()).append(
-            self.intersperse(args.iter().map(|expr| self.expression(expr)), self.space())
-                .parens(),
-        )
+        self.text(name)
+            .annotate(color_fn())
+            .append(self.softline())
+            .append(self.intersperse(
+                args.into_iter().map(|expr| self.expression(expr).parens().align()),
+                self.softline(),
+            ))
     }
 
     fn unary_function(
@@ -369,6 +373,10 @@ where
             .append(self.keyword("else"))
             .append(self.softline())
             .append(self.expression(r#else).align())
+    }
+
+    fn diff(&'a self, from: &'a Expression, to: &'a Expression) -> DocBuilder<'a, PrettyPrinter<'a, D>, ColorSpec> {
+        self.function("diff", [from, to])
     }
 }
 

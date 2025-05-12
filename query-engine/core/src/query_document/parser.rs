@@ -825,7 +825,7 @@ pub(crate) mod conversions {
         schema::{InputType, OutputType},
         ArgumentValue,
     };
-    use query_structure::PrismaValue;
+    use query_structure::{Placeholder, PrismaValue};
     use schema::InnerOutputType;
     use user_facing_errors::query_engine::validation::{self, InputTypeDescription};
 
@@ -933,7 +933,7 @@ pub(crate) mod conversions {
             PrismaValue::Float(_) => "Float".to_string(),
             PrismaValue::BigInt(_) => "BigInt".to_string(),
             PrismaValue::Bytes(_) => "Bytes".to_string(),
-            PrismaValue::Placeholder { r#type, .. } => r#type.to_string(),
+            PrismaValue::Placeholder(Placeholder { r#type, .. }) => r#type.to_string(),
             PrismaValue::GeneratorCall { return_type, .. } => return_type.to_string(),
         }
     }

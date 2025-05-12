@@ -52,10 +52,7 @@ pub enum PrismaValue {
     Bytes(Vec<u8>),
 
     #[serde(serialize_with = "serialize_placeholder")]
-    Placeholder {
-        name: String,
-        r#type: PrismaValueType,
-    },
+    Placeholder(Placeholder),
 
     #[serde(serialize_with = "serialize_generator_call")]
     GeneratorCall {
@@ -97,6 +94,12 @@ impl std::fmt::Display for PrismaValueType {
             PrismaValueType::Bytes => write!(f, "Bytes"),
         }
     }
+}
+
+#[derive(Debug, Clone, Eq, PartialEq, Hash, Deserialize, PartialOrd, Ord)]
+pub struct Placeholder {
+    pub name: String,
+    pub r#type: PrismaValueType,
 }
 
 /// Stringify a date to the following format
@@ -203,10 +206,10 @@ impl TryFrom<serde_json::Value> for PrismaValue {
                         .ok_or_else(|| ConversionFailure::new("param name", "JSON param value"))?
                         .to_owned();
 
-                    Ok(PrismaValue::Placeholder {
+                    Ok(PrismaValue::Placeholder(Placeholder {
                         name,
                         r#type: PrismaValueType::Any, // parsing the type is not implemented yet
-                    })
+                    }))
                 }
 
                 _ => Ok(PrismaValue::Json(serde_json::to_string(&obj).unwrap())),
@@ -276,7 +279,7 @@ where
     serializer.collect_map(obj.iter().map(|(k, v)| (k, v)))
 }
 
-fn serialize_placeholder<S>(name: &str, r#type: &PrismaValueType, serializer: S) -> Result<S::Ok, S::Error>
+fn serialize_placeholder<S>(Placeholder { name, r#type }: &Placeholder, serializer: S) -> Result<S::Ok, S::Error>
 where
     S: Serializer,
 {
@@ -424,7 +427,7 @@ impl PrismaValue {
     }
 
     pub fn placeholder(name: String, r#type: PrismaValueType) -> PrismaValue {
-        PrismaValue::Placeholder { name, r#type }
+        PrismaValue::Placeholder(Placeholder { name, r#type })
     }
 
     pub fn as_boolean(&self) -> Option<&bool> {
@@ -444,14 +447,6 @@ impl PrismaValue {
 
     pub fn as_tagged(&self) -> TaggedPrismaValue<'_> {
         TaggedPrismaValue::from(self)
-    }
-
-    pub fn placeholder_name(&self) -> Option<&str> {
-        if let Self::Placeholder { name, .. } = self {
-            Some(name)
-        } else {
-            None
-        }
     }
 }
 
@@ -482,7 +477,7 @@ impl fmt::Display for PrismaValue {
 
                 write!(f, "{{ {joined} }}")
             }
-            PrismaValue::Placeholder { name, r#type } => write!(f, "var({name}: {type})"),
+            PrismaValue::Placeholder(Placeholder { name, r#type }) => write!(f, "var({name}: {type})"),
             PrismaValue::GeneratorCall { name, args, .. } => {
                 write!(f, "{name}(")?;
                 for (i, arg) in args.iter().enumerate() {

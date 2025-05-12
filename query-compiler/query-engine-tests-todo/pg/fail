@@ -181,7 +181,6 @@ writes::regressions::prisma_11731::connect_or_create::one2one_inlined_child
 writes::regressions::prisma_11731::connect_or_create::one2one_inlined_parent
 writes::relations::rel_graphql::rel_graphql::one2one_rel_allow_one_item_per_side
 writes::unchecked_writes::unchecked_nested_update_many::unchecked_nested_um::allow_write_non_prent_inline_rel_sclrs
-writes::uniques_and_node_selectors::multi_field_uniq_mutation::multi_field_uniq_mut::nested_connect_one2one_rel
 writes::uniques_and_node_selectors::multi_field_uniq_mutation::multi_field_uniq_mut::nested_set_multi_field_uniq
 writes::uniques_and_node_selectors::non_embedded_setting_node_selector_to_null::non_embedded_node_sel_to_null::where_val_to_null
 writes::uniques_and_node_selectors::relation_uniques::compound_uniq_rel_field::compound_uniq_rel_field::compound_uniq_with_1_1_multi_rel
