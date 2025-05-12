@@ -30,7 +30,7 @@ use std::{
     sync::LazyLock,
     time,
 };
-use url::{Host, Url};
+use url::Url;
 use user_facing_errors::schema_engine::DatabaseSchemaInconsistent;
 
 use super::{SqlConnector, SqlDialect, UsingExternalShadowDb};
