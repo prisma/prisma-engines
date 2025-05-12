@@ -1,5 +1,7 @@
 use crate::flavour::postgres::{sql_schema_from_migrations_and_db, MigratePostgresUrl, PpgParams};
 use crate::flavour::{PostgresConnector, SqlConnector, UsingExternalShadowDb};
+use psl::PreviewFeatures;
+use quaint::connector::is_url_localhost;
 use schema_connector::{migrations_directory::MigrationDirectory, ConnectorResult};
 use schema_connector::{ConnectorError, ConnectorParams, Namespaces};
 use sql_schema_describer::SqlSchema;
@@ -18,32 +20,33 @@ pub async fn sql_schema_from_migration_history(
 
     match external_shadow_db {
         UsingExternalShadowDb::Yes => {
-            connector.ensure_connection_validity().await?;
-            tracing::info!("Connected to an external shadow database.");
-
-            if connector.reset(namespaces.clone()).await.is_err() {
-                crate::best_effort_reset(connector, namespaces.clone()).await?;
-            }
-
-            let circumstances = connector.circumstances();
-            connector
-                .with_connection(|conn, params| {
-                    sql_schema_from_migrations_and_db(
-                        conn,
-                        params,
-                        params.url.schema().to_owned(),
-                        migrations,
-                        namespaces,
-                        circumstances,
-                        params.connector_params.preview_features,
-                    )
-                })
-                .await
+            sql_schema_from_migration_history_for_external_db(connector, migrations, namespaces).await
         }
 
         // If we're not using an external shadow database, one must be created manually.
         UsingExternalShadowDb::No => {
             let (main_connection, params) = super::get_connection_and_params(&mut connector.state, provider).await?;
+
+            let mut shadow_database_url: Url = params
+                .connector_params
+                .connection_string
+                .parse()
+                .map_err(ConnectorError::url_parse_error)?;
+
+            let is_ppg = shadow_database_url.scheme() == MigratePostgresUrl::PRISMA_POSTGRES_SCHEME;
+
+            if is_ppg && is_url_localhost(&shadow_database_url) {
+                // when we're using a local PPG, we expect an external shadow database to be
+                // provided via the URL
+                return sql_schema_from_migration_history_for_local_ppg(
+                    &shadow_database_url,
+                    params.connector_params.preview_features,
+                    migrations,
+                    namespaces,
+                )
+                .await;
+            }
+
             let shadow_database_name = crate::new_shadow_database_name();
 
             {
@@ -54,13 +57,7 @@ pub async fn sql_schema_from_migration_history(
                     .map_err(|err| super::quaint_error_mapper(params)(err).into_shadow_db_creation_error())?;
             }
 
-            let mut shadow_database_url: Url = params
-                .connector_params
-                .connection_string
-                .parse()
-                .map_err(ConnectorError::url_parse_error)?;
-
-            if shadow_database_url.scheme() == MigratePostgresUrl::PRISMA_POSTGRES_SCHEME {
+            if is_ppg {
                 shadow_database_url
                     .query_pairs_mut()
                     .append_pair(PpgParams::DB_NAME_PARAM, &shadow_database_name);
@@ -109,6 +106,48 @@ pub async fn sql_schema_from_migration_history(
             ret
         }
     }
+}
+
+async fn sql_schema_from_migration_history_for_external_db(
+    connector: &mut PostgresConnector,
+    migrations: &[MigrationDirectory],
+    namespaces: Option<Namespaces>,
+) -> Result<SqlSchema, ConnectorError> {
+    connector.ensure_connection_validity().await?;
+    tracing::info!("Connected to an external shadow database.");
+
+    if connector.reset(namespaces.clone()).await.is_err() {
+        crate::best_effort_reset(connector, namespaces.clone()).await?;
+    }
+
+    let circumstances = connector.circumstances();
+    connector
+        .with_connection(|conn, params| {
+            sql_schema_from_migrations_and_db(
+                conn,
+                params,
+                params.url.schema().to_owned(),
+                migrations,
+                namespaces,
+                circumstances,
+                params.connector_params.preview_features,
+            )
+        })
+        .await
+}
+
+async fn sql_schema_from_migration_history_for_local_ppg(
+    url: &Url,
+    preview_features: PreviewFeatures,
+    migrations: &[MigrationDirectory],
+    namespaces: Option<Namespaces>,
+) -> Result<SqlSchema, ConnectorError> {
+    let ppg_params = PpgParams::parse_from(url)?;
+    let shadow_db_url = ppg_params.local_shadow_database_url()?;
+
+    let connector_params = ConnectorParams::new(shadow_db_url.to_string(), preview_features, None);
+    let mut shadow_database = PostgresConnector::new_with_params(connector_params)?;
+    sql_schema_from_migration_history_for_external_db(&mut shadow_database, migrations, namespaces).await
 }
 
 /// Drop a database using `WITH (FORCE)` syntax.

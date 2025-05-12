@@ -313,6 +313,13 @@ impl GenericApi for EngineState {
         &self,
         params: EnsureConnectionValidityParams,
     ) -> CoreResult<EnsureConnectionValidityResult> {
+        // checking connection validity is currently not supported with local PGLite because PGLite
+        // only supports a single connection at a time and this creates a new connector instance
+        if matches!(&params.datasource, DatasourceParam::ConnectionString(str) if str.url.starts_with("prisma+postgres://localhost"))
+        {
+            return Ok(EnsureConnectionValidityResult {});
+        }
+
         self.with_connector_from_datasource_param(
             params.datasource,
             Box::new(|connector| {
