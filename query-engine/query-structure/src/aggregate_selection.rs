@@ -34,17 +34,30 @@ impl AggregationSelection {
     /// Returns (field_db_name, TypeIdentifier, FieldArity)
     pub fn identifiers(&self) -> impl Iterator<Item = SelectionIdenfitier<'_>> {
         match self {
-            AggregationSelection::Field(field) => Either::Left(Self::map_field_types(slice::from_ref(field), |t| t)),
-            AggregationSelection::Average(fields) => Either::Left(Self::map_field_types(fields, |t| match t {
-                TypeIdentifier::Decimal => TypeIdentifier::Decimal,
-                _ => TypeIdentifier::Float,
-            })),
-            AggregationSelection::Sum(fields) => Either::Left(Self::map_field_types(fields, |t| t)),
-            AggregationSelection::Min(fields) => Either::Left(Self::map_field_types(fields, |t| t)),
-            AggregationSelection::Max(fields) => Either::Left(Self::map_field_types(fields, |t| t)),
+            AggregationSelection::Field(field) => {
+                Either::Left(Self::map_field_types(slice::from_ref(field), |t| t, |a| a))
+            }
+            AggregationSelection::Sum(fields) => {
+                Either::Left(Self::map_field_types(fields, |t| t, |_| FieldArity::Required))
+            }
+            AggregationSelection::Min(fields) => {
+                Either::Left(Self::map_field_types(fields, |t| t, |_| FieldArity::Required))
+            }
+            AggregationSelection::Max(fields) => {
+                Either::Left(Self::map_field_types(fields, |t| t, |_| FieldArity::Required))
+            }
+
+            AggregationSelection::Average(fields) => Either::Left(Self::map_field_types(
+                fields,
+                |t| match t {
+                    TypeIdentifier::Decimal => TypeIdentifier::Decimal,
+                    _ => TypeIdentifier::Float,
+                },
+                |_| FieldArity::Required,
+            )),
 
             AggregationSelection::Count { all, fields } => {
-                let mapped = Self::map_field_types(fields, |_| TypeIdentifier::Int);
+                let mapped = Self::map_field_types(fields, |_| TypeIdentifier::Int, |_| FieldArity::Required);
                 if *all {
                     Either::Right(mapped.chain([SelectionIdenfitier {
                         name: "all",
@@ -61,13 +74,14 @@ impl AggregationSelection {
 
     fn map_field_types(
         fields: &[ScalarFieldRef],
-        mapper: fn(TypeIdentifier) -> TypeIdentifier,
+        type_mapper: fn(TypeIdentifier) -> TypeIdentifier,
+        arity_mapper: fn(FieldArity) -> FieldArity,
     ) -> impl Iterator<Item = SelectionIdenfitier<'_>> {
         fields.iter().map(move |f| SelectionIdenfitier {
             name: f.name(),
             db_name: f.db_name(),
-            typ: mapper(f.type_identifier()),
-            arity: f.arity(),
+            typ: type_mapper(f.type_identifier()),
+            arity: arity_mapper(f.arity()),
         })
     }
 }
