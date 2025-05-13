@@ -135,7 +135,6 @@ queries::order_and_pagination::order_by_nulls::order_by_nulls::nulls_last_cursor
 queries::order_and_pagination::pagination::pagination::cursor_take_skip_multiple_unstable_order
 queries::regressions::pagination_regression::pagination_regr::prisma_3505_case_1
 queries::relations::duplicate_col_regression::dup_col_regr::test_1
-queries::relations::inline_relation::inline_rel::scalar_field_back_relation
 queries::relations::related_null_queries::inline_relation::multi_field_1n_rel_with_nulls
 queries::simple::json_result::json_as_result::test_when_distinct_result_is_json
 raw::sql::typed_output::typed_output::all_scalars_sqlite
