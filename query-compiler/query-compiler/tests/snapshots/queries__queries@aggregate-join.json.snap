@@ -1,12 +1,12 @@
 ---
 source: query-compiler/query-compiler/tests/queries.rs
-assertion_line: 58
 expression: pretty
 input_file: query-compiler/query-compiler/tests/data/aggregate-join.json
-snapshot_kind: text
 ---
 dataMap
    email: String [email]
+   _count: 
+      activations: Int [_aggr_count_activations]
 query «SELECT "public"."User"."id", "public"."User"."email",
        COALESCE("aggr_selection_0_Activation"."_aggr_count_activations", 0) AS
        "_aggr_count_activations" FROM "public"."User" LEFT JOIN (SELECT
