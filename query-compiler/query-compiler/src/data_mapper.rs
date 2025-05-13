@@ -28,20 +28,20 @@ fn map_query(query: &Query) -> Option<ResultNode> {
 
 fn map_read_query(query: &ReadQuery) -> Option<ResultNode> {
     match query {
-        ReadQuery::RecordQuery(q) => get_result_node(&q.selected_fields, &q.selection_order, Some(&q.nested)),
-        ReadQuery::ManyRecordsQuery(q) => get_result_node(&q.selected_fields, &q.selection_order, Some(&q.nested)),
-        ReadQuery::RelatedRecordsQuery(q) => get_result_node(&q.selected_fields, &q.selection_order, Some(&q.nested)),
+        ReadQuery::RecordQuery(q) => get_result_node(&q.selected_fields, &q.selection_order, &q.nested),
+        ReadQuery::ManyRecordsQuery(q) => get_result_node(&q.selected_fields, &q.selection_order, &q.nested),
+        ReadQuery::RelatedRecordsQuery(q) => get_result_node(&q.selected_fields, &q.selection_order, &q.nested),
         ReadQuery::AggregateRecordsQuery(q) => get_result_node_for_aggregation(&q.selectors, &q.selection_order),
     }
 }
 
 fn map_write_query(query: &WriteQuery) -> Option<ResultNode> {
     match query {
-        WriteQuery::CreateRecord(q) => get_result_node(&q.selected_fields, &q.selection_order, None),
+        WriteQuery::CreateRecord(q) => get_result_node(&q.selected_fields, &q.selection_order, &[]),
         WriteQuery::CreateManyRecords(q) => get_result_node_for_create_many(q.selected_fields.as_ref()),
         WriteQuery::UpdateRecord(u) => {
             match u {
-                UpdateRecord::WithSelection(w) => get_result_node(&w.selected_fields, &w.selection_order, None),
+                UpdateRecord::WithSelection(w) => get_result_node(&w.selected_fields, &w.selection_order, &[]),
                 UpdateRecord::WithoutSelection(_) => None, // No result data
             }
         }
@@ -52,14 +52,14 @@ fn map_write_query(query: &WriteQuery) -> Option<ResultNode> {
         WriteQuery::DisconnectRecords(_) => None, // No result data
         WriteQuery::ExecuteRaw(_) => None,        // No data mapping
         WriteQuery::QueryRaw(_) => None,          // No data mapping
-        WriteQuery::Upsert(q) => get_result_node(&q.selected_fields, &q.selection_order, None),
+        WriteQuery::Upsert(q) => get_result_node(&q.selected_fields, &q.selection_order, &[]),
     }
 }
 
 fn get_result_node(
     field_selection: &FieldSelection,
     selection_order: &Vec<String>,
-    nested_queries: Option<&Vec<ReadQuery>>,
+    nested_queries: &[ReadQuery],
 ) -> Option<ResultNode> {
     let field_map = field_selection
         .selections()
@@ -68,6 +68,10 @@ fn get_result_node(
     let grouped_virtuals = field_selection
         .virtuals()
         .into_group_map_by(|vs| vs.serialized_group_name());
+    let nested_map = nested_queries
+        .iter()
+        .map(|q| (q.get_alias_or_name(), q))
+        .collect::<HashMap<_, _>>();
 
     let mut node = ResultNode::new_object();
     for prisma_name in selection_order {
@@ -87,7 +91,7 @@ fn get_result_node(
             Some(SelectedField::Composite(_)) => todo!("MongoDB specific"),
             Some(SelectedField::Relation(f)) => {
                 let nested_selection = FieldSelection::new(f.selections.to_vec());
-                let nested_node = get_result_node(&nested_selection, &f.result_fields, None);
+                let nested_node = get_result_node(&nested_selection, &f.result_fields, &[]);
                 if let Some(nested_node) = nested_node {
                     node.add_field(f.field.name(), nested_node);
                 }
@@ -106,16 +110,13 @@ fn get_result_node(
                         .add_field(field_name, ResultNode::new_value(f.db_alias(), typ.to_prisma_type()));
                 }
             }
-            None => {}
-        }
-    }
-
-    if let Some(nested_queries) = nested_queries {
-        for nested_query in nested_queries {
-            let nested_node = map_read_query(nested_query);
-            if let Some(nested_node) = nested_node {
-                let nested_query_name = nested_query.get_alias_or_name();
-                node.add_field(nested_query_name, nested_node);
+            None => {
+                if let Some(q) = nested_map.get(prisma_name.as_str()) {
+                    let nested_node = map_read_query(q);
+                    if let Some(nested_node) = nested_node {
+                        node.add_field(q.get_alias_or_name(), nested_node);
+                    }
+                }
             }
         }
     }
@@ -184,18 +185,18 @@ fn get_result_node_for_create_many(selected_fields: Option<&CreateManyRecordsFie
     get_result_node(
         &selected_fields?.fields,
         &selected_fields?.order,
-        Some(&selected_fields?.nested),
+        &selected_fields?.nested,
     )
 }
 
 fn get_result_node_for_delete(selected_fields: Option<&DeleteRecordFields>) -> Option<ResultNode> {
-    get_result_node(&selected_fields?.fields, &selected_fields?.order, None)
+    get_result_node(&selected_fields?.fields, &selected_fields?.order, &[])
 }
 
 fn get_result_node_for_update_many(selected_fields: Option<&UpdateManyRecordsFields>) -> Option<ResultNode> {
     get_result_node(
         &selected_fields?.fields,
         &selected_fields?.order,
-        Some(&selected_fields?.nested),
+        &selected_fields?.nested,
     )
 }
