@@ -63,8 +63,11 @@ fn get_result_node(
 ) -> Option<ResultNode> {
     let field_map = field_selection
         .selections()
-        .map(|fs| (fs.prisma_name(), fs))
+        .map(|fs| (fs.prisma_name_grouping_virtuals(), fs))
         .collect::<HashMap<_, _>>();
+    let grouped_virtuals = field_selection
+        .virtuals()
+        .into_group_map_by(|vs| vs.serialized_group_name());
 
     let mut node = ResultNode::new_object();
     for prisma_name in selection_order {
@@ -90,10 +93,19 @@ fn get_result_node(
                 }
             }
             Some(SelectedField::Virtual(f)) => {
-                let prisma_type = f.type_identifier_with_arity().0.to_prisma_type();
-                let serialized_name = f.serialized_name();
-                let child = node.entry(serialized_name.0).or_insert_with(ResultNode::new_object);
-                child.add_field(serialized_name.1, ResultNode::new_value(f.db_alias(), prisma_type));
+                for vs in grouped_virtuals
+                    .get(f.serialized_group_name())
+                    .map(Vec::as_slice)
+                    .unwrap_or_default()
+                {
+                    let (group_name, field_name) = vs.serialized_name();
+                    let (typ, _) = vs.type_identifier_with_arity();
+
+                    node.entry(group_name).or_insert_with(ResultNode::new_object).add_field(
+                        field_name,
+                        ResultNode::new_value(f.relation_field().name().into(), typ.to_prisma_type()),
+                    );
+                }
             }
             None => {}
         }

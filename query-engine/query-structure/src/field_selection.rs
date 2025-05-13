@@ -300,15 +300,25 @@ pub enum VirtualSelection {
 impl VirtualSelection {
     pub fn db_alias(&self) -> String {
         match self {
-            Self::RelationCount(rf, _) => format!("_aggr_count_{}", rf.name()),
+            Self::RelationCount(rf, _) => format!("_count.{}", rf.name()),
         }
     }
 
     pub fn serialized_name(&self) -> (&'static str, &str) {
+        (self.serialized_group_name(), self.serialized_field_name())
+    }
+
+    pub fn serialized_group_name(&self) -> &'static str {
         match self {
             // TODO: we can't use UNDERSCORE_COUNT here because it would require a circular
             // dependency between `schema` and `query-structure` crates.
-            Self::RelationCount(rf, _) => ("_count", rf.name()),
+            Self::RelationCount(_, _) => "_count",
+        }
+    }
+
+    pub fn serialized_field_name(&self) -> &str {
+        match self {
+            Self::RelationCount(rf, _) => rf.name(),
         }
     }
 
