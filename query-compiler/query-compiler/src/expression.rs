@@ -107,6 +107,10 @@ pub enum Expression {
 
     /// Unit value.
     Unit,
+
+    /// Difference between the sets of rows in `from` and `to` (i.e. `from - to`,
+    /// or the set of rows that are in `from` but not in `to`).
+    Diff { from: Box<Expression>, to: Box<Expression> },
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize)]
@@ -181,6 +185,7 @@ impl Expression {
                 }
             }
             Expression::Unit => ExpressionType::Unit,
+            Expression::Diff { from, .. } => from.r#type(),
         }
     }
 

@@ -3,7 +3,7 @@ use crate::{
     value::{GeneratorCall, Placeholder},
 };
 use chrono::Utc;
-use prisma_value::PrismaValue;
+use prisma_value::{Placeholder as PrismaValuePlaceholder, PrismaValue};
 use quaint::{
     ast::{EnumName, OpaqueType, Value, ValueType},
     prelude::{EnumVariant, TypeDataLength, TypeFamily},
@@ -79,7 +79,7 @@ impl ScalarFieldExt for ScalarField {
                 TypeIdentifier::Bytes => Value::null_bytes(),
                 TypeIdentifier::Unsupported => unreachable!("No unsupported field should reach this path"),
             },
-            (PrismaValue::Placeholder { name, .. }, ident) => {
+            (PrismaValue::Placeholder(PrismaValuePlaceholder { name, .. }), ident) => {
                 Value::opaque(Placeholder::new(name), convert_type_identifier_to_opaque_type(&ident))
             }
             (PrismaValue::GeneratorCall { name, args, .. }, ident) => Value::opaque(
