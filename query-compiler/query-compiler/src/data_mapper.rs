@@ -101,10 +101,9 @@ fn get_result_node(
                     let (group_name, field_name) = vs.serialized_name();
                     let (typ, _) = vs.type_identifier_with_arity();
 
-                    node.entry(group_name).or_insert_with(ResultNode::new_object).add_field(
-                        field_name,
-                        ResultNode::new_value(f.relation_field().name().into(), typ.to_prisma_type()),
-                    );
+                    node.entry(group_name)
+                        .or_insert_with(ResultNode::new_flattened_object)
+                        .add_field(field_name, ResultNode::new_value(f.db_alias(), typ.to_prisma_type()));
                 }
             }
             None => {}

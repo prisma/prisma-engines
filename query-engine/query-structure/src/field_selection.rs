@@ -300,7 +300,7 @@ pub enum VirtualSelection {
 impl VirtualSelection {
     pub fn db_alias(&self) -> String {
         match self {
-            Self::RelationCount(rf, _) => format!("_count.{}", rf.name()),
+            Self::RelationCount(rf, _) => format!("_aggr_count_{}", rf.name()),
         }
     }
 

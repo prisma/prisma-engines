@@ -295,7 +295,7 @@ where
         indent: &str,
     ) -> DocBuilder<'a, PrettyPrinter<'a, D>, ColorSpec> {
         match node {
-            ResultNode::Object { fields } => {
+            ResultNode::Object { fields, .. } => {
                 let indent = &format!("{indent}   ");
                 let mut builder = doc.append(self.line());
                 for (name, field) in fields {
