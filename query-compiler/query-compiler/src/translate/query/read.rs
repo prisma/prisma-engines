@@ -225,7 +225,7 @@ fn build_read_related_records(
     if let Some(fields) = distinct_by {
         child_query = Expression::DistinctBy {
             expr: child_query.into(),
-            fields,
+            fields: fields.into_iter().chain(join_on.clone()).collect(),
         };
     };
 
