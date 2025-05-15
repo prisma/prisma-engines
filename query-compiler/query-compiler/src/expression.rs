@@ -138,15 +138,29 @@ pub enum Expression {
 }
 
 #[derive(Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct Pagination {
     cursor: Option<HashMap<String, PrismaValue>>,
     take: Option<i64>,
     skip: Option<i64>,
+    parent_links: Option<Vec<String>>,
 }
 
 impl Pagination {
     pub fn new(cursor: Option<HashMap<String, PrismaValue>>, take: Option<i64>, skip: Option<i64>) -> Self {
-        Self { cursor, take, skip }
+        Self {
+            cursor,
+            take,
+            skip,
+            parent_links: None,
+        }
+    }
+
+    pub fn with_parent_links(self, parent_links: impl Into<Vec<String>>) -> Self {
+        Self {
+            parent_links: Some(parent_links.into()),
+            ..self
+        }
     }
 
     pub fn cursor(&self) -> Option<&HashMap<String, PrismaValue>> {
