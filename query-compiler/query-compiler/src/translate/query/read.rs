@@ -370,9 +370,9 @@ fn extract_distinct_by(args: &mut QueryArguments) -> Vec<String> {
 #[derive(Debug, Clone)]
 struct JoinFields(Vec<String>);
 
-impl Into<Vec<String>> for JoinFields {
-    fn into(self) -> Vec<String> {
-        self.0
+impl From<JoinFields> for Vec<String> {
+    fn from(join_fields: JoinFields) -> Self {
+        join_fields.0
     }
 }
 
