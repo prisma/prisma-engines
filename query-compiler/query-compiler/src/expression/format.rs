@@ -72,6 +72,18 @@ where
             } => self.r#if(value, rule, then, r#else),
             Expression::Unit => self.keyword("()"),
             Expression::Diff { from, to } => self.diff(from, to),
+            Expression::DistinctBy { expr, fields } => self
+                .keyword("distinct")
+                .append(self.softline())
+                .append(self.expression(expr).parens())
+                .append(self.line())
+                .append(self.keyword("by"))
+                .append(self.softline())
+                .append(self.tuple(fields.iter().map(|name| self.var_name(name)))),
+            Expression::Paginate { expr, .. } => self
+                .keyword("paginate")
+                .append(self.softline())
+                .append(self.expression(expr).parens()),
         }
     }
 

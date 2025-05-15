@@ -1,6 +1,6 @@
 use crate::{
     TranslateError,
-    expression::{Binding, Expression, JoinExpression},
+    expression::{Binding, Expression, JoinExpression, Pagination},
     translate::TranslateResult,
 };
 use itertools::Itertools;
@@ -40,10 +40,32 @@ pub(crate) fn translate_read_query(query: ReadQuery, builder: &dyn QueryBuilder)
             }
         }
 
-        ReadQuery::ManyRecordsQuery(mrq) => {
+        ReadQuery::ManyRecordsQuery(mut mrq) => {
             let selected_fields = mrq.selected_fields.without_relations().into_virtuals_last();
             let needs_reversed_order = mrq.args.needs_reversed_order();
             let take = mrq.args.take;
+
+            let pagination = if mrq.args.requires_inmemory_processing() {
+                mrq.args.ignore_take = true;
+                mrq.args.ignore_skip = true;
+
+                let cursor = mrq.args.cursor.as_ref().map(|cursor| {
+                    cursor
+                        .pairs()
+                        .map(|(sf, val)| (sf.db_name().into_owned(), val.clone()))
+                        .collect()
+                });
+                Some(Pagination::new(cursor, mrq.args.take.abs(), mrq.args.skip))
+            } else {
+                None
+            };
+
+            let distinct_by = if mrq.args.requires_inmemory_distinct() {
+                let distinct = mrq.args.distinct.take().unwrap();
+                Some(distinct.db_names().collect_vec())
+            } else {
+                None
+            };
 
             // TODO: we ignore chunking for now
             let query = builder
@@ -51,13 +73,32 @@ pub(crate) fn translate_read_query(query: ReadQuery, builder: &dyn QueryBuilder)
                 .map_err(TranslateError::QueryBuildFailure)?;
 
             let expr = Expression::Query(query);
-            let expr = convert_options_to_validation(expr, mrq.options);
+
+            let expr = if let Some(fields) = distinct_by {
+                Expression::DistinctBy {
+                    expr: expr.into(),
+                    fields,
+                }
+            } else {
+                expr
+            };
+
+            let expr = if let Some(pagination) = pagination {
+                Expression::Paginate {
+                    expr: expr.into(),
+                    pagination,
+                }
+            } else {
+                expr
+            };
 
             let expr = if needs_reversed_order {
                 Expression::Reverse(Box::new(expr))
             } else {
                 expr
             };
+
+            let expr = convert_options_to_validation(expr, mrq.options);
 
             let expr = if mrq.nested.is_empty() {
                 expr

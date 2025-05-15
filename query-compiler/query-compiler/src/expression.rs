@@ -1,6 +1,9 @@
+use std::collections::HashMap;
+
 use crate::result_node::ResultNode;
 use query_builder::DbQuery;
 use query_core::{DataExpectation, DataRule};
+use query_structure::PrismaValue;
 use serde::Serialize;
 
 mod format;
@@ -38,7 +41,9 @@ pub enum Expression {
     Seq(Vec<Expression>),
 
     /// Get binding value.
-    Get { name: String },
+    Get {
+        name: String,
+    },
 
     /// A lexical scope with let-bindings.
     Let {
@@ -47,7 +52,9 @@ pub enum Expression {
     },
 
     /// Gets the first non-empty value from a list of bindings.
-    GetFirstNonEmpty { names: Vec<String> },
+    GetFirstNonEmpty {
+        names: Vec<String>,
+    },
 
     /// A database query that returns data.
     Query(DbQuery),
@@ -78,7 +85,10 @@ pub enum Expression {
 
     /// Get a field from a record or records. If the argument is a list of records,
     /// returns a list of values of this field.
-    MapField { field: String, records: Box<Expression> },
+    MapField {
+        field: String,
+        records: Box<Expression>,
+    },
 
     /// Run the query inside a transaction
     Transaction(Box<Expression>),
@@ -110,7 +120,46 @@ pub enum Expression {
 
     /// Difference between the sets of rows in `from` and `to` (i.e. `from - to`,
     /// or the set of rows that are in `from` but not in `to`).
-    Diff { from: Box<Expression>, to: Box<Expression> },
+    Diff {
+        from: Box<Expression>,
+        to: Box<Expression>,
+    },
+
+    DistinctBy {
+        expr: Box<Expression>,
+        fields: Vec<String>,
+    },
+
+    /// Pagination over the result of an expression.
+    Paginate {
+        expr: Box<Expression>,
+        pagination: Pagination,
+    },
+}
+
+#[derive(Debug, Serialize)]
+pub struct Pagination {
+    cursor: Option<HashMap<String, PrismaValue>>,
+    take: Option<i64>,
+    skip: Option<i64>,
+}
+
+impl Pagination {
+    pub fn new(cursor: Option<HashMap<String, PrismaValue>>, take: Option<i64>, skip: Option<i64>) -> Self {
+        Self { cursor, take, skip }
+    }
+
+    pub fn cursor(&self) -> Option<&HashMap<String, PrismaValue>> {
+        self.cursor.as_ref()
+    }
+
+    pub fn take(&self) -> Option<i64> {
+        self.take
+    }
+
+    pub fn skip(&self) -> Option<i64> {
+        self.skip
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize)]
@@ -186,6 +235,8 @@ impl Expression {
             }
             Expression::Unit => ExpressionType::Unit,
             Expression::Diff { from, .. } => from.r#type(),
+            Expression::DistinctBy { expr, .. } => expr.r#type(),
+            Expression::Paginate { expr, .. } => expr.r#type(),
         }
     }
 
