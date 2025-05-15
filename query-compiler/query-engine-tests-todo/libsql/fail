@@ -51,10 +51,6 @@ queries::data_types::enum_type::enum_type::read_one_invalid_sqlite
 queries::data_types::json::json::dollar_type_in_json_protocol
 queries::data_types::json::json::nested_dollar_type_in_json_protocol
 queries::data_types::through_relation::scalar_relations::common_types
-queries::distinct::distinct::nested_distinct
-queries::distinct::distinct::nested_distinct_not_in_selection
-queries::distinct::distinct::nested_distinct_order_by_field
-queries::distinct::distinct::nested_distinct_reversed
 queries::filters::many_relation::many_relation::prisma_25103
 queries::filters::many_relation::many_relation::simple_scalar_filter
 queries::filters::one_relation::one_relation::nested_to_one_filter

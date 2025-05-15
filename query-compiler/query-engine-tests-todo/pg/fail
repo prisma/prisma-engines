@@ -57,10 +57,6 @@ queries::data_types::json::json::nested_dollar_type_in_json_protocol
 queries::data_types::native::postgres::postgres_datetime::dt_native
 queries::data_types::native::postgres::postgres_others::native_other_types
 queries::data_types::through_relation::scalar_relations::common_types
-queries::distinct::distinct::nested_distinct
-queries::distinct::distinct::nested_distinct_not_in_selection
-queries::distinct::distinct::nested_distinct_order_by_field
-queries::distinct::distinct::nested_distinct_reversed
 queries::filters::json_filters::json_filters::multi_filtering
 queries::filters::many_relation::many_relation::prisma_25103
 queries::filters::many_relation::many_relation::simple_scalar_filter
