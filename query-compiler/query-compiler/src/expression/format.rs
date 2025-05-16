@@ -299,11 +299,15 @@ where
         indent: &str,
     ) -> DocBuilder<'a, PrettyPrinter<'a, D>, ColorSpec> {
         match node {
-            ResultNode::Object { fields } => {
+            ResultNode::Object { fields, flattened } => {
                 let indent = &format!("{indent}   ");
                 let mut builder = doc.append(self.line());
                 for (name, field) in fields {
-                    builder = builder.append(self.text(format!("{indent}{name}: ")));
+                    builder = builder.append(self.text(format!("{indent}{name}")));
+                    if *flattened {
+                        builder = builder.append(self.text(" (flattened)"));
+                    }
+                    builder = builder.append(self.text(": "));
                     builder = self.data_map_node(builder, field, indent);
                 }
                 builder
