@@ -131,7 +131,7 @@ pub struct Pagination {
     cursor: Option<HashMap<String, PrismaValue>>,
     take: Option<i64>,
     skip: Option<i64>,
-    parent_links: Option<Vec<String>>,
+    linking_fields: Option<Vec<String>>,
 }
 
 impl Pagination {
@@ -140,13 +140,13 @@ impl Pagination {
             cursor,
             take,
             skip,
-            parent_links: None,
+            linking_fields: None,
         }
     }
 
-    pub fn with_parent_links(self, parent_links: impl Into<Vec<String>>) -> Self {
+    pub fn with_parent_links(self, linking_fields: impl Into<Vec<String>>) -> Self {
         Self {
-            parent_links: Some(parent_links.into()),
+            linking_fields: Some(linking_fields.into()),
             ..self
         }
     }
