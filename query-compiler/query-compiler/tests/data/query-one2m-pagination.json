@@ -1,0 +1,21 @@
+{
+  "modelName": "Post",
+  "action": "findMany",
+  "query": {
+    "arguments": {},
+    "selection": {
+      "$scalars": true,
+      "categories": {
+        "arguments": {
+          "cursor": {
+            "id": 1
+          },
+          "skip": 1,
+          "take": 1,
+          "distinct": ["id"]
+        },
+        "selection": { "$scalars": true }
+      }
+    }
+  }
+}
