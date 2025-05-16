@@ -156,17 +156,18 @@ fn add_inmemory_join(
             let left_scalars = rrq.parent_field.left_scalars();
             let links = left_scalars
                 .iter()
-                .map(|field| {
+                .zip(rrq.parent_field.related_field().left_scalars())
+                .map(|(parent_scalar, child_scalar)| {
                     let placeholder = PrismaValue::placeholder(
-                        format!("@parent${}", field.name()),
-                        field.type_identifier().to_prisma_type(),
+                        format!("@parent${}", parent_scalar.name()),
+                        parent_scalar.type_identifier().to_prisma_type(),
                     );
                     let condition = if parent.r#type().is_list() {
                         ScalarCondition::InTemplate(ConditionValue::value(placeholder))
                     } else {
                         ScalarCondition::Equals(ConditionValue::value(placeholder))
                     };
-                    ConditionalLink::new(field.clone(), vec![condition])
+                    ConditionalLink::new(child_scalar.clone(), vec![condition])
                 })
                 .collect();
             let (child, join_fields) = build_read_related_records(rrq, links, builder)?;
