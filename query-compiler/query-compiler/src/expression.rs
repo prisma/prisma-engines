@@ -41,9 +41,7 @@ pub enum Expression {
     Seq(Vec<Expression>),
 
     /// Get binding value.
-    Get {
-        name: String,
-    },
+    Get { name: String },
 
     /// A lexical scope with let-bindings.
     Let {
@@ -52,9 +50,7 @@ pub enum Expression {
     },
 
     /// Gets the first non-empty value from a list of bindings.
-    GetFirstNonEmpty {
-        names: Vec<String>,
-    },
+    GetFirstNonEmpty { names: Vec<String> },
 
     /// A database query that returns data.
     Query(DbQuery),
@@ -85,10 +81,7 @@ pub enum Expression {
 
     /// Get a field from a record or records. If the argument is a list of records,
     /// returns a list of values of this field.
-    MapField {
-        field: String,
-        records: Box<Expression>,
-    },
+    MapField { field: String, records: Box<Expression> },
 
     /// Run the query inside a transaction
     Transaction(Box<Expression>),
@@ -120,15 +113,10 @@ pub enum Expression {
 
     /// Difference between the sets of rows in `from` and `to` (i.e. `from - to`,
     /// or the set of rows that are in `from` but not in `to`).
-    Diff {
-        from: Box<Expression>,
-        to: Box<Expression>,
-    },
+    Diff { from: Box<Expression>, to: Box<Expression> },
 
-    DistinctBy {
-        expr: Box<Expression>,
-        fields: Vec<String>,
-    },
+    /// Deduplicates the result of an expression by a list of fields.
+    DistinctBy { expr: Box<Expression>, fields: Vec<String> },
 
     /// Pagination over the result of an expression.
     Paginate {
