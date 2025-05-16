@@ -46,12 +46,12 @@ pub(crate) fn translate_write_query(query: WriteQuery, builder: &dyn QueryBuilde
         }
 
         WriteQuery::UpdateManyRecords(UpdateManyRecords {
+            name: _,
             model,
             record_filter,
             args,
             selected_fields,
             limit,
-            ..
         }) => {
             let projection = selected_fields.as_ref().map(|f| &f.fields);
             let updates = builder
@@ -77,7 +77,6 @@ pub(crate) fn translate_write_query(query: WriteQuery, builder: &dyn QueryBuilde
             record_filter,
             args,
             selected_fields,
-            // TODO: we're ignoring selection order
             selection_order: _,
         })) => {
             let query = if args.is_empty() {
