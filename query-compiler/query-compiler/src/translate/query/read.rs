@@ -4,14 +4,14 @@ use crate::{
     translate::TranslateResult,
 };
 use itertools::Itertools;
-use query_builder::{QueryArgumentsExt, QueryBuilder, RelationLink};
+use query_builder::{ConditionalLink, JoinLinks, QueryArgumentsExt, QueryBuilder};
 use query_core::{
     AggregateRecordsQuery, DataExpectation, DataOperation, FilteredQuery, MissingRecord, QueryGraphBuilderError,
     QueryOption, QueryOptions, ReadQuery, RelatedRecordsQuery,
 };
 use query_structure::{
-    ConditionValue, FieldSelection, Filter, IntoFilter, PrismaValue, QueryArguments, QueryMode, RelationField,
-    ScalarCondition, ScalarFilter, ScalarProjection, SelectionResult, Take,
+    ConditionValue, FieldSelection, Filter, PrismaValue, QueryArguments, QueryMode, ScalarCondition, ScalarFilter,
+    ScalarProjection, Take,
 };
 use std::slice;
 
@@ -92,7 +92,7 @@ pub(crate) fn translate_read_query(query: ReadQuery, builder: &dyn QueryBuilder)
         }
 
         ReadQuery::RelatedRecordsQuery(rrq) => {
-            let (expr, _) = build_read_related_records(rrq, None, builder)?;
+            let (expr, _) = build_read_related_records(rrq, vec![], builder)?;
             expr
         }
 
@@ -154,21 +154,22 @@ fn add_inmemory_join(
         .map(|rrq| -> TranslateResult<JoinExpression> {
             let parent_field_name = rrq.parent_field.name().to_owned();
             let left_scalars = rrq.parent_field.left_scalars();
-            let conditions = left_scalars
+            let links = left_scalars
                 .iter()
                 .map(|field| {
                     let placeholder = PrismaValue::placeholder(
                         format!("@parent${}", field.name()),
                         field.type_identifier().to_prisma_type(),
                     );
-                    if parent.r#type().is_list() {
+                    let condition = if parent.r#type().is_list() {
                         ScalarCondition::InTemplate(ConditionValue::value(placeholder))
                     } else {
                         ScalarCondition::Equals(ConditionValue::value(placeholder))
-                    }
+                    };
+                    ConditionalLink::new(field.clone(), vec![condition])
                 })
                 .collect();
-            let (child, join_fields) = build_read_related_records(rrq, Some(conditions), builder)?;
+            let (child, join_fields) = build_read_related_records(rrq, links, builder)?;
 
             Ok(JoinExpression {
                 child,
@@ -199,9 +200,34 @@ fn add_inmemory_join(
 
 fn build_read_related_records(
     mut rrq: RelatedRecordsQuery,
-    conditions: Option<Vec<ScalarCondition>>,
+    links: Vec<ConditionalLink>,
     builder: &dyn QueryBuilder,
 ) -> TranslateResult<(Expression, JoinFields)> {
+    let mut join_links = JoinLinks::new(rrq.parent_field.clone(), links);
+
+    if let Some(results) = rrq.parent_results {
+        let parent_link_id = rrq.parent_field.linking_fields();
+        let child_link_id = rrq.parent_field.related_field().linking_fields();
+
+        let selection = results
+            .into_iter()
+            .exactly_one()
+            .expect("parent results should be exactly one in the query compiler")
+            .split_into(slice::from_ref(&parent_link_id))
+            .pop()
+            .unwrap();
+
+        for (field, val) in child_link_id
+            .assimilate(selection)
+            .map_err(QueryGraphBuilderError::from)?
+            .pairs
+            .into_iter()
+        {
+            let Some(sf) = field.as_scalar() else { continue };
+            join_links.add_condition(sf.clone(), ScalarCondition::InTemplate(val.into()));
+        }
+    }
+
     let selected_fields = rrq.selected_fields.without_relations().into_virtuals_last();
     let needs_reversed_order = rrq.args.needs_reversed_order();
 
@@ -210,16 +236,9 @@ fn build_read_related_records(
     let distinct_by = (rrq.args.distinct.is_some()).then(|| extract_distinct_by(&mut rrq.args));
 
     let (mut child_query, join_on) = if rrq.parent_field.relation().is_many_to_many() {
-        build_read_m2m_query(rrq.parent_field, conditions, rrq.args, &selected_fields, builder)?
+        build_read_m2m_query(join_links, rrq.args, &selected_fields, builder)?
     } else {
-        build_read_one2m_query(
-            rrq.parent_field,
-            conditions,
-            rrq.args,
-            rrq.parent_results,
-            &selected_fields,
-            builder,
-        )?
+        build_read_one2m_query(join_links, rrq.args, &selected_fields, builder)?
     };
 
     if let Some(fields) = distinct_by {
@@ -247,76 +266,35 @@ fn build_read_related_records(
 }
 
 fn build_read_m2m_query(
-    field: RelationField,
-    conditions: Option<Vec<ScalarCondition>>,
+    join: JoinLinks,
     args: QueryArguments,
     selected_fields: &FieldSelection,
     builder: &dyn QueryBuilder,
 ) -> TranslateResult<(Expression, JoinFields)> {
-    let condition = conditions.map(|mut conditions| {
-        let condition = conditions
-            .pop()
-            .expect("should have at least one condition in m2m relation");
-        assert!(
-            conditions.is_empty(),
-            "should have at most one condition in m2m relation"
-        );
-        condition
-    });
-
-    let link = RelationLink::new(field, condition);
-    let link_name = link.to_string();
+    let link_name = join.to_string();
 
     let query = builder
-        .build_get_related_records(link, args, selected_fields)
+        .build_get_related_records(join, args, selected_fields)
         .map_err(TranslateError::QueryBuildFailure)?;
 
     Ok((Expression::Query(query), JoinFields(vec![link_name])))
 }
 
 fn build_read_one2m_query(
-    field: RelationField,
-    conditions: Option<Vec<ScalarCondition>>,
+    join: JoinLinks,
     mut args: QueryArguments,
-    parent_results: Option<Vec<SelectionResult>>,
     selected_fields: &FieldSelection,
     builder: &dyn QueryBuilder,
 ) -> TranslateResult<(Expression, JoinFields)> {
+    let (field, conditions_per_field) = join.into_parent_field_and_conditions();
     let related_scalars = field.related_field().left_scalars();
     let join_fields = related_scalars.iter().map(|sf| sf.name().to_owned()).collect();
 
-    if let Some(results) = parent_results {
-        let parent_link_id = field.linking_fields();
-        let child_link_id = field.related_field().linking_fields();
-
-        let links = results
-            .into_iter()
-            .map(|result| {
-                let parent_link = result.split_into(slice::from_ref(&parent_link_id)).pop().unwrap();
-                child_link_id.assimilate(parent_link)
-            })
-            .collect::<Result<Vec<_>, _>>()
-            .map_err(QueryGraphBuilderError::from)?;
-
-        let filter = args
-            .filter
-            .take()
-            .into_iter()
-            .fold(links.filter(), |acc, filter| Filter::and(vec![acc, filter]));
-        args.filter = Some(filter);
-    }
-
-    // TODO: we ignore chunking for now
-    if let Some(conditions) = conditions {
-        assert_eq!(
-            related_scalars.len(),
-            conditions.len(),
-            "linking fields should match conditions"
-        );
-        for (condition, child_field) in conditions.into_iter().zip(related_scalars) {
+    for (field, conditions) in conditions_per_field {
+        for condition in conditions {
             args.add_filter(Filter::Scalar(ScalarFilter {
                 condition,
-                projection: ScalarProjection::Single(child_field.clone()),
+                projection: ScalarProjection::Single(field.clone()),
                 mode: QueryMode::Default,
             }));
         }
