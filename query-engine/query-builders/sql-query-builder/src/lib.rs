@@ -146,7 +146,7 @@ impl<'a, V: Visitor<'a>> QueryBuilder for SqlQueryBuilder<'a, V> {
                     &self.context,
                 )
             })
-            .fold(ConditionTree::NoCondition, |l, r| l.and(r));
+            .reduce(|l, r| l.and(r));
 
         let columns = ModelProjection::from(selected_fields)
             .as_columns(&self.context)
@@ -165,7 +165,13 @@ impl<'a, V: Visitor<'a>> QueryBuilder for SqlQueryBuilder<'a, V> {
             .with_pagination(&query_arguments, None)
             .with_filters(query_arguments.filter, Some(related_alias), &self.context);
 
-        self.convert_query(select.and_where(filter))
+        let select = if let Some(filter) = filter {
+            select.and_where(filter)
+        } else {
+            select
+        };
+
+        self.convert_query(select)
     }
 
     fn build_aggregate(
