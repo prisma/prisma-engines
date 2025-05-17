@@ -3,6 +3,7 @@ use query_structure::{
     ScalarCondition, ScalarField, SelectionResult, TaggedPrismaValue, WriteArgs,
 };
 use serde::Serialize;
+use std::collections::BTreeMap;
 use std::fmt::Formatter;
 use std::{collections::HashMap, fmt};
 
@@ -23,7 +24,7 @@ pub trait QueryBuilder {
     #[cfg(feature = "relation_joins")]
     fn build_get_related_records(
         &self,
-        link: RelationLink,
+        join_links: JoinLinks,
         query_arguments: QueryArguments,
         selected_fields: &FieldSelection,
     ) -> Result<DbQuery, Box<dyn std::error::Error + Send + Sync>>;
@@ -116,28 +117,68 @@ pub trait QueryBuilder {
 }
 
 #[derive(Debug)]
-pub struct RelationLink {
-    field: RelationField,
-    condition: Option<ScalarCondition>,
+pub struct ConditionalLink {
+    field: ScalarField,
+    conditions: Vec<ScalarCondition>,
 }
 
-impl RelationLink {
-    pub fn new(field: RelationField, condition: Option<ScalarCondition>) -> Self {
-        Self { field, condition }
+impl ConditionalLink {
+    pub fn new(field: ScalarField, conditions: Vec<ScalarCondition>) -> Self {
+        Self { field, conditions }
     }
 
-    pub fn field(&self) -> &RelationField {
+    pub fn field(&self) -> &ScalarField {
         &self.field
     }
 
-    pub fn into_field_and_condition(self) -> (RelationField, Option<ScalarCondition>) {
-        (self.field, self.condition)
+    pub fn into_field_and_conditions(self) -> (ScalarField, Vec<ScalarCondition>) {
+        (self.field, self.conditions)
     }
 }
 
-impl fmt::Display for RelationLink {
+#[derive(Debug)]
+pub struct JoinLinks {
+    parent_field: RelationField,
+    conditions: BTreeMap<ScalarField, Vec<ScalarCondition>>,
+}
+
+impl JoinLinks {
+    pub fn new(field: RelationField, links: Vec<ConditionalLink>) -> Self {
+        Self {
+            parent_field: field,
+            conditions: links
+                .into_iter()
+                .map(ConditionalLink::into_field_and_conditions)
+                .collect(),
+        }
+    }
+
+    pub fn parent_field(&self) -> &RelationField {
+        &self.parent_field
+    }
+
+    pub fn add_condition(&mut self, field: ScalarField, condition: ScalarCondition) {
+        self.conditions.entry(field).or_default().push(condition);
+    }
+
+    pub fn into_parent_field_and_conditions(
+        self,
+    ) -> (
+        RelationField,
+        impl Iterator<Item = (ScalarField, Vec<ScalarCondition>)> + fmt::Debug,
+    ) {
+        (self.parent_field, self.conditions.into_iter())
+    }
+}
+
+impl fmt::Display for JoinLinks {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{}@{}", self.field.relation().name(), self.field.model().name())
+        write!(
+            f,
+            "{}@{}",
+            self.parent_field.relation().name(),
+            self.parent_field.model().name()
+        )
     }
 }
 
