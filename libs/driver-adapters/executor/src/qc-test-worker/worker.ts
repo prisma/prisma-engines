@@ -98,25 +98,46 @@ if (!parentPort) {
 
 setupDefaultPanicHandler()
 
+type RpcResponse =
+  | null
+  | { type: "Result"; args: object }
+  | { type: "Error"; args: RpcError };
+
+type RpcError = {
+  message: string
+  code?: string
+  stack?: string
+}
+
 parentPort.on('message', async (rawMsg: unknown) => {
   const msg = S.decodeUnknownSync(Message)(rawMsg)
-  let response: unknown
+  let response: RpcResponse
 
   debug('worker received message:', msg.type)
 
   try {
-    response = await dispatchMessage(msg)
-  } catch (error) {
-    // TODO: we should have a nicer mapping for driver adapter errors
-    response = error instanceof Error ? error : new Error(JSON.stringify(error))
-  }
-
-  // The Rust side expects `TransactionEndResponse::Ok(Empty)`,
-  // where `Empty` is `struct Empty {}` as an empty response.
-  // Without this conversion the test cases don't receive the
-  // response at all, rendering them frozen.
-  if (response === undefined) {
-    response = {}
+    // The Rust side expects `TransactionEndResponse::Ok(Empty)`,
+    // where `Empty` is `struct Empty {}` as an empty response.
+    // Without this conversion the test cases don't receive the
+    // response at all, rendering them frozen.
+    let result = await dispatchMessage(msg)
+    response = result === undefined || result === null
+      ? null
+      : {
+        type: 'Result',
+        args: result!,
+      }
+  } catch (e) {
+      // TODO: we should have a nicer mapping for driver adapter errors
+    const error = e instanceof Error ? e : new Error(JSON.stringify(e))
+    response = {
+      type: 'Error',
+      args: {
+        message: error.message,
+        code: (error as { code?: string }).code,
+        stack: error.stack,
+      },
+    }
   }
 
   debug('worker response:', JSON.stringify(response))
@@ -203,10 +224,7 @@ type InitQueryCompilerParams = {
   schema: string
 }
 
-async function initQueryCompiler({
-  driverAdapterManager,
-  schema,
-}: InitQueryCompilerParams) {
+async function initQueryCompiler({ driverAdapterManager, schema }: InitQueryCompilerParams) {
   const adapter = await driverAdapterManager.connect()
 
   let connectionInfo: ConnectionInfo = {}
@@ -226,7 +244,7 @@ async function initQueryCompiler({
   }
 }
 
-async function teardown(unwrappedState: State) {
+async function teardown(unwrappedState: State): Promise<void> {
   const { compiler, transactionManager, driverAdapterManager } = unwrappedState
 
   process.nextTick(() => {
@@ -241,6 +259,4 @@ async function teardown(unwrappedState: State) {
   await driverAdapterManager.teardown()
 
   state = undefined
-
-  return {}
 }

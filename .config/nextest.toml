@@ -13,7 +13,7 @@ dir = "target/nextest"
 # * retries = 3
 # * retries = { backoff = "fixed", count = 2, delay = "1s" }
 # * retries = { backoff = "exponential", count = 10, delay = "1s", jitter = true, max-delay = "10s" }
-retries = { backoff = "fixed", count = 2, delay = "1s", jitter = false }
+retries = { backoff = "fixed", count = 0, delay = "1s", jitter = false }
 
 # The number of threads to run tests with. Supported values are either an integer or
 # the string "num-cpus". Can be overridden through the `--test-threads` option.
@@ -71,7 +71,7 @@ fail-fast = false
 # which will cause slow tests to be terminated after the specified number of
 # periods have passed.
 # Example: slow-timeout = { period = "60s", terminate-after = 2 }
-slow-timeout = { period = "30s", terminate-after = 10 }
+slow-timeout = { period = "10s", terminate-after = 10 }
 
 # Treat a test as leaky if after the process is shut down, standard output and standard error
 # aren't closed within this duration.

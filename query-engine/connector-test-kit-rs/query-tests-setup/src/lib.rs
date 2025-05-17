@@ -50,7 +50,7 @@ pub static ENGINE_PROTOCOL: LazyLock<String> =
 async fn teardown_project(datamodel: &str, db_schemas: &[&str], schema_id: Option<usize>) -> TestResult<()> {
     if let Some(schema_id) = schema_id {
         let params = serde_json::json!({ "schemaId": schema_id });
-        executor_process_request::<serde_json::Value>("teardown", params).await?;
+        executor_process_request_no_return("teardown", params).await?;
     }
 
     Ok(qe_setup::teardown(datamodel, db_schemas).await?)
