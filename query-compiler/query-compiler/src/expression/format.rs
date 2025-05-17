@@ -72,6 +72,53 @@ where
             } => self.r#if(value, rule, then, r#else),
             Expression::Unit => self.keyword("()"),
             Expression::Diff { from, to } => self.diff(from, to),
+            Expression::DistinctBy { expr, fields } => self
+                .keyword("distinct")
+                .append(self.softline())
+                .append(self.expression(expr).parens())
+                .append(self.line())
+                .append(self.keyword("by"))
+                .append(self.softline())
+                .append(self.tuple(fields.iter().map(|name| self.var_name(name)))),
+            Expression::Paginate { expr, pagination } => {
+                let mut builder = self.nil();
+
+                if let Some(fields) = &pagination.cursor {
+                    builder = builder.append(
+                        self.keyword("cursor").append(self.softline()).append(
+                            self.intersperse(
+                                fields.iter().map(|(name, val)| {
+                                    self.tuple(vec![self.text(format!("{name:?}")), self.value(val)])
+                                }),
+                                self.text(",").append(self.softline()),
+                            )
+                            .align()
+                            .brackets()
+                            .append(self.line()),
+                        ),
+                    );
+                }
+
+                if let Some(skip) = &pagination.skip() {
+                    builder = builder.append(
+                        self.keyword("skip")
+                            .append(self.space())
+                            .append(self.text(skip.to_string()))
+                            .append(self.line()),
+                    );
+                }
+
+                if let Some(take) = &pagination.take() {
+                    builder = builder.append(
+                        self.keyword("take")
+                            .append(self.space())
+                            .append(self.text(take.to_string()))
+                            .append(self.line()),
+                    );
+                }
+
+                builder.append(self.expression(expr))
+            }
         }
     }
 

@@ -1,0 +1,29 @@
+---
+source: query-compiler/query-compiler/tests/queries.rs
+expression: pretty
+input_file: query-compiler/query-compiler/tests/data/query-one2m-pagination.json
+---
+dataMap
+   id: Int [id]
+   title: String [title]
+   userId: Int [userId]
+   categories: 
+      id: Int [id]
+      name: String [name]
+let @parent = query «SELECT "public"."Post"."id", "public"."Post"."title",
+                     "public"."Post"."userId" FROM "public"."Post" WHERE 1=1
+                     OFFSET $1»
+              params [const(BigInt(0))]
+in let @parent$id = mapField id (get @parent)
+   in join (get @parent)
+      with (cursor [("id", const(Int(1)))]
+           skip 1
+           take 1
+           distinct (query «SELECT "t1"."id", "t1"."name", "t0"."B" AS
+                            "CategoryToPost@Post" FROM
+                            "public"."_CategoryToPost" AS "t0" INNER JOIN
+                            "public"."Category" AS "t1" ON "t0"."A" = "t1"."id"
+                            WHERE "t0"."B" IN [$1] ORDER BY "t1"."id" ASC»
+                     params [var(@parent$id as Int)])
+           by (id,
+               CategoryToPost@Post)) on left.(id) = right.(CategoryToPost@Post) as categories
