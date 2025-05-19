@@ -78,15 +78,13 @@ transaction
                            in let @parent$id = mapField id (get @parent);
                                   @parent$userId = mapField userId (get @parent)
                               in join (get @parent)
-                                 with (unique (query «SELECT
-                                                      "public"."User"."id",
-                                                      "public"."User"."email"
-                                                      FROM "public"."User" WHERE
-                                                      "public"."User"."id" = $1
-                                                      LIMIT $2 OFFSET $3»
-                                               params [var(@parent$userId as Int),
-                                                       const(BigInt(1)),
-                                                       const(BigInt(0))])) on left.(userId) = right.(id) as user,
+                                 with (query «SELECT "public"."User"."id",
+                                              "public"."User"."email" FROM
+                                              "public"."User" WHERE
+                                              "public"."User"."id" = $1 OFFSET
+                                              $2»
+                                       params [var(@parent$userId as Int),
+                                               const(BigInt(0))]) on unique left.(userId) = right.(id) as user,
                                       (query «SELECT "t1"."id", "t1"."name",
                                               "t0"."B" AS "CategoryToPost@Post"
                                               FROM "public"."_CategoryToPost" AS

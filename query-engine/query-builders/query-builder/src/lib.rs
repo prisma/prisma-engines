@@ -24,7 +24,7 @@ pub trait QueryBuilder {
     #[cfg(feature = "relation_joins")]
     fn build_get_related_records(
         &self,
-        join_links: JoinLinks,
+        linkage: RelationLinkage,
         query_arguments: QueryArguments,
         selected_fields: &FieldSelection,
     ) -> Result<DbQuery, Box<dyn std::error::Error + Send + Sync>>;
@@ -137,12 +137,12 @@ impl ConditionalLink {
 }
 
 #[derive(Debug)]
-pub struct JoinLinks {
+pub struct RelationLinkage {
     parent_field: RelationField,
     conditions: BTreeMap<ScalarField, Vec<ScalarCondition>>,
 }
 
-impl JoinLinks {
+impl RelationLinkage {
     pub fn new(field: RelationField, links: Vec<ConditionalLink>) -> Self {
         Self {
             parent_field: field,
@@ -171,7 +171,7 @@ impl JoinLinks {
     }
 }
 
-impl fmt::Display for JoinLinks {
+impl fmt::Display for RelationLinkage {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(
             f,

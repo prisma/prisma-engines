@@ -98,7 +98,7 @@ impl<'a, V: Visitor<'a>> QueryBuilder for SqlQueryBuilder<'a, V> {
     #[cfg(feature = "relation_joins")]
     fn build_get_related_records(
         &self,
-        join_links: query_builder::JoinLinks,
+        linkage: query_builder::RelationLinkage,
         query_arguments: QueryArguments,
         selected_fields: &FieldSelection,
     ) -> Result<DbQuery, Box<dyn std::error::Error + Send + Sync>> {
@@ -109,8 +109,8 @@ impl<'a, V: Visitor<'a>> QueryBuilder for SqlQueryBuilder<'a, V> {
         use quaint::ast::{Aliasable, Joinable, Select};
         use select::{JoinConditionExt, SelectBuilderExt};
 
-        let link_alias = join_links.to_string();
-        let (rf, conditions_per_field) = join_links.into_parent_field_and_conditions();
+        let link_alias = linkage.to_string();
+        let (rf, conditions_per_field) = linkage.into_parent_field_and_conditions();
 
         let m2m_alias = self.context.next_table_alias();
         let m2m_table = rf.as_table(&self.context).alias(m2m_alias.to_string());

@@ -440,7 +440,7 @@ fn from_empty_to_migrations_directory(mut api: TestApi) {
     )
     .unwrap();
 
-    let migrations_list = list_migrations(&base_dir.into_path()).unwrap();
+    let migrations_list = list_migrations(&base_dir.keep()).unwrap();
 
     let params = DiffParams {
         exit_code: None,
@@ -481,7 +481,7 @@ fn from_empty_to_migrations_folder_without_shadow_db_url_must_error(mut api: Tes
     )
     .unwrap();
 
-    let migrations_list = list_migrations(&base_dir.into_path()).unwrap();
+    let migrations_list = list_migrations(&base_dir.keep()).unwrap();
 
     let params = DiffParams {
         exit_code: None,
@@ -777,8 +777,8 @@ fn diff_sqlite_migration_directories() {
     let migrations_lock_path = base_dir_2.path().join("migration_lock.toml");
     std::fs::write(migrations_lock_path, "provider = \"sqlite\"").unwrap();
 
-    let migrations_list = list_migrations(&base_dir.into_path()).unwrap();
-    let migrations_list_2 = list_migrations(&base_dir_2.into_path()).unwrap();
+    let migrations_list = list_migrations(&base_dir.keep()).unwrap();
+    let migrations_list_2 = list_migrations(&base_dir_2.keep()).unwrap();
 
     let params = DiffParams {
         exit_code: None,
