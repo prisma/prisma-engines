@@ -148,7 +148,7 @@ pub enum SqlError {
     DomainError(DomainError),
 
     #[error("Record not found: {:?}", _0)]
-    RecordNotFoundForWhere(Filter),
+    RecordNotFoundForWhere(Box<Filter>),
 
     #[error(
         "Violating a relation {} between {} and {}",
@@ -238,7 +238,7 @@ impl SqlError {
             SqlError::TableDoesNotExist(table) => ConnectorError::from_kind(ErrorKind::TableDoesNotExist { table }),
             SqlError::ColumnDoesNotExist(column) => ConnectorError::from_kind(ErrorKind::ColumnDoesNotExist { column }),
             SqlError::ConnectionError(e) => ConnectorError {
-                user_facing_error: user_facing_errors::quaint::render_quaint_error(&e, connection_info),
+                user_facing_error: user_facing_errors::quaint::render_quaint_error(&e, connection_info).map(Box::new),
                 kind: ErrorKind::ConnectionError(e.into()),
                 transient: false,
             },
@@ -278,7 +278,8 @@ impl SqlError {
                         user_facing_error: user_facing_errors::quaint::render_quaint_error(
                             quaint_error,
                             connection_info,
-                        ),
+                        )
+                        .map(Box::new),
                         kind: ErrorKind::QueryError(e),
                         transient: false,
                     },

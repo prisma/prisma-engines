@@ -18,8 +18,8 @@ transaction
                            const(BigInt(1)), const(BigInt(0))])
    in let 0$id = mapField id (get 0)
       in let 1 = query «SELECT "public"."Post"."id", "public"."Post"."userId"
-                        FROM "public"."Post" WHERE ("public"."Post"."userId" IN
-                        [$1] AND 1=1) OFFSET $2»
+                        FROM "public"."Post" WHERE (1=1 AND
+                        "public"."Post"."userId" IN [$1]) OFFSET $2»
                  params [var(0$id as Int), const(BigInt(0))]
          in let 2 = query «SELECT "public"."Post"."id" FROM "public"."Post"
                            WHERE (("public"."Post"."id" = $1 AND 1=1) OR

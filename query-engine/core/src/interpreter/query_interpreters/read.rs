@@ -303,9 +303,10 @@ pub(crate) fn process_nested<'conn>(
 fn record_not_found() -> InterpretationResult<QueryResult> {
     let cause = String::from("No record was found for a query.");
     Err(ConnectorError {
-        user_facing_error: Some(KnownError::new(
-            user_facing_errors::query_engine::RecordRequiredButNotFound { cause: cause.clone() },
-        )),
+        user_facing_error: Some(
+            KnownError::new(user_facing_errors::query_engine::RecordRequiredButNotFound { cause: cause.clone() })
+                .into(),
+        ),
         kind: connector::error::ErrorKind::RecordDoesNotExist { cause },
         transient: false,
     }
