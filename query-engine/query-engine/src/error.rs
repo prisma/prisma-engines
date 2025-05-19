@@ -37,7 +37,7 @@ impl From<PrismaError> for user_facing_errors::Error {
                 ConnectorError {
                     user_facing_error: Some(err),
                     ..
-                } => err.into(),
+                } => (*err).into(),
                 other => {
                     let err = PrismaError::ConnectorError(Box::new(other));
                     user_facing_errors::Error::new_non_panic_with_current_backtrace(err.to_string())

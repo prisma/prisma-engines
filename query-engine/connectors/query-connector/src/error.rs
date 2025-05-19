@@ -9,7 +9,7 @@ use user_facing_errors::{query_engine::DatabaseConstraint, KnownError};
 #[error("{}", kind)]
 pub struct ConnectorError {
     /// An optional error already rendered for users.
-    pub user_facing_error: Option<KnownError>,
+    pub user_facing_error: Option<Box<KnownError>>,
     /// The error information for internal use.
     pub kind: ErrorKind,
     /// Whether an error is transient and should be retried.
@@ -122,7 +122,7 @@ impl ConnectorError {
         };
 
         ConnectorError {
-            user_facing_error,
+            user_facing_error: user_facing_error.map(Box::new),
             kind,
             transient: false,
         }
@@ -176,7 +176,7 @@ pub enum ErrorKind {
     DomainError(DomainError),
 
     #[error("Record not found: {:?}", _0)]
-    RecordNotFoundForWhere(Filter),
+    RecordNotFoundForWhere(Box<Filter>),
 
     #[error(
         "Violating a relation {} between {} and {}",
