@@ -160,7 +160,7 @@ impl AsyncWrite for WsTunnel {
     fn poll_write(self: Pin<&mut Self>, cx: &mut Context<'_>, buf: &[u8]) -> Poll<std::io::Result<usize>> {
         let this = self.get_mut();
         let sink = &mut this.inner.get_mut().0;
-        let to_io_err = |err| IoError::new(IoErrorKind::Other, err);
+        let to_io_err = |err| IoError::other(err);
 
         match this.write_state {
             WriteState::Free => {
@@ -192,7 +192,7 @@ impl AsyncWrite for WsTunnel {
             .get_pin_mut()
             .get_pin_mut()
             .poll_flush(cx)
-            .map_err(|err| IoError::new(IoErrorKind::Other, err))
+            .map_err(IoError::other)
     }
 
     fn poll_shutdown(self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<std::io::Result<()>> {
@@ -201,7 +201,7 @@ impl AsyncWrite for WsTunnel {
             .get_pin_mut()
             .get_pin_mut()
             .poll_close(cx)
-            .map_err(|err| IoError::new(IoErrorKind::Other, err))
+            .map_err(IoError::other)
     }
 }
 
@@ -224,9 +224,9 @@ impl Stream for WsBytesStream {
                     cx.waker().wake_by_ref();
                     Poll::Pending
                 }
-                Message::Frame(_) => Poll::Ready(Some(Err(IoError::new(IoErrorKind::Other, "unexpected raw frame")))),
+                Message::Frame(_) => Poll::Ready(Some(Err(IoError::other("unexpected raw frame")))),
             },
-            Poll::Ready(Some(Err(err))) => Poll::Ready(Some(Err(IoError::new(IoErrorKind::Other, err)))),
+            Poll::Ready(Some(Err(err))) => Poll::Ready(Some(Err(IoError::other(err)))),
         }
     }
 

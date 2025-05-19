@@ -35,7 +35,7 @@ impl From<ApiError> for user_facing_errors::Error {
             ApiError::Connector(ConnectorError {
                 user_facing_error: Some(err),
                 ..
-            }) => err.into(),
+            }) => (*err).into(),
             ApiError::Conversion(errors, dml_string) => {
                 let mut full_error = errors.to_pretty_string("schema.prisma", &dml_string);
                 write!(full_error, "\nValidation Error Count: {}", errors.errors().len()).unwrap();
