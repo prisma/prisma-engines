@@ -47,18 +47,14 @@ transaction
                                   in let @parent$userId =
                                          mapField userId (get @parent)
                                      in join (get @parent)
-                                        with (unique (query «SELECT
-                                                             "public"."User"."id",
-                                                             "public"."User"."email"
-                                                             FROM
-                                                             "public"."User"
-                                                             WHERE
-                                                             "public"."User"."id"
-                                                             = $1 LIMIT $2
-                                                             OFFSET $3»
-                                                      params [var(@parent$userId as Int),
-                                                              const(BigInt(1)),
-                                                              const(BigInt(0))])) on left.(userId) = right.(id) as user
+                                        with (query «SELECT
+                                                     "public"."User"."id",
+                                                     "public"."User"."email"
+                                                     FROM "public"."User" WHERE
+                                                     "public"."User"."id" = $1
+                                                     OFFSET $2»
+                                              params [var(@parent$userId as Int),
+                                                      const(BigInt(0))]) on unique left.(userId) = right.(id) as user
                               in get 6
                        in get 6
              in get 0
