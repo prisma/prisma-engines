@@ -44,12 +44,10 @@ queries::data_types::through_relation::scalar_relations::common_types
 queries::filters::self_relation_regression::sr_regression::all_categories
 queries::order_and_pagination::nested_pagination::nested_pagination::m2m_many_children_nested_cursor
 queries::order_and_pagination::nested_pagination::nested_pagination::m2m_many_children_nested_cursor_skip_take
-queries::order_and_pagination::nested_pagination::nested_pagination::m2m_many_children_nested_skip_take
 queries::relations::duplicate_col_regression::dup_col_regr::test_1
 raw::sql::typed_output::typed_output::all_scalars_sqlite
 writes::ids::byoid::byoid::nested_upsert_should_work_1
 writes::ids::relation_pks::compound_pk_rel_field::compound_pk_rel::cpd_1_1_multi_field_rel
-writes::ids::relation_pks::compound_pk_rel_field::compound_pk_rel::cpd_1_1_single_field_rel
 writes::ids::relation_pks::compound_pk_rel_field::compound_pk_rel::cpd_1_m_multi_field_rel
 writes::ids::relation_pks::compound_pk_rel_field::compound_pk_rel::cpd_1_m_single_field_rel
 writes::ids::relation_pks::single_pk_rel_field::single_pk_rel_field::id_also_1_m_multi_field_rel
@@ -107,11 +105,8 @@ writes::nested_mutations::already_converted::nested_update_many_inside_update::u
 writes::nested_mutations::already_converted::nested_update_many_inside_update::um_inside_update::pm_c1_req_should_work
 writes::nested_mutations::already_converted::nested_update_many_inside_update::um_inside_update::pm_c1_should_work
 writes::nested_mutations::already_converted::nested_upsert_inside_update::upsert_inside_update::pm_c1_parnt_in_rel_update
-writes::nested_mutations::already_converted::nested_upsert_inside_update::upsert_inside_update::pm_c1req_child_in_req
 writes::nested_mutations::already_converted::nested_upsert_inside_update::upsert_inside_update::pm_cm_child_inrel_create
-writes::nested_mutations::combining_different_nested_mutations::many_nested_muts::create_then_delete
 writes::nested_mutations::combining_different_nested_mutations::many_nested_muts::create_then_disconnect
-writes::nested_mutations::combining_different_nested_mutations::many_nested_muts::create_then_set
 writes::nested_mutations::combining_different_nested_mutations::many_nested_muts::create_then_update
 writes::nested_mutations::combining_different_nested_mutations::many_nested_muts::create_then_upsert
 writes::nested_mutations::not_using_schema_base::nested_connect_or_create::connect_or_create::m2n_connect_or_create
@@ -137,6 +132,5 @@ writes::top_level_mutations::delete::delete::should_fail_non_exist_id
 writes::top_level_mutations::delete::delete::should_fail_non_existent_value_non_id_uniq_field
 writes::top_level_mutations::update_many_and_return::update_many_and_return::update_many_11_inline_rel_read_works
 writes::uniques_and_node_selectors::multi_field_uniq_mutation::multi_field_uniq_mut::nested_connect_one2one_rel
-writes::uniques_and_node_selectors::multi_field_uniq_mutation::multi_field_uniq_mut::nested_set_multi_field_uniq
 writes::uniques_and_node_selectors::relation_uniques::compound_uniq_rel_field::compound_uniq_rel_field::compound_uniq_with_1_1_multi_rel
 writes::uniques_and_node_selectors::relation_uniques::compound_uniq_rel_field::compound_uniq_rel_field::compound_uniq_with_1_1_single_rel
