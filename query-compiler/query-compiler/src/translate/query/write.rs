@@ -4,7 +4,7 @@ use query_core::{
     ConnectRecords, DeleteManyRecords, DeleteRecord, DisconnectRecords, RawQuery, UpdateManyRecords, UpdateRecord,
     UpdateRecordWithSelection, WriteQuery,
 };
-use query_structure::{QueryArguments, Take};
+use query_structure::{QueryArguments, RelationLoadStrategy, Take};
 
 use crate::{TranslateError, expression::Expression, translate::TranslateResult};
 
@@ -83,7 +83,7 @@ pub(crate) fn translate_write_query(query: WriteQuery, builder: &dyn QueryBuilde
                 // if there's no args we can just issue a read query
                 let args = QueryArguments::from((model.clone(), record_filter.filter)).with_take(Take::Some(1));
                 builder
-                    .build_get_records(&model, args, &selected_fields)
+                    .build_get_records(&model, args, &selected_fields, RelationLoadStrategy::Query)
                     .map_err(TranslateError::QueryBuildFailure)?
             } else {
                 builder

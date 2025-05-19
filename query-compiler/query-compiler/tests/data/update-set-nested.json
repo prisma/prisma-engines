@@ -3,6 +3,7 @@
   "action": "updateOne",
   "query": {
     "arguments": {
+      "relationLoadStrategy": "query",
       "where": { "email": "user.1737556028164@prisma.io" },
       "data": { "posts": { "set": [{ "id": 11 }, { "id": 12 }] } }
     },

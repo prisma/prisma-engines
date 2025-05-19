@@ -3,6 +3,7 @@
   "action": "findMany",
   "query": {
     "arguments": {
+      "relationLoadStrategy": "query",
       "where": {}
     },
     "selection": {

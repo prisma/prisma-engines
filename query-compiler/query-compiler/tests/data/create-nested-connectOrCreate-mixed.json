@@ -3,6 +3,7 @@
   "action": "createOne",
   "query": {
     "arguments": {
+      "relationLoadStrategy": "query",
       "data": {
         "title": "Quantum Topological Embeddings of Mycorrhizal Networks: A Fractal Analysis of Phyllotaxic Algorithms in Non-Euclidean Plant Informatic",
         "user": {

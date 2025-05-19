@@ -22,23 +22,33 @@ jobs:
   qe-tests-with-qc:
     strategy:
       fail-fast: false
+
       matrix:
         adapter:
           - name: pg
             setup_task: dev-pg-qc
             ignored_tests_list: query-compiler/query-engine-tests-todo/pg/skip
             should_fail_tests_list: query-compiler/query-engine-tests-todo/pg/fail
+            relation_load_strategy: '["join", "query"]'
+
           - name: libsql
             setup_task: dev-libsql-qc
             ignored_tests_list: query-compiler/query-engine-tests-todo/libsql/skip
             should_fail_tests_list: query-compiler/query-engine-tests-todo/libsql/fail
+            relation_load_strategy: '["query"]'
+
           - name: sqlite
             setup_task: dev-better-sqlite3-qc
             ignored_tests_list: query-compiler/query-engine-tests-todo/better-sqlite3/skip
             should_fail_tests_list: query-compiler/query-engine-tests-todo/better-sqlite3/fail
+            relation_load_strategy: '["query"]'
+
     name: ${{ matrix.adapter.name }}
+
     uses: ./.github/workflows/test-query-compiler-template.yml
+
     with:
       setup_task: ${{ matrix.adapter.setup_task }}
       ignored_tests_list: ${{ matrix.adapter.ignored_tests_list }}
       should_fail_tests_list: ${{ matrix.adapter.should_fail_tests_list }}
+      relation_load_strategy: ${{ matrix.adapter.relation_load_strategy }}

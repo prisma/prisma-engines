@@ -2,16 +2,15 @@
   "modelName": "User",
   "action": "findMany",
   "query": {
-    "arguments": {},
+    "arguments": {
+      "relationLoadStrategy": "join"
+    },
     "selection": {
-      "id": true,
       "email": true,
-      "activations": {
+      "_count": {
         "arguments": {},
         "selection": {
-          "issued": true,
-          "secret": true,
-          "done": true
+          "activations": true
         }
       }
     }

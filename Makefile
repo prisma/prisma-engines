@@ -239,7 +239,19 @@ test-pg-wasm: dev-pg-wasm test-qe-st
 dev-pg-qc: start-postgres13 build-qc-wasm build-driver-adapters-kit-qc
 	cp $(CONFIG_PATH)/pg-qc $(CONFIG_FILE)
 
+dev-pg-qc-join:
+	PRISMA_RELATION_LOAD_STRATEGY=join make dev-pg-qc
+
+dev-pg-qc-query:
+	PRISMA_RELATION_LOAD_STRATEGY=query make dev-pg-qc
+
 test-pg-qc: dev-pg-qc test-qe
+
+test-pg-qc-join:
+	PRISMA_RELATION_LOAD_STRATEGY=join make test-pg-qc
+
+test-pg-qc-query:
+	PRISMA_RELATION_LOAD_STRATEGY=query make test-pg-qc
 
 test-driver-adapter-pg: test-pg-js
 test-driver-adapter-pg-wasm: test-pg-wasm
