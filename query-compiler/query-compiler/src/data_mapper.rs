@@ -107,7 +107,7 @@ fn get_result_node(
 
                     node.entry(group_name)
                         .or_insert_with(ResultNode::new_flattened_object)
-                        .add_field(field_name, ResultNode::new_value(f.db_alias(), typ.to_prisma_type()));
+                        .add_field(field_name, ResultNode::new_value(vs.db_alias(), typ.to_prisma_type()));
                 }
             }
             None => {
