@@ -1,6 +1,5 @@
 new::interactive_tx::interactive_tx::batch_queries_failure
 new::interactive_tx::interactive_tx::batch_queries_rollback
-new::interactive_tx::interactive_tx::batch_queries_success
 new::interactive_tx::interactive_tx::commit_after_rollback
 new::interactive_tx::interactive_tx::double_commit
 new::interactive_tx::interactive_tx::double_rollback
@@ -62,9 +61,6 @@ queries::filters::json_filters::json_filters::multi_filtering
 queries::filters::many_relation::many_relation::prisma_25103
 queries::filters::one_relation::one_relation::one2one_join_relation_1level
 queries::filters::self_relation_regression::sr_regression::all_categories
-queries::order_and_pagination::nested_pagination::nested_pagination::m2m_many_children_nested_cursor
-queries::order_and_pagination::nested_pagination::nested_pagination::m2m_many_children_nested_cursor_skip_take
-queries::order_and_pagination::nested_pagination::nested_pagination::m2m_many_children_nested_skip_take
 queries::order_and_pagination::order_by_aggregation::order_by_aggr::cursor_m2m_count_asc_m2one2m_count_desc
 queries::order_and_pagination::order_by_aggregation::order_by_aggr::cursor_one2m_field_asc_m2m_count_desc
 queries::order_and_pagination::order_by_aggregation::order_by_aggr::m2one2m_count_asc
@@ -103,6 +99,10 @@ raw::sql::scalar_list::scalar_list::null_scalar_lists
 raw::sql::typed_output::typed_output::all_scalars_pg
 writes::data_types::native_types::postgres::postgres::native_date
 writes::data_types::native_types::postgres::postgres::native_other_types
+writes::ids::relation_pks::compound_pk_rel_field::compound_pk_rel::cpd_1_1_multi_field_rel
+writes::ids::relation_pks::compound_pk_rel_field::compound_pk_rel::cpd_1_1_single_field_rel
+writes::ids::relation_pks::single_pk_rel_field::single_pk_rel_field::id_also_1_1_multi_field_rel
+writes::ids::relation_pks::single_pk_rel_field::single_pk_rel_field::id_also_1_1_single_field_rel
 writes::nested_mutations::already_converted::nested_connect_inside_create::connect_inside_create::pm_to_c1_fail_if_wrong_id
 writes::nested_mutations::already_converted::nested_connect_inside_create::connect_inside_create::pm_to_c1_rel_fail_connect_no_node
 writes::nested_mutations::already_converted::nested_connect_inside_create::connect_inside_create::pm_to_c1_rel_fail_filter_dont_match
@@ -121,3 +121,6 @@ writes::top_level_mutations::delete::delete::delete_fails_if_filter_dont_match
 writes::top_level_mutations::delete::delete::should_fail_non_exist_id
 writes::top_level_mutations::delete::delete::should_fail_non_existent_value_non_id_uniq_field
 writes::top_level_mutations::update_many_and_return::update_many_and_return::update_many_11_inline_rel_read_works
+writes::uniques_and_node_selectors::non_embedded_setting_node_selector_to_null::non_embedded_node_sel_to_null::where_val_to_null
+writes::uniques_and_node_selectors::relation_uniques::compound_uniq_rel_field::compound_uniq_rel_field::compound_uniq_with_1_1_multi_rel
+writes::uniques_and_node_selectors::relation_uniques::compound_uniq_rel_field::compound_uniq_rel_field::compound_uniq_with_1_1_single_rel
