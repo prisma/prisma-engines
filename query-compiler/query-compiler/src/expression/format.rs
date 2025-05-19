@@ -239,10 +239,17 @@ where
                             .iter()
                             .map(|(l, r)| (self.field_name(l), self.field_name(r)))
                             .unzip();
-                        self.expression(&join.child)
+                        let mut builder = self
+                            .expression(&join.child)
                             .parens()
                             .append(self.space())
-                            .append(self.keyword("on"))
+                            .append(self.keyword("on"));
+
+                        if join.is_relation_unique {
+                            builder = builder.append(self.space()).append(self.keyword("unique"));
+                        }
+
+                        builder
                             .append(self.space())
                             .append(
                                 self.keyword("left")
