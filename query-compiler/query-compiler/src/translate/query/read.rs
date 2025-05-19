@@ -288,8 +288,7 @@ fn build_read_one2m_query(
     builder: &dyn QueryBuilder,
 ) -> TranslateResult<(Expression, JoinFields)> {
     let (field, conditions_per_field) = join.into_parent_field_and_conditions();
-    let related_scalars = field.related_field().left_scalars();
-    let join_fields = related_scalars.iter().map(|sf| sf.name().to_owned()).collect();
+    let to_one_relation = !field.arity().is_list();
 
     let filters = args
         .filter
@@ -305,14 +304,12 @@ fn build_read_one2m_query(
             })
         }))
         .collect_vec();
-    args.filter = Some(Filter::And(filters));
 
-    let to_one_relation = !field.arity().is_list();
-    let args = if to_one_relation {
-        args.with_take(Take::Some(1))
-    } else {
-        args
-    };
+    args.filter = Some(Filter::And(filters));
+    if to_one_relation {
+        args.take = Take::One;
+    }
+
     let query = builder
         .build_get_records(&field.related_model(), args, selected_fields)
         .map_err(TranslateError::QueryBuildFailure)?;
@@ -321,6 +318,10 @@ fn build_read_one2m_query(
     if to_one_relation {
         expr = Expression::Unique(Box::new(expr));
     }
+
+    let related_scalars = field.related_field().left_scalars();
+    let join_fields = related_scalars.iter().map(|sf| sf.name().to_owned()).collect();
+
     Ok((expr, JoinFields(join_fields)))
 }
 
