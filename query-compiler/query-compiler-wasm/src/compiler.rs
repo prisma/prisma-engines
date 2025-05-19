@@ -1,11 +1,14 @@
 use psl::ConnectorRegistry;
 use quaint::connector::ConnectionInfo;
 use query_compiler::{CompileError, Expression, TranslateError};
-use query_core::{ArgumentValue, BatchDocument, QueryDocument, QueryGraphBuilderError, protocol::EngineProtocol};
+use query_core::{
+    ArgumentValue, BatchDocument, QueryDocument, QueryGraphBuilderError, RelationViolation, protocol::EngineProtocol,
+};
 use request_handlers::{HandlerError, RequestBody};
 use serde::{Deserialize, Serialize};
 use std::{collections::HashMap, sync::Arc};
-use tsify_next::Tsify;
+use tsify::Tsify;
+use user_facing_errors::UserFacingError;
 use wasm_bindgen::prelude::wasm_bindgen;
 
 use crate::params::{AdapterProvider, JsConnectionInfo};
@@ -129,7 +132,7 @@ impl QueryCompiler {
 
 #[derive(Serialize, Tsify)]
 #[serde(tag = "type", rename_all = "camelCase")]
-#[tsify(into_wasm_abi)]
+#[tsify(into_wasm_abi, hashmap_as_object)]
 pub enum BatchResponse {
     Multi {
         plans: Vec<Expression>,
@@ -145,7 +148,7 @@ pub enum BatchResponse {
 }
 
 #[derive(Serialize, Tsify)]
-#[tsify(into_wasm_abi)]
+#[tsify(into_wasm_abi, hashmap_as_object)]
 pub struct JsCompileError {
     message: String,
     code: Option<String>,
@@ -160,18 +163,52 @@ impl JsCompileError {
             meta: None,
         }
     }
+
+    pub fn user_facing<E: UserFacingError>(error: E) -> Self {
+        JsCompileError {
+            message: error.message(),
+            code: Some(E::ERROR_CODE.into()),
+            meta: serde_json::to_value(&error).ok(),
+        }
+    }
 }
 
 impl From<CompileError> for JsCompileError {
     fn from(value: CompileError) -> Self {
         match value {
-            CompileError::GraphBuildError(QueryGraphBuilderError::QueryParserError(error))
-            | CompileError::TranslateError(TranslateError::GraphBuildError(
-                QueryGraphBuilderError::QueryParserError(error),
-            )) => JsCompileError {
-                message: error.message().into(),
-                code: Some(error.kind().code().into()),
-                meta: error.meta().cloned(),
+            CompileError::GraphBuildError(error)
+            | CompileError::TranslateError(TranslateError::GraphBuildError(error)) => match error {
+                QueryGraphBuilderError::QueryParserError(error) => JsCompileError {
+                    message: error.message().into(),
+                    code: Some(error.kind().code().into()),
+                    meta: serde_json::to_value(&error).ok(),
+                },
+                QueryGraphBuilderError::MissingRequiredArgument {
+                    argument_name,
+                    field_name,
+                    object_name,
+                } => JsCompileError::user_facing(user_facing_errors::query_engine::MissingRequiredArgument {
+                    argument_name,
+                    field_name,
+                    object_name,
+                }),
+                QueryGraphBuilderError::RelationViolation(RelationViolation {
+                    relation,
+                    model_a,
+                    model_b,
+                }) => JsCompileError::user_facing(user_facing_errors::query_engine::RelationViolation {
+                    relation_name: relation,
+                    model_a_name: model_a,
+                    model_b_name: model_b,
+                }),
+                QueryGraphBuilderError::InputError(details) => {
+                    JsCompileError::user_facing(user_facing_errors::query_engine::InputError { details })
+                }
+                _ => JsCompileError {
+                    message: error.to_string(),
+                    code: None,
+                    meta: None,
+                },
             },
             _ => JsCompileError {
                 message: value.to_string(),

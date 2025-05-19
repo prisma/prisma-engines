@@ -1,7 +1,7 @@
 use crate::{
     query_ast::*,
     query_graph::{Node, NodeRef, QueryGraph, QueryGraphDependency},
-    QueryGraphBuilderError, QueryGraphBuilderResult,
+    DataExpectation, IncompleteConnectInput, QueryGraphBuilderError, QueryGraphBuilderResult,
 };
 use query_structure::RelationFieldRef;
 
@@ -75,6 +75,7 @@ pub(crate) fn connect_records_node(
 
                 Ok(connect_node)
             }),
+            None,
         ),
     )?;
 
@@ -85,20 +86,18 @@ pub(crate) fn connect_records_node(
         QueryGraphDependency::ProjectedDataDependency(
             child_model_id,
             Box::new(move |mut connect_node, child_ids| {
-                let len = child_ids.len();
-
-                if len != expected_connects {
-                    return Err(QueryGraphBuilderError::RecordNotFound(format!(
-                        "Expected {expected_connects} records to be connected, found only {len}.",
-                    )));
-                }
-
                 if let Node::Query(Query::Write(WriteQuery::ConnectRecords(ref mut c))) = connect_node {
                     c.child_ids = child_ids;
                 }
 
                 Ok(connect_node)
             }),
+            Some(DataExpectation::exact_row_count(
+                expected_connects,
+                IncompleteConnectInput::builder()
+                    .expected_rows(expected_connects)
+                    .build(),
+            )),
         ),
     )?;
 

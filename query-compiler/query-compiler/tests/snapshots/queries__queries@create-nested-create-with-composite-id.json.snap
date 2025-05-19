@@ -1,51 +1,66 @@
 ---
 source: query-compiler/query-compiler/tests/queries.rs
-assertion_line: 46
 expression: pretty
 input_file: query-compiler/query-compiler/tests/data/create-nested-create-with-composite-id.json
-snapshot_kind: text
 ---
 transaction
+   dataMap
+      a: Int [a]
+      b: Int [b]
+      children: 
+         id: Int [id]
+         parentA: Int [parentA]
+         parentB: Int [parentB]
    let 0 = unique (query «INSERT INTO "public"."ParentModelWithCompositeId"
                           ("a","b") VALUES ($1,$2) RETURNING
                           "public"."ParentModelWithCompositeId"."a",
                           "public"."ParentModelWithCompositeId"."b"»
                    params [const(BigInt(1)), const(BigInt(1))])
-   in let 0$a = mapField a (get 0);
+   in let 0 = validate (get 0)
+          [ rowCountNeq 0
+          ] orRaise "MISSING_RELATED_RECORD";
+          0$a = mapField a (get 0);
           0$b = mapField b (get 0)
       in sum (execute «INSERT INTO "public"."ChildOfModelWithCompositeId"
                        ("id","parentA","parentB") VALUES ($1,$2,$3), ($4,$5,$6)»
               params [const(BigInt(1)), var(0$a as Int), var(0$b as Int),
                       const(BigInt(2)), var(0$a as Int), var(0$b as Int)]);
-      let 2 = let 0$a = mapField a (get 0);
+      let 2 = let 0 = validate (get 0)
+                  [ rowCountNeq 0
+                  ] orRaise "MISSING_RECORD";
+                  0$a = mapField a (get 0);
                   0$b = mapField b (get 0)
-          in let @parent = unique (query «SELECT
-                                          "public"."ParentModelWithCompositeId"."a",
-                                          "public"."ParentModelWithCompositeId"."b"
-                                          FROM
-                                          "public"."ParentModelWithCompositeId"
-                                          WHERE
-                                          ("public"."ParentModelWithCompositeId"."a"
-                                          = $1 AND
-                                          "public"."ParentModelWithCompositeId"."b"
-                                          = $2) LIMIT $3 OFFSET $4»
-                                   params [var(0$a as Int), var(0$b as Int),
-                                           const(BigInt(1)), const(BigInt(0))])
-             in let @parent$a = mapField a (get @parent);
-                    @parent$b = mapField b (get @parent)
-                in join (get @parent)
-                   with (query «SELECT
-                                "public"."ChildOfModelWithCompositeId"."id",
-                                "public"."ChildOfModelWithCompositeId"."parentA",
-                                "public"."ChildOfModelWithCompositeId"."parentB"
-                                FROM "public"."ChildOfModelWithCompositeId"
-                                WHERE
-                                ("public"."ChildOfModelWithCompositeId"."parentA"
-                                = $1 OR
-                                "public"."ChildOfModelWithCompositeId"."parentB"
-                                = $2) OFFSET $3»
-                         params [var(@parent$a as Int), var(@parent$b as Int),
-                                 const(BigInt(0))]) on left.(a,
-                                                             b) = right.(parentA,
-                                                                         parentB) as children
+          in let 2 = let @parent = unique (query «SELECT
+                                                  "public"."ParentModelWithCompositeId"."a",
+                                                  "public"."ParentModelWithCompositeId"."b"
+                                                  FROM
+                                                  "public"."ParentModelWithCompositeId"
+                                                  WHERE
+                                                  ("public"."ParentModelWithCompositeId"."a"
+                                                  = $1 AND
+                                                  "public"."ParentModelWithCompositeId"."b"
+                                                  = $2) LIMIT $3 OFFSET $4»
+                                           params [var(0$a as Int),
+                                                   var(0$b as Int),
+                                                   const(BigInt(1)),
+                                                   const(BigInt(0))])
+                 in let @parent$a = mapField a (get @parent);
+                        @parent$b = mapField b (get @parent)
+                    in join (get @parent)
+                       with (query «SELECT
+                                    "public"."ChildOfModelWithCompositeId"."id",
+                                    "public"."ChildOfModelWithCompositeId"."parentA",
+                                    "public"."ChildOfModelWithCompositeId"."parentB"
+                                    FROM "public"."ChildOfModelWithCompositeId"
+                                    WHERE
+                                    ("public"."ChildOfModelWithCompositeId"."parentA"
+                                    = $1 OR
+                                    "public"."ChildOfModelWithCompositeId"."parentB"
+                                    = $2) OFFSET $3»
+                             params [var(@parent$a as Int),
+                                     var(@parent$b as Int),
+                                     const(BigInt(0))]) on left.(a,
+                                                                 b) = right.(parentA,
+                                                                             parentB) as children
+             in get 2
       in get 2

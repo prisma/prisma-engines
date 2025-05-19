@@ -3,6 +3,11 @@ source: query-compiler/query-compiler/tests/queries.rs
 expression: pretty
 input_file: query-compiler/query-compiler/tests/data/aggregate.json
 ---
+dataMap
+   _count: 
+      id: Int [id]
+      email: Int [email]
+      _all: Int [_all]
 unique (query «SELECT COUNT("id") AS "_count.id", COUNT("email") AS
                "_count.email", COUNT(*) AS "_count._all" FROM (SELECT
                "public"."User"."id", "public"."User"."email" FROM

@@ -1,12 +1,20 @@
 import * as util from 'node:util'
-import { SqlQueryable, IsolationLevel } from '@prisma/driver-adapter-utils'
+import {
+  SqlQueryable,
+  IsolationLevel,
+  ColumnType,
+  ColumnTypeEnum,
+  SqlResultSet,
+} from '@prisma/driver-adapter-utils'
 import { JsonProtocolQuery, QueryParams } from '../types/jsonRpc'
 import type { State } from './worker'
-import { debug } from '../utils'
+import { assertNever, debug } from '../utils'
 import {
   noopTracingHelper,
+  QueryEvent,
   QueryInterpreter,
   type QueryInterpreterTransactionManager,
+  QueryPlanNode,
   type TransactionManager,
   UserFacingError,
 } from '@prisma/client-engine-runtime'
@@ -50,14 +58,14 @@ class QueryPipeline {
 
       debug('🟢 Batch query results: ', results)
 
-      return JSON.stringify({
+      return bigIntSafeJsonStringify({
         batchResult: batch.map((query, index) =>
           getResponseInQeFormat(query, results[index]),
         ),
       })
     } else {
       const queryable = txId
-        ? this.transactionManager.getTransaction({ id: txId }, query.action)
+        ? this.transactionManager.getTransaction({ id: txId }, 'query')
         : this.driverAdapter
 
       if (!queryable) {
@@ -69,12 +77,12 @@ class QueryPipeline {
       try {
         const result = await this.executeQuery(queryable, query, !txId)
 
-        debug('🟢 Query result: ', result)
+        debug('🟢 Query result: ', util.inspect(result, false, null, true))
 
-        return JSON.stringify(getResponseInQeFormat(query, result))
+        return bigIntSafeJsonStringify(getResponseInQeFormat(query, result))
       } catch (error) {
         if (error instanceof UserFacingError) {
-          return JSON.stringify({
+          return bigIntSafeJsonStringify({
             errors: [error.toQueryResponseErrorObject()],
           })
         }
@@ -91,7 +99,7 @@ class QueryPipeline {
     let queryPlanString: string
     try {
       queryPlanString = withLocalPanicHandler(() =>
-        this.compiler.compile(JSON.stringify(query)),
+        this.compiler.compile(bigIntSafeJsonStringify(query)),
       )
     } catch (error) {
       if (typeof error.message === 'string' && typeof error.code === 'string') {
@@ -101,7 +109,7 @@ class QueryPipeline {
       }
     }
 
-    const queryPlan = JSON.parse(queryPlanString)
+    const queryPlan = JSON.parse(queryPlanString) as QueryPlanNode
 
     debug('🟢 Query plan: ', util.inspect(queryPlan, false, null, true))
 
@@ -111,14 +119,22 @@ class QueryPipeline {
         : { enabled: false }
     ) satisfies QueryInterpreterTransactionManager
 
-    const interpreter = new QueryInterpreter({
+    const interpreterOpts = {
       transactionManager: qiTransactionManager,
       placeholderValues: {},
-      onQuery: (event) => {
-        this.logs.push(JSON.stringify(event))
+      onQuery: (event: QueryEvent) => {
+        this.logs.push(bigIntSafeJsonStringify(event))
       },
       tracingHelper: noopTracingHelper,
-    })
+    }
+
+    // workaround needed due to raw SQL tests being written against unserialized results
+    const interpreter = isPlainRawQuery(queryPlan)
+      ? new QueryInterpreter({
+          ...interpreterOpts,
+          serializer: serializeRawQueryResult,
+        })
+      : QueryInterpreter.forSql(interpreterOpts)
 
     return interpreter.run(queryPlan, queryable)
   }
@@ -136,17 +152,18 @@ class QueryPipeline {
     isolationLevel?: IsolationLevel,
   ) {
     const txInfo = await this.transactionManager.startTransaction({
+      maxWait: 200,
+      timeout: 500,
       isolationLevel,
     })
 
     const transaction = this.transactionManager.getTransaction(
       txInfo,
-      'batch transaction query',
+      'batch query',
     )
 
     try {
       const results: unknown[] = []
-
       for (const query of queries) {
         const result = await this.executeQuery(transaction, query, false)
         results.push(result)
@@ -167,7 +184,10 @@ class QueryPipeline {
 function getResponseInQeFormat(query: JsonProtocolQuery, result: unknown) {
   return {
     data: {
-      [getFullOperationName(query)]: getOperationResultInQeFormat(result),
+      [getFullOperationName(query)]:
+        query.action !== 'queryRaw' && query.action !== 'executeRaw'
+          ? getOperationResultInQeFormat(result)
+          : result,
     },
   }
 }
@@ -178,6 +198,10 @@ function getFullOperationName(query: JsonProtocolQuery): string {
       return `createMany${query.modelName}AndReturn`
     case 'updateManyAndReturn':
       return `updateMany${query.modelName}AndReturn`
+    case 'findFirstOrThrow':
+      return `findFirst${query.modelName}OrThrow`
+    case 'findUniqueOrThrow':
+      return `findUnique${query.modelName}OrThrow`
     default:
       if (query.modelName) {
         return query.action + query.modelName
@@ -192,5 +216,111 @@ function getOperationResultInQeFormat(result: unknown) {
     return { count: result }
   } else {
     return result
+  }
+}
+
+function isPlainRawQuery(plan: QueryPlanNode): boolean {
+  switch (plan.type) {
+    case 'query':
+      return plan.args.type === 'rawSql'
+    case 'seq':
+      return plan.args.length === 1 && isPlainRawQuery(plan.args[0])
+    default:
+      return false
+  }
+}
+
+function bigIntSafeJsonStringify(obj: unknown): string {
+  return JSON.stringify(obj, (_key, val) => {
+    if (typeof val === 'bigint') {
+      return val.toString()
+    } else if (val instanceof Uint8Array) {
+      return Buffer.from(val).toString('base64')
+    }
+    return val
+  })
+}
+
+function serializeRawQueryResult(
+  resultSet: SqlResultSet,
+): Record<string, unknown> {
+  return {
+    columns: resultSet.columnNames,
+    types: resultSet.columnTypes.map((type) => serializeColumnType(type)),
+    rows: resultSet.rows,
+  }
+}
+
+// maps JS column types to their Rust equivalents in order to satisfy assertions in tests
+function serializeColumnType(columnType: ColumnType): string {
+  switch (columnType) {
+    case ColumnTypeEnum.Int32:
+      return 'int'
+    case ColumnTypeEnum.Int64:
+      return 'bigint'
+    case ColumnTypeEnum.Float:
+      return 'float'
+    case ColumnTypeEnum.Double:
+      return 'double'
+    case ColumnTypeEnum.Text:
+      return 'string'
+    case ColumnTypeEnum.Enum:
+      return 'enum'
+    case ColumnTypeEnum.Bytes:
+      return 'bytes'
+    case ColumnTypeEnum.Boolean:
+      return 'bool'
+    case ColumnTypeEnum.Character:
+      return 'char'
+    case ColumnTypeEnum.Numeric:
+      return 'decimal'
+    case ColumnTypeEnum.Json:
+      return 'json'
+    case ColumnTypeEnum.Uuid:
+      return 'uuid'
+    case ColumnTypeEnum.DateTime:
+      return 'datetime'
+    case ColumnTypeEnum.Date:
+      return 'date'
+    case ColumnTypeEnum.Time:
+      return 'time'
+    case ColumnTypeEnum.Int32Array:
+      return 'int-array'
+    case ColumnTypeEnum.Int64Array:
+      return 'bigint-array'
+    case ColumnTypeEnum.FloatArray:
+      return 'float-array'
+    case ColumnTypeEnum.DoubleArray:
+      return 'double-array'
+    case ColumnTypeEnum.TextArray:
+      return 'string-array'
+    case ColumnTypeEnum.EnumArray:
+      return 'string-array'
+    case ColumnTypeEnum.BytesArray:
+      return 'bytes-array'
+    case ColumnTypeEnum.BooleanArray:
+      return 'bool-array'
+    case ColumnTypeEnum.CharacterArray:
+      return 'char-array'
+    case ColumnTypeEnum.NumericArray:
+      return 'decimal-array'
+    case ColumnTypeEnum.JsonArray:
+      return 'json-array'
+    case ColumnTypeEnum.UuidArray:
+      return 'uuid-array'
+    case ColumnTypeEnum.DateTimeArray:
+      return 'datetime-array'
+    case ColumnTypeEnum.DateArray:
+      return 'date-array'
+    case ColumnTypeEnum.TimeArray:
+      return 'time-array'
+    case ColumnTypeEnum.UnknownNumber:
+      return 'unknown'
+    case ColumnTypeEnum.Set:
+      /// The following PlanetScale type IDs are mapped into Set:
+      /// - SET (SET) -> e.g. `"foo,bar"` (String-encoded, comma-separated)
+      return 'string'
+    default:
+      assertNever(columnType, `Unexpected column type: ${columnType}`)
   }
 }

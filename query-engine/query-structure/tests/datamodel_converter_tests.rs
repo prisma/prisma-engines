@@ -248,6 +248,22 @@ fn models_with_only_scalar_fields() {
 }
 
 #[test]
+fn ignored_field_not_returned() {
+    let datamodel = convert(
+        r#"
+            model Test {
+                id String @id @default(cuid())
+                ignored String @ignore
+                notIgnored String
+            }
+        "#,
+    );
+    let model = datamodel.assert_model("Test");
+    model.assert_field_not_in_all("ignored");
+    model.assert_field_not_in_scalar("ignored");
+}
+
+#[test]
 fn db_names_work() {
     let datamodel = convert(
         r#"
@@ -503,11 +519,25 @@ impl DatamodelAssertions for InternalDataModel {
 
 trait ModelAssertions {
     fn assert_scalar_field(&self, name: &str) -> ScalarField;
+    fn assert_field_not_in_all(&self, name: &str) -> &Self;
+    fn assert_field_not_in_scalar(&self, name: &str) -> &Self;
 }
 
 impl ModelAssertions for Model {
     fn assert_scalar_field(&self, name: &str) -> ScalarField {
         self.fields().find_from_scalar(name).unwrap()
+    }
+
+    fn assert_field_not_in_all(&self, name: &str) -> &Self {
+        let field = self.fields().all().find(|field| field.name() == name);
+        assert!(field.is_none());
+        self
+    }
+
+    fn assert_field_not_in_scalar(&self, name: &str) -> &Self {
+        let field = self.fields().scalar().find(|field| field.name() == name);
+        assert!(field.is_none());
+        self
     }
 }
 

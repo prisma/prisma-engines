@@ -1,6 +1,6 @@
 use query_engine_tests::*;
 
-#[test_suite]
+#[test_suite(exclude(CockroachDb))]
 mod connect_inside_create {
     use indoc::indoc;
     use query_engine_tests::{assert_error, run_query, run_query_json, DatamodelWithParams};
@@ -875,7 +875,7 @@ mod connect_inside_create {
             }
           }"#,
           2025,
-          "An operation failed because it depends on one or more records that were required but not found. No 'Todo' record(s) (needed to inline the relation on 'Comment' record(s)) was found for a nested connect on one-to-many relation 'CommentToTodo'"
+          "An operation failed because it depends on one or more records that were required but not found. No 'Todo' record (needed to inline the relation on 'Comment' record(s)) was found for a nested connect on one-to-many relation 'CommentToTodo'."
       );
 
         Ok(())

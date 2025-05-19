@@ -5,11 +5,15 @@ use crate::{
 };
 use itertools::Itertools;
 use query_builder::{QueryArgumentsExt, QueryBuilder, RelationLink};
-use query_core::{AggregateRecordsQuery, FilteredQuery, ReadQuery, RelatedRecordsQuery};
-use query_structure::{
-    ConditionValue, FieldSelection, Filter, PrismaValue, QueryArguments, QueryMode, RelationField, ScalarCondition,
-    ScalarFilter, ScalarProjection,
+use query_core::{
+    AggregateRecordsQuery, DataExpectation, DataOperation, FilteredQuery, MissingRecord, QueryGraphBuilderError,
+    QueryOption, QueryOptions, ReadQuery, RelatedRecordsQuery,
 };
+use query_structure::{
+    ConditionValue, FieldSelection, Filter, IntoFilter, PrismaValue, QueryArguments, QueryMode, RelationField,
+    ScalarCondition, ScalarFilter, ScalarProjection, SelectionResult, Take,
+};
+use std::slice;
 
 pub(crate) fn translate_read_query(query: ReadQuery, builder: &dyn QueryBuilder) -> TranslateResult<Expression> {
     Ok(match query {
@@ -20,12 +24,13 @@ pub(crate) fn translate_read_query(query: ReadQuery, builder: &dyn QueryBuilder)
                 rq.model.clone(),
                 rq.filter.expect("ReadOne query should always have filter set"),
             ))
-            .with_take(Some(1));
+            .with_take(Take::One);
             let query = builder
                 .build_get_records(&rq.model, args, &selected_fields)
                 .map_err(TranslateError::QueryBuildFailure)?;
 
             let expr = Expression::Query(query);
+            let expr = convert_options_to_validation(expr, rq.options);
             let expr = Expression::Unique(Box::new(expr));
 
             if rq.nested.is_empty() {
@@ -38,6 +43,7 @@ pub(crate) fn translate_read_query(query: ReadQuery, builder: &dyn QueryBuilder)
         ReadQuery::ManyRecordsQuery(mrq) => {
             let selected_fields = mrq.selected_fields.without_relations().into_virtuals_last();
             let needs_reversed_order = mrq.args.needs_reversed_order();
+            let take = mrq.args.take;
 
             // TODO: we ignore chunking for now
             let query = builder
@@ -45,6 +51,7 @@ pub(crate) fn translate_read_query(query: ReadQuery, builder: &dyn QueryBuilder)
                 .map_err(TranslateError::QueryBuildFailure)?;
 
             let expr = Expression::Query(query);
+            let expr = convert_options_to_validation(expr, mrq.options);
 
             let expr = if needs_reversed_order {
                 Expression::Reverse(Box::new(expr))
@@ -52,10 +59,15 @@ pub(crate) fn translate_read_query(query: ReadQuery, builder: &dyn QueryBuilder)
                 expr
             };
 
-            if mrq.nested.is_empty() {
+            let expr = if mrq.nested.is_empty() {
                 expr
             } else {
                 add_inmemory_join(expr, mrq.nested, builder)?
+            };
+
+            match take {
+                Take::One => Expression::Unique(Box::new(expr)),
+                _ => expr,
             }
         }
 
@@ -75,10 +87,16 @@ pub(crate) fn translate_read_query(query: ReadQuery, builder: &dyn QueryBuilder)
             group_by,
             having,
         }) => {
+            let has_group_by = !group_by.is_empty();
             let query = builder
                 .build_aggregate(&model, args, &selectors, group_by, having)
                 .map_err(TranslateError::QueryBuildFailure)?;
-            Expression::Unique(Box::new(Expression::Query(query)))
+            let expr = Expression::Query(query);
+            if has_group_by {
+                expr
+            } else {
+                Expression::Unique(expr.into())
+            }
         }
     })
 }
@@ -172,7 +190,14 @@ fn build_read_related_records(
     let (mut child_query, join_on) = if rrq.parent_field.relation().is_many_to_many() {
         build_read_m2m_query(rrq.parent_field, conditions, rrq.args, &selected_fields, builder)?
     } else {
-        build_read_one2m_query(rrq.parent_field, conditions, rrq.args, &selected_fields, builder)?
+        build_read_one2m_query(
+            rrq.parent_field,
+            conditions,
+            rrq.args,
+            rrq.parent_results,
+            &selected_fields,
+            builder,
+        )?
     };
 
     if needs_reversed_order {
@@ -217,11 +242,33 @@ fn build_read_one2m_query(
     field: RelationField,
     conditions: Option<Vec<ScalarCondition>>,
     mut args: QueryArguments,
+    parent_results: Option<Vec<SelectionResult>>,
     selected_fields: &FieldSelection,
     builder: &dyn QueryBuilder,
 ) -> TranslateResult<(Expression, JoinFields)> {
     let related_scalars = field.related_field().left_scalars();
     let join_fields = related_scalars.iter().map(|sf| sf.name().to_owned()).collect();
+
+    if let Some(results) = parent_results {
+        let parent_link_id = field.linking_fields();
+        let child_link_id = field.related_field().linking_fields();
+
+        let links = results
+            .into_iter()
+            .map(|result| {
+                let parent_link = result.split_into(slice::from_ref(&parent_link_id)).pop().unwrap();
+                child_link_id.assimilate(parent_link)
+            })
+            .collect::<Result<Vec<_>, _>>()
+            .map_err(QueryGraphBuilderError::from)?;
+
+        let filter = args
+            .filter
+            .take()
+            .into_iter()
+            .fold(links.filter(), |acc, filter| Filter::and(vec![acc, filter]));
+        args.filter = Some(filter);
+    }
 
     // TODO: we ignore chunking for now
     if let Some(conditions) = conditions {
@@ -240,7 +287,11 @@ fn build_read_one2m_query(
     }
 
     let to_one_relation = !field.arity().is_list();
-    let args = if to_one_relation { args.with_take(Some(1)) } else { args };
+    let args = if to_one_relation {
+        args.with_take(Take::Some(1))
+    } else {
+        args
+    };
     let query = builder
         .build_get_records(&field.related_model(), args, selected_fields)
         .map_err(TranslateError::QueryBuildFailure)?;
@@ -250,6 +301,16 @@ fn build_read_one2m_query(
         expr = Expression::Unique(Box::new(expr));
     }
     Ok((expr, JoinFields(join_fields)))
+}
+
+fn convert_options_to_validation(expr: Expression, options: QueryOptions) -> Expression {
+    if options.contains(QueryOption::ThrowOnEmpty) {
+        let expectation =
+            DataExpectation::non_empty_rows(MissingRecord::builder().operation(DataOperation::Query).build());
+        Expression::validate_expectation(&expectation, expr)
+    } else {
+        expr
+    }
 }
 
 struct JoinFields(Vec<String>);

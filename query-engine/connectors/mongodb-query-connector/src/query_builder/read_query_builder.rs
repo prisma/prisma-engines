@@ -14,7 +14,7 @@ use bson::{doc, Document};
 use itertools::Itertools;
 use mongodb::{options::AggregateOptions, ClientSession, Collection};
 use query_structure::{
-    AggregationSelection, FieldSelection, Filter, Model, QueryArguments, ScalarFieldRef, VirtualSelection,
+    AggregationSelection, FieldSelection, Filter, Model, QueryArguments, ScalarFieldRef, Take, VirtualSelection,
 };
 use std::convert::TryFrom;
 use std::future::IntoFuture;
@@ -127,7 +127,7 @@ impl MongoReadQueryBuilder {
     }
 
     pub(crate) fn from_args(args: QueryArguments) -> crate::Result<MongoReadQueryBuilder> {
-        let reverse_order = args.take.map(|t| t < 0).unwrap_or(false);
+        let reverse_order = args.take.is_reversed();
         let order_by = args.order_by;
 
         let order_builder = Some(OrderByBuilder::new(order_by.clone(), reverse_order));
@@ -460,10 +460,14 @@ fn skip(skip: Option<u64>, ignore: bool) -> Option<u64> {
     }
 }
 
-fn take(take: Option<i64>, ignore: bool) -> Option<i64> {
+fn take(take: Take, ignore: bool) -> Option<i64> {
     if ignore {
         None
     } else {
-        take.map(|t| if t < 0 { -t } else { t })
+        match take {
+            Take::All => None,
+            Take::One => Some(1),
+            Take::Some(n) => Some(n.abs()),
+        }
     }
 }

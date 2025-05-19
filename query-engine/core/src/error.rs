@@ -138,18 +138,18 @@ impl From<CoreError> for user_facing_errors::Error {
             .into(),
 
             CoreError::QueryGraphBuilderError(QueryGraphBuilderError::RelationViolation(RelationViolation {
-                relation_name,
-                model_a_name,
-                model_b_name,
+                relation,
+                model_a: model_a_name,
+                model_b: model_b_name,
             }))
             | CoreError::InterpreterError(InterpreterError::QueryGraphBuilderError(
                 QueryGraphBuilderError::RelationViolation(RelationViolation {
-                    relation_name,
-                    model_a_name,
-                    model_b_name,
+                    relation,
+                    model_a: model_a_name,
+                    model_b: model_b_name,
                 }),
             )) => user_facing_errors::KnownError::new(user_facing_errors::query_engine::RelationViolation {
-                relation_name,
+                relation_name: relation,
                 model_a_name,
                 model_b_name,
             })
@@ -177,14 +177,14 @@ impl From<CoreError> for user_facing_errors::Error {
                     }
                     InterpreterError::QueryGraphBuilderError(QueryGraphBuilderError::RelationViolation(
                         RelationViolation {
-                            relation_name,
-                            model_a_name,
-                            model_b_name,
+                            relation,
+                            model_a: model_a_name,
+                            model_b: model_b_name,
                         },
                     )) => user_facing_errors::KnownError::new(user_facing_errors::query_engine::RelationViolation {
                         model_a_name: model_a_name.clone(),
                         model_b_name: model_b_name.clone(),
-                        relation_name: relation_name.clone(),
+                        relation_name: relation.clone(),
                     })
                     .into(),
                     InterpreterError::QueryGraphBuilderError(QueryGraphBuilderError::RecordsNotConnected {

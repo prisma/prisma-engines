@@ -1,11 +1,13 @@
 ---
 source: query-compiler/query-compiler/tests/queries.rs
-assertion_line: 46
 expression: pretty
 input_file: query-compiler/query-compiler/tests/data/update-m2m-disconnect.json
-snapshot_kind: text
 ---
 transaction
+   dataMap
+      id: Int [id]
+      title: String [title]
+      userId: Int [userId]
    let 0 = unique (query «SELECT "public"."Post"."id", "public"."Post"."title",
                           "public"."Post"."userId" FROM "public"."Post" WHERE
                           ("public"."Post"."id" = $1 AND 1=1) LIMIT $2 OFFSET
@@ -18,17 +20,25 @@ transaction
                         "public"."Category" AS "t1" ON "t0"."A" = "t1"."id"
                         WHERE ("t1"."id" = $1 AND 1=1)»
                  params [const(BigInt(1))]
-         in let 0$id = mapField id (get 0);
+         in let 0 = validate (get 0)
+                [ rowCountNeq 0
+                ] orRaise "MISSING_RELATED_RECORD";
+                0$id = mapField id (get 0);
                 1$id = mapField id (get 1)
             in execute «DELETE FROM "public"."_CategoryToPost" WHERE
                         ("public"."_CategoryToPost"."B" = ($1) AND
                         "public"."_CategoryToPost"."A" IN [$2])»
                params [var(0$id as Int), var(1$id as Int)];
-      let 3 = let 0$id = mapField id (get 0)
-          in unique (query «SELECT "public"."Post"."id",
-                            "public"."Post"."title", "public"."Post"."userId"
-                            FROM "public"."Post" WHERE "public"."Post"."id" = $1
-                            LIMIT $2 OFFSET $3»
-                     params [var(0$id as Int), const(BigInt(1)),
-                             const(BigInt(0))])
+      let 3 = let 0 = validate (get 0)
+                  [ rowCountNeq 0
+                  ] orRaise "MISSING_RECORD";
+                  0$id = mapField id (get 0)
+          in let 3 = unique (query «SELECT "public"."Post"."id",
+                                    "public"."Post"."title",
+                                    "public"."Post"."userId" FROM
+                                    "public"."Post" WHERE "public"."Post"."id" =
+                                    $1 LIMIT $2 OFFSET $3»
+                             params [var(0$id as Int), const(BigInt(1)),
+                                     const(BigInt(0))])
+             in get 3
       in get 3

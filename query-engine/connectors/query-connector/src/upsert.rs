@@ -7,8 +7,8 @@ pub struct NativeUpsert {
     record_filter: RecordFilter,
     create: WriteArgs,
     update: WriteArgs,
-    selected_fields: FieldSelection,
-    selection_order: Vec<String>,
+    pub selected_fields: FieldSelection,
+    pub selection_order: Vec<String>,
 }
 
 impl NativeUpsert {

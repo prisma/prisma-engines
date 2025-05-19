@@ -4,22 +4,33 @@ expression: pretty
 input_file: query-compiler/query-compiler/tests/data/update-create-parent-one2m.json
 ---
 transaction
+   dataMap
+      id: Int [id]
+      managerId: Int [managerId]
    let 1 = unique (query «INSERT INTO "public"."Employee" ("id") VALUES ($1)
                           RETURNING "public"."Employee"."id"»
                    params [const(BigInt(2))])
-   in let 0 = let 1$id = mapField id (get 1)
+   in let 0 = let 1 = validate (get 1)
+                  [ rowCountNeq 0
+                  ] orRaise "MISSING_RELATED_RECORD";
+                  1$id = mapField id (get 1)
           in let 0 = unique (query «UPDATE "public"."Employee" SET "managerId" =
                                     $1 WHERE ("public"."Employee"."id" = $2 AND
                                     1=1) RETURNING "public"."Employee"."id",
                                     "public"."Employee"."managerId"»
                              params [var(1$id as Int), const(BigInt(1))])
-             in let 2 = let 0$id = mapField id (get 0)
-                    in unique (query «SELECT "public"."Employee"."id",
-                                      "public"."Employee"."managerId" FROM
-                                      "public"."Employee" WHERE
-                                      "public"."Employee"."id" = $1 LIMIT $2
-                                      OFFSET $3»
-                               params [var(0$id as Int), const(BigInt(1)),
-                                       const(BigInt(0))])
+             in let 2 = let 0 = validate (get 0)
+                            [ rowCountNeq 0
+                            ] orRaise "MISSING_RECORD";
+                            0$id = mapField id (get 0)
+                    in let 2 = unique (query «SELECT "public"."Employee"."id",
+                                              "public"."Employee"."managerId"
+                                              FROM "public"."Employee" WHERE
+                                              "public"."Employee"."id" = $1
+                                              LIMIT $2 OFFSET $3»
+                                       params [var(0$id as Int),
+                                               const(BigInt(1)),
+                                               const(BigInt(0))])
+                       in get 2
                 in get 2
       in get 0

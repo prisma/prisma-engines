@@ -19,7 +19,10 @@ use user_facing_errors::{
     UserFacingError,
 };
 
-use crate::{flavour::validate_connection_infos_do_not_match, sql_renderer::IteratorJoin};
+use crate::{
+    flavour::{postgres::connection_string, validate_connection_infos_do_not_match},
+    sql_renderer::IteratorJoin,
+};
 
 use super::{Circumstances, MigratePostgresUrl, PostgresProvider};
 
@@ -37,13 +40,9 @@ impl Params {
             validate_connection_infos_do_not_match(&connector_params.connection_string, shadow_db_url)?;
         }
 
-        let mut url: Url = connector_params
-            .connection_string
-            .parse()
-            .map_err(ConnectorError::url_parse_error)?;
-        disable_postgres_statement_cache(&mut url)?;
-
+        let url = connection_string::parse(&connector_params.connection_string)?;
         let url = MigratePostgresUrl::new(url)?;
+
         Ok(Self { connector_params, url })
     }
 }
@@ -394,23 +393,4 @@ fn strip_schema_param_from_url(url: &mut Url) {
     let params: Vec<String> = params.into_iter().map(|(k, v)| format!("{k}={v}")).collect();
     let params: String = params.join("&");
     url.set_query(Some(&params));
-}
-
-fn disable_postgres_statement_cache(url: &mut Url) -> ConnectorResult<()> {
-    let params: Vec<(String, String)> = url.query_pairs().map(|(k, v)| (k.to_string(), v.to_string())).collect();
-
-    url.query_pairs_mut().clear();
-
-    for (k, v) in params.into_iter() {
-        if k == "statement_cache_size" {
-            url.query_pairs_mut().append_pair("statement_cache_size", "0");
-        } else {
-            url.query_pairs_mut().append_pair(&k, &v);
-        }
-    }
-
-    if !url.query_pairs().any(|(k, _)| k == "statement_cache_size") {
-        url.query_pairs_mut().append_pair("statement_cache_size", "0");
-    }
-    Ok(())
 }

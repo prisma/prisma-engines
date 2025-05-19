@@ -2,6 +2,7 @@ pub mod arithmetic;
 
 mod error;
 mod raw_json;
+mod tagged;
 
 use base64::prelude::*;
 use bigdecimal::{BigDecimal, FromPrimitive, ToPrimitive};
@@ -15,6 +16,8 @@ use uuid::Uuid;
 
 pub use error::ConversionFailure;
 pub use raw_json::RawJson;
+pub use tagged::TaggedPrismaValue;
+
 pub type PrismaValueResult<T> = std::result::Result<T, ConversionFailure>;
 pub type PrismaListValue = Vec<PrismaValue>;
 
@@ -49,10 +52,7 @@ pub enum PrismaValue {
     Bytes(Vec<u8>),
 
     #[serde(serialize_with = "serialize_placeholder")]
-    Placeholder {
-        name: String,
-        r#type: PrismaValueType,
-    },
+    Placeholder(Placeholder),
 
     #[serde(serialize_with = "serialize_generator_call")]
     GeneratorCall {
@@ -63,6 +63,7 @@ pub enum PrismaValue {
 }
 
 #[derive(Debug, Clone, Eq, PartialEq, Hash, Serialize, Deserialize, PartialOrd, Ord)]
+#[serde(tag = "type", content = "inner")]
 pub enum PrismaValueType {
     Any,
     String,
@@ -93,6 +94,12 @@ impl std::fmt::Display for PrismaValueType {
             PrismaValueType::Bytes => write!(f, "Bytes"),
         }
     }
+}
+
+#[derive(Debug, Clone, Eq, PartialEq, Hash, Deserialize, PartialOrd, Ord)]
+pub struct Placeholder {
+    pub name: String,
+    pub r#type: PrismaValueType,
 }
 
 /// Stringify a date to the following format
@@ -199,10 +206,10 @@ impl TryFrom<serde_json::Value> for PrismaValue {
                         .ok_or_else(|| ConversionFailure::new("param name", "JSON param value"))?
                         .to_owned();
 
-                    Ok(PrismaValue::Placeholder {
+                    Ok(PrismaValue::Placeholder(Placeholder {
                         name,
                         r#type: PrismaValueType::Any, // parsing the type is not implemented yet
-                    })
+                    }))
                 }
 
                 _ => Ok(PrismaValue::Json(serde_json::to_string(&obj).unwrap())),
@@ -243,7 +250,19 @@ fn serialize_decimal<S>(decimal: &BigDecimal, serializer: S) -> Result<S::Ok, S:
 where
     S: Serializer,
 {
-    decimal.to_string().parse::<f64>().unwrap().serialize(serializer)
+    const JS_MAX_SAFE_INTEGER: u64 = (1u64 << 53) - 1;
+
+    // convert decimals to integers when possible to avoid '.0' formatting
+    if let Some(d) = decimal
+        .is_integer()
+        .then(|| decimal.to_u64())
+        .flatten()
+        .filter(|&n| n <= JS_MAX_SAFE_INTEGER)
+    {
+        d.serialize(serializer)
+    } else {
+        decimal.to_string().parse::<f64>().unwrap().serialize(serializer)
+    }
 }
 
 fn deserialize_decimal<'de, D>(deserializer: D) -> Result<BigDecimal, D::Error>
@@ -253,20 +272,14 @@ where
     deserializer.deserialize_f64(BigDecimalVisitor)
 }
 
-fn serialize_object<S>(obj: &Vec<(String, PrismaValue)>, serializer: S) -> Result<S::Ok, S::Error>
+fn serialize_object<S>(obj: &[(String, PrismaValue)], serializer: S) -> Result<S::Ok, S::Error>
 where
     S: Serializer,
 {
-    let mut map = serializer.serialize_map(Some(obj.len()))?;
-
-    for (k, v) in obj {
-        map.serialize_entry(k, v)?;
-    }
-
-    map.end()
+    serializer.collect_map(obj.iter().map(|(k, v)| (k, v)))
 }
 
-fn serialize_placeholder<S>(name: &str, r#type: &PrismaValueType, serializer: S) -> Result<S::Ok, S::Error>
+fn serialize_placeholder<S>(Placeholder { name, r#type }: &Placeholder, serializer: S) -> Result<S::Ok, S::Error>
 where
     S: Serializer,
 {
@@ -414,7 +427,7 @@ impl PrismaValue {
     }
 
     pub fn placeholder(name: String, r#type: PrismaValueType) -> PrismaValue {
-        PrismaValue::Placeholder { name, r#type }
+        PrismaValue::Placeholder(Placeholder { name, r#type })
     }
 
     pub fn as_boolean(&self) -> Option<&bool> {
@@ -430,6 +443,10 @@ impl PrismaValue {
         } else {
             None
         }
+    }
+
+    pub fn as_tagged(&self) -> TaggedPrismaValue<'_> {
+        TaggedPrismaValue::from(self)
     }
 }
 
@@ -460,7 +477,7 @@ impl fmt::Display for PrismaValue {
 
                 write!(f, "{{ {joined} }}")
             }
-            PrismaValue::Placeholder { name, r#type } => write!(f, "var({name}: {type})"),
+            PrismaValue::Placeholder(Placeholder { name, r#type }) => write!(f, "var({name}: {type})"),
             PrismaValue::GeneratorCall { name, args, .. } => {
                 write!(f, "{name}(")?;
                 for (i, arg) in args.iter().enumerate() {

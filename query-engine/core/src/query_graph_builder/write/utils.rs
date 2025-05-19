@@ -1,7 +1,9 @@
 use crate::{
+    inputs::{IfInput, LeftSideDiffInput, ReturnInput, RightSideDiffInput},
     query_ast::*,
     query_graph::{Flow, Node, NodeRef, QueryGraph, QueryGraphDependency},
-    Computation, ParsedInputValue, QueryGraphBuilderError, QueryGraphBuilderResult,
+    Computation, DataExpectation, DataOperation, DataSink, MissingRelatedRecord, ParsedInputValue,
+    QueryGraphBuilderResult, RelationViolation,
 };
 use indexmap::IndexMap;
 use psl::parser_database::ReferentialAction;
@@ -153,6 +155,7 @@ where
 
                 Ok(read_children_node)
             }),
+            None,
         ),
     )?;
 
@@ -169,30 +172,22 @@ pub fn insert_1to1_idempotent_connect_checks(
 ) -> QueryGraphBuilderResult<NodeRef> {
     let child_model = parent_relation_field.related_model();
     let child_model_identifier = child_model.primary_identifier();
-    let relation_name = parent_relation_field.relation().name();
 
-    let diff_node = graph.create_node(Node::Computation(Computation::empty_diff()));
+    let diff_node = graph.create_node(Node::Computation(Computation::empty_diff_left_to_right()));
 
     graph.create_edge(
         read_new_child_node,
         &diff_node,
-        QueryGraphDependency::ProjectedDataDependency(
+        QueryGraphDependency::ProjectedDataSinkDependency(
             child_model_identifier.clone(),
-            Box::new(move |mut diff_node, child_ids| {
-                if child_ids.is_empty() {
-                    return Err(QueryGraphBuilderError::RecordNotFound(format!(
-                        "No '{}' record to connect was found for a nested connect on one-to-one relation '{}'.",
-                        child_model.name(),
-                        relation_name
-                    )));
-                }
-
-                if let Node::Computation(Computation::Diff(ref mut diff)) = diff_node {
-                    diff.right = child_ids.into_iter().collect();
-                }
-
-                Ok(diff_node)
-            }),
+            DataSink::AllRows(&LeftSideDiffInput),
+            Some(DataExpectation::non_empty_rows(
+                MissingRelatedRecord::builder()
+                    .model(&child_model.clone())
+                    .relation(&parent_relation_field.relation())
+                    .operation(DataOperation::NestedConnect)
+                    .build(),
+            )),
         ),
     )?;
     let read_old_child_node =
@@ -201,32 +196,18 @@ pub fn insert_1to1_idempotent_connect_checks(
     graph.create_edge(
         &read_old_child_node,
         &diff_node,
-        QueryGraphDependency::ProjectedDataDependency(
-            child_model_identifier,
-            Box::new(move |mut diff_node, child_ids| {
-                if let Node::Computation(Computation::Diff(ref mut diff)) = diff_node {
-                    diff.left = child_ids.into_iter().collect();
-                }
-
-                Ok(diff_node)
-            }),
+        QueryGraphDependency::ProjectedDataSinkDependency(
+            child_model_identifier.clone(),
+            DataSink::AllRows(&RightSideDiffInput),
+            None,
         ),
     )?;
-    let if_node = graph.create_node(Flow::default_if());
+    let if_node = graph.create_node(Flow::if_non_empty());
 
     graph.create_edge(
         &diff_node,
         &if_node,
-        QueryGraphDependency::DataDependency(Box::new(move |if_node, result| {
-            let diff_result = result.as_diff_result().unwrap();
-            let should_connect = !diff_result.is_empty();
-
-            if let Node::Flow(Flow::If(_)) = if_node {
-                Ok(Node::Flow(Flow::If(Box::new(move || should_connect))))
-            } else {
-                unreachable!()
-            }
-        })),
+        QueryGraphDependency::ProjectedDataSinkDependency(child_model_identifier, DataSink::AllRows(&IfInput), None),
     )?;
     let empty_node = graph.create_node(Node::Empty);
 
@@ -312,57 +293,58 @@ pub fn insert_existing_1to1_related_model_checks(
         insert_find_children_by_parent_node(graph, parent_node, parent_relation_field, Filter::empty())?;
 
     let update_existing_child = update_records_node_placeholder(graph, Filter::empty(), child_model);
-    let if_node = graph.create_node(Flow::default_if());
+
+    let if_node = graph.create_node(if relation_inlined_parent {
+        Flow::if_false()
+    } else {
+        Flow::if_non_empty()
+    });
 
     graph.create_edge(
         &read_existing_children,
         &if_node,
-        QueryGraphDependency::ProjectedDataDependency(
+        QueryGraphDependency::ProjectedDataSinkDependency(
             child_model_identifier.clone(),
-            Box::new(move |if_node, child_ids| {
-                // If the other side ("child") requires the connection, we need to make sure that there isn't a child already connected
-                // to the parent, as that would violate the other childs relation side.
-                if !child_ids.is_empty() && child_side_required {
-                    return Err(QueryGraphBuilderError::RelationViolation(rf.into()));
-                }
-
-                if let Node::Flow(Flow::If(_)) = if_node {
-                    // If the relation is inlined in the parent, we need to update the old parent and null out the relation (i.e. "disconnect").
-                    Ok(Node::Flow(Flow::If(Box::new(move || {
-                        !relation_inlined_parent && !child_ids.is_empty()
-                    }))))
-                } else {
-                    unreachable!()
-                }
-            }),
+            DataSink::AllRows(&IfInput),
+            // If the other side ("child") requires the connection, we need to make sure that there isn't a child already connected
+            // to the parent, as that would violate the other childs relation side.
+            if child_side_required {
+                Some(DataExpectation::empty_rows(RelationViolation::from(rf)))
+            } else {
+                None
+            },
         ),
     )?;
-
-    let relation_name = parent_relation_field.relation().name();
 
     graph.create_edge(&if_node, &update_existing_child, QueryGraphDependency::Then)?;
     graph.create_edge(
         &read_existing_children,
         &update_existing_child,
-        QueryGraphDependency::ProjectedDataDependency(child_model_identifier, Box::new(move |mut update_existing_child, mut child_ids| {
-            // This has to succeed or the if-then node wouldn't trigger.
-            let child_id = match child_ids.pop() {
-                Some(pid) => Ok(pid),
-                None => Err(QueryGraphBuilderError::RecordNotFound(format!(
-                    "No parent record (needed to update the previous parent) was found for a nested connect on relation '{relation_name}' ."
-                ))),
-            }?;
+        QueryGraphDependency::ProjectedDataDependency(
+            child_model_identifier,
+            Box::new(move |mut update_existing_child, mut child_ids| {
+                // This has to succeed or the if-then node wouldn't trigger.
+                let child_id = child_ids.pop().expect("child id should be present");
 
-            if let Node::Query(Query::Write(ref mut wq)) = update_existing_child {
-                wq.inject_result_into_args(SelectionResult::from(&child_linking_fields));
-            }
+                if let Node::Query(Query::Write(ref mut wq)) = update_existing_child {
+                    wq.inject_result_into_args(SelectionResult::from(&child_linking_fields));
+                }
 
-            if let Node::Query(Query::Write(WriteQuery::UpdateManyRecords(ref mut ur))) = update_existing_child {
-                ur.record_filter = child_id.into();
-            }
+                if let Node::Query(Query::Write(WriteQuery::UpdateManyRecords(ref mut ur))) = update_existing_child {
+                    ur.record_filter = child_id.into();
+                }
 
-            Ok(update_existing_child)
-         })))?;
+                Ok(update_existing_child)
+            }),
+            Some(DataExpectation::non_empty_rows(
+                MissingRelatedRecord::builder()
+                    .model(&parent_relation_field.model())
+                    .relation(&parent_relation_field.relation())
+                    .operation(DataOperation::NestedConnect)
+                    .build(),
+            )),
+        ),
+    )?;
 
     Ok(read_existing_children)
 }
@@ -484,13 +466,8 @@ pub fn emulate_on_delete_restrict(
         &noop_node,
         QueryGraphDependency::ProjectedDataDependency(
             child_model_identifier,
-            Box::new(move |noop_node, child_ids| {
-                if !child_ids.is_empty() {
-                    return Err(QueryGraphBuilderError::RelationViolation((relation_field).into()));
-                }
-
-                Ok(noop_node)
-            }),
+            Box::new(move |noop_node, _| Ok(noop_node)),
+            Some(DataExpectation::empty_rows(RelationViolation::from(relation_field))),
         ),
     )?;
 
@@ -567,6 +544,7 @@ pub fn emulate_on_delete_cascade(
 
                 Ok(delete_dependents_node)
             }),
+            None,
         ),
     )?;
 
@@ -662,6 +640,7 @@ pub fn emulate_on_delete_set_null(
 
                 Ok(set_null_dependents_node)
             }),
+            None,
         ),
     )?;
 
@@ -815,6 +794,7 @@ pub fn emulate_on_update_set_null(
 
                 Ok(set_null_dependents_node)
             }),
+            None,
         ),
     )?;
 
@@ -879,14 +859,13 @@ pub fn emulate_on_update_restrict(
         &noop_node,
         QueryGraphDependency::ProjectedDataDependency(
             child_model_identifier,
-            Box::new(move |noop_node, child_ids| {
-                // If any linking fields are to be updated and there are already connected children, then fail
-                if !child_ids.is_empty() && linking_fields_updated {
-                    return Err(QueryGraphBuilderError::RelationViolation((relation_field).into()));
-                }
-
-                Ok(noop_node)
-            }),
+            Box::new(move |noop_node, _| Ok(noop_node)),
+            // If any linking fields are to be updated and there are already connected children, then fail
+            if linking_fields_updated {
+                Some(DataExpectation::empty_rows(RelationViolation::from(relation_field)))
+            } else {
+                None
+            },
         ),
     )?;
 
@@ -959,20 +938,15 @@ pub fn insert_emulated_on_update_with_intermediary_node(
     let internal_model = &model_to_update.dm;
     let relation_fields = internal_model.fields_pointing_to_model(model_to_update);
 
-    let join_node = graph.create_node(Flow::Return(None));
+    let join_node = graph.create_node(Flow::Return(Vec::new()));
 
     graph.create_edge(
         parent_node,
         &join_node,
-        QueryGraphDependency::ProjectedDataDependency(
+        QueryGraphDependency::ProjectedDataSinkDependency(
             model_to_update.primary_identifier(),
-            Box::new(move |return_node, parent_ids| {
-                if let Node::Flow(Flow::Return(_)) = return_node {
-                    Ok(Node::Flow(Flow::Return(Some(parent_ids))))
-                } else {
-                    Ok(return_node)
-                }
-            }),
+            DataSink::AllRows(&ReturnInput),
+            None,
         ),
     )?;
 
@@ -1148,6 +1122,7 @@ pub fn emulate_on_update_cascade(
 
                 Ok(update_dependents_node)
             }),
+            None,
         ),
     )?;
 

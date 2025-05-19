@@ -10,6 +10,7 @@ graphql-protocol = []
 [dependencies]
 async-trait.workspace = true
 bigdecimal.workspace = true
+bon.workspace = true
 chrono.workspace = true
 connection-string.workspace = true
 connector = { path = "../connectors/query-connector", package = "query-connector" }
@@ -27,6 +28,7 @@ query-structure = { workspace = true, features = [
 prisma-metrics = { workspace = true, optional = true }
 serde.workspace = true
 serde_json.workspace = true
+smallvec.workspace = true
 thiserror.workspace = true
 tokio = { workspace = true, features = ["macros", "rt", "time"] }
 tracing = { workspace = true, features = ["attributes"] }

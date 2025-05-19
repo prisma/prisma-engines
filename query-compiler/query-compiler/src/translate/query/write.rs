@@ -4,7 +4,7 @@ use query_core::{
     ConnectRecords, DeleteManyRecords, DeleteRecord, DisconnectRecords, RawQuery, UpdateManyRecords, UpdateRecord,
     UpdateRecordWithSelection, WriteQuery,
 };
-use query_structure::QueryArguments;
+use query_structure::{QueryArguments, Take};
 
 use crate::{TranslateError, expression::Expression, translate::TranslateResult};
 
@@ -54,28 +54,16 @@ pub(crate) fn translate_write_query(query: WriteQuery, builder: &dyn QueryBuilde
             ..
         }) => {
             let projection = selected_fields.as_ref().map(|f| &f.fields);
-            let updates = if record_filter.has_selectors() {
-                // we'll need to implement the equivalent of:
-                // ```
-                // let filter = record_filter.filter.clone();
-                // let ids = conn.filter_selectors(model, record_filter, ctx).await?;
-                // let slice = &ids[..limit.unwrap_or(ids.len()).min(ids.len())];
-                // ```
-                //
-                // and pass it to a builder methods that takes the selectors
-                todo!()
-            } else {
-                builder
-                    .build_updates_from_filter(&model, record_filter.filter, args, projection, limit)
-                    .map_err(TranslateError::QueryBuildFailure)?
-                    .into_iter()
-                    .map(if projection.is_some() {
-                        Expression::Query
-                    } else {
-                        Expression::Execute
-                    })
-                    .collect::<Vec<_>>()
-            };
+            let updates = builder
+                .build_updates(&model, record_filter, args, projection, limit)
+                .map_err(TranslateError::QueryBuildFailure)?
+                .into_iter()
+                .map(if projection.is_some() {
+                    Expression::Query
+                } else {
+                    Expression::Execute
+                })
+                .collect::<Vec<_>>();
             if projection.is_some() {
                 Expression::Concat(updates)
             } else {
@@ -94,7 +82,7 @@ pub(crate) fn translate_write_query(query: WriteQuery, builder: &dyn QueryBuilde
         })) => {
             let query = if args.is_empty() {
                 // if there's no args we can just issue a read query
-                let args = QueryArguments::from((model.clone(), record_filter.filter)).with_take(Some(1));
+                let args = QueryArguments::from((model.clone(), record_filter.filter)).with_take(Take::Some(1));
                 builder
                     .build_get_records(&model, args, &selected_fields)
                     .map_err(TranslateError::QueryBuildFailure)?

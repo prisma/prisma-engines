@@ -304,7 +304,7 @@ mod update {
             }
           }"#,
           2025,
-          "An operation failed because it depends on one or more records that were required but not found. Record to update not found."
+          "An operation failed because it depends on one or more records that were required but not found. No record was found for an update."
         );
 
         Ok(())
@@ -527,7 +527,7 @@ mod update {
         );
         insta::assert_snapshot!(
           query_number_operation(&runner, "2", "optFloat", "multiply", "2").await?,
-          @r###"{"data":{"updateOneTestModel":{"optFloat":11.0}}}"###
+          @r###"{"data":{"updateOneTestModel":{"optFloat":11}}}"###
         );
 
         // Divide
@@ -595,7 +595,7 @@ mod update {
         );
         insta::assert_snapshot!(
           query_number_operation(&runner, "2", "optFloat", "multiply", "2").await?,
-          @r###"{"data":{"updateOneTestModel":{"optFloat":11.0}}}"###
+          @r###"{"data":{"updateOneTestModel":{"optFloat":11}}}"###
         );
 
         // Divide
@@ -698,7 +698,7 @@ mod update {
                   }
                 }"#,
             2025,
-            "An operation failed because it depends on one or more records that were required but not found. Record to update not found."
+            "An operation failed because it depends on one or more records that were required but not found. No record was found for an update."
         );
 
         Ok(())

@@ -1,10 +1,11 @@
 use super::*;
+use crate::inputs::{UpdateManyRecordsFilterInput, UpdateRecordFilterInput};
 use crate::query_graph_builder::write::update::UpdateManyRecordNodeOptionals;
 use crate::{
-    query_ast::*,
-    query_graph::{Node, NodeRef, QueryGraph, QueryGraphDependency},
+    query_graph::{NodeRef, QueryGraph, QueryGraphDependency},
     ParsedInputValue,
 };
+use crate::{DataExpectation, DataSink};
 use query_structure::{Filter, Model, RelationFieldRef};
 use schema::constants::args;
 use std::convert::TryInto;
@@ -91,28 +92,19 @@ pub fn nested_update(
         let update_node = update::update_record_node(graph, query_schema, filter, child_model.clone(), data_map, None)?;
         let child_model_identifier = parent_relation_field.related_model().primary_identifier();
 
-        let relation_name = parent_relation_field.relation().name().to_owned();
-        let child_model_name = child_model.name().to_owned();
-
         graph.create_edge(
             &find_child_records_node,
             &update_node,
-            QueryGraphDependency::ProjectedDataDependency(
+            QueryGraphDependency::ProjectedDataSinkDependency(
                 child_model_identifier.clone(),
-                Box::new(move |mut update_node, mut child_ids| {
-                    let child_id = match child_ids.pop() {
-                        Some(pid) => Ok(pid),
-                        None => Err(QueryGraphBuilderError::RecordNotFound(format!(
-                            "No '{child_model_name}' record was found for a nested update on relation '{relation_name}'."
-                        ))),
-                    }?;
-
-                    if let Node::Query(Query::Write(WriteQuery::UpdateRecord(ref mut ur))) = update_node {
-                        ur.set_selectors(vec![child_id]);
-                    }
-
-                    Ok(update_node)
-                }),
+                DataSink::SingleRowArray(&UpdateRecordFilterInput),
+                Some(DataExpectation::non_empty_rows(
+                    MissingRelatedRecord::builder()
+                        .model(child_model)
+                        .relation(&parent_relation_field.relation())
+                        .operation(DataOperation::NestedUpdate)
+                        .build(),
+                )),
             ),
         )?;
 
@@ -159,16 +151,10 @@ pub fn nested_update_many(
         graph.create_edge(
             &find_child_records_node,
             &update_many_node,
-            QueryGraphDependency::ProjectedDataDependency(
+            QueryGraphDependency::ProjectedDataSinkDependency(
                 child_model_identifier.clone(),
-                Box::new(move |mut update_many_node, child_ids| {
-                    if let Node::Query(Query::Write(WriteQuery::UpdateManyRecords(ref mut ur))) = update_many_node {
-                        // ur.set_filter(Filter::and(vec![ur.filter.clone(), child_ids.filter()]));
-                        ur.record_filter = child_ids.into();
-                    }
-
-                    Ok(update_many_node)
-                }),
+                DataSink::AllRows(&UpdateManyRecordsFilterInput),
+                None,
             ),
         )?;
     }

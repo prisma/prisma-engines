@@ -1,6 +1,7 @@
 use super::timings::TimingsLayer;
 use js_sys::Function as JsFunction;
 use std::io::{self, Write};
+use tracing::Dispatch;
 use tracing_error::ErrorLayer;
 use tracing_subscriber::{fmt, prelude::*};
 use wasm_bindgen::prelude::*;
@@ -58,12 +59,8 @@ extern "C" {
     fn error(a: &str);
 }
 
-macro_rules! console_error {
-    ($($t:tt)*) => (error(&format_args!($($t)*).to_string()))
-}
-
 /// Initializes the global logger using the provided JavaScript callback for log output.
-pub fn init_logger(log_callback: JsFunction) {
+pub fn init_logger(log_callback: JsFunction) -> Dispatch {
     let js_writer = JsLogWriterMaker::new(log_callback);
 
     let subscriber = fmt::Subscriber::builder()
@@ -74,10 +71,5 @@ pub fn init_logger(log_callback: JsFunction) {
         .with(ErrorLayer::default())
         .with(TimingsLayer);
 
-    tracing::subscriber::set_global_default(subscriber)
-        .map_err(|err| {
-            // Fallback: log to the browser console if initialization fails.
-            console_error!("[schema-engine-wasm] Error initializing the global logger: {}", err);
-        })
-        .ok();
+    Dispatch::new(subscriber)
 }

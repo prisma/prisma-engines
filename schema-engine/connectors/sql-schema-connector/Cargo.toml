@@ -44,6 +44,7 @@ datamodel-renderer.workspace = true
 sql-ddl.workspace = true
 user-facing-errors = { workspace = true, features = ["sql"] }
 
+base64.workspace = true
 chrono.workspace = true
 connection-string.workspace = true
 enumflags2.workspace = true

@@ -19,13 +19,14 @@ tracing.workspace = true
 js-sys.workspace = true
 serde.workspace = true
 serde_json.workspace = true
-tsify-next.workspace = true
+tsify.workspace = true
 wasm-bindgen.workspace = true
 wasm-rs-dbg.workspace = true
 query-core.workspace = true
 query-compiler.workspace = true
 schema.workspace = true
 request-handlers.workspace = true
+user-facing-errors.workspace = true
 
 [build-dependencies]
 build-utils.workspace = true

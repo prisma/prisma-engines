@@ -3,6 +3,7 @@ use crate::{error::*, SqlRow, ToSqlRow};
 use async_trait::async_trait;
 use futures::future::FutureExt;
 use itertools::Itertools;
+use prisma_value::Placeholder as PrismaValuePlaceholder;
 use quaint::{ast::*, connector::Queryable};
 use query_structure::*;
 use sql_query_builder::value::{GeneratorCall, Placeholder};
@@ -217,7 +218,7 @@ pub fn convert_prisma_value_to_quaint_lossy<'a>(pv: PrismaValue) -> Value<'a> {
         PrismaValue::Bytes(b) => Value::bytes(b),
         PrismaValue::Null => Value::null_int32(), // Can't tell which type the null is supposed to be.
         PrismaValue::Object(_) => unimplemented!(),
-        PrismaValue::Placeholder { name, r#type } => {
+        PrismaValue::Placeholder(PrismaValuePlaceholder { name, r#type }) => {
             Value::opaque(Placeholder::new(name), convert_prisma_type_to_opaque_type(&r#type))
         }
         PrismaValue::GeneratorCall {

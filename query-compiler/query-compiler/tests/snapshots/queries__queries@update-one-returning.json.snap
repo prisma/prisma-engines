@@ -3,8 +3,15 @@ source: query-compiler/query-compiler/tests/queries.rs
 expression: pretty
 input_file: query-compiler/query-compiler/tests/data/update-one-returning.json
 ---
-unique (query «UPDATE "public"."User" SET "email" = $1 WHERE
-               ("public"."User"."email" = $2 AND 1=1) RETURNING
-               "public"."User"."id", "public"."User"."email"»
-        params [const(String("user.2737556028164@prisma.io")),
-                const(String("user.1737556028164@prisma.io"))])
+dataMap
+   email: String [email]
+let 0 = unique (query «UPDATE "public"."User" SET "email" = $1 WHERE
+                       ("public"."User"."email" = $2 AND 1=1) RETURNING
+                       "public"."User"."id", "public"."User"."email"»
+                params [const(String("user.2737556028164@prisma.io")),
+                        const(String("user.1737556028164@prisma.io"))])
+in let 0 = validate (get 0)
+       [ rowCountNeq 0
+       ] orRaise "MISSING_RECORD"
+   in ();
+   get 0

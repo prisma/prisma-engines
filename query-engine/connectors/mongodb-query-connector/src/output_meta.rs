@@ -116,13 +116,13 @@ pub fn from_scalar_field(field: &ScalarFieldRef) -> OutputMeta {
 pub fn from_aggregation_selection(selection: &AggregationSelection) -> OutputMetaMapping {
     let mut map = OutputMetaMapping::new();
 
-    for (name, ident, field_arity) in selection.identifiers() {
+    for ident in selection.identifiers() {
         map.insert(
-            name,
+            ident.db_name.into(),
             OutputMeta::Scalar(ScalarOutputMeta {
-                ident,
+                ident: ident.typ,
                 default: None,
-                list: matches!(field_arity, FieldArity::List),
+                list: matches!(ident.arity, FieldArity::List),
             }),
         );
     }

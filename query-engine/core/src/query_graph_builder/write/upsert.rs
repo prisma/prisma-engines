@@ -1,8 +1,9 @@
 use super::{write_args_parser::WriteArgsParser, *};
 use crate::{
+    inputs::IfInput,
     query_ast::*,
     query_graph::{Flow, Node, QueryGraph, QueryGraphDependency},
-    ParsedField, ParsedInputMap, ParsedInputValue, ParsedObject,
+    DataExpectation, DataSink, ParsedField, ParsedInputMap, ParsedInputValue, ParsedObject,
 };
 use query_structure::{IntoFilter, Model};
 use schema::QuerySchema;
@@ -117,22 +118,12 @@ pub(crate) fn upsert_record(
     graph.add_result_node(&read_node_create);
     graph.add_result_node(&read_node_update);
 
-    let if_node = graph.create_node(Flow::default_if());
+    let if_node = graph.create_node(Flow::if_non_empty());
 
     graph.create_edge(
         &read_parent_records_node,
         &if_node,
-        QueryGraphDependency::ProjectedDataDependency(
-            model_id.clone(),
-            Box::new(|if_node, parent_ids| {
-                if let Node::Flow(Flow::If(_)) = if_node {
-                    // Todo: This looks super unnecessary
-                    Ok(Node::Flow(Flow::If(Box::new(move || !parent_ids.is_empty()))))
-                } else {
-                    Ok(if_node)
-                }
-            }),
-        ),
+        QueryGraphDependency::ProjectedDataSinkDependency(model_id.clone(), DataSink::AllRows(&IfInput), None),
     )?;
 
     // In case the connector doesn't support referential integrity, we add a subtree to the graph that emulates the ON_UPDATE referential action.
@@ -169,6 +160,7 @@ pub(crate) fn upsert_record(
 
                 Ok(update_node)
             }),
+            None,
         ),
     )?;
 
@@ -178,12 +170,7 @@ pub(crate) fn upsert_record(
         QueryGraphDependency::ProjectedDataDependency(
             model_id.clone(),
             Box::new(move |mut read_node_update, mut parent_ids| {
-                let parent_id = match parent_ids.pop() {
-                    Some(pid) => Ok(pid),
-                    None => Err(QueryGraphBuilderError::AssertionError(
-                        "Expected a valid parent ID to be present for create follow-up for upsert query.".to_string(),
-                    )),
-                }?;
+                let parent_id = parent_ids.pop().expect("parent id should be present");
 
                 if let Node::Query(Query::Read(ReadQuery::RecordQuery(ref mut rq))) = read_node_update {
                     rq.add_filter(parent_id.filter());
@@ -191,6 +178,9 @@ pub(crate) fn upsert_record(
 
                 Ok(read_node_update)
             }),
+            Some(DataExpectation::non_empty_rows(
+                MissingRecord::builder().operation(DataOperation::Upsert).build(),
+            )),
         ),
     )?;
 
@@ -200,12 +190,7 @@ pub(crate) fn upsert_record(
         QueryGraphDependency::ProjectedDataDependency(
             model_id,
             Box::new(move |mut read_node_create, mut parent_ids| {
-                let parent_id = match parent_ids.pop() {
-                    Some(pid) => Ok(pid),
-                    None => Err(QueryGraphBuilderError::AssertionError(
-                        "Expected a valid parent ID to be present for update follow-up for upsert query.".to_string(),
-                    )),
-                }?;
+                let parent_id = parent_ids.pop().expect("parent id should be present");
 
                 if let Node::Query(Query::Read(ReadQuery::RecordQuery(ref mut rq))) = read_node_create {
                     rq.add_filter(parent_id.filter());
@@ -213,6 +198,9 @@ pub(crate) fn upsert_record(
 
                 Ok(read_node_create)
             }),
+            Some(DataExpectation::non_empty_rows(
+                MissingRecord::builder().operation(DataOperation::Upsert).build(),
+            )),
         ),
     )?;
 

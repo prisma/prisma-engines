@@ -8,7 +8,7 @@ use napi::bindgen_prelude::{FromNapiValue, ToNapiValue};
 
 use quaint::connector::{ColumnType as QuaintColumnType, ExternalConnectionInfo, SqlFamily};
 #[cfg(target_arch = "wasm32")]
-use tsify_next::Tsify;
+use tsify::Tsify;
 
 use crate::conversion::{JSArg, JSArgType};
 pub use quaint::connector::external::AdapterProvider;

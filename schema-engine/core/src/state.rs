@@ -16,7 +16,7 @@ use std::{
     sync::Arc,
 };
 use tokio::sync::{mpsc, Mutex};
-use tracing_futures::Instrument;
+use tracing_futures::{Instrument, WithSubscriber};
 
 /// The container for the state of the schema engine. It can contain one or more connectors
 /// corresponding to a database to be reached or that we are already connected to.
@@ -118,11 +118,14 @@ impl EngineState {
 
                 connector.set_host(self.host.clone());
                 let (erased_sender, mut erased_receiver) = mpsc::channel::<ErasedConnectorRequest>(12);
-                tokio::spawn(async move {
-                    while let Some(req) = erased_receiver.recv().await {
-                        req(connector.as_mut()).await;
+                tokio::spawn(
+                    async move {
+                        while let Some(req) = erased_receiver.recv().await {
+                            req(connector.as_mut()).await;
+                        }
                     }
-                });
+                    .with_current_subscriber(),
+                );
                 match erased_sender.send(erased).await {
                     Ok(()) => (),
                     Err(_) => return Err(ConnectorError::from_msg("erased sender send error".to_owned())),
@@ -157,11 +160,14 @@ impl EngineState {
                 connector.set_host(self.host.clone());
 
                 let (erased_sender, mut erased_receiver) = mpsc::channel::<ErasedConnectorRequest>(12);
-                tokio::spawn(async move {
-                    while let Some(req) = erased_receiver.recv().await {
-                        req(connector.as_mut()).await;
+                tokio::spawn(
+                    async move {
+                        while let Some(req) = erased_receiver.recv().await {
+                            req(connector.as_mut()).await;
+                        }
                     }
-                });
+                    .with_current_subscriber(),
+                );
                 match erased_sender.send(erased).await {
                     Ok(()) => (),
                     Err(_) => return Err(ConnectorError::from_msg("erased sender send error".to_owned())),
@@ -307,6 +313,13 @@ impl GenericApi for EngineState {
         &self,
         params: EnsureConnectionValidityParams,
     ) -> CoreResult<EnsureConnectionValidityResult> {
+        // checking connection validity is currently not supported with local PGLite because PGLite
+        // only supports a single connection at a time and this creates a new connector instance
+        if matches!(&params.datasource, DatasourceParam::ConnectionString(str) if str.url.starts_with("prisma+postgres://localhost"))
+        {
+            return Ok(EnsureConnectionValidityResult {});
+        }
+
         self.with_connector_from_datasource_param(
             params.datasource,
             Box::new(|connector| {

@@ -51,8 +51,8 @@ features!(
     ExtendedIndexes,
     ExtendedWhereUnique,
     FieldReference,
-    FilteredRelationCount,
     FilterJson,
+    FilteredRelationCount,
     FullTextIndex,
     FullTextSearch,
     FullTextSearchPostgres,
@@ -65,27 +65,28 @@ features!(
     Middlewares,
     MongoDb,
     MultiSchema,
-    NamedConstraints,
     NApi,
+    NamedConstraints,
     NativeDistinct,
     NativeTypes,
+    OmitApi,
     OrderByAggregateGroup,
     OrderByNulls,
     OrderByRelation,
     PostgresqlExtensions,
+    PrismaSchemaFolder,
+    QueryCompiler,
+    ReactNative,
     ReferentialActions,
     ReferentialIntegrity,
+    RelationJoins,
     SelectRelationCount,
+    StrictUndefinedChecks,
     Tracing,
     TransactionApi,
+    TypedSql,
     UncheckedScalarInputs,
     Views,
-    RelationJoins,
-    ReactNative,
-    PrismaSchemaFolder,
-    OmitApi,
-    TypedSql,
-    StrictUndefinedChecks
 );
 
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
@@ -151,12 +152,12 @@ impl<'a> FeatureMapWithProvider<'a> {
         // Generator preview features (alphabetically sorted)
         let feature_map: FeatureMap = FeatureMap {
             active: enumflags2::make_bitflags!(PreviewFeature::{
-                Deno
-                 | DriverAdapters
+                 DriverAdapters
                  | Metrics
                  | MultiSchema
                  | NativeDistinct
                  | PostgresqlExtensions
+                 | QueryCompiler
                  | RelationJoins
                  | StrictUndefinedChecks
                  | Views
@@ -191,6 +192,7 @@ impl<'a> FeatureMapWithProvider<'a> {
                 | ConnectOrCreate
                 | CreateMany
                 | DataProxy
+                | Deno
                 | Distinct
                 | ExtendedIndexes
                 | ExtendedWhereUnique

@@ -100,4 +100,4 @@ jobs:
       - name: 'Run tests'
         env:
           PARTITION: ${{ matrix.partition }}
-        run: cargo nextest run --package query-engine-tests --test-threads=8 --partition hash:"$PARTITION"
+        run: cargo nextest run --package query-engine-tests --test-threads=4 --partition hash:"$PARTITION"

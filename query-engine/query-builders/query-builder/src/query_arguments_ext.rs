@@ -13,7 +13,7 @@ pub trait QueryArgumentsExt {
 
 impl QueryArgumentsExt for QueryArguments {
     fn needs_reversed_order(&self) -> bool {
-        self.take.map(|t| t < 0).unwrap_or(false)
+        self.take.is_reversed()
     }
 
     #[cfg(feature = "relation_joins")]

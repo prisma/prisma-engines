@@ -161,7 +161,7 @@ async fn get_many_records_joins(
 
     let mut records = ManyRecords::new(field_names.clone());
 
-    if let Some(0) = query_arguments.take {
+    if let Take::Some(0) = query_arguments.take {
         return Ok(records);
     };
 
@@ -210,7 +210,7 @@ async fn get_many_records_wo_joins(
     let meta = column_metadata::create(field_names.as_slice(), idents.as_slice());
     let mut records = ManyRecords::new(field_names.clone());
 
-    if let Some(0) = query_arguments.take {
+    if let Take::Some(0) = query_arguments.take {
         return Ok(records);
     };
 
@@ -390,7 +390,7 @@ async fn plain_aggregate(
     let idents: Vec<_> = selections
         .iter()
         .flat_map(|aggregator| aggregator.identifiers())
-        .map(|(_, ident, arity)| (ident, arity))
+        .map(|ident| (ident.typ, ident.arity))
         .collect();
 
     let meta = column_metadata::create_anonymous(&idents);
@@ -417,7 +417,7 @@ async fn group_by_aggregate(
     let idents: Vec<_> = selections
         .iter()
         .flat_map(|aggregator| aggregator.identifiers())
-        .map(|(_, ident, arity)| (ident, arity))
+        .map(|ident| (ident.typ, ident.arity))
         .collect();
 
     let meta = column_metadata::create_anonymous(&idents);

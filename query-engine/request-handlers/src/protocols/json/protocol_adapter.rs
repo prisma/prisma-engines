@@ -250,10 +250,7 @@ impl<'a> JsonProtocolAdapter<'a> {
                         .ok_or_else(build_err)?
                         .to_owned();
 
-                    let placeholder = PrismaValue::Placeholder {
-                        name,
-                        r#type: PrismaValueType::Any,
-                    };
+                    let placeholder = PrismaValue::placeholder(name, PrismaValueType::Any);
 
                     Ok(ArgumentValue::Scalar(placeholder))
                 }

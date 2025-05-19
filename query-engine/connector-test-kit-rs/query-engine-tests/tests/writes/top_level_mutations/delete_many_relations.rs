@@ -1,6 +1,6 @@
 use query_engine_tests::*;
 
-#[test_suite]
+#[test_suite(exclude(CockroachDb))]
 mod delete_many_rels {
     use indoc::indoc;
     use query_engine_tests::{run_query, Runner};

@@ -2,14 +2,13 @@ use super::update::*;
 use crate::row::ToSqlRow;
 use crate::value::to_prisma_value;
 use crate::{error::SqlError, QueryExt, Queryable};
-use quaint::ast::Query;
 use quaint::prelude::ResultSet;
 use quaint::{
     error::ErrorKind,
     prelude::{native_uuid, uuid_to_bin, uuid_to_bin_swapped, Aliasable, Select, SqlFamily},
 };
 use query_structure::*;
-use sql_query_builder::{column_metadata, update, write, Context, SelectionResultExt, SqlTraceComment};
+use sql_query_builder::{column_metadata, write, Context, SelectionResultExt, SqlTraceComment};
 use std::borrow::Cow;
 use std::collections::HashMap;
 use user_facing_errors::query_engine::DatabaseConstraint;
@@ -232,27 +231,6 @@ pub(crate) async fn update_record(
     }
 }
 
-async fn generate_updates(
-    conn: &dyn Queryable,
-    model: &Model,
-    record_filter: RecordFilter,
-    args: WriteArgs,
-    selected_fields: Option<&ModelProjection>,
-    limit: Option<usize>,
-    ctx: &Context<'_>,
-) -> crate::Result<Vec<Query<'static>>> {
-    if record_filter.has_selectors() {
-        let filter = record_filter.filter.clone();
-        let ids = conn.filter_selectors(model, record_filter, ctx).await?;
-        let slice = &ids[..limit.unwrap_or(ids.len()).min(ids.len())];
-        let queries = update::update_many_from_ids_and_filter(model, filter, slice, args, selected_fields, ctx);
-        Ok(queries)
-    } else {
-        let query = update::update_many_from_filter(model, record_filter.filter, args, selected_fields, limit, ctx);
-        Ok(vec![query])
-    }
-}
-
 /// Update multiple records in a database defined in `conn` and the records
 /// defined in `args`, and returning the number of updates
 /// This works via two ways, when there are ids in record_filter.selectors, it uses that to update
@@ -270,7 +248,7 @@ pub(crate) async fn update_records(
     }
 
     let mut count = 0;
-    for update in generate_updates(conn, model, record_filter, args, None, limit, ctx).await? {
+    for update in write::generate_update_statements(model, record_filter, args, None, limit, ctx) {
         count += conn.execute(update).await?;
     }
     Ok(count as usize)
@@ -292,16 +270,8 @@ pub(crate) async fn update_records_returning(
     let meta = column_metadata::create(&field_names, &idents);
     let mut records = ManyRecords::new(field_names.clone());
 
-    for update in generate_updates(
-        conn,
-        model,
-        record_filter,
-        args,
-        Some(&selected_fields.into()),
-        limit,
-        ctx,
-    )
-    .await?
+    for update in
+        write::generate_update_statements(model, record_filter, args, Some(&selected_fields.into()), limit, ctx)
     {
         let result_set = conn.query(update).await?;
 
@@ -366,7 +336,7 @@ pub(crate) async fn delete_record(
 
     let mut result_iter = result_set.into_iter();
     let result_row = result_iter.next().ok_or(SqlError::RecordDoesNotExist {
-        cause: "Record to delete does not exist.".to_owned(),
+        cause: "No record was found for a delete.".to_owned(),
     })?;
     debug_assert!(result_iter.next().is_none(), "Filter returned more than one row. This is a bug because we must always require `id` in filters for `deleteOne` mutations");
 

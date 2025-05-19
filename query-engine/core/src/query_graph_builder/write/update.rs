@@ -1,12 +1,12 @@
 use super::*;
 use crate::query_graph_builder::write::limit::validate_limit;
 use crate::query_graph_builder::write::write_args_parser::*;
-use crate::ParsedObject;
 use crate::{
     query_ast::*,
     query_graph::{Node, NodeRef, QueryGraph, QueryGraphDependency},
     ArgumentListLookup, ParsedField, ParsedInputMap,
 };
+use crate::{DataExpectation, ParsedObject};
 use psl::datamodel_connector::ConnectorCapability;
 use query_structure::{Filter, IntoFilter, Model};
 use schema::{constants::args, QuerySchema};
@@ -39,7 +39,7 @@ pub(crate) fn update_record(
     )?;
 
     if query_schema.relation_mode().is_prisma() {
-        let read_parent_node = graph.create_node(utils::read_ids_infallible(
+        let read_parent_node = graph.create_node(utils::read_id_infallible(
             model.clone(),
             model.primary_identifier(),
             filter,
@@ -59,6 +59,7 @@ pub(crate) fn update_record(
 
                     Ok(update_node)
                 }),
+                None,
             ),
         )?;
     }
@@ -75,15 +76,10 @@ pub(crate) fn update_record(
             &check_node,
             QueryGraphDependency::ProjectedDataDependency(
                 model.primary_identifier(),
-                Box::new(move |read_node, parent_ids| {
-                    if parent_ids.is_empty() {
-                        return Err(QueryGraphBuilderError::RecordNotFound(
-                            "Record to update not found.".to_string(),
-                        ));
-                    }
-
-                    Ok(read_node)
-                }),
+                Box::new(move |read_node, _| Ok(read_node)),
+                Some(DataExpectation::non_empty_rows(
+                    MissingRecord::builder().operation(DataOperation::Update).build(),
+                )),
             ),
         )?;
     // Otherwise, perform the update, and then do an additional read.
@@ -101,12 +97,7 @@ pub(crate) fn update_record(
             QueryGraphDependency::ProjectedDataDependency(
                 model.primary_identifier(),
                 Box::new(move |mut read_node, mut parent_ids| {
-                    let parent_id = match parent_ids.pop() {
-                        Some(pid) => Ok(pid),
-                        None => Err(QueryGraphBuilderError::RecordNotFound(
-                            "Record to update not found.".to_string(),
-                        )),
-                    }?;
+                    let parent_id = parent_ids.pop().expect("parent id should be present");
 
                     if let Node::Query(Query::Read(ReadQuery::RecordQuery(ref mut rq))) = read_node {
                         rq.add_filter(parent_id.filter());
@@ -114,6 +105,9 @@ pub(crate) fn update_record(
 
                     Ok(read_node)
                 }),
+                Some(DataExpectation::non_empty_rows(
+                    MissingRecord::builder().operation(DataOperation::Update).build(),
+                )),
             ),
         )?;
     }
@@ -190,6 +184,7 @@ pub fn update_many_records(
 
                     Ok(update_node)
                 }),
+                None,
             ),
         )?;
     }

@@ -2,12 +2,13 @@ use super::*;
 use std::fmt::{self, Display};
 
 pub fn format(graph: &QueryGraph) -> String {
+    let root_nodes: Vec<NodeRef> = graph.root_nodes().collect();
     format!(
         "---- Query Graph ----\nResult Nodes: {}\nMarked Nodes: {}\nRoot Nodes: {}\n\n{}\n----------------------",
         fmt_raw_indices(&graph.result_nodes),
         fmt_node_tuples(&graph.marked_node_pairs),
-        fmt_node_list(&graph.root_nodes()),
-        stringify_nodes(graph, graph.root_nodes(), &mut Vec::new()).join("\n\n")
+        fmt_node_list(&root_nodes),
+        stringify_nodes(graph, root_nodes, &mut Vec::new()).join("\n\n")
     )
 }
 
@@ -54,8 +55,8 @@ fn stringify_nodes(graph: &QueryGraph, nodes: Vec<NodeRef>, seen_nodes: &mut Vec
 impl Display for Flow {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            Self::If(_) => write!(f, "(If (condition func)"),
-            Self::Return(_) => write!(f, "(return results)"),
+            Self::If { rule, .. } => write!(f, "If {rule:?}"),
+            Self::Return(_) => write!(f, "Return"),
         }
     }
 }
@@ -63,7 +64,8 @@ impl Display for Flow {
 impl Display for Computation {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            Self::Diff(_) => write!(f, "Diff"),
+            Self::DiffLeftToRight(_) => write!(f, "DiffLeftToRight"),
+            Self::DiffRightToLeft(_) => write!(f, "DiffRightToLeft"),
         }
     }
 }
@@ -107,10 +109,20 @@ impl Display for QueryGraphDependency {
         match self {
             Self::ExecutionOrder => write!(f, "ExecutionOrder"),
             Self::DataDependency(_) => write!(f, "ParentResult"),
-            Self::ProjectedDataDependency(selection, _) => {
+            Self::ProjectedDataDependency(selection, _, _) => {
                 write!(
                     f,
                     "ProjectedDataDependency ({:?})",
+                    selection
+                        .selections()
+                        .map(|f| format!("{}.{}", f.container().name(), f.prisma_name()))
+                        .collect::<Vec<_>>()
+                )
+            }
+            Self::ProjectedDataSinkDependency(selection, sink, _) => {
+                write!(
+                    f,
+                    "ProjectedDataSinkDependency({sink:?}) {:?}",
                     selection
                         .selections()
                         .map(|f| format!("{}.{}", f.container().name(), f.prisma_name()))

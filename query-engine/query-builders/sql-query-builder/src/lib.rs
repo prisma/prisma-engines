@@ -18,6 +18,7 @@ pub mod write;
 
 use std::{collections::HashMap, marker::PhantomData};
 
+use itertools::{Either, Itertools};
 use prisma_value::PrismaValue;
 use quaint::{
     ast::{Column, Comparable, ConditionTree, ExpressionKind, Insert, OnConflict, OpaqueType, Query, Row, Values},
@@ -35,7 +36,7 @@ pub use context::Context;
 pub use convert::opaque_type_to_prisma_type;
 pub use filter::FilterBuilder;
 pub use model_extensions::{AsColumn, AsColumns, AsTable, RelationFieldExt, SelectionResultExt};
-use read::alias_with_prisma_name;
+use read::alias_with_db_name;
 pub use sql_trace::SqlTraceComment;
 use value::GeneratorCall;
 
@@ -63,7 +64,7 @@ impl<'a, V> SqlQueryBuilder<'a, V> {
         let params = template
             .parameters
             .into_iter()
-            .map(convert::quaint_value_to_prisma_value)
+            .map(|v| convert::quaint_value_to_prisma_value(v, self.context.sql_family()))
             .collect::<Vec<_>>();
 
         Ok(DbQuery::TemplateSql {
@@ -101,6 +102,7 @@ impl<'a, V: Visitor<'a>> QueryBuilder for SqlQueryBuilder<'a, V> {
         selected_fields: &FieldSelection,
     ) -> Result<DbQuery, Box<dyn std::error::Error + Send + Sync>> {
         use filter::default_scalar_filter;
+        use itertools::Itertools;
         use quaint::ast::{Aliasable, Joinable, Select};
         use select::{JoinConditionExt, SelectBuilderExt};
 
@@ -121,14 +123,12 @@ impl<'a, V: Visitor<'a>> QueryBuilder for SqlQueryBuilder<'a, V> {
             .m2m_column(&self.context)
             .table(m2m_alias.to_string());
 
-        let mut left_scalars = rf.related_field().left_scalars();
-        let left_scalar = left_scalars
-            .pop()
-            .expect("should have at least one left scalar in m2m relation");
-        assert!(
-            left_scalars.is_empty(),
-            "should have at most one left scalar in m2m relation"
-        );
+        let left_scalar = rf
+            .related_field()
+            .left_scalars()
+            .into_iter()
+            .exactly_one()
+            .expect("should have one left scalar in m2m relation");
         let filter =
             filter.map(|cond| default_scalar_filter(m2m_col.clone().into(), cond, &[left_scalar], None, &self.context));
 
@@ -167,7 +167,7 @@ impl<'a, V: Visitor<'a>> QueryBuilder for SqlQueryBuilder<'a, V> {
         having: Option<Filter>,
     ) -> Result<DbQuery, Box<dyn std::error::Error + Send + Sync>> {
         let query = if group_by.is_empty() {
-            read::aggregate(model, selections, args, alias_with_prisma_name(), &self.context)
+            read::aggregate(model, selections, args, alias_with_db_name(), &self.context)
         } else {
             read::group_by_aggregate(
                 model,
@@ -175,7 +175,7 @@ impl<'a, V: Visitor<'a>> QueryBuilder for SqlQueryBuilder<'a, V> {
                 selections,
                 group_by,
                 having,
-                alias_with_prisma_name(),
+                alias_with_db_name(),
                 &self.context,
             )
         };
@@ -226,17 +226,19 @@ impl<'a, V: Visitor<'a>> QueryBuilder for SqlQueryBuilder<'a, V> {
         }
     }
 
-    fn build_updates_from_filter(
+    fn build_updates(
         &self,
         model: &Model,
-        filter: Filter,
+        record_filter: RecordFilter,
         args: WriteArgs,
         selected_fields: Option<&FieldSelection>,
         limit: Option<usize>,
     ) -> Result<Vec<DbQuery>, Box<dyn std::error::Error + Send + Sync>> {
         let projection = selected_fields.map(ModelProjection::from);
-        let query = update::update_many_from_filter(model, filter, args, projection.as_ref(), limit, &self.context);
-        Ok(vec![self.convert_query(query)?])
+        write::generate_update_statements(model, record_filter, args, projection.as_ref(), limit, &self.context)
+            .into_iter()
+            .map(|query| self.convert_query(query))
+            .collect::<Result<Vec<_>, _>>()
     }
 
     fn build_upsert(
@@ -301,10 +303,10 @@ impl<'a, V: Visitor<'a>> QueryBuilder for SqlQueryBuilder<'a, V> {
         let query = if let Some(selected_fields) = selected_fields {
             write::delete_returning(model, record_filter.filter, &selected_fields.into(), &self.context)
         } else {
-            let mut queries = write::generate_delete_statements(model, record_filter, None, &self.context).into_iter();
-            let query = queries.next().expect("should generate at least one query");
-            assert_eq!(queries.next(), None, "should generat at most one query");
-            query
+            write::generate_delete_statements(model, record_filter, None, &self.context)
+                .into_iter()
+                .exactly_one()
+                .expect("should generate exactly one delete")
         };
         self.convert_query(query)
     }
@@ -359,9 +361,19 @@ pub fn in_conditions<'a>(
     results: impl IntoIterator<Item = &'a SelectionResult>,
     ctx: &Context<'_>,
 ) -> ConditionTree<'static> {
+    let iter = match results.into_iter().exactly_one() {
+        Ok(result) if matches!(&result.pairs[..], [(_, PrismaValue::Placeholder { .. })]) => {
+            return Row::from(columns.to_vec())
+                .in_selection(ExpressionKind::ParameterizedRow(result.db_values(ctx).pop().unwrap()))
+                .into()
+        }
+        // fall back to the default behavior in other cases
+        Ok(item) => Either::Left(std::iter::once(item)),
+        Err(items) => Either::Right(items),
+    };
     let mut values = Values::empty();
 
-    for result in results.into_iter() {
+    for result in iter {
         let vals: Vec<_> = result.db_values(ctx);
         values.push(vals)
     }

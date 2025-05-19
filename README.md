@@ -20,8 +20,13 @@ and test them.
 This repository contains four engines:
 
 - *Query engine*, used by the client to run database queries from Prisma Client
+- *Query compiler*, an actively developed replacement for the query engine, used
+  to compile Prisma Client queries into query plans containing SQL statements
+  and other operations, which the client can use to execute Prisma queries
+  entirely in JS land
 - *Schema engine*, used to create and run migrations and introspection
-- *Prisma Format*, used to format prisma files
+- *Prisma Format*, historically used to format prisma files (hence the name),
+  now powers other LSP functionality as well
 
 Additionally, the *psl* (Prisma Schema Language) is the library that defines how
 the language looks like, how it's parsed, etc.
@@ -31,7 +36,7 @@ You'll also find:
     various connector/database-specific libraries, etc.
 - a `docker-compose.yml` file that's helpful for running tests and bringing up
     containers for various databases
-- a `flake.nix` file for bringing up all dependencies and making it easy to
+- a `shell.nix` file for bringing up all dependencies and making it easy to
     build the code in this repository (the use of this file and `nix` is
     entirely optional, but can be a good and easy way to get started)
 - an `.envrc` file to make it easier to set everything up, including the `nix

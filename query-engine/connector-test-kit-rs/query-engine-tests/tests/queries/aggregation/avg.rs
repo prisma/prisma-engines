@@ -27,7 +27,7 @@ mod aggregation_avg {
                 runner,
                 "query { aggregateTestModel { _avg { int bInt float } } }"
             ),
-            @r###"{"data":{"aggregateTestModel":{"_avg":{"int":7.5,"bInt":7.5,"float":5.0}}}}"###
+            @r###"{"data":{"aggregateTestModel":{"_avg":{"int":7.5,"bInt":7.5,"float":5}}}}"###
         );
 
         Ok(())
@@ -42,7 +42,7 @@ mod aggregation_avg {
 
         insta::assert_snapshot!(
             run_query!(&runner, "query { aggregateTestModel(take: 2) { _avg { int bInt float } } }"),
-            @r###"{"data":{"aggregateTestModel":{"_avg":{"int":7.5,"bInt":7.5,"float":5.0}}}}"###
+            @r###"{"data":{"aggregateTestModel":{"_avg":{"int":7.5,"bInt":7.5,"float":5}}}}"###
         );
 
         insta::assert_snapshot!(

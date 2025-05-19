@@ -57,25 +57,25 @@ jobs:
       - name: 'Start ${{ inputs.database_name }}'
         run: make start-${{ inputs.database_name }}
 
-      - run: cargo nextest run -p sql-introspection-tests
+      - run: cargo nextest run -p sql-introspection-tests --test-threads=8
         if: ${{ !inputs.single_threaded }}
         env:
           CLICOLOR_FORCE: 1
           TEST_DATABASE_URL: ${{ inputs.database_url }}
 
-      - run: cargo nextest run -p sql-schema-describer --features all-native
+      - run: cargo nextest run -p sql-schema-describer --features all-native --test-threads=8
         if: ${{ !inputs.single_threaded }}
         env:
           CLICOLOR_FORCE: 1
           TEST_DATABASE_URL: ${{ inputs.database_url }}
 
-      - run: cargo nextest run -p sql-migration-tests
+      - run: cargo nextest run -p sql-migration-tests --test-threads=8
         if: ${{ !inputs.single_threaded }}
         env:
           CLICOLOR_FORCE: 1
           TEST_DATABASE_URL: ${{ inputs.database_url }}
 
-      - run: cargo nextest run -p schema-engine-cli
+      - run: cargo nextest run -p schema-engine-cli --test-threads=8
         if: ${{ !inputs.single_threaded }}
         env:
           CLICOLOR_FORCE: 1

@@ -18,7 +18,7 @@ use crate::*;
 pub struct QueryArguments {
     pub model: Model,
     pub cursor: Option<SelectionResult>,
-    pub take: Option<i64>,
+    pub take: Take,
     pub skip: Option<i64>,
     pub filter: Option<Filter>,
     pub order_by: Vec<OrderBy>,
@@ -26,6 +26,49 @@ pub struct QueryArguments {
     pub ignore_skip: bool,
     pub ignore_take: bool,
     pub relation_load_strategy: Option<RelationLoadStrategy>,
+}
+
+#[derive(Debug, Copy, Clone, PartialEq, Eq, Hash)]
+pub enum Take {
+    All,
+    One,
+    Some(i64),
+}
+
+impl Take {
+    pub fn is_all(self) -> bool {
+        self == Take::All
+    }
+
+    pub fn is_some(self) -> bool {
+        matches!(self, Take::Some(_))
+    }
+
+    pub fn abs(self) -> Option<i64> {
+        match self {
+            Take::All => None,
+            Take::One => Some(1),
+            Take::Some(n) => Some(n.abs()),
+        }
+    }
+
+    pub fn is_reversed(self) -> bool {
+        match self {
+            Take::All => false,
+            Take::One => false,
+            Take::Some(n) => n < 0,
+        }
+    }
+}
+
+impl From<Option<i64>> for Take {
+    fn from(n: Option<i64>) -> Self {
+        match n {
+            None => Take::All,
+            // Do NOT special-case Take::One here, because that must be used explicitly
+            Some(n) => Take::Some(n),
+        }
+    }
 }
 
 #[derive(Debug, Copy, Clone, PartialEq, Eq, Hash)]
@@ -78,7 +121,7 @@ impl QueryArguments {
         Self {
             model,
             cursor: None,
-            take: None,
+            take: Take::All,
             skip: None,
             filter: None,
             order_by: vec![],
@@ -89,14 +132,14 @@ impl QueryArguments {
         }
     }
 
-    pub fn with_take(mut self, take: Option<i64>) -> Self {
+    pub fn with_take(mut self, take: Take) -> Self {
         self.take = take;
         self
     }
 
     pub fn do_nothing(&self) -> bool {
         self.cursor.is_none()
-            && self.take.is_none()
+            && self.take.is_all()
             && self.skip.is_none()
             && self.filter.is_none()
             && self.order_by.is_empty()
@@ -120,7 +163,7 @@ impl QueryArguments {
     }
 
     pub fn requires_inmemory_pagination_with_joins(&self) -> bool {
-        self.skip.or(self.take).is_some() && self.requires_inmemory_distinct_with_joins()
+        (self.skip.is_some() || self.take.is_some()) && self.requires_inmemory_distinct_with_joins()
     }
 
     fn can_distinct_in_db(&self) -> bool {
@@ -236,10 +279,6 @@ impl QueryArguments {
         }
 
         source_contains_unique || order_by_contains_unique_index || relations_contain_1to1_unique
-    }
-
-    pub fn take_abs(&self) -> Option<i64> {
-        self.take.map(|t| t.abs())
     }
 
     pub fn has_unbatchable_ordering(&self) -> bool {

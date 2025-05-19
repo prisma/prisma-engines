@@ -1,6 +1,6 @@
 use std::sync::{self, atomic::AtomicUsize};
 
-use quaint::prelude::ConnectionInfo;
+use quaint::prelude::{ConnectionInfo, SqlFamily};
 use telemetry::TraceParent;
 
 use crate::filter::alias::Alias;
@@ -39,6 +39,10 @@ impl<'a> Context<'a> {
 
     pub(crate) fn schema_name(&self) -> &str {
         self.connection_info.schema_name()
+    }
+
+    pub fn sql_family(&self) -> SqlFamily {
+        self.connection_info.sql_family()
     }
 
     pub fn max_insert_rows(&self) -> Option<usize> {

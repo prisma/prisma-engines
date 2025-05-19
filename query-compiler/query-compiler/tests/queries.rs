@@ -1,13 +1,12 @@
-use std::{fs, sync::Arc};
-
 use quaint::{
     prelude::{ConnectionInfo, ExternalConnectionInfo, SqlFamily},
     visitor::Postgres,
 };
-use query_core::{QueryDocument, QueryGraphBuilder};
+use query_core::{QueryDocument, QueryGraphBuilder, ToGraphviz};
 use query_structure::psl;
 use request_handlers::{JsonBody, JsonSingleQuery, RequestBody};
 use sql_query_builder::{Context, SqlQueryBuilder};
+use std::{fs, process::Command, sync::Arc};
 
 #[test]
 fn queries() {
@@ -40,6 +39,30 @@ fn queries() {
             .without_eager_default_evaluation()
             .build(query)
             .unwrap();
+
+        let dot = graph.to_graphviz();
+        let tests_path = path.parent().unwrap().parent().unwrap();
+        let graphs_path = tests_path.join("graphs");
+        let dot_path = graphs_path.join(path.file_name().unwrap()).with_extension("dot");
+
+        std::thread::spawn(move || {
+            fs::create_dir_all(graphs_path).unwrap();
+            fs::write(&dot_path, dot).unwrap();
+
+            if std::env::var("RENDER_DOT_TO_PNG").is_ok() {
+                let png_path = dot_path.with_extension("png");
+                Command::new("dot")
+                    .arg("-Tpng")
+                    .arg(dot_path)
+                    .arg("-Gdpi=300")
+                    .arg("-Nfontname=Helvetica")
+                    .arg("-Efontname=Helvetica")
+                    .arg("-o")
+                    .arg(png_path)
+                    .status()
+                    .unwrap();
+            }
+        });
 
         let ctx = Context::new(&connection_info, None);
         let builder = SqlQueryBuilder::<Postgres<'_>>::new(ctx);

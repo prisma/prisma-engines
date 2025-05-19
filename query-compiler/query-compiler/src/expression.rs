@@ -1,4 +1,6 @@
+use crate::result_node::ResultNode;
 use query_builder::DbQuery;
+use query_core::{DataExpectation, DataRule};
 use serde::Serialize;
 
 mod format;
@@ -80,14 +82,44 @@ pub enum Expression {
 
     /// Run the query inside a transaction
     Transaction(Box<Expression>),
+
+    /// Data mapping
+    DataMap {
+        expr: Box<Expression>,
+        structure: ResultNode,
+    },
+
+    /// Validates the expression according to the data rule and throws an error if it doesn't match.
+    Validate {
+        expr: Box<Expression>,
+        rules: Vec<DataRule>,
+        error_identifier: &'static str,
+        context: serde_json::Value,
+    },
+
+    /// Checks if `value` satisifies the `rule`, and executes `then` if it does, or `r#else` if it doesn't.
+    If {
+        value: Box<Expression>,
+        rule: DataRule,
+        then: Box<Expression>,
+        r#else: Box<Expression>,
+    },
+
+    /// Unit value.
+    Unit,
+
+    /// Difference between the sets of rows in `from` and `to` (i.e. `from - to`,
+    /// or the set of rows that are in `from` but not in `to`).
+    Diff { from: Box<Expression>, to: Box<Expression> },
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Serialize)]
 pub enum ExpressionType {
     Scalar,
     Record,
     List(Box<ExpressionType>),
     Dynamic,
+    Unit,
 }
 
 impl ExpressionType {
@@ -141,6 +173,28 @@ impl Expression {
             Expression::Join { parent, .. } => parent.r#type(),
             Expression::MapField { records, .. } => records.r#type(),
             Expression::Transaction(expression) => expression.r#type(),
+            Expression::DataMap { expr, .. } => expr.r#type(),
+            Expression::Validate { expr, .. } => expr.r#type(),
+            Expression::If { then, r#else, .. } => {
+                let then_type = then.r#type();
+                let else_type = r#else.r#type();
+                if then_type == else_type {
+                    then_type
+                } else {
+                    ExpressionType::Dynamic
+                }
+            }
+            Expression::Unit => ExpressionType::Unit,
+            Expression::Diff { from, .. } => from.r#type(),
+        }
+    }
+
+    pub fn validate_expectation(expectation: &DataExpectation, expr: Expression) -> Expression {
+        Expression::Validate {
+            expr: expr.into(),
+            rules: expectation.rules().to_vec(),
+            error_identifier: expectation.error().id(),
+            context: expectation.error().context(),
         }
     }
 }
