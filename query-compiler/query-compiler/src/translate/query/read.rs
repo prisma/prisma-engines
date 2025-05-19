@@ -6,8 +6,8 @@ use crate::{
 use itertools::Itertools;
 use query_builder::{ConditionalLink, JoinLinks, QueryArgumentsExt, QueryBuilder};
 use query_core::{
-    AggregateRecordsQuery, DataExpectation, DataOperation, FilteredQuery, MissingRecord, QueryGraphBuilderError,
-    QueryOption, QueryOptions, ReadQuery, RelatedRecordsQuery,
+    AggregateRecordsQuery, DataExpectation, DataOperation, MissingRecord, QueryGraphBuilderError, QueryOption,
+    QueryOptions, ReadQuery, RelatedRecordsQuery,
 };
 use query_structure::{
     ConditionValue, FieldSelection, Filter, PrismaValue, QueryArguments, QueryMode, ScalarCondition, ScalarFilter,
@@ -291,15 +291,21 @@ fn build_read_one2m_query(
     let related_scalars = field.related_field().left_scalars();
     let join_fields = related_scalars.iter().map(|sf| sf.name().to_owned()).collect();
 
-    for (field, conditions) in conditions_per_field {
-        for condition in conditions {
-            args.add_filter(Filter::Scalar(ScalarFilter {
-                condition,
-                projection: ScalarProjection::Single(field.clone()),
-                mode: QueryMode::Default,
-            }));
-        }
-    }
+    let filters = args
+        .filter
+        .take()
+        .into_iter()
+        .chain(conditions_per_field.flat_map(|(field, conditions)| {
+            conditions.into_iter().map(move |condition| {
+                Filter::Scalar(ScalarFilter {
+                    condition,
+                    projection: ScalarProjection::Single(field.clone()),
+                    mode: QueryMode::Default,
+                })
+            })
+        }))
+        .collect_vec();
+    args.filter = Some(Filter::And(filters));
 
     let to_one_relation = !field.arity().is_list();
     let args = if to_one_relation {
