@@ -124,6 +124,28 @@ impl SelectionResult {
 
         Ok(Self { pairs })
     }
+
+    /// Converts the result into scalar fields and placeholders if it's composed exclusively of
+    /// scalar fields and placeholders. Otherwise, returns `None`.
+    pub fn as_placeholders(&self) -> Option<Vec<(&ScalarFieldRef, &PrismaValue)>> {
+        let pairs = self
+            .pairs
+            .iter()
+            .map(|pair| {
+                if let (SelectedField::Scalar(sf), value @ PrismaValue::Placeholder { .. }) = pair {
+                    Some((sf, value))
+                } else {
+                    None
+                }
+            })
+            .while_some()
+            .collect_vec();
+        if pairs.len() == self.pairs.len() {
+            Some(pairs)
+        } else {
+            None
+        }
+    }
 }
 
 impl TryFrom<SelectionResult> for PrismaValue {
