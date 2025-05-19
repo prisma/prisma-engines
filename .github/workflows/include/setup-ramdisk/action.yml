@@ -1,0 +1,19 @@
+name: Setup ramdisk
+description: Sets up ramdisk to improve test performance
+inputs:
+  mount-path:
+    description: Mount path in the filesystem
+
+runs:
+  using: composite
+  steps:
+    - name: Create ramdisk
+      shell: bash
+      run: |
+        if [ -d "${{ inputs.mount-path }}" ]; then
+          echo "${{ inputs.mount-path }} exists, skipping"
+        else
+          sudo mkdir ${{ inputs.mount-path }}
+          sudo mount -t tmpfs -o size=2G tmpfs "${{ inputs.mount-path }}"
+          echo "Ramdisk (2GB): ${{ inputs.mount-path }}"
+        fi
