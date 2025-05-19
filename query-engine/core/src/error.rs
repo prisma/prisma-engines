@@ -120,7 +120,7 @@ impl From<CoreError> for user_facing_errors::Error {
             | CoreError::InterpreterError(InterpreterError::ConnectorError(ConnectorError {
                 user_facing_error: Some(user_facing_error),
                 ..
-            })) => user_facing_error.into(),
+            })) => (*user_facing_error).into(),
 
             CoreError::QueryGraphBuilderError(QueryGraphBuilderError::QueryParserError(err)) => {
                 user_facing_errors::Error::from(err)

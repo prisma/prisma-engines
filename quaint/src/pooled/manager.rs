@@ -100,7 +100,7 @@ pub enum QuaintManager {
     #[cfg(feature = "postgresql")]
     Postgres {
         url: PostgresNativeUrl,
-        tls_manager: MakeTlsConnectorManager,
+        tls_manager: Box<MakeTlsConnectorManager>,
         is_tracing_enabled: bool,
     },
 

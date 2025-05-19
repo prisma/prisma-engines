@@ -599,7 +599,7 @@ fn get_cloudflare_d1_ignored_tables_regex() -> &'static Regex {
 
 /// Returns whether a table is one of the SQLite system tables or a Cloudflare D1 specific table.
 fn is_table_ignored(table_name: &str, _adapter_name: Option<AdapterName>) -> bool {
-    let early_result = SQLITE_IGNORED_TABLES.iter().any(|table| table_name == *table);
+    let early_result = SQLITE_IGNORED_TABLES.contains(&table_name);
 
     // TODO: remove the constant `is_cloudflare_d1 = true` and replace it with the following once we
     // get rid of `--local-d1`, `--to-local-d1`, `--from-local-d1` flags in the CLI.
