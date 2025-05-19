@@ -1,6 +1,6 @@
 use crate::{
     TranslateError,
-    expression::{Binding, Expression, JoinExpression},
+    expression::{Binding, Expression, JoinExpression, Pagination},
     translate::TranslateResult,
 };
 use itertools::Itertools;
@@ -40,29 +40,49 @@ pub(crate) fn translate_read_query(query: ReadQuery, builder: &dyn QueryBuilder)
             }
         }
 
-        ReadQuery::ManyRecordsQuery(mrq) => {
+        ReadQuery::ManyRecordsQuery(mut mrq) => {
             let selected_fields = mrq.selected_fields.without_relations().into_virtuals_last();
             let needs_reversed_order = mrq.args.needs_reversed_order();
             let take = mrq.args.take;
+
+            let pagination = mrq
+                .args
+                .requires_inmemory_processing()
+                .then(|| extract_pagination(&mut mrq.args));
+            let distinct_by = mrq
+                .args
+                .requires_inmemory_distinct()
+                .then(|| extract_distinct_by(&mut mrq.args));
 
             // TODO: we ignore chunking for now
             let query = builder
                 .build_get_records(&mrq.model, mrq.args, &selected_fields)
                 .map_err(TranslateError::QueryBuildFailure)?;
 
-            let expr = Expression::Query(query);
-            let expr = convert_options_to_validation(expr, mrq.options);
+            let mut expr = Expression::Query(query);
 
-            let expr = if needs_reversed_order {
-                Expression::Reverse(Box::new(expr))
-            } else {
-                expr
+            if let Some(fields) = distinct_by {
+                expr = Expression::DistinctBy {
+                    expr: expr.into(),
+                    fields,
+                };
             };
 
-            let expr = if mrq.nested.is_empty() {
-                expr
-            } else {
-                add_inmemory_join(expr, mrq.nested, builder)?
+            if let Some(pagination) = pagination {
+                expr = Expression::Paginate {
+                    expr: expr.into(),
+                    pagination,
+                };
+            };
+
+            if needs_reversed_order {
+                expr = Expression::Reverse(Box::new(expr));
+            };
+
+            expr = convert_options_to_validation(expr, mrq.options);
+
+            if !mrq.nested.is_empty() {
+                expr = add_inmemory_join(expr, mrq.nested, builder)?;
             };
 
             match take {
@@ -134,10 +154,8 @@ fn add_inmemory_join(
         .map(|rrq| -> TranslateResult<JoinExpression> {
             let parent_field_name = rrq.parent_field.name().to_owned();
             let left_scalars = rrq.parent_field.left_scalars();
-            let conditions = rrq
-                .parent_field
-                .left_scalars()
-                .into_iter()
+            let conditions = left_scalars
+                .iter()
                 .map(|field| {
                     let placeholder = PrismaValue::placeholder(
                         format!("@parent${}", field.name()),
@@ -180,12 +198,16 @@ fn add_inmemory_join(
 }
 
 fn build_read_related_records(
-    rrq: RelatedRecordsQuery,
+    mut rrq: RelatedRecordsQuery,
     conditions: Option<Vec<ScalarCondition>>,
     builder: &dyn QueryBuilder,
 ) -> TranslateResult<(Expression, JoinFields)> {
     let selected_fields = rrq.selected_fields.without_relations().into_virtuals_last();
     let needs_reversed_order = rrq.args.needs_reversed_order();
+
+    let pagination = (rrq.args.take.is_some() || rrq.args.skip.is_some() || rrq.args.cursor.is_some())
+        .then(|| extract_pagination(&mut rrq.args));
+    let distinct_by = (rrq.args.distinct.is_some()).then(|| extract_distinct_by(&mut rrq.args));
 
     let (mut child_query, join_on) = if rrq.parent_field.relation().is_many_to_many() {
         build_read_m2m_query(rrq.parent_field, conditions, rrq.args, &selected_fields, builder)?
@@ -200,9 +222,23 @@ fn build_read_related_records(
         )?
     };
 
+    if let Some(fields) = distinct_by {
+        child_query = Expression::DistinctBy {
+            expr: child_query.into(),
+            fields: fields.into_iter().chain(join_on.clone()).collect(),
+        };
+    };
+
+    if let Some(pagination) = pagination {
+        child_query = Expression::Paginate {
+            expr: child_query.into(),
+            pagination: pagination.with_parent_links(join_on.clone()),
+        };
+    };
+
     if needs_reversed_order {
         child_query = Expression::Reverse(Box::new(child_query));
-    }
+    };
 
     if !rrq.nested.is_empty() {
         child_query = add_inmemory_join(child_query, rrq.nested, builder)?;
@@ -313,7 +349,32 @@ fn convert_options_to_validation(expr: Expression, options: QueryOptions) -> Exp
     }
 }
 
+fn extract_pagination(args: &mut QueryArguments) -> Pagination {
+    args.ignore_take = true;
+    args.ignore_skip = true;
+
+    let cursor = args.cursor.as_ref().map(|cursor| {
+        cursor
+            .pairs()
+            .map(|(sf, val)| (sf.db_name().into_owned(), val.clone()))
+            .collect()
+    });
+    Pagination::new(cursor, args.take.abs(), args.skip)
+}
+
+fn extract_distinct_by(args: &mut QueryArguments) -> Vec<String> {
+    let distinct = args.distinct.take().unwrap();
+    distinct.db_names().collect_vec()
+}
+
+#[derive(Debug, Clone)]
 struct JoinFields(Vec<String>);
+
+impl From<JoinFields> for Vec<String> {
+    fn from(join_fields: JoinFields) -> Self {
+        join_fields.0
+    }
+}
 
 impl IntoIterator for JoinFields {
     type Item = String;

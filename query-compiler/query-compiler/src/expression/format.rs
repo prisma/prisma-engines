@@ -1,4 +1,4 @@
-use super::{Binding, DbQuery, Expression, JoinExpression};
+use super::{Binding, DbQuery, Expression, JoinExpression, Pagination};
 use crate::result_node::ResultNode;
 use pretty::{
     DocAllocator, DocBuilder,
@@ -72,6 +72,8 @@ where
             } => self.r#if(value, rule, then, r#else),
             Expression::Unit => self.keyword("()"),
             Expression::Diff { from, to } => self.diff(from, to),
+            Expression::DistinctBy { expr, fields } => self.distinct_by(expr, fields),
+            Expression::Paginate { expr, pagination } => self.paginate(expr, pagination),
         }
     }
 
@@ -381,6 +383,64 @@ where
 
     fn diff(&'a self, from: &'a Expression, to: &'a Expression) -> DocBuilder<'a, PrettyPrinter<'a, D>, ColorSpec> {
         self.function("diff", [from, to])
+    }
+
+    fn distinct_by(
+        &'a self,
+        expr: &'a Expression,
+        fields: &'a [String],
+    ) -> DocBuilder<'a, PrettyPrinter<'a, D>, ColorSpec> {
+        self.keyword("distinct")
+            .append(self.softline())
+            .append(self.keyword("by"))
+            .append(self.softline())
+            .append(self.tuple(fields.iter().map(|name| self.var_name(name))))
+            .append(self.line())
+            .append(self.expression(expr).parens())
+    }
+
+    fn paginate(
+        &'a self,
+        expr: &'a Expression,
+        pagination: &'a Pagination,
+    ) -> DocBuilder<'a, PrettyPrinter<'a, D>, ColorSpec> {
+        let mut builder = self.nil();
+
+        if let Some(fields) = &pagination.cursor {
+            builder = builder.append(
+                self.keyword("cursor").append(self.softline()).append(
+                    self.intersperse(
+                        fields
+                            .iter()
+                            .map(|(name, val)| self.tuple([self.text(format!("{name:?}")), self.value(val)])),
+                        self.text(",").append(self.softline()),
+                    )
+                    .align()
+                    .brackets()
+                    .append(self.line()),
+                ),
+            );
+        }
+
+        if let Some(skip) = &pagination.skip() {
+            builder = builder.append(
+                self.keyword("skip")
+                    .append(self.space())
+                    .append(self.text(skip.to_string()))
+                    .append(self.line()),
+            );
+        }
+
+        if let Some(take) = &pagination.take() {
+            builder = builder.append(
+                self.keyword("take")
+                    .append(self.space())
+                    .append(self.text(take.to_string()))
+                    .append(self.line()),
+            );
+        }
+
+        builder.append(self.expression(expr))
     }
 }
 

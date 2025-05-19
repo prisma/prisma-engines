@@ -461,13 +461,13 @@ impl<'a> SelectBuilderExt<'a> for Select<'a> {
         };
 
         let select = match take {
-            Some(take) => self.limit(take as usize),
-            None => self,
+            Some(take) if !args.ignore_take => self.limit(take as usize),
+            _ => self,
         };
 
         let select = match skip {
-            Some(skip) => select.offset(skip as usize),
-            None => select,
+            Some(skip) if !args.ignore_skip => select.offset(skip as usize),
+            _ => select,
         };
 
         select
