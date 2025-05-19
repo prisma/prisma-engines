@@ -26,12 +26,6 @@ queries::aggregation::group_by_having::aggr_group_by_having::having_max_scalar_f
 queries::aggregation::group_by_having::aggr_group_by_having::having_min_scalar_filter
 queries::aggregation::group_by_having::aggr_group_by_having::having_sum_scalar_filter
 queries::aggregation::group_by_having::aggr_group_by_having::having_without_aggr_sel
-queries::aggregation::many_count_relation::many_count_rel::count_m_n_self_rel
-queries::aggregation::many_count_relation::many_count_rel::count_one2m_m2m
-queries::aggregation::many_count_relation::many_count_rel::filtered_count_one2m_m2m
-queries::aggregation::many_count_relation::many_count_rel::nested_count_one2m_m2m
-queries::aggregation::uniq_count_relation::uniq_count_rel::count_one2m_m2m
-queries::aggregation::uniq_count_relation::uniq_count_rel::nested_count_one2m_m2m
 queries::batching::select_one_compound::compound_batch::two_success_sel_set_reorder
 queries::batching::select_one_singular::singular_batch::relation_traversal
 queries::batching::select_one_singular::singular_batch::relation_traversal_filtered
