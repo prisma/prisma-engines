@@ -16,9 +16,10 @@ pub mod update;
 pub mod value;
 pub mod write;
 
-use std::{collections::HashMap, marker::PhantomData};
+use std::{collections::HashMap, iter, marker::PhantomData};
 
 use itertools::{Either, Itertools};
+use model_extensions::ScalarFieldExt;
 use prisma_value::PrismaValue;
 use quaint::{
     ast::{Column, Comparable, ConditionTree, ExpressionKind, Insert, OnConflict, OpaqueType, Query, Row, Values},
@@ -377,16 +378,28 @@ pub fn in_conditions<'a>(
     results: impl IntoIterator<Item = &'a SelectionResult>,
     ctx: &Context<'_>,
 ) -> ConditionTree<'static> {
-    let iter = match results.into_iter().exactly_one() {
-        Ok(result) if matches!(&result.pairs[..], [(_, PrismaValue::Placeholder { .. })]) => {
-            return Row::from(columns.to_vec())
-                .in_selection(ExpressionKind::ParameterizedRow(result.db_values(ctx).pop().unwrap()))
-                .into()
+    let iter = match results
+        .into_iter()
+        .exactly_one()
+        .map_err(Either::Left)
+        .and_then(|res| res.as_placeholders().ok_or(Either::Right(iter::once(res))))
+    {
+        Ok(pairs) => {
+            return pairs
+                .into_iter()
+                .zip(columns)
+                .map(|((sf, value), col)| {
+                    ConditionTree::from(
+                        Row::from((col.clone(),))
+                            .in_selection(ExpressionKind::ParameterizedRow(sf.value(value.clone(), ctx))),
+                    )
+                })
+                .reduce(|l, r| l.and(r))
+                .expect("should have at least one column")
         }
-        // fall back to the default behavior in other cases
-        Ok(item) => Either::Left(std::iter::once(item)),
-        Err(items) => Either::Right(items),
+        Err(items) => items,
     };
+
     let mut values = Values::empty();
 
     for result in iter {
