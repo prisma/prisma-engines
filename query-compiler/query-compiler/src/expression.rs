@@ -32,6 +32,7 @@ pub struct JoinExpression {
     pub child: Expression,
     pub on: Vec<(String, String)>,
     pub parent_field: String,
+    pub is_relation_unique: bool,
 }
 
 #[derive(Debug, Serialize)]
@@ -144,7 +145,7 @@ impl Pagination {
         }
     }
 
-    pub fn with_parent_links(self, linking_fields: impl Into<Vec<String>>) -> Self {
+    pub fn with_linking_fields(self, linking_fields: impl Into<Vec<String>>) -> Self {
         Self {
             linking_fields: Some(linking_fields.into()),
             ..self
