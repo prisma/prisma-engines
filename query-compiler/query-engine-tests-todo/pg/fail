@@ -1,5 +1,6 @@
 new::interactive_tx::interactive_tx::batch_queries_failure
 new::interactive_tx::interactive_tx::batch_queries_rollback
+new::interactive_tx::interactive_tx::batch_queries_success
 new::interactive_tx::interactive_tx::commit_after_rollback
 new::interactive_tx::interactive_tx::double_commit
 new::interactive_tx::interactive_tx::double_rollback
@@ -83,5 +84,3 @@ writes::top_level_mutations::delete::delete::delete_fails_if_filter_dont_match
 writes::top_level_mutations::delete::delete::should_fail_non_exist_id
 writes::top_level_mutations::delete::delete::should_fail_non_existent_value_non_id_uniq_field
 writes::top_level_mutations::update_many_and_return::update_many_and_return::update_many_11_inline_rel_read_works
-writes::uniques_and_node_selectors::relation_uniques::compound_uniq_rel_field::compound_uniq_rel_field::compound_uniq_with_1_1_multi_rel
-writes::uniques_and_node_selectors::relation_uniques::compound_uniq_rel_field::compound_uniq_rel_field::compound_uniq_with_1_1_single_rel

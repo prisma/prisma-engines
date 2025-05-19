@@ -45,8 +45,6 @@ queries::data_types::json::json::nested_dollar_type_in_json_protocol
 queries::data_types::through_relation::scalar_relations::common_types
 queries::filters::self_relation_regression::sr_regression::all_categories
 raw::sql::typed_output::typed_output::all_scalars_sqlite
-writes::ids::relation_pks::compound_pk_rel_field::compound_pk_rel::cpd_1_1_multi_field_rel
-writes::ids::relation_pks::compound_pk_rel_field::compound_pk_rel::cpd_1_1_single_field_rel
 writes::ids::relation_pks::single_pk_rel_field::single_pk_rel_field::id_also_1_1_multi_field_rel
 writes::nested_mutations::already_converted::nested_connect_inside_create::connect_inside_create::pm_to_c1_fail_if_wrong_id
 writes::nested_mutations::already_converted::nested_connect_inside_create::connect_inside_create::pm_to_c1_rel_fail_connect_no_node
@@ -69,5 +67,3 @@ writes::top_level_mutations::delete::delete::delete_fails_if_filter_dont_match
 writes::top_level_mutations::delete::delete::should_fail_non_exist_id
 writes::top_level_mutations::delete::delete::should_fail_non_existent_value_non_id_uniq_field
 writes::top_level_mutations::update_many_and_return::update_many_and_return::update_many_11_inline_rel_read_works
-writes::uniques_and_node_selectors::relation_uniques::compound_uniq_rel_field::compound_uniq_rel_field::compound_uniq_with_1_1_multi_rel
-writes::uniques_and_node_selectors::relation_uniques::compound_uniq_rel_field::compound_uniq_rel_field::compound_uniq_with_1_1_single_rel
