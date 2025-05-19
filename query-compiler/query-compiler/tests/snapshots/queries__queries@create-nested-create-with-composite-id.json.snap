@@ -54,7 +54,7 @@ transaction
                                     FROM "public"."ChildOfModelWithCompositeId"
                                     WHERE
                                     ("public"."ChildOfModelWithCompositeId"."parentA"
-                                    = $1 OR
+                                    = $1 AND
                                     "public"."ChildOfModelWithCompositeId"."parentB"
                                     = $2) OFFSET $3»
                              params [var(@parent$a as Int),

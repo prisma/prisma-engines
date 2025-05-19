@@ -97,17 +97,19 @@ impl<'a, V: Visitor<'a>> QueryBuilder for SqlQueryBuilder<'a, V> {
     #[cfg(feature = "relation_joins")]
     fn build_get_related_records(
         &self,
-        link: query_builder::RelationLink,
+        join_links: query_builder::JoinLinks,
         query_arguments: QueryArguments,
         selected_fields: &FieldSelection,
     ) -> Result<DbQuery, Box<dyn std::error::Error + Send + Sync>> {
+        use std::slice;
+
         use filter::default_scalar_filter;
         use itertools::Itertools;
         use quaint::ast::{Aliasable, Joinable, Select};
         use select::{JoinConditionExt, SelectBuilderExt};
 
-        let link_alias = link.to_string();
-        let (rf, filter) = link.into_field_and_condition();
+        let link_alias = join_links.to_string();
+        let (rf, conditions_per_field) = join_links.into_parent_field_and_conditions();
 
         let m2m_alias = self.context.next_table_alias();
         let m2m_table = rf.as_table(&self.context).alias(m2m_alias.to_string());
@@ -129,8 +131,22 @@ impl<'a, V: Visitor<'a>> QueryBuilder for SqlQueryBuilder<'a, V> {
             .into_iter()
             .exactly_one()
             .expect("should have one left scalar in m2m relation");
-        let filter =
-            filter.map(|cond| default_scalar_filter(m2m_col.clone().into(), cond, &[left_scalar], None, &self.context));
+        let (_, conditions) = conditions_per_field
+            .exactly_one()
+            .expect("should have one field in m2m relation");
+
+        let filter = conditions
+            .into_iter()
+            .map(|cond| {
+                default_scalar_filter(
+                    m2m_col.clone().into(),
+                    cond,
+                    slice::from_ref(&left_scalar),
+                    None,
+                    &self.context,
+                )
+            })
+            .reduce(|l, r| l.and(r));
 
         let columns = ModelProjection::from(selected_fields)
             .as_columns(&self.context)
@@ -149,8 +165,8 @@ impl<'a, V: Visitor<'a>> QueryBuilder for SqlQueryBuilder<'a, V> {
             .with_pagination(&query_arguments, None)
             .with_filters(query_arguments.filter, Some(related_alias), &self.context);
 
-        let select = if let Some(cond) = filter {
-            select.and_where(cond)
+        let select = if let Some(filter) = filter {
+            select.and_where(filter)
         } else {
             select
         };

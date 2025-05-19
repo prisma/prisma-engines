@@ -18,6 +18,18 @@ impl<I: PartialEq> PartialEq for Zipper<I> {
 
 impl<I: Eq> Eq for Zipper<I> {}
 
+impl<I: PartialOrd> PartialOrd for Zipper<I> {
+    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
+        self.id.partial_cmp(&other.id)
+    }
+}
+
+impl<I: Ord> Ord for Zipper<I> {
+    fn cmp(&self, other: &Self) -> std::cmp::Ordering {
+        self.id.cmp(&other.id)
+    }
+}
+
 impl<I: Copy> Zipper<I> {
     pub fn walker(&self) -> Walker<'_, I> {
         self.dm.schema.db.walk(self.id)
