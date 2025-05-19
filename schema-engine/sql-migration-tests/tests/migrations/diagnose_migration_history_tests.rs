@@ -812,7 +812,7 @@ fn shadow_database_creation_error_is_special_cased_mysql(api: TestApi) {
     );
 
     let migration_api = schema_api(Some(datamodel), None).unwrap();
-    let migrations_list = list_migrations(&directory.into_path()).unwrap();
+    let migrations_list = list_migrations(&directory.keep()).unwrap();
 
     let output = tok(migration_api.diagnose_migration_history(DiagnoseMigrationHistoryInput {
         migrations_list,
@@ -858,7 +858,7 @@ fn shadow_database_creation_error_is_special_cased_postgres(api: TestApi) {
         dbport = api.connection_info().port().unwrap_or(5432),
     );
 
-    let migrations_list = list_migrations(&directory.into_path()).unwrap();
+    let migrations_list = list_migrations(&directory.keep()).unwrap();
 
     let output = tok(async {
         schema_api(Some(datamodel.clone()), None)
@@ -931,7 +931,7 @@ fn shadow_database_creation_error_is_special_cased_mssql(api: TestApi) {
         }
     };
 
-    let migrations_list = list_migrations(&directory.into_path()).unwrap();
+    let migrations_list = list_migrations(&directory.keep()).unwrap();
 
     let output = tok(migration_api.diagnose_migration_history(DiagnoseMigrationHistoryInput {
         migrations_list,

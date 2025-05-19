@@ -614,7 +614,7 @@ fn dev_diagnostic_shadow_database_creation_error_is_special_cased_mysql(api: Tes
         dbport = db_url.port().unwrap_or(3306),
     );
 
-    let migrations_list = list_migrations(&directory.into_path()).unwrap();
+    let migrations_list = list_migrations(&directory.keep()).unwrap();
 
     let err = tok(async {
         let migration_api = schema_api(Some(datamodel), None).unwrap();
@@ -662,7 +662,7 @@ fn dev_diagnostic_shadow_database_creation_error_is_special_cased_postgres(api: 
         dbport = db_url.port().unwrap(),
     );
 
-    let migrations_list = list_migrations(&directory.into_path()).unwrap();
+    let migrations_list = list_migrations(&directory.keep()).unwrap();
 
     let err = tok(async move {
         let migration_api = schema_api(Some(datamodel), None).unwrap();
@@ -824,7 +824,7 @@ ALTER TABLE "prisma-tests".profiles ADD CONSTRAINT profiles_id_fkey FOREIGN KEY 
     }))
     .unwrap();
 
-    let migrations_list = list_migrations(&tempdir.into_path()).unwrap();
+    let migrations_list = list_migrations(&tempdir.keep()).unwrap();
 
     tok(api.dev_diagnostic(DevDiagnosticInput { migrations_list })).unwrap();
 }
