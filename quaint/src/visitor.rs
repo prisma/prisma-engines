@@ -635,7 +635,7 @@ pub trait Visitor<'a> {
                 }
                 None => self.write("*")?,
             },
-            ExpressionKind::Default => self.write("DEFAULT")?,
+            ExpressionKind::Default => self.visit_default_value()?,
         }
 
         if let Some(alias) = value.alias {
@@ -1259,5 +1259,9 @@ pub trait Visitor<'a> {
 
     fn visit_comment(&mut self, comment: Cow<'a, str>) -> Result {
         self.surround_with("/* ", " */", |ref mut s| s.write(comment))
+    }
+
+    fn visit_default_value(&mut self) -> Result {
+        self.write("DEFAULT")
     }
 }

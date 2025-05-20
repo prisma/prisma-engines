@@ -72,10 +72,7 @@ pub fn create_records_nonempty(
                         row.push(field.value(value, ctx).into());
                     }
                     // We can't use `DEFAULT` for SQLite so we provided an explicit `NULL` instead.
-                    None if (!field.is_required() && field.default_value().is_none())
-                        || (field.is_required()
-                            && field.default_value().is_some_and(|default| default.is_autoincrement())) =>
-                    {
+                    None if !field.is_required() && field.default_value().is_none() => {
                         row.push(Value::null_int32().raw().into())
                     }
                     None => row.push(default_value()),

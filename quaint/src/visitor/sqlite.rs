@@ -566,6 +566,12 @@ impl<'a> Visitor<'a> for Sqlite<'a> {
 
         Ok(())
     }
+
+    fn visit_default_value(&mut self) -> visitor::Result {
+        // SQLite does not support the DEFAULT keyword, in case of db-generated values it expects
+        // them to be NULL or omitted
+        self.write("NULL")
+    }
 }
 
 #[cfg(test)]
