@@ -1,0 +1,45 @@
+{
+  "modelName": "Item",
+  "action": "aggregate",
+  "query": {
+    "arguments": {
+      "take": 2
+    },
+    "selection": {
+      "_count": {
+        "arguments": null,
+        "selection": {
+          "_all": true
+        }
+      },
+      "_sum": {
+        "arguments": null,
+        "selection": {
+          "float": true,
+          "int": true
+        }
+      },
+      "_avg": {
+        "arguments": null,
+        "selection": {
+          "float": true,
+          "int": true
+        }
+      },
+      "_min": {
+        "arguments": null,
+        "selection": {
+          "float": true,
+          "int": true
+        }
+      },
+      "_max": {
+        "arguments": null,
+        "selection": {
+          "float": true,
+          "int": true
+        }
+      }
+    }
+  }
+}
