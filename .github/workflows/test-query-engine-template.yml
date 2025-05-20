@@ -48,7 +48,6 @@ jobs:
       PRISMA_ENGINE_PROTOCOL: ${{ matrix.engine_protocol }}
       PRISMA_RELATION_LOAD_STRATEGY: ${{ matrix.relation_load_strategy }}
       WORKSPACE_ROOT: ${{ github.workspace }}
-      RAMDISK: '/mnt/prisma-test-ramdisk'
 
     runs-on: 'ubuntu-${{ inputs.ubuntu }}'
     steps:
@@ -56,8 +55,6 @@ jobs:
 
       - name: Create ramdisk
         uses: ./.github/workflows/include/setup-ramdisk
-        with:
-          mount-path: ${{ env.RAMDISK }}
 
       - uses: actions-rust-lang/setup-rust-toolchain@v1
         with:
