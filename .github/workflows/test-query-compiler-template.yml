@@ -37,7 +37,6 @@ jobs:
       SIMPLE_TEST_MODE: '1'
       QUERY_BATCH_SIZE: '10'
       WASM_BUILD_PROFILE: 'profiling' # Include debug info for proper backtraces
-      RAMDISK: '/mnt/prisma-test-ramdisk'
       WORKSPACE_ROOT: ${{ github.workspace }}
       IGNORED_TESTS: ${{ inputs.ignored_tests_list }}
       SHOULD_FAIL_TESTS: ${{ inputs.should_fail_tests_list }}
@@ -51,8 +50,6 @@ jobs:
 
       - name: Create ramdisk
         uses: ./.github/workflows/include/setup-ramdisk
-        with:
-          mount-path: ${{ env.RAMDISK }}
 
       - name: 'Setup Node.js'
         uses: actions/setup-node@v4
