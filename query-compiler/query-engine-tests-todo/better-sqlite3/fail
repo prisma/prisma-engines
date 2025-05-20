@@ -17,9 +17,6 @@ queries::aggregation::group_by_having::aggr_group_by_having::having_min_scalar_f
 queries::aggregation::group_by_having::aggr_group_by_having::having_sum_scalar_filter
 queries::aggregation::group_by_having::aggr_group_by_having::having_without_aggr_sel
 queries::batching::select_one_compound::compound_batch::two_success_sel_set_reorder
-queries::batching::select_one_singular::singular_batch::relation_traversal
-queries::batching::select_one_singular::singular_batch::relation_traversal_filtered
-queries::batching::select_one_singular::singular_batch::relation_traversal_filtered_diff
 queries::batching::select_one_singular::singular_batch::repro_16548
 queries::batching::select_one_singular::singular_batch::two_success_one_fail
 queries::batching::transactional_batch::transactional::batch_request_idx
@@ -30,7 +27,6 @@ queries::chunking::chunking::order_by_aggregation_should_fail
 queries::data_types::enum_type::enum_type::read_one_invalid_sqlite
 queries::data_types::json::json::dollar_type_in_json_protocol
 queries::data_types::json::json::nested_dollar_type_in_json_protocol
-queries::data_types::through_relation::scalar_relations::common_types
 queries::filters::self_relation_regression::sr_regression::all_categories
 raw::sql::typed_output::typed_output::all_scalars_sqlite
 writes::nested_mutations::already_converted::nested_connect_inside_create::connect_inside_create::pm_to_c1_fail_if_wrong_id

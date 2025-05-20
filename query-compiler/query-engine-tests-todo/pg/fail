@@ -28,9 +28,6 @@ new::relation_load_strategy::relation_load_strategy::test_update_lateral_join
 new::relation_load_strategy::relation_load_strategy::test_upsert_lateral_join
 queries::aggregation::group_by::aggregation_group_by::group_by_ordering_sum_aggregation
 queries::batching::select_one_compound::compound_batch::two_success_sel_set_reorder
-queries::batching::select_one_singular::singular_batch::relation_traversal
-queries::batching::select_one_singular::singular_batch::relation_traversal_filtered
-queries::batching::select_one_singular::singular_batch::relation_traversal_filtered_diff
 queries::batching::select_one_singular::singular_batch::repro_16548
 queries::batching::select_one_singular::singular_batch::two_success_one_fail
 queries::batching::transactional_batch::transactional::batch_request_idx
@@ -44,10 +41,8 @@ queries::data_types::json::json::json_list
 queries::data_types::json::json::nested_dollar_type_in_json_protocol
 queries::data_types::native::postgres::postgres_datetime::dt_native
 queries::data_types::native::postgres::postgres_others::native_other_types
-queries::data_types::through_relation::scalar_relations::common_types
 queries::filters::json_filters::json_filters::multi_filtering
 queries::filters::self_relation_regression::sr_regression::all_categories
-queries::simple::m2m::m2m::repro_16390
 raw::sql::errors::raw_errors::list_param_for_scalar_column_should_not_panic_pg_js
 raw::sql::scalar_list::scalar_list::null_native_type_lists
 raw::sql::scalar_list::scalar_list::null_scalar_lists
