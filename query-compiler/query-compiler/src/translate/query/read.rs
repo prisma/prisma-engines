@@ -10,38 +10,45 @@ use query_core::{
     QueryOptions, ReadQuery, RelatedRecordsQuery,
 };
 use query_structure::{
-    ConditionValue, FieldSelection, Filter, PrismaValue, QueryArguments, QueryMode, ScalarCondition, ScalarFilter,
-    ScalarProjection, Take,
+    ConditionValue, FieldSelection, Filter, PrismaValue, QueryArguments, QueryMode, RelationLoadStrategy,
+    ScalarCondition, ScalarFilter, ScalarProjection, Take,
 };
 use std::slice;
 
 pub(crate) fn translate_read_query(query: ReadQuery, builder: &dyn QueryBuilder) -> TranslateResult<Expression> {
     Ok(match query {
         ReadQuery::RecordQuery(rq) => {
-            let selected_fields = rq.selected_fields.without_relations().into_virtuals_last();
+            let selected_fields = match rq.relation_load_strategy {
+                RelationLoadStrategy::Join => rq.selected_fields.into_virtuals_last(),
+                RelationLoadStrategy::Query => rq.selected_fields.without_relations().into_virtuals_last(),
+            };
 
             let args = QueryArguments::from((
                 rq.model.clone(),
                 rq.filter.expect("ReadOne query should always have filter set"),
             ))
             .with_take(Take::One);
+
             let query = builder
-                .build_get_records(&rq.model, args, &selected_fields)
+                .build_get_records(&rq.model, args, &selected_fields, rq.relation_load_strategy)
                 .map_err(TranslateError::QueryBuildFailure)?;
 
             let expr = Expression::Query(query);
             let expr = convert_options_to_validation(expr, rq.options);
             let expr = Expression::Unique(Box::new(expr));
 
-            if rq.nested.is_empty() {
-                expr
-            } else {
-                add_inmemory_join(expr, rq.nested, builder)?
+            match rq.relation_load_strategy {
+                RelationLoadStrategy::Query if !rq.nested.is_empty() => add_inmemory_join(expr, rq.nested, builder)?,
+                _ => expr,
             }
         }
 
         ReadQuery::ManyRecordsQuery(mut mrq) => {
-            let selected_fields = mrq.selected_fields.without_relations().into_virtuals_last();
+            let selected_fields = match mrq.relation_load_strategy {
+                RelationLoadStrategy::Join => mrq.selected_fields.into_virtuals_last(),
+                RelationLoadStrategy::Query => mrq.selected_fields.without_relations().into_virtuals_last(),
+            };
+
             let needs_reversed_order = mrq.args.needs_reversed_order();
             let take = mrq.args.take;
 
@@ -56,7 +63,7 @@ pub(crate) fn translate_read_query(query: ReadQuery, builder: &dyn QueryBuilder)
 
             // TODO: we ignore chunking for now
             let query = builder
-                .build_get_records(&mrq.model, mrq.args, &selected_fields)
+                .build_get_records(&mrq.model, mrq.args, &selected_fields, mrq.relation_load_strategy)
                 .map_err(TranslateError::QueryBuildFailure)?;
 
             let mut expr = Expression::Query(query);
@@ -81,9 +88,9 @@ pub(crate) fn translate_read_query(query: ReadQuery, builder: &dyn QueryBuilder)
 
             expr = convert_options_to_validation(expr, mrq.options);
 
-            if !mrq.nested.is_empty() {
+            if mrq.relation_load_strategy == RelationLoadStrategy::Query && !mrq.nested.is_empty() {
                 expr = add_inmemory_join(expr, mrq.nested, builder)?;
-            };
+            }
 
             match take {
                 Take::One => Expression::Unique(Box::new(expr)),
@@ -319,7 +326,12 @@ fn build_read_one2m_query(
     args.filter = Some(Filter::And(filters));
 
     let query = builder
-        .build_get_records(&field.related_model(), args, selected_fields)
+        .build_get_records(
+            &field.related_model(),
+            args,
+            selected_fields,
+            RelationLoadStrategy::Query,
+        )
         .map_err(TranslateError::QueryBuildFailure)?;
 
     let expr = Expression::Query(query);

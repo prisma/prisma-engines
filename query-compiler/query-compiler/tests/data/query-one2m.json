@@ -3,6 +3,7 @@
   "action": "findUnique",
   "query": {
     "arguments": {
+      "relationLoadStrategy": "query",
       "where": {
         "id": 1
       }

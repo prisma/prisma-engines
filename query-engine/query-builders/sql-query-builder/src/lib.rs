@@ -29,7 +29,7 @@ use quaint::{
 use query_builder::{DbQuery, QueryBuilder};
 use query_structure::{
     AggregationSelection, FieldSelection, Filter, Model, ModelProjection, QueryArguments, RecordFilter, RelationField,
-    ScalarField, SelectionResult, WriteArgs,
+    RelationLoadStrategy, ScalarField, SelectionResult, WriteArgs,
 };
 
 pub use column_metadata::ColumnMetadata;
@@ -82,16 +82,25 @@ impl<'a, V: Visitor<'a>> QueryBuilder for SqlQueryBuilder<'a, V> {
         model: &Model,
         query_arguments: QueryArguments,
         selected_fields: &FieldSelection,
+        relation_load_strategy: RelationLoadStrategy,
     ) -> Result<DbQuery, Box<dyn std::error::Error + Send + Sync>> {
-        let query = read::get_records(
-            model,
-            ModelProjection::from(selected_fields)
-                .as_columns(&self.context)
-                .mark_all_selected(),
-            selected_fields.virtuals(),
-            query_arguments,
-            &self.context,
-        );
+        let query = match relation_load_strategy {
+            RelationLoadStrategy::Join => {
+                #[cfg(not(feature = "relation_joins"))]
+                unreachable!();
+                #[cfg(feature = "relation_joins")]
+                select::SelectBuilder::build(query_arguments, selected_fields, &self.context)
+            }
+            RelationLoadStrategy::Query => read::get_records(
+                model,
+                ModelProjection::from(selected_fields)
+                    .as_columns(&self.context)
+                    .mark_all_selected(),
+                selected_fields.virtuals(),
+                query_arguments,
+                &self.context,
+            ),
+        };
         self.convert_query(query)
     }
 

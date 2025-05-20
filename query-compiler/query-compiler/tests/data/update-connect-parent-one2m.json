@@ -3,6 +3,7 @@
   "action": "updateOne",
   "query": {
     "arguments": {
+      "relationLoadStrategy": "query",
       "where": { "id": 1 },
       "data": { "manager": { "connect": { "id": 2 } } }
     },

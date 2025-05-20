@@ -1,0 +1,15 @@
+---
+source: query-compiler/query-compiler/tests/queries.rs
+expression: pretty
+input_file: query-compiler/query-compiler/tests/data/aggregate-join-lateral.json
+---
+dataMap
+   email: String [email]
+   _count: 
+      activations (flattened): Int [_aggr_count_activations]
+query «SELECT "t0"."id", "t0"."email", JSONB_BUILD_OBJECT('activations',
+       COALESCE("t1"."_aggr_count_activations", 0)) AS "_count" FROM
+       "public"."User" AS "t0" LEFT JOIN LATERAL (SELECT COUNT(*) AS
+       "_aggr_count_activations" FROM "public"."Activation" AS "t2" WHERE
+       "t0"."id" = "t2"."userId") AS "t1" ON true»
+params []

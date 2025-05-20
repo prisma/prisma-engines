@@ -66,6 +66,7 @@ const workerPool = new (class WorkerPool {
     newWorker.on('exit', (code) => {
       console.error(`Worker exited with code ${code}`)
       this.#notifyDestroyed(newWorker)
+      newWorker.removeAllListeners('error')
     })
 
     return newWorker
@@ -73,6 +74,7 @@ const workerPool = new (class WorkerPool {
 
   releaseWorker(worker: Worker): void {
     this.#freeWorkers.push(worker)
+    worker.removeAllListeners('error')
   }
 
   #notifyDestroyed(worker: Worker): void {

@@ -2,7 +2,9 @@
   "modelName": "Post",
   "action": "findMany",
   "query": {
-    "arguments": {},
+    "arguments": {
+      "relationLoadStrategy": "query"
+    },
     "selection": {
       "$scalars": true,
       "categories": {

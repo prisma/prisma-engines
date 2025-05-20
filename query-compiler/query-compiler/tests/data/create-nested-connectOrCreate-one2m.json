@@ -3,6 +3,7 @@
   "action": "createOne",
   "query": {
     "arguments": {
+      "relationLoadStrategy": "query",
       "data": {
         "title": "How to get rich quick and not go to jail",
         "user": {

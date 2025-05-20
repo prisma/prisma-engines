@@ -138,8 +138,11 @@ async function dispatchMessage(msg: Message): Promise<unknown> {
       return rollbackTransaction(msg.params.txId, unwrapState())
     case 'teardown':
       return teardown(unwrapState())
-    case 'getLogs':
-      return logs
+    case 'getLogs': {
+      const clonedLogs = [...logs]
+      logs.length = 0
+      return clonedLogs
+    }
     default:
       assertNever(
         msg,
@@ -189,6 +192,8 @@ async function initializeSchema(
     driverAdapter: adapter,
     transactionManager,
   }
+
+  logs.length = 0
 
   if (adapter.getConnectionInfo) {
     return adapter.getConnectionInfo()

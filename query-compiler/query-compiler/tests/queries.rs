@@ -11,6 +11,9 @@ use std::{fs, process::Command, sync::Arc};
 #[test]
 fn queries() {
     insta::glob!("data/*.json", |path| {
+        let test_name = path.file_name().unwrap().to_str().unwrap();
+        println!("running: {test_name}");
+
         let schema_string = include_str!("data/schema.prisma");
         let schema = psl::validate(schema_string.into());
 
@@ -38,6 +41,7 @@ fn queries() {
         let (graph, _serializer) = QueryGraphBuilder::new(&query_schema)
             .without_eager_default_evaluation()
             .build(query)
+            .map_err(|err| format!("{test_name} failed: {err}"))
             .unwrap();
 
         let dot = graph.to_graphviz();
