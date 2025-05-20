@@ -8,12 +8,6 @@ new::interactive_tx::interactive_tx::rollback_after_commit
 new::interactive_tx::interactive_tx::tx_expiration_cycle
 new::interactive_tx::interactive_tx::tx_expiration_failure_cycle
 new::occ::occ::occ_update_many_test
-new::ref_actions::on_update::cascade::one2one_opt::update_parent_cascade
-new::ref_actions::on_update::cascade::one2one_req::update_parent_cascade
-new::ref_actions::on_update::restrict::one2many_opt::update_parent
-new::ref_actions::on_update::restrict::one2many_req::update_parent
-new::ref_actions::on_update::set_null::one2many_opt::update_many_parent
-new::ref_actions::on_update::set_null::one2one_opt::update_many_parent
 new::regressions::max_integer::max_integer::unfitted_int_should_fail
 new::regressions::max_integer::max_integer::unfitted_int_should_fail_pg_js
 new::regressions::prisma_11750::prisma_11750::test_itx_concurrent_updates_multi_thread

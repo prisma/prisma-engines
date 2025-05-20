@@ -9,7 +9,7 @@ use query_structure::{AggregationSelection, FieldSelection, PrismaValueType, Sel
 use std::collections::HashMap;
 
 pub fn map_result_structure(graph: &QueryGraph) -> Option<ResultNode> {
-    for idx in graph.result_nodes().chain(graph.root_nodes()) {
+    for idx in graph.result_nodes().chain(graph.leaf_nodes()) {
         let node = graph.node_content(&idx);
         if let Some(Node::Query(query)) = node {
             return map_query(query);
