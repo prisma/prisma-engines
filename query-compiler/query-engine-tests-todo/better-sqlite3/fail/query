@@ -34,9 +34,7 @@ writes::nested_mutations::already_converted::nested_connect_inside_create::conne
 writes::nested_mutations::already_converted::nested_connect_inside_update::connect_inside_update::p1_c1req_rel_child_idempotent
 writes::nested_mutations::not_using_schema_base::nested_connect_or_create::connect_or_create::one2m_connect_or_create
 writes::nested_mutations::not_using_schema_base::nested_connect_or_create::connect_or_create::one_req_2m_connect_or_create
-writes::top_level_mutations::create_many::create_many::basic_create_many_autoincrement
 writes::top_level_mutations::create_many::create_many::create_many_by_shape
-writes::top_level_mutations::create_many_and_return::create_many_and_return::basic_create_many_autoincrement
 writes::top_level_mutations::create_many_and_return::create_many_and_return::create_many_11_inline_rel_read_works
 writes::top_level_mutations::create_many_and_return::create_many_and_return::create_many_1m_inline_rel_read_works
 writes::top_level_mutations::create_many_and_return::create_many_and_return::create_many_by_shape
