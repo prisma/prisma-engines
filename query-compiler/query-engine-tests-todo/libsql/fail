@@ -8,7 +8,6 @@ new::interactive_tx::interactive_tx::rollback_after_commit
 new::interactive_tx::interactive_tx::tx_expiration_cycle
 new::interactive_tx::interactive_tx::tx_expiration_failure_cycle
 new::regressions::max_integer::max_integer::unfitted_int_should_fail
-new::regressions::prisma_12572::prisma_12572::all_generated_timestamps_are_the_same
 new::regressions::prisma_15204::conversion_error::convert_to_bigint_sqlite_js
 new::regressions::prisma_15204::conversion_error::convert_to_int_sqlite_js
 new::regressions::prisma_22971::prisma_22971::test_22971

@@ -75,7 +75,7 @@ impl DefaultKind {
             DefaultKind::Single(ref v) => Some(v.clone()),
             DefaultKind::Expression(g) if g.is_dbgenerated() || g.is_autoincrement() => None,
             DefaultKind::Expression(g) => Some(PrismaValue::GeneratorCall {
-                name: g.name.clone(),
+                name: g.name.clone().into(),
                 args: g.args.clone(),
                 return_type: g.return_type().unwrap_or(PrismaValueType::Any),
             }),

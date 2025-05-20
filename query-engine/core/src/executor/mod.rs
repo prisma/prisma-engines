@@ -13,7 +13,7 @@ mod request_context;
 
 pub use self::{execute_operation::*, interpreting_executor::InterpretingExecutor};
 
-pub(crate) use request_context::*;
+pub use request_context::*;
 pub use telemetry::TraceParent;
 
 use crate::{

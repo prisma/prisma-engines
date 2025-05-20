@@ -11,7 +11,7 @@ use serde::de::Unexpected;
 use serde::ser::SerializeMap;
 use serde::{ser::Serializer, Deserialize, Deserializer, Serialize};
 use serde_json::json;
-use std::{convert::TryFrom, fmt, str::FromStr};
+use std::{borrow::Cow, convert::TryFrom, fmt, str::FromStr};
 use uuid::Uuid;
 
 pub use error::ConversionFailure;
@@ -56,7 +56,7 @@ pub enum PrismaValue {
 
     #[serde(serialize_with = "serialize_generator_call")]
     GeneratorCall {
-        name: String,
+        name: Cow<'static, str>,
         args: Vec<Self>,
         return_type: PrismaValueType,
     },
@@ -428,6 +428,14 @@ impl PrismaValue {
 
     pub fn placeholder(name: String, r#type: PrismaValueType) -> PrismaValue {
         PrismaValue::Placeholder(Placeholder { name, r#type })
+    }
+
+    pub fn generator_now() -> PrismaValue {
+        PrismaValue::GeneratorCall {
+            name: "now".into(),
+            args: vec![],
+            return_type: PrismaValueType::Date,
+        }
     }
 
     pub fn as_boolean(&self) -> Option<&bool> {

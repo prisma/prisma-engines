@@ -13,7 +13,7 @@ pub mod response_ir;
 
 pub use self::{
     error::{CoreError, ExtendedUserFacingError, FieldConversionError},
-    executor::{QueryExecutor, TransactionOptions},
+    executor::{with_sync_unevaluated_request_context, QueryExecutor, TransactionOptions},
     interactive_transactions::{TransactionError, TxId},
     query_ast::*,
     query_document::*,
