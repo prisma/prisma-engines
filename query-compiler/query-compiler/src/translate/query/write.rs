@@ -8,6 +8,8 @@ use query_structure::{QueryArguments, RelationLoadStrategy, Take};
 
 use crate::{TranslateError, expression::Expression, translate::TranslateResult};
 
+use super::read::add_inmemory_join;
+
 pub(crate) fn translate_write_query(query: WriteQuery, builder: &dyn QueryBuilder) -> TranslateResult<Expression> {
     Ok(match query {
         WriteQuery::CreateRecord(cr) => {
@@ -25,14 +27,18 @@ pub(crate) fn translate_write_query(query: WriteQuery, builder: &dyn QueryBuilde
 
         WriteQuery::CreateManyRecords(cmr) => {
             if let Some(selected_fields) = cmr.selected_fields {
-                Expression::Concat(
+                let mut expr = Expression::Concat(
                     builder
                         .build_inserts(&cmr.model, cmr.args, cmr.skip_duplicates, Some(&selected_fields.fields))
                         .map_err(TranslateError::QueryBuildFailure)?
                         .into_iter()
                         .map(Expression::Query)
                         .collect::<Vec<_>>(),
-                )
+                );
+                if !selected_fields.nested.is_empty() {
+                    expr = add_inmemory_join(expr, selected_fields.nested, builder)?;
+                }
+                expr
             } else {
                 Expression::Sum(
                     builder
@@ -64,8 +70,13 @@ pub(crate) fn translate_write_query(query: WriteQuery, builder: &dyn QueryBuilde
                     Expression::Execute
                 })
                 .collect::<Vec<_>>();
-            if projection.is_some() {
-                Expression::Concat(updates)
+
+            if let Some(selected_fields) = selected_fields {
+                let mut expr = Expression::Concat(updates);
+                if !selected_fields.nested.is_empty() {
+                    expr = add_inmemory_join(expr, selected_fields.nested, builder)?;
+                }
+                expr
             } else {
                 Expression::Sum(updates)
             }
