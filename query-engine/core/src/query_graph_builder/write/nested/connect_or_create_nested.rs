@@ -539,7 +539,7 @@ fn one_to_one_inlined_parent(
     let parent_link = parent_relation_field.linking_fields();
     let child_link = parent_relation_field.related_field().linking_fields();
 
-    let read_node = graph.create_node(utils::read_ids_infallible(
+    let read_node = graph.create_node(utils::read_id_infallible(
         child_model.clone(),
         child_link.clone(),
         filter,
@@ -741,7 +741,7 @@ fn one_to_one_inlined_child(
     let child_link = parent_relation_field.related_field().linking_fields();
     let child_relation_field = parent_relation_field.related_field();
 
-    let read_new_child_node = graph.create_node(utils::read_ids_infallible(
+    let read_new_child_node = graph.create_node(utils::read_id_infallible(
         child_model.clone(),
         child_link.clone(),
         filter,
