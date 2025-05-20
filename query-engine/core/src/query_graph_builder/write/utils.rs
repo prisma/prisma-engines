@@ -2,8 +2,8 @@ use crate::{
     inputs::{IfInput, LeftSideDiffInput, ReturnInput, RightSideDiffInput},
     query_ast::*,
     query_graph::{Flow, Node, NodeRef, QueryGraph, QueryGraphDependency},
-    Computation, DataExpectation, DataOperation, DataSink, MissingRelatedRecord, ParsedInputValue,
-    QueryGraphBuilderResult, RelationViolation,
+    Computation, DataExpectation, DataOperation, MissingRelatedRecord, ParsedInputValue, QueryGraphBuilderResult,
+    RelationViolation, RowSink,
 };
 use indexmap::IndexMap;
 use psl::parser_database::ReferentialAction;
@@ -180,7 +180,7 @@ pub fn insert_1to1_idempotent_connect_checks(
         &diff_node,
         QueryGraphDependency::ProjectedDataSinkDependency(
             child_model_identifier.clone(),
-            DataSink::AllRows(&LeftSideDiffInput),
+            RowSink::AllRows(&LeftSideDiffInput),
             Some(DataExpectation::non_empty_rows(
                 MissingRelatedRecord::builder()
                     .model(&child_model.clone())
@@ -198,7 +198,7 @@ pub fn insert_1to1_idempotent_connect_checks(
         &diff_node,
         QueryGraphDependency::ProjectedDataSinkDependency(
             child_model_identifier.clone(),
-            DataSink::AllRows(&RightSideDiffInput),
+            RowSink::AllRows(&RightSideDiffInput),
             None,
         ),
     )?;
@@ -207,7 +207,7 @@ pub fn insert_1to1_idempotent_connect_checks(
     graph.create_edge(
         &diff_node,
         &if_node,
-        QueryGraphDependency::ProjectedDataSinkDependency(child_model_identifier, DataSink::AllRows(&IfInput), None),
+        QueryGraphDependency::ProjectedDataSinkDependency(child_model_identifier, RowSink::AllRows(&IfInput), None),
     )?;
     let empty_node = graph.create_node(Node::Empty);
 
@@ -305,7 +305,7 @@ pub fn insert_existing_1to1_related_model_checks(
         &if_node,
         QueryGraphDependency::ProjectedDataSinkDependency(
             child_model_identifier.clone(),
-            DataSink::AllRows(&IfInput),
+            RowSink::AllRows(&IfInput),
             // If the other side ("child") requires the connection, we need to make sure that there isn't a child already connected
             // to the parent, as that would violate the other childs relation side.
             if child_side_required {
@@ -945,7 +945,7 @@ pub fn insert_emulated_on_update_with_intermediary_node(
         &join_node,
         QueryGraphDependency::ProjectedDataSinkDependency(
             model_to_update.primary_identifier(),
-            DataSink::AllRows(&ReturnInput),
+            RowSink::AllRows(&ReturnInput),
             None,
         ),
     )?;

@@ -5,7 +5,7 @@ use crate::{
     query_graph::{NodeRef, QueryGraph, QueryGraphDependency},
     ParsedInputValue,
 };
-use crate::{DataExpectation, DataSink};
+use crate::{DataExpectation, RowSink};
 use query_structure::{Filter, Model, RelationFieldRef};
 use schema::constants::args;
 use std::convert::TryInto;
@@ -97,7 +97,7 @@ pub fn nested_update(
             &update_node,
             QueryGraphDependency::ProjectedDataSinkDependency(
                 child_model_identifier.clone(),
-                DataSink::SingleRowArray(&UpdateRecordFilterInput),
+                RowSink::SingleRowArray(&UpdateRecordFilterInput),
                 Some(DataExpectation::non_empty_rows(
                     MissingRelatedRecord::builder()
                         .model(child_model)
@@ -153,7 +153,7 @@ pub fn nested_update_many(
             &update_many_node,
             QueryGraphDependency::ProjectedDataSinkDependency(
                 child_model_identifier.clone(),
-                DataSink::AllRows(&UpdateManyRecordsFilterInput),
+                RowSink::AllRows(&UpdateManyRecordsFilterInput),
                 None,
             ),
         )?;

@@ -108,7 +108,7 @@ impl Display for QueryGraphDependency {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             Self::ExecutionOrder => write!(f, "ExecutionOrder"),
-            Self::DataDependency(_) => write!(f, "ParentResult"),
+            Self::DataDependency(_, _) => write!(f, "ParentResult"),
             Self::ProjectedDataDependency(selection, _, _) => {
                 write!(
                     f,

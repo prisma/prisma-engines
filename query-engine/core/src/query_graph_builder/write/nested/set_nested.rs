@@ -241,7 +241,7 @@ fn handle_one_to_many(
         &diff_left_to_right_node,
         QueryGraphDependency::ProjectedDataSinkDependency(
             child_model_identifier.clone(),
-            DataSink::AllRows(&LeftSideDiffInput),
+            RowSink::AllRows(&LeftSideDiffInput),
             None,
         ),
     )?;
@@ -250,7 +250,7 @@ fn handle_one_to_many(
         &diff_right_to_left_node,
         QueryGraphDependency::ProjectedDataSinkDependency(
             child_model_identifier.clone(),
-            DataSink::AllRows(&LeftSideDiffInput),
+            RowSink::AllRows(&LeftSideDiffInput),
             None,
         ),
     )?;
@@ -261,7 +261,7 @@ fn handle_one_to_many(
         &diff_left_to_right_node,
         QueryGraphDependency::ProjectedDataSinkDependency(
             child_model_identifier.clone(),
-            DataSink::AllRows(&RightSideDiffInput),
+            RowSink::AllRows(&RightSideDiffInput),
             None,
         ),
     )?;
@@ -270,7 +270,7 @@ fn handle_one_to_many(
         &diff_right_to_left_node,
         QueryGraphDependency::ProjectedDataSinkDependency(
             child_model_identifier.clone(),
-            DataSink::AllRows(&RightSideDiffInput),
+            RowSink::AllRows(&RightSideDiffInput),
             None,
         ),
     )?;
@@ -284,7 +284,7 @@ fn handle_one_to_many(
         &connect_if_node,
         QueryGraphDependency::ProjectedDataSinkDependency(
             child_model_identifier.clone(),
-            DataSink::AllRows(&IfInput),
+            RowSink::AllRows(&IfInput),
             None,
         ),
     )?;
@@ -343,7 +343,7 @@ fn handle_one_to_many(
         &disconnect_if_node,
         QueryGraphDependency::ProjectedDataSinkDependency(
             child_model_identifier.clone(),
-            DataSink::AllRows(&IfInput),
+            RowSink::AllRows(&IfInput),
             child_side_required.then(|| DataExpectation::empty_rows(RelationViolation::from(rf))),
         ),
     )?;

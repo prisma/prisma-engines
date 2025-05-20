@@ -146,9 +146,6 @@ impl EdgeRef {
 pub(crate) type ProjectedDataDependencyFn =
     Box<dyn FnOnce(Node, Vec<SelectionResult>) -> QueryGraphBuilderResult<Node> + Send + Sync + 'static>;
 
-pub(crate) type DataDependencyFn =
-    Box<dyn FnOnce(Node, &ExpressionResult) -> QueryGraphBuilderResult<Node> + Send + Sync + 'static>;
-
 /// Stored on the edges of the QueryGraph, a QueryGraphDependency contains information on how children are connected to their parents,
 /// expressing for example the need for additional information from the parent to be able to execute at runtime.
 pub enum QueryGraphDependency {
@@ -156,7 +153,7 @@ pub enum QueryGraphDependency {
     ExecutionOrder,
 
     /// Performs a transformation on the target node based on the source node result..
-    DataDependency(DataDependencyFn),
+    DataDependency(RowCountSink, Option<DataExpectation>),
 
     /// More specialized version of `DataDependency` with more guarantees and side effects.
     ///
@@ -169,7 +166,7 @@ pub enum QueryGraphDependency {
     /// See `insert_reloads` for more information.
     ProjectedDataDependency(FieldSelection, ProjectedDataDependencyFn, Option<DataExpectation>), // [Composites] todo rename
 
-    ProjectedDataSinkDependency(FieldSelection, DataSink, Option<DataExpectation>),
+    ProjectedDataSinkDependency(FieldSelection, RowSink, Option<DataExpectation>),
 
     /// Only valid in the context of a `If` control flow node.
     Then,
@@ -179,10 +176,15 @@ pub enum QueryGraphDependency {
 }
 
 #[derive(Debug)]
-pub enum DataSink {
+pub enum RowSink {
     AllRows(&'static dyn NodeInputField<Vec<SelectionResult>>),
     SingleRow(&'static dyn NodeInputField<SelectionResult>),
     SingleRowArray(&'static dyn NodeInputField<Vec<SelectionResult>>),
+}
+
+#[derive(Debug)]
+pub enum RowCountSink {
+    Discard,
 }
 
 pub trait NodeInputField<R>: Send + Sync + fmt::Debug {
@@ -217,6 +219,13 @@ impl DataExpectation {
         }
     }
 
+    pub fn affected_row_count(expected: usize, error: impl DataDependencyError + 'static) -> Self {
+        Self {
+            rules: smallvec![DataRule::AffectedRowCountEq(expected)],
+            error: Box::new(error),
+        }
+    }
+
     pub fn rules(&self) -> &[DataRule] {
         &self.rules
     }
@@ -225,10 +234,10 @@ impl DataExpectation {
         &*self.error
     }
 
-    pub fn check(&self, results: &[SelectionResult]) -> Result<(), QueryGraphBuilderError> {
+    pub fn check(&self, result: &ExpressionResult) -> Result<(), QueryGraphBuilderError> {
         for rule in &self.rules {
-            if !rule.matches_data(results) {
-                return Err(self.error.to_runtime_error(results));
+            if !rule.matches_result(result) {
+                return Err(self.error.to_runtime_error(result));
             }
         }
         Ok(())
@@ -243,15 +252,18 @@ pub enum DataRule {
     RowCountEq(usize),
     /// Expect the data dependency to contain a number of rows that is not equal to the given value.
     RowCountNeq(usize),
+    /// Expect the data dependency to result in a specific number of affected rows.
+    AffectedRowCountEq(usize),
     /// Expect the edge to not be taken and never match any data.
     Never,
 }
 
 impl DataRule {
-    pub fn matches_data(&self, results: &[SelectionResult]) -> bool {
+    pub fn matches_result(&self, result: &ExpressionResult) -> bool {
         match self {
-            Self::RowCountEq(expected) => results.len() == *expected,
-            Self::RowCountNeq(expected) => results.len() != *expected,
+            Self::RowCountEq(expected) => result.returned_row_count().is_some_and(|count| count == *expected),
+            Self::RowCountNeq(expected) => result.returned_row_count().is_some_and(|count| count != *expected),
+            Self::AffectedRowCountEq(expected) => result.affected_row_count().is_some_and(|count| count == *expected),
             Self::Never => false,
         }
     }
@@ -262,6 +274,7 @@ impl fmt::Display for DataRule {
         match self {
             Self::RowCountEq(expected) => write!(f, "rowCountEq {expected}"),
             Self::RowCountNeq(expected) => write!(f, "rowCountNeq {expected}"),
+            Self::AffectedRowCountEq(expected) => write!(f, "affectedRowCountEq {expected}"),
             Self::Never => write!(f, "never"),
         }
     }
@@ -272,7 +285,7 @@ pub trait DataDependencyError: Send + Sync {
     /// A unique identifier for the error.
     fn id(&self) -> &'static str;
     /// Converts the error into a runtime query engine error.
-    fn to_runtime_error(&self, results: &[SelectionResult]) -> QueryGraphBuilderError;
+    fn to_runtime_error(&self, result: &ExpressionResult) -> QueryGraphBuilderError;
     /// Context with additional information used to provide more context for the error.
     fn context(&self) -> serde_json::Value;
 }

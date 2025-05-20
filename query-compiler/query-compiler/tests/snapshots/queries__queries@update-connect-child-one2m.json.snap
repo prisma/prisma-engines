@@ -22,7 +22,10 @@ transaction
                                ("public"."Employee"."id" = $3 AND 1=1))»
                       params [var(0$id as Int), const(BigInt(2)),
                               const(BigInt(3))])
-         in ();
+         in validate (get 1)
+            [ affectedRowCountEq 2
+            ] orRaise "INCOMPLETE_CONNECT_OUTPUT";
+            ();
       let 3 = let 0 = validate (get 0)
                   [ rowCountNeq 0
                   ] orRaise "MISSING_RECORD";

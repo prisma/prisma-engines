@@ -3,7 +3,7 @@ use crate::{
     inputs::{IfInput, LeftSideDiffInput, ReturnInput, RightSideDiffInput},
     query_ast::*,
     query_graph::{Flow, Node, NodeRef, QueryGraph, QueryGraphDependency},
-    Computation, DataExpectation, DataSink, ParsedInputMap, ParsedInputValue,
+    Computation, DataExpectation, ParsedInputMap, ParsedInputValue, RowSink,
 };
 use query_structure::{Filter, IntoFilter, Model, RelationFieldRef, SelectionResult};
 use schema::constants::args;
@@ -127,7 +127,7 @@ fn handle_many_to_many(
             &if_node,
             QueryGraphDependency::ProjectedDataSinkDependency(
                 child_model.primary_identifier(),
-                DataSink::AllRows(&IfInput),
+                RowSink::AllRows(&IfInput),
                 None,
             ),
         )?;
@@ -280,7 +280,7 @@ fn one_to_many_inlined_child(
             &if_node,
             QueryGraphDependency::ProjectedDataSinkDependency(
                 child_model.primary_identifier(),
-                DataSink::AllRows(&IfInput),
+                RowSink::AllRows(&IfInput),
                 None,
             ),
         )?;
@@ -418,7 +418,7 @@ fn one_to_many_inlined_parent(
         &if_node,
         QueryGraphDependency::ProjectedDataSinkDependency(
             child_model.primary_identifier(),
-            DataSink::AllRows(&IfInput),
+            RowSink::AllRows(&IfInput),
             None,
         ),
     )?;
@@ -446,13 +446,13 @@ fn one_to_many_inlined_parent(
     graph.create_edge(
         &read_node,
         &return_existing,
-        QueryGraphDependency::ProjectedDataSinkDependency(child_link.clone(), DataSink::AllRows(&ReturnInput), None),
+        QueryGraphDependency::ProjectedDataSinkDependency(child_link.clone(), RowSink::AllRows(&ReturnInput), None),
     )?;
 
     graph.create_edge(
         &create_node,
         &return_create,
-        QueryGraphDependency::ProjectedDataSinkDependency(child_link, DataSink::AllRows(&ReturnInput), None),
+        QueryGraphDependency::ProjectedDataSinkDependency(child_link, RowSink::AllRows(&ReturnInput), None),
     )?;
 
     Ok(())
@@ -558,7 +558,7 @@ fn one_to_one_inlined_parent(
         &if_node,
         QueryGraphDependency::ProjectedDataSinkDependency(
             child_model.primary_identifier(),
-            DataSink::AllRows(&IfInput),
+            RowSink::AllRows(&IfInput),
             None,
         ),
     )?;
@@ -577,7 +577,7 @@ fn one_to_one_inlined_parent(
     graph.create_edge(
         &read_node,
         &return_existing,
-        QueryGraphDependency::ProjectedDataSinkDependency(child_link.clone(), DataSink::AllRows(&ReturnInput), None),
+        QueryGraphDependency::ProjectedDataSinkDependency(child_link.clone(), RowSink::AllRows(&ReturnInput), None),
     )?;
 
     // Else branch handling
@@ -585,7 +585,7 @@ fn one_to_one_inlined_parent(
     graph.create_edge(
         &create_node,
         &return_create,
-        QueryGraphDependency::ProjectedDataSinkDependency(child_link.clone(), DataSink::AllRows(&ReturnInput), None),
+        QueryGraphDependency::ProjectedDataSinkDependency(child_link.clone(), RowSink::AllRows(&ReturnInput), None),
     )?;
 
     if utils::node_is_create(graph, &parent_node) {
@@ -759,7 +759,7 @@ fn one_to_one_inlined_child(
         &if_node,
         QueryGraphDependency::ProjectedDataSinkDependency(
             child_model.primary_identifier(),
-            DataSink::AllRows(&IfInput),
+            RowSink::AllRows(&IfInput),
             None,
         ),
     )?;
@@ -875,7 +875,7 @@ fn one_to_one_inlined_child(
             &diff_node,
             QueryGraphDependency::ProjectedDataSinkDependency(
                 child_model_identifier.clone(),
-                DataSink::AllRows(&LeftSideDiffInput),
+                RowSink::AllRows(&LeftSideDiffInput),
                 None,
             ),
         )?;
@@ -886,7 +886,7 @@ fn one_to_one_inlined_child(
             &diff_node,
             QueryGraphDependency::ProjectedDataSinkDependency(
                 child_model_identifier.clone(),
-                DataSink::AllRows(&RightSideDiffInput),
+                RowSink::AllRows(&RightSideDiffInput),
                 None,
             ),
         )?;
@@ -897,7 +897,7 @@ fn one_to_one_inlined_child(
             &if_node,
             QueryGraphDependency::ProjectedDataSinkDependency(
                 child_model_identifier.clone(),
-                DataSink::AllRows(&IfInput),
+                RowSink::AllRows(&IfInput),
                 None,
             ),
         )?;

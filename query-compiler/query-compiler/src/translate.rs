@@ -7,8 +7,8 @@ use itertools::{Either, Itertools};
 use query::translate_query;
 use query_builder::QueryBuilder;
 use query_core::{
-    Computation, DataSink, EdgeRef, Flow, Node, NodeRef, Query, QueryGraph, QueryGraphBuilderError,
-    QueryGraphDependency, QueryGraphError,
+    Computation, EdgeRef, Flow, Node, NodeRef, Query, QueryGraph, QueryGraphBuilderError, QueryGraphDependency,
+    QueryGraphError, RowSink,
 };
 use query_structure::{FieldSelection, Placeholder, PrismaValue, PrismaValueType, SelectedField, SelectionResult};
 use thiserror::Error;
@@ -282,16 +282,16 @@ impl<'a, 'b> NodeTranslator<'a, 'b> {
                     let fields = self.process_edge_selections(edge, &node, selection);
 
                     match sink {
-                        DataSink::AllRows(field) | DataSink::SingleRowArray(field) => {
+                        RowSink::AllRows(field) | RowSink::SingleRowArray(field) => {
                             *field.node_input_field(&mut node) = vec![SelectionResult::new(fields)];
                         }
-                        DataSink::SingleRow(field) => {
+                        RowSink::SingleRow(field) => {
                             *field.node_input_field(&mut node) = SelectionResult::new(fields);
                         }
                     }
                 }
 
-                Some(QueryGraphDependency::DataDependency(_)) => todo!(),
+                Some(QueryGraphDependency::DataDependency(_, _)) => todo!(),
 
                 Some(QueryGraphDependency::ExecutionOrder)
                 | Some(QueryGraphDependency::Then)
@@ -382,6 +382,24 @@ impl<'a, 'b> NodeTranslator<'a, 'b> {
     fn process_child_with_dependencies(&mut self, node: NodeRef) -> TranslateResult<Expression> {
         let create_field_bindings = matches!(self.graph.node_content(&node), Some(Node::Query(_)));
 
+        let validations = self
+            .graph
+            .incoming_edges(&node)
+            .into_iter()
+            .filter_map(|edge| {
+                let Some(QueryGraphDependency::DataDependency(_, expectation)) = self.graph.edge_content(&edge) else {
+                    return None;
+                };
+                let mut expr = Expression::Get {
+                    name: self.graph.edge_source(&edge).id(),
+                };
+                if let Some(expectation) = expectation {
+                    expr = Expression::validate_expectation(expectation, expr);
+                }
+                Some(expr)
+            })
+            .collect_vec();
+
         let bindings = self
             .graph
             .incoming_edges(&node)
@@ -400,7 +418,7 @@ impl<'a, 'b> NodeTranslator<'a, 'b> {
                     edge_content,
                     Some(QueryGraphDependency::ProjectedDataSinkDependency(
                         _,
-                        DataSink::SingleRow(_),
+                        RowSink::SingleRow(_),
                         _
                     ))
                 );
@@ -446,14 +464,20 @@ impl<'a, 'b> NodeTranslator<'a, 'b> {
         let edges = self.graph.incoming_edges(&node);
         let expr = NodeTranslator::new(self.graph, node, &edges, self.query_builder).translate()?;
 
+        if bindings.is_empty() && validations.is_empty() {
+            return Ok(expr);
+        }
+
+        let mut children = validations;
         if !bindings.is_empty() {
-            Ok(Expression::Let {
+            children.push(Expression::Let {
                 bindings,
                 expr: Box::new(expr),
             })
         } else {
-            Ok(expr)
+            children.push(expr);
         }
+        Ok(Expression::Seq(children))
     }
 
     fn process_edge_selections(

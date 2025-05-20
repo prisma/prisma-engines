@@ -3,7 +3,7 @@ use crate::{
     inputs::IfInput,
     query_ast::*,
     query_graph::{Flow, Node, QueryGraph, QueryGraphDependency},
-    DataExpectation, DataSink, ParsedField, ParsedInputMap, ParsedInputValue, ParsedObject,
+    DataExpectation, ParsedField, ParsedInputMap, ParsedInputValue, ParsedObject, RowSink,
 };
 use query_structure::{IntoFilter, Model};
 use schema::QuerySchema;
@@ -123,7 +123,7 @@ pub(crate) fn upsert_record(
     graph.create_edge(
         &read_parent_records_node,
         &if_node,
-        QueryGraphDependency::ProjectedDataSinkDependency(model_id.clone(), DataSink::AllRows(&IfInput), None),
+        QueryGraphDependency::ProjectedDataSinkDependency(model_id.clone(), RowSink::AllRows(&IfInput), None),
     )?;
 
     // In case the connector doesn't support referential integrity, we add a subtree to the graph that emulates the ON_UPDATE referential action.

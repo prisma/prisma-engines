@@ -267,7 +267,7 @@ impl Expressionista {
 
             if let Flow::If { rule, data } = flow {
                 let if_expr = Expression::If {
-                    func: Box::new(move || rule.matches_data(&data)),
+                    func: Box::new(move || rule.matches_result(&ExpressionResult::FixedResult(data))),
                     then: vec![then_expr],
                     else_: else_expr,
                 };
@@ -365,45 +365,53 @@ impl Expressionista {
 
                                     let res = match dependency {
                                         QueryGraphDependency::ProjectedDataDependency(selection, f, expectation) => {
-                                            binding.as_selection_results(&selection).and_then(|parent_selections| {
-                                                if let Some(expectation) = expectation {
-                                                    expectation.check(&parent_selections)?;
-                                                }
-                                                Ok(f(node, parent_selections)?)
-                                            })
+                                            expectation
+                                                .map(|expect| expect.check(binding))
+                                                .transpose()
+                                                .map_err(Into::into)
+                                                .and(binding.as_selection_results(&selection))
+                                                .and_then(|parent_selections| Ok(f(node, parent_selections)?))
                                         }
 
                                         QueryGraphDependency::ProjectedDataSinkDependency(
                                             selection,
-                                            sink,
+                                            consumer,
                                             expectation,
-                                        ) => binding.as_selection_results(&selection).and_then(
-                                            |mut parent_selections| {
-                                                if let Some(expectation) = expectation {
-                                                    expectation.check(&parent_selections)?;
-                                                }
-                                                match sink {
-                                                    DataSink::AllRows(field) => {
+                                        ) => expectation
+                                            .map(|expect| expect.check(binding))
+                                            .transpose()
+                                            .map_err(Into::into)
+                                            .and(binding.as_selection_results(&selection))
+                                            .map(|mut parent_selections| {
+                                                match consumer {
+                                                    RowSink::AllRows(field) => {
                                                         *field.node_input_field(&mut node) = parent_selections
                                                     }
-                                                    DataSink::SingleRow(field) => {
+                                                    RowSink::SingleRow(field) => {
                                                         let row = parent_selections.pop().expect(
                                                             "parent selection should be present after validation",
                                                         );
                                                         *field.node_input_field(&mut node) = row;
                                                     }
-                                                    DataSink::SingleRowArray(field) => {
+                                                    RowSink::SingleRowArray(field) => {
                                                         let row = parent_selections.pop().expect(
                                                             "parent selection should be present after validation",
                                                         );
                                                         *field.node_input_field(&mut node) = vec![row];
                                                     }
                                                 }
-                                                Ok(node)
-                                            },
-                                        ),
+                                                node
+                                            }),
 
-                                        QueryGraphDependency::DataDependency(f) => Ok(f(node, binding)?),
+                                        QueryGraphDependency::DataDependency(consumer, expectation) => {
+                                            if let Some(expectation) = expectation {
+                                                expectation.check(binding)?;
+                                            }
+                                            match consumer {
+                                                RowCountSink::Discard => {}
+                                            }
+                                            Ok(node)
+                                        }
 
                                         _ => unreachable!(),
                                     };
@@ -431,7 +439,7 @@ impl Expressionista {
         parent_edges
             .into_iter()
             .filter_map(|edge| match graph.pluck_edge(&edge) {
-                x @ (QueryGraphDependency::DataDependency(_)
+                x @ (QueryGraphDependency::DataDependency(_, _)
                 | QueryGraphDependency::ProjectedDataDependency(_, _, _)
                 | QueryGraphDependency::ProjectedDataSinkDependency(_, _, _)) => {
                     let parent_binding_name = graph.edge_source(&edge).id();

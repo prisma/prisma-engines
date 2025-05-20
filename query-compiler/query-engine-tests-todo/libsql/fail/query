@@ -26,10 +26,6 @@ queries::data_types::json::json::dollar_type_in_json_protocol
 queries::data_types::json::json::nested_dollar_type_in_json_protocol
 queries::filters::self_relation_regression::sr_regression::all_categories
 raw::sql::typed_output::typed_output::all_scalars_sqlite
-writes::nested_mutations::already_converted::nested_connect_inside_create::connect_inside_create::pm_to_c1_fail_if_wrong_id
-writes::nested_mutations::already_converted::nested_connect_inside_create::connect_inside_create::pm_to_c1_rel_fail_connect_no_node
-writes::nested_mutations::already_converted::nested_connect_inside_create::connect_inside_create::pm_to_c1_rel_fail_filter_dont_match
-writes::nested_mutations::already_converted::nested_connect_inside_update::connect_inside_update::p1_c1req_rel_child_idempotent
 writes::top_level_mutations::delete::delete::delete_fails_if_filter_dont_match
 writes::top_level_mutations::delete::delete::should_fail_non_exist_id
 writes::top_level_mutations::delete::delete::should_fail_non_existent_value_non_id_uniq_field

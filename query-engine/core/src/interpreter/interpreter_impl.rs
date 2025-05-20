@@ -24,6 +24,22 @@ pub enum ExpressionResult {
 }
 
 impl ExpressionResult {
+    pub fn returned_row_count(&self) -> Option<usize> {
+        match self {
+            Self::Query(result) => result.returned_row_count(),
+            Self::FixedResult(results) => Some(results.len()),
+            Self::Empty => Some(0),
+        }
+    }
+
+    pub fn affected_row_count(&self) -> Option<usize> {
+        match self {
+            Self::Query(result) => result.affected_row_count(),
+            Self::FixedResult(_) => None,
+            Self::Empty => Some(0),
+        }
+    }
+
     /// Attempts to transform this `ExpressionResult` into a vector of `SelectionResult`s corresponding to the passed desired selection shape.
     /// A vector is returned as some expression results return more than one result row at once.
     pub fn as_selection_results(&self, field_selection: &FieldSelection) -> InterpretationResult<Vec<SelectionResult>> {
