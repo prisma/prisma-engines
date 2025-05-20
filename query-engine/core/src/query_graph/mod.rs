@@ -412,6 +412,18 @@ impl QueryGraph {
         })
     }
 
+    /// Returns all leaf nodes of the graph.
+    /// A leaf node is defined by having no outgoing edges.
+    pub fn leaf_nodes(&self) -> impl Iterator<Item = NodeRef> + '_ {
+        self.graph.node_indices().filter_map(|node_ix| {
+            self.graph
+                .edges_directed(node_ix, Direction::Outgoing)
+                .next()
+                .is_none()
+                .then_some(NodeRef { node_ix })
+        })
+    }
+
     /// Creates a node with content `t` and adds it to the graph.
     /// Returns a `NodeRef` to the newly added node.
     pub(crate) fn create_node<T>(&mut self, t: T) -> NodeRef
