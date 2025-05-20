@@ -44,8 +44,6 @@ writes::nested_mutations::already_converted::nested_connect_inside_create::conne
 writes::nested_mutations::already_converted::nested_connect_inside_create::connect_inside_create::pm_to_c1_rel_fail_filter_dont_match
 writes::nested_mutations::already_converted::nested_connect_inside_update::connect_inside_update::p1_c1req_rel_child_idempotent
 writes::nested_mutations::not_using_schema_base::nested_connect_or_create::connect_or_create::one2m_connect_or_create
-writes::nested_mutations::not_using_schema_base::nested_connect_or_create::connect_or_create::one2one_update_if_no_child_connected_yet
-writes::nested_mutations::not_using_schema_base::nested_connect_or_create::connect_or_create::one2one_upsert_if_no_child_connected_yet
 writes::nested_mutations::not_using_schema_base::nested_connect_or_create::connect_or_create::one_req_2m_connect_or_create
 writes::top_level_mutations::create_many::create_many::basic_create_many_autoincrement
 writes::top_level_mutations::create_many::create_many::create_many_by_shape
