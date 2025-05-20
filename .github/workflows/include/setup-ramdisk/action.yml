@@ -10,10 +10,7 @@ runs:
     - name: Create ramdisk
       shell: bash
       run: |
-        if [ -d "${{ inputs.mount-path }}" ]; then
-          echo "${{ inputs.mount-path }} exists, skipping"
-        else
-          sudo mkdir ${{ inputs.mount-path }}
-          sudo mount -t tmpfs -o size=2G tmpfs "${{ inputs.mount-path }}"
-          echo "Ramdisk (2GB): ${{ inputs.mount-path }}"
-        fi
+        ramdisk_path=$(sudo mktemp -d /mnt/prisma-ramdisk-XXXXXXXX)
+        sudo mount -t tmpfs -o size=2G tmpfs "$ramdisk_path"
+        echo "Ramdisk (2GB): $ramdisk_path"
+        echo "RAMDISK=$ramdisk_path" >> $GITHUB_ENV
