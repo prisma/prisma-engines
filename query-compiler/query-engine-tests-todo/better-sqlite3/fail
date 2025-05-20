@@ -12,7 +12,6 @@ new::ref_actions::on_update::restrict::one2many_req::update_parent
 new::ref_actions::on_update::set_null::one2many_opt::update_many_parent
 new::ref_actions::on_update::set_null::one2one_opt::update_many_parent
 new::regressions::max_integer::max_integer::unfitted_int_should_fail
-new::regressions::prisma_12572::prisma_12572::all_generated_timestamps_are_the_same
 new::regressions::prisma_22971::prisma_22971::test_22971
 new::regressions::prisma_7434::not_in_chunking::not_in_batch_filter
 queries::aggregation::group_by::aggregation_group_by::group_by_ordering_sum_aggregation

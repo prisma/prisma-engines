@@ -1,3 +1,5 @@
+use std::future::Future;
+
 use crate::protocol::EngineProtocol;
 use query_structure::PrismaValue;
 
@@ -49,13 +51,10 @@ pub(crate) fn get_engine_protocol() -> EngineProtocol {
 
 /// Execute a future with the current "now" timestamp that can be retrieved through
 /// `get_request_now()`, initializing it if necessary.
-pub(crate) async fn with_request_context<F, R>(
+pub(crate) async fn with_request_context<F: Future>(
     #[cfg_attr(not(feature = "graphql-protocol"), allow(unused_variables))] engine_protocol: EngineProtocol,
     fut: F,
-) -> R
-where
-    F: std::future::Future<Output = R>,
-{
+) -> F::Output {
     use chrono::{Duration, DurationRound};
 
     let is_set = REQUEST_CONTEXT.try_with(|_| async {}).is_ok();
@@ -76,4 +75,13 @@ where
 
         REQUEST_CONTEXT.scope(ctx, fut).await
     }
+}
+
+pub fn with_sync_unevaluated_request_context<R>(f: impl FnOnce() -> R) -> R {
+    let ctx = RequestContext {
+        request_now: PrismaValue::generator_now(),
+        #[cfg(feature = "graphql-protocol")]
+        engine_protocol: EngineProtocol::Json,
+    };
+    REQUEST_CONTEXT.sync_scope(ctx, f)
 }

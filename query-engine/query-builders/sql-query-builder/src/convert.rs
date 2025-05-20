@@ -91,7 +91,7 @@ pub(crate) fn quaint_value_to_prisma_value(value: quaint::Value<'_>, family: Sql
                 })
             } else if let Some(call) = opaque.downcast_ref::<GeneratorCall>() {
                 PrismaValue::GeneratorCall {
-                    name: call.name().to_owned(),
+                    name: call.name().to_owned().into(),
                     args: call.args().to_vec(),
                     return_type: opaque_type_to_prisma_type(opaque.typ()),
                 }

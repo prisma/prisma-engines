@@ -3,6 +3,7 @@ use quaint::connector::ConnectionInfo;
 use query_compiler::{CompileError, Expression, TranslateError};
 use query_core::{
     ArgumentValue, BatchDocument, QueryDocument, QueryGraphBuilderError, RelationViolation, protocol::EngineProtocol,
+    with_sync_unevaluated_request_context,
 };
 use request_handlers::{HandlerError, RequestBody};
 use serde::{Deserialize, Serialize};
@@ -90,43 +91,47 @@ impl QueryCompiler {
 
     #[wasm_bindgen]
     pub fn compile(&self, request: String) -> Result<String, JsCompileError> {
-        let request = RequestBody::try_from_str(&request, self.protocol)?;
-        let QueryDocument::Single(op) = request.into_doc(&self.schema)? else {
-            return Err(JsCompileError::plain("Unexpected batch request"));
-        };
-        let plan = query_compiler::compile(&self.schema, op, &self.connection_info)?;
-        Ok(serde_json::to_string(&plan)?)
+        with_sync_unevaluated_request_context(move || {
+            let request = RequestBody::try_from_str(&request, self.protocol)?;
+            let QueryDocument::Single(op) = request.into_doc(&self.schema)? else {
+                return Err(JsCompileError::plain("Unexpected batch request"));
+            };
+            let plan = query_compiler::compile(&self.schema, op, &self.connection_info)?;
+            Ok(serde_json::to_string(&plan)?)
+        })
     }
 
     #[wasm_bindgen(js_name = compileBatch)]
     pub fn compile_batch(&self, request: String) -> Result<BatchResponse, JsCompileError> {
-        let request = RequestBody::try_from_str(&request, self.protocol)?;
-        match request.into_doc(&self.schema)? {
-            QueryDocument::Single(op) => {
-                let plan = query_compiler::compile(&self.schema, op, &self.connection_info)?;
-                Ok(BatchResponse::Multi { plans: vec![plan] })
+        with_sync_unevaluated_request_context(move || {
+            let request = RequestBody::try_from_str(&request, self.protocol)?;
+            match request.into_doc(&self.schema)? {
+                QueryDocument::Single(op) => {
+                    let plan = query_compiler::compile(&self.schema, op, &self.connection_info)?;
+                    Ok(BatchResponse::Multi { plans: vec![plan] })
+                }
+                QueryDocument::Multi(batch) => match batch.compact(&self.schema) {
+                    BatchDocument::Multi(operations, _) => {
+                        let plans = operations
+                            .into_iter()
+                            .map(|op| query_compiler::compile(&self.schema, op, &self.connection_info))
+                            .collect::<Result<Vec<_>, _>>()?;
+                        Ok(BatchResponse::Multi { plans })
+                    }
+                    BatchDocument::Compact(compacted) => {
+                        let expect_non_empty = compacted.throw_on_empty();
+                        let plan = query_compiler::compile(&self.schema, compacted.operation, &self.connection_info)?;
+                        Ok(BatchResponse::Compacted {
+                            plan,
+                            arguments: compacted.arguments,
+                            nested_selection: compacted.nested_selection,
+                            keys: compacted.keys,
+                            expect_non_empty,
+                        })
+                    }
+                },
             }
-            QueryDocument::Multi(batch) => match batch.compact(&self.schema) {
-                BatchDocument::Multi(operations, _) => {
-                    let plans = operations
-                        .into_iter()
-                        .map(|op| query_compiler::compile(&self.schema, op, &self.connection_info))
-                        .collect::<Result<Vec<_>, _>>()?;
-                    Ok(BatchResponse::Multi { plans })
-                }
-                BatchDocument::Compact(compacted) => {
-                    let expect_non_empty = compacted.throw_on_empty();
-                    let plan = query_compiler::compile(&self.schema, compacted.operation, &self.connection_info)?;
-                    Ok(BatchResponse::Compacted {
-                        plan,
-                        arguments: compacted.arguments,
-                        nested_selection: compacted.nested_selection,
-                        keys: compacted.keys,
-                        expect_non_empty,
-                    })
-                }
-            },
-        }
+        })
     }
 }
 
