@@ -1,10 +1,11 @@
-use itertools::Itertools;
+use itertools::{Either, Itertools};
 use query_builder::QueryBuilder;
 use query_core::{
     ConnectRecords, DeleteManyRecords, DeleteRecord, DisconnectRecords, RawQuery, UpdateManyRecords, UpdateRecord,
     UpdateRecordWithSelection, WriteQuery,
 };
 use query_structure::{QueryArguments, RelationLoadStrategy, Take};
+use sql_query_builder::write::split_write_args_by_shape;
 
 use crate::{TranslateError, expression::Expression, translate::TranslateResult};
 
@@ -26,28 +27,31 @@ pub(crate) fn translate_write_query(query: WriteQuery, builder: &dyn QueryBuilde
         }
 
         WriteQuery::CreateManyRecords(cmr) => {
-            if let Some(selected_fields) = cmr.selected_fields {
-                let mut expr = Expression::Concat(
+            let split_args = if cmr.split_by_shape && !cmr.args.is_empty() {
+                Either::Left(split_write_args_by_shape(&cmr.model, cmr.args))
+            } else {
+                Either::Right([cmr.args])
+            };
+            let (projection, nested) = cmr.selected_fields.map(|sf| (sf.fields, sf.nested)).unzip();
+
+            let inserts = split_args
+                .into_iter()
+                .map(|args| {
                     builder
-                        .build_inserts(&cmr.model, cmr.args, cmr.skip_duplicates, Some(&selected_fields.fields))
-                        .map_err(TranslateError::QueryBuildFailure)?
-                        .into_iter()
-                        .map(Expression::Query)
-                        .collect::<Vec<_>>(),
-                );
-                if !selected_fields.nested.is_empty() {
-                    expr = add_inmemory_join(expr, selected_fields.nested, builder)?;
+                        .build_inserts(&cmr.model, args, cmr.skip_duplicates, projection.as_ref())
+                        .map_err(TranslateError::QueryBuildFailure)
+                })
+                .flatten_ok();
+
+            if projection.is_some() {
+                let mut expr = Expression::Concat(inserts.map_ok(Expression::Query).try_collect()?);
+                let nested = nested.unwrap_or_default();
+                if !nested.is_empty() {
+                    expr = add_inmemory_join(expr, nested, builder)?;
                 }
                 expr
             } else {
-                Expression::Sum(
-                    builder
-                        .build_inserts(&cmr.model, cmr.args, cmr.skip_duplicates, None)
-                        .map_err(TranslateError::QueryBuildFailure)?
-                        .into_iter()
-                        .map(Expression::Execute)
-                        .collect::<Vec<_>>(),
-                )
+                Expression::Sum(inserts.map_ok(Expression::Execute).try_collect()?)
             }
         }
 
