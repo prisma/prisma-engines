@@ -132,7 +132,7 @@ pub(crate) fn translate_read_query(query: ReadQuery, builder: &dyn QueryBuilder)
     })
 }
 
-fn add_inmemory_join(
+pub(super) fn add_inmemory_join(
     parent: Expression,
     nested: Vec<ReadQuery>,
     builder: &dyn QueryBuilder,
