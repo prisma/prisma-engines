@@ -28,11 +28,12 @@ transaction
                                     "public"."Post"."id"»
                              params [const(String("How to get rich quick and not go to jail")),
                                      var(1$id as Int)])
-             in let 2 = query «SELECT "public"."Category"."id" FROM
-                               "public"."Category" WHERE
-                               ("public"."Category"."id" = $1 AND 1=1) OFFSET
-                               $2»
-                        params [const(BigInt(10)), const(BigInt(0))]
+             in let 2 = unique (query «SELECT "public"."Category"."id" FROM
+                                       "public"."Category" WHERE
+                                       ("public"."Category"."id" = $1 AND 1=1)
+                                       LIMIT $2 OFFSET $3»
+                                params [const(BigInt(10)), const(BigInt(1)),
+                                        const(BigInt(0))])
                 in if (rowCountNeq 0 (get 2))
                    then let 0$id = mapField id (get 0);
                             2 = validate (get 2)

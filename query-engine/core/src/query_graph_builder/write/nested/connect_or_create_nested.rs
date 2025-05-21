@@ -106,7 +106,7 @@ fn handle_many_to_many(
         let create_map: ParsedInputMap<'_> = create_arg.try_into()?;
 
         let filter = extract_unique_filter(where_map, child_model)?;
-        let read_node = graph.create_node(utils::read_ids_infallible(
+        let read_node = graph.create_node(utils::read_id_infallible(
             child_model.clone(),
             child_model.primary_identifier(),
             filter,
@@ -262,7 +262,7 @@ fn one_to_many_inlined_child(
         let create_map: ParsedInputMap<'_> = create_arg.try_into()?;
 
         let filter = extract_unique_filter(where_map, child_model)?;
-        let read_node = graph.create_node(utils::read_ids_infallible(
+        let read_node = graph.create_node(utils::read_id_infallible(
             child_model.clone(),
             child_link.clone(),
             filter.clone(),
@@ -399,7 +399,7 @@ fn one_to_many_inlined_parent(
     let create_map: ParsedInputMap<'_> = create_arg.try_into()?;
 
     let filter = extract_unique_filter(where_map, child_model)?;
-    let read_node = graph.create_node(utils::read_ids_infallible(
+    let read_node = graph.create_node(utils::read_id_infallible(
         child_model.clone(),
         child_link.clone(),
         filter,
