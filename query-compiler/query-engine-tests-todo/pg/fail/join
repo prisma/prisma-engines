@@ -1,17 +1,5 @@
-new::interactive_tx::interactive_tx::batch_queries_failure
-new::interactive_tx::interactive_tx::batch_queries_rollback
-new::interactive_tx::interactive_tx::batch_queries_success
-new::interactive_tx::interactive_tx::commit_after_rollback
-new::interactive_tx::interactive_tx::double_commit
-new::interactive_tx::interactive_tx::double_rollback
-new::interactive_tx::interactive_tx::rollback_after_commit
-new::interactive_tx::interactive_tx::tx_expiration_cycle
-new::interactive_tx::interactive_tx::tx_expiration_failure_cycle
-new::occ::occ::occ_update_many_test
 new::regressions::max_integer::max_integer::unfitted_int_should_fail
 new::regressions::max_integer::max_integer::unfitted_int_should_fail_pg_js
-new::regressions::prisma_11750::prisma_11750::test_itx_concurrent_updates_multi_thread
-new::regressions::prisma_11750::prisma_11750::test_itx_concurrent_updates_single_thread
 new::regressions::prisma_13089::prisma_13097::filtering_with_dollar_values
 new::regressions::prisma_13097::prisma_13097::group_by_boolean_array
 new::regressions::prisma_13097::prisma_13097::group_by_enum_array
@@ -46,8 +34,6 @@ queries::batching::select_one_singular::singular_batch::repro_16548
 queries::batching::select_one_singular::singular_batch::two_success_one_fail
 queries::batching::transactional_batch::transactional::batch_request_idx
 queries::batching::transactional_batch::transactional::invalid_isolation_level
-queries::batching::transactional_batch::transactional::one_query
-queries::batching::transactional_batch::transactional::one_success_one_fail
 queries::chunking::chunking::order_by_aggregation_should_fail
 queries::chunking::chunking::order_by_relevance_should_fail
 queries::data_types::bytes::bytes::issue_687::common_types

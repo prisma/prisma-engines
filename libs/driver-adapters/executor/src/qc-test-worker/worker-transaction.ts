@@ -1,3 +1,4 @@
+import { UserFacingError } from '@prisma/client-engine-runtime'
 import type { IsolationLevel } from '@prisma/driver-adapter-utils'
 import type { State } from './worker'
 import { TxOptions } from '../types/jsonRpc'
@@ -40,27 +41,52 @@ export type TransactionInfo = {
   id: string
 }
 
+type UserFacingErrorObject = ReturnType<
+  UserFacingError['toQueryResponseErrorObject']
+>['user_facing_error']
+
 export async function startTransaction(
   options: TxOptions,
   state: State,
-): Promise<TransactionInfo> {
-  return await state.transactionManager.startTransaction({
-    maxWait: options.max_wait,
-    timeout: options.timeout,
-    isolationLevel: parseIsolationLevel(options.isolation_level),
-  })
+): Promise<TransactionInfo | UserFacingErrorObject> {
+  return await handleUserFacingError(() =>
+    state.transactionManager.startTransaction({
+      maxWait: options.max_wait,
+      timeout: options.timeout,
+      isolationLevel: parseIsolationLevel(options.isolation_level),
+    }),
+  )
 }
 
 export async function commitTransaction(
   txId: string,
   state: State,
-): Promise<void> {
-  await state.transactionManager.commitTransaction(txId)
+): Promise<Record<PropertyKey, never> | UserFacingErrorObject> {
+  return await handleUserFacingError(async () => {
+    await state.transactionManager.commitTransaction(txId)
+    return {}
+  })
 }
 
 export async function rollbackTransaction(
   txId: string,
   state: State,
-): Promise<void> {
-  await state.transactionManager.rollbackTransaction(txId)
+): Promise<Record<PropertyKey, never> | UserFacingErrorObject> {
+  return await handleUserFacingError(async () => {
+    await state.transactionManager.rollbackTransaction(txId)
+    return {}
+  })
+}
+
+async function handleUserFacingError<T>(
+  fn: () => Promise<T>,
+): Promise<T | UserFacingErrorObject> {
+  try {
+    return await fn()
+  } catch (error) {
+    if (error instanceof UserFacingError) {
+      return error.toQueryResponseErrorObject().user_facing_error
+    }
+    throw error
+  }
 }
