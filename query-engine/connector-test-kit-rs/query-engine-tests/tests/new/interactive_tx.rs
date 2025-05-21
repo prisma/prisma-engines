@@ -182,7 +182,7 @@ mod interactive_tx {
         runner.clear_active_tx();
 
         insta::assert_snapshot!(
-          run_query!(&runner, "query { findManyTestModel { id }}"),
+          run_query!(&runner, "query { findManyTestModel(orderBy: { id: asc }) { id }}"),
             @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2},{"id":3}]}}"###
         );
 

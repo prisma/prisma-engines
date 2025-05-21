@@ -1,10 +1,4 @@
 new::interactive_tx::interactive_tx::batch_queries_failure
-new::interactive_tx::interactive_tx::commit_after_rollback
-new::interactive_tx::interactive_tx::double_commit
-new::interactive_tx::interactive_tx::double_rollback
-new::interactive_tx::interactive_tx::rollback_after_commit
-new::interactive_tx::interactive_tx::tx_expiration_cycle
-new::interactive_tx::interactive_tx::tx_expiration_failure_cycle
 new::regressions::max_integer::max_integer::unfitted_int_should_fail
 new::regressions::prisma_22971::prisma_22971::test_22971
 new::regressions::prisma_7434::not_in_chunking::not_in_batch_filter
@@ -14,8 +8,6 @@ queries::batching::select_one_singular::singular_batch::repro_16548
 queries::batching::select_one_singular::singular_batch::two_success_one_fail
 queries::batching::transactional_batch::transactional::batch_request_idx
 queries::batching::transactional_batch::transactional::invalid_isolation_level
-queries::batching::transactional_batch::transactional::one_query
-queries::batching::transactional_batch::transactional::one_success_one_fail
 queries::chunking::chunking::order_by_aggregation_should_fail
 queries::data_types::enum_type::enum_type::read_one_invalid_sqlite
 queries::data_types::json::json::dollar_type_in_json_protocol
