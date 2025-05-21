@@ -4,6 +4,7 @@ use crate::{update, FilterBuilder};
 use itertools::Itertools;
 use quaint::ast::*;
 use query_structure::*;
+use std::collections::HashMap;
 use std::{collections::HashSet, convert::TryInto};
 
 /// `INSERT` a new record to the database. Resulting an `INSERT` ast and an
@@ -473,4 +474,42 @@ fn partition_into_batches(args: Vec<WriteArgs>, ctx: &Context<'_>) -> Vec<Vec<Wr
     } else {
         batches
     }
+}
+
+/// Returns a list of fields that can be used to group CreateMany entries optimally.
+///
+/// This is needed for connectors that don't support the `DEFAULT` expression when inserting records in bulk.
+/// `DEFAULT` is needed for fields that have a default value that the QueryEngine cannot generate at runtime (@autoincrement(), @dbgenerated()).
+///
+/// Two CreateMany entries cannot be grouped together when they contain different fields that require the use of a `DEFAULT` expression.
+/// - When they have the same set of fields that require `DEFAULT`, those fields can be ommited entirely from the `INSERT` expression, in which case `DEFAULT` is implied.
+/// - When they don't, since all `VALUES` entries of the `INSERT` expression must be the same, we have to split the CreateMany entries into separate `INSERT` expressions.
+///
+/// Consequently, if a field has a default value and is _not_ present in the [`WriteArgs`], this constitutes a discriminant that can be used to group CreateMany entries.
+///
+/// As such, the fields that we compute for a given CreateMany entry is the set of fields that are _not_ present in the [`WriteArgs`] and that have a default value.
+/// Note: This works because the [`crate::QueryDocumentParser`] injects into the CreateMany entries, the default values that _can_ be generated at runtime.
+/// Note: We can ignore optional fields without default values because they can be inserted as `NULL`. It is a value that the QueryEngine _can_ generate at runtime.
+pub fn split_write_args_by_shape(model: &Model, args: Vec<WriteArgs>) -> impl Iterator<Item = Vec<WriteArgs>> {
+    let mut args_by_shape: HashMap<_, Vec<_>> = HashMap::new();
+    for write_args in args {
+        let shape = write_args_to_shape(&write_args, model);
+        args_by_shape.entry(shape).or_default().push(write_args);
+    }
+    args_by_shape.into_values()
+}
+
+fn write_args_to_shape(write_args: &WriteArgs, model: &Model) -> Vec<DatasourceFieldName> {
+    let mut shape = Vec::new();
+
+    for field in model.fields().scalar() {
+        if !write_args.args.contains_key(field.db_name()) && field.default_value().is_some() {
+            shape.push(DatasourceFieldName(field.db_name().to_string()));
+        }
+    }
+
+    // This ensures that shapes are not dependent on order of fields.
+    shape.sort_unstable();
+
+    shape
 }
