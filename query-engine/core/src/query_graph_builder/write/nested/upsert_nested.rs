@@ -6,7 +6,7 @@ use crate::{
     query_graph::{Flow, Node, NodeRef, QueryGraph, QueryGraphDependency},
     ParsedInputMap, ParsedInputValue,
 };
-use crate::{DataExpectation, DataSink};
+use crate::{DataExpectation, RowSink};
 use query_structure::{Filter, RelationFieldRef};
 use schema::constants::args;
 use std::convert::TryInto;
@@ -153,7 +153,7 @@ pub fn nested_upsert(
             &if_node,
             QueryGraphDependency::ProjectedDataSinkDependency(
                 child_model_identifier.clone(),
-                DataSink::AllRows(&IfInput),
+                RowSink::AllRows(&IfInput),
                 None,
             ),
         )?;

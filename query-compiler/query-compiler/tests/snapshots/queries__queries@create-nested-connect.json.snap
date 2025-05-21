@@ -24,7 +24,10 @@ transaction
                                ("public"."Post"."id" = $4 AND 1=1))»
                       params [var(0$id as Int), const(BigInt(8)),
                               const(BigInt(9)), const(BigInt(10))])
-         in ();
+         in validate (get 1)
+            [ affectedRowCountEq 3
+            ] orRaise "INCOMPLETE_CONNECT_OUTPUT";
+            ();
       let 3 = let 0 = validate (get 0)
                   [ rowCountNeq 0
                   ] orRaise "MISSING_RECORD";

@@ -12,6 +12,26 @@ pub enum QueryResult {
     Unit,
 }
 
+impl QueryResult {
+    pub fn returned_row_count(&self) -> Option<usize> {
+        match self {
+            QueryResult::RecordSelection(selection) => selection.as_ref().map(|s| s.records.records.len()),
+            QueryResult::RecordSelectionWithRelations(selection) => Some(selection.records.records.len()),
+            QueryResult::Id(Some(_)) => Some(1),
+            QueryResult::Id(None) => Some(0),
+            QueryResult::RecordAggregations(aggregations) => Some(aggregations.results.len()),
+            _ => None,
+        }
+    }
+
+    pub fn affected_row_count(&self) -> Option<usize> {
+        match self {
+            QueryResult::Count(count) => Some(*count),
+            _ => None,
+        }
+    }
+}
+
 #[derive(Debug, Clone)]
 pub struct RecordSelectionWithRelations {
     /// Name of the query.

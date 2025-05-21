@@ -1,8 +1,8 @@
 use std::fmt;
 
-use crate::{DataDependencyError, QueryGraphError};
+use crate::{DataDependencyError, ExpressionResult, QueryGraphError};
 use bon::bon;
-use query_structure::{DomainError, Model, Relation, RelationFieldRef, SelectionResult};
+use query_structure::{DomainError, Model, Relation, RelationFieldRef};
 use serde::Serialize;
 use user_facing_errors::query_engine::validation::ValidationError;
 
@@ -105,7 +105,7 @@ impl DataDependencyError for RelationViolation {
         "RELATION_VIOLATION"
     }
 
-    fn to_runtime_error(&self, _results: &[SelectionResult]) -> QueryGraphBuilderError {
+    fn to_runtime_error(&self, _result: &ExpressionResult) -> QueryGraphBuilderError {
         QueryGraphBuilderError::RelationViolation(self.clone())
     }
 
@@ -139,7 +139,7 @@ impl DataDependencyError for MissingRecord {
         "MISSING_RECORD"
     }
 
-    fn to_runtime_error(&self, _results: &[SelectionResult]) -> QueryGraphBuilderError {
+    fn to_runtime_error(&self, _result: &ExpressionResult) -> QueryGraphBuilderError {
         QueryGraphBuilderError::RecordNotFound(self.to_string())
     }
 
@@ -170,13 +170,7 @@ impl MissingRelatedRecord {
         Self {
             model: model.name().to_owned(),
             relation: relation.name(),
-            relation_type: if relation.is_one_to_one() {
-                RelationType::OneToOne
-            } else if relation.is_one_to_many() {
-                RelationType::OneToMany
-            } else {
-                RelationType::ManyToMany
-            },
+            relation_type: relation.into(),
             operation,
             needed_for,
         }
@@ -211,7 +205,7 @@ impl DataDependencyError for MissingRelatedRecord {
         "MISSING_RELATED_RECORD"
     }
 
-    fn to_runtime_error(&self, _results: &[SelectionResult]) -> QueryGraphBuilderError {
+    fn to_runtime_error(&self, _result: &ExpressionResult) -> QueryGraphBuilderError {
         QueryGraphBuilderError::RecordNotFound(self.to_string())
     }
 
@@ -239,11 +233,53 @@ impl DataDependencyError for IncompleteConnectInput {
         "INCOMPLETE_CONNECT_INPUT"
     }
 
-    fn to_runtime_error(&self, results: &[SelectionResult]) -> QueryGraphBuilderError {
+    fn to_runtime_error(&self, result: &ExpressionResult) -> QueryGraphBuilderError {
         let Self { expected_rows } = self;
         QueryGraphBuilderError::RecordNotFound(format!(
             "Expected {expected_rows} records to be connected, found only {actual}.",
-            actual = results.len()
+            actual = result.returned_row_count().unwrap_or(0)
+        ))
+    }
+
+    fn context(&self) -> serde_json::Value {
+        serde_json::to_value(self).unwrap()
+    }
+}
+
+#[derive(Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub(crate) struct IncompleteConnectOutput {
+    expected_rows: usize,
+    relation: String,
+    relation_type: RelationType,
+}
+
+#[bon]
+impl IncompleteConnectOutput {
+    #[builder]
+    pub fn new(expected_rows: usize, relation: &Relation) -> Self {
+        Self {
+            expected_rows,
+            relation: relation.name(),
+            relation_type: relation.into(),
+        }
+    }
+}
+
+impl DataDependencyError for IncompleteConnectOutput {
+    fn id(&self) -> &'static str {
+        "INCOMPLETE_CONNECT_OUTPUT"
+    }
+
+    fn to_runtime_error(&self, result: &ExpressionResult) -> QueryGraphBuilderError {
+        let Self {
+            expected_rows,
+            relation,
+            relation_type,
+        } = self;
+        QueryGraphBuilderError::RecordNotFound(format!(
+            "Expected {expected_rows} records to be connected after connect operation on {relation_type} relation '{relation}', found {actual}.",
+            actual = result.affected_row_count().unwrap_or(0)
         ))
     }
 
@@ -276,7 +312,7 @@ impl DataDependencyError for RecordsNotConnected {
         "RECORDS_NOT_CONNECTED"
     }
 
-    fn to_runtime_error(&self, _results: &[SelectionResult]) -> QueryGraphBuilderError {
+    fn to_runtime_error(&self, _result: &ExpressionResult) -> QueryGraphBuilderError {
         QueryGraphBuilderError::RecordsNotConnected {
             relation_name: self.relation.clone(),
             parent_name: self.parent.clone(),
@@ -416,6 +452,18 @@ enum RelationType {
     OneToOne,
     OneToMany,
     ManyToMany,
+}
+
+impl From<&Relation> for RelationType {
+    fn from(relation: &Relation) -> Self {
+        if relation.is_one_to_one() {
+            Self::OneToOne
+        } else if relation.is_one_to_many() {
+            Self::OneToMany
+        } else {
+            Self::ManyToMany
+        }
+    }
 }
 
 impl fmt::Display for RelationType {

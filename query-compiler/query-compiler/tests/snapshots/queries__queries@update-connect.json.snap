@@ -23,7 +23,10 @@ transaction
       in let 1 = sum (execute «UPDATE "public"."Post" SET "userId" = $1 WHERE
                                ("public"."Post"."id" = $2 AND 1=1)»
                       params [var(0$id as Int), const(BigInt(11))])
-         in ();
+         in validate (get 1)
+            [ affectedRowCountEq 1
+            ] orRaise "INCOMPLETE_CONNECT_OUTPUT";
+            ();
       let 3 = let 0 = validate (get 0)
                   [ rowCountNeq 0
                   ] orRaise "MISSING_RECORD";

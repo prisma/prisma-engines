@@ -2,7 +2,7 @@ use super::*;
 use crate::{
     query_ast::*,
     query_graph::{Node, NodeRef, QueryGraph, QueryGraphDependency},
-    DataExpectation, ParsedInputMap, ParsedInputValue, QueryResult,
+    DataExpectation, ParsedInputMap, ParsedInputValue, RowCountSink,
 };
 use itertools::Itertools;
 use query_structure::{Filter, IntoFilter, Model, RelationFieldRef};
@@ -220,25 +220,20 @@ fn handle_one_to_many(
             ),
         )?;
 
-        let relation_name = parent_relation_field.relation().name();
-
         // Check that all specified children have been updated.
         graph.create_edge(
             &update_node,
             &check_node,
-            QueryGraphDependency::DataDependency(Box::new(move |check_node, parent_result| {
-                let query_result = parent_result.as_query_result().unwrap();
-
-                if let QueryResult::Count(c) = query_result {
-                    if c != &expected_id_count {
-                        return Err(QueryGraphBuilderError::RecordNotFound(format!(
-                            "Expected {expected_id_count} records to be connected after connect operation on one-to-many relation '{relation_name}', found {c}.",
-                        )));
-                    }
-                }
-
-                Ok(check_node)
-            })),
+            QueryGraphDependency::DataDependency(
+                RowCountSink::Discard,
+                Some(DataExpectation::affected_row_count(
+                    expected_id_count,
+                    IncompleteConnectOutput::builder()
+                        .expected_rows(expected_id_count)
+                        .relation(&parent_relation_field.relation())
+                        .build(),
+                )),
+            ),
         )?;
     };
 
