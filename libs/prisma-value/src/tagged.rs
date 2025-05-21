@@ -32,6 +32,9 @@ impl Serialize for TaggedPrismaValue<'_> {
                 )?;
                 map.end()
             }
+            PrismaValue::BigInt(i) => {
+                serializer.collect_map([("prisma__type", "bigint"), ("prisma__value", &i.to_string())])
+            }
             PrismaValue::List(items) => serializer.collect_seq(items.iter().map(TaggedPrismaValue)),
             PrismaValue::Object(items) => serializer.collect_map(items.iter().map(|(k, v)| (k, TaggedPrismaValue(v)))),
             other => other.serialize(serializer),

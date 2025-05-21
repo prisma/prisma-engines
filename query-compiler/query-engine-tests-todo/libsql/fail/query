@@ -13,12 +13,6 @@ new::regressions::prisma_15204::conversion_error::convert_to_int_sqlite_js
 new::regressions::prisma_22971::prisma_22971::test_22971
 new::regressions::prisma_7434::not_in_chunking::not_in_batch_filter
 queries::aggregation::group_by::aggregation_group_by::group_by_ordering_sum_aggregation
-queries::aggregation::group_by_having::aggr_group_by_having::having_count_non_numerical_field
-queries::aggregation::group_by_having::aggr_group_by_having::having_count_scalar_filter
-queries::aggregation::group_by_having::aggr_group_by_having::having_max_scalar_filter
-queries::aggregation::group_by_having::aggr_group_by_having::having_min_scalar_filter
-queries::aggregation::group_by_having::aggr_group_by_having::having_sum_scalar_filter
-queries::aggregation::group_by_having::aggr_group_by_having::having_without_aggr_sel
 queries::batching::select_one_compound::compound_batch::two_success_sel_set_reorder
 queries::batching::select_one_singular::singular_batch::repro_16548
 queries::batching::select_one_singular::singular_batch::two_success_one_fail
