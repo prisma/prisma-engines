@@ -3,7 +3,7 @@ use std::str::FromStr;
 
 pub use crate::types::{ColumnType, JsResultSet};
 use quaint::bigdecimal::BigDecimal;
-use quaint::chrono::{DateTime, NaiveDate, NaiveTime, Utc};
+use quaint::chrono::{self, DateTime, NaiveDate, NaiveTime, Utc};
 use quaint::{
     connector::{ColumnType as QuaintColumnType, ResultSet as QuaintResultSet},
     error::{Error as QuaintError, ErrorKind},
@@ -187,7 +187,10 @@ pub fn js_value_to_quaint(
         ColumnType::Date => match json_value {
             serde_json::Value::String(s) => NaiveDate::parse_from_str(&s, "%Y-%m-%d")
                 .map(QuaintValue::date)
-                .map_err(|_| conversion_error!("expected a date string in column '{column_name}', got {s}")),
+                .or_else(|_| Ok(QuaintValue::datetime(DateTime::parse_from_rfc3339(&s)?.to_utc())))
+                .map_err(|_: chrono::ParseError| {
+                    conversion_error!("expected a date string in column '{column_name}', got {s}")
+                }),
             serde_json::Value::Null => Ok(QuaintValue::null_date()),
             mismatch => Err(conversion_error!(
                 "expected a string in column '{column_name}', found {mismatch}"
@@ -196,7 +199,10 @@ pub fn js_value_to_quaint(
         ColumnType::Time => match json_value {
             serde_json::Value::String(s) => NaiveTime::parse_from_str(&s, "%H:%M:%S%.f")
                 .map(QuaintValue::time)
-                .map_err(|_| conversion_error!("expected a time string in column '{column_name}', got {s}")),
+                .or_else(|_| Ok(QuaintValue::datetime(DateTime::parse_from_rfc3339(&s)?.to_utc())))
+                .map_err(|_: chrono::ParseError| {
+                    conversion_error!("expected a time string in column '{column_name}', got {s}")
+                }),
             serde_json::Value::Null => Ok(QuaintValue::null_time()),
             mismatch => Err(conversion_error!(
                 "expected a string in column '{column_name}', found {mismatch}"

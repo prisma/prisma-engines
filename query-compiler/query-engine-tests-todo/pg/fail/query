@@ -15,7 +15,6 @@ queries::chunking::chunking::order_by_relevance_should_fail
 queries::data_types::json::json::dollar_type_in_json_protocol
 queries::data_types::json::json::json_list
 queries::data_types::json::json::nested_dollar_type_in_json_protocol
-queries::data_types::native::postgres::postgres_datetime::dt_native
 queries::data_types::native::postgres::postgres_others::native_other_types
 queries::filters::json_filters::json_filters::multi_filtering
 queries::filters::self_relation_regression::sr_regression::all_categories
