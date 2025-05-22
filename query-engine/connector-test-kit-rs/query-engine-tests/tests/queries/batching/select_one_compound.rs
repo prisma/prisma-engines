@@ -1,6 +1,6 @@
 use query_engine_tests::*;
 
-#[test_suite(schema(schema), capabilities(AnyId))]
+#[test_suite(schema(schema), capabilities(AnyId), exclude_executors("QueryCompiler"))]
 mod compound_batch {
     use indoc::indoc;
 

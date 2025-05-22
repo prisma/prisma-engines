@@ -5,7 +5,8 @@ use crate::{
 use log::warn;
 use qe_setup::driver_adapters::DriverAdapter;
 use serde::{Deserialize, Serialize};
-use std::{convert::TryFrom, env, fmt::Display, fs::File, io::Read, path::PathBuf};
+use std::{convert::TryFrom, env, fmt::Display, fs::File, io::Read, path::PathBuf, str::FromStr};
+use thiserror::Error;
 
 static TEST_CONFIG_FILE_NAME: &str = ".test_config";
 
@@ -18,6 +19,20 @@ pub enum TestExecutor {
     QueryCompiler,
 }
 
+impl FromStr for TestExecutor {
+    type Err = InvalidTestExecutor;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "Napi" => Ok(TestExecutor::Napi),
+            "Wasm" => Ok(TestExecutor::Wasm),
+            "Mobile" => Ok(TestExecutor::Mobile),
+            "QueryCompiler" => Ok(TestExecutor::QueryCompiler),
+            _ => Err(InvalidTestExecutor(s.to_string())),
+        }
+    }
+}
+
 impl Display for TestExecutor {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
@@ -28,6 +43,10 @@ impl Display for TestExecutor {
         }
     }
 }
+
+#[derive(Debug, PartialEq, Error)]
+#[error("received an invalid test executor: {0}")]
+pub struct InvalidTestExecutor(String);
 
 /// The central test configuration.
 /// This struct is a 1:1 mapping to the test config file.

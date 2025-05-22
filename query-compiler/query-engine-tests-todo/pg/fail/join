@@ -29,11 +29,6 @@ queries::aggregation::uniq_count_relation::uniq_count_rel::count_with_skip
 queries::aggregation::uniq_count_relation::uniq_count_rel::count_with_take
 queries::aggregation::uniq_count_relation::uniq_count_rel::nested_count_one2m_m2m
 queries::aggregation::uniq_count_relation::uniq_count_rel::no_rel_records
-queries::batching::select_one_compound::compound_batch::two_success_sel_set_reorder
-queries::batching::select_one_singular::singular_batch::repro_16548
-queries::batching::select_one_singular::singular_batch::two_success_one_fail
-queries::batching::transactional_batch::transactional::batch_request_idx
-queries::batching::transactional_batch::transactional::invalid_isolation_level
 queries::chunking::chunking::order_by_aggregation_should_fail
 queries::chunking::chunking::order_by_relevance_should_fail
 queries::data_types::bytes::bytes::issue_687::common_types

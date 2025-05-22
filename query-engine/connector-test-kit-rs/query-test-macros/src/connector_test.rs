@@ -22,6 +22,7 @@ pub fn connector_test_impl(attr: TokenStream, input: TokenStream) -> TokenStream
     };
 
     let excluded_features = args.exclude_features.features();
+    let excluded_executors = args.exclude_executors.as_ref();
     let db_schemas = args.db_schemas.schemas();
     let db_extensions = args.db_extensions.extensions();
     let only = &args.only;
@@ -81,6 +82,7 @@ pub fn connector_test_impl(attr: TokenStream, input: TokenStream) -> TokenStream
                 &[#exclude],
                 enumflags2::make_bitflags!(ConnectorCapability::{#(#capabilities)|*}),
                 &[#(#excluded_features),*],
+                &[#(#excluded_executors),*],
                 #handler,
                 &[#(#db_schemas),*],
                 &[#(#db_extensions),*],
