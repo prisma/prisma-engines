@@ -15,6 +15,7 @@ import {
   QueryInterpreter,
   type QueryInterpreterTransactionManager,
   QueryPlanNode,
+  safeJsonStringify,
   type TransactionManager,
   UserFacingError,
 } from '@prisma/client-engine-runtime'
@@ -64,7 +65,7 @@ class QueryPipeline {
 
         debug('🟢 Batch query results: ', results)
 
-        return bigIntSafeJsonStringify({
+        return safeJsonStringify({
           batchResult: batch.map((query, index) =>
             getResponseInQeFormat(query, results[index]),
           ),
@@ -84,11 +85,11 @@ class QueryPipeline {
 
         debug('🟢 Query result: ', util.inspect(result, false, null, true))
 
-        return bigIntSafeJsonStringify(getResponseInQeFormat(query, result))
+        return safeJsonStringify(getResponseInQeFormat(query, result))
       }
     } catch (error) {
       if (error instanceof UserFacingError) {
-        return bigIntSafeJsonStringify({
+        return safeJsonStringify({
           errors: [error.toQueryResponseErrorObject()],
         })
       }
@@ -104,7 +105,7 @@ class QueryPipeline {
     let queryPlanString: string
     try {
       queryPlanString = withLocalPanicHandler(() =>
-        this.compiler.compile(bigIntSafeJsonStringify(query)),
+        this.compiler.compile(safeJsonStringify(query)),
       )
     } catch (error) {
       if (typeof error.message === 'string' && typeof error.code === 'string') {
@@ -128,7 +129,7 @@ class QueryPipeline {
       transactionManager: qiTransactionManager,
       placeholderValues: {},
       onQuery: (event: QueryEvent) => {
-        this.logs.push(bigIntSafeJsonStringify(event))
+        this.logs.push(safeJsonStringify(event))
       },
       tracingHelper: noopTracingHelper,
     }
@@ -243,17 +244,6 @@ function isPlainRawQuery(plan: QueryPlanNode): boolean {
     default:
       return false
   }
-}
-
-function bigIntSafeJsonStringify(obj: unknown): string {
-  return JSON.stringify(obj, (_key, val) => {
-    if (typeof val === 'bigint') {
-      return val.toString()
-    } else if (val instanceof Uint8Array) {
-      return Buffer.from(val).toString('base64')
-    }
-    return val
-  })
 }
 
 function serializeRawQueryResult(
