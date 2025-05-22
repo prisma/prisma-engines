@@ -265,6 +265,7 @@ pub fn run_connector_test<T>(
     exclude: &[(&str, Option<&str>)],
     capabilities: ConnectorCapabilities,
     excluded_features: &[&str],
+    excluded_executors: &[&str],
     handler: fn() -> String,
     db_schemas: &[&str],
     db_extensions: &[&str],
@@ -287,6 +288,7 @@ pub fn run_connector_test<T>(
         exclude,
         capabilities,
         excluded_features,
+        excluded_executors,
         handler,
         db_schemas,
         db_extensions,
@@ -305,6 +307,7 @@ fn run_connector_test_impl(
     exclude: &[(&str, Option<&str>)],
     capabilities: ConnectorCapabilities,
     excluded_features: &[&str],
+    excluded_executors: &[&str],
     handler: fn() -> String,
     db_schemas: &[&str],
     db_extensions: &[&str],
@@ -313,6 +316,14 @@ fn run_connector_test_impl(
     test_fn_full_name: &'static str,
     original_test_function_name: &'static str,
 ) {
+    if CONFIG.with_driver_adapter().is_some_and(|da| {
+        excluded_executors
+            .iter()
+            .any(|exec| exec.parse::<TestExecutor>() == Ok(da.test_executor))
+    }) {
+        return;
+    }
+
     let (connector, version) = CONFIG.test_connector().unwrap();
 
     let full_test_name = build_full_test_name(test_fn_full_name, original_test_function_name);

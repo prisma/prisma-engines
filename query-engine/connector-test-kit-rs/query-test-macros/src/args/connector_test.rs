@@ -26,6 +26,9 @@ pub struct ConnectorTestArgs {
     pub exclude_features: ExcludeFeatures,
 
     #[darling(default)]
+    pub exclude_executors: ExcludeExecutors,
+
+    #[darling(default)]
     pub capabilities: RunOnlyForCapabilities,
 
     // #[deprecated(since = "4.5.0", note = "Use `relation_mode` instead")]
@@ -196,6 +199,23 @@ impl darling::FromMeta for ConnectorTags {
     fn from_list(items: &[NestedMeta]) -> Result<Self, darling::Error> {
         let tags = tags_from_list(items)?;
         Ok(ConnectorTags { tags })
+    }
+}
+
+#[derive(Debug, Default)]
+pub struct ExcludeExecutors {
+    executors: Vec<String>,
+}
+
+impl AsRef<[String]> for ExcludeExecutors {
+    fn as_ref(&self) -> &[String] {
+        self.executors.as_ref()
+    }
+}
+impl darling::FromMeta for ExcludeExecutors {
+    fn from_list(items: &[NestedMeta]) -> Result<Self, darling::Error> {
+        let executors = strings_to_list("ExcludeExecutors", items)?;
+        Ok(Self { executors })
     }
 }
 
