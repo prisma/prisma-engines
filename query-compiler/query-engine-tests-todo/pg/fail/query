@@ -7,12 +7,8 @@ new::regressions::prisma_7434::not_in_chunking::not_in_batch_filter
 queries::aggregation::group_by::aggregation_group_by::group_by_ordering_sum_aggregation
 queries::chunking::chunking::order_by_aggregation_should_fail
 queries::chunking::chunking::order_by_relevance_should_fail
-queries::data_types::json::json::dollar_type_in_json_protocol
 queries::data_types::json::json::json_list
-queries::data_types::json::json::nested_dollar_type_in_json_protocol
 queries::data_types::native::postgres::postgres_datetime::dt_native
-queries::data_types::native::postgres::postgres_others::native_other_types
-queries::filters::json_filters::json_filters::multi_filtering
 queries::filters::self_relation_regression::sr_regression::all_categories
 queries::simple::m2m::m2m::repro_16390
 raw::sql::errors::raw_errors::list_param_for_scalar_column_should_not_panic_pg_js
@@ -20,7 +16,6 @@ raw::sql::scalar_list::scalar_list::null_native_type_lists
 raw::sql::scalar_list::scalar_list::null_scalar_lists
 raw::sql::typed_output::typed_output::all_scalars_pg
 writes::data_types::native_types::postgres::postgres::native_date
-writes::data_types::native_types::postgres::postgres::native_other_types
 writes::nested_mutations::already_converted::nested_connect_inside_update::connect_inside_update::p1_c1req_rel_child_idempotent
 writes::top_level_mutations::create_list::create_list::create_not_accept_null_in_set
 writes::top_level_mutations::default_value::default_value::remapped_enum_field

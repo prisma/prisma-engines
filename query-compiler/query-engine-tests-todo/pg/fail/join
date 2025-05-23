@@ -31,17 +31,11 @@ queries::aggregation::uniq_count_relation::uniq_count_rel::nested_count_one2m_m2
 queries::aggregation::uniq_count_relation::uniq_count_rel::no_rel_records
 queries::chunking::chunking::order_by_aggregation_should_fail
 queries::chunking::chunking::order_by_relevance_should_fail
-queries::data_types::bytes::bytes::issue_687::common_types
-queries::data_types::json::json::dollar_type_in_json_protocol
 queries::data_types::json::json::json_list
-queries::data_types::json::json::nested_dollar_type_in_json_protocol
 queries::data_types::native::postgres::postgres_datetime::dt_native
-queries::data_types::native::postgres::postgres_others::native_other_types
-queries::data_types::through_relation::scalar_relations::common_types
 queries::distinct::distinct::nested_distinct
 queries::distinct::distinct::nested_distinct_not_in_selection
 queries::distinct::distinct::nested_distinct_reversed
-queries::filters::json_filters::json_filters::multi_filtering
 queries::filters::self_relation_regression::sr_regression::all_categories
 queries::order_and_pagination::nested_pagination::nested_pagination::bottom_lvl_take_minus_3
 queries::order_and_pagination::nested_pagination::nested_pagination::bottom_lvl_take_minus_4
@@ -56,7 +50,6 @@ raw::sql::scalar_list::scalar_list::null_native_type_lists
 raw::sql::scalar_list::scalar_list::null_scalar_lists
 raw::sql::typed_output::typed_output::all_scalars_pg
 writes::data_types::native_types::postgres::postgres::native_date
-writes::data_types::native_types::postgres::postgres::native_other_types
 writes::nested_mutations::already_converted::nested_connect_inside_update::connect_inside_update::p1_c1req_rel_child_idempotent
 writes::top_level_mutations::create_list::create_list::create_not_accept_null_in_set
 writes::top_level_mutations::default_value::default_value::remapped_enum_field

@@ -34,6 +34,7 @@
     "@prisma/client-engine-runtime": "workspace:*",
     "@prisma/schema-engine-wasm": "../../../schema-engine/schema-engine-wasm/pkg",
     "@prisma/driver-adapter-utils": "workspace:*",
+    "decimal.js": "10.5.0",
     "mitata": "0.1.11",
     "query-engine-wasm-baseline": "npm:@prisma/query-engine-wasm@0.0.19",
     "query-engine-wasm-latest": "npm:@prisma/query-engine-wasm@latest",
