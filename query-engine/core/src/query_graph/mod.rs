@@ -180,6 +180,7 @@ pub enum RowSink {
     AllRows(&'static dyn NodeInputField<Vec<SelectionResult>>),
     SingleRow(&'static dyn NodeInputField<SelectionResult>),
     SingleRowArray(&'static dyn NodeInputField<Vec<SelectionResult>>),
+    Discard,
 }
 
 #[derive(Debug)]
