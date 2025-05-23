@@ -11,4 +11,8 @@ let 0 = unique (query «DELETE FROM "public"."Post" WHERE ("public"."Post"."id" 
                        $1 AND 1=1) RETURNING "public"."Post"."id",
                        "public"."Post"."title", "public"."Post"."userId"»
                 params [const(BigInt(1))])
-in get 0
+in let 0 = validate (get 0)
+       [ rowCountNeq 0
+       ] orRaise "MISSING_RECORD"
+   in ();
+   get 0
