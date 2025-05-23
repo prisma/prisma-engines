@@ -399,6 +399,7 @@ impl Expressionista {
                                                         );
                                                         *field.node_input_field(&mut node) = vec![row];
                                                     }
+                                                    RowSink::Discard => {}
                                                 }
                                                 node
                                             }),

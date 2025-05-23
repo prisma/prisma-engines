@@ -1,11 +1,11 @@
 use super::*;
 use crate::query_graph_builder::write::limit::validate_limit;
-use crate::DataExpectation;
 use crate::{
     query_ast::*,
     query_graph::{Node, QueryGraph, QueryGraphDependency},
     ArgumentListLookup, FilteredQuery, ParsedField,
 };
+use crate::{DataExpectation, RowSink};
 use psl::datamodel_connector::ConnectorCapability;
 use query_structure::{Filter, Model};
 use schema::{constants::args, QuerySchema};
@@ -46,6 +46,20 @@ pub(crate) fn delete_record(
         }
 
         graph.add_result_node(&delete_node);
+
+        // Check that the delete node actually deleted something.
+        let check_node = graph.create_node(Node::Empty);
+        graph.create_edge(
+            &delete_node,
+            &check_node,
+            QueryGraphDependency::ProjectedDataSinkDependency(
+                model.primary_identifier(),
+                RowSink::Discard,
+                Some(DataExpectation::non_empty_rows(
+                    MissingRecord::builder().operation(DataOperation::Delete).build(),
+                )),
+            ),
+        )?;
     } else {
         // In case database does not support returning the deleted row, we need to emulate that
         // behaviour by first reading the row and only then deleting it.

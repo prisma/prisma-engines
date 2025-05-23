@@ -288,6 +288,7 @@ impl<'a, 'b> NodeTranslator<'a, 'b> {
                         RowSink::SingleRow(field) => {
                             *field.node_input_field(&mut node) = SelectionResult::new(fields);
                         }
+                        RowSink::Discard => {}
                     }
                 }
 
