@@ -328,6 +328,6 @@ jobs:
           repository: prisma/engines-wrapper
           event-type: publish-engines
           client-payload: '{ "commit": "${{ github.sha }}", "branch": "${{ github.head_ref || github.ref_name }}" }'
-          token: ${{ secrets.PRISMA_BOT_TOKEN }}
+          token: ${{ secrets.BOT_TOKEN_PRISMA_ENGINES_WRAPPER_BUILD }}
       - name: Cleanup local directories
         run: rm -rf engines-artifacts engines-artifacts-for-r2 engines-artifacts-for-s3
