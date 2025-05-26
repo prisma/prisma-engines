@@ -1,14 +1,5 @@
 import * as util from 'node:util'
-import {
-  SqlQueryable,
-  IsolationLevel,
-  ColumnType,
-  ColumnTypeEnum,
-  SqlResultSet,
-} from '@prisma/driver-adapter-utils'
-import { JsonProtocolQuery, QueryParams } from '../types/jsonRpc'
-import type { State } from './worker'
-import { assertNever, debug } from '../utils'
+
 import {
   noopTracingHelper,
   QueryEvent,
@@ -19,9 +10,22 @@ import {
   type TransactionManager,
   UserFacingError,
 } from '@prisma/client-engine-runtime'
-import { QueryCompiler } from '../query-compiler'
-import { parseIsolationLevel } from './worker-transaction'
+import {
+  ColumnType,
+  ColumnTypeEnum,
+  IsolationLevel,
+  SqlQueryable,
+  SqlResultSet,
+} from '@prisma/driver-adapter-utils'
+import Decimal from 'decimal.js'
+
+import { JsonOutputTaggedValue } from '../engines/JsonProtocol'
 import { withLocalPanicHandler } from '../panic'
+import { QueryCompiler } from '../query-compiler'
+import { JsonProtocolQuery, QueryParams } from '../types/jsonRpc'
+import { assertNever, debug } from '../utils'
+import type { State } from './worker'
+import { parseIsolationLevel } from './worker-transaction'
 
 export function query(
   params: QueryParams,
@@ -231,7 +235,7 @@ function getOperationResultInQeFormat(result: unknown) {
   if (typeof result === 'number') {
     return { count: result }
   } else {
-    return result
+    return normalizeJsonProtocolValues(result)
   }
 }
 
@@ -328,4 +332,81 @@ function serializeColumnType(columnType: ColumnType): string {
     default:
       assertNever(columnType, `Unexpected column type: ${columnType}`)
   }
+}
+
+function normalizeJsonProtocolValues(result: unknown): unknown {
+  if (result === null) {
+    return result
+  }
+
+  if (Array.isArray(result)) {
+    return result.map(normalizeJsonProtocolValues)
+  }
+
+  if (typeof result === 'object') {
+    if (isTaggedValue(result)) {
+      return normalizeTaggedValue(result)
+    }
+
+    // avoid mapping class instances
+    if (result.constructor !== null && result.constructor.name !== 'Object') {
+      return result
+    }
+
+    return mapObjectValues(result, normalizeJsonProtocolValues)
+  }
+
+  return result
+}
+
+function isTaggedValue(value: unknown): value is JsonOutputTaggedValue {
+  return (
+    value !== null &&
+    typeof value == 'object' &&
+    typeof value['$type'] === 'string'
+  )
+}
+
+/**
+ * Normalizes the value inside a tagged value to match the snapshots in tests.
+ * Sometimes there are multiple equally valid representations of the same value
+ * (e.g. a decimal string may contain an arbitrary number of trailing zeros,
+ * datetime strings may specify the UTC offset as either '+00:00' or 'Z', etc).
+ * Since these differences have no effect on the actual values received from the
+ * Prisma Client once the response is deserialized to JavaScript values, we don't
+ * spend extra CPU cycles on normalizing them in the data mapper. Instead, we
+ * patch and normalize them here to ensure they are consistent with the snapshots
+ * in the query engine tests.
+ */
+function normalizeTaggedValue({
+  $type,
+  value,
+}: JsonOutputTaggedValue): JsonOutputTaggedValue {
+  switch ($type) {
+    case 'BigInt':
+      return { $type, value: String(value) }
+    case 'Bytes':
+      return { $type, value }
+    case 'DateTime':
+      return { $type, value: new Date(value).toISOString() }
+    case 'Decimal':
+      return { $type, value: String(new Decimal(value)) }
+    case 'Json':
+      return { $type, value: JSON.stringify(JSON.parse(value)) }
+    default:
+      assertNever(value, 'Unknown tagged value')
+  }
+}
+
+function mapObjectValues<K extends PropertyKey, T, U>(
+  object: Record<K, T>,
+  mapper: (value: T, key: K) => U,
+): Record<K, U> {
+  const result = {} as Record<K, U>
+
+  for (const key of Object.keys(object)) {
+    result[key] = mapper(object[key] as T, key as K)
+  }
+
+  return result
 }
