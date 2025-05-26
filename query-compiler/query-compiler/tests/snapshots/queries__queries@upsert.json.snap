@@ -1,13 +1,11 @@
 ---
 source: query-compiler/query-compiler/tests/queries.rs
-assertion_line: 58
 expression: pretty
 input_file: query-compiler/query-compiler/tests/data/upsert.json
-snapshot_kind: text
 ---
 dataMap
-   id: Int [id]
-   email: String [email]
+    id: Int (id)
+    email: String (email)
 unique (query «INSERT INTO "public"."User" ("email") VALUES ($1) ON CONFLICT
                ("email") DO UPDATE SET "email" = $2 WHERE
                ("public"."User"."email" = $3 AND 1=1) RETURNING

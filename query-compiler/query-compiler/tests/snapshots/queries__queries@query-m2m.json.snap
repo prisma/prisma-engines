@@ -4,12 +4,12 @@ expression: pretty
 input_file: query-compiler/query-compiler/tests/data/query-m2m.json
 ---
 dataMap
-   id: Int [id]
-   title: String [title]
-   userId: Int [userId]
-   categories: 
-      id: Int [id]
-      name: String [name]
+    id: Int (id)
+    title: String (title)
+    userId: Int (userId)
+    categories: 
+        id: Int (id)
+        name: String (name)
 let @parent = unique (query «SELECT "public"."Post"."id",
                              "public"."Post"."title", "public"."Post"."userId"
                              FROM "public"."Post" WHERE ("public"."Post"."id" =

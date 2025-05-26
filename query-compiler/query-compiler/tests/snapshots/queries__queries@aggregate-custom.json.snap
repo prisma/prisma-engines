@@ -4,20 +4,20 @@ expression: pretty
 input_file: query-compiler/query-compiler/tests/data/aggregate-custom.json
 ---
 dataMap
-   _count: 
-      _all: Int [_all]
-   _sum: 
-      float: Float [db_float]
-      int: Int [db_int]
-   _avg: 
-      float: Float [db_float]
-      int: Float [db_int]
-   _min: 
-      float: Float [db_float]
-      int: Int [db_int]
-   _max: 
-      float: Float [db_float]
-      int: Int [db_int]
+    _count: 
+        _all: Int (_all)
+    _sum: 
+        float: Float (db_float)
+        int: Int (db_int)
+    _avg: 
+        float: Float (db_float)
+        int: Float (db_int)
+    _min: 
+        float: Float (db_float)
+        int: Int (db_int)
+    _max: 
+        float: Float (db_float)
+        int: Int (db_int)
 unique (query «SELECT COUNT(*) AS "_count._all", SUM("db_float") AS
                "_sum.db_float", SUM("db_int") AS "_sum.db_int", AVG("db_float")
                AS "_avg.db_float", AVG("db_int") AS "_avg.db_int",

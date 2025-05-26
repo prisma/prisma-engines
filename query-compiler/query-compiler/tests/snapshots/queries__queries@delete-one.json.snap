@@ -4,9 +4,9 @@ expression: pretty
 input_file: query-compiler/query-compiler/tests/data/delete-one.json
 ---
 dataMap
-   id: Int [id]
-   title: String [title]
-   userId: Int [userId]
+    id: Int (id)
+    title: String (title)
+    userId: Int (userId)
 let 0 = unique (query «DELETE FROM "public"."Post" WHERE ("public"."Post"."id" =
                        $1 AND 1=1) RETURNING "public"."Post"."id",
                        "public"."Post"."title", "public"."Post"."userId"»

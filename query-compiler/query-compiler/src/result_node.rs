@@ -1,6 +1,6 @@
 use indexmap::IndexMap;
 use indexmap::map::Entry;
-use query_structure::PrismaValueType;
+use query_structure::{FieldArity, PrismaValueType};
 use serde::Serialize;
 
 #[derive(Debug, Serialize)]
@@ -15,7 +15,16 @@ pub enum ResultNode {
     Value {
         db_name: String,
         result_type: PrismaValueType,
+        arity: ValueArity,
     },
+}
+
+#[derive(Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub enum ValueArity {
+    Required,
+    Optional,
+    List,
 }
 
 impl ResultNode {
@@ -33,8 +42,12 @@ impl ResultNode {
         }
     }
 
-    pub fn new_value(db_name: String, result_type: PrismaValueType) -> Self {
-        ResultNode::Value { db_name, result_type }
+    pub fn new_value(db_name: String, result_type: PrismaValueType, arity: ValueArity) -> Self {
+        ResultNode::Value {
+            db_name,
+            result_type,
+            arity,
+        }
     }
 
     pub fn add_field(&mut self, key: impl Into<String>, node: ResultNode) -> Option<ResultNode> {
@@ -52,6 +65,16 @@ impl ResultNode {
             ResultNode::Value { .. } => {
                 panic!("Only object nodes can be indexed");
             }
+        }
+    }
+}
+
+impl From<FieldArity> for ValueArity {
+    fn from(arity: FieldArity) -> Self {
+        match arity {
+            FieldArity::Required => ValueArity::Required,
+            FieldArity::Optional => ValueArity::Optional,
+            FieldArity::List => ValueArity::List,
         }
     }
 }

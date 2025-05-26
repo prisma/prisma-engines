@@ -5,12 +5,12 @@ input_file: query-compiler/query-compiler/tests/data/update-set-nested.json
 ---
 transaction
    dataMap
-      id: Int [id]
-      email: String [email]
-      posts: 
-         id: Int [id]
-         title: String [title]
-         userId: Int [userId]
+       id: Int (id)
+       email: String (email)
+       posts: 
+           id: Int (id)
+           title: String (title)
+           userId: Int (userId)
    let 0 = unique (query «SELECT "public"."User"."id", "public"."User"."email"
                           FROM "public"."User" WHERE ("public"."User"."email" =
                           $1 AND 1=1) LIMIT $2 OFFSET $3»

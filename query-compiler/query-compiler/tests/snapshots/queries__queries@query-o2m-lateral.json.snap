@@ -4,12 +4,12 @@ expression: pretty
 input_file: query-compiler/query-compiler/tests/data/query-o2m-lateral.json
 ---
 dataMap
-   id: Int [id]
-   email: String [email]
-   activations: 
-      issued: Date [issued]
-      secret: String [secret]
-      done: Boolean [done]
+    id: Int (id)
+    email: String (email)
+    activations: 
+        issued: Date (issued)
+        secret: String (secret)
+        done: Boolean (done)
 query «SELECT "t0"."id", "t0"."email", "User_activations"."__prisma_data__" AS
        "activations" FROM "public"."User" AS "t0" LEFT JOIN LATERAL (SELECT
        COALESCE(JSONB_AGG("__prisma_data__"), '[]') AS "__prisma_data__" FROM

@@ -5,8 +5,8 @@ input_file: query-compiler/query-compiler/tests/data/update-connect-parent-one2m
 ---
 transaction
    dataMap
-      id: Int [id]
-      managerId: Int [managerId]
+       id: Int (id)
+       managerId: Int? (managerId)
    let 1 = unique (query «SELECT "public"."Employee"."id" FROM
                           "public"."Employee" WHERE ("public"."Employee"."id" =
                           $1 AND 1=1) LIMIT $2 OFFSET $3»
