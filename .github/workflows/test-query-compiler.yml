@@ -48,6 +48,7 @@ jobs:
             ignored_tests_list: query-compiler/query-engine-tests-todo/d1/skip
             should_fail_tests_list: query-compiler/query-engine-tests-todo/d1/fail
             relation_load_strategy: '["query"]'
+            test_threads: 1
 
     name: ${{ matrix.adapter.name }}
 
