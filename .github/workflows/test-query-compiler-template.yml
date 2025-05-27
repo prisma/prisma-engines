@@ -14,6 +14,9 @@ on:
       relation_load_strategy:
         type: string
         required: true
+      test_threads:
+        type: number
+        required: true
 
 jobs:
   select_prisma_branch:
@@ -102,4 +105,4 @@ jobs:
       - name: 'Run tests'
         env:
           PARTITION: ${{ matrix.partition }}
-        run: cargo nextest run --package query-engine-tests --test-threads=4 --partition hash:"$PARTITION"
+        run: cargo nextest run --package query-engine-tests --test-threads=${{ inputs.test_threads }} --partition hash:"$PARTITION"

@@ -43,6 +43,13 @@ jobs:
             should_fail_tests_list: query-compiler/query-engine-tests-todo/better-sqlite3/fail
             relation_load_strategy: '["query"]'
 
+          - name: d1
+            setup_task: dev-d1-qc
+            ignored_tests_list: query-compiler/query-engine-tests-todo/d1/skip
+            should_fail_tests_list: query-compiler/query-engine-tests-todo/d1/fail
+            relation_load_strategy: '["query"]'
+            test_threads: 1
+
     name: ${{ matrix.adapter.name }}
 
     uses: ./.github/workflows/test-query-compiler-template.yml
@@ -52,3 +59,4 @@ jobs:
       ignored_tests_list: ${{ matrix.adapter.ignored_tests_list }}
       should_fail_tests_list: ${{ matrix.adapter.should_fail_tests_list }}
       relation_load_strategy: ${{ matrix.adapter.relation_load_strategy }}
+      test_threads: ${{ matrix.adapter.test_threads || 4 }}
