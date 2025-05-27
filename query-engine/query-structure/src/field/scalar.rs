@@ -207,6 +207,22 @@ impl ScalarField {
             ScalarFieldId::InCompositeType(_) => false,
         }
     }
+
+    pub fn corresponding_prisma_type(&self) -> PrismaValueType {
+        let type_ = match (self.type_identifier(), self.native_type()) {
+            (TypeIdentifier::DateTime, Some(native_type))
+                if native_type.name() == "Time" || native_type.name() == "Timetz" =>
+            {
+                PrismaValueType::Time
+            }
+            (type_identifier, _) => type_identifier.to_prisma_type(),
+        };
+        if self.is_list() {
+            PrismaValueType::Array(Box::new(type_))
+        } else {
+            type_
+        }
+    }
 }
 
 impl Display for ScalarField {
