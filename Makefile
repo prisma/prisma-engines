@@ -423,6 +423,11 @@ dev-planetscale-wasm: start-planetscale build-qe-wasm build-driver-adapters-kit-
 
 test-planetscale-wasm: dev-planetscale-wasm test-qe-st
 
+dev-planetscale-qc: build-qc-wasm build-driver-adapters-kit-qc
+	cp $(CONFIG_PATH)/planetscale-qc $(CONFIG_FILE)
+
+test-planetscale-qc: dev-planetscale-qc test-qe-st
+
 test-driver-adapter-planetscale: test-planetscale-js
 test-driver-adapter-planetscale-wasm: test-planetscale-wasm
 

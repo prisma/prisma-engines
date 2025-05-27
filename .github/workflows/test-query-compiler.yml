@@ -43,6 +43,12 @@ jobs:
             should_fail_tests_list: query-compiler/query-engine-tests-todo/better-sqlite3/fail
             relation_load_strategy: '["query"]'
 
+          - name: planetscale
+            setup_task: dev-planetscale-qc
+            ignored_tests_list: query-compiler/query-engine-tests-todo/planetscale/skip
+            should_fail_tests_list: query-compiler/query-engine-tests-todo/planetscale/fail
+            relation_load_strategy: '["query"]'
+
     name: ${{ matrix.adapter.name }}
 
     uses: ./.github/workflows/test-query-compiler-template.yml
