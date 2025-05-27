@@ -17,12 +17,18 @@ const DriverAdapterConfigFromString = S.transform(
 
 const EnvPlanetScale = S.struct({
   DRIVER_ADAPTER: S.literal('planetscale'),
-  DRIVER_ADAPTER_CONFIG: DriverAdapterConfigFromString,
+  DRIVER_ADAPTER_CONFIG: S.union(
+    DriverAdapterConfigFromString,
+    DriverAdapterConfig,
+  ),
 })
 
 const EnvNeonWS = S.struct({
   DRIVER_ADAPTER: S.literal('neon:ws'),
-  DRIVER_ADAPTER_CONFIG: DriverAdapterConfigFromString,
+  DRIVER_ADAPTER_CONFIG: S.union(
+    DriverAdapterConfigFromString,
+    DriverAdapterConfig,
+  ),
 })
 
 export const MobileAdapterConfig = S.struct({

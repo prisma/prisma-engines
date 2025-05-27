@@ -22,6 +22,7 @@ pub enum AdapterName {
     D1(AdapterD1),
     LibSQL,
     BetterSQLite3,
+    Planetscale,
     Unknown,
 }
 
@@ -36,6 +37,7 @@ impl FromStr for AdapterName {
                 "d1-http" => Ok(Self::D1(AdapterD1::HTTP)),
                 "libsql" => Ok(Self::LibSQL),
                 "better-sqlite3" => Ok(Self::BetterSQLite3),
+                "planetscale" => Ok(Self::Planetscale),
                 _ => Ok(Self::Unknown),
             }
         } else {
