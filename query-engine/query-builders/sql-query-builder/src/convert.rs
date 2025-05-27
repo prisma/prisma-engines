@@ -121,6 +121,6 @@ pub fn opaque_type_to_prisma_type(vt: &OpaqueType) -> PrismaValueType {
         OpaqueType::Uuid => PrismaValueType::String,
         OpaqueType::DateTime => PrismaValueType::Date,
         OpaqueType::Date => PrismaValueType::Date,
-        OpaqueType::Time => PrismaValueType::Date,
+        OpaqueType::Time => PrismaValueType::Time,
     }
 }
