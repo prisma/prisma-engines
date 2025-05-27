@@ -183,6 +183,11 @@ dev-better-sqlite3-qc: build-qc-wasm build-driver-adapters-kit-qc
 
 test-better-sqlite3-qc: dev-better-sqlite3-qc test-qe-st
 
+dev-d1-qc: build-qc-wasm build-driver-adapters-kit-qc
+	cp $(CONFIG_PATH)/d1-qc $(CONFIG_FILE)
+
+test-d1-qc: dev-d1-qc test-qe-st
+
 dev-d1: build-qe-wasm build-se-wasm build-driver-adapters-kit-qe
 	cp $(CONFIG_PATH)/cloudflare-d1 $(CONFIG_FILE)
 
