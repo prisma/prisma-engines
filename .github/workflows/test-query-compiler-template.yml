@@ -16,7 +16,7 @@ on:
         required: true
       test_threads:
         type: number
-        default: 4
+        required: true
 
 jobs:
   select_prisma_branch:
