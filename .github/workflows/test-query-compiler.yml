@@ -43,6 +43,12 @@ jobs:
             should_fail_tests_list: query-compiler/query-engine-tests-todo/better-sqlite3/fail
             relation_load_strategy: '["query"]'
 
+          - name: planetscale
+            setup_task: dev-planetscale-qc
+            ignored_tests_list: query-compiler/query-engine-tests-todo/planetscale/skip
+            should_fail_tests_list: query-compiler/query-engine-tests-todo/planetscale/fail
+            relation_load_strategy: '["query"]'
+
           - name: d1
             setup_task: dev-d1-qc
             ignored_tests_list: query-compiler/query-engine-tests-todo/d1/skip
