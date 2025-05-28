@@ -7,6 +7,7 @@ mod tagged;
 use base64::prelude::*;
 use bigdecimal::{BigDecimal, FromPrimitive, ToPrimitive};
 use chrono::prelude::*;
+use parser_database::EnumId;
 use serde::de::Unexpected;
 use serde::ser::SerializeMap;
 use serde::{ser::Serializer, Deserialize, Deserializer, Serialize};
@@ -77,6 +78,33 @@ pub enum PrismaValueType {
     Array(Box<PrismaValueType>),
     Object,
     Bytes,
+    #[serde(
+        serialize_with = "PrismaValueType::serialize_enum_id",
+        deserialize_with = "PrismaValueType::deserialize_enum_id"
+    )]
+    Enum(EnumId),
+}
+
+impl PrismaValueType {
+    pub fn key_from_enum_id((file_id, enum_id): &EnumId) -> String {
+        format!("{}:{}", file_id.0, enum_id.to_u32())
+    }
+
+    fn serialize_enum_id<S: Serializer>(id: &EnumId, serializer: S) -> Result<S::Ok, S::Error> {
+        serializer.serialize_str(&Self::key_from_enum_id(id))
+    }
+
+    fn deserialize_enum_id<'de, D: Deserializer<'de>>(_deserializer: D) -> Result<EnumId, D::Error> {
+        Err(serde::de::Error::custom("EnumId cannot be deserialized"))
+    }
+
+    pub fn enum_id(&self) -> Option<EnumId> {
+        match self {
+            PrismaValueType::Enum(id) => Some(*id),
+            PrismaValueType::Array(inner) => inner.enum_id(),
+            _ => None,
+        }
+    }
 }
 
 impl std::fmt::Display for PrismaValueType {
@@ -94,6 +122,7 @@ impl std::fmt::Display for PrismaValueType {
             PrismaValueType::Array(t) => write!(f, "Array<{t}>"),
             PrismaValueType::Object => write!(f, "Object"),
             PrismaValueType::Bytes => write!(f, "Bytes"),
+            PrismaValueType::Enum(id) => write!(f, "Enum<{}>", Self::key_from_enum_id(id)),
         }
     }
 }

@@ -11,10 +11,17 @@ transaction
        user: {
            id: Int (id)
            email: String (email)
+           role: Enum<0:2> (role)
        }
        categories: {
            id: Int (id)
            name: String (name)
+       }
+   }
+   enums {
+       "0:2": {
+           admin: ADMIN
+           user: USER
        }
    }
    let 1 = unique (query «SELECT "public"."User"."id" FROM "public"."User" WHERE
@@ -83,7 +90,8 @@ transaction
                                   @parent$userId = mapField userId (get @parent)
                               in join (get @parent)
                                  with (query «SELECT "public"."User"."id",
-                                              "public"."User"."email" FROM
+                                              "public"."User"."email",
+                                              "public"."User"."role"::text FROM
                                               "public"."User" WHERE
                                               "public"."User"."id" = $1 OFFSET
                                               $2»

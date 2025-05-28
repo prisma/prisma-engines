@@ -6,11 +6,19 @@ input_file: query-compiler/query-compiler/tests/data/upsert.json
 dataMap {
     id: Int (id)
     email: String (email)
+    role: Enum<0:2> (role)
 }
-unique (query «INSERT INTO "public"."User" ("email") VALUES ($1) ON CONFLICT
-               ("email") DO UPDATE SET "email" = $2 WHERE
-               ("public"."User"."email" = $3 AND 1=1) RETURNING
-               "public"."User"."id", "public"."User"."email"»
-        params [const(String("user.1@prisma.io")),
+enums {
+    "0:2": {
+        admin: ADMIN
+        user: USER
+    }
+}
+unique (query «INSERT INTO "public"."User" ("email","role") VALUES
+               ($1,CAST($2::text AS "public"."Role")) ON CONFLICT ("email") DO
+               UPDATE SET "email" = $3 WHERE ("public"."User"."email" = $4 AND
+               1=1) RETURNING "public"."User"."id", "public"."User"."email",
+               "public"."User"."role"::text»
+        params [const(String("user.1@prisma.io")), const(String("user")),
                 const(String("user.2@prisma.io")),
                 const(String("user.1@prisma.io"))])

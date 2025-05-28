@@ -3,7 +3,7 @@ use std::slice;
 use itertools::Either;
 use psl::schema_ast::ast::FieldArity;
 
-use crate::{ScalarFieldRef, TypeIdentifier};
+use crate::{InternalDataModel, ScalarFieldRef, TypeIdentifier};
 
 /// Selections for aggregation queries.
 #[derive(Debug, Clone)]
@@ -64,6 +64,7 @@ impl AggregationSelection {
                         db_name: "all",
                         typ: TypeIdentifier::Int,
                         arity: FieldArity::Required,
+                        dm: None,
                     }]))
                 } else {
                     Either::Left(mapped)
@@ -82,6 +83,7 @@ impl AggregationSelection {
             db_name: f.db_name(),
             typ: type_mapper(f.type_identifier()),
             arity: arity_mapper(f.arity()),
+            dm: Some(&f.dm),
         })
     }
 }
@@ -91,4 +93,5 @@ pub struct SelectionIdenfitier<'a> {
     pub db_name: &'a str,
     pub typ: TypeIdentifier,
     pub arity: FieldArity,
+    pub dm: Option<&'a InternalDataModel>,
 }

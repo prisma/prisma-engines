@@ -347,7 +347,6 @@ writes::relations::same_model_self_rel_without_back_rel::self_rel_no_back_rel::m
 writes::relations::same_model_self_rel_without_back_rel::self_rel_no_back_rel::one2one_self_rel
 writes::top_level_mutations::create_many::create_many::create_many_error_dups
 writes::top_level_mutations::create::create::gracefully_fails_when_uniq_violation
-writes::top_level_mutations::default_value::default_value::remapped_enum_field
 writes::top_level_mutations::delete_many::delete_many::nested_delete_many
 writes::top_level_mutations::insert_null_in_required_field::insert_null::update_optional_val_null
 writes::top_level_mutations::non_embedded_upsert::non_embedded_upsert::execute_nested_create_of_correct_branch

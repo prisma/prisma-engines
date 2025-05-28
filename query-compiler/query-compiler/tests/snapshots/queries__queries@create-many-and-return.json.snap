@@ -7,8 +7,19 @@ transaction
    dataMap {
        id: Int (id)
        email: String (email)
+       role: Enum<0:2> (role)
    }
-   concat (query «INSERT INTO "public"."User" ("email") VALUES ($1), ($2)
-                  RETURNING "public"."User"."id", "public"."User"."email"»
+   enums {
+       "0:2": {
+           admin: ADMIN
+           user: USER
+       }
+   }
+   concat (query «INSERT INTO "public"."User" ("email","role") VALUES
+                  ($1,CAST($2::text AS "public"."Role")), ($3,CAST($4::text AS
+                  "public"."Role")) RETURNING "public"."User"."id",
+                  "public"."User"."email", "public"."User"."role"::text»
            params [const(String("user.1737556028164@prisma.io")),
-                   const(String("user.1737556028165@prisma.io"))])
+                   const(String("user")),
+                   const(String("user.1737556028165@prisma.io")),
+                   const(String("user"))])

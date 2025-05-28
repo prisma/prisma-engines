@@ -1,4 +1,4 @@
-use crate::result_node::ResultNode;
+use crate::{expression::EnumsMap, result_node::ResultNode};
 use indexmap::IndexSet;
 use itertools::Itertools;
 use query_core::{
@@ -8,13 +8,13 @@ use query_core::{
 use query_structure::{AggregationSelection, FieldSelection, SelectedField};
 use std::collections::HashMap;
 
-pub fn map_result_structure(graph: &QueryGraph) -> Option<ResultNode> {
+pub fn map_result_structure(graph: &QueryGraph, enums: &mut EnumsMap) -> Option<ResultNode> {
     graph
         .result_nodes()
         .chain(graph.leaf_nodes())
         .find_map(|idx| {
             if let Node::Query(query) = graph.node_content(&idx)? {
-                map_query(query)
+                map_query(query, enums)
             } else {
                 None
             }
@@ -32,50 +32,56 @@ pub fn map_result_structure(graph: &QueryGraph) -> Option<ResultNode> {
         })
 }
 
-fn map_query(query: &Query) -> Option<ResultNode> {
+fn map_query(query: &Query, enums: &mut EnumsMap) -> Option<ResultNode> {
     match query {
-        Query::Read(read_query) => map_read_query(read_query),
-        Query::Write(write_query) => map_write_query(write_query),
+        Query::Read(read_query) => map_read_query(read_query, enums),
+        Query::Write(write_query) => map_write_query(write_query, enums),
     }
 }
 
-fn map_read_query(query: &ReadQuery) -> Option<ResultNode> {
+fn map_read_query(query: &ReadQuery, enums: &mut EnumsMap) -> Option<ResultNode> {
     match query {
         ReadQuery::RecordQuery(q) => get_result_node(
             &q.selected_fields,
             &q.selection_order,
             &q.nested,
             q.relation_load_strategy.is_join(),
+            enums,
         ),
         ReadQuery::ManyRecordsQuery(q) => get_result_node(
             &q.selected_fields,
             &q.selection_order,
             &q.nested,
             q.relation_load_strategy.is_join(),
+            enums,
         ),
-        ReadQuery::RelatedRecordsQuery(q) => get_result_node(&q.selected_fields, &q.selection_order, &q.nested, false),
-        ReadQuery::AggregateRecordsQuery(q) => get_result_node_for_aggregation(&q.selectors, &q.selection_order),
+        ReadQuery::RelatedRecordsQuery(q) => {
+            get_result_node(&q.selected_fields, &q.selection_order, &q.nested, false, enums)
+        }
+        ReadQuery::AggregateRecordsQuery(q) => get_result_node_for_aggregation(&q.selectors, &q.selection_order, enums),
     }
 }
 
-fn map_write_query(query: &WriteQuery) -> Option<ResultNode> {
+fn map_write_query(query: &WriteQuery, enums: &mut EnumsMap) -> Option<ResultNode> {
     match query {
-        WriteQuery::CreateRecord(q) => get_result_node(&q.selected_fields, &q.selection_order, &[], false),
-        WriteQuery::CreateManyRecords(q) => get_result_node_for_create_many(q.selected_fields.as_ref()),
+        WriteQuery::CreateRecord(q) => get_result_node(&q.selected_fields, &q.selection_order, &[], false, enums),
+        WriteQuery::CreateManyRecords(q) => get_result_node_for_create_many(q.selected_fields.as_ref(), enums),
         WriteQuery::UpdateRecord(u) => {
             match u {
-                UpdateRecord::WithSelection(w) => get_result_node(&w.selected_fields, &w.selection_order, &[], false),
+                UpdateRecord::WithSelection(w) => {
+                    get_result_node(&w.selected_fields, &w.selection_order, &[], false, enums)
+                }
                 UpdateRecord::WithoutSelection(_) => None, // No result data
             }
         }
-        WriteQuery::DeleteRecord(q) => get_result_node_for_delete(q.selected_fields.as_ref()),
-        WriteQuery::UpdateManyRecords(q) => get_result_node_for_update_many(q.selected_fields.as_ref()),
+        WriteQuery::DeleteRecord(q) => get_result_node_for_delete(q.selected_fields.as_ref(), enums),
+        WriteQuery::UpdateManyRecords(q) => get_result_node_for_update_many(q.selected_fields.as_ref(), enums),
         WriteQuery::DeleteManyRecords(_) => None, // No result data
         WriteQuery::ConnectRecords(_) => None,    // No result data
         WriteQuery::DisconnectRecords(_) => None, // No result data
         WriteQuery::ExecuteRaw(_) => None,        // No data mapping
         WriteQuery::QueryRaw(_) => None,          // No data mapping
-        WriteQuery::Upsert(q) => get_result_node(&q.selected_fields, &q.selection_order, &[], false),
+        WriteQuery::Upsert(q) => get_result_node(&q.selected_fields, &q.selection_order, &[], false, enums),
     }
 }
 
@@ -84,6 +90,7 @@ fn get_result_node(
     selection_order: &[String],
     nested_queries: &[ReadQuery],
     uses_relation_joins: bool,
+    enums: &mut EnumsMap,
 ) -> Option<ResultNode> {
     let field_map = field_selection
         .selections()
@@ -102,6 +109,7 @@ fn get_result_node(
         match field_map.get(prisma_name.as_str()) {
             Some(sf @ SelectedField::Scalar(f)) => {
                 let prisma_type = f.corresponding_prisma_type();
+                enums.add(&prisma_type, &f.dm);
                 node.add_field(
                     prisma_name,
                     ResultNode::new_value(sf.db_name().into_owned(), prisma_type),
@@ -110,7 +118,7 @@ fn get_result_node(
             Some(SelectedField::Composite(_)) => todo!("MongoDB specific"),
             Some(SelectedField::Relation(f)) => {
                 let nested_selection = FieldSelection::new(f.selections.to_vec());
-                let nested_node = get_result_node(&nested_selection, &f.result_fields, &[], uses_relation_joins);
+                let nested_node = get_result_node(&nested_selection, &f.result_fields, &[], uses_relation_joins, enums);
                 if let Some(nested_node) = nested_node {
                     node.add_field(f.field.name(), nested_node);
                 }
@@ -140,7 +148,7 @@ fn get_result_node(
             }
             None => {
                 if let Some(q) = nested_map.get(prisma_name.as_str()) {
-                    let nested_node = map_read_query(q);
+                    let nested_node = map_read_query(q, enums);
                     if let Some(nested_node) = nested_node {
                         node.add_field(q.get_alias_or_name(), nested_node);
                     }
@@ -155,6 +163,7 @@ fn get_result_node(
 fn get_result_node_for_aggregation(
     selectors: &[AggregationSelection],
     selection_order: &[(String, Option<Vec<String>>)],
+    enums: &mut EnumsMap,
 ) -> Option<ResultNode> {
     let mut ordered_set = IndexSet::new();
 
@@ -170,7 +179,7 @@ fn get_result_node_for_aggregation(
 
     let mut node = ResultNode::new_object();
 
-    for (underscore_name, name, db_name, typ) in selectors
+    for (underscore_name, name, db_name, typ, dm) in selectors
         .iter()
         .flat_map(|sel| {
             sel.identifiers().map(move |ident| {
@@ -180,12 +189,16 @@ fn get_result_node_for_aggregation(
                     } else {
                         (ident.name, ident.db_name)
                     };
-                (aggregate_underscore_name(sel), name, db_name, ident.typ)
+                (aggregate_underscore_name(sel), name, db_name, ident.typ, ident.dm)
             })
         })
-        .sorted_by_key(|(underscore_name, name, _, _)| ordered_set.get_index_of(&(*underscore_name, *name)))
+        .sorted_by_key(|(underscore_name, name, _, _, _)| ordered_set.get_index_of(&(*underscore_name, *name)))
     {
-        let value = ResultNode::new_value(db_name.into(), typ.to_prisma_type());
+        let prisma_type = typ.to_prisma_type();
+        if let Some(dm) = dm {
+            enums.add(&prisma_type, dm)
+        }
+        let value = ResultNode::new_value(db_name.into(), prisma_type);
         if let Some(undescore_name) = underscore_name {
             node.entry(undescore_name)
                 .or_insert_with(ResultNode::new_object)
@@ -209,24 +222,35 @@ fn aggregate_underscore_name(sel: &AggregationSelection) -> Option<&'static str>
     }
 }
 
-fn get_result_node_for_create_many(selected_fields: Option<&CreateManyRecordsFields>) -> Option<ResultNode> {
+fn get_result_node_for_create_many(
+    selected_fields: Option<&CreateManyRecordsFields>,
+    enums: &mut EnumsMap,
+) -> Option<ResultNode> {
     get_result_node(
         &selected_fields?.fields,
         &selected_fields?.order,
         &selected_fields?.nested,
         false,
+        enums,
     )
 }
 
-fn get_result_node_for_delete(selected_fields: Option<&DeleteRecordFields>) -> Option<ResultNode> {
-    get_result_node(&selected_fields?.fields, &selected_fields?.order, &[], false)
+fn get_result_node_for_delete(
+    selected_fields: Option<&DeleteRecordFields>,
+    enums: &mut EnumsMap,
+) -> Option<ResultNode> {
+    get_result_node(&selected_fields?.fields, &selected_fields?.order, &[], false, enums)
 }
 
-fn get_result_node_for_update_many(selected_fields: Option<&UpdateManyRecordsFields>) -> Option<ResultNode> {
+fn get_result_node_for_update_many(
+    selected_fields: Option<&UpdateManyRecordsFields>,
+    enums: &mut EnumsMap,
+) -> Option<ResultNode> {
     get_result_node(
         &selected_fields?.fields,
         &selected_fields?.order,
         &selected_fields?.nested,
         false,
+        enums,
     )
 }
