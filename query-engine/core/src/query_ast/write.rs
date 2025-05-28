@@ -3,7 +3,7 @@ use super::{FilteredNestedMutation, FilteredQuery};
 use crate::{ReadQuery, RecordQuery, ToGraphviz};
 use connector::NativeUpsert;
 use query_structure::{prelude::*, DatasourceFieldName, Filter, RecordFilter, WriteArgs};
-use std::collections::HashMap;
+use std::{borrow::Cow, collections::HashMap};
 
 #[derive(Debug, Clone)]
 pub enum WriteQuery {
@@ -64,14 +64,16 @@ impl WriteQuery {
     }
 
     /// Returns the field selection of a write query.
-    pub fn returns(&self) -> Option<&FieldSelection> {
-        match self {
+    pub fn returns(&self) -> Option<Cow<'_, FieldSelection>> {
+        let borrowed_fs = match self {
             Self::CreateRecord(cr) => Some(&cr.selected_fields),
             Self::CreateManyRecords(CreateManyRecords { selected_fields, .. }) => {
                 selected_fields.as_ref().map(|sf| &sf.fields)
             }
             Self::UpdateRecord(UpdateRecord::WithSelection(ur)) => Some(&ur.selected_fields),
-            Self::UpdateRecord(UpdateRecord::WithoutSelection(_)) => None,
+            Self::UpdateRecord(UpdateRecord::WithoutSelection(_)) => {
+                return Some(Cow::Owned(self.model().primary_identifier()))
+            }
             Self::DeleteRecord(DeleteRecord { selected_fields, .. }) => selected_fields.as_ref().map(|sf| &sf.fields),
             Self::UpdateManyRecords(UpdateManyRecords { selected_fields, .. }) => {
                 selected_fields.as_ref().map(|sf| &sf.fields)
@@ -82,7 +84,8 @@ impl WriteQuery {
             Self::ExecuteRaw(_) => None,
             Self::QueryRaw(_) => None,
             Self::Upsert(upsert) => Some(&upsert.selected_fields),
-        }
+        };
+        borrowed_fs.map(Cow::Borrowed)
     }
 
     /// Updates the field selection of the query to satisfy the inputted FieldSelection.
