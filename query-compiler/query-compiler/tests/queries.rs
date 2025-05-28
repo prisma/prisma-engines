@@ -11,7 +11,7 @@ use std::{fs, process::Command, sync::Arc};
 #[test]
 fn queries() {
     insta::glob!("data/*.json", |path| {
-        let test_name = path.file_name().unwrap().to_str().unwrap();
+        let test_name = path.file_name().unwrap().display();
         println!("running: {test_name}");
 
         let schema_string = include_str!("data/schema.prisma");
