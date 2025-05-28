@@ -44,6 +44,7 @@ use std::{
     time::Duration,
 };
 use tokio::sync::OnceCell;
+use tokio::task::JoinHandle;
 use tokio_postgres::{config::ChannelBinding, Client, Config, Statement};
 use tracing_futures::WithSubscriber;
 use websocket::connect_via_websocket;
@@ -73,7 +74,9 @@ const DB_SYSTEM_NAME_COCKROACHDB: &str = "cockroachdb";
 #[derive(Debug)]
 pub struct PostgreSql<Cache> {
     client: PostgresClient,
+    handle: JoinHandle<()>,
     pg_bouncer: bool,
+    single_use_connection: bool,
     socket_timeout: Option<Duration>,
     cache: Cache,
     is_healthy: AtomicBool,
@@ -233,12 +236,14 @@ impl PostgresNativeUrl {
 impl PostgreSqlWithNoCache {
     /// Create a new websocket connection to managed database
     pub async fn new_with_websocket(url: PostgresWebSocketUrl) -> crate::Result<Self> {
-        let client = connect_via_websocket(url).await?;
+        let (client, handle) = connect_via_websocket(url).await?;
 
         Ok(Self {
             client: PostgresClient(client),
+            handle,
             socket_timeout: None,
             pg_bouncer: false,
+            single_use_connection: false,
             cache: NoOpCache,
             is_healthy: AtomicBool::new(true),
             is_cockroachdb: false,
@@ -259,7 +264,7 @@ impl<Cache: QueryCache> PostgreSql<Cache> {
         let is_cockroachdb = conn.parameter("crdb_version").is_some();
         let is_materialize = conn.parameter("mz_version").is_some();
 
-        tokio::spawn(
+        let handle = tokio::spawn(
             conn.map(|r| {
                 if let Err(e) = r {
                     tracing::error!("Error in PostgreSQL connection: {e:?}");
@@ -297,8 +302,10 @@ impl<Cache: QueryCache> PostgreSql<Cache> {
 
         Ok(Self {
             client: PostgresClient(client),
-            socket_timeout: url.query_params.socket_timeout,
-            pg_bouncer: url.query_params.pg_bouncer,
+            handle,
+            socket_timeout: url.socket_timeout(),
+            pg_bouncer: url.pg_bouncer(),
+            single_use_connection: url.single_use_connections(),
             cache: url.cache_settings().into(),
             is_healthy: AtomicBool::new(true),
             is_cockroachdb,
@@ -494,6 +501,14 @@ impl<Cache: QueryCache> PostgreSql<Cache> {
             },
         )
         .await
+    }
+}
+
+impl<Cache> Drop for PostgreSql<Cache> {
+    fn drop(&mut self) {
+        if self.single_use_connection {
+            self.handle.abort();
+        }
     }
 }
 

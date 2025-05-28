@@ -265,6 +265,11 @@ impl PostgresNativeUrl {
         self.query_params.options.as_deref()
     }
 
+    /// If true, the connections are not reusable and must be closed after every transaction.
+    pub(crate) fn single_use_connections(&self) -> bool {
+        self.query_params.single_use_connections
+    }
+
     /// Sets whether the URL points to a Postgres, Cockroach or Unknown database.
     /// This is used to avoid a network roundtrip at connection to set the search path.
     ///
@@ -298,6 +303,7 @@ impl PostgresNativeUrl {
         let mut max_connection_lifetime = None;
         let mut max_idle_connection_lifetime = Some(Duration::from_secs(300));
         let mut options = None;
+        let mut single_use_connections = false;
 
         for (k, v) in url.query_pairs() {
             match k.as_ref() {
@@ -436,6 +442,11 @@ impl PostgresNativeUrl {
                 "options" => {
                     options = Some(v.to_string());
                 }
+                "single_use_connections" => {
+                    single_use_connections = v
+                        .parse()
+                        .map_err(|_| Error::builder(ErrorKind::InvalidConnectionArguments).build())?;
+                }
                 _ => {
                     tracing::trace!(message = "Discarding connection string param", param = &*k);
                 }
@@ -465,6 +476,7 @@ impl PostgresNativeUrl {
             channel_binding,
             #[cfg(feature = "postgresql-native")]
             ssl_mode,
+            single_use_connections,
         })
     }
 
@@ -497,6 +509,7 @@ pub(crate) struct PostgresUrlQueryParams {
     pub(crate) max_idle_connection_lifetime: Option<Duration>,
     pub(crate) application_name: Option<String>,
     pub(crate) options: Option<String>,
+    pub(crate) single_use_connections: bool,
 
     #[cfg(feature = "postgresql-native")]
     pub(crate) channel_binding: ChannelBinding,
@@ -650,6 +663,22 @@ mod tests {
                 .unwrap();
 
         assert_eq!("--cluster=my_cluster", url.options().unwrap());
+    }
+
+    #[test]
+    fn should_handle_single_use_connections() {
+        let url = PostgresNativeUrl::new(Url::parse("postgresql:///localhost:5432").unwrap()).unwrap();
+        assert!(!url.single_use_connections());
+
+        let url =
+            PostgresNativeUrl::new(Url::parse("postgresql:///localhost:5432?single_use_connections=true").unwrap())
+                .unwrap();
+        assert!(url.single_use_connections());
+
+        let url =
+            PostgresNativeUrl::new(Url::parse("postgresql:///localhost:5432?single_use_connections=false").unwrap())
+                .unwrap();
+        assert!(!url.single_use_connections());
     }
 
     #[tokio::test]

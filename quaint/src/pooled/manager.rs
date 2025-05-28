@@ -140,7 +140,7 @@ impl Manager for QuaintManager {
                 is_tracing_enabled: false,
             } => {
                 use crate::connector::{PostgreSqlWithDefaultCache, PostgreSqlWithNoCache};
-                Ok(if url.query_params.pg_bouncer {
+                Ok(if url.pg_bouncer() {
                     Box::new(PostgreSqlWithNoCache::new(url.clone(), tls_manager).await?) as Self::Connection
                 } else {
                     Box::new(PostgreSqlWithDefaultCache::new(url.clone(), tls_manager).await?) as Self::Connection
@@ -154,7 +154,7 @@ impl Manager for QuaintManager {
                 is_tracing_enabled: true,
             } => {
                 use crate::connector::{PostgreSqlWithNoCache, PostgreSqlWithTracingCache};
-                Ok(if url.query_params.pg_bouncer {
+                Ok(if url.pg_bouncer() {
                     Box::new(PostgreSqlWithNoCache::new(url.clone(), tls_manager).await?) as Self::Connection
                 } else {
                     Box::new(PostgreSqlWithTracingCache::new(url.clone(), tls_manager).await?) as Self::Connection
@@ -180,7 +180,11 @@ impl Manager for QuaintManager {
     }
 
     fn validate(&self, conn: &mut Self::Connection) -> bool {
-        conn.is_healthy()
+        let single_use_connection = match self {
+            Self::Postgres { url, .. } => url.single_use_connections(),
+            _ => false,
+        };
+        !single_use_connection && conn.is_healthy()
     }
 
     fn spawn_task<T>(&self, task: T)
