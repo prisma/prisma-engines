@@ -295,6 +295,7 @@ pub(crate) fn get_relation_load_strategy(
         },
         // Connectors does not support the join strategy so we always fallback to the `Query` one.
         JoinStrategySupport::No => Ok(RelationLoadStrategy::Query),
+        // TODO: Resolve the join strategy when initializing the query compiler.
         JoinStrategySupport::UnknownYet => Ok(RelationLoadStrategy::Query),
     }
 }
