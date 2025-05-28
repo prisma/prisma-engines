@@ -6,7 +6,6 @@ use query_core::{
 };
 use query_structure::{QueryArguments, RelationLoadStrategy, Take};
 use sql_query_builder::write::split_write_args_by_shape;
-use thiserror::Error;
 
 use crate::{TranslateError, expression::Expression, translate::TranslateResult};
 
@@ -206,12 +205,6 @@ pub(crate) fn translate_write_query(query: WriteQuery, builder: &dyn QueryBuilde
             Expression::Execute(query)
         }
 
-        other => {
-            return Err(TranslateError::QueryBuildFailure(Box::new(UnhandledBranch(other))));
-        }
+        other => todo!("{other:?}"),
     })
 }
-
-#[derive(Debug, Error)]
-#[error("unimplemented write query: {0:?}")]
-struct UnhandledBranch(WriteQuery);
