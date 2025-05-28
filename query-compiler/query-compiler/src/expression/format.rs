@@ -305,6 +305,7 @@ where
 
     fn data_map_node(&'a self, node: &'a ResultNode) -> DocBuilder<'a, PrettyPrinter<'a, D>, ColorSpec> {
         match node {
+            ResultNode::AffectedRows => self.keyword("affectedRows"),
             ResultNode::Object { fields, flattened } => self
                 .line()
                 .append(

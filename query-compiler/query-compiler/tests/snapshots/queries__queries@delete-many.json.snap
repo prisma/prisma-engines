@@ -3,6 +3,7 @@ source: query-compiler/query-compiler/tests/queries.rs
 expression: pretty
 input_file: query-compiler/query-compiler/tests/data/delete-many.json
 ---
+dataMap affectedRows
 let 0 = sum (execute «DELETE FROM "public"."Post" WHERE ("public"."Post"."id")
                       IN (SELECT "public"."Post"."id" FROM "public"."Post" WHERE
                       "public"."Post"."title" = $1 LIMIT $2)»

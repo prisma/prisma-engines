@@ -9,14 +9,27 @@ use query_structure::{AggregationSelection, FieldSelection, SelectedField};
 use std::collections::HashMap;
 
 pub fn map_result_structure(graph: &QueryGraph) -> Option<ResultNode> {
-    for idx in graph.result_nodes().chain(graph.leaf_nodes()) {
-        let node = graph.node_content(&idx);
-        if let Some(Node::Query(query)) = node {
-            return map_query(query);
-        }
-    }
-
-    None
+    graph
+        .result_nodes()
+        .chain(graph.leaf_nodes())
+        .find_map(|idx| {
+            if let Node::Query(query) = graph.node_content(&idx)? {
+                map_query(query)
+            } else {
+                None
+            }
+        })
+        .or_else(|| {
+            graph
+                .result_nodes()
+                .chain(graph.leaf_nodes())
+                .all(|idx| match graph.node_content(&idx) {
+                    Some(Node::Query(Query::Write(WriteQuery::QueryRaw(_) | WriteQuery::ExecuteRaw(_)))) => false,
+                    Some(Node::Query(Query::Write(write))) => write.returns().is_none(),
+                    _ => false,
+                })
+                .then_some(ResultNode::AffectedRows)
+        })
 }
 
 fn map_query(query: &Query) -> Option<ResultNode> {
