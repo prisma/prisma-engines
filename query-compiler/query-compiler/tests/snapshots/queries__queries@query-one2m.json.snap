@@ -10,6 +10,13 @@ dataMap {
     user: {
         id: Int (id)
         email: String (email)
+        role: Enum<0:2> (role)
+    }
+}
+enums {
+    "0:2": {
+        admin: ADMIN
+        user: USER
     }
 }
 let @parent = unique (query «SELECT "public"."Post"."id",
@@ -20,7 +27,8 @@ let @parent = unique (query «SELECT "public"."Post"."id",
                               const(BigInt(0))])
 in let @parent$userId = mapField userId (get @parent)
    in join (get @parent)
-      with (query «SELECT "public"."User"."id", "public"."User"."email" FROM
-                   "public"."User" WHERE "public"."User"."id" = $1 OFFSET $2»
+      with (query «SELECT "public"."User"."id", "public"."User"."email",
+                   "public"."User"."role"::text FROM "public"."User" WHERE
+                   "public"."User"."id" = $1 OFFSET $2»
             params [var(@parent$userId as Int),
                     const(BigInt(0))]) on unique left.(userId) = right.(id) as user

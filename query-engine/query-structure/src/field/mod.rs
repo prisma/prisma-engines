@@ -188,7 +188,7 @@ impl TypeIdentifier {
             TypeIdentifier::Float => PrismaValueType::Float,
             TypeIdentifier::Decimal => PrismaValueType::Decimal,
             TypeIdentifier::Boolean => PrismaValueType::Boolean,
-            TypeIdentifier::Enum(_) => PrismaValueType::String,
+            TypeIdentifier::Enum(id) => PrismaValueType::Enum(*id),
             TypeIdentifier::UUID => PrismaValueType::String,
             TypeIdentifier::Json => PrismaValueType::Object,
             TypeIdentifier::DateTime => PrismaValueType::Date,

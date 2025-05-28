@@ -1,10 +1,11 @@
 use std::collections::{BTreeMap, HashMap};
 
 use crate::result_node::ResultNode;
+use parser_database::EnumId;
 use query_builder::DbQuery;
 use query_core::{DataExpectation, DataRule};
-use query_structure::{PrismaValue, TaggedPrismaValue};
-use serde::Serialize;
+use query_structure::{InternalDataModel, PrismaValue, PrismaValueType, TaggedPrismaValue};
+use serde::{Serialize, Serializer};
 
 mod format;
 
@@ -91,6 +92,7 @@ pub enum Expression {
     DataMap {
         expr: Box<Expression>,
         structure: ResultNode,
+        enums: EnumsMap,
     },
 
     /// Validates the expression according to the data rule and throws an error if it doesn't match.
@@ -175,6 +177,32 @@ impl Pagination {
 
     pub fn skip(&self) -> Option<i64> {
         self.skip
+    }
+}
+
+#[derive(Debug, Default)]
+pub struct EnumsMap(BTreeMap<EnumId, BTreeMap<String, String>>);
+
+impl EnumsMap {
+    pub fn new() -> Self {
+        Default::default()
+    }
+
+    pub fn add(&mut self, ty: &PrismaValueType, dm: &InternalDataModel) {
+        if let Some(id) = ty.enum_id() {
+            self.0.entry(id).or_insert_with(|| {
+                dm.walk(id)
+                    .values()
+                    .map(|v| (v.database_name().to_owned(), v.name().to_owned()))
+                    .collect()
+            });
+        }
+    }
+}
+
+impl Serialize for EnumsMap {
+    fn serialize<S: Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
+        serializer.collect_map(self.0.iter().map(|(id, v)| (PrismaValueType::key_from_enum_id(id), v)))
     }
 }
 
