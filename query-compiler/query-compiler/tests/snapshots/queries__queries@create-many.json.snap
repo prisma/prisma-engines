@@ -4,6 +4,7 @@ expression: pretty
 input_file: query-compiler/query-compiler/tests/data/create-many.json
 ---
 transaction
+   dataMap affectedRows
    sum (execute «INSERT INTO "public"."User" ("email") VALUES ($1), ($2)»
         params [const(String("user.1737556028164@prisma.io")),
                 const(String("user.1737556028165@prisma.io"))])

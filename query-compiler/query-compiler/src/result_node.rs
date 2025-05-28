@@ -6,6 +6,7 @@ use serde::Serialize;
 #[derive(Debug, Serialize)]
 #[serde(tag = "type")]
 pub enum ResultNode {
+    AffectedRows,
     #[serde(rename_all = "camelCase")]
     Object {
         flattened: bool,
@@ -40,18 +41,14 @@ impl ResultNode {
     pub fn add_field(&mut self, key: impl Into<String>, node: ResultNode) -> Option<ResultNode> {
         match self {
             ResultNode::Object { fields, .. } => fields.insert(key.into(), node),
-            ResultNode::Value { .. } => {
-                panic!("Only object nodes can be indexed");
-            }
+            _ => panic!("Only object nodes can be indexed"),
         }
     }
 
     pub fn entry(&mut self, key: impl Into<String>) -> Entry<'_, String, ResultNode> {
         match self {
             ResultNode::Object { fields, .. } => fields.entry(key.into()),
-            ResultNode::Value { .. } => {
-                panic!("Only object nodes can be indexed");
-            }
+            _ => panic!("Only object nodes can be indexed"),
         }
     }
 }

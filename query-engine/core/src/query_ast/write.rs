@@ -68,7 +68,7 @@ impl WriteQuery {
     /// Most write operations only return IDs at the moment, so anything different
     /// from the primary ID is automatically not returned.
     /// DeleteMany, Connect and Disconnect do not return anything.
-    fn returns(&self) -> Option<FieldSelection> {
+    pub fn returns(&self) -> Option<FieldSelection> {
         let returns_id = Some(self.model().primary_identifier());
 
         match self {
