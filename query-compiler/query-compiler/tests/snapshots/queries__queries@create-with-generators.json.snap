@@ -3,10 +3,11 @@ source: query-compiler/query-compiler/tests/queries.rs
 expression: pretty
 input_file: query-compiler/query-compiler/tests/data/create-with-generators.json
 ---
-dataMap
-   id: String [id]
-   email: String [email]
-   createdAt: Date [createdAt]
+dataMap {
+    id: String (id)
+    email: String (email)
+    createdAt: Date (createdAt)
+}
 let 0 = unique (query «INSERT INTO "public"."UserWithGenerators"
                        ("id","email","createdAt") VALUES ($1,$2,$3) RETURNING
                        "public"."UserWithGenerators"."id",

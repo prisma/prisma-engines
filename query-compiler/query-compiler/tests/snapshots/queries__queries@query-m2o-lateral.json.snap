@@ -3,13 +3,15 @@ source: query-compiler/query-compiler/tests/queries.rs
 expression: pretty
 input_file: query-compiler/query-compiler/tests/data/query-m2o-lateral.json
 ---
-dataMap
-   issued: Date [issued]
-   secret: String [secret]
-   done: Boolean [done]
-   user: 
-      id: Int [id]
-      email: String [email]
+dataMap {
+    issued: Date (issued)
+    secret: String (secret)
+    done: Boolean (done)
+    user: {
+        id: Int (id)
+        email: String (email)
+    }
+}
 query «SELECT "t0"."id", "t0"."issued", "t0"."secret", "t0"."done",
        "t0"."userId", "Activation_user"."__prisma_data__" AS "user" FROM
        "public"."Activation" AS "t0" LEFT JOIN LATERAL (SELECT

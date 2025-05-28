@@ -4,9 +4,10 @@ expression: pretty
 input_file: query-compiler/query-compiler/tests/data/update-create-parent-one2m.json
 ---
 transaction
-   dataMap
-      id: Int [id]
-      managerId: Int [managerId]
+   dataMap {
+       id: Int (id)
+       managerId: Int (managerId)
+   }
    let 1 = unique (query «INSERT INTO "public"."Employee" ("id") VALUES ($1)
                           RETURNING "public"."Employee"."id"»
                    params [const(BigInt(2))])

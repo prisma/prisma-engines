@@ -296,34 +296,40 @@ where
         expr: &'a Expression,
         structure: &'a ResultNode,
     ) -> DocBuilder<'a, PrettyPrinter<'a, D>, ColorSpec> {
-        let doc = self.keyword("dataMap");
-        let doc = self.data_map_node(doc, structure, "");
-        doc.append(self.expression(expr).align())
+        self.keyword("dataMap")
+            .append(self.space())
+            .append(self.data_map_node(structure))
+            .append(self.line())
+            .append(self.expression(expr))
     }
 
-    fn data_map_node(
-        &'a self,
-        doc: DocBuilder<'a, PrettyPrinter<'a, D>, ColorSpec>,
-        node: &ResultNode,
-        indent: &str,
-    ) -> DocBuilder<'a, PrettyPrinter<'a, D>, ColorSpec> {
+    fn data_map_node(&'a self, node: &'a ResultNode) -> DocBuilder<'a, PrettyPrinter<'a, D>, ColorSpec> {
         match node {
-            ResultNode::Object { fields, flattened } => {
-                let indent = &format!("{indent}   ");
-                let mut builder = doc.append(self.line());
-                for (name, field) in fields {
-                    builder = builder.append(self.text(format!("{indent}{name}")));
-                    if *flattened {
-                        builder = builder.append(self.text(" (flattened)"));
-                    }
-                    builder = builder.append(self.text(": "));
-                    builder = self.data_map_node(builder, field, indent);
-                }
-                builder
-            }
-            ResultNode::Value { db_name, result_type } => doc
-                .append(self.text(format!("{result_type} [{db_name}]")))
-                .append(self.line()),
+            ResultNode::Object { fields, flattened } => self
+                .line()
+                .append(
+                    self.intersperse(
+                        fields.iter().map(|(name, field)| {
+                            let doc = self.field_name(name);
+                            let doc = if *flattened {
+                                doc.append(self.space().append(self.keyword("(flattened)")))
+                            } else {
+                                doc
+                            };
+                            doc.append(self.text(":"))
+                                .append(self.space())
+                                .append(self.data_map_node(field))
+                        }),
+                        self.line(),
+                    )
+                    .append(self.line())
+                    .indent(4),
+                )
+                .braces(),
+            ResultNode::Value { db_name, result_type } => self
+                .text(result_type.to_string())
+                .append(self.space())
+                .append(self.field_name(db_name).parens()),
         }
     }
 
