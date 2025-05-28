@@ -1,0 +1,13 @@
+---
+source: query-compiler/query-compiler/tests/queries.rs
+expression: pretty
+input_file: query-compiler/query-compiler/tests/data/data-types.json
+---
+dataMap {
+    id: Bytes (id)
+    optString: String (optString)
+    intArray: Array<Int> (intArray)
+}
+query «SELECT "t0"."id", "t0"."optString", "t0"."intArray" FROM
+       "public"."DataTypes" AS "t0"»
+params []

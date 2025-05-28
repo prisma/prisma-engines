@@ -3,13 +3,15 @@ source: query-compiler/query-compiler/tests/queries.rs
 expression: pretty
 input_file: query-compiler/query-compiler/tests/data/query-m2o.json
 ---
-dataMap
-   issued: Date [issued]
-   secret: String [secret]
-   done: Boolean [done]
-   user: 
-      id: Int [id]
-      email: String [email]
+dataMap {
+    issued: Date (issued)
+    secret: String (secret)
+    done: Boolean (done)
+    user: {
+        id: Int (id)
+        email: String (email)
+    }
+}
 let @parent = query «SELECT "public"."Activation"."id",
                      "public"."Activation"."issued",
                      "public"."Activation"."secret",

@@ -4,9 +4,10 @@ expression: pretty
 input_file: query-compiler/query-compiler/tests/data/update-create-child-one2m.json
 ---
 transaction
-   dataMap
-      id: Int [id]
-      managerId: Int [managerId]
+   dataMap {
+       id: Int (id)
+       managerId: Int (managerId)
+   }
    let 0 = unique (query «SELECT "public"."Employee"."id",
                           "public"."Employee"."managerId" FROM
                           "public"."Employee" WHERE ("public"."Employee"."id" =

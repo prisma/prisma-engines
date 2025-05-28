@@ -4,13 +4,15 @@ expression: pretty
 input_file: query-compiler/query-compiler/tests/data/create-nested-create-with-composite-id.json
 ---
 transaction
-   dataMap
-      a: Int [a]
-      b: Int [b]
-      children: 
-         id: Int [id]
-         parentA: Int [parentA]
-         parentB: Int [parentB]
+   dataMap {
+       a: Int (a)
+       b: Int (b)
+       children: {
+           id: Int (id)
+           parentA: Int (parentA)
+           parentB: Int (parentB)
+       }
+   }
    let 0 = unique (query «INSERT INTO "public"."ParentModelWithCompositeId"
                           ("a","b") VALUES ($1,$2) RETURNING
                           "public"."ParentModelWithCompositeId"."a",

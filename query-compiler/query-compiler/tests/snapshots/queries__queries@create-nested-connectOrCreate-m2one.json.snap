@@ -4,13 +4,15 @@ expression: pretty
 input_file: query-compiler/query-compiler/tests/data/create-nested-connectOrCreate-m2one.json
 ---
 transaction
-   dataMap
-      id: Int [id]
-      title: String [title]
-      userId: Int [userId]
-      user: 
-         id: Int [id]
-         email: String [email]
+   dataMap {
+       id: Int (id)
+       title: String (title)
+       userId: Int (userId)
+       user: {
+           id: Int (id)
+           email: String (email)
+       }
+   }
    let 1 = unique (query «SELECT "public"."User"."id" FROM "public"."User" WHERE
                           ("public"."User"."email" = $1 AND 1=1) LIMIT $2 OFFSET
                           $3»

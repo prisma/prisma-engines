@@ -4,16 +4,19 @@ expression: pretty
 input_file: query-compiler/query-compiler/tests/data/create-nested-connectOrCreate-one2m.json
 ---
 transaction
-   dataMap
-      id: Int [id]
-      title: String [title]
-      userId: Int [userId]
-      user: 
-         id: Int [id]
-         email: String [email]
-      categories: 
-         id: Int [id]
-         name: String [name]
+   dataMap {
+       id: Int (id)
+       title: String (title)
+       userId: Int (userId)
+       user: {
+           id: Int (id)
+           email: String (email)
+       }
+       categories: {
+           id: Int (id)
+           name: String (name)
+       }
+   }
    let 1 = unique (query «SELECT "public"."User"."id" FROM "public"."User" WHERE
                           ("public"."User"."id" = $1 AND 1=1) LIMIT $2 OFFSET
                           $3»
