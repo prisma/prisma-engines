@@ -60,9 +60,8 @@ pub(crate) fn quaint_value_to_prisma_value(value: quaint::Value<'_>, family: Sql
             Some("DATE") if family.is_postgres() => PrismaValue::String(dt.date_naive().to_string()),
             Some("TIME") if family.is_postgres() => PrismaValue::String(dt.time().to_string()),
             Some("TIMETZ") if family.is_postgres() => PrismaValue::String(dt.time().format(TIME_FORMAT).to_string()),
-            Some(_) if family.is_postgres() => PrismaValue::String(dt.naive_utc().to_string()),
-
-            Some(_) if family.is_mysql() => PrismaValue::String(dt.format(DATETIME_FORMAT).to_string()),
+            _ if family.is_postgres() => PrismaValue::String(dt.naive_utc().to_string()),
+            _ if family.is_mysql() => PrismaValue::String(dt.format(DATETIME_FORMAT).to_string()),
 
             _ => PrismaValue::String(dt.to_rfc3339()),
         },

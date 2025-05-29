@@ -1,29 +1,86 @@
 use itertools::{Either, Itertools};
-use query_builder::QueryBuilder;
+use query_builder::{CreateRecord, CreateRecordDefaultsQuery, QueryBuilder};
 use query_core::{
     ConnectRecords, DeleteManyRecords, DeleteRecord, DisconnectRecords, RawQuery, UpdateManyRecords, UpdateRecord,
     UpdateRecordWithSelection, WriteQuery,
 };
-use query_structure::{QueryArguments, RelationLoadStrategy, Take};
+use query_structure::{PrismaValue, QueryArguments, RelationLoadStrategy, Take};
 use sql_query_builder::write::split_write_args_by_shape;
+use std::{collections::HashMap, iter};
 
-use crate::{TranslateError, expression::Expression, translate::TranslateResult};
+use crate::{
+    TranslateError,
+    expression::{Binding, Expression, RecordValue},
+    translate::TranslateResult,
+};
 
 use super::read::add_inmemory_join;
 
 pub(crate) fn translate_write_query(query: WriteQuery, builder: &dyn QueryBuilder) -> TranslateResult<Expression> {
     Ok(match query {
         WriteQuery::CreateRecord(cr) => {
-            // TODO: MySQL needs additional logic to generate IDs on our side.
-            // See sql_query_connector::database::operations::write::create_record
-            let query = builder
+            let CreateRecord {
+                select_defaults,
+                insert_query,
+                last_insert_id_field,
+                merge_values,
+            } = builder
                 .build_create_record(&cr.model, cr.args, &cr.selected_fields)
                 .map_err(TranslateError::QueryBuildFailure)?;
 
-            // TODO: we probably need some additional node type or extra info in the WriteQuery node
-            // to help the client executor figure out the returned ID in the case when it's inferred
-            // from the query arguments.
-            Expression::Unique(Box::new(Expression::Query(query)))
+            let mut extensions = merge_values
+                .into_iter()
+                .map(|(field, value)| (field.prisma_name().into_owned(), RecordValue::Value(value)))
+                .collect::<HashMap<_, _>>();
+
+            if let Some(last_insert_id_field) = last_insert_id_field {
+                extensions.insert(last_insert_id_field.name().into(), RecordValue::LastInsertId);
+            }
+
+            if let Some(defaults_query) = &select_defaults {
+                for field in &defaults_query.selected_fields {
+                    let placeholder = PrismaValue::placeholder(field.name().into(), field.corresponding_prisma_type());
+                    extensions.insert(field.name().into(), RecordValue::Value(placeholder));
+                }
+            }
+
+            let mut expr = Expression::Unique(Expression::Query(insert_query).into());
+
+            if !extensions.is_empty() {
+                expr = Expression::ExtendRecord {
+                    expr: expr.into(),
+                    values: extensions,
+                };
+            }
+
+            if let Some(CreateRecordDefaultsQuery { query, selected_fields }) = select_defaults {
+                const DEFAULTS_BINDING_NAME: &str = "defaults";
+
+                let select_defaults = Binding::new(
+                    DEFAULTS_BINDING_NAME.into(),
+                    Expression::Unique(Expression::Query(query).into()),
+                );
+
+                let get_fields = selected_fields.into_iter().map(|field| {
+                    let get_defaults = Expression::Get {
+                        name: DEFAULTS_BINDING_NAME.into(),
+                    };
+                    Binding::new(
+                        field.name().into(),
+                        Expression::MapField {
+                            field: field.name().into(),
+                            records: get_defaults.into(),
+                        },
+                    )
+                });
+
+                expr = Expression::Let {
+                    bindings: iter::once(select_defaults).chain(get_fields).collect(),
+                    expr: expr.into(),
+                };
+            }
+
+            expr
         }
 
         WriteQuery::CreateManyRecords(cmr) => {

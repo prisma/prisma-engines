@@ -3,7 +3,7 @@ use std::collections::HashMap;
 use crate::result_node::ResultNode;
 use query_builder::DbQuery;
 use query_core::{DataExpectation, DataRule};
-use query_structure::PrismaValue;
+use query_structure::{PrismaValue, TaggedPrismaValue};
 use serde::Serialize;
 
 mod format;
@@ -124,6 +124,19 @@ pub enum Expression {
         expr: Box<Expression>,
         pagination: Pagination,
     },
+
+    /// Extends a record with additional values.
+    ExtendRecord {
+        expr: Box<Expression>,
+        values: HashMap<String, RecordValue>,
+    },
+}
+
+#[derive(Debug, Serialize)]
+#[serde(tag = "type", content = "value", rename_all = "camelCase")]
+pub enum RecordValue {
+    LastInsertId,
+    Value(#[serde(serialize_with = "serialize_tagged_value")] PrismaValue),
 }
 
 #[derive(Debug, Serialize)]
@@ -240,6 +253,7 @@ impl Expression {
             Expression::Diff { from, .. } => from.r#type(),
             Expression::DistinctBy { expr, .. } => expr.r#type(),
             Expression::Paginate { expr, .. } => expr.r#type(),
+            Expression::ExtendRecord { expr, .. } => expr.r#type(),
         }
     }
 
@@ -257,4 +271,11 @@ impl std::fmt::Display for Expression {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         self.pretty_print(false, 80).map_err(|_| std::fmt::Error)?.fmt(f)
     }
+}
+
+fn serialize_tagged_value<S>(obj: &PrismaValue, serializer: S) -> Result<S::Ok, S::Error>
+where
+    S: serde::Serializer,
+{
+    TaggedPrismaValue::from(obj).serialize(serializer)
 }

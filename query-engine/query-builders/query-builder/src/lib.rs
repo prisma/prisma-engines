@@ -1,6 +1,6 @@
 use query_structure::{
     AggregationSelection, FieldSelection, Filter, Model, PrismaValue, QueryArguments, RecordFilter, RelationField,
-    RelationLoadStrategy, ScalarCondition, ScalarField, SelectionResult, TaggedPrismaValue, WriteArgs,
+    RelationLoadStrategy, ScalarCondition, ScalarField, SelectedField, SelectionResult, TaggedPrismaValue, WriteArgs,
 };
 use serde::Serialize;
 use std::collections::BTreeMap;
@@ -44,7 +44,7 @@ pub trait QueryBuilder {
         model: &Model,
         args: WriteArgs,
         selected_fields: &FieldSelection,
-    ) -> Result<DbQuery, Box<dyn std::error::Error + Send + Sync>>;
+    ) -> Result<CreateRecord, Box<dyn std::error::Error + Send + Sync>>;
 
     fn build_inserts(
         &self,
@@ -115,6 +115,28 @@ pub trait QueryBuilder {
         inputs: HashMap<String, PrismaValue>,
         query_type: Option<String>,
     ) -> Result<DbQuery, Box<dyn std::error::Error + Send + Sync>>;
+}
+
+/// An insertion operation for a record in the database.
+pub struct CreateRecord {
+    /// The insert query to run in order to create the record.
+    pub insert_query: DbQuery,
+    /// The query to run prior to the insert in order to create default column values.
+    /// This is used in some cases where the database does not support returning default values.
+    pub select_defaults: Option<CreateRecordDefaultsQuery>,
+    /// The field in the model that corresponds to the last inserted ID, if applicable.
+    pub last_insert_id_field: Option<ScalarField>,
+    /// The values to merge into the record after insertion. These are inferred from the
+    /// input arguments.
+    pub merge_values: Vec<(SelectedField, PrismaValue)>,
+}
+
+/// A query that retrieves default values needed for creating a record.
+pub struct CreateRecordDefaultsQuery {
+    /// The query that returns the default values.
+    pub query: DbQuery,
+    /// The fields that are selected in the query.
+    pub selected_fields: Vec<ScalarField>,
 }
 
 #[derive(Debug)]
