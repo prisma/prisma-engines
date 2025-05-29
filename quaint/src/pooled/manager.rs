@@ -181,6 +181,7 @@ impl Manager for QuaintManager {
 
     fn validate(&self, conn: &mut Self::Connection) -> bool {
         let single_use_connection = match self {
+            #[cfg(feature = "postgresql")]
             Self::Postgres { url, .. } => url.single_use_connections(),
             _ => false,
         };
