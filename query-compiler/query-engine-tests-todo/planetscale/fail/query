@@ -1,11 +1,9 @@
-new::create_many::single_col::foo
 new::disconnect::disconnect_security::must_honor_connect_scope_m2m
 new::disconnect::disconnect_security::must_honor_connect_scope_one2m
 new::interactive_tx::interactive_tx::basic_commit_workflow
 new::interactive_tx::interactive_tx::basic_rollback_workflow
 new::interactive_tx::interactive_tx::batch_queries_failure
 new::interactive_tx::interactive_tx::batch_queries_rollback
-new::interactive_tx::interactive_tx::batch_queries_success
 new::interactive_tx::interactive_tx::tx_expiration_failure_cycle
 new::ref_actions::on_delete::set_null::one2many_opt::prisma_17255
 new::ref_actions::on_update::cascade::multiple_cascading_paths::it_should_work
@@ -117,7 +115,6 @@ queries::order_and_pagination::order_by_dependent::order_by_dependent::circular_
 queries::order_and_pagination::order_by_dependent::order_by_dependent::circular_related_record_desc
 queries::regressions::prisma_3078::prisma_3078::relation_filter_1_1_a
 queries::regressions::prisma_3078::prisma_3078::relation_filter_1_1_z
-queries::regressions::prisma_3078::prisma_3078::relation_filter_1_m_a
 queries::regressions::prisma_3078::prisma_3078::relation_filter_1_m_z
 queries::regressions::prisma_3078::prisma_3078::relation_filter_n_m_a
 queries::regressions::prisma_3078::prisma_3078::relation_filter_n_m_z
@@ -388,10 +385,7 @@ writes::top_level_mutations::upsert::upsert::upsert_apply_number_ops_for_float
 writes::top_level_mutations::upsert::upsert::upsert_apply_number_ops_for_int
 writes::top_level_mutations::upsert::upsert::upsert_called_twice_does_nothing
 writes::top_level_mutations::upsert::upsert::upsert_fails_if_filter_dont_match
-writes::unchecked_writes::unchecked_create::unchecked_create::allow_write_non_inlined_rel
 writes::unchecked_writes::unchecked_create::unchecked_create::allow_writing_inlined_rel_scalars
-writes::unchecked_writes::unchecked_create::unchecked_create::required_write_required_rel_scalars
-writes::unchecked_writes::unchecked_nested_create::unchecked_nested_create::allow_write_non_prent_inline_rel_sclrs
 writes::unchecked_writes::unchecked_nested_update_many::unchecked_nested_um::allow_write_autoinc_id
 writes::unchecked_writes::unchecked_nested_update_many::unchecked_nested_um::allow_write_non_prent_inline_rel_sclrs
 writes::unchecked_writes::unchecked_update_spec::unchecked_update::allow_write_autoinc_ids
