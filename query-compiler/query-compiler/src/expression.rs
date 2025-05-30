@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::collections::{BTreeMap, HashMap};
 
 use crate::result_node::ResultNode;
 use query_builder::DbQuery;
@@ -128,7 +128,7 @@ pub enum Expression {
     /// Extends a record with additional values.
     ExtendRecord {
         expr: Box<Expression>,
-        values: HashMap<String, RecordValue>,
+        values: BTreeMap<String, RecordValue>,
     },
 }
 

@@ -6,7 +6,7 @@ use pretty::{
 };
 use query_core::DataRule;
 use query_structure::{Placeholder, PrismaValue};
-use std::{borrow::Cow, collections::HashMap};
+use std::{borrow::Cow, collections::BTreeMap};
 
 fn color_kw() -> ColorSpec {
     ColorSpec::new().set_fg(Some(Color::Blue)).clone()
@@ -465,9 +465,10 @@ where
     fn extend_record(
         &'a self,
         expr: &'a Expression,
-        fields: &'a HashMap<String, RecordValue>,
+        fields: &'a BTreeMap<String, RecordValue>,
     ) -> DocBuilder<'a, PrettyPrinter<'a, D>, ColorSpec> {
         self.keyword("extend")
+            .append(self.space())
             .append(
                 self.intersperse(
                     fields.iter().map(|(name, value)| {
@@ -475,7 +476,6 @@ where
                             RecordValue::LastInsertId => self.keyword("lastInsertId"),
                             RecordValue::Value(value) => self.value(value),
                         };
-
                         self.field_name(name)
                             .append(self.text(":"))
                             .append(self.space())
@@ -484,9 +484,10 @@ where
                     self.line(),
                 )
                 .append(self.line())
-                .indent(4),
+                .indent(4)
+                .braces(),
             )
-            .braces()
+            .append(self.space())
             .append(self.expression(expr))
     }
 }
