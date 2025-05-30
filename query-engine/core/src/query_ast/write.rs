@@ -3,7 +3,7 @@ use super::{FilteredNestedMutation, FilteredQuery};
 use crate::{ReadQuery, RecordQuery, ToGraphviz};
 use connector::NativeUpsert;
 use query_structure::{prelude::*, DatasourceFieldName, Filter, RecordFilter, WriteArgs};
-use std::collections::HashMap;
+use std::{borrow::Cow, collections::HashMap};
 
 #[derive(Debug, Clone)]
 pub enum WriteQuery {
@@ -64,37 +64,28 @@ impl WriteQuery {
     }
 
     /// Returns the field selection of a write query.
-    ///
-    /// Most write operations only return IDs at the moment, so anything different
-    /// from the primary ID is automatically not returned.
-    /// DeleteMany, Connect and Disconnect do not return anything.
-    pub fn returns(&self) -> Option<FieldSelection> {
-        let returns_id = Some(self.model().primary_identifier());
-
-        match self {
-            Self::CreateRecord(cr) => Some(cr.selected_fields.clone()),
-            Self::CreateManyRecords(CreateManyRecords {
-                selected_fields: Some(selected_fields),
-                ..
-            }) => Some(selected_fields.fields.clone()),
-            Self::CreateManyRecords(CreateManyRecords {
-                selected_fields: None, ..
-            }) => None,
-            Self::UpdateRecord(UpdateRecord::WithSelection(ur)) => Some(ur.selected_fields.clone()),
-            Self::UpdateRecord(UpdateRecord::WithoutSelection(_)) => returns_id,
-            Self::DeleteRecord(DeleteRecord {
-                selected_fields: Some(selected_fields),
-                ..
-            }) => Some(selected_fields.fields.clone()),
-            Self::DeleteRecord(_) => returns_id,
-            Self::UpdateManyRecords(_) => returns_id,
+    pub fn returns(&self) -> Option<Cow<'_, FieldSelection>> {
+        let borrowed_fs = match self {
+            Self::CreateRecord(cr) => Some(&cr.selected_fields),
+            Self::CreateManyRecords(CreateManyRecords { selected_fields, .. }) => {
+                selected_fields.as_ref().map(|sf| &sf.fields)
+            }
+            Self::UpdateRecord(UpdateRecord::WithSelection(ur)) => Some(&ur.selected_fields),
+            Self::UpdateRecord(UpdateRecord::WithoutSelection(_)) => {
+                return Some(Cow::Owned(self.model().primary_identifier()))
+            }
+            Self::DeleteRecord(DeleteRecord { selected_fields, .. }) => selected_fields.as_ref().map(|sf| &sf.fields),
+            Self::UpdateManyRecords(UpdateManyRecords { selected_fields, .. }) => {
+                selected_fields.as_ref().map(|sf| &sf.fields)
+            }
             Self::DeleteManyRecords(_) => None,
             Self::ConnectRecords(_) => None,
             Self::DisconnectRecords(_) => None,
             Self::ExecuteRaw(_) => None,
             Self::QueryRaw(_) => None,
-            Self::Upsert(_) => returns_id,
-        }
+            Self::Upsert(upsert) => Some(&upsert.selected_fields),
+        };
+        borrowed_fs.map(Cow::Borrowed)
     }
 
     /// Updates the field selection of the query to satisfy the inputted FieldSelection.
