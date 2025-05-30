@@ -514,7 +514,7 @@ fn write_args_to_shape(write_args: &WriteArgs, model: &Model) -> Vec<DatasourceF
     shape
 }
 
-pub fn select_defaults_for_write_args<'a>(
+pub fn defaults_for_mysql_write_args<'a>(
     id_field: &'a FieldSelection,
     args: &'a WriteArgs,
 ) -> impl Iterator<Item = (ScalarField, Expression<'static>)> + use<'a> {

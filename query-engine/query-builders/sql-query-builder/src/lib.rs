@@ -20,7 +20,7 @@ use std::{collections::HashMap, iter, marker::PhantomData};
 
 use itertools::{Either, Itertools};
 use model_extensions::ScalarFieldExt;
-use prisma_value::PrismaValue;
+use prisma_value::{Placeholder, PrismaValue};
 use quaint::{
     ast::{
         Column, Comparable, ConditionTree, ExpressionKind, Insert, OnConflict, OpaqueType, Query, Row, Select, Values,
@@ -216,29 +216,38 @@ impl<'a, V: Visitor<'a>> QueryBuilder for SqlQueryBuilder<'a, V> {
         mut args: WriteArgs,
         selected_fields: &FieldSelection,
     ) -> Result<CreateRecord, Box<dyn std::error::Error + Send + Sync>> {
-        let id = model.primary_identifier();
+        let id_selection = model.primary_identifier();
 
         let (select_defaults, last_insert_id_field, merge_values) = if self.context.sql_family().is_mysql() {
-            let (fields, query): (Vec<_>, Select<'static>) = write::select_defaults_for_write_args(&id, &args).unzip();
-            let select_defaults = if !fields.is_empty() {
-                for field in &fields {
-                    let pv = PrismaValue::placeholder(field.name().into(), field.corresponding_prisma_type());
+            let (field_placeholders, query): (Vec<_>, Select<'static>) =
+                write::defaults_for_mysql_write_args(&id_selection, &args)
+                    .map(|(field, arg)| {
+                        let ph = Placeholder::new(field.name().into(), field.corresponding_prisma_type());
+                        ((field, ph), arg)
+                    })
+                    .unzip();
+
+            let select_defaults = if !field_placeholders.is_empty() {
+                // Set field defaults as placeholders in the arguments of the insert statement.
+                for (field, ph) in &field_placeholders {
                     let field = DatasourceFieldName(field.db_name().into());
-                    args.insert(field, WriteOperation::scalar_set(pv))
+                    args.insert(field, WriteOperation::scalar_set(PrismaValue::Placeholder(ph.clone())))
                 }
 
                 Some(CreateRecordDefaultsQuery {
                     query: self.convert_query(query)?,
-                    selected_fields: fields,
+                    field_placeholders,
                 })
             } else {
                 None
             };
 
-            let last_insert_id_field = id.scalars().find(|sf| sf.is_auto_generated_int_id()).cloned();
+            let last_insert_id_field = id_selection.scalars().find(|sf| sf.is_auto_generated_int_id()).cloned();
 
+            // Return all arguments that are a part of the primary identifier as values to merge
+            // into the created record.
             let merge_values = args
-                .as_selection_result((&id).into())
+                .as_selection_result((&id_selection).into())
                 .map(|res| res.pairs)
                 .unwrap_or_default();
 

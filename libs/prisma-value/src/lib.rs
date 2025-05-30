@@ -104,6 +104,12 @@ pub struct Placeholder {
     pub r#type: PrismaValueType,
 }
 
+impl Placeholder {
+    pub fn new(name: String, r#type: PrismaValueType) -> Self {
+        Self { name, r#type }
+    }
+}
+
 /// Stringify a date to the following format
 /// 1999-05-01T00:00:00.000Z
 pub fn stringify_datetime(datetime: &DateTime<FixedOffset>) -> String {

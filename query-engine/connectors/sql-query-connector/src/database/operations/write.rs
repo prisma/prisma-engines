@@ -9,7 +9,7 @@ use quaint::{
     prelude::{Select, SqlFamily},
 };
 use query_structure::*;
-use sql_query_builder::write::select_defaults_for_write_args;
+use sql_query_builder::write::defaults_for_mysql_write_args;
 use sql_query_builder::{column_metadata, write, Context, SelectionResultExt, SqlTraceComment};
 use std::borrow::Cow;
 use std::collections::HashMap;
@@ -22,7 +22,7 @@ async fn generate_id(
     ctx: &Context<'_>,
 ) -> crate::Result<Option<SelectionResult>> {
     // Go through all the values and generate a select statement with the correct MySQL function
-    let defaults = select_defaults_for_write_args(id_field, args)
+    let defaults = defaults_for_mysql_write_args(id_field, args)
         .map(|(_, val)| val)
         .collect_vec();
 
