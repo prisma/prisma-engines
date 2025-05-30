@@ -41,20 +41,30 @@ fn map_query(query: &Query) -> Option<ResultNode> {
 
 fn map_read_query(query: &ReadQuery) -> Option<ResultNode> {
     match query {
-        ReadQuery::RecordQuery(q) => get_result_node(&q.selected_fields, &q.selection_order, &q.nested),
-        ReadQuery::ManyRecordsQuery(q) => get_result_node(&q.selected_fields, &q.selection_order, &q.nested),
-        ReadQuery::RelatedRecordsQuery(q) => get_result_node(&q.selected_fields, &q.selection_order, &q.nested),
+        ReadQuery::RecordQuery(q) => get_result_node(
+            &q.selected_fields,
+            &q.selection_order,
+            &q.nested,
+            q.relation_load_strategy.is_join(),
+        ),
+        ReadQuery::ManyRecordsQuery(q) => get_result_node(
+            &q.selected_fields,
+            &q.selection_order,
+            &q.nested,
+            q.relation_load_strategy.is_join(),
+        ),
+        ReadQuery::RelatedRecordsQuery(q) => get_result_node(&q.selected_fields, &q.selection_order, &q.nested, false),
         ReadQuery::AggregateRecordsQuery(q) => get_result_node_for_aggregation(&q.selectors, &q.selection_order),
     }
 }
 
 fn map_write_query(query: &WriteQuery) -> Option<ResultNode> {
     match query {
-        WriteQuery::CreateRecord(q) => get_result_node(&q.selected_fields, &q.selection_order, &[]),
+        WriteQuery::CreateRecord(q) => get_result_node(&q.selected_fields, &q.selection_order, &[], false),
         WriteQuery::CreateManyRecords(q) => get_result_node_for_create_many(q.selected_fields.as_ref()),
         WriteQuery::UpdateRecord(u) => {
             match u {
-                UpdateRecord::WithSelection(w) => get_result_node(&w.selected_fields, &w.selection_order, &[]),
+                UpdateRecord::WithSelection(w) => get_result_node(&w.selected_fields, &w.selection_order, &[], false),
                 UpdateRecord::WithoutSelection(_) => None, // No result data
             }
         }
@@ -65,14 +75,15 @@ fn map_write_query(query: &WriteQuery) -> Option<ResultNode> {
         WriteQuery::DisconnectRecords(_) => None, // No result data
         WriteQuery::ExecuteRaw(_) => None,        // No data mapping
         WriteQuery::QueryRaw(_) => None,          // No data mapping
-        WriteQuery::Upsert(q) => get_result_node(&q.selected_fields, &q.selection_order, &[]),
+        WriteQuery::Upsert(q) => get_result_node(&q.selected_fields, &q.selection_order, &[], false),
     }
 }
 
 fn get_result_node(
     field_selection: &FieldSelection,
-    selection_order: &Vec<String>,
+    selection_order: &[String],
     nested_queries: &[ReadQuery],
+    uses_relation_joins: bool,
 ) -> Option<ResultNode> {
     let field_map = field_selection
         .selections()
@@ -99,7 +110,7 @@ fn get_result_node(
             Some(SelectedField::Composite(_)) => todo!("MongoDB specific"),
             Some(SelectedField::Relation(f)) => {
                 let nested_selection = FieldSelection::new(f.selections.to_vec());
-                let nested_node = get_result_node(&nested_selection, &f.result_fields, &[]);
+                let nested_node = get_result_node(&nested_selection, &f.result_fields, &[], uses_relation_joins);
                 if let Some(nested_node) = nested_node {
                     node.add_field(f.field.name(), nested_node);
                 }
@@ -111,11 +122,20 @@ fn get_result_node(
                     .unwrap_or_default()
                 {
                     let (group_name, field_name) = vs.serialized_name();
+                    let db_name = if uses_relation_joins {
+                        vs.serialized_field_name().to_owned()
+                    } else {
+                        vs.db_alias()
+                    };
                     let (typ, _) = vs.type_identifier_with_arity();
 
                     node.entry(group_name)
-                        .or_insert_with(ResultNode::new_flattened_object)
-                        .add_field(field_name, ResultNode::new_value(vs.db_alias(), typ.to_prisma_type()));
+                        .or_insert_with(if uses_relation_joins {
+                            ResultNode::new_object
+                        } else {
+                            ResultNode::new_flattened_object
+                        })
+                        .add_field(field_name, ResultNode::new_value(db_name, typ.to_prisma_type()));
                 }
             }
             None => {
@@ -194,11 +214,12 @@ fn get_result_node_for_create_many(selected_fields: Option<&CreateManyRecordsFie
         &selected_fields?.fields,
         &selected_fields?.order,
         &selected_fields?.nested,
+        false,
     )
 }
 
 fn get_result_node_for_delete(selected_fields: Option<&DeleteRecordFields>) -> Option<ResultNode> {
-    get_result_node(&selected_fields?.fields, &selected_fields?.order, &[])
+    get_result_node(&selected_fields?.fields, &selected_fields?.order, &[], false)
 }
 
 fn get_result_node_for_update_many(selected_fields: Option<&UpdateManyRecordsFields>) -> Option<ResultNode> {
@@ -206,5 +227,6 @@ fn get_result_node_for_update_many(selected_fields: Option<&UpdateManyRecordsFie
         &selected_fields?.fields,
         &selected_fields?.order,
         &selected_fields?.nested,
+        false,
     )
 }

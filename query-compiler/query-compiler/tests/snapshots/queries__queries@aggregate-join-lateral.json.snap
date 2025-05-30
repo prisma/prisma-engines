@@ -6,7 +6,7 @@ input_file: query-compiler/query-compiler/tests/data/aggregate-join-lateral.json
 dataMap {
     email: String (email)
     _count: {
-        activations (flattened): Int (_aggr_count_activations)
+        activations: Int (activations)
     }
 }
 query «SELECT "t0"."id", "t0"."email", JSONB_BUILD_OBJECT('activations',
