@@ -91,7 +91,7 @@ fn get_result_node(
     for prisma_name in selection_order {
         match field_map.get(prisma_name.as_str()) {
             Some(sf @ SelectedField::Scalar(f)) => {
-                enums.add(f.type_identifier(), &f.dm);
+                enums.add(&f.r#type());
                 node.add_field(
                     prisma_name,
                     ResultNode::new_value(sf.db_name().into_owned(), f.corresponding_prisma_type()),
@@ -112,13 +112,12 @@ fn get_result_node(
                     .unwrap_or_default()
                 {
                     let (group_name, field_name) = vs.serialized_name();
-                    let (typ, _) = vs.type_identifier_with_arity();
 
                     node.entry(group_name)
                         .or_insert_with(ResultNode::new_flattened_object)
                         .add_field(
                             field_name,
-                            ResultNode::new_value(vs.db_alias(), typ.to_prisma_type(&f.data_model().schema)),
+                            ResultNode::new_value(vs.db_alias(), vs.r#type().to_prisma_type()),
                         );
                 }
             }
@@ -155,7 +154,7 @@ fn get_result_node_for_aggregation(
 
     let mut node = ResultNode::new_object();
 
-    for (underscore_name, name, db_name, typ, dm) in selectors
+    for (underscore_name, name, db_name, typ) in selectors
         .iter()
         .flat_map(|sel| {
             sel.identifiers().map(move |ident| {
@@ -165,13 +164,13 @@ fn get_result_node_for_aggregation(
                     } else {
                         (ident.name, ident.db_name)
                     };
-                (aggregate_underscore_name(sel), name, db_name, ident.typ, ident.dm)
+                (aggregate_underscore_name(sel), name, db_name, ident.typ)
             })
         })
-        .sorted_by_key(|(underscore_name, name, _, _, _)| ordered_set.get_index_of(&(*underscore_name, *name)))
+        .sorted_by_key(|(underscore_name, name, _, _)| ordered_set.get_index_of(&(*underscore_name, *name)))
     {
-        enums.add(typ, dm);
-        let value = ResultNode::new_value(db_name.into(), typ.to_prisma_type(&dm.schema));
+        enums.add(&typ);
+        let value = ResultNode::new_value(db_name.into(), typ.to_prisma_type());
         if let Some(undescore_name) = underscore_name {
             node.entry(undescore_name)
                 .or_insert_with(ResultNode::new_object)

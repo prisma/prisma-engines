@@ -214,7 +214,7 @@ fn full_scalar_filter_type(
     include_aggregates: bool,
 ) -> InputObjectType<'_> {
     let native_type_name = native_type.as_ref().map(|nt| nt.name());
-    let scalar_type_name = typ.type_name(&ctx.internal_data_model.schema).into_owned();
+    let scalar_type_name = ctx.internal_data_model.clone().zip(typ).type_name().into_owned();
     let type_name = ctx.connector.scalar_filter_name(scalar_type_name, native_type_name);
     let ident = Identifier::new_prisma(scalar_filter_name(
         &type_name,
