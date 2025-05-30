@@ -20,16 +20,18 @@ use std::{collections::HashMap, iter, marker::PhantomData};
 
 use itertools::{Either, Itertools};
 use model_extensions::ScalarFieldExt;
-use prisma_value::PrismaValue;
+use prisma_value::{Placeholder, PrismaValue};
 use quaint::{
-    ast::{Column, Comparable, ConditionTree, ExpressionKind, Insert, OnConflict, OpaqueType, Query, Row, Values},
+    ast::{
+        Column, Comparable, ConditionTree, ExpressionKind, Insert, OnConflict, OpaqueType, Query, Row, Select, Values,
+    },
     visitor::Visitor,
     Value,
 };
-use query_builder::{DbQuery, QueryBuilder};
+use query_builder::{CreateRecord, CreateRecordDefaultsQuery, DbQuery, QueryBuilder};
 use query_structure::{
-    AggregationSelection, FieldSelection, Filter, Model, ModelProjection, QueryArguments, RecordFilter, RelationField,
-    RelationLoadStrategy, ScalarField, SelectionResult, WriteArgs,
+    AggregationSelection, DatasourceFieldName, FieldSelection, Filter, Model, ModelProjection, QueryArguments,
+    RecordFilter, RelationField, RelationLoadStrategy, ScalarField, SelectionResult, WriteArgs, WriteOperation,
 };
 
 pub use column_metadata::ColumnMetadata;
@@ -211,11 +213,56 @@ impl<'a, V: Visitor<'a>> QueryBuilder for SqlQueryBuilder<'a, V> {
     fn build_create_record(
         &self,
         model: &Model,
-        args: WriteArgs,
+        mut args: WriteArgs,
         selected_fields: &FieldSelection,
-    ) -> Result<DbQuery, Box<dyn std::error::Error + Send + Sync>> {
+    ) -> Result<CreateRecord, Box<dyn std::error::Error + Send + Sync>> {
+        let id_selection = model.primary_identifier();
+
+        let (select_defaults, last_insert_id_field, merge_values) = if self.context.sql_family().is_mysql() {
+            let (field_placeholders, query): (Vec<_>, Select<'static>) =
+                write::defaults_for_mysql_write_args(&id_selection, &args)
+                    .map(|(field, arg)| {
+                        let ph = Placeholder::new(field.name().into(), field.corresponding_prisma_type());
+                        ((field, ph), arg)
+                    })
+                    .unzip();
+
+            let select_defaults = if !field_placeholders.is_empty() {
+                // Set field defaults as placeholders in the arguments of the insert statement.
+                for (field, ph) in &field_placeholders {
+                    let field = DatasourceFieldName(field.db_name().into());
+                    args.insert(field, WriteOperation::scalar_set(PrismaValue::Placeholder(ph.clone())))
+                }
+
+                Some(CreateRecordDefaultsQuery {
+                    query: self.convert_query(query)?,
+                    field_placeholders,
+                })
+            } else {
+                None
+            };
+
+            let last_insert_id_field = id_selection.scalars().find(|sf| sf.is_auto_generated_int_id()).cloned();
+
+            // Return all arguments that are a part of the primary identifier as values to merge
+            // into the created record.
+            let merge_values = args
+                .as_selection_result((&id_selection).into())
+                .map(|res| res.pairs)
+                .unwrap_or_default();
+
+            (select_defaults, last_insert_id_field, merge_values)
+        } else {
+            (None, None, vec![])
+        };
+
         let query = write::create_record(model, args, &selected_fields.into(), &self.context);
-        self.convert_query(query)
+        Ok(CreateRecord {
+            select_defaults,
+            insert_query: self.convert_query(query)?,
+            last_insert_id_field,
+            merge_values,
+        })
     }
 
     fn build_inserts(

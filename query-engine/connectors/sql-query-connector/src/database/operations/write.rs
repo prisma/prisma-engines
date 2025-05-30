@@ -2,12 +2,14 @@ use super::update::*;
 use crate::row::ToSqlRow;
 use crate::value::to_prisma_value;
 use crate::{error::SqlError, QueryExt, Queryable};
+use itertools::Itertools;
 use quaint::prelude::ResultSet;
 use quaint::{
     error::ErrorKind,
-    prelude::{native_uuid, uuid_to_bin, uuid_to_bin_swapped, Aliasable, Select, SqlFamily},
+    prelude::{Select, SqlFamily},
 };
 use query_structure::*;
+use sql_query_builder::write::defaults_for_mysql_write_args;
 use sql_query_builder::{column_metadata, write, Context, SelectionResultExt, SqlTraceComment};
 use std::borrow::Cow;
 use std::collections::HashMap;
@@ -20,30 +22,15 @@ async fn generate_id(
     ctx: &Context<'_>,
 ) -> crate::Result<Option<SelectionResult>> {
     // Go through all the values and generate a select statement with the correct MySQL function
-    let (id_select, need_select) = id_field
-        .selections()
-        .filter_map(|field| match field {
-            SelectedField::Scalar(sf) if sf.default_value().is_some() && !args.has_arg_for(sf.db_name()) => sf
-                .default_value()
-                .unwrap()
-                .to_dbgenerated_func()
-                .map(|func| (field.db_name().to_string(), func)),
-            _ => None,
-        })
-        .fold((Select::default(), false), |(query, generated), value| {
-            let alias = value.0;
-            let func = value.1.to_lowercase().replace(' ', "");
-
-            match func.as_str() {
-                "(uuid())" => (query.value(native_uuid().alias(alias)), true),
-                "(uuid_to_bin(uuid()))" | "(uuid_to_bin(uuid(),0))" => (query.value(uuid_to_bin().alias(alias)), true),
-                "(uuid_to_bin(uuid(),1))" => (query.value(uuid_to_bin_swapped().alias(alias)), true),
-                _ => (query, generated),
-            }
-        });
+    let defaults = defaults_for_mysql_write_args(id_field, args)
+        .map(|(_, val)| val)
+        .collect_vec();
 
     // db generate values only if needed
-    if need_select {
+    if !defaults.is_empty() {
+        let mut id_select = Select::default();
+        id_select.extend(defaults);
+
         let pk_select = id_select.add_traceparent(ctx.traceparent());
         let pk_result = conn.query(pk_select.into()).await?;
         let result = try_convert(&(id_field.into()), pk_result)?;

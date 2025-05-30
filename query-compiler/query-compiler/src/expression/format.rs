@@ -1,4 +1,4 @@
-use super::{Binding, DbQuery, Expression, JoinExpression, Pagination};
+use super::{Binding, DbQuery, Expression, JoinExpression, Pagination, RecordValue};
 use crate::result_node::ResultNode;
 use pretty::{
     DocAllocator, DocBuilder,
@@ -6,7 +6,7 @@ use pretty::{
 };
 use query_core::DataRule;
 use query_structure::{Placeholder, PrismaValue};
-use std::borrow::Cow;
+use std::{borrow::Cow, collections::BTreeMap};
 
 fn color_kw() -> ColorSpec {
     ColorSpec::new().set_fg(Some(Color::Blue)).clone()
@@ -74,6 +74,7 @@ where
             Expression::Diff { from, to } => self.diff(from, to),
             Expression::DistinctBy { expr, fields } => self.distinct_by(expr, fields),
             Expression::Paginate { expr, pagination } => self.paginate(expr, pagination),
+            Expression::ExtendRecord { expr, values } => self.extend_record(expr, values),
         }
     }
 
@@ -459,6 +460,35 @@ where
         }
 
         builder.append(self.expression(expr))
+    }
+
+    fn extend_record(
+        &'a self,
+        expr: &'a Expression,
+        fields: &'a BTreeMap<String, RecordValue>,
+    ) -> DocBuilder<'a, PrettyPrinter<'a, D>, ColorSpec> {
+        self.keyword("extend")
+            .append(self.space())
+            .append(
+                self.intersperse(
+                    fields.iter().map(|(name, value)| {
+                        let value = match value {
+                            RecordValue::LastInsertId => self.keyword("lastInsertId"),
+                            RecordValue::Value(value) => self.value(value),
+                        };
+                        self.field_name(name)
+                            .append(self.text(":"))
+                            .append(self.space())
+                            .append(value)
+                    }),
+                    self.line(),
+                )
+                .append(self.line())
+                .indent(4)
+                .braces(),
+            )
+            .append(self.space())
+            .append(self.expression(expr))
     }
 }
 

@@ -513,3 +513,27 @@ fn write_args_to_shape(write_args: &WriteArgs, model: &Model) -> Vec<DatasourceF
 
     shape
 }
+
+pub fn defaults_for_mysql_write_args<'a>(
+    id_field: &'a FieldSelection,
+    args: &'a WriteArgs,
+) -> impl Iterator<Item = (ScalarField, Expression<'static>)> + use<'a> {
+    // Go through all the values and generate a select statement with the correct MySQL function
+    id_field.selections().filter_map(|field| {
+        let (sf, func) = match field {
+            SelectedField::Scalar(sf) if !args.has_arg_for(sf.db_name()) => {
+                (sf, sf.default_value()?.to_dbgenerated_func()?)
+            }
+            _ => return None,
+        };
+        let alias = field.db_name().into_owned();
+        let func = func.to_lowercase().replace(' ', "");
+
+        match func.as_str() {
+            "(uuid())" => Some((sf.clone(), native_uuid().alias(alias))),
+            "(uuid_to_bin(uuid()))" | "(uuid_to_bin(uuid(),0))" => Some((sf.clone(), uuid_to_bin().alias(alias))),
+            "(uuid_to_bin(uuid(),1))" => Some((sf.clone(), uuid_to_bin_swapped().alias(alias))),
+            _ => None,
+        }
+    })
+}

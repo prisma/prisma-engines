@@ -722,3 +722,9 @@ impl<'a> Select<'a> {
 }
 
 impl<'a> IntoCommonTableExpression<'a> for Select<'a> {}
+
+impl<'a> Extend<Expression<'a>> for Select<'a> {
+    fn extend<T: IntoIterator<Item = Expression<'a>>>(&mut self, iter: T) {
+        self.columns.extend(iter);
+    }
+}
