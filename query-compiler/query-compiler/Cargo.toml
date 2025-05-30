@@ -7,7 +7,6 @@ version = "0.1.0"
 query-structure.workspace = true
 query-builder.workspace = true
 query-core.workspace = true
-# we should drop sql-query-builder and quaint once we properly abstract over Mongo
 serde_json.workspace = true
 sql-query-builder = { workspace = true, features = ["relation_joins"]}
 quaint.workspace = true

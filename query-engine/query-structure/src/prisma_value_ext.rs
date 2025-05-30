@@ -1,16 +1,16 @@
-use super::{PrismaValue, TypeIdentifier};
+use super::{PrismaValue, Type, TypeIdentifier};
 use crate::DomainError;
 use bigdecimal::ToPrimitive;
 use prisma_value::{Placeholder, PrismaValueType};
 
 pub(crate) trait PrismaValueExtensions {
-    fn coerce(self, to_type: TypeIdentifier) -> crate::Result<PrismaValue>;
+    fn coerce(self, to_type: &Type) -> crate::Result<PrismaValue>;
 }
 
 impl PrismaValueExtensions for PrismaValue {
     // Todo this is not exhaustive for now.
-    fn coerce(self, to_type: TypeIdentifier) -> crate::Result<PrismaValue> {
-        let coerced = match (self, to_type) {
+    fn coerce(self, to_type: &Type) -> crate::Result<PrismaValue> {
+        let coerced = match (self, to_type.id) {
             // Trivial cases
             (PrismaValue::Null, _) => PrismaValue::Null,
             (val @ PrismaValue::String(_), TypeIdentifier::String) => val,
@@ -46,13 +46,13 @@ impl PrismaValueExtensions for PrismaValue {
             // Todo other coercions here
 
             // Lists
-            (PrismaValue::List(list), typ) => PrismaValue::List(
+            (PrismaValue::List(list), _) => PrismaValue::List(
                 list.into_iter()
-                    .map(|val| val.coerce(typ))
+                    .map(|val| val.coerce(to_type))
                     .collect::<crate::Result<Vec<_>>>()?,
             ),
 
-            (PrismaValue::Placeholder(Placeholder { name, r#type }), typ) if r#type == typ.to_prisma_type() => {
+            (PrismaValue::Placeholder(Placeholder { name, r#type }), _) if r#type == to_type.to_prisma_type() => {
                 PrismaValue::Placeholder(Placeholder { name, r#type })
             }
 
@@ -61,10 +61,10 @@ impl PrismaValueExtensions for PrismaValue {
                     name,
                     r#type: PrismaValueType::Any,
                 }),
-                typ,
+                _,
             ) => PrismaValue::Placeholder(Placeholder {
                 name,
-                r#type: typ.to_prisma_type(),
+                r#type: to_type.to_prisma_type(),
             }),
 
             // Invalid coercion

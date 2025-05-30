@@ -11,6 +11,13 @@ transaction
        user: {
            id: Int (id)
            email: String (email)
+           role: Enum<Role> (role)
+       }
+   }
+   enums {
+       Role: {
+           admin: ADMIN
+           user: USER
        }
    }
    let 1 = unique (query «SELECT "public"."User"."id" FROM "public"."User" WHERE
@@ -21,9 +28,12 @@ transaction
    in let 2 = let 2 = if (rowCountNeq 0 (get 1))
                   then get 1
                   else let 3 = unique (query «INSERT INTO "public"."User"
-                                              ("email") VALUES ($1) RETURNING
+                                              ("email","role") VALUES
+                                              ($1,CAST($2::text AS
+                                              "public"."Role")) RETURNING
                                               "public"."User"."id"»
-                                       params [const(String("john@example.com"))])
+                                       params [const(String("john@example.com")),
+                                               const(String("user"))])
                        in get 3
           in let 0 = let 2$id = mapField id (get 2)
                  in let 0 = unique (query «INSERT INTO "public"."Post"
@@ -53,7 +63,8 @@ transaction
                                      in join (get @parent)
                                         with (query «SELECT
                                                      "public"."User"."id",
-                                                     "public"."User"."email"
+                                                     "public"."User"."email",
+                                                     "public"."User"."role"::text
                                                      FROM "public"."User" WHERE
                                                      "public"."User"."id" = $1
                                                      OFFSET $2»

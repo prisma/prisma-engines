@@ -120,7 +120,7 @@ pub fn from_aggregation_selection(selection: &AggregationSelection) -> OutputMet
         map.insert(
             ident.db_name.into(),
             OutputMeta::Scalar(ScalarOutputMeta {
-                ident: ident.typ,
+                ident: ident.typ.id,
                 default: None,
                 list: matches!(ident.arity, FieldArity::List),
             }),

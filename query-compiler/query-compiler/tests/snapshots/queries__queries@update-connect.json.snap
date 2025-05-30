@@ -7,15 +7,23 @@ transaction
    dataMap {
        id: Int (id)
        email: String (email)
+       role: Enum<Role> (role)
        posts: {
            id: Int (id)
            title: String (title)
            userId: Int (userId)
        }
    }
-   let 0 = unique (query «SELECT "public"."User"."id", "public"."User"."email"
-                          FROM "public"."User" WHERE ("public"."User"."email" =
-                          $1 AND 1=1) LIMIT $2 OFFSET $3»
+   enums {
+       Role: {
+           admin: ADMIN
+           user: USER
+       }
+   }
+   let 0 = unique (query «SELECT "public"."User"."id", "public"."User"."email",
+                          "public"."User"."role"::text FROM "public"."User"
+                          WHERE ("public"."User"."email" = $1 AND 1=1) LIMIT $2
+                          OFFSET $3»
                    params [const(String("user.1737556028164@prisma.io")),
                            const(BigInt(1)), const(BigInt(0))])
    in let 0 = validate (get 0)
@@ -34,8 +42,9 @@ transaction
                   ] orRaise "MISSING_RECORD";
                   0$id = mapField id (get 0)
           in let 3 = let @parent = unique (query «SELECT "public"."User"."id",
-                                                  "public"."User"."email" FROM
-                                                  "public"."User" WHERE
+                                                  "public"."User"."email",
+                                                  "public"."User"."role"::text
+                                                  FROM "public"."User" WHERE
                                                   "public"."User"."id" = $1
                                                   LIMIT $2 OFFSET $3»
                                            params [var(0$id as Int),

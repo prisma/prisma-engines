@@ -77,6 +77,7 @@ pub enum PrismaValueType {
     Array(Box<PrismaValueType>),
     Object,
     Bytes,
+    Enum(String),
 }
 
 impl std::fmt::Display for PrismaValueType {
@@ -94,6 +95,7 @@ impl std::fmt::Display for PrismaValueType {
             PrismaValueType::Array(t) => write!(f, "Array<{t}>"),
             PrismaValueType::Object => write!(f, "Object"),
             PrismaValueType::Bytes => write!(f, "Bytes"),
+            PrismaValueType::Enum(name) => write!(f, "Enum<{name}>"),
         }
     }
 }
