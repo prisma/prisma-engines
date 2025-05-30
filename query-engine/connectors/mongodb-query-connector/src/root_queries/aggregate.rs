@@ -40,7 +40,7 @@ fn empty_aggregation(selections: Vec<AggregationSelection>) -> Vec<AggregationRo
                 row.push(AggregationResult::Field(f.clone(), PrismaValue::Null));
             }
             AggregationSelection::Count { all, fields } => {
-                if *all {
+                if all.is_some() {
                     row.push(AggregationResult::Count(None, PrismaValue::Int(0)));
                 }
 
@@ -99,7 +99,7 @@ fn to_aggregation_rows(
                     row.push(AggregationResult::Field(f.clone(), value_from_bson(field_val, meta)?));
                 }
                 AggregationSelection::Count { all, fields } => {
-                    if *all {
+                    if all.is_some() {
                         let meta = selection_meta.get("all").unwrap();
                         let field_val = value_from_bson(doc.remove("count_all").unwrap(), meta)?;
 

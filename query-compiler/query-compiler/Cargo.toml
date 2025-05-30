@@ -4,7 +4,6 @@ name = "query-compiler"
 version = "0.1.0"
 
 [dependencies]
-parser-database.workspace = true
 query-structure.workspace = true
 query-builder.workspace = true
 query-core.workspace = true

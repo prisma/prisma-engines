@@ -215,7 +215,7 @@ impl ScalarField {
             {
                 PrismaValueType::Time
             }
-            (type_identifier, _) => type_identifier.to_prisma_type(),
+            (type_identifier, _) => type_identifier.to_prisma_type(&self.dm.schema),
         };
         if self.is_list() {
             PrismaValueType::Array(Box::new(type_))

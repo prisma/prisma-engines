@@ -95,12 +95,6 @@ impl std::ops::Index<ModelId> for SchemaAst {
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct EnumId(u32);
 
-impl EnumId {
-    pub fn to_u32(self) -> u32 {
-        self.0
-    }
-}
-
 impl std::ops::Index<EnumId> for SchemaAst {
     type Output = Enum;
 

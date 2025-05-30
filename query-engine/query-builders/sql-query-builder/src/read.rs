@@ -206,7 +206,7 @@ pub fn aggregate(
                     )
                 });
 
-                if *all {
+                if all.is_some() {
                     select.value(count(asterisk()).alias(format!("{UNDERSCORE_COUNT}._all")))
                 } else {
                     select
@@ -278,7 +278,7 @@ pub fn group_by_aggregate(
                 )
             });
 
-            if *all {
+            if all.is_some() {
                 select.value(count(asterisk()).alias(format!("{UNDERSCORE_COUNT}._all")))
             } else {
                 select

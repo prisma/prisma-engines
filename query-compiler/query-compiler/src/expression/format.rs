@@ -5,7 +5,7 @@ use pretty::{
     termcolor::{Color, ColorSpec},
 };
 use query_core::DataRule;
-use query_structure::{Placeholder, PrismaValue, PrismaValueType};
+use query_structure::{Placeholder, PrismaValue};
 use std::{borrow::Cow, collections::BTreeMap};
 
 fn color_kw() -> ColorSpec {
@@ -311,9 +311,9 @@ where
     }
 
     fn enum_map(&'a self, enums: &'a EnumsMap) -> PrettyDoc<'a, D> {
-        self.object(enums.0.iter().map(|(id, value_mapping)| {
+        self.object(enums.0.iter().map(|(enum_name, value_mapping)| {
             (
-                self.text(PrismaValueType::key_from_enum_id(id)).double_quotes(),
+                self.text(enum_name),
                 self.object(
                     value_mapping
                         .iter()
