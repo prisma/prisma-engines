@@ -486,7 +486,7 @@ impl SelectedField {
     /// Coerces a value to fit the selection. If the conversion is not possible, an error will be thrown.
     pub(crate) fn coerce_value(&self, value: PrismaValue) -> crate::Result<PrismaValue> {
         match self {
-            SelectedField::Scalar(sf) => value.coerce(&sf.r#type()),
+            SelectedField::Scalar(sf) => value.coerce(&sf.base_type()),
             SelectedField::Composite(cs) => cs.coerce_value(value),
             SelectedField::Relation(_) => todo!(),
             SelectedField::Virtual(vs) => vs.coerce_value(value),
