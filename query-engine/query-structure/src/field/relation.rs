@@ -54,13 +54,13 @@ impl RelationField {
             .fields()
             .into_iter()
             .flatten()
-            .map(|f| self.dm.clone().zip(ScalarFieldId::InModel(f.id)))
+            .map(|f| self.zip(ScalarFieldId::InModel(f.id)))
             .collect()
     }
 
     pub fn relation(&self) -> Relation {
         let relation_id = self.dm.walk(self.id).relation().id;
-        self.dm.clone().zip(relation_id)
+        self.zip(relation_id)
     }
 
     /// Alias for more clarity (in most cases, doesn't add more clarity for self-relations);
@@ -86,7 +86,7 @@ impl RelationField {
 
     pub fn related_field(&self) -> RelationField {
         let id = self.walker().opposite_relation_field().unwrap().id;
-        self.dm.clone().zip(id)
+        self.zip(id)
     }
 
     pub fn type_identifiers_with_arities(&self) -> Vec<(TypeIdentifier, FieldArity)> {
@@ -101,7 +101,7 @@ impl RelationField {
             .referenced_fields()
             .into_iter()
             .flatten()
-            .map(|field| self.dm.clone().zip(ScalarFieldId::InModel(field.id)))
+            .map(|field| self.zip(ScalarFieldId::InModel(field.id)))
             .collect()
     }
 
@@ -126,13 +126,13 @@ impl RelationField {
                     forward
                         .fields()
                         .unwrap()
-                        .map(|sf| self.dm.clone().zip(ScalarFieldId::InModel(sf.id)))
+                        .map(|sf| self.zip(ScalarFieldId::InModel(sf.id)))
                         .collect()
                 } else {
                     forward
                         .referenced_fields()
                         .unwrap()
-                        .map(|sf| self.dm.clone().zip(ScalarFieldId::InModel(sf.id)))
+                        .map(|sf| self.zip(ScalarFieldId::InModel(sf.id)))
                         .collect()
                 }
             }

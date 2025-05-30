@@ -3,7 +3,7 @@ use std::collections::{BTreeMap, HashMap};
 use crate::result_node::ResultNode;
 use query_builder::DbQuery;
 use query_core::{DataExpectation, DataRule};
-use query_structure::{InternalDataModel, PrismaValue, TaggedPrismaValue, TypeIdentifier};
+use query_structure::{PrismaValue, TaggedPrismaValue, Type, TypeIdentifier};
 use serde::Serialize;
 
 mod format;
@@ -187,9 +187,9 @@ impl EnumsMap {
         Default::default()
     }
 
-    pub fn add(&mut self, ty: TypeIdentifier, dm: &InternalDataModel) {
-        let TypeIdentifier::Enum(id) = ty else { return };
-        let walker = dm.walk(id);
+    pub fn add(&mut self, ty: &Type) {
+        let TypeIdentifier::Enum(id) = ty.id else { return };
+        let walker = ty.dm.walk(id);
 
         if !self.0.contains_key(walker.name()) {
             self.0.insert(

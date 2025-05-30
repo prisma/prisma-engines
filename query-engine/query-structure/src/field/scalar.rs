@@ -101,6 +101,10 @@ impl ScalarField {
         }
     }
 
+    pub fn r#type(&self) -> Type {
+        self.zip(self.type_identifier())
+    }
+
     pub fn arity(&self) -> FieldArity {
         match self.id {
             ScalarFieldId::InModel(id) => self.dm.walk(id).ast_field().arity,
@@ -113,7 +117,7 @@ impl ScalarField {
             ScalarFieldId::InModel(id) => self.dm.walk(id).scalar_field_type().as_enum(),
             ScalarFieldId::InCompositeType(id) => self.dm.walk(id).r#type().as_enum(),
         }?;
-        Some(self.dm.clone().zip(enum_id))
+        Some(self.zip(enum_id))
     }
 
     pub fn default_value(&self) -> Option<DefaultKind> {
@@ -215,7 +219,7 @@ impl ScalarField {
             {
                 PrismaValueType::Time
             }
-            (type_identifier, _) => type_identifier.to_prisma_type(&self.dm.schema),
+            (type_identifier, _) => self.zip(type_identifier).to_prisma_type(),
         };
         if self.is_list() {
             PrismaValueType::Array(Box::new(type_))

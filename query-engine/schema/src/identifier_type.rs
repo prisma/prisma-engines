@@ -39,7 +39,7 @@ pub enum IdentifierType {
     RelationUpdateInput(RelationField, RelationField, bool),
     ScalarFieldEnum(Model),
     ScalarFilterInput(Model, bool),
-    ScalarListFilterInput(Zipper<TypeIdentifier>, bool),
+    ScalarListFilterInput(Type, bool),
     ScalarListUpdateInput(ScalarField),
     ToManyCompositeFilterInput(CompositeType),
     ToManyRelationFilterInput(Model),
@@ -202,13 +202,9 @@ impl std::fmt::Display for IdentifierType {
             IdentifierType::ToManyCompositeFilterInput(ct) => {
                 write!(f, "{}CompositeListFilter", capitalize(ct.name()))
             }
-            IdentifierType::ScalarListFilterInput(type_identifier, required) => f.write_str(&scalar_filter_name(
-                &type_identifier.id.type_name(&type_identifier.dm.schema),
-                true,
-                !required,
-                false,
-                false,
-            )),
+            IdentifierType::ScalarListFilterInput(typ, required) => {
+                f.write_str(&scalar_filter_name(&typ.type_name(), true, !required, false, false))
+            }
             IdentifierType::ScalarFilterInput(model, includes_aggregate) => {
                 let aggregate = if *includes_aggregate { "WithAggregates" } else { "" };
 

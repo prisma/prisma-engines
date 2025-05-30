@@ -3,7 +3,7 @@ use std::slice;
 use itertools::Either;
 use psl::schema_ast::ast::FieldArity;
 
-use crate::{InternalDataModelRef, ScalarFieldRef, TypeIdentifier, Zipper};
+use crate::{InternalDataModelRef, ScalarFieldRef, Type, TypeIdentifier, Zipper};
 
 /// Selections for aggregation queries.
 #[derive(Debug, Clone)]
@@ -64,9 +64,8 @@ impl AggregationSelection {
                     |all| SelectionIdentifier {
                         name: all.name(),
                         db_name: all.db_name(),
-                        typ: all.type_identifier(),
+                        typ: all.r#type(),
                         arity: all.arity(),
-                        dm: &all.dm,
                     },
                 )),
             ),
@@ -81,9 +80,8 @@ impl AggregationSelection {
         fields.iter().map(move |f| SelectionIdentifier {
             name: f.name(),
             db_name: f.db_name(),
-            typ: type_mapper(f.type_identifier()),
+            typ: f.zip(type_mapper(f.type_identifier())),
             arity: arity_mapper(f.arity()),
-            dm: &f.dm,
         })
     }
 }
@@ -117,6 +115,10 @@ impl CountAllAggregationSelection {
     pub fn arity(&self) -> FieldArity {
         FieldArity::Required
     }
+
+    pub fn r#type(&self) -> Type {
+        self.dm.clone().zip(self.type_identifier())
+    }
 }
 
 impl<I> From<&'_ Zipper<I>> for CountAllAggregationSelection {
@@ -128,7 +130,6 @@ impl<I> From<&'_ Zipper<I>> for CountAllAggregationSelection {
 pub struct SelectionIdentifier<'a> {
     pub name: &'a str,
     pub db_name: &'a str,
-    pub typ: TypeIdentifier,
+    pub typ: Type,
     pub arity: FieldArity,
-    pub dm: &'a InternalDataModelRef,
 }
