@@ -1,7 +1,7 @@
 use crate::{
     parent_container::ParentContainer, prisma_value_ext::PrismaValueExtensions, CompositeFieldRef, DomainError, Field,
-    Filter, Model, ModelProjection, QueryArguments, RelationField, RelationFieldRef, ScalarField, ScalarFieldRef,
-    SelectionResult, TypeIdentifier,
+    Filter, InternalDataModelRef, Model, ModelProjection, QueryArguments, RelationField, RelationFieldRef, ScalarField,
+    ScalarFieldRef, SelectionResult, TypeIdentifier,
 };
 use itertools::Itertools;
 use prisma_value::PrismaValue;
@@ -330,9 +330,9 @@ impl VirtualSelection {
 
     pub fn coerce_value(&self, value: PrismaValue) -> crate::Result<PrismaValue> {
         match self {
-            Self::RelationCount(_, _) => match value {
+            Self::RelationCount(rf, _) => match value {
                 PrismaValue::Null => Ok(PrismaValue::Int(0)),
-                _ => value.coerce(TypeIdentifier::Int),
+                _ => value.coerce(TypeIdentifier::Int, &rf.dm.schema),
             },
         }
     }
@@ -358,6 +358,12 @@ impl VirtualSelection {
     pub fn filter(&self) -> Option<&Filter> {
         match self {
             VirtualSelection::RelationCount(_, filter) => filter.as_ref(),
+        }
+    }
+
+    pub fn data_model(&self) -> InternalDataModelRef {
+        match self {
+            VirtualSelection::RelationCount(rf, _) => rf.dm.clone(),
         }
     }
 }
@@ -470,7 +476,7 @@ impl SelectedField {
     /// Coerces a value to fit the selection. If the conversion is not possible, an error will be thrown.
     pub(crate) fn coerce_value(&self, value: PrismaValue) -> crate::Result<PrismaValue> {
         match self {
-            SelectedField::Scalar(sf) => value.coerce(sf.type_identifier()),
+            SelectedField::Scalar(sf) => value.coerce(sf.type_identifier(), &sf.dm.schema),
             SelectedField::Composite(cs) => cs.coerce_value(value),
             SelectedField::Relation(_) => todo!(),
             SelectedField::Virtual(vs) => vs.coerce_value(value),

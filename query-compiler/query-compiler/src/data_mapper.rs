@@ -108,11 +108,10 @@ fn get_result_node(
     for prisma_name in selection_order {
         match field_map.get(prisma_name.as_str()) {
             Some(sf @ SelectedField::Scalar(f)) => {
-                let prisma_type = f.corresponding_prisma_type();
-                enums.add(&prisma_type, &f.dm);
+                enums.add(f.type_identifier(), &f.dm);
                 node.add_field(
                     prisma_name,
-                    ResultNode::new_value(sf.db_name().into_owned(), prisma_type),
+                    ResultNode::new_value(sf.db_name().into_owned(), f.corresponding_prisma_type()),
                 );
             }
             Some(SelectedField::Composite(_)) => todo!("MongoDB specific"),
@@ -143,7 +142,10 @@ fn get_result_node(
                         } else {
                             ResultNode::new_flattened_object
                         })
-                        .add_field(field_name, ResultNode::new_value(db_name, typ.to_prisma_type()));
+                        .add_field(
+                            field_name,
+                            ResultNode::new_value(db_name, typ.to_prisma_type(&f.data_model().schema)),
+                        );
                 }
             }
             None => {
@@ -184,7 +186,7 @@ fn get_result_node_for_aggregation(
         .flat_map(|sel| {
             sel.identifiers().map(move |ident| {
                 let (name, db_name) =
-                    if matches!(&sel, AggregationSelection::Count { all: true, .. }) && ident.name == "all" {
+                    if matches!(&sel, AggregationSelection::Count { all: Some(_), .. }) && ident.name == "all" {
                         ("_all", "_all")
                     } else {
                         (ident.name, ident.db_name)
@@ -194,11 +196,8 @@ fn get_result_node_for_aggregation(
         })
         .sorted_by_key(|(underscore_name, name, _, _, _)| ordered_set.get_index_of(&(*underscore_name, *name)))
     {
-        let prisma_type = typ.to_prisma_type();
-        if let Some(dm) = dm {
-            enums.add(&prisma_type, dm)
-        }
-        let value = ResultNode::new_value(db_name.into(), prisma_type);
+        enums.add(typ, dm);
+        let value = ResultNode::new_value(db_name.into(), typ.to_prisma_type(&dm.schema));
         if let Some(undescore_name) = underscore_name {
             node.entry(undescore_name)
                 .or_insert_with(ResultNode::new_object)

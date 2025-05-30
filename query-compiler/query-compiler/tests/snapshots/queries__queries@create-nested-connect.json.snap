@@ -7,7 +7,7 @@ transaction
    dataMap {
        id: Int (id)
        email: String (email)
-       role: Enum<0:2> (role)
+       role: Enum<Role> (role)
        posts: {
            id: Int (id)
            title: String (title)
@@ -15,7 +15,7 @@ transaction
        }
    }
    enums {
-       "0:2": {
+       Role: {
            admin: ADMIN
            user: USER
        }

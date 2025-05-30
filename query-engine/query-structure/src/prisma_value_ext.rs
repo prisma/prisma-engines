@@ -4,12 +4,12 @@ use bigdecimal::ToPrimitive;
 use prisma_value::{Placeholder, PrismaValueType};
 
 pub(crate) trait PrismaValueExtensions {
-    fn coerce(self, to_type: TypeIdentifier) -> crate::Result<PrismaValue>;
+    fn coerce(self, to_type: TypeIdentifier, schema: &psl::ValidatedSchema) -> crate::Result<PrismaValue>;
 }
 
 impl PrismaValueExtensions for PrismaValue {
     // Todo this is not exhaustive for now.
-    fn coerce(self, to_type: TypeIdentifier) -> crate::Result<PrismaValue> {
+    fn coerce(self, to_type: TypeIdentifier, schema: &psl::ValidatedSchema) -> crate::Result<PrismaValue> {
         let coerced = match (self, to_type) {
             // Trivial cases
             (PrismaValue::Null, _) => PrismaValue::Null,
@@ -48,11 +48,11 @@ impl PrismaValueExtensions for PrismaValue {
             // Lists
             (PrismaValue::List(list), typ) => PrismaValue::List(
                 list.into_iter()
-                    .map(|val| val.coerce(typ))
+                    .map(|val| val.coerce(typ, schema))
                     .collect::<crate::Result<Vec<_>>>()?,
             ),
 
-            (PrismaValue::Placeholder(Placeholder { name, r#type }), typ) if r#type == typ.to_prisma_type() => {
+            (PrismaValue::Placeholder(Placeholder { name, r#type }), typ) if r#type == typ.to_prisma_type(schema) => {
                 PrismaValue::Placeholder(Placeholder { name, r#type })
             }
 
@@ -64,7 +64,7 @@ impl PrismaValueExtensions for PrismaValue {
                 typ,
             ) => PrismaValue::Placeholder(Placeholder {
                 name,
-                r#type: typ.to_prisma_type(),
+                r#type: typ.to_prisma_type(schema),
             }),
 
             // Invalid coercion

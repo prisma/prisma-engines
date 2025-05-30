@@ -180,7 +180,7 @@ impl TypeIdentifier {
         }
     }
 
-    pub fn to_prisma_type(&self) -> PrismaValueType {
+    pub fn to_prisma_type(&self, schema: &psl::ValidatedSchema) -> PrismaValueType {
         match self {
             TypeIdentifier::String => PrismaValueType::String,
             TypeIdentifier::Int => PrismaValueType::Int,
@@ -188,7 +188,7 @@ impl TypeIdentifier {
             TypeIdentifier::Float => PrismaValueType::Float,
             TypeIdentifier::Decimal => PrismaValueType::Decimal,
             TypeIdentifier::Boolean => PrismaValueType::Boolean,
-            TypeIdentifier::Enum(id) => PrismaValueType::Enum(*id),
+            TypeIdentifier::Enum(id) => PrismaValueType::Enum(schema.db.walk(*id).name().to_owned()),
             TypeIdentifier::UUID => PrismaValueType::String,
             TypeIdentifier::Json => PrismaValueType::Object,
             TypeIdentifier::DateTime => PrismaValueType::Date,
