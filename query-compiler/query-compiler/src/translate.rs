@@ -3,6 +3,7 @@ mod query;
 use super::expression::{Binding, Expression};
 use crate::data_mapper::map_result_structure;
 use crate::expression::EnumsMap;
+use crate::result_node::ResultNodeBuilder;
 use crate::{Expression::Transaction, selection::SelectionResults};
 use itertools::{Either, Itertools};
 use query::translate_query;
@@ -30,7 +31,8 @@ pub type TranslateResult<T> = Result<T, TranslateError>;
 
 pub fn translate(mut graph: QueryGraph, builder: &dyn QueryBuilder) -> TranslateResult<Expression> {
     let mut enums = EnumsMap::new();
-    let structure = map_result_structure(&graph, &mut enums);
+    let mut result_node_builder = ResultNodeBuilder::new(&mut enums);
+    let structure = map_result_structure(&graph, &mut result_node_builder);
 
     // Must collect the root nodes first, because the following iteration is mutating the graph
     let root_nodes: Vec<NodeRef> = graph.root_nodes().collect();

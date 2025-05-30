@@ -296,9 +296,9 @@ where
     fn data_map_node(&'a self, node: &'a ResultNode) -> PrettyDoc<'a, D> {
         match node {
             ResultNode::AffectedRows => self.keyword("affectedRows"),
-            ResultNode::Object { fields, flattened } => self.object(fields.iter().map(|(name, field)| {
+            ResultNode::Object(object) => self.object(object.fields().iter().map(|(name, field)| {
                 let mut key = self.field_name(name);
-                if *flattened {
+                if object.is_flattened() {
                     key = key.append(self.space().append(self.keyword("(flattened)")));
                 }
                 (key, self.data_map_node(field))
