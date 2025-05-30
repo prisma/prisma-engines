@@ -6,8 +6,6 @@ new::regressions::prisma_13097::prisma_13097::group_by_enum_array
 new::regressions::prisma_15177::prisma_15177::repro
 new::regressions::prisma_22971::prisma_22971::test_22971
 new::regressions::prisma_7434::not_in_chunking::not_in_batch_filter
-new::regressions::team_orm_927::count_before_relation::find_many
-new::regressions::team_orm_927::count_before_relation::find_unique
 queries::aggregation::group_by::aggregation_group_by::group_by_ordering_sum_aggregation
 queries::chunking::chunking::order_by_aggregation_should_fail
 queries::chunking::chunking::order_by_relevance_should_fail
@@ -23,7 +21,6 @@ queries::order_and_pagination::nested_pagination::nested_pagination::mid_lvl_ski
 queries::order_and_pagination::nested_pagination::nested_pagination::mid_lvl_take_minus_3
 queries::order_and_pagination::nested_pagination::nested_pagination::mid_lvl_take_minus_4
 queries::simple::m2m::m2m::repro_16390
-queries::views::views::sorted_read
 raw::sql::errors::raw_errors::list_param_for_scalar_column_should_not_panic_pg_js
 raw::sql::scalar_list::scalar_list::null_native_type_lists
 raw::sql::scalar_list::scalar_list::null_scalar_lists
