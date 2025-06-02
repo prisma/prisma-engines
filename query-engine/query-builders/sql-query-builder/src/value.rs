@@ -10,7 +10,7 @@ impl Placeholder {
         Self(value.into())
     }
 
-    pub fn name(&self) -> &str {
+    pub fn name(&self) -> &Cow<'static, str> {
         &self.0
     }
 }

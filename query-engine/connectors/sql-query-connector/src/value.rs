@@ -105,7 +105,7 @@ pub fn to_prisma_value<'a, T: Into<ValueType<'a>>>(qv: T) -> crate::Result<Prism
 
         ValueType::Opaque(opaque) => {
             if let Some(placeholder) = opaque.downcast_ref::<Placeholder>() {
-                PrismaValue::placeholder(placeholder.name().to_owned(), opaque_type_to_prisma_type(opaque.typ()))
+                PrismaValue::placeholder(placeholder.name().clone(), opaque_type_to_prisma_type(opaque.typ()))
             } else if let Some(call) = opaque.downcast_ref::<GeneratorCall>() {
                 PrismaValue::GeneratorCall {
                     name: call.name().to_owned().into(),
