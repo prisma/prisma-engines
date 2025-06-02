@@ -81,6 +81,10 @@ impl RelationLoadStrategy {
     pub fn is_query(&self) -> bool {
         matches!(self, RelationLoadStrategy::Query)
     }
+
+    pub fn is_join(&self) -> bool {
+        matches!(self, RelationLoadStrategy::Join)
+    }
 }
 
 impl TryFrom<&str> for RelationLoadStrategy {
