@@ -12,18 +12,22 @@ use tokio::{select, signal};
 #[tokio::main]
 async fn main() {
     let work = async {
-        let opts = PrismaOpt::from_args();
+        tokio::spawn(async {
+            let opts = PrismaOpt::from_args();
 
-        match CliCommand::from_opt(&opts)? {
-            Some(cmd) => cmd.execute().await?,
-            None => {
-                let cx = context::setup(&opts).await?;
-                set_panic_hook(opts.log_format());
-                server::listen(cx, &opts).await?;
+            match CliCommand::from_opt(&opts)? {
+                Some(cmd) => cmd.execute().await?,
+                None => {
+                    let cx = context::setup(&opts).await?;
+                    set_panic_hook(opts.log_format());
+                    server::listen(cx, &opts).await?;
+                }
             }
-        }
 
-        Result::<(), PrismaError>::Ok(())
+            Result::<(), PrismaError>::Ok(())
+        })
+        .await
+        .expect("main task panicked")
     };
 
     let interrupt = async { signal::ctrl_c().await.expect("failed to listen for SIGINT/Ctrl+C") };
