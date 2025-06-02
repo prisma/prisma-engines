@@ -1,5 +1,5 @@
 use indexmap::IndexMap;
-use query_structure::{PrismaValueType, ScalarFieldResultType};
+use query_structure::{PrismaValueType, ScalarFieldResultType, TypeIdentifier};
 use serde::Serialize;
 
 use crate::expression::EnumsMap;
@@ -68,10 +68,13 @@ impl<'a> ResultNodeBuilder<'a> {
     }
 
     pub fn new_value(&mut self, db_name: String, result_type: ScalarFieldResultType) -> ResultNode {
-        self.enums.add(&result_type.typ);
+        let prisma_type = result_type.to_prisma_type();
+        if let TypeIdentifier::Enum(id) = result_type.typ.id {
+            self.enums.add(result_type.typ.map(id));
+        }
         ResultNode::Value {
             db_name,
-            result_type: result_type.to_prisma_type(),
+            result_type: prisma_type,
         }
     }
 }

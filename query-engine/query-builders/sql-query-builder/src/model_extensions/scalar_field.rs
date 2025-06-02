@@ -23,7 +23,7 @@ impl ScalarFieldExt for ScalarField {
             (PrismaValue::Boolean(b), _) => b.into(),
             (PrismaValue::DateTime(d), _) => d.with_timezone(&Utc).into(),
             (PrismaValue::Enum(e), TypeIdentifier::Enum(enum_id)) => {
-                let enum_walker = self.zip(enum_id);
+                let enum_walker = self.map_ref(enum_id);
                 let enum_name = enum_walker.db_name().to_owned();
                 let schema_name = enum_walker
                     .schema_name()
@@ -33,7 +33,7 @@ impl ScalarFieldExt for ScalarField {
                 Value::enum_variant_with_name(e, EnumName::new(enum_name, schema_name))
             }
             (PrismaValue::List(vals), TypeIdentifier::Enum(enum_id)) => {
-                let enum_walker = self.zip(enum_id);
+                let enum_walker = self.map_ref(enum_id);
                 let variants: Vec<_> = vals
                     .into_iter()
                     .map(|val| val.into_string().unwrap())
@@ -62,7 +62,7 @@ impl ScalarFieldExt for ScalarField {
                 TypeIdentifier::Decimal => Value::null_numeric(),
                 TypeIdentifier::Boolean => Value::null_boolean(),
                 TypeIdentifier::Enum(enum_id) => {
-                    let enum_walker = self.zip(enum_id);
+                    let enum_walker = self.map_ref(enum_id);
                     let enum_name = enum_walker.db_name().to_owned();
                     let schema_name = enum_walker
                         .schema_name()

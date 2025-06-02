@@ -10,8 +10,12 @@ pub struct Zipper<I> {
 }
 
 impl<I> Zipper<I> {
-    pub fn zip<O>(&self, other: O) -> Zipper<O> {
+    pub fn map_ref<O>(&self, other: O) -> Zipper<O> {
         self.dm.clone().zip(other)
+    }
+
+    pub fn map<O>(self, other: O) -> Zipper<O> {
+        self.dm.zip(other)
     }
 }
 

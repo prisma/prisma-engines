@@ -26,7 +26,7 @@ impl<'a> Fields<'a> {
             .filter(|pk| pk.fields().len() > 1)
             .map(|pk| {
                 pk.fields()
-                    .map(|field| self.model.zip(ScalarFieldId::InModel(field.id)))
+                    .map(|field| self.model.map_ref(ScalarFieldId::InModel(field.id)))
             })
     }
 
@@ -46,7 +46,7 @@ impl<'a> Fields<'a> {
                         ScalarFieldType::CompositeType(_) | ScalarFieldType::Unsupported(_)
                     )
             })
-            .map(|rf| self.model.zip(ScalarFieldId::InModel(rf.id)))
+            .map(|rf| self.model.map_ref(ScalarFieldId::InModel(rf.id)))
     }
 
     pub fn relation(&self) -> impl Iterator<Item = RelationFieldRef> + 'a {
@@ -55,7 +55,7 @@ impl<'a> Fields<'a> {
             .walk(self.model.id)
             .relation_fields()
             .filter(|rf| !rf.relation().is_ignored())
-            .map(|rf| self.model.zip(rf.id))
+            .map(|rf| self.model.map_ref(rf.id))
     }
 
     pub fn composite(&self) -> Vec<CompositeFieldRef> {
@@ -64,7 +64,7 @@ impl<'a> Fields<'a> {
             .walk(self.model.id)
             .scalar_fields()
             .filter(|sf| sf.scalar_field_type().as_composite_type().is_some() && !sf.is_ignored())
-            .map(|sf| self.model.zip(CompositeFieldId::InModel(sf.id)))
+            .map(|sf| self.model.map_ref(CompositeFieldId::InModel(sf.id)))
             .collect()
     }
 

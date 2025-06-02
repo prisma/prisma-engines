@@ -80,7 +80,7 @@ impl AggregationSelection {
         fields.iter().map(move |f| SelectionIdentifier {
             name: f.name(),
             db_name: f.db_name(),
-            typ: f.zip(type_mapper(f.type_identifier())),
+            typ: f.map_ref(type_mapper(f.type_identifier())),
             arity: arity_mapper(f.arity()),
         })
     }
