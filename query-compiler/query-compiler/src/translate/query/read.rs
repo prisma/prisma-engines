@@ -144,7 +144,7 @@ pub(super) fn add_inmemory_join(
             _ => unreachable!(),
         })
         .unique()
-        .sorted_by(|a, b| a.name().cmp(&b.name()));
+        .sorted_by(|a, b| a.name().cmp(b.name()));
 
     let linking_fields_bindings = all_linking_fields
         .map(|sf| Binding {
@@ -172,7 +172,7 @@ pub(super) fn add_inmemory_join(
                 .zip(rrq.parent_field.related_field().left_scalars())
                 .map(|(parent_scalar, child_scalar)| {
                     let placeholder = PrismaValue::placeholder(
-                        binding::join_parent_field(&parent_scalar),
+                        binding::join_parent_field(parent_scalar),
                         parent_scalar.corresponding_prisma_type(),
                     );
                     let condition = if parent.r#type().is_list() {
