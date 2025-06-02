@@ -1,7 +1,6 @@
 use crate::row::{sanitize_f32, sanitize_f64};
 use bigdecimal::{BigDecimal, FromPrimitive};
 use chrono::{DateTime, NaiveDate, Utc};
-use prisma_value::Placeholder as PrismaValuePlaceholder;
 use quaint::ValueType;
 use query_structure::PrismaValue;
 use sql_query_builder::{
@@ -106,10 +105,7 @@ pub fn to_prisma_value<'a, T: Into<ValueType<'a>>>(qv: T) -> crate::Result<Prism
 
         ValueType::Opaque(opaque) => {
             if let Some(placeholder) = opaque.downcast_ref::<Placeholder>() {
-                PrismaValue::Placeholder(PrismaValuePlaceholder {
-                    name: placeholder.name().to_owned(),
-                    r#type: opaque_type_to_prisma_type(opaque.typ()),
-                })
+                PrismaValue::placeholder(placeholder.name().to_owned(), opaque_type_to_prisma_type(opaque.typ()))
             } else if let Some(call) = opaque.downcast_ref::<GeneratorCall>() {
                 PrismaValue::GeneratorCall {
                     name: call.name().to_owned().into(),

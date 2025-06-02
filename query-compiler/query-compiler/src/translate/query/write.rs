@@ -9,7 +9,7 @@ use sql_query_builder::write::split_write_args_by_shape;
 use std::{collections::BTreeMap, iter};
 
 use crate::{
-    TranslateError,
+    TranslateError, binding,
     expression::{Binding, Expression, RecordValue},
     translate::TranslateResult,
 };
@@ -60,16 +60,12 @@ pub(crate) fn translate_write_query(query: WriteQuery, builder: &dyn QueryBuilde
                 field_placeholders,
             }) = select_defaults
             {
-                const DEFAULTS_BINDING_NAME: &str = "defaults";
-
-                let select_binding = Binding::new(
-                    DEFAULTS_BINDING_NAME.into(),
-                    Expression::Unique(Expression::Query(query).into()),
-                );
+                let select_binding =
+                    Binding::new(binding::defaults(), Expression::Unique(Expression::Query(query).into()));
 
                 let field_bindings = field_placeholders.into_iter().map(|(field, ph)| {
                     let get_defaults = Expression::Get {
-                        name: DEFAULTS_BINDING_NAME.into(),
+                        name: binding::defaults(),
                     };
                     Binding::new(
                         ph.name,

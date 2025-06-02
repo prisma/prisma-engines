@@ -100,13 +100,16 @@ impl std::fmt::Display for PrismaValueType {
 
 #[derive(Debug, Clone, Eq, PartialEq, Hash, Deserialize, PartialOrd, Ord)]
 pub struct Placeholder {
-    pub name: String,
+    pub name: Cow<'static, str>,
     pub r#type: PrismaValueType,
 }
 
 impl Placeholder {
-    pub fn new(name: String, r#type: PrismaValueType) -> Self {
-        Self { name, r#type }
+    pub fn new(name: impl Into<Cow<'static, str>>, r#type: PrismaValueType) -> Self {
+        Self {
+            name: name.into(),
+            r#type,
+        }
     }
 }
 
@@ -214,10 +217,7 @@ impl TryFrom<serde_json::Value> for PrismaValue {
                         .ok_or_else(|| ConversionFailure::new("param name", "JSON param value"))?
                         .to_owned();
 
-                    Ok(PrismaValue::Placeholder(Placeholder {
-                        name,
-                        r#type: PrismaValueType::Any, // parsing the type is not implemented yet
-                    }))
+                    Ok(PrismaValue::Placeholder(Placeholder::new(name, PrismaValueType::Any)))
                 }
 
                 _ => Ok(PrismaValue::Json(serde_json::to_string(&obj).unwrap())),
@@ -434,8 +434,8 @@ impl PrismaValue {
         PrismaValue::DateTime(parse_datetime(datetime).unwrap())
     }
 
-    pub fn placeholder(name: String, r#type: PrismaValueType) -> PrismaValue {
-        PrismaValue::Placeholder(Placeholder { name, r#type })
+    pub fn placeholder(name: impl Into<Cow<'static, str>>, r#type: PrismaValueType) -> PrismaValue {
+        PrismaValue::Placeholder(Placeholder::new(name, r#type))
     }
 
     pub fn generator_now() -> PrismaValue {

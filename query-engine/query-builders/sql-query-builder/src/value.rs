@@ -1,13 +1,13 @@
-use std::fmt;
+use std::{borrow::Cow, fmt};
 
 use prisma_value::PrismaValue;
 
 #[derive(Debug, PartialEq)]
-pub struct Placeholder(String);
+pub struct Placeholder(Cow<'static, str>);
 
 impl Placeholder {
-    pub fn new(value: String) -> Self {
-        Self(value)
+    pub fn new(value: impl Into<Cow<'static, str>>) -> Self {
+        Self(value.into())
     }
 
     pub fn name(&self) -> &str {

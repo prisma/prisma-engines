@@ -1,5 +1,5 @@
 use bigdecimal::{BigDecimal, FromPrimitive};
-use prisma_value::{Placeholder as PrismaValuePlaceholder, PrismaValue, PrismaValueType};
+use prisma_value::{PrismaValue, PrismaValueType};
 use quaint::{ast::OpaqueType, prelude::SqlFamily};
 
 use crate::value::{GeneratorCall, Placeholder};
@@ -84,10 +84,7 @@ pub(crate) fn quaint_value_to_prisma_value(value: quaint::Value<'_>, family: Sql
         quaint::ValueType::Time(None) => PrismaValue::Null,
         quaint::ValueType::Opaque(opaque) => {
             if let Some(placeholder) = opaque.downcast_ref::<Placeholder>() {
-                PrismaValue::Placeholder(PrismaValuePlaceholder {
-                    name: placeholder.name().to_owned(),
-                    r#type: opaque_type_to_prisma_type(opaque.typ()),
-                })
+                PrismaValue::placeholder(placeholder.name().to_owned(), opaque_type_to_prisma_type(opaque.typ()))
             } else if let Some(call) = opaque.downcast_ref::<GeneratorCall>() {
                 PrismaValue::GeneratorCall {
                     name: call.name().to_owned().into(),

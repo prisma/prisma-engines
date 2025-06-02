@@ -1,5 +1,5 @@
 use crate::{
-    TranslateError,
+    TranslateError, binding,
     expression::{Binding, Expression, JoinExpression, Pagination},
     translate::TranslateResult,
 };
@@ -148,10 +148,12 @@ pub(super) fn add_inmemory_join(
 
     let linking_fields_bindings = all_linking_fields
         .map(|sf| Binding {
-            name: format!("@parent${}", sf.prisma_name().into_owned()),
+            name: binding::join_parent_field(&sf),
             expr: Expression::MapField {
                 field: sf.prisma_name().into_owned(),
-                records: Box::new(Expression::Get { name: "@parent".into() }),
+                records: Box::new(Expression::Get {
+                    name: binding::join_parent(),
+                }),
             },
         })
         .collect();

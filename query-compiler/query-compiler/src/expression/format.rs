@@ -215,7 +215,10 @@ where
             .append(self.expression(expr).align())
     }
 
-    fn get_first_non_empty(&'a self, names: &'a [String]) -> DocBuilder<'a, PrettyPrinter<'a, D>, ColorSpec> {
+    fn get_first_non_empty(
+        &'a self,
+        names: &'a [Cow<'static, str>],
+    ) -> DocBuilder<'a, PrettyPrinter<'a, D>, ColorSpec> {
         self.text("getFirstNonEmpty")
             .annotate(color_fn())
             .append(self.intersperse(names.iter().map(|name| self.var_name(name)), self.space()))
