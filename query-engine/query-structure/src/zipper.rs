@@ -9,16 +9,6 @@ pub struct Zipper<I> {
     pub dm: InternalDataModelRef,
 }
 
-impl<I> Zipper<I> {
-    pub fn map_ref<O>(&self, other: O) -> Zipper<O> {
-        self.dm.clone().zip(other)
-    }
-
-    pub fn map<O>(self, other: O) -> Zipper<O> {
-        self.dm.zip(other)
-    }
-}
-
 impl<I: PartialEq> PartialEq for Zipper<I> {
     #[allow(unconditional_recursion)]
     fn eq(&self, other: &Self) -> bool {

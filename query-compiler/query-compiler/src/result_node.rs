@@ -70,7 +70,7 @@ impl<'a> ResultNodeBuilder<'a> {
     pub fn new_value(&mut self, db_name: String, result_type: ScalarFieldResultType) -> ResultNode {
         let prisma_type = result_type.to_prisma_type();
         if let TypeIdentifier::Enum(id) = result_type.typ.id {
-            self.enums.add(result_type.typ.map(id));
+            self.enums.add(result_type.typ.dm.zip(id));
         }
         ResultNode::Value {
             db_name,

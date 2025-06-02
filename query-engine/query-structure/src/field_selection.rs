@@ -332,7 +332,7 @@ impl VirtualSelection {
         match self {
             Self::RelationCount(rf, _) => match value {
                 PrismaValue::Null => Ok(PrismaValue::Int(0)),
-                _ => value.coerce(&rf.map_ref(TypeIdentifier::Int)),
+                _ => value.coerce(&rf.dm.clone().zip(TypeIdentifier::Int)),
             },
         }
     }
@@ -361,7 +361,7 @@ impl VirtualSelection {
 
     pub fn r#type(&self) -> Type {
         match self {
-            Self::RelationCount(rf, _) => rf.map_ref(self.type_identifier()),
+            Self::RelationCount(rf, _) => rf.dm.clone().zip(self.type_identifier()),
         }
     }
 

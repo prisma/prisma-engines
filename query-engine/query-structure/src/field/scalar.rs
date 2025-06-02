@@ -109,7 +109,7 @@ impl ScalarField {
     }
 
     pub fn base_type(&self) -> Type {
-        self.map_ref(self.type_identifier())
+        self.dm.clone().zip(self.type_identifier())
     }
 
     pub fn result_type(&self) -> ScalarFieldResultType {
@@ -125,7 +125,7 @@ impl ScalarField {
             ScalarFieldId::InModel(id) => self.dm.walk(id).scalar_field_type().as_enum(),
             ScalarFieldId::InCompositeType(id) => self.dm.walk(id).r#type().as_enum(),
         }?;
-        Some(self.map_ref(enum_id))
+        Some(self.dm.clone().zip(enum_id))
     }
 
     pub fn default_value(&self) -> Option<DefaultKind> {
