@@ -8,9 +8,15 @@ datasource db {
   url      = env("TEST_POSTGRES_URI")
 }
 
+enum Role {
+  USER  @map("user")
+  ADMIN @map("admin")
+}
+
 model User {
   id          Int          @id @default(autoincrement())
   email       String       @unique
+  role        Role         @default(USER)
   posts       Post[]
   activations Activation[]
 }

@@ -6,7 +6,7 @@ use std::{
 use crate::result_node::ResultNode;
 use query_builder::DbQuery;
 use query_core::{DataExpectation, DataRule};
-use query_structure::{PrismaValue, TaggedPrismaValue};
+use query_structure::{InternalEnum, PrismaValue, TaggedPrismaValue};
 use serde::Serialize;
 
 mod format;
@@ -97,6 +97,7 @@ pub enum Expression {
     DataMap {
         expr: Box<Expression>,
         structure: ResultNode,
+        enums: EnumsMap,
     },
 
     /// Validates the expression according to the data rule and throws an error if it doesn't match.
@@ -181,6 +182,28 @@ impl Pagination {
 
     pub fn skip(&self) -> Option<i64> {
         self.skip
+    }
+}
+
+#[derive(Debug, Default, Serialize)]
+pub struct EnumsMap(BTreeMap<String, BTreeMap<String, String>>);
+
+impl EnumsMap {
+    pub fn new() -> Self {
+        Default::default()
+    }
+
+    pub fn add(&mut self, r#enum: InternalEnum) {
+        let walker = r#enum.walker();
+        if !self.0.contains_key(walker.name()) {
+            self.0.insert(
+                walker.name().to_owned(),
+                walker
+                    .values()
+                    .map(|v| (v.database_name().to_owned(), v.name().to_owned()))
+                    .collect(),
+            );
+        }
     }
 }
 

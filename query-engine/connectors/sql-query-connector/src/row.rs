@@ -16,56 +16,51 @@ pub(crate) struct SqlRow {
 }
 
 impl SqlRow {
-    pub fn into_aggregation_results(self, selections: &[AggregationSelection]) -> Vec<AggregationResult> {
-        let mut values = self.values;
-        values.reverse();
-
+    pub fn into_aggregation_results(mut self, selections: &[AggregationSelection]) -> Vec<AggregationResult> {
         selections
             .iter()
             .flat_map(|selection| match selection {
                 AggregationSelection::Field(field) => {
-                    vec![AggregationResult::Field(field.clone(), values.pop().unwrap())]
+                    vec![AggregationResult::Field(
+                        field.clone(),
+                        self.values.drain(..1).next().unwrap(),
+                    )]
                 }
 
-                AggregationSelection::Count { all, fields } => {
-                    let mut results: Vec<_> = fields
-                        .iter()
-                        .map(|field| {
-                            AggregationResult::Count(
-                                Some(field.clone()),
-                                coerce_null_to_zero_value(values.pop().unwrap()),
-                            )
-                        })
-                        .collect();
-
-                    if *all {
-                        results.push(AggregationResult::Count(
-                            None,
-                            coerce_null_to_zero_value(values.pop().unwrap()),
-                        ))
-                    }
-
-                    results
-                }
+                AggregationSelection::Count { all, fields } => fields
+                    .iter()
+                    .map(|field| Some(field.clone()))
+                    .chain(all.iter().map(|_| None))
+                    .zip(
+                        self.values
+                            .drain(..fields.len() + if all.is_some() { 1 } else { 0 })
+                            .map(coerce_null_to_zero_value),
+                    )
+                    .map(|(field, value)| AggregationResult::Count(field, value))
+                    .collect(),
 
                 AggregationSelection::Average(fields) => fields
                     .iter()
-                    .map(|field| AggregationResult::Average(field.clone(), values.pop().unwrap()))
+                    .zip(self.values.drain(..fields.len()))
+                    .map(|(field, value)| AggregationResult::Average(field.clone(), value))
                     .collect(),
 
                 AggregationSelection::Sum(fields) => fields
                     .iter()
-                    .map(|field| AggregationResult::Sum(field.clone(), values.pop().unwrap()))
+                    .zip(self.values.drain(..fields.len()))
+                    .map(|(field, value)| AggregationResult::Sum(field.clone(), value))
                     .collect(),
 
                 AggregationSelection::Min(fields) => fields
                     .iter()
-                    .map(|field| AggregationResult::Min(field.clone(), values.pop().unwrap()))
+                    .zip(self.values.drain(..fields.len()))
+                    .map(|(field, value)| AggregationResult::Min(field.clone(), value))
                     .collect(),
 
                 AggregationSelection::Max(fields) => fields
                     .iter()
-                    .map(|field| AggregationResult::Max(field.clone(), values.pop().unwrap()))
+                    .zip(self.values.drain(..fields.len()))
+                    .map(|(field, value)| AggregationResult::Max(field.clone(), value))
                     .collect(),
             })
             .collect()

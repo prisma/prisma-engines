@@ -1,7 +1,7 @@
 use crate::{
     parent_container::ParentContainer, prisma_value_ext::PrismaValueExtensions, CompositeFieldRef, DomainError, Field,
     Filter, Model, ModelProjection, QueryArguments, RelationField, RelationFieldRef, ScalarField, ScalarFieldRef,
-    SelectionResult, TypeIdentifier,
+    SelectionResult, Type, TypeIdentifier,
 };
 use itertools::Itertools;
 use prisma_value::PrismaValue;
@@ -330,9 +330,9 @@ impl VirtualSelection {
 
     pub fn coerce_value(&self, value: PrismaValue) -> crate::Result<PrismaValue> {
         match self {
-            Self::RelationCount(_, _) => match value {
+            Self::RelationCount(rf, _) => match value {
                 PrismaValue::Null => Ok(PrismaValue::Int(0)),
-                _ => value.coerce(TypeIdentifier::Int),
+                _ => value.coerce(&rf.dm.clone().zip(TypeIdentifier::Int)),
             },
         }
     }
@@ -343,9 +343,25 @@ impl VirtualSelection {
         }
     }
 
-    pub fn type_identifier_with_arity(&self) -> (TypeIdentifier, FieldArity) {
+    pub fn type_identifier(&self) -> TypeIdentifier {
         match self {
-            Self::RelationCount(_, _) => (TypeIdentifier::Int, FieldArity::Required),
+            Self::RelationCount(_, _) => TypeIdentifier::Int,
+        }
+    }
+
+    pub fn arity(&self) -> FieldArity {
+        match self {
+            Self::RelationCount(_, _) => FieldArity::Required,
+        }
+    }
+
+    pub fn type_identifier_with_arity(&self) -> (TypeIdentifier, FieldArity) {
+        (self.type_identifier(), self.arity())
+    }
+
+    pub fn r#type(&self) -> Type {
+        match self {
+            Self::RelationCount(rf, _) => rf.dm.clone().zip(self.type_identifier()),
         }
     }
 
@@ -470,7 +486,7 @@ impl SelectedField {
     /// Coerces a value to fit the selection. If the conversion is not possible, an error will be thrown.
     pub(crate) fn coerce_value(&self, value: PrismaValue) -> crate::Result<PrismaValue> {
         match self {
-            SelectedField::Scalar(sf) => value.coerce(sf.type_identifier()),
+            SelectedField::Scalar(sf) => value.coerce(&sf.base_type()),
             SelectedField::Composite(cs) => cs.coerce_value(value),
             SelectedField::Relation(_) => todo!(),
             SelectedField::Virtual(vs) => vs.coerce_value(value),

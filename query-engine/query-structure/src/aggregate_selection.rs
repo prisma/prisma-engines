@@ -3,7 +3,7 @@ use std::slice;
 use itertools::Either;
 use psl::schema_ast::ast::FieldArity;
 
-use crate::{ScalarFieldRef, TypeIdentifier};
+use crate::{InternalDataModelRef, ScalarFieldRef, Type, TypeIdentifier, Zipper};
 
 /// Selections for aggregation queries.
 #[derive(Debug, Clone)]
@@ -13,9 +13,12 @@ pub enum AggregationSelection {
 
     /// Counts records of the model that match the query.
     /// `all` indicates that an all-records selection has been made (e.g. SQL *).
-    /// `fields` are specific fields to count on. By convention, if `all` is true,
+    /// `fields` are specific fields to count on. By convention, if `all` is set,
     /// it will always be the last of the count results.
-    Count { all: bool, fields: Vec<ScalarFieldRef> },
+    Count {
+        all: Option<CountAllAggregationSelection>,
+        fields: Vec<ScalarFieldRef>,
+    },
 
     /// Compute average for each field contained.
     Average(Vec<ScalarFieldRef>),
@@ -32,7 +35,7 @@ pub enum AggregationSelection {
 
 impl AggregationSelection {
     /// Returns (field_db_name, TypeIdentifier, FieldArity)
-    pub fn identifiers(&self) -> impl Iterator<Item = SelectionIdenfitier<'_>> {
+    pub fn identifiers(&self) -> impl Iterator<Item = SelectionIdentifier<'_>> {
         match self {
             AggregationSelection::Field(field) => {
                 Either::Left(Self::map_field_types(slice::from_ref(field), |t| t, |a| a))
@@ -56,19 +59,16 @@ impl AggregationSelection {
                 |_| FieldArity::Required,
             )),
 
-            AggregationSelection::Count { all, fields } => {
-                let mapped = Self::map_field_types(fields, |_| TypeIdentifier::Int, |_| FieldArity::Required);
-                if *all {
-                    Either::Right(mapped.chain([SelectionIdenfitier {
-                        name: "all",
-                        db_name: "all",
-                        typ: TypeIdentifier::Int,
-                        arity: FieldArity::Required,
-                    }]))
-                } else {
-                    Either::Left(mapped)
-                }
-            }
+            AggregationSelection::Count { all, fields } => Either::Right(
+                Self::map_field_types(fields, |_| TypeIdentifier::Int, |_| FieldArity::Required).chain(all.iter().map(
+                    |all| SelectionIdentifier {
+                        name: all.name(),
+                        db_name: all.db_name(),
+                        typ: all.r#type(),
+                        arity: all.arity(),
+                    },
+                )),
+            ),
         }
     }
 
@@ -76,19 +76,60 @@ impl AggregationSelection {
         fields: &[ScalarFieldRef],
         type_mapper: fn(TypeIdentifier) -> TypeIdentifier,
         arity_mapper: fn(FieldArity) -> FieldArity,
-    ) -> impl Iterator<Item = SelectionIdenfitier<'_>> {
-        fields.iter().map(move |f| SelectionIdenfitier {
+    ) -> impl Iterator<Item = SelectionIdentifier<'_>> {
+        fields.iter().map(move |f| SelectionIdentifier {
             name: f.name(),
             db_name: f.db_name(),
-            typ: type_mapper(f.type_identifier()),
+            typ: f.dm.clone().zip(type_mapper(f.type_identifier())),
             arity: arity_mapper(f.arity()),
         })
     }
 }
 
-pub struct SelectionIdenfitier<'a> {
+#[derive(Debug, Clone)]
+pub struct CountAllAggregationSelection {
+    pub dm: InternalDataModelRef,
+}
+
+impl CountAllAggregationSelection {
+    pub fn new(dm: InternalDataModelRef) -> Self {
+        CountAllAggregationSelection { dm }
+    }
+
+    #[inline]
+    pub fn name(&self) -> &str {
+        "all"
+    }
+
+    #[inline]
+    pub fn db_name(&self) -> &str {
+        "all"
+    }
+
+    #[inline]
+    pub fn type_identifier(&self) -> TypeIdentifier {
+        TypeIdentifier::Int
+    }
+
+    #[inline]
+    pub fn arity(&self) -> FieldArity {
+        FieldArity::Required
+    }
+
+    pub fn r#type(&self) -> Type {
+        self.dm.clone().zip(self.type_identifier())
+    }
+}
+
+impl<I> From<&'_ Zipper<I>> for CountAllAggregationSelection {
+    fn from(zipper: &Zipper<I>) -> Self {
+        CountAllAggregationSelection::new(zipper.dm.clone())
+    }
+}
+
+pub struct SelectionIdentifier<'a> {
     pub name: &'a str,
     pub db_name: &'a str,
-    pub typ: TypeIdentifier,
+    pub typ: Type,
     pub arity: FieldArity,
 }

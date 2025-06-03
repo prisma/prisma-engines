@@ -116,7 +116,7 @@ impl GroupByBuilder {
         for selection in selections {
             match selection {
                 AggregationSelection::Count { all, fields } => {
-                    if *all {
+                    if all.is_some() {
                         self.count_all = true;
                     }
 
