@@ -108,6 +108,18 @@ impl ScalarField {
         }
     }
 
+    pub fn base_type(&self) -> Type {
+        self.dm.clone().zip(self.type_identifier())
+    }
+
+    pub fn result_type(&self) -> ScalarFieldResultType {
+        ScalarFieldResultType {
+            typ: self.base_type(),
+            arity: self.arity(),
+            native_type: self.native_type(),
+        }
+    }
+
     pub fn internal_enum(&self) -> Option<crate::InternalEnum> {
         let enum_id = match self.id {
             ScalarFieldId::InModel(id) => self.dm.walk(id).scalar_field_type().as_enum(),
@@ -207,22 +219,6 @@ impl ScalarField {
             ScalarFieldId::InCompositeType(_) => false,
         }
     }
-
-    pub fn corresponding_prisma_type(&self) -> PrismaValueType {
-        let type_ = match (self.type_identifier(), self.native_type()) {
-            (TypeIdentifier::DateTime, Some(native_type))
-                if native_type.name() == "Time" || native_type.name() == "Timetz" =>
-            {
-                PrismaValueType::Time
-            }
-            (type_identifier, _) => type_identifier.to_prisma_type(),
-        };
-        if self.is_list() {
-            PrismaValueType::Array(Box::new(type_))
-        } else {
-            type_
-        }
-    }
 }
 
 impl Display for ScalarField {
@@ -236,6 +232,40 @@ impl From<(InternalDataModelRef, walkers::IndexFieldWalker<'_>)> for ScalarField
         match f {
             walkers::IndexFieldWalker::Scalar(sf) => dm.zip(ScalarFieldId::InModel(sf.id)),
             walkers::IndexFieldWalker::Composite(cf) => dm.zip(ScalarFieldId::InCompositeType(cf.id)),
+        }
+    }
+}
+
+pub struct ScalarFieldResultType {
+    pub typ: Type,
+    pub arity: FieldArity,
+    pub native_type: Option<NativeTypeInstance>,
+}
+
+impl ScalarFieldResultType {
+    pub fn to_prisma_type(&self) -> PrismaValueType {
+        let type_ = match (self.typ.id, self.native_type.as_ref()) {
+            (TypeIdentifier::DateTime, Some(native_type))
+                if native_type.name() == "Time" || native_type.name() == "Timetz" =>
+            {
+                PrismaValueType::Time
+            }
+            _ => self.typ.to_prisma_type(),
+        };
+        if self.arity.is_list() {
+            PrismaValueType::Array(Box::new(type_))
+        } else {
+            type_
+        }
+    }
+}
+
+impl From<Type> for ScalarFieldResultType {
+    fn from(typ: Type) -> Self {
+        ScalarFieldResultType {
+            typ,
+            native_type: None,
+            arity: FieldArity::Required,
         }
     }
 }

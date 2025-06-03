@@ -1,4 +1,4 @@
-use super::{Binding, DbQuery, Expression, JoinExpression, Pagination, RecordValue};
+use super::{Binding, DbQuery, EnumsMap, Expression, JoinExpression, Pagination, RecordValue};
 use crate::result_node::ResultNode;
 use pretty::{
     DocAllocator, DocBuilder,
@@ -28,6 +28,8 @@ fn color_field() -> ColorSpec {
     ColorSpec::new().set_bold(true).set_fg(Some(Color::Yellow)).clone()
 }
 
+type PrettyDoc<'a, D> = DocBuilder<'a, PrettyPrinter<'a, D>, ColorSpec>;
+
 pub(super) struct PrettyPrinter<'a, D> {
     allocator: &'a D,
 }
@@ -41,7 +43,7 @@ where
         Self { allocator }
     }
 
-    pub fn expression(&'a self, expression: &'a Expression) -> DocBuilder<'a, PrettyPrinter<'a, D>, ColorSpec> {
+    pub fn expression(&'a self, expression: &'a Expression) -> PrettyDoc<'a, D> {
         match expression {
             Expression::Seq(vec) => self.seq(vec),
             Expression::Get { name, .. } => self.get(name),
@@ -57,7 +59,7 @@ where
             Expression::Join { parent, children } => self.join(parent, children),
             Expression::MapField { field, records } => self.map_field(field, records),
             Expression::Transaction(expression) => self.transaction(expression),
-            Expression::DataMap { expr, structure } => self.data_map(expr, structure),
+            Expression::DataMap { expr, structure, enums } => self.data_map(expr, structure, enums),
             Expression::Validate {
                 expr,
                 rules,
@@ -78,28 +80,25 @@ where
         }
     }
 
-    fn keyword(&'a self, keyword: &'static str) -> DocBuilder<'a, PrettyPrinter<'a, D>, ColorSpec> {
+    fn keyword(&'a self, keyword: &'static str) -> PrettyDoc<'a, D> {
         self.text(keyword).annotate(color_kw())
     }
 
-    fn var_name(&'a self, name: &'a str) -> DocBuilder<'a, PrettyPrinter<'a, D>, ColorSpec> {
+    fn var_name(&'a self, name: &'a str) -> PrettyDoc<'a, D> {
         self.text(name).annotate(color_var())
     }
 
-    fn field_name(&'a self, name: &'a str) -> DocBuilder<'a, PrettyPrinter<'a, D>, ColorSpec> {
+    fn field_name(&'a self, name: &'a str) -> PrettyDoc<'a, D> {
         self.text(name).annotate(color_field())
     }
 
-    fn tuple(
-        &'a self,
-        subtrees: impl IntoIterator<Item = DocBuilder<'a, PrettyPrinter<'a, D>, ColorSpec>>,
-    ) -> DocBuilder<'a, PrettyPrinter<'a, D>, ColorSpec> {
+    fn tuple(&'a self, subtrees: impl IntoIterator<Item = PrettyDoc<'a, D>>) -> PrettyDoc<'a, D> {
         self.intersperse(subtrees, self.text(",").append(self.softline()))
             .align()
             .parens()
     }
 
-    fn query(&'a self, tag: &'static str, db_query: &'a DbQuery) -> DocBuilder<'a, PrettyPrinter<'a, D>, ColorSpec> {
+    fn query(&'a self, tag: &'static str, db_query: &'a DbQuery) -> PrettyDoc<'a, D> {
         let sql = db_query.to_string();
 
         // Copied the implementation from reflow, because DocBuilder does not provide the API to avoid issues with lifetimes here
@@ -121,7 +120,7 @@ where
             .align()
     }
 
-    fn list(&'a self, values: &'a [PrismaValue]) -> DocBuilder<'a, PrettyPrinter<'a, D>, ColorSpec> {
+    fn list(&'a self, values: &'a [PrismaValue]) -> PrettyDoc<'a, D> {
         self.intersperse(
             values.iter().map(|value| self.value(value)),
             self.text(",").append(self.softline()),
@@ -130,7 +129,7 @@ where
         .brackets()
     }
 
-    fn value(&'a self, value: &'a PrismaValue) -> DocBuilder<'a, PrettyPrinter<'a, D>, ColorSpec> {
+    fn value(&'a self, value: &'a PrismaValue) -> PrettyDoc<'a, D> {
         match value {
             PrismaValue::Placeholder(Placeholder { name, r#type }) => self.keyword("var").append(
                 self.var_name(name)
@@ -153,11 +152,7 @@ where
         }
     }
 
-    fn function(
-        &'a self,
-        name: &'static str,
-        args: impl IntoIterator<Item = &'a Expression>,
-    ) -> DocBuilder<'a, PrettyPrinter<'a, D>, ColorSpec> {
+    fn function(&'a self, name: &'static str, args: impl IntoIterator<Item = &'a Expression>) -> PrettyDoc<'a, D> {
         self.text(name)
             .annotate(color_fn())
             .append(self.softline())
@@ -167,33 +162,25 @@ where
             ))
     }
 
-    fn unary_function(
-        &'a self,
-        name: &'static str,
-        arg: &'a Expression,
-    ) -> DocBuilder<'a, PrettyPrinter<'a, D>, ColorSpec> {
+    fn unary_function(&'a self, name: &'static str, arg: &'a Expression) -> PrettyDoc<'a, D> {
         self.text(name)
             .annotate(color_fn())
             .append(self.space())
             .append(self.expression(arg).parens())
     }
 
-    fn seq(&'a self, vec: &'a [Expression]) -> DocBuilder<'a, PrettyPrinter<'a, D>, ColorSpec> {
+    fn seq(&'a self, vec: &'a [Expression]) -> PrettyDoc<'a, D> {
         self.intersperse(
             vec.iter().map(|expr| self.expression(expr)),
             self.text(";").append(self.line()),
         )
     }
 
-    fn get(&'a self, name: &'a str) -> DocBuilder<'a, PrettyPrinter<'a, D>, ColorSpec> {
+    fn get(&'a self, name: &'a str) -> PrettyDoc<'a, D> {
         self.keyword("get").append(self.space()).append(self.var_name(name))
     }
 
-    fn r#let(
-        &'a self,
-        bindings: &'a [Binding],
-        expr: &'a Expression,
-    ) -> DocBuilder<'a, PrettyPrinter<'a, D>, ColorSpec> {
+    fn r#let(&'a self, bindings: &'a [Binding], expr: &'a Expression) -> PrettyDoc<'a, D> {
         self.keyword("let")
             .append(self.softline())
             .append(
@@ -215,17 +202,13 @@ where
             .append(self.expression(expr).align())
     }
 
-    fn get_first_non_empty(&'a self, names: &'a [String]) -> DocBuilder<'a, PrettyPrinter<'a, D>, ColorSpec> {
+    fn get_first_non_empty(&'a self, names: &'a [String]) -> PrettyDoc<'a, D> {
         self.text("getFirstNonEmpty")
             .annotate(color_fn())
             .append(self.intersperse(names.iter().map(|name| self.var_name(name)), self.space()))
     }
 
-    fn join(
-        &'a self,
-        parent: &'a Expression,
-        children: &'a [JoinExpression],
-    ) -> DocBuilder<'a, PrettyPrinter<'a, D>, ColorSpec> {
+    fn join(&'a self, parent: &'a Expression, children: &'a [JoinExpression]) -> PrettyDoc<'a, D> {
         self.keyword("join")
             .append(self.space())
             .append(self.expression(parent).parens())
@@ -274,7 +257,7 @@ where
             )
     }
 
-    fn map_field(&'a self, field: &'a str, records: &'a Expression) -> DocBuilder<'a, PrettyPrinter<'a, D>, ColorSpec> {
+    fn map_field(&'a self, field: &'a str, records: &'a Expression) -> PrettyDoc<'a, D> {
         self.text("mapField")
             .annotate(color_fn())
             .append(self.space())
@@ -283,7 +266,7 @@ where
             .append(self.expression(records).parens())
     }
 
-    fn transaction(&'a self, expr: &'a Expression) -> DocBuilder<'a, PrettyPrinter<'a, D>, ColorSpec> {
+    fn transaction(&'a self, expr: &'a Expression) -> PrettyDoc<'a, D> {
         self.keyword("transaction")
             .append(self.line())
             .append(self.softline())
@@ -292,42 +275,34 @@ where
             .append(self.expression(expr).align())
     }
 
-    fn data_map(
-        &'a self,
-        expr: &'a Expression,
-        structure: &'a ResultNode,
-    ) -> DocBuilder<'a, PrettyPrinter<'a, D>, ColorSpec> {
-        self.keyword("dataMap")
+    fn data_map(&'a self, expr: &'a Expression, structure: &'a ResultNode, enums: &'a EnumsMap) -> PrettyDoc<'a, D> {
+        let mut doc = self
+            .keyword("dataMap")
             .append(self.space())
             .append(self.data_map_node(structure))
-            .append(self.line())
-            .append(self.expression(expr))
+            .append(self.line());
+
+        if !enums.0.is_empty() {
+            doc = doc
+                .append(self.keyword("enums"))
+                .append(self.space())
+                .append(self.enum_map(enums))
+                .append(self.line());
+        }
+
+        doc.append(self.expression(expr))
     }
 
-    fn data_map_node(&'a self, node: &'a ResultNode) -> DocBuilder<'a, PrettyPrinter<'a, D>, ColorSpec> {
+    fn data_map_node(&'a self, node: &'a ResultNode) -> PrettyDoc<'a, D> {
         match node {
             ResultNode::AffectedRows => self.keyword("affectedRows"),
-            ResultNode::Object { fields, flattened } => self
-                .line()
-                .append(
-                    self.intersperse(
-                        fields.iter().map(|(name, field)| {
-                            let doc = self.field_name(name);
-                            let doc = if *flattened {
-                                doc.append(self.space().append(self.keyword("(flattened)")))
-                            } else {
-                                doc
-                            };
-                            doc.append(self.text(":"))
-                                .append(self.space())
-                                .append(self.data_map_node(field))
-                        }),
-                        self.line(),
-                    )
-                    .append(self.line())
-                    .indent(4),
-                )
-                .braces(),
+            ResultNode::Object(object) => self.object(object.fields().iter().map(|(name, field)| {
+                let mut key = self.field_name(name);
+                if object.is_flattened() {
+                    key = key.append(self.space().append(self.keyword("(flattened)")));
+                }
+                (key, self.data_map_node(field))
+            })),
             ResultNode::Value { db_name, result_type } => self
                 .text(result_type.to_string())
                 .append(self.space())
@@ -335,12 +310,35 @@ where
         }
     }
 
-    fn validate(
-        &'a self,
-        expr: &'a Expression,
-        rules: &'a [DataRule],
-        id: &'a str,
-    ) -> DocBuilder<'a, PrettyPrinter<'a, D>, ColorSpec> {
+    fn enum_map(&'a self, enums: &'a EnumsMap) -> PrettyDoc<'a, D> {
+        self.object(enums.0.iter().map(|(enum_name, value_mapping)| {
+            (
+                self.text(enum_name),
+                self.object(
+                    value_mapping
+                        .iter()
+                        .map(|(db_name, prisma_name)| (self.text(db_name), self.text(prisma_name))),
+                ),
+            )
+        }))
+    }
+
+    fn object(&'a self, pairs: impl IntoIterator<Item = (PrettyDoc<'a, D>, PrettyDoc<'a, D>)>) -> PrettyDoc<'a, D> {
+        self.indented_braces(
+            self.intersperse(
+                pairs
+                    .into_iter()
+                    .map(|(key, value)| key.append(self.text(":").append(self.space()).append(value))),
+                self.line(),
+            ),
+        )
+    }
+
+    fn indented_braces(&'a self, content: PrettyDoc<'a, D>) -> PrettyDoc<'a, D> {
+        self.line().append(content.append(self.line()).indent(4)).braces()
+    }
+
+    fn validate(&'a self, expr: &'a Expression, rules: &'a [DataRule], id: &'a str) -> PrettyDoc<'a, D> {
         self.keyword("validate")
             .append(self.softline())
             .append(self.expression(expr).align().parens())
@@ -381,7 +379,7 @@ where
         rule: &'a DataRule,
         then: &'a Expression,
         r#else: &'a Expression,
-    ) -> DocBuilder<'a, PrettyPrinter<'a, D>, ColorSpec> {
+    ) -> PrettyDoc<'a, D> {
         self.keyword("if")
             .append(self.softline())
             .append(
@@ -400,15 +398,11 @@ where
             .append(self.expression(r#else).align())
     }
 
-    fn diff(&'a self, from: &'a Expression, to: &'a Expression) -> DocBuilder<'a, PrettyPrinter<'a, D>, ColorSpec> {
+    fn diff(&'a self, from: &'a Expression, to: &'a Expression) -> PrettyDoc<'a, D> {
         self.function("diff", [from, to])
     }
 
-    fn distinct_by(
-        &'a self,
-        expr: &'a Expression,
-        fields: &'a [String],
-    ) -> DocBuilder<'a, PrettyPrinter<'a, D>, ColorSpec> {
+    fn distinct_by(&'a self, expr: &'a Expression, fields: &'a [String]) -> PrettyDoc<'a, D> {
         self.keyword("distinct")
             .append(self.softline())
             .append(self.keyword("by"))
@@ -418,11 +412,7 @@ where
             .append(self.expression(expr).parens())
     }
 
-    fn paginate(
-        &'a self,
-        expr: &'a Expression,
-        pagination: &'a Pagination,
-    ) -> DocBuilder<'a, PrettyPrinter<'a, D>, ColorSpec> {
+    fn paginate(&'a self, expr: &'a Expression, pagination: &'a Pagination) -> PrettyDoc<'a, D> {
         let mut builder = self.nil();
 
         if let Some(fields) = &pagination.cursor {
@@ -462,31 +452,18 @@ where
         builder.append(self.expression(expr))
     }
 
-    fn extend_record(
-        &'a self,
-        expr: &'a Expression,
-        fields: &'a BTreeMap<String, RecordValue>,
-    ) -> DocBuilder<'a, PrettyPrinter<'a, D>, ColorSpec> {
+    fn extend_record(&'a self, expr: &'a Expression, fields: &'a BTreeMap<String, RecordValue>) -> PrettyDoc<'a, D> {
         self.keyword("extend")
             .append(self.space())
-            .append(
-                self.intersperse(
-                    fields.iter().map(|(name, value)| {
-                        let value = match value {
-                            RecordValue::LastInsertId => self.keyword("lastInsertId"),
-                            RecordValue::Value(value) => self.value(value),
-                        };
-                        self.field_name(name)
-                            .append(self.text(":"))
-                            .append(self.space())
-                            .append(value)
-                    }),
-                    self.line(),
+            .append(self.object(fields.iter().map(|(name, value)| {
+                (
+                    self.field_name(name),
+                    match value {
+                        RecordValue::LastInsertId => self.keyword("lastInsertId"),
+                        RecordValue::Value(value) => self.value(value),
+                    },
                 )
-                .append(self.line())
-                .indent(4)
-                .braces(),
-            )
+            })))
             .append(self.space())
             .append(self.expression(expr))
     }

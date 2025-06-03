@@ -7,7 +7,7 @@ use prisma_value::PrismaValueType;
 pub use relation::*;
 pub use scalar::*;
 
-use crate::{parent_container::ParentContainer, Model};
+use crate::{parent_container::ParentContainer, Model, Zipper};
 use psl::parser_database::{walkers, EnumId, ScalarType};
 use std::{borrow::Cow, hash::Hash};
 
@@ -160,8 +160,22 @@ impl TypeIdentifier {
         )
     }
 
-    pub fn type_name(&self, schema: &psl::ValidatedSchema) -> Cow<'static, str> {
-        match self {
+    /// Returns `true` if the type identifier is [`Enum`].
+    pub fn is_enum(&self) -> bool {
+        matches!(self, Self::Enum(..))
+    }
+
+    /// Returns `true` if the type identifier is [`Json`].
+    pub fn is_json(&self) -> bool {
+        matches!(self, Self::Json)
+    }
+}
+
+pub type Type = Zipper<TypeIdentifier>;
+
+impl Type {
+    pub fn type_name(&self) -> Cow<'static, str> {
+        match self.id {
             TypeIdentifier::String => "String".into(),
             TypeIdentifier::Int => "Int".into(),
             TypeIdentifier::BigInt => "BigInt".into(),
@@ -169,7 +183,7 @@ impl TypeIdentifier {
             TypeIdentifier::Decimal => "Decimal".into(),
             TypeIdentifier::Boolean => "Bool".into(),
             TypeIdentifier::Enum(enum_id) => {
-                let enum_name = schema.db.walk(*enum_id).name();
+                let enum_name = self.dm.walk(enum_id).name();
                 format!("Enum{enum_name}").into()
             }
             TypeIdentifier::UUID => "UUID".into(),
@@ -181,14 +195,14 @@ impl TypeIdentifier {
     }
 
     pub fn to_prisma_type(&self) -> PrismaValueType {
-        match self {
+        match self.id {
             TypeIdentifier::String => PrismaValueType::String,
             TypeIdentifier::Int => PrismaValueType::Int,
             TypeIdentifier::BigInt => PrismaValueType::BigInt,
             TypeIdentifier::Float => PrismaValueType::Float,
             TypeIdentifier::Decimal => PrismaValueType::Decimal,
             TypeIdentifier::Boolean => PrismaValueType::Boolean,
-            TypeIdentifier::Enum(_) => PrismaValueType::String,
+            TypeIdentifier::Enum(id) => PrismaValueType::Enum(self.dm.walk(id).name().to_owned()),
             TypeIdentifier::UUID => PrismaValueType::String,
             TypeIdentifier::Json => PrismaValueType::Object,
             TypeIdentifier::DateTime => PrismaValueType::Date,
@@ -196,15 +210,13 @@ impl TypeIdentifier {
             TypeIdentifier::Unsupported => PrismaValueType::Any,
         }
     }
+}
 
-    /// Returns `true` if the type identifier is [`Enum`].
-    pub fn is_enum(&self) -> bool {
-        matches!(self, Self::Enum(..))
-    }
-
-    /// Returns `true` if the type identifier is [`Json`].
-    pub fn is_json(&self) -> bool {
-        matches!(self, Self::Json)
+impl std::fmt::Debug for Type {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_tuple("TypeIdentifier")
+            .field(&format!("{:?}", self.id))
+            .finish()
     }
 }
 

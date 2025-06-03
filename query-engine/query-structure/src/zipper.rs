@@ -1,4 +1,4 @@
-use crate::{psl::parser_database::walkers::Walker, InternalDataModelRef, TypeIdentifier};
+use crate::{psl::parser_database::walkers::Walker, InternalDataModelRef};
 use std::hash::{Hash, Hasher};
 
 // Invariant: InternalDataModel must not contain any Zipper, this would be a reference counting
@@ -39,13 +39,5 @@ impl<I: Copy> Zipper<I> {
 impl<I: Hash> Hash for Zipper<I> {
     fn hash<H: Hasher>(&self, state: &mut H) {
         self.id.hash(state)
-    }
-}
-
-impl std::fmt::Debug for Zipper<TypeIdentifier> {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.debug_tuple("TypeIdentifier")
-            .field(&format!("{:?}", self.id))
-            .finish()
     }
 }

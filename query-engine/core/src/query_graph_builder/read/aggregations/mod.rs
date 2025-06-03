@@ -33,12 +33,12 @@ fn resolve_query(
                 nested_fields.fields.remove(pos);
 
                 AggregationSelection::Count {
-                    all: true,
+                    all: Some(model.into()),
                     fields: resolve_fields(model, field),
                 }
             }
             None => AggregationSelection::Count {
-                all: false,
+                all: None,
                 fields: resolve_fields(model, field),
             },
         }
@@ -68,7 +68,7 @@ fn resolve_fields(model: &Model, field: FieldPair<'_>) -> Vec<ScalarFieldRef> {
     let fields = field
         .parsed_field
         .nested_fields
-        .expect("Expected at least one selection for aggregate")
+        .expect("Expected at least one selection for aggregate")
         .fields;
 
     fields

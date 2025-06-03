@@ -7,12 +7,14 @@ dataMap {
     _count: {
         id: Int (id)
         email: Int (email)
+        role: Int (role)
         _all: Int (_all)
     }
 }
 unique (query «SELECT COUNT("id") AS "_count.id", COUNT("email") AS
-               "_count.email", COUNT(*) AS "_count._all" FROM (SELECT
-               "public"."User"."id", "public"."User"."email" FROM
+               "_count.email", COUNT("role") AS "_count.role", COUNT(*) AS
+               "_count._all" FROM (SELECT "public"."User"."id",
+               "public"."User"."email", "public"."User"."role" FROM
                "public"."User" WHERE "public"."User"."email"::text LIKE $1
                OFFSET $2) AS "sub"»
         params [const(String("%prisma.io%")), const(BigInt(0))])
