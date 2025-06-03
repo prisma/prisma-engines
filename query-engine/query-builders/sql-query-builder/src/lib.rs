@@ -222,7 +222,7 @@ impl<'a, V: Visitor<'a>> QueryBuilder for SqlQueryBuilder<'a, V> {
             let (field_placeholders, query): (Vec<_>, Select<'static>) =
                 write::defaults_for_mysql_write_args(&id_selection, &args)
                     .map(|(field, arg)| {
-                        let ph = Placeholder::new(field.name().into(), field.result_type().to_prisma_type());
+                        let ph = Placeholder::new(field.name().to_owned(), field.result_type().to_prisma_type());
                         ((field, ph), arg)
                     })
                     .unzip();

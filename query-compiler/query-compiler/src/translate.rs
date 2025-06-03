@@ -1,6 +1,7 @@
 mod query;
 
 use super::expression::{Binding, Expression};
+use crate::binding;
 use crate::data_mapper::map_result_structure;
 use crate::expression::EnumsMap;
 use crate::result_node::ResultNodeBuilder;
@@ -109,7 +110,9 @@ impl<'a, 'b> NodeTranslator<'a, 'b> {
     fn translate_children(&mut self) -> TranslateResult<Vec<Expression>> {
         let mut children = self.process_children()?;
         if self.graph.is_result_node(&self.node) {
-            children.push(Expression::Get { name: self.node.id() });
+            children.push(Expression::Get {
+                name: binding::node_result(self.node),
+            });
         }
         Ok(children)
     }
@@ -119,7 +122,7 @@ impl<'a, 'b> NodeTranslator<'a, 'b> {
             return expr;
         }
         Expression::Let {
-            bindings: vec![Binding::new(self.node.id(), expr)],
+            bindings: vec![Binding::new(binding::node_result(self.node), expr)],
             expr: if children.len() == 1 {
                 children.into_iter().next().unwrap().into()
             } else {
@@ -356,9 +359,8 @@ impl<'a, 'b> NodeTranslator<'a, 'b> {
         let bindings = result_subgraphs
             .into_iter()
             .map(|(_, node)| {
-                let name = node.id();
                 let expr = self.process_child_with_dependencies(node)?;
-                Ok(Binding { name, expr })
+                Ok(Binding::new(binding::node_result(node), expr))
             })
             .collect::<TranslateResult<Vec<_>>>()?;
 
@@ -397,7 +399,7 @@ impl<'a, 'b> NodeTranslator<'a, 'b> {
                     return None;
                 };
                 let mut expr = Expression::Get {
-                    name: self.graph.edge_source(&edge).id(),
+                    name: binding::node_result(self.graph.edge_source(&edge)),
                 };
                 if let Some(expectation) = expectation {
                     expr = Expression::validate_expectation(expectation, expr);
@@ -431,7 +433,9 @@ impl<'a, 'b> NodeTranslator<'a, 'b> {
 
                 let source = self.graph.edge_source(&edge);
 
-                let expr = Expression::Get { name: source.id() };
+                let expr = Expression::Get {
+                    name: binding::node_result(source),
+                };
                 let expr = match expectation {
                     Some(expectation) => Expression::validate_expectation(expectation, expr),
                     None => expr,
@@ -448,10 +452,13 @@ impl<'a, 'b> NodeTranslator<'a, 'b> {
                     Either::Right(Either::Left(parent_binding.chain(selection.selections().map(
                         move |field| {
                             Binding::new(
-                                generate_projected_dependency_name(source, field),
+                                binding::projected_dependency(source, field),
                                 Expression::MapField {
                                     field: field.prisma_name().into_owned(),
-                                    records: Expression::Get { name: source.id() }.into(),
+                                    records: Expression::Get {
+                                        name: binding::node_result(source),
+                                    }
+                                    .into(),
                                 },
                             )
                         },
@@ -501,9 +508,9 @@ impl<'a, 'b> NodeTranslator<'a, 'b> {
                     field.clone(),
                     PrismaValue::Placeholder(Placeholder {
                         name: if bindings_refer_to_fields {
-                            generate_projected_dependency_name(self.graph.edge_source(edge), field)
+                            binding::projected_dependency(self.graph.edge_source(edge), field)
                         } else {
-                            self.graph.edge_source(edge).id()
+                            binding::node_result(self.graph.edge_source(edge))
                         },
                         r#type: PrismaValueType::Any,
                     }),
@@ -511,8 +518,4 @@ impl<'a, 'b> NodeTranslator<'a, 'b> {
             })
             .collect_vec()
     }
-}
-
-fn generate_projected_dependency_name(source: NodeRef, field: &SelectedField) -> String {
-    format!("{}${}", source.id(), field.prisma_name())
 }

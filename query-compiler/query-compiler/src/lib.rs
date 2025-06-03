@@ -1,3 +1,4 @@
+mod binding;
 mod data_mapper;
 pub mod expression;
 pub mod result_node;

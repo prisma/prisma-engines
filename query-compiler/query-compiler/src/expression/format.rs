@@ -202,7 +202,7 @@ where
             .append(self.expression(expr).align())
     }
 
-    fn get_first_non_empty(&'a self, names: &'a [String]) -> PrettyDoc<'a, D> {
+    fn get_first_non_empty(&'a self, names: &'a [Cow<'static, str>]) -> PrettyDoc<'a, D> {
         self.text("getFirstNonEmpty")
             .annotate(color_fn())
             .append(self.intersperse(names.iter().map(|name| self.var_name(name)), self.space()))

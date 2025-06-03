@@ -1,4 +1,7 @@
-use std::collections::{BTreeMap, HashMap};
+use std::{
+    borrow::Cow,
+    collections::{BTreeMap, HashMap},
+};
 
 use crate::result_node::ResultNode;
 use query_builder::DbQuery;
@@ -10,13 +13,16 @@ mod format;
 
 #[derive(Debug, Serialize)]
 pub struct Binding {
-    pub name: String,
+    pub name: Cow<'static, str>,
     pub expr: Expression,
 }
 
 impl Binding {
-    pub fn new(name: String, expr: Expression) -> Self {
-        Self { name, expr }
+    pub fn new(name: impl Into<Cow<'static, str>>, expr: Expression) -> Self {
+        Self {
+            name: name.into(),
+            expr,
+        }
     }
 }
 
@@ -42,7 +48,7 @@ pub enum Expression {
     Seq(Vec<Expression>),
 
     /// Get binding value.
-    Get { name: String },
+    Get { name: Cow<'static, str> },
 
     /// A lexical scope with let-bindings.
     Let {
@@ -51,7 +57,7 @@ pub enum Expression {
     },
 
     /// Gets the first non-empty value from a list of bindings.
-    GetFirstNonEmpty { names: Vec<String> },
+    GetFirstNonEmpty { names: Vec<Cow<'static, str>> },
 
     /// A database query that returns data.
     Query(DbQuery),

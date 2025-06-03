@@ -1,5 +1,5 @@
 use crate::{
-    TranslateError,
+    TranslateError, binding,
     expression::{Binding, Expression, JoinExpression, Pagination},
     translate::TranslateResult,
 };
@@ -140,18 +140,20 @@ pub(super) fn add_inmemory_join(
     let all_linking_fields = nested
         .iter()
         .flat_map(|nested| match nested {
-            ReadQuery::RelatedRecordsQuery(rrq) => rrq.parent_field.linking_fields(),
+            ReadQuery::RelatedRecordsQuery(rrq) => rrq.parent_field.left_scalars(),
             _ => unreachable!(),
         })
         .unique()
-        .sorted_by(|a, b| a.prisma_name().cmp(&b.prisma_name()));
+        .sorted_by(|a, b| a.name().cmp(b.name()));
 
     let linking_fields_bindings = all_linking_fields
         .map(|sf| Binding {
-            name: format!("@parent${}", sf.prisma_name().into_owned()),
+            name: binding::join_parent_field(&sf),
             expr: Expression::MapField {
-                field: sf.prisma_name().into_owned(),
-                records: Box::new(Expression::Get { name: "@parent".into() }),
+                field: sf.name().to_owned(),
+                records: Box::new(Expression::Get {
+                    name: binding::join_parent(),
+                }),
             },
         })
         .collect();
@@ -170,7 +172,7 @@ pub(super) fn add_inmemory_join(
                 .zip(rrq.parent_field.related_field().left_scalars())
                 .map(|(parent_scalar, child_scalar)| {
                     let placeholder = PrismaValue::placeholder(
-                        format!("@parent${}", parent_scalar.name()),
+                        binding::join_parent_field(parent_scalar),
                         parent_scalar.result_type().to_prisma_type(),
                     );
                     let condition = if parent.r#type().is_list() {
@@ -198,13 +200,15 @@ pub(super) fn add_inmemory_join(
 
     Ok(Expression::Let {
         bindings: vec![Binding {
-            name: "@parent".into(),
+            name: binding::join_parent(),
             expr: parent,
         }],
         expr: Box::new(Expression::Let {
             bindings: linking_fields_bindings,
             expr: Box::new(Expression::Join {
-                parent: Box::new(Expression::Get { name: "@parent".into() }),
+                parent: Box::new(Expression::Get {
+                    name: binding::join_parent(),
+                }),
                 children: join_expressions,
             }),
         }),
