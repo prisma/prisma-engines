@@ -62,6 +62,28 @@ pub enum PrismaValue {
     },
 }
 
+impl PrismaValue {
+    pub fn r#type(&self) -> PrismaValueType {
+        match self {
+            PrismaValue::String(_) => PrismaValueType::String,
+            PrismaValue::Boolean(_) => PrismaValueType::Boolean,
+            PrismaValue::Int(_) => PrismaValueType::Int,
+            PrismaValue::Uuid(_) => PrismaValueType::String,
+            PrismaValue::List(_) => PrismaValueType::Array(PrismaValueType::Any.into()),
+            PrismaValue::Json(_) => PrismaValueType::Object,
+            PrismaValue::Object(_) => PrismaValueType::Object,
+            PrismaValue::DateTime(_) => PrismaValueType::Date,
+            PrismaValue::Float(_) => PrismaValueType::Float,
+            PrismaValue::BigInt(_) => PrismaValueType::BigInt,
+            PrismaValue::Bytes(_) => PrismaValueType::Bytes,
+            PrismaValue::Placeholder(placeholder) => placeholder.r#type.clone(),
+            PrismaValue::GeneratorCall { return_type, .. } => return_type.clone(),
+            PrismaValue::Enum(_) => PrismaValueType::Any, // we don't know the enum type at this point
+            PrismaValue::Null => PrismaValueType::Any,
+        }
+    }
+}
+
 #[derive(Debug, Clone, Eq, PartialEq, Hash, Serialize, Deserialize, PartialOrd, Ord)]
 #[serde(tag = "type", content = "inner")]
 pub enum PrismaValueType {

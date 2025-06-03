@@ -66,7 +66,7 @@ impl WriteOperation {
     }
 
     pub fn scalar_substract(pv: PrismaValue) -> Self {
-        Self::Scalar(ScalarWriteOperation::Substract(pv))
+        Self::Scalar(ScalarWriteOperation::Subtract(pv))
     }
 
     pub fn scalar_multiply(pv: PrismaValue) -> Self {
@@ -159,7 +159,7 @@ pub enum ScalarWriteOperation {
     Add(PrismaValue),
 
     /// Substract value from field
-    Substract(PrismaValue),
+    Subtract(PrismaValue),
 
     /// Multiply field by value.
     Multiply(PrismaValue),
@@ -484,7 +484,7 @@ pub fn apply_expression(val: PrismaValue, scalar_write: ScalarWriteOperation) ->
         ScalarWriteOperation::Field(_) => unimplemented!(),
         ScalarWriteOperation::Set(pv) => pv,
         ScalarWriteOperation::Add(rhs) => val + rhs,
-        ScalarWriteOperation::Substract(rhs) => val - rhs,
+        ScalarWriteOperation::Subtract(rhs) => val - rhs,
         ScalarWriteOperation::Multiply(rhs) => val * rhs,
         ScalarWriteOperation::Divide(rhs) => val / rhs,
         ScalarWriteOperation::Unset(_) => unimplemented!(),

@@ -873,6 +873,23 @@ pub trait Visitor<'a> {
                     self.visit_parameterized(pv)
                 }
 
+                // Flattening out a parameterized row with a single column.
+                (
+                    Expression {
+                        kind: ExpressionKind::Row(mut cols),
+                        ..
+                    },
+                    Expression {
+                        kind: ExpressionKind::ParameterizedRow(value),
+                        ..
+                    },
+                ) if cols.len() == 1 => {
+                    let col = cols.pop().unwrap();
+                    self.visit_expression(col)?;
+                    self.write(" IN ")?;
+                    self.visit_parameterized_row(value)
+                }
+
                 // expr IN (?, ?, ..., ?)
                 (
                     left,
@@ -956,6 +973,23 @@ pub trait Visitor<'a> {
                     self.visit_expression(left)?;
                     self.write(" <> ")?;
                     self.visit_parameterized(pv)
+                }
+
+                // Flattening out a parameterized row with a single column.
+                (
+                    Expression {
+                        kind: ExpressionKind::Row(mut cols),
+                        ..
+                    },
+                    Expression {
+                        kind: ExpressionKind::ParameterizedRow(value),
+                        ..
+                    },
+                ) if cols.len() == 1 => {
+                    let col = cols.pop().unwrap();
+                    self.visit_expression(col)?;
+                    self.write(" NOT IN ")?;
+                    self.visit_parameterized_row(value)
                 }
 
                 // expr NOT IN (?, ?, ..., ?)

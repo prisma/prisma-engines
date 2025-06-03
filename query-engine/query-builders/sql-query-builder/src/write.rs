@@ -176,7 +176,7 @@ pub fn build_update_and_set_query(
                     e + field.value(rhs, ctx).into()
                 }
 
-                ScalarWriteOperation::Substract(rhs) => {
+                ScalarWriteOperation::Subtract(rhs) => {
                     let e: Expression<'_> = Column::from((table.clone(), name.clone())).into();
                     e - field.value(rhs, ctx).into()
                 }
