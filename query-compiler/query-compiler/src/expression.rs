@@ -331,8 +331,7 @@ impl Expression {
             Expression::Diff { from, .. } => from.r#type(),
             Expression::DistinctBy { expr, .. } => expr.r#type(),
             Expression::Paginate { expr, .. } => expr.r#type(),
-            Expression::InitializeRecord { expr, .. } => expr.r#type(),
-            Expression::MapRecord { expr, .. } => expr.r#type(),
+            Expression::InitializeRecord { .. } | Expression::MapRecord { .. } => ExpressionType::Record,
         }
     }
 
