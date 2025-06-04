@@ -21,9 +21,9 @@ pub enum WriteQuery {
 }
 
 impl WriteQuery {
-    /// Returns a mutable slice of the write arguments from the underlying INSERT,
+    /// Returns a mutable slice of the write arguments from an underlying INSERT if applicable
     /// or an empty slice otherwise.
-    pub fn create_args_mut(&mut self) -> &mut [WriteArgs] {
+    pub fn insert_args_mut(&mut self) -> &mut [WriteArgs] {
         match self {
             Self::CreateRecord(cr) => slice::from_mut(&mut cr.args),
             Self::CreateManyRecords(CreateManyRecords { args, .. }) => &mut args[..],

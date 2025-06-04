@@ -154,7 +154,7 @@ pub(crate) fn translate_write_query(query: WriteQuery, builder: &dyn QueryBuilde
             selection_order: _,
         })) => {
             let query = if args.is_empty() {
-                // If there's no args we can just issue a read query.
+                // We can just issue a read query if there are no write arguments.
                 let query_args = QueryArguments::from((model.clone(), record_filter.filter)).with_take(Take::Some(1));
                 builder
                     .build_get_records(&model, query_args, &selected_fields, RelationLoadStrategy::Query)
@@ -167,13 +167,14 @@ pub(crate) fn translate_write_query(query: WriteQuery, builder: &dyn QueryBuilde
             Expression::Unique(Box::new(Expression::Query(query)))
         }
 
+        // This case is used for databases with no support for the `RETURNING` clause.
         WriteQuery::UpdateRecord(UpdateRecord::WithoutSelection(UpdateRecordWithoutSelection {
             model,
             record_filter,
             args,
         })) => {
-            // Create field initializers based on the selectors.
-            // We can do this because they uniquely identify the record to be updated.
+            // Initialize the fields of a record that represents the identifier of the row that
+            // is being updated. We use the record selectors to populate their values.
             let initializers = record_filter
                 .selectors
                 .as_ref()
@@ -186,8 +187,8 @@ pub(crate) fn translate_write_query(query: WriteQuery, builder: &dyn QueryBuilde
                 .map(|(field, val)| (field.prisma_name().into_owned(), FieldInitializer::Value(val.clone())))
                 .collect();
 
-            // Create updates that reflect the operations to be performed on the record.
-            // They will be applied in-memory to the record we create.
+            // Keep track of the operations that are applied to the primary identifier fields.
+            // They need to be applied in-memory to the record we intend to return.
             let operations = model
                 .primary_identifier()
                 .selections()
@@ -201,8 +202,9 @@ pub(crate) fn translate_write_query(query: WriteQuery, builder: &dyn QueryBuilde
                 .collect::<BTreeMap<_, _>>();
 
             let expr = if args.is_empty() {
-                // If there's no write args we can just skip the update.
-                // The query graph might still rely on the resulting record created afterwards.
+                // We can just skip the update if there are no write arguments, but the query
+                // graph still relies on this being wrapped with an `InitializeRecord`
+                // containing the primary identifier, even if no update is performed.
                 Expression::Unit
             } else {
                 Expression::Execute(

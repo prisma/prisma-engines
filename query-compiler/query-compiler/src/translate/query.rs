@@ -21,10 +21,10 @@ pub(crate) fn translate_query(query: Query, builder: &dyn QueryBuilder) -> Trans
     match query {
         Query::Read(rq) => translate_read_query(rq, builder),
         Query::Write(mut wq) => {
-            // Extract any side-effectful generator calls from the write query and convert
-            // them into bindings.
+            // Extract any side-effectful generator calls from an underlying INSERT (if any) and
+            // convert them into bindings.
             let bindings = wq
-                .create_args_mut()
+                .insert_args_mut()
                 .iter_mut()
                 .enumerate()
                 .flat_map(|(row_idx, args)| args.args.iter_mut().map(move |arg| (row_idx, arg)))
