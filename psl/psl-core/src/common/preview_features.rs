@@ -81,6 +81,7 @@ features!(
     ReferentialIntegrity,
     RelationJoins,
     SelectRelationCount,
+    ShardKeys,
     StrictUndefinedChecks,
     Tracing,
     TransactionApi,
@@ -159,6 +160,7 @@ impl<'a> FeatureMapWithProvider<'a> {
                  | PostgresqlExtensions
                  | QueryCompiler
                  | RelationJoins
+                 | ShardKeys
                  | StrictUndefinedChecks
                  | Views
             }),
