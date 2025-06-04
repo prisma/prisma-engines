@@ -1,0 +1,30 @@
+datasource db {
+  provider = "mysql"
+  url      = env("url")
+}
+
+generator client {
+  provider        = "prisma-client"
+  previewFeatures = ["shardKeys"]
+}
+
+model User {
+  id        Int    @id
+  firstName String
+  lastName  String
+
+  @@shardKey(["firstName", "lastName"])
+}
+
+// [1;91merror[0m: [1mExpected a constant value, but received string value `"firstName"`.[0m
+//   [1;94m-->[0m  [4mschema.prisma:16[0m
+// [1;94m   | [0m
+// [1;94m15 | [0m
+// [1;94m16 | [0m  @@shardKey([[1;91m"firstName"[0m, "lastName"])
+// [1;94m   | [0m
+// [1;91merror[0m: [1mExpected a constant value, but received string value `"lastName"`.[0m
+//   [1;94m-->[0m  [4mschema.prisma:16[0m
+// [1;94m   | [0m
+// [1;94m15 | [0m
+// [1;94m16 | [0m  @@shardKey(["firstName", [1;91m"lastName"[0m])
+// [1;94m   | [0m

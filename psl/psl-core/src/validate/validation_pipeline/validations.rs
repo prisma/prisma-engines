@@ -67,6 +67,8 @@ pub(super) fn validate(ctx: &mut Context<'_>) {
         models::schema_is_defined_in_the_datasource(model, ctx);
         models::schema_attribute_supported_in_connector(model, ctx);
         models::schema_attribute_missing(model, ctx);
+        models::shard_key_is_supported(model, ctx);
+        models::shard_key_has_fields(model, ctx);
         models::connector_specific(model, ctx);
 
         autoincrement::validate_auto_increment(model, ctx);

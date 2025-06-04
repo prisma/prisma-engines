@@ -1,7 +1,9 @@
 mod primary_key;
+mod shard_key;
 mod unique_criteria;
 
 pub use primary_key::*;
+pub use shard_key::*;
 
 pub(crate) use unique_criteria::*;
 
@@ -113,6 +115,15 @@ impl<'db> ModelWalker<'db> {
     /// The primary key of the model, if defined.
     pub fn primary_key(self) -> Option<PrimaryKeyWalker<'db>> {
         self.attributes().primary_key.as_ref().map(|pk| PrimaryKeyWalker {
+            model_id: self.id,
+            attribute: pk,
+            db: self.db,
+        })
+    }
+
+    /// The shard key of the model, if defined.
+    pub fn shard_key(self) -> Option<ShardKeyWalker<'db>> {
+        self.attributes().shard_key.as_ref().map(|pk| ShardKeyWalker {
             model_id: self.id,
             attribute: pk,
             db: self.db,

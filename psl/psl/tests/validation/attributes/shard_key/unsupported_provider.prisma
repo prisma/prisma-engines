@@ -1,0 +1,20 @@
+datasource db {
+  provider = "mongodb"
+  url      = env("url")
+}
+
+generator client {
+  provider        = "prisma-client"
+  previewFeatures = ["shardKeys"]
+}
+
+model User {
+  id     String @id @map("_id") @db.ObjectId
+  region String @shardKey
+}
+// [1;91merror[0m: [1mError parsing attribute "@shardKey": Shard keys are not currently supported for provider mongodb[0m
+//   [1;94m-->[0m  [4mschema.prisma:13[0m
+// [1;94m   | [0m
+// [1;94m12 | [0m  id     String @id @map("_id") @db.ObjectId
+// [1;94m13 | [0m  region String [1;91m@shardKey[0m
+// [1;94m   | [0m

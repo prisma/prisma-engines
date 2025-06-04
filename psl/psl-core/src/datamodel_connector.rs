@@ -298,6 +298,10 @@ pub trait Connector: Send + Sync {
     fn is_mongo(&self) -> bool {
         self.flavour().is_mongo()
     }
+
+    fn supports_shard_keys(&self) -> bool {
+        false
+    }
 }
 
 #[derive(Copy, Clone, Debug, PartialEq)]

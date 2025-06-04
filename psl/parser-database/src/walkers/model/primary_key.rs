@@ -49,7 +49,7 @@ impl<'db> PrimaryKeyWalker<'db> {
         self.attribute.clustered
     }
 
-    /// The model the id is deined on.
+    /// The model the id is defined on.
     pub fn model(self) -> ModelWalker<'db> {
         self.db.walk(self.model_id)
     }
