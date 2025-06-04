@@ -1,6 +1,4 @@
-new::create_many::single_col::foo
 new::regressions::max_integer::max_integer::unfitted_int_should_fail
-new::regressions::prisma_14696::prisma_14696::create_does_not_panic
 new::regressions::prisma_15177::prisma_15177::repro
 new::regressions::prisma_22971::prisma_22971::test_22971
 new::regressions::prisma_7434::not_in_chunking::not_in_batch_filter
@@ -32,9 +30,6 @@ writes::top_level_mutations::update_many::update_many::update_max_limit_items
 writes::top_level_mutations::update::update::update_fail_uniq_field_inexistant_value
 writes::top_level_mutations::update::update::update_fails_if_filter_dont_match
 writes::top_level_mutations::upsert::upsert::upsert_fails_if_filter_dont_match
-writes::unchecked_writes::unchecked_create::unchecked_create::allow_write_non_inlined_rel
 writes::unchecked_writes::unchecked_create::unchecked_create::allow_writing_inlined_rel_scalars
-writes::unchecked_writes::unchecked_create::unchecked_create::required_write_required_rel_scalars
-writes::unchecked_writes::unchecked_nested_create::unchecked_nested_create::allow_write_non_parent
 writes::unchecked_writes::unchecked_update_spec::unchecked_update::allow_write_non_inline_rels
 writes::unchecked_writes::unchecked_update_spec::unchecked_update::allow_write_non_prent_inline_rel_sclrs
