@@ -59,7 +59,9 @@ pub(crate) fn update_record(
 
                     Ok(update_node)
                 }),
-                None,
+                Some(DataExpectation::non_empty_rows(
+                    MissingRecord::builder().operation(DataOperation::Update).build(),
+                )),
             ),
         )?;
     }
