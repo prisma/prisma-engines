@@ -456,7 +456,7 @@ impl<'a, 'b> NodeTranslator<'a, 'b> {
                             Binding::new(
                                 binding::projected_dependency(source, field),
                                 Expression::MapField {
-                                    field: field.prisma_name().into_owned(),
+                                    field: field.db_name().into(),
                                     records: Expression::Get {
                                         name: binding::node_result(source),
                                     }
