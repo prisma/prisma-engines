@@ -78,7 +78,7 @@ where
 
 fn get_selected_fields(model: &Model, selection: FieldSelection) -> FieldSelection {
     // Always fetch the primary identifier as well.
-    let primary_model_id = model.primary_identifier();
+    let primary_model_id = model.shard_aware_primary_identifier();
 
     if selection != primary_model_id {
         primary_model_id.merge(selection)
@@ -122,7 +122,7 @@ pub(crate) fn insert_find_children_by_parent_node<T>(
 where
     T: Into<Filter>,
 {
-    let parent_model_id = parent_relation_field.model().primary_identifier();
+    let parent_model_id = parent_relation_field.model().shard_aware_primary_identifier();
     let parent_linking_fields = parent_relation_field.linking_fields();
     let selection = parent_model_id.merge(parent_linking_fields);
     let child_model = parent_relation_field.related_model();
@@ -171,7 +171,7 @@ pub fn insert_1to1_idempotent_connect_checks(
     parent_relation_field: &RelationFieldRef,
 ) -> QueryGraphBuilderResult<NodeRef> {
     let child_model = parent_relation_field.related_model();
-    let child_model_identifier = child_model.primary_identifier();
+    let child_model_identifier = child_model.shard_aware_primary_identifier();
 
     let diff_node = graph.create_node(Node::Computation(Computation::empty_diff_left_to_right()));
 
@@ -280,7 +280,7 @@ pub fn insert_existing_1to1_related_model_checks(
     parent_node: &NodeRef,
     parent_relation_field: &RelationFieldRef,
 ) -> QueryGraphBuilderResult<NodeRef> {
-    let child_model_identifier = parent_relation_field.related_model().primary_identifier();
+    let child_model_identifier = parent_relation_field.related_model().shard_aware_primary_identifier();
     let child_linking_fields = parent_relation_field.related_field().linking_fields();
 
     let child_model = parent_relation_field.related_model();
@@ -458,7 +458,7 @@ pub fn emulate_on_delete_restrict(
 ) -> QueryGraphBuilderResult<NodeRef> {
     let noop_node = graph.create_node(Node::Empty);
     let relation_field = relation_field.related_field();
-    let child_model_identifier = relation_field.related_model().primary_identifier();
+    let child_model_identifier = relation_field.related_model().shard_aware_primary_identifier();
     let read_node = insert_find_children_by_parent_node(graph, node_providing_ids, &relation_field, Filter::empty())?;
 
     graph.create_edge(
@@ -515,7 +515,7 @@ pub fn emulate_on_delete_cascade(
 ) -> QueryGraphBuilderResult<NodeRef> {
     let dependent_model = relation_field.model();
     let parent_relation_field = relation_field.related_field();
-    let child_model_identifier = parent_relation_field.related_model().primary_identifier();
+    let child_model_identifier = parent_relation_field.related_model().shard_aware_primary_identifier();
 
     // Records that need to be deleted for the cascade.
     let dependent_records_node =
@@ -593,7 +593,7 @@ pub fn emulate_on_delete_set_null(
 ) -> QueryGraphBuilderResult<Option<NodeRef>> {
     let dependent_model = relation_field.model();
     let parent_relation_field = relation_field.related_field();
-    let child_model_identifier = parent_relation_field.related_model().primary_identifier();
+    let child_model_identifier = parent_relation_field.related_model().shard_aware_primary_identifier();
     let child_fks = relation_field.left_scalars();
 
     let child_update_args: IndexMap<_, _> = child_fks
@@ -733,7 +733,7 @@ pub fn emulate_on_update_set_null(
 ) -> QueryGraphBuilderResult<()> {
     let dependent_model = relation_field.model();
     let parent_relation_field = relation_field.related_field();
-    let child_model_identifier = parent_relation_field.related_model().primary_identifier();
+    let child_model_identifier = parent_relation_field.related_model().shard_aware_primary_identifier();
 
     // Only the nullable fks should be updated to null
     let (parent_pks, child_fks) = if relation_field.is_inlined_on_enclosing_model() {
@@ -842,7 +842,7 @@ pub fn emulate_on_update_restrict(
 ) -> QueryGraphBuilderResult<()> {
     let noop_node = graph.create_node(Node::Empty);
     let relation_field = relation_field.related_field();
-    let child_model_identifier = relation_field.related_model().primary_identifier();
+    let child_model_identifier = relation_field.related_model().shard_aware_primary_identifier();
     let read_node = insert_find_children_by_parent_node(graph, parent_node, &relation_field, Filter::empty())?;
 
     let linking_fields = relation_field.linking_fields();
@@ -944,7 +944,7 @@ pub fn insert_emulated_on_update_with_intermediary_node(
         parent_node,
         &join_node,
         QueryGraphDependency::ProjectedDataSinkDependency(
-            model_to_update.primary_identifier(),
+            model_to_update.shard_aware_primary_identifier(),
             RowSink::AllRows(&ReturnInput),
             None,
         ),
@@ -1055,7 +1055,7 @@ pub fn emulate_on_update_cascade(
 ) -> QueryGraphBuilderResult<()> {
     let dependent_model = relation_field.model();
     let parent_relation_field = relation_field.related_field();
-    let child_model_identifier = parent_relation_field.related_model().primary_identifier();
+    let child_model_identifier = parent_relation_field.related_model().shard_aware_primary_identifier();
     let (parent_pks, child_fks) = if relation_field.is_inlined_on_enclosing_model() {
         (relation_field.referenced_fields(), relation_field.scalar_fields())
     } else {

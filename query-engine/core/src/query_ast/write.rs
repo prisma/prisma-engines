@@ -83,7 +83,7 @@ impl WriteQuery {
             }
             Self::UpdateRecord(UpdateRecord::WithSelection(ur)) => Some(&ur.selected_fields),
             Self::UpdateRecord(UpdateRecord::WithoutSelection(_)) => {
-                return Some(Cow::Owned(self.model().primary_identifier()))
+                return Some(Cow::Owned(self.model().shard_aware_primary_identifier()))
             }
             Self::DeleteRecord(DeleteRecord { selected_fields, .. }) => selected_fields.as_ref().map(|sf| &sf.fields),
             Self::UpdateManyRecords(UpdateManyRecords { selected_fields, .. }) => {
