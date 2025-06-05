@@ -32,7 +32,7 @@ impl IntoUpdateOperation for ScalarWriteOperation {
                 field_path,
                 doc! { "$add": [dollar_field_path, (field, rhs).into_bson()?] },
             )),
-            ScalarWriteOperation::Substract(rhs) => Some(UpdateOperation::generic(
+            ScalarWriteOperation::Subtract(rhs) => Some(UpdateOperation::generic(
                 field_path,
                 doc! { "$subtract": [dollar_field_path, (field, rhs).into_bson()?] },
             )),

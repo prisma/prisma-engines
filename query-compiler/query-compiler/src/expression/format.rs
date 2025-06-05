@@ -1,5 +1,5 @@
-use super::{Binding, DbQuery, EnumsMap, Expression, JoinExpression, Pagination, RecordValue};
-use crate::result_node::ResultNode;
+use super::{Binding, DbQuery, EnumsMap, Expression, FieldOperation, JoinExpression, Pagination};
+use crate::{expression::FieldInitializer, result_node::ResultNode};
 use pretty::{
     DocAllocator, DocBuilder,
     termcolor::{Color, ColorSpec},
@@ -45,6 +45,7 @@ where
 
     pub fn expression(&'a self, expression: &'a Expression) -> PrettyDoc<'a, D> {
         match expression {
+            Expression::Value(value) => self.value(value),
             Expression::Seq(vec) => self.seq(vec),
             Expression::Get { name, .. } => self.get(name),
             Expression::Let { bindings, expr } => self.r#let(bindings, expr),
@@ -76,7 +77,8 @@ where
             Expression::Diff { from, to } => self.diff(from, to),
             Expression::DistinctBy { expr, fields } => self.distinct_by(expr, fields),
             Expression::Paginate { expr, pagination } => self.paginate(expr, pagination),
-            Expression::ExtendRecord { expr, values } => self.extend_record(expr, values),
+            Expression::InitializeRecord { expr, fields } => self.initialize_record(expr, fields),
+            Expression::MapRecord { expr, fields } => self.map_record(expr, fields),
         }
     }
 
@@ -452,15 +454,44 @@ where
         builder.append(self.expression(expr))
     }
 
-    fn extend_record(&'a self, expr: &'a Expression, fields: &'a BTreeMap<String, RecordValue>) -> PrettyDoc<'a, D> {
-        self.keyword("extend")
+    fn initialize_record(
+        &'a self,
+        expr: &'a Expression,
+        fields: &'a BTreeMap<String, FieldInitializer>,
+    ) -> PrettyDoc<'a, D> {
+        self.keyword("initRecord")
             .append(self.space())
             .append(self.object(fields.iter().map(|(name, value)| {
                 (
                     self.field_name(name),
                     match value {
-                        RecordValue::LastInsertId => self.keyword("lastInsertId"),
-                        RecordValue::Value(value) => self.value(value),
+                        FieldInitializer::LastInsertId => self.keyword("lastInsertId"),
+                        FieldInitializer::Value(prisma_value) => self.value(prisma_value),
+                    },
+                )
+            })))
+            .append(self.space())
+            .append(self.expression(expr))
+    }
+
+    fn map_record(&'a self, expr: &'a Expression, fields: &'a BTreeMap<String, FieldOperation>) -> PrettyDoc<'a, D> {
+        self.keyword("mapRecord")
+            .append(self.space())
+            .append(self.object(fields.iter().map(|(name, value)| {
+                (
+                    self.field_name(name),
+                    match value {
+                        FieldOperation::Set(value) => {
+                            self.keyword("set").append(self.space()).append(self.value(value))
+                        }
+                        FieldOperation::Add(val) => self.keyword("add").append(self.space()).append(self.value(val)),
+                        FieldOperation::Subtract(val) => {
+                            self.keyword("sub").append(self.space()).append(self.value(val))
+                        }
+                        FieldOperation::Multiply(val) => {
+                            self.keyword("mul").append(self.space()).append(self.value(val))
+                        }
+                        FieldOperation::Divide(val) => self.keyword("div").append(self.space()).append(self.value(val)),
                     },
                 )
             })))

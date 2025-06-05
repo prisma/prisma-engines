@@ -44,8 +44,16 @@ impl NativeUpsert {
         &self.update
     }
 
+    pub fn update_mut(&mut self) -> &mut WriteArgs {
+        &mut self.update
+    }
+
     pub fn create(&self) -> &WriteArgs {
         &self.create
+    }
+
+    pub fn create_mut(&mut self) -> &mut WriteArgs {
+        &mut self.create
     }
 
     pub fn unique_constraints(&self) -> Vec<ScalarFieldRef> {

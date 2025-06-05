@@ -6,8 +6,9 @@ use std::{
 use crate::result_node::ResultNode;
 use query_builder::DbQuery;
 use query_core::{DataExpectation, DataRule};
-use query_structure::{InternalEnum, PrismaValue, TaggedPrismaValue};
+use query_structure::{InternalEnum, PrismaValue, PrismaValueType, ScalarWriteOperation, TaggedPrismaValue};
 use serde::Serialize;
+use thiserror::Error;
 
 mod format;
 
@@ -44,6 +45,9 @@ pub struct JoinExpression {
 #[derive(Debug, Serialize)]
 #[serde(tag = "type", content = "args", rename_all = "camelCase")]
 pub enum Expression {
+    /// Expression that evaluates to a plain value.
+    Value(PrismaValue),
+
     /// Sequence of statements. The whole sequence evaluates to the result of the last expression.
     Seq(Vec<Expression>),
 
@@ -132,19 +136,54 @@ pub enum Expression {
         pagination: Pagination,
     },
 
-    /// Extends a record with additional values.
-    ExtendRecord {
+    /// Initializes a record with a set of initializers.
+    InitializeRecord {
         expr: Box<Expression>,
-        values: BTreeMap<String, RecordValue>,
+        fields: BTreeMap<String, FieldInitializer>,
+    },
+
+    /// Applies a set of operations to fields of a record.
+    MapRecord {
+        expr: Box<Expression>,
+        fields: BTreeMap<String, FieldOperation>,
     },
 }
 
 #[derive(Debug, Serialize)]
 #[serde(tag = "type", content = "value", rename_all = "camelCase")]
-pub enum RecordValue {
+pub enum FieldInitializer {
     LastInsertId,
     Value(#[serde(serialize_with = "serialize_tagged_value")] PrismaValue),
 }
+
+#[derive(Debug, Serialize)]
+#[serde(tag = "type", content = "value", rename_all = "camelCase")]
+pub enum FieldOperation {
+    Set(#[serde(serialize_with = "serialize_tagged_value")] PrismaValue),
+    Add(#[serde(serialize_with = "serialize_tagged_value")] PrismaValue),
+    Subtract(#[serde(serialize_with = "serialize_tagged_value")] PrismaValue),
+    Multiply(#[serde(serialize_with = "serialize_tagged_value")] PrismaValue),
+    Divide(#[serde(serialize_with = "serialize_tagged_value")] PrismaValue),
+}
+
+impl TryFrom<ScalarWriteOperation> for FieldOperation {
+    type Error = UnsupportedScalarWriteOperation;
+
+    fn try_from(op: ScalarWriteOperation) -> Result<Self, Self::Error> {
+        match op {
+            ScalarWriteOperation::Set(val) => Ok(Self::Set(val)),
+            ScalarWriteOperation::Add(val) => Ok(Self::Add(val)),
+            ScalarWriteOperation::Subtract(val) => Ok(Self::Subtract(val)),
+            ScalarWriteOperation::Multiply(val) => Ok(Self::Multiply(val)),
+            ScalarWriteOperation::Divide(val) => Ok(Self::Divide(val)),
+            ScalarWriteOperation::Field(_) | ScalarWriteOperation::Unset(_) => Err(UnsupportedScalarWriteOperation(op)),
+        }
+    }
+}
+
+#[derive(Debug, Error)]
+#[error("unsupported scalar write operation: {0:?}")]
+pub struct UnsupportedScalarWriteOperation(ScalarWriteOperation);
 
 #[derive(Debug, Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -220,6 +259,15 @@ impl ExpressionType {
     pub fn is_list(&self) -> bool {
         matches!(self, ExpressionType::List(_) | ExpressionType::Dynamic)
     }
+
+    pub fn from_value_type(value_type: PrismaValueType) -> Self {
+        match value_type {
+            PrismaValueType::Any => ExpressionType::Dynamic,
+            PrismaValueType::Array(inner) => ExpressionType::List(Box::new(ExpressionType::from_value_type(*inner))),
+            PrismaValueType::Object => ExpressionType::Record,
+            _ => ExpressionType::Scalar,
+        }
+    }
 }
 
 #[derive(thiserror::Error, Debug)]
@@ -248,6 +296,7 @@ impl Expression {
 
     pub fn r#type(&self) -> ExpressionType {
         match self {
+            Expression::Value(value) => ExpressionType::from_value_type(value.r#type()),
             Expression::Seq(vec) => vec.iter().last().map_or(ExpressionType::Scalar, Expression::r#type),
             Expression::Get { .. } => ExpressionType::Dynamic,
             Expression::Let { expr, .. } => expr.r#type(),
@@ -282,7 +331,7 @@ impl Expression {
             Expression::Diff { from, .. } => from.r#type(),
             Expression::DistinctBy { expr, .. } => expr.r#type(),
             Expression::Paginate { expr, .. } => expr.r#type(),
-            Expression::ExtendRecord { expr, .. } => expr.r#type(),
+            Expression::InitializeRecord { .. } | Expression::MapRecord { .. } => ExpressionType::Record,
         }
     }
 

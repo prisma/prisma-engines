@@ -291,10 +291,22 @@ impl<'a, V: Visitor<'a>> QueryBuilder for SqlQueryBuilder<'a, V> {
                 self.convert_query(query)
             }
             None => {
-                // this branch is for updates without selections, normally used for databases
-                // without RETURNING, the logic is slightly more complicated and will require
-                // translating update::update_one_without_selection from the sql-query-connector
-                todo!()
+                let selection_results = record_filter
+                    .selectors
+                    .expect("should have record selectors for update");
+                let query = update::update_many_from_ids_and_filter(
+                    model,
+                    record_filter.filter,
+                    &selection_results,
+                    args,
+                    None,
+                    &self.context,
+                )
+                .into_iter()
+                .exactly_one()
+                .expect("should generate exactly one update query");
+
+                self.convert_query(query)
             }
         }
     }

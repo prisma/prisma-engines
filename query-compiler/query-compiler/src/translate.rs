@@ -11,7 +11,7 @@ use query::translate_query;
 use query_builder::QueryBuilder;
 use query_core::{
     Computation, EdgeRef, Flow, Node, NodeRef, Query, QueryGraph, QueryGraphBuilderError, QueryGraphDependency,
-    QueryGraphError, RowSink,
+    QueryGraphError, RowCountSink, RowSink,
 };
 use query_structure::{FieldSelection, Placeholder, PrismaValue, PrismaValueType, SelectedField, SelectionResult};
 use thiserror::Error;
@@ -395,7 +395,9 @@ impl<'a, 'b> NodeTranslator<'a, 'b> {
             .incoming_edges(&node)
             .into_iter()
             .filter_map(|edge| {
-                let Some(QueryGraphDependency::DataDependency(_, expectation)) = self.graph.edge_content(&edge) else {
+                let Some(QueryGraphDependency::DataDependency(RowCountSink::Discard, expectation)) =
+                    self.graph.edge_content(&edge)
+                else {
                     return None;
                 };
                 let mut expr = Expression::Get {

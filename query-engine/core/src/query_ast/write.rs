@@ -3,7 +3,7 @@ use super::{FilteredNestedMutation, FilteredQuery};
 use crate::{ReadQuery, RecordQuery, ToGraphviz};
 use connector::NativeUpsert;
 use query_structure::{prelude::*, DatasourceFieldName, Filter, RecordFilter, WriteArgs};
-use std::{borrow::Cow, collections::HashMap};
+use std::{borrow::Cow, collections::HashMap, slice};
 
 #[derive(Debug, Clone)]
 pub enum WriteQuery {
@@ -21,6 +21,17 @@ pub enum WriteQuery {
 }
 
 impl WriteQuery {
+    /// Returns a mutable slice of the write arguments from an underlying INSERT if applicable
+    /// or an empty slice otherwise.
+    pub fn insert_args_mut(&mut self) -> &mut [WriteArgs] {
+        match self {
+            Self::CreateRecord(cr) => slice::from_mut(&mut cr.args),
+            Self::CreateManyRecords(CreateManyRecords { args, .. }) => &mut args[..],
+            Self::Upsert(upsert) => slice::from_mut(upsert.create_mut()),
+            _ => &mut [],
+        }
+    }
+
     /// Takes a SelectionResult and writes its contents into the write arguments of the underlying query.
     pub fn inject_result_into_args(&mut self, result: SelectionResult) {
         let model = self.model();
