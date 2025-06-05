@@ -27,8 +27,6 @@ writes::relations::deeply_nested_self_rel::deep_nested_rel::deep_nested_create_s
 writes::top_level_mutations::create_many::create_many::create_many_error_dups
 writes::top_level_mutations::create::create::gracefully_fails_when_uniq_violation
 writes::top_level_mutations::update_many::update_many::update_max_limit_items
-writes::top_level_mutations::update::update::update_fail_uniq_field_inexistant_value
-writes::top_level_mutations::update::update::update_fails_if_filter_dont_match
 writes::top_level_mutations::upsert::upsert::upsert_fails_if_filter_dont_match
 writes::unchecked_writes::unchecked_create::unchecked_create::allow_writing_inlined_rel_scalars
 writes::unchecked_writes::unchecked_update_spec::unchecked_update::allow_write_non_inline_rels
