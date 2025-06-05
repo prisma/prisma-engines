@@ -1,10 +1,1 @@
-new::interactive_tx::interactive_tx::batch_queries_failure
-new::interactive_tx::interactive_tx::batch_queries_rollback
-new::interactive_tx::interactive_tx::batch_queries_success
-new::interactive_tx::interactive_tx::tx_expiration_failure_cycle
-queries::regressions::prisma_3078::prisma_3078::relation_filter_1_1_a
-queries::regressions::prisma_3078::prisma_3078::relation_filter_1_1_z
-queries::regressions::prisma_3078::prisma_3078::relation_filter_1_m_a
-queries::regressions::prisma_3078::prisma_3078::relation_filter_1_m_z
-queries::regressions::prisma_3078::prisma_3078::relation_filter_n_m_a
-queries::regressions::prisma_3078::prisma_3078::relation_filter_n_m_z
+

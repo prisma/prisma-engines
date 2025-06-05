@@ -1,3 +1,5 @@
+new::interactive_tx::interactive_tx::batch_queries_failure
+new::interactive_tx::interactive_tx::tx_expiration_failure_cycle
 new::regressions::max_integer::max_integer::unfitted_int_should_fail
 new::regressions::prisma_7434::not_in_chunking::not_in_batch_filter
 new::relation_load_strategy::relation_load_strategy::test_create_subquery_join
@@ -11,7 +13,6 @@ new::relation_load_strategy::relation_load_strategy::test_update_subquery_join
 new::relation_load_strategy::relation_load_strategy::test_upsert_subquery_join
 queries::aggregation::group_by::aggregation_group_by::group_by_ordering_sum_aggregation
 queries::chunking::chunking::order_by_aggregation_should_fail
-queries::filters::one2one_regression::one2one_regression::work_with_nulls
 queries::filters::search_filter::search_filter_with_index::throws_error_on_missing_index
 queries::filters::self_relation_regression::sr_regression::all_categories
 writes::ids::byoid::byoid::create_and_return_item_woi_1
@@ -21,11 +22,7 @@ writes::ids::byoid::byoid::nested_create_return_item_woi_2
 writes::nested_mutations::already_converted::nested_connect_inside_update::connect_inside_update::p1_c1req_rel_child_idempotent
 writes::nested_mutations::not_using_schema_base::nested_create_many::nested_create_many::nested_createmany_fail_dups
 writes::relations::compound_fks_mixed_requiredness::compound_fks::one2m_mix_required_writable_readable
-writes::relations::deeply_nested_self_rel::deep_nested_rel::deep_nested_create_should_work
 writes::top_level_mutations::create_many::create_many::create_many_error_dups
 writes::top_level_mutations::create::create::gracefully_fails_when_uniq_violation
 writes::top_level_mutations::update_many::update_many::update_max_limit_items
 writes::top_level_mutations::upsert::upsert::upsert_fails_if_filter_dont_match
-writes::unchecked_writes::unchecked_create::unchecked_create::allow_writing_inlined_rel_scalars
-writes::unchecked_writes::unchecked_update_spec::unchecked_update::allow_write_non_inline_rels
-writes::unchecked_writes::unchecked_update_spec::unchecked_update::allow_write_non_prent_inline_rel_sclrs
