@@ -201,10 +201,10 @@ pub(crate) fn translate_write_query(query: WriteQuery, builder: &dyn QueryBuilde
                 .map(|(field, val)| (field.db_name().into(), FieldInitializer::Value(val.clone())))
                 .collect();
 
-            // Keep track of the operations that are applied to the primary identifier fields.
+            // Keep track of the operations that are applied to the primary identifier or shard key fields.
             // They need to be applied in-memory to the record we intend to return.
             let operations = model
-                .primary_identifier()
+                .shard_aware_primary_identifier()
                 .selections()
                 .filter_map(|field| {
                     Some((
