@@ -4,7 +4,6 @@ new::regressions::prisma_13089::prisma_13097::filtering_with_dollar_values
 new::regressions::prisma_13097::prisma_13097::group_by_boolean_array
 new::regressions::prisma_13097::prisma_13097::group_by_enum_array
 new::regressions::prisma_15177::prisma_15177::repro
-new::regressions::prisma_22971::prisma_22971::test_22971
 new::regressions::prisma_7434::not_in_chunking::not_in_batch_filter
 queries::aggregation::group_by::aggregation_group_by::group_by_ordering_sum_aggregation
 queries::chunking::chunking::order_by_aggregation_should_fail

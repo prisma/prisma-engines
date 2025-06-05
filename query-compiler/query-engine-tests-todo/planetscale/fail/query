@@ -1,5 +1,4 @@
 new::regressions::max_integer::max_integer::unfitted_int_should_fail
-new::regressions::prisma_22971::prisma_22971::test_22971
 new::regressions::prisma_7434::not_in_chunking::not_in_batch_filter
 new::relation_load_strategy::relation_load_strategy::test_create_subquery_join
 new::relation_load_strategy::relation_load_strategy::test_delete_subquery_join

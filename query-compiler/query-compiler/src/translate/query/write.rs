@@ -34,7 +34,7 @@ pub(crate) fn translate_write_query(query: WriteQuery, builder: &dyn QueryBuilde
                 .collect::<BTreeMap<_, _>>();
 
             if let Some(last_insert_id_field) = last_insert_id_field {
-                initializers.insert(last_insert_id_field.name().into(), FieldInitializer::LastInsertId);
+                initializers.insert(last_insert_id_field.db_name().into(), FieldInitializer::LastInsertId);
             }
 
             if let Some(defaults_query) = &select_defaults {
@@ -42,7 +42,7 @@ pub(crate) fn translate_write_query(query: WriteQuery, builder: &dyn QueryBuilde
                 // select query, since they can a part of the primary identifier.
                 for (field, placeholder) in &defaults_query.field_placeholders {
                     let value = FieldInitializer::Value(PrismaValue::Placeholder(placeholder.clone()));
-                    initializers.insert(field.name().into(), value);
+                    initializers.insert(field.db_name().into(), value);
                 }
             }
 
