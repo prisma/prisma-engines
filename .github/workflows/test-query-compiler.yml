@@ -47,7 +47,7 @@ jobs:
             setup_task: dev-planetscale-qc
             ignored_tests_list: query-compiler/query-engine-tests-todo/planetscale/skip
             should_fail_tests_list: query-compiler/query-engine-tests-todo/planetscale/fail
-            relation_load_strategy: '["query"]'
+            relation_load_strategy: '["queryWithJoinSupport"]'
 
           - name: d1
             setup_task: dev-d1-qc

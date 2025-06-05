@@ -387,7 +387,7 @@ impl ConstraintScope {
 }
 
 /// Describes whether a connector supports relation join strategy.
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq)]
 pub enum JoinStrategySupport {
     /// The connector supports it.
     Yes,

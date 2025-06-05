@@ -2,8 +2,8 @@ use std::sync::LazyLock;
 
 use super::*;
 use crate::{ArgumentListLookup, FieldPair, ParsedField, ReadQuery};
-use psl::datamodel_connector::JoinStrategySupport;
-use query_structure::{prelude::*, RelationLoadStrategy};
+use psl::{datamodel_connector::JoinStrategySupport, PreviewFeature};
+use query_structure::{prelude::*, RelationLoadStrategy, RelationLoadStrategyMode};
 use schema::{
     constants::{aggregations::*, args},
     QuerySchema,
@@ -259,16 +259,31 @@ pub(crate) fn get_relation_load_strategy(
     nested_queries: &[ReadQuery],
     query_schema: &QuerySchema,
 ) -> QueryGraphBuilderResult<RelationLoadStrategy> {
-    static DEFAULT_RELATION_LOAD_STRATEGY: LazyLock<Option<RelationLoadStrategy>> = LazyLock::new(|| {
+    static RELATION_LOAD_STRATEGY_MODE: LazyLock<Option<RelationLoadStrategyMode>> = LazyLock::new(|| {
         std::env::var("PRISMA_RELATION_LOAD_STRATEGY")
             .map(|var| var.as_str().try_into().unwrap())
             .ok()
             .or_else(|| option_env!("PRISMA_RELATION_LOAD_STRATEGY").map(|var| var.try_into().unwrap()))
     });
 
-    match query_schema.join_strategy_support() {
-        // Connector and database version supports the `Join` strategy...
-        JoinStrategySupport::Yes => match requested_strategy {
+    let join_strategy_support = query_schema.join_strategy_support();
+
+    let is_unknown_with_join_support = join_strategy_support == JoinStrategySupport::UnknownYet
+        && (
+            // The query compiler is meant to leave preview in Prisma 7 which will no longer
+            // require a runtime check for the join strategy support.
+            query_schema.has_feature(PreviewFeature::QueryCompiler)
+            // Alternatively, the relation load mode can force enable the join strategy support.
+                || matches!(
+                    *RELATION_LOAD_STRATEGY_MODE,
+                    Some(
+                        RelationLoadStrategyMode::JoinWithJoinSupport | RelationLoadStrategyMode::QueryWithJoinSupport
+                    )
+                )
+        );
+
+    match (join_strategy_support, is_unknown_with_join_support) {
+        (JoinStrategySupport::Yes, _) | (_, true) => match requested_strategy {
             // But incoming query cannot be resolved with joins.
             _ if !query_can_be_resolved_with_joins(cursor, nested_queries) => {
                 // So we fallback to the `Query` one.
@@ -278,14 +293,14 @@ pub(crate) fn get_relation_load_strategy(
             Some(RelationLoadStrategy::Query) => Ok(RelationLoadStrategy::Query),
             // Or requested strategy is `Join`.
             Some(RelationLoadStrategy::Join) => Ok(RelationLoadStrategy::Join),
-            // or there's none selected, in which case we check for an envar else `Join`.
-            None => match *DEFAULT_RELATION_LOAD_STRATEGY {
-                Some(rls) => Ok(rls),
-                None => Ok(RelationLoadStrategy::Join),
-            },
+            // or there's none selected, in which case we check the mode
+            None if !RELATION_LOAD_STRATEGY_MODE.is_some_and(RelationLoadStrategyMode::is_query) => {
+                Ok(RelationLoadStrategy::Join)
+            }
+            None => Ok(RelationLoadStrategy::Query),
         },
         // Connector supports `Join` strategy but database version does not...
-        JoinStrategySupport::UnsupportedDbVersion => match requested_strategy {
+        (JoinStrategySupport::UnsupportedDbVersion, _) => match requested_strategy {
             // So we error out if the requested strategy is `Join`.
             Some(RelationLoadStrategy::Join) => Err(QueryGraphBuilderError::InputError(
                 "`relationLoadStrategy: join` is not available for MySQL < 8.0.14 and MariaDB.".into(),
@@ -294,9 +309,10 @@ pub(crate) fn get_relation_load_strategy(
             Some(RelationLoadStrategy::Query) | None => Ok(RelationLoadStrategy::Query),
         },
         // Connectors does not support the join strategy so we always fallback to the `Query` one.
-        JoinStrategySupport::No => Ok(RelationLoadStrategy::Query),
-        // TODO: Resolve the join strategy when initializing the query compiler.
-        JoinStrategySupport::UnknownYet => Ok(RelationLoadStrategy::Query),
+        (JoinStrategySupport::No, _) => Ok(RelationLoadStrategy::Query),
+        (JoinStrategySupport::UnknownYet, _) => {
+            unreachable!("Connector should have resolved the join strategy support by now.")
+        }
     }
 }
 

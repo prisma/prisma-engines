@@ -103,6 +103,40 @@ impl TryFrom<&str> for RelationLoadStrategy {
     }
 }
 
+#[derive(Debug, Copy, Clone, PartialEq, Eq)]
+pub enum RelationLoadStrategyMode {
+    Join,
+    Query,
+    JoinWithJoinSupport,
+    QueryWithJoinSupport,
+}
+
+impl RelationLoadStrategyMode {
+    pub fn is_query(self) -> bool {
+        matches!(
+            self,
+            RelationLoadStrategyMode::Query | RelationLoadStrategyMode::QueryWithJoinSupport
+        )
+    }
+}
+
+impl TryFrom<&str> for RelationLoadStrategyMode {
+    type Error = crate::error::DomainError;
+
+    fn try_from(value: &str) -> crate::Result<Self> {
+        match value {
+            "join" => Ok(Self::Join),
+            "query" => Ok(Self::Query),
+            "joinWithJoinSupport" => Ok(Self::JoinWithJoinSupport),
+            "queryWithJoinSupport" => Ok(Self::QueryWithJoinSupport),
+            _ => Err(DomainError::ConversionFailure(
+                value.to_owned(),
+                "RelationLoadStrategyMode".to_owned(),
+            )),
+        }
+    }
+}
+
 impl std::fmt::Debug for QueryArguments {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_struct("QueryArguments")
