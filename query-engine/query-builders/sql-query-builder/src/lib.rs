@@ -216,7 +216,7 @@ impl<'a, V: Visitor<'a>> QueryBuilder for SqlQueryBuilder<'a, V> {
         mut args: WriteArgs,
         selected_fields: &FieldSelection,
     ) -> Result<CreateRecord, Box<dyn std::error::Error + Send + Sync>> {
-        let id_selection = model.primary_identifier();
+        let id_selection = model.shard_aware_primary_identifier();
 
         let (select_defaults, last_insert_id_field, merge_values) = if self.context.sql_family().is_mysql() {
             let (field_placeholders, query): (Vec<_>, Select<'static>) =
