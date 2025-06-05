@@ -1,4 +1,5 @@
 use crate::prelude::*;
+use itertools::Itertools;
 use psl::parser_database::{walkers, ModelId};
 
 pub type Model = crate::Zipper<ModelId>;
@@ -13,20 +14,44 @@ impl Model {
     /// the identifier is not to be mistaken for a stable, external identifier, but has to be understood as
     /// implementation detail that is used to reason over a fixed set of fields.
     pub fn primary_identifier(&self) -> FieldSelection {
-        let fields: Vec<_> = self
-            .walker()
+        self.primary_identifier_scalars()
+            .map(|id| self.dm.clone().zip(ScalarFieldId::InModel(id)))
+            .collect_vec()
+            .into()
+    }
+
+    fn primary_identifier_scalars(
+        &self,
+    ) -> impl ExactSizeIterator<Item = psl::parser_database::ScalarFieldId> + use<'_> {
+        self.walker()
             .required_unique_criterias()
             .next()
-            .unwrap()
+            .expect("model must have at least one unique criterion")
             .fields()
             .map(|f| {
-                self.dm
-                    .clone()
-                    .zip(ScalarFieldId::InModel(f.as_scalar_field().unwrap().id))
+                f.as_scalar_field()
+                    .expect("primary identifier must consist of scalar fields")
+                    .id
             })
-            .collect();
+    }
 
-        FieldSelection::from(fields)
+    pub fn shard_aware_primary_identifier(&self) -> FieldSelection {
+        let id = self.primary_identifier_scalars().collect_vec();
+
+        let sk = self
+            .walker()
+            .shard_key()
+            .into_iter()
+            .flat_map(|sk| sk.fields())
+            .map(|sf| sf.id)
+            .filter(|sk_field| id.iter().all(|id_field| id_field != sk_field));
+
+        id.iter()
+            .copied()
+            .chain(sk)
+            .map(|id| self.dm.clone().zip(ScalarFieldId::InModel(id)))
+            .collect_vec()
+            .into()
     }
 
     pub fn fields(&self) -> Fields<'_> {

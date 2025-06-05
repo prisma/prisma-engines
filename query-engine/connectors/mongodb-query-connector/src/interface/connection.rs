@@ -148,7 +148,7 @@ impl WriteOperations for MongoDbConnection {
             let record = result.into_iter().next().map(|id| SingleRecord {
                 record: Record::from(id),
                 field_names: selected_fields
-                    .unwrap_or_else(|| model.primary_identifier())
+                    .unwrap_or_else(|| model.shard_aware_primary_identifier())
                     .db_names()
                     .collect(),
             });

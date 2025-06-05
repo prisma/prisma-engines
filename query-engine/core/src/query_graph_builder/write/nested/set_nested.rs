@@ -91,9 +91,9 @@ fn handle_many_to_many(
     parent_relation_field: &RelationFieldRef,
     filter: Filter,
 ) -> QueryGraphBuilderResult<()> {
-    let parent_model_identifier = parent_relation_field.model().primary_identifier();
+    let parent_model_identifier = parent_relation_field.model().shard_aware_primary_identifier();
     let child_model = parent_relation_field.related_model();
-    let child_model_identifier = child_model.primary_identifier();
+    let child_model_identifier = child_model.shard_aware_primary_identifier();
     let read_old_node =
         utils::insert_find_children_by_parent_node(graph, parent_node, parent_relation_field, Filter::empty())?;
 
@@ -219,7 +219,7 @@ fn handle_one_to_many(
     parent_relation_field: &RelationFieldRef,
     filter: Filter,
 ) -> QueryGraphBuilderResult<()> {
-    let child_model_identifier = parent_relation_field.related_model().primary_identifier();
+    let child_model_identifier = parent_relation_field.related_model().shard_aware_primary_identifier();
     let child_link = parent_relation_field.related_field().linking_fields();
     let parent_link = parent_relation_field.linking_fields();
     let empty_child_link = SelectionResult::from(&child_link);

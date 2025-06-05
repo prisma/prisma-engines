@@ -60,14 +60,14 @@ pub(crate) async fn update_one_without_selection(
 
         let record = ids.into_iter().next().map(|id| SingleRecord {
             record: Record::from(id),
-            field_names: model.primary_identifier().db_names().collect_vec(),
+            field_names: model.shard_aware_primary_identifier().db_names().collect_vec(),
         });
 
         return Ok(record);
     }
 
     // Pick the primary identifiers args from the WriteArgs if there are any.
-    let id_args = pick_args(&model.primary_identifier().into(), &args);
+    let id_args = pick_args(&model.shard_aware_primary_identifier().into(), &args);
     // Perform the update and return the ids on which we've applied the update.
     // Note: We are _not_ getting back the ids from the update. Either we got some ids passed from the parent operation or we perform a read _before_ doing the update.
     let filter = record_filter.filter.clone();
@@ -83,7 +83,7 @@ pub(crate) async fn update_one_without_selection(
 
     let record = merged_ids.into_iter().next().map(|id| SingleRecord {
         record: Record::from(id),
-        field_names: model.primary_identifier().db_names().collect(),
+        field_names: model.shard_aware_primary_identifier().db_names().collect(),
     });
 
     Ok(record)
