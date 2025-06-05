@@ -79,7 +79,11 @@ fn handle_many_to_many(
     child_model: &Model,
 ) -> QueryGraphBuilderResult<()> {
     let expected_connects = filter.size();
-    let child_read_query = utils::read_ids_infallible(child_model.clone(), child_model.primary_identifier(), filter);
+    let child_read_query = utils::read_ids_infallible(
+        child_model.clone(),
+        child_model.shard_aware_primary_identifier(),
+        filter,
+    );
     let child_node = graph.create_node(child_read_query);
 
     graph.create_edge(&parent_node, &child_node, QueryGraphDependency::ExecutionOrder)?;
@@ -407,7 +411,10 @@ fn handle_one_to_one_parent_update(
 
         let parent_linking_fields = parent_relation_field.linking_fields();
         let child_linking_fields = parent_relation_field.related_field().linking_fields();
-        let child_model_identifier = parent_relation_field.related_field().model().primary_identifier();
+        let child_model_identifier = parent_relation_field
+            .related_field()
+            .model()
+            .shard_aware_primary_identifier();
 
         graph.create_edge(
             &read_new_child_node,
@@ -494,7 +501,7 @@ fn handle_one_to_one_parent_update(
             ),
         )?;
 
-        let parent_model_identifier = parent_relation_field.model().primary_identifier();
+        let parent_model_identifier = parent_relation_field.model().shard_aware_primary_identifier();
         graph.create_edge(
             &idempotent_check_node,
             &update_parent_node,
@@ -593,7 +600,10 @@ fn handle_one_to_one_parent_create(
 
         let parent_linking_fields = parent_relation_field.linking_fields();
         let child_linking_fields = parent_relation_field.related_field().linking_fields();
-        let child_model_identifier = parent_relation_field.related_field().model().primary_identifier();
+        let child_model_identifier = parent_relation_field
+            .related_field()
+            .model()
+            .shard_aware_primary_identifier();
 
         graph.create_edge(
             &read_new_child_node,

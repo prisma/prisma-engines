@@ -177,7 +177,8 @@ impl FieldSelection {
 
     /// Checks if a given `SelectionResult` belongs to this `FieldSelection`.
     pub fn matches(&self, result: &SelectionResult) -> bool {
-        result.pairs.iter().all(|(rt, _)| self.selections.contains(rt))
+        self.selections()
+            .all(|sf| result.pairs().any(|(result_field, _)| result_field == sf))
     }
 
     /// Merges all given `FieldSelection` a set union of all.

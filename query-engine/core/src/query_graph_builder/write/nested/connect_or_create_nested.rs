@@ -108,7 +108,7 @@ fn handle_many_to_many(
         let filter = extract_unique_filter(where_map, child_model)?;
         let read_node = graph.create_node(utils::read_id_infallible(
             child_model.clone(),
-            child_model.primary_identifier(),
+            child_model.shard_aware_primary_identifier(),
             filter,
         ));
 
@@ -126,7 +126,7 @@ fn handle_many_to_many(
             &read_node,
             &if_node,
             QueryGraphDependency::ProjectedDataSinkDependency(
-                child_model.primary_identifier(),
+                child_model.shard_aware_primary_identifier(),
                 RowSink::AllRows(&IfInput),
                 None,
             ),
@@ -279,7 +279,7 @@ fn one_to_many_inlined_child(
             &read_node,
             &if_node,
             QueryGraphDependency::ProjectedDataSinkDependency(
-                child_model.primary_identifier(),
+                child_model.shard_aware_primary_identifier(),
                 RowSink::AllRows(&IfInput),
                 None,
             ),
@@ -417,7 +417,7 @@ fn one_to_many_inlined_parent(
         &read_node,
         &if_node,
         QueryGraphDependency::ProjectedDataSinkDependency(
-            child_model.primary_identifier(),
+            child_model.shard_aware_primary_identifier(),
             RowSink::AllRows(&IfInput),
             None,
         ),
@@ -557,7 +557,7 @@ fn one_to_one_inlined_parent(
         &read_node,
         &if_node,
         QueryGraphDependency::ProjectedDataSinkDependency(
-            child_model.primary_identifier(),
+            child_model.shard_aware_primary_identifier(),
             RowSink::AllRows(&IfInput),
             None,
         ),
@@ -618,7 +618,7 @@ fn one_to_one_inlined_parent(
             &parent_node,
             &update_parent_node,
             QueryGraphDependency::ProjectedDataDependency(
-                parent_model.primary_identifier(),
+                parent_model.shard_aware_primary_identifier(),
                 Box::new(move |mut update_parent_node, mut parent_ids| {
                     let parent_id = parent_ids.pop().expect("parent id should be present");
 
@@ -736,7 +736,7 @@ fn one_to_one_inlined_child(
     create_data: ParsedInputMap<'_>,
     child_model: &Model,
 ) -> QueryGraphBuilderResult<()> {
-    let child_model_identifier = child_model.primary_identifier();
+    let child_model_identifier = child_model.shard_aware_primary_identifier();
     let parent_link = parent_relation_field.linking_fields();
     let child_link = parent_relation_field.related_field().linking_fields();
     let child_relation_field = parent_relation_field.related_field();
@@ -758,7 +758,7 @@ fn one_to_one_inlined_child(
         &read_new_child_node,
         &if_node,
         QueryGraphDependency::ProjectedDataSinkDependency(
-            child_model.primary_identifier(),
+            child_model.shard_aware_primary_identifier(),
             RowSink::AllRows(&IfInput),
             None,
         ),
