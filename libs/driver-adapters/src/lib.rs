@@ -17,7 +17,7 @@ pub(crate) mod transaction;
 pub(crate) mod types;
 
 use crate::error::DriverAdapterError;
-use quaint::error::{Error as QuaintError, ErrorKind};
+use quaint::error::{DatabaseConstraint, Error as QuaintError, ErrorKind};
 
 #[cfg(target_arch = "wasm32")]
 pub(crate) use wasm::result::AdapterResult;
@@ -42,19 +42,19 @@ impl From<DriverAdapterError> for QuaintError {
             }
             DriverAdapterError::UniqueConstraintViolation { constraint } => {
                 QuaintError::builder(ErrorKind::UniqueConstraintViolation {
-                    constraint: constraint.into(),
+                    constraint: constraint.map_or(DatabaseConstraint::CannotParse, DatabaseConstraint::from),
                 })
                 .build()
             }
             DriverAdapterError::NullConstraintViolation { constraint } => {
                 QuaintError::builder(ErrorKind::NullConstraintViolation {
-                    constraint: constraint.into(),
+                    constraint: constraint.map_or(DatabaseConstraint::CannotParse, DatabaseConstraint::from),
                 })
                 .build()
             }
             DriverAdapterError::ForeignKeyConstraintViolation { constraint } => {
                 QuaintError::builder(ErrorKind::ForeignKeyConstraintViolation {
-                    constraint: constraint.into(),
+                    constraint: constraint.map_or(DatabaseConstraint::CannotParse, DatabaseConstraint::from),
                 })
                 .build()
             }

@@ -56,13 +56,13 @@ pub(crate) enum DriverAdapterError {
         column: Option<String>,
     },
     UniqueConstraintViolation {
-        constraint: DriverAdapterConstraint,
+        constraint: Option<DriverAdapterConstraint>,
     },
     NullConstraintViolation {
-        constraint: DriverAdapterConstraint,
+        constraint: Option<DriverAdapterConstraint>,
     },
     ForeignKeyConstraintViolation {
-        constraint: DriverAdapterConstraint,
+        constraint: Option<DriverAdapterConstraint>,
     },
     DatabaseDoesNotExist {
         db: Option<String>,
