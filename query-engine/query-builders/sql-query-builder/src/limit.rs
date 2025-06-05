@@ -10,7 +10,7 @@ pub fn wrap_with_limit_subquery_if_needed<'a>(
 ) -> ConditionTree<'a> {
     if let Some(limit) = limit {
         let columns = model
-            .primary_identifier()
+            .shard_aware_primary_identifier()
             .as_scalar_fields()
             .expect("primary identifier must contain scalar fields")
             .into_iter()

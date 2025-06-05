@@ -90,7 +90,7 @@ pub fn nested_update(
             utils::insert_find_children_by_parent_node(graph, parent, parent_relation_field, filter.clone())?;
 
         let update_node = update::update_record_node(graph, query_schema, filter, child_model.clone(), data_map, None)?;
-        let child_model_identifier = parent_relation_field.related_model().primary_identifier();
+        let child_model_identifier = parent_relation_field.related_model().shard_aware_primary_identifier();
 
         graph.create_edge(
             &find_child_records_node,
@@ -128,7 +128,7 @@ pub fn nested_update_many(
         let data_value = map.swap_remove(args::DATA).unwrap();
         let data_map: ParsedInputMap<'_> = data_value.try_into()?;
         let where_map: ParsedInputMap<'_> = where_arg.try_into()?;
-        let child_model_identifier = parent_relation_field.related_model().primary_identifier();
+        let child_model_identifier = parent_relation_field.related_model().shard_aware_primary_identifier();
 
         let filter = extract_filter(where_map, child_model)?;
 
