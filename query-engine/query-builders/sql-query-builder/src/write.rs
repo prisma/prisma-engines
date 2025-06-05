@@ -215,7 +215,7 @@ pub fn chunk_update_with_ids(
     filter_condition: ConditionTree<'static>,
     ctx: &Context<'_>,
 ) -> Vec<Query<'static>> {
-    let columns: Vec<_> = ModelProjection::from(model.primary_identifier())
+    let columns: Vec<_> = ModelProjection::from(model.shard_aware_primary_identifier())
         .as_columns(ctx)
         .collect();
 
@@ -307,7 +307,7 @@ pub fn delete_many_from_ids_and_filter(
     limit: Option<usize>,
     ctx: &Context<'_>,
 ) -> Vec<Query<'static>> {
-    let columns: Vec<_> = ModelProjection::from(model.primary_identifier())
+    let columns: Vec<_> = ModelProjection::from(model.shard_aware_primary_identifier())
         .as_columns(ctx)
         .collect();
 
