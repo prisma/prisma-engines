@@ -17,7 +17,7 @@ pub(crate) mod transaction;
 pub(crate) mod types;
 
 use crate::error::DriverAdapterError;
-use quaint::error::{DatabaseConstraint, Error as QuaintError, ErrorKind};
+use quaint::error::{Error as QuaintError, ErrorKind};
 
 #[cfg(target_arch = "wasm32")]
 pub(crate) use wasm::result::AdapterResult;
@@ -40,25 +40,23 @@ impl From<DriverAdapterError> for QuaintError {
             DriverAdapterError::LengthMismatch { column } => {
                 QuaintError::builder(ErrorKind::LengthMismatch { column: column.into() }).build()
             }
-            DriverAdapterError::UniqueConstraintViolation { fields } => {
+            DriverAdapterError::UniqueConstraintViolation { constraint } => {
                 QuaintError::builder(ErrorKind::UniqueConstraintViolation {
-                    constraint: DatabaseConstraint::Fields(fields),
+                    constraint: constraint.into(),
                 })
                 .build()
             }
-            DriverAdapterError::NullConstraintViolation { fields } => {
+            DriverAdapterError::NullConstraintViolation { constraint } => {
                 QuaintError::builder(ErrorKind::NullConstraintViolation {
-                    constraint: DatabaseConstraint::Fields(fields),
+                    constraint: constraint.into(),
                 })
                 .build()
             }
             DriverAdapterError::ForeignKeyConstraintViolation { constraint } => {
-                let constraint = match constraint {
-                    error::DriverAdapterConstraint::Fields(fields) => DatabaseConstraint::Fields(fields),
-                    error::DriverAdapterConstraint::Index(index) => DatabaseConstraint::Index(index),
-                    error::DriverAdapterConstraint::ForeignKey => DatabaseConstraint::ForeignKey,
-                };
-                QuaintError::builder(ErrorKind::ForeignKeyConstraintViolation { constraint }).build()
+                QuaintError::builder(ErrorKind::ForeignKeyConstraintViolation {
+                    constraint: constraint.into(),
+                })
+                .build()
             }
             DriverAdapterError::DatabaseDoesNotExist { db } => {
                 QuaintError::builder(ErrorKind::DatabaseDoesNotExist { db_name: db.into() }).build()
@@ -83,6 +81,12 @@ impl From<DriverAdapterError> for QuaintError {
             }
             DriverAdapterError::TooManyConnections { cause } => {
                 QuaintError::builder(ErrorKind::TooManyConnections(cause.into())).build()
+            }
+            DriverAdapterError::ValueOutOfRange { cause } => {
+                QuaintError::builder(ErrorKind::ValueOutOfRange { message: cause }).build()
+            }
+            DriverAdapterError::MissingFullTextSearchIndex => {
+                QuaintError::builder(ErrorKind::MissingFullTextSearchIndex).build()
             }
             DriverAdapterError::GenericJs { id } => QuaintError::external_error(id),
             #[cfg(feature = "postgresql")]

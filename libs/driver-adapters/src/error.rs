@@ -56,10 +56,10 @@ pub(crate) enum DriverAdapterError {
         column: Option<String>,
     },
     UniqueConstraintViolation {
-        fields: Vec<String>,
+        constraint: DriverAdapterConstraint,
     },
     NullConstraintViolation {
-        fields: Vec<String>,
+        constraint: DriverAdapterConstraint,
     },
     ForeignKeyConstraintViolation {
         constraint: DriverAdapterConstraint,
@@ -87,6 +87,10 @@ pub(crate) enum DriverAdapterError {
     TooManyConnections {
         cause: String,
     },
+    ValueOutOfRange {
+        cause: String,
+    },
+    MissingFullTextSearchIndex,
     #[cfg(feature = "postgresql")]
     #[serde(rename = "postgres")]
     Postgres(#[serde(with = "PostgresErrorDef")] PostgresError),
@@ -104,4 +108,14 @@ pub(crate) enum DriverAdapterConstraint {
     Fields(Vec<String>),
     Index(String),
     ForeignKey,
+}
+
+impl From<DriverAdapterConstraint> for quaint::error::DatabaseConstraint {
+    fn from(value: DriverAdapterConstraint) -> Self {
+        match value {
+            DriverAdapterConstraint::Fields(fields) => quaint::error::DatabaseConstraint::Fields(fields),
+            DriverAdapterConstraint::Index(index) => quaint::error::DatabaseConstraint::Index(index),
+            DriverAdapterConstraint::ForeignKey => quaint::error::DatabaseConstraint::ForeignKey,
+        }
+    }
 }
