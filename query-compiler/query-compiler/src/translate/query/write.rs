@@ -30,11 +30,11 @@ pub(crate) fn translate_write_query(query: WriteQuery, builder: &dyn QueryBuilde
 
             let mut initializers = merge_values
                 .into_iter()
-                .map(|(field, value)| (field.prisma_name().into_owned(), FieldInitializer::Value(value)))
+                .map(|(field, value)| (field.db_name().into(), FieldInitializer::Value(value)))
                 .collect::<BTreeMap<_, _>>();
 
             if let Some(last_insert_id_field) = last_insert_id_field {
-                initializers.insert(last_insert_id_field.name().into(), FieldInitializer::LastInsertId);
+                initializers.insert(last_insert_id_field.db_name().into(), FieldInitializer::LastInsertId);
             }
 
             if let Some(defaults_query) = &select_defaults {
@@ -42,7 +42,7 @@ pub(crate) fn translate_write_query(query: WriteQuery, builder: &dyn QueryBuilde
                 // select query, since they can a part of the primary identifier.
                 for (field, placeholder) in &defaults_query.field_placeholders {
                     let value = FieldInitializer::Value(PrismaValue::Placeholder(placeholder.clone()));
-                    initializers.insert(field.name().into(), value);
+                    initializers.insert(field.db_name().into(), value);
                 }
             }
 
@@ -70,7 +70,7 @@ pub(crate) fn translate_write_query(query: WriteQuery, builder: &dyn QueryBuilde
                     Binding::new(
                         ph.name,
                         Expression::MapField {
-                            field: field.name().into(),
+                            field: field.db_name().into(),
                             records: get_defaults.into(),
                         },
                     )
@@ -184,7 +184,7 @@ pub(crate) fn translate_write_query(query: WriteQuery, builder: &dyn QueryBuilde
                 .expect("should have exactly one selector")
                 .pairs
                 .iter()
-                .map(|(field, val)| (field.prisma_name().into_owned(), FieldInitializer::Value(val.clone())))
+                .map(|(field, val)| (field.db_name().into(), FieldInitializer::Value(val.clone())))
                 .collect();
 
             // Keep track of the operations that are applied to the primary identifier fields.
@@ -194,7 +194,7 @@ pub(crate) fn translate_write_query(query: WriteQuery, builder: &dyn QueryBuilde
                 .selections()
                 .filter_map(|field| {
                     Some((
-                        field.prisma_name().into_owned(),
+                        field.db_name().into(),
                         FieldOperation::try_from(args.get_field_value(&field.db_name())?.as_scalar()?.clone())
                             .expect("arg value should be convertible to FieldOperation"),
                     ))

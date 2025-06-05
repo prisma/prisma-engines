@@ -150,7 +150,7 @@ pub(super) fn add_inmemory_join(
         .map(|sf| Binding {
             name: binding::join_parent_field(&sf),
             expr: Expression::MapField {
-                field: sf.name().to_owned(),
+                field: sf.db_name().into(),
                 records: Box::new(Expression::Get {
                     name: binding::join_parent(),
                 }),
@@ -190,7 +190,7 @@ pub(super) fn add_inmemory_join(
                 is_relation_unique: join.is_relation_unique,
                 on: left_scalars
                     .into_iter()
-                    .map(|sf| sf.name().to_owned())
+                    .map(|sf| sf.db_name().into())
                     .zip(join.into_fields())
                     .collect(),
                 parent_field: parent_field_name,
@@ -347,7 +347,7 @@ fn build_read_one2m_query(
                 .related_field()
                 .left_scalars()
                 .iter()
-                .map(|sf| sf.name().to_owned())
+                .map(|sf| sf.db_name().into())
                 .collect(),
             is_relation_unique: !field.arity().is_list(),
         },
