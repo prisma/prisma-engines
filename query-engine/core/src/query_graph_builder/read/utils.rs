@@ -28,7 +28,7 @@ pub fn collect_selected_fields(
     model: &Model,
     query_schema: &QuerySchema,
 ) -> QueryGraphBuilderResult<FieldSelection> {
-    let model_id = model.primary_identifier();
+    let model_id = model.shard_aware_primary_identifier();
     let selected_fields = pairs_to_selections(model, from_pairs, query_schema)?;
 
     let selection = FieldSelection::new(selected_fields);
@@ -45,7 +45,7 @@ pub fn collect_selected_fields(
 /// Creates a `FieldSelection` from a query selection, which contains only scalar fields.
 /// Automatically adds model IDs to the selected fields as well.
 pub fn collect_selected_scalars(from_pairs: &[FieldPair<'_>], model: &Model) -> FieldSelection {
-    let model_id = model.primary_identifier();
+    let model_id = model.shard_aware_primary_identifier();
     let selected_fields = pairs_to_scalar_selections(model, from_pairs);
     let selection = FieldSelection::new(selected_fields);
 
