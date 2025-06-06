@@ -105,9 +105,15 @@ impl TryFrom<&str> for RelationLoadStrategy {
 
 #[derive(Debug, Copy, Clone, PartialEq, Eq)]
 pub enum RelationLoadStrategyMode {
+    /// Use join as the default strategy.
     Join,
+    /// Use query as the default strategy.
     Query,
+    /// Use join as the default strategy and additionally allow support for databases that
+    /// would normally require a runtime check (MySQL).
     JoinWithJoinSupport,
+    /// Use query as the default strategy and additionally allow support for databases that
+    /// would normally require a runtime check (MySQL).
     QueryWithJoinSupport,
 }
 
