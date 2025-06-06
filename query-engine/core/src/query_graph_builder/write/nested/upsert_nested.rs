@@ -102,7 +102,7 @@ pub fn nested_upsert(
     value: ParsedInputValue<'_>,
 ) -> QueryGraphBuilderResult<()> {
     let child_model = parent_relation_field.related_model();
-    let child_model_identifier = child_model.primary_identifier();
+    let child_model_identifier = child_model.shard_aware_primary_identifier();
 
     for value in coerce_vec(value) {
         let parent_link = parent_relation_field.linking_fields();
@@ -211,7 +211,7 @@ pub fn nested_upsert(
             connect::connect_records_node(graph, &parent_node, &create_node, parent_relation_field, 1)?;
         } else if parent_relation_field.is_inlined_on_enclosing_model() {
             let parent_model = parent_relation_field.model();
-            let parent_model_id = parent_model.primary_identifier();
+            let parent_model_id = parent_model.shard_aware_primary_identifier();
             let update_node = utils::update_records_node_placeholder(graph, filter, parent_model.clone());
 
             // Edge to retrieve the finder
