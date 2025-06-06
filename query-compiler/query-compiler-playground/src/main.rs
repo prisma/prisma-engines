@@ -24,6 +24,7 @@ pub fn main() -> anyhow::Result<()> {
         SqlFamily::Postgres,
         "public".to_owned(),
         None,
+        true,
     ));
 
     // prisma.user.findUnique({
