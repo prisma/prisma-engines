@@ -26,6 +26,7 @@ fn queries() {
             SqlFamily::Postgres,
             "public".to_owned(),
             None,
+            true,
         ));
 
         let query = fs::read_to_string(path).unwrap();

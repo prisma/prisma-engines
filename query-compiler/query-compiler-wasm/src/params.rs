@@ -10,6 +10,7 @@ use serde::Deserialize;
 pub struct JsConnectionInfo {
     pub schema_name: Option<String>,
     pub max_bind_values: Option<u32>,
+    pub supports_relation_joins: bool,
 }
 
 impl JsConnectionInfo {
@@ -21,6 +22,7 @@ impl JsConnectionInfo {
             sql_family,
             schema_name.to_owned(),
             self.max_bind_values.map(|v| v as usize),
+            self.supports_relation_joins,
         )
     }
 
