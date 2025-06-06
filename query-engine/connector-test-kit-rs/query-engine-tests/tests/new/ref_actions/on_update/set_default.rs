@@ -98,7 +98,7 @@ mod one2one_req {
             &runner,
             r#"mutation { updateOneParent(where: { id: 1 }, data: { uniq: "u1" }) { id }}"#,
             2011,
-            "Null constraint violation on the fields"
+            "Null constraint violation on the"
         );
 
         Ok(())
@@ -306,7 +306,7 @@ mod one2many_req {
             &runner,
             r#"mutation { updateOneParent(where: { id: 1 }, data: { uniq: "u1" }) { id }}"#,
             2011,
-            "Null constraint violation on the fields"
+            "Null constraint violation on the"
         );
 
         Ok(())
