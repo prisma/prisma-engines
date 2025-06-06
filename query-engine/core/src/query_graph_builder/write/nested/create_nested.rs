@@ -60,7 +60,7 @@ pub fn nested_create(
     if should_use_bulk_create {
         // Create all child records in a single query.
         let selected_fields = if relation.is_many_to_many() {
-            let selected_fields = child_model.primary_identifier();
+            let selected_fields = child_model.shard_aware_primary_identifier();
             let selection_order = selected_fields.db_names().collect();
             Some(CreateManyRecordsFields {
                 fields: selected_fields,
@@ -547,7 +547,7 @@ fn handle_one_to_one(
             &parent_node,
             &update_node,
             QueryGraphDependency::ProjectedDataDependency(
-                parent_relation_field.model().primary_identifier(),
+                parent_relation_field.model().shard_aware_primary_identifier(),
                 Box::new(move |mut update_node, mut parent_ids| {
                     let parent_id = parent_ids.pop().expect("parent id should be present");
 

@@ -42,8 +42,8 @@ pub(crate) fn connect_records_node(
 ) -> QueryGraphBuilderResult<NodeRef> {
     assert!(parent_relation_field.relation().is_many_to_many());
 
-    let parent_model_id = parent_relation_field.model().primary_identifier();
-    let child_model_id = parent_relation_field.related_model().primary_identifier();
+    let parent_model_id = parent_relation_field.model().shard_aware_primary_identifier();
+    let child_model_id = parent_relation_field.related_model().shard_aware_primary_identifier();
 
     let connect = WriteQuery::ConnectRecords(ConnectRecords {
         parent_id: None,
