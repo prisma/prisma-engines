@@ -302,6 +302,10 @@ impl Connector for MySqlDatamodelConnector {
             false => JoinStrategySupport::No,
         }
     }
+
+    fn supports_shard_keys(&self) -> bool {
+        true
+    }
 }
 
 /// Removes newlines from a base64 string.

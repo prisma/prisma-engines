@@ -104,7 +104,7 @@ fn id_must_error_when_multi_field_is_referring_to_undefined_fields() {
     "#};
 
     let expectation = expect![[r#"
-        [1;91merror[0m: [1mError validating model "Model": The multi field id declaration refers to the unknown fields c.[0m
+        [1;91merror[0m: [1mError validating model "Model": The multi field id declaration refers to the unknown field `c`.[0m
           [1;94m-->[0m  [4mschema.prisma:5[0m
         [1;94m   | [0m
         [1;94m 4 | [0m
@@ -131,7 +131,7 @@ fn relation_fields_as_part_of_compound_id_must_error() {
     "#};
 
     let expectation = expect![[r#"
-        [1;91merror[0m: [1mError validating model "User": The id definition refers to the relation fields identification. ID definitions must reference only scalar fields.[0m
+        [1;91merror[0m: [1mError validating model "User": The id definition refers to the relation field `identification`. ID definitions must reference only scalar fields.[0m
           [1;94m-->[0m  [4mschema.prisma:5[0m
         [1;94m   | [0m
         [1;94m 4 | [0m
@@ -155,7 +155,7 @@ fn must_error_when_multi_field_is_referring_fields_that_are_not_required() {
     "#};
 
     let expectation = expect![[r#"
-        [1;91merror[0m: [1mError validating model "Model": The id definition refers to the optional fields b, c. ID definitions must reference only required fields.[0m
+        [1;91merror[0m: [1mError validating model "Model": The id definition refers to the optional fields `b`, `c`. ID definitions must reference only required fields.[0m
           [1;94m-->[0m  [4mschema.prisma:6[0m
         [1;94m   | [0m
         [1;94m 5 | [0m

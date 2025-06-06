@@ -343,6 +343,8 @@ pub(crate) struct ModelAttributes {
     ///          ^^^^^^^^
     /// ```
     pub(crate) schema: Option<(StringId, ast::Span)>,
+    /// @(@)shardKey
+    pub(crate) shard_key: Option<ShardKeyAttribute>,
 }
 
 /// A type of index as defined by the `type: ...` argument on an index attribute.
@@ -503,6 +505,13 @@ pub(crate) struct IdAttribute {
     pub(super) name: Option<StringId>,
     pub(super) mapped_name: Option<StringId>,
     pub(super) clustered: Option<bool>,
+}
+
+#[derive(Debug)]
+pub(crate) struct ShardKeyAttribute {
+    pub(crate) fields: Vec<ScalarFieldId>,
+    pub(super) source_field: Option<ast::FieldId>,
+    pub(super) source_attribute: crate::AttributeId,
 }
 
 /// Defines a path to a field that is not directly in the model.

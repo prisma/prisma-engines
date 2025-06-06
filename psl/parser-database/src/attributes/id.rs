@@ -1,7 +1,7 @@
 use super::{FieldResolutionError, FieldResolvingSetup};
 use crate::{
     ast::{self, WithName, WithSpan},
-    attributes::resolve_field_array_with_args,
+    attributes::{format_fields_in_error_with_leading_word, resolve_field_array_with_args},
     coerce,
     context::Context,
     types::{FieldWithArgs, IdAttribute, IndexFieldPath, ModelAttributes, ScalarField, SortOrder},
@@ -27,7 +27,7 @@ pub(super) fn model(model_data: &mut ModelAttributes, model_id: crate::ModelId, 
             relation_fields,
         }) => {
             if !unresolvable_fields.is_empty() {
-                let fields_str = unresolvable_fields
+                let field_names = unresolvable_fields
                     .into_iter()
                     .map(|((file_id, top_id), field_name)| match top_id {
                         ast::TopId::CompositeType(ctid) => {
@@ -37,25 +37,28 @@ pub(super) fn model(model_data: &mut ModelAttributes, model_id: crate::ModelId, 
                         }
                         ast::TopId::Model(_) => Cow::from(field_name),
                         _ => unreachable!(),
-                    })
-                    .collect::<Vec<_>>()
-                    .join(", ");
+                    });
 
-                let msg = format!("The multi field id declaration refers to the unknown fields {fields_str}.");
-                let error =
-                    DatamodelError::new_model_validation_error(&msg, "model", ctx.asts[model_id].name(), fields.span());
+                let msg = format!(
+                    "The multi field id declaration refers to the unknown {}.",
+                    format_fields_in_error_with_leading_word(field_names)
+                );
 
-                ctx.push_error(error);
+                ctx.push_error(DatamodelError::new_model_validation_error(
+                    &msg,
+                    "model",
+                    ctx.asts[model_id].name(),
+                    fields.span(),
+                ));
             }
 
             if !relation_fields.is_empty() {
-                let field_names = relation_fields
-                    .iter()
-                    .map(|(f, _)| f.name())
-                    .collect::<Vec<_>>()
-                    .join(", ");
+                let field_names = relation_fields.iter().map(|(f, _)| f.name());
 
-                let msg = format!("The id definition refers to the relation fields {field_names}. ID definitions must reference only scalar fields.");
+                let msg = format!(
+                    "The id definition refers to the relation {}. ID definitions must reference only scalar fields.",
+                    format_fields_in_error_with_leading_word(field_names)
+                );
 
                 ctx.push_error(DatamodelError::new_model_validation_error(
                     &msg,
@@ -97,11 +100,11 @@ pub(super) fn model(model_data: &mut ModelAttributes, model_id: crate::ModelId, 
         })
         .collect();
 
-    if !fields_that_are_not_required.is_empty() {
+    if !fields_that_are_not_required.is_empty() && !model_data.is_ignored {
         ctx.push_error(DatamodelError::new_model_validation_error(
             &format!(
-                "The id definition refers to the optional fields {}. ID definitions must reference only required fields.",
-                fields_that_are_not_required.join(", ")
+                "The id definition refers to the optional {}. ID definitions must reference only required fields.",
+                format_fields_in_error_with_leading_word(fields_that_are_not_required)
             ),
             "model",
             ast_model.name(),
@@ -197,6 +200,8 @@ pub(super) fn field<'db>(
     }
 }
 
+// This has to be a separate step because we don't have the model attributes
+// (which may include `@@ignored`) collected yet when we process field attributes.
 pub(super) fn validate_id_field_arities(
     model_id: crate::ModelId,
     model_attributes: &ModelAttributes,
@@ -206,9 +211,7 @@ pub(super) fn validate_id_field_arities(
         return;
     }
 
-    let pk = if let Some(pk) = &model_attributes.primary_key {
-        pk
-    } else {
+    let Some(pk) = &model_attributes.primary_key else {
         return;
     };
 
@@ -218,7 +221,7 @@ pub(super) fn validate_id_field_arities(
         return;
     };
 
-    if let ast::FieldArity::List | ast::FieldArity::Optional = ast_field.arity {
+    if !ast_field.arity.is_required() {
         ctx.push_error(DatamodelError::new_attribute_validation_error(
             "Fields that are marked as id must be required.",
             "@id",

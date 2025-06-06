@@ -4,6 +4,7 @@ use crate::{
     diagnostics::DatamodelError,
     parser_database::ast::{WithName, WithSpan},
     validate::validation_pipeline::context::Context,
+    PreviewFeature,
 };
 use parser_database::walkers::{ModelWalker, PrimaryKeyWalker};
 use std::{borrow::Cow, collections::HashMap};
@@ -235,14 +236,17 @@ pub(super) fn connector_specific(model: ModelWalker<'_>, ctx: &mut Context<'_>) 
 }
 
 pub(super) fn id_has_fields(model: ModelWalker<'_>, ctx: &mut Context<'_>) {
-    let id = if let Some(id) = model.primary_key() { id } else { return };
+    let Some(id) = model.primary_key() else { return };
 
     if id.fields().len() > 0 {
         return;
     }
 
     ctx.push_error(DatamodelError::new_attribute_validation_error(
-        "The list of fields in an `@@id()` attribute cannot be empty. Please specify at least one field.",
+        &format!(
+            "The list of fields in an `{}()` attribute cannot be empty. Please specify at least one field.",
+            id.attribute_name()
+        ),
         id.attribute_name(),
         id.ast_attribute().span,
     ))
@@ -407,6 +411,46 @@ pub(super) fn multischema_feature_flag_needed(model: ModelWalker<'_>, ctx: &mut 
         ctx.push_error(DatamodelError::new_static(
             "@@schema is only available with the `multiSchema` preview feature.",
             span,
+        ));
+    }
+}
+
+pub(super) fn shard_key_has_fields(model: ModelWalker<'_>, ctx: &mut Context<'_>) {
+    let Some(shard_key) = model.shard_key() else { return };
+
+    if shard_key.fields().len() > 0 {
+        return;
+    }
+
+    ctx.push_error(DatamodelError::new_attribute_validation_error(
+        &format!(
+            "The list of fields in a `{}()` attribute cannot be empty. Please specify at least one field.",
+            shard_key.attribute_name()
+        ),
+        shard_key.attribute_name(),
+        shard_key.ast_attribute().span,
+    ))
+}
+
+pub(super) fn shard_key_is_supported(model: ModelWalker<'_>, ctx: &mut Context<'_>) {
+    let Some(shard_key) = model.shard_key() else { return };
+
+    if !ctx.preview_features.contains(PreviewFeature::ShardKeys) {
+        ctx.push_error(DatamodelError::new_attribute_validation_error(
+            "Defining shard keys requires enabling the `shardKeys` preview feature",
+            shard_key.attribute_name(),
+            shard_key.ast_attribute().span,
+        ));
+    }
+
+    if !ctx.connector.supports_shard_keys() {
+        ctx.push_error(DatamodelError::new_attribute_validation_error(
+            &format!(
+                "Shard keys are not currently supported for provider {}",
+                ctx.connector.provider_name()
+            ),
+            shard_key.attribute_name(),
+            shard_key.ast_attribute().span,
         ));
     }
 }

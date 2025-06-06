@@ -1,0 +1,21 @@
+datasource db {
+  provider = "mysql"
+  url      = env("url")
+}
+
+generator client {
+  provider        = "prisma-client"
+  previewFeatures = ["shardKeys"]
+}
+
+model Post {
+  title  String @id
+  region String @shardKey(type: "string")
+}
+
+// [1;91merror[0m: [1mNo such argument.[0m
+//   [1;94m-->[0m  [4mschema.prisma:13[0m
+// [1;94m   | [0m
+// [1;94m12 | [0m  title  String @id
+// [1;94m13 | [0m  region String @shardKey([1;91mtype: "string"[0m)
+// [1;94m   | [0m

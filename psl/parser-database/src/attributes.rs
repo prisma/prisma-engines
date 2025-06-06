@@ -3,6 +3,7 @@ mod id;
 mod map;
 mod native_types;
 mod schema;
+mod shard_key;
 
 use crate::{
     ast::{self, WithName, WithSpan},
@@ -16,7 +17,8 @@ use crate::{
     DatamodelError, ScalarFieldId, StringId,
 };
 use diagnostics::Span;
-use std::borrow::Cow;
+use itertools::Itertools;
+use std::{borrow::Cow, cell::Cell, fmt::Display};
 
 pub(super) fn resolve_attributes(ctx: &mut Context<'_>) {
     for rfid in ctx.types.iter_relation_field_ids() {
@@ -175,8 +177,15 @@ fn resolve_model_attributes(model_id: crate::ModelId, ctx: &mut Context<'_>) {
         ctx.validate_visited_arguments();
     }
 
+    // @@shardKey
+    if ctx.visit_optional_single_attr("shardKey") {
+        shard_key::model(&mut model_attributes, model_id, ctx);
+        ctx.validate_visited_arguments();
+    }
+
     // Model-global validations
     id::validate_id_field_arities(model_id, &model_attributes, ctx);
+    shard_key::validate_shard_key_field_arities(model_id, &model_attributes, ctx);
 
     ctx.types.model_attributes.insert(model_id, model_attributes);
     ctx.validate_visited_attributes();
@@ -262,6 +271,12 @@ fn visit_scalar_field_attributes(
     // @unique
     if ctx.visit_optional_single_attr("unique") {
         visit_field_unique(scalar_field_id, model_data, ctx);
+        ctx.validate_visited_arguments();
+    }
+
+    // @shardKey
+    if ctx.visit_optional_single_attr("shardKey") {
+        shard_key::field(ast_model, scalar_field_id, field_id, model_data, ctx);
         ctx.validate_visited_arguments();
     }
 
@@ -1101,4 +1116,37 @@ fn validate_client_name(span: Span, object_name: &str, name: StringId, attribute
 fn validate_clustering_setting(ctx: &mut Context<'_>) -> Option<bool> {
     ctx.visit_optional_arg("clustered")
         .and_then(|sort| coerce::boolean(sort, ctx.diagnostics))
+}
+
+fn format_fields_in_error_with_leading_word<'a>(
+    fields: impl IntoIterator<IntoIter: ExactSizeIterator<Item = impl Display + 'a> + 'a>,
+) -> impl Display + 'a {
+    struct Format<I>(Cell<Option<I>>);
+
+    impl<F, I> Display for Format<I>
+    where
+        F: Display,
+        I: IntoIterator<IntoIter: ExactSizeIterator<Item = F>>,
+    {
+        fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+            let Some(iter) = self.0.take().map(<_>::into_iter) else {
+                panic!("`format_fields_in_error_with_leading_word` result can only be formatted once")
+            };
+            write!(f, "field")?;
+            if iter.len() > 1 {
+                write!(f, "s")?;
+            }
+            write!(f, " {}", iter.map(Field).format(", "))
+        }
+    }
+
+    struct Field<D>(D);
+
+    impl<D: Display> Display for Field<D> {
+        fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+            write!(f, "`{}`", self.0)
+        }
+    }
+
+    Format(Cell::new(Some(fields.into_iter())))
 }

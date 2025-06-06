@@ -1,0 +1,23 @@
+datasource db {
+  provider = "mysql"
+  url      = env("url")
+}
+
+generator client {
+  provider        = "prisma-client"
+  previewFeatures = ["shardKeys"]
+}
+
+model A {
+  a String  @id
+  b String?
+
+  @@shardKey([a, b])
+}
+
+// [1;91merror[0m: [1mError validating model "A": The shard key definition refers to the optional field `b`. Shard key definitions must reference only required fields.[0m
+//   [1;94m-->[0m  [4mschema.prisma:15[0m
+// [1;94m   | [0m
+// [1;94m14 | [0m
+// [1;94m15 | [0m  [1;91m@@shardKey([a, b])[0m
+// [1;94m   | [0m

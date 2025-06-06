@@ -1,0 +1,21 @@
+datasource db {
+  provider = "mysql"
+  url      = env("url")
+}
+
+generator client {
+  provider        = "prisma-client"
+  previewFeatures = ["shardKeys"]
+}
+
+model A {
+  a String  @id
+  b String? @shardKey
+}
+
+// [1;91merror[0m: [1mError parsing attribute "@shardKey": Fields that are marked as shard keys must be required.[0m
+//   [1;94m-->[0m  [4mschema.prisma:13[0m
+// [1;94m   | [0m
+// [1;94m12 | [0m  a String  @id
+// [1;94m13 | [0m  b String? [1;91m@shardKey[0m
+// [1;94m   | [0m

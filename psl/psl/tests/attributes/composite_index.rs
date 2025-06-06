@@ -462,7 +462,7 @@ fn id_cannot_use_composite_fields() {
     let error = parse_unwrap_err(&dml);
 
     let expected = expect![[r#"
-        [1;91merror[0m: [1mError validating model "B": The multi field id declaration refers to the unknown fields a.id.[0m
+        [1;91merror[0m: [1mError validating model "B": The multi field id declaration refers to the unknown field `a.id`.[0m
           [1;94m-->[0m  [4mschema.prisma:18[0m
         [1;94m   | [0m
         [1;94m17 | [0m

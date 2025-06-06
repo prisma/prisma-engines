@@ -1,0 +1,29 @@
+datasource db {
+  provider = "mysql"
+  url      = env("url")
+}
+
+generator client {
+  provider        = "prisma-client"
+  previewFeatures = ["shardKeys"]
+}
+
+model User {
+  id               Int @id
+  identificationId Int
+
+  identification Identification @relation(fields: [identificationId], references: [id])
+
+  @@shardKey([identification])
+}
+
+model Identification {
+  id Int @id
+}
+
+// [1;91merror[0m: [1mError validating model "User": The shard key definition refers to the relation field `identification`. Shard key definitions must reference only scalar fields.[0m
+//   [1;94m-->[0m  [4mschema.prisma:17[0m
+// [1;94m   | [0m
+// [1;94m16 | [0m
+// [1;94m17 | [0m  [1;91m@@shardKey([identification])[0m
+// [1;94m   | [0m
