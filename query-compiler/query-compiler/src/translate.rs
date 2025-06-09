@@ -13,7 +13,9 @@ use query_core::{
     Computation, EdgeRef, Flow, Node, NodeRef, Query, QueryGraph, QueryGraphBuilderError, QueryGraphDependency,
     QueryGraphError, RowCountSink, RowSink,
 };
-use query_structure::{FieldSelection, Placeholder, PrismaValue, PrismaValueType, SelectedField, SelectionResult};
+use query_structure::{
+    FieldSelection, Placeholder, PrismaValue, PrismaValueType, ScalarFieldResultType, SelectedField, SelectionResult,
+};
 use thiserror::Error;
 
 #[derive(Debug, Error)]
@@ -502,10 +504,22 @@ impl<'a, 'b> NodeTranslator<'a, 'b> {
         selection: FieldSelection,
     ) -> Vec<(SelectedField, PrismaValue)> {
         let bindings_refer_to_fields = matches!(node, Node::Query(_));
+        let binding_is_unique = matches!(node, Node::Query(q) if q.is_unique());
 
         selection
             .selections()
             .map(|field| {
+                let r#type = field
+                    .result_type()
+                    .as_ref()
+                    .map(ScalarFieldResultType::to_prisma_type)
+                    .unwrap_or(PrismaValueType::Any);
+                let r#type = if binding_is_unique {
+                    r#type
+                } else {
+                    PrismaValueType::Array(r#type.into())
+                };
+
                 (
                     field.clone(),
                     PrismaValue::Placeholder(Placeholder {
@@ -514,7 +528,7 @@ impl<'a, 'b> NodeTranslator<'a, 'b> {
                         } else {
                             binding::node_result(self.graph.edge_source(edge))
                         },
-                        r#type: PrismaValueType::Any,
+                        r#type,
                     }),
                 )
             })

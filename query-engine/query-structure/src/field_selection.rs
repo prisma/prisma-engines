@@ -1,7 +1,7 @@
 use crate::{
     parent_container::ParentContainer, prisma_value_ext::PrismaValueExtensions, CompositeFieldRef, DomainError, Field,
-    Filter, Model, ModelProjection, QueryArguments, RelationField, RelationFieldRef, ScalarField, ScalarFieldRef,
-    SelectionResult, Type, TypeIdentifier,
+    Filter, InternalDataModel, Model, ModelProjection, QueryArguments, RelationField, RelationFieldRef, ScalarField,
+    ScalarFieldRef, ScalarFieldResultType, SelectionResult, Type, TypeIdentifier,
 };
 use itertools::Itertools;
 use prisma_value::PrismaValue;
@@ -437,6 +437,17 @@ impl SelectedField {
         }
     }
 
+    pub fn result_type(&self) -> Option<ScalarFieldResultType> {
+        let (typ, arity) = self.type_identifier_with_arity()?;
+        let dm = self.datamodel();
+
+        Some(ScalarFieldResultType {
+            typ: dm.clone().zip(typ),
+            arity,
+            native_type: self.as_scalar().and_then(ScalarField::native_type),
+        })
+    }
+
     /// Returns the type identifier and arity of this field, unless it is a composite field, in
     /// which case [`None`] is returned.
     ///
@@ -496,6 +507,15 @@ impl SelectedField {
     /// Returns `true` if the selected field is [`Scalar`].
     pub fn is_scalar(&self) -> bool {
         matches!(self, Self::Scalar(..))
+    }
+
+    fn datamodel(&self) -> &InternalDataModel {
+        match self {
+            SelectedField::Scalar(sf) => &sf.dm,
+            SelectedField::Composite(cs) => &cs.field.dm,
+            SelectedField::Relation(rs) => &rs.field.dm,
+            SelectedField::Virtual(vs) => &vs.relation_field().dm,
+        }
     }
 }
 

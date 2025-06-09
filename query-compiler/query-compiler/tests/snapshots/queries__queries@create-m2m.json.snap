@@ -44,7 +44,7 @@ transaction
                    2$id = mapField id (get 2)
                in execute «INSERT INTO "public"."_CategoryToPost" ("B","A")
                            VALUES [($1)] ON CONFLICT DO NOTHING»
-                  params [product(var(1$id as Any), var(2$id as Any))];
+                  params [product(var(1$id as Int[]), var(2$id as Int[]))];
       let 4 = let 0 = validate (get 0)
                   [ rowCountNeq 0
                   ] orRaise "MISSING_RECORD";

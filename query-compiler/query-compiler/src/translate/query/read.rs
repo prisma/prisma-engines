@@ -374,7 +374,11 @@ fn extract_pagination(args: &mut QueryArguments) -> Pagination {
             .map(|(sf, val)| (sf.db_name().into_owned(), val.clone()))
             .collect()
     });
-    Pagination::new(cursor, args.take.abs(), args.skip)
+    Pagination::builder()
+        .maybe_cursor(cursor)
+        .maybe_take(args.take.abs())
+        .maybe_skip(args.skip)
+        .build()
 }
 
 fn extract_distinct_by(args: &mut QueryArguments) -> Vec<String> {

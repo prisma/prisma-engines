@@ -2,7 +2,7 @@
 use super::FilteredQuery;
 use crate::ToGraphviz;
 use enumflags2::BitFlags;
-use query_structure::{prelude::*, AggregationSelection, Filter, QueryArguments, RelationLoadStrategy};
+use query_structure::{prelude::*, AggregationSelection, Filter, QueryArguments, RelationLoadStrategy, Take};
 use std::fmt::Display;
 
 #[allow(clippy::enum_variant_names)]
@@ -15,6 +15,16 @@ pub enum ReadQuery {
 }
 
 impl ReadQuery {
+    /// Returns true if the query is expected to return a single record.
+    pub fn is_unique(&self) -> bool {
+        match self {
+            ReadQuery::RecordQuery(_) => true,
+            ReadQuery::ManyRecordsQuery(q) => q.args.take == Take::One,
+            ReadQuery::RelatedRecordsQuery(q) => q.args.take == Take::One,
+            ReadQuery::AggregateRecordsQuery(_) => false,
+        }
+    }
+
     pub fn get_alias_or_name(&self) -> &str {
         match self {
             ReadQuery::RecordQuery(q) => q.alias.as_deref().unwrap_or(&q.name),

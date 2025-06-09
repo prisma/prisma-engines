@@ -53,7 +53,8 @@ transaction
                         in execute «INSERT INTO "public"."_CategoryToPost"
                                     ("B","A") VALUES [($1)] ON CONFLICT DO
                                     NOTHING»
-                           params [product(var(0$id as Any), var(2$id as Any))]
+                           params [product(var(0$id as Int[]),
+                                           var(2$id as Int[]))]
                    else let 3 = unique (query «INSERT INTO "public"."Category"
                                                ("id","name") VALUES ($1,$2)
                                                RETURNING
@@ -68,8 +69,8 @@ transaction
                            in execute «INSERT INTO "public"."_CategoryToPost"
                                        ("B","A") VALUES [($1)] ON CONFLICT DO
                                        NOTHING»
-                              params [product(var(0$id as Any),
-                                              var(3$id as Any))];
+                              params [product(var(0$id as Int[]),
+                                              var(3$id as Int[]))];
                 let 7 = let 0 = validate (get 0)
                             [ rowCountNeq 0
                             ] orRaise "MISSING_RECORD";

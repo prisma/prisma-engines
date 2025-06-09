@@ -4,6 +4,7 @@ use std::{
 };
 
 use crate::result_node::ResultNode;
+use bon::bon;
 use query_builder::DbQuery;
 use query_core::{DataExpectation, DataRule};
 use query_structure::{InternalEnum, PrismaValue, PrismaValueType, ScalarWriteOperation, TaggedPrismaValue};
@@ -194,7 +195,9 @@ pub struct Pagination {
     linking_fields: Option<Vec<String>>,
 }
 
+#[bon]
 impl Pagination {
+    #[builder]
     pub fn new(cursor: Option<HashMap<String, PrismaValue>>, take: Option<i64>, skip: Option<i64>) -> Self {
         Self {
             cursor,

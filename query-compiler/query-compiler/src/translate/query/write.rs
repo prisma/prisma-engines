@@ -4,13 +4,13 @@ use query_core::{
     ConnectRecords, DeleteManyRecords, DeleteRecord, DisconnectRecords, RawQuery, UpdateManyRecords, UpdateRecord,
     UpdateRecordWithSelection, UpdateRecordWithoutSelection, WriteQuery,
 };
-use query_structure::{PrismaValue, QueryArguments, RelationLoadStrategy, Take};
+use query_structure::{PrismaValue, PrismaValueType, QueryArguments, RecordFilter, RelationLoadStrategy, Take};
 use sql_query_builder::write::split_write_args_by_shape;
-use std::{collections::BTreeMap, iter};
+use std::{collections::BTreeMap, iter, mem};
 
 use crate::{
     TranslateError, binding,
-    expression::{Binding, Expression, FieldInitializer, FieldOperation},
+    expression::{Binding, Expression, FieldInitializer, FieldOperation, Pagination},
     translate::TranslateResult,
 };
 
@@ -117,12 +117,17 @@ pub(crate) fn translate_write_query(query: WriteQuery, builder: &dyn QueryBuilde
         WriteQuery::UpdateManyRecords(UpdateManyRecords {
             name: _,
             model,
-            record_filter,
+            mut record_filter,
             args,
             selected_fields,
             limit,
         }) => {
             let projection = selected_fields.as_ref().map(|f| &f.fields);
+
+            let selector_bindings = limit
+                .map(|limit| extract_selectors_that_require_limit(&mut record_filter, limit))
+                .unwrap_or_default();
+
             let updates = builder
                 .build_updates(&model, record_filter, args, projection, limit)
                 .map_err(TranslateError::QueryBuildFailure)?
@@ -134,7 +139,7 @@ pub(crate) fn translate_write_query(query: WriteQuery, builder: &dyn QueryBuilde
                 })
                 .collect::<Vec<_>>();
 
-            if let Some(selected_fields) = selected_fields {
+            let mut expr = if let Some(selected_fields) = selected_fields {
                 let mut expr = Expression::Concat(updates);
                 if !selected_fields.nested.is_empty() {
                     expr = add_inmemory_join(expr, selected_fields.nested, builder)?;
@@ -142,7 +147,16 @@ pub(crate) fn translate_write_query(query: WriteQuery, builder: &dyn QueryBuilde
                 expr
             } else {
                 Expression::Sum(updates)
+            };
+
+            if !selector_bindings.is_empty() {
+                expr = Expression::Let {
+                    bindings: selector_bindings,
+                    expr: expr.into(),
+                };
             }
+
+            expr
         }
 
         WriteQuery::UpdateRecord(UpdateRecord::WithSelection(UpdateRecordWithSelection {
@@ -282,16 +296,31 @@ pub(crate) fn translate_write_query(query: WriteQuery, builder: &dyn QueryBuilde
 
         WriteQuery::DeleteManyRecords(DeleteManyRecords {
             model,
-            record_filter,
+            mut record_filter,
             limit,
-        }) => Expression::Sum(
-            builder
-                .build_deletes(&model, record_filter, limit)
-                .map_err(TranslateError::QueryBuildFailure)?
-                .into_iter()
-                .map(Expression::Execute)
-                .collect::<Vec<_>>(),
-        ),
+        }) => {
+            let selector_bindings = limit
+                .map(|limit| extract_selectors_that_require_limit(&mut record_filter, limit))
+                .unwrap_or_default();
+
+            let mut expr = Expression::Sum(
+                builder
+                    .build_deletes(&model, record_filter, limit)
+                    .map_err(TranslateError::QueryBuildFailure)?
+                    .into_iter()
+                    .map(Expression::Execute)
+                    .collect::<Vec<_>>(),
+            );
+
+            if !selector_bindings.is_empty() {
+                expr = Expression::Let {
+                    bindings: selector_bindings,
+                    expr: expr.into(),
+                };
+            }
+
+            expr
+        }
 
         WriteQuery::ConnectRecords(ConnectRecords {
             parent_id,
@@ -326,4 +355,28 @@ pub(crate) fn translate_write_query(query: WriteQuery, builder: &dyn QueryBuilde
             Expression::Execute(query)
         }
     })
+}
+
+/// Extracts selectors from the filter that require an in-memory limit operation as bindings.
+/// Selectors in the [`RecordFilter`] are replaced with placeholders that refer to the
+/// returned bindings.
+fn extract_selectors_that_require_limit(record_filter: &mut RecordFilter, limit: usize) -> Vec<Binding> {
+    record_filter
+        .selectors
+        .iter_mut()
+        .flatten()
+        .flat_map(|result| result.pairs.iter_mut())
+        .filter_map(|(field, value)| {
+            let typ = value.r#type();
+            if !matches!(typ, PrismaValueType::Array(_)) {
+                return None;
+            }
+
+            let name = binding::selector(field);
+            let value = mem::replace(value, PrismaValue::placeholder(name.clone(), typ));
+            let pagination = Pagination::builder().take(limit as i64).build();
+            let expr = Expression::Value(value).into();
+            Some(Binding::new(name, Expression::Paginate { expr, pagination }))
+        })
+        .collect_vec()
 }
