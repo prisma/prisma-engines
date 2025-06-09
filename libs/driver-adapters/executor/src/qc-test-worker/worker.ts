@@ -198,7 +198,7 @@ async function initializeSchema(
     return adapter.getConnectionInfo()
   }
 
-  return { maxBindValues: undefined }
+  return { supportsRelationJoins: false }
 }
 
 type InitQueryCompilerParams = {
@@ -213,7 +213,7 @@ async function initQueryCompiler({
 }: InitQueryCompilerParams) {
   const adapter = await driverAdapterManager.connect()
 
-  let connectionInfo: ConnectionInfo = {}
+  let connectionInfo: ConnectionInfo = { supportsRelationJoins: false }
   if (adapter.getConnectionInfo) {
     connectionInfo = adapter.getConnectionInfo()
   }

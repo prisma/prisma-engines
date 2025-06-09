@@ -77,7 +77,9 @@ impl QueryCompiler {
 
         // Note: if we used `psl::validate`, we'd add ~1MB to the Wasm artifact (before gzip).
         let schema = Arc::new(psl::parse_without_validation(datamodel.into(), CONNECTOR_REGISTRY));
-        let schema = Arc::new(schema::build(schema, true));
+        let schema = Arc::new(
+            schema::build(schema, true).with_db_version_supports_join_strategy(connection_info.supports_relation_joins),
+        );
 
         tracing::info!(git_hash = env!("GIT_HASH"), "Starting query-compiler-wasm");
         register_panic_hook();
