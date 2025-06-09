@@ -42,30 +42,30 @@ vendored-openssl = [
 
 postgresql-native = [
   "postgresql",
-  "native-tls",
-  "tokio-postgres",
-  "postgres-types",
-  "postgres-native-tls",
-  "bytes",
-  "tokio",
-  "bit-vec",
-  "lru-cache",
-  "byteorder",
+  "dep:native-tls",
+  "dep:tokio-postgres",
+  "dep:postgres-types",
+  "dep:postgres-native-tls",
+  "dep:bytes",
+  "dep:tokio",
+  "dep:bit-vec",
+  "dep:lru-cache",
+  "dep:byteorder",
   "dep:tokio-tungstenite",
 ]
 postgresql = []
 
-mssql-native = ["mssql", "tiberius", "tokio-util", "tokio/time", "tokio/net"]
+mssql-native = ["mssql", "dep:tiberius", "dep:tokio-util", "tokio/time", "tokio/net"]
 mssql = []
 
-mysql-native = ["mysql", "mysql_async", "tokio/time", "lru-cache"]
+mysql-native = ["mysql", "dep:mysql_async", "tokio/time", "dep:lru-cache"]
 mysql = ["chrono/std"]
 
-pooled = ["mobc"]
+pooled = ["dep:mobc"]
 sqlite-native = ["sqlite", "rusqlite/bundled", "tokio/sync"]
 sqlite = []
 
-fmt-sql = ["sqlformat"]
+fmt-sql = ["dep:sqlformat"]
 
 [dependencies]
 bigdecimal.workspace = true

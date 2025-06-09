@@ -10,7 +10,7 @@ use serde::{Deserialize, Serialize};
 use std::{collections::HashMap, sync::Arc};
 use tsify::Tsify;
 use user_facing_errors::UserFacingError;
-use wasm_bindgen::prelude::wasm_bindgen;
+use wasm_bindgen::{JsValue, prelude::wasm_bindgen};
 
 use crate::params::{AdapterProvider, JsConnectionInfo};
 
@@ -92,25 +92,25 @@ impl QueryCompiler {
     }
 
     #[wasm_bindgen]
-    pub fn compile(&self, request: String) -> Result<String, JsCompileError> {
+    pub fn compile(&self, request: String) -> Result<JsValue, JsCompileError> {
         with_sync_unevaluated_request_context(move || {
             let request = RequestBody::try_from_str(&request, self.protocol)?;
             let QueryDocument::Single(op) = request.into_doc(&self.schema)? else {
                 return Err(JsCompileError::plain("Unexpected batch request"));
             };
             let plan = query_compiler::compile(&self.schema, op, &self.connection_info)?;
-            Ok(serde_json::to_string(&plan)?)
+            Ok(plan.serialize(&shared_wasm::RESPONSE_SERIALIZER)?)
         })
     }
 
     #[wasm_bindgen(js_name = compileBatch)]
-    pub fn compile_batch(&self, request: String) -> Result<BatchResponse, JsCompileError> {
+    pub fn compile_batch(&self, request: String) -> Result<JsValue, JsCompileError> {
         with_sync_unevaluated_request_context(move || {
             let request = RequestBody::try_from_str(&request, self.protocol)?;
-            match request.into_doc(&self.schema)? {
+            let response = match request.into_doc(&self.schema)? {
                 QueryDocument::Single(op) => {
                     let plan = query_compiler::compile(&self.schema, op, &self.connection_info)?;
-                    Ok(BatchResponse::Multi { plans: vec![plan] })
+                    BatchResponse::Multi { plans: vec![plan] }
                 }
                 QueryDocument::Multi(batch) => match batch.compact(&self.schema) {
                     BatchDocument::Multi(operations, _) => {
@@ -118,21 +118,22 @@ impl QueryCompiler {
                             .into_iter()
                             .map(|op| query_compiler::compile(&self.schema, op, &self.connection_info))
                             .collect::<Result<Vec<_>, _>>()?;
-                        Ok(BatchResponse::Multi { plans })
+                        BatchResponse::Multi { plans }
                     }
                     BatchDocument::Compact(compacted) => {
                         let expect_non_empty = compacted.throw_on_empty();
                         let plan = query_compiler::compile(&self.schema, compacted.operation, &self.connection_info)?;
-                        Ok(BatchResponse::Compacted {
+                        BatchResponse::Compacted {
                             plan,
                             arguments: compacted.arguments,
                             nested_selection: compacted.nested_selection,
                             keys: compacted.keys,
                             expect_non_empty,
-                        })
+                        }
                     }
                 },
-            }
+            };
+            Ok(response.serialize(&shared_wasm::RESPONSE_SERIALIZER)?)
         })
     }
 }
@@ -230,6 +231,16 @@ impl From<serde_json::Error> for JsCompileError {
     fn from(error: serde_json::Error) -> Self {
         JsCompileError {
             message: format!("JSON Error: {error}"),
+            code: None,
+            meta: None,
+        }
+    }
+}
+
+impl From<tsify::serde_wasm_bindgen::Error> for JsCompileError {
+    fn from(error: tsify::serde_wasm_bindgen::Error) -> Self {
+        JsCompileError {
+            message: format!("Serialization Error: {error}"),
             code: None,
             meta: None,
         }
