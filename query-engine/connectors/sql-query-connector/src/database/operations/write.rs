@@ -51,7 +51,7 @@ pub(crate) async fn create_record(
     selected_fields: FieldSelection,
     ctx: &Context<'_>,
 ) -> crate::Result<SingleRecord> {
-    let id_field: FieldSelection = model.primary_identifier();
+    let id_field: FieldSelection = model.shard_aware_primary_identifier();
 
     let returned_id = if sql_family.is_mysql() {
         generate_id(conn, &id_field, &args, ctx)
