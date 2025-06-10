@@ -7,4 +7,5 @@
 mod new;
 mod queries;
 mod raw;
+mod sharding;
 mod writes;
