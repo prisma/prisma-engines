@@ -473,6 +473,56 @@ mod create_many {
 
         Ok(())
     }
+
+    fn schema_8() -> String {
+        indoc! {
+            r#"
+                model TestModel {
+                    #id(id, Int, @id)
+                    field1  Int
+                    field2  Int
+                    field3  Int
+                    field4  Int
+                    field5  Int
+                    field6  Int
+                    field7  Int
+                    field8  Int
+                    field9  Int
+                    field10 Int
+                    field11 Int
+                    field12 Int
+                }
+            "#
+        }
+        .to_owned()
+    }
+
+    #[connector_test(schema(schema_8))]
+    async fn create_many_with_many_fields(runner: Runner) -> TestResult<()> {
+        const FIELDS_IN_TEST_MODEL: usize = 12;
+
+        if let Some(max_bind_values) = runner.max_bind_values() {
+            assert!(max_bind_values < FIELDS_IN_TEST_MODEL, "When QUERY_BATCH_SIZE is set, its value must be less than {FIELDS_IN_TEST_MODEL}, otherwise the test will not be testing what it's supposed to. Either update this test, or the QUERY_BATCH_SIZE env var value in .envrc and GitHub Actions pipelines");
+        }
+
+        let result = run_query!(
+            runner,
+            r#"mutation {
+                createManyTestModel(data: [
+                    { id: 1, field1: 1, field2: 2, field3: 3, field4: 4, field5: 5, field6: 6, field7: 7, field8: 8, field9: 9, field10: 10, field11: 11, field12: 12 },
+                    { id: 2, field1: 1, field2: 2, field3: 3, field4: 4, field5: 5, field6: 6, field7: 7, field8: 8, field9: 9, field10: 10, field11: 11, field12: 12 },
+                    { id: 3, field1: 1, field2: 2, field3: 3, field4: 4, field5: 5, field6: 6, field7: 7, field8: 8, field9: 9, field10: 10, field11: 11, field12: 12 },
+                    { id: 4, field1: 1, field2: 2, field3: 3, field4: 4, field5: 5, field6: 6, field7: 7, field8: 8, field9: 9, field10: 10, field11: 11, field12: 12 },
+                ]) {
+                    count
+                }
+            }"#
+        );
+
+        insta::assert_snapshot!(result, @r#"{"data":{"createManyTestModel":{"count":4}}}"#);
+
+        Ok(())
+    }
 }
 
 #[test_suite(schema(json_opt), exclude(MySql(5.6)), capabilities(CreateMany, Json))]
