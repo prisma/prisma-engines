@@ -40,7 +40,7 @@ pub(crate) fn create_record(
             &create_node,
             &read_node,
             QueryGraphDependency::ProjectedDataDependency(
-                model.primary_identifier(),
+                model.shard_aware_primary_identifier(),
                 Box::new(move |mut read_node, mut parent_ids| {
                     let parent_id = parent_ids.pop().expect("parent id should be present");
 
@@ -136,7 +136,7 @@ pub(crate) fn create_record_node_from_args(
     args: WriteArgs,
     nested: Vec<(Zipper<RelationFieldId>, ParsedInputMap<'_>)>,
 ) -> QueryGraphBuilderResult<NodeRef> {
-    let selected_fields = model.primary_identifier();
+    let selected_fields = model.shard_aware_primary_identifier();
     let selection_order = selected_fields.db_names().collect();
 
     let cr = CreateRecord {
