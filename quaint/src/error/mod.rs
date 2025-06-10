@@ -15,6 +15,8 @@ use std::time::Duration;
 #[cfg(not(target_arch = "wasm32"))]
 pub use native::NativeErrorKind;
 
+#[cfg(feature = "mssql")]
+pub use crate::connector::mssql::MssqlError;
 #[cfg(feature = "mysql")]
 pub use crate::connector::mysql::MysqlError;
 #[cfg(feature = "postgresql")]

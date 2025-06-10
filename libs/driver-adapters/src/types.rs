@@ -53,6 +53,8 @@ impl JsConnectionInfo {
             AdapterProvider::Postgres => quaint::connector::DEFAULT_POSTGRES_SCHEMA,
             #[cfg(feature = "sqlite")]
             AdapterProvider::Sqlite => quaint::connector::DEFAULT_SQLITE_DATABASE,
+            #[cfg(feature = "mssql")]
+            AdapterProvider::SqlServer => quaint::connector::DEFAULT_MSSQL_SCHEMA,
         }
     }
 }

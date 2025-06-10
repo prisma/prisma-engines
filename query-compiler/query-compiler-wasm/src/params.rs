@@ -41,6 +41,8 @@ impl JsConnectionInfo {
             AdapterProvider::Postgres => quaint::connector::DEFAULT_POSTGRES_SCHEMA,
             #[cfg(feature = "sqlite")]
             AdapterProvider::Sqlite => quaint::connector::DEFAULT_SQLITE_DATABASE,
+            #[cfg(feature = "mssql")]
+            AdapterProvider::SqlServer => quaint::connector::DEFAULT_MSSQL_SCHEMA,
         }
     }
 }
@@ -54,6 +56,9 @@ pub enum AdapterProvider {
     Postgres,
     #[cfg(feature = "sqlite")]
     Sqlite,
+    #[cfg(feature = "mssql")]
+    #[serde(rename = "sqlserver")]
+    SqlServer,
 }
 
 impl From<AdapterProvider> for SqlFamily {
@@ -65,6 +70,8 @@ impl From<AdapterProvider> for SqlFamily {
             AdapterProvider::Postgres => SqlFamily::Postgres,
             #[cfg(feature = "sqlite")]
             AdapterProvider::Sqlite => SqlFamily::Sqlite,
+            #[cfg(feature = "mssql")]
+            AdapterProvider::SqlServer => SqlFamily::Mssql,
         }
     }
 }

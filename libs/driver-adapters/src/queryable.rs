@@ -56,6 +56,8 @@ impl JsBaseQueryable {
             AdapterProvider::Postgres => visitor::Postgres::build(q),
             #[cfg(feature = "sqlite")]
             AdapterProvider::Sqlite => visitor::Sqlite::build(q),
+            #[cfg(feature = "mssql")]
+            AdapterProvider::SqlServer => visitor::Mssql::build(q),
         }
     }
 
@@ -69,6 +71,8 @@ impl JsBaseQueryable {
             AdapterProvider::Sqlite => conversion::sqlite::value_to_js_arg,
             #[cfg(feature = "mysql")]
             AdapterProvider::Mysql => conversion::mysql::value_to_js_arg,
+            #[cfg(feature = "mssql")]
+            AdapterProvider::SqlServer => conversion::mssql::value_to_js_arg,
         };
 
         let args = values
@@ -134,16 +138,18 @@ impl QuaintQueryable for JsBaseQueryable {
 
     // Note: Needed by the Wasm Schema Engine only.
     async fn version(&self) -> quaint::Result<Option<String>> {
-        let version_fn: &'static str = match self.provider {
+        let version_expr: &'static str = match self.provider {
             #[cfg(feature = "mysql")]
-            AdapterProvider::Mysql => visitor::Mysql::version_fn(),
+            AdapterProvider::Mysql => visitor::Mysql::version_expr(),
             #[cfg(feature = "postgresql")]
-            AdapterProvider::Postgres => visitor::Postgres::version_fn(),
+            AdapterProvider::Postgres => visitor::Postgres::version_expr(),
             #[cfg(feature = "sqlite")]
-            AdapterProvider::Sqlite => visitor::Sqlite::version_fn(),
+            AdapterProvider::Sqlite => visitor::Sqlite::version_expr(),
+            #[cfg(feature = "mssql")]
+            AdapterProvider::SqlServer => visitor::Mssql::version_expr(),
         };
 
-        let query = format!(r#"SELECT {}() AS version"#, version_fn);
+        let query = format!(r#"SELECT {} AS version"#, version_expr);
         let rows = self.query_raw(query.as_str(), &[]).await?;
 
         let version_string = rows
@@ -173,6 +179,8 @@ impl QuaintQueryable for JsBaseQueryable {
             AdapterProvider::Postgres => false,
             #[cfg(feature = "sqlite")]
             AdapterProvider::Sqlite => false,
+            #[cfg(feature = "mssql")]
+            AdapterProvider::SqlServer => true,
         }
     }
 }

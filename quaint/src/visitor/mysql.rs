@@ -17,9 +17,9 @@ pub struct Mysql<'a> {
 }
 
 impl<'a> Mysql<'a> {
-    /// Name of the function used to view the version of the database.
-    pub const fn version_fn() -> &'static str {
-        "version"
+    /// Expression that evaluates to the current MySQL version.
+    pub const fn version_expr() -> &'static str {
+        "version()"
     }
 
     fn visit_regular_equality_comparison(&mut self, left: Expression<'a>, right: Expression<'a>) -> visitor::Result {

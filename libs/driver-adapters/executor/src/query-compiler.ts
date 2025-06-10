@@ -5,7 +5,7 @@ import { QueryPlanNode } from '@prisma/client-engine-runtime'
 export type QueryCompilerParams = {
   // TODO: support multiple datamodels
   datamodel: string
-  provider: 'postgres' | 'mysql' | 'sqlite'
+  provider: 'postgres' | 'mysql' | 'sqlite' | 'sqlserver'
   connectionInfo: ConnectionInfo
 }
 

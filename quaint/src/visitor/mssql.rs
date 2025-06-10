@@ -24,6 +24,11 @@ pub struct Mssql<'a> {
 }
 
 impl<'a> Mssql<'a> {
+    /// Expression that evaluates to the current MSSQL server version.
+    pub const fn version_expr() -> &'static str {
+        "@@VERSION"
+    }
+
     // TODO: figure out that merge shit
     fn visit_returning(&mut self, columns: Vec<Column<'a>>) -> visitor::Result {
         let cols: Vec<_> = columns.into_iter().map(|c| c.table("Inserted")).collect();

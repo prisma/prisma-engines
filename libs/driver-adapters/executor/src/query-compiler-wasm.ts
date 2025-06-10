@@ -1,6 +1,7 @@
 import * as wasmPostgres from '../../../../query-compiler/query-compiler-wasm/pkg/postgresql/query_compiler_bg.js'
 import * as wasmMysql from '../../../../query-compiler/query-compiler-wasm/pkg/mysql/query_compiler_bg.js'
 import * as wasmSqlite from '../../../../query-compiler/query-compiler-wasm/pkg/sqlite/query_compiler_bg.js'
+import * as wasmSqlServer from '../../../../query-compiler/query-compiler-wasm/pkg/sqlserver/query_compiler_bg.js'
 import fs from 'node:fs/promises'
 import path from 'node:path'
 import { __dirname } from './utils.js'
@@ -9,6 +10,7 @@ const wasm = {
   postgres: wasmPostgres,
   mysql: wasmMysql,
   sqlite: wasmSqlite,
+  sqlserver: wasmSqlServer,
 }
 
 type EngineName = keyof typeof wasm

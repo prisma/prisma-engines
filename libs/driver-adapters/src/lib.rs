@@ -88,6 +88,9 @@ impl From<DriverAdapterError> for QuaintError {
             DriverAdapterError::MissingFullTextSearchIndex => {
                 QuaintError::builder(ErrorKind::MissingFullTextSearchIndex).build()
             }
+            DriverAdapterError::TransactionAlreadyClosed { cause } => {
+                QuaintError::builder(ErrorKind::TransactionAlreadyClosed(cause)).build()
+            }
             DriverAdapterError::GenericJs { id } => QuaintError::external_error(id),
             #[cfg(feature = "postgresql")]
             DriverAdapterError::Postgres(e) => e.into(),
@@ -95,6 +98,8 @@ impl From<DriverAdapterError> for QuaintError {
             DriverAdapterError::Mysql(e) => e.into(),
             #[cfg(feature = "sqlite")]
             DriverAdapterError::Sqlite(e) => e.into(),
+            #[cfg(feature = "mssql")]
+            DriverAdapterError::Mssql(e) => e.into(),
             // in future, more error types would be added and we'll need to convert them to proper QuaintErrors here
         }
     }
