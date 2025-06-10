@@ -96,7 +96,7 @@ pub(crate) fn upsert_record(
 
     graph.flag_transactional();
 
-    let model_id = model.primary_identifier();
+    let model_id = model.shard_aware_primary_identifier();
 
     let read_parent_records = utils::read_ids_infallible(model.clone(), model_id.clone(), filter.clone());
     let read_parent_records_node = graph.create_node(read_parent_records);

@@ -53,7 +53,7 @@ pub(crate) fn delete_record(
             &delete_node,
             &check_node,
             QueryGraphDependency::ProjectedDataSinkDependency(
-                model.primary_identifier(),
+                model.shard_aware_primary_identifier(),
                 RowSink::Discard,
                 Some(DataExpectation::non_empty_rows(
                     MissingRecord::builder().operation(DataOperation::Delete).build(),
@@ -95,7 +95,7 @@ pub(crate) fn delete_record(
             // NOTE: We do not actually use primary identifier returned from `read_node`, this edge
             // is just checking if any records matched the filter.
             QueryGraphDependency::ProjectedDataDependency(
-                model.primary_identifier(),
+                model.shard_aware_primary_identifier(),
                 Box::new(|delete_node, _| Ok(delete_node)),
                 Some(DataExpectation::non_empty_rows(
                     MissingRecord::builder().operation(DataOperation::Delete).build(),
@@ -124,7 +124,7 @@ pub fn delete_many_records(
 
     let limit = validate_limit(field.arguments.lookup(args::LIMIT))?;
 
-    let model_id = model.primary_identifier();
+    let model_id = model.shard_aware_primary_identifier();
     let record_filter = filter.clone().into();
     let delete_many = WriteQuery::DeleteManyRecords(DeleteManyRecords {
         model: model.clone(),
