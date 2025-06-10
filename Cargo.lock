@@ -1192,6 +1192,7 @@ dependencies = [
  "serde-wasm-bindgen",
  "serde_json",
  "serde_repr",
+ "shared-wasm",
  "telemetry",
  "tokio",
  "tracing",
@@ -3876,6 +3877,7 @@ dependencies = [
  "schema",
  "serde",
  "serde_json",
+ "shared-wasm",
  "tracing",
  "tsify",
  "user-facing-errors",
@@ -5173,6 +5175,13 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "900fba806f70c630b0a382d0d825e17a0f19fcd059a2ade1ff237bcddf446b31"
 dependencies = [
  "lazy_static",
+]
+
+[[package]]
+name = "shared-wasm"
+version = "0.1.0"
+dependencies = [
+ "serde-wasm-bindgen",
 ]
 
 [[package]]

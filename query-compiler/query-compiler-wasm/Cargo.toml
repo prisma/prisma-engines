@@ -25,6 +25,7 @@ wasm-rs-dbg.workspace = true
 query-core.workspace = true
 query-compiler.workspace = true
 schema.workspace = true
+shared-wasm.workspace = true
 request-handlers.workspace = true
 user-facing-errors.workspace = true
 

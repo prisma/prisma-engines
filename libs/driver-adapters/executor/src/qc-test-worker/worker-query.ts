@@ -106,9 +106,9 @@ class QueryPipeline {
     query: JsonProtocolQuery,
     allowTransaction: boolean,
   ) {
-    let queryPlanString: string
+    let queryPlan: QueryPlanNode
     try {
-      queryPlanString = withLocalPanicHandler(() =>
+      queryPlan = withLocalPanicHandler(() =>
         this.compiler.compile(safeJsonStringify(query)),
       )
     } catch (error) {
@@ -118,8 +118,6 @@ class QueryPipeline {
         throw error
       }
     }
-
-    const queryPlan = JSON.parse(queryPlanString) as QueryPlanNode
 
     debug('🟢 Query plan: ', util.inspect(queryPlan, false, null, true))
 

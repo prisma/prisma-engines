@@ -33,7 +33,6 @@ members = [
     "query-compiler/query-compiler-playground",
     "query-compiler/query-compiler-wasm",
     "query-compiler/query-engine-tests-todo",
-    "libs/query-template",
     "libs/*",
     "prisma-fmt",
     "prisma-schema-wasm",
@@ -200,6 +199,7 @@ mongodb-client.path = "./libs/mongodb-client"
 test-setup.path = "./libs/test-setup"
 test-macros.path = "./libs/test-macros"
 query-engine-common.path = "./libs/query-engine-common"
+shared-wasm.path = "./libs/shared-wasm"
 driver-adapters.path = "./libs/driver-adapters"
 sql-ddl.path = "./libs/sql-ddl"
 query-template.path = "libs/query-template"
