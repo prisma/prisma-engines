@@ -14,7 +14,7 @@ use query_core::{
     QueryGraphError, RowCountSink, RowSink,
 };
 use query_structure::{
-    FieldSelection, Placeholder, PrismaValue, PrismaValueType, ScalarFieldResultType, SelectedField, SelectionResult,
+    FieldSelection, FieldTypeInformation, Placeholder, PrismaValue, PrismaValueType, SelectedField, SelectionResult,
 };
 use thiserror::Error;
 
@@ -510,9 +510,9 @@ impl<'a, 'b> NodeTranslator<'a, 'b> {
             .selections()
             .map(|field| {
                 let r#type = field
-                    .result_type()
+                    .type_info()
                     .as_ref()
-                    .map(ScalarFieldResultType::to_prisma_type)
+                    .map(FieldTypeInformation::to_prisma_type)
                     .unwrap_or(PrismaValueType::Any);
                 let r#type = if binding_is_unique {
                     r#type

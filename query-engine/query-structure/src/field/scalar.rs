@@ -112,8 +112,8 @@ impl ScalarField {
         self.dm.clone().zip(self.type_identifier())
     }
 
-    pub fn result_type(&self) -> ScalarFieldResultType {
-        ScalarFieldResultType {
+    pub fn type_info(&self) -> FieldTypeInformation {
+        FieldTypeInformation {
             typ: self.base_type(),
             arity: self.arity(),
             native_type: self.native_type(),
@@ -232,40 +232,6 @@ impl From<(InternalDataModelRef, walkers::IndexFieldWalker<'_>)> for ScalarField
         match f {
             walkers::IndexFieldWalker::Scalar(sf) => dm.zip(ScalarFieldId::InModel(sf.id)),
             walkers::IndexFieldWalker::Composite(cf) => dm.zip(ScalarFieldId::InCompositeType(cf.id)),
-        }
-    }
-}
-
-pub struct ScalarFieldResultType {
-    pub typ: Type,
-    pub arity: FieldArity,
-    pub native_type: Option<NativeTypeInstance>,
-}
-
-impl ScalarFieldResultType {
-    pub fn to_prisma_type(&self) -> PrismaValueType {
-        let type_ = match (self.typ.id, self.native_type.as_ref()) {
-            (TypeIdentifier::DateTime, Some(native_type))
-                if native_type.name() == "Time" || native_type.name() == "Timetz" =>
-            {
-                PrismaValueType::Time
-            }
-            _ => self.typ.to_prisma_type(),
-        };
-        if self.arity.is_list() {
-            PrismaValueType::Array(Box::new(type_))
-        } else {
-            type_
-        }
-    }
-}
-
-impl From<Type> for ScalarFieldResultType {
-    fn from(typ: Type) -> Self {
-        ScalarFieldResultType {
-            typ,
-            native_type: None,
-            arity: FieldArity::Required,
         }
     }
 }

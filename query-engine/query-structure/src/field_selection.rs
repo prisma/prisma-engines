@@ -1,7 +1,7 @@
 use crate::{
     parent_container::ParentContainer, prisma_value_ext::PrismaValueExtensions, CompositeFieldRef, DomainError, Field,
-    Filter, InternalDataModel, Model, ModelProjection, QueryArguments, RelationField, RelationFieldRef, ScalarField,
-    ScalarFieldRef, ScalarFieldResultType, SelectionResult, Type, TypeIdentifier,
+    FieldTypeInformation, Filter, InternalDataModel, Model, ModelProjection, QueryArguments, RelationField,
+    RelationFieldRef, ScalarField, ScalarFieldRef, SelectionResult, Type, TypeIdentifier,
 };
 use itertools::Itertools;
 use prisma_value::PrismaValue;
@@ -437,11 +437,11 @@ impl SelectedField {
         }
     }
 
-    pub fn result_type(&self) -> Option<ScalarFieldResultType> {
+    pub fn type_info(&self) -> Option<FieldTypeInformation> {
         let (typ, arity) = self.type_identifier_with_arity()?;
         let dm = self.datamodel();
 
-        Some(ScalarFieldResultType {
+        Some(FieldTypeInformation {
             typ: dm.clone().zip(typ),
             arity,
             native_type: self.as_scalar().and_then(ScalarField::native_type),
