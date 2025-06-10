@@ -168,7 +168,7 @@ fn handle_one_to_x(
         if parent_relation_field.is_inlined_on_enclosing_model() {
             // Inlined on parent
             let parent_model = parent_relation_field.model();
-            let extractor_model_id = parent_model.primary_identifier();
+            let extractor_model_id = parent_model.shard_aware_primary_identifier();
             let null_record_id = SelectionResult::from(&parent_relation_field.linking_fields());
             // If the relation is inlined on the parent and a filter is applied on the child then update is done on the parent table.
             // Therefore, the filter applied on the child needs to be converted to a "relational" filter so that the connector renders the adequate SQL to join the Child table.
@@ -182,7 +182,7 @@ fn handle_one_to_x(
         } else {
             // Inlined on child
             let child_model = child_relation_field.model();
-            let extractor_model_id = child_model.primary_identifier();
+            let extractor_model_id = child_model.shard_aware_primary_identifier();
             let null_record_id = SelectionResult::from(&child_relation_field.linking_fields());
 
             (

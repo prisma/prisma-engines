@@ -215,7 +215,7 @@ pub fn chunk_update_with_ids(
     filter_condition: ConditionTree<'static>,
     ctx: &Context<'_>,
 ) -> Vec<Query<'static>> {
-    let columns: Vec<_> = ModelProjection::from(model.primary_identifier())
+    let columns: Vec<_> = ModelProjection::from(model.shard_aware_primary_identifier())
         .as_columns(ctx)
         .collect();
 
@@ -307,7 +307,7 @@ pub fn delete_many_from_ids_and_filter(
     limit: Option<usize>,
     ctx: &Context<'_>,
 ) -> Vec<Query<'static>> {
-    let columns: Vec<_> = ModelProjection::from(model.primary_identifier())
+    let columns: Vec<_> = ModelProjection::from(model.shard_aware_primary_identifier())
         .as_columns(ctx)
         .collect();
 
@@ -410,43 +410,48 @@ fn collect_affected_fields(args: &[WriteArgs], model: &Model) -> HashSet<ScalarF
 
 /// Partitions data into batches, respecting `max_bind_values` and `max_insert_rows` settings from
 /// the `Context`.
+///
+/// We need to split inserts if they are above a parameter threshold, as well as split based on number of rows:
+/// horizontal partitioning by row number, vertical by number of args.
 fn partition_into_batches(args: Vec<WriteArgs>, ctx: &Context<'_>) -> Vec<Vec<WriteArgs>> {
     let batches = if let Some(max_params) = ctx.max_bind_values() {
-        // We need to split inserts if they are above a parameter threshold, as well as split based on number of rows.
-        // -> Horizontal partitioning by row number, vertical by number of args.
+        #[derive(Default)]
+        struct Batch {
+            items: Vec<WriteArgs>,
+            param_count: usize,
+        }
+
+        impl Batch {
+            fn add(&mut self, item: WriteArgs) {
+                let len = item.len();
+                self.items.push(item);
+                self.param_count += len;
+            }
+        }
+
+        impl From<WriteArgs> for Batch {
+            fn from(args: WriteArgs) -> Self {
+                let mut batch = Self::default();
+                batch.add(args);
+                batch
+            }
+        }
+
         args.into_iter()
-            .peekable()
-            .batching(|iter| {
-                let mut param_count: usize = 0;
-                let mut batch = vec![];
-
-                while param_count < max_params {
-                    // If the param count _including_ the next item doens't exceed the limit,
-                    // we continue filling up the current batch.
-                    let proceed = match iter.peek() {
-                        Some(next) => (param_count + next.len()) <= max_params,
-                        None => break,
-                    };
-
-                    if proceed {
-                        match iter.next() {
-                            Some(next) => {
-                                param_count += next.len();
-                                batch.push(next)
-                            }
-                            None => break,
-                        }
+            .fold(Vec::<Batch>::new(), |mut acc, item| {
+                if let Some(last_batch) = acc.last_mut() {
+                    if last_batch.param_count + item.len() > max_params {
+                        acc.push(item.into());
                     } else {
-                        break;
+                        last_batch.add(item);
                     }
-                }
-
-                if batch.is_empty() {
-                    None
                 } else {
-                    Some(batch)
+                    acc.push(item.into());
                 }
+                acc
             })
+            .into_iter()
+            .map(|batch| batch.items)
             .collect_vec()
     } else {
         vec![args]
