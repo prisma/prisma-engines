@@ -7,8 +7,11 @@ use prisma_value::PrismaValueType;
 pub use relation::*;
 pub use scalar::*;
 
-use crate::{parent_container::ParentContainer, Model, Zipper};
-use psl::parser_database::{walkers, EnumId, ScalarType};
+use crate::{parent_container::ParentContainer, Model, NativeTypeInstance, Zipper};
+use psl::{
+    parser_database::{walkers, EnumId, ScalarType},
+    schema_ast::ast::FieldArity,
+};
 use std::{borrow::Cow, hash::Hash};
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -283,6 +286,40 @@ impl From<ScalarType> for TypeIdentifier {
             ScalarType::Json => Self::Json,
             ScalarType::Decimal => Self::Decimal,
             ScalarType::Bytes => Self::Bytes,
+        }
+    }
+}
+
+pub struct FieldTypeInformation {
+    pub typ: Type,
+    pub arity: FieldArity,
+    pub native_type: Option<NativeTypeInstance>,
+}
+
+impl FieldTypeInformation {
+    pub fn to_prisma_type(&self) -> PrismaValueType {
+        let type_ = match (self.typ.id, self.native_type.as_ref()) {
+            (TypeIdentifier::DateTime, Some(native_type))
+                if native_type.name() == "Time" || native_type.name() == "Timetz" =>
+            {
+                PrismaValueType::Time
+            }
+            _ => self.typ.to_prisma_type(),
+        };
+        if self.arity.is_list() {
+            PrismaValueType::Array(Box::new(type_))
+        } else {
+            type_
+        }
+    }
+}
+
+impl From<Type> for FieldTypeInformation {
+    fn from(typ: Type) -> Self {
+        FieldTypeInformation {
+            typ,
+            native_type: None,
+            arity: FieldArity::Required,
         }
     }
 }

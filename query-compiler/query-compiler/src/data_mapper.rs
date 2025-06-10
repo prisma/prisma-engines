@@ -110,10 +110,7 @@ fn get_result_node(
     for prisma_name in selection_order {
         match field_map.get(prisma_name.as_str()) {
             Some(sf @ SelectedField::Scalar(f)) => {
-                node.add_field(
-                    prisma_name,
-                    builder.new_value(sf.db_name().into_owned(), f.result_type()),
-                );
+                node.add_field(prisma_name, builder.new_value(sf.db_name().into_owned(), f.type_info()));
             }
             Some(SelectedField::Composite(_)) => todo!("MongoDB specific"),
             Some(SelectedField::Relation(f)) => {

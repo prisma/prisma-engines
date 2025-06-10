@@ -15,6 +15,14 @@ pub enum Query {
 }
 
 impl Query {
+    /// Returns true if the query is expected to return a single record.
+    pub fn is_unique(&self) -> bool {
+        match self {
+            Self::Read(rq) => rq.is_unique(),
+            Self::Write(wq) => wq.is_unique(),
+        }
+    }
+
     pub(crate) fn satisfies(&self, fields: &FieldSelection) -> bool {
         match self {
             Self::Read(rq) => rq.satisfies(fields),

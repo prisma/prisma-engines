@@ -173,7 +173,7 @@ pub(super) fn add_inmemory_join(
                 .map(|(parent_scalar, child_scalar)| {
                     let placeholder = PrismaValue::placeholder(
                         binding::join_parent_field(parent_scalar),
-                        parent_scalar.result_type().to_prisma_type(),
+                        parent_scalar.type_info().to_prisma_type(),
                     );
                     let condition = if parent.r#type().is_list() {
                         ScalarCondition::InTemplate(ConditionValue::value(placeholder))
@@ -374,7 +374,11 @@ fn extract_pagination(args: &mut QueryArguments) -> Pagination {
             .map(|(sf, val)| (sf.db_name().into_owned(), val.clone()))
             .collect()
     });
-    Pagination::new(cursor, args.take.abs(), args.skip)
+    Pagination::builder()
+        .maybe_cursor(cursor)
+        .maybe_take(args.take.abs())
+        .maybe_skip(args.skip)
+        .build()
 }
 
 fn extract_distinct_by(args: &mut QueryArguments) -> Vec<String> {

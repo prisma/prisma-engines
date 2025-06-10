@@ -43,8 +43,6 @@ impl PrismaValueExtensions for PrismaValue {
             // Valid BigInt coersions
             (PrismaValue::Int(i), TypeIdentifier::BigInt) => PrismaValue::BigInt(i),
 
-            // Todo other coercions here
-
             // Lists
             (PrismaValue::List(list), _) => PrismaValue::List(
                 list.into_iter()
@@ -52,7 +50,12 @@ impl PrismaValueExtensions for PrismaValue {
                     .collect::<crate::Result<Vec<_>>>()?,
             ),
 
-            (PrismaValue::Placeholder(Placeholder { name, r#type }), _) if r#type == to_type.to_prisma_type() => {
+            (PrismaValue::Placeholder(Placeholder { name, r#type }), _)
+                if r#type == to_type.to_prisma_type()
+                    // TODO: we currently don't know the arity of the target type, so we always
+                    // accept arrays of the same type, but we should try to enforce it
+                    || matches!(&r#type, PrismaValueType::Array(inner) if **inner == to_type.to_prisma_type()) =>
+            {
                 PrismaValue::Placeholder(Placeholder { name, r#type })
             }
 

@@ -21,6 +21,20 @@ pub enum WriteQuery {
 }
 
 impl WriteQuery {
+    /// Returns true if the query is expected to return a single record.
+    pub fn is_unique(&self) -> bool {
+        match self {
+            Self::CreateRecord(_) | Self::UpdateRecord(_) | Self::DeleteRecord(_) | Self::Upsert(_) => true,
+            Self::CreateManyRecords(_)
+            | Self::UpdateManyRecords(_)
+            | Self::DeleteManyRecords(_)
+            | Self::ConnectRecords(_)
+            | Self::DisconnectRecords(_)
+            | Self::ExecuteRaw(_)
+            | Self::QueryRaw(_) => false,
+        }
+    }
+
     /// Returns a mutable slice of the write arguments from an underlying INSERT if applicable
     /// or an empty slice otherwise.
     pub fn insert_args_mut(&mut self) -> &mut [WriteArgs] {
