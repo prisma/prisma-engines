@@ -1,10 +1,12 @@
 use serde::{Deserialize, Serialize};
-use std::{any::Any, fmt};
+use std::fmt;
+
+use crate::cloneable_any::CloneableAny;
 
 /// A helper for arbitrary connector-specific data in SqlSchema.
 #[derive(Default)]
-pub(crate) struct ConnectorData {
-    pub(crate) data: Option<Box<dyn Any + Send + Sync + 'static>>,
+pub struct ConnectorData {
+    pub data: Option<Box<dyn CloneableAny + Send + Sync>>,
 }
 
 impl PartialEq for ConnectorData {
@@ -34,5 +36,13 @@ impl<'de> Deserialize<'de> for ConnectorData {
         D: serde::Deserializer<'de>,
     {
         Ok(Default::default())
+    }
+}
+
+impl Clone for ConnectorData {
+    fn clone(&self) -> Self {
+        let cloned_data = self.data.as_ref().map(|d| (&**d).clone_box());
+
+        ConnectorData { data: cloned_data }
     }
 }

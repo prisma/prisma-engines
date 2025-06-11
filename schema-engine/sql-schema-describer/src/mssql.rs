@@ -66,7 +66,7 @@ pub struct SqlSchemaDescriber<'a> {
     conn: &'a dyn Queryable,
 }
 
-#[derive(Default)]
+#[derive(Default, Clone)]
 pub struct MssqlSchemaExt {
     pub index_bits: HashMap<IndexId, BitFlags<IndexBits>>,
 }

@@ -9,11 +9,14 @@ pub mod postgres;
 pub mod sqlite;
 pub mod walkers;
 
+mod cloneable_any;
 mod connector_data;
 mod error;
 mod getters;
 mod ids;
 mod parsers;
+
+use crate::cloneable_any::CloneableAny;
 
 pub use self::{
     error::{DescriberError, DescriberErrorKind, DescriberResult},
@@ -26,10 +29,7 @@ pub use prisma_value::PrismaValue;
 use enumflags2::{BitFlag, BitFlags};
 use regex::Regex;
 use serde::{Deserialize, Serialize};
-use std::{
-    any::Any,
-    fmt::{self, Debug},
-};
+use std::fmt::{self, Debug};
 
 /// A database description connector.
 #[async_trait::async_trait]
@@ -54,7 +54,7 @@ pub struct SqlMetadata {
 }
 
 /// The result of describing a database schema.
-#[derive(Serialize, Deserialize, Debug, Default)]
+#[derive(Serialize, Deserialize, Debug, Default, Clone)]
 pub struct SqlSchema {
     /// Namespaces (schemas)
     namespaces: Vec<String>,
@@ -127,7 +127,7 @@ impl SqlSchema {
     }
 
     /// Insert connector-specific data into the schema. This will replace existing connector data.
-    pub fn set_connector_data(&mut self, data: Box<dyn Any + Send + Sync>) {
+    pub fn set_connector_data(&mut self, data: Box<dyn CloneableAny>) {
         self.connector_data.data = Some(data);
     }
 
