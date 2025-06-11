@@ -24,7 +24,7 @@ fn queries() {
 
         let connection_info = ConnectionInfo::External(ExternalConnectionInfo::new(
             SqlFamily::Postgres,
-            "public".to_owned(),
+            Some("public".to_owned()),
             None,
             true,
         ));

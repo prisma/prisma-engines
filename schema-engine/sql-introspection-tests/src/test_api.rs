@@ -301,7 +301,7 @@ impl TestApi {
     }
 
     pub fn schema_name(&self) -> &str {
-        self.database.connection_info().schema_name()
+        self.database.connection_info().schema_name().unwrap()
     }
 
     pub fn barrel(&self) -> BarrelMigrationExecutor {

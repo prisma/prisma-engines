@@ -72,8 +72,17 @@ impl Connector for Mysql {
 
             // Note: `runtime_conn` must be `Sized`, as that's required by `TransactionCapable`
             let mut conn_info = self.connection_info.clone();
+            // MySQL has its version grabbed at connection time. We know it's infallible.
             let db_version = runtime_conn.version().await.unwrap();
-            // MySQL has its version grabbed at connection time. We know it's infaillible.
+
+            // On Vitess, we allow connecting without a database name to support sharding.
+            // Vitess routes queries to the correct MySQL database based on which keyspace
+            // each table belongs to and on shard key values.
+            // Otherwise, we use `mysql` as the default database.
+            if self.connection_info.dbname().is_none() && !db_version.as_ref().is_some_and(|v| v.contains("Vitess")) {
+                runtime_conn.execute_raw("USE mysql", &[]).await?;
+            }
+
             conn_info.set_version(db_version);
 
             let sql_conn = SqlConnection::new(runtime_conn, conn_info, self.features);

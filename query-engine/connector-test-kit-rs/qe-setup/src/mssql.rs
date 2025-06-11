@@ -29,14 +29,17 @@ pub(crate) async fn mssql_setup(url: String, prisma_schema: &str, db_schemas: &[
 
         conn.raw_cmd(&format!(
             "DROP SCHEMA IF EXISTS {}",
-            conn.connection_info().schema_name()
+            conn.connection_info().schema_name().unwrap()
         ))
         .await
         .unwrap();
 
-        conn.raw_cmd(&format!("CREATE SCHEMA {}", conn.connection_info().schema_name(),))
-            .await
-            .unwrap();
+        conn.raw_cmd(&format!(
+            "CREATE SCHEMA {}",
+            conn.connection_info().schema_name().unwrap()
+        ))
+        .await
+        .unwrap();
     }
 
     let params = ConnectorParams::new(url, Default::default(), None);

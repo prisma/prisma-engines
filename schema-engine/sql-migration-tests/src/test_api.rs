@@ -71,7 +71,7 @@ impl TestApi {
 
     /// Plan an `applyMigrations` command
     pub fn apply_migrations<'a>(&'a mut self, migrations_directory: &'a TempDir) -> ApplyMigrations<'a> {
-        let search_path = self.root.admin_conn.connection_info().schema_name();
+        let search_path = self.root.admin_conn.connection_info().schema_name().unwrap();
         let mut namespaces = vec![search_path.to_string()];
 
         for namespace in self.root.args.namespaces() {
@@ -94,7 +94,7 @@ impl TestApi {
     }
 
     pub fn schema_name(&self) -> String {
-        self.connection_info().schema_name().to_owned()
+        self.connection_info().schema_name().unwrap().to_owned()
     }
 
     /// Plan a `createMigration` command.
@@ -378,10 +378,14 @@ impl TestApi {
 
     /// Render a table name with the required prefixing for use with quaint query building.
     pub fn render_table_name(&self, table_name: &str) -> quaint::ast::Table<'static> {
+        let Some(schema_name) = self.connection_info().schema_name().map(<_>::to_owned) else {
+            return table_name.to_owned().into();
+        };
+
         if self.root.is_sqlite() {
             table_name.to_owned().into()
         } else {
-            (self.connection_info().schema_name().to_owned(), table_name.to_owned()).into()
+            (schema_name, table_name.to_owned()).into()
         }
     }
 

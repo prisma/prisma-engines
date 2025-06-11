@@ -29,7 +29,10 @@ impl State {
             .get_connection_info()
             .await
             .map_err(|err| ConnectorError::from_source(err, "failed to get connection info"))?;
-        let schema_name = info.schema_name.to_owned();
+
+        let schema_name = info
+            .schema_name
+            .unwrap_or_else(|| quaint::connector::DEFAULT_POSTGRES_SCHEMA.to_owned());
 
         let connection = Connection { adapter };
         let circumstances = super::setup_connection(&connection, &Params, provider, &schema_name).await?;

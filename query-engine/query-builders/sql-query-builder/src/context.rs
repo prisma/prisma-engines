@@ -37,7 +37,7 @@ impl<'a> Context<'a> {
         self.traceparent
     }
 
-    pub(crate) fn schema_name(&self) -> &str {
+    pub(crate) fn schema_name(&self) -> Option<&str> {
         self.connection_info.schema_name()
     }
 
