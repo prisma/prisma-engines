@@ -198,7 +198,7 @@ async fn update_one(
         }
         UpdateRecord::WithoutSelection(_) => {
             let res = res
-                .map(|record| record.extract_selection_result(&q.model().primary_identifier()))
+                .map(|record| record.extract_selection_result(&q.model().shard_aware_primary_identifier()))
                 .transpose()?;
 
             Ok(QueryResult::Id(res))
