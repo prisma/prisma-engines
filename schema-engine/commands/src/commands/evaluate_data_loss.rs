@@ -1,5 +1,5 @@
-use crate::{CoreResult, SchemaContainerExt, json_rpc::types::*};
-use schema_connector::{SchemaConnector, migrations_directory::*};
+use crate::{CoreResult, SchemaContainerExt, json_rpc::types::*, migration_cache::MigrationCache};
+use schema_connector::{ConnectorError, Migration, SchemaConnector, migrations_directory::*};
 
 /// Development command for migrations. Evaluate the data loss induced by the
 /// next migration the engine would generate on the main database.
@@ -9,23 +9,30 @@ use schema_connector::{SchemaConnector, migrations_directory::*};
 pub async fn evaluate_data_loss(
     input: EvaluateDataLossInput,
     connector: &mut dyn SchemaConnector,
+    migrations_cache: &mut MigrationCache,
 ) -> CoreResult<EvaluateDataLossOutput> {
     error_on_changed_provider(&input.migrations_list.lockfile, connector.connector_type())?;
     let sources: Vec<_> = input.schema.to_psl_input();
 
-    let migrations_from_directory = list_migrations(input.migrations_list.migration_directories);
+    let migrations_from_directory = list_migrations(input.migrations_list.migration_directories.clone());
 
     let dialect = connector.schema_dialect();
-    let to = dialect.schema_from_datamodel(sources)?;
-    let namespaces = dialect.extract_namespaces(&to);
 
-    // TODO(MultiSchema): we may need to do something similar to
-    // namespaces_and_preview_features_from_diff_targets here as well,
-    // particulalry if it's not correctly setting the preview features flags.
-    let from = connector
-        .schema_from_migrations(&migrations_from_directory, namespaces)
+    let migration = migrations_cache
+        .get_or_insert(&sources, &input.migrations_list, || async {
+            let to = dialect.schema_from_datamodel(sources.clone())?;
+            let namespaces = dialect.extract_namespaces(&to);
+
+            // TODO(MultiSchema): we may need to do something similar to
+            // namespaces_and_preview_features_from_diff_targets here as well,
+            // particularly if it's not correctly setting the preview features flags.
+            let from = connector
+                .schema_from_migrations(&migrations_from_directory, namespaces)
+                .await?;
+
+            Ok::<Migration, ConnectorError>(dialect.diff(from, to))
+        })
         .await?;
-    let migration = dialect.diff(from, to);
 
     let migration_steps = dialect.migration_len(&migration) as u32;
     let diagnostics = connector.destructive_change_checker().check(&migration).await?;

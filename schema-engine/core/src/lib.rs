@@ -8,6 +8,7 @@
 #[doc(hidden)]
 pub mod commands;
 
+pub use ::commands::MigrationCache;
 pub use ::commands::{CoreError, CoreResult, GenericApi};
 pub use json_rpc;
 

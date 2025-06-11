@@ -1,6 +1,6 @@
-use crate::{CoreError, CoreResult, SchemaContainerExt, json_rpc::types::*};
+use crate::{CoreError, CoreResult, MigrationCache, SchemaContainerExt, json_rpc::types::*};
 use crosstarget_utils::time::format_utc_now;
-use schema_connector::{SchemaConnector, migrations_directory::*};
+use schema_connector::{ConnectorError, Migration, SchemaConnector, migrations_directory::*};
 use user_facing_errors::schema_engine::MigrationNameTooLong;
 
 /// Create a directory name for a new migration.
@@ -14,6 +14,7 @@ pub fn generate_migration_directory_name(migration_name: &str) -> String {
 pub async fn create_migration(
     input: CreateMigrationInput,
     connector: &mut dyn SchemaConnector,
+    migrations_cache: &mut MigrationCache,
 ) -> CoreResult<CreateMigrationOutput> {
     let connector_type = connector.connector_type();
 
@@ -27,25 +28,29 @@ pub async fn create_migration(
     let generated_migration_name = generate_migration_directory_name(&input.migration_name);
 
     // Infer the migration.
-    let previous_migrations = list_migrations(input.migrations_list.migration_directories);
+    let previous_migrations = list_migrations(input.migrations_list.migration_directories.clone());
     let sources: Vec<_> = input.schema.to_psl_input();
     let dialect = connector.schema_dialect();
-    // We need to start with the 'to', which is the Schema, in order to grab the
-    // namespaces, in case we've got MultiSchema enabled.
-    let to = dialect.schema_from_datamodel(sources)?;
 
-    let namespaces = dialect.extract_namespaces(&to);
-    // We pass the namespaces here, because we want to describe all of these namespaces.
-    // let target = SchemaFromMigrationTarget::NativeConnector { url: connector. }
-    let from = connector
-        .schema_from_migrations(&previous_migrations, namespaces)
+    let migration = migrations_cache
+        .get_or_insert(&sources, &input.migrations_list, || async {
+            let to = dialect.schema_from_datamodel(sources.clone())?;
+            let namespaces = dialect.extract_namespaces(&to);
+
+            // TODO(MultiSchema): we may need to do something similar to
+            // namespaces_and_preview_features_from_diff_targets here as well,
+            // particularly if it's not correctly setting the preview features flags.
+            let from = connector
+                .schema_from_migrations(&previous_migrations, namespaces)
+                .await?;
+
+            Ok::<Migration, ConnectorError>(dialect.diff(from, to))
+        })
         .await?;
-
-    let migration = dialect.diff(from, to);
 
     let extension = dialect.migration_file_extension().to_owned();
 
-    if dialect.migration_is_empty(&migration) && !input.draft {
+    if dialect.migration_is_empty(migration) && !input.draft {
         tracing::info!("Database is up-to-date, returning without creating new migration.");
 
         return Ok(CreateMigrationOutput {
@@ -56,9 +61,9 @@ pub async fn create_migration(
         });
     }
 
-    let destructive_change_diagnostics = connector.destructive_change_checker().pure_check(&migration);
+    let destructive_change_diagnostics = connector.destructive_change_checker().pure_check(migration);
 
-    let migration_script = dialect.render_script(&migration, &destructive_change_diagnostics)?;
+    let migration_script = dialect.render_script(migration, &destructive_change_diagnostics)?;
 
     Ok(CreateMigrationOutput {
         connector_type: connector_type.to_owned(),

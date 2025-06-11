@@ -1,7 +1,7 @@
 use super::logger::init_logger;
 use commands::{
     schema_connector::{self, ConnectorError, IntrospectionResult, Namespaces, SchemaConnector},
-    CoreError, SchemaContainerExt,
+    CoreError, MigrationCache, SchemaContainerExt,
 };
 use driver_adapters::{adapter_factory_from_js, JsObject};
 use js_sys::Function as JsFunction;
@@ -71,6 +71,9 @@ pub struct SchemaEngine {
 
     /// The dispatcher for tracing.
     dispatch: Dispatch,
+
+    /// The cache for migrations to avoid redundant work during `prisma migrate dev`.
+    migrations_cache: MigrationCache,
 }
 
 #[wasm_bindgen]
@@ -120,6 +123,7 @@ impl SchemaEngine {
                 connector,
                 namespaces,
                 dispatch,
+                migrations_cache: MigrationCache::new(),
             })
         }
         .with_subscriber(cloned_dispatch)
@@ -175,7 +179,7 @@ impl SchemaEngine {
                 migration_name = input.migration_name.as_str(),
                 draft = input.draft,
             );
-            let result = commands::create_migration(input, &mut self.connector)
+            let result = commands::create_migration(input, &mut self.connector, &mut self.migrations_cache)
                 .instrument(span)
                 .await?;
             Ok(result)
@@ -271,7 +275,7 @@ impl SchemaEngine {
     ) -> Result<EvaluateDataLossOutput, JsValue> {
         let dispatch = self.dispatch.clone();
         async move {
-            let result = commands::evaluate_data_loss(input, &mut self.connector)
+            let result = commands::evaluate_data_loss(input, &mut self.connector, &mut self.migrations_cache)
                 .instrument(tracing::info_span!("EvaluateDataLoss"))
                 .await?;
             Ok(result)
