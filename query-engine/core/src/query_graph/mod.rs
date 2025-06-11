@@ -950,7 +950,7 @@ impl QueryGraph {
 
             // Create reload node and connect it to the `node`.
             let model = query.model();
-            let primary_model_id = model.primary_identifier();
+            let primary_model_id = model.shard_aware_primary_identifier();
 
             let read_query = ReadQuery::ManyRecordsQuery(ManyRecordsQuery {
                 name: "reload".into(),
