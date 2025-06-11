@@ -56,7 +56,10 @@ pub(crate) struct DriverProxy {
     get_connection_info: Option<AdapterMethod<(), JsConnectionInfo>>,
 
     /// Start a new transaction.
-    start_transaction: AdapterMethod<Option<String>, JsTransaction>,
+    start_transaction: AdapterMethod<(), JsTransaction>,
+
+    /// Start a new transaction with a specific isolation level.
+    start_transaction_with_isolation_level: AdapterMethod<String, JsTransaction>,
 
     /// Dispose of the underlying driver.
     dispose: AdapterMethod<(), ()>,
@@ -146,6 +149,7 @@ impl DriverProxy {
         Ok(Self {
             execute_script: get_named_property(object, "executeScript")?,
             start_transaction: get_named_property(object, "startTransaction")?,
+            start_transaction_with_isolation_level: get_named_property(object, "startTransaction")?,
             get_connection_info: get_optional_named_property(object, "getConnectionInfo")?,
             dispose: get_named_property(object, "dispose")?,
         })
@@ -156,10 +160,13 @@ impl DriverProxy {
     }
 
     async fn start_transaction_inner(&self, isolation: Option<IsolationLevel>) -> quaint::Result<Box<JsTransaction>> {
-        let tx = self
-            .start_transaction
-            .call_as_async(isolation.map(|lvl| lvl.to_string()))
-            .await?;
+        let tx = if let Some(level) = isolation {
+            self.start_transaction_with_isolation_level
+                .call_as_async(level.to_string())
+                .await?
+        } else {
+            self.start_transaction.call_as_async(()).await?
+        };
 
         // Decrement for this gauge is done in JsTransaction::commit/JsTransaction::rollback
         // Previously, it was done in JsTransaction::new, similar to the native Transaction.
