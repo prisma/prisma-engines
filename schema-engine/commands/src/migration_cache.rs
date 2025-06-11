@@ -58,3 +58,9 @@ impl MigrationCache {
         hasher.finish().to_string()
     }
 }
+
+impl Default for MigrationCache {
+    fn default() -> Self {
+        Self::new()
+    }
+}

@@ -1,6 +1,4 @@
-use schema_core::{
-    commands::evaluate_data_loss, json_rpc::types::*, schema_connector::SchemaConnector, CoreResult, MigrationCache,
-};
+use schema_core::{commands::evaluate_data_loss, json_rpc::types::*, schema_connector::SchemaConnector, CoreResult};
 use std::borrow::Cow;
 use tempfile::TempDir;
 
@@ -34,7 +32,7 @@ impl<'a> EvaluateDataLoss<'a> {
 
     fn send_impl(self) -> CoreResult<EvaluateDataLossAssertion<'a>> {
         let migrations_list = utils::list_migrations(self.migrations_directory.path()).unwrap();
-        let mut migrations_cache = MigrationCache::new();
+        let mut migrations_cache = Default::default();
         let fut = evaluate_data_loss(
             EvaluateDataLossInput {
                 migrations_list,

@@ -79,7 +79,7 @@ impl EngineState {
             initial_datamodel: initial_datamodels.as_deref().map(psl::validate_multi_file),
             host: host.unwrap_or_else(|| Arc::new(schema_connector::EmptyHost)),
             connectors: Default::default(),
-            migrations_cache: Arc::new(Mutex::new(MigrationCache::new())),
+            migrations_cache: Arc::new(Mutex::new(Default::default())),
         }
     }
 
@@ -261,7 +261,7 @@ impl GenericApi for EngineState {
             );
             Box::pin(async move {
                 let mut migrations_cache = migrations_cache.lock().await;
-                commands::create_migration(input, connector, &mut *migrations_cache)
+                commands::create_migration(input, connector, &mut migrations_cache)
                     .instrument(span)
                     .await
             })
@@ -347,7 +347,7 @@ impl GenericApi for EngineState {
         self.with_default_connector(Box::new(|connector| {
             Box::pin(async move {
                 let mut migrations_cache = migrations_cache.lock().await;
-                commands::evaluate_data_loss(input, connector, &mut *migrations_cache)
+                commands::evaluate_data_loss(input, connector, &mut migrations_cache)
                     .instrument(tracing::info_span!("EvaluateDataLoss"))
                     .await
             })

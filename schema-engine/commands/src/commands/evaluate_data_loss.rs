@@ -34,8 +34,8 @@ pub async fn evaluate_data_loss(
         })
         .await?;
 
-    let migration_steps = dialect.migration_len(&migration) as u32;
-    let diagnostics = connector.destructive_change_checker().check(&migration).await?;
+    let migration_steps = dialect.migration_len(migration) as u32;
+    let diagnostics = connector.destructive_change_checker().check(migration).await?;
 
     let warnings = diagnostics
         .warnings

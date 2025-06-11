@@ -1,7 +1,6 @@
 use pretty_assertions::assert_eq;
 use schema_core::{
     commands::create_migration, json_rpc::types::*, schema_connector::SchemaConnector, CoreError, CoreResult,
-    MigrationCache,
 };
 use std::path::{Path, PathBuf};
 use tempfile::TempDir;
@@ -120,7 +119,7 @@ impl<'a> CreateMigration<'a> {
     pub async fn send(self) -> CoreResult<CreateMigrationAssertion<'a>> {
         let migrations_list = utils::list_migrations(self.migrations_directory.path()).unwrap();
         let migration_name = self.name.to_owned();
-        let mut migrations_cache = MigrationCache::new();
+        let mut migrations_cache = Default::default();
         let output = create_migration(
             CreateMigrationInput {
                 migrations_list,

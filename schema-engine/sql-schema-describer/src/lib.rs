@@ -497,7 +497,7 @@ pub enum TableProperties {
 }
 
 /// A table found in a schema.
-#[derive(Serialize, Deserialize, PartialEq, Debug, Default)]
+#[derive(Serialize, Deserialize, PartialEq, Debug, Default, Clone)]
 pub struct Table {
     namespace_id: NamespaceId,
     name: String,
@@ -555,7 +555,7 @@ pub struct IndexColumn {
 }
 
 /// An index on a table.
-#[derive(Serialize, Deserialize, PartialEq, Debug)]
+#[derive(Serialize, Deserialize, PartialEq, Debug, Clone)]
 struct Index {
     table_id: TableId,
     index_name: String,
@@ -584,7 +584,7 @@ pub struct UserDefinedType {
     pub definition: Option<String>,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Column {
     /// Column name.
     pub name: String,
@@ -755,7 +755,7 @@ impl ForeignKeyAction {
     }
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 struct ForeignKey {
     /// The table the foreign key is defined on.
     constrained_table: TableId,
@@ -767,7 +767,7 @@ struct ForeignKey {
     on_update_action: ForeignKeyAction,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 struct ForeignKeyColumn {
     foreign_key_id: ForeignKeyId,
     constrained_column: TableColumnId,
@@ -775,7 +775,7 @@ struct ForeignKeyColumn {
 }
 
 /// A SQL enum.
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 struct Enum {
     /// The namespace the enum type belongs to, if applicable.
     namespace_id: NamespaceId,
@@ -783,7 +783,7 @@ struct Enum {
     description: Option<String>,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 struct EnumVariant {
     enum_id: EnumId,
     variant_name: String,
