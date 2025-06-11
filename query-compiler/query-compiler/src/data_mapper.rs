@@ -91,6 +91,7 @@ fn get_result_node(
     field_selection: &FieldSelection,
     selection_order: &[String],
     nested_queries: &[ReadQuery],
+    // relationJoins queries use prisma names rather than db names
     uses_relation_joins: bool,
     builder: &mut ResultNodeBuilder,
 ) -> Option<ResultNode> {
@@ -110,7 +111,12 @@ fn get_result_node(
     for prisma_name in selection_order {
         match field_map.get(prisma_name.as_str()) {
             Some(sf @ SelectedField::Scalar(f)) => {
-                node.add_field(prisma_name, builder.new_value(sf.db_name().into_owned(), f.type_info()));
+                let name = if uses_relation_joins {
+                    sf.prisma_name().into_owned()
+                } else {
+                    sf.db_name().into_owned()
+                };
+                node.add_field(prisma_name, builder.new_value(name, f.type_info()));
             }
             Some(SelectedField::Composite(_)) => todo!("MongoDB specific"),
             Some(SelectedField::Relation(f)) => {
