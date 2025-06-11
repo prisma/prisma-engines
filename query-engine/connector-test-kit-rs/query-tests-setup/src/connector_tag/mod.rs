@@ -319,7 +319,7 @@ impl ConnectorVersion {
     /// Determines if the connector uses a driver adapter implemented in Wasm.
     /// Do not delete! This is used because the `#[cfg(target_arch = "wasm32")]` conditional compilation
     /// directive doesn't work in the test runner.
-    fn is_wasm(&self) -> bool {
+    pub fn is_wasm(&self) -> bool {
         matches!(
             self,
             Self::Postgres(Some(PostgresVersion::PgJsWasm))
