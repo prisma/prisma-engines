@@ -25,6 +25,8 @@ jobs:
       mysql_size_gz: ${{ steps.measure.outputs.mysql_size_gz }}
       sqlite_size: ${{ steps.measure.outputs.sqlite_size }}
       sqlite_size_gz: ${{ steps.measure.outputs.sqlite_size_gz }}
+      sqlserver_size: ${{ steps.measure.outputs.sqlserver_size }}
+      sqlserver_size_gz: ${{ steps.measure.outputs.sqlserver_size_gz }}
     steps:
       - name: Checkout PR branch
         uses: actions/checkout@v4
@@ -47,6 +49,8 @@ jobs:
       mysql_size_gz: ${{ steps.measure.outputs.mysql_size_gz }}
       sqlite_size: ${{ steps.measure.outputs.sqlite_size }}
       sqlite_size_gz: ${{ steps.measure.outputs.sqlite_size_gz }}
+      sqlserver_size: ${{ steps.measure.outputs.sqlserver_size }}
+      sqlserver_size_gz: ${{ steps.measure.outputs.sqlserver_size_gz }}
     steps:
       - name: Checkout base branch
         uses: actions/checkout@v4
