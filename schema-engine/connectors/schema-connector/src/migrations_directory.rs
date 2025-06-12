@@ -7,7 +7,7 @@
 
 use crate::{checksum, ConnectorError, ConnectorResult};
 use json_rpc::types::MigrationLockfile;
-use std::{error::Error, fmt::Display, hash};
+use std::{error::Error, fmt::Display};
 use tracing_error::SpanTrace;
 use user_facing_errors::schema_engine::ProviderSwitchedError;
 
@@ -64,7 +64,7 @@ pub fn list_migrations(
 }
 
 /// Proxy to a directory containing one migration.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Hash)]
 pub struct MigrationDirectory(pub(crate) json_rpc::types::MigrationDirectory);
 
 impl MigrationDirectory {
@@ -91,12 +91,6 @@ impl MigrationDirectory {
         let filesystem_script: Result<String, String> = self.0.migration_file.content.clone().into();
 
         filesystem_script.map_err(|err| ReadMigrationScriptError::new(std::io::Error::other(err), migration_file_path))
-    }
-}
-
-impl hash::Hash for MigrationDirectory {
-    fn hash<H: hash::Hasher>(&self, hasher: &mut H) {
-        self.0.hash(hasher)
     }
 }
 
