@@ -53,7 +53,8 @@ build() {
     echo "ℹ️  Note that query-engine compiled to WASM uses a different Rust toolchain"
     cargo --version
 
-    local CONNECTOR="$1"
+    local PROVIDER="$1"
+    local CONNECTOR="${2:-$PROVIDER}"
     local CARGO_TARGET_DIR
     CARGO_TARGET_DIR=$(cargo metadata --format-version 1 | jq -r .target_directory)
     echo "🔨 Building $CONNECTOR"
@@ -65,15 +66,15 @@ build() {
         -Zbuild-std=std,panic_abort -Zbuild-std-features=panic_immediate_abort
 
     local IN_FILE="$CARGO_TARGET_DIR/wasm32-unknown-unknown/$WASM_TARGET_SUBDIR/query_engine_wasm.wasm"
-    local OUT_FILE="$OUT_FOLDER/$CONNECTOR/query_engine_bg.wasm"
+    local OUT_FILE="$OUT_FOLDER/$PROVIDER/query_engine_bg.wasm"
 
-    wasm-bindgen --target "$OUT_TARGET" --out-name query_engine --out-dir "$OUT_FOLDER/$CONNECTOR" "$IN_FILE"
+    wasm-bindgen --target "$OUT_TARGET" --out-name query_engine --out-dir "$OUT_FOLDER/$PROVIDER" "$IN_FILE"
     optimize "$OUT_FILE"
 
     if ! command -v wasm2wat &> /dev/null; then
         echo "Skipping wasm2wat, as it is not installed."
     else
-        wasm2wat "$OUT_FILE" -o "./query_engine.$CONNECTOR.wat"
+        wasm2wat "$OUT_FILE" -o "./query_engine.$PROVIDER.wat"
     fi
 }
 
@@ -102,16 +103,16 @@ optimize() {
 }
 
 report_size() {
-    local CONNECTOR
+    local PROVIDER
     local GZ_SIZE
     local FORMATTED_GZ_SIZE
 
-    CONNECTOR="$1"
-    GZ_SIZE=$(gzip -c "${OUT_FOLDER}/$CONNECTOR/query_engine_bg.wasm" | wc -c)
+    PROVIDER="$1"
+    GZ_SIZE=$(gzip -c "${OUT_FOLDER}/$PROVIDER/query_engine_bg.wasm" | wc -c)
     FORMATTED_GZ_SIZE=$(echo "$GZ_SIZE"|numfmt --format '%.3f' --to=iec-i --suffix=B)
 
-    echo "$CONNECTOR:"
-    echo "ℹ️  raw: $(du -h "${OUT_FOLDER}/$CONNECTOR/query_engine_bg.wasm")"
+    echo "$PROVIDER:"
+    echo "ℹ️  raw: $(du -h "${OUT_FOLDER}/$PROVIDER/query_engine_bg.wasm")"
     echo "ℹ️  zip: $GZ_SIZE bytes ($FORMATTED_GZ_SIZE)"
     echo ""
 }
@@ -121,9 +122,11 @@ echo "Building query-engine-wasm using $WASM_BUILD_PROFILE profile"
 build "postgresql"
 build "sqlite"
 build "mysql"
+build "sqlserver" "mssql"
 
 jq '.version=$version' --arg version "$OUT_VERSION" package.json > "$OUT_JSON"
 
 report_size "postgresql"
 report_size "sqlite"
 report_size "mysql"
+report_size "sqlserver"
