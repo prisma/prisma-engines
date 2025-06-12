@@ -46,14 +46,16 @@ pub(crate) fn translate_write_query(query: WriteQuery, builder: &dyn QueryBuilde
                 }
             }
 
-            let mut expr = Expression::Execute(insert_query);
-
-            if !initializers.is_empty() {
-                expr = Expression::InitializeRecord {
-                    expr: expr.into(),
+            let mut expr = if !initializers.is_empty() {
+                // If we have initializers, we use them to create the record rather than
+                // `Expression::Query`.
+                Expression::InitializeRecord {
+                    expr: Expression::Execute(insert_query).into(),
                     fields: initializers,
-                };
-            }
+                }
+            } else {
+                Expression::Unique(Expression::Query(insert_query).into())
+            };
 
             if let Some(CreateRecordDefaultsQuery {
                 query,
