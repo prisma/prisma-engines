@@ -46,7 +46,7 @@ pub(crate) fn translate_write_query(query: WriteQuery, builder: &dyn QueryBuilde
                 }
             }
 
-            let mut expr = Expression::Unique(Expression::Query(insert_query).into());
+            let mut expr = Expression::Execute(insert_query);
 
             if !initializers.is_empty() {
                 expr = Expression::InitializeRecord {
