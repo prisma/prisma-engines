@@ -1,3 +1,4 @@
+use crate::conversion::MaybeDefined;
 pub(crate) use crate::conversion::{JSArg, JSArgType};
 
 use napi::bindgen_prelude::{FromNapiValue, ToNapiValue};
@@ -56,5 +57,17 @@ impl ToNapiValue for JSArg {
 impl ToNapiValue for JSArgType {
     unsafe fn to_napi_value(env: napi::sys::napi_env, value: Self) -> napi::Result<napi::sys::napi_value> {
         ToNapiValue::to_napi_value(env, value.to_string())
+    }
+}
+
+impl<V: ToNapiValue> ToNapiValue for MaybeDefined<V> {
+    unsafe fn to_napi_value(env: napi::sys::napi_env, val: Self) -> napi::Result<napi::sys::napi_value> {
+        match val {
+            MaybeDefined(Some(v)) => ToNapiValue::to_napi_value(env, v),
+            MaybeDefined(None) => {
+                let undefined = napi::Env::from_raw(env).get_undefined()?;
+                ToNapiValue::to_napi_value(env, undefined)
+            }
+        }
     }
 }

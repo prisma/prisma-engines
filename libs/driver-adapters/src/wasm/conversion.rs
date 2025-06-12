@@ -1,6 +1,5 @@
-use crate::conversion::{JSArg, JSArgType};
-
 use super::to_js::{serde_serialize, ToJsValue};
+use crate::conversion::{JSArg, JSArgType, MaybeDefined};
 use crate::types::Query;
 use js_sys::{Array, JsString, Object, Reflect, Uint8Array};
 use wasm_bindgen::JsValue;
@@ -54,5 +53,14 @@ impl ToJsValue for JSArg {
 impl ToJsValue for JSArgType {
     fn to_js_value(&self) -> Result<wasm_bindgen::prelude::JsValue, wasm_bindgen::prelude::JsValue> {
         Ok(JsValue::from(self.to_string()))
+    }
+}
+
+impl<V: ToJsValue> ToJsValue for MaybeDefined<V> {
+    fn to_js_value(&self) -> Result<wasm_bindgen::prelude::JsValue, wasm_bindgen::prelude::JsValue> {
+        match &self.0 {
+            Some(value) => value.to_js_value(),
+            None => Ok(JsValue::UNDEFINED),
+        }
     }
 }
