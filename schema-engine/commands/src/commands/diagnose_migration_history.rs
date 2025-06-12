@@ -1,6 +1,6 @@
 use std::sync::Arc;
 
-use crate::CoreResult;
+use crate::{CoreResult, migration_schema_cache::MigrationSchemaCache};
 pub use json_rpc::types::{DiagnoseMigrationHistoryInput, HistoryDiagnostic};
 use quaint::connector::ExternalConnectorFactory;
 use schema_connector::{
@@ -73,6 +73,7 @@ pub async fn diagnose_migration_history(
     namespaces: Option<Namespaces>,
     connector: &mut dyn SchemaConnector,
     adapter_factory: Arc<dyn ExternalConnectorFactory>,
+    migration_schema_cache: &mut MigrationSchemaCache,
 ) -> CoreResult<DiagnoseMigrationHistoryOutput> {
     tracing::debug!("Diagnosing migration history");
 
@@ -138,9 +139,13 @@ pub async fn diagnose_migration_history(
             let target = ExternalShadowDatabase::DriverAdapter(adapter_factory);
             // TODO(MultiSchema): this should probably fill the following namespaces from the CLI since there is
             // no schema to grab the namespaces off, in the case of MultiSchema.
-            let from = connector
-                .schema_dialect()
-                .schema_from_migrations_with_target(&applied_migrations, namespaces.clone(), target.clone())
+            let from = migration_schema_cache
+                .get_or_insert(&applied_migrations, || async {
+                    connector
+                        .schema_dialect()
+                        .schema_from_migrations_with_target(&applied_migrations, namespaces.clone(), target.clone())
+                        .await
+                })
                 .await;
             let to = connector.schema_from_database(namespaces.clone()).await;
             let drift = match from.and_then(|from| to.map(|to| dialect.diff(from, to))).map(|mig| {

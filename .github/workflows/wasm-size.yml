@@ -25,6 +25,8 @@ jobs:
       mysql_size_gz: ${{ steps.measure.outputs.mysql_size_gz }}
       sqlite_size: ${{ steps.measure.outputs.sqlite_size }}
       sqlite_size_gz: ${{ steps.measure.outputs.sqlite_size_gz }}
+      sqlserver_size: ${{ steps.measure.outputs.sqlserver_size }}
+      sqlserver_size_gz: ${{ steps.measure.outputs.sqlserver_size_gz }}
     steps:
       - name: Checkout PR branch
         uses: actions/checkout@v4
@@ -47,6 +49,8 @@ jobs:
       mysql_size_gz: ${{ steps.measure.outputs.mysql_size_gz }}
       sqlite_size: ${{ steps.measure.outputs.sqlite_size }}
       sqlite_size_gz: ${{ steps.measure.outputs.sqlite_size_gz }}
+      sqlserver_size: ${{ steps.measure.outputs.sqlserver_size }}
+      sqlserver_size_gz: ${{ steps.measure.outputs.sqlserver_size_gz }}
     steps:
       - name: Checkout base branch
         uses: actions/checkout@v4
@@ -99,6 +103,9 @@ jobs:
           compute_diff "sqlite" "${{ needs.base-wasm-size.outputs.sqlite_size }}" "${{ needs.pr-wasm-size.outputs.sqlite_size }}"
           compute_diff "sqlite_gz" "${{ needs.base-wasm-size.outputs.sqlite_size_gz }}" "${{ needs.pr-wasm-size.outputs.sqlite_size_gz }}"
 
+          compute_diff "sqlserver" "${{ needs.base-wasm-size.outputs.sqlserver_size }}" "${{ needs.pr-wasm-size.outputs.sqlserver_size }}"
+          compute_diff "sqlserver_gz" "${{ needs.base-wasm-size.outputs.sqlserver_size_gz }}" "${{ needs.pr-wasm-size.outputs.sqlserver_size_gz }}"
+
       - name: Find past report comment
         uses: peter-evans/find-comment@v3
         id: findReportComment
@@ -126,4 +133,6 @@ jobs:
             | Mysql (gzip)     | ${{ steps.compute.outputs.mysql_gz_pr}}      |  ${{ steps.compute.outputs.mysql_gz_base}}       | ${{ steps.compute.outputs.mysql_gz_diff}}
             | Sqlite           | ${{ steps.compute.outputs.sqlite_pr}}        |  ${{ steps.compute.outputs.sqlite_base}}         | ${{ steps.compute.outputs.sqlite_diff}}
             | Sqlite (gzip)    | ${{ steps.compute.outputs.sqlite_gz_pr}}     |  ${{ steps.compute.outputs.sqlite_gz_base }}     | ${{ steps.compute.outputs.sqlite_gz_diff}}
+            | SQL Server       | ${{ steps.compute.outputs.sqlserver_pr}}     |  ${{ steps.compute.outputs.sqlserver_base}}      | ${{ steps.compute.outputs.sqlserver_diff}}
+            | SQL Server (gzip)| ${{ steps.compute.outputs.sqlserver_gz_pr}}  |  ${{ steps.compute.outputs.sqlserver_gz_base }}  | ${{ steps.compute.outputs.sqlserver_gz_diff}}
           edit-mode: replace

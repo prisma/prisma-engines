@@ -1,4 +1,4 @@
-use crate::{CoreError, CoreResult, SchemaContainerExt, json_rpc::types::*};
+use crate::{CoreError, CoreResult, MigrationSchemaCache, SchemaContainerExt, json_rpc::types::*};
 use crosstarget_utils::time::format_utc_now;
 use schema_connector::{SchemaConnector, migrations_directory::*};
 use user_facing_errors::schema_engine::MigrationNameTooLong;
@@ -14,6 +14,7 @@ pub fn generate_migration_directory_name(migration_name: &str) -> String {
 pub async fn create_migration(
     input: CreateMigrationInput,
     connector: &mut dyn SchemaConnector,
+    migration_schema_cache: &mut MigrationSchemaCache,
 ) -> CoreResult<CreateMigrationOutput> {
     let connector_type = connector.connector_type();
 
@@ -27,18 +28,19 @@ pub async fn create_migration(
     let generated_migration_name = generate_migration_directory_name(&input.migration_name);
 
     // Infer the migration.
-    let previous_migrations = list_migrations(input.migrations_list.migration_directories);
+    let previous_migrations = list_migrations(input.migrations_list.migration_directories.clone());
     let sources: Vec<_> = input.schema.to_psl_input();
     let dialect = connector.schema_dialect();
     // We need to start with the 'to', which is the Schema, in order to grab the
     // namespaces, in case we've got MultiSchema enabled.
     let to = dialect.schema_from_datamodel(sources)?;
 
-    let namespaces = dialect.extract_namespaces(&to);
-    // We pass the namespaces here, because we want to describe all of these namespaces.
-    // let target = SchemaFromMigrationTarget::NativeConnector { url: connector. }
-    let from = connector
-        .schema_from_migrations(&previous_migrations, namespaces)
+    let from = migration_schema_cache
+        .get_or_insert(&input.migrations_list.migration_directories, || async {
+            let namespaces = dialect.extract_namespaces(&to);
+            // We pass the namespaces here, because we want to describe all of these namespaces.
+            connector.schema_from_migrations(&previous_migrations, namespaces).await
+        })
         .await?;
 
     let migration = dialect.diff(from, to);

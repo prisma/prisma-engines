@@ -1,5 +1,5 @@
 use crate::CoreResult;
-use commands::{DiagnoseMigrationHistoryOutput, DriftDiagnostic};
+use commands::{DiagnoseMigrationHistoryOutput, DriftDiagnostic, MigrationSchemaCache};
 pub use json_rpc::types::{DiagnoseMigrationHistoryInput, HistoryDiagnostic};
 use schema_connector::{
     migrations_directory::{error_on_changed_provider, list_migrations, MigrationDirectory},
@@ -13,6 +13,7 @@ pub async fn diagnose_migration_history_cli(
     input: DiagnoseMigrationHistoryInput,
     namespaces: Option<Namespaces>,
     connector: &mut dyn SchemaConnector,
+    migration_schema_cache: &mut MigrationSchemaCache,
 ) -> CoreResult<DiagnoseMigrationHistoryOutput> {
     tracing::debug!("Diagnosing migration history");
 
@@ -77,9 +78,14 @@ pub async fn diagnose_migration_history_cli(
             let dialect = connector.schema_dialect();
             // TODO(MultiSchema): this should probably fill the following namespaces from the CLI since there is
             // no schema to grab the namespaces off, in the case of MultiSchema.
-            let from = connector
-                .schema_from_migrations(&applied_migrations, namespaces.clone())
+            let from = migration_schema_cache
+                .get_or_insert(&applied_migrations, || async {
+                    connector
+                        .schema_from_migrations(&applied_migrations, namespaces.clone())
+                        .await
+                })
                 .await;
+
             let to = connector.schema_from_database(namespaces.clone()).await;
             let drift = match from.and_then(|from| to.map(|to| dialect.diff(from, to))).map(|mig| {
                 if dialect.migration_is_empty(&mig) {

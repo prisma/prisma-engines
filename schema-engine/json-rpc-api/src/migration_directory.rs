@@ -1,3 +1,5 @@
+use std::hash;
+
 use crate::js_result::JsResult;
 use serde::{Deserialize, Serialize};
 
@@ -33,5 +35,15 @@ impl MigrationDirectory {
     /// The `{timestamp}_{name}` formatted migration name.
     pub fn migration_name(&self) -> &str {
         self.path.as_str()
+    }
+}
+
+impl hash::Hash for MigrationDirectory {
+    fn hash<H: hash::Hasher>(&self, hasher: &mut H) {
+        self.path.hash(hasher);
+        self.migration_file.path.hash(hasher);
+        if let JsResult::Ok(content) = &self.migration_file.content {
+            content.hash(hasher);
+        }
     }
 }
