@@ -6,6 +6,7 @@ use std::hash::{Hash, Hasher};
 use schema_connector::DatabaseSchema;
 
 /// A cache for DatabaseSchemas based on the migration directories to avoid redundant work during `prisma migrate dev`.
+#[derive(Default)]
 pub struct MigrationSchemaCache {
     migrations: HashMap<String, DatabaseSchema>,
 }
@@ -37,11 +38,5 @@ impl MigrationSchemaCache {
                 Ok(entry.insert(schema).clone())
             }
         }
-    }
-}
-
-impl Default for MigrationSchemaCache {
-    fn default() -> Self {
-        Self::new()
     }
 }
