@@ -99,6 +99,9 @@ jobs:
           compute_diff "sqlite" "${{ needs.base-wasm-size.outputs.sqlite_size }}" "${{ needs.pr-wasm-size.outputs.sqlite_size }}"
           compute_diff "sqlite_gz" "${{ needs.base-wasm-size.outputs.sqlite_size_gz }}" "${{ needs.pr-wasm-size.outputs.sqlite_size_gz }}"
 
+          compute_diff "sqlserver" "${{ needs.base-wasm-size.outputs.sqlserver_size }}" "${{ needs.pr-wasm-size.outputs.sqlserver_size }}"
+          compute_diff "sqlserver_gz" "${{ needs.base-wasm-size.outputs.sqlserver_size_gz }}" "${{ needs.pr-wasm-size.outputs.sqlserver_size_gz }}"
+
       - name: Find past report comment
         uses: peter-evans/find-comment@v3
         id: findReportComment

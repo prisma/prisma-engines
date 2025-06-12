@@ -35,7 +35,7 @@ jobs:
           make build-qe-wasm-gz
           mkdir -p $TARGET_DIR
 
-          for provider in "postgresql" "mysql" "sqlite"; do
+          for provider in "postgresql" "mysql" "sqlite" "sqlserver"; do
             cp $PKG_DIR/$provider/query_engine_bg.wasm $TARGET_DIR/query-engine-$provider.wasm
             cp $PKG_DIR/$provider.gz $TARGET_DIR/query-engine-$provider.wasm.gz
           done
