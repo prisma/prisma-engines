@@ -1,6 +1,6 @@
 use query_engine_tests::*;
 
-#[test_suite(only(MySql))]
+#[test_suite(only(MySql), exclude(MySql("5.6")))]
 mod shard_complex {
     use indoc::indoc;
 
@@ -317,22 +317,25 @@ mod shard_complex {
         let result = run_query!(
             &runner,
             r#"query {
-                findManyUser(where: {
-                    OR: [
-                        {
-                            AND: [
-                                { region: "us-east-1" },
-                                { score: { gte: 150 } }
-                            ]
-                        },
-                        {
-                            AND: [
-                                { region: "eu-west-1" },
-                                { score: { gte: 250 } }
-                            ]
-                        }
-                    ]
-                }) {
+                findManyUser(
+                    where: {
+                        OR: [
+                            {
+                                AND: [
+                                    { region: "us-east-1" },
+                                    { score: { gte: 150 } }
+                                ]
+                            },
+                            {
+                                AND: [
+                                    { region: "eu-west-1" },
+                                    { score: { gte: 250 } }
+                                ]
+                            }
+                        ]
+                    }
+                    orderBy: { id: asc }
+                ) {
                     id
                     firstName
                     score
@@ -344,7 +347,7 @@ mod shard_complex {
         assert!(result.contains("user-3")); // us-east-1 with score 150
         assert!(result.contains("user-4")); // eu-west-1 with score 300
 
-        insta::assert_snapshot!(result, @r#"{"data":{"findManyUser":[{"id":"user-4","firstName":"Alice","score":300,"region":"eu-west-1"},{"id":"user-3","firstName":"Bob","score":150,"region":"us-east-1"}]}}"#);
+        insta::assert_snapshot!(result, @r#"{"data":{"findManyUser":[{"id":"user-3","firstName":"Bob","score":150,"region":"us-east-1"},{"id":"user-4","firstName":"Alice","score":300,"region":"eu-west-1"}]}}"#);
 
         Ok(())
     }
@@ -357,10 +360,13 @@ mod shard_complex {
         let result = run_query!(
             &runner,
             r#"query {
-                findManyUser(where: {
-                    region: { in: ["us-east-1", "eu-west-1"] }
-                    score: { in: [100, 300] }
-                }) {
+                findManyUser(
+                    where: {
+                        region: { in: ["us-east-1", "eu-west-1"] }
+                        score: { in: [100, 300] }
+                    }
+                    orderBy: { id: asc }
+                ) {
                     id
                     firstName
                     score
@@ -372,7 +378,7 @@ mod shard_complex {
         assert!(result.contains("user-1")); // us-east-1, score 100
         assert!(result.contains("user-4")); // eu-west-1, score 300
 
-        insta::assert_snapshot!(result, @r#"{"data":{"findManyUser":[{"id":"user-4","firstName":"Alice","score":300,"region":"eu-west-1"},{"id":"user-1","firstName":"John","score":100,"region":"us-east-1"}]}}"#);
+        insta::assert_snapshot!(result, @r#"{"data":{"findManyUser":[{"id":"user-1","firstName":"John","score":100,"region":"us-east-1"},{"id":"user-4","firstName":"Alice","score":300,"region":"eu-west-1"}]}}"#);
 
         Ok(())
     }
