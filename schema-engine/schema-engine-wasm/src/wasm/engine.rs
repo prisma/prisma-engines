@@ -72,7 +72,7 @@ pub struct SchemaEngine {
     /// The dispatcher for tracing.
     dispatch: Dispatch,
 
-    /// The cache for migrations to avoid redundant work during `prisma migrate dev`.
+    /// The cache for DatabaseSchemas based of migration directories to avoid redundant work during `prisma migrate dev`.
     migration_schema_cache: MigrationSchemaCache,
 }
 

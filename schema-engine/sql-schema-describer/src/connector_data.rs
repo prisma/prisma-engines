@@ -41,7 +41,7 @@ impl<'de> Deserialize<'de> for ConnectorData {
 
 impl Clone for ConnectorData {
     fn clone(&self) -> Self {
-        let cloned_data = self.data.as_ref().map(|d| (&**d).clone_box());
+        let cloned_data = self.data.as_ref().map(|d| (**d).clone_box());
 
         ConnectorData { data: cloned_data }
     }

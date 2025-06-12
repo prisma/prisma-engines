@@ -36,7 +36,7 @@ pub(crate) struct EngineState {
     //
     // To a channel leading to a spawned MigrationConnector.
     connectors: Mutex<HashMap<ConnectorRequestType, mpsc::Sender<ErasedConnectorRequest>>>,
-    /// The cache for migrations to avoid redundant work during `prisma migrate dev`.
+    /// The cache for DatabaseSchemas based of migration directories to avoid redundant work during `prisma migrate dev`.
     migration_schema_cache: Arc<Mutex<MigrationSchemaCache>>,
 }
 

@@ -31,15 +31,14 @@ pub async fn create_migration(
     let previous_migrations = list_migrations(input.migrations_list.migration_directories.clone());
     let sources: Vec<_> = input.schema.to_psl_input();
     let dialect = connector.schema_dialect();
-
+    // We need to start with the 'to', which is the Schema, in order to grab the
+    // namespaces, in case we've got MultiSchema enabled.
     let to = dialect.schema_from_datamodel(sources.clone())?;
 
     let from = migration_schema_cache
         .get_or_insert(&input.migrations_list.migration_directories, || async {
             let namespaces = dialect.extract_namespaces(&to);
-            // TODO(MultiSchema): we may need to do something similar to
-            // namespaces_and_preview_features_from_diff_targets here as well,
-            // particularly if it's not correctly setting the preview features flags.
+            // We pass the namespaces here, because we want to describe all of these namespaces.
             connector.schema_from_migrations(&previous_migrations, namespaces).await
         })
         .await?;

@@ -4,7 +4,7 @@ use std::hash::{Hash, Hasher};
 
 use schema_connector::DatabaseSchema;
 
-/// A cache for migrations to avoid redundant work during `prisma migrate dev`.
+/// A cache for DatabaseSchemas based on the migration directories to avoid redundant work during `prisma migrate dev`.
 pub struct MigrationSchemaCache {
     migrations: HashMap<String, DatabaseSchema>,
 }
@@ -17,7 +17,7 @@ impl MigrationSchemaCache {
         }
     }
 
-    /// Gets a migration from the cache, or computes it using the provided async closure if not found.
+    /// Gets a DatabaseSchema from the cache, or calls the provided async closure if not found and stores its result in the cache.
     pub async fn get_or_insert<F, Fut, E, T>(
         &mut self,
         migration_directories: &Vec<T>,
@@ -28,25 +28,16 @@ impl MigrationSchemaCache {
         Fut: std::future::Future<Output = Result<DatabaseSchema, E>>,
         T: Hash,
     {
-        let key = self.cache_key(migration_directories);
+        let mut hasher = DefaultHasher::new();
+        migration_directories.hash(&mut hasher);
+        let cache_key = hasher.finish().to_string();
 
-        if !self.migrations.contains_key(&key) {
-            println!("Cache miss for key: {}", key);
+        if !self.migrations.contains_key(&cache_key) {
             let schema = f().await?;
-            self.migrations.insert(key.clone(), schema);
-        } else {
-            println!("Cache hit for key: {}", key);
+            self.migrations.insert(cache_key.clone(), schema);
         }
 
-        Ok(self.migrations.get(&key).unwrap().clone())
-    }
-
-    fn cache_key<T: Hash>(&self, migration_directories: &Vec<T>) -> String {
-        let mut hasher = DefaultHasher::new();
-
-        migration_directories.hash(&mut hasher);
-
-        hasher.finish().to_string()
+        Ok(self.migrations.get(&cache_key).unwrap().clone())
     }
 }
 
