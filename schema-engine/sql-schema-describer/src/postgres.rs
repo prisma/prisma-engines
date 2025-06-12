@@ -29,7 +29,7 @@ use tracing::trace;
 
 /// A PostgreSQL sequence.
 /// <https://www.postgresql.org/docs/current/view-pg-sequences.html>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Sequence {
     /// Sequence name
     pub namespace_id: NamespaceId,
@@ -145,7 +145,7 @@ pub enum ConstraintOption {
     Deferrable,
 }
 
-#[derive(Default, Debug)]
+#[derive(Default, Debug, Clone)]
 pub struct PostgresSchemaExt {
     pub opclasses: Vec<(IndexColumnId, SQLOperatorClass)>,
     pub indexes: Vec<(IndexId, SqlIndexAlgorithm)>,

@@ -1,8 +1,11 @@
 use std::sync::Arc;
 
 use super::{DiagnoseMigrationHistoryOutput, DriftDiagnostic, HistoryDiagnostic, diagnose_migration_history};
-use crate::json_rpc::types::{
-    DevAction, DevActionReset, DevDiagnosticInput, DevDiagnosticOutput, DiagnoseMigrationHistoryInput,
+use crate::{
+    json_rpc::types::{
+        DevAction, DevActionReset, DevDiagnosticInput, DevDiagnosticOutput, DiagnoseMigrationHistoryInput,
+    },
+    migration_schema_cache::MigrationSchemaCache,
 };
 use quaint::connector::ExternalConnectorFactory;
 use schema_connector::{ConnectorResult, Namespaces, SchemaConnector, migrations_directory};
@@ -14,6 +17,7 @@ pub async fn dev_diagnostic(
     namespaces: Option<Namespaces>,
     connector: &mut dyn SchemaConnector,
     adapter_factory: Arc<dyn ExternalConnectorFactory>,
+    migration_schema_cache: &mut MigrationSchemaCache,
 ) -> ConnectorResult<DevDiagnosticOutput> {
     migrations_directory::error_on_changed_provider(&input.migrations_list.lockfile, connector.connector_type())?;
 
@@ -22,8 +26,14 @@ pub async fn dev_diagnostic(
         opt_in_to_shadow_database: true,
     };
 
-    let diagnose_migration_history_output =
-        diagnose_migration_history(diagnose_input, namespaces, connector, adapter_factory).await?;
+    let diagnose_migration_history_output = diagnose_migration_history(
+        diagnose_input,
+        namespaces,
+        connector,
+        adapter_factory,
+        migration_schema_cache,
+    )
+    .await?;
 
     check_for_broken_migrations(&diagnose_migration_history_output)?;
 

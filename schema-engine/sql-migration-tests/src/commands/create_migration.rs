@@ -119,6 +119,7 @@ impl<'a> CreateMigration<'a> {
     pub async fn send(self) -> CoreResult<CreateMigrationAssertion<'a>> {
         let migrations_list = utils::list_migrations(self.migrations_directory.path()).unwrap();
         let migration_name = self.name.to_owned();
+        let mut migration_schema_cache = Default::default();
         let output = create_migration(
             CreateMigrationInput {
                 migrations_list,
@@ -127,6 +128,7 @@ impl<'a> CreateMigration<'a> {
                 migration_name: migration_name.clone(),
             },
             self.api,
+            &mut migration_schema_cache,
         )
         .await?;
 

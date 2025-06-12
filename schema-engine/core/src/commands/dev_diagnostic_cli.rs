@@ -1,4 +1,7 @@
-use super::{diagnose_migration_history_cli, DiagnoseMigrationHistoryOutput, DriftDiagnostic, HistoryDiagnostic};
+use super::{
+    diagnose_migration_history_cli, DiagnoseMigrationHistoryOutput, DriftDiagnostic, HistoryDiagnostic,
+    MigrationSchemaCache,
+};
 use crate::json_rpc::types::{
     DevAction, DevActionReset, DevDiagnosticInput, DevDiagnosticOutput, DiagnoseMigrationHistoryInput,
 };
@@ -10,6 +13,7 @@ pub async fn dev_diagnostic_cli(
     input: DevDiagnosticInput,
     namespaces: Option<Namespaces>,
     connector: &mut dyn SchemaConnector,
+    migration_schema_cache: &mut MigrationSchemaCache,
 ) -> ConnectorResult<DevDiagnosticOutput> {
     migrations_directory::error_on_changed_provider(&input.migrations_list.lockfile, connector.connector_type())?;
 
@@ -19,7 +23,7 @@ pub async fn dev_diagnostic_cli(
     };
 
     let diagnose_migration_history_output =
-        diagnose_migration_history_cli(diagnose_input, namespaces, connector).await?;
+        diagnose_migration_history_cli(diagnose_input, namespaces, connector, migration_schema_cache).await?;
 
     check_for_broken_migrations(&diagnose_migration_history_output)?;
 

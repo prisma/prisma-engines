@@ -1,7 +1,7 @@
 use schema_connector::DatabaseSchema;
 use sql_schema_describer::{self as sql, SqlSchema};
 
-#[derive(Default, Debug)]
+#[derive(Default, Debug, Clone)]
 pub(crate) struct SqlDatabaseSchema {
     pub(crate) describer_schema: SqlSchema,
     /// A _sorted_ array of column ids with prisma-level defaults.
