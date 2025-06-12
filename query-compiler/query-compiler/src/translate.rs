@@ -14,7 +14,8 @@ use query_core::{
     QueryGraphError, RowCountSink, RowSink,
 };
 use query_structure::{
-    FieldSelection, FieldTypeInformation, Placeholder, PrismaValue, PrismaValueType, SelectedField, SelectionResult,
+    FieldSelection, FieldTypeInformation, IntoFilter, Placeholder, PrismaValue, PrismaValueType, SelectedField,
+    SelectionResult,
 };
 use thiserror::Error;
 
@@ -298,6 +299,9 @@ impl<'a, 'b> NodeTranslator<'a, 'b> {
                         RowSink::SingleRow(field) => {
                             *field.node_input_field(&mut node) = SelectionResult::new(fields);
                         }
+                        RowSink::SingleRowFilter(field) => {
+                            *field.node_input_field(&mut node) = SelectionResult::new(fields).filter();
+                        }
                         RowSink::Discard => {}
                     }
                 }
@@ -430,7 +434,7 @@ impl<'a, 'b> NodeTranslator<'a, 'b> {
                     edge_content,
                     Some(QueryGraphDependency::ProjectedDataSinkDependency(
                         _,
-                        RowSink::SingleRow(_),
+                        RowSink::SingleRow(_) | RowSink::SingleRowArray(_) | RowSink::SingleRowFilter(_),
                         _
                     ))
                 );

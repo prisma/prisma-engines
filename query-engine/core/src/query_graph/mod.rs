@@ -21,7 +21,7 @@ use petgraph::{
     visit::{EdgeRef as PEdgeRef, NodeIndexable},
     *,
 };
-use query_structure::{FieldSelection, IntoFilter, QueryArguments, SelectionResult};
+use query_structure::{FieldSelection, Filter, IntoFilter, QueryArguments, SelectionResult};
 
 pub type QueryGraphResult<T> = std::result::Result<T, QueryGraphError>;
 
@@ -180,6 +180,7 @@ pub enum RowSink {
     AllRows(&'static dyn NodeInputField<Vec<SelectionResult>>),
     SingleRow(&'static dyn NodeInputField<SelectionResult>),
     SingleRowArray(&'static dyn NodeInputField<Vec<SelectionResult>>),
+    SingleRowFilter(&'static dyn NodeInputField<Filter>),
     Discard,
 }
 

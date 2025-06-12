@@ -21,6 +21,8 @@ const CONNECTOR_REGISTRY: ConnectorRegistry<'_> = &[
     psl::builtin_connectors::MYSQL,
     #[cfg(feature = "sqlite")]
     psl::builtin_connectors::SQLITE,
+    #[cfg(feature = "mssql")]
+    psl::builtin_connectors::MSSQL,
 ];
 
 #[wasm_bindgen]

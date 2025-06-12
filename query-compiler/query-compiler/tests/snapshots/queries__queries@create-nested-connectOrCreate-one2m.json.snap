@@ -71,9 +71,9 @@ transaction
                                        NOTHING»
                               params [product(var(0$id as Int[]),
                                               var(3$id as Int[]))];
-                let 7 = let 0 = validate (get 0)
+                let 7 = let 0 = unique (validate (get 0)
                             [ rowCountNeq 0
-                            ] orRaise "MISSING_RECORD";
+                            ] orRaise "MISSING_RECORD");
                             0$id = mapField id (get 0)
                     in let 7 = let @parent = unique (query «SELECT
                                                             "public"."Post"."id",

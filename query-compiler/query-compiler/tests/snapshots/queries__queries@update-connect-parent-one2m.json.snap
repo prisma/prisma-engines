@@ -22,9 +22,9 @@ transaction
                                     1=1) RETURNING "public"."Employee"."id",
                                     "public"."Employee"."managerId"»
                              params [var(1$id as Int), const(BigInt(1))])
-             in let 2 = let 0 = validate (get 0)
+             in let 2 = let 0 = unique (validate (get 0)
                             [ rowCountNeq 0
-                            ] orRaise "MISSING_RECORD";
+                            ] orRaise "MISSING_RECORD");
                             0$id = mapField id (get 0)
                     in let 2 = unique (query «SELECT "public"."Employee"."id",
                                               "public"."Employee"."managerId"

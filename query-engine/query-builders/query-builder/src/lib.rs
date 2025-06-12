@@ -251,8 +251,8 @@ impl fmt::Display for DbQuery {
                 let mut number = 1;
                 for fragment in fragments {
                     match fragment {
-                        Fragment::StringChunk(s) => {
-                            write!(formatter, "{}", s)?;
+                        Fragment::StringChunk { chunk } => {
+                            write!(formatter, "{chunk}")?;
                         }
                         Fragment::Parameter => {
                             placeholder_format.write(formatter, &mut number)?;
@@ -262,7 +262,7 @@ impl fmt::Display for DbQuery {
                             placeholder_format.write(formatter, &mut number)?;
                             write!(formatter, "]")?;
                         }
-                        Fragment::ParameterTupleList => {
+                        Fragment::ParameterTupleList { .. } => {
                             write!(formatter, "[(")?;
                             placeholder_format.write(formatter, &mut number)?;
                             write!(formatter, ")]")?;

@@ -1,4 +1,5 @@
 use super::*;
+use crate::inputs::RecordQueryFilterInput;
 use crate::query_graph_builder::write::limit::validate_limit;
 use crate::query_graph_builder::write::write_args_parser::*;
 use crate::{
@@ -6,9 +7,9 @@ use crate::{
     query_graph::{Node, NodeRef, QueryGraph, QueryGraphDependency},
     ArgumentListLookup, ParsedField, ParsedInputMap,
 };
-use crate::{DataExpectation, ParsedObject};
+use crate::{DataExpectation, ParsedObject, RowSink};
 use psl::datamodel_connector::ConnectorCapability;
-use query_structure::{Filter, IntoFilter, Model};
+use query_structure::{Filter, Model};
 use schema::{constants::args, QuerySchema};
 use std::convert::TryInto;
 
@@ -96,17 +97,9 @@ pub(crate) fn update_record(
         graph.create_edge(
             &update_node,
             &read_node,
-            QueryGraphDependency::ProjectedDataDependency(
+            QueryGraphDependency::ProjectedDataSinkDependency(
                 model.shard_aware_primary_identifier(),
-                Box::new(move |mut read_node, mut parent_ids| {
-                    let parent_id = parent_ids.pop().expect("parent id should be present");
-
-                    if let Node::Query(Query::Read(ReadQuery::RecordQuery(ref mut rq))) = read_node {
-                        rq.add_filter(parent_id.filter());
-                    };
-
-                    Ok(read_node)
-                }),
+                RowSink::SingleRowFilter(&RecordQueryFilterInput),
                 Some(DataExpectation::non_empty_rows(
                     MissingRecord::builder().operation(DataOperation::Update).build(),
                 )),

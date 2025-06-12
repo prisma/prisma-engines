@@ -243,7 +243,7 @@ impl<'a> Visitor<'a> for Mysql<'a> {
 
                 self.write(")")?;
                 self.write(" VALUES ")?;
-                self.query_template.write_parameter_tuple_list();
+                self.query_template.write_parameter_tuple_list("(", ",", ")", ",");
                 self.query_template.parameters.push(row);
             }
             Expression {
