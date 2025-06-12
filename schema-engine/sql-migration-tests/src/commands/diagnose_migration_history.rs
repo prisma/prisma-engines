@@ -32,6 +32,7 @@ impl<'a> DiagnoseMigrationHistory<'a> {
 
     pub async fn send(self) -> CoreResult<DiagnoseMigrationHistoryAssertions<'a>> {
         let migrations_list = utils::list_migrations(self.migrations_directory.path()).unwrap();
+        let mut migration_schema_cache = Default::default();
         let output = diagnose_migration_history_cli(
             DiagnoseMigrationHistoryInput {
                 migrations_list,
@@ -39,6 +40,7 @@ impl<'a> DiagnoseMigrationHistory<'a> {
             },
             None,
             self.api,
+            &mut migration_schema_cache,
         )
         .await?;
 

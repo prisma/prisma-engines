@@ -16,12 +16,12 @@ pub mod commands;
 pub mod core_error;
 
 mod api;
-mod migration_cache;
+mod migration_schema_cache;
 
 pub use self::{api::GenericApi, core_error::*};
 pub use commands::*;
 use json_rpc::types::{SchemaContainer, SchemasContainer, SchemasWithConfigDir};
-pub use migration_cache::MigrationCache;
+pub use migration_schema_cache::MigrationSchemaCache;
 pub use schema_connector;
 
 use psl::{

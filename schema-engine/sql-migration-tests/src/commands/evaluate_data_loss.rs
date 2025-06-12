@@ -32,14 +32,14 @@ impl<'a> EvaluateDataLoss<'a> {
 
     fn send_impl(self) -> CoreResult<EvaluateDataLossAssertion<'a>> {
         let migrations_list = utils::list_migrations(self.migrations_directory.path()).unwrap();
-        let mut migrations_cache = Default::default();
+        let mut migration_schema_cache = Default::default();
         let fut = evaluate_data_loss(
             EvaluateDataLossInput {
                 migrations_list,
                 schema: SchemasContainer { files: self.files },
             },
             self.api,
-            &mut migrations_cache,
+            &mut migration_schema_cache,
         );
         let output = test_setup::runtime::run_with_thread_local_runtime(fut)?;
 

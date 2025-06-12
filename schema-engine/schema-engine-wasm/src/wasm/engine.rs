@@ -1,7 +1,7 @@
 use super::logger::init_logger;
 use commands::{
     schema_connector::{self, ConnectorError, IntrospectionResult, Namespaces, SchemaConnector},
-    CoreError, MigrationCache, SchemaContainerExt,
+    CoreError, MigrationSchemaCache, SchemaContainerExt,
 };
 use driver_adapters::{adapter_factory_from_js, JsObject};
 use js_sys::Function as JsFunction;
@@ -73,7 +73,7 @@ pub struct SchemaEngine {
     dispatch: Dispatch,
 
     /// The cache for migrations to avoid redundant work during `prisma migrate dev`.
-    migrations_cache: MigrationCache,
+    migration_schema_cache: MigrationSchemaCache,
 }
 
 #[wasm_bindgen]
@@ -123,7 +123,7 @@ impl SchemaEngine {
                 connector,
                 namespaces,
                 dispatch,
-                migrations_cache: MigrationCache::new(),
+                migration_schema_cache: MigrationSchemaCache::new(),
             })
         }
         .with_subscriber(cloned_dispatch)
@@ -179,7 +179,7 @@ impl SchemaEngine {
                 migration_name = input.migration_name.as_str(),
                 draft = input.draft,
             );
-            let result = commands::create_migration(input, &mut self.connector, &mut self.migrations_cache)
+            let result = commands::create_migration(input, &mut self.connector, &mut self.migration_schema_cache)
                 .instrument(span)
                 .await?;
             Ok(result)
@@ -205,9 +205,15 @@ impl SchemaEngine {
         let dispatch = self.dispatch.clone();
         async move {
             let namespaces = self.namespaces();
-            let result = commands::dev_diagnostic(input, namespaces, &mut self.connector, self.adapter_factory.clone())
-                .instrument(tracing::info_span!("DevDiagnostic"))
-                .await?;
+            let result = commands::dev_diagnostic(
+                input,
+                namespaces,
+                &mut self.connector,
+                self.adapter_factory.clone(),
+                &mut self.migration_schema_cache,
+            )
+            .instrument(tracing::info_span!("DevDiagnostic"))
+            .await?;
             Ok(result)
         }
         .with_subscriber(dispatch)
@@ -242,6 +248,7 @@ impl SchemaEngine {
                 namespaces,
                 &mut self.connector,
                 self.adapter_factory.clone(),
+                &mut self.migration_schema_cache,
             )
             .instrument(tracing::info_span!("DiagnoseMigrationHistory"))
             .await?
@@ -275,7 +282,7 @@ impl SchemaEngine {
     ) -> Result<EvaluateDataLossOutput, JsValue> {
         let dispatch = self.dispatch.clone();
         async move {
-            let result = commands::evaluate_data_loss(input, &mut self.connector, &mut self.migrations_cache)
+            let result = commands::evaluate_data_loss(input, &mut self.connector, &mut self.migration_schema_cache)
                 .instrument(tracing::info_span!("EvaluateDataLoss"))
                 .await?;
             Ok(result)

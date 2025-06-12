@@ -21,7 +21,13 @@ impl<'a> DevDiagnostic<'a> {
 
     fn send_impl(self) -> CoreResult<DevDiagnosticAssertions<'a>> {
         let migrations_list = utils::list_migrations(self.migrations_directory.path()).unwrap();
-        let fut = dev_diagnostic_cli(DevDiagnosticInput { migrations_list }, None, self.api);
+        let mut migration_schema_cache = Default::default();
+        let fut = dev_diagnostic_cli(
+            DevDiagnosticInput { migrations_list },
+            None,
+            self.api,
+            &mut migration_schema_cache,
+        );
         let output = test_setup::runtime::run_with_thread_local_runtime(fut)?;
         Ok(DevDiagnosticAssertions {
             output,
