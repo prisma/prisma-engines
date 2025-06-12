@@ -1,3 +1,4 @@
+use std::borrow::Borrow;
 use std::collections::HashMap;
 use std::collections::hash_map::DefaultHasher;
 use std::hash::{Hash, Hasher};
@@ -22,7 +23,7 @@ impl MigrationSchemaCache {
     where
         F: FnOnce() -> Fut,
         Fut: std::future::Future<Output = Result<DatabaseSchema, E>>,
-        T: Hash,
+        T: Borrow<json_rpc::types::MigrationDirectory> + Hash,
     {
         let mut hasher = DefaultHasher::new();
         migration_directories.hash(&mut hasher);
