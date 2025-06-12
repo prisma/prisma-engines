@@ -33,7 +33,7 @@ pub async fn create_migration(
     let dialect = connector.schema_dialect();
     // We need to start with the 'to', which is the Schema, in order to grab the
     // namespaces, in case we've got MultiSchema enabled.
-    let to = dialect.schema_from_datamodel(sources.clone())?;
+    let to = dialect.schema_from_datamodel(sources)?;
 
     let from = migration_schema_cache
         .get_or_insert(&input.migrations_list.migration_directories, || async {

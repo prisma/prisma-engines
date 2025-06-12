@@ -18,7 +18,7 @@ pub async fn evaluate_data_loss(
 
     let dialect = connector.schema_dialect();
 
-    let to = dialect.schema_from_datamodel(sources.clone())?;
+    let to = dialect.schema_from_datamodel(sources)?;
 
     let from = migration_schema_cache
         .get_or_insert(&input.migrations_list.migration_directories, || async {
