@@ -56,6 +56,8 @@ jobs:
             target/query-engine-wasm/query-engine-mysql.wasm
             target/query-engine-wasm/query-engine-sqlite.wasm.gz
             target/query-engine-wasm/query-engine-sqlite.wasm
+            target/query-engine-wasm/query-engine-sqlserver.wasm.gz
+            target/query-engine-wasm/query-engine-sqlserver.wasm
           )
 
           DATE_TIME="$(date -u --iso-8601=seconds)"
