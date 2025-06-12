@@ -72,7 +72,7 @@ impl AdapterProvider {
             #[cfg(feature = "sqlite")]
             Self::Sqlite => "sqlite",
             #[cfg(feature = "mssql")]
-            Self::SqlServer => "sqlserver",
+            Self::SqlServer => "mssql",
         }
     }
 }
