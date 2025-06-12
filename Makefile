@@ -71,7 +71,7 @@ build-qe-wasm:
 
 build-qe-wasm-gz: build-qe-wasm
 	@cd query-engine/query-engine-wasm/pkg && \
-    for provider in postgresql mysql sqlite; do \
+    for provider in postgresql mysql sqlite sqlserver; do \
         gzip -knc $$provider/query_engine_bg.wasm > $$provider.gz; \
     done;
 
@@ -442,7 +442,7 @@ test-driver-adapter-planetscale-wasm: test-planetscale-wasm
 
 measure-qe-wasm: build-qe-wasm-gz
 	@cd query-engine/query-engine-wasm/pkg; \
-	for provider in postgresql mysql sqlite; do \
+	for provider in postgresql mysql sqlite sqlserver; do \
 		echo "$${provider}_size=$$(cat $$provider/query_engine_bg.wasm | wc -c | tr -d ' ')" >> $(ENGINE_SIZE_OUTPUT); \
 		echo "$${provider}_size_gz=$$(cat $$provider.gz | wc -c | tr -d ' ')" >> $(ENGINE_SIZE_OUTPUT); \
 	done;
