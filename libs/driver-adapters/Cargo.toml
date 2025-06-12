@@ -7,6 +7,7 @@ edition = "2021"
 mysql = ["quaint/mysql"]
 sqlite = ["quaint/sqlite"]
 postgresql = ["quaint/postgresql"]
+mssql = ["quaint/mssql"]
 
 [lints]
 workspace = true

@@ -36,6 +36,7 @@ build-utils.workspace = true
 sqlite = ["psl/sqlite", "query-compiler/sqlite"]
 postgresql = ["psl/postgresql", "query-compiler/postgresql"]
 mysql = ["psl/mysql", "query-compiler/mysql"]
+mssql = ["psl/mssql", "query-compiler/mssql"]
 
 [package.metadata.wasm-pack.profile.release]
 wasm-opt = false # use wasm-opt explicitly in `./build.sh`

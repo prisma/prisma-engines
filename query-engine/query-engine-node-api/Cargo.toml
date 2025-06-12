@@ -38,6 +38,7 @@ driver-adapters = { workspace = true, features = [
     "postgresql",
     "sqlite",
     "mysql",
+    "mssql"
 ] }
 napi.workspace = true
 napi-derive.workspace = true

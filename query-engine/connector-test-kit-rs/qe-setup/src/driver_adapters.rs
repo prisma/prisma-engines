@@ -20,6 +20,9 @@ pub enum DriverAdapter {
 
     #[serde(rename = "better-sqlite3")]
     BetterSQLite3,
+
+    #[serde(rename = "mssql")]
+    Mssql,
 }
 
 impl From<String> for DriverAdapter {

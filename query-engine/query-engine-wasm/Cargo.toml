@@ -27,6 +27,12 @@ mysql = [
     "psl/mysql",
     "request-handlers/mysql",
 ]
+mssql = [
+    "driver-adapters/mssql",
+    "sql-connector/mssql",
+    "psl/mssql",
+    "request-handlers/mssql",
+]
 
 [lints]
 workspace = true

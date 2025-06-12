@@ -6,6 +6,10 @@ use quaint::error::PostgresError;
 
 #[cfg(feature = "sqlite")]
 use quaint::error::SqliteError;
+
+#[cfg(feature = "mssql")]
+use quaint::error::MssqlError;
+
 use serde::Deserialize;
 
 #[cfg(feature = "postgresql")]
@@ -35,6 +39,14 @@ pub struct MysqlErrorDef {
 pub struct SqliteErrorDef {
     pub extended_code: i32,
     pub message: Option<String>,
+}
+
+#[cfg(feature = "mssql")]
+#[derive(Deserialize)]
+#[serde(remote = "MssqlError")]
+pub struct MssqlErrorDef {
+    pub code: u32,
+    pub message: String,
 }
 
 #[derive(Deserialize)]
@@ -91,6 +103,9 @@ pub(crate) enum DriverAdapterError {
         cause: String,
     },
     MissingFullTextSearchIndex,
+    TransactionAlreadyClosed {
+        cause: String,
+    },
     #[cfg(feature = "postgresql")]
     #[serde(rename = "postgres")]
     Postgres(#[serde(with = "PostgresErrorDef")] PostgresError),
@@ -100,6 +115,9 @@ pub(crate) enum DriverAdapterError {
     #[cfg(feature = "sqlite")]
     #[serde(rename = "sqlite")]
     Sqlite(#[serde(with = "SqliteErrorDef")] SqliteError),
+    #[cfg(feature = "mssql")]
+    #[serde(rename = "mssql")]
+    Mssql(#[serde(with = "MssqlErrorDef")] MssqlError),
 }
 
 #[derive(Deserialize)]

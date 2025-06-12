@@ -17,9 +17,9 @@ pub struct Postgres<'a> {
 }
 
 impl<'a> Postgres<'a> {
-    /// Name of the function used to view the version of the database.
-    pub const fn version_fn() -> &'static str {
-        "version"
+    /// Expression that evaluates to the current PostgreSQL version.
+    pub const fn version_expr() -> &'static str {
+        "version()"
     }
 
     fn visit_json_build_obj_expr(&mut self, expr: Expression<'a>) -> crate::Result<()> {

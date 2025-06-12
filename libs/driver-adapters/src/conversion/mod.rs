@@ -2,6 +2,8 @@ pub(crate) mod js_arg;
 pub(crate) mod js_arg_type;
 pub(crate) mod js_to_quaint;
 
+#[cfg(feature = "mssql")]
+pub(crate) mod mssql;
 #[cfg(feature = "mysql")]
 pub(crate) mod mysql;
 #[cfg(feature = "postgresql")]
