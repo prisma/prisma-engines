@@ -146,8 +146,13 @@ async fn json_rpc_diff_target_to_dialect(
             let mut connector = crate::connector_for_connection_string(url.clone(), None, BitFlags::empty())?;
             connector.ensure_connection_validity().await?;
             connector.set_preview_features(preview_features);
+
             let schema = connector.schema_from_database(namespaces).await?;
-            Ok(Some((connector.schema_dialect(), schema)))
+            let dialect = connector.schema_dialect();
+
+            connector.dispose().await?;
+
+            Ok(Some((dialect, schema)))
         }
         DiffTarget::Migrations(MigrationList {
             lockfile,

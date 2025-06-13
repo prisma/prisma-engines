@@ -3,38 +3,65 @@ use json_rpc::method_names::*;
 use jsonrpc_core::{types::error::Error as JsonRpcError, IoHandler, Params};
 use psl::SourceFile;
 use std::sync::Arc;
+use tokio::sync::RwLock;
 
-/// Initialize a JSON-RPC ready schema engine API.
-pub fn rpc_api(
-    initial_datamodels: Option<Vec<(String, String)>>,
-    host: Arc<dyn schema_connector::ConnectorHost>,
-) -> IoHandler {
-    let mut io_handler = IoHandler::default();
-    let initial_datamodels = initial_datamodels.map(|schemas| {
-        schemas
-            .into_iter()
-            .map(|(name, schema)| (name, SourceFile::from(schema)))
-            .collect()
-    });
-
-    let api = Arc::new(crate::state::EngineState::new(initial_datamodels, Some(host)));
-
-    for cmd in METHOD_NAMES {
-        let api = api.clone();
-        io_handler.add_method(cmd, move |params: Params| {
-            Box::pin(run_command(api.clone(), cmd, params))
-        });
-    }
-
-    io_handler
+/// Stateful JSON-RPC API wrapper.
+pub struct RpcApi {
+    io_handler: IoHandler,
+    api: Arc<RwLock<dyn GenericApi>>,
 }
 
-#[allow(clippy::redundant_allocation)]
+impl RpcApi {
+    /// Initializes a JSON-RPC ready schema engine API.
+    pub fn new(
+        initial_datamodels: Option<Vec<(String, String)>>,
+        host: Arc<dyn schema_connector::ConnectorHost>,
+    ) -> Self {
+        let mut io_handler = IoHandler::default();
+        let initial_datamodels = initial_datamodels.map(|schemas| {
+            schemas
+                .into_iter()
+                .map(|(name, schema)| (name, SourceFile::from(schema)))
+                .collect()
+        });
+
+        let api = Arc::new(RwLock::new(crate::state::EngineState::new(
+            initial_datamodels,
+            Some(host),
+        )));
+
+        for cmd in METHOD_NAMES {
+            let api = api.clone();
+            io_handler.add_method(cmd, move |params: Params| {
+                Box::pin(run_command(api.clone(), cmd, params))
+            });
+        }
+
+        Self { io_handler, api }
+    }
+
+    /// Returns the underlying JSON-RPC handler.
+    pub fn io_handler(&self) -> &IoHandler {
+        &self.io_handler
+    }
+
+    /// Disposes the database connectors and drops the JSON-RPC handler.
+    /// It is not strictly necessary to call this method when dealing with most
+    /// well-behaved databases, but it ensures that the connections are always
+    /// closed politely and gracefully, which is required, e.g., for PGlite.
+    /// If not called, there will be no resource leaks or correctness issues
+    /// on our side, but the database might not be notified about the shutdown.
+    pub async fn dispose(self) -> CoreResult<()> {
+        self.api.write().await.dispose().await
+    }
+}
+
 async fn run_command(
-    executor: Arc<dyn GenericApi>,
+    executor: Arc<RwLock<dyn GenericApi>>,
     cmd: &str,
     params: Params,
 ) -> Result<serde_json::Value, JsonRpcError> {
+    let executor = executor.read_owned().await;
     match cmd {
         APPLY_MIGRATIONS => render(executor.apply_migrations(params.parse()?).await),
         CREATE_DATABASE => render(executor.create_database(params.parse()?).await),

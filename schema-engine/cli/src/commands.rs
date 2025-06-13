@@ -3,6 +3,7 @@ use base64::prelude::*;
 use schema_connector::ConnectorError;
 use schema_core::json_rpc::types::{DatasourceParam, UrlContainer};
 use structopt::StructOpt;
+use tokio_util::sync::CancellationToken;
 use user_facing_errors::common::SchemaParserError;
 
 #[derive(Debug, StructOpt)]
@@ -15,8 +16,8 @@ pub(crate) struct Cli {
 }
 
 impl Cli {
-    pub(crate) async fn run(self) {
-        match self.run_inner().await {
+    pub(crate) async fn run(self, shutdown_token: CancellationToken) {
+        match self.run_inner(shutdown_token).await {
             Ok(msg) => {
                 tracing::info!("{}", msg);
             }
@@ -24,33 +25,44 @@ impl Cli {
         }
     }
 
-    pub(crate) async fn run_inner(self) -> Result<String, ConnectorError> {
-        let api = schema_core::schema_api(None, None)?;
-        match self.command {
-            CliCommand::CreateDatabase => {
-                let schema_core::json_rpc::types::CreateDatabaseResult { database_name } = api
+    pub(crate) async fn run_inner(self, shutdown_token: CancellationToken) -> Result<String, ConnectorError> {
+        let mut api = schema_core::schema_api(None, None)?;
+
+        let work = async {
+            match self.command {
+                CliCommand::CreateDatabase => api
                     .create_database(schema_core::json_rpc::types::CreateDatabaseParams {
                         datasource: DatasourceParam::ConnectionString(UrlContainer {
                             url: self.datasource.clone(),
                         }),
                     })
-                    .await?;
-                Ok(format!("Database '{database_name}' was successfully created."))
-            }
-            CliCommand::CanConnectToDatabase => {
-                api.ensure_connection_validity(schema_core::json_rpc::types::EnsureConnectionValidityParams {
-                    datasource: DatasourceParam::ConnectionString(UrlContainer {
-                        url: self.datasource.clone(),
+                    .await
+                    .map(|schema_core::json_rpc::types::CreateDatabaseResult { database_name }| {
+                        format!("Database '{database_name}' was successfully created.")
                     }),
-                })
-                .await?;
-                Ok("Connection successful".to_owned())
+                CliCommand::CanConnectToDatabase => api
+                    .ensure_connection_validity(schema_core::json_rpc::types::EnsureConnectionValidityParams {
+                        datasource: DatasourceParam::ConnectionString(UrlContainer {
+                            url: self.datasource.clone(),
+                        }),
+                    })
+                    .await
+                    .map(|_| "Connection successful".to_owned()),
+                CliCommand::DropDatabase => api
+                    .drop_database(self.datasource.clone())
+                    .await
+                    .map(|_| "The database was successfully dropped.".to_owned()),
             }
-            CliCommand::DropDatabase => {
-                api.drop_database(self.datasource.clone()).await?;
-                Ok("The database was successfully dropped.".to_owned())
-            }
-        }
+        };
+
+        let result = tokio::select! {
+            result = work => result,
+            _ = shutdown_token.cancelled() => Err(ConnectorError::from_msg("Operation was cancelled".to_owned())),
+        };
+
+        api.dispose().await?;
+
+        result
     }
 }
 

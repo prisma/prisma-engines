@@ -1,11 +1,12 @@
 use expect_test::expect;
+use schema_core::RpcApi;
 use std::sync::Arc;
 use test_macros::test_connector;
 use test_setup::*;
 
 struct TestApi {
     _args: TestApiArgs,
-    api: jsonrpc_core::IoHandler,
+    api: RpcApi,
     rt: tokio::runtime::Runtime,
 }
 
@@ -15,13 +16,13 @@ impl TestApi {
         let rt = tokio::runtime::Runtime::new().unwrap();
         TestApi {
             _args,
-            api: schema_core::rpc_api(None, host),
+            api: RpcApi::new(None, host),
             rt,
         }
     }
 
     fn send_request(&mut self, request: &str) -> Option<String> {
-        self.rt.block_on(self.api.handle_request(request))
+        self.rt.block_on(self.api.io_handler().handle_request(request))
     }
 }
 

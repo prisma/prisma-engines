@@ -557,6 +557,10 @@ impl SchemaConnector for SqlSchemaConnector {
             })
         })
     }
+
+    fn dispose(&mut self) -> BoxFuture<'_, ConnectorResult<()>> {
+        self.inner.dispose()
+    }
 }
 
 fn new_shadow_database_name() -> String {

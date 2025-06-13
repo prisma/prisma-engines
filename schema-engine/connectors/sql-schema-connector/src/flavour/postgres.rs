@@ -593,8 +593,10 @@ impl SqlConnector for PostgresConnector {
         self.schema_name()
     }
 
-    fn dispose(&self) -> BoxFuture<'_, ConnectorResult<()>> {
-        Box::pin(imp::dispose(&self.state))
+    fn dispose(&mut self) -> BoxFuture<'_, ConnectorResult<()>> {
+        // Clippy thinks `imp::dispose` takes a shared reference for whatever reason.
+        #[allow(clippy::unnecessary_mut_passed)]
+        Box::pin(imp::dispose(&mut self.state))
     }
 }
 
