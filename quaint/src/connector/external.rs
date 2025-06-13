@@ -23,6 +23,7 @@ pub enum AdapterName {
     LibSQL,
     BetterSQLite3,
     Planetscale,
+    MySQL2,
     Mssql,
     Unknown,
 }
@@ -38,6 +39,7 @@ impl FromStr for AdapterName {
                 "d1-http" => Ok(Self::D1(AdapterD1::HTTP)),
                 "libsql" => Ok(Self::LibSQL),
                 "better-sqlite3" => Ok(Self::BetterSQLite3),
+                "mysql2" => Ok(Self::MySQL2),
                 "planetscale" => Ok(Self::Planetscale),
                 "mssql" => Ok(Self::Mssql),
                 _ => Ok(Self::Unknown),
