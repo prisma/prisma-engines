@@ -192,41 +192,69 @@ fn parses_doc_no_alias(api: TestApi) {
     api.introspect_sql("test_1", sql).send_sync().expect_result(expected)
 }
 
-#[test_connector(tags(Postgres))]
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
 fn parses_doc_enum_name(api: TestApi) {
     api.schema_push(ENUM_SCHEMA).send().assert_green();
 
     let expected = expect![[r#"
         IntrospectSqlQueryOutput {
             name: "test_1",
-            source: "\nSELECT * FROM model WHERE id = $1;\n",
+            source: "\n  -- @param  {MyFancyEnum} $1:alias\n    SELECT 'col' as \"col\" WHERE 1 = $1;\n    ",
             documentation: None,
             parameters: [
                 IntrospectSqlQueryParameterOutput {
                     documentation: None,
-                    name: "int4",
+                    name: "alias",
                     typ: "MyFancyEnum",
                     nullable: false,
                 },
             ],
             result_columns: [
                 IntrospectSqlQueryColumnOutput {
-                    name: "id",
-                    typ: "int",
-                    nullable: false,
-                },
-                IntrospectSqlQueryColumnOutput {
-                    name: "enum",
-                    typ: "MyFancyEnum",
-                    nullable: false,
+                    name: "col",
+                    typ: "string",
+                    nullable: true,
                 },
             ],
         }
     "#]];
 
     let sql = r#"
-  -- @param  {MyFancyEnum} $1
-    SELECT * FROM model WHERE id = ?;
+  -- @param  {MyFancyEnum} $1:alias
+    SELECT 'col' as "col" WHERE 1 = ?;
+    "#;
+
+    api.introspect_sql("test_1", sql).send_sync().expect_result(expected)
+}
+
+#[test_connector(tags(Postgres))]
+fn parses_doc_array(api: TestApi) {
+    let expected = expect![[r#"
+        IntrospectSqlQueryOutput {
+            name: "test_1",
+            source: "\n  -- @param {Int[]} $1:myIntArray\n    SELECT 1 as \"col\" WHERE 1 = $1;\n    ",
+            documentation: None,
+            parameters: [
+                IntrospectSqlQueryParameterOutput {
+                    documentation: None,
+                    name: "myIntArray",
+                    typ: "int-array",
+                    nullable: false,
+                },
+            ],
+            result_columns: [
+                IntrospectSqlQueryColumnOutput {
+                    name: "col",
+                    typ: "int",
+                    nullable: true,
+                },
+            ],
+        }
+    "#]];
+
+    let sql = r#"
+  -- @param {Int[]} $1:myIntArray
+    SELECT 1 as "col" WHERE 1 = ?;
     "#;
 
     api.introspect_sql("test_1", sql).send_sync().expect_result(expected)
