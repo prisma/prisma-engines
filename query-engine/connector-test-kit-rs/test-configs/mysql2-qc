@@ -1,0 +1,6 @@
+{
+    "connector": "mysql",
+    "version": "mysql2.js.wasm",
+    "driver_adapter": "mysql2",
+    "external_test_executor": "QueryCompiler"
+}
