@@ -436,6 +436,17 @@ test-planetscale-qc: dev-planetscale-qc test-qe-st
 test-driver-adapter-planetscale: test-planetscale-js
 test-driver-adapter-planetscale-wasm: test-planetscale-wasm
 
+start-mysql2:
+	docker compose -f docker-compose.yml up -d --remove-orphans mysql-8-0
+
+dev-mysql2-wasm: start-mysql2 build-qe-wasm build-driver-adapters-kit-qe
+	cp $(CONFIG_PATH)/mysql2-wasm $(CONFIG_FILE)
+
+dev-mysql2-qc: start-mysql2 build-qc-wasm build-driver-adapters-kit-qc
+	cp $(CONFIG_PATH)/mysql2-qc $(CONFIG_FILE)
+
+test-mysql2-qc: dev-mysql2-qc test-qe-st
+
 ######################
 # Local dev commands #
 ######################

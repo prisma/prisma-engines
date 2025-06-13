@@ -1,6 +1,7 @@
 packages:
   - '../../../prisma/packages/adapter-d1'
   - '../../../prisma/packages/adapter-better-sqlite3'
+  - '../../../prisma/packages/adapter-mysql2'
   - '../../../prisma/packages/adapter-libsql'
   - '../../../prisma/packages/adapter-neon'
   - '../../../prisma/packages/adapter-pg'

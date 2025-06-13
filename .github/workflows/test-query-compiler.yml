@@ -49,6 +49,12 @@ jobs:
             should_fail_tests_list: query-compiler/query-engine-tests-todo/planetscale/fail
             relation_load_strategy: '["query"]'
 
+          - name: mysql2
+            setup_task: dev-mysql2-qc
+            ignored_tests_list: query-compiler/query-engine-tests-todo/mysql2/skip
+            should_fail_tests_list: query-compiler/query-engine-tests-todo/mysql2/fail
+            relation_load_strategy: '["query"]'
+
           - name: d1
             setup_task: dev-d1-qc
             ignored_tests_list: query-compiler/query-engine-tests-todo/d1/skip

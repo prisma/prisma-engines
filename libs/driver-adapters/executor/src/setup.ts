@@ -10,6 +10,7 @@ import { LibSQLManager } from './driver-adapters-manager/libsql'
 import { PlanetScaleManager } from './driver-adapters-manager/planetscale'
 import { D1Manager } from './driver-adapters-manager/d1'
 import { BetterSQLite3Manager } from './driver-adapters-manager/better-sqlite3'
+import { MySQL2Manager } from './driver-adapters-manager/mysql2'
 
 export async function setupDriverAdaptersManager(
   env: Env,
@@ -39,6 +40,10 @@ export async function setupDriverAdaptersManager(
     .with(
       { DRIVER_ADAPTER: 'better-sqlite3' },
       async (env) => await BetterSQLite3Manager.setup(env, input),
+    )
+    .with(
+      { DRIVER_ADAPTER: 'mysql2' },
+      async (env) => await MySQL2Manager.setup(env, input),
     )
     .exhaustive()
 }

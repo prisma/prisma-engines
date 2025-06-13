@@ -219,6 +219,8 @@ jobs:
         adapter:
           - name: 'planetscale (wasm)'
             setup_task: 'dev-planetscale-wasm'
+          - name: 'mysql2 (wasm)'
+            setup_task: 'dev-mysql2-wasm'
           - name: 'pg (wasm)'
             setup_task: 'dev-pg-wasm'
           - name: 'neon (wasm)'
