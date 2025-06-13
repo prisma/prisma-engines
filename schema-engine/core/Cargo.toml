@@ -24,6 +24,7 @@ json-rpc = { path = "../json-rpc-api", package = "json-rpc-api" }
 async-trait.workspace = true
 chrono.workspace = true
 enumflags2.workspace = true
+futures.workspace = true
 jsonrpc-core.workspace = true
 serde.workspace = true
 serde_json.workspace = true

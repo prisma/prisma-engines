@@ -6,6 +6,7 @@
 use crate::{commands, parse_configuration_multi, CoreError, CoreResult, GenericApi, SchemaContainerExt};
 use ::commands::MigrationSchemaCache;
 use enumflags2::BitFlags;
+use futures::stream::{FuturesUnordered, StreamExt};
 use json_rpc::types::*;
 use psl::{parser_database::SourceFile, PreviewFeature};
 use schema_connector::{ConnectorError, ConnectorHost, IntrospectionResult, Namespaces, SchemaConnector};
@@ -16,7 +17,7 @@ use std::{
     pin::Pin,
     sync::Arc,
 };
-use tokio::sync::{mpsc, Mutex};
+use tokio::sync::{mpsc, oneshot, Mutex};
 use tracing_futures::{Instrument, WithSubscriber};
 
 /// The container for the state of the schema engine. It can contain one or more connectors
@@ -522,5 +523,32 @@ impl GenericApi for EngineState {
             Box::pin(commands::schema_push(input, connector).instrument(tracing::info_span!("SchemaPush")))
         }))
         .await
+    }
+
+    async fn dispose(&mut self) -> CoreResult<()> {
+        self.connectors
+            .lock()
+            .await
+            .drain()
+            .map(|(_, snd)| async move {
+                let (tx, rx) = oneshot::channel();
+
+                snd.send({
+                    Box::new(move |conn| {
+                        Box::pin(async move {
+                            _ = tx.send(conn.dispose().await);
+                        })
+                    })
+                })
+                .await
+                .map_err(|err| CoreError::from_msg(format!("Failed to send dispose command to connector: {err}")))?;
+
+                rx.await.map_err(|err| {
+                    CoreError::from_msg(format!("Connector did not respond to dispose command: {err}"))
+                })?
+            })
+            .collect::<FuturesUnordered<_>>()
+            .fold(Ok(()), async |acc, result| acc.and(result))
+            .await
     }
 }

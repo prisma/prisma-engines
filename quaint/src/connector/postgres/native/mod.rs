@@ -502,13 +502,11 @@ impl<Cache: QueryCache> PostgreSql<Cache> {
         )
         .await
     }
-}
 
-impl<Cache> Drop for PostgreSql<Cache> {
-    fn drop(&mut self) {
-        if self.single_use_connection {
-            self.handle.abort();
-        }
+    /// Closes the connection and waits for the connection task to complete.
+    pub async fn close(self) {
+        drop(self.client);
+        self.handle.await.expect("connection task panicked")
     }
 }
 
