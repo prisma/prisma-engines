@@ -128,7 +128,10 @@ impl MysqlConnector {
     }
 
     pub(crate) fn database_name(&self) -> &str {
-        self.state.params().map(|p| p.url.dbname()).unwrap_or("mysql")
+        self.state
+            .params()
+            .map(|p| p.url.dbname_or_default())
+            .unwrap_or(quaint::connector::DEFAULT_MYSQL_DB)
     }
 
     fn circumstances(&self) -> BitFlags<Circumstances> {
@@ -265,7 +268,7 @@ impl SqlConnector for MysqlConnector {
 
             let mysql_url = MysqlUrl::new(url.clone()).unwrap();
             let mut conn = Connection::new(url).await?;
-            let db_name = params.url.dbname();
+            let db_name = params.url.dbname_or_default();
 
             let query = format!("CREATE DATABASE `{db_name}` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;");
 
@@ -296,7 +299,7 @@ impl SqlConnector for MysqlConnector {
         Box::pin(async {
             let params = self.state.get_unwrapped_params();
             let mut connection = Connection::new(params.url.url().clone()).await?;
-            let db_name = params.url.dbname();
+            let db_name = params.url.dbname_or_default();
 
             connection
                 .raw_cmd(&format!("DROP DATABASE `{db_name}`"), &params.url)
@@ -347,7 +350,7 @@ impl SqlConnector for MysqlConnector {
                 ));
             }
 
-            let db_name = params.url.dbname();
+            let db_name = params.url.dbname_or_default();
             connection
                 .raw_cmd(&format!("DROP DATABASE `{db_name}`"), &params.url)
                 .await?;
@@ -513,7 +516,7 @@ where
             state
                 .try_connect(|params| {
                     Box::pin(async move {
-                        let db_name = params.url.dbname();
+                        let db_name = params.url.dbname_or_default();
                         let mut connection = Connection::new(params.url.url().clone()).await?;
 
                         if MYSQL_SYSTEM_DATABASES.is_match(db_name) {

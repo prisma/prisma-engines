@@ -63,12 +63,14 @@ impl MysqlUrl {
         }
     }
 
-    /// Name of the database connected. Defaults to `mysql`.
-    pub fn dbname(&self) -> &str {
-        match self.url.path_segments() {
-            Some(mut segments) => segments.next().unwrap_or(super::defaults::DEFAULT_MYSQL_DB),
-            None => super::defaults::DEFAULT_MYSQL_DB,
-        }
+    /// Name of the database connected.
+    pub fn dbname(&self) -> Option<&str> {
+        self.url.path_segments().and_then(|mut s| s.next())
+    }
+
+    /// Name of the database in the URL, or the default database if not set.
+    pub fn dbname_or_default(&self) -> &str {
+        self.dbname().unwrap_or(super::defaults::DEFAULT_MYSQL_DB)
     }
 
     /// The database host. If `socket` and `host` are not set, defaults to `localhost`.
@@ -343,14 +345,14 @@ mod tests {
     #[test]
     fn should_parse_socket_url() {
         let url = MysqlUrl::new(Url::parse("mysql://root@localhost/dbname?socket=(/tmp/mysql.sock)").unwrap()).unwrap();
-        assert_eq!("dbname", url.dbname());
+        assert_eq!(Some("dbname"), url.dbname());
         assert_eq!(&Some(String::from("/tmp/mysql.sock")), url.socket());
     }
 
     #[test]
     fn should_parse_socket_url_as_host() {
         let url = MysqlUrl::new(Url::parse("mysql://root@localhost/dbname?socket=(/tmp/mysql.sock)").unwrap()).unwrap();
-        assert_eq!("dbname", url.dbname());
+        assert_eq!(Some("dbname"), url.dbname());
         assert_eq!(&String::from("/tmp/mysql.sock"), url.host());
     }
 

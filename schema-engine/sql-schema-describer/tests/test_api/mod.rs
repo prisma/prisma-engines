@@ -136,7 +136,7 @@ impl TestApi {
     }
 
     pub(crate) fn schema_name(&self) -> &str {
-        self.database.connection_info().schema_name()
+        self.database.connection_info().schema_name().unwrap()
     }
 
     #[track_caller]

@@ -123,7 +123,7 @@ impl ConnectionInfo {
                 #[cfg(feature = "postgresql-native")]
                 NativeConnectionInfo::Postgres(url) => Some(url.dbname()),
                 #[cfg(feature = "mysql-native")]
-                NativeConnectionInfo::Mysql(url) => Some(url.dbname()),
+                NativeConnectionInfo::Mysql(url) => url.dbname(),
                 #[cfg(feature = "mssql-native")]
                 NativeConnectionInfo::Mssql(url) => Some(url.dbname()),
                 #[cfg(feature = "sqlite-native")]
@@ -137,8 +137,8 @@ impl ConnectionInfo {
     ///
     /// - In SQLite, this is the schema name that the database file was attached as.
     /// - In Postgres, it is the selected schema inside the current database.
-    /// - In MySQL, it is the database name.
-    pub fn schema_name(&self) -> &str {
+    /// - In MySQL, it is the database name (may be empty for Vitess).
+    pub fn schema_name(&self) -> Option<&str> {
         match self {
             #[cfg(any(
                 feature = "sqlite-native",
@@ -148,17 +148,17 @@ impl ConnectionInfo {
             ))]
             ConnectionInfo::Native(info) => match info {
                 #[cfg(feature = "postgresql-native")]
-                NativeConnectionInfo::Postgres(url) => url.schema(),
+                NativeConnectionInfo::Postgres(url) => Some(url.schema()),
                 #[cfg(feature = "mysql-native")]
                 NativeConnectionInfo::Mysql(url) => url.dbname(),
                 #[cfg(feature = "mssql-native")]
-                NativeConnectionInfo::Mssql(url) => url.schema(),
+                NativeConnectionInfo::Mssql(url) => Some(url.schema()),
                 #[cfg(feature = "sqlite-native")]
-                NativeConnectionInfo::Sqlite { db_name, .. } => db_name,
+                NativeConnectionInfo::Sqlite { db_name, .. } => Some(db_name),
                 #[cfg(feature = "sqlite-native")]
-                NativeConnectionInfo::InMemorySqlite { db_name } => db_name,
+                NativeConnectionInfo::InMemorySqlite { db_name } => Some(db_name),
             },
-            ConnectionInfo::External(info) => &info.schema_name,
+            ConnectionInfo::External(info) => info.schema_name.as_deref(),
         }
     }
 
@@ -592,7 +592,23 @@ mod tests {
             assert_eq!(url.password().unwrap(), "my#pass#word");
             assert_eq!(url.host(), "lclhst");
             assert_eq!(url.username(), "myuser");
-            assert_eq!(url.dbname(), "mydb");
+            assert_eq!(url.dbname(), Some("mydb"));
+        } else {
+            panic!("Wrong type of connection info, should be Mysql");
+        }
+    }
+
+    #[test]
+    #[cfg(feature = "mysql-native")]
+    fn mysql_connection_info_from_str_without_db_name() {
+        let conn_info = ConnectionInfo::from_url("mysql://myuser:my%23pass%23word@lclhst:5432").unwrap();
+
+        #[allow(irrefutable_let_patterns)]
+        if let ConnectionInfo::Native(NativeConnectionInfo::Mysql(url)) = conn_info {
+            assert_eq!(url.password().unwrap(), "my#pass#word");
+            assert_eq!(url.host(), "lclhst");
+            assert_eq!(url.username(), "myuser");
+            assert_eq!(url.dbname(), None);
         } else {
             panic!("Wrong type of connection info, should be Mysql");
         }

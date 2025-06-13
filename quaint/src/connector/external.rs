@@ -114,7 +114,7 @@ impl From<&AdapterProvider> for SqlFamily {
 pub struct ExternalConnectionInfo {
     // TODO: `sql_family` doesn't exist in TypeScript's `ConnectionInfo` type.
     pub sql_family: SqlFamily,
-    pub schema_name: String,
+    pub schema_name: Option<String>,
     pub max_bind_values: Option<usize>,
     pub supports_relation_joins: bool,
 }
@@ -122,7 +122,7 @@ pub struct ExternalConnectionInfo {
 impl ExternalConnectionInfo {
     pub fn new(
         sql_family: SqlFamily,
-        schema_name: String,
+        schema_name: Option<String>,
         max_bind_values: Option<usize>,
         supports_relation_joins: bool,
     ) -> Self {

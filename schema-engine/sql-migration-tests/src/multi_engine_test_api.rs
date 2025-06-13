@@ -307,7 +307,7 @@ pub struct EngineTestApi {
 impl EngineTestApi {
     /// Plan an `applyMigrations` command
     pub fn apply_migrations<'a>(&'a mut self, migrations_directory: &'a TempDir) -> ApplyMigrations<'a> {
-        let mut namespaces = vec![self.connection_info.schema_name().to_string()];
+        let mut namespaces = vec![self.connection_info.schema_name().unwrap().to_string()];
 
         for namespace in self.namespaces {
             namespaces.push(namespace.to_string());
@@ -362,7 +362,7 @@ impl EngineTestApi {
 
     /// The schema name of the current connected database.
     pub fn schema_name(&self) -> &str {
-        self.connection_info.schema_name()
+        self.connection_info.schema_name().unwrap()
     }
 
     /// Execute a raw SQL command and expect it to succeed.

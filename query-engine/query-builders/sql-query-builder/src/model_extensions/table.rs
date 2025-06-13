@@ -6,10 +6,16 @@ pub(crate) fn db_name_with_schema(model: &Model, ctx: &Context<'_>) -> Table<'st
     let schema_prefix = model
         .walker()
         .schema_name()
-        .map(ToOwned::to_owned)
-        .unwrap_or_else(|| ctx.schema_name().to_owned());
+        .or(ctx.schema_name())
+        .map(ToOwned::to_owned);
+
     let model_db_name = model.db_name().to_owned();
-    (schema_prefix, model_db_name).into()
+
+    if let Some(schema_prefix) = schema_prefix {
+        (schema_prefix, model_db_name).into()
+    } else {
+        model_db_name.into()
+    }
 }
 
 pub trait AsTable {

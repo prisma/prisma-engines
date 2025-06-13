@@ -70,7 +70,7 @@ impl Connection {
         }
 
         let mut schema = sql_schema_describer::mysql::SqlSchemaDescriber::new(&self.0, describer_circumstances)
-            .describe(&[params.url.dbname()])
+            .describe(&[params.url.dbname_or_default()])
             .await
             .map_err(|err| match err.into_kind() {
                 DescriberErrorKind::QuaintError(err) => quaint_err(&params.url)(err),

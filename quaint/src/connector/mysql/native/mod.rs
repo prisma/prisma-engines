@@ -43,7 +43,7 @@ impl MysqlUrl {
             .stmt_cache_size(Some(0))
             .user(Some(self.username()))
             .pass(self.password())
-            .db_name(Some(self.dbname()));
+            .db_name(self.dbname());
 
         match self.socket() {
             Some(ref socket) => {
@@ -323,7 +323,13 @@ impl Queryable for Mysql {
     async fn version(&self) -> crate::Result<Option<String>> {
         let guard = self.conn.lock().await;
         let (major, minor, patch) = guard.server_version();
-        let flavour = if guard.is_mariadb() { "MariaDB" } else { "MySQL" };
+        let flavour = if guard.is_mariadb() {
+            "MariaDB"
+        } else if guard.is_vitess() {
+            "Vitess"
+        } else {
+            "MySQL"
+        };
         drop(guard);
 
         Ok(Some(format!("{major}.{minor}.{patch}-{flavour}")))
