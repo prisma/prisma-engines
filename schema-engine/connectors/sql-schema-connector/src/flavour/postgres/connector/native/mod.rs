@@ -215,6 +215,10 @@ impl Connection {
             }
         }
     }
+
+    pub async fn close(self) {
+        self.0.close().await
+    }
 }
 
 pub async fn create_database(state: &State) -> ConnectorResult<String> {
@@ -254,6 +258,8 @@ pub async fn create_database(state: &State) -> ConnectorResult<String> {
         return Err(err);
     }
 
+    conn.close().await;
+
     Ok(db_name.to_owned())
 }
 
@@ -268,6 +274,8 @@ pub async fn drop_database(state: &State) -> ConnectorResult<()> {
         .raw_cmd(&format!("DROP DATABASE \"{db_name}\""))
         .await
         .map_err(quaint_error_mapper(&admin_params))?;
+
+    admin_conn.close().await;
 
     Ok(())
 }
@@ -336,8 +344,10 @@ pub fn get_shadow_db_url(state: &State) -> Option<&str> {
         .as_deref()
 }
 
-pub async fn dispose(_state: &State) -> ConnectorResult<()> {
-    // Nothing to on dispose, the connection is disposed in Drop
+pub async fn dispose(state: &mut State) -> ConnectorResult<()> {
+    if let State::Connected(_, (_, conn)) = std::mem::replace(state, State::Initial) {
+        conn.close().await;
+    }
     Ok(())
 }
 

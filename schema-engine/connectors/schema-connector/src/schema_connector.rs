@@ -184,6 +184,9 @@ pub trait SchemaConnector: Send + Sync + 'static {
             }
         })
     }
+
+    /// Dispose of the connector.
+    fn dispose(&mut self) -> BoxFuture<'_, ConnectorResult<()>>;
 }
 
 #[derive(Clone)]

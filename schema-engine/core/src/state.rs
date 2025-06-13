@@ -6,6 +6,7 @@
 use crate::{commands, parse_configuration_multi, CoreError, CoreResult, GenericApi, SchemaContainerExt};
 use ::commands::MigrationSchemaCache;
 use enumflags2::BitFlags;
+use futures::stream::{FuturesUnordered, StreamExt};
 use json_rpc::types::*;
 use psl::{parser_database::SourceFile, PreviewFeature};
 use schema_connector::{ConnectorError, ConnectorHost, IntrospectionResult, Namespaces, SchemaConnector};
@@ -522,5 +523,35 @@ impl GenericApi for EngineState {
             Box::pin(commands::schema_push(input, connector).instrument(tracing::info_span!("SchemaPush")))
         }))
         .await
+    }
+
+    async fn dispose(&mut self) -> CoreResult<()> {
+        self.connectors
+            .lock()
+            .await
+            .drain()
+            .map(|(_, snd)| async move {
+                let (tx, mut rx) = mpsc::channel(1);
+
+                let send_result = snd
+                    .send({
+                        let tx = tx.clone();
+                        Box::new(move |conn| {
+                            Box::pin(async move {
+                                _ = tx.send(conn.dispose().await).await;
+                            })
+                        })
+                    })
+                    .await;
+
+                if send_result.is_err() {
+                    _ = tx.send(Ok(())).await;
+                }
+
+                rx.recv().await.unwrap_or(Ok(()))
+            })
+            .collect::<FuturesUnordered<_>>()
+            .fold(Ok(()), async |acc, result| acc.and(result))
+            .await
     }
 }

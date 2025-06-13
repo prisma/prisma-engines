@@ -334,7 +334,7 @@ pub(crate) trait SqlConnector: Send + Sync + Debug {
 
     fn search_path(&self) -> &str;
 
-    fn dispose(&self) -> BoxFuture<'_, ConnectorResult<()>>;
+    fn dispose(&mut self) -> BoxFuture<'_, ConnectorResult<()>>;
 }
 
 // Utility function shared by multiple dialects to compare shadow database and main connection.

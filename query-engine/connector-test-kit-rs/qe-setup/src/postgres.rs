@@ -1,5 +1,5 @@
 use quaint::{connector::PostgresFlavour, prelude::*, single::Quaint};
-use schema_core::schema_connector::{ConnectorError, ConnectorParams, ConnectorResult};
+use schema_core::schema_connector::{ConnectorError, ConnectorParams, ConnectorResult, SchemaConnector};
 use std::collections::HashMap;
 use url::Url;
 
@@ -40,7 +40,11 @@ pub(crate) async fn postgres_setup(url: String, prisma_schema: &str, db_schemas:
 
     let params = ConnectorParams::new(url, Default::default(), None);
     let mut connector = sql_schema_connector::SqlSchemaConnector::new_postgres(params)?;
-    crate::diff_and_apply(prisma_schema, &mut connector).await
+    let result = crate::diff_and_apply(prisma_schema, &mut connector).await;
+
+    connector.dispose().await?;
+
+    result
 }
 
 pub(crate) async fn postgres_teardown(url: &str, db_schemas: &[&str]) -> ConnectorResult<()> {

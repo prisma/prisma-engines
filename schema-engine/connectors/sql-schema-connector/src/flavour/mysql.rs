@@ -455,7 +455,7 @@ impl SqlConnector for MysqlConnector {
         })
     }
 
-    fn dispose(&self) -> BoxFuture<'_, ConnectorResult<()>> {
+    fn dispose(&mut self) -> BoxFuture<'_, ConnectorResult<()>> {
         // Nothing to on dispose, the connection is disposed in Drop
         Box::pin(async move { Ok(()) })
     }

@@ -400,7 +400,7 @@ impl SqlConnector for SqliteConnector {
         "main"
     }
 
-    fn dispose(&self) -> BoxFuture<'_, ConnectorResult<()>> {
+    fn dispose(&mut self) -> BoxFuture<'_, ConnectorResult<()>> {
         Box::pin(imp::dispose(&self.state))
     }
 }
