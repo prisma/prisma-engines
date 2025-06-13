@@ -33,7 +33,7 @@ use parser_database::{
     ast::{self, SchemaPosition},
     walkers, IndexAlgorithm, ParserDatabase, ReferentialAction, ScalarType,
 };
-use std::{borrow::Cow, collections::HashMap, str::FromStr};
+use std::{borrow::Cow, collections::HashMap};
 
 pub const EXTENSIONS_KEY: &str = "extensions";
 
@@ -321,20 +321,6 @@ impl Flavour {
 
     pub fn is_mongo(&self) -> bool {
         matches!(self, Flavour::Mongo)
-    }
-}
-
-impl FromStr for Flavour {
-    type Err = String;
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s.to_lowercase().as_str() {
-            "mysql" => Ok(Self::Mysql),
-            "postgres" => Ok(Self::Postgres),
-            "cockroachdb" => Ok(Self::Cockroach),
-            "mssql" => Ok(Self::Sqlserver),
-            "sqlite" => Ok(Self::Sqlite),
-            _ => Err(format!("Unknown flavour: {}", s)),
-        }
     }
 }
 

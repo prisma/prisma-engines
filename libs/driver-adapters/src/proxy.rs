@@ -1,7 +1,7 @@
-use crate::queryable::JsQueryable;
 use crate::send_future::UnsafeFuture;
 use crate::types::JsConnectionInfo;
 pub use crate::types::{JsResultSet, Query, TransactionOptions};
+use crate::{conversion::MaybeDefined, queryable::JsQueryable};
 use crate::{
     from_js_value, get_named_property, get_optional_named_property, to_rust_str, AdapterMethod, JsObject, JsResult,
     JsString, JsTransaction,
@@ -55,11 +55,8 @@ pub(crate) struct DriverProxy {
     /// Retrieve driver-specific info, such as the maximum number of query parameters
     get_connection_info: Option<AdapterMethod<(), JsConnectionInfo>>,
 
-    /// Start a new transaction.
-    start_transaction: AdapterMethod<(), JsTransaction>,
-
     /// Start a new transaction with a specific isolation level.
-    start_transaction_with_isolation_level: AdapterMethod<String, JsTransaction>,
+    start_transaction: AdapterMethod<MaybeDefined<String>, JsTransaction>,
 
     /// Dispose of the underlying driver.
     dispose: AdapterMethod<(), ()>,
@@ -149,7 +146,6 @@ impl DriverProxy {
         Ok(Self {
             execute_script: get_named_property(object, "executeScript")?,
             start_transaction: get_named_property(object, "startTransaction")?,
-            start_transaction_with_isolation_level: get_named_property(object, "startTransaction")?,
             get_connection_info: get_optional_named_property(object, "getConnectionInfo")?,
             dispose: get_named_property(object, "dispose")?,
         })
@@ -160,13 +156,10 @@ impl DriverProxy {
     }
 
     async fn start_transaction_inner(&self, isolation: Option<IsolationLevel>) -> quaint::Result<Box<JsTransaction>> {
-        let tx = if let Some(level) = isolation {
-            self.start_transaction_with_isolation_level
-                .call_as_async(level.to_string())
-                .await?
-        } else {
-            self.start_transaction.call_as_async(()).await?
-        };
+        let tx = self
+            .start_transaction
+            .call_as_async(isolation.map(|lvl| lvl.to_string()).into())
+            .await?;
 
         // Decrement for this gauge is done in JsTransaction::commit/JsTransaction::rollback
         // Previously, it was done in JsTransaction::new, similar to the native Transaction.

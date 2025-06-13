@@ -41,9 +41,9 @@ transaction
                                            RETURNING "public"."Post"."id"»
                                     params [const(String("How to wakesurf on crude oil")),
                                             var(2$id as Int)])
-                    in let 6 = let 0 = validate (get 0)
+                    in let 6 = let 0 = unique (validate (get 0)
                                    [ rowCountNeq 0
-                                   ] orRaise "MISSING_RECORD";
+                                   ] orRaise "MISSING_RECORD");
                                    0$id = mapField id (get 0)
                            in let 6 = let @parent = unique (query «SELECT
                                                                    "public"."Post"."id",

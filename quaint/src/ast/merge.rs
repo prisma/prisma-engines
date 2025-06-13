@@ -136,6 +136,9 @@ impl<'a> TryFrom<Insert<'a>> for Merge<'a> {
                 Query::from(union)
             }
             ExpressionKind::Selection(selection) => Query::from(selection),
+            ExpressionKind::Parameterized(value) => {
+                Select::default().value(ExpressionKind::ParameterizedRow(value)).into()
+            }
             _ => {
                 let kind = ErrorKind::conversion("Insert type not supported.");
                 return Err(Error::builder(kind).build());

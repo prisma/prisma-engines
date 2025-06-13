@@ -1,6 +1,19 @@
-use query_structure::SelectionResult;
+use query_structure::{Filter, SelectionResult};
 
-use crate::{Computation, Flow, Node, NodeInputField, Query, WriteQuery};
+use crate::{Computation, Flow, Node, NodeInputField, Query, ReadQuery, WriteQuery};
+
+#[derive(Debug)]
+pub(crate) struct RecordQueryFilterInput;
+
+impl NodeInputField<Filter> for RecordQueryFilterInput {
+    fn node_input_field<'a>(&self, node: &'a mut crate::Node) -> &'a mut Filter {
+        if let Node::Query(Query::Read(ReadQuery::RecordQuery(ref mut rq))) = node {
+            rq.filter.get_or_insert(Filter::empty())
+        } else {
+            panic!("RecordQueryFilterInput can only be used with RecordQuery node")
+        }
+    }
+}
 
 #[derive(Debug)]
 pub(crate) struct UpdateRecordFilterInput;

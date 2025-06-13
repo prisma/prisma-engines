@@ -36,21 +36,26 @@ fn query_template_formatting_unnumbered() {
 
 fn new_query_template(pf: PlaceholderFormat) -> QueryTemplate<Dummy> {
     let mut qt = new_common_query_template(pf);
-    qt.fragments.push(Fragment::StringChunk(" LIMIT 1".to_string()));
+    qt.fragments.push(Fragment::StringChunk {
+        chunk: " LIMIT 1".to_string(),
+    });
     qt
 }
 
 fn new_query_template_with_parameter_tuple(pf: PlaceholderFormat) -> QueryTemplate<Dummy> {
     let mut qt = new_common_query_template(pf);
-    qt.fragments.push(Fragment::StringChunk(" AND status IN ".to_string()));
+    qt.fragments.push(Fragment::StringChunk {
+        chunk: " AND status IN ".to_string(),
+    });
     qt.fragments.push(Fragment::ParameterTuple);
     qt
 }
 
 fn new_common_query_template(pf: PlaceholderFormat) -> QueryTemplate<Dummy> {
     let mut qt: QueryTemplate<Dummy> = QueryTemplate::new(pf);
-    qt.fragments
-        .push(Fragment::StringChunk("SELECT * FROM users WHERE id = ".to_string()));
+    qt.fragments.push(Fragment::StringChunk {
+        chunk: "SELECT * FROM users WHERE id = ".to_string(),
+    });
     qt.fragments.push(Fragment::Parameter);
     qt
 }

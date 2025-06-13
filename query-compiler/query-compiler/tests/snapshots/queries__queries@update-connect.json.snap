@@ -37,9 +37,9 @@ transaction
             [ affectedRowCountEq 1
             ] orRaise "INCOMPLETE_CONNECT_OUTPUT";
             ();
-      let 3 = let 0 = validate (get 0)
+      let 3 = let 0 = unique (validate (get 0)
                   [ rowCountNeq 0
-                  ] orRaise "MISSING_RECORD";
+                  ] orRaise "MISSING_RECORD");
                   0$id = mapField id (get 0)
           in let 3 = let @parent = unique (query «SELECT "public"."User"."id",
                                                   "public"."User"."email",

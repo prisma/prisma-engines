@@ -1,4 +1,5 @@
 use super::{NativeColumnType, Visitor};
+use crate::ast::Update;
 use crate::prelude::{JsonArrayAgg, JsonBuildObject, JsonExtract, JsonType, JsonUnquote};
 use crate::visitor::query_writer::QueryWriter;
 use crate::{
@@ -10,6 +11,8 @@ use crate::{
     prelude::{Aliasable, Average, Query},
     visitor, Value, ValueType,
 };
+use either::Either;
+use itertools::Itertools;
 use query_template::{PlaceholderFormat, QueryTemplate};
 use std::{borrow::Cow, convert::TryFrom, iter};
 
@@ -230,6 +233,37 @@ impl<'a> Visitor<'a> for Mssql<'a> {
     fn visit_parameterized_row(&mut self, value: Value<'a>) -> visitor::Result {
         self.query_template.write_parameter_tuple();
         self.query_template.parameters.push(value);
+        Ok(())
+    }
+
+    fn visit_columns(&mut self, columns: Vec<Expression<'a>>) -> visitor::Result {
+        let len = columns.len();
+
+        let columns = match columns.into_iter().exactly_one() {
+            Ok(Expression {
+                kind: ExpressionKind::ParameterizedRow(row),
+                ..
+            }) => {
+                // If we have a parameterized SELECT <rows>, we want the client to dynamically
+                // generate a list of rows, separated by `UNION ALL`, e.g.:
+                // `SELECT 1, 2 UNION ALL SELECT 3, 4 UNION ALL SELECT 5, 6`
+                self.query_template
+                    .write_parameter_tuple_list("", ",", "", " UNION ALL SELECT ");
+                self.query_template.parameters.push(row);
+                return Ok(());
+            }
+            Ok(other) => Either::Left(iter::once(other)),
+            Err(columns) => Either::Right(columns),
+        };
+
+        for (i, column) in columns.enumerate() {
+            self.visit_expression(column)?;
+
+            if i < (len - 1) {
+                self.write(", ")?;
+            }
+        }
+
         Ok(())
     }
 
@@ -498,7 +532,7 @@ impl<'a> Visitor<'a> for Mssql<'a> {
                 }
 
                 self.write(" VALUES ")?;
-                self.query_template.write_parameter_tuple_list();
+                self.query_template.write_parameter_tuple_list("(", ",", ")", ",");
                 self.query_template.parameters.push(row);
             }
             Expression {
@@ -555,6 +589,55 @@ impl<'a> Visitor<'a> for Mssql<'a> {
         }
 
         if let Some(comment) = insert.comment {
+            self.write(" ")?;
+            self.visit_comment(comment)?;
+        }
+
+        Ok(())
+    }
+
+    // Implements `RETURNING` using the `OUTPUT` clause in SQL Server.
+    fn visit_update(&mut self, update: Update<'a>) -> visitor::Result {
+        if let Some(returning) = update.returning.as_ref().cloned() {
+            self.create_generated_keys(returning)?;
+            self.write(" ")?;
+        }
+
+        self.write("UPDATE ")?;
+        self.visit_table(update.table.clone(), true)?;
+
+        {
+            self.write(" SET ")?;
+            let pairs = update.columns.into_iter().zip(update.values);
+            let len = pairs.len();
+
+            for (i, (key, value)) in pairs.enumerate() {
+                self.visit_column(key)?;
+                self.write(" = ")?;
+                self.visit_expression(value)?;
+
+                if i < (len - 1) {
+                    self.write(", ")?;
+                }
+            }
+
+            if let Some(returning) = update.returning.as_ref().cloned() {
+                self.visit_returning(returning)?;
+            }
+        }
+
+        if let Some(conditions) = update.conditions {
+            self.write(" WHERE ")?;
+            self.visit_conditions(conditions)?;
+        }
+
+        if let Some(returning) = update.returning {
+            let table = update.table;
+            self.write(" ")?;
+            self.select_generated_keys(returning, table)?;
+        }
+
+        if let Some(comment) = update.comment {
             self.write(" ")?;
             self.visit_comment(comment)?;
         }

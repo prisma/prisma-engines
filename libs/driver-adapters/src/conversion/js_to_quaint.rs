@@ -187,6 +187,7 @@ pub fn js_value_to_quaint(
         ColumnType::Date => match json_value {
             serde_json::Value::String(s) => NaiveDate::parse_from_str(&s, "%Y-%m-%d")
                 .map(QuaintValue::date)
+                .or_else(|_| DateTime::parse_from_rfc3339(&s).map(|date| QuaintValue::date(date.naive_utc().date())))
                 .map_err(|_| conversion_error!("expected a date string in column '{column_name}', got {s}")),
             serde_json::Value::Null => Ok(QuaintValue::null_date()),
             mismatch => Err(conversion_error!(
@@ -196,6 +197,7 @@ pub fn js_value_to_quaint(
         ColumnType::Time => match json_value {
             serde_json::Value::String(s) => NaiveTime::parse_from_str(&s, "%H:%M:%S%.f")
                 .map(QuaintValue::time)
+                .or_else(|_| DateTime::parse_from_rfc3339(&s).map(|date| QuaintValue::time(date.naive_utc().time())))
                 .map_err(|_| conversion_error!("expected a time string in column '{column_name}', got {s}")),
             serde_json::Value::Null => Ok(QuaintValue::null_time()),
             mismatch => Err(conversion_error!(

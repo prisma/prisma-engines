@@ -1,3 +1,5 @@
+use query_structure::IntoFilter;
+
 use super::{expression::*, Env, ExpressionResult, InterpretationResult, InterpreterError};
 use crate::{query_graph::*, Query};
 use std::{
@@ -398,6 +400,12 @@ impl Expressionista {
                                                             "parent selection should be present after validation",
                                                         );
                                                         *field.node_input_field(&mut node) = vec![row];
+                                                    }
+                                                    RowSink::SingleRowFilter(filter) => {
+                                                        let row = parent_selections.pop().expect(
+                                                            "parent selection should be present after validation",
+                                                        );
+                                                        *filter.node_input_field(&mut node) = row.filter();
                                                     }
                                                     RowSink::Discard => {}
                                                 }
