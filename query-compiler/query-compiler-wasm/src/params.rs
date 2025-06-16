@@ -18,6 +18,12 @@ impl JsConnectionInfo {
         let schema_name = self.get_schema_name(provider);
         let sql_family = SqlFamily::from(provider);
 
+        wasm_rs_dbg::dbg!(format!(
+            "into_external_connection_info: {:?}; {}",
+            &sql_family, self.supports_relation_joins
+        ));
+        // ==> into_external_connection_info: Mysql; true
+
         ExternalConnectionInfo::new(
             sql_family,
             schema_name.to_owned(),

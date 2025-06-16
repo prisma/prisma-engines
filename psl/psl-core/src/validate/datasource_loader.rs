@@ -33,6 +33,10 @@ pub(crate) fn load_datasources_from_ast(
 
     for src in ast_schema.sources() {
         if let Some(source) = lift_datasource(src, diagnostics, connectors, is_using_driver_adapters) {
+            wasm_rs_dbg::dbg!(format!(
+                "load_datasources_from_ast: {:?}; {}",
+                &source, &source.active_provider
+            ));
             sources.push(source);
         }
     }

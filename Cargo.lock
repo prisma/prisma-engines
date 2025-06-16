@@ -3681,6 +3681,7 @@ dependencies = [
  "serde",
  "serde_json",
  "url",
+ "wasm-rs-dbg",
 ]
 
 [[package]]

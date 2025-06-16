@@ -28,6 +28,7 @@ enumflags2.workspace = true
 indoc.workspace = true
 either.workspace = true
 hex.workspace = true
+wasm-rs-dbg.workspace = true
 
 # For the connector API.
 lsp-types.workspace = true

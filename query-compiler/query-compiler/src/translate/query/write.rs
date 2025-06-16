@@ -200,6 +200,8 @@ pub(crate) fn translate_write_query(query: WriteQuery, builder: &dyn QueryBuilde
                     return Ok(Expression::Unique(Expression::Query(read).into()));
                 }
 
+                unreachable!();
+
                 // If we have no selectors, we can't construct a record manually, so
                 // the query builder is expected to handle the selected fields.
                 let update = builder
