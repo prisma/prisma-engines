@@ -83,25 +83,12 @@ impl QueryCompiler {
             schema::build(schema, true).with_db_version_supports_join_strategy(connection_info.supports_relation_joins),
         );
 
-        wasm_rs_dbg::dbg!(format!(
-            "schema@QueryCompiler supports UPDATE RETURNING: {}",
-            &schema.has_capability(psl::datamodel_connector::ConnectorCapability::UpdateReturning),
-        ));
-        // ==> schema@QueryCompiler supports UPDATE RETURNING: false
-
-        let external_connection_info = connection_info.into_external_connection_info(provider);
-        wasm_rs_dbg::dbg!(format!(
-            "schema@QueryCompiler external_connection_info: {:?}; {}",
-            &external_connection_info.sql_family, external_connection_info.supports_relation_joins
-        ));
-        // ==> schema@QueryCompiler external_connection_info: Mysql; true
-
         tracing::info!(git_hash = env!("GIT_HASH"), "Starting query-compiler-wasm");
         register_panic_hook();
 
         Ok(Self {
             schema,
-            connection_info: ConnectionInfo::External(external_connection_info),
+            connection_info: ConnectionInfo::External(connection_info.into_external_connection_info(provider)),
             protocol: EngineProtocol::Json,
         })
     }
