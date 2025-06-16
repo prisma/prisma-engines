@@ -17,8 +17,10 @@ export class MySQL2Manager implements DriverAdaptersManager {
     private env: EnvForAdapter<TAG>,
     { url }: SetupDriverAdaptersInput,
   ) {
+    const database = new URL(url).pathname.split('/').pop()
     this.#factory = new PrismaMySQL2({
       uri: url,
+      database,
     })
   }
 
