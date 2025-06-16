@@ -37,7 +37,7 @@ impl Query {
         }
     }
 
-    pub(crate) fn model(&self) -> Model {
+    pub fn model(&self) -> Model {
         match self {
             Self::Read(rq) => rq.model(),
             Self::Write(wq) => wq.model(),

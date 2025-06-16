@@ -61,13 +61,13 @@ pub(crate) fn quaint_value_to_prisma_value(value: quaint::Value<'_>, family: Sql
             Some("TIME") if family.is_postgres() => PrismaValue::String(dt.time().to_string()),
             Some("TIMETZ") if family.is_postgres() => PrismaValue::String(dt.time().format(TIME_FORMAT).to_string()),
             _ if family.is_postgres() => PrismaValue::String(dt.naive_utc().to_string()),
-            _ if family.is_mysql() => PrismaValue::String(dt.format(DATETIME_FORMAT).to_string()),
+            _ if family.is_mysql() || family.is_mssql() => PrismaValue::String(dt.format(DATETIME_FORMAT).to_string()),
 
             _ => PrismaValue::String(dt.to_rfc3339()),
         },
         quaint::ValueType::DateTime(None) => PrismaValue::Null,
         quaint::ValueType::Date(Some(d)) => {
-            if family.is_mysql() {
+            if family.is_mysql() || family.is_mssql() {
                 PrismaValue::String(d.format(DATE_FORMAT).to_string())
             } else {
                 PrismaValue::String(d.to_string())
@@ -75,7 +75,7 @@ pub(crate) fn quaint_value_to_prisma_value(value: quaint::Value<'_>, family: Sql
         }
         quaint::ValueType::Date(None) => PrismaValue::Null,
         quaint::ValueType::Time(Some(t)) => {
-            if family.is_mysql() {
+            if family.is_mysql() || family.is_mssql() {
                 PrismaValue::String(t.format(TIME_FORMAT).to_string())
             } else {
                 PrismaValue::String(t.to_string())

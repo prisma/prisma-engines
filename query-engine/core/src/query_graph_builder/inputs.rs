@@ -1,6 +1,27 @@
-use query_structure::{Filter, SelectionResult};
+use std::slice;
+
+use query_structure::{Filter, SelectionResult, WriteArgs};
 
 use crate::{Computation, Flow, Node, NodeInputField, Query, ReadQuery, WriteQuery};
+
+#[derive(Debug)]
+pub(crate) struct UpdateOrCreateArgsInput;
+
+impl NodeInputField<[WriteArgs]> for UpdateOrCreateArgsInput {
+    fn node_input_field<'a>(&self, node: &'a mut crate::Node) -> &'a mut [WriteArgs] {
+        if let Node::Query(Query::Write(wn)) = node {
+            match wn {
+                WriteQuery::UpdateRecord(ur) => slice::from_mut(ur.args_mut()),
+                WriteQuery::UpdateManyRecords(urm) => slice::from_mut(&mut urm.args),
+                WriteQuery::CreateRecord(cr) => slice::from_mut(&mut cr.args),
+                WriteQuery::CreateManyRecords(cr) => &mut cr.args,
+                _ => panic!("UpdateOrCreateArgsInput can only be used with update or create nodes",),
+            }
+        } else {
+            panic!("UpdateOrCreateArgsInput can only be used with WriteQuery nodes")
+        }
+    }
+}
 
 #[derive(Debug)]
 pub(crate) struct RecordQueryFilterInput;
@@ -16,9 +37,9 @@ impl NodeInputField<Filter> for RecordQueryFilterInput {
 }
 
 #[derive(Debug)]
-pub(crate) struct UpdateRecordFilterInput;
+pub(crate) struct UpdateRecordSelectorsInput;
 
-impl NodeInputField<Vec<SelectionResult>> for UpdateRecordFilterInput {
+impl NodeInputField<Vec<SelectionResult>> for UpdateRecordSelectorsInput {
     fn node_input_field<'a>(&self, node: &'a mut crate::Node) -> &'a mut Vec<SelectionResult> {
         if let Node::Query(Query::Write(WriteQuery::UpdateRecord(ref mut ur))) = node {
             ur.record_filter_mut().selectors.get_or_insert_default()
@@ -29,9 +50,9 @@ impl NodeInputField<Vec<SelectionResult>> for UpdateRecordFilterInput {
 }
 
 #[derive(Debug)]
-pub(crate) struct UpdateManyRecordsFilterInput;
+pub(crate) struct UpdateManyRecordsSelectorsInput;
 
-impl NodeInputField<Vec<SelectionResult>> for UpdateManyRecordsFilterInput {
+impl NodeInputField<Vec<SelectionResult>> for UpdateManyRecordsSelectorsInput {
     fn node_input_field<'a>(&self, node: &'a mut crate::Node) -> &'a mut Vec<SelectionResult> {
         if let Node::Query(Query::Write(WriteQuery::UpdateManyRecords(ref mut ur))) = node {
             ur.record_filter.selectors.get_or_insert_default()

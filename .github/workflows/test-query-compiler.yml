@@ -56,6 +56,12 @@ jobs:
             relation_load_strategy: '["query"]'
             test_threads: 1
 
+          - name: mssql
+            setup_task: dev-mssql-qc
+            ignored_tests_list: query-compiler/query-engine-tests-todo/mssql/skip
+            should_fail_tests_list: query-compiler/query-engine-tests-todo/mssql/fail
+            relation_load_strategy: '["query"]'
+
     name: ${{ matrix.adapter.name }}
 
     uses: ./.github/workflows/test-query-compiler-template.yml

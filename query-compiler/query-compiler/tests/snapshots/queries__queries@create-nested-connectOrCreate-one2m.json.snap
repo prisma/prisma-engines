@@ -29,9 +29,9 @@ transaction
                           $3»
                    params [const(BigInt(1)), const(BigInt(1)),
                            const(BigInt(0))])
-   in let 0 = let 1 = validate (get 1)
+   in let 0 = let 1 = unique (validate (get 1)
                   [ rowCountNeq 0
-                  ] orRaise "MISSING_RELATED_RECORD";
+                  ] orRaise "MISSING_RELATED_RECORD");
                   1$id = mapField id (get 1)
           in let 0 = unique (query «INSERT INTO "public"."Post"
                                     ("title","userId") VALUES ($1,$2) RETURNING

@@ -18,9 +18,9 @@ transaction
                           "public"."ParentModelWithCompositeId"."a",
                           "public"."ParentModelWithCompositeId"."b"»
                    params [const(BigInt(1)), const(BigInt(1))])
-   in let 0 = validate (get 0)
+   in let 0 = unique (validate (get 0)
           [ rowCountNeq 0
-          ] orRaise "MISSING_RELATED_RECORD";
+          ] orRaise "MISSING_RELATED_RECORD");
           0$a = mapField a (get 0);
           0$b = mapField b (get 0)
       in sum (execute «INSERT INTO "public"."ChildOfModelWithCompositeId"

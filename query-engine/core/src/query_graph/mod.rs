@@ -21,7 +21,7 @@ use petgraph::{
     visit::{EdgeRef as PEdgeRef, NodeIndexable},
     *,
 };
-use query_structure::{FieldSelection, Filter, IntoFilter, QueryArguments, SelectionResult};
+use query_structure::{FieldSelection, Filter, IntoFilter, QueryArguments, SelectionResult, WriteArgs};
 
 pub type QueryGraphResult<T> = std::result::Result<T, QueryGraphError>;
 
@@ -43,7 +43,7 @@ pub enum Node {
 }
 
 impl Node {
-    pub(crate) fn as_query(&self) -> Option<&Query> {
+    pub fn as_query(&self) -> Option<&Query> {
         if let Self::Query(v) = self {
             Some(v)
         } else {
@@ -177,11 +177,34 @@ pub enum QueryGraphDependency {
 
 #[derive(Debug)]
 pub enum RowSink {
-    AllRows(&'static dyn NodeInputField<Vec<SelectionResult>>),
-    SingleRow(&'static dyn NodeInputField<SelectionResult>),
-    SingleRowArray(&'static dyn NodeInputField<Vec<SelectionResult>>),
-    SingleRowFilter(&'static dyn NodeInputField<Filter>),
+    /// Store a single row to the node input field.
+    Single(&'static dyn NodeInputField<SelectionResult>),
+    /// Store all rows to the node input field.
+    All(&'static dyn NodeInputField<Vec<SelectionResult>>),
+    /// Store at most one row to the node input field.
+    AtMostOne(&'static dyn NodeInputField<Vec<SelectionResult>>),
+    /// Store an array of exactly one row to the node input field.
+    ExactlyOne(&'static dyn NodeInputField<Vec<SelectionResult>>),
+    /// Store exactly one filter to the node input field.
+    ExactlyOneFilter(&'static dyn NodeInputField<Filter>),
+    /// Inject write arguments based on selection retrieved from exactly one row.
+    ExactlyOneWriteArgs(FieldSelection, &'static dyn NodeInputField<[WriteArgs]>),
+    /// Discard the result.
     Discard,
+}
+
+impl RowSink {
+    /// Checks if this is a sink that expects a unique result.
+    pub fn is_unique(&self) -> bool {
+        matches!(
+            self,
+            Self::Single(_)
+                | Self::AtMostOne(_)
+                | Self::ExactlyOne(_)
+                | Self::ExactlyOneFilter(_)
+                | Self::ExactlyOneWriteArgs(_, _)
+        )
+    }
 }
 
 #[derive(Debug)]
@@ -189,7 +212,7 @@ pub enum RowCountSink {
     Discard,
 }
 
-pub trait NodeInputField<R>: Send + Sync + fmt::Debug {
+pub trait NodeInputField<R: ?Sized>: Send + Sync + fmt::Debug {
     fn node_input_field<'a>(&self, node: &'a mut Node) -> &'a mut R;
 }
 

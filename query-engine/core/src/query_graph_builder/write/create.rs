@@ -42,7 +42,7 @@ pub(crate) fn create_record(
             &read_node,
             QueryGraphDependency::ProjectedDataSinkDependency(
                 model.shard_aware_primary_identifier(),
-                RowSink::SingleRowFilter(&RecordQueryFilterInput),
+                RowSink::ExactlyOneFilter(&RecordQueryFilterInput),
                 Some(DataExpectation::non_empty_rows(
                     MissingRecord::builder().operation(DataOperation::Query).build(),
                 )),

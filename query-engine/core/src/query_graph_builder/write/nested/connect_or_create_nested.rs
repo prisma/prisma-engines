@@ -1,11 +1,13 @@
 use super::*;
 use crate::{
-    inputs::{IfInput, LeftSideDiffInput, ReturnInput, RightSideDiffInput},
-    query_ast::*,
+    inputs::{
+        IfInput, LeftSideDiffInput, ReturnInput, RightSideDiffInput, UpdateManyRecordsSelectorsInput,
+        UpdateOrCreateArgsInput,
+    },
     query_graph::{Flow, Node, NodeRef, QueryGraph, QueryGraphDependency},
     Computation, DataExpectation, ParsedInputMap, ParsedInputValue, RowSink,
 };
-use query_structure::{Filter, IntoFilter, Model, RelationFieldRef, SelectionResult};
+use query_structure::{Filter, Model, RelationFieldRef, SelectionResult, WriteArgs};
 use schema::constants::args;
 use std::convert::TryInto;
 
@@ -127,7 +129,7 @@ fn handle_many_to_many(
             &if_node,
             QueryGraphDependency::ProjectedDataSinkDependency(
                 child_model.shard_aware_primary_identifier(),
-                RowSink::AllRows(&IfInput),
+                RowSink::All(&IfInput),
                 None,
             ),
         )?;
@@ -280,7 +282,7 @@ fn one_to_many_inlined_child(
             &if_node,
             QueryGraphDependency::ProjectedDataSinkDependency(
                 child_model.shard_aware_primary_identifier(),
-                RowSink::AllRows(&IfInput),
+                RowSink::All(&IfInput),
                 None,
             ),
         )?;
@@ -288,17 +290,9 @@ fn one_to_many_inlined_child(
         graph.create_edge(
             &parent_node,
             &create_node,
-            QueryGraphDependency::ProjectedDataDependency(
+            QueryGraphDependency::ProjectedDataSinkDependency(
                 parent_link.clone(),
-                Box::new(move |mut create_node, mut parent_ids| {
-                    let parent_id = parent_ids.pop().expect("parent id should be present");
-
-                    if let Node::Query(Query::Write(ref mut wq)) = create_node {
-                        wq.inject_result_into_args(child_link.assimilate(parent_id)?);
-                    }
-
-                    Ok(create_node)
-                }),
+                RowSink::ExactlyOneWriteArgs(child_link, &UpdateOrCreateArgsInput),
                 Some(DataExpectation::non_empty_rows(
                     MissingRelatedRecord::builder()
                         .model(child_model)
@@ -317,17 +311,9 @@ fn one_to_many_inlined_child(
         graph.create_edge(
             &parent_node,
             &update_child_node,
-            QueryGraphDependency::ProjectedDataDependency(
+            QueryGraphDependency::ProjectedDataSinkDependency(
                 parent_link,
-                Box::new(move |mut update_node, mut parent_ids| {
-                    let parent_id = parent_ids.pop().expect("parent id should be present");
-
-                    if let Node::Query(Query::Write(ref mut wq)) = update_node {
-                        wq.inject_result_into_args(child_link.assimilate(parent_id)?);
-                    }
-
-                    Ok(update_node)
-                }),
+                RowSink::ExactlyOneWriteArgs(child_link, &UpdateOrCreateArgsInput),
                 Some(DataExpectation::non_empty_rows(
                     MissingRelatedRecord::builder()
                         .model(child_model)
@@ -418,7 +404,7 @@ fn one_to_many_inlined_parent(
         &if_node,
         QueryGraphDependency::ProjectedDataSinkDependency(
             child_model.shard_aware_primary_identifier(),
-            RowSink::AllRows(&IfInput),
+            RowSink::All(&IfInput),
             None,
         ),
     )?;
@@ -429,16 +415,9 @@ fn one_to_many_inlined_parent(
     graph.create_edge(
         &if_node,
         &parent_node,
-        QueryGraphDependency::ProjectedDataDependency(
+        QueryGraphDependency::ProjectedDataSinkDependency(
             child_link.clone(),
-            Box::new(move |mut parent, mut child_ids| {
-                let child_id = child_ids.pop().unwrap();
-                if let Node::Query(Query::Write(ref mut wq)) = parent {
-                    wq.inject_result_into_args(parent_link.assimilate(child_id)?);
-                }
-
-                Ok(parent)
-            }),
+            RowSink::ExactlyOneWriteArgs(parent_link, &UpdateOrCreateArgsInput),
             None,
         ),
     )?;
@@ -446,13 +425,13 @@ fn one_to_many_inlined_parent(
     graph.create_edge(
         &read_node,
         &return_existing,
-        QueryGraphDependency::ProjectedDataSinkDependency(child_link.clone(), RowSink::AllRows(&ReturnInput), None),
+        QueryGraphDependency::ProjectedDataSinkDependency(child_link.clone(), RowSink::All(&ReturnInput), None),
     )?;
 
     graph.create_edge(
         &create_node,
         &return_create,
-        QueryGraphDependency::ProjectedDataSinkDependency(child_link, RowSink::AllRows(&ReturnInput), None),
+        QueryGraphDependency::ProjectedDataSinkDependency(child_link, RowSink::All(&ReturnInput), None),
     )?;
 
     Ok(())
@@ -558,7 +537,7 @@ fn one_to_one_inlined_parent(
         &if_node,
         QueryGraphDependency::ProjectedDataSinkDependency(
             child_model.shard_aware_primary_identifier(),
-            RowSink::AllRows(&IfInput),
+            RowSink::All(&IfInput),
             None,
         ),
     )?;
@@ -577,7 +556,7 @@ fn one_to_one_inlined_parent(
     graph.create_edge(
         &read_node,
         &return_existing,
-        QueryGraphDependency::ProjectedDataSinkDependency(child_link.clone(), RowSink::AllRows(&ReturnInput), None),
+        QueryGraphDependency::ProjectedDataSinkDependency(child_link.clone(), RowSink::All(&ReturnInput), None),
     )?;
 
     // Else branch handling
@@ -585,7 +564,7 @@ fn one_to_one_inlined_parent(
     graph.create_edge(
         &create_node,
         &return_create,
-        QueryGraphDependency::ProjectedDataSinkDependency(child_link.clone(), RowSink::AllRows(&ReturnInput), None),
+        QueryGraphDependency::ProjectedDataSinkDependency(child_link.clone(), RowSink::All(&ReturnInput), None),
     )?;
 
     if utils::node_is_create(graph, &parent_node) {
@@ -593,16 +572,9 @@ fn one_to_one_inlined_parent(
         graph.create_edge(
             &if_node,
             &parent_node,
-            QueryGraphDependency::ProjectedDataDependency(
+            QueryGraphDependency::ProjectedDataSinkDependency(
                 child_link,
-                Box::new(move |mut parent, mut child_ids| {
-                    let child_id = child_ids.pop().unwrap();
-                    if let Node::Query(Query::Write(ref mut wq)) = parent {
-                        wq.inject_result_into_args(parent_link.assimilate(child_id)?);
-                    }
-
-                    Ok(parent)
-                }),
+                RowSink::ExactlyOneWriteArgs(parent_link, &UpdateOrCreateArgsInput),
                 None,
             ),
         )?;
@@ -617,17 +589,9 @@ fn one_to_one_inlined_parent(
         graph.create_edge(
             &parent_node,
             &update_parent_node,
-            QueryGraphDependency::ProjectedDataDependency(
+            QueryGraphDependency::ProjectedDataSinkDependency(
                 parent_model.shard_aware_primary_identifier(),
-                Box::new(move |mut update_parent_node, mut parent_ids| {
-                    let parent_id = parent_ids.pop().expect("parent id should be present");
-
-                    if let Node::Query(ref mut q) = update_parent_node {
-                        q.add_filter(parent_id.filter());
-                    }
-
-                    Ok(update_parent_node)
-                }),
+                RowSink::ExactlyOne(&UpdateManyRecordsSelectorsInput),
                 Some(DataExpectation::non_empty_rows(
                     MissingRelatedRecord::builder()
                         .model(child_model)
@@ -642,17 +606,9 @@ fn one_to_one_inlined_parent(
         graph.create_edge(
             &if_node,
             &update_parent_node,
-            QueryGraphDependency::ProjectedDataDependency(
+            QueryGraphDependency::ProjectedDataSinkDependency(
                 child_link,
-                Box::new(move |mut update_parent_node, mut child_results| {
-                    let child_result = child_results.pop().expect("child result should be present");
-
-                    if let Node::Query(Query::Write(ref mut wq)) = update_parent_node {
-                        wq.inject_result_into_args(parent_link.assimilate(child_result)?);
-                    }
-
-                    Ok(update_parent_node)
-                }),
+                RowSink::ExactlyOneWriteArgs(parent_link, &UpdateOrCreateArgsInput),
                 Some(DataExpectation::non_empty_rows(
                     MissingRelatedRecord::builder()
                         .model(child_model)
@@ -759,7 +715,7 @@ fn one_to_one_inlined_child(
         &if_node,
         QueryGraphDependency::ProjectedDataSinkDependency(
             child_model.shard_aware_primary_identifier(),
-            RowSink::AllRows(&IfInput),
+            RowSink::All(&IfInput),
             None,
         ),
     )?;
@@ -775,17 +731,9 @@ fn one_to_one_inlined_child(
     graph.create_edge(
         &parent_node,
         &update_new_child_node,
-        QueryGraphDependency::ProjectedDataDependency(
+        QueryGraphDependency::ProjectedDataSinkDependency(
             parent_link.clone(),
-            Box::new(move |mut update_new_child_node, mut parent_links| {
-                let parent_link = parent_links.pop().expect("parent link should be present");
-
-                if let Node::Query(Query::Write(ref mut wq)) = update_new_child_node {
-                    wq.inject_result_into_args(child_link.assimilate(parent_link)?);
-                }
-
-                Ok(update_new_child_node)
-            }),
+            RowSink::ExactlyOneWriteArgs(child_link, &UpdateOrCreateArgsInput),
             Some(DataExpectation::non_empty_rows(
                 MissingRelatedRecord::builder()
                     .model(&parent_relation_field.model())
@@ -803,17 +751,9 @@ fn one_to_one_inlined_child(
     graph.create_edge(
         &parent_node,
         &create_node,
-        QueryGraphDependency::ProjectedDataDependency(
+        QueryGraphDependency::ProjectedDataSinkDependency(
             parent_link,
-            Box::new(move |mut create_node, mut parent_links| {
-                let parent_link = parent_links.pop().expect("parent link should be present");
-
-                if let Node::Query(Query::Write(ref mut wq)) = create_node {
-                    wq.inject_result_into_args(child_link.assimilate(parent_link)?);
-                }
-
-                Ok(create_node)
-            }),
+            RowSink::ExactlyOneWriteArgs(child_link, &UpdateOrCreateArgsInput),
             Some(DataExpectation::non_empty_rows(
                 MissingRelatedRecord::builder()
                     .model(&parent_relation_field.model())
@@ -831,17 +771,9 @@ fn one_to_one_inlined_child(
     graph.create_edge(
         &read_new_child_node,
         &update_new_child_node,
-        QueryGraphDependency::ProjectedDataDependency(
+        QueryGraphDependency::ProjectedDataSinkDependency(
             child_model_identifier.clone(),
-            Box::new(move |mut update_new_child_node, mut new_child_ids| {
-                let old_child_id = new_child_ids.pop().expect("old child id should be present");
-
-                if let Node::Query(Query::Write(ref mut wq)) = update_new_child_node {
-                    wq.add_filter(old_child_id.filter());
-                }
-
-                Ok(update_new_child_node)
-            }),
+            RowSink::ExactlyOne(&UpdateManyRecordsSelectorsInput),
             Some(DataExpectation::non_empty_rows(
                 MissingRelatedRecord::builder()
                     .model(&parent_relation_field.model())
@@ -875,7 +807,7 @@ fn one_to_one_inlined_child(
             &diff_node,
             QueryGraphDependency::ProjectedDataSinkDependency(
                 child_model_identifier.clone(),
-                RowSink::AllRows(&LeftSideDiffInput),
+                RowSink::All(&LeftSideDiffInput),
                 None,
             ),
         )?;
@@ -886,7 +818,7 @@ fn one_to_one_inlined_child(
             &diff_node,
             QueryGraphDependency::ProjectedDataSinkDependency(
                 child_model_identifier.clone(),
-                RowSink::AllRows(&RightSideDiffInput),
+                RowSink::All(&RightSideDiffInput),
                 None,
             ),
         )?;
@@ -897,36 +829,24 @@ fn one_to_one_inlined_child(
             &if_node,
             QueryGraphDependency::ProjectedDataSinkDependency(
                 child_model_identifier.clone(),
-                RowSink::AllRows(&IfInput),
+                RowSink::All(&IfInput),
                 None,
             ),
         )?;
 
         // update old child, set link to null
-        let update_old_child_node = utils::update_records_node_placeholder(graph, Filter::empty(), child_model.clone());
+        let write_args = WriteArgs::from_result(SelectionResult::from(&child_link), crate::executor::get_request_now());
+        let update_old_child_node =
+            utils::update_records_node_placeholder_with_args(graph, Filter::empty(), child_model.clone(), write_args);
         let rf = parent_relation_field.clone();
 
         // Edge: Read old child node -> update old child
         graph.create_edge(
             &read_old_child_node,
             &update_old_child_node,
-            QueryGraphDependency::ProjectedDataDependency(
+            QueryGraphDependency::ProjectedDataSinkDependency(
                 child_model_identifier,
-                Box::new(move |mut update_old_child_node, mut old_child_ids| {
-                    // If there's no child connected, don't attempt to disconnect it.
-                    if old_child_ids.is_empty() {
-                        return Ok(update_old_child_node);
-                    }
-
-                    let old_child_id = old_child_ids.pop().expect("old child id should be present");
-
-                    if let Node::Query(Query::Write(ref mut wq)) = update_old_child_node {
-                        wq.add_filter(old_child_id.filter());
-                        wq.inject_result_into_args(SelectionResult::from(&child_link));
-                    }
-
-                    Ok(update_old_child_node)
-                }),
+                RowSink::AtMostOne(&UpdateManyRecordsSelectorsInput),
                 if child_relation_field.is_required() {
                     Some(DataExpectation::empty_rows(RelationViolation::from(rf)))
                 } else {

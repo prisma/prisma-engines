@@ -1,5 +1,5 @@
 use crate::{
-    inputs::{IfInput, LeftSideDiffInput, ReturnInput, RightSideDiffInput},
+    inputs::{IfInput, LeftSideDiffInput, ReturnInput, RightSideDiffInput, UpdateManyRecordsSelectorsInput},
     query_ast::*,
     query_graph::{Flow, Node, NodeRef, QueryGraph, QueryGraphDependency},
     Computation, DataExpectation, DataOperation, MissingRelatedRecord, ParsedInputValue, QueryGraphBuilderResult,
@@ -180,7 +180,7 @@ pub fn insert_1to1_idempotent_connect_checks(
         &diff_node,
         QueryGraphDependency::ProjectedDataSinkDependency(
             child_model_identifier.clone(),
-            RowSink::AllRows(&LeftSideDiffInput),
+            RowSink::All(&LeftSideDiffInput),
             Some(DataExpectation::non_empty_rows(
                 MissingRelatedRecord::builder()
                     .model(&child_model.clone())
@@ -198,7 +198,7 @@ pub fn insert_1to1_idempotent_connect_checks(
         &diff_node,
         QueryGraphDependency::ProjectedDataSinkDependency(
             child_model_identifier.clone(),
-            RowSink::AllRows(&RightSideDiffInput),
+            RowSink::All(&RightSideDiffInput),
             None,
         ),
     )?;
@@ -207,7 +207,7 @@ pub fn insert_1to1_idempotent_connect_checks(
     graph.create_edge(
         &diff_node,
         &if_node,
-        QueryGraphDependency::ProjectedDataSinkDependency(child_model_identifier, RowSink::AllRows(&IfInput), None),
+        QueryGraphDependency::ProjectedDataSinkDependency(child_model_identifier, RowSink::All(&IfInput), None),
     )?;
     let empty_node = graph.create_node(Node::Empty);
 
@@ -225,7 +225,23 @@ pub fn update_records_node_placeholder<T>(graph: &mut QueryGraph, filter: T, mod
 where
     T: Into<Filter>,
 {
-    let args = WriteArgs::new_empty(crate::executor::get_request_now());
+    update_records_node_placeholder_with_args(
+        graph,
+        filter,
+        model,
+        WriteArgs::new_empty(crate::executor::get_request_now()),
+    )
+}
+
+pub fn update_records_node_placeholder_with_args<T>(
+    graph: &mut QueryGraph,
+    filter: T,
+    model: Model,
+    args: WriteArgs,
+) -> NodeRef
+where
+    T: Into<Filter>,
+{
     let filter = filter.into();
     let record_filter = filter.into();
 
@@ -292,7 +308,13 @@ pub fn insert_existing_1to1_related_model_checks(
     let read_existing_children =
         insert_find_children_by_parent_node(graph, parent_node, parent_relation_field, Filter::empty())?;
 
-    let update_existing_child = update_records_node_placeholder(graph, Filter::empty(), child_model);
+    let write_args = WriteArgs::from_result(
+        SelectionResult::from(&child_linking_fields),
+        crate::executor::get_request_now(),
+    );
+
+    let update_existing_child =
+        update_records_node_placeholder_with_args(graph, Filter::empty(), child_model, write_args);
 
     let if_node = graph.create_node(if relation_inlined_parent {
         Flow::if_false()
@@ -305,7 +327,7 @@ pub fn insert_existing_1to1_related_model_checks(
         &if_node,
         QueryGraphDependency::ProjectedDataSinkDependency(
             child_model_identifier.clone(),
-            RowSink::AllRows(&IfInput),
+            RowSink::All(&IfInput),
             // If the other side ("child") requires the connection, we need to make sure that there isn't a child already connected
             // to the parent, as that would violate the other childs relation side.
             if child_side_required {
@@ -320,22 +342,9 @@ pub fn insert_existing_1to1_related_model_checks(
     graph.create_edge(
         &read_existing_children,
         &update_existing_child,
-        QueryGraphDependency::ProjectedDataDependency(
+        QueryGraphDependency::ProjectedDataSinkDependency(
             child_model_identifier,
-            Box::new(move |mut update_existing_child, mut child_ids| {
-                // This has to succeed or the if-then node wouldn't trigger.
-                let child_id = child_ids.pop().expect("child id should be present");
-
-                if let Node::Query(Query::Write(ref mut wq)) = update_existing_child {
-                    wq.inject_result_into_args(SelectionResult::from(&child_linking_fields));
-                }
-
-                if let Node::Query(Query::Write(WriteQuery::UpdateManyRecords(ref mut ur))) = update_existing_child {
-                    ur.record_filter = child_id.into();
-                }
-
-                Ok(update_existing_child)
-            }),
+            RowSink::ExactlyOne(&UpdateManyRecordsSelectorsInput),
             Some(DataExpectation::non_empty_rows(
                 MissingRelatedRecord::builder()
                     .model(&parent_relation_field.model())
@@ -945,7 +954,7 @@ pub fn insert_emulated_on_update_with_intermediary_node(
         &join_node,
         QueryGraphDependency::ProjectedDataSinkDependency(
             model_to_update.shard_aware_primary_identifier(),
-            RowSink::AllRows(&ReturnInput),
+            RowSink::All(&ReturnInput),
             None,
         ),
     )?;

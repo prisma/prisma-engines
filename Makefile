@@ -376,6 +376,11 @@ start-mssql_edge:
 dev-mssql_edge: start-mssql_edge
 	cp $(CONFIG_PATH)/sqlserver2019 $(CONFIG_FILE)
 
+dev-mssql-qc: start-mssql_2022 build-qc-wasm build-driver-adapters-kit-qc
+	cp $(CONFIG_PATH)/sqlserver-qc $(CONFIG_FILE)
+
+test-mssql-qc: dev-mssql-qc test-qe
+
 start-mssql_2017:
 	docker compose -f docker-compose.yml up --wait -d --remove-orphans mssql-2017
 

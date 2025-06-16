@@ -359,6 +359,12 @@ impl WriteArgs {
         }
     }
 
+    pub fn from_result(selection: SelectionResult, request_now: PrismaValue) -> Self {
+        let mut this = Self::new_empty(request_now);
+        this.inject(selection);
+        this
+    }
+
     pub fn insert<T, V>(&mut self, key: T, arg: V)
     where
         T: Into<DatasourceFieldName>,
@@ -433,6 +439,15 @@ impl WriteArgs {
             .collect();
 
         Some(pairs.into())
+    }
+
+    pub fn inject(&mut self, selection: SelectionResult) {
+        for (selected_field, value) in selection.pairs {
+            self.insert(
+                DatasourceFieldName(selected_field.db_name().into_owned()),
+                (&selected_field, value),
+            )
+        }
     }
 }
 

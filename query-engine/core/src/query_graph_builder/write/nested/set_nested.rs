@@ -1,6 +1,6 @@
 use super::*;
 use crate::{
-    inputs::{IfInput, LeftSideDiffInput, RightSideDiffInput},
+    inputs::{IfInput, LeftSideDiffInput, RightSideDiffInput, UpdateOrCreateArgsInput},
     query_ast::*,
     query_graph::*,
     ParsedInputValue,
@@ -241,7 +241,7 @@ fn handle_one_to_many(
         &diff_left_to_right_node,
         QueryGraphDependency::ProjectedDataSinkDependency(
             child_model_identifier.clone(),
-            RowSink::AllRows(&LeftSideDiffInput),
+            RowSink::All(&LeftSideDiffInput),
             None,
         ),
     )?;
@@ -250,7 +250,7 @@ fn handle_one_to_many(
         &diff_right_to_left_node,
         QueryGraphDependency::ProjectedDataSinkDependency(
             child_model_identifier.clone(),
-            RowSink::AllRows(&LeftSideDiffInput),
+            RowSink::All(&LeftSideDiffInput),
             None,
         ),
     )?;
@@ -261,7 +261,7 @@ fn handle_one_to_many(
         &diff_left_to_right_node,
         QueryGraphDependency::ProjectedDataSinkDependency(
             child_model_identifier.clone(),
-            RowSink::AllRows(&RightSideDiffInput),
+            RowSink::All(&RightSideDiffInput),
             None,
         ),
     )?;
@@ -270,7 +270,7 @@ fn handle_one_to_many(
         &diff_right_to_left_node,
         QueryGraphDependency::ProjectedDataSinkDependency(
             child_model_identifier.clone(),
-            RowSink::AllRows(&RightSideDiffInput),
+            RowSink::All(&RightSideDiffInput),
             None,
         ),
     )?;
@@ -282,11 +282,7 @@ fn handle_one_to_many(
     graph.create_edge(
         &diff_left_to_right_node,
         &connect_if_node,
-        QueryGraphDependency::ProjectedDataSinkDependency(
-            child_model_identifier.clone(),
-            RowSink::AllRows(&IfInput),
-            None,
-        ),
+        QueryGraphDependency::ProjectedDataSinkDependency(child_model_identifier.clone(), RowSink::All(&IfInput), None),
     )?;
 
     // Connect to the if node, the parent node (for the inlining ID) and the diff node (to get the IDs to update)
@@ -294,17 +290,9 @@ fn handle_one_to_many(
     graph.create_edge(
         parent_node,
         &update_connect_node,
-        QueryGraphDependency::ProjectedDataDependency(
+        QueryGraphDependency::ProjectedDataSinkDependency(
             parent_link,
-            Box::new(move |mut update_connect_node, mut parent_links| {
-                let parent_link = parent_links.pop().expect("parent link should be present");
-
-                if let Node::Query(Query::Write(ref mut wq)) = update_connect_node {
-                    wq.inject_result_into_args(child_link.assimilate(parent_link)?);
-                }
-
-                Ok(update_connect_node)
-            }),
+            RowSink::ExactlyOneWriteArgs(child_link, &UpdateOrCreateArgsInput),
             Some(DataExpectation::non_empty_rows(
                 MissingRelatedRecord::builder()
                     .model(&parent_relation_field.model())
@@ -343,7 +331,7 @@ fn handle_one_to_many(
         &disconnect_if_node,
         QueryGraphDependency::ProjectedDataSinkDependency(
             child_model_identifier.clone(),
-            RowSink::AllRows(&IfInput),
+            RowSink::All(&IfInput),
             child_side_required.then(|| DataExpectation::empty_rows(RelationViolation::from(rf))),
         ),
     )?;

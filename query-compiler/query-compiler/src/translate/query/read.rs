@@ -44,6 +44,11 @@ pub(crate) fn translate_read_query(query: ReadQuery, builder: &dyn QueryBuilder)
         }
 
         ReadQuery::ManyRecordsQuery(mut mrq) => {
+            // Skip the query entirely if the take is 0.
+            if mrq.args.take == Take::Some(0) {
+                return Ok(Expression::Concat(vec![]));
+            }
+
             let selected_fields = match mrq.relation_load_strategy {
                 RelationLoadStrategy::Join => mrq.selected_fields.into_virtuals_last(),
                 RelationLoadStrategy::Query => mrq.selected_fields.without_relations().into_virtuals_last(),
@@ -220,6 +225,11 @@ fn build_read_related_records(
     links: Vec<ConditionalLink>,
     builder: &dyn QueryBuilder,
 ) -> TranslateResult<(Expression, JoinMetadata)> {
+    // Skip the query entirely if the take is 0.
+    if rrq.args.take == Take::Some(0) {
+        return Ok((Expression::Concat(vec![]), JoinMetadata::default()));
+    }
+
     let mut linkage = RelationLinkage::new(rrq.parent_field.clone(), links);
 
     if let Some(results) = rrq.parent_results {
@@ -386,7 +396,7 @@ fn extract_distinct_by(args: &mut QueryArguments) -> Vec<String> {
     distinct.db_names().collect_vec()
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Default, Clone)]
 struct JoinMetadata {
     fields: Vec<String>,
     is_relation_unique: bool,

@@ -25,9 +25,9 @@ transaction
                           "public"."User"."id"»
                    params [const(String("user.1737556027349@prisma.io")),
                            const(String("user"))])
-   in let 0 = validate (get 0)
+   in let 0 = unique (validate (get 0)
           [ rowCountNeq 0
-          ] orRaise "MISSING_RELATED_RECORD";
+          ] orRaise "MISSING_RELATED_RECORD");
           0$id = mapField id (get 0)
       in let 1 = unique (query «INSERT INTO "public"."Post" ("title","userId")
                                 VALUES ($1,$2) RETURNING "public"."Post"."id"»

@@ -1,6 +1,6 @@
 use super::{write_args_parser::WriteArgsParser, *};
 use crate::{
-    inputs::{IfInput, RecordQueryFilterInput, UpdateRecordFilterInput},
+    inputs::{IfInput, RecordQueryFilterInput, UpdateRecordSelectorsInput},
     query_ast::*,
     query_graph::{Flow, QueryGraph, QueryGraphDependency},
     DataExpectation, ParsedField, ParsedInputMap, ParsedInputValue, ParsedObject, RowSink,
@@ -123,7 +123,7 @@ pub(crate) fn upsert_record(
     graph.create_edge(
         &read_parent_records_node,
         &if_node,
-        QueryGraphDependency::ProjectedDataSinkDependency(model_id.clone(), RowSink::AllRows(&IfInput), None),
+        QueryGraphDependency::ProjectedDataSinkDependency(model_id.clone(), RowSink::All(&IfInput), None),
     )?;
 
     // In case the connector doesn't support referential integrity, we add a subtree to the graph that emulates the ON_UPDATE referential action.
@@ -153,7 +153,7 @@ pub(crate) fn upsert_record(
         &update_node,
         QueryGraphDependency::ProjectedDataSinkDependency(
             model_id.clone(),
-            RowSink::SingleRowArray(&UpdateRecordFilterInput),
+            RowSink::ExactlyOne(&UpdateRecordSelectorsInput),
             None,
         ),
     )?;
@@ -163,7 +163,7 @@ pub(crate) fn upsert_record(
         &read_node_update,
         QueryGraphDependency::ProjectedDataSinkDependency(
             model_id.clone(),
-            RowSink::SingleRowFilter(&RecordQueryFilterInput),
+            RowSink::ExactlyOneFilter(&RecordQueryFilterInput),
             Some(DataExpectation::non_empty_rows(
                 MissingRecord::builder().operation(DataOperation::Upsert).build(),
             )),
@@ -175,7 +175,7 @@ pub(crate) fn upsert_record(
         &read_node_create,
         QueryGraphDependency::ProjectedDataSinkDependency(
             model_id,
-            RowSink::SingleRowFilter(&RecordQueryFilterInput),
+            RowSink::ExactlyOneFilter(&RecordQueryFilterInput),
             Some(DataExpectation::non_empty_rows(
                 MissingRecord::builder().operation(DataOperation::Upsert).build(),
             )),
