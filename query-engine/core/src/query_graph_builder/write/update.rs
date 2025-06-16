@@ -39,32 +39,16 @@ pub(crate) fn update_record(
         Some(&field),
     )?;
 
+    let read_parent_node = graph.create_node(utils::read_id_infallible(
+        model.clone(),
+        model.shard_aware_primary_identifier(),
+        filter,
+    ));
+
+    let needs_read_parent = query_schema.relation_mode().is_prisma() || !can_use_atomic_update;
+
     if query_schema.relation_mode().is_prisma() {
-        let read_parent_node = graph.create_node(utils::read_id_infallible(
-            model.clone(),
-            model.shard_aware_primary_identifier(),
-            filter,
-        ));
-
         utils::insert_emulated_on_update(graph, query_schema, &model, &read_parent_node, &update_node)?;
-
-        graph.create_edge(
-            &read_parent_node,
-            &update_node,
-            QueryGraphDependency::ProjectedDataDependency(
-                model.shard_aware_primary_identifier(),
-                Box::new(move |mut update_node, parent_ids| {
-                    if let Node::Query(Query::Write(WriteQuery::UpdateRecord(ref mut ur))) = update_node {
-                        ur.set_record_filter(parent_ids.into());
-                    }
-
-                    Ok(update_node)
-                }),
-                Some(DataExpectation::non_empty_rows(
-                    MissingRecord::builder().operation(DataOperation::Update).build(),
-                )),
-            ),
-        )?;
     }
 
     // If the update can be done in a single operation (which includes getting the result back),
@@ -100,6 +84,26 @@ pub(crate) fn update_record(
             QueryGraphDependency::ProjectedDataSinkDependency(
                 model.shard_aware_primary_identifier(),
                 RowSink::SingleRowFilter(&RecordQueryFilterInput),
+                Some(DataExpectation::non_empty_rows(
+                    MissingRecord::builder().operation(DataOperation::Update).build(),
+                )),
+            ),
+        )?;
+    }
+
+    if needs_read_parent {
+        graph.create_edge(
+            &read_parent_node,
+            &update_node,
+            QueryGraphDependency::ProjectedDataDependency(
+                model.shard_aware_primary_identifier(),
+                Box::new(move |mut update_node, parent_ids| {
+                    if let Node::Query(Query::Write(WriteQuery::UpdateRecord(ref mut ur))) = update_node {
+                        ur.set_record_filter(parent_ids.into());
+                    }
+
+                    Ok(update_node)
+                }),
                 Some(DataExpectation::non_empty_rows(
                     MissingRecord::builder().operation(DataOperation::Update).build(),
                 )),
