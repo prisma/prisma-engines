@@ -1,5 +1,5 @@
 use super::*;
-use crate::inputs::RecordQueryFilterInput;
+use crate::inputs::{RecordQueryFilterInput, UpdateRecordSelectorsInput};
 use crate::query_graph_builder::write::limit::validate_limit;
 use crate::query_graph_builder::write::write_args_parser::*;
 use crate::{
@@ -43,28 +43,31 @@ pub(crate) fn update_record(
         let read_parent_node = graph.create_node(utils::read_id_infallible(
             model.clone(),
             model.shard_aware_primary_identifier(),
-            filter,
+            filter.clone(),
         ));
 
         utils::insert_emulated_on_update(graph, query_schema, &model, &read_parent_node, &update_node)?;
 
-        graph.create_edge(
-            &read_parent_node,
-            &update_node,
-            QueryGraphDependency::ProjectedDataDependency(
-                model.shard_aware_primary_identifier(),
-                Box::new(move |mut update_node, parent_ids| {
-                    if let Node::Query(Query::Write(WriteQuery::UpdateRecord(ref mut ur))) = update_node {
-                        ur.set_record_filter(parent_ids.into());
-                    }
-
-                    Ok(update_node)
-                }),
-                Some(DataExpectation::non_empty_rows(
-                    MissingRecord::builder().operation(DataOperation::Update).build(),
-                )),
-            ),
-        )?;
+        // If nothing was linked, we can skip the read.
+        if graph.outgoing_edges(&read_parent_node).is_empty() {
+            *graph.node_content_mut(&read_parent_node).unwrap() = Node::Empty;
+        }
+        // If we use don't use an atomic update, the selectors have to be included anyway
+        // later in this function, so we only make sure they're present when atomic update
+        // is supported.
+        else if can_use_atomic_update {
+            graph.create_edge(
+                &read_parent_node,
+                &update_node,
+                QueryGraphDependency::ProjectedDataSinkDependency(
+                    model.shard_aware_primary_identifier(),
+                    RowSink::All(&UpdateRecordSelectorsInput),
+                    Some(DataExpectation::non_empty_rows(
+                        MissingRecord::builder().operation(DataOperation::Update).build(),
+                    )),
+                ),
+            )?;
+        }
     }
 
     // If the update can be done in a single operation (which includes getting the result back),
@@ -89,14 +92,31 @@ pub(crate) fn update_record(
     } else {
         graph.flag_transactional();
 
-        let read_query = read::find_unique(field, model.clone(), query_schema)?;
-        let read_node = graph.create_node(Query::Read(read_query));
+        let read_ids = graph.create_node(utils::read_id_infallible(
+            model.clone(),
+            model.shard_aware_primary_identifier(),
+            filter,
+        ));
 
-        graph.add_result_node(&read_node);
+        let read_result = graph.create_node(Query::Read(read::find_unique(field, model.clone(), query_schema)?));
+
+        graph.add_result_node(&read_result);
+
+        graph.create_edge(
+            &read_ids,
+            &update_node,
+            QueryGraphDependency::ProjectedDataSinkDependency(
+                model.shard_aware_primary_identifier(),
+                RowSink::All(&UpdateRecordSelectorsInput),
+                Some(DataExpectation::non_empty_rows(
+                    MissingRecord::builder().operation(DataOperation::Update).build(),
+                )),
+            ),
+        )?;
 
         graph.create_edge(
             &update_node,
-            &read_node,
+            &read_result,
             QueryGraphDependency::ProjectedDataSinkDependency(
                 model.shard_aware_primary_identifier(),
                 RowSink::ExactlyOneFilter(&RecordQueryFilterInput),
