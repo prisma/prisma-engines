@@ -4,13 +4,9 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-schema-connector = { workspace = true, features = [
-    "all-native",
-] }
+schema-connector = { workspace = true, features = ["all-native"] }
 schema-core.workspace = true
-user-facing-errors = { workspace = true, features = [
-    "all-native",
-] }
+user-facing-errors = { workspace = true, features = ["all-native"] }
 panic-utils.workspace = true
 
 base64.workspace = true
@@ -18,7 +14,8 @@ jsonrpc-core.workspace = true
 structopt.workspace = true
 serde_json.workspace = true
 serde.workspace = true
-tokio = { workspace = true, features = ["io-std"] }
+tokio = { workspace = true, features = ["io-std", "signal"] }
+tokio-util.workspace = true
 tracing.workspace = true
 tracing-error.workspace = true
 tracing-subscriber = { workspace = true, features = [

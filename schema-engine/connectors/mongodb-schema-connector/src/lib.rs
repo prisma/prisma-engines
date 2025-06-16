@@ -232,6 +232,10 @@ impl SchemaConnector for MongoDbSchemaConnector {
     ) -> BoxFuture<'a, ConnectorResult<DatabaseSchema>> {
         Box::pin(async { Err(unsupported_command_error()) })
     }
+
+    fn dispose(&mut self) -> BoxFuture<'_, ConnectorResult<()>> {
+        Box::pin(async { Ok(()) })
+    }
 }
 
 fn unsupported_command_error() -> ConnectorError {

@@ -4,10 +4,35 @@ mod commands;
 mod json_rpc_stdio;
 mod logger;
 
+use std::{
+    backtrace::Backtrace,
+    sync::{Arc, LazyLock},
+    time::Duration,
+};
+
 use schema_connector::{BoxFuture, ConnectorHost, ConnectorResult};
-use schema_core::rpc_api;
-use std::{backtrace::Backtrace, sync::Arc};
+use schema_core::RpcApi;
 use structopt::StructOpt;
+use tokio::{signal, sync::oneshot};
+use tokio_util::sync::CancellationToken;
+
+/// The timeout for graceful shutdown of asynchronous tasks like network connections on SIGTERM.
+static GRACEFUL_SHUTDOWN_TIMEOUT: LazyLock<Duration> = LazyLock::new(|| {
+    std::env::var("PRISMA_GRACEFUL_SHUTDOWN_TIMEOUT")
+        .ok()
+        .and_then(|s| s.parse::<u64>().ok())
+        .map(Duration::from_millis)
+        .unwrap_or(Duration::from_secs(4))
+});
+
+/// The shutdown deadline for blocking background tasks.
+static BLOCKING_TASKS_SHUTDOWN_TIMEOUT: LazyLock<Duration> = LazyLock::new(|| {
+    std::env::var("PRISMA_BLOCKING_TASKS_SHUTDOWN_TIMEOUT")
+        .ok()
+        .and_then(|s| s.parse::<u64>().ok())
+        .map(Duration::from_millis)
+        .unwrap_or(Duration::from_millis(200))
+});
 
 /// When no subcommand is specified, the schema engine will default to starting as a JSON-RPC
 /// server over stdio.
@@ -28,18 +53,87 @@ enum SubCommand {
     Cli(commands::Cli),
 }
 
-#[tokio::main]
-async fn main() {
+fn main() {
+    let rt = tokio::runtime::Builder::new_multi_thread()
+        .enable_all()
+        .build()
+        .expect("Failed building the Tokio runtime");
+
+    rt.block_on(async_main());
+
+    // By default (i.e. on Drop), Tokio runs the pending async tasks until they
+    // yield and blocking tasks until completion. The JSON-RPC server uses
+    // blocking file I/O to read from stdin, and spawns a background blocking
+    // task for it, which keeps running even if the future is cancelled. This
+    // means that the process would keep running forever until the stdin is
+    // closed externally (i.e. from JavaScript) or the process is terminated
+    // with a signal which we don't/can't handle (e.g. SIGKILL). That's why we
+    // need to shutdown the runtime explicitly, providing a timeout for pending
+    // blocking tasks.
+    rt.shutdown_timeout(*BLOCKING_TASKS_SHUTDOWN_TIMEOUT);
+}
+
+async fn async_main() {
     set_panic_hook();
     logger::init_logger();
 
     let input = SchemaEngineCli::from_args();
+    let shutdown_token = CancellationToken::new();
+    let (done_tx, done_rx) = oneshot::channel();
 
-    match input.cli_subcommand {
-        None => start_engine(input.datamodels).await,
-        Some(SubCommand::Cli(cli_command)) => {
-            tracing::info!(git_hash = env!("GIT_HASH"), "Starting schema engine CLI");
-            cli_command.run().await;
+    let work = tokio::spawn({
+        let shutdown_token = shutdown_token.clone();
+        async {
+            match input.cli_subcommand {
+                None => start_engine(input.datamodels, shutdown_token).await,
+                Some(SubCommand::Cli(cli_command)) => {
+                    tracing::info!(git_hash = env!("GIT_HASH"), "Starting schema engine CLI");
+                    cli_command.run(shutdown_token).await;
+                }
+            }
+            _ = done_tx.send(());
+        }
+    });
+
+    let interrupt = async { signal::ctrl_c().await.expect("failed to listen for SIGINT/Ctrl+C") };
+
+    #[cfg(unix)]
+    let terminate = async {
+        signal::unix::signal(signal::unix::SignalKind::terminate())
+            .expect("failed to install SIGTERM handler")
+            .recv()
+            .await
+    };
+
+    #[cfg(not(unix))]
+    let terminate = std::future::pending();
+
+    let graceful_shutdown = async {
+        shutdown_token.cancel();
+
+        match tokio::time::timeout(*GRACEFUL_SHUTDOWN_TIMEOUT, work).await {
+            Ok(Ok(())) => (),
+            Ok(Err(err)) => {
+                panic!("main task panicked: {}", err);
+            }
+            Err(_) => {
+                tracing::error!("Graceful shutdown timed out");
+                std::process::exit(1);
+            }
+        }
+    };
+
+    tokio::select! {
+        _ = done_rx => (),
+
+        _ = interrupt => {
+            tracing::info!("Received SIGINT/Ctrl+C");
+            graceful_shutdown.await;
+        }
+
+        _ = terminate => {
+            tracing::info!("Received SIGTERM");
+            graceful_shutdown.await;
         }
     }
 }
@@ -86,7 +180,7 @@ impl ConnectorHost for JsonRpcHost {
     }
 }
 
-async fn start_engine(datamodel_locations: Option<Vec<String>>) {
+async fn start_engine(datamodel_locations: Option<Vec<String>>, shutdown_token: CancellationToken) {
     use std::io::Read as _;
 
     tracing::info!(git_hash = env!("GIT_HASH"), "Starting schema engine RPC server",);
@@ -114,7 +208,18 @@ async fn start_engine(datamodel_locations: Option<Vec<String>>) {
     let (client, adapter) = json_rpc_stdio::new_client();
     let host = JsonRpcHost { client };
 
-    let api = rpc_api(datamodel_locations, Arc::new(host));
-    // Block the thread and handle IO in async until EOF.
-    json_rpc_stdio::run_with_client(&api, adapter).await.unwrap();
+    let api = RpcApi::new(datamodel_locations, Arc::new(host));
+
+    // Handle IO in async until EOF or cancelled. Note that the even if the
+    // [`json_rpc_stdio::run_with_client`] future is cancelled, a separate
+    // worker thread may still be blocked on read in a blocking task unless we
+    // read EOF. This is why we need to explicitly use
+    // [`tokio::runtime::Runtime::shutdown_timeout`] to shut down the runtime
+    // instead of relying on the default behavior.
+    tokio::select! {
+        result = json_rpc_stdio::run_with_client(api.io_handler(), adapter) => result.unwrap(),
+        _ = shutdown_token.cancelled() => (),
+    }
+
+    api.dispose().await.unwrap();
 }

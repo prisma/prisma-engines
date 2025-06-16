@@ -70,4 +70,12 @@ pub trait GenericApi: Send + Sync + 'static {
 
     /// The command behind `prisma db push`.
     async fn schema_push(&self, input: SchemaPushInput) -> CoreResult<SchemaPushOutput>;
+
+    /// Dispose of all connectors and gracefully close the underlying database connections.
+    /// Failure to call this method must not result in resource leaks or correctness issues,
+    /// but may result in connections being closed abruptly without notifying the database.
+    /// It is acceptable to not call this method in tests or test harness but it needs to be
+    /// called explicitly in the user facing binary to ensure compatibility with PGlite which
+    /// can't handle abrupt disconnections.
+    async fn dispose(&mut self) -> CoreResult<()>;
 }

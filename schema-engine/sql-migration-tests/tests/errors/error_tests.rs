@@ -12,21 +12,28 @@ use std::str::FromStr;
 use url::Url;
 
 pub(crate) async fn connection_error(schema: String) -> ConnectorError {
-    let api = match schema_core::schema_api(Some(schema.clone()), None) {
+    let mut api = match schema_core::schema_api(Some(schema.clone()), None) {
         Ok(api) => api,
         Err(err) => return err,
     };
 
-    api.ensure_connection_validity(EnsureConnectionValidityParams {
-        datasource: DatasourceParam::Schema(SchemasContainer {
-            files: vec![SchemaContainer {
-                path: "schema.prisma".to_string(),
-                content: schema,
-            }],
-        }),
-    })
-    .await
-    .unwrap_err()
+    let err = api
+        .ensure_connection_validity(EnsureConnectionValidityParams {
+            datasource: DatasourceParam::Schema(SchemasContainer {
+                files: vec![SchemaContainer {
+                    path: "schema.prisma".to_string(),
+                    content: schema,
+                }],
+            }),
+        })
+        .await
+        .unwrap_err();
+
+    // The type of the error here fits the return type of the function, but it's a different error semantically!
+    // Since it's not expected to fail, we can just unwrap here.
+    api.dispose().await.unwrap();
+
+    err
 }
 
 #[test_connector(tags(Postgres12))]
@@ -465,7 +472,7 @@ async fn connection_string_problems_give_a_nice_error() {
             provider.1
         );
 
-        let api = schema_core::schema_api(Some(dm.clone()), None).unwrap();
+        let mut api = schema_core::schema_api(Some(dm.clone()), None).unwrap();
         let error = api
             .ensure_connection_validity(EnsureConnectionValidityParams {
                 datasource: DatasourceParam::Schema(SchemasContainer {
@@ -477,6 +484,7 @@ async fn connection_string_problems_give_a_nice_error() {
             })
             .await
             .unwrap_err();
+        api.dispose().await.unwrap();
 
         let json_error = serde_json::to_value(error.to_user_facing()).unwrap();
 
