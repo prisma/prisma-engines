@@ -14,9 +14,9 @@ transaction
                           $1 AND 1=1) LIMIT $2 OFFSET $3»
                    params [const(BigInt(1)), const(BigInt(1)),
                            const(BigInt(0))])
-   in let 0 = validate (get 0)
+   in let 0 = unique (validate (get 0)
           [ rowCountNeq 0
-          ] orRaise "MISSING_RELATED_RECORD";
+          ] orRaise "MISSING_RELATED_RECORD");
           0$id = mapField id (get 0)
       in sum (execute «INSERT INTO "public"."Employee" ("id","managerId") VALUES
                        ($1,$2), ($3,$4)»

@@ -384,32 +384,49 @@ impl Expressionista {
                                             .transpose()
                                             .map_err(Into::into)
                                             .and(binding.as_selection_results(&selection))
-                                            .map(|mut parent_selections| {
+                                            .and_then(|mut parent_selections| {
                                                 match consumer {
-                                                    RowSink::AllRows(field) => {
-                                                        *field.node_input_field(&mut node) = parent_selections
-                                                    }
-                                                    RowSink::SingleRow(field) => {
+                                                    RowSink::Single(field) => {
                                                         let row = parent_selections.pop().expect(
                                                             "parent selection should be present after validation",
                                                         );
                                                         *field.node_input_field(&mut node) = row;
                                                     }
-                                                    RowSink::SingleRowArray(field) => {
+                                                    RowSink::All(field) => {
+                                                        *field.node_input_field(&mut node) = parent_selections
+                                                    }
+                                                    RowSink::AtMostOne(field) => {
+                                                        parent_selections.truncate(1);
+                                                        *field.node_input_field(&mut node) = parent_selections;
+                                                    }
+                                                    RowSink::ExactlyOne(field) => {
                                                         let row = parent_selections.pop().expect(
                                                             "parent selection should be present after validation",
                                                         );
                                                         *field.node_input_field(&mut node) = vec![row];
                                                     }
-                                                    RowSink::SingleRowFilter(filter) => {
+                                                    RowSink::ExactlyOneFilter(filter) => {
                                                         let row = parent_selections.pop().expect(
                                                             "parent selection should be present after validation",
                                                         );
                                                         *filter.node_input_field(&mut node) = row.filter();
                                                     }
+                                                    RowSink::ExactlyOneWriteArgs(selection, field) => {
+                                                        let row = parent_selections.pop().expect(
+                                                            "parent selection should be present after validation",
+                                                        );
+                                                        let model = node.as_query().map(Query::model);
+                                                        let args = field.node_input_field(&mut node);
+                                                        for arg in args {
+                                                            arg.inject(selection.assimilate(row.clone())?);
+                                                            if let Some(model) = &model {
+                                                                arg.update_datetimes(model);
+                                                            }
+                                                        }
+                                                    }
                                                     RowSink::Discard => {}
                                                 }
-                                                node
+                                                Ok(node)
                                             }),
 
                                         QueryGraphDependency::DataDependency(consumer, expectation) => {

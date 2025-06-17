@@ -1,12 +1,13 @@
 use super::*;
 use crate::{
+    inputs::{UpdateManyRecordsSelectorsInput, UpdateOrCreateArgsInput},
     query_ast::*,
-    query_graph::{Node, NodeRef, QueryGraph, QueryGraphDependency},
+    query_graph::{NodeRef, QueryGraph, QueryGraphDependency},
     write::write_args_parser::WriteArgsParser,
-    DataExpectation, ParsedInputList, ParsedInputValue,
+    DataExpectation, ParsedInputList, ParsedInputValue, RowSink,
 };
 use psl::datamodel_connector::ConnectorCapability;
-use query_structure::{Filter, IntoFilter, Model, RelationFieldRef};
+use query_structure::{Filter, Model, RelationFieldRef};
 use schema::constants::args;
 use std::convert::TryInto;
 
@@ -131,17 +132,9 @@ fn handle_one_to_many_bulk(
     graph.create_edge(
         &parent_node,
         &child_node,
-        QueryGraphDependency::ProjectedDataDependency(
+        QueryGraphDependency::ProjectedDataSinkDependency(
             parent_link,
-            Box::new(move |mut create_node, mut parent_links| {
-                let parent_link = parent_links.pop().expect("parent link should be present");
-
-                if let Node::Query(Query::Write(ref mut wq)) = create_node {
-                    wq.inject_result_into_args(child_link.assimilate(parent_link)?);
-                }
-
-                Ok(create_node)
-            }),
+            RowSink::ExactlyOneWriteArgs(child_link, &UpdateOrCreateArgsInput),
             Some(DataExpectation::non_empty_rows(
                 MissingRelatedRecord::builder()
                     .model(&parent_relation_field.model())
@@ -290,17 +283,9 @@ fn handle_one_to_many(
         graph.create_edge(
             &parent_node,
             &child_node,
-            QueryGraphDependency::ProjectedDataDependency(
+            QueryGraphDependency::ProjectedDataSinkDependency(
                 child_link,
-                Box::new(move |mut parent_node, mut child_links| {
-                    let child_link = child_links.pop().expect("child link should be present");
-
-                    if let Node::Query(Query::Write(ref mut wq)) = parent_node {
-                        wq.inject_result_into_args(parent_link.assimilate(child_link)?);
-                    }
-
-                    Ok(parent_node)
-                }),
+                RowSink::ExactlyOneWriteArgs(parent_link, &UpdateOrCreateArgsInput),
                 Some(DataExpectation::non_empty_rows(
                     MissingRelatedRecord::builder()
                         .model(&parent_relation_field.related_model())
@@ -319,17 +304,9 @@ fn handle_one_to_many(
             graph.create_edge(
                 &parent_node,
                 &create_node,
-                QueryGraphDependency::ProjectedDataDependency(
+                QueryGraphDependency::ProjectedDataSinkDependency(
                     parent_link,
-                    Box::new(move |mut create_node, mut parent_links| {
-                        let parent_link = parent_links.pop().expect("parent link should be present");
-
-                        if let Node::Query(Query::Write(ref mut wq)) = create_node {
-                            wq.inject_result_into_args(child_link.assimilate(parent_link)?);
-                        }
-
-                        Ok(create_node)
-                    }),
+                    RowSink::ExactlyOneWriteArgs(child_link, &UpdateOrCreateArgsInput),
                     Some(DataExpectation::non_empty_rows(
                         MissingRelatedRecord::builder()
                             .model(&parent_relation_field.model())
@@ -485,18 +462,9 @@ fn handle_one_to_one(
     graph.create_edge(
         &parent_node,
         &create_node,
-        QueryGraphDependency::ProjectedDataDependency(
+        QueryGraphDependency::ProjectedDataSinkDependency(
             extractor,
-            Box::new(move |mut child_node, mut links| {
-                let link = links.pop().expect("link should be present");
-
-                // We ONLY inject for creates here. Check end of doc comment for explanation.
-                if let Node::Query(Query::Write(ref mut q @ WriteQuery::CreateRecord(_))) = child_node {
-                    q.inject_result_into_args(assimilator.assimilate(link)?);
-                }
-
-                Ok(child_node)
-            }),
+            RowSink::ExactlyOneWriteArgs(assimilator, &UpdateOrCreateArgsInput),
             Some(DataExpectation::non_empty_rows(
                 MissingRelatedRecord::builder()
                     .model(&extractor_model)
@@ -519,17 +487,9 @@ fn handle_one_to_one(
         graph.create_edge(
             &create_node,
             &update_node,
-            QueryGraphDependency::ProjectedDataDependency(
+            QueryGraphDependency::ProjectedDataSinkDependency(
                 child_link,
-                Box::new(move |mut update_node, mut child_links| {
-                    let child_link = child_links.pop().expect("child link should be present");
-
-                    if let Node::Query(Query::Write(ref mut wq)) = update_node {
-                        wq.inject_result_into_args(parent_link.assimilate(child_link)?);
-                    }
-
-                    Ok(update_node)
-                }),
+                RowSink::ExactlyOneWriteArgs(parent_link, &UpdateOrCreateArgsInput),
                 Some(DataExpectation::non_empty_rows(
                     MissingRelatedRecord::builder()
                         .model(&parent_model)
@@ -546,17 +506,9 @@ fn handle_one_to_one(
         graph.create_edge(
             &parent_node,
             &update_node,
-            QueryGraphDependency::ProjectedDataDependency(
+            QueryGraphDependency::ProjectedDataSinkDependency(
                 parent_relation_field.model().shard_aware_primary_identifier(),
-                Box::new(move |mut update_node, mut parent_ids| {
-                    let parent_id = parent_ids.pop().expect("parent id should be present");
-
-                    if let Node::Query(Query::Write(ref mut wq)) = update_node {
-                        wq.add_filter(parent_id.filter());
-                    }
-
-                    Ok(update_node)
-                }),
+                RowSink::ExactlyOne(&UpdateManyRecordsSelectorsInput),
                 Some(DataExpectation::non_empty_rows(
                     MissingRelatedRecord::builder()
                         .model(&parent_relation_field.model())

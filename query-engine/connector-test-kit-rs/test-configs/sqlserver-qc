@@ -1,5 +1,5 @@
 {
-    "connector": "mssql",
+    "connector": "sqlserver",
     "version": "mssql.js.wasm",
     "driver_adapter": "mssql",
     "external_test_executor": "QueryCompiler"

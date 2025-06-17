@@ -25,9 +25,9 @@ transaction
                           "public"."User"."id"»
                    params [const(String("user.1737556028164@prisma.io")),
                            const(String("user"))])
-   in let 0 = validate (get 0)
+   in let 0 = unique (validate (get 0)
           [ rowCountNeq 0
-          ] orRaise "MISSING_RELATED_RECORD";
+          ] orRaise "MISSING_RELATED_RECORD");
           0$id = mapField id (get 0)
       in let 1 = sum (execute «UPDATE "public"."Post" SET "userId" = $1 WHERE
                                (("public"."Post"."id" = $2 AND 1=1) OR

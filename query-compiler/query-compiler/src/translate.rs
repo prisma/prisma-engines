@@ -293,14 +293,27 @@ impl<'a, 'b> NodeTranslator<'a, 'b> {
                     let fields = self.process_edge_selections(edge, &node, selection);
 
                     match sink {
-                        RowSink::AllRows(field) | RowSink::SingleRowArray(field) => {
+                        RowSink::All(field) | RowSink::ExactlyOne(field) | RowSink::AtMostOne(field) => {
                             *field.node_input_field(&mut node) = vec![SelectionResult::new(fields)];
                         }
-                        RowSink::SingleRow(field) => {
+                        RowSink::Single(field) => {
                             *field.node_input_field(&mut node) = SelectionResult::new(fields);
                         }
-                        RowSink::SingleRowFilter(field) => {
+                        RowSink::ExactlyOneFilter(field) => {
                             *field.node_input_field(&mut node) = SelectionResult::new(fields).filter();
+                        }
+                        RowSink::ExactlyOneWriteArgs(selection, field) => {
+                            let result = SelectionResult::new(fields);
+                            let model = node.as_query().map(Query::model);
+                            let args = field.node_input_field(&mut node);
+                            for arg in args {
+                                arg.inject(selection.assimilate(result.clone()).map_err(|err| {
+                                    TranslateError::GraphBuildError(QueryGraphBuilderError::DomainError(err))
+                                })?);
+                                if let Some(model) = &model {
+                                    arg.update_datetimes(model);
+                                }
+                            }
                         }
                         RowSink::Discard => {}
                     }
@@ -432,11 +445,8 @@ impl<'a, 'b> NodeTranslator<'a, 'b> {
 
                 let requires_unique = matches!(
                     edge_content,
-                    Some(QueryGraphDependency::ProjectedDataSinkDependency(
-                        _,
-                        RowSink::SingleRow(_) | RowSink::SingleRowArray(_) | RowSink::SingleRowFilter(_),
-                        _
-                    ))
+                    Some(QueryGraphDependency::ProjectedDataSinkDependency(_, sink, _))
+                        if sink.is_unique()
                 );
 
                 let source = self.graph.edge_source(&edge);

@@ -240,13 +240,13 @@ const CONFIG_LOAD_FAILED: &str = r####"
 🔴 Unable to load config from file or env. 🔴
 =============================================
 
-ℹ️  How do I fix this? ℹ️ 
+ℹ️  How do I fix this? ℹ️
 
 Test config can come from the environment, or a config file.
 
 ♻️  Environment variables
 
-Be sure to have WORKSPACE_ROOT set to the root of the prisma-engines 
+Be sure to have WORKSPACE_ROOT set to the root of the prisma-engines
 repository.
 
 Set the following vars to denote the connector under test
@@ -438,7 +438,7 @@ impl TestConfig {
         self.connector.as_str()
     }
 
-    pub(crate) fn connector_version(&self) -> Option<&str> {
+    pub fn connector_version(&self) -> Option<&str> {
         self.connector_version.as_deref()
     }
 
@@ -478,7 +478,7 @@ impl TestConfig {
 
         vec!(
             (
-                "DRIVER_ADAPTER".to_string(), 
+                "DRIVER_ADAPTER".to_string(),
                 with_driver_adapter.adapter.to_string()
             ),
             (

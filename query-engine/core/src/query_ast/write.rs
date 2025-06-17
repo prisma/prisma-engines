@@ -2,7 +2,7 @@
 use super::{FilteredNestedMutation, FilteredQuery};
 use crate::{ReadQuery, RecordQuery, ToGraphviz};
 use connector::NativeUpsert;
-use query_structure::{prelude::*, DatasourceFieldName, Filter, RecordFilter, WriteArgs};
+use query_structure::{prelude::*, Filter, RecordFilter, WriteArgs};
 use std::{borrow::Cow, collections::HashMap, slice};
 
 #[derive(Debug, Clone)]
@@ -51,12 +51,7 @@ impl WriteQuery {
         let model = self.model();
 
         let inject = |args: &mut WriteArgs| {
-            for (selected_field, value) in result.pairs() {
-                args.insert(
-                    DatasourceFieldName(selected_field.db_name().into_owned()),
-                    (selected_field, value.clone()),
-                )
-            }
+            args.inject(result.clone());
             args.update_datetimes(&model);
         };
 
@@ -315,10 +310,17 @@ pub enum UpdateRecord {
 }
 
 impl UpdateRecord {
-    pub(crate) fn args(&self) -> &WriteArgs {
+    pub fn args(&self) -> &WriteArgs {
         match self {
             UpdateRecord::WithSelection(u) => &u.args,
             UpdateRecord::WithoutSelection(u) => &u.args,
+        }
+    }
+
+    pub fn args_mut(&mut self) -> &mut WriteArgs {
+        match self {
+            UpdateRecord::WithSelection(u) => &mut u.args,
+            UpdateRecord::WithoutSelection(u) => &mut u.args,
         }
     }
 

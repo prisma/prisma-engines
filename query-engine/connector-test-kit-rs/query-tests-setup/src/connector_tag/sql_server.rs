@@ -34,6 +34,7 @@ pub enum SqlServerVersion {
     V2017,
     V2019,
     V2022,
+    MssqlJsWasm,
 }
 
 impl TryFrom<&str> for SqlServerVersion {
@@ -44,6 +45,7 @@ impl TryFrom<&str> for SqlServerVersion {
             "2017" => Self::V2017,
             "2019" => Self::V2019,
             "2022" => Self::V2022,
+            "mssql.js.wasm" => Self::MssqlJsWasm,
             _ => return Err(TestError::parse_error(format!("Unknown SqlServer version `{s}`"))),
         };
 
@@ -57,6 +59,7 @@ impl Display for SqlServerVersion {
             SqlServerVersion::V2017 => f.write_str("2017"),
             SqlServerVersion::V2019 => f.write_str("2019"),
             SqlServerVersion::V2022 => f.write_str("2022"),
+            SqlServerVersion::MssqlJsWasm => f.write_str("mssql.js.wasm"),
         }
     }
 }

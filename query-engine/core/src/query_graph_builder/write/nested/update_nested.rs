@@ -1,5 +1,5 @@
 use super::*;
-use crate::inputs::{UpdateManyRecordsFilterInput, UpdateRecordFilterInput};
+use crate::inputs::{UpdateManyRecordsSelectorsInput, UpdateRecordSelectorsInput};
 use crate::query_graph_builder::write::update::UpdateManyRecordNodeOptionals;
 use crate::{
     query_graph::{NodeRef, QueryGraph, QueryGraphDependency},
@@ -97,7 +97,7 @@ pub fn nested_update(
             &update_node,
             QueryGraphDependency::ProjectedDataSinkDependency(
                 child_model_identifier.clone(),
-                RowSink::SingleRowArray(&UpdateRecordFilterInput),
+                RowSink::ExactlyOne(&UpdateRecordSelectorsInput),
                 Some(DataExpectation::non_empty_rows(
                     MissingRelatedRecord::builder()
                         .model(child_model)
@@ -153,7 +153,7 @@ pub fn nested_update_many(
             &update_many_node,
             QueryGraphDependency::ProjectedDataSinkDependency(
                 child_model_identifier.clone(),
-                RowSink::AllRows(&UpdateManyRecordsFilterInput),
+                RowSink::All(&UpdateManyRecordsSelectorsInput),
                 None,
             ),
         )?;

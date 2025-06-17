@@ -10,13 +10,7 @@ import {
   type TransactionManager,
   UserFacingError,
 } from '@prisma/client-engine-runtime'
-import {
-  ColumnType,
-  ColumnTypeEnum,
-  IsolationLevel,
-  SqlQueryable,
-  SqlResultSet,
-} from '@prisma/driver-adapter-utils'
+import { IsolationLevel, SqlQueryable } from '@prisma/driver-adapter-utils'
 import Decimal from 'decimal.js'
 
 import { JsonOutputTaggedValue } from '../engines/JsonProtocol'
