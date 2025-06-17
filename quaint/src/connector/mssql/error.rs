@@ -3,57 +3,58 @@ use thiserror::Error;
 
 /// This type represents MSSQL server error.
 #[derive(Debug, Error, Clone, Eq, PartialEq)]
-#[error("ERROR {}: {}", code, message)]
+#[error("ERROR {}: {}", code_name, message)]
 pub struct MssqlError {
-    pub code: u32,
+    pub code: Option<u32>,
+    pub code_name: String,
     pub message: String,
 }
 
 impl From<MssqlError> for Error {
     fn from(error: MssqlError) -> Self {
         match error.code {
-            3902 | 3903 | 3971 => {
+            Some(3902 | 3903 | 3971) => {
                 let kind = ErrorKind::TransactionAlreadyClosed(error.message.clone());
 
                 let mut builder = Error::builder(kind);
 
-                builder.set_original_code(format!("{}", error.code));
+                builder.set_original_code(error.code_name);
                 builder.set_original_message(error.message);
 
                 builder.build()
             }
-            8169 => {
+            Some(8169) => {
                 let kind = ErrorKind::conversion(error.message.clone());
 
                 let mut builder = Error::builder(kind);
 
-                builder.set_original_code(format!("{}", error.code));
+                builder.set_original_code(error.code_name);
                 builder.set_original_message(error.message);
 
                 builder.build()
             }
-            18456 => {
+            Some(18456) => {
                 let user = error.message.split('\'').nth(1).into();
                 let kind = ErrorKind::AuthenticationFailed { user };
 
                 let mut builder = Error::builder(kind);
 
-                builder.set_original_code(format!("{}", error.code));
+                builder.set_original_code(error.code_name);
                 builder.set_original_message(error.message);
 
                 builder.build()
             }
-            4060 => {
+            Some(4060) => {
                 let db_name = error.message.split('"').nth(1).into();
                 let kind = ErrorKind::DatabaseDoesNotExist { db_name };
                 let mut builder = Error::builder(kind);
 
-                builder.set_original_code(format!("{}", error.code));
+                builder.set_original_code(error.code_name);
                 builder.set_original_message(error.message);
 
                 builder.build()
             }
-            515 => {
+            Some(515) => {
                 let constraint = error
                     .message
                     .split_whitespace()
@@ -65,23 +66,23 @@ impl From<MssqlError> for Error {
                 let kind = ErrorKind::NullConstraintViolation { constraint };
                 let mut builder = Error::builder(kind);
 
-                builder.set_original_code(format!("{}", error.code));
+                builder.set_original_code(error.code_name);
                 builder.set_original_message(error.message);
 
                 builder.build()
             }
-            1801 => {
+            Some(1801) => {
                 let db_name = error.message.split('\'').nth(1).into();
                 let kind = ErrorKind::DatabaseAlreadyExists { db_name };
 
                 let mut builder = Error::builder(kind);
 
-                builder.set_original_code(format!("{}", error.code));
+                builder.set_original_code(error.code_name);
                 builder.set_original_message(error.message);
 
                 builder.build()
             }
-            2627 => {
+            Some(2627) => {
                 let constraint = error
                     .message
                     .split(". ")
@@ -95,12 +96,12 @@ impl From<MssqlError> for Error {
                 let kind = ErrorKind::UniqueConstraintViolation { constraint };
                 let mut builder = Error::builder(kind);
 
-                builder.set_original_code(format!("{}", error.code));
+                builder.set_original_code(error.code_name);
                 builder.set_original_message(error.message);
 
                 builder.build()
             }
-            547 => {
+            Some(547) => {
                 let constraint = error
                     .message
                     .split('.')
@@ -114,12 +115,12 @@ impl From<MssqlError> for Error {
                 let kind = ErrorKind::ForeignKeyConstraintViolation { constraint };
                 let mut builder = Error::builder(kind);
 
-                builder.set_original_code(format!("{}", error.code));
+                builder.set_original_code(error.code_name);
                 builder.set_original_message(error.message);
 
                 builder.build()
             }
-            1505 => {
+            Some(1505) => {
                 let constraint = error
                     .message
                     .split('\'')
@@ -131,12 +132,12 @@ impl From<MssqlError> for Error {
                 let kind = ErrorKind::UniqueConstraintViolation { constraint };
                 let mut builder = Error::builder(kind);
 
-                builder.set_original_code(format!("{}", error.code));
+                builder.set_original_code(error.code_name);
                 builder.set_original_message(error.message);
 
                 builder.build()
             }
-            2601 => {
+            Some(2601) => {
                 let constraint = error
                     .message
                     .split_whitespace()
@@ -149,23 +150,23 @@ impl From<MssqlError> for Error {
                 let kind = ErrorKind::UniqueConstraintViolation { constraint };
                 let mut builder = Error::builder(kind);
 
-                builder.set_original_code(format!("{}", error.code));
+                builder.set_original_code(error.code_name);
                 builder.set_original_message(error.message);
 
                 builder.build()
             }
-            2628 => {
+            Some(2628) => {
                 let column = error.message.split('\'').nth(3).into();
                 let kind = ErrorKind::LengthMismatch { column };
 
                 let mut builder = Error::builder(kind);
 
-                builder.set_original_code(format!("{}", error.code));
+                builder.set_original_code(error.code_name);
                 builder.set_original_message(error.message);
 
                 builder.build()
             }
-            208 => {
+            Some(208) => {
                 let table = error
                     .message
                     .split_whitespace()
@@ -176,12 +177,12 @@ impl From<MssqlError> for Error {
                 let kind = ErrorKind::TableDoesNotExist { table };
                 let mut builder = Error::builder(kind);
 
-                builder.set_original_code(format!("{}", error.code));
+                builder.set_original_code(error.code_name);
                 builder.set_original_message(error.message);
 
                 builder.build()
             }
-            207 => {
+            Some(207) => {
                 let column = error
                     .message
                     .split_whitespace()
@@ -192,22 +193,22 @@ impl From<MssqlError> for Error {
                 let kind = ErrorKind::ColumnNotFound { column };
                 let mut builder = Error::builder(kind);
 
-                builder.set_original_code(format!("{}", error.code));
+                builder.set_original_code(error.code_name);
                 builder.set_original_message(error.message);
 
                 builder.build()
             }
-            1205 => {
+            Some(1205) => {
                 let mut builder = Error::builder(ErrorKind::TransactionWriteConflict);
 
-                builder.set_original_code(format!("{}", error.code));
+                builder.set_original_code(error.code_name);
                 builder.set_original_message(error.message);
 
                 builder.build()
             }
-            5828 => {
+            Some(5828) => {
                 let mut builder = Error::builder(ErrorKind::TooManyConnections(error.clone().into()));
-                builder.set_original_code(format!("{}", error.code));
+                builder.set_original_code(error.code_name);
                 builder.set_original_message(error.message);
 
                 builder.build()
@@ -216,7 +217,7 @@ impl From<MssqlError> for Error {
                 let kind = ErrorKind::QueryError(error.clone().into());
 
                 let mut builder = Error::builder(kind);
-                builder.set_original_code(format!("{}", error.code));
+                builder.set_original_code(error.code_name);
                 builder.set_original_message(error.message);
 
                 builder.build()

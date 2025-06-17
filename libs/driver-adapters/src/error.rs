@@ -43,9 +43,10 @@ pub struct SqliteErrorDef {
 
 #[cfg(feature = "mssql")]
 #[derive(Deserialize)]
-#[serde(remote = "MssqlError")]
+#[serde(remote = "MssqlError", rename_all = "camelCase")]
 pub struct MssqlErrorDef {
-    pub code: u32,
+    pub code: Option<u32>,
+    pub code_name: String,
     pub message: String,
 }
 

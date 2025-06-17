@@ -542,13 +542,25 @@ mod typed_output {
         Ok(())
     }
 
-    #[connector_test(schema(generic), only(SqlServer))]
+    #[connector_test(schema(generic), only(SqlServer("2017", "2019", "2022")))]
     async fn unknown_type_mssql(runner: Runner) -> TestResult<()> {
         assert_error!(
             &runner,
             fmt_query_raw(r#"SELECT geometry::Parse('POINT(3 4 7 2.5)');"#, vec![]),
             2010,
             "not yet implemented for Udt"
+        );
+
+        Ok(())
+    }
+
+    #[connector_test(schema(generic), only(SqlServer("mssql.js.wasm")))]
+    async fn unknown_type_mssql_js(runner: Runner) -> TestResult<()> {
+        assert_error!(
+            &runner,
+            fmt_query_raw(r#"SELECT geometry::Parse('POINT(3 4 7 2.5)');"#, vec![]),
+            2010,
+            "Failed to deserialize column of type 'geometry'"
         );
 
         Ok(())
