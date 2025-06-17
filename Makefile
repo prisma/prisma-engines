@@ -376,6 +376,9 @@ start-mssql_edge:
 dev-mssql_edge: start-mssql_edge
 	cp $(CONFIG_PATH)/sqlserver2019 $(CONFIG_FILE)
 
+dev-mssql-wasm: start-mssql_2022 build-qe-wasm build-driver-adapters-kit-qe
+	cp $(CONFIG_PATH)/sqlserver-wasm $(CONFIG_FILE)
+
 dev-mssql-qc: start-mssql_2022 build-qc-wasm build-driver-adapters-kit-qc
 	cp $(CONFIG_PATH)/sqlserver-qc $(CONFIG_FILE)
 
