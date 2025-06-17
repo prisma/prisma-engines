@@ -34,8 +34,7 @@ impl From<tiberius::error::Error> for Error {
 impl From<tiberius::error::TokenError> for MssqlError {
     fn from(value: tiberius::error::TokenError) -> Self {
         MssqlError {
-            code: Some(value.code()),
-            code_name: value.code().to_string(),
+            code: value.code(),
             message: value.message().to_owned(),
         }
     }
