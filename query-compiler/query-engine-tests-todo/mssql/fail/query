@@ -1,4 +1,3 @@
-new::interactive_tx::interactive_tx::batch_queries_failure
 new::regressions::max_integer::max_integer::unfitted_int_should_fail
 new::regressions::max_integer::max_integer::unfitted_int_should_fail_mssql
 new::regressions::prisma_7434::not_in_chunking::not_in_batch_filter
