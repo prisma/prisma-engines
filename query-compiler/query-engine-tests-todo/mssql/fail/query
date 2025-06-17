@@ -1,12 +1,8 @@
-new::interactive_tx::interactive_tx::batch_queries_failure
 new::regressions::max_integer::max_integer::unfitted_int_should_fail
 new::regressions::max_integer::max_integer::unfitted_int_should_fail_mssql
 new::regressions::prisma_7434::not_in_chunking::not_in_batch_filter
 queries::aggregation::group_by::aggregation_group_by::group_by_ordering_sum_aggregation
 queries::chunking::chunking::order_by_aggregation_should_fail
 queries::filters::self_relation_regression::sr_regression::all_categories
-raw::sql::typed_output::typed_output::unknown_type_mssql
-writes::data_types::bytes::bytes::using_bytes_field
-writes::data_types::decimal::decimal::using_decimal_as_id
 writes::data_types::native_types::sql_server::sql_server::native_decimal_type
 writes::nested_mutations::already_converted::nested_connect_inside_update::connect_inside_update::p1_c1req_rel_child_idempotent
