@@ -6,6 +6,7 @@ use query_structure::{ScalarField, SelectedField};
 const JOIN_PARENT: &str = "@parent";
 const DEFAULTS: &str = "@defaults";
 const GENERATED: &str = "@generated";
+
 const SELECTOR: &str = "@selector";
 
 const FIELD_SEPARATOR: &str = "$";
