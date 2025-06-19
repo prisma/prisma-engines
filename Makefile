@@ -280,6 +280,23 @@ dev-neon-wasm: start-neon build-qe-wasm build-driver-adapters-kit-qe
 
 test-neon-wasm: dev-neon-wasm test-qe-st
 
+dev-neon-qc: start-neon build-qc-wasm build-driver-adapters-kit-qc
+	cp $(CONFIG_PATH)/neon-qc $(CONFIG_FILE)
+
+dev-neon-qc-join:
+	PRISMA_RELATION_LOAD_STRATEGY=join make dev-neon-qc
+
+dev-neon-qc-query:
+	PRISMA_RELATION_LOAD_STRATEGY=query make dev-neon-qc
+
+test-neon-qc: dev-neon-qc test-qe
+
+test-neon-qc-join:
+	PRISMA_RELATION_LOAD_STRATEGY=join make test-neon-qc
+
+test-neon-qc-query:
+	PRISMA_RELATION_LOAD_STRATEGY=query make test-neon-qc
+
 test-driver-adapter-neon: test-neon-js
 test-driver-adapter-neon-wasm: test-neon-wasm
 
