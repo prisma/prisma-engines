@@ -1,12 +1,14 @@
 use super::*;
 use crate::{
-    inputs::{IfInput, LeftSideDiffInput, RightSideDiffInput, UpdateOrCreateArgsInput},
+    inputs::{
+        IfInput, LeftSideDiffInput, RightSideDiffInput, UpdateManyRecordsSelectorsInput, UpdateOrCreateArgsInput,
+    },
     query_ast::*,
     query_graph::*,
     ParsedInputValue,
 };
 use itertools::Itertools;
-use query_structure::{Filter, Model, RelationFieldRef, SelectionResult};
+use query_structure::{Filter, Model, RelationFieldRef, SelectionResult, WriteArgs};
 use std::convert::TryInto;
 
 /// Only for x-to-many relations.
@@ -321,7 +323,9 @@ fn handle_one_to_many(
 
     // Update (disconnect) case: Check right diff IDs.
     let disconnect_if_node = graph.create_node(Node::Flow(Flow::if_non_empty()));
-    let update_disconnect_node = utils::update_records_node_placeholder(graph, Filter::empty(), child_model);
+    let write_args = WriteArgs::from_result(empty_child_link, crate::executor::get_request_now());
+    let update_disconnect_node =
+        utils::update_records_node_placeholder_with_args(graph, Filter::empty(), child_model, write_args);
 
     let child_side_required = parent_relation_field.related_field().is_required();
     let rf = parent_relation_field.clone();
@@ -341,19 +345,9 @@ fn handle_one_to_many(
     graph.create_edge(
         &diff_right_to_left_node,
         &update_disconnect_node,
-        QueryGraphDependency::ProjectedDataDependency(
+        QueryGraphDependency::ProjectedDataSinkDependency(
             child_model_identifier,
-            Box::new(move |mut node, diff_right_result| {
-                if let Node::Query(Query::Write(WriteQuery::UpdateManyRecords(ref mut ur))) = node {
-                    ur.record_filter = diff_right_result.to_vec().into();
-                }
-
-                if let Node::Query(Query::Write(ref mut wq)) = node {
-                    wq.inject_result_into_args(empty_child_link);
-                }
-
-                Ok(node)
-            }),
+            RowSink::All(&UpdateManyRecordsSelectorsInput),
             None,
         ),
     )?;

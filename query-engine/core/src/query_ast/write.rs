@@ -46,27 +46,6 @@ impl WriteQuery {
         }
     }
 
-    /// Takes a SelectionResult and writes its contents into the write arguments of the underlying query.
-    pub fn inject_result_into_args(&mut self, result: SelectionResult) {
-        let model = self.model();
-
-        let inject = |args: &mut WriteArgs| {
-            args.inject(result.clone());
-            args.update_datetimes(&model);
-        };
-
-        match self {
-            Self::CreateRecord(ref mut x) => inject(&mut x.args),
-            Self::CreateManyRecords(ref mut x) => x.args.iter_mut().map(inject).collect(),
-            Self::UpdateRecord(ref mut x) => match x {
-                UpdateRecord::WithSelection(u) => inject(&mut u.args),
-                UpdateRecord::WithoutSelection(u) => inject(&mut u.args),
-            },
-            Self::UpdateManyRecords(x) => inject(&mut x.args),
-            _ => (),
-        };
-    }
-
     pub fn set_selectors(&mut self, selectors: Vec<SelectionResult>) {
         match self {
             Self::UpdateManyRecords(x) => x.set_selectors(selectors),
