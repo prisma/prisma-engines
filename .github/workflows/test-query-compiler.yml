@@ -62,6 +62,12 @@ jobs:
             should_fail_tests_list: query-compiler/query-engine-tests-todo/mssql/fail
             relation_load_strategy: '["query"]'
 
+          - name: neon
+            setup_task: dev-neon-qc
+            ignored_tests_list: query-compiler/query-engine-tests-todo/neon/skip
+            should_fail_tests_list: query-compiler/query-engine-tests-todo/neon/fail
+            relation_load_strategy: '["join", "query"]'
+
     name: ${{ matrix.adapter.name }}
 
     uses: ./.github/workflows/test-query-compiler-template.yml
