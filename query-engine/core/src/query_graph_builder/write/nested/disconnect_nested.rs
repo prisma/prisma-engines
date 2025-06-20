@@ -1,10 +1,11 @@
 use super::*;
 use crate::{
-    query_graph::{Node, NodeRef, QueryGraph, QueryGraphDependency},
-    ParsedInputMap, ParsedInputValue, Query, WriteQuery,
+    inputs::UpdateManyRecordsSelectorsInput,
+    query_graph::{NodeRef, QueryGraph, QueryGraphDependency},
+    ParsedInputMap, ParsedInputValue, RowSink,
 };
 use itertools::Itertools;
-use query_structure::{Filter, Model, PrismaValue, RelationCompare, RelationFieldRef, SelectionResult};
+use query_structure::{Filter, Model, PrismaValue, RelationCompare, RelationFieldRef, SelectionResult, WriteArgs};
 use std::convert::TryInto;
 
 /// Handles nested disconnect cases.
@@ -194,27 +195,16 @@ fn handle_one_to_x(
             )
         };
 
-    let update_node = utils::update_records_node_placeholder(graph, filter, model_to_update);
+    let write_args = WriteArgs::from_result(null_record_id, crate::executor::get_request_now());
+    let update_node = utils::update_records_node_placeholder_with_args(graph, filter, model_to_update, write_args);
 
     // Edge to inject the correct data into the update (either from the parent or child).
     graph.create_edge(
         node_to_attach,
         &update_node,
-        QueryGraphDependency::ProjectedDataDependency(
+        QueryGraphDependency::ProjectedDataSinkDependency(
             extractor_model_id,
-            Box::new(move |mut update_node, links| {
-                if links.is_empty() {
-                    return Ok(update_node);
-                }
-
-                // Handle filter & arg injection
-                if let Node::Query(Query::Write(ref mut wq @ WriteQuery::UpdateManyRecords(_))) = update_node {
-                    wq.set_selectors(links);
-                    wq.inject_result_into_args(null_record_id);
-                };
-
-                Ok(update_node)
-            }),
+            RowSink::All(&UpdateManyRecordsSelectorsInput),
             None,
         ),
     )?;
