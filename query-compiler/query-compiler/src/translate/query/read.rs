@@ -234,8 +234,6 @@ fn build_read_related_records(
 
     if let Some(results) = rrq.parent_results {
         let parent_link_id = rrq.parent_field.linking_fields();
-        let child_link_id = rrq.parent_field.related_field().linking_fields();
-
         let selection = results
             .into_iter()
             .exactly_one()
@@ -244,7 +242,19 @@ fn build_read_related_records(
             .pop()
             .unwrap();
 
-        for (field, val) in child_link_id
+        // When we query for children by parent, we typically want to generate a query with filters
+        // for every field in `parent_field.related_field().linking_fields()`. It's not correct to
+        // do that for many-to-many relations though, because their `related_field` points at the
+        // primary identifier of the child model, which cannot be used as a filter for the parent
+        // identifiers. The actual field that must be used belongs to the linking table, and it
+        // corresponds to the primary identifier of the parent model.
+        let fields_to_filter_by = if rrq.parent_field.relation().is_many_to_many() {
+            parent_link_id
+        } else {
+            rrq.parent_field.related_field().linking_fields()
+        };
+
+        for (field, val) in fields_to_filter_by
             .assimilate(selection)
             .map_err(QueryGraphBuilderError::from)?
             .pairs
