@@ -3,7 +3,7 @@ use std::str::FromStr;
 
 pub use crate::types::{ColumnType, JsResultSet};
 use quaint::bigdecimal::BigDecimal;
-use quaint::chrono::{DateTime, NaiveDate, NaiveTime, Utc};
+use quaint::chrono::{DateTime, NaiveDate, NaiveTime, TimeZone, Utc};
 use quaint::{
     connector::{ColumnType as QuaintColumnType, ResultSet as QuaintResultSet},
     error::{Error as QuaintError, ErrorKind},
@@ -189,6 +189,17 @@ pub fn js_value_to_quaint(
                 .map(QuaintValue::date)
                 .or_else(|_| DateTime::parse_from_rfc3339(&s).map(|date| QuaintValue::date(date.naive_utc().date())))
                 .map_err(|_| conversion_error!("expected a date string in column '{column_name}', got {s}")),
+            serde_json::Value::Number(n) => n
+                .as_i64()
+                .ok_or_else(|| {
+                    conversion_error!("expected the number in column '{column_name}' to be integer, got {n}")
+                })
+                .and_then(|n| {
+                    Utc.timestamp_millis_opt(n).single().ok_or(conversion_error!(
+                        "expected the number in column '{column_name}' to be a valid timestamp, got {n}"
+                    ))
+                })
+                .map(|dt| QuaintValue::date(dt.date_naive())),
             serde_json::Value::Null => Ok(QuaintValue::null_date()),
             mismatch => Err(conversion_error!(
                 "expected a string in column '{column_name}', found {mismatch}"
@@ -211,6 +222,17 @@ pub fn js_value_to_quaint(
                 .or_else(|_| DateTime::parse_from_rfc3339(&s).map(DateTime::<Utc>::from))
                 .map(QuaintValue::datetime)
                 .map_err(|_| conversion_error!("expected a datetime string in column '{column_name}', found {s}")),
+            serde_json::Value::Number(n) => n
+                .as_i64()
+                .ok_or_else(|| {
+                    conversion_error!("expected the number in column '{column_name}' to be integer, got {n}")
+                })
+                .and_then(|n| {
+                    Utc.timestamp_millis_opt(n).single().ok_or(conversion_error!(
+                        "expected the number in column '{column_name}' to be a valid timestamp, got {n}"
+                    ))
+                })
+                .map(QuaintValue::datetime),
             serde_json::Value::Null => Ok(QuaintValue::null_datetime()),
             mismatch => Err(conversion_error!(
                 "expected a string in column '{column_name}', found {mismatch}"
