@@ -1,5 +1,5 @@
 use super::*;
-use crate::inputs::RecordQueryFilterInput;
+use crate::inputs::{RecordQueryFilterInput, UpdateRecordSelectorsInput};
 use crate::query_graph_builder::write::limit::validate_limit;
 use crate::query_graph_builder::write::write_args_parser::*;
 use crate::{
@@ -39,27 +39,23 @@ pub(crate) fn update_record(
         Some(&field),
     )?;
 
-    if query_schema.relation_mode().is_prisma() {
+    if !query_schema.has_capability(ConnectorCapability::UpdateReturning) || query_schema.relation_mode().is_prisma() {
         let read_parent_node = graph.create_node(utils::read_id_infallible(
             model.clone(),
             model.shard_aware_primary_identifier(),
-            filter,
+            filter.clone(),
         ));
 
-        utils::insert_emulated_on_update(graph, query_schema, &model, &read_parent_node, &update_node)?;
+        if query_schema.relation_mode().is_prisma() {
+            utils::insert_emulated_on_update(graph, query_schema, &model, &read_parent_node, &update_node)?;
+        }
 
         graph.create_edge(
             &read_parent_node,
             &update_node,
-            QueryGraphDependency::ProjectedDataDependency(
+            QueryGraphDependency::ProjectedDataSinkDependency(
                 model.shard_aware_primary_identifier(),
-                Box::new(move |mut update_node, parent_ids| {
-                    if let Node::Query(Query::Write(WriteQuery::UpdateRecord(ref mut ur))) = update_node {
-                        ur.set_record_filter(parent_ids.into());
-                    }
-
-                    Ok(update_node)
-                }),
+                RowSink::All(&UpdateRecordSelectorsInput),
                 Some(DataExpectation::non_empty_rows(
                     MissingRecord::builder().operation(DataOperation::Update).build(),
                 )),
