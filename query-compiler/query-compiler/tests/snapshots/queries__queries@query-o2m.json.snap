@@ -6,7 +6,7 @@ input_file: query-compiler/query-compiler/tests/data/query-o2m.json
 dataMap {
     id: Int (id)
     email: String (email)
-    activations: {
+    activations (from @nested$activations): {
         issued: Date (issued)
         secret: String (secret)
         done: Boolean (done)
@@ -23,4 +23,4 @@ in let @parent$id = mapField id (get @parent)
                    "public"."Activation"."userId" FROM "public"."Activation"
                    WHERE "public"."Activation"."userId" IN [$1] OFFSET $2»
             params [var(@parent$id as Int),
-                    const(BigInt(0))]) on left.(id) = right.(userId) as activations
+                    const(BigInt(0))]) on left.(id) = right.(userId) as @nested$activations

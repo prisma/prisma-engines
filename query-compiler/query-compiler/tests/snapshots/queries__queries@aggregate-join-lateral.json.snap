@@ -5,7 +5,7 @@ input_file: query-compiler/query-compiler/tests/data/aggregate-join-lateral.json
 ---
 dataMap {
     email: String (email)
-    _count: {
+    _count (from _count): {
         activations: Int (activations)
     }
 }

@@ -6,7 +6,7 @@ input_file: query-compiler/query-compiler/tests/data/query-o2m-lateral.json
 dataMap {
     id: Int (id)
     email: String (email)
-    activations: {
+    activations (from activations): {
         issued: Date (issued)
         secret: String (secret)
         done: Boolean (done)

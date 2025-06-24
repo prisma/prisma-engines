@@ -39,6 +39,10 @@ pub fn selector(field: &SelectedField) -> Cow<'static, str> {
     format!("{SELECTOR}{FIELD_SEPARATOR}{}", field.prisma_name()).into()
 }
 
-pub fn nested_relation_field(field: &RelationField) -> String {
-    format!("{NESTED}{FIELD_SEPARATOR}{}", field.name())
+pub fn nested_relation_field(field: &RelationField) -> Cow<'static, str> {
+    nested_relation_field_by_name(field.name())
+}
+
+pub fn nested_relation_field_by_name(field_name: &str) -> Cow<'static, str> {
+    format!("{NESTED}{FIELD_SEPARATOR}{}", field_name).into()
 }

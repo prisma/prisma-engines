@@ -198,7 +198,7 @@ pub(super) fn add_inmemory_join(
                     .map(|sf| sf.db_name().into())
                     .zip(join.into_fields())
                     .collect(),
-                parent_field: prefixed_parent_field_name,
+                parent_field: prefixed_parent_field_name.into_owned(),
             })
         })
         .try_collect()?;

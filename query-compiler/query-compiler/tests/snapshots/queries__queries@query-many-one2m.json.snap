@@ -7,7 +7,7 @@ dataMap {
     id: Int (id)
     title: String (title)
     userId: Int (userId)
-    user: {
+    user (from @nested$user): {
         id: Int (id)
         email: String (email)
         role: Enum<Role> (role)
@@ -29,4 +29,4 @@ in let @parent$userId = mapField userId (get @parent)
                    "public"."User"."role"::text FROM "public"."User" WHERE
                    "public"."User"."id" IN [$1] OFFSET $2»
             params [var(@parent$userId as Int),
-                    const(BigInt(0))]) on unique left.(userId) = right.(id) as user
+                    const(BigInt(0))]) on unique left.(userId) = right.(id) as @nested$user
