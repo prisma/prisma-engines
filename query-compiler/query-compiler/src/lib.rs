@@ -5,8 +5,6 @@ pub mod result_node;
 mod selection;
 pub mod translate;
 
-use std::sync::Arc;
-
 pub use expression::Expression;
 use quaint::{
     prelude::{ConnectionInfo, SqlFamily},
@@ -32,7 +30,7 @@ pub enum CompileError {
 }
 
 pub fn compile(
-    query_schema: &Arc<QuerySchema>,
+    query_schema: &QuerySchema,
     query: Operation,
     connection_info: &ConnectionInfo,
 ) -> Result<Expression, CompileError> {
