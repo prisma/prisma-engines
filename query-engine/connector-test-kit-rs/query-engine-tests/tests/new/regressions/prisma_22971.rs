@@ -53,6 +53,20 @@ mod prisma_22971 {
 
     #[connector_test]
     async fn nested(runner: Runner) -> TestResult<()> {
+        // FIXME: this query fails on MySQL with `relationLoadStrategy: join`:
+        // ```
+        // QueryError(Server(MysqlError { code: 1060, message: \"Duplicate column name 'post'\", state: \"42S21\" }))
+        // ```
+        // See https://linear.app/prisma-company/issue/ORM-1140/fix-a-variant-of-gh-issue-22971-for-mysql
+        let rls_override = if matches!(
+            runner.connector_version(),
+            ConnectorVersion::MySql(_) | ConnectorVersion::Vitess(_)
+        ) {
+            "(relationLoadStrategy: query)"
+        } else {
+            ""
+        };
+
         run_query!(&runner, r#"mutation { createOnePost(data: { id: 1 }) { id } }"#);
         run_query!(
             &runner,
@@ -60,26 +74,26 @@ mod prisma_22971 {
         );
 
         insta::assert_snapshot!(
-          run_query_pretty!(&runner, r#"{
-              findManyUser {
+          run_query_pretty!(&runner, format_args!(r#"{{
+              findManyUser{rls_override} {{
                 id
                 updatedAt
                 postId
-                post {
+                post {{
                   id
                   updatedAt
-                  from_User_post {
+                  from_User_post {{
                     id
                     updatedAt
                     postId
-                    post {
+                    post {{
                       id
                       updatedAt
-                    }
-                  }
-                }
-              }
-          }"#),
+                    }}
+                  }}
+                }}
+              }}
+          }}"#)),
           @r#"
         {
           "data": {
