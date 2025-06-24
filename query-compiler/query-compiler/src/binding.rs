@@ -1,12 +1,13 @@
 use std::borrow::Cow;
 
 use query_core::NodeRef;
-use query_structure::{ScalarField, SelectedField};
+use query_structure::{RelationField, ScalarField, SelectedField};
 
 const JOIN_PARENT: &str = "@parent";
 const DEFAULTS: &str = "@defaults";
 const GENERATED: &str = "@generated";
 const SELECTOR: &str = "@selector";
+const NESTED: &str = "@nested";
 
 const FIELD_SEPARATOR: &str = "$";
 
@@ -36,4 +37,8 @@ pub fn generated(row_idx: usize, field_name: &str) -> Cow<'static, str> {
 
 pub fn selector(field: &SelectedField) -> Cow<'static, str> {
     format!("{SELECTOR}{FIELD_SEPARATOR}{}", field.prisma_name()).into()
+}
+
+pub fn nested_relation_field(field: &RelationField) -> String {
+    format!("{NESTED}{FIELD_SEPARATOR}{}", field.name())
 }

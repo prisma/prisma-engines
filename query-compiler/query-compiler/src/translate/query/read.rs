@@ -170,7 +170,7 @@ pub(super) fn add_inmemory_join(
             _ => None,
         })
         .map(|rrq| -> TranslateResult<JoinExpression> {
-            let parent_field_name = rrq.parent_field.name().to_owned();
+            let prefixed_parent_field_name = binding::nested_relation_field(&rrq.parent_field);
             let left_scalars = rrq.parent_field.left_scalars();
             let links = left_scalars
                 .iter()
@@ -198,7 +198,7 @@ pub(super) fn add_inmemory_join(
                     .map(|sf| sf.db_name().into())
                     .zip(join.into_fields())
                     .collect(),
-                parent_field: parent_field_name,
+                parent_field: prefixed_parent_field_name,
             })
         })
         .try_collect()?;
