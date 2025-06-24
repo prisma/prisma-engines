@@ -26,7 +26,10 @@ impl Expressionista {
             .into_iter()
             .map(|root_node| Self::build_expression(&mut graph, &root_node, vec![]))
             .collect::<InterpretationResult<Vec<Expression>>>()
-            .map(|res| Expression::Sequence { seq: res })
+            .map(|mut res| {
+                res.retain(|expr| !expr.is_empty_seq());
+                Expression::Sequence { seq: res }
+            })
     }
 
     fn build_expression(

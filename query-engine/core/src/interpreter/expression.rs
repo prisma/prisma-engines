@@ -38,6 +38,12 @@ pub(crate) enum Expression {
     },
 }
 
+impl Expression {
+    pub fn is_empty_seq(&self) -> bool {
+        matches!(self, Expression::Sequence { seq } if seq.is_empty())
+    }
+}
+
 pub(crate) struct Binding {
     pub name: String,
     pub expr: Expression,
