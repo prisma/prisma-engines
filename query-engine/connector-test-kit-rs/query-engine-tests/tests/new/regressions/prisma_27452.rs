@@ -35,7 +35,7 @@ mod prisma_27452 {
             }
 
             model CommentLike {
-              id Int @id @default(autoincrement())
+              id Int @id
 
               user     User      @relation(fields: [ownerId], references: [id], onDelete: Cascade)
               ownerId  String
@@ -56,6 +56,7 @@ mod prisma_27452 {
         let post_id = "1";
         let comment1_id = "1";
         let comment2_id = "2";
+        let comment_like_id = "1";
 
         runner
             .query(&format!(
@@ -93,6 +94,7 @@ mod prisma_27452 {
                       postId_ownerId: {{ postId: "{post_id}", ownerId: "{user_id}" }}
                     }}
                     create: {{
+                      id: {comment_like_id}
                       postId: "{post_id}"
                       ownerId: "{user_id}"
                       comments: {{
