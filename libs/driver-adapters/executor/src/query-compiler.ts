@@ -1,6 +1,7 @@
 import { ConnectionInfo } from '@prisma/driver-adapter-utils'
 import { __dirname } from './utils.js'
 import { QueryPlanNode } from '@prisma/client-engine-runtime'
+import { Env } from './types/index.js'
 
 export type QueryCompilerParams = {
   // TODO: support multiple datamodels
@@ -17,12 +18,13 @@ export interface QueryCompiler {
 
 export async function initQueryCompiler(
   params: QueryCompilerParams,
+  connector: Env['CONNECTOR'],
 ): Promise<QueryCompiler> {
-  const { getQueryCompilerForProvider } = await import(
+  const { getQueryCompilerForConnector } = await import(
     './query-compiler-wasm.js'
   )
-  const WasmQueryCompiler = (await getQueryCompilerForProvider(
-    params.provider,
+  const WasmQueryCompiler = (await getQueryCompilerForConnector(
+    connector,
   )) as QueryCompiler
   return new WasmQueryCompiler(params)
 }

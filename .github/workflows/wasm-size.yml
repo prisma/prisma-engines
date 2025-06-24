@@ -27,6 +27,8 @@ jobs:
       sqlite_size_gz: ${{ steps.measure.outputs.sqlite_size_gz }}
       sqlserver_size: ${{ steps.measure.outputs.sqlserver_size }}
       sqlserver_size_gz: ${{ steps.measure.outputs.sqlserver_size_gz }}
+      cockroachdb_size: ${{ steps.measure.outputs.cockroachdb_size }}
+      cockroachdb_size_gz: ${{ steps.measure.outputs.cockroachdb_size_gz }}
     steps:
       - name: Checkout PR branch
         uses: actions/checkout@v4
@@ -51,6 +53,8 @@ jobs:
       sqlite_size_gz: ${{ steps.measure.outputs.sqlite_size_gz }}
       sqlserver_size: ${{ steps.measure.outputs.sqlserver_size }}
       sqlserver_size_gz: ${{ steps.measure.outputs.sqlserver_size_gz }}
+      cockroachdb_size: ${{ steps.measure.outputs.cockroachdb_size }}
+      cockroachdb_size_gz: ${{ steps.measure.outputs.cockroachdb_size_gz }}
     steps:
       - name: Checkout base branch
         uses: actions/checkout@v4
@@ -106,6 +110,9 @@ jobs:
           compute_diff "sqlserver" "${{ needs.base-wasm-size.outputs.sqlserver_size }}" "${{ needs.pr-wasm-size.outputs.sqlserver_size }}"
           compute_diff "sqlserver_gz" "${{ needs.base-wasm-size.outputs.sqlserver_size_gz }}" "${{ needs.pr-wasm-size.outputs.sqlserver_size_gz }}"
 
+          compute_diff "cockroachdb" "${{ needs.base-wasm-size.outputs.cockroachdb_size }}" "${{ needs.pr-wasm-size.outputs.cockroachdb_size }}"
+          compute_diff "cockroachdb_gz" "${{ needs.base-wasm-size.outputs.cockroachdb_size_gz }}" "${{ needs.pr-wasm-size.outputs.cockroachdb_size_gz }}"
+
       - name: Find past report comment
         uses: peter-evans/find-comment@v3
         id: findReportComment
@@ -125,14 +132,16 @@ jobs:
             <!-- wasm-size -->
             ### WASM Query Engine file Size
 
-            |Engine            | This PR                                      | Base branch                                      | Diff
-            |------------------|----------------------------------------------|--------------------------------------------------|-----------------------------------------------
-            | Postgres         | ${{ steps.compute.outputs.postgresql_pr}}    |  ${{ steps.compute.outputs.postgresql_base }}    | ${{ steps.compute.outputs.postgresql_diff}}
-            | Postgres (gzip)  | ${{ steps.compute.outputs.postgresql_gz_pr}} |  ${{ steps.compute.outputs.postgresql_gz_base }} | ${{ steps.compute.outputs.postgresql_gz_diff}}
-            | Mysql            | ${{ steps.compute.outputs.mysql_pr}}         |  ${{ steps.compute.outputs.mysql_base}}          | ${{ steps.compute.outputs.mysql_diff}}
-            | Mysql (gzip)     | ${{ steps.compute.outputs.mysql_gz_pr}}      |  ${{ steps.compute.outputs.mysql_gz_base}}       | ${{ steps.compute.outputs.mysql_gz_diff}}
-            | Sqlite           | ${{ steps.compute.outputs.sqlite_pr}}        |  ${{ steps.compute.outputs.sqlite_base}}         | ${{ steps.compute.outputs.sqlite_diff}}
-            | Sqlite (gzip)    | ${{ steps.compute.outputs.sqlite_gz_pr}}     |  ${{ steps.compute.outputs.sqlite_gz_base }}     | ${{ steps.compute.outputs.sqlite_gz_diff}}
-            | SQL Server       | ${{ steps.compute.outputs.sqlserver_pr}}     |  ${{ steps.compute.outputs.sqlserver_base}}      | ${{ steps.compute.outputs.sqlserver_diff}}
-            | SQL Server (gzip)| ${{ steps.compute.outputs.sqlserver_gz_pr}}  |  ${{ steps.compute.outputs.sqlserver_gz_base }}  | ${{ steps.compute.outputs.sqlserver_gz_diff}}
+            | Engine             | This PR                                          | Base branch                                      | Diff                                             |
+            |--------------------|--------------------------------------------------|--------------------------------------------------|--------------------------------------------------|
+            | Postgres           | ${{ steps.compute.outputs.postgresql_pr }}       | ${{ steps.compute.outputs.postgresql_base }}     | ${{ steps.compute.outputs.postgresql_diff }}     |
+            | Postgres (gzip)    | ${{ steps.compute.outputs.postgresql_gz_pr }}    | ${{ steps.compute.outputs.postgresql_gz_base }}  | ${{ steps.compute.outputs.postgresql_gz_diff }}  |
+            | Mysql              | ${{ steps.compute.outputs.mysql_pr }}            | ${{ steps.compute.outputs.mysql_base }}          | ${{ steps.compute.outputs.mysql_diff }}          |
+            | Mysql (gzip)       | ${{ steps.compute.outputs.mysql_gz_pr }}         | ${{ steps.compute.outputs.mysql_gz_base }}       | ${{ steps.compute.outputs.mysql_gz_diff }}       |
+            | Sqlite             | ${{ steps.compute.outputs.sqlite_pr }}           | ${{ steps.compute.outputs.sqlite_base }}         | ${{ steps.compute.outputs.sqlite_diff }}         |
+            | Sqlite (gzip)      | ${{ steps.compute.outputs.sqlite_gz_pr }}        | ${{ steps.compute.outputs.sqlite_gz_base }}      | ${{ steps.compute.outputs.sqlite_gz_diff }}      |
+            | SQL Server         | ${{ steps.compute.outputs.sqlserver_pr }}        | ${{ steps.compute.outputs.sqlserver_base }}      | ${{ steps.compute.outputs.sqlserver_diff }}      |
+            | SQL Server (gzip)  | ${{ steps.compute.outputs.sqlserver_gz_pr }}     | ${{ steps.compute.outputs.sqlserver_gz_base }}   | ${{ steps.compute.outputs.sqlserver_gz_diff }}   |
+            | CockroachDB        | ${{ steps.compute.outputs.cockroachdb_pr }}      | ${{ steps.compute.outputs.cockroachdb_base }}    | ${{ steps.compute.outputs.cockroachdb_diff }}    |
+            | CockroachDB (gzip) | ${{ steps.compute.outputs.cockroachdb_gz_pr }}   | ${{ steps.compute.outputs.cockroachdb_gz_base }} | ${{ steps.compute.outputs.cockroachdb_gz_diff }} |
           edit-mode: replace

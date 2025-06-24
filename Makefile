@@ -71,7 +71,7 @@ build-qe-wasm:
 
 build-qe-wasm-gz: build-qe-wasm
 	@cd query-engine/query-engine-wasm/pkg && \
-    for provider in postgresql mysql sqlite sqlserver; do \
+    for provider in postgresql mysql sqlite sqlserver cockroachdb; do \
         gzip -knc $$provider/query_engine_bg.wasm > $$provider.gz; \
     done;
 
@@ -265,6 +265,28 @@ start-pg-bench:
 	docker compose -f libs/driver-adapters/executor/bench/docker-compose.yml up --wait -d --remove-orphans postgres
 
 setup-pg-bench: start-pg-bench build-qe-napi build-qe-wasm build-driver-adapters-kit-qe
+
+dev-pg-cockroachdb-wasm: start-cockroach_23_1 build-qe-wasm build-driver-adapters-kit-qe
+	cp $(CONFIG_PATH)/pg-cockroachdb-wasm $(CONFIG_FILE)
+
+test-pg-cockroachdb-wasm: dev-pg-cockroachdb-wasm test-qe-st
+
+dev-pg-cockroachdb-qc: start-cockroach_23_1 build-qc-wasm build-driver-adapters-kit-qc
+	cp $(CONFIG_PATH)/pg-cockroachdb-qc $(CONFIG_FILE)
+
+dev-pg-cockroachdb-qc-join:
+	PRISMA_RELATION_LOAD_STRATEGY=join make dev-pg-cockroachdb-qc
+
+dev-pg-cockroachdb-qc-query:
+	PRISMA_RELATION_LOAD_STRATEGY=query make dev-pg-cockroachdb-qc
+
+test-pg-cockroachdb-qc: dev-pg-cockroachdb-qc test-qe
+
+test-pg-cockroachdb-qc-join:
+	PRISMA_RELATION_LOAD_STRATEGY=join make test-pg-cockroachdb-qc
+
+test-pg-cockroachdb-qc-query:
+	PRISMA_RELATION_LOAD_STRATEGY=query make test-pg-cockroachdb-qc
 
 run-bench:
 	DATABASE_URL="postgresql://postgres:postgres@localhost:5432/bench?schema=imdb_bench&sslmode=disable" \
@@ -467,7 +489,7 @@ test-driver-adapter-planetscale-wasm: test-planetscale-wasm
 
 measure-qe-wasm: build-qe-wasm-gz
 	@cd query-engine/query-engine-wasm/pkg; \
-	for provider in postgresql mysql sqlite sqlserver; do \
+	for provider in postgresql mysql sqlite sqlserver cockroachdb; do \
 		echo "$${provider}_size=$$(cat $$provider/query_engine_bg.wasm | wc -c | tr -d ' ')" >> $(ENGINE_SIZE_OUTPUT); \
 		echo "$${provider}_size_gz=$$(cat $$provider.gz | wc -c | tr -d ' ')" >> $(ENGINE_SIZE_OUTPUT); \
 	done;

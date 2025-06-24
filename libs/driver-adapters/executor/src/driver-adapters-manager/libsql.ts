@@ -42,4 +42,8 @@ export class LibSQLManager implements DriverAdaptersManager {
   async teardown() {
     await this.#adapter?.dispose()
   }
+
+  connector(): 'sqlite' {
+    return 'sqlite'
+  }
 }

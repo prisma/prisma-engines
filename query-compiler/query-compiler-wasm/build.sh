@@ -127,6 +127,7 @@ build "postgresql"
 build "sqlite"
 build "mysql"
 build "sqlserver" "mssql"
+build "cockroachdb"
 
 jq '.version=$version' --arg version "$OUT_VERSION" package.json > "$OUT_JSON"
 
@@ -134,3 +135,4 @@ report_size "postgresql"
 report_size "sqlite"
 report_size "mysql"
 report_size "sqlserver"
+report_size "cockroachdb"

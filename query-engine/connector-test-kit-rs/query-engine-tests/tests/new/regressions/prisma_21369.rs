@@ -1,6 +1,7 @@
 use query_engine_tests::*;
 
-#[test_suite(schema(generic), exclude(MongoDb))]
+// The `null` comes back with type `unknown` for CockroachDB with pg.
+#[test_suite(schema(generic), exclude(MongoDb, CockroachDb("pg.js.wasm")))]
 mod prisma_21369 {
     #[connector_test]
     async fn select_null_works(runner: Runner) -> TestResult<()> {

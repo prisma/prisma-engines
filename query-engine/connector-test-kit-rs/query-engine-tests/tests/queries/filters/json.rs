@@ -215,6 +215,7 @@ mod json {
             Vitess("planetscale.js.wasm"),
             Postgres("neon.js.wasm", "pg.js.wasm"),
             Sqlite("libsql.js.wasm", "cfd1", "better-sqlite3"),
+            CockroachDb("pg.js.wasm"),
             MySQL(5.6)
         )
     )]

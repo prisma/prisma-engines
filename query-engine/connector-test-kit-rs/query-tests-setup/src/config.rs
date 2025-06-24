@@ -478,6 +478,10 @@ impl TestConfig {
 
         vec!(
             (
+                "CONNECTOR".to_string(),
+                self.connector().to_string()
+            ),
+            (
                 "DRIVER_ADAPTER".to_string(),
                 with_driver_adapter.adapter.to_string()
             ),

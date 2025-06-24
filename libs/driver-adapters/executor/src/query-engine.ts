@@ -3,6 +3,7 @@ import * as napi from './engines/Library.js'
 import * as os from 'node:os'
 import * as path from 'node:path'
 import { __dirname } from './utils.js'
+import { Env } from './types/env.js'
 
 export interface QueryEngine {
   connect(trace: string, requestId: string): Promise<void>
@@ -36,6 +37,7 @@ export async function initQueryEngine(
   engineType: 'Napi' | 'Wasm',
   adapter: ErrorCapturingSqlDriverAdapter,
   datamodel: string,
+  connector: Env['CONNECTOR'],
   queryLogCallback: QueryLogCallback,
   debug: (...args: any[]) => void,
 ): Promise<QueryEngine> {
@@ -50,10 +52,10 @@ export async function initQueryEngine(
   const options = queryEngineOptions(datamodel)
 
   if (engineType === 'Wasm') {
-    const { getQueryEngineForProvider: getEngineForProvider } = await import(
+    const { getQueryEngineForConnector } = await import(
       './query-engine-wasm.js'
     )
-    const WasmQueryEngine = await getEngineForProvider(adapter.provider)
+    const WasmQueryEngine = await getQueryEngineForConnector(connector)
     return new WasmQueryEngine(options, logCallback, adapter)
   } else {
     const { QueryEngine } = loadNapiEngine()

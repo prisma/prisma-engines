@@ -8,6 +8,7 @@ use query_engine_tests::*;
         Postgres("neon.js.wasm", "pg.js.wasm"),
         Sqlite("libsql.js.wasm", "cfd1", "react-native", "better-sqlite3"),
         Sqlserver("mssql.js.wasm"),
+        CockroachDb("pg.js.wasm")
     )
 )]
 mod logs {

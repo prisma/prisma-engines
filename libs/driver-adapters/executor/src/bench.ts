@@ -9,6 +9,7 @@ import {
   bindAdapter,
   SqlDriverAdapter,
   ErrorCapturingSqlDriverAdapter,
+  Provider,
 } from '@prisma/driver-adapter-utils'
 
 import { recording } from './recording.js'
@@ -23,6 +24,7 @@ import { QueryEngine as WasmBaseline } from 'query-engine-wasm-baseline'
 // rather than the latest locally built one. We're pulling in the Postgres Query Engine
 // because benchmarks are only run against a Postgres database.
 import { QueryEngine as WasmLatest } from 'query-engine-wasm-latest/postgresql/query_engine.js'
+import { Env } from './types'
 
 async function main(): Promise<void> {
   // read the prisma schema from stdin
@@ -234,7 +236,14 @@ async function initQeNapiCurrent(
   adapter: ErrorCapturingSqlDriverAdapter,
   datamodel: string,
 ): Promise<qe.QueryEngine> {
-  return await qe.initQueryEngine('Napi', adapter, datamodel, debug, debug)
+  return await qe.initQueryEngine(
+    'Napi',
+    adapter,
+    datamodel,
+    providerToConnector(adapter.provider),
+    debug,
+    debug,
+  )
 }
 
 async function initQeWasmCurrent(
@@ -245,6 +254,7 @@ async function initQeWasmCurrent(
     'Wasm',
     adapter,
     datamodel,
+    providerToConnector(adapter.provider),
     (...args) => {},
     debug,
   )
@@ -262,6 +272,20 @@ function initQeWasmBaseLine(
   datamodel: string,
 ): qe.QueryEngine {
   return new WasmBaseline(qe.queryEngineOptions(datamodel), debug, adapter)
+}
+
+function providerToConnector(provider: Provider): Env['CONNECTOR'] {
+  // this mapping isn't 100% accurate, but it is good enough for the benchmarks
+  switch (provider) {
+    case 'postgres':
+      return 'postgres'
+    case 'mysql':
+      return 'mysql'
+    case 'sqlite':
+      return 'sqlite'
+    case 'sqlserver':
+      return 'sqlserver'
+  }
 }
 
 main().catch((err) => {

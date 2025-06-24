@@ -193,7 +193,7 @@ pub(crate) fn connection_string(
                 Some(CockroachDbVersion::V222) if is_ci => {
                     format!("postgresql://prisma@test-db-cockroachdb-22-2:26259/{database}?schema={database}")
                 }
-                Some(CockroachDbVersion::V231) if is_ci => {
+                Some(CockroachDbVersion::V231 | CockroachDbVersion::PgJsWasm) if is_ci => {
                     format!("postgresql://prisma@test-db-cockroachdb-23-1:26260/{database}?schema={database}")
                 }
                 Some(CockroachDbVersion::V221) => {
@@ -202,7 +202,7 @@ pub(crate) fn connection_string(
                 Some(CockroachDbVersion::V222) => {
                     format!("postgresql://prisma@127.0.0.1:26259/{database}?schema={database}")
                 }
-                Some(CockroachDbVersion::V231) => {
+                Some(CockroachDbVersion::V231 | CockroachDbVersion::PgJsWasm) => {
                     format!("postgresql://prisma@127.0.0.1:26260/{database}?schema={database}")
                 }
 
@@ -331,6 +331,7 @@ impl ConnectorVersion {
                 | Self::Sqlite(Some(SqliteVersion::CloudflareD1))
                 | Self::Sqlite(Some(SqliteVersion::BetterSQLite3))
                 | Self::SqlServer(Some(SqlServerVersion::MssqlJsWasm))
+                | Self::CockroachDb(Some(CockroachDbVersion::PgJsWasm))
         )
     }
 }
