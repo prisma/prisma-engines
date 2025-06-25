@@ -7,7 +7,7 @@ transaction
    dataMap {
        a: Int (a)
        b: Int (b)
-       children: {
+       children (from @nested$children): {
            id: Int (id)
            parentA: Int (parentA)
            parentB: Int (parentB)
@@ -63,6 +63,6 @@ transaction
                                      var(@parent$b as Int),
                                      const(BigInt(0))]) on left.(a,
                                                                  b) = right.(parentA,
-                                                                             parentB) as children
+                                                                             parentB) as @nested$children
              in get 2
       in get 2

@@ -8,12 +8,12 @@ transaction
        id: Int (id)
        title: String (title)
        userId: Int (userId)
-       user: {
+       user (from @nested$user): {
            id: Int (id)
            email: String (email)
            role: Enum<Role> (role)
        }
-       categories: {
+       categories (from @nested$categories): {
            id: Int (id)
            name: String (name)
        }
@@ -112,7 +112,7 @@ transaction
                                                      "public"."User"."id" = $1
                                                      OFFSET $2»
                                               params [var(@parent$userId as Int),
-                                                      const(BigInt(0))]) on unique left.(userId) = right.(id) as user,
+                                                      const(BigInt(0))]) on unique left.(userId) = right.(id) as @nested$user,
                                              (query «SELECT "t1"."id",
                                                      "t1"."name", "t0"."B" AS
                                                      "CategoryToPost@Post" FROM
@@ -121,7 +121,7 @@ transaction
                                                      "public"."Category" AS "t1"
                                                      ON "t0"."A" = "t1"."id"
                                                      WHERE "t0"."B" = $1»
-                                              params [var(@parent$id as Int)]) on left.(id) = right.(CategoryToPost@Post) as categories
+                                              params [var(@parent$id as Int)]) on left.(id) = right.(CategoryToPost@Post) as @nested$categories
                               in get 11
                        in get 11
              in get 0

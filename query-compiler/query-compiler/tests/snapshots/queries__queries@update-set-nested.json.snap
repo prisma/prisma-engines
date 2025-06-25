@@ -8,7 +8,7 @@ transaction
        id: Int (id)
        email: String (email)
        role: Enum<Role> (role)
-       posts: {
+       posts (from @nested$posts): {
            id: Int (id)
            title: String (title)
            userId: Int (userId)
@@ -80,6 +80,6 @@ transaction
                                     "public"."Post" WHERE
                                     "public"."Post"."userId" = $1 OFFSET $2»
                              params [var(@parent$id as Int),
-                                     const(BigInt(0))]) on left.(id) = right.(userId) as posts
+                                     const(BigInt(0))]) on left.(id) = right.(userId) as @nested$posts
              in get 9
       in get 9

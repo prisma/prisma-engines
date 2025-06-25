@@ -7,7 +7,7 @@ dataMap {
     issued: Date (issued)
     secret: String (secret)
     done: Boolean (done)
-    user: {
+    user (from user): {
         id: Int (id)
         email: String (email)
     }

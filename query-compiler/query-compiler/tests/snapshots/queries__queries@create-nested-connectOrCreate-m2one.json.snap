@@ -8,7 +8,7 @@ transaction
        id: Int (id)
        title: String (title)
        userId: Int (userId)
-       user: {
+       user (from @nested$user): {
            id: Int (id)
            email: String (email)
            role: Enum<Role> (role)
@@ -70,7 +70,7 @@ transaction
                                                      "public"."User"."id" = $1
                                                      OFFSET $2»
                                               params [var(@parent$userId as Int),
-                                                      const(BigInt(0))]) on unique left.(userId) = right.(id) as user
+                                                      const(BigInt(0))]) on unique left.(userId) = right.(id) as @nested$user
                               in get 6
                        in get 6
              in get 0

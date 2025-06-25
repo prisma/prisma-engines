@@ -1,3 +1,5 @@
+use std::borrow::Cow;
+
 use indexmap::IndexMap;
 use query_structure::{FieldTypeInformation, PrismaValueType, TypeIdentifier};
 use serde::Serialize;
@@ -11,42 +13,32 @@ pub enum ResultNode {
     Object(Object),
     #[serde(rename_all = "camelCase")]
     Value {
-        db_name: String,
+        db_name: Cow<'static, str>,
         result_type: PrismaValueType,
     },
 }
 
 #[derive(Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct Object {
-    flattened: bool,
-    fields: IndexMap<String, ResultNode>,
+    serialized_name: Option<Cow<'static, str>>,
+    fields: IndexMap<Cow<'static, str>, ResultNode>,
 }
 
 impl Object {
-    fn new(kind: ObjectKind) -> Self {
+    fn new(serialized_name: Option<impl Into<Cow<'static, str>>>) -> Self {
         Self {
-            flattened: kind.is_flattened(),
+            serialized_name: serialized_name.map(Into::into),
             fields: IndexMap::new(),
         }
     }
 
-    pub fn is_flattened(&self) -> bool {
-        self.flattened
+    pub fn serialized_name(&self) -> Option<&str> {
+        self.serialized_name.as_deref()
     }
 
-    pub fn fields(&self) -> &IndexMap<String, ResultNode> {
+    pub fn fields(&self) -> &IndexMap<Cow<'static, str>, ResultNode> {
         &self.fields
-    }
-}
-
-pub enum ObjectKind {
-    Flattened,
-    Nested,
-}
-
-impl ObjectKind {
-    fn is_flattened(&self) -> bool {
-        matches!(self, ObjectKind::Flattened)
     }
 }
 
@@ -59,15 +51,20 @@ impl<'a> ResultNodeBuilder<'a> {
         Self { enums }
     }
 
-    pub fn new_object() -> ObjectBuilder {
-        ObjectBuilder::new(ObjectKind::Nested)
+    pub fn new_object(serialized_name: Option<impl Into<Cow<'static, str>>>) -> ObjectBuilder {
+        ObjectBuilder::new(serialized_name)
     }
 
-    pub fn new_flattened_object() -> ObjectBuilder {
-        ObjectBuilder::new(ObjectKind::Flattened)
+    #[inline]
+    pub fn new_value(
+        &mut self,
+        db_name: impl Into<Cow<'static, str>>,
+        result_type: FieldTypeInformation,
+    ) -> ResultNode {
+        self.new_value_inner(db_name.into(), result_type)
     }
 
-    pub fn new_value(&mut self, db_name: String, result_type: FieldTypeInformation) -> ResultNode {
+    fn new_value_inner(&mut self, db_name: Cow<'static, str>, result_type: FieldTypeInformation) -> ResultNode {
         let prisma_type = result_type.to_prisma_type();
         if let TypeIdentifier::Enum(id) = result_type.typ.id {
             self.enums.add(result_type.typ.dm.zip(id));
@@ -84,30 +81,39 @@ pub struct ObjectBuilder {
 }
 
 impl ObjectBuilder {
-    fn new(kind: ObjectKind) -> Self {
+    fn new(serialized_name: Option<impl Into<Cow<'static, str>>>) -> Self {
         Self {
-            object: Object::new(kind),
+            object: Object::new(serialized_name),
         }
     }
 
-    pub fn add_field(&mut self, key: impl Into<String>, node: ResultNode) {
+    pub fn add_field(&mut self, key: impl Into<Cow<'static, str>>, node: ResultNode) {
         ObjectMutBuilder::new(&mut self.object).add_field(key, node)
     }
 
-    pub fn entry_or_insert_nested(&mut self, key: impl Into<String>) -> ObjectMutBuilder<'_> {
-        self.entry_or_insert(key, ObjectKind::Nested)
+    pub fn entry_or_insert_nested(&mut self, key: impl Into<Cow<'static, str>> + Clone) -> ObjectMutBuilder<'_> {
+        self.entry_or_insert(key.clone(), Some(key))
     }
 
-    pub fn entry_or_insert_flattened(&mut self, key: impl Into<String>) -> ObjectMutBuilder<'_> {
-        self.entry_or_insert(key, ObjectKind::Flattened)
+    #[inline]
+    pub fn entry_or_insert(
+        &mut self,
+        key: impl Into<Cow<'static, str>>,
+        original_key: Option<impl Into<Cow<'static, str>>>,
+    ) -> ObjectMutBuilder<'_> {
+        self.entry_or_insert_inner(key.into(), original_key.map(Into::into))
     }
 
-    pub fn entry_or_insert(&mut self, key: impl Into<String>, kind: ObjectKind) -> ObjectMutBuilder<'_> {
+    fn entry_or_insert_inner(
+        &mut self,
+        key: Cow<'static, str>,
+        original_key: Option<Cow<'static, str>>,
+    ) -> ObjectMutBuilder<'_> {
         let node = self
             .object
             .fields
-            .entry(key.into())
-            .or_insert(ResultNode::Object(Object::new(kind)));
+            .entry(key)
+            .or_insert(ResultNode::Object(Object::new(original_key)));
 
         let ResultNode::Object(object) = node else {
             panic!("ObjectBuilder::entry_or_insert can only be called with key which is vacant or points at an object")
@@ -130,7 +136,7 @@ impl<'a> ObjectMutBuilder<'a> {
         Self { object }
     }
 
-    pub fn add_field(&mut self, key: impl Into<String>, node: ResultNode) {
+    pub fn add_field(&mut self, key: impl Into<Cow<'static, str>>, node: ResultNode) {
         self.object.fields.insert(key.into(), node);
     }
 }

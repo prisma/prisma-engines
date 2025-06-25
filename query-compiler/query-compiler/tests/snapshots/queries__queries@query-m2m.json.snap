@@ -7,7 +7,7 @@ dataMap {
     id: Int (id)
     title: String (title)
     userId: Int (userId)
-    categories: {
+    categories (from @nested$categories): {
         id: Int (id)
         name: String (name)
     }
@@ -24,4 +24,4 @@ in let @parent$id = mapField id (get @parent)
                    "CategoryToPost@Post" FROM "public"."_CategoryToPost" AS "t0"
                    INNER JOIN "public"."Category" AS "t1" ON "t0"."A" =
                    "t1"."id" WHERE "t0"."B" = $1»
-            params [var(@parent$id as Int)]) on left.(id) = right.(CategoryToPost@Post) as categories
+            params [var(@parent$id as Int)]) on left.(id) = right.(CategoryToPost@Post) as @nested$categories

@@ -4,22 +4,22 @@ expression: pretty
 input_file: query-compiler/query-compiler/tests/data/aggregate-custom.json
 ---
 dataMap {
-    _count: {
+    _count (from _count): {
         _all: Int (_all)
     }
-    _sum: {
+    _sum (from _sum): {
         float: Float (db_float)
         int: Int (db_int)
     }
-    _avg: {
+    _avg (from _avg): {
         float: Float (db_float)
         int: Float (db_int)
     }
-    _min: {
+    _min (from _min): {
         float: Float (db_float)
         int: Int (db_int)
     }
-    _max: {
+    _max (from _max): {
         float: Float (db_float)
         int: Int (db_int)
     }

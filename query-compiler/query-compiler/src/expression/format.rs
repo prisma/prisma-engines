@@ -300,8 +300,15 @@ where
             ResultNode::AffectedRows => self.keyword("affectedRows"),
             ResultNode::Object(object) => self.object(object.fields().iter().map(|(name, field)| {
                 let mut key = self.field_name(name);
-                if object.is_flattened() {
-                    key = key.append(self.space().append(self.keyword("(flattened)")));
+                if let ResultNode::Object(nested_object) = field {
+                    let source = match nested_object.serialized_name() {
+                        Some(original_key) => self
+                            .keyword("from")
+                            .append(self.space())
+                            .append(self.field_name(original_key)),
+                        None => self.keyword("inlined"),
+                    };
+                    key = key.append(self.space().append(source.parens()))
                 }
                 (key, self.data_map_node(field))
             })),

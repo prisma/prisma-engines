@@ -1,4 +1,7 @@
-use crate::result_node::{ObjectKind, ResultNode, ResultNodeBuilder};
+use crate::{
+    binding,
+    result_node::{ResultNode, ResultNodeBuilder},
+};
 use indexmap::IndexSet;
 use itertools::Itertools;
 use query_core::{
@@ -6,7 +9,7 @@ use query_core::{
     UpdateRecord, WriteQuery, schema::constants::aggregations,
 };
 use query_structure::{AggregationSelection, FieldSelection, SelectedField};
-use std::collections::HashMap;
+use std::{borrow::Cow, collections::HashMap};
 
 pub fn map_result_structure(graph: &QueryGraph, builder: &mut ResultNodeBuilder) -> Option<ResultNode> {
     graph
@@ -34,12 +37,16 @@ pub fn map_result_structure(graph: &QueryGraph, builder: &mut ResultNodeBuilder)
 
 fn map_query(query: &Query, builder: &mut ResultNodeBuilder) -> Option<ResultNode> {
     match query {
-        Query::Read(read_query) => map_read_query(read_query, builder),
+        Query::Read(read_query) => map_read_query(read_query, builder, None),
         Query::Write(write_query) => map_write_query(write_query, builder),
     }
 }
 
-fn map_read_query(query: &ReadQuery, builder: &mut ResultNodeBuilder) -> Option<ResultNode> {
+fn map_read_query(
+    query: &ReadQuery,
+    builder: &mut ResultNodeBuilder,
+    object_name: Option<Cow<'static, str>>,
+) -> Option<ResultNode> {
     match query {
         ReadQuery::RecordQuery(q) => get_result_node(
             &q.selected_fields,
@@ -47,6 +54,7 @@ fn map_read_query(query: &ReadQuery, builder: &mut ResultNodeBuilder) -> Option<
             &q.nested,
             q.relation_load_strategy.is_join(),
             builder,
+            object_name,
         ),
         ReadQuery::ManyRecordsQuery(q) => get_result_node(
             &q.selected_fields,
@@ -54,24 +62,32 @@ fn map_read_query(query: &ReadQuery, builder: &mut ResultNodeBuilder) -> Option<
             &q.nested,
             q.relation_load_strategy.is_join(),
             builder,
+            object_name,
         ),
-        ReadQuery::RelatedRecordsQuery(q) => {
-            get_result_node(&q.selected_fields, &q.selection_order, &q.nested, false, builder)
-        }
+        ReadQuery::RelatedRecordsQuery(q) => get_result_node(
+            &q.selected_fields,
+            &q.selection_order,
+            &q.nested,
+            false,
+            builder,
+            object_name,
+        ),
         ReadQuery::AggregateRecordsQuery(q) => {
-            get_result_node_for_aggregation(&q.selectors, &q.selection_order, builder)
+            get_result_node_for_aggregation(&q.selectors, &q.selection_order, builder, object_name)
         }
     }
 }
 
 fn map_write_query(query: &WriteQuery, builder: &mut ResultNodeBuilder) -> Option<ResultNode> {
     match query {
-        WriteQuery::CreateRecord(q) => get_result_node(&q.selected_fields, &q.selection_order, &[], false, builder),
+        WriteQuery::CreateRecord(q) => {
+            get_result_node(&q.selected_fields, &q.selection_order, &[], false, builder, None)
+        }
         WriteQuery::CreateManyRecords(q) => get_result_node_for_create_many(q.selected_fields.as_ref(), builder),
         WriteQuery::UpdateRecord(u) => {
             match u {
                 UpdateRecord::WithSelection(w) => {
-                    get_result_node(&w.selected_fields, &w.selection_order, &[], false, builder)
+                    get_result_node(&w.selected_fields, &w.selection_order, &[], false, builder, None)
                 }
                 UpdateRecord::WithoutSelection(_) => None, // No result data
             }
@@ -83,7 +99,7 @@ fn map_write_query(query: &WriteQuery, builder: &mut ResultNodeBuilder) -> Optio
         WriteQuery::DisconnectRecords(_) => None, // No result data
         WriteQuery::ExecuteRaw(_) => None,        // No data mapping
         WriteQuery::QueryRaw(_) => None,          // No data mapping
-        WriteQuery::Upsert(q) => get_result_node(&q.selected_fields, &q.selection_order, &[], false, builder),
+        WriteQuery::Upsert(q) => get_result_node(&q.selected_fields, &q.selection_order, &[], false, builder, None),
     }
 }
 
@@ -94,6 +110,7 @@ fn get_result_node(
     // relationJoins queries use prisma names rather than db names
     uses_relation_joins: bool,
     builder: &mut ResultNodeBuilder,
+    original_name: Option<Cow<'static, str>>,
 ) -> Option<ResultNode> {
     let field_map = field_selection
         .selections()
@@ -107,24 +124,38 @@ fn get_result_node(
         .map(|q| (q.get_alias_or_name(), q))
         .collect::<HashMap<_, _>>();
 
-    let mut node = ResultNodeBuilder::new_object();
+    let mut node = ResultNodeBuilder::new_object(original_name);
+
     for prisma_name in selection_order {
         match field_map.get(prisma_name.as_str()) {
             Some(sf @ SelectedField::Scalar(f)) => {
                 let name = if uses_relation_joins {
-                    sf.prisma_name().into_owned()
+                    sf.prisma_name()
                 } else {
-                    sf.db_name().into_owned()
+                    sf.db_name()
                 };
-                node.add_field(prisma_name, builder.new_value(name, f.type_info()));
+                node.add_field(
+                    prisma_name.to_owned(),
+                    builder.new_value(name.into_owned(), f.type_info()),
+                );
             }
             Some(SelectedField::Composite(_)) => todo!("MongoDB specific"),
             Some(SelectedField::Relation(f)) => {
                 let nested_selection = FieldSelection::new(f.selections.to_vec());
-                let nested_node =
-                    get_result_node(&nested_selection, &f.result_fields, &[], uses_relation_joins, builder);
+                let nested_node = get_result_node(
+                    &nested_selection,
+                    &f.result_fields,
+                    &[],
+                    uses_relation_joins,
+                    builder,
+                    Some(if uses_relation_joins {
+                        f.field.name().to_owned().into()
+                    } else {
+                        binding::nested_relation_field(&f.field)
+                    }),
+                );
                 if let Some(nested_node) = nested_node {
-                    node.add_field(f.field.name(), nested_node);
+                    node.add_field(f.field.name().to_owned(), nested_node);
                 }
             }
             Some(SelectedField::Virtual(f)) => {
@@ -140,22 +171,23 @@ fn get_result_node(
                         vs.db_alias()
                     };
 
-                    node.entry_or_insert(
-                        group_name,
-                        if uses_relation_joins {
-                            ObjectKind::Nested
-                        } else {
-                            ObjectKind::Flattened
-                        },
-                    )
-                    .add_field(field_name, builder.new_value(db_name, vs.r#type().into()));
+                    node.entry_or_insert(group_name, uses_relation_joins.then_some(group_name))
+                        .add_field(field_name.to_owned(), builder.new_value(db_name, vs.r#type().into()));
                 }
             }
             None => {
                 if let Some(q) = nested_map.get(prisma_name.as_str()) {
-                    let nested_node = map_read_query(q, builder);
+                    let nested_node = map_read_query(
+                        q,
+                        builder,
+                        Some(if uses_relation_joins {
+                            prisma_name.to_owned().into()
+                        } else {
+                            binding::nested_relation_field_by_name(prisma_name)
+                        }),
+                    );
                     if let Some(nested_node) = nested_node {
-                        node.add_field(q.get_alias_or_name(), nested_node);
+                        node.add_field(q.get_alias_or_name().to_owned(), nested_node);
                     }
                 }
             }
@@ -169,6 +201,7 @@ fn get_result_node_for_aggregation(
     selectors: &[AggregationSelection],
     selection_order: &[(String, Option<Vec<String>>)],
     builder: &mut ResultNodeBuilder,
+    object_name: Option<Cow<'static, str>>,
 ) -> Option<ResultNode> {
     let mut ordered_set = IndexSet::new();
 
@@ -182,7 +215,7 @@ fn get_result_node_for_aggregation(
         }
     }
 
-    let mut node = ResultNodeBuilder::new_object();
+    let mut node = ResultNodeBuilder::new_object(object_name);
 
     for (underscore_name, name, db_name, typ) in selectors
         .iter()
@@ -199,11 +232,12 @@ fn get_result_node_for_aggregation(
         })
         .sorted_by_key(|(underscore_name, name, _, _)| ordered_set.get_index_of(&(*underscore_name, *name)))
     {
-        let value = builder.new_value(db_name.into(), typ.into());
+        let value = builder.new_value(db_name.to_owned(), typ.into());
         if let Some(undescore_name) = underscore_name {
-            node.entry_or_insert_nested(undescore_name).add_field(name, value);
+            node.entry_or_insert_nested(undescore_name)
+                .add_field(name.to_owned(), value);
         } else {
-            node.add_field(name, value);
+            node.add_field(name.to_owned(), value);
         }
     }
 
@@ -231,6 +265,7 @@ fn get_result_node_for_create_many(
         &selected_fields?.nested,
         false,
         builder,
+        None,
     )
 }
 
@@ -238,7 +273,14 @@ fn get_result_node_for_delete(
     selected_fields: Option<&DeleteRecordFields>,
     builder: &mut ResultNodeBuilder,
 ) -> Option<ResultNode> {
-    get_result_node(&selected_fields?.fields, &selected_fields?.order, &[], false, builder)
+    get_result_node(
+        &selected_fields?.fields,
+        &selected_fields?.order,
+        &[],
+        false,
+        builder,
+        None,
+    )
 }
 
 fn get_result_node_for_update_many(
@@ -251,5 +293,6 @@ fn get_result_node_for_update_many(
         &selected_fields?.nested,
         false,
         builder,
+        None,
     )
 }
