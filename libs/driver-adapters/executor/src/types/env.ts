@@ -53,6 +53,7 @@ export const Env = S.extend(
         'd1',
         'better-sqlite3',
         'mssql',
+        'mariadb',
       ),
     }),
   ),

@@ -6,7 +6,8 @@ use query_engine_tests::test_suite;
         Vitess("planetscale.js.wasm"),
         Postgres("neon.js.wasm", "pg.js.wasm"),
         Sqlite("libsql.js.wasm", "cfd1", "react-native", "better-sqlite3"),
-        Sqlserver("mssql.js.wasm")
+        Sqlserver("mssql.js.wasm"),
+        Mysql("mariadb.js.wasm")
     )
 )]
 mod metrics {
