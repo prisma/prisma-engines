@@ -2,7 +2,7 @@ import { match } from 'ts-pattern'
 import type {
   SetupDriverAdaptersInput,
   DriverAdaptersManager,
-} from './driver-adapters-manager'
+} from './driver-adapters-manager/index.js'
 import type { Env } from './types/index.js'
 import { PgManager } from './driver-adapters-manager/pg.js'
 import { NeonWsManager } from './driver-adapters-manager/neon.ws.js'
