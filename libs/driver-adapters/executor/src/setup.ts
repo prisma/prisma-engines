@@ -3,14 +3,14 @@ import type {
   SetupDriverAdaptersInput,
   DriverAdaptersManager,
 } from './driver-adapters-manager'
-import type { Env } from './types'
-import { PgManager } from './driver-adapters-manager/pg'
-import { NeonWsManager } from './driver-adapters-manager/neon.ws'
-import { LibSQLManager } from './driver-adapters-manager/libsql'
-import { PlanetScaleManager } from './driver-adapters-manager/planetscale'
-import { D1Manager } from './driver-adapters-manager/d1'
-import { BetterSQLite3Manager } from './driver-adapters-manager/better-sqlite3'
-import { MssqlManager } from './driver-adapters-manager/mssql'
+import type { Env } from './types/index.js'
+import { PgManager } from './driver-adapters-manager/pg.js'
+import { NeonWsManager } from './driver-adapters-manager/neon.ws.js'
+import { LibSQLManager } from './driver-adapters-manager/libsql.js'
+import { PlanetScaleManager } from './driver-adapters-manager/planetscale.js'
+import { D1Manager } from './driver-adapters-manager/d1.js'
+import { BetterSQLite3Manager } from './driver-adapters-manager/better-sqlite3.js'
+import { MssqlManager } from './driver-adapters-manager/mssql.js'
 
 export async function setupDriverAdaptersManager(
   env: Env,

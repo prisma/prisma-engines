@@ -4,10 +4,10 @@ import * as util from 'node:util'
 import { Worker, MessageChannel } from 'node:worker_threads'
 import * as S from '@effect/schema/Schema'
 
-import { Env, jsonRpc } from './types'
-import { assertNever, debug, err } from './utils'
-import { SchemaId } from './types/jsonRpc'
-import type { Message } from './qc-test-worker/worker'
+import { Env, jsonRpc } from './types/index.js'
+import { assertNever, debug, err } from './utils.js'
+import { SchemaId } from './types/jsonRpc.js'
+import type { Message } from './qc-test-worker/worker.js'
 
 async function main(): Promise<void> {
   const env = S.decodeUnknownSync(Env)(process.env)

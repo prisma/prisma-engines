@@ -3,8 +3,11 @@ import type {
   SqlDriverAdapter,
   SqlDriverAdapterFactory,
 } from '@prisma/driver-adapter-utils'
-import type { DriverAdaptersManager, SetupDriverAdaptersInput } from './index'
-import type { DriverAdapterTag, EnvForAdapter } from '../types'
+import type {
+  DriverAdaptersManager,
+  SetupDriverAdaptersInput,
+} from './index.js'
+import type { DriverAdapterTag, EnvForAdapter } from '../types/index.js'
 
 const TAG = 'mssql' as const satisfies DriverAdapterTag
 type TAG = typeof TAG

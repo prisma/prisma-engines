@@ -1,10 +1,9 @@
 import * as fs from 'node:fs/promises'
 import path from 'node:path'
-import { __dirname } from './utils'
+import { __dirname } from './utils.js'
 
-import * as qe from './query-engine'
+import * as qe from './query-engine.js'
 
-import { pg } from '@prisma/bundled-js-drivers'
 import * as prismaPg from '@prisma/adapter-pg'
 import {
   bindAdapter,
@@ -12,8 +11,8 @@ import {
   ErrorCapturingSqlDriverAdapter,
 } from '@prisma/driver-adapter-utils'
 
-import { recording } from './recording'
-import { nextRequestId } from './requestId'
+import { recording } from './recording.js'
+import { nextRequestId } from './requestId.js'
 import prismaQueries from '../bench/queries.json'
 
 import { baseline, bench, group, run } from 'mitata'

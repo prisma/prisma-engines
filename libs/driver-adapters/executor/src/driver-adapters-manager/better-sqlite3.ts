@@ -3,8 +3,11 @@ import type {
   SqlDriverAdapter,
   SqlMigrationAwareDriverAdapterFactory,
 } from '@prisma/driver-adapter-utils'
-import type { DriverAdaptersManager, SetupDriverAdaptersInput } from './index'
-import type { DriverAdapterTag, EnvForAdapter } from '../types'
+import type {
+  DriverAdaptersManager,
+  SetupDriverAdaptersInput,
+} from './index.js'
+import type { DriverAdapterTag, EnvForAdapter } from '../types/index.js'
 
 const TAG = 'better-sqlite3' as const satisfies DriverAdapterTag
 type TAG = typeof TAG

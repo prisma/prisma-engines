@@ -1,5 +1,5 @@
 import { ConnectionInfo } from '@prisma/driver-adapter-utils'
-import { __dirname } from './utils'
+import { __dirname } from './utils.js'
 import { QueryPlanNode } from '@prisma/client-engine-runtime'
 
 export type QueryCompilerParams = {
@@ -18,7 +18,9 @@ export interface QueryCompiler {
 export async function initQueryCompiler(
   params: QueryCompilerParams,
 ): Promise<QueryCompiler> {
-  const { getQueryCompilerForProvider } = await import('./query-compiler-wasm')
+  const { getQueryCompilerForProvider } = await import(
+    './query-compiler-wasm.js'
+  )
   const WasmQueryCompiler = (await getQueryCompilerForProvider(
     params.provider,
   )) as QueryCompiler

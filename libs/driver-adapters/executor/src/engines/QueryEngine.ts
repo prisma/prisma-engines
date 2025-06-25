@@ -1,5 +1,5 @@
-import { JsonBatchQuery, JsonQuery } from './JsonProtocol'
-import * as Transaction from './Transaction'
+import { JsonBatchQuery, JsonQuery } from './JsonProtocol.js'
+import * as Transaction from './Transaction.js'
 
 // Events
 export type QueryEngineEvent =

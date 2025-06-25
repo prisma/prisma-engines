@@ -16,8 +16,13 @@
     "useUnknownInCatchVariables": false,
     "skipDefaultLibCheck": true,
     "skipLibCheck": true,
-    "emitDeclarationOnly": true,
-    "resolveJsonModule": true,
+    "outDir": "dist",
+    "resolveJsonModule": true
   },
-  "exclude": ["**/dist", "**/declaration", "**/node_modules", "**/src/__tests__"]
+  "exclude": [
+    "**/dist",
+    "**/declaration",
+    "**/node_modules",
+    "**/src/__tests__"
+  ]
 }

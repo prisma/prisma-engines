@@ -3,22 +3,25 @@ import * as S from '@effect/schema/Schema'
 import { PrismaD1 } from '@prisma/adapter-d1'
 import type {
   SqlDriverAdapter,
-  SqlMigrationAwareDriverAdapterFactory,
+  SqlDriverAdapterFactory,
 } from '@prisma/driver-adapter-utils'
 import { getPlatformProxy } from 'wrangler'
 import type { D1Database, D1Result } from '@cloudflare/workers-types'
 
-import { __dirname, runBatch } from '../utils'
-import type { DriverAdaptersManager, SetupDriverAdaptersInput } from './index'
-import type { DriverAdapterTag, EnvForAdapter } from '../types'
-import { D1Tables } from '../types/d1'
+import { __dirname, runBatch } from '../utils.js'
+import type {
+  DriverAdaptersManager,
+  SetupDriverAdaptersInput,
+} from './index.js'
+import type { DriverAdapterTag, EnvForAdapter } from '../types/index.js'
+import { D1Tables } from '../types/d1.js'
 
 const TAG = 'd1' as const satisfies DriverAdapterTag
 type TAG = typeof TAG
 
 export class D1Manager implements DriverAdaptersManager {
   #dispose: () => Promise<void>
-  #factory: SqlMigrationAwareDriverAdapterFactory
+  #factory: SqlDriverAdapterFactory
   #adapter?: SqlDriverAdapter
 
   private constructor(

@@ -1,6 +1,6 @@
 import fs from 'node:fs/promises'
 import path from 'node:path'
-import { __dirname, normaliseProvider } from './utils'
+import { __dirname, normaliseProvider } from './utils.js'
 import type { SqlQueryable } from '@prisma/driver-adapter-utils'
 
 const relativePath = '../../../../query-engine/query-engine-wasm/pkg'

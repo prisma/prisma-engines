@@ -2,15 +2,15 @@ import * as S from '@effect/schema/Schema'
 import { bindSqlAdapterFactory } from '@prisma/driver-adapter-utils'
 import process from 'node:process'
 
-import type { DriverAdaptersManager } from './driver-adapters-manager'
-import { Env } from './types'
-import * as se from './schema-engine-wasm-module'
-import { setupDriverAdaptersManager } from './setup'
+import type { DriverAdaptersManager } from './driver-adapters-manager/index.js'
+import { Env } from './types/index.js'
+import * as se from './schema-engine-wasm-module.js'
+import { setupDriverAdaptersManager } from './setup.js'
 import {
   getWasmError,
   isWasmPanic,
   WasmPanicRegistry,
-} from './wasm-panic-registry'
+} from './wasm-panic-registry.js'
 
 /**
  * Set up a global registry for Wasm panics.
