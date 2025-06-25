@@ -3,8 +3,8 @@ import type {
   ConnectionInfo,
   SqlDriverAdapter,
 } from '@prisma/driver-adapter-utils'
-import { DriverAdaptersManager } from '../driver-adapters-manager'
-import * as qc from '../query-compiler'
+import { DriverAdaptersManager } from '../driver-adapters-manager/index.js'
+import * as qc from '../query-compiler.js'
 import {
   noopTracingHelper,
   TransactionManager,
@@ -17,17 +17,17 @@ import {
   QueryParams,
   RollbackTxParams,
   StartTxParams,
-} from '../types/jsonRpc'
-import { assertNever, debug } from '../utils'
-import { setupDriverAdaptersManager } from '../setup'
-import { Env } from '../types'
-import { query } from './worker-query'
+} from '../types/jsonRpc.js'
+import { assertNever, debug } from '../utils.js'
+import { setupDriverAdaptersManager } from '../setup.js'
+import { Env } from '../types/index.js'
+import { query } from './worker-query.js'
 import {
   commitTransaction,
   rollbackTransaction,
   startTransaction,
-} from './worker-transaction'
-import { setupDefaultPanicHandler } from '../panic'
+} from './worker-transaction.js'
+import { setupDefaultPanicHandler } from '../panic.js'
 
 const InitializeSchemaMessage = S.struct({
   type: S.literal('initializeSchema'),

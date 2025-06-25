@@ -1,7 +1,7 @@
 import { UserFacingError } from '@prisma/client-engine-runtime'
 import type { IsolationLevel } from '@prisma/driver-adapter-utils'
-import type { State } from './worker'
-import { TxOptions } from '../types/jsonRpc'
+import type { State } from './worker.js'
+import { TxOptions } from '../types/jsonRpc.js'
 
 export function parseIsolationLevel(
   level: string | null | undefined,

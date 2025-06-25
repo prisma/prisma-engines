@@ -9,9 +9,9 @@
   "description": "",
   "private": true,
   "scripts": {
-    "build": "tsup ./src/testd-qe.ts ./src/qc-test-runner.ts ./src/qc-test-worker/worker.ts ./src/demo-se.ts ./src/bench.ts --format esm --dts",
-    "build:qe": "tsup ./src/testd-qe.ts ./src/bench.ts --format esm --dts",
-    "build:qc": "tsup ./src/qc-test-runner.ts ./src/qc-test-worker/worker.ts --format esm --dts",
+    "build": "tsc",
+    "build:qe": "tsc --project tsconfig.qe.json",
+    "build:qc": "tsc --project tsconfig.qc.json",
     "test:qe": "node --import tsx ./src/testd-qe.ts",
     "test:qc": "node --import tsx ./src/testd-qc.ts",
     "demo:se": "node --experimental-wasm-modules --import tsx ./src/demo-se.ts",
@@ -47,7 +47,6 @@
   "devDependencies": {
     "@cloudflare/workers-types": "4.20250320.0",
     "@types/node": "20.12.7",
-    "tsup": "8.3.5",
     "tsx": "4.7.2",
     "typescript": "5.4.5"
   }

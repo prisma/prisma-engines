@@ -1,11 +1,11 @@
 import * as S from '@effect/schema/Schema'
 import { bindAdapter, ConnectionInfo } from '@prisma/driver-adapter-utils'
 
-import type { DriverAdaptersManager } from './driver-adapters-manager'
-import { Env } from './types'
-import * as qc from './query-compiler'
-import { err } from './utils'
-import { setupDriverAdaptersManager } from './setup'
+import type { DriverAdaptersManager } from './driver-adapters-manager/index.js'
+import { Env } from './types/index.js'
+import * as qc from './query-compiler.js'
+import { err } from './utils.js'
+import { setupDriverAdaptersManager } from './setup.js'
 
 /**
  * Example run: `DRIVER_ADAPTER="libsql" pnpm demo:qc`
@@ -84,7 +84,7 @@ async function initQC({
   const adapter = await driverAdapterManager.connect()
   const errorCapturingAdapter = bindAdapter(adapter)
 
-  let connectionInfo: ConnectionInfo = {}
+  let connectionInfo: ConnectionInfo = { supportsRelationJoins: false }
   if (errorCapturingAdapter.getConnectionInfo) {
     const result = errorCapturingAdapter.getConnectionInfo()
     if (!result.ok) {

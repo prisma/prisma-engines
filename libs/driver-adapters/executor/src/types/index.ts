@@ -1,2 +1,2 @@
-export * from './env'
-export * as jsonRpc from './jsonRpc'
+export * from './env.js'
+export * as jsonRpc from './jsonRpc.js'

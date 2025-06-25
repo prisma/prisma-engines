@@ -13,13 +13,13 @@ import {
 import { IsolationLevel, SqlQueryable } from '@prisma/driver-adapter-utils'
 import Decimal from 'decimal.js'
 
-import { JsonOutputTaggedValue } from '../engines/JsonProtocol'
-import { withLocalPanicHandler } from '../panic'
-import { QueryCompiler } from '../query-compiler'
-import { JsonProtocolQuery, QueryParams } from '../types/jsonRpc'
-import { assertNever, debug } from '../utils'
-import type { State } from './worker'
-import { parseIsolationLevel } from './worker-transaction'
+import { JsonOutputTaggedValue } from '../engines/JsonProtocol.js'
+import { withLocalPanicHandler } from '../panic.js'
+import { QueryCompiler } from '../query-compiler.js'
+import { JsonProtocolQuery, QueryParams } from '../types/jsonRpc.js'
+import { assertNever, debug } from '../utils.js'
+import type { State } from './worker.js'
+import { parseIsolationLevel } from './worker-transaction.js'
 
 export function query(
   params: QueryParams,

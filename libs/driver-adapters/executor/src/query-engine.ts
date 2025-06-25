@@ -1,8 +1,8 @@
 import type { ErrorCapturingSqlDriverAdapter } from '@prisma/driver-adapter-utils'
-import * as napi from './engines/Library'
+import * as napi from './engines/Library.js'
 import * as os from 'node:os'
 import * as path from 'node:path'
-import { __dirname } from './utils'
+import { __dirname } from './utils.js'
 
 export interface QueryEngine {
   connect(trace: string, requestId: string): Promise<void>
@@ -51,7 +51,7 @@ export async function initQueryEngine(
 
   if (engineType === 'Wasm') {
     const { getQueryEngineForProvider: getEngineForProvider } = await import(
-      './query-engine-wasm'
+      './query-engine-wasm.js'
     )
     const WasmQueryEngine = await getEngineForProvider(adapter.provider)
     return new WasmQueryEngine(options, logCallback, adapter)

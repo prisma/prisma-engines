@@ -1,5 +1,5 @@
 import type { ErrorCapturingSqlDriverAdapter } from '@prisma/driver-adapter-utils'
-import type { QueryEngineConfig } from './QueryEngine'
+import type { QueryEngineConfig } from './QueryEngine.js'
 
 export type QueryEngineInstance = {
   connect(headers: string, requestId: string): Promise<void>

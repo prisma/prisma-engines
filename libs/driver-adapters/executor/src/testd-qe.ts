@@ -5,15 +5,15 @@ import {
   ErrorCapturingSqlDriverAdapter,
 } from '@prisma/driver-adapter-utils'
 
-import type { DriverAdaptersManager } from './driver-adapters-manager'
-import { Env, jsonRpc } from './types'
-import * as qe from './query-engine'
-import { nextRequestId } from './requestId'
-import { createRNEngineConnector } from './rn'
-import { assertNever, debug, err } from './utils'
-import { setupDriverAdaptersManager } from './setup'
-import { SchemaId } from './types/jsonRpc'
-import { setupDefaultPanicHandler } from './panic'
+import type { DriverAdaptersManager } from './driver-adapters-manager/index.js'
+import { Env, jsonRpc } from './types/index.js'
+import * as qe from './query-engine.js'
+import { nextRequestId } from './requestId.js'
+import { createRNEngineConnector } from './rn.js'
+import { assertNever, debug, err } from './utils.js'
+import { setupDriverAdaptersManager } from './setup.js'
+import { SchemaId } from './types/jsonRpc.js'
+import { setupDefaultPanicHandler } from './panic.js'
 
 async function main(): Promise<void> {
   const env = S.decodeUnknownSync(Env)(process.env)
