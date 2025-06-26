@@ -23,6 +23,9 @@ pub enum DriverAdapter {
 
     #[serde(rename = "mssql")]
     Mssql,
+
+    #[serde(rename = "mariadb")]
+    MariaDb,
 }
 
 impl From<String> for DriverAdapter {

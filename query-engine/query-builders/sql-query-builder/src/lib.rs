@@ -242,7 +242,7 @@ impl<'a, V: Visitor<'a>> QueryBuilder for SqlQueryBuilder<'a, V> {
                 None
             };
 
-            let last_insert_id_field = id_selection.scalars().find(|sf| sf.is_auto_generated_int_id()).cloned();
+            let last_insert_id_field = id_selection.scalars().find(|sf| sf.is_autoincrement()).cloned();
 
             // Return all arguments that are a part of the primary identifier as values to merge
             // into the created record.
