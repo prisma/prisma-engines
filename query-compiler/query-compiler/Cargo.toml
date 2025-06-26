@@ -22,7 +22,7 @@ indexmap = { workspace = true, features = ["serde"] }
 insta = { workspace = true, features = ["glob"] }
 request-handlers.workspace = true
 # pull all connectors for testing
-psl = { workspace = true, features = ["sqlite", "mysql", "postgresql", "mssql"] }
+psl = { workspace = true, features = ["sqlite", "mysql", "postgresql", "mssql", "cockroachdb"] }
 quaint = { workspace = true, features = ["sqlite", "mysql", "postgresql", "mssql"] }
 
 [features]
@@ -31,4 +31,5 @@ sqlite = ["quaint/sqlite"]
 postgresql = ["quaint/postgresql"]
 mysql = ["quaint/mysql"]
 mssql = ["quaint/mssql"]
-all = ["sqlite", "postgresql", "mysql", "mssql"]
+cockroachdb = ["postgresql"]
+all = ["sqlite", "postgresql", "mysql", "mssql", "cockroachdb"]

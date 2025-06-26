@@ -216,6 +216,7 @@ mod json {
             Postgres("neon.js.wasm", "pg.js.wasm"),
             Sqlite("libsql.js.wasm", "cfd1", "better-sqlite3"),
             MySQL(5.6, "mariadb.js.wasm"),
+            CockroachDb("pg.js.wasm"),
         )
     )]
     async fn nested_not_shorthand(runner: Runner) -> TestResult<()> {

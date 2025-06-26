@@ -6,6 +6,7 @@ import type {
 import type { SqlQueryable } from '@prisma/driver-adapter-utils'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { Env } from './types'
 
 export const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
@@ -22,8 +23,24 @@ export function copyPathName({
   return toObj.toString()
 }
 
-export function normaliseProvider(provider: SqlQueryable['provider']) {
-  return provider === 'postgres' ? 'postgresql' : provider
+export function connectorWasmFileName(
+  connector: Env['CONNECTOR'],
+): 'postgresql' | 'mysql' | 'sqlite' | 'sqlserver' | 'cockroachdb' {
+  switch (connector) {
+    case 'postgres':
+      return 'postgresql'
+    case 'mysql':
+    case 'vitess':
+      return 'mysql'
+    case 'sqlite':
+      return 'sqlite'
+    case 'sqlserver':
+      return 'sqlserver'
+    case 'cockroachdb':
+      return 'cockroachdb'
+    default:
+      assertNever(connector, `Unknown connector: ${connector}`)
+  }
 }
 
 export function postgresSchemaName(url: string) {

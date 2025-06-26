@@ -23,6 +23,8 @@ const CONNECTOR_REGISTRY: ConnectorRegistry<'_> = &[
     psl::builtin_connectors::SQLITE,
     #[cfg(feature = "mssql")]
     psl::builtin_connectors::MSSQL,
+    #[cfg(feature = "cockroachdb")]
+    psl::builtin_connectors::COCKROACH,
 ];
 
 #[wasm_bindgen]

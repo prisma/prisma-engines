@@ -43,4 +43,8 @@ export class PlanetScaleManager implements DriverAdaptersManager {
   }
 
   async teardown() {}
+
+  connector(): 'mysql' {
+    return 'mysql'
+  }
 }

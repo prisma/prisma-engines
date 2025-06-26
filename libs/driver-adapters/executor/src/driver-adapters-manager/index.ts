@@ -2,6 +2,7 @@ import type {
   SqlDriverAdapter,
   SqlDriverAdapterFactory,
 } from '@prisma/driver-adapter-utils'
+import { Env, EnvForAdapter } from '../types'
 
 export type SetupDriverAdaptersInput = {
   /**
@@ -34,4 +35,9 @@ export interface DriverAdaptersManager {
    * Closes the connection to the database and cleans up any used resources.
    */
   teardown: () => Promise<void>
+
+  /**
+   * Returns the connector used by the Manager.
+   */
+  connector: () => Env['CONNECTOR']
 }

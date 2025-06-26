@@ -54,4 +54,8 @@ export class NeonWsManager implements DriverAdaptersManager {
   async teardown() {
     await this.#adapter?.dispose()
   }
+
+  connector(): 'postgres' {
+    return 'postgres'
+  }
 }

@@ -93,11 +93,14 @@ async function initQC({
     connectionInfo = result.value
   }
 
-  const compiler = await qc.initQueryCompiler({
-    datamodel: schema,
-    provider: adapter.provider,
-    connectionInfo,
-  })
+  const compiler = await qc.initQueryCompiler(
+    {
+      datamodel: schema,
+      provider: adapter.provider,
+      connectionInfo,
+    },
+    driverAdapterManager.connector(),
+  )
 
   return {
     compiler: compiler,

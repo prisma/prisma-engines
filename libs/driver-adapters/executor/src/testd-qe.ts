@@ -256,6 +256,7 @@ async function initQe({
     env.EXTERNAL_TEST_EXECUTOR,
     errorCapturingAdapter,
     schema,
+    driverAdapterManager.connector(),
     logCallback,
     debug,
   )

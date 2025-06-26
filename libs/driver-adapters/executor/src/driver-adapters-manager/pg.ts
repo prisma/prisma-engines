@@ -8,7 +8,7 @@ import type {
   DriverAdaptersManager,
   SetupDriverAdaptersInput,
 } from './index.js'
-import type { DriverAdapterTag, EnvForAdapter } from '../types/index.js'
+import type { DriverAdapterTag, Env, EnvForAdapter } from '../types/index.js'
 
 const TAG = 'pg' as const satisfies DriverAdapterTag
 type TAG = typeof TAG
@@ -42,5 +42,10 @@ export class PgManager implements DriverAdaptersManager {
 
   async teardown() {
     await this.#adapter?.dispose()
+  }
+
+  connector(): Env['CONNECTOR'] {
+    // could be 'postgresql' or 'cockroachdb'
+    return this.env.CONNECTOR
   }
 }

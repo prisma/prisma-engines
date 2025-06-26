@@ -35,7 +35,7 @@ jobs:
           make build-qe-wasm-gz
           mkdir -p $TARGET_DIR
 
-          for provider in "postgresql" "mysql" "sqlite" "sqlserver"; do
+          for provider in "postgresql" "mysql" "sqlite" "sqlserver" "cockroachdb"; do
             cp $PKG_DIR/$provider/query_engine_bg.wasm $TARGET_DIR/query-engine-$provider.wasm
             cp $PKG_DIR/$provider.gz $TARGET_DIR/query-engine-$provider.wasm.gz
           done
@@ -58,6 +58,8 @@ jobs:
             target/query-engine-wasm/query-engine-sqlite.wasm
             target/query-engine-wasm/query-engine-sqlserver.wasm.gz
             target/query-engine-wasm/query-engine-sqlserver.wasm
+            target/query-engine-wasm/query-engine-cockroachdb.wasm.gz
+            target/query-engine-wasm/query-engine-cockroachdb.wasm
           )
 
           DATE_TIME="$(date -u --iso-8601=seconds)"

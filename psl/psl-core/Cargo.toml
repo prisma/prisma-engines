@@ -7,7 +7,7 @@ version = "0.1.0"
 postgresql = []
 sqlite = []
 mysql = []
-cockroachdb = []
+cockroachdb = ["postgresql"]
 mssql = []
 mongodb = []
 

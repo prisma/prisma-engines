@@ -70,6 +70,10 @@ export class D1Manager implements DriverAdaptersManager {
   async teardown() {
     await this.#dispose()
   }
+
+  connector(): 'sqlite' {
+    return 'sqlite'
+  }
 }
 
 async function migrateDiff(D1_DATABASE: D1Database, migrationScript: string) {

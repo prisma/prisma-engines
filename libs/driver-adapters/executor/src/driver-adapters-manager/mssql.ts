@@ -40,6 +40,10 @@ export class MssqlManager implements DriverAdaptersManager {
   async teardown() {
     await this.#adapter?.dispose()
   }
+
+  connector(): 'sqlserver' {
+    return 'sqlserver'
+  }
 }
 
 function mssqlOptions(url: string) {

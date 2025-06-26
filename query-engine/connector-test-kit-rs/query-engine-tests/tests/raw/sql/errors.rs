@@ -88,4 +88,19 @@ mod raw_errors {
 
         Ok(())
     }
+
+    #[connector_test(schema(common_nullable_types), only(CockroachDb("pg.js.wasm")))]
+    async fn list_param_for_scalar_column_should_not_panic_pg_crdb(runner: Runner) -> TestResult<()> {
+        assert_error!(
+            runner,
+            fmt_execute_raw(
+                r#"INSERT INTO "TestModel" ("id") VALUES ($1);"#,
+                vec![RawParam::array(vec![1])],
+            ),
+            2010,
+            r#"error in argument for $1: could not parse"#
+        );
+
+        Ok(())
+    }
 }

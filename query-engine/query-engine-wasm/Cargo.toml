@@ -33,6 +33,12 @@ mssql = [
     "psl/mssql",
     "request-handlers/mssql",
 ]
+cockroachdb = [
+    "sql-connector/cockroachdb",
+    "psl/cockroachdb",
+    "request-handlers/cockroachdb",
+    "postgresql",
+]
 
 [lints]
 workspace = true

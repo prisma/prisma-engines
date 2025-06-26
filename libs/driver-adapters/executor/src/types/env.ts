@@ -43,28 +43,40 @@ export const MobileAdapterConfig = S.struct({
 export const ExternalTestExecutor = S.literal('Wasm', 'Napi', 'QueryCompiler')
 
 export const Env = S.extend(
-  S.union(
-    EnvPlanetScale,
-    EnvNeonWS,
-    S.struct({
-      DRIVER_ADAPTER: S.literal(
-        'pg',
-        'libsql',
-        'd1',
-        'better-sqlite3',
-        'mssql',
-        'mariadb',
-      ),
-    }),
-  ),
-  S.union(
-    MobileAdapterConfig,
-    S.struct({
-      EXTERNAL_TEST_EXECUTOR: S.optional(ExternalTestExecutor, {
-        default: () => 'Napi',
+  S.extend(
+    S.union(
+      EnvPlanetScale,
+      EnvNeonWS,
+      S.struct({
+        DRIVER_ADAPTER: S.literal(
+          'pg',
+          'libsql',
+          'd1',
+          'better-sqlite3',
+          'mssql',
+          'mariadb',
+        ),
       }),
-    }),
+    ),
+    S.union(
+      MobileAdapterConfig,
+      S.struct({
+        EXTERNAL_TEST_EXECUTOR: S.optional(ExternalTestExecutor, {
+          default: () => 'Napi',
+        }),
+      }),
+    ),
   ),
+  S.struct({
+    CONNECTOR: S.literal(
+      'postgres',
+      'cockroachdb',
+      'sqlite',
+      'mysql',
+      'sqlserver',
+      'vitess',
+    ),
+  }),
 )
 
 export type Env = S.Schema.Type<typeof Env>
