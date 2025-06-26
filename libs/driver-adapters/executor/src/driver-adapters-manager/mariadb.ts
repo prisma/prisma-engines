@@ -39,6 +39,10 @@ export class MariaDbManager implements DriverAdaptersManager {
   async teardown() {
     await this.#adapter?.dispose()
   }
+
+  connector(): 'mysql' {
+    return 'mysql'
+  }
 }
 
 function mariadbOptions(urlStr: string) {
