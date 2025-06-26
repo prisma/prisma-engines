@@ -189,28 +189,12 @@ pub(crate) fn translate_write_query(query: WriteQuery, builder: &dyn QueryBuilde
         })) => {
             let id_fields = model.shard_aware_primary_identifier();
 
-            let Some(selectors) = record_filter.selectors.as_ref() else {
-                if args.is_empty() {
-                    // We can just issue a read query if there are no write arguments.
-                    let query_args =
-                        QueryArguments::from((model.clone(), record_filter.filter)).with_take(Take::Some(1));
-                    let read = builder
-                        .build_get_records(&model, query_args, &id_fields, RelationLoadStrategy::Query)
-                        .map_err(TranslateError::QueryBuildFailure)?;
-                    return Ok(Expression::Unique(Expression::Query(read).into()));
-                }
-
-                // If we have no selectors, we can't construct a record manually, so
-                // the query builder is expected to handle the selected fields.
-                let update = builder
-                    .build_update(&model, record_filter, args, Some(&id_fields))
-                    .map_err(TranslateError::QueryBuildFailure)?;
-                return Ok(Expression::Unique(Expression::Query(update).into()));
-            };
-
             // Initialize the fields of a record that represents the identifier of the row that
             // is being updated. We use the record selectors to populate their values.
-            let initializers = selectors
+            let initializers = record_filter
+                .selectors
+                .as_ref()
+                .expect("should have selectors for update")
                 .iter()
                 .exactly_one()
                 .expect("should have exactly one selector")
