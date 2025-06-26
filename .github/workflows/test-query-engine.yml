@@ -231,6 +231,8 @@ jobs:
             setup_task: 'dev-better-sqlite3'
           - name: 'mssql (wasm)'
             setup_task: 'dev-mssql-wasm'
+          - name: 'mariadb (wasm)'
+            setup_task: 'dev-mariadb-wasm'
           - name: 'pg-cockroachdb (wasm)'
             setup_task: 'dev-pg-cockroachdb-wasm'
     name: ${{ matrix.adapter.name }}

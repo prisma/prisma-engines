@@ -68,6 +68,12 @@ jobs:
             should_fail_tests_list: query-compiler/query-engine-tests-todo/neon/fail
             relation_load_strategy: '["join", "query"]'
 
+          - name: mariadb
+            setup_task: dev-mariadb-qc
+            ignored_tests_list: query-compiler/query-engine-tests-todo/mariadb/skip
+            should_fail_tests_list: query-compiler/query-engine-tests-todo/mariadb/fail
+            relation_load_strategy: '["query"]'
+
           - name: pg-cockroachdb
             setup_task: dev-pg-cockroachdb-qc
             ignored_tests_list: query-compiler/query-engine-tests-todo/pg-cockroachdb/skip

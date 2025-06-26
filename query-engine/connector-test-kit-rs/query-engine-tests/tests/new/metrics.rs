@@ -7,6 +7,7 @@ use query_engine_tests::test_suite;
         Postgres("neon.js.wasm", "pg.js.wasm"),
         Sqlite("libsql.js.wasm", "cfd1", "react-native", "better-sqlite3"),
         Sqlserver("mssql.js.wasm"),
+        Mysql("mariadb.js.wasm"),
         CockroachDb("pg.js.wasm"),
     )
 )]

@@ -137,13 +137,17 @@ pub(crate) fn connection_string(
         ConnectorVersion::MySql(v) => match v {
             Some(MySqlVersion::V5_6) if is_ci => format!("mysql://root:prisma@test-db-mysql-5-6:3306/{database}"),
             Some(MySqlVersion::V5_7) if is_ci => format!("mysql://root:prisma@test-db-mysql-5-7:3306/{database}"),
-            Some(MySqlVersion::V8) if is_ci => format!("mysql://root:prisma@test-db-mysql-8:3306/{database}"),
+            Some(MySqlVersion::V8 | MySqlVersion::MariaDbJsWasm) if is_ci => {
+                format!("mysql://root:prisma@test-db-mysql-8:3306/{database}")
+            }
             Some(MySqlVersion::MariaDb) if is_ci => {
                 format!("mysql://root:prisma@test-db-mysql-mariadb:3306/{database}")
             }
             Some(MySqlVersion::V5_6) => format!("mysql://root:prisma@127.0.0.1:3309/{database}"),
             Some(MySqlVersion::V5_7) => format!("mysql://root:prisma@127.0.0.1:3306/{database}"),
-            Some(MySqlVersion::V8) => format!("mysql://root:prisma@127.0.0.1:3307/{database}"),
+            Some(MySqlVersion::V8 | MySqlVersion::MariaDbJsWasm) => {
+                format!("mysql://root:prisma@127.0.0.1:3307/{database}")
+            }
             Some(MySqlVersion::MariaDb) => {
                 format!("mysql://root:prisma@127.0.0.1:3308/{database}")
             }
@@ -331,6 +335,7 @@ impl ConnectorVersion {
                 | Self::Sqlite(Some(SqliteVersion::CloudflareD1))
                 | Self::Sqlite(Some(SqliteVersion::BetterSQLite3))
                 | Self::SqlServer(Some(SqlServerVersion::MssqlJsWasm))
+                | Self::MySql(Some(MySqlVersion::MariaDbJsWasm))
                 | Self::CockroachDb(Some(CockroachDbVersion::PgJsWasm))
         )
     }

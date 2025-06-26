@@ -31,6 +31,7 @@
     "@prisma/adapter-neon": "workspace:*",
     "@prisma/adapter-pg": "workspace:*",
     "@prisma/adapter-planetscale": "workspace:*",
+    "@prisma/adapter-mariadb": "workspace:*",
     "@prisma/bundled-js-drivers": "workspace:*",
     "@prisma/client-engine-runtime": "workspace:*",
     "@prisma/schema-engine-wasm": "../../../schema-engine/schema-engine-wasm/pkg",

@@ -11,6 +11,7 @@ import { PlanetScaleManager } from './driver-adapters-manager/planetscale.js'
 import { D1Manager } from './driver-adapters-manager/d1.js'
 import { BetterSQLite3Manager } from './driver-adapters-manager/better-sqlite3.js'
 import { MssqlManager } from './driver-adapters-manager/mssql.js'
+import { MariaDbManager } from './driver-adapters-manager/mariadb.js'
 
 export async function setupDriverAdaptersManager(
   env: Env,
@@ -44,6 +45,10 @@ export async function setupDriverAdaptersManager(
     .with(
       { DRIVER_ADAPTER: 'mssql' },
       async (env) => await MssqlManager.setup(env, input),
+    )
+    .with(
+      { DRIVER_ADAPTER: 'mariadb' },
+      async (env) => await MariaDbManager.setup(env, input),
     )
     .exhaustive()
 }
