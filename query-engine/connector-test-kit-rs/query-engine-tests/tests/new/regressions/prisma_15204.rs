@@ -27,7 +27,7 @@ mod conversion_error {
     #[connector_test(
         schema(schema_int),
         only(Sqlite),
-        exclude(Sqlite("libsql.js.wasm", "better-sqlite3"))
+        exclude(Sqlite("libsql.js.wasm", "better-sqlite3.js.wasm"))
     )]
     async fn convert_to_int_sqlite_quaint(runner: Runner) -> TestResult<()> {
         create_test_data(&runner).await?;
@@ -59,7 +59,7 @@ mod conversion_error {
     #[connector_test(
         schema(schema_bigint),
         only(Sqlite),
-        exclude(Sqlite("libsql.js.wasm", "better-sqlite3"))
+        exclude(Sqlite("libsql.js.wasm", "better-sqlite3.js.wasm"))
     )]
     async fn convert_to_bigint_sqlite_quaint(runner: Runner) -> TestResult<()> {
         create_test_data(&runner).await?;

@@ -38,7 +38,7 @@ mod raw_errors {
         only(Postgres, Sqlite),
         exclude(
             Postgres("neon.js.wasm", "pg.js.wasm"),
-            Sqlite("libsql.js.wasm", "cfd1", "better-sqlite3")
+            Sqlite("libsql.js.wasm", "cfd1", "better-sqlite3.js.wasm")
         )
     )]
     async fn invalid_parameter_count(runner: Runner) -> TestResult<()> {

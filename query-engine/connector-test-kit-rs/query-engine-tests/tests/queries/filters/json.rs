@@ -214,7 +214,7 @@ mod json {
         exclude(
             Vitess("planetscale.js.wasm"),
             Postgres("neon.js.wasm", "pg.js.wasm"),
-            Sqlite("libsql.js.wasm", "cfd1", "better-sqlite3"),
+            Sqlite("libsql.js.wasm", "cfd1", "better-sqlite3.js.wasm"),
             MySQL(5.6, "mariadb.js.wasm"),
             CockroachDb("pg.js.wasm"),
         )

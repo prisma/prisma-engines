@@ -228,7 +228,7 @@ jobs:
           - name: 'd1 (wasm)'
             setup_task: 'dev-d1'
           - name: 'better-sqlite3 (wasm)'
-            setup_task: 'dev-better-sqlite3'
+            setup_task: 'dev-better-sqlite3-wasm'
           - name: 'mssql (wasm)'
             setup_task: 'dev-mssql-wasm'
           - name: 'mariadb (wasm)'

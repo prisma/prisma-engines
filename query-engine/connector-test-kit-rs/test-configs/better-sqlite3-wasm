@@ -1,6 +1,6 @@
 {
     "connector": "sqlite",
-    "version": "better-sqlite3",
+    "version": "better-sqlite3.js.wasm",
     "driver_adapter": "better-sqlite3",
     "external_test_executor": "Wasm"
 }
