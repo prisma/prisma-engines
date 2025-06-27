@@ -68,7 +68,7 @@ ALTER TABLE blocks
     let expected = format!(
         r#"datasource db {{
   provider = "postgres"
-  url      = "{}"
+  url      = "{url_str}"
 }}
 
 /// This table is a partition table and requires additional setup for migrations. Visit https://pris.ly/d/partition-tables for more info.
@@ -81,8 +81,7 @@ model blocks {{
 
   @@id([account, id])
 }}
-"#,
-        url_str
+"#
     );
     pretty_assertions::assert_eq!(expected, result.schema.files.first().unwrap().content.as_str());
 }
@@ -144,7 +143,7 @@ CREATE TABLE capitals (
     let expected = format!(
         r#"datasource db {{
   provider = "postgres"
-  url      = "{}"
+  url      = "{url_str}"
 }}
 
 model capitals {{
@@ -160,8 +159,7 @@ model cities {{
   population Float? @db.Real
   elevation  Int?
 }}
-"#,
-        url_str
+"#
     );
     pretty_assertions::assert_eq!(expected, result.schema.files.first().unwrap().content.as_str());
 }
@@ -221,7 +219,7 @@ CREATE TABLE capitals (
     let expected = format!(
         r#"datasource db {{
   provider = "postgres"
-  url      = "{}"
+  url      = "{url_str}"
 }}
 
 /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
@@ -240,8 +238,7 @@ model cities {{
   population Float? @db.Real
   elevation  Int?
 }}
-"#,
-        url_str
+"#
     );
     pretty_assertions::assert_eq!(expected, result.schema.files.first().unwrap().content.as_str());
 }

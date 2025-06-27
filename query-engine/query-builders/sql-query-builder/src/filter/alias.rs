@@ -31,8 +31,8 @@ impl Alias {
 impl fmt::Display for Alias {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            Self::Table(index) => write!(f, "t{}", index),
-            Self::Join(index) => write!(f, "j{}", index),
+            Self::Table(index) => write!(f, "t{index}"),
+            Self::Join(index) => write!(f, "j{index}"),
         }
     }
 }

@@ -28,7 +28,7 @@ mod prisma_concurrent_write {
     // Runs 100 `run_create_user` queries in parallel, followed by 100 `run_create_profile` queries in parallel.
     async fn concurrent_creates_should_succeed(runner: Runner) -> TestResult<()> {
         let n = 100;
-        let ids: Vec<String> = (1..=n).map(|i| format!("{:05}", i)).collect();
+        let ids: Vec<String> = (1..=n).map(|i| format!("{i:05}")).collect();
 
         let runner_arc = Arc::new(runner);
 
@@ -73,7 +73,7 @@ mod prisma_concurrent_write {
     // Runs 2 `run_create_user` queries in parallel, followed by 2 `run_upsert_profile` queries in parallel.
     async fn concurrent_upserts_should_succeed(runner: Runner) -> TestResult<()> {
         let n = 2;
-        let ids: Vec<String> = (1..=n).map(|i| format!("{:05}", i)).collect();
+        let ids: Vec<String> = (1..=n).map(|i| format!("{i:05}")).collect();
 
         let runner_arc = Arc::new(runner);
 

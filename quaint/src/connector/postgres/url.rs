@@ -156,7 +156,7 @@ impl PostgresNativeUrl {
     }
 
     /// The percent-decoded database username.
-    pub fn username(&self) -> Cow<str> {
+    pub fn username(&self) -> Cow<'_, str> {
         match percent_decode(self.url.username().as_bytes()).decode_utf8() {
             Ok(username) => username,
             Err(_) => {
@@ -202,7 +202,7 @@ impl PostgresNativeUrl {
     }
 
     /// The percent-decoded database password.
-    pub fn password(&self) -> Cow<str> {
+    pub fn password(&self) -> Cow<'_, str> {
         match self
             .url
             .password()
@@ -701,7 +701,7 @@ mod tests {
                     );
                     assert_eq!(&Name::available("this_does_not_exist"), db_name)
                 }
-                kind => panic!("Expected `DatabaseDoesNotExist`, got {:?}", kind),
+                kind => panic!("Expected `DatabaseDoesNotExist`, got {kind:?}"),
             },
         }
     }
@@ -731,7 +731,7 @@ mod tests {
             Ok(_) => unreachable!(),
             Err(e) => match e.kind() {
                 ErrorKind::Native(NativeErrorKind::TlsError { .. }) => (),
-                other => panic!("{:#?}", other),
+                other => panic!("{other:#?}"),
             },
         }
     }
@@ -752,7 +752,7 @@ mod tests {
                     assert_eq!(1, *expected);
                     assert_eq!(2, *actual);
                 }
-                other => panic!("{:#?}", other),
+                other => panic!("{other:#?}"),
             },
         }
     }

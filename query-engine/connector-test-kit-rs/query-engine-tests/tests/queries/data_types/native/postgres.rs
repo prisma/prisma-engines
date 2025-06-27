@@ -65,7 +65,7 @@ mod postgres_datetime {
 
     async fn create_row(runner: &Runner, data: &str) -> TestResult<()> {
         runner
-            .query(format!("mutation {{ createOneParent(data: {}) {{ id }} }}", data))
+            .query(format!("mutation {{ createOneParent(data: {data}) {{ id }} }}"))
             .await?
             .assert_success();
         Ok(())
@@ -127,7 +127,7 @@ mod postgres_decimal {
 
     async fn create_row(runner: &Runner, data: &str) -> TestResult<()> {
         runner
-            .query(format!("mutation {{ createOneParent(data: {}) {{ id }} }}", data))
+            .query(format!("mutation {{ createOneParent(data: {data}) {{ id }} }}"))
             .await?
             .assert_success();
         Ok(())
@@ -205,7 +205,7 @@ mod postgres_string {
 
     async fn create_row(runner: &Runner, data: &str) -> TestResult<()> {
         runner
-            .query(format!("mutation {{ createOneParent(data: {}) {{ id }} }}", data))
+            .query(format!("mutation {{ createOneParent(data: {data}) {{ id }} }}"))
             .await?
             .assert_success();
         Ok(())
@@ -316,7 +316,7 @@ mod postgres_others {
 
     async fn create_row(runner: &Runner, data: &str) -> TestResult<()> {
         runner
-            .query(format!("mutation {{ createOneParent(data: {}) {{ id }} }}", data))
+            .query(format!("mutation {{ createOneParent(data: {data}) {{ id }} }}"))
             .await?
             .assert_success();
         Ok(())

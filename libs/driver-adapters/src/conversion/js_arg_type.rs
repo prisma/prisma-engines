@@ -65,7 +65,7 @@ impl core::fmt::Display for JSArgType {
             JSArgType::Time => "Time",
         };
 
-        write!(f, "{}", s)
+        write!(f, "{s}")
     }
 }
 

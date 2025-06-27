@@ -119,8 +119,7 @@ impl<'a> PpgParams<'a> {
 
     fn required_param_error(param_name: &str) -> ConnectorError {
         ConnectorError::url_parse_error(format!(
-            "Required `{}` query string parameter was not provided in a connection URL",
-            param_name
+            "Required `{param_name}` query string parameter was not provided in a connection URL"
         ))
     }
 }

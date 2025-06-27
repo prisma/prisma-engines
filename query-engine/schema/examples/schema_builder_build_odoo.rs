@@ -7,5 +7,5 @@ fn main() {
     let _ = schema::build(validated_schema, true);
     let elapsed = now.elapsed();
 
-    println!("Elapsed: {:.2?}", elapsed);
+    println!("Elapsed: {elapsed:.2?}");
 }

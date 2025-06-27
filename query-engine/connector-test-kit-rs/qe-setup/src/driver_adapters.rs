@@ -47,6 +47,6 @@ impl From<DriverAdapter> for String {
 impl Display for DriverAdapter {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         let s: String = (*self).into();
-        write!(f, "{}", s)
+        write!(f, "{s}")
     }
 }

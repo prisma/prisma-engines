@@ -22,14 +22,10 @@ mod smoke_tests {
                 let value = capture.get(1).unwrap().as_str().parse::<f64>().unwrap();
                 assert!(
                     value >= low && value <= high,
-                    "expected {} value of {} to be between {} and {}",
-                    metric,
-                    value,
-                    low,
-                    high
+                    "expected {metric} value of {value} to be between {low} and {high}"
                 );
             }
-            None => panic!("Metric {} not found in metrics text", metric),
+            None => panic!("Metric {metric} not found in metrics text"),
         }
     }
 

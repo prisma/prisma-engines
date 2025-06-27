@@ -228,7 +228,7 @@ impl<Filter: AllowAttribute> field::Visit for SpanAttributeVisitor<'_, Filter> {
 
     fn record_debug(&mut self, field: &field::Field, value: &dyn std::fmt::Debug) {
         if Filter::allow_on_span(field.name()) {
-            self.record_str(field, &format!("{:?}", value))
+            self.record_str(field, &format!("{value:?}"))
         }
     }
 }
@@ -285,7 +285,7 @@ impl<Filter: AllowAttribute> field::Visit for EventAttributeVisitor<'_, Filter> 
 
     fn record_debug(&mut self, field: &field::Field, value: &dyn std::fmt::Debug) {
         if Filter::allow_on_event(field.name()) {
-            self.record_str(field, &format!("{:?}", value))
+            self.record_str(field, &format!("{value:?}"))
         }
     }
 }

@@ -149,7 +149,7 @@ impl QuaintQueryable for JsBaseQueryable {
             AdapterProvider::SqlServer => visitor::Mssql::version_expr(),
         };
 
-        let query = format!(r#"SELECT {} AS version"#, version_expr);
+        let query = format!(r#"SELECT {version_expr} AS version"#);
         let rows = self.query_raw(query.as_str(), &[]).await?;
 
         let version_string = rows
@@ -187,7 +187,7 @@ impl QuaintQueryable for JsBaseQueryable {
 
 impl JsBaseQueryable {
     pub fn phantom_query_message(stmt: &str) -> String {
-        format!(r#"-- Implicit "{}" query via underlying driver"#, stmt)
+        format!(r#"-- Implicit "{stmt}" query via underlying driver"#)
     }
 
     async fn do_query_raw_inner(&self, sql: &str, params: &[quaint::Value<'_>]) -> quaint::Result<ResultSet> {

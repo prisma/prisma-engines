@@ -443,8 +443,7 @@ impl<'a> ScalarFilterParser<'a> {
                         .find(|container| container.name() == container_ref_name)
                         .ok_or_else(|| {
                             QueryGraphBuilderError::InputError(format!(
-                                "Model or composite type {} used for field ref {} does not exist.",
-                                container_ref_name, field_ref_name
+                                "Model or composite type {container_ref_name} used for field ref {field_ref_name} does not exist."
                             ))
                         })?;
 

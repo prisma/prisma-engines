@@ -12,7 +12,7 @@ impl<'a> Documentation<'a> {
                 d.push_str(docs.as_ref());
             }
             Cow::Borrowed(existing) => {
-                self.0 = Cow::Owned(format!("{existing}\n{}", docs));
+                self.0 = Cow::Owned(format!("{existing}\n{docs}"));
             }
         }
     }

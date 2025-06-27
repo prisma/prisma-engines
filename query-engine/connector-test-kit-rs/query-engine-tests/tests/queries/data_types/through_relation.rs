@@ -362,7 +362,7 @@ mod scalar_relations {
 
     async fn create_child(runner: &Runner, data: &str) -> TestResult<()> {
         runner
-            .query(format!("mutation {{ createOneChild(data: {}) {{ childId }} }}", data))
+            .query(format!("mutation {{ createOneChild(data: {data}) {{ childId }} }}"))
             .await?
             .assert_success();
         Ok(())
@@ -370,7 +370,7 @@ mod scalar_relations {
 
     async fn create_parent(runner: &Runner, data: &str) -> TestResult<()> {
         runner
-            .query(format!("mutation {{ createOneParent(data: {}) {{ id }} }}", data))
+            .query(format!("mutation {{ createOneParent(data: {data}) {{ id }} }}"))
             .await?
             .assert_success();
         Ok(())

@@ -29,7 +29,7 @@ pub static CONNECTORS: LazyLock<Connectors> = LazyLock::new(|| {
         .map(|(name, feature_name, tags)| ConnectorDefinition {
             name: (*name).to_owned(),
             feature_name: (*feature_name).to_owned(),
-            test_api_factory_name: format!("{}_test_api", name),
+            test_api_factory_name: format!("{name}_test_api"),
             tags: *tags,
         })
         .collect();

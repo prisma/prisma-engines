@@ -105,7 +105,7 @@ impl Connection {
 
         let truncate_sql = table_ids
             .iter()
-            .map(|(table_name, _)| format!("DELETE FROM {}", table_name))
+            .map(|(table_name, _)| format!("DELETE FROM {table_name}"))
             .collect::<Vec<_>>()
             .join("; ");
 

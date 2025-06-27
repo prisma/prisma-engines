@@ -304,7 +304,7 @@ pub(super) fn add_referencing_side_relation(
                 .find(|arg| arg.value.is_string())
                 .map_or(Default::default(), |arg| format!("{arg}, "));
 
-            let new_text = format!("@relation({}{}, {})", name, fields_arg, references);
+            let new_text = format!("@relation({name}{fields_arg}, {references})");
             let range = super::span_to_range(attr.span(), ctx.initiating_file_source());
 
             (range, new_text)

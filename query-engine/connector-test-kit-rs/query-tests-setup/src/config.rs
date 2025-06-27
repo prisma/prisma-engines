@@ -415,7 +415,7 @@ impl TestConfig {
             let path = PathBuf::from(file);
             let md = path.metadata();
             if !path.exists() || md.is_err() || !md.unwrap().is_file() {
-                exit_with_message(&format!("The external test executor path `{}` must be a file", file));
+                exit_with_message(&format!("The external test executor path `{file}` must be a file"));
             }
             #[cfg(unix)]
             {
@@ -426,8 +426,7 @@ impl TestConfig {
                 };
                 if !is_executable {
                     exit_with_message(&format!(
-                        "The external test executor file `{}` must be have permissions to execute",
-                        file
+                        "The external test executor file `{file}` must be have permissions to execute"
                     ));
                 }
             }

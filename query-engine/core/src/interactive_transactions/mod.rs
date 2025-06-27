@@ -11,7 +11,7 @@ pub(crate) use manager::*;
 pub(crate) use transaction::*;
 
 #[derive(Debug, Clone, Hash, Eq, PartialEq, Serialize, Deserialize, Display)]
-#[display(fmt = "{}", _0)]
+#[display(fmt = "{_0}")]
 pub struct TxId(String);
 
 impl Default for TxId {

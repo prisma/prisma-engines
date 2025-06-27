@@ -44,5 +44,5 @@ pub fn nested_relation_field(field: &RelationField) -> Cow<'static, str> {
 }
 
 pub fn nested_relation_field_by_name(field_name: &str) -> Cow<'static, str> {
-    format!("{NESTED}{FIELD_SEPARATOR}{}", field_name).into()
+    format!("{NESTED}{FIELD_SEPARATOR}{field_name}").into()
 }

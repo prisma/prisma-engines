@@ -385,7 +385,7 @@ impl WriteArgs {
         self.args.swap_remove(field)
     }
 
-    pub fn keys(&self) -> Keys<DatasourceFieldName, WriteOperation> {
+    pub fn keys(&self) -> Keys<'_, DatasourceFieldName, WriteOperation> {
         self.args.keys()
     }
 

@@ -2110,8 +2110,8 @@ fn value_into_json(value: &Value) -> Option<serde_json::Value> {
     match value.typed.clone() {
         // MariaDB returns JSON as text
         ValueType::Text(Some(text)) => {
-            let json: serde_json::Value = serde_json::from_str(&text)
-                .unwrap_or_else(|_| panic!("expected parsable text to json, found {}", text));
+            let json: serde_json::Value =
+                serde_json::from_str(&text).unwrap_or_else(|_| panic!("expected parsable text to json, found {text}"));
 
             Some(json)
         }

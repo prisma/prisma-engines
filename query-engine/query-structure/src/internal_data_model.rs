@@ -69,7 +69,7 @@ impl InternalDataModel {
             .map(move |rf| self.clone().zip(rf.id))
     }
 
-    pub fn walk<I>(&self, id: I) -> psl::parser_database::walkers::Walker<I> {
+    pub fn walk<I>(&self, id: I) -> psl::parser_database::walkers::Walker<'_, I> {
         self.schema.db.walk(id)
     }
 
