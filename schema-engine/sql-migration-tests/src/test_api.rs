@@ -195,9 +195,9 @@ impl TestApi {
 
                 while let Some(idx) = line.find('?') {
                     let replacer = if self.is_postgres() || self.is_cockroach() {
-                        format!("${}", counter)
+                        format!("${counter}")
                     } else if self.is_mssql() {
-                        format!("@P{}", counter)
+                        format!("@P{counter}")
                     } else {
                         unimplemented!()
                     };

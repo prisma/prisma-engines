@@ -324,7 +324,7 @@ impl ValueGeneratorFn {
         PrismaValue::String(match version {
             1 => cuid::cuid1(),
             2 => cuid::cuid2(),
-            _ => panic!("Unknown `cuid` version: {}", version),
+            _ => panic!("Unknown `cuid` version: {version}"),
         })
     }
 
@@ -333,7 +333,7 @@ impl ValueGeneratorFn {
         PrismaValue::Uuid(match version {
             4 => uuid::Uuid::new_v4(),
             7 => uuid::Uuid::now_v7(),
-            _ => panic!("Unknown UUID version: {}", version),
+            _ => panic!("Unknown UUID version: {version}"),
         })
     }
 

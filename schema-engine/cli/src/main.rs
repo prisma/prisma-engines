@@ -114,7 +114,7 @@ async fn async_main() {
         match tokio::time::timeout(*GRACEFUL_SHUTDOWN_TIMEOUT, work).await {
             Ok(Ok(())) => (),
             Ok(Err(err)) => {
-                panic!("main task panicked: {}", err);
+                panic!("main task panicked: {err}");
             }
             Err(_) => {
                 tracing::error!("Graceful shutdown timed out");

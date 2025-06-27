@@ -185,7 +185,7 @@ mod logs {
             .collect::<Vec<_>>();
         assert!(!query_logs.is_empty(), "expected db.query.text logs in {logs:?}");
 
-        let expected_traceparent = format!("/* traceparent='{}' */", traceparent);
+        let expected_traceparent = format!("/* traceparent='{traceparent}' */");
         let matching = query_logs
             .iter()
             .filter(|log| log.contains(&expected_traceparent))

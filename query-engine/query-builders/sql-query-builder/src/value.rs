@@ -51,7 +51,7 @@ impl fmt::Display for GeneratorCall {
             if i > 0 {
                 write!(f, ", ")?;
             }
-            write!(f, "{}", arg)?;
+            write!(f, "{arg}")?;
         }
         write!(f, ")")
     }

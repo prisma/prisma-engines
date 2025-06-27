@@ -66,7 +66,7 @@ impl<'a> DatasourceBuilder<'a> {
     }
 
     fn add_debug(&mut self, key: &'static str, value: impl std::fmt::Debug) {
-        self.properties.insert(key, format!("{:?}", value));
+        self.properties.insert(key, format!("{value:?}"));
     }
 }
 

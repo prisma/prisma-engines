@@ -22,10 +22,9 @@ impl UniqueTestDatabaseNames {
                         "Test database (or schema) names must be unique.\n\
                          It is concatenation of the test suite and the test case names.\n\
                          To resolve this error rename them until they are unique.\n\
-                         - Test suite: `{}`\n\
-                         - Test case: `{}`\n\
-                         - Database (or schema): `{}`\n",
-                        suite_name, test_name, test_database_name
+                         - Test suite: `{suite_name}`\n\
+                         - Test case: `{test_name}`\n\
+                         - Database (or schema): `{test_database_name}`\n"
                     );
                 }
                 names.insert(test_database_name.to_string());
@@ -42,10 +41,9 @@ impl UniqueTestDatabaseNames {
                 "Test database (or schema) names must be at most 64 characters \
                  for PostgreSQL compatibility.\n\
                  To resolve this error shorten the name of the test suite and/or test case.\n\
-                 - Test suite: `{}`\n\
-                 - Test case: `{}`\n\
-                 - Database (or schema): `{}`\n",
-                suite_name, test_name, test_database_name
+                 - Test suite: `{suite_name}`\n\
+                 - Test case: `{test_name}`\n\
+                 - Database (or schema): `{test_database_name}`\n"
             );
         }
     }

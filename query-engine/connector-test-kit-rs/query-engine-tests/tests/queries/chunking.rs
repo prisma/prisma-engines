@@ -46,9 +46,8 @@ mod chunking {
                     runner,
                     &format!(
                         r#"
-                        {{ id: {}, posts: {{ create: [{{ id: {} }}, {{ id: {} }}] }} }}
-                        "#,
-                        i, post_a_id, post_b_id
+                        {{ id: {i}, posts: {{ create: [{{ id: {post_a_id} }}, {{ id: {post_b_id} }}] }} }}
+                        "#
                     ),
                 )
                 .await?;
@@ -110,7 +109,7 @@ mod chunking {
                 .map(|x| x["id"].as_i64().unwrap())
                 .collect::<Vec<i64>>();
 
-            let posts_as_graphql: Vec<String> = ids_vec.into_iter().map(|id| format!("{{ id: {} }}", id)).collect();
+            let posts_as_graphql: Vec<String> = ids_vec.into_iter().map(|id| format!("{{ id: {id} }}")).collect();
             assert_eq!(posts_as_graphql.len(), 400);
 
             let query = format!("{{ id: 201, posts: {{ connect: [{}] }} }}", posts_as_graphql.join(", "));

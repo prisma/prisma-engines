@@ -283,7 +283,7 @@ mod delete_many {
                 assert_eq!(count, array_res.len());
             }
             _ => {
-                panic!("Unexpected result when counting todos: {}", res);
+                panic!("Unexpected result when counting todos: {res}");
             }
         }
 

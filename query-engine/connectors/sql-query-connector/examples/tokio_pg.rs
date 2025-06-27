@@ -13,7 +13,7 @@ async fn main() {
     tokio::spawn(async move {
         let now = Instant::now();
         if let Err(e) = connection.await {
-            eprintln!("connection error: {}", e);
+            eprintln!("connection error: {e}");
         }
         eprintln!("connection time: {:?}", now.elapsed());
     });

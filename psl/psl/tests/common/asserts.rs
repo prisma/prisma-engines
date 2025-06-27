@@ -355,7 +355,7 @@ impl ScalarFieldAssert for walkers::ScalarFieldWalker<'_> {
 
         let nt = match connector.parse_native_type(r#type, params, span, &mut diagnostics) {
             Some(nt) => nt,
-            None => panic!("Invalid native type {}", r#type),
+            None => panic!("Invalid native type {type}"),
         };
 
         diagnostics.to_result().unwrap();

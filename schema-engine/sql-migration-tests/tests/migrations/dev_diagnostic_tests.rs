@@ -451,7 +451,7 @@ fn with_a_failed_migration(api: TestApi) {
     assert!(action
         .as_reset()
         .unwrap()
-        .contains(&format!("The migration `{}` failed.", generated_migration_name)));
+        .contains(&format!("The migration `{generated_migration_name}` failed.")));
 }
 
 #[test_connector]
@@ -500,10 +500,8 @@ fn with_an_invalid_unapplied_migration_should_report_it(api: TestApi) {
         .to_user_facing()
         .unwrap_known();
 
-    let expected_msg = format!(
-        "Migration `{}` failed to apply cleanly to the shadow database. \nError",
-        generated_migration_name
-    );
+    let expected_msg =
+        format!("Migration `{generated_migration_name}` failed to apply cleanly to the shadow database. \nError");
 
     assert_eq!(err.error_code, MigrationDoesNotApplyCleanly::ERROR_CODE);
     assert!(err.message.starts_with(&expected_msg));

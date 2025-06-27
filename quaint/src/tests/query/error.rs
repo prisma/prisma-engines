@@ -15,7 +15,7 @@ async fn table_does_not_exist(api: &mut dyn TestApi) -> crate::Result<()> {
         ErrorKind::TableDoesNotExist { table } => {
             assert_eq!(&Name::available("not_there"), table);
         }
-        e => panic!("Expected error TableDoesNotExist, got {:?}", e),
+        e => panic!("Expected error TableDoesNotExist, got {e:?}"),
     }
 
     Ok(())
@@ -31,7 +31,7 @@ async fn database_already_exists(api: &mut dyn TestApi) -> crate::Result<()> {
         ErrorKind::DatabaseAlreadyExists { db_name } => {
             assert_eq!(&Name::available("master"), db_name);
         }
-        e => panic!("Expected error DatabaseAlreadyExists, got {:?}", e),
+        e => panic!("Expected error DatabaseAlreadyExists, got {e:?}"),
     }
 
     Ok(())
@@ -52,7 +52,7 @@ async fn column_does_not_exist_on_write(api: &mut dyn TestApi) -> crate::Result<
         ErrorKind::ColumnNotFound { column } => {
             assert_eq!(&Name::available("does_not_exist"), column);
         }
-        e => panic!("Expected error ColumnNotFound, got {:?}", e),
+        e => panic!("Expected error ColumnNotFound, got {e:?}"),
     }
 
     Ok(())
@@ -76,7 +76,7 @@ async fn column_does_not_exist_on_read(api: &mut dyn TestApi) -> crate::Result<(
         ErrorKind::ColumnNotFound { column } => {
             assert_eq!(&Name::available("does_not_exist"), column);
         }
-        e => panic!("Expected error ColumnNotFound, got {:?}", e),
+        e => panic!("Expected error ColumnNotFound, got {e:?}"),
     }
 
     Ok(())
@@ -283,7 +283,7 @@ async fn garbage_datetime_values(api: &mut dyn TestApi) -> crate::Result<()> {
 
             assert_eq!(&expected_message, message);
         }
-        e => panic!("Expected error ColumnNotFound, got {:?}", e),
+        e => panic!("Expected error ColumnNotFound, got {e:?}"),
     }
 
     Ok(())

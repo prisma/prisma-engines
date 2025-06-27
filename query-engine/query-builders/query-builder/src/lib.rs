@@ -241,7 +241,7 @@ impl fmt::Display for DbQuery {
     fn fmt(&self, formatter: &mut Formatter<'_>) -> fmt::Result {
         match self {
             DbQuery::RawSql { sql, .. } => {
-                write!(formatter, "{}", sql)?;
+                write!(formatter, "{sql}")?;
             }
             DbQuery::TemplateSql { fragments, .. } => {
                 let placeholder_format = PlaceholderFormat {

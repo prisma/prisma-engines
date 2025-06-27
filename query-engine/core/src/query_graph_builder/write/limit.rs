@@ -12,8 +12,7 @@ pub(crate) fn validate_limit(limit_arg: Option<ParsedArgument<'_>>) -> QueryGrap
         Some(i) => {
             if i < 0 {
                 return Err(QueryGraphBuilderError::InputError(format!(
-                    "Provided limit ({}) must be a positive integer.",
-                    i
+                    "Provided limit ({i}) must be a positive integer."
                 )));
             }
 

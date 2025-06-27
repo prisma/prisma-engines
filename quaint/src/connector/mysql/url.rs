@@ -408,7 +408,7 @@ mod tests {
                 assert_eq!(Some("Unknown database \'this_does_not_exist\'"), err.original_message());
                 assert_eq!(&Name::available("this_does_not_exist"), db_name)
             }
-            e => panic!("Expected `DatabaseDoesNotExist`, got {:?}", e),
+            e => panic!("Expected `DatabaseDoesNotExist`, got {e:?}"),
         }
     }
 

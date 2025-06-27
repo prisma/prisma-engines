@@ -212,7 +212,7 @@ mod tests {
             ErrorKind::TableDoesNotExist { table } => {
                 assert_eq!(&Name::available("not_there"), table);
             }
-            e => panic!("Expected error TableDoesNotExist, got {:?}", e),
+            e => panic!("Expected error TableDoesNotExist, got {e:?}"),
         }
     }
 

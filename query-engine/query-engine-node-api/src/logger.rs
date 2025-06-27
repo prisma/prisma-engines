@@ -158,7 +158,7 @@ impl StringCallback for CallbackLayer {
         let status = self.callback.call(message, ThreadsafeFunctionCallMode::Blocking);
 
         if status != napi::Status::Ok {
-            Err(format!("Could not call JS callback: {}", status))
+            Err(format!("Could not call JS callback: {status}"))
         } else {
             Ok(())
         }

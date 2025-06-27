@@ -90,7 +90,7 @@ impl FromStr for AdapterProvider {
             "sqlite" => Ok(Self::Sqlite),
             #[cfg(feature = "mssql")]
             "sqlserver" => Ok(Self::SqlServer),
-            _ => Err(format!("Unsupported adapter flavour: {:?}", s)),
+            _ => Err(format!("Unsupported adapter flavour: {s:?}")),
         }
     }
 }

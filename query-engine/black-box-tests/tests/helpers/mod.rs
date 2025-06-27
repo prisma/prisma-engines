@@ -54,13 +54,13 @@ pub(crate) fn query_engine_cmd(dml: &str) -> (process::Command, String) {
     let port = generate_free_port();
     cmd.env("PRISMA_DML", dml).arg("--port").arg(port.to_string()).arg("-g");
 
-    (cmd, format!("http://0.0.0.0:{}", port))
+    (cmd, format!("http://0.0.0.0:{port}"))
 }
 
 /// Returns the path of the query-engine binary
 pub(crate) fn query_engine_bin_path() -> path::PathBuf {
     let name = "query-engine";
-    let env_var = format!("CARGO_BIN_EXE_{}", name);
+    let env_var = format!("CARGO_BIN_EXE_{name}");
     std::env::var_os(env_var)
         .map(|p| p.into())
         .unwrap_or_else(|| target_dir().join(format!("{}{}", name, env::consts::EXE_SUFFIX)))

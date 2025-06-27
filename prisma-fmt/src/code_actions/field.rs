@@ -56,7 +56,7 @@ pub(super) fn add_missing_opposite_relation(
         .find(|attr| attr.name() == "relation")
         .and_then(|attr| attr.arguments.arguments.iter().find(|arg| arg.value.is_string()));
 
-    let relation = name_arg.map_or(Default::default(), |arg| format!(" @relation({})", arg));
+    let relation = name_arg.map_or(Default::default(), |arg| format!(" @relation({arg})"));
 
     let formatted_content = format!("{separator}{indentation}{name} {name}[]{relation}{newline}");
 
@@ -71,7 +71,7 @@ pub(super) fn add_missing_opposite_relation(
     };
 
     let action = CodeAction {
-        title: format!("Add missing relation field to model {}", target_name),
+        title: format!("Add missing relation field to model {target_name}"),
         kind: Some(CodeActionKind::QUICKFIX),
         edit: Some(edit),
         diagnostics: Some(diagnostics),

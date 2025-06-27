@@ -8,7 +8,7 @@ use derive_more::Display;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Display, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
-#[display(fmt = "{}", _0)]
+#[display(fmt = "{_0}")]
 #[repr(transparent)]
 struct SerializableNonZeroU64(NonZeroU64);
 

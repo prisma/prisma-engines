@@ -135,7 +135,7 @@ fn reference_locations_for_target(ctx: ReferencesContext<'_>, target: SchemaPosi
                 let referenced_model = field.field_type.name();
 
                 let Some(ref_model_id) = ctx.db.find_model(referenced_model) else {
-                    warn!("Could not find model with name: {}", referenced_model);
+                    warn!("Could not find model with name: {referenced_model}");
                     return empty_references();
                 };
 

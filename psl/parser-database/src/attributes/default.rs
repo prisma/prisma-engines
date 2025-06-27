@@ -398,7 +398,7 @@ fn format_valid_values<const N: usize>(valid_values: &[u8; N]) -> String {
 
             let (last, rest) = valid_values.split_last().unwrap();
             let rest_str = rest.iter().map(|v| v.to_string()).join(", ");
-            format!("{}, or {}", rest_str, last)
+            format!("{rest_str}, or {last}")
         }
     }
 }

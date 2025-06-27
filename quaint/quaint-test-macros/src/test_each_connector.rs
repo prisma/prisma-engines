@@ -120,7 +120,7 @@ fn test_each_connector_async_wrapper_functions(
     for connector in args.connectors_to_test() {
         let connector_name = connector.name();
         let feature_name = connector.feature_name();
-        let connector_test_fn_name = Ident::new(&format!("{}_on_{}", test_fn_name, connector_name), Span::call_site());
+        let connector_test_fn_name = Ident::new(&format!("{test_fn_name}_on_{connector_name}"), Span::call_site());
 
         let conn_api_factory = Ident::new(connector.test_api(), Span::call_site());
 

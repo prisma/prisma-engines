@@ -115,7 +115,7 @@ impl ConnectorError {
 
             ErrorKind::TooManyConnections(e) => Some(user_facing_errors::KnownError::new(
                 user_facing_errors::query_engine::TooManyConnections {
-                    message: format!("{}", e),
+                    message: format!("{e}"),
                 },
             )),
             _ => None,

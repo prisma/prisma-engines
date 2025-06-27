@@ -21,10 +21,10 @@ impl Display for PostgresError {
     fn fmt(&self, fmt: &mut Formatter<'_>) -> std::fmt::Result {
         write!(fmt, "{}: {}", self.severity, self.message)?;
         if let Some(detail) = &self.detail {
-            write!(fmt, "\nDETAIL: {}", detail)?;
+            write!(fmt, "\nDETAIL: {detail}")?;
         }
         if let Some(hint) = &self.hint {
-            write!(fmt, "\nHINT: {}", hint)?;
+            write!(fmt, "\nHINT: {hint}")?;
         }
         Ok(())
     }
