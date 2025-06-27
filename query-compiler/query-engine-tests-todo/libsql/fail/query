@@ -1,5 +1,4 @@
 new::interactive_tx::interactive_tx::batch_queries_failure
-new::regressions::max_integer::max_integer::unfitted_int_should_fail
 new::regressions::prisma_15204::conversion_error::convert_to_bigint_sqlite_js
 new::regressions::prisma_15204::conversion_error::convert_to_int_sqlite_js
 new::regressions::prisma_7434::not_in_chunking::not_in_batch_filter

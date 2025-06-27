@@ -194,17 +194,11 @@ dev-d1: build-qe-wasm build-se-wasm build-driver-adapters-kit-qe
 test-d1: dev-d1 test-qe-st
 test-driver-adapter-d1: test-d1
 
-dev-better-sqlite3: build-qe-wasm build-se-wasm build-driver-adapters-kit-qe
-	cp $(CONFIG_PATH)/better-sqlite3 $(CONFIG_FILE)
+dev-better-sqlite3-wasm: build-qe-wasm build-se-wasm build-driver-adapters-kit-qe
+	cp $(CONFIG_PATH)/better-sqlite3-wasm $(CONFIG_FILE)
 
-test-better-sqlite3: dev-better-sqlite3 test-qe-st
-test-driver-adapter-better-sqlite3: test-better-sqlite3
-
-dev-sqlite3: build-qe-wasm build-se-wasm build-driver-adapters-kit-qe
-	cp $(CONFIG_PATH)/sqlite3 $(CONFIG_FILE)
-
-test-sqlite3: dev-sqlite3 test-qe-st
-test-driver-adapter-sqlite3: test-sqlite3
+test-better-sqlite3-wasm: dev-better-sqlite3-wasm test-qe-st
+test-driver-adapter-better-sqlite3-wasm: test-better-sqlite3-wasm
 
 start-postgres9:
 	docker compose -f docker-compose.yml up --wait -d --remove-orphans postgres9

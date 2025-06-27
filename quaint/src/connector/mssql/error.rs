@@ -212,6 +212,17 @@ impl From<MssqlError> for Error {
 
                 builder.build()
             }
+            108 | 168 | 183 | 187 | 220 | 232 | 236 | 242 | 244 | 248 | 294 | 296 | 298 | 304 | 517 | 535 | 1007
+            | 1080 | 2386 | 2568 | 2570 | 2579 | 2742 | 2950 | 3194 | 3250 | 3606 | 3995 | 4079 | 4867 | 6244
+            | 6398 | 6937 | 6938 | 6960 | 7116 | 7135 | 7722 | 7810 | 7981 | 8115 | 8165 | 8351 | 8411 | 8727
+            | 8729 | 8968 | 8991 | 9109 | 9204 | 9526 | 9527 | 9746 | 9813 | 9835 | 9838 | 9839 => {
+                let mut builder = Error::builder(ErrorKind::value_out_of_range(error.message.clone()));
+
+                builder.set_original_code(error.code.to_string());
+                builder.set_original_message(error.message);
+
+                builder.build()
+            }
             _ => {
                 let kind = ErrorKind::QueryError(error.clone().into());
 

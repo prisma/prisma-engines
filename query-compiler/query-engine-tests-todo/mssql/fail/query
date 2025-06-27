@@ -1,5 +1,3 @@
-new::regressions::max_integer::max_integer::unfitted_int_should_fail
-new::regressions::max_integer::max_integer::unfitted_int_should_fail_mssql
 new::regressions::prisma_7434::not_in_chunking::not_in_batch_filter
 queries::aggregation::group_by::aggregation_group_by::group_by_ordering_sum_aggregation
 queries::chunking::chunking::order_by_aggregation_should_fail
