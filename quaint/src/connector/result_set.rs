@@ -56,12 +56,12 @@ impl ResultSet {
     }
 
     /// Returns the first row of the `ResultSet`, or None if the set is empty.
-    pub fn first(&self) -> Option<ResultRowRef> {
+    pub fn first(&self) -> Option<ResultRowRef<'_>> {
         self.get(0)
     }
 
     /// Returns a reference to a row in a given position.
-    pub fn get(&self, index: usize) -> Option<ResultRowRef> {
+    pub fn get(&self, index: usize) -> Option<ResultRowRef<'_>> {
         self.rows.get(index).map(|row| ResultRowRef {
             columns: Arc::clone(&self.columns),
             values: row,

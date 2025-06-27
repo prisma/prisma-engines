@@ -79,7 +79,7 @@ impl ResultRow {
     }
 
     /// Make a referring [ResultRowRef](struct.ResultRowRef.html).
-    pub fn as_ref(&self) -> ResultRowRef {
+    pub fn as_ref(&self) -> ResultRowRef<'_> {
         ResultRowRef {
             columns: Arc::clone(&self.columns),
             values: &self.values,

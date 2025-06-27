@@ -156,7 +156,7 @@ impl PostgresNativeUrl {
     }
 
     /// The percent-decoded database username.
-    pub fn username(&self) -> Cow<str> {
+    pub fn username(&self) -> Cow<'_, str> {
         match percent_decode(self.url.username().as_bytes()).decode_utf8() {
             Ok(username) => username,
             Err(_) => {
@@ -202,7 +202,7 @@ impl PostgresNativeUrl {
     }
 
     /// The percent-decoded database password.
-    pub fn password(&self) -> Cow<str> {
+    pub fn password(&self) -> Cow<'_, str> {
         match self
             .url
             .password()

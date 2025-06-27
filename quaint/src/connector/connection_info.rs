@@ -186,7 +186,7 @@ impl ConnectionInfo {
     }
 
     /// The provided database user name. This will be `None` on SQLite.
-    pub fn username(&self) -> Option<Cow<str>> {
+    pub fn username(&self) -> Option<Cow<'_, str>> {
         // TODO: why do some of the native `.username()` methods return an `Option<&str>` and others a `Cow<str>`?
         match self {
             #[cfg(any(
