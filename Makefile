@@ -87,6 +87,12 @@ build-qc-wasm:
 	cd query-compiler/query-compiler-wasm && \
 	./build.sh $(QE_WASM_VERSION) query-compiler/query-compiler-wasm/pkg
 
+build-qc-wasm-gz: build-qc-wasm
+	@cd query-compiler/query-compiler-wasm/pkg && \
+    for provider in postgresql mysql sqlite sqlserver cockroachdb; do \
+        gzip -knc $$provider/query_compiler_bg.wasm > $$provider.gz; \
+    done;
+
 build-schema-wasm:
 	@printf '%s\n' "🛠️  Building the Rust crate"
 	cargo build --profile $(PROFILE) --target=wasm32-unknown-unknown -p prisma-schema-build
@@ -497,8 +503,15 @@ test-driver-adapter-mariadb-wasm: test-mariadb-wasm
 measure-qe-wasm: build-qe-wasm-gz
 	@cd query-engine/query-engine-wasm/pkg; \
 	for provider in postgresql mysql sqlite sqlserver cockroachdb; do \
-		echo "$${provider}_size=$$(cat $$provider/query_engine_bg.wasm | wc -c | tr -d ' ')" >> $(ENGINE_SIZE_OUTPUT); \
-		echo "$${provider}_size_gz=$$(cat $$provider.gz | wc -c | tr -d ' ')" >> $(ENGINE_SIZE_OUTPUT); \
+		echo "$${provider}_qe_size=$$(cat $$provider/query_engine_bg.wasm | wc -c | tr -d ' ')" >> $(ENGINE_SIZE_OUTPUT); \
+		echo "$${provider}_qe_size_gz=$$(cat $$provider.gz | wc -c | tr -d ' ')" >> $(ENGINE_SIZE_OUTPUT); \
+	done;
+
+measure-qc-wasm: build-qc-wasm-gz
+	@cd query-compiler/query-compiler-wasm/pkg; \
+	for provider in postgresql mysql sqlite sqlserver cockroachdb; do \
+		echo "$${provider}_qc_size=$$(cat $$provider/query_compiler_bg.wasm | wc -c | tr -d ' ')" >> $(ENGINE_SIZE_OUTPUT); \
+		echo "$${provider}_qc_size_gz=$$(cat $$provider.gz | wc -c | tr -d ' ')" >> $(ENGINE_SIZE_OUTPUT); \
 	done;
 
 install-driver-adapters-kit-deps: build-driver-adapters
