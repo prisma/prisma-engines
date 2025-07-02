@@ -11,9 +11,9 @@ generator js {
 }
 
 datasource db {
-  provider = "cockroachdb"
-  url      = env("DATABASE_URL")
-  schemas  = ["public"]
+  provider   = "cockroachdb"
+  url        = env("DATABASE_URL")
+  namespaces = ["public"]
 }
 
 /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
@@ -21,6 +21,6 @@ view A {
   id BigInt?
 
   @@ignore
-  @@schema("public")
+  @@namespace("public")
 }
 */

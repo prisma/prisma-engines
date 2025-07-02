@@ -10,7 +10,7 @@ pub(super) fn database_name_clashes(ctx: &mut Context<'_>) {
     let mut database_names: HashSet<(Option<&str>, &str)> = HashSet::with_capacity(ctx.db.enums_count());
 
     for enm in ctx.db.walk_enums() {
-        if !database_names.insert((enm.schema().map(|(n, _)| n), enm.database_name())) {
+        if !database_names.insert((enm.namespace().map(|(n, _)| n), enm.database_name())) {
             ctx.push_error(DatamodelError::new_duplicate_enum_database_name_error(
                 enm.ast_enum().span(),
             ));
@@ -23,7 +23,7 @@ pub(super) fn schema_is_defined_in_the_datasource(r#enum: EnumWalker<'_>, ctx: &
         return;
     }
 
-    if !ctx.has_capability(ConnectorCapability::MultiSchema) {
+    if !ctx.has_capability(ConnectorCapability::MultiNamespace) {
         return;
     }
 
@@ -32,7 +32,7 @@ pub(super) fn schema_is_defined_in_the_datasource(r#enum: EnumWalker<'_>, ctx: &
         None => return,
     };
 
-    let (schema_name, span) = match r#enum.schema() {
+    let (schema_name, span) = match r#enum.namespace() {
         Some(tuple) => tuple,
         None => return,
     };
@@ -42,7 +42,7 @@ pub(super) fn schema_is_defined_in_the_datasource(r#enum: EnumWalker<'_>, ctx: &
     }
 
     ctx.push_error(DatamodelError::new_static(
-        "This schema is not defined in the datasource. Read more on `@@schema` at https://pris.ly/d/multi-schema",
+        "This namespace is not defined in the datasource. Read more on `@@namespace` at https://pris.ly/d/multi-schema",
         span,
     ))
 }
@@ -52,17 +52,17 @@ pub(super) fn schema_attribute_supported_in_connector(r#enum: EnumWalker<'_>, ct
         return;
     }
 
-    if ctx.has_capability(ConnectorCapability::MultiSchema) {
+    if ctx.has_capability(ConnectorCapability::MultiNamespace) {
         return;
     }
 
-    let (_, span) = match r#enum.schema() {
+    let (_, span) = match r#enum.namespace() {
         Some(tuple) => tuple,
         None => return,
     };
 
     ctx.push_error(DatamodelError::new_static(
-        "@@schema is not supported on the current datasource provider",
+        "@@namespace is not supported on the current datasource provider",
         span,
     ));
 }
@@ -72,7 +72,7 @@ pub(super) fn schema_attribute_missing(r#enum: EnumWalker<'_>, ctx: &mut Context
         return;
     }
 
-    if !ctx.has_capability(ConnectorCapability::MultiSchema) {
+    if !ctx.has_capability(ConnectorCapability::MultiNamespace) {
         return;
     }
 
@@ -81,7 +81,7 @@ pub(super) fn schema_attribute_missing(r#enum: EnumWalker<'_>, ctx: &mut Context
         None => return,
     };
 
-    if datasource.schemas_span.is_none() {
+    if datasource.namespaces_span.is_none() {
         return;
     }
 
@@ -89,12 +89,12 @@ pub(super) fn schema_attribute_missing(r#enum: EnumWalker<'_>, ctx: &mut Context
         return;
     }
 
-    if r#enum.schema().is_some() {
+    if r#enum.namespace().is_some() {
         return;
     }
 
     ctx.push_error(DatamodelError::new_static(
-        "This enum is missing an `@@schema` attribute.",
+        "This enum is missing an `@@namespace` attribute.",
         r#enum.ast_enum().span,
     ))
 }
@@ -104,9 +104,9 @@ pub(super) fn multischema_feature_flag_needed(r#enum: EnumWalker<'_>, ctx: &mut 
         return;
     }
 
-    if let Some((_, span)) = r#enum.schema() {
+    if let Some((_, span)) = r#enum.namespace() {
         ctx.push_error(DatamodelError::new_static(
-            "@@schema is only available with the `multiSchema` preview feature.",
+            "@@namespace is only available with the `multiSchema` preview feature.",
             span,
         ));
     }

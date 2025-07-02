@@ -1,5 +1,5 @@
 #[test]
-fn code_actions_should_not_crash_on_validation_errors_with_multi_schema() {
+fn code_actions_should_not_crash_on_validation_errors_with_multi_namespaces() {
     let schema = r#"
         generator client {
           provider        = "prisma-client-js"
@@ -7,9 +7,9 @@ fn code_actions_should_not_crash_on_validation_errors_with_multi_schema() {
         }
 
         datasource db {
-          provider = "postgresql"
-          url      = env("DATABASE_URL")
-          schemas  = ["auth", "public"]
+          provider   = "postgresql"
+          url        = env("DATABASE_URL")
+          namespaces = ["auth", "public"]
         }
 
         model A {

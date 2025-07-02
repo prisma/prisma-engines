@@ -1689,9 +1689,9 @@ async fn re_introspecting_with_schemas_property(api: &mut TestApi) -> TestResult
          }
 
          datasource myds {
-           provider = "postgresql"
-           url      = env("DATABASE_URL")
-           schemas  = ["first", "second"]
+           provider   = "postgresql"
+           url        = env("DATABASE_URL")
+           namespaces = ["first", "second"]
          }
     "#};
 
@@ -1704,21 +1704,21 @@ async fn re_introspecting_with_schemas_property(api: &mut TestApi) -> TestResult
         }
 
         datasource myds {
-          provider = "postgresql"
-          url      = env("DATABASE_URL")
-          schemas  = ["first", "second"]
+          provider   = "postgresql"
+          url        = env("DATABASE_URL")
+          namespaces = ["first", "second"]
         }
 
         model A {
           id String @id
 
-          @@schema("first")
+          @@namespace("first")
         }
 
         model B {
           id String @id
 
-          @@schema("second")
+          @@namespace("second")
         }
     "#]];
 

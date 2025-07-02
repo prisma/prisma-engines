@@ -48,7 +48,7 @@ pub const CAPABILITIES: ConnectorCapabilities = enumflags2::make_bitflags!(Conne
     JsonFilteringAlphanumeric |
     JsonFilteringAlphanumericFieldRef |
     JsonArrayContains |
-    MultiSchema |
+    MultiNamespace |
     NamedForeignKeys |
     NamedPrimaryKeys |
     RelationFieldsInArbitraryOrder |
@@ -570,8 +570,8 @@ impl Connector for PostgresDatamodelConnector {
             completions::extensions_completion(completion_list);
         }
 
-        if config.preview_features().contains(PreviewFeature::MultiSchema) && !ds.schemas_defined() {
-            completions::schemas_completion(completion_list);
+        if config.preview_features().contains(PreviewFeature::MultiSchema) && !ds.namespaces_defined() {
+            completions::namespaces_completion(completion_list);
         }
     }
 

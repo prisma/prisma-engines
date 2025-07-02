@@ -32,7 +32,7 @@ pub struct Model<'a> {
     map: Option<BlockAttribute<'a>>,
     fields: Vec<Field<'a>>,
     indexes: Vec<IndexDefinition<'a>>,
-    schema: Option<BlockAttribute<'a>>,
+    namespace: Option<BlockAttribute<'a>>,
 }
 
 impl<'a> Model<'a> {
@@ -53,7 +53,7 @@ impl<'a> Model<'a> {
             documentation: None,
             ignore: None,
             id: None,
-            schema: None,
+            namespace: None,
             fields: Vec::new(),
             indexes: Vec::new(),
         }
@@ -126,19 +126,19 @@ impl<'a> Model<'a> {
         self.map = Some(BlockAttribute(fun));
     }
 
-    /// The schema attribute of the model block
+    /// The namespace attribute of the model block
     ///
     /// ```ignore
     /// model Foo {
-    ///   @@schema("public")
+    ///   @@namespace("public")
     ///   ^^^^^^^^^^^^^^^^^^ this
     /// }
     /// ```
-    pub fn schema(&mut self, schema: impl Into<Cow<'a, str>>) {
-        let mut fun = Function::new("schema");
-        fun.push_param(schema.into());
+    pub fn namespace(&mut self, namespace: impl Into<Cow<'a, str>>) {
+        let mut fun = Function::new("namespace");
+        fun.push_param(namespace.into());
 
-        self.schema = Some(BlockAttribute(fun));
+        self.namespace = Some(BlockAttribute(fun));
     }
 
     /// Comments the complete model block out.
@@ -224,8 +224,8 @@ impl fmt::Display for Model<'_> {
             writeln!(f, "{comment}{ignore}")?;
         }
 
-        if let Some(ref schema) = self.schema {
-            writeln!(f, "{comment}{schema}")?;
+        if let Some(ref namespace) = self.namespace {
+            writeln!(f, "{comment}{namespace}")?;
         }
 
         writeln!(f, "{comment}}}")?;
@@ -334,7 +334,7 @@ mod tests {
         let fulltext = IndexDefinition::fulltext(["foo", "bar"].iter().map(|s| IndexFieldInput::new(*s)));
         model.push_index(fulltext);
 
-        model.schema("public");
+        model.namespace("public");
         model.ignore();
 
         let expected = expect![[r#"
@@ -357,7 +357,7 @@ mod tests {
               @@fulltext([foo, bar])
               @@map("1Country")
               @@ignore
-              @@schema("public")
+              @@namespace("public")
             }
         "#]];
 
@@ -375,13 +375,13 @@ mod tests {
         field.default(DefaultValue::function(Function::new("uuid")));
         model.push_field(field);
 
-        model.schema("public");
+        model.namespace("public");
         model.comment_out();
 
         let expected = expect![[r#"
             // model Country {
             // id String @id @default(uuid()) @db.VarChar(255)
-            // @@schema("public")
+            // @@namespace("public")
             // }
         "#]];
 

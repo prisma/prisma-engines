@@ -39,7 +39,7 @@ pub struct ConnectorTestArgs {
     pub relation_mode: Option<RelationMode>,
 
     #[darling(default)]
-    pub db_schemas: DbSchemas,
+    pub db_namespaces: DbSchemas,
 
     #[darling(default)]
     pub db_extensions: DBExtensions,
@@ -139,19 +139,19 @@ impl ExcludeFeatures {
 
 #[derive(Debug, Default)]
 pub struct DbSchemas {
-    db_schemas: Vec<String>,
+    db_namespaces: Vec<String>,
 }
 
 impl DbSchemas {
     pub fn schemas(&self) -> &[String] {
-        self.db_schemas.as_ref()
+        self.db_namespaces.as_ref()
     }
 }
 
 impl darling::FromMeta for DbSchemas {
     fn from_list(items: &[NestedMeta]) -> Result<Self, darling::Error> {
-        let db_schemas = strings_to_list("DbSchemas", items)?;
-        Ok(DbSchemas { db_schemas })
+        let db_namespaces = strings_to_list("DbSchemas", items)?;
+        Ok(DbSchemas { db_namespaces })
     }
 }
 

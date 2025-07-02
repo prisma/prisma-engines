@@ -751,15 +751,15 @@ fn dev_diagnostic_shadow_database_creation_error_is_special_cased_postgres(api: 
 // }
 
 #[test]
-fn dev_diagnostic_multi_schema_does_not_panic() {
+fn dev_diagnostic_multi_namespaces_does_not_panic() {
     let db = test_setup::only!(Postgres);
     let (_, url) = tok(test_setup::postgres::create_postgres_database(
         db.url(),
-        "dev_diagnostic_multi_schema",
+        "dev_diagnostic_multi_namespaces",
     ))
     .unwrap();
 
-    let provider = test_setup::TestApiArgs::new("dev_diagnostic_multi_schema_does_not_panic", &[], &[])
+    let provider = test_setup::TestApiArgs::new("dev_diagnostic_multi_namespaces_does_not_panic", &[], &[])
         .provider()
         .to_owned();
 
@@ -767,7 +767,7 @@ fn dev_diagnostic_multi_schema_does_not_panic() {
         datasource db {{
             provider = "{provider}"
             url = "{url}"
-            schemas = ["prisma-tests", "auth"]
+            namespaces = ["prisma-tests", "auth"]
         }}
 
         generator js {{
@@ -779,14 +779,14 @@ fn dev_diagnostic_multi_schema_does_not_panic() {
           id       String    @id @db.Uuid
           profiles profiles?
 
-          @@schema("auth")
+          @@namespace("auth")
         }}
 
         model profiles {{
           id    String @id @db.Uuid
           users users  @relation(fields: [id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
-          @@schema("prisma-tests")
+          @@namespace("prisma-tests")
         }}
     "#};
 

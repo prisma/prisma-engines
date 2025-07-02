@@ -47,13 +47,13 @@ pub static ENGINE_PROTOCOL: LazyLock<String> =
     LazyLock::new(|| std::env::var("PRISMA_ENGINE_PROTOCOL").unwrap_or_else(|_| "graphql".to_owned()));
 
 /// Teardown of a test setup.
-async fn teardown_project(datamodel: &str, db_schemas: &[&str], schema_id: Option<usize>) -> TestResult<()> {
+async fn teardown_project(datamodel: &str, db_namespaces: &[&str], schema_id: Option<usize>) -> TestResult<()> {
     if let Some(schema_id) = schema_id {
         let params = serde_json::json!({ "schemaId": schema_id });
         executor_process_request::<serde_json::Value>("teardown", params).await?;
     }
 
-    Ok(qe_setup::teardown(datamodel, db_schemas).await?)
+    Ok(qe_setup::teardown(datamodel, db_namespaces).await?)
 }
 
 /// Helper method to allow a sync shell function to run the async test blocks.
@@ -267,7 +267,7 @@ pub fn run_connector_test<T>(
     excluded_features: &[&str],
     excluded_executors: &[&str],
     handler: fn() -> String,
-    db_schemas: &[&str],
+    db_namespaces: &[&str],
     db_extensions: &[&str],
     referential_override: Option<String>,
     test_fn: T,
@@ -290,7 +290,7 @@ pub fn run_connector_test<T>(
         excluded_features,
         excluded_executors,
         handler,
-        db_schemas,
+        db_namespaces,
         db_extensions,
         referential_override,
         &boxify(test_fn),
@@ -309,7 +309,7 @@ fn run_connector_test_impl(
     excluded_features: &[&str],
     excluded_executors: &[&str],
     handler: fn() -> String,
-    db_schemas: &[&str],
+    db_namespaces: &[&str],
     db_extensions: &[&str],
     referential_override: Option<String>,
     test_fn: &dyn Fn(Runner) -> BoxFuture<'static, TestResult<()>>,
@@ -342,7 +342,7 @@ fn run_connector_test_impl(
         template,
         excluded_features,
         referential_override,
-        db_schemas,
+        db_namespaces,
         db_extensions,
         None,
     );
@@ -356,7 +356,7 @@ fn run_connector_test_impl(
         let override_local_max_bind_values = None;
         let runner = Runner::load(
             datamodel.clone(),
-            db_schemas,
+            db_namespaces,
             version,
             connector_tag,
             override_local_max_bind_values,
@@ -403,7 +403,7 @@ fn run_connector_test_impl(
             panic!("💥 Test failed due to an error (see above)");
         }
 
-        if let Err(e) = crate::teardown_project(&datamodel, db_schemas, schema_id).await {
+        if let Err(e) = crate::teardown_project(&datamodel, db_namespaces, schema_id).await {
             if expected_to_fail {
                 eprintln!("Teardown failed: {e}");
             } else {

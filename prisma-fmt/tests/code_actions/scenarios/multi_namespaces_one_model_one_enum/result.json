@@ -1,0 +1,80 @@
+[
+  {
+    "title": "Add `@@namespace` attribute",
+    "kind": "quickfix",
+    "diagnostics": [
+      {
+        "range": {
+          "start": {
+            "line": 11,
+            "character": 0
+          },
+          "end": {
+            "line": 13,
+            "character": 1
+          }
+        },
+        "severity": 1,
+        "message": "Error validating model \"User\": This model is missing an `@@namespace` attribute."
+      }
+    ],
+    "edit": {
+      "changes": {
+        "file:///path/to/schema.prisma": [
+          {
+            "range": {
+              "start": {
+                "line": 13,
+                "character": 0
+              },
+              "end": {
+                "line": 13,
+                "character": 1
+              }
+            },
+            "newText": "\n    @@namespace()\n}"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "title": "Add `@@namespace` attribute",
+    "kind": "quickfix",
+    "diagnostics": [
+      {
+        "range": {
+          "start": {
+            "line": 15,
+            "character": 0
+          },
+          "end": {
+            "line": 17,
+            "character": 1
+          }
+        },
+        "severity": 1,
+        "message": "This enum is missing an `@@namespace` attribute."
+      }
+    ],
+    "edit": {
+      "changes": {
+        "file:///path/to/schema.prisma": [
+          {
+            "range": {
+              "start": {
+                "line": 17,
+                "character": 0
+              },
+              "end": {
+                "line": 17,
+                "character": 1
+              }
+            },
+            "newText": "\n  @@namespace()\n}"
+          }
+        ]
+      }
+    }
+  }
+]

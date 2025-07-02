@@ -2,7 +2,7 @@ use psl::parser_database::SourceFile;
 use schema_core::schema_connector::DiffTarget;
 use sql_migration_tests::test_api::*;
 
-mod multi_schema;
+mod multi_namespaces;
 
 #[test_connector(tags(Mssql))]
 fn reset_clears_udts(api: TestApi) {
@@ -10,19 +10,19 @@ fn reset_clears_udts(api: TestApi) {
 
     api.raw_cmd(&format!("CREATE TYPE {schema}.[testType] AS TABLE (FooBar INT)"));
 
-    let schemas = api.query_raw(
+    let namespaces = api.query_raw(
         &format!("SELECT * FROM sys.types WHERE SCHEMA_NAME(schema_id) = '{schema}' and NAME = 'testType'"),
         &[],
     );
-    assert_eq!(1, schemas.len());
+    assert_eq!(1, namespaces.len());
 
     api.reset().send_sync(None);
 
-    let schemas = api.query_raw(
+    let namespaces = api.query_raw(
         &format!("SELECT * FROM sys.types WHERE SCHEMA_NAME(schema_id) = '{schema}' and NAME = 'testType'"),
         &[],
     );
-    assert_eq!(0, schemas.len());
+    assert_eq!(0, namespaces.len());
 }
 
 #[test_connector(tags(Mssql))]

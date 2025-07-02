@@ -1,10 +1,10 @@
-// This is _not_ valid: once @@schema is specified once, it has to be
+// This is _not_ valid: once @@namespace is specified once, it has to be
 // specified for every model and enum.
 
 datasource testds {
-    provider = "postgresql"
-    url      = env("TEST_DATABASE_URL")
-    schemas  = ["public", "security", "users"]
+    provider   = "postgresql"
+    url        = env("TEST_DATABASE_URL")
+    namespaces = ["public", "security", "users"]
 }
 
 generator js {
@@ -25,7 +25,7 @@ enum UserType {
     Archea
     Eukaryote
 }
-// [1;91merror[0m: [1mError validating model "Test": This model is missing an `@@schema` attribute.[0m
+// [1;91merror[0m: [1mError validating model "Test": This model is missing an `@@namespace` attribute.[0m
 //   [1;94m-->[0m  [4mschema.prisma:15[0m
 // [1;94m   | [0m
 // [1;94m14 | [0m
@@ -33,7 +33,7 @@ enum UserType {
 // [1;94m16 | [0m    id Int @id
 // [1;94m17 | [0m}
 // [1;94m   | [0m
-// [1;91merror[0m: [1mError validating model "Test2": This model is missing an `@@schema` attribute.[0m
+// [1;91merror[0m: [1mError validating model "Test2": This model is missing an `@@namespace` attribute.[0m
 //   [1;94m-->[0m  [4mschema.prisma:19[0m
 // [1;94m   | [0m
 // [1;94m18 | [0m
@@ -41,7 +41,7 @@ enum UserType {
 // [1;94m20 | [0m    id Int @id
 // [1;94m21 | [0m}
 // [1;94m   | [0m
-// [1;91merror[0m: [1mThis enum is missing an `@@schema` attribute.[0m
+// [1;91merror[0m: [1mThis enum is missing an `@@namespace` attribute.[0m
 //   [1;94m-->[0m  [4mschema.prisma:23[0m
 // [1;94m   | [0m
 // [1;94m22 | [0m

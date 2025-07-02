@@ -1,6 +1,6 @@
 mod extensions;
 mod introspection;
-mod multi_schema;
+mod multi_namespaces;
 
 use psl::parser_database::SourceFile;
 use quaint::Value;

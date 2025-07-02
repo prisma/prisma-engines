@@ -5,7 +5,7 @@ use query_structure::Model;
 pub(crate) fn db_name_with_schema(model: &Model, ctx: &Context<'_>) -> Table<'static> {
     let schema_prefix = model
         .walker()
-        .schema_name()
+        .namespace_name()
         .or(ctx.schema_name())
         .map(ToOwned::to_owned);
 

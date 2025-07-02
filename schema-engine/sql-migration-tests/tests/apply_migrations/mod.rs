@@ -34,13 +34,13 @@ fn applying_a_single_migration_should_work(api: TestApi) {
 }
 
 #[test_connector(tags(Mssql, Postgres), preview_features("multiSchema"), namespaces("one", "two"))]
-fn multi_schema_applying_two_migrations_works(api: TestApi) {
+fn multi_namespaces_applying_two_migrations_works(api: TestApi) {
     let dm1 = api.datamodel_with_provider_and_features(
         r#"
         model Cat {
             id      Int @id
             name    String
-            @@schema("one")
+            @@namespace("one")
         }
     "#,
         &[("schemas", "[\"one\", \"two\"]")],
@@ -56,7 +56,7 @@ fn multi_schema_applying_two_migrations_works(api: TestApi) {
         model Cat {
             id          Int @id
             name        String
-            @@schema("two")
+            @@namespace("two")
         }
     "#,
         &[("schemas", "[\"one\", \"two\"]")],
@@ -76,7 +76,7 @@ fn multi_schema_applying_two_migrations_works(api: TestApi) {
 }
 
 #[test_connector(tags(Mssql), preview_features("multiSchema"), namespaces("one", "two"))]
-fn multi_schema_two_migrations_drop_fks(api: TestApi) {
+fn multi_namespaces_two_migrations_drop_fks(api: TestApi) {
     let dm1 = api.datamodel_with_provider_and_features(
         r#"
         model First {
@@ -88,7 +88,7 @@ fn multi_schema_two_migrations_drop_fks(api: TestApi) {
             r2_second Second? @relation("r2", fields: [r2_secondId], references: [id], onDelete: NoAction, onUpdate: NoAction)
             r2_secondId Int? @unique
 
-            @@schema("one")
+            @@namespace("one")
         }
         model Second {
             id      Int @id
@@ -99,7 +99,7 @@ fn multi_schema_two_migrations_drop_fks(api: TestApi) {
 
             r2_first First? @relation("r2")
 
-            @@schema("two")
+            @@namespace("two")
         }
     "#,
         &[("schemas", "[\"one\", \"two\"]")],
@@ -128,7 +128,7 @@ fn multi_schema_two_migrations_drop_fks(api: TestApi) {
             r2_second Second? @relation("r2", fields: [r2_secondId], references: [id], onDelete: NoAction, onUpdate: NoAction)
             r2_secondId Int? @unique
 
-            @@schema("two")
+            @@namespace("two")
         }
         model Second {
             id      Int @id
@@ -139,7 +139,7 @@ fn multi_schema_two_migrations_drop_fks(api: TestApi) {
 
             r2_first First? @relation("r2")
 
-            @@schema("one")
+            @@namespace("one")
         }
       "#, &[("schemas", "[\"one\", \"two\"]")], &["multiSchema"]);
 
@@ -156,7 +156,7 @@ fn multi_schema_two_migrations_drop_fks(api: TestApi) {
 }
 
 #[test_connector(tags(Mssql), preview_features("multiSchema"), namespaces("one", "two"))]
-fn multi_schema_two_migrations_reset(api: TestApi) {
+fn multi_namespaces_two_migrations_reset(api: TestApi) {
     let dm1 = api.datamodel_with_provider_and_features(
         r#"
         model First {
@@ -168,7 +168,7 @@ fn multi_schema_two_migrations_reset(api: TestApi) {
             r2_second Second? @relation("r2", fields: [r2_secondId], references: [id], onDelete: NoAction, onUpdate: NoAction)
             r2_secondId Int? @unique
 
-            @@schema("one")
+            @@namespace("one")
         }
         model Second {
             id      Int @id
@@ -179,7 +179,7 @@ fn multi_schema_two_migrations_reset(api: TestApi) {
 
             r2_first First? @relation("r2")
 
-            @@schema("two")
+            @@namespace("two")
         }
     "#,
         &[("schemas", "[\"one\", \"two\"]")],
@@ -208,7 +208,7 @@ fn multi_schema_two_migrations_reset(api: TestApi) {
             r2_second Second? @relation("r2", fields: [r2_secondId], references: [id], onDelete: NoAction, onUpdate: NoAction)
             r2_secondId Int? @unique
 
-            @@schema("two")
+            @@namespace("two")
         }
         model Second {
             id      Int @id
@@ -219,7 +219,7 @@ fn multi_schema_two_migrations_reset(api: TestApi) {
 
             r2_first First? @relation("r2")
 
-            @@schema("one")
+            @@namespace("one")
         }
       "#, &[("schemas", "[\"one\", \"two\"]")], &["multiSchema"]);
 

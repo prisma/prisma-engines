@@ -278,7 +278,7 @@ pub(super) fn schema_is_defined_in_the_datasource(model: ModelWalker<'_>, ctx: &
         return;
     }
 
-    if !ctx.has_capability(ConnectorCapability::MultiSchema) {
+    if !ctx.has_capability(ConnectorCapability::MultiNamespace) {
         return;
     }
 
@@ -287,7 +287,7 @@ pub(super) fn schema_is_defined_in_the_datasource(model: ModelWalker<'_>, ctx: &
         None => return,
     };
 
-    let (schema_name, span) = match model.schema() {
+    let (schema_name, span) = match model.namespace() {
         Some(tuple) => tuple,
         None => return,
     };
@@ -297,7 +297,7 @@ pub(super) fn schema_is_defined_in_the_datasource(model: ModelWalker<'_>, ctx: &
     }
 
     ctx.push_error(DatamodelError::new_static(
-        "This schema is not defined in the datasource. Read more on `@@schema` at https://pris.ly/d/multi-schema",
+        "This namespace is not defined in the datasource. Read more on `@@namespace` at https://pris.ly/d/multi-schema",
         span,
     ))
 }
@@ -307,17 +307,17 @@ pub(super) fn schema_attribute_supported_in_connector(model: ModelWalker<'_>, ct
         return;
     }
 
-    if ctx.has_capability(ConnectorCapability::MultiSchema) {
+    if ctx.has_capability(ConnectorCapability::MultiNamespace) {
         return;
     }
 
-    let (_, span) = match model.schema() {
+    let (_, span) = match model.namespace() {
         Some(tuple) => tuple,
         None => return,
     };
 
     ctx.push_error(DatamodelError::new_static(
-        "@@schema is not supported on the current datasource provider",
+        "@@namespace is not supported on the current datasource provider",
         span,
     ));
 }
@@ -327,7 +327,7 @@ pub(super) fn schema_attribute_missing(model: ModelWalker<'_>, ctx: &mut Context
         return;
     }
 
-    if !ctx.has_capability(ConnectorCapability::MultiSchema) {
+    if !ctx.has_capability(ConnectorCapability::MultiNamespace) {
         return;
     }
 
@@ -336,7 +336,7 @@ pub(super) fn schema_attribute_missing(model: ModelWalker<'_>, ctx: &mut Context
         None => return,
     };
 
-    if datasource.schemas_span.is_none() {
+    if datasource.namespaces_span.is_none() {
         return;
     }
 
@@ -344,14 +344,14 @@ pub(super) fn schema_attribute_missing(model: ModelWalker<'_>, ctx: &mut Context
         return;
     }
 
-    if model.schema().is_some() {
+    if model.namespace().is_some() {
         return;
     }
 
     let container = if model.ast_model().is_view() { "view" } else { "model" };
 
     ctx.push_error(DatamodelError::new_model_validation_error(
-        &format!("This {container} is missing an `@@schema` attribute."),
+        &format!("This {container} is missing an `@@namespace` attribute."),
         container,
         model.name(),
         model.ast_model().span(),
@@ -364,7 +364,7 @@ pub(super) fn database_name_clashes(ctx: &mut Context<'_>) {
         HashMap::with_capacity(ctx.db.models_count());
 
     for model in ctx.db.walk_models().chain(ctx.db.walk_views()) {
-        let key = (model.schema().map(|(name, _)| name), model.database_name());
+        let key = (model.namespace().map(|(name, _)| name), model.database_name());
         match database_names.insert(key, model.id) {
             // Two branches because we want to put the error on the @@map attribute, and it can be
             // on either model.
@@ -407,9 +407,9 @@ pub(super) fn multischema_feature_flag_needed(model: ModelWalker<'_>, ctx: &mut 
         return;
     }
 
-    if let Some((_, span)) = model.schema() {
+    if let Some((_, span)) = model.namespace() {
         ctx.push_error(DatamodelError::new_static(
-            "@@schema is only available with the `multiSchema` preview feature.",
+            "@@namespace is only available with the `multiSchema` preview feature.",
             span,
         ));
     }

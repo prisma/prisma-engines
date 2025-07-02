@@ -54,7 +54,7 @@ capabilities!(
     DefaultValueAuto,
     TwoWayEmbeddedManyToManyRelation,
     ImplicitManyToManyRelation,
-    MultiSchema,
+    MultiNamespace,
     //Start of ME/IE only capabilities
     AutoIncrementAllowedOnNonId,
     AutoIncrementMultipleAllowed,

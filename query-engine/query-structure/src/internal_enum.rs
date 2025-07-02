@@ -14,7 +14,7 @@ impl InternalEnum {
     }
 
     pub fn schema_name(&self) -> Option<&str> {
-        self.dm.walk(self.id).schema().map(|tuple| tuple.0)
+        self.dm.walk(self.id).namespace().map(|tuple| tuple.0)
     }
 }
 

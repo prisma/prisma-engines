@@ -13,7 +13,7 @@ use psl::{
 use crate::LSPContext;
 
 mod datasource;
-mod multi_schema;
+mod multi_namespaces;
 mod referential_actions;
 
 pub(super) type CompletionContext<'a> = LSPContext<'a, CompletionParams>;
@@ -210,7 +210,7 @@ fn push_namespaces(ctx: CompletionContext<'_>, completion_list: &mut CompletionL
             namespace.to_string()
         };
 
-        multi_schema::schema_namespace_completion(completion_list, namespace, insert_text);
+        multi_namespaces::schema_namespace_completion(completion_list, namespace, insert_text);
     }
 }
 

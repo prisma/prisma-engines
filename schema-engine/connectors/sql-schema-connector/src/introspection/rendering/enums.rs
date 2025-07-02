@@ -46,7 +46,7 @@ fn render_enum(r#enum: EnumPair<'_>) -> renderer::Enum<'_> {
     let mut rendered_enum = renderer::Enum::new(r#enum.name());
 
     if let Some(schema) = r#enum.namespace() {
-        rendered_enum.schema(schema);
+        rendered_enum.namespace(schema);
     }
 
     if let Some(mapped_name) = r#enum.mapped_name() {

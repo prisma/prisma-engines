@@ -201,7 +201,7 @@ fn match_enums(sql_schema: &sql::SqlSchema, prisma_schema: &psl::ValidatedSchema
             .walk_enums()
             .filter_map(|prisma_enum| {
                 sql_schema
-                    .find_enum(prisma_enum.database_name(), prisma_enum.schema().map(|s| s.0))
+                    .find_enum(prisma_enum.database_name(), prisma_enum.namespace().map(|s| s.0))
                     .map(|sql_id| (sql_id, prisma_enum.id))
             })
             .collect()
@@ -216,7 +216,7 @@ fn match_existing_models(
     map: &mut IntrospectionMap<'_>,
 ) {
     for model in prisma_schema.db.walk_models() {
-        match schema.find_table(model.database_name(), model.schema_name()) {
+        match schema.find_table(model.database_name(), model.namespace_name()) {
             Some(sql_id) => {
                 map.existing_models.insert(sql_id, model.id);
             }
@@ -236,7 +236,7 @@ fn match_existing_views(
     map: &mut IntrospectionMap<'_>,
 ) {
     for view in prisma_schema.db.walk_views() {
-        match sql_schema.find_view(view.database_name(), view.schema_name()) {
+        match sql_schema.find_view(view.database_name(), view.namespace_name()) {
             Some(sql_id) => {
                 map.existing_views.insert(sql_id, view.id);
             }

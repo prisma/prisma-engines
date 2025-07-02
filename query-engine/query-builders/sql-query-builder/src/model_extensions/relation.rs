@@ -74,7 +74,7 @@ impl AsTable for Relation {
             // a `MERGE` statement.
             walkers::RefinedRelationWalker::ImplicitManyToMany(ref m) => {
                 let mut table = Table::from(m.table_name().to_string());
-                if let Some(prefix) = m.model_a().schema_name().or_else(|| ctx.schema_name()) {
+                if let Some(prefix) = m.model_a().namespace_name().or_else(|| ctx.schema_name()) {
                     table = table.database(prefix.to_owned());
                 };
                 table.add_unique_index(vec![Column::from("A"), Column::from("B")])

@@ -12,7 +12,7 @@ pub struct SourceConfig {
     pub url: StringFromEnvVar,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub direct_url: Option<StringFromEnvVar>,
-    pub schemas: Vec<String>,
+    pub namespaces: Vec<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub documentation: Option<String>,
     pub source_file_path: String,
@@ -39,7 +39,7 @@ fn sources_to_json_structs(sources: &[configuration::Datasource], files: &Files)
 }
 
 fn source_to_json_struct(source: &configuration::Datasource, files: &Files) -> SourceConfig {
-    let schemas: Vec<String> = source
+    let namespaces: Vec<String> = source
         .namespaces
         .iter()
         .map(|(namespace, _)| namespace.clone())
@@ -52,7 +52,7 @@ fn source_to_json_struct(source: &configuration::Datasource, files: &Files) -> S
         url: source.url.clone(),
         direct_url: source.direct_url.clone(),
         documentation: source.documentation.clone(),
-        schemas,
+        namespaces,
         source_file_path: files[source.span().file_id].0.clone(),
     }
 }

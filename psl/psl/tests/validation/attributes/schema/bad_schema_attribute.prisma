@@ -1,7 +1,7 @@
 datasource testds {
     provider = "postgresql"
     url = env("TEST_DATABASE_URL")
-    schemas = ["public"]
+    namespaces = ["public"]
 }
 
 generator js {
@@ -11,19 +11,19 @@ generator js {
 
 model Test {
   id Int @id
-  @@schema
+  @@namespace
 }
 
 enum Language {
   English
   Spanish
 
-  @@schema
+  @@namespace
 }
 
 model Test2 {
   id Int @id
-  @@schema(101)
+  @@namespace(101)
 }
 
 
@@ -31,17 +31,17 @@ model Test2 {
 //   [1;94m-->[0m  [4mschema.prisma:14[0m
 // [1;94m   | [0m
 // [1;94m13 | [0m  id Int @id
-// [1;94m14 | [0m  [1;91m@@schema[0m
+// [1;94m14 | [0m  [1;91m@@namespace[0m
 // [1;94m   | [0m
 // [1;91merror[0m: [1mArgument "map" is missing.[0m
 //   [1;94m-->[0m  [4mschema.prisma:21[0m
 // [1;94m   | [0m
 // [1;94m20 | [0m
-// [1;94m21 | [0m  [1;91m@@schema[0m
+// [1;94m21 | [0m  [1;91m@@namespace[0m
 // [1;94m   | [0m
 // [1;91merror[0m: [1mExpected a string value, but received numeric value `101`.[0m
 //   [1;94m-->[0m  [4mschema.prisma:26[0m
 // [1;94m   | [0m
 // [1;94m25 | [0m  id Int @id
-// [1;94m26 | [0m  @@schema([1;91m101[0m)
+// [1;94m26 | [0m  @@namespace([1;91m101[0m)
 // [1;94m   | [0m

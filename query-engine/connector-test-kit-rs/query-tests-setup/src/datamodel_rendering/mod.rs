@@ -38,14 +38,14 @@ pub fn render_test_datamodel(
     template: String,
     excluded_features: &[&str],
     relation_mode_override: Option<String>,
-    db_schemas: &[&str],
+    db_namespaces: &[&str],
     db_extensions: &[&str],
     isolation_level: Option<&'static str>,
 ) -> String {
     let (tag, version) = CONFIG.test_connector().unwrap();
     let preview_features = render_preview_features(tag.datamodel_provider(), excluded_features);
 
-    let is_multi_schema = !db_schemas.is_empty();
+    let is_multi_namespaces = !db_namespaces.is_empty();
 
     let datasource = DatasourceBuilder::new("test")
         .provider(tag.datamodel_provider())
@@ -53,11 +53,11 @@ pub fn render_test_datamodel(
             &CONFIG,
             &version,
             test_database,
-            is_multi_schema,
+            is_multi_namespaces,
             isolation_level,
         ))
         .relation_mode(relation_mode_override.unwrap_or_else(|| tag.relation_mode().to_string()))
-        .schemas_if_not_empty(db_schemas)
+        .namespaces_if_not_empty(db_namespaces)
         .extensions_if_not_empty(db_extensions)
         .render();
 

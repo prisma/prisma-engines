@@ -5,7 +5,7 @@ mod disconnect;
 mod interactive_tx;
 mod logs;
 mod metrics;
-mod multi_schema;
+mod multi_namspaces;
 mod native_types;
 mod native_upsert;
 mod occ;

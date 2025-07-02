@@ -14,7 +14,7 @@ use schema_ast::ast::WithSpan;
 use std::{borrow::Cow, collections::HashMap};
 
 const PREVIEW_FEATURES_KEY: &str = "previewFeatures";
-const SCHEMAS_KEY: &str = "schemas";
+const NAMESPACES_KEY: &str = "namespaces";
 const SHADOW_DATABASE_URL_KEY: &str = "shadowDatabaseUrl";
 const URL_KEY: &str = "url";
 const DIRECT_URL_KEY: &str = "directUrl";
@@ -200,28 +200,28 @@ fn lift_datasource(
 
     let documentation = ast_source.documentation().map(String::from);
 
-    let (schemas, schemas_span) = match args.remove(SCHEMAS_KEY) {
-        Some((_span, schemas)) => coerce_array(schemas, &coerce::string_with_span, diagnostics)
-            .map(|b| (b, schemas.span()))
-            .and_then(|(mut schemas, span)| {
-                if schemas.is_empty() {
-                    diagnostics.push_error(DatamodelError::new_schemas_array_empty_error(span));
+    let (namespaces, namespaces_span) = match args.remove(NAMESPACES_KEY) {
+        Some((_span, namespaces)) => coerce_array(namespaces, &coerce::string_with_span, diagnostics)
+            .map(|b| (b, namespaces.span()))
+            .and_then(|(mut namespaces, span)| {
+                if namespaces.is_empty() {
+                    diagnostics.push_error(DatamodelError::new_namespaces_array_empty_error(span));
 
                     return None;
                 }
 
-                schemas.sort_by(|(a, _), (b, _)| a.cmp(b));
+                namespaces.sort_by(|(a, _), (b, _)| a.cmp(b));
 
-                for pair in schemas.windows(2) {
+                for pair in namespaces.windows(2) {
                     if pair[0].0 == pair[1].0 {
                         diagnostics.push_error(DatamodelError::new_static(
-                            "Duplicated schema names are not allowed",
+                            "Duplicated namespace names are not allowed",
                             pair[0].1,
                         ))
                     }
                 }
 
-                Some((schemas, Some(span)))
+                Some((namespaces, Some(span)))
             })
             .unwrap_or_default(),
 
@@ -233,9 +233,9 @@ fn lift_datasource(
     }
 
     Some(Datasource {
-        namespaces: schemas.into_iter().map(|(s, span)| (s.to_owned(), span)).collect(),
+        namespaces: namespaces.into_iter().map(|(s, span)| (s.to_owned(), span)).collect(),
         span: ast_source.span(),
-        schemas_span,
+        namespaces_span,
         name: source_name.to_owned(),
         provider: provider.to_owned(),
         active_provider: active_connector.provider_name(),

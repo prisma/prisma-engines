@@ -1,5 +1,0 @@
-model A {
-    id Int @id
-
-    @@schema("base")
-}

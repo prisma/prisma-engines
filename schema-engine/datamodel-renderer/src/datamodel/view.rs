@@ -15,7 +15,7 @@ pub struct View<'a> {
     map: Option<BlockAttribute<'a>>,
     fields: Vec<Field<'a>>,
     indexes: Vec<IndexDefinition<'a>>,
-    schema: Option<BlockAttribute<'a>>,
+    namespace: Option<BlockAttribute<'a>>,
 }
 
 impl<'a> View<'a> {
@@ -36,7 +36,7 @@ impl<'a> View<'a> {
             documentation: None,
             ignore: None,
             id: None,
-            schema: None,
+            namespace: None,
             fields: Vec::new(),
             indexes: Vec::new(),
         }
@@ -97,19 +97,19 @@ impl<'a> View<'a> {
         self.map = Some(BlockAttribute(fun));
     }
 
-    /// The schema attribute of the view block
+    /// The namespace attribute of the view block
     ///
     /// ```ignore
     /// view Foo {
-    ///   @@schema("public")
+    ///   @@namespace("public")
     ///   ^^^^^^^^^^^^^^^^^^ this
     /// }
     /// ```
-    pub fn schema(&mut self, schema: impl Into<Cow<'a, str>>) {
-        let mut fun = Function::new("schema");
-        fun.push_param(schema.into());
+    pub fn namespace(&mut self, namespace: impl Into<Cow<'a, str>>) {
+        let mut fun = Function::new("namespace");
+        fun.push_param(namespace.into());
 
-        self.schema = Some(BlockAttribute(fun));
+        self.namespace = Some(BlockAttribute(fun));
     }
 
     /// Push a new field to the view.
@@ -169,8 +169,8 @@ impl fmt::Display for View<'_> {
             writeln!(f, "{comment}{ignore}")?;
         }
 
-        if let Some(ref schema) = self.schema {
-            writeln!(f, "{comment}{schema}")?;
+        if let Some(ref namespace) = self.namespace {
+            writeln!(f, "{comment}{namespace}")?;
         }
 
         writeln!(f, "{comment}}}")?;
@@ -279,7 +279,7 @@ mod tests {
         let fulltext = IndexDefinition::fulltext(["foo", "bar"].iter().map(|s| IndexFieldInput::new(*s)));
         model.push_index(fulltext);
 
-        model.schema("public");
+        model.namespace("public");
         model.ignore();
 
         let expected = expect![[r#"
@@ -302,7 +302,7 @@ mod tests {
               @@fulltext([foo, bar])
               @@map("1Country")
               @@ignore
-              @@schema("public")
+              @@namespace("public")
             }
         "#]];
 

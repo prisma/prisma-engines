@@ -342,7 +342,7 @@ impl TestApi {
         let namespaces = if namespaces.is_empty() {
             "".to_string()
         } else {
-            format!("\nschemas = [{}]", namespaces.join(", "))
+            format!("\nnamespaces = [{}]", namespaces.join(", "))
         };
 
         let provider = &self.args.provider();

@@ -1,0 +1,41 @@
+[
+  {
+    "title": "Add `@@namespace` attribute",
+    "kind": "quickfix",
+    "diagnostics": [
+      {
+        "range": {
+          "start": {
+            "line": 11,
+            "character": 0
+          },
+          "end": {
+            "line": 13,
+            "character": 1
+          }
+        },
+        "severity": 1,
+        "message": "This model is missing an `@@namespace` attribute."
+      }
+    ],
+    "edit": {
+      "changes": {
+        "file:///path/to/schema.prisma": [
+          {
+            "range": {
+              "start": {
+                "line": 13,
+                "character": 0
+              },
+              "end": {
+                "line": 13,
+                "character": 1
+              }
+            },
+            "newText": "\n    @@namespace(\"\")\n}"
+          }
+        ]
+      }
+    }
+  }
+]

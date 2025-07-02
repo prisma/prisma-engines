@@ -19,22 +19,22 @@ pub(crate) fn extensions_completion(completion_list: &mut lsp_types::CompletionL
 }
 
 #[cfg(any(feature = "postgresql", feature = "cockroachdb", feature = "mssql"))]
-pub(crate) fn schemas_completion(completion_list: &mut lsp_types::CompletionList) {
+pub(crate) fn namespaces_completion(completion_list: &mut lsp_types::CompletionList) {
     use lsp_types::*;
     completion_list.items.push(CompletionItem {
-        label: "schemas".to_owned(),
-        insert_text: Some(r#"schemas = [$0]"#.to_owned()),
+        label: "namespaces".to_owned(),
+        insert_text: Some(r#"namespaces = [$0]"#.to_owned()),
         insert_text_format: Some(InsertTextFormat::SNIPPET),
         kind: Some(CompletionItemKind::FIELD),
         documentation: Some(Documentation::MarkupContent(MarkupContent {
             kind: MarkupKind::Markdown,
             value: crate::datamodel_connector::format_completion_docs(
-                r#"schemas = ["foo", "bar", "baz"]"#,
-                "The list of database schemas. [Learn More](https://pris.ly/d/multi-schema-configuration)",
+                r#"namespaces = ["foo", "bar", "baz"]"#,
+                "The list of database namespaces. [Learn More](https://pris.ly/d/multi-schema-configuration)",
                 None,
             ),
         })),
-        // detail: Some("schemas".to_owned()),
+        // detail: Some("namespaces".to_owned()),
         ..Default::default()
     });
 }

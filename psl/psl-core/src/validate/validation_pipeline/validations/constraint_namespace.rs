@@ -22,7 +22,7 @@ impl<'db> ConstraintNamespace<'db> {
         name: ConstraintName<'db>,
         ctx: &super::Context<'db>,
     ) -> impl Iterator<Item = &'db ConstraintScope> + '_ {
-        let schema_name = ctx.db.walk(model_id).schema_name();
+        let schema_name = ctx.db.walk(model_id).namespace_name();
         self.global_constraint_name_scope_violations(schema_name, name)
             .chain(self.local_constraint_name_scope_violations(model_id, name))
     }
@@ -74,7 +74,11 @@ impl<'db> ConstraintNamespace<'db> {
         {
             let counter = self
                 .global
-                .entry((scope, index.model().schema_name(), index.constraint_name(ctx.connector)))
+                .entry((
+                    scope,
+                    index.model().namespace_name(),
+                    index.constraint_name(ctx.connector),
+                ))
                 .or_default();
             *counter += 1;
         }
@@ -84,7 +88,7 @@ impl<'db> ConstraintNamespace<'db> {
     pub(super) fn add_global_relations(&mut self, scope: ConstraintScope, ctx: &super::Context<'db>) {
         for relation in ctx.db.walk_relations().filter_map(|r| r.refine().as_inline()) {
             let name = relation.constraint_name(ctx.connector);
-            let schema = relation.referencing_model().schema_name();
+            let schema = relation.referencing_model().namespace_name();
             let counter = self.global.entry((scope, schema, name)).or_default();
             *counter += 1;
         }
@@ -94,7 +98,7 @@ impl<'db> ConstraintNamespace<'db> {
     pub(super) fn add_global_primary_keys(&mut self, scope: ConstraintScope, ctx: &super::Context<'db>) {
         for model in ctx.db.walk_models().chain(ctx.db.walk_views()) {
             if let Some(name) = model.primary_key().and_then(|k| k.constraint_name(ctx.connector)) {
-                let schema_name = model.schema_name();
+                let schema_name = model.namespace_name();
                 let counter = self.global.entry((scope, schema_name, name)).or_default();
                 *counter += 1;
             }
@@ -117,7 +121,7 @@ impl<'db> ConstraintNamespace<'db> {
 
                 let counter = self
                     .global
-                    .entry((scope, field.model().schema_name(), name))
+                    .entry((scope, field.model().namespace_name(), name))
                     .or_default();
                 *counter += 1;
             }

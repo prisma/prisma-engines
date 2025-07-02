@@ -23,7 +23,7 @@ pub fn connector_test_impl(attr: TokenStream, input: TokenStream) -> TokenStream
 
     let excluded_features = args.exclude_features.features();
     let excluded_executors = args.exclude_executors.as_ref();
-    let db_schemas = args.db_schemas.schemas();
+    let db_namespaces = args.db_namespaces.schemas();
     let db_extensions = args.db_extensions.extensions();
     let only = &args.only;
     let exclude = &args.exclude;
@@ -84,7 +84,7 @@ pub fn connector_test_impl(attr: TokenStream, input: TokenStream) -> TokenStream
                 &[#(#excluded_features),*],
                 &[#(#excluded_executors),*],
                 #handler,
-                &[#(#db_schemas),*],
+                &[#(#db_namespaces),*],
                 &[#(#db_extensions),*],
                 #referential_override,
                 #runner_fn_ident,

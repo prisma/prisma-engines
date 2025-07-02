@@ -230,7 +230,7 @@ impl Runner {
 
     pub async fn load(
         datamodel: String,
-        db_schemas: &[&str],
+        db_namespaces: &[&str],
         connector_version: ConnectorVersion,
         connector_tag: ConnectorTag,
         override_local_max_bind_values: Option<usize>,
@@ -249,7 +249,7 @@ impl Runner {
                 let external_initializer = external_executor.init(&datamodel, url.as_str());
 
                 let init_external_result =
-                    qe_setup::setup_external(with_driver_adapter.adapter, external_initializer, db_schemas).await?;
+                    qe_setup::setup_external(with_driver_adapter.adapter, external_initializer, db_namespaces).await?;
 
                 let database_version = None;
                 let executor = RunnerExecutor::External(external_executor);
@@ -257,7 +257,7 @@ impl Runner {
                 (executor, database_version, Some(init_external_result))
             }
             None => {
-                qe_setup::setup(&datamodel, db_schemas).await?;
+                qe_setup::setup(&datamodel, db_namespaces).await?;
 
                 let query_executor = request_handlers::load_executor(
                     ConnectorKind::Rust {

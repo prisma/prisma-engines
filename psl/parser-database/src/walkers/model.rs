@@ -269,23 +269,23 @@ impl<'db> ModelWalker<'db> {
         newline(src, span)
     }
 
-    /// The name of the schema the model belongs to.
+    /// The name of the (schema) namespace the model belongs to.
     ///
     /// ```ignore
-    /// @@schema("public")
+    /// @@namespace("public")
     ///          ^^^^^^^^
     /// ```
-    pub fn schema(self) -> Option<(&'db str, ast::Span)> {
-        self.attributes().schema.map(|(id, span)| (&self.db[id], span))
+    pub fn namespace(self) -> Option<(&'db str, ast::Span)> {
+        self.attributes().namespace.map(|(id, span)| (&self.db[id], span))
     }
 
-    /// The name of the schema the model belongs to.
+    /// The name of the (schema) namespace the model belongs to.
     ///
     /// ```ignore
-    /// @@schema("public")
+    /// @@namespace("public")
     ///          ^^^^^^^^
     /// ```
-    pub fn schema_name(self) -> Option<&'db str> {
-        self.schema().map(|(name, _)| name)
+    pub fn namespace_name(self) -> Option<&'db str> {
+        self.namespace().map(|(name, _)| name)
     }
 }

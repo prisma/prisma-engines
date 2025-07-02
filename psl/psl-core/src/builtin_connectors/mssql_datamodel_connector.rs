@@ -33,7 +33,7 @@ const CAPABILITIES: ConnectorCapabilities = enumflags2::make_bitflags!(Connector
     AutoIncrementNonIndexedAllowed |
     CompoundIds |
     CreateMany |
-    MultiSchema |
+    MultiNamespace |
     NamedDefaultValues |
     NamedForeignKeys |
     NamedPrimaryKeys |
@@ -281,8 +281,8 @@ impl Connector for MsSqlDatamodelConnector {
             None => return,
         };
 
-        if config.preview_features().contains(PreviewFeature::MultiSchema) && !ds.schemas_defined() {
-            completions::schemas_completion(completion_list);
+        if config.preview_features().contains(PreviewFeature::MultiSchema) && !ds.namespaces_defined() {
+            completions::namespaces_completion(completion_list);
         }
     }
 

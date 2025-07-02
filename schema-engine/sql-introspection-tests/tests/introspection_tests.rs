@@ -4,7 +4,7 @@ mod enums;
 mod lists;
 mod model_renames;
 mod mssql;
-mod multi_schema;
+mod multi_namespaces;
 mod mysql;
 mod named_constraints;
 mod native_types;

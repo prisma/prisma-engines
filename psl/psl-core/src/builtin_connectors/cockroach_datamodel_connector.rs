@@ -55,7 +55,7 @@ const CAPABILITIES: ConnectorCapabilities = enumflags2::make_bitflags!(Connector
     OrderByNullsFirstLast |
     SupportsTxIsolationSerializable |
     NativeUpsert |
-    MultiSchema |
+    MultiNamespace |
     FilteredInlineChildNestedToOneDisconnect |
     InsertReturning |
     UpdateReturning |
@@ -304,8 +304,8 @@ impl Connector for CockroachDatamodelConnector {
             None => return,
         };
 
-        if config.preview_features().contains(PreviewFeature::MultiSchema) && !ds.schemas_defined() {
-            completions::schemas_completion(completion_list);
+        if config.preview_features().contains(PreviewFeature::MultiSchema) && !ds.namespaces_defined() {
+            completions::namespaces_completion(completion_list);
         }
     }
 

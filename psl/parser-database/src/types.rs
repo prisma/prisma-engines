@@ -339,10 +339,10 @@ pub(crate) struct ModelAttributes {
     /// @@map
     pub(crate) mapped_name: Option<StringId>,
     /// ```ignore
-    /// @@schema("public")
+    /// @@namespace("public")
     ///          ^^^^^^^^
     /// ```
-    pub(crate) schema: Option<(StringId, ast::Span)>,
+    pub(crate) namespace: Option<(StringId, ast::Span)>,
     /// @(@)shardKey
     pub(crate) shard_key: Option<ShardKeyAttribute>,
 }
@@ -640,10 +640,10 @@ pub(super) struct EnumAttributes {
     /// @map on enum values.
     pub(super) mapped_values: HashMap<EnumValueId, StringId>,
     /// ```ignore
-    /// @@schema("public")
+    /// @@namespace("public")
     ///          ^^^^^^^^
     /// ```
-    pub(crate) schema: Option<(StringId, ast::Span)>,
+    pub(crate) namespace: Option<(StringId, ast::Span)>,
 }
 
 fn visit_model<'db>(model_id: crate::ModelId, ast_model: &'db ast::Model, ctx: &mut Context<'db>) {

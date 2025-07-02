@@ -40,7 +40,7 @@ fn serialize_builtin_sources_to_dmmf() {
               "fromEnvVar": null,
               "value": "postgresql://localhost/postgres1"
             },
-            "schemas": [],
+            "namespaces": [],
             "sourceFilePath": "schema.prisma"
           }
         ]"#]];
@@ -64,7 +64,7 @@ fn serialize_builtin_sources_to_dmmf() {
               "fromEnvVar": "pg2",
               "value": null
             },
-            "schemas": [],
+            "namespaces": [],
             "sourceFilePath": "schema.prisma"
           }
         ]"#]];
@@ -88,7 +88,7 @@ fn serialize_builtin_sources_to_dmmf() {
               "fromEnvVar": null,
               "value": "file://file.db"
             },
-            "schemas": [],
+            "namespaces": [],
             "sourceFilePath": "schema.prisma"
           }
         ]"#]];
@@ -112,7 +112,7 @@ fn serialize_builtin_sources_to_dmmf() {
               "fromEnvVar": null,
               "value": "mysql://localhost"
             },
-            "schemas": [],
+            "namespaces": [],
             "sourceFilePath": "schema.prisma"
           }
         ]"#]];
@@ -234,16 +234,16 @@ fn empty_schema_property_should_error() {
         datasource ds {
           provider   = "postgres"
           url        = env("DATABASE_URL")
-          schemas = []
+          namespaces = []
         }
     "#};
 
     let expect = expect![[r#"
-        [1;91merror[0m: [1mIf provided, the schemas array can not be empty.[0m
+        [1;91merror[0m: [1mIf provided, the namespaces array can not be empty.[0m
           [1;94m-->[0m  [4mschema.prisma:9[0m
         [1;94m   | [0m
         [1;94m 8 | [0m  url        = env("DATABASE_URL")
-        [1;94m 9 | [0m  schemas = [1;91m[][0m
+        [1;94m 9 | [0m  namespaces = [1;91m[][0m
         [1;94m   | [0m
     "#]];
 
@@ -251,7 +251,7 @@ fn empty_schema_property_should_error() {
 }
 
 #[test]
-fn schemas_array_without_preview_feature_should_error() {
+fn namespaces_array_without_preview_feature_should_error() {
     let schema = indoc! {r#"
         generator js {
           provider        = "prisma-client-js"
@@ -260,16 +260,16 @@ fn schemas_array_without_preview_feature_should_error() {
         datasource ds {
           provider   = "postgres"
           url        = env("DATABASE_URL")
-          schemas = ["test"]
+          namespaces = ["test"]
         }
     "#};
 
     let expect = expect![[r#"
-        [1;91merror[0m: [1mThe `schemas` property is only availably with the `multiSchema` preview feature.[0m
+        [1;91merror[0m: [1mThe `namespaces` property is only available with the `multiSchema` preview feature.[0m
           [1;94m-->[0m  [4mschema.prisma:8[0m
         [1;94m   | [0m
         [1;94m 7 | [0m  url        = env("DATABASE_URL")
-        [1;94m 8 | [0m  schemas = [1;91m["test"][0m
+        [1;94m 8 | [0m  namespaces = [1;91m["test"][0m
         [1;94m   | [0m
     "#]];
 

@@ -132,7 +132,7 @@ fn model_to_dmmf(model: walkers::ModelWalker<'_>) -> Model {
     Model {
         name: model.name().to_owned(),
         db_name: model.mapped_name().map(ToOwned::to_owned),
-        schema: model.schema().map(|(s, _)| s.to_owned()),
+        schema: model.namespace().map(|(s, _)| s.to_owned()),
         fields: model
             .fields()
             .filter(|field| !should_skip_model_field(field))

@@ -3,14 +3,14 @@ use schema_core::schema_connector::{ConnectorError, ConnectorParams, ConnectorRe
 use std::collections::HashMap;
 use url::Url;
 
-pub(crate) async fn postgres_setup(url: String, prisma_schema: &str, db_schemas: &[&str]) -> ConnectorResult<()> {
+pub(crate) async fn postgres_setup(url: String, prisma_schema: &str, db_namespaces: &[&str]) -> ConnectorResult<()> {
     let mut parsed_url = Url::parse(&url).map_err(ConnectorError::url_parse_error)?;
     let mut quaint_url = quaint::connector::PostgresNativeUrl::new(parsed_url.clone()).unwrap();
     quaint_url.set_flavour(PostgresFlavour::Postgres);
 
     let (db_name, schema) = (quaint_url.dbname(), quaint_url.schema());
 
-    if !db_schemas.is_empty() {
+    if !db_namespaces.is_empty() {
         strip_schema_param_from_url(&mut parsed_url);
         let conn = create_postgres_admin_conn(parsed_url.clone()).await?;
 
@@ -47,9 +47,9 @@ pub(crate) async fn postgres_setup(url: String, prisma_schema: &str, db_schemas:
     result
 }
 
-pub(crate) async fn postgres_teardown(url: &str, db_schemas: &[&str]) -> ConnectorResult<()> {
+pub(crate) async fn postgres_teardown(url: &str, db_namespaces: &[&str]) -> ConnectorResult<()> {
     // only teardown if we doing multischema
-    if !db_schemas.is_empty() {
+    if !db_namespaces.is_empty() {
         let mut url = Url::parse(url).map_err(ConnectorError::url_parse_error)?;
         strip_schema_param_from_url(&mut url);
 

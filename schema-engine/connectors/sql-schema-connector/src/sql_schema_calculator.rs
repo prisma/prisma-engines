@@ -57,7 +57,7 @@ pub(crate) fn calculate_sql_schema(
 fn push_model_tables(ctx: &mut Context<'_>) {
     for model in ctx.datamodel.db.walk_models() {
         let namespace_id = model
-            .schema()
+            .namespace()
             .and_then(|(name, _)| ctx.schemas.get(name))
             .copied()
             .unwrap_or_default();

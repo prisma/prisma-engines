@@ -19,7 +19,7 @@ mod mark_migration_rolled_back_tests;
 mod migrate_lock;
 mod migration_persistence_tests;
 mod mssql;
-mod multi_schema;
+mod multi_namespaces;
 mod mysql;
 mod postgres;
 mod relation_mode;

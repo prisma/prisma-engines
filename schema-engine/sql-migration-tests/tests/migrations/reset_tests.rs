@@ -100,7 +100,7 @@ fn reset_then_diagnostics_with_migrations_directory_works(api: TestApi) {
     namespaces("felines", "rodents"),
     preview_features("multiSchema")
 )]
-fn multi_schema_reset(mut api: TestApi) {
+fn multi_namespaces_reset(mut api: TestApi) {
     let prisma_schema = format! {
         r#"
             {}
@@ -112,12 +112,12 @@ fn multi_schema_reset(mut api: TestApi) {
 
             model Manul {{
                 id Int @id
-                @@schema("felines")
+                @@namespace("felines")
             }}
 
             model Capybara {{
                 id Int @id
-                @@schema("rodents")
+                @@namespace("rodents")
             }}
         "#, api.datasource_block_with(&[("schemas", r#"["felines", "rodents"]"#)])
     };

@@ -74,14 +74,14 @@ impl<'db> EnumWalker<'db> {
         newline(src, value.span)
     }
 
-    /// The name of the schema the enum belongs to.
+    /// The name of the (schema) namespace the enum belongs to.
     ///
     /// ```ignore
-    /// @@schema("public")
+    /// @@namespace("public")
     ///          ^^^^^^^^
     /// ```
-    pub fn schema(self) -> Option<(&'db str, ast::Span)> {
-        self.attributes().schema.map(|(id, span)| (&self.db[id], span))
+    pub fn namespace(self) -> Option<(&'db str, ast::Span)> {
+        self.attributes().namespace.map(|(id, span)| (&self.db[id], span))
     }
 }
 

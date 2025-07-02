@@ -1,7 +1,7 @@
 datasource testds {
     provider = "postgresql"
     url = env("TEST_DATABASE_URL")
-    schemas = ["one", 2, ["three"]]
+    namespaces = ["one", 2, ["three"]]
 }
 
 
@@ -9,11 +9,11 @@ datasource testds {
 //   [1;94m-->[0m  [4mschema.prisma:4[0m
 // [1;94m   | [0m
 // [1;94m 3 | [0m    url = env("TEST_DATABASE_URL")
-// [1;94m 4 | [0m    schemas = ["one", [1;91m2[0m, ["three"]]
+// [1;94m 4 | [0m    namespaces = ["one", [1;91m2[0m, ["three"]]
 // [1;94m   | [0m
 // [1;91merror[0m: [1mExpected a string value, but received array value `["three"]`.[0m
 //   [1;94m-->[0m  [4mschema.prisma:4[0m
 // [1;94m   | [0m
 // [1;94m 3 | [0m    url = env("TEST_DATABASE_URL")
-// [1;94m 4 | [0m    schemas = ["one", 2, [1;91m["three"][0m]
+// [1;94m 4 | [0m    namespaces = ["one", 2, [1;91m["three"][0m]
 // [1;94m   | [0m

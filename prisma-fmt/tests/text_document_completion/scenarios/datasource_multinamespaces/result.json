@@ -1,0 +1,45 @@
+{
+  "isIncomplete": false,
+  "items": [
+    {
+      "label": "shadowDatabaseUrl",
+      "kind": 5,
+      "documentation": {
+        "kind": "markdown",
+        "value": "```prisma\nshadowDatabaseUrl = \"String\" | env(\"ENVIRONMENT_VARIABLE\")\n```\n___\nConnection URL including authentication info to use for Migrate's [shadow database](https://pris.ly/d/migrate-shadow).\n\n"
+      },
+      "insertText": "shadowDatabaseUrl = $0",
+      "insertTextFormat": 2
+    },
+    {
+      "label": "directUrl",
+      "kind": 5,
+      "documentation": {
+        "kind": "markdown",
+        "value": "```prisma\ndirectUrl = \"String\" | env(\"ENVIRONMENT_VARIABLE\")\n```\n___\nConnection URL for direct connection to the database. [Learn more](https://pris.ly/d/data-proxy-cli).\n\n"
+      },
+      "insertText": "directUrl = $0",
+      "insertTextFormat": 2
+    },
+    {
+      "label": "relationMode",
+      "kind": 5,
+      "documentation": {
+        "kind": "markdown",
+        "value": "```prisma\nrelationMode = \"foreignKeys\" | \"prisma\"\n```\n___\nSet the global relation mode for all relations. Values can be either \"foreignKeys\" (Default), or \"prisma\". [Learn more](https://pris.ly/d/relation-mode)\n\n"
+      },
+      "insertText": "relationMode = $0",
+      "insertTextFormat": 2
+    },
+    {
+      "label": "namespaces",
+      "kind": 5,
+      "documentation": {
+        "kind": "markdown",
+        "value": "```prisma\nnamespaces = [\"foo\", \"bar\", \"baz\"]\n```\n___\nThe list of database namespaces. [Learn More](https://pris.ly/d/multi-schema-configuration)\n\n"
+      },
+      "insertText": "namespaces = [$0]",
+      "insertTextFormat": 2
+    }
+  ]
+}

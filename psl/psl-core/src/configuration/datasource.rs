@@ -28,9 +28,9 @@ pub struct Datasource {
     pub shadow_database_url: Option<(StringFromEnvVar, Span)>,
     /// In which layer referential actions are handled.
     pub relation_mode: Option<RelationMode>,
-    /// _Sorted_ vec of schemas defined in the schemas property.
+    /// _Sorted_ vec of namespaces defined in the namespaces property.
     pub namespaces: Vec<(String, Span)>,
-    pub schemas_span: Option<Span>,
+    pub namespaces_span: Option<Span>,
     pub connector_data: DatasourceConnectorData,
 }
 
@@ -271,8 +271,8 @@ impl Datasource {
         self.relation_mode.is_some()
     }
 
-    pub fn schemas_defined(&self) -> bool {
-        self.schemas_span.is_some()
+    pub fn namespaces_defined(&self) -> bool {
+        self.namespaces_span.is_some()
     }
 }
 

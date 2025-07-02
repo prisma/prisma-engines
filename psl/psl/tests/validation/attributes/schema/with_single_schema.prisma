@@ -1,7 +1,7 @@
 datasource testds {
     provider = "postgresql"
     url = env("TEST_DATABASE_URL")
-    schemas = ["public"]
+    namespaces = ["public"]
 }
 
 generator js {
@@ -11,14 +11,14 @@ generator js {
 
 model Test {
   id Int @id
-  @@schema("public")
+  @@namespace("public")
 }
 
 enum Language {
   English
   Spanish
 
-  @@schema("public")
+  @@namespace("public")
 }
 
 

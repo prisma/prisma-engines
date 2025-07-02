@@ -82,7 +82,7 @@ fn render_model(model: ModelPair<'_>, sql_family: SqlFamily) -> renderer::Model<
     }
 
     if let Some(namespace) = model.namespace() {
-        rendered.schema(namespace);
+        rendered.namespace(namespace);
     }
 
     if model.ignored() {

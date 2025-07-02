@@ -1,8 +1,8 @@
 mod default;
 mod id;
 mod map;
+mod namespace;
 mod native_types;
-mod schema;
 mod shard_key;
 
 use crate::{
@@ -114,9 +114,9 @@ fn resolve_enum_attributes<'db>(enum_id: crate::EnumId, ast_enum: &'db ast::Enum
         ctx.validate_visited_arguments();
     }
 
-    // @@schema
-    if ctx.visit_optional_single_attr("schema") {
-        schema::r#enum(&mut enum_attributes, ctx);
+    // @@namespace
+    if ctx.visit_optional_single_attr("namespace") {
+        namespace::r#enum(&mut enum_attributes, ctx);
         ctx.validate_visited_arguments();
     }
 
@@ -153,9 +153,9 @@ fn resolve_model_attributes(model_id: crate::ModelId, ctx: &mut Context<'_>) {
         ctx.validate_visited_arguments();
     }
 
-    // @@schema
-    if ctx.visit_optional_single_attr("schema") {
-        schema::model(&mut model_attributes, ctx);
+    // @@namespace
+    if ctx.visit_optional_single_attr("namespace") {
+        namespace::model(&mut model_attributes, ctx);
         ctx.validate_visited_arguments();
     }
 

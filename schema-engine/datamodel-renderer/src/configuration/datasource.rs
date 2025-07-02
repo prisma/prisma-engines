@@ -163,7 +163,7 @@ impl fmt::Display for Datasource<'_> {
         }
 
         if !self.namespaces.is_empty() {
-            writeln!(f, "schemas = {}", self.namespaces)?;
+            writeln!(f, "namespaces = {}", self.namespaces)?;
         }
 
         f.write_str("}\n")?;

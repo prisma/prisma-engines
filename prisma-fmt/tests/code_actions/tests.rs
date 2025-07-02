@@ -42,14 +42,14 @@ scenarios! {
     relation_mode_referential_integrity
     relation_mode_mysql_foreign_keys_set_default
     relation_mode_mysql_foreign_keys_set_default_multifile
-    multi_schema_one_model
-    multi_schema_one_model_multifile
-    multi_schema_one_model_one_enum
-    multi_schema_one_model_one_enum_multifile
-    multi_schema_two_models
-    multi_schema_add_to_existing_schemas
-    multi_schema_add_to_existing_schemas_multifile
-    multi_schema_add_to_nonexisting_schemas
+    multi_namespaces_one_model
+    multi_namespaces_one_model_multifile
+    multi_namespaces_one_model_one_enum
+    multi_namespaces_one_model_one_enum_multifile
+    multi_namespaces_two_models
+    multi_namespaces_add_to_existing_schemas
+    multi_namespaces_add_to_existing_schemas_multifile
+    multi_namespaces_add_to_nonexisting_schemas
     mongodb_at_map
     mongodb_at_map_multifile
     mongodb_at_map_with_validation_errors

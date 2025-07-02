@@ -31,16 +31,16 @@ impl<'a> DatasourceBuilder<'a> {
         self
     }
 
-    pub fn schemas(mut self, schemas: &[&str]) -> Self {
-        self.add_debug("schemas", schemas);
+    pub fn namespaces(mut self, namespaces: &[&str]) -> Self {
+        self.add_debug("namespaces", namespaces);
         self
     }
 
-    pub fn schemas_if_not_empty(self, schemas: &[&str]) -> Self {
-        if schemas.is_empty() {
+    pub fn namespaces_if_not_empty(self, namespaces: &[&str]) -> Self {
+        if namespaces.is_empty() {
             self
         } else {
-            self.schemas(schemas)
+            self.namespaces(namespaces)
         }
     }
 
@@ -82,7 +82,7 @@ mod test {
             .provider("postgresql")
             .url("postgres://test")
             .relation_mode("foreignKeys")
-            .schemas(&["public"])
+            .namespaces(&["public"])
             .extensions(&["citext", r#"postgis(version: "2.1")"#])
             .render();
 
@@ -94,7 +94,7 @@ mod test {
                     provider = "postgresql"
                     url = "postgres://test"
                     relationMode = "foreignKeys"
-                    schemas = ["public"]
+                    namespaces = ["public"]
                     extensions = [citext, postgis(version: "2.1")]
                 }
                 "#
@@ -125,7 +125,7 @@ mod test {
     #[test]
     fn skip_empty_arrays() {
         let datasource = DatasourceBuilder::new("invalid")
-            .schemas_if_not_empty(&[])
+            .namespaces_if_not_empty(&[])
             .extensions_if_not_empty(&[])
             .render();
 

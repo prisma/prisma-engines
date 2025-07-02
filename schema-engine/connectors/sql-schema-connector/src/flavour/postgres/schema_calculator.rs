@@ -41,7 +41,7 @@ impl SqlSchemaCalculatorFlavour for PostgresSchemaCalculatorFlavour {
     fn calculate_enums(&self, ctx: &mut Context<'_>) {
         for prisma_enum in ctx.datamodel.db.walk_enums() {
             let sql_namespace_id: sql::NamespaceId = prisma_enum
-                .schema()
+                .namespace()
                 .and_then(|(name, _)| ctx.schemas.get(name).cloned())
                 .unwrap_or_default();
             let sql_enum_id =

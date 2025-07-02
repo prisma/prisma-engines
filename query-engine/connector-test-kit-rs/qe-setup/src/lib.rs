@@ -68,7 +68,7 @@ fn parse_configuration(datamodel: &str) -> ConnectorResult<(Datasource, String, 
 pub async fn setup_external<'a>(
     driver_adapter: DriverAdapter,
     initializer: impl ExternalInitializer<'a>,
-    db_schemas: &[&str],
+    db_namespaces: &[&str],
 ) -> ConnectorResult<InitResult> {
     let prisma_schema = initializer.datamodel();
     let (source, _, _preview_features) = parse_configuration(prisma_schema)?;
@@ -90,7 +90,7 @@ pub async fn setup_external<'a>(
                 .map_err(|err| ConnectorError::from_msg(format!("Error migrating with D1 adapter: {err}")))
         }
         _ => {
-            setup(prisma_schema, db_schemas).await?;
+            setup(prisma_schema, db_namespaces).await?;
 
             // 3. Tell JavaScript to initialize the external test session.
             //    The schema migration is taken care of by the Schema Engine.
@@ -105,14 +105,14 @@ pub async fn setup_external<'a>(
 }
 
 /// Database setup for connector-test-kit-rs.
-pub async fn setup(prisma_schema: &str, db_schemas: &[&str]) -> ConnectorResult<()> {
+pub async fn setup(prisma_schema: &str, db_namespaces: &[&str]) -> ConnectorResult<()> {
     let (source, url, _preview_features) = parse_configuration(prisma_schema)?;
 
     let provider = Provider::try_from(source.active_provider).ok();
 
     match provider {
-        Some(Provider::SqlServer) => mssql_setup(url, prisma_schema, db_schemas).await,
-        Some(Provider::Postgres) => postgres_setup(url, prisma_schema, db_schemas).await,
+        Some(Provider::SqlServer) => mssql_setup(url, prisma_schema, db_namespaces).await,
+        Some(Provider::Postgres) => postgres_setup(url, prisma_schema, db_namespaces).await,
         Some(Provider::Cockroach) => cockroach_setup(url, prisma_schema).await,
         Some(Provider::Mysql) => mysql_setup(url, prisma_schema).await,
         Some(Provider::Mongo) => mongo_setup(prisma_schema, &url).await,
@@ -122,12 +122,12 @@ pub async fn setup(prisma_schema: &str, db_schemas: &[&str]) -> ConnectorResult<
 }
 
 /// Database teardown for connector-test-kit-rs.
-pub async fn teardown(prisma_schema: &str, db_schemas: &[&str]) -> ConnectorResult<()> {
+pub async fn teardown(prisma_schema: &str, db_namespaces: &[&str]) -> ConnectorResult<()> {
     let (source, url, _) = parse_configuration(prisma_schema)?;
 
     match &source.active_provider {
         provider if [POSTGRES.provider_name()].contains(provider) => {
-            postgres_teardown(&url, db_schemas).await?;
+            postgres_teardown(&url, db_namespaces).await?;
         }
 
         provider

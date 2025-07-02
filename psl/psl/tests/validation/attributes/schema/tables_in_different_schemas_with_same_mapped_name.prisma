@@ -6,9 +6,9 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("TEST_DATABASE_URL")
-  schemas  = ["base", "transactional"]
+  provider   = "postgresql"
+  url        = env("TEST_DATABASE_URL")
+  namespaces = ["base", "transactional"]
 }
 
 model User {
@@ -17,7 +17,7 @@ model User {
   posts Post[]
 
   @@map("some_table")
-  @@schema("base")
+  @@namespace("base")
 }
 
 model Post {
@@ -26,5 +26,5 @@ model Post {
   author   User?  @relation(fields: [authorId], references: [id])
 
   @@map("some_table")
-  @@schema("transactional")
+  @@namespace("transactional")
 }

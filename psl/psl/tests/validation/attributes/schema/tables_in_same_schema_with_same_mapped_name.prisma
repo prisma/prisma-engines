@@ -1,7 +1,7 @@
 datasource mydb {
   provider = "sqlserver"
   url = env("TEST_DB_URL")
-  schemas  = ["base", "transactional"]
+  namespaces = ["base", "transactional"]
 }
 
 generator client {
@@ -14,14 +14,14 @@ model Dog {
   id Int @id
 
   @@map("pets")
-  @@schema("base")
+  @@namespace("base")
 }
 
 model Cat {
   id Int @id(map: "cat_pets_pkey")
 
   @@map("pets")
-  @@schema("base")
+  @@namespace("base")
 }
 
 // [1;91merror[0m: [1mThe model with database name "pets" could not be defined because another model or view with this name exists: "Dog"[0m

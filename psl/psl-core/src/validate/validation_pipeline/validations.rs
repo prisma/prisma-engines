@@ -40,8 +40,8 @@ pub(super) fn validate(ctx: &mut Context<'_>) {
         .validate_scalar_field_unknown_default_functions(ctx.db, ctx.diagnostics);
 
     if let Some(ds) = ctx.datasource {
-        datasource::schemas_property_without_preview_feature(ds, ctx);
-        datasource::schemas_property_with_no_connector_support(ds, ctx);
+        datasource::namespaces_property_without_preview_feature(ds, ctx);
+        datasource::namespaces_property_with_no_connector_support(ds, ctx);
         ctx.connector
             .validate_datasource(ctx.preview_features, ds, ctx.diagnostics);
     }

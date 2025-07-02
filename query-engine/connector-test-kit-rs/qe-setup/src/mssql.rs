@@ -3,7 +3,7 @@ use quaint::{prelude::*, single::Quaint};
 use schema_core::schema_connector::{ConnectorError, ConnectorParams, ConnectorResult};
 use std::str::FromStr;
 
-pub(crate) async fn mssql_setup(url: String, prisma_schema: &str, db_schemas: &[&str]) -> ConnectorResult<()> {
+pub(crate) async fn mssql_setup(url: String, prisma_schema: &str, db_namespaces: &[&str]) -> ConnectorResult<()> {
     let mut conn = JdbcString::from_str(&format!("jdbc:{url}"))
         .map_err(|e| ConnectorError::from_source(e, "JDBC string parse error"))?;
     let params = conn.properties_mut();
@@ -11,7 +11,7 @@ pub(crate) async fn mssql_setup(url: String, prisma_schema: &str, db_schemas: &[
     let db_name = params.remove("database").unwrap_or_else(|| String::from("master"));
     let conn = Quaint::new(&conn.to_string()).await.unwrap();
 
-    if !db_schemas.is_empty() {
+    if !db_namespaces.is_empty() {
         let sql = format!(
             r#"
             DROP DATABASE IF EXISTS [{db_name}];

@@ -903,9 +903,9 @@ async fn schema_is_introspected(api: &mut TestApi) -> TestResult {
         }
 
         datasource db {
-          provider = "postgresql"
-          url      = "env(TEST_DATABASE_URL)"
-          schemas  = ["public"]
+          provider   = "postgresql"
+          url        = "env(TEST_DATABASE_URL)"
+          namespaces = ["public"]
         }
 
         /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
@@ -913,7 +913,7 @@ async fn schema_is_introspected(api: &mut TestApi) -> TestResult {
           id Int?
 
           @@ignore
-          @@schema("public")
+          @@namespace("public")
         }
     "#]];
 
@@ -1069,16 +1069,16 @@ async fn dupes_are_renamed(api: &mut TestApi) -> TestResult {
         }
 
         datasource db {
-          provider = "postgresql"
-          url      = "env(TEST_DATABASE_URL)"
-          schemas  = ["private", "public"]
+          provider   = "postgresql"
+          url        = "env(TEST_DATABASE_URL)"
+          namespaces = ["private", "public"]
         }
 
         model private_A {
           id Int @id
 
           @@map("A")
-          @@schema("private")
+          @@namespace("private")
         }
 
         /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
@@ -1087,7 +1087,7 @@ async fn dupes_are_renamed(api: &mut TestApi) -> TestResult {
 
           @@map("A")
           @@ignore
-          @@schema("public")
+          @@namespace("public")
         }
     "#]];
 
@@ -1131,15 +1131,15 @@ async fn dupe_views_are_not_considered_without_preview_feature(api: &mut TestApi
         }
 
         datasource db {
-          provider = "postgresql"
-          url      = "env(TEST_DATABASE_URL)"
-          schemas  = ["private", "public"]
+          provider   = "postgresql"
+          url        = "env(TEST_DATABASE_URL)"
+          namespaces = ["private", "public"]
         }
 
         model A {
           id Int @id
 
-          @@schema("private")
+          @@namespace("private")
         }
     "#]];
 

@@ -55,13 +55,13 @@ pub(crate) fn connection_string(
     test_config: &TestConfig,
     version: &ConnectorVersion,
     database: &str,
-    is_multi_schema: bool,
+    is_multi_namespaces: bool,
     isolation_level: Option<&'static str>,
 ) -> String {
     let is_ci = test_config.is_ci;
     match version {
         ConnectorVersion::SqlServer(v) => {
-            let database = if is_multi_schema {
+            let database = if is_multi_namespaces {
                 format!("database={database};schema=dbo")
             } else {
                 format!("database=master;schema={database}")
@@ -85,7 +85,7 @@ pub(crate) fn connection_string(
         }
         }
         ConnectorVersion::Postgres(v) => {
-            let database = if is_multi_schema {
+            let database = if is_multi_namespaces {
                 database.to_string()
             } else {
                 format!("db?schema={database}")

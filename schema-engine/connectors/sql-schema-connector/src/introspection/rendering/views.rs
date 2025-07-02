@@ -69,7 +69,7 @@ fn render_view(view: ViewPair<'_>) -> renderer::View<'_> {
     }
 
     if let Some(namespace) = view.namespace() {
-        rendered.schema(namespace);
+        rendered.namespace(namespace);
     }
 
     if view.ignored() {

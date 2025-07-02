@@ -408,7 +408,7 @@ fn new_lines_in_source_must_work() {
               "fromEnvVar": null,
               "value": "postgresql://localhost"
             },
-            "schemas": [],
+            "namespaces": [],
             "sourceFilePath": "schema.prisma"
           }
         ]"#]];
@@ -427,13 +427,13 @@ fn multischema_must_work() {
       datasource ds {
         provider = "postgresql"
         url = "postgresql://localhost"
-        schemas = ["transactional", "public"]
+        namespaces = ["transactional", "public"]
       }
     "#};
 
     let rendered = render_datasources(schema);
 
-    // schemas are sorted in ascending order
+    // namespaces are sorted in ascending order
     let expected = expect![[r#"
         [
           {
@@ -444,7 +444,7 @@ fn multischema_must_work() {
               "fromEnvVar": null,
               "value": "postgresql://localhost"
             },
-            "schemas": [
+            "namespaces": [
               "public",
               "transactional"
             ],

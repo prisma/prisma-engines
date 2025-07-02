@@ -102,7 +102,7 @@ pub struct Enum<'a> {
     documentation: Option<Documentation<'a>>,
     variants: Vec<EnumVariant<'a>>,
     map: Option<BlockAttribute<'a>>,
-    schema: Option<BlockAttribute<'a>>,
+    namespace: Option<BlockAttribute<'a>>,
 }
 
 impl<'a> Enum<'a> {
@@ -120,7 +120,7 @@ impl<'a> Enum<'a> {
             documentation: None,
             variants: Vec::new(),
             map: None,
-            schema: None,
+            namespace: None,
         }
     }
 
@@ -136,21 +136,21 @@ impl<'a> Enum<'a> {
         self.documentation = Some(Documentation(documentation.into()));
     }
 
-    /// The schema attribute of the enum block
+    /// The namespace attribute of the enum block
     ///
     /// ```ignore
     /// enum Foo {
     ///   Bar
     ///
-    ///   @@schema("public")
+    ///   @@namespace("public")
     ///             ^^^^^^ this
     /// }
     /// ```
-    pub fn schema(&mut self, schema: impl Into<Cow<'a, str>>) {
-        let mut fun = Function::new("schema");
-        fun.push_param(schema.into());
+    pub fn namespace(&mut self, namespace: impl Into<Cow<'a, str>>) {
+        let mut fun = Function::new("namespace");
+        fun.push_param(namespace.into());
 
-        self.schema = Some(BlockAttribute(fun));
+        self.namespace = Some(BlockAttribute(fun));
     }
 
     /// Add a new variant to the enum declaration. If passing a string
@@ -200,8 +200,8 @@ impl fmt::Display for Enum<'_> {
             writeln!(f, "{map}")?;
         }
 
-        if let Some(schema) = &self.schema {
-            writeln!(f, "{schema}")?;
+        if let Some(namespace) = &self.namespace {
+            writeln!(f, "{namespace}")?;
         }
 
         f.write_str("}\n")?;
@@ -239,7 +239,7 @@ mod tests {
         r#enum.push_variant(variant);
         r#enum.push_variant("Black");
 
-        r#enum.schema("city_planning");
+        r#enum.namespace("city_planning");
 
         let expected = expect![[r#"
             /// Cat's foot, iron claw
@@ -254,7 +254,7 @@ mod tests {
               Black
 
               @@map("1TrafficLight")
-              @@schema("city_planning")
+              @@namespace("city_planning")
             }
         "#]];
 

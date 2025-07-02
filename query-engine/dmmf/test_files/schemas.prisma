@@ -1,7 +1,7 @@
 datasource pg {
-  provider = "postgresql"
-  url      = "postgresql://"
-  schemas  = ["public", "test"]
+  provider   = "postgresql"
+  url        = "postgresql://"
+  namespaces = ["public", "test"]
 }
 
 generator client {
@@ -12,11 +12,11 @@ generator client {
 model A {
   id Int @id
 
-  @@schema("public")
+  @@namespace("public")
 }
 
 model B {
   id Int @id
 
-  @@schema("test")
+  @@namespace("test")
 }

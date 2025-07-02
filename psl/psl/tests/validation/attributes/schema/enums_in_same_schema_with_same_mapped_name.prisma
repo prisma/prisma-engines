@@ -4,9 +4,9 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("TEST_DATABASE_URL")
-  schemas  = ["base", "transactional"]
+  provider   = "postgresql"
+  url        = env("TEST_DATABASE_URL")
+  namespaces = ["base", "transactional"]
 }
 
 enum Color {
@@ -15,7 +15,7 @@ enum Color {
     BLUE
 
     @@map("attribute")
-    @@schema("transactional")
+    @@namespace("transactional")
 }
 
 enum Size {
@@ -25,7 +25,7 @@ enum Size {
     VENTI
 
     @@map("attribute")
-    @@schema("transactional")
+    @@namespace("transactional")
 }
 
 // [1;91merror[0m: [1mAn enum with the same database name is already defined.[0m
@@ -39,6 +39,6 @@ enum Size {
 // [1;94m25 | [0m    VENTI
 // [1;94m26 | [0m
 // [1;94m27 | [0m    @@map("attribute")
-// [1;94m28 | [0m    @@schema("transactional")
+// [1;94m28 | [0m    @@namespace("transactional")
 // [1;94m29 | [0m}
 // [1;94m   | [0m
