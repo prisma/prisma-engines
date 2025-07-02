@@ -11,6 +11,4 @@ packages:
   - '../../../prisma/packages/client-engine-runtime'
   - '../../../prisma/packages/debug'
   - '../../../prisma/packages/driver-adapter-utils'
-  - '../../../prisma/packages/dmmf'
-  - '../../../prisma/packages/generator'
   - './executor'
