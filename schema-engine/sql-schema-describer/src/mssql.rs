@@ -3,7 +3,7 @@
 use crate::{
     getters::Getter, ids::*, parsers::Parser, Column, ColumnArity, ColumnType, ColumnTypeFamily, DefaultValue,
     DescriberError, DescriberErrorKind, DescriberResult, ForeignKeyAction, IndexColumn, Procedure, SQLSortOrder,
-    SqlMetadata, SqlSchema, UserDefinedType, View,
+    SqlSchema, UserDefinedType, View,
 };
 use either::Either;
 use enumflags2::BitFlags;
@@ -16,7 +16,7 @@ use psl::{
 };
 use quaint::prelude::Queryable;
 use regex::Regex;
-use std::{any::type_name, borrow::Cow, collections::HashMap, convert::TryInto, sync::LazyLock};
+use std::{any::type_name, borrow::Cow, collections::HashMap, sync::LazyLock};
 
 /// Matches a default value in the schema, that is not a string.
 ///
@@ -105,20 +105,6 @@ impl std::fmt::Debug for SqlSchemaDescriber<'_> {
 impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber<'_> {
     async fn list_databases(&self) -> DescriberResult<Vec<String>> {
         Ok(self.get_databases().await?)
-    }
-
-    async fn get_metadata(&self, schema: &str) -> DescriberResult<SqlMetadata> {
-        let mut sql_schema = SqlSchema::default();
-
-        self.get_namespaces(&mut sql_schema, &[schema]).await?;
-
-        let table_count = self.get_table_names(&mut sql_schema).await?.len();
-        let size_in_bytes = self.get_size(schema).await?;
-
-        Ok(SqlMetadata {
-            table_count,
-            size_in_bytes,
-        })
     }
 
     async fn describe(&self, schemas: &[&str]) -> DescriberResult<SqlSchema> {
@@ -230,36 +216,6 @@ impl<'a> SqlSchemaDescriber<'a> {
         }
 
         Ok(map)
-    }
-
-    async fn get_size(&self, schema: &str) -> DescriberResult<usize> {
-        let sql = indoc! {r#"
-            SELECT
-                SUM(a.total_pages) * 8000 AS size
-            FROM
-                sys.tables t
-            INNER JOIN
-                sys.partitions p ON t.object_id = p.object_id
-            INNER JOIN
-                sys.allocation_units a ON p.partition_id = a.container_id
-            WHERE SCHEMA_NAME(t.schema_id) = @P1
-                AND t.is_ms_shipped = 0
-            GROUP BY
-                t.schema_id
-            ORDER BY
-                size DESC;
-        "#};
-
-        let rows = self.conn.query_raw(sql, &[schema.into()]).await?;
-
-        let size: i64 = rows
-            .into_single()
-            .map(|row| row.get("size").and_then(|x| x.as_integer()).unwrap_or(0))
-            .unwrap_or(0);
-
-        Ok(size
-            .try_into()
-            .expect("Invariant violation: size is not a valid usize value."))
     }
 
     async fn get_columns(&self, sql_schema: &mut SqlSchema) -> DescriberResult<()> {
