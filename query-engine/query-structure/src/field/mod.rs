@@ -297,6 +297,14 @@ pub struct FieldTypeInformation {
 }
 
 impl FieldTypeInformation {
+    pub fn new(typ: Type, arity: FieldArity, native_type: Option<NativeTypeInstance>) -> Self {
+        FieldTypeInformation {
+            typ,
+            arity,
+            native_type,
+        }
+    }
+
     pub fn to_prisma_type(&self) -> PrismaValueType {
         let type_ = match (self.typ.id, self.native_type.as_ref()) {
             (TypeIdentifier::DateTime, Some(native_type))

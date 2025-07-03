@@ -8,7 +8,7 @@ use query_core::{
     CreateManyRecordsFields, DeleteRecordFields, Node, Query, QueryGraph, ReadQuery, UpdateManyRecordsFields,
     UpdateRecord, WriteQuery, schema::constants::aggregations,
 };
-use query_structure::{AggregationSelection, FieldSelection, SelectedField};
+use query_structure::{AggregationSelection, FieldSelection, FieldTypeInformation, SelectedField};
 use std::{borrow::Cow, collections::HashMap};
 
 pub fn map_result_structure(graph: &QueryGraph, builder: &mut ResultNodeBuilder) -> Option<ResultNode> {
@@ -227,12 +227,13 @@ fn get_result_node_for_aggregation(
                     } else {
                         (ident.name, ident.db_name)
                     };
-                (aggregate_underscore_name(sel), name, db_name, ident.typ)
+                let type_info = FieldTypeInformation::new(ident.typ, ident.arity, None);
+                (aggregate_underscore_name(sel), name, db_name, type_info)
             })
         })
         .sorted_by_key(|(underscore_name, name, _, _)| ordered_set.get_index_of(&(*underscore_name, *name)))
     {
-        let value = builder.new_value(db_name.to_owned(), typ.into());
+        let value = builder.new_value(db_name.to_owned(), typ);
         if let Some(undescore_name) = underscore_name {
             node.entry_or_insert_nested(undescore_name)
                 .add_field(name.to_owned(), value);
