@@ -9,6 +9,7 @@ use schema_connector::IntrospectionContext;
 use schema_connector::IntrospectionResult;
 use schema_connector::ViewDefinition;
 pub use test_macros::test_connector;
+use test_setup::mysql::drop_mysql_namespaces;
 pub use test_setup::{BitFlags, Capabilities, Tags};
 
 use crate::{BarrelMigrationExecutor, Result};
@@ -69,6 +70,11 @@ impl TestApi {
                 shadow_database_connection_string: None,
             };
             let me = SqlSchemaConnector::new_mysql(params).unwrap();
+
+            let namespace_refs: Vec<&str> = namespaces.iter().map(|s| s.as_str()).collect();
+            drop_mysql_namespaces(args.database_url(), &namespace_refs)
+                .await
+                .unwrap();
 
             (Quaint::new(&cs).await.unwrap(), cs, me)
         } else if tags.contains(Tags::Postgres) && !tags.contains(Tags::CockroachDb) {
