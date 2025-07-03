@@ -282,7 +282,7 @@ impl<'a> SqlSchemaDescriber<'a> {
                 AND column_info.table_schema IN ({placeholders})
                 -- Exclude views.
                 AND table_info.table_type = 'BASE TABLE'
-            ORDER BY BINARY table_info.table_name"#
+            ORDER BY namespace, table_name"#
         );
 
         let rows = self
@@ -356,7 +356,7 @@ impl<'a> SqlSchemaDescriber<'a> {
                 IF(column_comment = '', NULL, column_comment) AS column_comment
             FROM information_schema.columns
             WHERE table_schema IN ({placeholders})
-            ORDER BY ordinal_position
+            ORDER BY namespace, table_name, ordinal_position
         "
         );
 
@@ -718,8 +718,6 @@ impl<'a> SqlSchemaDescriber<'a> {
 
         let rows = self.conn.query_raw(sql, &[]).await?;
 
-        println!("rows: {rows:#?}");
-
         for row in rows {
             let namespace = row.get_expect_string("namespace");
             let table_name = row.get_expect_string("table_name");
@@ -803,7 +801,7 @@ async fn push_foreign_keys(sql_schema: &mut SqlSchema, conn: &dyn Queryable) -> 
                 kcu.table_name table_name,
                 kcu.column_name column_name,
                 kcu.referenced_table_schema referenced_namespace,
-                kcu.referenced_table_name referenced_table_name, -- TODO: this is not the table name, it's the schema name
+                kcu.referenced_table_name referenced_table_name,
                 kcu.referenced_column_name referenced_column_name,
                 kcu.ordinal_position ordinal_position,
                 rc.delete_rule delete_rule,

@@ -81,180 +81,182 @@ async fn multiple_schemas_w_tables_are_introspected(api: &mut TestApi) -> TestRe
     Ok(())
 }
 
-// #[test_connector(tags(Mysql), preview_features("multiSchema"), namespaces("first", "second"))]
-// async fn multiple_schemas_w_tables_are_reintrospected(api: &mut TestApi) -> TestResult {
-//     let schema_name = "first";
-//     let other_name = "second";
-//     let create_schema = format!("CREATE Schema `{schema_name}`",);
-//     let create_table = format!("CREATE TABLE `{schema_name}`.`A` (id Text PRIMARY KEY, data Text)",);
-//     let create_primary = format!("CREATE INDEX `A_idx` ON `{schema_name}`.`A` (`data`)",);
+#[test_connector(tags(Mysql), preview_features("multiSchema"), namespaces("first", "second"))]
+async fn multiple_schemas_w_tables_are_reintrospected(api: &mut TestApi) -> TestResult {
+    let schema_name = &api.namespaces()[0];
+    let other_name = &api.namespaces()[1];
+    let create_schema = format!("CREATE Schema `{schema_name}`",);
+    let create_table = format!("CREATE TABLE `{schema_name}`.`A` (id Int PRIMARY KEY, data Text)",);
+    let create_primary = format!("CREATE INDEX `A_idx` ON `{schema_name}`.`A` (`data`(128))",);
 
-//     api.database().raw_cmd(&create_schema).await?;
-//     api.database().raw_cmd(&create_table).await?;
-//     api.database().raw_cmd(&create_primary).await?;
+    api.database().raw_cmd(&create_schema).await?;
+    api.database().raw_cmd(&create_table).await?;
+    api.database().raw_cmd(&create_primary).await?;
 
-//     let create_schema = format!("CREATE Schema `{other_name}`",);
-//     let create_table = format!("CREATE TABLE `{other_name}`.`B` (id Text PRIMARY KEY, data Text)",);
-//     let create_primary = format!("CREATE INDEX `B_idx` ON `{other_name}`.`B` (`data`)",);
+    let create_schema = format!("CREATE Schema `{other_name}`",);
+    let create_table = format!("CREATE TABLE `{other_name}`.`B` (id Int PRIMARY KEY, data Text)",);
+    let create_primary = format!("CREATE INDEX `B_idx` ON `{other_name}`.`B` (`data`(128))",);
 
-//     api.database().raw_cmd(&create_schema).await?;
-//     api.database().raw_cmd(&create_table).await?;
-//     api.database().raw_cmd(&create_primary).await?;
+    api.database().raw_cmd(&create_schema).await?;
+    api.database().raw_cmd(&create_table).await?;
+    api.database().raw_cmd(&create_primary).await?;
 
-//     let input = indoc! {r#"
-//         model A {
-//           id   String  @id
-//           data String?
+    let input = format!(
+        r#"
+        model A {{
+          id   Int     @id
+          data String? @db.Text
 
-//           @@index([data], map: "A_idx")
-//           @@schema("first")
-//         }
+          @@index([data(length: 128)], map: "A_idx")
+          @@schema("{schema_name}")
+        }}
 
-//         model B {
-//           id   String  @id
-//           data String?
+        model B {{
+          id   Int     @id
+          data String? @db.Text
 
-//           @@index([data], map: "B_idx")
-//           @@schema("first")
-//         }
-//     "#};
+          @@index([data(length: 128)], map: "B_idx")
+          @@schema("{other_name}")
+        }}
+    "#
+    );
 
-//     let expected = expect![[r#"
-//         model A {
-//           id   String  @id
-//           data String?
+    let expected = expect![[r#"
+        model A {
+          id   Int     @id
+          data String? @db.Text
 
-//           @@index([data], map: "A_idx")
-//           @@schema("first")
-//         }
+          @@index([data(length: 128)], map: "A_idx")
+          @@schema("first")
+        }
 
-//         model B {
-//           id   String  @id
-//           data String?
+        model B {
+          id   Int     @id
+          data String? @db.Text
 
-//           @@index([data], map: "B_idx")
-//           @@schema("second")
-//         }
-//     "#]];
+          @@index([data(length: 128)], map: "B_idx")
+          @@schema("second")
+        }
+    "#]];
 
-//     api.expect_re_introspected_datamodel(input, expected).await;
+    api.expect_re_introspected_datamodel(&input, expected).await;
 
-//     Ok(())
-// }
+    Ok(())
+}
 
-// #[test_connector(tags(Mysql), preview_features("multiSchema"), namespaces("first", "second"))]
-// async fn multiple_schemas_w_duplicate_table_names_are_introspected(api: &mut TestApi) -> TestResult {
-//     let schema_name = "first";
-//     let other_name = "second";
-//     let setup = formatdoc! {
-//         r#"
-//              CREATE SCHEMA "{schema_name}";
-//              CREATE TABLE "{schema_name}"."A" (id TEXT PRIMARY KEY);
+#[test_connector(tags(Mysql), preview_features("multiSchema"), namespaces("first", "second"))]
+async fn multiple_schemas_w_duplicate_table_names_are_introspected(api: &mut TestApi) -> TestResult {
+    let schema_name = "first";
+    let other_name = "second";
+    let setup = formatdoc! {
+        r#"
+             CREATE SCHEMA `{schema_name}`;
+             CREATE TABLE `{schema_name}`.`A` (id INT PRIMARY KEY);
 
-//              CREATE SCHEMA "{other_name}";
-//              CREATE TABLE "{other_name}"."A" (id TEXT PRIMARY KEY);
-//          "#
-//     };
-//     api.raw_cmd(&setup).await;
+             CREATE SCHEMA `{other_name}`;
+             CREATE TABLE `{other_name}`.`A` (id INT PRIMARY KEY);
+         "#
+    };
+    api.raw_cmd(&setup).await;
 
-//     let expected = expect![[r#"
-//         generator client {
-//           provider        = "prisma-client-js"
-//           previewFeatures = ["multiSchema"]
-//         }
+    let expected = expect![[r#"
+        generator client {
+          provider        = "prisma-client-js"
+          previewFeatures = ["multiSchema"]
+        }
 
-//         datasource db {
-//           provider = "mysql"
-//           url      = "env(TEST_DATABASE_URL)"
-//           schemas  = ["first", "second"]
-//         }
+        datasource db {
+          provider = "mysql"
+          url      = "env(TEST_DATABASE_URL)"
+          schemas  = ["first", "second"]
+        }
 
-//         model first_A {
-//           id String @id
+        model first_A {
+          id Int @id
 
-//           @@map("A")
-//           @@schema("first")
-//         }
+          @@map("A")
+          @@schema("first")
+        }
 
-//         model second_A {
-//           id String @id
+        model second_A {
+          id Int @id
 
-//           @@map("A")
-//           @@schema("second")
-//         }
-//     "#]];
+          @@map("A")
+          @@schema("second")
+        }
+    "#]];
 
-//     api.expect_datamodel(&expected).await;
+    api.expect_datamodel(&expected).await;
 
-//     let expected = expect![[r#"
-//         *** WARNING ***
+    let expected = expect![[r#"
+        *** WARNING ***
 
-//         These items were renamed due to their names being duplicates in the Prisma schema:
-//           - Type: "model", name: "first_A"
-//           - Type: "model", name: "second_A"
-//     "#]];
+        These items were renamed due to their names being duplicates in the Prisma schema:
+          - Type: "model", name: "first_A"
+          - Type: "model", name: "second_A"
+    "#]];
 
-//     api.expect_warnings(&expected).await;
+    api.expect_warnings(&expected).await;
 
-//     Ok(())
-// }
+    Ok(())
+}
 
-// #[test_connector(tags(Mysql), preview_features("multiSchema"), namespaces("1first", "2second"))]
-// async fn multiple_schemas_w_duplicate_sanitized_table_names_are_introspected(api: &mut TestApi) -> TestResult {
-//     let schema_name = "1first";
-//     let other_name = "2second";
-//     let setup = formatdoc! {
-//         r#"
-//              CREATE SCHEMA "{schema_name}";
-//              CREATE TABLE "{schema_name}"."2A" (id TEXT PRIMARY KEY);
+#[test_connector(tags(Mysql), preview_features("multiSchema"), namespaces("1first", "2second"))]
+async fn multiple_schemas_w_duplicate_sanitized_table_names_are_introspected(api: &mut TestApi) -> TestResult {
+    let schema_name = "1first";
+    let other_name = "2second";
+    let setup = formatdoc! {
+        r#"
+             CREATE SCHEMA `{schema_name}`;
+             CREATE TABLE `{schema_name}`.`2A` (id INT PRIMARY KEY);
 
-//              CREATE SCHEMA "{other_name}";
-//              CREATE TABLE "{other_name}"."1A" (id TEXT PRIMARY KEY);
-//          "#
-//     };
-//     api.raw_cmd(&setup).await;
+             CREATE SCHEMA `{other_name}`;
+             CREATE TABLE `{other_name}`.`1A` (id INT PRIMARY KEY);
+         "#
+    };
+    api.raw_cmd(&setup).await;
 
-//     let expected = expect![[r#"
-//         generator client {
-//           provider        = "prisma-client-js"
-//           previewFeatures = ["multiSchema"]
-//         }
+    let expected = expect![[r#"
+        generator client {
+          provider        = "prisma-client-js"
+          previewFeatures = ["multiSchema"]
+        }
 
-//         datasource db {
-//           provider = "mysql"
-//           url      = "env(TEST_DATABASE_URL)"
-//           schemas  = ["1first", "2second"]
-//         }
+        datasource db {
+          provider = "mysql"
+          url      = "env(TEST_DATABASE_URL)"
+          schemas  = ["1first", "2second"]
+        }
 
-//         model first_2A {
-//           id String @id
+        model first_2A {
+          id Int @id
 
-//           @@map("2A")
-//           @@schema("1first")
-//         }
+          @@map("2A")
+          @@schema("1first")
+        }
 
-//         model second_1A {
-//           id String @id
+        model second_1A {
+          id Int @id
 
-//           @@map("1A")
-//           @@schema("2second")
-//         }
-//     "#]];
+          @@map("1A")
+          @@schema("2second")
+        }
+    "#]];
 
-//     api.expect_datamodel(&expected).await;
+    api.expect_datamodel(&expected).await;
 
-//     let expected = expect![[r#"
-//         *** WARNING ***
+    let expected = expect![[r#"
+        *** WARNING ***
 
-//         These items were renamed due to their names being duplicates in the Prisma schema:
-//           - Type: "model", name: "first_2A"
-//           - Type: "model", name: "second_1A"
-//     "#]];
+        These items were renamed due to their names being duplicates in the Prisma schema:
+          - Type: "model", name: "first_2A"
+          - Type: "model", name: "second_1A"
+    "#]];
 
-//     api.expect_warnings(&expected).await;
+    api.expect_warnings(&expected).await;
 
-//     Ok(())
-// }
+    Ok(())
+}
 
 // #[test_connector(tags(Mysql), preview_features("multiSchema"), namespaces("first", "second"))]
 // async fn multiple_schemas_w_cross_schema_are_introspected(api: &mut TestApi) -> TestResult {
