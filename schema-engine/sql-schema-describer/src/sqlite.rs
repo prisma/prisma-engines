@@ -16,7 +16,6 @@ use std::{
     any::type_name,
     borrow::Cow,
     collections::BTreeMap,
-    convert::TryInto,
     fmt::Debug,
     path::Path,
     sync::{Arc, LazyLock, OnceLock},
@@ -167,17 +166,6 @@ impl<'a> SqlSchemaDescriber<'a> {
         }
 
         Ok(map)
-    }
-
-    async fn get_size(&self) -> DescriberResult<usize> {
-        let sql = r#"SELECT page_count * page_size as size FROM pragma_page_count(), pragma_page_size();"#;
-        let result = self.conn.query_raw(sql, &[]).await?;
-        let size: i64 = result
-            .first()
-            .map(|row| row.get("size").and_then(|x| x.as_integer()).unwrap_or(0))
-            .unwrap();
-
-        Ok(size.try_into().unwrap())
     }
 
     async fn push_foreign_keys(
