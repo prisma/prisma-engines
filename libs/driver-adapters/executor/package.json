@@ -49,6 +49,6 @@
     "@cloudflare/workers-types": "4.20250320.0",
     "@types/node": "20.12.7",
     "tsx": "4.7.2",
-    "typescript": "5.4.5"
+    "typescript": "5.8.3"
   }
 }
