@@ -56,10 +56,6 @@ pub struct SqlSchemaDescriber<'a> {
 
 #[async_trait::async_trait]
 impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber<'_> {
-    async fn list_databases(&self) -> DescriberResult<Vec<String>> {
-        self.get_databases().await
-    }
-
     #[tracing::instrument(skip(self))]
     async fn describe(&self, schemas: &[&str]) -> DescriberResult<SqlSchema> {
         let schema = schemas[0];
@@ -205,20 +201,6 @@ impl<'a> SqlSchemaDescriber<'a> {
     /// Constructor.
     pub fn new(conn: &'a dyn Queryable, circumstances: BitFlags<Circumstances>) -> SqlSchemaDescriber<'a> {
         SqlSchemaDescriber { conn, circumstances }
-    }
-
-    #[tracing::instrument(skip(self))]
-    async fn get_databases(&self) -> DescriberResult<Vec<String>> {
-        let sql = "select schema_name as schema_name from information_schema.schemata;";
-        let rows = self.conn.query_raw(sql, &[]).await?;
-        let names = rows
-            .into_iter()
-            .map(|row| row.get_expect_string("schema_name"))
-            .collect();
-
-        trace!("Found schema names: {names:?}");
-
-        Ok(names)
     }
 
     #[tracing::instrument(skip(self))]

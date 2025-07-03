@@ -103,10 +103,6 @@ impl std::fmt::Debug for SqlSchemaDescriber<'_> {
 
 #[async_trait::async_trait]
 impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber<'_> {
-    async fn list_databases(&self) -> DescriberResult<Vec<String>> {
-        Ok(self.get_databases().await?)
-    }
-
     async fn describe(&self, schemas: &[&str]) -> DescriberResult<SqlSchema> {
         let mut sql_schema = SqlSchema::default();
         let mut mssql_ext = MssqlSchemaExt::default();
@@ -141,12 +137,6 @@ impl Parser for SqlSchemaDescriber<'_> {}
 impl<'a> SqlSchemaDescriber<'a> {
     pub fn new(conn: &'a dyn Queryable) -> Self {
         Self { conn }
-    }
-
-    async fn get_databases(&self) -> DescriberResult<Vec<String>> {
-        let sql = "SELECT name FROM sys.schemas";
-        let rows = self.conn.query_raw(sql, &[]).await?;
-        Ok(rows.into_iter().map(|row| row.get_expect_string("name")).collect())
     }
 
     async fn get_procedures(&self, sql_schema: &mut SqlSchema) -> DescriberResult<()> {
