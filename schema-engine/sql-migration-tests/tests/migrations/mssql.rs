@@ -1,6 +1,7 @@
-use psl::parser_database::SourceFile;
-use schema_core::schema_connector::DiffTarget;
+use psl::{parser_database::SourceFile, PreviewFeatures};
+use schema_core::schema_connector::{ConnectorParams, DiffTarget};
 use sql_migration_tests::test_api::*;
+use sql_schema_connector::SqlSchemaConnector;
 
 mod multi_schema;
 
@@ -384,4 +385,76 @@ fn float_columns(api: TestApi) {
 
     api.schema_push(schema).send().assert_green();
     api.schema_push(schema).send().assert_green().assert_no_steps();
+}
+
+#[test_connector(tags(Mssql))]
+fn apply_migrations_with_a_schema_in_url(mut api: TestApi) {
+    api.raw_cmd("CREATE SCHEMA myschema;");
+    api.connector = SqlSchemaConnector::new_mssql(ConnectorParams {
+        connection_string: format!("{};schema=myschema", api.connection_string()),
+        preview_features: PreviewFeatures::empty(),
+        shadow_database_connection_string: None,
+    })
+    .unwrap();
+
+    let schema = r#"
+        datasource mypg {
+            provider = "sqlserver"
+            url = env("TEST_DATABASE_URL")
+        }
+
+        model foo {
+          id  String @id
+        }
+    "#;
+
+    let migrations_directory = api.create_migrations_directory();
+    let migration = r#"
+        BEGIN TRY
+
+        BEGIN TRAN;
+        CREATE TABLE [myschema].[foo] (
+            [id] NVARCHAR(1000) NOT NULL,
+            CONSTRAINT [foo_pkey] PRIMARY KEY CLUSTERED ([id])
+        );
+        COMMIT TRAN;
+
+        END TRY
+
+        BEGIN CATCH
+
+        IF @@TRANCOUNT > 0
+        BEGIN
+            ROLLBACK TRAN;
+        END;
+        THROW
+
+        END CATCH
+    "#;
+
+    api.create_migration("01init", schema, &migrations_directory)
+        .draft(true)
+        .send_sync()
+        .modify_migration(|contents| {
+            contents.clear();
+            contents.push_str(migration);
+        })
+        .into_output();
+
+    api.apply_migrations(&migrations_directory)
+        .send_sync()
+        .assert_applied_migrations(&["01init"])
+        .into_output();
+
+    let output = api
+        .diagnose_migration_history(&migrations_directory)
+        .opt_in_to_shadow_database(true)
+        .send_sync()
+        .into_output();
+    assert!(output.drift.is_none(), "Found drift: {:?}", output.drift);
+
+    api.schema_push(schema).send().assert_green().assert_no_steps();
+    api.assert_schema().assert_table("foo", |table| {
+        table.assert_column("id", |col| col.assert_type_is_string().assert_is_required())
+    });
 }
