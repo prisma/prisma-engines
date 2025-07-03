@@ -175,7 +175,7 @@ impl TestApi {
     }
 
     /// Instantiate a new schema engine for the current database.
-    pub fn new_engine(&self) -> EngineTestApi {
+    pub fn new_engine(&self) -> EngineTestApi<'_> {
         let shadow_db = self.args.shadow_database_url().as_ref().map(ToString::to_string);
         self.new_engine_with_connection_strings(self.connection_string.clone(), shadow_db)
     }
@@ -185,7 +185,7 @@ impl TestApi {
         &self,
         connection_string: String,
         shadow_database_connection_string: Option<String>,
-    ) -> EngineTestApi {
+    ) -> EngineTestApi<'_> {
         self.new_engine_with_connection_strings_or_err(connection_string, shadow_database_connection_string)
             .unwrap()
     }
@@ -195,7 +195,7 @@ impl TestApi {
         &self,
         connection_string: String,
         shadow_database_connection_string: Option<String>,
-    ) -> ConnectorResult<EngineTestApi> {
+    ) -> ConnectorResult<EngineTestApi<'_>> {
         let connection_info = ConnectionInfo::from_url(&connection_string).unwrap();
 
         let params = ConnectorParams {
@@ -296,20 +296,20 @@ impl TestApi {
 
 /// A wrapper around a schema engine instance optimized for convenience in
 /// writing tests.
-pub struct EngineTestApi {
+pub struct EngineTestApi<'n> {
     pub(crate) connector: SqlSchemaConnector,
     connection_info: ConnectionInfo,
     tags: BitFlags<Tags>,
-    namespaces: &'static [&'static str],
+    namespaces: &'n [String],
     max_ddl_refresh_delay: Option<Duration>,
 }
 
-impl EngineTestApi {
+impl EngineTestApi<'_> {
     /// Plan an `applyMigrations` command
     pub fn apply_migrations<'a>(&'a mut self, migrations_directory: &'a TempDir) -> ApplyMigrations<'a> {
         let mut namespaces = vec![self.connection_info.schema_name().unwrap().to_string()];
 
-        for namespace in self.namespaces {
+        for namespace in self.namespaces.iter() {
             namespaces.push(namespace.to_string());
         }
 
