@@ -76,7 +76,7 @@ impl DestructiveChangeCheckerFlavour for MssqlDestructiveChangeCheckerFlavour {
                 plan.push_warning(
                     SqlMigrationWarningCheck::RiskyCast {
                         table: columns.previous.table().name().to_owned(),
-                        namespace: None,
+                        namespace: columns.previous.table().namespace().map(str::to_owned),
                         column: columns.previous.name().to_owned(),
                         previous_type,
                         next_type,
@@ -88,7 +88,7 @@ impl DestructiveChangeCheckerFlavour for MssqlDestructiveChangeCheckerFlavour {
                 plan.push_warning(
                     SqlMigrationWarningCheck::NotCastable {
                         table: columns.previous.table().name().to_owned(),
-                        namespace: None,
+                        namespace: columns.previous.table().namespace().map(str::to_owned),
                         column: columns.previous.name().to_owned(),
                         previous_type: format!("{:?}", columns.previous.column_type_family()),
                         next_type: format!("{:?}", columns.next.column_type_family()),
@@ -134,7 +134,7 @@ impl DestructiveChangeCheckerFlavour for MssqlDestructiveChangeCheckerFlavour {
                 SqlMigrationWarningCheck::DropAndRecreateColumn {
                     column: columns.previous.name().to_owned(),
                     table: columns.previous.table().name().to_owned(),
-                    namespace: None,
+                    namespace: columns.previous.table().namespace().map(str::to_owned),
                 },
                 step_index,
             )

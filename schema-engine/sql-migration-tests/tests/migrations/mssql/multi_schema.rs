@@ -1075,6 +1075,42 @@ fn multi_schema_tests(_api: TestApi) {
             }),
             skip: None,
         },
+        TestData {
+            name: "issue prisma/prisma#24068",
+            description: "Modify the primary key of a table in a namespace",
+            schema: Schema {
+                common: base_schema.into(),
+                first: indoc! {r#"
+                    model Report {
+                      id String @id
+
+                      @@schema("two")
+                    }"#}
+                .into(),
+                second: Some(indoc! {r#"
+                    model Report {
+                      id String @id @unique @db.NVarChar(450)
+
+                      @@schema("two")
+                    }"#}
+                .into())
+            },
+            namespaces,
+            schema_push: SchemaPush::PushAnd(WithSchema::First, &SchemaPush::PushCustomAnd(CustomPushStep {
+                warnings: &["A unique constraint covering the columns `[id]` on the table `Report` will be added. If there are existing duplicate values, this will fail."],
+                errors: &[],
+                with_schema: WithSchema::Second,
+                executed_steps: ExecutedSteps::NonZero,
+            }, &SchemaPush::Done)),
+            assertion: Box::new(|assert| {
+                assert
+                    .assert_has_table_with_ns("two", "Report")
+                    .assert_table_with_ns("two", "Report", |table| {
+                        table.assert_column("id", |column| column.assert_is_required().assert_type_is_string())
+                    });
+            }),
+            skip: None,
+        },
     ];
 
     // traverse_ is always the answer
