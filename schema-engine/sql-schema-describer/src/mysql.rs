@@ -56,10 +56,6 @@ pub struct SqlSchemaDescriber<'a> {
 
 #[async_trait::async_trait]
 impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber<'_> {
-    async fn list_databases(&self) -> DescriberResult<Vec<String>> {
-        self.get_databases().await
-    }
-
     #[tracing::instrument(skip(self))]
     async fn describe(&self, schemas: &[&str]) -> DescriberResult<SqlSchema> {
         let schema = schemas[0];
@@ -208,20 +204,6 @@ impl<'a> SqlSchemaDescriber<'a> {
     }
 
     #[tracing::instrument(skip(self))]
-    async fn get_databases(&self) -> DescriberResult<Vec<String>> {
-        let sql = "select schema_name as schema_name from information_schema.schemata;";
-        let rows = self.conn.query_raw(sql, &[]).await?;
-        let names = rows
-            .into_iter()
-            .map(|row| row.get_expect_string("schema_name"))
-            .collect();
-
-        trace!("Found schema names: {names:?}");
-
-        Ok(names)
-    }
-
-    #[tracing::instrument(skip(self))]
     async fn get_views(&self, schema: &str) -> DescriberResult<Vec<View>> {
         let sql = indoc! {r#"
             SELECT TABLE_NAME AS view_name, VIEW_DEFINITION AS view_sql
@@ -316,6 +298,8 @@ impl<'a> SqlSchemaDescriber<'a> {
             };
             map.insert(cloned_name, id);
         }
+
+        println!("table_names: {:?}", map);
 
         trace!("Found table names: {map:?}");
 

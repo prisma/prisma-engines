@@ -26,10 +26,6 @@ impl Connection for std::sync::Mutex<rusqlite::Connection> {
 
 #[async_trait::async_trait]
 impl SqlSchemaDescriberBackend for SqlSchemaDescriber<'_> {
-    async fn list_databases(&self) -> DescriberResult<Vec<String>> {
-        Ok(self.get_databases().await?)
-    }
-
     async fn describe(&self, _schemas: &[&str]) -> DescriberResult<SqlSchema> {
         self.describe_impl().await
     }

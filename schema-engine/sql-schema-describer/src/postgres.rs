@@ -528,10 +528,6 @@ impl AsRef<str> for SQLOperatorClassKind {
 
 #[async_trait::async_trait]
 impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber<'_> {
-    async fn list_databases(&self) -> DescriberResult<Vec<String>> {
-        Ok(self.get_databases().await?)
-    }
-
     async fn describe(&self, schemas: &[&str]) -> DescriberResult<SqlSchema> {
         let mut sql_schema = SqlSchema::default();
         let mut pg_ext = PostgresSchemaExt::default();
@@ -612,19 +608,6 @@ impl<'a> SqlSchemaDescriber<'a> {
         pg_ext.extensions = extensions;
 
         Ok(())
-    }
-
-    async fn get_databases(&self) -> DescriberResult<Vec<String>> {
-        let sql = "select schema_name from information_schema.schemata;";
-        let rows = self.conn.query_raw(sql, &[]).await?;
-        let names = rows
-            .into_iter()
-            .map(|row| row.get_expect_string("schema_name"))
-            .collect();
-
-        trace!("Found schema names: {:?}", names);
-
-        Ok(names)
     }
 
     async fn get_procedures(&self, sql_schema: &mut SqlSchema) -> DescriberResult<()> {

@@ -17,7 +17,6 @@ use std::{
     borrow::Cow,
     collections::BTreeMap,
     fmt::Debug,
-    path::Path,
     sync::{Arc, LazyLock, OnceLock},
 };
 use tracing::trace;
@@ -104,28 +103,6 @@ impl<'a> SqlSchemaDescriber<'a> {
         }
 
         Ok(schema)
-    }
-
-    async fn get_databases(&self) -> DescriberResult<Vec<String>> {
-        let sql = "PRAGMA database_list;";
-        let rows = self.conn.query_raw(sql, &[]).await?;
-        let names = rows
-            .into_iter()
-            .map(|row| {
-                row.get("file")
-                    .and_then(|x| x.to_string())
-                    .and_then(|x| {
-                        Path::new(&x)
-                            .file_name()
-                            .map(|name| name.to_string_lossy().into_owned())
-                    })
-                    .expect("convert schema names")
-            })
-            .collect();
-
-        trace!("Found schema names: {:?}", names);
-
-        Ok(names)
     }
 
     pub async fn get_table_names(
