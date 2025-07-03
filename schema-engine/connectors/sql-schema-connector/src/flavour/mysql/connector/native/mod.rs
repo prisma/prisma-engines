@@ -11,7 +11,7 @@ use quaint::{
     },
     prelude::{ColumnType, NativeConnectionInfo, Queryable},
 };
-use schema_connector::{ConnectorError, ConnectorResult};
+use schema_connector::{ConnectorError, ConnectorResult, Namespaces};
 use sql_schema_describer::{DescriberErrorKind, SqlSchema};
 use user_facing_errors::{
     schema_engine::DatabaseSchemaInconsistent,
@@ -38,6 +38,7 @@ impl Connection {
         &mut self,
         circumstances: BitFlags<super::Circumstances>,
         params: &super::Params,
+        namespaces: Option<Namespaces>,
     ) -> ConnectorResult<SqlSchema> {
         use sql_schema_describer::{mysql as describer, SqlSchemaDescriberBackend};
         let mut describer_circumstances: BitFlags<describer::Circumstances> = Default::default();
@@ -69,8 +70,10 @@ impl Connection {
             describer_circumstances |= describer::Circumstances::CheckConstraints;
         }
 
+        let namespaces = Namespaces::to_vec(namespaces, params.url.dbname_or_default().to_string());
+
         let mut schema = sql_schema_describer::mysql::SqlSchemaDescriber::new(&self.0, describer_circumstances)
-            .describe(&[params.url.dbname_or_default()])
+            .describe(&namespaces.iter().map(|s| s.as_str()).collect::<Vec<_>>())
             .await
             .map_err(|err| match err.into_kind() {
                 DescriberErrorKind::QuaintError(err) => quaint_err(&params.url)(err),

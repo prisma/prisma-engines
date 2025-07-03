@@ -66,17 +66,19 @@ impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber<'_> {
             .map(|s| Flavour::from_version(s))
             .unwrap_or(Flavour::Mysql);
 
+        for schema in schemas {
+            sql_schema.push_namespace(schema.to_string());
+        }
+
         sql_schema.views = self.get_views(schema).await?;
 
-        let table_names = self.get_table_names(schema, &mut sql_schema).await?;
-        sql_schema.tables.reserve(table_names.len());
-        sql_schema.table_columns.reserve(table_names.len());
+        self.get_table_names(&mut sql_schema).await?;
 
-        self.get_constraints(&table_names, &mut sql_schema).await?;
+        self.get_constraints(&mut sql_schema).await?;
 
-        Self::get_all_columns(&table_names, self.conn, schema, &mut sql_schema, &flavour).await?;
-        push_foreign_keys(schema, &table_names, &mut sql_schema, self.conn).await?;
-        push_indexes(&table_names, schema, &mut sql_schema, self.conn).await?;
+        Self::get_all_columns(self.conn, &mut sql_schema, &flavour).await?;
+        push_foreign_keys(&mut sql_schema, self.conn).await?;
+        push_indexes(&mut sql_schema, self.conn).await?;
 
         sql_schema.procedures = self.get_procedures(schema).await?;
 
@@ -89,18 +91,22 @@ impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber<'_> {
     }
 }
 
-async fn push_indexes(
-    table_ids: &IndexMap<String, TableId>,
-    schema_name: &str,
-    sql_schema: &mut SqlSchema,
-    conn: &dyn Queryable,
-) -> DescriberResult<()> {
+async fn push_indexes(sql_schema: &mut SqlSchema, conn: &dyn Queryable) -> DescriberResult<()> {
+    let namespaces: Vec<_> = sql_schema
+        .namespaces
+        .iter()
+        .map(|s| Value::text(s.to_string()))
+        .collect();
+
     // We alias all the columns because MySQL column names are case-insensitive in queries, but
     // the information schema column names became upper-case in MySQL 8, causing the code
     // fetching the result values by column name below to fail.
-    let sql = include_str!("mysql/indexes_query.sql");
+    let sql = format!(
+        include_str!("mysql/indexes_query.sql"),
+        placeholders = vec!["?"; namespaces.len()].join(", ")
+    );
 
-    let rows = conn.query_raw(sql, &[schema_name.into()]).await?;
+    let rows = conn.query_raw(&sql, &namespaces).await?;
     let mut current_index_id: Option<IndexId> = None;
     let mut index_should_be_filtered_out = false;
 
@@ -117,10 +123,11 @@ async fn push_indexes(
     };
 
     for row in rows {
+        let namespace = row.get_expect_string("namespace");
         let table_name = row.get_expect_string("table_name");
 
-        let table_id = if let Some(id) = table_ids.get(table_name.as_str()) {
-            *id
+        let table_id = if let Some(t_walker) = sql_schema.table_walker_ns(&namespace, &table_name) {
+            t_walker.id
         } else {
             continue;
         };
@@ -251,29 +258,40 @@ impl<'a> SqlSchemaDescriber<'a> {
     }
 
     #[tracing::instrument(skip(self))]
-    async fn get_table_names(
-        &self,
-        schema: &str,
-        sql_schema: &mut SqlSchema,
-    ) -> DescriberResult<IndexMap<String, TableId>> {
+    async fn get_table_names(&self, sql_schema: &mut SqlSchema) -> DescriberResult<IndexMap<String, TableId>> {
+        let namespaces: Vec<_> = sql_schema
+            .namespaces
+            .iter()
+            .map(|s| Value::text(s.to_string()))
+            .collect();
+
         // Only consider tables for which we can read at least one column.
-        let sql = r#"
+        let placeholders = vec!["?"; namespaces.len()].join(", ");
+        let sql = format!(
+            r#"
             SELECT DISTINCT
+              table_info.table_schema AS namespace,
               BINARY table_info.table_name AS table_name,
               table_info.create_options AS create_options,
-              table_info.table_comment AS table_comment
+              table_info.table_comment AS table_comment              
             FROM information_schema.tables AS table_info
             JOIN information_schema.columns AS column_info
                 ON BINARY column_info.table_name = BINARY table_info.table_name
             WHERE
-                table_info.table_schema = ?
-                AND column_info.table_schema = ?
+                table_info.table_schema IN ({placeholders})
+                AND column_info.table_schema IN ({placeholders})
                 -- Exclude views.
                 AND table_info.table_type = 'BASE TABLE'
-            ORDER BY BINARY table_info.table_name"#;
-        let rows = self.conn.query_raw(sql, &[schema.into(), schema.into()]).await?;
+            ORDER BY BINARY table_info.table_name"#
+        );
+
+        let rows = self
+            .conn
+            .query_raw(&sql, &[&namespaces[..], &namespaces[..]].concat())
+            .await?;
         let names = rows.into_iter().map(|row| {
             (
+                row.get_expect_string("namespace"),
                 row.get_expect_string("table_name"),
                 row.get_string("create_options")
                     .filter(|c| c.as_str() == "partitioned")
@@ -284,17 +302,18 @@ impl<'a> SqlSchemaDescriber<'a> {
 
         let mut map = IndexMap::default();
 
-        for (name, is_partition, description) in names {
+        for (namespace, name, is_partition, description) in names {
+            let namespace_id = sql_schema.get_namespace_id(&namespace).unwrap();
             let cloned_name = name.clone();
             let id = if is_partition {
                 sql_schema.push_table_with_properties(
                     name,
-                    Default::default(),
+                    namespace_id,
                     Into::into(TableProperties::IsPartition),
                     description,
                 )
             } else {
-                sql_schema.push_table(name, Default::default(), description)
+                sql_schema.push_table(name, namespace_id, description)
             };
             map.insert(cloned_name, id);
         }
@@ -307,17 +326,24 @@ impl<'a> SqlSchemaDescriber<'a> {
     }
 
     async fn get_all_columns(
-        table_ids: &IndexMap<String, TableId>,
         conn: &dyn Queryable,
-        schema_name: &str,
         sql_schema: &mut SqlSchema,
         flavour: &Flavour,
     ) -> DescriberResult<()> {
+        let namespaces: Vec<_> = sql_schema
+            .namespaces
+            .iter()
+            .map(|s| Value::text(s.to_string()))
+            .collect();
+
         // We alias all the columns because MySQL column names are case-insensitive in queries, but the
         // information schema column names became upper-case in MySQL 8, causing the code fetching
         // the result values by column name below to fail.
-        let sql = "
+        let placeholders = vec!["?"; namespaces.len()].join(", ");
+        let sql = format!(
+            "
             SELECT
+                table_schema namespace,
                 column_name column_name,
                 data_type data_type,
                 column_type full_data_type,
@@ -331,23 +357,25 @@ impl<'a> SqlSchemaDescriber<'a> {
                 table_name table_name,
                 IF(column_comment = '', NULL, column_comment) AS column_comment
             FROM information_schema.columns
-            WHERE table_schema = ?
+            WHERE table_schema IN ({placeholders})
             ORDER BY ordinal_position
-        ";
+        "
+        );
 
         let mut table_defaults = Vec::new();
         let mut view_defaults = Vec::new();
-        let rows = conn.query_raw(sql, &[schema_name.into()]).await?;
+        let rows = conn.query_raw(&sql, &namespaces).await?;
 
         for col in rows {
             trace!("Got column: {col:?}");
+            let namespace = col.get_expect_string("namespace");
             let table_name = col.get_expect_string("table_name");
 
-            let table_id = table_ids.get(table_name.as_str());
-            let view_id = sql_schema.view_walker(table_name.as_str());
+            let table_id = sql_schema.table_walker_ns(&namespace, &table_name);
+            let view_id = sql_schema.view_walker_ns(&namespace, &table_name);
 
             let container_id = match (table_id, view_id) {
-                (Some(id), _) => Either::Left(id),
+                (Some(t_walker), _) => Either::Left(t_walker.id),
                 (_, Some(v_walker)) => Either::Right(v_walker.id),
                 (None, None) => continue, // we only care about columns in tables we have access to
             };
@@ -509,7 +537,7 @@ impl<'a> SqlSchemaDescriber<'a> {
 
             match container_id {
                 Either::Left(table_id) => {
-                    sql_schema.table_columns.push((*table_id, col));
+                    sql_schema.table_columns.push((table_id, col));
                 }
                 Either::Right(view_id) => {
                     sql_schema.view_columns.push((view_id, col));
@@ -681,11 +709,7 @@ impl<'a> SqlSchemaDescriber<'a> {
 
     /// Return the constraints that are not primary keys, foreign keys, or unique keys, fulltext, or spacial.
     /// Namely, this currently just returns CHECK constraints.
-    async fn get_constraints(
-        &self,
-        table_names: &IndexMap<String, TableId>,
-        sql_schema: &mut SqlSchema,
-    ) -> DescriberResult<()> {
+    async fn get_constraints(&self, sql_schema: &mut SqlSchema) -> DescriberResult<()> {
         // Only MySQL 8.0.16 and above supports check constraints and has the CHECK_CONSTRAINTS table we can query.
         if !self.supports_check_constraints() {
             return Ok(());
@@ -696,13 +720,16 @@ impl<'a> SqlSchemaDescriber<'a> {
 
         let rows = self.conn.query_raw(sql, &[]).await?;
 
+        println!("rows: {rows:#?}");
+
         for row in rows {
+            let namespace = row.get_expect_string("namespace");
             let table_name = row.get_expect_string("table_name");
             let constraint_name = row.get_expect_string("constraint_name");
             let constraint_type = row.get_expect_string("constraint_type");
 
-            let table_id = match table_names.get(&table_name) {
-                Some(id) => *id,
+            let table_id = match sql_schema.table_walker_ns(&namespace, &table_name) {
+                Some(t_walker) => t_walker.id,
                 None => continue,
             };
 
@@ -759,31 +786,36 @@ impl<'a> SqlSchemaDescriber<'a> {
     }
 }
 
-async fn push_foreign_keys(
-    schema_name: &str,
-    table_ids: &IndexMap<String, TableId>,
-    sql_schema: &mut SqlSchema,
-    conn: &dyn Queryable,
-) -> DescriberResult<()> {
+async fn push_foreign_keys(sql_schema: &mut SqlSchema, conn: &dyn Queryable) -> DescriberResult<()> {
+    let namespaces: Vec<_> = sql_schema
+        .namespaces
+        .iter()
+        .map(|s| Value::text(s.to_string()))
+        .collect();
+
     // We alias all the columns because MySQL column names are case-insensitive in queries, but
     // the information schema column names became upper-case in MySQL 8, causing the code
     // fetching the result values by column name below to fail.
-    let sql = "
+    let placeholders = vec!["?"; namespaces.len()].join(", ");
+    let sql = format!(
+        "
             SELECT
                 kcu.constraint_name constraint_name,
+                kcu.table_schema namespace,
+                kcu.table_name table_name,
                 kcu.column_name column_name,
-                kcu.referenced_table_name referenced_table_name,
+                kcu.referenced_table_schema referenced_namespace,
+                kcu.referenced_table_name referenced_table_name, -- TODO: this is not the table name, it's the schema name
                 kcu.referenced_column_name referenced_column_name,
                 kcu.ordinal_position ordinal_position,
-                kcu.table_name table_name,
                 rc.delete_rule delete_rule,
                 rc.update_rule update_rule
             FROM information_schema.key_column_usage AS kcu
             INNER JOIN information_schema.referential_constraints AS rc ON
                 BINARY kcu.constraint_name = BINARY rc.constraint_name
             WHERE
-                BINARY kcu.table_schema = ?
-                AND BINARY rc.constraint_schema = ?
+                BINARY kcu.table_schema IN ({placeholders})
+                AND BINARY rc.constraint_schema IN ({placeholders})
                 AND kcu.referenced_column_name IS NOT NULL
 
             ORDER BY
@@ -791,33 +823,36 @@ async fn push_foreign_keys(
                 BINARY kcu.table_name,
                 BINARY kcu.constraint_name,
                 kcu.ordinal_position
-        ";
+        "
+    );
 
-    fn get_ids(
-        row: &ResultRow,
-        table_ids: &IndexMap<String, TableId>,
-        sql_schema: &SqlSchema,
-    ) -> Option<(TableId, TableColumnId, TableId, TableColumnId)> {
+    fn get_ids(row: &ResultRow, sql_schema: &SqlSchema) -> Option<(TableId, TableColumnId, TableId, TableColumnId)> {
+        let namespace = row.get_expect_string("namespace");
         let table_name = row.get_expect_string("table_name");
         let column_name = row.get_expect_string("column_name");
+        let referenced_namespace = row.get_expect_string("referenced_namespace");
         let referenced_table_name = row.get_expect_string("referenced_table_name");
         let referenced_column_name = row.get_expect_string("referenced_column_name");
 
-        let table_id = *table_ids.get(&table_name)?;
-        let referenced_table_id = *table_ids.get(&referenced_table_name)?;
+        let table_id = sql_schema.table_walker_ns(&namespace, &table_name)?.id;
+        let referenced_table_id = sql_schema
+            .table_walker_ns(&referenced_namespace, &referenced_table_name)?
+            .id;
         let column_id = sql_schema.walk(table_id).column(&column_name)?.id;
         let referenced_column_id = sql_schema.walk(referenced_table_id).column(&referenced_column_name)?.id;
 
         Some((table_id, column_id, referenced_table_id, referenced_column_id))
     }
 
-    let result_set = conn.query_raw(sql, &[schema_name.into(), schema_name.into()]).await?;
+    let result_set = conn
+        .query_raw(&sql, &[&namespaces[..], &namespaces[..]].concat())
+        .await?;
     let mut current_fk: Option<(TableId, String, ForeignKeyId)> = None;
 
     for row in result_set.into_iter() {
         trace!("Got description FK row {row:#?}");
         let (table_id, column_id, referenced_table_id, referenced_column_id) =
-            if let Some(ids) = get_ids(&row, table_ids, sql_schema) {
+            if let Some(ids) = get_ids(&row, sql_schema) {
                 ids
             } else {
                 continue;

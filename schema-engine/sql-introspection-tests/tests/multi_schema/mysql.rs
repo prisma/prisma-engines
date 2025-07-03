@@ -1,19 +1,23 @@
 use sql_introspection_tests::{test_api::*, TestResult};
 
-#[test_connector(tags(Mysql), namespaces("second"))]
+#[test_connector(tags(Mysql))]
 async fn multiple_schemas_without_schema_property_are_not_introspected(api: &mut TestApi) -> TestResult {
     let schema_name = api.schema_name();
-    let other_name = &api.namespaces()[0];
+    let other_name = "not_inspected_schema";
     let create_table = format!("CREATE TABLE `{schema_name}`.`A` (id Int PRIMARY KEY, data Text)",);
     let create_primary = format!("CREATE INDEX `A_idx` ON `{schema_name}`.`A` (`data`(128))",);
 
     api.database().raw_cmd(&create_table).await?;
     api.database().raw_cmd(&create_primary).await?;
 
+    // Need to manually drop the schema to cleanup from prior tests as this test cannot rely on the usual
+    // cleanup logic through test_connector(..namespaces(...)))
+    let drop_schema = format!("DROP Schema IF EXISTS `{other_name}`",);
     let create_schema = format!("CREATE Schema `{other_name}`",);
     let create_table = format!("CREATE TABLE `{other_name}`.`B` (id Int PRIMARY KEY, data Text)",);
     let create_primary = format!("CREATE INDEX `B_idx` ON `{other_name}`.`B` (`data`(128))",);
 
+    api.database().raw_cmd(&drop_schema).await?;
     api.database().raw_cmd(&create_schema).await?;
     api.database().raw_cmd(&create_table).await?;
     api.database().raw_cmd(&create_primary).await?;
