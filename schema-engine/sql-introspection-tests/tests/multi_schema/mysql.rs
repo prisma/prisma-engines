@@ -258,146 +258,146 @@ async fn multiple_schemas_w_duplicate_sanitized_table_names_are_introspected(api
     Ok(())
 }
 
-// #[test_connector(tags(Mysql), preview_features("multiSchema"), namespaces("first", "second"))]
-// async fn multiple_schemas_w_cross_schema_are_introspected(api: &mut TestApi) -> TestResult {
-//     let schema_name = "first";
-//     let other_name = "second";
-//     let create_schema = format!("CREATE Schema `{schema_name}`",);
-//     let create_table = format!("CREATE TABLE `{schema_name}`.`A` (id Text PRIMARY KEY)",);
-//     //Todo
-//     api.database().raw_cmd(&create_schema).await?;
-//     api.database().raw_cmd(&create_table).await?;
+#[test_connector(tags(Mysql), preview_features("multiSchema"), namespaces("first", "second"))]
+async fn multiple_schemas_w_cross_schema_are_introspected(api: &mut TestApi) -> TestResult {
+    let schema_name = "first";
+    let other_name = "second";
+    let create_schema = format!("CREATE Schema `{schema_name}`",);
+    let create_table = format!("CREATE TABLE `{schema_name}`.`A` (id INT PRIMARY KEY)",);
+    //Todo
+    api.database().raw_cmd(&create_schema).await?;
+    api.database().raw_cmd(&create_table).await?;
 
-//     let create_schema = format!("CREATE Schema `{other_name}`",);
-//     let create_table = format!(
-//         "CREATE TABLE `{other_name}`.`B` (id Text PRIMARY KEY, fk Text References `{schema_name}`.`A`(`id`))",
-//     );
+    let create_schema = format!("CREATE Schema `{other_name}`",);
+    let create_table =
+        format!("CREATE TABLE `{other_name}`.`B` (id INT PRIMARY KEY, fk INT, FOREIGN KEY (fk) REFERENCES `{schema_name}`.`A`(`id`))",);
 
-//     api.database().raw_cmd(&create_schema).await?;
-//     api.database().raw_cmd(&create_table).await?;
+    api.database().raw_cmd(&create_schema).await?;
+    api.database().raw_cmd(&create_table).await?;
 
-//     let expected = expect![[r#"
-//         model A {
-//           id String @id
-//           B  B[]
+    let expected = expect![[r#"
+        model A {
+          id Int @id
+          B  B[]
 
-//           @@schema("first")
-//         }
+          @@schema("first")
+        }
 
-//         model B {
-//           id String  @id
-//           fk String?
-//           A  A?      @relation(fields: [fk], references: [id], onDelete: NoAction, onUpdate: NoAction)
+        model B {
+          id Int  @id
+          fk Int?
+          A  A?   @relation(fields: [fk], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "B_ibfk_1")
 
-//           @@schema("second")
-//         }
-//     "#]];
+          @@index([fk], map: "fk")
+          @@schema("second")
+        }
+    "#]];
 
-//     let result = api.introspect_dml().await?;
-//     expected.assert_eq(&result);
+    let result = api.introspect_dml().await?;
+    expected.assert_eq(&result);
 
-//     Ok(())
-// }
+    Ok(())
+}
 
-// #[test_connector(tags(Mysql), preview_features("multiSchema"), namespaces("first", "second"))]
-// async fn multiple_schemas_w_cross_schema_are_reintrospected(api: &mut TestApi) -> TestResult {
-//     let schema_name = "first";
-//     let other_name = "second";
-//     let create_schema = format!("CREATE Schema `{schema_name}`",);
-//     let create_table = format!("CREATE TABLE `{schema_name}`.`A` (id Text PRIMARY KEY)",);
-//     //Todo
-//     api.database().raw_cmd(&create_schema).await?;
-//     api.database().raw_cmd(&create_table).await?;
+#[test_connector(tags(Mysql), preview_features("multiSchema"), namespaces("first", "second"))]
+async fn multiple_schemas_w_cross_schema_are_reintrospected(api: &mut TestApi) -> TestResult {
+    let schema_name = "first";
+    let other_name = "second";
+    let create_schema = format!("CREATE Schema `{schema_name}`",);
+    let create_table = format!("CREATE TABLE `{schema_name}`.`A` (id Int PRIMARY KEY)",);
+    //Todo
+    api.database().raw_cmd(&create_schema).await?;
+    api.database().raw_cmd(&create_table).await?;
 
-//     let create_schema = format!("CREATE Schema `{other_name}`",);
-//     let create_table = format!(
-//         "CREATE TABLE `{other_name}`.`B` (id Text PRIMARY KEY, fk Text References `{schema_name}`.`A`(`id`))",
-//     );
+    let create_schema = format!("CREATE Schema `{other_name}`",);
+    let create_table =
+        format!("CREATE TABLE `{other_name}`.`B` (id Int PRIMARY KEY, fk Int, FOREIGN KEY (fk) REFERENCES `{schema_name}`.`A`(`id`))",);
 
-//     api.database().raw_cmd(&create_schema).await?;
-//     api.database().raw_cmd(&create_table).await?;
+    api.database().raw_cmd(&create_schema).await?;
+    api.database().raw_cmd(&create_table).await?;
 
-//     let input = indoc! {r#"
-//         model A {
-//           id String @id
-//           B  B[]
+    let input = indoc! {r#"
+        model A {
+          id Int @id
+          B  B[]
 
-//           @@schema("first")
-//         }
+          @@schema("first")
+        }
 
-//         model B {
-//           id String  @id
-//           fk String?
-//           A  A?      @relation(fields: [fk], references: [id], onDelete: NoAction, onUpdate: NoAction)
+        model B {
+          id Int  @id
+          fk Int?
+          A  A?   @relation(fields: [fk], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
-//           @@schema("first")
-//         }
-//     "#};
+          @@schema("first")
+        }
+    "#};
 
-//     let expected = expect![[r#"
-//         model A {
-//           id String @id
-//           B  B[]
+    let expected = expect![[r#"
+        model A {
+          id Int @id
+          B  B[]
 
-//           @@schema("first")
-//         }
+          @@schema("first")
+        }
 
-//         model B {
-//           id String  @id
-//           fk String?
-//           A  A?      @relation(fields: [fk], references: [id], onDelete: NoAction, onUpdate: NoAction)
+        model B {
+          id Int  @id
+          fk Int?
+          A  A?   @relation(fields: [fk], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "B_ibfk_1")
 
-//           @@schema("second")
-//         }
-//     "#]];
+          @@index([fk], map: "fk")
+          @@schema("second")
+        }
+    "#]];
 
-//     api.expect_re_introspected_datamodel(input, expected).await;
+    api.expect_re_introspected_datamodel(input, expected).await;
 
-//     Ok(())
-// }
+    Ok(())
+}
 
-// #[test_connector(tags(Mysql), preview_features("multiSchema"), namespaces("first", "second"))]
-// async fn multiple_schemas_w_cross_schema_fks_w_duplicate_names_are_introspected(api: &mut TestApi) -> TestResult {
-//     let schema_name = "first";
-//     let other_name = "second";
-//     let create_schema = format!("CREATE SCHEMA `{schema_name}`",);
-//     let create_table = format!("CREATE TABLE `{schema_name}`.`A` (id Text PRIMARY KEY)",);
-//     //Todo
-//     api.database().raw_cmd(&create_schema).await?;
-//     api.database().raw_cmd(&create_table).await?;
+#[test_connector(tags(Mysql), preview_features("multiSchema"), namespaces("first", "second"))]
+async fn multiple_schemas_w_cross_schema_fks_w_duplicate_names_are_introspected(api: &mut TestApi) -> TestResult {
+    let schema_name = "first";
+    let other_name = "second";
+    let create_schema = format!("CREATE SCHEMA `{schema_name}`",);
+    let create_table = format!("CREATE TABLE `{schema_name}`.`A` (id INT PRIMARY KEY)",);
+    //Todo
+    api.database().raw_cmd(&create_schema).await?;
+    api.database().raw_cmd(&create_table).await?;
 
-//     let create_schema = format!("CREATE SCHEMA `{other_name}`",);
-//     let create_table = format!(
-//         "CREATE TABLE `{other_name}`.`A` (id TEXT PRIMARY KEY, fk TEXT REFERENCES `{schema_name}`.`A`(`id`))",
-//     );
+    let create_schema = format!("CREATE SCHEMA `{other_name}`",);
+    let create_table =
+        format!("CREATE TABLE `{other_name}`.`A` (id INT PRIMARY KEY, fk INT, FOREIGN KEY (fk) REFERENCES `{schema_name}`.`A`(`id`))",);
 
-//     api.database().raw_cmd(&create_schema).await?;
-//     api.database().raw_cmd(&create_table).await?;
+    api.database().raw_cmd(&create_schema).await?;
+    api.database().raw_cmd(&create_table).await?;
 
-//     let expected = expect![[r#"
-//         model first_A {
-//           id String     @id
-//           A  second_A[]
+    let expected = expect![[r#"
+        model first_A {
+          id Int        @id
+          A  second_A[]
 
-//           @@map("A")
-//           @@schema("first")
-//         }
+          @@map("A")
+          @@schema("first")
+        }
 
-//         model second_A {
-//           id String   @id
-//           fk String?
-//           A  first_A? @relation(fields: [fk], references: [id], onDelete: NoAction, onUpdate: NoAction)
+        model second_A {
+          id Int      @id
+          fk Int?
+          A  first_A? @relation(fields: [fk], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "A_ibfk_1")
 
-//           @@map("A")
-//           @@schema("second")
-//         }
-//     "#]];
+          @@index([fk], map: "fk")
+          @@map("A")
+          @@schema("second")
+        }
+    "#]];
 
-//     let result = api.introspect_dml().await?;
-//     expected.assert_eq(&result);
+    let result = api.introspect_dml().await?;
+    expected.assert_eq(&result);
 
-//     Ok(())
-// }
+    Ok(())
+}
 
 // #[test_connector(tags(Mysql), preview_features("multiSchema"), namespaces("first", "second_schema"))]
 // async fn multiple_schemas_w_enums_are_introspected(api: &mut TestApi) -> TestResult {

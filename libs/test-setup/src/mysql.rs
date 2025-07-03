@@ -123,8 +123,10 @@ pub async fn drop_mysql_namespaces(database_url: &str, namespaces: &[&str]) -> R
     for namespace in namespaces {
         let db_name = mysql_safe_identifier(namespace);
         let drop = format!(
-            r#"
-        DROP DATABASE IF EXISTS `{db_name}`;
+            r#"            
+            SET FOREIGN_KEY_CHECKS=0;
+            DROP DATABASE IF EXISTS `{db_name}`;
+            SET FOREIGN_KEY_CHECKS=1;
         "#,
         );
         conn.raw_cmd(&drop).await?;
