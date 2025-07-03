@@ -147,9 +147,8 @@ impl TestApiArgs {
             let mut hasher = DefaultHasher::new();
             test_function_name.hash(&mut hasher);
             let hash = hasher.finish();
-            let hash_hex = format!("{:x}", hash);
 
-            namespaces.iter().map(|s| format!("{s}_{hash_hex}")).collect::<Vec<_>>()
+            namespaces.iter().map(|s| format!("{s}_{hash}")).collect::<Vec<_>>()
         } else {
             namespaces.iter().map(|s| s.to_string()).collect::<Vec<_>>()
         };

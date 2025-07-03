@@ -318,8 +318,6 @@ impl<'a> SqlSchemaDescriber<'a> {
             map.insert(cloned_name, id);
         }
 
-        println!("table_names: {:?}", map);
-
         trace!("Found table names: {map:?}");
 
         Ok(map)

@@ -178,9 +178,9 @@ impl SqlConnector for MysqlConnector {
         "mysql"
     }
 
-    fn describe_schema(&mut self, _namespaces: Option<Namespaces>) -> BoxFuture<'_, ConnectorResult<SqlSchema>> {
+    fn describe_schema(&mut self, namespaces: Option<Namespaces>) -> BoxFuture<'_, ConnectorResult<SqlSchema>> {
         with_connection(&mut self.state, |params, circumstances, connection| async move {
-            connection.describe_schema(circumstances, params).await
+            connection.describe_schema(circumstances, params, namespaces).await
         })
     }
 
