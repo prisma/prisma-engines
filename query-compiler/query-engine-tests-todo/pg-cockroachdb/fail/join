@@ -1,5 +1,3 @@
-new::regressions::prisma_13097::prisma_13097::group_by_boolean_array
-new::regressions::prisma_13097::prisma_13097::group_by_enum_array
 new::regressions::prisma_7434::not_in_chunking_cockroachdb::not_in_batch_filter
 queries::aggregation::group_by::aggregation_group_by::group_by_ordering_sum_aggregation
 queries::aggregation::many_count_relation::many_count_rel::count_with_distinct
