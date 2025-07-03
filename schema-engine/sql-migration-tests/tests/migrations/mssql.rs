@@ -409,8 +409,7 @@ fn apply_migrations_with_a_schema_in_url(mut api: TestApi) {
     "#;
 
     let migrations_directory = api.create_migrations_directory();
-    let migration = format!(
-        r#"
+    let migration = r#"
         BEGIN TRY
 
         BEGIN TRAN;
@@ -431,18 +430,16 @@ fn apply_migrations_with_a_schema_in_url(mut api: TestApi) {
         THROW
 
         END CATCH
-    "#,
-    );
+    "#;
 
     api.create_migration("01init", schema, &migrations_directory)
         .draft(true)
         .send_sync()
         .modify_migration(|contents| {
             contents.clear();
-            contents.push_str(&migration);
+            contents.push_str(migration);
         })
-        .into_output()
-        .generated_migration_name;
+        .into_output();
 
     api.apply_migrations(&migrations_directory)
         .send_sync()
