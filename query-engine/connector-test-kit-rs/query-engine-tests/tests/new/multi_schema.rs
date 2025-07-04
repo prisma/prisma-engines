@@ -1,6 +1,7 @@
 use query_engine_tests::test_suite;
 
-#[test_suite(capabilities(MultiSchema))]
+// TODO: activate mysql tests when namespace sql-render is implemented
+#[test_suite(capabilities(MultiSchema), exclude(Mysql))]
 mod multi_schema {
     use query_engine_tests::*;
 
