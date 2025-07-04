@@ -1754,7 +1754,9 @@ fn all_mysql_8_column_types_must_work(api: TestApi) {
 
     let expectation = expect![[r#"
         SqlSchema {
-            namespaces: [],
+            namespaces: [
+                "all_mysql_8_column_types_must_work",
+            ],
             tables: [
                 Table {
                     namespace_id: NamespaceId(
@@ -2647,7 +2649,9 @@ fn constraints_from_other_databases_should_not_be_introspected(api: TestApi) {
 
     let expectation = expect![[r#"
         SqlSchema {
-            namespaces: [],
+            namespaces: [
+                "constraints_from_other_databases_should_not_be_introspected",
+            ],
             tables: [
                 Table {
                     namespace_id: NamespaceId(
@@ -2921,7 +2925,9 @@ fn escaped_quotes_in_string_defaults_must_be_unescaped(api: TestApi) {
 
     let expectation = expect![[r#"
         SqlSchema {
-            namespaces: [],
+            namespaces: [
+                "escaped_quotes_in_string_defaults_must_be_unescaped",
+            ],
             tables: [
                 Table {
                     namespace_id: NamespaceId(
@@ -3030,7 +3036,9 @@ fn escaped_backslashes_in_string_literals_must_be_unescaped(api: TestApi) {
 
     let expectation = expect![[r#"
         SqlSchema {
-            namespaces: [],
+            namespaces: [
+                "escaped_backslashes_in_string_literals_must_be_unescaped",
+            ],
             tables: [
                 Table {
                     namespace_id: NamespaceId(
@@ -3119,7 +3127,9 @@ fn function_expression_defaults_are_described_as_dbgenerated(api: TestApi) {
 
     let expectation = expect![[r#"
         SqlSchema {
-            namespaces: [],
+            namespaces: [
+                "function_expression_defaults_are_described_as_dbgenerated",
+            ],
             tables: [
                 Table {
                     namespace_id: NamespaceId(
