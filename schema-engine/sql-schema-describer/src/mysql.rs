@@ -410,7 +410,7 @@ impl<'a> SqlSchemaDescriber<'a> {
             let default_value = col.get("column_default");
 
             let tpe = Self::get_column_type(
-                (&table_name, &name),
+                (&namespace, &table_name, &name),
                 &data_type,
                 &full_data_type,
                 precision,
@@ -577,7 +577,7 @@ impl<'a> SqlSchemaDescriber<'a> {
     }
 
     fn get_column_type(
-        (table, column_name): (&str, &str),
+        (namespace, table, column_name): (&str, &str, &str),
         data_type: &str,
         full_data_type: &str,
         precision: Precision,
@@ -642,7 +642,8 @@ impl<'a> SqlSchemaDescriber<'a> {
             "longtext" => (ColumnTypeFamily::String, Some(MySqlType::LongText)),
             "enum" => {
                 let enum_name = format!("{table}_{column_name}");
-                let enum_id = sql_schema.push_enum(Default::default(), enum_name, None);
+                let namespace_id = sql_schema.get_namespace_id(namespace).unwrap();
+                let enum_id = sql_schema.push_enum(namespace_id, enum_name, None);
                 push_enum_variants(full_data_type, enum_id, sql_schema);
                 (ColumnTypeFamily::Enum(enum_id), None)
             }

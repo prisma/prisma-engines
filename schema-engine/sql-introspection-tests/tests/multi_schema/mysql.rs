@@ -399,133 +399,137 @@ async fn multiple_schemas_w_cross_schema_fks_w_duplicate_names_are_introspected(
     Ok(())
 }
 
-// #[test_connector(tags(Mysql), preview_features("multiSchema"), namespaces("first", "second_schema"))]
-// async fn multiple_schemas_w_enums_are_introspected(api: &mut TestApi) -> TestResult {
-//     let schema_name = "first";
-//     let other_name = "second_schema";
-//     let sql = format! {
-//         r#"
-//             CREATE SCHEMA "{schema_name}";
-//             CREATE TYPE "{schema_name}"."HappyMood" AS ENUM ('happy');
-//             CREATE SCHEMA "{other_name}";
-//             CREATE TYPE "{other_name}"."SadMood" AS ENUM ('sad');
-//         "#,
-//     };
+#[test_connector(tags(Mysql), preview_features("multiSchema"), namespaces("first", "second_schema"))]
+async fn multiple_schemas_w_enums_are_introspected(api: &mut TestApi) -> TestResult {
+    let schema_name = "first";
+    let other_name = "second_schema";
+    let sql = format! {
+        r#"
+            CREATE SCHEMA `{schema_name}`;
+            CREATE TABLE `{schema_name}`.`HappyPerson` (mood ENUM ('happy') PRIMARY KEY);
 
-//     api.raw_cmd(&sql).await;
+            CREATE SCHEMA `{other_name}`;
+            CREATE TABLE `{other_name}`.`SadPerson` (mood ENUM ('sad') PRIMARY KEY);
+        "#,
+    };
 
-//     let expected = expect![[r#"
-//         generator client {
-//           provider        = "prisma-client-js"
-//           previewFeatures = ["multiSchema"]
-//         }
+    api.raw_cmd(&sql).await;
 
-//         datasource db {
-//           provider = "mysql"
-//           url      = "env(TEST_DATABASE_URL)"
-//           schemas  = ["first", "second_schema"]
-//         }
+    let expected = expect![[r#"
+        generator client {
+          provider        = "prisma-client-js"
+          previewFeatures = ["multiSchema"]
+        }
 
-//         enum HappyMood {
-//           happy
+        datasource db {
+          provider = "mysql"
+          url      = "env(TEST_DATABASE_URL)"
+          schemas  = ["first", "second_schema"]
+        }
 
-//           @@schema("first")
-//         }
+        model HappyPerson {
+          mood HappyPerson_mood @id
 
-//         enum SadMood {
-//           sad
+          @@schema("first")
+        }
 
-//           @@schema("second_schema")
-//         }
-//     "#]];
+        model SadPerson {
+          mood SadPerson_mood @id
 
-//     api.expect_datamodel(&expected).await;
-//     Ok(())
-// }
+          @@schema("second_schema")
+        }
 
-// #[test_connector(tags(Mysql), preview_features("multiSchema"), namespaces("first", "second"))]
-// async fn multiple_schemas_w_duplicate_enums_are_introspected(api: &mut TestApi) -> TestResult {
-//     let schema_name = "first";
-//     let other_name = "second";
-//     let setup = formatdoc! {
-//         r#"
-//             CREATE SCHEMA "{schema_name}";
-//             CREATE TYPE "{schema_name}"."HappyMood" AS ENUM ('happy');
-//             CREATE TABLE "{schema_name}"."HappyPerson" (mood "{schema_name}"."HappyMood" PRIMARY KEY);
+        enum HappyPerson_mood {
+          happy
 
-//             CREATE SCHEMA "{other_name}";
-//             CREATE TYPE "{other_name}"."HappyMood" AS ENUM ('veryHappy');
-//             CREATE TABLE "{other_name}"."VeryHappyPerson" (mood "{other_name}"."HappyMood" PRIMARY KEY);
-//             CREATE TABLE "{other_name}"."HappyPerson" (mood "{schema_name}"."HappyMood" PRIMARY KEY);
+          @@schema("first")
+        }
 
-//         "#
-//     };
+        enum SadPerson_mood {
+          sad
 
-//     api.raw_cmd(&setup).await;
+          @@schema("second_schema")
+        }
+    "#]];
 
-//     let expected = expect![[r#"
-//         generator client {
-//           provider        = "prisma-client-js"
-//           previewFeatures = ["multiSchema"]
-//         }
+    api.expect_datamodel(&expected).await;
+    Ok(())
+}
 
-//         datasource db {
-//           provider = "mysql"
-//           url      = "env(TEST_DATABASE_URL)"
-//           schemas  = ["first", "second"]
-//         }
+#[test_connector(tags(Mysql), preview_features("multiSchema"), namespaces("first", "second"))]
+async fn multiple_schemas_w_duplicate_enums_are_introspected(api: &mut TestApi) -> TestResult {
+    let schema_name = "first";
+    let other_name = "second";
+    let setup = formatdoc! {
+        r#"
+            CREATE SCHEMA `{schema_name}`;
+            CREATE TABLE `{schema_name}`.`HappyPerson` (mood ENUM ('happy') PRIMARY KEY);
 
-//         model first_HappyPerson {
-//           mood first_HappyMood @id
+            CREATE SCHEMA `{other_name}`;
+            CREATE TABLE `{other_name}`.`HappyPerson` (mood ENUM ('very_happy') PRIMARY KEY);
 
-//           @@map("HappyPerson")
-//           @@schema("first")
-//         }
+        "#
+    };
 
-//         model second_HappyPerson {
-//           mood first_HappyMood @id
+    api.raw_cmd(&setup).await;
 
-//           @@map("HappyPerson")
-//           @@schema("second")
-//         }
+    let expected = expect![[r#"
+        generator client {
+          provider        = "prisma-client-js"
+          previewFeatures = ["multiSchema"]
+        }
 
-//         model VeryHappyPerson {
-//           mood second_HappyMood @id
+        datasource db {
+          provider = "mysql"
+          url      = "env(TEST_DATABASE_URL)"
+          schemas  = ["first", "second"]
+        }
 
-//           @@schema("second")
-//         }
+        model first_HappyPerson {
+          mood first_HappyPerson_mood @id
 
-//         enum first_HappyMood {
-//           happy
+          @@map("HappyPerson")
+          @@schema("first")
+        }
 
-//           @@map("HappyMood")
-//           @@schema("first")
-//         }
+        model second_HappyPerson {
+          mood second_HappyPerson_mood @id
 
-//         enum second_HappyMood {
-//           veryHappy
+          @@map("HappyPerson")
+          @@schema("second")
+        }
 
-//           @@map("HappyMood")
-//           @@schema("second")
-//         }
-//     "#]];
+        enum first_HappyPerson_mood {
+          happy
 
-//     api.expect_datamodel(&expected).await;
+          @@map("HappyPerson_mood")
+          @@schema("first")
+        }
 
-//     let expected = expect![[r#"
-//         *** WARNING ***
+        enum second_HappyPerson_mood {
+          very_happy
 
-//         These items were renamed due to their names being duplicates in the Prisma schema:
-//           - Type: "enum", name: "first_HappyMood"
-//           - Type: "enum", name: "second_HappyMood"
-//           - Type: "model", name: "first_HappyPerson"
-//           - Type: "model", name: "second_HappyPerson"
-//     "#]];
+          @@map("HappyPerson_mood")
+          @@schema("second")
+        }
+    "#]];
 
-//     api.expect_warnings(&expected).await;
+    api.expect_datamodel(&expected).await;
 
-//     Ok(())
-// }
+    let expected = expect![[r#"
+        *** WARNING ***
+
+        These items were renamed due to their names being duplicates in the Prisma schema:
+          - Type: "enum", name: "first_HappyPerson_mood"
+          - Type: "enum", name: "second_HappyPerson_mood"
+          - Type: "model", name: "first_HappyPerson"
+          - Type: "model", name: "second_HappyPerson"
+    "#]];
+
+    api.expect_warnings(&expected).await;
+
+    Ok(())
+}
 
 // #[test_connector(tags(Mysql), preview_features("multiSchema"), namespaces("first", "second"))]
 // async fn multiple_schemas_w_duplicate_models_are_reintrospected(api: &mut TestApi) -> TestResult {
