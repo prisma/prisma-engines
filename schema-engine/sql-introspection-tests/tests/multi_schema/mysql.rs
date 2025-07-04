@@ -531,243 +531,272 @@ async fn multiple_schemas_w_duplicate_enums_are_introspected(api: &mut TestApi) 
     Ok(())
 }
 
-// #[test_connector(tags(Mysql), preview_features("multiSchema"), namespaces("first", "second"))]
-// async fn multiple_schemas_w_duplicate_models_are_reintrospected(api: &mut TestApi) -> TestResult {
-//     let schema_name = "first";
-//     let other_name = "second";
-//     let setup = formatdoc! {
-//         r#"
-//             CREATE SCHEMA "{schema_name}";
-//             CREATE TABLE "{schema_name}"."HappyPerson" (id SERIAL PRIMARY KEY);
+#[test_connector(tags(Mysql), preview_features("multiSchema"), namespaces("first", "second"))]
+async fn multiple_schemas_w_duplicate_models_are_reintrospected(api: &mut TestApi) -> TestResult {
+    let schema_name = "first";
+    let other_name = "second";
+    let setup = formatdoc! {
+        r#"
+            CREATE SCHEMA `{schema_name}`;
+            CREATE TABLE `{schema_name}`.`HappyPerson` (id INT PRIMARY KEY);
 
-//             CREATE SCHEMA "{other_name}";
-//             CREATE TABLE "{other_name}"."HappyPerson" (id SERIAL PRIMARY KEY);
+            CREATE SCHEMA `{other_name}`;
+            CREATE TABLE `{other_name}`.`HappyPerson` (id INT PRIMARY KEY);
 
-//         "#
-//     };
+        "#
+    };
 
-//     api.raw_cmd(&setup).await;
+    api.raw_cmd(&setup).await;
 
-//     let input = indoc! {r#"
-//         model FooBar {
-//           id Int @id @default(autoincrement())
+    let input = indoc! {r#"
+        model FooBar {
+          id Int @id
 
-//           @@map("HappyPerson")
-//           @@schema("first")
-//         }
+          @@map("HappyPerson")
+          @@schema("first")
+        }
 
-//         model HappyPerson {
-//           id Int @id @default(autoincrement())
+        model HappyPerson {
+          id Int @id
 
-//           @@schema("second")
-//         }
-//     "#};
+          @@schema("second")
+        }
+    "#};
 
-//     let expected = expect![[r#"
-//         model FooBar {
-//           id Int @id @default(autoincrement())
+    let expected = expect![[r#"
+        model FooBar {
+          id Int @id
 
-//           @@map("HappyPerson")
-//           @@schema("first")
-//         }
+          @@map("HappyPerson")
+          @@schema("first")
+        }
 
-//         model HappyPerson {
-//           id Int @id @default(autoincrement())
+        model HappyPerson {
+          id Int @id
 
-//           @@schema("second")
-//         }
-//     "#]];
+          @@schema("second")
+        }
+    "#]];
 
-//     api.expect_re_introspected_datamodel(input, expected).await;
+    api.expect_re_introspected_datamodel(input, expected).await;
 
-//     let expected = expect![[r#"
-//         *** WARNING ***
+    let expected = expect![[r#"
+        *** WARNING ***
 
-//         These models were enriched with `@@map` information taken from the previous Prisma schema:
-//           - "FooBar"
-//     "#]];
+        These models were enriched with `@@map` information taken from the previous Prisma schema:
+          - "FooBar"
+    "#]];
 
-//     api.expect_re_introspect_warnings(input, expected).await;
+    api.expect_re_introspect_warnings(input, expected).await;
 
-//     Ok(())
-// }
+    Ok(())
+}
 
-// #[test_connector(tags(Mysql), preview_features("multiSchema"), namespaces("first", "second"))]
-// async fn multiple_schemas_w_duplicate_models_are_reintrospected_never_renamed(api: &mut TestApi) -> TestResult {
-//     let schema_name = "first";
-//     let other_name = "second";
-//     let setup = formatdoc! {
-//         r#"
-//             CREATE SCHEMA "{schema_name}";
-//             CREATE TABLE "{schema_name}"."HappyPerson" (id SERIAL PRIMARY KEY);
+#[test_connector(tags(Mysql), preview_features("multiSchema"), namespaces("first", "second"))]
+async fn multiple_schemas_w_duplicate_models_are_reintrospected_never_renamed(api: &mut TestApi) -> TestResult {
+    let schema_name = "first";
+    let other_name = "second";
+    let setup = formatdoc! {
+        r#"
+            CREATE SCHEMA `{schema_name}`;
+            CREATE TABLE `{schema_name}`.`HappyPerson` (id INT PRIMARY KEY);
 
-//             CREATE SCHEMA "{other_name}";
-//             CREATE TABLE "{other_name}"."HappyPerson" (id SERIAL PRIMARY KEY);
+            CREATE SCHEMA `{other_name}`;
+            CREATE TABLE `{other_name}`.`HappyPerson` (id INT PRIMARY KEY);
 
-//         "#
-//     };
+        "#
+    };
 
-//     api.raw_cmd(&setup).await;
+    api.raw_cmd(&setup).await;
 
-//     let input = indoc! {r#"
-//         model HappyPerson {
-//           id Int @id @default(autoincrement())
+    let input = indoc! {r#"
+        model HappyPerson {
+          id Int @id
 
-//           @@schema("first")
-//         }
-//     "#};
+          @@schema("first")
+        }
+    "#};
 
-//     let expected = expect![[r#"
-//         model HappyPerson {
-//           id Int @id @default(autoincrement())
+    let expected = expect![[r#"
+        model HappyPerson {
+          id Int @id
 
-//           @@schema("first")
-//         }
+          @@schema("first")
+        }
 
-//         model second_HappyPerson {
-//           id Int @id @default(autoincrement())
+        model second_HappyPerson {
+          id Int @id
 
-//           @@map("HappyPerson")
-//           @@schema("second")
-//         }
-//     "#]];
+          @@map("HappyPerson")
+          @@schema("second")
+        }
+    "#]];
 
-//     api.expect_re_introspected_datamodel(input, expected).await;
+    api.expect_re_introspected_datamodel(input, expected).await;
 
-//     let expected = expect![[r#"
-//         *** WARNING ***
+    let expected = expect![[r#"
+        *** WARNING ***
 
-//         These items were renamed due to their names being duplicates in the Prisma schema:
-//           - Type: "model", name: "second_HappyPerson"
-//     "#]];
+        These items were renamed due to their names being duplicates in the Prisma schema:
+          - Type: "model", name: "second_HappyPerson"
+    "#]];
 
-//     api.expect_re_introspect_warnings(input, expected).await;
+    api.expect_re_introspect_warnings(input, expected).await;
 
-//     Ok(())
-// }
+    Ok(())
+}
 
-// #[test_connector(tags(Mysql), preview_features("multiSchema"), namespaces("first", "second"))]
-// async fn multiple_schemas_w_duplicate_enums_are_reintrospected(api: &mut TestApi) -> TestResult {
-//     let schema_name = "first";
-//     let other_name = "second";
-//     let setup = formatdoc! {
-//         r#"
-//             CREATE SCHEMA "{schema_name}";
-//             CREATE TYPE "{schema_name}"."HappyMood" AS ENUM ('veryHappy');
+#[test_connector(tags(Mysql), preview_features("multiSchema"), namespaces("first", "second"))]
+async fn multiple_schemas_w_duplicate_enums_are_reintrospected(api: &mut TestApi) -> TestResult {
+    let schema_name = "first";
+    let other_name = "second";
+    let setup = formatdoc! {
+        r#"
+            CREATE SCHEMA `{schema_name}`;
+            CREATE TABLE `{schema_name}`.`HappyPerson` (mood ENUM ('happy') PRIMARY KEY);
 
-//             CREATE SCHEMA "{other_name}";
-//             CREATE TYPE "{other_name}"."HappyMood" AS ENUM ('veryHappy');
-//         "#
-//     };
+            CREATE SCHEMA `{other_name}`;
+            CREATE TABLE `{other_name}`.`HappyPerson` (mood ENUM ('very_happy') PRIMARY KEY);
+        "#
+    };
 
-//     api.raw_cmd(&setup).await;
+    api.raw_cmd(&setup).await;
 
-//     let input = indoc! {r#"
-//         enum RenamedMood {
-//           veryHappy
+    let input = indoc! {r#"
+        model HappyPerson {
+          mood RenamedMood @id
 
-//           @@map("HappyMood")
-//           @@schema("first")
-//         }
-//     "#};
+          @@schema("first")
+        }
 
-//     let expected = expect![[r#"
-//         enum RenamedMood {
-//           veryHappy
+        enum RenamedMood {
+          happy
 
-//           @@map("HappyMood")
-//           @@schema("first")
-//         }
+          @@map("HappyPerson_mood")
+          @@schema("first")
+        }
+    "#};
 
-//         enum HappyMood {
-//           veryHappy
+    let expected = expect![[r#"
+        model HappyPerson {
+          mood RenamedMood @id
 
-//           @@schema("second")
-//         }
-//     "#]];
+          @@schema("first")
+        }
 
-//     api.expect_re_introspected_datamodel(input, expected).await;
+        model second_HappyPerson {
+          mood HappyPerson_mood @id
 
-//     let expected = expect![[r#"
-//         *** WARNING ***
+          @@map("HappyPerson")
+          @@schema("second")
+        }
 
-//         These enums were enriched with `@@map` information taken from the previous Prisma schema:
-//           - "RenamedMood"
-//     "#]];
+        enum RenamedMood {
+          happy
 
-//     api.expect_re_introspect_warnings(input, expected).await;
+          @@map("HappyPerson_mood")
+          @@schema("first")
+        }
 
-//     Ok(())
-// }
+        enum HappyPerson_mood {
+          very_happy
 
-// #[test_connector(tags(Mysql))]
-// async fn multiple_schemas_w_enums_without_schemas_are_not_introspected(api: &mut TestApi) -> TestResult {
-//     let schema_name = api.schema_name();
-//     let other_name = "second";
-//     let create_type = format!("CREATE TYPE `{schema_name}`.`HappyMood` AS ENUM ('happy')",);
+          @@schema("second")
+        }
+    "#]];
 
-//     api.database().raw_cmd(&create_type).await?;
+    api.expect_re_introspected_datamodel(input, expected).await;
 
-//     let create_schema = format!("CREATE Schema `{other_name}`",);
-//     let create_type = format!("CREATE TYPE `{other_name}`.`SadMood` AS ENUM ('sad')",);
+    let expected = expect![[r#"
+        *** WARNING ***
 
-//     api.database().raw_cmd(&create_schema).await?;
-//     api.database().raw_cmd(&create_type).await?;
+        These enums were enriched with `@@map` information taken from the previous Prisma schema:
+          - "RenamedMood"
 
-//     let expected = expect![[r#"
-//         enum HappyMood {
-//           happy
-//         }
-//     "#]];
+        These items were renamed due to their names being duplicates in the Prisma schema:
+          - Type: "model", name: "second_HappyPerson"
+    "#]];
 
-//     let result = api.introspect_dml().await?;
-//     expected.assert_eq(&result);
+    api.expect_re_introspect_warnings(input, expected).await;
 
-//     Ok(())
-// }
+    Ok(())
+}
 
-// #[test_connector(tags(Mysql), preview_features("multiSchema"), namespaces("first", "second_schema"))]
-// async fn same_table_name_with_relation_in_two_schemas(api: &mut TestApi) -> TestResult {
-//     let sql = r#"
-//         CREATE SCHEMA "first";
-//         CREATE SCHEMA "second_schema";
-//         CREATE TABLE "first"."tbl" ( id SERIAL PRIMARY KEY );
-//         CREATE TABLE "second_schema"."tbl" ( id SERIAL PRIMARY KEY, fst INT REFERENCES "first"."tbl"("id") );
-//     "#;
+#[test_connector(tags(Mysql))]
+async fn multiple_schemas_w_enums_without_schemas_are_not_introspected(api: &mut TestApi) -> TestResult {
+    let schema_name = api.schema_name();
+    let other_name = "second";
+    let create_type = format!("CREATE TABLE `{schema_name}`.`HappyPerson` (mood ENUM ('happy') PRIMARY KEY)",);
 
-//     api.raw_cmd(sql).await;
+    api.database().raw_cmd(&create_type).await?;
 
-//     let expected = expect![[r#"
-//         generator client {
-//           provider        = "prisma-client-js"
-//           previewFeatures = ["multiSchema"]
-//         }
+    let drop_schema = format!("DROP Schema IF EXISTS `{other_name}`",);
+    let create_schema = format!("CREATE Schema `{other_name}`",);
+    let create_type = format!("CREATE TABLE `{other_name}`.`SadPerson` (mood ENUM ('sad') PRIMARY KEY)",);
 
-//         datasource db {
-//           provider = "mysql"
-//           url      = "env(TEST_DATABASE_URL)"
-//           schemas  = ["first", "second_schema"]
-//         }
+    api.database().raw_cmd(&drop_schema).await?;
+    api.database().raw_cmd(&create_schema).await?;
+    api.database().raw_cmd(&create_type).await?;
 
-//         model first_tbl {
-//           id  Int                 @id @default(autoincrement())
-//           tbl second_schema_tbl[]
+    let expected = expect![[r#"
+        model HappyPerson {
+          mood HappyPerson_mood @id
+        }
 
-//           @@map("tbl")
-//           @@schema("first")
-//         }
+        enum HappyPerson_mood {
+          happy
+        }
+    "#]];
 
-//         model second_schema_tbl {
-//           id  Int        @id @default(autoincrement())
-//           fst Int?
-//           tbl first_tbl? @relation(fields: [fst], references: [id], onDelete: NoAction, onUpdate: NoAction)
+    let result = api.introspect_dml().await?;
+    expected.assert_eq(&result);
 
-//           @@map("tbl")
-//           @@schema("second_schema")
-//         }
-//     "#]];
+    Ok(())
+}
 
-//     api.expect_datamodel(&expected).await;
+#[test_connector(tags(Mysql), preview_features("multiSchema"), namespaces("first", "second_schema"))]
+async fn same_table_name_with_relation_in_two_schemas(api: &mut TestApi) -> TestResult {
+    let sql = r#"
+        CREATE SCHEMA `first`;
+        CREATE SCHEMA `second_schema`;
+        CREATE TABLE `first`.`tbl` ( id INT PRIMARY KEY );
+        CREATE TABLE `second_schema`.`tbl` ( id INT PRIMARY KEY, fst INT, FOREIGN KEY (fst) REFERENCES `first`.`tbl`(`id`) );
+    "#;
 
-//     Ok(())
-// }
+    api.raw_cmd(sql).await;
+
+    let expected = expect![[r#"
+        generator client {
+          provider        = "prisma-client-js"
+          previewFeatures = ["multiSchema"]
+        }
+
+        datasource db {
+          provider = "mysql"
+          url      = "env(TEST_DATABASE_URL)"
+          schemas  = ["first", "second_schema"]
+        }
+
+        model first_tbl {
+          id  Int                 @id
+          tbl second_schema_tbl[]
+
+          @@map("tbl")
+          @@schema("first")
+        }
+
+        model second_schema_tbl {
+          id  Int        @id
+          fst Int?
+          tbl first_tbl? @relation(fields: [fst], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "tbl_ibfk_1")
+
+          @@index([fst], map: "fst")
+          @@map("tbl")
+          @@schema("second_schema")
+        }
+    "#]];
+
+    api.expect_datamodel(&expected).await;
+
+    Ok(())
+}
