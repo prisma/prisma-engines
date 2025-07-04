@@ -89,21 +89,16 @@ impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber<'_> {
 }
 
 async fn push_indexes(sql_schema: &mut SqlSchema, conn: &dyn Queryable) -> DescriberResult<()> {
-    let namespaces: Vec<_> = sql_schema
-        .namespaces
-        .iter()
-        .map(|s| Value::text(s.to_string()))
-        .collect();
-
     // We alias all the columns because MySQL column names are case-insensitive in queries, but
     // the information schema column names became upper-case in MySQL 8, causing the code
     // fetching the result values by column name below to fail.
+    let namespaces_filter = namespaces_filter_string(sql_schema);
     let sql = format!(
         include_str!("mysql/indexes_query.sql"),
-        placeholders = vec!["?"; namespaces.len()].join(", ")
+        namespaces_filter = namespaces_filter
     );
 
-    let rows = conn.query_raw(&sql, &namespaces).await?;
+    let rows = conn.query_raw(&sql, &[]).await?;
     let mut current_index_id: Option<IndexId> = None;
     let mut index_should_be_filtered_out = false;
 
@@ -209,19 +204,14 @@ impl<'a> SqlSchemaDescriber<'a> {
 
     #[tracing::instrument(skip(self))]
     async fn get_views(&self, sql_schema: &mut SqlSchema) -> DescriberResult<()> {
-        let namespaces: Vec<_> = sql_schema
-            .namespaces
-            .iter()
-            .map(|s| Value::text(s.to_string()))
-            .collect();
-        let placeholders = vec!["?"; namespaces.len()].join(", ");
+        let namespaces_filter = namespaces_filter_string(sql_schema);
         let sql = format! {r#"
             SELECT TABLE_SCHEMA AS namespace, TABLE_NAME AS view_name, VIEW_DEFINITION AS view_sql
             FROM INFORMATION_SCHEMA.VIEWS
-            WHERE TABLE_SCHEMA IN ({placeholders})
+            WHERE TABLE_SCHEMA IN ({namespaces_filter})
         "#};
 
-        let result_set = self.conn.query_raw(&sql, &namespaces).await?;
+        let result_set = self.conn.query_raw(&sql, &[]).await?;
 
         for row in result_set.into_iter() {
             let namespace_id = sql_schema
@@ -240,13 +230,7 @@ impl<'a> SqlSchemaDescriber<'a> {
 
     #[tracing::instrument(skip(self))]
     async fn get_procedures(&self, sql_schema: &mut SqlSchema) -> DescriberResult<()> {
-        let namespaces: Vec<_> = sql_schema
-            .namespaces
-            .iter()
-            .map(|s| Value::text(s.to_string()))
-            .collect();
-
-        let placeholders = vec!["?"; namespaces.len()].join(", ");
+        let namespaces_filter = namespaces_filter_string(sql_schema);
         let sql = format!(
             r#"
             SELECT 
@@ -254,12 +238,12 @@ impl<'a> SqlSchemaDescriber<'a> {
                 routine_name AS name,
                 routine_definition AS definition
             FROM information_schema.routines
-            WHERE ROUTINE_SCHEMA IN ({placeholders})
+            WHERE ROUTINE_SCHEMA IN ({namespaces_filter})
             AND ROUTINE_TYPE = 'PROCEDURE'
         "#
         );
 
-        let rows = self.conn.query_raw(&sql, &namespaces).await?;
+        let rows = self.conn.query_raw(&sql, &[]).await?;
         let mut procedures = Vec::with_capacity(rows.len());
 
         for row in rows.into_iter() {
@@ -280,14 +264,8 @@ impl<'a> SqlSchemaDescriber<'a> {
 
     #[tracing::instrument(skip(self))]
     async fn get_table_names(&self, sql_schema: &mut SqlSchema) -> DescriberResult<()> {
-        let namespaces: Vec<_> = sql_schema
-            .namespaces
-            .iter()
-            .map(|s| Value::text(s.to_string()))
-            .collect();
-
         // Only consider tables for which we can read at least one column.
-        let placeholders = vec!["?"; namespaces.len()].join(", ");
+        let namespaces_filter = namespaces_filter_string(sql_schema);
         let sql = format!(
             r#"
             SELECT DISTINCT
@@ -299,17 +277,14 @@ impl<'a> SqlSchemaDescriber<'a> {
             JOIN information_schema.columns AS column_info
                 ON BINARY column_info.table_name = BINARY table_info.table_name
             WHERE
-                table_info.table_schema IN ({placeholders})
-                AND column_info.table_schema IN ({placeholders})
+                table_info.table_schema IN ({namespaces_filter})
+                AND column_info.table_schema IN ({namespaces_filter})
                 -- Exclude views.
                 AND table_info.table_type = 'BASE TABLE'
             ORDER BY BINARY namespace, BINARY table_name"#
         );
 
-        let rows = self
-            .conn
-            .query_raw(&sql, &[&namespaces[..], &namespaces[..]].concat())
-            .await?;
+        let rows = self.conn.query_raw(&sql, &[]).await?;
         let names = rows.into_iter().map(|row| {
             (
                 row.get_expect_string("namespace"),
@@ -343,16 +318,10 @@ impl<'a> SqlSchemaDescriber<'a> {
         sql_schema: &mut SqlSchema,
         flavour: &Flavour,
     ) -> DescriberResult<()> {
-        let namespaces: Vec<_> = sql_schema
-            .namespaces
-            .iter()
-            .map(|s| Value::text(s.to_string()))
-            .collect();
-
         // We alias all the columns because MySQL column names are case-insensitive in queries, but the
         // information schema column names became upper-case in MySQL 8, causing the code fetching
         // the result values by column name below to fail.
-        let placeholders = vec!["?"; namespaces.len()].join(", ");
+        let namespaces_filter = namespaces_filter_string(sql_schema);
         let sql = format!(
             "
             SELECT
@@ -370,14 +339,14 @@ impl<'a> SqlSchemaDescriber<'a> {
                 table_name table_name,
                 IF(column_comment = '', NULL, column_comment) AS column_comment
             FROM information_schema.columns
-            WHERE table_schema IN ({placeholders})
+            WHERE table_schema IN ({namespaces_filter})
             ORDER BY BINARY namespace, BINARY table_name, ordinal_position
         "
         );
 
         let mut table_defaults = Vec::new();
         let mut view_defaults = Vec::new();
-        let rows = conn.query_raw(&sql, &namespaces).await?;
+        let rows = conn.query_raw(&sql, &[]).await?;
 
         for col in rows {
             trace!("Got column: {col:?}");
@@ -799,16 +768,10 @@ impl<'a> SqlSchemaDescriber<'a> {
 }
 
 async fn push_foreign_keys(sql_schema: &mut SqlSchema, conn: &dyn Queryable) -> DescriberResult<()> {
-    let namespaces: Vec<_> = sql_schema
-        .namespaces
-        .iter()
-        .map(|s| Value::text(s.to_string()))
-        .collect();
-
     // We alias all the columns because MySQL column names are case-insensitive in queries, but
     // the information schema column names became upper-case in MySQL 8, causing the code
     // fetching the result values by column name below to fail.
-    let placeholders = vec!["?"; namespaces.len()].join(", ");
+    let namespaces_filter = namespaces_filter_string(sql_schema);
     let sql = format!(
         "
             SELECT
@@ -826,8 +789,8 @@ async fn push_foreign_keys(sql_schema: &mut SqlSchema, conn: &dyn Queryable) -> 
             INNER JOIN information_schema.referential_constraints AS rc ON
                 BINARY kcu.constraint_name = BINARY rc.constraint_name
             WHERE
-                BINARY kcu.table_schema IN ({placeholders})
-                AND BINARY rc.constraint_schema IN ({placeholders})
+                BINARY kcu.table_schema IN ({namespaces_filter})
+                AND BINARY rc.constraint_schema IN ({namespaces_filter})
                 AND kcu.referenced_column_name IS NOT NULL
 
             ORDER BY
@@ -856,9 +819,7 @@ async fn push_foreign_keys(sql_schema: &mut SqlSchema, conn: &dyn Queryable) -> 
         Some((table_id, column_id, referenced_table_id, referenced_column_id))
     }
 
-    let result_set = conn
-        .query_raw(&sql, &[&namespaces[..], &namespaces[..]].concat())
-        .await?;
+    let result_set = conn.query_raw(&sql, &[]).await?;
     let mut current_fk: Option<(TableId, String, ForeignKeyId)> = None;
 
     for row in result_set.into_iter() {
@@ -916,4 +877,13 @@ fn push_enum_variants(full_data_type: &str, enum_id: EnumId, sql_schema: &mut Sq
     for variant in vals.split(',').map(unquote_string) {
         sql_schema.push_enum_variant(enum_id, variant.replace("''", "'"));
     }
+}
+
+fn namespaces_filter_string(sql_schema: &SqlSchema) -> String {
+    sql_schema
+        .namespaces
+        .iter()
+        .map(|s| format!(r#""{s}""#))
+        .collect::<Vec<_>>()
+        .join(", ")
 }
