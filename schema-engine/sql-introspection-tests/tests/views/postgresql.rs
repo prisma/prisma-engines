@@ -935,8 +935,10 @@ async fn schemas_are_introspected(api: &mut TestApi) -> TestResult {
         SELECT
           1 AS id;"#]];
 
-    api.expect_view_definition_in_schema("public", "A", &expected).await;
-    api.expect_view_definition_in_schema("private", "A", &expected).await;
+    api.expect_view_definition_in_schema("public", "public_A", &expected)
+        .await;
+    api.expect_view_definition_in_schema("private", "private_A", &expected)
+        .await;
 
     Ok(())
 }

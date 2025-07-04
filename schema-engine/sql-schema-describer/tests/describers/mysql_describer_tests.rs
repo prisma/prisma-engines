@@ -2841,7 +2841,9 @@ fn introspected_default_strings_should_be_unescaped(api: TestApi) {
     api.raw_cmd(create_table);
     let expectation = expect![[r#"
         SqlSchema {
-            namespaces: [],
+            namespaces: [
+                "introspected_default_strings_should_be_unescaped",
+            ],
             tables: [
                 Table {
                     namespace_id: NamespaceId(
