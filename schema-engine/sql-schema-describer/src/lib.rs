@@ -24,6 +24,7 @@ pub use self::{
     walkers::*,
 };
 pub use either::Either;
+use indexmap::IndexSet;
 pub use prisma_value::PrismaValue;
 
 use enumflags2::{BitFlag, BitFlags};
@@ -57,7 +58,7 @@ pub struct SqlMetadata {
 #[derive(Serialize, Deserialize, Debug, Default, Clone)]
 pub struct SqlSchema {
     /// Namespaces (schemas)
-    namespaces: Vec<String>,
+    namespaces: IndexSet<String>,
     /// The schema's tables.
     tables: Vec<Table>,
     /// The schema's enums.
@@ -185,10 +186,7 @@ impl SqlSchema {
 
     /// Find a namespace by name.
     pub fn get_namespace_id(&self, name: &str) -> Option<NamespaceId> {
-        self.namespaces
-            .binary_search_by(|ns_name| ns_name.as_str().cmp(name))
-            .ok()
-            .map(|pos| NamespaceId(pos as u32))
+        self.namespaces.get_index_of(name).map(|pos| NamespaceId(pos as u32))
     }
 
     /// The total number of indexes in the schema.
@@ -333,9 +331,8 @@ impl SqlSchema {
     }
 
     pub fn push_namespace(&mut self, name: String) -> NamespaceId {
-        let id = NamespaceId(self.namespaces.len() as u32);
-        self.namespaces.push(name);
-        id
+        let (id, _) = self.namespaces.insert_full(name);
+        NamespaceId(id as u32)
     }
 
     pub fn push_table(&mut self, name: String, namespace_id: NamespaceId, description: Option<String>) -> TableId {
