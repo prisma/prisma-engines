@@ -10,4 +10,4 @@ SELECT
     index_type AS index_type
 FROM information_schema.statistics
 WHERE table_schema IN ({placeholders})
-ORDER BY BINARY table_name, BINARY index_name, seq_in_index
+ORDER BY BINARY namespace, BINARY table_name, BINARY index_name, seq_in_index
