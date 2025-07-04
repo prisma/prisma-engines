@@ -274,7 +274,7 @@ async fn multiple_schemas_w_cross_schema_are_introspected(api: &mut TestApi) -> 
 
     let create_schema = format!("CREATE Schema `{other_name}`",);
     let create_table =
-        format!("CREATE TABLE `{other_name}`.`B` (id INT PRIMARY KEY, fk INT, FOREIGN KEY (fk) REFERENCES `{schema_name}`.`A`(`id`))",);
+        format!("CREATE TABLE `{other_name}`.`B` (id INT PRIMARY KEY, fk INT, CONSTRAINT fk_tbl FOREIGN KEY (fk) REFERENCES `{schema_name}`.`A`(`id`) ON DELETE RESTRICT ON UPDATE RESTRICT)",);
 
     api.database().raw_cmd(&create_schema).await?;
     api.database().raw_cmd(&create_table).await?;
@@ -290,9 +290,9 @@ async fn multiple_schemas_w_cross_schema_are_introspected(api: &mut TestApi) -> 
         model B {
           id Int  @id
           fk Int?
-          A  A?   @relation(fields: [fk], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "B_ibfk_1")
+          A  A?   @relation(fields: [fk], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "fk_tbl")
 
-          @@index([fk], map: "fk")
+          @@index([fk], map: "fk_tbl")
           @@schema("second_m5")
         }
     "#]];
@@ -315,7 +315,7 @@ async fn multiple_schemas_w_cross_schema_are_reintrospected(api: &mut TestApi) -
 
     let create_schema = format!("CREATE Schema `{other_name}`",);
     let create_table =
-        format!("CREATE TABLE `{other_name}`.`B` (id Int PRIMARY KEY, fk Int, FOREIGN KEY (fk) REFERENCES `{schema_name}`.`A`(`id`))",);
+        format!("CREATE TABLE `{other_name}`.`B` (id Int PRIMARY KEY, fk Int, CONSTRAINT fk_tbl FOREIGN KEY (fk) REFERENCES `{schema_name}`.`A`(`id`) ON DELETE RESTRICT ON UPDATE RESTRICT)",);
 
     api.database().raw_cmd(&create_schema).await?;
     api.database().raw_cmd(&create_table).await?;
@@ -331,7 +331,7 @@ async fn multiple_schemas_w_cross_schema_are_reintrospected(api: &mut TestApi) -
         model B {
           id Int  @id
           fk Int?
-          A  A?   @relation(fields: [fk], references: [id], onDelete: NoAction, onUpdate: NoAction)
+          A  A?   @relation(fields: [fk], references: [id], onDelete: Restrict, onUpdate: Restrict)
 
           @@schema("first_m6")
         }
@@ -348,9 +348,9 @@ async fn multiple_schemas_w_cross_schema_are_reintrospected(api: &mut TestApi) -
         model B {
           id Int  @id
           fk Int?
-          A  A?   @relation(fields: [fk], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "B_ibfk_1")
+          A  A?   @relation(fields: [fk], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "fk_tbl")
 
-          @@index([fk], map: "fk")
+          @@index([fk], map: "fk_tbl")
           @@schema("second_m6")
         }
     "#]];
@@ -372,7 +372,7 @@ async fn multiple_schemas_w_cross_schema_fks_w_duplicate_names_are_introspected(
 
     let create_schema = format!("CREATE SCHEMA `{other_name}`",);
     let create_table =
-        format!("CREATE TABLE `{other_name}`.`A` (id INT PRIMARY KEY, fk INT, FOREIGN KEY (fk) REFERENCES `{schema_name}`.`A`(`id`))",);
+        format!("CREATE TABLE `{other_name}`.`A` (id INT PRIMARY KEY, fk INT, CONSTRAINT fk_tbl FOREIGN KEY (fk) REFERENCES `{schema_name}`.`A`(`id`) ON DELETE RESTRICT ON UPDATE RESTRICT)",);
 
     api.database().raw_cmd(&create_schema).await?;
     api.database().raw_cmd(&create_table).await?;
@@ -389,9 +389,9 @@ async fn multiple_schemas_w_cross_schema_fks_w_duplicate_names_are_introspected(
         model second_m7_A {
           id Int         @id
           fk Int?
-          A  first_m7_A? @relation(fields: [fk], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "A_ibfk_1")
+          A  first_m7_A? @relation(fields: [fk], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "fk_tbl")
 
-          @@index([fk], map: "fk")
+          @@index([fk], map: "fk_tbl")
           @@map("A")
           @@schema("second_m7")
         }
@@ -764,7 +764,7 @@ async fn same_table_name_with_relation_in_two_schemas(api: &mut TestApi) -> Test
         CREATE SCHEMA `first_m13`;
         CREATE SCHEMA `second_m13`;
         CREATE TABLE `first_m13`.`tbl` ( id INT PRIMARY KEY );
-        CREATE TABLE `second_m13`.`tbl` ( id INT PRIMARY KEY, fst INT, FOREIGN KEY (fst) REFERENCES `first_m13`.`tbl`(`id`) );
+        CREATE TABLE `second_m13`.`tbl` ( id INT PRIMARY KEY, fst INT, CONSTRAINT fk_tbl FOREIGN KEY (fst) REFERENCES `first_m13`.`tbl`(`id`) ON DELETE RESTRICT ON UPDATE RESTRICT);
     "#;
 
     api.raw_cmd(sql).await;
@@ -792,9 +792,9 @@ async fn same_table_name_with_relation_in_two_schemas(api: &mut TestApi) -> Test
         model second_m13_tbl {
           id  Int            @id
           fst Int?
-          tbl first_m13_tbl? @relation(fields: [fst], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "tbl_ibfk_1")
+          tbl first_m13_tbl? @relation(fields: [fst], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "fk_tbl")
 
-          @@index([fst], map: "fst")
+          @@index([fst], map: "fk_tbl")
           @@map("tbl")
           @@schema("second_m13")
         }
