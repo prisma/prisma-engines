@@ -1,7 +1,6 @@
 use crate::{logging, mssql, mysql, postgres, Capabilities, Tags};
 use enumflags2::BitFlags;
 use quaint::single::Quaint;
-use std::hash::{DefaultHasher, Hash, Hasher};
 use std::sync::LazyLock;
 use std::time::Duration;
 use std::{fmt::Display, io::Write as _};
@@ -127,7 +126,7 @@ pub(crate) fn db_under_test() -> &'static DbUnderTest {
 pub struct TestApiArgs {
     test_function_name: &'static str,
     preview_features: &'static [&'static str],
-    namespaces: Vec<String>,
+    namespaces: &'static [&'static str],
     db: &'static DbUnderTest,
 }
 
@@ -137,27 +136,11 @@ impl TestApiArgs {
         preview_features: &'static [&'static str],
         namespaces: &'static [&'static str],
     ) -> Self {
-        let db = db_under_test();
-
-        // In MySQL all namespaces aka schemas are global to the whole MySQL server as "CREATE DATABASE" and "CREATE SCHEMA" are aliases.
-        // Hence we cannot rely on test isolation by creating fresh databases and then having multiple schemas in there.
-        // => We ensure unique names for the namespace by adding a hash of the test function name to the namespace name.
-        // Note that MySQL also constraints names to 64 characters. So we cannot just add the full test function name to the namespace name.
-        let scoped_namespaces = if db.provider == "mysql" {
-            let mut hasher = DefaultHasher::new();
-            test_function_name.hash(&mut hasher);
-            let hash = hasher.finish();
-
-            namespaces.iter().map(|s| format!("{s}_{hash}")).collect::<Vec<_>>()
-        } else {
-            namespaces.iter().map(|s| s.to_string()).collect::<Vec<_>>()
-        };
-
         TestApiArgs {
             test_function_name,
             preview_features,
-            namespaces: scoped_namespaces,
-            db,
+            namespaces,
+            db: db_under_test(),
         }
     }
 
@@ -165,8 +148,8 @@ impl TestApiArgs {
         self.preview_features
     }
 
-    pub fn namespaces(&self) -> &[String] {
-        &self.namespaces
+    pub fn namespaces(&self) -> &'static [&'static str] {
+        self.namespaces
     }
 
     pub fn test_function_name(&self) -> &'static str {

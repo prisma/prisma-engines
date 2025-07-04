@@ -43,7 +43,7 @@ impl TestApi {
             .flat_map(|f| PreviewFeature::parse_opt(f))
             .collect();
 
-        let namespaces: Vec<String> = args.namespaces().to_vec();
+        let namespaces: Vec<String> = args.namespaces().iter().map(|ns| ns.to_string()).collect();
         let (database, connection_string, api): (Quaint, String, SqlSchemaConnector) = if tags.intersects(Tags::Vitess)
         {
             let params = ConnectorParams {

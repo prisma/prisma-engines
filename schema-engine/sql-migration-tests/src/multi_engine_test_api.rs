@@ -300,7 +300,7 @@ pub struct EngineTestApi<'n> {
     pub(crate) connector: SqlSchemaConnector,
     connection_info: ConnectionInfo,
     tags: BitFlags<Tags>,
-    namespaces: &'n [String],
+    namespaces: &'static [&'static str],
     max_ddl_refresh_delay: Option<Duration>,
 }
 
@@ -309,7 +309,7 @@ impl EngineTestApi<'_> {
     pub fn apply_migrations<'a>(&'a mut self, migrations_directory: &'a TempDir) -> ApplyMigrations<'a> {
         let mut namespaces = vec![self.connection_info.schema_name().unwrap().to_string()];
 
-        for namespace in self.namespaces.iter() {
+        for namespace in self.namespaces {
             namespaces.push(namespace.to_string());
         }
 
