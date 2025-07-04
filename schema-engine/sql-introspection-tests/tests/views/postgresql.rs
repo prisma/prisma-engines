@@ -907,11 +907,11 @@ async fn schemas_are_introspected(api: &mut TestApi) -> TestResult {
         datasource db {
           provider = "postgresql"
           url      = "env(TEST_DATABASE_URL)"
-          schemas  = ["public", "private"]
+          schemas  = ["private", "public"]
         }
 
         /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
-        view A {
+        view public_A {
           id Int?
 
           @@map("A")
@@ -920,7 +920,7 @@ async fn schemas_are_introspected(api: &mut TestApi) -> TestResult {
         }
 
         /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
-        view A {
+        view private_A {
           id Int?
 
           @@map("A")
