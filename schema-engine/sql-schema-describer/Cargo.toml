@@ -32,6 +32,7 @@ bigdecimal.workspace = true
 enumflags2 = { workspace = true, features = ["serde"] }
 indexmap.workspace = true
 indoc.workspace = true
+itertools.workspace = true
 regex.workspace = true
 serde.workspace = true
 tracing.workspace = true

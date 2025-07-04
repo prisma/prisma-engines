@@ -9,6 +9,7 @@ use either::Either;
 use enumflags2::BitFlags;
 use indexmap::IndexMap;
 use indoc::indoc;
+use itertools::Itertools;
 use prisma_value::PrismaValue;
 use psl::{
     builtin_connectors::{MsSqlType, MsSqlTypeParameter},
@@ -546,7 +547,11 @@ impl<'a> SqlSchemaDescriber<'a> {
         let names = rows
             .into_iter()
             .map(|row| row.get_expect_string("name"))
-            .filter(|name| namespaces.contains(&name.as_str()));
+            .filter(|name| namespaces.contains(&name.as_str()))
+            // SqlSchema uses binary search, namespaces must be added in sorted order.
+            // We have to sort regardless of the ORDER BY since Rust ordering could
+            // be different then the one used by SQL Server.
+            .sorted();
 
         for name in names {
             sql_schema.push_namespace(name);
