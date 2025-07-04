@@ -130,9 +130,9 @@ fn all_postgres_column_types_must_work(api: TestApi) {
     api.raw_cmd(sql);
     let expectation = expect![[r#"
         SqlSchema {
-            namespaces: [
+            namespaces: {
                 "prisma-tests",
-            ],
+            },
             tables: [
                 Table {
                     namespace_id: NamespaceId(
@@ -1307,9 +1307,9 @@ fn escaped_quotes_in_string_defaults_must_be_unescaped(api: TestApi) {
     api.raw_cmd(create_table);
     let expectation = expect![[r#"
         SqlSchema {
-            namespaces: [
+            namespaces: {
                 "prisma-tests",
-            ],
+            },
             tables: [
                 Table {
                     namespace_id: NamespaceId(
@@ -1488,9 +1488,9 @@ fn seemingly_escaped_backslashes_in_string_literals_must_not_be_unescaped(api: T
     api.raw_cmd(create_table);
     let expectation = expect![[r#"
         SqlSchema {
-            namespaces: [
+            namespaces: {
                 "prisma-tests",
-            ],
+            },
             tables: [
                 Table {
                     namespace_id: NamespaceId(
@@ -1851,10 +1851,10 @@ fn multiple_schemas_with_same_table_names_are_described(api: TestApi) {
 
     let expected_schema = expect![[r#"
         SqlSchema {
-            namespaces: [
+            namespaces: {
                 "schema_0",
                 "schema_1",
-            ],
+            },
             tables: [
                 Table {
                     namespace_id: NamespaceId(
@@ -2072,7 +2072,7 @@ fn multiple_schemas_with_same_foreign_key_are_described(api: TestApi) {
            CREATE TABLE "schema_1"."Table_0" ("id_2" SERIAL PRIMARY KEY);
            CREATE TABLE "schema_1"."Table_1" ("id_3" SERIAL PRIMARY KEY, o_id_0 Integer);
            ALTER TABLE "schema_1"."Table_1" ADD CONSTRAINT "fk_0" FOREIGN KEY ("o_id_0") REFERENCES "schema_1"."Table_0" ("id_2");
-           
+
            CREATE TABLE "schema_1"."Table_2" ("id_4" SERIAL PRIMARY KEY, o_id_0 Integer);
            ALTER TABLE "schema_1"."Table_2" ADD CONSTRAINT "fk_1" FOREIGN KEY ("o_id_0") REFERENCES "schema_0"."Table_0" ("id_0");
     "#;
@@ -2082,10 +2082,10 @@ fn multiple_schemas_with_same_foreign_key_are_described(api: TestApi) {
 
     let expected_schema = expect![[r#"
         SqlSchema {
-            namespaces: [
+            namespaces: {
                 "schema_0",
                 "schema_1",
-            ],
+            },
             tables: [
                 Table {
                     namespace_id: NamespaceId(
@@ -2564,7 +2564,7 @@ fn multiple_schemas_are_described(api: TestApi) {
             AS $$
             Select 0;
             $$;
-           
+
            CREATE Schema "schema_1";
            CREATE TABLE "schema_1"."Table_2" ("id_2" SERIAL PRIMARY KEY);
            CREATE TABLE "schema_1"."Table_3" ("id_3" SERIAL PRIMARY KEY, o_id_2 Integer References "schema_1"."Table_2"("id_2"));
@@ -2584,10 +2584,10 @@ fn multiple_schemas_are_described(api: TestApi) {
 
     let expected_schema = expect![[r#"
         SqlSchema {
-            namespaces: [
+            namespaces: {
                 "schema_0",
                 "schema_1",
-            ],
+            },
             tables: [
                 Table {
                     namespace_id: NamespaceId(

@@ -62,7 +62,7 @@ fn sqlite_column_types_must_work(api: TestApi) {
     api.raw_cmd(sql);
     let expectation = expect![[r#"
         SqlSchema {
-            namespaces: [],
+            namespaces: {},
             tables: [
                 Table {
                     namespace_id: NamespaceId(
@@ -279,7 +279,7 @@ fn escaped_quotes_in_string_defaults_must_be_unescaped(api: TestApi) {
     api.raw_cmd(create_table);
     let expectation = expect![[r#"
         SqlSchema {
-            namespaces: [],
+            namespaces: {},
             tables: [
                 Table {
                     namespace_id: NamespaceId(
@@ -384,7 +384,7 @@ fn backslashes_in_string_literals(api: TestApi) {
 
     let expectation = expect![[r#"
         SqlSchema {
-            namespaces: [],
+            namespaces: {},
             tables: [
                 Table {
                     namespace_id: NamespaceId(
@@ -472,7 +472,7 @@ fn broken_relations_are_filtered_out(api: TestApi) {
     // the relation to platypus should be the only foreign key on dog
     let expectation = expect![[r#"
         SqlSchema {
-            namespaces: [],
+            namespaces: {},
             tables: [
                 Table {
                     namespace_id: NamespaceId(
