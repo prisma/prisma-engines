@@ -50,6 +50,7 @@ impl PrismaContext {
         boot_request_id: RequestId,
     ) -> PrismaResult<PrismaContext> {
         let arced_schema = Arc::new(schema);
+
         let arced_schema_2 = Arc::clone(&arced_schema);
 
         let query_schema_fut = tokio::runtime::Handle::current().spawn_blocking(move || {
