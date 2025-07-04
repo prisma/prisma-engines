@@ -114,3 +114,23 @@ pub async fn create_mysql_database<'a>(database_url: &str, db_name: &'a str) -> 
 
     Ok((db_name, url_str))
 }
+
+/// Drops the given namespaces (aka "databases" in mysql) from the database without recreating them..
+pub async fn drop_mysql_namespaces(database_url: &str, namespaces: &[&str]) -> Result<(), AnyError> {
+    let url: Url = database_url.parse()?;
+    let conn: Quaint = Quaint::new(url.as_ref()).await?;
+
+    for namespace in namespaces {
+        let db_name = mysql_safe_identifier(namespace);
+        let drop = format!(
+            r#"            
+            SET FOREIGN_KEY_CHECKS=0;
+            DROP DATABASE IF EXISTS `{db_name}`;
+            SET FOREIGN_KEY_CHECKS=1;
+        "#,
+        );
+        conn.raw_cmd(&drop).await?;
+    }
+
+    Ok(())
+}

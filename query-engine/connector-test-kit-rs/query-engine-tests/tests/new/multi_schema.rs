@@ -1,6 +1,7 @@
 use query_engine_tests::test_suite;
 
-#[test_suite(capabilities(MultiSchema))]
+// TODO: activate mysql & vitess tests when namespace sql-render is implemented
+#[test_suite(capabilities(MultiSchema), exclude(Mysql, Vitess))]
 mod multi_schema {
     use query_engine_tests::*;
 

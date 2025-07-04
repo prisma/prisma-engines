@@ -16,9 +16,7 @@ use std::{
     any::type_name,
     borrow::Cow,
     collections::BTreeMap,
-    convert::TryInto,
     fmt::Debug,
-    path::Path,
     sync::{Arc, LazyLock, OnceLock},
 };
 use tracing::trace;
@@ -107,28 +105,6 @@ impl<'a> SqlSchemaDescriber<'a> {
         Ok(schema)
     }
 
-    async fn get_databases(&self) -> DescriberResult<Vec<String>> {
-        let sql = "PRAGMA database_list;";
-        let rows = self.conn.query_raw(sql, &[]).await?;
-        let names = rows
-            .into_iter()
-            .map(|row| {
-                row.get("file")
-                    .and_then(|x| x.to_string())
-                    .and_then(|x| {
-                        Path::new(&x)
-                            .file_name()
-                            .map(|name| name.to_string_lossy().into_owned())
-                    })
-                    .expect("convert schema names")
-            })
-            .collect();
-
-        trace!("Found schema names: {:?}", names);
-
-        Ok(names)
-    }
-
     pub async fn get_table_names(
         &self,
         schema: &mut SqlSchema,
@@ -167,17 +143,6 @@ impl<'a> SqlSchemaDescriber<'a> {
         }
 
         Ok(map)
-    }
-
-    async fn get_size(&self) -> DescriberResult<usize> {
-        let sql = r#"SELECT page_count * page_size as size FROM pragma_page_count(), pragma_page_size();"#;
-        let result = self.conn.query_raw(sql, &[]).await?;
-        let size: i64 = result
-            .first()
-            .map(|row| row.get("size").and_then(|x| x.as_integer()).unwrap_or(0))
-            .unwrap();
-
-        Ok(size.try_into().unwrap())
     }
 
     async fn push_foreign_keys(

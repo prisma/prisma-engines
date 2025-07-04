@@ -582,3 +582,163 @@ async fn invalid_field_names_trigger_warnings(api: &mut TestApi) -> TestResult {
 
     Ok(())
 }
+
+#[test_connector(
+    tags(Mysql),
+    preview_features("views", "multiSchema"),
+    namespaces("first_v1", "second_v1")
+)]
+async fn schemas_are_introspected(api: &mut TestApi) -> TestResult {
+    let setup = indoc! {r#"
+        CREATE SCHEMA `first_v1`;
+        CREATE SCHEMA `second_v1`;
+        CREATE VIEW `first_v1`.`A` AS SELECT 1 AS id;
+        CREATE VIEW `second_v1`.`A` AS SELECT 1 AS id;
+    "#};
+
+    api.raw_cmd(setup).await;
+
+    let expected = expect![[r#"
+        generator client {
+          provider        = "prisma-client-js"
+          previewFeatures = ["multiSchema", "views"]
+        }
+
+        datasource db {
+          provider = "mysql"
+          url      = "env(TEST_DATABASE_URL)"
+          schemas  = ["first_v1", "second_v1"]
+        }
+
+        /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+        view first_v1_A {
+          id Int @default(0)
+
+          @@map("A")
+          @@ignore
+          @@schema("first_v1")
+        }
+
+        /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+        view second_v1_A {
+          id Int @default(0)
+
+          @@map("A")
+          @@ignore
+          @@schema("second_v1")
+        }
+    "#]];
+
+    api.expect_datamodel(&expected).await;
+
+    let expected = expect![[r#"
+        SELECT
+          1 AS `id`"#]];
+
+    api.expect_view_definition_in_schema("first_v1", "first_v1_A", &expected)
+        .await;
+    api.expect_view_definition_in_schema("second_v1", "second_v1_A", &expected)
+        .await;
+
+    Ok(())
+}
+
+#[test_connector(
+    tags(Mysql),
+    preview_features("views", "multiSchema"),
+    namespaces("first_v2", "second_v2")
+)]
+async fn dupes_are_renamed(api: &mut TestApi) -> TestResult {
+    let setup = indoc! {r#"
+        CREATE SCHEMA `first_v2`;
+        CREATE SCHEMA `second_v2`;
+        CREATE VIEW `first_v2`.`A` AS SELECT 1 AS id;
+        CREATE TABLE `second_v2`.`A` (id INT PRIMARY KEY);
+    "#};
+
+    api.raw_cmd(setup).await;
+
+    let expected = expect![[r#"
+        generator client {
+          provider        = "prisma-client-js"
+          previewFeatures = ["multiSchema", "views"]
+        }
+
+        datasource db {
+          provider = "mysql"
+          url      = "env(TEST_DATABASE_URL)"
+          schemas  = ["first_v2", "second_v2"]
+        }
+
+        model second_v2_A {
+          id Int @id
+
+          @@map("A")
+          @@schema("second_v2")
+        }
+
+        /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+        view first_v2_A {
+          id Int @default(0)
+
+          @@map("A")
+          @@ignore
+          @@schema("first_v2")
+        }
+    "#]];
+
+    api.expect_datamodel(&expected).await;
+
+    let expected = expect![[r#"
+        *** WARNING ***
+
+        The following views were ignored as they do not have a valid unique identifier or id. This is currently not supported by Prisma Client. Please refer to the documentation on defining unique identifiers in views: https://pris.ly/d/view-identifiers
+          - "first_v2_A"
+
+        These items were renamed due to their names being duplicates in the Prisma schema:
+          - Type: "model", name: "second_v2_A"
+          - Type: "view", name: "first_v2_A"
+    "#]];
+
+    api.expect_warnings(&expected).await;
+
+    Ok(())
+}
+
+#[test_connector(tags(Mysql), preview_features("multiSchema"), namespaces("first_v3", "second_v3"))]
+async fn dupe_views_are_not_considered_without_preview_feature(api: &mut TestApi) -> TestResult {
+    let setup = indoc! {r#"
+        CREATE SCHEMA `first_v3`;
+        CREATE SCHEMA `second_v3`;
+        CREATE VIEW `first_v3`.`A` AS SELECT 1 AS id;
+        CREATE TABLE `second_v3`.`A` (id INT PRIMARY KEY);
+    "#};
+
+    api.raw_cmd(setup).await;
+
+    let expected = expect![[r#"
+        generator client {
+          provider        = "prisma-client-js"
+          previewFeatures = ["multiSchema"]
+        }
+
+        datasource db {
+          provider = "mysql"
+          url      = "env(TEST_DATABASE_URL)"
+          schemas  = ["first_v3", "second_v3"]
+        }
+
+        model A {
+          id Int @id
+
+          @@schema("second_v3")
+        }
+    "#]];
+
+    api.expect_datamodel(&expected).await;
+
+    let expected = expect![""];
+    api.expect_warnings(&expected).await;
+
+    Ok(())
+}
