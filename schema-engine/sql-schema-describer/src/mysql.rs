@@ -1,8 +1,6 @@
 //! MySQL schema description.
 
 use crate::{getters::Getter, parsers::Parser, *};
-use indexmap::IndexMap;
-use indoc::indoc;
 use psl::{builtin_connectors::MySqlType, datamodel_connector::NativeTypeInstance};
 use quaint::{
     prelude::{Queryable, ResultRow},
@@ -58,7 +56,6 @@ pub struct SqlSchemaDescriber<'a> {
 impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber<'_> {
     #[tracing::instrument(skip(self))]
     async fn describe(&self, schemas: &[&str]) -> DescriberResult<SqlSchema> {
-        let schema = schemas[0];
         let mut sql_schema = SqlSchema::default();
         let version = self.conn.version().await.ok().flatten();
         let flavour = version
@@ -80,7 +77,7 @@ impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber<'_> {
         push_foreign_keys(&mut sql_schema, self.conn).await?;
         push_indexes(&mut sql_schema, self.conn).await?;
 
-        sql_schema.procedures = self.get_procedures(schema).await?;
+        self.get_procedures(&mut sql_schema).await?;
 
         Ok(sql_schema)
     }
@@ -242,27 +239,43 @@ impl<'a> SqlSchemaDescriber<'a> {
     }
 
     #[tracing::instrument(skip(self))]
-    async fn get_procedures(&self, schema: &str) -> DescriberResult<Vec<Procedure>> {
-        let sql = r#"
-            SELECT routine_name AS name,
+    async fn get_procedures(&self, sql_schema: &mut SqlSchema) -> DescriberResult<()> {
+        let namespaces: Vec<_> = sql_schema
+            .namespaces
+            .iter()
+            .map(|s| Value::text(s.to_string()))
+            .collect();
+
+        let placeholders = vec!["?"; namespaces.len()].join(", ");
+        let sql = format!(
+            r#"
+            SELECT 
+                routine_schema AS namespace, 
+                routine_name AS name,
                 routine_definition AS definition
             FROM information_schema.routines
-            WHERE ROUTINE_SCHEMA = ?
+            WHERE ROUTINE_SCHEMA IN ({placeholders})
             AND ROUTINE_TYPE = 'PROCEDURE'
-        "#;
+        "#
+        );
 
-        let rows = self.conn.query_raw(sql, &[schema.into()]).await?;
+        let rows = self.conn.query_raw(&sql, &namespaces).await?;
         let mut procedures = Vec::with_capacity(rows.len());
 
         for row in rows.into_iter() {
+            let namespace_id = sql_schema
+                .get_namespace_id(&row.get_expect_string("namespace"))
+                .unwrap();
             procedures.push(Procedure {
-                namespace_id: NamespaceId(0),
+                namespace_id,
                 name: row.get_expect_string("name"),
                 definition: row.get_string("definition"),
             });
         }
 
-        Ok(procedures)
+        sql_schema.procedures = procedures;
+
+        Ok(())
     }
 
     #[tracing::instrument(skip(self))]
