@@ -70,7 +70,7 @@ impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber<'_> {
             sql_schema.push_namespace(schema.to_string());
         }
 
-        sql_schema.views = self.get_views(schema).await?;
+        self.get_views(&mut sql_schema).await?;
 
         self.get_table_names(&mut sql_schema).await?;
 
@@ -211,26 +211,34 @@ impl<'a> SqlSchemaDescriber<'a> {
     }
 
     #[tracing::instrument(skip(self))]
-    async fn get_views(&self, schema: &str) -> DescriberResult<Vec<View>> {
-        let sql = indoc! {r#"
-            SELECT TABLE_NAME AS view_name, VIEW_DEFINITION AS view_sql
+    async fn get_views(&self, sql_schema: &mut SqlSchema) -> DescriberResult<()> {
+        let namespaces: Vec<_> = sql_schema
+            .namespaces
+            .iter()
+            .map(|s| Value::text(s.to_string()))
+            .collect();
+        let placeholders = vec!["?"; namespaces.len()].join(", ");
+        let sql = format! {r#"
+            SELECT TABLE_SCHEMA AS namespace, TABLE_NAME AS view_name, VIEW_DEFINITION AS view_sql
             FROM INFORMATION_SCHEMA.VIEWS
-            WHERE TABLE_SCHEMA = ?;
+            WHERE TABLE_SCHEMA IN ({placeholders})
         "#};
 
-        let result_set = self.conn.query_raw(sql, &[schema.into()]).await?;
-        let mut views = Vec::with_capacity(result_set.len());
+        let result_set = self.conn.query_raw(&sql, &namespaces).await?;
 
         for row in result_set.into_iter() {
-            views.push(View {
-                namespace_id: NamespaceId(0),
-                name: row.get_expect_string("view_name"),
-                definition: row.get_string("view_sql"),
-                description: None,
-            })
+            let namespace_id = sql_schema
+                .get_namespace_id(&row.get_expect_string("namespace"))
+                .unwrap();
+            sql_schema.push_view(
+                row.get_expect_string("view_name"),
+                namespace_id,
+                row.get_string("view_sql"),
+                None,
+            );
         }
 
-        Ok(views)
+        Ok(())
     }
 
     #[tracing::instrument(skip(self))]
@@ -258,7 +266,7 @@ impl<'a> SqlSchemaDescriber<'a> {
     }
 
     #[tracing::instrument(skip(self))]
-    async fn get_table_names(&self, sql_schema: &mut SqlSchema) -> DescriberResult<IndexMap<String, TableId>> {
+    async fn get_table_names(&self, sql_schema: &mut SqlSchema) -> DescriberResult<()> {
         let namespaces: Vec<_> = sql_schema
             .namespaces
             .iter()
@@ -300,12 +308,9 @@ impl<'a> SqlSchemaDescriber<'a> {
             )
         });
 
-        let mut map = IndexMap::default();
-
         for (namespace, name, is_partition, description) in names {
             let namespace_id = sql_schema.get_namespace_id(&namespace).unwrap();
-            let cloned_name = name.clone();
-            let id = if is_partition {
+            if is_partition {
                 sql_schema.push_table_with_properties(
                     name,
                     namespace_id,
@@ -315,12 +320,9 @@ impl<'a> SqlSchemaDescriber<'a> {
             } else {
                 sql_schema.push_table(name, namespace_id, description)
             };
-            map.insert(cloned_name, id);
         }
 
-        trace!("Found table names: {map:?}");
-
-        Ok(map)
+        Ok(())
     }
 
     async fn get_all_columns(

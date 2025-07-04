@@ -887,11 +887,13 @@ async fn re_intro_keeps_the_field_map(api: &mut TestApi) -> TestResult {
     tags(Postgres),
     exclude(CockroachDb),
     preview_features("views", "multiSchema"),
-    namespaces("public")
+    namespaces("public", "private")
 )]
-async fn schema_is_introspected(api: &mut TestApi) -> TestResult {
+async fn schemas_are_introspected(api: &mut TestApi) -> TestResult {
     let setup = indoc! {r#"
+        CREATE SCHEMA IF NOT EXISTS "private";
         CREATE VIEW public."A" AS SELECT 1 AS id;
+        CREATE VIEW private."A" AS SELECT 1 AS id;
     "#};
 
     api.raw_cmd(setup).await;
@@ -905,15 +907,25 @@ async fn schema_is_introspected(api: &mut TestApi) -> TestResult {
         datasource db {
           provider = "postgresql"
           url      = "env(TEST_DATABASE_URL)"
-          schemas  = ["public"]
+          schemas  = ["public", "private"]
         }
 
         /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
         view A {
           id Int?
 
+          @@map("A")
           @@ignore
           @@schema("public")
+        }
+
+        /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+        view A {
+          id Int?
+
+          @@map("A")
+          @@ignore
+          @@schema("private")
         }
     "#]];
 
@@ -924,6 +936,7 @@ async fn schema_is_introspected(api: &mut TestApi) -> TestResult {
           1 AS id;"#]];
 
     api.expect_view_definition_in_schema("public", "A", &expected).await;
+    api.expect_view_definition_in_schema("private", "A", &expected).await;
 
     Ok(())
 }
