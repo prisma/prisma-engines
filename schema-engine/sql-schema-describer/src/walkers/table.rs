@@ -71,7 +71,7 @@ impl<'a> TableWalker<'a> {
     pub fn namespace(self) -> Option<&'a str> {
         self.schema
             .namespaces
-            .get(self.table().namespace_id.0 as usize)
+            .get_index(self.table().namespace_id.0 as usize)
             .map(|s| s.as_str())
     }
 

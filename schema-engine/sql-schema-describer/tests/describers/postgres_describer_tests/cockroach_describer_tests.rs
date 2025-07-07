@@ -228,9 +228,9 @@ fn multi_field_indexes_must_be_inferred_in_the_right_order(api: TestApi) {
     api.raw_cmd(&schema);
     let expectation = expect![[r#"
         SqlSchema {
-            namespaces: [
+            namespaces: {
                 "prisma-tests",
-            ],
+            },
             tables: [
                 Table {
                     namespace_id: NamespaceId(
@@ -437,7 +437,7 @@ fn cockroachdb_22_1_sequences_must_work(api: TestApi) {
         CREATE SEQUENCE "testnotcycling" NO CYCLE;
 
         -- Other options
-        CREATE SEQUENCE "testmore" 
+        CREATE SEQUENCE "testmore"
             INCREMENT 4
             MINVALUE 10
             MAXVALUE 100
@@ -510,7 +510,7 @@ fn cockroachdb_22_2_sequences_must_work(api: TestApi) {
         CREATE SEQUENCE "testnotcycling" NO CYCLE;
 
         -- Other options
-        CREATE SEQUENCE "testmore" 
+        CREATE SEQUENCE "testmore"
             INCREMENT 4
             MINVALUE 10
             MAXVALUE 100

@@ -127,9 +127,9 @@ fn all_mssql_column_types_must_work(api: TestApi) {
     api.raw_cmd(sql);
     let expectation = expect![[r#"
         SqlSchema {
-            namespaces: [
+            namespaces: {
                 "dbo",
-            ],
+            },
             tables: [
                 Table {
                     namespace_id: NamespaceId(
@@ -837,10 +837,10 @@ fn multiple_schemas_with_same_table_names_are_described(api: TestApi) {
 
     let expected_schema = expect![[r#"
         SqlSchema {
-            namespaces: [
+            namespaces: {
                 "schema_0",
                 "schema_1",
-            ],
+            },
             tables: [
                 Table {
                     namespace_id: NamespaceId(
@@ -1021,10 +1021,10 @@ fn multiple_schemas_with_same_foreign_key_are_described(api: TestApi) {
 
     let expected_schema = expect![[r#"
         SqlSchema {
-            namespaces: [
+            namespaces: {
                 "schema_0",
                 "schema_1",
-            ],
+            },
             tables: [
                 Table {
                     namespace_id: NamespaceId(
