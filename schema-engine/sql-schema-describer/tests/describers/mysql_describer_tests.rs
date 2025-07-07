@@ -3643,3 +3643,1410 @@ fn index_length_and_sorting_is_handled(api: TestApi) {
     assert_eq!(Some(10), columns[0].length());
     assert_eq!(Some(20), columns[1].length());
 }
+
+#[test_connector(tags(Mysql))]
+fn multiple_schemas_with_same_table_names_are_described(api: TestApi) {
+    let schema = r#"
+           DROP SCHEMA IF EXISTS `schema_0`;
+           DROP SCHEMA IF EXISTS `schema_1`;
+
+           CREATE Schema `schema_0`;
+           CREATE TABLE `schema_0`.`Table_0` (`id_0` SERIAL PRIMARY KEY, `int` Integer Default 0);
+
+           CREATE Schema `schema_1`;
+           CREATE TABLE `schema_1`.`Table_0` (`id_1` SERIAL PRIMARY KEY, `int` Integer Default 1);
+    "#;
+
+    api.raw_cmd(schema);
+    let schema = api.describe_with_schemas(&["schema_0", "schema_1"]);
+
+    let expected_schema = expect![[r#"
+        SqlSchema {
+            namespaces: {
+                "schema_0",
+                "schema_1",
+            },
+            tables: [
+                Table {
+                    namespace_id: NamespaceId(
+                        0,
+                    ),
+                    name: "Table_0",
+                    properties: BitFlags<TableProperties> {
+                        bits: 0b0,
+                    },
+                    description: None,
+                },
+                Table {
+                    namespace_id: NamespaceId(
+                        1,
+                    ),
+                    name: "Table_0",
+                    properties: BitFlags<TableProperties> {
+                        bits: 0b0,
+                    },
+                    description: None,
+                },
+            ],
+            enums: [],
+            enum_variants: [],
+            table_columns: [
+                (
+                    TableId(
+                        0,
+                    ),
+                    Column {
+                        name: "id_0",
+                        tpe: ColumnType {
+                            full_data_type: "bigint unsigned",
+                            family: BigInt,
+                            arity: Required,
+                            native_type: Some(
+                                NativeTypeInstance(..),
+                            ),
+                        },
+                        auto_increment: true,
+                        description: None,
+                    },
+                ),
+                (
+                    TableId(
+                        0,
+                    ),
+                    Column {
+                        name: "int",
+                        tpe: ColumnType {
+                            full_data_type: "int",
+                            family: Int,
+                            arity: Nullable,
+                            native_type: Some(
+                                NativeTypeInstance(..),
+                            ),
+                        },
+                        auto_increment: false,
+                        description: None,
+                    },
+                ),
+                (
+                    TableId(
+                        1,
+                    ),
+                    Column {
+                        name: "id_1",
+                        tpe: ColumnType {
+                            full_data_type: "bigint unsigned",
+                            family: BigInt,
+                            arity: Required,
+                            native_type: Some(
+                                NativeTypeInstance(..),
+                            ),
+                        },
+                        auto_increment: true,
+                        description: None,
+                    },
+                ),
+                (
+                    TableId(
+                        1,
+                    ),
+                    Column {
+                        name: "int",
+                        tpe: ColumnType {
+                            full_data_type: "int",
+                            family: Int,
+                            arity: Nullable,
+                            native_type: Some(
+                                NativeTypeInstance(..),
+                            ),
+                        },
+                        auto_increment: false,
+                        description: None,
+                    },
+                ),
+            ],
+            foreign_keys: [],
+            table_default_values: [
+                (
+                    TableColumnId(
+                        1,
+                    ),
+                    DefaultValue {
+                        kind: Value(
+                            Int(
+                                0,
+                            ),
+                        ),
+                        constraint_name: None,
+                    },
+                ),
+                (
+                    TableColumnId(
+                        3,
+                    ),
+                    DefaultValue {
+                        kind: Value(
+                            Int(
+                                1,
+                            ),
+                        ),
+                        constraint_name: None,
+                    },
+                ),
+            ],
+            view_default_values: [],
+            foreign_key_columns: [],
+            indexes: [
+                Index {
+                    table_id: TableId(
+                        0,
+                    ),
+                    index_name: "",
+                    tpe: PrimaryKey,
+                },
+                Index {
+                    table_id: TableId(
+                        0,
+                    ),
+                    index_name: "id_0",
+                    tpe: Unique,
+                },
+                Index {
+                    table_id: TableId(
+                        1,
+                    ),
+                    index_name: "",
+                    tpe: PrimaryKey,
+                },
+                Index {
+                    table_id: TableId(
+                        1,
+                    ),
+                    index_name: "id_1",
+                    tpe: Unique,
+                },
+            ],
+            index_columns: [
+                IndexColumn {
+                    index_id: IndexId(
+                        0,
+                    ),
+                    column_id: TableColumnId(
+                        0,
+                    ),
+                    sort_order: Some(
+                        Asc,
+                    ),
+                    length: None,
+                },
+                IndexColumn {
+                    index_id: IndexId(
+                        1,
+                    ),
+                    column_id: TableColumnId(
+                        0,
+                    ),
+                    sort_order: Some(
+                        Asc,
+                    ),
+                    length: None,
+                },
+                IndexColumn {
+                    index_id: IndexId(
+                        2,
+                    ),
+                    column_id: TableColumnId(
+                        2,
+                    ),
+                    sort_order: Some(
+                        Asc,
+                    ),
+                    length: None,
+                },
+                IndexColumn {
+                    index_id: IndexId(
+                        3,
+                    ),
+                    column_id: TableColumnId(
+                        2,
+                    ),
+                    sort_order: Some(
+                        Asc,
+                    ),
+                    length: None,
+                },
+            ],
+            check_constraints: [],
+            views: [],
+            view_columns: [],
+            procedures: [],
+            user_defined_types: [],
+            connector_data: <ConnectorData>,
+        }
+    "#]];
+
+    expected_schema.assert_debug_eq(&schema);
+}
+
+#[test_connector(tags(Mysql))]
+fn multiple_schemas_with_same_foreign_key_are_described(api: TestApi) {
+    let schema = r#"
+           DROP SCHEMA IF EXISTS `schema_3`;
+           DROP SCHEMA IF EXISTS `schema_2`;
+
+           CREATE Schema `schema_2`;
+           CREATE TABLE `schema_2`.`Table_0` (`other` Integer, `id_0` SERIAL PRIMARY KEY);
+           CREATE TABLE `schema_2`.`Table_1` (`id_1` SERIAL PRIMARY KEY, `o_id_0` BIGINT UNSIGNED);
+           ALTER TABLE `schema_2`.`Table_1` ADD CONSTRAINT `fk_0` FOREIGN KEY (`o_id_0`) REFERENCES `schema_2`.`Table_0` (`id_0`);
+
+           CREATE Schema `schema_3`;
+           CREATE TABLE `schema_3`.`Table_0` (`id_2` SERIAL PRIMARY KEY);
+           CREATE TABLE `schema_3`.`Table_1` (`id_3` SERIAL PRIMARY KEY, `o_id_0` BIGINT UNSIGNED);
+           ALTER TABLE `schema_3`.`Table_1` ADD CONSTRAINT `fk_0` FOREIGN KEY (`o_id_0`) REFERENCES `schema_3`.`Table_0` (`id_2`);
+
+           CREATE TABLE `schema_3`.`Table_2` (`id_4` SERIAL PRIMARY KEY, `o_id_0` BIGINT UNSIGNED);
+           ALTER TABLE `schema_3`.`Table_2` ADD CONSTRAINT `fk_1` FOREIGN KEY (`o_id_0`) REFERENCES `schema_2`.`Table_0` (`id_0`);
+    "#;
+
+    api.raw_cmd(schema);
+    let schema = api.describe_with_schemas(&["schema_2", "schema_3"]);
+
+    let expected_schema = expect![[r#"
+        SqlSchema {
+            namespaces: {
+                "schema_2",
+                "schema_3",
+            },
+            tables: [
+                Table {
+                    namespace_id: NamespaceId(
+                        0,
+                    ),
+                    name: "Table_0",
+                    properties: BitFlags<TableProperties> {
+                        bits: 0b0,
+                    },
+                    description: None,
+                },
+                Table {
+                    namespace_id: NamespaceId(
+                        0,
+                    ),
+                    name: "Table_1",
+                    properties: BitFlags<TableProperties> {
+                        bits: 0b0,
+                    },
+                    description: None,
+                },
+                Table {
+                    namespace_id: NamespaceId(
+                        1,
+                    ),
+                    name: "Table_0",
+                    properties: BitFlags<TableProperties> {
+                        bits: 0b0,
+                    },
+                    description: None,
+                },
+                Table {
+                    namespace_id: NamespaceId(
+                        1,
+                    ),
+                    name: "Table_1",
+                    properties: BitFlags<TableProperties> {
+                        bits: 0b0,
+                    },
+                    description: None,
+                },
+                Table {
+                    namespace_id: NamespaceId(
+                        1,
+                    ),
+                    name: "Table_2",
+                    properties: BitFlags<TableProperties> {
+                        bits: 0b0,
+                    },
+                    description: None,
+                },
+            ],
+            enums: [],
+            enum_variants: [],
+            table_columns: [
+                (
+                    TableId(
+                        0,
+                    ),
+                    Column {
+                        name: "other",
+                        tpe: ColumnType {
+                            full_data_type: "int",
+                            family: Int,
+                            arity: Nullable,
+                            native_type: Some(
+                                NativeTypeInstance(..),
+                            ),
+                        },
+                        auto_increment: false,
+                        description: None,
+                    },
+                ),
+                (
+                    TableId(
+                        0,
+                    ),
+                    Column {
+                        name: "id_0",
+                        tpe: ColumnType {
+                            full_data_type: "bigint unsigned",
+                            family: BigInt,
+                            arity: Required,
+                            native_type: Some(
+                                NativeTypeInstance(..),
+                            ),
+                        },
+                        auto_increment: true,
+                        description: None,
+                    },
+                ),
+                (
+                    TableId(
+                        1,
+                    ),
+                    Column {
+                        name: "id_1",
+                        tpe: ColumnType {
+                            full_data_type: "bigint unsigned",
+                            family: BigInt,
+                            arity: Required,
+                            native_type: Some(
+                                NativeTypeInstance(..),
+                            ),
+                        },
+                        auto_increment: true,
+                        description: None,
+                    },
+                ),
+                (
+                    TableId(
+                        1,
+                    ),
+                    Column {
+                        name: "o_id_0",
+                        tpe: ColumnType {
+                            full_data_type: "bigint unsigned",
+                            family: BigInt,
+                            arity: Nullable,
+                            native_type: Some(
+                                NativeTypeInstance(..),
+                            ),
+                        },
+                        auto_increment: false,
+                        description: None,
+                    },
+                ),
+                (
+                    TableId(
+                        2,
+                    ),
+                    Column {
+                        name: "id_2",
+                        tpe: ColumnType {
+                            full_data_type: "bigint unsigned",
+                            family: BigInt,
+                            arity: Required,
+                            native_type: Some(
+                                NativeTypeInstance(..),
+                            ),
+                        },
+                        auto_increment: true,
+                        description: None,
+                    },
+                ),
+                (
+                    TableId(
+                        3,
+                    ),
+                    Column {
+                        name: "id_3",
+                        tpe: ColumnType {
+                            full_data_type: "bigint unsigned",
+                            family: BigInt,
+                            arity: Required,
+                            native_type: Some(
+                                NativeTypeInstance(..),
+                            ),
+                        },
+                        auto_increment: true,
+                        description: None,
+                    },
+                ),
+                (
+                    TableId(
+                        3,
+                    ),
+                    Column {
+                        name: "o_id_0",
+                        tpe: ColumnType {
+                            full_data_type: "bigint unsigned",
+                            family: BigInt,
+                            arity: Nullable,
+                            native_type: Some(
+                                NativeTypeInstance(..),
+                            ),
+                        },
+                        auto_increment: false,
+                        description: None,
+                    },
+                ),
+                (
+                    TableId(
+                        4,
+                    ),
+                    Column {
+                        name: "id_4",
+                        tpe: ColumnType {
+                            full_data_type: "bigint unsigned",
+                            family: BigInt,
+                            arity: Required,
+                            native_type: Some(
+                                NativeTypeInstance(..),
+                            ),
+                        },
+                        auto_increment: true,
+                        description: None,
+                    },
+                ),
+                (
+                    TableId(
+                        4,
+                    ),
+                    Column {
+                        name: "o_id_0",
+                        tpe: ColumnType {
+                            full_data_type: "bigint unsigned",
+                            family: BigInt,
+                            arity: Nullable,
+                            native_type: Some(
+                                NativeTypeInstance(..),
+                            ),
+                        },
+                        auto_increment: false,
+                        description: None,
+                    },
+                ),
+            ],
+            foreign_keys: [
+                ForeignKey {
+                    constrained_table: TableId(
+                        1,
+                    ),
+                    referenced_table: TableId(
+                        0,
+                    ),
+                    constraint_name: Some(
+                        "fk_0",
+                    ),
+                    on_delete_action: NoAction,
+                    on_update_action: NoAction,
+                },
+                ForeignKey {
+                    constrained_table: TableId(
+                        3,
+                    ),
+                    referenced_table: TableId(
+                        2,
+                    ),
+                    constraint_name: Some(
+                        "fk_0",
+                    ),
+                    on_delete_action: NoAction,
+                    on_update_action: NoAction,
+                },
+                ForeignKey {
+                    constrained_table: TableId(
+                        4,
+                    ),
+                    referenced_table: TableId(
+                        0,
+                    ),
+                    constraint_name: Some(
+                        "fk_1",
+                    ),
+                    on_delete_action: NoAction,
+                    on_update_action: NoAction,
+                },
+            ],
+            table_default_values: [],
+            view_default_values: [],
+            foreign_key_columns: [
+                ForeignKeyColumn {
+                    foreign_key_id: ForeignKeyId(
+                        0,
+                    ),
+                    constrained_column: TableColumnId(
+                        3,
+                    ),
+                    referenced_column: TableColumnId(
+                        1,
+                    ),
+                },
+                ForeignKeyColumn {
+                    foreign_key_id: ForeignKeyId(
+                        0,
+                    ),
+                    constrained_column: TableColumnId(
+                        3,
+                    ),
+                    referenced_column: TableColumnId(
+                        1,
+                    ),
+                },
+                ForeignKeyColumn {
+                    foreign_key_id: ForeignKeyId(
+                        1,
+                    ),
+                    constrained_column: TableColumnId(
+                        6,
+                    ),
+                    referenced_column: TableColumnId(
+                        4,
+                    ),
+                },
+                ForeignKeyColumn {
+                    foreign_key_id: ForeignKeyId(
+                        1,
+                    ),
+                    constrained_column: TableColumnId(
+                        6,
+                    ),
+                    referenced_column: TableColumnId(
+                        4,
+                    ),
+                },
+                ForeignKeyColumn {
+                    foreign_key_id: ForeignKeyId(
+                        2,
+                    ),
+                    constrained_column: TableColumnId(
+                        8,
+                    ),
+                    referenced_column: TableColumnId(
+                        1,
+                    ),
+                },
+            ],
+            indexes: [
+                Index {
+                    table_id: TableId(
+                        0,
+                    ),
+                    index_name: "",
+                    tpe: PrimaryKey,
+                },
+                Index {
+                    table_id: TableId(
+                        0,
+                    ),
+                    index_name: "id_0",
+                    tpe: Unique,
+                },
+                Index {
+                    table_id: TableId(
+                        1,
+                    ),
+                    index_name: "",
+                    tpe: PrimaryKey,
+                },
+                Index {
+                    table_id: TableId(
+                        1,
+                    ),
+                    index_name: "fk_0",
+                    tpe: Normal,
+                },
+                Index {
+                    table_id: TableId(
+                        1,
+                    ),
+                    index_name: "id_1",
+                    tpe: Unique,
+                },
+                Index {
+                    table_id: TableId(
+                        2,
+                    ),
+                    index_name: "",
+                    tpe: PrimaryKey,
+                },
+                Index {
+                    table_id: TableId(
+                        2,
+                    ),
+                    index_name: "id_2",
+                    tpe: Unique,
+                },
+                Index {
+                    table_id: TableId(
+                        3,
+                    ),
+                    index_name: "",
+                    tpe: PrimaryKey,
+                },
+                Index {
+                    table_id: TableId(
+                        3,
+                    ),
+                    index_name: "fk_0",
+                    tpe: Normal,
+                },
+                Index {
+                    table_id: TableId(
+                        3,
+                    ),
+                    index_name: "id_3",
+                    tpe: Unique,
+                },
+                Index {
+                    table_id: TableId(
+                        4,
+                    ),
+                    index_name: "",
+                    tpe: PrimaryKey,
+                },
+                Index {
+                    table_id: TableId(
+                        4,
+                    ),
+                    index_name: "fk_1",
+                    tpe: Normal,
+                },
+                Index {
+                    table_id: TableId(
+                        4,
+                    ),
+                    index_name: "id_4",
+                    tpe: Unique,
+                },
+            ],
+            index_columns: [
+                IndexColumn {
+                    index_id: IndexId(
+                        0,
+                    ),
+                    column_id: TableColumnId(
+                        1,
+                    ),
+                    sort_order: Some(
+                        Asc,
+                    ),
+                    length: None,
+                },
+                IndexColumn {
+                    index_id: IndexId(
+                        1,
+                    ),
+                    column_id: TableColumnId(
+                        1,
+                    ),
+                    sort_order: Some(
+                        Asc,
+                    ),
+                    length: None,
+                },
+                IndexColumn {
+                    index_id: IndexId(
+                        2,
+                    ),
+                    column_id: TableColumnId(
+                        2,
+                    ),
+                    sort_order: Some(
+                        Asc,
+                    ),
+                    length: None,
+                },
+                IndexColumn {
+                    index_id: IndexId(
+                        3,
+                    ),
+                    column_id: TableColumnId(
+                        3,
+                    ),
+                    sort_order: Some(
+                        Asc,
+                    ),
+                    length: None,
+                },
+                IndexColumn {
+                    index_id: IndexId(
+                        4,
+                    ),
+                    column_id: TableColumnId(
+                        2,
+                    ),
+                    sort_order: Some(
+                        Asc,
+                    ),
+                    length: None,
+                },
+                IndexColumn {
+                    index_id: IndexId(
+                        5,
+                    ),
+                    column_id: TableColumnId(
+                        4,
+                    ),
+                    sort_order: Some(
+                        Asc,
+                    ),
+                    length: None,
+                },
+                IndexColumn {
+                    index_id: IndexId(
+                        6,
+                    ),
+                    column_id: TableColumnId(
+                        4,
+                    ),
+                    sort_order: Some(
+                        Asc,
+                    ),
+                    length: None,
+                },
+                IndexColumn {
+                    index_id: IndexId(
+                        7,
+                    ),
+                    column_id: TableColumnId(
+                        5,
+                    ),
+                    sort_order: Some(
+                        Asc,
+                    ),
+                    length: None,
+                },
+                IndexColumn {
+                    index_id: IndexId(
+                        8,
+                    ),
+                    column_id: TableColumnId(
+                        6,
+                    ),
+                    sort_order: Some(
+                        Asc,
+                    ),
+                    length: None,
+                },
+                IndexColumn {
+                    index_id: IndexId(
+                        9,
+                    ),
+                    column_id: TableColumnId(
+                        5,
+                    ),
+                    sort_order: Some(
+                        Asc,
+                    ),
+                    length: None,
+                },
+                IndexColumn {
+                    index_id: IndexId(
+                        10,
+                    ),
+                    column_id: TableColumnId(
+                        7,
+                    ),
+                    sort_order: Some(
+                        Asc,
+                    ),
+                    length: None,
+                },
+                IndexColumn {
+                    index_id: IndexId(
+                        11,
+                    ),
+                    column_id: TableColumnId(
+                        8,
+                    ),
+                    sort_order: Some(
+                        Asc,
+                    ),
+                    length: None,
+                },
+                IndexColumn {
+                    index_id: IndexId(
+                        12,
+                    ),
+                    column_id: TableColumnId(
+                        7,
+                    ),
+                    sort_order: Some(
+                        Asc,
+                    ),
+                    length: None,
+                },
+            ],
+            check_constraints: [],
+            views: [],
+            view_columns: [],
+            procedures: [],
+            user_defined_types: [],
+            connector_data: <ConnectorData>,
+        }
+    "#]];
+
+    expected_schema.assert_debug_eq(&schema);
+}
+
+#[test_connector(tags(Mysql))]
+fn multiple_schemas_are_described(api: TestApi) {
+    let schema = r#"
+           DROP SCHEMA IF EXISTS `schema_5`;
+           DROP SCHEMA IF EXISTS `schema_4`;
+
+           CREATE Schema `schema_4`;
+           CREATE TABLE `schema_4`.`Table_0` (`id_0` SERIAL PRIMARY KEY);
+           CREATE TABLE `schema_4`.`Table_1` (`id_1` SERIAL PRIMARY KEY, `o_id_0` BIGINT UNSIGNED, FOREIGN KEY (o_id_0) REFERENCES `schema_4`.`Table_0`(`id_0`));
+           CREATE INDEX `Index_0` ON `schema_4`.`Table_1`(`o_id_0`);
+           CREATE VIEW `schema_4`.`View_0` AS SELECT 0;
+           CREATE PROCEDURE `schema_4`.`Procedure_0` ()
+            BEGIN
+                SELECT 0;
+            END;
+
+           CREATE Schema `schema_5`;
+           CREATE TABLE `schema_5`.`Table_2` (`id_2` SERIAL PRIMARY KEY);
+           CREATE TABLE `schema_5`.`Table_3` (`id_3` SERIAL PRIMARY KEY, `o_id_2` BIGINT UNSIGNED, FOREIGN KEY (o_id_2) REFERENCES `schema_5`.`Table_2`(`id_2`));
+           CREATE INDEX `Index_1` ON `schema_5`.`Table_3`(`o_id_2`);
+           CREATE VIEW `schema_5`.`View_1` AS SELECT 1;
+           CREATE PROCEDURE `schema_5`.`Procedure_1` ()
+            BEGIN
+                SELECT 1;
+            END;
+    "#;
+
+    api.raw_cmd(schema);
+    let schema = api.describe_with_schemas(&["schema_4", "schema_5"]);
+
+    let expected_schema = expect![[r#"
+        SqlSchema {
+            namespaces: {
+                "schema_4",
+                "schema_5",
+            },
+            tables: [
+                Table {
+                    namespace_id: NamespaceId(
+                        0,
+                    ),
+                    name: "Table_0",
+                    properties: BitFlags<TableProperties> {
+                        bits: 0b0,
+                    },
+                    description: None,
+                },
+                Table {
+                    namespace_id: NamespaceId(
+                        0,
+                    ),
+                    name: "Table_1",
+                    properties: BitFlags<TableProperties> {
+                        bits: 0b0,
+                    },
+                    description: None,
+                },
+                Table {
+                    namespace_id: NamespaceId(
+                        1,
+                    ),
+                    name: "Table_2",
+                    properties: BitFlags<TableProperties> {
+                        bits: 0b0,
+                    },
+                    description: None,
+                },
+                Table {
+                    namespace_id: NamespaceId(
+                        1,
+                    ),
+                    name: "Table_3",
+                    properties: BitFlags<TableProperties> {
+                        bits: 0b0,
+                    },
+                    description: None,
+                },
+            ],
+            enums: [],
+            enum_variants: [],
+            table_columns: [
+                (
+                    TableId(
+                        0,
+                    ),
+                    Column {
+                        name: "id_0",
+                        tpe: ColumnType {
+                            full_data_type: "bigint unsigned",
+                            family: BigInt,
+                            arity: Required,
+                            native_type: Some(
+                                NativeTypeInstance(..),
+                            ),
+                        },
+                        auto_increment: true,
+                        description: None,
+                    },
+                ),
+                (
+                    TableId(
+                        1,
+                    ),
+                    Column {
+                        name: "id_1",
+                        tpe: ColumnType {
+                            full_data_type: "bigint unsigned",
+                            family: BigInt,
+                            arity: Required,
+                            native_type: Some(
+                                NativeTypeInstance(..),
+                            ),
+                        },
+                        auto_increment: true,
+                        description: None,
+                    },
+                ),
+                (
+                    TableId(
+                        1,
+                    ),
+                    Column {
+                        name: "o_id_0",
+                        tpe: ColumnType {
+                            full_data_type: "bigint unsigned",
+                            family: BigInt,
+                            arity: Nullable,
+                            native_type: Some(
+                                NativeTypeInstance(..),
+                            ),
+                        },
+                        auto_increment: false,
+                        description: None,
+                    },
+                ),
+                (
+                    TableId(
+                        2,
+                    ),
+                    Column {
+                        name: "id_2",
+                        tpe: ColumnType {
+                            full_data_type: "bigint unsigned",
+                            family: BigInt,
+                            arity: Required,
+                            native_type: Some(
+                                NativeTypeInstance(..),
+                            ),
+                        },
+                        auto_increment: true,
+                        description: None,
+                    },
+                ),
+                (
+                    TableId(
+                        3,
+                    ),
+                    Column {
+                        name: "id_3",
+                        tpe: ColumnType {
+                            full_data_type: "bigint unsigned",
+                            family: BigInt,
+                            arity: Required,
+                            native_type: Some(
+                                NativeTypeInstance(..),
+                            ),
+                        },
+                        auto_increment: true,
+                        description: None,
+                    },
+                ),
+                (
+                    TableId(
+                        3,
+                    ),
+                    Column {
+                        name: "o_id_2",
+                        tpe: ColumnType {
+                            full_data_type: "bigint unsigned",
+                            family: BigInt,
+                            arity: Nullable,
+                            native_type: Some(
+                                NativeTypeInstance(..),
+                            ),
+                        },
+                        auto_increment: false,
+                        description: None,
+                    },
+                ),
+            ],
+            foreign_keys: [
+                ForeignKey {
+                    constrained_table: TableId(
+                        1,
+                    ),
+                    referenced_table: TableId(
+                        0,
+                    ),
+                    constraint_name: Some(
+                        "Table_1_ibfk_1",
+                    ),
+                    on_delete_action: NoAction,
+                    on_update_action: NoAction,
+                },
+                ForeignKey {
+                    constrained_table: TableId(
+                        3,
+                    ),
+                    referenced_table: TableId(
+                        2,
+                    ),
+                    constraint_name: Some(
+                        "Table_3_ibfk_1",
+                    ),
+                    on_delete_action: NoAction,
+                    on_update_action: NoAction,
+                },
+            ],
+            table_default_values: [],
+            view_default_values: [
+                (
+                    ViewColumnId(
+                        0,
+                    ),
+                    DefaultValue {
+                        kind: Value(
+                            Int(
+                                0,
+                            ),
+                        ),
+                        constraint_name: None,
+                    },
+                ),
+                (
+                    ViewColumnId(
+                        1,
+                    ),
+                    DefaultValue {
+                        kind: Value(
+                            Int(
+                                0,
+                            ),
+                        ),
+                        constraint_name: None,
+                    },
+                ),
+            ],
+            foreign_key_columns: [
+                ForeignKeyColumn {
+                    foreign_key_id: ForeignKeyId(
+                        0,
+                    ),
+                    constrained_column: TableColumnId(
+                        2,
+                    ),
+                    referenced_column: TableColumnId(
+                        0,
+                    ),
+                },
+                ForeignKeyColumn {
+                    foreign_key_id: ForeignKeyId(
+                        1,
+                    ),
+                    constrained_column: TableColumnId(
+                        5,
+                    ),
+                    referenced_column: TableColumnId(
+                        3,
+                    ),
+                },
+            ],
+            indexes: [
+                Index {
+                    table_id: TableId(
+                        0,
+                    ),
+                    index_name: "",
+                    tpe: PrimaryKey,
+                },
+                Index {
+                    table_id: TableId(
+                        0,
+                    ),
+                    index_name: "id_0",
+                    tpe: Unique,
+                },
+                Index {
+                    table_id: TableId(
+                        1,
+                    ),
+                    index_name: "Index_0",
+                    tpe: Normal,
+                },
+                Index {
+                    table_id: TableId(
+                        1,
+                    ),
+                    index_name: "",
+                    tpe: PrimaryKey,
+                },
+                Index {
+                    table_id: TableId(
+                        1,
+                    ),
+                    index_name: "id_1",
+                    tpe: Unique,
+                },
+                Index {
+                    table_id: TableId(
+                        2,
+                    ),
+                    index_name: "",
+                    tpe: PrimaryKey,
+                },
+                Index {
+                    table_id: TableId(
+                        2,
+                    ),
+                    index_name: "id_2",
+                    tpe: Unique,
+                },
+                Index {
+                    table_id: TableId(
+                        3,
+                    ),
+                    index_name: "Index_1",
+                    tpe: Normal,
+                },
+                Index {
+                    table_id: TableId(
+                        3,
+                    ),
+                    index_name: "",
+                    tpe: PrimaryKey,
+                },
+                Index {
+                    table_id: TableId(
+                        3,
+                    ),
+                    index_name: "id_3",
+                    tpe: Unique,
+                },
+            ],
+            index_columns: [
+                IndexColumn {
+                    index_id: IndexId(
+                        0,
+                    ),
+                    column_id: TableColumnId(
+                        0,
+                    ),
+                    sort_order: Some(
+                        Asc,
+                    ),
+                    length: None,
+                },
+                IndexColumn {
+                    index_id: IndexId(
+                        1,
+                    ),
+                    column_id: TableColumnId(
+                        0,
+                    ),
+                    sort_order: Some(
+                        Asc,
+                    ),
+                    length: None,
+                },
+                IndexColumn {
+                    index_id: IndexId(
+                        2,
+                    ),
+                    column_id: TableColumnId(
+                        2,
+                    ),
+                    sort_order: Some(
+                        Asc,
+                    ),
+                    length: None,
+                },
+                IndexColumn {
+                    index_id: IndexId(
+                        3,
+                    ),
+                    column_id: TableColumnId(
+                        1,
+                    ),
+                    sort_order: Some(
+                        Asc,
+                    ),
+                    length: None,
+                },
+                IndexColumn {
+                    index_id: IndexId(
+                        4,
+                    ),
+                    column_id: TableColumnId(
+                        1,
+                    ),
+                    sort_order: Some(
+                        Asc,
+                    ),
+                    length: None,
+                },
+                IndexColumn {
+                    index_id: IndexId(
+                        5,
+                    ),
+                    column_id: TableColumnId(
+                        3,
+                    ),
+                    sort_order: Some(
+                        Asc,
+                    ),
+                    length: None,
+                },
+                IndexColumn {
+                    index_id: IndexId(
+                        6,
+                    ),
+                    column_id: TableColumnId(
+                        3,
+                    ),
+                    sort_order: Some(
+                        Asc,
+                    ),
+                    length: None,
+                },
+                IndexColumn {
+                    index_id: IndexId(
+                        7,
+                    ),
+                    column_id: TableColumnId(
+                        5,
+                    ),
+                    sort_order: Some(
+                        Asc,
+                    ),
+                    length: None,
+                },
+                IndexColumn {
+                    index_id: IndexId(
+                        8,
+                    ),
+                    column_id: TableColumnId(
+                        4,
+                    ),
+                    sort_order: Some(
+                        Asc,
+                    ),
+                    length: None,
+                },
+                IndexColumn {
+                    index_id: IndexId(
+                        9,
+                    ),
+                    column_id: TableColumnId(
+                        4,
+                    ),
+                    sort_order: Some(
+                        Asc,
+                    ),
+                    length: None,
+                },
+            ],
+            check_constraints: [],
+            views: [
+                View {
+                    namespace_id: NamespaceId(
+                        0,
+                    ),
+                    name: "View_0",
+                    definition: Some(
+                        "select 0 AS `0`",
+                    ),
+                    description: None,
+                },
+                View {
+                    namespace_id: NamespaceId(
+                        1,
+                    ),
+                    name: "View_1",
+                    definition: Some(
+                        "select 1 AS `1`",
+                    ),
+                    description: None,
+                },
+            ],
+            view_columns: [
+                (
+                    ViewId(
+                        0,
+                    ),
+                    Column {
+                        name: "0",
+                        tpe: ColumnType {
+                            full_data_type: "int",
+                            family: Int,
+                            arity: Required,
+                            native_type: Some(
+                                NativeTypeInstance(..),
+                            ),
+                        },
+                        auto_increment: false,
+                        description: None,
+                    },
+                ),
+                (
+                    ViewId(
+                        1,
+                    ),
+                    Column {
+                        name: "1",
+                        tpe: ColumnType {
+                            full_data_type: "int",
+                            family: Int,
+                            arity: Required,
+                            native_type: Some(
+                                NativeTypeInstance(..),
+                            ),
+                        },
+                        auto_increment: false,
+                        description: None,
+                    },
+                ),
+            ],
+            procedures: [
+                Procedure {
+                    namespace_id: NamespaceId(
+                        0,
+                    ),
+                    name: "Procedure_0",
+                    definition: Some(
+                        "BEGIN\n                SELECT 0;\n            END",
+                    ),
+                },
+                Procedure {
+                    namespace_id: NamespaceId(
+                        1,
+                    ),
+                    name: "Procedure_1",
+                    definition: Some(
+                        "BEGIN\n                SELECT 1;\n            END",
+                    ),
+                },
+            ],
+            user_defined_types: [],
+            connector_data: <ConnectorData>,
+        }
+    "#]];
+
+    expected_schema.assert_debug_eq(&schema);
+}
