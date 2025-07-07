@@ -9,4 +9,4 @@ LEFT JOIN INFORMATION_SCHEMA.CHECK_CONSTRAINTS cc
 	ON cc.constraint_schema = tc.table_schema
 	AND cc.constraint_name = tc.constraint_name
 WHERE constraint_type = 'CHECK'
-ORDER BY BINARY namespace, BINARY table_name, constraint_type, constraint_name;
+ORDER BY BINARY namespace, BINARY tc.table_name, constraint_type, tc.constraint_name;

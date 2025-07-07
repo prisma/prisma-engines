@@ -281,7 +281,7 @@ impl<'a> SqlSchemaDescriber<'a> {
                 AND column_info.table_schema IN ({namespaces_filter})
                 -- Exclude views.
                 AND table_info.table_type = 'BASE TABLE'
-            ORDER BY BINARY namespace, BINARY table_name"#
+            ORDER BY BINARY namespace, BINARY table_info.table_name"#
         );
 
         let rows = self.conn.query_raw(&sql, &[]).await?;
