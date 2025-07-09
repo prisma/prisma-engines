@@ -302,3 +302,30 @@ fn parse_direct_url_should_work() {
 
     assert_eq!("DIRECT_DATABASE_URL", result);
 }
+
+#[test]
+fn parse_multi_schema_for_unsupported_connector_should_error() {
+    let schema = indoc! {r#"
+        generator js {
+          provider        = "prisma-client-js"
+        }
+
+        datasource ds {
+          provider   = "mysql"
+          url        = env("DATABASE_URL")
+          schemas = ["test"]
+        }
+    "#};
+
+    let actual = parse_config(schema).unwrap_err();
+    let expect = expect![[r#"
+        [1;91merror[0m: [1mThe `schemas` property is not supported on the current connector.[0m
+          [1;94m-->[0m  [4mschema.prisma:8[0m
+        [1;94m   | [0m
+        [1;94m 7 | [0m  url        = env("DATABASE_URL")
+        [1;94m 8 | [0m  schemas = [1;91m["test"][0m
+        [1;94m   | [0m
+    "#]];
+
+    expect.assert_eq(&actual);
+}
