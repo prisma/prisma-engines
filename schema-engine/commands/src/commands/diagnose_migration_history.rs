@@ -137,8 +137,6 @@ pub async fn diagnose_migration_history(
         if input.opt_in_to_shadow_database {
             let mut dialect = connector.schema_dialect();
             let target = ExternalShadowDatabase::DriverAdapter(adapter_factory);
-            // TODO(MultiSchema): this should probably fill the following namespaces from the CLI since there is
-            // no schema to grab the namespaces off, in the case of MultiSchema.
             let from = migration_schema_cache
                 .get_or_insert(&applied_migrations, || async {
                     connector
@@ -164,8 +162,6 @@ pub async fn diagnose_migration_history(
 
             let error_in_unapplied_migration = if !matches!(drift, Some(DriftDiagnostic::MigrationFailedToApply { .. }))
             {
-                // TODO(MultiSchema): Not entirely sure passing no namespaces here is correct. Probably should
-                // also grab this as a CLI argument.
                 dialect
                     .validate_migrations_with_target(&migrations_from_filesystem, namespaces, target)
                     .await

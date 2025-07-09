@@ -22,8 +22,6 @@ pub async fn diff(
     // In order to properly handle MultiSchema, we need to make sure the preview feature is
     // correctly set, and we need to grab the namespaces from the Schema, if any.
     // Note that currently, we union all namespaces and preview features. This may not be correct.
-    // TODO: This effectively reads and parses (parts of) the schema twice: once here, and once
-    // below, when defining 'from'/'to'. We should revisit this.
     let (namespaces, preview_features) =
         namespaces_and_preview_features_from_diff_targets(&[&params.from, &params.to])?;
 

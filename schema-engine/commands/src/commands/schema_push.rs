@@ -24,11 +24,9 @@ pub async fn schema_push(input: SchemaPushInput, connector: &mut dyn SchemaConne
     let dialect = connector.schema_dialect();
 
     let to = dialect.schema_from_datamodel(sources)?;
+    // We only consider the namespaces present in the "to" schema aka the PSL file for the introspection of the "from" schema.
+    // So when the user removes a previously existing namespace from their PSL file we will not modify that namespace in the database.
     let namespaces = dialect.extract_namespaces(&to);
-
-    // TODO(MultiSchema): we may need to do something similar to
-    // namespaces_and_preview_features_from_diff_targets here as well,
-    // particulalry if it's not correctly setting the preview features flags.
     let from = connector
         .schema_from_database(namespaces)
         .instrument(tracing::info_span!("Calculate from database"))

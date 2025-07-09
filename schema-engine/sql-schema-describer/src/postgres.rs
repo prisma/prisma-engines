@@ -648,7 +648,7 @@ impl<'a> SqlSchemaDescriber<'a> {
     }
 
     async fn get_namespaces(&self, sql_schema: &mut SqlSchema, namespaces: &[&str]) -> DescriberResult<()> {
-        // TODO: this query isn't really useful. We already have namespaces.
+        // Although we have a list of namespaces we should introspect, we still need to check whether they actually already exist in the database.
         let sql = include_str!("postgres/namespaces_query.sql");
 
         let rows = self.conn.query_raw(sql, &[Value::array(namespaces)]).await?;
