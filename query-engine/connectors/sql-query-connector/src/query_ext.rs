@@ -135,16 +135,14 @@ impl<Q: Queryable + ?Sized> QueryExt for Q {
         let field_names: Vec<_> = model_id.fields().map(|field| field.name()).collect();
         let meta = column_metadata::create(field_names.as_slice(), &idents);
 
-        // TODO: Add tracing
-        let mut rows = self.filter(select.into(), &meta, ctx).await?;
-        let mut result = Vec::new();
-
-        for row in rows.drain(0..) {
-            let tuples: Vec<_> = model_id.scalar_fields().zip(row.values.into_iter()).collect();
-            let record_id: SelectionResult = SelectionResult::new(tuples);
-
-            result.push(record_id);
-        }
+        let rows = self.filter(select.into(), &meta, ctx).await?;
+        let result = rows
+            .into_iter()
+            .map(|row| {
+                let tuples = model_id.scalar_fields().zip(row.values.into_iter()).collect();
+                SelectionResult::new(tuples)
+            })
+            .collect();
 
         Ok(result)
     }
