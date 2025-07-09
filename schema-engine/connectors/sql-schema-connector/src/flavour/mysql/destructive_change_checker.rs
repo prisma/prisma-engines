@@ -145,7 +145,6 @@ impl DestructiveChangeCheckerFlavour for MysqlDestructiveChangeCheckerFlavour {
         connector: &'a mut dyn SqlConnector,
         table: &'a Table,
     ) -> BoxFuture<'a, ConnectorResult<i64>> {
-        // TODO(MultiSchema): replace this when implementing MySQL.
         let query = format!("SELECT COUNT(*) FROM `{}`", table.table);
 
         Box::pin(async move {
@@ -160,7 +159,6 @@ impl DestructiveChangeCheckerFlavour for MysqlDestructiveChangeCheckerFlavour {
         connector: &'a mut dyn SqlConnector,
         column: &'a Column,
     ) -> BoxFuture<'a, ConnectorResult<i64>> {
-        // TODO(MultiSchema): replace this when implementing MySQL.
         let query = format!(
             "SELECT COUNT(*) FROM `{}` WHERE `{}` IS NOT NULL",
             column.table, column.column
