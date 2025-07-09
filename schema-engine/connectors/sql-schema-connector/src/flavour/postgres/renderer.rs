@@ -50,7 +50,7 @@ impl PostgresRenderer {
 }
 
 impl SqlRenderer for PostgresRenderer {
-    // TODO(MultiSchema): We only do alter_sequence on CockroachDB.
+    // TODO: We only do alter_sequence on CockroachDB.
     fn render_alter_sequence(
         &self,
         sequence_idx: MigrationPair<u32>,
