@@ -21,7 +21,6 @@ use regex::Regex;
 use std::{
     any::type_name,
     collections::{BTreeMap, HashMap},
-    convert::TryInto,
     iter::Peekable,
     sync::LazyLock,
 };
@@ -529,28 +528,6 @@ impl AsRef<str> for SQLOperatorClassKind {
 
 #[async_trait::async_trait]
 impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber<'_> {
-    async fn list_databases(&self) -> DescriberResult<Vec<String>> {
-        Ok(self.get_databases().await?)
-    }
-
-    // TODO(MultiSchema): this going to provide wrong results with respect to MultiSchema,
-    // but this function does not seem to be called all that much. Should probably look into
-    // either updating or removing it.
-    async fn get_metadata(&self, schema: &str) -> DescriberResult<SqlMetadata> {
-        let mut sql_schema = SqlSchema::default();
-        let mut pg_ext = PostgresSchemaExt::default();
-
-        self.get_namespaces(&mut sql_schema, &[schema]).await?;
-
-        let table_count = self.get_table_names(&mut sql_schema, &mut pg_ext).await?.len();
-        let size_in_bytes = self.get_size(schema).await?;
-
-        Ok(SqlMetadata {
-            table_count,
-            size_in_bytes,
-        })
-    }
-
     async fn describe(&self, schemas: &[&str]) -> DescriberResult<SqlSchema> {
         let mut sql_schema = SqlSchema::default();
         let mut pg_ext = PostgresSchemaExt::default();
@@ -631,19 +608,6 @@ impl<'a> SqlSchemaDescriber<'a> {
         pg_ext.extensions = extensions;
 
         Ok(())
-    }
-
-    async fn get_databases(&self) -> DescriberResult<Vec<String>> {
-        let sql = "select schema_name from information_schema.schemata;";
-        let rows = self.conn.query_raw(sql, &[]).await?;
-        let names = rows
-            .into_iter()
-            .map(|row| row.get_expect_string("schema_name"))
-            .collect();
-
-        trace!("Found schema names: {:?}", names);
-
-        Ok(names)
     }
 
     async fn get_procedures(&self, sql_schema: &mut SqlSchema) -> DescriberResult<()> {
@@ -780,23 +744,6 @@ impl<'a> SqlSchemaDescriber<'a> {
         }
 
         Ok(map)
-    }
-
-    async fn get_size(&self, schema: &str) -> DescriberResult<usize> {
-        if self.circumstances.contains(Circumstances::Cockroach) {
-            return Ok(0); // TODO
-        }
-
-        let sql =
-            "SELECT SUM(pg_total_relation_size(quote_ident(schemaname) || '.' || quote_ident(tablename)))::BIGINT as size
-             FROM pg_tables
-             WHERE schemaname = $1::text";
-        let mut result_iter = self.conn.query_raw(sql, &[schema.into()]).await?.into_iter();
-        let size: i64 = result_iter.next().and_then(|row| row.get_i64("size")).unwrap_or(0);
-
-        trace!("Found db size: {:?}", size);
-
-        Ok(size.try_into().expect("size is not a valid usize"))
     }
 
     async fn get_views(&self, sql_schema: &mut SqlSchema) -> DescriberResult<()> {

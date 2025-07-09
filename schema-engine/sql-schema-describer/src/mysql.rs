@@ -1,7 +1,6 @@
 //! MySQL schema description.
 
 use crate::{getters::Getter, parsers::Parser, *};
-use bigdecimal::ToPrimitive;
 use indexmap::IndexMap;
 use indoc::indoc;
 use psl::{builtin_connectors::MySqlType, datamodel_connector::NativeTypeInstance};
@@ -57,21 +56,6 @@ pub struct SqlSchemaDescriber<'a> {
 
 #[async_trait::async_trait]
 impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber<'_> {
-    async fn list_databases(&self) -> DescriberResult<Vec<String>> {
-        self.get_databases().await
-    }
-
-    async fn get_metadata(&self, schema: &str) -> DescriberResult<SqlMetadata> {
-        let mut sql_schema = SqlSchema::default();
-        let table_count = self.get_table_names(schema, &mut sql_schema).await?.len();
-        let size_in_bytes = self.get_size(schema).await?;
-
-        Ok(SqlMetadata {
-            table_count,
-            size_in_bytes,
-        })
-    }
-
     #[tracing::instrument(skip(self))]
     async fn describe(&self, schemas: &[&str]) -> DescriberResult<SqlSchema> {
         let schema = schemas[0];
@@ -220,20 +204,6 @@ impl<'a> SqlSchemaDescriber<'a> {
     }
 
     #[tracing::instrument(skip(self))]
-    async fn get_databases(&self) -> DescriberResult<Vec<String>> {
-        let sql = "select schema_name as schema_name from information_schema.schemata;";
-        let rows = self.conn.query_raw(sql, &[]).await?;
-        let names = rows
-            .into_iter()
-            .map(|row| row.get_expect_string("schema_name"))
-            .collect();
-
-        trace!("Found schema names: {names:?}");
-
-        Ok(names)
-    }
-
-    #[tracing::instrument(skip(self))]
     async fn get_views(&self, schema: &str) -> DescriberResult<Vec<View>> {
         let sql = indoc! {r#"
             SELECT TABLE_NAME AS view_name, VIEW_DEFINITION AS view_sql
@@ -332,30 +302,6 @@ impl<'a> SqlSchemaDescriber<'a> {
         trace!("Found table names: {map:?}");
 
         Ok(map)
-    }
-
-    #[tracing::instrument(skip(self))]
-    async fn get_size(&self, schema: &str) -> DescriberResult<usize> {
-        let sql = r#"
-            SELECT
-            SUM(data_length + index_length) as size
-            FROM information_schema.TABLES
-            WHERE table_schema = ?
-        "#;
-
-        let result = self.conn.query_raw(sql, &[schema.into()]).await?;
-        let size = result
-            .first()
-            .and_then(|row| {
-                row.get("size")
-                    .and_then(|x| x.as_numeric())
-                    .and_then(|decimal| decimal.round(0).to_usize())
-            })
-            .unwrap_or(0);
-
-        trace!("Found db size: {size:?}");
-
-        Ok(size)
     }
 
     async fn get_all_columns(

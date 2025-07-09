@@ -35,23 +35,11 @@ use std::fmt::{self, Debug};
 /// A database description connector.
 #[async_trait::async_trait]
 pub trait SqlSchemaDescriberBackend: Send + Sync {
-    /// List the database's schemas.
-    async fn list_databases(&self) -> DescriberResult<Vec<String>>;
-
-    /// Get the databases metadata.
-    async fn get_metadata(&self, schema: &str) -> DescriberResult<SqlMetadata>;
-
     /// Describe a database schema.
     async fn describe(&self, schemas: &[&str]) -> DescriberResult<SqlSchema>;
 
     /// Get the database version.
     async fn version(&self) -> DescriberResult<Option<String>>;
-}
-
-/// The return type of get_metadata().
-pub struct SqlMetadata {
-    pub table_count: usize,
-    pub size_in_bytes: usize,
 }
 
 /// The result of describing a database schema.
