@@ -378,16 +378,16 @@ impl GenericApi for EngineState {
                 PathBuf::new().join(&params.base_directory_path),
             )
         } else {
-            let previous_schema =
-                psl::parse_schema_multi(&source_files).map_err(ConnectorError::new_schema_parser_error)?;
-
-            schema_connector::IntrospectionContext::new(
-                previous_schema,
-                composite_type_depth,
-                params.namespaces,
-                PathBuf::new().join(&params.base_directory_path),
-            )
-        };
+            psl::parse_schema_multi(&source_files).map(|previous_schema| {
+                schema_connector::IntrospectionContext::new(
+                    previous_schema,
+                    composite_type_depth,
+                    params.namespaces,
+                    PathBuf::new().join(&params.base_directory_path),
+                )
+            })
+        }
+        .map_err(ConnectorError::new_schema_parser_error)?;
 
         if !ctx
             .configuration()

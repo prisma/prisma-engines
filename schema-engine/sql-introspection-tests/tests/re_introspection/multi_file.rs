@@ -305,6 +305,39 @@ async fn reintrospect_force_multi_file(api: &mut TestApi) -> TestResult {
     Ok(())
 }
 
+#[test_connector(exclude(CockroachDb))]
+async fn reintrospect_force_invalid_config(api: &mut TestApi) -> TestResult {
+    let invalid_config_dm = indoc! {r#"
+      datasource db {
+        provider = "mysql"
+        url = "env(TEST_DATABASE_URL)"
+        schemas  = ["foo"]
+      }
+
+      generator client {
+        provider = "prisma-client-js"
+        previewFeatures = ["multiSchema"]
+      }
+    "#};
+
+    let input_dms = [("foo.prisma", invalid_config_dm.to_string())];
+
+    let expected = expect![[r#"
+        [1;91merror[0m: [1mThe `schemas` property is not supported on the current connector.[0m
+          [1;94m-->[0m  [4mfoo.prisma:4[0m
+        [1;94m   | [0m
+        [1;94m 3 | [0m  url = "env(TEST_DATABASE_URL)"
+        [1;94m 4 | [0m  schemas  = [1;91m["foo"][0m
+        [1;94m   | [0m
+
+    "#]];
+
+    api.expect_re_introspected_force_datamodels_error(&input_dms, expected)
+        .await;
+
+    Ok(())
+}
+
 // ----- Enums -----
 
 #[test_connector(tags(Postgres), exclude(CockroachDb))]

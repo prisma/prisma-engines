@@ -43,7 +43,7 @@ impl IntrospectionContext {
         composite_type_depth: CompositeTypeDepth,
         namespaces: Option<Vec<String>>,
         base_directory_path: PathBuf,
-    ) -> Self {
+    ) -> Result<Self, String> {
         let mut config_blocks = String::new();
 
         for source in previous_schema.db.datasources() {
@@ -60,15 +60,14 @@ impl IntrospectionContext {
         let previous_schema_config_only = psl::parse_schema_multi(&[(
             Self::introspection_file_path_impl(&previous_schema, &base_directory_path).to_string(),
             config_blocks.into(),
-        )])
-        .unwrap();
+        )])?;
 
-        Self::new(
+        Ok(Self::new(
             previous_schema_config_only,
             composite_type_depth,
             namespaces,
             base_directory_path,
-        )
+        ))
     }
 
     /// The PSL file with the previous schema definition.

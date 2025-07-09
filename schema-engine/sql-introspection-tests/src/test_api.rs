@@ -4,6 +4,7 @@ pub use indoc::{formatdoc, indoc};
 use itertools::Itertools;
 pub use quaint::prelude::Queryable;
 use schema_connector::CompositeTypeDepth;
+use schema_connector::ConnectorError;
 use schema_connector::ConnectorResult;
 use schema_connector::IntrospectionContext;
 use schema_connector::IntrospectionResult;
@@ -235,7 +236,8 @@ impl TestApi {
         render_config: bool,
     ) -> ConnectorResult<IntrospectionResult> {
         let mut ctx =
-            IntrospectionContext::new_config_only(previous_schema, CompositeTypeDepth::Infinite, None, PathBuf::new());
+            IntrospectionContext::new_config_only(previous_schema, CompositeTypeDepth::Infinite, None, PathBuf::new())
+                .map_err(ConnectorError::new_schema_parser_error)?;
         ctx.render_config = render_config;
 
         self.api
@@ -483,6 +485,17 @@ impl TestApi {
             .to_multi_test_result();
 
         expectation.assert_eq(&reintrospected.datamodels);
+    }
+
+    pub async fn expect_re_introspected_force_datamodels_error(
+        &mut self,
+        datamodels: &[(&str, String)],
+        expectation: expect_test::Expect,
+    ) {
+        let schema = parse_datamodels(datamodels);
+        let reintrospected = self.test_introspect_force_internal(schema, false).await.unwrap_err();
+
+        expectation.assert_eq(&reintrospected.to_string());
     }
 
     pub async fn expect_re_introspected_datamodels_with_config(
