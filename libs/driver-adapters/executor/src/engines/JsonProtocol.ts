@@ -1,3 +1,4 @@
+import type { JsonTaggedValue } from '@prisma/client-engine-runtime'
 import * as Transaction from './Transaction.js'
 
 export type JsonQuery = {
@@ -52,27 +53,3 @@ export type JsonArgumentValue =
   | JsonTaggedValue
   | JsonArgumentValue[]
   | { [key: string]: JsonArgumentValue }
-
-export type DateTaggedValue = { $type: 'DateTime'; value: string }
-export type DecimalTaggedValue = { $type: 'Decimal'; value: string }
-export type BytesTaggedValue = { $type: 'Bytes'; value: string }
-export type BigIntTaggedValue = { $type: 'BigInt'; value: string }
-export type FieldRefTaggedValue = { $type: 'FieldRef'; value: { _ref: string } }
-export type EnumTaggedValue = { $type: 'Enum'; value: string }
-export type JsonTaggedValue = { $type: 'Json'; value: string }
-
-export type JsonInputTaggedValue =
-  | DateTaggedValue
-  | DecimalTaggedValue
-  | BytesTaggedValue
-  | BigIntTaggedValue
-  | FieldRefTaggedValue
-  | JsonTaggedValue
-  | EnumTaggedValue
-
-export type JsonOutputTaggedValue =
-  | DateTaggedValue
-  | DecimalTaggedValue
-  | BytesTaggedValue
-  | BigIntTaggedValue
-  | JsonTaggedValue
