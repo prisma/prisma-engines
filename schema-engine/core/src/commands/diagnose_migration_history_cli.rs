@@ -3,7 +3,7 @@ use commands::{DiagnoseMigrationHistoryOutput, DriftDiagnostic, MigrationSchemaC
 pub use json_rpc::types::{DiagnoseMigrationHistoryInput, HistoryDiagnostic};
 use schema_connector::{
     migrations_directory::{error_on_changed_provider, list_migrations, MigrationDirectory},
-    ConnectorError, MigrationRecord, Namespaces, PersistenceNotInitializedError, SchemaConnector,
+    ConnectorError, MigrationRecord, Namespaces, PersistenceNotInitializedError, SchemaConnector, SchemaFilter,
 };
 
 /// Read the contents of the migrations directory and the migrations table, and
@@ -76,11 +76,14 @@ pub async fn diagnose_migration_history_cli(
     let (drift, error_in_unapplied_migration) = {
         if input.opt_in_to_shadow_database {
             let dialect = connector.schema_dialect();
+            // TODO:(schema-filter) add actual schema filter from DiagnoseMigrationHistoryInput
+            let filter = SchemaFilter {
+                included_namespaces: namespaces.clone(),
+                ..Default::default()
+            };
             let from = migration_schema_cache
                 .get_or_insert(&applied_migrations, || async {
-                    connector
-                        .schema_from_migrations(&applied_migrations, namespaces.clone())
-                        .await
+                    connector.schema_from_migrations(&applied_migrations, &filter).await
                 })
                 .await;
 

@@ -1,3 +1,5 @@
+use crate::Namespaces;
+
 /// Configuration of entities in the schema/database to be included or excluded from an operation.
 #[derive(Debug, Default)]
 pub struct SchemaFilter {
@@ -7,7 +9,7 @@ pub struct SchemaFilter {
     pub external_tables: Vec<String>,
 
     /// Namespaces that shall be considered.
-    pub included_namespaces: Vec<String>,
+    pub included_namespaces: Option<Namespaces>,
 }
 
 impl From<json_rpc::types::SchemaFilter> for SchemaFilter {

@@ -24,7 +24,7 @@ pub async fn schema_push(input: SchemaPushInput, connector: &mut dyn SchemaConne
     let dialect = connector.schema_dialect();
 
     // TODO:(schema-filter) add actual schema filter
-    let to = dialect.schema_from_datamodel(sources, SchemaFilter::default())?;
+    let to = dialect.schema_from_datamodel(sources, &SchemaFilter::default())?;
     // We only consider the namespaces present in the "to" schema aka the PSL file for the introspection of the "from" schema.
     // So when the user removes a previously existing namespace from their PSL file we will not modify that namespace in the database.
     let namespaces = dialect.extract_namespaces(&to);

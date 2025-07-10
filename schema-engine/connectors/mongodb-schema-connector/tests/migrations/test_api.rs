@@ -184,7 +184,7 @@ pub(crate) fn test_scenario(scenario_name: &str) {
         let to = dialect
             .schema_from_datamodel(
                 vec![("schema.prisma".to_string(), schema.clone())],
-                SchemaFilter::default(),
+                &SchemaFilter::default(),
             )
             .unwrap();
         let migration = dialect.diff(from, to);
@@ -225,7 +225,7 @@ Snapshot comparison failed. Run the test again with UPDATE_EXPECT=1 in the envir
         let to = dialect
             .schema_from_datamodel(
                 vec![("schema.prisma".to_string(), schema.clone())],
-                SchemaFilter::default(),
+                &SchemaFilter::default(),
             )
             .unwrap();
         let migration = dialect.diff(from, to);

@@ -128,7 +128,7 @@ async fn diff_target_to_dialect(
             let sources = schemas.to_psl_input();
             let dialect = schema_to_dialect(&sources)?;
             // TODO:(schema-filter) add actual schema filter
-            let schema = dialect.schema_from_datamodel(sources, SchemaFilter::default())?;
+            let schema = dialect.schema_from_datamodel(sources, &SchemaFilter::default())?;
             Ok(Some((dialect, schema)))
         }
         DiffTarget::Url(UrlContainer { .. }) => Err(ConnectorError::from_msg(
@@ -146,11 +146,16 @@ async fn diff_target_to_dialect(
                     let directories =
                         schema_connector::migrations_directory::list_migrations(migration_directories.clone());
 
+                    // TODO:(schema-filter) add actual schema filter
+                    let filter = SchemaFilter {
+                        included_namespaces: namespaces,
+                        ..Default::default()
+                    };
                     // TODO: enable Driver Adapter for shadow database, using the AdapterFactory.
                     let schema = dialect
                         .schema_from_migrations_with_target(
                             &directories,
-                            namespaces,
+                            &filter,
                             ExternalShadowDatabase::DriverAdapter(adapter_factory),
                         )
                         .await?;

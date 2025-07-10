@@ -152,7 +152,7 @@ pub(crate) async fn diff(schema: &str, dialect: &dyn SchemaDialect) -> Connector
     let from = dialect.empty_database_schema();
     let to = dialect.schema_from_datamodel(
         vec![("schema.prisma".to_string(), schema.into())],
-        SchemaFilter::default(),
+        &SchemaFilter::default(),
     )?;
     let migration = dialect.diff(from, to);
     dialect.render_script(&migration, &Default::default())

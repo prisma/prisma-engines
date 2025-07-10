@@ -127,7 +127,7 @@ impl SchemaDialect for SqlSchemaDialect {
     fn schema_from_datamodel(
         &self,
         sources: Vec<(String, SourceFile)>,
-        schema_filter: SchemaFilter,
+        schema_filter: &SchemaFilter,
     ) -> ConnectorResult<DatabaseSchema> {
         let schema = psl::parse_schema_multi(&sources).map_err(ConnectorError::new_schema_parser_error)?;
         self.dialect.check_schema_features(&schema)?;
@@ -141,11 +141,11 @@ impl SchemaDialect for SqlSchemaDialect {
     fn validate_migrations_with_target<'a>(
         &'a mut self,
         migrations: &'a [MigrationDirectory],
-        namespaces: Option<Namespaces>,
+        schema_filter: &'a SchemaFilter,
         target: ExternalShadowDatabase,
     ) -> BoxFuture<'a, ConnectorResult<()>> {
         Box::pin(async move {
-            self.schema_from_migrations_with_target(migrations, namespaces, target)
+            self.schema_from_migrations_with_target(migrations, schema_filter, target)
                 .await?;
             Ok(())
         })
@@ -154,7 +154,7 @@ impl SchemaDialect for SqlSchemaDialect {
     fn schema_from_migrations_with_target<'a>(
         &'a self,
         migrations: &'a [MigrationDirectory],
-        namespaces: Option<Namespaces>,
+        schema_filter: &'a SchemaFilter,
         target: ExternalShadowDatabase,
     ) -> BoxFuture<'a, ConnectorResult<DatabaseSchema>> {
         Box::pin(async move {
@@ -187,8 +187,13 @@ impl SchemaDialect for SqlSchemaDialect {
                 }
             };
             let schema = connector
-                .sql_schema_from_migration_history(migrations, namespaces, UsingExternalShadowDb::Yes)
-                .await;
+                .sql_schema_from_migration_history(
+                    migrations,
+                    schema_filter.included_namespaces.clone(),
+                    UsingExternalShadowDb::Yes,
+                )
+                .await
+                .map(|schema| filter::filter_sql_schema(schema, schema_filter));
             // dispose of the connector regardless of the result
             connector.dispose().await?;
             Ok(DatabaseSchema::new(SqlDatabaseSchema::from(schema?)))
@@ -426,7 +431,7 @@ impl SchemaConnector for SqlSchemaConnector {
     fn schema_from_migrations<'a>(
         &'a mut self,
         migrations: &'a [MigrationDirectory],
-        namespaces: Option<Namespaces>,
+        schema_filter: &'a SchemaFilter,
     ) -> BoxFuture<'a, ConnectorResult<DatabaseSchema>> {
         Box::pin(async move {
             match self.inner.shadow_db_url() {
@@ -436,13 +441,18 @@ impl SchemaConnector for SqlSchemaConnector {
                         preview_features: self.inner.preview_features(),
                     };
                     self.schema_dialect()
-                        .schema_from_migrations_with_target(migrations, namespaces, target)
+                        .schema_from_migrations_with_target(migrations, schema_filter, target)
                         .await
                 }
                 None => self
                     .inner
-                    .sql_schema_from_migration_history(migrations, namespaces, UsingExternalShadowDb::No)
+                    .sql_schema_from_migration_history(
+                        migrations,
+                        schema_filter.included_namespaces.clone(),
+                        UsingExternalShadowDb::No,
+                    )
                     .await
+                    .map(|schema| filter::filter_sql_schema(schema, schema_filter))
                     .map(SqlDatabaseSchema::from)
                     .map(DatabaseSchema::new),
             }
@@ -511,7 +521,12 @@ impl SchemaConnector for SqlSchemaConnector {
         namespaces: Option<Namespaces>,
     ) -> BoxFuture<'a, ConnectorResult<()>> {
         Box::pin(async move {
-            self.schema_from_migrations(migrations, namespaces).await?;
+            // TODO:(schema-filter) propagate schema filter up from here
+            let schema_filter = SchemaFilter {
+                included_namespaces: namespaces,
+                ..Default::default()
+            };
+            self.schema_from_migrations(migrations, &schema_filter).await?;
             Ok(())
         })
     }

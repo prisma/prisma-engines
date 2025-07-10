@@ -1,5 +1,5 @@
 use crate::{CoreResult, MigrationSchemaCache, SchemaContainerExt, json_rpc::types::*};
-use schema_connector::{SchemaConnector, migrations_directory::*};
+use schema_connector::{SchemaConnector, SchemaFilter, migrations_directory::*};
 
 /// Development command for migrations. Evaluate the data loss induced by the
 /// next migration the engine would generate on the main database.
@@ -18,15 +18,16 @@ pub async fn evaluate_data_loss(
 
     let dialect = connector.schema_dialect();
 
-    let to = dialect.schema_from_datamodel(sources, input.filters.into())?;
+    let mut filter: SchemaFilter = input.filters.into();
+    let to = dialect.schema_from_datamodel(sources, &filter)?;
 
     let from = migration_schema_cache
         .get_or_insert(&input.migrations_list.migration_directories, || async {
             // We only consider the namespaces present in the "to" schema aka the PSL file for the introspection of the "from" schema.
             // So when the user removes a previously existing namespace from their PSL file we will not introspect that namespace in the database.
-            let namespaces = dialect.extract_namespaces(&to);
+            filter.included_namespaces = dialect.extract_namespaces(&to);
             connector
-                .schema_from_migrations(&migrations_from_directory, namespaces)
+                .schema_from_migrations(&migrations_from_directory, &filter)
                 .await
         })
         .await?;
