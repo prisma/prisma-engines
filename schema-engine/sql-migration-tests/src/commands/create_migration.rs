@@ -126,6 +126,7 @@ impl<'a> CreateMigration<'a> {
                 schema: SchemasContainer { files: self.files },
                 draft: self.draft,
                 migration_name: migration_name.clone(),
+                filters: None,
             },
             self.api,
             &mut migration_schema_cache,
