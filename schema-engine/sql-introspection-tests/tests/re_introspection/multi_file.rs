@@ -310,7 +310,7 @@ async fn reintrospect_force_invalid_config(api: &mut TestApi) -> TestResult {
     let invalid_config_dm = indoc! {r#"
       datasource db {
         provider = "mysql"
-        url = "env(TEST_DATABASE_URL)"
+        url = env("TEST_DATABASE_URL")
         schemas  = ["foo"]
       }
 
@@ -326,7 +326,7 @@ async fn reintrospect_force_invalid_config(api: &mut TestApi) -> TestResult {
         [1;91merror[0m: [1mThe `schemas` property is not supported on the current connector.[0m
           [1;94m-->[0m  [4mfoo.prisma:4[0m
         [1;94m   | [0m
-        [1;94m 3 | [0m  url = "env(TEST_DATABASE_URL)"
+        [1;94m 3 | [0m  url = env("TEST_DATABASE_URL")
         [1;94m 4 | [0m  schemas  = [1;91m["foo"][0m
         [1;94m   | [0m
 
