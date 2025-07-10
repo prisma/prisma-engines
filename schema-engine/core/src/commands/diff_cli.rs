@@ -9,6 +9,7 @@ use enumflags2::BitFlags;
 use json_rpc::types::MigrationList;
 use schema_connector::{
     ConnectorError, ConnectorHost, DatabaseSchema, ExternalShadowDatabase, Namespaces, SchemaConnector, SchemaDialect,
+    SchemaFilter,
 };
 use sql_schema_connector::SqlSchemaConnector;
 
@@ -137,7 +138,8 @@ async fn json_rpc_diff_target_to_dialect(
         DiffTarget::SchemaDatamodel(schemas) => {
             let sources = schemas.to_psl_input();
             let dialect = crate::schema_to_dialect(&sources)?;
-            let schema = dialect.schema_from_datamodel(sources)?;
+            // TODO:(schema-filter) add actual schema filter
+            let schema = dialect.schema_from_datamodel(sources, SchemaFilter::default())?;
             Ok(Some((dialect, schema)))
         }
         DiffTarget::Url(UrlContainer { url }) => {

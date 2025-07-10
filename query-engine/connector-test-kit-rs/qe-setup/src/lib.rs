@@ -18,7 +18,7 @@ use driver_adapters::DriverAdapter;
 use enumflags2::BitFlags;
 use providers::Provider;
 use psl::{builtin_connectors::*, Datasource};
-use schema_core::schema_connector::{ConnectorResult, SchemaConnector, SchemaDialect};
+use schema_core::schema_connector::{ConnectorResult, SchemaConnector, SchemaDialect, SchemaFilter};
 use std::env;
 
 #[derive(Debug, serde::Deserialize, PartialEq)]
@@ -150,7 +150,10 @@ pub async fn teardown(prisma_schema: &str, db_schemas: &[&str]) -> ConnectorResu
 /// `prisma migrate diff --from-empty --to-schema-datamodel $SCHEMA_PATH --script`.
 pub(crate) async fn diff(schema: &str, dialect: &dyn SchemaDialect) -> ConnectorResult<String> {
     let from = dialect.empty_database_schema();
-    let to = dialect.schema_from_datamodel(vec![("schema.prisma".to_string(), schema.into())])?;
+    let to = dialect.schema_from_datamodel(
+        vec![("schema.prisma".to_string(), schema.into())],
+        SchemaFilter::default(),
+    )?;
     let migration = dialect.diff(from, to);
     dialect.render_script(&migration, &Default::default())
 }

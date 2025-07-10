@@ -7,6 +7,7 @@ use crate::{
     migrations_directory::MigrationDirectory, BoxFuture, ConnectorHost, ConnectorResult, DatabaseSchema,
     DestructiveChangeChecker, DestructiveChangeDiagnostics, DiffTarget, IntrospectSqlQueryInput,
     IntrospectSqlQueryOutput, IntrospectionContext, IntrospectionResult, Migration, MigrationPersistence, Namespaces,
+    SchemaFilter,
 };
 
 /// The dialect for schema operations on a particular database.
@@ -46,7 +47,11 @@ pub trait SchemaDialect: Send + Sync + 'static {
     fn empty_database_schema(&self) -> DatabaseSchema;
 
     /// Create a database schema from datamodel source files.
-    fn schema_from_datamodel(&self, sources: Vec<(String, SourceFile)>) -> ConnectorResult<DatabaseSchema>;
+    fn schema_from_datamodel(
+        &self,
+        sources: Vec<(String, SourceFile)>,
+        schema_filter: SchemaFilter,
+    ) -> ConnectorResult<DatabaseSchema>;
 
     /// If possible, check that the passed in migrations apply cleanly.
     fn validate_migrations_with_target<'a>(
@@ -177,7 +182,10 @@ pub trait SchemaConnector: Send + Sync + 'static {
     ) -> BoxFuture<'a, ConnectorResult<DatabaseSchema>> {
         Box::pin(async move {
             match diff_target {
-                DiffTarget::Datamodel(sources) => self.schema_dialect().schema_from_datamodel(sources),
+                DiffTarget::Datamodel(sources) => self
+                    .schema_dialect()
+                    // TODO:(schema-filter) add actual schema filter
+                    .schema_from_datamodel(sources, SchemaFilter::default()),
                 DiffTarget::Migrations(migrations) => self.schema_from_migrations(migrations, namespaces).await,
                 DiffTarget::Database => self.schema_from_database(namespaces).await,
                 DiffTarget::Empty => Ok(self.schema_dialect().empty_database_schema()),

@@ -11,7 +11,7 @@ use json_rpc::types::MigrationList;
 use psl::SourceFile;
 use quaint::connector::ExternalConnectorFactory;
 use schema_connector::{
-    ConnectorError, DatabaseSchema, ExternalShadowDatabase, Namespaces, SchemaConnector, SchemaDialect,
+    ConnectorError, DatabaseSchema, ExternalShadowDatabase, Namespaces, SchemaConnector, SchemaDialect, SchemaFilter,
 };
 
 pub async fn diff(
@@ -127,7 +127,8 @@ async fn diff_target_to_dialect(
         DiffTarget::SchemaDatamodel(schemas) => {
             let sources = schemas.to_psl_input();
             let dialect = schema_to_dialect(&sources)?;
-            let schema = dialect.schema_from_datamodel(sources)?;
+            // TODO:(schema-filter) add actual schema filter
+            let schema = dialect.schema_from_datamodel(sources, SchemaFilter::default())?;
             Ok(Some((dialect, schema)))
         }
         DiffTarget::Url(UrlContainer { .. }) => Err(ConnectorError::from_msg(

@@ -90,7 +90,12 @@ impl SchemaDialect for MongoDbSchemaDialect {
         DatabaseSchema::new(MongoSchema::default())
     }
 
-    fn schema_from_datamodel(&self, sources: Vec<(String, psl::SourceFile)>) -> ConnectorResult<DatabaseSchema> {
+    fn schema_from_datamodel(
+        &self,
+        sources: Vec<(String, psl::SourceFile)>,
+        // on mongo db we do not perform any filtering on the schema
+        _schema_filter: SchemaFilter,
+    ) -> ConnectorResult<DatabaseSchema> {
         let validated_schema = psl::parse_schema_multi(&sources).map_err(ConnectorError::new_schema_parser_error)?;
         Ok(DatabaseSchema::new(schema_calculator::calculate(&validated_schema)))
     }

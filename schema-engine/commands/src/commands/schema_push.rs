@@ -1,5 +1,5 @@
 use crate::{CoreResult, SchemaContainerExt, json_rpc::types::*, parse_schema_multi};
-use schema_connector::{ConnectorError, SchemaConnector};
+use schema_connector::{ConnectorError, SchemaConnector, SchemaFilter};
 use tracing_futures::Instrument;
 
 /// Command to bring the local database in sync with the prisma schema, without
@@ -23,7 +23,8 @@ pub async fn schema_push(input: SchemaPushInput, connector: &mut dyn SchemaConne
     let _ = connector.ensure_connection_validity().await;
     let dialect = connector.schema_dialect();
 
-    let to = dialect.schema_from_datamodel(sources)?;
+    // TODO:(schema-filter) add actual schema filter
+    let to = dialect.schema_from_datamodel(sources, SchemaFilter::default())?;
     // We only consider the namespaces present in the "to" schema aka the PSL file for the introspection of the "from" schema.
     // So when the user removes a previously existing namespace from their PSL file we will not modify that namespace in the database.
     let namespaces = dialect.extract_namespaces(&to);

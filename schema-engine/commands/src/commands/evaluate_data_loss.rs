@@ -18,7 +18,8 @@ pub async fn evaluate_data_loss(
 
     let dialect = connector.schema_dialect();
 
-    let to = dialect.schema_from_datamodel(sources)?;
+    // TODO:(schema-filter) add actual schema filter
+    let to = dialect.schema_from_datamodel(sources, SchemaFilter::default())?;
 
     let from = migration_schema_cache
         .get_or_insert(&input.migrations_list.migration_directories, || async {
