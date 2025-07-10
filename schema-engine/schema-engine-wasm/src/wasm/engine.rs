@@ -312,16 +312,16 @@ impl SchemaEngine {
                     PathBuf::new().join(&params.base_directory_path),
                 )
             } else {
-                let previous_schema = psl::parse_schema_multi(&source_files)
-                    .map_err(|e| ConnectorError::new_schema_parser_error(e).into_js_error())?;
-
-                schema_connector::IntrospectionContext::new(
-                    previous_schema,
-                    composite_type_depth,
-                    params.namespaces,
-                    PathBuf::new().join(&params.base_directory_path),
-                )
-            };
+                psl::parse_schema_multi(&source_files).map(|previous_schema| {
+                    schema_connector::IntrospectionContext::new(
+                        previous_schema,
+                        composite_type_depth,
+                        params.namespaces,
+                        PathBuf::new().join(&params.base_directory_path),
+                    )
+                })
+            }
+            .map_err(|e| ConnectorError::new_schema_parser_error(e).into_js_error())?;
 
             if !ctx
                 .configuration()

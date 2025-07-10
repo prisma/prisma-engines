@@ -1,7 +1,7 @@
 use crate::{
     ast::{self, SourceConfig, Span, WithName},
     configuration::StringFromEnvVar,
-    datamodel_connector::RelationMode,
+    datamodel_connector::{ConnectorCapability, RelationMode},
     diagnostics::{DatamodelError, Diagnostics},
     Datasource,
 };
@@ -204,6 +204,17 @@ fn lift_datasource(
         Some((_span, schemas)) => coerce_array(schemas, &coerce::string_with_span, diagnostics)
             .map(|b| (b, schemas.span()))
             .and_then(|(mut schemas, span)| {
+                if !active_connector
+                    .capabilities()
+                    .contains(ConnectorCapability::MultiSchema)
+                {
+                    diagnostics.push_error(DatamodelError::new_static(
+                        "The `schemas` property is not supported on the current connector.",
+                        span,
+                    ));
+                    return None;
+                }
+
                 if schemas.is_empty() {
                     diagnostics.push_error(DatamodelError::new_schemas_array_empty_error(span));
 
