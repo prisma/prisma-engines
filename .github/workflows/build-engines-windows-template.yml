@@ -24,10 +24,12 @@ jobs:
           - name: windows
             runner: windows-latest
             arch: x86_64
+            openssl: x64-windows-static-md
 
           - name: windows-arm64
             runner: windows-11-arm
             arch: ARM64
+            openssl: arm64-windows-static-md
 
     steps:
       - name: Output link to real commit
@@ -50,7 +52,13 @@ jobs:
 
       - uses: actions-rust-lang/setup-rust-toolchain@v1
 
-      - run: cargo build --release -p query-engine -p query-engine-node-api -p schema-engine-cli -p prisma-fmt
+      - name: Install OpenSSL
+        run: |
+          vcpkg integrate install
+          vcpkg install openssl:${{ matrix.target.openssl }}
+
+      - name: Build engines
+        run: cargo build --release -p query-engine -p query-engine-node-api -p schema-engine-cli -p prisma-fmt
 
       - name: Rename files
         working-directory: ${{ github.workspace }}/target/release/

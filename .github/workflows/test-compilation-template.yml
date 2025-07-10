@@ -23,6 +23,12 @@ jobs:
             target
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
 
+      - shell: bash
+        if: ${{ runner.os == 'Windows' }}
+        run: |
+          vcpkg integrate install
+          vcpkg install openssl:x64-windows-static-md
+
       - name: compile ${{ inputs.crate }}
         shell: bash
         env:
