@@ -21,6 +21,7 @@ use mysql_async::{
     self as my,
     prelude::{Query as _, Queryable as _},
 };
+use std::borrow::Cow;
 use std::{
     future::Future,
     sync::atomic::{AtomicBool, Ordering},
@@ -352,5 +353,25 @@ impl Queryable for Mysql {
 
     fn requires_isolation_first(&self) -> bool {
         true
+    }
+
+    /// Statement to begin a transaction
+    fn begin_statement(&self) -> &'static str {
+        "BEGIN"
+    }
+
+    /// Statement to create a savepoint
+    fn create_savepoint_statement(&self, depth: i32) -> Cow<'static, str> {
+        Cow::Owned(format!("SAVEPOINT savepoint{depth}"))
+    }
+
+    /// Statement to release a savepoint
+    fn release_savepoint_statement(&self, depth: i32) -> Cow<'static, str> {
+        Cow::Owned(format!("RELEASE SAVEPOINT savepoint{depth}"))
+    }
+
+    /// Statement to rollback to a savepoint
+    fn rollback_to_savepoint_statement(&self, depth: i32) -> Cow<'static, str> {
+        Cow::Owned(format!("ROLLBACK TO savepoint{depth}"))
     }
 }

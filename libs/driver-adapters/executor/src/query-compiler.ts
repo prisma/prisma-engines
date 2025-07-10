@@ -11,7 +11,7 @@ export type QueryCompilerParams = {
 }
 
 export interface QueryCompiler {
-  new (params: QueryCompilerParams): QueryCompiler
+  new(params: QueryCompilerParams): QueryCompiler
   compile(query: string): QueryPlanNode
   free(): void
 }
