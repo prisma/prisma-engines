@@ -610,6 +610,8 @@ pub struct EvaluateDataLossInput {
     pub migrations_list: MigrationList,
     /// The prisma schema files to migrate to.
     pub schema: SchemasContainer,
+    /// Entities to be included or excluded during the data loss evaluation.
+    pub filters: Option<SchemaFilter>,
 }
 
 /// The output of the `evaluateDataLoss` command.
