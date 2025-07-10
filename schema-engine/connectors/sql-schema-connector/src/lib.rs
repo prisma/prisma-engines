@@ -6,6 +6,7 @@
 mod apply_migration;
 mod database_schema;
 mod error;
+mod filter;
 mod flavour;
 mod introspection;
 mod migration_pair;
@@ -126,13 +127,14 @@ impl SchemaDialect for SqlSchemaDialect {
     fn schema_from_datamodel(
         &self,
         sources: Vec<(String, SourceFile)>,
-        _schema_filter: SchemaFilter,
+        schema_filter: SchemaFilter,
     ) -> ConnectorResult<DatabaseSchema> {
         let schema = psl::parse_schema_multi(&sources).map_err(ConnectorError::new_schema_parser_error)?;
         self.dialect.check_schema_features(&schema)?;
         let calculator = self.dialect.schema_calculator();
-        // TODO:(schema-filter) perform actual filtering
-        Ok(sql_schema_calculator::calculate_sql_schema(&schema, &*calculator).into())
+        let sql_schema = sql_schema_calculator::calculate_sql_schema(&schema, &*calculator);
+        let filtered_schema = filter::filter_sql_database_schema(sql_schema, schema_filter);
+        Ok(filtered_schema.into())
     }
 
     #[tracing::instrument(skip(self, migrations, target))]
