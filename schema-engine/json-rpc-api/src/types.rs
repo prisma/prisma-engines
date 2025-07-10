@@ -353,6 +353,9 @@ pub struct DebugPanicOutput {}
 pub struct DevDiagnosticInput {
     /// The list of migrations, already loaded from disk.
     pub migrations_list: MigrationList,
+
+    /// The schema filter to use for the next migration.
+    pub schema_filter: Option<SchemaFilter>,
 }
 
 /// The response type for `devDiagnostic`.
@@ -377,6 +380,9 @@ pub struct DiagnoseMigrationHistoryInput {
 
     /// Whether creating a shadow database is allowed.
     pub opt_in_to_shadow_database: bool,
+
+    /// The schema filter to use for the next migration.
+    pub schema_filter: Option<SchemaFilter>,
 }
 
 /// The result type for `diagnoseMigrationHistory` responses.

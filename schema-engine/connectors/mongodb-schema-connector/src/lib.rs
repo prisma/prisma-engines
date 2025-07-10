@@ -211,7 +211,7 @@ impl SchemaConnector for MongoDbSchemaConnector {
     fn validate_migrations<'a>(
         &'a mut self,
         _migrations: &'a [MigrationDirectory],
-        _namespaces: Option<Namespaces>,
+        _schema_filter: &'a SchemaFilter,
     ) -> BoxFuture<'a, ConnectorResult<()>> {
         Box::pin(future::ready(Ok(())))
     }

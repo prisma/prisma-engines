@@ -23,7 +23,10 @@ impl<'a> DevDiagnostic<'a> {
         let migrations_list = utils::list_migrations(self.migrations_directory.path()).unwrap();
         let mut migration_schema_cache = Default::default();
         let fut = dev_diagnostic_cli(
-            DevDiagnosticInput { migrations_list },
+            DevDiagnosticInput {
+                migrations_list,
+                schema_filter: None,
+            },
             None,
             self.api,
             &mut migration_schema_cache,

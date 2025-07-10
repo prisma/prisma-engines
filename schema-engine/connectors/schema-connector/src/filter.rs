@@ -12,6 +12,19 @@ pub struct SchemaFilter {
     pub included_namespaces: Option<Namespaces>,
 }
 
+impl SchemaFilter {
+    /// Create a SchemaFilter from a json_rpc::types::SchemaFilter and a set of namespaces.
+    pub fn from_filter_and_namespaces(
+        filter: Option<json_rpc::types::SchemaFilter>,
+        namespaces: Option<Namespaces>,
+    ) -> Self {
+        Self {
+            external_tables: filter.map(|f| f.external_tables).unwrap_or_default(),
+            included_namespaces: namespaces,
+        }
+    }
+}
+
 impl From<json_rpc::types::SchemaFilter> for SchemaFilter {
     fn from(filter: json_rpc::types::SchemaFilter) -> Self {
         Self {

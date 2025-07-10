@@ -518,15 +518,10 @@ impl SchemaConnector for SqlSchemaConnector {
     fn validate_migrations<'a>(
         &'a mut self,
         migrations: &'a [MigrationDirectory],
-        namespaces: Option<Namespaces>,
+        schema_filter: &'a SchemaFilter,
     ) -> BoxFuture<'a, ConnectorResult<()>> {
         Box::pin(async move {
-            // TODO:(schema-filter) propagate schema filter up from here
-            let schema_filter = SchemaFilter {
-                included_namespaces: namespaces,
-                ..Default::default()
-            };
-            self.schema_from_migrations(migrations, &schema_filter).await?;
+            self.schema_from_migrations(migrations, schema_filter).await?;
             Ok(())
         })
     }

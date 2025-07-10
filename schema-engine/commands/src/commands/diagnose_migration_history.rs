@@ -137,11 +137,7 @@ pub async fn diagnose_migration_history(
         if input.opt_in_to_shadow_database {
             let mut dialect = connector.schema_dialect();
             let target = ExternalShadowDatabase::DriverAdapter(adapter_factory);
-            // TODO:(schema-filter) add actual schema filter
-            let filter = SchemaFilter {
-                included_namespaces: namespaces.clone(),
-                ..Default::default()
-            };
+            let filter = SchemaFilter::from_filter_and_namespaces(input.schema_filter, namespaces.clone());
             let from = migration_schema_cache
                 .get_or_insert(&applied_migrations, || async {
                     connector

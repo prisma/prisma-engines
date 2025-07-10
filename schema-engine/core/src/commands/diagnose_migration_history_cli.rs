@@ -76,11 +76,7 @@ pub async fn diagnose_migration_history_cli(
     let (drift, error_in_unapplied_migration) = {
         if input.opt_in_to_shadow_database {
             let dialect = connector.schema_dialect();
-            // TODO:(schema-filter) add actual schema filter from DiagnoseMigrationHistoryInput
-            let filter = SchemaFilter {
-                included_namespaces: namespaces.clone(),
-                ..Default::default()
-            };
+            let filter = SchemaFilter::from_filter_and_namespaces(input.schema_filter, namespaces.clone());
             let from = migration_schema_cache
                 .get_or_insert(&applied_migrations, || async {
                     connector.schema_from_migrations(&applied_migrations, &filter).await
@@ -105,7 +101,7 @@ pub async fn diagnose_migration_history_cli(
             let error_in_unapplied_migration = if !matches!(drift, Some(DriftDiagnostic::MigrationFailedToApply { .. }))
             {
                 connector
-                    .validate_migrations(&migrations_from_filesystem, namespaces)
+                    .validate_migrations(&migrations_from_filesystem, &filter)
                     .await
                     .err()
             } else {

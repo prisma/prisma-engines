@@ -171,7 +171,7 @@ pub trait SchemaConnector: Send + Sync + 'static {
     fn validate_migrations<'a>(
         &'a mut self,
         _migrations: &'a [MigrationDirectory],
-        namespaces: Option<Namespaces>,
+        _schema_filter: &'a SchemaFilter,
     ) -> BoxFuture<'a, ConnectorResult<()>>;
 
     /// Read a schema for diffing.
