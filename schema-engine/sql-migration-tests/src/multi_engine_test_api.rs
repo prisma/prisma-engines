@@ -3,6 +3,7 @@
 //! A TestApi that is initialized without IO or async code and can instantiate
 //! multiple schema engines.
 
+use schema_core::json_rpc::types::SchemaFilter;
 use std::time::Duration;
 pub use test_macros::test_connector;
 pub use test_setup::sqlite_test_url;
@@ -328,6 +329,7 @@ impl EngineTestApi {
             name,
             &[("schema.prisma", schema)],
             migrations_directory,
+            SchemaFilter::default(),
         )
     }
 
