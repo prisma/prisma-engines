@@ -13,7 +13,7 @@ use crate::{
 /// The dialect for schema operations on a particular database.
 pub trait SchemaDialect: Send + Sync + 'static {
     /// Create a migration by comparing two database schemas.
-    fn diff(&self, from: DatabaseSchema, to: DatabaseSchema) -> Migration;
+    fn diff(&self, from: DatabaseSchema, to: DatabaseSchema, filter: &SchemaFilter) -> Migration;
 
     /// Render the migration to a runnable script.
     ///

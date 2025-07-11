@@ -32,7 +32,8 @@ pub async fn schema_push(input: SchemaPushInput, connector: &mut dyn SchemaConne
         .schema_from_database(namespaces)
         .instrument(tracing::info_span!("Calculate from database"))
         .await?;
-    let database_migration = dialect.diff(from, to);
+    // TODO:(schema-filter) get filter from prisma config
+    let database_migration = dialect.diff(from, to, &SchemaFilter::default());
 
     tracing::debug!(migration = dialect.migration_summary(&database_migration).as_str());
 

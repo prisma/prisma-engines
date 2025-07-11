@@ -187,7 +187,7 @@ pub(crate) fn test_scenario(scenario_name: &str) {
                 &SchemaFilter::default(),
             )
             .unwrap();
-        let migration = dialect.diff(from, to);
+        let migration = dialect.diff(from, to, &SchemaFilter::default());
 
         connector.apply_migration(&migration).await.unwrap();
 
@@ -228,7 +228,7 @@ Snapshot comparison failed. Run the test again with UPDATE_EXPECT=1 in the envir
                 &SchemaFilter::default(),
             )
             .unwrap();
-        let migration = dialect.diff(from, to);
+        let migration = dialect.diff(from, to, &SchemaFilter::default());
 
         assert!(
             dialect.migration_is_empty(&migration),

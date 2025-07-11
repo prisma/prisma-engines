@@ -20,7 +20,9 @@ use quaint::{
 };
 use schema_core::{
     commands::diff_cli,
-    schema_connector::{BoxFuture, ConnectorHost, ConnectorResult, DiffTarget, MigrationPersistence, SchemaConnector},
+    schema_connector::{
+        BoxFuture, ConnectorHost, ConnectorResult, DiffTarget, MigrationPersistence, SchemaConnector, SchemaFilter,
+    },
 };
 use sql_schema_connector::SqlSchemaConnector;
 use sql_schema_describer::SqlSchema;
@@ -346,7 +348,7 @@ impl TestApi {
         let from = tok(self.connector.schema_from_diff_target(from, namespaces.clone())).unwrap();
         let to = tok(self.connector.schema_from_diff_target(to, namespaces)).unwrap();
         let dialect = self.connector.schema_dialect();
-        let migration = dialect.diff(from, to);
+        let migration = dialect.diff(from, to, &SchemaFilter::default());
         dialect.render_script(&migration, &Default::default()).unwrap()
     }
 

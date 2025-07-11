@@ -1,6 +1,7 @@
 use super::{column, enums::EnumDiffer, table::TableDiffer, SqlSchemaDifferFlavour};
 use crate::{migration_pair::MigrationPair, SqlDatabaseSchema};
 use indexmap::IndexMap;
+use schema_connector::SchemaFilter;
 use sql_schema_describer::{
     postgres::{ExtensionId, ExtensionWalker, PostgresSchemaExt},
     walkers::{EnumWalker, TableColumnWalker, TableWalker},
@@ -18,6 +19,8 @@ pub(crate) struct DifferDatabase<'a> {
     pub(super) flavour: &'a dyn SqlSchemaDifferFlavour,
     /// The schemas being diffed
     pub(crate) schemas: MigrationPair<&'a SqlDatabaseSchema>,
+    /// The filter used to diff the schemas
+    pub(crate) filter: &'a SchemaFilter,
     /// Namespace name -> namespace indexes.
     namespaces: IndexMap<Cow<'a, str>, MigrationPair<Option<NamespaceId>>>,
     /// Table name -> table indexes.
@@ -35,7 +38,11 @@ pub(crate) struct DifferDatabase<'a> {
 }
 
 impl<'a> DifferDatabase<'a> {
-    pub(crate) fn new(schemas: MigrationPair<&'a SqlDatabaseSchema>, flavour: &'a dyn SqlSchemaDifferFlavour) -> Self {
+    pub(crate) fn new(
+        schemas: MigrationPair<&'a SqlDatabaseSchema>,
+        flavour: &'a dyn SqlSchemaDifferFlavour,
+        filter: &'a SchemaFilter,
+    ) -> Self {
         let namespace_count_lb = std::cmp::max(
             schemas.previous.describer_schema.namespaces_count(),
             schemas.next.describer_schema.namespaces_count(),
@@ -48,6 +55,7 @@ impl<'a> DifferDatabase<'a> {
         let mut db = DifferDatabase {
             flavour,
             schemas,
+            filter,
             namespaces: IndexMap::with_capacity(namespace_count_lb),
             tables: IndexMap::with_capacity(table_count_lb),
             columns: BTreeMap::new(),

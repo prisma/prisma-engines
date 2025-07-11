@@ -44,7 +44,7 @@ pub async fn create_migration(
         })
         .await?;
 
-    let migration = dialect.diff(from, to);
+    let migration = dialect.diff(from, to, &filter);
 
     let extension = dialect.migration_file_extension().to_owned();
 

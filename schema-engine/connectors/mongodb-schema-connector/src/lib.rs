@@ -54,7 +54,7 @@ impl MongoDbSchemaConnector {
 }
 
 impl SchemaDialect for MongoDbSchemaDialect {
-    fn diff(&self, from: DatabaseSchema, to: DatabaseSchema) -> Migration {
+    fn diff(&self, from: DatabaseSchema, to: DatabaseSchema, _filter: &SchemaFilter) -> Migration {
         let from: Box<MongoSchema> = from.downcast();
         let to: Box<MongoSchema> = to.downcast();
         Migration::new(differ::diff(from, to))
