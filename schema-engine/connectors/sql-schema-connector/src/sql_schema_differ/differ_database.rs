@@ -199,6 +199,7 @@ impl<'a> DifferDatabase<'a> {
             .filter(|p| p.previous.is_none())
             .filter_map(|p| p.next)
             .map(move |table_id| self.schemas.next.walk(table_id))
+            .filter(|table| !self.is_table_external(table))
     }
 
     pub(crate) fn created_namespaces(&self) -> impl Iterator<Item = NamespaceWalker<'_>> + '_ {
@@ -221,6 +222,7 @@ impl<'a> DifferDatabase<'a> {
             .filter(|p| p.next.is_none())
             .filter_map(|p| p.previous)
             .map(move |table_id| self.schemas.previous.walk(table_id))
+            .filter(|table| !self.is_table_external(table))
     }
 
     fn range_columns(
@@ -246,12 +248,14 @@ impl<'a> DifferDatabase<'a> {
                 tables: self.schemas.walk(table_ids),
                 db: self,
             })
+            .filter(|tables| !self.is_table_pair_external(tables.tables))
     }
 
     /// Same as `table_pairs()`, but with the redefined tables filtered out.
     pub(crate) fn non_redefined_table_pairs<'db>(&'db self) -> impl Iterator<Item = TableDiffer<'a, 'db>> + 'db {
         self.table_pairs()
             .filter(move |differ| !self.tables_to_redefine.contains(&differ.table_ids()))
+            .filter(|differ| !self.is_table_pair_external(differ.tables))
     }
 
     pub(crate) fn table_is_redefined(&self, namespace: Option<Cow<'_, str>>, table_name: Cow<'_, str>) -> bool {
@@ -318,6 +322,18 @@ impl<'a> DifferDatabase<'a> {
                 })
                 .map(|next| MigrationPair::new(previous, next))
         })
+    }
+
+    pub(crate) fn is_table_external(&self, table: &TableWalker<'_>) -> bool {
+        // TODO:(schema-filter) optimize for speed to avoid recomputing the underlying contains?
+        self.filter.is_table_external(table.namespace(), table.name())
+    }
+
+    pub(crate) fn is_table_pair_external(&self, tables: MigrationPair<TableWalker<'_>>) -> bool {
+        if self.is_table_external(&tables.next) ^ self.is_table_external(&tables.previous) {
+            unreachable!("Table is external in one schema but not in the other");
+        }
+        self.is_table_external(&tables.previous) && self.is_table_external(&tables.next)
     }
 
     fn previous_enums(&self) -> impl Iterator<Item = EnumWalker<'a>> {

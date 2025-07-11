@@ -23,6 +23,18 @@ impl SchemaFilter {
             included_namespaces: namespaces,
         }
     }
+
+    /// Check if the given table name is in the list of external tables.
+    /// `external_tables` can contain fully qualified table names with namespace
+    /// (e.g. "auth.user") or just the table name.
+    pub fn is_table_external(&self, namespace: Option<&str>, table_name: &str) -> bool {
+        if let Some(namespace) = namespace {
+            self.external_tables.contains(&format!("{namespace}.{table_name}"))
+                || self.external_tables.contains(&table_name.to_string())
+        } else {
+            self.external_tables.contains(&table_name.to_string())
+        }
+    }
 }
 
 impl From<json_rpc::types::SchemaFilter> for SchemaFilter {
