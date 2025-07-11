@@ -1,4 +1,4 @@
-use sql_schema_describer::SqlSchema;
+use sql_schema_describer::{filter::SqlSchemaFilter, SqlSchema};
 
 use crate::{database_schema::SqlDatabaseSchema, SchemaFilter};
 
@@ -9,7 +9,9 @@ pub fn filter_sql_database_schema(schema: SqlDatabaseSchema, filter: &SchemaFilt
     }
 }
 
-pub fn filter_sql_schema(schema: SqlSchema, _filter: &SchemaFilter) -> SqlSchema {
-    // TODO: Implement filtering logic
-    schema
+pub fn filter_sql_schema(schema: SqlSchema, filter: &SchemaFilter) -> SqlSchema {
+    let sql_filter = SqlSchemaFilter {
+        external_tables: filter.external_tables.clone(),
+    };
+    schema.filter(&sql_filter)
 }
