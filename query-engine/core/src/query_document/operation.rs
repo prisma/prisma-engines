@@ -51,9 +51,14 @@ impl Operation {
             Operation::Write(x) => x.arguments(),
         }
     }
-}
 
-impl Operation {
+    pub fn argument<'a>(&'a self, name: &str) -> Option<&'a ArgumentValue> {
+        match self {
+            Operation::Read(sel) => sel.argument(name),
+            Operation::Write(sel) => sel.argument(name),
+        }
+    }
+
     pub fn dedup_selections(self) -> Self {
         match self {
             Self::Read(s) => Self::Read(s.dedup()),

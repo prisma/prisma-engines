@@ -198,7 +198,9 @@ async function handleRequest(
     }
     case 'getLogs': {
       const { schemaId } = params
-      return state[schemaId].logs
+      const clonedLogs = [...state[schemaId].logs]
+      state[schemaId].logs.length = 0
+      return clonedLogs
     }
     default: {
       assertNever(method, `Unknown method: \`${method}\``)

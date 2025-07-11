@@ -80,7 +80,12 @@ impl BatchDocument {
             return true;
         }
 
-        let where_obj = op.as_read().unwrap().arguments()[0].1.clone().into_object().unwrap();
+        let where_obj = op
+            .as_read()
+            .and_then(|sel| sel.argument(args::WHERE))
+            .and_then(|arg| arg.to_owned().into_object())
+            .expect("findUnique must be a read query containing `where` object argument");
+
         let field = schema.find_query_field(op.name()).unwrap();
         let model = schema.internal_data_model.clone().zip(field.model().unwrap());
 
@@ -113,10 +118,13 @@ impl BatchDocument {
                         return false;
                     }
 
+                    let first_rls = first.argument(args::RELATION_LOAD_STRATEGY);
+
                     rest.iter().all(|op| {
                         op.is_find_unique(schema)
                             && first.name() == op.name()
                             && first.nested_selections().len() == op.nested_selections().len()
+                            && first_rls == op.argument(args::RELATION_LOAD_STRATEGY)
                             && first
                                 .nested_selections()
                                 .iter()
@@ -220,12 +228,11 @@ impl CompactedDocument {
             let query_filters = selections
                 .iter()
                 .map(|selection| {
-                    // findUnique always has only one argument. We know it must be an object, otherwise this will panic.
-                    let where_obj = selection.arguments()[0]
-                        .1
-                        .clone()
-                        .into_object()
-                        .expect("Trying to compact a selection with non-object argument");
+                    // findUnique always has a `where` argument which is an object (validated during query parsing).
+                    let where_obj = selection
+                        .argument(args::WHERE)
+                        .and_then(|arg| arg.to_owned().into_object())
+                        .expect("findUnique must contain `where` object argument");
                     let filters = extract_filter(where_obj, &model);
 
                     QueryFilters::new(filters)
@@ -244,6 +251,10 @@ impl CompactedDocument {
             // The `In` handles both cases, with singular id it'll do an `IN`
             // expression and with a compound id a combination of `AND` and `OR`.
             builder.push_argument(args::WHERE, In::new(selection_set));
+
+            if let Some(rls) = selections[0].argument(args::RELATION_LOAD_STRATEGY) {
+                builder.push_argument(args::RELATION_LOAD_STRATEGY, rls.to_owned());
+            }
 
             builder.set_alias(selections[0].alias().clone());
 
