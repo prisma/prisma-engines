@@ -13,7 +13,7 @@ impl SqlSchemaFilter {
     /// (e.g. "auth.user") or just the table name.
     fn is_table_external(&self, namespace: Option<&str>, table_name: &str) -> bool {
         if let Some(namespace) = namespace {
-            self.external_tables.contains(&format!("{}.{}", namespace, table_name))
+            self.external_tables.contains(&format!("{namespace}.{table_name}"))
                 || self.external_tables.contains(&table_name.to_string())
         } else {
             self.external_tables.contains(&table_name.to_string())

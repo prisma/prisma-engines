@@ -617,7 +617,10 @@ fn dev_diagnostic_shadow_database_creation_error_is_special_cased_mysql(api: Tes
     let err = tok(async {
         let migration_api = schema_api(Some(datamodel), None).unwrap();
         migration_api
-            .dev_diagnostic(DevDiagnosticInput { migrations_list })
+            .dev_diagnostic(DevDiagnosticInput {
+                migrations_list,
+                schema_filter: None,
+            })
             .await
     })
     .unwrap_err()
@@ -665,7 +668,10 @@ fn dev_diagnostic_shadow_database_creation_error_is_special_cased_postgres(api: 
     let err = tok(async move {
         let migration_api = schema_api(Some(datamodel), None).unwrap();
         migration_api
-            .dev_diagnostic(DevDiagnosticInput { migrations_list })
+            .dev_diagnostic(DevDiagnosticInput {
+                migrations_list,
+                schema_filter: None,
+            })
             .await
     })
     .unwrap_err()
@@ -824,5 +830,9 @@ ALTER TABLE "prisma-tests".profiles ADD CONSTRAINT profiles_id_fkey FOREIGN KEY 
 
     let migrations_list = list_migrations(&tempdir.keep()).unwrap();
 
-    tok(api.dev_diagnostic(DevDiagnosticInput { migrations_list })).unwrap();
+    tok(api.dev_diagnostic(DevDiagnosticInput {
+        migrations_list,
+        schema_filter: None,
+    }))
+    .unwrap();
 }
