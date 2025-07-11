@@ -1300,8 +1300,13 @@ impl<'a> SqlSchemaDescriber<'a> {
 
     async fn get_enums(&self, sql_schema: &mut SqlSchema) -> DescriberResult<()> {
         let namespaces = &sql_schema.namespaces;
+        let is_external_clause = if self.is_cockroach() {
+            " AND t.typname NOT LIKE 'crdb_internal%'"
+        } else {
+            ""
+        };
 
-        let sql = "
+        let sql = format!(r#"
             SELECT
                 t.typname AS name,
                 e.enumlabel AS value,
@@ -1310,10 +1315,10 @@ impl<'a> SqlSchemaDescriber<'a> {
             FROM pg_type t
             JOIN pg_enum e ON t.oid = e.enumtypid
             JOIN pg_catalog.pg_namespace n ON n.oid = t.typnamespace
-            WHERE n.nspname = ANY ( $1 )
-            ORDER BY e.enumsortorder";
+            WHERE n.nspname = ANY ( $1 ) {is_external_clause}
+            ORDER BY e.enumsortorder"#);
 
-        let rows = self.conn.query_raw(sql, &[Value::array(namespaces)]).await?;
+        let rows = self.conn.query_raw(sql.as_str(), &[Value::array(namespaces)]).await?;
         let mut enum_values: BTreeMap<(NamespaceId, String, Option<String>), Vec<String>> = BTreeMap::new();
 
         for row in rows.into_iter() {
@@ -1415,7 +1420,7 @@ fn index_from_row(
         };
 
         // * Note: Expression Indexes can have 1 & 2
-        if column_index == 0 {
+        if current_index.is_none() {
             // new index!
             let index_id = if is_primary_key {
                 sql_schema.push_primary_key(table_id, index_name)
