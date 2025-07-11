@@ -5,7 +5,7 @@ pub use json_rpc::types::{DiagnoseMigrationHistoryInput, HistoryDiagnostic};
 use quaint::connector::ExternalConnectorFactory;
 use schema_connector::{
     ConnectorError, ExternalShadowDatabase, MigrationRecord, Namespaces, PersistenceNotInitializedError,
-    SchemaConnector,
+    SchemaConnector, SchemaFilter,
     migrations_directory::{MigrationDirectory, error_on_changed_provider, list_migrations},
 };
 use serde::Serialize;
@@ -137,22 +137,25 @@ pub async fn diagnose_migration_history(
         if input.opt_in_to_shadow_database {
             let mut dialect = connector.schema_dialect();
             let target = ExternalShadowDatabase::DriverAdapter(adapter_factory);
+            let filter = SchemaFilter::from_filter_and_namespaces(input.schema_filter, namespaces.clone());
             let from = migration_schema_cache
                 .get_or_insert(&applied_migrations, || async {
                     connector
                         .schema_dialect()
-                        .schema_from_migrations_with_target(&applied_migrations, namespaces.clone(), target.clone())
+                        .schema_from_migrations_with_target(&applied_migrations, &filter, target.clone())
                         .await
                 })
                 .await;
             let to = connector.schema_from_database(namespaces.clone()).await;
-            let drift = match from.and_then(|from| to.map(|to| dialect.diff(from, to))).map(|mig| {
-                if dialect.migration_is_empty(&mig) {
-                    None
-                } else {
-                    Some(mig)
-                }
-            }) {
+            let drift = match from
+                .and_then(|from| to.map(|to| dialect.diff(from, to, &filter)))
+                .map(|mig| {
+                    if dialect.migration_is_empty(&mig) {
+                        None
+                    } else {
+                        Some(mig)
+                    }
+                }) {
                 Ok(Some(drift)) => Some(DriftDiagnostic::DriftDetected {
                     summary: dialect.migration_summary(&drift),
                 }),
@@ -163,7 +166,7 @@ pub async fn diagnose_migration_history(
             let error_in_unapplied_migration = if !matches!(drift, Some(DriftDiagnostic::MigrationFailedToApply { .. }))
             {
                 dialect
-                    .validate_migrations_with_target(&migrations_from_filesystem, namespaces, target)
+                    .validate_migrations_with_target(&migrations_from_filesystem, &filter, target)
                     .await
                     .err()
             } else {

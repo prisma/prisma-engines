@@ -1,6 +1,6 @@
 use crate::{CoreError, CoreResult, MigrationSchemaCache, SchemaContainerExt, json_rpc::types::*};
 use crosstarget_utils::time::format_utc_now;
-use schema_connector::{SchemaConnector, migrations_directory::*};
+use schema_connector::{SchemaConnector, SchemaFilter, migrations_directory::*};
 use user_facing_errors::schema_engine::MigrationNameTooLong;
 
 /// Create a directory name for a new migration.
@@ -33,17 +33,18 @@ pub async fn create_migration(
     let dialect = connector.schema_dialect();
     // We need to start with the 'to', which is the Schema, in order to grab the
     // namespaces, in case we've got MultiSchema enabled.
-    let to = dialect.schema_from_datamodel(sources)?;
+    let mut filter: SchemaFilter = input.filters.into();
+    let to = dialect.schema_from_datamodel(sources, &filter)?;
 
     let from = migration_schema_cache
         .get_or_insert(&input.migrations_list.migration_directories, || async {
-            let namespaces = dialect.extract_namespaces(&to);
-            // We pass the namespaces here, because we want to describe all of these namespaces.
-            connector.schema_from_migrations(&previous_migrations, namespaces).await
+            // We pass the namespaces here, because we want to describe all of the namespaces we know about from the "to" schema.
+            filter.included_namespaces = dialect.extract_namespaces(&to);
+            connector.schema_from_migrations(&previous_migrations, &filter).await
         })
         .await?;
 
-    let migration = dialect.diff(from, to);
+    let migration = dialect.diff(from, to, &filter);
 
     let extension = dialect.migration_file_extension().to_owned();
 

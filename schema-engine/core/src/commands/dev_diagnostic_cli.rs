@@ -20,6 +20,7 @@ pub async fn dev_diagnostic_cli(
     let diagnose_input = DiagnoseMigrationHistoryInput {
         migrations_list: input.migrations_list,
         opt_in_to_shadow_database: true,
+        schema_filter: input.schema_filter,
     };
 
     let diagnose_migration_history_output =

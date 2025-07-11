@@ -6,6 +6,7 @@
 mod apply_migration;
 mod database_schema;
 mod error;
+mod filter;
 mod flavour;
 mod introspection;
 mod migration_pair;
@@ -74,11 +75,14 @@ impl SqlSchemaDialect {
 
 impl SchemaDialect for SqlSchemaDialect {
     #[tracing::instrument(skip(self, from, to))]
-    fn diff(&self, from: DatabaseSchema, to: DatabaseSchema) -> Migration {
+    fn diff(&self, from: DatabaseSchema, to: DatabaseSchema, filter: &SchemaFilter) -> Migration {
         let previous = SqlDatabaseSchema::from_erased(from);
         let next = SqlDatabaseSchema::from_erased(to);
-        let steps =
-            sql_schema_differ::calculate_steps(MigrationPair::new(&previous, &next), &*self.dialect.schema_differ());
+        let steps = sql_schema_differ::calculate_steps(
+            MigrationPair::new(&previous, &next),
+            &*self.dialect.schema_differ(),
+            filter,
+        );
         tracing::debug!(?steps, "Inferred migration steps.");
 
         Migration::new(SqlMigration {
@@ -123,22 +127,28 @@ impl SchemaDialect for SqlSchemaDialect {
         )
     }
 
-    fn schema_from_datamodel(&self, sources: Vec<(String, SourceFile)>) -> ConnectorResult<DatabaseSchema> {
+    fn schema_from_datamodel(
+        &self,
+        sources: Vec<(String, SourceFile)>,
+        schema_filter: &SchemaFilter,
+    ) -> ConnectorResult<DatabaseSchema> {
         let schema = psl::parse_schema_multi(&sources).map_err(ConnectorError::new_schema_parser_error)?;
         self.dialect.check_schema_features(&schema)?;
         let calculator = self.dialect.schema_calculator();
-        Ok(sql_schema_calculator::calculate_sql_schema(&schema, &*calculator).into())
+        let sql_schema = sql_schema_calculator::calculate_sql_schema(&schema, &*calculator);
+        let filtered_schema = filter::filter_sql_database_schema(sql_schema, schema_filter);
+        Ok(filtered_schema.into())
     }
 
     #[tracing::instrument(skip(self, migrations, target))]
     fn validate_migrations_with_target<'a>(
         &'a mut self,
         migrations: &'a [MigrationDirectory],
-        namespaces: Option<Namespaces>,
+        schema_filter: &'a SchemaFilter,
         target: ExternalShadowDatabase,
     ) -> BoxFuture<'a, ConnectorResult<()>> {
         Box::pin(async move {
-            self.schema_from_migrations_with_target(migrations, namespaces, target)
+            self.schema_from_migrations_with_target(migrations, schema_filter, target)
                 .await?;
             Ok(())
         })
@@ -147,7 +157,7 @@ impl SchemaDialect for SqlSchemaDialect {
     fn schema_from_migrations_with_target<'a>(
         &'a self,
         migrations: &'a [MigrationDirectory],
-        namespaces: Option<Namespaces>,
+        schema_filter: &'a SchemaFilter,
         target: ExternalShadowDatabase,
     ) -> BoxFuture<'a, ConnectorResult<DatabaseSchema>> {
         Box::pin(async move {
@@ -180,8 +190,13 @@ impl SchemaDialect for SqlSchemaDialect {
                 }
             };
             let schema = connector
-                .sql_schema_from_migration_history(migrations, namespaces, UsingExternalShadowDb::Yes)
-                .await;
+                .sql_schema_from_migration_history(
+                    migrations,
+                    schema_filter.included_namespaces.clone(),
+                    UsingExternalShadowDb::Yes,
+                )
+                .await
+                .map(|schema| filter::filter_sql_schema(schema, schema_filter));
             // dispose of the connector regardless of the result
             connector.dispose().await?;
             Ok(DatabaseSchema::new(SqlDatabaseSchema::from(schema?)))
@@ -419,7 +434,7 @@ impl SchemaConnector for SqlSchemaConnector {
     fn schema_from_migrations<'a>(
         &'a mut self,
         migrations: &'a [MigrationDirectory],
-        namespaces: Option<Namespaces>,
+        schema_filter: &'a SchemaFilter,
     ) -> BoxFuture<'a, ConnectorResult<DatabaseSchema>> {
         Box::pin(async move {
             match self.inner.shadow_db_url() {
@@ -429,13 +444,18 @@ impl SchemaConnector for SqlSchemaConnector {
                         preview_features: self.inner.preview_features(),
                     };
                     self.schema_dialect()
-                        .schema_from_migrations_with_target(migrations, namespaces, target)
+                        .schema_from_migrations_with_target(migrations, schema_filter, target)
                         .await
                 }
                 None => self
                     .inner
-                    .sql_schema_from_migration_history(migrations, namespaces, UsingExternalShadowDb::No)
+                    .sql_schema_from_migration_history(
+                        migrations,
+                        schema_filter.included_namespaces.clone(),
+                        UsingExternalShadowDb::No,
+                    )
                     .await
+                    .map(|schema| filter::filter_sql_schema(schema, schema_filter))
                     .map(SqlDatabaseSchema::from)
                     .map(DatabaseSchema::new),
             }
@@ -501,10 +521,10 @@ impl SchemaConnector for SqlSchemaConnector {
     fn validate_migrations<'a>(
         &'a mut self,
         migrations: &'a [MigrationDirectory],
-        namespaces: Option<Namespaces>,
+        schema_filter: &'a SchemaFilter,
     ) -> BoxFuture<'a, ConnectorResult<()>> {
         Box::pin(async move {
-            self.schema_from_migrations(migrations, namespaces).await?;
+            self.schema_from_migrations(migrations, schema_filter).await?;
             Ok(())
         })
     }
@@ -604,6 +624,8 @@ async fn best_effort_reset_impl(
     steps.extend(sql_schema_differ::calculate_steps(
         diffables.as_ref(),
         &*dialect.schema_differ(),
+        // TODO:(schema-filter) get filter from prisma config
+        &SchemaFilter::default(),
     ));
     let (source_schema, target_schema) = diffables.map(|s| s.describer_schema).into_tuple();
 

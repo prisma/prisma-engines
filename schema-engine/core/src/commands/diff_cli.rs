@@ -9,6 +9,7 @@ use enumflags2::BitFlags;
 use json_rpc::types::MigrationList;
 use schema_connector::{
     ConnectorError, ConnectorHost, DatabaseSchema, ExternalShadowDatabase, Namespaces, SchemaConnector, SchemaDialect,
+    SchemaFilter,
 };
 use sql_schema_connector::SqlSchemaConnector;
 
@@ -58,7 +59,8 @@ pub async fn diff_cli(params: DiffParams, host: Arc<dyn ConnectorHost>) -> CoreR
         }
     };
 
-    let migration = dialect.diff(from, to);
+    // TODO:(schema-filter) get filter from params and prisma config
+    let migration = dialect.diff(from, to, &SchemaFilter::default());
 
     let mut stdout = if params.script {
         dialect.render_script(&migration, &Default::default())?
@@ -137,7 +139,8 @@ async fn json_rpc_diff_target_to_dialect(
         DiffTarget::SchemaDatamodel(schemas) => {
             let sources = schemas.to_psl_input();
             let dialect = crate::schema_to_dialect(&sources)?;
-            let schema = dialect.schema_from_datamodel(sources)?;
+            // TODO:(schema-filter) add actual schema filter
+            let schema = dialect.schema_from_datamodel(sources, &SchemaFilter::default())?;
             Ok(Some((dialect, schema)))
         }
         DiffTarget::Url(UrlContainer { url }) => {
@@ -165,11 +168,15 @@ async fn json_rpc_diff_target_to_dialect(
                     let dialect = ::commands::dialect_for_provider(provider)?;
                     let directories =
                         schema_connector::migrations_directory::list_migrations(migration_directories.clone());
-
+                    // TODO:(schema-filter) add actual schema filter
+                    let filter = SchemaFilter {
+                        included_namespaces: namespaces,
+                        ..Default::default()
+                    };
                     let schema = dialect
                         .schema_from_migrations_with_target(
                             &directories,
-                            namespaces,
+                            &filter,
                             ExternalShadowDatabase::ConnectionString {
                                 connection_string: shadow_database_url.to_owned(),
                                 preview_features,
@@ -183,7 +190,12 @@ async fn json_rpc_diff_target_to_dialect(
                     let mut connector = SqlSchemaConnector::new_sqlite_inmem(preview_features)?;
                     let directories =
                         schema_connector::migrations_directory::list_migrations(migration_directories.clone());
-                    let schema = connector.schema_from_migrations(&directories, namespaces).await?;
+                    // TODO:(schema-filter) add actual schema filter
+                    let filter = SchemaFilter {
+                        included_namespaces: namespaces,
+                        ..Default::default()
+                    };
+                    let schema = connector.schema_from_migrations(&directories, &filter).await?;
                     Ok(Some((connector.schema_dialect(), schema)))
                 }
                 (Some(_), None) => Err(ConnectorError::from_msg(

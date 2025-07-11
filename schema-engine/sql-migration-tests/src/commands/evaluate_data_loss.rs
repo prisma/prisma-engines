@@ -37,6 +37,7 @@ impl<'a> EvaluateDataLoss<'a> {
             EvaluateDataLossInput {
                 migrations_list,
                 schema: SchemasContainer { files: self.files },
+                filters: None,
             },
             self.api,
             &mut migration_schema_cache,
