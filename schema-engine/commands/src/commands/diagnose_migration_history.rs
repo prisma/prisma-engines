@@ -5,7 +5,7 @@ pub use json_rpc::types::{DiagnoseMigrationHistoryInput, HistoryDiagnostic};
 use quaint::connector::ExternalConnectorFactory;
 use schema_connector::{
     ConnectorError, ExternalShadowDatabase, MigrationRecord, Namespaces, PersistenceNotInitializedError,
-    SchemaConnector, SchemaFilter,
+    SchemaConnector,
     migrations_directory::{MigrationDirectory, error_on_changed_provider, list_migrations},
 };
 use serde::Serialize;
@@ -137,7 +137,6 @@ pub async fn diagnose_migration_history(
         if input.opt_in_to_shadow_database {
             let mut dialect = connector.schema_dialect();
             let target = ExternalShadowDatabase::DriverAdapter(adapter_factory);
-            let filter = SchemaFilter::from_filter_and_namespaces(input.schema_filter, namespaces.clone());
             let from = migration_schema_cache
                 .get_or_insert(&applied_migrations, || async {
                     connector
@@ -148,7 +147,7 @@ pub async fn diagnose_migration_history(
                 .await;
             let to = connector.schema_from_database(namespaces.clone()).await;
             let drift = match from
-                .and_then(|from| to.map(|to| dialect.diff(from, to, &filter)))
+                .and_then(|from| to.map(|to| dialect.diff(from, to, &input.schema_filter.into())))
                 .map(|mig| {
                     if dialect.migration_is_empty(&mig) {
                         None

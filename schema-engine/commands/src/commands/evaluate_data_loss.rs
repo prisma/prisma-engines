@@ -1,5 +1,5 @@
 use crate::{CoreResult, MigrationSchemaCache, SchemaContainerExt, json_rpc::types::*};
-use schema_connector::{SchemaConnector, SchemaFilter, migrations_directory::*};
+use schema_connector::{SchemaConnector, migrations_directory::*};
 
 /// Development command for migrations. Evaluate the data loss induced by the
 /// next migration the engine would generate on the main database.
@@ -18,7 +18,6 @@ pub async fn evaluate_data_loss(
 
     let dialect = connector.schema_dialect();
 
-    let mut filter: SchemaFilter = input.filters.into();
     let to = dialect.schema_from_datamodel(sources)?;
 
     let from = migration_schema_cache
@@ -32,7 +31,7 @@ pub async fn evaluate_data_loss(
         })
         .await?;
 
-    let migration = dialect.diff(from, to, &filter);
+    let migration = dialect.diff(from, to, &input.filters.into());
 
     let migration_steps = dialect.migration_len(&migration) as u32;
     let diagnostics = connector.destructive_change_checker().check(&migration).await?;
