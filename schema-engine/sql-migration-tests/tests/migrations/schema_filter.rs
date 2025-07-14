@@ -450,7 +450,7 @@ fn schema_filter_migration_modifying_external_tables_incl_relations(mut api: Tes
                     -- AddForeignKey
                     ALTER TABLE "Cat" ADD CONSTRAINT "Cat_externalTableId_fkey" FOREIGN KEY ("externalTableId") REFERENCES "ExternalTableA"("id") ON DELETE SET NULL ON UPDATE CASCADE;
                 "#]]
-            } else if is_mysql {    
+            } else if is_mysql {
                 expect![[r#"
                     -- AlterTable
                     ALTER TABLE `Cat` ADD COLUMN `externalTableId` INTEGER NULL;
@@ -593,9 +593,7 @@ fn schema_filter_migration_multi_schema(api: TestApi) {
 
 #[test_connector]
 fn schema_filter_migration_dev_diagnostic_drift_detection(api: TestApi) {
-    api.raw_cmd(
-        "CREATE TABLE external_table (id INTEGER NOT NULL, name TEXT NOT NULL, PRIMARY KEY (id));",
-    );
+    api.raw_cmd("CREATE TABLE external_table (id INTEGER NOT NULL, name TEXT NOT NULL, PRIMARY KEY (id));");
 
     let dir = api.create_migrations_directory();
 

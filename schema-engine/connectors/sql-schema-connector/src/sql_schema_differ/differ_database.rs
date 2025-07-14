@@ -338,11 +338,15 @@ impl<'a> DifferDatabase<'a> {
     }
 
     /// A namespace is external if it contains only external tables.
+    /// If a a namespace is fully external we don't want to create `CREATE SCHEMA` statements for it.
     fn is_namespace_external(&self, namespace: &NamespaceWalker<'_>) -> bool {
-        self.tables
+        let all_tables_are_external = self
+            .tables
             .iter()
             .filter(|(k, _)| k.0.as_deref() == Some(namespace.name()))
-            .all(|(k, _)| self.filter.is_table_external(k.0.as_deref(), k.1.as_ref()))
+            .all(|(k, _)| self.filter.is_table_external(k.0.as_deref(), k.1.as_ref()));
+        let has_enums = self.created_enums().any(|e| e.namespace() == Some(namespace.name()));
+        all_tables_are_external && !has_enums
     }
 
     fn previous_enums(&self) -> impl Iterator<Item = EnumWalker<'a>> {
