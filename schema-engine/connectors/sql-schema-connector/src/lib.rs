@@ -130,8 +130,7 @@ impl SchemaDialect for SqlSchemaDialect {
         let schema = psl::parse_schema_multi(&sources).map_err(ConnectorError::new_schema_parser_error)?;
         self.dialect.check_schema_features(&schema)?;
         let calculator = self.dialect.schema_calculator();
-        let sql_schema = sql_schema_calculator::calculate_sql_schema(&schema, &*calculator);
-        Ok(sql_schema.into())
+        Ok(sql_schema_calculator::calculate_sql_schema(&schema, &*calculator).into())
     }
 
     #[tracing::instrument(skip(self, migrations, target))]
@@ -438,7 +437,7 @@ impl SchemaConnector for SqlSchemaConnector {
                 }
                 None => self
                     .inner
-                    .sql_schema_from_migration_history(migrations, namespaces.clone(), UsingExternalShadowDb::No)
+                    .sql_schema_from_migration_history(migrations, namespaces, UsingExternalShadowDb::No)
                     .await
                     .map(SqlDatabaseSchema::from)
                     .map(DatabaseSchema::new),

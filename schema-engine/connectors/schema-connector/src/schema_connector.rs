@@ -53,7 +53,7 @@ pub trait SchemaDialect: Send + Sync + 'static {
     fn validate_migrations_with_target<'a>(
         &'a mut self,
         _migrations: &'a [MigrationDirectory],
-        _namespaces: Option<Namespaces>,
+        namespaces: Option<Namespaces>,
         target: ExternalShadowDatabase,
     ) -> BoxFuture<'a, ConnectorResult<()>>;
 
@@ -167,7 +167,7 @@ pub trait SchemaConnector: Send + Sync + 'static {
     fn validate_migrations<'a>(
         &'a mut self,
         _migrations: &'a [MigrationDirectory],
-        _namespaces: Option<Namespaces>,
+        namespaces: Option<Namespaces>,
     ) -> BoxFuture<'a, ConnectorResult<()>>;
 
     /// Read a schema for diffing.

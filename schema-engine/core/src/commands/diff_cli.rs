@@ -167,6 +167,7 @@ async fn json_rpc_diff_target_to_dialect(
                     let dialect = ::commands::dialect_for_provider(provider)?;
                     let directories =
                         schema_connector::migrations_directory::list_migrations(migration_directories.clone());
+
                     let schema = dialect
                         .schema_from_migrations_with_target(
                             &directories,
