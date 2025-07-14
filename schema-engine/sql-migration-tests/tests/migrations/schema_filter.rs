@@ -145,7 +145,7 @@ fn schema_filter_migration_adding_external_tables_incl_relations(api: TestApi) {
 
     let dir = api.create_migrations_directory();
 
-        let is_postgres = api.is_postgres();
+    let is_postgres = api.is_postgres();
     let is_mysql = api.is_mysql();
     let is_sqlite = api.is_sqlite();
     let is_mssql = api.is_mssql();
