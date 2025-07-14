@@ -208,6 +208,7 @@ impl<'a> DifferDatabase<'a> {
             .filter(|p| p.previous.is_none())
             .filter_map(|p| p.next)
             .map(move |namespace_id| self.schemas.next.walk(namespace_id))
+            .filter(|namespace| !self.is_namespace_external(namespace))
     }
 
     pub(crate) fn dropped_columns(&self, table: MigrationPair<TableId>) -> impl Iterator<Item = TableColumnId> + '_ {
@@ -324,16 +325,24 @@ impl<'a> DifferDatabase<'a> {
         })
     }
 
-    pub(crate) fn is_table_external(&self, table: &TableWalker<'_>) -> bool {
+    fn is_table_external(&self, table: &TableWalker<'_>) -> bool {
         // TODO:(schema-filter) optimize for speed to avoid recomputing the underlying contains?
         self.filter.is_table_external(table.namespace(), table.name())
     }
 
-    pub(crate) fn is_table_pair_external(&self, tables: MigrationPair<TableWalker<'_>>) -> bool {
+    fn is_table_pair_external(&self, tables: MigrationPair<TableWalker<'_>>) -> bool {
         if self.is_table_external(&tables.next) ^ self.is_table_external(&tables.previous) {
             unreachable!("Table is external in one schema but not in the other");
         }
         self.is_table_external(&tables.previous) && self.is_table_external(&tables.next)
+    }
+
+    /// A namespace is external if it contains only external tables.
+    fn is_namespace_external(&self, namespace: &NamespaceWalker<'_>) -> bool {
+        self.tables
+            .iter()
+            .filter(|(k, _)| k.0.as_deref() == Some(namespace.name()))
+            .all(|(k, _)| self.filter.is_table_external(k.0.as_deref(), k.1.as_ref()))
     }
 
     fn previous_enums(&self) -> impl Iterator<Item = EnumWalker<'a>> {

@@ -547,9 +547,6 @@ fn schema_filter_migration_multi_schema(api: TestApi) {
                 -- CreateSchema
                 CREATE SCHEMA IF NOT EXISTS "one";
 
-                -- CreateSchema
-                CREATE SCHEMA IF NOT EXISTS "two";
-
                 -- CreateTable
                 CREATE TABLE "one"."Cat" (
                     "id" INTEGER NOT NULL,
@@ -566,9 +563,6 @@ fn schema_filter_migration_multi_schema(api: TestApi) {
 
                     -- CreateSchema
                     EXEC sp_executesql N'CREATE SCHEMA [one];';;
-
-                    -- CreateSchema
-                    EXEC sp_executesql N'CREATE SCHEMA [two];';;
 
                     -- CreateTable
                     CREATE TABLE [one].[Cat] (
