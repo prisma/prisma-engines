@@ -47,17 +47,13 @@ pub trait SchemaDialect: Send + Sync + 'static {
     fn empty_database_schema(&self) -> DatabaseSchema;
 
     /// Create a database schema from datamodel source files.
-    fn schema_from_datamodel(
-        &self,
-        sources: Vec<(String, SourceFile)>,
-        schema_filter: &SchemaFilter,
-    ) -> ConnectorResult<DatabaseSchema>;
+    fn schema_from_datamodel(&self, sources: Vec<(String, SourceFile)>) -> ConnectorResult<DatabaseSchema>;
 
     /// If possible, check that the passed in migrations apply cleanly.
     fn validate_migrations_with_target<'a>(
         &'a mut self,
         _migrations: &'a [MigrationDirectory],
-        schema_filter: &'a SchemaFilter,
+        _namespaces: Option<Namespaces>,
         target: ExternalShadowDatabase,
     ) -> BoxFuture<'a, ConnectorResult<()>>;
 
@@ -67,7 +63,7 @@ pub trait SchemaDialect: Send + Sync + 'static {
     fn schema_from_migrations_with_target<'a>(
         &'a self,
         migrations: &'a [MigrationDirectory],
-        schema_filter: &'a SchemaFilter,
+        namespaces: Option<Namespaces>,
         target: ExternalShadowDatabase,
     ) -> BoxFuture<'a, ConnectorResult<DatabaseSchema>>;
 }
@@ -152,7 +148,7 @@ pub trait SchemaConnector: Send + Sync + 'static {
     fn schema_from_migrations<'a>(
         &'a mut self,
         migrations: &'a [MigrationDirectory],
-        schema_filter: &'a SchemaFilter,
+        namespaces: Option<Namespaces>,
     ) -> BoxFuture<'a, ConnectorResult<DatabaseSchema>>;
 
     /// In-tro-spec-shon.
@@ -171,7 +167,7 @@ pub trait SchemaConnector: Send + Sync + 'static {
     fn validate_migrations<'a>(
         &'a mut self,
         _migrations: &'a [MigrationDirectory],
-        _schema_filter: &'a SchemaFilter,
+        _namespaces: Option<Namespaces>,
     ) -> BoxFuture<'a, ConnectorResult<()>>;
 
     /// Read a schema for diffing.
@@ -180,17 +176,10 @@ pub trait SchemaConnector: Send + Sync + 'static {
         diff_target: DiffTarget<'a>,
         namespaces: Option<Namespaces>,
     ) -> BoxFuture<'a, ConnectorResult<DatabaseSchema>> {
-        let schema_filter = SchemaFilter {
-            included_namespaces: namespaces.clone(),
-            ..Default::default()
-        };
         Box::pin(async move {
             match diff_target {
-                DiffTarget::Datamodel(sources) => self
-                    .schema_dialect()
-                    // TODO:(schema-filter) add actual schema filter
-                    .schema_from_datamodel(sources, &SchemaFilter::default()),
-                DiffTarget::Migrations(migrations) => self.schema_from_migrations(migrations, &schema_filter).await,
+                DiffTarget::Datamodel(sources) => self.schema_dialect().schema_from_datamodel(sources),
+                DiffTarget::Migrations(migrations) => self.schema_from_migrations(migrations, namespaces).await,
                 DiffTarget::Database => self.schema_from_database(namespaces).await,
                 DiffTarget::Empty => Ok(self.schema_dialect().empty_database_schema()),
             }

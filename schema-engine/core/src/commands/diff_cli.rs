@@ -139,8 +139,7 @@ async fn json_rpc_diff_target_to_dialect(
         DiffTarget::SchemaDatamodel(schemas) => {
             let sources = schemas.to_psl_input();
             let dialect = crate::schema_to_dialect(&sources)?;
-            // TODO:(schema-filter) add actual schema filter
-            let schema = dialect.schema_from_datamodel(sources, &SchemaFilter::default())?;
+            let schema = dialect.schema_from_datamodel(sources)?;
             Ok(Some((dialect, schema)))
         }
         DiffTarget::Url(UrlContainer { url }) => {
@@ -168,15 +167,10 @@ async fn json_rpc_diff_target_to_dialect(
                     let dialect = ::commands::dialect_for_provider(provider)?;
                     let directories =
                         schema_connector::migrations_directory::list_migrations(migration_directories.clone());
-                    // TODO:(schema-filter) add actual schema filter
-                    let filter = SchemaFilter {
-                        included_namespaces: namespaces,
-                        ..Default::default()
-                    };
                     let schema = dialect
                         .schema_from_migrations_with_target(
                             &directories,
-                            &filter,
+                            namespaces,
                             ExternalShadowDatabase::ConnectionString {
                                 connection_string: shadow_database_url.to_owned(),
                                 preview_features,
@@ -190,12 +184,7 @@ async fn json_rpc_diff_target_to_dialect(
                     let mut connector = SqlSchemaConnector::new_sqlite_inmem(preview_features)?;
                     let directories =
                         schema_connector::migrations_directory::list_migrations(migration_directories.clone());
-                    // TODO:(schema-filter) add actual schema filter
-                    let filter = SchemaFilter {
-                        included_namespaces: namespaces,
-                        ..Default::default()
-                    };
-                    let schema = connector.schema_from_migrations(&directories, &filter).await?;
+                    let schema = connector.schema_from_migrations(&directories, namespaces).await?;
                     Ok(Some((connector.schema_dialect(), schema)))
                 }
                 (Some(_), None) => Err(ConnectorError::from_msg(

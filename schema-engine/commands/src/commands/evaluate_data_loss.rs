@@ -19,15 +19,15 @@ pub async fn evaluate_data_loss(
     let dialect = connector.schema_dialect();
 
     let mut filter: SchemaFilter = input.filters.into();
-    let to = dialect.schema_from_datamodel(sources, &filter)?;
+    let to = dialect.schema_from_datamodel(sources)?;
 
     let from = migration_schema_cache
         .get_or_insert(&input.migrations_list.migration_directories, || async {
             // We only consider the namespaces present in the "to" schema aka the PSL file for the introspection of the "from" schema.
             // So when the user removes a previously existing namespace from their PSL file we will not introspect that namespace in the database.
-            filter.included_namespaces = dialect.extract_namespaces(&to);
+            let namespaces = dialect.extract_namespaces(&to);
             connector
-                .schema_from_migrations(&migrations_from_directory, &filter)
+                .schema_from_migrations(&migrations_from_directory, namespaces)
                 .await
         })
         .await?;

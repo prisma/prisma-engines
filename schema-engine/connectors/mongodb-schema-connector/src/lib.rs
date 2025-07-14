@@ -90,12 +90,7 @@ impl SchemaDialect for MongoDbSchemaDialect {
         DatabaseSchema::new(MongoSchema::default())
     }
 
-    fn schema_from_datamodel(
-        &self,
-        sources: Vec<(String, psl::SourceFile)>,
-        // on mongo db we do not perform any filtering on the schema
-        _schema_filter: &SchemaFilter,
-    ) -> ConnectorResult<DatabaseSchema> {
+    fn schema_from_datamodel(&self, sources: Vec<(String, psl::SourceFile)>) -> ConnectorResult<DatabaseSchema> {
         let validated_schema = psl::parse_schema_multi(&sources).map_err(ConnectorError::new_schema_parser_error)?;
         Ok(DatabaseSchema::new(schema_calculator::calculate(&validated_schema)))
     }
@@ -103,7 +98,7 @@ impl SchemaDialect for MongoDbSchemaDialect {
     fn validate_migrations_with_target<'a>(
         &'a mut self,
         _migrations: &'a [MigrationDirectory],
-        _schema_filter: &'a SchemaFilter,
+        _namespaces: Option<Namespaces>,
         _target: ExternalShadowDatabase,
     ) -> BoxFuture<'a, ConnectorResult<()>> {
         Box::pin(future::ready(Ok(())))
@@ -112,7 +107,7 @@ impl SchemaDialect for MongoDbSchemaDialect {
     fn schema_from_migrations_with_target<'a>(
         &'a self,
         _migrations: &'a [MigrationDirectory],
-        _schema_filter: &'a SchemaFilter,
+        _namespaces: Option<Namespaces>,
         _target: ExternalShadowDatabase,
     ) -> BoxFuture<'a, ConnectorResult<DatabaseSchema>> {
         Box::pin(async { Err(unsupported_command_error()) })
@@ -211,7 +206,7 @@ impl SchemaConnector for MongoDbSchemaConnector {
     fn validate_migrations<'a>(
         &'a mut self,
         _migrations: &'a [MigrationDirectory],
-        _schema_filter: &'a SchemaFilter,
+        _namespaces: Option<Namespaces>,
     ) -> BoxFuture<'a, ConnectorResult<()>> {
         Box::pin(future::ready(Ok(())))
     }
@@ -233,7 +228,7 @@ impl SchemaConnector for MongoDbSchemaConnector {
     fn schema_from_migrations<'a>(
         &'a mut self,
         _migrations: &'a [MigrationDirectory],
-        _schema_filter: &'a SchemaFilter,
+        _namespaces: Option<Namespaces>,
     ) -> BoxFuture<'a, ConnectorResult<DatabaseSchema>> {
         Box::pin(async { Err(unsupported_command_error()) })
     }

@@ -142,7 +142,7 @@ pub async fn diagnose_migration_history(
                 .get_or_insert(&applied_migrations, || async {
                     connector
                         .schema_dialect()
-                        .schema_from_migrations_with_target(&applied_migrations, &filter, target.clone())
+                        .schema_from_migrations_with_target(&applied_migrations, namespaces.clone(), target.clone())
                         .await
                 })
                 .await;
@@ -166,7 +166,7 @@ pub async fn diagnose_migration_history(
             let error_in_unapplied_migration = if !matches!(drift, Some(DriftDiagnostic::MigrationFailedToApply { .. }))
             {
                 dialect
-                    .validate_migrations_with_target(&migrations_from_filesystem, &filter, target)
+                    .validate_migrations_with_target(&migrations_from_filesystem, namespaces, target)
                     .await
                     .err()
             } else {

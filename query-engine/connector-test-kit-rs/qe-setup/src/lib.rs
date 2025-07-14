@@ -150,10 +150,7 @@ pub async fn teardown(prisma_schema: &str, db_schemas: &[&str]) -> ConnectorResu
 /// `prisma migrate diff --from-empty --to-schema-datamodel $SCHEMA_PATH --script`.
 pub(crate) async fn diff(schema: &str, dialect: &dyn SchemaDialect) -> ConnectorResult<String> {
     let from = dialect.empty_database_schema();
-    let to = dialect.schema_from_datamodel(
-        vec![("schema.prisma".to_string(), schema.into())],
-        &SchemaFilter::default(),
-    )?;
+    let to = dialect.schema_from_datamodel(vec![("schema.prisma".to_string(), schema.into())])?;
     let migration = dialect.diff(from, to, &SchemaFilter::default());
     dialect.render_script(&migration, &Default::default())
 }

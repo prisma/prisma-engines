@@ -79,7 +79,9 @@ pub async fn diagnose_migration_history_cli(
             let filter = SchemaFilter::from_filter_and_namespaces(input.schema_filter, namespaces.clone());
             let from = migration_schema_cache
                 .get_or_insert(&applied_migrations, || async {
-                    connector.schema_from_migrations(&applied_migrations, &filter).await
+                    connector
+                        .schema_from_migrations(&applied_migrations, namespaces.clone())
+                        .await
                 })
                 .await;
 
@@ -103,7 +105,7 @@ pub async fn diagnose_migration_history_cli(
             let error_in_unapplied_migration = if !matches!(drift, Some(DriftDiagnostic::MigrationFailedToApply { .. }))
             {
                 connector
-                    .validate_migrations(&migrations_from_filesystem, &filter)
+                    .validate_migrations(&migrations_from_filesystem, namespaces)
                     .await
                     .err()
             } else {

@@ -182,10 +182,7 @@ pub(crate) fn test_scenario(scenario_name: &str) {
         let dialect = connector.schema_dialect();
         let from = connector.schema_from_database(None).await.unwrap();
         let to = dialect
-            .schema_from_datamodel(
-                vec![("schema.prisma".to_string(), schema.clone())],
-                &SchemaFilter::default(),
-            )
+            .schema_from_datamodel(vec![("schema.prisma".to_string(), schema.clone())])
             .unwrap();
         let migration = dialect.diff(from, to, &SchemaFilter::default());
 
@@ -223,10 +220,7 @@ Snapshot comparison failed. Run the test again with UPDATE_EXPECT=1 in the envir
         // Check that the migration is idempotent.
         let from = connector.schema_from_database(None).await.unwrap();
         let to = dialect
-            .schema_from_datamodel(
-                vec![("schema.prisma".to_string(), schema.clone())],
-                &SchemaFilter::default(),
-            )
+            .schema_from_datamodel(vec![("schema.prisma".to_string(), schema.clone())])
             .unwrap();
         let migration = dialect.diff(from, to, &SchemaFilter::default());
 

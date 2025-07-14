@@ -34,13 +34,13 @@ pub async fn create_migration(
     // We need to start with the 'to', which is the Schema, in order to grab the
     // namespaces, in case we've got MultiSchema enabled.
     let mut filter: SchemaFilter = input.filters.into();
-    let to = dialect.schema_from_datamodel(sources, &filter)?;
+    let to = dialect.schema_from_datamodel(sources)?;
 
     let from = migration_schema_cache
         .get_or_insert(&input.migrations_list.migration_directories, || async {
             // We pass the namespaces here, because we want to describe all of the namespaces we know about from the "to" schema.
-            filter.included_namespaces = dialect.extract_namespaces(&to);
-            connector.schema_from_migrations(&previous_migrations, &filter).await
+            let namespaces = dialect.extract_namespaces(&to);
+            connector.schema_from_migrations(&previous_migrations, namespaces).await
         })
         .await?;
 
