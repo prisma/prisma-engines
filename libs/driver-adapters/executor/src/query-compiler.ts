@@ -13,7 +13,24 @@ export type QueryCompilerParams = {
 export interface QueryCompiler {
   new (params: QueryCompilerParams): QueryCompiler
   compile(query: string): QueryPlanNode
+  compileBatch(batch: string): BatchResponse
   free(): void
+}
+
+export type BatchResponse = MultiBatchResponse | CompactedBatchResponse
+
+export type MultiBatchResponse = {
+  type: 'multi'
+  plans: QueryPlanNode[]
+}
+
+export type CompactedBatchResponse = {
+  type: 'compacted'
+  plan: QueryPlanNode
+  arguments: Record<string, {}>[]
+  nestedSelection: string[]
+  keys: string[]
+  expectNonEmpty: boolean
 }
 
 export async function initQueryCompiler(
