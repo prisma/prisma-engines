@@ -20,7 +20,7 @@ pub(crate) use sql_server::*;
 pub(crate) use sqlite::*;
 pub(crate) use vitess::*;
 
-use crate::{datamodel_rendering::DatamodelRenderer, BoxFuture, TestConfig, TestError, CONFIG};
+use crate::{datamodel_rendering::DatamodelRenderer, BoxFuture, TestError, CONFIG};
 use psl::datamodel_connector::ConnectorCapabilities;
 use quaint::prelude::SqlFamily;
 use std::{convert::TryFrom, fmt, fs};
