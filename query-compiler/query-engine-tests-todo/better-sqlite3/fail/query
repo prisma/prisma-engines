@@ -1,3 +1,2 @@
-new::interactive_tx::interactive_tx::batch_queries_failure
 queries::aggregation::group_by::aggregation_group_by::group_by_ordering_sum_aggregation
 raw::sql::typed_output::typed_output::all_scalars_sqlite
