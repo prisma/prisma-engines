@@ -299,7 +299,7 @@ Notes:
 
 #### Manual integration releases from this repository to npm
 
-Additionally to the automated integration release for `integration/` branches, you can also trigger a publish by committing a commit with the content `[integration]`.
+Additionally to the automated integration release for `integration/` branches, you can also trigger a publish by pushing a commit with the content `[integration]`.
 
 ## Parallel rust-analyzer builds
 
