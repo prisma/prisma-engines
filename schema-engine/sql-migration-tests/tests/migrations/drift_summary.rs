@@ -24,6 +24,7 @@ fn check(from: &str, to: &str, expectation: Expect) {
                 content: to.to_string(),
             }],
         }),
+        filters: None,
     };
 
     let host = Arc::new(TestConnectorHost::default());

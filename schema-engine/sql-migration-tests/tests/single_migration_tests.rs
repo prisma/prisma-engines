@@ -112,6 +112,7 @@ fn run_single_migration_test(test_file_path: &str, test_function_name: &'static 
                 content: text.to_string(),
             }],
         }),
+        filters: None,
     }))
     .unwrap();
 
@@ -140,6 +141,7 @@ fn run_single_migration_test(test_file_path: &str, test_function_name: &'static 
                 content: text.to_string(),
             }],
         }),
+        filters: None,
     }))
     .unwrap();
 

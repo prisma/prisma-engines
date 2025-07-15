@@ -9,7 +9,6 @@ use enumflags2::BitFlags;
 use json_rpc::types::MigrationList;
 use schema_connector::{
     ConnectorError, ConnectorHost, DatabaseSchema, ExternalShadowDatabase, Namespaces, SchemaConnector, SchemaDialect,
-    SchemaFilter,
 };
 use sql_schema_connector::SqlSchemaConnector;
 
@@ -59,8 +58,7 @@ pub async fn diff_cli(params: DiffParams, host: Arc<dyn ConnectorHost>) -> CoreR
         }
     };
 
-    // TODO:(schema-filter) get filter from params and prisma config
-    let migration = dialect.diff(from, to, &SchemaFilter::default());
+    let migration = dialect.diff(from, to, &params.filters.into());
 
     let mut stdout = if params.script {
         dialect.render_script(&migration, &Default::default())?

@@ -36,6 +36,7 @@ fn db_push_on_cockroach_db_with_postgres_provider_fails(api: TestApi) {
                 content: schema,
             }],
         },
+        filters: None,
     }))
     .unwrap_err()
     .message()

@@ -47,6 +47,7 @@ impl<'a> SchemaPush<'a> {
         let input = SchemaPushInput {
             schema: SchemasContainer { files: self.files },
             force: self.force,
+            filters: None,
         };
 
         let fut = schema_push(input, self.api)

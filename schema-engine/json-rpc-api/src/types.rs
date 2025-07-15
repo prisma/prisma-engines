@@ -441,6 +441,9 @@ pub struct DiffParams {
     /// If this is set, the engine will return exitCode = 2 in the diffResult in case the diff is
     /// non-empty. Other than this, it does not change the behaviour of the command.
     pub exit_code: Option<bool>,
+
+    /// The schema filter to use during the diff.
+    pub filters: Option<SchemaFilter>,
 }
 
 /// The result type for the `diff` method.
@@ -743,6 +746,9 @@ pub struct SchemaPushInput {
 
     /// The Prisma schema files.
     pub schema: SchemasContainer,
+
+    /// The schema filter to use during the push.
+    pub filters: Option<SchemaFilter>,
 }
 
 /// Response result for the `schemaPush` method.
