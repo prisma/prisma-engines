@@ -63,11 +63,6 @@ pub struct TestConfigFromSerde {
     #[serde(rename = "version")]
     pub(crate) connector_version: Option<String>,
 
-    /// Indicates whether or not the tests are running in CI context.
-    /// Env key: `BUILDKITE`
-    #[serde(default)]
-    pub(crate) is_ci: bool,
-
     /// An external process to execute the test queries and produced responses for assertion
     /// Used when testing driver adapters, this process is expected to be a javascript process
     /// loading the library engine (as a library, or WASM modules) and providing it with a
@@ -196,7 +191,6 @@ pub struct TestConfig {
     pub(crate) connector: String,
     pub(crate) connector_version: Option<String>,
     pub(crate) with_driver_adapter: Option<WithDriverAdapter>,
-    pub(crate) is_ci: bool,
     pub(crate) mobile_emulator_url: Option<String>,
 }
 
@@ -217,7 +211,6 @@ impl From<TestConfigFromSerde> for TestConfig {
         Self {
             connector: config.connector,
             connector_version: config.connector_version,
-            is_ci: config.is_ci,
             with_driver_adapter,
             mobile_emulator_url: config.mobile_emulator_url,
         }
@@ -306,7 +299,6 @@ impl TestConfig {
             self.connector,
             self.connector_version().unwrap_or_default()
         );
-        println!("* CI? {}", self.is_ci);
         if let Some(with_driver_adapter) = self.with_driver_adapter() {
             println!("* External test executor: {}", with_driver_adapter.test_executor);
             println!("* Driver adapter: {}", with_driver_adapter.adapter);
@@ -332,14 +324,10 @@ impl TestConfig {
 
         let mobile_emulator_url = std::env::var("MOBILE_EMULATOR_URL").ok();
 
-        // Just care for a set value for now.
-        let is_ci = std::env::var("BUILDKITE").is_ok();
-
         connector
             .map(|connector| TestConfigFromSerde {
                 connector,
                 connector_version,
-                is_ci,
                 external_test_executor,
                 driver_adapter,
                 driver_adapter_config,
@@ -439,10 +427,6 @@ impl TestConfig {
 
     pub fn connector_version(&self) -> Option<&str> {
         self.connector_version.as_deref()
-    }
-
-    pub fn is_ci(&self) -> bool {
-        self.is_ci
     }
 
     pub fn test_connector(&self) -> TestResult<(ConnectorTag, ConnectorVersion)> {
