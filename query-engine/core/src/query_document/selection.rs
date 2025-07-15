@@ -99,6 +99,10 @@ impl Selection {
         &self.arguments
     }
 
+    pub fn argument<'a>(&'a self, name: &str) -> Option<&'a ArgumentValue> {
+        self.arguments.iter().find(|(k, _)| k == name).map(|(_, v)| v)
+    }
+
     pub fn pop_argument(&mut self) -> Option<(String, ArgumentValue)> {
         self.arguments.pop()
     }
