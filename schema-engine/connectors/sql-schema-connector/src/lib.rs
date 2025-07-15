@@ -74,11 +74,14 @@ impl SqlSchemaDialect {
 
 impl SchemaDialect for SqlSchemaDialect {
     #[tracing::instrument(skip(self, from, to))]
-    fn diff(&self, from: DatabaseSchema, to: DatabaseSchema) -> Migration {
+    fn diff(&self, from: DatabaseSchema, to: DatabaseSchema, filter: &SchemaFilter) -> Migration {
         let previous = SqlDatabaseSchema::from_erased(from);
         let next = SqlDatabaseSchema::from_erased(to);
-        let steps =
-            sql_schema_differ::calculate_steps(MigrationPair::new(&previous, &next), &*self.dialect.schema_differ());
+        let steps = sql_schema_differ::calculate_steps(
+            MigrationPair::new(&previous, &next),
+            &*self.dialect.schema_differ(),
+            filter,
+        );
         tracing::debug!(?steps, "Inferred migration steps.");
 
         Migration::new(SqlMigration {
@@ -604,6 +607,8 @@ async fn best_effort_reset_impl(
     steps.extend(sql_schema_differ::calculate_steps(
         diffables.as_ref(),
         &*dialect.schema_differ(),
+        // TODO:(schema-filter) get filter from prisma config
+        &SchemaFilter::default(),
     ));
     let (source_schema, target_schema) = diffables.map(|s| s.describer_schema).into_tuple();
 

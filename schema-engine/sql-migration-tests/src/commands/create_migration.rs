@@ -14,6 +14,7 @@ pub struct CreateMigration<'a> {
     migrations_directory: &'a TempDir,
     draft: bool,
     name: &'a str,
+    filter: SchemaFilter,
 }
 
 /// The file name for migration scripts, not including the file extension.
@@ -94,6 +95,7 @@ impl<'a> CreateMigration<'a> {
         name: &'a str,
         files: &[(&'a str, &'a str)],
         migrations_directory: &'a TempDir,
+        filter: SchemaFilter,
     ) -> Self {
         CreateMigration {
             api,
@@ -107,6 +109,7 @@ impl<'a> CreateMigration<'a> {
             migrations_directory,
             draft: false,
             name,
+            filter,
         }
     }
 
@@ -126,6 +129,7 @@ impl<'a> CreateMigration<'a> {
                 schema: SchemasContainer { files: self.files },
                 draft: self.draft,
                 migration_name: migration_name.clone(),
+                filters: Some(self.filter),
             },
             self.api,
             &mut migration_schema_cache,

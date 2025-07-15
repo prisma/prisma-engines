@@ -20,6 +20,7 @@ use quaint::{
 };
 use schema_core::{
     commands::diff_cli,
+    json_rpc::types::SchemaFilter,
     schema_connector::{BoxFuture, ConnectorHost, ConnectorResult, DiffTarget, MigrationPersistence, SchemaConnector},
 };
 use sql_schema_connector::SqlSchemaConnector;
@@ -109,6 +110,23 @@ impl TestApi {
             name,
             &[("schema.prisma", schema)],
             migrations_directory,
+            SchemaFilter::default(),
+        )
+    }
+
+    pub fn create_migration_with_filter<'a>(
+        &'a mut self,
+        name: &'a str,
+        schema: &'a str,
+        migrations_directory: &'a TempDir,
+        filter: SchemaFilter,
+    ) -> CreateMigration<'a> {
+        CreateMigration::new(
+            &mut self.connector,
+            name,
+            &[("schema.prisma", schema)],
+            migrations_directory,
+            filter,
         )
     }
 
@@ -118,7 +136,13 @@ impl TestApi {
         files: &[(&'a str, &'a str)],
         migrations_directory: &'a TempDir,
     ) -> CreateMigration<'a> {
-        CreateMigration::new(&mut self.connector, name, files, migrations_directory)
+        CreateMigration::new(
+            &mut self.connector,
+            name,
+            files,
+            migrations_directory,
+            SchemaFilter::default(),
+        )
     }
 
     /// Create a temporary directory to serve as a test migrations directory.
@@ -128,7 +152,15 @@ impl TestApi {
 
     /// Builder and assertions to call the `devDiagnostic` command.
     pub fn dev_diagnostic<'a>(&'a mut self, migrations_directory: &'a TempDir) -> DevDiagnostic<'a> {
-        DevDiagnostic::new(&mut self.connector, migrations_directory)
+        DevDiagnostic::new(&mut self.connector, migrations_directory, SchemaFilter::default())
+    }
+
+    pub fn dev_diagnostic_with_filter<'a>(
+        &'a mut self,
+        migrations_directory: &'a TempDir,
+        filter: SchemaFilter,
+    ) -> DevDiagnostic<'a> {
+        DevDiagnostic::new(&mut self.connector, migrations_directory, filter)
     }
 
     pub fn diagnose_migration_history<'a>(
@@ -154,7 +186,26 @@ impl TestApi {
         migrations_directory: &'a TempDir,
         schema: String,
     ) -> EvaluateDataLoss<'a> {
-        EvaluateDataLoss::new(&mut self.connector, migrations_directory, &[("schema.prisma", &schema)])
+        EvaluateDataLoss::new(
+            &mut self.connector,
+            migrations_directory,
+            &[("schema.prisma", &schema)],
+            SchemaFilter::default(),
+        )
+    }
+
+    pub fn evaluate_data_loss_with_filter<'a>(
+        &'a mut self,
+        migrations_directory: &'a TempDir,
+        schema: String,
+        filter: SchemaFilter,
+    ) -> EvaluateDataLoss<'a> {
+        EvaluateDataLoss::new(
+            &mut self.connector,
+            migrations_directory,
+            &[("schema.prisma", &schema)],
+            filter,
+        )
     }
 
     pub fn evaluate_data_loss_multi_file<'a>(
@@ -162,7 +213,12 @@ impl TestApi {
         migrations_directory: &'a TempDir,
         files: &[(&'a str, &'a str)],
     ) -> EvaluateDataLoss<'a> {
-        EvaluateDataLoss::new(&mut self.connector, migrations_directory, files)
+        EvaluateDataLoss::new(
+            &mut self.connector,
+            migrations_directory,
+            files,
+            SchemaFilter::default(),
+        )
     }
 
     pub fn introspect_sql<'a>(&'a mut self, name: &'a str, source: &'a str) -> IntrospectSql<'a> {
@@ -346,7 +402,7 @@ impl TestApi {
         let from = tok(self.connector.schema_from_diff_target(from, namespaces.clone())).unwrap();
         let to = tok(self.connector.schema_from_diff_target(to, namespaces)).unwrap();
         let dialect = self.connector.schema_dialect();
-        let migration = dialect.diff(from, to);
+        let migration = dialect.diff(from, to, &SchemaFilter::default().into());
         dialect.render_script(&migration, &Default::default()).unwrap()
     }
 

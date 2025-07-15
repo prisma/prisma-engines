@@ -58,9 +58,6 @@ model Test5 {
 // CREATE SCHEMA IF NOT EXISTS "security";
 // 
 // -- CreateSchema
-// CREATE SCHEMA IF NOT EXISTS "unused";
-// 
-// -- CreateSchema
 // CREATE SCHEMA IF NOT EXISTS "users";
 // 
 // -- CreateEnum

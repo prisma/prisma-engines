@@ -9,13 +9,19 @@ use crate::utils;
 pub struct DevDiagnostic<'a> {
     api: &'a mut dyn SchemaConnector,
     migrations_directory: &'a TempDir,
+    filter: SchemaFilter,
 }
 
 impl<'a> DevDiagnostic<'a> {
-    pub(crate) fn new(api: &'a mut dyn SchemaConnector, migrations_directory: &'a TempDir) -> Self {
+    pub(crate) fn new(
+        api: &'a mut dyn SchemaConnector,
+        migrations_directory: &'a TempDir,
+        filter: SchemaFilter,
+    ) -> Self {
         DevDiagnostic {
             api,
             migrations_directory,
+            filter,
         }
     }
 
@@ -23,7 +29,10 @@ impl<'a> DevDiagnostic<'a> {
         let migrations_list = utils::list_migrations(self.migrations_directory.path()).unwrap();
         let mut migration_schema_cache = Default::default();
         let fut = dev_diagnostic_cli(
-            DevDiagnosticInput { migrations_list },
+            DevDiagnosticInput {
+                migrations_list,
+                schema_filter: Some(self.filter),
+            },
             None,
             self.api,
             &mut migration_schema_cache,
@@ -60,5 +69,11 @@ impl std::fmt::Debug for DevDiagnosticAssertions<'_> {
 impl DevDiagnosticAssertions<'_> {
     pub fn into_output(self) -> DevDiagnosticOutput {
         self.output
+    }
+
+    pub fn assert_is_create_migration(self) -> Self {
+        assert!(matches!(self.output.action, DevAction::CreateMigration));
+
+        self
     }
 }

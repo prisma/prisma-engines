@@ -225,26 +225,25 @@ impl SqlSchema {
         id
     }
 
-    /// Add a fulltext index to the schema.
-    pub fn push_fulltext_index(&mut self, table_id: TableId, index_name: String) -> IndexId {
+    /// Add an index of a certain type to the schema.
+    pub fn push_index_of_type(&mut self, table_id: TableId, index_name: String, tpe: IndexType) -> IndexId {
         let id = IndexId(self.indexes.len() as u32);
         self.indexes.push(Index {
             table_id,
             index_name,
-            tpe: IndexType::Fulltext,
+            tpe,
         });
         id
     }
 
+    /// Add a fulltext index to the schema.
+    pub fn push_fulltext_index(&mut self, table_id: TableId, index_name: String) -> IndexId {
+        self.push_index_of_type(table_id, index_name, IndexType::Fulltext)
+    }
+
     /// Add an index to the schema.
     pub fn push_index(&mut self, table_id: TableId, index_name: String) -> IndexId {
-        let id = IndexId(self.indexes.len() as u32);
-        self.indexes.push(Index {
-            table_id,
-            index_name,
-            tpe: IndexType::Normal,
-        });
-        id
+        self.push_index_of_type(table_id, index_name, IndexType::Normal)
     }
 
     /// Add table default value to the schema.
@@ -263,24 +262,12 @@ impl SqlSchema {
 
     /// Add a primary key to the schema.
     pub fn push_primary_key(&mut self, table_id: TableId, index_name: String) -> IndexId {
-        let id = IndexId(self.indexes.len() as u32);
-        self.indexes.push(Index {
-            table_id,
-            index_name,
-            tpe: IndexType::PrimaryKey,
-        });
-        id
+        self.push_index_of_type(table_id, index_name, IndexType::PrimaryKey)
     }
 
     /// Add a unique constraint/index to the schema.
     pub fn push_unique_constraint(&mut self, table_id: TableId, index_name: String) -> IndexId {
-        let id = IndexId(self.indexes.len() as u32);
-        self.indexes.push(Index {
-            table_id,
-            index_name,
-            tpe: IndexType::Unique,
-        });
-        id
+        self.push_index_of_type(table_id, index_name, IndexType::Unique)
     }
 
     pub fn push_index_column(&mut self, column: IndexColumn) -> IndexColumnId {

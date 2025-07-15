@@ -1060,6 +1060,11 @@ fn multi_schema_tests(_api: TestApi) {
                       id Int @id
                       name String
                       @@schema("one")
+                    }
+                    model Second {
+                      id Int @id
+                      name String
+                      @@schema("two")
                     }"#
                 }),
                 first: indoc! {r#""#}.into(),
@@ -1115,6 +1120,7 @@ fn multi_schema_tests(_api: TestApi) {
 
     // traverse_ is always the answer
     tests.iter_mut().filter(|t| t.skip.is_none()).for_each(|t| {
+        println!("Running test: {}", t.name);
         run_test(t);
     });
 }

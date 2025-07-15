@@ -1213,6 +1213,11 @@ fn multi_schema_tests(_api: TestApi) {
                       id Int @id
                       name String
                       @@schema("one")
+                    }
+                    model Second {
+                      id Int @id
+                      name String
+                      @@schema("two")
                     }"#
                 }),
                 first: indoc! {r#""#}.into(),
@@ -1358,6 +1363,7 @@ fn multi_schema_tests(_api: TestApi) {
 
     // traverse_ is always the answer
     tests.iter_mut().filter(|t| t.skip.is_none()).for_each(|t| {
+        println!("Running test: {}", t.name);
         run_test(t);
     });
 }
@@ -1392,6 +1398,7 @@ fn migration_with_shadow_database(api: TestApi) {
 
     let namespaces = Namespaces::from_vec(&mut vec![String::from("one"), String::from("two")]);
 
+    api.raw_cmd("DROP DATABASE IF EXISTS shadow");
     api.raw_cmd("CREATE DATABASE shadow");
     api.reset().send_sync(namespaces.clone());
     api.raw_cmd("DROP SCHEMA public CASCADE");

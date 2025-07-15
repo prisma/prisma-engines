@@ -817,6 +817,7 @@ fn shadow_database_creation_error_is_special_cased_mysql(api: TestApi) {
     let output = tok(migration_api.diagnose_migration_history(DiagnoseMigrationHistoryInput {
         migrations_list,
         opt_in_to_shadow_database: true,
+        schema_filter: None,
     }))
     .unwrap();
 
@@ -866,6 +867,7 @@ fn shadow_database_creation_error_is_special_cased_postgres(api: TestApi) {
             .diagnose_migration_history(DiagnoseMigrationHistoryInput {
                 migrations_list,
                 opt_in_to_shadow_database: true,
+                schema_filter: None,
             })
             .await
     })
@@ -936,6 +938,7 @@ fn shadow_database_creation_error_is_special_cased_mssql(api: TestApi) {
     let output = tok(migration_api.diagnose_migration_history(DiagnoseMigrationHistoryInput {
         migrations_list,
         opt_in_to_shadow_database: true,
+        schema_filter: None,
     }))
     .unwrap();
 

@@ -85,6 +85,16 @@ pub struct SchemasWithConfigDir {
     pub config_dir: String,
 }
 
+/// Configuration of entities in the schema/database to be included or excluded from an operation.
+#[derive(Debug, Serialize, Deserialize, Default, Clone)]
+#[cfg_attr(target_arch = "wasm32", derive(Tsify))]
+#[cfg_attr(target_arch = "wasm32", tsify(missing_as_null, from_wasm_abi, into_wasm_abi))]
+#[serde(rename_all = "camelCase")]
+pub struct SchemaFilter {
+    /// Tables that shall be considered 'externally" managed. As per prisma.config.ts > tables.external.
+    pub external_tables: Vec<String>,
+}
+
 /// The path to a live database taken as input. For flexibility, this can be Prisma schemas as strings, or only the
 /// connection string. See variants.
 #[derive(Debug, Serialize, Deserialize)]
@@ -269,6 +279,9 @@ pub struct CreateMigrationInput {
 
     /// The Prisma schema content to use as a target for the generated migration.
     pub schema: SchemasContainer,
+
+    /// Entities to be included or excluded from the migration.
+    pub filters: Option<SchemaFilter>,
 }
 
 /// The output of the `createMigration` command.
@@ -340,6 +353,9 @@ pub struct DebugPanicOutput {}
 pub struct DevDiagnosticInput {
     /// The list of migrations, already loaded from disk.
     pub migrations_list: MigrationList,
+
+    /// The schema filter to use during checks on the database.
+    pub schema_filter: Option<SchemaFilter>,
 }
 
 /// The response type for `devDiagnostic`.
@@ -364,6 +380,10 @@ pub struct DiagnoseMigrationHistoryInput {
 
     /// Whether creating a shadow database is allowed.
     pub opt_in_to_shadow_database: bool,
+
+    /// The schema filter to use during checks on the database.
+    /// Note: Only used if opt_in_to_shadow_database is true.
+    pub schema_filter: Option<SchemaFilter>,
 }
 
 /// The result type for `diagnoseMigrationHistory` responses.
@@ -597,6 +617,8 @@ pub struct EvaluateDataLossInput {
     pub migrations_list: MigrationList,
     /// The prisma schema files to migrate to.
     pub schema: SchemasContainer,
+    /// Entities to be included or excluded during the data loss evaluation.
+    pub filters: Option<SchemaFilter>,
 }
 
 /// The output of the `evaluateDataLoss` command.

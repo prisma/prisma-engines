@@ -9,6 +9,7 @@ pub struct EvaluateDataLoss<'a> {
     api: &'a mut dyn SchemaConnector,
     migrations_directory: &'a TempDir,
     files: Vec<SchemaContainer>,
+    filter: SchemaFilter,
 }
 
 impl<'a> EvaluateDataLoss<'a> {
@@ -16,6 +17,7 @@ impl<'a> EvaluateDataLoss<'a> {
         api: &'a mut dyn SchemaConnector,
         migrations_directory: &'a TempDir,
         files: &[(&'b str, &'b str)],
+        filter: SchemaFilter,
     ) -> Self {
         EvaluateDataLoss {
             api,
@@ -27,6 +29,7 @@ impl<'a> EvaluateDataLoss<'a> {
                     content: content.to_string(),
                 })
                 .collect(),
+            filter,
         }
     }
 
@@ -37,6 +40,7 @@ impl<'a> EvaluateDataLoss<'a> {
             EvaluateDataLossInput {
                 migrations_list,
                 schema: SchemasContainer { files: self.files },
+                filters: Some(self.filter),
             },
             self.api,
             &mut migration_schema_cache,

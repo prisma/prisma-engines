@@ -37,13 +37,13 @@ pub async fn create_migration(
 
     let from = migration_schema_cache
         .get_or_insert(&input.migrations_list.migration_directories, || async {
+            // We pass the namespaces here, because we want to describe all of the namespaces we know about from the "to" schema.
             let namespaces = dialect.extract_namespaces(&to);
-            // We pass the namespaces here, because we want to describe all of these namespaces.
             connector.schema_from_migrations(&previous_migrations, namespaces).await
         })
         .await?;
 
-    let migration = dialect.diff(from, to);
+    let migration = dialect.diff(from, to, &input.filters.into());
 
     let extension = dialect.migration_file_extension().to_owned();
 
