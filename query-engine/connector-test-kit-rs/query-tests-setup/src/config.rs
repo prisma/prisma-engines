@@ -64,7 +64,7 @@ pub struct TestConfigFromSerde {
     pub(crate) connector_version: Option<String>,
 
     /// Indicates whether or not the tests are running in CI context.
-    /// Env key: `GITHUB_ACTIONS`
+    /// Env key: `BUILDKITE`
     #[serde(default)]
     pub(crate) is_ci: bool,
 
@@ -333,7 +333,7 @@ impl TestConfig {
         let mobile_emulator_url = std::env::var("MOBILE_EMULATOR_URL").ok();
 
         // Just care for a set value for now.
-        let is_ci = std::env::var("GITHUB_ACTIONS").is_ok();
+        let is_ci = std::env::var("BUILDKITE").is_ok();
 
         connector
             .map(|connector| TestConfigFromSerde {
