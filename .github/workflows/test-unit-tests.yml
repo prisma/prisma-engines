@@ -7,7 +7,6 @@ on:
     paths-ignore:
       - '.github/**'
       - '!.github/workflows/test-unit-tests.yml'
-      - '.buildkite/**'
       - '*.md'
       - 'LICENSE'
       - 'CODEOWNERS'

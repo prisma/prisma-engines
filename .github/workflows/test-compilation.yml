@@ -5,7 +5,6 @@ on:
       - '!.github/workflows/test-compilation.yml'
       - '!.github/workflows/test-compilation-template.yml'
       - '.github/**'
-      - '.buildkite/**'
       - '*.md'
       - 'LICENSE'
       - 'CODEOWNERS'

@@ -8,7 +8,6 @@ on:
       - '.github/**'
       - '!.github/workflows/test-schema-engine.yml'
       - '!.github/workflows/test-schema-engine-linux-template.yml'
-      - '.buildkite/**'
       - '*.md'
       - 'LICENSE'
       - 'CODEOWNERS'

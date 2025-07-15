@@ -8,7 +8,7 @@ on:
 
 jobs:
   build:
-    # Do not change `name`, prisma-engines Buildkite build job depends on this name ending with the commit
+    # Do not change `name`, prisma-engines build job might(?) depend on this name ending with the commit
     name: 'Windows engines build on branch ${{ github.event.ref }} for commit ${{ github.event.inputs.commit }}'
     env:
       SQLITE_MAX_VARIABLE_NUMBER: 250000

@@ -10,7 +10,6 @@ on:
       - '!.github/workflows/test-query-engine-template.yml'
       - '!.github/workflows/test-driver-adapters-template.yml'
       - '!.github/workflows/include/rust-wasm-setup/action.yml'
-      - '.buildkite/**'
       - '*.md'
       - 'LICENSE'
       - 'CODEOWNERS'

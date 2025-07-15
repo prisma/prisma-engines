@@ -7,7 +7,6 @@ on:
     paths-ignore:
       - '!.github/workflows/test-query-engine-black-box.yml'
       - '.github/**'
-      - '.buildkite/**'
       - '*.md'
       - 'LICENSE'
       - 'CODEOWNERS'

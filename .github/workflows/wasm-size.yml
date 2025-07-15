@@ -5,7 +5,6 @@ on:
       - '.github/**'
       - '!.github/workflows/wasm-size.yml'
       - '!.github/workflows/include/rust-wasm-setup/action.yml'
-      - '.buildkite/**'
       - '*.md'
       - 'LICENSE'
       - 'CODEOWNERS'
