@@ -11,7 +11,7 @@ use json_rpc::types::MigrationList;
 use psl::SourceFile;
 use quaint::connector::ExternalConnectorFactory;
 use schema_connector::{
-    ConnectorError, DatabaseSchema, ExternalShadowDatabase, Namespaces, SchemaConnector, SchemaDialect, SchemaFilter,
+    ConnectorError, DatabaseSchema, ExternalShadowDatabase, Namespaces, SchemaConnector, SchemaDialect,
 };
 
 pub async fn diff(
@@ -49,8 +49,7 @@ pub async fn diff(
     let from = schema_from.unwrap_or_else(|| dialect.empty_database_schema());
     let to = schema_to.unwrap_or_else(|| dialect.empty_database_schema());
 
-    // TODO:(schema-filter) get filter from params and prisma config
-    let migration = dialect.diff(from, to, &SchemaFilter::default());
+    let migration = dialect.diff(from, to, &params.filters.into());
 
     let mut stdout = if params.script {
         dialect.render_script(&migration, &Default::default())?

@@ -14,10 +14,16 @@ pub struct SchemaPush<'a> {
     migration_id: Option<&'a str>,
     // In eventually-consistent systems, we might need to wait for a while before the system refreshes
     max_ddl_refresh_delay: Option<Duration>,
+    schema_filter: Option<SchemaFilter>,
 }
 
 impl<'a> SchemaPush<'a> {
-    pub fn new(api: &'a mut dyn SchemaConnector, files: &[(&str, &str)], max_refresh_delay: Option<Duration>) -> Self {
+    pub fn new(
+        api: &'a mut dyn SchemaConnector,
+        files: &[(&str, &str)],
+        max_refresh_delay: Option<Duration>,
+        schema_filter: Option<SchemaFilter>,
+    ) -> Self {
         SchemaPush {
             api,
             files: files
@@ -30,6 +36,7 @@ impl<'a> SchemaPush<'a> {
             force: false,
             migration_id: None,
             max_ddl_refresh_delay: max_refresh_delay,
+            schema_filter,
         }
     }
 
@@ -47,6 +54,7 @@ impl<'a> SchemaPush<'a> {
         let input = SchemaPushInput {
             schema: SchemasContainer { files: self.files },
             force: self.force,
+            filters: self.schema_filter,
         };
 
         let fut = schema_push(input, self.api)

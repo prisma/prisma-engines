@@ -86,7 +86,7 @@ pub async fn diagnose_migration_history_cli(
 
             let to = connector.schema_from_database(namespaces.clone()).await;
             let drift = match from
-                .and_then(|from| to.map(|to| dialect.diff(from, to, &input.schema_filter.into())))
+                .and_then(|from| to.map(|to| dialect.diff(from, to, &input.filters.into())))
                 .map(|mig| {
                     if dialect.migration_is_empty(&mig) {
                         None

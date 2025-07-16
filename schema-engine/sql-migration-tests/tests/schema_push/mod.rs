@@ -1,6 +1,7 @@
 mod views;
 
 use indoc::indoc;
+use schema_core::json_rpc::types::SchemaFilter;
 use sql_migration_tests::test_api::*;
 use sql_schema_describer::ColumnTypeFamily;
 
@@ -454,4 +455,31 @@ fn issue_repro_extended_indexes(api: TestApi) {
 
     api.schema_push_w_datasource(dm).send().assert_executable();
     api.schema_push_w_datasource(dm).send().assert_green().assert_no_steps();
+}
+
+#[test_connector]
+fn schema_push_with_schema_filters(api: TestApi) {
+    let dm = r#"
+    model Cat {
+        id Int @id
+    }
+
+    model ExternalTable {
+        id Int @id        
+    }
+    "#;
+
+    api.schema_push_with_filter(
+        dm,
+        Some(SchemaFilter {
+            external_tables: vec!["ExternalTable".to_string()],
+        }),
+    )
+    .send()
+    .assert_green()
+    .assert_has_executed_steps();
+
+    api.assert_schema()
+        .assert_has_table("Cat")
+        .assert_has_no_table("ExternalTable");
 }
