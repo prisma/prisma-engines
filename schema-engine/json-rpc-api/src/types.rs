@@ -355,7 +355,7 @@ pub struct DevDiagnosticInput {
     pub migrations_list: MigrationList,
 
     /// The schema filter to use during checks on the database.
-    pub schema_filter: Option<SchemaFilter>,
+    pub filters: Option<SchemaFilter>,
 }
 
 /// The response type for `devDiagnostic`.
@@ -383,7 +383,7 @@ pub struct DiagnoseMigrationHistoryInput {
 
     /// The schema filter to use during checks on the database.
     /// Note: Only used if opt_in_to_shadow_database is true.
-    pub schema_filter: Option<SchemaFilter>,
+    pub filters: Option<SchemaFilter>,
 }
 
 /// The result type for `diagnoseMigrationHistory` responses.

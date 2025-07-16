@@ -37,7 +37,7 @@ impl<'a> DiagnoseMigrationHistory<'a> {
             DiagnoseMigrationHistoryInput {
                 migrations_list,
                 opt_in_to_shadow_database: self.opt_in_to_shadow_database,
-                schema_filter: None,
+                filters: None,
             },
             None,
             self.api,
