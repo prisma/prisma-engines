@@ -7,7 +7,6 @@ on:
     paths-ignore:
       - '.github/**'
       - '!.github/workflows/benchmark.yml'
-      - '.buildkite/**'
       - '*.md'
       - 'LICENSE'
       - 'CODEOWNERS'

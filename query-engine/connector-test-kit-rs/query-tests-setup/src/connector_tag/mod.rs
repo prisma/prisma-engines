@@ -20,7 +20,7 @@ pub(crate) use sql_server::*;
 pub(crate) use sqlite::*;
 pub(crate) use vitess::*;
 
-use crate::{datamodel_rendering::DatamodelRenderer, BoxFuture, TestConfig, TestError, CONFIG};
+use crate::{datamodel_rendering::DatamodelRenderer, BoxFuture, TestError, CONFIG};
 use psl::datamodel_connector::ConnectorCapabilities;
 use quaint::prelude::SqlFamily;
 use std::{convert::TryFrom, fmt, fs};
@@ -49,16 +49,12 @@ pub trait ConnectorTagInterface {
 /// The connection string to use to connect to the test database and version.
 /// - `test_database` is the database to connect to, which is an implementation detail of the
 ///   implementing connector, like a file or a schema.
-/// - `is_ci` signals whether or not the test run is done on CI or not. May be important if local
-///   test run connection strings and CI connection strings differ because of networking.
 pub(crate) fn connection_string(
-    test_config: &TestConfig,
     version: &ConnectorVersion,
     database: &str,
     is_multi_schema: bool,
     isolation_level: Option<&'static str>,
 ) -> String {
-    let is_ci = test_config.is_ci;
     match version {
         ConnectorVersion::SqlServer(v) => {
             let database = if is_multi_schema {
@@ -70,14 +66,10 @@ pub(crate) fn connection_string(
             let isolation_level = isolation_level.unwrap_or("READ UNCOMMITTED");
 
             match v {
-            Some(SqlServerVersion::V2017) if is_ci => format!("sqlserver://test-db-sqlserver-2017:1433;{database};user=SA;password=<YourStrong@Passw0rd>;trustServerCertificate=true;isolationLevel={isolation_level}"),
             Some(SqlServerVersion::V2017) => format!("sqlserver://127.0.0.1:1434;{database};user=SA;password=<YourStrong@Passw0rd>;trustServerCertificate=true;isolationLevel={isolation_level}"),
 
-            Some(SqlServerVersion::V2019) if is_ci => format!("sqlserver://test-db-sqlserver-2019:1433;{database};user=SA;password=<YourStrong@Passw0rd>;trustServerCertificate=true;isolationLevel={isolation_level}"),
             Some(SqlServerVersion::V2019) => format!("sqlserver://127.0.0.1:1433;{database};user=SA;password=<YourStrong@Passw0rd>;trustServerCertificate=true;isolationLevel={isolation_level}"),
 
-            Some(SqlServerVersion::V2022 | SqlServerVersion::MssqlJsWasm) if is_ci =>
-                format!("sqlserver://test-db-sqlserver-2022:1433;{database};user=SA;password=<YourStrong@Passw0rd>;trustServerCertificate=true;isolationLevel={isolation_level}"),
             Some(SqlServerVersion::V2022 | SqlServerVersion::MssqlJsWasm) =>
                 format!("sqlserver://127.0.0.1:1435;{database};user=SA;password=<YourStrong@Passw0rd>;trustServerCertificate=true;isolationLevel={isolation_level}"),
 
@@ -92,31 +84,6 @@ pub(crate) fn connection_string(
             };
 
             match v {
-                Some(PostgresVersion::V9) if is_ci => {
-                    format!("postgresql://postgres:prisma@test-db-postgres-9:5432/{database}")
-                }
-                Some(PostgresVersion::V10) if is_ci => {
-                    format!("postgresql://postgres:prisma@test-db-postgres-10:5432/{database}")
-                }
-                Some(PostgresVersion::V11) if is_ci => {
-                    format!("postgresql://postgres:prisma@test-db-postgres-11:5432/{database}")
-                }
-                Some(PostgresVersion::V12) if is_ci => {
-                    format!("postgresql://postgres:prisma@test-db-postgres-12:5432/{database}")
-                }
-                Some(PostgresVersion::V13) if is_ci => {
-                    format!("postgresql://postgres:prisma@test-db-postgres-13:5432/{database}")
-                }
-                Some(PostgresVersion::V14) if is_ci => {
-                    format!("postgresql://postgres:prisma@test-db-postgres-14:5432/{database}")
-                }
-                Some(PostgresVersion::V15) if is_ci => {
-                    format!("postgresql://postgres:prisma@test-db-postgres-15:5432/{database}")
-                }
-                Some(PostgresVersion::PgBouncer) if is_ci => {
-                    format!("postgresql://postgres:prisma@test-db-pgbouncer:6432/{database}&pgbouncer=true")
-                }
-
                 Some(PostgresVersion::V9) => format!("postgresql://postgres:prisma@127.0.0.1:5431/{database}"),
                 Some(PostgresVersion::V10) => format!("postgresql://postgres:prisma@127.0.0.1:5432/{database}"),
                 Some(PostgresVersion::V11) => format!("postgresql://postgres:prisma@127.0.0.1:5433/{database}"),
@@ -135,14 +102,6 @@ pub(crate) fn connection_string(
             }
         }
         ConnectorVersion::MySql(v) => match v {
-            Some(MySqlVersion::V5_6) if is_ci => format!("mysql://root:prisma@test-db-mysql-5-6:3306/{database}"),
-            Some(MySqlVersion::V5_7) if is_ci => format!("mysql://root:prisma@test-db-mysql-5-7:3306/{database}"),
-            Some(MySqlVersion::V8 | MySqlVersion::MariaDbJsWasm) if is_ci => {
-                format!("mysql://root:prisma@test-db-mysql-8:3306/{database}")
-            }
-            Some(MySqlVersion::MariaDb) if is_ci => {
-                format!("mysql://root:prisma@test-db-mysql-mariadb:3306/{database}")
-            }
             Some(MySqlVersion::V5_6) => format!("mysql://root:prisma@127.0.0.1:3309/{database}"),
             Some(MySqlVersion::V5_7) => format!("mysql://root:prisma@127.0.0.1:3306/{database}"),
             Some(MySqlVersion::V8 | MySqlVersion::MariaDbJsWasm) => {
@@ -155,20 +114,11 @@ pub(crate) fn connection_string(
             None => unreachable!("A versioned connector must have a concrete version to run."),
         },
         ConnectorVersion::MongoDb(v) => match v {
-            Some(MongoDbVersion::V4_2) if is_ci => format!(
-                "mongodb://prisma:prisma@test-db-mongodb-4-2:27016/{database}?authSource=admin&retryWrites=true"
-            ),
             Some(MongoDbVersion::V4_2) => {
                 format!("mongodb://prisma:prisma@127.0.0.1:27016/{database}?authSource=admin&retryWrites=true")
             }
-            Some(MongoDbVersion::V4_4) if is_ci => format!(
-                "mongodb://prisma:prisma@test-db-mongodb-4-4:27017/{database}?authSource=admin&retryWrites=true"
-            ),
             Some(MongoDbVersion::V4_4) => {
                 format!("mongodb://prisma:prisma@127.0.0.1:27017/{database}?authSource=admin&retryWrites=true")
-            }
-            Some(MongoDbVersion::V5) if is_ci => {
-                format!("mongodb://prisma:prisma@test-db-mongodb-5:27018/{database}?authSource=admin&retryWrites=true")
             }
             Some(MongoDbVersion::V5) => {
                 format!("mongodb://prisma:prisma@127.0.0.1:27018/{database}?authSource=admin&retryWrites=true")
@@ -191,15 +141,6 @@ pub(crate) fn connection_string(
             // Use the same database and schema name for CockroachDB - unfortunately CockroachDB
             // can't handle 1 schema per test in a database well at this point in time.
             match v {
-                Some(CockroachDbVersion::V221) if is_ci => {
-                    format!("postgresql://prisma@test-db-cockroachdb-22-1:26257/{database}?schema={database}")
-                }
-                Some(CockroachDbVersion::V222) if is_ci => {
-                    format!("postgresql://prisma@test-db-cockroachdb-22-2:26259/{database}?schema={database}")
-                }
-                Some(CockroachDbVersion::V231 | CockroachDbVersion::PgJsWasm) if is_ci => {
-                    format!("postgresql://prisma@test-db-cockroachdb-23-1:26260/{database}?schema={database}")
-                }
                 Some(CockroachDbVersion::V221) => {
                     format!("postgresql://prisma@127.0.0.1:26257/{database}?schema={database}")
                 }

@@ -38,7 +38,7 @@ echo "ℹ️  target version: $OUT_VERSION"
 echo "ℹ️  out folder: $OUT_FOLDER"
 
 if [[ -z "${WASM_BUILD_PROFILE:-}" ]]; then
-    if [[ -z "${BUILDKITE:-}" ]] && [[ -z "${GITHUB_ACTIONS:-}" ]]; then
+    if [[ -z "${GITHUB_ACTIONS:-}" ]]; then
         WASM_BUILD_PROFILE="dev"
     else
         WASM_BUILD_PROFILE="release"

@@ -50,7 +50,6 @@ pub fn render_test_datamodel(
     let datasource = DatasourceBuilder::new("test")
         .provider(tag.datamodel_provider())
         .url(connection_string(
-            &CONFIG,
             &version,
             test_database,
             is_multi_schema,
