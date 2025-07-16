@@ -138,6 +138,9 @@ pub(crate) trait SqlSchemaDifferFlavour {
         names.previous == names.next
     }
 
+    /// Check if the given table name is in the given list of tables names.
+    /// The table names  can contain fully qualified table names with namespace
+    /// (e.g. "auth.user") or just the table name.
     fn contains_table(&self, tables: &[String], namespace: Option<&str>, table_name: &str) -> bool {
         if let Some(namespace) = namespace {
             tables.contains(&format!("{namespace}.{table_name}")) || tables.contains(&table_name.to_string())

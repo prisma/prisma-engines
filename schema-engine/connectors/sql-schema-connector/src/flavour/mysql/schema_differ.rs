@@ -114,24 +114,19 @@ impl SqlSchemaDifferFlavour for MysqlSchemaDifferFlavour {
         }
     }
 
+    /// Check if the given table name is in the given list of tables names.
+    /// The table names  can contain fully qualified table names with namespace
+    /// (e.g. "auth.user") or just the table name.
     fn contains_table(&self, tables: &[String], namespace: Option<&str>, table_name: &str) -> bool {
-        let table_name = if self.lower_cases_table_names() {
-            table_name.to_ascii_lowercase()
+        let cmp = if self.lower_cases_table_names() {
+            str::eq_ignore_ascii_case
         } else {
-            table_name.to_string()
+            str::eq
         };
-
-        let namespace = if self.lower_cases_table_names() {
-            namespace.map(|ns| ns.to_ascii_lowercase())
-        } else {
-            namespace.map(|ns| ns.to_string())
-        };
-
-        if let Some(namespace) = namespace {
-            tables.contains(&format!("{namespace}.{table_name}")) || tables.contains(&table_name)
-        } else {
-            tables.contains(&table_name)
-        }
+        let namespaced_table_name = namespace.map(|ns| format!("{namespace}.{table_name}"));
+        tables
+            .iter()
+            .any(|t| cmp(t, table_name) || namespaced_table_name.is_none_or(|n| cmp(n, table_name)))
     }
 }
 
