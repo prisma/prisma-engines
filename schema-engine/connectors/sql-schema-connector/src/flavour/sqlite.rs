@@ -167,7 +167,12 @@ impl SqlConnector for SqliteConnector {
             let table_names: Vec<String> = rows
                 .into_iter()
                 .flat_map(|row| row.get("table_name").and_then(|s| s.to_string()))
-                .filter(|table_name| !filters.is_table_external(None, table_name))
+                .filter(|table_name| {
+                    !self
+                        .dialect()
+                        .schema_differ()
+                        .contains_table(&filters.external_tables, None, table_name)
+                })
                 .collect();
 
             Ok(table_names)

@@ -138,6 +138,14 @@ pub(crate) trait SqlSchemaDifferFlavour {
         names.previous == names.next
     }
 
+    fn contains_table(&self, tables: &[String], namespace: Option<&str>, table_name: &str) -> bool {
+        if let Some(namespace) = namespace {
+            tables.contains(&format!("{namespace}.{table_name}")) || tables.contains(&table_name.to_string())
+        } else {
+            tables.contains(&table_name.to_string())
+        }
+    }
+
     /// Return the tables that cannot be migrated without being redefined. This
     /// is currently useful only on SQLite.
     fn set_tables_to_redefine(&self, _db: &mut DifferDatabase<'_>) {}

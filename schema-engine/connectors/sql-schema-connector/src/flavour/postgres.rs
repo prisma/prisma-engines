@@ -422,7 +422,12 @@ impl SqlConnector for PostgresConnector {
 
                     ns.and_then(|ns| table_name.map(|table_name| (ns, table_name)))
                 })
-                .filter(|(ns, table_name)| !filters.is_table_external(Some(ns), table_name))
+                .filter(|(ns, table_name)| {
+                    !self
+                        .dialect()
+                        .schema_differ()
+                        .contains_table(&filters.external_tables, Some(ns), table_name)
+                })
                 .map(|(_, table_name)| table_name)
                 .collect();
 
