@@ -1,5 +1,5 @@
 use crate::prelude::*;
-use itertools::Itertools;
+use itertools::{Either, Itertools};
 use psl::parser_database::{walkers, ModelId};
 
 pub type Model = crate::Zipper<ModelId>;
@@ -20,19 +20,22 @@ impl Model {
             .into()
     }
 
-    fn primary_identifier_scalars(
-        &self,
-    ) -> impl ExactSizeIterator<Item = psl::parser_database::ScalarFieldId> + use<'_> {
-        self.walker()
-            .required_unique_criterias()
-            .next()
-            .expect("model must have at least one unique criterion")
-            .fields()
-            .map(|f| {
-                f.as_scalar_field()
-                    .expect("primary identifier must consist of scalar fields")
-                    .id
-            })
+    fn primary_identifier_scalars(&self) -> impl Iterator<Item = psl::parser_database::ScalarFieldId> + use<'_> {
+        if self.walker().ast_model().is_view() {
+            return Either::Left(self.walker().scalar_fields().map(|sf| sf.id));
+        }
+        Either::Right(
+            self.walker()
+                .required_unique_criterias()
+                .next()
+                .expect("model must have at least one unique criterion")
+                .fields()
+                .map(|f| {
+                    f.as_scalar_field()
+                        .expect("primary identifier must consist of scalar fields")
+                        .id
+                }),
+        )
     }
 
     pub fn shard_aware_primary_identifier(&self) -> FieldSelection {
