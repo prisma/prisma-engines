@@ -12,7 +12,7 @@ use quaint::connector::AdapterName;
 use renderer::SqliteRenderer;
 use schema_calculator::SqliteSchemaCalculatorFlavour;
 use schema_connector::{
-    migrations_directory::MigrationDirectory, BoxFuture, ConnectorError, ConnectorResult, Namespaces,
+    migrations_directory::MigrationDirectory, BoxFuture, ConnectorError, ConnectorResult, Namespaces, SchemaFilter,
 };
 use schema_differ::SqliteSchemaDifferFlavour;
 use sql_schema_describer::{sqlite::SqlSchemaDescriber, DescriberErrorKind, SqlSchema};
@@ -155,7 +155,11 @@ impl SqlConnector for SqliteConnector {
         self.with_connection(|conn, _| conn.apply_migration_script(migration_name, script))
     }
 
-    fn table_names(&mut self, _namespaces: Option<Namespaces>) -> BoxFuture<'_, ConnectorResult<Vec<String>>> {
+    fn table_names(
+        &mut self,
+        _namespaces: Option<Namespaces>,
+        filters: SchemaFilter,
+    ) -> BoxFuture<'_, ConnectorResult<Vec<String>>> {
         Box::pin(async move {
             let select = r#"SELECT name AS table_name FROM sqlite_master WHERE type='table' ORDER BY name ASC"#;
             let rows = self.query_raw(select, &[]).await?;
@@ -163,6 +167,7 @@ impl SqlConnector for SqliteConnector {
             let table_names: Vec<String> = rows
                 .into_iter()
                 .flat_map(|row| row.get("table_name").and_then(|s| s.to_string()))
+                .filter(|table_name| !filters.is_table_external(None, table_name))
                 .collect();
 
             Ok(table_names)

@@ -17,6 +17,7 @@ use renderer::MssqlRenderer;
 use schema_calculator::MssqlSchemaCalculatorFlavour;
 use schema_connector::{
     migrations_directory::MigrationDirectory, BoxFuture, ConnectorError, ConnectorParams, ConnectorResult, Namespaces,
+    SchemaFilter,
 };
 use schema_differ::MssqlSchemaDifferFlavour;
 use sql_schema_describer::SqlSchema;
@@ -279,7 +280,11 @@ impl SqlConnector for MssqlConnector {
         })
     }
 
-    fn table_names(&mut self, namespaces: Option<Namespaces>) -> BoxFuture<'_, ConnectorResult<Vec<String>>> {
+    fn table_names(
+        &mut self,
+        namespaces: Option<Namespaces>,
+        filters: SchemaFilter,
+    ) -> BoxFuture<'_, ConnectorResult<Vec<String>>> {
         Box::pin(async move {
             let search_path = self.schema_name().to_string();
 
@@ -305,7 +310,7 @@ impl SqlConnector for MssqlConnector {
 
                     ns.and_then(|ns| table_name.map(|table_name| (ns, table_name)))
                 })
-                .filter(|(ns, _)| namespaces.contains(ns))
+                .filter(|(ns, table_name)| namespaces.contains(ns) && !filters.is_table_external(Some(ns), table_name))
                 .map(|(_, table_name)| table_name)
                 .collect();
 

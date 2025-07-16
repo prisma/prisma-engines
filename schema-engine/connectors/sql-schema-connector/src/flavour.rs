@@ -35,7 +35,7 @@ use psl::{PreviewFeature, PreviewFeatures, ValidatedSchema};
 use quaint::prelude::{NativeConnectionInfo, Table};
 use schema_connector::{
     migrations_directory::MigrationDirectory, BoxFuture, ConnectorError, ConnectorResult, IntrospectionContext,
-    MigrationRecord, Namespaces, PersistenceNotInitializedError,
+    MigrationRecord, Namespaces, PersistenceNotInitializedError, SchemaFilter,
 };
 use sql_schema_describer::SqlSchema;
 use std::fmt::Debug;
@@ -195,7 +195,11 @@ pub(crate) trait SqlConnector: Send + Sync + Debug {
 
     /// List all visible tables in the given namespaces,
     /// including the search path.
-    fn table_names(&mut self, namespaces: Option<Namespaces>) -> BoxFuture<'_, ConnectorResult<Vec<String>>>;
+    fn table_names(
+        &mut self,
+        namespaces: Option<Namespaces>,
+        filters: SchemaFilter,
+    ) -> BoxFuture<'_, ConnectorResult<Vec<String>>>;
 
     /// Check a connection to make sure it is usable by the schema engine.
     /// This can include some set up on the database, like ensuring that the

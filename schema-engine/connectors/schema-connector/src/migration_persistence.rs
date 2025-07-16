@@ -1,4 +1,4 @@
-use crate::{checksum, BoxFuture, ConnectorError, ConnectorResult, Namespaces};
+use crate::{checksum, BoxFuture, ConnectorError, ConnectorResult, Namespaces, SchemaFilter};
 
 /// A timestamp.
 pub type Timestamp = chrono::DateTime<chrono::Utc>;
@@ -14,7 +14,11 @@ pub trait MigrationPersistence: Send + Sync {
     /// If the migration persistence is not present in the target database,
     /// check whether the database schema is empty. If it is, initialize the
     /// migration persistence. If not, return a DatabaseSchemaNotEmpty error.
-    fn initialize(&mut self, namespaces: Option<Namespaces>) -> BoxFuture<'_, ConnectorResult<()>>;
+    fn initialize(
+        &mut self,
+        namespaces: Option<Namespaces>,
+        filters: SchemaFilter,
+    ) -> BoxFuture<'_, ConnectorResult<()>>;
 
     /// Implementation in the connector for the core's MarkMigrationApplied
     /// command. See the docs there. Note that the started_at and finished_at

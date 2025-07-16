@@ -17,6 +17,7 @@ use renderer::MysqlRenderer;
 use schema_calculator::MysqlSchemaCalculatorFlavour;
 use schema_connector::{
     migrations_directory::MigrationDirectory, BoxFuture, ConnectorError, ConnectorParams, ConnectorResult, Namespaces,
+    SchemaFilter,
 };
 use schema_differ::MysqlSchemaDifferFlavour;
 use sql_schema_describer::SqlSchema;
@@ -184,7 +185,11 @@ impl SqlConnector for MysqlConnector {
         })
     }
 
-    fn table_names(&mut self, _namespaces: Option<Namespaces>) -> BoxFuture<'_, ConnectorResult<Vec<String>>> {
+    fn table_names(
+        &mut self,
+        _namespaces: Option<Namespaces>,
+        filters: SchemaFilter,
+    ) -> BoxFuture<'_, ConnectorResult<Vec<String>>> {
         Box::pin(async move {
             let select = r#"
                 SELECT DISTINCT BINARY table_info.table_name AS table_name
@@ -211,6 +216,7 @@ impl SqlConnector for MysqlConnector {
             let table_names: Vec<String> = rows
                 .into_iter()
                 .flat_map(|row| row.get("table_name").and_then(|s| s.to_string()))
+                .filter(|table_name| !filters.is_table_external(None, table_name))
                 .collect();
 
             Ok(table_names)

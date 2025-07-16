@@ -31,7 +31,15 @@ impl<'a> ApplyMigrations<'a> {
 
     pub async fn send(self) -> CoreResult<ApplyMigrationsAssertion<'a>> {
         let migrations_list = utils::list_migrations(self.migrations_directory.path()).unwrap();
-        let output = apply_migrations(ApplyMigrationsInput { migrations_list }, self.api, self.namespaces).await?;
+        let output = apply_migrations(
+            ApplyMigrationsInput {
+                migrations_list,
+                filters: None,
+            },
+            self.api,
+            self.namespaces,
+        )
+        .await?;
 
         Ok(ApplyMigrationsAssertion {
             output,
