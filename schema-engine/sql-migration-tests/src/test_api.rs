@@ -399,8 +399,15 @@ impl TestApi {
         to: DiffTarget<'_>,
         namespaces: Option<Namespaces>,
     ) -> String {
-        let from = tok(self.connector.schema_from_diff_target(from, namespaces.clone())).unwrap();
-        let to = tok(self.connector.schema_from_diff_target(to, namespaces)).unwrap();
+        let from =
+            tok(self
+                .connector
+                .schema_from_diff_target(from, namespaces.clone(), &SchemaFilter::default().into()))
+            .unwrap();
+        let to = tok(self
+            .connector
+            .schema_from_diff_target(to, namespaces, &SchemaFilter::default().into()))
+        .unwrap();
         let dialect = self.connector.schema_dialect();
         let migration = dialect.diff(from, to, &SchemaFilter::default().into());
         dialect.render_script(&migration, &Default::default()).unwrap()

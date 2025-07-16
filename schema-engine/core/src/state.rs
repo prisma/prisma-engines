@@ -508,11 +508,16 @@ impl GenericApi for EngineState {
         .await
     }
 
-    async fn reset(&self) -> CoreResult<()> {
+    async fn reset(&self, input: ResetInput) -> CoreResult<()> {
         tracing::debug!("Resetting the database.");
         let namespaces = self.namespaces();
         self.with_default_connector(Box::new(move |connector| {
-            Box::pin(SchemaConnector::reset(connector, false, namespaces).instrument(tracing::info_span!("Reset")))
+            Box::pin(async move {
+                let filter: schema_connector::SchemaFilter = input.filter.into();
+                SchemaConnector::reset(connector, false, namespaces, &filter)
+                    .instrument(tracing::info_span!("Reset"))
+                    .await
+            })
         }))
         .await?;
         Ok(())

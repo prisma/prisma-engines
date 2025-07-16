@@ -8,6 +8,7 @@ use schema_connector::ConnectorError;
 use schema_connector::ConnectorResult;
 use schema_connector::IntrospectionContext;
 use schema_connector::IntrospectionResult;
+use schema_connector::SchemaFilter;
 use schema_connector::ViewDefinition;
 pub use test_macros::test_connector;
 pub use test_setup::{BitFlags, Capabilities, Tags};
@@ -53,9 +54,13 @@ impl TestApi {
             };
             let mut me = SqlSchemaConnector::new_mysql(params).unwrap();
 
-            me.reset(true, schema_connector::Namespaces::from_vec(&mut namespaces.clone()))
-                .await
-                .unwrap();
+            me.reset(
+                true,
+                schema_connector::Namespaces::from_vec(&mut namespaces.clone()),
+                &SchemaFilter::default(),
+            )
+            .await
+            .unwrap();
 
             (
                 Quaint::new(connection_string).await.unwrap(),

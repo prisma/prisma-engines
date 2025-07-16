@@ -66,7 +66,7 @@ pub trait GenericApi: Send + Sync + 'static {
     ) -> CoreResult<MarkMigrationRolledBackOutput>;
 
     /// Reset a database to an empty state (no data, no schema).
-    async fn reset(&self) -> CoreResult<()>;
+    async fn reset(&self, input: ResetInput) -> CoreResult<()>;
 
     /// The command behind `prisma db push`.
     async fn schema_push(&self, input: SchemaPushInput) -> CoreResult<SchemaPushOutput>;

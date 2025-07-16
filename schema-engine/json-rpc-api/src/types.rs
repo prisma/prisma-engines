@@ -729,7 +729,10 @@ pub struct MarkMigrationRolledBackOutput {}
 #[derive(Debug, Deserialize)]
 #[cfg_attr(target_arch = "wasm32", derive(Tsify))]
 #[cfg_attr(target_arch = "wasm32", tsify(missing_as_null, from_wasm_abi))]
-pub struct ResetInput {}
+pub struct ResetInput {
+    /// The schema filter to use during the reset. Only relevant during "soft" resets though - usually we try to drop the whole database.
+    pub filter: Option<SchemaFilter>,
+}
 
 /// The output of the `reset` command.
 #[derive(Debug, Serialize)]

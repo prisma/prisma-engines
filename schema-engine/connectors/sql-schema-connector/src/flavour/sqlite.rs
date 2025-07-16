@@ -357,6 +357,7 @@ impl SqlConnector for SqliteConnector {
         &'a mut self,
         migrations: &'a [MigrationDirectory],
         _namespaces: Option<Namespaces>,
+        _filter: &'a SchemaFilter,
         external_shadow_db: UsingExternalShadowDb,
     ) -> BoxFuture<'a, ConnectorResult<SqlSchema>> {
         async fn apply_migrations_and_describe(

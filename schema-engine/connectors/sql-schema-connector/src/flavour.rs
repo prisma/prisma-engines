@@ -322,6 +322,7 @@ pub(crate) trait SqlConnector: Send + Sync + Debug {
         &'a mut self,
         migrations: &'a [MigrationDirectory],
         namespaces: Option<Namespaces>,
+        filter: &'a SchemaFilter,
         external_shadow_db: UsingExternalShadowDb,
     ) -> BoxFuture<'a, ConnectorResult<SqlSchema>>;
 

@@ -99,6 +99,7 @@ impl SchemaDialect for MongoDbSchemaDialect {
         &'a mut self,
         _migrations: &'a [MigrationDirectory],
         _namespaces: Option<Namespaces>,
+        _filter: &SchemaFilter,
         _target: ExternalShadowDatabase,
     ) -> BoxFuture<'a, ConnectorResult<()>> {
         Box::pin(future::ready(Ok(())))
@@ -108,6 +109,7 @@ impl SchemaDialect for MongoDbSchemaDialect {
         &'a self,
         _migrations: &'a [MigrationDirectory],
         _namespaces: Option<Namespaces>,
+        _filter: &SchemaFilter,
         _target: ExternalShadowDatabase,
     ) -> BoxFuture<'a, ConnectorResult<DatabaseSchema>> {
         Box::pin(async { Err(unsupported_command_error()) })
@@ -161,11 +163,12 @@ impl SchemaConnector for MongoDbSchemaConnector {
         Box::pin(async { self.client().await?.drop_database().await })
     }
 
-    fn reset(
-        &mut self,
+    fn reset<'a>(
+        &'a mut self,
         _soft: bool,
         _namespaces: Option<Namespaces>,
-    ) -> BoxFuture<'_, schema_connector::ConnectorResult<()>> {
+        _filter: &'a SchemaFilter,
+    ) -> BoxFuture<'a, schema_connector::ConnectorResult<()>> {
         Box::pin(async { self.client().await?.drop_database().await })
     }
 
@@ -207,6 +210,7 @@ impl SchemaConnector for MongoDbSchemaConnector {
         &'a mut self,
         _migrations: &'a [MigrationDirectory],
         _namespaces: Option<Namespaces>,
+        _filter: &SchemaFilter,
     ) -> BoxFuture<'a, ConnectorResult<()>> {
         Box::pin(future::ready(Ok(())))
     }
@@ -229,6 +233,7 @@ impl SchemaConnector for MongoDbSchemaConnector {
         &'a mut self,
         _migrations: &'a [MigrationDirectory],
         _namespaces: Option<Namespaces>,
+        _filter: &SchemaFilter,
     ) -> BoxFuture<'a, ConnectorResult<DatabaseSchema>> {
         Box::pin(async { Err(unsupported_command_error()) })
     }

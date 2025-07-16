@@ -582,6 +582,7 @@ impl SqlConnector for PostgresConnector {
         &'a mut self,
         migrations: &'a [MigrationDirectory],
         namespaces: Option<Namespaces>,
+        filter: &'a SchemaFilter,
         external_shadow_db: UsingExternalShadowDb,
     ) -> BoxFuture<'a, ConnectorResult<SqlSchema>> {
         Box::pin(imp::shadow_db::sql_schema_from_migration_history(
@@ -589,6 +590,7 @@ impl SqlConnector for PostgresConnector {
             self.provider,
             migrations,
             namespaces,
+            filter,
             external_shadow_db,
         ))
     }

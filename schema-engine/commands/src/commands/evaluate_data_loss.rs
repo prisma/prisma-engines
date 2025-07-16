@@ -17,6 +17,7 @@ pub async fn evaluate_data_loss(
     let migrations_from_directory = list_migrations(input.migrations_list.migration_directories.clone());
 
     let dialect = connector.schema_dialect();
+    let filter: schema_connector::SchemaFilter = input.filters.into();
 
     let to = dialect.schema_from_datamodel(sources)?;
 
@@ -26,12 +27,12 @@ pub async fn evaluate_data_loss(
             // So when the user removes a previously existing namespace from their PSL file we will not introspect that namespace in the database.
             let namespaces = dialect.extract_namespaces(&to);
             connector
-                .schema_from_migrations(&migrations_from_directory, namespaces)
+                .schema_from_migrations(&migrations_from_directory, namespaces, &filter)
                 .await
         })
         .await?;
 
-    let migration = dialect.diff(from, to, &input.filters.into());
+    let migration = dialect.diff(from, to, &filter);
 
     let migration_steps = dialect.migration_len(&migration) as u32;
     let diagnostics = connector.destructive_change_checker().check(&migration).await?;
