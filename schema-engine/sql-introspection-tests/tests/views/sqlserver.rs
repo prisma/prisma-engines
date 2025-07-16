@@ -228,7 +228,7 @@ async fn re_intro_keeps_view_uniques(api: &mut TestApi) -> TestResult {
           id         Int     @unique
           first_name String  @db.VarChar(255)
           last_name  String? @db.VarChar(255)
-        }  
+        }
     "#};
 
     let expected = expect![[r#"
@@ -281,7 +281,7 @@ async fn re_intro_keeps_id(api: &mut TestApi) -> TestResult {
           id         Int     @id
           first_name String  @db.VarChar(255)
           last_name  String? @db.VarChar(255)
-        }  
+        }
     "#};
 
     let expected = expect![[r#"
@@ -340,7 +340,7 @@ async fn re_intro_keeps_compound_unique(api: &mut TestApi) -> TestResult {
           last_name  String? @db.VarChar(255)
 
           @@unique([side_a, side_b])
-        }  
+        }
     "#};
 
     let expected = expect![[r#"
@@ -360,51 +360,6 @@ async fn re_intro_keeps_compound_unique(api: &mut TestApi) -> TestResult {
           last_name  String? @db.VarChar(255)
 
           @@unique([side_a, side_b])
-        }
-    "#]];
-
-    api.expect_re_introspected_datamodel(input, expected).await;
-
-    Ok(())
-}
-
-#[test_connector(tags(Mssql), preview_features("views"))]
-async fn re_intro_keeps_view_to_view_relations(api: &mut TestApi) -> TestResult {
-    let setup = indoc! {r#"
-        CREATE VIEW A AS SELECT 1 AS id;
-    "#};
-
-    api.raw_cmd(setup).await;
-
-    let setup = indoc! {r#"
-        CREATE VIEW B AS SELECT 2 AS id, 1 AS a_id;
-    "#};
-
-    api.raw_cmd(setup).await;
-
-    let input = indoc! {r#"
-        view A {
-          id Int @unique
-          b  B[]
-        }
-
-        view B {
-          id   Int  @unique
-          a_id Int?
-          a    A?   @relation(fields: [a_id], references: [id])
-        }
-    "#};
-
-    let expected = expect![[r#"
-        view A {
-          id Int @unique
-          b  B[]
-        }
-
-        view B {
-          id   Int @unique
-          a_id Int
-          a    A?  @relation(fields: [a_id], references: [id])
         }
     "#]];
 

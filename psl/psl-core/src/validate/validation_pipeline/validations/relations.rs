@@ -10,7 +10,7 @@ use crate::{diagnostics::DatamodelError, validate::validation_pipeline::context:
 use diagnostics::DatamodelWarning;
 use indoc::formatdoc;
 use itertools::Itertools;
-use parser_database::walkers::RelationFieldId;
+use parser_database::walkers::{RelationFieldId, RelationWalker};
 use parser_database::ReferentialAction;
 use parser_database::{
     ast::WithSpan,
@@ -587,6 +587,24 @@ pub(crate) fn required_relation_cannot_use_set_null(relation: InlineRelationWalk
                 RELATION_ATTRIBUTE_NAME,
                 span,
             ))
+        }
+    }
+}
+
+/// Views cannot be used in relations.
+pub(super) fn is_used_with_a_view(relation: RelationWalker<'_>, ctx: &mut Context<'_>) {
+    for model in relation.models() {
+        let model = relation.walk(model);
+        if !model.ast_model().is_view() {
+            continue;
+        }
+
+        for field in relation.relation_fields() {
+            let message = format!(
+                "The field `{}` is part of a relation that references a view. Relations currently cannot be used with views.",
+                field.name(),
+            );
+            ctx.push_error(DatamodelError::new_validation_error(&message, field.ast_field().span()));
         }
     }
 }

@@ -1,0 +1,28 @@
+generator js {
+  provider = "prisma-client-js"
+  previewFeatures = ["views"]
+}
+
+view SomeUser {
+  id      Int      @id
+  profile Profile? @relation(fields: [id], references: [id])
+}
+
+model Profile {
+  id   Int       @id
+  user SomeUser?
+}
+// [1;91merror[0m: [1mError validating: The field `profile` is part of a relation that references a view. Relations currently cannot be used with views.[0m
+//   [1;94m-->[0m  [4mschema.prisma:8[0m
+// [1;94m   | [0m
+// [1;94m 7 | [0m  id      Int      @id
+// [1;94m 8 | [0m  [1;91mprofile Profile? @relation(fields: [id], references: [id])[0m
+// [1;94m 9 | [0m}
+// [1;94m   | [0m
+// [1;91merror[0m: [1mError validating: The field `user` is part of a relation that references a view. Relations currently cannot be used with views.[0m
+//   [1;94m-->[0m  [4mschema.prisma:13[0m
+// [1;94m   | [0m
+// [1;94m12 | [0m  id   Int       @id
+// [1;94m13 | [0m  [1;91muser SomeUser?[0m
+// [1;94m14 | [0m}
+// [1;94m   | [0m
