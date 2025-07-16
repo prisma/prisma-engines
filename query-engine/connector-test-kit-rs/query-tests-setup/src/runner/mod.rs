@@ -364,7 +364,7 @@ impl Runner {
         let request_body = match self.protocol {
             EngineProtocol::Json => {
                 // Translate the GraphQL query to JSON
-                let json_query = JsonRequest::from_graphql(&query, self.query_schema()).unwrap();
+                let json_query = JsonRequest::from_graphql(&query, self.query_schema())?;
                 println!("{}", serde_json::to_string_pretty(&json_query).unwrap().green());
 
                 RequestBody::Json(JsonBody::Single(json_query))

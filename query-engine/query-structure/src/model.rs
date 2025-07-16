@@ -67,7 +67,7 @@ impl Model {
             .scalar_fields()
             .any(|sf| sf.ast_field().arity.is_required() && sf.is_unsupported() && sf.default_value().is_none());
 
-        !has_unsupported_field
+        !has_unsupported_field && !self.is_view()
     }
 
     /// The name of the model in the database
@@ -85,6 +85,10 @@ impl Model {
             .indexes()
             .filter(|idx| idx.is_unique())
             .filter(|index| !index.fields().any(|f| f.is_unsupported()))
+    }
+
+    pub fn is_view(&self) -> bool {
+        self.walker().ast_model().is_view()
     }
 }
 
