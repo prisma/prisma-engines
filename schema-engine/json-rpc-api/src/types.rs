@@ -227,6 +227,9 @@ pub struct DevActionReset {
 pub struct ApplyMigrationsInput {
     /// The list of migrations, already loaded from disk.
     pub migrations_list: MigrationList,
+
+    /// The schema filter to use during the apply migrations.
+    pub filters: Option<SchemaFilter>,
 }
 
 /// The output of the `applyMigrations` command.

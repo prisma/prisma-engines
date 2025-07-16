@@ -1,4 +1,5 @@
 use pretty_assertions::assert_eq;
+use schema_core::schema_connector::SchemaFilter;
 use sql_migration_tests::test_api::*;
 use user_facing_errors::UserFacingError;
 
@@ -13,7 +14,7 @@ fn mark_migration_rolled_back_on_an_empty_database_errors(api: TestApi) {
 
 #[test_connector]
 fn mark_migration_rolled_back_on_a_database_with_migrations_table_errors(api: TestApi) {
-    tok(api.migration_persistence().initialize(None)).unwrap();
+    tok(api.migration_persistence().initialize(None, SchemaFilter::default())).unwrap();
 
     let err = api
         .mark_migration_rolled_back("anything")

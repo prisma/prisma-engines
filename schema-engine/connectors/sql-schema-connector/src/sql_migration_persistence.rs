@@ -2,7 +2,7 @@ use crate::SqlSchemaConnector;
 use quaint::ast::*;
 use schema_connector::{
     BoxFuture, ConnectorError, ConnectorResult, MigrationPersistence, MigrationRecord, Namespaces,
-    PersistenceNotInitializedError,
+    PersistenceNotInitializedError, SchemaFilter,
 };
 use uuid::Uuid;
 
@@ -15,9 +15,13 @@ impl MigrationPersistence for SqlSchemaConnector {
     }
 
     #[tracing::instrument(skip(self))]
-    fn initialize(&mut self, namespaces: Option<Namespaces>) -> BoxFuture<'_, ConnectorResult<()>> {
+    fn initialize(
+        &mut self,
+        namespaces: Option<Namespaces>,
+        filters: SchemaFilter,
+    ) -> BoxFuture<'_, ConnectorResult<()>> {
         Box::pin(async move {
-            let table_names = self.inner.table_names(namespaces).await?;
+            let table_names = self.inner.table_names(namespaces, filters).await?;
 
             if table_names.iter().any(|name| name == crate::MIGRATIONS_TABLE_NAME) {
                 return Ok(());

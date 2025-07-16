@@ -18,7 +18,7 @@ use quaint::{
 use renderer::PostgresRenderer;
 use schema_calculator::PostgresSchemaCalculatorFlavour;
 use schema_connector::{
-    migrations_directory::MigrationDirectory, BoxFuture, ConnectorError, ConnectorResult, Namespaces,
+    migrations_directory::MigrationDirectory, BoxFuture, ConnectorError, ConnectorResult, Namespaces, SchemaFilter,
 };
 use schema_differ::PostgresSchemaDifferFlavour;
 use serde::Deserialize;
@@ -391,7 +391,11 @@ impl SqlConnector for PostgresConnector {
         }
     }
 
-    fn table_names(&mut self, namespaces: Option<Namespaces>) -> BoxFuture<'_, ConnectorResult<Vec<String>>> {
+    fn table_names(
+        &mut self,
+        namespaces: Option<Namespaces>,
+        filters: SchemaFilter,
+    ) -> BoxFuture<'_, ConnectorResult<Vec<String>>> {
         Box::pin(async move {
             let search_path = self.schema_name().to_string();
 
@@ -402,7 +406,7 @@ impl SqlConnector for PostgresConnector {
             namespaces.push(Value::text(search_path));
 
             let select = r#"
-                SELECT tbl.relname AS table_name
+                SELECT tbl.relname AS table_name, namespace.nspname AS table_namespace
                 FROM pg_class AS tbl
                 INNER JOIN pg_namespace AS namespace ON namespace.oid = tbl.relnamespace
                 WHERE tbl.relkind = 'r' AND namespace.nspname = ANY ( $1 )
@@ -412,7 +416,14 @@ impl SqlConnector for PostgresConnector {
 
             let table_names: Vec<String> = rows
                 .into_iter()
-                .flat_map(|row| row.get("table_name").and_then(|s| s.to_string()))
+                .flat_map(|row| {
+                    let ns = row.get("table_namespace").and_then(|s| s.to_string());
+                    let table_name = row.get("table_name").and_then(|s| s.to_string());
+
+                    ns.and_then(|ns| table_name.map(|table_name| (ns, table_name)))
+                })
+                .filter(|(ns, table_name)| !filters.is_table_external(Some(ns), table_name))
+                .map(|(_, table_name)| table_name)
                 .collect();
 
             Ok(table_names)

@@ -18,7 +18,10 @@ pub async fn apply_migrations(
     let migrations_from_filesystem = list_migrations(input.migrations_list.migration_directories);
 
     connector.acquire_lock().await?;
-    connector.migration_persistence().initialize(namespaces).await?;
+    connector
+        .migration_persistence()
+        .initialize(namespaces, input.filters.into())
+        .await?;
 
     let migrations_from_database = connector
         .migration_persistence()
