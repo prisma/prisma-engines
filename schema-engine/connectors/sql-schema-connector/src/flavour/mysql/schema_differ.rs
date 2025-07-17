@@ -118,15 +118,15 @@ impl SqlSchemaDifferFlavour for MysqlSchemaDifferFlavour {
     /// The table names  can contain fully qualified table names with namespace
     /// (e.g. "auth.user") or just the table name.
     fn contains_table(&self, tables: &[String], namespace: Option<&str>, table_name: &str) -> bool {
-        let cmp = if self.lower_cases_table_names() {
+        let str_eq = if self.lower_cases_table_names() {
             str::eq_ignore_ascii_case
         } else {
             str::eq
         };
-        let namespaced_table_name = namespace.map(|ns| format!("{namespace}.{table_name}"));
+        let namespaced_table_name = namespace.map(|ns| format!("{ns}.{table_name}"));
         tables
             .iter()
-            .any(|t| cmp(t, table_name) || namespaced_table_name.is_none_or(|n| cmp(n, table_name)))
+            .any(|t| str_eq(t, table_name) || namespaced_table_name.as_deref().is_some_and(|n| str_eq(t, n)))
     }
 }
 
