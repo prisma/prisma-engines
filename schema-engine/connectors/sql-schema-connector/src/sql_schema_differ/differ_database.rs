@@ -327,7 +327,8 @@ impl<'a> DifferDatabase<'a> {
 
     fn is_table_external(&self, table: &TableWalker<'_>) -> bool {
         // TODO:(schema-filter) optimize for speed to avoid recomputing the underlying contains?
-        self.filter.is_table_external(table.namespace(), table.name())
+        self.flavour
+            .contains_table(&self.filter.external_tables, table.namespace(), table.name())
     }
 
     fn is_table_pair_external(&self, tables: MigrationPair<TableWalker<'_>>) -> bool {
@@ -344,7 +345,10 @@ impl<'a> DifferDatabase<'a> {
             .tables
             .iter()
             .filter(|(k, _)| k.0.as_deref() == Some(namespace.name()))
-            .all(|(k, _)| self.filter.is_table_external(k.0.as_deref(), k.1.as_ref()));
+            .all(|(k, _)| {
+                self.flavour
+                    .contains_table(&self.filter.external_tables, k.0.as_deref(), k.1.as_ref())
+            });
         let has_enums = self.created_enums().any(|e| e.namespace() == Some(namespace.name()));
         all_tables_are_external && !has_enums
     }

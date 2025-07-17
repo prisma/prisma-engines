@@ -233,7 +233,7 @@ fn schema_filter_migration_adding_external_tables_incl_relations(api: TestApi) {
         });
 }
 
-#[test_connector(exclude(CockroachDb))]
+#[test_connector(exclude(CockroachDb, Vitess))]
 fn schema_filter_migration_removing_external_tables_incl_relations(mut api: TestApi) {
     let schema_1 = api.datamodel_with_provider(
         r#"

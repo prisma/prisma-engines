@@ -138,6 +138,14 @@ pub(crate) trait SqlSchemaDifferFlavour {
         names.previous == names.next
     }
 
+    /// Check if the given table name is in the given list of tables names.
+    /// The table names  can contain fully qualified table names with namespace
+    /// (e.g. "auth.user") or just the table name.
+    fn contains_table(&self, tables: &[String], namespace: Option<&str>, table_name: &str) -> bool {
+        tables.iter().any(|t| t == table_name)
+            || namespace.is_some_and(|ns| tables.contains(&format!("{ns}.{table_name}")))
+    }
+
     /// Return the tables that cannot be migrated without being redefined. This
     /// is currently useful only on SQLite.
     fn set_tables_to_redefine(&self, _db: &mut DifferDatabase<'_>) {}
