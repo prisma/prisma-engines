@@ -73,6 +73,20 @@ mod views {
         Ok(())
     }
 
+    #[connector_test]
+    async fn no_cursor(runner: Runner) -> TestResult<()> {
+        create_test_data(&runner, "no_cursor").await?;
+
+        assert_error!(
+            runner,
+            r#"{ findManyTestView(cursor: { id: 1 }) { fullName } }"#,
+            2009,
+            "Argument does not exist in enclosing type"
+        );
+
+        Ok(())
+    }
+
     async fn create_test_data(runner: &Runner, schema_name: &str) -> TestResult<()> {
         migrate_view(runner, schema_name).await?;
 
