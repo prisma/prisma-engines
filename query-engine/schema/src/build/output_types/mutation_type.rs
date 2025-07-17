@@ -16,6 +16,10 @@ pub(crate) fn mutation_fields(ctx: &QuerySchema) -> Vec<FieldFn> {
     }
 
     for model in ctx.internal_data_model.models() {
+        if model.is_view() {
+            continue;
+        }
+
         if model.supports_create_operation() {
             field!(create_one, model);
 
