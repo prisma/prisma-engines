@@ -63,26 +63,26 @@ fn graphql_args_to_json_args(
 
     let mut args: IndexMap<String, JsonValue> = IndexMap::new();
 
-    for (arg_name, arg_value) in selection.arguments().iter().cloned() {
-        let arg_field = args_fields.iter().find(|arg_field| arg_field.name == arg_name);
-        let inferrer = FieldTypeInferrer::from_field(arg_field).infer(&arg_value);
+    for (arg_name, arg_value) in selection.arguments() {
+        let arg_field = args_fields.iter().find(|arg_field| arg_field.name == *arg_name);
+        let inferrer = FieldTypeInferrer::from_field(arg_field).infer(arg_value);
         let json = arg_value_to_json(arg_value, inferrer);
-        args.insert(arg_name, json);
+        args.insert(arg_name.to_owned(), json);
     }
 
     Some(args)
 }
 
-fn arg_value_to_json(value: ArgumentValue, typ: InferredType) -> JsonValue {
+fn arg_value_to_json(value: &ArgumentValue, typ: InferredType) -> JsonValue {
     match (value, typ) {
         (ArgumentValue::Object(obj), InferredType::Object(typ)) => JsonValue::Object(
             obj.into_iter()
                 .map(|(k, v)| {
-                    let field = typ.find_field(&k);
+                    let field = typ.find_field(k);
                     let inferrer = FieldTypeInferrer::from_field(field);
-                    let inferred_type = inferrer.infer(&v);
+                    let inferred_type = inferrer.infer(v);
 
-                    (k, arg_value_to_json(v, inferred_type))
+                    (k.to_owned(), arg_value_to_json(v, inferred_type))
                 })
                 .collect(),
         ),
@@ -94,24 +94,24 @@ fn arg_value_to_json(value: ArgumentValue, typ: InferredType) -> JsonValue {
         (ArgumentValue::Object(obj), InferredType::Unknown) => {
             let obj = obj
                 .into_iter()
-                .map(|(k, v)| (k, arg_value_to_json(v, InferredType::Unknown)))
+                .map(|(k, v)| (k.to_owned(), arg_value_to_json(v, InferredType::Unknown)))
                 .collect();
 
             JsonValue::Object(obj)
         }
         (ArgumentValue::Scalar(PrismaValue::Enum(str)), InferredType::JsonNullEnum) => {
-            make_json_custom_type(custom_types::ENUM, JsonValue::String(str))
+            make_json_custom_type(custom_types::ENUM, JsonValue::String(str.to_owned()))
         }
         (ArgumentValue::Scalar(PrismaValue::String(str)), InferredType::Json) => {
-            serde_json::from_str(&str).unwrap_or_else(|_| panic!("Expected {str} to be JSON."))
+            serde_json::from_str(str).unwrap_or_else(|_| panic!("Expected {str} to be JSON."))
         }
         (ArgumentValue::Scalar(pv), InferredType::Unknown) => serde_json::to_value(pv).unwrap(),
 
         (ArgumentValue::List(list), InferredType::List(typ)) => {
             let values = list
-                .into_iter()
+                .iter()
                 .map(|val| {
-                    let inferred_typ = FieldTypeInferrer::new(Some(&[typ.clone()])).infer(&val);
+                    let inferred_typ = FieldTypeInferrer::new(Some(std::slice::from_ref(&typ))).infer(val);
 
                     arg_value_to_json(val, inferred_typ)
                 })
@@ -120,7 +120,7 @@ fn arg_value_to_json(value: ArgumentValue, typ: InferredType) -> JsonValue {
             JsonValue::Array(values)
         }
         (ArgumentValue::List(list), InferredType::Unknown) => JsonValue::Array(
-            list.into_iter()
+            list.iter()
                 .map(|val| arg_value_to_json(val, InferredType::Unknown))
                 .collect_vec(),
         ),
