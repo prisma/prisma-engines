@@ -3,7 +3,7 @@
 use crate::QueryParserResult;
 use indexmap::IndexMap;
 use query_structure::{OrderBy, PrismaValue, ScalarFieldRef};
-use schema::ObjectTag;
+use schema::{ObjectTag, constants::args};
 use std::{
     borrow::Cow,
     ops::{Deref, DerefMut},
@@ -97,15 +97,15 @@ pub struct ParsedField<'a> {
 
 impl<'a> ParsedField<'a> {
     pub(crate) fn where_arg(&mut self) -> QueryParserResult<Option<ParsedInputMap<'a>>> {
-        self.look_arg("where")
+        self.look_arg(args::WHERE)
     }
 
     pub(crate) fn create_arg(&mut self) -> QueryParserResult<Option<ParsedInputMap<'a>>> {
-        self.look_arg("create")
+        self.look_arg(args::CREATE)
     }
 
     pub(crate) fn update_arg(&mut self) -> QueryParserResult<Option<ParsedInputMap<'a>>> {
-        self.look_arg("update")
+        self.look_arg(args::UPDATE)
     }
 
     pub(crate) fn has_nested_selection(&self) -> bool {
