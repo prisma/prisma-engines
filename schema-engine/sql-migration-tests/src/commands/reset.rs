@@ -1,6 +1,6 @@
 use schema_core::{
-    schema_connector::{Namespaces, SchemaConnector, SchemaFilter},
     CoreResult,
+    schema_connector::{Namespaces, SchemaConnector, SchemaFilter},
 };
 
 #[must_use = "This struct does nothing on its own. See Reset::send()"]

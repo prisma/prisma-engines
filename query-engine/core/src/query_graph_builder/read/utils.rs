@@ -3,10 +3,10 @@ use std::sync::LazyLock;
 use super::*;
 use crate::{ArgumentListLookup, FieldPair, ParsedField, ReadQuery};
 use psl::datamodel_connector::JoinStrategySupport;
-use query_structure::{prelude::*, RelationLoadStrategy};
+use query_structure::{RelationLoadStrategy, prelude::*};
 use schema::{
-    constants::{aggregations::*, args},
     QuerySchema,
+    constants::{aggregations::*, args},
 };
 
 pub fn collect_selection_order(from: &[FieldPair<'_>]) -> Vec<String> {
@@ -233,7 +233,7 @@ pub(crate) fn merge_relation_selections(
     let nested: Vec<_> = nested_queries
         .iter()
         .map(|nested_query| {
-            if let ReadQuery::RelatedRecordsQuery(ref rq) = nested_query {
+            if let ReadQuery::RelatedRecordsQuery(rq) = nested_query {
                 rq.parent_field.linking_fields()
             } else {
                 unreachable!()

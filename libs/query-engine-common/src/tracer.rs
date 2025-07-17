@@ -1,7 +1,7 @@
 use serde::Deserialize;
 use telemetry::{
-    exporter::{CaptureSettings, CaptureTarget},
     Exporter, RequestId, TraceParent,
+    exporter::{CaptureSettings, CaptureTarget},
 };
 use tracing::Span;
 

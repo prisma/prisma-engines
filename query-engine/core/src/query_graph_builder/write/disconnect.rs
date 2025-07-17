@@ -1,7 +1,7 @@
 use crate::{
+    DataExpectation, DataOperation, MissingRelatedRecord, QueryGraphBuilderResult,
     query_ast::*,
     query_graph::{Node, NodeRef, QueryGraph, QueryGraphDependency},
-    DataExpectation, DataOperation, MissingRelatedRecord, QueryGraphBuilderResult,
 };
 use query_structure::RelationFieldRef;
 

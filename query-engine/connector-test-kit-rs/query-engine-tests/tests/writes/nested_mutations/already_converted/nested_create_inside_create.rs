@@ -3,7 +3,7 @@ use query_engine_tests::*;
 // TODO(dom): All failings except one (only a couple of tests is failing per test)
 #[test_suite(exclude(CockroachDb))]
 mod create_inside_create {
-    use query_engine_tests::{run_query, DatamodelWithParams};
+    use query_engine_tests::{DatamodelWithParams, run_query};
     use query_test_macros::relation_link_test;
 
     // "a P1 to C1 relation should work"

@@ -1,8 +1,8 @@
 use super::{Datasource, Generator};
 use crate::{
+    PreviewFeature,
     datamodel_connector::RelationMode,
     diagnostics::{DatamodelError, Diagnostics},
-    PreviewFeature,
 };
 use enumflags2::BitFlags;
 
@@ -127,11 +127,14 @@ impl Configuration {
 
             if let (Some(direct_url), Some(span)) = (&datasource.direct_url, &datasource.direct_url_span) {
                 let result = match super::from_url(direct_url, env) {
-                        Err(err) => {
-                            match err {
+                    Err(err) => match err {
                         super::UrlValidationError::EmptyUrlValue => {
                             let msg = "You must provide a nonempty direct URL";
-                            Err(DatamodelError::new_source_validation_error(msg, &datasource.name, *span))
+                            Err(DatamodelError::new_source_validation_error(
+                                msg,
+                                &datasource.name,
+                                *span,
+                            ))
                         }
                         super::UrlValidationError::EmptyEnvValue(env_var) => {
                             Err(DatamodelError::new_source_validation_error(
@@ -141,20 +144,14 @@ impl Configuration {
                                 &datasource.name,
                                 *span,
                             ))
-                        },
-                        super::UrlValidationError::NoEnvValue(env_var) => {
-                            Err(DatamodelError::new_environment_functional_evaluation_error(
-                                env_var,
-                                *span,
-                            ))
-                        },
-                        super::UrlValidationError::NoUrlOrEnv => {
-                          Ok(None)
-                        },
-                    }
-                        },
-                        Ok(res) => Ok(Some(res)),
-                    }?;
+                        }
+                        super::UrlValidationError::NoEnvValue(env_var) => Err(
+                            DatamodelError::new_environment_functional_evaluation_error(env_var, *span),
+                        ),
+                        super::UrlValidationError::NoUrlOrEnv => Ok(None),
+                    },
+                    Ok(res) => Ok(Some(res)),
+                }?;
 
                 has_direct_url = true;
 

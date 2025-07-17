@@ -1,4 +1,4 @@
-use crate::{ast, Field};
+use crate::{Field, ast};
 use psl::parser_database::CompositeTypeId;
 
 pub type CompositeType = crate::Zipper<CompositeTypeId>;

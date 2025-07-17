@@ -6,11 +6,11 @@ mod conversion;
 mod error;
 
 pub(crate) use crate::connector::mysql::MysqlUrl;
-use crate::connector::{timeout, ColumnType, DescribedColumn, DescribedParameter, DescribedQuery, IsolationLevel};
+use crate::connector::{ColumnType, DescribedColumn, DescribedParameter, DescribedQuery, IsolationLevel, timeout};
 
 use crate::{
     ast::{Query, Value},
-    connector::{metrics, queryable::*, ResultSet},
+    connector::{ResultSet, metrics, queryable::*},
     error::{Error, ErrorKind},
     visitor::{self, Visitor},
 };
@@ -46,7 +46,7 @@ impl MysqlUrl {
             .db_name(self.dbname());
 
         match self.socket() {
-            Some(ref socket) => {
+            Some(socket) => {
                 config = config.socket(Some(socket));
             }
             None => {

@@ -17,7 +17,7 @@ use self::{cockroachdb::*, mongodb::*, mssql::*, mysql::*, postgres::*};
 use driver_adapters::DriverAdapter;
 use enumflags2::BitFlags;
 use providers::Provider;
-use psl::{builtin_connectors::*, Datasource};
+use psl::{Datasource, builtin_connectors::*};
 use schema_core::schema_connector::{ConnectorResult, SchemaConnector, SchemaDialect, SchemaFilter};
 use std::env;
 
@@ -32,7 +32,7 @@ where
 {
     #[allow(async_fn_in_trait)]
     async fn init_with_migration(&self, script: String)
-        -> Result<InitResult, Box<dyn std::error::Error + Send + Sync>>;
+    -> Result<InitResult, Box<dyn std::error::Error + Send + Sync>>;
 
     #[allow(async_fn_in_trait)]
     async fn init(&self) -> Result<InitResult, Box<dyn std::error::Error + Send + Sync>>;

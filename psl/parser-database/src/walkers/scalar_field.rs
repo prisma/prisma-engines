@@ -1,10 +1,10 @@
 use std::fmt;
 
 use crate::{
+    OperatorClass, ParserDatabase, ScalarFieldId, ScalarFieldType,
     ast::{self, WithName},
     types::{DefaultAttribute, FieldWithArgs, OperatorClassStore, ScalarField, ScalarType, SortOrder},
     walkers::*,
-    OperatorClass, ParserDatabase, ScalarFieldId, ScalarFieldType,
 };
 use diagnostics::Span;
 use either::Either;

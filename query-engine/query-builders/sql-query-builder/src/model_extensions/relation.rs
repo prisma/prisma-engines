@@ -1,9 +1,9 @@
 use crate::{
-    model_extensions::{AsColumns, AsTable, ColumnIterator},
     Context,
+    model_extensions::{AsColumns, AsTable, ColumnIterator},
 };
 use quaint::{ast::Table, prelude::Column};
-use query_structure::{walkers, ModelProjection, Relation, RelationField};
+use query_structure::{ModelProjection, Relation, RelationField, walkers};
 
 pub trait RelationFieldExt {
     fn m2m_column(&self, ctx: &Context<'_>) -> Column<'static>;

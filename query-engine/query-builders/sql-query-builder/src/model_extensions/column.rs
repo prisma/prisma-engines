@@ -1,4 +1,4 @@
-use crate::{model_extensions::ScalarFieldExt, Context};
+use crate::{Context, model_extensions::ScalarFieldExt};
 use itertools::Itertools;
 use quaint::ast::Column;
 use query_structure::{Field, ModelProjection, RelationField, ScalarField};
@@ -55,8 +55,8 @@ pub trait AsColumn {
 impl AsColumns for Field {
     fn as_columns(&self, ctx: &Context<'_>) -> ColumnIterator {
         match self {
-            Field::Scalar(ref sf) => ColumnIterator::from(vec![sf.as_column(ctx)]),
-            Field::Relation(ref rf) => rf.as_columns(ctx),
+            Field::Scalar(sf) => ColumnIterator::from(vec![sf.as_column(ctx)]),
+            Field::Relation(rf) => rf.as_columns(ctx),
             Field::Composite(_) => unimplemented!(),
         }
     }

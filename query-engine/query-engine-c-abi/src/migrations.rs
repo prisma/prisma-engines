@@ -1,9 +1,9 @@
 use indoc::indoc;
-use query_engine_common::error::ApiError;
 use query_engine_common::Result;
+use query_engine_common::error::ApiError;
 use rusqlite::Connection;
 use std::{
-    fs::{read_dir, DirEntry},
+    fs::{DirEntry, read_dir},
     path::{Path, PathBuf},
 };
 

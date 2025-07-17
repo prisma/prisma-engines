@@ -1,7 +1,7 @@
 use crate::{ParserDatabase, ValidatedSchema};
 use diagnostics::FileId;
 use parser_database::{ast::WithSpan, walkers};
-use schema_ast::{ast, SourceFile};
+use schema_ast::{SourceFile, ast};
 use std::{borrow::Cow, collections::HashMap};
 
 /// Returns either the reformatted schema, or the original input if we can't reformat. This happens
@@ -76,11 +76,7 @@ impl MagicReformatCtx<'_> {
 
     fn get_missing_bits(&self, file_id: FileId) -> Option<&Vec<MissingBit>> {
         let bits_vec = self.missing_bits_map.get(&file_id)?;
-        if bits_vec.is_empty() {
-            None
-        } else {
-            Some(bits_vec)
-        }
+        if bits_vec.is_empty() { None } else { Some(bits_vec) }
     }
 
     fn sort_missing_bits(&mut self) {

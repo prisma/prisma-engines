@@ -1,6 +1,7 @@
 use super::group_by_builder::*;
 
 use crate::{
+    BsonTransform, IntoBson,
     constants::*,
     cursor::{CursorBuilder, CursorData},
     filter::{FilterPrefix, MongoFilterVisitor},
@@ -8,11 +9,11 @@ use crate::{
     orderby::OrderByBuilder,
     query_strings::Aggregate,
     root_queries::observing,
-    vacuum_cursor, BsonTransform, IntoBson,
+    vacuum_cursor,
 };
-use bson::{doc, Document};
+use bson::{Document, doc};
 use itertools::Itertools;
-use mongodb::{options::AggregateOptions, ClientSession, Collection};
+use mongodb::{ClientSession, Collection, options::AggregateOptions};
 use query_structure::{
     AggregationSelection, FieldSelection, Filter, Model, QueryArguments, ScalarFieldRef, Take, VirtualSelection,
 };
@@ -453,11 +454,7 @@ impl MongoReadQueryBuilder {
 }
 
 fn skip(skip: Option<u64>, ignore: bool) -> Option<u64> {
-    if ignore {
-        None
-    } else {
-        skip
-    }
+    if ignore { None } else { skip }
 }
 
 fn take(take: Take, ignore: bool) -> Option<i64> {

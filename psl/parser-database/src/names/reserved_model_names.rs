@@ -1,6 +1,6 @@
 use crate::{
-    ast::{self, WithName, WithSpan},
     DatamodelError, Diagnostics,
+    ast::{self, WithName, WithSpan},
 };
 
 /// Is this a valid type name for the Prisma Client API?

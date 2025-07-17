@@ -1,4 +1,4 @@
-use crate::ast::{traits::WithSpan, CompositeType, Enum, GeneratorConfig, Identifier, Model, SourceConfig, Span};
+use crate::ast::{CompositeType, Enum, GeneratorConfig, Identifier, Model, SourceConfig, Span, traits::WithSpan};
 
 use super::WithDocumentation;
 
@@ -83,7 +83,7 @@ impl Top {
     /// Try to interpret the item as a generator block.
     pub fn as_generator(&self) -> Option<&GeneratorConfig> {
         match self {
-            Top::Generator(gen) => Some(gen),
+            Top::Generator(generator) => Some(generator),
             _ => None,
         }
     }
@@ -104,7 +104,7 @@ impl WithSpan for Top {
             Top::Enum(en) => en.span(),
             Top::Model(model) => model.span(),
             Top::Source(source) => source.span(),
-            Top::Generator(gen) => gen.span(),
+            Top::Generator(generator) => generator.span(),
         }
     }
 }

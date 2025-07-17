@@ -255,8 +255,12 @@ impl crate::UserFacingError for ProviderSwitchedError {
         let expected_provider = &self.expected_provider;
 
         match (provider.as_str(), expected_provider.as_str()) {
-            ("cockroachdb", "postgresql") => format!("The datasource provider `{provider}` specified in your schema does not match the one specified in the migration_lock.toml, `{expected_provider}`. Check out the following documentation for how to resolve this: https://pris.ly/d/cockroachdb-postgresql-provider"),
-            _ => format!("The datasource provider `{provider}` specified in your schema does not match the one specified in the migration_lock.toml, `{expected_provider}`. Please remove your current migration directory and start a new migration history with prisma migrate dev. Read more: https://pris.ly/d/migrate-provider-switch")
+            ("cockroachdb", "postgresql") => format!(
+                "The datasource provider `{provider}` specified in your schema does not match the one specified in the migration_lock.toml, `{expected_provider}`. Check out the following documentation for how to resolve this: https://pris.ly/d/cockroachdb-postgresql-provider"
+            ),
+            _ => format!(
+                "The datasource provider `{provider}` specified in your schema does not match the one specified in the migration_lock.toml, `{expected_provider}`. Please remove your current migration directory and start a new migration history with prisma migrate dev. Read more: https://pris.ly/d/migrate-provider-switch"
+            ),
         }
     }
 }

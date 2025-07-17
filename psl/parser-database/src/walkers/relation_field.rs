@@ -1,8 +1,8 @@
 use crate::{
+    ReferentialAction,
     ast::{self, FieldArity},
     types::{RelationField, RelationFieldId},
     walkers::*,
-    ReferentialAction,
 };
 use std::{
     borrow::Cow,

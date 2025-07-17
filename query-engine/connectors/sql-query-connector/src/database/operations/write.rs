@@ -1,7 +1,7 @@
 use super::update::*;
 use crate::row::ToSqlRow;
 use crate::value::to_prisma_value;
-use crate::{error::SqlError, QueryExt, Queryable};
+use crate::{QueryExt, Queryable, error::SqlError};
 use itertools::Itertools;
 use quaint::prelude::ResultSet;
 use quaint::{
@@ -10,7 +10,7 @@ use quaint::{
 };
 use query_structure::*;
 use sql_query_builder::write::defaults_for_mysql_write_args;
-use sql_query_builder::{column_metadata, write, Context, SelectionResultExt, SqlTraceComment};
+use sql_query_builder::{Context, SelectionResultExt, SqlTraceComment, column_metadata, write};
 use std::borrow::Cow;
 use std::collections::HashMap;
 use user_facing_errors::query_engine::DatabaseConstraint;
@@ -325,7 +325,10 @@ pub(crate) async fn delete_record(
     let result_row = result_iter.next().ok_or(SqlError::RecordDoesNotExist {
         cause: "No record was found for a delete.".to_owned(),
     })?;
-    debug_assert!(result_iter.next().is_none(), "Filter returned more than one row. This is a bug because we must always require `id` in filters for `deleteOne` mutations");
+    debug_assert!(
+        result_iter.next().is_none(),
+        "Filter returned more than one row. This is a bug because we must always require `id` in filters for `deleteOne` mutations"
+    );
 
     let field_db_names: Vec<_> = selected_fields.db_names().collect();
     let types_and_arities = selected_fields.type_identifiers_with_arities();
@@ -402,7 +405,7 @@ fn try_convert(model_projection: &ModelProjection, result_set: ResultSet) -> cra
                         name: columns[i].clone(),
                         container_type: "model",
                         container_name: String::from("unspecified"),
-                    }))
+                    }));
                 }
             }
         }

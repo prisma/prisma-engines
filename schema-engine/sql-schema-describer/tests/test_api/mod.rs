@@ -2,13 +2,12 @@ pub use expect_test::expect;
 pub use indoc::{formatdoc, indoc};
 pub use quaint::{prelude::Queryable, single::Quaint};
 pub use test_macros::test_connector;
-pub use test_setup::{runtime::run_with_thread_local_runtime as tok, BitFlags, Tags};
+pub use test_setup::{BitFlags, Tags, runtime::run_with_thread_local_runtime as tok};
 
 use quaint::prelude::SqlFamily;
 use sql_schema_describer::{
-    mysql, postgres,
+    ColumnTypeFamily, DescriberError, ForeignKeyAction, SqlSchema, SqlSchemaDescriberBackend, mysql, postgres,
     walkers::{ForeignKeyWalker, IndexWalker, TableColumnWalker, TableWalker},
-    ColumnTypeFamily, DescriberError, ForeignKeyAction, SqlSchema, SqlSchemaDescriberBackend,
 };
 use std::future::Future;
 use test_setup::*;

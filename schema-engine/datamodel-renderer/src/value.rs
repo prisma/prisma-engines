@@ -14,7 +14,7 @@ pub use env::Env;
 pub use function::{Function, FunctionParam};
 pub use text::Text;
 
-use crate::{datamodel::IndexOps, Cow};
+use crate::{Cow, datamodel::IndexOps};
 use base64::display::Base64Display;
 use psl::GeneratorConfigValue;
 use std::fmt;

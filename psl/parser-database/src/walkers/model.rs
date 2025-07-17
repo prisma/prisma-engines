@@ -8,14 +8,14 @@ pub use shard_key::*;
 pub(crate) use unique_criteria::*;
 
 use super::{
-    newline, CompleteInlineRelationWalker, FieldWalker, IndexWalker, InlineRelationWalker, RelationFieldWalker,
-    RelationWalker, ScalarFieldWalker,
+    CompleteInlineRelationWalker, FieldWalker, IndexWalker, InlineRelationWalker, RelationFieldWalker, RelationWalker,
+    ScalarFieldWalker, newline,
 };
 
 use crate::{
+    FileId,
     ast::{self, IndentationType, NewlineType, WithName, WithSpan},
     types::ModelAttributes,
-    FileId,
 };
 
 /// A `model` declaration in the Prisma schema.

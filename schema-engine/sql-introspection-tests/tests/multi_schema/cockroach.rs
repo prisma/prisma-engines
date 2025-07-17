@@ -1,4 +1,4 @@
-use sql_introspection_tests::{test_api::*, TestResult};
+use sql_introspection_tests::{TestResult, test_api::*};
 
 #[test_connector(tags(CockroachDb), preview_features("multiSchema"), namespaces("first", "second"))]
 async fn multiple_schemas_w_tables_are_reintrospected(api: &mut TestApi) -> TestResult {

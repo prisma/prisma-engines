@@ -10,7 +10,7 @@ pub fn value_to_js_arg(value: &quaint::Value) -> serde_json::Result<JSArg> {
         quaint::ValueType::Json(Some(s)) => JSArg::Value(JsonValue::String(serde_json::to_string(s)?)),
         quaint::ValueType::Bytes(Some(bytes)) => JSArg::Buffer(bytes.to_vec()),
         quaint::ValueType::Int32(Some(value)) => JSArg::SafeInt(*value),
-        quaint::ValueType::Array(Some(ref items)) => JSArg::Array(
+        quaint::ValueType::Array(Some(items)) => JSArg::Array(
             items
                 .iter()
                 .map(value_to_js_arg)
@@ -26,9 +26,9 @@ pub fn value_to_js_arg(value: &quaint::Value) -> serde_json::Result<JSArg> {
 #[cfg(test)]
 mod test {
     use super::*;
+    use quaint::ValueType;
     use quaint::bigdecimal::BigDecimal;
     use quaint::chrono::*;
-    use quaint::ValueType;
     use serde_json::Value;
     use std::str::FromStr;
 

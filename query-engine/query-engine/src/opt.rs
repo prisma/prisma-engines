@@ -1,6 +1,6 @@
-use crate::{error::PrismaError, PrismaResult};
+use crate::{PrismaResult, error::PrismaError};
 use base64::prelude::*;
-use psl::{parser_database::Files, SourceFile};
+use psl::{SourceFile, parser_database::Files};
 use query_core::protocol::EngineProtocol;
 use serde::Deserialize;
 use std::{env, ffi::OsStr, fs::File, io::Read, sync::Arc};

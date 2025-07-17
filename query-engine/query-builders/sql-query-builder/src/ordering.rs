@@ -1,4 +1,4 @@
-use crate::{join_utils::*, model_extensions::*, Context};
+use crate::{Context, join_utils::*, model_extensions::*};
 use itertools::Itertools;
 use psl::{datamodel_connector::ConnectorCapability, reachable_only_with_capability};
 use quaint::ast::*;

@@ -1,8 +1,8 @@
 use crate::{constants::*, output_meta, query_builder::MongoReadQueryBuilder, value::value_from_bson};
 
 use connector_interface::*;
-use mongodb::{bson::Document, ClientSession, Database};
-use query_structure::{prelude::*, AggregationSelection, Filter, QueryArguments};
+use mongodb::{ClientSession, Database, bson::Document};
+use query_structure::{AggregationSelection, Filter, QueryArguments, prelude::*};
 
 pub async fn aggregate(
     database: &Database,

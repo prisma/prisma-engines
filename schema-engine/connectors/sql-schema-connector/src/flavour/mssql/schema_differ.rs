@@ -2,12 +2,12 @@ use crate::{
     migration_pair::MigrationPair,
     sql_migration::SqlMigrationStep,
     sql_schema_differ::{
-        column::ColumnTypeChange, differ_database::DifferDatabase, table::TableDiffer, ColumnChanges,
-        SqlSchemaDifferFlavour,
+        ColumnChanges, SqlSchemaDifferFlavour, column::ColumnTypeChange, differ_database::DifferDatabase,
+        table::TableDiffer,
     },
 };
 use psl::builtin_connectors::{MsSqlType, MsSqlTypeParameter};
-use sql_schema_describer::{self as sql, mssql::MssqlSchemaExt, ColumnTypeFamily, TableColumnId};
+use sql_schema_describer::{self as sql, ColumnTypeFamily, TableColumnId, mssql::MssqlSchemaExt};
 
 #[derive(Debug, Default)]
 pub struct MssqlSchemaDifferFlavour;

@@ -1,5 +1,5 @@
 use crate::introspection::test_api::*;
-use bson::{doc, Bson, DateTime, Timestamp};
+use bson::{Bson, DateTime, Timestamp, doc};
 
 #[test]
 fn explicit_id_field() {

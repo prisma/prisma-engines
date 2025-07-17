@@ -5,8 +5,8 @@ pub use error::*;
 use std::str::FromStr;
 
 use mongodb::{
-    options::{ClientOptions, DriverInfo, ResolverConfig},
     Client,
+    options::{ClientOptions, DriverInfo, ResolverConfig},
 };
 
 /// A wrapper to create a new MongoDB client. Please remove me when we do not

@@ -1,7 +1,7 @@
 use crate::{
+    Datasource, PreviewFeature,
     builtin_connectors::has_capability,
     datamodel_connector::{Connector, ConnectorCapability, RelationMode},
-    Datasource, PreviewFeature,
 };
 use diagnostics::{DatamodelError, DatamodelWarning, Diagnostics};
 use enumflags2::BitFlags;

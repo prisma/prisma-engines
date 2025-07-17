@@ -1,4 +1,4 @@
-use crate::{parent_container::ParentContainer, CompositeType};
+use crate::{CompositeType, parent_container::ParentContainer};
 use psl::{
     parser_database::{self as db, ScalarFieldId},
     schema_ast::ast::{self, FieldArity},

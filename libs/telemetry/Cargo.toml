@@ -1,5 +1,5 @@
 [package]
-edition = "2021"
+edition.workspace = true
 name = "telemetry"
 version = "0.1.0"
 

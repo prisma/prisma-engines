@@ -4,20 +4,20 @@ mod renderer;
 mod schema_calculator;
 mod schema_differ;
 
-use crate::{sql_destructive_change_checker, sql_renderer::SqlRenderer, SqlConnector};
+use crate::{SqlConnector, sql_destructive_change_checker, sql_renderer::SqlRenderer};
 use connection_string::JdbcString;
 #[cfg(feature = "mssql-native")]
-use connector::{generic_apply_migration_script, shadow_db, Connection};
+use connector::{Connection, generic_apply_migration_script, shadow_db};
 #[cfg(not(feature = "mssql-native"))]
-use connector::{generic_apply_migration_script, shadow_db, Connection};
+use connector::{Connection, generic_apply_migration_script, shadow_db};
 use destructive_change_checker::MssqlDestructiveChangeCheckerFlavour;
 use indoc::formatdoc;
 use quaint::{connector::MssqlUrl, prelude::Table};
 use renderer::MssqlRenderer;
 use schema_calculator::MssqlSchemaCalculatorFlavour;
 use schema_connector::{
-    migrations_directory::MigrationDirectory, BoxFuture, ConnectorError, ConnectorParams, ConnectorResult, Namespaces,
-    SchemaFilter,
+    BoxFuture, ConnectorError, ConnectorParams, ConnectorResult, Namespaces, SchemaFilter,
+    migrations_directory::MigrationDirectory,
 };
 use schema_differ::MssqlSchemaDifferFlavour;
 use sql_schema_describer::SqlSchema;

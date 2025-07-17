@@ -109,7 +109,7 @@ fn filter_create_many_fields<'a>(
     ctx: &'a QuerySchema,
     model: &'a Model,
     parent_field: Option<RelationFieldRef>,
-) -> impl Iterator<Item = ModelField> + 'a {
+) -> impl Iterator<Item = ModelField> + use<'a> {
     let linking_fields = if let Some(parent_field) = parent_field {
         let child_field = parent_field.related_field();
         if child_field.is_inlined_on_enclosing_model() {

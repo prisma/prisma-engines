@@ -24,12 +24,12 @@ pub(crate) mod warning_check;
 pub(crate) use destructive_change_checker_flavour::DestructiveChangeCheckerFlavour;
 
 use crate::{
-    sql_migration::{AlterEnum, AlterTable, ColumnTypeChange, SqlMigrationStep, TableChange},
     SqlMigration, SqlSchemaConnector,
+    sql_migration::{AlterEnum, AlterTable, ColumnTypeChange, SqlMigrationStep, TableChange},
 };
 use destructive_check_plan::DestructiveCheckPlan;
 use schema_connector::{BoxFuture, ConnectorResult, DestructiveChangeChecker, DestructiveChangeDiagnostics, Migration};
-use sql_schema_describer::{walkers::TableColumnWalker, ColumnArity};
+use sql_schema_describer::{ColumnArity, walkers::TableColumnWalker};
 use unexecutable_step_check::UnexecutableStepCheck;
 use warning_check::SqlMigrationWarningCheck;
 

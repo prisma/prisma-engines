@@ -5,8 +5,8 @@ mod sqlite;
 use barrel::types;
 use enumflags2::BitFlags;
 use expect_test::expect;
-use sql_introspection_tests::test_api::*;
 use sql_introspection_tests::TestResult;
+use sql_introspection_tests::test_api::*;
 use test_macros::test_connector;
 
 #[test_connector(exclude(Mysql, Mssql, Sqlite, CockroachDb))]

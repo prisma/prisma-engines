@@ -2,8 +2,8 @@ use crate::CoreResult;
 use commands::{DiagnoseMigrationHistoryOutput, DriftDiagnostic, MigrationSchemaCache};
 pub use json_rpc::types::{DiagnoseMigrationHistoryInput, HistoryDiagnostic};
 use schema_connector::{
-    migrations_directory::{error_on_changed_provider, list_migrations, MigrationDirectory},
     ConnectorError, MigrationRecord, Namespaces, PersistenceNotInitializedError, SchemaConnector, SchemaFilter,
+    migrations_directory::{MigrationDirectory, error_on_changed_provider, list_migrations},
 };
 
 /// Read the contents of the migrations directory and the migrations table, and

@@ -171,9 +171,11 @@ fn update_operations_object_type<'a>(
     obj.require_exactly_one_field();
     obj.set_fields(move || {
         let typ = map_scalar_input_type_for_field(ctx, &sf);
-        let mut fields = vec![simple_input_field(operations::SET, typ.clone(), None)
-            .optional()
-            .nullable_if(!sf.is_required())];
+        let mut fields = vec![
+            simple_input_field(operations::SET, typ.clone(), None)
+                .optional()
+                .nullable_if(!sf.is_required()),
+        ];
 
         if with_number_operators {
             fields.push(simple_input_field(operations::INCREMENT, typ.clone(), None).optional());

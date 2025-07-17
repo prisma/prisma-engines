@@ -1,7 +1,7 @@
 use query_structure::IntoFilter;
 
-use super::{expression::*, Env, ExpressionResult, InterpretationResult, InterpreterError};
-use crate::{query_graph::*, Query};
+use super::{Env, ExpressionResult, InterpretationResult, InterpreterError, expression::*};
+use crate::{Query, query_graph::*};
 use std::{
     collections::{HashSet, VecDeque},
     convert::TryInto,

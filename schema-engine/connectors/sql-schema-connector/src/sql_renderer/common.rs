@@ -90,11 +90,7 @@ where
 }
 
 pub fn render_nullability(column: TableColumnWalker<'_>) -> &'static str {
-    if column.arity().is_required() {
-        " NOT NULL"
-    } else {
-        ""
-    }
+    if column.arity().is_required() { " NOT NULL" } else { "" }
 }
 
 pub fn render_referential_action(action: ForeignKeyAction) -> &'static str {

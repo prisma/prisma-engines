@@ -1,6 +1,6 @@
 use psl::parser_database::IndexAlgorithm;
 
-use crate::{common::*, with_header, Provider};
+use crate::{Provider, common::*, with_header};
 
 #[test]
 fn array_field_default_ops() {

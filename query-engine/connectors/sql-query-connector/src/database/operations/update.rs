@@ -5,7 +5,7 @@ use crate::{QueryExt, Queryable};
 
 use itertools::Itertools;
 use query_structure::*;
-use sql_query_builder::{column_metadata, update, ColumnMetadata, Context};
+use sql_query_builder::{ColumnMetadata, Context, column_metadata, update};
 
 /// Performs an update with an explicit selection set.
 /// This function is called for connectors that supports the `UpdateReturning` capability.

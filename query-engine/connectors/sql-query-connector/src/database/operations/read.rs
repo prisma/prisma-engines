@@ -11,9 +11,8 @@ use quaint::ast::*;
 use query_builder::QueryArgumentsExt;
 use query_structure::*;
 use sql_query_builder::{
-    column_metadata,
+    AsColumns, AsTable, Context, RelationFieldExt, column_metadata,
     read::{self, no_alias},
-    AsColumns, AsTable, Context, RelationFieldExt,
 };
 
 pub(crate) async fn get_single_record(

@@ -1,13 +1,13 @@
 use super::catch;
-use crate::{database::operations::*, SqlError};
+use crate::{SqlError, database::operations::*};
 use async_trait::async_trait;
 use connector::ConnectionLike;
 use connector_interface::{self as connector, AggregationRow, ReadOperations, Transaction, WriteOperations};
 use prisma_value::PrismaValue;
 use quaint::prelude::ConnectionInfo;
 use query_structure::{
-    prelude::*, AggregationSelection, Filter, QueryArguments, RecordFilter, RelationLoadStrategy, SelectionResult,
-    WriteArgs,
+    AggregationSelection, Filter, QueryArguments, RecordFilter, RelationLoadStrategy, SelectionResult, WriteArgs,
+    prelude::*,
 };
 use sql_query_builder::Context;
 use std::collections::HashMap;

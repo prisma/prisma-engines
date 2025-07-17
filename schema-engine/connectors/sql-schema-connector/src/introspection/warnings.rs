@@ -7,7 +7,7 @@ mod view;
 
 use crate::introspection::datamodel_calculator::DatamodelCalculatorContext;
 use psl::PreviewFeature;
-use schema_connector::{warnings::Model, Warnings};
+use schema_connector::{Warnings, warnings::Model};
 
 use super::introspection_pair::RelationFieldDirection;
 

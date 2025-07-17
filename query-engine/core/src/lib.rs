@@ -13,7 +13,7 @@ pub mod response_ir;
 
 pub use self::{
     error::{CoreError, ExtendedUserFacingError, FieldConversionError},
-    executor::{with_sync_unevaluated_request_context, QueryExecutor, TransactionOptions},
+    executor::{QueryExecutor, TransactionOptions, with_sync_unevaluated_request_context},
     interactive_transactions::{TransactionError, TxId},
     query_ast::*,
     query_document::*,
@@ -22,8 +22,8 @@ pub use self::{
 };
 
 pub use connector::{
-    error::{ConnectorError, ErrorKind as ConnectorErrorKind},
     Connector,
+    error::{ConnectorError, ErrorKind as ConnectorErrorKind},
 };
 
 mod error;

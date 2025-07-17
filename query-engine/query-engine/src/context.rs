@@ -1,15 +1,15 @@
 use crate::features::{EnabledFeatures, Feature};
-use crate::{logger::Logger, opt::PrismaOpt};
 use crate::{PrismaError, PrismaResult};
+use crate::{logger::Logger, opt::PrismaOpt};
 use prisma_metrics::{MetricRecorder, MetricRegistry};
 use psl::PreviewFeature;
 use query_core::{
+    QueryExecutor,
     protocol::EngineProtocol,
     relation_load_strategy,
     schema::{self, QuerySchemaRef},
-    QueryExecutor,
 };
-use request_handlers::{load_executor, ConnectorKind};
+use request_handlers::{ConnectorKind, load_executor};
 use std::{env, fmt, sync::Arc};
 use telemetry::exporter::{CaptureSettings, CaptureTarget};
 use telemetry::{NextId, RequestId};

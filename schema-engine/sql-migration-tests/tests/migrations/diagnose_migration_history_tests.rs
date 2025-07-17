@@ -6,7 +6,7 @@ use schema_core::{
 };
 use sql_migration_tests::{test_api::*, utils::list_migrations};
 use std::io::Write;
-use user_facing_errors::{schema_engine::ShadowDbCreationError, UserFacingError};
+use user_facing_errors::{UserFacingError, schema_engine::ShadowDbCreationError};
 
 #[test_connector]
 fn diagnose_migrations_history_on_an_empty_database_without_migration_returns_nothing(api: TestApi) {

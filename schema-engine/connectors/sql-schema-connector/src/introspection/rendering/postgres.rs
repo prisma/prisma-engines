@@ -2,8 +2,8 @@
 
 use crate::introspection::sanitize_datamodel_names::{needs_sanitation, sanitize_string};
 use datamodel_renderer as render;
-use psl::{builtin_connectors::PostgresDatasourceProperties, Configuration, PreviewFeature};
-use sql_schema_describer::{postgres::PostgresSchemaExt, SqlSchema};
+use psl::{Configuration, PreviewFeature, builtin_connectors::PostgresDatasourceProperties};
+use sql_schema_describer::{SqlSchema, postgres::PostgresSchemaExt};
 
 const EXTENSION_ALLOW_LIST: &[&str] = &["citext", "postgis", "pg_crypto", "uuid-ossp"];
 

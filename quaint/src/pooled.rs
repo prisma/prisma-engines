@@ -511,7 +511,7 @@ impl Quaint {
         let inner = match res {
             Ok(conn) => conn,
             Err(mobc::Error::PoolClosed) => {
-                return Err(Error::builder(ErrorKind::Native(NativeErrorKind::PoolClosed {})).build())
+                return Err(Error::builder(ErrorKind::Native(NativeErrorKind::PoolClosed {})).build());
             }
             Err(mobc::Error::Timeout) => {
                 let state = self.inner.state().await;

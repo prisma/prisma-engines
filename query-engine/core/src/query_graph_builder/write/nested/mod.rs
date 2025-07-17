@@ -9,8 +9,8 @@ mod upsert_nested;
 
 use super::*;
 use crate::{
-    query_graph::{NodeRef, QueryGraph},
     ParsedInputMap,
+    query_graph::{NodeRef, QueryGraph},
 };
 use connect_nested::*;
 use connect_or_create_nested::*;
@@ -18,7 +18,7 @@ use create_nested::*;
 use delete_nested::*;
 use disconnect_nested::*;
 use query_structure::RelationFieldRef;
-use schema::{constants::operations, QuerySchema};
+use schema::{QuerySchema, constants::operations};
 use set_nested::*;
 use update_nested::*;
 use upsert_nested::*;

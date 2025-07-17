@@ -40,7 +40,7 @@ mod tests {
 
     use std::sync::Arc;
 
-    use crate::{native_distinct_compatible_with_order_by, ScalarFieldRef};
+    use crate::{ScalarFieldRef, native_distinct_compatible_with_order_by};
 
     struct TestFields {
         a: ScalarFieldRef,

@@ -9,13 +9,13 @@ use crate::offsets::{position_after_span, range_to_span, span_to_range};
 use log::warn;
 use lsp_types::{CodeActionOrCommand, CodeActionParams, Diagnostic, Range, TextEdit, Url, WorkspaceEdit};
 use psl::{
+    PreviewFeature,
     diagnostics::Span,
     parser_database::{
-        walkers::{ModelWalker, RefinedRelationWalker, ScalarFieldWalker},
         SourceFile,
+        walkers::{ModelWalker, RefinedRelationWalker, ScalarFieldWalker},
     },
     schema_ast::ast::{self, Attribute, IndentationType, NewlineType, WithSpan},
-    PreviewFeature,
 };
 use std::collections::HashMap;
 

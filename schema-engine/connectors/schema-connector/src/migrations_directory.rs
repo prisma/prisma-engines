@@ -5,7 +5,7 @@
 //! It also contains multiple subfolders, named after the migration id, and each containing:
 //! - A migration script
 
-use crate::{checksum, ConnectorError, ConnectorResult};
+use crate::{ConnectorError, ConnectorResult, checksum};
 use json_rpc::types::MigrationLockfile;
 use std::{borrow::Borrow, error::Error, fmt::Display};
 use tracing_error::SpanTrace;

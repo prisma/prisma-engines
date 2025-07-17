@@ -1,7 +1,7 @@
 use either::Either;
 use sql_schema_describer::{
-    walkers::{IndexWalker, TableWalker},
     ForeignKeyWalker, IndexType,
+    walkers::{IndexWalker, TableWalker},
 };
 use std::iter;
 

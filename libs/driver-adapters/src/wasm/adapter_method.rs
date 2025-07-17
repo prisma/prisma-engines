@@ -106,6 +106,6 @@ where
     type Abi = <JsFunction as FromWasmAbi>::Abi;
 
     unsafe fn from_abi(js: Self::Abi) -> Self {
-        JsFunction::from_abi(js).into()
+        unsafe { JsFunction::from_abi(js) }.into()
     }
 }

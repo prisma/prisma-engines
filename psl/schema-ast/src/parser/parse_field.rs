@@ -1,9 +1,9 @@
 use super::{
-    helpers::{parsing_catch_all, Pair},
+    Rule,
+    helpers::{Pair, parsing_catch_all},
     parse_attribute::parse_attribute,
     parse_comments::*,
     parse_types::parse_field_type,
-    Rule,
 };
 use crate::ast::{self, *};
 use diagnostics::{DatamodelError, Diagnostics, FileId};
@@ -30,7 +30,7 @@ pub(crate) fn parse_field(
                 return Err(DatamodelError::new_legacy_parser_error(
                     "Field declarations don't require a `:`.",
                     (file_id, current.as_span()).into(),
-                ))
+                ));
             }
             Rule::field_attribute => attributes.push(parse_attribute(current, diagnostics, file_id)),
             Rule::trailing_comment => {

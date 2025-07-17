@@ -1,12 +1,12 @@
 use crate::{
-    configuration::{EnvFunction, StringFromEnvVar},
     PreviewFeature,
+    configuration::{EnvFunction, StringFromEnvVar},
 };
 use diagnostics::{Diagnostics, Span};
 use enumflags2::BitFlags;
 use parser_database::ast::Expression;
 use schema_ast::ast::WithSpan;
-use serde::{ser::SerializeSeq, Serialize, Serializer};
+use serde::{Serialize, Serializer, ser::SerializeSeq};
 use std::collections::HashMap;
 
 #[derive(Debug, Serialize, Clone)]

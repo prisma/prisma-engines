@@ -21,7 +21,7 @@ use schema_connector::{ConnectorParams, SchemaConnector};
 use sql_schema_connector::SqlSchemaConnector;
 use std::fmt::Write;
 use std::path::PathBuf;
-use test_setup::{sqlite_test_url, DatasourceBlock, TestApiArgs};
+use test_setup::{DatasourceBlock, TestApiArgs, sqlite_test_url};
 use tracing::Instrument;
 
 pub struct TestApi {

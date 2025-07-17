@@ -1,8 +1,8 @@
 use std::time::{Duration, Instant};
 
 use mongodb::{
-    error::{CommandError, ErrorKind, Result, TRANSIENT_TRANSACTION_ERROR, UNKNOWN_TRANSACTION_COMMIT_RESULT},
     ClientSession,
+    error::{CommandError, ErrorKind, Result, TRANSIENT_TRANSACTION_ERROR, UNKNOWN_TRANSACTION_COMMIT_RESULT},
 };
 
 // As suggested by the MongoDB documentation

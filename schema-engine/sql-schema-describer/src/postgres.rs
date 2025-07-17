@@ -16,7 +16,7 @@ use psl::{
     builtin_connectors::{CockroachType, PostgresType},
     datamodel_connector::NativeTypeInstance,
 };
-use quaint::{connector::ResultRow, prelude::Queryable, Value};
+use quaint::{Value, connector::ResultRow, prelude::Queryable};
 use regex::Regex;
 use std::{
     any::type_name,
@@ -521,7 +521,7 @@ impl AsRef<str> for SQLOperatorClassKind {
             SQLOperatorClassKind::UuidBloomOps => "uuid_bloom_ops",
             SQLOperatorClassKind::UuidMinMaxOps => "uuid_minmax_ops",
             SQLOperatorClassKind::UuidMinMaxMultiOps => "uuid_minmax_multi_ops",
-            SQLOperatorClassKind::Raw(ref c) => c,
+            SQLOperatorClassKind::Raw(c) => c,
         }
     }
 }

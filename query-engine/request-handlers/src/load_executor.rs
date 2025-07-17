@@ -1,8 +1,8 @@
 #![allow(unused_imports)]
 
-use psl::{builtin_connectors::*, Datasource, PreviewFeatures};
+use psl::{Datasource, PreviewFeatures, builtin_connectors::*};
 use quaint::connector::ExternalConnector;
-use query_core::{executor::InterpretingExecutor, Connector, QueryExecutor};
+use query_core::{Connector, QueryExecutor, executor::InterpretingExecutor};
 #[cfg(feature = "sql")]
 use sql_query_connector::*;
 use std::collections::HashMap;

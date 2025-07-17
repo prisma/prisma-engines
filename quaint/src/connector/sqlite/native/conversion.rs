@@ -3,15 +3,15 @@ use std::convert::TryFrom;
 use crate::{
     ast::{Value, ValueType},
     connector::{
-        queryable::{GetRow, ToColumnNames},
         TypeIdentifier,
+        queryable::{GetRow, ToColumnNames},
     },
     error::{Error, ErrorKind},
 };
 
 use rusqlite::{
-    types::{Null, ToSql, ToSqlOutput, ValueRef},
     Column, Error as RusqlError, Row as SqliteRow, Rows as SqliteRows,
+    types::{Null, ToSql, ToSqlOutput, ValueRef},
 };
 
 use chrono::TimeZone;
@@ -181,7 +181,11 @@ impl GetRow for SqliteRow<'_> {
                             if let Ok(converted) = i32::try_from(i) {
                                 Value::int32(converted)
                             } else {
-                                let msg = format!("Value {} does not fit in an INT column, try migrating the '{}' column type to BIGINT", i, c.name());
+                                let msg = format!(
+                                    "Value {} does not fit in an INT column, try migrating the '{}' column type to BIGINT",
+                                    i,
+                                    c.name()
+                                );
                                 let kind = ErrorKind::conversion(msg);
 
                                 return Err(Error::builder(kind).build());

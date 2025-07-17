@@ -34,8 +34,8 @@ use enumflags2::BitFlags;
 use psl::{PreviewFeature, PreviewFeatures, ValidatedSchema};
 use quaint::prelude::{NativeConnectionInfo, Table};
 use schema_connector::{
-    migrations_directory::MigrationDirectory, BoxFuture, ConnectorError, ConnectorResult, IntrospectionContext,
-    MigrationRecord, Namespaces, PersistenceNotInitializedError, SchemaFilter,
+    BoxFuture, ConnectorError, ConnectorResult, IntrospectionContext, MigrationRecord, Namespaces,
+    PersistenceNotInitializedError, SchemaFilter, migrations_directory::MigrationDirectory,
 };
 use sql_schema_describer::SqlSchema;
 use std::fmt::Debug;

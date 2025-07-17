@@ -1,6 +1,6 @@
 use psl::parser_database::{IndexAlgorithm, OperatorClass};
 
-use crate::{common::*, with_header, Provider};
+use crate::{Provider, common::*, with_header};
 
 #[test]
 fn with_raw_unsupported() {

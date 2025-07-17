@@ -1,8 +1,7 @@
 use crate::{
-    ast,
+    ParserDatabase, ast,
     types::ShardKeyAttribute,
     walkers::{ModelWalker, ScalarFieldWalker},
-    ParserDatabase,
 };
 
 /// A `@shardKey`/`@@shardKey` attribute in the schema.

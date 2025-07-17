@@ -19,17 +19,17 @@ mod top;
 pub use crate::types::RelationFieldId;
 pub use composite_type::*;
 use diagnostics::Span;
+pub use r#enum::*;
 pub use field::*;
 pub use index::*;
 pub use model::*;
-pub use r#enum::*;
 pub use relation::*;
 pub use relation_field::*;
 pub use scalar_field::*;
 use schema_ast::ast::{NewlineType, WithSpan};
 pub use top::*;
 
-use crate::{ast, FileId, ModelId};
+use crate::{FileId, ModelId, ast};
 
 /// A generic walker. Only walkers intantiated with a concrete ID type (`I`) are useful.
 #[derive(Clone, Copy)]

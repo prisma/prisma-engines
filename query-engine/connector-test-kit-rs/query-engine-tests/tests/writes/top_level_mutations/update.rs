@@ -3,7 +3,7 @@ use query_engine_tests::*;
 #[test_suite]
 mod update {
     use indoc::indoc;
-    use query_engine_tests::{assert_error, run_query, run_query_json, TROUBLE_CHARS};
+    use query_engine_tests::{TROUBLE_CHARS, assert_error, run_query, run_query_json};
     use std::time::Duration;
     use tokio::time::sleep;
 
@@ -294,8 +294,8 @@ mod update {
         create_row(&runner, r#"{ id: 1, strField: "test", uniqField: "uniq"}"#).await?;
 
         assert_error!(
-          runner,
-          r#"mutation {
+            runner,
+            r#"mutation {
             updateOneTestModel(
               where: { uniqField: "doesn't exist" }
               data: { strField: { set: "updated" } }
@@ -303,8 +303,8 @@ mod update {
               id
             }
           }"#,
-          2025,
-          "An operation failed because it depends on one or more records that were required but not found. No record was found for an update."
+            2025,
+            "An operation failed because it depends on one or more records that were required but not found. No record was found for an update."
         );
 
         Ok(())

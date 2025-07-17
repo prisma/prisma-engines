@@ -12,7 +12,7 @@ mod migration_step_applier;
 mod sampler;
 mod schema_calculator;
 
-use client_wrapper::{mongo_error_to_connector_error, Client};
+use client_wrapper::{Client, mongo_error_to_connector_error};
 use enumflags2::BitFlags;
 use migration::MongoDbMigration;
 use mongodb_schema_describer::MongoSchema;

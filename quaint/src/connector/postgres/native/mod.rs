@@ -12,16 +12,16 @@ mod websocket;
 pub(crate) use crate::connector::postgres::url::PostgresNativeUrl;
 use crate::connector::postgres::url::{Hidden, SslAcceptMode, SslParams};
 use crate::connector::{
-    timeout, ColumnType, DescribedColumn, DescribedParameter, DescribedQuery, IsolationLevel, Transaction,
-    TransactionOptions,
+    ColumnType, DescribedColumn, DescribedParameter, DescribedQuery, IsolationLevel, Transaction, TransactionOptions,
+    timeout,
 };
 use crate::error::NativeErrorKind;
 
-use crate::prelude::DefaultTransaction;
 use crate::ValueType;
+use crate::prelude::DefaultTransaction;
 use crate::{
     ast::{Query, Value},
-    connector::{metrics, queryable::*, ResultSet},
+    connector::{ResultSet, metrics, queryable::*},
     error::{Error, ErrorKind},
     visitor::{self, Visitor},
 };
@@ -29,8 +29,8 @@ use async_trait::async_trait;
 pub use cache::QueryCache;
 use cache::{CacheSettings, NoOpCache, PreparedStatementLruCache, TracingLruCache};
 use column_type::PGColumnType;
-use futures::future::FutureExt;
 use futures::StreamExt;
+use futures::future::FutureExt;
 use native_tls::{Certificate, Identity, TlsConnector};
 use postgres_native_tls::MakeTlsConnector;
 use postgres_types::{Kind as PostgresKind, Type as PostgresType};
@@ -45,7 +45,7 @@ use std::{
 };
 use tokio::sync::OnceCell;
 use tokio::task::JoinHandle;
-use tokio_postgres::{config::ChannelBinding, Client, Config, Statement};
+use tokio_postgres::{Client, Config, Statement, config::ChannelBinding};
 use tracing_futures::WithSubscriber;
 use websocket::connect_via_websocket;
 
@@ -410,7 +410,7 @@ impl<Cache: QueryCache> PostgreSql<Cache> {
     /// and returns `None` for all others.
     /// All credits go to sqlx: https://github.com/launchbadge/sqlx/blob/a892ebc6e283f443145f92bbc7fce4ae44547331/sqlx-postgres/src/connection/describe.rs#L482
     async fn nullables_from_explain(&self, stmt: &Statement) -> Result<Vec<Option<bool>>, Error> {
-        use explain::{visit_plan, Explain, Plan};
+        use explain::{Explain, Plan, visit_plan};
 
         let mut explain = format!("EXPLAIN (VERBOSE, FORMAT JSON) EXECUTE {}", stmt.name());
         let params_len = stmt.params().len();
@@ -444,8 +444,7 @@ impl<Cache: QueryCache> PostgreSql<Cache> {
 
         if let Some(Explain::Plan {
             plan: plan @ Plan {
-                output: Some(ref outputs),
-                ..
+                output: Some(outputs), ..
             },
         }) = explain
         {
@@ -621,7 +620,9 @@ impl<Cache: QueryCache> Queryable for PostgreSql<Cache> {
             let (typ, enum_name) = resolve_type(col.type_(), &enums_results);
 
             if col.name() == "?column?" {
-                let kind = ErrorKind::QueryInvalidInput(format!("Invalid column name '?column?' for index {idx}. Your SQL query must explicitly alias that column name."));
+                let kind = ErrorKind::QueryInvalidInput(format!(
+                    "Invalid column name '?column?' for index {idx}. Your SQL query must explicitly alias that column name."
+                ));
 
                 return Err(Error::builder(kind).build());
             }
@@ -954,10 +955,10 @@ impl MakeTlsConnectorManager {
 #[cfg(test)]
 mod tests {
     use super::*;
-    pub(crate) use crate::connector::postgres::url::PostgresFlavour;
     use crate::connector::Queryable;
-    use crate::tests::test_api::postgres::CONN_STR;
+    pub(crate) use crate::connector::postgres::url::PostgresFlavour;
     use crate::tests::test_api::CRDB_CONN_STR;
+    use crate::tests::test_api::postgres::CONN_STR;
     use url::Url;
 
     #[tokio::test]

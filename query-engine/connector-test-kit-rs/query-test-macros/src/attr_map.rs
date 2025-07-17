@@ -1,7 +1,7 @@
-use darling::{ast::NestedMeta, ToTokens};
-use quote::{quote, TokenStreamExt};
+use darling::{ToTokens, ast::NestedMeta};
+use quote::{TokenStreamExt, quote};
 use std::{
-    collections::{hash_map, HashMap},
+    collections::{HashMap, hash_map},
     ops::{Deref, DerefMut},
 };
 

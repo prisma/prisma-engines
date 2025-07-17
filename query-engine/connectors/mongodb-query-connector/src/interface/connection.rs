@@ -1,13 +1,13 @@
 use super::catch;
 use crate::{
+    MongoDbTransaction,
     error::MongoError,
     root_queries::{aggregate, read, write},
-    MongoDbTransaction,
 };
 use async_trait::async_trait;
 use connector_interface::{Connection, ConnectionLike, ReadOperations, Transaction, UpdateType, WriteOperations};
 use mongodb::{ClientSession, Database};
-use query_structure::{prelude::*, RelationLoadStrategy, SelectionResult};
+use query_structure::{RelationLoadStrategy, SelectionResult, prelude::*};
 use std::collections::HashMap;
 use telemetry::TraceParent;
 

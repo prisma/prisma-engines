@@ -1,8 +1,8 @@
 use schema_core::{
-    commands::DiagnoseMigrationHistoryOutput,
-    commands::{diagnose_migration_history_cli, DiagnoseMigrationHistoryInput},
-    schema_connector::SchemaConnector,
     CoreError, CoreResult,
+    commands::DiagnoseMigrationHistoryOutput,
+    commands::{DiagnoseMigrationHistoryInput, diagnose_migration_history_cli},
+    schema_connector::SchemaConnector,
 };
 use tempfile::TempDir;
 

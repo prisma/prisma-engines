@@ -42,7 +42,7 @@ impl<'a> IrSerializer<'a> {
                                 return Err(CoreError::SerializationError(format!(
                                     "Query {} is required to return data, but found no record(s).",
                                     self.output_field.name()
-                                )))
+                                )));
                             }
                         }
                     }

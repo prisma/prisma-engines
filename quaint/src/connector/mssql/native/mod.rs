@@ -6,11 +6,11 @@ mod conversion;
 mod error;
 
 pub(crate) use crate::connector::mssql::MssqlUrl;
-use crate::connector::{timeout, DescribedQuery, IsolationLevel, Transaction, TransactionOptions};
+use crate::connector::{DescribedQuery, IsolationLevel, Transaction, TransactionOptions, timeout};
 
 use crate::{
     ast::{Query, Value},
-    connector::{metrics, queryable::*, ColumnType as QuaintColumnType, DefaultTransaction, ResultSet},
+    connector::{ColumnType as QuaintColumnType, DefaultTransaction, ResultSet, metrics, queryable::*},
     visitor::{self, Visitor},
 };
 use async_trait::async_trait;

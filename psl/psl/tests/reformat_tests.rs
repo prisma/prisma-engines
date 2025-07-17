@@ -43,7 +43,7 @@ fn reformat(s: &str) -> String {
 mod reformat_multi_file {
     use std::{collections::HashMap, fs, io::Write, path};
 
-    use psl::{reformat_multiple, SourceFile};
+    use psl::{SourceFile, reformat_multiple};
 
     use crate::panic_with_diff;
 

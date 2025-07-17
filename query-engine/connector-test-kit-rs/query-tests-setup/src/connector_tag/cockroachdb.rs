@@ -1,5 +1,5 @@
 use super::*;
-use crate::{datamodel_rendering::SqlDatamodelRenderer, BoxFuture};
+use crate::{BoxFuture, datamodel_rendering::SqlDatamodelRenderer};
 use psl::datamodel_connector::ConnectorCapabilities;
 use quaint::{prelude::Queryable, single::Quaint};
 

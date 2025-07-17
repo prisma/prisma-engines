@@ -1,7 +1,7 @@
 use lsp_types::{Diagnostic, DiagnosticSeverity};
 
 use prisma_fmt::offsets::span_to_range;
-use psl::{diagnostics::Span, SourceFile};
+use psl::{SourceFile, diagnostics::Span};
 use std::{fmt::Write as _, io::Write as _, path::PathBuf, sync::LazyLock};
 
 use crate::helpers::load_schema_files;

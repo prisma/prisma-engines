@@ -1,4 +1,4 @@
-use crate::{common::*, with_header, Provider};
+use crate::{Provider, common::*, with_header};
 
 #[test]
 fn clustered_index_works_on_sql_server() {

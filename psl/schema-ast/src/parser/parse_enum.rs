@@ -1,8 +1,8 @@
 use super::{
-    helpers::{parsing_catch_all, Pair},
+    Rule,
+    helpers::{Pair, parsing_catch_all},
     parse_attribute::parse_attribute,
     parse_comments::*,
-    Rule,
 };
 use crate::ast::{self, Attribute, Comment, Enum, EnumValue, Identifier};
 use diagnostics::{DatamodelError, Diagnostics, FileId, Span};

@@ -139,7 +139,7 @@ impl<'a> ScalarFilterParser<'a> {
             filters::ENDS_WITH => Ok(vec![field.ends_with(self.as_condition_value(input, false)?)]),
 
             filters::LOWER_THAN if self.reverse() => Ok(vec![
-                field.greater_than_or_equals(self.as_condition_value(input, false)?)
+                field.greater_than_or_equals(self.as_condition_value(input, false)?),
             ]),
             filters::GREATER_THAN if self.reverse() => {
                 Ok(vec![field.less_than_or_equals(self.as_condition_value(input, false)?)])
@@ -155,7 +155,7 @@ impl<'a> ScalarFilterParser<'a> {
             filters::GREATER_THAN => Ok(vec![field.greater_than(self.as_condition_value(input, false)?)]),
             filters::LOWER_THAN_OR_EQUAL => Ok(vec![field.less_than_or_equals(self.as_condition_value(input, false)?)]),
             filters::GREATER_THAN_OR_EQUAL => Ok(vec![
-                field.greater_than_or_equals(self.as_condition_value(input, false)?)
+                field.greater_than_or_equals(self.as_condition_value(input, false)?),
             ]),
 
             filters::SEARCH if self.reverse() => Ok(vec![field.not_search(self.as_condition_value(input, false)?)]),
@@ -255,17 +255,17 @@ impl<'a> ScalarFilterParser<'a> {
             }
 
             filters::LOWER_THAN_OR_EQUAL if self.reverse() => Ok(vec![
-                field.json_greater_than(self.as_condition_value(input, false)?, json_path)
+                field.json_greater_than(self.as_condition_value(input, false)?, json_path),
             ]),
 
             filters::GREATER_THAN_OR_EQUAL if self.reverse() => Ok(vec![
-                field.json_less_than(self.as_condition_value(input, false)?, json_path)
+                field.json_less_than(self.as_condition_value(input, false)?, json_path),
             ]),
             filters::LOWER_THAN => Ok(vec![
-                field.json_less_than(self.as_condition_value(input, false)?, json_path)
+                field.json_less_than(self.as_condition_value(input, false)?, json_path),
             ]),
             filters::GREATER_THAN => Ok(vec![
-                field.json_greater_than(self.as_condition_value(input, false)?, json_path)
+                field.json_greater_than(self.as_condition_value(input, false)?, json_path),
             ]),
             filters::LOWER_THAN_OR_EQUAL => {
                 Ok(vec![field.json_less_than_or_equals(
@@ -564,7 +564,7 @@ fn json_null_enum_filter<F>(
 where
     F: Fn(ConditionValue, Option<JsonFilterPath>) -> Filter,
 {
-    let filter = match value.into() {
+    match value.into() {
         ConditionValue::Value(value) => match value {
             PrismaValue::Enum(e) => match e.as_str() {
                 json_null::DB_NULL => filter_fn(PrismaValue::Null.into(), json_path),
@@ -585,9 +585,7 @@ where
             val => filter_fn(val.into(), json_path),
         },
         ConditionValue::FieldRef(field_ref) => filter_fn(field_ref.into(), json_path),
-    };
-
-    filter
+    }
 }
 
 fn parse_json_path(input: ParsedInputValue<'_>) -> QueryGraphBuilderResult<JsonFilterPath> {

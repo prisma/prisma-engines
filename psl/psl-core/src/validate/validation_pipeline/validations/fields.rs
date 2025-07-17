@@ -6,12 +6,12 @@ use super::{
     default_value,
     names::{NameTaken, Names},
 };
-use crate::datamodel_connector::{walker_ext_traits::*, ConnectorCapability};
+use crate::datamodel_connector::{ConnectorCapability, walker_ext_traits::*};
 use crate::{diagnostics::DatamodelError, validate::validation_pipeline::context::Context};
 use parser_database::{
+    ScalarFieldType, ScalarType,
     ast::{self, WithSpan},
     walkers::{FieldWalker, PrimaryKeyWalker, ScalarFieldAttributeWalker, ScalarFieldWalker, TypedFieldWalker},
-    ScalarFieldType, ScalarType,
 };
 
 pub(super) fn validate_client_name(field: FieldWalker<'_>, names: &Names<'_>, ctx: &mut Context<'_>) {
@@ -354,9 +354,13 @@ pub(super) fn validate_unsupported_field_type(field: ScalarFieldWalker<'_>, ctx:
             let prisma_type = connector.scalar_type_for_native_type(&native_type);
 
             let msg = format!(
-                        "The type `Unsupported(\"{}\")` you specified in the type definition for the field `{}` is supported as a native type by Prisma. Please use the native type notation `{} @{}.{}` for full support.",
-                        unsupported_lit, field.name(), prisma_type.as_str(), &source.name, connector.native_type_to_string(&native_type)
-                    );
+                "The type `Unsupported(\"{}\")` you specified in the type definition for the field `{}` is supported as a native type by Prisma. Please use the native type notation `{} @{}.{}` for full support.",
+                unsupported_lit,
+                field.name(),
+                prisma_type.as_str(),
+                &source.name,
+                connector.native_type_to_string(&native_type)
+            );
 
             ctx.push_error(DatamodelError::new_validation_error(&msg, field.ast_field().span()));
         }

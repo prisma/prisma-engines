@@ -5,16 +5,16 @@ use serde::{Deserialize, Serialize};
 use telemetry::TraceParent;
 
 use crate::{
-    executor_process_request, ConnectorTag, ConnectorVersion, QueryResult, TestError, TestLogCapture, TestResult,
-    ENGINE_PROTOCOL,
+    ConnectorTag, ConnectorVersion, ENGINE_PROTOCOL, QueryResult, TestError, TestLogCapture, TestResult,
+    executor_process_request,
 };
 use colored::Colorize;
 use prisma_metrics::MetricRegistry;
 use query_core::{
+    QueryExecutor, TransactionOptions, TxId,
     protocol::EngineProtocol,
     relation_load_strategy,
     schema::{self, QuerySchemaRef},
-    QueryExecutor, TransactionOptions, TxId,
 };
 use request_handlers::{
     BatchTransactionOption, ConnectorKind, GraphqlBody, JsonBatchQuery, JsonBody, JsonSingleQuery, MultiQuery,
@@ -24,7 +24,7 @@ use serde_json::json;
 use std::{
     env,
     fmt::Display,
-    sync::{atomic::AtomicUsize, Arc},
+    sync::{Arc, atomic::AtomicUsize},
 };
 
 pub type TxResult = Result<(), user_facing_errors::Error>;

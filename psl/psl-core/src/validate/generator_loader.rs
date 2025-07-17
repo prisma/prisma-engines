@@ -27,8 +27,8 @@ pub(crate) fn load_generators_from_ast(
 ) -> Vec<Generator> {
     let mut generators: Vec<Generator> = Vec::new();
 
-    for gen in ast_schema.generators() {
-        if let Some(generator) = lift_generator(gen, diagnostics, feature_map_with_provider) {
+    for generator in ast_schema.generators() {
+        if let Some(generator) = lift_generator(generator, diagnostics, feature_map_with_provider) {
             generators.push(generator);
         }
     }

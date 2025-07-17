@@ -2,8 +2,8 @@
 #![cfg_attr(target_arch = "wasm32", allow(dead_code))]
 
 use crate::{
-    getters::Getter, ids::*, parsers::Parser, Column, ColumnArity, ColumnType, ColumnTypeFamily, DefaultValue,
-    DescriberResult, ForeignKeyAction, PrismaValue, Regex, SQLSortOrder, SqlSchema,
+    Column, ColumnArity, ColumnType, ColumnTypeFamily, DefaultValue, DescriberResult, ForeignKeyAction, PrismaValue,
+    Regex, SQLSortOrder, SqlSchema, getters::Getter, ids::*, parsers::Parser,
 };
 use either::Either;
 use indexmap::IndexMap;

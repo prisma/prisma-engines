@@ -49,11 +49,7 @@ impl IntoUpdateOperation for ScalarWriteOperation {
             ScalarWriteOperation::Field(_) => unimplemented!(),
         };
 
-        if let Some(doc) = doc {
-            Ok(vec![doc])
-        } else {
-            Ok(vec![])
-        }
+        if let Some(doc) = doc { Ok(vec![doc]) } else { Ok(vec![]) }
     }
 }
 

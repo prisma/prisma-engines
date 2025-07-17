@@ -1,4 +1,4 @@
-use super::{render_default, MssqlRenderer};
+use super::{MssqlRenderer, render_default};
 use crate::{
     migration_pair::MigrationPair,
     sql_migration::AlterColumn,
@@ -7,9 +7,9 @@ use crate::{
     sql_schema_differ::ColumnChanges,
 };
 use sql_schema_describer::{
+    DefaultValue, TableColumnId,
     mssql::MssqlSchemaExt,
     walkers::{TableColumnWalker, TableWalker},
-    DefaultValue, TableColumnId,
 };
 use std::borrow::Cow;
 use std::collections::BTreeSet;

@@ -4,7 +4,7 @@ use query_engine_tests::*;
 // TODO(dom): All failing except one
 #[test_suite(exclude(CockroachDb))]
 mod create_inside_update {
-    use query_engine_tests::{assert_error, run_query, run_query_json, DatamodelWithParams};
+    use query_engine_tests::{DatamodelWithParams, assert_error, run_query, run_query_json};
     use query_test_macros::relation_link_test;
 
     // "a P1! to C1 relation" should "work"
@@ -164,7 +164,8 @@ mod create_inside_update {
 
         assert_error!(
             runner,
-            format!(r#"mutation {{
+            format!(
+                r#"mutation {{
               updateOneParent(
               where: {parent}
               data:{{
@@ -174,7 +175,8 @@ mod create_inside_update {
                   c
                 }}
               }}
-            }}"#),
+            }}"#
+            ),
             2014,
             "The change you are trying to make would violate the required relation 'ChildToParent' between the `Child` and `Parent` models."
         );

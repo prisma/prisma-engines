@@ -1,8 +1,8 @@
 use crate::{
+    SqlConnector, SqlSchemaConnector,
     migration_pair::MigrationPair,
     sql_migration::{SqlMigration, SqlMigrationStep},
     sql_renderer::SqlRenderer,
-    SqlConnector, SqlSchemaConnector,
 };
 use schema_connector::{ConnectorResult, DestructiveChangeDiagnostics, Migration};
 use sql_schema_describer::SqlSchema;

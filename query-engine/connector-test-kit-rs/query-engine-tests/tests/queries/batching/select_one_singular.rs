@@ -4,8 +4,9 @@ use query_engine_tests::*;
 mod singular_batch {
     use indoc::indoc;
     use query_engine_tests::{
+        Runner, TestResult,
         query_core::{BatchDocument, QueryDocument},
-        run_query, Runner, TestResult,
+        run_query,
     };
 
     fn schema() -> String {

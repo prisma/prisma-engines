@@ -1,5 +1,5 @@
 use schema_core::{
-    commands::dev_diagnostic_cli, json_rpc::types::*, schema_connector::SchemaConnector, CoreError, CoreResult,
+    CoreError, CoreResult, commands::dev_diagnostic_cli, json_rpc::types::*, schema_connector::SchemaConnector,
 };
 use tempfile::TempDir;
 

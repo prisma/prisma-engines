@@ -5,9 +5,9 @@ use crate::{
 };
 use enumflags2::BitFlags;
 use sql_schema_describer::{
+    EnumId, ForeignKeyId, IndexId, SqlSchema, TableColumnId, TableId, UdtId, ViewId,
     postgres::{self, PostgresSchemaExt},
     walkers::{TableColumnWalker, TableWalker},
-    EnumId, ForeignKeyId, IndexId, SqlSchema, TableColumnId, TableId, UdtId, ViewId,
 };
 use std::{collections::BTreeSet, fmt::Write as _};
 

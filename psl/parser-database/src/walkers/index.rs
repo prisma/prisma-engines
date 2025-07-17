@@ -2,10 +2,9 @@ use either::Either;
 
 use super::CompositeTypeFieldWalker;
 use crate::{
-    ast,
+    ParserDatabase, ScalarFieldType, ast,
     types::{IndexAlgorithm, IndexAttribute},
     walkers::{ModelWalker, ScalarFieldAttributeWalker, ScalarFieldWalker},
-    ParserDatabase, ScalarFieldType,
 };
 
 /// An index, unique or fulltext attribute.

@@ -1,5 +1,5 @@
 use super::{expression, into_expression::IntoUpdateExpression};
-use bson::{doc, Document};
+use bson::{Document, doc};
 use query_structure::{FieldPath, Filter};
 
 /// `UpdateOperation` is an intermediary AST used to perform preliminary transformations from a `WriteOperation`.
@@ -51,11 +51,7 @@ impl UpdateOperation {
     }
 
     pub(crate) fn try_into_generic(self) -> Option<GenericOperation> {
-        if let Self::Generic(v) = self {
-            Some(v)
-        } else {
-            None
-        }
+        if let Self::Generic(v) = self { Some(v) } else { None }
     }
 }
 

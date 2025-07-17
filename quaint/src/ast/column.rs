@@ -1,7 +1,7 @@
-use super::{values::NativeColumnType, Aliasable};
+use super::{Aliasable, values::NativeColumnType};
 use crate::{
-    ast::{Expression, ExpressionKind, Table},
     Value,
+    ast::{Expression, ExpressionKind, Table},
 };
 use std::borrow::Cow;
 

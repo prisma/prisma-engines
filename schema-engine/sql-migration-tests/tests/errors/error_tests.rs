@@ -440,12 +440,16 @@ fn json_fields_must_be_rejected_on_mysql_5_6(api: TestApi) {
         .unwrap_known();
 
     assert_eq!(result.error_code, "P1015");
-    assert!(result
-        .message
-        .contains("Your Prisma schema is using features that are not supported for the version of the database"));
-    assert!(result
-        .message
-        .contains("- The `Json` data type used in Test.j is not supported on MySQL 5.6.\n"));
+    assert!(
+        result
+            .message
+            .contains("Your Prisma schema is using features that are not supported for the version of the database")
+    );
+    assert!(
+        result
+            .message
+            .contains("- The `Json` data type used in Test.j is not supported on MySQL 5.6.\n")
+    );
 }
 
 #[tokio::test]

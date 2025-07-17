@@ -2,9 +2,9 @@ use super::default_value;
 use crate::{datamodel_connector::ConnectorCapability, validate::validation_pipeline::context::Context};
 use diagnostics::DatamodelError;
 use parser_database::{
+    ScalarFieldType,
     ast::WithSpan,
     walkers::{CompositeTypeFieldWalker, CompositeTypeWalker},
-    ScalarFieldType,
 };
 use std::{fmt, rc::Rc};
 

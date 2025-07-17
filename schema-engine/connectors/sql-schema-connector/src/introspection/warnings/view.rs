@@ -1,5 +1,5 @@
 use crate::introspection::introspection_pair::ViewPair;
-use schema_connector::{warnings as generators, Warnings};
+use schema_connector::{Warnings, warnings as generators};
 
 /// Analyze and generate warnigs from a view.
 pub(super) fn generate_warnings(view: ViewPair<'_>, warnings: &mut Warnings) {

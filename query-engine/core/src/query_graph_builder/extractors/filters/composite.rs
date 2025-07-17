@@ -1,7 +1,7 @@
 use super::extract_filter;
 use crate::{ParsedInputMap, ParsedInputValue, QueryGraphBuilderError, QueryGraphBuilderResult};
 use query_structure::{CompositeCompare, CompositeFieldRef, Filter, PrismaValue};
-use schema::{constants::filters, ObjectTag};
+use schema::{ObjectTag, constants::filters};
 use std::convert::TryInto;
 
 pub fn parse(

@@ -1,11 +1,11 @@
 #![allow(clippy::upper_case_acronyms)]
 
+use query_engine::LogFormat;
 use query_engine::cli::CliCommand;
 use query_engine::context;
 use query_engine::error::PrismaError;
 use query_engine::opt::PrismaOpt;
 use query_engine::server;
-use query_engine::LogFormat;
 use structopt::StructOpt;
 use tokio::{select, signal};
 

@@ -82,7 +82,7 @@ impl Check for UnexecutableStepCheck {
                         let null_value_count = row_count - value_count;
 
                         if null_value_count == 0 {
-                            return None
+                            return None;
                         }
 
                         Some(format!(
@@ -91,7 +91,7 @@ impl Check for UnexecutableStepCheck {
                             table = column.table,
                             null_value_count = null_value_count,
                         ))
-                    },
+                    }
                     (_, _) => Some(format!(
                         "Made the column `{column}` on table `{table}` required. This step will fail if there are existing NULL values in that column.",
                         column = column.column,
@@ -101,10 +101,12 @@ impl Check for UnexecutableStepCheck {
             }
             UnexecutableStepCheck::MadeScalarFieldIntoArrayField(column) => {
                 let message = |details| {
-                    format!("Changed the column `{column}` on the `{table}` table from a scalar field to a list field. {details}",
-                            column = column.column,
-                            table = column.table,
-                            details = details)
+                    format!(
+                        "Changed the column `{column}` on the `{table}` table from a scalar field to a list field. {details}",
+                        column = column.column,
+                        table = column.table,
+                        details = details
+                    )
                 };
 
                 match database_checks.get_row_and_non_null_value_count(column) {
@@ -120,9 +122,17 @@ impl Check for UnexecutableStepCheck {
             }
             UnexecutableStepCheck::DropAndRecreateRequiredColumn(column) => {
                 match database_checks.get_row_count(&Table::from_column(column)) {
-                    None => Some(format!("Changed the type of `{column}` on the `{table}` table. No cast exists, the column would be dropped and recreated, which cannot be done if there is data, since the column is required.", column = column.column, table = column.table)),
+                    None => Some(format!(
+                        "Changed the type of `{column}` on the `{table}` table. No cast exists, the column would be dropped and recreated, which cannot be done if there is data, since the column is required.",
+                        column = column.column,
+                        table = column.table
+                    )),
                     Some(0) => None,
-                    Some(_) => Some(format!("Changed the type of `{column}` on the `{table}` table. No cast exists, the column would be dropped and recreated, which cannot be done since the column is required and there is data in the table.", column = column.column, table = column.table)),
+                    Some(_) => Some(format!(
+                        "Changed the type of `{column}` on the `{table}` table. No cast exists, the column would be dropped and recreated, which cannot be done since the column is required and there is data in the table.",
+                        column = column.column,
+                        table = column.table
+                    )),
                 }
             }
         }

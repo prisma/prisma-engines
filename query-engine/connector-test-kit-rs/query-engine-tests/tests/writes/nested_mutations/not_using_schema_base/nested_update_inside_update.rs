@@ -3,7 +3,7 @@ use query_engine_tests::*;
 #[test_suite(exclude(CockroachDb))]
 mod update_inside_update {
     use indoc::indoc;
-    use query_engine_tests::{assert_error, run_query, run_query_json, DatamodelWithParams};
+    use query_engine_tests::{DatamodelWithParams, assert_error, run_query, run_query_json};
     use query_test_macros::relation_link_test;
 
     // ----------------------------------
@@ -126,7 +126,8 @@ mod update_inside_update {
 
         assert_error!(
             runner,
-            format!(r#"mutation {{
+            format!(
+                r#"mutation {{
               updateOneParent(
               where: {parent}
               data:{{
@@ -136,7 +137,8 @@ mod update_inside_update {
                   c
                 }}
               }}
-            }}"#),
+            }}"#
+            ),
             2025,
             "An operation failed because it depends on one or more records that were required but not found. No 'Child' record was found for a nested update on one-to-many relation 'ChildToParent'."
         );
@@ -169,7 +171,8 @@ mod update_inside_update {
 
         assert_error!(
             runner,
-            format!(r#"mutation {{
+            format!(
+                r#"mutation {{
               updateOneParent(
                 where: {parent}
                 data:{{ childOpt: {{ update: {{ where: {{ non_unique: "1" }}, data: {{ non_unique: "updated" }} }} }} }}
@@ -178,7 +181,8 @@ mod update_inside_update {
                   c
                 }}
               }}
-            }}"#),
+            }}"#
+            ),
             2025,
             "An operation failed because it depends on one or more records that were required but not found. No 'Child' record was found for a nested update on one-to-many relation 'ChildToParent'."
         );
@@ -309,7 +313,8 @@ mod update_inside_update {
 
         assert_error!(
             runner,
-            format!(r#"mutation {{
+            format!(
+                r#"mutation {{
               updateOneParent(
                 where: {parent}
                 data: {{
@@ -324,7 +329,8 @@ mod update_inside_update {
                   c
                 }}
               }}
-            }}"#),
+            }}"#
+            ),
             2025,
             "An operation failed because it depends on one or more records that were required but not found. No 'Child' record was found for a nested update on one-to-many relation 'ChildToParent'."
         );
@@ -357,7 +363,8 @@ mod update_inside_update {
 
         assert_error!(
             runner,
-            format!(r#"mutation {{
+            format!(
+                r#"mutation {{
               updateOneParent(
                 where: {parent}
                 data:{{ childrenOpt: {{
@@ -371,7 +378,8 @@ mod update_inside_update {
                   c
                 }}
               }}
-            }}"#),
+            }}"#
+            ),
             2025,
             "An operation failed because it depends on one or more records that were required but not found. No 'Child' record was found for a nested update on one-to-many relation 'ChildToParent'."
         );
@@ -500,7 +508,8 @@ mod update_inside_update {
 
         assert_error!(
             runner,
-            format!(r#"mutation {{
+            format!(
+                r#"mutation {{
               updateOneParent(
                 where: {parent}
                 data: {{
@@ -515,7 +524,8 @@ mod update_inside_update {
                   c
                 }}
               }}
-            }}"#),
+            }}"#
+            ),
             2025,
             "An operation failed because it depends on one or more records that were required but not found. No 'Child' record was found for a nested update on many-to-many relation 'ChildToParent'."
         );
@@ -548,7 +558,8 @@ mod update_inside_update {
 
         assert_error!(
             runner,
-            format!(r#"mutation {{
+            format!(
+                r#"mutation {{
               updateOneParent(
                 where: {parent}
                 data:{{ childrenOpt: {{
@@ -562,7 +573,8 @@ mod update_inside_update {
                   c
                 }}
               }}
-            }}"#),
+            }}"#
+            ),
             2025,
             "An operation failed because it depends on one or more records that were required but not found. No 'Child' record was found for a nested update on many-to-many relation 'ChildToParent'."
         );
@@ -620,7 +632,8 @@ mod update_inside_update {
 
         assert_error!(
             runner,
-            format!(r#"mutation {{
+            format!(
+                r#"mutation {{
               updateOneNote(
                 where: {{
                   id: {note_id}
@@ -637,10 +650,10 @@ mod update_inside_update {
               ){{
                 text
               }}
-            }}"#),
+            }}"#
+            ),
             2025,
-            "An operation failed because it depends on one or more records that were required but not found. No 'Todo' record was found for a nested update on many-to-many relation 'NoteToTodo'."
-            // No Node for the model Todo with value DOES NOT EXIST for id found.
+            "An operation failed because it depends on one or more records that were required but not found. No 'Todo' record was found for a nested update on many-to-many relation 'NoteToTodo'." // No Node for the model Todo with value DOES NOT EXIST for id found.
         );
 
         insta::assert_snapshot!(
@@ -678,8 +691,9 @@ mod update_inside_update {
         let note_id = &res["data"]["createOneNote"]["id"].to_string();
 
         assert_error!(
-          runner,
-          format!(r#"mutation {{
+            runner,
+            format!(
+                r#"mutation {{
             updateOneNote(
               where: {{
                 id: {note_id}
@@ -696,10 +710,11 @@ mod update_inside_update {
             ){{
               text
             }}
-          }}"#),
-          2025,
-          "An operation failed because it depends on one or more records that were required but not found. No 'Todo' record was found for a nested update on many-to-many relation 'NoteToTodo'."
-      );
+          }}"#
+            ),
+            2025,
+            "An operation failed because it depends on one or more records that were required but not found. No 'Todo' record was found for a nested update on many-to-many relation 'NoteToTodo'."
+        );
 
         Ok(())
     }

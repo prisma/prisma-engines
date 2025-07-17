@@ -4,7 +4,7 @@ use query_engine_tests::*;
 #[test_suite(only(MySql), relation_mode = "prisma")]
 mod relations_shard_key {
     use indoc::indoc;
-    use query_engine_tests::{run_query, Runner};
+    use query_engine_tests::{Runner, run_query};
 
     fn relations_schema() -> String {
         let schema = indoc! {

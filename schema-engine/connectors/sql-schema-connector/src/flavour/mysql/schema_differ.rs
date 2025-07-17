@@ -1,13 +1,13 @@
 use crate::{
     flavour::mysql::Circumstances,
     migration_pair::MigrationPair,
-    sql_schema_differ::{all_match, column::ColumnTypeChange, SqlSchemaDifferFlavour},
+    sql_schema_differ::{SqlSchemaDifferFlavour, all_match, column::ColumnTypeChange},
 };
 use enumflags2::BitFlags;
 use psl::builtin_connectors::MySqlType;
 use sql_schema_describer::{
-    walkers::{IndexWalker, TableColumnWalker},
     ColumnTypeFamily,
+    walkers::{IndexWalker, TableColumnWalker},
 };
 
 #[derive(Debug)]
@@ -452,95 +452,91 @@ fn native_type_change(types: MigrationPair<&MySqlType>) -> Option<ColumnTypeChan
 
             MySqlType::DateTime(_) | MySqlType::Timestamp(_) | MySqlType::Date => not_castable(),
         },
-        MySqlType::Double => match next {
-            MySqlType::Double => return None,
+        MySqlType::Double => {
+            match next {
+                MySqlType::Double => return None,
 
-            MySqlType::Float => safe(),
-            MySqlType::Bit(64) => safe(),
-            MySqlType::Bit(_) => not_castable(),
+                MySqlType::Float => safe(),
+                MySqlType::Bit(64) => safe(),
+                MySqlType::Bit(_) => not_castable(),
 
-            // Integer types
-            MySqlType::UnsignedTinyInt
-            | MySqlType::Decimal(_)
-            | MySqlType::BigInt
-            | MySqlType::UnsignedBigInt
-            | MySqlType::TinyInt
-            | MySqlType::Int
-            | MySqlType::Json
-            | MySqlType::UnsignedInt
-            | MySqlType::SmallInt
-            | MySqlType::UnsignedSmallInt
-            | MySqlType::MediumInt
-            | MySqlType::UnsignedMediumInt
-            | MySqlType::Year => safe(),
+                // Integer types
+                MySqlType::UnsignedTinyInt
+                | MySqlType::Decimal(_)
+                | MySqlType::BigInt
+                | MySqlType::UnsignedBigInt
+                | MySqlType::TinyInt
+                | MySqlType::Int
+                | MySqlType::Json
+                | MySqlType::UnsignedInt
+                | MySqlType::SmallInt
+                | MySqlType::UnsignedSmallInt
+                | MySqlType::MediumInt
+                | MySqlType::UnsignedMediumInt
+                | MySqlType::Year => safe(),
 
-            MySqlType::Binary(n) | MySqlType::Char(n) | MySqlType::VarBinary(n) | MySqlType::VarChar(n) => {
-                if *n >= 32 {
-                    risky()
-                } else {
-                    not_castable()
+                MySqlType::Binary(n) | MySqlType::Char(n) | MySqlType::VarBinary(n) | MySqlType::VarChar(n) => {
+                    if *n >= 32 { risky() } else { not_castable() }
                 }
+
+                // To string
+                MySqlType::LongText
+                | MySqlType::MediumText
+                | MySqlType::Text
+                | MySqlType::TinyText
+                | MySqlType::Blob
+                | MySqlType::TinyBlob
+                | MySqlType::LongBlob
+                | MySqlType::MediumBlob => safe(),
+
+                MySqlType::Time(_) => safe(),
+
+                MySqlType::Timestamp(_) | MySqlType::DateTime(_) | MySqlType::Date => not_castable(),
             }
+        }
+        MySqlType::Float => {
+            match next {
+                MySqlType::Float => return None,
 
-            // To string
-            MySqlType::LongText
-            | MySqlType::MediumText
-            | MySqlType::Text
-            | MySqlType::TinyText
-            | MySqlType::Blob
-            | MySqlType::TinyBlob
-            | MySqlType::LongBlob
-            | MySqlType::MediumBlob => safe(),
+                MySqlType::Double => safe(),
 
-            MySqlType::Time(_) => safe(),
+                MySqlType::Bit(n) if *n >= 32 => safe(),
+                MySqlType::Bit(_) => not_castable(),
 
-            MySqlType::Timestamp(_) | MySqlType::DateTime(_) | MySqlType::Date => not_castable(),
-        },
-        MySqlType::Float => match next {
-            MySqlType::Float => return None,
+                // Integer types
+                MySqlType::UnsignedTinyInt
+                | MySqlType::Decimal(_)
+                | MySqlType::BigInt
+                | MySqlType::UnsignedBigInt
+                | MySqlType::TinyInt
+                | MySqlType::Int
+                | MySqlType::Json
+                | MySqlType::UnsignedInt
+                | MySqlType::SmallInt
+                | MySqlType::UnsignedSmallInt
+                | MySqlType::MediumInt
+                | MySqlType::UnsignedMediumInt
+                | MySqlType::Year => safe(),
 
-            MySqlType::Double => safe(),
-
-            MySqlType::Bit(n) if *n >= 32 => safe(),
-            MySqlType::Bit(_) => not_castable(),
-
-            // Integer types
-            MySqlType::UnsignedTinyInt
-            | MySqlType::Decimal(_)
-            | MySqlType::BigInt
-            | MySqlType::UnsignedBigInt
-            | MySqlType::TinyInt
-            | MySqlType::Int
-            | MySqlType::Json
-            | MySqlType::UnsignedInt
-            | MySqlType::SmallInt
-            | MySqlType::UnsignedSmallInt
-            | MySqlType::MediumInt
-            | MySqlType::UnsignedMediumInt
-            | MySqlType::Year => safe(),
-
-            MySqlType::Binary(n) | MySqlType::Char(n) | MySqlType::VarBinary(n) | MySqlType::VarChar(n) => {
-                if *n >= 32 {
-                    risky()
-                } else {
-                    not_castable()
+                MySqlType::Binary(n) | MySqlType::Char(n) | MySqlType::VarBinary(n) | MySqlType::VarChar(n) => {
+                    if *n >= 32 { risky() } else { not_castable() }
                 }
+
+                // To string
+                MySqlType::LongText
+                | MySqlType::MediumText
+                | MySqlType::Text
+                | MySqlType::TinyText
+                | MySqlType::Blob
+                | MySqlType::TinyBlob
+                | MySqlType::LongBlob
+                | MySqlType::MediumBlob => safe(),
+
+                MySqlType::Time(_) => safe(),
+
+                MySqlType::Timestamp(_) | MySqlType::DateTime(_) | MySqlType::Date => not_castable(),
             }
-
-            // To string
-            MySqlType::LongText
-            | MySqlType::MediumText
-            | MySqlType::Text
-            | MySqlType::TinyText
-            | MySqlType::Blob
-            | MySqlType::TinyBlob
-            | MySqlType::LongBlob
-            | MySqlType::MediumBlob => safe(),
-
-            MySqlType::Time(_) => safe(),
-
-            MySqlType::Timestamp(_) | MySqlType::DateTime(_) | MySqlType::Date => not_castable(),
-        },
+        }
         MySqlType::Int => match next {
             MySqlType::Int => return None,
 

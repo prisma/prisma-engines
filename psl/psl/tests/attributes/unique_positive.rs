@@ -1,4 +1,4 @@
-use crate::{common::*, with_header, Provider};
+use crate::{Provider, common::*, with_header};
 
 #[test]
 fn basic_unique_index_must_work() {

@@ -1,14 +1,13 @@
 use std::marker::PhantomData;
 
 use tracing::{
-    field,
+    Subscriber, field,
     span::{Attributes, Id},
-    Subscriber,
 };
 use tracing_subscriber::{
+    Layer,
     layer::Context,
     registry::{LookupSpan, SpanRef},
-    Layer,
 };
 
 use crate::collector::{AllowAttribute, Collector, EventBuilder, SpanBuilder};
@@ -305,8 +304,8 @@ mod tests {
     use insta::assert_ron_snapshot;
     use insta::internals::{Content, Redaction};
     use tracing::info_span;
-    use tracing_subscriber::layer::SubscriberExt;
     use tracing_subscriber::Registry;
+    use tracing_subscriber::layer::SubscriberExt;
 
     #[derive(Debug, Default, Clone)]
     struct TestCollector {

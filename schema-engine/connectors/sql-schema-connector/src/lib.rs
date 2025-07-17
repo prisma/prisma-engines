@@ -21,7 +21,7 @@ use database_schema::SqlDatabaseSchema;
 use enumflags2::BitFlags;
 use flavour::{SqlConnector, SqlDialect, UsingExternalShadowDb};
 use migration_pair::MigrationPair;
-use psl::{datamodel_connector::NativeTypeInstance, parser_database::ScalarType, SourceFile, ValidatedSchema};
+use psl::{SourceFile, ValidatedSchema, datamodel_connector::NativeTypeInstance, parser_database::ScalarType};
 use quaint::connector::DescribedQuery;
 use schema_connector::{migrations_directory::MigrationDirectory, *};
 use sql_doc_parser::{parse_sql_doc, sanitize_sql};
@@ -181,7 +181,7 @@ impl SchemaDialect for SqlSchemaDialect {
                 _ => {
                     return Err(ConnectorError::from_msg(
                         "Received an unsupported shadow database target".to_owned(),
-                    ))
+                    ));
                 }
             };
             let schema = connector

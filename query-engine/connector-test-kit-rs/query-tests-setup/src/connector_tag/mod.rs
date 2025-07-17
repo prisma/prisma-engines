@@ -20,7 +20,7 @@ pub(crate) use sql_server::*;
 pub(crate) use sqlite::*;
 pub(crate) use vitess::*;
 
-use crate::{datamodel_rendering::DatamodelRenderer, BoxFuture, TestError, CONFIG};
+use crate::{BoxFuture, CONFIG, TestError, datamodel_rendering::DatamodelRenderer};
 use psl::datamodel_connector::ConnectorCapabilities;
 use quaint::prelude::SqlFamily;
 use std::{convert::TryFrom, fmt, fs};
@@ -66,15 +66,20 @@ pub(crate) fn connection_string(
             let isolation_level = isolation_level.unwrap_or("READ UNCOMMITTED");
 
             match v {
-            Some(SqlServerVersion::V2017) => format!("sqlserver://127.0.0.1:1434;{database};user=SA;password=<YourStrong@Passw0rd>;trustServerCertificate=true;isolationLevel={isolation_level}"),
+                Some(SqlServerVersion::V2017) => format!(
+                    "sqlserver://127.0.0.1:1434;{database};user=SA;password=<YourStrong@Passw0rd>;trustServerCertificate=true;isolationLevel={isolation_level}"
+                ),
 
-            Some(SqlServerVersion::V2019) => format!("sqlserver://127.0.0.1:1433;{database};user=SA;password=<YourStrong@Passw0rd>;trustServerCertificate=true;isolationLevel={isolation_level}"),
+                Some(SqlServerVersion::V2019) => format!(
+                    "sqlserver://127.0.0.1:1433;{database};user=SA;password=<YourStrong@Passw0rd>;trustServerCertificate=true;isolationLevel={isolation_level}"
+                ),
 
-            Some(SqlServerVersion::V2022 | SqlServerVersion::MssqlJsWasm) =>
-                format!("sqlserver://127.0.0.1:1435;{database};user=SA;password=<YourStrong@Passw0rd>;trustServerCertificate=true;isolationLevel={isolation_level}"),
+                Some(SqlServerVersion::V2022 | SqlServerVersion::MssqlJsWasm) => format!(
+                    "sqlserver://127.0.0.1:1435;{database};user=SA;password=<YourStrong@Passw0rd>;trustServerCertificate=true;isolationLevel={isolation_level}"
+                ),
 
-            None => unreachable!("A versioned connector must have a concrete version to run."),
-        }
+                None => unreachable!("A versioned connector must have a concrete version to run."),
+            }
         }
         ConnectorVersion::Postgres(v) => {
             let database = if is_multi_schema {
@@ -343,7 +348,9 @@ pub(crate) fn should_run(
     for exclusion in exclusions.iter() {
         for inclusion in inclusions.iter() {
             if exclusion.is_broader(inclusion) {
-                panic!("Error in connector test execution rules. Version `{exclusion}` in `excluded()` is broader than `{inclusion}` in `only()`");
+                panic!(
+                    "Error in connector test execution rules. Version `{exclusion}` in `excluded()` is broader than `{inclusion}` in `only()`"
+                );
             }
         }
     }

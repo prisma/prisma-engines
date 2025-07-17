@@ -1,14 +1,14 @@
 use async_trait::async_trait;
 use prisma_metrics::gauge;
 use quaint::{
+    Value,
     connector::{DescribedQuery, IsolationLevel, Transaction as QuaintTransaction},
     prelude::{Query as QuaintQuery, Queryable, ResultSet},
-    Value,
 };
 
 use crate::proxy::{TransactionOptions, TransactionProxy};
-use crate::{proxy::CommonProxy, queryable::JsBaseQueryable, send_future::UnsafeFuture};
 use crate::{JsObject, JsResult};
+use crate::{proxy::CommonProxy, queryable::JsBaseQueryable, send_future::UnsafeFuture};
 
 // Wrapper around JS transaction objects that implements Queryable
 // and quaint::Transaction. Can be used in place of quaint transaction,
@@ -149,7 +149,7 @@ impl super::wasm::FromJsValue for JsTransaction {
 #[cfg(not(target_arch = "wasm32"))]
 impl ::napi::bindgen_prelude::FromNapiValue for JsTransaction {
     unsafe fn from_napi_value(env: napi::sys::napi_env, napi_val: napi::sys::napi_value) -> JsResult<Self> {
-        let object = JsObject::from_napi_value(env, napi_val)?;
+        let object = unsafe { JsObject::from_napi_value(env, napi_val) }?;
         let common_proxy = CommonProxy::new(&object)?;
         let tx_proxy = TransactionProxy::new(&object)?;
 

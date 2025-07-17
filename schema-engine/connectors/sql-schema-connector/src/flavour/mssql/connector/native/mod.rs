@@ -7,8 +7,8 @@ use quaint::{
     prelude::{NativeConnectionInfo, Queryable},
 };
 use schema_connector::{ConnectorError, ConnectorResult, Namespaces};
-use sql_schema_describer::{mssql as describer, DescriberErrorKind, SqlSchema, SqlSchemaDescriberBackend};
-use user_facing_errors::{schema_engine::ApplyMigrationError, schema_engine::DatabaseSchemaInconsistent, KnownError};
+use sql_schema_describer::{DescriberErrorKind, SqlSchema, SqlSchemaDescriberBackend, mssql as describer};
+use user_facing_errors::{KnownError, schema_engine::ApplyMigrationError, schema_engine::DatabaseSchemaInconsistent};
 
 pub struct Connection(connector::Mssql);
 

@@ -1,20 +1,20 @@
 use crate::{
     logger::Logger,
     migrations::{
-        detect_failed_migrations, execute_migration_script, list_migration_dir, list_migrations,
-        record_migration_started, MigrationDirectory,
+        MigrationDirectory, detect_failed_migrations, execute_migration_script, list_migration_dir, list_migrations,
+        record_migration_started,
     },
 };
 use query_core::{
+    TransactionOptions, TxId,
     protocol::EngineProtocol,
     schema::{self},
-    TransactionOptions, TxId,
 };
-use request_handlers::{load_executor, RequestBody, RequestHandler};
+use request_handlers::{RequestBody, RequestHandler, load_executor};
 use serde_json::json;
 use std::{
     env,
-    ffi::{c_char, c_int, CStr, CString},
+    ffi::{CStr, CString, c_char, c_int},
     mem::ManuallyDrop,
     path::{Path, PathBuf},
     ptr::null_mut,
@@ -24,13 +24,13 @@ use tokio::{
     runtime::{self, Runtime},
     sync::RwLock,
 };
-use tracing::{instrument::WithSubscriber, level_filters::LevelFilter, Instrument};
+use tracing::{Instrument, instrument::WithSubscriber, level_filters::LevelFilter};
 
+use query_engine_common::{Result, tracer::start_trace};
 use query_engine_common::{
-    engine::{stringify_env_values, ConnectedEngine, ConnectedEngineNative, EngineBuilder, EngineBuilderNative, Inner},
+    engine::{ConnectedEngine, ConnectedEngineNative, EngineBuilder, EngineBuilderNative, Inner, stringify_env_values},
     error::ApiError,
 };
-use query_engine_common::{tracer::start_trace, Result};
 use request_handlers::ConnectorKind;
 
 // The query engine code is async by nature, however the C API does not function with async functions
@@ -39,11 +39,11 @@ static RUNTIME: LazyLock<Runtime> =
     LazyLock::new(|| runtime::Builder::new_multi_thread().enable_all().build().unwrap());
 
 // C-like return codes
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub static PRISMA_OK: i32 = 0;
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub static PRISMA_UNKNOWN_ERROR: i32 = 1;
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub static PRISMA_MISSING_POINTER: i32 = 2;
 
 /// This struct holds an instance of the prisma query engine
@@ -558,7 +558,7 @@ impl QueryEngine {
 /// # Safety
 /// The calling context needs to pass a valid pointer that will store the reference
 /// The calling context also need to clear the pointer of the error string if it is not null
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn prisma_create(
     options: ConstructorOptions,
     qe_ptr: *mut *mut QueryEngine,
@@ -571,12 +571,12 @@ pub unsafe extern "C" fn prisma_create(
     let res = QueryEngine::new(options);
     match res {
         Ok(v) => {
-            *qe_ptr = Box::into_raw(Box::new(v));
+            unsafe { *qe_ptr = Box::into_raw(Box::new(v)) };
             PRISMA_OK
         }
         Err(err) => {
             let error_string = CString::new(err.to_string()).unwrap();
-            *error_string_ptr = error_string.into_raw() as *mut c_char;
+            unsafe { *error_string_ptr = error_string.into_raw() as *mut c_char };
             PRISMA_UNKNOWN_ERROR
         }
     }
@@ -586,25 +586,25 @@ pub unsafe extern "C" fn prisma_create(
 ///
 /// The calling context needs to pass a valid pointer that will store the reference to the error string
 /// The calling context also need to clear the pointer of the error string if it is not null
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn prisma_connect(
     qe: *mut QueryEngine,
     trace: *const c_char,
     request_id: *const c_char,
     error_string_ptr: *mut *mut c_char,
 ) -> c_int {
-    let query_engine: Box<QueryEngine> = Box::from_raw(qe);
+    let query_engine: Box<QueryEngine> = unsafe { Box::from_raw(qe) };
     let result = RUNTIME.block_on(async { query_engine.connect(trace, request_id).await });
 
     match result {
         Ok(_engine) => {
             std::mem::forget(query_engine);
-            *error_string_ptr = std::ptr::null_mut();
+            unsafe { *error_string_ptr = std::ptr::null_mut() };
             PRISMA_OK
         }
         Err(err) => {
             let error_string = CString::new(err.to_string()).unwrap();
-            *error_string_ptr = error_string.into_raw() as *mut c_char;
+            unsafe { *error_string_ptr = error_string.into_raw() as *mut c_char };
             std::mem::forget(query_engine);
             PRISMA_UNKNOWN_ERROR
         }
@@ -615,7 +615,7 @@ pub unsafe extern "C" fn prisma_connect(
 ///
 /// The calling context needs to pass a valid pointer that will store the reference to the error string
 /// The calling context also need to clear the pointer of the error string if it is not null
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn prisma_query(
     qe: *mut QueryEngine,
     body_str: *const c_char,
@@ -624,17 +624,17 @@ pub unsafe extern "C" fn prisma_query(
     request_id: *const c_char,
     error_string_ptr: *mut *mut c_char,
 ) -> *const c_char {
-    let query_engine: Box<QueryEngine> = Box::from_raw(qe);
+    let query_engine: Box<QueryEngine> = unsafe { Box::from_raw(qe) };
     let result = RUNTIME.block_on(async { query_engine.query(body_str, header_str, tx_id_str, request_id).await });
     match result {
         Ok(query_result) => {
             std::mem::forget(query_engine);
-            *error_string_ptr = std::ptr::null_mut();
+            unsafe { *error_string_ptr = std::ptr::null_mut() };
             CString::new(query_result).unwrap().into_raw()
         }
         Err(err) => {
             let error_string = CString::new(err.to_string()).unwrap();
-            *error_string_ptr = error_string.into_raw() as *mut c_char;
+            unsafe { *error_string_ptr = error_string.into_raw() as *mut c_char };
 
             std::mem::forget(query_engine);
             null_mut()
@@ -646,14 +646,14 @@ pub unsafe extern "C" fn prisma_query(
 ///
 /// The calling context needs to pass a valid pointer that will store the reference to the error string
 /// The calling context also need to clear the pointer of the error string if it is not null
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn prisma_start_transaction(
     qe: *mut QueryEngine,
     options_str: *const c_char,
     header_str: *const c_char,
     request_id: *const c_char,
 ) -> *const c_char {
-    let query_engine: Box<QueryEngine> = Box::from_raw(qe);
+    let query_engine: Box<QueryEngine> = unsafe { Box::from_raw(qe) };
     let result = RUNTIME.block_on(async {
         query_engine
             .start_transaction(options_str, header_str, request_id)
@@ -674,14 +674,14 @@ pub unsafe extern "C" fn prisma_start_transaction(
 /// # Safety
 ///
 /// The calling context needs to pass a valid pointer that will store the reference to the error string
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn prisma_commit_transaction(
     qe: *mut QueryEngine,
     tx_id_str: *const c_char,
     header_str: *const c_char,
     request_id: *const c_char,
 ) -> *const c_char {
-    let query_engine: Box<QueryEngine> = Box::from_raw(qe);
+    let query_engine: Box<QueryEngine> = unsafe { Box::from_raw(qe) };
     let result = RUNTIME.block_on(async { query_engine.commit_transaction(tx_id_str, header_str, request_id).await });
     std::mem::forget(query_engine);
     match result {
@@ -693,14 +693,14 @@ pub unsafe extern "C" fn prisma_commit_transaction(
 /// # Safety
 ///
 /// The calling context needs to pass a valid pointer that will store the reference to the error string
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn prisma_rollback_transaction(
     qe: *mut QueryEngine,
     tx_id_str: *const c_char,
     header_str: *const c_char,
     request_id: *const c_char,
 ) -> *const c_char {
-    let query_engine: Box<QueryEngine> = Box::from_raw(qe);
+    let query_engine: Box<QueryEngine> = unsafe { Box::from_raw(qe) };
     let result = RUNTIME.block_on(async {
         query_engine
             .rollback_transaction(tx_id_str, header_str, request_id)
@@ -716,13 +716,13 @@ pub unsafe extern "C" fn prisma_rollback_transaction(
 /// # Safety
 ///
 /// The calling context needs to pass a valid pointer that will store the reference to the error string
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn prisma_disconnect(
     qe: *mut QueryEngine,
     header_str: *const c_char,
     request_id: *const c_char,
 ) -> c_int {
-    let query_engine: Box<QueryEngine> = Box::from_raw(qe);
+    let query_engine: Box<QueryEngine> = unsafe { Box::from_raw(qe) };
     let result = RUNTIME.block_on(async { query_engine.disconnect(header_str, request_id).await });
     std::mem::forget(query_engine);
     match result {
@@ -738,26 +738,26 @@ pub unsafe extern "C" fn prisma_disconnect(
 ///
 /// The caller must pass a pointer to a location to store the pointer to the error string in.
 /// If it is not null, the caller is responsible for deallocating the string.
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn prisma_trace(
     qe: *mut QueryEngine,
     request_id: *const c_char,
     error_string_ptr: *mut *mut c_char,
 ) -> *const c_char {
-    let query_engine = ManuallyDrop::new(Box::<QueryEngine>::from_raw(qe));
+    let query_engine = ManuallyDrop::new(unsafe { Box::<QueryEngine>::from_raw(qe) });
     let result = RUNTIME.block_on(query_engine.trace(request_id));
     match result {
         Ok(Some(trace)) => {
-            *error_string_ptr = std::ptr::null_mut();
+            unsafe { *error_string_ptr = std::ptr::null_mut() };
             CString::new(trace).unwrap().into_raw()
         }
         Ok(None) => {
-            *error_string_ptr = std::ptr::null_mut();
+            unsafe { *error_string_ptr = std::ptr::null_mut() };
             std::ptr::null()
         }
         Err(err) => {
             let error_string = CString::new(err.to_string()).unwrap();
-            *error_string_ptr = error_string.into_raw();
+            unsafe { *error_string_ptr = error_string.into_raw() };
             std::ptr::null()
         }
     }
@@ -767,23 +767,23 @@ pub unsafe extern "C" fn prisma_trace(
 ///
 /// The calling context needs to pass a valid pointer that will store the reference to the error string
 /// The calling context also need to clear the pointer of the error string if it is not null
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn prisma_apply_pending_migrations(
     qe: *mut QueryEngine,
     migration_folder_path: *const c_char,
     error_string_ptr: *mut *mut c_char,
 ) -> c_int {
-    let query_engine: Box<QueryEngine> = Box::from_raw(qe);
-    let result = RUNTIME.block_on(async { query_engine.apply_migrations(migration_folder_path).await });
+    let query_engine: Box<QueryEngine> = unsafe { Box::from_raw(qe) };
+    let result = RUNTIME.block_on(async { unsafe { query_engine.apply_migrations(migration_folder_path) }.await });
     match result {
         Ok(_) => {
             std::mem::forget(query_engine);
-            *error_string_ptr = std::ptr::null_mut();
+            unsafe { *error_string_ptr = std::ptr::null_mut() };
             PRISMA_OK
         }
         Err(err) => {
             let error_string = CString::new(err.to_string()).unwrap();
-            *error_string_ptr = error_string.into_raw() as *mut c_char;
+            unsafe { *error_string_ptr = error_string.into_raw() as *mut c_char };
             std::mem::forget(query_engine);
             PRISMA_UNKNOWN_ERROR
         }
@@ -793,9 +793,9 @@ pub unsafe extern "C" fn prisma_apply_pending_migrations(
 /// # Safety
 ///
 /// Will destroy the pointer to the query engine
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn prisma_destroy(qe: *mut QueryEngine) -> c_int {
     // Once the variable goes out of scope, it will be deallocated
-    let _query_engine: Box<QueryEngine> = Box::from_raw(qe);
+    let _query_engine: Box<QueryEngine> = unsafe { Box::from_raw(qe) };
     PRISMA_OK
 }

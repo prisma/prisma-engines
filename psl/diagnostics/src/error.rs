@@ -1,8 +1,8 @@
 use colored::{ColoredString, Colorize};
 
 use crate::{
-    pretty_print::{pretty_print, DiagnosticColorer},
     Span,
+    pretty_print::{DiagnosticColorer, pretty_print},
 };
 use std::borrow::Cow;
 
@@ -116,7 +116,9 @@ impl DatamodelError {
         suggestion: &str,
         span: Span,
     ) -> DatamodelError {
-        let msg =  format!("The prefix {given_prefix} is invalid. It must be equal to the name of an existing datasource e.g. {expected_prefix}. Did you mean to use {suggestion}?");
+        let msg = format!(
+            "The prefix {given_prefix} is invalid. It must be equal to the name of an existing datasource e.g. {expected_prefix}. Did you mean to use {suggestion}?"
+        );
         DatamodelError::new(msg, span)
     }
 
@@ -140,7 +142,9 @@ impl DatamodelError {
         existing_model_name: &str,
         span: Span,
     ) -> DatamodelError {
-        let msg = format!("The model with database name \"{model_database_name}\" could not be defined because another model or view with this name exists: \"{existing_model_name}\"");
+        let msg = format!(
+            "The model with database name \"{model_database_name}\" could not be defined because another model or view with this name exists: \"{existing_model_name}\""
+        );
         Self::new(msg, span)
     }
 
@@ -149,7 +153,9 @@ impl DatamodelError {
         existing_model_name: &str,
         span: Span,
     ) -> DatamodelError {
-        let msg = format!("The view with database name \"{model_database_name}\" could not be defined because another model or view with this name exists: \"{existing_model_name}\"");
+        let msg = format!(
+            "The view with database name \"{model_database_name}\" could not be defined because another model or view with this name exists: \"{existing_model_name}\""
+        );
         Self::new(msg, span)
     }
 
@@ -207,7 +213,9 @@ impl DatamodelError {
         field_name: &str,
         span: Span,
     ) -> DatamodelError {
-        let msg = format!("Field \"{field_name}\" in {container} \"{container_name}\" can't be a list. The current connector does not support lists of primitive types.");
+        let msg = format!(
+            "Field \"{field_name}\" in {container} \"{container_name}\" can't be a list. The current connector does not support lists of primitive types."
+        );
         Self::new(msg, span)
     }
 
@@ -324,10 +332,11 @@ impl DatamodelError {
     }
 
     pub fn new_default_unknown_function(function_name: &str, span: Span) -> DatamodelError {
-        DatamodelError::new(format!(
+        DatamodelError::new(
+            format!(
                 "Unknown function in @default(): `{function_name}` is not known. You can read about the available functions here: https://pris.ly/d/attribute-functions"
             ),
-            span
+            span,
         )
     }
 
@@ -340,12 +349,16 @@ impl DatamodelError {
     }
 
     pub fn new_shadow_database_is_same_as_main_url_error(source_name: &str, span: Span) -> DatamodelError {
-        let msg = format!("shadowDatabaseUrl is the same as url for datasource \"{source_name}\". Please specify a different database as shadow database to avoid data loss.");
+        let msg = format!(
+            "shadowDatabaseUrl is the same as url for datasource \"{source_name}\". Please specify a different database as shadow database to avoid data loss."
+        );
         Self::new(msg, span)
     }
 
     pub fn new_shadow_database_is_same_as_direct_url_error(source_name: &str, span: Span) -> DatamodelError {
-        let msg = format!("shadowDatabaseUrl is the same as directUrl for datasource \"{source_name}\". Please specify a different database as shadow database to avoid data loss.");
+        let msg = format!(
+            "shadowDatabaseUrl is the same as directUrl for datasource \"{source_name}\". Please specify a different database as shadow database to avoid data loss."
+        );
         Self::new(msg, span)
     }
 

@@ -1,7 +1,7 @@
 use super::{
-    helpers::{parsing_catch_all, Pair},
-    parse_arguments::parse_arguments_list,
     Rule,
+    helpers::{Pair, parsing_catch_all},
+    parse_arguments::parse_arguments_list,
 };
 use crate::ast::*;
 use diagnostics::{DatamodelError, Diagnostics, FileId};

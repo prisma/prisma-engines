@@ -1,10 +1,10 @@
 use std::collections::HashSet;
 
-use super::{differ_database::DifferDatabase, foreign_keys_match, SqlSchemaDifferFlavour};
+use super::{SqlSchemaDifferFlavour, differ_database::DifferDatabase, foreign_keys_match};
 use crate::migration_pair::MigrationPair;
 use sql_schema_describer::{
-    walkers::{ForeignKeyWalker, IndexWalker, TableColumnWalker, TableWalker},
     ForeignKeyId, TableId,
+    walkers::{ForeignKeyWalker, IndexWalker, TableColumnWalker, TableWalker},
 };
 
 pub(crate) struct TableDiffer<'a, 'b> {

@@ -9,8 +9,8 @@ use diagnostics::DatamodelWarning;
 use enumflags2::BitFlags;
 use itertools::Itertools;
 use parser_database::{
-    walkers::{ModelWalker, RelationFieldId, RelationFieldWalker, RelationName},
     ReferentialAction,
+    walkers::{ModelWalker, RelationFieldId, RelationFieldWalker, RelationName},
 };
 use std::fmt;
 
@@ -132,7 +132,9 @@ pub(super) fn ignored_related_model(field: RelationFieldWalker<'_>, ctx: &mut Co
 
     let message = format!(
         "The relation field `{}` on Model `{}` must specify the `@ignore` attribute, because the model {} it is pointing to is marked ignored.",
-        field.name(), model.name(), related_model.name()
+        field.name(),
+        model.name(),
+        related_model.name()
     );
 
     ctx.push_error(DatamodelError::new_attribute_validation_error(

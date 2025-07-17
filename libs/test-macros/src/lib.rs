@@ -1,6 +1,6 @@
 extern crate proc_macro;
 
-use darling::{ast::NestedMeta, FromMeta};
+use darling::{FromMeta, ast::NestedMeta};
 use proc_macro::TokenStream;
 use proc_macro2::{Delimiter, TokenTree};
 use quote::quote;

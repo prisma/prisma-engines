@@ -40,10 +40,10 @@ mod find_first_or_throw_query {
         test_data(&runner).await?;
 
         assert_error!(
-          &runner,
-          "query { findFirstTestModelOrThrow(where: { id: 6 }) { id }}",
-          2025,
-          "An operation failed because it depends on one or more records that were required but not found. No record was found for a query."
+            &runner,
+            "query { findFirstTestModelOrThrow(where: { id: 6 }) { id }}",
+            2025,
+            "An operation failed because it depends on one or more records that were required but not found. No record was found for a query."
         );
 
         Ok(())

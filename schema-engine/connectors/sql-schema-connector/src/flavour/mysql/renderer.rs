@@ -1,4 +1,4 @@
-use crate::sql_renderer::{render_step, IteratorJoin, Quoted, QuotedWithPrefix, SqlRenderer};
+use crate::sql_renderer::{IteratorJoin, Quoted, QuotedWithPrefix, SqlRenderer, render_step};
 use crate::{
     migration_pair::MigrationPair,
     sql_migration::{AlterColumn, AlterEnum, AlterTable, RedefineTable, TableChange},
@@ -6,12 +6,12 @@ use crate::{
 };
 use psl::builtin_connectors::MySqlType;
 use regex::Regex;
-use sql_ddl::{mysql as ddl, IndexColumn, SortOrder};
+use sql_ddl::{IndexColumn, SortOrder, mysql as ddl};
 use sql_schema_describer::{
+    ColumnTypeFamily, DefaultKind, DefaultValue, ForeignKeyAction, PrismaValue, SQLSortOrder, SqlSchema,
     walkers::{
         EnumWalker, ForeignKeyWalker, IndexWalker, TableColumnWalker, TableWalker, UserDefinedTypeWalker, ViewWalker,
     },
-    ColumnTypeFamily, DefaultKind, DefaultValue, ForeignKeyAction, PrismaValue, SQLSortOrder, SqlSchema,
 };
 use std::{borrow::Cow, fmt::Write as _, sync::LazyLock};
 

@@ -1,11 +1,11 @@
 use super::{FieldResolutionError, FieldResolvingSetup};
 use crate::{
+    DatamodelError, ScalarFieldId, StringId,
     ast::{self, WithName, WithSpan},
     attributes::{format_fields_in_error_with_leading_word, resolve_field_array_with_args},
     coerce,
     context::Context,
     types::{FieldWithArgs, IdAttribute, IndexFieldPath, ModelAttributes, ScalarField, SortOrder},
-    DatamodelError, ScalarFieldId, StringId,
 };
 use std::borrow::Cow;
 
@@ -231,7 +231,7 @@ pub(super) fn validate_id_field_arities(
 }
 
 fn primary_key_mapped_name(ctx: &mut Context<'_>) -> Option<StringId> {
-    let mapped_name = match ctx
+    match ctx
         .visit_optional_arg("map")
         .and_then(|name| coerce::string(name, ctx.diagnostics))
     {
@@ -241,7 +241,5 @@ fn primary_key_mapped_name(ctx: &mut Context<'_>) -> Option<StringId> {
         }
         Some(name) => Some(ctx.interner.intern(name)),
         None => None,
-    };
-
-    mapped_name
+    }
 }

@@ -1,9 +1,9 @@
 use super::*;
 use crate::{
-    query_document::{ParsedArgument, ParsedInputMap},
     QueryGraphBuilderError, QueryGraphBuilderResult,
+    query_document::{ParsedArgument, ParsedInputMap},
 };
-use query_structure::{prelude::*, QueryArguments};
+use query_structure::{QueryArguments, prelude::*};
 use schema::constants::{aggregations, args, ordering};
 use std::convert::TryInto;
 
@@ -301,7 +301,7 @@ fn extract_cursor(value: ParsedInputValue<'_>, model: &Model) -> QueryGraphBuild
                         "Unable to resolve field {} to a field or a set of fields on model {}",
                         field_name,
                         model.name()
-                    )))
+                    )));
                 }
             },
         };

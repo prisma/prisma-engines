@@ -1,20 +1,20 @@
 use super::*;
 use crate::error::MongoError::ConversionError;
 use crate::{
+    IntoBson,
     error::{DecorateErrorWithFieldInformationExtension, MongoError},
     filter::{FilterPrefix, MongoFilter, MongoFilterVisitor},
     output_meta,
     query_builder::MongoReadQueryBuilder,
     query_strings::{Aggregate, DeleteMany, DeleteOne, Find, InsertMany, InsertOne, RunCommand, UpdateMany, UpdateOne},
     root_queries::raw::{MongoCommand, MongoOperation},
-    IntoBson,
 };
 use connector_interface::*;
 use mongodb::{
-    bson::{doc, Document},
+    ClientSession, Collection, Database,
+    bson::{Document, doc},
     error::ErrorKind,
     options::InsertManyOptions,
-    ClientSession, Collection, Database,
 };
 use query_structure::{Model, PrismaValue, SelectionResult};
 use std::future::IntoFuture;
@@ -119,7 +119,7 @@ pub async fn create_records(
     match insert.await {
         Ok(insert_result) => Ok(insert_result.inserted_ids.len()),
         Err(err) if skip_duplicates => match err.kind.as_ref() {
-            ErrorKind::BulkWrite(ref failure) => {
+            ErrorKind::BulkWrite(failure) => {
                 let errs = &failure.write_errors;
                 if !errs.iter().any(|(_, err)| err.code != 11000) {
                     Ok(num_records - errs.len())
@@ -128,7 +128,7 @@ pub async fn create_records(
                 }
             }
 
-            ErrorKind::InsertMany(ref failure) => match failure.write_errors {
+            ErrorKind::InsertMany(failure) => match failure.write_errors {
                 Some(ref errs) if !errs.iter().any(|err| err.code != 11000) => Ok(num_records - errs.len()),
                 _ => Err(err.into()),
             },
@@ -333,7 +333,7 @@ async fn find_ids(
                 return Err(ConversionError {
                     from: "usize".to_owned(),
                     to: "i64".to_owned(),
-                })
+                });
             }
         }
     }

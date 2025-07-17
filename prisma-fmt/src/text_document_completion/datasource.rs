@@ -5,7 +5,7 @@ use lsp_types::{
 };
 use psl::datamodel_connector::format_completion_docs;
 
-use super::{add_quotes, CompletionContext};
+use super::{CompletionContext, add_quotes};
 
 pub(super) fn relation_mode_completion(completion_list: &mut CompletionList) {
     completion_list.items.push(CompletionItem {

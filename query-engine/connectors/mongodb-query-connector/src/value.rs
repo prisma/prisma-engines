@@ -1,10 +1,10 @@
 use crate::{
+    IntoBson, MongoError,
     filter::FilterPrefix,
     output_meta::{CompositeOutputMeta, OutputMeta, ScalarOutputMeta},
-    IntoBson, MongoError,
 };
 use bigdecimal::{BigDecimal, FromPrimitive, ToPrimitive};
-use bson::{oid::ObjectId, spec::BinarySubtype, Binary, Bson, Document, Timestamp};
+use bson::{Binary, Bson, Document, Timestamp, oid::ObjectId, spec::BinarySubtype};
 use chrono::{TimeZone, Utc};
 use itertools::Itertools;
 use psl::builtin_connectors::MongoDbType;
@@ -203,7 +203,7 @@ impl IntoBson for (&MongoDbType, PrismaValue) {
                 return Err(MongoError::ConversionError {
                     from: format!("{p_val:?}"),
                     to: format!("{mdb_type:?}"),
-                })
+                });
             }
         })
     }
@@ -279,7 +279,7 @@ impl IntoBson for (&TypeIdentifier, PrismaValue) {
             (ident, val) => {
                 return Err(MongoError::Unsupported(format!(
                     "Unhandled and unsupported value mapping for MongoDB: {val} as {ident:?}.",
-                )))
+                )));
             }
         })
     }
@@ -381,7 +381,7 @@ fn read_scalar_value(bson: Bson, meta: &ScalarOutputMeta) -> crate::Result<Prism
             return Err(MongoError::ConversionError {
                 from: bson.to_string(),
                 to: format!("{ident:?}"),
-            })
+            });
         }
     };
 
@@ -441,7 +441,7 @@ fn read_composite_value(bson: Bson, meta: &CompositeOutputMeta) -> crate::Result
                 return Err(MongoError::ConversionError {
                     from: format!("{bson:?}"),
                     to: "Document".to_owned(),
-                })
+                });
             }
         }
     };

@@ -1,9 +1,8 @@
 use super::connection::SqlConnection;
 use async_trait::async_trait;
 use connector_interface::{
-    self as connector,
+    self as connector, Connection, Connector,
     error::{ConnectorError, ErrorKind},
-    Connection, Connector,
 };
 use quaint::{
     connector::{ExternalConnector, IsolationLevel, Transaction},

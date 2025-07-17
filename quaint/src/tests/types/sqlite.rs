@@ -2,8 +2,8 @@
 
 use crate::connector::ColumnType;
 use crate::macros::assert_matching_value_and_column_type;
-use crate::tests::test_api::sqlite_test_api;
 use crate::tests::test_api::TestApi;
+use crate::tests::test_api::sqlite_test_api;
 use crate::{ast::*, connector::Queryable};
 
 use std::str::FromStr;

@@ -2,18 +2,18 @@ use crate::{
     flavour::SqlConnector,
     migration_pair::MigrationPair,
     sql_destructive_change_checker::{
+        DestructiveChangeCheckerFlavour,
         check::{Column, Table},
         destructive_change_checker_flavour::{extract_column_values_count, extract_table_rows_count},
         destructive_check_plan::DestructiveCheckPlan,
         unexecutable_step_check::UnexecutableStepCheck,
         warning_check::SqlMigrationWarningCheck,
-        DestructiveChangeCheckerFlavour,
     },
     sql_migration::{AlterColumn, ColumnTypeChange},
     sql_schema_differ::ColumnChanges,
 };
 use schema_connector::{BoxFuture, ConnectorResult};
-use sql_schema_describer::{walkers::TableColumnWalker, ColumnArity};
+use sql_schema_describer::{ColumnArity, walkers::TableColumnWalker};
 
 #[derive(Debug, Default)]
 pub struct SqliteDestructiveChangeCheckerFlavour;

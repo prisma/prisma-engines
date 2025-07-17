@@ -1,4 +1,4 @@
-use codspeed_criterion_compat::{black_box, criterion_group, criterion_main, Criterion};
+use codspeed_criterion_compat::{Criterion, black_box, criterion_group, criterion_main};
 
 const SMALL: (&str, &str) = ("small", include_str!("../test-schemas/standupbot.prisma"));
 const MEDIUM: (&str, &str) = ("medium", include_str!("../test-schemas/noalyss_folder.prisma"));

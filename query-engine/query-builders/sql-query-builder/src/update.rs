@@ -1,7 +1,7 @@
 use quaint::ast::{Query, Update};
 use query_structure::{Filter, IntoFilter, Model, ModelProjection, RecordFilter, SelectionResult, WriteArgs};
 
-use crate::{limit, write, AsColumns, Context, FilterBuilder};
+use crate::{AsColumns, Context, FilterBuilder, limit, write};
 
 // Generates a query like this:
 //  UPDATE "public"."User" SET "name" = $1 WHERE "public"."User"."age" > $1

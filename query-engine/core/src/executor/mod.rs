@@ -17,8 +17,8 @@ pub use request_context::*;
 pub use telemetry::TraceParent;
 
 use crate::{
-    protocol::EngineProtocol, query_document::Operation, response_ir::ResponseData, schema::QuerySchemaRef,
-    BatchDocumentTransaction, TxId,
+    BatchDocumentTransaction, TxId, protocol::EngineProtocol, query_document::Operation, response_ir::ResponseData,
+    schema::QuerySchemaRef,
 };
 use async_trait::async_trait;
 use connector::Connector;

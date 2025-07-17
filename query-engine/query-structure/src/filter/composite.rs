@@ -1,4 +1,4 @@
-use crate::{filter::Filter, CompositeCompare, CompositeFieldRef};
+use crate::{CompositeCompare, CompositeFieldRef, filter::Filter};
 use prisma_value::PrismaValue;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]

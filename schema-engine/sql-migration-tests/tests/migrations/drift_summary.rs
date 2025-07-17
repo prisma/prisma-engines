@@ -1,4 +1,4 @@
-use expect_test::{expect, Expect};
+use expect_test::{Expect, expect};
 use schema_core::json_rpc::types::SchemasContainer;
 use sql_migration_tests::test_api::*;
 use std::sync::Arc;

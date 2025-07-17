@@ -86,8 +86,8 @@ impl FieldType {
             FieldType::Timestamp => "DateTime",
             FieldType::Int64 => "BigInt",
             FieldType::Json => "Json",
-            FieldType::Document(ref s) => s,
-            FieldType::Array(ref r#type) => r#type.prisma_type(),
+            FieldType::Document(s) => s,
+            FieldType::Array(r#type) => r#type.prisma_type(),
             FieldType::Unsupported(r#type) => r#type,
         }
     }

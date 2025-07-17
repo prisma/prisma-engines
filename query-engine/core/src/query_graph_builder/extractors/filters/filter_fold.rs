@@ -319,9 +319,9 @@ fn generate_filters() -> Vec<Filter> {
             let (nested_conditions, rest) = conditions_with_vars.split_first_mut().unwrap();
 
             match nested_conditions {
-                Filter::And(ref mut f) => f.append(&mut rest.to_vec()),
-                Filter::Or(ref mut f) => f.append(&mut rest.to_vec()),
-                Filter::Not(ref mut f) => f.append(&mut rest.to_vec()),
+                Filter::And(f) => f.append(&mut rest.to_vec()),
+                Filter::Or(f) => f.append(&mut rest.to_vec()),
+                Filter::Not(f) => f.append(&mut rest.to_vec()),
                 _ => unreachable!(),
             }
 

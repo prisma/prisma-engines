@@ -5,14 +5,14 @@ use serde_json::Value;
 use std::collections::BTreeMap;
 use telemetry::Exporter;
 use tracing::{
+    Dispatch, Level, Subscriber,
     field::{Field, Visit},
     level_filters::LevelFilter,
-    Dispatch, Level, Subscriber,
 };
 use tracing_subscriber::{
-    filter::{filter_fn, FilterExt},
-    layer::SubscriberExt,
     Layer, Registry,
+    filter::{FilterExt, filter_fn},
+    layer::SubscriberExt,
 };
 use wasm_bindgen::JsValue;
 

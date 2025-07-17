@@ -1,9 +1,9 @@
 use crate::utils;
 use schema_core::{
+    CoreError, CoreResult,
     commands::apply_migrations,
     json_rpc::types::*,
     schema_connector::{Namespaces, SchemaConnector},
-    CoreError, CoreResult,
 };
 use tempfile::TempDir;
 

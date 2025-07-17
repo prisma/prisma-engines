@@ -9,7 +9,7 @@ use crate::{
 
 use super::column_type::*;
 
-use bigdecimal::{num_bigint::BigInt, BigDecimal, FromPrimitive, ToPrimitive};
+use bigdecimal::{BigDecimal, FromPrimitive, ToPrimitive, num_bigint::BigInt};
 use bit_vec::BitVec;
 use bytes::BytesMut;
 use chrono::{DateTime, NaiveDateTime, Utc};
@@ -18,8 +18,8 @@ pub(crate) use decimal::DecimalWrapper;
 use postgres_types::{FromSql, ToSql, WrongType};
 use std::{borrow::Cow, convert::TryFrom, error::Error as StdError};
 use tokio_postgres::{
-    types::{self, IsNull, Kind, Type as PostgresType},
     Row as PostgresRow, Statement as PostgresStatement,
+    types::{self, IsNull, Kind, Type as PostgresType},
 };
 
 use uuid::Uuid;
@@ -58,7 +58,7 @@ pub(crate) fn params_to_types(params: &[Value<'_>]) -> Vec<PostgresType> {
                 ValueType::Date(_) => PostgresType::TIMESTAMP,
                 ValueType::Time(_) => PostgresType::TIME,
 
-                ValueType::Array(ref arr) => {
+                ValueType::Array(arr) => {
                     let arr = arr.as_ref().unwrap();
 
                     // If the array is empty, we can't infer the type so we let PG infer it

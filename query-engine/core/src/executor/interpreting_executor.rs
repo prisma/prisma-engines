@@ -2,8 +2,8 @@ use super::execute_operation::{execute_many_operations, execute_many_self_contai
 use super::request_context;
 use crate::ItxManager;
 use crate::{
-    protocol::EngineProtocol, BatchDocumentTransaction, CoreError, Operation, QueryExecutor, ResponseData,
-    TransactionError, TransactionManager, TransactionOptions, TxId,
+    BatchDocumentTransaction, CoreError, Operation, QueryExecutor, ResponseData, TransactionError, TransactionManager,
+    TransactionOptions, TxId, protocol::EngineProtocol,
 };
 
 use async_trait::async_trait;

@@ -1,9 +1,9 @@
 use itertools::Itertools;
-use query_structure::prelude::DomainError;
 use query_structure::Filter;
+use query_structure::prelude::DomainError;
 use std::fmt::Display;
 use thiserror::Error;
-use user_facing_errors::{query_engine::DatabaseConstraint, KnownError};
+use user_facing_errors::{KnownError, query_engine::DatabaseConstraint};
 
 #[derive(Debug, Error)]
 #[error("{}", kind)]

@@ -90,9 +90,11 @@ mod interactive_tx {
         println!("KNOWN ERROR {known_err:?}");
 
         assert_eq!(known_err.error_code, Cow::Borrowed("P2028"));
-        assert!(known_err
-            .message
-            .contains("A commit cannot be executed on an expired transaction"));
+        assert!(
+            known_err
+                .message
+                .contains("A commit cannot be executed on an expired transaction")
+        );
 
         // Try again
         let res = runner.commit_tx(tx_id).await?;
@@ -100,9 +102,11 @@ mod interactive_tx {
         let known_err = error.as_known().unwrap();
 
         assert_eq!(known_err.error_code, Cow::Borrowed("P2028"));
-        assert!(known_err
-            .message
-            .contains("A commit cannot be executed on an expired transaction"));
+        assert!(
+            known_err
+                .message
+                .contains("A commit cannot be executed on an expired transaction")
+        );
 
         Ok(())
     }
@@ -288,9 +292,11 @@ mod interactive_tx {
         let known_err = error.as_known().unwrap();
 
         assert_eq!(known_err.error_code, Cow::Borrowed("P2028"));
-        assert!(known_err
-            .message
-            .contains("A commit cannot be executed on an expired transaction"));
+        assert!(
+            known_err
+                .message
+                .contains("A commit cannot be executed on an expired transaction")
+        );
 
         // Expect the state of the tx to be expired so the rollback should fail.
         let res = runner.rollback_tx(tx_id.clone()).await?;
@@ -298,9 +304,11 @@ mod interactive_tx {
         let known_err = error.as_known().unwrap();
 
         assert_eq!(known_err.error_code, Cow::Borrowed("P2028"));
-        assert!(known_err
-            .message
-            .contains("A rollback cannot be executed on an expired transaction"));
+        assert!(
+            known_err
+                .message
+                .contains("A rollback cannot be executed on an expired transaction")
+        );
 
         // Expect the state of the tx to be expired so the query should fail.
         assert_error!(
@@ -447,9 +455,11 @@ mod interactive_tx {
         let known_err = error.as_known().unwrap();
 
         assert_eq!(known_err.error_code, Cow::Borrowed("P2028"));
-        assert!(known_err
-            .message
-            .contains("A commit cannot be executed on a committed transaction"));
+        assert!(
+            known_err
+                .message
+                .contains("A commit cannot be executed on a committed transaction")
+        );
 
         // The first commit must have worked
         insta::assert_snapshot!(
@@ -484,9 +494,11 @@ mod interactive_tx {
         let known_err = error.as_known().unwrap();
 
         assert_eq!(known_err.error_code, Cow::Borrowed("P2028"));
-        assert!(known_err
-            .message
-            .contains("A rollback cannot be executed on a transaction that was rolled back"));
+        assert!(
+            known_err
+                .message
+                .contains("A rollback cannot be executed on a transaction that was rolled back")
+        );
 
         // Check that the rollback still worked
         insta::assert_snapshot!(
@@ -521,9 +533,11 @@ mod interactive_tx {
         let known_err = error.as_known().unwrap();
 
         assert_eq!(known_err.error_code, Cow::Borrowed("P2028"));
-        assert!(known_err
-            .message
-            .contains("A commit cannot be executed on a transaction that was rolled back"));
+        assert!(
+            known_err
+                .message
+                .contains("A commit cannot be executed on a transaction that was rolled back")
+        );
 
         // Check that the commit didn't work
         insta::assert_snapshot!(
@@ -558,9 +572,11 @@ mod interactive_tx {
         let known_err = error.as_known().unwrap();
 
         assert_eq!(known_err.error_code, Cow::Borrowed("P2028"));
-        assert!(known_err
-            .message
-            .contains("A rollback cannot be executed on a committed transaction"));
+        assert!(
+            known_err
+                .message
+                .contains("A rollback cannot be executed on a committed transaction")
+        );
 
         // Check that the commit worked
         insta::assert_snapshot!(

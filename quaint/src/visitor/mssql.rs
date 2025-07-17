@@ -3,13 +3,14 @@ use crate::ast::Update;
 use crate::prelude::{JsonArrayAgg, JsonBuildObject, JsonExtract, JsonType, JsonUnquote};
 use crate::visitor::query_writer::QueryWriter;
 use crate::{
+    Value, ValueType,
     ast::{
         Column, Comparable, Expression, ExpressionKind, Insert, IntoRaw, Join, JoinData, Joinable, Merge, OnConflict,
         Order, Ordering, Row, Table, TypeDataLength, TypeFamily, Values,
     },
     error::{Error, ErrorKind},
     prelude::{Aliasable, Average, Query},
-    visitor, Value, ValueType,
+    visitor,
 };
 use either::Either;
 use itertools::Itertools;
@@ -1245,8 +1246,7 @@ mod tests {
 
     #[test]
     fn test_additional_condition_inner_join() {
-        let expected_sql =
-            "SELECT [users].* FROM [users] INNER JOIN [posts] ON ([users].[id] = [posts].[user_id] AND [posts].[published] = @P1)";
+        let expected_sql = "SELECT [users].* FROM [users] INNER JOIN [posts] ON ([users].[id] = [posts].[user_id] AND [posts].[published] = @P1)";
 
         let query = Select::from_table("users").inner_join(
             "posts".on(("users", "id")
@@ -1273,8 +1273,7 @@ mod tests {
 
     #[test]
     fn test_additional_condition_left_join() {
-        let expected_sql =
-            "SELECT [users].* FROM [users] LEFT JOIN [posts] ON ([users].[id] = [posts].[user_id] AND [posts].[published] = @P1)";
+        let expected_sql = "SELECT [users].* FROM [users] LEFT JOIN [posts] ON ([users].[id] = [posts].[user_id] AND [posts].[published] = @P1)";
 
         let query = Select::from_table("users").left_join(
             "posts".on(("users", "id")
@@ -1451,7 +1450,10 @@ mod tests {
         let insert = Insert::single_into("foo").value("bar", "lol");
         let (sql, params) = Mssql::build(Insert::from(insert).returning(vec!["bar"])).unwrap();
 
-        assert_eq!("DECLARE @generated_keys table([bar] NVARCHAR(255)) INSERT INTO [foo] ([bar]) OUTPUT [Inserted].[bar] INTO @generated_keys VALUES (@P1) SELECT [t].[bar] FROM @generated_keys AS g INNER JOIN [foo] AS [t] ON [t].[bar] = [g].[bar] WHERE @@ROWCOUNT > 0", sql);
+        assert_eq!(
+            "DECLARE @generated_keys table([bar] NVARCHAR(255)) INSERT INTO [foo] ([bar]) OUTPUT [Inserted].[bar] INTO @generated_keys VALUES (@P1) SELECT [t].[bar] FROM @generated_keys AS g INNER JOIN [foo] AS [t] ON [t].[bar] = [g].[bar] WHERE @@ROWCOUNT > 0",
+            sql
+        );
 
         assert_eq!(vec![Value::from("lol")], params);
     }

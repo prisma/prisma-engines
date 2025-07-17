@@ -1,9 +1,9 @@
 use crate::{error::SqlError, value::to_prisma_value};
 use bigdecimal::{BigDecimal, FromPrimitive, ToPrimitive};
 use chrono::{DateTime, NaiveDate, Utc};
-use connector_interface::{coerce_null_to_zero_value, AggregationResult};
+use connector_interface::{AggregationResult, coerce_null_to_zero_value};
 use core::{f32, f64};
-use quaint::{connector::ResultRow, Value, ValueType};
+use quaint::{Value, ValueType, connector::ResultRow};
 use query_structure::{AggregationSelection, ConversionFailure, FieldArity, PrismaValue, Record, TypeIdentifier};
 use sql_query_builder::ColumnMetadata;
 use std::{io, str::FromStr};
@@ -100,7 +100,10 @@ impl ToSqlRow for ResultRow {
                     _ => {
                         let error = io::Error::new(
                             io::ErrorKind::InvalidData,
-                            format!("List field did not return an Array from database. Type identifier was {:?}. Value was {:?}.", &type_identifier, &p_value),
+                            format!(
+                                "List field did not return an Array from database. Type identifier was {:?}. Value was {:?}.",
+                                &type_identifier, &p_value
+                            ),
                         );
                         return Err(SqlError::ConversionError(error.into()));
                     }

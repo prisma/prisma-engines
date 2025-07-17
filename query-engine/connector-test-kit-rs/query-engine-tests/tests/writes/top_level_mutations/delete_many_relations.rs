@@ -3,7 +3,7 @@ use query_engine_tests::*;
 #[test_suite(exclude(CockroachDb))]
 mod delete_many_rels {
     use indoc::indoc;
-    use query_engine_tests::{run_query, Runner};
+    use query_engine_tests::{Runner, run_query};
     use query_test_macros::relation_link_test;
 
     #[relation_link_test(

@@ -1,6 +1,6 @@
 use tracing::Subscriber;
 use tracing_error::ErrorLayer;
-use tracing_subscriber::{prelude::*, Layer};
+use tracing_subscriber::{Layer, prelude::*};
 
 use crate::LogEmit;
 

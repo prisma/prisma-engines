@@ -5,9 +5,9 @@ use crosstarget_utils::time::{ElapsedTimeCounter, SystemTime};
 #[cfg(test)]
 use serde::Serialize;
 
+use crate::NextId;
 use crate::id::{RequestId, SpanId};
 use crate::models::{LogLevel, SpanKind};
-use crate::NextId;
 
 #[derive(Debug, Clone)]
 #[cfg_attr(test, derive(Serialize))]

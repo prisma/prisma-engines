@@ -12,17 +12,17 @@ use enumflags2::BitFlags;
 use indoc::indoc;
 use psl::PreviewFeature;
 use quaint::{
-    connector::{is_url_localhost, PostgresUrl, PostgresWebSocketUrl},
     Value,
+    connector::{PostgresUrl, PostgresWebSocketUrl, is_url_localhost},
 };
 use renderer::PostgresRenderer;
 use schema_calculator::PostgresSchemaCalculatorFlavour;
 use schema_connector::{
-    migrations_directory::MigrationDirectory, BoxFuture, ConnectorError, ConnectorResult, Namespaces, SchemaFilter,
+    BoxFuture, ConnectorError, ConnectorResult, Namespaces, SchemaFilter, migrations_directory::MigrationDirectory,
 };
 use schema_differ::PostgresSchemaDifferFlavour;
 use serde::Deserialize;
-use sql_schema_describer::{postgres::PostgresSchemaExt, SqlSchema};
+use sql_schema_describer::{SqlSchema, postgres::PostgresSchemaExt};
 use std::{
     borrow::Cow,
     future::{self, Future},
@@ -626,7 +626,7 @@ async fn describe_schema_with(
     namespaces: Option<Namespaces>,
     schema: String,
 ) -> ConnectorResult<SqlSchema> {
-    use sql_schema_describer::{postgres as describer, DescriberErrorKind, SqlSchemaDescriberBackend};
+    use sql_schema_describer::{DescriberErrorKind, SqlSchemaDescriberBackend, postgres as describer};
 
     let mut describer_circumstances: BitFlags<describer::Circumstances> = Default::default();
 

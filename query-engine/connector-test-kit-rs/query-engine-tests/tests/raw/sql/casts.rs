@@ -3,7 +3,7 @@ use query_engine_tests::*;
 
 #[test_suite(schema(common_nullable_types), only(Postgres))]
 mod casts {
-    use query_engine_tests::{fmt_query_raw, run_query, RawParam};
+    use query_engine_tests::{RawParam, fmt_query_raw, run_query};
 
     // The following tests are excluded for driver adapters. The underlying
     // driver rejects queries where the values of the positional arguments do

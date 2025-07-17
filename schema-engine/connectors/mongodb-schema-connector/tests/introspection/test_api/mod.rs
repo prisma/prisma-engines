@@ -1,8 +1,8 @@
 mod utils;
 
 use enumflags2::BitFlags;
-pub use expect_test::expect;
 use expect_test::Expect;
+pub use expect_test::expect;
 use itertools::Itertools;
 use mongodb::Database;
 use mongodb_schema_connector::MongoDbSchemaConnector;

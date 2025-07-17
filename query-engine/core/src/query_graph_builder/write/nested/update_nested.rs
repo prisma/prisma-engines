@@ -1,11 +1,11 @@
 use super::*;
 use crate::inputs::{UpdateManyRecordsSelectorsInput, UpdateRecordSelectorsInput};
 use crate::query_graph_builder::write::update::UpdateManyRecordNodeOptionals;
-use crate::{
-    query_graph::{NodeRef, QueryGraph, QueryGraphDependency},
-    ParsedInputValue,
-};
 use crate::{DataExpectation, RowSink};
+use crate::{
+    ParsedInputValue,
+    query_graph::{NodeRef, QueryGraph, QueryGraphDependency},
+};
 use query_structure::{Filter, Model, RelationFieldRef};
 use schema::constants::args;
 use std::convert::TryInto;

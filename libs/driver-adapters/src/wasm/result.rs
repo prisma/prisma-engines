@@ -2,7 +2,7 @@ use js_sys::Boolean as JsBoolean;
 use wasm_bindgen::{JsCast, JsValue};
 
 use super::from_js::FromJsValue;
-use crate::{error::DriverAdapterError, JsObjectExtern};
+use crate::{JsObjectExtern, error::DriverAdapterError};
 
 /// Wrapper for JS-side result type.
 /// This Wasm-specific implementation has the same shape and API as the Napi implementation,

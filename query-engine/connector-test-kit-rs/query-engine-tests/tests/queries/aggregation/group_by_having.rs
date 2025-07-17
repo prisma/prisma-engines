@@ -8,7 +8,7 @@ use query_engine_tests::*;
 //   operators applied. For a good confidence, we choose `equals`, `in`, `not equals`, `endsWith` (where applicable).
 #[test_suite(schema(schemas::common_text_and_numeric_types_optional))]
 mod aggr_group_by_having {
-    use query_engine_tests::{assert_error, match_connector_result, run_query, Runner};
+    use query_engine_tests::{Runner, assert_error, match_connector_result, run_query};
 
     // This is just basic confirmation that scalar filters are applied correctly.
     // The assumption is that we don't need to test all normal scalar filters as they share the exact same code path
@@ -421,7 +421,7 @@ mod aggr_group_by_having {
 
 #[test_suite(schema(schema), capabilities(DecimalType))]
 mod decimal_aggregation_group_by_having {
-    use query_engine_tests::{match_connector_result, run_query, Runner};
+    use query_engine_tests::{Runner, match_connector_result, run_query};
 
     fn schema() -> String {
         let schema = indoc! {

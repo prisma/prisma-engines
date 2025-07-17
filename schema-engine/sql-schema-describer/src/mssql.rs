@@ -1,9 +1,9 @@
 //! SQL server schema description.
 
 use crate::{
-    getters::Getter, ids::*, parsers::Parser, Column, ColumnArity, ColumnType, ColumnTypeFamily, DefaultValue,
-    DescriberError, DescriberErrorKind, DescriberResult, ForeignKeyAction, IndexColumn, Procedure, SQLSortOrder,
-    SqlSchema, UserDefinedType, View,
+    Column, ColumnArity, ColumnType, ColumnTypeFamily, DefaultValue, DescriberError, DescriberErrorKind,
+    DescriberResult, ForeignKeyAction, IndexColumn, Procedure, SQLSortOrder, SqlSchema, UserDefinedType, View,
+    getters::Getter, ids::*, parsers::Parser,
 };
 use either::Either;
 use enumflags2::BitFlags;

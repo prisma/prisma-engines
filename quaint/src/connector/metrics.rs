@@ -3,7 +3,7 @@ use std::future::Future;
 use crosstarget_utils::time::ElapsedTimeCounter;
 use prisma_metrics::{counter, histogram};
 use telemetry::formatting::QueryForTracing;
-use tracing::{info_span, Instrument};
+use tracing::{Instrument, info_span};
 
 use crate::ast::{Params, Value};
 

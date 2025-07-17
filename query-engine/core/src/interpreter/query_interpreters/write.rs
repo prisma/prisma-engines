@@ -1,7 +1,7 @@
 use crate::{
+    QueryResult, RecordSelection,
     interpreter::{InterpretationResult, InterpreterError},
     query_ast::*,
-    QueryResult, RecordSelection,
 };
 use connector::{ConnectionLike, NativeUpsert};
 use query_structure::{ManyRecords, RawJson};

@@ -22,11 +22,11 @@ use itertools::{Either, Itertools};
 use model_extensions::ScalarFieldExt;
 use prisma_value::{Placeholder, PrismaValue};
 use quaint::{
+    Value,
     ast::{
         Column, Comparable, ConditionTree, ExpressionKind, Insert, OnConflict, OpaqueType, Query, Row, Select, Values,
     },
     visitor::Visitor,
-    Value,
 };
 use query_builder::{CreateRecord, CreateRecordDefaultsQuery, DbQuery, QueryBuilder};
 use query_structure::{
@@ -463,7 +463,7 @@ pub fn in_conditions<'a>(
                     )
                 })
                 .reduce(|l, r| l.and(r))
-                .expect("should have at least one column")
+                .expect("should have at least one column");
         }
         Err(items) => items,
     };

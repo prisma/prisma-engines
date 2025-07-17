@@ -1,11 +1,11 @@
 use crate::{
-    datamodel_connector::{walker_ext_traits::ScalarFieldWalkerExt, Connector},
+    datamodel_connector::{Connector, walker_ext_traits::ScalarFieldWalkerExt},
     diagnostics::Diagnostics,
     diagnostics::{DatamodelWarning, Span},
     parser_database::{
+        ReferentialAction,
         ast::WithSpan,
         walkers::{IndexWalker, PrimaryKeyWalker, RelationFieldWalker},
-        ReferentialAction,
     },
 };
 use indoc::formatdoc;

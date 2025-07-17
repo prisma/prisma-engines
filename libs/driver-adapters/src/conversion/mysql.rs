@@ -15,7 +15,7 @@ pub fn value_to_js_arg(value: &quaint::Value) -> serde_json::Result<JSArg> {
         quaint::ValueType::DateTime(Some(dt)) => JSArg::Value(JsonValue::String(dt.format(DATETIME_FORMAT).to_string())),
         quaint::ValueType::Int32(Some(value)) => JSArg::SafeInt(*value),
         quaint::ValueType::Time(Some(t)) => JSArg::Value(JsonValue::String(t.format(TIME_FORMAT).to_string())),
-        quaint::ValueType::Array(Some(ref items)) => JSArg::Array(
+        quaint::ValueType::Array(Some(items)) => JSArg::Array(
             items
                 .iter()
                 .map(value_to_js_arg)
@@ -29,9 +29,9 @@ pub fn value_to_js_arg(value: &quaint::Value) -> serde_json::Result<JSArg> {
 #[cfg(test)]
 mod test {
     use super::*;
+    use quaint::ValueType;
     use quaint::bigdecimal::BigDecimal;
     use quaint::chrono::*;
-    use quaint::ValueType;
     use std::str::FromStr;
 
     #[test]
@@ -39,7 +39,7 @@ mod test {
     fn test_value_to_js_arg() {
             let test_cases = vec![
             (
-                ValueType::Numeric(Some(1.into())), 
+                ValueType::Numeric(Some(1.into())),
                 JSArg::Value(JsonValue::String("1".to_string()))
             ),
             (
@@ -98,7 +98,7 @@ mod test {
                 ValueType::Bytes(Some("hello".as_bytes().into())),
                 JSArg::Buffer("hello".as_bytes().to_vec())
             ),
-        
+
         ];
 
         let mut errors: Vec<String> = vec![];

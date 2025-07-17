@@ -1,9 +1,9 @@
 use std::sync::Arc;
 
 use crate::{
+    SchemaContainerExt,
     core_error::CoreResult,
     json_rpc::types::{DiffParams, DiffResult, DiffTarget, UrlContainer},
-    SchemaContainerExt,
 };
 use enumflags2::BitFlags;
 use json_rpc::types::MigrationList;
@@ -58,7 +58,7 @@ pub async fn diff_cli(params: DiffParams, host: Arc<dyn ConnectorHost>) -> CoreR
         (None, None) => {
             return Err(ConnectorError::from_msg(
                 "Could not determine the connector to use for diffing.".to_owned(),
-            ))
+            ));
         }
     };
 

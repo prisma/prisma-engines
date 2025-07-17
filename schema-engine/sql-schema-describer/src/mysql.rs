@@ -5,8 +5,8 @@ use indexmap::IndexMap;
 use indoc::indoc;
 use psl::{builtin_connectors::MySqlType, datamodel_connector::NativeTypeInstance};
 use quaint::{
-    prelude::{Queryable, ResultRow},
     Value,
+    prelude::{Queryable, ResultRow},
 };
 use std::{borrow::Cow, sync::LazyLock};
 use tracing::trace;

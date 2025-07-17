@@ -21,7 +21,7 @@ fn missing_native_type_should_still_allow_config_parsing() {
 
 #[test]
 fn serialize_builtin_sources_to_dmmf() {
-    std::env::set_var("pg2", "postgresql://localhost/postgres2");
+    unsafe { std::env::set_var("pg2", "postgresql://localhost/postgres2") };
 
     let schema = indoc! { r#"
         datasource pg1 {

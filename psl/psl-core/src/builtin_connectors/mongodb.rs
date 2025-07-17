@@ -9,7 +9,7 @@ use crate::{
         NativeTypeInstance, RelationMode,
     },
     diagnostics::{Diagnostics, Span},
-    parser_database::{walkers::*, ReferentialAction, ScalarType},
+    parser_database::{ReferentialAction, ScalarType, walkers::*},
 };
 use enumflags2::BitFlags;
 use mongodb_types::*;

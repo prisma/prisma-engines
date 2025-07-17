@@ -1,9 +1,9 @@
 use super::PostgresType;
 use crate::{
-    datamodel_connector::{walker_ext_traits::*, Connector},
-    diagnostics::{DatamodelError, Diagnostics},
-    parser_database::{ast::WithSpan, walkers::IndexWalker, IndexAlgorithm, OperatorClass},
     PreviewFeature,
+    datamodel_connector::{Connector, walker_ext_traits::*},
+    diagnostics::{DatamodelError, Diagnostics},
+    parser_database::{IndexAlgorithm, OperatorClass, ast::WithSpan, walkers::IndexWalker},
 };
 use enumflags2::BitFlags;
 
@@ -159,8 +159,8 @@ pub(super) fn generalized_index_validations(
                         let opclass = opclass.unwrap();
 
                         let msg = format!(
-                        "The given operator class `{opclass}` points to the field `{name}` that is not of Json type."
-                    );
+                            "The given operator class `{opclass}` points to the field `{name}` that is not of Json type."
+                        );
 
                         errors.push_error(DatamodelError::new_attribute_validation_error(
                             &msg,

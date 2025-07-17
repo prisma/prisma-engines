@@ -183,9 +183,11 @@ fn unique_constraint_errors_in_migrations(api: TestApi) {
         .send_unwrap_err()
         .to_user_facing();
 
-    assert!(serde_json::to_string_pretty(&res)
-        .unwrap()
-        .contains("UNIQUE constraint failed: Fruit.name"));
+    assert!(
+        serde_json::to_string_pretty(&res)
+            .unwrap()
+            .contains("UNIQUE constraint failed: Fruit.name")
+    );
 }
 
 #[test]

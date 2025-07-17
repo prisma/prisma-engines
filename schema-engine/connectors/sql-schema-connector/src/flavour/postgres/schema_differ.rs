@@ -8,7 +8,7 @@ use crate::{
         AlterEnum, AlterExtension, CreateExtension, DropExtension, ExtensionChange, SequenceChange, SequenceChanges,
         SqlMigrationStep,
     },
-    sql_schema_differ::{column::ColumnTypeChange, differ_database::DifferDatabase, SqlSchemaDifferFlavour},
+    sql_schema_differ::{SqlSchemaDifferFlavour, column::ColumnTypeChange, differ_database::DifferDatabase},
 };
 use enumflags2::BitFlags;
 use psl::builtin_connectors::{CockroachType, PostgresType};
@@ -386,8 +386,8 @@ fn postgres_column_type_change(columns: MigrationPair<TableColumnWalker<'_>>) ->
 }
 
 fn postgres_native_type_change_riskyness(previous: &PostgresType, next: &PostgresType) -> Option<ColumnTypeChange> {
-    use psl::builtin_connectors::PostgresType::*;
     use ColumnTypeChange::*;
+    use psl::builtin_connectors::PostgresType::*;
 
     // varchar / varbit without param=> unlimited length
     // char / bit without param => length is 1
@@ -679,11 +679,7 @@ fn postgres_native_type_change_riskyness(previous: &PostgresType, next: &Postgre
         })
     };
 
-    if previous == next {
-        None
-    } else {
-        cast()
-    }
+    if previous == next { None } else { cast() }
 }
 
 fn push_alter_enum_previous_usages_as_default(db: &DifferDatabase<'_>, alter_enum: &mut AlterEnum) {

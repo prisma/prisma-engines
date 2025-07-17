@@ -45,11 +45,11 @@ pub use diagnostics::FileId;
 use diagnostics::{DatamodelError, Diagnostics};
 pub use files::Files;
 pub use ids::*;
-pub use names::is_reserved_type_name;
 use names::Names;
+pub use names::is_reserved_type_name;
 pub use relations::{ManyToManyRelationId, ReferentialAction, RelationId};
 use schema_ast::ast::{GeneratorConfig, SourceConfig};
-pub use schema_ast::{ast, SourceFile};
+pub use schema_ast::{SourceFile, ast};
 pub use types::{
     IndexAlgorithm, IndexFieldPath, IndexType, OperatorClass, RelationFieldId, ScalarFieldId, ScalarFieldType,
     ScalarType, SortOrder,

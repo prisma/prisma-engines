@@ -1,7 +1,7 @@
 use indexmap::IndexMap;
 use query_structure::{
-    ast::FieldArity, AggregationSelection, DefaultKind, FieldSelection, PrismaValue, ScalarFieldRef, SelectedField,
-    TypeIdentifier,
+    AggregationSelection, DefaultKind, FieldSelection, PrismaValue, ScalarFieldRef, SelectedField, TypeIdentifier,
+    ast::FieldArity,
 };
 
 /// Maps field db field names to their meta information.

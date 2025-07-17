@@ -1,6 +1,6 @@
 use std::{borrow::Cow, sync::LazyLock};
 
-use tracing_subscriber::{filter::filter_fn, layer::Filter, EnvFilter};
+use tracing_subscriber::{EnvFilter, filter::filter_fn, layer::Filter};
 
 pub static SHOW_ALL_TRACES: LazyLock<bool> = LazyLock::new(|| {
     std::env::var("PRISMA_SHOW_ALL_TRACES")

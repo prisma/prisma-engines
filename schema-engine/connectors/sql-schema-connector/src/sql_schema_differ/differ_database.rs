@@ -1,11 +1,11 @@
-use super::{column, enums::EnumDiffer, table::TableDiffer, SqlSchemaDifferFlavour};
-use crate::{migration_pair::MigrationPair, SqlDatabaseSchema};
+use super::{SqlSchemaDifferFlavour, column, enums::EnumDiffer, table::TableDiffer};
+use crate::{SqlDatabaseSchema, migration_pair::MigrationPair};
 use indexmap::IndexMap;
 use schema_connector::SchemaFilter;
 use sql_schema_describer::{
+    NamespaceId, NamespaceWalker, TableColumnId, TableId,
     postgres::{ExtensionId, ExtensionWalker, PostgresSchemaExt},
     walkers::{EnumWalker, TableColumnWalker, TableWalker},
-    NamespaceId, NamespaceWalker, TableColumnId, TableId,
 };
 use std::{
     borrow::Cow,

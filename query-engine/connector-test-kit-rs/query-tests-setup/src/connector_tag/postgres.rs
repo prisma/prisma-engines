@@ -1,7 +1,7 @@
 use std::fmt::Display;
 
 use super::*;
-use crate::{datamodel_rendering::SqlDatamodelRenderer, BoxFuture, TestError};
+use crate::{BoxFuture, TestError, datamodel_rendering::SqlDatamodelRenderer};
 use quaint::{prelude::Queryable, single::Quaint};
 
 #[derive(Debug, Default, Clone)]

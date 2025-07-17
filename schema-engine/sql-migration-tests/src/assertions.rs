@@ -9,14 +9,13 @@ use pretty_assertions::assert_eq;
 use prisma_value::PrismaValue;
 use psl::datamodel_connector::Connector;
 use sql::{
+    ViewWalker,
     postgres::{ExtensionWalker, PostgresSchemaExt},
     walkers::{ForeignKeyWalker, IndexWalker, TableColumnWalker, TableWalker},
-    ViewWalker,
 };
 use sql_schema_describer::{
-    self as sql,
+    self as sql, ColumnTypeFamily, DefaultKind, DefaultValue, ForeignKeyAction, IndexType, SQLSortOrder, SqlSchema,
     postgres::{SQLOperatorClassKind, SqlIndexAlgorithm},
-    ColumnTypeFamily, DefaultKind, DefaultValue, ForeignKeyAction, IndexType, SQLSortOrder, SqlSchema,
 };
 use test_setup::{BitFlags, Tags};
 
@@ -303,7 +302,8 @@ impl EnumAssertion<'_> {
 
     pub fn assert_values(self, expected_values: &[&'static str]) -> Self {
         assert!(
-            self.0.values().len() == expected_values.len() && self.0.values().zip(expected_values).all(|(a, b)| a == *b),
+            self.0.values().len() == expected_values.len()
+                && self.0.values().zip(expected_values).all(|(a, b)| a == *b),
             "Assertion failed. The `{}` enum does not contain the expected variants.\nExpected:\n{:#?}\n\nFound:\n{:#?}\n",
             self.0.name(),
             expected_values,
@@ -590,7 +590,7 @@ impl ColumnAssertion<'_> {
         let found = self.column.default();
 
         match found.as_ref().map(|d| d.kind()) {
-            Some(DefaultKind::Value(ref val)) => assert!(
+            Some(DefaultKind::Value(val)) => assert!(
                 val == expected,
                 "Assertion failed. Expected the default value for `{}` to be `{:?}`, got `{:?}`",
                 self.column.name(),
@@ -1021,7 +1021,8 @@ pub struct PostgresExtensionAssertion<'a> {
 impl PostgresExtensionAssertion<'_> {
     pub fn assert_schema(self, expected_schema: &str) -> Self {
         assert_eq!(
-            self.extension.schema(), expected_schema,
+            self.extension.schema(),
+            expected_schema,
             "Assertion failed. Expected the extension to be in the {expected_schema} schema, but was in {} schema instead.",
             self.extension.schema()
         );
@@ -1031,7 +1032,8 @@ impl PostgresExtensionAssertion<'_> {
 
     pub fn assert_version(self, expected_version: &str) -> Self {
         assert_eq!(
-            self.extension.version(), expected_version,
+            self.extension.version(),
+            expected_version,
             "Assertion failed. Expected the extension to be of version {expected_version}, but was of version {} instead.",
             self.extension.version()
         );

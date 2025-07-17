@@ -498,17 +498,21 @@ fn escaped_string_defaults_are_not_arbitrarily_migrated(api: TestApi) {
             .default()
             .unwrap();
         assert_eq!(DefaultValue::value("top\ndown").kind(), default.kind());
-        assert!(default
-            .constraint_name()
-            .map(|cn| cn.starts_with("Fruit_sideNames_df"))
-            .unwrap());
+        assert!(
+            default
+                .constraint_name()
+                .map(|cn| cn.starts_with("Fruit_sideNames_df"))
+                .unwrap()
+        );
 
         let default = sql_schema.walk(table_id).column("contains").unwrap().default().unwrap();
         assert_eq!(DefaultValue::value("'potassium'").kind(), default.kind());
-        assert!(default
-            .constraint_name()
-            .map(|cn| cn.starts_with("Fruit_contains_df"))
-            .unwrap());
+        assert!(
+            default
+                .constraint_name()
+                .map(|cn| cn.starts_with("Fruit_contains_df"))
+                .unwrap()
+        );
 
         let default = sql_schema
             .walk(table_id)
@@ -517,10 +521,12 @@ fn escaped_string_defaults_are_not_arbitrarily_migrated(api: TestApi) {
             .default()
             .unwrap();
         assert_eq!(DefaultValue::value(r#""summer""#).kind(), default.kind());
-        assert!(default
-            .constraint_name()
-            .map(|cn| cn.starts_with("Fruit_seasonality_df"))
-            .unwrap());
+        assert!(
+            default
+                .constraint_name()
+                .map(|cn| cn.starts_with("Fruit_seasonality_df"))
+                .unwrap()
+        );
     } else {
         assert_eq!(
             sql_schema

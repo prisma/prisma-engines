@@ -16,7 +16,7 @@ use crate::{
     sql_migration::{self, AlterColumn, AlterTable, RedefineTable, SqlMigrationStep, TableChange},
 };
 use column::ColumnTypeChange;
-use sql_schema_describer::{walkers::ForeignKeyWalker, IndexId, TableColumnId, Walker};
+use sql_schema_describer::{IndexId, TableColumnId, Walker, walkers::ForeignKeyWalker};
 use std::{borrow::Cow, collections::HashSet};
 use table::TableDiffer;
 

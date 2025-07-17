@@ -1,6 +1,6 @@
 use psl::{
     datamodel_connector::constraint_names::ConstraintNames,
-    parser_database::{walkers, IndexType},
+    parser_database::{IndexType, walkers},
     schema_ast::ast,
 };
 use sql::{mssql::MssqlSchemaExt, postgres::PostgresSchemaExt};
@@ -82,11 +82,7 @@ impl<'a> IndexPair<'a> {
             None => self.previous.and_then(|prev| prev.clustered()).unwrap_or(false),
         };
 
-        if !clustered {
-            None
-        } else {
-            Some(clustered)
-        }
+        if !clustered { None } else { Some(clustered) }
     }
 
     /// A PostgreSQL specific algorithm. Defines the data structure

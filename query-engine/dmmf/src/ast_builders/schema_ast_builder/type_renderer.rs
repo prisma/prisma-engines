@@ -11,28 +11,25 @@ pub(super) fn render_output_type<'a>(output_type: &OutputType<'a>, ctx: &mut Ren
         InnerOutputType::Object(obj) => {
             ctx.mark_to_be_rendered(obj);
 
-            let type_reference = DmmfTypeReference {
+            DmmfTypeReference {
                 typ: obj.name(),
                 namespace: Some(obj.identifier().namespace().to_string()),
                 location: TypeLocation::OutputObjectTypes,
                 is_list: false,
-            };
-
-            type_reference
+            }
         }
 
         InnerOutputType::Enum(et) => {
             ctx.mark_to_be_rendered(et);
 
             let ident = et.identifier();
-            let type_reference = DmmfTypeReference {
+
+            DmmfTypeReference {
                 typ: ident.name(),
                 namespace: Some(ident.namespace().to_owned()),
                 location: TypeLocation::EnumTypes,
                 is_list: false,
-            };
-
-            type_reference
+            }
         }
 
         InnerOutputType::Scalar(scalar) => {
@@ -74,7 +71,7 @@ pub(super) fn render_input_types<'a>(
 
 pub(super) fn render_input_type<'a>(input_type: &InputType<'a>, ctx: &mut RenderContext<'a>) -> DmmfTypeReference {
     match input_type {
-        InputType::Object(ref obj) => {
+        InputType::Object(obj) => {
             ctx.mark_to_be_rendered(obj);
 
             let location = match obj.tag() {
@@ -82,38 +79,35 @@ pub(super) fn render_input_type<'a>(input_type: &InputType<'a>, ctx: &mut Render
                 _ => TypeLocation::InputObjectTypes,
             };
 
-            let type_reference = DmmfTypeReference {
+            DmmfTypeReference {
                 typ: obj.identifier.name(),
                 namespace: Some(obj.identifier.namespace().to_owned()),
                 location,
                 is_list: false,
-            };
-
-            type_reference
+            }
         }
 
         InputType::Enum(et) => {
             ctx.mark_to_be_rendered(et);
 
             let ident = et.identifier();
-            let type_reference = DmmfTypeReference {
+
+            DmmfTypeReference {
                 typ: ident.name(),
                 namespace: Some(ident.namespace().to_owned()),
                 location: TypeLocation::EnumTypes,
                 is_list: false,
-            };
-
-            type_reference
+            }
         }
 
-        InputType::List(ref l) => {
+        InputType::List(l) => {
             let mut type_reference = render_input_type(l, ctx);
             type_reference.is_list = true;
 
             type_reference
         }
 
-        InputType::Scalar(ref scalar) => {
+        InputType::Scalar(scalar) => {
             let stringified = scalar.to_string();
 
             DmmfTypeReference {

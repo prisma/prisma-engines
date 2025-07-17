@@ -3601,39 +3601,45 @@ async fn overflowing_int_errors_out(api: &mut dyn TestApi) -> crate::Result<()> 
 
     let insert = Insert::single_into(&table).value("smallint", (i16::MAX as i64) + 1);
     let err = api.conn().insert(insert.into()).await.unwrap_err();
-    assert!(err
-        .to_string()
-        .contains("Unable to fit integer value '32768' into an INT2 (16-bit signed integer)."));
+    assert!(
+        err.to_string()
+            .contains("Unable to fit integer value '32768' into an INT2 (16-bit signed integer).")
+    );
 
     let insert = Insert::single_into(&table).value("smallint", (i16::MIN as i64) - 1);
     let err = api.conn().insert(insert.into()).await.unwrap_err();
-    assert!(err
-        .to_string()
-        .contains("Unable to fit integer value '-32769' into an INT2 (16-bit signed integer)."));
+    assert!(
+        err.to_string()
+            .contains("Unable to fit integer value '-32769' into an INT2 (16-bit signed integer).")
+    );
 
     let insert = Insert::single_into(&table).value("int", (i32::MAX as i64) + 1);
     let err = api.conn().insert(insert.into()).await.unwrap_err();
-    assert!(err
-        .to_string()
-        .contains("Unable to fit integer value '2147483648' into an INT4 (32-bit signed integer)."));
+    assert!(
+        err.to_string()
+            .contains("Unable to fit integer value '2147483648' into an INT4 (32-bit signed integer).")
+    );
 
     let insert = Insert::single_into(&table).value("int", (i32::MIN as i64) - 1);
     let err = api.conn().insert(insert.into()).await.unwrap_err();
-    assert!(err
-        .to_string()
-        .contains("Unable to fit integer value '-2147483649' into an INT4 (32-bit signed integer)."));
+    assert!(
+        err.to_string()
+            .contains("Unable to fit integer value '-2147483649' into an INT4 (32-bit signed integer).")
+    );
 
     let insert = Insert::single_into(&table).value("oid", (u32::MAX as i64) + 1);
     let err = api.conn().insert(insert.into()).await.unwrap_err();
-    assert!(err
-        .to_string()
-        .contains("Unable to fit integer value '4294967296' into an OID (32-bit unsigned integer)."));
+    assert!(
+        err.to_string()
+            .contains("Unable to fit integer value '4294967296' into an OID (32-bit unsigned integer).")
+    );
 
     let insert = Insert::single_into(&table).value("oid", -1);
     let err = api.conn().insert(insert.into()).await.unwrap_err();
-    assert!(err
-        .to_string()
-        .contains("Unable to fit integer value '-1' into an OID (32-bit unsigned integer)."));
+    assert!(
+        err.to_string()
+            .contains("Unable to fit integer value '-1' into an OID (32-bit unsigned integer).")
+    );
 
     Ok(())
 }

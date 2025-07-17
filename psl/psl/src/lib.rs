@@ -4,6 +4,18 @@
 pub use psl_core::builtin_connectors;
 use psl_core::parser_database::Files;
 pub use psl_core::{
+    ALL_PREVIEW_FEATURES,
+    Configuration,
+    ConnectorRegistry,
+    Datasource,
+    DatasourceConnectorData,
+    FeatureMapWithProvider,
+    Generator,
+    GeneratorConfigValue,
+    PreviewFeature,
+    PreviewFeatures,
+    StringFromEnvVar,
+    ValidatedSchema,
     builtin_connectors::{can_have_capability, can_support_relation_load_strategy, has_capability},
     datamodel_connector,
     diagnostics::{self, Diagnostics},
@@ -18,18 +30,6 @@ pub use psl_core::{
     reformat_validated_schema_into_single,
     schema_ast,
     set_config_dir,
-    Configuration,
-    ConnectorRegistry,
-    Datasource,
-    DatasourceConnectorData,
-    FeatureMapWithProvider,
-    Generator,
-    GeneratorConfigValue,
-    PreviewFeature,
-    PreviewFeatures,
-    StringFromEnvVar,
-    ValidatedSchema,
-    ALL_PREVIEW_FEATURES,
 };
 
 /// The implementation of the CLI getConfig() utility and its JSON format.

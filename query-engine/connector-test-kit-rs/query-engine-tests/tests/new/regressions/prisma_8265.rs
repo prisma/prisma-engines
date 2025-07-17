@@ -3,7 +3,7 @@ use query_engine_tests::*;
 #[test_suite(schema(schema))]
 mod mongodb {
     use indoc::indoc;
-    use query_engine_tests::{run_query_json, Runner};
+    use query_engine_tests::{Runner, run_query_json};
     use std::time::Duration;
     use tokio::time::sleep;
 

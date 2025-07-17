@@ -3,8 +3,8 @@ use psl::{
     parser_database::walkers::*,
 };
 use sql_schema_describer::{
-    mssql::{IndexBits, MssqlSchemaExt},
     ForeignKeyAction,
+    mssql::{IndexBits, MssqlSchemaExt},
 };
 
 use crate::sql_schema_calculator::SqlSchemaCalculatorFlavour;

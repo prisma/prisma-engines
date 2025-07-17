@@ -1,6 +1,6 @@
 use pretty_assertions::assert_eq;
 use schema_core::{
-    commands::create_migration, json_rpc::types::*, schema_connector::SchemaConnector, CoreError, CoreResult,
+    CoreError, CoreResult, commands::create_migration, json_rpc::types::*, schema_connector::SchemaConnector,
 };
 use std::path::{Path, PathBuf};
 use tempfile::TempDir;

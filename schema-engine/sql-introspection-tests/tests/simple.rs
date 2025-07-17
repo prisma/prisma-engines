@@ -102,11 +102,7 @@ source .test_database_urls/mysql_5_6
             .map(|prefix_end| &database_url[..prefix_end])
             .unwrap_or_else(|| database_url.as_str());
 
-        if provider == "file" {
-            "sqlite"
-        } else {
-            provider
-        }
+        if provider == "file" { "sqlite" } else { provider }
     };
 
     match provider {

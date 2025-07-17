@@ -2,7 +2,7 @@
 #![allow(clippy::empty_docs)]
 
 use js_sys::{JsString, Object as JsObject};
-use wasm_bindgen::{prelude::wasm_bindgen, JsValue};
+use wasm_bindgen::{JsValue, prelude::wasm_bindgen};
 
 #[wasm_bindgen]
 extern "C" {

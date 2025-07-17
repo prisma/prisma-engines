@@ -135,7 +135,7 @@ impl<'a> Visitor<'a> for Sqlite<'a> {
             }
 
             ValueType::Json(j) => match j {
-                Some(ref j) => {
+                Some(j) => {
                     let s = serde_json::to_string(j)?;
                     Some(self.write(format!("'{s}'")))
                 }
@@ -889,8 +889,7 @@ mod tests {
 
     #[test]
     fn test_additional_condition_inner_join() {
-        let expected_sql =
-            "SELECT `users`.* FROM `users` INNER JOIN `posts` ON (`users`.`id` = `posts`.`user_id` AND `posts`.`published` = ?)";
+        let expected_sql = "SELECT `users`.* FROM `users` INNER JOIN `posts` ON (`users`.`id` = `posts`.`user_id` AND `posts`.`published` = ?)";
 
         let query = Select::from_table("users").inner_join(
             "posts".on(("users", "id")
@@ -917,8 +916,7 @@ mod tests {
 
     #[test]
     fn test_additional_condition_left_join() {
-        let expected_sql =
-            "SELECT `users`.* FROM `users` LEFT JOIN `posts` ON (`users`.`id` = `posts`.`user_id` AND `posts`.`published` = ?)";
+        let expected_sql = "SELECT `users`.* FROM `users` LEFT JOIN `posts` ON (`users`.`id` = `posts`.`user_id` AND `posts`.`published` = ?)";
 
         let query = Select::from_table("users").left_join(
             "posts".on(("users", "id")

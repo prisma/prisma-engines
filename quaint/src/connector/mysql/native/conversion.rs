@@ -1,6 +1,6 @@
 use crate::{
     ast::{Value, ValueType},
-    connector::{queryable::TakeRow, TypeIdentifier},
+    connector::{TypeIdentifier, queryable::TakeRow},
     error::{Error, ErrorKind},
 };
 use chrono::{DateTime, Datelike, NaiveDate, NaiveDateTime, NaiveTime, Timelike, Utc};
@@ -42,7 +42,7 @@ pub fn conv_params(params: &[Value<'_>]) -> crate::Result<my::Params> {
 
                 ValueType::Numeric(f) => f.as_ref().map(|f| my::Value::Bytes(f.to_string().as_bytes().to_vec())),
                 ValueType::Json(s) => match s {
-                    Some(ref s) => {
+                    Some(s) => {
                         let json = serde_json::to_string(s)?;
                         let bytes = json.into_bytes();
 

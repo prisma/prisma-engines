@@ -1,10 +1,10 @@
 use bigdecimal::{
-    num_bigint::{BigInt, Sign},
     BigDecimal, Zero,
+    num_bigint::{BigInt, Sign},
 };
 use byteorder::{BigEndian, ReadBytesExt};
 use bytes::{BufMut, BytesMut};
-use postgres_types::{to_sql_checked, FromSql, IsNull, ToSql, Type};
+use postgres_types::{FromSql, IsNull, ToSql, Type, to_sql_checked};
 use std::{cmp, convert::TryInto, error, fmt, io::Cursor};
 
 #[derive(Debug, Clone)]
@@ -200,7 +200,7 @@ impl FromSql<'_> for DecimalWrapper {
         let mut raw = Cursor::new(raw);
         let num_groups = raw.read_u16::<BigEndian>()?;
         let weight = raw.read_i16::<BigEndian>()?; // 10000^weight
-                                                   // Sign: 0x0000 = positive, 0x4000 = negative, 0xC000 = NaN
+        // Sign: 0x0000 = positive, 0x4000 = negative, 0xC000 = NaN
         let sign = raw.read_u16::<BigEndian>()?;
 
         // Number of digits (in base 10) to print after decimal separator

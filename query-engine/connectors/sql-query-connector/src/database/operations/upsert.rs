@@ -1,7 +1,7 @@
-use crate::{row::ToSqlRow, Queryable};
+use crate::{Queryable, row::ToSqlRow};
 use connector_interface::NativeUpsert;
 use query_structure::{ModelProjection, Record, SingleRecord};
-use sql_query_builder::{column_metadata, write, Context};
+use sql_query_builder::{Context, column_metadata, write};
 
 pub(crate) async fn native_upsert(
     conn: &dyn Queryable,

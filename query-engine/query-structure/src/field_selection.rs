@@ -1,7 +1,7 @@
 use crate::{
-    parent_container::ParentContainer, prisma_value_ext::PrismaValueExtensions, CompositeFieldRef, DomainError, Field,
-    FieldTypeInformation, Filter, InternalDataModel, Model, ModelProjection, QueryArguments, RelationField,
-    RelationFieldRef, ScalarField, ScalarFieldRef, SelectionResult, Type, TypeIdentifier,
+    CompositeFieldRef, DomainError, Field, FieldTypeInformation, Filter, InternalDataModel, Model, ModelProjection,
+    QueryArguments, RelationField, RelationFieldRef, ScalarField, ScalarFieldRef, SelectionResult, Type,
+    TypeIdentifier, parent_container::ParentContainer, prisma_value_ext::PrismaValueExtensions,
 };
 use itertools::Itertools;
 use prisma_value::PrismaValue;
@@ -474,7 +474,7 @@ impl SelectedField {
 
     pub fn as_composite(&self) -> Option<&CompositeSelection> {
         match self {
-            SelectedField::Composite(ref cs) => Some(cs),
+            SelectedField::Composite(cs) => Some(cs),
             _ => None,
         }
     }

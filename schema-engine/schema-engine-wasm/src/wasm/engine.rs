@@ -1,9 +1,9 @@
 use super::logger::init_logger;
 use commands::{
-    schema_connector::{self, ConnectorError, IntrospectionResult, Namespaces, SchemaConnector},
     CoreError, MigrationSchemaCache, SchemaContainerExt,
+    schema_connector::{self, ConnectorError, IntrospectionResult, Namespaces, SchemaConnector},
 };
-use driver_adapters::{adapter_factory_from_js, JsObject};
+use driver_adapters::{JsObject, adapter_factory_from_js};
 use js_sys::Function as JsFunction;
 use json_rpc::types::*;
 use psl::{PreviewFeature, SourceFile};
@@ -15,7 +15,7 @@ use std::sync::Arc;
 use tracing::Dispatch;
 use tracing_futures::{Instrument, WithSubscriber};
 use tsify::Tsify;
-use wasm_bindgen::prelude::{wasm_bindgen, JsError, JsValue};
+use wasm_bindgen::prelude::{JsError, JsValue, wasm_bindgen};
 
 #[wasm_bindgen]
 extern "C" {

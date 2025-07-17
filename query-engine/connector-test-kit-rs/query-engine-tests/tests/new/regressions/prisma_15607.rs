@@ -6,8 +6,8 @@
 use indoc::indoc;
 use prisma_metrics::{MetricRecorder, WithMetricsInstrumentation};
 use query_engine_tests::{
-    query_core::TxId, render_test_datamodel, setup_metrics, test_tracing_subscriber, LogEmit, QueryResult, Runner,
-    TestError, TestLogCapture, TestResult, WithSubscriber, CONFIG, ENV_LOG_LEVEL,
+    CONFIG, ENV_LOG_LEVEL, LogEmit, QueryResult, Runner, TestError, TestLogCapture, TestResult, WithSubscriber,
+    query_core::TxId, render_test_datamodel, setup_metrics, test_tracing_subscriber,
 };
 use std::future::Future;
 use tokio::sync::mpsc;

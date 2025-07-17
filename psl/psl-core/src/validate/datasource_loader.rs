@@ -1,9 +1,9 @@
 use crate::{
+    Datasource,
     ast::{self, SourceConfig, Span, WithName},
     configuration::StringFromEnvVar,
     datamodel_connector::{ConnectorCapability, RelationMode},
     diagnostics::{DatamodelError, Diagnostics},
-    Datasource,
 };
 use diagnostics::DatamodelWarning;
 use parser_database::{

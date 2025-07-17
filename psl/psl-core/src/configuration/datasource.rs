@@ -132,22 +132,22 @@ impl Datasource {
         F: Fn(&str) -> Option<String>,
     {
         from_url(&self.url, env).map_err(|err| match err {
-                UrlValidationError::EmptyUrlValue => {
-                    let msg = "You must provide a nonempty URL";
-                    DatamodelError::new_source_validation_error(msg, &self.name, self.url_span).into()
-                }
-                UrlValidationError::EmptyEnvValue(env_var) => {
-                    DatamodelError::new_source_validation_error(
-                        &format!("You must provide a nonempty URL. The environment variable `{env_var}` resolved to an empty string."),
-                        &self.name,
-                        self.url_span,
-                    )
-                    .into()
-                }
-                UrlValidationError::NoEnvValue(env_var) => {
-                    DatamodelError::new_environment_functional_evaluation_error(env_var, self.url_span).into()
-                }
-                UrlValidationError::NoUrlOrEnv => unreachable!("Missing url in datasource"),
+            UrlValidationError::EmptyUrlValue => {
+                let msg = "You must provide a nonempty URL";
+                DatamodelError::new_source_validation_error(msg, &self.name, self.url_span).into()
+            }
+            UrlValidationError::EmptyEnvValue(env_var) => DatamodelError::new_source_validation_error(
+                &format!(
+                    "You must provide a nonempty URL. The environment variable `{env_var}` resolved to an empty string."
+                ),
+                &self.name,
+                self.url_span,
+            )
+            .into(),
+            UrlValidationError::NoEnvValue(env_var) => {
+                DatamodelError::new_environment_functional_evaluation_error(env_var, self.url_span).into()
+            }
+            UrlValidationError::NoUrlOrEnv => unreachable!("Missing url in datasource"),
         })
     }
 

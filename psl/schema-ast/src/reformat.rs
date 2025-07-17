@@ -304,7 +304,7 @@ fn reformat_field_type(pair: Pair<'_>, target: &mut dyn LineWriteable) {
 }
 
 fn get_identifier(pair: Pair<'_>) -> &str {
-    let ident_token = match pair.as_rule() {
+    match pair.as_rule() {
         Rule::base_type => pair.as_str(),
         Rule::list_type
         | Rule::legacy_list_type
@@ -316,9 +316,7 @@ fn get_identifier(pair: Pair<'_>) -> &str {
             ident_token.as_str()
         }
         _ => unreachable(&pair),
-    };
-
-    ident_token
+    }
 }
 
 fn reformat_arguments_list(pair: Pair<'_>, target: &mut dyn LineWriteable) {

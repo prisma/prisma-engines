@@ -1,6 +1,7 @@
 use log::*;
 use lsp_types::{Location, ReferenceParams, Url};
 use psl::{
+    Diagnostics, SourceFile,
     diagnostics::{FileId, Span},
     error_tolerant_parse_configuration,
     parser_database::ParserDatabase,
@@ -8,12 +9,11 @@ use psl::{
         AttributePosition, CompositeTypePosition, EnumPosition, Field, FieldId, FieldPosition, FieldType, ModelId,
         ModelPosition, SchemaPosition, SourcePosition, Top, WithAttributes, WithIdentifier, WithName, WithSpan,
     },
-    Diagnostics, SourceFile,
 };
 
 use crate::{
-    offsets::{position_to_offset, span_to_range},
     LSPContext,
+    offsets::{position_to_offset, span_to_range},
 };
 
 pub(super) type ReferencesContext<'a> = LSPContext<'a, ReferenceParams>;

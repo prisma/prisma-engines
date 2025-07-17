@@ -35,11 +35,7 @@ fn is_in_list(test_name: &str, env_var: &'static str, cache: &OnceLock<HashSet<S
             .map(|line| line.expect("could not read line"))
             .map(|line| {
                 let trimmed = line.trim();
-                if line != trimmed {
-                    trimmed.to_owned()
-                } else {
-                    line
-                }
+                if line != trimmed { trimmed.to_owned() } else { line }
             })
             .filter(|line| !line.is_empty() && !line.starts_with('#'))
             .collect()

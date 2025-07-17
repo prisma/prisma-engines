@@ -1,11 +1,11 @@
 use crate::send_future::UnsafeFuture;
 use crate::types::JsConnectionInfo;
 pub use crate::types::{JsResultSet, Query, TransactionOptions};
-use crate::{conversion::MaybeDefined, queryable::JsQueryable};
 use crate::{
-    from_js_value, get_named_property, get_optional_named_property, to_rust_str, AdapterMethod, JsObject, JsResult,
-    JsString, JsTransaction,
+    AdapterMethod, JsObject, JsResult, JsString, JsTransaction, from_js_value, get_named_property,
+    get_optional_named_property, to_rust_str,
 };
+use crate::{conversion::MaybeDefined, queryable::JsQueryable};
 
 use futures::Future;
 use prisma_metrics::gauge;

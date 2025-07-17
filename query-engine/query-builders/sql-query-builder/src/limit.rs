@@ -1,4 +1,4 @@
-use crate::{model_extensions::*, Context};
+use crate::{Context, model_extensions::*};
 use quaint::ast::*;
 use query_structure::*;
 

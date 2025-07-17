@@ -1,6 +1,6 @@
 use diagnostics::DatamodelError;
 
-use crate::{validate::validation_pipeline::context::Context, Datasource};
+use crate::{Datasource, validate::validation_pipeline::context::Context};
 
 pub(super) fn schemas_property_without_preview_feature(datasource: &Datasource, ctx: &mut Context<'_>) {
     if ctx.preview_features.contains(crate::PreviewFeature::MultiSchema) {

@@ -1,4 +1,4 @@
-use crate::{common::*, with_header, Provider};
+use crate::{Provider, common::*, with_header};
 
 #[test]
 fn fail_if_ambiguous_relation_fields_do_not_specify_a_name() {

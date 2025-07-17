@@ -1,8 +1,8 @@
 use crate::{
+    DatamodelError, Diagnostics, FileId,
     ast::{self, WithName},
     interner::StringId,
     walkers::RelationFieldId,
-    DatamodelError, Diagnostics, FileId,
     {context::Context, types::RelationField},
 };
 use enumflags2::bitflags;

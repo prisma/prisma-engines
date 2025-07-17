@@ -1,9 +1,9 @@
 use super::{
-    check::{Column, Table},
     DestructiveCheckPlan,
+    check::{Column, Table},
 };
 use crate::{
-    migration_pair::MigrationPair, sql_migration::AlterColumn, sql_schema_differ::ColumnChanges, SqlConnector,
+    SqlConnector, migration_pair::MigrationPair, sql_migration::AlterColumn, sql_schema_differ::ColumnChanges,
 };
 use schema_connector::{BoxFuture, ConnectorError, ConnectorResult};
 use sql_schema_describer::walkers::TableColumnWalker;

@@ -1,8 +1,8 @@
-use telemetry::{filter, Exporter};
+use telemetry::{Exporter, filter};
 use tracing::{dispatcher::SetGlobalDefaultError, subscriber};
-use tracing_subscriber::{filter::FilterExt, layer::SubscriberExt, Layer};
+use tracing_subscriber::{Layer, filter::FilterExt, layer::SubscriberExt};
 
-use crate::{opt::PrismaOpt, LogFormat};
+use crate::{LogFormat, opt::PrismaOpt};
 
 type LoggerResult<T> = Result<T, SetGlobalDefaultError>;
 

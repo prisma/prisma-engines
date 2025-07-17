@@ -1,21 +1,21 @@
 use std::collections::HashMap;
 use std::fmt;
-use std::sync::{atomic::Ordering, Arc};
+use std::sync::{Arc, atomic::Ordering};
 
 use metrics::{CounterFn, GaugeFn, HistogramFn, Key};
 use metrics_util::{
-    registry::{GenerationalAtomicStorage, GenerationalStorage, Registry},
     Histogram as HistogramUtil,
+    registry::{GenerationalAtomicStorage, GenerationalStorage, Registry},
 };
 use parking_lot::RwLock;
 use serde_json::Value;
 
 use super::formatters::metrics_to_json;
+use super::{ACCEPT_LIST, HISTOGRAM_BOUNDS};
 use super::{
     common::{Metric, MetricAction, MetricType, MetricValue, Snapshot},
     formatters::metrics_to_prometheus,
 };
-use super::{ACCEPT_LIST, HISTOGRAM_BOUNDS};
 
 struct Inner {
     descriptions: RwLock<HashMap<String, String>>,

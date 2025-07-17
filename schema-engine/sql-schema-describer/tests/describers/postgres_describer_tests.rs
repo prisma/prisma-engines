@@ -1123,7 +1123,9 @@ fn cross_schema_references_are_not_allowed(api: TestApi) {
 
     let err = api.describe_error();
 
-    let expected = expect!["The schema of the introspected database was inconsistent: Cross schema references are only allowed when the target schema is listed in the schemas property of your datasource. `prisma-tests.User` points to `prisma-tests_2.City` in constraint `User_city_fkey`. Please add `prisma-tests_2` to your `schemas` property and run this command again."];
+    let expected = expect![
+        "The schema of the introspected database was inconsistent: Cross schema references are only allowed when the target schema is listed in the schemas property of your datasource. `prisma-tests.User` points to `prisma-tests_2.City` in constraint `User_city_fkey`. Please add `prisma-tests_2` to your `schemas` property and run this command again."
+    ];
 
     expected.assert_eq(&err.to_string());
 }

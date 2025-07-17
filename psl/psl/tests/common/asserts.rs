@@ -4,7 +4,7 @@ use base64::prelude::*;
 use either::Either::{Left, Right};
 use psl::datamodel_connector::Connector;
 use psl::diagnostics::DatamodelWarning;
-use psl::parser_database::{walkers, IndexAlgorithm, ModelId, OperatorClass, ReferentialAction, ScalarType, SortOrder};
+use psl::parser_database::{IndexAlgorithm, ModelId, OperatorClass, ReferentialAction, ScalarType, SortOrder, walkers};
 use psl::schema_ast::ast::WithDocumentation;
 use psl::schema_ast::ast::{self, FieldArity};
 use psl::{Diagnostics, StringFromEnvVar};

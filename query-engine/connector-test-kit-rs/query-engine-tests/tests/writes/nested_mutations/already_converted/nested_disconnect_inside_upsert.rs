@@ -250,7 +250,8 @@ mod disconnect_inside_upsert {
 
         assert_error!(
             runner,
-            format!(r#"mutation {{
+            format!(
+                r#"mutation {{
               upsertOneParent(
                 where: {parent}
                 update:{{
@@ -262,7 +263,8 @@ mod disconnect_inside_upsert {
                   c
                 }}
               }}
-            }}"#),
+            }}"#
+            ),
             2014,
             "The change you are trying to make would violate the required relation 'ChildToParent' between the `Child` and `Parent` models."
         );
@@ -297,7 +299,8 @@ mod disconnect_inside_upsert {
 
         assert_error!(
             runner,
-            format!(r#"mutation {{
+            format!(
+                r#"mutation {{
               upsertOneParent(
               where: {parent}
               update:{{
@@ -309,7 +312,8 @@ mod disconnect_inside_upsert {
                   c
                 }}
               }}
-            }}"#),
+            }}"#
+            ),
             2014,
             "The change you are trying to make would violate the required relation 'ChildToParent' between the `Child` and `Parent` models."
         );

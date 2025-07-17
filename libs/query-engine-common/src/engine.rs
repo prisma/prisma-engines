@@ -2,7 +2,7 @@
 #![allow(unused_imports, clippy::empty_docs)]
 
 use crate::error::ApiError;
-use query_core::{protocol::EngineProtocol, schema::QuerySchema, QueryExecutor};
+use query_core::{QueryExecutor, protocol::EngineProtocol, schema::QuerySchema};
 use serde::Deserialize;
 use std::{
     collections::{BTreeMap, HashMap},
@@ -26,7 +26,7 @@ impl Inner {
     /// Returns a builder if the engine is not connected
     pub fn as_builder(&self) -> crate::Result<&EngineBuilder> {
         match self {
-            Inner::Builder(ref builder) => Ok(builder),
+            Inner::Builder(builder) => Ok(builder),
             Inner::Connected(_) => Err(ApiError::AlreadyConnected),
         }
     }
@@ -35,7 +35,7 @@ impl Inner {
     pub fn as_engine(&self) -> crate::Result<&ConnectedEngine> {
         match self {
             Inner::Builder(_) => Err(ApiError::NotConnected),
-            Inner::Connected(ref engine) => Ok(engine),
+            Inner::Connected(engine) => Ok(engine),
         }
     }
 }

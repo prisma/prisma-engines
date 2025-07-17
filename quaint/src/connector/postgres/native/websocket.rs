@@ -2,7 +2,7 @@ use std::{
     io::{Error as IoError, ErrorKind as IoErrorKind},
     pin::Pin,
     str::FromStr,
-    task::{ready, Context, Poll},
+    task::{Context, Poll, ready},
 };
 
 use bytes::Bytes;
@@ -17,14 +17,12 @@ use tokio::{
 };
 use tokio_postgres::{Client, Config};
 use tokio_tungstenite::{
-    connect_async,
+    MaybeTlsStream, WebSocketStream, connect_async,
     tungstenite::{
-        self,
+        self, Error as TungsteniteError, Message,
         client::IntoClientRequest,
         http::{HeaderMap, HeaderValue, StatusCode},
-        Error as TungsteniteError, Message,
     },
-    MaybeTlsStream, WebSocketStream,
 };
 use tokio_util::io::StreamReader;
 use tracing_futures::WithSubscriber;

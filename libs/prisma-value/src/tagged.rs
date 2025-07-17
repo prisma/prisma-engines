@@ -1,7 +1,7 @@
-use serde::{ser::SerializeMap, Serialize};
+use serde::{Serialize, ser::SerializeMap};
 use serde_json::json;
 
-use crate::{encode_bytes, PrismaValue};
+use crate::{PrismaValue, encode_bytes};
 
 #[derive(Debug, Clone, Eq, PartialEq)]
 pub struct TaggedPrismaValue<'a>(&'a PrismaValue);

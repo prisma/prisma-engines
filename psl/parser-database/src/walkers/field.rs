@@ -1,7 +1,7 @@
 use super::{CompositeTypeFieldWalker, ModelWalker, RelationFieldWalker, ScalarFieldWalker, Walker};
 use crate::{
-    types::{RefinedFieldVariant, RelationField, ScalarField},
     ScalarType,
+    types::{RefinedFieldVariant, RelationField, ScalarField},
 };
 use schema_ast::ast;
 

@@ -14,7 +14,7 @@ use bson::Bson;
 use bson::Document;
 use futures::Future;
 use prisma_metrics::{
-    counter, histogram, PRISMA_DATASOURCE_QUERIES_DURATION_HISTOGRAM_MS, PRISMA_DATASOURCE_QUERIES_TOTAL,
+    PRISMA_DATASOURCE_QUERIES_DURATION_HISTOGRAM_MS, PRISMA_DATASOURCE_QUERIES_TOTAL, counter, histogram,
 };
 use query_structure::*;
 use std::sync::Arc;

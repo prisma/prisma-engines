@@ -1,8 +1,8 @@
 use crate::{IdentifierType, ObjectType, OutputField};
 use psl::{
-    can_support_relation_load_strategy,
+    PreviewFeature, PreviewFeatures, can_support_relation_load_strategy,
     datamodel_connector::{Connector, ConnectorCapabilities, ConnectorCapability, JoinStrategySupport, RelationMode},
-    has_capability, parser_database as db, PreviewFeature, PreviewFeatures,
+    has_capability, parser_database as db,
 };
 use query_structure::InternalDataModel;
 use std::{collections::HashMap, fmt};

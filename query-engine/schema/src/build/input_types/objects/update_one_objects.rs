@@ -127,7 +127,7 @@ pub(super) fn filter_unchecked_update_fields<'a>(
         // 2) Exclude @@id or @id fields if not updatable
         ModelField::Scalar(sf) => {
             !linking_fields.contains(sf)
-                && if let Some(ref id_fields) = &id_fields {
+                && if let Some(id_fields) = &id_fields {
                     // Exclude @@id or @id fields if not updatable
                     if id_fields.clone().any(|f| f.id == sf.id) {
                         ctx.has_capability(ConnectorCapability::UpdateableId)

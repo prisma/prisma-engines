@@ -1,7 +1,8 @@
 use crate::{
-    flavour::{postgres::Circumstances, SqlConnector},
+    flavour::{SqlConnector, postgres::Circumstances},
     migration_pair::MigrationPair,
     sql_destructive_change_checker::{
+        DestructiveChangeCheckerFlavour,
         check::{Column, Table},
         destructive_change_checker_flavour::{
             display_column_type, extract_column_values_count, extract_table_rows_count,
@@ -9,7 +10,6 @@ use crate::{
         destructive_check_plan::DestructiveCheckPlan,
         unexecutable_step_check::UnexecutableStepCheck,
         warning_check::SqlMigrationWarningCheck,
-        DestructiveChangeCheckerFlavour,
     },
     sql_migration::{AlterColumn, ColumnTypeChange},
     sql_schema_differ::ColumnChanges,

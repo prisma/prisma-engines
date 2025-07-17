@@ -9,10 +9,10 @@ use crate::introspection::{
     sanitize_datamodel_names::{EnumVariantName, IntrospectedName, ModelName},
 };
 use psl::{
+    Configuration, PreviewFeature,
     builtin_connectors::*,
     datamodel_connector::Connector,
     parser_database::{self as db, walkers},
-    Configuration, PreviewFeature,
 };
 use quaint::prelude::SqlFamily;
 use schema_connector::IntrospectionContext;

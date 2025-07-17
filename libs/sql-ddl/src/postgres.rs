@@ -501,8 +501,7 @@ mod tests {
             })],
         };
 
-        let expected =
-            "ALTER TABLE \"public\".\"Cat\" ADD CONSTRAINT \"cat_friend\" FOREIGN KEY (\"friendName\", \"friendTemperament\") REFERENCES Dog(\"name\", \"temperament\")";
+        let expected = "ALTER TABLE \"public\".\"Cat\" ADD CONSTRAINT \"cat_friend\" FOREIGN KEY (\"friendName\", \"friendTemperament\") REFERENCES Dog(\"name\", \"temperament\")";
 
         assert_eq!(alter_table.to_string(), expected);
     }

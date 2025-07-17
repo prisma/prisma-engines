@@ -1,6 +1,6 @@
 use crate::prelude::*;
 use itertools::{Either, Itertools};
-use psl::parser_database::{walkers, ModelId};
+use psl::parser_database::{ModelId, walkers};
 
 pub type Model = crate::Zipper<ModelId>;
 

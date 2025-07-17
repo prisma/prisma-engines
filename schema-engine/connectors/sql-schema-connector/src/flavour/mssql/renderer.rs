@@ -1,7 +1,7 @@
 mod alter_table;
 
 use crate::sql_renderer::{
-    format_hex, render_nullability, render_referential_action, IteratorJoin, Quoted, QuotedWithPrefix, SqlRenderer,
+    IteratorJoin, Quoted, QuotedWithPrefix, SqlRenderer, format_hex, render_nullability, render_referential_action,
 };
 use crate::{
     migration_pair::MigrationPair,
@@ -9,7 +9,7 @@ use crate::{
 };
 use indoc::{formatdoc, indoc};
 use psl::builtin_connectors::{MsSqlType, MsSqlTypeParameter};
-use sql_schema_describer::{self as sql, mssql::MssqlSchemaExt, PrismaValue};
+use sql_schema_describer::{self as sql, PrismaValue, mssql::MssqlSchemaExt};
 use std::{borrow::Cow, fmt::Write};
 
 #[derive(Debug)]

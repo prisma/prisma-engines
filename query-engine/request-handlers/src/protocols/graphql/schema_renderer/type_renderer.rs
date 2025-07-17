@@ -29,12 +29,12 @@ impl<'a> GqlTypeRenderer<'a> {
                 et.identifier().name()
             }
 
-            InputType::List(ref l) => {
+            InputType::List(l) => {
                 let substring = self.render_input_type(l, ctx);
                 format!("[{substring}]")
             }
 
-            InputType::Scalar(ref scalar) => {
+            InputType::Scalar(scalar) => {
                 let stringified = match scalar {
                     ScalarType::String => "String",
                     ScalarType::Int => "Int",
@@ -73,7 +73,7 @@ impl<'a> GqlTypeRenderer<'a> {
                 et.identifier().name()
             }
 
-            InnerOutputType::Scalar(ref scalar) => {
+            InnerOutputType::Scalar(scalar) => {
                 let stringified = match scalar {
                     ScalarType::String => "String",
                     ScalarType::Int => "Int",

@@ -18,7 +18,7 @@ mod validate;
 use std::sync::Arc;
 
 pub use crate::{
-    common::{FeatureMapWithProvider, PreviewFeature, PreviewFeatures, ALL_PREVIEW_FEATURES},
+    common::{ALL_PREVIEW_FEATURES, FeatureMapWithProvider, PreviewFeature, PreviewFeatures},
     configuration::{
         Configuration, Datasource, DatasourceConnectorData, Generator, GeneratorConfigValue, StringFromEnvVar,
     },
@@ -31,7 +31,7 @@ pub use set_config_dir::set_config_dir;
 
 use self::validate::{datasource_loader, generator_loader};
 use diagnostics::Diagnostics;
-use parser_database::{ast, Files, ParserDatabase, SourceFile};
+use parser_database::{Files, ParserDatabase, SourceFile, ast};
 use schema_ast::ast::WithName;
 
 /// The collection of all available connectors.

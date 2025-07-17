@@ -1,5 +1,5 @@
 use crate::ser_raw::SerializedResultSet;
-use crate::{error::*, SqlRow, ToSqlRow};
+use crate::{SqlRow, ToSqlRow, error::*};
 use async_trait::async_trait;
 use futures::future::FutureExt;
 use itertools::Itertools;
@@ -7,7 +7,7 @@ use prisma_value::Placeholder as PrismaValuePlaceholder;
 use quaint::{ast::*, connector::Queryable};
 use query_structure::*;
 use sql_query_builder::value::{GeneratorCall, Placeholder};
-use sql_query_builder::{column_metadata, AsColumns, AsTable, ColumnMetadata, Context, FilterBuilder, SqlTraceComment};
+use sql_query_builder::{AsColumns, AsTable, ColumnMetadata, Context, FilterBuilder, SqlTraceComment, column_metadata};
 use std::{collections::HashMap, panic::AssertUnwindSafe};
 use tracing::info_span;
 use tracing_futures::Instrument;
@@ -189,7 +189,7 @@ pub(crate) trait QueryExt {
 
     /// Read the all columns as a (primary) identifier.
     async fn filter_ids(&self, model: &Model, filter: Filter, ctx: &Context<'_>)
-        -> crate::Result<Vec<SelectionResult>>;
+    -> crate::Result<Vec<SelectionResult>>;
 
     async fn select_ids(
         &self,

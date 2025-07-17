@@ -1,9 +1,9 @@
 use super::*;
 use crate::{
-    error::DecorateErrorWithFieldInformationExtension, output_meta, query_builder::MongoReadQueryBuilder,
-    query_strings::Find, vacuum_cursor, IntoBson,
+    IntoBson, error::DecorateErrorWithFieldInformationExtension, output_meta, query_builder::MongoReadQueryBuilder,
+    query_strings::Find, vacuum_cursor,
 };
-use mongodb::{bson::doc, options::FindOptions, ClientSession, Database};
+use mongodb::{ClientSession, Database, bson::doc, options::FindOptions};
 use query_structure::*;
 use std::future::IntoFuture;
 

@@ -23,7 +23,7 @@ pub use schema_connector;
 use enumflags2::BitFlags;
 use mongodb_schema_connector::MongoDbSchemaConnector;
 use psl::{
-    builtin_connectors::*, datamodel_connector::Flavour, parser_database::SourceFile, Datasource, PreviewFeature,
+    Datasource, PreviewFeature, builtin_connectors::*, datamodel_connector::Flavour, parser_database::SourceFile,
 };
 use schema_connector::ConnectorParams;
 use sql_schema_connector::SqlSchemaConnector;
