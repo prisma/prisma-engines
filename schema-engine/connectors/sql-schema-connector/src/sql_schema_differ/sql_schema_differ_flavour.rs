@@ -142,11 +142,8 @@ pub(crate) trait SqlSchemaDifferFlavour {
     /// The table names  can contain fully qualified table names with namespace
     /// (e.g. "auth.user") or just the table name.
     fn contains_table(&self, tables: &[String], namespace: Option<&str>, table_name: &str) -> bool {
-        if let Some(namespace) = namespace {
-            tables.contains(&format!("{namespace}.{table_name}")) || tables.contains(&table_name.to_string())
-        } else {
-            tables.contains(&table_name.to_string())
-        }
+        tables.iter().any(|t| t == table_name)
+            || namespace.is_some_and(|ns| tables.contains(&format!("{ns}.{table_name}")))
     }
 
     /// Return the tables that cannot be migrated without being redefined. This
