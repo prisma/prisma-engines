@@ -1,6 +1,6 @@
 pub(crate) mod index_fields;
 
-use crate::{context::Context, interner::StringId, walkers::IndexFieldWalker, DatamodelError};
+use crate::{DatamodelError, context::Context, interner::StringId, walkers::IndexFieldWalker};
 use either::Either;
 use enumflags2::bitflags;
 use rustc_hash::FxHashMap as HashMap;
@@ -80,7 +80,7 @@ impl Types {
     pub(super) fn range_model_scalar_field_ids(
         &self,
         model_id: crate::ModelId,
-    ) -> impl Iterator<Item = ScalarFieldId> + Clone {
+    ) -> impl Iterator<Item = ScalarFieldId> + Clone + use<> {
         let end = self.scalar_fields.partition_point(|sf| sf.model_id <= model_id);
         let start = self.scalar_fields[..end].partition_point(|sf| sf.model_id < model_id);
         (start..end).map(|idx| ScalarFieldId(idx as u32))
@@ -444,12 +444,24 @@ impl IndexAlgorithm {
     /// Documentation for editor autocompletion.
     pub fn documentation(self) -> &'static str {
         match self {
-            IndexAlgorithm::BTree => "Can handle equality and range queries on data that can be sorted into some ordering (default).",
-            IndexAlgorithm::Hash => "Can handle simple equality queries, but no ordering. Faster than BTree, if ordering is not needed.",
-            IndexAlgorithm::Gist => "Generalized Search Tree. A framework for building specialized indices for custom data types.",
-            IndexAlgorithm::Gin => "Generalized Inverted Index. Useful for indexing composite items, such as arrays or text.",
-            IndexAlgorithm::SpGist => "Space-partitioned Generalized Search Tree. For implenting a wide range of different non-balanced data structures.",
-            IndexAlgorithm::Brin => "Block Range Index. If the data has some natural correlation with their physical location within the table, can compress very large amount of data into a small space.",
+            IndexAlgorithm::BTree => {
+                "Can handle equality and range queries on data that can be sorted into some ordering (default)."
+            }
+            IndexAlgorithm::Hash => {
+                "Can handle simple equality queries, but no ordering. Faster than BTree, if ordering is not needed."
+            }
+            IndexAlgorithm::Gist => {
+                "Generalized Search Tree. A framework for building specialized indices for custom data types."
+            }
+            IndexAlgorithm::Gin => {
+                "Generalized Inverted Index. Useful for indexing composite items, such as arrays or text."
+            }
+            IndexAlgorithm::SpGist => {
+                "Space-partitioned Generalized Search Tree. For implenting a wide range of different non-balanced data structures."
+            }
+            IndexAlgorithm::Brin => {
+                "Block Range Index. If the data has some natural correlation with their physical location within the table, can compress very large amount of data into a small space."
+            }
         }
     }
 }

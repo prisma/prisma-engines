@@ -1,4 +1,4 @@
-use crate::{common, query_engine, KnownError};
+use crate::{KnownError, common, query_engine};
 use indoc::formatdoc;
 use quaint::connector::NativeConnectionInfo;
 use quaint::error::ErrorKind;

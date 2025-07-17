@@ -1,6 +1,6 @@
 use crate::{
     datamodel::{
-        attributes::FieldAttribute, index::UniqueFieldAttribute, DefaultValue, FieldType, IdFieldDefinition, Relation,
+        DefaultValue, FieldType, IdFieldDefinition, Relation, attributes::FieldAttribute, index::UniqueFieldAttribute,
     },
     value::{Constant, Documentation, Function},
 };

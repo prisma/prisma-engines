@@ -53,15 +53,23 @@ impl RelationReference<'_> {
     fn render_compound_parent_id(&self, rf: &RelationField) -> String {
         match rf.is_list() {
             true => "@relation(references: [id_1, id_2])".to_string(),
-            false => format!("@relation(fields: [parent_id_1, parent_id_2], references: [id_1, id_2]) \n parent_id_1 String{}\n parent_id_2 String{}", rf.optional_suffix(), rf.optional_suffix())
+            false => format!(
+                "@relation(fields: [parent_id_1, parent_id_2], references: [id_1, id_2]) \n parent_id_1 String{}\n parent_id_2 String{}",
+                rf.optional_suffix(),
+                rf.optional_suffix()
+            ),
         }
     }
 
     fn render_compound_child_id(&self, rf: &RelationField) -> String {
         match rf.is_list() {
-          true => "@relation(references: [id_1, id_2])".to_string(),
-          false => format!("@relation(fields: [child_id_1, child_id_2], references: [id_1, id_2])\n child_id_1 String{}\n child_id_2 String{}", rf.optional_suffix(), rf.optional_suffix()),
-      }
+            true => "@relation(references: [id_1, id_2])".to_string(),
+            false => format!(
+                "@relation(fields: [child_id_1, child_id_2], references: [id_1, id_2])\n child_id_1 String{}\n child_id_2 String{}",
+                rf.optional_suffix(),
+                rf.optional_suffix()
+            ),
+        }
     }
 
     fn render_parent_ref(&self, rf: &RelationField) -> String {
@@ -76,9 +84,13 @@ impl RelationReference<'_> {
 
     fn render_compound_parent_ref(&self, rf: &RelationField) -> String {
         match rf.is_list() {
-          true => "@relation(references: [p_1, p_2])".to_string(),
-          false => format!("@relation(fields: [parent_p_1, parent_p_2], references: [p_1, p_2])\nparent_p_1 String{}\n parent_p_2 String{}", rf.optional_suffix(), rf.optional_suffix()),
-      }
+            true => "@relation(references: [p_1, p_2])".to_string(),
+            false => format!(
+                "@relation(fields: [parent_p_1, parent_p_2], references: [p_1, p_2])\nparent_p_1 String{}\n parent_p_2 String{}",
+                rf.optional_suffix(),
+                rf.optional_suffix()
+            ),
+        }
     }
 
     fn render_child_ref(&self, rf: &RelationField) -> String {
@@ -94,9 +106,13 @@ impl RelationReference<'_> {
     fn render_compound_child_ref(&self, rf: &RelationField) -> String {
         //"@relation(references: [c_1, c_2]) @map([\"child_c_1\", \"child_c_2\"])"
         match rf.is_list() {
-          true => "@relation(references: [c_1, c_2])".to_string(),
-          false => format!("@relation(fields: [child_c_1, child_c_2], references: [c_1, c_2])\n child_c_1 String{}\n child_c_2 String{}", rf.optional_suffix(), rf.optional_suffix()),
-      }
+            true => "@relation(references: [c_1, c_2])".to_string(),
+            false => format!(
+                "@relation(fields: [child_c_1, child_c_2], references: [c_1, c_2])\n child_c_1 String{}\n child_c_2 String{}",
+                rf.optional_suffix(),
+                rf.optional_suffix()
+            ),
+        }
     }
 }
 

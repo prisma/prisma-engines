@@ -1,4 +1,4 @@
-use psl::{diagnostics::DatamodelError, error_tolerant_parse_configuration, parser_database::Files, Diagnostics};
+use psl::{Diagnostics, diagnostics::DatamodelError, error_tolerant_parse_configuration, parser_database::Files};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 

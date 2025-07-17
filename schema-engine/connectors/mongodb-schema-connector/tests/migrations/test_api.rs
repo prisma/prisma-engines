@@ -2,13 +2,13 @@ use bson::{self, doc};
 use enumflags2::BitFlags;
 use futures::TryStreamExt;
 use mongodb_schema_connector::MongoDbSchemaConnector;
-use psl::{parser_database::SourceFile, PreviewFeature};
+use psl::{PreviewFeature, parser_database::SourceFile};
 use schema_connector::{ConnectorParams, SchemaConnector, SchemaFilter};
 use std::{
     collections::BTreeMap,
     fmt::Write as _,
     io::Write as _,
-    sync::{atomic::AtomicUsize, Arc, LazyLock},
+    sync::{Arc, LazyLock, atomic::AtomicUsize},
 };
 use tokio::sync::OnceCell;
 

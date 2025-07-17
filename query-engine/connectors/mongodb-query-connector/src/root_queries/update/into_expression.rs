@@ -1,7 +1,7 @@
 use super::{expression::*, operation::*};
-use crate::{filter, IntoBson};
+use crate::{IntoBson, filter};
 
-use bson::{doc, Bson};
+use bson::{Bson, doc};
 use itertools::Itertools;
 
 pub(crate) trait IntoUpdateExpression {

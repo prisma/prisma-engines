@@ -9,7 +9,7 @@ use bigdecimal::{BigDecimal, FromPrimitive, ToPrimitive};
 use chrono::prelude::*;
 use serde::de::Unexpected;
 use serde::ser::SerializeMap;
-use serde::{ser::Serializer, Deserialize, Deserializer, Serialize};
+use serde::{Deserialize, Deserializer, Serialize, ser::Serializer};
 use serde_json::json;
 use std::{borrow::Cow, convert::TryFrom, fmt, str::FromStr};
 use uuid::Uuid;
@@ -478,11 +478,7 @@ impl PrismaValue {
     }
 
     pub fn as_json(&self) -> Option<&String> {
-        if let Self::Json(v) = self {
-            Some(v)
-        } else {
-            None
-        }
+        if let Self::Json(v) = self { Some(v) } else { None }
     }
 
     pub fn as_tagged(&self) -> TaggedPrismaValue<'_> {

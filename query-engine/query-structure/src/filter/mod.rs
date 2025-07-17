@@ -193,19 +193,11 @@ impl Filter {
     }
 
     pub fn as_scalar(&self) -> Option<&ScalarFilter> {
-        if let Self::Scalar(v) = self {
-            Some(v)
-        } else {
-            None
-        }
+        if let Self::Scalar(v) = self { Some(v) } else { None }
     }
 
     pub fn into_scalar(self) -> Option<ScalarFilter> {
-        if let Self::Scalar(v) = self {
-            Some(v)
-        } else {
-            None
-        }
+        if let Self::Scalar(v) = self { Some(v) } else { None }
     }
 
     pub fn is_empty(&self) -> bool {

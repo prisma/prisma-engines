@@ -13,7 +13,7 @@ pub use handler::*;
 pub use load_executor::ConnectorKind;
 #[cfg(feature = "graphql-protocol")]
 pub use protocols::graphql::*;
-pub use protocols::{json::*, RequestBody};
+pub use protocols::{RequestBody, json::*};
 pub use response::*;
 
 pub type Result<T> = std::result::Result<T, HandlerError>;

@@ -5,9 +5,9 @@ pub use crate::types::{ColumnType, JsResultSet};
 use quaint::bigdecimal::BigDecimal;
 use quaint::chrono::{DateTime, NaiveDate, NaiveTime, Utc};
 use quaint::{
+    Value as QuaintValue,
     connector::{ColumnType as QuaintColumnType, ResultSet as QuaintResultSet},
     error::{Error as QuaintError, ErrorKind},
-    Value as QuaintValue,
 };
 
 impl TryFrom<JsResultSet> for QuaintResultSet {

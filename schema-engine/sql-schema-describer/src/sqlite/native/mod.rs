@@ -1,7 +1,7 @@
-use crate::{sqlite::Connection, DescriberResult, SqlSchema, SqlSchemaDescriberBackend};
+use crate::{DescriberResult, SqlSchema, SqlSchemaDescriberBackend, sqlite::Connection};
 
 use quaint::{
-    connector::{rusqlite, ColumnType as QuaintColumnType, GetRow, ToColumnNames},
+    connector::{ColumnType as QuaintColumnType, GetRow, ToColumnNames, rusqlite},
     prelude::{ResultSet, Value},
 };
 

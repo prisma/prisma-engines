@@ -1,4 +1,4 @@
-use serde::{ser::SerializeMap, Serialize, Serializer};
+use serde::{Serialize, Serializer, ser::SerializeMap};
 use std::cmp::Ordering;
 use std::{cell::RefCell, collections::HashMap};
 

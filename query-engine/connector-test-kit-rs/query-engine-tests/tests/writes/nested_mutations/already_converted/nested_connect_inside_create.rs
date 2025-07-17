@@ -3,7 +3,7 @@ use query_engine_tests::*;
 #[test_suite(exclude(CockroachDb))]
 mod connect_inside_create {
     use indoc::indoc;
-    use query_engine_tests::{assert_error, run_query, run_query_json, DatamodelWithParams};
+    use query_engine_tests::{DatamodelWithParams, assert_error, run_query, run_query_json};
     use query_test_macros::relation_link_test;
 
     // "a P1 to C1  relation with the child already in a relation" should "be connectable through a nested mutation by id if the child is already in a relation"
@@ -471,9 +471,9 @@ mod connect_inside_create {
         )?;
 
         assert_error!(
-          runner,
-          format!(
-              r#"mutation {{
+            runner,
+            format!(
+                r#"mutation {{
                 createOneParent(data:{{
                   p: "p2"
                   p_1: "p2_1"
@@ -485,10 +485,10 @@ mod connect_inside_create {
                   }}
                 }}
               }}"#
-          ),
-          2018,
-          "The required connected records were not found. Expected 1 records to be connected after connect operation on one-to-many relation 'ChildToParent', found 0."
-      );
+            ),
+            2018,
+            "The required connected records were not found. Expected 1 records to be connected after connect operation on one-to-many relation 'ChildToParent', found 0."
+        );
 
         Ok(())
     }
@@ -775,9 +775,9 @@ mod connect_inside_create {
         )?;
 
         assert_error!(
-          runner,
-          format!(
-              r#"mutation {{
+            runner,
+            format!(
+                r#"mutation {{
                 createOneParent(data:{{
                   p: "p2"
                   p_1: "p2_1"
@@ -789,10 +789,10 @@ mod connect_inside_create {
                   }}
                 }}
               }}"#
-          ),
-          2025,
-          "An operation failed because it depends on one or more records that were required but not found. Expected 1 records to be connected, found only 0."
-      );
+            ),
+            2025,
+            "An operation failed because it depends on one or more records that were required but not found. Expected 1 records to be connected, found only 0."
+        );
 
         Ok(())
     }
@@ -863,8 +863,8 @@ mod connect_inside_create {
     #[connector_test(schema(schema_3))]
     async fn p1_to_cm_fail_if_wrong_id_other_side(runner: Runner) -> TestResult<()> {
         assert_error!(
-          &runner,
-          r#"mutation {
+            &runner,
+            r#"mutation {
             createOneComment(data:{
               text: "bla"
               todo: {
@@ -874,9 +874,9 @@ mod connect_inside_create {
               id
             }
           }"#,
-          2025,
-          "An operation failed because it depends on one or more records that were required but not found. No 'Todo' record (needed to inline the relation on 'Comment' record(s)) was found for a nested connect on one-to-many relation 'CommentToTodo'."
-      );
+            2025,
+            "An operation failed because it depends on one or more records that were required but not found. No 'Todo' record (needed to inline the relation on 'Comment' record(s)) was found for a nested connect on one-to-many relation 'CommentToTodo'."
+        );
 
         Ok(())
     }

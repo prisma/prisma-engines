@@ -1,12 +1,12 @@
 use tracing_error::ErrorLayer;
 use tracing_subscriber::{
+    EnvFilter, FmtSubscriber,
     fmt::{
-        format::{DefaultFields, Format},
         TestWriter,
+        format::{DefaultFields, Format},
     },
     layer::Layered,
     prelude::*,
-    EnvFilter, FmtSubscriber,
 };
 
 pub(crate) fn init_logger() {

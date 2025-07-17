@@ -260,7 +260,7 @@ Use the Makefile.
 "####;
 
 fn exit_with_message(msg: &str) -> ! {
-    use std::io::{stderr, Write};
+    use std::io::{Write, stderr};
     let stderr = stderr();
     let mut sink = stderr.lock();
     sink.write_all(b"Error in the test configuration:\n").unwrap();

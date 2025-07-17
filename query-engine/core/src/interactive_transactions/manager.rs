@@ -9,8 +9,8 @@ use std::{
 use telemetry::TraceParent;
 use tokio::{
     sync::{
-        mpsc::{unbounded_channel, UnboundedSender},
         Mutex, RwLock,
+        mpsc::{UnboundedSender, unbounded_channel},
     },
     time::Duration,
 };

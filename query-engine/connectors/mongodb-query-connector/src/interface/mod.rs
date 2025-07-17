@@ -7,8 +7,8 @@ pub use transaction::*;
 
 use async_trait::async_trait;
 use connector_interface::{
-    error::{ConnectorError, ErrorKind},
     Connector,
+    error::{ConnectorError, ErrorKind},
 };
 use futures::Future;
 use mongodb::Client;
@@ -119,9 +119,11 @@ mod tests {
         let url = "mongodb+srv://root:example@localhost:27017/myDatabase";
         let error = mongodb_connector(url).await.err().unwrap();
 
-        assert!(error
-            .to_string()
-            .contains("a port cannot be specified with 'mongodb+srv'"));
+        assert!(
+            error
+                .to_string()
+                .contains("a port cannot be specified with 'mongodb+srv'")
+        );
     }
 
     /// Regression test for https://github.com/prisma/prisma/issues/11883

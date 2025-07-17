@@ -1,5 +1,5 @@
 use crate::sql_schema_calculator::{Context, SqlSchemaCalculatorFlavour};
-use psl::parser_database::{walkers::*, ScalarType};
+use psl::parser_database::{ScalarType, walkers::*};
 use sql_schema_describer::ColumnTypeFamily;
 
 #[derive(Debug, Default)]

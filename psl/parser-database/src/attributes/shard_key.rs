@@ -4,9 +4,9 @@ use diagnostics::DatamodelError;
 use schema_ast::ast::{self, WithName, WithSpan};
 
 use crate::{
-    attributes::{format_fields_in_error_with_leading_word, resolve_field_array_without_args, FieldResolutionError},
-    types::{ModelAttributes, ScalarField, ShardKeyAttribute},
     Context, ScalarFieldId,
+    attributes::{FieldResolutionError, format_fields_in_error_with_leading_word, resolve_field_array_without_args},
+    types::{ModelAttributes, ScalarField, ShardKeyAttribute},
 };
 
 /// `@@shardKey` on models

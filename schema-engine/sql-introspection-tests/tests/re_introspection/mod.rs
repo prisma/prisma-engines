@@ -1626,8 +1626,9 @@ async fn re_introspecting_custom_compound_unique_upgrade(api: &mut TestApi) -> T
 #[test_connector(tags(Postgres12))]
 async fn re_introspecting_custom_index_order(api: &mut TestApi) -> TestResult {
     let schema_name = api.schema_name();
-    let create_table =
-        format!("CREATE TABLE \"{schema_name}\".\"A\" (id SERIAL PRIMARY KEY, a jsonb not null, b jsonb not null, c jsonb not null)",);
+    let create_table = format!(
+        "CREATE TABLE \"{schema_name}\".\"A\" (id SERIAL PRIMARY KEY, a jsonb not null, b jsonb not null, c jsonb not null)",
+    );
     let create_idx_a = format!("CREATE INDEX \"aaaaaa\" ON \"{schema_name}\".\"A\" USING GIN (b);",);
     let create_idx_b = format!("CREATE INDEX \"bbbbbb\" ON \"{schema_name}\".\"A\" USING GIN (a);",);
     let create_idx_c = format!("CREATE INDEX \"cccccc\" ON \"{schema_name}\".\"A\" USING GIN (c);",);

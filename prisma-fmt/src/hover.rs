@@ -1,19 +1,18 @@
 use log::warn;
 use lsp_types::{Hover, HoverContents, HoverParams, MarkupContent, MarkupKind};
 use psl::{
-    error_tolerant_parse_configuration,
+    Diagnostics, SourceFile, error_tolerant_parse_configuration,
     parser_database::{
-        walkers::{self, Walker},
         ParserDatabase, RelationFieldId, ScalarFieldType,
+        walkers::{self, Walker},
     },
     schema_ast::ast::{
         self, CompositeTypePosition, EnumPosition, EnumValuePosition, Field, FieldPosition, ModelPosition,
         SchemaPosition, WithDocumentation, WithName,
     },
-    Diagnostics, SourceFile,
 };
 
-use crate::{offsets::position_to_offset, LSPContext};
+use crate::{LSPContext, offsets::position_to_offset};
 
 pub(super) type HoverContext<'a> = LSPContext<'a, HoverParams>;
 

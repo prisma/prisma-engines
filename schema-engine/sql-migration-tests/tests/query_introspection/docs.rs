@@ -262,7 +262,9 @@ fn unknown_type_fails(api: TestApi) {
     SELECT int FROM model WHERE int = ? and string = ?;
     "#;
 
-    let expected = expect!["SQL documentation parsing: invalid type: 'Hello' (accepted types are: 'Int', 'BigInt', 'Float', 'Boolean', 'String', 'DateTime', 'Json', 'Bytes', 'Decimal') at '{Hello} $hello:myInt some integer'."];
+    let expected = expect![
+        "SQL documentation parsing: invalid type: 'Hello' (accepted types are: 'Int', 'BigInt', 'Float', 'Boolean', 'String', 'DateTime', 'Json', 'Bytes', 'Decimal') at '{Hello} $hello:myInt some integer'."
+    ];
 
     expected.assert_eq(
         api.introspect_sql("test_1", sql)
@@ -282,7 +284,9 @@ fn duplicate_param_position_fails(api: TestApi) {
     SELECT int FROM model WHERE int = ? and string = ?;
     "#;
 
-    let expected = expect!["SQL documentation parsing: duplicate parameter (position or alias is already used) at '@param  {String} $1:myString'."];
+    let expected = expect![
+        "SQL documentation parsing: duplicate parameter (position or alias is already used) at '@param  {String} $1:myString'."
+    ];
 
     expected.assert_eq(
         api.introspect_sql("test_1", sql)
@@ -302,7 +306,9 @@ fn duplicate_param_name_fails(api: TestApi) {
     SELECT int FROM model WHERE int = ? and string = ?;
     "#;
 
-    let expected = expect!["SQL documentation parsing: duplicate parameter (position or alias is already used) at '@param  {String} $2:myInt'."];
+    let expected = expect![
+        "SQL documentation parsing: duplicate parameter (position or alias is already used) at '@param  {String} $2:myInt'."
+    ];
 
     expected.assert_eq(
         api.introspect_sql("test_1", sql)

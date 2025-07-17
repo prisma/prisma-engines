@@ -3,14 +3,14 @@ use crate::inputs::{RecordQueryFilterInput, UpdateRecordSelectorsInput};
 use crate::query_graph_builder::write::limit::validate_limit;
 use crate::query_graph_builder::write::write_args_parser::*;
 use crate::{
+    ArgumentListLookup, ParsedField, ParsedInputMap,
     query_ast::*,
     query_graph::{Node, NodeRef, QueryGraph, QueryGraphDependency},
-    ArgumentListLookup, ParsedField, ParsedInputMap,
 };
 use crate::{DataExpectation, ParsedObject, RowSink};
 use psl::datamodel_connector::ConnectorCapability;
 use query_structure::{Filter, Model};
-use schema::{constants::args, QuerySchema};
+use schema::{QuerySchema, constants::args};
 use std::convert::TryInto;
 
 /// Creates an update record query and adds it to the query graph, together with it's nested queries and companion read query.

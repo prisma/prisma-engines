@@ -3,7 +3,7 @@ use query_engine_tests::*;
 #[test_suite(exclude(CockroachDb))]
 // update_many_inside_update
 mod um_inside_update {
-    use query_engine_tests::{assert_error, run_query, run_query_json, DatamodelWithParams, Runner, TestResult};
+    use query_engine_tests::{DatamodelWithParams, Runner, TestResult, assert_error, run_query, run_query_json};
     use query_test_macros::relation_link_test;
 
     // "A 1-n relation" should "error if trying to use nestedUpdateMany"

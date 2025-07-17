@@ -5,7 +5,7 @@ use psl::parser_database::{
 };
 use std::collections::HashMap;
 
-use super::{format_block_attribute, parse_url, CodeActionsContext};
+use super::{CodeActionsContext, format_block_attribute, parse_url};
 
 /// If the referencing side of the one-to-one relation does not point
 /// to a unique constraint, the action adds the attribute.

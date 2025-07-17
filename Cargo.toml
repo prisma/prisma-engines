@@ -40,6 +40,9 @@ members = [
     "quaint",
 ]
 
+[workspace.package]
+edition = "2024"
+
 [workspace.lints.rust.unexpected_cfgs]
 level = "warn"
 check-cfg = ['cfg(wasm_bindgen_unstable_test_coverage)', 'cfg(debug_assert)']
@@ -161,7 +164,7 @@ wasm-bindgen-futures = "0.4"
 wasm-logger = "0.2"
 
 # build dependencies
-cbindgen = "0.24"
+cbindgen = "0.29"
 cfg_aliases = "0.2"
 darling = "0.20"
 napi-build = "1"

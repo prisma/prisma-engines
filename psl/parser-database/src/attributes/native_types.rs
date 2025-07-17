@@ -1,4 +1,4 @@
-use crate::{ast, context::Context, ScalarFieldId, StringId};
+use crate::{ScalarFieldId, StringId, ast, context::Context};
 
 pub(super) fn visit_model_field_native_type_attribute(
     id: ScalarFieldId,

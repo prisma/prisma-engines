@@ -1,9 +1,9 @@
 use base64::prelude::*;
 use quaint::{
-    connector::{ColumnType, ResultRowRef, ResultSet},
     Value, ValueType,
+    connector::{ColumnType, ResultRowRef, ResultSet},
 };
-use serde::{ser::*, Serialize, Serializer};
+use serde::{Serialize, Serializer, ser::*};
 
 pub struct SerializedResultSet(pub ResultSet);
 

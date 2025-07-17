@@ -8,11 +8,11 @@ use std::fmt;
 pub use error::*;
 use psl::datamodel_connector::{ConnectorCapabilities, ConnectorCapability};
 use serde::Serialize;
-use smallvec::{smallvec, SmallVec};
+use smallvec::{SmallVec, smallvec};
 
 use crate::{
-    interpreter::ExpressionResult, FilteredQuery, ManyRecordsQuery, Query, QueryGraphBuilderError,
-    QueryGraphBuilderResult, QueryOptions, ReadQuery,
+    FilteredQuery, ManyRecordsQuery, Query, QueryGraphBuilderError, QueryGraphBuilderResult, QueryOptions, ReadQuery,
+    interpreter::ExpressionResult,
 };
 use guard::*;
 use itertools::Itertools;
@@ -44,19 +44,11 @@ pub enum Node {
 
 impl Node {
     pub fn as_query(&self) -> Option<&Query> {
-        if let Self::Query(v) = self {
-            Some(v)
-        } else {
-            None
-        }
+        if let Self::Query(v) = self { Some(v) } else { None }
     }
 
     pub(crate) fn as_query_mut(&mut self) -> Option<&mut Query> {
-        if let Self::Query(v) = self {
-            Some(v)
-        } else {
-            None
-        }
+        if let Self::Query(v) = self { Some(v) } else { None }
     }
 }
 
@@ -850,8 +842,8 @@ impl QueryGraph {
             let dependencies: Vec<FieldSelection> = out_edges
                 .into_iter()
                 .filter_map(|edge| match self.edge_content(&edge).unwrap() {
-                    QueryGraphDependency::ProjectedDataDependency(ref requested_selection, _, _)
-                    | QueryGraphDependency::ProjectedDataSinkDependency(ref requested_selection, _, _) => {
+                    QueryGraphDependency::ProjectedDataDependency(requested_selection, _, _)
+                    | QueryGraphDependency::ProjectedDataSinkDependency(requested_selection, _, _) => {
                         Some(requested_selection.clone())
                     }
                     _ => None,
@@ -1110,8 +1102,8 @@ impl QueryGraph {
                     let unsatisfied_dependencies: Vec<_> = edges
                         .into_iter()
                         .filter_map(|edge| match self.edge_content(&edge).unwrap() {
-                            QueryGraphDependency::ProjectedDataDependency(ref requested_selection, _, _)
-                            | QueryGraphDependency::ProjectedDataSinkDependency(ref requested_selection, _, _)
+                            QueryGraphDependency::ProjectedDataDependency(requested_selection, _, _)
+                            | QueryGraphDependency::ProjectedDataSinkDependency(requested_selection, _, _)
                                 if !q.satisfies(requested_selection) =>
                             {
                                 Some(requested_selection.clone())

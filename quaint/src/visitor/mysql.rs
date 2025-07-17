@@ -191,7 +191,7 @@ impl<'a> Visitor<'a> for Mysql<'a> {
             ValueType::Numeric(r) => r.as_ref().map(|r| self.write(r)),
 
             ValueType::Json(j) => match j {
-                Some(ref j) => {
+                Some(j) => {
                     let s = serde_json::to_string(&j)?;
                     Some(self.write(format!("CONVERT('{s}', JSON)")))
                 }

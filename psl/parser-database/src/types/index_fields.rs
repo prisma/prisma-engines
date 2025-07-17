@@ -1,4 +1,4 @@
-use crate::{ast, coerce, types::SortOrder, DatamodelError};
+use crate::{DatamodelError, ast, coerce, types::SortOrder};
 
 pub(crate) enum OperatorClass<'a> {
     Constant(crate::OperatorClass),

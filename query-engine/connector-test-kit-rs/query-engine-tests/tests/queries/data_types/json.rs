@@ -2,7 +2,7 @@ use query_engine_tests::*;
 
 #[test_suite(schema(json_opt), capabilities(Json), exclude(MySql(5.6)))]
 mod json {
-    use query_engine_tests::{run_query, EngineProtocol, Runner};
+    use query_engine_tests::{EngineProtocol, Runner, run_query};
 
     #[connector_test]
     async fn read_one(runner: Runner) -> TestResult<()> {

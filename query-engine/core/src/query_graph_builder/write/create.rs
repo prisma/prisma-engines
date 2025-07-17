@@ -1,13 +1,13 @@
 use super::*;
 use crate::{
+    ArgumentListLookup, DataExpectation, ParsedField, ParsedInputList, ParsedInputMap, RowSink,
     inputs::RecordQueryFilterInput,
     query_ast::*,
     query_graph::{NodeRef, QueryGraph, QueryGraphDependency},
-    ArgumentListLookup, DataExpectation, ParsedField, ParsedInputList, ParsedInputMap, RowSink,
 };
 use psl::{datamodel_connector::ConnectorCapability, parser_database::RelationFieldId};
 use query_structure::{Model, WriteArgs, Zipper};
-use schema::{constants::args, QuerySchema};
+use schema::{QuerySchema, constants::args};
 use std::convert::TryInto;
 use write_args_parser::*;
 

@@ -10,6 +10,6 @@ pub use diagnose_migration_history_cli::diagnose_migration_history_cli;
 pub use diff_cli::diff_cli;
 
 pub use ::commands::{
-    core_error::{CoreError, CoreResult},
     GenericApi,
+    core_error::{CoreError, CoreResult},
 };

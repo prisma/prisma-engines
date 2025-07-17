@@ -1,5 +1,5 @@
 use crate::introspection::introspection_pair::ModelPair;
-use schema_connector::{warnings as generators, Warnings};
+use schema_connector::{Warnings, warnings as generators};
 
 /// Analyze and generate warnigs from a model.
 pub(super) fn generate_warnings(model: ModelPair<'_>, warnings: &mut Warnings) {

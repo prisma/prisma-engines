@@ -1,4 +1,4 @@
-use schema_core::{commands::evaluate_data_loss, json_rpc::types::*, schema_connector::SchemaConnector, CoreResult};
+use schema_core::{CoreResult, commands::evaluate_data_loss, json_rpc::types::*, schema_connector::SchemaConnector};
 use std::borrow::Cow;
 use tempfile::TempDir;
 

@@ -1,6 +1,6 @@
 use crate::{
-    walkers::{ModelWalker, RelationFieldId, RelationFieldWalker, ScalarFieldWalker},
     ParserDatabase, ReferentialAction,
+    walkers::{ModelWalker, RelationFieldId, RelationFieldWalker, ScalarFieldWalker},
 };
 use diagnostics::Span;
 use schema_ast::ast;

@@ -204,7 +204,10 @@ fn parse_typ_opt<'a>(
             let typ = input.move_between(start + 1, end);
 
             if typ.is_empty() {
-                return Err(build_error(input, "missing type (accepted types are: 'Int', 'BigInt', 'Float', 'Boolean', 'String', 'DateTime', 'Json', 'Bytes', 'Decimal')"));
+                return Err(build_error(
+                    input,
+                    "missing type (accepted types are: 'Int', 'BigInt', 'Float', 'Boolean', 'String', 'DateTime', 'Json', 'Bytes', 'Decimal')",
+                ));
             }
 
             let parsed_typ = ScalarType::try_from_str(typ.inner(), false)

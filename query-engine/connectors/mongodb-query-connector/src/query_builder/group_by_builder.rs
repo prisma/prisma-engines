@@ -1,6 +1,6 @@
 use crate::constants::*;
 
-use bson::{doc, Bson, Document};
+use bson::{Bson, Document, doc};
 use query_structure::{AggregationFilter, AggregationSelection, Filter, ScalarFieldRef};
 use std::collections::HashSet;
 

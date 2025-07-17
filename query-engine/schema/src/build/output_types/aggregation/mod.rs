@@ -1,5 +1,5 @@
 use super::*;
-use query_structure::{prelude::ParentContainer, ScalarField};
+use query_structure::{ScalarField, prelude::ParentContainer};
 
 pub(crate) mod group_by;
 pub(crate) mod plain;

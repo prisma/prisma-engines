@@ -1,7 +1,7 @@
 use super::{utils::get_relation_load_strategy, *};
-use crate::{query_document::*, QueryOption, QueryOptions, ReadQuery, RecordQuery};
+use crate::{QueryOption, QueryOptions, ReadQuery, RecordQuery, query_document::*};
 use query_structure::Model;
-use schema::{constants::args, QuerySchema};
+use schema::{QuerySchema, constants::args};
 use std::convert::TryInto;
 
 pub(crate) fn find_unique(

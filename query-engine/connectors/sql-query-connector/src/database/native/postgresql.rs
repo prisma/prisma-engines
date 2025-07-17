@@ -2,8 +2,8 @@ use crate::database::{catch, connection::SqlConnection};
 use crate::{FromSource, SqlError};
 use async_trait::async_trait;
 use connector_interface::{
-    error::{ConnectorError, ErrorKind},
     Connection, Connector,
+    error::{ConnectorError, ErrorKind},
 };
 use psl::builtin_connectors::COCKROACH;
 use quaint::{connector::PostgresFlavour, pooled::Quaint, prelude::ConnectionInfo};

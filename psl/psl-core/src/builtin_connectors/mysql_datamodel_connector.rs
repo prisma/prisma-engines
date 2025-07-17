@@ -3,7 +3,7 @@ mod validations;
 
 use chrono::FixedOffset;
 pub use native_types::MySqlType;
-use prisma_value::{decode_bytes, PrismaValueResult};
+use prisma_value::{PrismaValueResult, decode_bytes};
 
 use crate::{
     datamodel_connector::{
@@ -11,10 +11,10 @@ use crate::{
         NativeTypeConstructor, NativeTypeInstance, RelationMode,
     },
     diagnostics::{Diagnostics, Span},
-    parser_database::{walkers, ReferentialAction, ScalarType},
+    parser_database::{ReferentialAction, ScalarType, walkers},
 };
-use enumflags2::BitFlags;
 use MySqlType::*;
+use enumflags2::BitFlags;
 
 const TINY_BLOB_TYPE_NAME: &str = "TinyBlob";
 const BLOB_TYPE_NAME: &str = "Blob";

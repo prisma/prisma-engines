@@ -1,7 +1,7 @@
 use crate::{
+    PrismaResult,
     cli::CliCommand,
     opt::{CliOpt, PrismaOpt, Subcommand},
-    PrismaResult,
 };
 use query_core::schema::{self, QuerySchema};
 use serial_test::serial;

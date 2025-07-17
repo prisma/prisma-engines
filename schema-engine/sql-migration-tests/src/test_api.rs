@@ -7,7 +7,7 @@ pub use schema_core::{
     schema_connector::Namespaces,
 };
 pub use test_macros::test_connector;
-pub use test_setup::{runtime::run_with_thread_local_runtime as tok, BitFlags, Capabilities, Tags};
+pub use test_setup::{BitFlags, Capabilities, Tags, runtime::run_with_thread_local_runtime as tok};
 
 use crate::{commands::*, multi_engine_test_api::TestApi as RootTestApi};
 use psl::{
@@ -15,8 +15,8 @@ use psl::{
     parser_database::{ScalarType, SourceFile},
 };
 use quaint::{
-    prelude::{ConnectionInfo, ResultSet},
     Value,
+    prelude::{ConnectionInfo, ResultSet},
 };
 use schema_core::{
     commands::diff_cli,

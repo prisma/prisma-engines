@@ -2,7 +2,7 @@
 use super::FilteredQuery;
 use crate::ToGraphviz;
 use enumflags2::BitFlags;
-use query_structure::{prelude::*, AggregationSelection, Filter, QueryArguments, RelationLoadStrategy, Take};
+use query_structure::{AggregationSelection, Filter, QueryArguments, RelationLoadStrategy, Take, prelude::*};
 use std::fmt::Display;
 
 #[allow(clippy::enum_variant_names)]

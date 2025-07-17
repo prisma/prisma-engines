@@ -1,15 +1,15 @@
 use std::{
     fmt,
     sync::{
-        atomic::{AtomicU32, Ordering},
         LazyLock,
+        atomic::{AtomicU32, Ordering},
     },
 };
 
 use chrono::Local;
 
 use super::*;
-use crate::{query_document::*, query_graph::*, schema::*, IrSerializer};
+use crate::{IrSerializer, query_document::*, query_graph::*, schema::*};
 
 static PRISMA_DOT_PATH: LazyLock<Option<String>> = LazyLock::new(|| {
     // Query graphs are saved only if `PRISMA_RENDER_DOT_FILE` env variable is set.

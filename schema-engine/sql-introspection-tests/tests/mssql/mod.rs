@@ -1,6 +1,6 @@
 use expect_test::expect;
 use quaint::prelude::Queryable;
-use sql_introspection_tests::{test_api::*, TestResult};
+use sql_introspection_tests::{TestResult, test_api::*};
 use test_macros::test_connector;
 
 #[test_connector(tags(Mssql))]

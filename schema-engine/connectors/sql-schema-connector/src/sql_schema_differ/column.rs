@@ -1,7 +1,7 @@
 use crate::migration_pair::MigrationPair;
 use enumflags2::BitFlags;
 
-use sql_schema_describer::{walkers::TableColumnWalker, DefaultKind, PrismaValue};
+use sql_schema_describer::{DefaultKind, PrismaValue, walkers::TableColumnWalker};
 
 use super::SqlSchemaDifferFlavour;
 

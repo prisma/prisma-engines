@@ -6,6 +6,7 @@ mod schema;
 mod shard_key;
 
 use crate::{
+    DatamodelError, ScalarFieldId, StringId,
     ast::{self, WithName, WithSpan},
     coerce, coerce_array,
     context::Context,
@@ -14,7 +15,6 @@ use crate::{
         ModelAttributes, OperatorClassStore, RelationField, ScalarField, ScalarFieldType, SortOrder,
     },
     walkers::RelationFieldId,
-    DatamodelError, ScalarFieldId, StringId,
 };
 use diagnostics::Span;
 use itertools::Itertools;
@@ -710,7 +710,9 @@ fn visit_relation(model_id: crate::ModelId, relation_field_id: RelationFieldId, 
                         .collect::<Vec<_>>()
                         .join(", ");
 
-                    let msg = format!("The argument fields must refer only to existing fields. The following fields do not exist in this model: {unresolvable_fields}");
+                    let msg = format!(
+                        "The argument fields must refer only to existing fields. The following fields do not exist in this model: {unresolvable_fields}"
+                    );
 
                     ctx.push_error(DatamodelError::new_validation_error(&msg, fields.span()))
                 }
@@ -722,7 +724,9 @@ fn visit_relation(model_id: crate::ModelId, relation_field_id: RelationFieldId, 
                         .collect::<Vec<_>>()
                         .join(", ");
 
-                    let msg = format!("The argument fields must refer only to scalar fields. But it is referencing the following relation fields: {relation_fields}");
+                    let msg = format!(
+                        "The argument fields must refer only to scalar fields. But it is referencing the following relation fields: {relation_fields}"
+                    );
 
                     ctx.push_error(DatamodelError::new_validation_error(&msg, fields.span()));
                 }
@@ -767,7 +771,11 @@ fn visit_relation(model_id: crate::ModelId, relation_field_id: RelationFieldId, 
                     let msg = format!(
                         "The argument `references` must refer only to scalar fields in the related model `{}`. But it is referencing the following relation fields: {}",
                         ctx.asts[ctx.types[relation_field_id].referenced_model].name(),
-                        relation_fields.iter().map(|(f, _)| f.name()).collect::<Vec<_>>().join(", "),
+                        relation_fields
+                            .iter()
+                            .map(|(f, _)| f.name())
+                            .collect::<Vec<_>>()
+                            .join(", "),
                     );
                     ctx.push_error(DatamodelError::new_validation_error(&msg, attr.span));
                 }
@@ -807,7 +815,7 @@ fn visit_relation(model_id: crate::ModelId, relation_field_id: RelationFieldId, 
     }
 
     let fk_name = {
-        let mapped_name = match ctx
+        match ctx
             .visit_optional_arg("map")
             .and_then(|name| coerce::string(name, ctx.diagnostics))
         {
@@ -817,9 +825,7 @@ fn visit_relation(model_id: crate::ModelId, relation_field_id: RelationFieldId, 
             }
             Some(name) => Some(ctx.interner.intern(name)),
             None => None,
-        };
-
-        mapped_name
+        }
     };
 
     ctx.types[relation_field_id].mapped_name = fk_name;

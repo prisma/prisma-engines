@@ -1,8 +1,8 @@
 use crate::{
+    Context,
     join_utils::AliasedJoin,
     model_extensions::{AsColumn, AsColumns, AsTable, SelectionResultExt},
     ordering::OrderByDefinition,
-    Context,
 };
 use itertools::Itertools;
 use quaint::ast::*;
@@ -231,7 +231,8 @@ pub(crate) fn build(
             let reverse = query_arguments.needs_reversed_order();
 
             // If we only have one ordering, we only want a single, slightly different, condition of (orderField [<= / >=] cmp_field).
-            let condition_tree = if len == 1 {
+
+            if len == 1 {
                 let order_definition = definitions.pop().unwrap();
                 ConditionTree::Single(Box::new(map_orderby_condition(
                     &order_subquery,
@@ -298,9 +299,7 @@ pub(crate) fn build(
                 });
 
                 ConditionTree::Or(or_conditions.into_iter().map(Into::into).collect())
-            };
-
-            condition_tree
+            }
         }
     }
 }
@@ -368,7 +367,8 @@ fn map_orderby_condition(
     };
 
     // Add OR statements for the foreign key fields too if they are nullable
-    let order_expr = if let Some(fks) = &order_definition.order_fks {
+
+    if let Some(fks) = &order_definition.order_fks {
         fks.iter()
             .filter(|fk| !fk.field.is_required())
             .fold(order_expr, |acc, fk| {
@@ -383,9 +383,7 @@ fn map_orderby_condition(
             })
     } else {
         order_expr
-    };
-
-    order_expr
+    }
 }
 
 fn map_equality_condition(

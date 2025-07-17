@@ -140,7 +140,7 @@ impl<'a> IndexFieldPair<'a> {
             sql::postgres::SQLOperatorClassKind::UuidBloomOps => Some(IndexOps::Managed("UuidBloomOps")),
             sql::postgres::SQLOperatorClassKind::UuidMinMaxOps => Some(IndexOps::Managed("UuidMinMaxOps")),
             sql::postgres::SQLOperatorClassKind::UuidMinMaxMultiOps => Some(IndexOps::Managed("UuidMinMaxMultiOps")),
-            sql::postgres::SQLOperatorClassKind::Raw(ref c) => Some(IndexOps::Raw(c)),
+            sql::postgres::SQLOperatorClassKind::Raw(c) => Some(IndexOps::Raw(c)),
         }
     }
 

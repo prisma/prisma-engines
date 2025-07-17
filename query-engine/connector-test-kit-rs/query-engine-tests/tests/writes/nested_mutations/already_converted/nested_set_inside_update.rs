@@ -2,7 +2,7 @@ use query_engine_tests::*;
 
 #[test_suite(exclude(CockroachDb))]
 mod set_inside_update {
-    use query_engine_tests::{run_query, run_query_json, DatamodelWithParams};
+    use query_engine_tests::{DatamodelWithParams, run_query, run_query_json};
     use query_test_macros::relation_link_test;
 
     // "a PM to C1  relation with the child already in a relation" should "be setable through a nested mutation by unique"

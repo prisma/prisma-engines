@@ -5,7 +5,7 @@ pub(super) mod shadow_db;
 use enumflags2::BitFlags;
 use quaint::connector::{ColumnType, DescribedColumn, DescribedParameter, GetRow, MssqlUrl, ToColumnNames};
 use schema_connector::{BoxFuture, ConnectorError, ConnectorResult, Namespaces};
-use sql_schema_describer::{mssql as describer, DescriberErrorKind, SqlSchema};
+use sql_schema_describer::{DescriberErrorKind, SqlSchema, mssql as describer};
 use user_facing_errors::schema_engine::ApplyMigrationError;
 
 // TODO: use ExternalConnector here.

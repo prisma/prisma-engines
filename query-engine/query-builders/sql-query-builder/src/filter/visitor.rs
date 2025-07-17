@@ -1,6 +1,6 @@
 use super::alias::*;
-use crate::join_utils::{compute_one2m_join, AliasedJoin};
-use crate::{model_extensions::*, Context};
+use crate::join_utils::{AliasedJoin, compute_one2m_join};
+use crate::{Context, model_extensions::*};
 
 use psl::datamodel_connector::ConnectorCapability;
 use psl::reachable_only_with_capability;
@@ -11,7 +11,7 @@ use std::convert::TryInto;
 
 pub(crate) trait FilterVisitorExt {
     fn visit_filter(&mut self, filter: Filter, ctx: &Context<'_>)
-        -> (ConditionTree<'static>, Option<Vec<AliasedJoin>>);
+    -> (ConditionTree<'static>, Option<Vec<AliasedJoin>>);
     fn visit_relation_filter(
         &mut self,
         filter: RelationFilter,
@@ -1160,11 +1160,7 @@ fn insensitive_scalar_filter(
 }
 
 fn lower_if(expr: Expression<'_>, cond: bool) -> Expression<'_> {
-    if cond {
-        lower(expr).into()
-    } else {
-        expr
-    }
+    if cond { lower(expr).into() } else { expr }
 }
 
 fn convert_value<'a>(

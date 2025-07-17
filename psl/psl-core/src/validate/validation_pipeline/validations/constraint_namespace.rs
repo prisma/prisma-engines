@@ -1,4 +1,4 @@
-use crate::datamodel_connector::{walker_ext_traits::*, ConstraintScope};
+use crate::datamodel_connector::{ConstraintScope, walker_ext_traits::*};
 use std::{borrow::Cow, collections::HashMap, ops::Deref};
 
 /// A constraint namespace consists of two kinds of namespaces:

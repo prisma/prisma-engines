@@ -1,6 +1,6 @@
 use pretty_assertions::assert_eq;
 use sql_migration_tests::test_api::*;
-use user_facing_errors::{schema_engine::MigrationToMarkAppliedNotFound, UserFacingError};
+use user_facing_errors::{UserFacingError, schema_engine::MigrationToMarkAppliedNotFound};
 
 const BASE_DM: &str = r#"
     model Test {

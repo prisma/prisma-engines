@@ -1,14 +1,14 @@
 use crate::serialization_ast::{
-    datamodel_ast::{Datamodel, Enum, EnumValue, Field, Function, Model, PrimaryKey, UniqueIndex},
     Index, IndexField, IndexType,
+    datamodel_ast::{Datamodel, Enum, EnumValue, Field, Function, Model, PrimaryKey, UniqueIndex},
 };
 use bigdecimal::ToPrimitive;
 use itertools::{Either, Itertools};
 use psl::{
-    parser_database::{walkers, ScalarFieldType},
+    parser_database::{ScalarFieldType, walkers},
     schema_ast::ast::WithDocumentation,
 };
-use query_structure::{dml_default_kind, encode_bytes, DefaultKind, FieldArity, PrismaValue};
+use query_structure::{DefaultKind, FieldArity, PrismaValue, dml_default_kind, encode_bytes};
 
 pub(crate) fn schema_to_dmmf(schema: &psl::ValidatedSchema) -> Datamodel {
     let mut datamodel = Datamodel {

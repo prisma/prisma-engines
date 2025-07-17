@@ -7,8 +7,8 @@ use crate::introspection::{
     introspection_pair::RelationFieldDirection, sanitize_datamodel_names,
 };
 use psl::{
-    parser_database::{self as db, ScalarFieldId},
     PreviewFeature,
+    parser_database::{self as db, ScalarFieldId},
 };
 use relation_names::RelationNames;
 use sql_schema_describer as sql;

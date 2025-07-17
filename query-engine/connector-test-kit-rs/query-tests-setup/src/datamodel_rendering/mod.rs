@@ -8,8 +8,8 @@ pub use mongodb_renderer::*;
 pub use sql_renderer::*;
 
 use crate::{
-    connection_string, datamodel_rendering::datasource::DatasourceBuilder, templating, DatamodelFragment, IdFragment,
-    M2mFragment, CONFIG,
+    CONFIG, DatamodelFragment, IdFragment, M2mFragment, connection_string,
+    datamodel_rendering::datasource::DatasourceBuilder, templating,
 };
 use indoc::indoc;
 use itertools::Itertools;

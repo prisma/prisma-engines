@@ -3,8 +3,8 @@
 
 use super::pipeline::QueryPipeline;
 use crate::{
-    executor::request_context, protocol::EngineProtocol, CoreError, IrSerializer, Operation, QueryGraph,
-    QueryGraphBuilder, QueryInterpreter, ResponseData,
+    CoreError, IrSerializer, Operation, QueryGraph, QueryGraphBuilder, QueryInterpreter, ResponseData,
+    executor::request_context, protocol::EngineProtocol,
 };
 use connector::{Connection, ConnectionLike, Connector};
 use crosstarget_utils::time::ElapsedTimeCounter;
@@ -14,8 +14,8 @@ use futures::future;
 use crate::metrics::MetricsInstrumentationStub;
 #[cfg(feature = "metrics")]
 use prisma_metrics::{
-    counter, histogram, WithMetricsInstrumentation, PRISMA_CLIENT_QUERIES_DURATION_HISTOGRAM_MS,
-    PRISMA_CLIENT_QUERIES_TOTAL,
+    PRISMA_CLIENT_QUERIES_DURATION_HISTOGRAM_MS, PRISMA_CLIENT_QUERIES_TOTAL, WithMetricsInstrumentation, counter,
+    histogram,
 };
 
 use schema::{QuerySchema, QuerySchemaRef};

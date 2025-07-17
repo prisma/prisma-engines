@@ -11,7 +11,7 @@ impl<'a> Fields<'a> {
         Fields { model }
     }
 
-    pub fn id_fields(&self) -> Option<impl Iterator<Item = ScalarFieldRef> + Clone + 'a> {
+    pub fn id_fields(&self) -> Option<impl Iterator<Item = ScalarFieldRef> + Clone + use<'a>> {
         let dm = &self.model.dm;
         self.model.walker().primary_key().map(move |pk| {
             pk.fields()
@@ -129,7 +129,7 @@ impl<'a> Fields<'a> {
             })
     }
 
-    pub fn all(&self) -> impl Iterator<Item = Field> + 'a {
+    pub fn all(&self) -> impl Iterator<Item = Field> + use<'a> {
         let dm = &self.model.dm;
         let model_walker = dm.walk(self.model.id);
         model_walker
@@ -144,9 +144,9 @@ impl<'a> Fields<'a> {
             )
     }
 
-    pub fn filter_all<P>(&self, predicate: P) -> impl Iterator<Item = Field> + 'a
+    pub fn filter_all<P>(&self, predicate: P) -> impl Iterator<Item = Field> + use<'a, P>
     where
-        P: Fn(&&Field) -> bool + 'a,
+        P: Fn(&&Field) -> bool,
     {
         self.all().filter(move |f| predicate(&f))
     }

@@ -5,18 +5,17 @@ pub mod shadow_db;
 use enumflags2::BitFlags;
 use quaint::{
     connector::{
-        self,
+        self, MysqlUrl,
         mysql_async::{self as my, prelude::Query},
-        MysqlUrl,
     },
     prelude::{ColumnType, NativeConnectionInfo, Queryable},
 };
 use schema_connector::{ConnectorError, ConnectorResult};
 use sql_schema_describer::{DescriberErrorKind, SqlSchema};
 use user_facing_errors::{
+    KnownError,
     schema_engine::DatabaseSchemaInconsistent,
     schema_engine::{ApplyMigrationError, DirectDdlNotAllowed, ForeignKeyCreationNotAllowed},
-    KnownError,
 };
 
 pub struct Connection(connector::Mysql);
@@ -39,7 +38,7 @@ impl Connection {
         circumstances: BitFlags<super::Circumstances>,
         params: &super::Params,
     ) -> ConnectorResult<SqlSchema> {
-        use sql_schema_describer::{mysql as describer, SqlSchemaDescriberBackend};
+        use sql_schema_describer::{SqlSchemaDescriberBackend, mysql as describer};
         let mut describer_circumstances: BitFlags<describer::Circumstances> = Default::default();
 
         if circumstances.contains(super::Circumstances::IsMariadb) {

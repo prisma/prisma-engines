@@ -1,11 +1,11 @@
 use super::{constraint_namespace::ConstraintName, database_name::validate_db_name};
 use crate::{
-    datamodel_connector::{walker_ext_traits::*, ConnectorCapability},
+    datamodel_connector::{ConnectorCapability, walker_ext_traits::*},
     diagnostics::DatamodelError,
     validate::validation_pipeline::context::Context,
 };
 use itertools::Itertools;
-use parser_database::{walkers::IndexWalker, IndexAlgorithm};
+use parser_database::{IndexAlgorithm, walkers::IndexWalker};
 
 /// Different databases validate index and unique constraint names in a certain namespace.
 /// Validates index and unique constraint names against the database requirements.

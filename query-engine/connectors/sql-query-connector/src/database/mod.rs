@@ -23,7 +23,7 @@ pub(crate) mod native {
 pub(crate) mod operations;
 
 use async_trait::async_trait;
-use connector_interface::{error::ConnectorError, Connector};
+use connector_interface::{Connector, error::ConnectorError};
 
 #[cfg(feature = "driver-adapters")]
 pub use js::*;

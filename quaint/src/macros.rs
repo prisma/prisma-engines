@@ -1,4 +1,4 @@
-use crate::{connector::ColumnType, Value};
+use crate::{Value, connector::ColumnType};
 
 /// Convert given set of tuples into `Values`.
 ///

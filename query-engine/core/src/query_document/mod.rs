@@ -34,7 +34,7 @@ use crate::{
 };
 use itertools::Itertools;
 use query_structure::Model;
-use schema::{constants::*, QuerySchema};
+use schema::{QuerySchema, constants::*};
 use std::collections::HashMap;
 use user_facing_errors::query_engine::validation::ValidationError;
 

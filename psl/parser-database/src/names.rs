@@ -3,9 +3,9 @@ mod reserved_model_names;
 pub use reserved_model_names::is_reserved_type_name;
 
 use crate::{
+    Context, DatamodelError, FileId, StringId,
     ast::{self, ConfigBlockProperty, TopId, WithAttributes, WithIdentifier, WithName, WithSpan},
     types::ScalarType,
-    Context, DatamodelError, FileId, StringId,
 };
 use reserved_model_names::{validate_enum_name, validate_model_name};
 use rustc_hash::{FxHashMap as HashMap, FxHashSet as HashSet};

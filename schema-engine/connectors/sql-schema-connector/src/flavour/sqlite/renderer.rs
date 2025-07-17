@@ -1,4 +1,4 @@
-use crate::sql_renderer::{format_hex, render_step, IteratorJoin, Quoted, QuotedWithPrefix, SqlRenderer};
+use crate::sql_renderer::{IteratorJoin, Quoted, QuotedWithPrefix, SqlRenderer, format_hex, render_step};
 use crate::{
     migration_pair::MigrationPair,
     sql_migration::{AlterEnum, AlterTable, RedefineTable, TableChange},

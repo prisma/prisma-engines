@@ -1,9 +1,9 @@
 use mongodb_schema_describer::{IndexField, IndexFieldProperty, MongoSchema};
 use psl::{
+    ValidatedSchema,
     builtin_connectors::MONGODB,
     datamodel_connector::walker_ext_traits::*,
     parser_database::{IndexType, SortOrder},
-    ValidatedSchema,
 };
 
 /// Datamodel -> MongoSchema

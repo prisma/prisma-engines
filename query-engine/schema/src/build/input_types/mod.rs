@@ -25,11 +25,7 @@ fn map_scalar_input_type(ctx: &'_ QuerySchema, typ: TypeIdentifier, list: bool) 
         TypeIdentifier::Unsupported => unreachable!("No unsupported field should reach that path"),
     };
 
-    if list {
-        InputType::list(typ)
-    } else {
-        typ
-    }
+    if list { InputType::list(typ) } else { typ }
 }
 
 /// Convenience function to return [object_type, list_object_type]

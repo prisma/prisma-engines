@@ -1,4 +1,4 @@
-use psl::{datamodel_connector::ConnectorCapability, has_capability, PreviewFeature};
+use psl::{PreviewFeature, datamodel_connector::ConnectorCapability, has_capability};
 
 use crate::*;
 

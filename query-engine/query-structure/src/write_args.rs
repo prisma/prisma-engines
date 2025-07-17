@@ -2,7 +2,7 @@ use crate::{
     CompositeFieldRef, Field, Filter, Model, ModelProjection, PrismaValue, ScalarFieldRef, SelectedField,
     SelectionResult,
 };
-use indexmap::{map::Keys, IndexMap};
+use indexmap::{IndexMap, map::Keys};
 use std::{borrow::Borrow, convert::TryInto, ops::Deref};
 
 /// WriteArgs represent data to be written to an underlying data source.
@@ -112,35 +112,19 @@ impl WriteOperation {
     }
 
     pub fn as_scalar(&self) -> Option<&ScalarWriteOperation> {
-        if let Self::Scalar(v) = self {
-            Some(v)
-        } else {
-            None
-        }
+        if let Self::Scalar(v) = self { Some(v) } else { None }
     }
 
     pub fn as_composite(&self) -> Option<&CompositeWriteOperation> {
-        if let Self::Composite(v) = self {
-            Some(v)
-        } else {
-            None
-        }
+        if let Self::Composite(v) = self { Some(v) } else { None }
     }
 
     pub fn try_into_scalar(self) -> Option<ScalarWriteOperation> {
-        if let Self::Scalar(v) = self {
-            Some(v)
-        } else {
-            None
-        }
+        if let Self::Scalar(v) = self { Some(v) } else { None }
     }
 
     pub fn try_into_composite(self) -> Option<CompositeWriteOperation> {
-        if let Self::Composite(v) = self {
-            Some(v)
-        } else {
-            None
-        }
+        if let Self::Composite(v) = self { Some(v) } else { None }
     }
 }
 

@@ -22,15 +22,15 @@ pub use schema_gen::*;
 pub use templating::*;
 
 use colored::Colorize;
-use futures::{future::Either, FutureExt};
+use futures::{FutureExt, future::Either};
 use prisma_metrics::{MetricRecorder, MetricRegistry, WithMetricsInstrumentation};
 use psl::datamodel_connector::ConnectorCapabilities;
 use std::future::Future;
 use std::panic::AssertUnwindSafe;
-use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::LazyLock;
+use std::sync::atomic::{AtomicBool, Ordering};
 use tokio::runtime::Builder;
-use tokio::sync::mpsc::{unbounded_channel, UnboundedReceiver, UnboundedSender};
+use tokio::sync::mpsc::{UnboundedReceiver, UnboundedSender, unbounded_channel};
 use tracing_futures::WithSubscriber;
 
 pub type TestResult<T> = Result<T, TestError>;

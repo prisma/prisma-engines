@@ -3,7 +3,7 @@ use std::fmt::Display;
 use quaint::{prelude::Queryable, single::Quaint};
 
 use super::*;
-use crate::{datamodel_rendering::SqlDatamodelRenderer, BoxFuture, TestError};
+use crate::{BoxFuture, TestError, datamodel_rendering::SqlDatamodelRenderer};
 
 #[derive(Debug, Default, Clone)]
 pub(crate) struct SqlServerConnectorTag;

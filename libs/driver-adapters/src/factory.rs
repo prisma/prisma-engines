@@ -1,6 +1,6 @@
 use std::sync::{
-    atomic::{AtomicBool, Ordering},
     Arc,
+    atomic::{AtomicBool, Ordering},
 };
 
 use async_trait::async_trait;
@@ -193,7 +193,7 @@ impl super::wasm::FromJsValue for JsAdapterFactory {
 #[cfg(not(target_arch = "wasm32"))]
 impl ::napi::bindgen_prelude::FromNapiValue for JsAdapterFactory {
     unsafe fn from_napi_value(env: napi::sys::napi_env, napi_val: napi::sys::napi_value) -> JsResult<Self> {
-        let object = JsObject::from_napi_value(env, napi_val)?;
+        let object = unsafe { JsObject::from_napi_value(env, napi_val) }?;
         let common_proxy = AdapterFactoryProxy::new(&object)?;
         Ok(Self::new(common_proxy))
     }

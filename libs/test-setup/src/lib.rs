@@ -22,7 +22,7 @@ pub use diff::panic_with_diff;
 pub use enumflags2::BitFlags;
 pub use mssql::reset_schema as reset_mssql_schema;
 pub use sqlite::sqlite_test_url;
-pub use tags::{tags_from_comma_separated_list, Tags};
+pub use tags::{Tags, tags_from_comma_separated_list};
 pub use test_api_args::{DatasourceBlock, TestApiArgs};
 
 type AnyError = Box<dyn std::error::Error + Send + Sync + 'static>;

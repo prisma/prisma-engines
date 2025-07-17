@@ -4,9 +4,9 @@ use std::{
     error::Error as StdError,
     fmt::Display,
     io::Write as _,
-    sync::{atomic::Ordering, Arc, LazyLock},
+    sync::{Arc, LazyLock, atomic::Ordering},
 };
-use tokio::sync::{mpsc, oneshot, RwLock};
+use tokio::sync::{RwLock, mpsc, oneshot};
 
 type Result<T> = std::result::Result<T, Box<dyn std::error::Error + Send + Sync>>;
 

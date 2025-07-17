@@ -8,12 +8,12 @@ use async_trait::async_trait;
 use futures::Future;
 use quaint::connector::{AdapterName, DescribedQuery, ExternalConnectionInfo, ExternalConnector};
 use quaint::{
-    connector::{metrics, IsolationLevel, Transaction},
+    connector::{IsolationLevel, Transaction, metrics},
     prelude::{Query as QuaintQuery, Queryable as QuaintQueryable, ResultSet, TransactionCapable},
     visitor::{self, Visitor},
 };
 use telemetry::formatting::QueryForTracing;
-use tracing::{info_span, Instrument};
+use tracing::{Instrument, info_span};
 
 /// A JsQueryable adapts a Proxy to implement quaint's Queryable interface. It has the
 /// responsibility of transforming inputs and outputs of `query` and `execute` methods from quaint
@@ -412,7 +412,7 @@ impl super::wasm::FromJsValue for JsBaseQueryable {
 #[cfg(not(target_arch = "wasm32"))]
 impl ::napi::bindgen_prelude::FromNapiValue for JsBaseQueryable {
     unsafe fn from_napi_value(env: napi::sys::napi_env, napi_val: napi::sys::napi_value) -> JsResult<Self> {
-        let object = JsObject::from_napi_value(env, napi_val)?;
+        let object = unsafe { JsObject::from_napi_value(env, napi_val) }?;
         let common_proxy = CommonProxy::new(&object)?;
         Ok(Self::new(common_proxy))
     }
@@ -436,7 +436,7 @@ impl super::wasm::FromJsValue for JsQueryable {
 #[cfg(not(target_arch = "wasm32"))]
 impl ::napi::bindgen_prelude::FromNapiValue for JsQueryable {
     unsafe fn from_napi_value(env: napi::sys::napi_env, napi_val: napi::sys::napi_value) -> JsResult<Self> {
-        let object = JsObject::from_napi_value(env, napi_val)?;
+        let object = unsafe { JsObject::from_napi_value(env, napi_val) }?;
         let common_proxy = CommonProxy::new(&object)?;
         let driver_proxy = DriverProxy::new(&object)?;
 

@@ -3,7 +3,7 @@ use query_engine_tests::*;
 #[test_suite(schema(schema), capabilities(ScalarLists, Json, JsonLists))]
 mod json {
     use indoc::indoc;
-    use query_engine_tests::{run_query, Runner};
+    use query_engine_tests::{Runner, run_query};
 
     fn schema() -> String {
         let schema = indoc! {

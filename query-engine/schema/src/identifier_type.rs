@@ -283,11 +283,11 @@ impl std::fmt::Display for IdentifierType {
                 )
             }
             IdentifierType::CheckedCreateInput(model, related_field) => match related_field {
-                Some(ref rf) => write!(f, "{}CreateWithout{}Input", model.name(), capitalize(rf.name())),
+                Some(rf) => write!(f, "{}CreateWithout{}Input", model.name(), capitalize(rf.name())),
                 _ => write!(f, "{}CreateInput", model.name()),
             },
             IdentifierType::UncheckedCreateInput(model, related_field) => match related_field {
-                Some(ref rf) => write!(
+                Some(rf) => write!(
                     f,
                     "{}UncheckedCreateWithout{}Input",
                     model.name(),
@@ -296,7 +296,7 @@ impl std::fmt::Display for IdentifierType {
                 _ => write!(f, "{}UncheckedCreateInput", model.name()),
             },
             IdentifierType::CreateManyInput(model, related_field) => match related_field {
-                Some(ref rf) => write!(f, "{}CreateMany{}Input", model.name(), capitalize(rf.name())),
+                Some(rf) => write!(f, "{}CreateMany{}Input", model.name(), capitalize(rf.name())),
                 _ => write!(f, "{}CreateManyInput", model.name()),
             },
             IdentifierType::CreateManyAndReturnOutput(model) => {

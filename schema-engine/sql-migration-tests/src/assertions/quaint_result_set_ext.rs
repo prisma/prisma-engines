@@ -1,4 +1,4 @@
-use quaint::{connector::ResultRowRef, prelude::ResultSet, Value, ValueType};
+use quaint::{Value, ValueType, connector::ResultRowRef, prelude::ResultSet};
 
 pub trait ResultSetExt: Sized {
     fn assert_row_count(self, expected_count: usize) -> Self;

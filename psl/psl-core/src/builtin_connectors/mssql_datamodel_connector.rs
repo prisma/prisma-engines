@@ -4,13 +4,13 @@ mod validations;
 pub use native_types::{MsSqlType, MsSqlTypeParameter};
 
 use crate::{
+    PreviewFeature,
     datamodel_connector::{
         Connector, ConnectorCapabilities, ConnectorCapability, ConstraintScope, Flavour, NativeTypeConstructor,
         NativeTypeInstance, RelationMode,
     },
     diagnostics::{Diagnostics, Span},
-    parser_database::{self, ast, ParserDatabase, ReferentialAction, ScalarType},
-    PreviewFeature,
+    parser_database::{self, ParserDatabase, ReferentialAction, ScalarType, ast},
 };
 use enumflags2::BitFlags;
 use lsp_types::{CompletionItem, CompletionItemKind, CompletionList};

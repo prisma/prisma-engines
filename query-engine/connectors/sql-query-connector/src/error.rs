@@ -1,6 +1,6 @@
 use connector_interface::error::*;
 use quaint::error::ErrorKind as QuaintKind;
-use query_structure::{prelude::DomainError, Filter};
+use query_structure::{Filter, prelude::DomainError};
 use std::{any::Any, borrow::Cow, string::FromUtf8Error};
 use thiserror::Error;
 use user_facing_errors::query_engine::DatabaseConstraint;

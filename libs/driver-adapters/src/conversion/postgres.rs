@@ -32,9 +32,9 @@ pub fn value_to_js_arg(value: &quaint::Value) -> serde_json::Result<JSArg> {
 #[cfg(test)]
 mod test {
     use super::*;
+    use quaint::ValueType;
     use quaint::bigdecimal::BigDecimal;
     use quaint::chrono::*;
-    use quaint::ValueType;
     use std::str::FromStr;
 
     #[test]

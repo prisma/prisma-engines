@@ -105,8 +105,8 @@ impl<'a> IndexOps<'a> {
 impl fmt::Display for IndexOps<'_> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match &self.0 {
-            InnerOps::Managed(ref s) => f.write_str(s),
-            InnerOps::Raw(ref s) => {
+            InnerOps::Managed(s) => f.write_str(s),
+            InnerOps::Raw(s) => {
                 write!(f, "raw({s})")
             }
         }

@@ -3,11 +3,11 @@ use enumflags2::BitFlags;
 use log::*;
 use lsp_types::*;
 use psl::{
+    Diagnostics, PreviewFeature,
     diagnostics::Span,
     error_tolerant_parse_configuration,
-    parser_database::{ast, ParserDatabase, SourceFile},
+    parser_database::{ParserDatabase, SourceFile, ast},
     schema_ast::ast::AttributePosition,
-    Diagnostics, PreviewFeature,
 };
 
 use crate::LSPContext;
@@ -24,7 +24,7 @@ impl<'a> CompletionContext<'a> {
     }
     pub(super) fn preview_features(&self) -> BitFlags<PreviewFeature> {
         self.generator()
-            .and_then(|gen| gen.preview_features)
+            .and_then(|generator| generator.preview_features)
             .unwrap_or_default()
     }
 

@@ -1,6 +1,6 @@
 use super::{into_expression::IntoUpdateExpression, operation};
 
-use bson::{doc, Bson, Document};
+use bson::{Bson, Document, doc};
 use indexmap::IndexMap;
 use query_structure::FieldPath;
 
@@ -44,15 +44,11 @@ impl UpdateExpression {
     }
 
     pub(crate) fn try_into_set(self) -> Option<Set> {
-        if let Self::Set(v) = self {
-            Some(v)
-        } else {
-            None
-        }
+        if let Self::Set(v) = self { Some(v) } else { None }
     }
 
     pub(crate) fn as_merge_objects_mut(&mut self) -> Option<&mut MergeObjects> {
-        if let Self::MergeObjects(ref mut v) = self {
+        if let Self::MergeObjects(v) = self {
             Some(v)
         } else {
             None
@@ -238,14 +234,11 @@ impl MergeObjects {
             let mut merge_path = field_path.clone();
             merge_path.take(depth + 1);
 
-            let inner_merge = acc
-                .doc_mut()
+            (acc.doc_mut()
                 .entry(segment.to_string())
                 .or_insert(MergeObjects::new(merge_path).into())
                 .as_merge_objects_mut()
-                .unwrap();
-
-            inner_merge
+                .unwrap()) as _
         });
 
         (target, inner_merge)

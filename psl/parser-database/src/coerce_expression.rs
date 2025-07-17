@@ -1,4 +1,4 @@
-use crate::{ast, DatamodelError, Diagnostics};
+use crate::{DatamodelError, Diagnostics, ast};
 
 macro_rules! impl_coercions {
     ($lt:lifetime; $($name:ident : $expected_type:expr => $out:ty;)*) => {

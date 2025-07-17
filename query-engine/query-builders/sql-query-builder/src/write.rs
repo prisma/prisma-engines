@@ -1,6 +1,6 @@
 use crate::limit::wrap_with_limit_subquery_if_needed;
-use crate::{model_extensions::*, sql_trace::SqlTraceComment, Context};
-use crate::{update, FilterBuilder};
+use crate::{Context, model_extensions::*, sql_trace::SqlTraceComment};
+use crate::{FilterBuilder, update};
 use itertools::Itertools;
 use quaint::ast::*;
 use query_structure::*;
@@ -199,13 +199,11 @@ pub fn build_update_and_set_query(
 
     let query = query.add_traceparent(ctx.traceparent);
 
-    let query = if let Some(selected_fields) = selected_fields {
+    if let Some(selected_fields) = selected_fields {
         query.returning(selected_fields.as_columns(ctx).map(|c| c.set_is_selected(true)))
     } else {
         query
-    };
-
-    query
+    }
 }
 
 pub fn chunk_update_with_ids(

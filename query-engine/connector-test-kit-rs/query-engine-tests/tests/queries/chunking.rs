@@ -208,7 +208,10 @@ mod chunking {
 
         assert_error!(
             runner,
-            with_id_excess!(&runner, "query { findManyA(where: {id: { in: [:id_list:] }}, orderBy: { b: { as: { _count: asc } } } ) { id } }"),
+            with_id_excess!(
+                &runner,
+                "query { findManyA(where: {id: { in: [:id_list:] }}, orderBy: { b: { as: { _count: asc } } } ) { id } }"
+            ),
             2029 // QueryParameterLimitExceeded
         );
 

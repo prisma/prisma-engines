@@ -1,8 +1,8 @@
-use super::{differ_database::DifferDatabase, ColumnTypeChange};
+use super::{ColumnTypeChange, differ_database::DifferDatabase};
 use crate::{migration_pair::MigrationPair, sql_migration::SqlMigrationStep, sql_schema_differ};
 use sql_schema_describer::{
-    walkers::{IndexWalker, TableColumnWalker, TableWalker},
     TableColumnId,
+    walkers::{IndexWalker, TableColumnWalker, TableWalker},
 };
 
 /// Trait to specialize SQL schema diffing (resulting in migration steps) by SQL backend.

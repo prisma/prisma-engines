@@ -1,4 +1,4 @@
-use sql_introspection_tests::{test_api::*, TestResult};
+use sql_introspection_tests::{TestResult, test_api::*};
 
 #[test_connector(tags(Postgres))]
 async fn multiple_schemas_without_schema_property_are_not_introspected(api: &mut TestApi) -> TestResult {

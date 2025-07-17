@@ -1,7 +1,7 @@
 use super::expression::*;
 use crate::IntoBson;
 
-use bson::{doc, Bson, Document};
+use bson::{Bson, Document, doc};
 use itertools::Itertools;
 
 impl IntoBson for Set {

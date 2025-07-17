@@ -6,7 +6,7 @@
 ))]
 use super::TypeIdentifier;
 
-use crate::{ast::OpaqueType, Value, ValueType};
+use crate::{Value, ValueType, ast::OpaqueType};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ColumnType {

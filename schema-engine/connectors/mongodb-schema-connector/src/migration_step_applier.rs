@@ -1,7 +1,7 @@
 use crate::{
+    MongoDbSchemaConnector,
     client_wrapper::mongo_error_to_connector_error,
     migration::{MongoDbMigration, MongoDbMigrationStep},
-    MongoDbSchemaConnector,
 };
 use bson::{self, Bson, Document};
 use schema_connector::{ConnectorResult, Migration, SchemaConnector};

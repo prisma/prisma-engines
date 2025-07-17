@@ -1,7 +1,7 @@
 mod composite;
 
 use crate::introspection::test_api::*;
-use bson::{doc, oid::ObjectId, Binary, Bson, DateTime, Decimal128, Timestamp};
+use bson::{Binary, Bson, DateTime, Decimal128, Timestamp, doc, oid::ObjectId};
 
 #[test]
 fn string() {

@@ -1,5 +1,5 @@
 use crate::introspection::test_api::*;
-use bson::{doc, oid::ObjectId, Bson};
+use bson::{Bson, doc, oid::ObjectId};
 use schema_connector::CompositeTypeDepth;
 
 #[test]

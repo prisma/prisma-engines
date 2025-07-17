@@ -1,7 +1,7 @@
 use crate::{
+    ParserDatabase,
     types::FieldWithArgs,
     walkers::{IndexFieldWalker, ScalarFieldWalker},
-    ParserDatabase,
 };
 
 /// Describes any unique criteria in a model. Can either be a primary

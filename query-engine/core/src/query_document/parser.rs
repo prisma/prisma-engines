@@ -277,7 +277,7 @@ impl QueryDocumentParser {
                         &selection_path,
                         &argument_path,
                         &value,
-                    )?))
+                    )?));
                 }
                 // With the JSON protocol, JSON values are sent as deserialized values.
                 // This means that a JsonList([1, 2]) will be coerced as an `ArgumentValue::List([1, 2])`.
@@ -301,7 +301,7 @@ impl QueryDocumentParser {
                 (ArgumentValue::Scalar(pv), input_type) => match (pv, input_type) {
                     // Null handling
                     (PrismaValue::Null, InputType::Scalar(ScalarType::Null)) => {
-                        return Ok(ParsedInputValue::Single(PrismaValue::Null))
+                        return Ok(ParsedInputValue::Single(PrismaValue::Null));
                     }
                     (PrismaValue::Null, input_type) => try_this!(Err(ValidationError::required_argument_missing(
                         selection_path.segments(),
@@ -309,9 +309,10 @@ impl QueryDocumentParser {
                         &conversions::input_types_to_input_type_descriptions(&[input_type.clone()],),
                     ))),
                     // Scalar handling
-                    (pv, InputType::Scalar(st)) => try_this!(self
-                        .parse_scalar(&selection_path, &argument_path, pv, *st, &value)
-                        .map(ParsedInputValue::Single)),
+                    (pv, InputType::Scalar(st)) => try_this!(
+                        self.parse_scalar(&selection_path, &argument_path, pv, *st, &value)
+                            .map(ParsedInputValue::Single)
+                    ),
 
                     // Enum handling
                     (pv @ PrismaValue::Enum(_), InputType::Enum(et)) => {
@@ -336,20 +337,22 @@ impl QueryDocumentParser {
                 },
 
                 // List handling.
-                (ArgumentValue::List(values), InputType::List(l)) => try_this!(self
-                    .parse_list(&selection_path, &argument_path, values.clone(), l, query_schema)
-                    .map(ParsedInputValue::List)),
+                (ArgumentValue::List(values), InputType::List(l)) => try_this!(
+                    self.parse_list(&selection_path, &argument_path, values.clone(), l, query_schema)
+                        .map(ParsedInputValue::List)
+                ),
 
                 // Object handling
-                (ArgumentValue::Object(o) | ArgumentValue::FieldRef(o), InputType::Object(obj)) => try_this!(self
-                    .parse_input_object(
+                (ArgumentValue::Object(o) | ArgumentValue::FieldRef(o), InputType::Object(obj)) => try_this!(
+                    self.parse_input_object(
                         selection_path.clone(),
                         argument_path.clone(),
                         o.clone(),
                         obj,
                         query_schema,
                     )
-                    .map(ParsedInputValue::Map)),
+                    .map(ParsedInputValue::Map)
+                ),
 
                 // Invalid combinations
                 (_, input_type) => try_this!(Err(ValidationError::invalid_argument_type(
@@ -696,9 +699,7 @@ impl QueryDocumentParser {
                     Some(default_value) => {
                         let default_pv = match self {
                             Self::WithEagerDefaultEvaluation { default_now } => match default_value {
-                                DefaultKind::Expression(ref expr)
-                                    if matches!(expr.generator(), ValueGeneratorFn::Now) =>
-                                {
+                                DefaultKind::Expression(expr) if matches!(expr.generator(), ValueGeneratorFn::Now) => {
                                     default_now.clone()
                                 }
                                 _ => default_value.get_evaluated()?,
@@ -822,8 +823,8 @@ pub(crate) mod conversions {
     use std::borrow::Cow;
 
     use crate::{
-        schema::{InputType, OutputType},
         ArgumentValue,
+        schema::{InputType, OutputType},
     };
     use query_structure::{Placeholder, PrismaValue};
     use schema::InnerOutputType;

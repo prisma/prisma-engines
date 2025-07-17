@@ -3,12 +3,12 @@
 //! Why this rather than using connectors directly? We must be able to use the schema engine
 //! without a valid schema or database connection for commands like createDatabase and diff.
 
-use crate::{commands, parse_configuration_multi, CoreError, CoreResult, GenericApi, SchemaContainerExt};
+use crate::{CoreError, CoreResult, GenericApi, SchemaContainerExt, commands, parse_configuration_multi};
 use ::commands::MigrationSchemaCache;
 use enumflags2::BitFlags;
 use futures::stream::{FuturesUnordered, StreamExt};
 use json_rpc::types::*;
-use psl::{parser_database::SourceFile, PreviewFeature};
+use psl::{PreviewFeature, parser_database::SourceFile};
 use schema_connector::{ConnectorError, ConnectorHost, IntrospectionResult, Namespaces, SchemaConnector};
 use std::{
     collections::HashMap,
@@ -17,7 +17,7 @@ use std::{
     pin::Pin,
     sync::Arc,
 };
-use tokio::sync::{mpsc, oneshot, Mutex};
+use tokio::sync::{Mutex, mpsc, oneshot};
 use tracing_futures::{Instrument, WithSubscriber};
 
 /// The container for the state of the schema engine. It can contain one or more connectors

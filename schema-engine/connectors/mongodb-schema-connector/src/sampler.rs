@@ -4,12 +4,12 @@ mod statistics;
 use datamodel_renderer as render;
 use futures::TryStreamExt;
 use mongodb::{
-    bson::{doc, Document},
-    options::AggregateOptions,
     Database,
+    bson::{Document, doc},
+    options::AggregateOptions,
 };
 use mongodb_schema_describer::MongoSchema;
-use schema_connector::{warnings::Model, IntrospectionContext, IntrospectionResult, Warnings};
+use schema_connector::{IntrospectionContext, IntrospectionResult, Warnings, warnings::Model};
 use statistics::*;
 use std::borrow::Cow;
 

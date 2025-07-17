@@ -1,6 +1,6 @@
 use super::*;
 use constants::filters;
-use query_structure::{prelude::ParentContainer, CompositeFieldRef};
+use query_structure::{CompositeFieldRef, prelude::ParentContainer};
 
 pub(crate) fn scalar_filter_object_type(
     ctx: &'_ QuerySchema,

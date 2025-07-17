@@ -1,5 +1,5 @@
 use crate::flavour::{MssqlConnector, SqlConnector};
-use schema_connector::{migrations_directory::MigrationDirectory, ConnectorResult, Namespaces};
+use schema_connector::{ConnectorResult, Namespaces, migrations_directory::MigrationDirectory};
 use sql_schema_describer::SqlSchema;
 
 pub async fn sql_schema_from_migrations_history(

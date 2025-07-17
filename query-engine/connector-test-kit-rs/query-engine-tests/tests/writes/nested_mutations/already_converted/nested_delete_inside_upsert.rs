@@ -2,7 +2,7 @@ use query_engine_tests::*;
 
 #[test_suite(exclude(CockroachDb))]
 mod delete_inside_upsert {
-    use query_engine_tests::{assert_error, run_query, run_query_json, DatamodelWithParams};
+    use query_engine_tests::{DatamodelWithParams, assert_error, run_query, run_query_json};
     use query_test_macros::relation_link_test;
 
     // ----------------------------------
@@ -124,7 +124,8 @@ mod delete_inside_upsert {
 
         assert_error!(
             runner,
-            format!(r#"mutation {{
+            format!(
+                r#"mutation {{
               upsertOneParent(
                 where: {parent}
                 update:{{
@@ -137,7 +138,8 @@ mod delete_inside_upsert {
                   c
                 }}
               }}
-            }}"#),
+            }}"#
+            ),
             2025,
             "An operation failed because it depends on one or more records that were required but not found. No 'Child' record was found for a nested delete on one-to-one relation 'ChildToParent'."
         );
@@ -173,8 +175,9 @@ mod delete_inside_upsert {
         )?;
 
         assert_error!(
-                runner,
-                format!(r#"mutation {{
+            runner,
+            format!(
+                r#"mutation {{
                   upsertOneParent(
                     where: {parent}
                     update:{{
@@ -187,10 +190,11 @@ mod delete_inside_upsert {
                       c
                     }}
                   }}
-                }}"#),
-                2025,
-                "An operation failed because it depends on one or more records that were required but not found. No 'Child' record was found for a nested delete on one-to-one relation 'ChildToParent'."
-            );
+                }}"#
+            ),
+            2025,
+            "An operation failed because it depends on one or more records that were required but not found. No 'Child' record was found for a nested delete on one-to-one relation 'ChildToParent'."
+        );
 
         Ok(())
     }
@@ -499,7 +503,8 @@ mod delete_inside_upsert {
 
         assert_error!(
             runner,
-            format!(r#"mutation {{
+            format!(
+                r#"mutation {{
               upsertOneParent(
                 where: {parent}
                 update:{{
@@ -512,7 +517,8 @@ mod delete_inside_upsert {
                   c
                 }}
               }}
-            }}"#),
+            }}"#
+            ),
             2025,
             "An operation failed because it depends on one or more records that were required but not found. No 'Child' record was found for a nested delete on one-to-one relation 'ChildToParent'."
         );
@@ -548,8 +554,9 @@ mod delete_inside_upsert {
         )?;
 
         assert_error!(
-                runner,
-                format!(r#"mutation {{
+            runner,
+            format!(
+                r#"mutation {{
                   upsertOneParent(
                     where: {parent}
                     update:{{
@@ -562,10 +569,11 @@ mod delete_inside_upsert {
                       c
                     }}
                   }}
-                }}"#),
-                2025,
-                "An operation failed because it depends on one or more records that were required but not found. No 'Child' record was found for a nested delete on one-to-one relation 'ChildToParent'."
-            );
+                }}"#
+            ),
+            2025,
+            "An operation failed because it depends on one or more records that were required but not found. No 'Child' record was found for a nested delete on one-to-one relation 'ChildToParent'."
+        );
 
         Ok(())
     }

@@ -1,8 +1,8 @@
 use crate::introspection::test_api::*;
 use mongodb::{
-    bson::{doc, Bson},
-    options::IndexOptions,
     IndexModel,
+    bson::{Bson, doc},
+    options::IndexOptions,
 };
 use schema_connector::CompositeTypeDepth;
 

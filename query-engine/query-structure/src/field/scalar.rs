@@ -1,8 +1,8 @@
-use crate::{ast, parent_container::ParentContainer, prelude::*, DefaultKind, NativeTypeInstance, ValueGenerator};
+use crate::{DefaultKind, NativeTypeInstance, ValueGenerator, ast, parent_container::ParentContainer, prelude::*};
 use chrono::{DateTime, FixedOffset};
 use psl::{
     generators::{DEFAULT_CUID_VERSION, DEFAULT_UUID_VERSION},
-    parser_database::{self as db, walkers, ScalarFieldType, ScalarType},
+    parser_database::{self as db, ScalarFieldType, ScalarType, walkers},
     schema_ast::ast::FieldArity,
 };
 use std::fmt::{Debug, Display};

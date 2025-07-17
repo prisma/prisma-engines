@@ -1,4 +1,4 @@
-use psl::{parser_database::SourceFile, PreviewFeatures};
+use psl::{PreviewFeatures, parser_database::SourceFile};
 use schema_core::schema_connector::{ConnectorParams, DiffTarget};
 use sql_migration_tests::test_api::*;
 use sql_schema_connector::SqlSchemaConnector;

@@ -3,7 +3,7 @@ mod tokenize;
 
 use crate::{ColumnType, ColumnTypeFamily, DefaultKind, DefaultValue};
 use prisma_value::PrismaValue;
-use tokenize::{tokenize, Token};
+use tokenize::{Token, tokenize};
 
 #[derive(Debug)]
 struct Parser<'a> {
@@ -738,11 +738,13 @@ mod tests {
 
         assert_is_sequence(r#"nextval(('fifth_sequence'::text)::regclass)"#, "fifth_sequence");
         let non_autoincrement = r#"string_default_named_seq"#;
-        assert!(get_default_value(
-            non_autoincrement,
-            &ColumnType::pure(ColumnTypeFamily::Int, crate::ColumnArity::Required)
-        )
-        .unwrap()
-        .is_db_generated());
+        assert!(
+            get_default_value(
+                non_autoincrement,
+                &ColumnType::pure(ColumnTypeFamily::Int, crate::ColumnArity::Required)
+            )
+            .unwrap()
+            .is_db_generated()
+        );
     }
 }

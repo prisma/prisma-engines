@@ -1,6 +1,6 @@
 use crate::{
-    ast::{self, WithSpan},
     FileId,
+    ast::{self, WithSpan},
 };
 
 /// Any top declaration in the Prisma schema.

@@ -3,7 +3,7 @@ use schema_core::schema_connector::{ConnectorError, ConnectorParams, ConnectorRe
 use std::{
     future::Future,
     pin::Pin,
-    sync::{mpsc, OnceLock},
+    sync::{OnceLock, mpsc},
 };
 use test_setup::{mysql::mysql_safe_identifier, runtime::run_with_thread_local_runtime as tok};
 use url::Url;

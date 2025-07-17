@@ -1,7 +1,7 @@
 use indexmap::IndexMap;
 use query_core::{
-    response_ir::{Item, Map, ResponseData},
     CoreError,
+    response_ir::{Item, Map, ResponseData},
 };
 
 use crate::HandlerError;

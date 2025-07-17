@@ -1,7 +1,7 @@
 use crate::{
     builtin_connectors::has_capability,
     datamodel_connector::{
-        constraint_names::ConstraintNames, Connector, NativeTypeInstance, ReferentialAction, RelationMode,
+        Connector, NativeTypeInstance, ReferentialAction, RelationMode, constraint_names::ConstraintNames,
     },
 };
 use parser_database::{

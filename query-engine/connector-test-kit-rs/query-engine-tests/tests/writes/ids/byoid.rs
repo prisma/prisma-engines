@@ -4,7 +4,7 @@ use query_engine_tests::*;
 //  bring_your_own_id
 mod byoid {
     use indoc::indoc;
-    use query_engine_tests::{assert_error, run_query, Runner};
+    use query_engine_tests::{Runner, assert_error, run_query};
 
     fn schema_1() -> String {
         let schema = indoc! {

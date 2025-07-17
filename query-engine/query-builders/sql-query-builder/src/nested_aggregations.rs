@@ -1,6 +1,6 @@
 use crate::{
-    join_utils::{compute_aggr_join, AggregationType, AliasedJoin},
     Context,
+    join_utils::{AggregationType, AliasedJoin, compute_aggr_join},
 };
 use quaint::prelude::*;
 use query_structure::VirtualSelection;

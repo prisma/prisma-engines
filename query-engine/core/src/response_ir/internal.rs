@@ -1,9 +1,9 @@
 use super::*;
 use crate::{
+    CoreError, QueryResult, RecordAggregations, RecordSelection,
     constants::custom_types,
     protocol::EngineProtocol,
     result_ast::{RecordSelectionWithRelations, RelationRecordSelection},
-    CoreError, QueryResult, RecordAggregations, RecordSelection,
 };
 use connector::AggregationResult;
 use indexmap::IndexMap;
@@ -634,7 +634,7 @@ fn write_nested_items(
 
         // The value must be a reference (or None - handle default), everything else is an error in the serialization logic.
         match val {
-            Some(Item::Ref(ref r)) => {
+            Some(Item::Ref(r)) => {
                 into.insert(field_name.to_owned(), Item::Ref(ItemRef::clone(r)));
             }
 
@@ -759,7 +759,7 @@ fn serialize_scalar(field: &OutputField<'_>, value: PrismaValue) -> crate::Resul
                 let items = unwrap_prisma_value(value)
                     .into_iter()
                     .map(|v| match &et {
-                        EnumType::Database(ref dbt) => convert_enum(v, dbt),
+                        EnumType::Database(dbt) => convert_enum(v, dbt),
                         _ => unreachable!(),
                     })
                     .collect::<Result<Vec<Item>, CoreError>>()?;
@@ -772,7 +772,7 @@ fn serialize_scalar(field: &OutputField<'_>, value: PrismaValue) -> crate::Resul
             ))),
         },
         (_, InnerOutputType::Enum(et)) => match &et {
-            EnumType::Database(ref db) => convert_enum(value, db),
+            EnumType::Database(db) => convert_enum(value, db),
             _ => unreachable!(),
         },
         (_, InnerOutputType::Scalar(st)) => Ok(Item::Value(convert_prisma_value(field, value, st)?)),
@@ -821,7 +821,7 @@ fn convert_prisma_value_graphql_protocol(
                 field.name().clone().into_owned(),
                 format!("{st:?}"),
                 pv.to_string(),
-            ))
+            ));
         }
     };
 
@@ -866,7 +866,7 @@ fn convert_prisma_value_json_protocol(
                 field.name().clone().into_owned(),
                 format!("{st:?}"),
                 pv.to_string(),
-            ))
+            ));
         }
     };
 

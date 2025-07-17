@@ -2,9 +2,8 @@ use crate::database::{catch, connection::SqlConnection};
 use crate::{FromSource, SqlError};
 use async_trait::async_trait;
 use connector_interface::{
-    self as connector,
+    self as connector, Connection, Connector,
     error::{ConnectorError, ErrorKind},
-    Connection, Connector,
 };
 use quaint::{connector::SqliteParams, error::ErrorKind as QuaintKind, pooled::Quaint, prelude::ConnectionInfo};
 use std::{convert::TryFrom, time::Duration};

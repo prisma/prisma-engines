@@ -6,18 +6,18 @@ mod schema_differ;
 
 use super::{SqlDialect, UsingExternalShadowDb};
 use crate::{error::SystemDatabase, flavour::SqlConnector};
-use connector::{shadow_db, Connection};
+use connector::{Connection, shadow_db};
 use destructive_change_checker::MysqlDestructiveChangeCheckerFlavour;
 use enumflags2::BitFlags;
 use indoc::indoc;
-use psl::{datamodel_connector, parser_database::ScalarType, ValidatedSchema};
+use psl::{ValidatedSchema, datamodel_connector, parser_database::ScalarType};
 use quaint::connector::MysqlUrl;
 use regex::{Regex, RegexSet};
 use renderer::MysqlRenderer;
 use schema_calculator::MysqlSchemaCalculatorFlavour;
 use schema_connector::{
-    migrations_directory::MigrationDirectory, BoxFuture, ConnectorError, ConnectorParams, ConnectorResult, Namespaces,
-    SchemaFilter,
+    BoxFuture, ConnectorError, ConnectorParams, ConnectorResult, Namespaces, SchemaFilter,
+    migrations_directory::MigrationDirectory,
 };
 use schema_differ::MysqlSchemaDifferFlavour;
 use sql_schema_describer::SqlSchema;

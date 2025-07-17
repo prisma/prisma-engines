@@ -1,4 +1,4 @@
-use crate::{filter::FilterBuilder, model_extensions::*, Context};
+use crate::{Context, filter::FilterBuilder, model_extensions::*};
 use quaint::prelude::*;
 use query_structure::*;
 

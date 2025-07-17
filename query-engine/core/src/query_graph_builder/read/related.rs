@@ -1,5 +1,5 @@
 use super::*;
-use crate::{query_document::ParsedField, ReadQuery, RelatedRecordsQuery};
+use crate::{ReadQuery, RelatedRecordsQuery, query_document::ParsedField};
 use query_structure::{Model, RelationFieldRef};
 use schema::QuerySchema;
 

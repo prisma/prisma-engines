@@ -1,8 +1,8 @@
 use crate::{
     migration_pair::MigrationPair,
-    sql_schema_differ::{column::ColumnTypeChange, differ_database::DifferDatabase, SqlSchemaDifferFlavour},
+    sql_schema_differ::{SqlSchemaDifferFlavour, column::ColumnTypeChange, differ_database::DifferDatabase},
 };
-use sql_schema_describer::{walkers::TableColumnWalker, ColumnTypeFamily};
+use sql_schema_describer::{ColumnTypeFamily, walkers::TableColumnWalker};
 
 #[derive(Debug, Default)]
 pub struct SqliteSchemaDifferFlavour;

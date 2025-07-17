@@ -6,13 +6,13 @@ mod conversion;
 mod error;
 
 use crate::connector::IsolationLevel;
-use crate::connector::{sqlite::params::SqliteParams, ColumnType, DescribedQuery};
+use crate::connector::{ColumnType, DescribedQuery, sqlite::params::SqliteParams};
 
 pub use rusqlite::{params_from_iter, version as sqlite_version};
 
 use crate::{
     ast::{Query, Value},
-    connector::{metrics, queryable::*, ResultSet},
+    connector::{ResultSet, metrics, queryable::*},
     error::{Error, ErrorKind},
     visitor::{self, Visitor},
 };

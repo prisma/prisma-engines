@@ -10,4 +10,4 @@ mod wasm;
 #[cfg(not(feature = "postgresql-native"))]
 pub use wasm::*;
 
-use super::{setup_connection, Circumstances, MigratePostgresUrl, PostgresProvider};
+use super::{Circumstances, MigratePostgresUrl, PostgresProvider, setup_connection};

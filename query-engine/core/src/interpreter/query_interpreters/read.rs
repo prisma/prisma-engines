@@ -1,6 +1,6 @@
 use super::{inmemory_record_processor::InMemoryRecordProcessor, *};
 use crate::{interpreter::InterpretationResult, query_ast::*, result_ast::*};
-use connector::{error::ConnectorError, ConnectionLike};
+use connector::{ConnectionLike, error::ConnectorError};
 use futures::future::{BoxFuture, FutureExt};
 use psl::can_support_relation_load_strategy;
 use query_structure::{ManyRecords, RelationLoadStrategy, RelationSelection};

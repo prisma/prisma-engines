@@ -1,15 +1,15 @@
 use crate::{
+    PrismaResult,
     context::PrismaContext,
     features::{EnabledFeatures, Feature},
     logger::Logger,
     opt::{CliOpt, PrismaOpt, Subcommand},
-    PrismaResult,
 };
 
 use base64::prelude::*;
 use psl::parser_database::Files;
 use query_core::{protocol::EngineProtocol, schema};
-use request_handlers::{dmmf, RequestBody, RequestHandler};
+use request_handlers::{RequestBody, RequestHandler, dmmf};
 use std::{env, sync::Arc};
 use telemetry::{NextId, RequestId};
 
@@ -52,7 +52,7 @@ impl CliCommand {
         };
 
         match subcommand {
-            Subcommand::Cli(ref cliopts) => match cliopts {
+            Subcommand::Cli(cliopts) => match cliopts {
                 CliOpt::Dmmf => Ok(Some(CliCommand::Dmmf(DmmfRequest {
                     schema: opts.schema(true)?,
                     enable_raw_queries: opts.enable_raw_queries,

@@ -10,21 +10,21 @@ use js_sys::Function as JsFunction;
 use psl::ConnectorRegistry;
 use quaint::connector::ExternalConnector;
 use query_core::{
+    TransactionOptions, TxId,
     protocol::EngineProtocol,
     relation_load_strategy,
     schema::{self},
-    TransactionOptions, TxId,
 };
 use query_engine_common::{
-    engine::{map_known_error, ConnectedEngine, ConstructorOptions, EngineBuilder, Inner},
+    engine::{ConnectedEngine, ConstructorOptions, EngineBuilder, Inner, map_known_error},
     tracer::start_trace,
 };
 use request_handlers::ConnectorKind;
-use request_handlers::{load_executor, RequestBody, RequestHandler};
+use request_handlers::{RequestBody, RequestHandler, load_executor};
 use serde_json::json;
 use std::{marker::PhantomData, sync::Arc};
 use tokio::sync::RwLock;
-use tracing::{instrument::WithSubscriber, Instrument, Level};
+use tracing::{Instrument, Level, instrument::WithSubscriber};
 use tracing_subscriber::filter::LevelFilter;
 use wasm_bindgen::prelude::wasm_bindgen;
 

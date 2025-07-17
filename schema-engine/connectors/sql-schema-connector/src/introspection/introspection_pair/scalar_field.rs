@@ -92,7 +92,7 @@ impl<'a> ScalarFieldPair<'a> {
             sql::ColumnTypeFamily::Json => Cow::from("Json"),
             sql::ColumnTypeFamily::Uuid => Cow::from("String"),
             sql::ColumnTypeFamily::Enum(id) => self.context.enum_prisma_name(*id).prisma_name(),
-            sql::ColumnTypeFamily::Unsupported(ref typ) => Cow::from(typ),
+            sql::ColumnTypeFamily::Unsupported(typ) => Cow::from(typ),
         }
     }
 

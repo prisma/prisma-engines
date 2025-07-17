@@ -2,9 +2,9 @@
 
 pub mod shadow_db;
 
-use crate::flavour::postgres::{Circumstances, PostgresProvider, ADVISORY_LOCK_TIMEOUT};
-use crate::flavour::quaint_error_to_connector_error;
 use crate::BitFlags;
+use crate::flavour::postgres::{ADVISORY_LOCK_TIMEOUT, Circumstances, PostgresProvider};
+use crate::flavour::quaint_error_to_connector_error;
 use psl::PreviewFeature;
 use quaint::connector::{ExternalConnector, Queryable};
 use schema_connector::{ConnectorError, ConnectorResult};

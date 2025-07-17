@@ -1,7 +1,7 @@
 /// The stable identifier for a PSL file.
 #[derive(Debug, PartialEq, Clone, Copy, Hash, Eq, PartialOrd, Ord)]
 pub struct FileId(pub u32); // we can't encapsulate because it would be a circular crate
-                            // dependency between diagnostics and parser-database
+// dependency between diagnostics and parser-database
 
 impl FileId {
     pub const ZERO: FileId = FileId(0);

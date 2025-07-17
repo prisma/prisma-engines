@@ -81,15 +81,15 @@ pub trait FilteredQuery {
         let filter = filter.into();
         let existing_filter = self.get_filter();
         let filter = match existing_filter {
-            Some(Filter::And(ref mut v)) => {
+            Some(Filter::And(v)) => {
                 v.push(filter);
                 None
             }
-            Some(Filter::Or(ref mut v)) => {
+            Some(Filter::Or(v)) => {
                 v.push(filter);
                 None
             }
-            Some(Filter::Not(ref mut v)) => {
+            Some(Filter::Not(v)) => {
                 v.push(filter);
                 None
             }

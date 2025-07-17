@@ -1,5 +1,5 @@
 use super::*;
-use crate::{query_document::ParsedField, AggregateRecordsQuery};
+use crate::{AggregateRecordsQuery, query_document::ParsedField};
 use query_structure::Model;
 
 pub(crate) fn aggregate(field: ParsedField<'_>, model: Model) -> QueryGraphBuilderResult<ReadQuery> {

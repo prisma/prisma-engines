@@ -2,7 +2,7 @@ use query_engine_tests::*;
 
 #[test_suite(capabilities(Json), exclude(MySQL(5.6)))]
 mod json {
-    use query_engine_tests::{assert_error, jNull, run_query, ConnectorCapability};
+    use query_engine_tests::{ConnectorCapability, assert_error, jNull, run_query};
     use query_tests_setup::Runner;
 
     #[connector_test(schema(json_opt))]

@@ -28,7 +28,7 @@ pub(crate) struct RecordQueryFilterInput;
 
 impl NodeInputField<Filter> for RecordQueryFilterInput {
     fn node_input_field<'a>(&self, node: &'a mut crate::Node) -> &'a mut Filter {
-        if let Node::Query(Query::Read(ReadQuery::RecordQuery(ref mut rq))) = node {
+        if let Node::Query(Query::Read(ReadQuery::RecordQuery(rq))) = node {
             rq.filter.get_or_insert(Filter::empty())
         } else {
             panic!("RecordQueryFilterInput can only be used with RecordQuery node")
@@ -41,7 +41,7 @@ pub(crate) struct UpdateRecordSelectorsInput;
 
 impl NodeInputField<Vec<SelectionResult>> for UpdateRecordSelectorsInput {
     fn node_input_field<'a>(&self, node: &'a mut crate::Node) -> &'a mut Vec<SelectionResult> {
-        if let Node::Query(Query::Write(WriteQuery::UpdateRecord(ref mut ur))) = node {
+        if let Node::Query(Query::Write(WriteQuery::UpdateRecord(ur))) = node {
             ur.record_filter_mut().selectors.get_or_insert_default()
         } else {
             panic!("UpdateRecordFilterInput can only be used with UpdateRecord node")
@@ -54,7 +54,7 @@ pub(crate) struct UpdateManyRecordsSelectorsInput;
 
 impl NodeInputField<Vec<SelectionResult>> for UpdateManyRecordsSelectorsInput {
     fn node_input_field<'a>(&self, node: &'a mut crate::Node) -> &'a mut Vec<SelectionResult> {
-        if let Node::Query(Query::Write(WriteQuery::UpdateManyRecords(ref mut ur))) = node {
+        if let Node::Query(Query::Write(WriteQuery::UpdateManyRecords(ur))) = node {
             ur.record_filter.selectors.get_or_insert_default()
         } else {
             panic!("UpdateManyRecordsFilterInput can only be used with UpdateManyRecords node")

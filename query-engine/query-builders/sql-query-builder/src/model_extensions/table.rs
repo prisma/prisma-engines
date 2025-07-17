@@ -1,4 +1,4 @@
-use crate::{model_extensions::AsColumns, Context};
+use crate::{Context, model_extensions::AsColumns};
 use quaint::ast::{Column, Table};
 use query_structure::Model;
 

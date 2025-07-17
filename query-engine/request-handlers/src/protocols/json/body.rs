@@ -1,7 +1,7 @@
 use indexmap::IndexMap;
 use query_core::{
-    schema::{QuerySchemaRef, QueryTag},
     BatchDocument, BatchDocumentTransaction, Operation, QueryDocument,
+    schema::{QuerySchemaRef, QueryTag},
 };
 use serde::{Deserialize, Serialize};
 use tracing::info_span;

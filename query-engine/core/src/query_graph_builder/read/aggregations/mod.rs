@@ -103,11 +103,7 @@ fn collect_selection_tree(fields: &[FieldPair<'_>]) -> Vec<(String, Option<Vec<S
                         .map(|f| f.parsed_field.name.clone())
                         .collect();
 
-                    if nested.is_empty() {
-                        None
-                    } else {
-                        Some(nested)
-                    }
+                    if nested.is_empty() { None } else { Some(nested) }
                 }),
             )
         })

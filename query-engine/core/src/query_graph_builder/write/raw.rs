@@ -1,5 +1,5 @@
 use super::*;
-use crate::{query_ast::*, query_graph::QueryGraph, ParsedField};
+use crate::{ParsedField, query_ast::*, query_graph::QueryGraph};
 use query_structure::{Model, PrismaValue};
 use std::{collections::HashMap, convert::TryInto};
 

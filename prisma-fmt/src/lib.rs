@@ -17,8 +17,8 @@ pub mod offsets;
 
 use log::*;
 use psl::{
-    datamodel_connector::Connector, diagnostics::FileId, parser_database::ParserDatabase, Configuration, Datasource,
-    Generator,
+    Configuration, Datasource, Generator, datamodel_connector::Connector, diagnostics::FileId,
+    parser_database::ParserDatabase,
 };
 use schema_file_input::SchemaFileInput;
 use serde_json::json;

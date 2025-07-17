@@ -9,7 +9,7 @@ use std::{
 };
 use tracing_error::SpanTrace;
 use user_facing_errors::{
-    common::SchemaParserError, schema_engine::MigrationFileNotFound, KnownError, UserFacingError,
+    KnownError, UserFacingError, common::SchemaParserError, schema_engine::MigrationFileNotFound,
 };
 use wasm_bindgen::JsValue;
 

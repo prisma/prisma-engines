@@ -7,8 +7,8 @@ use renderer::{
     value::Function,
 };
 use schema_connector::{
-    warnings::{ModelAndField, ModelAndFieldAndType, TypeAndField, TypeAndFieldAndType},
     CompositeTypeDepth, IntrospectionContext, Warnings,
+    warnings::{ModelAndField, ModelAndFieldAndType, TypeAndField, TypeAndFieldAndType},
 };
 
 use super::field_type::FieldType;
@@ -365,7 +365,7 @@ impl<'a> Statistics<'a> {
             }
 
             match container {
-                Name::Model(ref model_name) => {
+                Name::Model(model_name) => {
                     let unique = self.indices.get(model_name).and_then(|indices| {
                         indices.iter().find(|idx| {
                             idx.is_unique() && idx.fields().len() == 1 && idx.fields().any(|f| f.name() == field_name)
@@ -401,7 +401,7 @@ impl<'a> Statistics<'a> {
                         model.push_field(field);
                     }
                 }
-                Name::CompositeType(ref type_name) => {
+                Name::CompositeType(type_name) => {
                     let r#type = types
                         .entry(type_name.as_str())
                         .or_insert_with(|| renderer::datamodel::CompositeType::new(type_name));

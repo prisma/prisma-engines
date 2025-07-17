@@ -2,7 +2,7 @@ use std::{borrow::Cow, fmt};
 
 use crate::value::{Constant, Documentation, Function};
 
-use super::{attributes::BlockAttribute, model::Commented, Field, IdDefinition, IndexDefinition};
+use super::{Field, IdDefinition, IndexDefinition, attributes::BlockAttribute, model::Commented};
 
 /// Defines a model block.
 #[derive(Debug)]

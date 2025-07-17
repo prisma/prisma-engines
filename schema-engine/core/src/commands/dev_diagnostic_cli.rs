@@ -1,11 +1,11 @@
 use super::{
-    diagnose_migration_history_cli, DiagnoseMigrationHistoryOutput, DriftDiagnostic, HistoryDiagnostic,
-    MigrationSchemaCache,
+    DiagnoseMigrationHistoryOutput, DriftDiagnostic, HistoryDiagnostic, MigrationSchemaCache,
+    diagnose_migration_history_cli,
 };
 use crate::json_rpc::types::{
     DevAction, DevActionReset, DevDiagnosticInput, DevDiagnosticOutput, DiagnoseMigrationHistoryInput,
 };
-use schema_connector::{migrations_directory, ConnectorResult, Namespaces, SchemaConnector};
+use schema_connector::{ConnectorResult, Namespaces, SchemaConnector, migrations_directory};
 
 /// Method called at the beginning of `migrate dev` to decide the course of
 /// action based on the current state of the workspace.

@@ -4,10 +4,9 @@ use psl::{PreviewFeatures, SourceFile, ValidatedSchema};
 use quaint::connector::ExternalConnectorFactory;
 
 use crate::{
-    migrations_directory::MigrationDirectory, BoxFuture, ConnectorHost, ConnectorResult, DatabaseSchema,
-    DestructiveChangeChecker, DestructiveChangeDiagnostics, DiffTarget, IntrospectSqlQueryInput,
-    IntrospectSqlQueryOutput, IntrospectionContext, IntrospectionResult, Migration, MigrationPersistence, Namespaces,
-    SchemaFilter,
+    BoxFuture, ConnectorHost, ConnectorResult, DatabaseSchema, DestructiveChangeChecker, DestructiveChangeDiagnostics,
+    DiffTarget, IntrospectSqlQueryInput, IntrospectSqlQueryOutput, IntrospectionContext, IntrospectionResult,
+    Migration, MigrationPersistence, Namespaces, SchemaFilter, migrations_directory::MigrationDirectory,
 };
 
 /// The dialect for schema operations on a particular database.

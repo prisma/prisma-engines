@@ -1,10 +1,10 @@
-use crate::{attr_map::NestedAttrMap, ConnectorTestArgs};
-use darling::{ast::NestedMeta, FromMeta, ToTokens};
+use crate::{ConnectorTestArgs, attr_map::NestedAttrMap};
+use darling::{FromMeta, ToTokens, ast::NestedMeta};
 use proc_macro::TokenStream;
 use quote::quote;
 use std::collections::hash_map::Entry;
 use syn::{
-    parse_macro_input, parse_quote, spanned::Spanned, token::Paren, Item, ItemMod, MacroDelimiter, Meta, MetaList,
+    Item, ItemMod, MacroDelimiter, Meta, MetaList, parse_macro_input, parse_quote, spanned::Spanned, token::Paren,
 };
 
 /// What does this do?
@@ -72,7 +72,7 @@ pub fn test_suite_impl(attr: TokenStream, input: TokenStream) -> TokenStream {
         add_module_imports(items);
 
         for item in items {
-            if let syn::Item::Fn(ref mut f) = item {
+            if let syn::Item::Fn(f) = item {
                 // Check if the function is marked as `connector_test` or `relation_link_test`.
                 if let Some(ref mut attr) = f.attrs.iter_mut().find(|attr| match attr.path().get_ident() {
                     Some(ident) => &ident.to_string() == "connector_test" || &ident.to_string() == "relation_link_test",

@@ -1,11 +1,11 @@
 use crate::context::PrismaContext;
 use crate::features::Feature;
 use crate::logger::TracingConfig;
-use crate::{opt::PrismaOpt, PrismaResult};
+use crate::{PrismaResult, opt::PrismaOpt};
 use hyper::service::{make_service_fn, service_fn};
-use hyper::{header::CONTENT_TYPE, Body, HeaderMap, Method, Request, Response, Server, StatusCode};
+use hyper::{Body, HeaderMap, Method, Request, Response, Server, StatusCode, header::CONTENT_TYPE};
 use query_core::{ExtendedUserFacingError, TransactionOptions, TxId};
-use request_handlers::{dmmf, render_graphql_schema, RequestBody, RequestHandler};
+use request_handlers::{RequestBody, RequestHandler, dmmf, render_graphql_schema};
 use serde::Serialize;
 use serde_json::json;
 use std::collections::HashMap;
@@ -276,7 +276,7 @@ async fn transaction_start_handler(cx: Arc<PrismaContext>, req: Request<Body>) -
             return Ok(Response::builder()
                 .status(StatusCode::BAD_REQUEST)
                 .body(Body::from("Invalid transaction options"))
-                .unwrap())
+                .unwrap());
         }
     };
 

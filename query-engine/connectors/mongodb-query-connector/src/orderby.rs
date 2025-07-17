@@ -1,5 +1,5 @@
 use crate::join::JoinStage;
-use bson::{doc, Document};
+use bson::{Document, doc};
 use itertools::Itertools;
 use query_structure::{OrderBy, OrderByHop, OrderByToManyAggregation, SortOrder};
 use std::{fmt::Display, iter};

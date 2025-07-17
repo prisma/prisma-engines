@@ -1,10 +1,10 @@
 use crate::{
+    DatamodelError, ScalarFieldId, StringId,
     ast::{self, WithName},
     coerce,
     context::Context,
     generators::{CUID_SUPPORTED_VERSIONS, UUID_SUPPORTED_VERSIONS},
     types::{DefaultAttribute, ScalarFieldType, ScalarType},
-    DatamodelError, ScalarFieldId, StringId,
 };
 
 /// @default on model scalar fields

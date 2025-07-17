@@ -1,6 +1,6 @@
 use super::{
-    type_renderer::{render_input_types, render_output_type},
     DmmfInputField, DmmfOutputField, RenderContext,
+    type_renderer::{render_input_types, render_output_type},
 };
 use schema::{InputField, InputType, OutputField, ScalarType};
 

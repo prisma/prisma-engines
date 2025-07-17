@@ -3,7 +3,7 @@ use query_engine_tests::*;
 #[test_suite(exclude(CockroachDb))]
 mod delete_mutation_relations {
     use indoc::indoc;
-    use query_engine_tests::{run_query, Runner};
+    use query_engine_tests::{Runner, run_query};
     use query_test_macros::relation_link_test;
 
     // "a P1 to C1  relation " should "succeed when trying to delete the parent"

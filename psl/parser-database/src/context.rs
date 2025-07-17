@@ -2,8 +2,8 @@ mod attributes;
 
 use self::attributes::AttributesValidationState;
 use crate::{
-    ast, interner::StringInterner, names::Names, relations::Relations, types::Types, DatamodelError, Diagnostics,
-    InFile, StringId,
+    DatamodelError, Diagnostics, InFile, StringId, ast, interner::StringInterner, names::Names, relations::Relations,
+    types::Types,
 };
 use schema_ast::ast::{EnumValueId, Expression, WithName};
 use std::collections::{HashMap, HashSet};
@@ -123,8 +123,7 @@ impl<'db> Context<'db> {
         if self.attributes.attributes.is_some() || !self.attributes.unused_attributes.is_empty() {
             panic!(
                 "`ctx.visit_attributes() called with {:?} while the Context is still validating previous attribute set on {:?}`",
-                ast_attributes,
-                self.attributes.attributes
+                ast_attributes, self.attributes.attributes
             );
         }
 
@@ -341,7 +340,10 @@ impl<'db> Context<'db> {
     /// process. Returns whether the attribute is valid enough to be usable.
     fn set_attribute(&mut self, attribute_id: crate::AttributeId, attribute: &'db ast::Attribute) -> bool {
         if self.attributes.attribute.is_some() || !self.attributes.args.is_empty() {
-            panic!("State error: we cannot start validating new arguments before `validate_visited_arguments()` or `discard_arguments()` has been called.\n{:#?}", self.attributes);
+            panic!(
+                "State error: we cannot start validating new arguments before `validate_visited_arguments()` or `discard_arguments()` has been called.\n{:#?}",
+                self.attributes
+            );
         }
 
         let mut is_reasonably_valid = true;

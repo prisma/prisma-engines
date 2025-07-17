@@ -2,16 +2,16 @@ use crate::{TestError, TestResult};
 use indexmap::IndexMap;
 use itertools::Itertools;
 use query_core::{
+    ArgumentValue, ArgumentValueObject, Selection,
     constants::custom_types,
     schema::{
-        constants::{self, json_null},
         InputField, InputObjectType, InputType, OutputField, QuerySchema,
+        constants::{self, json_null},
     },
-    ArgumentValue, ArgumentValueObject, Selection,
 };
 use query_structure::PrismaValue;
 use request_handlers::{Action, FieldQuery, GraphQLProtocolAdapter, JsonSingleQuery, SelectionSet, SelectionSetValue};
-use serde_json::{json, Value as JsonValue};
+use serde_json::{Value as JsonValue, json};
 use user_facing_errors::query_engine::validation::ValidationError;
 
 pub struct JsonRequest;

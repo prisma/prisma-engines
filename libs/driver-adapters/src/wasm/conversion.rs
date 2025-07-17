@@ -1,4 +1,4 @@
-use super::to_js::{serde_serialize, ToJsValue};
+use super::to_js::{ToJsValue, serde_serialize};
 use crate::conversion::{JSArg, JSArgType, MaybeDefined};
 use crate::types::Query;
 use js_sys::{Array, JsString, Object, Reflect, Uint8Array};

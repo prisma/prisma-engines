@@ -1,4 +1,4 @@
-use crate::{checksum, BoxFuture, ConnectorError, ConnectorResult, Namespaces, SchemaFilter};
+use crate::{BoxFuture, ConnectorError, ConnectorResult, Namespaces, SchemaFilter, checksum};
 
 /// A timestamp.
 pub type Timestamp = chrono::DateTime<chrono::Utc>;

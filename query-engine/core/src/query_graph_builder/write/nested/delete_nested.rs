@@ -1,8 +1,8 @@
 use super::*;
 use crate::{
+    DataExpectation, ParsedInputMap, ParsedInputValue,
     query_ast::*,
     query_graph::{Node, NodeRef, QueryGraph, QueryGraphDependency},
-    DataExpectation, ParsedInputMap, ParsedInputValue,
 };
 use query_structure::{Filter, Model, PrismaValue, RecordFilter, RelationFieldRef};
 use std::convert::TryInto;

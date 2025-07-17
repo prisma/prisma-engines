@@ -1,11 +1,11 @@
 use super::*;
 use crate::inputs::{IfInput, UpdateManyRecordsSelectorsInput, UpdateOrCreateArgsInput, UpdateRecordSelectorsInput};
 use crate::query_graph_builder::write::utils::coerce_vec;
-use crate::{
-    query_graph::{Flow, NodeRef, QueryGraph, QueryGraphDependency},
-    ParsedInputMap, ParsedInputValue,
-};
 use crate::{DataExpectation, RowSink};
+use crate::{
+    ParsedInputMap, ParsedInputValue,
+    query_graph::{Flow, NodeRef, QueryGraph, QueryGraphDependency},
+};
 use query_structure::{Filter, RelationFieldRef};
 use schema::constants::args;
 use std::convert::TryInto;

@@ -1,6 +1,6 @@
 use super::*;
 use fmt::Debug;
-use query_structure::{prelude::ParentContainer, DefaultKind};
+use query_structure::{DefaultKind, prelude::ParentContainer};
 use std::{borrow::Cow, boxed::Box, fmt, sync::LazyLock};
 
 type InputObjectFields<'a> =
@@ -167,11 +167,7 @@ impl<'a> InputField<'a> {
 
     /// Sets the field as optional if the condition is true.
     pub(crate) fn optional_if(self, condition: bool) -> Self {
-        if condition {
-            self.optional()
-        } else {
-            self
-        }
+        if condition { self.optional() } else { self }
     }
 
     /// Sets the field as nullable (accepting null inputs).
@@ -188,11 +184,7 @@ impl<'a> InputField<'a> {
 
     /// Sets the field as nullable if the condition is true.
     pub(crate) fn nullable_if(self, condition: bool) -> Self {
-        if condition {
-            self.nullable()
-        } else {
-            self
-        }
+        if condition { self.nullable() } else { self }
     }
 }
 
@@ -296,19 +288,11 @@ impl<'a> InputType<'a> {
     }
 
     pub fn as_object(&self) -> Option<&InputObjectType<'a>> {
-        if let Self::Object(v) = self {
-            Some(v)
-        } else {
-            None
-        }
+        if let Self::Object(v) = self { Some(v) } else { None }
     }
 
     pub fn as_list(&self) -> Option<&InputType<'a>> {
-        if let Self::List(list) = self {
-            Some(list)
-        } else {
-            None
-        }
+        if let Self::List(list) = self { Some(list) } else { None }
     }
 
     pub fn into_object(self) -> Option<InputObjectType<'a>> {

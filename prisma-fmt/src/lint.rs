@@ -1,7 +1,7 @@
 use crate::offsets::span_to_lsp_offsets;
 use psl::{
-    diagnostics::{DatamodelError, DatamodelWarning},
     ValidatedSchema,
+    diagnostics::{DatamodelError, DatamodelWarning},
 };
 
 use crate::schema_file_input::SchemaFileInput;

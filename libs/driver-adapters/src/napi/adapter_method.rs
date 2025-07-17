@@ -74,8 +74,8 @@ where
     ReturnType: FromNapiValue + 'static,
 {
     unsafe fn from_napi_value(napi_env: napi::sys::napi_env, napi_val: napi::sys::napi_value) -> napi::Result<Self> {
-        let env = Env::from_raw(napi_env);
-        let threadsafe_fn = ThreadsafeFunction::from_napi_value(napi_env, napi_val)?;
+        let env = unsafe { Env::from_raw(napi_env) };
+        let threadsafe_fn = unsafe { ThreadsafeFunction::from_napi_value(napi_env, napi_val) }?;
         Self::from_threadsafe_function(threadsafe_fn, env)
     }
 }

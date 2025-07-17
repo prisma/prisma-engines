@@ -5,13 +5,12 @@ pub(super) use sql_schema_calculator_flavour::SqlSchemaCalculatorFlavour;
 
 use crate::SqlDatabaseSchema;
 use psl::{
+    ValidatedSchema,
     datamodel_connector::walker_ext_traits::*,
     parser_database::{
-        self as db, ast,
+        self as db, ReferentialAction, ScalarFieldType, ScalarType, SortOrder, ast,
         walkers::{ModelWalker, ScalarFieldWalker},
-        ReferentialAction, ScalarFieldType, ScalarType, SortOrder,
     },
-    ValidatedSchema,
 };
 use sql_schema_describer::{self as sql, PrismaValue, SqlSchema};
 use std::collections::HashMap;

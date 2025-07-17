@@ -38,13 +38,19 @@ model Opp {
             runner,
             r#"{groupByApp(by: [categories], orderBy: { categories: "desc" }) { _count { slug } categories }}"#
         );
-        assert_eq!(result, "{\"data\":{\"groupByApp\":[{\"_count\":{\"slug\":1},\"categories\":[\"messaging\",\"payment\"]},{\"_count\":{\"slug\":2},\"categories\":[\"calendar\",\"other\"]},{\"_count\":{\"slug\":1},\"categories\":[]}]}}");
+        assert_eq!(
+            result,
+            "{\"data\":{\"groupByApp\":[{\"_count\":{\"slug\":1},\"categories\":[\"messaging\",\"payment\"]},{\"_count\":{\"slug\":2},\"categories\":[\"calendar\",\"other\"]},{\"_count\":{\"slug\":1},\"categories\":[]}]}}"
+        );
 
         let result = run_query!(
             runner,
             r#"{groupByApp(by: [categories], orderBy: { categories: "asc" }) { _count { slug categories } }}"#
         );
-        assert_eq!(result, "{\"data\":{\"groupByApp\":[{\"_count\":{\"slug\":1,\"categories\":1}},{\"_count\":{\"slug\":2,\"categories\":2}},{\"_count\":{\"slug\":1,\"categories\":1}}]}}");
+        assert_eq!(
+            result,
+            "{\"data\":{\"groupByApp\":[{\"_count\":{\"slug\":1,\"categories\":1}},{\"_count\":{\"slug\":2,\"categories\":2}},{\"_count\":{\"slug\":1,\"categories\":1}}]}}"
+        );
 
         Ok(())
     }
@@ -61,7 +67,10 @@ model Opp {
             runner,
             r#"{groupByOpp(by: [categories], orderBy: { categories: "desc" }) { _count { slug } categories }}"#
         );
-        assert_eq!(result, "{\"data\":{\"groupByOpp\":[{\"_count\":{\"slug\":2},\"categories\":[true,false]},{\"_count\":{\"slug\":1},\"categories\":[false,true]},{\"_count\":{\"slug\":1},\"categories\":[]}]}}");
+        assert_eq!(
+            result,
+            "{\"data\":{\"groupByOpp\":[{\"_count\":{\"slug\":2},\"categories\":[true,false]},{\"_count\":{\"slug\":1},\"categories\":[false,true]},{\"_count\":{\"slug\":1},\"categories\":[]}]}}"
+        );
 
         Ok(())
     }

@@ -2,7 +2,7 @@ use indoc::{formatdoc, indoc};
 use pretty_assertions::assert_eq;
 use sql_migration_tests::test_api::*;
 use std::io::Write;
-use user_facing_errors::{schema_engine::ApplyMigrationError, UserFacingError};
+use user_facing_errors::{UserFacingError, schema_engine::ApplyMigrationError};
 
 #[test_connector]
 fn apply_migrations_with_an_empty_migrations_folder_works(api: TestApi) {
@@ -349,8 +349,10 @@ fn migrations_should_fail_when_the_script_is_invalid(api: TestApi) {
                     HINT: try \h SELECT
                 "#},
                 t if t.contains(Tags::Vitess) => "syntax error at position 10",
-                t if t.contains(Tags::Mariadb) => "You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near \'^.^)_n\' at line 1",
-                t if t.contains(Tags::Mysql) => "You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near \'^.^)_n\' at line 1",
+                t if t.contains(Tags::Mariadb) =>
+                    "You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near \'^.^)_n\' at line 1",
+                t if t.contains(Tags::Mysql) =>
+                    "You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near \'^.^)_n\' at line 1",
                 t if t.contains(Tags::Mssql) => "Incorrect syntax near \'^\'.",
                 t if t.contains(Tags::Postgres) => "ERROR: syntax error at or near \"^\"",
                 t if t.contains(Tags::Sqlite) => "unrecognized token: \"^\" in \n\nSELECT (^.^)_n;\n at offset 10",

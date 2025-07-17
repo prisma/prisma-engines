@@ -1,15 +1,15 @@
 use crate::{
     flavour::postgres::Circumstances,
     sql_schema_calculator::{
-        sql_schema_calculator_flavour::JoinTableUniquenessConstraint, Context, SqlSchemaCalculatorFlavour,
+        Context, SqlSchemaCalculatorFlavour, sql_schema_calculator_flavour::JoinTableUniquenessConstraint,
     },
 };
 use either::Either;
 use enumflags2::BitFlags;
 use psl::{
-    builtin_connectors::{cockroach_datamodel_connector::SequenceFunction, PostgresDatasourceProperties},
+    builtin_connectors::{PostgresDatasourceProperties, cockroach_datamodel_connector::SequenceFunction},
     datamodel_connector::walker_ext_traits::IndexWalkerExt,
-    parser_database::{walkers::EnumWalker, IndexAlgorithm, OperatorClass},
+    parser_database::{IndexAlgorithm, OperatorClass, walkers::EnumWalker},
 };
 use sql::postgres::DatabaseExtension;
 use sql_schema_describer::{self as sql, postgres::PostgresSchemaExt};

@@ -64,7 +64,7 @@ impl DefaultKind {
     // intended for primary key values!
     pub fn to_dbgenerated_func(&self) -> Option<String> {
         match self {
-            DefaultKind::Expression(ref expr) if expr.is_dbgenerated() => expr.args.first().map(|val| val.to_string()),
+            DefaultKind::Expression(expr) if expr.is_dbgenerated() => expr.args.first().map(|val| val.to_string()),
             _ => None,
         }
     }
@@ -72,7 +72,7 @@ impl DefaultKind {
     /// Returns either a copy of the contained single value or a non-evaluated generator call.
     pub fn get(&self) -> Option<PrismaValue> {
         match self {
-            DefaultKind::Single(ref v) => Some(v.clone()),
+            DefaultKind::Single(v) => Some(v.clone()),
             DefaultKind::Expression(g) if g.is_dbgenerated() || g.is_autoincrement() => None,
             DefaultKind::Expression(g) => Some(PrismaValue::GeneratorCall {
                 name: g.name.clone().into(),
@@ -87,7 +87,7 @@ impl DefaultKind {
     #[cfg(feature = "default_generators")]
     pub fn get_evaluated(&self) -> Option<PrismaValue> {
         match self {
-            DefaultKind::Single(ref v) => Some(v.clone()),
+            DefaultKind::Single(v) => Some(v.clone()),
             DefaultKind::Expression(g) => g.generate(),
         }
     }
@@ -373,7 +373,7 @@ impl PartialEq for ValueGenerator {
 impl fmt::Debug for DefaultKind {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match &self {
-            DefaultKind::Single(ref v) => write!(f, "DefaultValue::Single({v:?})"),
+            DefaultKind::Single(v) => write!(f, "DefaultValue::Single({v:?})"),
             DefaultKind::Expression(g) => write!(f, "DefaultValue::Expression({}(){:?})", g.name(), g.args),
         }
     }

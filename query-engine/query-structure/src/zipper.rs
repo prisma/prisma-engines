@@ -1,4 +1,4 @@
-use crate::{psl::parser_database::walkers::Walker, InternalDataModelRef};
+use crate::{InternalDataModelRef, psl::parser_database::walkers::Walker};
 use std::hash::{Hash, Hasher};
 
 // Invariant: InternalDataModel must not contain any Zipper, this would be a reference counting

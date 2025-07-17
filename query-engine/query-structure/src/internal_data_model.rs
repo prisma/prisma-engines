@@ -1,4 +1,4 @@
-use crate::{prelude::*, CompositeType, InternalEnum};
+use crate::{CompositeType, InternalEnum, prelude::*};
 use psl::parser_database as db;
 use std::sync::Arc;
 

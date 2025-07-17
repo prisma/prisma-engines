@@ -1,6 +1,6 @@
 use bigdecimal::BigDecimal;
 use chrono::Utc;
-use quaint::{prelude::Insert, Value};
+use quaint::{Value, prelude::Insert};
 use sql_migration_tests::test_api::*;
 use std::{collections::HashMap, fmt::Write as _, str::FromStr, sync::LazyLock};
 

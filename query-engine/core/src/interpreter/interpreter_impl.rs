@@ -1,7 +1,7 @@
 use super::{
+    InterpretationResult, InterpreterError,
     expression::*,
     query_interpreters::{read, write},
-    InterpretationResult, InterpreterError,
 };
 use crate::{Query, QueryResult};
 use connector::ConnectionLike;
@@ -44,7 +44,7 @@ impl ExpressionResult {
     /// A vector is returned as some expression results return more than one result row at once.
     pub fn as_selection_results(&self, field_selection: &FieldSelection) -> InterpretationResult<Vec<SelectionResult>> {
         let converted = match self {
-            Self::Query(ref result) => match result {
+            Self::Query(result) => match result {
                 QueryResult::Id(id) => match id {
                     Some(id) if field_selection.matches(id) => {
                         Some(id.clone().split_into(slice::from_ref(field_selection)))
@@ -53,8 +53,7 @@ impl ExpressionResult {
                     Some(id) => {
                         trace!(
                             "Selection result {:?} does not match field selection {:?}",
-                            id,
-                            field_selection
+                            id, field_selection
                         );
                         None
                     }
@@ -100,7 +99,7 @@ impl ExpressionResult {
 
     pub fn as_query_result(&self) -> InterpretationResult<&QueryResult> {
         let converted = match self {
-            Self::Query(ref q) => Some(q),
+            Self::Query(q) => Some(q),
             _ => None,
         };
 

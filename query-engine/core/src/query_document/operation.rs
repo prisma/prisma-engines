@@ -38,11 +38,7 @@ impl Operation {
     }
 
     pub fn as_read(&self) -> Option<&Selection> {
-        if let Self::Read(v) = self {
-            Some(v)
-        } else {
-            None
-        }
+        if let Self::Read(v) = self { Some(v) } else { None }
     }
 
     pub fn arguments(&self) -> &[(String, ArgumentValue)] {

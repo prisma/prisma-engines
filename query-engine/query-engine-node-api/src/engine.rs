@@ -1,19 +1,19 @@
 use crate::{error::ApiError, logger::Logger};
 use futures::FutureExt;
-use napi::{threadsafe_function::ThreadSafeCallContext, Env, JsFunction, JsObject, JsUnknown};
+use napi::{Env, JsFunction, JsObject, JsUnknown, threadsafe_function::ThreadSafeCallContext};
 use napi_derive::napi;
 use prisma_metrics::{MetricFormat, WithMetricsInstrumentation};
 use psl::PreviewFeature;
 use quaint::{connector::ExternalConnector, prelude::ConnectionInfo};
-use query_core::{protocol::EngineProtocol, relation_load_strategy, schema, QueryDocument, TransactionOptions, TxId};
+use query_core::{QueryDocument, TransactionOptions, TxId, protocol::EngineProtocol, relation_load_strategy, schema};
 use query_engine_common::{
     engine::{
-        map_known_error, stringify_env_values, ConnectedEngine, ConnectedEngineNative, ConstructorOptions,
-        ConstructorOptionsNative, EngineBuilder, EngineBuilderNative, Inner,
+        ConnectedEngine, ConnectedEngineNative, ConstructorOptions, ConstructorOptionsNative, EngineBuilder,
+        EngineBuilderNative, Inner, map_known_error, stringify_env_values,
     },
     tracer::start_trace,
 };
-use request_handlers::{load_executor, render_graphql_schema, ConnectorKind, RequestBody, RequestHandler};
+use request_handlers::{ConnectorKind, RequestBody, RequestHandler, load_executor, render_graphql_schema};
 use serde::Deserialize;
 use serde_json::json;
 use std::{collections::HashMap, future::Future, marker::PhantomData, panic::AssertUnwindSafe, sync::Arc};
@@ -381,7 +381,7 @@ impl QueryEngine {
                 ConnectorMode::Rust => {
                     return Err(napi::Error::from_reason(
                         "Query compiler requires JS driver adapter".to_string(),
-                    ))
+                    ));
                 }
             };
 

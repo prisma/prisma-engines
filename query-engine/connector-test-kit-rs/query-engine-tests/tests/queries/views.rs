@@ -5,7 +5,7 @@ use query_engine_tests::*;
 // On D1, the migration setup fails because Schema Engine doesn't know anything about Driver Adapters.
 #[test_suite(schema(schema), exclude(MongoDb, MySQL("mariadb"), Vitess, Sqlite("cfd1")))]
 mod views {
-    use query_engine_tests::{connector_test, run_query, Runner};
+    use query_engine_tests::{Runner, connector_test, run_query};
 
     fn schema() -> String {
         let schema = indoc! {

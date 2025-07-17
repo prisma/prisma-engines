@@ -38,10 +38,10 @@ mod delete {
         create_row(&runner, r#"{ id: 1, string: "test" }"#).await?;
 
         assert_error!(
-          runner,
-          r#"mutation { deleteOneScalarModel(where: {id: 2 }){ id }}"#,
-          2025,
-          "An operation failed because it depends on one or more records that were required but not found. No record was found for a delete."
+            runner,
+            r#"mutation { deleteOneScalarModel(where: {id: 2 }){ id }}"#,
+            2025,
+            "An operation failed because it depends on one or more records that were required but not found. No record was found for a delete."
         );
 
         insta::assert_snapshot!(
@@ -77,10 +77,10 @@ mod delete {
         create_row(&runner, r#"{id: 1, unicorn: "a"}"#).await?;
 
         assert_error!(
-          runner,
-          r#"mutation { deleteOneScalarModel(where: {unicorn: "c"}) { unicorn }}"#,
-          2025,
-          "An operation failed because it depends on one or more records that were required but not found. No record was found for a delete."
+            runner,
+            r#"mutation { deleteOneScalarModel(where: {unicorn: "c"}) { unicorn }}"#,
+            2025,
+            "An operation failed because it depends on one or more records that were required but not found. No record was found for a delete."
         );
 
         insta::assert_snapshot!(

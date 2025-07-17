@@ -1,8 +1,8 @@
 //! All the quaint-wrangling for the sqlite connector should happen here.
 
+use crate::BitFlags;
 use crate::flavour::quaint_error_to_connector_error;
 use crate::flavour::sqlite::SqlSchemaDescriber;
-use crate::BitFlags;
 use psl::PreviewFeature;
 use quaint::{
     connector::{AdapterName, ConnectionInfo, ExternalConnectionInfo, ExternalConnector},

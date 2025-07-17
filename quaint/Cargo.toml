@@ -9,7 +9,7 @@ authors = [
 ]
 description = "An abstraction layer for SQL databases."
 documentation = "https://docs.rs/quaint/"
-edition = "2021"
+edition.workspace = true
 homepage = "https://github.com/prisma/quaint/"
 keywords = ["mysql", "postgresql", "sqlite", "sql"]
 license = "Apache-2.0"

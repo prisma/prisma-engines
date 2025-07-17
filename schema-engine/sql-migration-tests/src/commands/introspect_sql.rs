@@ -1,7 +1,7 @@
 use quaint::prelude::ColumnType;
 use schema_core::{
-    schema_connector::{IntrospectSqlQueryInput, IntrospectSqlQueryOutput, SchemaConnector},
     CoreError, CoreResult,
+    schema_connector::{IntrospectSqlQueryInput, IntrospectSqlQueryOutput, SchemaConnector},
 };
 
 #[must_use = "This struct does nothing on its own. See ApplyMigrations::send()"]

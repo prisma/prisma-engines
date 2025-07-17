@@ -9,7 +9,7 @@ pub fn derive_simple_user_facing_error(input: proc_macro::TokenStream) -> proc_m
         _ => {
             return syn::Error::new_spanned(input, "derive works only on structs")
                 .to_compile_error()
-                .into()
+                .into();
         }
     };
 
@@ -49,7 +49,7 @@ pub fn derive_user_facing_error(input: proc_macro::TokenStream) -> proc_macro::T
         _ => {
             return syn::Error::new_spanned(input, "derive works only on structs")
                 .to_compile_error()
-                .into()
+                .into();
         }
     };
 
@@ -64,7 +64,7 @@ pub fn derive_user_facing_error(input: proc_macro::TokenStream) -> proc_macro::T
         syn::Fields::Unnamed(unnamed) => {
             return syn::Error::new_spanned(unnamed, "The error fields must be named")
                 .to_compile_error()
-                .into()
+                .into();
         }
     };
 
@@ -120,7 +120,7 @@ impl<'a> UserErrorDeriveInput<'a> {
                         return Err(syn::Error::new_spanned(
                             other,
                             "Expected attribute of the form `#[user_facing(code = \"...\", message = \"...\")]`",
-                        ))
+                        ));
                     }
                 };
 
@@ -135,7 +135,7 @@ impl<'a> UserErrorDeriveInput<'a> {
                         return Err(syn::Error::new_spanned(
                             other,
                             "Expected attribute of the form `#[user_facing(code = \"...\", message = \"...\")]`",
-                        ))
+                        ));
                     }
                 }
             }

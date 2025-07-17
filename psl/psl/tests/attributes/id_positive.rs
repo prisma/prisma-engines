@@ -1,6 +1,6 @@
 use psl::parser_database::ScalarType;
 
-use crate::{common::*, with_header, Provider};
+use crate::{Provider, common::*, with_header};
 
 #[test]
 fn int_id_without_default_should_have_strategy_none() {

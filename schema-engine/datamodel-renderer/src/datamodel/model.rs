@@ -2,7 +2,7 @@ mod relation;
 
 pub use relation::Relation;
 
-use super::{attributes::BlockAttribute, field::Field, IdDefinition, IndexDefinition};
+use super::{IdDefinition, IndexDefinition, attributes::BlockAttribute, field::Field};
 use crate::value::{Constant, Documentation, Function};
 use std::{borrow::Cow, fmt};
 

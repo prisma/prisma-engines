@@ -1,4 +1,4 @@
-use crate::{logging, mssql, mysql, postgres, Capabilities, Tags};
+use crate::{Capabilities, Tags, logging, mssql, mysql, postgres};
 use enumflags2::BitFlags;
 use quaint::single::Quaint;
 use std::sync::LazyLock;

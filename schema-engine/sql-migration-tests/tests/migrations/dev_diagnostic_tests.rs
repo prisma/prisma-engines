@@ -2,7 +2,7 @@ use pretty_assertions::assert_eq;
 use schema_core::{json_rpc::types::*, schema_api};
 use sql_migration_tests::{test_api::*, utils::list_migrations};
 use std::io::Write;
-use user_facing_errors::{schema_engine::MigrationDoesNotApplyCleanly, UserFacingError};
+use user_facing_errors::{UserFacingError, schema_engine::MigrationDoesNotApplyCleanly};
 
 trait DevActionExt {
     fn is_create_migration(&self) -> bool;
@@ -448,10 +448,12 @@ fn with_a_failed_migration(api: TestApi) {
 
     let DevDiagnosticOutput { action } = api.dev_diagnostic(&migrations_directory).send().into_output();
 
-    assert!(action
-        .as_reset()
-        .unwrap()
-        .contains(&format!("The migration `{generated_migration_name}` failed.")));
+    assert!(
+        action
+            .as_reset()
+            .unwrap()
+            .contains(&format!("The migration `{generated_migration_name}` failed."))
+    );
 }
 
 #[test_connector]

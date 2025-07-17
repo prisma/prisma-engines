@@ -4,7 +4,7 @@ pub(crate) use ::indoc::{formatdoc, indoc};
 pub(crate) use asserts::*;
 pub(crate) use expect_test::expect;
 
-use psl::{parse_configuration_multi_file, Configuration, SourceFile};
+use psl::{Configuration, SourceFile, parse_configuration_multi_file};
 
 pub(crate) fn reformat(input: &str) -> String {
     psl::reformat(input, 2).unwrap_or_else(|| input.to_owned())

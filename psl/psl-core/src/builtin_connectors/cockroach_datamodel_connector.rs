@@ -4,19 +4,18 @@ mod validations;
 pub use native_types::CockroachType;
 
 use crate::{
+    PreviewFeature,
     datamodel_connector::{
         Connector, ConnectorCapabilities, ConnectorCapability, ConstraintScope, Flavour, NativeTypeConstructor,
         NativeTypeInstance, RelationMode, StringFilter,
     },
     diagnostics::{DatamodelError, Diagnostics},
     parser_database::{
-        self,
+        self, IndexAlgorithm, ParserDatabase, ReferentialAction, ScalarType,
         ast::{self, SchemaPosition},
         coerce,
         walkers::ModelWalker,
-        IndexAlgorithm, ParserDatabase, ReferentialAction, ScalarType,
     },
-    PreviewFeature,
 };
 use chrono::*;
 use enumflags2::BitFlags;

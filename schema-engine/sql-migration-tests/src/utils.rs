@@ -67,7 +67,7 @@ pub fn list_migrations(migrations_directory_path: &Path) -> Result<MigrationList
                 base_dir,
                 lockfile,
                 migration_directories: entries,
-            })
+            });
         }
         Err(err) => return Err(err.into()),
     };

@@ -6,14 +6,14 @@ use std::sync::Arc;
 use std::{collections::BTreeMap, fmt::Display};
 use telemetry::Exporter;
 use tracing::{
+    Dispatch, Level, Subscriber,
     field::{Field, Visit},
     level_filters::LevelFilter,
-    Dispatch, Level, Subscriber,
 };
 use tracing_subscriber::{
-    filter::{filter_fn, FilterExt},
-    layer::SubscriberExt,
     Layer, Registry,
+    filter::{FilterExt, filter_fn},
+    layer::SubscriberExt,
 };
 
 pub(crate) type LogCallback = Box<dyn Fn(String) + Send + Sync + 'static>;

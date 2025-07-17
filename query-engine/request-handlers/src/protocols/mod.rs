@@ -2,7 +2,7 @@
 pub mod graphql;
 pub mod json;
 
-use query_core::{protocol::EngineProtocol, schema::QuerySchemaRef, QueryDocument};
+use query_core::{QueryDocument, protocol::EngineProtocol, schema::QuerySchemaRef};
 
 #[derive(Debug)]
 pub enum RequestBody {

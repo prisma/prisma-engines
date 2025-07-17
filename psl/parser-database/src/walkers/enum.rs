@@ -1,7 +1,7 @@
 use crate::{
     ast::{self, IndentationType, NewlineType, WithDocumentation, WithName},
     types,
-    walkers::{newline, Walker},
+    walkers::{Walker, newline},
 };
 
 /// An `enum` declaration in the schema.

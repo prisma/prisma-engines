@@ -188,19 +188,19 @@ impl fmt::Display for Warnings {
         render_warnings_grouped(
             "These fields were commented out because their names are currently not supported by Prisma. Please provide valid ones that match [a-zA-Z][a-zA-Z0-9_]* using the `@map` attribute:",
             &self.fields_with_empty_names_in_model,
-            f
+            f,
         )?;
 
         render_warnings_grouped(
             "These fields were commented out because their names are currently not supported by Prisma. Please provide valid ones that match [a-zA-Z][a-zA-Z0-9_]* using the `@map` attribute:",
             &self.fields_with_empty_names_in_view,
-            f
+            f,
         )?;
 
         render_warnings_grouped(
             "These fields were commented out because their names are currently not supported by Prisma. Please provide valid ones that match [a-zA-Z][a-zA-Z0-9_]* using the `@map` attribute:",
             &self.fields_with_empty_names_in_type,
-            f
+            f,
         )?;
 
         render_warnings(
@@ -218,25 +218,25 @@ impl fmt::Display for Warnings {
         render_warnings(
             "These enum values were commented out because their names are currently not supported by Prisma. Please provide valid ones that match [a-zA-Z][a-zA-Z0-9_]* using the `@map` attribute:",
             &self.enum_values_with_empty_names,
-            f
+            f,
         )?;
 
         render_warnings(
             "The following models were commented out as we could not retrieve columns for them. Please check your privileges:",
             &self.models_without_columns,
-            f
+            f,
         )?;
 
         render_warnings(
             "The following models were ignored as they do not have a valid unique identifier or id. This is currently not supported by Prisma Client:",
             &self.models_without_identifiers,
-            f
+            f,
         )?;
 
         render_warnings(
             "The following views were ignored as they do not have a valid unique identifier or id. This is currently not supported by Prisma Client. Please refer to the documentation on defining unique identifiers in views: https://pris.ly/d/view-identifiers",
             &self.views_without_identifiers,
-            f
+            f,
         )?;
 
         render_warnings(
@@ -398,19 +398,19 @@ impl fmt::Display for Warnings {
         render_warnings(
             "The following models have a JSON Schema defined in the database, which is not yet fully supported. Read more: https://pris.ly/d/mongodb-json-schema",
             &self.json_schema_defined,
-            f
+            f,
         )?;
 
         render_warnings(
             "The following models are capped collections, which are not yet fully supported. Read more: https://pris.ly/d/mongodb-capped-collections",
             &self.capped_collection,
-            f
+            f,
         )?;
 
         render_warnings(
             "These indexes are not supported by Prisma Client, because Prisma currently does not fully support expression indexes. Read more: https://pris.ly/d/expression-indexes",
             &self.expression_indexes,
-            f
+            f,
         )?;
 
         if !self.broken_m2m_relations.is_empty() {

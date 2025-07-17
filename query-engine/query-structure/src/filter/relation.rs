@@ -1,4 +1,4 @@
-use crate::{filter::Filter, RelationCompare, RelationField};
+use crate::{RelationCompare, RelationField, filter::Filter};
 
 #[derive(Clone, PartialEq, Eq, Hash)]
 pub struct RelationFilter {

@@ -2,7 +2,7 @@ use query_engine_tests::*;
 
 #[test_suite(schema(common_nullable_types))]
 mod bytes {
-    use query_engine_tests::{run_query, EngineProtocol, Runner};
+    use query_engine_tests::{EngineProtocol, Runner, run_query};
 
     #[test_suite]
     mod issue_687 {

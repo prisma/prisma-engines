@@ -12,7 +12,7 @@ pub(crate) mod postgres;
 pub(crate) mod sqlite;
 
 pub use js_arg::JSArg;
-pub use js_arg_type::{value_to_js_arg_type, JSArgType};
+pub use js_arg_type::{JSArgType, value_to_js_arg_type};
 
 /// A wrapper around `Option` that indicates that `None` should be treated as
 /// `undefined` in JavaScript.

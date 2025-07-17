@@ -1,5 +1,5 @@
 use super::*;
-use query_structure::{walkers, DefaultKind};
+use query_structure::{DefaultKind, walkers};
 use std::{borrow::Cow, sync::LazyLock};
 
 /// Input object type initializer for cases where only the name is known, and fields are computed later.

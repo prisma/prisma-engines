@@ -1,5 +1,5 @@
 use super::{utils::get_relation_load_strategy, *};
-use crate::{query_document::ParsedField, ManyRecordsQuery, QueryOption, QueryOptions, ReadQuery};
+use crate::{ManyRecordsQuery, QueryOption, QueryOptions, ReadQuery, query_document::ParsedField};
 use query_structure::Model;
 use schema::QuerySchema;
 

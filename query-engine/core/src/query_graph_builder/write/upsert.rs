@@ -1,9 +1,9 @@
 use super::{write_args_parser::WriteArgsParser, *};
 use crate::{
+    DataExpectation, ParsedField, ParsedInputMap, ParsedInputValue, ParsedObject, RowSink,
     inputs::{IfInput, RecordQueryFilterInput, UpdateRecordSelectorsInput},
     query_ast::*,
     query_graph::{Flow, QueryGraph, QueryGraphDependency},
-    DataExpectation, ParsedField, ParsedInputMap, ParsedInputValue, ParsedObject, RowSink,
 };
 use query_structure::Model;
 use schema::QuerySchema;

@@ -4,9 +4,9 @@ use derive_more::Display;
 use metrics::{Counter, CounterFn, Gauge, GaugeFn, Histogram, HistogramFn, Key, Recorder, Unit};
 use metrics::{KeyName, Metadata, SharedString};
 
+use crate::MetricRegistry;
 use crate::common::{MetricAction, MetricType};
 use crate::registry::MetricVisitor;
-use crate::MetricRegistry;
 
 /// Default global metric recorder.
 ///

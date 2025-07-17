@@ -218,11 +218,7 @@ impl<'a> RelationFieldPair<'a> {
             },
         };
 
-        if name.is_empty() {
-            None
-        } else {
-            Some(name)
-        }
+        if name.is_empty() { None } else { Some(name) }
     }
 
     /// The referencing fields in the current model.

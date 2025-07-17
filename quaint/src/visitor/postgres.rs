@@ -1324,7 +1324,10 @@ mod tests {
         let q = Select::from_table(joined_table).and_from("Toto");
         let (sql, _) = Postgres::build(q).unwrap();
 
-        assert_eq!("SELECT \"User\".*, \"Toto\".* FROM \"User\" LEFT JOIN \"Post\" AS \"p\" ON \"p\".\"userId\" = \"User\".\"id\", \"Toto\"", sql);
+        assert_eq!(
+            "SELECT \"User\".*, \"Toto\".* FROM \"User\" LEFT JOIN \"Post\" AS \"p\" ON \"p\".\"userId\" = \"User\".\"id\", \"Toto\"",
+            sql
+        );
     }
 
     #[test]

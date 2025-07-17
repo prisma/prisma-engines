@@ -6,8 +6,8 @@ mod scalar;
 
 use super::utils;
 use crate::{
-    query_document::{ParsedInputMap, ParsedInputValue},
     QueryGraphBuilderError, QueryGraphBuilderResult,
+    query_document::{ParsedInputMap, ParsedInputValue},
 };
 use filter_fold::*;
 use filter_grouping::*;
@@ -218,7 +218,7 @@ fn fold_search_filters(filters: &[Filter]) -> Vec<Filter> {
     // Gather search filters that have the same condition
     for filter in filters.iter() {
         match filter {
-            Filter::Scalar(ref sf) => match sf.condition {
+            Filter::Scalar(sf) => match sf.condition {
                 ScalarCondition::Search(ref pv, _) => {
                     let pv = pv.as_value().unwrap();
                     // If there's already an entry, then store the "additional" projections that will need to be merged

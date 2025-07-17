@@ -3,7 +3,7 @@ use query_engine_tests::*;
 #[test_suite(schema(schema), capabilities(ScalarLists))]
 mod basic_types {
     use indoc::indoc;
-    use query_engine_tests::{assert_error, run_query, TROUBLE_CHARS};
+    use query_engine_tests::{TROUBLE_CHARS, assert_error, run_query};
 
     fn schema() -> String {
         let schema = indoc! {

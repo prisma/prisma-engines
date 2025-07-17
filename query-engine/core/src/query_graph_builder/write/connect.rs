@@ -1,7 +1,7 @@
 use crate::{
+    DataExpectation, IncompleteConnectInput, QueryGraphBuilderError, QueryGraphBuilderResult,
     query_ast::*,
     query_graph::{Node, NodeRef, QueryGraph, QueryGraphDependency},
-    DataExpectation, IncompleteConnectInput, QueryGraphBuilderError, QueryGraphBuilderResult,
 };
 use query_structure::RelationFieldRef;
 

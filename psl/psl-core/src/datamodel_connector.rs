@@ -24,14 +24,15 @@ pub use self::{
     relation_mode::RelationMode,
 };
 
-use crate::{configuration::DatasourceConnectorData, Configuration, Datasource, PreviewFeature};
+use crate::{Configuration, Datasource, PreviewFeature, configuration::DatasourceConnectorData};
 use chrono::{DateTime, FixedOffset};
 use diagnostics::{DatamodelError, Diagnostics, NativeTypeErrorFactory, Span};
 use enumflags2::BitFlags;
 use lsp_types::CompletionList;
 use parser_database::{
+    IndexAlgorithm, ParserDatabase, ReferentialAction, ScalarType,
     ast::{self, SchemaPosition},
-    walkers, IndexAlgorithm, ParserDatabase, ReferentialAction, ScalarType,
+    walkers,
 };
 use std::{borrow::Cow, collections::HashMap};
 

@@ -17,35 +17,19 @@ impl ConditionValue {
     }
 
     pub fn into_value(self) -> Option<PrismaValue> {
-        if let Self::Value(pv) = self {
-            Some(pv)
-        } else {
-            None
-        }
+        if let Self::Value(pv) = self { Some(pv) } else { None }
     }
 
     pub fn into_reference(self) -> Option<ScalarFieldRef> {
-        if let Self::FieldRef(sf) = self {
-            Some(sf)
-        } else {
-            None
-        }
+        if let Self::FieldRef(sf) = self { Some(sf) } else { None }
     }
 
     pub fn as_value(&self) -> Option<&PrismaValue> {
-        if let Self::Value(v) = self {
-            Some(v)
-        } else {
-            None
-        }
+        if let Self::Value(v) = self { Some(v) } else { None }
     }
 
     pub fn as_field_ref(&self) -> Option<&ScalarFieldRef> {
-        if let Self::FieldRef(v) = self {
-            Some(v)
-        } else {
-            None
-        }
+        if let Self::FieldRef(v) = self { Some(v) } else { None }
     }
 }
 
@@ -97,11 +81,7 @@ impl ConditionListValue {
     }
 
     pub fn as_field_ref(&self) -> Option<&ScalarFieldRef> {
-        if let Self::FieldRef(v) = self {
-            Some(v)
-        } else {
-            None
-        }
+        if let Self::FieldRef(v) = self { Some(v) } else { None }
     }
 }
 

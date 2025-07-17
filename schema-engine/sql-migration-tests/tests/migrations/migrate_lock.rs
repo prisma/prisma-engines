@@ -2,7 +2,7 @@ use indoc::indoc;
 use sql_migration_tests::multi_engine_test_api::*;
 use std::{fs::File, io::Write};
 use test_macros::test_connector;
-use user_facing_errors::{schema_engine::ProviderSwitchedError, UserFacingError};
+use user_facing_errors::{UserFacingError, schema_engine::ProviderSwitchedError};
 
 #[test_connector(tags(Postgres), exclude(CockroachDb))]
 fn create_migration_with_new_provider_errors(api: TestApi) {

@@ -1,10 +1,10 @@
 use super::*;
 use crate::ensure_db_names::UNIQUE_TEST_DATABASE_NAMES;
-use darling::{ast::NestedMeta, FromMeta};
+use darling::{FromMeta, ast::NestedMeta};
 use proc_macro::TokenStream;
 use proc_macro2::{Ident, Span};
 use quote::quote;
-use syn::{parse_macro_input, ItemFn};
+use syn::{ItemFn, parse_macro_input};
 
 pub fn relation_link_test_impl(attr: TokenStream, input: TokenStream) -> TokenStream {
     let attributes_meta = match NestedMeta::parse_meta_list(attr.into()) {

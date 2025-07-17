@@ -1,10 +1,10 @@
 use super::database_name::validate_db_name;
 use crate::{
-    datamodel_connector::{walker_ext_traits::*, ConnectorCapability},
+    PreviewFeature,
+    datamodel_connector::{ConnectorCapability, walker_ext_traits::*},
     diagnostics::DatamodelError,
     parser_database::ast::{WithName, WithSpan},
     validate::validation_pipeline::context::Context,
-    PreviewFeature,
 };
 use parser_database::walkers::{ModelWalker, PrimaryKeyWalker};
 use std::{borrow::Cow, collections::HashMap};
@@ -34,8 +34,9 @@ pub(super) fn has_a_strict_unique_criteria(model: ModelWalker<'_>, ctx: &mut Con
 
     let container_type = if model.ast_model().is_view() { "view" } else { "model" };
 
-    let msg =
-        format!("Each {container_type} must have at least one unique criteria that has only required fields. Either mark a single field with `@id`, `@unique` or add a multi field criterion with `@@id([])` or `@@unique([])` to the {container_type}.");
+    let msg = format!(
+        "Each {container_type} must have at least one unique criteria that has only required fields. Either mark a single field with `@id`, `@unique` or add a multi field criterion with `@@id([])` or `@@unique([])` to the {container_type}."
+    );
 
     let msg = if loose_criterias.peek().is_some() {
         let suffix = format!(

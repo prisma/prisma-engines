@@ -8,15 +8,15 @@ use enumflags2::BitFlags;
 use indoc::indoc;
 use psl::PreviewFeature;
 use quaint::{
-    connector::{self, tokio_postgres::error::ErrorPosition, MakeTlsConnectorManager, PostgresUrl},
+    connector::{self, MakeTlsConnectorManager, PostgresUrl, tokio_postgres::error::ErrorPosition},
     prelude::{NativeConnectionInfo, Queryable},
 };
 use schema_connector::{ConnectorError, ConnectorParams, ConnectorResult};
 use url::Url;
 use user_facing_errors::{
+    UserFacingError,
     common::{DatabaseAccessDenied, DatabaseDoesNotExist},
     schema_engine::{self, ApplyMigrationError},
-    UserFacingError,
 };
 
 use crate::{
@@ -52,11 +52,11 @@ pub struct Connection(connector::PostgreSqlWithNoCache);
 impl Connection {
     pub async fn new(params: &Params) -> ConnectorResult<Connection> {
         let quaint = match &params.url.0 {
-            PostgresUrl::Native(ref native_url) => {
+            PostgresUrl::Native(native_url) => {
                 let tls_manager = MakeTlsConnectorManager::new(native_url.as_ref().clone());
                 connector::PostgreSqlWithNoCache::new(native_url.as_ref().clone(), &tls_manager).await
             }
-            PostgresUrl::WebSocket(ref ws_url) => connector::PostgreSql::new_with_websocket(ws_url.clone()).await,
+            PostgresUrl::WebSocket(ws_url) => connector::PostgreSql::new_with_websocket(ws_url.clone()).await,
         }
         .map_err(quaint_error_mapper(params))?;
 

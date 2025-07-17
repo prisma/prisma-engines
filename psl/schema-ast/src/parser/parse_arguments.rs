@@ -1,7 +1,7 @@
 use super::{
-    helpers::{parsing_catch_all, Pair},
-    parse_expression::parse_expression,
     Rule,
+    helpers::{Pair, parsing_catch_all},
+    parse_expression::parse_expression,
 };
 use crate::ast;
 use diagnostics::{Diagnostics, FileId};

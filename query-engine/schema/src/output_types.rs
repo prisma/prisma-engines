@@ -205,11 +205,7 @@ impl<'a> OutputField<'a> {
     }
 
     pub(crate) fn nullable_if(self, condition: bool) -> Self {
-        if condition {
-            self.nullable()
-        } else {
-            self
-        }
+        if condition { self.nullable() } else { self }
     }
 
     pub fn model(&self) -> Option<db::ModelId> {

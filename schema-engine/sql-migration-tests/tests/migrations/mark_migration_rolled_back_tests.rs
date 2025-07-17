@@ -7,9 +7,11 @@ use user_facing_errors::UserFacingError;
 fn mark_migration_rolled_back_on_an_empty_database_errors(api: TestApi) {
     let err = api.mark_migration_rolled_back("anything").send_unwrap_err();
 
-    assert!(err
-        .to_string()
-        .starts_with("Invariant violation: called markMigrationRolledBack on a database without migrations table.\n"));
+    assert!(
+        err.to_string().starts_with(
+            "Invariant violation: called markMigrationRolledBack on a database without migrations table.\n"
+        )
+    );
 }
 
 #[test_connector]

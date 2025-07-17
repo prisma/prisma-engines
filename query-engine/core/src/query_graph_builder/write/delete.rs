@@ -1,14 +1,14 @@
 use super::*;
 use crate::query_graph_builder::write::limit::validate_limit;
 use crate::{
+    ArgumentListLookup, FilteredQuery, ParsedField,
     query_ast::*,
     query_graph::{Node, QueryGraph, QueryGraphDependency},
-    ArgumentListLookup, FilteredQuery, ParsedField,
 };
 use crate::{DataExpectation, RowSink};
 use psl::datamodel_connector::ConnectorCapability;
 use query_structure::{Filter, Model};
-use schema::{constants::args, QuerySchema};
+use schema::{QuerySchema, constants::args};
 use std::convert::TryInto;
 
 /// Creates a top level delete record query and adds it to the query graph.

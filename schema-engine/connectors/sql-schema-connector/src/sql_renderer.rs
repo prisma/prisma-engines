@@ -19,9 +19,8 @@ use crate::{
     },
 };
 use sql_schema_describer::{
-    self as sql,
+    self as sql, SqlSchema,
     walkers::{EnumWalker, ForeignKeyWalker, IndexWalker, TableWalker, UserDefinedTypeWalker, ViewWalker},
-    SqlSchema,
 };
 
 pub(crate) trait SqlRenderer: Send + Sync {

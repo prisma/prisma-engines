@@ -87,7 +87,7 @@ impl TryFrom<(&str, bool)> for RelationField {
             _ => {
                 return Err(TestError::parse_error(format!(
                     "Unknown relation field `{name}`. Valid names are: ToOneOpt, ToOneReq and ToMany"
-                )))
+                )));
             }
         };
 

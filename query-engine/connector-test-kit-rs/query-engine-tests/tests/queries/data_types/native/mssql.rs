@@ -52,11 +52,13 @@ mod mssql_string {
               }}"#),
             @r###"{"data":{"findManyParent":[{"id":1,"vChar":"0"}]}}"###
         );
-        assert!(runner
-            .get_logs()
-            .await
-            .iter()
-            .any(|log| log.contains("WHERE [mssql_string_native_string].[Parent].[vChar] = CAST(@P1 AS VARCHAR)")));
+        assert!(
+            runner
+                .get_logs()
+                .await
+                .iter()
+                .any(|log| log.contains("WHERE [mssql_string_native_string].[Parent].[vChar] = CAST(@P1 AS VARCHAR)"))
+        );
 
         // VARCHAR(40)
         runner.clear_logs().await;
@@ -69,9 +71,9 @@ mod mssql_string {
         );
 
         // Ensure the VarChar(40) is casted to VARCHAR(40) to avoid implicit coercion
-        assert!(runner.get_logs().await.iter().any(
-            |log| log.contains("WHERE [mssql_string_native_string].[Parent].[vChar40] = CAST(@P1 AS VARCHAR(40))")
-        ));
+        assert!(runner.get_logs().await.iter().any(|log| {
+            log.contains("WHERE [mssql_string_native_string].[Parent].[vChar40] = CAST(@P1 AS VARCHAR(40))")
+        }));
 
         // VARCHAR(MAX)
         runner.clear_logs().await;
@@ -84,12 +86,9 @@ mod mssql_string {
         );
 
         // Ensure the VarChar is casted to VARCHAR(MAX) to avoid implicit coercion
-        assert!(runner
-            .get_logs()
-            .await
-            .iter()
-            .any(|log| log
-                .contains("WHERE [mssql_string_native_string].[Parent].[vCharMax] = CAST(@P1 AS VARCHAR(MAX))")));
+        assert!(runner.get_logs().await.iter().any(|log| {
+            log.contains("WHERE [mssql_string_native_string].[Parent].[vCharMax] = CAST(@P1 AS VARCHAR(MAX))")
+        }));
 
         // Ensure it works as well with gt
         runner.clear_logs().await;
@@ -97,9 +96,9 @@ mod mssql_string {
           run_query!(&runner, r#"{ findManyParent(where: { vChar40: { gt: "0" } }) { id vChar40 } }"#),
           @r###"{"data":{"findManyParent":[{"id":1,"vChar40":"0123456789012345678901234567890123456789"}]}}"###
         );
-        assert!(runner.get_logs().await.iter().any(
-            |log| log.contains("WHERE [mssql_string_native_string].[Parent].[vChar40] > CAST(@P1 AS VARCHAR(40))")
-        ));
+        assert!(runner.get_logs().await.iter().any(|log| {
+            log.contains("WHERE [mssql_string_native_string].[Parent].[vChar40] > CAST(@P1 AS VARCHAR(40))")
+        }));
 
         Ok(())
     }
