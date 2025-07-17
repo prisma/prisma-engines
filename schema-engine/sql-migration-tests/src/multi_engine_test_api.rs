@@ -18,7 +18,7 @@ use quaint::{
     prelude::{ConnectionInfo, NativeConnectionInfo, Queryable, ResultSet},
     single::Quaint,
 };
-use schema_core::schema_connector::{ConnectorParams, ConnectorResult, SchemaConnector};
+use schema_core::schema_connector::{self, ConnectorParams, ConnectorResult, SchemaConnector};
 use sql_schema_connector::SqlSchemaConnector;
 use tempfile::TempDir;
 use test_setup::{DatasourceBlock, TestApiArgs};
@@ -52,7 +52,7 @@ impl TestApi {
                 shadow_database_connection_string: args.shadow_database_url().map(String::from),
             };
             let mut conn = SqlSchemaConnector::new_mysql(params).unwrap();
-            tok(conn.reset(false, None)).unwrap();
+            tok(conn.reset(false, None, &schema_connector::SchemaFilter::default())).unwrap();
 
             (
                 tok(Quaint::new(args.database_url())).unwrap(),

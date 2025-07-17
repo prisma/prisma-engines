@@ -31,6 +31,7 @@ pub async fn create_migration(
     let previous_migrations = list_migrations(input.migrations_list.migration_directories.clone());
     let sources: Vec<_> = input.schema.to_psl_input();
     let dialect = connector.schema_dialect();
+    let filter: schema_connector::SchemaFilter = input.filters.into();
     // We need to start with the 'to', which is the Schema, in order to grab the
     // namespaces, in case we've got MultiSchema enabled.
     let to = dialect.schema_from_datamodel(sources)?;
@@ -39,11 +40,13 @@ pub async fn create_migration(
         .get_or_insert(&input.migrations_list.migration_directories, || async {
             // We pass the namespaces here, because we want to describe all of the namespaces we know about from the "to" schema.
             let namespaces = dialect.extract_namespaces(&to);
-            connector.schema_from_migrations(&previous_migrations, namespaces).await
+            connector
+                .schema_from_migrations(&previous_migrations, namespaces, &filter)
+                .await
         })
         .await?;
 
-    let migration = dialect.diff(from, to, &input.filters.into());
+    let migration = dialect.diff(from, to, &filter);
 
     let extension = dialect.migration_file_extension().to_owned();
 

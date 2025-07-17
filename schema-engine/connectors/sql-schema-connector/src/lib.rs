@@ -138,10 +138,11 @@ impl SchemaDialect for SqlSchemaDialect {
         &'a mut self,
         migrations: &'a [MigrationDirectory],
         namespaces: Option<Namespaces>,
+        filter: &'a SchemaFilter,
         target: ExternalShadowDatabase,
     ) -> BoxFuture<'a, ConnectorResult<()>> {
         Box::pin(async move {
-            self.schema_from_migrations_with_target(migrations, namespaces, target)
+            self.schema_from_migrations_with_target(migrations, namespaces, filter, target)
                 .await?;
             Ok(())
         })
@@ -151,6 +152,7 @@ impl SchemaDialect for SqlSchemaDialect {
         &'a self,
         migrations: &'a [MigrationDirectory],
         namespaces: Option<Namespaces>,
+        filter: &'a SchemaFilter,
         target: ExternalShadowDatabase,
     ) -> BoxFuture<'a, ConnectorResult<DatabaseSchema>> {
         Box::pin(async move {
@@ -183,7 +185,7 @@ impl SchemaDialect for SqlSchemaDialect {
                 }
             };
             let schema = connector
-                .sql_schema_from_migration_history(migrations, namespaces, UsingExternalShadowDb::Yes)
+                .sql_schema_from_migration_history(migrations, namespaces, filter, UsingExternalShadowDb::Yes)
                 .await;
             // dispose of the connector regardless of the result
             connector.dispose().await?;
@@ -423,6 +425,7 @@ impl SchemaConnector for SqlSchemaConnector {
         &'a mut self,
         migrations: &'a [MigrationDirectory],
         namespaces: Option<Namespaces>,
+        filter: &'a SchemaFilter,
     ) -> BoxFuture<'a, ConnectorResult<DatabaseSchema>> {
         Box::pin(async move {
             match self.inner.shadow_db_url() {
@@ -432,12 +435,12 @@ impl SchemaConnector for SqlSchemaConnector {
                         preview_features: self.inner.preview_features(),
                     };
                     self.schema_dialect()
-                        .schema_from_migrations_with_target(migrations, namespaces, target)
+                        .schema_from_migrations_with_target(migrations, namespaces, filter, target)
                         .await
                 }
                 None => self
                     .inner
-                    .sql_schema_from_migration_history(migrations, namespaces, UsingExternalShadowDb::No)
+                    .sql_schema_from_migration_history(migrations, namespaces, filter, UsingExternalShadowDb::No)
                     .await
                     .map(SqlDatabaseSchema::from)
                     .map(DatabaseSchema::new),
@@ -473,10 +476,15 @@ impl SchemaConnector for SqlSchemaConnector {
         })
     }
 
-    fn reset(&mut self, soft: bool, namespaces: Option<Namespaces>) -> BoxFuture<'_, ConnectorResult<()>> {
+    fn reset<'a>(
+        &'a mut self,
+        soft: bool,
+        namespaces: Option<Namespaces>,
+        filter: &'a SchemaFilter,
+    ) -> BoxFuture<'a, ConnectorResult<()>> {
         Box::pin(async move {
             if soft || self.inner.reset(namespaces.clone()).await.is_err() {
-                best_effort_reset(self.inner.as_mut(), namespaces).await?;
+                best_effort_reset(self.inner.as_mut(), namespaces, filter).await?;
             }
 
             Ok(())
@@ -505,9 +513,10 @@ impl SchemaConnector for SqlSchemaConnector {
         &'a mut self,
         migrations: &'a [MigrationDirectory],
         namespaces: Option<Namespaces>,
+        filter: &'a SchemaFilter,
     ) -> BoxFuture<'a, ConnectorResult<()>> {
         Box::pin(async move {
-            self.schema_from_migrations(migrations, namespaces).await?;
+            self.schema_from_migrations(migrations, namespaces, filter).await?;
             Ok(())
         })
     }
@@ -576,8 +585,9 @@ fn new_shadow_database_name() -> String {
 async fn best_effort_reset(
     connector: &mut (dyn SqlConnector + Send + Sync),
     namespaces: Option<Namespaces>,
+    filter: &SchemaFilter,
 ) -> ConnectorResult<()> {
-    best_effort_reset_impl(connector, namespaces)
+    best_effort_reset_impl(connector, namespaces, filter)
         .await
         .map_err(|err| err.into_soft_reset_failed_error())
 }
@@ -585,6 +595,7 @@ async fn best_effort_reset(
 async fn best_effort_reset_impl(
     connector: &mut (dyn SqlConnector + Send + Sync),
     namespaces: Option<Namespaces>,
+    filter: &SchemaFilter,
 ) -> ConnectorResult<()> {
     tracing::info!("Attempting best_effort_reset");
 
@@ -607,8 +618,7 @@ async fn best_effort_reset_impl(
     steps.extend(sql_schema_differ::calculate_steps(
         diffables.as_ref(),
         &*dialect.schema_differ(),
-        // TODO:(schema-filter) get filter from prisma config
-        &SchemaFilter::default(),
+        filter,
     ));
     let (source_schema, target_schema) = diffables.map(|s| s.describer_schema).into_tuple();
 

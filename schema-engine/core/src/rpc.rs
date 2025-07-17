@@ -78,7 +78,7 @@ async fn run_command(
         INTROSPECT_SQL => render(executor.introspect_sql(params.parse()?).await),
         MARK_MIGRATION_APPLIED => render(executor.mark_migration_applied(params.parse()?).await),
         MARK_MIGRATION_ROLLED_BACK => render(executor.mark_migration_rolled_back(params.parse()?).await),
-        RESET => render(executor.reset().await),
+        RESET => render(executor.reset(params.parse()?).await),
         SCHEMA_PUSH => render(executor.schema_push(params.parse()?).await),
         other => unreachable!("Unknown command {}", other),
     }

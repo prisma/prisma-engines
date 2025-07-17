@@ -3,7 +3,7 @@ use commands::{DiagnoseMigrationHistoryOutput, DriftDiagnostic, MigrationSchemaC
 pub use json_rpc::types::{DiagnoseMigrationHistoryInput, HistoryDiagnostic};
 use schema_connector::{
     migrations_directory::{error_on_changed_provider, list_migrations, MigrationDirectory},
-    ConnectorError, MigrationRecord, Namespaces, PersistenceNotInitializedError, SchemaConnector,
+    ConnectorError, MigrationRecord, Namespaces, PersistenceNotInitializedError, SchemaConnector, SchemaFilter,
 };
 
 /// Read the contents of the migrations directory and the migrations table, and
@@ -74,19 +74,20 @@ pub async fn diagnose_migration_history_cli(
         .collect();
 
     let (drift, error_in_unapplied_migration) = {
+        let filter: SchemaFilter = input.filters.into();
         if input.opt_in_to_shadow_database {
             let dialect = connector.schema_dialect();
             let from = migration_schema_cache
                 .get_or_insert(&applied_migrations, || async {
                     connector
-                        .schema_from_migrations(&applied_migrations, namespaces.clone())
+                        .schema_from_migrations(&applied_migrations, namespaces.clone(), &filter)
                         .await
                 })
                 .await;
 
             let to = connector.schema_from_database(namespaces.clone()).await;
             let drift = match from
-                .and_then(|from| to.map(|to| dialect.diff(from, to, &input.filters.into())))
+                .and_then(|from| to.map(|to| dialect.diff(from, to, &filter)))
                 .map(|mig| {
                     if dialect.migration_is_empty(&mig) {
                         None
@@ -104,7 +105,7 @@ pub async fn diagnose_migration_history_cli(
             let error_in_unapplied_migration = if !matches!(drift, Some(DriftDiagnostic::MigrationFailedToApply { .. }))
             {
                 connector
-                    .validate_migrations(&migrations_from_filesystem, namespaces)
+                    .validate_migrations(&migrations_from_filesystem, namespaces, &filter)
                     .await
                     .err()
             } else {

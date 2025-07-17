@@ -494,6 +494,7 @@ impl SqlConnector for MssqlConnector {
         &'a mut self,
         migrations: &'a [MigrationDirectory],
         namespaces: Option<Namespaces>,
+        filter: &'a SchemaFilter,
         external_shadow_db: UsingExternalShadowDb,
     ) -> BoxFuture<'a, ConnectorResult<SqlSchema>> {
         match external_shadow_db {
@@ -502,7 +503,7 @@ impl SqlConnector for MssqlConnector {
                 tracing::info!("Connected to an external shadow database.");
 
                 if self.reset(namespaces.clone()).await.is_err() {
-                    crate::best_effort_reset(self, namespaces.clone()).await?;
+                    crate::best_effort_reset(self, namespaces.clone(), filter).await?;
                 }
 
                 shadow_db::sql_schema_from_migrations_history(migrations, self, namespaces).await

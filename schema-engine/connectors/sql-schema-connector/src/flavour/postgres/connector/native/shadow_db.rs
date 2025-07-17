@@ -3,7 +3,7 @@ use crate::flavour::{PostgresConnector, SqlConnector, UsingExternalShadowDb};
 use psl::PreviewFeatures;
 use quaint::connector::is_url_localhost;
 use schema_connector::{migrations_directory::MigrationDirectory, ConnectorResult};
-use schema_connector::{ConnectorError, ConnectorParams, Namespaces};
+use schema_connector::{ConnectorError, ConnectorParams, Namespaces, SchemaFilter};
 use sql_schema_describer::SqlSchema;
 use url::Url;
 
@@ -14,13 +14,14 @@ pub async fn sql_schema_from_migration_history(
     provider: PostgresProvider,
     migrations: &[MigrationDirectory],
     namespaces: Option<Namespaces>,
+    filter: &SchemaFilter,
     external_shadow_db: UsingExternalShadowDb,
 ) -> ConnectorResult<SqlSchema> {
     let is_vanilla_postgres = !connector.is_cockroachdb();
 
     match external_shadow_db {
         UsingExternalShadowDb::Yes => {
-            sql_schema_from_migration_history_for_external_db(connector, migrations, namespaces).await
+            sql_schema_from_migration_history_for_external_db(connector, migrations, namespaces, filter).await
         }
 
         // If we're not using an external shadow database, one must be created manually.
@@ -43,6 +44,7 @@ pub async fn sql_schema_from_migration_history(
                     params.connector_params.preview_features,
                     migrations,
                     namespaces,
+                    filter,
                 )
                 .await;
             }
@@ -115,12 +117,13 @@ async fn sql_schema_from_migration_history_for_external_db(
     connector: &mut PostgresConnector,
     migrations: &[MigrationDirectory],
     namespaces: Option<Namespaces>,
+    filter: &SchemaFilter,
 ) -> Result<SqlSchema, ConnectorError> {
     connector.ensure_connection_validity().await?;
     tracing::info!("Connected to an external shadow database.");
 
     if connector.reset(namespaces.clone()).await.is_err() {
-        crate::best_effort_reset(connector, namespaces.clone()).await?;
+        crate::best_effort_reset(connector, namespaces.clone(), filter).await?;
     }
 
     let circumstances = connector.circumstances();
@@ -144,6 +147,7 @@ async fn sql_schema_from_migration_history_for_local_ppg(
     preview_features: PreviewFeatures,
     migrations: &[MigrationDirectory],
     namespaces: Option<Namespaces>,
+    filter: &SchemaFilter,
 ) -> Result<SqlSchema, ConnectorError> {
     let ppg_params = PpgParams::parse_from(url)?;
     let shadow_db_url = ppg_params.local_shadow_database_url()?;
@@ -151,7 +155,8 @@ async fn sql_schema_from_migration_history_for_local_ppg(
     let connector_params = ConnectorParams::new(shadow_db_url.to_string(), preview_features, None);
     let mut shadow_database = PostgresConnector::new_with_params(connector_params)?;
 
-    let result = sql_schema_from_migration_history_for_external_db(&mut shadow_database, migrations, namespaces).await;
+    let result =
+        sql_schema_from_migration_history_for_external_db(&mut shadow_database, migrations, namespaces, filter).await;
 
     shadow_database.dispose().await?;
 

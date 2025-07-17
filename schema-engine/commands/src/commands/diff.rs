@@ -11,7 +11,7 @@ use json_rpc::types::MigrationList;
 use psl::SourceFile;
 use quaint::connector::ExternalConnectorFactory;
 use schema_connector::{
-    ConnectorError, DatabaseSchema, ExternalShadowDatabase, Namespaces, SchemaConnector, SchemaDialect,
+    ConnectorError, DatabaseSchema, ExternalShadowDatabase, Namespaces, SchemaConnector, SchemaDialect, SchemaFilter,
 };
 
 pub async fn diff(
@@ -25,20 +25,29 @@ pub async fn diff(
     let (namespaces, preview_features) =
         namespaces_and_preview_features_from_diff_targets(&[&params.from, &params.to])?;
 
+    let filter: SchemaFilter = params.filters.into();
+
     let (conn_from, schema_from) = diff_target_to_dialect(
         &params.from,
         connector,
         adapter_factory.clone(),
         namespaces.clone(),
+        &filter,
         preview_features,
     )
     .await?
     .unzip();
 
-    let (conn_to, schema_to) =
-        diff_target_to_dialect(&params.to, connector, adapter_factory, namespaces, preview_features)
-            .await?
-            .unzip();
+    let (conn_to, schema_to) = diff_target_to_dialect(
+        &params.to,
+        connector,
+        adapter_factory,
+        namespaces,
+        &filter,
+        preview_features,
+    )
+    .await?
+    .unzip();
 
     let dialect = conn_from
         .or(conn_to)
@@ -49,7 +58,7 @@ pub async fn diff(
     let from = schema_from.unwrap_or_else(|| dialect.empty_database_schema());
     let to = schema_to.unwrap_or_else(|| dialect.empty_database_schema());
 
-    let migration = dialect.diff(from, to, &params.filters.into());
+    let migration = dialect.diff(from, to, &filter);
 
     let mut stdout = if params.script {
         dialect.render_script(&migration, &Default::default())?
@@ -106,6 +115,7 @@ async fn diff_target_to_dialect(
     connector: &mut dyn SchemaConnector,
     adapter_factory: Arc<dyn ExternalConnectorFactory>,
     namespaces: Option<Namespaces>,
+    filter: &SchemaFilter,
     preview_features: BitFlags<psl::PreviewFeature>,
 ) -> CoreResult<Option<(Box<dyn SchemaDialect>, DatabaseSchema)>> {
     match target {
@@ -150,6 +160,7 @@ async fn diff_target_to_dialect(
                         .schema_from_migrations_with_target(
                             &directories,
                             namespaces,
+                            filter,
                             ExternalShadowDatabase::DriverAdapter(adapter_factory),
                         )
                         .await?;

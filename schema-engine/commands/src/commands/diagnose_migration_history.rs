@@ -134,6 +134,7 @@ pub async fn diagnose_migration_history(
         .collect();
 
     let (drift, error_in_unapplied_migration) = {
+        let filter: schema_connector::SchemaFilter = input.filters.into();
         if input.opt_in_to_shadow_database {
             let mut dialect = connector.schema_dialect();
             let target = ExternalShadowDatabase::DriverAdapter(adapter_factory);
@@ -141,13 +142,18 @@ pub async fn diagnose_migration_history(
                 .get_or_insert(&applied_migrations, || async {
                     connector
                         .schema_dialect()
-                        .schema_from_migrations_with_target(&applied_migrations, namespaces.clone(), target.clone())
+                        .schema_from_migrations_with_target(
+                            &applied_migrations,
+                            namespaces.clone(),
+                            &filter,
+                            target.clone(),
+                        )
                         .await
                 })
                 .await;
             let to = connector.schema_from_database(namespaces.clone()).await;
             let drift = match from
-                .and_then(|from| to.map(|to| dialect.diff(from, to, &input.filters.into())))
+                .and_then(|from| to.map(|to| dialect.diff(from, to, &filter)))
                 .map(|mig| {
                     if dialect.migration_is_empty(&mig) {
                         None
@@ -165,7 +171,7 @@ pub async fn diagnose_migration_history(
             let error_in_unapplied_migration = if !matches!(drift, Some(DriftDiagnostic::MigrationFailedToApply { .. }))
             {
                 dialect
-                    .validate_migrations_with_target(&migrations_from_filesystem, namespaces, target)
+                    .validate_migrations_with_target(&migrations_from_filesystem, namespaces, &filter, target)
                     .await
                     .err()
             } else {
