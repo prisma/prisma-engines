@@ -1,0 +1,28 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator js {
+  provider = "prisma-client-js"
+  previewFeatures = ["views"]
+}
+
+view Mountain {
+  name String @unique
+  region String
+
+  @@index([name, region])
+}
+// [1;91merror[0m: [1mError validating: Views cannot have indexes.[0m
+//   [1;94m-->[0m  [4mschema.prisma:12[0m
+// [1;94m   | [0m
+// [1;94m11 | [0mview Mountain {
+// [1;94m12 | [0m  name String [1;91m@unique[0m
+// [1;94m   | [0m
+// [1;91merror[0m: [1mError validating: Views cannot have indexes.[0m
+//   [1;94m-->[0m  [4mschema.prisma:15[0m
+// [1;94m   | [0m
+// [1;94m14 | [0m
+// [1;94m15 | [0m  [1;91m@@index([name, region])[0m
+// [1;94m   | [0m

@@ -37,13 +37,10 @@ async fn simple_view_from_one_table(api: &mut TestApi) -> TestResult {
           last_name  String? @db.VarChar(255)
         }
 
-        /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
         view B {
           id         Int
           first_name String  @db.VarChar(255)
           last_name  String? @db.VarChar(255)
-
-          @@ignore
         }
     "#]];
 
@@ -59,14 +56,7 @@ async fn simple_view_from_one_table(api: &mut TestApi) -> TestResult {
 
     api.expect_view_definition("B", &expected).await;
 
-    let expected = expect![[r#"
-        *** WARNING ***
-
-        The following views were ignored as they do not have a valid unique identifier or id. This is currently not supported by Prisma Client. Please refer to the documentation on defining unique identifiers in views: https://pris.ly/d/view-identifiers
-          - "B"
-    "#]];
-
-    api.expect_warnings(&expected).await;
+    api.expect_no_warnings().await;
 
     Ok(())
 }
@@ -90,11 +80,8 @@ async fn simple_view_with_cte(api: &mut TestApi) -> TestResult {
           url      = "env(TEST_DATABASE_URL)"
         }
 
-        /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
         view A {
           bar Int
-
-          @@ignore
         }
     "#]];
 
@@ -171,13 +158,10 @@ async fn simple_view_from_two_tables(api: &mut TestApi) -> TestResult {
           A            A       @relation(fields: [user_id], references: [id], onDelete: Cascade, map: "Profile_User_fkey")
         }
 
-        /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
         view AB {
           id           Int
           name         String  @db.VarChar(511)
           introduction String? @db.VarChar(Max)
-
-          @@ignore
         }
     "#]];
 
@@ -193,177 +177,6 @@ async fn simple_view_from_two_tables(api: &mut TestApi) -> TestResult {
           JOIN B AS b ON a.id = b.user_id;"#]];
 
     api.expect_view_definition("AB", &expected).await;
-
-    Ok(())
-}
-
-#[test_connector(tags(Mssql), preview_features("views"))]
-async fn re_intro_keeps_view_uniques(api: &mut TestApi) -> TestResult {
-    let setup = indoc! {r#"
-        CREATE TABLE A (
-            id INT NOT NULL,
-            first_name VARCHAR(255) NOT NULL,
-            last_name VARCHAR(255) NOT NULL,
-            CONSTRAINT A_pkey PRIMARY KEY (id)
-        );
-    "#};
-
-    api.raw_cmd(setup).await;
-
-    let setup = indoc! {r#"
-        CREATE VIEW B AS
-            SELECT id, first_name, last_name FROM A;
-    "#};
-
-    api.raw_cmd(setup).await;
-
-    let input = indoc! {r#"
-        model A {
-          id         Int     @id @default(autoincrement())
-          first_name String? @db.VarChar(255)
-          last_name  String? @db.VarChar(255)
-        }
-
-        view B {
-          id         Int     @unique
-          first_name String  @db.VarChar(255)
-          last_name  String? @db.VarChar(255)
-        }
-    "#};
-
-    let expected = expect![[r#"
-        model A {
-          id         Int    @id
-          first_name String @db.VarChar(255)
-          last_name  String @db.VarChar(255)
-        }
-
-        view B {
-          id         Int    @unique
-          first_name String @db.VarChar(255)
-          last_name  String @db.VarChar(255)
-        }
-    "#]];
-
-    api.expect_re_introspected_datamodel(input, expected).await;
-
-    Ok(())
-}
-
-#[test_connector(tags(Mssql), preview_features("views"))]
-async fn re_intro_keeps_id(api: &mut TestApi) -> TestResult {
-    let setup = indoc! {r#"
-        CREATE TABLE A (
-            id INT,
-            first_name VARCHAR(255) NOT NULL,
-            last_name VARCHAR(255) NULL,
-            CONSTRAINT A_pkey PRIMARY KEY (id)
-        );
-    "#};
-
-    api.raw_cmd(setup).await;
-
-    let setup = indoc! {r#"
-        CREATE VIEW B AS
-            SELECT id, first_name, last_name FROM A;
-    "#};
-
-    api.raw_cmd(setup).await;
-
-    let input = indoc! {r#"
-        model A {
-          id         Int     @id @default(autoincrement())
-          first_name String  @db.VarChar(255)
-          last_name  String? @db.VarChar(255)
-        }
-
-        view B {
-          id         Int     @id
-          first_name String  @db.VarChar(255)
-          last_name  String? @db.VarChar(255)
-        }
-    "#};
-
-    let expected = expect![[r#"
-        model A {
-          id         Int     @id
-          first_name String  @db.VarChar(255)
-          last_name  String? @db.VarChar(255)
-        }
-
-        view B {
-          id         Int     @id
-          first_name String  @db.VarChar(255)
-          last_name  String? @db.VarChar(255)
-        }
-    "#]];
-
-    api.expect_re_introspected_datamodel(input, expected).await;
-
-    Ok(())
-}
-
-#[test_connector(tags(Mssql), preview_features("views"))]
-async fn re_intro_keeps_compound_unique(api: &mut TestApi) -> TestResult {
-    let setup = indoc! {r#"
-        CREATE TABLE A (
-            side_a INT NOT NULL,
-            side_b INT NOT NULL,
-            first_name VARCHAR(255) NOT NULL,
-            last_name VARCHAR(255) NULL,
-            CONSTRAINT A_pkey PRIMARY KEY (side_a, side_b)
-        );
-    "#};
-
-    api.raw_cmd(setup).await;
-
-    let setup = indoc! {r#"
-        CREATE VIEW B AS SELECT side_a, side_b, first_name, last_name FROM A;
-    "#};
-
-    api.raw_cmd(setup).await;
-
-    let input = indoc! {r#"
-        model A {
-          side_a     Int
-          side_b     Int
-          first_name String  @db.VarChar(255)
-          last_name  String? @db.VarChar(255)
-
-          @@id([side_a, side_b])
-        }
-
-        view B {
-          side_a     Int
-          side_b     Int
-          first_name String  @db.VarChar(255)
-          last_name  String? @db.VarChar(255)
-
-          @@unique([side_a, side_b])
-        }
-    "#};
-
-    let expected = expect![[r#"
-        model A {
-          side_a     Int
-          side_b     Int
-          first_name String  @db.VarChar(255)
-          last_name  String? @db.VarChar(255)
-
-          @@id([side_a, side_b])
-        }
-
-        view B {
-          side_a     Int
-          side_b     Int
-          first_name String  @db.VarChar(255)
-          last_name  String? @db.VarChar(255)
-
-          @@unique([side_a, side_b])
-        }
-    "#]];
-
-    api.expect_re_introspected_datamodel(input, expected).await;
 
     Ok(())
 }
@@ -398,12 +211,9 @@ async fn views_cannot_have_default_values(api: &mut TestApi) -> TestResult {
           val Int? @default(2)
         }
 
-        /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
         view B {
           id  Int
           val Int?
-
-          @@ignore
         }
     "#]];
 
@@ -433,7 +243,7 @@ async fn prisma_defaults_are_kept(api: &mut TestApi) -> TestResult {
         }
 
         view B {
-          id  Int     @id
+          id  Int
           val String? @db.VarChar(255) @default(cuid())
         }
     "#};
@@ -445,7 +255,7 @@ async fn prisma_defaults_are_kept(api: &mut TestApi) -> TestResult {
         }
 
         view B {
-          id  Int     @id
+          id  Int
           val String? @default(cuid()) @db.VarChar(255)
         }
     "#]];

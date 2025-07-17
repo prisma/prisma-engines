@@ -84,6 +84,12 @@ impl Connector for MongoDbDatamodelConnector {
         }
     }
 
+    fn validate_view(&self, model: ModelWalker<'_>, errors: &mut Diagnostics) {
+        for field in model.scalar_fields() {
+            validations::field_name_uses_valid_characters(field, errors);
+        }
+    }
+
     fn validate_relation_field(
         &self,
         field: crate::parser_database::walkers::RelationFieldWalker<'_>,

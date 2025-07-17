@@ -16,7 +16,7 @@ model A {
 }
 
 view Mountain {
-  id Int @unique
+  id Int
 
   @@schema("A")
 }

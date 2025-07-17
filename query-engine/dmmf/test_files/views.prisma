@@ -17,7 +17,7 @@ model Profile {
 }
 
 view UserInfo {
-  id    String @id
+  id    String
   email String
   name  String
   bio   String
