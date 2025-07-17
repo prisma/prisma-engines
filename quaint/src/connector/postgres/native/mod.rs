@@ -36,6 +36,7 @@ use postgres_native_tls::MakeTlsConnector;
 use postgres_types::{Kind as PostgresKind, Type as PostgresType};
 use prisma_metrics::WithMetricsInstrumentation;
 use query::PreparedQuery;
+use std::borrow::Cow;
 use std::{
     fmt::{Debug, Display},
     fs,
@@ -555,9 +556,7 @@ impl<Cache: QueryCache> TransactionCapable for PostgreSql<Cache> {
     ) -> crate::Result<Box<dyn Transaction + 'a>> {
         let opts = TransactionOptions::new(isolation, self.requires_isolation_first());
 
-        Ok(Box::new(
-            DefaultTransaction::new(self, self.begin_statement(), opts).await?,
-        ))
+        Ok(Box::new(DefaultTransaction::new(self, opts).await?))
     }
 }
 
@@ -764,6 +763,26 @@ impl<Cache: QueryCache> Queryable for PostgreSql<Cache> {
 
     fn requires_isolation_first(&self) -> bool {
         false
+    }
+
+    /// Statement to begin a transaction
+    fn begin_statement(&self) -> &'static str {
+        "BEGIN"
+    }
+
+    /// Statement to create a savepoint
+    fn create_savepoint_statement(&self, depth: i32) -> Cow<'static, str> {
+        Cow::Owned(format!("SAVEPOINT savepoint{depth}"))
+    }
+
+    /// Statement to release a savepoint
+    fn release_savepoint_statement(&self, depth: i32) -> Cow<'static, str> {
+        Cow::Owned(format!("RELEASE SAVEPOINT savepoint{depth}"))
+    }
+
+    /// Statement to rollback to a savepoint
+    fn rollback_to_savepoint_statement(&self, depth: i32) -> Cow<'static, str> {
+        Cow::Owned(format!("ROLLBACK TO SAVEPOINT savepoint{depth}"))
     }
 }
 
