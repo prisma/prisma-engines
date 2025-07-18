@@ -197,32 +197,37 @@ impl<'a> ManyRecordsSelectionArgumentsBuilder<'a> {
     }
 
     pub(crate) fn build(self) -> Vec<InputField<'a>> {
-        let unique_input_type =
-            InputType::object(filter_objects::where_unique_object_type(self.ctx, self.model.clone()));
-
-        let order_by_options = OrderByOptions {
-            include_relations: true,
-            include_scalar_aggregations: false,
-            include_full_text_search: self.ctx.can_full_text_search(),
-        };
-
-        let mut args = vec![
+        [
             where_argument(self.ctx, &self.model),
-            order_by_argument(self.ctx, self.model.clone().into(), order_by_options),
-            input_field(args::CURSOR, vec![unique_input_type], None).optional(),
+            order_by_argument(
+                self.ctx,
+                self.model.clone().into(),
+                OrderByOptions {
+                    include_relations: true,
+                    include_scalar_aggregations: false,
+                    include_full_text_search: self.ctx.can_full_text_search(),
+                },
+            ),
+        ]
+        .into_iter()
+        .chain((!self.model.is_view()).then(|| {
+            let unique_input_type =
+                InputType::object(filter_objects::where_unique_object_type(self.ctx, self.model.clone()));
+            input_field(args::CURSOR, vec![unique_input_type], None).optional()
+        }))
+        .chain([
             input_field(args::TAKE, vec![InputType::int()], None).optional(),
             input_field(args::SKIP, vec![InputType::int()], None).optional(),
-        ];
-
-        if self.include_distinct {
+        ])
+        .chain(self.include_distinct.then(|| {
             let input_types = list_union_type(InputType::Enum(model_field_enum(&self.model)), true);
-            args.push(input_field(args::DISTINCT, input_types, None).optional());
-        }
-
-        if self.include_relation_load_strategy {
-            args.extend(relation_load_strategy_argument(self.ctx))
-        }
-
-        args
+            input_field(args::DISTINCT, input_types, None).optional()
+        }))
+        .chain(
+            self.include_relation_load_strategy
+                .then(|| relation_load_strategy_argument(self.ctx))
+                .flatten(),
+        )
+        .collect()
     }
 }
