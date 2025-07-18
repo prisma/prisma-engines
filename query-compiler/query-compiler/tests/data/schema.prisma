@@ -14,11 +14,13 @@ enum Role {
 }
 
 model User {
-  id          Int          @id @default(autoincrement())
-  email       String       @unique
-  role        Role         @default(USER)
-  posts       Post[]
-  activations Activation[]
+  id                   Int                   @id @default(autoincrement())
+  email                String                @unique
+  role                 Role                  @default(USER)
+  posts                Post[]
+  activations          Activation[]
+  notificationSettings NotificationSettings?
+  patients             Patient[]
 }
 
 model Employee {
@@ -82,4 +84,17 @@ model DataTypes {
   id        Bytes   @id
   optString String?
   intArray  Int[]
+}
+
+model Patient {
+  id     Int  @id @default(autoincrement())
+  userId Int  @unique
+  user   User @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model NotificationSettings {
+  userId         Int     @unique
+  emailMarketing Boolean @default(true)
+  smsMarketing   Boolean @default(true)
+  user           User    @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
 }
