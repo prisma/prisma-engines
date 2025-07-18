@@ -1,15 +1,13 @@
 use crate::flavour::postgres::{
     PostgresConnector, PostgresProvider, UsingExternalShadowDb, sql_schema_from_migrations_and_db,
 };
-use schema_connector::{
-    ConnectorError, ConnectorResult, Namespaces, SchemaFilter, migrations_directory::MigrationDirectories,
-};
+use schema_connector::{ConnectorError, ConnectorResult, Namespaces, SchemaFilter, migrations_directory::Migrations};
 use sql_schema_describer::SqlSchema;
 
 pub async fn sql_schema_from_migration_history(
     connector: &mut PostgresConnector,
     _provider: PostgresProvider,
-    migrations: &MigrationDirectories,
+    migrations: &Migrations,
     namespaces: Option<Namespaces>,
     _filter: &SchemaFilter,
     external_shadow_db: UsingExternalShadowDb,

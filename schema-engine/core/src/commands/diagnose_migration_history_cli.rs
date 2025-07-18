@@ -3,7 +3,7 @@ use commands::{DiagnoseMigrationHistoryOutput, DriftDiagnostic, MigrationSchemaC
 pub use json_rpc::types::{DiagnoseMigrationHistoryInput, HistoryDiagnostic};
 use schema_connector::{
     ConnectorError, MigrationRecord, Namespaces, PersistenceNotInitializedError, SchemaConnector, SchemaFilter,
-    migrations_directory::{MigrationDirectories, MigrationDirectory, error_on_changed_provider},
+    migrations_directory::{MigrationDirectory, Migrations, error_on_changed_provider},
 };
 
 /// Read the contents of the migrations directory and the migrations table, and
@@ -18,7 +18,7 @@ pub async fn diagnose_migration_history_cli(
     tracing::debug!("Diagnosing migration history");
 
     error_on_changed_provider(&input.migrations_list.lockfile, connector.connector_type())?;
-    let migrations_from_filesystem = MigrationDirectories::from_migration_list(&input.migrations_list);
+    let migrations_from_filesystem = Migrations::from_migration_list(&input.migrations_list);
 
     let (migrations_from_database, has_migrations_table) =
         match connector.migration_persistence().list_migrations().await? {
@@ -63,7 +63,7 @@ pub async fn diagnose_migration_history_cli(
     }
 
     // Detect drift
-    let applied_migrations = MigrationDirectories {
+    let applied_migrations = Migrations {
         migration_directories: migrations_from_filesystem
             .migration_directories
             .iter()

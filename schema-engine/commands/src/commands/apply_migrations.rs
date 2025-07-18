@@ -2,7 +2,7 @@ use crate::{CoreError, CoreResult, json_rpc::types::*};
 use crosstarget_utils::time::ElapsedTimeCounter;
 use schema_connector::{
     ConnectorError, MigrationRecord, Namespaces, PersistenceNotInitializedError, SchemaConnector,
-    migrations_directory::{MigrationDirectories, MigrationDirectory, error_on_changed_provider},
+    migrations_directory::{MigrationDirectory, Migrations, error_on_changed_provider},
 };
 use tracing::Instrument;
 use user_facing_errors::schema_engine::FoundFailedMigrations;
@@ -15,7 +15,7 @@ pub async fn apply_migrations(
     let start = ElapsedTimeCounter::start();
 
     error_on_changed_provider(&input.migrations_list.lockfile, connector.connector_type())?;
-    let migrations_from_filesystem = MigrationDirectories::from_migration_list(&input.migrations_list);
+    let migrations_from_filesystem = Migrations::from_migration_list(&input.migrations_list);
 
     connector.acquire_lock().await?;
     connector

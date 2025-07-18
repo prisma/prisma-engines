@@ -11,7 +11,7 @@ use psl::SourceFile;
 use quaint::connector::ExternalConnectorFactory;
 use schema_connector::{
     ConnectorError, DatabaseSchema, ExternalShadowDatabase, Namespaces, SchemaConnector, SchemaDialect, SchemaFilter,
-    migrations_directory::MigrationDirectories,
+    migrations_directory::Migrations,
 };
 
 pub async fn diff(
@@ -149,7 +149,7 @@ async fn diff_target_to_dialect(
             match provider.as_deref() {
                 Some(provider) => {
                     let dialect = dialect_for_provider(provider)?;
-                    let migrations = MigrationDirectories::from_migration_list(migration_list);
+                    let migrations = Migrations::from_migration_list(migration_list);
 
                     // TODO: enable Driver Adapter for shadow database, using the AdapterFactory.
                     let schema = dialect

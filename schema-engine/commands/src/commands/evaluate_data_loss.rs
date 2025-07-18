@@ -14,7 +14,7 @@ pub async fn evaluate_data_loss(
     error_on_changed_provider(&input.migrations_list.lockfile, connector.connector_type())?;
     let sources: Vec<_> = input.schema.to_psl_input();
 
-    let migrations = MigrationDirectories::from_migration_list(&input.migrations_list);
+    let migrations = Migrations::from_migration_list(&input.migrations_list);
     let dialect = connector.schema_dialect();
     let filter: schema_connector::SchemaFilter = input.filters.into();
 

@@ -23,7 +23,7 @@ use flavour::{SqlConnector, SqlDialect, UsingExternalShadowDb};
 use migration_pair::MigrationPair;
 use psl::{SourceFile, ValidatedSchema, datamodel_connector::NativeTypeInstance, parser_database::ScalarType};
 use quaint::connector::DescribedQuery;
-use schema_connector::{migrations_directory::MigrationDirectories, *};
+use schema_connector::{migrations_directory::Migrations, *};
 use sql_doc_parser::{parse_sql_doc, sanitize_sql};
 use sql_migration::{DropUserDefinedType, DropView, SqlMigration, SqlMigrationStep};
 use sql_schema_describer as sql;
@@ -136,7 +136,7 @@ impl SchemaDialect for SqlSchemaDialect {
     #[tracing::instrument(skip(self, migrations, target))]
     fn validate_migrations_with_target<'a>(
         &'a mut self,
-        migrations: &'a MigrationDirectories,
+        migrations: &'a Migrations,
         namespaces: Option<Namespaces>,
         filter: &'a SchemaFilter,
         target: ExternalShadowDatabase,
@@ -150,7 +150,7 @@ impl SchemaDialect for SqlSchemaDialect {
 
     fn schema_from_migrations_with_target<'a>(
         &'a self,
-        migrations: &'a MigrationDirectories,
+        migrations: &'a Migrations,
         namespaces: Option<Namespaces>,
         filter: &'a SchemaFilter,
         target: ExternalShadowDatabase,
@@ -423,7 +423,7 @@ impl SchemaConnector for SqlSchemaConnector {
 
     fn schema_from_migrations<'a>(
         &'a mut self,
-        migrations: &'a MigrationDirectories,
+        migrations: &'a Migrations,
         namespaces: Option<Namespaces>,
         filter: &'a SchemaFilter,
     ) -> BoxFuture<'a, ConnectorResult<DatabaseSchema>> {
@@ -511,7 +511,7 @@ impl SchemaConnector for SqlSchemaConnector {
     #[tracing::instrument(skip(self, migrations))]
     fn validate_migrations<'a>(
         &'a mut self,
-        migrations: &'a MigrationDirectories,
+        migrations: &'a Migrations,
         namespaces: Option<Namespaces>,
         filter: &'a SchemaFilter,
     ) -> BoxFuture<'a, ConnectorResult<()>> {

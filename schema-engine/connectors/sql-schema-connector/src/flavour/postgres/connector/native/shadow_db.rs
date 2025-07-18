@@ -3,8 +3,7 @@ use crate::flavour::{PostgresConnector, SqlConnector, UsingExternalShadowDb};
 use psl::PreviewFeatures;
 use quaint::connector::is_url_localhost;
 use schema_connector::{
-    ConnectorError, ConnectorParams, ConnectorResult, Namespaces, SchemaFilter,
-    migrations_directory::MigrationDirectories,
+    ConnectorError, ConnectorParams, ConnectorResult, Namespaces, SchemaFilter, migrations_directory::Migrations,
 };
 use sql_schema_describer::SqlSchema;
 use url::Url;
@@ -14,7 +13,7 @@ use super::{Connection, PostgresProvider};
 pub async fn sql_schema_from_migration_history(
     connector: &mut PostgresConnector,
     provider: PostgresProvider,
-    migrations: &MigrationDirectories,
+    migrations: &Migrations,
     namespaces: Option<Namespaces>,
     filter: &SchemaFilter,
     external_shadow_db: UsingExternalShadowDb,
@@ -117,7 +116,7 @@ pub async fn sql_schema_from_migration_history(
 
 async fn sql_schema_from_migration_history_for_external_db(
     connector: &mut PostgresConnector,
-    migrations: &MigrationDirectories,
+    migrations: &Migrations,
     namespaces: Option<Namespaces>,
     filter: &SchemaFilter,
 ) -> Result<SqlSchema, ConnectorError> {
@@ -147,7 +146,7 @@ async fn sql_schema_from_migration_history_for_external_db(
 async fn sql_schema_from_migration_history_for_local_ppg(
     url: &Url,
     preview_features: PreviewFeatures,
-    migrations: &MigrationDirectories,
+    migrations: &Migrations,
     namespaces: Option<Namespaces>,
     filter: &SchemaFilter,
 ) -> Result<SqlSchema, ConnectorError> {

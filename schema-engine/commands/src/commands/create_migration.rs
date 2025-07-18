@@ -28,7 +28,7 @@ pub async fn create_migration(
     let generated_migration_name = generate_migration_directory_name(&input.migration_name);
 
     // Infer the migration.
-    let migrations = MigrationDirectories::from_migration_list(&input.migrations_list);
+    let migrations = Migrations::from_migration_list(&input.migrations_list);
     let sources: Vec<_> = input.schema.to_psl_input();
     let dialect = connector.schema_dialect();
     let filter: schema_connector::SchemaFilter = input.filters.into();

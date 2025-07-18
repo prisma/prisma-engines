@@ -17,7 +17,7 @@ use enumflags2::BitFlags;
 use migration::MongoDbMigration;
 use mongodb_schema_describer::MongoSchema;
 use psl::PreviewFeature;
-use schema_connector::{migrations_directory::MigrationDirectories, *};
+use schema_connector::{migrations_directory::Migrations, *};
 use std::{future, sync::Arc};
 use tokio::sync::OnceCell;
 
@@ -97,7 +97,7 @@ impl SchemaDialect for MongoDbSchemaDialect {
 
     fn validate_migrations_with_target<'a>(
         &'a mut self,
-        _migrations: &'a MigrationDirectories,
+        _migrations: &'a Migrations,
         _namespaces: Option<Namespaces>,
         _filter: &SchemaFilter,
         _target: ExternalShadowDatabase,
@@ -107,7 +107,7 @@ impl SchemaDialect for MongoDbSchemaDialect {
 
     fn schema_from_migrations_with_target<'a>(
         &'a self,
-        _migrations: &'a MigrationDirectories,
+        _migrations: &'a Migrations,
         _namespaces: Option<Namespaces>,
         _filter: &SchemaFilter,
         _target: ExternalShadowDatabase,
@@ -208,7 +208,7 @@ impl SchemaConnector for MongoDbSchemaConnector {
 
     fn validate_migrations<'a>(
         &'a mut self,
-        _migrations: &'a MigrationDirectories,
+        _migrations: &'a Migrations,
         _namespaces: Option<Namespaces>,
         _filter: &SchemaFilter,
     ) -> BoxFuture<'a, ConnectorResult<()>> {
@@ -231,7 +231,7 @@ impl SchemaConnector for MongoDbSchemaConnector {
 
     fn schema_from_migrations<'a>(
         &'a mut self,
-        _migrations: &'a MigrationDirectories,
+        _migrations: &'a Migrations,
         _namespaces: Option<Namespaces>,
         _filter: &SchemaFilter,
     ) -> BoxFuture<'a, ConnectorResult<DatabaseSchema>> {

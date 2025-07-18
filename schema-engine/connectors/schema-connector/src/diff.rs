@@ -1,4 +1,4 @@
-use crate::migrations_directory::MigrationDirectories;
+use crate::migrations_directory::Migrations;
 use psl::parser_database::SourceFile;
 use std::fmt::Debug;
 
@@ -8,7 +8,7 @@ pub enum DiffTarget<'a> {
     Datamodel(Vec<(String, SourceFile)>),
     /// A migrations folder and an optional init script. What is diffable is the state of the database schema at the end of the
     /// migrations history.
-    Migrations(&'a MigrationDirectories),
+    Migrations(&'a Migrations),
     /// A live database connection string.
     Database,
     /// Assume an empty database schema.

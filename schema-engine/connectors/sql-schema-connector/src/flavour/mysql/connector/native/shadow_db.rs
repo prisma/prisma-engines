@@ -1,9 +1,9 @@
 use crate::flavour::{MysqlConnector, SqlConnector, mysql};
-use schema_connector::{ConnectorResult, migrations_directory::MigrationDirectories};
+use schema_connector::{ConnectorResult, migrations_directory::Migrations};
 use sql_schema_describer::SqlSchema;
 
 pub async fn sql_schema_from_migrations_history(
-    migrations: &MigrationDirectories,
+    migrations: &Migrations,
     shadow_db: &mut MysqlConnector,
 ) -> ConnectorResult<SqlSchema> {
     if !migrations.shadow_db_init_script.trim().is_empty() {

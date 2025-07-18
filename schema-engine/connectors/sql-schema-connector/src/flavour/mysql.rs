@@ -17,7 +17,7 @@ use renderer::MysqlRenderer;
 use schema_calculator::MysqlSchemaCalculatorFlavour;
 use schema_connector::{
     BoxFuture, ConnectorError, ConnectorParams, ConnectorResult, Namespaces, SchemaFilter,
-    migrations_directory::MigrationDirectories,
+    migrations_directory::Migrations,
 };
 use schema_differ::MysqlSchemaDifferFlavour;
 use sql_schema_describer::SqlSchema;
@@ -377,7 +377,7 @@ impl SqlConnector for MysqlConnector {
     #[tracing::instrument(skip(self, migrations))]
     fn sql_schema_from_migration_history<'a>(
         &'a mut self,
-        migrations: &'a MigrationDirectories,
+        migrations: &'a Migrations,
         namespaces: Option<Namespaces>,
         filter: &'a SchemaFilter,
         external_shadow_db: UsingExternalShadowDb,

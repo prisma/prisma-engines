@@ -55,21 +55,21 @@ pub fn read_provider_from_lock_file(lockfile: &MigrationLockfile) -> Option<Stri
 
 /// A list of migration directories with an optional init script that will be run on the shadow database before the migrations are applied.
 #[derive(Debug, Clone)]
-pub struct MigrationDirectories {
+pub struct Migrations {
     /// The list of migration directories.
     pub migration_directories: Vec<MigrationDirectory>,
     /// The init script that will be run on the shadow database before the migrations are applied.
     pub shadow_db_init_script: String,
 }
 
-impl MigrationDirectories {
+impl Migrations {
     /// Create it from a migration list rpc input type.
     pub fn from_migration_list(migration_list: &MigrationList) -> Self {
         Self {
             migration_directories: migration_list
                 .migration_directories
-                .clone()
-                .into_iter()
+                .iter()
+                .cloned()
                 .map(MigrationDirectory::new)
                 .collect(),
             shadow_db_init_script: migration_list.shadow_db_init_script.clone(),

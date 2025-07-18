@@ -8,7 +8,7 @@ use crate::{
 use enumflags2::BitFlags;
 use schema_connector::{
     ConnectorError, ConnectorHost, DatabaseSchema, ExternalShadowDatabase, Namespaces, SchemaConnector, SchemaDialect,
-    SchemaFilter, migrations_directory::MigrationDirectories,
+    SchemaFilter, migrations_directory::Migrations,
 };
 use sql_schema_connector::SqlSchemaConnector;
 
@@ -164,7 +164,7 @@ async fn json_rpc_diff_target_to_dialect(
             match (provider.as_deref(), shadow_database_url) {
                 (Some(provider), Some(shadow_database_url)) => {
                     let dialect = ::commands::dialect_for_provider(provider)?;
-                    let migrations = MigrationDirectories::from_migration_list(migration_list);
+                    let migrations = Migrations::from_migration_list(migration_list);
 
                     let schema = dialect
                         .schema_from_migrations_with_target(
@@ -182,7 +182,7 @@ async fn json_rpc_diff_target_to_dialect(
                 (Some("sqlite"), None) => {
                     // TODO: we don't need this branch
                     let mut connector = SqlSchemaConnector::new_sqlite_inmem(preview_features)?;
-                    let migrations = MigrationDirectories::from_migration_list(migration_list);
+                    let migrations = Migrations::from_migration_list(migration_list);
                     let schema = connector
                         .schema_from_migrations(&migrations, namespaces, filter)
                         .await?;

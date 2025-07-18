@@ -12,7 +12,7 @@ use quaint::connector::AdapterName;
 use renderer::SqliteRenderer;
 use schema_calculator::SqliteSchemaCalculatorFlavour;
 use schema_connector::{
-    BoxFuture, ConnectorError, ConnectorResult, Namespaces, SchemaFilter, migrations_directory::MigrationDirectories,
+    BoxFuture, ConnectorError, ConnectorResult, Namespaces, SchemaFilter, migrations_directory::Migrations,
 };
 use schema_differ::SqliteSchemaDifferFlavour;
 use sql_schema_describer::{DescriberErrorKind, SqlSchema, sqlite::SqlSchemaDescriber};
@@ -360,14 +360,14 @@ impl SqlConnector for SqliteConnector {
     #[tracing::instrument(skip(self, migrations))]
     fn sql_schema_from_migration_history<'a>(
         &'a mut self,
-        migrations: &'a MigrationDirectories,
+        migrations: &'a Migrations,
         _namespaces: Option<Namespaces>,
         _filter: &'a SchemaFilter,
         external_shadow_db: UsingExternalShadowDb,
     ) -> BoxFuture<'a, ConnectorResult<SqlSchema>> {
         async fn apply_migrations_and_describe(
             connection: &imp::Connection,
-            migrations: &MigrationDirectories,
+            migrations: &Migrations,
         ) -> ConnectorResult<SqlSchema> {
             if !migrations.shadow_db_init_script.trim().is_empty() {
                 connection.raw_cmd(&migrations.shadow_db_init_script).await?;
