@@ -9,6 +9,6 @@ generator js {
 }
 
 view Mountain {
-  id Int @unique
+  id Int
   val String
 }

@@ -4,7 +4,7 @@ datasource db {
 }
 
 view Mountain {
-  id  Int    @unique
+  id  Int
   val String
 }
 
@@ -14,7 +14,7 @@ view Mountain {
 // [1;94m   | [0m
 // [1;94m 5 | [0m
 // [1;94m 6 | [0m[1;91mview Mountain {[0m
-// [1;94m 7 | [0m  id  Int    @unique
+// [1;94m 7 | [0m  id  Int
 // [1;94m 8 | [0m  val String
 // [1;94m 9 | [0m}
 // [1;94m   | [0m

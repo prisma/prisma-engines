@@ -12,6 +12,12 @@ model Profile {
   id   Int       @id
   user SomeUser?
 }
+// [1;91merror[0m: [1mError validating: Views cannot have primary keys.[0m
+//   [1;94m-->[0m  [4mschema.prisma:7[0m
+// [1;94m   | [0m
+// [1;94m 6 | [0mview SomeUser {
+// [1;94m 7 | [0m  id      Int      [1;91m@id[0m
+// [1;94m   | [0m
 // [1;91merror[0m: [1mError validating: The field `profile` is part of a relation that references a view. Relations currently cannot be used with views.[0m
 //   [1;94m-->[0m  [4mschema.prisma:8[0m
 // [1;94m   | [0m

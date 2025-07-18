@@ -9,12 +9,6 @@ pub(super) fn generate_warnings(view: ViewPair<'_>, warnings: &mut Warnings) {
         });
     }
 
-    if !view.has_usable_identifier() && !view.ignored_in_psl() {
-        warnings.views_without_identifiers.push(generators::View {
-            view: view.name().to_string(),
-        });
-    }
-
     if view.uses_duplicate_name() {
         warnings.duplicate_names.push(generators::TopLevelItem {
             r#type: generators::TopLevelType::View,

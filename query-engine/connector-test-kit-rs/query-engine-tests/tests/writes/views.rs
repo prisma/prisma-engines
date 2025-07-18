@@ -11,8 +11,7 @@ mod views {
             }
 
             view TestView {
-              #id(id, Int, @id)
-
+              id        Int
               firstName String
               lastName  String
               fullName  String

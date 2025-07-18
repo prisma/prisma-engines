@@ -14,9 +14,7 @@ model User {
 }
 
 view IgnoredView {
-  id String @id
+  id String
 
   @@ignore
 }
-
-

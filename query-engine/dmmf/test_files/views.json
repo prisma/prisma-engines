@@ -116,12 +116,8 @@
           "type": "User",
           "nativeType": null,
           "relationName": "ProfileToUser",
-          "relationFromFields": [
-            "userId"
-          ],
-          "relationToFields": [
-            "id"
-          ],
+          "relationFromFields": ["userId"],
+          "relationToFields": ["id"],
           "isGenerated": false,
           "isUpdatedAt": false
         },
@@ -156,7 +152,7 @@
           "isList": false,
           "isRequired": true,
           "isUnique": false,
-          "isId": true,
+          "isId": false,
           "isReadOnly": false,
           "hasDefaultValue": false,
           "type": "String",
@@ -252,16 +248,6 @@
       "fields": [
         {
           "name": "userId"
-        }
-      ]
-    },
-    {
-      "model": "UserInfo",
-      "type": "id",
-      "isDefinedOnField": true,
-      "fields": [
-        {
-          "name": "id"
         }
       ]
     }

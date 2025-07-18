@@ -16,8 +16,7 @@ mod views {
             }
 
             view TestView {
-              #id(id, Int, @id)
-
+              id        Int
               firstName String
               lastName  String
               fullName  String
@@ -47,8 +46,8 @@ mod views {
 
         // Filter on column
         insta::assert_snapshot!(
-          run_query!(&runner, r#"{ findUniqueTestView(where: { id: 1 }) { id fullName } }"#),
-          @r###"{"data":{"findUniqueTestView":{"id":1,"fullName":"John Doe"}}}"###
+          run_query!(&runner, r#"{ findManyTestView(where: { id: 1 }) { id fullName } }"#),
+          @r###"{"data":{"findManyTestView":[{"id":1,"fullName":"John Doe"}]}}"###
         );
 
         // Filter on computed column of the view

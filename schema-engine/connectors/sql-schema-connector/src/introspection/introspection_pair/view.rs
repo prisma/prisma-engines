@@ -78,56 +78,14 @@ impl<'a> ViewPair<'a> {
         self.previous.filter(|v| v.mapped_name().is_some()).is_some()
     }
 
-    /// A view must have either an id, or at least one unique
-    /// index defined that consists of columns that are all supported by
-    /// prisma and not null.
-    ///
-    /// We cannot fetch these from the underlying table during introspection,
-    /// so this is always false if the user hasn't explicitly specified them
-    /// in the PSL.
-    pub(crate) fn has_usable_identifier(self) -> bool {
-        let identifier_in_indices = self
-            .previous
-            .map(|view| view.indexes().filter(|idx| idx.is_unique()))
-            .map(|mut idxs| {
-                idxs.any(|idx| {
-                    idx.fields()
-                        .all(|f| !f.is_unsupported() && f.ast_field().arity.is_required())
-                })
-            })
-            .unwrap_or(false);
-
-        let identifier_in_id = self
-            .previous
-            .and_then(|view| {
-                view.primary_key().map(|pk| {
-                    pk.fields()
-                        .all(|f| !f.is_unsupported() && f.ast_field().arity.is_required())
-                })
-            })
-            .unwrap_or(false);
-
-        identifier_in_indices || identifier_in_id
-    }
-
     /// True, if the view uses the same name as another top-level item from
     /// a different namespace.
     pub(crate) fn uses_duplicate_name(self) -> bool {
         self.previous.is_none() && !self.context.name_is_unique(self.next.name())
     }
 
-    /// If the view is marked as ignored. Can happen either if user
-    /// explicitly sets the view attribute, or if the view has no
-    /// usable identifiers.
+    /// If the view is marked as ignored in the PSL.
     pub(crate) fn ignored(self) -> bool {
-        let explicit_ignore = self.ignored_in_psl();
-        let implicit_ignore = !self.has_usable_identifier() && self.scalar_fields().len() > 0;
-
-        explicit_ignore || implicit_ignore
-    }
-
-    /// If the view is already marked as ignored in the PSL.
-    pub(crate) fn ignored_in_psl(self) -> bool {
         self.previous.map(|view| view.is_ignored()).unwrap_or(false)
     }
 

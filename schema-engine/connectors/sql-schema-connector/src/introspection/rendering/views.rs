@@ -80,11 +80,6 @@ fn render_view(view: ViewPair<'_>) -> renderer::View<'_> {
         rendered.id(id::render(id));
     }
 
-    if !view.has_usable_identifier() && !view.ignored_in_psl() {
-        let docs = "The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.";
-        rendered.documentation(docs);
-    }
-
     if view.adds_a_description() {
         let docs = "This view or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments";
         rendered.documentation(docs);

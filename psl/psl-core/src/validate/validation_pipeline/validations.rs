@@ -51,29 +51,37 @@ pub(super) fn validate(ctx: &mut Context<'_>) {
 
     for model in ctx.db.walk_models().chain(ctx.db.walk_views()) {
         if model.ast_model().is_view() {
+            // view-specific validations
             views::view_definition_without_preview_flag(model, ctx);
+            views::connector_specific(model, ctx);
+        } else {
+            // table-specific validations
+            models::has_a_strict_unique_criteria(model, ctx);
+            models::has_a_unique_primary_key_name(model, &names, ctx);
+            models::has_a_unique_custom_primary_key_name_per_model(model, &names, ctx);
+            models::id_has_fields(model, ctx);
+            models::id_client_name_does_not_clash_with_field(model, ctx);
+            models::primary_key_connector_specific(model, ctx);
+            models::primary_key_length_prefix_supported(model, ctx);
+            models::primary_key_sort_order_supported(model, ctx);
+            models::only_one_fulltext_attribute_allowed(model, ctx);
+            models::shard_key_is_supported(model, ctx);
+            models::shard_key_has_fields(model, ctx);
+            models::connector_specific(model, ctx);
+            autoincrement::validate_auto_increment(model, ctx);
         }
 
-        models::has_a_strict_unique_criteria(model, ctx);
-        models::has_a_unique_primary_key_name(model, &names, ctx);
-        models::has_a_unique_custom_primary_key_name_per_model(model, &names, ctx);
-        models::id_has_fields(model, ctx);
-        models::id_client_name_does_not_clash_with_field(model, ctx);
-        models::primary_key_connector_specific(model, ctx);
-        models::primary_key_length_prefix_supported(model, ctx);
-        models::primary_key_sort_order_supported(model, ctx);
-        models::only_one_fulltext_attribute_allowed(model, ctx);
+        // common validations
         models::multischema_feature_flag_needed(model, ctx);
         models::schema_is_defined_in_the_datasource(model, ctx);
         models::schema_attribute_supported_in_connector(model, ctx);
         models::schema_attribute_missing(model, ctx);
-        models::shard_key_is_supported(model, ctx);
-        models::shard_key_has_fields(model, ctx);
-        models::connector_specific(model, ctx);
 
-        autoincrement::validate_auto_increment(model, ctx);
-
-        if let Some(pk) = model.primary_key() {
+        if let Some(pk) = model.primary_key()
+            && model.ast_model().is_view()
+        {
+            views::primary_key(pk, ctx);
+        } else if let Some(pk) = model.primary_key() {
             for field_attribute in pk.scalar_field_attributes() {
                 let span = pk.ast_attribute().span;
                 let attribute = (pk.attribute_name(), span);
@@ -111,6 +119,11 @@ pub(super) fn validate(ctx: &mut Context<'_>) {
         }
 
         for index in model.indexes() {
+            if model.ast_model().is_view() {
+                views::index(index, ctx);
+                continue;
+            }
+
             indexes::has_fields(index, ctx);
             indexes::has_a_unique_constraint_name(index, &names, ctx);
             indexes::unique_client_name_does_not_clash_with_field(index, ctx);

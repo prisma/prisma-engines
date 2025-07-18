@@ -32,13 +32,10 @@ async fn simple_view_from_one_table(api: &mut TestApi) -> TestResult {
           last_name  String? @db.VarChar(255)
         }
 
-        /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
         view B {
           id         Int
           first_name String  @db.VarChar(255)
           last_name  String? @db.VarChar(255)
-
-          @@ignore
         }
     "#]];
 
@@ -54,14 +51,7 @@ async fn simple_view_from_one_table(api: &mut TestApi) -> TestResult {
 
     api.expect_view_definition("B", &expected).await;
 
-    let expected = expect![[r#"
-        *** WARNING ***
-
-        The following views were ignored as they do not have a valid unique identifier or id. This is currently not supported by Prisma Client. Please refer to the documentation on defining unique identifiers in views: https://pris.ly/d/view-identifiers
-          - "B"
-    "#]];
-
-    api.expect_warnings(&expected).await;
+    api.expect_no_warnings().await;
 
     Ok(())
 }
@@ -116,13 +106,10 @@ async fn simple_view_from_two_tables(api: &mut TestApi) -> TestResult {
           Profile    Profile?
         }
 
-        /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
         view Schwuser {
           id           Int
           name         String? @db.VarChar(511)
           introduction String? @db.Text
-
-          @@ignore
         }
     "#]];
 
@@ -140,164 +127,6 @@ async fn simple_view_from_two_tables(api: &mut TestApi) -> TestResult {
           )"#]];
 
     api.expect_view_definition("Schwuser", &expected).await;
-
-    Ok(())
-}
-
-#[test_connector(tags(Mysql), exclude(Vitess), preview_features("views"))]
-async fn re_intro_keeps_view_uniques(api: &mut TestApi) -> TestResult {
-    let setup = indoc! {r#"
-        CREATE TABLE User (
-            id INT PRIMARY KEY,
-            first_name VARCHAR(255) NOT NULL,
-            last_name VARCHAR(255) NOT NULL
-        );
-
-        CREATE VIEW Schwuser AS
-            SELECT id, first_name, last_name FROM User;
-    "#};
-
-    api.raw_cmd(setup).await;
-
-    let input = indoc! {r#"
-        model User {
-          id         Int     @id @default(autoincrement())
-          first_name String? @db.VarChar(255)
-          last_name  String? @db.VarChar(255)
-        }
-
-        view Schwuser {
-          id         Int     @unique
-          first_name String  @db.VarChar(255)
-          last_name  String? @db.VarChar(255)
-        }
-    "#};
-
-    let expected = expect![[r#"
-        model User {
-          id         Int    @id
-          first_name String @db.VarChar(255)
-          last_name  String @db.VarChar(255)
-        }
-
-        view Schwuser {
-          id         Int    @unique
-          first_name String @db.VarChar(255)
-          last_name  String @db.VarChar(255)
-        }
-    "#]];
-
-    api.expect_re_introspected_datamodel(input, expected).await;
-
-    Ok(())
-}
-
-#[test_connector(tags(Mysql), exclude(Vitess), preview_features("views"))]
-async fn re_intro_keeps_id(api: &mut TestApi) -> TestResult {
-    let setup = indoc! {r#"
-        CREATE TABLE User (
-            id INT PRIMARY KEY,
-            first_name VARCHAR(255) NOT NULL,
-            last_name VARCHAR(255) NULL
-        );
-
-        CREATE VIEW Schwuser AS
-            SELECT id, first_name, last_name FROM User;
-    "#};
-
-    api.raw_cmd(setup).await;
-
-    let input = indoc! {r#"
-        model User {
-          id         Int     @id @default(autoincrement())
-          first_name String  @db.VarChar(255)
-          last_name  String? @db.VarChar(255)
-        }
-
-        view Schwuser {
-          id         Int     @id
-          first_name String  @db.VarChar(255)
-          last_name  String? @db.VarChar(255)
-        }
-    "#};
-
-    let expected = expect![[r#"
-        model User {
-          id         Int     @id
-          first_name String  @db.VarChar(255)
-          last_name  String? @db.VarChar(255)
-        }
-
-        view Schwuser {
-          id         Int     @id
-          first_name String  @db.VarChar(255)
-          last_name  String? @db.VarChar(255)
-        }
-    "#]];
-
-    api.expect_re_introspected_datamodel(input, expected).await;
-
-    Ok(())
-}
-
-#[test_connector(tags(Mysql), exclude(Vitess), preview_features("views"))]
-async fn re_intro_keeps_compound_unique(api: &mut TestApi) -> TestResult {
-    let setup = indoc! {r#"
-        CREATE TABLE User (
-            side_a INT NOT NULL,
-            side_b INT NOT NULL,
-            first_name VARCHAR(255) NOT NULL,
-            last_name VARCHAR(255) NULL,
-            CONSTRAINT User_pkey PRIMARY KEY (side_a, side_b)
-        );
-
-        CREATE VIEW Schwuser AS
-            SELECT side_a, side_b, first_name, last_name FROM User;
-    "#};
-
-    api.raw_cmd(setup).await;
-
-    let input = indoc! {r#"
-        model User {
-          side_a     Int
-          side_b     Int
-          first_name String  @db.VarChar(255)
-          last_name  String? @db.VarChar(255)
-
-          @@id([side_a, side_b])
-        }
-
-        view Schwuser {
-          side_a     Int
-          side_b     Int
-          first_name String  @db.VarChar(255)
-          last_name  String? @db.VarChar(255)
-
-          @@unique([side_a, side_b])
-        }
-    "#};
-
-    let expected = expect![[r#"
-        model User {
-          side_a     Int
-          side_b     Int
-          first_name String  @db.VarChar(255)
-          last_name  String? @db.VarChar(255)
-
-          @@id([side_a, side_b])
-        }
-
-        view Schwuser {
-          side_a     Int
-          side_b     Int
-          first_name String  @db.VarChar(255)
-          last_name  String? @db.VarChar(255)
-
-          @@unique([side_a, side_b])
-        }
-    "#]];
-
-    api.expect_re_introspected_datamodel(input, expected).await;
 
     Ok(())
 }
@@ -327,12 +156,9 @@ async fn defaults_are_introspected(api: &mut TestApi) -> TestResult {
           val Int? @default(2)
         }
 
-        /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
         view B {
           id  Int
           val Int? @default(2)
-
-          @@ignore
         }
     "#]];
 
@@ -370,12 +196,9 @@ async fn views_are_rendered_with_enums(api: &mut TestApi) -> TestResult {
           val A_val?
         }
 
-        /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
         view B {
           id  Int
           val B_val?
-
-          @@ignore
         }
 
         enum A_val {
@@ -481,10 +304,8 @@ async fn invalid_field_names_trigger_warnings(api: &mut TestApi) -> TestResult {
           @@ignore
         }
 
-        /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
         view view_w_invalid_names_one {
           all_ages Int?
-
           /// This field was commented out because of an invalid name. Please provide a valid one that matches [a-zA-Z][a-zA-Z0-9_]*
           // 0 Int? @map("0")
           /// This field was commented out because of an invalid name. Please provide a valid one that matches [a-zA-Z][a-zA-Z0-9_]*
@@ -497,13 +318,10 @@ async fn invalid_field_names_trigger_warnings(api: &mut TestApi) -> TestResult {
           // 4 Int? @map("4")
           /// This field was commented out because of an invalid name. Please provide a valid one that matches [a-zA-Z][a-zA-Z0-9_]*
           // 5 Int? @map("5")
-          @@ignore
         }
 
-        /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
         view view_w_invalid_names_two {
           all_ages Int?
-
           /// This field was commented out because of an invalid name. Please provide a valid one that matches [a-zA-Z][a-zA-Z0-9_]*
           // 0 Int? @map("0")
           /// This field was commented out because of an invalid name. Please provide a valid one that matches [a-zA-Z][a-zA-Z0-9_]*
@@ -512,7 +330,6 @@ async fn invalid_field_names_trigger_warnings(api: &mut TestApi) -> TestResult {
           // 2 Int? @map("2")
           /// This field was commented out because of an invalid name. Please provide a valid one that matches [a-zA-Z][a-zA-Z0-9_]*
           // 3 Int? @map("3")
-          @@ignore
         }
     "#]];
 
@@ -532,10 +349,6 @@ async fn invalid_field_names_trigger_warnings(api: &mut TestApi) -> TestResult {
         The following models were ignored as they do not have a valid unique identifier or id. This is currently not supported by Prisma Client:
           - "table_w_invalid_names_one"
           - "table_w_invalid_names_two"
-
-        The following views were ignored as they do not have a valid unique identifier or id. This is currently not supported by Prisma Client. Please refer to the documentation on defining unique identifiers in views: https://pris.ly/d/view-identifiers
-          - "view_w_invalid_names_one"
-          - "view_w_invalid_names_two"
     "#]];
 
     api.expect_warnings(&expected).await;
