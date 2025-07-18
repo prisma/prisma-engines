@@ -201,7 +201,35 @@ integration tests.
 
   You can find them at `./query-engine/connector-test-kit-rs`.
 
-### Set up & run tests:
+> [!NOTE]
+> Help needed: document how to run
+> - `quaint` tests
+> - schema engine tests
+>
+> This can be a good first contribution.
+
+### Run unit tests
+
+To run unit tests for the whole workspace (except `quaint`, which requires
+additional steps), skipping the packages with heavy integration tests (you
+probably want to run them separately) as well as the `query-engine-node-api`
+package, use this command:
+
+```bash
+make test-unit
+```
+
+> [!WARNING]
+> Running just `cargo test` for the whole workspace will not work because the
+> `query-engine-node-api` package can only be compiled as a library crate and
+> can't be linked into a test binary due to the dependency on external Node.js
+> symbols. Additionally, some crates require passing explicit cargo features to
+> enable database connectors.
+>
+> If you really want to run *all* tests for the whole workspace, use
+> `cargo test --workspace --exclude=query-engine-node-api --all-features`.
+
+### Set up & run query engine integration tests:
 
 **Prerequisites:**
 
@@ -234,16 +262,12 @@ To actually get the tests working, read the contents of `.envrc`. Then `Edit env
 the correct values for the following variables:
 
 - `WORKSPACE_ROOT` should point to the root directory of `prisma-engines` project.
-- `PRISMA_BINARY_PATH` is usually
-  `%WORKSPACE_ROOT%\target\release\query-engine.exe`.
-- `SCHEMA_ENGINE_BINARY_PATH` should be
-  `%WORKSPACE_ROOT%\target\release\schema-engine.exe`.
 
 Other variables may or may not be useful.
 
 **Run:**
 
-Run `cargo test` in the repository root.
+Run `cargo test -p query-engine-tests` in the repository root.
 
 ### Testing driver adapters
 

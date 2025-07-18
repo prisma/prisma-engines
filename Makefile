@@ -568,15 +568,6 @@ qe-dmmf:
 qe-dev-mongo_4_4: start-mongodb_4_4
 	cp $(SCHEMA_EXAMPLES_PATH)/generic_mongo4.prisma $(DEV_SCHEMA_FILE)
 
-use-local-schema-engine:
-	cargo build --release
-	cp target/release/schema-engine $(PRISMA2_BINARY_PATH)/
-
-use-local-query-engine:
-	cargo build --release
-	cp target/release/query-engine $(PRISMA2_BINARY_PATH)/runtime/
-	cp target/release/query-engine $(PRISMA2_BINARY_PATH)/query-engine-darwin
-
 show-metrics:
 	docker compose -f docker-compose.yml up --wait -d --remove-orphans grafana prometheus
 
