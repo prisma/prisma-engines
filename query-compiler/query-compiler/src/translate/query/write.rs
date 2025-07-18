@@ -4,7 +4,9 @@ use query_core::{
     ConnectRecords, DeleteManyRecords, DeleteRecord, DisconnectRecords, RawQuery, UpdateManyRecords, UpdateRecord,
     UpdateRecordWithSelection, UpdateRecordWithoutSelection, WriteQuery,
 };
-use query_structure::{PrismaValue, PrismaValueType, QueryArguments, RecordFilter, RelationLoadStrategy, Take};
+use query_structure::{
+    Filter, IntoFilter, PrismaValue, PrismaValueType, QueryArguments, RecordFilter, RelationLoadStrategy, Take,
+};
 use sql_query_builder::write::split_write_args_by_shape;
 use std::{collections::BTreeMap, iter, mem};
 
@@ -169,7 +171,16 @@ pub(crate) fn translate_write_query(query: WriteQuery, builder: &dyn QueryBuilde
         })) => {
             let query = if args.is_empty() {
                 // We can just issue a read query if there are no write arguments.
-                let query_args = QueryArguments::from((model.clone(), record_filter.filter)).with_take(Take::Some(1));
+
+                // It's possible for us to receive selectors here and they cannot be passed to
+                // a read query directly, so we need to build a filter from them.
+                let filter = record_filter
+                    .selectors
+                    .map(IntoFilter::filter)
+                    .into_iter()
+                    .fold(record_filter.filter, |acc, f| Filter::and(vec![acc, f]));
+
+                let query_args = QueryArguments::from((model.clone(), filter)).with_take(Take::Some(1));
                 builder
                     .build_get_records(&model, query_args, &selected_fields, RelationLoadStrategy::Query)
                     .map_err(TranslateError::QueryBuildFailure)?
