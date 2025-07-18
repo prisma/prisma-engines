@@ -1,13 +1,17 @@
 use crate::flavour::{MssqlConnector, SqlConnector};
-use schema_connector::{ConnectorResult, Namespaces, migrations_directory::MigrationDirectory};
+use schema_connector::{ConnectorResult, Namespaces, migrations_directory::Migrations};
 use sql_schema_describer::SqlSchema;
 
 pub async fn sql_schema_from_migrations_history(
-    migrations: &[MigrationDirectory],
+    migrations: &Migrations,
     shadow_db: &mut MssqlConnector,
     namespaces: Option<Namespaces>,
 ) -> ConnectorResult<SqlSchema> {
-    for migration in migrations {
+    if !migrations.shadow_db_init_script.trim().is_empty() {
+        shadow_db.raw_cmd(&migrations.shadow_db_init_script).await?;
+    }
+
+    for migration in migrations.migration_directories.iter() {
         let script = migration.read_migration_script()?;
 
         tracing::debug!(

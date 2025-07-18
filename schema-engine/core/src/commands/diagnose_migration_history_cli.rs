@@ -3,7 +3,7 @@ use commands::{DiagnoseMigrationHistoryOutput, DriftDiagnostic, MigrationSchemaC
 pub use json_rpc::types::{DiagnoseMigrationHistoryInput, HistoryDiagnostic};
 use schema_connector::{
     ConnectorError, MigrationRecord, Namespaces, PersistenceNotInitializedError, SchemaConnector, SchemaFilter,
-    migrations_directory::{MigrationDirectory, error_on_changed_provider, list_migrations},
+    migrations_directory::{MigrationDirectory, Migrations, error_on_changed_provider},
 };
 
 /// Read the contents of the migrations directory and the migrations table, and
@@ -18,7 +18,7 @@ pub async fn diagnose_migration_history_cli(
     tracing::debug!("Diagnosing migration history");
 
     error_on_changed_provider(&input.migrations_list.lockfile, connector.connector_type())?;
-    let migrations_from_filesystem = list_migrations(input.migrations_list.migration_directories);
+    let migrations_from_filesystem = Migrations::from_migration_list(&input.migrations_list);
 
     let (migrations_from_database, has_migrations_table) =
         match connector.migration_persistence().list_migrations().await? {
@@ -26,10 +26,10 @@ pub async fn diagnose_migration_history_cli(
             Err(PersistenceNotInitializedError {}) => (vec![], false),
         };
 
-    let mut diagnostics = Diagnostics::new(&migrations_from_filesystem);
+    let mut diagnostics = Diagnostics::new(&migrations_from_filesystem.migration_directories);
 
     // Check filesystem history against database history.
-    for (index, fs_migration) in migrations_from_filesystem.iter().enumerate() {
+    for (index, fs_migration) in migrations_from_filesystem.migration_directories.iter().enumerate() {
         let corresponding_db_migration = migrations_from_database
             .iter()
             .find(|db_migration| db_migration.migration_name == fs_migration.migration_name());
@@ -49,6 +49,7 @@ pub async fn diagnose_migration_history_cli(
 
     for (index, db_migration) in migrations_from_database.iter().enumerate() {
         let corresponding_fs_migration = migrations_from_filesystem
+            .migration_directories
             .iter()
             .find(|fs_migration| db_migration.migration_name == fs_migration.migration_name());
 
@@ -62,23 +63,27 @@ pub async fn diagnose_migration_history_cli(
     }
 
     // Detect drift
-    let applied_migrations: Vec<_> = migrations_from_filesystem
-        .iter()
-        .filter(|fs_migration| {
-            migrations_from_database
-                .iter()
-                .filter(|db_migration| db_migration.finished_at.is_some() && db_migration.rolled_back_at.is_none())
-                .any(|db_migration| db_migration.migration_name == fs_migration.migration_name())
-        })
-        .cloned()
-        .collect();
+    let applied_migrations = Migrations {
+        migration_directories: migrations_from_filesystem
+            .migration_directories
+            .iter()
+            .filter(|fs_migration| {
+                migrations_from_database
+                    .iter()
+                    .filter(|db_migration| db_migration.finished_at.is_some() && db_migration.rolled_back_at.is_none())
+                    .any(|db_migration| db_migration.migration_name == fs_migration.migration_name())
+            })
+            .cloned()
+            .collect(),
+        shadow_db_init_script: input.migrations_list.shadow_db_init_script.clone(),
+    };
 
     let (drift, error_in_unapplied_migration) = {
         let filter: SchemaFilter = input.filters.into();
         if input.opt_in_to_shadow_database {
             let dialect = connector.schema_dialect();
             let from = migration_schema_cache
-                .get_or_insert(&applied_migrations, || async {
+                .get_or_insert(&applied_migrations.migration_directories, || async {
                     connector
                         .schema_from_migrations(&applied_migrations, namespaces.clone(), &filter)
                         .await

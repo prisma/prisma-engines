@@ -330,6 +330,7 @@ impl EngineTestApi {
             &[("schema.prisma", schema)],
             migrations_directory,
             SchemaFilter::default(),
+            Default::default(),
         )
     }
 

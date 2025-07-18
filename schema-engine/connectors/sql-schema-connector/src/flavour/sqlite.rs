@@ -12,7 +12,7 @@ use quaint::connector::AdapterName;
 use renderer::SqliteRenderer;
 use schema_calculator::SqliteSchemaCalculatorFlavour;
 use schema_connector::{
-    BoxFuture, ConnectorError, ConnectorResult, Namespaces, SchemaFilter, migrations_directory::MigrationDirectory,
+    BoxFuture, ConnectorError, ConnectorResult, Namespaces, SchemaFilter, migrations_directory::Migrations,
 };
 use schema_differ::SqliteSchemaDifferFlavour;
 use sql_schema_describer::{DescriberErrorKind, SqlSchema, sqlite::SqlSchemaDescriber};
@@ -360,16 +360,20 @@ impl SqlConnector for SqliteConnector {
     #[tracing::instrument(skip(self, migrations))]
     fn sql_schema_from_migration_history<'a>(
         &'a mut self,
-        migrations: &'a [MigrationDirectory],
+        migrations: &'a Migrations,
         _namespaces: Option<Namespaces>,
         _filter: &'a SchemaFilter,
         external_shadow_db: UsingExternalShadowDb,
     ) -> BoxFuture<'a, ConnectorResult<SqlSchema>> {
         async fn apply_migrations_and_describe(
             connection: &imp::Connection,
-            migrations: &[MigrationDirectory],
+            migrations: &Migrations,
         ) -> ConnectorResult<SqlSchema> {
-            for migration in migrations {
+            if !migrations.shadow_db_init_script.trim().is_empty() {
+                connection.raw_cmd(&migrations.shadow_db_init_script).await?;
+            }
+
+            for migration in migrations.migration_directories.iter() {
                 let script = migration.read_migration_script()?;
 
                 tracing::debug!(

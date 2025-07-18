@@ -6,7 +6,7 @@ use quaint::connector::ExternalConnectorFactory;
 use crate::{
     BoxFuture, ConnectorHost, ConnectorResult, DatabaseSchema, DestructiveChangeChecker, DestructiveChangeDiagnostics,
     DiffTarget, IntrospectSqlQueryInput, IntrospectSqlQueryOutput, IntrospectionContext, IntrospectionResult,
-    Migration, MigrationPersistence, Namespaces, SchemaFilter, migrations_directory::MigrationDirectory,
+    Migration, MigrationPersistence, Namespaces, SchemaFilter, migrations_directory::Migrations,
 };
 
 /// The dialect for schema operations on a particular database.
@@ -51,7 +51,7 @@ pub trait SchemaDialect: Send + Sync + 'static {
     /// If possible, check that the passed in migrations apply cleanly.
     fn validate_migrations_with_target<'a>(
         &'a mut self,
-        _migrations: &'a [MigrationDirectory],
+        migrations: &'a Migrations,
         namespaces: Option<Namespaces>,
         filter: &'a SchemaFilter,
         target: ExternalShadowDatabase,
@@ -62,7 +62,7 @@ pub trait SchemaDialect: Send + Sync + 'static {
     /// prisma schema, because that information is otherwise unavailable.
     fn schema_from_migrations_with_target<'a>(
         &'a self,
-        migrations: &'a [MigrationDirectory],
+        migrations: &'a Migrations,
         namespaces: Option<Namespaces>,
         filter: &'a SchemaFilter,
         target: ExternalShadowDatabase,
@@ -153,7 +153,7 @@ pub trait SchemaConnector: Send + Sync + 'static {
     /// connector.
     fn schema_from_migrations<'a>(
         &'a mut self,
-        migrations: &'a [MigrationDirectory],
+        migrations: &'a Migrations,
         namespaces: Option<Namespaces>,
         filter: &'a SchemaFilter,
     ) -> BoxFuture<'a, ConnectorResult<DatabaseSchema>>;
@@ -173,7 +173,7 @@ pub trait SchemaConnector: Send + Sync + 'static {
     /// If possible, check that the passed in migrations apply cleanly.
     fn validate_migrations<'a>(
         &'a mut self,
-        _migrations: &'a [MigrationDirectory],
+        migrations: &'a Migrations,
         namespaces: Option<Namespaces>,
         filter: &'a SchemaFilter,
     ) -> BoxFuture<'a, ConnectorResult<()>>;
