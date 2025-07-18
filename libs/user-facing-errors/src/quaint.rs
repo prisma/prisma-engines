@@ -46,6 +46,14 @@ pub fn invalid_connection_string_description(error_details: &str) -> String {
 
 pub fn render_quaint_error(kind: &ErrorKind, connection_info: Option<&NativeConnectionInfo>) -> Option<KnownError> {
     match kind {
+        ErrorKind::DatabaseNotReachable {
+            database_host,
+            database_port,
+        } => Some(KnownError::new(common::DatabaseNotReachable {
+            database_host: database_host.to_string(),
+            database_port: *database_port,
+        })),
+
         ErrorKind::DatabaseDoesNotExist { db_name } => Some(KnownError::new(common::DatabaseDoesNotExist {
             database_name: db_name.to_string(),
         })),
@@ -104,6 +112,12 @@ pub fn render_quaint_error(kind: &ErrorKind, connection_info: Option<&NativeConn
         ErrorKind::ValueOutOfRange { message } => Some(KnownError::new(query_engine::ValueOutOfRange {
             details: message.clone(),
         })),
+
+        ErrorKind::TlsConnectionError { message } => Some(KnownError::new(common::TlsConnectionError {
+            message: message.to_string(),
+        })),
+
+        ErrorKind::ConnectionClosed => Some(KnownError::new(common::ConnectionClosed)),
 
         #[cfg(any(
             feature = "mssql-native",

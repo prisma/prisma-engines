@@ -156,6 +156,9 @@ pub enum ErrorKind {
     #[error("Invalid input provided to query: {}", _0)]
     QueryInvalidInput(String),
 
+    #[error("Database not reachable: {}:{}", database_host, database_port)]
+    DatabaseNotReachable { database_host: String, database_port: u16 },
+
     #[error("Database does not exist: {}", db_name)]
     DatabaseDoesNotExist { db_name: Name },
 
@@ -164,6 +167,12 @@ pub enum ErrorKind {
 
     #[error("Database already exists {}", db_name)]
     DatabaseAlreadyExists { db_name: Name },
+
+    #[error("Error opening a TLS connection: {}", message)]
+    TlsConnectionError { message: String },
+
+    #[error("Server has closed the connection.")]
+    ConnectionClosed,
 
     #[error("Authentication failed for user {}", user)]
     AuthenticationFailed { user: Name },
