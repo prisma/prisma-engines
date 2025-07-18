@@ -18,8 +18,10 @@ pub(crate) fn query_fields(ctx: &QuerySchema) -> Vec<FieldFn> {
         field!(find_many_field, model);
         field!(plain_aggregation_field, model);
         field!(group_by_aggregation_field, model);
-        field!(find_unique_field, model);
-        field!(find_unique_or_throw_field, model);
+        if !model.is_view() {
+            field!(find_unique_field, model);
+            field!(find_unique_or_throw_field, model);
+        }
 
         if ctx.enable_raw_queries && ctx.is_mongo() {
             let model_cloned = model.clone();

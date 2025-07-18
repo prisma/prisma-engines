@@ -86,6 +86,20 @@ mod views {
         Ok(())
     }
 
+    #[connector_test]
+    async fn no_find_unique(runner: Runner) -> TestResult<()> {
+        test_no_toplevel_query(runner, r#"{ findUniqueTestView(where: { id: 1 }) { fullName } }"#).await
+    }
+
+    #[connector_test]
+    async fn no_find_unique_or_throw(runner: Runner) -> TestResult<()> {
+        test_no_toplevel_query(
+            runner,
+            r#"{ findUniqueTestViewOrThrow(where: { id: 1 }) { fullName } }"#,
+        )
+        .await
+    }
+
     async fn create_test_data(runner: &Runner, schema_name: &str) -> TestResult<()> {
         migrate_view(runner, schema_name).await?;
 
@@ -131,6 +145,16 @@ mod views {
             .query(format!("mutation {{ createOneTestModel(data: {data}) {{ id }} }}"))
             .await?
             .assert_success();
+        Ok(())
+    }
+
+    async fn test_no_toplevel_query(runner: Runner, query: &str) -> TestResult<()> {
+        match runner.query(query).await {
+            Ok(res) => res.assert_failure(2009, None),
+            Err(TestError::QueryConversionError(err)) if err.kind().code() == "P2009" => (),
+            Err(err) => return Err(err),
+        }
+
         Ok(())
     }
 }
