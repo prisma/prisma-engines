@@ -149,6 +149,19 @@ test-qe-verbose-st:
 test-qe-black-box: build-qe
 	cargo test --package black-box-tests -- --test-threads 1
 
+test-unit:
+	cargo test --workspace --all-features \
+	    --exclude=quaint \
+	    --exclude=query-engine \
+	    --exclude=query-engine-node-api \
+	    --exclude=black-box-tests \
+	    --exclude=query-engine-tests \
+	    --exclude=sql-migration-tests \
+	    --exclude=schema-engine-cli \
+	    --exclude=sql-schema-describer \
+	    --exclude=sql-introspection-tests \
+	    --exclude=mongodb-schema-connector
+
 check-schema-wasm-package: build-schema-wasm
 	PRISMA_SCHEMA_WASM="$(REPO_ROOT)/target/prisma-schema-wasm" \
 	out=$(shell mktemp -d) \
