@@ -18,7 +18,7 @@ use quaint::{
 use renderer::PostgresRenderer;
 use schema_calculator::PostgresSchemaCalculatorFlavour;
 use schema_connector::{
-    BoxFuture, ConnectorError, ConnectorResult, Namespaces, SchemaFilter, migrations_directory::MigrationDirectory,
+    BoxFuture, ConnectorError, ConnectorResult, Namespaces, SchemaFilter, migrations_directory::MigrationDirectories,
 };
 use schema_differ::PostgresSchemaDifferFlavour;
 use serde::Deserialize;
@@ -585,7 +585,7 @@ impl SqlConnector for PostgresConnector {
     #[tracing::instrument(skip(self, migrations))]
     fn sql_schema_from_migration_history<'a>(
         &'a mut self,
-        migrations: &'a [MigrationDirectory],
+        migrations: &'a MigrationDirectories,
         namespaces: Option<Namespaces>,
         filter: &'a SchemaFilter,
         external_shadow_db: UsingExternalShadowDb,
@@ -668,7 +668,7 @@ async fn sql_schema_from_migrations_and_db(
     conn: &imp::Connection,
     params: &imp::Params,
     schema: String,
-    migrations: &[MigrationDirectory],
+    migrations: &MigrationDirectories,
     namespaces: Option<Namespaces>,
     circumstances: BitFlags<Circumstances>,
     preview_features: BitFlags<PreviewFeature>,
@@ -682,7 +682,13 @@ async fn sql_schema_from_migrations_and_db(
         conn.raw_cmd("BEGIN;").await.map_err(imp::quaint_error_mapper(params))?;
     }
 
-    for migration in migrations {
+    if let Some(init_script) = &migrations.shadow_db_init_script {
+        conn.raw_cmd(init_script)
+            .await
+            .map_err(imp::quaint_error_mapper(params))?;
+    }
+
+    for migration in migrations.migration_directories.iter() {
         let script = migration.read_migration_script()?;
 
         tracing::debug!(

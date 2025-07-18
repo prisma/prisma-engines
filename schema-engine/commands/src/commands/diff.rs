@@ -7,11 +7,11 @@ use crate::{
     json_rpc::types::{DiffParams, DiffResult, DiffTarget, UrlContainer},
 };
 use enumflags2::BitFlags;
-use json_rpc::types::MigrationList;
 use psl::SourceFile;
 use quaint::connector::ExternalConnectorFactory;
 use schema_connector::{
     ConnectorError, DatabaseSchema, ExternalShadowDatabase, Namespaces, SchemaConnector, SchemaDialect, SchemaFilter,
+    migrations_directory::MigrationDirectories,
 };
 
 pub async fn diff(
@@ -143,22 +143,18 @@ async fn diff_target_to_dialect(
         DiffTarget::Url(UrlContainer { .. }) => Err(ConnectorError::from_msg(
             "--from-url and --to-url flags are no longer supported".to_owned(),
         )),
-        DiffTarget::Migrations(MigrationList {
-            lockfile,
-            migration_directories,
-            ..
-        }) => {
-            let provider = schema_connector::migrations_directory::read_provider_from_lock_file(lockfile);
+        DiffTarget::Migrations(migration_list) => {
+            let provider =
+                schema_connector::migrations_directory::read_provider_from_lock_file(&migration_list.lockfile);
             match provider.as_deref() {
                 Some(provider) => {
                     let dialect = dialect_for_provider(provider)?;
-                    let directories =
-                        schema_connector::migrations_directory::list_migrations(migration_directories.clone());
+                    let migrations = MigrationDirectories::from_migration_list(migration_list);
 
                     // TODO: enable Driver Adapter for shadow database, using the AdapterFactory.
                     let schema = dialect
                         .schema_from_migrations_with_target(
-                            &directories,
+                            &migrations,
                             namespaces,
                             filter,
                             ExternalShadowDatabase::DriverAdapter(adapter_factory),

@@ -1,4 +1,4 @@
-use crate::migrations_directory::MigrationDirectory;
+use crate::migrations_directory::MigrationDirectories;
 use psl::parser_database::SourceFile;
 use std::fmt::Debug;
 
@@ -6,9 +6,9 @@ use std::fmt::Debug;
 pub enum DiffTarget<'a> {
     /// A Prisma schema.
     Datamodel(Vec<(String, SourceFile)>),
-    /// A migrations folder. What is diffable is the state of the database schema at the end of the
+    /// A migrations folder and an optional init script. What is diffable is the state of the database schema at the end of the
     /// migrations history.
-    Migrations(&'a [MigrationDirectory]),
+    Migrations(&'a MigrationDirectories),
     /// A live database connection string.
     Database,
     /// Assume an empty database schema.

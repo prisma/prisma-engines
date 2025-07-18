@@ -37,6 +37,9 @@ pub struct MigrationList {
     /// Description of the lockfile, which may or may not exist.
     pub lockfile: MigrationLockfile,
 
+    /// An optional init script that will be run on the shadow database before the migrations are applied.
+    pub shadow_db_init_script: Option<String>,
+
     /// List of migration directories.
     pub migration_directories: Vec<MigrationDirectory>,
 }

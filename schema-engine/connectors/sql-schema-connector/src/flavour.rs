@@ -35,7 +35,7 @@ use psl::{PreviewFeature, PreviewFeatures, ValidatedSchema};
 use quaint::prelude::{NativeConnectionInfo, Table};
 use schema_connector::{
     BoxFuture, ConnectorError, ConnectorResult, IntrospectionContext, MigrationRecord, Namespaces,
-    PersistenceNotInitializedError, SchemaFilter, migrations_directory::MigrationDirectory,
+    PersistenceNotInitializedError, SchemaFilter, migrations_directory::MigrationDirectories,
 };
 use sql_schema_describer::SqlSchema;
 use std::fmt::Debug;
@@ -320,7 +320,7 @@ pub(crate) trait SqlConnector: Send + Sync + Debug {
     /// shadow database is being used - if not, we need to create a temporary one.
     fn sql_schema_from_migration_history<'a>(
         &'a mut self,
-        migrations: &'a [MigrationDirectory],
+        migrations: &'a MigrationDirectories,
         namespaces: Option<Namespaces>,
         filter: &'a SchemaFilter,
         external_shadow_db: UsingExternalShadowDb,

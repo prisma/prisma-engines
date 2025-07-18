@@ -4,7 +4,7 @@ use schema_connector::{ConnectorResult, migrations_directory::MigrationDirectory
 use sql_schema_describer::SqlSchema;
 
 pub async fn sql_schema_from_migrations_history(
-    migrations: &[MigrationDirectory],
+    migrations: &MigrationDirectories,
     mut shadow_db: MssqlFlavour,
     namespaces: Option<Namespaces>,
 ) -> ConnectorResult<SqlSchema> {

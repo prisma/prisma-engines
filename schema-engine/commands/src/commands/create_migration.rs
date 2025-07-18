@@ -28,7 +28,7 @@ pub async fn create_migration(
     let generated_migration_name = generate_migration_directory_name(&input.migration_name);
 
     // Infer the migration.
-    let previous_migrations = list_migrations(input.migrations_list.migration_directories.clone());
+    let migrations = MigrationDirectories::from_migration_list(&input.migrations_list);
     let sources: Vec<_> = input.schema.to_psl_input();
     let dialect = connector.schema_dialect();
     let filter: schema_connector::SchemaFilter = input.filters.into();
@@ -40,9 +40,7 @@ pub async fn create_migration(
         .get_or_insert(&input.migrations_list.migration_directories, || async {
             // We pass the namespaces here, because we want to describe all of the namespaces we know about from the "to" schema.
             let namespaces = dialect.extract_namespaces(&to);
-            connector
-                .schema_from_migrations(&previous_migrations, namespaces, &filter)
-                .await
+            connector.schema_from_migrations(&migrations, namespaces, &filter).await
         })
         .await?;
 

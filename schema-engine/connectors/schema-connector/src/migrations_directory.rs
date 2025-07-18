@@ -53,14 +53,28 @@ pub fn read_provider_from_lock_file(lockfile: &MigrationLockfile) -> Option<Stri
     })
 }
 
-/// Returns a list of migration directories from the filesystem, with extra functionality.
-pub fn list_migrations(
-    migrations_from_filesystem: Vec<json_rpc::types::MigrationDirectory>,
-) -> Vec<MigrationDirectory> {
-    migrations_from_filesystem
-        .into_iter()
-        .map(MigrationDirectory::new)
-        .collect()
+/// A list of migration directories with an optional init script that will be run on the shadow database before the migrations are applied.
+#[derive(Debug, Clone)]
+pub struct MigrationDirectories {
+    /// The list of migration directories.
+    pub migration_directories: Vec<MigrationDirectory>,
+    /// The init script that will be run on the shadow database before the migrations are applied.
+    pub shadow_db_init_script: Option<String>,
+}
+
+impl MigrationDirectories {
+    /// Create it from a migration list rpc input type.
+    pub fn from_migration_list(migration_list: &MigrationList) -> Self {
+        Self {
+            migration_directories: migration_list
+                .migration_directories
+                .clone()
+                .into_iter()
+                .map(MigrationDirectory::new)
+                .collect(),
+            shadow_db_init_script: migration_list.shadow_db_init_script.clone(),
+        }
+    }
 }
 
 /// Proxy to a directory containing one migration.

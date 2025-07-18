@@ -6,7 +6,7 @@ use quaint::connector::ExternalConnectorFactory;
 use schema_connector::{
     ConnectorError, ExternalShadowDatabase, MigrationRecord, Namespaces, PersistenceNotInitializedError,
     SchemaConnector,
-    migrations_directory::{MigrationDirectory, error_on_changed_provider, list_migrations},
+    migrations_directory::{MigrationDirectories, MigrationDirectory, error_on_changed_provider},
 };
 use serde::Serialize;
 
@@ -78,7 +78,7 @@ pub async fn diagnose_migration_history(
     tracing::debug!("Diagnosing migration history");
 
     error_on_changed_provider(&input.migrations_list.lockfile, connector.connector_type())?;
-    let migrations_from_filesystem = list_migrations(input.migrations_list.migration_directories);
+    let migrations_from_filesystem = MigrationDirectories::from_migration_list(&input.migrations_list);
 
     let (migrations_from_database, has_migrations_table) =
         match connector.migration_persistence().list_migrations().await? {
@@ -86,10 +86,10 @@ pub async fn diagnose_migration_history(
             Err(PersistenceNotInitializedError {}) => (vec![], false),
         };
 
-    let mut diagnostics = Diagnostics::new(&migrations_from_filesystem);
+    let mut diagnostics = Diagnostics::new(&migrations_from_filesystem.migration_directories);
 
     // Check filesystem history against database history.
-    for (index, fs_migration) in migrations_from_filesystem.iter().enumerate() {
+    for (index, fs_migration) in migrations_from_filesystem.migration_directories.iter().enumerate() {
         let corresponding_db_migration = migrations_from_database
             .iter()
             .find(|db_migration| db_migration.migration_name == fs_migration.migration_name());
@@ -109,6 +109,7 @@ pub async fn diagnose_migration_history(
 
     for (index, db_migration) in migrations_from_database.iter().enumerate() {
         let corresponding_fs_migration = migrations_from_filesystem
+            .migration_directories
             .iter()
             .find(|fs_migration| db_migration.migration_name == fs_migration.migration_name());
 
@@ -122,16 +123,20 @@ pub async fn diagnose_migration_history(
     }
 
     // Detect drift
-    let applied_migrations: Vec<_> = migrations_from_filesystem
-        .iter()
-        .filter(|fs_migration| {
-            migrations_from_database
-                .iter()
-                .filter(|db_migration| db_migration.finished_at.is_some() && db_migration.rolled_back_at.is_none())
-                .any(|db_migration| db_migration.migration_name == fs_migration.migration_name())
-        })
-        .cloned()
-        .collect();
+    let applied_migrations = MigrationDirectories {
+        migration_directories: migrations_from_filesystem
+            .migration_directories
+            .iter()
+            .filter(|fs_migration| {
+                migrations_from_database
+                    .iter()
+                    .filter(|db_migration| db_migration.finished_at.is_some() && db_migration.rolled_back_at.is_none())
+                    .any(|db_migration| db_migration.migration_name == fs_migration.migration_name())
+            })
+            .cloned()
+            .collect(),
+        shadow_db_init_script: input.migrations_list.shadow_db_init_script.clone(),
+    };
 
     let (drift, error_in_unapplied_migration) = {
         let filter: schema_connector::SchemaFilter = input.filters.into();
@@ -139,7 +144,7 @@ pub async fn diagnose_migration_history(
             let mut dialect = connector.schema_dialect();
             let target = ExternalShadowDatabase::DriverAdapter(adapter_factory);
             let from = migration_schema_cache
-                .get_or_insert(&applied_migrations, || async {
+                .get_or_insert(&applied_migrations.migration_directories, || async {
                     connector
                         .schema_dialect()
                         .schema_from_migrations_with_target(

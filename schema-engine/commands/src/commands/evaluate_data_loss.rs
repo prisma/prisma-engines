@@ -14,8 +14,7 @@ pub async fn evaluate_data_loss(
     error_on_changed_provider(&input.migrations_list.lockfile, connector.connector_type())?;
     let sources: Vec<_> = input.schema.to_psl_input();
 
-    let migrations_from_directory = list_migrations(input.migrations_list.migration_directories.clone());
-
+    let migrations = MigrationDirectories::from_migration_list(&input.migrations_list);
     let dialect = connector.schema_dialect();
     let filter: schema_connector::SchemaFilter = input.filters.into();
 
@@ -26,9 +25,7 @@ pub async fn evaluate_data_loss(
             // We only consider the namespaces present in the "to" schema aka the PSL file for the introspection of the "from" schema.
             // So when the user removes a previously existing namespace from their PSL file we will not introspect that namespace in the database.
             let namespaces = dialect.extract_namespaces(&to);
-            connector
-                .schema_from_migrations(&migrations_from_directory, namespaces, &filter)
-                .await
+            connector.schema_from_migrations(&migrations, namespaces, &filter).await
         })
         .await?;
 
