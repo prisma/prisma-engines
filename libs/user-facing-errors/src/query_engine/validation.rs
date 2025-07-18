@@ -514,7 +514,7 @@ impl OutputTypeDescriptionField {
     }
 }
 #[derive(Debug, Serialize, Clone)]
-#[serde(tag = "kind", rename_all = "camelCase")]
+#[serde(tag = "kind", rename_all = "camelCase", rename_all_fields = "camelCase")]
 pub enum InputTypeDescription {
     Object {
         name: String,
