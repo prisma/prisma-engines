@@ -2,9 +2,10 @@ use crate::flavour::postgres::{MigratePostgresUrl, PpgParams, sql_schema_from_mi
 use crate::flavour::{PostgresConnector, SqlConnector, UsingExternalShadowDb};
 use psl::PreviewFeatures;
 use quaint::connector::is_url_localhost;
-use schema_connector::{ConnectorError, ConnectorParams, Namespaces, SchemaFilter};
-use schema_connector::{ConnectorResult, migrations_directory::MigrationDirectory};
-use schema_connector::{ConnectorResult, migrations_directory::MigrationDirectory};
+use schema_connector::{
+    ConnectorError, ConnectorParams, ConnectorResult, Namespaces, SchemaFilter,
+    migrations_directory::MigrationDirectories,
+};
 use sql_schema_describer::SqlSchema;
 use url::Url;
 

@@ -6,7 +6,7 @@
 //! - A migration script
 
 use crate::{ConnectorError, ConnectorResult, checksum};
-use json_rpc::types::MigrationLockfile;
+use json_rpc::types::{MigrationList, MigrationLockfile};
 use std::{borrow::Borrow, error::Error, fmt::Display};
 use tracing_error::SpanTrace;
 use user_facing_errors::schema_engine::ProviderSwitchedError;

@@ -1,9 +1,9 @@
 use crate::flavour::postgres::{
     PostgresConnector, PostgresProvider, UsingExternalShadowDb, sql_schema_from_migrations_and_db,
 };
-use schema_connector::{ConnectorError, Namespaces};
-use schema_connector::{ConnectorResult, SchemaFilter, migrations_directory::MigrationDirectories};
-use schema_connector::{ConnectorResult, SchemaFilter, migrations_directory::MigrationDirectory};
+use schema_connector::{
+    ConnectorError, ConnectorResult, Namespaces, SchemaFilter, migrations_directory::MigrationDirectories,
+};
 use sql_schema_describer::SqlSchema;
 
 pub async fn sql_schema_from_migration_history(
