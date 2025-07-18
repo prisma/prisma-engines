@@ -17,7 +17,7 @@ fn schema_filter_migration_adding_external_table(api: TestApi) {
     let filter = SchemaFilter {
         external_tables: vec!["ExternalTable".to_string()],
     };
-    api.create_migration_with_filter("custom", &schema, &dir, filter)
+    api.create_migration_with_filter("custom", &schema, &dir, filter, None)
         .send_sync()
         .assert_migration_directories_count(0);
 }
@@ -43,7 +43,7 @@ fn schema_filter_migration_removing_external_table(mut api: TestApi) {
     let filter = SchemaFilter {
         external_tables: vec!["ExternalTable".to_string()],
     };
-    api.create_migration_with_filter("remove", &schema_2, &dir, filter)
+    api.create_migration_with_filter("remove", &schema_2, &dir, filter, None)
         .send_sync()
         .assert_migration_directories_count(1);
 }
@@ -105,7 +105,7 @@ fn schema_filter_migration_modifying_external_table(mut api: TestApi) {
     let filter = SchemaFilter {
         external_tables: vec!["ExternalTable".to_string()],
     };
-    api.create_migration_with_filter("modify", &schema_2, &dir, filter)
+    api.create_migration_with_filter("modify", &schema_2, &dir, filter, None)
         .send_sync()
         .assert_migration_directories_count(1);
 }
@@ -153,7 +153,7 @@ fn schema_filter_migration_adding_external_tables_incl_relations(api: TestApi) {
     let filter = SchemaFilter {
         external_tables: vec!["ExternalTableA".to_string(), "ExternalTableB".to_string()],
     };
-    api.create_migration_with_filter("custom", &schema, &dir, filter)
+    api.create_migration_with_filter("custom", &schema, &dir, filter, None)
         .send_sync()
         .assert_migration_directories_count(1)
         .assert_migration("custom", move |migration| {
@@ -284,7 +284,7 @@ fn schema_filter_migration_removing_external_tables_incl_relations(mut api: Test
     let filter = SchemaFilter {
         external_tables: vec!["ExternalTableA".to_string(), "ExternalTableB".to_string()],
     };
-    api.create_migration_with_filter("remove", &schema_2, &dir, filter)
+    api.create_migration_with_filter("remove", &schema_2, &dir, filter, None)
         .send_sync()
         .assert_migration_directories_count(2)
         .assert_migration("remove", move |migration| {
@@ -437,7 +437,7 @@ fn schema_filter_migration_modifying_external_tables_incl_relations(mut api: Tes
     let filter = SchemaFilter {
         external_tables: vec!["ExternalTableA".to_string(), "ExternalTableB".to_string()],
     };
-    api.create_migration_with_filter("modify", &schema_2, &dir, filter)
+    api.create_migration_with_filter("modify", &schema_2, &dir, filter, None)
         .send_sync()
         .assert_migration_directories_count(2)
         .assert_migration("modify", move |migration| {
@@ -507,6 +507,122 @@ fn schema_filter_migration_modifying_external_tables_incl_relations(mut api: Tes
         });
 }
 
+#[test_connector(exclude(CockroachDb, Vitess))]
+fn schema_filter_leveraging_init_script(api: TestApi) {
+    // Creating the external table through the init script so it exists in the shadow db.
+    // Therefore it can be referenced with a foreign key constraint from the Cat model without being created by a Prisma migration itself.
+    let init_script = if api.is_mssql() {
+        r#"CREATE TABLE [external] (id INT);"#
+    } else {
+        r#"CREATE TABLE external (id INT);"#
+    };
+
+    let schema = api.datamodel_with_provider(
+        r#"
+        model Cat {
+            id      Int @id
+            name    String
+            externalTable external? @relation(fields: [externalTableId], references: [id])
+            externalTableId Int?
+        }
+
+        model external {
+            id      Int @id
+            cats    Cat[]
+        }
+    "#,
+    );
+
+    let dir = api.create_migrations_directory();
+
+    let is_postgres = api.is_postgres();
+    let is_mysql = api.is_mysql();
+    let is_sqlite = api.is_sqlite();
+    let is_mssql = api.is_mssql();
+
+    let filter = SchemaFilter {
+        external_tables: vec!["external".to_string()],
+    };
+    api.create_migration_with_filter("custom", &schema, &dir, filter, Some(init_script))
+        .send_sync()
+        .assert_migration_directories_count(1)
+        .assert_migration("custom", move |migration| {
+            // migration contains only add foreign key statements on the non external table
+            let expected_script = if is_postgres {
+                expect![[r#"
+                    -- CreateTable
+                    CREATE TABLE "Cat" (
+                        "id" INTEGER NOT NULL,
+                        "name" TEXT NOT NULL,
+                        "externalTableId" INTEGER,
+
+                        CONSTRAINT "Cat_pkey" PRIMARY KEY ("id")
+                    );
+
+                    -- AddForeignKey
+                    ALTER TABLE "Cat" ADD CONSTRAINT "Cat_externalTableId_fkey" FOREIGN KEY ("externalTableId") REFERENCES "external"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+                "#]]
+            } else if is_mysql {
+                expect![[r#"
+                    -- CreateTable
+                    CREATE TABLE `Cat` (
+                        `id` INTEGER NOT NULL,
+                        `name` VARCHAR(191) NOT NULL,
+                        `externalTableId` INTEGER NULL,
+
+                        PRIMARY KEY (`id`)
+                    ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+                    -- AddForeignKey
+                    ALTER TABLE `Cat` ADD CONSTRAINT `Cat_externalTableId_fkey` FOREIGN KEY (`externalTableId`) REFERENCES `external`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+                "#]]
+            } else if is_sqlite {
+                expect![[r#"
+                    -- CreateTable
+                    CREATE TABLE "Cat" (
+                        "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+                        "name" TEXT NOT NULL,
+                        "externalTableId" INTEGER,
+                        CONSTRAINT "Cat_externalTableId_fkey" FOREIGN KEY ("externalTableId") REFERENCES "external" ("id") ON DELETE SET NULL ON UPDATE CASCADE
+                    );
+                "#]]
+            } else if is_mssql {
+                expect![[r#"
+                    BEGIN TRY
+
+                    BEGIN TRAN;
+
+                    -- CreateTable
+                    CREATE TABLE [dbo].[Cat] (
+                        [id] INT NOT NULL,
+                        [name] NVARCHAR(1000) NOT NULL,
+                        [externalTableId] INT,
+                        CONSTRAINT [Cat_pkey] PRIMARY KEY CLUSTERED ([id])
+                    );
+
+                    -- AddForeignKey
+                    ALTER TABLE [dbo].[Cat] ADD CONSTRAINT [Cat_externalTableId_fkey] FOREIGN KEY ([externalTableId]) REFERENCES [dbo].[external]([id]) ON DELETE SET NULL ON UPDATE CASCADE;
+
+                    COMMIT TRAN;
+
+                    END TRY
+                    BEGIN CATCH
+
+                    IF @@TRANCOUNT > 0
+                    BEGIN
+                        ROLLBACK TRAN;
+                    END;
+                    THROW
+
+                    END CATCH
+                "#]]
+            } else {
+                unreachable!()
+            };
+            migration.expect_contents(expected_script)
+        });
+}
+
 #[test_connector(tags(Postgres, Mssql), exclude(CockroachDb))]
 fn schema_filter_migration_multi_schema(api: TestApi) {
     let schema = api.datamodel_with_provider_and_features(
@@ -537,7 +653,7 @@ fn schema_filter_migration_multi_schema(api: TestApi) {
     let filter = SchemaFilter {
         external_tables: vec!["two.ExternalTable".to_string()],
     };
-    api.create_migration_with_filter("custom", &schema, &dir, filter)
+    api.create_migration_with_filter("custom", &schema, &dir, filter, None)
         .send_sync()
         .assert_migration_directories_count(1)
         .assert_migration("custom", move |migration| {
