@@ -67,7 +67,7 @@ pub fn extract_query_args(
         },
     )?;
 
-    Ok(finalize_arguments(query_args, model))
+    finalize_arguments(query_args, model)
 }
 
 /// Extracts order by conditions in order of appearance.
@@ -336,7 +336,7 @@ fn extract_compound_cursor_field(
 }
 
 /// Runs final transformations on the QueryArguments.
-fn finalize_arguments(mut args: QueryArguments, model: &Model) -> QueryArguments {
+fn finalize_arguments(mut args: QueryArguments, model: &Model) -> QueryGraphBuilderResult<QueryArguments> {
     // Check if the query requires an implicit ordering added to the arguments.
     // An implicit ordering is convenient for deterministic results for take and skip, for cursor it's _required_
     // as a cursor needs a direction to page. We simply take the primary identifier as a default order-by.
@@ -345,6 +345,12 @@ fn finalize_arguments(mut args: QueryArguments, model: &Model) -> QueryArguments
             && args.order_by.is_empty();
 
     if add_implicit_ordering {
+        if model.is_view() {
+            return Err(QueryGraphBuilderError::InputError(
+                "`orderBy` definition must not be empty when querying views".into(),
+            ));
+        }
+
         let primary_identifier = model.primary_identifier();
         let order_bys = primary_identifier.into_iter().map(|f| match f {
             // IDs can _only_ contain scalar selections.
@@ -355,5 +361,5 @@ fn finalize_arguments(mut args: QueryArguments, model: &Model) -> QueryArguments
         args.order_by.extend(order_bys);
     }
 
-    args
+    Ok(args)
 }

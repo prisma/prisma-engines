@@ -151,21 +151,38 @@ pub(crate) fn order_by_argument(
     .optional()
 }
 
+pub(crate) fn take_argument<'a>(model: &Model) -> InputField<'a> {
+    pagination_argument(args::TAKE, model)
+}
+
+pub(crate) fn skip_argument<'a>(model: &Model) -> InputField<'a> {
+    pagination_argument(args::SKIP, model)
+}
+
+fn pagination_argument<'a>(arg: &'static str, model: &Model) -> InputField<'a> {
+    let arg = input_field(arg, vec![InputType::int()], None).optional();
+    if model.is_view() {
+        arg.with_requires_other_fields([args::ORDER_BY])
+    } else {
+        arg
+    }
+}
+
 pub(crate) fn group_by_arguments(ctx: &QuerySchema, model: Model) -> Vec<InputField<'_>> {
     let field_enum_type = InputType::Enum(model_field_enum(&model));
     let filter_object = InputType::object(filter_objects::scalar_filter_object_type(ctx, model.clone(), true));
 
     vec![
         where_argument(ctx, &model),
-        order_by_argument(ctx, model.into(), OrderByOptions::new().with_aggregates()),
+        order_by_argument(ctx, model.clone().into(), OrderByOptions::new().with_aggregates()),
         input_field(
             args::BY,
             vec![InputType::list(field_enum_type.clone()), field_enum_type],
             None,
         ),
         input_field(args::HAVING, vec![filter_object], None).optional(),
-        input_field(args::TAKE, vec![InputType::int()], None).optional(),
-        input_field(args::SKIP, vec![InputType::int()], None).optional(),
+        take_argument(&model),
+        skip_argument(&model),
     ]
 }
 
@@ -215,10 +232,7 @@ impl<'a> ManyRecordsSelectionArgumentsBuilder<'a> {
                 InputType::object(filter_objects::where_unique_object_type(self.ctx, self.model.clone()));
             input_field(args::CURSOR, vec![unique_input_type], None).optional()
         }))
-        .chain([
-            input_field(args::TAKE, vec![InputType::int()], None).optional(),
-            input_field(args::SKIP, vec![InputType::int()], None).optional(),
-        ])
+        .chain([take_argument(&self.model), skip_argument(&self.model)])
         .chain(self.include_distinct.then(|| {
             let input_types = list_union_type(InputType::Enum(model_field_enum(&self.model)), true);
             input_field(args::DISTINCT, input_types, None).optional()
