@@ -6,8 +6,8 @@ pub async fn sql_schema_from_migrations_history(
     migrations: &MigrationDirectories,
     shadow_db: &mut MysqlConnector,
 ) -> ConnectorResult<SqlSchema> {
-    if let Some(init_script) = &migrations.shadow_db_init_script {
-        shadow_db.raw_cmd(init_script).await?;
+    if !migrations.shadow_db_init_script.trim().is_empty() {
+        shadow_db.raw_cmd(&migrations.shadow_db_init_script).await?;
     }
 
     for migration in migrations.migration_directories.iter() {

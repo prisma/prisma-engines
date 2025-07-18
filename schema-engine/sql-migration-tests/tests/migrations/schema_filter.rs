@@ -17,7 +17,7 @@ fn schema_filter_migration_adding_external_table(api: TestApi) {
     let filter = SchemaFilter {
         external_tables: vec!["ExternalTable".to_string()],
     };
-    api.create_migration_with_filter("custom", &schema, &dir, filter, None)
+    api.create_migration_with_filter("custom", &schema, &dir, filter, "")
         .send_sync()
         .assert_migration_directories_count(0);
 }
@@ -43,7 +43,7 @@ fn schema_filter_migration_removing_external_table(mut api: TestApi) {
     let filter = SchemaFilter {
         external_tables: vec!["ExternalTable".to_string()],
     };
-    api.create_migration_with_filter("remove", &schema_2, &dir, filter, None)
+    api.create_migration_with_filter("remove", &schema_2, &dir, filter, "")
         .send_sync()
         .assert_migration_directories_count(1);
 }
@@ -105,7 +105,7 @@ fn schema_filter_migration_modifying_external_table(mut api: TestApi) {
     let filter = SchemaFilter {
         external_tables: vec!["ExternalTable".to_string()],
     };
-    api.create_migration_with_filter("modify", &schema_2, &dir, filter, None)
+    api.create_migration_with_filter("modify", &schema_2, &dir, filter, "")
         .send_sync()
         .assert_migration_directories_count(1);
 }
@@ -153,7 +153,7 @@ fn schema_filter_migration_adding_external_tables_incl_relations(api: TestApi) {
     let filter = SchemaFilter {
         external_tables: vec!["ExternalTableA".to_string(), "ExternalTableB".to_string()],
     };
-    api.create_migration_with_filter("custom", &schema, &dir, filter, None)
+    api.create_migration_with_filter("custom", &schema, &dir, filter, "")
         .send_sync()
         .assert_migration_directories_count(1)
         .assert_migration("custom", move |migration| {
@@ -284,7 +284,7 @@ fn schema_filter_migration_removing_external_tables_incl_relations(mut api: Test
     let filter = SchemaFilter {
         external_tables: vec!["ExternalTableA".to_string(), "ExternalTableB".to_string()],
     };
-    api.create_migration_with_filter("remove", &schema_2, &dir, filter, None)
+    api.create_migration_with_filter("remove", &schema_2, &dir, filter, "")
         .send_sync()
         .assert_migration_directories_count(2)
         .assert_migration("remove", move |migration| {
@@ -437,7 +437,7 @@ fn schema_filter_migration_modifying_external_tables_incl_relations(mut api: Tes
     let filter = SchemaFilter {
         external_tables: vec!["ExternalTableA".to_string(), "ExternalTableB".to_string()],
     };
-    api.create_migration_with_filter("modify", &schema_2, &dir, filter, None)
+    api.create_migration_with_filter("modify", &schema_2, &dir, filter, "")
         .send_sync()
         .assert_migration_directories_count(2)
         .assert_migration("modify", move |migration| {
@@ -543,7 +543,7 @@ fn schema_filter_leveraging_init_script(api: TestApi) {
     let filter = SchemaFilter {
         external_tables: vec!["external".to_string()],
     };
-    api.create_migration_with_filter("custom", &schema, &dir, filter, Some(init_script))
+    api.create_migration_with_filter("custom", &schema, &dir, filter, init_script)
         .send_sync()
         .assert_migration_directories_count(1)
         .assert_migration("custom", move |migration| {
@@ -653,7 +653,7 @@ fn schema_filter_migration_multi_schema(api: TestApi) {
     let filter = SchemaFilter {
         external_tables: vec!["two.ExternalTable".to_string()],
     };
-    api.create_migration_with_filter("custom", &schema, &dir, filter, None)
+    api.create_migration_with_filter("custom", &schema, &dir, filter, "")
         .send_sync()
         .assert_migration_directories_count(1)
         .assert_migration("custom", move |migration| {

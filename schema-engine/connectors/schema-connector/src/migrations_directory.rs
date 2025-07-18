@@ -59,7 +59,7 @@ pub struct MigrationDirectories {
     /// The list of migration directories.
     pub migration_directories: Vec<MigrationDirectory>,
     /// The init script that will be run on the shadow database before the migrations are applied.
-    pub shadow_db_init_script: Option<String>,
+    pub shadow_db_init_script: String,
 }
 
 impl MigrationDirectories {

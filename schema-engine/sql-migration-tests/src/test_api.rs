@@ -111,7 +111,7 @@ impl TestApi {
             &[("schema.prisma", schema)],
             migrations_directory,
             SchemaFilter::default(),
-            None,
+            "",
         )
     }
 
@@ -121,7 +121,7 @@ impl TestApi {
         schema: &'a str,
         migrations_directory: &'a TempDir,
         filter: SchemaFilter,
-        init_script: Option<&'a str>,
+        init_script: &'a str,
     ) -> CreateMigration<'a> {
         CreateMigration::new(
             &mut self.connector,
@@ -145,7 +145,7 @@ impl TestApi {
             files,
             migrations_directory,
             SchemaFilter::default(),
-            None,
+            "",
         )
     }
 

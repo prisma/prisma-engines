@@ -15,7 +15,7 @@ pub struct CreateMigration<'a> {
     draft: bool,
     name: &'a str,
     filter: SchemaFilter,
-    init_script: Option<&'a str>,
+    init_script: &'a str,
 }
 
 /// The file name for migration scripts, not including the file extension.
@@ -97,7 +97,7 @@ impl<'a> CreateMigration<'a> {
         files: &[(&'a str, &'a str)],
         migrations_directory: &'a TempDir,
         filter: SchemaFilter,
-        init_script: Option<&'a str>,
+        init_script: &'a str,
     ) -> Self {
         CreateMigration {
             api,
@@ -124,7 +124,7 @@ impl<'a> CreateMigration<'a> {
 
     pub async fn send(self) -> CoreResult<CreateMigrationAssertion<'a>> {
         let mut migrations_list = utils::list_migrations(self.migrations_directory.path()).unwrap();
-        migrations_list.shadow_db_init_script = self.init_script.map(|s| s.to_string());
+        migrations_list.shadow_db_init_script = self.init_script.to_string();
         let migration_name = self.name.to_owned();
         let mut migration_schema_cache = Default::default();
         let output = create_migration(

@@ -682,8 +682,8 @@ async fn sql_schema_from_migrations_and_db(
         conn.raw_cmd("BEGIN;").await.map_err(imp::quaint_error_mapper(params))?;
     }
 
-    if let Some(init_script) = &migrations.shadow_db_init_script {
-        conn.raw_cmd(init_script)
+    if !migrations.shadow_db_init_script.trim().is_empty() {
+        conn.raw_cmd(&migrations.shadow_db_init_script)
             .await
             .map_err(imp::quaint_error_mapper(params))?;
     }

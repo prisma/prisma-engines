@@ -369,8 +369,8 @@ impl SqlConnector for SqliteConnector {
             connection: &imp::Connection,
             migrations: &MigrationDirectories,
         ) -> ConnectorResult<SqlSchema> {
-            if let Some(init_script) = &migrations.shadow_db_init_script {
-                connection.raw_cmd(init_script).await?;
+            if !migrations.shadow_db_init_script.trim().is_empty() {
+                connection.raw_cmd(&migrations.shadow_db_init_script).await?;
             }
 
             for migration in migrations.migration_directories.iter() {
