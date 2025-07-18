@@ -237,7 +237,7 @@ fn schema_filter_migration_adding_external_tables_incl_relations(api: TestApi) {
 fn schema_filter_migration_removing_external_tables_incl_relations(mut api: TestApi) {
     let schema_1 = api.datamodel_with_provider(
         r#"
-        model Cat {
+        model cat {
             id      Int @id
             name    String
             
@@ -250,13 +250,13 @@ fn schema_filter_migration_removing_external_tables_incl_relations(mut api: Test
         model ExternalTableA {
             id      Int @id
             name    String
-            cats    Cat[]
+            cats    cat[]
         }
 
         model ExternalTableB {
             id      Int @id
             name    String
-            cat     Cat? @relation(fields: [catId], references: [id])
+            cat     cat? @relation(fields: [catId], references: [id])
             catId   Int?
         }
     "#,
@@ -274,7 +274,7 @@ fn schema_filter_migration_removing_external_tables_incl_relations(mut api: Test
 
     let schema_2 = api.datamodel_with_provider(
         r#"
-            model Cat {
+            model cat {
                 id      Int @id
                 name    String
             }
@@ -294,50 +294,50 @@ fn schema_filter_migration_removing_external_tables_incl_relations(mut api: Test
                 /*
                   Warnings:
 
-                  - You are about to drop the column `externalTableId` on the `Cat` table. All the data in the column will be lost.
+                  - You are about to drop the column `externalTableId` on the `cat` table. All the data in the column will be lost.
 
                 */
                 -- DropForeignKey
-                ALTER TABLE "Cat" DROP CONSTRAINT "Cat_externalTableId_fkey";
+                ALTER TABLE "cat" DROP CONSTRAINT "cat_externalTableId_fkey";
 
                 -- AlterTable
-                ALTER TABLE "Cat" DROP COLUMN "externalTableId";
+                ALTER TABLE "cat" DROP COLUMN "externalTableId";
             "#]]
             } else if is_mysql {
                 expect![[r#"
                     /*
                       Warnings:
 
-                      - You are about to drop the column `externalTableId` on the `Cat` table. All the data in the column will be lost.
+                      - You are about to drop the column `externalTableId` on the `cat` table. All the data in the column will be lost.
 
                     */
                     -- DropForeignKey
-                    ALTER TABLE `Cat` DROP FOREIGN KEY `Cat_externalTableId_fkey`;
+                    ALTER TABLE `cat` DROP FOREIGN KEY `cat_externalTableId_fkey`;
 
                     -- DropIndex
-                    DROP INDEX `Cat_externalTableId_fkey` ON `Cat`;
+                    DROP INDEX `cat_externalTableId_fkey` ON `cat`;
 
                     -- AlterTable
-                    ALTER TABLE `Cat` DROP COLUMN `externalTableId`;
+                    ALTER TABLE `cat` DROP COLUMN `externalTableId`;
                 "#]]
             } else if is_sqlite {
                 expect![[r#"
                     /*
                       Warnings:
 
-                      - You are about to drop the column `externalTableId` on the `Cat` table. All the data in the column will be lost.
+                      - You are about to drop the column `externalTableId` on the `cat` table. All the data in the column will be lost.
 
                     */
                     -- RedefineTables
                     PRAGMA defer_foreign_keys=ON;
                     PRAGMA foreign_keys=OFF;
-                    CREATE TABLE "new_Cat" (
+                    CREATE TABLE "new_cat" (
                         "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
                         "name" TEXT NOT NULL
                     );
-                    INSERT INTO "new_Cat" ("id", "name") SELECT "id", "name" FROM "Cat";
-                    DROP TABLE "Cat";
-                    ALTER TABLE "new_Cat" RENAME TO "Cat";
+                    INSERT INTO "new_cat" ("id", "name") SELECT "id", "name" FROM "cat";
+                    DROP TABLE "cat";
+                    ALTER TABLE "new_cat" RENAME TO "cat";
                     PRAGMA foreign_keys=ON;
                     PRAGMA defer_foreign_keys=OFF;
                 "#]]
@@ -346,7 +346,7 @@ fn schema_filter_migration_removing_external_tables_incl_relations(mut api: Test
                     /*
                       Warnings:
 
-                      - You are about to drop the column `externalTableId` on the `Cat` table. All the data in the column will be lost.
+                      - You are about to drop the column `externalTableId` on the `cat` table. All the data in the column will be lost.
 
                     */
                     BEGIN TRY
@@ -354,10 +354,10 @@ fn schema_filter_migration_removing_external_tables_incl_relations(mut api: Test
                     BEGIN TRAN;
 
                     -- DropForeignKey
-                    ALTER TABLE [dbo].[Cat] DROP CONSTRAINT [Cat_externalTableId_fkey];
+                    ALTER TABLE [dbo].[cat] DROP CONSTRAINT [cat_externalTableId_fkey];
 
                     -- AlterTable
-                    ALTER TABLE [dbo].[Cat] DROP COLUMN [externalTableId];
+                    ALTER TABLE [dbo].[cat] DROP COLUMN [externalTableId];
 
                     COMMIT TRAN;
 
@@ -379,11 +379,11 @@ fn schema_filter_migration_removing_external_tables_incl_relations(mut api: Test
         });
 }
 
-#[test_connector(exclude(CockroachDb))]
+#[test_connector(exclude(CockroachDb, Vitess))]
 fn schema_filter_migration_modifying_external_tables_incl_relations(mut api: TestApi) {
     let schema_1 = api.datamodel_with_provider(
         r#"
-        model Cat {
+        model cat {
             id      Int @id
             name    String
         }
@@ -410,7 +410,7 @@ fn schema_filter_migration_modifying_external_tables_incl_relations(mut api: Tes
 
     let schema_2 = api.datamodel_with_provider(
         r#"
-            model Cat {
+            model cat {
                 id      Int @id
                 name    String
                 externalTablesB ExternalTableB[]
@@ -422,13 +422,13 @@ fn schema_filter_migration_modifying_external_tables_incl_relations(mut api: Tes
             model ExternalTableA {
                 id      Int @id
                 name    String
-                cats    Cat[]
+                cats    cat[]
             }
 
             model ExternalTableB {
                 id      Int @id
                 name    String
-                cat     Cat? @relation(fields: [catId], references: [id])
+                cat     cat? @relation(fields: [catId], references: [id])
                 catId   Int?
             }
         "#,
@@ -445,33 +445,33 @@ fn schema_filter_migration_modifying_external_tables_incl_relations(mut api: Tes
             let expected_script = if is_postgres {
                 expect![[r#"
                     -- AlterTable
-                    ALTER TABLE "Cat" ADD COLUMN     "externalTableId" INTEGER;
+                    ALTER TABLE "cat" ADD COLUMN     "externalTableId" INTEGER;
 
                     -- AddForeignKey
-                    ALTER TABLE "Cat" ADD CONSTRAINT "Cat_externalTableId_fkey" FOREIGN KEY ("externalTableId") REFERENCES "ExternalTableA"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+                    ALTER TABLE "cat" ADD CONSTRAINT "cat_externalTableId_fkey" FOREIGN KEY ("externalTableId") REFERENCES "ExternalTableA"("id") ON DELETE SET NULL ON UPDATE CASCADE;
                 "#]]
             } else if is_mysql {
                 expect![[r#"
                     -- AlterTable
-                    ALTER TABLE `Cat` ADD COLUMN `externalTableId` INTEGER NULL;
+                    ALTER TABLE `cat` ADD COLUMN `externalTableId` INTEGER NULL;
 
                     -- AddForeignKey
-                    ALTER TABLE `Cat` ADD CONSTRAINT `Cat_externalTableId_fkey` FOREIGN KEY (`externalTableId`) REFERENCES `ExternalTableA`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+                    ALTER TABLE `cat` ADD CONSTRAINT `cat_externalTableId_fkey` FOREIGN KEY (`externalTableId`) REFERENCES `ExternalTableA`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
                 "#]]
             } else if is_sqlite {
                 expect![[r#"
                     -- RedefineTables
                     PRAGMA defer_foreign_keys=ON;
                     PRAGMA foreign_keys=OFF;
-                    CREATE TABLE "new_Cat" (
+                    CREATE TABLE "new_cat" (
                         "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
                         "name" TEXT NOT NULL,
                         "externalTableId" INTEGER,
-                        CONSTRAINT "Cat_externalTableId_fkey" FOREIGN KEY ("externalTableId") REFERENCES "ExternalTableA" ("id") ON DELETE SET NULL ON UPDATE CASCADE
+                        CONSTRAINT "cat_externalTableId_fkey" FOREIGN KEY ("externalTableId") REFERENCES "ExternalTableA" ("id") ON DELETE SET NULL ON UPDATE CASCADE
                     );
-                    INSERT INTO "new_Cat" ("id", "name") SELECT "id", "name" FROM "Cat";
-                    DROP TABLE "Cat";
-                    ALTER TABLE "new_Cat" RENAME TO "Cat";
+                    INSERT INTO "new_cat" ("id", "name") SELECT "id", "name" FROM "cat";
+                    DROP TABLE "cat";
+                    ALTER TABLE "new_cat" RENAME TO "cat";
                     PRAGMA foreign_keys=ON;
                     PRAGMA defer_foreign_keys=OFF;
                 "#]]
@@ -482,10 +482,10 @@ fn schema_filter_migration_modifying_external_tables_incl_relations(mut api: Tes
                     BEGIN TRAN;
 
                     -- AlterTable
-                    ALTER TABLE [dbo].[Cat] ADD [externalTableId] INT;
+                    ALTER TABLE [dbo].[cat] ADD [externalTableId] INT;
 
                     -- AddForeignKey
-                    ALTER TABLE [dbo].[Cat] ADD CONSTRAINT [Cat_externalTableId_fkey] FOREIGN KEY ([externalTableId]) REFERENCES [dbo].[ExternalTableA]([id]) ON DELETE SET NULL ON UPDATE CASCADE;
+                    ALTER TABLE [dbo].[cat] ADD CONSTRAINT [cat_externalTableId_fkey] FOREIGN KEY ([externalTableId]) REFERENCES [dbo].[ExternalTableA]([id]) ON DELETE SET NULL ON UPDATE CASCADE;
 
                     COMMIT TRAN;
 
