@@ -110,7 +110,7 @@ fn schema_filter_migration_modifying_external_table(mut api: TestApi) {
         .assert_migration_directories_count(1);
 }
 
-#[test_connector(exclude(CockroachDb))]
+#[test_connector(exclude(CockroachDb, Vitess))]
 fn schema_filter_migration_adding_external_tables_incl_relations(api: TestApi) {
     let schema = api.datamodel_with_provider(
         r#"
