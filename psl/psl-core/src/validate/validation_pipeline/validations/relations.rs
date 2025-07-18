@@ -233,7 +233,7 @@ pub(super) fn cycles(relation: CompleteInlineRelationWalker<'_>, ctx: &mut Conte
     if !ctx.has_capability(ConnectorCapability::ReferenceCycleDetection)
         && ctx
             .datasource
-            .map(|ds| ds.relation_mode().uses_foreign_keys())
+            .map(|ds| ds.relation_mode().should_skip_emulated_referential_integrity())
             .unwrap_or(true)
     {
         return;
