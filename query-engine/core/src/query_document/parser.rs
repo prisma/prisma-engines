@@ -226,8 +226,6 @@ impl QueryDocumentParser {
                     ))),
                 }
             })
-            .collect::<Vec<QueryParserResult<ParsedArgument<'_>>>>()
-            .into_iter()
             .collect()
     }
 
