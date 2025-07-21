@@ -5,8 +5,6 @@ use query_engine_tests::*;
 // On D1, the migration setup fails because Schema Engine doesn't know anything about Driver Adapters.
 #[test_suite(schema(schema), exclude(MongoDb, MySQL("mariadb"), Vitess, Sqlite("cfd1")))]
 mod views {
-    use query_engine_tests::{Runner, connector_test, run_query};
-
     fn schema() -> String {
         let schema = indoc! {
             r#"model TestModel {
@@ -98,6 +96,192 @@ mod views {
             r#"{ findUniqueTestViewOrThrow(where: { id: 1 }) { fullName } }"#,
         )
         .await
+    }
+
+    #[connector_test]
+    async fn take_with_order_by(runner: Runner) -> TestResult<()> {
+        create_test_data(&runner, "take_with_order_by").await?;
+
+        insta::assert_snapshot!(
+            run_query!(runner, r#"{ findManyTestView(take: 2, orderBy: { fullName: asc }) { id fullName } }"#),
+            @r###"{"data":{"findManyTestView":[{"id":3,"fullName":"Bob Maurane"},{"id":2,"fullName":"Jane Doe"}]}}"###
+        );
+
+        Ok(())
+    }
+
+    #[connector_test]
+    async fn take_without_order_by(runner: Runner) -> TestResult<()> {
+        create_test_data(&runner, "take_without_order_by").await?;
+
+        assert_error!(
+            runner,
+            r#"{ findManyTestView(take: 2) { id fullName } }"#,
+            2012,
+            "`orderBy`: A value is required but not set. It is required because `take` was provided."
+        );
+
+        Ok(())
+    }
+
+    #[connector_test]
+    async fn skip_with_order_by(runner: Runner) -> TestResult<()> {
+        create_test_data(&runner, "skip_with_order_by").await?;
+
+        insta::assert_snapshot!(
+            run_query!(runner, r#"{ findManyTestView(skip: 1, orderBy: { fullName: desc }) { id fullName } }"#),
+            @r###"{"data":{"findManyTestView":[{"id":2,"fullName":"Jane Doe"},{"id":3,"fullName":"Bob Maurane"}]}}"###
+        );
+
+        Ok(())
+    }
+
+    #[connector_test]
+    async fn skip_without_order_by(runner: Runner) -> TestResult<()> {
+        create_test_data(&runner, "skip_without_order_by").await?;
+
+        assert_error!(
+            runner,
+            r#"{ findManyTestView(skip: 2) { id fullName } }"#,
+            2012,
+            "`orderBy`: A value is required but not set. It is required because `skip` was provided."
+        );
+
+        Ok(())
+    }
+
+    #[connector_test]
+    async fn take_skip_with_order_by(runner: Runner) -> TestResult<()> {
+        create_test_data(&runner, "take_skip_with_order_by").await?;
+
+        insta::assert_snapshot!(
+            run_query!(runner, r#"{ findManyTestView(take: 1, skip: 1, orderBy: { fullName: asc }) { id fullName } }"#),
+            @r#"{"data":{"findManyTestView":[{"id":2,"fullName":"Jane Doe"}]}}"#
+        );
+
+        Ok(())
+    }
+
+    #[connector_test]
+    async fn take_skip_without_order_by(runner: Runner) -> TestResult<()> {
+        create_test_data(&runner, "take_skip_without_order_by").await?;
+
+        assert_error!(
+            runner,
+            r#"{ findManyTestView(take: 1, skip: 1) { id lastName fullName } }"#,
+            2012,
+            "`orderBy`: A value is required but not set. It is required because `take` was provided."
+        );
+
+        Ok(())
+    }
+
+    #[connector_test]
+    async fn take_with_empty_order_by(runner: Runner) -> TestResult<()> {
+        create_test_data(&runner, "take_with_empty_order_by").await?;
+
+        assert_error!(
+            runner,
+            r#"{ findManyTestView(take: 1, orderBy: {}) { id fullName } }"#,
+            2019,
+            "`orderBy` definition must not be empty when querying views"
+        );
+
+        Ok(())
+    }
+
+    #[connector_test]
+    async fn skip_with_empty_order_by(runner: Runner) -> TestResult<()> {
+        create_test_data(&runner, "skip_with_empty_order_by").await?;
+
+        assert_error!(
+            runner,
+            r#"{ findManyTestView(skip: 1, orderBy: {}) { id fullName } }"#,
+            2019,
+            "`orderBy` definition must not be empty when querying views"
+        );
+
+        Ok(())
+    }
+
+    #[connector_test]
+    async fn group_by_take_with_order_by(runner: Runner) -> TestResult<()> {
+        create_test_data(&runner, "group_by_take_with_order_by").await?;
+
+        insta::assert_snapshot!(
+            run_query!(runner, r#"{ groupByTestView(by: lastName, orderBy: { lastName: asc }, take: 1) { lastName } }"#),
+            @r#"{"data":{"groupByTestView":[{"lastName":"Doe"}]}}"#
+        );
+
+        Ok(())
+    }
+
+    #[connector_test]
+    async fn group_by_take_without_order_by(runner: Runner) -> TestResult<()> {
+        create_test_data(&runner, "group_by_take_without_order_by").await?;
+
+        assert_error!(
+            runner,
+            r#"{ groupByTestView(by: lastName, take: 1) { lastName } }"#,
+            2012,
+            "`orderBy`: A value is required but not set. It is required because `take` was provided."
+        );
+
+        Ok(())
+    }
+
+    #[connector_test]
+    async fn group_by_take_with_empty_order_by(runner: Runner) -> TestResult<()> {
+        create_test_data(&runner, "group_by_take_with_empty_order_by").await?;
+
+        assert_error!(
+            runner,
+            r#"{ groupByTestView(by: lastName, take: 1, orderBy: {}) { lastName } }"#,
+            2019,
+            "`orderBy` definition must not be empty when querying views"
+        );
+
+        Ok(())
+    }
+
+    #[connector_test]
+    async fn group_by_skip_with_order_by(runner: Runner) -> TestResult<()> {
+        create_test_data(&runner, "group_by_skip_with_order_by").await?;
+
+        insta::assert_snapshot!(
+            run_query!(runner, r#"{ groupByTestView(by: lastName, orderBy: { lastName: asc }, skip: 1) { lastName } }"#),
+            @r#"{"data":{"groupByTestView":[{"lastName":"Maurane"}]}}"#
+        );
+
+        Ok(())
+    }
+
+    #[connector_test]
+    async fn group_by_skip_without_order_by(runner: Runner) -> TestResult<()> {
+        create_test_data(&runner, "group_by_skip_without_order_by").await?;
+
+        assert_error!(
+            runner,
+            r#"{ groupByTestView(by: lastName, skip: 1) { lastName } }"#,
+            2012,
+            "`orderBy`: A value is required but not set. It is required because `skip` was provided."
+        );
+
+        Ok(())
+    }
+
+    #[connector_test]
+    async fn group_by_skip_with_empty_order_by(runner: Runner) -> TestResult<()> {
+        create_test_data(&runner, "group_by_skip_with_empty_order_by").await?;
+
+        assert_error!(
+            runner,
+            r#"{ groupByTestView(by: lastName, skip: 1, orderBy: {}) { lastName } }"#,
+            2019,
+            "`orderBy` definition must not be empty when querying views"
+        );
+
+        Ok(())
     }
 
     async fn create_test_data(runner: &Runner, schema_name: &str) -> TestResult<()> {
