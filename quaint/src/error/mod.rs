@@ -56,6 +56,23 @@ impl fmt::Display for DatabaseConstraint {
     }
 }
 
+#[derive(Debug)]
+pub struct DatabaseNotReachableLocation {
+    pub host: Option<String>,
+    pub port: Option<u16>,
+}
+
+impl fmt::Display for DatabaseNotReachableLocation {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match (&self.host, &self.port) {
+            (Some(host), Some(port)) => write!(f, "{host}:{port}"),
+            (Some(host), None) => write!(f, "{host}"),
+            (None, Some(port)) => write!(f, "<unknown host>:{port}"),
+            (None, None) => write!(f, "<unknown host>"),
+        }
+    }
+}
+
 #[derive(Debug, Error)]
 /// The error types for database I/O, connection and query parameter
 /// construction.
@@ -156,8 +173,10 @@ pub enum ErrorKind {
     #[error("Invalid input provided to query: {}", _0)]
     QueryInvalidInput(String),
 
-    #[error("Database not reachable: {}:{}", database_host, database_port)]
-    DatabaseNotReachable { database_host: String, database_port: u16 },
+    #[error("Database not reachable: {database_location}")]
+    DatabaseNotReachable {
+        database_location: DatabaseNotReachableLocation,
+    },
 
     #[error("Database does not exist: {}", db_name)]
     DatabaseDoesNotExist { db_name: Name },

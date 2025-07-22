@@ -60,8 +60,7 @@ impl From<DriverAdapterError> for QuaintError {
             }
             DriverAdapterError::DatabaseNotReachable { host, port } => {
                 QuaintError::builder(ErrorKind::DatabaseNotReachable {
-                    database_host: host.unwrap_or_default(),
-                    database_port: port.unwrap_or_default(),
+                    database_location: quaint::error::DatabaseNotReachableLocation { host, port },
                 })
                 .build()
             }
@@ -74,7 +73,7 @@ impl From<DriverAdapterError> for QuaintError {
             DriverAdapterError::DatabaseAccessDenied { db } => {
                 QuaintError::builder(ErrorKind::DatabaseAccessDenied { db_name: db.into() }).build()
             }
-            DriverAdapterError::ConnectionClosed {} => QuaintError::builder(ErrorKind::ConnectionClosed).build(),
+            DriverAdapterError::ConnectionClosed => QuaintError::builder(ErrorKind::ConnectionClosed).build(),
             DriverAdapterError::TlsConnectionError { reason } => {
                 QuaintError::builder(ErrorKind::TlsConnectionError { message: reason }).build()
             }

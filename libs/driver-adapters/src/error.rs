@@ -89,7 +89,7 @@ pub(crate) enum DriverAdapterError {
     DatabaseAccessDenied {
         db: Option<String>,
     },
-    ConnectionClosed {},
+    ConnectionClosed,
     TlsConnectionError {
         reason: String,
     },

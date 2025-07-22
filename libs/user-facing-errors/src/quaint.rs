@@ -46,12 +46,8 @@ pub fn invalid_connection_string_description(error_details: &str) -> String {
 
 pub fn render_quaint_error(kind: &ErrorKind, connection_info: Option<&NativeConnectionInfo>) -> Option<KnownError> {
     match kind {
-        ErrorKind::DatabaseNotReachable {
-            database_host,
-            database_port,
-        } => Some(KnownError::new(common::DatabaseNotReachable {
-            database_host: database_host.to_string(),
-            database_port: *database_port,
+        ErrorKind::DatabaseNotReachable { database_location } => Some(KnownError::new(common::DatabaseNotReachable {
+            database_location: database_location.to_string(),
         })),
 
         ErrorKind::DatabaseDoesNotExist { db_name } => Some(KnownError::new(common::DatabaseDoesNotExist {
@@ -129,22 +125,19 @@ pub fn render_quaint_error(kind: &ErrorKind, connection_info: Option<&NativeConn
             #[cfg(feature = "postgresql-native")]
             (NativeErrorKind::ConnectionError(_), Some(NativeConnectionInfo::Postgres(url))) => {
                 Some(KnownError::new(common::DatabaseNotReachable {
-                    database_port: url.port(),
-                    database_host: url.host().to_owned(),
+                    database_location: format!("{}:{}", url.host(), url.port()),
                 }))
             }
             #[cfg(feature = "mysql-native")]
             (NativeErrorKind::ConnectionError(_), Some(NativeConnectionInfo::Mysql(url))) => {
                 Some(KnownError::new(common::DatabaseNotReachable {
-                    database_port: url.port(),
-                    database_host: url.host().to_owned(),
+                    database_location: format!("{}:{}", url.host(), url.port()),
                 }))
             }
             #[cfg(feature = "mssql-native")]
             (NativeErrorKind::ConnectionError(_), Some(NativeConnectionInfo::Mssql(url))) => {
                 Some(KnownError::new(common::DatabaseNotReachable {
-                    database_port: url.port(),
-                    database_host: url.host().to_owned(),
+                    database_location: format!("{}:{}", url.host(), url.port()),
                 }))
             }
             (NativeErrorKind::TlsError { message }, _) => Some(KnownError::new(common::TlsConnectionError {
@@ -153,22 +146,19 @@ pub fn render_quaint_error(kind: &ErrorKind, connection_info: Option<&NativeConn
             #[cfg(feature = "postgresql-native")]
             (NativeErrorKind::ConnectTimeout, Some(NativeConnectionInfo::Postgres(url))) => {
                 Some(KnownError::new(common::DatabaseNotReachable {
-                    database_host: url.host().to_owned(),
-                    database_port: url.port(),
+                    database_location: format!("{}:{}", url.host(), url.port()),
                 }))
             }
             #[cfg(feature = "mysql-native")]
             (NativeErrorKind::ConnectTimeout, Some(NativeConnectionInfo::Mysql(url))) => {
                 Some(KnownError::new(common::DatabaseNotReachable {
-                    database_host: url.host().to_owned(),
-                    database_port: url.port(),
+                    database_location: format!("{}:{}", url.host(), url.port()),
                 }))
             }
             #[cfg(feature = "mssql-native")]
             (NativeErrorKind::ConnectTimeout, Some(NativeConnectionInfo::Mssql(url))) => {
                 Some(KnownError::new(common::DatabaseNotReachable {
-                    database_host: url.host().to_owned(),
-                    database_port: url.port(),
+                    database_location: format!("{}:{}", url.host(), url.port()),
                 }))
             }
             (NativeErrorKind::PoolTimeout { max_open, timeout, .. }, _) => {
