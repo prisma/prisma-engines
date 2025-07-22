@@ -17,14 +17,10 @@ impl SchemaFilter {
         let has_explicit_namespaces = namespaces.is_some();
 
         for table_name in self.external_tables.iter() {
-            if has_explicit_namespaces {
-                if !table_name.contains(".") {
-                    return Err(ConnectorError::user_facing(MissingNamespaceInExternalTables));
-                }
-            } else {
-                if table_name.contains(".") {
-                    return Err(ConnectorError::user_facing(ExcessiveNamespaceInExternalTables));
-                }
+            if has_explicit_namespaces && !table_name.contains(".") {
+                return Err(ConnectorError::user_facing(MissingNamespaceInExternalTables));
+            } else if !has_explicit_namespaces && table_name.contains(".") {
+                return Err(ConnectorError::user_facing(ExcessiveNamespaceInExternalTables));
             }
         }
 
