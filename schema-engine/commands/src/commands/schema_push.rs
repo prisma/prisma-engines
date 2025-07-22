@@ -28,7 +28,7 @@ pub async fn schema_push(input: SchemaPushInput, connector: &mut dyn SchemaConne
     // We only consider the namespaces present in the "to" schema aka the PSL file for the introspection of the "from" schema.
     // So when the user removes a previously existing namespace from their PSL file we will not modify that namespace in the database.
     let namespaces = dialect.extract_namespaces(&to);
-    filter.validate(&namespaces)?;
+    filter.validate(namespaces.as_ref())?;
 
     let from = connector
         .schema_from_database(namespaces)

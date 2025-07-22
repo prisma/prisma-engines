@@ -26,7 +26,7 @@ pub async fn diff(
         namespaces_and_preview_features_from_diff_targets(&[&params.from, &params.to])?;
 
     let filter: SchemaFilter = params.filters.into();
-    filter.validate(&namespaces)?;
+    filter.validate(namespaces.as_ref())?;
 
     let (conn_from, schema_from) = diff_target_to_dialect(
         &params.from,

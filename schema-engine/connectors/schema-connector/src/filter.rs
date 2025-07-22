@@ -13,7 +13,7 @@ pub struct SchemaFilter {
 
 impl SchemaFilter {
     /// Validate that the schema filter contains correctly qualified table names.
-    pub fn validate(&self, namespaces: &Option<Namespaces>) -> ConnectorResult<()> {
+    pub fn validate(&self, namespaces: Option<&Namespaces>) -> ConnectorResult<()> {
         let has_explicit_namespaces = namespaces.is_some();
 
         for table_name in self.external_tables.iter() {
