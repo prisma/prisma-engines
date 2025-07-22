@@ -75,6 +75,9 @@ pub struct DmmfInputField {
     pub is_nullable: bool,
     pub input_types: Vec<DmmfTypeReference>,
 
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    pub requires_other_fields: Vec<String>,
+
     #[serde(skip_serializing_if = "Option::is_none")]
     pub deprecation: Option<DmmfDeprecation>,
 }

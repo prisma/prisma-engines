@@ -16,6 +16,11 @@ pub(super) fn render_input_field<'a>(input_field: &InputField<'a>, ctx: &mut Ren
         input_types: type_references,
         is_required: input_field.is_required(),
         is_nullable: nullable,
+        requires_other_fields: input_field
+            .requires_other_fields()
+            .iter()
+            .map(|f| f.to_string())
+            .collect(),
         deprecation: None,
     }
 }
