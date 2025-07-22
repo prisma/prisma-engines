@@ -298,7 +298,7 @@ pub struct MissingNamespaceInExternalTables;
     code = "P3024",
     message = "When using no explicit schemas list in your datasource, `externalTables` in your prisma config must contain only simple table names without a schema name."
 )]
-pub struct ExcessiveNamespaceInExternalTables;
+pub struct UnexpectedNamespaceInExternalTables;
 
 #[derive(Debug, SimpleUserFacingError)]
 #[user_facing(code = "P4001", message = "The introspected database was empty.")]

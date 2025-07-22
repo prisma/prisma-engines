@@ -1,4 +1,4 @@
-use user_facing_errors::schema_engine::{ExcessiveNamespaceInExternalTables, MissingNamespaceInExternalTables};
+use user_facing_errors::schema_engine::{MissingNamespaceInExternalTables, UnexpectedNamespaceInExternalTables};
 
 use crate::{ConnectorError, ConnectorResult, Namespaces};
 
@@ -20,7 +20,7 @@ impl SchemaFilter {
             if has_explicit_namespaces && !table_name.contains(".") {
                 return Err(ConnectorError::user_facing(MissingNamespaceInExternalTables));
             } else if !has_explicit_namespaces && table_name.contains(".") {
-                return Err(ConnectorError::user_facing(ExcessiveNamespaceInExternalTables));
+                return Err(ConnectorError::user_facing(UnexpectedNamespaceInExternalTables));
             }
         }
 
