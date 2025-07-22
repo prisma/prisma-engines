@@ -287,6 +287,20 @@ pub struct ForeignKeyCreationNotAllowed;
 pub struct DirectDdlNotAllowed;
 
 #[derive(Debug, SimpleUserFacingError)]
+#[user_facing(
+    code = "P3023",
+    message = "When using an explicit schemas list in your datasource, `externalTables` in your prisma config must contain only fully qualified table names (e.g. `schema_name.table_name`)."
+)]
+pub struct MissingNamespaceInExternalTables;
+
+#[derive(Debug, SimpleUserFacingError)]
+#[user_facing(
+    code = "P3024",
+    message = "When using no explicit schemas list in your datasource, `externalTables` in your prisma config must contain only simple table names without a schema name."
+)]
+pub struct UnexpectedNamespaceInExternalTables;
+
+#[derive(Debug, SimpleUserFacingError)]
 #[user_facing(code = "P4001", message = "The introspected database was empty.")]
 pub struct IntrospectionResultEmpty;
 

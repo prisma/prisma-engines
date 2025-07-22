@@ -624,7 +624,7 @@ fn schema_filter_leveraging_init_script(api: TestApi) {
 }
 
 #[test_connector(tags(Postgres, Mssql), exclude(CockroachDb))]
-fn schema_filter_migration_multi_schema(api: TestApi) {
+fn schema_filter_migration_multi_schema_requires_namespaced_table_names(api: TestApi) {
     let schema = api.datamodel_with_provider_and_features(
         r#"
         model Cat {
@@ -705,6 +705,76 @@ fn schema_filter_migration_multi_schema(api: TestApi) {
             };
             migration.expect_contents(expected_script)
         });
+}
+
+#[test_connector(tags(Postgres, Mssql), exclude(CockroachDb))]
+fn schema_filter_migration_multi_schema_without_namespaced_table_names(api: TestApi) {
+    let schema = api.datamodel_with_provider_and_features(
+        r#"
+        model Cat {
+            id      Int @id
+
+            @@schema("one")
+        }
+
+        model ExternalTable {
+            id      Int @id
+
+            @@schema("two")
+        }
+    "#,
+        &[("schemas", "[\"one\", \"two\"]")],
+        &["multiSchema"],
+    );
+
+    let dir = api.create_migrations_directory();
+
+    let filter = SchemaFilter {
+        external_tables: vec!["ExternalTable".to_string()],
+    };
+    let err = api
+        .create_migration_with_filter("custom", &schema, &dir, filter, "")
+        .send_unwrap_err();
+
+    assert_eq!(err.error_code(), Some("P3023"));
+    assert_eq!(
+        err.message(),
+        Some(
+            "When using an explicit schemas list in your datasource, `externalTables` in your prisma config must contain only fully qualified table names (e.g. `schema_name.table_name`)."
+        )
+    );
+}
+
+#[test_connector(exclude(CockroachDb))]
+fn schema_filter_migration_with_namespaced_table_names_and_no_explicit_schemas_list(api: TestApi) {
+    let schema = api.datamodel_with_provider(
+        r#"
+        model Cat {
+            id      Int @id
+        }
+
+        model ExternalTable {
+            id      Int @id
+        }
+    "#,
+    );
+
+    let dir = api.create_migrations_directory();
+
+    let filter = SchemaFilter {
+        external_tables: vec!["public.ExternalTable".to_string()],
+    };
+    let err = api
+        .create_migration_with_filter("custom", &schema, &dir, filter, "")
+        .send_unwrap_err();
+
+    assert_eq!(err.error_code(), Some("P3024"));
+    assert_eq!(
+        err.message(),
+        Some(
+            "When using no explicit schemas list in your datasource, `externalTables` in your prisma config must contain only simple table names without a schema name."
+        )
+    );
 }
 
 #[test_connector]

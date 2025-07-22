@@ -22,6 +22,8 @@ pub async fn diff_cli(params: DiffParams, host: Arc<dyn ConnectorHost>) -> CoreR
         namespaces_and_preview_features_from_diff_targets(&[&params.from, &params.to])?;
 
     let filter: SchemaFilter = params.filters.into();
+    filter.validate(namespaces.as_ref())?;
+
     let from = json_rpc_diff_target_to_dialect(
         &params.from,
         params.shadow_database_url.as_deref(),

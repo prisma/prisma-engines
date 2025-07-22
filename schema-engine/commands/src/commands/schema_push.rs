@@ -22,16 +22,19 @@ pub async fn schema_push(input: SchemaPushInput, connector: &mut dyn SchemaConne
     // TODO: We should remove this call once the state machines are no longer used.
     let _ = connector.ensure_connection_validity().await;
     let dialect = connector.schema_dialect();
+    let filter: schema_connector::SchemaFilter = input.filters.into();
 
     let to = dialect.schema_from_datamodel(sources)?;
     // We only consider the namespaces present in the "to" schema aka the PSL file for the introspection of the "from" schema.
     // So when the user removes a previously existing namespace from their PSL file we will not modify that namespace in the database.
     let namespaces = dialect.extract_namespaces(&to);
+    filter.validate(namespaces.as_ref())?;
+
     let from = connector
         .schema_from_database(namespaces)
         .instrument(tracing::info_span!("Calculate from database"))
         .await?;
-    let database_migration = dialect.diff(from, to, &input.filters.into());
+    let database_migration = dialect.diff(from, to, &filter);
 
     tracing::debug!(migration = dialect.migration_summary(&database_migration).as_str());
 
