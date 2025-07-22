@@ -21,16 +21,12 @@ pub struct IncorrectDatabaseCredentials {
 #[user_facing(
     code = "P1001",
     message = "\
-Can't reach database server at `{database_host}:{database_port}`
+Can't reach database server at `{database_location}`
 
-Please make sure your database server is running at `{database_host}:{database_port}`."
+Please make sure your database server is running at `{database_location}`."
 )]
 pub struct DatabaseNotReachable {
-    /// Database host URI
-    pub database_host: String,
-
-    /// Database port
-    pub database_port: u16,
+    pub database_location: String,
 }
 
 #[derive(Debug, UserFacingError, Serialize)]

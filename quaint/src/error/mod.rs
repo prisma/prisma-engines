@@ -56,6 +56,23 @@ impl fmt::Display for DatabaseConstraint {
     }
 }
 
+#[derive(Debug)]
+pub struct DatabaseNotReachableLocation {
+    pub host: Option<String>,
+    pub port: Option<u16>,
+}
+
+impl fmt::Display for DatabaseNotReachableLocation {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match (&self.host, &self.port) {
+            (Some(host), Some(port)) => write!(f, "{host}:{port}"),
+            (Some(host), None) => write!(f, "{host}"),
+            (None, Some(port)) => write!(f, "<unknown host>:{port}"),
+            (None, None) => write!(f, "<unknown host>"),
+        }
+    }
+}
+
 #[derive(Debug, Error)]
 /// The error types for database I/O, connection and query parameter
 /// construction.
@@ -156,6 +173,11 @@ pub enum ErrorKind {
     #[error("Invalid input provided to query: {}", _0)]
     QueryInvalidInput(String),
 
+    #[error("Database not reachable: {database_location}")]
+    DatabaseNotReachable {
+        database_location: DatabaseNotReachableLocation,
+    },
+
     #[error("Database does not exist: {}", db_name)]
     DatabaseDoesNotExist { db_name: Name },
 
@@ -164,6 +186,12 @@ pub enum ErrorKind {
 
     #[error("Database already exists {}", db_name)]
     DatabaseAlreadyExists { db_name: Name },
+
+    #[error("Error opening a TLS connection: {}", message)]
+    TlsConnectionError { message: String },
+
+    #[error("Server has closed the connection.")]
+    ConnectionClosed,
 
     #[error("Authentication failed for user {}", user)]
     AuthenticationFailed { user: Name },

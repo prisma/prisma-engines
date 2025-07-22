@@ -359,6 +359,7 @@ impl From<quaint::error::Error> for SqlError {
             QuaintKind::RollbackWithoutBegin => Self::RollbackWithoutBegin,
             QuaintKind::ExternalError(error_id) => Self::ExternalError(error_id),
             QuaintKind::TooManyConnections(e) => Self::TooManyConnections(e),
+            QuaintKind::ConnectionClosed => Self::ConnectionClosed,
             e @ QuaintKind::UnsupportedColumnType { .. } => SqlError::ConversionError(e.into()),
             e @ QuaintKind::TransactionAlreadyClosed(_) => SqlError::TransactionAlreadyClosed(format!("{e}")),
             e @ QuaintKind::IncorrectNumberOfParameters { .. } => SqlError::QueryError(e.into()),
@@ -377,6 +378,8 @@ impl From<quaint::error::Error> for SqlError {
             e @ QuaintKind::SocketTimeout => SqlError::ConnectionError(e),
             e @ QuaintKind::OpaqueAsRawValue { .. } => SqlError::ConversionError(e.into()),
             e @ QuaintKind::RanQueryWithOpaqueParam { .. } => SqlError::ConversionError(e.into()),
+            e @ QuaintKind::TlsConnectionError { .. } => SqlError::ConnectionError(e),
+            e @ QuaintKind::DatabaseNotReachable { .. } => SqlError::ConnectionError(e),
         }
     }
 }

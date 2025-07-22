@@ -76,6 +76,10 @@ pub(crate) enum DriverAdapterError {
     ForeignKeyConstraintViolation {
         constraint: Option<DriverAdapterConstraint>,
     },
+    DatabaseNotReachable {
+        host: Option<String>,
+        port: Option<u16>,
+    },
     DatabaseDoesNotExist {
         db: Option<String>,
     },
@@ -84,6 +88,10 @@ pub(crate) enum DriverAdapterError {
     },
     DatabaseAccessDenied {
         db: Option<String>,
+    },
+    ConnectionClosed,
+    TlsConnectionError {
+        reason: String,
     },
     AuthenticationFailed {
         user: Option<String>,

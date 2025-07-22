@@ -46,6 +46,10 @@ pub fn invalid_connection_string_description(error_details: &str) -> String {
 
 pub fn render_quaint_error(kind: &ErrorKind, connection_info: Option<&NativeConnectionInfo>) -> Option<KnownError> {
     match kind {
+        ErrorKind::DatabaseNotReachable { database_location } => Some(KnownError::new(common::DatabaseNotReachable {
+            database_location: database_location.to_string(),
+        })),
+
         ErrorKind::DatabaseDoesNotExist { db_name } => Some(KnownError::new(common::DatabaseDoesNotExist {
             database_name: db_name.to_string(),
         })),
@@ -105,6 +109,12 @@ pub fn render_quaint_error(kind: &ErrorKind, connection_info: Option<&NativeConn
             details: message.clone(),
         })),
 
+        ErrorKind::TlsConnectionError { message } => Some(KnownError::new(common::TlsConnectionError {
+            message: message.to_string(),
+        })),
+
+        ErrorKind::ConnectionClosed => Some(KnownError::new(common::ConnectionClosed)),
+
         #[cfg(any(
             feature = "mssql-native",
             feature = "mysql-native",
@@ -115,22 +125,19 @@ pub fn render_quaint_error(kind: &ErrorKind, connection_info: Option<&NativeConn
             #[cfg(feature = "postgresql-native")]
             (NativeErrorKind::ConnectionError(_), Some(NativeConnectionInfo::Postgres(url))) => {
                 Some(KnownError::new(common::DatabaseNotReachable {
-                    database_port: url.port(),
-                    database_host: url.host().to_owned(),
+                    database_location: format!("{}:{}", url.host(), url.port()),
                 }))
             }
             #[cfg(feature = "mysql-native")]
             (NativeErrorKind::ConnectionError(_), Some(NativeConnectionInfo::Mysql(url))) => {
                 Some(KnownError::new(common::DatabaseNotReachable {
-                    database_port: url.port(),
-                    database_host: url.host().to_owned(),
+                    database_location: format!("{}:{}", url.host(), url.port()),
                 }))
             }
             #[cfg(feature = "mssql-native")]
             (NativeErrorKind::ConnectionError(_), Some(NativeConnectionInfo::Mssql(url))) => {
                 Some(KnownError::new(common::DatabaseNotReachable {
-                    database_port: url.port(),
-                    database_host: url.host().to_owned(),
+                    database_location: format!("{}:{}", url.host(), url.port()),
                 }))
             }
             (NativeErrorKind::TlsError { message }, _) => Some(KnownError::new(common::TlsConnectionError {
@@ -139,22 +146,19 @@ pub fn render_quaint_error(kind: &ErrorKind, connection_info: Option<&NativeConn
             #[cfg(feature = "postgresql-native")]
             (NativeErrorKind::ConnectTimeout, Some(NativeConnectionInfo::Postgres(url))) => {
                 Some(KnownError::new(common::DatabaseNotReachable {
-                    database_host: url.host().to_owned(),
-                    database_port: url.port(),
+                    database_location: format!("{}:{}", url.host(), url.port()),
                 }))
             }
             #[cfg(feature = "mysql-native")]
             (NativeErrorKind::ConnectTimeout, Some(NativeConnectionInfo::Mysql(url))) => {
                 Some(KnownError::new(common::DatabaseNotReachable {
-                    database_host: url.host().to_owned(),
-                    database_port: url.port(),
+                    database_location: format!("{}:{}", url.host(), url.port()),
                 }))
             }
             #[cfg(feature = "mssql-native")]
             (NativeErrorKind::ConnectTimeout, Some(NativeConnectionInfo::Mssql(url))) => {
                 Some(KnownError::new(common::DatabaseNotReachable {
-                    database_host: url.host().to_owned(),
-                    database_port: url.port(),
+                    database_location: format!("{}:{}", url.host(), url.port()),
                 }))
             }
             (NativeErrorKind::PoolTimeout { max_open, timeout, .. }, _) => {
