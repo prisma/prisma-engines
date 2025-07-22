@@ -16,6 +16,7 @@ fn schema_filter_migration_adding_external_table(api: TestApi) {
 
     let filter = SchemaFilter {
         external_tables: vec!["ExternalTable".to_string()],
+        external_enums: vec![],
     };
     api.create_migration_with_filter("custom", &schema, &dir, filter, "")
         .send_sync()
@@ -42,6 +43,7 @@ fn schema_filter_migration_removing_external_table(mut api: TestApi) {
 
     let filter = SchemaFilter {
         external_tables: vec!["ExternalTable".to_string()],
+        external_enums: vec![],
     };
     api.create_migration_with_filter("remove", &schema_2, &dir, filter, "")
         .send_sync()
@@ -72,6 +74,7 @@ fn schema_filter_migration_removing_external_table_with_contents(mut api: TestAp
 
     let filter = SchemaFilter {
         external_tables: vec!["Cat".to_string()],
+        external_enums: vec![],
     };
     api.evaluate_data_loss_with_filter(&dir, schema_2.clone(), filter)
         .send()
@@ -104,8 +107,58 @@ fn schema_filter_migration_modifying_external_table(mut api: TestApi) {
 
     let filter = SchemaFilter {
         external_tables: vec!["ExternalTable".to_string()],
+        external_enums: vec![],
     };
     api.create_migration_with_filter("modify", &schema_2, &dir, filter, "")
+        .send_sync()
+        .assert_migration_directories_count(1);
+}
+
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
+fn schema_filter_migration_adding_external_enum(api: TestApi) {
+    let schema = api.datamodel_with_provider(
+        r#"
+        enum ExternalEnum {
+            ONE
+            TWO
+        }
+    "#,
+    );
+
+    let dir = api.create_migrations_directory();
+
+    let filter = SchemaFilter {
+        external_tables: vec![],
+        external_enums: vec!["ExternalEnum".to_string()],
+    };
+    api.create_migration_with_filter("custom", &schema, &dir, filter, "")
+        .send_sync()
+        .assert_migration_directories_count(0);
+}
+
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
+fn schema_filter_migration_removing_external_enum(mut api: TestApi) {
+    let schema_1 = api.datamodel_with_provider(
+        r#"
+        enum ExternalEnum {
+            ONE
+            TWO
+        }
+    "#,
+    );
+
+    let dir = api.create_migrations_directory();
+
+    // No filter applied here to actually create the external enum first
+    api.create_migration("create", &schema_1, &dir).send_sync();
+
+    let schema_2 = api.datamodel_with_provider("");
+
+    let filter = SchemaFilter {
+        external_tables: vec![],
+        external_enums: vec!["ExternalEnum".to_string()],
+    };
+    api.create_migration_with_filter("remove", &schema_2, &dir, filter, "")
         .send_sync()
         .assert_migration_directories_count(1);
 }
@@ -152,6 +205,7 @@ fn schema_filter_migration_adding_external_tables_incl_relations(api: TestApi) {
 
     let filter = SchemaFilter {
         external_tables: vec!["ExternalTableA".to_string(), "ExternalTableB".to_string()],
+        external_enums: vec![],
     };
     api.create_migration_with_filter("custom", &schema, &dir, filter, "")
         .send_sync()
@@ -283,6 +337,7 @@ fn schema_filter_migration_removing_external_tables_incl_relations(mut api: Test
 
     let filter = SchemaFilter {
         external_tables: vec!["ExternalTableA".to_string(), "ExternalTableB".to_string()],
+        external_enums: vec![],
     };
     api.create_migration_with_filter("remove", &schema_2, &dir, filter, "")
         .send_sync()
@@ -436,6 +491,7 @@ fn schema_filter_migration_modifying_external_tables_incl_relations(mut api: Tes
 
     let filter = SchemaFilter {
         external_tables: vec!["ExternalTableA".to_string(), "ExternalTableB".to_string()],
+        external_enums: vec![],
     };
     api.create_migration_with_filter("modify", &schema_2, &dir, filter, "")
         .send_sync()
@@ -542,6 +598,7 @@ fn schema_filter_leveraging_init_script(api: TestApi) {
 
     let filter = SchemaFilter {
         external_tables: vec!["external".to_string()],
+        external_enums: vec![],
     };
     api.create_migration_with_filter("custom", &schema, &dir, filter, init_script)
         .send_sync()
@@ -652,6 +709,7 @@ fn schema_filter_migration_multi_schema_requires_namespaced_table_names(api: Tes
 
     let filter = SchemaFilter {
         external_tables: vec!["two.ExternalTable".to_string()],
+        external_enums: vec![],
     };
     api.create_migration_with_filter("custom", &schema, &dir, filter, "")
         .send_sync()
@@ -731,6 +789,7 @@ fn schema_filter_migration_multi_schema_without_namespaced_table_names(api: Test
 
     let filter = SchemaFilter {
         external_tables: vec!["ExternalTable".to_string()],
+        external_enums: vec![],
     };
     let err = api
         .create_migration_with_filter("custom", &schema, &dir, filter, "")
@@ -763,6 +822,7 @@ fn schema_filter_migration_with_namespaced_table_names_and_no_explicit_schemas_l
 
     let filter = SchemaFilter {
         external_tables: vec!["public.ExternalTable".to_string()],
+        external_enums: vec![],
     };
     let err = api
         .create_migration_with_filter("custom", &schema, &dir, filter, "")
@@ -785,6 +845,7 @@ fn schema_filter_migration_dev_diagnostic_drift_detection(api: TestApi) {
 
     let filter = SchemaFilter {
         external_tables: vec!["external_table".to_string()],
+        external_enums: vec![],
     };
     // Table exists in DB and is missing in the schema but is marked as external => not a drift.
     api.dev_diagnostic_with_filter(&dir, filter)

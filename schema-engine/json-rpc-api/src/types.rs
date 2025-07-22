@@ -96,6 +96,8 @@ pub struct SchemasWithConfigDir {
 pub struct SchemaFilter {
     /// Tables that shall be considered 'externally" managed. As per prisma.config.ts > tables.external.
     pub external_tables: Vec<String>,
+    /// Enums that shall be considered "externally" managed. As per prisma.config.ts > enums.external.
+    pub external_enums: Vec<String>,
 }
 
 /// The path to a live database taken as input. For flexibility, this can be Prisma schemas as strings, or only the
