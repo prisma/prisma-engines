@@ -162,8 +162,7 @@ fn unreachable_database_must_return_a_proper_error_on_mysql(api: TestApi) {
         "is_panic": false,
         "message": format!("Can't reach database server at `{host}:{port}`\n\nPlease make sure your database server is running at `{host}:{port}`."),
         "meta": {
-            "database_host": host,
-            "database_port": port,
+            "database_location": format!("{host}:{port}"),
         },
         "error_code": "P1001"
     });
@@ -196,8 +195,7 @@ fn unreachable_database_must_return_a_proper_error_on_postgres(api: TestApi) {
         "is_panic": false,
         "message": format!("Can't reach database server at `{host}:{port}`\n\nPlease make sure your database server is running at `{host}:{port}`."),
         "meta": {
-            "database_host": host,
-            "database_port": port,
+            "database_location": format!("{host}:{port}"),
         },
         "error_code": "P1001"
     });
