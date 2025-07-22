@@ -734,6 +734,50 @@ fn with_schema_filters(mut api: TestApi) {
 }
 
 #[test_connector]
+fn with_invalid_schema_filters(mut api: TestApi) {
+    let tempdir = tempfile::tempdir().unwrap();
+    let host = Arc::new(TestConnectorHost::default());
+    api.connector.set_host(host.clone());
+
+    let base_dir = tempfile::TempDir::new().unwrap();
+    let base_dir_str = base_dir.path().to_string_lossy();
+    let first_url = format!("file:{base_dir_str}/first_db.sqlite");
+    let second_url = format!("file:{base_dir_str}/second_db.sqlite");
+
+    let schema_content = format!(
+        r#"
+          datasource db {{
+              provider = "sqlite"
+              url = "{}"
+          }}
+        "#,
+        first_url.replace('\\', "\\\\")
+    );
+    let schema_path = write_file_to_tmp(&schema_content, &tempdir, "schema.prisma");
+
+    let input = DiffParams {
+        exit_code: None,
+        from: DiffTarget::SchemaDatasource(SchemasWithConfigDir {
+            files: vec![SchemaContainer {
+                path: schema_path.to_string_lossy().into_owned(),
+                content: schema_content.to_string(),
+            }],
+            config_dir: schema_path.parent().unwrap().to_string_lossy().into_owned(),
+        }),
+        script: true,
+        shadow_database_url: None,
+        to: DiffTarget::Url(UrlContainer { url: second_url }),
+        filters: Some(SchemaFilter {
+            external_tables: vec!["public.external_table".to_string()],
+        }),
+    };
+
+    let err = api.diff(input).unwrap_err();
+
+    assert_eq!(err.error_code(), Some("P3024"));
+}
+
+#[test_connector]
 fn from_url_to_url(mut api: TestApi) {
     let host = Arc::new(TestConnectorHost::default());
     api.connector.set_host(host.clone());

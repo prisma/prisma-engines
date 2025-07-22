@@ -483,3 +483,27 @@ fn schema_push_with_schema_filters(api: TestApi) {
         .assert_has_table("Cat")
         .assert_has_no_table("ExternalTable");
 }
+
+#[test_connector]
+fn schema_push_with_invalid_schema_filters(api: TestApi) {
+    let dm = r#"
+    model Cat {
+        id Int @id
+    }
+
+    model ExternalTable {
+        id Int @id        
+    }
+    "#;
+
+    let err = api
+        .schema_push_with_filter(
+            dm,
+            Some(SchemaFilter {
+                external_tables: vec!["public.ExternalTable".to_string()],
+            }),
+        )
+        .send_unwrap_err();
+
+    assert_eq!(err.error_code(), Some("P3024"));
+}

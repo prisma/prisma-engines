@@ -139,11 +139,20 @@ pub(crate) trait SqlSchemaDifferFlavour {
     }
 
     /// Check if the given table name is in the given list of tables names.
-    /// The table names  can contain fully qualified table names with namespace
-    /// (e.g. "auth.user") or just the table name.
+    /// If the user uses multiple schemas the table names has to be fully qualified (e.g. `auth.user`).
     fn contains_table(&self, tables: &[String], namespace: Option<&str>, table_name: &str) -> bool {
-        tables.iter().any(|t| t == table_name)
-            || namespace.is_some_and(|ns| tables.contains(&format!("{ns}.{table_name}")))
+        let str_eq = if self.lower_cases_table_names() {
+            str::eq_ignore_ascii_case
+        } else {
+            str::eq
+        };
+
+        if let Some(ns) = namespace {
+            let namespaced_table_name = format!("{ns}.{table_name}");
+            tables.iter().any(|t| str_eq(t, &namespaced_table_name))
+        } else {
+            tables.iter().any(|t| str_eq(t, table_name))
+        }
     }
 
     /// Return the tables that cannot be migrated without being redefined. This
