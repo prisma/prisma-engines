@@ -107,8 +107,8 @@ pub(crate) trait SqlRenderer: Send + Sync {
     /// Render a `RenameForeignKey` step.
     fn render_rename_foreign_key(&self, fks: MigrationPair<ForeignKeyWalker<'_>>) -> String;
 
-    fn render_create_namespace(&self, _namespace: sql::NamespaceWalker<'_>) -> String {
-        "".to_string() // On databases that do not support multiple schemas we do not create namespaces
+    fn render_create_namespace(&self, _namespace: sql::NamespaceWalker<'_>) -> Vec<String> {
+        vec![] // On databases that do not support multiple schemas we do not create namespaces
     }
 
     fn render_create_extension(&self, _create: &CreateExtension, _schema: &SqlSchema) -> Vec<String> {
