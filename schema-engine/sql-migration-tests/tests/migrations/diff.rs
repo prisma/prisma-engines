@@ -91,7 +91,7 @@ fn from_unique_index_to_without(mut api: TestApi) {
     } else if api.is_sqlite() || api.is_postgres() || api.is_cockroach() {
         expect![[r#"
             [
-                "-- DropIndex\nDROP INDEX \"Post_authorId_key\";\n",
+                "-- DropIndex\nDROP INDEX \"public\".\"Post_authorId_key\";\n",
             ]
         "#]]
     } else if api.is_mssql() {
@@ -208,20 +208,20 @@ fn from_unique_index_to_pk(mut api: TestApi) {
             [
                 [
                     "-- DropIndex",
-                    "DROP INDEX \"C_secondary_key\";",
+                    "DROP INDEX \"public\".\"C_secondary_key\";",
                     "",
                     "-- AlterTable",
-                    "ALTER TABLE \"A\" DROP COLUMN \"name\",",
+                    "ALTER TABLE \"public\".\"A\" DROP COLUMN \"name\",",
                     "ADD CONSTRAINT \"A_pkey\" PRIMARY KEY (\"id\");",
                     "",
                     "-- DropIndex",
-                    "DROP INDEX \"A_id_key\";",
+                    "DROP INDEX \"public\".\"A_id_key\";",
                     "",
                     "-- AlterTable",
-                    "ALTER TABLE \"B\" ADD CONSTRAINT \"B_pkey\" PRIMARY KEY (\"x\", \"y\");",
+                    "ALTER TABLE \"public\".\"B\" ADD CONSTRAINT \"B_pkey\" PRIMARY KEY (\"x\", \"y\");",
                     "",
                     "-- DropIndex",
-                    "DROP INDEX \"B_x_y_key\";",
+                    "DROP INDEX \"public\".\"B_x_y_key\";",
                     "",
                 ],
             ]
@@ -460,7 +460,7 @@ fn from_empty_to_migrations_directory(mut api: TestApi) {
 
     let expected_printed_messages = expect![[r#"
         [
-            "-- CreateTable\nCREATE TABLE \"cats\" (\n    \"id\" INTEGER NOT NULL,\n    \"moos\" BOOLEAN DEFAULT false,\n\n    CONSTRAINT \"cats_pkey\" PRIMARY KEY (\"id\")\n);\n",
+            "-- CreateSchema\nCREATE SCHEMA IF NOT EXISTS \"prisma-tests\";\n\n-- CreateTable\nCREATE TABLE \"prisma-tests\".\"cats\" (\n    \"id\" INTEGER NOT NULL,\n    \"moos\" BOOLEAN DEFAULT false,\n\n    CONSTRAINT \"cats_pkey\" PRIMARY KEY (\"id\")\n);\n",
         ]
     "#]];
     expected_printed_messages.assert_debug_eq(&host.printed_messages.lock().unwrap());

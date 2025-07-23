@@ -597,15 +597,18 @@ fn mapped_enum_defaults_must_work(api: TestApi) {
     "#;
 
     let expect = expect![[r#"
+        -- CreateSchema
+        CREATE SCHEMA IF NOT EXISTS "prisma-tests";
+
         -- CreateEnum
-        CREATE TYPE "Color" AS ENUM ('0', 'Grün', 'Blu', 'pfuh 🙄...');
+        CREATE TYPE "prisma-tests"."Color" AS ENUM ('0', 'Grün', 'Blu', 'pfuh 🙄...');
 
         -- CreateTable
-        CREATE TABLE "Test" (
+        CREATE TABLE "prisma-tests"."Test" (
             "id" INTEGER NOT NULL,
-            "mainColor" "Color" NOT NULL DEFAULT 'Grün',
-            "secondaryColor" "Color" NOT NULL DEFAULT '0',
-            "colorOrdering" "Color"[] DEFAULT ARRAY['Blu', '0', 'Grün', '0', 'Blu', '0']::"Color"[],
+            "mainColor" "prisma-tests"."Color" NOT NULL DEFAULT 'Grün',
+            "secondaryColor" "prisma-tests"."Color" NOT NULL DEFAULT '0',
+            "colorOrdering" "prisma-tests"."Color"[] DEFAULT ARRAY['Blu', '0', 'Grün', '0', 'Blu', '0']::"prisma-tests"."Color"[],
 
             CONSTRAINT "Test_pkey" PRIMARY KEY ("id")
         );
@@ -682,17 +685,17 @@ fn alter_enum_and_change_default_must_work(api: TestApi) {
                 */
                 -- AlterEnum
                 BEGIN;
-                CREATE TYPE "Mood_new" AS ENUM ('HUNGRY', 'SLEEPY');
-                ALTER TABLE "Cat" ALTER COLUMN "moods" DROP DEFAULT;
-                ALTER TABLE "Cat" ALTER COLUMN "moods" TYPE "Mood_new"[] USING ("moods"::text::"Mood_new"[]);
-                ALTER TYPE "Mood" RENAME TO "Mood_old";
-                ALTER TYPE "Mood_new" RENAME TO "Mood";
-                DROP TYPE "Mood_old";
-                ALTER TABLE "Cat" ALTER COLUMN "moods" SET DEFAULT ARRAY['SLEEPY']::"Mood"[];
+                CREATE TYPE "prisma-tests"."Mood_new" AS ENUM ('HUNGRY', 'SLEEPY');
+                ALTER TABLE "prisma-tests"."Cat" ALTER COLUMN "moods" DROP DEFAULT;
+                ALTER TABLE "prisma-tests"."Cat" ALTER COLUMN "moods" TYPE "prisma-tests"."Mood_new"[] USING ("moods"::text::"prisma-tests"."Mood_new"[]);
+                ALTER TYPE "prisma-tests"."Mood" RENAME TO "Mood_old";
+                ALTER TYPE "prisma-tests"."Mood_new" RENAME TO "Mood";
+                DROP TYPE "prisma-tests"."Mood_old";
+                ALTER TABLE "prisma-tests"."Cat" ALTER COLUMN "moods" SET DEFAULT ARRAY['SLEEPY']::"prisma-tests"."Mood"[];
                 COMMIT;
 
                 -- AlterTable
-                ALTER TABLE "Cat" ALTER COLUMN "moods" SET DEFAULT ARRAY['SLEEPY']::"Mood"[];
+                ALTER TABLE "prisma-tests"."Cat" ALTER COLUMN "moods" SET DEFAULT ARRAY['SLEEPY']::"prisma-tests"."Mood"[];
             "#]];
             migration.expect_contents(expected_script)
         });
