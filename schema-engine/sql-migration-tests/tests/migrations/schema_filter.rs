@@ -160,6 +160,7 @@ fn schema_filter_migration_removing_external_enum(mut api: TestApi) {
     };
     api.create_migration_with_filter("remove", &schema_2, &dir, filter, "")
         .send_sync()
+        // No additional migration created because the enum is not being removed as it is marked external
         .assert_migration_directories_count(1);
 }
 
