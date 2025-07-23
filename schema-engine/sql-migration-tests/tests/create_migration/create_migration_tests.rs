@@ -494,12 +494,12 @@ fn create_enum_step_only_rendered_when_needed(api: TestApi) {
                 indoc! {
                     r#"
                         -- CreateEnum
-                        CREATE TYPE "Mood" AS ENUM ('HUNGRY', 'SLEEPY');
+                        CREATE TYPE "prisma-tests"."Mood" AS ENUM ('HUNGRY', 'SLEEPY');
 
                         -- CreateTable
-                        CREATE TABLE "Cat" (
+                        CREATE TABLE "prisma-tests"."Cat" (
                             "id" INT4 NOT NULL,
-                            "mood" "Mood" NOT NULL,
+                            "mood" "prisma-tests"."Mood" NOT NULL,
 
                             CONSTRAINT "Cat_pkey" PRIMARY KEY ("id")
                         );
@@ -509,12 +509,12 @@ fn create_enum_step_only_rendered_when_needed(api: TestApi) {
                 indoc! {
                     r#"
                         -- CreateEnum
-                        CREATE TYPE "Mood" AS ENUM ('HUNGRY', 'SLEEPY');
+                        CREATE TYPE "prisma-tests"."Mood" AS ENUM ('HUNGRY', 'SLEEPY');
 
                         -- CreateTable
-                        CREATE TABLE "Cat" (
+                        CREATE TABLE "prisma-tests"."Cat" (
                             "id" INTEGER NOT NULL,
-                            "mood" "Mood" NOT NULL,
+                            "mood" "prisma-tests"."Mood" NOT NULL,
 
                             CONSTRAINT "Cat_pkey" PRIMARY KEY ("id")
                         );
@@ -568,12 +568,12 @@ fn create_enum_renders_correctly(api: TestApi) {
             let expected_script = indoc! {
                     r#"
                         -- CreateEnum
-                        CREATE TYPE "Mood" AS ENUM ('HUNGRY', 'SLEEPY');
+                        CREATE TYPE "prisma-tests"."Mood" AS ENUM ('HUNGRY', 'SLEEPY');
 
                         -- CreateTable
                         CREATE TABLE "Cat" (
                             "id" INTEGER NOT NULL,
-                            "mood" "Mood" NOT NULL,
+                            "mood" "prisma-tests"."Mood" NOT NULL,
 
                             CONSTRAINT "Cat_pkey" PRIMARY KEY ("id")
                         );
@@ -607,7 +607,7 @@ fn unsupported_type_renders_correctly(api: TestApi) {
             let expected_script = indoc! {
                 r#"
                         -- CreateTable
-                        CREATE TABLE "Cat" (
+                        CREATE TABLE "prisma-tests"."Cat" (
                             "id" TEXT NOT NULL,
                             "home" point NOT NULL,
 
@@ -651,21 +651,21 @@ fn no_additional_unique_created(api: TestApi) {
                     indoc! {
                         r#"
                         -- CreateTable
-                        CREATE TABLE "Cat" (
+                        CREATE TABLE "prisma-tests"."Cat" (
                             "id" INTEGER NOT NULL,
 
                             CONSTRAINT "Cat_pkey" PRIMARY KEY ("id")
                         );
 
                         -- CreateTable
-                        CREATE TABLE "Collar" (
+                        CREATE TABLE "prisma-tests"."Collar" (
                             "id" INTEGER NOT NULL,
 
                             CONSTRAINT "Collar_pkey" PRIMARY KEY ("id")
                         );
 
                         -- AddForeignKey
-                        ALTER TABLE "Collar" ADD CONSTRAINT "Collar_id_fkey" FOREIGN KEY ("id") REFERENCES "Cat"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+                        ALTER TABLE "prisma-tests"."Collar" ADD CONSTRAINT "Collar_id_fkey" FOREIGN KEY ("id") REFERENCES "prisma-tests"."Cat"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
                         "#
                     }
                 }
