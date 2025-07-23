@@ -88,7 +88,13 @@ fn from_unique_index_to_without(mut api: TestApi) {
                 "-- DropForeignKey\nALTER TABLE `Post` DROP FOREIGN KEY `Post_authorId_fkey`;\n\n-- DropIndex\nDROP INDEX `Post_authorId_key` ON `Post`;\n\n-- AddForeignKey\nALTER TABLE `Post` ADD CONSTRAINT `Post_authorId_fkey` FOREIGN KEY (`authorId`) REFERENCES `User`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;\n",
             ]
         "#]]
-    } else if api.is_sqlite() || api.is_postgres() || api.is_cockroach() {
+    } else if api.is_sqlite() {
+        expect![[r#"
+            [
+                "-- DropIndex\nDROP INDEX \"Post_authorId_key\";\n",
+            ]
+        "#]]
+    } else if api.is_postgres() || api.is_cockroach() {
         expect![[r#"
             [
                 "-- DropIndex\nDROP INDEX \"public\".\"Post_authorId_key\";\n",
@@ -418,7 +424,7 @@ fn diffing_postgres_schemas_when_initialized_on_sqlite(mut api: TestApi) {
 
     let expected_printed_messages = expect![[r#"
         [
-            "-- AlterTable\nALTER TABLE \"TestModel\" DROP COLUMN \"names\",\nADD COLUMN     \"names\" TEXT[];\n\n-- CreateTable\nCREATE TABLE \"TestModel2\" (\n    \"id\" SERIAL NOT NULL,\n\n    CONSTRAINT \"TestModel2_pkey\" PRIMARY KEY (\"id\")\n);\n",
+            "-- AlterTable\nALTER TABLE \"public\".\"TestModel\" DROP COLUMN \"names\",\nADD COLUMN     \"names\" TEXT[];\n\n-- CreateTable\nCREATE TABLE \"public\".\"TestModel2\" (\n    \"id\" SERIAL NOT NULL,\n\n    CONSTRAINT \"TestModel2_pkey\" PRIMARY KEY (\"id\")\n);\n",
             "\n[+] Added tables\n  - TestModel2\n\n[*] Changed the `TestModel` table\n  [*] Column `names` would be dropped and recreated (changed from Required to List, type changed)\n",
         ]
     "#]];
