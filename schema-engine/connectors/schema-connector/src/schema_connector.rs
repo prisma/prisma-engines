@@ -46,7 +46,11 @@ pub trait SchemaDialect: Send + Sync + 'static {
     fn empty_database_schema(&self) -> DatabaseSchema;
 
     /// Create a database schema from datamodel source files.
-    fn schema_from_datamodel(&self, sources: Vec<(String, SourceFile)>) -> ConnectorResult<DatabaseSchema>;
+    fn schema_from_datamodel(
+        &self,
+        sources: Vec<(String, SourceFile)>,
+        default_namespace: Option<&str>,
+    ) -> ConnectorResult<DatabaseSchema>;
 
     /// If possible, check that the passed in migrations apply cleanly.
     fn validate_migrations_with_target<'a>(
@@ -74,6 +78,9 @@ pub trait SchemaDialect: Send + Sync + 'static {
 pub trait SchemaConnector: Send + Sync + 'static {
     /// Return the schema dialect of the connector.
     fn schema_dialect(&self) -> Box<dyn SchemaDialect>;
+
+    /// Return the default namespaces for the connector.
+    fn default_namespace(&self) -> Option<&str>;
 
     /// Accept a new ConnectorHost.
     fn set_host(&mut self, host: Arc<dyn ConnectorHost>);
@@ -183,11 +190,14 @@ pub trait SchemaConnector: Send + Sync + 'static {
         &'a mut self,
         diff_target: DiffTarget<'a>,
         namespaces: Option<Namespaces>,
+        default_namespace: Option<&'a str>,
         filter: &'a SchemaFilter,
     ) -> BoxFuture<'a, ConnectorResult<DatabaseSchema>> {
         Box::pin(async move {
             match diff_target {
-                DiffTarget::Datamodel(sources) => self.schema_dialect().schema_from_datamodel(sources),
+                DiffTarget::Datamodel(sources) => {
+                    self.schema_dialect().schema_from_datamodel(sources, default_namespace)
+                }
                 DiffTarget::Migrations(migrations) => self.schema_from_migrations(migrations, namespaces, filter).await,
                 DiffTarget::Database => self.schema_from_database(namespaces).await,
                 DiffTarget::Empty => Ok(self.schema_dialect().empty_database_schema()),

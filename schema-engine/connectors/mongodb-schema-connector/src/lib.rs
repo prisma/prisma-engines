@@ -90,7 +90,11 @@ impl SchemaDialect for MongoDbSchemaDialect {
         DatabaseSchema::new(MongoSchema::default())
     }
 
-    fn schema_from_datamodel(&self, sources: Vec<(String, psl::SourceFile)>) -> ConnectorResult<DatabaseSchema> {
+    fn schema_from_datamodel(
+        &self,
+        sources: Vec<(String, psl::SourceFile)>,
+        _default_namespace: Option<&str>,
+    ) -> ConnectorResult<DatabaseSchema> {
         let validated_schema = psl::parse_schema_multi(&sources).map_err(ConnectorError::new_schema_parser_error)?;
         Ok(DatabaseSchema::new(schema_calculator::calculate(&validated_schema)))
     }
@@ -119,6 +123,10 @@ impl SchemaDialect for MongoDbSchemaDialect {
 impl SchemaConnector for MongoDbSchemaConnector {
     fn schema_dialect(&self) -> Box<dyn SchemaDialect> {
         Box::new(MongoDbSchemaDialect)
+    }
+
+    fn default_namespace(&self) -> Option<&str> {
+        None
     }
 
     fn host(&self) -> &Arc<dyn ConnectorHost> {

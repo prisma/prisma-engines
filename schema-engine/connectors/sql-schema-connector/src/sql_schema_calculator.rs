@@ -17,6 +17,7 @@ use std::collections::HashMap;
 
 pub(crate) fn calculate_sql_schema(
     datamodel: &ValidatedSchema,
+    default_namespace: &str,
     flavour: &dyn SqlSchemaCalculatorFlavour,
 ) -> SqlDatabaseSchema {
     let mut schema = SqlDatabaseSchema::default();
@@ -38,6 +39,8 @@ pub(crate) fn calculate_sql_schema(
         }
     }
 
+    push_namespaces(&mut context, default_namespace);
+
     flavour.calculate_enums(&mut context);
 
     // Two types of tables: model tables and implicit M2M relation tables (a.k.a. join tables.).
@@ -51,6 +54,28 @@ pub(crate) fn calculate_sql_schema(
     flavour.push_connector_data(&mut context);
 
     schema
+}
+
+fn push_namespaces<'a>(ctx: &mut Context<'a>, default_namespace: &'a str) {
+    ctx.schemas.insert(
+        default_namespace,
+        ctx.schema
+            .describer_schema
+            .push_namespace(default_namespace.to_string()),
+    );
+
+    let namespaces = ctx
+        .datamodel
+        .configuration
+        .first_datasource()
+        .namespaces
+        .iter()
+        .filter(|(n, _)| n != default_namespace);
+
+    for (schema, _) in namespaces {
+        ctx.schemas
+            .insert(schema, ctx.schema.describer_schema.push_namespace(schema.clone()));
+    }
 }
 
 fn push_model_tables(ctx: &mut Context<'_>) {

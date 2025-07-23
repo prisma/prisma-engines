@@ -403,14 +403,21 @@ impl TestApi {
         to: DiffTarget<'_>,
         namespaces: Option<Namespaces>,
     ) -> String {
-        let from =
-            tok(self
-                .connector
-                .schema_from_diff_target(from, namespaces.clone(), &SchemaFilter::default().into()))
-            .unwrap();
-        let to = tok(self
-            .connector
-            .schema_from_diff_target(to, namespaces, &SchemaFilter::default().into()))
+        let default_namespace = self.connector.default_namespace().map(|s| s.to_string());
+
+        let from = tok(self.connector.schema_from_diff_target(
+            from,
+            namespaces.clone(),
+            default_namespace.as_deref(),
+            &SchemaFilter::default().into(),
+        ))
+        .unwrap();
+        let to = tok(self.connector.schema_from_diff_target(
+            to,
+            namespaces,
+            default_namespace.as_deref(),
+            &SchemaFilter::default().into(),
+        ))
         .unwrap();
         let dialect = self.connector.schema_dialect();
         let migration = dialect.diff(from, to, &SchemaFilter::default().into());

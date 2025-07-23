@@ -1679,3 +1679,45 @@ fn migration_with_shadow_database(api: TestApi) {
         .send_sync()
         .assert_applied_migrations(&["init"]);
 }
+
+#[test_connector(tags(Postgres), exclude(CockroachDb), preview_features("multiSchema"))]
+fn migration_without_schema_change(api: TestApi) {
+    let datasource = formatdoc! {r#"
+            datasource db {{
+              provider   = "postgresql"
+              url        = env("TEST_DATABASE_URL")
+            }}
+
+            generator js {{
+              provider        = "prisma-client-javascript"
+              previewFeatures = ["multiSchema"]
+            }}
+        "#};
+
+    let dm = formatdoc! {r#"
+        {datasource}
+
+        model A {{
+          id  Int @id
+        }}
+
+        model B {{
+          id  Int @id
+        }}
+    "#};
+
+    let dir = api.create_migrations_directory();
+
+    api.create_migration("init", &dm, &dir)
+        .send_sync()
+        .assert_migration_directories_count(1);
+
+    api.apply_migrations(&dir)
+        .send_sync()
+        .assert_applied_migrations(&["init"]);
+
+    api.create_migration("init2", &dm, &dir)
+        .send_sync()
+        // Should not create a migration because there is no schema change
+        .assert_migration_directories_count(1);
+}

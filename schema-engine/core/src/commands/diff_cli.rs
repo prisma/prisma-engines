@@ -143,7 +143,9 @@ async fn json_rpc_diff_target_to_dialect(
         DiffTarget::SchemaDatamodel(schemas) => {
             let sources = schemas.to_psl_input();
             let dialect = crate::schema_to_dialect(&sources)?;
-            let schema = dialect.schema_from_datamodel(sources)?;
+            // Connector only needed to infer the default namespace.
+            let connector = crate::schema_to_connector(&sources, None)?;
+            let schema = dialect.schema_from_datamodel(sources, connector.default_namespace())?;
             Ok(Some((dialect, schema)))
         }
         DiffTarget::Url(UrlContainer { url }) => {
