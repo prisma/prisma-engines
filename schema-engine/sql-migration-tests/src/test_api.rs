@@ -104,7 +104,7 @@ impl TestApi {
         SchemaFilter {
             external_tables: tables
                 .iter()
-                .map(|table| default_namespace.map_or(table.to_string(), |ns| format!("{}.{}", ns, table)))
+                .map(|table| default_namespace.map_or(table.to_string(), |ns| format!("{ns}.{table}")))
                 .collect(),
         }
     }
