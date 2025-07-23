@@ -1,6 +1,5 @@
 use connection_string::JdbcString;
 use quaint::{prelude::Queryable, single::Quaint};
-use schema_core::schema_connector::SchemaFilter;
 use sql_migration_tests::multi_engine_test_api::*;
 use test_macros::test_connector;
 
@@ -267,14 +266,9 @@ fn soft_resets_does_not_drop_external_tables(mut api: TestApi) {
     api.raw_cmd("CREATE TABLE external_table (id INT);");
 
     let mut engine = api.new_engine_with_connection_strings(api.connection_string().to_string(), None);
+    let filter = engine.namespaced_schema_filter(&["external_table"]);
 
-    engine
-        .reset()
-        .soft(true)
-        .filter(SchemaFilter {
-            external_tables: vec!["external_table".to_string()],
-        })
-        .send_sync(None);
+    engine.reset().soft(true).filter(filter.into()).send_sync(None);
 
     engine
         .assert_schema()
