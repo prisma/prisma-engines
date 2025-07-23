@@ -45,6 +45,9 @@ pub trait SchemaDialect: Send + Sync + 'static {
     /// An empty database schema (for diffing).
     fn empty_database_schema(&self) -> DatabaseSchema;
 
+    /// The default namespace for the dialect if it supports multiple namespaces.
+    fn default_namespace(&self) -> Option<&str>;
+
     /// Create a database schema from datamodel source files.
     fn schema_from_datamodel(
         &self,

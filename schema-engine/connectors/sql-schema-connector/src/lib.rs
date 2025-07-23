@@ -95,6 +95,10 @@ impl SchemaDialect for SqlSchemaDialect {
         DatabaseSchema::new(SqlDatabaseSchema::from(self.dialect.empty_database_schema()))
     }
 
+    fn default_namespace(&self) -> Option<&str> {
+        self.dialect.default_namespace()
+    }
+
     fn migration_file_extension(&self) -> &'static str {
         "sql"
     }

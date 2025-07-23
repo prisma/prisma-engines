@@ -12,7 +12,10 @@ use connector::{Connection, generic_apply_migration_script, shadow_db};
 use connector::{Connection, generic_apply_migration_script, shadow_db};
 use destructive_change_checker::MssqlDestructiveChangeCheckerFlavour;
 use indoc::formatdoc;
-use quaint::{connector::MssqlUrl, prelude::Table};
+use quaint::{
+    connector::{DEFAULT_MSSQL_SCHEMA, MssqlUrl},
+    prelude::Table,
+};
 use renderer::MssqlRenderer;
 use schema_calculator::MssqlSchemaCalculatorFlavour;
 use schema_connector::{
@@ -99,6 +102,10 @@ impl SqlDialect for MssqlDialect {
         let mut schema = SqlSchema::default();
         schema.set_connector_data(Box::<sql_schema_describer::mssql::MssqlSchemaExt>::default());
         schema
+    }
+
+    fn default_namespace(&self) -> Option<&str> {
+        Some(DEFAULT_MSSQL_SCHEMA)
     }
 
     #[cfg(feature = "mssql-native")]

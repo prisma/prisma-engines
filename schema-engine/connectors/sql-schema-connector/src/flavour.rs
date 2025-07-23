@@ -123,6 +123,11 @@ pub(crate) trait SqlDialect: Send + Sync + 'static {
         SqlSchema::default()
     }
 
+    /// The default namespace for the dialect if it supports multiple namespaces.
+    fn default_namespace(&self) -> Option<&str> {
+        None
+    }
+
     /// Optionally scan a migration script that could have been altered by users and emit warnings.
     fn scan_migration_script(&self, _script: &str) {}
 

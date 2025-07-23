@@ -90,6 +90,10 @@ impl SchemaDialect for MongoDbSchemaDialect {
         DatabaseSchema::new(MongoSchema::default())
     }
 
+    fn default_namespace(&self) -> Option<&str> {
+        None
+    }
+
     fn schema_from_datamodel(
         &self,
         sources: Vec<(String, psl::SourceFile)>,

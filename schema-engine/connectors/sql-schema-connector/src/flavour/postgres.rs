@@ -13,7 +13,7 @@ use indoc::indoc;
 use psl::PreviewFeature;
 use quaint::{
     Value,
-    connector::{PostgresUrl, PostgresWebSocketUrl, is_url_localhost},
+    connector::{DEFAULT_POSTGRES_SCHEMA, PostgresUrl, PostgresWebSocketUrl, is_url_localhost},
 };
 use renderer::PostgresRenderer;
 use schema_calculator::PostgresSchemaCalculatorFlavour;
@@ -243,6 +243,10 @@ impl SqlDialect for PostgresDialect {
         let mut schema = SqlSchema::default();
         schema.set_connector_data(Box::<sql_schema_describer::postgres::PostgresSchemaExt>::default());
         schema
+    }
+
+    fn default_namespace(&self) -> Option<&str> {
+        Some(DEFAULT_POSTGRES_SCHEMA)
     }
 
     #[cfg(feature = "postgresql-native")]
