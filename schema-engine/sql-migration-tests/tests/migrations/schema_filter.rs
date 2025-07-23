@@ -21,6 +21,8 @@ fn schema_filter_migration_adding_external_table(api: TestApi) {
     api.create_migration_with_filter("custom", &schema, &dir, filter, "")
         .send_sync()
         .assert_migration_directories_count(0);
+    // Table is external => migrations should not touch it => created no migration => external table should not be there
+    api.assert_schema().assert_has_no_table("ExternalTable");
 }
 
 #[test_connector]
@@ -33,12 +35,10 @@ fn schema_filter_migration_removing_external_table(mut api: TestApi) {
         }
     "#,
     );
+    // No filter applied here to actually create the external tables first
+    api.schema_push(schema_1).send();
 
     let dir = api.create_migrations_directory();
-
-    // No filter applied here to actually create the external tables first
-    api.create_migration("create", &schema_1, &dir).send_sync();
-
     let schema_2 = api.datamodel_with_provider("");
 
     let filter = SchemaFilter {
@@ -47,7 +47,9 @@ fn schema_filter_migration_removing_external_table(mut api: TestApi) {
     };
     api.create_migration_with_filter("remove", &schema_2, &dir, filter, "")
         .send_sync()
-        .assert_migration_directories_count(1);
+        .assert_migration_directories_count(0);
+    // Table is external => migrations should not touch it => created no migration => external table should still be there
+    api.assert_schema().assert_has_table("ExternalTable");
 }
 
 #[test_connector]
@@ -60,16 +62,12 @@ fn schema_filter_migration_removing_external_table_with_contents(mut api: TestAp
         }
     "#,
     );
-
-    let dir = api.create_migrations_directory();
-
     // No filter applied here to actually create the external tables first
-    api.create_migration("create", &schema_1, &dir).send_sync();
-    api.apply_migrations(&dir).send_sync();
-
+    api.schema_push(schema_1).send();
     api.insert("Cat").value("id", 1).value("name", "Felix").result_raw();
     api.insert("Cat").value("id", 2).value("name", "Norbert").result_raw();
 
+    let dir = api.create_migrations_directory();
     let schema_2 = api.datamodel_with_provider("");
 
     let filter = SchemaFilter {
@@ -90,12 +88,10 @@ fn schema_filter_migration_modifying_external_table(mut api: TestApi) {
         }
     "#,
     );
+    // No filter applied here to actually create the external tables first
+    api.schema_push(schema_1).send();
 
     let dir = api.create_migrations_directory();
-
-    // No filter applied here to actually create the external tables first
-    api.create_migration("create", &schema_1, &dir).send_sync();
-
     let schema_2 = api.datamodel_with_provider(
         r#"
             model ExternalTable {
@@ -111,7 +107,11 @@ fn schema_filter_migration_modifying_external_table(mut api: TestApi) {
     };
     api.create_migration_with_filter("modify", &schema_2, &dir, filter, "")
         .send_sync()
-        .assert_migration_directories_count(1);
+        .assert_migration_directories_count(0);
+    // Table is external => migrations should not touch it => created no migration => external table should still be in the old state
+    api.assert_schema().assert_table("ExternalTable", |table_assertions| {
+        table_assertions.assert_column_count(1)
+    });
 }
 
 #[test_connector(tags(Postgres), exclude(CockroachDb))]
@@ -134,6 +134,8 @@ fn schema_filter_migration_adding_external_enum(api: TestApi) {
     api.create_migration_with_filter("custom", &schema, &dir, filter, "")
         .send_sync()
         .assert_migration_directories_count(0);
+    // Enum is external => migrations should not touch it => created no migration => external enum should not be there
+    api.assert_schema().assert_has_no_enum("ExternalEnum");
 }
 
 #[test_connector(tags(Postgres), exclude(CockroachDb))]
@@ -146,11 +148,10 @@ fn schema_filter_migration_removing_external_enum(mut api: TestApi) {
         }
     "#,
     );
+    // Create the external enum in the database
+    api.schema_push(schema_1).send();
 
     let dir = api.create_migrations_directory();
-
-    // No filter applied here to actually create the external enum first
-    api.create_migration("create", &schema_1, &dir).send_sync();
 
     let schema_2 = api.datamodel_with_provider("");
 
@@ -160,8 +161,11 @@ fn schema_filter_migration_removing_external_enum(mut api: TestApi) {
     };
     api.create_migration_with_filter("remove", &schema_2, &dir, filter, "")
         .send_sync()
-        // No additional migration created because the enum is not being removed as it is marked external
-        .assert_migration_directories_count(1);
+        .assert_migration_directories_count(0);
+    // Enum is external => migrations should not touch it => created no migration => external enum should still be there
+    api.assert_schema().assert_enum("ExternalEnum", |enum_assertions| {
+        enum_assertions.assert_values(&["ONE", "TWO"])
+    });
 }
 
 #[test_connector(exclude(CockroachDb, Vitess))]
