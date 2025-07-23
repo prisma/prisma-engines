@@ -30,8 +30,7 @@ use crate::{
     sql_destructive_change_checker::DestructiveChangeCheckerFlavour, sql_renderer::SqlRenderer,
     sql_schema_calculator::SqlSchemaCalculatorFlavour, sql_schema_differ::SqlSchemaDifferFlavour,
 };
-use enumflags2::BitFlags;
-use psl::{PreviewFeature, PreviewFeatures, ValidatedSchema};
+use psl::{PreviewFeatures, ValidatedSchema};
 use quaint::prelude::{NativeConnectionInfo, Table};
 use schema_connector::{
     BoxFuture, ConnectorError, ConnectorResult, IntrospectionContext, MigrationRecord, Namespaces,
@@ -348,13 +347,6 @@ fn validate_connection_infos_do_not_match(previous: &str, next: &str) -> Connect
         Err(ConnectorError::from_msg("The shadow database you configured appears to be the same as the main database. Please specify another shadow database.".into()))
     } else {
         Ok(())
-    }
-}
-
-/// Remove all usage of non-enabled preview feature elements from the SqlSchema.
-fn normalize_sql_schema(sql_schema: &mut SqlSchema, preview_features: BitFlags<PreviewFeature>) {
-    if !preview_features.contains(PreviewFeature::MultiSchema) {
-        sql_schema.clear_namespaces();
     }
 }
 

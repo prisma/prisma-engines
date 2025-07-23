@@ -68,7 +68,7 @@ impl Connection {
             describer_circumstances |= describer::Circumstances::CheckConstraints;
         }
 
-        let mut schema = sql_schema_describer::mysql::SqlSchemaDescriber::new(&self.0, describer_circumstances)
+        let schema = sql_schema_describer::mysql::SqlSchemaDescriber::new(&self.0, describer_circumstances)
             .describe(&[params.url.dbname_or_default()])
             .await
             .map_err(|err| match err.into_kind() {
@@ -80,8 +80,6 @@ impl Connection {
                     ConnectorError::user_facing(err)
                 }
             })?;
-
-        crate::flavour::normalize_sql_schema(&mut schema, params.connector_params.preview_features);
 
         Ok(schema)
     }

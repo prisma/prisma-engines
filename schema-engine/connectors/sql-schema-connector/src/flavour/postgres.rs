@@ -661,7 +661,6 @@ async fn describe_schema_with(
                 }
             })?;
 
-    crate::flavour::normalize_sql_schema(&mut schema, preview_features);
     normalize_sql_schema(&mut schema, preview_features);
 
     Ok(schema)
