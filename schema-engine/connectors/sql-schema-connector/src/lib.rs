@@ -131,11 +131,6 @@ impl SchemaDialect for SqlSchemaDialect {
         sources: Vec<(String, SourceFile)>,
         default_namespace: Option<&str>,
     ) -> ConnectorResult<DatabaseSchema> {
-        let default_namespace = match default_namespace {
-            Some(ns) => ns,
-            None => unreachable!("Default namespace is required for SQL schema connector"),
-        };
-
         let schema = psl::parse_schema_multi(&sources).map_err(ConnectorError::new_schema_parser_error)?;
         self.dialect.check_schema_features(&schema)?;
         let calculator = self.dialect.schema_calculator();
@@ -358,7 +353,7 @@ impl SchemaConnector for SqlSchemaConnector {
     }
 
     fn default_namespace(&self) -> Option<&str> {
-        Some(self.inner.search_path())
+        self.inner.default_namespace()
     }
 
     // TODO: this only seems to be used in `sql-migration-tests`.

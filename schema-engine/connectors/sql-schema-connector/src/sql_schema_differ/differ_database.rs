@@ -103,6 +103,7 @@ impl<'a> DifferDatabase<'a> {
             } else {
                 Cow::Borrowed(table.name())
             };
+            println!("table_name previous: {:?}, {:?}", table.namespace(), table_name);
             db.tables.insert(
                 (table.namespace().map(Cow::Borrowed), table_name),
                 MigrationPair::new(Some(table.id), None),
@@ -122,6 +123,8 @@ impl<'a> DifferDatabase<'a> {
             } else {
                 Cow::Borrowed(table.name())
             };
+            println!("table_name next: {:?}, {:?}", table.namespace(), table_name);
+
             let entry = db
                 .tables
                 .entry((table.namespace().map(Cow::Borrowed), table_name))

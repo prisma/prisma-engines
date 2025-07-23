@@ -415,6 +415,10 @@ impl SqlConnector for SqliteConnector {
         "main"
     }
 
+    fn default_namespace(&self) -> Option<&str> {
+        None // For Sqlite we do not support multiple schemas and hence use no schema qualifiers
+    }
+
     fn dispose(&mut self) -> BoxFuture<'_, ConnectorResult<()>> {
         Box::pin(imp::dispose(&self.state))
     }

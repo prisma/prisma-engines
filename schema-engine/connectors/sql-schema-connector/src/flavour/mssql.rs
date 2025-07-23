@@ -587,6 +587,10 @@ impl SqlConnector for MssqlConnector {
         self.schema_name()
     }
 
+    fn default_namespace(&self) -> Option<&str> {
+        Some(self.schema_name())
+    }
+
     fn describe_query<'a>(
         &'a mut self,
         _sql: &str,

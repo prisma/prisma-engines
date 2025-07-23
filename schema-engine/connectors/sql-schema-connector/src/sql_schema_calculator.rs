@@ -17,7 +17,7 @@ use std::collections::HashMap;
 
 pub(crate) fn calculate_sql_schema(
     datamodel: &ValidatedSchema,
-    default_namespace: &str,
+    default_namespace: Option<&str>,
     flavour: &dyn SqlSchemaCalculatorFlavour,
 ) -> SqlDatabaseSchema {
     let mut schema = SqlDatabaseSchema::default();
@@ -56,18 +56,20 @@ pub(crate) fn calculate_sql_schema(
     schema
 }
 
-fn push_namespaces<'a>(ctx: &mut Context<'a>, default_namespace: &'a str) {
-    ctx.schemas.insert(
-        default_namespace,
-        ctx.schema
-            .describer_schema
-            .push_namespace(default_namespace.to_string()),
-    );
+fn push_namespaces<'a>(ctx: &mut Context<'a>, default_namespace: Option<&'a str>) {
+    if let Some(default_namespace) = default_namespace {
+        ctx.schemas.insert(
+            default_namespace,
+            ctx.schema
+                .describer_schema
+                .push_namespace(default_namespace.to_string()),
+        );
 
-    if let Some(ds) = ctx.datamodel.configuration.datasources.first() {
-        for (schema, _) in ds.namespaces.iter().filter(|(n, _)| n != default_namespace) {
-            ctx.schemas
-                .insert(schema, ctx.schema.describer_schema.push_namespace(schema.clone()));
+        if let Some(ds) = ctx.datamodel.configuration.datasources.first() {
+            for (schema, _) in ds.namespaces.iter().filter(|(n, _)| n != default_namespace) {
+                ctx.schemas
+                    .insert(schema, ctx.schema.describer_schema.push_namespace(schema.clone()));
+            }
         }
     }
 }

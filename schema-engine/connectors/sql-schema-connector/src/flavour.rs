@@ -338,6 +338,8 @@ pub(crate) trait SqlConnector: Send + Sync + Debug {
 
     fn search_path(&self) -> &str;
 
+    fn default_namespace(&self) -> Option<&str>;
+
     fn dispose(&mut self) -> BoxFuture<'_, ConnectorResult<()>>;
 }
 
