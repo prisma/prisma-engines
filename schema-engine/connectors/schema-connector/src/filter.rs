@@ -35,11 +35,3 @@ impl From<json_rpc::types::SchemaFilter> for SchemaFilter {
         }
     }
 }
-
-impl From<Option<json_rpc::types::SchemaFilter>> for SchemaFilter {
-    fn from(filter: Option<json_rpc::types::SchemaFilter>) -> Self {
-        Self {
-            external_tables: filter.map(|f| f.external_tables).unwrap_or_default(),
-        }
-    }
-}

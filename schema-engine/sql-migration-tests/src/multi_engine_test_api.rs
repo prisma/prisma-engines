@@ -360,7 +360,7 @@ impl EngineTestApi {
             &mut self.connector,
             &[("schema.prisma", &dm)],
             self.max_ddl_refresh_delay,
-            None,
+            SchemaFilter::default(),
         )
     }
 

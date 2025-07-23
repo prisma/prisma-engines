@@ -471,9 +471,9 @@ fn schema_push_with_schema_filters(api: TestApi) {
 
     api.schema_push_with_filter(
         dm,
-        Some(SchemaFilter {
+        SchemaFilter {
             external_tables: vec!["ExternalTable".to_string()],
-        }),
+        },
     )
     .send()
     .assert_green()
@@ -499,9 +499,9 @@ fn schema_push_with_invalid_schema_filters(api: TestApi) {
     let err = api
         .schema_push_with_filter(
             dm,
-            Some(SchemaFilter {
+            SchemaFilter {
                 external_tables: vec!["public.ExternalTable".to_string()],
-            }),
+            },
         )
         .send_unwrap_err();
 
