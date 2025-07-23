@@ -469,15 +469,10 @@ fn schema_push_with_schema_filters(api: TestApi) {
     }
     "#;
 
-    api.schema_push_with_filter(
-        dm,
-        Some(SchemaFilter {
-            external_tables: vec!["ExternalTable".to_string()],
-        }),
-    )
-    .send()
-    .assert_green()
-    .assert_has_executed_steps();
+    api.schema_push_with_filter(dm, Some(api.namespaced_schema_filter(&["ExternalTable"])))
+        .send()
+        .assert_green()
+        .assert_has_executed_steps();
 
     api.assert_schema()
         .assert_has_table("Cat")
