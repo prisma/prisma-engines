@@ -473,6 +473,7 @@ fn schema_push_with_schema_filters(api: TestApi) {
         dm,
         SchemaFilter {
             external_tables: vec!["ExternalTable".to_string()],
+            external_enums: vec![],
         },
     )
     .send()
@@ -501,6 +502,7 @@ fn schema_push_with_invalid_schema_filters(api: TestApi) {
             dm,
             SchemaFilter {
                 external_tables: vec!["public.ExternalTable".to_string()],
+                external_enums: vec![],
             },
         )
         .send_unwrap_err();

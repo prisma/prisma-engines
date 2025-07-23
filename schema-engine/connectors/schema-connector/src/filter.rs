@@ -9,10 +9,14 @@ pub struct SchemaFilter {
     /// Prisma will not consider those tables during diffing operations, migration creation, or introspection.
     /// They are still available for querying at runtime.
     pub external_tables: Vec<String>,
+    /// Enums that shall be considered "externally" managed. As per prisma.config.ts > enums.external.
+    /// Prisma will not consider those enums during diffing operations, migration creation, or introspection.
+    /// They are still available for querying at runtime.
+    pub external_enums: Vec<String>,
 }
 
 impl SchemaFilter {
-    /// Validate that the schema filter contains correctly qualified table names.
+    /// Validate that the schema filter contains correctly qualified table and enum names.
     pub fn validate(&self, namespaces: Option<&Namespaces>) -> ConnectorResult<()> {
         let has_explicit_namespaces = namespaces.is_some();
 
@@ -20,6 +24,14 @@ impl SchemaFilter {
             if has_explicit_namespaces && !table_name.contains(".") {
                 return Err(ConnectorError::user_facing(MissingNamespaceInExternalTables));
             } else if !has_explicit_namespaces && table_name.contains(".") {
+                return Err(ConnectorError::user_facing(UnexpectedNamespaceInExternalTables));
+            }
+        }
+
+        for enum_name in self.external_enums.iter() {
+            if has_explicit_namespaces && !enum_name.contains(".") {
+                return Err(ConnectorError::user_facing(MissingNamespaceInExternalTables));
+            } else if !has_explicit_namespaces && enum_name.contains(".") {
                 return Err(ConnectorError::user_facing(UnexpectedNamespaceInExternalTables));
             }
         }
@@ -32,6 +44,7 @@ impl From<json_rpc::types::SchemaFilter> for SchemaFilter {
     fn from(filter: json_rpc::types::SchemaFilter) -> Self {
         Self {
             external_tables: filter.external_tables,
+            external_enums: filter.external_enums,
         }
     }
 }

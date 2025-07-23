@@ -273,6 +273,7 @@ fn soft_resets_does_not_drop_external_tables(mut api: TestApi) {
         .soft(true)
         .filter(SchemaFilter {
             external_tables: vec!["external_table".to_string()],
+            external_enums: vec![],
         })
         .send_sync(None);
 
