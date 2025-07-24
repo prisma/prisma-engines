@@ -1,6 +1,6 @@
 use user_facing_errors::schema_engine::{MissingNamespaceInExternalTables, UnexpectedNamespaceInExternalTables};
 
-use crate::{ConnectorError, ConnectorResult, Namespaces};
+use crate::{ConnectorError, ConnectorResult, SchemaDialect};
 
 /// Configuration of entities in the schema/database to be included or excluded from an operation.
 #[derive(Debug, Default)]
@@ -17,21 +17,21 @@ pub struct SchemaFilter {
 
 impl SchemaFilter {
     /// Validate that the schema filter contains correctly qualified table and enum names.
-    pub fn validate(&self, namespaces: Option<&Namespaces>) -> ConnectorResult<()> {
-        let has_explicit_namespaces = namespaces.is_some();
+    pub fn validate(&self, dialect: &dyn SchemaDialect) -> ConnectorResult<()> {
+        let requires_explicit_namespaces = dialect.default_namespace().is_some();
 
         for table_name in self.external_tables.iter() {
-            if has_explicit_namespaces && !table_name.contains(".") {
+            if requires_explicit_namespaces && !table_name.contains(".") {
                 return Err(ConnectorError::user_facing(MissingNamespaceInExternalTables));
-            } else if !has_explicit_namespaces && table_name.contains(".") {
+            } else if !requires_explicit_namespaces && table_name.contains(".") {
                 return Err(ConnectorError::user_facing(UnexpectedNamespaceInExternalTables));
             }
         }
 
         for enum_name in self.external_enums.iter() {
-            if has_explicit_namespaces && !enum_name.contains(".") {
+            if requires_explicit_namespaces && !enum_name.contains(".") {
                 return Err(ConnectorError::user_facing(MissingNamespaceInExternalTables));
-            } else if !has_explicit_namespaces && enum_name.contains(".") {
+            } else if !requires_explicit_namespaces && enum_name.contains(".") {
                 return Err(ConnectorError::user_facing(UnexpectedNamespaceInExternalTables));
             }
         }

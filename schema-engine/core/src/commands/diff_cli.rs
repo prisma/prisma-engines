@@ -22,7 +22,6 @@ pub async fn diff_cli(params: DiffParams, host: Arc<dyn ConnectorHost>) -> CoreR
         namespaces_and_preview_features_from_diff_targets(&[&params.from, &params.to])?;
 
     let filter: SchemaFilter = params.filters.into();
-    filter.validate(namespaces.as_ref())?;
 
     let from = json_rpc_diff_target_to_dialect(
         &params.from,
@@ -137,6 +136,8 @@ async fn json_rpc_diff_target_to_dialect(
             let mut connector = crate::schema_to_connector(&sources, Some(config_dir))?;
             connector.ensure_connection_validity().await?;
             connector.set_preview_features(preview_features);
+            filter.validate(&*connector.schema_dialect())?;
+
             let schema = connector.schema_from_database(namespaces).await?;
             Ok(Some((connector.schema_dialect(), schema)))
         }
@@ -156,6 +157,8 @@ async fn json_rpc_diff_target_to_dialect(
                 }
             };
 
+            filter.validate(&*dialect)?;
+
             let schema = dialect.schema_from_datamodel(sources, default_namespace.as_deref())?;
 
             Ok(Some((dialect, schema)))
@@ -169,6 +172,7 @@ async fn json_rpc_diff_target_to_dialect(
 
             let schema = connector.schema_from_database(namespaces).await?;
             let dialect = connector.schema_dialect();
+            filter.validate(&*dialect)?;
 
             connector.dispose().await?;
 
@@ -181,6 +185,8 @@ async fn json_rpc_diff_target_to_dialect(
                 (Some(provider), Some(shadow_database_url)) => {
                     let dialect = ::commands::dialect_for_provider(provider)?;
                     let migrations = Migrations::from_migration_list(migration_list);
+
+                    filter.validate(&*dialect)?;
 
                     let schema = dialect
                         .schema_from_migrations_with_target(
@@ -199,6 +205,8 @@ async fn json_rpc_diff_target_to_dialect(
                     // TODO: we don't need this branch
                     let mut connector = SqlSchemaConnector::new_sqlite_inmem(preview_features)?;
                     let migrations = Migrations::from_migration_list(migration_list);
+                    filter.validate(&*connector.schema_dialect())?;
+
                     let schema = connector
                         .schema_from_migrations(&migrations, namespaces, filter)
                         .await?;
