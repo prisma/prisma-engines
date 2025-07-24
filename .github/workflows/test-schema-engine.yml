@@ -20,7 +20,8 @@ concurrency:
 
 jobs:
   test-mongodb-schema-connector:
-    if: github.event_name == 'push'
+    if: github.event_name == 'push' ||
+      (github.event_name == 'pull_request' && contains(github.event.pull_request.body, '/test-all'))
     strategy:
       fail-fast: false
       matrix:
@@ -82,7 +83,9 @@ jobs:
       database_url: ${{ matrix.database.url }}
 
   test-linux-push:
-    if: github.event_name == 'push'
+    if: |
+      github.event_name == 'push' ||
+      (github.event_name == 'pull_request' && contains(github.event.pull_request.body, '/test-all'))
     strategy:
       fail-fast: false
       matrix:
@@ -133,7 +136,8 @@ jobs:
       single_threaded: ${{ matrix.database.single_threaded }}
 
   test-windows:
-    if: github.event_name == 'push'
+    if: github.event_name == 'push' ||
+      (github.event_name == 'pull_request' && contains(github.event.pull_request.body, '/test-all'))
     strategy:
       fail-fast: false
       matrix:
