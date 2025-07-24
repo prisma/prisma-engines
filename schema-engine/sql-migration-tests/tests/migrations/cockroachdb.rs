@@ -4,7 +4,10 @@ mod failure_modes;
 use prisma_value::PrismaValue;
 use psl::parser_database::*;
 use quaint::prelude::Insert;
-use schema_core::{json_rpc::types::SchemasContainer, schema_connector::DiffTarget};
+use schema_core::{
+    json_rpc::types::{SchemaFilter, SchemasContainer},
+    schema_connector::DiffTarget,
+};
 use serde_json::json;
 use sql_migration_tests::test_api::*;
 use sql_schema_describer::{ColumnTypeFamily, ForeignKeyAction};
@@ -36,7 +39,7 @@ fn db_push_on_cockroach_db_with_postgres_provider_fails(api: TestApi) {
                 content: schema,
             }],
         },
-        filters: None,
+        filters: SchemaFilter::default(),
     }))
     .unwrap_err()
     .message()

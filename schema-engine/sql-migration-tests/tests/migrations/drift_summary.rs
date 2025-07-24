@@ -1,5 +1,5 @@
 use expect_test::{Expect, expect};
-use schema_core::json_rpc::types::SchemasContainer;
+use schema_core::json_rpc::types::{SchemaFilter, SchemasContainer};
 use sql_migration_tests::test_api::*;
 use std::sync::Arc;
 
@@ -24,7 +24,7 @@ fn check(from: &str, to: &str, expectation: Expect) {
                 content: to.to_string(),
             }],
         }),
-        filters: None,
+        filters: SchemaFilter::default(),
     };
 
     let host = Arc::new(TestConnectorHost::default());

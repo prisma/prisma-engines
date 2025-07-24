@@ -621,7 +621,7 @@ fn dev_diagnostic_shadow_database_creation_error_is_special_cased_mysql(api: Tes
         migration_api
             .dev_diagnostic(DevDiagnosticInput {
                 migrations_list,
-                filters: None,
+                filters: SchemaFilter::default(),
             })
             .await
     })
@@ -672,7 +672,7 @@ fn dev_diagnostic_shadow_database_creation_error_is_special_cased_postgres(api: 
         migration_api
             .dev_diagnostic(DevDiagnosticInput {
                 migrations_list,
-                filters: None,
+                filters: SchemaFilter::default(),
             })
             .await
     })
@@ -834,7 +834,7 @@ ALTER TABLE "prisma-tests".profiles ADD CONSTRAINT profiles_id_fkey FOREIGN KEY 
 
     tok(api.dev_diagnostic(DevDiagnosticInput {
         migrations_list,
-        filters: None,
+        filters: SchemaFilter::default(),
     }))
     .unwrap();
 }

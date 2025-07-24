@@ -31,7 +31,7 @@ impl<'a> DevDiagnostic<'a> {
         let fut = dev_diagnostic_cli(
             DevDiagnosticInput {
                 migrations_list,
-                filters: Some(self.filter),
+                filters: self.filter,
             },
             None,
             self.api,

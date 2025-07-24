@@ -484,7 +484,7 @@ fn dropping_m2m_relation_from_datamodel_works() {
         }),
         script: true,
         shadow_database_url: None,
-        filters: None,
+        filters: SchemaFilter::default(),
     });
 
     let expected = expect![[r#"
