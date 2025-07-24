@@ -14,7 +14,7 @@ fn views_can_be_described(api: TestApi) {
     let result = api.describe();
     let view = result.get_view("ab").expect("couldn't get ab view").to_owned();
 
-    let expected_sql = "SELECT a_id FROM views_can_be_described.\"prisma-tests\".a UNION ALL SELECT b_id FROM views_can_be_described.\"prisma-tests\".b";
+    let expected_sql = "SELECT a_id FROM views_can_be_described.\"public\".a UNION ALL SELECT b_id FROM views_can_be_described.\"public\".b";
 
     assert_eq!("ab", &view.name);
     assert_eq!(expected_sql, view.definition.unwrap());
@@ -229,7 +229,7 @@ fn multi_field_indexes_must_be_inferred_in_the_right_order(api: TestApi) {
     let expectation = expect![[r#"
         SqlSchema {
             namespaces: {
-                "prisma-tests",
+                "public",
             },
             tables: [
                 Table {

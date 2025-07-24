@@ -1,6 +1,6 @@
 use schema_core::{
-    json_rpc::types::SchemasContainer,
-    schema_connector::{ConnectorParams, SchemaConnector, SchemaFilter},
+    json_rpc::types::{SchemaFilter, SchemasContainer},
+    schema_connector::{ConnectorParams, SchemaConnector},
 };
 use sql_migration_tests::test_api::*;
 use sql_schema_connector::SqlSchemaConnector;
@@ -80,7 +80,7 @@ fn run_single_migration_test(test_file_path: &str, test_function_name: &'static 
             shadow_database_connection_string: None,
         };
         let mut conn = SqlSchemaConnector::new_mysql(params).unwrap();
-        tok(conn.reset(false, None, &SchemaFilter::default())).unwrap();
+        tok(conn.reset(false, None, &SchemaFilter::default().into())).unwrap();
         test_api_args.database_url().to_owned()
     } else if tags.contains(Tags::Mysql) {
         let (_, connection_string) = tok(test_api_args.create_mysql_database());
@@ -108,7 +108,7 @@ fn run_single_migration_test(test_file_path: &str, test_function_name: &'static 
                 content: text.to_string(),
             }],
         }),
-        filters: None,
+        filters: SchemaFilter::default(),
     }))
     .unwrap();
 
@@ -137,7 +137,7 @@ fn run_single_migration_test(test_file_path: &str, test_function_name: &'static 
                 content: text.to_string(),
             }],
         }),
-        filters: None,
+        filters: SchemaFilter::default(),
     }))
     .unwrap();
 

@@ -38,14 +38,14 @@ fn basic_create_migration_works(mut api: TestApi) {
                 "#]]
             } else if is_postgres {
                 expect![[r#"
-                        -- CreateTable
-                        CREATE TABLE "Cat" (
-                            "id" INTEGER NOT NULL,
-                            "name" TEXT NOT NULL,
+                    -- CreateTable
+                    CREATE TABLE "public"."Cat" (
+                        "id" INTEGER NOT NULL,
+                        "name" TEXT NOT NULL,
 
-                            CONSTRAINT "Cat_pkey" PRIMARY KEY ("id")
-                        );
-                    "#]]
+                        CONSTRAINT "Cat_pkey" PRIMARY KEY ("id")
+                    );
+                "#]]
             } else if is_mysql {
                 expect![[r#"
                         -- CreateTable
@@ -149,7 +149,7 @@ fn basic_create_migration_multi_file_works(api: TestApi) {
             } else if is_postgres {
                 expect![[r#"
                     -- CreateTable
-                    CREATE TABLE "Cat" (
+                    CREATE TABLE "public"."Cat" (
                         "id" INTEGER NOT NULL,
                         "name" TEXT NOT NULL,
 
@@ -157,7 +157,7 @@ fn basic_create_migration_multi_file_works(api: TestApi) {
                     );
 
                     -- CreateTable
-                    CREATE TABLE "Dog" (
+                    CREATE TABLE "public"."Dog" (
                         "id" INTEGER NOT NULL,
                         "name" TEXT NOT NULL,
 
@@ -289,14 +289,14 @@ fn creating_a_second_migration_should_have_the_previous_sql_schema_as_baseline(a
                 "#]]
             } else if is_postgres {
                 expect![[r#"
-                        -- CreateTable
-                        CREATE TABLE "Dog" (
-                            "id" INTEGER NOT NULL,
-                            "name" TEXT NOT NULL,
+                    -- CreateTable
+                    CREATE TABLE "public"."Dog" (
+                        "id" INTEGER NOT NULL,
+                        "name" TEXT NOT NULL,
 
-                            CONSTRAINT "Dog_pkey" PRIMARY KEY ("id")
-                        );
-                        "#]]
+                        CONSTRAINT "Dog_pkey" PRIMARY KEY ("id")
+                    );
+                "#]]
             } else if is_mysql {
                 expect![[r#"
                         -- CreateTable
@@ -494,12 +494,12 @@ fn create_enum_step_only_rendered_when_needed(api: TestApi) {
                 indoc! {
                     r#"
                         -- CreateEnum
-                        CREATE TYPE "Mood" AS ENUM ('HUNGRY', 'SLEEPY');
+                        CREATE TYPE "public"."Mood" AS ENUM ('HUNGRY', 'SLEEPY');
 
                         -- CreateTable
-                        CREATE TABLE "Cat" (
+                        CREATE TABLE "public"."Cat" (
                             "id" INT4 NOT NULL,
-                            "mood" "Mood" NOT NULL,
+                            "mood" "public"."Mood" NOT NULL,
 
                             CONSTRAINT "Cat_pkey" PRIMARY KEY ("id")
                         );
@@ -509,12 +509,12 @@ fn create_enum_step_only_rendered_when_needed(api: TestApi) {
                 indoc! {
                     r#"
                         -- CreateEnum
-                        CREATE TYPE "Mood" AS ENUM ('HUNGRY', 'SLEEPY');
+                        CREATE TYPE "public"."Mood" AS ENUM ('HUNGRY', 'SLEEPY');
 
                         -- CreateTable
-                        CREATE TABLE "Cat" (
+                        CREATE TABLE "public"."Cat" (
                             "id" INTEGER NOT NULL,
-                            "mood" "Mood" NOT NULL,
+                            "mood" "public"."Mood" NOT NULL,
 
                             CONSTRAINT "Cat_pkey" PRIMARY KEY ("id")
                         );
@@ -568,12 +568,12 @@ fn create_enum_renders_correctly(api: TestApi) {
             let expected_script = indoc! {
                     r#"
                         -- CreateEnum
-                        CREATE TYPE "Mood" AS ENUM ('HUNGRY', 'SLEEPY');
+                        CREATE TYPE "public"."Mood" AS ENUM ('HUNGRY', 'SLEEPY');
 
                         -- CreateTable
-                        CREATE TABLE "Cat" (
+                        CREATE TABLE "public"."Cat" (
                             "id" INTEGER NOT NULL,
-                            "mood" "Mood" NOT NULL,
+                            "mood" "public"."Mood" NOT NULL,
 
                             CONSTRAINT "Cat_pkey" PRIMARY KEY ("id")
                         );
@@ -607,7 +607,7 @@ fn unsupported_type_renders_correctly(api: TestApi) {
             let expected_script = indoc! {
                 r#"
                         -- CreateTable
-                        CREATE TABLE "Cat" (
+                        CREATE TABLE "public"."Cat" (
                             "id" TEXT NOT NULL,
                             "home" point NOT NULL,
 
@@ -651,21 +651,21 @@ fn no_additional_unique_created(api: TestApi) {
                     indoc! {
                         r#"
                         -- CreateTable
-                        CREATE TABLE "Cat" (
+                        CREATE TABLE "public"."Cat" (
                             "id" INTEGER NOT NULL,
 
                             CONSTRAINT "Cat_pkey" PRIMARY KEY ("id")
                         );
 
                         -- CreateTable
-                        CREATE TABLE "Collar" (
+                        CREATE TABLE "public"."Collar" (
                             "id" INTEGER NOT NULL,
 
                             CONSTRAINT "Collar_pkey" PRIMARY KEY ("id")
                         );
 
                         -- AddForeignKey
-                        ALTER TABLE "Collar" ADD CONSTRAINT "Collar_id_fkey" FOREIGN KEY ("id") REFERENCES "Cat"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+                        ALTER TABLE "public"."Collar" ADD CONSTRAINT "Collar_id_fkey" FOREIGN KEY ("id") REFERENCES "public"."Cat"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
                         "#
                     }
                 }
@@ -797,43 +797,41 @@ fn create_constraint_name_tests_w_implicit_names(api: TestApi) {
                 "#
                      ]]
             } else if is_postgres {
-                expect![[
-                     r#"
-                     -- CreateTable
-                     CREATE TABLE "A" (
-                         "id" INTEGER NOT NULL,
-                         "name" TEXT NOT NULL,
-                         "a" TEXT NOT NULL,
-                         "b" TEXT NOT NULL,
+                expect![[r#"
+                    -- CreateTable
+                    CREATE TABLE "public"."A" (
+                        "id" INTEGER NOT NULL,
+                        "name" TEXT NOT NULL,
+                        "a" TEXT NOT NULL,
+                        "b" TEXT NOT NULL,
 
-                         CONSTRAINT "A_pkey" PRIMARY KEY ("id")
-                     );
+                        CONSTRAINT "A_pkey" PRIMARY KEY ("id")
+                    );
 
-                     -- CreateTable
-                     CREATE TABLE "B" (
-                         "a" TEXT NOT NULL,
-                         "b" TEXT NOT NULL,
-                         "aId" INTEGER NOT NULL,
+                    -- CreateTable
+                    CREATE TABLE "public"."B" (
+                        "a" TEXT NOT NULL,
+                        "b" TEXT NOT NULL,
+                        "aId" INTEGER NOT NULL,
 
-                         CONSTRAINT "B_pkey" PRIMARY KEY ("a","b")
-                     );
+                        CONSTRAINT "B_pkey" PRIMARY KEY ("a","b")
+                    );
 
-                     -- CreateIndex
-                     CREATE UNIQUE INDEX "A_name_key" ON "A"("name");
+                    -- CreateIndex
+                    CREATE UNIQUE INDEX "A_name_key" ON "public"."A"("name");
 
-                     -- CreateIndex
-                     CREATE INDEX "A_a_idx" ON "A"("a");
+                    -- CreateIndex
+                    CREATE INDEX "A_a_idx" ON "public"."A"("a");
 
-                     -- CreateIndex
-                     CREATE UNIQUE INDEX "A_a_b_key" ON "A"("a", "b");
+                    -- CreateIndex
+                    CREATE UNIQUE INDEX "A_a_b_key" ON "public"."A"("a", "b");
 
-                     -- CreateIndex
-                     CREATE INDEX "B_a_b_idx" ON "B"("a", "b");
+                    -- CreateIndex
+                    CREATE INDEX "B_a_b_idx" ON "public"."B"("a", "b");
 
-                     -- AddForeignKey
-                     ALTER TABLE "B" ADD CONSTRAINT "B_aId_fkey" FOREIGN KEY ("aId") REFERENCES "A"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-                 "#
-                     ]]
+                    -- AddForeignKey
+                    ALTER TABLE "public"."B" ADD CONSTRAINT "B_aId_fkey" FOREIGN KEY ("aId") REFERENCES "public"."A"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+                "#]]
             } else if is_mysql {
                 expect![[
                      r#"
@@ -1031,46 +1029,44 @@ fn create_constraint_name_tests_w_explicit_names(api: TestApi) {
                 "#
                      ]]
             }else if is_postgres {
-                expect![[
-                     r#"
-                     -- CreateTable
-                     CREATE TABLE "A" (
-                         "id" INTEGER NOT NULL,
-                         "name" TEXT NOT NULL,
-                         "a" TEXT NOT NULL,
-                         "b" TEXT NOT NULL,
+                expect![[r#"
+                    -- CreateTable
+                    CREATE TABLE "public"."A" (
+                        "id" INTEGER NOT NULL,
+                        "name" TEXT NOT NULL,
+                        "a" TEXT NOT NULL,
+                        "b" TEXT NOT NULL,
 
-                         CONSTRAINT "A_pkey" PRIMARY KEY ("id")
-                     );
+                        CONSTRAINT "A_pkey" PRIMARY KEY ("id")
+                    );
 
-                     -- CreateTable
-                     CREATE TABLE "B" (
-                         "a" TEXT NOT NULL,
-                         "b" TEXT NOT NULL,
-                         "aId" INTEGER NOT NULL,
+                    -- CreateTable
+                    CREATE TABLE "public"."B" (
+                        "a" TEXT NOT NULL,
+                        "b" TEXT NOT NULL,
+                        "aId" INTEGER NOT NULL,
 
-                         CONSTRAINT "B_pkey" PRIMARY KEY ("a","b")
-                     );
+                        CONSTRAINT "B_pkey" PRIMARY KEY ("a","b")
+                    );
 
-                     -- CreateIndex
-                     CREATE UNIQUE INDEX "SingleUnique" ON "A"("name");
+                    -- CreateIndex
+                    CREATE UNIQUE INDEX "SingleUnique" ON "public"."A"("name");
 
-                     -- CreateIndex
-                     CREATE INDEX "SingleIndex" ON "A"("a");
+                    -- CreateIndex
+                    CREATE INDEX "SingleIndex" ON "public"."A"("a");
 
-                     -- CreateIndex
-                     CREATE UNIQUE INDEX "NamedCompoundUnique" ON "A"("a", "b");
+                    -- CreateIndex
+                    CREATE UNIQUE INDEX "NamedCompoundUnique" ON "public"."A"("a", "b");
 
-                     -- CreateIndex
-                     CREATE UNIQUE INDEX "UnNamedCompoundUnique" ON "A"("a", "b");
+                    -- CreateIndex
+                    CREATE UNIQUE INDEX "UnNamedCompoundUnique" ON "public"."A"("a", "b");
 
-                     -- CreateIndex
-                     CREATE INDEX "CompoundIndex" ON "B"("a", "b");
+                    -- CreateIndex
+                    CREATE INDEX "CompoundIndex" ON "public"."B"("a", "b");
 
-                     -- AddForeignKey
-                     ALTER TABLE "B" ADD CONSTRAINT "ForeignKey" FOREIGN KEY ("aId") REFERENCES "A"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-                 "#
-                     ]]
+                    -- AddForeignKey
+                    ALTER TABLE "public"."B" ADD CONSTRAINT "ForeignKey" FOREIGN KEY ("aId") REFERENCES "public"."A"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+                "#]]
             } else if is_mysql {
                 expect![[
                      r#"
@@ -1244,25 +1240,25 @@ fn alter_constraint_name(mut api: TestApi) {
             } else if is_postgres15 || is_postgres16 {
                 expect![[r#"
                     -- AlterTable
-                    ALTER TABLE "A" RENAME CONSTRAINT "A_pkey" TO "CustomId";
+                    ALTER TABLE "public"."A" RENAME CONSTRAINT "A_pkey" TO "CustomId";
 
                     -- AlterTable
-                    ALTER TABLE "B" RENAME CONSTRAINT "B_pkey" TO "CustomCompoundId";
+                    ALTER TABLE "public"."B" RENAME CONSTRAINT "B_pkey" TO "CustomCompoundId";
 
                     -- RenameForeignKey
-                    ALTER TABLE "B" RENAME CONSTRAINT "B_aId_fkey" TO "CustomFK";
+                    ALTER TABLE "public"."B" RENAME CONSTRAINT "B_aId_fkey" TO "CustomFK";
 
                     -- RenameIndex
-                    ALTER INDEX "A_a_b_key" RENAME TO "CustomCompoundUnique";
+                    ALTER INDEX "public"."A_a_b_key" RENAME TO "CustomCompoundUnique";
 
                     -- RenameIndex
-                    ALTER INDEX "A_a_idx" RENAME TO "CustomIndex";
+                    ALTER INDEX "public"."A_a_idx" RENAME TO "CustomIndex";
 
                     -- RenameIndex
-                    ALTER INDEX "A_name_key" RENAME TO "CustomUnique";
+                    ALTER INDEX "public"."A_name_key" RENAME TO "CustomUnique";
 
                     -- RenameIndex
-                    ALTER INDEX "B_a_b_idx" RENAME TO "AnotherCustomIndex";
+                    ALTER INDEX "public"."B_a_b_idx" RENAME TO "AnotherCustomIndex";
                 "#]]
             } else if is_postgres {
                 expect![[r#"

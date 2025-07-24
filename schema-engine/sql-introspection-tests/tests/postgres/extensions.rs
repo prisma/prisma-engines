@@ -19,7 +19,7 @@ async fn should_work_with_the_preview_feature_enabled(api: &mut TestApi) -> Test
         datasource db {
           provider   = "postgresql"
           url        = "env(TEST_DATABASE_URL)"
-          extensions = [citext(schema: "prisma-tests")]
+          extensions = [citext(schema: "public")]
         }
     "#]];
 
@@ -45,7 +45,7 @@ async fn sanitizes_problematic_extension_names(api: &mut TestApi) -> TestResult 
         datasource db {
           provider   = "postgresql"
           url        = "env(TEST_DATABASE_URL)"
-          extensions = [uuid_ossp(map: "uuid-ossp", schema: "prisma-tests")]
+          extensions = [uuid_ossp(map: "uuid-ossp", schema: "public")]
         }
     "#]];
 
@@ -245,7 +245,7 @@ async fn should_keep_schema_attribute_if_same_as_db(api: &mut TestApi) -> TestRe
         datasource db {
           provider   = "postgresql"
           url        = "env(TEST_DATABASE_URL)"
-          extensions = [citext(schema: "prisma-tests")]
+          extensions = [citext(schema: "public")]
         }
     "#};
 
@@ -258,7 +258,7 @@ async fn should_keep_schema_attribute_if_same_as_db(api: &mut TestApi) -> TestRe
         datasource db {
           provider   = "postgresql"
           url        = "env(TEST_DATABASE_URL)"
-          extensions = [citext(schema: "prisma-tests")]
+          extensions = [citext(schema: "public")]
         }
     "#]];
 
@@ -297,7 +297,7 @@ async fn should_update_schema_attribute_if_different_than_db(api: &mut TestApi) 
         datasource db {
           provider   = "postgresql"
           url        = "env(TEST_DATABASE_URL)"
-          extensions = [citext(schema: "prisma-tests")]
+          extensions = [citext(schema: "public")]
         }
     "#]];
 

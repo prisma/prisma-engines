@@ -395,8 +395,11 @@ impl SqlRenderer for PostgresRenderer {
         .to_string()
     }
 
-    fn render_create_namespace(&self, ns: sql_schema_describer::NamespaceWalker<'_>) -> String {
-        format!("CREATE SCHEMA IF NOT EXISTS {}", Quoted::postgres_ident(ns.name()))
+    fn render_create_namespace(&self, ns: sql_schema_describer::NamespaceWalker<'_>) -> Vec<String> {
+        vec![format!(
+            "CREATE SCHEMA IF NOT EXISTS {}",
+            Quoted::postgres_ident(ns.name())
+        )]
     }
 
     fn render_create_table(&self, table: TableWalker<'_>) -> String {

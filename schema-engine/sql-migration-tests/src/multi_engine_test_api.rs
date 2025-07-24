@@ -360,13 +360,25 @@ impl EngineTestApi {
             &mut self.connector,
             &[("schema.prisma", &dm)],
             self.max_ddl_refresh_delay,
-            None,
+            SchemaFilter::default(),
         )
     }
 
     /// The schema name of the current connected database.
     pub fn schema_name(&self) -> &str {
         self.connection_info.schema_name().unwrap()
+    }
+
+    /// Creates a schema filter for the given tables and prefixes them with the default namespace if applicable.
+    pub fn namespaced_schema_filter(&self, tables: &[&str]) -> SchemaFilter {
+        let default_namespace = self.connector.default_runtime_namespace();
+        SchemaFilter {
+            external_tables: tables
+                .iter()
+                .map(|table| default_namespace.map_or(table.to_string(), |ns| format!("{ns}.{table}")))
+                .collect(),
+            external_enums: vec![],
+        }
     }
 
     /// Execute a raw SQL command and expect it to succeed.

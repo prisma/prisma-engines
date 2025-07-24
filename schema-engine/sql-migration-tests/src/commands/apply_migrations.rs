@@ -34,7 +34,7 @@ impl<'a> ApplyMigrations<'a> {
         let output = apply_migrations(
             ApplyMigrationsInput {
                 migrations_list,
-                filters: None,
+                filters: SchemaFilter::default(),
             },
             self.api,
             self.namespaces,

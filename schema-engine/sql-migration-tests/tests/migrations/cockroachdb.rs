@@ -4,7 +4,10 @@ mod failure_modes;
 use prisma_value::PrismaValue;
 use psl::parser_database::*;
 use quaint::prelude::Insert;
-use schema_core::{json_rpc::types::SchemasContainer, schema_connector::DiffTarget};
+use schema_core::{
+    json_rpc::types::{SchemaFilter, SchemasContainer},
+    schema_connector::DiffTarget,
+};
 use serde_json::json;
 use sql_migration_tests::test_api::*;
 use sql_schema_describer::{ColumnTypeFamily, ForeignKeyAction};
@@ -36,7 +39,7 @@ fn db_push_on_cockroach_db_with_postgres_provider_fails(api: TestApi) {
                 content: schema,
             }],
         },
-        filters: None,
+        filters: SchemaFilter::default(),
     }))
     .unwrap_err()
     .message()
@@ -1437,7 +1440,7 @@ fn cockroach_introspection_with_postgres_provider_fails() {
     tok(me.db_execute(DbExecuteParams {
         datasource_type: DbExecuteDatasourceType::Url(UrlContainer { url: url_str.clone() }),
         script: r#"
-            CREATE TABLE "prisma-tests"."Post" (
+            CREATE TABLE "public"."Post" (
                 "id" TEXT NOT NULL,
                 "title" VARCHAR NOT NULL,
                 "content" STRING,
@@ -1449,7 +1452,7 @@ fn cockroach_introspection_with_postgres_provider_fails() {
                 PRIMARY KEY ("id")
             );
 
-            CREATE TABLE "prisma-tests"."User" (
+            CREATE TABLE "public"."User" (
                 "id" TEXT,
                 "email" STRING(32) NOT NULL,
                 "name" CHARACTER VARYING(32),

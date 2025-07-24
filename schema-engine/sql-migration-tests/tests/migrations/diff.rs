@@ -71,7 +71,7 @@ fn from_unique_index_to_without(mut api: TestApi) {
             }],
         }),
         script: true,
-        filters: None,
+        filters: SchemaFilter::default(),
     })
     .unwrap();
 
@@ -88,10 +88,16 @@ fn from_unique_index_to_without(mut api: TestApi) {
                 "-- DropForeignKey\nALTER TABLE `Post` DROP FOREIGN KEY `Post_authorId_fkey`;\n\n-- DropIndex\nDROP INDEX `Post_authorId_key` ON `Post`;\n\n-- AddForeignKey\nALTER TABLE `Post` ADD CONSTRAINT `Post_authorId_fkey` FOREIGN KEY (`authorId`) REFERENCES `User`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;\n",
             ]
         "#]]
-    } else if api.is_sqlite() || api.is_postgres() || api.is_cockroach() {
+    } else if api.is_sqlite() {
         expect![[r#"
             [
                 "-- DropIndex\nDROP INDEX \"Post_authorId_key\";\n",
+            ]
+        "#]]
+    } else if api.is_postgres() || api.is_cockroach() {
+        expect![[r#"
+            [
+                "-- DropIndex\nDROP INDEX \"public\".\"Post_authorId_key\";\n",
             ]
         "#]]
     } else if api.is_mssql() {
@@ -176,7 +182,7 @@ fn from_unique_index_to_pk(mut api: TestApi) {
             }],
         }),
         script: true,
-        filters: None,
+        filters: SchemaFilter::default(),
     })
     .unwrap();
 
@@ -208,20 +214,20 @@ fn from_unique_index_to_pk(mut api: TestApi) {
             [
                 [
                     "-- DropIndex",
-                    "DROP INDEX \"C_secondary_key\";",
+                    "DROP INDEX \"public\".\"C_secondary_key\";",
                     "",
                     "-- AlterTable",
-                    "ALTER TABLE \"A\" DROP COLUMN \"name\",",
+                    "ALTER TABLE \"public\".\"A\" DROP COLUMN \"name\",",
                     "ADD CONSTRAINT \"A_pkey\" PRIMARY KEY (\"id\");",
                     "",
                     "-- DropIndex",
-                    "DROP INDEX \"A_id_key\";",
+                    "DROP INDEX \"public\".\"A_id_key\";",
                     "",
                     "-- AlterTable",
-                    "ALTER TABLE \"B\" ADD CONSTRAINT \"B_pkey\" PRIMARY KEY (\"x\", \"y\");",
+                    "ALTER TABLE \"public\".\"B\" ADD CONSTRAINT \"B_pkey\" PRIMARY KEY (\"x\", \"y\");",
                     "",
                     "-- DropIndex",
-                    "DROP INDEX \"B_x_y_key\";",
+                    "DROP INDEX \"public\".\"B_x_y_key\";",
                     "",
                 ],
             ]
@@ -392,7 +398,7 @@ fn diffing_postgres_schemas_when_initialized_on_sqlite(mut api: TestApi) {
             }],
         }),
         script: true,
-        filters: None,
+        filters: SchemaFilter::default(),
     })
     .unwrap();
 
@@ -412,13 +418,13 @@ fn diffing_postgres_schemas_when_initialized_on_sqlite(mut api: TestApi) {
             }],
         }),
         script: false,
-        filters: None,
+        filters: SchemaFilter::default(),
     })
     .unwrap();
 
     let expected_printed_messages = expect![[r#"
         [
-            "-- AlterTable\nALTER TABLE \"TestModel\" DROP COLUMN \"names\",\nADD COLUMN     \"names\" TEXT[];\n\n-- CreateTable\nCREATE TABLE \"TestModel2\" (\n    \"id\" SERIAL NOT NULL,\n\n    CONSTRAINT \"TestModel2_pkey\" PRIMARY KEY (\"id\")\n);\n",
+            "-- AlterTable\nALTER TABLE \"public\".\"TestModel\" DROP COLUMN \"names\",\nADD COLUMN     \"names\" TEXT[];\n\n-- CreateTable\nCREATE TABLE \"public\".\"TestModel2\" (\n    \"id\" SERIAL NOT NULL,\n\n    CONSTRAINT \"TestModel2_pkey\" PRIMARY KEY (\"id\")\n);\n",
             "\n[+] Added tables\n  - TestModel2\n\n[*] Changed the `TestModel` table\n  [*] Column `names` would be dropped and recreated (changed from Required to List, type changed)\n",
         ]
     "#]];
@@ -452,7 +458,7 @@ fn from_empty_to_migrations_directory(mut api: TestApi) {
         to: DiffTarget::Migrations(migrations_list),
         script: true,
         shadow_database_url: Some(api.connection_string().to_owned()),
-        filters: None,
+        filters: SchemaFilter::default(),
     };
 
     let host = Arc::new(TestConnectorHost::default());
@@ -460,7 +466,7 @@ fn from_empty_to_migrations_directory(mut api: TestApi) {
 
     let expected_printed_messages = expect![[r#"
         [
-            "-- CreateTable\nCREATE TABLE \"cats\" (\n    \"id\" INTEGER NOT NULL,\n    \"moos\" BOOLEAN DEFAULT false,\n\n    CONSTRAINT \"cats_pkey\" PRIMARY KEY (\"id\")\n);\n",
+            "-- CreateSchema\nCREATE SCHEMA IF NOT EXISTS \"public\";\n\n-- CreateTable\nCREATE TABLE \"public\".\"cats\" (\n    \"id\" INTEGER NOT NULL,\n    \"moos\" BOOLEAN DEFAULT false,\n\n    CONSTRAINT \"cats_pkey\" PRIMARY KEY (\"id\")\n);\n",
         ]
     "#]];
     expected_printed_messages.assert_debug_eq(&host.printed_messages.lock().unwrap());
@@ -494,7 +500,7 @@ fn from_empty_to_migrations_folder_without_shadow_db_url_must_error(mut api: Tes
         to: DiffTarget::Migrations(migrations_list),
         script: true,
         shadow_database_url: None, // TODO: ?
-        filters: None,
+        filters: SchemaFilter::default(),
     };
 
     let err = api.diff(params).unwrap_err();
@@ -545,7 +551,7 @@ fn from_schema_datamodel_to_url(mut api: TestApi) {
         script: true,
         shadow_database_url: None,
         to: DiffTarget::Url(UrlContainer { url: second_url }),
-        filters: None,
+        filters: SchemaFilter::default(),
     };
 
     api.diff(input).unwrap();
@@ -598,7 +604,7 @@ fn from_schema_datasource_relative(mut api: TestApi) {
         script: true,
         shadow_database_url: None,
         to: DiffTarget::Empty,
-        filters: None,
+        filters: SchemaFilter::default(),
     };
 
     api.diff(params).unwrap();
@@ -659,7 +665,7 @@ fn from_schema_datasource_to_url(mut api: TestApi) {
         script: true,
         shadow_database_url: None,
         to: DiffTarget::Url(UrlContainer { url: second_url }),
-        filters: None,
+        filters: SchemaFilter::default(),
     };
 
     api.diff(input).unwrap();
@@ -718,9 +724,10 @@ fn with_schema_filters(mut api: TestApi) {
         script: true,
         shadow_database_url: None,
         to: DiffTarget::Url(UrlContainer { url: second_url }),
-        filters: Some(SchemaFilter {
+        filters: SchemaFilter {
             external_tables: vec!["external_table".to_string()],
-        }),
+            external_enums: vec![],
+        },
     };
 
     api.diff(input).unwrap();
@@ -767,9 +774,10 @@ fn with_invalid_schema_filters(mut api: TestApi) {
         script: true,
         shadow_database_url: None,
         to: DiffTarget::Url(UrlContainer { url: second_url }),
-        filters: Some(SchemaFilter {
+        filters: SchemaFilter {
             external_tables: vec!["public.external_table".to_string()],
-        }),
+            external_enums: vec![],
+        },
     };
 
     let err = api.diff(input).unwrap_err();
@@ -807,7 +815,7 @@ fn from_url_to_url(mut api: TestApi) {
         script: true,
         shadow_database_url: None,
         to: DiffTarget::Url(UrlContainer { url: second_url }),
-        filters: None,
+        filters: SchemaFilter::default(),
     };
 
     api.diff(input).unwrap();
@@ -874,7 +882,7 @@ fn diffing_mongo_schemas_to_script_returns_a_nice_error() {
             }],
         }),
         script: true,
-        filters: None,
+        filters: SchemaFilter::default(),
     };
 
     let expected = expect![[r#"
@@ -902,7 +910,7 @@ fn diff_sqlite_migration_directories() {
         script: true,
         shadow_database_url: None,
         to: DiffTarget::Migrations(migrations_list_2),
-        filters: None,
+        filters: SchemaFilter::default(),
     };
 
     tok(schema_core::schema_api(None, None).unwrap().diff(params)).unwrap();
@@ -963,7 +971,7 @@ fn diffing_mongo_schemas_works() {
             }],
         }),
         script: false,
-        filters: None,
+        filters: SchemaFilter::default(),
     };
 
     let expected_printed_messages = expect![[r#"
@@ -1024,7 +1032,7 @@ fn diffing_two_schema_datamodels_with_missing_datasource_env_vars() {
                     content: schema_b.to_string(),
                 }],
             }),
-            filters: None,
+            filters: SchemaFilter::default(),
         }))
     }
 }
@@ -1062,7 +1070,7 @@ fn diff_with_exit_code_and_empty_diff_returns_zero() {
         }),
         script: false,
         shadow_database_url: None,
-        filters: None,
+        filters: SchemaFilter::default(),
     });
 
     assert_eq!(result.exit_code, 0);
@@ -1100,7 +1108,7 @@ fn diff_with_exit_code_and_non_empty_diff_returns_two() {
         }),
         script: false,
         shadow_database_url: None,
-        filters: None,
+        filters: SchemaFilter::default(),
     });
 
     assert_eq!(result.exit_code, 2);
@@ -1127,7 +1135,7 @@ fn diff_with_non_existing_sqlite_database_from_url() {
         to: DiffTarget::Url(UrlContainer {
             url: format!("file:{}", tmpdir.path().join("db.sqlite").to_string_lossy()),
         }),
-        filters: None,
+        filters: SchemaFilter::default(),
     });
 
     let error = error
@@ -1165,7 +1173,7 @@ fn diff_with_non_existing_sqlite_database_from_datasource() {
             }],
             config_dir: schema_path.parent().unwrap().to_string_lossy().into_owned(),
         }),
-        filters: None,
+        filters: SchemaFilter::default(),
     });
 
     if cfg!(target_os = "windows") {
@@ -1232,7 +1240,7 @@ fn from_multi_file_schema_datasource_to_url(mut api: TestApi) {
         script: true,
         shadow_database_url: None,
         to: DiffTarget::Url(UrlContainer { url: second_url }),
-        filters: None,
+        filters: SchemaFilter::default(),
     };
 
     api.diff(input).unwrap();
@@ -1299,7 +1307,7 @@ fn from_multi_file_schema_datamodel_to_url(mut api: TestApi) {
         script: true,
         shadow_database_url: None,
         to: DiffTarget::Url(UrlContainer { url: second_url }),
-        filters: None,
+        filters: SchemaFilter::default(),
     };
 
     api.diff(input).unwrap();

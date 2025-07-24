@@ -1193,6 +1193,7 @@ fn migration_with_shadow_database(api: TestApi) {
 
     let namespaces = Namespaces::from_vec(&mut vec![String::from("dbo"), String::from("one"), String::from("two")]);
 
+    api.raw_cmd("DROP DATABASE IF EXISTS shadow");
     api.raw_cmd("CREATE DATABASE shadow");
     api.reset().send_sync(namespaces.clone());
 
@@ -1230,10 +1231,10 @@ fn migration_with_shadow_database(api: TestApi) {
                 BEGIN TRAN;
 
                 -- CreateSchema
-                EXEC sp_executesql N'CREATE SCHEMA [one];';;
+                IF NOT EXISTS (SELECT * FROM sys.schemas WHERE name = N'one') EXEC sp_executesql N'CREATE SCHEMA [one];';
 
                 -- CreateSchema
-                EXEC sp_executesql N'CREATE SCHEMA [two];';;
+                IF NOT EXISTS (SELECT * FROM sys.schemas WHERE name = N'two') EXEC sp_executesql N'CREATE SCHEMA [two];';
 
                 -- CreateTable
                 CREATE TABLE [one].[A] (

@@ -337,11 +337,11 @@ impl SqlRenderer for MysqlRenderer {
         format!("DROP VIEW {}", Quoted::mysql_ident(view.name()))
     }
 
-    fn render_create_namespace(&self, _: sql_schema_describer::NamespaceWalker<'_>) -> String {
+    fn render_create_namespace(&self, _: sql_schema_describer::NamespaceWalker<'_>) -> Vec<String> {
         // Implementing multi schema support for MySQL comes with various challenges due to the missing differentiation
         // of schemas and databases in MySQL. Hence it was decided to not support it.
         // See the full explainer here: https://github.com/prisma/prisma/issues/16943#issuecomment-3051614612
-        unreachable!("render_create_namespace on MySQL")
+        vec![]
     }
 
     fn render_drop_user_defined_type(&self, _: &UserDefinedTypeWalker<'_>) -> String {

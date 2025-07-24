@@ -44,7 +44,7 @@ fn shadow_db_url_can_be_configured_on_postgres(api: TestApi) {
         let create_user = r#"
             DROP USER IF EXISTS shadowdbconfigtestuser;
             CREATE USER shadowdbconfigtestuser PASSWORD '1234batman' LOGIN;
-            GRANT USAGE, CREATE ON SCHEMA "prisma-tests" TO shadowdbconfigtestuser;
+            GRANT USAGE, CREATE ON SCHEMA "public" TO shadowdbconfigtestuser;
             GRANT ALL PRIVILEGES ON DATABASE "testshadowdb0001" TO shadowdbconfigtestuser;
         "#;
 
@@ -55,9 +55,8 @@ fn shadow_db_url_can_be_configured_on_postgres(api: TestApi) {
 
         let shadow_db_connection = tok(Quaint::new(shadow_db_url.as_ref())).unwrap();
 
-        tok(shadow_db_connection.raw_cmd(
-            "CREATE SCHEMA \"prisma-tests\"; GRANT USAGE, CREATE ON SCHEMA \"prisma-tests\" TO shadowdbconfigtestuser",
-        ))
+        tok(shadow_db_connection
+            .raw_cmd("CREATE SCHEMA IF NOT EXISTS \"public\"; GRANT USAGE, CREATE ON SCHEMA \"public\" TO shadowdbconfigtestuser"))
         .unwrap();
     }
 

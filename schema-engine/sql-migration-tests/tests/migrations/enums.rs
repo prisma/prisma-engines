@@ -489,7 +489,7 @@ fn existing_enums_are_picked_up(api: TestApi) {
     let sql = r#"
         CREATE TYPE "Genre" AS ENUM ('SKA', 'PUNK');
 
-        CREATE TABLE "prisma-tests"."Band" (
+        CREATE TABLE "public"."Band" (
             id BIGSERIAL PRIMARY KEY,
             name TEXT NOT NULL,
             genre "Genre" NOT NULL
@@ -597,15 +597,18 @@ fn mapped_enum_defaults_must_work(api: TestApi) {
     "#;
 
     let expect = expect![[r#"
+        -- CreateSchema
+        CREATE SCHEMA IF NOT EXISTS "public";
+
         -- CreateEnum
-        CREATE TYPE "Color" AS ENUM ('0', 'Grün', 'Blu', 'pfuh 🙄...');
+        CREATE TYPE "public"."Color" AS ENUM ('0', 'Grün', 'Blu', 'pfuh 🙄...');
 
         -- CreateTable
-        CREATE TABLE "Test" (
+        CREATE TABLE "public"."Test" (
             "id" INTEGER NOT NULL,
-            "mainColor" "Color" NOT NULL DEFAULT 'Grün',
-            "secondaryColor" "Color" NOT NULL DEFAULT '0',
-            "colorOrdering" "Color"[] DEFAULT ARRAY['Blu', '0', 'Grün', '0', 'Blu', '0']::"Color"[],
+            "mainColor" "public"."Color" NOT NULL DEFAULT 'Grün',
+            "secondaryColor" "public"."Color" NOT NULL DEFAULT '0',
+            "colorOrdering" "public"."Color"[] DEFAULT ARRAY['Blu', '0', 'Grün', '0', 'Blu', '0']::"public"."Color"[],
 
             CONSTRAINT "Test_pkey" PRIMARY KEY ("id")
         );
@@ -682,17 +685,17 @@ fn alter_enum_and_change_default_must_work(api: TestApi) {
                 */
                 -- AlterEnum
                 BEGIN;
-                CREATE TYPE "Mood_new" AS ENUM ('HUNGRY', 'SLEEPY');
-                ALTER TABLE "Cat" ALTER COLUMN "moods" DROP DEFAULT;
-                ALTER TABLE "Cat" ALTER COLUMN "moods" TYPE "Mood_new"[] USING ("moods"::text::"Mood_new"[]);
-                ALTER TYPE "Mood" RENAME TO "Mood_old";
-                ALTER TYPE "Mood_new" RENAME TO "Mood";
-                DROP TYPE "Mood_old";
-                ALTER TABLE "Cat" ALTER COLUMN "moods" SET DEFAULT ARRAY['SLEEPY']::"Mood"[];
+                CREATE TYPE "public"."Mood_new" AS ENUM ('HUNGRY', 'SLEEPY');
+                ALTER TABLE "public"."Cat" ALTER COLUMN "moods" DROP DEFAULT;
+                ALTER TABLE "public"."Cat" ALTER COLUMN "moods" TYPE "public"."Mood_new"[] USING ("moods"::text::"public"."Mood_new"[]);
+                ALTER TYPE "public"."Mood" RENAME TO "Mood_old";
+                ALTER TYPE "public"."Mood_new" RENAME TO "Mood";
+                DROP TYPE "public"."Mood_old";
+                ALTER TABLE "public"."Cat" ALTER COLUMN "moods" SET DEFAULT ARRAY['SLEEPY']::"public"."Mood"[];
                 COMMIT;
 
                 -- AlterTable
-                ALTER TABLE "Cat" ALTER COLUMN "moods" SET DEFAULT ARRAY['SLEEPY']::"Mood"[];
+                ALTER TABLE "public"."Cat" ALTER COLUMN "moods" SET DEFAULT ARRAY['SLEEPY']::"public"."Mood"[];
             "#]];
             migration.expect_contents(expected_script)
         });

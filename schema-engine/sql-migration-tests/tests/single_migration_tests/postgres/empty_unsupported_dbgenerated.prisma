@@ -12,8 +12,11 @@ model table {
 }
 
 // Expected Migration:
+// -- CreateSchema
+// CREATE SCHEMA IF NOT EXISTS "public";
+// 
 // -- CreateTable
-// CREATE TABLE "table" (
+// CREATE TABLE "public"."table" (
 //     "id" TEXT NOT NULL,
 //     "hereBeDragons" tsvector,
 // 

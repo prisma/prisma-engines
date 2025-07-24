@@ -14,7 +14,7 @@ pub struct SchemaPush<'a> {
     migration_id: Option<&'a str>,
     // In eventually-consistent systems, we might need to wait for a while before the system refreshes
     max_ddl_refresh_delay: Option<Duration>,
-    schema_filter: Option<SchemaFilter>,
+    schema_filter: SchemaFilter,
 }
 
 impl<'a> SchemaPush<'a> {
@@ -22,7 +22,7 @@ impl<'a> SchemaPush<'a> {
         api: &'a mut dyn SchemaConnector,
         files: &[(&str, &str)],
         max_refresh_delay: Option<Duration>,
-        schema_filter: Option<SchemaFilter>,
+        schema_filter: SchemaFilter,
     ) -> Self {
         SchemaPush {
             api,

@@ -8,7 +8,7 @@ use crate::{flavour::SqlConnector, sql_renderer::SqlRenderer};
 use connector as imp;
 use destructive_change_checker::SqliteDestructiveChangeCheckerFlavour;
 use indoc::indoc;
-use quaint::connector::AdapterName;
+use quaint::connector::{AdapterName, DEFAULT_SQLITE_DATABASE};
 use renderer::SqliteRenderer;
 use schema_calculator::SqliteSchemaCalculatorFlavour;
 use schema_connector::{
@@ -412,7 +412,11 @@ impl SqlConnector for SqliteConnector {
     }
 
     fn search_path(&self) -> &str {
-        "main"
+        DEFAULT_SQLITE_DATABASE
+    }
+
+    fn default_namespace(&self) -> Option<&str> {
+        None // For Sqlite we do not support multiple namespaces
     }
 
     fn dispose(&mut self) -> BoxFuture<'_, ConnectorResult<()>> {

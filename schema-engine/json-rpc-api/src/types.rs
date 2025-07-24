@@ -96,6 +96,8 @@ pub struct SchemasWithConfigDir {
 pub struct SchemaFilter {
     /// Tables that shall be considered 'externally" managed. As per prisma.config.ts > tables.external.
     pub external_tables: Vec<String>,
+    /// Enums that shall be considered "externally" managed. As per prisma.config.ts > enums.external.
+    pub external_enums: Vec<String>,
 }
 
 /// The path to a live database taken as input. For flexibility, this can be Prisma schemas as strings, or only the
@@ -232,7 +234,7 @@ pub struct ApplyMigrationsInput {
     pub migrations_list: MigrationList,
 
     /// The schema filter to use during the apply migrations.
-    pub filters: Option<SchemaFilter>,
+    pub filters: SchemaFilter,
 }
 
 /// The output of the `applyMigrations` command.
@@ -287,7 +289,7 @@ pub struct CreateMigrationInput {
     pub schema: SchemasContainer,
 
     /// Entities to be included or excluded from the migration.
-    pub filters: Option<SchemaFilter>,
+    pub filters: SchemaFilter,
 }
 
 /// The output of the `createMigration` command.
@@ -361,7 +363,7 @@ pub struct DevDiagnosticInput {
     pub migrations_list: MigrationList,
 
     /// The schema filter to use during checks on the database.
-    pub filters: Option<SchemaFilter>,
+    pub filters: SchemaFilter,
 }
 
 /// The response type for `devDiagnostic`.
@@ -389,7 +391,7 @@ pub struct DiagnoseMigrationHistoryInput {
 
     /// The schema filter to use during checks on the database.
     /// Note: Only used if opt_in_to_shadow_database is true.
-    pub filters: Option<SchemaFilter>,
+    pub filters: SchemaFilter,
 }
 
 /// The result type for `diagnoseMigrationHistory` responses.
@@ -449,7 +451,7 @@ pub struct DiffParams {
     pub exit_code: Option<bool>,
 
     /// The schema filter to use during the diff.
-    pub filters: Option<SchemaFilter>,
+    pub filters: SchemaFilter,
 }
 
 /// The result type for the `diff` method.
@@ -627,7 +629,7 @@ pub struct EvaluateDataLossInput {
     /// The prisma schema files to migrate to.
     pub schema: SchemasContainer,
     /// Entities to be included or excluded during the data loss evaluation.
-    pub filters: Option<SchemaFilter>,
+    pub filters: SchemaFilter,
 }
 
 /// The output of the `evaluateDataLoss` command.
@@ -734,7 +736,7 @@ pub struct MarkMigrationRolledBackOutput {}
 #[cfg_attr(target_arch = "wasm32", tsify(missing_as_null, from_wasm_abi))]
 pub struct ResetInput {
     /// The schema filter to use during the reset. Only relevant during "soft" resets though - usually we try to drop the whole database.
-    pub filter: Option<SchemaFilter>,
+    pub filter: SchemaFilter,
 }
 
 /// The output of the `reset` command.
@@ -757,7 +759,7 @@ pub struct SchemaPushInput {
     pub schema: SchemasContainer,
 
     /// The schema filter to use during the push.
-    pub filters: Option<SchemaFilter>,
+    pub filters: SchemaFilter,
 }
 
 /// Response result for the `schemaPush` method.
