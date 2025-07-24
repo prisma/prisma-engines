@@ -88,10 +88,16 @@ fn from_unique_index_to_without(mut api: TestApi) {
                 "-- DropForeignKey\nALTER TABLE `Post` DROP FOREIGN KEY `Post_authorId_fkey`;\n\n-- DropIndex\nDROP INDEX `Post_authorId_key` ON `Post`;\n\n-- AddForeignKey\nALTER TABLE `Post` ADD CONSTRAINT `Post_authorId_fkey` FOREIGN KEY (`authorId`) REFERENCES `User`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;\n",
             ]
         "#]]
-    } else if api.is_sqlite() || api.is_postgres() || api.is_cockroach() {
+    } else if api.is_sqlite() {
         expect![[r#"
             [
                 "-- DropIndex\nDROP INDEX \"Post_authorId_key\";\n",
+            ]
+        "#]]
+    } else if api.is_postgres() || api.is_cockroach() {
+        expect![[r#"
+            [
+                "-- DropIndex\nDROP INDEX \"public\".\"Post_authorId_key\";\n",
             ]
         "#]]
     } else if api.is_mssql() {
@@ -208,20 +214,20 @@ fn from_unique_index_to_pk(mut api: TestApi) {
             [
                 [
                     "-- DropIndex",
-                    "DROP INDEX \"C_secondary_key\";",
+                    "DROP INDEX \"public\".\"C_secondary_key\";",
                     "",
                     "-- AlterTable",
-                    "ALTER TABLE \"A\" DROP COLUMN \"name\",",
+                    "ALTER TABLE \"public\".\"A\" DROP COLUMN \"name\",",
                     "ADD CONSTRAINT \"A_pkey\" PRIMARY KEY (\"id\");",
                     "",
                     "-- DropIndex",
-                    "DROP INDEX \"A_id_key\";",
+                    "DROP INDEX \"public\".\"A_id_key\";",
                     "",
                     "-- AlterTable",
-                    "ALTER TABLE \"B\" ADD CONSTRAINT \"B_pkey\" PRIMARY KEY (\"x\", \"y\");",
+                    "ALTER TABLE \"public\".\"B\" ADD CONSTRAINT \"B_pkey\" PRIMARY KEY (\"x\", \"y\");",
                     "",
                     "-- DropIndex",
-                    "DROP INDEX \"B_x_y_key\";",
+                    "DROP INDEX \"public\".\"B_x_y_key\";",
                     "",
                 ],
             ]
@@ -418,7 +424,7 @@ fn diffing_postgres_schemas_when_initialized_on_sqlite(mut api: TestApi) {
 
     let expected_printed_messages = expect![[r#"
         [
-            "-- AlterTable\nALTER TABLE \"TestModel\" DROP COLUMN \"names\",\nADD COLUMN     \"names\" TEXT[];\n\n-- CreateTable\nCREATE TABLE \"TestModel2\" (\n    \"id\" SERIAL NOT NULL,\n\n    CONSTRAINT \"TestModel2_pkey\" PRIMARY KEY (\"id\")\n);\n",
+            "-- AlterTable\nALTER TABLE \"public\".\"TestModel\" DROP COLUMN \"names\",\nADD COLUMN     \"names\" TEXT[];\n\n-- CreateTable\nCREATE TABLE \"public\".\"TestModel2\" (\n    \"id\" SERIAL NOT NULL,\n\n    CONSTRAINT \"TestModel2_pkey\" PRIMARY KEY (\"id\")\n);\n",
             "\n[+] Added tables\n  - TestModel2\n\n[*] Changed the `TestModel` table\n  [*] Column `names` would be dropped and recreated (changed from Required to List, type changed)\n",
         ]
     "#]];
@@ -460,7 +466,7 @@ fn from_empty_to_migrations_directory(mut api: TestApi) {
 
     let expected_printed_messages = expect![[r#"
         [
-            "-- CreateTable\nCREATE TABLE \"cats\" (\n    \"id\" INTEGER NOT NULL,\n    \"moos\" BOOLEAN DEFAULT false,\n\n    CONSTRAINT \"cats_pkey\" PRIMARY KEY (\"id\")\n);\n",
+            "-- CreateSchema\nCREATE SCHEMA IF NOT EXISTS \"public\";\n\n-- CreateTable\nCREATE TABLE \"public\".\"cats\" (\n    \"id\" INTEGER NOT NULL,\n    \"moos\" BOOLEAN DEFAULT false,\n\n    CONSTRAINT \"cats_pkey\" PRIMARY KEY (\"id\")\n);\n",
         ]
     "#]];
     expected_printed_messages.assert_debug_eq(&host.printed_messages.lock().unwrap());

@@ -775,7 +775,7 @@ fn dev_diagnostic_multi_schema_does_not_panic() {
         datasource db {{
             provider = "{provider}"
             url = "{url}"
-            schemas = ["prisma-tests", "auth"]
+            schemas = ["public", "auth"]
         }}
 
         generator js {{
@@ -794,7 +794,7 @@ fn dev_diagnostic_multi_schema_does_not_panic() {
           id    String @id @db.Uuid
           users users  @relation(fields: [id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
-          @@schema("prisma-tests")
+          @@schema("public")
         }}
     "#};
 
@@ -809,14 +809,14 @@ CREATE TABLE auth.users (
     CONSTRAINT users_pkey PRIMARY KEY (id)
 );
 
--- "prisma-tests".profiles definition
-CREATE TABLE "prisma-tests".profiles (
+-- "public".profiles definition
+CREATE TABLE "public".profiles (
     id uuid NOT NULL,
     CONSTRAINT profiles_pkey PRIMARY KEY (id)
 );
 
--- "prisma-tests".profiles foreign keys
-ALTER TABLE "prisma-tests".profiles ADD CONSTRAINT profiles_id_fkey FOREIGN KEY (id) REFERENCES auth.users(id);
+-- "public".profiles foreign keys
+ALTER TABLE "public".profiles ADD CONSTRAINT profiles_id_fkey FOREIGN KEY (id) REFERENCES auth.users(id);
     "#;
 
     let tempdir = tempfile::tempdir().unwrap();

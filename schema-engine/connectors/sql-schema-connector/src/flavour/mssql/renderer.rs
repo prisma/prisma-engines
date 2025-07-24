@@ -459,11 +459,12 @@ impl SqlRenderer for MssqlRenderer {
         Some(sql)
     }
 
-    fn render_create_namespace(&self, namespace: sql_schema_describer::NamespaceWalker<'_>) -> String {
-        format!(
-            "EXEC sp_executesql N'CREATE SCHEMA {};';",
+    fn render_create_namespace(&self, namespace: sql_schema_describer::NamespaceWalker<'_>) -> Vec<String> {
+        vec![format!(
+            r#"IF NOT EXISTS (SELECT * FROM sys.schemas WHERE name = N'{0}') EXEC sp_executesql N'CREATE SCHEMA {1};'"#,
+            namespace.name(),
             Quoted::mssql_ident(namespace.name())
-        )
+        )]
     }
 
     fn render_rename_foreign_key(&self, fks: MigrationPair<sql::ForeignKeyWalker<'_>>) -> String {

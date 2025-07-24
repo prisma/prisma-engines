@@ -33,7 +33,7 @@ impl Connection {
         let namespaces_vec = Namespaces::to_vec(namespaces, String::from(params.url.schema()));
         let namespaces_str: Vec<&str> = namespaces_vec.iter().map(AsRef::as_ref).collect();
 
-        let mut schema = describer::SqlSchemaDescriber::new(&self.0)
+        let schema = describer::SqlSchemaDescriber::new(&self.0)
             .describe(namespaces_str.as_slice())
             .await
             .map_err(|err| match err.into_kind() {
@@ -46,8 +46,6 @@ impl Connection {
                     ConnectorError::from(err)
                 }
             })?;
-
-        crate::flavour::normalize_sql_schema(&mut schema, params.connector_params.preview_features);
 
         Ok(schema)
     }

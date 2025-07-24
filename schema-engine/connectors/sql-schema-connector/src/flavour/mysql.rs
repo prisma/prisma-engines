@@ -458,6 +458,10 @@ impl SqlConnector for MysqlConnector {
         self.database_name()
     }
 
+    fn default_namespace(&self) -> Option<&str> {
+        None // For MySQL we do not support multiple namespaces
+    }
+
     fn describe_query<'a>(
         &'a mut self,
         sql: &'a str,

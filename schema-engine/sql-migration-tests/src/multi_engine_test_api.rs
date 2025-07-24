@@ -369,6 +369,18 @@ impl EngineTestApi {
         self.connection_info.schema_name().unwrap()
     }
 
+    /// Creates a schema filter for the given tables and prefixes them with the default namespace if applicable.
+    pub fn namespaced_schema_filter(&self, tables: &[&str]) -> SchemaFilter {
+        let default_namespace = self.connector.default_runtime_namespace();
+        SchemaFilter {
+            external_tables: tables
+                .iter()
+                .map(|table| default_namespace.map_or(table.to_string(), |ns| format!("{ns}.{table}")))
+                .collect(),
+            external_enums: vec![],
+        }
+    }
+
     /// Execute a raw SQL command and expect it to succeed.
     #[track_caller]
     pub fn raw_cmd(&mut self, cmd: &str) {

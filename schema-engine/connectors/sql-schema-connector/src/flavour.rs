@@ -30,8 +30,7 @@ use crate::{
     sql_destructive_change_checker::DestructiveChangeCheckerFlavour, sql_renderer::SqlRenderer,
     sql_schema_calculator::SqlSchemaCalculatorFlavour, sql_schema_differ::SqlSchemaDifferFlavour,
 };
-use enumflags2::BitFlags;
-use psl::{PreviewFeature, PreviewFeatures, ValidatedSchema};
+use psl::{PreviewFeatures, ValidatedSchema};
 use quaint::prelude::{NativeConnectionInfo, Table};
 use schema_connector::{
     BoxFuture, ConnectorError, ConnectorResult, IntrospectionContext, MigrationRecord, Namespaces,
@@ -122,6 +121,11 @@ pub(crate) trait SqlDialect: Send + Sync + 'static {
     /// Return an empty database schema.
     fn empty_database_schema(&self) -> SqlSchema {
         SqlSchema::default()
+    }
+
+    /// The default namespace for the dialect if it supports multiple namespaces.
+    fn default_namespace(&self) -> Option<&str> {
+        None
     }
 
     /// Optionally scan a migration script that could have been altered by users and emit warnings.
@@ -339,6 +343,10 @@ pub(crate) trait SqlConnector: Send + Sync + Debug {
 
     fn search_path(&self) -> &str;
 
+    /// The default namespaces for the connector if it supports multiple namespaces.
+    /// Should be derived from the connectors runtime configuration but can fallback to the dialect's default.
+    fn default_namespace(&self) -> Option<&str>;
+
     fn dispose(&mut self) -> BoxFuture<'_, ConnectorResult<()>>;
 }
 
@@ -348,13 +356,6 @@ fn validate_connection_infos_do_not_match(previous: &str, next: &str) -> Connect
         Err(ConnectorError::from_msg("The shadow database you configured appears to be the same as the main database. Please specify another shadow database.".into()))
     } else {
         Ok(())
-    }
-}
-
-/// Remove all usage of non-enabled preview feature elements from the SqlSchema.
-fn normalize_sql_schema(sql_schema: &mut SqlSchema, preview_features: BitFlags<PreviewFeature>) {
-    if !preview_features.contains(PreviewFeature::MultiSchema) {
-        sql_schema.clear_namespaces();
     }
 }
 

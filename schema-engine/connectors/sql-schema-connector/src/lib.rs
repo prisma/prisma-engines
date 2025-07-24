@@ -95,6 +95,10 @@ impl SchemaDialect for SqlSchemaDialect {
         DatabaseSchema::new(SqlDatabaseSchema::from(self.dialect.empty_database_schema()))
     }
 
+    fn default_namespace(&self) -> Option<&str> {
+        self.dialect.default_namespace()
+    }
+
     fn migration_file_extension(&self) -> &'static str {
         "sql"
     }
@@ -126,11 +130,15 @@ impl SchemaDialect for SqlSchemaDialect {
         )
     }
 
-    fn schema_from_datamodel(&self, sources: Vec<(String, SourceFile)>) -> ConnectorResult<DatabaseSchema> {
+    fn schema_from_datamodel(
+        &self,
+        sources: Vec<(String, SourceFile)>,
+        default_namespace: Option<&str>,
+    ) -> ConnectorResult<DatabaseSchema> {
         let schema = psl::parse_schema_multi(&sources).map_err(ConnectorError::new_schema_parser_error)?;
         self.dialect.check_schema_features(&schema)?;
         let calculator = self.dialect.schema_calculator();
-        Ok(sql_schema_calculator::calculate_sql_schema(&schema, &*calculator).into())
+        Ok(sql_schema_calculator::calculate_sql_schema(&schema, default_namespace, &*calculator).into())
     }
 
     #[tracing::instrument(skip(self, migrations, target))]
@@ -346,6 +354,10 @@ impl SqlSchemaConnector {
 impl SchemaConnector for SqlSchemaConnector {
     fn schema_dialect(&self) -> Box<dyn SchemaDialect> {
         Box::new(SqlSchemaDialect::new(self.inner.dialect()))
+    }
+
+    fn default_runtime_namespace(&self) -> Option<&str> {
+        self.inner.default_namespace()
     }
 
     // TODO: this only seems to be used in `sql-migration-tests`.

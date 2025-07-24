@@ -78,7 +78,7 @@ pub async fn setup_external<'a>(
             // 1. Compute the diff migration script.
             std::fs::remove_file(source.url.as_literal().unwrap().trim_start_matches("file:")).ok();
             let dialect = sql_schema_connector::SqlSchemaDialect::sqlite();
-            let migration_script = crate::diff(prisma_schema, &dialect).await?;
+            let migration_script = crate::diff(prisma_schema, &dialect, None).await?;
 
             // 2. Tell JavaScript to take care of the schema migration.
             //    This results in a JSON-RPC call to the JS runtime.
@@ -148,15 +148,25 @@ pub async fn teardown(prisma_schema: &str, db_schemas: &[&str]) -> ConnectorResu
 
 /// Compute an initialisation migration script via
 /// `prisma migrate diff --from-empty --to-schema-datamodel $SCHEMA_PATH --script`.
-pub(crate) async fn diff(schema: &str, dialect: &dyn SchemaDialect) -> ConnectorResult<String> {
+pub(crate) async fn diff(
+    schema: &str,
+    dialect: &dyn SchemaDialect,
+    default_namespace: Option<&str>,
+) -> ConnectorResult<String> {
     let from = dialect.empty_database_schema();
-    let to = dialect.schema_from_datamodel(vec![("schema.prisma".to_string(), schema.into())])?;
+    let to = dialect.schema_from_datamodel(vec![("schema.prisma".to_string(), schema.into())], default_namespace)?;
     let migration = dialect.diff(from, to, &SchemaFilter::default());
     dialect.render_script(&migration, &Default::default())
 }
 
 /// Apply the script returned by [`diff`] against the database.
 pub(crate) async fn diff_and_apply(schema: &str, connector: &mut dyn SchemaConnector) -> ConnectorResult<()> {
-    let script = diff(schema, &*connector.schema_dialect()).await.unwrap();
+    let script = diff(
+        schema,
+        &*connector.schema_dialect(),
+        connector.default_runtime_namespace(),
+    )
+    .await
+    .unwrap();
     connector.db_execute(script).await
 }

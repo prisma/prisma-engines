@@ -469,16 +469,10 @@ fn schema_push_with_schema_filters(api: TestApi) {
     }
     "#;
 
-    api.schema_push_with_filter(
-        dm,
-        SchemaFilter {
-            external_tables: vec!["ExternalTable".to_string()],
-            external_enums: vec![],
-        },
-    )
-    .send()
-    .assert_green()
-    .assert_has_executed_steps();
+    api.schema_push_with_filter(dm, api.namespaced_schema_filter(&["ExternalTable"]))
+        .send()
+        .assert_green()
+        .assert_has_executed_steps();
 
     api.assert_schema()
         .assert_has_table("Cat")
@@ -497,15 +491,21 @@ fn schema_push_with_invalid_schema_filters(api: TestApi) {
     }
     "#;
 
+    let (expected_error_code, table_name) = if api.is_postgres() || api.is_mssql() {
+        ("P3023", "ExternalTable")
+    } else {
+        ("P3024", "public.ExternalTable")
+    };
+
     let err = api
         .schema_push_with_filter(
             dm,
             SchemaFilter {
-                external_tables: vec!["public.ExternalTable".to_string()],
+                external_tables: vec![table_name.to_string()],
                 external_enums: vec![],
             },
         )
         .send_unwrap_err();
 
-    assert_eq!(err.error_code(), Some("P3024"));
+    assert_eq!(err.error_code(), Some(expected_error_code));
 }

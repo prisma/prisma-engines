@@ -1440,7 +1440,7 @@ fn cockroach_introspection_with_postgres_provider_fails() {
     tok(me.db_execute(DbExecuteParams {
         datasource_type: DbExecuteDatasourceType::Url(UrlContainer { url: url_str.clone() }),
         script: r#"
-            CREATE TABLE "prisma-tests"."Post" (
+            CREATE TABLE "public"."Post" (
                 "id" TEXT NOT NULL,
                 "title" VARCHAR NOT NULL,
                 "content" STRING,
@@ -1452,7 +1452,7 @@ fn cockroach_introspection_with_postgres_provider_fails() {
                 PRIMARY KEY ("id")
             );
 
-            CREATE TABLE "prisma-tests"."User" (
+            CREATE TABLE "public"."User" (
                 "id" TEXT,
                 "email" STRING(32) NOT NULL,
                 "name" CHARACTER VARYING(32),
