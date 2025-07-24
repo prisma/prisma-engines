@@ -571,7 +571,7 @@ fn create_enum_renders_correctly(api: TestApi) {
                         CREATE TYPE "prisma-tests"."Mood" AS ENUM ('HUNGRY', 'SLEEPY');
 
                         -- CreateTable
-                        CREATE TABLE "Cat" (
+                        CREATE TABLE "prisma-tests"."Cat" (
                             "id" INTEGER NOT NULL,
                             "mood" "prisma-tests"."Mood" NOT NULL,
 

@@ -491,15 +491,21 @@ fn schema_push_with_invalid_schema_filters(api: TestApi) {
     }
     "#;
 
+    let (expected_error_code, table_name) = if api.is_postgres() || api.is_mssql() {
+        ("P3023", "ExternalTable")
+    } else {
+        ("P3024", "public.ExternalTable")
+    };
+
     let err = api
         .schema_push_with_filter(
             dm,
             Some(SchemaFilter {
-                external_tables: vec!["public.ExternalTable".to_string()],
+                external_tables: vec![table_name.to_string()],
                 external_enums: vec![],
             }),
         )
         .send_unwrap_err();
 
-    assert_eq!(err.error_code(), Some("P3024"));
+    assert_eq!(err.error_code(), Some(expected_error_code));
 }
