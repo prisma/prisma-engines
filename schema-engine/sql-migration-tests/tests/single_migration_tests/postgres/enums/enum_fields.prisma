@@ -31,6 +31,9 @@ enum Kind {
 }
 
 // Expected Migration:
+// -- CreateSchema
+// CREATE SCHEMA IF NOT EXISTS "public";
+// 
 // -- CreateEnum
 // CREATE TYPE "public"."Result" AS ENUM ('succeeded', 'failed');
 // 

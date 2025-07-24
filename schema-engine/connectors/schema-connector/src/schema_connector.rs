@@ -49,6 +49,9 @@ pub trait SchemaDialect: Send + Sync + 'static {
     fn default_namespace(&self) -> Option<&str>;
 
     /// Create a database schema from datamodel source files.
+    ///
+    /// Note: The `default_namespace` should be taken from the connector's runtime
+    /// configuration, which might be different from the dialect's default!
     fn schema_from_datamodel(
         &self,
         sources: Vec<(String, SourceFile)>,
@@ -82,7 +85,8 @@ pub trait SchemaConnector: Send + Sync + 'static {
     /// Return the schema dialect of the connector.
     fn schema_dialect(&self) -> Box<dyn SchemaDialect>;
 
-    /// Return the default namespaces for the connector.
+    /// The default namespaces for the connector if it supports multiple namespaces.
+    /// Should be derived from the connectors runtime configuration but can fallback to the dialect's default.
     fn default_namespace(&self) -> Option<&str>;
 
     /// Accept a new ConnectorHost.

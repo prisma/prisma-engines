@@ -459,7 +459,7 @@ impl SqlConnector for MysqlConnector {
     }
 
     fn default_namespace(&self) -> Option<&str> {
-        None // For MySQL we do not support multiple schemas and hence use no schema qualifiers
+        None // For MySQL we do not support multiple namespaces
     }
 
     fn describe_query<'a>(

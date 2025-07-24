@@ -343,6 +343,8 @@ pub(crate) trait SqlConnector: Send + Sync + Debug {
 
     fn search_path(&self) -> &str;
 
+    /// The default namespaces for the connector if it supports multiple namespaces.
+    /// Should be derived from the connectors runtime configuration but can fallback to the dialect's default.
     fn default_namespace(&self) -> Option<&str>;
 
     fn dispose(&mut self) -> BoxFuture<'_, ConnectorResult<()>>;

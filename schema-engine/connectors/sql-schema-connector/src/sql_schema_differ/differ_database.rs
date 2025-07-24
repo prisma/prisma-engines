@@ -122,7 +122,6 @@ impl<'a> DifferDatabase<'a> {
             } else {
                 Cow::Borrowed(table.name())
             };
-
             let entry = db
                 .tables
                 .entry((table.namespace().map(Cow::Borrowed), table_name))

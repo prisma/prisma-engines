@@ -416,7 +416,7 @@ impl SqlConnector for SqliteConnector {
     }
 
     fn default_namespace(&self) -> Option<&str> {
-        None // For Sqlite we do not support multiple schemas and hence use no schema qualifiers
+        None // For Sqlite we do not support multiple namespaces
     }
 
     fn dispose(&mut self) -> BoxFuture<'_, ConnectorResult<()>> {

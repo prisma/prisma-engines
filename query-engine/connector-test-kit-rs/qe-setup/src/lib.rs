@@ -78,8 +78,7 @@ pub async fn setup_external<'a>(
             // 1. Compute the diff migration script.
             std::fs::remove_file(source.url.as_literal().unwrap().trim_start_matches("file:")).ok();
             let dialect = sql_schema_connector::SqlSchemaDialect::sqlite();
-            let d1_default_namespace = "main"; // as for any SQLite DB
-            let migration_script = crate::diff(prisma_schema, &dialect, Some(d1_default_namespace)).await?;
+            let migration_script = crate::diff(prisma_schema, &dialect, None).await?;
 
             // 2. Tell JavaScript to take care of the schema migration.
             //    This results in a JSON-RPC call to the JS runtime.

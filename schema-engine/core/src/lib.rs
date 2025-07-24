@@ -117,8 +117,6 @@ fn schema_to_connector(
 ) -> CoreResult<Box<dyn schema_connector::SchemaConnector>> {
     let (source, url, preview_features, shadow_database_url) = parse_configuration_multi(files)?;
 
-    println!("FLOOOOO url: {url}");
-
     let url = config_dir
         .map(|config_dir| psl::set_config_dir(source.active_connector.flavour(), config_dir, &url).into_owned())
         .unwrap_or(url);
