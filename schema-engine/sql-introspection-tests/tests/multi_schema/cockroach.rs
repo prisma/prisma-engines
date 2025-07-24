@@ -1,6 +1,6 @@
 use sql_introspection_tests::{TestResult, test_api::*};
 
-#[test_connector(tags(CockroachDb), preview_features("multiSchema"), namespaces("first", "second"))]
+#[test_connector(tags(CockroachDb), namespaces("first", "second"))]
 async fn multiple_schemas_w_tables_are_reintrospected(api: &mut TestApi) -> TestResult {
     let schema_name = "first";
     let other_name = "second";
@@ -61,7 +61,7 @@ async fn multiple_schemas_w_tables_are_reintrospected(api: &mut TestApi) -> Test
     Ok(())
 }
 
-#[test_connector(tags(CockroachDb), preview_features("multiSchema"), namespaces("first", "second"))]
+#[test_connector(tags(CockroachDb), namespaces("first", "second"))]
 async fn multiple_schemas_w_duplicate_table_names_are_introspected(api: &mut TestApi) -> TestResult {
     let schema_name = "first";
     let other_name = "second";
@@ -79,7 +79,7 @@ async fn multiple_schemas_w_duplicate_table_names_are_introspected(api: &mut Tes
     let expected = expect![[r#"
         generator client {
           provider        = "prisma-client-js"
-          previewFeatures = ["multiSchema"]
+          previewFeatures = []
         }
 
         datasource db {
@@ -107,7 +107,7 @@ async fn multiple_schemas_w_duplicate_table_names_are_introspected(api: &mut Tes
     Ok(())
 }
 
-#[test_connector(tags(CockroachDb), preview_features("multiSchema"), namespaces("first", "second"))]
+#[test_connector(tags(CockroachDb), namespaces("first", "second"))]
 async fn multiple_schemas_w_cross_schema_are_reintrospected(api: &mut TestApi) -> TestResult {
     let schema_name = "first";
     let other_name = "second";
@@ -166,7 +166,6 @@ async fn multiple_schemas_w_cross_schema_are_reintrospected(api: &mut TestApi) -
 
 #[test_connector(
     tags(CockroachDb),
-    preview_features("multiSchema"),
     namespaces("first", "second_schema")
 )]
 async fn multiple_schemas_w_enums_are_introspected(api: &mut TestApi) -> TestResult {
@@ -186,7 +185,7 @@ async fn multiple_schemas_w_enums_are_introspected(api: &mut TestApi) -> TestRes
     let expected = expect![[r#"
         generator client {
           provider        = "prisma-client-js"
-          previewFeatures = ["multiSchema"]
+          previewFeatures = []
         }
 
         datasource db {
@@ -212,7 +211,7 @@ async fn multiple_schemas_w_enums_are_introspected(api: &mut TestApi) -> TestRes
     Ok(())
 }
 
-#[test_connector(tags(CockroachDb), preview_features("multiSchema"), namespaces("first", "second"))]
+#[test_connector(tags(CockroachDb), namespaces("first", "second"))]
 async fn multiple_schemas_w_duplicate_enums_are_introspected(api: &mut TestApi) -> TestResult {
     let schema_name = "first";
     let other_name = "second";
@@ -235,7 +234,7 @@ async fn multiple_schemas_w_duplicate_enums_are_introspected(api: &mut TestApi) 
     let expected = expect![[r#"
         generator client {
           provider        = "prisma-client-js"
-          previewFeatures = ["multiSchema"]
+          previewFeatures = []
         }
 
         datasource db {
@@ -285,7 +284,6 @@ async fn multiple_schemas_w_duplicate_enums_are_introspected(api: &mut TestApi) 
 
 #[test_connector(
     tags(CockroachDb),
-    preview_features("multiSchema"),
     namespaces("first", "second_schema")
 )]
 async fn same_table_name_with_relation_in_two_schemas(api: &mut TestApi) -> TestResult {
@@ -301,7 +299,7 @@ async fn same_table_name_with_relation_in_two_schemas(api: &mut TestApi) -> Test
     let expected = expect![[r#"
         generator client {
           provider        = "prisma-client-js"
-          previewFeatures = ["multiSchema"]
+          previewFeatures = []
         }
 
         datasource db {

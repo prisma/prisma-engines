@@ -42,7 +42,7 @@ async fn multiple_schemas_without_schema_property_are_not_introspected(api: &mut
     Ok(())
 }
 
-#[test_connector(tags(Mssql), preview_features("multiSchema"), namespaces("first", "second"))]
+#[test_connector(tags(Mssql), namespaces("first", "second"))]
 async fn multiple_schemas_w_tables_are_introspected(api: &mut TestApi) -> TestResult {
     let schema_name = "first";
     let other_name = "second";
@@ -92,7 +92,7 @@ async fn multiple_schemas_w_tables_are_introspected(api: &mut TestApi) -> TestRe
     let expected = expect![[r#"
         generator client {
           provider        = "prisma-client-js"
-          previewFeatures = ["multiSchema"]
+          previewFeatures = []
         }
 
         datasource db {
@@ -121,7 +121,7 @@ async fn multiple_schemas_w_tables_are_introspected(api: &mut TestApi) -> TestRe
     Ok(())
 }
 
-#[test_connector(tags(Mssql), preview_features("multiSchema"), namespaces("first", "second"))]
+#[test_connector(tags(Mssql), namespaces("first", "second"))]
 async fn multiple_schemas_w_tables_are_reintrospected(api: &mut TestApi) -> TestResult {
     let schema_name = "first";
     let other_name = "second";
@@ -203,7 +203,7 @@ async fn multiple_schemas_w_tables_are_reintrospected(api: &mut TestApi) -> Test
     Ok(())
 }
 
-#[test_connector(tags(Mssql), preview_features("multiSchema"), namespaces("first", "second"))]
+#[test_connector(tags(Mssql), namespaces("first", "second"))]
 async fn multiple_schemas_w_duplicate_table_names_are_introspected(api: &mut TestApi) -> TestResult {
     let schema_name = "first";
     let other_name = "second";
@@ -221,7 +221,7 @@ async fn multiple_schemas_w_duplicate_table_names_are_introspected(api: &mut Tes
     let expected = expect![[r#"
         generator client {
           provider        = "prisma-client-js"
-          previewFeatures = ["multiSchema"]
+          previewFeatures = []
         }
 
         datasource db {
@@ -250,7 +250,7 @@ async fn multiple_schemas_w_duplicate_table_names_are_introspected(api: &mut Tes
     Ok(())
 }
 
-#[test_connector(tags(Mssql), preview_features("multiSchema"), namespaces("first", "second"))]
+#[test_connector(tags(Mssql), namespaces("first", "second"))]
 async fn multiple_schemas_w_cross_schema_are_introspected(api: &mut TestApi) -> TestResult {
     let schema_name = "first";
     let other_name = "second";
@@ -276,7 +276,7 @@ async fn multiple_schemas_w_cross_schema_are_introspected(api: &mut TestApi) -> 
     let expected = expect![[r#"
         generator client {
           provider        = "prisma-client-js"
-          previewFeatures = ["multiSchema"]
+          previewFeatures = []
         }
 
         datasource db {
@@ -306,7 +306,7 @@ async fn multiple_schemas_w_cross_schema_are_introspected(api: &mut TestApi) -> 
     Ok(())
 }
 
-#[test_connector(tags(Mssql), preview_features("multiSchema"), namespaces("first", "second"))]
+#[test_connector(tags(Mssql), namespaces("first", "second"))]
 async fn multiple_schemas_w_cross_schema_are_reintrospected(api: &mut TestApi) -> TestResult {
     let schema_name = "first";
     let other_name = "second";
@@ -368,7 +368,7 @@ async fn multiple_schemas_w_cross_schema_are_reintrospected(api: &mut TestApi) -
     Ok(())
 }
 
-#[test_connector(tags(Mssql), preview_features("multiSchema"), namespaces("first", "second"))]
+#[test_connector(tags(Mssql), namespaces("first", "second"))]
 async fn multiple_schemas_w_cross_schema_fks_w_duplicate_names_are_introspected(api: &mut TestApi) -> TestResult {
     let schema_name = "first";
     let other_name = "second";
@@ -394,7 +394,7 @@ async fn multiple_schemas_w_cross_schema_fks_w_duplicate_names_are_introspected(
     let expected = expect![[r#"
         generator client {
           provider        = "prisma-client-js"
-          previewFeatures = ["multiSchema"]
+          previewFeatures = []
         }
 
         datasource db {
@@ -428,7 +428,6 @@ async fn multiple_schemas_w_cross_schema_fks_w_duplicate_names_are_introspected(
 
 #[test_connector(
     tags(Mssql),
-    preview_features("multiSchema"),
     namespaces("Appointments", "Trips", "core")
 )]
 async fn schemas_with_varying_case(api: &mut TestApi) -> TestResult {
@@ -494,7 +493,7 @@ async fn schemas_with_varying_case(api: &mut TestApi) -> TestResult {
     let expected = expect![[r#"
         generator client {
           provider        = "prisma-client-js"
-          previewFeatures = ["multiSchema"]
+          previewFeatures = []
         }
 
         datasource db {
@@ -571,7 +570,7 @@ async fn schemas_with_varying_case(api: &mut TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(tags(Mssql), preview_features("multiSchema"), namespaces("first", "second"))]
+#[test_connector(tags(Mssql), namespaces("first", "second"))]
 async fn defaults_are_introspected(api: &mut TestApi) -> TestResult {
     let schema_name = "first";
     let other_name = "second";
@@ -598,7 +597,7 @@ async fn defaults_are_introspected(api: &mut TestApi) -> TestResult {
     let expected = expect![[r#"
         generator client {
           provider        = "prisma-client-js"
-          previewFeatures = ["multiSchema"]
+          previewFeatures = []
         }
 
         datasource db {

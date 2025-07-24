@@ -642,7 +642,7 @@ fn schema_filter_migration_multi_schema_requires_namespaced_table_names(api: Tes
         }
     "#,
         &[("schemas", "[\"one\", \"two\"]")],
-        &["multiSchema"],
+        &[],
     );
 
     let dir = api.create_migrations_directory();
@@ -724,7 +724,7 @@ fn schema_filter_migration_multi_schema_without_namespaced_table_names(api: Test
         }
     "#,
         &[("schemas", "[\"one\", \"two\"]")],
-        &["multiSchema"],
+        &[],
     );
 
     let dir = api.create_migrations_directory();

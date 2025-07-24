@@ -33,7 +33,7 @@ fn applying_a_single_migration_should_work(api: TestApi) {
     api.apply_migrations(&dir).send_sync().assert_applied_migrations(&[]);
 }
 
-#[test_connector(tags(Mssql, Postgres), preview_features("multiSchema"), namespaces("one", "two"))]
+#[test_connector(tags(Mssql, Postgres), namespaces("one", "two"))]
 fn multi_schema_applying_two_migrations_works(api: TestApi) {
     let dm1 = api.datamodel_with_provider_and_features(
         r#"
@@ -44,7 +44,7 @@ fn multi_schema_applying_two_migrations_works(api: TestApi) {
         }
     "#,
         &[("schemas", "[\"one\", \"two\"]")],
-        &["multiSchema"],
+        &[],
     );
 
     let migrations_directory = api.create_migrations_directory();
@@ -60,7 +60,7 @@ fn multi_schema_applying_two_migrations_works(api: TestApi) {
         }
     "#,
         &[("schemas", "[\"one\", \"two\"]")],
-        &["multiSchema"],
+        &[],
     );
 
     api.create_migration("second-migration", &dm2, &migrations_directory)
@@ -75,7 +75,7 @@ fn multi_schema_applying_two_migrations_works(api: TestApi) {
         .assert_applied_migrations(&[]);
 }
 
-#[test_connector(tags(Mssql), preview_features("multiSchema"), namespaces("one", "two"))]
+#[test_connector(tags(Mssql), namespaces("one", "two"))]
 fn multi_schema_two_migrations_drop_fks(api: TestApi) {
     let dm1 = api.datamodel_with_provider_and_features(
         r#"
@@ -103,7 +103,7 @@ fn multi_schema_two_migrations_drop_fks(api: TestApi) {
         }
     "#,
         &[("schemas", "[\"one\", \"two\"]")],
-        &["multiSchema"],
+        &[],
     );
 
     let migrations_directory = api.create_migrations_directory();
@@ -141,7 +141,7 @@ fn multi_schema_two_migrations_drop_fks(api: TestApi) {
 
             @@schema("one")
         }
-      "#, &[("schemas", "[\"one\", \"two\"]")], &["multiSchema"]);
+      "#, &[("schemas", "[\"one\", \"two\"]")], &[]);
 
     api.create_migration("second-migration", &dm2, &migrations_directory)
         .send_sync();
@@ -155,7 +155,7 @@ fn multi_schema_two_migrations_drop_fks(api: TestApi) {
         .assert_applied_migrations(&[]);
 }
 
-#[test_connector(tags(Mssql), preview_features("multiSchema"), namespaces("one", "two"))]
+#[test_connector(tags(Mssql), namespaces("one", "two"))]
 fn multi_schema_two_migrations_reset(api: TestApi) {
     let dm1 = api.datamodel_with_provider_and_features(
         r#"
@@ -183,7 +183,7 @@ fn multi_schema_two_migrations_reset(api: TestApi) {
         }
     "#,
         &[("schemas", "[\"one\", \"two\"]")],
-        &["multiSchema"],
+        &[],
     );
 
     let migrations_directory = api.create_migrations_directory();
@@ -221,7 +221,7 @@ fn multi_schema_two_migrations_reset(api: TestApi) {
 
             @@schema("one")
         }
-      "#, &[("schemas", "[\"one\", \"two\"]")], &["multiSchema"]);
+      "#, &[("schemas", "[\"one\", \"two\"]")], &[]);
 
     api.create_migration("second-migration", &dm2, &migrations_directory)
         .send_sync();

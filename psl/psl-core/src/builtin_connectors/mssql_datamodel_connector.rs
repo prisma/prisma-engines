@@ -4,7 +4,6 @@ mod validations;
 pub use native_types::{MsSqlType, MsSqlTypeParameter};
 
 use crate::{
-    PreviewFeature,
     datamodel_connector::{
         Connector, ConnectorCapabilities, ConnectorCapability, ConstraintScope, Flavour, NativeTypeConstructor,
         NativeTypeInstance, RelationMode,
@@ -281,7 +280,7 @@ impl Connector for MsSqlDatamodelConnector {
             None => return,
         };
 
-        if config.preview_features().contains(PreviewFeature::MultiSchema) && !ds.schemas_defined() {
+        if !ds.schemas_defined() {
             completions::schemas_completion(completion_list);
         }
     }

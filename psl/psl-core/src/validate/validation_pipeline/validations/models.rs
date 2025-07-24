@@ -275,10 +275,6 @@ pub(super) fn id_client_name_does_not_clash_with_field(model: ModelWalker<'_>, c
 }
 
 pub(super) fn schema_is_defined_in_the_datasource(model: ModelWalker<'_>, ctx: &mut Context<'_>) {
-    if !ctx.preview_features.contains(crate::PreviewFeature::MultiSchema) {
-        return;
-    }
-
     if !ctx.has_capability(ConnectorCapability::MultiSchema) {
         return;
     }
@@ -304,10 +300,6 @@ pub(super) fn schema_is_defined_in_the_datasource(model: ModelWalker<'_>, ctx: &
 }
 
 pub(super) fn schema_attribute_supported_in_connector(model: ModelWalker<'_>, ctx: &mut Context<'_>) {
-    if !ctx.preview_features.contains(crate::PreviewFeature::MultiSchema) {
-        return;
-    }
-
     if ctx.has_capability(ConnectorCapability::MultiSchema) {
         return;
     }
@@ -324,10 +316,6 @@ pub(super) fn schema_attribute_supported_in_connector(model: ModelWalker<'_>, ct
 }
 
 pub(super) fn schema_attribute_missing(model: ModelWalker<'_>, ctx: &mut Context<'_>) {
-    if !ctx.preview_features.contains(crate::PreviewFeature::MultiSchema) {
-        return;
-    }
-
     if !ctx.has_capability(ConnectorCapability::MultiSchema) {
         return;
     }
@@ -400,19 +388,6 @@ pub(super) fn database_name_clashes(ctx: &mut Context<'_>) {
             }
             None => (),
         }
-    }
-}
-
-pub(super) fn multischema_feature_flag_needed(model: ModelWalker<'_>, ctx: &mut Context<'_>) {
-    if ctx.preview_features.contains(crate::PreviewFeature::MultiSchema) {
-        return;
-    }
-
-    if let Some((_, span)) = model.schema() {
-        ctx.push_error(DatamodelError::new_static(
-            "@@schema is only available with the `multiSchema` preview feature.",
-            span,
-        ));
     }
 }
 

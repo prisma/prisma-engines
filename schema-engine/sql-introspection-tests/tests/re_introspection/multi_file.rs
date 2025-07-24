@@ -316,7 +316,7 @@ async fn reintrospect_force_invalid_config(api: &mut TestApi) -> TestResult {
 
       generator client {
         provider = "prisma-client-js"
-        previewFeatures = ["multiSchema"]
+        previewFeatures = []
       }
     "#};
 

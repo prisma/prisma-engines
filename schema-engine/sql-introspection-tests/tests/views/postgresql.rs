@@ -526,7 +526,7 @@ async fn re_intro_keeps_the_field_map(api: &mut TestApi) -> TestResult {
 #[test_connector(
     tags(Postgres),
     exclude(CockroachDb),
-    preview_features("views", "multiSchema"),
+    preview_features("views"),
     namespaces("public")
 )]
 async fn schema_is_introspected(api: &mut TestApi) -> TestResult {
@@ -539,7 +539,7 @@ async fn schema_is_introspected(api: &mut TestApi) -> TestResult {
     let expected = expect![[r#"
         generator client {
           provider        = "prisma-client-js"
-          previewFeatures = ["multiSchema", "views"]
+          previewFeatures = ["views"]
         }
 
         datasource db {
@@ -639,7 +639,7 @@ async fn invalid_field_names_trigger_warnings(api: &mut TestApi) -> TestResult {
 #[test_connector(
     tags(Postgres),
     exclude(CockroachDb),
-    preview_features("views", "multiSchema"),
+    preview_features("views"),
     namespaces("public", "private")
 )]
 async fn dupes_are_renamed(api: &mut TestApi) -> TestResult {
@@ -654,7 +654,7 @@ async fn dupes_are_renamed(api: &mut TestApi) -> TestResult {
     let expected = expect![[r#"
         generator client {
           provider        = "prisma-client-js"
-          previewFeatures = ["multiSchema", "views"]
+          previewFeatures = ["views"]
         }
 
         datasource db {
@@ -696,7 +696,6 @@ async fn dupes_are_renamed(api: &mut TestApi) -> TestResult {
 #[test_connector(
     tags(Postgres),
     exclude(CockroachDb),
-    preview_features("multiSchema"),
     namespaces("public", "private")
 )]
 async fn dupe_views_are_not_considered_without_preview_feature(api: &mut TestApi) -> TestResult {
@@ -711,7 +710,7 @@ async fn dupe_views_are_not_considered_without_preview_feature(api: &mut TestApi
     let expected = expect![[r#"
         generator client {
           provider        = "prisma-client-js"
-          previewFeatures = ["multiSchema"]
+          previewFeatures = []
         }
 
         datasource db {

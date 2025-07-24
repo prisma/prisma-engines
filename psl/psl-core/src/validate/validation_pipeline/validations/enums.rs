@@ -19,10 +19,6 @@ pub(super) fn database_name_clashes(ctx: &mut Context<'_>) {
 }
 
 pub(super) fn schema_is_defined_in_the_datasource(r#enum: EnumWalker<'_>, ctx: &mut Context<'_>) {
-    if !ctx.preview_features.contains(crate::PreviewFeature::MultiSchema) {
-        return;
-    }
-
     if !ctx.has_capability(ConnectorCapability::MultiSchema) {
         return;
     }
@@ -48,10 +44,6 @@ pub(super) fn schema_is_defined_in_the_datasource(r#enum: EnumWalker<'_>, ctx: &
 }
 
 pub(super) fn schema_attribute_supported_in_connector(r#enum: EnumWalker<'_>, ctx: &mut Context<'_>) {
-    if !ctx.preview_features.contains(crate::PreviewFeature::MultiSchema) {
-        return;
-    }
-
     if ctx.has_capability(ConnectorCapability::MultiSchema) {
         return;
     }
@@ -68,10 +60,6 @@ pub(super) fn schema_attribute_supported_in_connector(r#enum: EnumWalker<'_>, ct
 }
 
 pub(super) fn schema_attribute_missing(r#enum: EnumWalker<'_>, ctx: &mut Context<'_>) {
-    if !ctx.preview_features.contains(crate::PreviewFeature::MultiSchema) {
-        return;
-    }
-
     if !ctx.has_capability(ConnectorCapability::MultiSchema) {
         return;
     }
@@ -97,19 +85,6 @@ pub(super) fn schema_attribute_missing(r#enum: EnumWalker<'_>, ctx: &mut Context
         "This enum is missing an `@@schema` attribute.",
         r#enum.ast_enum().span,
     ))
-}
-
-pub(super) fn multischema_feature_flag_needed(r#enum: EnumWalker<'_>, ctx: &mut Context<'_>) {
-    if ctx.preview_features.contains(crate::PreviewFeature::MultiSchema) {
-        return;
-    }
-
-    if let Some((_, span)) = r#enum.schema() {
-        ctx.push_error(DatamodelError::new_static(
-            "@@schema is only available with the `multiSchema` preview feature.",
-            span,
-        ));
-    }
 }
 
 pub(crate) fn connector_supports_enums(r#enum: EnumWalker<'_>, ctx: &mut Context<'_>) {

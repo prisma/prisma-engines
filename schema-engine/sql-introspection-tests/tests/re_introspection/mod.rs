@@ -1669,7 +1669,7 @@ async fn re_introspecting_custom_index_order(api: &mut TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(tags(Postgres), preview_features("multiSchema"))]
+#[test_connector(tags(Postgres))]
 async fn re_introspecting_with_schemas_property(api: &mut TestApi) -> TestResult {
     let create_schema = "CREATE SCHEMA \"first\"";
     let create_table = "CREATE TABLE \"first\".\"A\" (id TEXT PRIMARY KEY)";
@@ -1686,7 +1686,7 @@ async fn re_introspecting_with_schemas_property(api: &mut TestApi) -> TestResult
     let input_dm = indoc! {r#"
           generator client {
            provider        = "prisma-client-js"
-           previewFeatures = ["multiSchema"]
+           previewFeatures = []
          }
 
          datasource myds {
@@ -1701,7 +1701,7 @@ async fn re_introspecting_with_schemas_property(api: &mut TestApi) -> TestResult
     let expected = expect![[r#"
         generator client {
           provider        = "prisma-client-js"
-          previewFeatures = ["multiSchema"]
+          previewFeatures = []
         }
 
         datasource myds {

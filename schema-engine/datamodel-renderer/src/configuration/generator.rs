@@ -199,7 +199,7 @@ mod tests {
             generator client {
               provider        = "prisma-client-js"
               output          = "/dev/null"
-              previewFeatures = ["multiSchema", "postgresqlExtensions"]
+              previewFeatures = ["postgresqlExtensions"]
               binaryTargets   = [env("BINARY TARGET")]
               afterGenerate   = ["lambda", [], ["print", ["quote", "done!"]]]
               customEnvValue  = env("var")

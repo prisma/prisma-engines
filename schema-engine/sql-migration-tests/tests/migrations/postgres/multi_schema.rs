@@ -5,7 +5,7 @@ use crate::migrations::multi_schema::*;
 use sql_migration_tests::test_api::*;
 use sql_schema_describer::DefaultValue;
 
-#[test_connector(tags(Postgres), preview_features("multiSchema"), namespaces("one", "prisma-tests"))]
+#[test_connector(tags(Postgres), namespaces("one", "prisma-tests"))]
 fn apply_migrations_with_multiple_schemas_where_one_is_search_path_with_a_foreign_key(api: TestApi) {
     let datasource = api.datasource_block_with(&[("schemas", r#"["one", "prisma-tests"]"#)]);
     let generator = api.generator_block();
@@ -44,7 +44,7 @@ fn apply_migrations_with_multiple_schemas_where_one_is_search_path_with_a_foreig
 
 // This is the only "top" level test in this module. It defines a list of tests and executes them.
 // If you want to look at the tests, see the `tests` variable below.
-#[test_connector(tags(Postgres), preview_features("multiSchema"), namespaces("one", "two"))]
+#[test_connector(tags(Postgres), namespaces("one", "two"))]
 fn multi_schema_tests(_api: TestApi) {
     let namespaces: &'static [&'static str] = &["one", "two"];
     let base_schema = indoc! {r#"
@@ -56,7 +56,7 @@ fn multi_schema_tests(_api: TestApi) {
 
         generator js {
           provider        = "prisma-client-js"
-          previewFeatures = ["multiSchema"]
+          previewFeatures = []
         }
     "#};
 
@@ -1581,7 +1581,6 @@ fn multi_schema_tests(_api: TestApi) {
 #[test_connector(
     tags(Postgres),
     exclude(CockroachDb),
-    preview_features("multiSchema"),
     namespaces("one", "two")
 )]
 fn migration_with_shadow_database(api: TestApi) {
@@ -1602,7 +1601,7 @@ fn migration_with_shadow_database(api: TestApi) {
 
             generator js {{
               provider        = "prisma-client-javascript"
-              previewFeatures = ["multiSchema"]
+              previewFeatures = []
             }}
         "#};
 

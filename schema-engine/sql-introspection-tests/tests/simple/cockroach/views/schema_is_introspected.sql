@@ -1,4 +1,4 @@
--- preview_features=views,multiSchema
+-- preview_features=views
 -- schemas=public
 -- tags=cockroachdb
 
@@ -7,7 +7,7 @@ CREATE VIEW public."A" AS SELECT 1 AS id;
 /*
 generator js {
   provider        = "prisma-client-js"
-  previewFeatures = ["multiSchema", "views"]
+  previewFeatures = ["views"]
 }
 
 datasource db {
