@@ -23,7 +23,7 @@ impl<'a> CompletionContext<'a> {
         self.datasource().map(|ds| ds.namespaces.as_slice()).unwrap_or(&[])
     }
 
-    #[allow(unused_imports)]
+    #[allow(dead_code)]
     pub(super) fn preview_features(&self) -> BitFlags<PreviewFeature> {
         self.generator()
             .and_then(|generator| generator.preview_features)

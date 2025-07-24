@@ -365,7 +365,6 @@ impl GenericApi for EngineState {
         tracing::info!("{:?}", params.schema);
         let source_files = params.schema.to_psl_input();
 
-        let has_some_namespaces = params.namespaces.is_some();
         let composite_type_depth = From::from(params.composite_type_depth);
 
         let ctx = if params.force {
