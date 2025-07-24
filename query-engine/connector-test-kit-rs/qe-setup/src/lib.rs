@@ -161,8 +161,12 @@ pub(crate) async fn diff(
 
 /// Apply the script returned by [`diff`] against the database.
 pub(crate) async fn diff_and_apply(schema: &str, connector: &mut dyn SchemaConnector) -> ConnectorResult<()> {
-    let script = diff(schema, &*connector.schema_dialect(), connector.default_namespace())
-        .await
-        .unwrap();
+    let script = diff(
+        schema,
+        &*connector.schema_dialect(),
+        connector.default_runtime_namespace(),
+    )
+    .await
+    .unwrap();
     connector.db_execute(script).await
 }

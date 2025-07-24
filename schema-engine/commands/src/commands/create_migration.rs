@@ -32,7 +32,7 @@ pub async fn create_migration(
     let sources: Vec<_> = input.schema.to_psl_input();
     let dialect = connector.schema_dialect();
     let filter: schema_connector::SchemaFilter = input.filters.into();
-    let default_namespace = connector.default_namespace();
+    let default_namespace = connector.default_runtime_namespace();
     // We need to start with the 'to', which is the Schema, in order to grab the
     // namespaces, in case we've got MultiSchema enabled.
     let to = dialect.schema_from_datamodel(sources, default_namespace)?;

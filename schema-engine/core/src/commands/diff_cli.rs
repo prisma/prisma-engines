@@ -142,13 +142,19 @@ async fn json_rpc_diff_target_to_dialect(
         }
         DiffTarget::SchemaDatamodel(schemas) => {
             let sources = schemas.to_psl_input();
-            let dialect = crate::schema_to_dialect(&sources)?;
 
             // Connector only needed to infer the default namespace.
             // If connector cannot be created (e.g. due to invalid or missing URL) we use the dialect's default namespace.
-            let default_namespace = crate::schema_to_connector(&sources, None)
-                .map(|connector| connector.default_namespace().map(|ns| ns.to_owned()))
-                .unwrap_or_else(|_| dialect.default_namespace().map(|ns| ns.to_owned()));
+            let (default_namespace, dialect) = match crate::schema_to_connector(&sources, None) {
+                Ok(connector) => (
+                    connector.default_runtime_namespace().map(|ns| ns.to_string()),
+                    connector.schema_dialect(),
+                ),
+                Err(_) => {
+                    let dialect = crate::schema_to_dialect(&sources)?;
+                    (dialect.default_namespace().map(|ns| ns.to_string()), dialect)
+                }
+            };
 
             let schema = dialect.schema_from_datamodel(sources, default_namespace.as_deref())?;
 

@@ -129,7 +129,7 @@ impl SchemaConnector for MongoDbSchemaConnector {
         Box::new(MongoDbSchemaDialect)
     }
 
-    fn default_namespace(&self) -> Option<&str> {
+    fn default_runtime_namespace(&self) -> Option<&str> {
         None
     }
 

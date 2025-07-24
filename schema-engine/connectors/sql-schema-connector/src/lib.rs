@@ -356,7 +356,7 @@ impl SchemaConnector for SqlSchemaConnector {
         Box::new(SqlSchemaDialect::new(self.inner.dialect()))
     }
 
-    fn default_namespace(&self) -> Option<&str> {
+    fn default_runtime_namespace(&self) -> Option<&str> {
         self.inner.default_namespace()
     }
 

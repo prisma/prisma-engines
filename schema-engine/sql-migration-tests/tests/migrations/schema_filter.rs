@@ -780,7 +780,7 @@ fn schema_filter_without_namespaced_table_names_on_pg_and_sql_server(api: TestAp
     assert_eq!(
         err.message(),
         Some(
-            "For the current database dialect, `externalTables` & `externalEnums` in your prisma config must contain only fully qualified identifiers (e.g. `schema_name.table_name`)."
+            "For the current database, `externalTables` & `externalEnums` in your prisma config must contain only fully qualified identifiers (e.g. `schema_name.table_name`)."
         )
     );
 }
@@ -813,7 +813,7 @@ fn schema_filter_with_namespaced_table_names_on_other_dialects(api: TestApi) {
     assert_eq!(
         err.message(),
         Some(
-            "For the current database dialect, `externalTables` & `externalEnums` in your prisma config must contain only simple identifiers without a schema name."
+            "For the current database, `externalTables` & `externalEnums` in your prisma config must contain only simple identifiers without a schema name."
         )
     );
 }

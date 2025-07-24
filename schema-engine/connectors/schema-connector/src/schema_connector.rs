@@ -87,7 +87,7 @@ pub trait SchemaConnector: Send + Sync + 'static {
 
     /// The default namespaces for the connector if it supports multiple namespaces.
     /// Should be derived from the connectors runtime configuration but can fallback to the dialect's default.
-    fn default_namespace(&self) -> Option<&str>;
+    fn default_runtime_namespace(&self) -> Option<&str>;
 
     /// Accept a new ConnectorHost.
     fn set_host(&mut self, host: Arc<dyn ConnectorHost>);
