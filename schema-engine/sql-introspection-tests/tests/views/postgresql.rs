@@ -705,8 +705,7 @@ async fn dupe_views_are_not_considered_without_preview_feature(api: &mut TestApi
 
     let expected = expect![[r#"
         generator client {
-          provider        = "prisma-client-js"
-          previewFeatures = []
+          provider = "prisma-client-js"
         }
 
         datasource db {

@@ -17,8 +17,7 @@ fn multi_schema_tests(_api: TestApi) {
         }
 
         generator js {
-          provider        = "prisma-client-js"
-          previewFeatures = []
+          provider = "prisma-client-js"
         }
     "#};
 
@@ -1131,8 +1130,7 @@ fn multi_schema_migration(api: TestApi) {
         }
 
         generator js {
-          provider        = "prisma-client-js"
-          previewFeatures = []
+          provider = "prisma-client-js"
         }
 
         model A {
@@ -1187,7 +1185,6 @@ fn migration_with_shadow_database(api: TestApi) {
 
         generator js {{
           provider        = "prisma-client-javascript"
-          previewFeatures = []
         }}
     "#};
 

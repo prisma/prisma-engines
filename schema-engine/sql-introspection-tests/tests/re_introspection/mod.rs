@@ -1685,7 +1685,7 @@ async fn re_introspecting_with_schemas_property(api: &mut TestApi) -> TestResult
 
     let input_dm = indoc! {r#"
           generator client {
-           provider        = "prisma-client-js"
+           provider = "prisma-client-js"
            previewFeatures = []
          }
 
@@ -1700,8 +1700,7 @@ async fn re_introspecting_with_schemas_property(api: &mut TestApi) -> TestResult
 
     let expected = expect![[r#"
         generator client {
-          provider        = "prisma-client-js"
-          previewFeatures = []
+          provider = "prisma-client-js"
         }
 
         datasource myds {

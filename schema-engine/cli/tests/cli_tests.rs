@@ -614,7 +614,7 @@ fn introspect_single_postgres_force(api: TestApi) {
         }
 
         generator js {
-          provider = "prisma-client-js"
+          provider        = "prisma-client-js"
           previewFeatures = ["views"]
         }
     "#};
