@@ -22,6 +22,8 @@ impl<'a> CompletionContext<'a> {
     pub(super) fn namespaces(&'a self) -> &'a [(String, Span)] {
         self.datasource().map(|ds| ds.namespaces.as_slice()).unwrap_or(&[])
     }
+
+    #[allow(unused_imports)]
     pub(super) fn preview_features(&self) -> BitFlags<PreviewFeature> {
         self.generator()
             .and_then(|generator| generator.preview_features)
