@@ -11,7 +11,7 @@ use crate::introspection::{
 use psl::{
     Configuration, PreviewFeature,
     builtin_connectors::*,
-    datamodel_connector::Connector,
+    datamodel_connector::{Connector, ConnectorCapability},
     parser_database::{self as db, walkers},
 };
 use quaint::prelude::SqlFamily;
@@ -82,10 +82,12 @@ impl<'a> DatamodelCalculatorContext<'a> {
     }
 
     pub(crate) fn uses_namespaces(&self) -> bool {
-        let schemas_in_datasource = matches!(self.config.datasources.first(), Some(ds) if !ds.namespaces.is_empty());
-        let schemas_in_parameters = self.force_namespaces.is_some();
+        let connector_supports_multischema = self
+            .active_connector()
+            .capabilities()
+            .contains(ConnectorCapability::MultiSchema);
 
-        schemas_in_datasource || schemas_in_parameters
+        connector_supports_multischema || self.force_namespaces.is_some()
     }
 
     /// Iterate over the database enums, combined together with a
