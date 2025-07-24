@@ -726,6 +726,7 @@ fn with_schema_filters(mut api: TestApi) {
         to: DiffTarget::Url(UrlContainer { url: second_url }),
         filters: Some(SchemaFilter {
             external_tables: vec!["external_table".to_string()],
+            external_enums: vec![],
         }),
     };
 
@@ -775,6 +776,7 @@ fn with_invalid_schema_filters(mut api: TestApi) {
         to: DiffTarget::Url(UrlContainer { url: second_url }),
         filters: Some(SchemaFilter {
             external_tables: vec!["public.external_table".to_string()],
+            external_enums: vec![],
         }),
     };
 

@@ -496,6 +496,7 @@ fn schema_push_with_invalid_schema_filters(api: TestApi) {
             dm,
             Some(SchemaFilter {
                 external_tables: vec!["public.ExternalTable".to_string()],
+                external_enums: vec![],
             }),
         )
         .send_unwrap_err();

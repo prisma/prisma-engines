@@ -377,6 +377,7 @@ impl EngineTestApi {
                 .iter()
                 .map(|table| default_namespace.map_or(table.to_string(), |ns| format!("{ns}.{table}")))
                 .collect(),
+            external_enums: vec![],
         }
     }
 

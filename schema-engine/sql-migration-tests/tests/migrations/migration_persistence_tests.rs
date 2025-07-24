@@ -204,6 +204,7 @@ fn starting_a_migration_on_db_with_existing_external_table_does_not_errors(api: 
         None,
         SchemaFilter {
             external_tables: vec!["cats".to_string()],
+            external_enums: vec![],
         },
     ));
 

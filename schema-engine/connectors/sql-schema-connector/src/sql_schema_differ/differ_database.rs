@@ -354,12 +354,25 @@ impl<'a> DifferDatabase<'a> {
         all_tables_are_external && !has_enums
     }
 
+    fn is_enum_external(&self, enum_walker: &EnumWalker<'_>) -> bool {
+        self.flavour
+            .contains_table(&self.filter.external_enums, enum_walker.namespace(), enum_walker.name())
+    }
+
     fn previous_enums(&self) -> impl Iterator<Item = EnumWalker<'a>> {
-        self.schemas.previous.describer_schema.enum_walkers()
+        self.schemas
+            .previous
+            .describer_schema
+            .enum_walkers()
+            .filter(|e| !self.is_enum_external(e))
     }
 
     fn next_enums(&self) -> impl Iterator<Item = EnumWalker<'a>> {
-        self.schemas.next.describer_schema.enum_walkers()
+        self.schemas
+            .next
+            .describer_schema
+            .enum_walkers()
+            .filter(|e| !self.is_enum_external(e))
     }
 
     fn previous_extensions(&self) -> impl Iterator<Item = ExtensionWalker<'a>> {
