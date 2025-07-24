@@ -93,11 +93,8 @@ pub(crate) fn available_actions(
 
         block::create_missing_block_for_model(&mut actions, &context, model);
 
-        if config.preview_features().contains(PreviewFeature::MultiSchema) {
-            multi_schema::add_schema_block_attribute_model(&mut actions, &context, model);
-
-            multi_schema::add_schema_to_schemas(&mut actions, &context, model);
-        }
+        multi_schema::add_schema_block_attribute_model(&mut actions, &context, model);
+        multi_schema::add_schema_to_schemas(&mut actions, &context, model);
 
         if matches!(datasource, Some(ds) if ds.active_provider == "mongodb") {
             mongodb::add_at_map_for_id(&mut actions, &context, model);
@@ -113,9 +110,7 @@ pub(crate) fn available_actions(
     }
 
     for enumerator in validated_schema.db.walk_enums_in_file(initiating_file_id) {
-        if config.preview_features().contains(PreviewFeature::MultiSchema) {
-            multi_schema::add_schema_block_attribute_enum(&mut actions, &context, enumerator);
-        }
+        multi_schema::add_schema_block_attribute_enum(&mut actions, &context, enumerator);
     }
 
     for relation in validated_schema.db.walk_relations() {

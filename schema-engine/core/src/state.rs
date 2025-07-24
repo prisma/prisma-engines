@@ -389,18 +389,6 @@ impl GenericApi for EngineState {
         }
         .map_err(ConnectorError::new_schema_parser_error)?;
 
-        if !ctx
-            .configuration()
-            .preview_features()
-            .contains(PreviewFeature::MultiSchema)
-            && has_some_namespaces
-        {
-            let msg =
-                "The preview feature `multiSchema` must be enabled before using --schemas command line parameter.";
-
-            return Err(CoreError::from_msg(msg.to_string()));
-        }
-
         self.with_connector_for_schema(
             source_files,
             None,

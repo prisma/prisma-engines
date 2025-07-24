@@ -323,18 +323,6 @@ impl SchemaEngine {
             }
             .map_err(|e| ConnectorError::new_schema_parser_error(e).into_js_error())?;
 
-            if !ctx
-                .configuration()
-                .preview_features()
-                .contains(PreviewFeature::MultiSchema)
-                && has_some_namespaces
-            {
-                let msg =
-                    "The preview feature `multiSchema` must be enabled before using --schemas command line parameter.";
-
-                return Err(CoreError::from_msg(msg.to_string()).into());
-            }
-
             let IntrospectionResult {
                 datamodels,
                 views,

@@ -353,9 +353,7 @@ fn validate_connection_infos_do_not_match(previous: &str, next: &str) -> Connect
 
 /// Remove all usage of non-enabled preview feature elements from the SqlSchema.
 fn normalize_sql_schema(sql_schema: &mut SqlSchema, preview_features: BitFlags<PreviewFeature>) {
-    if !preview_features.contains(PreviewFeature::MultiSchema) {
-        sql_schema.clear_namespaces();
-    }
+    sql_schema.clear_namespaces();
 }
 
 pub(crate) fn quaint_error_to_connector_error(

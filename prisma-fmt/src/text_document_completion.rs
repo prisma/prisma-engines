@@ -126,14 +126,14 @@ fn push_ast_completions(ctx: CompletionContext<'_>, completion_list: &mut Comple
         ast::SchemaPosition::Model(
             _model_id,
             ast::ModelPosition::ModelAttribute("schema", _, ast::AttributePosition::Attribute),
-        ) if ctx.preview_features().contains(PreviewFeature::MultiSchema) => {
+        ) => {
             push_namespaces(ctx, completion_list);
         }
 
         ast::SchemaPosition::Enum(
             _enum_id,
             ast::EnumPosition::EnumAttribute("schema", _, ast::AttributePosition::Attribute),
-        ) if ctx.preview_features().contains(PreviewFeature::MultiSchema) => {
+        ) => {
             push_namespaces(ctx, completion_list);
         }
 
