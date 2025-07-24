@@ -505,15 +505,20 @@ impl TestApi {
 
     /// Plan a `schemaPush` command
     pub fn schema_push(&mut self, dm: impl Into<String>) -> SchemaPush<'_> {
-        self.schema_push_with_filter(dm, None)
+        self.schema_push_with_filter(dm, SchemaFilter::default())
     }
 
     pub fn schema_push_multi_file(&mut self, files: &[(&str, &str)]) -> SchemaPush<'_> {
         let max_ddl_refresh_delay = self.max_ddl_refresh_delay();
-        SchemaPush::new(&mut self.connector, files, max_ddl_refresh_delay, None)
+        SchemaPush::new(
+            &mut self.connector,
+            files,
+            max_ddl_refresh_delay,
+            SchemaFilter::default(),
+        )
     }
 
-    pub fn schema_push_with_filter(&mut self, dm: impl Into<String>, filter: Option<SchemaFilter>) -> SchemaPush<'_> {
+    pub fn schema_push_with_filter(&mut self, dm: impl Into<String>, filter: SchemaFilter) -> SchemaPush<'_> {
         let max_ddl_refresh_delay = self.max_ddl_refresh_delay();
         let dm: String = dm.into();
 

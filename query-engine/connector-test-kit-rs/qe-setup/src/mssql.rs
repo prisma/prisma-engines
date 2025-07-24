@@ -1,7 +1,7 @@
 use connection_string::JdbcString;
 use quaint::{prelude::*, single::Quaint};
 use schema_core::{
-    json_rpc::types::ResetInput,
+    json_rpc::types::{ResetInput, SchemaFilter},
     schema_connector::{ConnectorError, ConnectorParams, ConnectorResult},
 };
 use std::str::FromStr;
@@ -24,7 +24,11 @@ pub(crate) async fn mssql_setup(url: String, prisma_schema: &str, db_schemas: &[
         conn.raw_cmd(&sql).await.unwrap();
     } else {
         let mut api = schema_core::schema_api(Some(prisma_schema.to_owned()), None)?;
-        api.reset(ResetInput { filter: None }).await.ok();
+        api.reset(ResetInput {
+            filter: SchemaFilter::default(),
+        })
+        .await
+        .ok();
         api.dispose().await.ok();
         // Without these, our poor connection gets deadlocks if other schemas
         // are modified while we introspect.

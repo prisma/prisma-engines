@@ -1,7 +1,7 @@
 use schema_core::{
     CoreError, CoreResult,
-    commands::DiagnoseMigrationHistoryOutput,
-    commands::{DiagnoseMigrationHistoryInput, diagnose_migration_history_cli},
+    commands::{DiagnoseMigrationHistoryInput, DiagnoseMigrationHistoryOutput, diagnose_migration_history_cli},
+    json_rpc::types::SchemaFilter,
     schema_connector::SchemaConnector,
 };
 use tempfile::TempDir;
@@ -37,7 +37,7 @@ impl<'a> DiagnoseMigrationHistory<'a> {
             DiagnoseMigrationHistoryInput {
                 migrations_list,
                 opt_in_to_shadow_database: self.opt_in_to_shadow_database,
-                filters: None,
+                filters: SchemaFilter::default(),
             },
             None,
             self.api,

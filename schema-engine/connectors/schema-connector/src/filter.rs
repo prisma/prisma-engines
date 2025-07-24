@@ -48,13 +48,3 @@ impl From<json_rpc::types::SchemaFilter> for SchemaFilter {
         }
     }
 }
-
-impl From<Option<json_rpc::types::SchemaFilter>> for SchemaFilter {
-    fn from(filter: Option<json_rpc::types::SchemaFilter>) -> Self {
-        let filter = filter.unwrap_or_default();
-        Self {
-            external_tables: filter.external_tables,
-            external_enums: filter.external_enums,
-        }
-    }
-}
