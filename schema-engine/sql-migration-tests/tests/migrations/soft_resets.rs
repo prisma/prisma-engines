@@ -25,7 +25,7 @@ fn soft_resets_work_on_postgres(mut api: TestApi) {
         let create_user = r#"
             DROP USER IF EXISTS softresetstestuser;
             CREATE USER softresetstestuser PASSWORD '1234batman' LOGIN;
-            GRANT USAGE, CREATE ON SCHEMA "prisma-tests" TO softresetstestuser;
+            GRANT USAGE, CREATE ON SCHEMA "public" TO softresetstestuser;
         "#;
 
         api.raw_cmd(create_user);

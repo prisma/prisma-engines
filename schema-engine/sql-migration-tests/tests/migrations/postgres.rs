@@ -390,7 +390,7 @@ fn foreign_key_renaming_to_default_works(api: TestApi) {
     );
     let expected = expect![[r#"
         -- RenameForeignKey
-        ALTER TABLE "prisma-tests"."Dog" RENAME CONSTRAINT "favouriteFood" TO "Dog_favourite_food_id_fkey";
+        ALTER TABLE "public"."Dog" RENAME CONSTRAINT "favouriteFood" TO "Dog_favourite_food_id_fkey";
     "#]];
 
     expected.assert_eq(&migration);
@@ -538,13 +538,13 @@ fn scalar_list_defaults_work(api: TestApi) {
 
     let expected_sql = expect![[r#"
         -- CreateSchema
-        CREATE SCHEMA IF NOT EXISTS "prisma-tests";
+        CREATE SCHEMA IF NOT EXISTS "public";
 
         -- CreateEnum
-        CREATE TYPE "prisma-tests"."Color" AS ENUM ('RED', 'GREEN', 'BLUE');
+        CREATE TYPE "public"."Color" AS ENUM ('RED', 'GREEN', 'BLUE');
 
         -- CreateTable
-        CREATE TABLE "prisma-tests"."Model" (
+        CREATE TABLE "public"."Model" (
             "id" INTEGER NOT NULL,
             "int_empty" INTEGER[] DEFAULT ARRAY[]::INTEGER[],
             "int" INTEGER[] DEFAULT ARRAY[0, 1, 1, 2, 3, 5, 8, 13, 21]::INTEGER[],
@@ -552,8 +552,8 @@ fn scalar_list_defaults_work(api: TestApi) {
             "string" TEXT[] DEFAULT ARRAY['Arrabbiata', 'Carbonara', 'Al Ragù']::TEXT[],
             "boolean" BOOLEAN[] DEFAULT ARRAY[false, true, true, true]::BOOLEAN[],
             "dateTime" TIMESTAMP(3)[] DEFAULT ARRAY['2019-06-17 14:20:57 +00:00', '2020-09-21 20:00:00 +02:00']::TIMESTAMP(3)[],
-            "colors" "prisma-tests"."Color"[] DEFAULT ARRAY['GREEN', 'BLUE']::"prisma-tests"."Color"[],
-            "colors_empty" "prisma-tests"."Color"[] DEFAULT ARRAY[]::"prisma-tests"."Color"[],
+            "colors" "public"."Color"[] DEFAULT ARRAY['GREEN', 'BLUE']::"public"."Color"[],
+            "colors_empty" "public"."Color"[] DEFAULT ARRAY[]::"public"."Color"[],
             "bytes" BYTEA[] DEFAULT ARRAY['\x68656c6c6f20776f726c64']::BYTEA[],
             "json" JSONB[] DEFAULT ARRAY['{ "a": ["b"] }', '3']::JSONB[],
             "decimal" DECIMAL(65,30)[] DEFAULT ARRAY[121.10299000124800000001, 0.4, 1.1, -68.0]::DECIMAL(65,30)[],
@@ -631,11 +631,11 @@ fn scalar_list_default_diffing(api: TestApi) {
 
     let expected_migration = expect![[r#"
         -- AlterTable
-        ALTER TABLE "prisma-tests"."Model" ALTER COLUMN "int" SET DEFAULT ARRAY[0, 1, 1, 2, 3, 5, 8, 13, 22]::INTEGER[],
+        ALTER TABLE "public"."Model" ALTER COLUMN "int" SET DEFAULT ARRAY[0, 1, 1, 2, 3, 5, 8, 13, 22]::INTEGER[],
         ALTER COLUMN "float" SET DEFAULT ARRAY[3.20, 4.20, 9.9999999, 1000.7]::DOUBLE PRECISION[],
         ALTER COLUMN "string" SET DEFAULT ARRAY['Arrabbiata', 'Quattro Formaggi', 'Al Ragù']::TEXT[],
         ALTER COLUMN "boolean" SET DEFAULT ARRAY[true, true, true, true]::BOOLEAN[],
-        ALTER COLUMN "colors" SET DEFAULT ARRAY['BLUE', 'GREEN']::"prisma-tests"."Color"[],
+        ALTER COLUMN "colors" SET DEFAULT ARRAY['BLUE', 'GREEN']::"public"."Color"[],
         ALTER COLUMN "bytes" SET DEFAULT ARRAY['\x68656c6c6f20776f726c64', '\x68656c6c6f20777ef26c64']::BYTEA[],
         ALTER COLUMN "json" SET DEFAULT ARRAY['{ "a": ["b"] }', '4']::JSONB[],
         ALTER COLUMN "decimal" SET DEFAULT ARRAY[0.4, 1.1, -68.0]::DECIMAL(65,30)[];
@@ -675,10 +675,10 @@ fn json_defaults_with_escaped_quotes_work(api: TestApi) {
 
     let sql = expect![[r#"
         -- CreateSchema
-        CREATE SCHEMA IF NOT EXISTS "prisma-tests";
+        CREATE SCHEMA IF NOT EXISTS "public";
 
         -- CreateTable
-        CREATE TABLE "prisma-tests"."Foo" (
+        CREATE TABLE "public"."Foo" (
             "id" INTEGER NOT NULL,
             "bar" JSONB DEFAULT '{"message": "This message includes a quote: Here''''s it!"}',
 
@@ -704,10 +704,10 @@ fn bigint_defaults_work(api: TestApi) {
     "#;
     let sql = expect![[r#"
         -- CreateSchema
-        CREATE SCHEMA IF NOT EXISTS "prisma-tests";
+        CREATE SCHEMA IF NOT EXISTS "public";
 
         -- CreateTable
-        CREATE TABLE "prisma-tests"."foo" (
+        CREATE TABLE "public"."foo" (
             "id" TEXT NOT NULL,
             "bar" BIGINT NOT NULL DEFAULT 0,
 

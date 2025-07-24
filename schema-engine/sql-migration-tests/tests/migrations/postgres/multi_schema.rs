@@ -5,9 +5,9 @@ use crate::migrations::multi_schema::*;
 use sql_migration_tests::test_api::*;
 use sql_schema_describer::DefaultValue;
 
-#[test_connector(tags(Postgres), preview_features("multiSchema"), namespaces("one", "prisma-tests"))]
+#[test_connector(tags(Postgres), preview_features("multiSchema"), namespaces("one", "public"))]
 fn apply_migrations_with_multiple_schemas_where_one_is_search_path_with_a_foreign_key(api: TestApi) {
-    let datasource = api.datasource_block_with(&[("schemas", r#"["one", "prisma-tests"]"#)]);
+    let datasource = api.datasource_block_with(&[("schemas", r#"["one", "public"]"#)]);
     let generator = api.generator_block();
 
     let dm = indoc::formatdoc! {r#"
@@ -27,7 +27,7 @@ fn apply_migrations_with_multiple_schemas_where_one_is_search_path_with_a_foreig
            aId Int
            a   A    @relation(fields: [aId], references: [id])
 
-           @@schema("prisma-tests")
+           @@schema("public")
         }}
     "#};
 

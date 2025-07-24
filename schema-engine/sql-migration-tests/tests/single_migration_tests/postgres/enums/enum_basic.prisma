@@ -18,12 +18,12 @@ enum MyEnum {
 
 // Expected Migration:
 // -- CreateEnum
-// CREATE TYPE "MyEnum" AS ENUM ('A', 'B');
+// CREATE TYPE "public"."MyEnum" AS ENUM ('A', 'B');
 // 
 // -- CreateTable
-// CREATE TABLE "Test" (
+// CREATE TABLE "public"."Test" (
 //     "id" TEXT NOT NULL,
-//     "enum" "MyEnum" NOT NULL,
+//     "enum" "public"."MyEnum" NOT NULL,
 // 
 //     CONSTRAINT "Test_pkey" PRIMARY KEY ("id")
 // );

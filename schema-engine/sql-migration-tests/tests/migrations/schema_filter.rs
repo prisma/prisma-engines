@@ -117,7 +117,7 @@ fn schema_filter_migration_adding_external_enum(api: TestApi) {
 
     let filter = SchemaFilter {
         external_tables: vec![],
-        external_enums: vec!["prisma-tests.ExternalEnum".to_string()],
+        external_enums: vec!["public.ExternalEnum".to_string()],
     };
     api.create_migration_with_filter("custom", &schema, &dir, filter, "")
         .send_sync()
@@ -145,7 +145,7 @@ fn schema_filter_migration_removing_external_enum(mut api: TestApi) {
 
     let filter = SchemaFilter {
         external_tables: vec![],
-        external_enums: vec!["prisma-tests.ExternalEnum".to_string()],
+        external_enums: vec!["public.ExternalEnum".to_string()],
     };
     api.create_migration_with_filter("remove", &schema_2, &dir, filter, "")
         .send_sync()
@@ -205,7 +205,7 @@ fn schema_filter_migration_adding_external_tables_incl_relations(api: TestApi) {
             let expected_script = if is_postgres {
                 expect![[r#"
                     -- CreateTable
-                    CREATE TABLE "prisma-tests"."Cat" (
+                    CREATE TABLE "public"."Cat" (
                         "id" INTEGER NOT NULL,
                         "name" TEXT NOT NULL,
                         "externalTableId" INTEGER,
@@ -214,7 +214,7 @@ fn schema_filter_migration_adding_external_tables_incl_relations(api: TestApi) {
                     );
 
                     -- AddForeignKey
-                    ALTER TABLE "prisma-tests"."Cat" ADD CONSTRAINT "Cat_externalTableId_fkey" FOREIGN KEY ("externalTableId") REFERENCES "prisma-tests"."ExternalTableA"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+                    ALTER TABLE "public"."Cat" ADD CONSTRAINT "Cat_externalTableId_fkey" FOREIGN KEY ("externalTableId") REFERENCES "public"."ExternalTableA"("id") ON DELETE SET NULL ON UPDATE CASCADE;
                 "#]]
             } else if is_mysql {
                 expect![[r#"
@@ -340,10 +340,10 @@ fn schema_filter_migration_removing_external_tables_incl_relations(mut api: Test
 
                     */
                     -- DropForeignKey
-                    ALTER TABLE "prisma-tests"."cat" DROP CONSTRAINT "cat_externalTableId_fkey";
+                    ALTER TABLE "public"."cat" DROP CONSTRAINT "cat_externalTableId_fkey";
 
                     -- AlterTable
-                    ALTER TABLE "prisma-tests"."cat" DROP COLUMN "externalTableId";
+                    ALTER TABLE "public"."cat" DROP COLUMN "externalTableId";
                 "#]]
             } else if is_mysql {
                 expect![[r#"
@@ -485,10 +485,10 @@ fn schema_filter_migration_modifying_external_tables_incl_relations(mut api: Tes
             let expected_script = if is_postgres {
                 expect![[r#"
                     -- AlterTable
-                    ALTER TABLE "prisma-tests"."cat" ADD COLUMN     "externalTableId" INTEGER;
+                    ALTER TABLE "public"."cat" ADD COLUMN     "externalTableId" INTEGER;
 
                     -- AddForeignKey
-                    ALTER TABLE "prisma-tests"."cat" ADD CONSTRAINT "cat_externalTableId_fkey" FOREIGN KEY ("externalTableId") REFERENCES "prisma-tests"."ExternalTableA"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+                    ALTER TABLE "public"."cat" ADD CONSTRAINT "cat_externalTableId_fkey" FOREIGN KEY ("externalTableId") REFERENCES "public"."ExternalTableA"("id") ON DELETE SET NULL ON UPDATE CASCADE;
                 "#]]
             } else if is_mysql {
                 expect![[r#"
@@ -589,7 +589,7 @@ fn schema_filter_leveraging_init_script(api: TestApi) {
             let expected_script = if is_postgres {
                 expect![[r#"
                     -- CreateTable
-                    CREATE TABLE "prisma-tests"."Cat" (
+                    CREATE TABLE "public"."Cat" (
                         "id" INTEGER NOT NULL,
                         "name" TEXT NOT NULL,
                         "externalTableId" INTEGER,
@@ -598,7 +598,7 @@ fn schema_filter_leveraging_init_script(api: TestApi) {
                     );
 
                     -- AddForeignKey
-                    ALTER TABLE "prisma-tests"."Cat" ADD CONSTRAINT "Cat_externalTableId_fkey" FOREIGN KEY ("externalTableId") REFERENCES "prisma-tests"."external"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+                    ALTER TABLE "public"."Cat" ADD CONSTRAINT "Cat_externalTableId_fkey" FOREIGN KEY ("externalTableId") REFERENCES "public"."external"("id") ON DELETE SET NULL ON UPDATE CASCADE;
                 "#]]
             } else if is_mysql {
                 expect![[r#"

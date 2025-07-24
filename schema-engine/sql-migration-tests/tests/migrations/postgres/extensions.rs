@@ -158,13 +158,13 @@ fn extension_version_does_not_change_on_empty(api: TestApi) {
 
 #[test_connector(tags(Postgres), exclude(CockroachDb), preview_features("postgresqlExtensions"))]
 fn extension_schema_can_be_defined(api: TestApi) {
-    api.raw_cmd("CREATE SCHEMA \"prisma-tests-temp\"");
+    api.raw_cmd("CREATE SCHEMA \"public-temp\"");
 
     let dm = indoc! {r#"
         datasource db {
           provider   = "postgresql"
           url        = env("TEST_DATABASE_URL")
-          extensions = [citext(schema: "prisma-tests-temp")]
+          extensions = [citext(schema: "public-temp")]
         }
 
         generator js {
@@ -177,18 +177,18 @@ fn extension_schema_can_be_defined(api: TestApi) {
 
     api.assert_schema()
         .assert_has_extension("citext")
-        .assert_schema("prisma-tests-temp");
+        .assert_schema("public-temp");
 }
 
 #[test_connector(tags(Postgres), exclude(CockroachDb), preview_features("postgresqlExtensions"))]
 fn relocatable_extension_can_be_relocated(api: TestApi) {
-    api.raw_cmd("CREATE SCHEMA \"prisma-tests-temp\"");
+    api.raw_cmd("CREATE SCHEMA \"public-temp\"");
 
     let dm = indoc! {r#"
         datasource db {
           provider   = "postgresql"
           url        = env("TEST_DATABASE_URL")
-          extensions = [citext(schema: "prisma-tests")]
+          extensions = [citext(schema: "public")]
         }
 
         generator js {
@@ -201,13 +201,13 @@ fn relocatable_extension_can_be_relocated(api: TestApi) {
 
     api.assert_schema()
         .assert_has_extension("citext")
-        .assert_schema("prisma-tests");
+        .assert_schema("public");
 
     let dm = indoc! {r#"
         datasource db {
           provider   = "postgresql"
           url        = env("TEST_DATABASE_URL")
-          extensions = [citext(schema: "prisma-tests-temp")]
+          extensions = [citext(schema: "public-temp")]
         }
 
         generator js {
@@ -220,18 +220,35 @@ fn relocatable_extension_can_be_relocated(api: TestApi) {
 
     api.assert_schema()
         .assert_has_extension("citext")
-        .assert_schema("prisma-tests-temp");
+        .assert_schema("public-temp");
 }
 
 #[test_connector(tags(Postgres14), exclude(CockroachDb), preview_features("postgresqlExtensions"))]
 fn non_relocatable_extension_can_be_relocated(api: TestApi) {
-    api.raw_cmd("CREATE SCHEMA \"prisma-tests-temp\"");
+    api.raw_cmd("CREATE SCHEMA \"public-temp\"");
 
     let dm = indoc! {r#"
         datasource db {
           provider   = "postgresql"
           url        = env("TEST_DATABASE_URL")
-          extensions = [xml2(schema: "prisma-tests")]
+          extensions = [xml2(schema: "public")]
+        }
+
+        generator js {
+          provider        = "prisma-client-js"
+          previewFeatures = ["postgresqlExtensions"]
+        }
+    "#};
+
+    api.schema_push(dm).send().assert_green().assert_has_executed_steps();
+
+    api.assert_schema().assert_has_extension("xml2").assert_schema("public");
+
+    let dm = indoc! {r#"
+        datasource db {
+          provider   = "postgresql"
+          url        = env("TEST_DATABASE_URL")
+          extensions = [xml2(schema: "public-temp")]
         }
 
         generator js {
@@ -244,26 +261,7 @@ fn non_relocatable_extension_can_be_relocated(api: TestApi) {
 
     api.assert_schema()
         .assert_has_extension("xml2")
-        .assert_schema("prisma-tests");
-
-    let dm = indoc! {r#"
-        datasource db {
-          provider   = "postgresql"
-          url        = env("TEST_DATABASE_URL")
-          extensions = [xml2(schema: "prisma-tests-temp")]
-        }
-
-        generator js {
-          provider        = "prisma-client-js"
-          previewFeatures = ["postgresqlExtensions"]
-        }
-    "#};
-
-    api.schema_push(dm).send().assert_green().assert_has_executed_steps();
-
-    api.assert_schema()
-        .assert_has_extension("xml2")
-        .assert_schema("prisma-tests-temp");
+        .assert_schema("public-temp");
 }
 
 #[test_connector(tags(Postgres), exclude(CockroachDb), preview_features("postgresqlExtensions"))]
@@ -272,7 +270,7 @@ fn removing_schema_definition_does_nothing(api: TestApi) {
         datasource db {
           provider   = "postgresql"
           url        = env("TEST_DATABASE_URL")
-          extensions = [citext(schema: "prisma-tests")]
+          extensions = [citext(schema: "public")]
         }
 
         generator js {
@@ -285,7 +283,7 @@ fn removing_schema_definition_does_nothing(api: TestApi) {
 
     api.assert_schema()
         .assert_has_extension("citext")
-        .assert_schema("prisma-tests");
+        .assert_schema("public");
 
     let dm = indoc! {r#"
         datasource db {
@@ -304,7 +302,7 @@ fn removing_schema_definition_does_nothing(api: TestApi) {
 
     api.assert_schema()
         .assert_has_extension("citext")
-        .assert_schema("prisma-tests");
+        .assert_schema("public");
 }
 
 #[test_connector(tags(Postgres), exclude(CockroachDb), preview_features("postgresqlExtensions"))]

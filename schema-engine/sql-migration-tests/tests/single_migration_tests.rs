@@ -113,6 +113,7 @@ fn run_single_migration_test(test_file_path: &str, test_function_name: &'static 
     .unwrap();
 
     let migration: String = host.printed_messages.lock().unwrap()[0].clone();
+    println!("FLOOOOO migration: {migration}");
 
     tok(schema_engine.db_execute(schema_core::json_rpc::types::DbExecuteParams {
         datasource_type: schema_core::json_rpc::types::DbExecuteDatasourceType::Url(
@@ -123,6 +124,8 @@ fn run_single_migration_test(test_file_path: &str, test_function_name: &'static 
         script: migration.clone(),
     }))
     .unwrap(); // check that it runs
+
+    println!("FLOOOOO connection_string: {connection_string}");
 
     let second_migration_result = tok(schema_engine.diff(schema_core::json_rpc::types::DiffParams {
         exit_code: Some(true),

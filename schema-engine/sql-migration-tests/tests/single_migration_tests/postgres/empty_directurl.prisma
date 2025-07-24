@@ -13,7 +13,7 @@ model table {
 }
 // Expected Migration:
 // -- CreateTable
-// CREATE TABLE "table" (
+// CREATE TABLE "public"."table" (
 //     "id" TEXT NOT NULL,
 //     "hereBeDragons" TEXT NOT NULL,
 

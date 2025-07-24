@@ -32,20 +32,20 @@ enum Kind {
 
 // Expected Migration:
 // -- CreateEnum
-// CREATE TYPE "Result" AS ENUM ('succeeded', 'failed');
+// CREATE TYPE "public"."Result" AS ENUM ('succeeded', 'failed');
 // 
 // -- CreateEnum
-// CREATE TYPE "Activity" AS ENUM ('DANCING', 'SLEEPING', 'READING');
+// CREATE TYPE "public"."Activity" AS ENUM ('DANCING', 'SLEEPING', 'READING');
 // 
 // -- CreateEnum
-// CREATE TYPE "Kind" AS ENUM ('info', 'warning', 'error');
+// CREATE TYPE "public"."Kind" AS ENUM ('info', 'warning', 'error');
 // 
 // -- CreateTable
-// CREATE TABLE "MyTable" (
+// CREATE TABLE "public"."MyTable" (
 //     "id" INTEGER NOT NULL,
-//     "a" "Activity" NOT NULL DEFAULT 'SLEEPING',
-//     "k" "Kind" DEFAULT 'error',
-//     "r" "Result" NOT NULL DEFAULT 'succeeded',
+//     "a" "public"."Activity" NOT NULL DEFAULT 'SLEEPING',
+//     "k" "public"."Kind" DEFAULT 'error',
+//     "r" "public"."Result" NOT NULL DEFAULT 'succeeded',
 // 
 //     CONSTRAINT "MyTable_pkey" PRIMARY KEY ("id")
 // );

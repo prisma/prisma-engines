@@ -131,7 +131,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
     let expectation = expect![[r#"
         SqlSchema {
             namespaces: {
-                "prisma-tests",
+                "public",
             },
             tables: [
                 Table {
@@ -1124,7 +1124,7 @@ fn cross_schema_references_are_not_allowed(api: TestApi) {
     let err = api.describe_error();
 
     let expected = expect![
-        "The schema of the introspected database was inconsistent: Cross schema references are only allowed when the target schema is listed in the schemas property of your datasource. `prisma-tests.User` points to `prisma-tests_2.City` in constraint `User_city_fkey`. Please add `prisma-tests_2` to your `schemas` property and run this command again."
+        "The schema of the introspected database was inconsistent: Cross schema references are only allowed when the target schema is listed in the schemas property of your datasource. `public.User` points to `public_2.City` in constraint `User_city_fkey`. Please add `public_2` to your `schemas` property and run this command again."
     ];
 
     expected.assert_eq(&err.to_string());
@@ -1310,7 +1310,7 @@ fn escaped_quotes_in_string_defaults_must_be_unescaped(api: TestApi) {
     let expectation = expect![[r#"
         SqlSchema {
             namespaces: {
-                "prisma-tests",
+                "public",
             },
             tables: [
                 Table {
@@ -1491,7 +1491,7 @@ fn seemingly_escaped_backslashes_in_string_literals_must_not_be_unescaped(api: T
     let expectation = expect![[r#"
         SqlSchema {
             namespaces: {
-                "prisma-tests",
+                "public",
             },
             tables: [
                 Table {
@@ -1819,7 +1819,7 @@ fn extensions_are_described_correctly(api: TestApi) {
             extensions: [
                 DatabaseExtension {
                     name: "citext",
-                    schema: "prisma-tests",
+                    schema: "public",
                     version: "1.6",
                     relocatable: true,
                 },
