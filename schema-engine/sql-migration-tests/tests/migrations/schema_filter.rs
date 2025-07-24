@@ -717,7 +717,7 @@ fn schema_filter_migration_multi_schema_requires_namespaced_table_names(api: Tes
                     BEGIN TRAN;
 
                     -- CreateSchema
-                    IF NOT EXISTS (SELECT * FROM sys.schemas WHERE name = N'one') EXEC sp_executesql N'CREATE SCHEMA [one];';;
+                    IF NOT EXISTS (SELECT * FROM sys.schemas WHERE name = N'one') EXEC sp_executesql N'CREATE SCHEMA [one];';
 
                     -- CreateTable
                     CREATE TABLE [one].[Cat] (

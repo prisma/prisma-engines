@@ -1235,10 +1235,10 @@ fn migration_with_shadow_database(api: TestApi) {
                 BEGIN TRAN;
 
                 -- CreateSchema
-                IF NOT EXISTS (SELECT * FROM sys.schemas WHERE name = N'one') EXEC sp_executesql N'CREATE SCHEMA [one];';;
+                IF NOT EXISTS (SELECT * FROM sys.schemas WHERE name = N'one') EXEC sp_executesql N'CREATE SCHEMA [one];';
 
                 -- CreateSchema
-                IF NOT EXISTS (SELECT * FROM sys.schemas WHERE name = N'two') EXEC sp_executesql N'CREATE SCHEMA [two];';;
+                IF NOT EXISTS (SELECT * FROM sys.schemas WHERE name = N'two') EXEC sp_executesql N'CREATE SCHEMA [two];';
 
                 -- CreateTable
                 CREATE TABLE [one].[A] (
