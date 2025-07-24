@@ -8,7 +8,7 @@ use ::commands::MigrationSchemaCache;
 use enumflags2::BitFlags;
 use futures::stream::{FuturesUnordered, StreamExt};
 use json_rpc::types::*;
-use psl::{PreviewFeature, parser_database::SourceFile};
+use psl::parser_database::SourceFile;
 use schema_connector::{ConnectorError, ConnectorHost, IntrospectionResult, Namespaces, SchemaConnector};
 use std::{
     collections::HashMap,

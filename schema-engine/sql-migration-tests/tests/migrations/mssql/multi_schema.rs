@@ -6,10 +6,7 @@ use sql_schema_describer::DefaultValue;
 
 // This is the only "top" level test in this module. It defines a list of tests and executes them.
 // If you want to look at the tests, see the `tests` variable below.
-#[test_connector(
-    tags(Mssql, Mssql2019, Mssql2017),
-    namespaces("one", "two")
-)]
+#[test_connector(tags(Mssql, Mssql2019, Mssql2017), namespaces("one", "two"))]
 fn multi_schema_tests(_api: TestApi) {
     let namespaces: &'static [&'static str] = &["one", "two"];
     let base_schema = indoc! {r#"

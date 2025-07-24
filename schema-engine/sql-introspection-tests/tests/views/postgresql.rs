@@ -693,11 +693,7 @@ async fn dupes_are_renamed(api: &mut TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(
-    tags(Postgres),
-    exclude(CockroachDb),
-    namespaces("public", "private")
-)]
+#[test_connector(tags(Postgres), exclude(CockroachDb), namespaces("public", "private"))]
 async fn dupe_views_are_not_considered_without_preview_feature(api: &mut TestApi) -> TestResult {
     let setup = indoc! {r#"
         CREATE SCHEMA IF NOT EXISTS "private";

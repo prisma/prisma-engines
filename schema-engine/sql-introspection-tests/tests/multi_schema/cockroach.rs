@@ -164,10 +164,7 @@ async fn multiple_schemas_w_cross_schema_are_reintrospected(api: &mut TestApi) -
     Ok(())
 }
 
-#[test_connector(
-    tags(CockroachDb),
-    namespaces("first", "second_schema")
-)]
+#[test_connector(tags(CockroachDb), namespaces("first", "second_schema"))]
 async fn multiple_schemas_w_enums_are_introspected(api: &mut TestApi) -> TestResult {
     let schema_name = "first";
     let other_name = "second_schema";
@@ -282,10 +279,7 @@ async fn multiple_schemas_w_duplicate_enums_are_introspected(api: &mut TestApi) 
     Ok(())
 }
 
-#[test_connector(
-    tags(CockroachDb),
-    namespaces("first", "second_schema")
-)]
+#[test_connector(tags(CockroachDb), namespaces("first", "second_schema"))]
 async fn same_table_name_with_relation_in_two_schemas(api: &mut TestApi) -> TestResult {
     let sql = r#"
         CREATE SCHEMA "first";

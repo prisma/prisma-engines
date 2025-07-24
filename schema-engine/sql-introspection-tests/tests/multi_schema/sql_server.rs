@@ -426,10 +426,7 @@ async fn multiple_schemas_w_cross_schema_fks_w_duplicate_names_are_introspected(
     Ok(())
 }
 
-#[test_connector(
-    tags(Mssql),
-    namespaces("Appointments", "Trips", "core")
-)]
+#[test_connector(tags(Mssql), namespaces("Appointments", "Trips", "core"))]
 async fn schemas_with_varying_case(api: &mut TestApi) -> TestResult {
     for schema in ["Appointments", "Trips", "core"] {
         api.raw_cmd(&format!("CREATE SCHEMA {schema}")).await;

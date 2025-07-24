@@ -1578,11 +1578,7 @@ fn multi_schema_tests(_api: TestApi) {
     });
 }
 
-#[test_connector(
-    tags(Postgres),
-    exclude(CockroachDb),
-    namespaces("one", "two")
-)]
+#[test_connector(tags(Postgres), exclude(CockroachDb), namespaces("one", "two"))]
 fn migration_with_shadow_database(api: TestApi) {
     let conn_str = std::env::var("TEST_DATABASE_URL").unwrap();
 
