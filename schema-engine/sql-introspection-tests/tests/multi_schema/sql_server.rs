@@ -34,7 +34,6 @@ async fn multiple_schemas_without_schema_property_are_not_introspected(api: &mut
           data Int?
 
           @@index([data], map: "A_idx")
-          @@schema("dbo")
         }
     "#]];
 
