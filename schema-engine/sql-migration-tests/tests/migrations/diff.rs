@@ -617,7 +617,7 @@ fn from_schema_datasource_relative(mut api: TestApi) {
     expected_printed_messages.assert_debug_eq(&host.printed_messages.lock().unwrap());
 }
 
-#[test_connector]
+#[test_connector(tags(Sqlite))]
 fn from_schema_datasource_to_url(mut api: TestApi) {
     let tempdir = tempfile::tempdir().unwrap();
     let host = Arc::new(TestConnectorHost::default());
@@ -678,7 +678,7 @@ fn from_schema_datasource_to_url(mut api: TestApi) {
     expected_printed_messages.assert_debug_eq(&host.printed_messages.lock().unwrap());
 }
 
-#[test_connector]
+#[test_connector(tags(Sqlite))]
 fn with_schema_filters(mut api: TestApi) {
     let tempdir = tempfile::tempdir().unwrap();
     let host = Arc::new(TestConnectorHost::default());
@@ -696,6 +696,7 @@ fn with_schema_filters(mut api: TestApi) {
             .unwrap();
     });
 
+    // Ensure DB exists
     tok(async {
         let q = quaint::single::Quaint::new(&second_url).await.unwrap();
         q.raw_cmd("SELECT 1;").await.unwrap();
@@ -740,8 +741,8 @@ fn with_schema_filters(mut api: TestApi) {
     expected_printed_messages.assert_debug_eq(&host.printed_messages.lock().unwrap());
 }
 
-#[test_connector]
-fn with_invalid_schema_filters(mut api: TestApi) {
+#[test_connector(tags(Sqlite))]
+fn with_invalid_schema_filter_sqlite(mut api: TestApi) {
     let tempdir = tempfile::tempdir().unwrap();
     let host = Arc::new(TestConnectorHost::default());
     api.connector.set_host(host.clone());
@@ -750,6 +751,12 @@ fn with_invalid_schema_filters(mut api: TestApi) {
     let base_dir_str = base_dir.path().to_string_lossy();
     let first_url = format!("file:{base_dir_str}/first_db.sqlite");
     let second_url = format!("file:{base_dir_str}/second_db.sqlite");
+
+    // Ensure DB exists
+    tok(async {
+        let q = quaint::single::Quaint::new(&first_url).await.unwrap();
+        q.raw_cmd("SELECT 1;").await.unwrap();
+    });
 
     let schema_content = format!(
         r#"
@@ -785,7 +792,47 @@ fn with_invalid_schema_filters(mut api: TestApi) {
     assert_eq!(err.error_code(), Some("P3024"));
 }
 
-#[test_connector]
+#[test_connector(tags(Postgres))]
+fn with_invalid_schema_filter_postgres(mut api: TestApi) {
+    let tempdir = tempfile::tempdir().unwrap();
+    let connection_string = api.connection_string();
+
+    let schema_content = format!(
+        r#"
+          datasource db {{
+              provider = "postgresql"
+              url = "{connection_string}"
+          }}
+        "#
+    );
+    let schema_path = write_file_to_tmp(&schema_content, &tempdir, "schema.prisma");
+
+    let input = DiffParams {
+        exit_code: None,
+        from: DiffTarget::SchemaDatasource(SchemasWithConfigDir {
+            files: vec![SchemaContainer {
+                path: schema_path.to_string_lossy().into_owned(),
+                content: schema_content.to_string(),
+            }],
+            config_dir: schema_path.parent().unwrap().to_string_lossy().into_owned(),
+        }),
+        script: true,
+        shadow_database_url: None,
+        to: DiffTarget::Url(UrlContainer {
+            url: connection_string.to_string(),
+        }),
+        filters: SchemaFilter {
+            external_tables: vec!["external_table".to_string()],
+            external_enums: vec![],
+        },
+    };
+
+    let err = api.diff(input).unwrap_err();
+
+    assert_eq!(err.error_code(), Some("P3023"));
+}
+
+#[test_connector(tags(Sqlite))]
 fn from_url_to_url(mut api: TestApi) {
     let host = Arc::new(TestConnectorHost::default());
     api.connector.set_host(host.clone());
