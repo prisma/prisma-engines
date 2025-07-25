@@ -8,7 +8,7 @@ use ::commands::MigrationSchemaCache;
 use enumflags2::BitFlags;
 use futures::stream::{FuturesUnordered, StreamExt};
 use json_rpc::types::*;
-use psl::{PreviewFeature, parser_database::SourceFile};
+use psl::parser_database::SourceFile;
 use schema_connector::{ConnectorError, ConnectorHost, IntrospectionResult, Namespaces, SchemaConnector};
 use std::{
     collections::HashMap,
@@ -365,7 +365,6 @@ impl GenericApi for EngineState {
         tracing::info!("{:?}", params.schema);
         let source_files = params.schema.to_psl_input();
 
-        let has_some_namespaces = params.namespaces.is_some();
         let composite_type_depth = From::from(params.composite_type_depth);
 
         let ctx = if params.force {
@@ -388,18 +387,6 @@ impl GenericApi for EngineState {
             })
         }
         .map_err(ConnectorError::new_schema_parser_error)?;
-
-        if !ctx
-            .configuration()
-            .preview_features()
-            .contains(PreviewFeature::MultiSchema)
-            && has_some_namespaces
-        {
-            let msg =
-                "The preview feature `multiSchema` must be enabled before using --schemas command line parameter.";
-
-            return Err(CoreError::from_msg(msg.to_string()));
-        }
 
         self.with_connector_for_schema(
             source_files,

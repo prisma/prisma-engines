@@ -9,7 +9,7 @@ datasource testds {
 
 generator js {
     provider = "prisma-client-js"
-    previewFeatures = ["multiSchema"]
+    previewFeatures = []
 }
 
 model zoodles {

@@ -33,7 +33,7 @@ async fn multiple_schemas_without_schema_property_are_not_introspected(api: &mut
     Ok(())
 }
 
-#[test_connector(tags(Postgres), preview_features("multiSchema"), namespaces("first", "second"))]
+#[test_connector(tags(Postgres), namespaces("first", "second"))]
 async fn multiple_schemas_w_tables_are_introspected(api: &mut TestApi) -> TestResult {
     let schema_name = "first";
     let other_name = "second";
@@ -77,12 +77,7 @@ async fn multiple_schemas_w_tables_are_introspected(api: &mut TestApi) -> TestRe
     Ok(())
 }
 
-#[test_connector(
-    tags(Postgres),
-    exclude(CockroachDb),
-    preview_features("multiSchema"),
-    namespaces("first", "second")
-)]
+#[test_connector(tags(Postgres), exclude(CockroachDb), namespaces("first", "second"))]
 async fn multiple_schemas_w_tables_are_reintrospected(api: &mut TestApi) -> TestResult {
     let schema_name = "first";
     let other_name = "second";
@@ -143,12 +138,7 @@ async fn multiple_schemas_w_tables_are_reintrospected(api: &mut TestApi) -> Test
     Ok(())
 }
 
-#[test_connector(
-    tags(Postgres),
-    exclude(CockroachDb),
-    preview_features("multiSchema"),
-    namespaces("first", "second")
-)]
+#[test_connector(tags(Postgres), exclude(CockroachDb), namespaces("first", "second"))]
 async fn multiple_schemas_w_duplicate_table_names_are_introspected(api: &mut TestApi) -> TestResult {
     let schema_name = "first";
     let other_name = "second";
@@ -165,8 +155,7 @@ async fn multiple_schemas_w_duplicate_table_names_are_introspected(api: &mut Tes
 
     let expected = expect![[r#"
         generator client {
-          provider        = "prisma-client-js"
-          previewFeatures = ["multiSchema"]
+          provider = "prisma-client-js"
         }
 
         datasource db {
@@ -205,12 +194,7 @@ async fn multiple_schemas_w_duplicate_table_names_are_introspected(api: &mut Tes
     Ok(())
 }
 
-#[test_connector(
-    tags(Postgres),
-    exclude(CockroachDb),
-    preview_features("multiSchema"),
-    namespaces("1first", "2second")
-)]
+#[test_connector(tags(Postgres), exclude(CockroachDb), namespaces("1first", "2second"))]
 async fn multiple_schemas_w_duplicate_sanitized_table_names_are_introspected(api: &mut TestApi) -> TestResult {
     let schema_name = "1first";
     let other_name = "2second";
@@ -227,8 +211,7 @@ async fn multiple_schemas_w_duplicate_sanitized_table_names_are_introspected(api
 
     let expected = expect![[r#"
         generator client {
-          provider        = "prisma-client-js"
-          previewFeatures = ["multiSchema"]
+          provider = "prisma-client-js"
         }
 
         datasource db {
@@ -267,7 +250,7 @@ async fn multiple_schemas_w_duplicate_sanitized_table_names_are_introspected(api
     Ok(())
 }
 
-#[test_connector(tags(Postgres), preview_features("multiSchema"), namespaces("first", "second"))]
+#[test_connector(tags(Postgres), namespaces("first", "second"))]
 async fn multiple_schemas_w_cross_schema_are_introspected(api: &mut TestApi) -> TestResult {
     let schema_name = "first";
     let other_name = "second";
@@ -308,12 +291,7 @@ async fn multiple_schemas_w_cross_schema_are_introspected(api: &mut TestApi) -> 
     Ok(())
 }
 
-#[test_connector(
-    tags(Postgres),
-    exclude(CockroachDb),
-    preview_features("multiSchema"),
-    namespaces("first", "second")
-)]
+#[test_connector(tags(Postgres), exclude(CockroachDb), namespaces("first", "second"))]
 async fn multiple_schemas_w_cross_schema_are_reintrospected(api: &mut TestApi) -> TestResult {
     let schema_name = "first";
     let other_name = "second";
@@ -370,7 +348,7 @@ async fn multiple_schemas_w_cross_schema_are_reintrospected(api: &mut TestApi) -
     Ok(())
 }
 
-#[test_connector(tags(Postgres), preview_features("multiSchema"), namespaces("first", "second"))]
+#[test_connector(tags(Postgres), namespaces("first", "second"))]
 async fn multiple_schemas_w_cross_schema_fks_w_duplicate_names_are_introspected(api: &mut TestApi) -> TestResult {
     let schema_name = "first";
     let other_name = "second";
@@ -413,12 +391,7 @@ async fn multiple_schemas_w_cross_schema_fks_w_duplicate_names_are_introspected(
     Ok(())
 }
 
-#[test_connector(
-    tags(Postgres),
-    exclude(CockroachDb),
-    preview_features("multiSchema"),
-    namespaces("first", "second_schema")
-)]
+#[test_connector(tags(Postgres), exclude(CockroachDb), namespaces("first", "second_schema"))]
 async fn multiple_schemas_w_enums_are_introspected(api: &mut TestApi) -> TestResult {
     let schema_name = "first";
     let other_name = "second_schema";
@@ -435,8 +408,7 @@ async fn multiple_schemas_w_enums_are_introspected(api: &mut TestApi) -> TestRes
 
     let expected = expect![[r#"
         generator client {
-          provider        = "prisma-client-js"
-          previewFeatures = ["multiSchema"]
+          provider = "prisma-client-js"
         }
 
         datasource db {
@@ -462,12 +434,7 @@ async fn multiple_schemas_w_enums_are_introspected(api: &mut TestApi) -> TestRes
     Ok(())
 }
 
-#[test_connector(
-    tags(Postgres),
-    exclude(CockroachDb),
-    preview_features("multiSchema"),
-    namespaces("first", "second")
-)]
+#[test_connector(tags(Postgres), exclude(CockroachDb), namespaces("first", "second"))]
 async fn multiple_schemas_w_duplicate_enums_are_introspected(api: &mut TestApi) -> TestResult {
     let schema_name = "first";
     let other_name = "second";
@@ -489,8 +456,7 @@ async fn multiple_schemas_w_duplicate_enums_are_introspected(api: &mut TestApi) 
 
     let expected = expect![[r#"
         generator client {
-          provider        = "prisma-client-js"
-          previewFeatures = ["multiSchema"]
+          provider = "prisma-client-js"
         }
 
         datasource db {
@@ -551,12 +517,7 @@ async fn multiple_schemas_w_duplicate_enums_are_introspected(api: &mut TestApi) 
     Ok(())
 }
 
-#[test_connector(
-    tags(Postgres),
-    exclude(CockroachDb),
-    preview_features("multiSchema"),
-    namespaces("first", "second")
-)]
+#[test_connector(tags(Postgres), exclude(CockroachDb), namespaces("first", "second"))]
 async fn multiple_schemas_w_duplicate_models_are_reintrospected(api: &mut TestApi) -> TestResult {
     let schema_name = "first";
     let other_name = "second";
@@ -617,12 +578,7 @@ async fn multiple_schemas_w_duplicate_models_are_reintrospected(api: &mut TestAp
     Ok(())
 }
 
-#[test_connector(
-    tags(Postgres),
-    exclude(CockroachDb),
-    preview_features("multiSchema"),
-    namespaces("first", "second")
-)]
+#[test_connector(tags(Postgres), exclude(CockroachDb), namespaces("first", "second"))]
 async fn multiple_schemas_w_duplicate_models_are_reintrospected_never_renamed(api: &mut TestApi) -> TestResult {
     let schema_name = "first";
     let other_name = "second";
@@ -676,12 +632,7 @@ async fn multiple_schemas_w_duplicate_models_are_reintrospected_never_renamed(ap
     Ok(())
 }
 
-#[test_connector(
-    tags(Postgres),
-    exclude(CockroachDb),
-    preview_features("multiSchema"),
-    namespaces("first", "second")
-)]
+#[test_connector(tags(Postgres), exclude(CockroachDb), namespaces("first", "second"))]
 async fn multiple_schemas_w_duplicate_enums_are_reintrospected(api: &mut TestApi) -> TestResult {
     let schema_name = "first";
     let other_name = "second";
@@ -761,12 +712,7 @@ async fn multiple_schemas_w_enums_without_schemas_are_not_introspected(api: &mut
     Ok(())
 }
 
-#[test_connector(
-    tags(Postgres),
-    exclude(CockroachDb),
-    preview_features("multiSchema"),
-    namespaces("first", "second_schema")
-)]
+#[test_connector(tags(Postgres), exclude(CockroachDb), namespaces("first", "second_schema"))]
 async fn same_table_name_with_relation_in_two_schemas(api: &mut TestApi) -> TestResult {
     let sql = r#"
         CREATE SCHEMA "first";
@@ -779,8 +725,7 @@ async fn same_table_name_with_relation_in_two_schemas(api: &mut TestApi) -> Test
 
     let expected = expect![[r#"
         generator client {
-          provider        = "prisma-client-js"
-          previewFeatures = ["multiSchema"]
+          provider = "prisma-client-js"
         }
 
         datasource db {

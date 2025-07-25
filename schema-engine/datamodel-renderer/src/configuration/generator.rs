@@ -169,7 +169,6 @@ mod tests {
         generator.output(Env::value("/dev/null"));
         generator.push_binary_target(Env::variable("BINARY TARGET"));
 
-        generator.push_preview_feature(PreviewFeature::MultiSchema);
         generator.push_preview_feature(PreviewFeature::PostgresqlExtensions);
 
         generator.push_config_value("customValue", "meow");
@@ -199,7 +198,7 @@ mod tests {
             generator client {
               provider        = "prisma-client-js"
               output          = "/dev/null"
-              previewFeatures = ["multiSchema", "postgresqlExtensions"]
+              previewFeatures = ["postgresqlExtensions"]
               binaryTargets   = [env("BINARY TARGET")]
               afterGenerate   = ["lambda", [], ["print", ["quote", "done!"]]]
               customEnvValue  = env("var")

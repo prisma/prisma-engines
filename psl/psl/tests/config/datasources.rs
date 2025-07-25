@@ -228,7 +228,7 @@ fn empty_schema_property_should_error() {
     let schema = indoc! {r#"
         generator js {
           provider        = "prisma-client-js"
-          previewFeatures = ["multiSchema"]
+          previewFeatures = []
         }
 
         datasource ds {
@@ -244,32 +244,6 @@ fn empty_schema_property_should_error() {
         [1;94m   | [0m
         [1;94m 8 | [0m  url        = env("DATABASE_URL")
         [1;94m 9 | [0m  schemas = [1;91m[][0m
-        [1;94m   | [0m
-    "#]];
-
-    expect_error(schema, &expect);
-}
-
-#[test]
-fn schemas_array_without_preview_feature_should_error() {
-    let schema = indoc! {r#"
-        generator js {
-          provider        = "prisma-client-js"
-        }
-
-        datasource ds {
-          provider   = "postgres"
-          url        = env("DATABASE_URL")
-          schemas = ["test"]
-        }
-    "#};
-
-    let expect = expect![[r#"
-        [1;91merror[0m: [1mThe `schemas` property is only availably with the `multiSchema` preview feature.[0m
-          [1;94m-->[0m  [4mschema.prisma:8[0m
-        [1;94m   | [0m
-        [1;94m 7 | [0m  url        = env("DATABASE_URL")
-        [1;94m 8 | [0m  schemas = [1;91m["test"][0m
         [1;94m   | [0m
     "#]];
 

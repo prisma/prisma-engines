@@ -6,11 +6,7 @@ use sql_schema_describer::DefaultValue;
 
 // This is the only "top" level test in this module. It defines a list of tests and executes them.
 // If you want to look at the tests, see the `tests` variable below.
-#[test_connector(
-    tags(Mssql, Mssql2019, Mssql2017),
-    preview_features("multiSchema"),
-    namespaces("one", "two")
-)]
+#[test_connector(tags(Mssql, Mssql2019, Mssql2017), namespaces("one", "two"))]
 fn multi_schema_tests(_api: TestApi) {
     let namespaces: &'static [&'static str] = &["one", "two"];
     let base_schema = indoc! {r#"
@@ -21,8 +17,7 @@ fn multi_schema_tests(_api: TestApi) {
         }
 
         generator js {
-          provider        = "prisma-client-js"
-          previewFeatures = ["multiSchema"]
+          provider = "prisma-client-js"
         }
     "#};
 
@@ -1125,7 +1120,7 @@ fn multi_schema_tests(_api: TestApi) {
     });
 }
 
-#[test_connector(tags(Mssql), preview_features("multiSchema"), namespaces("one", "two"))]
+#[test_connector(tags(Mssql), namespaces("one", "two"))]
 fn multi_schema_migration(api: TestApi) {
     let dm = indoc! {r#"
         datasource db {
@@ -1135,8 +1130,7 @@ fn multi_schema_migration(api: TestApi) {
         }
 
         generator js {
-          provider        = "prisma-client-js"
-          previewFeatures = ["multiSchema"]
+          provider = "prisma-client-js"
         }
 
         model A {
@@ -1169,7 +1163,7 @@ fn multi_schema_migration(api: TestApi) {
     api.apply_migrations(&dir).send_sync().assert_applied_migrations(&[]);
 }
 
-#[test_connector(tags(Mssql), preview_features("multiSchema"), namespaces("one", "two"))]
+#[test_connector(tags(Mssql), namespaces("one", "two"))]
 fn migration_with_shadow_database(api: TestApi) {
     let conn_str = std::env::var("TEST_DATABASE_URL").unwrap();
 
@@ -1191,7 +1185,6 @@ fn migration_with_shadow_database(api: TestApi) {
 
         generator js {{
           provider        = "prisma-client-javascript"
-          previewFeatures = ["multiSchema"]
         }}
     "#};
 

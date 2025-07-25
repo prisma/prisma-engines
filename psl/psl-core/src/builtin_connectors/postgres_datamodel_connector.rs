@@ -570,7 +570,7 @@ impl Connector for PostgresDatamodelConnector {
             completions::extensions_completion(completion_list);
         }
 
-        if config.preview_features().contains(PreviewFeature::MultiSchema) && !ds.schemas_defined() {
+        if !ds.schemas_defined() {
             completions::schemas_completion(completion_list);
         }
     }

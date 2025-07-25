@@ -421,7 +421,7 @@ fn multischema_must_work() {
     let schema = indoc! {r#"
       generator client {
         provider        = "prisma-client-js"
-        previewFeatures = ["multiSchema"]
+        previewFeatures = []
       }
 
       datasource ds {

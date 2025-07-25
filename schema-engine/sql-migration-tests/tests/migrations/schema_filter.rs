@@ -680,7 +680,7 @@ fn schema_filter_migration_multi_schema_requires_namespaced_table_names(api: Tes
         }
     "#,
         &[("schemas", "[\"one\", \"two\"]")],
-        &["multiSchema"],
+        &[],
     );
 
     let dir = api.create_migrations_directory();
@@ -763,7 +763,7 @@ fn schema_filter_without_namespaced_table_names_on_pg_and_sql_server(api: TestAp
         }
     "#,
         &[("schemas", "[\"one\", \"two\"]")],
-        &["multiSchema"],
+        &[],
     );
 
     let dir = api.create_migrations_directory();

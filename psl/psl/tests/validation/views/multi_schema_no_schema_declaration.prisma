@@ -6,7 +6,7 @@ datasource db {
 
 generator js {
   provider = "prisma-client-js"
-  previewFeatures = ["views", "multiSchema"]
+  previewFeatures = ["views"]
 }
 
 model A {

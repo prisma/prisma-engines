@@ -316,7 +316,7 @@ async fn reintrospect_force_invalid_config(api: &mut TestApi) -> TestResult {
 
       generator client {
         provider = "prisma-client-js"
-        previewFeatures = ["multiSchema"]
+        previewFeatures = []
       }
     "#};
 
@@ -600,13 +600,10 @@ async fn reintrospect_new_view_single_file(api: &mut TestApi) -> TestResult {
           last_name  String? @db.VarChar(255)
         }
 
-        /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
         view Schwuser {
           id         Int?
           first_name String? @db.VarChar(255)
           last_name  String? @db.VarChar(255)
-
-          @@ignore
         }
     "#]];
 
@@ -622,12 +619,7 @@ async fn reintrospect_new_view_single_file(api: &mut TestApi) -> TestResult {
 
     api.expect_view_definition("Schwuser", &expected).await;
 
-    let expected = expect![[r#"
-        *** WARNING ***
-
-        The following views were ignored as they do not have a valid unique identifier or id. This is currently not supported by Prisma Client. Please refer to the documentation on defining unique identifiers in views: https://pris.ly/d/view-identifiers
-          - "Schwuser"
-    "#]];
+    let expected = expect![""];
     api.expect_warnings(&expected).await;
 
     Ok(())
@@ -718,13 +710,10 @@ async fn reintrospect_new_view_multi_file(api: &mut TestApi) -> TestResult {
 
     let expected = expect![[r#"
         // file: introspected.prisma
-        /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
         view Schwuser {
           id         Int?
           first_name String? @db.VarChar(255)
           last_name  String? @db.VarChar(255)
-
-          @@ignore
         }
         ------
         // file: post.prisma
@@ -752,12 +741,7 @@ async fn reintrospect_new_view_multi_file(api: &mut TestApi) -> TestResult {
 
     api.expect_view_definition_multi("Schwuser", &expected).await;
 
-    let expected = expect![[r#"
-        *** WARNING ***
-
-        The following views were ignored as they do not have a valid unique identifier or id. This is currently not supported by Prisma Client. Please refer to the documentation on defining unique identifiers in views: https://pris.ly/d/view-identifiers
-          - "Schwuser"
-    "#]];
+    let expected = expect![""];
     api.expect_warnings(&expected).await;
 
     Ok(())

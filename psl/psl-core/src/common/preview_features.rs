@@ -155,7 +155,6 @@ impl<'a> FeatureMapWithProvider<'a> {
             active: enumflags2::make_bitflags!(PreviewFeature::{
                  DriverAdapters
                  | Metrics
-                 | MultiSchema
                  | NativeDistinct
                  | PostgresqlExtensions
                  | QueryCompiler
@@ -210,6 +209,7 @@ impl<'a> FeatureMapWithProvider<'a> {
                 | MicrosoftSqlServer
                 | Middlewares
                 | MongoDb
+                | MultiSchema
                 | NamedConstraints
                 | NApi
                 | NativeTypes

@@ -50,6 +50,7 @@ impl<'a, T> LSPContext<'a, T> {
             .unwrap_or(&psl::datamodel_connector::EmptyDatamodelConnector)
     }
 
+    #[allow(dead_code)]
     pub(crate) fn generator(&self) -> Option<&'a Generator> {
         self.config.generators.first()
     }

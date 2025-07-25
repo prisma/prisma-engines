@@ -467,22 +467,22 @@ async fn check_constraints_stopgap(api: &mut TestApi) -> TestResult {
     api.raw_cmd(raw_sql).await;
 
     let schema = expect![[r#"
-          generator client {
-            provider = "prisma-client-js"
-          }
+        generator client {
+          provider = "prisma-client-js"
+        }
 
-          datasource db {
-            provider = "postgresql"
-            url      = "env(TEST_DATABASE_URL)"
-          }
+        datasource db {
+          provider = "postgresql"
+          url      = "env(TEST_DATABASE_URL)"
+        }
 
-          /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
-          model products {
-            product_id Int      @id @default(autoincrement())
-            name       String?
-            price      Decimal? @db.Decimal
-          }
-      "#]];
+        /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+        model products {
+          product_id Int      @id @default(autoincrement())
+          name       String?
+          price      Decimal? @db.Decimal
+        }
+    "#]];
 
     api.expect_datamodel(&schema).await;
 
@@ -509,13 +509,13 @@ async fn check_constraints_stopgap(api: &mut TestApi) -> TestResult {
     };
 
     let expectation = expect![[r#"
-          /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
-          model products {
-            product_id Int      @id @default(autoincrement())
-            name       String?
-            price      Decimal? @db.Decimal
-          }
-      "#]];
+        /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+        model products {
+          product_id Int      @id @default(autoincrement())
+          name       String?
+          price      Decimal? @db.Decimal
+        }
+    "#]];
     api.expect_re_introspected_datamodel(input, expectation).await;
 
     Ok(())

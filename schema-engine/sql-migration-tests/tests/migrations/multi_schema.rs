@@ -82,7 +82,7 @@ pub struct TestData {
 
 // Run a single test: create a new TestApi context, run the schema pushing, execute assertions.
 pub fn run_test(test: &mut TestData) {
-    let api_args = TestApiArgs::new("test", &["multiSchema"], &["one", "two"]);
+    let api_args = TestApiArgs::new("test", &[], &["one", "two"]);
     let mut api = TestApi::new(api_args);
 
     let mut vec_namespaces = test.namespaces.iter().map(|s| s.to_string()).collect();

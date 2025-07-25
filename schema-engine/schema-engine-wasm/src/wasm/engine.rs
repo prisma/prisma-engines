@@ -1,12 +1,12 @@
 use super::logger::init_logger;
 use commands::{
-    CoreError, MigrationSchemaCache, SchemaContainerExt,
+    MigrationSchemaCache, SchemaContainerExt,
     schema_connector::{self, ConnectorError, IntrospectionResult, Namespaces, SchemaConnector},
 };
 use driver_adapters::{JsObject, adapter_factory_from_js};
 use js_sys::Function as JsFunction;
 use json_rpc::types::*;
-use psl::{PreviewFeature, SourceFile};
+use psl::SourceFile;
 use quaint::connector::ExternalConnectorFactory;
 use serde::Deserialize;
 use sql_schema_connector::SqlSchemaConnector;
@@ -299,7 +299,6 @@ impl SchemaEngine {
             tracing::info!("{:?}", params.schema);
             let source_files = params.schema.to_psl_input();
 
-            let has_some_namespaces = params.namespaces.is_some();
             let composite_type_depth = From::from(params.composite_type_depth);
 
             let ctx = if params.force {
@@ -322,18 +321,6 @@ impl SchemaEngine {
                 })
             }
             .map_err(|e| ConnectorError::new_schema_parser_error(e).into_js_error())?;
-
-            if !ctx
-                .configuration()
-                .preview_features()
-                .contains(PreviewFeature::MultiSchema)
-                && has_some_namespaces
-            {
-                let msg =
-                    "The preview feature `multiSchema` must be enabled before using --schemas command line parameter.";
-
-                return Err(CoreError::from_msg(msg.to_string()).into());
-            }
 
             let IntrospectionResult {
                 datamodels,

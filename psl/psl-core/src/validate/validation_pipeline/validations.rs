@@ -40,7 +40,6 @@ pub(super) fn validate(ctx: &mut Context<'_>) {
         .validate_scalar_field_unknown_default_functions(ctx.db, ctx.diagnostics);
 
     if let Some(ds) = ctx.datasource {
-        datasource::schemas_property_without_preview_feature(ds, ctx);
         datasource::schemas_property_with_no_connector_support(ds, ctx);
         ctx.connector
             .validate_datasource(ctx.preview_features, ds, ctx.diagnostics);
@@ -72,7 +71,6 @@ pub(super) fn validate(ctx: &mut Context<'_>) {
         }
 
         // common validations
-        models::multischema_feature_flag_needed(model, ctx);
         models::schema_is_defined_in_the_datasource(model, ctx);
         models::schema_attribute_supported_in_connector(model, ctx);
         models::schema_attribute_missing(model, ctx);
@@ -156,7 +154,6 @@ pub(super) fn validate(ctx: &mut Context<'_>) {
 
     for r#enum in ctx.db.walk_enums() {
         enums::connector_supports_enums(r#enum, ctx);
-        enums::multischema_feature_flag_needed(r#enum, ctx);
         enums::schema_is_defined_in_the_datasource(r#enum, ctx);
         enums::schema_attribute_supported_in_connector(r#enum, ctx);
         enums::schema_attribute_missing(r#enum, ctx);
