@@ -24,7 +24,6 @@ async fn multiple_schemas_without_schema_property_are_not_introspected(api: &mut
           data String?
 
           @@index([data], map: "A_idx")
-          @@schema("public")
         }
     "#]];
 
@@ -704,8 +703,6 @@ async fn multiple_schemas_w_enums_without_schemas_are_not_introspected(api: &mut
     let expected = expect![[r#"
         enum HappyMood {
           happy
-
-          @@schema("public")
         }
     "#]];
 

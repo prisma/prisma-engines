@@ -1700,7 +1700,8 @@ async fn re_introspecting_with_schemas_property(api: &mut TestApi) -> TestResult
 
     let expected = expect![[r#"
         generator client {
-          provider = "prisma-client-js"
+          provider        = "prisma-client-js"
+          previewFeatures = []
         }
 
         datasource myds {

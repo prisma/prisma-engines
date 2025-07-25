@@ -40,24 +40,24 @@ async fn re_introspecting_custom_compound_id_names(api: &mut TestApi) -> TestRes
      "#};
 
     let expectation = expect![[r#"
-         model User {
-           first Int
-           last  Int
+        model User {
+          first Int
+          last  Int
 
-           @@id([first, last], name: "compound", map: "User.something@invalid-and/weird")
-         }
+          @@id([first, last], name: "compound", map: "User.something@invalid-and/weird")
+        }
 
-         model User2 {
-           first Int
-           last  Int
+        model User2 {
+          first Int
+          last  Int
 
-           @@id([first, last], name: "compound")
-         }
+          @@id([first, last], name: "compound")
+        }
 
-         model Unrelated {
-           id Int @id @default(autoincrement())
-         }
-     "#]];
+        model Unrelated {
+          id Int @id @default(autoincrement())
+        }
+    "#]];
 
     api.expect_re_introspected_datamodel(input_dm, expectation).await;
 
@@ -102,18 +102,18 @@ async fn re_introspecting_custom_compound_unique_names(api: &mut TestApi) -> Tes
      "#};
 
     let expectation = expect![[r#"
-         model User {
-           id    Int @id @default(autoincrement())
-           first Int
-           last  Int
+        model User {
+          id    Int @id @default(autoincrement())
+          first Int
+          last  Int
 
-           @@unique([first, last], name: "compound", map: "User.something@invalid-and/weird")
-         }
+          @@unique([first, last], name: "compound", map: "User.something@invalid-and/weird")
+        }
 
-         model Unrelated {
-           id Int @id @default(autoincrement())
-         }
-     "#]];
+        model Unrelated {
+          id Int @id @default(autoincrement())
+        }
+    "#]];
 
     api.expect_re_introspected_datamodel(input_dm, expectation).await;
 
