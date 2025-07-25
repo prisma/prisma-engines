@@ -1715,3 +1715,45 @@ fn migration_without_schema_change(api: TestApi) {
         // Should not create a migration because there is no schema change
         .assert_migration_directories_count(1);
 }
+
+#[test_connector(
+    tags(Postgres, Mssql),
+    exclude(CockroachDb),
+    preview_features("multiSchema"),
+    namespaces("one")
+)]
+fn schema_push_with_multi_schema_should_ignore_default_schema(api: TestApi) {
+    // This table and data should not appear in the diff, should not be dropped and hence not create a data loss warning.
+    api.raw_cmd(
+        r#"
+        CREATE TABLE default_table ( id INT );
+        INSERT INTO default_table (id) VALUES (1);
+    "#,
+    );
+
+    let dm = r#"
+        datasource db {
+          provider   = "postgresql"
+          url        = env("TEST_DATABASE_URL")
+          schemas    = ["one"]
+        }
+
+        generator js {
+          provider        = "prisma-client-javascript"
+          previewFeatures = ["multiSchema"]
+        }
+
+        model A {
+          id  Int @id
+
+          @@schema("one")
+        }
+    "#;
+
+    api.schema_push(dm).send().assert_green().assert_has_executed_steps();
+
+    assert_ne!(api.schema_name(), "one"); // ensure default schema name is not by accident the explicitly given schema name
+    api.assert_schema_with_namespaces(Namespaces::from_vec(&mut vec![api.schema_name(), "one".to_string()]))
+        .assert_has_table_with_ns(&api.schema_name(), "default_table")
+        .assert_has_table_with_ns("one", "A");
+}
