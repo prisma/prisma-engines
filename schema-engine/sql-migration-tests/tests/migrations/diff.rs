@@ -617,7 +617,7 @@ fn from_schema_datasource_relative(mut api: TestApi) {
     expected_printed_messages.assert_debug_eq(&host.printed_messages.lock().unwrap());
 }
 
-#[test_connector]
+#[test_connector(tags(Sqlite))]
 fn from_schema_datasource_to_url(mut api: TestApi) {
     let tempdir = tempfile::tempdir().unwrap();
     let host = Arc::new(TestConnectorHost::default());
@@ -678,7 +678,7 @@ fn from_schema_datasource_to_url(mut api: TestApi) {
     expected_printed_messages.assert_debug_eq(&host.printed_messages.lock().unwrap());
 }
 
-#[test_connector]
+#[test_connector(tags(Sqlite))]
 fn with_schema_filters(mut api: TestApi) {
     let tempdir = tempfile::tempdir().unwrap();
     let host = Arc::new(TestConnectorHost::default());
@@ -696,6 +696,7 @@ fn with_schema_filters(mut api: TestApi) {
             .unwrap();
     });
 
+    // Ensure DB exists
     tok(async {
         let q = quaint::single::Quaint::new(&second_url).await.unwrap();
         q.raw_cmd("SELECT 1;").await.unwrap();
@@ -740,7 +741,7 @@ fn with_schema_filters(mut api: TestApi) {
     expected_printed_messages.assert_debug_eq(&host.printed_messages.lock().unwrap());
 }
 
-#[test_connector]
+#[test_connector(tags(Sqlite))]
 fn with_invalid_schema_filters(mut api: TestApi) {
     let tempdir = tempfile::tempdir().unwrap();
     let host = Arc::new(TestConnectorHost::default());
@@ -750,6 +751,12 @@ fn with_invalid_schema_filters(mut api: TestApi) {
     let base_dir_str = base_dir.path().to_string_lossy();
     let first_url = format!("file:{base_dir_str}/first_db.sqlite");
     let second_url = format!("file:{base_dir_str}/second_db.sqlite");
+
+    // Ensure DB exists
+    tok(async {
+        let q = quaint::single::Quaint::new(&first_url).await.unwrap();
+        q.raw_cmd("SELECT 1;").await.unwrap();
+    });
 
     let schema_content = format!(
         r#"
@@ -785,7 +792,7 @@ fn with_invalid_schema_filters(mut api: TestApi) {
     assert_eq!(err.error_code(), Some("P3024"));
 }
 
-#[test_connector]
+#[test_connector(tags(Sqlite))]
 fn from_url_to_url(mut api: TestApi) {
     let host = Arc::new(TestConnectorHost::default());
     api.connector.set_host(host.clone());
