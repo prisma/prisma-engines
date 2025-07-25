@@ -11,7 +11,7 @@ use crate::introspection::{
 use psl::{
     Configuration, PreviewFeature,
     builtin_connectors::*,
-    datamodel_connector::{Connector, ConnectorCapability},
+    datamodel_connector::Connector,
     parser_database::{self as db, walkers},
 };
 use quaint::prelude::SqlFamily;
@@ -81,13 +81,23 @@ impl<'a> DatamodelCalculatorContext<'a> {
         self.config.datasources.first().unwrap().active_connector
     }
 
+    // Note: when this method returns true, we use it to add `@@schema` attributes to the
+    // introspected models, enums, views.
     pub(crate) fn uses_namespaces(&self) -> bool {
-        let connector_supports_multischema = self
-            .active_connector()
-            .capabilities()
-            .contains(ConnectorCapability::MultiSchema);
+        // Note: you may be tempted to return true when
+        // ```
+        // self
+        //     .active_connector()
+        //     .capabilities()
+        //     .contains(ConnectorCapability::MultiSchema)
+        // ```
+        // but that would not be correct in all cases.
+        // Why? Because we should only add `@@schema` attributes when the user has specified
+        // an explicit list of `schemas`.
+        let schemas_in_datasource = matches!(self.config.datasources.first(), Some(ds) if !ds.namespaces.is_empty());
+        let schemas_in_parameters = self.force_namespaces.is_some();
 
-        connector_supports_multischema || self.force_namespaces.is_some()
+        schemas_in_datasource || schemas_in_parameters
     }
 
     /// Iterate over the database enums, combined together with a
