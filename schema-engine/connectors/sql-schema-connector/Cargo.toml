@@ -36,6 +36,7 @@ serde.workspace = true
 indoc.workspace = true
 uuid.workspace = true
 indexmap.workspace = true
+itertools.workspace = true
 
 prisma-value.workspace = true
 schema-connector.workspace = true

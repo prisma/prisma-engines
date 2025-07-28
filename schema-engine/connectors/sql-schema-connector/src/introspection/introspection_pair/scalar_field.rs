@@ -1,7 +1,8 @@
 use crate::introspection::sanitize_datamodel_names;
 use either::Either;
 use psl::{
-    datamodel_connector::walker_ext_traits::IndexWalkerExt, parser_database::walkers,
+    datamodel_connector::{Flavour, walker_ext_traits::IndexWalkerExt},
+    parser_database::walkers,
     schema_ast::ast::WithDocumentation,
 };
 use sql::ColumnArity;
@@ -86,7 +87,18 @@ impl<'a> ScalarFieldPair<'a> {
             sql::ColumnTypeFamily::Float => Cow::from("Float"),
             sql::ColumnTypeFamily::Decimal => Cow::from("Decimal"),
             sql::ColumnTypeFamily::Boolean => Cow::from("Boolean"),
-            sql::ColumnTypeFamily::String => Cow::from("String"),
+            sql::ColumnTypeFamily::String => {
+                // If the previous type is enum and the connector is SQLite, we render the enum
+                // name as the Prisma type. This is because SQLite does not support enums natively,
+                // and we want to keep the enum type in the Prisma schema.
+                if let Some(enum_name) = self.previous.and_then(|field| Some(field.field_type_as_enum()?.name()))
+                    && self.context.active_connector().flavour() == Flavour::Sqlite
+                {
+                    enum_name.into()
+                } else {
+                    Cow::from("String")
+                }
+            }
             sql::ColumnTypeFamily::DateTime => Cow::from("DateTime"),
             sql::ColumnTypeFamily::Binary => Cow::from("Bytes"),
             sql::ColumnTypeFamily::Json => Cow::from("Json"),
