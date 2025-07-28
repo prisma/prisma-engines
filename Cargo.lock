@@ -5452,6 +5452,7 @@ dependencies = [
  "expect-test",
  "indexmap 2.2.2",
  "indoc",
+ "itertools 0.13.0",
  "prisma-value",
  "psl",
  "quaint",

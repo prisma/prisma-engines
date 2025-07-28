@@ -1,6 +1,7 @@
 mod cockroachdb;
 mod mysql;
 mod postgres;
+mod sqlite;
 
 use barrel::types;
 use quaint::prelude::Queryable;
