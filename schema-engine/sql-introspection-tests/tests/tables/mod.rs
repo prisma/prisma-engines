@@ -598,12 +598,9 @@ async fn a_table_with_partial_indexes_should_include_them(api: &mut TestApi) -> 
     let create_table = format!(
         "CREATE TABLE \"{schema_name}\".\"pages\" (id SERIAL PRIMARY KEY, \"staticId\" INTEGER NOT NULL, latest INTEGER NOT NULL, other INTEGER NOT NULL)"
     );
-    let create_partial_idx = format!(
-        "CREATE UNIQUE INDEX \"partial\" ON \"{schema_name}\".\"pages\" (\"staticId\") WHERE latest = 1"
-    );
-    let create_full_idx = format!(
-        "CREATE UNIQUE INDEX \"full\" ON \"{schema_name}\".\"pages\" (other)"
-    );
+    let create_partial_idx =
+        format!("CREATE UNIQUE INDEX \"partial\" ON \"{schema_name}\".\"pages\" (\"staticId\") WHERE latest = 1");
+    let create_full_idx = format!("CREATE UNIQUE INDEX \"full\" ON \"{schema_name}\".\"pages\" (other)");
 
     api.database().raw_cmd(&create_table).await?;
     api.database().raw_cmd(&create_partial_idx).await?;
@@ -628,7 +625,8 @@ async fn a_table_with_partial_indexes_should_include_them(api: &mut TestApi) -> 
           latest   Int
           other    Int @unique(map: "full")
         }
-    "#]]).await;
+    "#]])
+        .await;
 
     Ok(())
 }

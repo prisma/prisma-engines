@@ -10,9 +10,8 @@ async fn partial_index_basic(api: &mut TestApi) -> TestResult {
     let create_table = format!(
         "CREATE TABLE \"{schema_name}\".\"User\" (id SERIAL PRIMARY KEY, email VARCHAR(255), active BOOLEAN NOT NULL DEFAULT false)"
     );
-    let create_idx = format!(
-        "CREATE INDEX \"User_email_idx\" ON \"{schema_name}\".\"User\" (email) WHERE email IS NOT NULL"
-    );
+    let create_idx =
+        format!("CREATE INDEX \"User_email_idx\" ON \"{schema_name}\".\"User\" (email) WHERE email IS NOT NULL");
 
     api.database().raw_cmd(&create_table).await?;
     api.database().raw_cmd(&create_idx).await?;
@@ -49,9 +48,8 @@ async fn partial_unique_index(api: &mut TestApi) -> TestResult {
     let create_table = format!(
         "CREATE TABLE \"{schema_name}\".\"Post\" (id SERIAL PRIMARY KEY, slug VARCHAR(255), published BOOLEAN NOT NULL DEFAULT false)"
     );
-    let create_idx = format!(
-        "CREATE UNIQUE INDEX \"Post_slug_key\" ON \"{schema_name}\".\"Post\" (slug) WHERE published = true"
-    );
+    let create_idx =
+        format!("CREATE UNIQUE INDEX \"Post_slug_key\" ON \"{schema_name}\".\"Post\" (slug) WHERE published = true");
 
     api.database().raw_cmd(&create_table).await?;
     api.database().raw_cmd(&create_idx).await?;
@@ -106,12 +104,10 @@ async fn multiple_partial_indexes_same_table(api: &mut TestApi) -> TestResult {
     let create_table = format!(
         "CREATE TABLE \"{schema_name}\".\"Product\" (id SERIAL PRIMARY KEY, name VARCHAR(255), price DECIMAL(10,2), active BOOLEAN DEFAULT true, category_id INT)"
     );
-    let create_idx1 = format!(
-        "CREATE INDEX \"Product_active_idx\" ON \"{schema_name}\".\"Product\" (name) WHERE active = true"
-    );
-    let create_idx2 = format!(
-        "CREATE INDEX \"Product_expensive_idx\" ON \"{schema_name}\".\"Product\" (price) WHERE price > 100.00"
-    );
+    let create_idx1 =
+        format!("CREATE INDEX \"Product_active_idx\" ON \"{schema_name}\".\"Product\" (name) WHERE active = true");
+    let create_idx2 =
+        format!("CREATE INDEX \"Product_expensive_idx\" ON \"{schema_name}\".\"Product\" (price) WHERE price > 100.00");
 
     api.database().raw_cmd(&create_table).await?;
     api.database().raw_cmd(&create_idx1).await?;
@@ -171,9 +167,8 @@ async fn re_introspect_partial_index(api: &mut TestApi) -> TestResult {
     let create_table = format!(
         "CREATE TABLE \"{schema_name}\".\"Task\" (id SERIAL PRIMARY KEY, title VARCHAR(255), completed BOOLEAN DEFAULT false)"
     );
-    let create_idx = format!(
-        "CREATE INDEX \"Task_title_idx\" ON \"{schema_name}\".\"Task\" (title) WHERE completed = false"
-    );
+    let create_idx =
+        format!("CREATE INDEX \"Task_title_idx\" ON \"{schema_name}\".\"Task\" (title) WHERE completed = false");
 
     api.database().raw_cmd(&create_table).await?;
     api.database().raw_cmd(&create_idx).await?;

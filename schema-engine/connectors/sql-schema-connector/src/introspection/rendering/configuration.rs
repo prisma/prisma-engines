@@ -26,11 +26,14 @@ pub(super) fn render<'a>(
         let prev_gen_file_name = previous_schema.db.file_name(prev_gen.span.file_id);
 
         let mut generator = render::configuration::Generator::from_psl(prev_gen);
-        
+
         // Add partialIndexes preview feature if partial indexes are detected and not already present
-        if has_partial_indexes(schema) 
-            && (prev_ds.active_connector.is_provider("postgresql") || prev_ds.active_connector.is_provider("cockroachdb"))
-            && !prev_gen.preview_features.map_or(false, |features| features.contains(PreviewFeature::PartialIndexes))
+        if has_partial_indexes(schema)
+            && (prev_ds.active_connector.is_provider("postgresql")
+                || prev_ds.active_connector.is_provider("cockroachdb"))
+            && !prev_gen
+                .preview_features
+                .is_some_and(|features| features.contains(PreviewFeature::PartialIndexes))
         {
             generator.push_preview_feature(PreviewFeature::PartialIndexes);
         }

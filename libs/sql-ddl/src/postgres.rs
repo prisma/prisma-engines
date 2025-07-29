@@ -392,7 +392,7 @@ impl Display for CreateIndex<'_> {
         f.write_str(")")?;
 
         if let Some(where_clause) = self.where_clause {
-            write!(f, " WHERE {}", where_clause)?;
+            write!(f, " WHERE {where_clause}")?;
         }
 
         Ok(())

@@ -140,7 +140,9 @@ impl SqlSchemaCalculatorFlavour for PostgresSchemaCalculatorFlavour {
 
                 // Add WHERE clause for partial indexes
                 if let Some(where_clause) = index.where_clause() {
-                    postgres_ext.partial_indexes.insert(sql_index.id, where_clause.to_string());
+                    postgres_ext
+                        .partial_indexes
+                        .insert(sql_index.id, where_clause.to_string());
                 }
             }
 
