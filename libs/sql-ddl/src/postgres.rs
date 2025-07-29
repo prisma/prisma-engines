@@ -439,6 +439,7 @@ mod tests {
             table_reference: &PostgresIdentifier::Simple(Cow::Borrowed("Cat")),
             columns,
             using: None,
+            where_clause: None,
         };
 
         assert_eq!(
@@ -457,6 +458,7 @@ mod tests {
             table_reference: &PostgresIdentifier::Simple(Cow::Borrowed("Cat")),
             columns,
             using: Some(IndexAlgorithm::Hash),
+            where_clause: None,
         };
 
         assert_eq!(
@@ -486,6 +488,7 @@ mod tests {
             table_reference: &PostgresIdentifier::Simple("Cat".into()),
             columns,
             using: None,
+            where_clause: None,
         };
 
         assert_eq!(
