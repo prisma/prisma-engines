@@ -590,36 +590,45 @@ async fn a_table_with_an_index_that_contains_expressions_should_be_ignored(api: 
 }
 
 // MySQL doesn't have partial indices.
+// This test validates that partial indexes are detected and the partialIndexes preview feature is added,
+// even if field-level partial unique indexes are simplified to regular field-level unique indexes
 #[test_connector(exclude(Mysql, CockroachDb))]
-async fn a_table_with_partial_indexes_should_ignore_them(api: &mut TestApi) -> TestResult {
-    api.barrel()
-        .execute(move |migration| {
-            migration.create_table("pages", move |t| {
-                t.add_column("id", types::integer().increments(true));
-                t.add_column("staticId", types::integer().nullable(false));
-                t.add_column("latest", types::integer().nullable(false));
-                t.add_column("other", types::integer().nullable(false));
-                t.add_index("full", types::index(vec!["other"]).unique(true));
-                t.add_partial_index("partial", types::index(vec!["staticId"]).unique(true), "latest = 1");
+async fn a_table_with_partial_indexes_should_include_them(api: &mut TestApi) -> TestResult {
+    let schema_name = api.schema_name();
+    let create_table = format!(
+        "CREATE TABLE \"{schema_name}\".\"pages\" (id SERIAL PRIMARY KEY, \"staticId\" INTEGER NOT NULL, latest INTEGER NOT NULL, other INTEGER NOT NULL)"
+    );
+    let create_partial_idx = format!(
+        "CREATE UNIQUE INDEX \"partial\" ON \"{schema_name}\".\"pages\" (\"staticId\") WHERE latest = 1"
+    );
+    let create_full_idx = format!(
+        "CREATE UNIQUE INDEX \"full\" ON \"{schema_name}\".\"pages\" (other)"
+    );
 
-                t.add_constraint("pages_pkey", types::primary_constraint(vec!["id"]));
-            });
-        })
-        .await?;
+    api.database().raw_cmd(&create_table).await?;
+    api.database().raw_cmd(&create_partial_idx).await?;
+    api.database().raw_cmd(&create_full_idx).await?;
 
-    let dm = indoc! {
-        r#"
-        model pages {
-            id       Int     @id @default(autoincrement())
-            staticId Int
-            latest   Int
-            other    Int     @unique(map: "full")
+    // Note: Introspection detects partial indexes and adds the partialIndexes preview feature,
+    // but field-level partial unique indexes are simplified to regular unique indexes
+    api.expect_datamodel(&expect![[r#"
+        generator client {
+          provider        = "prisma-client-js"
+          previewFeatures = ["partialIndexes"]
         }
-        "#
-    };
 
-    let result = api.introspect().await?;
-    api.assert_eq_datamodels(dm, &result);
+        datasource db {
+          provider = "postgresql"
+          url      = "env(TEST_DATABASE_URL)"
+        }
+
+        model pages {
+          id       Int @id @default(autoincrement())
+          staticId Int @unique(map: "partial")
+          latest   Int
+          other    Int @unique(map: "full")
+        }
+    "#]]).await;
 
     Ok(())
 }

@@ -119,6 +119,24 @@ impl<'a> IndexPair<'a> {
         }
     }
 
+    /// The WHERE clause for partial indexes, specific to PostgreSQL and CockroachDB.
+    pub(crate) fn where_clause(self) -> Option<&'a str> {
+        if !self.context.sql_family().is_postgres() {
+            return None;
+        }
+
+        match (self.next, self.previous) {
+            // Index is defined in a table to the database.
+            (Some(next), _) => {
+                let data: &PostgresSchemaExt = self.context.sql_schema.downcast_connector_data();
+                data.get_partial_index_where_clause(next.id).map(|s| s.as_str())
+            }
+            // For views, we copy whatever is written in PSL.
+            (None, Some(prev)) => prev.where_clause(),
+            _ => None,
+        }
+    }
+
     /// The fields that are defining the index.
     pub(crate) fn fields(self) -> Box<dyn Iterator<Item = IndexFieldPair<'a>> + 'a> {
         match (self.next, self.previous) {

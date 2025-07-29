@@ -1,0 +1,60 @@
+// tags=postgres
+// exclude=cockroachdb
+
+datasource testds {
+    provider = "postgresql"
+    url = env("TEST_DATABASE_URL")
+}
+
+generator js {
+    provider = "prisma-client-js"
+    previewFeatures = ["partialIndexes"]
+}
+
+model Task {
+  id        Int      @id @default(autoincrement())
+  title     String?  @testds.VarChar(255)
+  priority  Int?
+  completed Boolean  @default(false)
+  archived  Boolean  @default(false)
+
+  @@index([title], where: "completed = false")
+  @@index([priority], where: "priority > 3 AND archived = false")
+}
+
+// -- CreateTable
+// CREATE TABLE "Task" (
+//     "id" SERIAL NOT NULL,
+//     "title" VARCHAR(255),
+//     "priority" INTEGER,
+//     "completed" BOOLEAN NOT NULL DEFAULT false,
+//     "archived" BOOLEAN NOT NULL DEFAULT false,
+//
+//     CONSTRAINT "Task_pkey" PRIMARY KEY ("id")
+// );
+
+// -- CreateIndex
+// CREATE INDEX "Task_title_idx" ON "Task"("title") WHERE completed = false;
+
+// -- CreateIndex
+// CREATE INDEX "Task_priority_idx" ON "Task"("priority") WHERE priority > 3 AND archived = false;
+// Expected Migration:
+// -- CreateSchema
+// CREATE SCHEMA IF NOT EXISTS "public";
+// 
+// -- CreateTable
+// CREATE TABLE "public"."Task" (
+//     "id" SERIAL NOT NULL,
+//     "title" VARCHAR(255),
+//     "priority" INTEGER,
+//     "completed" BOOLEAN NOT NULL DEFAULT false,
+//     "archived" BOOLEAN NOT NULL DEFAULT false,
+// 
+//     CONSTRAINT "Task_pkey" PRIMARY KEY ("id")
+// );
+// 
+// -- CreateIndex
+// CREATE INDEX "Task_title_idx" ON "public"."Task"("title") WHERE completed = false;
+// 
+// -- CreateIndex
+// CREATE INDEX "Task_priority_idx" ON "public"."Task"("priority") WHERE priority > 3 AND archived = false;

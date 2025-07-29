@@ -1,0 +1,47 @@
+// tags=postgres
+// exclude=cockroachdb
+
+datasource testds {
+    provider = "postgresql"
+    url = env("TEST_DATABASE_URL")
+}
+
+generator js {
+    provider = "prisma-client-js"
+    previewFeatures = ["partialIndexes"]
+}
+
+model Post {
+  id        Int      @id @default(autoincrement())
+  slug      String?  @testds.VarChar(255)
+  published Boolean  @default(false)
+
+  @@unique([slug], where: "published = true")
+}
+
+// -- CreateTable
+// CREATE TABLE "Post" (
+//     "id" SERIAL NOT NULL,
+//     "slug" VARCHAR(255),
+//     "published" BOOLEAN NOT NULL DEFAULT false,
+//
+//     CONSTRAINT "Post_pkey" PRIMARY KEY ("id")
+// );
+
+// -- CreateIndex
+// CREATE UNIQUE INDEX "Post_slug_key" ON "Post"("slug") WHERE published = true;
+// Expected Migration:
+// -- CreateSchema
+// CREATE SCHEMA IF NOT EXISTS "public";
+// 
+// -- CreateTable
+// CREATE TABLE "public"."Post" (
+//     "id" SERIAL NOT NULL,
+//     "slug" VARCHAR(255),
+//     "published" BOOLEAN NOT NULL DEFAULT false,
+// 
+//     CONSTRAINT "Post_pkey" PRIMARY KEY ("id")
+// );
+// 
+// -- CreateIndex
+// CREATE UNIQUE INDEX "Post_slug_key" ON "public"."Post"("slug") WHERE published = true;

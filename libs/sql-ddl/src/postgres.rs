@@ -347,6 +347,7 @@ pub struct CreateIndex<'a> {
     pub table_reference: &'a dyn Display,
     pub columns: Vec<IndexColumn<'a>>,
     pub using: Option<IndexAlgorithm>,
+    pub where_clause: Option<&'a str>,
 }
 
 impl Display for CreateIndex<'_> {
@@ -388,7 +389,13 @@ impl Display for CreateIndex<'_> {
             })
             .join(", ", f)?;
 
-        f.write_str(")")
+        f.write_str(")")?;
+
+        if let Some(where_clause) = self.where_clause {
+            write!(f, " WHERE {}", where_clause)?;
+        }
+
+        Ok(())
     }
 }
 

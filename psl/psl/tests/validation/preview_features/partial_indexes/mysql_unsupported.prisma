@@ -1,0 +1,35 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["partialIndexes"]
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id       Int     @id
+  email    String  @unique
+  isActive Boolean @default(true)
+
+  @@unique([email], where: "isActive = true")
+}
+// error: Error parsing attribute "@unique": The given constraint name `User_email_key` has to be unique in the following namespace: on model `User` for indexes and unique constraints. Please provide a different name using the `map` argument.
+//   -->  schema.prisma:13
+//    | 
+// 12 |   id       Int     @id
+// 13 |   email    String  @unique
+//    | 
+// error: Error parsing attribute "@@unique": The given constraint name `User_email_key` has to be unique in the following namespace: on model `User` for indexes and unique constraints. Please provide a different name using the `map` argument.
+//   -->  schema.prisma:16
+//    | 
+// 15 | 
+// 16 |   @@unique([email], where: "isActive = true")
+//    | 
+// error: Error parsing attribute "@@unique": Partial indexes are only supported on PostgreSQL and CockroachDB. Your connector is `mysql`.
+//   -->  schema.prisma:16
+//    | 
+// 15 | 
+// 16 |   @@unique([email], where: "isActive = true")
+//    | 

@@ -1,0 +1,19 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["partialIndexes"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id       Int     @id
+  email    String  @unique
+  name     String?
+  isActive Boolean @default(true)
+
+  @@index([email], where: "isActive = true")
+  @@unique([name], where: "name IS NOT NULL")
+}

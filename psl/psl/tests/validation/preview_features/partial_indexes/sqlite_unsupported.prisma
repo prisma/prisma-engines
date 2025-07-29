@@ -1,0 +1,23 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["partialIndexes"]
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id       Int     @id
+  email    String  @unique
+  isActive Boolean @default(true)
+
+  @@index([email], where: "isActive = true")
+}
+// error: Error parsing attribute "@@index": Partial indexes are only supported on PostgreSQL and CockroachDB. Your connector is `sqlite`.
+//   -->  schema.prisma:16
+//    | 
+// 15 | 
+// 16 |   @@index([email], where: "isActive = true")
+//    | 

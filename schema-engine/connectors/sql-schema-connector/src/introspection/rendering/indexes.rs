@@ -52,5 +52,9 @@ pub(super) fn render(index: IndexPair<'_>) -> renderer::IndexDefinition<'_> {
         definition.index_type(algo);
     }
 
+    if let Some(where_clause) = index.where_clause() {
+        definition.where_clause(where_clause);
+    }
+
     definition
 }

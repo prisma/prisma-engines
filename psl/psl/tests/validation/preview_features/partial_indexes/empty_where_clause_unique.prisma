@@ -1,0 +1,23 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["partialIndexes"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id       Int     @id
+  email    String  @unique
+  isActive Boolean @default(true)
+
+  @@unique([email], where: "")
+}
+// error: Error parsing attribute "@unique": The `where` argument cannot be an empty string.
+//   -->  schema.prisma:16
+//    | 
+// 15 | 
+// 16 |   @@unique([email], where: "")
+//    | 

@@ -1,5 +1,6 @@
 use super::{constraint_namespace::ConstraintName, database_name::validate_db_name};
 use crate::{
+    PreviewFeature,
     datamodel_connector::{ConnectorCapability, walker_ext_traits::*},
     diagnostics::DatamodelError,
     validate::validation_pipeline::context::Context,
@@ -394,6 +395,38 @@ pub(super) fn unique_client_name_does_not_clash_with_field(index: IndexWalker<'_
             &format!("The field `{idx_client_name}` clashes with the `{attr_name}` name. Please resolve the conflict by providing a custom id name: `{attr_name}([...], name: \"custom_name\")`"),
             container_type,
             index.model().name(),
+            index.ast_attribute().span,
+        ));
+    }
+}
+
+/// Partial indexes are only supported on PostgreSQL and CockroachDB with the partialIndexes preview feature.
+pub(crate) fn partial_index_is_supported(index: IndexWalker<'_>, ctx: &mut Context<'_>) {
+    if index.where_clause().is_none() {
+        return;
+    }
+
+    if !ctx.preview_features.contains(PreviewFeature::PartialIndexes) {
+        let message = "You have a partial index definition. Partial indexes are currently a preview feature. To use partial indexes, please add \"partialIndexes\" to the preview features.";
+
+        ctx.push_error(DatamodelError::new_attribute_validation_error(
+            message,
+            index.attribute_name(),
+            index.ast_attribute().span,
+        ));
+
+        return;
+    }
+
+    let connector_name = ctx.connector.provider_name();
+    if !matches!(connector_name, "postgresql" | "cockroachdb") {
+        let message = format!(
+            "Partial indexes are only supported on PostgreSQL and CockroachDB. Your connector is `{connector_name}`."
+        );
+
+        ctx.push_error(DatamodelError::new_attribute_validation_error(
+            &message,
+            index.attribute_name(),
             index.ast_attribute().span,
         ));
     }
