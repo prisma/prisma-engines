@@ -13,23 +13,11 @@ model User {
   email    String  @unique
   isActive Boolean @default(true)
 
-  @@unique([email], where: "isActive = true")
+  @@index([email], where: "isActive = true")
 }
-// error: Error parsing attribute "@unique": The given constraint name `User_email_key` has to be unique in the following namespace: on model `User` for indexes and unique constraints. Please provide a different name using the `map` argument.
-//   -->  schema.prisma:13
-//    | 
-// 12 |   id       Int     @id
-// 13 |   email    String  @unique
-//    | 
-// error: Error parsing attribute "@@unique": The given constraint name `User_email_key` has to be unique in the following namespace: on model `User` for indexes and unique constraints. Please provide a different name using the `map` argument.
-//   -->  schema.prisma:16
-//    | 
-// 15 | 
-// 16 |   @@unique([email], where: "isActive = true")
-//    | 
-// error: Error parsing attribute "@@unique": Partial indexes are only supported on PostgreSQL and CockroachDB. Your connector is `mysql`.
-//   -->  schema.prisma:16
-//    | 
-// 15 | 
-// 16 |   @@unique([email], where: "isActive = true")
-//    | 
+// [1;91merror[0m: [1mError parsing attribute "@@index": Partial indexes are only supported on PostgreSQL and CockroachDB. Your connector is `mysql`.[0m
+//   [1;94m-->[0m  [4mschema.prisma:16[0m
+// [1;94m   | [0m
+// [1;94m15 | [0m
+// [1;94m16 | [0m  [1;91m@@index([email], where: "isActive = true")[0m
+// [1;94m   | [0m

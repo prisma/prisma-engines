@@ -530,6 +530,7 @@ fn cockroachdb_22_2_sequences_must_work(api: TestApi) {
             constraint_options: {},
             table_options: [],
             exclude_constraints: [],
+            partial_indexes: {},
             sequences: [
                 Sequence {
                     namespace_id: NamespaceId(

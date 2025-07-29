@@ -15,9 +15,9 @@ model User {
 
   @@index([email], where: "")
 }
-// error: Error parsing attribute "@index": The `where` argument cannot be an empty string.
-//   -->  schema.prisma:16
-//    | 
-// 15 | 
-// 16 |   @@index([email], where: "")
-//    | 
+// [1;91merror[0m: [1mError parsing attribute "@index": The `where` argument cannot be an empty string.[0m
+//   [1;94m-->[0m  [4mschema.prisma:16[0m
+// [1;94m   | [0m
+// [1;94m15 | [0m
+// [1;94m16 | [0m  [1;91m@@index([email], where: "")[0m
+// [1;94m   | [0m
