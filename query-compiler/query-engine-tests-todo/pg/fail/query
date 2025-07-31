@@ -1,9 +1,6 @@
-new::regressions::prisma_7434::not_in_chunking::not_in_batch_filter
 new::relation_load_strategy::batch::relation_load_strategy_batch::compacted_join_lateral
 new::relation_load_strategy::batch::relation_load_strategy_batch::compacted_query_lateral
 queries::aggregation::group_by::aggregation_group_by::group_by_ordering_sum_aggregation
-queries::chunking::chunking::order_by_aggregation_should_fail
-queries::chunking::chunking::order_by_relevance_should_fail
 queries::data_types::json::json::json_list
 queries::filters::self_relation_regression::sr_regression::all_categories
 queries::simple::m2m::m2m::repro_16390

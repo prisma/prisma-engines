@@ -20,7 +20,7 @@ pub trait QueryBuilder {
         query_arguments: QueryArguments,
         selected_fields: &FieldSelection,
         relation_load_strategy: RelationLoadStrategy,
-    ) -> Result<DbQuery, Box<dyn std::error::Error + Send + Sync>>;
+    ) -> Result<Vec<DbQuery>, Box<dyn std::error::Error + Send + Sync>>;
 
     /// Retrieve related records through an M2M relation.
     #[cfg(feature = "relation_joins")]
@@ -223,6 +223,7 @@ pub enum DbQuery {
         #[serde(serialize_with = "serialize_params")]
         params: Vec<PrismaValue>,
         placeholder_format: PlaceholderFormat,
+        chunkable: Chunkable,
     },
 }
 
@@ -280,4 +281,42 @@ where
     S: serde::Serializer,
 {
     serializer.collect_seq(obj.iter().map(TaggedPrismaValue::from))
+}
+
+/// Indicates whether the parameters of this query can be chunked into smaller queries.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize)]
+#[serde(into = "bool")]
+pub enum Chunkable {
+    Yes,
+    No,
+}
+
+impl From<Chunkable> for bool {
+    fn from(chunkable: Chunkable) -> Self {
+        matches!(chunkable, Chunkable::Yes)
+    }
+}
+
+impl From<&QueryArguments> for Chunkable {
+    fn from(args: &QueryArguments) -> Self {
+        if !args.order_by.is_empty()
+            || args.cursor.is_some()
+            || args.has_unbatchable_filters()
+            || args.has_unbatchable_ordering()
+        {
+            Chunkable::No
+        } else {
+            Chunkable::Yes
+        }
+    }
+}
+
+impl From<&Filter> for Chunkable {
+    fn from(filter: &Filter) -> Self {
+        if filter.can_batch() {
+            Chunkable::Yes
+        } else {
+            Chunkable::No
+        }
+    }
 }

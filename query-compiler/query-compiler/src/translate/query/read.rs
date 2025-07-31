@@ -10,7 +10,7 @@ use query_core::{
     QueryOptions, ReadQuery, RelatedRecordsQuery,
 };
 use query_structure::{
-    ConditionValue, FieldSelection, Filter, PrismaValue, QueryArguments, QueryMode, RelationLoadStrategy,
+    ConditionValue, FieldSelection, Filter, Model, PrismaValue, QueryArguments, QueryMode, RelationLoadStrategy,
     ScalarCondition, ScalarFilter, ScalarProjection, Take,
 };
 use std::slice;
@@ -29,11 +29,7 @@ pub(crate) fn translate_read_query(query: ReadQuery, builder: &dyn QueryBuilder)
             ))
             .with_take(Take::One);
 
-            let query = builder
-                .build_get_records(&rq.model, args, &selected_fields, rq.relation_load_strategy)
-                .map_err(TranslateError::QueryBuildFailure)?;
-
-            let expr = Expression::Query(query);
+            let expr = build_get_records(builder, &rq.model, args, &selected_fields, rq.relation_load_strategy)?;
             let expr = convert_options_to_validation(expr, rq.options);
             let expr = Expression::Unique(Box::new(expr));
 
@@ -66,12 +62,13 @@ pub(crate) fn translate_read_query(query: ReadQuery, builder: &dyn QueryBuilder)
                 .requires_inmemory_distinct()
                 .then(|| extract_distinct_by(&mut mrq.args));
 
-            // TODO: we ignore chunking for now
-            let query = builder
-                .build_get_records(&mrq.model, mrq.args, &selected_fields, mrq.relation_load_strategy)
-                .map_err(TranslateError::QueryBuildFailure)?;
-
-            let mut expr = Expression::Query(query);
+            let mut expr = build_get_records(
+                builder,
+                &mrq.model,
+                mrq.args,
+                &selected_fields,
+                mrq.relation_load_strategy,
+            )?;
 
             if let Some(fields) = distinct_by {
                 expr = Expression::DistinctBy {
@@ -349,16 +346,13 @@ fn build_read_one2m_query(
 
     args.filter = Some(Filter::And(filters));
 
-    let query = builder
-        .build_get_records(
-            &field.related_model(),
-            args,
-            selected_fields,
-            RelationLoadStrategy::Query,
-        )
-        .map_err(TranslateError::QueryBuildFailure)?;
-
-    let expr = Expression::Query(query);
+    let expr = build_get_records(
+        builder,
+        &field.related_model(),
+        args,
+        selected_fields,
+        RelationLoadStrategy::Query,
+    )?;
 
     Ok((
         expr,
@@ -372,6 +366,28 @@ fn build_read_one2m_query(
             is_relation_unique: !field.arity().is_list(),
         },
     ))
+}
+
+fn build_get_records(
+    builder: &dyn QueryBuilder,
+    model: &Model,
+    args: QueryArguments,
+    selected_fields: &FieldSelection,
+    relation_load_strategy: RelationLoadStrategy,
+) -> Result<Expression, TranslateError> {
+    Ok(builder
+        .build_get_records(model, args, selected_fields, relation_load_strategy)
+        .map_err(TranslateError::QueryBuildFailure)?
+        .into_iter()
+        .map(Expression::Query)
+        .reduce(|acc, q| match acc {
+            Expression::Concat(mut vec) => {
+                vec.push(q);
+                Expression::Concat(vec)
+            }
+            _ => Expression::Concat(vec![acc, q]),
+        })
+        .expect("should always have at least one query"))
 }
 
 fn convert_options_to_validation(expr: Expression, options: QueryOptions) -> Expression {
