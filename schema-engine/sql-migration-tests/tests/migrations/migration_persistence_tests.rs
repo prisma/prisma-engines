@@ -198,15 +198,10 @@ fn starting_a_migration_on_a_non_empty_database_errors(api: TestApi) {
 fn starting_a_migration_on_db_with_existing_external_table_does_not_errors(api: TestApi) {
     api.raw_cmd("CREATE TABLE cats (id INT)");
 
+    let filter = api.namespaced_schema_filter(&["cats"]).into();
     let persistence = api.migration_persistence();
 
-    let result = tok(persistence.initialize(
-        None,
-        SchemaFilter {
-            external_tables: vec!["cats".to_string()],
-            external_enums: vec![],
-        },
-    ));
+    let result = tok(persistence.initialize(None, filter));
 
     assert!(result.is_ok());
 }
