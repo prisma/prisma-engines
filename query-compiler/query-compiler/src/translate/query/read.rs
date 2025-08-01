@@ -101,7 +101,7 @@ pub(crate) fn translate_read_query(query: ReadQuery, builder: &dyn QueryBuilder)
         }
 
         ReadQuery::RelatedRecordsQuery(rrq) => {
-            let (expr, join) = build_read_related_records(rrq, vec![], builder)?;
+            let (expr, join) = build_read_related_records(rrq, vec![], false, builder)?;
             if join.is_relation_unique {
                 Expression::Unique(Box::new(expr))
             } else {
@@ -167,8 +167,10 @@ pub(super) fn add_inmemory_join(
             _ => None,
         })
         .map(|rrq| -> TranslateResult<JoinExpression> {
+            let has_unique_parent = !parent.r#type().is_list();
             let prefixed_parent_field_name = binding::nested_relation_field(&rrq.parent_field);
             let left_scalars = rrq.parent_field.left_scalars();
+
             let links = left_scalars
                 .iter()
                 .zip(rrq.parent_field.related_field().left_scalars())
@@ -177,15 +179,15 @@ pub(super) fn add_inmemory_join(
                         binding::join_parent_field(parent_scalar),
                         parent_scalar.type_info().to_prisma_type(),
                     );
-                    let condition = if parent.r#type().is_list() {
-                        ScalarCondition::InTemplate(ConditionValue::value(placeholder))
-                    } else {
+                    let condition = if has_unique_parent {
                         ScalarCondition::Equals(ConditionValue::value(placeholder))
+                    } else {
+                        ScalarCondition::InTemplate(ConditionValue::value(placeholder))
                     };
                     ConditionalLink::new(child_scalar.clone(), vec![condition])
                 })
                 .collect();
-            let (child, join) = build_read_related_records(rrq, links, builder)?;
+            let (child, join) = build_read_related_records(rrq, links, has_unique_parent, builder)?;
 
             Ok(JoinExpression {
                 child,
@@ -220,6 +222,7 @@ pub(super) fn add_inmemory_join(
 fn build_read_related_records(
     mut rrq: RelatedRecordsQuery,
     links: Vec<ConditionalLink>,
+    has_unique_parent: bool,
     builder: &dyn QueryBuilder,
 ) -> TranslateResult<(Expression, JoinMetadata)> {
     // Skip the query entirely if the take is 0.
@@ -265,9 +268,15 @@ fn build_read_related_records(
     let selected_fields = rrq.selected_fields.without_relations().into_virtuals_last();
     let needs_reversed_order = rrq.args.needs_reversed_order();
 
-    let pagination = (rrq.args.take.is_some() || rrq.args.skip.is_some() || rrq.args.cursor.is_some())
+    // We are forced to use in-memory processing when we have potentially more than one parent
+    // record (!has_unique_parent). Otherwise our skip/limit on the database level would apply to
+    // children of multiple parents, which would produce incorrect results.
+    let needs_pagination = rrq.args.take.is_some() || rrq.args.skip.is_some() || rrq.args.cursor.is_some();
+    let pagination = (needs_pagination && (!has_unique_parent || rrq.args.requires_inmemory_processing()))
         .then(|| extract_pagination(&mut rrq.args));
-    let distinct_by = (rrq.args.distinct.is_some()).then(|| extract_distinct_by(&mut rrq.args));
+    let needs_distinct = rrq.args.distinct.is_some();
+    let distinct_by = (needs_distinct && (!has_unique_parent || rrq.args.requires_inmemory_distinct()))
+        .then(|| extract_distinct_by(&mut rrq.args));
 
     let (mut child_query, join) = if rrq.parent_field.relation().is_many_to_many() {
         build_read_m2m_query(linkage, rrq.args, &selected_fields, builder)?

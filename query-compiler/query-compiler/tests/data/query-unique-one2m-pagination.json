@@ -1,0 +1,22 @@
+{
+  "modelName": "User",
+  "action": "findUnique",
+  "query": {
+    "arguments": {
+      "relationLoadStrategy": "query",
+      "where": {
+        "id": 1
+      }
+    },
+    "selection": {
+      "$scalars": true,
+      "posts": {
+        "arguments": {
+          "skip": 10,
+          "take": 10
+        },
+        "selection": { "id": true }
+      }
+    }
+  }
+}
