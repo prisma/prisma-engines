@@ -16,11 +16,12 @@ transaction
                    params [const(BigInt(1)), const(BigInt(1)),
                            const(BigInt(0))])
    in let 0$id = mapField id (get 0)
-      in let 1 = query «SELECT "t1"."id", "t0"."B" AS "CategoryToPost@Post" FROM
-                        "public"."_CategoryToPost" AS "t0" INNER JOIN
-                        "public"."Category" AS "t1" ON "t0"."A" = "t1"."id"
-                        WHERE ("t1"."id" = $1 AND 1=1 AND "t0"."B" IN [$2])»
-                 params [const(BigInt(1)), var(0$id as Int)]
+      in let 1 = query «SELECT "public"."Category"."id", "t0"."B" AS
+                        "CategoryToPost@Post" FROM "public"."Category" INNER
+                        JOIN "public"."_CategoryToPost" AS "t0" ON "t0"."A" =
+                        "public"."Category"."id" WHERE ("public"."Category"."id"
+                        = $1 AND 1=1 AND "t0"."B" IN [$2]) OFFSET $3»
+                 params [const(BigInt(1)), var(0$id as Int), const(BigInt(0))]
          in let 0 = validate (get 0)
                 [ rowCountNeq 0
                 ] orRaise "MISSING_RELATED_RECORD";
