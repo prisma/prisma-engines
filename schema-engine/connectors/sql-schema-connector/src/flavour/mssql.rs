@@ -295,8 +295,6 @@ impl SqlConnector for MssqlConnector {
         Box::pin(async move {
             let search_path = self.schema_name().to_string();
 
-            let uses_explicit_namespaces = namespaces.is_some();
-
             let mut namespaces: Vec<_> = namespaces.map(|ns| ns.into_iter().collect()).unwrap_or_default();
             namespaces.push(search_path);
 
@@ -323,7 +321,7 @@ impl SqlConnector for MssqlConnector {
                     namespaces.contains(ns)
                         && !self.dialect().schema_differ().contains_table(
                             &filters.external_tables,
-                            uses_explicit_namespaces.then_some(ns),
+                            Some(ns),
                             table_name,
                         )
                 })
