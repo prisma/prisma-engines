@@ -11,12 +11,16 @@ import {
   type TransactionManager,
   UserFacingError,
 } from '@prisma/client-engine-runtime'
-import { IsolationLevel, SqlQueryable } from '@prisma/driver-adapter-utils'
+import {
+  IsolationLevel,
+  SqlDriverAdapter,
+  SqlQueryable,
+} from '@prisma/driver-adapter-utils'
 
 import { withLocalPanicHandler } from '../panic.js'
 import { QueryCompiler } from '../query-compiler.js'
 import { JsonProtocolQuery, QueryParams } from '../types/jsonRpc.js'
-import { assertNever, debug } from '../utils.js'
+import { debug } from '../utils.js'
 import type { State } from './worker.js'
 import { parseIsolationLevel } from './worker-transaction.js'
 
@@ -31,7 +35,7 @@ export function query(
 
 class QueryPipeline {
   private compiler: QueryCompiler
-  private driverAdapter: SqlQueryable
+  private driverAdapter: SqlDriverAdapter
   private transactionManager: TransactionManager
 
   constructor(
@@ -127,6 +131,8 @@ class QueryPipeline {
         this.logs.push(safeJsonStringify(event))
       },
       tracingHelper: noopTracingHelper,
+      provider: this.driverAdapter.provider,
+      connectionInfo: this.driverAdapter.getConnectionInfo?.(),
     }
 
     const interpreter = QueryInterpreter.forSql(interpreterOpts)

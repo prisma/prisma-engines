@@ -1,7 +1,5 @@
 new::interactive_tx::interactive_tx::batch_queries_failure
-new::regressions::prisma_7434::not_in_chunking::not_in_batch_filter
 queries::aggregation::group_by::aggregation_group_by::group_by_ordering_sum_aggregation
-queries::chunking::chunking::order_by_aggregation_should_fail
 queries::data_types::enum_type::enum_type::read_one_invalid_sqlite
 queries::filters::self_relation_regression::sr_regression::all_categories
 raw::sql::typed_output::typed_output::all_scalars_sqlite

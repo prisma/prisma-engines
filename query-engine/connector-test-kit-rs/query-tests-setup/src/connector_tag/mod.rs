@@ -248,7 +248,10 @@ impl ConnectorVersion {
     /// will use. i.e. if it's a WASM connector, the default, not overridable one. Otherwise the one
     /// as seen by the test binary (which will be the same as the engine exercised)
     pub fn max_bind_values(&self) -> Option<usize> {
-        if self.is_wasm() {
+        if matches!(self, Self::Sqlite(Some(SqliteVersion::CloudflareD1))) {
+            // D1 doesn't have the same limit as other SQLite implementations.
+            Some(98)
+        } else if self.is_wasm() {
             self.sql_family().map(|f| f.default_max_bind_values())
         } else {
             self.sql_family().map(|f| f.max_bind_values())

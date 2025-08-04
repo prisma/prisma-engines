@@ -184,6 +184,9 @@ pub(crate) fn translate_write_query(query: WriteQuery, builder: &dyn QueryBuilde
                 builder
                     .build_get_records(&model, query_args, &selected_fields, RelationLoadStrategy::Query)
                     .map_err(TranslateError::QueryBuildFailure)?
+                    .into_iter()
+                    .exactly_one()
+                    .expect("should have exactly one query for update with selection")
             } else {
                 builder
                     .build_update(&model, record_filter, args, Some(&selected_fields))
