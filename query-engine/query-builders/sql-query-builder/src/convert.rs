@@ -1,4 +1,5 @@
 use bigdecimal::{BigDecimal, FromPrimitive};
+use chrono::SecondsFormat;
 use prisma_value::{PrismaValue, PrismaValueType};
 use quaint::{ast::OpaqueType, prelude::SqlFamily};
 
@@ -63,7 +64,7 @@ pub(crate) fn quaint_value_to_prisma_value(value: quaint::Value<'_>, family: Sql
             _ if family.is_postgres() => PrismaValue::String(dt.naive_utc().to_string()),
             _ if family.is_mysql() || family.is_mssql() => PrismaValue::String(dt.format(DATETIME_FORMAT).to_string()),
 
-            _ => PrismaValue::String(dt.to_rfc3339()),
+            _ => PrismaValue::String(dt.to_rfc3339_opts(SecondsFormat::Millis, true)),
         },
         quaint::ValueType::DateTime(None) => PrismaValue::Null,
         quaint::ValueType::Date(Some(d)) => {
