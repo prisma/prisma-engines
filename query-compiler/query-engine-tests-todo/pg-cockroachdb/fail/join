@@ -1,17 +1,3 @@
 new::relation_load_strategy::batch::relation_load_strategy_batch::compacted_join_lateral
 new::relation_load_strategy::batch::relation_load_strategy_batch::compacted_query_lateral
 queries::aggregation::group_by::aggregation_group_by::group_by_ordering_sum_aggregation
-queries::aggregation::many_count_relation::many_count_rel::count_with_distinct
-queries::aggregation::uniq_count_relation::uniq_count_rel::count_with_distinct
-queries::data_types::through_relation::scalar_relations::scalar_lists
-queries::distinct::distinct::nested_distinct
-queries::distinct::distinct::nested_distinct_not_in_selection
-queries::distinct::distinct::nested_distinct_order_by_field
-queries::distinct::distinct::nested_distinct_reversed
-queries::order_and_pagination::nested_pagination::nested_pagination::bottom_lvl_take_minus_3
-queries::order_and_pagination::nested_pagination::nested_pagination::bottom_lvl_take_minus_4
-queries::order_and_pagination::nested_pagination::nested_pagination::m2m_many_children_nested_skip_take
-queries::order_and_pagination::nested_pagination::nested_pagination::mid_lvl_skip_1_take_minus_3
-queries::order_and_pagination::nested_pagination::nested_pagination::mid_lvl_take_minus_3
-queries::order_and_pagination::nested_pagination::nested_pagination::mid_lvl_take_minus_4
-queries::simple::m2m::m2m::repro_16390

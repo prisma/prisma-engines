@@ -18,16 +18,25 @@ let @parent = query «SELECT "public"."Post"."id", "public"."Post"."title",
               params [const(BigInt(0))]
 in let @parent$id = mapField id (get @parent)
    in join (get @parent)
-      with (cursor [("id", const(Int(1)))]
-           skip 1
-           take 1
-           distinct by (id, CategoryToPost@Post)
-           (query «SELECT "public"."Category"."id", "public"."Category"."name",
-                   "t0"."B" AS "CategoryToPost@Post" FROM "public"."Category"
-                   INNER JOIN "public"."_CategoryToPost" AS "t0" ON "t0"."A" =
-                   "public"."Category"."id" WHERE ("public"."Category"."id" >=
-                   (SELECT "public"."Category"."id" FROM "public"."Category"
-                   WHERE ("public"."Category"."id") = ($1)) AND "t0"."B" IN
-                   [$2]) ORDER BY "public"."Category"."id" ASC OFFSET $3»
-            params [const(BigInt(1)), var(@parent$id as Int),
-                    const(BigInt(0))])) on left.(id) = right.(CategoryToPost@Post) as @nested$categories
+      with (process {
+               .: {
+                   linkingFields: (CategoryToPost@Post)
+                   distinct: (id)
+                   pagination: {
+                       skip: 1
+                       take: 1
+                       cursor: {
+                           id: const(Int(1))
+                       }
+                   }
+               }
+           } (query «SELECT "public"."Category"."id",
+                     "public"."Category"."name", "t0"."B" AS
+                     "CategoryToPost@Post" FROM "public"."Category" INNER JOIN
+                     "public"."_CategoryToPost" AS "t0" ON "t0"."A" =
+                     "public"."Category"."id" WHERE ("public"."Category"."id" >=
+                     (SELECT "public"."Category"."id" FROM "public"."Category"
+                     WHERE ("public"."Category"."id") = ($1)) AND "t0"."B" IN
+                     [$2]) ORDER BY "public"."Category"."id" ASC OFFSET $3»
+              params [const(BigInt(1)), var(@parent$id as Int),
+                      const(BigInt(0))])) on left.(id) = right.(CategoryToPost@Post) as @nested$categories

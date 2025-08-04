@@ -1,5 +1,8 @@
 use super::{Binding, DbQuery, EnumsMap, Expression, FieldOperation, JoinExpression, Pagination};
-use crate::{expression::FieldInitializer, result_node::ResultNode};
+use crate::{
+    expression::{FieldInitializer, InMemoryOps},
+    result_node::ResultNode,
+};
 use pretty::{
     DocAllocator, DocBuilder,
     termcolor::{Color, ColorSpec},
@@ -52,7 +55,6 @@ where
             Expression::GetFirstNonEmpty { names } => self.get_first_non_empty(names),
             Expression::Query(db_query) => self.query("query", db_query),
             Expression::Execute(db_query) => self.query("execute", db_query),
-            Expression::Reverse(expression) => self.unary_function("reverse", expression),
             Expression::Sum(vec) => self.function("sum", vec),
             Expression::Concat(vec) => self.function("concat", vec),
             Expression::Unique(expression) => self.unary_function("unique", expression),
@@ -75,10 +77,9 @@ where
             } => self.r#if(value, rule, then, r#else),
             Expression::Unit => self.keyword("()"),
             Expression::Diff { from, to } => self.diff(from, to),
-            Expression::DistinctBy { expr, fields } => self.distinct_by(expr, fields),
-            Expression::Paginate { expr, pagination } => self.paginate(expr, pagination),
             Expression::InitializeRecord { expr, fields } => self.initialize_record(expr, fields),
             Expression::MapRecord { expr, fields } => self.map_record(expr, fields),
+            Expression::Process { expr, operations } => self.process(expr, operations),
         }
     }
 
@@ -98,6 +99,13 @@ where
         self.intersperse(subtrees, self.text(",").append(self.softline()))
             .align()
             .parens()
+    }
+
+    fn fields<F>(&'a self, fields: impl IntoIterator<Item = &'a F>) -> PrettyDoc<'a, D>
+    where
+        F: AsRef<str> + 'a,
+    {
+        self.tuple(fields.into_iter().map(|f| self.field_name(f.as_ref())))
     }
 
     fn query(&'a self, tag: &'static str, db_query: &'a DbQuery) -> PrettyDoc<'a, D> {
@@ -220,11 +228,7 @@ where
             .append(
                 self.intersperse(
                     children.iter().map(|join| {
-                        let (left_fields, right_fields): (Vec<_>, Vec<_>) = join
-                            .on
-                            .iter()
-                            .map(|(l, r)| (self.field_name(l), self.field_name(r)))
-                            .unzip();
+                        let (left_fields, right_fields): (Vec<_>, Vec<_>) = join.on.iter().map(|(l, r)| (l, r)).unzip();
                         let mut builder = self
                             .expression(&join.child)
                             .parens()
@@ -240,13 +244,13 @@ where
                             .append(
                                 self.keyword("left")
                                     .append(".")
-                                    .append(self.tuple(left_fields))
+                                    .append(self.fields(left_fields))
                                     .append(self.space())
                                     .append("=")
                                     .append(self.space())
                                     .append(self.keyword("right"))
                                     .append(".")
-                                    .append(self.tuple(right_fields)),
+                                    .append(self.fields(right_fields)),
                             )
                             .append(self.space())
                             .append(self.keyword("as"))
@@ -411,56 +415,6 @@ where
         self.function("diff", [from, to])
     }
 
-    fn distinct_by(&'a self, expr: &'a Expression, fields: &'a [String]) -> PrettyDoc<'a, D> {
-        self.keyword("distinct")
-            .append(self.softline())
-            .append(self.keyword("by"))
-            .append(self.softline())
-            .append(self.tuple(fields.iter().map(|name| self.var_name(name))))
-            .append(self.line())
-            .append(self.expression(expr).parens())
-    }
-
-    fn paginate(&'a self, expr: &'a Expression, pagination: &'a Pagination) -> PrettyDoc<'a, D> {
-        let mut builder = self.nil();
-
-        if let Some(fields) = &pagination.cursor {
-            builder = builder.append(
-                self.keyword("cursor").append(self.softline()).append(
-                    self.intersperse(
-                        fields
-                            .iter()
-                            .map(|(name, val)| self.tuple([self.text(format!("{name:?}")), self.value(val)])),
-                        self.text(",").append(self.softline()),
-                    )
-                    .align()
-                    .brackets()
-                    .append(self.line()),
-                ),
-            );
-        }
-
-        if let Some(skip) = &pagination.skip() {
-            builder = builder.append(
-                self.keyword("skip")
-                    .append(self.space())
-                    .append(self.text(skip.to_string()))
-                    .append(self.line()),
-            );
-        }
-
-        if let Some(take) = &pagination.take() {
-            builder = builder.append(
-                self.keyword("take")
-                    .append(self.space())
-                    .append(self.text(take.to_string()))
-                    .append(self.line()),
-            );
-        }
-
-        builder.append(self.expression(expr))
-    }
-
     fn initialize_record(
         &'a self,
         expr: &'a Expression,
@@ -504,6 +458,71 @@ where
             })))
             .append(self.space())
             .append(self.expression(expr))
+    }
+
+    fn process(&'a self, expr: &'a Expression, ops: &'a InMemoryOps) -> PrettyDoc<'a, D> {
+        self.keyword("process")
+            .append(self.space())
+            .append(self.in_memory_ops_recursive(ops))
+            .append(self.space())
+            .append(self.expression(expr).parens())
+    }
+
+    fn in_memory_ops_recursive(&'a self, ops: &'a InMemoryOps) -> PrettyDoc<'a, D> {
+        self.object(
+            (!ops.is_empty_toplevel())
+                .then(|| (self.text("."), self.in_memory_ops_single(ops)))
+                .into_iter()
+                .chain(
+                    ops.nested
+                        .iter()
+                        .map(|(name, ops)| (self.text(name), self.in_memory_ops_recursive(ops))),
+                ),
+        )
+    }
+
+    fn in_memory_ops_single(&'a self, ops: &'a InMemoryOps) -> PrettyDoc<'a, D> {
+        self.object(
+            ops.linking_fields
+                .as_ref()
+                .map(|fields| (self.text("linkingFields"), self.fields(fields)))
+                .into_iter()
+                .chain(
+                    ops.distinct
+                        .as_ref()
+                        .map(|fields| (self.text("distinct"), self.fields(fields))),
+                )
+                .chain(ops.reverse.then_some((self.text("reverse"), self.keyword("true"))))
+                .chain(
+                    ops.pagination
+                        .as_ref()
+                        .map(|pagination| (self.text("pagination"), self.pagination(pagination))),
+                ),
+        )
+    }
+
+    fn pagination(&'a self, pagination: &'a Pagination) -> PrettyDoc<'a, D> {
+        self.object(
+            pagination
+                .skip()
+                .map(|skip| (self.text("skip"), self.text(skip.to_string())))
+                .into_iter()
+                .chain(
+                    pagination
+                        .take()
+                        .map(|take| (self.text("take"), self.text(take.to_string()))),
+                )
+                .chain(pagination.cursor().map(|cursor| {
+                    (
+                        self.text("cursor"),
+                        self.object(
+                            cursor
+                                .iter()
+                                .map(|(field, val)| (self.field_name(field), self.value(val))),
+                        ),
+                    )
+                })),
+        )
     }
 }
 

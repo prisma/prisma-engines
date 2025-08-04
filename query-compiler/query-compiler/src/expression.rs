@@ -4,7 +4,7 @@ use std::{
 };
 
 use crate::result_node::ResultNode;
-use bon::bon;
+use bon::{Builder, bon};
 use query_builder::DbQuery;
 use query_core::{DataExpectation, DataRule};
 use query_structure::{InternalEnum, PrismaValue, PrismaValueType, ScalarWriteOperation, TaggedPrismaValue};
@@ -70,9 +70,6 @@ pub enum Expression {
     /// A database query that returns the number of affected rows.
     Execute(DbQuery),
 
-    /// Reverses the result of an expression in memory.
-    Reverse(Box<Expression>),
-
     /// Sums a list of scalars returned by the expressions.
     Sum(Vec<Expression>),
 
@@ -128,15 +125,6 @@ pub enum Expression {
     /// or the set of rows that are in `from` but not in `to`).
     Diff { from: Box<Expression>, to: Box<Expression> },
 
-    /// Deduplicates the result of an expression by a list of fields.
-    DistinctBy { expr: Box<Expression>, fields: Vec<String> },
-
-    /// Pagination over the result of an expression.
-    Paginate {
-        expr: Box<Expression>,
-        pagination: Pagination,
-    },
-
     /// Initializes a record with a set of initializers.
     InitializeRecord {
         expr: Box<Expression>,
@@ -147,6 +135,12 @@ pub enum Expression {
     MapRecord {
         expr: Box<Expression>,
         fields: BTreeMap<String, FieldOperation>,
+    },
+
+    /// Process records in memory.
+    Process {
+        expr: Box<Expression>,
+        operations: InMemoryOps,
     },
 }
 
@@ -190,9 +184,6 @@ impl Expression {
             Expression::GetFirstNonEmpty { .. } => {}
             Expression::Query(_) => {}
             Expression::Execute(_) => {}
-            Expression::Reverse(expr) => {
-                expr.simplify();
-            }
             Expression::Unique(expr) => {
                 expr.simplify();
             }
@@ -227,16 +218,13 @@ impl Expression {
                 from.simplify();
                 to.simplify();
             }
-            Expression::DistinctBy { expr, .. } => {
-                expr.simplify();
-            }
-            Expression::Paginate { expr, .. } => {
-                expr.simplify();
-            }
             Expression::InitializeRecord { expr, .. } => {
                 expr.simplify();
             }
             Expression::MapRecord { expr, .. } => {
+                expr.simplify();
+            }
+            Expression::Process { expr, .. } => {
                 expr.simplify();
             }
         }
@@ -285,26 +273,13 @@ pub struct Pagination {
     cursor: Option<HashMap<String, PrismaValue>>,
     take: Option<i64>,
     skip: Option<i64>,
-    linking_fields: Option<Vec<String>>,
 }
 
 #[bon]
 impl Pagination {
     #[builder]
     pub fn new(cursor: Option<HashMap<String, PrismaValue>>, take: Option<i64>, skip: Option<i64>) -> Self {
-        Self {
-            cursor,
-            take,
-            skip,
-            linking_fields: None,
-        }
-    }
-
-    pub fn with_linking_fields(self, linking_fields: impl Into<Vec<String>>) -> Self {
-        Self {
-            linking_fields: Some(linking_fields.into()),
-            ..self
-        }
+        Self { cursor, take, skip }
     }
 
     pub fn cursor(&self) -> Option<&HashMap<String, PrismaValue>> {
@@ -317,6 +292,45 @@ impl Pagination {
 
     pub fn skip(&self) -> Option<i64> {
         self.skip
+    }
+}
+
+#[derive(Debug, Default, Serialize, Builder)]
+#[serde(rename_all = "camelCase")]
+pub struct InMemoryOps {
+    pub(crate) pagination: Option<Pagination>,
+    pub(crate) distinct: Option<Vec<String>>,
+    #[builder(default)]
+    pub(crate) reverse: bool,
+    #[builder(default)]
+    pub(crate) nested: BTreeMap<String, InMemoryOps>,
+    pub(crate) linking_fields: Option<Vec<String>>,
+}
+
+impl InMemoryOps {
+    pub fn is_empty(&self) -> bool {
+        self.is_empty_toplevel() && self.nested.is_empty()
+    }
+
+    pub fn is_empty_toplevel(&self) -> bool {
+        self.pagination.is_none() && self.distinct.is_none() && !self.reverse
+    }
+
+    pub fn into_expression(self, inner: Expression) -> Expression {
+        if self.is_empty() {
+            inner
+        } else {
+            Expression::Process {
+                expr: inner.into(),
+                operations: self,
+            }
+        }
+    }
+}
+
+impl From<Pagination> for InMemoryOps {
+    fn from(pagination: Pagination) -> Self {
+        Self::builder().pagination(pagination).build()
     }
 }
 
@@ -399,7 +413,6 @@ impl Expression {
             Expression::GetFirstNonEmpty { .. } => ExpressionType::Dynamic,
             Expression::Query(_) => ExpressionType::List(Box::new(ExpressionType::Record)),
             Expression::Execute(_) => ExpressionType::Scalar,
-            Expression::Reverse(expression) => expression.r#type(),
             Expression::Sum(_) => ExpressionType::Scalar,
             Expression::Concat(vec) => ExpressionType::List(Box::new(
                 vec.iter().last().map_or(ExpressionType::Scalar, Expression::r#type),
@@ -425,9 +438,8 @@ impl Expression {
             }
             Expression::Unit => ExpressionType::Unit,
             Expression::Diff { from, .. } => from.r#type(),
-            Expression::DistinctBy { expr, .. } => expr.r#type(),
-            Expression::Paginate { expr, .. } => expr.r#type(),
             Expression::InitializeRecord { .. } | Expression::MapRecord { .. } => ExpressionType::Record,
+            Expression::Process { expr, .. } => expr.r#type(),
         }
     }
 
