@@ -1,0 +1,40 @@
+{
+  "modelName": "User",
+  "action": "findFirst",
+  "query": {
+    "arguments": {
+      "where": {
+        "email": {
+          "contains": "prisma.io"
+        }
+      },
+      "relationLoadStrategy": "query"
+    },
+    "selection": {
+      "posts": {
+        "arguments": {
+          "orderBy": {
+            "id": "asc"
+          }
+        },
+        "selection": {
+          "_count": {
+            "arguments": {},
+            "selection": {
+              "categories": {
+                "arguments": {
+                  "where": {
+                    "name": {
+                      "contains": "tech"
+                    }
+                  }
+                },
+                "selection": {}
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

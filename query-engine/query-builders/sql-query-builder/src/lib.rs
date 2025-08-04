@@ -151,10 +151,11 @@ impl<'a, V: Visitor<'a>> QueryBuilder for SqlQueryBuilder<'a, V> {
     ) -> Result<DbQuery, Box<dyn std::error::Error + Send + Sync>> {
         use std::slice;
 
+        use crate::read::SelectDefinition;
         use filter::default_scalar_filter;
         use itertools::Itertools;
-        use quaint::ast::{Aliasable, Joinable, Select};
-        use select::{JoinConditionExt, SelectBuilderExt};
+        use quaint::ast::{Aliasable, Joinable};
+        use select::JoinConditionExt;
 
         let chunkable = Chunkable::from(&query_arguments);
         let link_alias = linkage.to_string();
@@ -162,12 +163,6 @@ impl<'a, V: Visitor<'a>> QueryBuilder for SqlQueryBuilder<'a, V> {
 
         let m2m_alias = self.context.next_table_alias();
         let m2m_table = rf.as_table(&self.context).alias(m2m_alias.to_string());
-
-        let related_alias = self.context.next_table_alias();
-        let related_table = rf
-            .related_model()
-            .as_table(&self.context)
-            .alias(related_alias.to_string());
 
         let m2m_col = rf
             .related_field()
@@ -199,26 +194,24 @@ impl<'a, V: Visitor<'a>> QueryBuilder for SqlQueryBuilder<'a, V> {
 
         let columns = ModelProjection::from(selected_fields)
             .as_columns(&self.context)
-            .map(|col| col.table(related_alias.to_string()))
+            .map(|col| col.table(rf.related_model().as_table(&self.context)))
             // Add an m2m column with an alias to make it possible to join it outside of this
             // function.
             .chain([m2m_col.alias(link_alias)]);
 
-        let join_condition = rf.m2m_join_conditions(Some(m2m_alias), Some(related_alias), &self.context);
+        let join_condition = rf.m2m_join_conditions(Some(m2m_alias), None, &self.context);
 
-        let select = Select::from_table(m2m_table)
-            .columns(columns)
-            .inner_join(related_table.on(join_condition))
-            .with_distinct(&query_arguments, related_alias)
-            .with_ordering(&query_arguments, Some(related_alias.to_string()), &self.context)
-            .with_pagination(&query_arguments, None)
-            .with_filters(query_arguments.filter, Some(related_alias), &self.context);
-
+        let (select, additional_selection_set) =
+            query_arguments.into_select(&rf.related_model(), selected_fields.virtuals(), &self.context);
+        let select = select.columns(columns).inner_join(m2m_table.on(join_condition.clone()));
         let select = if let Some(filter) = filter {
             select.and_where(filter)
         } else {
             select
         };
+        let select = additional_selection_set
+            .into_iter()
+            .fold(select, |acc, val| acc.value(val));
 
         self.convert_query(select, chunkable)
     }

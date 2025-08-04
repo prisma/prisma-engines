@@ -1,0 +1,29 @@
+---
+source: query-compiler/query-compiler/tests/queries.rs
+expression: pretty
+input_file: query-compiler/query-compiler/tests/data/test.json
+---
+dataMap {
+    posts (from posts): {
+        _count (from _count): {
+            categories: Int (categories)
+        }
+    }
+}
+unique (query «SELECT "t0"."id", "User_posts"."__prisma_data__" AS "posts" FROM
+               "public"."User" AS "t0" LEFT JOIN LATERAL (SELECT
+               COALESCE(JSONB_AGG("__prisma_data__"), '[]') AS "__prisma_data__"
+               FROM (SELECT "t3"."__prisma_data__" FROM (SELECT
+               JSONB_BUILD_OBJECT('_count', JSONB_BUILD_OBJECT('categories',
+               COALESCE("t5"."_aggr_count_categories", 0))) AS
+               "__prisma_data__", "t2"."id" FROM (SELECT "t1".* FROM
+               "public"."Post" AS "t1" WHERE "t0"."id" = "t1"."userId" /* root
+               select */) AS "t2" LEFT JOIN LATERAL (SELECT COUNT(*) AS
+               "_aggr_count_categories" FROM "public"."Category" AS "t6" LEFT
+               JOIN "public"."_CategoryToPost" AS "t7" ON "t7"."A" = "t6"."id"
+               WHERE ("t7"."B" = "t2"."id" AND "t6"."name"::text LIKE $1)) AS
+               "t5" ON true /* inner select */) AS "t3" ORDER BY "t3"."id" ASC
+               /* middle select */) AS "t4" /* outer select */) AS "User_posts"
+               ON true WHERE "t0"."email" = $2 LIMIT $3»
+        params [const(String("%tech%")), const(String("john@doe.com")),
+                const(BigInt(1))])
