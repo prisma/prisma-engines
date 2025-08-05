@@ -3,10 +3,12 @@ import * as util from 'node:util'
 import {
   noopTracingHelper,
   normalizeJsonProtocolValues,
+  normalizeRawJsonProtocolResponse,
   QueryEvent,
   QueryInterpreter,
   type QueryInterpreterTransactionManager,
   QueryPlanNode,
+  RawResponse,
   safeJsonStringify,
   type TransactionManager,
   UserFacingError,
@@ -195,7 +197,10 @@ class QueryPipeline {
 function getResponseInQeFormat(query: JsonProtocolQuery, result: unknown) {
   return {
     data: {
-      [getFullOperationName(query)]: normalizeJsonProtocolValues(result),
+      [getFullOperationName(query)]:
+        query.action === 'queryRaw'
+          ? normalizeRawJsonProtocolResponse(result as RawResponse)
+          : normalizeJsonProtocolValues(result),
     },
   }
 }
