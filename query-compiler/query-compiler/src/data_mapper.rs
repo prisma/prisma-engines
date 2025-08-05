@@ -8,7 +8,9 @@ use query_core::{
     CreateManyRecordsFields, DeleteRecordFields, Node, Query, QueryGraph, ReadQuery, UpdateManyRecordsFields,
     UpdateRecord, WriteQuery, schema::constants::aggregations,
 };
-use query_structure::{AggregationSelection, FieldSelection, FieldTypeInformation, SelectedField};
+use query_structure::{
+    AggregationSelection, FieldSelection, FieldTypeInformation, PrismaValueType, SelectedField, TypeIdentifier,
+};
 use std::{borrow::Cow, collections::HashMap};
 
 pub fn map_result_structure(graph: &QueryGraph, builder: &mut ResultNodeBuilder) -> Option<ResultNode> {
@@ -129,15 +131,26 @@ fn get_result_node(
     for prisma_name in selection_order {
         match field_map.get(prisma_name.as_str()) {
             Some(sf @ SelectedField::Scalar(f)) => {
-                let name = if uses_relation_joins {
+                let from_name = if uses_relation_joins {
                     sf.prisma_name()
                 } else {
                     sf.db_name()
                 };
-                node.add_field(
-                    prisma_name.to_owned(),
-                    builder.new_value(name.into_owned(), f.type_info()),
-                );
+                let to_name = prisma_name.to_owned();
+                let type_info = f.type_info();
+
+                // JSON fields get returned directly as objects when using relation joins
+                if uses_relation_joins && type_info.typ.id == TypeIdentifier::Json {
+                    let mut result_type = PrismaValueType::Object;
+                    if type_info.arity.is_list() {
+                        result_type = PrismaValueType::Array(result_type.into());
+                    }
+                    let db_name = from_name.into_owned().into();
+                    node.add_field(to_name, ResultNode::Value { db_name, result_type });
+                } else {
+                    let field = builder.new_value(from_name.into_owned(), type_info);
+                    node.add_field(to_name, field);
+                }
             }
             Some(SelectedField::Composite(_)) => todo!("MongoDB specific"),
             Some(SelectedField::Relation(f)) => {
