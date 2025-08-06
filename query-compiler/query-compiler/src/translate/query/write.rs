@@ -388,7 +388,7 @@ fn build_query_from_record_filter(
     }
 
     let query = builder
-        .build_get_records(model, query_args, &projection, RelationLoadStrategy::Query)
+        .build_get_records(model, query_args, projection, RelationLoadStrategy::Query)
         .map_err(TranslateError::QueryBuildFailure)?
         .into_iter()
         .exactly_one()
