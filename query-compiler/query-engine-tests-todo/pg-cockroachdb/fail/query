@@ -1,7 +1,5 @@
 new::relation_load_strategy::batch::relation_load_strategy_batch::compacted_join_lateral
 new::relation_load_strategy::batch::relation_load_strategy_batch::compacted_query_lateral
 queries::aggregation::group_by::aggregation_group_by::group_by_ordering_sum_aggregation
-queries::data_types::json::json::json_list
 queries::filters::self_relation_regression::sr_regression::all_categories
 queries::simple::m2m::m2m::repro_16390
-raw::sql::scalar_list::scalar_list::null_scalar_lists
