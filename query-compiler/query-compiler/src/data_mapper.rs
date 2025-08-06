@@ -55,6 +55,7 @@ fn map_read_query(
             &q.selection_order,
             &q.nested,
             q.relation_load_strategy.is_join(),
+            true,
             builder,
             object_name,
         ),
@@ -63,6 +64,7 @@ fn map_read_query(
             &q.selection_order,
             &q.nested,
             q.relation_load_strategy.is_join(),
+            true,
             builder,
             object_name,
         ),
@@ -71,6 +73,7 @@ fn map_read_query(
             &q.selection_order,
             &q.nested,
             false,
+            true,
             builder,
             object_name,
         ),
@@ -83,13 +86,13 @@ fn map_read_query(
 fn map_write_query(query: &WriteQuery, builder: &mut ResultNodeBuilder) -> Option<ResultNode> {
     match query {
         WriteQuery::CreateRecord(q) => {
-            get_result_node(&q.selected_fields, &q.selection_order, &[], false, builder, None)
+            get_result_node(&q.selected_fields, &q.selection_order, &[], false, true, builder, None)
         }
         WriteQuery::CreateManyRecords(q) => get_result_node_for_create_many(q.selected_fields.as_ref(), builder),
         WriteQuery::UpdateRecord(u) => {
             match u {
                 UpdateRecord::WithSelection(w) => {
-                    get_result_node(&w.selected_fields, &w.selection_order, &[], false, builder, None)
+                    get_result_node(&w.selected_fields, &w.selection_order, &[], false, true, builder, None)
                 }
                 UpdateRecord::WithoutSelection(_) => None, // No result data
             }
@@ -101,7 +104,9 @@ fn map_write_query(query: &WriteQuery, builder: &mut ResultNodeBuilder) -> Optio
         WriteQuery::DisconnectRecords(_) => None, // No result data
         WriteQuery::ExecuteRaw(_) => None,        // No data mapping
         WriteQuery::QueryRaw(_) => None,          // No data mapping
-        WriteQuery::Upsert(q) => get_result_node(&q.selected_fields, &q.selection_order, &[], false, builder, None),
+        WriteQuery::Upsert(q) => {
+            get_result_node(&q.selected_fields, &q.selection_order, &[], false, true, builder, None)
+        }
     }
 }
 
@@ -111,6 +116,7 @@ fn get_result_node(
     nested_queries: &[ReadQuery],
     // relationJoins queries use prisma names rather than db names
     uses_relation_joins: bool,
+    is_top_level: bool,
     builder: &mut ResultNodeBuilder,
     original_name: Option<Cow<'static, str>>,
 ) -> Option<ResultNode> {
@@ -140,7 +146,7 @@ fn get_result_node(
                 let type_info = f.type_info();
 
                 // JSON fields get returned directly as objects when using relation joins
-                if uses_relation_joins && type_info.typ.id == TypeIdentifier::Json {
+                if uses_relation_joins && !is_top_level && type_info.typ.id == TypeIdentifier::Json {
                     let mut result_type = PrismaValueType::Object;
                     if type_info.arity.is_list() {
                         result_type = PrismaValueType::Array(result_type.into());
@@ -160,6 +166,7 @@ fn get_result_node(
                     &f.result_fields,
                     &[],
                     uses_relation_joins,
+                    false,
                     builder,
                     Some(if uses_relation_joins {
                         f.field.name().to_owned().into()
@@ -278,6 +285,7 @@ fn get_result_node_for_create_many(
         &selected_fields?.order,
         &selected_fields?.nested,
         false,
+        true,
         builder,
         None,
     )
@@ -292,6 +300,7 @@ fn get_result_node_for_delete(
         &selected_fields?.order,
         &[],
         false,
+        true,
         builder,
         None,
     )
@@ -306,6 +315,7 @@ fn get_result_node_for_update_many(
         &selected_fields?.order,
         &selected_fields?.nested,
         false,
+        true,
         builder,
         None,
     )
