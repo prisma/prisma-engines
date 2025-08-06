@@ -2,6 +2,7 @@ use crate::{
     binding,
     result_node::{ResultNode, ResultNodeBuilder},
 };
+use bon::builder;
 use indexmap::IndexSet;
 use itertools::Itertools;
 use query_core::{
@@ -50,33 +51,29 @@ fn map_read_query(
     object_name: Option<Cow<'static, str>>,
 ) -> Option<ResultNode> {
     match query {
-        ReadQuery::RecordQuery(q) => get_result_node(
-            &q.selected_fields,
-            &q.selection_order,
-            &q.nested,
-            q.relation_load_strategy.is_join(),
-            true,
-            builder,
-            object_name,
-        ),
-        ReadQuery::ManyRecordsQuery(q) => get_result_node(
-            &q.selected_fields,
-            &q.selection_order,
-            &q.nested,
-            q.relation_load_strategy.is_join(),
-            true,
-            builder,
-            object_name,
-        ),
-        ReadQuery::RelatedRecordsQuery(q) => get_result_node(
-            &q.selected_fields,
-            &q.selection_order,
-            &q.nested,
-            false,
-            true,
-            builder,
-            object_name,
-        ),
+        ReadQuery::RecordQuery(q) => get_result_node()
+            .field_selection(&q.selected_fields)
+            .selection_order(&q.selection_order)
+            .nested_queries(&q.nested)
+            .builder(builder)
+            .maybe_original_name(object_name)
+            .uses_relation_joins(q.relation_load_strategy.is_join())
+            .call(),
+        ReadQuery::ManyRecordsQuery(q) => get_result_node()
+            .field_selection(&q.selected_fields)
+            .selection_order(&q.selection_order)
+            .nested_queries(&q.nested)
+            .builder(builder)
+            .maybe_original_name(object_name)
+            .uses_relation_joins(q.relation_load_strategy.is_join())
+            .call(),
+        ReadQuery::RelatedRecordsQuery(q) => get_result_node()
+            .field_selection(&q.selected_fields)
+            .selection_order(&q.selection_order)
+            .nested_queries(&q.nested)
+            .builder(builder)
+            .maybe_original_name(object_name)
+            .call(),
         ReadQuery::AggregateRecordsQuery(q) => {
             get_result_node_for_aggregation(&q.selectors, &q.selection_order, builder, object_name)
         }
@@ -85,15 +82,19 @@ fn map_read_query(
 
 fn map_write_query(query: &WriteQuery, builder: &mut ResultNodeBuilder) -> Option<ResultNode> {
     match query {
-        WriteQuery::CreateRecord(q) => {
-            get_result_node(&q.selected_fields, &q.selection_order, &[], false, true, builder, None)
-        }
+        WriteQuery::CreateRecord(q) => get_result_node()
+            .field_selection(&q.selected_fields)
+            .selection_order(&q.selection_order)
+            .builder(builder)
+            .call(),
         WriteQuery::CreateManyRecords(q) => get_result_node_for_create_many(q.selected_fields.as_ref(), builder),
         WriteQuery::UpdateRecord(u) => {
             match u {
-                UpdateRecord::WithSelection(w) => {
-                    get_result_node(&w.selected_fields, &w.selection_order, &[], false, true, builder, None)
-                }
+                UpdateRecord::WithSelection(w) => get_result_node()
+                    .field_selection(&w.selected_fields)
+                    .selection_order(&w.selection_order)
+                    .builder(builder)
+                    .call(),
                 UpdateRecord::WithoutSelection(_) => None, // No result data
             }
         }
@@ -104,20 +105,23 @@ fn map_write_query(query: &WriteQuery, builder: &mut ResultNodeBuilder) -> Optio
         WriteQuery::DisconnectRecords(_) => None, // No result data
         WriteQuery::ExecuteRaw(_) => None,        // No data mapping
         WriteQuery::QueryRaw(_) => None,          // No data mapping
-        WriteQuery::Upsert(q) => {
-            get_result_node(&q.selected_fields, &q.selection_order, &[], false, true, builder, None)
-        }
+        WriteQuery::Upsert(q) => get_result_node()
+            .field_selection(&q.selected_fields)
+            .selection_order(&q.selection_order)
+            .builder(builder)
+            .call(),
     }
 }
 
+#[builder]
 fn get_result_node(
     field_selection: &FieldSelection,
     selection_order: &[String],
-    nested_queries: &[ReadQuery],
+    #[builder(default = &[])] nested_queries: &[ReadQuery],
     // relationJoins queries use prisma names rather than db names
-    uses_relation_joins: bool,
-    is_top_level: bool,
-    builder: &mut ResultNodeBuilder,
+    #[builder(default = false)] uses_relation_joins: bool,
+    #[builder(default = false)] is_nested: bool,
+    builder: &mut ResultNodeBuilder<'_>,
     original_name: Option<Cow<'static, str>>,
 ) -> Option<ResultNode> {
     let field_map = field_selection
@@ -145,8 +149,8 @@ fn get_result_node(
                 let to_name = prisma_name.to_owned();
                 let type_info = f.type_info();
 
-                // JSON fields get returned directly as objects when using relation joins
-                if uses_relation_joins && !is_top_level && type_info.typ.id == TypeIdentifier::Json {
+                // nested JSON fields get returned directly as objects when using relation joins
+                if uses_relation_joins && is_nested && type_info.typ.id == TypeIdentifier::Json {
                     let mut result_type = PrismaValueType::Object;
                     if type_info.arity.is_list() {
                         result_type = PrismaValueType::Array(result_type.into());
@@ -161,19 +165,19 @@ fn get_result_node(
             Some(SelectedField::Composite(_)) => todo!("MongoDB specific"),
             Some(SelectedField::Relation(f)) => {
                 let nested_selection = FieldSelection::new(f.selections.to_vec());
-                let nested_node = get_result_node(
-                    &nested_selection,
-                    &f.result_fields,
-                    &[],
-                    uses_relation_joins,
-                    false,
-                    builder,
-                    Some(if uses_relation_joins {
-                        f.field.name().to_owned().into()
-                    } else {
-                        binding::nested_relation_field(&f.field)
-                    }),
-                );
+                let original_name = if uses_relation_joins {
+                    f.field.name().to_owned().into()
+                } else {
+                    binding::nested_relation_field(&f.field)
+                };
+                let nested_node = get_result_node()
+                    .field_selection(&nested_selection)
+                    .selection_order(&f.result_fields)
+                    .builder(builder)
+                    .original_name(original_name)
+                    .uses_relation_joins(uses_relation_joins)
+                    .is_nested(true)
+                    .call();
                 if let Some(nested_node) = nested_node {
                     node.add_field(f.field.name().to_owned(), nested_node);
                 }
@@ -280,43 +284,33 @@ fn get_result_node_for_create_many(
     selected_fields: Option<&CreateManyRecordsFields>,
     builder: &mut ResultNodeBuilder,
 ) -> Option<ResultNode> {
-    get_result_node(
-        &selected_fields?.fields,
-        &selected_fields?.order,
-        &selected_fields?.nested,
-        false,
-        true,
-        builder,
-        None,
-    )
+    get_result_node()
+        .field_selection(&selected_fields?.fields)
+        .selection_order(&selected_fields?.order)
+        .nested_queries(&selected_fields?.nested)
+        .builder(builder)
+        .call()
 }
 
 fn get_result_node_for_delete(
     selected_fields: Option<&DeleteRecordFields>,
     builder: &mut ResultNodeBuilder,
 ) -> Option<ResultNode> {
-    get_result_node(
-        &selected_fields?.fields,
-        &selected_fields?.order,
-        &[],
-        false,
-        true,
-        builder,
-        None,
-    )
+    get_result_node()
+        .field_selection(&selected_fields?.fields)
+        .selection_order(&selected_fields?.order)
+        .builder(builder)
+        .call()
 }
 
 fn get_result_node_for_update_many(
     selected_fields: Option<&UpdateManyRecordsFields>,
     builder: &mut ResultNodeBuilder,
 ) -> Option<ResultNode> {
-    get_result_node(
-        &selected_fields?.fields,
-        &selected_fields?.order,
-        &selected_fields?.nested,
-        false,
-        true,
-        builder,
-        None,
-    )
+    get_result_node()
+        .field_selection(&selected_fields?.fields)
+        .selection_order(&selected_fields?.order)
+        .nested_queries(&selected_fields?.nested)
+        .builder(builder)
+        .call()
 }
