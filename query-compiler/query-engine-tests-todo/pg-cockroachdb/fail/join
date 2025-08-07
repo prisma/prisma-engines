@@ -3,7 +3,6 @@ new::relation_load_strategy::batch::relation_load_strategy_batch::compacted_quer
 queries::aggregation::group_by::aggregation_group_by::group_by_ordering_sum_aggregation
 queries::aggregation::many_count_relation::many_count_rel::count_with_distinct
 queries::aggregation::uniq_count_relation::uniq_count_rel::count_with_distinct
-queries::data_types::json::json::json_list
 queries::data_types::through_relation::scalar_relations::scalar_lists
 queries::distinct::distinct::nested_distinct
 queries::distinct::distinct::nested_distinct_not_in_selection
@@ -16,7 +15,3 @@ queries::order_and_pagination::nested_pagination::nested_pagination::mid_lvl_ski
 queries::order_and_pagination::nested_pagination::nested_pagination::mid_lvl_take_minus_3
 queries::order_and_pagination::nested_pagination::nested_pagination::mid_lvl_take_minus_4
 queries::simple::m2m::m2m::repro_16390
-raw::sql::errors::raw_errors::list_param_for_scalar_column_should_not_panic_pg_crdb
-raw::sql::errors::raw_errors::list_param_for_scalar_column_should_not_panic_pg_js
-raw::sql::scalar_list::scalar_list::null_native_type_lists
-raw::sql::scalar_list::scalar_list::null_scalar_lists

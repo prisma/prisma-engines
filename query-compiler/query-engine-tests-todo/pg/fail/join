@@ -1,7 +1,6 @@
 new::relation_load_strategy::batch::relation_load_strategy_batch::compacted_join_lateral
 new::relation_load_strategy::batch::relation_load_strategy_batch::compacted_query_lateral
 queries::aggregation::group_by::aggregation_group_by::group_by_ordering_sum_aggregation
-queries::data_types::json::json::json_list
 queries::distinct::distinct::nested_distinct
 queries::distinct::distinct::nested_distinct_not_in_selection
 queries::distinct::distinct::nested_distinct_reversed
@@ -12,8 +11,4 @@ queries::order_and_pagination::nested_pagination::nested_pagination::mid_lvl_ski
 queries::order_and_pagination::nested_pagination::nested_pagination::mid_lvl_take_minus_3
 queries::order_and_pagination::nested_pagination::nested_pagination::mid_lvl_take_minus_4
 queries::simple::m2m::m2m::repro_16390
-raw::sql::errors::raw_errors::list_param_for_scalar_column_should_not_panic_pg_js
-raw::sql::scalar_list::scalar_list::null_native_type_lists
-raw::sql::scalar_list::scalar_list::null_scalar_lists
-raw::sql::typed_output::typed_output::all_scalars_pg
 writes::nested_mutations::already_converted::nested_connect_inside_update::connect_inside_update::p1_c1req_rel_child_idempotent

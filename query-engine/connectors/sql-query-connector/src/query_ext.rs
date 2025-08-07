@@ -242,7 +242,8 @@ pub fn convert_prisma_type_to_opaque_type(pt: &PrismaValueType) -> OpaqueType {
         PrismaValueType::Date => OpaqueType::DateTime,
         PrismaValueType::Time => OpaqueType::Time,
         PrismaValueType::Array(t) => OpaqueType::Array(Box::new(convert_prisma_type_to_opaque_type(t))),
-        PrismaValueType::Object => OpaqueType::Json,
+        PrismaValueType::Json => OpaqueType::Json,
+        PrismaValueType::Object => OpaqueType::Object,
         PrismaValueType::Bytes => OpaqueType::Bytes,
         PrismaValueType::Enum { .. } => OpaqueType::Text,
     }
