@@ -327,6 +327,230 @@ async fn re_intro_does_not_keep_column_arity_if_list(api: &mut TestApi) -> TestR
 }
 
 #[test_connector(tags(Postgres), exclude(CockroachDb), preview_features("views"))]
+async fn re_intro_keeps_back_relations(api: &mut TestApi) -> TestResult {
+    let setup = indoc! {r#"
+        CREATE TABLE "User" (
+            id SERIAL PRIMARY KEY,
+            first_name VARCHAR(255) NOT NULL,
+            last_name VARCHAR(255) NULL
+        );
+
+        CREATE TABLE "Profile" (
+            user_id INT PRIMARY KEY,
+            introduction TEXT,
+            CONSTRAINT Profile_User_fkey FOREIGN KEY (user_id) REFERENCES "User"(id)
+        );
+
+        CREATE TABLE "Random" (
+            id INT PRIMARY KEY,
+            view_id INT NOT NULL
+        );
+
+        CREATE VIEW "Schwuser" AS
+            SELECT
+                u.id,
+                CONCAT(u.first_name, ' ', u.last_name) AS name,
+                p.introduction
+            FROM "User" u
+            INNER JOIN "Profile" p ON u.id = p.user_id;
+    "#};
+
+    api.raw_cmd(setup).await;
+
+    let input = indoc! {r#"
+        model Profile {
+          user_id      Int     @id
+          introduction String?
+          User         User    @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "profile_user_fkey")
+        }
+
+        model User {
+          id         Int      @id @default(autoincrement())
+          first_name String   @db.VarChar(255)
+          last_name  String?  @db.VarChar(255)
+          Profile    Profile?
+        }
+
+        model Random {
+          id       Int       @id
+          view_id  Int?
+          schwuser Schwuser? @relation(fields: [view_id], references: [id])
+        }
+
+        view Schwuser {
+          id         Int      @unique
+          first_name String   @db.VarChar(255)
+          last_name  String?  @db.VarChar(255)
+          random     Random[]
+        }
+    "#};
+
+    let expected = expect![[r#"
+        model Profile {
+          user_id      Int     @id
+          introduction String?
+          User         User    @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "profile_user_fkey")
+        }
+
+        model User {
+          id         Int      @id @default(autoincrement())
+          first_name String   @db.VarChar(255)
+          last_name  String?  @db.VarChar(255)
+          Profile    Profile?
+        }
+
+        model Random {
+          id       Int       @id
+          view_id  Int
+          schwuser Schwuser? @relation(fields: [view_id], references: [id])
+        }
+
+        view Schwuser {
+          id           Int      @unique
+          name         String?
+          introduction String?
+          random       Random[]
+        }
+    "#]];
+
+    api.expect_re_introspected_datamodel(input, expected).await;
+
+    Ok(())
+}
+
+#[test_connector(tags(Postgres), exclude(CockroachDb), preview_features("views"))]
+async fn re_intro_keeps_forward_relations(api: &mut TestApi) -> TestResult {
+    let setup = indoc! {r#"
+        CREATE TABLE "User" (
+            id SERIAL PRIMARY KEY,
+            first_name VARCHAR(255) NOT NULL,
+            last_name VARCHAR(255) NULL
+        );
+
+        CREATE TABLE "Profile" (
+            user_id INT PRIMARY KEY,
+            introduction TEXT,
+            CONSTRAINT Profile_User_fkey FOREIGN KEY (user_id) REFERENCES "User"(id)
+        );
+
+        CREATE TABLE "Random" (
+            id INT PRIMARY KEY
+        );
+
+        CREATE VIEW "Schwuser" AS
+            SELECT
+                u.id,
+                CONCAT(u.first_name, ' ', u.last_name) AS name,
+                p.introduction,
+                1 AS random_id
+            FROM "User" u
+            INNER JOIN "Profile" p ON u.id = p.user_id;
+    "#};
+
+    api.raw_cmd(setup).await;
+
+    let input = indoc! {r#"
+        model Profile {
+          user_id      Int     @id
+          introduction String?
+          User         User    @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "profile_user_fkey")
+        }
+
+        model User {
+          id         Int      @id @default(autoincrement())
+          first_name String   @db.VarChar(255)
+          last_name  String?  @db.VarChar(255)
+          Profile    Profile?
+        }
+
+        model Random {
+          id       Int        @id
+          schwuser Schwuser[]
+        }
+
+        view Schwuser {
+          id         Int     @unique
+          first_name String  @db.VarChar(255)
+          last_name  String? @db.VarChar(255)
+          random_id  Int?
+          random     Random? @relation(fields: [random_id], references: [id])
+        }
+    "#};
+
+    let expected = expect![[r#"
+        model Profile {
+          user_id      Int     @id
+          introduction String?
+          User         User    @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "profile_user_fkey")
+        }
+
+        model User {
+          id         Int      @id @default(autoincrement())
+          first_name String   @db.VarChar(255)
+          last_name  String?  @db.VarChar(255)
+          Profile    Profile?
+        }
+
+        model Random {
+          id       Int        @id
+          schwuser Schwuser[]
+        }
+
+        view Schwuser {
+          id           Int     @unique
+          name         String?
+          introduction String?
+          random_id    Int?
+          random       Random? @relation(fields: [random_id], references: [id])
+        }
+    "#]];
+
+    api.expect_re_introspected_datamodel(input, expected).await;
+
+    Ok(())
+}
+
+#[test_connector(tags(Postgres), exclude(CockroachDb), preview_features("views"))]
+async fn re_intro_keeps_view_to_view_relations(api: &mut TestApi) -> TestResult {
+    let setup = indoc! {r#"
+        CREATE VIEW "A" AS SELECT 1 AS id;
+        CREATE VIEW "B" AS SELECT 2 AS id, 1 AS a_id;
+    "#};
+
+    api.raw_cmd(setup).await;
+
+    let input = indoc! {r#"
+        view A {
+          id Int @unique
+          b  B[]
+        }
+
+        view B {
+          id   Int  @unique
+          a_id Int?
+          a    A?   @relation(fields: [a_id], references: [id])
+        }
+    "#};
+
+    let expected = expect![[r#"
+        view A {
+          id Int @unique
+          b  B[]
+        }
+
+        view B {
+          id   Int  @unique
+          a_id Int?
+          a    A?   @relation(fields: [a_id], references: [id])
+        }
+    "#]];
+
+    api.expect_re_introspected_datamodel(input, expected).await;
+
+    Ok(())
+}
+
+#[test_connector(tags(Postgres), exclude(CockroachDb), preview_features("views"))]
 async fn re_intro_keeps_comments(api: &mut TestApi) -> TestResult {
     let setup = indoc! {r#"
         CREATE VIEW "A" AS SELECT 1 AS id;

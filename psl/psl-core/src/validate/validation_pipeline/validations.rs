@@ -166,8 +166,6 @@ pub(super) fn validate(ctx: &mut Context<'_>) {
     }
 
     for relation in ctx.db.walk_relations() {
-        relations::is_used_with_a_view(relation, ctx);
-
         match relation.refine() {
             // 1:1, 1:n
             RefinedRelationWalker::Inline(relation) => {
