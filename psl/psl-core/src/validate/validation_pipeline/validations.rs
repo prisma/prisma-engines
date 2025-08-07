@@ -138,6 +138,7 @@ pub(super) fn validate(ctx: &mut Context<'_>) {
             indexes::clustering_can_be_defined_only_once(index, ctx);
             indexes::opclasses_are_not_allowed_with_other_than_normal_indices(index, ctx);
             indexes::composite_type_in_compound_unique_index(index, ctx);
+            indexes::partial_index_is_supported(index, ctx);
 
             for field_attribute in index.scalar_field_attributes() {
                 let span = index.ast_attribute().span;

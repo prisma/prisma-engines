@@ -177,6 +177,11 @@ impl<'db> IndexWalker<'db> {
         self.index_attribute.clustered
     }
 
+    /// The WHERE clause of the partial index, if any.
+    pub fn where_clause(self) -> Option<&'db str> {
+        self.index_attribute.where_clause.map(|id| &self.db[id])
+    }
+
     /// The model the index is defined on.
     pub fn model(self) -> ModelWalker<'db> {
         self.db.walk(self.model_id)

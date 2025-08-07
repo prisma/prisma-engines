@@ -391,6 +391,7 @@ impl SqlRenderer for PostgresRenderer {
                     operator_class: pg_ext.get_opclass(c.id).map(|c| c.kind.as_ref().into()),
                 })
                 .collect(),
+            where_clause: pg_ext.get_partial_index_where_clause(index.id).map(|s| s.as_str()),
         }
         .to_string()
     }

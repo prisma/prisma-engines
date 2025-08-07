@@ -1,8 +1,8 @@
 //! Rendering of the datasource and generator parts of the PSL.
 
 use datamodel_renderer as render;
-use psl::ValidatedSchema;
-use sql_schema_describer::SqlSchema;
+use psl::{PreviewFeature, ValidatedSchema};
+use sql_schema_describer::{SqlSchema, postgres::PostgresSchemaExt};
 
 /// Render a configuration block.
 pub(super) fn render<'a>(
@@ -25,11 +25,27 @@ pub(super) fn render<'a>(
     for prev_gen in &previous_schema.configuration.generators {
         let prev_gen_file_name = previous_schema.db.file_name(prev_gen.span.file_id);
 
-        output.push_generator(
-            prev_gen_file_name.to_owned(),
-            render::configuration::Generator::from_psl(prev_gen),
-        );
+        let mut generator = render::configuration::Generator::from_psl(prev_gen);
+
+        // Add partialIndexes preview feature if partial indexes are detected and not already present
+        if has_partial_indexes(schema)
+            && (prev_ds.active_connector.is_provider("postgresql")
+                || prev_ds.active_connector.is_provider("cockroachdb"))
+            && !prev_gen
+                .preview_features
+                .is_some_and(|features| features.contains(PreviewFeature::PartialIndexes))
+        {
+            generator.push_preview_feature(PreviewFeature::PartialIndexes);
+        }
+
+        output.push_generator(prev_gen_file_name.to_owned(), generator);
     }
 
     output
+}
+
+/// Check if the schema contains any partial indexes.
+fn has_partial_indexes(schema: &SqlSchema) -> bool {
+    let pg_ext: &PostgresSchemaExt = schema.downcast_connector_data();
+    !pg_ext.partial_indexes.is_empty()
 }

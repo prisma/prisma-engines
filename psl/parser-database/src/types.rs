@@ -493,6 +493,7 @@ pub(crate) struct IndexAttribute {
     pub(crate) mapped_name: Option<StringId>,
     pub(crate) algorithm: Option<IndexAlgorithm>,
     pub(crate) clustered: Option<bool>,
+    pub(crate) where_clause: Option<StringId>,
 }
 
 impl IndexAttribute {

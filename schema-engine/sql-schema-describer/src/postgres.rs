@@ -153,6 +153,8 @@ pub struct PostgresSchemaExt {
     pub constraint_options: HashMap<Constraint, BitFlags<ConstraintOption>>,
     pub table_options: Vec<BTreeMap<String, String>>,
     pub exclude_constraints: Vec<(TableId, String)>,
+    /// WHERE clauses for partial indexes
+    pub partial_indexes: HashMap<IndexId, String>,
     /// The schema's sequences.
     pub sequences: Vec<Sequence>,
     /// The extensions included in the schema(s).
@@ -249,6 +251,10 @@ impl PostgresSchemaExt {
             Some(opts) => opts.contains(ConstraintOption::Deferrable) || opts.contains(ConstraintOption::Deferred),
             None => false,
         }
+    }
+
+    pub fn get_partial_index_where_clause(&self, index_id: IndexId) -> Option<&String> {
+        self.partial_indexes.get(&index_id)
     }
 
     pub fn exclude_constraints(&self, table_id: TableId) -> impl ExactSizeIterator<Item = &str> {
@@ -1418,12 +1424,19 @@ fn index_from_row(
         if column_index == 0 {
             // new index!
             let index_id = if is_primary_key {
-                sql_schema.push_primary_key(table_id, index_name)
+                sql_schema.push_primary_key(table_id, index_name.clone())
             } else if is_unique {
-                sql_schema.push_unique_constraint(table_id, index_name)
+                sql_schema.push_unique_constraint(table_id, index_name.clone())
             } else {
-                sql_schema.push_index(table_id, index_name)
+                sql_schema.push_index(table_id, index_name.clone())
             };
+
+            // Store WHERE clause for partial indexes
+            if let Some(where_clause) = row.get_string("where_clause") {
+                if !where_clause.is_empty() {
+                    pg_ext.partial_indexes.insert(index_id, where_clause);
+                }
+            }
 
             if is_primary_key || is_unique {
                 let mut constraint_options = BitFlags::empty();

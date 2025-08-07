@@ -1,0 +1,47 @@
+// tags=postgres
+// exclude=cockroachdb
+
+datasource testds {
+    provider = "postgresql"
+    url = env("TEST_DATABASE_URL")
+}
+
+generator js {
+    provider = "prisma-client-js"
+    previewFeatures = ["partialIndexes"]
+}
+
+model Document {
+  id        Int       @id @default(autoincrement())
+  tags      String[]
+  published Boolean   @default(false)
+
+  @@index([tags], type: Gin, where: "published = true")
+}
+
+// -- CreateTable
+// CREATE TABLE "Document" (
+//     "id" SERIAL NOT NULL,
+//     "tags" TEXT[],
+//     "published" BOOLEAN NOT NULL DEFAULT false,
+//
+//     CONSTRAINT "Document_pkey" PRIMARY KEY ("id")
+// );
+
+// -- CreateIndex
+// CREATE INDEX "Document_tags_idx" ON "Document" USING GIN ("tags") WHERE published = true;
+// Expected Migration:
+// -- CreateSchema
+// CREATE SCHEMA IF NOT EXISTS "public";
+// 
+// -- CreateTable
+// CREATE TABLE "public"."Document" (
+//     "id" SERIAL NOT NULL,
+//     "tags" TEXT[],
+//     "published" BOOLEAN NOT NULL DEFAULT false,
+// 
+//     CONSTRAINT "Document_pkey" PRIMARY KEY ("id")
+// );
+// 
+// -- CreateIndex
+// CREATE INDEX "Document_tags_idx" ON "public"."Document" USING GIN ("tags") WHERE published = true;

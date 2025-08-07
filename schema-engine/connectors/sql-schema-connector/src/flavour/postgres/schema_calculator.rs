@@ -137,6 +137,13 @@ impl SqlSchemaCalculatorFlavour for PostgresSchemaCalculatorFlavour {
                         postgres_ext.opclasses.push((field_id, opclass));
                     }
                 }
+
+                // Add WHERE clause for partial indexes
+                if let Some(where_clause) = index.where_clause() {
+                    postgres_ext
+                        .partial_indexes
+                        .insert(sql_index.id, where_clause.to_string());
+                }
             }
 
             // Add sequences for the fields with a default sequence in the model.

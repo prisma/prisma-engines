@@ -73,6 +73,7 @@ features!(
     OrderByAggregateGroup,
     OrderByNulls,
     OrderByRelation,
+    PartialIndexes,
     PostgresqlExtensions,
     PrismaSchemaFolder,
     QueryCompiler,
@@ -156,6 +157,7 @@ impl<'a> FeatureMapWithProvider<'a> {
                  DriverAdapters
                  | Metrics
                  | NativeDistinct
+                 | PartialIndexes
                  | PostgresqlExtensions
                  | QueryCompiler
                  | RelationJoins

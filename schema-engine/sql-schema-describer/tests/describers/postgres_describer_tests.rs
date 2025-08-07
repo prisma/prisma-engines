@@ -1037,6 +1037,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                 {},
             ],
             exclude_constraints: [],
+            partial_indexes: {},
             sequences: [
                 Sequence {
                     namespace_id: NamespaceId(
@@ -1214,6 +1215,7 @@ fn postgres_sequences_must_work(api: TestApi) {
             constraint_options: {},
             table_options: [],
             exclude_constraints: [],
+            partial_indexes: {},
             sequences: [
                 Sequence {
                     namespace_id: NamespaceId(
@@ -1815,6 +1817,7 @@ fn extensions_are_described_correctly(api: TestApi) {
             constraint_options: {},
             table_options: [],
             exclude_constraints: [],
+            partial_indexes: {},
             sequences: [],
             extensions: [
                 DatabaseExtension {

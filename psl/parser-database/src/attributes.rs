@@ -537,6 +537,20 @@ fn model_index(data: &mut ModelAttributes, model_id: crate::ModelId, ctx: &mut C
     index_attribute.algorithm = algo;
     index_attribute.clustered = validate_clustering_setting(ctx);
 
+    let where_clause = match ctx
+        .visit_optional_arg("where")
+        .and_then(|expr| coerce::string(expr, ctx.diagnostics))
+    {
+        Some("") => {
+            ctx.push_attribute_validation_error("The `where` argument cannot be an empty string.");
+            None
+        }
+        Some(clause) => Some(ctx.interner.intern(clause)),
+        None => None,
+    };
+
+    index_attribute.where_clause = where_clause;
+
     data.ast_indexes.push((ctx.current_attribute_id().1, index_attribute));
 }
 
@@ -592,6 +606,20 @@ fn model_unique(data: &mut ModelAttributes, model_id: crate::ModelId, ctx: &mut 
     index_attribute.name = name;
     index_attribute.mapped_name = mapped_name;
     index_attribute.clustered = validate_clustering_setting(ctx);
+
+    let where_clause = match ctx
+        .visit_optional_arg("where")
+        .and_then(|expr| coerce::string(expr, ctx.diagnostics))
+    {
+        Some("") => {
+            ctx.push_attribute_validation_error("The `where` argument cannot be an empty string.");
+            None
+        }
+        Some(clause) => Some(ctx.interner.intern(clause)),
+        None => None,
+    };
+
+    index_attribute.where_clause = where_clause;
 
     data.ast_indexes.push((current_attribute_id.1, index_attribute));
 }

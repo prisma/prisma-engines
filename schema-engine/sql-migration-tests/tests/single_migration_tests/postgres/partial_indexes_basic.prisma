@@ -1,0 +1,47 @@
+// tags=postgres
+// exclude=cockroachdb
+
+datasource testds {
+    provider = "postgresql"
+    url = env("TEST_DATABASE_URL")
+}
+
+generator js {
+    provider = "prisma-client-js"
+    previewFeatures = ["partialIndexes"]
+}
+
+model User {
+  id       Int      @id @default(autoincrement())
+  email    String?  @testds.VarChar(255)
+  isActive Boolean  @default(false)
+
+  @@index([email], where: "email IS NOT NULL")
+}
+
+// -- CreateTable
+// CREATE TABLE "User" (
+//     "id" SERIAL NOT NULL,
+//     "email" VARCHAR(255),
+//     "isActive" BOOLEAN NOT NULL DEFAULT false,
+//
+//     CONSTRAINT "User_pkey" PRIMARY KEY ("id")
+// );
+
+// -- CreateIndex
+// CREATE INDEX "User_email_idx" ON "User"("email") WHERE email IS NOT NULL;
+// Expected Migration:
+// -- CreateSchema
+// CREATE SCHEMA IF NOT EXISTS "public";
+// 
+// -- CreateTable
+// CREATE TABLE "public"."User" (
+//     "id" SERIAL NOT NULL,
+//     "email" VARCHAR(255),
+//     "isActive" BOOLEAN NOT NULL DEFAULT false,
+// 
+//     CONSTRAINT "User_pkey" PRIMARY KEY ("id")
+// );
+// 
+// -- CreateIndex
+// CREATE INDEX "User_email_idx" ON "public"."User"("email") WHERE email IS NOT NULL;

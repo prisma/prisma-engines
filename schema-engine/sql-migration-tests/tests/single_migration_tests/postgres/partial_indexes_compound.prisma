@@ -1,0 +1,50 @@
+// tags=postgres
+// exclude=cockroachdb
+
+datasource testds {
+    provider = "postgresql"
+    url = env("TEST_DATABASE_URL")
+}
+
+generator js {
+    provider = "prisma-client-js"
+    previewFeatures = ["partialIndexes"]
+}
+
+model Order {
+  id         Int       @id @default(autoincrement())
+  userId     Int
+  status     String    @testds.VarChar(20)
+  createdAt  DateTime? @testds.Timestamp(6)
+
+  @@index([userId, status], where: "status IN ('pending', 'processing')")
+}
+
+// -- CreateTable
+// CREATE TABLE "Order" (
+//     "id" SERIAL NOT NULL,
+//     "userId" INTEGER NOT NULL,
+//     "status" VARCHAR(20) NOT NULL,
+//     "createdAt" TIMESTAMP(6),
+//
+//     CONSTRAINT "Order_pkey" PRIMARY KEY ("id")
+// );
+
+// -- CreateIndex
+// CREATE INDEX "Order_userId_status_idx" ON "Order"("userId", "status") WHERE status IN ('pending', 'processing');
+// Expected Migration:
+// -- CreateSchema
+// CREATE SCHEMA IF NOT EXISTS "public";
+// 
+// -- CreateTable
+// CREATE TABLE "public"."Order" (
+//     "id" SERIAL NOT NULL,
+//     "userId" INTEGER NOT NULL,
+//     "status" VARCHAR(20) NOT NULL,
+//     "createdAt" TIMESTAMP(6),
+// 
+//     CONSTRAINT "Order_pkey" PRIMARY KEY ("id")
+// );
+// 
+// -- CreateIndex
+// CREATE INDEX "Order_userId_status_idx" ON "public"."Order"("userId", "status") WHERE status IN ('pending', 'processing');
