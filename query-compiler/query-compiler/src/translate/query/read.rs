@@ -1,10 +1,10 @@
 use crate::{
     TranslateError, binding,
-    expression::{Binding, Expression, JoinExpression, Pagination},
+    expression::{Binding, Expression, JoinExpression},
     translate::TranslateResult,
 };
 use itertools::Itertools;
-use query_builder::{ConditionalLink, QueryArgumentsExt, QueryBuilder, RelationLinkage};
+use query_builder::{ConditionalLink, QueryBuilder, RelationLinkage};
 use query_core::{
     AggregateRecordsQuery, DataExpectation, DataOperation, MissingRecord, QueryGraphBuilderError, QueryOption,
     QueryOptions, ReadQuery, RelatedRecordsQuery,
@@ -15,21 +15,27 @@ use query_structure::{
 };
 use std::slice;
 
+mod in_memory_processing;
+
 pub(crate) fn translate_read_query(query: ReadQuery, builder: &dyn QueryBuilder) -> TranslateResult<Expression> {
     Ok(match query {
-        ReadQuery::RecordQuery(rq) => {
+        ReadQuery::RecordQuery(mut rq) => {
             let selected_fields = match rq.relation_load_strategy {
                 RelationLoadStrategy::Join => rq.selected_fields.into_virtuals_last(),
                 RelationLoadStrategy::Query => rq.selected_fields.without_relations().into_virtuals_last(),
             };
 
-            let args = QueryArguments::from((
+            let mut args = QueryArguments::from((
                 rq.model.clone(),
                 rq.filter.expect("ReadOne query should always have filter set"),
             ))
             .with_take(Take::One);
 
+            let in_memory_ops =
+                in_memory_processing::extract_in_memory_ops(&mut args, rq.relation_load_strategy, &mut rq.nested);
+
             let expr = build_get_records(builder, &rq.model, args, &selected_fields, rq.relation_load_strategy)?;
+            let expr = in_memory_ops.into_expression(expr);
             let expr = convert_options_to_validation(expr, rq.options);
             let expr = Expression::Unique(Box::new(expr));
 
@@ -50,19 +56,12 @@ pub(crate) fn translate_read_query(query: ReadQuery, builder: &dyn QueryBuilder)
                 RelationLoadStrategy::Query => mrq.selected_fields.without_relations().into_virtuals_last(),
             };
 
-            let needs_reversed_order = mrq.args.needs_reversed_order();
             let take = mrq.args.take;
 
-            let pagination = mrq
-                .args
-                .requires_inmemory_processing()
-                .then(|| extract_pagination(&mut mrq.args));
-            let distinct_by = mrq
-                .args
-                .requires_inmemory_distinct()
-                .then(|| extract_distinct_by(&mut mrq.args));
+            let in_memory_ops =
+                in_memory_processing::extract_in_memory_ops(&mut mrq.args, mrq.relation_load_strategy, &mut mrq.nested);
 
-            let mut expr = build_get_records(
+            let expr = build_get_records(
                 builder,
                 &mrq.model,
                 mrq.args,
@@ -70,25 +69,9 @@ pub(crate) fn translate_read_query(query: ReadQuery, builder: &dyn QueryBuilder)
                 mrq.relation_load_strategy,
             )?;
 
-            if let Some(fields) = distinct_by {
-                expr = Expression::DistinctBy {
-                    expr: expr.into(),
-                    fields,
-                };
-            };
+            let expr = in_memory_ops.into_expression(expr);
 
-            if let Some(pagination) = pagination {
-                expr = Expression::Paginate {
-                    expr: expr.into(),
-                    pagination,
-                };
-            };
-
-            if needs_reversed_order {
-                expr = Expression::Reverse(Box::new(expr));
-            };
-
-            expr = convert_options_to_validation(expr, mrq.options);
+            let mut expr = convert_options_to_validation(expr, mrq.options);
 
             if mrq.relation_load_strategy == RelationLoadStrategy::Query && !mrq.nested.is_empty() {
                 expr = add_inmemory_join(expr, mrq.nested, builder)?;
@@ -266,17 +249,9 @@ fn build_read_related_records(
     }
 
     let selected_fields = rrq.selected_fields.without_relations().into_virtuals_last();
-    let needs_reversed_order = rrq.args.needs_reversed_order();
 
-    // We are forced to use in-memory processing when we have potentially more than one parent
-    // record (!has_unique_parent). Otherwise our skip/limit on the database level would apply to
-    // children of multiple parents, which would produce incorrect results.
-    let needs_pagination = rrq.args.take.is_some() || rrq.args.skip.is_some() || rrq.args.cursor.is_some();
-    let pagination = (needs_pagination && (!has_unique_parent || rrq.args.requires_inmemory_processing()))
-        .then(|| extract_pagination(&mut rrq.args));
-    let needs_distinct = rrq.args.distinct.is_some();
-    let distinct_by = (needs_distinct && (!has_unique_parent || rrq.args.requires_inmemory_distinct()))
-        .then(|| extract_distinct_by(&mut rrq.args));
+    let mut in_memory_ops =
+        in_memory_processing::extract_in_memory_ops_for_nested_query(&mut rrq.args, has_unique_parent);
 
     let (mut child_query, join) = if rrq.parent_field.relation().is_many_to_many() {
         build_read_m2m_query(linkage, rrq.args, &selected_fields, builder)?
@@ -284,23 +259,9 @@ fn build_read_related_records(
         build_read_one2m_query(linkage, rrq.args, &selected_fields, builder)?
     };
 
-    if let Some(fields) = distinct_by {
-        child_query = Expression::DistinctBy {
-            expr: child_query.into(),
-            fields: fields.into_iter().chain(join.fields.iter().cloned()).collect(),
-        };
-    };
+    in_memory_ops.linking_fields = Some(join.fields.clone());
 
-    if let Some(pagination) = pagination {
-        child_query = Expression::Paginate {
-            expr: child_query.into(),
-            pagination: pagination.with_linking_fields(join.fields.clone()),
-        };
-    };
-
-    if needs_reversed_order {
-        child_query = Expression::Reverse(Box::new(child_query));
-    };
+    child_query = in_memory_ops.into_expression(child_query);
 
     if !rrq.nested.is_empty() {
         child_query = add_inmemory_join(child_query, rrq.nested, builder)?;
@@ -407,28 +368,6 @@ fn convert_options_to_validation(expr: Expression, options: QueryOptions) -> Exp
     } else {
         expr
     }
-}
-
-fn extract_pagination(args: &mut QueryArguments) -> Pagination {
-    args.ignore_take = true;
-    args.ignore_skip = true;
-
-    let cursor = args.cursor.as_ref().map(|cursor| {
-        cursor
-            .pairs()
-            .map(|(sf, val)| (sf.db_name().into_owned(), val.clone()))
-            .collect()
-    });
-    Pagination::builder()
-        .maybe_cursor(cursor)
-        .maybe_take(args.take.abs())
-        .maybe_skip(args.skip)
-        .build()
-}
-
-fn extract_distinct_by(args: &mut QueryArguments) -> Vec<String> {
-    let distinct = args.distinct.take().unwrap();
-    distinct.db_names().collect_vec()
 }
 
 #[derive(Debug, Default, Clone)]

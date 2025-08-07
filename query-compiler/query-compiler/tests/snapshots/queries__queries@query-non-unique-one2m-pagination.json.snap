@@ -23,10 +23,16 @@ let @parent = query «SELECT "public"."User"."id", "public"."User"."email",
               params [const(BigInt(1)), const(BigInt(0))]
 in let @parent$id = mapField id (get @parent)
    in join (get @parent)
-      with (skip 10
-           take 10
-           query «SELECT "public"."Post"."id", "public"."Post"."userId" FROM
-                  "public"."Post" WHERE "public"."Post"."userId" IN [$1] ORDER
-                  BY "public"."Post"."id" ASC OFFSET $2»
-           params [var(@parent$id as Int),
-                   const(BigInt(0))]) on left.(id) = right.(userId) as @nested$posts
+      with (process {
+               .: {
+                   linkingFields: (userId)
+                   pagination: {
+                       skip: 10
+                       take: 10
+                   }
+               }
+           } (query «SELECT "public"."Post"."id", "public"."Post"."userId" FROM
+                     "public"."Post" WHERE "public"."Post"."userId" IN [$1]
+                     ORDER BY "public"."Post"."id" ASC OFFSET $2»
+              params [var(@parent$id as Int),
+                      const(BigInt(0))])) on left.(id) = right.(userId) as @nested$posts

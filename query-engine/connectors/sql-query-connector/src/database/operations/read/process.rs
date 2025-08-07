@@ -2,7 +2,7 @@ use std::borrow::Cow;
 
 use itertools::{Either, Itertools};
 use query_builder::QueryArgumentsExt;
-use query_structure::{QueryArguments, Record};
+use query_structure::{QueryArguments, Record, RelationLoadStrategy};
 
 macro_rules! processor_state {
     ($name:ident $(-> $transition:ident($bound:ident))?) => {
@@ -61,7 +61,7 @@ where
         mut get_record_and_fields: impl for<'b> FnMut(&'b Self::Item) -> Option<(Cow<'b, Record>, Cow<'a, [String]>)> + 'a,
     ) -> WithDistinct<impl Iterator<Item = T>> {
         WithDistinct(match args.distinct.as_ref() {
-            Some(distinct) if args.requires_inmemory_distinct_with_joins() => {
+            Some(distinct) if args.requires_inmemory_distinct(RelationLoadStrategy::Join) => {
                 Either::Left(self.unique_by(move |value| {
                     get_record_and_fields(value).map(|(record, field_names)| {
                         record
@@ -81,12 +81,16 @@ where
 {
     fn apply_pagination(self, args: &QueryArguments) -> WithPagination<impl Iterator<Item = T>> {
         let iter = match args.skip {
-            Some(skip) if args.requires_inmemory_pagination_with_joins() => Either::Left(self.skip(skip as usize)),
+            Some(skip) if args.requires_inmemory_pagination(RelationLoadStrategy::Join) => {
+                Either::Left(self.skip(skip as usize))
+            }
             _ => Either::Right(self),
         };
 
         let iter = match args.take.abs() {
-            Some(take) if args.requires_inmemory_pagination_with_joins() => Either::Left(iter.take(take as usize)),
+            Some(take) if args.requires_inmemory_pagination(RelationLoadStrategy::Join) => {
+                Either::Left(iter.take(take as usize))
+            }
             _ => Either::Right(iter),
         };
 

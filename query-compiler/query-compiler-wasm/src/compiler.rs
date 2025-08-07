@@ -128,7 +128,7 @@ impl QueryCompiler {
                         let expect_non_empty = compacted.throw_on_empty();
                         let plan = query_compiler::compile(&self.schema, compacted.operation, &self.connection_info)?;
                         BatchResponse::Compacted {
-                            plan,
+                            plan: plan.into(),
                             arguments: compacted.arguments,
                             nested_selection: compacted.nested_selection,
                             keys: compacted.keys,
@@ -151,7 +151,7 @@ pub enum BatchResponse {
     },
     #[serde(rename_all = "camelCase")]
     Compacted {
-        plan: Expression,
+        plan: Box<Expression>,
         arguments: Vec<HashMap<String, ArgumentValue>>,
         nested_selection: Vec<String>,
         keys: Vec<String>,

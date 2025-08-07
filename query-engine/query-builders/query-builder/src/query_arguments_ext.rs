@@ -18,8 +18,10 @@ impl QueryArgumentsExt for QueryArguments {
 
     #[cfg(feature = "relation_joins")]
     fn needs_inmemory_processing_with_joins(&self) -> bool {
+        use query_structure::RelationLoadStrategy;
+
         self.needs_reversed_order()
-            || self.requires_inmemory_distinct_with_joins()
-            || self.requires_inmemory_pagination_with_joins()
+            || self.requires_inmemory_distinct(RelationLoadStrategy::Join)
+            || self.requires_inmemory_pagination(RelationLoadStrategy::Join)
     }
 }

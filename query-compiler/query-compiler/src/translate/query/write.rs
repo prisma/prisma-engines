@@ -13,7 +13,7 @@ use std::{collections::BTreeMap, iter, mem};
 
 use crate::{
     TranslateError, binding,
-    expression::{Binding, Expression, FieldInitializer, FieldOperation, Pagination},
+    expression::{Binding, Expression, FieldInitializer, FieldOperation, InMemoryOps, Pagination},
     translate::TranslateResult,
 };
 
@@ -414,8 +414,8 @@ fn extract_selectors_that_require_limit(record_filter: &mut RecordFilter, limit:
             let name = binding::selector(field);
             let value = mem::replace(value, PrismaValue::placeholder(name.clone(), typ));
             let pagination = Pagination::builder().take(limit as i64).build();
-            let expr = Expression::Value(value).into();
-            Some(Binding::new(name, Expression::Paginate { expr, pagination }))
+            let expr = Expression::Value(value);
+            Some(Binding::new(name, InMemoryOps::from(pagination).into_expression(expr)))
         })
         .collect_vec()
 }

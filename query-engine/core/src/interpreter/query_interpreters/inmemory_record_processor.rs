@@ -22,7 +22,7 @@ impl InMemoryRecordProcessor {
     pub(crate) fn new_from_query_args(args: &mut QueryArguments) -> Self {
         let mut processor = Self { args: args.clone() };
 
-        if !args.requires_inmemory_distinct() {
+        if !args.requires_inmemory_distinct(RelationLoadStrategy::Query) {
             processor.args.distinct = None;
         } else {
             args.distinct = None;
@@ -51,7 +51,7 @@ impl InMemoryRecordProcessor {
             records
         };
 
-        let records = if self.requires_inmemory_distinct() {
+        let records = if self.requires_inmemory_distinct(RelationLoadStrategy::Query) {
             self.apply_distinct(records)
         } else {
             records

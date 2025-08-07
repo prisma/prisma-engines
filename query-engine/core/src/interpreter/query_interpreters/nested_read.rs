@@ -189,11 +189,12 @@ pub async fn one2m(
     // If we're fetching related records from a single parent, then we can apply normal pagination instead of in-memory processing.
     // However, we can't just apply a LIMIT/OFFSET for multiple parents as we need N related records PER parent.
     // We could use ROW_NUMBER() but it requires further refactoring so we're still using in-memory processing for now.
-    let processor = if uniq_selections.len() == 1 && !query_args.requires_inmemory_processing() {
-        None
-    } else {
-        Some(InMemoryRecordProcessor::new_from_query_args(&mut query_args))
-    };
+    let processor =
+        if uniq_selections.len() == 1 && !query_args.requires_inmemory_processing(RelationLoadStrategy::Query) {
+            None
+        } else {
+            Some(InMemoryRecordProcessor::new_from_query_args(&mut query_args))
+        };
 
     let mut scalars = {
         let filter = child_link_id.is_in(ConditionListValue::list(uniq_selections));

@@ -154,23 +154,34 @@ impl QueryArguments {
     /// This is a marker that generally expresses whether or not a set of records can be
     /// retrieved by the connector or if it requires the query engine to fetch a raw set
     /// of records and perform certain operations itself, in-memory.
-    pub fn requires_inmemory_processing(&self) -> bool {
-        self.contains_unstable_cursor() || self.contains_null_cursor() || self.requires_inmemory_distinct()
+    pub fn requires_inmemory_processing(&self, rls: RelationLoadStrategy) -> bool {
+        self.contains_unstable_cursor() || self.contains_null_cursor() || self.requires_inmemory_distinct(rls)
     }
 
-    pub fn requires_inmemory_distinct(&self) -> bool {
-        self.distinct.is_some() && !self.can_distinct_in_db()
+    pub fn requires_inmemory_distinct(&self, rls: RelationLoadStrategy) -> bool {
+        self.distinct.is_some() && !self.can_distinct_in_db(rls)
     }
 
-    pub fn requires_inmemory_distinct_with_joins(&self) -> bool {
-        self.distinct.is_some() && !self.can_distinct_in_db_with_joins()
+    pub fn requires_inmemory_pagination(&self, rls: RelationLoadStrategy) -> bool {
+        match rls {
+            RelationLoadStrategy::Query => {
+                (self.skip.is_some() || self.take.is_some() || self.cursor.is_some())
+                    && self.requires_inmemory_processing(rls)
+            }
+            RelationLoadStrategy::Join => {
+                (self.skip.is_some() || self.take.is_some()) && self.requires_inmemory_distinct(rls)
+            }
+        }
     }
 
-    pub fn requires_inmemory_pagination_with_joins(&self) -> bool {
-        (self.skip.is_some() || self.take.is_some()) && self.requires_inmemory_distinct_with_joins()
+    pub fn can_distinct_in_db(&self, rls: RelationLoadStrategy) -> bool {
+        match rls {
+            RelationLoadStrategy::Query => self.can_distinct_in_db_with_queries(),
+            RelationLoadStrategy::Join => self.can_distinct_in_db_with_joins(),
+        }
     }
 
-    fn can_distinct_in_db(&self) -> bool {
+    fn can_distinct_in_db_with_queries(&self) -> bool {
         let has_distinct_feature = self
             .model()
             .dm
@@ -184,7 +195,7 @@ impl QueryArguments {
 
     // TODO: separation between `can_distinct_in_db` and `can_distinct_in_db_with_joins` shouldn't
     // be necessary once nativeDistinct is GA.
-    pub fn can_distinct_in_db_with_joins(&self) -> bool {
+    fn can_distinct_in_db_with_joins(&self) -> bool {
         self.connector_supports_distinct_on()
             && native_distinct_compatible_with_order_by(self.distinct.as_ref(), &self.order_by)
     }

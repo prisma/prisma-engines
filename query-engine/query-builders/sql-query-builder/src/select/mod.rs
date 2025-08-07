@@ -446,12 +446,12 @@ impl<'a> SelectBuilderExt<'a> for Select<'a> {
 
     fn with_pagination(self, args: &QueryArguments, override_empty_take: Option<i64>) -> Select<'a> {
         let take = match args.take.abs() {
-            Some(_) if args.requires_inmemory_pagination_with_joins() => override_empty_take,
+            Some(_) if args.requires_inmemory_pagination(RelationLoadStrategy::Join) => override_empty_take,
             Some(take) => Some(take),
             None => override_empty_take,
         };
 
-        let skip = match args.requires_inmemory_pagination_with_joins() {
+        let skip = match args.requires_inmemory_pagination(RelationLoadStrategy::Join) {
             true => None,
             false => args.skip,
         };
@@ -483,7 +483,7 @@ impl<'a> SelectBuilderExt<'a> for Select<'a> {
     }
 
     fn with_distinct(self, args: &QueryArguments, table_alias: Alias) -> Select<'a> {
-        if !args.can_distinct_in_db_with_joins() {
+        if !args.can_distinct_in_db(RelationLoadStrategy::Join) {
             return self;
         }
 
@@ -623,7 +623,7 @@ fn distinct_selection(rs: &RelationSelection) -> FieldSelection {
 
 fn json_obj_selections(rs: &RelationSelection) -> impl Iterator<Item = &SelectedField> + '_ {
     match rs.args.distinct.as_ref() {
-        Some(distinct) if rs.args.requires_inmemory_distinct_with_joins() => {
+        Some(distinct) if rs.args.requires_inmemory_distinct(RelationLoadStrategy::Join) => {
             Either::Left(rs.selections.iter().chain(distinct.selections()).unique())
         }
         _ => Either::Right(rs.selections.iter()),

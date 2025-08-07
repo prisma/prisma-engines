@@ -1,6 +1,6 @@
 use super::*;
 use crate::{AggregateRecordsQuery, query_document::ParsedField};
-use query_structure::Model;
+use query_structure::{Model, RelationLoadStrategy};
 
 pub(crate) fn aggregate(field: ParsedField<'_>, model: Model) -> QueryGraphBuilderResult<ReadQuery> {
     let name = field.name;
@@ -11,7 +11,7 @@ pub(crate) fn aggregate(field: ParsedField<'_>, model: Model) -> QueryGraphBuild
     let args = extractors::extract_query_args(field.arguments, &model)?;
 
     // Reject any inmemory-requiring operation for aggregations, we don't have an in-memory aggregator yet.
-    if args.requires_inmemory_processing() {
+    if args.requires_inmemory_processing(RelationLoadStrategy::Query) {
         return Err(QueryGraphBuilderError::InputError(
             "Unable to process combination of query arguments for aggregation query. \
              Please note that it is not possible at the moment to have a null-cursor, \

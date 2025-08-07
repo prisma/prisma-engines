@@ -1,0 +1,32 @@
+---
+source: query-compiler/query-compiler/tests/queries.rs
+expression: pretty
+input_file: query-compiler/query-compiler/tests/data/nested-distinct-pagination-query.json
+---
+dataMap {
+    id: Int (id)
+    posts (from @nested$posts): {
+        id: Int (id)
+        title: String (title)
+    }
+}
+let @parent = query «SELECT "public"."User"."id" FROM "public"."User" WHERE 1=1
+                     OFFSET $1»
+              params [const(BigInt(0))]
+in let @parent$id = mapField id (get @parent)
+   in join (get @parent)
+      with (process {
+               .: {
+                   linkingFields: (userId)
+                   distinct: (title)
+                   pagination: {
+                       skip: 20
+                       take: 10
+                   }
+               }
+           } (query «SELECT "public"."Post"."id", "public"."Post"."title",
+                     "public"."Post"."userId" FROM "public"."Post" WHERE
+                     "public"."Post"."userId" IN [$1] ORDER BY
+                     "public"."Post"."id" ASC OFFSET $2»
+              params [var(@parent$id as Int),
+                      const(BigInt(0))])) on left.(id) = right.(userId) as @nested$posts
