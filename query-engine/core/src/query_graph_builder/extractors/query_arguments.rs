@@ -345,9 +345,9 @@ fn finalize_arguments(mut args: QueryArguments, model: &Model) -> QueryGraphBuil
             && args.order_by.is_empty();
 
     if add_implicit_ordering {
-        if model.is_view() {
+        if !model.has_unique_identifier() {
             return Err(QueryGraphBuilderError::InputError(
-                "`orderBy` definition must not be empty when querying views".into(),
+                "`orderBy` definition must not be empty when querying views without unique fields".into(),
             ));
         }
 

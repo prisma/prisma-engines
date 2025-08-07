@@ -64,6 +64,12 @@ impl Model {
         !has_unsupported_field && !self.is_view()
     }
 
+    /// Checks if the model has a true unique identifier defined in the schema.
+    /// This can only be false if the "model" is actually a view.
+    pub fn has_unique_identifier(&self) -> bool {
+        self.walker().required_unique_criterias().next().is_some()
+    }
+
     /// The name of the model in the database
     /// For a sql database this will be the Table name for this model
     pub fn db_name(&self) -> &str {
