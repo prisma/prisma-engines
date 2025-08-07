@@ -161,10 +161,10 @@ pub(crate) fn skip_argument<'a>(model: &Model) -> InputField<'a> {
 
 fn pagination_argument<'a>(arg: &'static str, model: &Model) -> InputField<'a> {
     let arg = input_field(arg, vec![InputType::int()], None).optional();
-    if model.is_view() {
-        arg.with_requires_other_fields([args::ORDER_BY])
-    } else {
+    if model.has_unique_identifier() {
         arg
+    } else {
+        arg.with_requires_other_fields([args::ORDER_BY])
     }
 }
 
@@ -227,7 +227,7 @@ impl<'a> ManyRecordsSelectionArgumentsBuilder<'a> {
             ),
         ]
         .into_iter()
-        .chain((!self.model.is_view()).then(|| {
+        .chain(self.model.has_unique_identifier().then(|| {
             let unique_input_type =
                 InputType::object(filter_objects::where_unique_object_type(self.ctx, self.model.clone()));
             input_field(args::CURSOR, vec![unique_input_type], None).optional()
