@@ -27,8 +27,8 @@ mod sr_regression {
         test_data(&runner).await?;
 
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyCategory(orderBy: { id: asc }) { name parent { name }}}"#),
-          @r###"{"data":{"findManyCategory":[{"name":"Sub","parent":{"name":"Root"}},{"name":"Root","parent":null}]}}"###
+          run_query!(&runner, r#"query { findManyCategory(orderBy: { name: asc }) { name parent { name }}}"#),
+          @r###"{"data":{"findManyCategory":[{"name":"Root","parent":null},{"name":"Sub","parent":{"name":"Root"}}]}}"###
         );
 
         Ok(())
