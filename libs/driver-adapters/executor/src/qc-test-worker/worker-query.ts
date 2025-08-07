@@ -1,6 +1,7 @@
 import * as util from 'node:util'
 
 import {
+  DataMapperError,
   noopTracingHelper,
   normalizeJsonProtocolValues,
   normalizeRawJsonProtocolResponse,
@@ -94,6 +95,18 @@ class QueryPipeline {
       if (error instanceof UserFacingError) {
         return safeJsonStringify({
           errors: [error.toQueryResponseErrorObject()],
+        })
+      } else if (error instanceof DataMapperError) {
+        return safeJsonStringify({
+          errors: [
+            {
+              error: error.message,
+              user_facing_error: {
+                is_panic: false,
+                message: error.message,
+              },
+            },
+          ],
         })
       }
       throw error
