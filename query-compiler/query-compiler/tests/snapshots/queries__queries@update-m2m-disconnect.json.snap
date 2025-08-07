@@ -31,16 +31,11 @@ transaction
                         ("public"."_CategoryToPost"."B" = ($1) AND
                         "public"."_CategoryToPost"."A" IN [$2])»
                params [var(0$id as Int), var(1$id as Int)];
-      let 3 = let 0 = unique (validate (get 0)
-                  [ rowCountNeq 0
-                  ] orRaise "MISSING_RECORD");
-                  0$id = mapField id (get 0)
-          in let 3 = unique (query «SELECT "public"."Post"."id",
-                                    "public"."Post"."title",
-                                    "public"."Post"."userId" FROM
-                                    "public"."Post" WHERE "public"."Post"."id" =
-                                    $1 LIMIT $2 OFFSET $3»
-                             params [var(0$id as Int), const(BigInt(1)),
-                                     const(BigInt(0))])
-             in get 3
-      in get 3
+      let 0 = unique (validate (get 0)
+          [ rowCountNeq 0
+          ] orRaise "MISSING_RECORD");
+          0$id = mapField id (get 0)
+      in unique (query «SELECT "public"."Post"."id", "public"."Post"."title",
+                        "public"."Post"."userId" FROM "public"."Post" WHERE
+                        "public"."Post"."id" = $1 LIMIT $2 OFFSET $3»
+                 params [var(0$id as Int), const(BigInt(1)), const(BigInt(0))])
