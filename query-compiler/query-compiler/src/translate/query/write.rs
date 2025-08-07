@@ -5,7 +5,8 @@ use query_core::{
     UpdateRecordWithSelection, UpdateRecordWithoutSelection, WriteQuery,
 };
 use query_structure::{
-    Filter, IntoFilter, PrismaValue, PrismaValueType, QueryArguments, RecordFilter, RelationLoadStrategy, Take,
+    FieldSelection, Filter, IntoFilter, Model, PrismaValue, PrismaValueType, QueryArguments, RecordFilter,
+    RelationLoadStrategy, Take,
 };
 use sql_query_builder::write::split_write_args_by_shape;
 use std::{collections::BTreeMap, iter, mem};
@@ -126,6 +127,16 @@ pub(crate) fn translate_write_query(query: WriteQuery, builder: &dyn QueryBuilde
         }) => {
             let projection = selected_fields.as_ref().map(|f| &f.fields);
 
+            if args.is_empty() {
+                let projection = projection.cloned().unwrap_or_else(|| model.primary_identifier());
+                let query = build_query_from_record_filter(builder, &model, record_filter, &projection, None)?;
+                return if selected_fields.is_some() {
+                    Ok(Expression::Query(query))
+                } else {
+                    Ok(Expression::Execute(query))
+                };
+            }
+
             let selector_bindings = limit
                 .map(|limit| extract_selectors_that_require_limit(&mut record_filter, limit))
                 .unwrap_or_default();
@@ -171,22 +182,7 @@ pub(crate) fn translate_write_query(query: WriteQuery, builder: &dyn QueryBuilde
         })) => {
             let query = if args.is_empty() {
                 // We can just issue a read query if there are no write arguments.
-
-                // It's possible for us to receive selectors here and they cannot be passed to
-                // a read query directly, so we need to build a filter from them.
-                let filter = record_filter
-                    .selectors
-                    .map(IntoFilter::filter)
-                    .into_iter()
-                    .fold(record_filter.filter, |acc, f| Filter::and(vec![acc, f]));
-
-                let query_args = QueryArguments::from((model.clone(), filter)).with_take(Take::Some(1));
-                builder
-                    .build_get_records(&model, query_args, &selected_fields, RelationLoadStrategy::Query)
-                    .map_err(TranslateError::QueryBuildFailure)?
-                    .into_iter()
-                    .exactly_one()
-                    .expect("should have exactly one query for update with selection")
+                build_query_from_record_filter(builder, &model, record_filter, &selected_fields, Some(Take::Some(1)))?
             } else {
                 builder
                     .build_update(&model, record_filter, args, Some(&selected_fields))
@@ -370,6 +366,34 @@ pub(crate) fn translate_write_query(query: WriteQuery, builder: &dyn QueryBuilde
             Expression::Execute(query)
         }
     })
+}
+
+fn build_query_from_record_filter(
+    builder: &dyn QueryBuilder,
+    model: &Model,
+    record_filter: RecordFilter,
+    projection: &FieldSelection,
+    take: Option<Take>,
+) -> Result<query_builder::DbQuery, TranslateError> {
+    // It's possible for us to receive selectors here and they cannot be passed to
+    // a read query directly, so we need to build a filter from them.
+    let filter = record_filter
+        .selectors
+        .map(IntoFilter::filter)
+        .into_iter()
+        .fold(record_filter.filter, |acc, f| Filter::and(vec![acc, f]));
+    let mut query_args = QueryArguments::from((model.clone(), filter));
+    if let Some(take) = take {
+        query_args.take = take;
+    }
+
+    let query = builder
+        .build_get_records(model, query_args, projection, RelationLoadStrategy::Query)
+        .map_err(TranslateError::QueryBuildFailure)?
+        .into_iter()
+        .exactly_one()
+        .expect("should have exactly one query for update with selection");
+    Ok(query)
 }
 
 /// Extracts selectors from the filter that require an in-memory limit operation as bindings.

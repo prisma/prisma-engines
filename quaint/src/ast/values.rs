@@ -636,6 +636,7 @@ pub enum OpaqueType {
     Array(Box<OpaqueType>),
     Numeric,
     Json,
+    Object,
     Xml,
     Uuid,
     DateTime,
@@ -663,6 +664,7 @@ impl fmt::Display for OpaqueType {
             }
             OpaqueType::Numeric => write!(f, "Numeric"),
             OpaqueType::Json => write!(f, "Json"),
+            OpaqueType::Object => write!(f, "Object"),
             OpaqueType::Xml => write!(f, "Xml"),
             OpaqueType::Uuid => write!(f, "Uuid"),
             OpaqueType::DateTime => write!(f, "DateTime"),
