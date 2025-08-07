@@ -150,6 +150,98 @@ pub enum Expression {
     },
 }
 
+impl Expression {
+    pub fn simplify(&mut self) {
+        match self {
+            Expression::Seq(seq) if seq.len() == 1 => {
+                *self = seq.pop().unwrap();
+                self.simplify();
+            }
+            Expression::Seq(seq) => {
+                seq.iter_mut().for_each(Expression::simplify);
+            }
+            Expression::Let { bindings, expr } => match (&bindings[..], &**expr) {
+                ([binding], Self::Get { name }) if &binding.name == name => {
+                    *self = bindings.pop().unwrap().expr;
+                    self.simplify();
+                }
+                _ => {
+                    bindings.iter_mut().for_each(|binding| binding.expr.simplify());
+                    expr.simplify();
+                }
+            },
+            Expression::Concat(vec) if vec.len() == 1 => {
+                *self = vec.pop().unwrap();
+                self.simplify();
+            }
+            Expression::Concat(vec) => {
+                vec.iter_mut().for_each(Expression::simplify);
+            }
+            Expression::Sum(vec) if vec.len() == 1 => {
+                *self = vec.pop().unwrap();
+                self.simplify();
+            }
+            Expression::Sum(vec) => {
+                vec.iter_mut().for_each(Expression::simplify);
+            }
+            Expression::Value(_) => {}
+            Expression::Get { .. } => {}
+            Expression::GetFirstNonEmpty { .. } => {}
+            Expression::Query(_) => {}
+            Expression::Execute(_) => {}
+            Expression::Reverse(expr) => {
+                expr.simplify();
+            }
+            Expression::Unique(expr) => {
+                expr.simplify();
+            }
+            Expression::Required(expr) => {
+                expr.simplify();
+            }
+            Expression::Join { parent, children } => {
+                parent.simplify();
+                children.iter_mut().for_each(|child| child.child.simplify());
+            }
+            Expression::MapField { records, .. } => {
+                records.simplify();
+            }
+            Expression::Transaction(expr) => {
+                expr.simplify();
+            }
+            Expression::DataMap { expr, .. } => {
+                expr.simplify();
+            }
+            Expression::Validate { expr, .. } => {
+                expr.simplify();
+            }
+            Expression::If {
+                value, then, r#else, ..
+            } => {
+                value.simplify();
+                then.simplify();
+                r#else.simplify();
+            }
+            Expression::Unit => {}
+            Expression::Diff { from, to } => {
+                from.simplify();
+                to.simplify();
+            }
+            Expression::DistinctBy { expr, .. } => {
+                expr.simplify();
+            }
+            Expression::Paginate { expr, .. } => {
+                expr.simplify();
+            }
+            Expression::InitializeRecord { expr, .. } => {
+                expr.simplify();
+            }
+            Expression::MapRecord { expr, .. } => {
+                expr.simplify();
+            }
+        }
+    }
+}
+
 #[derive(Debug, Serialize)]
 #[serde(tag = "type", content = "value", rename_all = "camelCase")]
 pub enum FieldInitializer {

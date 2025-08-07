@@ -52,16 +52,11 @@ transaction
                                    params [const(Boolean(true)),
                                            const(Boolean(false)),
                                            var(3$userId as Int)]);
-      let 5 = let 0 = unique (validate (get 0)
-                  [ rowCountNeq 0
-                  ] orRaise "MISSING_RECORD");
-                  0$id = mapField id (get 0)
-          in let 5 = unique (query «SELECT "public"."Patient"."id",
-                                    "public"."Patient"."userId" FROM
-                                    "public"."Patient" WHERE
-                                    "public"."Patient"."id" = $1 LIMIT $2 OFFSET
-                                    $3»
-                             params [var(0$id as Int), const(BigInt(1)),
-                                     const(BigInt(0))])
-             in get 5
-      in get 5
+      let 0 = unique (validate (get 0)
+          [ rowCountNeq 0
+          ] orRaise "MISSING_RECORD");
+          0$id = mapField id (get 0)
+      in unique (query «SELECT "public"."Patient"."id",
+                        "public"."Patient"."userId" FROM "public"."Patient"
+                        WHERE "public"."Patient"."id" = $1 LIMIT $2 OFFSET $3»
+                 params [var(0$id as Int), const(BigInt(1)), const(BigInt(0))])

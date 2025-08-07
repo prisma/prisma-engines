@@ -29,85 +29,71 @@ transaction
                           $3»
                    params [const(BigInt(1)), const(BigInt(1)),
                            const(BigInt(0))])
-   in let 0 = let 1 = unique (validate (get 1)
-                  [ rowCountNeq 0
-                  ] orRaise "MISSING_RELATED_RECORD");
-                  1$id = mapField id (get 1)
-          in let 0 = unique (query «INSERT INTO "public"."Post"
-                                    ("title","userId") VALUES ($1,$2) RETURNING
-                                    "public"."Post"."id"»
-                             params [const(String("How to get rich quick and not go to jail")),
-                                     var(1$id as Int)])
-             in let 2 = unique (query «SELECT "public"."Category"."id" FROM
-                                       "public"."Category" WHERE
-                                       ("public"."Category"."id" = $1 AND 1=1)
-                                       LIMIT $2 OFFSET $3»
-                                params [const(BigInt(10)), const(BigInt(1)),
-                                        const(BigInt(0))])
-                in if (rowCountNeq 0 (get 2))
-                   then let 0$id = mapField id (get 0);
-                            2 = validate (get 2)
-                            [ rowCountEq 1
-                            ] orRaise "INCOMPLETE_CONNECT_INPUT";
-                            2$id = mapField id (get 2)
-                        in execute «INSERT INTO "public"."_CategoryToPost"
-                                    ("B","A") VALUES [($1)] ON CONFLICT DO
-                                    NOTHING»
-                           params [product(var(0$id as Int[]),
-                                           var(2$id as Int[]))]
-                   else let 3 = unique (query «INSERT INTO "public"."Category"
-                                               ("id","name") VALUES ($1,$2)
-                                               RETURNING
-                                               "public"."Category"."id"»
-                                        params [const(BigInt(10)),
-                                                const(String("JavaScript"))])
-                        in let 0$id = mapField id (get 0);
-                               3 = validate (get 3)
-                               [ rowCountEq 1
-                               ] orRaise "INCOMPLETE_CONNECT_INPUT";
-                               3$id = mapField id (get 3)
-                           in execute «INSERT INTO "public"."_CategoryToPost"
-                                       ("B","A") VALUES [($1)] ON CONFLICT DO
-                                       NOTHING»
-                              params [product(var(0$id as Int[]),
-                                              var(3$id as Int[]))];
-                let 7 = let 0 = unique (validate (get 0)
-                            [ rowCountNeq 0
-                            ] orRaise "MISSING_RECORD");
-                            0$id = mapField id (get 0)
-                    in let 7 = let @parent = unique (query «SELECT
-                                                            "public"."Post"."id",
-                                                            "public"."Post"."title",
-                                                            "public"."Post"."userId"
-                                                            FROM "public"."Post"
-                                                            WHERE
-                                                            "public"."Post"."id"
-                                                            = $1 LIMIT $2 OFFSET
-                                                            $3»
-                                                     params [var(0$id as Int),
-                                                             const(BigInt(1)),
-                                                             const(BigInt(0))])
-                           in let @parent$id = mapField id (get @parent);
-                                  @parent$userId = mapField userId (get @parent)
-                              in join (get @parent)
-                                 with (query «SELECT "public"."User"."id",
-                                              "public"."User"."email",
-                                              "public"."User"."role"::text FROM
-                                              "public"."User" WHERE
-                                              "public"."User"."id" = $1 OFFSET
-                                              $2»
-                                       params [var(@parent$userId as Int),
-                                               const(BigInt(0))]) on unique left.(userId) = right.(id) as @nested$user,
-                                      (query «SELECT "public"."Category"."id",
-                                              "public"."Category"."name",
-                                              "t0"."B" AS "CategoryToPost@Post"
-                                              FROM "public"."Category" INNER
-                                              JOIN "public"."_CategoryToPost" AS
-                                              "t0" ON "t0"."A" =
-                                              "public"."Category"."id" WHERE
-                                              (1=1 AND "t0"."B" = $1) OFFSET $2»
-                                       params [var(@parent$id as Int),
-                                               const(BigInt(0))]) on left.(id) = right.(CategoryToPost@Post) as @nested$categories
-                       in get 7
-                in get 7
-      in get 0
+   in let 1 = unique (validate (get 1)
+          [ rowCountNeq 0
+          ] orRaise "MISSING_RELATED_RECORD");
+          1$id = mapField id (get 1)
+      in let 0 = unique (query «INSERT INTO "public"."Post" ("title","userId")
+                                VALUES ($1,$2) RETURNING "public"."Post"."id"»
+                         params [const(String("How to get rich quick and not go to jail")),
+                                 var(1$id as Int)])
+         in let 2 = unique (query «SELECT "public"."Category"."id" FROM
+                                   "public"."Category" WHERE
+                                   ("public"."Category"."id" = $1 AND 1=1) LIMIT
+                                   $2 OFFSET $3»
+                            params [const(BigInt(10)), const(BigInt(1)),
+                                    const(BigInt(0))])
+            in if (rowCountNeq 0 (get 2))
+               then let 0$id = mapField id (get 0);
+                        2 = validate (get 2)
+                        [ rowCountEq 1
+                        ] orRaise "INCOMPLETE_CONNECT_INPUT";
+                        2$id = mapField id (get 2)
+                    in execute «INSERT INTO "public"."_CategoryToPost" ("B","A")
+                                VALUES [($1)] ON CONFLICT DO NOTHING»
+                       params [product(var(0$id as Int[]), var(2$id as Int[]))]
+               else let 3 = unique (query «INSERT INTO "public"."Category"
+                                           ("id","name") VALUES ($1,$2)
+                                           RETURNING "public"."Category"."id"»
+                                    params [const(BigInt(10)),
+                                            const(String("JavaScript"))])
+                    in let 0$id = mapField id (get 0);
+                           3 = validate (get 3)
+                           [ rowCountEq 1
+                           ] orRaise "INCOMPLETE_CONNECT_INPUT";
+                           3$id = mapField id (get 3)
+                       in execute «INSERT INTO "public"."_CategoryToPost"
+                                   ("B","A") VALUES [($1)] ON CONFLICT DO
+                                   NOTHING»
+                          params [product(var(0$id as Int[]),
+                                          var(3$id as Int[]))];
+            let 0 = unique (validate (get 0)
+                [ rowCountNeq 0
+                ] orRaise "MISSING_RECORD");
+                0$id = mapField id (get 0)
+            in let @parent = unique (query «SELECT "public"."Post"."id",
+                                            "public"."Post"."title",
+                                            "public"."Post"."userId" FROM
+                                            "public"."Post" WHERE
+                                            "public"."Post"."id" = $1 LIMIT $2
+                                            OFFSET $3»
+                                     params [var(0$id as Int), const(BigInt(1)),
+                                             const(BigInt(0))])
+               in let @parent$id = mapField id (get @parent);
+                      @parent$userId = mapField userId (get @parent)
+                  in join (get @parent)
+                     with (query «SELECT "public"."User"."id",
+                                  "public"."User"."email",
+                                  "public"."User"."role"::text FROM
+                                  "public"."User" WHERE "public"."User"."id" =
+                                  $1 OFFSET $2»
+                           params [var(@parent$userId as Int),
+                                   const(BigInt(0))]) on unique left.(userId) = right.(id) as @nested$user,
+                          (query «SELECT "public"."Category"."id",
+                                  "public"."Category"."name", "t0"."B" AS
+                                  "CategoryToPost@Post" FROM "public"."Category"
+                                  INNER JOIN "public"."_CategoryToPost" AS "t0"
+                                  ON "t0"."A" = "public"."Category"."id" WHERE
+                                  (1=1 AND "t0"."B" = $1) OFFSET $2»
+                           params [var(@parent$id as Int),
+                                   const(BigInt(0))]) on left.(id) = right.(CategoryToPost@Post) as @nested$categories

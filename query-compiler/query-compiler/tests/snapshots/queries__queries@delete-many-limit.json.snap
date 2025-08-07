@@ -4,7 +4,5 @@ expression: pretty
 input_file: query-compiler/query-compiler/tests/data/delete-many-limit.json
 ---
 dataMap affectedRows
-let 0 = sum (execute «DELETE FROM "public"."Post" WHERE "public"."Post"."title"
-                      = $1»
-             params [const(String("whatever"))])
-in get 0
+execute «DELETE FROM "public"."Post" WHERE "public"."Post"."title" = $1»
+params [const(String("whatever"))]

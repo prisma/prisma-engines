@@ -8,14 +8,13 @@ dataMap {
     email: String (email)
     createdAt: Date (createdAt)
 }
-let 0 = let @generated$row0$id = uuid(const(Int(7)));
-            @generated$row0$createdAt = now()
-    in unique (query «INSERT INTO "public"."UserWithGenerators"
-                      ("id","email","createdAt") VALUES ($1,$2,$3) RETURNING
-                      "public"."UserWithGenerators"."id",
-                      "public"."UserWithGenerators"."email",
-                      "public"."UserWithGenerators"."createdAt"»
-               params [var(@generated$row0$id as String),
-                       const(String("user.1@prisma.io")),
-                       var(@generated$row0$createdAt as Date)])
-in get 0
+let @generated$row0$id = uuid(const(Int(7)));
+    @generated$row0$createdAt = now()
+in unique (query «INSERT INTO "public"."UserWithGenerators"
+                  ("id","email","createdAt") VALUES ($1,$2,$3) RETURNING
+                  "public"."UserWithGenerators"."id",
+                  "public"."UserWithGenerators"."email",
+                  "public"."UserWithGenerators"."createdAt"»
+           params [var(@generated$row0$id as String),
+                   const(String("user.1@prisma.io")),
+                   var(@generated$row0$createdAt as Date)])
