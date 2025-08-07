@@ -2,5 +2,4 @@ new::interactive_tx::interactive_tx::batch_queries_failure
 new::relation_load_strategy::batch::relation_load_strategy_batch::compacted_join_subquery
 new::relation_load_strategy::batch::relation_load_strategy_batch::compacted_query_subquery
 queries::aggregation::group_by::aggregation_group_by::group_by_ordering_sum_aggregation
-queries::filters::self_relation_regression::sr_regression::all_categories
 writes::nested_mutations::already_converted::nested_connect_inside_update::connect_inside_update::p1_c1req_rel_child_idempotent

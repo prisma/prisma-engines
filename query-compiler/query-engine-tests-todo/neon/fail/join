@@ -5,7 +5,6 @@ queries::data_types::json::json::json_list
 queries::distinct::distinct::nested_distinct
 queries::distinct::distinct::nested_distinct_not_in_selection
 queries::distinct::distinct::nested_distinct_reversed
-queries::filters::self_relation_regression::sr_regression::all_categories
 queries::order_and_pagination::nested_pagination::nested_pagination::bottom_lvl_take_minus_3
 queries::order_and_pagination::nested_pagination::nested_pagination::bottom_lvl_take_minus_4
 queries::order_and_pagination::nested_pagination::nested_pagination::m2m_many_children_nested_skip_take

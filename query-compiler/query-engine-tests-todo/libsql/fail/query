@@ -3,6 +3,5 @@ new::regressions::prisma_15204::conversion_error::convert_to_bigint_sqlite_js
 new::regressions::prisma_15204::conversion_error::convert_to_int_sqlite_js
 queries::aggregation::group_by::aggregation_group_by::group_by_ordering_sum_aggregation
 queries::data_types::enum_type::enum_type::read_one_invalid_sqlite
-queries::filters::self_relation_regression::sr_regression::all_categories
 raw::sql::typed_output::typed_output::all_scalars_sqlite
 writes::nested_mutations::already_converted::nested_connect_inside_update::connect_inside_update::p1_c1req_rel_child_idempotent

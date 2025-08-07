@@ -1,4 +1,3 @@
 queries::aggregation::group_by::aggregation_group_by::group_by_ordering_sum_aggregation
-queries::filters::self_relation_regression::sr_regression::all_categories
 writes::data_types::native_types::sql_server::sql_server::native_decimal_type
 writes::nested_mutations::already_converted::nested_connect_inside_update::connect_inside_update::p1_c1req_rel_child_idempotent
