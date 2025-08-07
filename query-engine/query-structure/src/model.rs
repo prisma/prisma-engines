@@ -21,21 +21,15 @@ impl Model {
     }
 
     fn primary_identifier_scalars(&self) -> impl Iterator<Item = psl::parser_database::ScalarFieldId> + use<'_> {
-        if self.walker().ast_model().is_view() {
-            return Either::Left(self.walker().scalar_fields().map(|sf| sf.id));
+        match self.walker().required_unique_criterias().next() {
+            Some(unique) => Either::Left(unique.fields().map(|f| {
+                f.as_scalar_field()
+                    .expect("primary identifier must consist of scalar fields")
+                    .id
+            })),
+            None if self.walker().ast_model().is_view() => Either::Right(self.walker().scalar_fields().map(|sf| sf.id)),
+            None => panic!("model must have at least one unique criterion"),
         }
-        Either::Right(
-            self.walker()
-                .required_unique_criterias()
-                .next()
-                .expect("model must have at least one unique criterion")
-                .fields()
-                .map(|f| {
-                    f.as_scalar_field()
-                        .expect("primary identifier must consist of scalar fields")
-                        .id
-                }),
-        )
     }
 
     pub fn shard_aware_primary_identifier(&self) -> FieldSelection {
@@ -68,6 +62,12 @@ impl Model {
             .any(|sf| sf.ast_field().arity.is_required() && sf.is_unsupported() && sf.default_value().is_none());
 
         !has_unsupported_field && !self.is_view()
+    }
+
+    /// Checks if the model has a true unique identifier defined in the schema.
+    /// This can only be false if the "model" is actually a view.
+    pub fn has_unique_identifier(&self) -> bool {
+        self.walker().required_unique_criterias().next().is_some()
     }
 
     /// The name of the model in the database

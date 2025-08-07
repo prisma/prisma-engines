@@ -1,0 +1,36 @@
+generator js {
+  provider        = "prisma-client-js"
+  previewFeatures = ["views"]
+}
+
+model User {
+  id             Int    @id
+  commentedPosts Post[]
+}
+
+view Post {
+  id         Int    @unique
+  commenters User[]
+}
+
+// [1;91merror[0m: [1mError validating: Implicit many-to-many relations are not supported for views.[0m
+//   [1;94m-->[0m  [4mschema.prisma:13[0m
+// [1;94m   | [0m
+// [1;94m12 | [0m  id         Int    @unique
+// [1;94m13 | [0m  [1;91mcommenters User[][0m
+// [1;94m14 | [0m}
+// [1;94m   | [0m
+// [1;91merror[0m: [1mError validating: Implicit many-to-many relations are not supported for views.[0m
+//   [1;94m-->[0m  [4mschema.prisma:8[0m
+// [1;94m   | [0m
+// [1;94m 7 | [0m  id             Int    @id
+// [1;94m 8 | [0m  [1;91mcommentedPosts Post[][0m
+// [1;94m 9 | [0m}
+// [1;94m   | [0m
+// [1;91merror[0m: [1mError validating field `commentedPosts` in view `User`: The relation field `commentedPosts` on view `User` references `Post` which does not have an `@id` field. Models without `@id` cannot be part of a many to many relation. Use an explicit intermediate Model to represent this relationship.[0m
+//   [1;94m-->[0m  [4mschema.prisma:8[0m
+// [1;94m   | [0m
+// [1;94m 7 | [0m  id             Int    @id
+// [1;94m 8 | [0m  [1;91mcommentedPosts Post[][0m
+// [1;94m 9 | [0m}
+// [1;94m   | [0m

@@ -18,7 +18,8 @@ pub(crate) fn query_fields(ctx: &QuerySchema) -> Vec<FieldFn> {
         field!(find_many_field, model);
         field!(plain_aggregation_field, model);
         field!(group_by_aggregation_field, model);
-        if !model.is_view() {
+
+        if model.has_unique_identifier() {
             field!(find_unique_field, model);
             field!(find_unique_or_throw_field, model);
         }

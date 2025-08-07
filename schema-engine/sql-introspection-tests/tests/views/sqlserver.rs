@@ -182,6 +182,51 @@ async fn simple_view_from_two_tables(api: &mut TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Mssql), preview_features("views"))]
+async fn re_intro_keeps_view_to_view_relations(api: &mut TestApi) -> TestResult {
+    let setup = indoc! {r#"
+        CREATE VIEW A AS SELECT 1 AS id;
+    "#};
+
+    api.raw_cmd(setup).await;
+
+    let setup = indoc! {r#"
+        CREATE VIEW B AS SELECT 2 AS id, 1 AS a_id;
+    "#};
+
+    api.raw_cmd(setup).await;
+
+    let input = indoc! {r#"
+        view A {
+          id Int @unique
+          b  B[]
+        }
+
+        view B {
+          id   Int  @unique
+          a_id Int?
+          a    A?   @relation(fields: [a_id], references: [id])
+        }
+    "#};
+
+    let expected = expect![[r#"
+        view A {
+          id Int @unique
+          b  B[]
+        }
+
+        view B {
+          id   Int @unique
+          a_id Int
+          a    A?  @relation(fields: [a_id], references: [id])
+        }
+    "#]];
+
+    api.expect_re_introspected_datamodel(input, expected).await;
+
+    Ok(())
+}
+
+#[test_connector(tags(Mssql), preview_features("views"))]
 async fn views_cannot_have_default_values(api: &mut TestApi) -> TestResult {
     let setup = indoc! {r#"
         CREATE TABLE A (id INT CONSTRAINT A_pkey PRIMARY KEY, val INT CONSTRAINT A_val_df DEFAULT 2);

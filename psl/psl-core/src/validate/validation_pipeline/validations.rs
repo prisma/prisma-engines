@@ -119,31 +119,35 @@ pub(super) fn validate(ctx: &mut Context<'_>) {
         for index in model.indexes() {
             if model.ast_model().is_view() {
                 views::index(index, ctx);
-                continue;
+                indexes::unique_client_name_does_not_clash_with_field(index, ctx);
+            } else {
+                indexes::has_fields(index, ctx);
+                indexes::has_a_unique_constraint_name(index, &names, ctx);
+                indexes::unique_client_name_does_not_clash_with_field(index, ctx);
+                indexes::unique_index_has_a_unique_custom_name_per_model(index, &names, ctx);
+                indexes::field_length_prefix_supported(index, ctx);
+                indexes::index_algorithm_is_supported(index, ctx);
+                indexes::hash_index_must_not_use_sort_param(index, ctx);
+                indexes::fulltext_index_supported(index, ctx);
+                indexes::fulltext_columns_should_not_define_length(index, ctx);
+                indexes::fulltext_column_sort_is_supported(index, ctx);
+                indexes::fulltext_text_columns_should_be_bundled_together(index, ctx);
+                indexes::has_valid_mapped_name(index, ctx);
+                indexes::supports_clustering_setting(index, ctx);
+                indexes::clustering_can_be_defined_only_once(index, ctx);
+                indexes::opclasses_are_not_allowed_with_other_than_normal_indices(index, ctx);
+                indexes::composite_type_in_compound_unique_index(index, ctx);
             }
 
-            indexes::has_fields(index, ctx);
-            indexes::has_a_unique_constraint_name(index, &names, ctx);
-            indexes::unique_client_name_does_not_clash_with_field(index, ctx);
-            indexes::unique_index_has_a_unique_custom_name_per_model(index, &names, ctx);
-            indexes::field_length_prefix_supported(index, ctx);
-            indexes::index_algorithm_is_supported(index, ctx);
-            indexes::hash_index_must_not_use_sort_param(index, ctx);
-            indexes::fulltext_index_supported(index, ctx);
-            indexes::fulltext_columns_should_not_define_length(index, ctx);
-            indexes::fulltext_column_sort_is_supported(index, ctx);
-            indexes::fulltext_text_columns_should_be_bundled_together(index, ctx);
-            indexes::has_valid_mapped_name(index, ctx);
-            indexes::supports_clustering_setting(index, ctx);
-            indexes::clustering_can_be_defined_only_once(index, ctx);
-            indexes::opclasses_are_not_allowed_with_other_than_normal_indices(index, ctx);
-            indexes::composite_type_in_compound_unique_index(index, ctx);
-
             for field_attribute in index.scalar_field_attributes() {
-                let span = index.ast_attribute().span;
-                let attribute = (index.attribute_name(), span);
+                if model.ast_model().is_view() {
+                    views::index_field_attribute(index, field_attribute, ctx);
+                } else {
+                    let span = index.ast_attribute().span;
+                    let attribute = (index.attribute_name(), span);
 
-                fields::validate_length_used_with_correct_types(field_attribute, attribute, ctx);
+                    fields::validate_length_used_with_correct_types(field_attribute, attribute, ctx);
+                }
             }
         }
     }
@@ -162,8 +166,6 @@ pub(super) fn validate(ctx: &mut Context<'_>) {
     }
 
     for relation in ctx.db.walk_relations() {
-        relations::is_used_with_a_view(relation, ctx);
-
         match relation.refine() {
             // 1:1, 1:n
             RefinedRelationWalker::Inline(relation) => {

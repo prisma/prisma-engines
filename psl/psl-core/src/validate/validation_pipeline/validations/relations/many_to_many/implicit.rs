@@ -58,23 +58,33 @@ pub(crate) fn validate_no_referential_actions(relation: ImplicitManyToManyRelati
     }
 }
 
-/// We do not support implicit m:n relations on MongoDb.
+/// We do not support implicit m:n relations on MongoDB and views.
 pub(crate) fn supports_implicit_relations(relation: ImplicitManyToManyRelationWalker<'_>, ctx: &mut Context<'_>) {
-    if ctx.has_capability(ConnectorCapability::ImplicitManyToManyRelation) {
-        return;
+    if relation.one_side_is_view() {
+        push_error_for_both_sides(
+            relation,
+            ctx,
+            "Implicit many-to-many relations are not supported for views.",
+        )
+    } else if !ctx.has_capability(ConnectorCapability::ImplicitManyToManyRelation) {
+        push_error_for_both_sides(
+            relation,
+            ctx,
+            &format!(
+                "Implicit many-to-many relations are not supported on {}. Please use the syntax defined in https://pris.ly/d/document-database-many-to-many",
+                ctx.connector.name()
+            ),
+        )
     }
+}
 
+fn push_error_for_both_sides(relation: ImplicitManyToManyRelationWalker<'_>, ctx: &mut Context<'_>, msg: &str) {
     let spans = [relation.field_a(), relation.field_b()]
         .into_iter()
         .map(|r| r.ast_field().span());
 
-    let msg = format!(
-        "Implicit many-to-many relations are not supported on {}. Please use the syntax defined in https://pris.ly/d/document-database-many-to-many",
-        ctx.connector.name()
-    );
-
     for span in spans {
-        ctx.push_error(DatamodelError::new_validation_error(&msg, span));
+        ctx.push_error(DatamodelError::new_validation_error(msg, span));
     }
 }
 

@@ -19,6 +19,13 @@ mod views {
               lastName  String
               fullName  String
             }
+
+            view TestViewWithUnique {
+              #id(id, Int, @unique)
+              firstName String
+              lastName  String
+              fullName  String
+            }
             "#
         };
 
@@ -85,8 +92,32 @@ mod views {
     }
 
     #[connector_test]
+    async fn cursor(runner: Runner) -> TestResult<()> {
+        create_test_data(&runner, "cursor").await?;
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"{ findManyTestViewWithUnique(cursor: { id: 1 }) { fullName } }"#),
+          @r#"{"data":{"findManyTestViewWithUnique":[{"fullName":"John Doe"},{"fullName":"Jane Doe"},{"fullName":"Bob Maurane"}]}}"#
+        );
+
+        Ok(())
+    }
+
+    #[connector_test]
     async fn no_find_unique(runner: Runner) -> TestResult<()> {
         test_no_toplevel_query(runner, r#"{ findUniqueTestView(where: { id: 1 }) { fullName } }"#).await
+    }
+
+    #[connector_test]
+    async fn find_unique(runner: Runner) -> TestResult<()> {
+        create_test_data(&runner, "find_unique").await?;
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"{ findUniqueTestViewWithUnique(where: { id: 1 }) { fullName } }"#),
+          @r#"{"data":{"findUniqueTestViewWithUnique":{"fullName":"John Doe"}}}"#
+        );
+
+        Ok(())
     }
 
     #[connector_test]
@@ -96,6 +127,18 @@ mod views {
             r#"{ findUniqueTestViewOrThrow(where: { id: 1 }) { fullName } }"#,
         )
         .await
+    }
+
+    #[connector_test]
+    async fn find_unique_or_throw(runner: Runner) -> TestResult<()> {
+        create_test_data(&runner, "find_unique_or_throw").await?;
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"{ findUniqueTestViewWithUniqueOrThrow(where: { id: 1 }) { fullName } }"#),
+          @r#"{"data":{"findUniqueTestViewWithUniqueOrThrow":{"fullName":"John Doe"}}}"#
+        );
+
+        Ok(())
     }
 
     #[connector_test]
@@ -119,6 +162,18 @@ mod views {
             r#"{ findManyTestView(take: 2) { id fullName } }"#,
             2012,
             "`orderBy`: A value is required but not set. It is required because `take` was provided."
+        );
+
+        Ok(())
+    }
+
+    #[connector_test]
+    async fn take_without_order_by_with_unique(runner: Runner) -> TestResult<()> {
+        create_test_data(&runner, "take_without_order_by_with_unique").await?;
+
+        insta::assert_snapshot!(
+            run_query!(runner, r#"{ findManyTestViewWithUnique(take: 2) { id fullName } }"#),
+            @r#"{"data":{"findManyTestViewWithUnique":[{"id":1,"fullName":"John Doe"},{"id":2,"fullName":"Jane Doe"}]}}"#
         );
 
         Ok(())
@@ -151,6 +206,18 @@ mod views {
     }
 
     #[connector_test]
+    async fn skip_without_order_by_with_unique(runner: Runner) -> TestResult<()> {
+        create_test_data(&runner, "skip_without_order_by_with_unique").await?;
+
+        insta::assert_snapshot!(
+            run_query!(runner, r#"{ findManyTestViewWithUnique(skip: 2) { id fullName } }"#),
+            @r#"{"data":{"findManyTestViewWithUnique":[{"id":3,"fullName":"Bob Maurane"}]}}"#
+        );
+
+        Ok(())
+    }
+
+    #[connector_test]
     async fn take_skip_with_order_by(runner: Runner) -> TestResult<()> {
         create_test_data(&runner, "take_skip_with_order_by").await?;
 
@@ -175,6 +242,17 @@ mod views {
 
         Ok(())
     }
+    #[connector_test]
+    async fn take_skip_without_order_by_with_unique(runner: Runner) -> TestResult<()> {
+        create_test_data(&runner, "take_skip_without_order_by_with_unique").await?;
+
+        insta::assert_snapshot!(
+            run_query!(runner, r#"{ findManyTestViewWithUnique(take: 1, skip: 1) { id fullName } }"#),
+            @r#"{"data":{"findManyTestViewWithUnique":[{"id":2,"fullName":"Jane Doe"}]}}"#
+        );
+
+        Ok(())
+    }
 
     #[connector_test]
     async fn take_with_empty_order_by(runner: Runner) -> TestResult<()> {
@@ -184,7 +262,19 @@ mod views {
             runner,
             r#"{ findManyTestView(take: 1, orderBy: {}) { id fullName } }"#,
             2019,
-            "`orderBy` definition must not be empty when querying views"
+            "`orderBy` definition must not be empty when querying views without unique fields"
+        );
+
+        Ok(())
+    }
+
+    #[connector_test]
+    async fn take_with_empty_order_by_with_unique(runner: Runner) -> TestResult<()> {
+        create_test_data(&runner, "take_with_empty_order_by_with_unique").await?;
+
+        insta::assert_snapshot!(
+            run_query!(runner, r#"{ findManyTestViewWithUnique(take: 1, orderBy: {}) { id fullName } }"#),
+            @r#"{"data":{"findManyTestViewWithUnique":[{"id":1,"fullName":"John Doe"}]}}"#
         );
 
         Ok(())
@@ -198,7 +288,19 @@ mod views {
             runner,
             r#"{ findManyTestView(skip: 1, orderBy: {}) { id fullName } }"#,
             2019,
-            "`orderBy` definition must not be empty when querying views"
+            "`orderBy` definition must not be empty when querying views without unique fields"
+        );
+
+        Ok(())
+    }
+
+    #[connector_test]
+    async fn skip_with_empty_order_by_with_unique(runner: Runner) -> TestResult<()> {
+        create_test_data(&runner, "skip_with_empty_order_by_with_unique").await?;
+
+        insta::assert_snapshot!(
+            run_query!(runner, r#"{ findManyTestViewWithUnique(skip: 1, orderBy: {}) { id fullName } }"#),
+            @r#"{"data":{"findManyTestViewWithUnique":[{"id":2,"fullName":"Jane Doe"},{"id":3,"fullName":"Bob Maurane"}]}}"#
         );
 
         Ok(())
@@ -231,6 +333,18 @@ mod views {
     }
 
     #[connector_test]
+    async fn group_by_take_without_order_by_with_unique(runner: Runner) -> TestResult<()> {
+        create_test_data(&runner, "group_by_take_without_order_by_with_unique").await?;
+
+        insta::assert_snapshot!(
+            run_query!(runner, r#"{ groupByTestViewWithUnique(by: [lastName, id], take: 1) { lastName } }"#),
+            @r#"{"data":{"groupByTestViewWithUnique":[{"lastName":"Doe"}]}}"#
+        );
+
+        Ok(())
+    }
+
+    #[connector_test]
     async fn group_by_take_with_empty_order_by(runner: Runner) -> TestResult<()> {
         create_test_data(&runner, "group_by_take_with_empty_order_by").await?;
 
@@ -238,7 +352,19 @@ mod views {
             runner,
             r#"{ groupByTestView(by: lastName, take: 1, orderBy: {}) { lastName } }"#,
             2019,
-            "`orderBy` definition must not be empty when querying views"
+            "`orderBy` definition must not be empty when querying views without unique fields"
+        );
+
+        Ok(())
+    }
+
+    #[connector_test]
+    async fn group_by_take_with_empty_order_by_with_unique(runner: Runner) -> TestResult<()> {
+        create_test_data(&runner, "group_by_take_with_empty_order_by_with_unique").await?;
+
+        insta::assert_snapshot!(
+            run_query!(runner, r#"{ groupByTestViewWithUnique(by: [lastName, id], take: 1, orderBy: {}) { lastName } }"#),
+            @r#"{"data":{"groupByTestViewWithUnique":[{"lastName":"Doe"}]}}"#
         );
 
         Ok(())
@@ -271,6 +397,18 @@ mod views {
     }
 
     #[connector_test]
+    async fn group_by_skip_without_order_by_with_unique(runner: Runner) -> TestResult<()> {
+        create_test_data(&runner, "group_by_skip_without_order_by_with_unique").await?;
+
+        insta::assert_snapshot!(
+            run_query!(runner, r#"{ groupByTestViewWithUnique(by: [lastName, id], skip: 1) { lastName } }"#),
+            @r#"{"data":{"groupByTestViewWithUnique":[{"lastName":"Doe"},{"lastName":"Maurane"}]}}"#
+        );
+
+        Ok(())
+    }
+
+    #[connector_test]
     async fn group_by_skip_with_empty_order_by(runner: Runner) -> TestResult<()> {
         create_test_data(&runner, "group_by_skip_with_empty_order_by").await?;
 
@@ -278,14 +416,27 @@ mod views {
             runner,
             r#"{ groupByTestView(by: lastName, skip: 1, orderBy: {}) { lastName } }"#,
             2019,
-            "`orderBy` definition must not be empty when querying views"
+            "`orderBy` definition must not be empty when querying views without unique fields"
+        );
+
+        Ok(())
+    }
+
+    #[connector_test]
+    async fn group_by_skip_with_empty_order_by_with_unique(runner: Runner) -> TestResult<()> {
+        create_test_data(&runner, "group_by_skip_with_empty_order_by_with_unique").await?;
+
+        insta::assert_snapshot!(
+            run_query!(runner, r#"{ groupByTestViewWithUnique(by: [lastName, id], skip: 1, orderBy: {}) { lastName } }"#),
+            @r#"{"data":{"groupByTestViewWithUnique":[{"lastName":"Doe"},{"lastName":"Maurane"}]}}"#
         );
 
         Ok(())
     }
 
     async fn create_test_data(runner: &Runner, schema_name: &str) -> TestResult<()> {
-        migrate_view(runner, schema_name).await?;
+        migrate_view(runner, schema_name, "TestView").await?;
+        migrate_view(runner, schema_name, "TestViewWithUnique").await?;
 
         create_test_model(runner, r#"{ id: 1, firstName: "John", lastName: "Doe" }"#).await?;
         create_test_model(runner, r#"{ id: 2, firstName: "Jane", lastName: "Doe" }"#).await?;
@@ -294,32 +445,34 @@ mod views {
         Ok(())
     }
 
-    async fn migrate_view(runner: &Runner, schema_name: &str) -> TestResult<()> {
-        let sql = migrate_view_sql(runner, schema_name).await;
-
-        runner.raw_execute(sql).await?;
-
-        Ok(())
+    async fn migrate_view(runner: &Runner, schema_name: &str, view_name: &str) -> TestResult<()> {
+        let sql = migrate_view_sql(runner, schema_name, view_name).await;
+        runner.raw_execute(sql).await
     }
 
     // schema name must be the name of the test in which it's called.
-    async fn migrate_view_sql(runner: &Runner, schema_name: &str) -> String {
+    async fn migrate_view_sql(runner: &Runner, schema_name: &str, view_name: &str) -> String {
         match runner.connector_version() {
-            ConnectorVersion::Postgres(_)
-            | ConnectorVersion::CockroachDb(_)
-             => {
-                r#"CREATE VIEW "TestView" AS SELECT "TestModel".id, "TestModel"."firstName", "TestModel"."lastName", CONCAT("TestModel"."firstName", ' ', "TestModel"."lastName") as "fullName" From "TestModel""#.to_owned()
+            ConnectorVersion::Postgres(_) | ConnectorVersion::CockroachDb(_) => {
+                format!(
+                    r#"CREATE VIEW "{view_name}" AS SELECT "TestModel".id, "TestModel"."firstName", "TestModel"."lastName", CONCAT("TestModel"."firstName", ' ', "TestModel"."lastName") as "fullName" From "TestModel""#
+                )
             }
-            ConnectorVersion::MySql(_) | ConnectorVersion::Vitess(_)
-             => {
-              r#"CREATE VIEW TestView AS SELECT TestModel.*, CONCAT(TestModel.firstName, ' ', TestModel.lastName) AS "fullName" FROM TestModel"#.to_owned()
-            },
+            ConnectorVersion::MySql(_) | ConnectorVersion::Vitess(_) => {
+                format!(
+                    r#"CREATE VIEW "{view_name}" AS SELECT TestModel.*, CONCAT(TestModel.firstName, ' ', TestModel.lastName) AS "fullName" FROM TestModel"#
+                )
+            }
             ConnectorVersion::Sqlite(_) => {
-              r#"CREATE VIEW TestView AS SELECT TestModel.*, TestModel.firstName || ' ' || TestModel.lastName AS "fullName" FROM TestModel"#.to_owned()
+                format!(
+                    r#"CREATE VIEW "{view_name}" AS SELECT TestModel.*, TestModel.firstName || ' ' || TestModel.lastName AS "fullName" FROM TestModel"#
+                )
             }
             ConnectorVersion::SqlServer(_) => {
-              format!(r#"CREATE VIEW [views_{schema_name}].[TestView] AS SELECT [views_{schema_name}].[TestModel].[id], [views_{schema_name}].[TestModel].[firstName], [views_{schema_name}].[TestModel].[lastName], CONCAT([views_{schema_name}].[TestModel].[firstName], ' ', [views_{schema_name}].[TestModel].[lastName]) as "fullName" FROM [views_{schema_name}].[TestModel];"#)
-            },
+                format!(
+                    r#"CREATE VIEW [views_{schema_name}].[{view_name}] AS SELECT [views_{schema_name}].[TestModel].[id], [views_{schema_name}].[TestModel].[firstName], [views_{schema_name}].[TestModel].[lastName], CONCAT([views_{schema_name}].[TestModel].[firstName], ' ', [views_{schema_name}].[TestModel].[lastName]) as "fullName" FROM [views_{schema_name}].[TestModel];"#
+                )
+            }
             ConnectorVersion::MongoDb(_) => unreachable!(),
         }
     }
