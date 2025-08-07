@@ -199,7 +199,7 @@ impl Type {
             TypeIdentifier::Boolean => PrismaValueType::Boolean,
             TypeIdentifier::Enum(id) => PrismaValueType::Enum(self.dm.walk(id).name().to_owned()),
             TypeIdentifier::UUID => PrismaValueType::String,
-            TypeIdentifier::Json => PrismaValueType::Object,
+            TypeIdentifier::Json => PrismaValueType::Json,
             TypeIdentifier::DateTime => PrismaValueType::Date,
             TypeIdentifier::Bytes => PrismaValueType::Bytes,
             TypeIdentifier::Unsupported => PrismaValueType::Any,
