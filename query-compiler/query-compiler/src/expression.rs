@@ -160,16 +160,17 @@ impl Expression {
             Expression::Seq(seq) => {
                 seq.iter_mut().for_each(Expression::simplify);
             }
-            Expression::Let { bindings, expr } => match (&bindings[..], &**expr) {
-                ([binding], Self::Get { name }) if &binding.name == name => {
-                    *self = bindings.pop().unwrap().expr;
-                    self.simplify();
+            Expression::Let { bindings, expr } => {
+                expr.simplify();
+
+                match (&bindings[..], &**expr) {
+                    ([binding], Self::Get { name }) if &binding.name == name => {
+                        *self = bindings.pop().unwrap().expr;
+                        self.simplify();
+                    }
+                    _ => bindings.iter_mut().for_each(|binding| binding.expr.simplify()),
                 }
-                _ => {
-                    bindings.iter_mut().for_each(|binding| binding.expr.simplify());
-                    expr.simplify();
-                }
-            },
+            }
             Expression::Concat(vec) if vec.len() == 1 => {
                 *self = vec.pop().unwrap();
                 self.simplify();
