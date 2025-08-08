@@ -1,4 +1,3 @@
-use itertools::Itertools;
 use query_builder::QueryArgumentsExt;
 use query_core::ReadQuery;
 use query_structure::{QueryArguments, RelationLoadStrategy};
@@ -13,7 +12,10 @@ pub fn extract_in_memory_ops(
     InMemoryOps::builder()
         .reverse(args.needs_reversed_order())
         .maybe_pagination(args.requires_inmemory_pagination(rls).then(|| extract_pagination(args)))
-        .maybe_distinct(args.requires_inmemory_distinct(rls).then(|| extract_distinct_by(args)))
+        .maybe_distinct(
+            args.requires_inmemory_distinct(rls)
+                .then(|| extract_distinct_by(args, rls)),
+        )
         .maybe_nested((rls == RelationLoadStrategy::Join).then(|| {
             nested
                 .iter_mut()
@@ -45,7 +47,7 @@ pub fn extract_in_memory_ops_for_nested_query(args: &mut QueryArguments, has_uni
     InMemoryOps::builder()
         .reverse(args.needs_reversed_order())
         .maybe_pagination(must_paginate_in_memory.then(|| extract_pagination(args)))
-        .maybe_distinct(must_distinct_in_memory.then(|| extract_distinct_by(args)))
+        .maybe_distinct(must_distinct_in_memory.then(|| extract_distinct_by(args, RelationLoadStrategy::Query)))
         .build()
 }
 
@@ -67,7 +69,10 @@ fn extract_pagination(args: &mut QueryArguments) -> Pagination {
         .build()
 }
 
-fn extract_distinct_by(args: &mut QueryArguments) -> Vec<String> {
+fn extract_distinct_by(args: &mut QueryArguments, rls: RelationLoadStrategy) -> Vec<String> {
     let distinct = args.distinct.take().unwrap();
-    distinct.db_names().collect_vec()
+    match rls {
+        RelationLoadStrategy::Query => distinct.db_names().collect(),
+        RelationLoadStrategy::Join => distinct.prisma_names().collect(),
+    }
 }

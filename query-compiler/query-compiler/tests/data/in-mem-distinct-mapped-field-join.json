@@ -1,0 +1,16 @@
+{
+  "modelName": "Item",
+  "action": "findMany",
+  "query": {
+    "arguments": {
+      "relationLoadStrategy": "join",
+      "distinct": ["float"],
+      "skip": 20,
+      "take": 10
+    },
+    "selection": {
+      "int": true,
+      "float": true
+    }
+  }
+}
