@@ -132,6 +132,9 @@ fn parse_and_validate_preview_features(
     for feature_str in preview_features {
         let feature_opt = PreviewFeature::parse_opt(feature_str);
         match feature_opt {
+            Some(PreviewFeature::Metrics) => {
+                diagnostics.push_warning(DatamodelWarning::new_preview_feature_will_be_removed(feature_str, span));
+            }
             Some(feature) if feature_map_with_provider.is_deprecated(feature) => {
                 match feature_map_with_provider.is_renamed(feature) {
                     Some(RenamedFeature::AllProviders(renamed_feature)) => {
@@ -157,7 +160,10 @@ fn parse_and_validate_preview_features(
                     }
                     None => {
                         features |= feature;
-                        diagnostics.push_warning(DatamodelWarning::new_preview_feature_deprecated(feature_str, span));
+                        diagnostics.push_warning(DatamodelWarning::new_preview_feature_is_generally_available(
+                            feature_str,
+                            span,
+                        ));
                     }
                 }
             }
