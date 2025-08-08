@@ -266,7 +266,7 @@ impl ToColumnNames for SqliteRows<'_> {
 }
 
 impl ToSql for Value<'_> {
-    fn to_sql(&self) -> Result<ToSqlOutput, RusqlError> {
+    fn to_sql(&self) -> Result<ToSqlOutput<'_>, RusqlError> {
         let value = match &self.typed {
             ValueType::Int32(integer) => integer.map(ToSqlOutput::from),
             ValueType::Int64(integer) => integer.map(ToSqlOutput::from),

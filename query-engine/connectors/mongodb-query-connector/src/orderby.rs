@@ -255,25 +255,25 @@ impl OrderByBuilder {
             // Unwind order by aggregate to-one middle joins into the top level join
             // to prevent nested join result which break the stages that come after
             // See `unwind_aggregate_joins` for more explanation
-            if let OrderBy::ToManyAggregation(order_by_aggregate) = &data.order_by {
-                if !order_by_aggregate.path.is_empty() {
-                    match order_by_aggregate.sort_aggregation {
-                        query_structure::SortAggregation::Count => {
-                            if let Some(clone_to) = data.prefix.as_ref().and_then(|x| x.clone_to.clone()) {
-                                order_aggregate_proj_doc.push(doc! { "$addFields": { clone_to.clone(): { "$size": { "$ifNull": [format!("${}", data.full_reference_path(false)), []] } } } });
-                                field_name = clone_to; // Todo: Just a hack right now, this whole function needs love.
-                            } else {
-                                order_aggregate_proj_doc.extend(unwind_aggregate_joins(
-                                    field_name.clone().as_str(),
-                                    order_by_aggregate,
-                                    &data,
-                                ));
+            if let OrderBy::ToManyAggregation(order_by_aggregate) = &data.order_by
+                && !order_by_aggregate.path.is_empty()
+            {
+                match order_by_aggregate.sort_aggregation {
+                    query_structure::SortAggregation::Count => {
+                        if let Some(clone_to) = data.prefix.as_ref().and_then(|x| x.clone_to.clone()) {
+                            order_aggregate_proj_doc.push(doc! { "$addFields": { clone_to.clone(): { "$size": { "$ifNull": [format!("${}", data.full_reference_path(false)), []] } } } });
+                            field_name = clone_to; // Todo: Just a hack right now, this whole function needs love.
+                        } else {
+                            order_aggregate_proj_doc.extend(unwind_aggregate_joins(
+                                field_name.clone().as_str(),
+                                order_by_aggregate,
+                                &data,
+                            ));
 
-                                order_aggregate_proj_doc.push(doc! { "$addFields": { field_name.clone(): { "$size": { "$ifNull": [format!("${field_name}"), []] } } } });
-                            }
+                            order_aggregate_proj_doc.push(doc! { "$addFields": { field_name.clone(): { "$size": { "$ifNull": [format!("${field_name}"), []] } } } });
                         }
-                        _ => unimplemented!("Order by aggregate only supports COUNT"),
                     }
+                    _ => unimplemented!("Order by aggregate only supports COUNT"),
                 }
             }
 

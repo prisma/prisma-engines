@@ -321,7 +321,7 @@ impl QueryDocumentParser {
                     (PrismaValue::Null, input_type) => try_this!(Err(ValidationError::required_argument_missing(
                         selection_path.segments(),
                         argument_path.segments(),
-                        &conversions::input_types_to_input_type_descriptions(&[input_type.clone()],),
+                        &conversions::input_types_to_input_type_descriptions(std::slice::from_ref(input_type)),
                     ))),
                     // Scalar handling
                     (pv, InputType::Scalar(st)) => try_this!(
@@ -630,7 +630,7 @@ impl QueryDocumentParser {
                     selection_path.clone(),
                     argument_path.clone(),
                     val,
-                    &[value_type.clone()],
+                    std::slice::from_ref(value_type),
                     query_schema,
                 )
             })

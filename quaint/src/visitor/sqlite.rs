@@ -23,20 +23,20 @@ impl<'a> Sqlite<'a> {
     }
 
     fn returning(&mut self, returning: Option<Vec<Column<'a>>>) -> visitor::Result {
-        if let Some(returning) = returning {
-            if !returning.is_empty() {
-                let values_len = returning.len();
-                self.write(" RETURNING ")?;
+        if let Some(returning) = returning
+            && !returning.is_empty()
+        {
+            let values_len = returning.len();
+            self.write(" RETURNING ")?;
 
-                for (i, column) in returning.into_iter().enumerate() {
-                    // Workaround for SQLite parsing bug
-                    // https://sqlite.org/forum/info/6c141f151fa5c444db257eb4d95c302b70bfe5515901cf987e83ed8ebd434c49?t=h
-                    self.surround_with_backticks(&column.name)?;
-                    self.write(" AS ")?;
-                    self.surround_with_backticks(&column.name)?;
-                    if i < (values_len - 1) {
-                        self.write(", ")?;
-                    }
+            for (i, column) in returning.into_iter().enumerate() {
+                // Workaround for SQLite parsing bug
+                // https://sqlite.org/forum/info/6c141f151fa5c444db257eb4d95c302b70bfe5515901cf987e83ed8ebd434c49?t=h
+                self.surround_with_backticks(&column.name)?;
+                self.write(" AS ")?;
+                self.surround_with_backticks(&column.name)?;
+                if i < (values_len - 1) {
+                    self.write(", ")?;
                 }
             }
         }

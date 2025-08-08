@@ -61,15 +61,15 @@ fn lift_generator(
         .collect::<Option<HashMap<_, _>>>()?;
 
     // E.g., "library"
-    if let Some(expr) = args.get(ENGINE_TYPE_KEY) {
-        if !expr.is_string() {
-            diagnostics.push_error(DatamodelError::new_type_mismatch_error(
-                "String",
-                expr.describe_value_type(),
-                &expr.to_string(),
-                expr.span(),
-            ))
-        }
+    if let Some(expr) = args.get(ENGINE_TYPE_KEY)
+        && !expr.is_string()
+    {
+        diagnostics.push_error(DatamodelError::new_type_mismatch_error(
+            "String",
+            expr.describe_value_type(),
+            &expr.to_string(),
+            expr.span(),
+        ))
     }
 
     // E.g., "prisma-client-js"

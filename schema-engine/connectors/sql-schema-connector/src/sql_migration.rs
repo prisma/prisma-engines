@@ -651,7 +651,7 @@ pub(crate) struct SequenceChanges(pub(crate) BitFlags<SequenceChange>);
 
 impl PartialOrd for SequenceChanges {
     fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
-        Some(self.0.bits().cmp(&other.0.bits()))
+        Some(self.cmp(other))
     }
 }
 

@@ -112,16 +112,16 @@ fn push_ast_completions(ctx: CompletionContext<'_>, completion_list: &mut Comple
                 ast::FieldPosition::Attribute("relation", _, AttributePosition::ArgumentValue(attr_name, value)),
             ),
         ) => {
-            if let Some(attr_name) = attr_name {
-                if attr_name == "onDelete" || attr_name == "onUpdate" {
-                    ctx.connector()
-                        .referential_actions(&relation_mode)
-                        .iter()
-                        .filter(|ref_action| ref_action.to_string().starts_with(&value))
-                        .for_each(|referential_action| {
-                            referential_actions::referential_action_completion(completion_list, referential_action)
-                        });
-                }
+            if let Some(attr_name) = attr_name
+                && (attr_name == "onDelete" || attr_name == "onUpdate")
+            {
+                ctx.connector()
+                    .referential_actions(&relation_mode)
+                    .iter()
+                    .filter(|ref_action| ref_action.to_string().starts_with(&value))
+                    .for_each(|referential_action| {
+                        referential_actions::referential_action_completion(completion_list, referential_action)
+                    });
             }
         }
 

@@ -501,13 +501,13 @@ mod create_many {
     async fn create_many_with_many_fields(runner: Runner) -> TestResult<()> {
         const FIELDS_IN_TEST_MODEL: usize = 12;
 
-        if let Some(max_bind_values) = runner.max_bind_values() {
-            if !runner.connector_version().is_wasm() {
-                assert!(
-                    max_bind_values < FIELDS_IN_TEST_MODEL,
-                    "When QUERY_BATCH_SIZE is set, its value must be less than {FIELDS_IN_TEST_MODEL}, otherwise the test will not be testing what it's supposed to; instead got {max_bind_values}. Either update this test, or the QUERY_BATCH_SIZE env var value in .envrc and GitHub Actions pipelines"
-                );
-            }
+        if let Some(max_bind_values) = runner.max_bind_values()
+            && !runner.connector_version().is_wasm()
+        {
+            assert!(
+                max_bind_values < FIELDS_IN_TEST_MODEL,
+                "When QUERY_BATCH_SIZE is set, its value must be less than {FIELDS_IN_TEST_MODEL}, otherwise the test will not be testing what it's supposed to; instead got {max_bind_values}. Either update this test, or the QUERY_BATCH_SIZE env var value in .envrc and GitHub Actions pipelines"
+            );
         }
 
         let result = run_query!(

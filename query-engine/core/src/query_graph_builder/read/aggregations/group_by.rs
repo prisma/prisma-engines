@@ -47,10 +47,10 @@ fn verify_selections(selectors: &[AggregationSelection], group_by: &[ScalarField
     let mut missing_fields = vec![];
 
     for selector in selectors {
-        if let AggregationSelection::Field(field) = selector {
-            if !group_by.contains(field) {
-                missing_fields.push(field.name().to_owned());
-            }
+        if let AggregationSelection::Field(field) = selector
+            && !group_by.contains(field)
+        {
+            missing_fields.push(field.name().to_owned());
         }
     }
 
@@ -71,10 +71,10 @@ fn verify_orderings(orderings: &[OrderBy], group_by: &[ScalarFieldRef]) -> Query
     let mut missing_fields = vec![];
 
     for ordering in orderings {
-        if let OrderBy::Scalar(by_scalar) = ordering {
-            if !group_by.contains(&by_scalar.field) {
-                missing_fields.push(by_scalar.field.name().to_owned());
-            }
+        if let OrderBy::Scalar(by_scalar) = ordering
+            && !group_by.contains(&by_scalar.field)
+        {
+            missing_fields.push(by_scalar.field.name().to_owned());
         }
     }
 

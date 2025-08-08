@@ -112,26 +112,25 @@ pub(super) fn has_a_unique_custom_primary_key_name_per_model(
         None => return,
     };
 
-    if let Some(name) = pk.name() {
-        if names
+    if let Some(name) = pk.name()
+        && names
             .constraint_namespace
             .local_custom_name_scope_violations(model.id, name.as_ref())
-        {
-            let message = format!(
-                "The given custom name `{name}` has to be unique on the model. Please provide a different name for the `name` argument."
-            );
+    {
+        let message = format!(
+            "The given custom name `{name}` has to be unique on the model. Please provide a different name for the `name` argument."
+        );
 
-            let span = pk
-                .ast_attribute()
-                .span_for_argument("name")
-                .unwrap_or_else(|| pk.ast_attribute().span);
+        let span = pk
+            .ast_attribute()
+            .span_for_argument("name")
+            .unwrap_or_else(|| pk.ast_attribute().span);
 
-            ctx.push_error(DatamodelError::new_attribute_validation_error(
-                &message,
-                pk.attribute_name(),
-                span,
-            ));
-        }
+        ctx.push_error(DatamodelError::new_attribute_validation_error(
+            &message,
+            pk.attribute_name(),
+            span,
+        ));
     }
 }
 
@@ -141,17 +140,17 @@ pub(crate) fn primary_key_length_prefix_supported(model: ModelWalker<'_>, ctx: &
         return;
     }
 
-    if let Some(pk) = model.primary_key() {
-        if pk.scalar_field_attributes().any(|f| f.length().is_some()) {
-            let message = "The length argument is not supported in the primary key with the current connector";
-            let span = pk.ast_attribute().span;
+    if let Some(pk) = model.primary_key()
+        && pk.scalar_field_attributes().any(|f| f.length().is_some())
+    {
+        let message = "The length argument is not supported in the primary key with the current connector";
+        let span = pk.ast_attribute().span;
 
-            ctx.push_error(DatamodelError::new_attribute_validation_error(
-                message,
-                pk.attribute_name(),
-                span,
-            ));
-        }
+        ctx.push_error(DatamodelError::new_attribute_validation_error(
+            message,
+            pk.attribute_name(),
+            span,
+        ));
     }
 }
 
@@ -161,17 +160,17 @@ pub(crate) fn primary_key_sort_order_supported(model: ModelWalker<'_>, ctx: &mut
         return;
     }
 
-    if let Some(pk) = model.primary_key() {
-        if pk.scalar_field_attributes().any(|f| f.sort_order().is_some()) {
-            let message = "The sort argument is not supported in the primary key with the current connector";
-            let span = pk.ast_attribute().span;
+    if let Some(pk) = model.primary_key()
+        && pk.scalar_field_attributes().any(|f| f.sort_order().is_some())
+    {
+        let message = "The sort argument is not supported in the primary key with the current connector";
+        let span = pk.ast_attribute().span;
 
-            ctx.push_error(DatamodelError::new_attribute_validation_error(
-                message,
-                pk.attribute_name(),
-                span,
-            ));
-        }
+        ctx.push_error(DatamodelError::new_attribute_validation_error(
+            message,
+            pk.attribute_name(),
+            span,
+        ));
     }
 }
 

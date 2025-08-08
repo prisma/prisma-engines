@@ -96,18 +96,18 @@ impl DestructiveCheckPlan {
         results: &mut DatabaseInspectionResults,
     ) -> ConnectorResult<()> {
         let mut checker = connector.dialect().destructive_change_checker();
-        if let Some(table) = check.needed_table_row_count() {
-            if results.get_row_count(&table).is_none() {
-                let count = checker.count_rows_in_table(connector, &table).await?;
-                results.set_row_count(table.to_owned(), count)
-            }
+        if let Some(table) = check.needed_table_row_count()
+            && results.get_row_count(&table).is_none()
+        {
+            let count = checker.count_rows_in_table(connector, &table).await?;
+            results.set_row_count(table.to_owned(), count)
         }
 
-        if let Some(column) = check.needed_column_value_count() {
-            if let (_, None) = results.get_row_and_non_null_value_count(&column) {
-                let count = checker.count_values_in_column(connector, &column).await?;
-                results.set_value_count(column, count);
-            }
+        if let Some(column) = check.needed_column_value_count()
+            && let (_, None) = results.get_row_and_non_null_value_count(&column)
+        {
+            let count = checker.count_values_in_column(connector, &column).await?;
+            results.set_value_count(column, count);
         }
 
         Ok(())

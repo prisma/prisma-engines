@@ -116,14 +116,14 @@ impl RelationReference<'_> {
     }
 }
 
-pub fn common_parent_references(rf: &RelationField) -> Vec<RelationReference> {
+pub fn common_parent_references(rf: &RelationField) -> Vec<RelationReference<'_>> {
     vec![
         RelationReference::ParentReference(rf),
         RelationReference::CompoundParentReference(rf),
     ]
 }
 
-pub fn common_child_references(rf: &RelationField) -> Vec<RelationReference> {
+pub fn common_child_references(rf: &RelationField) -> Vec<RelationReference<'_>> {
     vec![
         RelationReference::ChildReference(rf),
         RelationReference::CompoundChildReference(rf),

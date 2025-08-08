@@ -141,7 +141,7 @@ impl SchemaConnector for MongoDbSchemaConnector {
         Box::pin(self.apply_migration_impl(migration))
     }
 
-    fn apply_script(&mut self, _migration_name: &str, _script: &str) -> BoxFuture<ConnectorResult<()>> {
+    fn apply_script(&mut self, _migration_name: &str, _script: &str) -> BoxFuture<'_, ConnectorResult<()>> {
         Box::pin(future::ready(Err(crate::unsupported_command_error())))
     }
 

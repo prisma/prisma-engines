@@ -48,17 +48,17 @@ pub(super) fn create_missing_block_for_model(
             model.newline(),
         );
 
-        if let Some(ds) = context.datasource() {
-            if ds.active_provider == "mongodb" {
-                push_missing_block(
-                    diag,
-                    context.params.text_document.uri.clone(),
-                    range,
-                    "type",
-                    actions,
-                    model.newline(),
-                );
-            }
+        if let Some(ds) = context.datasource()
+            && ds.active_provider == "mongodb"
+        {
+            push_missing_block(
+                diag,
+                context.params.text_document.uri.clone(),
+                range,
+                "type",
+                actions,
+                model.newline(),
+            );
         }
     })
 }

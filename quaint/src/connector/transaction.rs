@@ -86,18 +86,18 @@ impl<'a> DefaultTransaction<'a> {
             gauge: GaugeGuard::increment("prisma_client_queries_active"),
         };
 
-        if tx_opts.isolation_first {
-            if let Some(isolation) = tx_opts.isolation_level {
-                inner.set_tx_isolation_level(isolation).await?;
-            }
+        if tx_opts.isolation_first
+            && let Some(isolation) = tx_opts.isolation_level
+        {
+            inner.set_tx_isolation_level(isolation).await?;
         }
 
         inner.raw_cmd(begin_stmt).await?;
 
-        if !tx_opts.isolation_first {
-            if let Some(isolation) = tx_opts.isolation_level {
-                inner.set_tx_isolation_level(isolation).await?;
-            }
+        if !tx_opts.isolation_first
+            && let Some(isolation) = tx_opts.isolation_level
+        {
+            inner.set_tx_isolation_level(isolation).await?;
         }
 
         inner.server_reset_query(&this).await?;

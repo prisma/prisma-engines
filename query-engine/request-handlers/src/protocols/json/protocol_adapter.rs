@@ -75,15 +75,15 @@ impl<'a> JsonProtocolAdapter<'a> {
                 }
                 // $composites: true
                 crate::SelectionSetValue::Shorthand(true) if SelectionSet::is_all_composites(&selection_name) => {
-                    if let Some(schema_object) = field.field_type().as_object_type() {
-                        if let Some(container) = container {
-                            Self::default_composite_selection(
-                                &mut selection,
-                                container,
-                                schema_object,
-                                &mut Vec::<String>::new(),
-                            )?;
-                        }
+                    if let Some(schema_object) = field.field_type().as_object_type()
+                        && let Some(container) = container
+                    {
+                        Self::default_composite_selection(
+                            &mut selection,
+                            container,
+                            schema_object,
+                            &mut Vec::<String>::new(),
+                        )?;
                     }
                 }
                 // <field_name>: true

@@ -91,10 +91,10 @@ pub(crate) fn render(default: DefaultValuePair<'_>) -> Option<renderer::DefaultV
         None => None,
     };
 
-    if let Some(res) = rendered.as_mut() {
-        if let Some(mapped_name) = default.mapped_name() {
-            res.map(mapped_name);
-        }
+    if let Some(res) = rendered.as_mut()
+        && let Some(mapped_name) = default.mapped_name()
+    {
+        res.map(mapped_name);
     }
 
     rendered

@@ -73,25 +73,23 @@ pub(crate) fn upsert_record(
     let filter = extract_unique_filter(where_argument, &model)?;
     let read_query = read::find_unique(field.clone(), model.clone(), query_schema)?;
 
-    if can_use_native_upsert {
-        if let ReadQuery::RecordQuery(read) = read_query {
-            let mut create_write_args = WriteArgsParser::from(&model, create_argument)?.args;
-            let mut update_write_args = WriteArgsParser::from(&model, update_argument)?.args;
+    if can_use_native_upsert && let ReadQuery::RecordQuery(read) = read_query {
+        let mut create_write_args = WriteArgsParser::from(&model, create_argument)?.args;
+        let mut update_write_args = WriteArgsParser::from(&model, update_argument)?.args;
 
-            create_write_args.add_datetimes(&model);
-            update_write_args.add_datetimes(&model);
+        create_write_args.add_datetimes(&model);
+        update_write_args.add_datetimes(&model);
 
-            graph.create_node(WriteQuery::native_upsert(
-                field.name,
-                model,
-                filter.into(),
-                create_write_args,
-                update_write_args,
-                read,
-            ));
+        graph.create_node(WriteQuery::native_upsert(
+            field.name,
+            model,
+            filter.into(),
+            create_write_args,
+            update_write_args,
+            read,
+        ));
 
-            return Ok(());
-        }
+        return Ok(());
     }
 
     graph.flag_transactional();

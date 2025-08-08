@@ -140,11 +140,11 @@ async fn request_handler(cx: Arc<PrismaContext>, req: Request<Body>) -> Result<R
                     let handler = RequestHandler::new(cx.executor(), cx.query_schema(), cx.engine_protocol());
                     let mut result = handler.handle(body, tx_id, traceparent).instrument(span).await;
 
-                    if cx.logger.tracing_config().should_capture() {
-                        if let Some(trace) = cx.logger.exporter().stop_capturing(request_id).await {
-                            result.set_extension("traces".to_owned(), json!(trace.spans));
-                            result.set_extension("logs".to_owned(), json!(trace.events));
-                        }
+                    if cx.logger.tracing_config().should_capture()
+                        && let Some(trace) = cx.logger.exporter().stop_capturing(request_id).await
+                    {
+                        result.set_extension("traces".to_owned(), json!(trace.spans));
+                        result.set_extension("logs".to_owned(), json!(trace.events));
                     }
 
                     let res = build_json_response(StatusCode::OK, &result);
