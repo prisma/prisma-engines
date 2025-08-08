@@ -123,10 +123,10 @@ pub(crate) fn validate_length_used_with_correct_types(
         return;
     }
 
-    if let Some(r#type) = attr.as_index_field().scalar_field_type().as_builtin_scalar() {
-        if [ScalarType::String, ScalarType::Bytes].iter().any(|t| t == &r#type) {
-            return;
-        }
+    if let Some(r#type) = attr.as_index_field().scalar_field_type().as_builtin_scalar()
+        && [ScalarType::String, ScalarType::Bytes].iter().any(|t| t == &r#type)
+    {
+        return;
     };
 
     let message = "The length argument is only allowed with field types `String` or `Bytes`.";
@@ -148,16 +148,16 @@ pub(super) fn validate_native_type_arguments<'db>(field: impl Into<TypedFieldWal
     };
 
     // Validate that the attribute is scoped with the right datasource name.
-    if let Some(datasource) = ctx.datasource {
-        if datasource.name != attr_scope {
-            let suggestion = [datasource.name.as_str(), type_name].join(".");
-            ctx.push_error(DatamodelError::new_invalid_prefix_for_native_types(
-                attr_scope,
-                &datasource.name,
-                &suggestion,
-                span,
-            ));
-        }
+    if let Some(datasource) = ctx.datasource
+        && datasource.name != attr_scope
+    {
+        let suggestion = [datasource.name.as_str(), type_name].join(".");
+        ctx.push_error(DatamodelError::new_invalid_prefix_for_native_types(
+            attr_scope,
+            &datasource.name,
+            &suggestion,
+            span,
+        ));
     }
 
     let constructor = if let Some(cons) = ctx.connector.find_native_type_constructor(type_name) {

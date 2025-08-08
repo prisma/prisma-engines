@@ -244,10 +244,10 @@ impl Filter {
                 .iter()
                 .for_each(|f| Self::filter_and_collect_scalars(f, filter_check, scalars)),
             Filter::Scalar(sf) => {
-                if filter_check(sf) {
-                    if let Some(field) = sf.scalar_ref() {
-                        scalars.push(field.to_owned())
-                    }
+                if filter_check(sf)
+                    && let Some(field) = sf.scalar_ref()
+                {
+                    scalars.push(field.to_owned())
                 }
             }
             _ => (),

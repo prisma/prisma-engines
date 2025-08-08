@@ -105,10 +105,10 @@ impl<'ast> EnumValuePosition<'ast> {
                 }
 
                 // If the cursor is after a trailing comma, we're not in an argument.
-                if let Some(span) = attr.arguments.trailing_comma {
-                    if position > span.start {
-                        arg_name = None;
-                    }
+                if let Some(span) = attr.arguments.trailing_comma
+                    && position > span.start
+                {
+                    arg_name = None;
                 }
 
                 return EnumValuePosition::Attribute(attr.name(), attr_idx, arg_name.flatten());

@@ -179,13 +179,13 @@ fn lift_datasource(
     };
 
     if let Some((shadow_url, _)) = &shadow_database_url {
-        if let (Some(direct_url), Some(direct_url_span)) = (&direct_url, direct_url_span) {
-            if shadow_url == direct_url {
-                diagnostics.push_error(DatamodelError::new_shadow_database_is_same_as_direct_url_error(
-                    source_name,
-                    direct_url_span,
-                ));
-            }
+        if let (Some(direct_url), Some(direct_url_span)) = (&direct_url, direct_url_span)
+            && shadow_url == direct_url
+        {
+            diagnostics.push_error(DatamodelError::new_shadow_database_is_same_as_direct_url_error(
+                source_name,
+                direct_url_span,
+            ));
         }
 
         if shadow_url == &url {

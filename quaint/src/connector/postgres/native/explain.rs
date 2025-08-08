@@ -47,11 +47,11 @@ pub(crate) fn visit_plan(plan: &Plan, outputs: &[String], nullables: &mut Vec<Op
         }
     }
 
-    if let Some(plans) = &plan.plans {
-        if let Some("Left") | Some("Right") = plan.join_type.as_deref() {
-            for plan in plans {
-                visit_plan(plan, outputs, nullables);
-            }
+    if let Some(plans) = &plan.plans
+        && matches!(plan.join_type.as_deref(), Some("Left" | "Right"))
+    {
+        for plan in plans {
+            visit_plan(plan, outputs, nullables);
         }
     }
 }

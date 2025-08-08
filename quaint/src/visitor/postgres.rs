@@ -38,12 +38,12 @@ impl<'a> Postgres<'a> {
     }
 
     fn visit_returning(&mut self, returning: Option<Vec<Column<'a>>>) -> visitor::Result {
-        if let Some(returning) = returning {
-            if !returning.is_empty() {
-                let values = returning.into_iter().map(|r| r.into()).collect();
-                self.write(" RETURNING ")?;
-                self.visit_columns(values)?;
-            }
+        if let Some(returning) = returning
+            && !returning.is_empty()
+        {
+            let values = returning.into_iter().map(|r| r.into()).collect();
+            self.write(" RETURNING ")?;
+            self.visit_columns(values)?;
         }
         Ok(())
     }

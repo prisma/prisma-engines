@@ -321,14 +321,14 @@ impl<'a> Visitor<'a> for Mysql<'a> {
     fn visit_sub_selection(&mut self, query: SelectQuery<'a>) -> visitor::Result {
         match query {
             SelectQuery::Select(select) => {
-                if let Some(table) = &self.target_table {
-                    if select.tables.contains(table) {
-                        let tmp_name = "tmp_subselect_table";
-                        let tmp_table = Table::from(*select).alias(tmp_name);
-                        let sub_select = Select::from_table(tmp_table).value(Table::from(tmp_name).asterisk());
+                if let Some(table) = &self.target_table
+                    && select.tables.contains(table)
+                {
+                    let tmp_name = "tmp_subselect_table";
+                    let tmp_table = Table::from(*select).alias(tmp_name);
+                    let sub_select = Select::from_table(tmp_table).value(Table::from(tmp_name).asterisk());
 
-                        return self.visit_select(sub_select);
-                    }
+                    return self.visit_select(sub_select);
                 }
 
                 self.visit_select(*select)

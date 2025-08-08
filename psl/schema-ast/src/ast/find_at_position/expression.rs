@@ -58,10 +58,10 @@ fn narrow_function_position<'ast>(
     }
 
     // If the cursor is after a trailing comma, we're not in an argument.
-    if let Some(span) = args.trailing_comma {
-        if position > span.start {
-            arg_name = None;
-        }
+    if let Some(span) = args.trailing_comma
+        && position > span.start
+    {
+        arg_name = None;
     }
 
     if let Some(arg_name) = arg_name.flatten() {

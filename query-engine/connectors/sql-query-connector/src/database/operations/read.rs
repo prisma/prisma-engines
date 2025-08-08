@@ -312,7 +312,7 @@ pub(crate) async fn get_related_m2m_record_ids(
     // [DTODO] To verify: We might need chunked fetch here (too many parameters in the query).
     let select = Select::from_table(table)
         .so_that(sql_query_builder::in_conditions(
-            &[from_column.clone()],
+            std::slice::from_ref(&from_column),
             from_record_ids,
             ctx,
         ))

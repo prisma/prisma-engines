@@ -555,13 +555,13 @@ impl SqlConnector for MssqlConnector {
                         ConnectorParams::new(jdbc_string.to_string(), params.connector_params.preview_features, None);
                     let mut shadow_database = MssqlConnector::new_with_params(connector_params.clone())?;
 
-                    if let Some(schema) = jdbc_string.properties().get("schema") {
-                        if schema != DEFAULT_SCHEMA_NAME {
-                            shadow_database
-                                .raw_cmd(&format!("CREATE SCHEMA [{schema}]"))
-                                .await
-                                .map_err(|err| err.into_shadow_db_creation_error())?;
-                        }
+                    if let Some(schema) = jdbc_string.properties().get("schema")
+                        && schema != DEFAULT_SCHEMA_NAME
+                    {
+                        shadow_database
+                            .raw_cmd(&format!("CREATE SCHEMA [{schema}]"))
+                            .await
+                            .map_err(|err| err.into_shadow_db_creation_error())?;
                     }
 
                     // We go through the whole process without early return, then clean up

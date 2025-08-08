@@ -777,7 +777,7 @@ fn convert_json_filter(
                 cond,
                 reverse,
                 query_mode,
-                &[field.clone()],
+                std::slice::from_ref(field),
                 alias,
                 false,
                 ctx,

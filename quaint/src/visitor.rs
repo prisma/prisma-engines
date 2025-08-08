@@ -412,12 +412,12 @@ pub trait Visitor<'a> {
             self.visit_conditions(conditions)?;
         }
 
-        if let Some(returning) = update.returning {
-            if !returning.is_empty() {
-                let values = returning.into_iter().map(|r| r.into()).collect();
-                self.write(" RETURNING ")?;
-                self.visit_columns(values)?;
-            }
+        if let Some(returning) = update.returning
+            && !returning.is_empty()
+        {
+            let values = returning.into_iter().map(|r| r.into()).collect();
+            self.write(" RETURNING ")?;
+            self.visit_columns(values)?;
         }
 
         if let Some(comment) = update.comment {
@@ -685,13 +685,11 @@ pub trait Visitor<'a> {
             }
         };
 
-        if include_alias {
-            if let Some(alias) = table.alias {
-                self.write(" AS ")?;
+        if include_alias && let Some(alias) = table.alias {
+            self.write(" AS ")?;
 
-                self.delimited_identifiers(&[&*alias])?;
-            };
-        }
+            self.delimited_identifiers(&[&*alias])?;
+        };
 
         Ok(())
     }

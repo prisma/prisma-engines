@@ -40,13 +40,14 @@ impl<'ast> PropertyPosition<'ast> {
             return PropertyPosition::Name(property.name());
         }
 
-        if let Some(val) = &property.value {
-            if val.span().contains(position) && val.is_function() {
-                let func = val.as_function().unwrap();
+        if let Some(val) = &property.value
+            && val.span().contains(position)
+            && val.is_function()
+        {
+            let func = val.as_function().unwrap();
 
-                if func.0 == "env" {
-                    return PropertyPosition::FunctionValue("env");
-                }
+            if func.0 == "env" {
+                return PropertyPosition::FunctionValue("env");
             }
         }
         if property.span.contains(position) && !property.name.span.contains(position) {

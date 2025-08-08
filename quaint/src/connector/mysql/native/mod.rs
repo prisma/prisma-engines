@@ -172,10 +172,10 @@ impl Mysql {
                 );
 
                 let mut conn = self.conn.lock().await;
-                if cache.capacity() == cache.len() {
-                    if let Some((_, stmt)) = cache.remove_lru() {
-                        conn.close(stmt).await?;
-                    }
+                if cache.capacity() == cache.len()
+                    && let Some((_, stmt)) = cache.remove_lru()
+                {
+                    conn.close(stmt).await?;
                 }
 
                 let stmt = conn.prep(sql).await?;
