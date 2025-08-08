@@ -1,0 +1,20 @@
+---
+source: query-compiler/query-compiler/tests/queries.rs
+expression: pretty
+input_file: query-compiler/query-compiler/tests/data/in-mem-distinct-mapped-field-join.json
+---
+dataMap {
+    int: Int (int)
+    float: Float (float)
+}
+process {
+    .: {
+        distinct: (float)
+        pagination: {
+            skip: 20
+            take: 10
+        }
+    }
+} (query «SELECT "t0"."id", "t0"."db_int" AS "int", "t0"."db_float" AS "float"
+          FROM "public"."Item" AS "t0" ORDER BY "t0"."id" ASC»
+   params [])
