@@ -248,17 +248,7 @@ pub(crate) trait SqlConnector: Send + Sync + Debug {
                 {
                     return Ok(Err(PersistenceNotInitializedError));
                 }
-                Err(_) => {
-                    // TODO: this is a workaround, as currently the errors thrown by Driver Adapters do not
-                    // match the known user-facing errors we expect.
-                    // We should fix this in the future.
-                    //
-                    // This used to actually yield:
-                    // ```
-                    // err @ Err(_) => err?
-                    // ```
-                    return Ok(Err(PersistenceNotInitializedError));
-                }
+                Err(err) => return Err(err),
             };
 
             let rows = rows
