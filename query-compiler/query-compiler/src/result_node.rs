@@ -23,6 +23,7 @@ pub enum ResultNode {
 pub struct Object {
     serialized_name: Option<Cow<'static, str>>,
     fields: IndexMap<Cow<'static, str>, ResultNode>,
+    skip_nulls: bool,
 }
 
 impl Object {
@@ -30,7 +31,13 @@ impl Object {
         Self {
             serialized_name: serialized_name.map(Into::into),
             fields: IndexMap::new(),
+            skip_nulls: false,
         }
+    }
+
+    fn set_skip_nulls(&mut self, skip: bool) -> &mut Self {
+        self.skip_nulls = skip;
+        self
     }
 
     pub fn serialized_name(&self) -> Option<&str> {
@@ -85,6 +92,11 @@ impl ObjectBuilder {
         Self {
             object: Object::new(serialized_name),
         }
+    }
+
+    pub fn set_skip_nulls(&mut self, skip: bool) -> &mut Self {
+        self.object.set_skip_nulls(skip);
+        self
     }
 
     pub fn add_field(&mut self, key: impl Into<Cow<'static, str>>, node: ResultNode) {
