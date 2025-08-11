@@ -89,12 +89,12 @@ pub struct ErrorBuilder {
 }
 
 impl ErrorBuilder {
-    pub(crate) fn set_original_code(&mut self, code: impl Into<String>) -> &mut Self {
+    pub fn set_original_code(&mut self, code: impl Into<String>) -> &mut Self {
         self.original_code = Some(code.into());
         self
     }
 
-    pub(crate) fn set_original_message(&mut self, message: impl Into<String>) -> &mut Self {
+    pub fn set_original_message(&mut self, message: impl Into<String>) -> &mut Self {
         self.original_message = Some(message.into());
         self
     }
