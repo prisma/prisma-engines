@@ -200,18 +200,18 @@ impl Exporter {
                     }
 
                     Message::AddSpan(request_id, span) => {
-                        if let Some(trace) = traces.get_mut(&request_id) {
-                            if trace.settings.filter(CaptureTarget::Spans) {
-                                trace.data.spans.push(span.into());
-                            }
+                        if let Some(trace) = traces.get_mut(&request_id)
+                            && trace.settings.filter(CaptureTarget::Spans)
+                        {
+                            trace.data.spans.push(span.into());
                         }
                     }
 
                     Message::AddEvent(request_id, event) => {
-                        if let Some(trace) = traces.get_mut(&request_id) {
-                            if trace.settings.filter(event.level.into()) {
-                                trace.data.events.push(event.into());
-                            }
+                        if let Some(trace) = traces.get_mut(&request_id)
+                            && trace.settings.filter(event.level.into())
+                        {
+                            trace.data.events.push(event.into());
                         }
                     }
                 }

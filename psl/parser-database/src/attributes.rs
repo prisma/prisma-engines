@@ -802,16 +802,16 @@ fn visit_relation(model_id: crate::ModelId, relation_field_id: RelationFieldId, 
     }
 
     // Validate referential actions.
-    if let Some(on_delete) = ctx.visit_optional_arg("onDelete") {
-        if let Some(action) = crate::ReferentialAction::try_from_expression(on_delete, ctx.diagnostics) {
-            ctx.types[relation_field_id].on_delete = Some((action, on_delete.span()));
-        }
+    if let Some(on_delete) = ctx.visit_optional_arg("onDelete")
+        && let Some(action) = crate::ReferentialAction::try_from_expression(on_delete, ctx.diagnostics)
+    {
+        ctx.types[relation_field_id].on_delete = Some((action, on_delete.span()));
     }
 
-    if let Some(on_update) = ctx.visit_optional_arg("onUpdate") {
-        if let Some(action) = crate::ReferentialAction::try_from_expression(on_update, ctx.diagnostics) {
-            ctx.types[relation_field_id].on_update = Some((action, on_update.span()));
-        }
+    if let Some(on_update) = ctx.visit_optional_arg("onUpdate")
+        && let Some(action) = crate::ReferentialAction::try_from_expression(on_update, ctx.diagnostics)
+    {
+        ctx.types[relation_field_id].on_update = Some((action, on_update.span()));
     }
 
     let fk_name = {

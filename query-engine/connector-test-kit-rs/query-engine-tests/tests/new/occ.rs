@@ -222,10 +222,10 @@ mod occ {
 
         let mut num_deleted: u64 = 0;
         while let Some(res) = set.join_next().await {
-            if let Ok(row_count) = res {
-                if row_count > 0 {
-                    num_deleted += 1;
-                }
+            if let Ok(row_count) = res
+                && row_count > 0
+            {
+                num_deleted += 1;
             }
         }
 

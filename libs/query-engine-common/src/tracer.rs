@@ -29,12 +29,12 @@ pub async fn start_trace(
         .and_then(|tc| tc.traceparent)
         .and_then(|tp| tp.parse::<TraceParent>().ok());
 
-    if let Some(traceparent) = traceparent {
-        if traceparent.sampled() {
-            exporter
-                .start_capturing(request_id, CaptureSettings::new(CaptureTarget::Spans))
-                .await;
-        }
+    if let Some(traceparent) = traceparent
+        && traceparent.sampled()
+    {
+        exporter
+            .start_capturing(request_id, CaptureSettings::new(CaptureTarget::Spans))
+            .await;
     }
 
     Ok(traceparent)

@@ -37,10 +37,10 @@ impl<'ast> AttributePosition<'ast> {
         }
 
         // If the cursor is after a trailing comma, we're not in an argument.
-        if let Some(span) = attr.arguments.trailing_comma {
-            if position > span.start {
-                arg_name = None;
-            }
+        if let Some(span) = attr.arguments.trailing_comma
+            && position > span.start
+        {
+            arg_name = None;
         }
 
         if let Some(arg) = attr.arguments.iter().find(|arg| arg.span().contains(position)) {
