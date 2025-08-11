@@ -13,7 +13,7 @@ fn nice_warning_for_deprecated_generator_preview_feature() {
     let res = psl::parse_configuration(schema).unwrap();
 
     res.warnings
-        .assert_is(DatamodelWarning::new_preview_feature_is_generally_available(
+        .assert_is(DatamodelWarning::new_preview_feature_is_stabilized(
             "middlewares",
             Span::new(88, 103, psl_core::parser_database::FileId::ZERO),
         ));

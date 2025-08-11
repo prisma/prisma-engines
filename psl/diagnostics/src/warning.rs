@@ -21,13 +21,13 @@ impl DatamodelWarning {
         DatamodelWarning { message, span }
     }
 
-    pub fn new_preview_feature_will_be_removed(feature: &str, span: Span) -> DatamodelWarning {
+    pub fn new_preview_feature_deprecated(feature: &str, span: Span) -> DatamodelWarning {
         let message =
             format!("Preview feature \"{feature}\" is deprecated. It will be removed in a future version of Prisma.");
         Self::new(message, span)
     }
 
-    pub fn new_preview_feature_is_generally_available(feature: &str, span: Span) -> DatamodelWarning {
+    pub fn new_preview_feature_is_stabilized(feature: &str, span: Span) -> DatamodelWarning {
         let message = format!(
             "Preview feature \"{feature}\" is deprecated. The functionality can be used without specifying it as a preview feature."
         );

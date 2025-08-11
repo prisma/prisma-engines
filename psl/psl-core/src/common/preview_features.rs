@@ -125,6 +125,9 @@ struct FeatureMap {
     /// Valid, but connector-specific features that are only visible on matching provider key.
     native: HashMap<&'static str, PreviewFeatures>,
 
+    /// Stabilized features.
+    stabilized: PreviewFeatures,
+
     /// Deprecated features.
     deprecated: PreviewFeatures,
 
@@ -186,6 +189,9 @@ impl<'a> FeatureMapWithProvider<'a> {
                 ),
             ]),
             deprecated: enumflags2::make_bitflags!(PreviewFeature::{
+                Metrics
+            }),
+            stabilized: enumflags2::make_bitflags!(PreviewFeature::{
                 AtomicNumberOperations
                 | AggregateApi
                 | ClientExtensions
@@ -252,11 +258,15 @@ impl<'a> FeatureMapWithProvider<'a> {
         (self.active_features() | self.feature_map.hidden).contains(flag)
     }
 
+    pub(crate) fn is_stabilized(&self, flag: PreviewFeature) -> bool {
+        self.feature_map.stabilized.contains(flag)
+    }
+
     pub(crate) fn is_deprecated(&self, flag: PreviewFeature) -> bool {
         self.feature_map.deprecated.contains(flag)
     }
 
-    /// Was the given preview feature deprecated and renamed?
+    /// Was the given preview feature stabilized and renamed?
     pub(crate) fn is_renamed(&self, flag: PreviewFeature) -> Option<RenamedFeature<'a>> {
         // Check for a renamed feature specific to the provider. This is only possible if a provider is not None.
         let provider_specific = self.provider.and_then(|provider| {
