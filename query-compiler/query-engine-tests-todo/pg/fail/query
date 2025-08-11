@@ -1,4 +1,3 @@
 new::relation_load_strategy::batch::relation_load_strategy_batch::compacted_join_lateral
 new::relation_load_strategy::batch::relation_load_strategy_batch::compacted_query_lateral
 queries::aggregation::group_by::aggregation_group_by::group_by_ordering_sum_aggregation
-queries::simple::m2m::m2m::repro_16390

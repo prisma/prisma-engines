@@ -118,9 +118,16 @@ fn get_result_node(
     field_selection: &FieldSelection,
     selection_order: &[String],
     #[builder(default = &[])] nested_queries: &[ReadQuery],
-    // relationJoins queries use prisma names rather than db names
-    #[builder(default = false)] uses_relation_joins: bool,
+    /// Indicates whether the query uses `relationJoins`. When true, the data mapper uses prisma names
+    /// for fields rather than db names.
+    #[builder(default = false)]
+    uses_relation_joins: bool,
     #[builder(default = false)] is_nested: bool,
+    /// Indicates whether we should skip `null` values when deserializing arrays of objects.
+    /// This is a workaround for a bug in the Prisma relation mode.
+    /// See https://github.com/prisma/prisma/issues/16390.
+    #[builder(default = false)]
+    skip_nulls: bool,
     builder: &mut ResultNodeBuilder<'_>,
     original_name: Option<Cow<'static, str>>,
 ) -> Option<ResultNode> {
@@ -137,6 +144,7 @@ fn get_result_node(
         .collect::<HashMap<_, _>>();
 
     let mut node = ResultNodeBuilder::new_object(original_name);
+    node.set_skip_nulls(skip_nulls);
 
     for prisma_name in selection_order {
         match field_map.get(prisma_name.as_str()) {
@@ -177,6 +185,7 @@ fn get_result_node(
                     .original_name(original_name)
                     .uses_relation_joins(uses_relation_joins)
                     .is_nested(true)
+                    .skip_nulls(f.field.relation().is_many_to_many())
                     .call();
                 if let Some(nested_node) = nested_node {
                     node.add_field(f.field.name().to_owned(), nested_node);
