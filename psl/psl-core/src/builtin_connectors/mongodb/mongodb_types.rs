@@ -1,5 +1,6 @@
 use crate::parser_database::ScalarType;
-use std::{collections::HashMap, sync::LazyLock};
+use hashbrown::HashMap;
+use lazy_race::LazyRace;
 
 crate::native_type_definition! {
     /// MongoDB native types.
@@ -31,7 +32,7 @@ crate::native_type_definition! {
     // Regex
 }
 
-static DEFAULT_MAPPING: LazyLock<HashMap<ScalarType, MongoDbType>> = LazyLock::new(|| {
+static DEFAULT_MAPPING: LazyRace<HashMap<ScalarType, MongoDbType>> = LazyRace::new(|| {
     vec![
         (ScalarType::Int, MongoDbType::Long),
         (ScalarType::BigInt, MongoDbType::Long),

@@ -1,11 +1,12 @@
 use crate::{DefaultKind, NativeTypeInstance, ValueGenerator, ast, parent_container::ParentContainer, prelude::*};
+use alloc::{borrow::ToOwned, string::String, vec::Vec};
 use chrono::{DateTime, FixedOffset};
+use core::fmt::{Debug, Display};
 use psl::{
     generators::{DEFAULT_CUID_VERSION, DEFAULT_UUID_VERSION},
     parser_database::{self as db, ScalarFieldType, ScalarType, walkers},
     schema_ast::ast::FieldArity,
 };
-use std::fmt::{Debug, Display};
 
 pub type ScalarField = crate::Zipper<ScalarFieldId>;
 pub type ScalarFieldRef = ScalarField;
@@ -222,7 +223,7 @@ impl ScalarField {
 }
 
 impl Display for ScalarField {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}.{}", self.container().name(), self.name())
     }
 }
@@ -322,8 +323,8 @@ pub fn dml_default_kind(default_value: &ast::Expression, scalar_type: Option<Sca
     }
 }
 
-impl std::fmt::Debug for ScalarField {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl core::fmt::Debug for ScalarField {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         f.debug_tuple("ScalarField")
             .field(&format!("{}.{}", self.container().name(), self.name()))
             .finish()

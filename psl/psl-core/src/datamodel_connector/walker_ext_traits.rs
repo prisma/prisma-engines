@@ -4,11 +4,11 @@ use crate::{
         Connector, NativeTypeInstance, ReferentialAction, RelationMode, constraint_names::ConstraintNames,
     },
 };
+use alloc::{borrow::Cow, vec::Vec};
 use parser_database::{
     ast::{self, WithSpan},
     walkers::*,
 };
-use std::borrow::Cow;
 
 use super::ConnectorCapability;
 

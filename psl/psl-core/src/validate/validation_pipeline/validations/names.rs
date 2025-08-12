@@ -1,9 +1,10 @@
 use super::constraint_namespace::ConstraintNamespace;
+use alloc::vec::Vec;
+use hashbrown::{HashMap, HashSet};
 use parser_database::{
     ModelId,
     walkers::{RelationFieldId, RelationName},
 };
-use std::collections::{HashMap, HashSet};
 
 type RelationIdentifier<'db> = (ModelId, ModelId, RelationName<'db>);
 

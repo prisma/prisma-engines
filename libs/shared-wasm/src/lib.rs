@@ -1,3 +1,5 @@
+#![no_std]
+
 use serde_wasm_bindgen::Serializer;
 
 // - `serialize_missing_as_null` is required to make sure that "empty" values (e.g., `None` and `()`)

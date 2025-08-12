@@ -1,4 +1,5 @@
-use std::slice;
+use alloc::vec::Vec;
+use core::slice;
 
 use itertools::Either;
 use psl::schema_ast::ast::FieldArity;

@@ -10,4 +10,4 @@ indexmap.workspace = true
 enumflags2.workspace = true
 itertools.workspace = true
 either.workspace = true
-rustc-hash.workspace = true
+hashbrown.workspace = true

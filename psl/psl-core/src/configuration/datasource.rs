@@ -1,12 +1,15 @@
+use alloc::{borrow::Cow, boxed::Box, string::String, vec::Vec};
+use core::any::Any;
+
 use schema_ast::ast::WithSpan;
 
+#[cfg(feature = "std")]
+use crate::set_config_dir;
 use crate::{
     configuration::StringFromEnvVar,
     datamodel_connector::{Connector, ConnectorCapabilities, RelationMode},
     diagnostics::{DatamodelError, Diagnostics, Span},
-    set_config_dir,
 };
-use std::{any::Any, borrow::Cow, path::Path};
 
 /// a `datasource` from the prisma schema.
 pub struct Datasource {
@@ -57,8 +60,8 @@ impl DatasourceConnectorData {
     }
 }
 
-impl std::fmt::Debug for Datasource {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl core::fmt::Debug for Datasource {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         f.debug_struct("Datasource")
             .field("name", &self.name)
             .field("provider", &self.provider)
@@ -207,7 +210,8 @@ impl Datasource {
     /// context of Node-API integration.
     ///
     /// P.S. Don't forget to add new parameters here if needed!
-    pub fn load_url_with_config_dir<F>(&self, config_dir: &Path, env: F) -> Result<String, Diagnostics>
+    #[cfg(feature = "std")]
+    pub fn load_url_with_config_dir<F>(&self, config_dir: &std::path::Path, env: F) -> Result<String, Diagnostics>
     where
         F: Fn(&str) -> Option<String>,
     {
@@ -219,6 +223,7 @@ impl Datasource {
     }
 
     /// Load the shadow database URL, validating it and resolving env vars in the process.
+    #[cfg(feature = "std")]
     pub fn load_shadow_database_url(&self) -> Result<Option<String>, Diagnostics> {
         let (url, url_span) = match self
             .shadow_database_url

@@ -1,6 +1,6 @@
+use core::fmt::{self, Write};
+
 use serde::Serialize;
-use std::fmt;
-use std::fmt::Write;
 
 #[derive(Clone, Debug, Serialize)]
 #[serde(rename_all = "camelCase")]

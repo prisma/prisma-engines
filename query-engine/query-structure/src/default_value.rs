@@ -1,5 +1,10 @@
+use alloc::{
+    borrow::ToOwned,
+    string::{String, ToString},
+    vec::Vec,
+};
+use core::fmt;
 use prisma_value::{PrismaValue, PrismaValueType};
-use std::fmt;
 
 /// Represents a default specified on a field.
 #[derive(Clone, PartialEq, Debug)]
@@ -278,7 +283,7 @@ pub enum ValueGeneratorFn {
 }
 
 impl ValueGeneratorFn {
-    fn new(name: &str, args: &[PrismaValue]) -> std::result::Result<Self, String> {
+    fn new(name: &str, args: &[PrismaValue]) -> core::result::Result<Self, String> {
         match name {
             "ulid" => Ok(Self::Ulid),
             "cuid" => match args[..] {
@@ -381,6 +386,8 @@ impl fmt::Debug for DefaultKind {
 
 #[cfg(test)]
 mod tests {
+    use alloc::string::ToString;
+
     use super::{DefaultValue, ValueGenerator};
 
     #[test]

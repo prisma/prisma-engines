@@ -1,4 +1,8 @@
-use std::fmt;
+use alloc::{
+    fmt,
+    string::{String, ToString},
+    vec::Vec,
+};
 
 #[derive(Debug, Clone, PartialEq, Copy)]
 pub enum MsSqlTypeParameter {

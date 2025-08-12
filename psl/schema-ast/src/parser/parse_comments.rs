@@ -1,3 +1,5 @@
+use alloc::vec::Vec;
+
 use super::{
     Rule,
     helpers::{Pair, parsing_catch_all},

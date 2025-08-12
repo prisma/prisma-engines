@@ -1,6 +1,8 @@
 mod generator;
 mod source;
 
+use alloc::{borrow::ToOwned, string::String, vec::Vec};
+
 pub use generator::*;
 use parser_database::Files;
 pub use source::*;

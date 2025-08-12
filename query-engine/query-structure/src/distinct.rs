@@ -38,7 +38,7 @@ pub fn native_distinct_compatible_with_order_by(
 mod tests {
     use super::*;
 
-    use std::sync::Arc;
+    use alloc::sync::Arc;
 
     use crate::{ScalarFieldRef, native_distinct_compatible_with_order_by};
 

@@ -7,7 +7,7 @@ use crate::{
     context::Context,
     types::{FieldWithArgs, IdAttribute, IndexFieldPath, ModelAttributes, ScalarField, SortOrder},
 };
-use std::borrow::Cow;
+use alloc::{borrow::Cow, vec::Vec};
 
 /// @@id on models
 pub(super) fn model(model_data: &mut ModelAttributes, model_id: crate::ModelId, ctx: &mut Context<'_>) {

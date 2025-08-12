@@ -6,8 +6,9 @@ use crate::{
     parser_database::ast::{WithName, WithSpan},
     validate::validation_pipeline::context::Context,
 };
+use alloc::{borrow::Cow, vec::Vec};
+use hashbrown::HashMap;
 use parser_database::walkers::{ModelWalker, PrimaryKeyWalker};
-use std::{borrow::Cow, collections::HashMap};
 
 /// A model must have either a primary key, or a unique criterion
 /// with no optional, commented-out or unsupported fields.

@@ -16,9 +16,10 @@ use crate::{
     },
     walkers::RelationFieldId,
 };
+use alloc::{borrow::Cow, string::String, vec::Vec};
+use core::{cell::Cell, fmt::Display};
 use diagnostics::Span;
 use itertools::Itertools;
-use std::{borrow::Cow, cell::Cell, fmt::Display};
 
 pub(super) fn resolve_attributes(ctx: &mut Context<'_>) {
     for rfid in ctx.types.iter_relation_field_ids() {
@@ -1134,7 +1135,7 @@ fn format_fields_in_error_with_leading_word<'a>(
         F: Display,
         I: IntoIterator<IntoIter: ExactSizeIterator<Item = F>>,
     {
-        fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
             let Some(iter) = self.0.take().map(<_>::into_iter) else {
                 panic!("`format_fields_in_error_with_leading_word` result can only be formatted once")
             };
@@ -1149,7 +1150,7 @@ fn format_fields_in_error_with_leading_word<'a>(
     struct Field<D>(D);
 
     impl<D: Display> Display for Field<D> {
-        fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
             write!(f, "`{}`", self.0)
         }
     }

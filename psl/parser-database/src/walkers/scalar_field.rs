@@ -1,4 +1,4 @@
-use std::fmt;
+use alloc::{fmt, string::String, vec::Vec};
 
 use crate::{
     OperatorClass, ParserDatabase, ScalarFieldId, ScalarFieldType,

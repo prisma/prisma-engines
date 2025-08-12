@@ -11,9 +11,10 @@ use crate::{
     diagnostics::{Diagnostics, Span},
     parser_database::{ReferentialAction, ScalarType, walkers::*},
 };
+use alloc::{string::String, vec::Vec};
+use core::result::Result as StdResult;
 use enumflags2::BitFlags;
 use mongodb_types::*;
-use std::result::Result as StdResult;
 
 const CAPABILITIES: ConnectorCapabilities = enumflags2::make_bitflags!(ConnectorCapability::{
     Json |

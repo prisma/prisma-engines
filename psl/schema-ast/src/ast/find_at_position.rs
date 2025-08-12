@@ -46,7 +46,7 @@ impl ast::SchemaAst {
 
     /// Do a binary search for the `Top` at the given byte offset.
     pub fn find_top_at_position(&self, position: usize) -> Option<ast::TopId> {
-        use std::cmp::Ordering;
+        use core::cmp::Ordering;
 
         let top_idx = self.tops.binary_search_by(|top| {
             let span = top.span();

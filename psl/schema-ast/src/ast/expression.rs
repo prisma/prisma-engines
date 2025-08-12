@@ -1,5 +1,10 @@
+use alloc::{
+    string::{String, ToString},
+    vec::Vec,
+};
+use core::fmt;
+
 use crate::ast::{self, Span};
-use std::fmt;
 
 /// Represents arbitrary, even nested, expressions.
 #[derive(Debug, Clone)]

@@ -1,5 +1,10 @@
 use crate::datamodel_connector::ScalarType;
-use std::{any::Any, sync::Arc};
+use alloc::{
+    string::{String, ToString},
+    sync::Arc,
+    vec::Vec,
+};
+use core::any::Any;
 
 /// Represents an available native type.
 pub struct NativeTypeConstructor {
@@ -19,8 +24,8 @@ pub struct NativeTypeConstructor {
 #[derive(Clone)]
 pub struct NativeTypeInstance(Arc<dyn Any + Send + Sync + 'static>);
 
-impl std::fmt::Debug for NativeTypeInstance {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl core::fmt::Debug for NativeTypeInstance {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         f.write_str("NativeTypeInstance(..)")
     }
 }

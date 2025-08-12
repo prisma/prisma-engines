@@ -1,4 +1,5 @@
 use crate::{Field, FieldSelection, ScalarFieldRef, SelectedField, TypeIdentifier};
+use alloc::{borrow::ToOwned, string::String, vec::Vec};
 use itertools::Itertools;
 use psl::schema_ast::ast::FieldArity;
 
@@ -99,7 +100,7 @@ impl ModelProjection {
 
 impl IntoIterator for ModelProjection {
     type Item = Field;
-    type IntoIter = std::vec::IntoIter<Self::Item>;
+    type IntoIter = alloc::vec::IntoIter<Self::Item>;
 
     fn into_iter(self) -> Self::IntoIter {
         self.fields.into_iter()

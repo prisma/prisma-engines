@@ -3,6 +3,7 @@ use super::{
     parse_model::parse_model, parse_source_and_generator::parse_config_block, parse_view::parse_view,
 };
 use crate::ast::*;
+use alloc::{string::String, vec::Vec};
 use diagnostics::{DatamodelError, Diagnostics, FileId};
 use pest::Parser;
 
@@ -97,7 +98,7 @@ pub fn parse_schema(datamodel_string: &str, diagnostics: &mut Diagnostics, file_
 }
 
 fn get_expected_from_error(positives: &[Rule]) -> String {
-    use std::fmt::Write as _;
+    use core::fmt::Write as _;
     let mut out = String::with_capacity(positives.len() * 6);
 
     for positive in positives {

@@ -1,4 +1,4 @@
-use std::fmt::Display;
+use core::fmt::Display;
 
 use crate::{
     relations::{ManyToManyRelationId, Relation, RelationAttributes},
@@ -84,7 +84,7 @@ impl<'db> ImplicitManyToManyRelationWalker<'db> {
 pub struct ImplicitManyToManyRelationTableName<'db>(RelationName<'db>);
 
 impl Display for ImplicitManyToManyRelationTableName<'_> {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         f.write_str("_")?;
         Display::fmt(&self.0, f)
     }

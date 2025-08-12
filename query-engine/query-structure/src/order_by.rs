@@ -1,5 +1,7 @@
+use alloc::{string::String, vec::Vec};
+
 use crate::{CompositeFieldRef, RelationFieldRef, ScalarFieldRef};
-use std::fmt::Display;
+use core::fmt::Display;
 
 #[derive(Clone, Copy, PartialEq, Debug, Eq, Hash)]
 pub enum SortOrder {
@@ -121,8 +123,8 @@ pub enum OrderByHop {
     Composite(CompositeFieldRef),
 }
 
-impl std::fmt::Debug for OrderByHop {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl core::fmt::Debug for OrderByHop {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
             Self::Relation(rf) => f.debug_tuple("Relation").field(&format!("{rf}")).finish(),
             Self::Composite(cf) => f.debug_tuple("Composite").field(&format!("{cf}")).finish(),
@@ -211,7 +213,7 @@ pub struct OrderByRelevance {
 }
 
 impl Display for SortOrder {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
             SortOrder::Ascending => f.write_str("ASC"),
             SortOrder::Descending => f.write_str("DESC"),

@@ -1,7 +1,7 @@
+use alloc::{fmt, string::ToString};
+use hashbrown::HashMap;
+use lazy_race::LazyRace;
 use serde::{Serialize, Serializer};
-use std::collections::HashMap;
-use std::fmt;
-use std::sync::LazyLock;
 
 /// A set of preview features.
 pub type PreviewFeatures = enumflags2::BitFlags<PreviewFeature>;
@@ -148,8 +148,8 @@ pub struct FeatureMapWithProvider<'a> {
 /// The default feature map with an unknown provider.
 /// This is used for convenience in `prisma/language-tools`, which needs the list of all available preview features
 /// before a provider is necessarily known.
-pub static ALL_PREVIEW_FEATURES: LazyLock<FeatureMapWithProvider<'static>> =
-    LazyLock::new(|| FeatureMapWithProvider::new(None));
+pub static ALL_PREVIEW_FEATURES: LazyRace<FeatureMapWithProvider<'static>> =
+    LazyRace::new(|| FeatureMapWithProvider::new(None));
 
 impl<'a> FeatureMapWithProvider<'a> {
     pub fn new(connector_provider: Option<&'a str>) -> FeatureMapWithProvider<'a> {

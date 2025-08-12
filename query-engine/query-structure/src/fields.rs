@@ -1,4 +1,5 @@
 use crate::*;
+use alloc::{borrow::ToOwned, string::ToString, vec::Vec};
 use psl::parser_database::ScalarFieldType;
 
 #[derive(Debug, Clone)]
