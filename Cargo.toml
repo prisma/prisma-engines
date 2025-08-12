@@ -113,7 +113,7 @@ paste = "1"
 percent-encoding = "2"
 pest = "2"
 pest_derive = "2"
-petgraph = "0.4"
+petgraph = "0.8"
 pin-project = "1"
 postgres-native-tls = { git = "https://github.com/prisma/rust-postgres", branch = "pgbouncer-mode" }
 postgres-types = { git = "https://github.com/prisma/rust-postgres", branch = "pgbouncer-mode" }
