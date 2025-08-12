@@ -1,9 +1,9 @@
 use crate::{CompositeType, parent_container::ParentContainer};
+use core::fmt::{Debug, Display};
 use psl::{
     parser_database::{self as db, ScalarFieldId},
     schema_ast::ast::{self, FieldArity},
 };
-use std::fmt::{Debug, Display};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum CompositeFieldId {
@@ -75,13 +75,13 @@ impl CompositeField {
 }
 
 impl Display for CompositeField {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}.{}", self.container().name(), self.name())
     }
 }
 
-impl std::fmt::Debug for CompositeField {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl core::fmt::Debug for CompositeField {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         f.debug_tuple("CompositeField")
             .field(&format!("{}.{}", self.container().name(), self.name()))
             .finish()

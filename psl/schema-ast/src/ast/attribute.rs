@@ -1,5 +1,5 @@
 use super::{ArgumentsList, EnumValueId, Identifier, Span, WithIdentifier, WithSpan};
-use std::ops::Index;
+use core::ops::Index;
 
 /// An attribute (following `@` or `@@``) on a model, model field, enum, enum value or composite
 /// type field.

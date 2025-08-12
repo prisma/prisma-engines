@@ -3,7 +3,11 @@ use async_trait::async_trait;
 use prisma_value::PrismaValue;
 use query_structure::*;
 use std::collections::HashMap;
+#[cfg(feature = "telemetry")]
 use telemetry::TraceParent;
+
+#[cfg(not(feature = "telemetry"))]
+enum TraceParent {}
 
 #[async_trait]
 pub trait Connector {

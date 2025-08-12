@@ -11,11 +11,13 @@ cockroachdb = ["psl-core/cockroachdb", "postgresql"]
 mssql = ["psl-core/mssql"]
 mongodb = ["psl-core/mongodb"]
 all = ["postgresql", "sqlite", "mysql", "cockroachdb", "mssql", "mongodb"]
+std = ["psl-core/std"]
 
 [dependencies]
 psl-core.workspace = true
 
 [dev-dependencies]
+psl-core = { workspace = true, features = ["std"] }
 base64.workspace = true
 dissimilar.workspace = true
 expect-test.workspace = true

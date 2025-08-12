@@ -669,7 +669,7 @@ fn fail_when_no_source_is_declared() {
           [1;94m-->[0m  [4mschema.prisma:1[0m
         [1;94m   | [0m
         [1;94m   | [0m
-        [1;94m 1 | [0m[1;91m[0m        
+        [1;94m 1 | [0m[1;91m[0m
         [1;94m   | [0m[1;91m^ Unexpected token.[0m
         [1;94m   | [0m
     "#]];

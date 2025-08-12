@@ -17,10 +17,18 @@ ulid = { workspace = true, optional = true }
 nanoid = { workspace = true, optional = true }
 chrono.workspace = true
 indexmap.workspace = true
+hashbrown.workspace = true
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]
 getrandom = { workspace = true, features = ["js"] }
 
 [features]
 # Support for generating default UUID, CUID, ULID, nanoid and datetime values.
-default_generators = ["uuid/v4", "uuid/v7", "cuid", "ulid", "nanoid"]
+default_generators = [
+    "uuid/v4",
+    "uuid/v7",
+    "cuid",
+    "ulid",
+    "ulid/std",
+    "nanoid",
+]

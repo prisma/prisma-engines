@@ -1,4 +1,4 @@
-use std::fmt;
+use core::fmt;
 
 /// Defines the newline type of a PSL block.
 #[derive(Default, Debug, Clone, Copy, PartialEq)]

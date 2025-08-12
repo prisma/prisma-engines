@@ -2,6 +2,13 @@ mod datasource;
 mod native_types;
 mod validations;
 
+use alloc::{
+    borrow::{Cow, ToOwned},
+    boxed::Box,
+    string::{String, ToString},
+    vec::Vec,
+};
+
 pub use native_types::PostgresType;
 
 use crate::{
@@ -16,8 +23,8 @@ use crate::{
 use PostgresType::*;
 use chrono::*;
 use enumflags2::BitFlags;
+use hashbrown::HashMap;
 use lsp_types::{CompletionItem, CompletionItemKind, CompletionList, InsertTextFormat};
-use std::{borrow::Cow, collections::HashMap};
 
 use super::completions;
 

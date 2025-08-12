@@ -1,6 +1,6 @@
+use alloc::{fmt, rc::Rc, vec::Vec};
 use itertools::Itertools;
 use parser_database::walkers::CompleteInlineRelationWalker;
-use std::{fmt, rc::Rc};
 
 /// A linked list structure for visited relation paths.
 #[derive(Clone)]

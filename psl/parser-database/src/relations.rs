@@ -5,9 +5,9 @@ use crate::{
     walkers::RelationFieldId,
     {context::Context, types::RelationField},
 };
+use alloc::{collections::BTreeSet, fmt, vec::Vec};
 use enumflags2::bitflags;
-use rustc_hash::FxHashMap as HashMap;
-use std::{collections::BTreeSet, fmt};
+use hashbrown::HashMap;
 
 /// Detect relation types and construct relation objects to the database.
 pub(super) fn infer_relations(ctx: &mut Context<'_>) {
@@ -18,7 +18,7 @@ pub(super) fn infer_relations(ctx: &mut Context<'_>) {
         ingest_relation(evidence, &mut relations, ctx);
     }
 
-    let _ = std::mem::replace(ctx.relations, relations);
+    let _ = core::mem::replace(ctx.relations, relations);
 }
 
 /// Identifier for a single relation in a Prisma schema.
@@ -82,7 +82,7 @@ pub(crate) struct Relations {
     back: BTreeSet<(crate::ModelId, crate::ModelId, RelationId)>,
 }
 
-impl std::ops::Index<RelationId> for Relations {
+impl core::ops::Index<RelationId> for Relations {
     type Output = Relation;
 
     fn index(&self, index: RelationId) -> &Self::Output {
@@ -90,7 +90,7 @@ impl std::ops::Index<RelationId> for Relations {
     }
 }
 
-impl std::ops::Index<RelationFieldId> for Relations {
+impl core::ops::Index<RelationFieldId> for Relations {
     type Output = RelationId;
 
     fn index(&self, index: RelationFieldId) -> &Self::Output {

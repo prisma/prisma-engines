@@ -1,13 +1,19 @@
+use alloc::{
+    borrow::ToOwned,
+    string::{String, ToString},
+    vec::Vec,
+};
+
 use crate::{
     PreviewFeature,
     configuration::{EnvFunction, StringFromEnvVar},
 };
 use diagnostics::{Diagnostics, Span};
 use enumflags2::BitFlags;
+use hashbrown::HashMap;
 use parser_database::ast::Expression;
 use schema_ast::ast::WithSpan;
 use serde::{Serialize, Serializer, ser::SerializeSeq};
-use std::collections::HashMap;
 
 #[derive(Debug, Serialize, Clone)]
 #[serde(untagged)]

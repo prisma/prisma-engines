@@ -1,5 +1,6 @@
 mod table;
 
+use alloc::string::String;
 pub(crate) use table::TableFormat;
 
 pub(crate) trait LineWriteable {

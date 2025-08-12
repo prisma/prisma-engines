@@ -1,7 +1,8 @@
+use alloc::{string::String, vec::Vec};
+use core::fmt::{self, Debug};
+
 use crate::fragment::Fragment;
 use crate::placeholder::PlaceholderFormat;
-use std::fmt;
-use std::fmt::Debug;
 
 #[derive(Debug)]
 pub struct QueryTemplate<P> {

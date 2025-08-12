@@ -2,6 +2,8 @@
 
 #![deny(missing_docs)]
 
+use alloc::{borrow::ToOwned, string::String};
+
 use enumflags2::*;
 
 macro_rules! filters {

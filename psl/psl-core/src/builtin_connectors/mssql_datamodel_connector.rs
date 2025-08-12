@@ -1,6 +1,12 @@
 mod native_types;
 mod validations;
 
+use alloc::{
+    borrow::ToOwned,
+    string::{String, ToString},
+    vec::Vec,
+};
+
 pub use native_types::{MsSqlType, MsSqlTypeParameter};
 
 use crate::{

@@ -1,3 +1,8 @@
+#![no_std]
+
+#[macro_use]
+extern crate alloc;
+
 mod aggregate_selection;
 mod composite_type;
 mod convert;
@@ -54,4 +59,4 @@ pub use psl::{
     schema_ast::ast::{self, FieldArity},
 };
 
-pub type Result<T> = std::result::Result<T, DomainError>;
+pub type Result<T> = core::result::Result<T, DomainError>;

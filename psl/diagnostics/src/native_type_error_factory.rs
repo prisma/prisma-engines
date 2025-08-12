@@ -1,3 +1,5 @@
+use alloc::string::String;
+
 use crate::{DatamodelError, Span};
 
 pub struct NativeTypeErrorFactory {

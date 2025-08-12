@@ -3,10 +3,15 @@ use crate::{
     QueryArguments, RelationField, RelationFieldRef, ScalarField, ScalarFieldRef, SelectionResult, Type,
     TypeIdentifier, parent_container::ParentContainer, prisma_value_ext::PrismaValueExtensions,
 };
+use alloc::{
+    borrow::{Cow, ToOwned},
+    string::{String, ToString},
+    vec::Vec,
+};
+use core::fmt::Display;
 use itertools::Itertools;
 use prisma_value::PrismaValue;
 use psl::schema_ast::ast::FieldArity;
-use std::{borrow::Cow, fmt::Display};
 
 /// A selection of fields from a model.
 #[derive(Debug, Clone, PartialEq, Default, Hash, Eq)]
@@ -206,7 +211,7 @@ impl FieldSelection {
     }
 
     pub fn merge_in_place(&mut self, other: FieldSelection) {
-        let this = std::mem::take(self);
+        let this = core::mem::take(self);
         *self = this.merge(other);
     }
 
@@ -380,7 +385,7 @@ impl VirtualSelection {
 }
 
 impl Display for VirtualSelection {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         let model = self.relation_field().model();
         let model_name = model.name();
         let (obj, field) = self.serialized_name();
@@ -591,7 +596,7 @@ impl From<ScalarFieldRef> for SelectedField {
 }
 
 impl Display for FieldSelection {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(
             f,
             "FieldSelection {{ fields: [{}] }}",
@@ -604,7 +609,7 @@ impl Display for FieldSelection {
 }
 
 impl Display for SelectedField {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
             SelectedField::Scalar(sf) => write!(f, "{sf}"),
             SelectedField::Composite(cs) => write!(
@@ -638,7 +643,7 @@ impl From<&SelectionResult> for FieldSelection {
 
 impl IntoIterator for FieldSelection {
     type Item = SelectedField;
-    type IntoIter = std::vec::IntoIter<Self::Item>;
+    type IntoIter = alloc::vec::IntoIter<Self::Item>;
 
     fn into_iter(self) -> Self::IntoIter {
         self.selections.into_iter()

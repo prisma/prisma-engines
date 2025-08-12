@@ -4,7 +4,7 @@ name = "telemetry"
 version = "0.1.0"
 
 [dependencies]
-ahash.workspace = true
+hashbrown = { workspace = true, features = ["serde"] }
 serde.workspace = true
 serde_json.workspace = true
 thiserror.workspace = true

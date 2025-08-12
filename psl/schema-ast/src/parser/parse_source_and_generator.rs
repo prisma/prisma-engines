@@ -5,6 +5,7 @@ use super::{
     parse_expression::parse_expression,
 };
 use crate::ast::{self, *};
+use alloc::vec::Vec;
 use diagnostics::{DatamodelError, Diagnostics, FileId};
 
 pub(crate) fn parse_config_block(pair: Pair<'_>, diagnostics: &mut Diagnostics, file_id: FileId) -> Top {

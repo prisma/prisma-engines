@@ -14,6 +14,7 @@ mod record;
 mod relation;
 mod scalar;
 
+use alloc::{borrow::ToOwned, boxed::Box, vec::Vec};
 pub use compare::*;
 pub use composite::*;
 pub use into_filter::*;

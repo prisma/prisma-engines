@@ -1,4 +1,6 @@
-use crate::ast::{self};
+use alloc::vec::Vec;
+
+use crate::ast;
 
 use super::WithSpan;
 

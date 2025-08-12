@@ -1,3 +1,5 @@
+use alloc::vec::Vec;
+
 use crate::field::ScalarFieldRef;
 
 #[derive(Clone, PartialEq, Eq, Hash)]
@@ -9,8 +11,8 @@ pub enum ScalarProjection {
     Compound(Vec<ScalarFieldRef>),
 }
 
-impl std::fmt::Debug for ScalarProjection {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl core::fmt::Debug for ScalarProjection {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
             Self::Single(sf) => f.debug_tuple("SingleProjection").field(&format!("{sf}")).finish(),
             Self::Compound(sfs) => {

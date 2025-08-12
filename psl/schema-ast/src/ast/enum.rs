@@ -1,3 +1,5 @@
+use alloc::vec::Vec;
+
 use super::{Attribute, Comment, Identifier, Span, WithAttributes, WithDocumentation, WithIdentifier, WithSpan};
 
 /// An opaque identifier for a value in an AST enum. Use the
@@ -12,7 +14,7 @@ impl EnumValueId {
     pub const MAX: EnumValueId = EnumValueId(u32::MAX);
 }
 
-impl std::ops::Index<EnumValueId> for Enum {
+impl core::ops::Index<EnumValueId> for Enum {
     type Output = EnumValue;
 
     fn index(&self, index: EnumValueId) -> &Self::Output {

@@ -1,3 +1,5 @@
+use alloc::string::{String, ToString};
+
 use crate::{
     DatamodelError, ScalarFieldId, StringId,
     ast::{self, WithName},

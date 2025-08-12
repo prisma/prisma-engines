@@ -1,6 +1,8 @@
 mod native_types;
 mod validations;
 
+use alloc::{borrow::ToOwned, string::String, vec::Vec};
+
 use chrono::FixedOffset;
 pub use native_types::MySqlType;
 use prisma_value::{PrismaValueResult, decode_bytes};

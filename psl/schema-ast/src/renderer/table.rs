@@ -1,5 +1,7 @@
+use alloc::{string::String, vec::Vec};
+use core::cmp::max;
+
 use super::LineWriteable;
-use std::cmp::max;
 
 const COLUMN_SPACING: usize = 1;
 
@@ -19,7 +21,7 @@ pub(crate) struct TableFormat {
 
 impl TableFormat {
     fn reset(&mut self) {
-        std::mem::take(self);
+        core::mem::take(self);
     }
 
     pub(crate) fn column_locked_writer_for(&mut self, index: usize) -> &mut String {

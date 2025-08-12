@@ -2,6 +2,8 @@ mod primary_key;
 mod shard_key;
 mod unique_criteria;
 
+use alloc::vec::Vec;
+
 pub use primary_key::*;
 pub use shard_key::*;
 

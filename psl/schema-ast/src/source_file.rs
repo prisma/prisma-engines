@@ -1,4 +1,4 @@
-use std::sync::Arc;
+use alloc::{borrow::ToOwned, boxed::Box, string::String, sync::Arc};
 
 use serde::{Deserialize, Deserializer};
 
@@ -83,8 +83,8 @@ enum Contents {
     Allocated(Arc<str>),
 }
 
-impl std::hash::Hash for Contents {
-    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+impl core::hash::Hash for Contents {
+    fn hash<H: core::hash::Hasher>(&self, state: &mut H) {
         match self {
             Contents::Static(s) => (*s).hash(state),
             Contents::Allocated(s) => {

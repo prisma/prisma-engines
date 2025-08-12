@@ -15,7 +15,7 @@ fn parse_schema_fail_on_diagnostics(file: impl Into<SourceFile>) -> Result<Valid
     match (schema.diagnostics.warnings(), schema.diagnostics.errors()) {
         ([], []) => Ok(schema),
         (warnings, errors) => {
-            let mut message: Vec<u8> = Vec::new();
+            let mut message = String::new();
 
             for warn in warnings {
                 warn.pretty_print(&mut message, file_name, datamodel_string)
@@ -27,7 +27,7 @@ fn parse_schema_fail_on_diagnostics(file: impl Into<SourceFile>) -> Result<Valid
                     .expect("printing datamodel error");
             }
 
-            Err(String::from_utf8_lossy(&message).into_owned())
+            Err(message)
         }
     }
 }

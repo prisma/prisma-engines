@@ -1,3 +1,5 @@
+use alloc::vec::Vec;
+
 use crate::ast::{Comment, Field, FieldId, Identifier, SchemaAst, Span};
 
 use super::{WithDocumentation, WithIdentifier};
@@ -59,7 +61,7 @@ impl CompositeType {
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct CompositeTypeId(pub(super) u32);
 
-impl std::ops::Index<CompositeTypeId> for SchemaAst {
+impl core::ops::Index<CompositeTypeId> for SchemaAst {
     type Output = CompositeType;
 
     fn index(&self, index: CompositeTypeId) -> &Self::Output {
@@ -67,7 +69,7 @@ impl std::ops::Index<CompositeTypeId> for SchemaAst {
     }
 }
 
-impl std::ops::Index<FieldId> for CompositeType {
+impl core::ops::Index<FieldId> for CompositeType {
     type Output = Field;
 
     fn index(&self, index: FieldId) -> &Self::Output {

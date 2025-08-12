@@ -1,3 +1,4 @@
+use alloc::{borrow::ToOwned, vec::Vec};
 use psl::{PreviewFeature, datamodel_connector::ConnectorCapability, has_capability};
 
 use crate::*;
@@ -103,8 +104,8 @@ impl TryFrom<&str> for RelationLoadStrategy {
     }
 }
 
-impl std::fmt::Debug for QueryArguments {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl core::fmt::Debug for QueryArguments {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         f.debug_struct("QueryArguments")
             .field("model", &self.model.name())
             .field("cursor", &self.cursor)

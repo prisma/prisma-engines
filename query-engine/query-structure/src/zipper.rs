@@ -1,5 +1,5 @@
 use crate::{InternalDataModelRef, psl::parser_database::walkers::Walker};
-use std::hash::{Hash, Hasher};
+use core::hash::{Hash, Hasher};
 
 // Invariant: InternalDataModel must not contain any Zipper, this would be a reference counting
 // cycle (memory leak).
@@ -19,13 +19,13 @@ impl<I: PartialEq> PartialEq for Zipper<I> {
 impl<I: Eq> Eq for Zipper<I> {}
 
 impl<I: PartialOrd> PartialOrd for Zipper<I> {
-    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
+    fn partial_cmp(&self, other: &Self) -> Option<core::cmp::Ordering> {
         self.id.partial_cmp(&other.id)
     }
 }
 
 impl<I: Ord> Ord for Zipper<I> {
-    fn cmp(&self, other: &Self) -> std::cmp::Ordering {
+    fn cmp(&self, other: &Self) -> core::cmp::Ordering {
         self.id.cmp(&other.id)
     }
 }

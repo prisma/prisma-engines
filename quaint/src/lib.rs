@@ -117,11 +117,13 @@ pub use bigdecimal;
 pub use chrono;
 
 pub mod ast;
+#[cfg(feature = "connector")]
 pub mod connector;
 pub mod error;
-#[cfg(feature = "pooled")]
+#[cfg(all(feature = "pooled", feature = "connector"))]
 pub mod pooled;
 pub mod prelude;
+#[cfg(feature = "connector")]
 pub mod single;
 pub mod visitor;
 

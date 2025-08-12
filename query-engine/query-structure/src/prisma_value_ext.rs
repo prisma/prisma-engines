@@ -1,5 +1,6 @@
 use super::{PrismaValue, Type, TypeIdentifier};
 use crate::DomainError;
+use alloc::{string::ToString, vec::Vec};
 use bigdecimal::ToPrimitive;
 use prisma_value::{Placeholder, PrismaValueType};
 

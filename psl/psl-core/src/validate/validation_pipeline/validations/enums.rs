@@ -4,7 +4,7 @@ use crate::{
     parser_database::{ast::WithSpan, walkers::EnumWalker},
     validate::validation_pipeline::context::Context,
 };
-use std::collections::HashSet;
+use hashbrown::HashSet;
 
 pub(super) fn database_name_clashes(ctx: &mut Context<'_>) {
     let mut database_names: HashSet<(Option<&str>, &str)> = HashSet::with_capacity(ctx.db.enums_count());

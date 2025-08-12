@@ -1,3 +1,5 @@
+use alloc::string::String;
+
 use itertools::Itertools;
 use parser_database::Files;
 use serde::Serialize;

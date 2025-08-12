@@ -5,6 +5,7 @@ use super::{
     parse_comments::*,
 };
 use crate::ast::{self, Attribute, Comment, Enum, EnumValue, Identifier};
+use alloc::vec::Vec;
 use diagnostics::{DatamodelError, Diagnostics, FileId, Span};
 
 pub fn parse_enum(

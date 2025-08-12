@@ -1,5 +1,6 @@
 #[cfg(feature = "postgresql")]
 pub(crate) fn extensions_completion(completion_list: &mut lsp_types::CompletionList) {
+    use alloc::borrow::ToOwned;
     use lsp_types::*;
     completion_list.items.push(CompletionItem {
         label: "extensions".to_owned(),
@@ -20,6 +21,7 @@ pub(crate) fn extensions_completion(completion_list: &mut lsp_types::CompletionL
 
 #[cfg(any(feature = "postgresql", feature = "cockroachdb", feature = "mssql"))]
 pub(crate) fn schemas_completion(completion_list: &mut lsp_types::CompletionList) {
+    use alloc::borrow::ToOwned;
     use lsp_types::*;
     completion_list.items.push(CompletionItem {
         label: "schemas".to_owned(),

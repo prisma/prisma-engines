@@ -1,3 +1,5 @@
+use alloc::{borrow::ToOwned, string::String};
+
 use serde::Serialize;
 use serde_json::value::RawValue;
 

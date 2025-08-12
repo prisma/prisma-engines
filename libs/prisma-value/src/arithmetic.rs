@@ -1,6 +1,6 @@
 //! Note: Only number operations are implemented at the moment.
 use super::*;
-use std::ops::*;
+use core::ops::*;
 
 /// Used right now to reduce code duplication, probably needs to be scrapped once we need anything beyond that.
 macro_rules! number_operation {

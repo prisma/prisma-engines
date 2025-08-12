@@ -2,6 +2,10 @@
 
 #![deny(rust_2018_idioms, unsafe_code)]
 #![allow(clippy::derive_partial_eq_without_eq)]
+#![no_std]
+
+#[macro_use]
+extern crate alloc;
 
 pub use self::{parser::parse_schema, reformat::reformat, source_file::SourceFile};
 
@@ -25,11 +29,11 @@ mod source_file;
 ///hi"#;
 ///assert_eq!(r#""oh\nhi""#, &string_literal(input).to_string());
 /// ```
-pub fn string_literal(s: &str) -> impl std::fmt::Display + '_ {
+pub fn string_literal(s: &str) -> impl core::fmt::Display + '_ {
     struct StringLiteral<'a>(&'a str);
 
-    impl std::fmt::Display for StringLiteral<'_> {
-        fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    impl core::fmt::Display for StringLiteral<'_> {
+        fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
             f.write_str("\"")?;
             for c in self.0.char_indices() {
                 match c {

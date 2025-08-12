@@ -2,8 +2,9 @@ use crate::{
     parser::{PrismaDatamodelParser, Rule},
     renderer::{LineWriteable, Renderer, TableFormat},
 };
+use alloc::{string::String, vec::Vec};
+use core::iter::Peekable;
 use pest::Parser;
-use std::iter::Peekable;
 
 type Pair<'a> = pest::iterators::Pair<'a, Rule>;
 

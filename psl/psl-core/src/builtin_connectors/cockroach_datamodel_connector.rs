@@ -1,6 +1,12 @@
 mod native_types;
 mod validations;
 
+use alloc::{
+    borrow::{Cow, ToOwned},
+    string::{String, ToString},
+    vec::Vec,
+};
+
 pub use native_types::CockroachType;
 
 use crate::{
@@ -19,7 +25,6 @@ use crate::{
 use chrono::*;
 use enumflags2::BitFlags;
 use lsp_types::{CompletionItem, CompletionItemKind, CompletionList};
-use std::borrow::Cow;
 
 use super::completions;
 

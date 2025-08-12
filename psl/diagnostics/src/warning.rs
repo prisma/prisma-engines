@@ -2,9 +2,13 @@ use crate::{
     Span,
     pretty_print::{DiagnosticColorer, pretty_print},
 };
+use alloc::{
+    borrow::ToOwned,
+    string::{String, ToString},
+};
 use colored::{ColoredString, Colorize};
+use core::fmt::Display;
 use indoc::indoc;
-use std::fmt::Display;
 
 /// A non-fatal warning emitted by the schema parser.
 /// For fancy printing, please use the `pretty_print_error` function.
@@ -100,7 +104,7 @@ impl DatamodelWarning {
         self.span
     }
 
-    pub fn pretty_print(&self, f: &mut dyn std::io::Write, file_name: &str, text: &str) -> std::io::Result<()> {
+    pub fn pretty_print(&self, f: &mut dyn core::fmt::Write, file_name: &str, text: &str) -> core::fmt::Result {
         pretty_print(
             f,
             file_name,

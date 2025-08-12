@@ -18,6 +18,7 @@ mod traits;
 
 pub(crate) use self::comment::Comment;
 
+use alloc::vec::Vec;
 pub use argument::{Argument, ArgumentsList, EmptyArgument};
 pub use attribute::{Attribute, AttributeContainer, AttributeId};
 pub use composite_type::{CompositeType, CompositeTypeId};
@@ -83,7 +84,7 @@ impl ModelId {
     pub const MAX: ModelId = ModelId(u32::MAX);
 }
 
-impl std::ops::Index<ModelId> for SchemaAst {
+impl core::ops::Index<ModelId> for SchemaAst {
     type Output = Model;
 
     fn index(&self, index: ModelId) -> &Self::Output {
@@ -95,7 +96,7 @@ impl std::ops::Index<ModelId> for SchemaAst {
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct EnumId(u32);
 
-impl std::ops::Index<EnumId> for SchemaAst {
+impl core::ops::Index<EnumId> for SchemaAst {
     type Output = Enum;
 
     fn index(&self, index: EnumId) -> &Self::Output {
@@ -107,7 +108,7 @@ impl std::ops::Index<EnumId> for SchemaAst {
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct GeneratorId(u32);
 
-impl std::ops::Index<GeneratorId> for SchemaAst {
+impl core::ops::Index<GeneratorId> for SchemaAst {
     type Output = GeneratorConfig;
 
     fn index(&self, index: GeneratorId) -> &Self::Output {
@@ -119,7 +120,7 @@ impl std::ops::Index<GeneratorId> for SchemaAst {
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct SourceId(u32);
 
-impl std::ops::Index<SourceId> for SchemaAst {
+impl core::ops::Index<SourceId> for SchemaAst {
     type Output = SourceConfig;
 
     fn index(&self, index: SourceId) -> &Self::Output {
@@ -169,7 +170,7 @@ impl TopId {
     }
 }
 
-impl std::ops::Index<TopId> for SchemaAst {
+impl core::ops::Index<TopId> for SchemaAst {
     type Output = Top;
 
     fn index(&self, index: TopId) -> &Self::Output {

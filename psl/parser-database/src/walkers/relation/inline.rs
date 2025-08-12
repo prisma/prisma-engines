@@ -1,5 +1,7 @@
 mod complete;
 
+use alloc::boxed::Box;
+
 pub use complete::CompleteInlineRelationWalker;
 
 use super::RelationWalker;

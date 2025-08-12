@@ -1,3 +1,8 @@
+use alloc::{
+    string::{String, ToString},
+    vec::Vec,
+};
+
 use crate::{ScalarFieldId, StringId, ast, context::Context};
 
 pub(super) fn visit_model_field_native_type_attribute(

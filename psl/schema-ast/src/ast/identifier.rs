@@ -1,3 +1,5 @@
+use alloc::{borrow::ToOwned, string::String};
+
 use super::{Span, WithSpan};
 use diagnostics::FileId;
 

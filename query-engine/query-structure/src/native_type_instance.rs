@@ -1,3 +1,4 @@
+use alloc::{string::String, vec::Vec};
 use psl::datamodel_connector::{Connector, NativeTypeInstance as PslNativeTypeInstance};
 
 /// Represents an instance of a native type declared in the Prisma schema.
@@ -12,7 +13,7 @@ impl NativeTypeInstance {
         NativeTypeInstance { native_type, connector }
     }
 
-    pub fn deserialize_native_type<T: std::any::Any>(&self) -> &T {
+    pub fn deserialize_native_type<T: core::any::Any>(&self) -> &T {
         self.native_type.downcast_ref()
     }
 

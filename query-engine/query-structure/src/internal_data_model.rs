@@ -1,6 +1,6 @@
 use crate::{CompositeType, InternalEnum, prelude::*};
+use alloc::{string::ToString, sync::Arc};
 use psl::parser_database as db;
-use std::sync::Arc;
 
 pub(crate) type InternalDataModelRef = InternalDataModel;
 

@@ -15,7 +15,7 @@ workspace = true
 psl.workspace = true
 quaint.workspace = true
 tracing.workspace = true
-
+hashbrown.workspace = true
 js-sys.workspace = true
 serde.workspace = true
 serde_json.workspace = true

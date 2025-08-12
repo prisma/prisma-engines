@@ -37,7 +37,7 @@ macro_rules! native_type_definition {
         );
 
         impl $enumName {
-            pub fn to_parts(&self) -> (&'static str, Vec<String>) {
+            pub fn to_parts(&self) -> (&'static str, $crate::alloc::vec::Vec<$crate::alloc::string::String>) {
                 use $enumName::*;
 
                 $crate::native_type_definition!(
@@ -51,7 +51,7 @@ macro_rules! native_type_definition {
             #[allow(unused_variables)] // some impls (mongo) don't use the arguments param
             pub fn from_parts(
                 name: &str,
-                arguments: &[String],
+                arguments: &[$crate::alloc::string::String],
                 span: $crate::parser_database::ast::Span,
                 diagnostics: &mut $crate::diagnostics::Diagnostics
             ) -> Option<Self> {
@@ -148,7 +148,7 @@ macro_rules! native_type_definition {
             $self,
             {
                 $($body)*
-                $variant => (stringify!($variant), Vec::new()),
+                $variant => (stringify!($variant), $crate::alloc::vec::Vec::new()),
             }
             $($tail)*
         }

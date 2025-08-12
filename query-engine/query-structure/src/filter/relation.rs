@@ -1,3 +1,5 @@
+use alloc::boxed::Box;
+
 use crate::{RelationCompare, RelationField, filter::Filter};
 
 #[derive(Clone, PartialEq, Eq, Hash)]
@@ -14,8 +16,8 @@ pub struct RelationFilter {
     pub condition: RelationCondition,
 }
 
-impl std::fmt::Debug for RelationFilter {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl core::fmt::Debug for RelationFilter {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         f.debug_struct("RelationFilter")
             .field("field", &format!("{}", self.field))
             .field("nested_filter", &self.nested_filter)

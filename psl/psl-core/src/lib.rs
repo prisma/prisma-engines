@@ -1,6 +1,10 @@
 #![doc = include_str!("../README.md")]
 #![deny(rust_2018_idioms, unsafe_code)]
 #![allow(clippy::derive_partial_eq_without_eq)]
+#![cfg_attr(not(feature = "std"), no_std)]
+
+#[cfg_attr(not(feature = "std"), macro_use)]
+extern crate alloc;
 
 pub mod builtin_connectors;
 pub mod datamodel_connector;
@@ -12,10 +16,15 @@ pub mod mcf;
 mod common;
 mod configuration;
 mod reformat;
+#[cfg(feature = "std")]
 mod set_config_dir;
 mod validate;
 
-use std::sync::Arc;
+use alloc::{
+    borrow::ToOwned,
+    string::{String, ToString},
+    sync::Arc,
+};
 
 pub use crate::{
     common::{ALL_PREVIEW_FEATURES, FeatureMapWithProvider, PreviewFeature, PreviewFeatures},
@@ -27,6 +36,7 @@ pub use crate::{
 pub use diagnostics;
 pub use parser_database::{self, coerce, coerce_array, generators, is_reserved_type_name};
 pub use schema_ast;
+#[cfg(feature = "std")]
 pub use set_config_dir::set_config_dir;
 
 use self::validate::{datasource_loader, generator_loader};
@@ -45,8 +55,8 @@ pub struct ValidatedSchema {
     relation_mode: datamodel_connector::RelationMode,
 }
 
-impl std::fmt::Debug for ValidatedSchema {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl core::fmt::Debug for ValidatedSchema {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         f.write_str("<Prisma schema>")
     }
 }

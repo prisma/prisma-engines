@@ -1,3 +1,4 @@
+use alloc::string::{String, ToString};
 use psl::{
     datamodel_connector::walker_ext_traits::*,
     parser_database::{ReferentialAction, RelationId, walkers},
@@ -70,8 +71,8 @@ impl Relation {
     }
 }
 
-impl std::fmt::Debug for Relation {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl core::fmt::Debug for Relation {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         f.debug_tuple("Relation").field(&self.name()).finish()
     }
 }

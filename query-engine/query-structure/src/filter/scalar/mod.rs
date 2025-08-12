@@ -7,7 +7,7 @@ pub use projection::*;
 
 use crate::*;
 
-use std::collections::BTreeSet;
+use alloc::{collections::BTreeSet, vec::Vec};
 
 /// Filtering with a scalar value. From a GraphQL point of view this is in the
 /// head of the query:

@@ -1,4 +1,5 @@
-use std::fmt::Display;
+use alloc::{string::String, vec::Vec};
+use core::fmt::Display;
 
 use super::{
     Attribute, Comment, Identifier, Span, WithAttributes, WithDocumentation, WithIdentifier, WithName, WithSpan,
@@ -43,7 +44,7 @@ pub struct Field {
 }
 
 impl Display for Field {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         let extension = if self.arity.is_list() {
             "[]"
         } else if self.arity.is_optional() {

@@ -4,7 +4,11 @@ use crate::{
     diagnostics::{DatamodelError, Diagnostics},
     parser_database::{ast, coerce, coerce_array},
 };
-use std::collections::{HashMap, HashSet};
+use alloc::{
+    string::{String, ToString},
+    vec::Vec,
+};
+use hashbrown::{HashMap, HashSet};
 
 pub(super) fn parse_extensions(
     args: &mut HashMap<&str, (ast::Span, &ast::Expression)>,

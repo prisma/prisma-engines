@@ -1,6 +1,6 @@
 use crate::{DomainError, FieldSelection, PrismaValue, ScalarFieldRef, SelectedField};
+use alloc::{borrow::Cow, vec::Vec};
 use itertools::Itertools;
-use std::{borrow::Cow, convert::TryFrom};
 
 /// Represents a set of results.
 #[derive(Default, Clone, PartialEq, Eq, Hash)]
@@ -8,8 +8,8 @@ pub struct SelectionResult {
     pub pairs: Vec<(SelectedField, PrismaValue)>,
 }
 
-impl std::fmt::Debug for SelectionResult {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl core::fmt::Debug for SelectionResult {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         f.debug_list()
             .entries(
                 self.pairs
@@ -164,7 +164,7 @@ impl TryFrom<SelectionResult> for PrismaValue {
 
 impl IntoIterator for SelectionResult {
     type Item = (SelectedField, PrismaValue);
-    type IntoIter = std::vec::IntoIter<Self::Item>;
+    type IntoIter = alloc::vec::IntoIter<Self::Item>;
 
     fn into_iter(self) -> Self::IntoIter {
         self.pairs.into_iter()

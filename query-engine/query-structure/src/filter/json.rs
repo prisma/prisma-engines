@@ -1,3 +1,5 @@
+use alloc::{boxed::Box, string::String, vec::Vec};
+
 use super::scalar::*;
 use crate::{Filter, JsonCompare, ScalarFieldRef, ScalarFilter};
 

@@ -17,4 +17,4 @@ thiserror.workspace = true
 user-facing-errors = { workspace = true, features = ["sql"] }
 uuid.workspace = true
 indexmap.workspace = true
-telemetry.workspace = true
+telemetry = { workspace = true, optional = true }

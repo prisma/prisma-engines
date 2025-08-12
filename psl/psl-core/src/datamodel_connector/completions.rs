@@ -1,4 +1,5 @@
-use std::collections::HashMap;
+use alloc::{string::String, vec::Vec};
+use hashbrown::HashMap;
 
 /// Formats the documentation for a completion.
 /// example: How the completion is expected to be used.

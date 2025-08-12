@@ -1,5 +1,6 @@
 use super::{Rule, helpers::Pair};
 use crate::{ast::*, parser::parse_expression::parse_expression};
+use alloc::string::ToString;
 use diagnostics::{DatamodelError, Diagnostics, FileId};
 
 pub fn parse_field_type(

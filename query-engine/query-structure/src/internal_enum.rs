@@ -18,8 +18,8 @@ impl InternalEnum {
     }
 }
 
-impl std::fmt::Debug for InternalEnum {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl core::fmt::Debug for InternalEnum {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         f.debug_tuple("InternalEnum").field(&self.name()).finish()
     }
 }

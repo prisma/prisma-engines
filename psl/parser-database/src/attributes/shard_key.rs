@@ -1,4 +1,4 @@
-use std::borrow::Cow;
+use alloc::{borrow::Cow, vec::Vec};
 
 use diagnostics::DatamodelError;
 use schema_ast::ast::{self, WithName, WithSpan};

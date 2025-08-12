@@ -1,3 +1,4 @@
+use alloc::string::String;
 use either::Either;
 
 use super::CompositeTypeFieldWalker;

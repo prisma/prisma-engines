@@ -958,7 +958,7 @@ name = "crosstarget-utils"
 version = "0.1.0"
 dependencies = [
  "chrono",
- "derive_more",
+ "derive_more 2.0.1",
  "enumflags2",
  "futures",
  "js-sys",
@@ -1096,7 +1096,7 @@ dependencies = [
  "base64 0.22.1",
  "expect-test",
  "indoc",
- "itertools 0.13.0",
+ "itertools 0.14.0",
  "psl",
  "regex",
 ]
@@ -1132,6 +1132,26 @@ dependencies = [
  "proc-macro2",
  "quote",
  "rustc_version",
+ "syn 2.0.104",
+]
+
+[[package]]
+name = "derive_more"
+version = "2.0.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "093242cf7570c207c83073cf82f79706fe7b8317e98620a47d5be7c3d8497678"
+dependencies = [
+ "derive_more-impl",
+]
+
+[[package]]
+name = "derive_more-impl"
+version = "2.0.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "bda628edc44c4bb645fbe0f758797143e4e07926f7ebf4e9bdfbd3d2ce621df3"
+dependencies = [
+ "proc-macro2",
+ "quote",
  "syn 2.0.104",
 ]
 
@@ -1188,7 +1208,7 @@ dependencies = [
  "flate2",
  "indexmap 2.10.0",
  "indoc",
- "itertools 0.13.0",
+ "itertools 0.14.0",
  "pretty_assertions",
  "psl",
  "query-structure",
@@ -1761,6 +1781,8 @@ dependencies = [
  "allocator-api2",
  "equivalent",
  "foldhash",
+ "rustc-std-workspace-alloc",
+ "serde",
 ]
 
 [[package]]
@@ -2263,6 +2285,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "itertools"
+version = "0.14.0"
+source = "git+https://github.com/aqrln/itertools?branch=hashbrown#a57809b9e0784e8b71a0e2d66c1e4942e57a7d9b"
+dependencies = [
+ "either",
+ "hashbrown 0.15.2",
+]
+
+[[package]]
 name = "itoa"
 version = "1.0.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2319,6 +2350,13 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "8f6d5ed8676d904364de097082f4e7d240b571b67989ced0240f08b7f966f940"
 dependencies = [
  "cpufeatures",
+]
+
+[[package]]
+name = "lazy-race"
+version = "0.1.0"
+dependencies = [
+ "once_cell",
 ]
 
 [[package]]
@@ -2699,7 +2737,7 @@ dependencies = [
  "bson",
  "chrono",
  "derivative",
- "derive_more",
+ "derive_more 0.99.20",
  "flate2",
  "futures-core",
  "futures-executor",
@@ -2766,10 +2804,10 @@ dependencies = [
  "bigdecimal",
  "bson",
  "chrono",
- "derive_more",
+ "derive_more 2.0.1",
  "futures",
  "indexmap 2.10.0",
- "itertools 0.13.0",
+ "itertools 0.14.0",
  "mongodb",
  "mongodb-client",
  "pretty_assertions",
@@ -2803,7 +2841,7 @@ dependencies = [
  "expect-test",
  "futures",
  "indoc",
- "itertools 0.13.0",
+ "itertools 0.14.0",
  "mongodb",
  "mongodb-client",
  "mongodb-schema-describer",
@@ -3278,9 +3316,9 @@ dependencies = [
  "diagnostics",
  "either",
  "enumflags2",
+ "hashbrown 0.15.2",
  "indexmap 2.10.0",
- "itertools 0.13.0",
- "rustc-hash",
+ "itertools 0.14.0",
  "schema-ast",
 ]
 
@@ -3373,7 +3411,6 @@ dependencies = [
  "fixedbitset",
  "hashbrown 0.15.2",
  "indexmap 2.10.0",
- "serde",
 ]
 
 [[package]]
@@ -3592,7 +3629,7 @@ dependencies = [
 name = "prisma-metrics"
 version = "0.1.0"
 dependencies = [
- "derive_more",
+ "derive_more 2.0.1",
  "expect-test",
  "futures",
  "metrics",
@@ -3695,9 +3732,11 @@ dependencies = [
  "diagnostics",
  "either",
  "enumflags2",
+ "hashbrown 0.15.2",
  "hex",
  "indoc",
- "itertools 0.13.0",
+ "itertools 0.14.0",
+ "lazy-race",
  "lsp-types",
  "parser-database",
  "prisma-value",
@@ -3769,7 +3808,7 @@ dependencies = [
  "getrandom 0.2.11",
  "hex",
  "indoc",
- "itertools 0.13.0",
+ "itertools 0.14.0",
  "lru-cache",
  "mobc",
  "mysql_async",
@@ -3857,7 +3896,7 @@ dependencies = [
  "bon",
  "indexmap 2.10.0",
  "insta",
- "itertools 0.13.0",
+ "itertools 0.14.0",
  "pretty",
  "psl",
  "quaint",
@@ -3894,6 +3933,7 @@ name = "query-compiler-wasm"
 version = "0.1.0"
 dependencies = [
  "build-utils",
+ "hashbrown 0.15.2",
  "js-sys",
  "psl",
  "quaint",
@@ -3920,7 +3960,7 @@ dependencies = [
  "chrono",
  "futures",
  "indexmap 2.10.0",
- "itertools 0.13.0",
+ "itertools 0.14.0",
  "prisma-value",
  "query-structure",
  "serde",
@@ -3943,11 +3983,11 @@ dependencies = [
  "crossbeam-channel",
  "crosstarget-utils",
  "cuid",
- "derive_more",
+ "derive_more 2.0.1",
  "enumflags2",
  "futures",
  "indexmap 2.10.0",
- "itertools 0.13.0",
+ "itertools 0.14.0",
  "lru 0.7.8",
  "petgraph",
  "prisma-metrics",
@@ -4114,7 +4154,7 @@ dependencies = [
  "futures",
  "indoc",
  "insta",
- "itertools 0.13.0",
+ "itertools 0.14.0",
  "paste",
  "prisma-metrics",
  "prisma-value",
@@ -4174,8 +4214,9 @@ dependencies = [
  "chrono",
  "cuid",
  "getrandom 0.2.11",
+ "hashbrown 0.15.2",
  "indexmap 2.10.0",
- "itertools 0.13.0",
+ "itertools 0.14.0",
  "nanoid",
  "prisma-value",
  "psl",
@@ -4214,7 +4255,7 @@ dependencies = [
  "indexmap 2.10.0",
  "indoc",
  "insta",
- "itertools 0.13.0",
+ "itertools 0.14.0",
  "jsonrpc-core",
  "log",
  "nom",
@@ -4542,7 +4583,7 @@ dependencies = [
  "graphql-parser",
  "indexmap 2.10.0",
  "insta",
- "itertools 0.13.0",
+ "itertools 0.14.0",
  "mongodb-query-connector",
  "prisma-value",
  "psl",
@@ -4720,6 +4761,12 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "08d43f7aa6b08d49f382cde6a7982047c3426db949b1424bc4b7ec9ae12c6ce2"
 
 [[package]]
+name = "rustc-std-workspace-alloc"
+version = "1.0.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f9d441c3b2ebf55cebf796bfdc265d67fa09db17b7bb6bd4be75c509e1e8fec3"
+
+[[package]]
 name = "rustc_version"
 version = "0.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4825,7 +4872,6 @@ dependencies = [
  "codspeed-criterion-compat",
  "psl",
  "query-structure",
- "rustc-hash",
 ]
 
 [[package]]
@@ -5335,7 +5381,7 @@ dependencies = [
  "enumflags2",
  "expect-test",
  "indoc",
- "itertools 0.13.0",
+ "itertools 0.14.0",
  "pretty_assertions",
  "psl",
  "quaint",
@@ -5389,7 +5435,7 @@ version = "0.1.0"
 dependencies = [
  "bigdecimal",
  "chrono",
- "itertools 0.13.0",
+ "itertools 0.14.0",
  "prisma-value",
  "psl",
  "quaint",
@@ -5412,7 +5458,7 @@ dependencies = [
  "cuid",
  "expect-test",
  "futures",
- "itertools 0.13.0",
+ "itertools 0.14.0",
  "panic-utils",
  "prisma-value",
  "psl",
@@ -5448,7 +5494,7 @@ dependencies = [
  "expect-test",
  "indexmap 2.10.0",
  "indoc",
- "itertools 0.13.0",
+ "itertools 0.14.0",
  "prisma-value",
  "psl",
  "quaint",
@@ -5482,7 +5528,7 @@ dependencies = [
  "expect-test",
  "indexmap 2.10.0",
  "indoc",
- "itertools 0.13.0",
+ "itertools 0.14.0",
  "pretty_assertions",
  "prisma-value",
  "psl",
@@ -5709,10 +5755,10 @@ checksum = "55937e1799185b12863d447f42597ed69d9928686b8d88a1df17376a097d8369"
 name = "telemetry"
 version = "0.1.0"
 dependencies = [
- "ahash 0.8.11",
  "crosstarget-utils",
- "derive_more",
+ "derive_more 2.0.1",
  "enumflags2",
+ "hashbrown 0.15.2",
  "insta",
  "rand 0.8.5",
  "serde",
@@ -6391,7 +6437,7 @@ name = "user-facing-errors"
 version = "0.1.0"
 dependencies = [
  "indoc",
- "itertools 0.13.0",
+ "itertools 0.14.0",
  "panic-utils",
  "quaint",
  "serde",

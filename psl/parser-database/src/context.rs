@@ -5,8 +5,9 @@ use crate::{
     DatamodelError, Diagnostics, InFile, StringId, ast, interner::StringInterner, names::Names, relations::Relations,
     types::Types,
 };
+use alloc::{string::ToString, vec::Vec};
+use hashbrown::{HashMap, HashSet};
 use schema_ast::ast::{EnumValueId, Expression, WithName};
-use std::collections::{HashMap, HashSet};
 
 /// Validation context. This is an implementation detail of ParserDatabase. It
 /// contains the database itself, as well as context that is discarded after
@@ -350,7 +351,7 @@ impl<'db> Context<'db> {
 
         {
             // The arguments lists of the attribute and all nested function expressions.
-            let all_arguments_lists = std::iter::once(&attribute.arguments).chain(
+            let all_arguments_lists = core::iter::once(&attribute.arguments).chain(
                 attribute
                     .arguments
                     .arguments
@@ -453,7 +454,7 @@ fn iter_attributes<'a, 'ast: 'a>(
         })
 }
 
-impl std::ops::Index<StringId> for Context<'_> {
+impl core::ops::Index<StringId> for Context<'_> {
     type Output = str;
 
     fn index(&self, index: StringId) -> &Self::Output {

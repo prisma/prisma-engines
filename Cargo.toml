@@ -48,39 +48,44 @@ level = "warn"
 check-cfg = ['cfg(wasm_bindgen_unstable_test_coverage)', 'cfg(debug_assert)']
 
 [workspace.dependencies]
-ahash = "0.8"
-anyhow = "1"
+anyhow = { version = "1", default-features = false }
 async-trait = "0.1"
 barrel = { git = "https://github.com/prisma/barrel.git", branch = "mssql-support" }
-base64 = "0.22"
+base64 = { version = "0.22", default-features = false, features = ["alloc"] }
 bigdecimal = "0.3"
 bitflags = "2"
-bit-vec = "0.6"
-bon = "3"
+bit-vec = { version = "0.6", default-features = false }
+bon = { version = "3", default-features = false, features = ["alloc"] }
 bson = "2"
-bytes = "1"
+bytes = { version = "1", default-features = false }
 byteorder = { version = "1", default-features = false }
 cfg-if = "1"
-chrono = "0.4"
+chrono = { version = "0.4", default-features = false, features = ["alloc"] }
 colored = "3"
 concat-idents = "1"
 connection-string = "0.2"
 convert_case = "0.6"
-crossbeam-channel = "0.5"
+crossbeam-channel = { version = "0.5", default-features = false }
 cuid = { git = "https://github.com/prisma/cuid-rust", branch = "v1.3.3-wasm32-unknown-unknown" }
-derive_more = "0.99"
-either = "1"
+derive_more = { version = "2", default-features = false }
+either = { version = "1", default-features = false }
 enumflags2 = "0.7"
 env_logger = "0.11"
-futures = "0.3"
+futures = { version = "0.3", default-features = false, features = [
+    "alloc",
+    "async-await",
+] }
 getrandom = "0.2"
 graphql-parser = { git = "https://github.com/prisma/graphql-parser" }
+hashbrown = "0.15"
 heck = "0.4"
-hex = "0.4"
+hex = { version = "0.4", default-features = false, features = ["alloc"] }
 hyper = "0.14"
 indoc = "2"
-indexmap = "2"
-itertools = "0.13"
+indexmap = { version = "2", default-features = false }
+itertools = { git = "https://github.com/aqrln/itertools", branch = "hashbrown", default-features = false, features = [
+    "hashbrown",
+] }
 jsonrpc-core = "17"
 log = "0.4"
 lru = "0.7"
@@ -105,27 +110,39 @@ napi = { version = "2", default-features = false, features = [
 ] }
 napi-derive = "2"
 native-tls = "0.2"
-nom = "7"
+nom = { version = "7", default-features = false, features = ["alloc"] }
 num_cpus = "1"
+once_cell = { version = "1", default-features = false, features = ["alloc"] }
 parking_lot = "0.12"
 parse-hyperlinks = "0.23"
 paste = "1"
-percent-encoding = "2"
-pest = "2"
-pest_derive = "2"
-petgraph = "0.8"
+percent-encoding = { version = "2", default-features = false, features = [
+    "alloc",
+] }
+pest = { version = "2", default-features = false, features = ["memchr"] }
+pest_derive = { version = "2", default-features = false }
+petgraph = { version = "0.8", default-features = false }
 pin-project = "1"
 postgres-native-tls = { git = "https://github.com/prisma/rust-postgres", branch = "pgbouncer-mode" }
 postgres-types = { git = "https://github.com/prisma/rust-postgres", branch = "pgbouncer-mode" }
 pretty = "0.12"
-rustc-hash = "1"
-rand = "0.8"
-regex = "1"
+rand = { version = "0.8", default-features = false, features = [
+    "alloc",
+    "getrandom",
+] }
+regex = { version = "1", default-features = false, features = [
+    "perf",
+    "unicode",
+] }
 reqwest = "0.11"
 rusqlite = "0.32"
 sha2 = "0.10"
-serde = { version = "1", features = ["derive"] }
-serde_json = { version = "1", features = [
+serde = { version = "1", default-features = false, features = [
+    "alloc",
+    "derive",
+] }
+serde_json = { version = "1", default-features = false, features = [
+    "alloc",
     "float_roundtrip",
     "preserve_order",
     "raw_value",
@@ -146,21 +163,35 @@ tokio-postgres = { git = "https://github.com/prisma/rust-postgres", branch = "pg
 tokio-tungstenite = "0.26"
 tokio-util = "0.7"
 toml = "0.5"
-tracing = "0.1"
-tracing-core = "0.1"
+tracing = { version = "0.1", default-features = false, features = [
+    "attributes",
+] }
+tracing-core = { version = "0.1", default-features = false }
 tracing-error = "0.2"
-tracing-subscriber = "0.3"
-tracing-futures = "0.2"
+tracing-subscriber = { version = "0.3", default-features = false, features = [
+    "alloc",
+    "smallvec",
+    "tracing-log",
+] }
+tracing-futures = { version = "0.2", default-features = false, features = [
+    "std-future",
+] }
 tsify = { version = "0.5", default-features = false, features = ["js"] }
-thiserror = "2"
-url = "2"
-ulid = "1"
-uuid = { version = "1", features = ["v4", "v7", "js"] }
+thiserror = { version = "2", default-features = false }
+url = { version = "2", default-features = false }
+ulid = { version = "1", default-features = false, features = ["rand"] }
+uuid = { version = "1", default-features = false, features = [
+    "v4",
+    "v7",
+    "js",
+] }
 versions = "6"
 
-js-sys = "0.3"
-wasm-bindgen = "0.2"
-wasm-bindgen-futures = "0.4"
+js-sys = { version = "0.3", default-features = false }
+wasm-bindgen = { version = "0.2", default-features = false, features = [
+    "msrv",
+] }
+wasm-bindgen-futures = { version = "0.4", default-features = false }
 wasm-logger = "0.2"
 
 # build dependencies
@@ -205,7 +236,8 @@ query-engine-common.path = "./libs/query-engine-common"
 shared-wasm.path = "./libs/shared-wasm"
 driver-adapters.path = "./libs/driver-adapters"
 sql-ddl.path = "./libs/sql-ddl"
-query-template.path = "libs/query-template"
+query-template.path = "./libs/query-template"
+lazy-race.path = "./libs/lazy-race"
 
 psl.path = "./psl/psl"
 psl-core.path = "./psl/psl-core"

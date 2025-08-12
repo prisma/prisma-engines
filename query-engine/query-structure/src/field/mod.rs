@@ -2,6 +2,11 @@ mod composite;
 mod relation;
 mod scalar;
 
+use alloc::{
+    borrow::{Cow, ToOwned},
+    boxed::Box,
+    vec::Vec,
+};
 pub use composite::*;
 use prisma_value::PrismaValueType;
 pub use relation::*;
@@ -12,7 +17,6 @@ use psl::{
     parser_database::{EnumId, ScalarType, walkers},
     schema_ast::ast::FieldArity,
 };
-use std::{borrow::Cow, hash::Hash};
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum Field {
@@ -207,8 +211,8 @@ impl Type {
     }
 }
 
-impl std::fmt::Debug for Type {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl core::fmt::Debug for Type {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         f.debug_tuple("TypeIdentifier")
             .field(&format!("{:?}", self.id))
             .finish()

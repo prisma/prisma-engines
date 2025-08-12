@@ -1,3 +1,8 @@
+use alloc::{
+    string::{String, ToString},
+    vec::Vec,
+};
+
 use parser_database::Files;
 use schema_ast::ast::WithSpan;
 

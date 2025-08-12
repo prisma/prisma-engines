@@ -4,8 +4,8 @@ use crate::{
     types::{RelationField, RelationFieldId},
     walkers::*,
 };
-use std::{
-    borrow::Cow,
+use alloc::{borrow::Cow, string::String};
+use core::{
     fmt::{self, Debug},
     hash::Hasher,
 };
@@ -191,7 +191,7 @@ impl PartialEq for RelationName<'_> {
 impl Eq for RelationName<'_> {}
 
 impl Ord for RelationName<'_> {
-    fn cmp(&self, other: &Self) -> std::cmp::Ordering {
+    fn cmp(&self, other: &Self) -> core::cmp::Ordering {
         match (self, other) {
             (Self::Explicit(l0), Self::Explicit(r0)) => l0.cmp(r0),
             (Self::Generated(l0), Self::Generated(r0)) => l0.cmp(r0),
@@ -202,12 +202,12 @@ impl Ord for RelationName<'_> {
 }
 
 impl PartialOrd for RelationName<'_> {
-    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
+    fn partial_cmp(&self, other: &Self) -> Option<core::cmp::Ordering> {
         Some(self.cmp(other))
     }
 }
 
-impl std::hash::Hash for RelationName<'_> {
+impl core::hash::Hash for RelationName<'_> {
     fn hash<H: Hasher>(&self, state: &mut H) {
         match self {
             RelationName::Explicit(s) => s.hash(state),

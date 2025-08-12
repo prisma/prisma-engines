@@ -1,3 +1,5 @@
+use alloc::vec::Vec;
+
 use super::{Comment, ConfigBlockProperty, Identifier, Span, WithDocumentation, WithIdentifier, WithSpan};
 
 /// A source block declaration.

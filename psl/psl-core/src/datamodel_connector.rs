@@ -15,6 +15,12 @@ mod filters;
 mod native_types;
 mod relation_mode;
 
+use alloc::{
+    borrow::{Cow, ToOwned},
+    string::String,
+    vec::Vec,
+};
+
 pub use self::{
     capabilities::{ConnectorCapabilities, ConnectorCapability},
     completions::format_completion_docs,
@@ -28,13 +34,13 @@ use crate::{Configuration, Datasource, PreviewFeature, configuration::Datasource
 use chrono::{DateTime, FixedOffset};
 use diagnostics::{DatamodelError, Diagnostics, NativeTypeErrorFactory, Span};
 use enumflags2::BitFlags;
+use hashbrown::HashMap;
 use lsp_types::CompletionList;
 use parser_database::{
     IndexAlgorithm, ParserDatabase, ReferentialAction, ScalarType,
     ast::{self, SchemaPosition},
     walkers,
 };
-use std::{borrow::Cow, collections::HashMap};
 
 pub const EXTENSIONS_KEY: &str = "extensions";
 

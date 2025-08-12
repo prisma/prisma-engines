@@ -1,3 +1,5 @@
+use alloc::vec::Vec;
+
 use super::{Comment, Identifier, Span, WithDocumentation, WithIdentifier, WithSpan};
 use crate::ast::config::ConfigBlockProperty;
 

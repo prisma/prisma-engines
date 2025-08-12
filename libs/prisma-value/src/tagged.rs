@@ -1,3 +1,5 @@
+use alloc::string::ToString;
+
 use serde::{Serialize, ser::SerializeMap};
 use serde_json::json;
 
@@ -49,11 +51,11 @@ impl<'a> From<&'a PrismaValue> for TaggedPrismaValue<'a> {
 }
 
 struct TaggedPrismaValueSliceIter<'a> {
-    iter: std::slice::Iter<'a, PrismaValue>,
+    iter: core::slice::Iter<'a, PrismaValue>,
 }
 
 impl<'a> TaggedPrismaValueSliceIter<'a> {
-    fn new(iter: std::slice::Iter<'a, PrismaValue>) -> Self {
+    fn new(iter: core::slice::Iter<'a, PrismaValue>) -> Self {
         Self { iter }
     }
 }

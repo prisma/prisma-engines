@@ -1,5 +1,7 @@
 use crate::datamodel_connector::{ConstraintScope, walker_ext_traits::*};
-use std::{borrow::Cow, collections::HashMap, ops::Deref};
+use alloc::{borrow::Cow, string::ToString};
+use core::ops::Deref;
+use hashbrown::HashMap;
 
 /// A constraint namespace consists of two kinds of namespaces:
 ///

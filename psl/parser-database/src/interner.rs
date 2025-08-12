@@ -4,6 +4,8 @@
 //! The StringIds returned by `intern` are only valid for this specific instance of the interner
 //! they were interned with.
 
+use alloc::{borrow::ToOwned, string::String};
+
 use indexmap::IndexSet;
 
 #[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Debug, Hash)]

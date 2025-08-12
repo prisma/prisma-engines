@@ -6,6 +6,7 @@ use super::{
     parse_types::parse_field_type,
 };
 use crate::ast::{self, *};
+use alloc::vec::Vec;
 use diagnostics::{DatamodelError, Diagnostics, FileId};
 
 pub(crate) fn parse_field(

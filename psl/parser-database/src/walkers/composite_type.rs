@@ -3,6 +3,7 @@ use crate::{
     ast::{self, NewlineType, WithDocumentation, WithName, WithSpan},
     walkers::{Walker, newline},
 };
+use alloc::string::String;
 use diagnostics::Span;
 
 use super::EnumWalker;

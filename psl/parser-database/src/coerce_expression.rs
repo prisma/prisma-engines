@@ -1,3 +1,5 @@
+use alloc::{string::ToString, vec::Vec};
+
 use crate::{DatamodelError, Diagnostics, ast};
 
 macro_rules! impl_coercions {

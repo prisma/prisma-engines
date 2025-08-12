@@ -1,3 +1,5 @@
+use alloc::vec::Vec;
+
 use super::{Attribute, Comment, Field, Identifier, Span, WithAttributes, WithDocumentation, WithIdentifier, WithSpan};
 
 /// An opaque identifier for a field in an AST model. Use the
@@ -12,7 +14,7 @@ impl FieldId {
     pub const MAX: FieldId = FieldId(u32::MAX);
 }
 
-impl std::ops::Index<FieldId> for Model {
+impl core::ops::Index<FieldId> for Model {
     type Output = Field;
 
     fn index(&self, index: FieldId) -> &Self::Output {

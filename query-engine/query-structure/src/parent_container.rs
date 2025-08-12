@@ -1,6 +1,10 @@
+use alloc::{borrow::ToOwned, string::String, vec::Vec};
+use core::{
+    fmt::Debug,
+    hash::{Hash, Hasher},
+};
+
 use crate::{CompositeType, Field, InternalDataModelRef, Model};
-use std::fmt::Debug;
-use std::hash::{Hash, Hasher};
 
 #[derive(Clone)]
 pub enum ParentContainer {
@@ -80,7 +84,7 @@ impl From<CompositeType> for ParentContainer {
 }
 
 impl Debug for ParentContainer {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
             ParentContainer::Model(m) => f
                 .debug_struct("ParentContainer")

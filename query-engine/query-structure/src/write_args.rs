@@ -1,9 +1,11 @@
+use core::{borrow::Borrow, ops::Deref};
+
 use crate::{
     CompositeFieldRef, Field, Filter, Model, ModelProjection, PrismaValue, ScalarFieldRef, SelectedField,
     SelectionResult,
 };
+use alloc::{borrow::ToOwned, boxed::Box, string::String, vec::Vec};
 use indexmap::{IndexMap, map::Keys};
-use std::{borrow::Borrow, convert::TryInto, ops::Deref};
 
 /// WriteArgs represent data to be written to an underlying data source.
 #[derive(Debug, PartialEq, Clone)]

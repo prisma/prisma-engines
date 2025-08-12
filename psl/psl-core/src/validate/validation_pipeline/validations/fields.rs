@@ -1,5 +1,3 @@
-use std::sync::LazyLock;
-
 use super::{
     constraint_namespace::ConstraintName,
     database_name::validate_db_name,
@@ -8,6 +6,8 @@ use super::{
 };
 use crate::datamodel_connector::{ConnectorCapability, walker_ext_traits::*};
 use crate::{diagnostics::DatamodelError, validate::validation_pipeline::context::Context};
+use alloc::{string::ToString, vec::Vec};
+use lazy_race::LazyRace;
 use parser_database::{
     ScalarFieldType, ScalarType,
     ast::{self, WithSpan},
@@ -322,7 +322,7 @@ pub(super) fn validate_unsupported_field_type(field: ScalarFieldWalker<'_>, ctx:
 
     let source = if let Some(s) = ctx.datasource { s } else { return };
 
-    static TYPE_REGEX: LazyLock<Regex> = LazyLock::new(|| {
+    static TYPE_REGEX: LazyRace<Regex> = LazyRace::new(|| {
         Regex::new(r"(?x)
     ^                           # beginning of the string
     (?P<prefix>[^(]+)           # a required prefix that is any character until the first opening brace

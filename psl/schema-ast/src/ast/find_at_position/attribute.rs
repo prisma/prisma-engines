@@ -1,4 +1,9 @@
-use crate::ast::{self};
+use alloc::{
+    string::{String, ToString},
+    vec::Vec,
+};
+
+use crate::ast;
 
 use super::{ExpressionPosition, WithSpan};
 

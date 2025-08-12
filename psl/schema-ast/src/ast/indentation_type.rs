@@ -1,4 +1,4 @@
-use std::fmt;
+use core::fmt;
 
 /// Defines the indentation of a PSL block.
 #[derive(Debug, Clone, Copy, PartialEq)]

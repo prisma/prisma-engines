@@ -7,7 +7,9 @@ mod visited_relation;
 use super::constraint_namespace::ConstraintName;
 use crate::datamodel_connector::{Connector, ConnectorCapability, RelationMode, walker_ext_traits::*};
 use crate::{diagnostics::DatamodelError, validate::validation_pipeline::context::Context};
+use alloc::{collections::BTreeSet, rc::Rc, string::ToString, vec::Vec};
 use diagnostics::DatamodelWarning;
+use hashbrown::{HashMap, HashSet};
 use indoc::formatdoc;
 use itertools::Itertools;
 use parser_database::ReferentialAction;
@@ -16,10 +18,6 @@ use parser_database::{
     ScalarFieldType,
     ast::WithSpan,
     walkers::{CompleteInlineRelationWalker, InlineRelationWalker},
-};
-use std::{
-    collections::{BTreeSet, HashMap, HashSet},
-    rc::Rc,
 };
 use visited_relation::*;
 

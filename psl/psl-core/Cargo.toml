@@ -10,6 +10,7 @@ mysql = []
 cockroachdb = ["postgresql"]
 mssql = []
 mongodb = []
+std = ["dep:connection-string"]
 
 [dependencies]
 diagnostics.workspace = true
@@ -19,7 +20,7 @@ schema-ast.workspace = true
 
 bigdecimal.workspace = true
 chrono.workspace = true
-connection-string.workspace = true
+connection-string = { workspace = true, optional = true }
 itertools.workspace = true
 regex.workspace = true
 serde.workspace = true
@@ -28,6 +29,8 @@ enumflags2.workspace = true
 indoc.workspace = true
 either.workspace = true
 hex.workspace = true
+hashbrown = { workspace = true, features = ["serde"] }
+lazy-race.workspace = true
 
 # For the connector API.
 lsp-types.workspace = true

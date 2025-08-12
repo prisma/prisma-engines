@@ -1,4 +1,5 @@
 use crate::datamodel_connector::Connector;
+use alloc::string::String;
 use diagnostics::{DatamodelError, Span};
 
 pub struct ConstraintNames;
@@ -143,7 +144,7 @@ impl ConstraintNames {
 /// This method can help you to truncate a string so that it's still
 /// valid UTF-8, but doesn't exceed a given number of bytes.
 ///
-/// To be replaced with `std::str::floor_char_boundary` when it's
+/// To be replaced with `core::str::floor_char_boundary` when it's
 /// stabilized.
 fn floor_char_boundary(s: &str, mut index: usize) -> usize {
     if index >= s.len() {
