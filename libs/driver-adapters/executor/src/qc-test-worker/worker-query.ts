@@ -1,6 +1,8 @@
 import * as util from 'node:util'
 
 import {
+  BatchResponse,
+  convertCompactedRows,
   DataMapperError,
   noopTracingHelper,
   normalizeJsonProtocolValues,
@@ -67,7 +69,10 @@ class QueryPipeline {
             )
           : await this.executeIndependentBatch(batch, txId)
 
-        debug('🟢 Batch query results: ', results)
+        debug(
+          '🟢 Batch query results: ',
+          util.inspect(results, false, null, true),
+        )
 
         return safeJsonStringify({
           batchResult: batch.map((query, index) =>
@@ -133,6 +138,14 @@ class QueryPipeline {
 
     debug('🟢 Query plan: ', util.inspect(queryPlan, false, null, true))
 
+    return this.#executeQueryPlan(queryable, queryPlan, allowTransaction)
+  }
+
+  async #executeQueryPlan(
+    queryable: SqlQueryable,
+    queryPlan: QueryPlanNode,
+    allowTransaction: boolean,
+  ) {
     const qiTransactionManager = (
       allowTransaction
         ? { enabled: true, manager: this.transactionManager }
@@ -166,10 +179,10 @@ class QueryPipeline {
 
     const canStartNewTransaction = txId === null
 
-    return Promise.all(
-      queries.map((query) =>
-        this.executeQuery(queryable, query, canStartNewTransaction),
-      ),
+    return await this.#executeBatchOn(
+      queryable,
+      queries,
+      canStartNewTransaction,
     )
   }
 
@@ -189,14 +202,8 @@ class QueryPipeline {
     )
 
     try {
-      const results: unknown[] = []
-      for (const query of queries) {
-        const result = await this.executeQuery(transaction, query, false)
-        results.push(result)
-      }
-
+      const results = await this.#executeBatchOn(transaction, queries, false)
       await this.transactionManager.commitTransaction(txInfo.id)
-
       return results
     } catch (err) {
       await this.transactionManager
@@ -204,6 +211,62 @@ class QueryPipeline {
         .catch(console.error)
       throw err
     }
+  }
+
+  async #executeBatchOn(
+    queryable: SqlQueryable,
+    queries: readonly JsonProtocolQuery[],
+    canStartNewTransaction: boolean,
+  ): Promise<unknown[]> {
+    let compiledBatch: BatchResponse
+    try {
+      compiledBatch = withLocalPanicHandler(() =>
+        this.compiler.compileBatch(safeJsonStringify({ batch: queries })),
+      )
+    } catch (error) {
+      if (typeof error.message === 'string' && typeof error.code === 'string') {
+        throw new UserFacingError(error.message, error.code, error.meta)
+      } else {
+        throw error
+      }
+    }
+
+    debug(
+      '🟢 Batch query plan: ',
+      util.inspect(compiledBatch, false, null, true),
+    )
+
+    const results: unknown[] = []
+
+    switch (compiledBatch.type) {
+      case 'multi':
+        for (const plan of compiledBatch.plans) {
+          results.push(
+            await this.#executeQueryPlan(
+              queryable,
+              plan,
+              canStartNewTransaction,
+            ),
+          )
+        }
+        break
+
+      case 'compacted': {
+        if (!queries.every((q) => q.action === queries[0].action)) {
+          throw new Error('All queries in a batch must have the same action')
+        }
+
+        const rows = await this.#executeQueryPlan(
+          queryable,
+          compiledBatch.plan,
+          canStartNewTransaction,
+        )
+
+        results.push(...convertCompactedRows(rows as {}[], compiledBatch))
+      }
+    }
+
+    return results
   }
 }
 

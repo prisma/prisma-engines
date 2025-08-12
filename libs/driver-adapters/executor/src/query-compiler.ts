@@ -1,6 +1,6 @@
 import { ConnectionInfo } from '@prisma/driver-adapter-utils'
 import { __dirname } from './utils.js'
-import { QueryPlanNode } from '@prisma/client-engine-runtime'
+import { BatchResponse, QueryPlanNode } from '@prisma/client-engine-runtime'
 import { Env } from './types/index.js'
 
 export type QueryCompilerParams = {
@@ -13,6 +13,7 @@ export type QueryCompilerParams = {
 export interface QueryCompiler {
   new (params: QueryCompilerParams): QueryCompiler
   compile(query: string): QueryPlanNode
+  compileBatch(batch: string): BatchResponse
   free(): void
 }
 

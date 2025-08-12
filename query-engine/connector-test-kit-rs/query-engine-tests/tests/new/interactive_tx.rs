@@ -242,13 +242,12 @@ mod interactive_tx {
         assert!(now.elapsed() <= Duration::from_millis(5000));
 
         if matches!(runner.connector_version(), ConnectorVersion::MongoDb(_)) {
-            assert!(res.is_err());
-            let err = res.err().unwrap();
+            let err = res.unwrap_err();
             let known_err = err.as_known().unwrap();
             assert!(known_err.message.contains("has been aborted."));
             assert_eq!(known_err.error_code, "P2028");
         } else {
-            assert!(res.is_ok());
+            res.unwrap();
         }
         runner.clear_active_tx();
 
