@@ -2,7 +2,6 @@ pub mod arithmetic;
 
 mod error;
 mod raw_json;
-mod tagged;
 
 use base64::prelude::*;
 use bigdecimal::{BigDecimal, FromPrimitive, ToPrimitive};
@@ -16,7 +15,6 @@ use uuid::Uuid;
 
 pub use error::ConversionFailure;
 pub use raw_json::RawJson;
-pub use tagged::TaggedPrismaValue;
 
 pub type PrismaValueResult<T> = std::result::Result<T, ConversionFailure>;
 pub type PrismaListValue = Vec<PrismaValue>;
@@ -69,10 +67,16 @@ impl PrismaValue {
             PrismaValue::Boolean(_) => PrismaValueType::Boolean,
             PrismaValue::Int(_) => PrismaValueType::Int,
             PrismaValue::Uuid(_) => PrismaValueType::String,
-            PrismaValue::List(_) => PrismaValueType::Array(PrismaValueType::Any.into()),
+            PrismaValue::List(list) => PrismaValueType::List(
+                list.iter()
+                    .map(|elem| elem.r#type())
+                    .find(|typ| !matches!(typ, PrismaValueType::Any))
+                    .unwrap_or(PrismaValueType::Any)
+                    .into(),
+            ),
             PrismaValue::Json(_) => PrismaValueType::Json,
             PrismaValue::Object(_) => PrismaValueType::Object,
-            PrismaValue::DateTime(_) => PrismaValueType::Date,
+            PrismaValue::DateTime(_) => PrismaValueType::DateTime,
             PrismaValue::Float(_) => PrismaValueType::Float,
             PrismaValue::BigInt(_) => PrismaValueType::BigInt,
             PrismaValue::Bytes(_) => PrismaValueType::Bytes,
@@ -87,39 +91,37 @@ impl PrismaValue {
 #[derive(Debug, Clone, Eq, PartialEq, Hash, Serialize, Deserialize, PartialOrd, Ord)]
 #[serde(tag = "type", content = "inner")]
 pub enum PrismaValueType {
-    Any,
     String,
-    Int,
-    BigInt,
-    Float,
     Boolean,
-    Decimal,
-    Date,
-    Time,
-    Array(Box<PrismaValueType>),
+    Enum,
+    Int,
+    Uuid,
+    List(Box<PrismaValueType>),
     Json,
     Object,
+    DateTime,
+    Float,
+    BigInt,
     Bytes,
-    Enum(String),
+    Any,
 }
 
 impl std::fmt::Display for PrismaValueType {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            PrismaValueType::Any => write!(f, "Any"),
-            PrismaValueType::String => write!(f, "String"),
-            PrismaValueType::Int => write!(f, "Int"),
-            PrismaValueType::BigInt => write!(f, "BigInt"),
-            PrismaValueType::Float => write!(f, "Float"),
-            PrismaValueType::Boolean => write!(f, "Boolean"),
-            PrismaValueType::Decimal => write!(f, "Decimal"),
-            PrismaValueType::Date => write!(f, "Date"),
-            PrismaValueType::Time => write!(f, "Time"),
-            PrismaValueType::Array(t) => write!(f, "Array<{t}>"),
-            PrismaValueType::Json => write!(f, "Json"),
-            PrismaValueType::Object => write!(f, "Object"),
-            PrismaValueType::Bytes => write!(f, "Bytes"),
-            PrismaValueType::Enum(name) => write!(f, "Enum<{name}>"),
+            PrismaValueType::String => "String".fmt(f),
+            PrismaValueType::Boolean => "Boolean".fmt(f),
+            PrismaValueType::Enum => "Enum".fmt(f),
+            PrismaValueType::Int => "Int".fmt(f),
+            PrismaValueType::Uuid => "Uuid".fmt(f),
+            PrismaValueType::List(inner) => write!(f, "List<{}>", inner),
+            PrismaValueType::Json => "Json".fmt(f),
+            PrismaValueType::Object => "Object".fmt(f),
+            PrismaValueType::DateTime => "DateTime".fmt(f),
+            PrismaValueType::Float => "Float".fmt(f),
+            PrismaValueType::BigInt => "BigInt".fmt(f),
+            PrismaValueType::Bytes => "Bytes".fmt(f),
+            PrismaValueType::Any => "Any".fmt(f),
         }
     }
 }
@@ -468,7 +470,7 @@ impl PrismaValue {
         PrismaValue::GeneratorCall {
             name: "now".into(),
             args: vec![],
-            return_type: PrismaValueType::Date,
+            return_type: PrismaValueType::DateTime,
         }
     }
 
@@ -481,10 +483,6 @@ impl PrismaValue {
 
     pub fn as_json(&self) -> Option<&String> {
         if let Self::Json(v) = self { Some(v) } else { None }
-    }
-
-    pub fn as_tagged(&self) -> TaggedPrismaValue<'_> {
-        TaggedPrismaValue::from(self)
     }
 }
 

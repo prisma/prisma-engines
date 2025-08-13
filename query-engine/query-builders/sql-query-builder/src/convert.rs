@@ -1,16 +1,14 @@
 use bigdecimal::{BigDecimal, FromPrimitive};
-use chrono::SecondsFormat;
+use chrono::{DateTime, NaiveTime};
 use prisma_value::{PrismaValue, PrismaValueType};
-use quaint::{ast::OpaqueType, prelude::SqlFamily};
+use quaint::ast::OpaqueType;
+use query_builder::{ArgScalarType, ArgType, Arity, DynamicArgType};
+use query_structure::{FieldArity, FieldTypeInformation, TypeIdentifier};
 
 use crate::value::{GeneratorCall, Placeholder};
 
-const DATETIME_FORMAT: &str = "%Y-%m-%d %H:%M:%S%.f";
-const DATE_FORMAT: &str = "%Y-%m-%d";
-const TIME_FORMAT: &str = "%H:%M:%S%.f";
-
-pub(crate) fn quaint_value_to_prisma_value(value: quaint::Value<'_>, family: SqlFamily) -> PrismaValue {
-    match value.typed {
+pub fn quaint_value_to_prisma_value(value: quaint::ValueType<'_>) -> PrismaValue {
+    match value {
         quaint::ValueType::Int32(Some(i)) => PrismaValue::Int(i.into()),
         quaint::ValueType::Int32(None) => PrismaValue::Null,
         quaint::ValueType::Int64(Some(i)) => PrismaValue::BigInt(i),
@@ -34,7 +32,7 @@ pub(crate) fn quaint_value_to_prisma_value(value: quaint::Value<'_>, family: Sql
         quaint::ValueType::EnumArray(Some(es), _) => PrismaValue::List(
             es.into_iter()
                 .map(|e| e.into_text())
-                .map(|v| quaint_value_to_prisma_value(v, family))
+                .map(|v| quaint_value_to_prisma_value(v.typed))
                 .collect(),
         ),
         quaint::ValueType::EnumArray(None, _) => PrismaValue::Null,
@@ -45,11 +43,11 @@ pub(crate) fn quaint_value_to_prisma_value(value: quaint::Value<'_>, family: Sql
         quaint::ValueType::Char(Some(c)) => PrismaValue::String(c.to_string()),
         quaint::ValueType::Char(None) => PrismaValue::Null,
         quaint::ValueType::Array(Some(a)) => {
-            PrismaValue::List(a.into_iter().map(|v| quaint_value_to_prisma_value(v, family)).collect())
+            PrismaValue::List(a.into_iter().map(|v| quaint_value_to_prisma_value(v.typed)).collect())
         }
         quaint::ValueType::Array(None) => PrismaValue::Null,
-        quaint::ValueType::Numeric(Some(bd)) if !family.is_sqlite() => PrismaValue::String(bd.to_string()),
-        quaint::ValueType::Numeric(Some(bd)) => PrismaValue::Float(bd),
+        // We can't use PrismValue::Float with BigDecimal, because its serializer loses precision.
+        quaint::ValueType::Numeric(Some(bd)) => PrismaValue::String(bd.to_string()),
         quaint::ValueType::Numeric(None) => PrismaValue::Null,
         quaint::ValueType::Json(Some(j)) => PrismaValue::Json(j.to_string()),
         quaint::ValueType::Json(None) => PrismaValue::Null,
@@ -57,30 +55,12 @@ pub(crate) fn quaint_value_to_prisma_value(value: quaint::Value<'_>, family: Sql
         quaint::ValueType::Xml(None) => PrismaValue::Null,
         quaint::ValueType::Uuid(Some(u)) => PrismaValue::Uuid(u),
         quaint::ValueType::Uuid(None) => PrismaValue::Null,
-        quaint::ValueType::DateTime(Some(dt)) => match value.native_column_type.as_deref() {
-            Some("DATE") if family.is_postgres() => PrismaValue::String(dt.date_naive().to_string()),
-            Some("TIME") if family.is_postgres() => PrismaValue::String(dt.time().to_string()),
-            Some("TIMETZ") if family.is_postgres() => PrismaValue::String(dt.time().format(TIME_FORMAT).to_string()),
-            _ if family.is_postgres() => PrismaValue::String(dt.naive_utc().to_string()),
-            _ if family.is_mysql() || family.is_mssql() => PrismaValue::String(dt.format(DATETIME_FORMAT).to_string()),
-
-            _ => PrismaValue::String(dt.to_rfc3339_opts(SecondsFormat::Millis, true)),
-        },
+        quaint::ValueType::DateTime(Some(dt)) => PrismaValue::DateTime(dt.fixed_offset()),
         quaint::ValueType::DateTime(None) => PrismaValue::Null,
-        quaint::ValueType::Date(Some(d)) => {
-            if family.is_mysql() || family.is_mssql() {
-                PrismaValue::String(d.format(DATE_FORMAT).to_string())
-            } else {
-                PrismaValue::String(d.to_string())
-            }
-        }
+        quaint::ValueType::Date(Some(d)) => PrismaValue::DateTime(d.and_time(NaiveTime::MIN).and_utc().fixed_offset()),
         quaint::ValueType::Date(None) => PrismaValue::Null,
         quaint::ValueType::Time(Some(t)) => {
-            if family.is_mysql() || family.is_mssql() {
-                PrismaValue::String(t.format(TIME_FORMAT).to_string())
-            } else {
-                PrismaValue::String(t.to_string())
-            }
+            PrismaValue::DateTime(DateTime::UNIX_EPOCH.date_naive().and_time(t).and_utc().fixed_offset())
         }
         quaint::ValueType::Time(None) => PrismaValue::Null,
         quaint::ValueType::Opaque(opaque) => {
@@ -101,24 +81,153 @@ pub(crate) fn quaint_value_to_prisma_value(value: quaint::Value<'_>, family: Sql
 
 pub fn opaque_type_to_prisma_type(vt: &OpaqueType) -> PrismaValueType {
     match vt {
-        OpaqueType::Unknown => PrismaValueType::Any,
+        OpaqueType::Unknown | OpaqueType::Tuple(_) => PrismaValueType::Any,
         OpaqueType::Int32 => PrismaValueType::Int,
         OpaqueType::Int64 => PrismaValueType::BigInt,
-        OpaqueType::Float => PrismaValueType::Float,
-        OpaqueType::Double => PrismaValueType::Float,
-        OpaqueType::Text => PrismaValueType::String,
-        OpaqueType::Enum => PrismaValueType::String,
+        OpaqueType::Float | OpaqueType::Double | OpaqueType::Numeric => PrismaValueType::Float,
+        OpaqueType::Enum => PrismaValueType::Enum,
+        OpaqueType::Text | OpaqueType::Xml | OpaqueType::Char => PrismaValueType::String,
+        OpaqueType::Uuid => PrismaValueType::Uuid,
         OpaqueType::Bytes => PrismaValueType::Bytes,
         OpaqueType::Boolean => PrismaValueType::Boolean,
-        OpaqueType::Char => PrismaValueType::String,
-        OpaqueType::Array(t) => PrismaValueType::Array(Box::new(opaque_type_to_prisma_type(t))),
-        OpaqueType::Numeric => PrismaValueType::Decimal,
+        OpaqueType::Array(inner) => PrismaValueType::List(opaque_type_to_prisma_type(inner).into()),
         OpaqueType::Json => PrismaValueType::Json,
         OpaqueType::Object => PrismaValueType::Object,
-        OpaqueType::Xml => PrismaValueType::String,
-        OpaqueType::Uuid => PrismaValueType::String,
-        OpaqueType::DateTime => PrismaValueType::Date,
-        OpaqueType::Date => PrismaValueType::Date,
-        OpaqueType::Time => PrismaValueType::Time,
+        OpaqueType::DateTime | OpaqueType::Date | OpaqueType::Time => PrismaValueType::DateTime,
+    }
+}
+
+pub fn prisma_type_to_arg_type(pt: &PrismaValueType) -> ArgType {
+    let scalar_type = match pt {
+        PrismaValueType::Any => ArgScalarType::Unknown,
+        PrismaValueType::String => ArgScalarType::String,
+        PrismaValueType::Uuid => ArgScalarType::Uuid,
+        PrismaValueType::Int => ArgScalarType::Int,
+        PrismaValueType::BigInt => ArgScalarType::BigInt,
+        PrismaValueType::Float => ArgScalarType::Float,
+        PrismaValueType::Boolean => ArgScalarType::Boolean,
+        PrismaValueType::DateTime => ArgScalarType::DateTime,
+        PrismaValueType::Json | PrismaValueType::Object => ArgScalarType::Json,
+        PrismaValueType::Bytes => ArgScalarType::Bytes,
+        PrismaValueType::Enum => ArgScalarType::Enum,
+        PrismaValueType::List(inner) => {
+            let inner = prisma_type_to_arg_type(inner);
+            assert_eq!(inner.arity, Arity::Scalar, "list element type must be a scalar type");
+            return ArgType::new(Arity::List, inner.scalar_type, None);
+        }
+    };
+    ArgType::new(Arity::Scalar, scalar_type, None)
+}
+
+pub fn quaint_value_to_arg_type(value: &quaint::Value<'_>) -> DynamicArgType {
+    let native_type = value.native_column_type.as_deref().map(|nt| nt.to_owned());
+    let scalar_type = match &value.typed {
+        quaint::ValueType::Int32(_) => ArgScalarType::Int,
+        quaint::ValueType::Int64(_) => ArgScalarType::BigInt,
+        quaint::ValueType::Float(_) | quaint::ValueType::Double(_) => ArgScalarType::Float,
+        quaint::ValueType::Numeric(_) => ArgScalarType::Decimal,
+        quaint::ValueType::Enum(_, _) => ArgScalarType::Enum,
+        quaint::ValueType::Text(_) | quaint::ValueType::Xml(_) | quaint::ValueType::Char(_) => ArgScalarType::String,
+        quaint::ValueType::Uuid(_) => ArgScalarType::Uuid,
+        quaint::ValueType::Bytes(_) => ArgScalarType::Bytes,
+        quaint::ValueType::Boolean(_) => ArgScalarType::Boolean,
+        quaint::ValueType::Json(_) => ArgScalarType::Json,
+        quaint::ValueType::DateTime(_) | quaint::ValueType::Date(_) | quaint::ValueType::Time(_) => {
+            ArgScalarType::DateTime
+        }
+        quaint::ValueType::Array(list) => {
+            let scalar_type = list
+                .as_deref()
+                .unwrap_or_default()
+                .first()
+                .map(|val| {
+                    let DynamicArgType::Single { r#type } = quaint_value_to_arg_type(val) else {
+                        panic!("array element type must not be a tuple");
+                    };
+                    assert_eq!(r#type.arity, Arity::Scalar, "array element type must be a scalar type");
+                    r#type.scalar_type
+                })
+                .unwrap_or(ArgScalarType::Unknown);
+            return DynamicArgType::Single {
+                r#type: ArgType::new(Arity::List, scalar_type, native_type),
+            };
+        }
+        quaint::ValueType::EnumArray(_, _) => {
+            return DynamicArgType::Single {
+                r#type: ArgType::new(Arity::List, ArgScalarType::Enum, native_type),
+            };
+        }
+        quaint::ValueType::Opaque(opaque) => return opaque_type_to_arg_type(opaque.typ(), native_type),
+    };
+    DynamicArgType::Single {
+        r#type: ArgType::new(Arity::Scalar, scalar_type, native_type),
+    }
+}
+
+fn opaque_type_to_arg_type(opaque: &OpaqueType, native_type: Option<String>) -> DynamicArgType {
+    let scalar_type = match opaque {
+        OpaqueType::Unknown => ArgScalarType::Unknown,
+        OpaqueType::Int32 => ArgScalarType::Int,
+        OpaqueType::Int64 => ArgScalarType::BigInt,
+        OpaqueType::Float | OpaqueType::Double => ArgScalarType::Float,
+        OpaqueType::Numeric => ArgScalarType::Decimal,
+        OpaqueType::Enum => ArgScalarType::Enum,
+        OpaqueType::Text | OpaqueType::Xml | OpaqueType::Char => ArgScalarType::String,
+        OpaqueType::Uuid => ArgScalarType::Uuid,
+        OpaqueType::Bytes => ArgScalarType::Bytes,
+        OpaqueType::Boolean => ArgScalarType::Boolean,
+        OpaqueType::Json | OpaqueType::Object => ArgScalarType::Json,
+        OpaqueType::DateTime | OpaqueType::Date | OpaqueType::Time => ArgScalarType::DateTime,
+        OpaqueType::Array(element_type) => {
+            let DynamicArgType::Single { r#type } = opaque_type_to_arg_type(element_type, native_type) else {
+                panic!("array element type must not be a tuple");
+            };
+            assert_eq!(r#type.arity, Arity::Scalar, "array element type must be a scalar type");
+            return DynamicArgType::Single {
+                r#type: ArgType::new(Arity::List, r#type.scalar_type, r#type.db_type),
+            };
+        }
+        OpaqueType::Tuple(elems) => {
+            return DynamicArgType::Tuple {
+                elements: elems
+                    .iter()
+                    .map(|(typ, nt)| {
+                        let DynamicArgType::Single { r#type } =
+                            opaque_type_to_arg_type(typ, nt.as_deref().map(ToOwned::to_owned))
+                        else {
+                            panic!("tuple element type must not be a tuple");
+                        };
+                        r#type
+                    })
+                    .collect(),
+            };
+        }
+    };
+    DynamicArgType::Single {
+        r#type: ArgType::new(Arity::Scalar, scalar_type, native_type),
+    }
+}
+
+pub fn type_identifier_to_opaque_type(identifier: &TypeIdentifier) -> OpaqueType {
+    match identifier {
+        TypeIdentifier::String => OpaqueType::Text,
+        TypeIdentifier::Int => OpaqueType::Int32,
+        TypeIdentifier::BigInt => OpaqueType::Int64,
+        TypeIdentifier::Float => OpaqueType::Numeric,
+        TypeIdentifier::Decimal => OpaqueType::Numeric,
+        TypeIdentifier::Boolean => OpaqueType::Boolean,
+        TypeIdentifier::Enum(_) => OpaqueType::Enum,
+        TypeIdentifier::UUID => OpaqueType::Uuid,
+        TypeIdentifier::Json => OpaqueType::Json,
+        TypeIdentifier::DateTime => OpaqueType::DateTime,
+        TypeIdentifier::Bytes => OpaqueType::Bytes,
+        TypeIdentifier::Unsupported => OpaqueType::Unknown,
+    }
+}
+
+pub fn type_information_to_opaque_type(typ: &FieldTypeInformation) -> OpaqueType {
+    match typ.arity {
+        FieldArity::Required | FieldArity::Optional => type_identifier_to_opaque_type(&typ.typ.id),
+        FieldArity::List => OpaqueType::Array(type_identifier_to_opaque_type(&typ.typ.id).into()),
     }
 }

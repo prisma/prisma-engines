@@ -10,9 +10,10 @@ use query_core::{
     UpdateRecord, WriteQuery, schema::constants::aggregations,
 };
 use query_structure::{
-    AggregationSelection, FieldSelection, FieldTypeInformation, PrismaValueType, SelectedField, TypeIdentifier,
+    AggregationSelection, FieldArity, FieldSelection, FieldTypeInformation, SelectedField, Type, TypeIdentifier,
 };
-use std::{borrow::Cow, collections::HashMap};
+use serde::Serialize;
+use std::{borrow::Cow, collections::HashMap, fmt};
 
 pub fn map_result_structure(graph: &QueryGraph, builder: &mut ResultNodeBuilder) -> Option<ResultNode> {
     graph
@@ -159,12 +160,9 @@ fn get_result_node(
 
                 // nested JSON fields get returned directly as objects when using relation joins
                 if uses_relation_joins && is_nested && type_info.typ.id == TypeIdentifier::Json {
-                    let mut result_type = PrismaValueType::Object;
-                    if type_info.arity.is_list() {
-                        result_type = PrismaValueType::Array(result_type.into());
-                    }
+                    let field_type = FieldType::new(type_info.arity, FieldScalarType::Object);
                     let db_name = from_name.into_owned().into();
-                    node.add_field(to_name, ResultNode::Value { db_name, result_type });
+                    node.add_field(to_name, ResultNode::Field { db_name, field_type });
                 } else {
                     let field = builder.new_value(from_name.into_owned(), type_info);
                     node.add_field(to_name, field);
@@ -322,4 +320,119 @@ fn get_result_node_for_update_many(
         .nested_queries(&selected_fields?.nested)
         .builder(builder)
         .call()
+}
+
+#[derive(Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct FieldType {
+    arity: Arity,
+    #[serde(flatten)]
+    r#type: FieldScalarType,
+}
+
+impl FieldType {
+    pub fn new(arity: impl Into<Arity>, r#type: impl Into<FieldScalarType>) -> Self {
+        Self {
+            arity: arity.into(),
+            r#type: r#type.into(),
+        }
+    }
+}
+
+impl fmt::Display for FieldType {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self.arity {
+            Arity::Required => write!(f, "{}", self.r#type),
+            Arity::List => write!(f, "{}[]", self.r#type),
+            Arity::Optional => write!(f, "{}?", self.r#type),
+        }
+    }
+}
+
+impl From<&FieldTypeInformation> for FieldType {
+    fn from(info: &FieldTypeInformation) -> Self {
+        Self {
+            arity: info.arity.into(),
+            r#type: FieldScalarType::from(&info.typ),
+        }
+    }
+}
+
+#[derive(Debug, Serialize)]
+#[serde(rename_all = "camelCase", tag = "type")]
+pub enum FieldScalarType {
+    String,
+    Int,
+    #[serde(rename = "bigint")]
+    BigInt,
+    Float,
+    Decimal,
+    Boolean,
+    Enum {
+        name: String,
+    },
+    Json,
+    Object,
+    #[serde(rename = "datetime")]
+    DateTime,
+    Bytes,
+    Unsupported,
+}
+
+impl fmt::Display for FieldScalarType {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Self::String => write!(f, "String"),
+            Self::Int => write!(f, "Int"),
+            Self::BigInt => write!(f, "BigInt"),
+            Self::Float => write!(f, "Float"),
+            Self::Decimal => write!(f, "Decimal"),
+            Self::Boolean => write!(f, "Boolean"),
+            Self::Enum { name } => write!(f, "Enum<{name}>"),
+            Self::Json => write!(f, "Json"),
+            Self::Object => write!(f, "Object"),
+            Self::DateTime => write!(f, "DateTime"),
+            Self::Bytes => write!(f, "Bytes"),
+            Self::Unsupported => write!(f, "Unsupported"),
+        }
+    }
+}
+
+impl From<&Type> for FieldScalarType {
+    fn from(typ: &Type) -> Self {
+        match typ.id {
+            TypeIdentifier::String => Self::String,
+            TypeIdentifier::Int => Self::Int,
+            TypeIdentifier::BigInt => Self::BigInt,
+            TypeIdentifier::Float => Self::Float,
+            TypeIdentifier::Decimal => Self::Decimal,
+            TypeIdentifier::Boolean => Self::Boolean,
+            TypeIdentifier::Enum(id) => Self::Enum {
+                name: typ.dm.clone().zip(id).name().to_owned(),
+            },
+            TypeIdentifier::UUID => Self::String,
+            TypeIdentifier::Json => Self::Json,
+            TypeIdentifier::DateTime => Self::DateTime,
+            TypeIdentifier::Bytes => Self::Bytes,
+            TypeIdentifier::Unsupported => Self::Unsupported,
+        }
+    }
+}
+
+#[derive(Debug, Clone, Copy, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub enum Arity {
+    Required,
+    Optional,
+    List,
+}
+
+impl From<FieldArity> for Arity {
+    fn from(arity: FieldArity) -> Self {
+        match arity {
+            FieldArity::Required => Self::Required,
+            FieldArity::Optional => Self::Optional,
+            FieldArity::List => Self::List,
+        }
+    }
 }

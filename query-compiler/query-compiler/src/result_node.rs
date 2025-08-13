@@ -1,20 +1,20 @@
 use std::borrow::Cow;
 
 use indexmap::IndexMap;
-use query_structure::{FieldTypeInformation, PrismaValueType, TypeIdentifier};
+use query_structure::{FieldTypeInformation, TypeIdentifier};
 use serde::Serialize;
 
-use crate::expression::EnumsMap;
+use crate::{data_mapper::FieldType, expression::EnumsMap};
 
 #[derive(Debug, Serialize)]
-#[serde(tag = "type")]
+#[serde(tag = "type", rename_all = "camelCase")]
 pub enum ResultNode {
     AffectedRows,
     Object(Object),
     #[serde(rename_all = "camelCase")]
-    Value {
+    Field {
         db_name: Cow<'static, str>,
-        result_type: PrismaValueType,
+        field_type: FieldType,
     },
 }
 
@@ -71,15 +71,12 @@ impl<'a> ResultNodeBuilder<'a> {
         self.new_value_inner(db_name.into(), result_type)
     }
 
-    fn new_value_inner(&mut self, db_name: Cow<'static, str>, result_type: FieldTypeInformation) -> ResultNode {
-        let prisma_type = result_type.to_prisma_type();
-        if let TypeIdentifier::Enum(id) = result_type.typ.id {
-            self.enums.add(result_type.typ.dm.zip(id));
+    fn new_value_inner(&mut self, db_name: Cow<'static, str>, type_info: FieldTypeInformation) -> ResultNode {
+        let field_type = FieldType::from(&type_info);
+        if let TypeIdentifier::Enum(id) = type_info.typ.id {
+            self.enums.add(type_info.typ.dm.zip(id));
         }
-        ResultNode::Value {
-            db_name,
-            result_type: prisma_type,
-        }
+        ResultNode::Field { db_name, field_type }
     }
 }
 

@@ -234,17 +234,16 @@ pub fn convert_prisma_type_to_opaque_type(pt: &PrismaValueType) -> OpaqueType {
     match pt {
         PrismaValueType::Any => OpaqueType::Unknown,
         PrismaValueType::String => OpaqueType::Text,
+        PrismaValueType::Uuid => OpaqueType::Uuid,
         PrismaValueType::Int => OpaqueType::Int32,
         PrismaValueType::BigInt => OpaqueType::Int64,
         PrismaValueType::Float => OpaqueType::Numeric,
         PrismaValueType::Boolean => OpaqueType::Boolean,
-        PrismaValueType::Decimal => OpaqueType::Numeric,
-        PrismaValueType::Date => OpaqueType::DateTime,
-        PrismaValueType::Time => OpaqueType::Time,
-        PrismaValueType::Array(t) => OpaqueType::Array(Box::new(convert_prisma_type_to_opaque_type(t))),
+        PrismaValueType::DateTime => OpaqueType::DateTime,
+        PrismaValueType::List(t) => OpaqueType::Array(Box::new(convert_prisma_type_to_opaque_type(t))),
         PrismaValueType::Json => OpaqueType::Json,
         PrismaValueType::Object => OpaqueType::Object,
         PrismaValueType::Bytes => OpaqueType::Bytes,
-        PrismaValueType::Enum { .. } => OpaqueType::Text,
+        PrismaValueType::Enum => OpaqueType::Text,
     }
 }

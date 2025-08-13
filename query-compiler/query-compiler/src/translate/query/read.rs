@@ -10,8 +10,8 @@ use query_core::{
     QueryOptions, ReadQuery, RelatedRecordsQuery,
 };
 use query_structure::{
-    ConditionValue, FieldSelection, Filter, Model, PrismaValue, QueryArguments, QueryMode, RelationLoadStrategy,
-    ScalarCondition, ScalarFilter, ScalarProjection, Take,
+    ConditionValue, FieldSelection, Filter, Model, PrismaValue, QueryArguments, QueryMode, RelationField,
+    RelationLoadStrategy, ScalarCondition, ScalarField, ScalarFilter, ScalarProjection, Take,
 };
 use std::slice;
 
@@ -156,7 +156,7 @@ pub(super) fn add_inmemory_join(
 
             let links = left_scalars
                 .iter()
-                .zip(rrq.parent_field.related_field().left_scalars())
+                .zip(get_relation_scalars_for_filters(&rrq.parent_field))
                 .map(|(parent_scalar, child_scalar)| {
                     let placeholder = PrismaValue::placeholder(
                         binding::join_parent_field(parent_scalar),
@@ -225,19 +225,7 @@ fn build_read_related_records(
             .pop()
             .unwrap();
 
-        // When we query for children by parent, we typically want to generate a query with filters
-        // for every field in `parent_field.related_field().linking_fields()`. It's not correct to
-        // do that for many-to-many relations though, because their `related_field` points at the
-        // primary identifier of the child model, which cannot be used as a filter for the parent
-        // identifiers. The actual field that must be used belongs to the linking table, and it
-        // corresponds to the primary identifier of the parent model.
-        let fields_to_filter_by = if rrq.parent_field.relation().is_many_to_many() {
-            parent_link_id
-        } else {
-            rrq.parent_field.related_field().linking_fields()
-        };
-
-        for (field, val) in fields_to_filter_by
+        for (field, val) in FieldSelection::from(get_relation_scalars_for_filters(&rrq.parent_field))
             .assimilate(selection)
             .map_err(QueryGraphBuilderError::from)?
             .pairs
@@ -268,6 +256,20 @@ fn build_read_related_records(
     };
 
     Ok((child_query, join))
+}
+
+// When we query for children by parent, we typically want to generate a query with filters
+// for every field in `parent_field.related_field().linking_fields()`. It's not correct to
+// do that for many-to-many relations though, because their `related_field` points at the
+// primary identifier of the child model, which cannot be used as a filter for the parent
+// identifiers. The actual field that must be used belongs to the linking table, and it
+// corresponds to the primary identifier of the parent model.
+fn get_relation_scalars_for_filters(rf: &RelationField) -> Vec<ScalarField> {
+    if rf.relation().is_many_to_many() {
+        rf.left_scalars()
+    } else {
+        rf.related_field().left_scalars()
+    }
 }
 
 fn build_read_m2m_query(

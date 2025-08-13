@@ -633,7 +633,7 @@ pub enum OpaqueType {
     Bytes,
     Boolean,
     Char,
-    Array(Box<OpaqueType>),
+    Array(Box<Self>),
     Numeric,
     Json,
     Object,
@@ -642,6 +642,7 @@ pub enum OpaqueType {
     DateTime,
     Date,
     Time,
+    Tuple(Vec<(Self, Option<NativeColumnType<'static>>)>),
 }
 
 impl fmt::Display for OpaqueType {
@@ -670,6 +671,19 @@ impl fmt::Display for OpaqueType {
             OpaqueType::DateTime => write!(f, "DateTime"),
             OpaqueType::Date => write!(f, "Date"),
             OpaqueType::Time => write!(f, "Time"),
+            OpaqueType::Tuple(types) => {
+                write!(f, "Tuple<")?;
+                let len = types.len();
+
+                for (i, (t, _)) in types.iter().enumerate() {
+                    write!(f, "{t}")?;
+
+                    if i < (len - 1) {
+                        write!(f, ", ")?;
+                    }
+                }
+                write!(f, ">")
+            }
         }
     }
 }

@@ -1,7 +1,6 @@
 use query_structure::{
     AggregationSelection, FieldSelection, Filter, Model, Placeholder, PrismaValue, QueryArguments, RecordFilter,
-    RelationField, RelationLoadStrategy, ScalarCondition, ScalarField, SelectedField, SelectionResult,
-    TaggedPrismaValue, WriteArgs,
+    RelationField, RelationLoadStrategy, ScalarCondition, ScalarField, SelectedField, SelectionResult, WriteArgs,
 };
 use serde::Serialize;
 use std::collections::BTreeMap;
@@ -85,8 +84,8 @@ pub trait QueryBuilder {
     fn build_m2m_connect(
         &self,
         field: RelationField,
-        parent: PrismaValue,
-        child: PrismaValue,
+        fields: [SelectedField; 2],
+        values: [PrismaValue; 2],
     ) -> Result<DbQuery, Box<dyn std::error::Error + Send + Sync>>;
 
     fn build_m2m_disconnect(
@@ -214,24 +213,24 @@ pub enum DbQuery {
     #[serde(rename_all = "camelCase")]
     RawSql {
         sql: String,
-        #[serde(serialize_with = "serialize_params")]
-        params: Vec<PrismaValue>,
+        args: Vec<PrismaValue>,
+        arg_types: Vec<ArgType>,
     },
     #[serde(rename_all = "camelCase")]
     TemplateSql {
         fragments: Vec<Fragment>,
-        #[serde(serialize_with = "serialize_params")]
-        params: Vec<PrismaValue>,
+        args: Vec<PrismaValue>,
+        arg_types: Vec<DynamicArgType>,
         placeholder_format: PlaceholderFormat,
         chunkable: Chunkable,
     },
 }
 
 impl DbQuery {
-    pub fn params(&self) -> &Vec<PrismaValue> {
+    pub fn params(&self) -> &[PrismaValue] {
         match self {
-            DbQuery::RawSql { params, .. } => params,
-            DbQuery::TemplateSql { params, .. } => params,
+            DbQuery::RawSql { args: params, .. } => params,
+            DbQuery::TemplateSql { args: params, .. } => params,
         }
     }
 }
@@ -276,11 +275,61 @@ impl fmt::Display for DbQuery {
     }
 }
 
-fn serialize_params<S>(obj: &[PrismaValue], serializer: S) -> Result<S::Ok, S::Error>
-where
-    S: serde::Serializer,
-{
-    serializer.collect_seq(obj.iter().map(TaggedPrismaValue::from))
+#[derive(Debug, Serialize)]
+#[serde(tag = "arity", rename_all = "camelCase")]
+pub enum DynamicArgType {
+    Tuple {
+        elements: Vec<ArgType>,
+    },
+    #[serde(untagged)]
+    Single {
+        #[serde(flatten)]
+        r#type: ArgType,
+    },
+}
+
+#[derive(Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct ArgType {
+    pub arity: Arity,
+    pub scalar_type: ArgScalarType,
+    pub db_type: Option<String>,
+}
+
+impl ArgType {
+    pub fn new(arity: Arity, scalar_type: ArgScalarType, db_type: Option<String>) -> Self {
+        Self {
+            arity,
+            scalar_type,
+            db_type,
+        }
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub enum Arity {
+    Scalar,
+    List,
+}
+
+#[derive(Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub enum ArgScalarType {
+    String,
+    Int,
+    #[serde(rename = "bigint")]
+    BigInt,
+    Float,
+    Decimal,
+    Boolean,
+    Enum,
+    Uuid,
+    Json,
+    #[serde(rename = "datetime")]
+    DateTime,
+    Bytes,
+    Unknown,
 }
 
 /// Indicates whether the parameters of this query can be chunked into smaller queries.

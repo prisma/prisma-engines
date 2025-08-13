@@ -1,94 +1,96 @@
-/// `JSArgType` is a 1:1 mapping of [`quaint::ValueType`] that:
-/// - only includes the type tag (e.g. `Int32`, `Text`, `Enum`, etc.)
-/// - doesn't care for the optionality of the actual value (e.g., `quaint::Value::Int32(None)` -> `JSArgType::Int32`)
-/// - is used to guide the JS side on how to serialize the query argument value before sending it to the JS driver.
 #[derive(Debug, PartialEq)]
-pub enum JSArgType {
-    /// 32-bit signed integer.
-    Int32,
-    /// 64-bit signed integer.
-    Int64,
-    /// 32-bit floating point.
-    Float,
-    /// 64-bit floating point.
-    Double,
-    /// String value.
-    Text,
-    /// Database enum value.
-    Enum,
-    /// Database enum array (PostgreSQL specific).
-    EnumArray,
-    /// Bytes value.
-    Bytes,
-    /// Boolean value.
-    Boolean,
-    /// A single character.
-    Char,
-    /// An array value (PostgreSQL).
-    Array,
-    /// A numeric value.
-    Numeric,
-    /// A JSON value.
-    Json,
-    /// A XML value.
-    Xml,
-    /// An UUID value.
-    Uuid,
-    /// A datetime value.
-    DateTime,
-    /// A date value.
-    Date,
-    /// A time value.
-    Time,
+pub struct JSArgType {
+    pub scalar_type: JSArgScalarType,
+    pub db_type: Option<String>,
+    pub arity: JSArgArity,
 }
 
-impl core::fmt::Display for JSArgType {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let s = match self {
-            JSArgType::Int32 => "Int32",
-            JSArgType::Int64 => "Int64",
-            JSArgType::Float => "Float",
-            JSArgType::Double => "Double",
-            JSArgType::Text => "Text",
-            JSArgType::Enum => "Enum",
-            JSArgType::EnumArray => "EnumArray",
-            JSArgType::Bytes => "Bytes",
-            JSArgType::Boolean => "Boolean",
-            JSArgType::Char => "Char",
-            JSArgType::Array => "Array",
-            JSArgType::Numeric => "Numeric",
-            JSArgType::Json => "Json",
-            JSArgType::Xml => "Xml",
-            JSArgType::Uuid => "Uuid",
-            JSArgType::DateTime => "DateTime",
-            JSArgType::Date => "Date",
-            JSArgType::Time => "Time",
-        };
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum JSArgScalarType {
+    String,
+    Int,
+    BigInt,
+    Float,
+    Decimal,
+    Boolean,
+    Enum,
+    Uuid,
+    Json,
+    DateTime,
+    Bytes,
+    Unknown,
+}
 
-        write!(f, "{s}")
+impl From<JSArgScalarType> for &'static str {
+    fn from(arg: JSArgScalarType) -> Self {
+        match arg {
+            JSArgScalarType::String => "string",
+            JSArgScalarType::Int => "int",
+            JSArgScalarType::BigInt => "bigint",
+            JSArgScalarType::Float => "float",
+            JSArgScalarType::Decimal => "decimal",
+            JSArgScalarType::Boolean => "boolean",
+            JSArgScalarType::Enum => "enum",
+            JSArgScalarType::Uuid => "uuid",
+            JSArgScalarType::Json => "json",
+            JSArgScalarType::DateTime => "datetime",
+            JSArgScalarType::Bytes => "bytes",
+            JSArgScalarType::Unknown => "unknown",
+        }
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum JSArgArity {
+    Scalar,
+    List,
+}
+
+impl From<JSArgArity> for &'static str {
+    fn from(arg: JSArgArity) -> Self {
+        match arg {
+            JSArgArity::Scalar => "scalar",
+            JSArgArity::List => "list",
+        }
     }
 }
 
 pub fn value_to_js_arg_type(value: &quaint::Value) -> JSArgType {
+    JSArgType {
+        scalar_type: value_to_js_arg_scalar_type(value),
+        db_type: value.native_column_type_name().map(|nt| nt.to_string()),
+        arity: if matches!(
+            value.typed,
+            quaint::ValueType::Array(_) | quaint::ValueType::EnumArray(_, _)
+        ) {
+            JSArgArity::List
+        } else {
+            JSArgArity::Scalar
+        },
+    }
+}
+
+fn value_to_js_arg_scalar_type(value: &quaint::Value) -> JSArgScalarType {
     match &value.typed {
-        quaint::ValueType::Int32(_) => JSArgType::Int32,
-        quaint::ValueType::Int64(_) => JSArgType::Int64,
-        quaint::ValueType::Float(_) => JSArgType::Float,
-        quaint::ValueType::Double(_) => JSArgType::Double,
-        quaint::ValueType::Text(_) => JSArgType::Text,
-        quaint::ValueType::Enum(_, _) => JSArgType::Enum,
-        quaint::ValueType::EnumArray(_, _) => JSArgType::EnumArray,
-        quaint::ValueType::Bytes(_) => JSArgType::Bytes,
-        quaint::ValueType::Boolean(_) => JSArgType::Boolean,
-        quaint::ValueType::Char(_) => JSArgType::Char,
-        quaint::ValueType::Array(_) => JSArgType::Array,
-        quaint::ValueType::Numeric(_) => JSArgType::Numeric,
-        quaint::ValueType::Json(_) => JSArgType::Json,
-        quaint::ValueType::Xml(_) => JSArgType::Xml,
-        quaint::ValueType::Uuid(_) => JSArgType::Uuid,
-        quaint::ValueType::DateTime(_) => JSArgType::DateTime,
-        quaint::ValueType::Date(_) => JSArgType::Date,
-        quaint::ValueType::Time(_) => JSArgType::Time,
+        quaint::ValueType::Int32(_) => JSArgScalarType::Int,
+        quaint::ValueType::Int64(_) => JSArgScalarType::BigInt,
+        quaint::ValueType::Float(_) => JSArgScalarType::Float,
+        quaint::ValueType::Double(_) => JSArgScalarType::Float,
+        quaint::ValueType::Text(_) | quaint::ValueType::Char(_) | quaint::ValueType::Xml(_) => JSArgScalarType::String,
+        quaint::ValueType::Enum(_, _) | quaint::ValueType::EnumArray(_, _) => JSArgScalarType::Enum,
+        quaint::ValueType::Bytes(_) => JSArgScalarType::Bytes,
+        quaint::ValueType::Boolean(_) => JSArgScalarType::Boolean,
+        quaint::ValueType::Array(vals) => vals
+            .as_deref()
+            .unwrap_or_default()
+            .first()
+            .map_or(JSArgScalarType::Unknown, value_to_js_arg_scalar_type),
+        quaint::ValueType::Numeric(_) => JSArgScalarType::Decimal,
+        quaint::ValueType::Json(_) => JSArgScalarType::Json,
+        quaint::ValueType::Uuid(_) => JSArgScalarType::Uuid,
+        quaint::ValueType::DateTime(_) | quaint::ValueType::Date(_) | quaint::ValueType::Time(_) => {
+            JSArgScalarType::DateTime
+        }
         quaint::ValueType::Opaque(_) => unreachable!("Opaque values are not supposed to be converted to JSON"),
     }
 }

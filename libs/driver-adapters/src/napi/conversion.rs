@@ -58,7 +58,14 @@ impl ToNapiValue for JSArg {
 
 impl ToNapiValue for JSArgType {
     unsafe fn to_napi_value(env: napi::sys::napi_env, value: Self) -> napi::Result<napi::sys::napi_value> {
-        unsafe { ToNapiValue::to_napi_value(env, value.to_string()) }
+        let env = unsafe { napi::Env::from_raw(env) };
+
+        let mut obj = env.create_object()?;
+        obj.set_named_property("scalarType", <&str>::from(value.scalar_type))?;
+        obj.set_named_property("dbType", MaybeDefined(value.db_type))?;
+        obj.set_named_property("arity", <&str>::from(value.arity))?;
+
+        unsafe { ToNapiValue::to_napi_value(env.raw(), obj) }
     }
 }
 

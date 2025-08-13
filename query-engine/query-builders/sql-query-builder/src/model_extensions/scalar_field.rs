@@ -1,11 +1,12 @@
 use crate::{
     context::Context,
+    convert,
     value::{GeneratorCall, Placeholder},
 };
 use chrono::Utc;
 use prisma_value::{Placeholder as PrismaValuePlaceholder, PrismaValue};
 use quaint::{
-    ast::{EnumName, OpaqueType, Value, ValueType},
+    ast::{EnumName, Value, ValueType},
     prelude::{EnumVariant, TypeDataLength, TypeFamily},
 };
 use query_structure::{ScalarField, TypeIdentifier};
@@ -69,11 +70,11 @@ impl ScalarFieldExt for ScalarField {
                 TypeIdentifier::Unsupported => unreachable!("No unsupported field should reach this path"),
             },
             (PrismaValue::Placeholder(PrismaValuePlaceholder { name, .. }), ident) => {
-                Value::opaque(Placeholder::new(name), convert_type_identifier_to_opaque_type(&ident))
+                Value::opaque(Placeholder::new(name), convert::type_identifier_to_opaque_type(&ident))
             }
             (PrismaValue::GeneratorCall { name, args, .. }, ident) => Value::opaque(
                 GeneratorCall::new(name, args),
-                convert_type_identifier_to_opaque_type(&ident),
+                convert::type_identifier_to_opaque_type(&ident),
             ),
         };
 
@@ -105,23 +106,6 @@ impl ScalarFieldExt for ScalarField {
             TypeIdentifier::Bytes => TypeFamily::Text(parse_scalar_length(self)),
             TypeIdentifier::Unsupported => unreachable!("No unsupported field should reach that path"),
         }
-    }
-}
-
-fn convert_type_identifier_to_opaque_type(identifier: &TypeIdentifier) -> OpaqueType {
-    match identifier {
-        TypeIdentifier::String => OpaqueType::Text,
-        TypeIdentifier::Int => OpaqueType::Int32,
-        TypeIdentifier::BigInt => OpaqueType::Int64,
-        TypeIdentifier::Float => OpaqueType::Numeric,
-        TypeIdentifier::Decimal => OpaqueType::Numeric,
-        TypeIdentifier::Boolean => OpaqueType::Boolean,
-        TypeIdentifier::Enum(_) => OpaqueType::Enum,
-        TypeIdentifier::UUID => OpaqueType::Uuid,
-        TypeIdentifier::Json => OpaqueType::Json,
-        TypeIdentifier::DateTime => OpaqueType::DateTime,
-        TypeIdentifier::Bytes => OpaqueType::Bytes,
-        TypeIdentifier::Unsupported => unreachable!("No field should reach this path"),
     }
 }
 

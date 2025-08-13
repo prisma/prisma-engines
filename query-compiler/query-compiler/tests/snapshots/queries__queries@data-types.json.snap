@@ -5,8 +5,8 @@ input_file: query-compiler/query-compiler/tests/data/data-types.json
 ---
 dataMap {
     id: Bytes (id)
-    optString: String (optString)
-    intArray: Array<Int> (intArray)
+    optString: String? (optString)
+    intArray: Int[] (intArray)
 }
 query «SELECT "t0"."id", "t0"."optString", "t0"."intArray" FROM
        "public"."DataTypes" AS "t0"»

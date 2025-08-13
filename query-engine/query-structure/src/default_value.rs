@@ -358,7 +358,7 @@ impl ValueGeneratorFn {
             | ValueGeneratorFn::Cuid(_)
             | ValueGeneratorFn::Ulid
             | ValueGeneratorFn::Nanoid(_) => Some(PrismaValueType::String),
-            ValueGeneratorFn::Now => Some(PrismaValueType::Date),
+            ValueGeneratorFn::Now => Some(PrismaValueType::DateTime),
             _ => None,
         }
     }

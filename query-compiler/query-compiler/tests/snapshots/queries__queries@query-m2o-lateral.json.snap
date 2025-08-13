@@ -4,7 +4,7 @@ expression: pretty
 input_file: query-compiler/query-compiler/tests/data/query-m2o-lateral.json
 ---
 dataMap {
-    issued: Date (issued)
+    issued: DateTime (issued)
     secret: String (secret)
     done: Boolean (done)
     user (from user): {

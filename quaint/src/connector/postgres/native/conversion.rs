@@ -136,8 +136,9 @@ pub(crate) fn params_to_types(params: &[Value<'_>]) -> Vec<PostgresType> {
                         OpaqueType::DateTime => PostgresType::TIMESTAMPTZ_ARRAY,
                         OpaqueType::Date => PostgresType::TIMESTAMP_ARRAY,
                         OpaqueType::Time => PostgresType::TIME_ARRAY,
-                        OpaqueType::Array(_) => PostgresType::UNKNOWN,
+                        OpaqueType::Array(_) | OpaqueType::Tuple(_) => PostgresType::UNKNOWN,
                     },
+                    OpaqueType::Tuple(_) => PostgresType::UNKNOWN,
                 },
             }
         })
