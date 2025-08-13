@@ -4,6 +4,7 @@ use crate::{
     datamodel_connector::RelationMode,
     diagnostics::{DatamodelError, Diagnostics},
 };
+use alloc::{string::String, vec::Vec};
 use enumflags2::BitFlags;
 
 #[derive(Debug, Default)]

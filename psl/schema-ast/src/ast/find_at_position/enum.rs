@@ -1,3 +1,5 @@
+use alloc::vec::Vec;
+
 use super::{AttributePosition, WithName, WithSpan};
 use crate::ast::{self};
 

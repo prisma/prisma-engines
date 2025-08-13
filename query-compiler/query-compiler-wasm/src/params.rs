@@ -1,3 +1,4 @@
+use alloc::{borrow::ToOwned, string::String};
 use quaint::prelude::{ExternalConnectionInfo, SqlFamily};
 use serde::Deserialize;
 

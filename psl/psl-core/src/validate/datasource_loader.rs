@@ -1,3 +1,9 @@
+use alloc::{
+    borrow::{Cow, ToOwned},
+    string::String,
+    vec::Vec,
+};
+
 use crate::{
     Datasource,
     ast::{self, SourceConfig, Span, WithName},
@@ -6,12 +12,12 @@ use crate::{
     diagnostics::{DatamodelError, Diagnostics},
 };
 use diagnostics::DatamodelWarning;
+use hashbrown::HashMap;
 use parser_database::{
     ast::{Expression, WithDocumentation},
     coerce, coerce_array, coerce_opt,
 };
 use schema_ast::ast::WithSpan;
-use std::{borrow::Cow, collections::HashMap};
 
 const PREVIEW_FEATURES_KEY: &str = "previewFeatures";
 const SCHEMAS_KEY: &str = "schemas";

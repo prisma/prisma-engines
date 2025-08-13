@@ -1,3 +1,8 @@
+use alloc::{
+    borrow::ToOwned,
+    string::{String, ToString},
+};
+
 use crate::parser_database::{ast, coerce};
 use diagnostics::{DatamodelError, DatamodelWarning, Diagnostics};
 use schema_ast::ast::WithSpan;

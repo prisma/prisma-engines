@@ -1,4 +1,5 @@
 pub(crate) use crate::datamodel_connector::*;
+use alloc::{string::String, vec::Vec};
 use diagnostics::{DatamodelError, Span};
 use enumflags2::BitFlags;
 
@@ -12,7 +13,7 @@ impl Connector for EmptyDatamodelConnector {
     }
 
     fn name(&self) -> &str {
-        std::any::type_name::<EmptyDatamodelConnector>()
+        core::any::type_name::<EmptyDatamodelConnector>()
     }
 
     fn foreign_key_referential_actions(&self) -> BitFlags<ReferentialAction> {

@@ -1,8 +1,14 @@
+use alloc::{
+    borrow::{Cow, ToOwned},
+    string::String,
+    vec::Vec,
+};
+
 use crate::{ParserDatabase, ValidatedSchema};
 use diagnostics::FileId;
+use hashbrown::HashMap;
 use parser_database::{ast::WithSpan, walkers};
 use schema_ast::{SourceFile, ast};
-use std::{borrow::Cow, collections::HashMap};
 
 /// Returns either the reformatted schema, or the original input if we can't reformat. This happens
 /// if and only if the source does not parse to a well formed AST.

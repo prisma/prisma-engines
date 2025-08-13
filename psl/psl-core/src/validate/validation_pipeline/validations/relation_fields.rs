@@ -5,6 +5,7 @@ use crate::{
     diagnostics::DatamodelError,
     validate::validation_pipeline::context::Context,
 };
+use alloc::{fmt, string::String};
 use diagnostics::DatamodelWarning;
 use enumflags2::BitFlags;
 use itertools::Itertools;
@@ -12,7 +13,6 @@ use parser_database::{
     ReferentialAction,
     walkers::{ModelWalker, RelationFieldId, RelationFieldWalker, RelationName},
 };
-use std::fmt;
 
 struct Fields<'db> {
     fields: &'db [RelationFieldId],

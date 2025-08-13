@@ -1,3 +1,5 @@
+use alloc::{borrow::ToOwned, string::ToString, vec::Vec};
+
 use crate::{DatamodelError, ast, coerce, types::SortOrder};
 
 pub(crate) enum OperatorClass<'a> {

@@ -1,5 +1,6 @@
 use crate::validate::validation_pipeline::{context::Context, validations::relations::RELATION_ATTRIBUTE_NAME};
 use crate::{datamodel_connector::ConnectorCapability, diagnostics::DatamodelError};
+use alloc::vec::Vec;
 use parser_database::{ast::WithSpan, walkers::ImplicitManyToManyRelationWalker};
 
 /// Our weird many-to-many requirement.

@@ -4,14 +4,19 @@ use crate::{
     configuration::{Generator, GeneratorConfigValue, StringFromEnvVar},
     diagnostics::*,
 };
+use alloc::{
+    borrow::ToOwned,
+    string::{String, ToString},
+    vec::Vec,
+};
 use enumflags2::BitFlags;
+use hashbrown::HashMap;
 use itertools::Itertools;
 use parser_database::{
     ast::{self, WithDocumentation},
     coerce, coerce_array,
 };
 use schema_ast::ast::WithName;
-use std::collections::HashMap;
 
 const PROVIDER_KEY: &str = "provider";
 const OUTPUT_KEY: &str = "output";

@@ -1,5 +1,7 @@
+use alloc::vec::Vec;
+use core::fmt::{Display, Formatter};
+
 use super::{Expression, Identifier, Span, WithSpan};
-use std::fmt::{Display, Formatter};
 
 /// A list of arguments inside parentheses.
 #[derive(Debug, Clone, Default)]
@@ -28,7 +30,7 @@ pub struct ArgumentsList {
 }
 
 impl ArgumentsList {
-    pub(crate) fn iter(&self) -> std::slice::Iter<'_, Argument> {
+    pub(crate) fn iter(&self) -> core::slice::Iter<'_, Argument> {
         self.arguments.iter()
     }
 }
@@ -55,7 +57,7 @@ pub struct Argument {
 }
 
 impl Display for Argument {
-    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+    fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
         if let Some(name) = &self.name {
             f.write_str(&name.name)?;
             f.write_str(": ")?;

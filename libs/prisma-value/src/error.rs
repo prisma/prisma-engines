@@ -1,6 +1,5 @@
-use std::borrow::Cow;
-use std::error::Error;
-use std::fmt::Display;
+use alloc::borrow::Cow;
+use core::{error::Error, fmt::Display};
 
 #[derive(Debug)]
 pub struct ConversionFailure {
@@ -11,7 +10,7 @@ pub struct ConversionFailure {
 impl Error for ConversionFailure {}
 
 impl Display for ConversionFailure {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "Could not convert from `{}` to `{}`", self.from, self.to)
     }
 }

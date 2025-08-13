@@ -1,5 +1,6 @@
 use super::*;
 use crate::{diagnostics::DatamodelError, validate::validation_pipeline::context::Context};
+use alloc::vec::Vec;
 use parser_database::ast::WithSpan;
 
 /// A relation should have the explicit and back-relation side defined.

@@ -1,8 +1,21 @@
+#![no_std]
+
+#[macro_use]
+extern crate alloc;
+
 pub mod arithmetic;
 
 mod error;
 mod raw_json;
 mod tagged;
+
+use alloc::{
+    borrow::{Cow, ToOwned},
+    boxed::Box,
+    string::{String, ToString},
+    vec::Vec,
+};
+use core::{fmt, str::FromStr};
 
 use base64::prelude::*;
 use bigdecimal::{BigDecimal, FromPrimitive, ToPrimitive};
@@ -11,14 +24,13 @@ use serde::de::Unexpected;
 use serde::ser::SerializeMap;
 use serde::{Deserialize, Deserializer, Serialize, ser::Serializer};
 use serde_json::json;
-use std::{borrow::Cow, convert::TryFrom, fmt, str::FromStr};
 use uuid::Uuid;
 
 pub use error::ConversionFailure;
 pub use raw_json::RawJson;
 pub use tagged::TaggedPrismaValue;
 
-pub type PrismaValueResult<T> = std::result::Result<T, ConversionFailure>;
+pub type PrismaValueResult<T> = core::result::Result<T, ConversionFailure>;
 pub type PrismaListValue = Vec<PrismaValue>;
 
 #[derive(Debug, Clone, Eq, PartialEq, Hash, Serialize, Deserialize, PartialOrd, Ord)]
@@ -103,7 +115,7 @@ pub enum PrismaValueType {
     Enum(String),
 }
 
-impl std::fmt::Display for PrismaValueType {
+impl core::fmt::Display for PrismaValueType {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             PrismaValueType::Any => write!(f, "Any"),

@@ -1,9 +1,10 @@
 use crate::prelude::*;
+use alloc::{borrow::ToOwned, string::String, vec::Vec};
+use core::fmt::Display;
 use psl::parser_database::{
     ast::FieldArity,
     walkers::{self, RelationFieldId},
 };
-use std::fmt::Display;
 
 pub type RelationField = crate::Zipper<RelationFieldId>;
 pub type RelationFieldRef = RelationField;
@@ -145,14 +146,14 @@ impl RelationField {
 }
 
 impl Display for RelationField {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         let walker = self.walker();
         write!(f, "{}.{}", walker.model().name(), walker.name())
     }
 }
 
-impl std::fmt::Debug for RelationField {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl core::fmt::Debug for RelationField {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         f.debug_tuple("RelationField")
             .field(&format!("{}.{}", self.model().name(), self.name(),))
             .finish()

@@ -1,11 +1,11 @@
 [package]
 authors = [
-  "Julius de Bruijn <bruijn@prisma.io>",
-  "Katharina Fey <kookie@spacekookie.de>",
-  "Tom Houlé <tom@tomhoule.com>",
-  "Emanuel Jöbstl <emanuel.joebstl@gmail.com>",
-  "Matthias Oertel <oertel@prisma.io>",
-  "Dominic Petrick <petrick@prisma.io>",
+    "Julius de Bruijn <bruijn@prisma.io>",
+    "Katharina Fey <kookie@spacekookie.de>",
+    "Tom Houlé <tom@tomhoule.com>",
+    "Emanuel Jöbstl <emanuel.joebstl@gmail.com>",
+    "Matthias Oertel <oertel@prisma.io>",
+    "Dominic Petrick <petrick@prisma.io>",
 ]
 description = "An abstraction layer for SQL databases."
 documentation = "https://docs.rs/quaint/"
@@ -29,49 +29,59 @@ docs = []
 expose-drivers = []
 
 all-native = [
-  "postgresql-native",
-  "mysql-native",
-  "mssql-native",
-  "sqlite-native",
+    "postgresql-native",
+    "mysql-native",
+    "mssql-native",
+    "sqlite-native",
 ]
 
 vendored-openssl = [
-  "postgres-native-tls/vendored-openssl",
-  "mysql_async/vendored-openssl",
+    "postgres-native-tls/vendored-openssl",
+    "mysql_async/vendored-openssl",
 ]
 
 postgresql-native = [
-  "postgresql",
-  "dep:native-tls",
-  "dep:tokio-postgres",
-  "dep:postgres-types",
-  "dep:postgres-native-tls",
-  "dep:bytes",
-  "dep:tokio",
-  "dep:bit-vec",
-  "dep:lru-cache",
-  "dep:byteorder",
-  "dep:tokio-tungstenite",
+    "postgresql",
+    "dep:native-tls",
+    "dep:tokio-postgres",
+    "dep:postgres-types",
+    "dep:postgres-native-tls",
+    "dep:bytes",
+    "dep:tokio",
+    "dep:bit-vec",
+    "dep:lru-cache",
+    "dep:byteorder",
+    "dep:tokio-tungstenite",
+    "tracing-futures/std",
 ]
 postgresql = []
 
-mssql-native = ["mssql", "dep:tiberius", "dep:tokio-util", "tokio/time", "tokio/net"]
+mssql-native = [
+    "mssql",
+    "dep:tiberius",
+    "dep:tokio-util",
+    "tokio/time",
+    "tokio/net",
+]
 mssql = []
 
 mysql-native = ["mysql", "dep:mysql_async", "tokio/time", "dep:lru-cache"]
 mysql = ["chrono/std"]
 
 pooled = ["dep:mobc"]
+
 sqlite-native = ["sqlite", "rusqlite/bundled", "tokio/sync"]
 sqlite = []
 
 fmt-sql = ["dep:sqlformat"]
 
+connector = ["dep:telemetry"]
+
 [dependencies]
 bigdecimal.workspace = true
 connection-string.workspace = true
 percent-encoding.workspace = true
-telemetry.workspace = true
+telemetry = { workspace = true, optional = true }
 tracing.workspace = true
 tracing-futures.workspace = true
 async-trait.workspace = true
@@ -138,43 +148,43 @@ optional = true
 workspace = true
 optional = true
 features = [
-  "sql-browser-tokio",
-  "chrono",
-  "tds73",
-  "bigdecimal",
-  "native-tls",
-  "winauth",
+    "sql-browser-tokio",
+    "chrono",
+    "tds73",
+    "bigdecimal",
+    "native-tls",
+    "winauth",
 ]
 
 [target.'cfg(any(target_os = "macos", target_os = "ios"))'.dependencies.tiberius]
 workspace = true
 optional = true
 features = [
-  "sql-browser-tokio",
-  "vendored-openssl",
-  "chrono",
-  "bigdecimal",
-  "tds73",
-  "winauth",
+    "sql-browser-tokio",
+    "vendored-openssl",
+    "chrono",
+    "bigdecimal",
+    "tds73",
+    "winauth",
 ]
 
 [dependencies.tokio-postgres]
 workspace = true
 features = [
-  "with-uuid-1",
-  "with-chrono-0_4",
-  "with-serde_json-1",
-  "with-bit-vec-0_6",
+    "with-uuid-1",
+    "with-chrono-0_4",
+    "with-serde_json-1",
+    "with-bit-vec-0_6",
 ]
 optional = true
 
 [dependencies.postgres-types]
 workspace = true
 features = [
-  "with-uuid-1",
-  "with-chrono-0_4",
-  "with-serde_json-1",
-  "with-bit-vec-0_6",
+    "with-uuid-1",
+    "with-chrono-0_4",
+    "with-serde_json-1",
+    "with-bit-vec-0_6",
 ]
 optional = true
 

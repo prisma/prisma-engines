@@ -1,12 +1,12 @@
 use super::default_value;
 use crate::{datamodel_connector::ConnectorCapability, validate::validation_pipeline::context::Context};
+use alloc::{fmt, rc::Rc, vec::Vec};
 use diagnostics::DatamodelError;
 use parser_database::{
     ScalarFieldType,
     ast::WithSpan,
     walkers::{CompositeTypeFieldWalker, CompositeTypeWalker},
 };
-use std::{fmt, rc::Rc};
 
 /// Detect compound type chains that form a cycle, that is not broken with either an optional or an
 /// array type.

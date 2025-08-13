@@ -1,7 +1,8 @@
 use crate::FileId;
+use alloc::{borrow::ToOwned, string::String, vec::Vec};
+use core::ops::Index;
 use diagnostics::Diagnostics;
 use schema_ast::ast;
-use std::ops::Index;
 
 /// The content is a list of (file path, file source text, file AST).
 ///
@@ -45,14 +46,14 @@ impl Files {
     /// Render the given diagnostics (warnings + errors) into a String.
     /// This method is multi-file aware.
     pub fn render_diagnostics(&self, diagnostics: &Diagnostics) -> String {
-        let mut out = Vec::new();
+        let mut out = String::new();
 
         for error in diagnostics.errors() {
             let (file_name, source, _) = &self[error.span().file_id];
             error.pretty_print(&mut out, file_name, source.as_str()).unwrap();
         }
 
-        String::from_utf8(out).unwrap()
+        out
     }
 
     /// Returns the number of files.

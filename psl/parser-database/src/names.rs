@@ -7,8 +7,8 @@ use crate::{
     ast::{self, ConfigBlockProperty, TopId, WithAttributes, WithIdentifier, WithName, WithSpan},
     types::ScalarType,
 };
+use hashbrown::{HashMap, HashSet};
 use reserved_model_names::{validate_enum_name, validate_model_name};
-use rustc_hash::{FxHashMap as HashMap, FxHashSet as HashSet};
 
 /// Resolved names for use in the validation process.
 #[derive(Default)]
@@ -147,7 +147,7 @@ pub(super) fn resolve_names(ctx: &mut Context<'_>) {
         insert_name(file_id, top_id, top, namespace, ctx)
     }
 
-    let _ = std::mem::replace(ctx.names, names);
+    let _ = core::mem::replace(ctx.names, names);
 }
 
 fn insert_name(

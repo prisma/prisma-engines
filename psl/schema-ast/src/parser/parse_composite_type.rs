@@ -6,6 +6,7 @@ use super::{
     parse_field::parse_field,
 };
 use crate::ast;
+use alloc::vec::Vec;
 use diagnostics::{DatamodelError, Diagnostics, FileId, Span};
 
 pub(crate) fn parse_composite_type(

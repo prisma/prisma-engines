@@ -1,7 +1,7 @@
 use std::{borrow::Cow, fmt::Debug, str::FromStr};
 
-use ahash::{HashMap, HashMapExt};
 use enumflags2::{BitFlags, bitflags};
+use hashbrown::HashMap;
 use serde::Serialize;
 use tokio::sync::{
     mpsc::{self, UnboundedSender},

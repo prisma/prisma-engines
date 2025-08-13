@@ -3,6 +3,7 @@ use crate::{
     ScalarType,
     types::{RefinedFieldVariant, RelationField, ScalarField},
 };
+use alloc::string::String;
 use schema_ast::ast;
 
 /// A model field, scalar or relation.

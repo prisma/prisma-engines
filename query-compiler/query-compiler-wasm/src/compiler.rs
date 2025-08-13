@@ -1,3 +1,6 @@
+use alloc::{boxed::Box, string::String, sync::Arc, vec::Vec};
+
+use hashbrown::HashMap;
 use psl::ConnectorRegistry;
 use quaint::connector::ConnectionInfo;
 use query_compiler::{CompileError, Expression, TranslateError};
@@ -7,7 +10,6 @@ use query_core::{
 };
 use request_handlers::{HandlerError, RequestBody};
 use serde::{Deserialize, Serialize};
-use std::{collections::HashMap, sync::Arc};
 use tsify::Tsify;
 use user_facing_errors::UserFacingError;
 use wasm_bindgen::{JsValue, prelude::wasm_bindgen};
@@ -26,31 +28,6 @@ const CONNECTOR_REGISTRY: ConnectorRegistry<'_> = &[
     #[cfg(feature = "cockroachdb")]
     psl::builtin_connectors::COCKROACH,
 ];
-
-#[wasm_bindgen]
-extern "C" {
-    /// This function registers the reason for a Wasm panic via the
-    /// JS function `globalThis.PRISMA_WASM_PANIC_REGISTRY.set_message()`
-    #[wasm_bindgen(js_namespace = ["global", "PRISMA_WASM_PANIC_REGISTRY"], js_name = "set_message")]
-    fn prisma_set_wasm_panic_message(s: &str);
-}
-
-/// Registers a singleton panic hook that will register the reason for the Wasm panic in JS.
-/// Without this, the panic message would be lost: you'd see `RuntimeError: unreachable` message in JS,
-/// with no reference to the Rust function and line that panicked.
-/// This function should be manually called before any other public function in this module.
-/// Note: no method is safe to call after a panic has occurred.
-fn register_panic_hook() {
-    use std::sync::Once;
-    static SET_HOOK: Once = Once::new();
-
-    SET_HOOK.call_once(|| {
-        std::panic::set_hook(Box::new(|info| {
-            let message = &info.to_string();
-            prisma_set_wasm_panic_message(message);
-        }));
-    });
-}
 
 #[derive(Deserialize, Tsify)]
 #[serde(rename_all = "camelCase")]
@@ -86,7 +63,6 @@ impl QueryCompiler {
         );
 
         tracing::info!(git_hash = env!("GIT_HASH"), "Starting query-compiler-wasm");
-        register_panic_hook();
 
         Ok(Self {
             schema,

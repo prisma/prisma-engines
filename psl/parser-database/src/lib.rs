@@ -1,5 +1,6 @@
 #![deny(unsafe_code, rust_2018_idioms, missing_docs)]
 #![allow(clippy::derive_partial_eq_without_eq)]
+#![no_std]
 
 //! See the docs on [ParserDatabase](./struct.ParserDatabase.html).
 //!
@@ -26,6 +27,9 @@
 //!   defined with a `map:` argument or be a default, generated name if the `map:` argument is not
 //!   provided. These usually require a datamodel connector to be defined.
 
+#[macro_use]
+extern crate alloc;
+
 pub mod walkers;
 
 mod attributes;
@@ -40,6 +44,7 @@ mod relations;
 mod types;
 
 use self::{context::Context, interner::StringId, relations::Relations, types::Types};
+use alloc::{borrow::ToOwned, string::String};
 pub use coerce_expression::{coerce, coerce_array, coerce_opt};
 pub use diagnostics::FileId;
 use diagnostics::{DatamodelError, Diagnostics};
@@ -223,7 +228,7 @@ impl ParserDatabase {
     }
 }
 
-impl std::ops::Index<FileId> for ParserDatabase {
+impl core::ops::Index<FileId> for ParserDatabase {
     type Output = (String, SourceFile, ast::SchemaAst);
 
     fn index(&self, index: FileId) -> &Self::Output {
@@ -231,13 +236,13 @@ impl std::ops::Index<FileId> for ParserDatabase {
     }
 }
 
-impl std::fmt::Debug for ParserDatabase {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl core::fmt::Debug for ParserDatabase {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         f.write_str("ParserDatabase { ... }")
     }
 }
 
-impl std::ops::Index<StringId> for ParserDatabase {
+impl core::ops::Index<StringId> for ParserDatabase {
     type Output = str;
 
     fn index(&self, index: StringId) -> &Self::Output {

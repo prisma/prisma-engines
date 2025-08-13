@@ -1,7 +1,7 @@
 use std::{borrow::Cow, time::Duration};
 
-use ahash::{HashMap, HashMapExt};
 use crosstarget_utils::time::{ElapsedTimeCounter, SystemTime};
+use hashbrown::HashMap;
 #[cfg(test)]
 use serde::Serialize;
 

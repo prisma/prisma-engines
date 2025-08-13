@@ -4,6 +4,8 @@ name = "query-core"
 version = "0.1.0"
 
 [features]
+std = []
+executor = ["std", "telemetry", "connector", "tracing-subscriber"]
 metrics = ["prisma-metrics"]
 graphql-protocol = []
 
@@ -13,7 +15,7 @@ bigdecimal.workspace = true
 bon.workspace = true
 chrono.workspace = true
 connection-string.workspace = true
-connector = { path = "../connectors/query-connector", package = "query-connector" }
+connector = { path = "../connectors/query-connector", package = "query-connector", optional = true }
 crossbeam-channel.workspace = true
 psl.workspace = true
 futures.workspace = true
@@ -22,9 +24,7 @@ itertools.workspace = true
 petgraph.workspace = true
 query-builder.workspace = true
 sql-query-builder.workspace = true
-query-structure = { workspace = true, features = [
-    "default_generators",
-] }
+query-structure = { workspace = true, features = ["default_generators"] }
 prisma-metrics = { workspace = true, optional = true }
 serde.workspace = true
 serde_json.workspace = true
@@ -33,14 +33,16 @@ thiserror.workspace = true
 tokio = { workspace = true, features = ["macros", "rt", "time"] }
 tracing = { workspace = true, features = ["attributes"] }
 tracing-futures.workspace = true
-tracing-subscriber = { workspace = true, features = ["env-filter"] }
+tracing-subscriber = { workspace = true, features = [
+    "env-filter",
+], optional = true }
 user-facing-errors.workspace = true
 uuid.workspace = true
 cuid.workspace = true
 ulid.workspace = true
 schema.workspace = true
 crosstarget-utils.workspace = true
-telemetry.workspace = true
+telemetry = { workspace = true, optional = true }
 lru.workspace = true
 enumflags2.workspace = true
 derive_more.workspace = true

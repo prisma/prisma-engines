@@ -1,0 +1,10 @@
+[package]
+name = "lazy-race"
+version = "0.1.0"
+edition.workspace = true
+
+[dependencies]
+once_cell = { workspace = true, features = ["alloc", "race"] }
+
+[lints]
+workspace = true

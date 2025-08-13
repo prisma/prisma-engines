@@ -1,5 +1,3 @@
-use crate::{Value, connector::ColumnType};
-
 /// Convert given set of tuples into `Values`.
 ///
 /// ```rust
@@ -250,9 +248,12 @@ macro_rules! test_type {
     };
 }
 
-#[allow(dead_code)]
-pub(crate) fn assert_matching_value_and_column_type(col_type: &ColumnType, value: &Value) {
-    let inferred_column_type = ColumnType::from(&value.typed);
+#[cfg(test)]
+pub(crate) fn assert_matching_value_and_column_type(
+    col_type: &crate::connector::ColumnType,
+    value: &crate::ast::Value,
+) {
+    let inferred_column_type = crate::connector::ColumnType::from(&value.typed);
 
     if !inferred_column_type.is_unknown() {
         assert_eq!(col_type, &inferred_column_type);

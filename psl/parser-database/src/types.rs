@@ -1,11 +1,11 @@
 pub(crate) mod index_fields;
 
 use crate::{DatamodelError, context::Context, interner::StringId, walkers::IndexFieldWalker};
+use alloc::{collections::BTreeMap, fmt, string::String, vec::Vec};
 use either::Either;
 use enumflags2::bitflags;
-use rustc_hash::FxHashMap as HashMap;
+use hashbrown::HashMap;
 use schema_ast::ast::{self, EnumValueId, WithName};
-use std::{collections::BTreeMap, fmt};
 
 pub(super) fn resolve_types(ctx: &mut Context<'_>) {
     for ((file_id, top_id), top) in ctx.iter_tops() {
@@ -123,7 +123,7 @@ impl Types {
     }
 }
 
-impl std::ops::Index<RelationFieldId> for Types {
+impl core::ops::Index<RelationFieldId> for Types {
     type Output = RelationField;
 
     fn index(&self, index: RelationFieldId) -> &Self::Output {
@@ -131,13 +131,13 @@ impl std::ops::Index<RelationFieldId> for Types {
     }
 }
 
-impl std::ops::IndexMut<RelationFieldId> for Types {
+impl core::ops::IndexMut<RelationFieldId> for Types {
     fn index_mut(&mut self, index: RelationFieldId) -> &mut Self::Output {
         &mut self.relation_fields[index.0 as usize]
     }
 }
 
-impl std::ops::Index<ScalarFieldId> for Types {
+impl core::ops::Index<ScalarFieldId> for Types {
     type Output = ScalarField;
 
     fn index(&self, index: ScalarFieldId) -> &Self::Output {
@@ -145,7 +145,7 @@ impl std::ops::Index<ScalarFieldId> for Types {
     }
 }
 
-impl std::ops::IndexMut<ScalarFieldId> for Types {
+impl core::ops::IndexMut<ScalarFieldId> for Types {
     fn index_mut(&mut self, index: ScalarFieldId) -> &mut Self::Output {
         &mut self.scalar_fields[index.0 as usize]
     }

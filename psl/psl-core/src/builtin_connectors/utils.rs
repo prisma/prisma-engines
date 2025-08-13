@@ -28,6 +28,7 @@ pub(crate) mod common {
 
 #[cfg(feature = "postgresql")]
 pub(crate) mod postgres {
+    use alloc::vec::Vec;
     use chrono::*;
 
     pub(crate) fn parse_timestamptz(str: &str) -> Result<DateTime<FixedOffset>, chrono::ParseError> {

@@ -5,6 +5,7 @@ pub mod native;
 
 pub(crate) mod name;
 
+#[cfg(feature = "connector")]
 use crate::connector::IsolationLevel;
 use std::{borrow::Cow, fmt, num};
 use thiserror::Error;
@@ -15,13 +16,13 @@ use std::time::Duration;
 #[cfg(not(target_arch = "wasm32"))]
 pub use native::NativeErrorKind;
 
-#[cfg(feature = "mssql")]
+#[cfg(all(feature = "mssql", feature = "connector"))]
 pub use crate::connector::mssql::MssqlError;
-#[cfg(feature = "mysql")]
+#[cfg(all(feature = "mysql", feature = "connector"))]
 pub use crate::connector::mysql::MysqlError;
-#[cfg(feature = "postgresql")]
+#[cfg(all(feature = "postgresql", feature = "connector"))]
 pub use crate::connector::postgres::PostgresError;
-#[cfg(feature = "sqlite")]
+#[cfg(all(feature = "sqlite", feature = "connector"))]
 pub use crate::connector::sqlite::SqliteError;
 pub(crate) use name::Name;
 
@@ -309,6 +310,7 @@ impl ErrorKind {
         })
     }
 
+    #[cfg(feature = "connector")]
     pub fn invalid_isolation_level(isolation_level: &IsolationLevel) -> Self {
         Self::InvalidIsolationLevel(isolation_level.to_string())
     }

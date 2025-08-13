@@ -1,3 +1,8 @@
+use alloc::{
+    string::{String, ToString},
+    vec::Vec,
+};
+
 use super::{
     Rule,
     helpers::{Pair, parsing_catch_all},

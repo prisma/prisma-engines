@@ -17,6 +17,6 @@ Please see [`lib.rs`](src/lib.rs) and the [rustdoc documentation](https://prisma
 Main use-case, parsing a string to datamodel:
 
 ```ignore
-let file = std::fs::read_to_string(&args[1]).unwrap();
+let file = core::fs::read_to_string(&args[1]).unwrap();
 let validated_schema = datamodel::parse_schema(&file)?;
 ```

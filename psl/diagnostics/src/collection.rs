@@ -1,3 +1,5 @@
+use alloc::{string::String, vec::Vec};
+
 use super::DatamodelError;
 use crate::warning::DatamodelWarning;
 
@@ -46,32 +48,32 @@ impl Diagnostics {
 
     pub fn to_result(&mut self) -> Result<(), Diagnostics> {
         if self.has_errors() {
-            Err(std::mem::take(self))
+            Err(core::mem::take(self))
         } else {
             Ok(())
         }
     }
 
     pub fn to_pretty_string(&self, file_name: &str, datamodel_string: &str) -> String {
-        let mut message: Vec<u8> = Vec::new();
+        let mut message = String::new();
 
         for err in self.errors() {
             err.pretty_print(&mut message, file_name, datamodel_string)
                 .expect("printing datamodel error");
         }
 
-        String::from_utf8_lossy(&message).into_owned()
+        message
     }
 
     pub fn warnings_to_pretty_string(&self, file_name: &str, datamodel_string: &str) -> String {
-        let mut message: Vec<u8> = Vec::new();
+        let mut message = String::new();
 
         for warn in self.warnings() {
             warn.pretty_print(&mut message, file_name, datamodel_string)
                 .expect("printing datamodel warning");
         }
 
-        String::from_utf8_lossy(&message).into_owned()
+        message
     }
 }
 

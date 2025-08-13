@@ -1,4 +1,5 @@
 use crate::field::*;
+use alloc::vec::Vec;
 use prisma_value::{PrismaListValue, PrismaValue};
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]

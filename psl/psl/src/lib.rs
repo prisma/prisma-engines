@@ -1,8 +1,15 @@
 #![doc = include_str!("../README.md")]
 #![deny(rust_2018_idioms, unsafe_code, missing_docs)]
+#![cfg_attr(not(feature = "std"), no_std)]
+
+extern crate alloc;
+
+use alloc::string::String;
 
 pub use psl_core::builtin_connectors;
 use psl_core::parser_database::Files;
+#[cfg(any(feature = "std", test))]
+pub use psl_core::set_config_dir;
 pub use psl_core::{
     ALL_PREVIEW_FEATURES,
     Configuration,
@@ -29,7 +36,6 @@ pub use psl_core::{
     reformat_multiple,
     reformat_validated_schema_into_single,
     schema_ast,
-    set_config_dir,
 };
 
 /// The implementation of the CLI getConfig() utility and its JSON format.

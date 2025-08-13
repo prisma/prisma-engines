@@ -6,6 +6,7 @@ use super::{
     parse_field::parse_field,
 };
 use crate::ast::{self, Attribute};
+use alloc::vec::Vec;
 use diagnostics::{DatamodelError, Diagnostics, FileId};
 
 pub(crate) fn parse_view(
