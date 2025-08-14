@@ -31,8 +31,7 @@ use quaint::{
 use query_builder::{Chunkable, CreateRecord, CreateRecordDefaultsQuery, DbQuery, QueryBuilder};
 use query_structure::{
     AggregationSelection, DatasourceFieldName, FieldSelection, Filter, Model, ModelProjection, QueryArguments,
-    RecordFilter, RelationField, RelationLoadStrategy, ScalarField, SelectedField, SelectionResult, WriteArgs,
-    WriteOperation,
+    RecordFilter, RelationField, RelationLoadStrategy, ScalarField, SelectionResult, WriteArgs, WriteOperation,
 };
 
 pub use column_metadata::ColumnMetadata;
@@ -388,15 +387,18 @@ impl<'a, V: Visitor<'a>> QueryBuilder for SqlQueryBuilder<'a, V> {
 
     fn build_m2m_connect(
         &self,
-        relation_field: RelationField,
-        [parent_field, child_field]: [SelectedField; 2],
-        [parent, child]: [PrismaValue; 2],
+        parent_field: RelationField,
+        parent: PrismaValue,
+        child: PrismaValue,
     ) -> Result<DbQuery, Box<dyn std::error::Error + Send + Sync>> {
         // Inserts are always chunkable.
         let chunkable = Chunkable::Yes;
 
-        let parent_column = relation_field.related_field().m2m_column(&self.context);
-        let child_column = relation_field.m2m_column(&self.context);
+        let child_field = parent_field.related_field();
+        // `m2m_column` gives the opposite m2m column for some reason so this looks like
+        // it's the wrong way around, but it's not.
+        let child_column = parent_field.m2m_column(&self.context);
+        let parent_column = child_field.m2m_column(&self.context);
 
         // parent and child can refer to arrays, so we need a product of the two
         let call = GeneratorCall::new("product", vec![parent, child]);
@@ -405,7 +407,11 @@ impl<'a, V: Visitor<'a>> QueryBuilder for SqlQueryBuilder<'a, V> {
             [&parent_field, &child_field]
                 .into_iter()
                 .map(|field| {
-                    let scalar = field.as_scalar().expect("m2m fields must be scalar");
+                    let scalar = field
+                        .left_scalars()
+                        .into_iter()
+                        .exactly_one()
+                        .expect("m2m relation should have exactly one scalar field");
                     let opaque_type = convert::type_information_to_opaque_type(&scalar.type_info());
                     (opaque_type, scalar.native_type().map(|nt| nt.name().into()))
                 })
@@ -413,7 +419,7 @@ impl<'a, V: Visitor<'a>> QueryBuilder for SqlQueryBuilder<'a, V> {
         );
 
         let insert = Insert::expression_into(
-            relation_field.relation().as_table(&self.context),
+            parent_field.relation().as_table(&self.context),
             vec![parent_column, child_column],
             ExpressionKind::Parameterized(Value::opaque(call, typ)),
         );

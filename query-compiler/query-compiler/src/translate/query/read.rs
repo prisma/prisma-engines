@@ -258,12 +258,16 @@ fn build_read_related_records(
     Ok((child_query, join))
 }
 
-// When we query for children by parent, we typically want to generate a query with filters
-// for every field in `parent_field.related_field().linking_fields()`. It's not correct to
-// do that for many-to-many relations though, because their `related_field` points at the
-// primary identifier of the child model, which cannot be used as a filter for the parent
-// identifiers. The actual field that must be used belongs to the linking table, and it
-// corresponds to the primary identifier of the parent model.
+/// Returns the scalar fields that would be used to filter the children by. The returned fields
+/// do not necessarily represent the actual SQL filter, since some of the underlying SQL fields
+/// cannot be represented within our data model (for example m2m linking fields). This function
+/// is primarily useful for inferring the correct types of parameters.
+///
+/// For one-to-one and one-to-many relations, this function returns the linking fields of the child
+/// model. It is not correct to do the same for many-to-many relations though, because for them
+/// the linking fields of the child do not link to the parent model's identifiers, but rather to
+/// the linking table. Instead, we return the linking fields of the parent model, since that's
+/// what would be used to query the linking table.
 fn get_relation_scalars_for_filters(rf: &RelationField) -> Vec<ScalarField> {
     if rf.relation().is_many_to_many() {
         rf.left_scalars()

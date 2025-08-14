@@ -83,9 +83,9 @@ pub trait QueryBuilder {
 
     fn build_m2m_connect(
         &self,
-        field: RelationField,
-        fields: [SelectedField; 2],
-        values: [PrismaValue; 2],
+        parent_field: RelationField,
+        parent: PrismaValue,
+        child: PrismaValue,
     ) -> Result<DbQuery, Box<dyn std::error::Error + Send + Sync>>;
 
     fn build_m2m_disconnect(

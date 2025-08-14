@@ -338,18 +338,18 @@ pub(crate) fn translate_write_query(query: WriteQuery, builder: &dyn QueryBuilde
             child_ids,
             relation_field,
         }) => {
-            let (parent_field, parent) = parent_id
+            let (_, parent) = parent_id
                 .into_iter()
                 .flat_map(IntoIterator::into_iter)
                 .exactly_one()
                 .expect("query compiler connects should never have more than one parent expression");
-            let (child_field, child) = child_ids
+            let (_, child) = child_ids
                 .into_iter()
                 .flat_map(IntoIterator::into_iter)
                 .exactly_one()
                 .expect("query compiler connects should never have more than one child expression");
             let query = builder
-                .build_m2m_connect(relation_field, [parent_field, child_field], [parent, child])
+                .build_m2m_connect(relation_field, parent, child)
                 .map_err(TranslateError::QueryBuildFailure)?;
             Expression::Execute(query)
         }
