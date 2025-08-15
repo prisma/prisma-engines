@@ -415,7 +415,7 @@ impl<'a, V: Visitor<'a>> QueryBuilder for SqlQueryBuilder<'a, V> {
                     let opaque_type = convert::type_information_to_opaque_type(&scalar.type_info());
                     (opaque_type, scalar.native_type().map(|nt| nt.name().into()))
                 })
-                .collect::<Vec<_>>(),
+                .collect_vec(),
         );
 
         let insert = Insert::expression_into(
