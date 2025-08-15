@@ -57,7 +57,7 @@ impl QueryDocument {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum BatchDocument {
     Multi(Vec<Operation>, Option<BatchDocumentTransaction>),
     Compact(CompactedDocument),
@@ -153,7 +153,7 @@ impl BatchDocument {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct BatchDocumentTransaction {
     isolation_level: Option<String>,
 }
