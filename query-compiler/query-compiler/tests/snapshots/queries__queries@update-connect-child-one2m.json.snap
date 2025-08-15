@@ -6,7 +6,7 @@ input_file: query-compiler/query-compiler/tests/data/update-connect-child-one2m.
 transaction
    dataMap {
        id: Int (id)
-       managerId: Int (managerId)
+       managerId: Int? (managerId)
    }
    let 0 = unique (query «SELECT "public"."Employee"."id",
                           "public"."Employee"."managerId" FROM

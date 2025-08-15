@@ -7,7 +7,7 @@ dataMap {
     id: Int (id)
     email: String (email)
     activations (from @nested$activations): {
-        issued: Date (issued)
+        issued: DateTime (issued)
         secret: String (secret)
         done: Boolean (done)
     }

@@ -54,7 +54,7 @@ impl PrismaValueExtensions for PrismaValue {
                 if r#type == to_type.to_prisma_type()
                     // TODO: we currently don't know the arity of the target type, so we always
                     // accept arrays of the same type, but we should try to enforce it
-                    || matches!(&r#type, PrismaValueType::Array(inner) if **inner == to_type.to_prisma_type()) =>
+                    || matches!(&r#type, PrismaValueType::List(inner) if **inner == to_type.to_prisma_type()) =>
             {
                 PrismaValue::Placeholder(Placeholder { name, r#type })
             }

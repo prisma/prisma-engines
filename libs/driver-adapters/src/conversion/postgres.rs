@@ -1,18 +1,9 @@
-use std::sync::LazyLock;
-
 use crate::conversion::JSArg;
-use quaint::chrono::format::StrftimeItems;
 use serde_json::value::Value as JsonValue;
-
-static TIME_FMT: LazyLock<StrftimeItems> = LazyLock::new(|| StrftimeItems::new("%H:%M:%S%.f"));
 
 #[rustfmt::skip]
 pub fn value_to_js_arg(value: &quaint::Value) -> serde_json::Result<JSArg> {
     let res = match (&value.typed, value.native_column_type_name()) {
-        (quaint::ValueType::DateTime(Some(dt)), Some("DATE")) => JSArg::Value(JsonValue::String(dt.date_naive().to_string())),
-        (quaint::ValueType::DateTime(Some(dt)), Some("TIME")) =>  JSArg::Value(JsonValue::String(dt.time().to_string())),
-        (quaint::ValueType::DateTime(Some(dt)), Some("TIMETZ")) => JSArg::Value(JsonValue::String(dt.time().format_with_items(TIME_FMT.clone()).to_string())),
-        (quaint::ValueType::DateTime(Some(dt)), _) => JSArg::Value(JsonValue::String(dt.naive_utc().to_string())),
         (quaint::ValueType::Json(Some(s)), _) => JSArg::Value(JsonValue::String(serde_json::to_string(s)?)),
         (quaint::ValueType::Bytes(Some(bytes)), _) => JSArg::Buffer(bytes.to_vec()),
         (quaint::ValueType::Int32(Some(value)), _) => JSArg::SafeInt(*value),
@@ -70,16 +61,8 @@ mod test {
                 JSArg::Value(JsonValue::Null)
             ),
             (
-                ValueType::DateTime(Some(Utc.with_ymd_and_hms(2020, 1, 1, 23, 13, 1).unwrap())).into_value().with_native_column_type(Some("DATE")),
-                JSArg::Value(JsonValue::String("2020-01-01".to_string()))
-            ),
-            (
-                ValueType::DateTime(Some(Utc.with_ymd_and_hms(2020, 1, 1, 23, 13, 1).unwrap())).into_value().with_native_column_type(Some("TIME")),
-                JSArg::Value(JsonValue::String("23:13:01".to_string()))
-            ),
-            (
-                ValueType::DateTime(Some(Utc.with_ymd_and_hms(2020, 1, 1, 23, 13, 1).unwrap())).into_value().with_native_column_type(Some("TIMETZ")),
-                JSArg::Value(JsonValue::String("23:13:01".to_string()))
+                ValueType::DateTime(Some(Utc.with_ymd_and_hms(2020, 1, 1, 23, 13, 1).unwrap())).into_value(),
+                JSArg::Value(JsonValue::String("2020-01-01T23:13:01+00:00".to_string()))
             ),
             (
                 ValueType::DateTime(None).into_value(),

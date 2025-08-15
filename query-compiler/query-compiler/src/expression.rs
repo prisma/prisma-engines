@@ -7,7 +7,7 @@ use crate::result_node::ResultNode;
 use bon::{Builder, bon};
 use query_builder::DbQuery;
 use query_core::{DataExpectation, DataRule};
-use query_structure::{InternalEnum, PrismaValue, PrismaValueType, ScalarWriteOperation, TaggedPrismaValue};
+use query_structure::{InternalEnum, PrismaValue, PrismaValueType, ScalarWriteOperation};
 use serde::Serialize;
 use thiserror::Error;
 
@@ -235,17 +235,17 @@ impl Expression {
 #[serde(tag = "type", content = "value", rename_all = "camelCase")]
 pub enum FieldInitializer {
     LastInsertId,
-    Value(#[serde(serialize_with = "serialize_tagged_value")] PrismaValue),
+    Value(PrismaValue),
 }
 
 #[derive(Debug, Serialize)]
 #[serde(tag = "type", content = "value", rename_all = "camelCase")]
 pub enum FieldOperation {
-    Set(#[serde(serialize_with = "serialize_tagged_value")] PrismaValue),
-    Add(#[serde(serialize_with = "serialize_tagged_value")] PrismaValue),
-    Subtract(#[serde(serialize_with = "serialize_tagged_value")] PrismaValue),
-    Multiply(#[serde(serialize_with = "serialize_tagged_value")] PrismaValue),
-    Divide(#[serde(serialize_with = "serialize_tagged_value")] PrismaValue),
+    Set(PrismaValue),
+    Add(PrismaValue),
+    Subtract(PrismaValue),
+    Multiply(PrismaValue),
+    Divide(PrismaValue),
 }
 
 impl TryFrom<ScalarWriteOperation> for FieldOperation {
@@ -373,7 +373,7 @@ impl ExpressionType {
     pub fn from_value_type(value_type: PrismaValueType) -> Self {
         match value_type {
             PrismaValueType::Any => ExpressionType::Dynamic,
-            PrismaValueType::Array(inner) => ExpressionType::List(Box::new(ExpressionType::from_value_type(*inner))),
+            PrismaValueType::List(inner) => ExpressionType::List(Box::new(ExpressionType::from_value_type(*inner))),
             PrismaValueType::Object => ExpressionType::Record,
             _ => ExpressionType::Scalar,
         }
@@ -457,11 +457,4 @@ impl std::fmt::Display for Expression {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         self.pretty_print(false, 80).map_err(|_| std::fmt::Error)?.fmt(f)
     }
-}
-
-fn serialize_tagged_value<S>(obj: &PrismaValue, serializer: S) -> Result<S::Ok, S::Error>
-where
-    S: serde::Serializer,
-{
-    TaggedPrismaValue::from(obj).serialize(serializer)
 }

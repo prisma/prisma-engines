@@ -1,20 +1,13 @@
 use super::JSArg;
 use serde_json::value::Value as JsonValue;
 
-const DATETIME_FORMAT: &str = "%Y-%m-%d %H:%M:%S%.f";
-const DATE_FORMAT: &str = "%Y-%m-%d";
-const TIME_FORMAT: &str = "%H:%M:%S%.f";
-
 #[rustfmt::skip]
 pub fn value_to_js_arg(value: &quaint::Value) -> serde_json::Result<JSArg> {
     let res = match &value.typed {
         quaint::ValueType::Numeric(Some(bd)) => JSArg::Value(JsonValue::String(bd.to_string())),
         quaint::ValueType::Json(Some(s)) => JSArg::Value(JsonValue::String(serde_json::to_string(s)?)),
         quaint::ValueType::Bytes(Some(bytes)) => JSArg::Buffer(bytes.to_vec()),
-        quaint::ValueType::Date(Some(d)) => JSArg::Value(JsonValue::String(d.format(DATE_FORMAT).to_string())),
-        quaint::ValueType::DateTime(Some(dt)) => JSArg::Value(JsonValue::String(dt.format(DATETIME_FORMAT).to_string())),
         quaint::ValueType::Int32(Some(value)) => JSArg::SafeInt(*value),
-        quaint::ValueType::Time(Some(t)) => JSArg::Value(JsonValue::String(t.format(TIME_FORMAT).to_string())),
         quaint::ValueType::Array(Some(items)) => JSArg::Array(
             items
                 .iter()
@@ -68,7 +61,7 @@ mod test {
             ),
             (
                 ValueType::DateTime(Some(Utc.with_ymd_and_hms(2020, 1, 1, 23, 13, 1).unwrap().with_nanosecond(100).unwrap())),
-                JSArg::Value(JsonValue::String("2020-01-01 23:13:01.000000100".to_string()))
+                JSArg::Value(JsonValue::String("2020-01-01T23:13:01.000000100+00:00".to_string()))
             ),
             (
                 ValueType::DateTime(None),

@@ -1,2 +1,1 @@
 queries::aggregation::group_by::aggregation_group_by::group_by_ordering_sum_aggregation
-writes::data_types::native_types::sql_server::sql_server::native_decimal_type

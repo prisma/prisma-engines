@@ -130,9 +130,9 @@ where
             .align()
     }
 
-    fn list(&'a self, values: &'a [PrismaValue]) -> PrettyDoc<'a, D> {
+    fn list(&'a self, values: impl IntoIterator<Item = &'a PrismaValue>) -> PrettyDoc<'a, D> {
         self.intersperse(
-            values.iter().map(|value| self.value(value)),
+            values.into_iter().map(|value| self.value(value)),
             self.text(",").append(self.softline()),
         )
         .align()
@@ -147,7 +147,7 @@ where
                     .append(self.keyword("as"))
                     .append(self.space())
                     .append(match r#type {
-                        query_structure::PrismaValueType::Array(inner) => format!("{inner:?}[]"),
+                        query_structure::PrismaValueType::List(inner) => format!("{inner:?}[]"),
                         _ => format!("{type:?}"),
                     })
                     .parens(),
@@ -316,8 +316,8 @@ where
                 }
                 (key, self.data_map_node(field))
             })),
-            ResultNode::Value { db_name, result_type } => self
-                .text(result_type.to_string())
+            ResultNode::Field { db_name, field_type } => self
+                .text(field_type.to_string())
                 .append(self.space())
                 .append(self.field_name(db_name).parens()),
         }

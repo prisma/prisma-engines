@@ -71,16 +71,22 @@ impl<'a, V> SqlQueryBuilder<'a, V> {
     {
         let template = V::build_template(query)?;
 
-        let params = template
+        let (arg_types, args) = template
             .parameters
             .into_iter()
-            .map(|v| convert::quaint_value_to_prisma_value(v, self.context.sql_family()))
-            .collect::<Vec<_>>();
+            .map(|v| {
+                (
+                    convert::quaint_value_to_arg_type(&v),
+                    convert::quaint_value_to_prisma_value(v.typed),
+                )
+            })
+            .unzip();
 
         Ok(DbQuery::TemplateSql {
             fragments: template.fragments,
             placeholder_format: template.placeholder_format,
-            params,
+            args,
+            arg_types,
             chunkable,
         })
     }
@@ -169,13 +175,7 @@ impl<'a, V: Visitor<'a>> QueryBuilder for SqlQueryBuilder<'a, V> {
             .m2m_column(&self.context)
             .table(m2m_alias.to_string());
 
-        let left_scalar = rf
-            .related_field()
-            .left_scalars()
-            .into_iter()
-            .exactly_one()
-            .expect("should have one left scalar in m2m relation");
-        let (_, conditions) = conditions_per_field
+        let (condition_field, conditions) = conditions_per_field
             .exactly_one()
             .expect("should have one field in m2m relation");
 
@@ -185,7 +185,7 @@ impl<'a, V: Visitor<'a>> QueryBuilder for SqlQueryBuilder<'a, V> {
                 default_scalar_filter(
                     m2m_col.clone().into(),
                     cond,
-                    slice::from_ref(&left_scalar),
+                    slice::from_ref(&condition_field),
                     None,
                     &self.context,
                 )
@@ -387,23 +387,41 @@ impl<'a, V: Visitor<'a>> QueryBuilder for SqlQueryBuilder<'a, V> {
 
     fn build_m2m_connect(
         &self,
-        field: RelationField,
+        parent_field: RelationField,
         parent: PrismaValue,
         child: PrismaValue,
     ) -> Result<DbQuery, Box<dyn std::error::Error + Send + Sync>> {
         // Inserts are always chunkable.
         let chunkable = Chunkable::Yes;
-        let relation = field.relation();
 
-        let parent_column = field.related_field().m2m_column(&self.context);
-        let child_column = field.m2m_column(&self.context);
+        let child_field = parent_field.related_field();
+        // `m2m_column` gives the opposite m2m column for some reason so this looks like
+        // it's the wrong way around, but it's not.
+        let child_column = parent_field.m2m_column(&self.context);
+        let parent_column = child_field.m2m_column(&self.context);
 
         // parent and child can refer to arrays, so we need a product of the two
         let call = GeneratorCall::new("product", vec![parent, child]);
+
+        let typ = OpaqueType::Tuple(
+            [&parent_field, &child_field]
+                .into_iter()
+                .map(|field| {
+                    let scalar = field
+                        .left_scalars()
+                        .into_iter()
+                        .exactly_one()
+                        .expect("m2m relation should have exactly one scalar field");
+                    let opaque_type = convert::type_information_to_opaque_type(&scalar.type_info());
+                    (opaque_type, scalar.native_type().map(|nt| nt.name().into()))
+                })
+                .collect_vec(),
+        );
+
         let insert = Insert::expression_into(
-            relation.as_table(&self.context),
+            parent_field.relation().as_table(&self.context),
             vec![parent_column, child_column],
-            ExpressionKind::Parameterized(Value::opaque(call, OpaqueType::Unknown)),
+            ExpressionKind::Parameterized(Value::opaque(call, typ)),
         );
         let query = insert.on_conflict(OnConflict::DoNothing);
         self.convert_query(query, chunkable)
@@ -462,7 +480,14 @@ impl<'a, V: Visitor<'a>> QueryBuilder for SqlQueryBuilder<'a, V> {
         // Unwrapping query & params is safe since it's already passed the query parsing stage
         let query = inputs.remove("query").unwrap().into_string().unwrap();
         let params = inputs.remove("parameters").unwrap().into_list().unwrap();
-        Ok(DbQuery::RawSql { sql: query, params })
+        Ok(DbQuery::RawSql {
+            sql: query,
+            arg_types: params
+                .iter()
+                .map(|arg| convert::prisma_type_to_arg_type(&arg.r#type()))
+                .collect(),
+            args: params,
+        })
     }
 }
 

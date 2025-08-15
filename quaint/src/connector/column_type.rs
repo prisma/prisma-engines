@@ -179,8 +179,9 @@ impl From<&ValueType<'_>> for ColumnType {
                     OpaqueType::DateTime => ColumnType::DateTimeArray,
                     OpaqueType::Date => ColumnType::DateArray,
                     OpaqueType::Time => ColumnType::TimeArray,
-                    OpaqueType::Array(_) => ColumnType::Unknown,
+                    OpaqueType::Array(_) | OpaqueType::Tuple(_) => ColumnType::Unknown,
                 },
+                OpaqueType::Tuple(_) => ColumnType::Unknown,
             },
         }
     }

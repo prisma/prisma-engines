@@ -6,7 +6,7 @@ input_file: query-compiler/query-compiler/tests/data/create-with-generators.json
 dataMap {
     id: String (id)
     email: String (email)
-    createdAt: Date (createdAt)
+    createdAt: DateTime (createdAt)
 }
 let @generated$row0$id = uuid(const(Int(7)));
     @generated$row0$createdAt = now()
@@ -17,4 +17,4 @@ in unique (query «INSERT INTO "public"."UserWithGenerators"
                   "public"."UserWithGenerators"."createdAt"»
            params [var(@generated$row0$id as String),
                    const(String("user.1@prisma.io")),
-                   var(@generated$row0$createdAt as Date)])
+                   var(@generated$row0$createdAt as DateTime)])

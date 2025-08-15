@@ -407,7 +407,7 @@ fn extract_selectors_that_require_limit(record_filter: &mut RecordFilter, limit:
         .flat_map(|result| result.pairs.iter_mut())
         .filter_map(|(field, value)| {
             let typ = value.r#type();
-            if !matches!(typ, PrismaValueType::Array(_)) {
+            if !matches!(typ, PrismaValueType::List(_)) {
                 return None;
             }
 

@@ -195,12 +195,12 @@ impl Type {
             TypeIdentifier::Int => PrismaValueType::Int,
             TypeIdentifier::BigInt => PrismaValueType::BigInt,
             TypeIdentifier::Float => PrismaValueType::Float,
-            TypeIdentifier::Decimal => PrismaValueType::Decimal,
+            TypeIdentifier::Decimal => PrismaValueType::Float,
             TypeIdentifier::Boolean => PrismaValueType::Boolean,
-            TypeIdentifier::Enum(id) => PrismaValueType::Enum(self.dm.walk(id).name().to_owned()),
+            TypeIdentifier::Enum(_) => PrismaValueType::Enum,
             TypeIdentifier::UUID => PrismaValueType::String,
             TypeIdentifier::Json => PrismaValueType::Json,
-            TypeIdentifier::DateTime => PrismaValueType::Date,
+            TypeIdentifier::DateTime => PrismaValueType::DateTime,
             TypeIdentifier::Bytes => PrismaValueType::Bytes,
             TypeIdentifier::Unsupported => PrismaValueType::Any,
         }
@@ -298,16 +298,9 @@ impl FieldTypeInformation {
     }
 
     pub fn to_prisma_type(&self) -> PrismaValueType {
-        let type_ = match (self.typ.id, self.native_type.as_ref()) {
-            (TypeIdentifier::DateTime, Some(native_type))
-                if native_type.name() == "Time" || native_type.name() == "Timetz" =>
-            {
-                PrismaValueType::Time
-            }
-            _ => self.typ.to_prisma_type(),
-        };
+        let type_ = self.typ.to_prisma_type();
         if self.arity.is_list() {
-            PrismaValueType::Array(Box::new(type_))
+            PrismaValueType::List(Box::new(type_))
         } else {
             type_
         }

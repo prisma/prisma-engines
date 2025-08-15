@@ -531,7 +531,7 @@ impl<'a, 'b> NodeTranslator<'a, 'b> {
                 let r#type = if binding_is_unique {
                     r#type
                 } else {
-                    PrismaValueType::Array(r#type.into())
+                    PrismaValueType::List(r#type.into())
                 };
 
                 (
