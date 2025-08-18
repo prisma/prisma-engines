@@ -265,6 +265,7 @@ pub fn run_connector_test<T>(
     exclude: &[(&str, Option<&str>)],
     capabilities: ConnectorCapabilities,
     excluded_features: &[&str],
+    only_executors: &[&str],
     excluded_executors: &[&str],
     handler: fn() -> String,
     db_schemas: &[&str],
@@ -288,6 +289,7 @@ pub fn run_connector_test<T>(
         exclude,
         capabilities,
         excluded_features,
+        only_executors,
         excluded_executors,
         handler,
         db_schemas,
@@ -307,6 +309,7 @@ fn run_connector_test_impl(
     exclude: &[(&str, Option<&str>)],
     capabilities: ConnectorCapabilities,
     excluded_features: &[&str],
+    only_executors: &[&str],
     excluded_executors: &[&str],
     handler: fn() -> String,
     db_schemas: &[&str],
@@ -321,6 +324,16 @@ fn run_connector_test_impl(
             .iter()
             .any(|exec| exec.parse::<TestExecutor>() == Ok(da.test_executor))
     }) {
+        return;
+    }
+
+    if !only_executors.is_empty()
+        && !CONFIG.with_driver_adapter().is_some_and(|da| {
+            only_executors
+                .iter()
+                .any(|exec| exec.parse::<TestExecutor>() == Ok(da.test_executor))
+        })
+    {
         return;
     }
 
