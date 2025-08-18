@@ -73,9 +73,15 @@ pub fn js_value_to_quaint(
     column_name: &str,
 ) -> quaint::Result<QuaintValue<'static>> {
     let parse_number_as_i64 = |n: &serde_json::Number| {
-        n.as_i64().ok_or(conversion_error!(
-            "number must be an integer in column '{column_name}', got '{n}'"
-        ))
+        n.as_i64()
+            .or_else(|| {
+                n.as_f64()
+                    .filter(|&f| f.fract() == 0. && f as i64 as f64 == f)
+                    .map(|f| f as i64)
+            })
+            .ok_or(conversion_error!(
+                "number must be an integer in column '{column_name}', got '{n}'"
+            ))
     };
 
     //  Note for the future: it may be worth revisiting how much bloat so many panics with different static
