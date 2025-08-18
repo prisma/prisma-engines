@@ -81,7 +81,7 @@ class QueryPipeline {
         })
       } else {
         const queryable = txId
-          ? this.transactionManager.getTransaction({ id: txId }, 'query')
+          ? await this.transactionManager.getTransaction({ id: txId }, 'query')
           : this.driverAdapter
 
         if (!queryable) {
@@ -174,7 +174,10 @@ class QueryPipeline {
   ) {
     const queryable =
       txId !== null
-        ? this.transactionManager.getTransaction({ id: txId }, 'batch query')
+        ? await this.transactionManager.getTransaction(
+            { id: txId },
+            'batch query',
+          )
         : this.driverAdapter
 
     const canStartNewTransaction = txId === null
@@ -196,7 +199,7 @@ class QueryPipeline {
       isolationLevel,
     })
 
-    const transaction = this.transactionManager.getTransaction(
+    const transaction = await this.transactionManager.getTransaction(
       txInfo,
       'batch query',
     )
