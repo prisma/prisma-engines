@@ -254,7 +254,10 @@ fn get_scalar_field_result_node(
 
         // PostgreSQL based databases return bytes as hex encoded strings.
         if type_info.typ.id == TypeIdentifier::Bytes
-            && [Flavour::Postgres, Flavour::Cockroach].contains(&field.dm.schema.connector.flavour())
+            && matches!(
+                field.dm.schema.connector.flavour(),
+                Flavour::Postgres | Flavour::Cockroach
+            )
         {
             let typ = FieldScalarType::Bytes {
                 encoding: ByteArrayEncoding::Hex,
