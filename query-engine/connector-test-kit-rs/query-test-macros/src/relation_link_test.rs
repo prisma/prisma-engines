@@ -23,6 +23,8 @@ pub fn relation_link_test_impl(attr: TokenStream, input: TokenStream) -> TokenSt
 
     let only = args.only;
     let exclude = args.exclude;
+    let only_executors = args.only_executors.as_ref();
+    let excluded_executors = args.exclude_executors.as_ref();
     let id_only = args.id_only;
     let on_parent = args.on_parent.relation_field;
     let on_child = args.on_child.relation_field;
@@ -69,6 +71,8 @@ pub fn relation_link_test_impl(attr: TokenStream, input: TokenStream) -> TokenSt
                 #id_only,
                 &[#only],
                 &[#exclude],
+                &[#(#only_executors),*],
+                &[#(#excluded_executors),*],
                 enumflags2::make_bitflags!(ConnectorCapability::{#(#required_capabilities)|*}),
                 (#suite_name, #test_name),
                 #runner_fn_ident,
