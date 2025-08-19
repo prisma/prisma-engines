@@ -5,12 +5,14 @@ use crate::{
 use bon::builder;
 use indexmap::IndexSet;
 use itertools::Itertools;
+use psl::datamodel_connector::Flavour;
 use query_core::{
     CreateManyRecordsFields, DeleteRecordFields, Node, Query, QueryGraph, ReadQuery, UpdateManyRecordsFields,
     UpdateRecord, WriteQuery, schema::constants::aggregations,
 };
 use query_structure::{
-    AggregationSelection, FieldArity, FieldSelection, FieldTypeInformation, SelectedField, Type, TypeIdentifier,
+    AggregationSelection, FieldArity, FieldSelection, FieldTypeInformation, ScalarField, SelectedField, Type,
+    TypeIdentifier,
 };
 use serde::Serialize;
 use std::{borrow::Cow, collections::HashMap, fmt};
@@ -149,24 +151,11 @@ fn get_result_node(
 
     for prisma_name in selection_order {
         match field_map.get(prisma_name.as_str()) {
-            Some(sf @ SelectedField::Scalar(f)) => {
-                let from_name = if uses_relation_joins {
-                    sf.prisma_name()
-                } else {
-                    sf.db_name()
-                };
-                let to_name = prisma_name.to_owned();
-                let type_info = f.type_info();
-
-                // nested JSON fields get returned directly as objects when using relation joins
-                if uses_relation_joins && is_nested && type_info.typ.id == TypeIdentifier::Json {
-                    let field_type = FieldType::new(type_info.arity, FieldScalarType::Object);
-                    let db_name = from_name.into_owned().into();
-                    node.add_field(to_name, ResultNode::Field { db_name, field_type });
-                } else {
-                    let field = builder.new_value(from_name.into_owned(), type_info);
-                    node.add_field(to_name, field);
-                }
+            Some(SelectedField::Scalar(field)) => {
+                node.add_field(
+                    field.name().to_owned(),
+                    get_scalar_field_result_node(field, uses_relation_joins, is_nested, builder),
+                );
             }
             Some(SelectedField::Composite(_)) => todo!("MongoDB specific"),
             Some(SelectedField::Relation(f)) => {
@@ -226,6 +215,61 @@ fn get_result_node(
     }
 
     Some(node.build())
+}
+
+fn get_scalar_field_result_node(
+    field: &ScalarField,
+    uses_relation_joins: bool,
+    is_nested: bool,
+    builder: &mut ResultNodeBuilder<'_>,
+) -> ResultNode {
+    let from_name = if uses_relation_joins {
+        field.name().to_owned()
+    } else {
+        field.db_name().to_owned()
+    };
+    let type_info = field.type_info();
+
+    // Nested relation join fields can have different types based on the output of database
+    // specific aggregation functions.
+    if uses_relation_joins && is_nested {
+        // JSON fields are return as deserialized objects.
+        if type_info.typ.id == TypeIdentifier::Json {
+            return ResultNode::Field {
+                db_name: from_name.into(),
+                field_type: FieldType::new(type_info.arity, FieldScalarType::Object),
+            };
+        }
+
+        // MySQL returns bytes as base64 encoded strings.
+        if type_info.typ.id == TypeIdentifier::Bytes && field.dm.schema.connector.flavour() == Flavour::Mysql {
+            let typ = FieldScalarType::Bytes {
+                encoding: ByteArrayEncoding::Base64,
+            };
+            return ResultNode::Field {
+                db_name: from_name.into(),
+                field_type: FieldType::new(type_info.arity, typ),
+            };
+        }
+
+        // PostgreSQL based databases return bytes as hex encoded strings.
+        if type_info.typ.id == TypeIdentifier::Bytes
+            && matches!(
+                field.dm.schema.connector.flavour(),
+                Flavour::Postgres | Flavour::Cockroach
+            )
+        {
+            let typ = FieldScalarType::Bytes {
+                encoding: ByteArrayEncoding::Hex,
+            };
+            return ResultNode::Field {
+                db_name: from_name.into(),
+                field_type: FieldType::new(type_info.arity, typ),
+            };
+        }
+    }
+
+    builder.new_value(from_name, type_info)
 }
 
 fn get_result_node_for_aggregation(
@@ -375,7 +419,9 @@ pub enum FieldScalarType {
     Object,
     #[serde(rename = "datetime")]
     DateTime,
-    Bytes,
+    Bytes {
+        encoding: ByteArrayEncoding,
+    },
     Unsupported,
 }
 
@@ -392,7 +438,7 @@ impl fmt::Display for FieldScalarType {
             Self::Json => write!(f, "Json"),
             Self::Object => write!(f, "Object"),
             Self::DateTime => write!(f, "DateTime"),
-            Self::Bytes => write!(f, "Bytes"),
+            Self::Bytes { .. } => write!(f, "Bytes"),
             Self::Unsupported => write!(f, "Unsupported"),
         }
     }
@@ -413,10 +459,21 @@ impl From<&Type> for FieldScalarType {
             TypeIdentifier::UUID => Self::String,
             TypeIdentifier::Json => Self::Json,
             TypeIdentifier::DateTime => Self::DateTime,
-            TypeIdentifier::Bytes => Self::Bytes,
+            TypeIdentifier::Bytes => Self::Bytes {
+                encoding: ByteArrayEncoding::default(),
+            },
             TypeIdentifier::Unsupported => Self::Unsupported,
         }
     }
+}
+
+#[derive(Debug, Default, Clone, Copy, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub enum ByteArrayEncoding {
+    #[default]
+    Array,
+    Base64,
+    Hex,
 }
 
 #[derive(Debug, Clone, Copy, Serialize)]
