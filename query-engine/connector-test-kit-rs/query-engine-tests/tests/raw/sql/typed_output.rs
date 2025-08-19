@@ -337,6 +337,93 @@ mod typed_output {
         Ok(())
     }
 
+    #[connector_test(schema(schema_mysql), only(MySql("mariadb.js.wasm")))]
+    async fn all_scalars_mariadb_js(runner: Runner) -> TestResult<()> {
+        create_row(
+            &runner,
+            r#"{
+            id: 1,
+            string: "str",
+            int: 42,
+            bInt: "9223372036854775807",
+            float: 1.5432,
+            bytes: "AQID",
+            bool: true,
+            dt: "1900-10-10T01:10:10.001Z",
+            dec: "123.45678910",
+            json: "{\"a\": \"b\"}"
+          }"#,
+        )
+        .await?;
+        create_row(&runner, r#"{ id: 2 }"#).await?;
+
+        insta::assert_snapshot!(
+          run_query_pretty!(&runner, fmt_query_raw(r#"SELECT * FROM TestModel;"#, vec![])),
+          @r###"
+        {
+          "data": {
+            "queryRaw": {
+              "columns": [
+                "id",
+                "string",
+                "int",
+                "bInt",
+                "float",
+                "bytes",
+                "bool",
+                "dt",
+                "dec",
+                "json"
+              ],
+              "types": [
+                "int",
+                "string",
+                "int",
+                "bigint",
+                "double",
+                "bytes",
+                "int",
+                "datetime",
+                "decimal",
+                "json"
+              ],
+              "rows": [
+                [
+                  1,
+                  "str",
+                  42,
+                  "9223372036854775807",
+                  1.5432,
+                  "AQID",
+                  1,
+                  "1900-10-10T01:10:10.001+00:00",
+                  "123.4567891",
+                  {
+                    "a": "b"
+                  }
+                ],
+                [
+                  2,
+                  null,
+                  null,
+                  null,
+                  null,
+                  null,
+                  null,
+                  null,
+                  null,
+                  null
+                ]
+              ]
+            }
+          }
+        }
+        "###
+        );
+
+        Ok(())
+    }
+
     fn schema_sqlite() -> String {
         let schema = indoc! {
             r#"model TestModel {
