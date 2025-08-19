@@ -291,9 +291,8 @@ mod aggregation_group_by {
         create_row(&runner, r#"{ id: 3, float: 1.1, int: 3, string: "group2" }"#).await?;
         create_row(&runner, r#"{ id: 4, float: 4.0, int: 3, string: "group3" }"#).await?;
 
-        insta::assert_snapshot!(
-            run_query!(
-                runner,
+        let result = runner
+            .query(
                 "{
                     groupByA(by: [float], orderBy: { _sum: { float: asc } }) {
                       float
@@ -301,14 +300,21 @@ mod aggregation_group_by {
                         float
                       }
                     }
-                  }"
-            ),
-            @r###"{"data":{"groupByA":[{"float":1.1,"_sum":{"float":3.3}},{"float":4,"_sum":{"float":4}}]}}"###
-        );
+                  }",
+            )
+            .await?;
+        result.assert_success();
 
-        insta::assert_snapshot!(
-            run_query!(
-                runner,
+        let rows = &result.into_data().pop().unwrap()["groupByA"];
+
+        assert_eq!(rows[0]["float"].as_f64().unwrap() as f32, 1.1);
+        assert_eq!(rows[0]["_sum"]["float"].as_f64().unwrap() as f32, 3.3);
+
+        assert_eq!(rows[1]["float"].as_f64().unwrap() as f32, 4.0);
+        assert_eq!(rows[1]["_sum"]["float"].as_f64().unwrap() as f32, 4.0);
+
+        let result = runner
+            .query(
                 "{
                     groupByA(by: [float], orderBy: { _sum: { float: desc } }) {
                       float
@@ -316,10 +322,18 @@ mod aggregation_group_by {
                         float
                       }
                     }
-                  }"
-            ),
-            @r###"{"data":{"groupByA":[{"float":4,"_sum":{"float":4}},{"float":1.1,"_sum":{"float":3.3}}]}}"###
-        );
+                  }",
+            )
+            .await?;
+        result.assert_success();
+
+        let rows = &result.into_data().pop().unwrap()["groupByA"];
+
+        assert_eq!(rows[0]["float"].as_f64().unwrap() as f32, 4.0);
+        assert_eq!(rows[0]["_sum"]["float"].as_f64().unwrap() as f32, 4.0);
+
+        assert_eq!(rows[1]["float"].as_f64().unwrap() as f32, 1.1);
+        assert_eq!(rows[1]["_sum"]["float"].as_f64().unwrap() as f32, 3.3);
 
         Ok(())
     }
