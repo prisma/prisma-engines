@@ -71,7 +71,7 @@ jobs:
             setup_task: dev-mariadb-qc
             ignored_tests_list: query-compiler/query-engine-tests-todo/mariadb/skip
             should_fail_tests_list: query-compiler/query-engine-tests-todo/mariadb/fail
-            relation_load_strategy: '["query"]'
+            relation_load_strategy: '["join", "query"]'
 
           - name: pg-cockroachdb
             setup_task: dev-pg-cockroachdb-qc
