@@ -102,6 +102,8 @@ pub fn run_relation_link_test<F>(
     id_only: bool,
     only: &[(&str, Option<&str>)],
     exclude: &[(&str, Option<&str>)],
+    only_executors: &[&str],
+    excluded_executors: &[&str],
     required_capabilities: ConnectorCapabilities,
     (suite_name, test_name): (&str, &str),
     test_fn: F,
@@ -126,6 +128,8 @@ pub fn run_relation_link_test<F>(
         id_only,
         only,
         exclude,
+        only_executors,
+        excluded_executors,
         required_capabilities,
         (suite_name, test_name),
         &boxify(test_fn),
@@ -142,12 +146,32 @@ fn run_relation_link_test_impl(
     id_only: bool,
     only: &[(&str, Option<&str>)],
     exclude: &[(&str, Option<&str>)],
+    only_executors: &[&str],
+    excluded_executors: &[&str],
     required_capabilities: ConnectorCapabilities,
     (suite_name, test_name): (&str, &str),
     test_fn: &dyn for<'a> Fn(&'a Runner, &'a DatamodelWithParams) -> BoxFuture<'a, TestResult<()>>,
     test_fn_full_name: &'static str,
     original_test_function_name: &'static str,
 ) {
+    if CONFIG.with_driver_adapter().is_some_and(|da| {
+        excluded_executors
+            .iter()
+            .any(|exec| exec.parse::<TestExecutor>() == Ok(da.test_executor))
+    }) {
+        return;
+    }
+
+    if !only_executors.is_empty()
+        && !CONFIG.with_driver_adapter().is_some_and(|da| {
+            only_executors
+                .iter()
+                .any(|exec| exec.parse::<TestExecutor>() == Ok(da.test_executor))
+        })
+    {
+        return;
+    }
+
     let full_test_name = build_full_test_name(test_fn_full_name, original_test_function_name);
 
     if ignore_lists::is_ignored(&full_test_name) {
@@ -265,6 +289,7 @@ pub fn run_connector_test<T>(
     exclude: &[(&str, Option<&str>)],
     capabilities: ConnectorCapabilities,
     excluded_features: &[&str],
+    only_executors: &[&str],
     excluded_executors: &[&str],
     handler: fn() -> String,
     db_schemas: &[&str],
@@ -288,6 +313,7 @@ pub fn run_connector_test<T>(
         exclude,
         capabilities,
         excluded_features,
+        only_executors,
         excluded_executors,
         handler,
         db_schemas,
@@ -307,6 +333,7 @@ fn run_connector_test_impl(
     exclude: &[(&str, Option<&str>)],
     capabilities: ConnectorCapabilities,
     excluded_features: &[&str],
+    only_executors: &[&str],
     excluded_executors: &[&str],
     handler: fn() -> String,
     db_schemas: &[&str],
@@ -321,6 +348,16 @@ fn run_connector_test_impl(
             .iter()
             .any(|exec| exec.parse::<TestExecutor>() == Ok(da.test_executor))
     }) {
+        return;
+    }
+
+    if !only_executors.is_empty()
+        && !CONFIG.with_driver_adapter().is_some_and(|da| {
+            only_executors
+                .iter()
+                .any(|exec| exec.parse::<TestExecutor>() == Ok(da.test_executor))
+        })
+    {
         return;
     }
 

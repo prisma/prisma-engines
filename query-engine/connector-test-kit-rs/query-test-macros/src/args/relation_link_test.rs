@@ -32,6 +32,12 @@ pub(crate) struct RelationLinkTestArgs {
     pub(crate) exclude: ConnectorTags,
 
     #[darling(default)]
+    pub only_executors: Executors,
+
+    #[darling(default)]
+    pub exclude_executors: Executors,
+
+    #[darling(default)]
     pub capabilities: RunOnlyForCapabilities,
 }
 

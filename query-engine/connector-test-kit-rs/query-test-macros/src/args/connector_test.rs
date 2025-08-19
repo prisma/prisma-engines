@@ -26,7 +26,10 @@ pub struct ConnectorTestArgs {
     pub exclude_features: ExcludeFeatures,
 
     #[darling(default)]
-    pub exclude_executors: ExcludeExecutors,
+    pub only_executors: Executors,
+
+    #[darling(default)]
+    pub exclude_executors: Executors,
 
     #[darling(default)]
     pub capabilities: RunOnlyForCapabilities,
@@ -203,18 +206,18 @@ impl darling::FromMeta for ConnectorTags {
 }
 
 #[derive(Debug, Default)]
-pub struct ExcludeExecutors {
+pub struct Executors {
     executors: Vec<String>,
 }
 
-impl AsRef<[String]> for ExcludeExecutors {
+impl AsRef<[String]> for Executors {
     fn as_ref(&self) -> &[String] {
         self.executors.as_ref()
     }
 }
-impl darling::FromMeta for ExcludeExecutors {
+impl darling::FromMeta for Executors {
     fn from_list(items: &[NestedMeta]) -> Result<Self, darling::Error> {
-        let executors = strings_to_list("ExcludeExecutors", items)?;
+        let executors = strings_to_list("Executors", items)?;
         Ok(Self { executors })
     }
 }
