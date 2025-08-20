@@ -7,10 +7,6 @@ on:
         required: true
       ignored_tests_list:
         type: string
-        required: true
-      should_fail_tests_list:
-        type: string
-        required: true
       relation_load_strategy:
         type: string
         required: true
@@ -46,8 +42,7 @@ jobs:
       QUERY_BATCH_SIZE: '10'
       WASM_BUILD_PROFILE: 'profiling' # Include debug info for proper backtraces
       WORKSPACE_ROOT: ${{ github.workspace }}
-      IGNORED_TESTS: ${{ inputs.ignored_tests_list }}/${{ matrix.relation_load_strategy }}
-      SHOULD_FAIL_TESTS: ${{ inputs.should_fail_tests_list }}/${{ matrix.relation_load_strategy }}
+      IGNORED_TESTS: ${{ inputs.ignored_tests_list }}
       PRISMA_RELATION_LOAD_STRATEGY: ${{ matrix.relation_load_strategy }}
 
     runs-on: ubuntu-latest

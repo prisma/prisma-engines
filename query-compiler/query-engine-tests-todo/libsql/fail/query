@@ -1,2 +1,0 @@
-new::regressions::prisma_15204::conversion_error::convert_to_bigint_sqlite_js
-new::regressions::prisma_15204::conversion_error::convert_to_int_sqlite_js

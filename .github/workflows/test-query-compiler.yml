@@ -26,57 +26,40 @@ jobs:
         adapter:
           - name: pg
             setup_task: dev-pg-qc
-            ignored_tests_list: query-compiler/query-engine-tests-todo/pg/skip
-            should_fail_tests_list: query-compiler/query-engine-tests-todo/pg/fail
             relation_load_strategy: '["join", "query"]'
 
           - name: libsql
             setup_task: dev-libsql-qc
-            ignored_tests_list: query-compiler/query-engine-tests-todo/libsql/skip
-            should_fail_tests_list: query-compiler/query-engine-tests-todo/libsql/fail
             relation_load_strategy: '["query"]'
 
           - name: sqlite
             setup_task: dev-better-sqlite3-qc
-            ignored_tests_list: query-compiler/query-engine-tests-todo/better-sqlite3/skip
-            should_fail_tests_list: query-compiler/query-engine-tests-todo/better-sqlite3/fail
             relation_load_strategy: '["query"]'
 
           - name: planetscale
             setup_task: dev-planetscale-qc
-            ignored_tests_list: query-compiler/query-engine-tests-todo/planetscale/skip
-            should_fail_tests_list: query-compiler/query-engine-tests-todo/planetscale/fail
             relation_load_strategy: '["query"]'
 
           - name: d1
             setup_task: dev-d1-qc
-            ignored_tests_list: query-compiler/query-engine-tests-todo/d1/skip
-            should_fail_tests_list: query-compiler/query-engine-tests-todo/d1/fail
             relation_load_strategy: '["query"]'
             test_threads: 1
 
           - name: mssql
             setup_task: dev-mssql-qc
-            ignored_tests_list: query-compiler/query-engine-tests-todo/mssql/skip
-            should_fail_tests_list: query-compiler/query-engine-tests-todo/mssql/fail
             relation_load_strategy: '["query"]'
 
           - name: neon
             setup_task: dev-neon-qc
-            ignored_tests_list: query-compiler/query-engine-tests-todo/neon/skip
-            should_fail_tests_list: query-compiler/query-engine-tests-todo/neon/fail
             relation_load_strategy: '["join", "query"]'
 
           - name: mariadb
             setup_task: dev-mariadb-qc
-            ignored_tests_list: query-compiler/query-engine-tests-todo/mariadb/skip
-            should_fail_tests_list: query-compiler/query-engine-tests-todo/mariadb/fail
             relation_load_strategy: '["join", "query"]'
 
           - name: pg-cockroachdb
             setup_task: dev-pg-cockroachdb-qc
             ignored_tests_list: query-compiler/query-engine-tests-todo/pg-cockroachdb/skip
-            should_fail_tests_list: query-compiler/query-engine-tests-todo/pg-cockroachdb/fail
             relation_load_strategy: '["join", "query"]'
 
     name: ${{ matrix.adapter.name }}
@@ -86,6 +69,5 @@ jobs:
     with:
       setup_task: ${{ matrix.adapter.setup_task }}
       ignored_tests_list: ${{ matrix.adapter.ignored_tests_list }}
-      should_fail_tests_list: ${{ matrix.adapter.should_fail_tests_list }}
       relation_load_strategy: ${{ matrix.adapter.relation_load_strategy }}
       test_threads: ${{ matrix.adapter.test_threads || 4 }}
