@@ -22,13 +22,10 @@ pub use schema_gen::*;
 pub use templating::*;
 
 use colored::Colorize;
-use futures::{FutureExt, future::Either};
 use prisma_metrics::{MetricRecorder, MetricRegistry, WithMetricsInstrumentation};
 use psl::datamodel_connector::ConnectorCapabilities;
 use std::future::Future;
-use std::panic::AssertUnwindSafe;
 use std::sync::LazyLock;
-use std::sync::atomic::{AtomicBool, Ordering};
 use tokio::runtime::Builder;
 use tokio::sync::mpsc::{UnboundedReceiver, UnboundedSender, unbounded_channel};
 use tracing_futures::WithSubscriber;
@@ -178,9 +175,6 @@ fn run_relation_link_test_impl(
         return;
     }
 
-    let expected_to_fail = ignore_lists::is_expected_to_fail(&full_test_name);
-    let failed = &AtomicBool::new(false);
-
     static RELATION_TEST_IDX: LazyLock<Option<usize>> =
         LazyLock::new(|| std::env::var("RELATION_TEST_IDX").ok().and_then(|s| s.parse().ok()));
 
@@ -214,53 +208,19 @@ fn run_relation_link_test_impl(
                         .await
                         .unwrap();
 
-                    let test_future = if expected_to_fail {
-                        Either::Left(async {
-                            match AssertUnwindSafe(test_fn(&runner, &dm)).catch_unwind().await {
-                                Ok(Ok(_)) => {},
-                                Ok(Err(err)) => {
-                                    failed.store(true, Ordering::Relaxed);
-                                    eprintln!("test failed as expected: {err}");
-                                }
-                                Err(panic) => {
-                                    failed.store(true, Ordering::Relaxed);
-                                    eprintln!(
-                                        "test panicked as expected: {}",
-                                        panic_utils::downcast_box_to_string(panic).unwrap_or_default()
-                                    );
-                                }
-                            };
-                            Ok(())
-                        })
-                    } else {
-                        Either::Right(test_fn(&runner, &dm))
-                    };
-
-                    test_future.with_subscriber(test_tracing_subscriber(
+                    test_fn(&runner, &dm).with_subscriber(test_tracing_subscriber(
                         ENV_LOG_LEVEL.to_string(),
                         log_tx,
                     )).with_recorder(recorder)
                     .await.unwrap();
 
-                    if let Err(e) = teardown_project(&datamodel, Default::default(), runner.schema_id()).await {
-                        if expected_to_fail {
-                            eprintln!("Teardown failed: {e}");
-                        } else {
-                            panic!("Teardown failed: {e}");
-                        }
-                    }
+                    teardown_project(&datamodel, Default::default(), runner.schema_id())
+                        .await
+                        .unwrap();
 
                 }
             );
-
-            if failed.load(Ordering::Relaxed) {
-                break;
-            }
         }
-    }
-
-    if expected_to_fail && !failed.load(Ordering::Relaxed) {
-        panic!("expected at least one of the variants of the relation test to fail but they all succeeded");
     }
 }
 
@@ -404,30 +364,7 @@ fn run_connector_test_impl(
         .unwrap();
         let schema_id = runner.schema_id();
 
-        let expected_to_fail = ignore_lists::is_expected_to_fail(&full_test_name);
-
-        let test_future = if expected_to_fail {
-            Either::Left(async {
-                match AssertUnwindSafe(test_fn(runner)).catch_unwind().await {
-                    Ok(Ok(_)) => panic!("expected this test to fail but it succeeded"),
-                    Ok(Err(err)) => {
-                        eprintln!("test failed as expected: {err}");
-                        Ok(())
-                    }
-                    Err(panic) => {
-                        eprintln!(
-                            "test panicked as expected: {}",
-                            panic_utils::downcast_box_to_string(panic).unwrap_or_default()
-                        );
-                        Ok(())
-                    }
-                }
-            })
-        } else {
-            Either::Right(test_fn(runner))
-        };
-
-        if let Err(err) = test_future
+        if let Err(err) = test_fn(runner)
             .with_subscriber(test_tracing_subscriber(ENV_LOG_LEVEL.to_string(), log_tx))
             .with_recorder(recorder)
             .await
@@ -440,13 +377,9 @@ fn run_connector_test_impl(
             panic!("💥 Test failed due to an error (see above)");
         }
 
-        if let Err(e) = crate::teardown_project(&datamodel, db_schemas, schema_id).await {
-            if expected_to_fail {
-                eprintln!("Teardown failed: {e}");
-            } else {
-                panic!("Teardown failed: {e}");
-            }
-        }
+        crate::teardown_project(&datamodel, db_schemas, schema_id)
+            .await
+            .unwrap();
     });
 }
 

@@ -7,14 +7,9 @@ use std::{
 };
 
 static IGNORED_TESTS: OnceLock<HashSet<String>> = OnceLock::new();
-static SHOULD_FAIL_TESTS: OnceLock<HashSet<String>> = OnceLock::new();
 
 pub fn is_ignored(test_name: &str) -> bool {
     is_in_list(test_name, "IGNORED_TESTS", &IGNORED_TESTS)
-}
-
-pub fn is_expected_to_fail(test_name: &str) -> bool {
-    is_in_list(test_name, "SHOULD_FAIL_TESTS", &SHOULD_FAIL_TESTS)
 }
 
 fn is_in_list(test_name: &str, env_var: &'static str, cache: &OnceLock<HashSet<String>>) -> bool {

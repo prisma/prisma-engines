@@ -1,6 +1,7 @@
 use query_engine_tests::*;
 
-#[test_suite(only(Sqlite))]
+// TODO: Remove the exclude: https://linear.app/prisma-company/issue/ORM-1362/fix-issues15204-conversion-error
+#[test_suite(only(Sqlite), exclude_executors("QueryCompiler"))]
 mod conversion_error {
     fn schema_int() -> String {
         let schema = indoc! {
