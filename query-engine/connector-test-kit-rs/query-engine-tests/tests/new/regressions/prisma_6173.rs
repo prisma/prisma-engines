@@ -36,7 +36,7 @@ mod query_raw {
           "data": {
             "queryRaw": {
               "columns": [
-                "f0"
+                "id"
               ],
               "types": [
                 "int"
