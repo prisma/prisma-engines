@@ -13,9 +13,8 @@ pub fn is_ignored(test_name: &str) -> bool {
 }
 
 fn is_in_list(test_name: &str, env_var: &'static str, cache: &OnceLock<HashSet<String>>) -> bool {
-    let list_file = match std::env::var(env_var) {
-        Ok(file) => file,
-        Err(_) => return false,
+    let Some(list_file) = std::env::var(env_var).ok().filter(|s| !s.is_empty()) else {
+        return false;
     };
 
     let tests = cache.get_or_init(|| {
