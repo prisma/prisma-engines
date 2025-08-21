@@ -15,7 +15,7 @@ import {
   safeJsonStringify,
   type TransactionManager,
   UserFacingError,
-} from '@prisma/client-engine-runtime'
+} from '@prisma/client-engine'
 import {
   IsolationLevel,
   SqlDriverAdapter,

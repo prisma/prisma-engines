@@ -1,6 +1,6 @@
 import { ConnectionInfo } from '@prisma/driver-adapter-utils'
 import { __dirname } from './utils.js'
-import { BatchResponse, QueryPlanNode } from '@prisma/client-engine-runtime'
+import { BatchResponse, QueryPlanNode } from '@prisma/client-engine'
 import { Env } from './types/index.js'
 
 export type QueryCompilerParams = {

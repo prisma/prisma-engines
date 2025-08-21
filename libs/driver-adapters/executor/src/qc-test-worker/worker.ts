@@ -9,7 +9,7 @@ import {
   noopTracingHelper,
   TransactionManager,
   type TransactionOptions,
-} from '@prisma/client-engine-runtime'
+} from '@prisma/client-engine'
 import { parentPort } from 'worker_threads'
 import {
   CommitTxParams,

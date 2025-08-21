@@ -33,7 +33,7 @@
     "@prisma/adapter-planetscale": "workspace:*",
     "@prisma/adapter-mariadb": "workspace:*",
     "@prisma/bundled-js-drivers": "workspace:*",
-    "@prisma/client-engine-runtime": "workspace:*",
+    "@prisma/client-engine": "workspace:*",
     "@prisma/schema-engine-wasm": "../../../schema-engine/schema-engine-wasm/pkg",
     "@prisma/driver-adapter-utils": "workspace:*",
     "decimal.js": "10.5.0",

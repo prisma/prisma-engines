@@ -1,4 +1,4 @@
-import type { JsonTaggedValue } from '@prisma/client-engine-runtime'
+import type { JsonTaggedValue } from '@prisma/client-engine'
 import * as Transaction from './Transaction.js'
 
 export type JsonQuery = {
