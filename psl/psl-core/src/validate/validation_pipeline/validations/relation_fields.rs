@@ -197,10 +197,17 @@ pub(super) fn referential_actions(field: RelationFieldWalker<'_>, ctx: &mut Cont
         )
     };
 
+    // validation template for relationMode = "prismaSkipIntegrity"
+    let msg_prisma_skip_integrity = |action: ReferentialAction| {
+        let additional_info = "When using `relationMode = \"prismaSkipIntegrity\"`, you cannot specify any referential action. Learn more at https://pris.ly/d/relation-mode";
+        format!("Invalid referential action: `{}`. {additional_info}", action.as_str())
+    };
+
     let msg_template = |action: ReferentialAction| -> String {
         match relation_mode {
             RelationMode::ForeignKeys => msg_foreign_keys(action),
             RelationMode::Prisma => msg_prisma(action),
+            RelationMode::PrismaSkipIntegrity => msg_prisma_skip_integrity(action),
         }
     };
 
