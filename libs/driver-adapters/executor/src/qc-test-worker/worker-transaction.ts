@@ -1,4 +1,4 @@
-import { UserFacingError } from '@prisma/client-engine-runtime'
+import { UserFacingError } from '@prisma/client-engine'
 import type { IsolationLevel } from '@prisma/driver-adapter-utils'
 import type { State } from './worker.js'
 import { TxOptions } from '../types/jsonRpc.js'
