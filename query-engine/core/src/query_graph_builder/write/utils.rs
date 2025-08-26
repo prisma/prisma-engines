@@ -1,7 +1,10 @@
 use crate::{
     Computation, DataExpectation, DataOperation, MissingRelatedRecord, ParsedInputValue, QueryGraphBuilderResult,
     RelationViolation, RowSink,
-    inputs::{IfInput, LeftSideDiffInput, ReturnInput, RightSideDiffInput, UpdateManyRecordsSelectorsInput},
+    inputs::{
+        DeleteManyRecordsSelectorsInput, IfInput, LeftSideDiffInput, RelatedRecordsSelectorsInput, ReturnInput,
+        RightSideDiffInput, UpdateManyRecordsSelectorsInput,
+    },
     query_ast::*,
     query_graph::{Flow, Node, NodeRef, QueryGraph, QueryGraphDependency},
 };
@@ -146,17 +149,7 @@ where
     graph.create_edge(
         parent_node,
         &read_children_node,
-        QueryGraphDependency::ProjectedDataDependency(
-            selection,
-            Box::new(|mut read_children_node, selections| {
-                if let Node::Query(Query::Read(ReadQuery::RelatedRecordsQuery(ref mut rq))) = read_children_node {
-                    rq.parent_results = Some(selections);
-                };
-
-                Ok(read_children_node)
-            }),
-            None,
-        ),
+        QueryGraphDependency::ProjectedDataDependency(selection, RowSink::All(&RelatedRecordsSelectorsInput), None),
     )?;
 
     Ok(read_children_node)
@@ -178,7 +171,7 @@ pub fn insert_1to1_idempotent_connect_checks(
     graph.create_edge(
         read_new_child_node,
         &diff_node,
-        QueryGraphDependency::ProjectedDataSinkDependency(
+        QueryGraphDependency::ProjectedDataDependency(
             child_model_identifier.clone(),
             RowSink::All(&LeftSideDiffInput),
             Some(DataExpectation::non_empty_rows(
@@ -196,7 +189,7 @@ pub fn insert_1to1_idempotent_connect_checks(
     graph.create_edge(
         &read_old_child_node,
         &diff_node,
-        QueryGraphDependency::ProjectedDataSinkDependency(
+        QueryGraphDependency::ProjectedDataDependency(
             child_model_identifier.clone(),
             RowSink::All(&RightSideDiffInput),
             None,
@@ -207,7 +200,7 @@ pub fn insert_1to1_idempotent_connect_checks(
     graph.create_edge(
         &diff_node,
         &if_node,
-        QueryGraphDependency::ProjectedDataSinkDependency(child_model_identifier, RowSink::All(&IfInput), None),
+        QueryGraphDependency::ProjectedDataDependency(child_model_identifier, RowSink::All(&IfInput), None),
     )?;
     let empty_node = graph.create_node(Node::Empty);
 
@@ -325,7 +318,7 @@ pub fn insert_existing_1to1_related_model_checks(
     graph.create_edge(
         &read_existing_children,
         &if_node,
-        QueryGraphDependency::ProjectedDataSinkDependency(
+        QueryGraphDependency::ProjectedDataDependency(
             child_model_identifier.clone(),
             RowSink::All(&IfInput),
             // If the other side ("child") requires the connection, we need to make sure that there isn't a child already connected
@@ -342,7 +335,7 @@ pub fn insert_existing_1to1_related_model_checks(
     graph.create_edge(
         &read_existing_children,
         &update_existing_child,
-        QueryGraphDependency::ProjectedDataSinkDependency(
+        QueryGraphDependency::ProjectedDataDependency(
             child_model_identifier,
             RowSink::ExactlyOne(&UpdateManyRecordsSelectorsInput),
             Some(DataExpectation::non_empty_rows(
@@ -475,7 +468,7 @@ pub fn emulate_on_delete_restrict(
         &noop_node,
         QueryGraphDependency::ProjectedDataDependency(
             child_model_identifier,
-            Box::new(move |noop_node, _| Ok(noop_node)),
+            RowSink::Discard,
             Some(DataExpectation::empty_rows(RelationViolation::from(relation_field))),
         ),
     )?;
@@ -546,13 +539,7 @@ pub fn emulate_on_delete_cascade(
         &delete_dependents_node,
         QueryGraphDependency::ProjectedDataDependency(
             child_model_identifier,
-            Box::new(move |mut delete_dependents_node, dependent_ids| {
-                if let Node::Query(Query::Write(WriteQuery::DeleteManyRecords(ref mut dmr))) = delete_dependents_node {
-                    dmr.record_filter = dependent_ids.into();
-                }
-
-                Ok(delete_dependents_node)
-            }),
+            RowSink::All(&DeleteManyRecordsSelectorsInput),
             None,
         ),
     )?;
@@ -641,14 +628,7 @@ pub fn emulate_on_delete_set_null(
         &set_null_dependents_node,
         QueryGraphDependency::ProjectedDataDependency(
             child_model_identifier,
-            Box::new(move |mut set_null_dependents_node, dependent_ids| {
-                if let Node::Query(Query::Write(WriteQuery::UpdateManyRecords(ref mut dmr))) = set_null_dependents_node
-                {
-                    dmr.record_filter = dependent_ids.into();
-                }
-
-                Ok(set_null_dependents_node)
-            }),
+            RowSink::All(&UpdateManyRecordsSelectorsInput),
             None,
         ),
     )?;
@@ -795,14 +775,7 @@ pub fn emulate_on_update_set_null(
         &set_null_dependents_node,
         QueryGraphDependency::ProjectedDataDependency(
             child_model_identifier,
-            Box::new(move |mut set_null_dependents_node, dependent_ids| {
-                if let Node::Query(Query::Write(WriteQuery::UpdateManyRecords(ref mut dmr))) = set_null_dependents_node
-                {
-                    dmr.record_filter = dependent_ids.into();
-                }
-
-                Ok(set_null_dependents_node)
-            }),
+            RowSink::All(&UpdateManyRecordsSelectorsInput),
             None,
         ),
     )?;
@@ -868,7 +841,7 @@ pub fn emulate_on_update_restrict(
         &noop_node,
         QueryGraphDependency::ProjectedDataDependency(
             child_model_identifier,
-            Box::new(move |noop_node, _| Ok(noop_node)),
+            RowSink::Discard,
             // If any linking fields are to be updated and there are already connected children, then fail
             if linking_fields_updated {
                 Some(DataExpectation::empty_rows(RelationViolation::from(relation_field)))
@@ -952,7 +925,7 @@ pub fn insert_emulated_on_update_with_intermediary_node(
     graph.create_edge(
         parent_node,
         &join_node,
-        QueryGraphDependency::ProjectedDataSinkDependency(
+        QueryGraphDependency::ProjectedDataDependency(
             model_to_update.shard_aware_primary_identifier(),
             RowSink::All(&ReturnInput),
             None,
@@ -1124,13 +1097,7 @@ pub fn emulate_on_update_cascade(
         &update_dependents_node,
         QueryGraphDependency::ProjectedDataDependency(
             child_model_identifier,
-            Box::new(move |mut update_dependents_node, dependent_ids| {
-                if let Node::Query(Query::Write(WriteQuery::UpdateManyRecords(ref mut dmr))) = update_dependents_node {
-                    dmr.record_filter = dependent_ids.into();
-                }
-
-                Ok(update_dependents_node)
-            }),
+            RowSink::All(&UpdateManyRecordsSelectorsInput),
             None,
         ),
     )?;

@@ -23,97 +23,115 @@ impl NodeInputField<[WriteArgs]> for UpdateOrCreateArgsInput {
     }
 }
 
-#[derive(Debug)]
-pub(crate) struct RecordQueryFilterInput;
+macro_rules! node_input_field {
+    ($name:ident,
+     $type:ty,
+     $variant:pat => $expr:expr
+    ) => {
+        #[derive(Debug)]
+        pub(crate) struct $name;
 
-impl NodeInputField<Filter> for RecordQueryFilterInput {
-    fn node_input_field<'a>(&self, node: &'a mut crate::Node) -> &'a mut Filter {
-        if let Node::Query(Query::Read(ReadQuery::RecordQuery(rq))) = node {
-            rq.filter.get_or_insert(Filter::empty())
-        } else {
-            panic!("RecordQueryFilterInput can only be used with RecordQuery node")
+        impl NodeInputField<$type> for $name {
+            fn node_input_field<'a>(&self, node: &'a mut crate::Node) -> &'a mut $type {
+                if let $variant = node {
+                    $expr
+                } else {
+                    panic!(
+                        "{}",
+                        concat!(stringify!($name), " can only be used with ", stringify!($variant))
+                    )
+                }
+            }
         }
-    }
+    };
 }
 
-#[derive(Debug)]
-pub(crate) struct UpdateRecordSelectorsInput;
+node_input_field!(
+    RecordQueryFilterInput,
+    Filter,
+    Node::Query(Query::Read(ReadQuery::RecordQuery(rq))) => rq.filter.get_or_insert(Filter::empty())
+);
 
-impl NodeInputField<Vec<SelectionResult>> for UpdateRecordSelectorsInput {
-    fn node_input_field<'a>(&self, node: &'a mut crate::Node) -> &'a mut Vec<SelectionResult> {
-        if let Node::Query(Query::Write(WriteQuery::UpdateRecord(ur))) = node {
-            ur.record_filter_mut().selectors.get_or_insert_default()
-        } else {
-            panic!("UpdateRecordFilterInput can only be used with UpdateRecord node")
-        }
-    }
-}
+node_input_field!(
+    ManyRecordsQueryFilterInput,
+    Filter,
+    Node::Query(Query::Read(ReadQuery::ManyRecordsQuery(mrq))) => mrq.args.filter.get_or_insert(Filter::empty())
+);
 
-#[derive(Debug)]
-pub(crate) struct UpdateManyRecordsSelectorsInput;
+node_input_field!(
+    UpdateRecordSelectorsInput,
+    Vec<SelectionResult>,
+    Node::Query(Query::Write(WriteQuery::UpdateRecord(ur))) => ur.record_filter_mut().selectors.get_or_insert_default()
+);
 
-impl NodeInputField<Vec<SelectionResult>> for UpdateManyRecordsSelectorsInput {
-    fn node_input_field<'a>(&self, node: &'a mut crate::Node) -> &'a mut Vec<SelectionResult> {
-        if let Node::Query(Query::Write(WriteQuery::UpdateManyRecords(ur))) = node {
-            ur.record_filter.selectors.get_or_insert_default()
-        } else {
-            panic!("UpdateManyRecordsFilterInput can only be used with UpdateManyRecords node")
-        }
-    }
-}
+node_input_field!(
+    UpdateManyRecordsSelectorsInput,
+    Vec<SelectionResult>,
+    Node::Query(Query::Write(WriteQuery::UpdateManyRecords(ur))) => ur.record_filter.selectors.get_or_insert_default()
+);
 
-#[derive(Debug)]
-pub(crate) struct LeftSideDiffInput;
+node_input_field!(
+    DeleteRecordSelectorsInput,
+    Vec<SelectionResult>,
+    Node::Query(Query::Write(WriteQuery::DeleteRecord(dr))) => dr.record_filter.selectors.get_or_insert_default()
+);
 
-impl NodeInputField<Vec<SelectionResult>> for LeftSideDiffInput {
-    fn node_input_field<'a>(&self, node: &'a mut Node) -> &'a mut Vec<SelectionResult> {
-        if let Node::Computation(Computation::DiffLeftToRight(diff_node) | Computation::DiffRightToLeft(diff_node)) =
-            node
-        {
-            &mut diff_node.left
-        } else {
-            panic!("LeftSideDiffInput can only be used with DiffLeftToRight or DiffRightToLeft node")
-        }
-    }
-}
+node_input_field!(
+    DeleteManyRecordsSelectorsInput,
+    Vec<SelectionResult>,
+    Node::Query(Query::Write(WriteQuery::DeleteManyRecords(dr))) => dr.record_filter.selectors.get_or_insert_default()
+);
 
-#[derive(Debug)]
-pub(crate) struct RightSideDiffInput;
+node_input_field!(
+    LeftSideDiffInput,
+    Vec<SelectionResult>,
+    Node::Computation(Computation::DiffLeftToRight(diff_node) | Computation::DiffRightToLeft(diff_node)) => &mut diff_node.left
+);
 
-impl NodeInputField<Vec<SelectionResult>> for RightSideDiffInput {
-    fn node_input_field<'a>(&self, node: &'a mut Node) -> &'a mut Vec<SelectionResult> {
-        if let Node::Computation(Computation::DiffLeftToRight(diff_node) | Computation::DiffRightToLeft(diff_node)) =
-            node
-        {
-            &mut diff_node.right
-        } else {
-            panic!("RightSideDiffInput can only be used with DiffLeftToRight or DiffRightToLeft node")
-        }
-    }
-}
+node_input_field!(
+    RightSideDiffInput,
+    Vec<SelectionResult>,
+    Node::Computation(Computation::DiffLeftToRight(diff_node) | Computation::DiffRightToLeft(diff_node)) => &mut diff_node.right
+);
 
-#[derive(Debug)]
-pub(crate) struct IfInput;
+node_input_field!(
+    IfInput,
+    Vec<SelectionResult>,
+    Node::Flow(Flow::If { data, .. }) => data
+);
 
-impl NodeInputField<Vec<SelectionResult>> for IfInput {
-    fn node_input_field<'a>(&self, node: &'a mut Node) -> &'a mut Vec<SelectionResult> {
-        if let Node::Flow(Flow::If { data, .. }) = node {
-            data
-        } else {
-            panic!("IfInput can only be used with If node")
-        }
-    }
-}
+node_input_field!(
+    ReturnInput,
+    Vec<SelectionResult>,
+    Node::Flow(Flow::Return(data)) => data
+);
 
-#[derive(Debug)]
-pub(crate) struct ReturnInput;
+node_input_field!(
+    RelatedRecordsSelectorsInput,
+    Vec<SelectionResult>,
+    Node::Query(Query::Read(ReadQuery::RelatedRecordsQuery(rq))) => rq.parent_results.get_or_insert_default()
+);
 
-impl NodeInputField<Vec<SelectionResult>> for ReturnInput {
-    fn node_input_field<'a>(&self, node: &'a mut Node) -> &'a mut Vec<SelectionResult> {
-        if let Node::Flow(Flow::Return(data)) = node {
-            data
-        } else {
-            panic!("ReturnInput can only be used with Return node")
-        }
-    }
-}
+node_input_field!(
+    ConnectParentInput,
+    Option<SelectionResult>,
+    Node::Query(Query::Write(WriteQuery::ConnectRecords(cr))) => &mut cr.parent_id
+);
+
+node_input_field!(
+    ConnectChildrenInput,
+    Vec<SelectionResult>,
+    Node::Query(Query::Write(WriteQuery::ConnectRecords(cr))) => &mut cr.child_ids
+);
+
+node_input_field!(
+    DisconnectParentInput,
+    Option<SelectionResult>,
+    Node::Query(Query::Write(WriteQuery::DisconnectRecords(dr))) => &mut dr.parent_id
+);
+
+node_input_field!(
+    DisconnectChildrenInput,
+    Vec<SelectionResult>,
+    Node::Query(Query::Write(WriteQuery::DisconnectRecords(dr))) => &mut dr.child_ids
+);

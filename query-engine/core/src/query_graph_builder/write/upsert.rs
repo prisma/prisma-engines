@@ -121,7 +121,7 @@ pub(crate) fn upsert_record(
     graph.create_edge(
         &read_parent_records_node,
         &if_node,
-        QueryGraphDependency::ProjectedDataSinkDependency(model_id.clone(), RowSink::All(&IfInput), None),
+        QueryGraphDependency::ProjectedDataDependency(model_id.clone(), RowSink::All(&IfInput), None),
     )?;
 
     // In case the connector doesn't support referential integrity, we add a subtree to the graph that emulates the ON_UPDATE referential action.
@@ -149,7 +149,7 @@ pub(crate) fn upsert_record(
     graph.create_edge(
         &read_parent_records_node,
         &update_node,
-        QueryGraphDependency::ProjectedDataSinkDependency(
+        QueryGraphDependency::ProjectedDataDependency(
             model_id.clone(),
             RowSink::ExactlyOne(&UpdateRecordSelectorsInput),
             None,
@@ -159,7 +159,7 @@ pub(crate) fn upsert_record(
     graph.create_edge(
         &update_node,
         &read_node_update,
-        QueryGraphDependency::ProjectedDataSinkDependency(
+        QueryGraphDependency::ProjectedDataDependency(
             model_id.clone(),
             RowSink::ExactlyOneFilter(&RecordQueryFilterInput),
             Some(DataExpectation::non_empty_rows(
@@ -171,7 +171,7 @@ pub(crate) fn upsert_record(
     graph.create_edge(
         &create_node,
         &read_node_create,
-        QueryGraphDependency::ProjectedDataSinkDependency(
+        QueryGraphDependency::ProjectedDataDependency(
             model_id,
             RowSink::ExactlyOneFilter(&RecordQueryFilterInput),
             Some(DataExpectation::non_empty_rows(

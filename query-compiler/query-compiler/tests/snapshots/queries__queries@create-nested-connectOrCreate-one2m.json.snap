@@ -44,7 +44,10 @@ transaction
                             params [const(BigInt(10)), const(BigInt(1)),
                                     const(BigInt(0))])
             in if (rowCountNeq 0 (get 2))
-               then let 0$id = mapField id (get 0);
+               then let 0 = unique (validate (get 0)
+                        [ rowCountNeq 0
+                        ] orRaise "MISSING_RELATED_RECORD");
+                        0$id = mapField id (get 0);
                         2 = validate (get 2)
                         [ rowCountEq 1
                         ] orRaise "INCOMPLETE_CONNECT_INPUT";
@@ -57,7 +60,10 @@ transaction
                                            RETURNING "public"."Category"."id"»
                                     params [const(BigInt(10)),
                                             const(String("JavaScript"))])
-                    in let 0$id = mapField id (get 0);
+                    in let 0 = unique (validate (get 0)
+                           [ rowCountNeq 0
+                           ] orRaise "MISSING_RELATED_RECORD");
+                           0$id = mapField id (get 0);
                            3 = validate (get 3)
                            [ rowCountEq 1
                            ] orRaise "INCOMPLETE_CONNECT_INPUT";

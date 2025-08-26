@@ -1,4 +1,5 @@
 use super::*;
+use crate::inputs::DeleteManyRecordsSelectorsInput;
 use crate::query_graph_builder::write::limit::validate_limit;
 use crate::{
     ArgumentListLookup, FilteredQuery, ParsedField,
@@ -52,7 +53,7 @@ pub(crate) fn delete_record(
         graph.create_edge(
             &delete_node,
             &check_node,
-            QueryGraphDependency::ProjectedDataSinkDependency(
+            QueryGraphDependency::ProjectedDataDependency(
                 model.shard_aware_primary_identifier(),
                 RowSink::Discard,
                 Some(DataExpectation::non_empty_rows(
@@ -96,7 +97,7 @@ pub(crate) fn delete_record(
             // is just checking if any records matched the filter.
             QueryGraphDependency::ProjectedDataDependency(
                 model.shard_aware_primary_identifier(),
-                Box::new(|delete_node, _| Ok(delete_node)),
+                RowSink::Discard,
                 Some(DataExpectation::non_empty_rows(
                     MissingRecord::builder().operation(DataOperation::Delete).build(),
                 )),
@@ -148,13 +149,7 @@ pub fn delete_many_records(
             &delete_many_node,
             QueryGraphDependency::ProjectedDataDependency(
                 model_id,
-                Box::new(|mut delete_many_node, ids| {
-                    if let Node::Query(Query::Write(WriteQuery::DeleteManyRecords(ref mut dmr))) = delete_many_node {
-                        dmr.record_filter = ids.into();
-                    }
-
-                    Ok(delete_many_node)
-                }),
+                RowSink::All(&DeleteManyRecordsSelectorsInput),
                 None,
             ),
         )?;

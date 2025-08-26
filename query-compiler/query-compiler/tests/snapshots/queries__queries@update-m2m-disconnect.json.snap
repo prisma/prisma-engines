@@ -22,9 +22,9 @@ transaction
                         "public"."Category"."id" WHERE ("public"."Category"."id"
                         = $1 AND 1=1 AND "t0"."B" IN [$2]) OFFSET $3»
                  params [const(BigInt(1)), var(0$id as Int), const(BigInt(0))]
-         in let 0 = validate (get 0)
+         in let 0 = unique (validate (get 0)
                 [ rowCountNeq 0
-                ] orRaise "MISSING_RELATED_RECORD";
+                ] orRaise "MISSING_RELATED_RECORD");
                 0$id = mapField id (get 0);
                 1$id = mapField id (get 1)
             in execute «DELETE FROM "public"."_CategoryToPost" WHERE

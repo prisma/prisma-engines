@@ -150,17 +150,13 @@ pub fn nested_upsert(
         graph.create_edge(
             &read_children_node,
             &if_node,
-            QueryGraphDependency::ProjectedDataSinkDependency(
-                child_model_identifier.clone(),
-                RowSink::All(&IfInput),
-                None,
-            ),
+            QueryGraphDependency::ProjectedDataDependency(child_model_identifier.clone(), RowSink::All(&IfInput), None),
         )?;
 
         graph.create_edge(
             &read_children_node,
             &update_node,
-            QueryGraphDependency::ProjectedDataSinkDependency(
+            QueryGraphDependency::ProjectedDataDependency(
                 child_model_identifier.clone(),
                 RowSink::ExactlyOne(&UpdateRecordSelectorsInput),
                 Some(DataExpectation::non_empty_rows(
@@ -210,7 +206,7 @@ pub fn nested_upsert(
             graph.create_edge(
                 &parent_node,
                 &update_node,
-                QueryGraphDependency::ProjectedDataSinkDependency(
+                QueryGraphDependency::ProjectedDataDependency(
                     parent_model_id,
                     RowSink::ExactlyOne(&UpdateManyRecordsSelectorsInput),
                     Some(DataExpectation::non_empty_rows(
@@ -228,7 +224,7 @@ pub fn nested_upsert(
             graph.create_edge(
                 &create_node,
                 &update_node,
-                QueryGraphDependency::ProjectedDataSinkDependency(
+                QueryGraphDependency::ProjectedDataDependency(
                     child_link.clone(),
                     RowSink::ExactlyOneWriteArgs(parent_link, &UpdateOrCreateArgsInput),
                     Some(DataExpectation::non_empty_rows(
@@ -249,7 +245,7 @@ pub fn nested_upsert(
             graph.create_edge(
                 &parent_node,
                 &create_node,
-                QueryGraphDependency::ProjectedDataSinkDependency(
+                QueryGraphDependency::ProjectedDataDependency(
                     parent_link,
                     RowSink::ExactlyOneWriteArgs(child_link, &UpdateOrCreateArgsInput),
                     Some(DataExpectation::non_empty_rows(

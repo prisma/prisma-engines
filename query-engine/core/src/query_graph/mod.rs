@@ -11,8 +11,8 @@ use serde::Serialize;
 use smallvec::{SmallVec, smallvec};
 
 use crate::{
-    FilteredQuery, ManyRecordsQuery, Query, QueryGraphBuilderError, QueryGraphBuilderResult, QueryOptions, ReadQuery,
-    interpreter::ExpressionResult,
+    ManyRecordsQuery, Query, QueryGraphBuilderError, QueryGraphBuilderResult, QueryOptions, ReadQuery,
+    inputs::ManyRecordsQueryFilterInput, interpreter::ExpressionResult,
 };
 use guard::*;
 use itertools::Itertools;
@@ -21,7 +21,7 @@ use petgraph::{
     visit::{EdgeRef as PEdgeRef, NodeIndexable},
     *,
 };
-use query_structure::{FieldSelection, Filter, IntoFilter, QueryArguments, SelectionResult, WriteArgs};
+use query_structure::{FieldSelection, Filter, QueryArguments, SelectionResult, WriteArgs};
 
 pub type QueryGraphResult<T> = std::result::Result<T, QueryGraphError>;
 
@@ -135,9 +135,6 @@ impl EdgeRef {
     }
 }
 
-pub(crate) type ProjectedDataDependencyFn =
-    Box<dyn FnOnce(Node, Vec<SelectionResult>) -> QueryGraphBuilderResult<Node> + Send + Sync + 'static>;
-
 /// Stored on the edges of the QueryGraph, a QueryGraphDependency contains information on how children are connected to their parents,
 /// expressing for example the need for additional information from the parent to be able to execute at runtime.
 pub enum QueryGraphDependency {
@@ -156,9 +153,7 @@ pub enum QueryGraphDependency {
     /// Important note: As opposed to `DataDependency`, this dependency guarantees that if the closure is called, the source result contains at least the requested selection.
     /// To achieve that, the query graph is post-processed in the `finalize` and reloads are injected at points where a selection is not fulfilled.
     /// See `insert_reloads` for more information.
-    ProjectedDataDependency(FieldSelection, ProjectedDataDependencyFn, Option<DataExpectation>), // [Composites] todo rename
-
-    ProjectedDataSinkDependency(FieldSelection, RowSink, Option<DataExpectation>),
+    ProjectedDataDependency(FieldSelection, RowSink, Option<DataExpectation>),
 
     /// Only valid in the context of a `If` control flow node.
     Then,
@@ -170,14 +165,16 @@ pub enum QueryGraphDependency {
 #[derive(Debug)]
 pub enum RowSink {
     /// Store a single row to the node input field.
-    Single(&'static dyn NodeInputField<SelectionResult>),
+    Single(&'static dyn NodeInputField<Option<SelectionResult>>),
     /// Store all rows to the node input field.
     All(&'static dyn NodeInputField<Vec<SelectionResult>>),
     /// Store at most one row to the node input field.
     AtMostOne(&'static dyn NodeInputField<Vec<SelectionResult>>),
     /// Store an array of exactly one row to the node input field.
     ExactlyOne(&'static dyn NodeInputField<Vec<SelectionResult>>),
-    /// Store exactly one filter to the node input field.
+    /// Store a filter representing all rows to the node input field.
+    AllFilter(&'static dyn NodeInputField<Filter>),
+    /// Store a filter representing exactly one row to the node input field.
     ExactlyOneFilter(&'static dyn NodeInputField<Filter>),
     /// Inject write arguments based on selection retrieved from exactly one row.
     ExactlyOneWriteArgs(FieldSelection, &'static dyn NodeInputField<[WriteArgs]>),
@@ -841,12 +838,14 @@ impl QueryGraph {
             let out_edges = self.outgoing_edges(&return_node);
             let dependencies: Vec<FieldSelection> = out_edges
                 .into_iter()
-                .filter_map(|edge| match self.edge_content(&edge).unwrap() {
-                    QueryGraphDependency::ProjectedDataDependency(requested_selection, _, _)
-                    | QueryGraphDependency::ProjectedDataSinkDependency(requested_selection, _, _) => {
+                .filter_map(|edge| {
+                    if let QueryGraphDependency::ProjectedDataDependency(requested_selection, _, _) =
+                        self.edge_content(&edge).unwrap()
+                    {
                         Some(requested_selection.clone())
+                    } else {
+                        None
                     }
-                    _ => None,
                 })
                 .collect();
             let dependencies = FieldSelection::union(dependencies);
@@ -857,10 +856,7 @@ impl QueryGraph {
             let incoming_dep_edge = in_edges.into_iter().find(|edge| {
                 matches!(
                     self.edge_content(edge),
-                    Some(
-                        QueryGraphDependency::ProjectedDataDependency(_, _, _)
-                            | QueryGraphDependency::ProjectedDataSinkDependency(_, _, _)
-                    )
+                    Some(QueryGraphDependency::ProjectedDataDependency(_, _, _))
                 )
             });
 
@@ -871,28 +867,13 @@ impl QueryGraph {
                     .remove_edge(incoming_edge)
                     .expect("Expected edges between marked nodes to be non-empty.");
 
-                match content {
-                    QueryGraphDependency::ProjectedDataDependency(existing, transformer, expectation) => {
-                        let merged_dependencies = dependencies.merge(existing);
-                        self.create_edge(
-                            &source,
-                            &target,
-                            QueryGraphDependency::ProjectedDataDependency(
-                                merged_dependencies,
-                                transformer,
-                                expectation,
-                            ),
-                        )?;
-                    }
-                    QueryGraphDependency::ProjectedDataSinkDependency(existing, sink, expectation) => {
-                        let merged_dependencies = dependencies.merge(existing);
-                        self.create_edge(
-                            &source,
-                            &target,
-                            QueryGraphDependency::ProjectedDataSinkDependency(merged_dependencies, sink, expectation),
-                        )?;
-                    }
-                    _ => (),
+                if let QueryGraphDependency::ProjectedDataDependency(existing, sink, expectation) = content {
+                    let merged_dependencies = dependencies.merge(existing);
+                    self.create_edge(
+                        &source,
+                        &target,
+                        QueryGraphDependency::ProjectedDataDependency(merged_dependencies, sink, expectation),
+                    )?;
                 }
             }
         }
@@ -988,13 +969,7 @@ impl QueryGraph {
                 &reload_node,
                 QueryGraphDependency::ProjectedDataDependency(
                     primary_model_id,
-                    Box::new(|mut reload_node, parent_result| {
-                        if let Node::Query(Query::Read(ReadQuery::ManyRecordsQuery(ref mut mr))) = reload_node {
-                            mr.set_filter(parent_result.filter());
-                        }
-
-                        Ok(reload_node)
-                    }),
+                    RowSink::AllFilter(&ManyRecordsQueryFilterInput),
                     None,
                 ),
             )?;
@@ -1103,7 +1078,6 @@ impl QueryGraph {
                         .into_iter()
                         .filter_map(|edge| match self.edge_content(&edge).unwrap() {
                             QueryGraphDependency::ProjectedDataDependency(requested_selection, _, _)
-                            | QueryGraphDependency::ProjectedDataSinkDependency(requested_selection, _, _)
                                 if !q.satisfies(requested_selection) =>
                             {
                                 Some(requested_selection.clone())

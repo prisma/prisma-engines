@@ -109,20 +109,10 @@ impl Display for QueryGraphDependency {
         match self {
             Self::ExecutionOrder => write!(f, "ExecutionOrder"),
             Self::DataDependency(_, _) => write!(f, "ParentResult"),
-            Self::ProjectedDataDependency(selection, _, _) => {
+            Self::ProjectedDataDependency(selection, sink, _) => {
                 write!(
                     f,
-                    "ProjectedDataDependency ({:?})",
-                    selection
-                        .selections()
-                        .map(|f| format!("{}.{}", f.container().name(), f.prisma_name()))
-                        .collect::<Vec<_>>()
-                )
-            }
-            Self::ProjectedDataSinkDependency(selection, sink, _) => {
-                write!(
-                    f,
-                    "ProjectedDataSinkDependency({sink:?}) {:?}",
+                    "ProjectedDataDependency({sink:?}) {:?}",
                     selection
                         .selections()
                         .map(|f| format!("{}.{}", f.container().name(), f.prisma_name()))

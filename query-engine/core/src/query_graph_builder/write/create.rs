@@ -40,7 +40,7 @@ pub(crate) fn create_record(
         graph.create_edge(
             &create_node,
             &read_node,
-            QueryGraphDependency::ProjectedDataSinkDependency(
+            QueryGraphDependency::ProjectedDataDependency(
                 model.shard_aware_primary_identifier(),
                 RowSink::ExactlyOneFilter(&RecordQueryFilterInput),
                 Some(DataExpectation::non_empty_rows(

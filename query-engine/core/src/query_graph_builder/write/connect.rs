@@ -1,7 +1,8 @@
 use crate::{
-    DataExpectation, IncompleteConnectInput, QueryGraphBuilderError, QueryGraphBuilderResult,
+    DataExpectation, DataOperation, IncompleteConnectInput, MissingRelatedRecord, QueryGraphBuilderResult, RowSink,
+    inputs::{ConnectChildrenInput, ConnectParentInput},
     query_ast::*,
-    query_graph::{Node, NodeRef, QueryGraph, QueryGraphDependency},
+    query_graph::{NodeRef, QueryGraph, QueryGraphDependency},
 };
 use query_structure::RelationFieldRef;
 
@@ -59,23 +60,14 @@ pub(crate) fn connect_records_node(
         &connect_node,
         QueryGraphDependency::ProjectedDataDependency(
             parent_model_id,
-            Box::new(|mut connect_node, mut parent_ids| {
-                let len = parent_ids.len();
-
-                if len == 0 {
-                    return Err(QueryGraphBuilderError::AssertionError(
-                        "Required exactly one parent ID to be present for connect query, found 0.".to_string(),
-                    ));
-                }
-
-                if let Node::Query(Query::Write(WriteQuery::ConnectRecords(ref mut c))) = connect_node {
-                    let parent_id = parent_ids.pop().unwrap();
-                    c.parent_id = Some(parent_id);
-                }
-
-                Ok(connect_node)
-            }),
-            None,
+            RowSink::Single(&ConnectParentInput),
+            Some(DataExpectation::non_empty_rows(
+                MissingRelatedRecord::builder()
+                    .model(&parent_relation_field.model())
+                    .relation(&parent_relation_field.relation())
+                    .operation(DataOperation::Connect)
+                    .build(),
+            )),
         ),
     )?;
 
@@ -85,13 +77,7 @@ pub(crate) fn connect_records_node(
         &connect_node,
         QueryGraphDependency::ProjectedDataDependency(
             child_model_id,
-            Box::new(move |mut connect_node, child_ids| {
-                if let Node::Query(Query::Write(WriteQuery::ConnectRecords(ref mut c))) = connect_node {
-                    c.child_ids = child_ids;
-                }
-
-                Ok(connect_node)
-            }),
+            RowSink::All(&ConnectChildrenInput),
             Some(DataExpectation::exact_row_count(
                 expected_connects,
                 IncompleteConnectInput::builder()

@@ -37,7 +37,10 @@ transaction
                                    VALUES ($1) RETURNING
                                    "public"."Category"."id"»
                             params [const(String("cooking"))])
-            in let 1$id = mapField id (get 1);
+            in let 1 = unique (validate (get 1)
+                   [ rowCountNeq 0
+                   ] orRaise "MISSING_RELATED_RECORD");
+                   1$id = mapField id (get 1);
                    2 = validate (get 2)
                    [ rowCountEq 1
                    ] orRaise "INCOMPLETE_CONNECT_INPUT";
