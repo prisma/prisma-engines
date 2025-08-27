@@ -11,6 +11,7 @@ mod json_unquote;
 mod lower;
 mod maximum;
 mod minimum;
+mod now;
 mod row_number;
 mod row_to_json;
 mod search;
@@ -32,6 +33,7 @@ pub use json_unquote::*;
 pub use lower::*;
 pub use maximum::*;
 pub use minimum::*;
+pub use now::*;
 pub use row_number::*;
 pub use row_to_json::*;
 pub use search::*;
@@ -90,6 +92,7 @@ pub(crate) enum FunctionType<'a> {
     UuidToBin,
     UuidToBinSwapped,
     Uuid,
+    Now,
 }
 
 impl<'a> Aliasable<'a> for Function<'a> {

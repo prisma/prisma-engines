@@ -19,16 +19,16 @@ impl UpdateDataInputFieldMapper {
 impl DataInputFieldMapper for UpdateDataInputFieldMapper {
     fn map_scalar<'a>(&self, ctx: &'a QuerySchema, sf: ScalarFieldRef) -> InputField<'a> {
         let base_update_type = match sf.type_identifier() {
-            TypeIdentifier::Float => InputType::object(update_operations_object_type(ctx, "Float", sf.clone(), true)),
+            TypeIdentifier::Float => InputType::object(update_operations_object_type(ctx, "Float", sf.clone(), true, false)),
             TypeIdentifier::Decimal => {
-                InputType::object(update_operations_object_type(ctx, "Decimal", sf.clone(), true))
+                InputType::object(update_operations_object_type(ctx, "Decimal", sf.clone(), true, false))
             }
-            TypeIdentifier::Int => InputType::object(update_operations_object_type(ctx, "Int", sf.clone(), true)),
-            TypeIdentifier::BigInt => InputType::object(update_operations_object_type(ctx, "BigInt", sf.clone(), true)),
+            TypeIdentifier::Int => InputType::object(update_operations_object_type(ctx, "Int", sf.clone(), true, false)),
+            TypeIdentifier::BigInt => InputType::object(update_operations_object_type(ctx, "BigInt", sf.clone(), true, false)),
             TypeIdentifier::String => {
-                InputType::object(update_operations_object_type(ctx, "String", sf.clone(), false))
+                InputType::object(update_operations_object_type(ctx, "String", sf.clone(), false, false))
             }
-            TypeIdentifier::Boolean => InputType::object(update_operations_object_type(ctx, "Bool", sf.clone(), false)),
+            TypeIdentifier::Boolean => InputType::object(update_operations_object_type(ctx, "Bool", sf.clone(), false, false)),
             TypeIdentifier::Enum(enum_id) => {
                 let enum_name = ctx.internal_data_model.walk(enum_id).name();
                 InputType::object(update_operations_object_type(
@@ -36,14 +36,15 @@ impl DataInputFieldMapper for UpdateDataInputFieldMapper {
                     &format!("Enum{enum_name}"),
                     sf.clone(),
                     false,
+                    false,
                 ))
             }
             TypeIdentifier::Json => map_scalar_input_type_for_field(ctx, &sf),
             TypeIdentifier::DateTime => {
-                InputType::object(update_operations_object_type(ctx, "DateTime", sf.clone(), false))
+                InputType::object(update_operations_object_type(ctx, "DateTime", sf.clone(), false, true))
             }
-            TypeIdentifier::UUID => InputType::object(update_operations_object_type(ctx, "Uuid", sf.clone(), false)),
-            TypeIdentifier::Bytes => InputType::object(update_operations_object_type(ctx, "Bytes", sf.clone(), false)),
+            TypeIdentifier::UUID => InputType::object(update_operations_object_type(ctx, "Uuid", sf.clone(), false, false)),
+            TypeIdentifier::Bytes => InputType::object(update_operations_object_type(ctx, "Bytes", sf.clone(), false, false)),
 
             TypeIdentifier::Unsupported => unreachable!("No unsupported field should reach that path"),
         };
@@ -160,6 +161,7 @@ fn update_operations_object_type<'a>(
     prefix: &str,
     sf: ScalarField,
     with_number_operators: bool,
+    with_datetime_operators: bool,
 ) -> InputObjectType<'a> {
     let ident = Identifier::new_prisma(IdentifierType::FieldUpdateOperationsInput(
         !sf.is_required(),
@@ -182,6 +184,10 @@ fn update_operations_object_type<'a>(
             fields.push(simple_input_field(operations::DECREMENT, typ.clone(), None).optional());
             fields.push(simple_input_field(operations::MULTIPLY, typ.clone(), None).optional());
             fields.push(simple_input_field(operations::DIVIDE, typ, None).optional());
+        }
+
+        if with_datetime_operators {
+            fields.push(InputField::new(operations::NOW.into(), vec![], None, false));
         }
 
         if ctx.has_capability(ConnectorCapability::UndefinedType) && !sf.is_required() {
