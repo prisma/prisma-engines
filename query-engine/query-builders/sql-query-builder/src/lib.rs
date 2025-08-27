@@ -194,6 +194,7 @@ impl<'a, V: Visitor<'a>> QueryBuilder for SqlQueryBuilder<'a, V> {
 
         let columns = ModelProjection::from(selected_fields)
             .as_columns(&self.context)
+            .mark_all_selected()
             .map(|col| col.table(rf.related_model().as_table(&self.context)))
             // Add an m2m column with an alias to make it possible to join it outside of this
             // function.
