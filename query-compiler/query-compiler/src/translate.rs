@@ -284,12 +284,7 @@ impl<'a, 'b> NodeTranslator<'a, 'b> {
     fn transform_node(&mut self, mut node: Node) -> TranslateResult<Node> {
         for edge in self.parent_edges {
             match self.graph.take_edge(edge) {
-                Some(QueryGraphDependency::ProjectedDataDependency(selection, f, _)) => {
-                    let fields = self.process_edge_selections(edge, &node, selection);
-                    node = f(node, vec![SelectionResult::new(fields)])?;
-                }
-
-                Some(QueryGraphDependency::ProjectedDataSinkDependency(selection, sink, _)) => {
+                Some(QueryGraphDependency::ProjectedDataDependency(selection, sink, _)) => {
                     let fields = self.process_edge_selections(edge, &node, selection);
 
                     match sink {
@@ -297,9 +292,9 @@ impl<'a, 'b> NodeTranslator<'a, 'b> {
                             *field.node_input_field(&mut node) = vec![SelectionResult::new(fields)];
                         }
                         RowSink::Single(field) => {
-                            *field.node_input_field(&mut node) = SelectionResult::new(fields);
+                            *field.node_input_field(&mut node) = Some(SelectionResult::new(fields));
                         }
-                        RowSink::ExactlyOneFilter(field) => {
+                        RowSink::AllFilter(field) | RowSink::ExactlyOneFilter(field) => {
                             *field.node_input_field(&mut node) = SelectionResult::new(fields).filter();
                         }
                         RowSink::ExactlyOneWriteArgs(selection, field) => {
@@ -435,17 +430,14 @@ impl<'a, 'b> NodeTranslator<'a, 'b> {
             .into_iter()
             .flat_map(|edge| {
                 let edge_content = self.graph.edge_content(&edge);
-                let Some(
-                    QueryGraphDependency::ProjectedDataDependency(selection, _, expectation)
-                    | QueryGraphDependency::ProjectedDataSinkDependency(selection, _, expectation),
-                ) = edge_content
+                let Some(QueryGraphDependency::ProjectedDataDependency(selection, _, expectation)) = edge_content
                 else {
                     return Either::Left(std::iter::empty());
                 };
 
                 let requires_unique = matches!(
                     edge_content,
-                    Some(QueryGraphDependency::ProjectedDataSinkDependency(_, sink, _))
+                    Some(QueryGraphDependency::ProjectedDataDependency(_, sink, _))
                         if sink.is_unique()
                 );
 

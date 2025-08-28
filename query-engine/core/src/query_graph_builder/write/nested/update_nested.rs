@@ -95,7 +95,7 @@ pub fn nested_update(
         graph.create_edge(
             &find_child_records_node,
             &update_node,
-            QueryGraphDependency::ProjectedDataSinkDependency(
+            QueryGraphDependency::ProjectedDataDependency(
                 child_model_identifier.clone(),
                 RowSink::ExactlyOne(&UpdateRecordSelectorsInput),
                 Some(DataExpectation::non_empty_rows(
@@ -151,7 +151,7 @@ pub fn nested_update_many(
         graph.create_edge(
             &find_child_records_node,
             &update_many_node,
-            QueryGraphDependency::ProjectedDataSinkDependency(
+            QueryGraphDependency::ProjectedDataDependency(
                 child_model_identifier.clone(),
                 RowSink::All(&UpdateManyRecordsSelectorsInput),
                 None,

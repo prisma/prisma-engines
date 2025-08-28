@@ -50,7 +50,10 @@ transaction
                                params [const(BigInt(10)), const(BigInt(1)),
                                        const(BigInt(0))])
                in if (rowCountNeq 0 (get 6))
-                  then let 0$id = mapField id (get 0);
+                  then let 0 = unique (validate (get 0)
+                           [ rowCountNeq 0
+                           ] orRaise "MISSING_RELATED_RECORD");
+                           0$id = mapField id (get 0);
                            6 = validate (get 6)
                            [ rowCountEq 1
                            ] orRaise "INCOMPLETE_CONNECT_INPUT";
@@ -66,7 +69,10 @@ transaction
                                               "public"."Category"."id"»
                                        params [const(BigInt(10)),
                                                const(String("Mushrooms"))])
-                       in let 0$id = mapField id (get 0);
+                       in let 0 = unique (validate (get 0)
+                              [ rowCountNeq 0
+                              ] orRaise "MISSING_RELATED_RECORD");
+                              0$id = mapField id (get 0);
                               7 = validate (get 7)
                               [ rowCountEq 1
                               ] orRaise "INCOMPLETE_CONNECT_INPUT";

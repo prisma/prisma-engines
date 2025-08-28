@@ -1,7 +1,8 @@
 use crate::{
-    DataExpectation, DataOperation, MissingRelatedRecord, QueryGraphBuilderResult,
+    DataExpectation, DataOperation, MissingRelatedRecord, QueryGraphBuilderResult, RowSink,
+    inputs::{DisconnectChildrenInput, DisconnectParentInput},
     query_ast::*,
-    query_graph::{Node, NodeRef, QueryGraph, QueryGraphDependency},
+    query_graph::{NodeRef, QueryGraph, QueryGraphDependency},
 };
 use query_structure::RelationFieldRef;
 
@@ -57,15 +58,7 @@ pub(crate) fn disconnect_records_node(
         &disconnect_node,
         QueryGraphDependency::ProjectedDataDependency(
             parent_model_id,
-            Box::new(move |mut disconnect_node, mut parent_ids| {
-                let parent_id = parent_ids.pop().expect("parent id should be present");
-
-                if let Node::Query(Query::Write(WriteQuery::DisconnectRecords(ref mut c))) = disconnect_node {
-                    c.parent_id = Some(parent_id);
-                }
-
-                Ok(disconnect_node)
-            }),
+            RowSink::Single(&DisconnectParentInput),
             Some(DataExpectation::non_empty_rows(
                 MissingRelatedRecord::builder()
                     .model(&parent_relation_field.model())
@@ -80,17 +73,7 @@ pub(crate) fn disconnect_records_node(
     graph.create_edge(
         child_node,
         &disconnect_node,
-        QueryGraphDependency::ProjectedDataDependency(
-            child_model_id,
-            Box::new(move |mut disconnect_node, child_ids| {
-                if let Node::Query(Query::Write(WriteQuery::DisconnectRecords(ref mut c))) = disconnect_node {
-                    c.child_ids = child_ids;
-                }
-
-                Ok(disconnect_node)
-            }),
-            None,
-        ),
+        QueryGraphDependency::ProjectedDataDependency(child_model_id, RowSink::All(&DisconnectChildrenInput), None),
     )?;
 
     Ok(disconnect_node)

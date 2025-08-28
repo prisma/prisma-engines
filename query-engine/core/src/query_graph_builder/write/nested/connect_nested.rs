@@ -173,7 +173,7 @@ fn handle_one_to_many(
         graph.create_edge(
             &parent_node,
             &read_children_node,
-            QueryGraphDependency::ProjectedDataSinkDependency(
+            QueryGraphDependency::ProjectedDataDependency(
                 child_link,
                 RowSink::ExactlyOneWriteArgs(parent_link, &UpdateOrCreateArgsInput),
                 Some(DataExpectation::non_empty_rows(
@@ -194,7 +194,7 @@ fn handle_one_to_many(
         graph.create_edge(
             &parent_node,
             &update_node,
-            QueryGraphDependency::ProjectedDataSinkDependency(
+            QueryGraphDependency::ProjectedDataDependency(
                 parent_link,
                 RowSink::ExactlyOneWriteArgs(child_link, &UpdateOrCreateArgsInput),
                 Some(DataExpectation::non_empty_rows(
@@ -403,7 +403,7 @@ fn handle_one_to_one_parent_update(
         graph.create_edge(
             &read_new_child_node,
             &update_children_node,
-            QueryGraphDependency::ProjectedDataSinkDependency(
+            QueryGraphDependency::ProjectedDataDependency(
                 child_model_identifier,
                 RowSink::ExactlyOne(&UpdateManyRecordsSelectorsInput),
                 Some(DataExpectation::non_empty_rows(
@@ -425,7 +425,7 @@ fn handle_one_to_one_parent_update(
         graph.create_edge(
             &parent_node,
             &update_children_node,
-            QueryGraphDependency::ProjectedDataSinkDependency(
+            QueryGraphDependency::ProjectedDataDependency(
                 parent_linking_fields,
                 RowSink::ExactlyOneWriteArgs(child_linking_fields, &UpdateOrCreateArgsInput),
                 Some(DataExpectation::non_empty_rows(
@@ -448,7 +448,7 @@ fn handle_one_to_one_parent_update(
         graph.create_edge(
             &read_new_child_node,
             &update_parent_node,
-            QueryGraphDependency::ProjectedDataSinkDependency(
+            QueryGraphDependency::ProjectedDataDependency(
                 child_linking_fields,
                 RowSink::ExactlyOneWriteArgs(parent_linking_fields, &UpdateOrCreateArgsInput),
                 Some(DataExpectation::non_empty_rows(
@@ -472,7 +472,7 @@ fn handle_one_to_one_parent_update(
         graph.create_edge(
             &parent_node,
             &update_parent_node,
-            QueryGraphDependency::ProjectedDataSinkDependency(
+            QueryGraphDependency::ProjectedDataDependency(
                 parent_model_identifier,
                 RowSink::ExactlyOne(&UpdateManyRecordsSelectorsInput),
                 Some(DataExpectation::non_empty_rows(
@@ -520,7 +520,7 @@ fn handle_one_to_one_parent_create(
     graph.create_edge(
         &parent_node,
         &read_new_child_node,
-        QueryGraphDependency::ProjectedDataSinkDependency(
+        QueryGraphDependency::ProjectedDataDependency(
             child_linking_fields,
             // This takes care of cases where the relation is inlined, CREATE ONLY. See doc comment for explanation.
             if relation_inlined_parent {
@@ -555,7 +555,7 @@ fn handle_one_to_one_parent_create(
         graph.create_edge(
             &read_new_child_node,
             &update_children_node,
-            QueryGraphDependency::ProjectedDataSinkDependency(
+            QueryGraphDependency::ProjectedDataDependency(
                 child_model_identifier,
                 RowSink::ExactlyOne(&UpdateManyRecordsSelectorsInput),
                 Some(DataExpectation::non_empty_rows(
@@ -571,7 +571,7 @@ fn handle_one_to_one_parent_create(
         graph.create_edge(
             &parent_node,
             &update_children_node,
-            QueryGraphDependency::ProjectedDataSinkDependency(
+            QueryGraphDependency::ProjectedDataDependency(
                 parent_linking_fields,
                 RowSink::ExactlyOneWriteArgs(child_linking_fields, &UpdateOrCreateArgsInput),
                 Some(DataExpectation::non_empty_rows(

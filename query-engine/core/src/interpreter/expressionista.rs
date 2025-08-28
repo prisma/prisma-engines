@@ -366,16 +366,7 @@ impl Expressionista {
                                     }?;
 
                                     let res = match dependency {
-                                        QueryGraphDependency::ProjectedDataDependency(selection, f, expectation) => {
-                                            expectation
-                                                .map(|expect| expect.check(binding))
-                                                .transpose()
-                                                .map_err(Into::into)
-                                                .and(binding.as_selection_results(&selection))
-                                                .and_then(|parent_selections| Ok(f(node, parent_selections)?))
-                                        }
-
-                                        QueryGraphDependency::ProjectedDataSinkDependency(
+                                        QueryGraphDependency::ProjectedDataDependency(
                                             selection,
                                             consumer,
                                             expectation,
@@ -390,7 +381,7 @@ impl Expressionista {
                                                         let row = parent_selections.pop().expect(
                                                             "parent selection should be present after validation",
                                                         );
-                                                        *field.node_input_field(&mut node) = row;
+                                                        *field.node_input_field(&mut node) = Some(row);
                                                     }
                                                     RowSink::All(field) => {
                                                         *field.node_input_field(&mut node) = parent_selections
@@ -404,6 +395,10 @@ impl Expressionista {
                                                             "parent selection should be present after validation",
                                                         );
                                                         *field.node_input_field(&mut node) = vec![row];
+                                                    }
+                                                    RowSink::AllFilter(filter) => {
+                                                        *filter.node_input_field(&mut node) =
+                                                            parent_selections.filter();
                                                     }
                                                     RowSink::ExactlyOneFilter(filter) => {
                                                         let row = parent_selections.pop().expect(
@@ -466,8 +461,7 @@ impl Expressionista {
             .into_iter()
             .filter_map(|edge| match graph.pluck_edge(&edge) {
                 x @ (QueryGraphDependency::DataDependency(_, _)
-                | QueryGraphDependency::ProjectedDataDependency(_, _, _)
-                | QueryGraphDependency::ProjectedDataSinkDependency(_, _, _)) => {
+                | QueryGraphDependency::ProjectedDataDependency(_, _, _)) => {
                     let parent_binding_name = graph.edge_source(&edge).id();
                     Some((parent_binding_name, x))
                 }

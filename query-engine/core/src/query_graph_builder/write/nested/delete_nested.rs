@@ -1,8 +1,9 @@
 use super::*;
 use crate::{
-    DataExpectation, ParsedInputMap, ParsedInputValue,
+    DataExpectation, ParsedInputMap, ParsedInputValue, RowSink,
+    inputs::{DeleteManyRecordsSelectorsInput, DeleteRecordSelectorsInput},
     query_ast::*,
-    query_graph::{Node, NodeRef, QueryGraph, QueryGraphDependency},
+    query_graph::{NodeRef, QueryGraph, QueryGraphDependency},
 };
 use query_structure::{Filter, Model, PrismaValue, RecordFilter, RelationFieldRef};
 use std::convert::TryInto;
@@ -59,13 +60,7 @@ pub fn nested_delete(
             &delete_many_node,
             QueryGraphDependency::ProjectedDataDependency(
                 child_model_identifier,
-                Box::new(move |mut delete_many_node, child_ids| {
-                    if let Node::Query(Query::Write(WriteQuery::DeleteManyRecords(ref mut dmr))) = delete_many_node {
-                        dmr.record_filter = child_ids.into();
-                    }
-
-                    Ok(delete_many_node)
-                }),
+                RowSink::All(&DeleteManyRecordsSelectorsInput),
                 Some(DataExpectation::exact_row_count(
                     filter_len,
                     RecordsNotConnected::builder()
@@ -108,15 +103,7 @@ pub fn nested_delete(
                 &delete_record_node,
                 QueryGraphDependency::ProjectedDataDependency(
                     child_model_identifier,
-                    Box::new(move |mut delete_record_node, mut child_ids| {
-                        let child_id = child_ids.pop().expect("child id should be present");
-
-                        if let Node::Query(Query::Write(WriteQuery::DeleteRecord(ref mut dq))) = delete_record_node {
-                            dq.set_selectors(vec![child_id]);
-                        }
-
-                        Ok(delete_record_node)
-                    }),
+                    RowSink::ExactlyOne(&DeleteRecordSelectorsInput),
                     Some(DataExpectation::non_empty_rows(
                         MissingRelatedRecord::builder()
                             .model(child_model)
@@ -165,13 +152,7 @@ pub fn nested_delete_many(
             &delete_many_node,
             QueryGraphDependency::ProjectedDataDependency(
                 child_model_identifier.clone(),
-                Box::new(move |mut delete_many_node, child_ids| {
-                    if let Node::Query(Query::Write(WriteQuery::DeleteManyRecords(ref mut dmr))) = delete_many_node {
-                        dmr.record_filter = child_ids.into();
-                    }
-
-                    Ok(delete_many_node)
-                }),
+                RowSink::All(&DeleteManyRecordsSelectorsInput),
                 None,
             ),
         )?;
