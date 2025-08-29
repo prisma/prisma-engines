@@ -1,9 +1,6 @@
 use itertools::Itertools;
 use quaint::ast::*;
 use query_structure::*;
-use schema::constants::aggregations::{
-    UNDERSCORE_AVG, UNDERSCORE_COUNT, UNDERSCORE_MAX, UNDERSCORE_MIN, UNDERSCORE_SUM,
-};
 
 use crate::{
     context::Context,
@@ -180,77 +177,14 @@ pub fn aggregate(
     model: &Model,
     selections: &[AggregationSelection],
     args: QueryArguments,
-    alias: impl AliasGenerator,
     ctx: &Context<'_>,
 ) -> Select<'static> {
     let columns = extract_columns(model, selections, ctx);
     let sub_query = get_records(model, columns.into_iter(), &[], args, ctx);
     let sub_table = Table::from(sub_query).alias("sub");
-
     selections.iter().fold(
         Select::from_table(sub_table).add_traceparent(ctx.traceparent),
-        |select, next_op| match next_op {
-            AggregationSelection::Field(field) => select.column(
-                alias
-                    .apply(Column::from(field.db_name().to_owned()), field)
-                    .set_is_enum(field.type_identifier().is_enum())
-                    .set_is_selected(true),
-            ),
-
-            AggregationSelection::Count { all, fields } => {
-                let select = fields.iter().fold(select, |select, next_field| {
-                    select.value(
-                        alias
-                            .with_prefix(UNDERSCORE_COUNT)
-                            .apply(count(Column::from(next_field.db_name().to_owned())), next_field),
-                    )
-                });
-
-                if all.is_some() {
-                    select.value(count(asterisk()).alias(format!("{UNDERSCORE_COUNT}._all")))
-                } else {
-                    select
-                }
-            }
-
-            AggregationSelection::Average(fields) => fields.iter().fold(select, |select, next_field| {
-                select.value(
-                    alias
-                        .with_prefix(UNDERSCORE_AVG)
-                        .apply(avg(Column::from(next_field.db_name().to_owned())), next_field),
-                )
-            }),
-
-            AggregationSelection::Sum(fields) => fields.iter().fold(select, |select, next_field| {
-                select.value(
-                    alias
-                        .with_prefix(UNDERSCORE_SUM)
-                        .apply(sum(Column::from(next_field.db_name().to_owned())), next_field),
-                )
-            }),
-
-            AggregationSelection::Min(fields) => fields.iter().fold(select, |select, next_field| {
-                select.value(
-                    alias.with_prefix(UNDERSCORE_MIN).apply(
-                        min(Column::from(next_field.db_name().to_owned())
-                            .set_is_enum(next_field.type_identifier().is_enum())
-                            .set_is_selected(true)),
-                        next_field,
-                    ),
-                )
-            }),
-
-            AggregationSelection::Max(fields) => fields.iter().fold(select, |select, next_field| {
-                select.value(
-                    alias.with_prefix(UNDERSCORE_MAX).apply(
-                        max(Column::from(next_field.db_name().to_owned())
-                            .set_is_enum(next_field.type_identifier().is_enum())
-                            .set_is_selected(true)),
-                        next_field,
-                    ),
-                )
-            }),
-        },
+        apply_aggregate_selections,
     )
 }
 
@@ -260,63 +194,10 @@ pub fn group_by_aggregate(
     selections: &[AggregationSelection],
     group_by: Vec<ScalarFieldRef>,
     having: Option<Filter>,
-    alias: impl AliasGenerator,
     ctx: &Context<'_>,
 ) -> Select<'static> {
     let (base_query, _) = args.into_select(model, &[], ctx);
-    let select_query = selections.iter().fold(base_query, |select, next_op| match next_op {
-        AggregationSelection::Field(field) => {
-            select.column(alias.apply(field.as_column(ctx), field).set_is_selected(true))
-        }
-
-        AggregationSelection::Count { all, fields } => {
-            let select = fields.iter().fold(select, |select, next_field| {
-                select.value(
-                    alias
-                        .with_prefix(UNDERSCORE_COUNT)
-                        .apply(count(next_field.as_column(ctx)), next_field),
-                )
-            });
-
-            if all.is_some() {
-                select.value(count(asterisk()).alias(format!("{UNDERSCORE_COUNT}._all")))
-            } else {
-                select
-            }
-        }
-
-        AggregationSelection::Average(fields) => fields.iter().fold(select, |select, next_field| {
-            select.value(
-                alias
-                    .with_prefix(UNDERSCORE_AVG)
-                    .apply(avg(next_field.as_column(ctx)), next_field),
-            )
-        }),
-
-        AggregationSelection::Sum(fields) => fields.iter().fold(select, |select, next_field| {
-            select.value(
-                alias
-                    .with_prefix(UNDERSCORE_SUM)
-                    .apply(sum(next_field.as_column(ctx)), next_field),
-            )
-        }),
-
-        AggregationSelection::Min(fields) => fields.iter().fold(select, |select, next_field| {
-            select.value(
-                alias
-                    .with_prefix(UNDERSCORE_MIN)
-                    .apply(min(next_field.as_column(ctx).set_is_selected(true)), next_field),
-            )
-        }),
-
-        AggregationSelection::Max(fields) => fields.iter().fold(select, |select, next_field| {
-            select.value(
-                alias
-                    .with_prefix(UNDERSCORE_MAX)
-                    .apply(max(next_field.as_column(ctx).set_is_selected(true)), next_field),
-            )
-        }),
-    });
+    let select_query = selections.iter().fold(base_query, apply_aggregate_selections);
 
     let grouped = group_by
         .into_iter()
@@ -331,6 +212,51 @@ pub fn group_by_aggregate(
             grouped.having(cond)
         }
         None => grouped,
+    }
+}
+
+fn apply_aggregate_selections(select: Select<'static>, selection: &AggregationSelection) -> Select<'static> {
+    match selection {
+        AggregationSelection::Field(field) => select.column(
+            Column::from(field.db_name().to_owned())
+                .set_is_enum(field.type_identifier().is_enum())
+                .set_is_selected(true),
+        ),
+
+        AggregationSelection::Count { all, .. } => selection.identifiers().fold(select, |select, next_field| {
+            let expr = if all.is_some() && next_field.name == "all" {
+                asterisk()
+            } else {
+                Column::from(next_field.name.to_owned()).into()
+            };
+            select.value(count(expr).alias(next_field.db_alias.into_owned()))
+        }),
+
+        AggregationSelection::Average(_) => selection.identifiers().fold(select, |select, next_field| {
+            select.value(avg(Column::from(next_field.field_db_name.to_owned())).alias(next_field.db_alias.into_owned()))
+        }),
+
+        AggregationSelection::Sum(_) => selection.identifiers().fold(select, |select, next_field| {
+            select.value(sum(Column::from(next_field.field_db_name.to_owned())).alias(next_field.db_alias.into_owned()))
+        }),
+
+        AggregationSelection::Min(_) => selection.identifiers().fold(select, |select, next_field| {
+            select.value(
+                min(Column::from(next_field.field_db_name.to_owned())
+                    .set_is_enum(next_field.typ.id.is_enum())
+                    .set_is_selected(true))
+                .alias(next_field.db_alias.into_owned()),
+            )
+        }),
+
+        AggregationSelection::Max(_) => selection.identifiers().fold(select, |select, next_field| {
+            select.value(
+                max(Column::from(next_field.field_db_name.to_owned())
+                    .set_is_enum(next_field.typ.id.is_enum())
+                    .set_is_selected(true))
+                .alias(next_field.db_alias.into_owned()),
+            )
+        }),
     }
 }
 
@@ -358,64 +284,4 @@ fn extract_columns(model: &Model, selections: &[AggregationSelection], ctx: &Con
         .collect();
 
     fields.as_columns(ctx).collect()
-}
-
-pub trait AliasGenerator {
-    fn generate(&self, field: &ScalarField) -> Option<String>;
-
-    /// Creates a new alias generator that prefixes all generated aliases with the given prefix.
-    fn with_prefix<'a>(&'a self, prefix: &'a str) -> impl AliasGenerator + 'a
-    where
-        Self: Sized,
-    {
-        DotPrefixedAlias(prefix, self)
-    }
-
-    fn apply<'a, A: Aliasable<'a, Target = A>>(&self, expr: A, field: &ScalarField) -> A::Target {
-        match self.generate(field) {
-            Some(alias) => expr.alias(alias),
-            None => expr,
-        }
-    }
-}
-
-#[derive(Debug, Default, Clone, Copy)]
-struct NoAlias;
-
-impl AliasGenerator for NoAlias {
-    fn generate(&self, _: &ScalarField) -> Option<String> {
-        None
-    }
-}
-
-#[derive(Debug, Default, Clone, Copy)]
-struct DbNameAlias;
-
-impl AliasGenerator for DbNameAlias {
-    fn generate(&self, field: &ScalarField) -> Option<String> {
-        Some(field.db_name().to_owned())
-    }
-}
-
-#[derive(Debug, Clone, Copy)]
-struct DotPrefixedAlias<'a, Inner>(&'a str, &'a Inner);
-
-impl<Inner> AliasGenerator for DotPrefixedAlias<'_, Inner>
-where
-    Inner: AliasGenerator,
-{
-    fn generate(&self, field: &ScalarField) -> Option<String> {
-        let suffix = self.1.generate(field)?;
-        Some(format!("{prefix}.{suffix}", prefix = self.0))
-    }
-}
-
-/// Alias generator that uses the database name of the field.
-pub fn alias_with_db_name() -> impl AliasGenerator {
-    DbNameAlias
-}
-
-/// Alias generator that does not generate any aliases.
-pub fn no_alias() -> impl AliasGenerator {
-    NoAlias
 }

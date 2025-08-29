@@ -4,32 +4,32 @@ expression: pretty
 input_file: query-compiler/query-compiler/tests/data/aggregate-custom.json
 ---
 dataMap {
-    _count (from _count): {
-        _all: Int (_all)
+    _count (inlined): {
+        _all: Int (_count$_all)
     }
-    _sum (from _sum): {
-        float: Float (db_float)
-        int: Int (db_int)
+    _sum (inlined): {
+        float: Float (_sum$db_float)
+        int: Int (_sum$db_int)
     }
-    _avg (from _avg): {
-        float: Float (db_float)
-        int: Float (db_int)
+    _avg (inlined): {
+        float: Float (_avg$db_float)
+        int: Float (_avg$db_int)
     }
-    _min (from _min): {
-        float: Float (db_float)
-        int: Int (db_int)
+    _min (inlined): {
+        float: Float (_min$db_float)
+        int: Int (_min$db_int)
     }
-    _max (from _max): {
-        float: Float (db_float)
-        int: Int (db_int)
+    _max (inlined): {
+        float: Float (_max$db_float)
+        int: Int (_max$db_int)
     }
 }
-unique (query «SELECT COUNT(*) AS "_count._all", SUM("db_float") AS
-               "_sum.db_float", SUM("db_int") AS "_sum.db_int", AVG("db_float")
-               AS "_avg.db_float", AVG("db_int") AS "_avg.db_int",
-               MIN("db_float") AS "_min.db_float", MIN("db_int") AS
-               "_min.db_int", MAX("db_float") AS "_max.db_float", MAX("db_int")
-               AS "_max.db_int" FROM (SELECT "public"."Item"."id",
+unique (query «SELECT COUNT(*) AS "_count$_all", SUM("db_float") AS
+               "_sum$db_float", SUM("db_int") AS "_sum$db_int", AVG("db_float")
+               AS "_avg$db_float", AVG("db_int") AS "_avg$db_int",
+               MIN("db_float") AS "_min$db_float", MIN("db_int") AS
+               "_min$db_int", MAX("db_float") AS "_max$db_float", MAX("db_int")
+               AS "_max$db_int" FROM (SELECT "public"."Item"."id",
                "public"."Item"."db_float", "public"."Item"."db_int" FROM
                "public"."Item" WHERE 1=1 ORDER BY "public"."Item"."id" ASC LIMIT
                $1 OFFSET $2) AS "sub"»

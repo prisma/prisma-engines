@@ -1,4 +1,4 @@
-use std::slice;
+use std::{borrow::Cow, slice};
 
 use itertools::Either;
 use psl::schema_ast::ast::FieldArity;
@@ -38,19 +38,19 @@ impl AggregationSelection {
     pub fn identifiers(&self) -> impl Iterator<Item = SelectionIdentifier<'_>> {
         match self {
             AggregationSelection::Field(field) => {
-                Either::Left(Self::map_field_types(slice::from_ref(field), |t| t, |a| a))
+                Either::Left(self.map_field_types(slice::from_ref(field), |t| t, |a| a))
             }
             AggregationSelection::Sum(fields) => {
-                Either::Left(Self::map_field_types(fields, |t| t, |_| FieldArity::Required))
+                Either::Left(self.map_field_types(fields, |t| t, |_| FieldArity::Required))
             }
             AggregationSelection::Min(fields) => {
-                Either::Left(Self::map_field_types(fields, |t| t, |_| FieldArity::Required))
+                Either::Left(self.map_field_types(fields, |t| t, |_| FieldArity::Required))
             }
             AggregationSelection::Max(fields) => {
-                Either::Left(Self::map_field_types(fields, |t| t, |_| FieldArity::Required))
+                Either::Left(self.map_field_types(fields, |t| t, |_| FieldArity::Required))
             }
 
-            AggregationSelection::Average(fields) => Either::Left(Self::map_field_types(
+            AggregationSelection::Average(fields) => Either::Left(self.map_field_types(
                 fields,
                 |t| match t {
                     TypeIdentifier::Decimal => TypeIdentifier::Decimal,
@@ -60,26 +60,46 @@ impl AggregationSelection {
             )),
 
             AggregationSelection::Count { all, fields } => Either::Right(
-                Self::map_field_types(fields, |_| TypeIdentifier::Int, |_| FieldArity::Required).chain(all.iter().map(
-                    |all| SelectionIdentifier {
+                self.map_field_types(fields, |_| TypeIdentifier::Int, |_| FieldArity::Required)
+                    .chain(all.iter().map(|all| SelectionIdentifier {
                         name: all.name(),
-                        db_name: all.db_name(),
+                        db_alias: self.aggregation_db_alias("_all"),
+                        field_db_name: all.db_name(),
                         typ: all.r#type(),
                         arity: all.arity(),
-                    },
-                )),
+                    })),
             ),
         }
     }
 
-    fn map_field_types(
-        fields: &[ScalarFieldRef],
+    pub fn aggregation_name(&self) -> Option<&'static str> {
+        match self {
+            AggregationSelection::Field(_) => None,
+            AggregationSelection::Count { .. } => Some("_count"),
+            AggregationSelection::Average(_) => Some("_avg"),
+            AggregationSelection::Sum(_) => Some("_sum"),
+            AggregationSelection::Min(_) => Some("_min"),
+            AggregationSelection::Max(_) => Some("_max"),
+        }
+    }
+
+    fn aggregation_db_alias<'name>(&self, db_name: &'name str) -> Cow<'name, str> {
+        const FIELD_SEPARATOR: &str = "$";
+        self.aggregation_name().map_or(Cow::Borrowed(db_name), |aggregation| {
+            Cow::Owned(format!("{aggregation}{FIELD_SEPARATOR}{db_name}"))
+        })
+    }
+
+    fn map_field_types<'a>(
+        &self,
+        fields: &'a [ScalarFieldRef],
         type_mapper: fn(TypeIdentifier) -> TypeIdentifier,
         arity_mapper: fn(FieldArity) -> FieldArity,
-    ) -> impl Iterator<Item = SelectionIdentifier<'_>> {
+    ) -> impl Iterator<Item = SelectionIdentifier<'a>> {
         fields.iter().map(move |f| SelectionIdentifier {
             name: f.name(),
-            db_name: f.db_name(),
+            db_alias: self.aggregation_db_alias(f.db_name()),
+            field_db_name: f.db_name(),
             typ: f.dm.clone().zip(type_mapper(f.type_identifier())),
             arity: arity_mapper(f.arity()),
         })
@@ -129,7 +149,8 @@ impl<I> From<&'_ Zipper<I>> for CountAllAggregationSelection {
 
 pub struct SelectionIdentifier<'a> {
     pub name: &'a str,
-    pub db_name: &'a str,
+    pub db_alias: Cow<'a, str>,
+    pub field_db_name: &'a str,
     pub typ: Type,
     pub arity: FieldArity,
 }
