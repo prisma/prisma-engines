@@ -63,7 +63,7 @@ impl AggregationSelection {
                 self.map_field_types(fields, |_| TypeIdentifier::Int, |_| FieldArity::Required)
                     .chain(all.iter().map(|all| SelectionIdentifier {
                         name: all.name(),
-                        db_alias: self.aggregation_db_alias("_all"),
+                        aggregation_name: self.aggregation_name(),
                         field_db_name: all.db_name(),
                         typ: all.r#type(),
                         arity: all.arity(),
@@ -83,22 +83,16 @@ impl AggregationSelection {
         }
     }
 
-    fn aggregation_db_alias<'name>(&self, db_name: &'name str) -> Cow<'name, str> {
-        const FIELD_SEPARATOR: &str = "$";
-        self.aggregation_name().map_or(Cow::Borrowed(db_name), |aggregation| {
-            Cow::Owned(format!("{aggregation}{FIELD_SEPARATOR}{db_name}"))
-        })
-    }
-
     fn map_field_types<'a>(
         &self,
         fields: &'a [ScalarFieldRef],
         type_mapper: fn(TypeIdentifier) -> TypeIdentifier,
         arity_mapper: fn(FieldArity) -> FieldArity,
     ) -> impl Iterator<Item = SelectionIdentifier<'a>> {
+        let aggregation_name = self.aggregation_name();
         fields.iter().map(move |f| SelectionIdentifier {
             name: f.name(),
-            db_alias: self.aggregation_db_alias(f.db_name()),
+            aggregation_name,
             field_db_name: f.db_name(),
             typ: f.dm.clone().zip(type_mapper(f.type_identifier())),
             arity: arity_mapper(f.arity()),
@@ -118,12 +112,12 @@ impl CountAllAggregationSelection {
 
     #[inline]
     pub fn name(&self) -> &str {
-        "all"
+        "_all"
     }
 
     #[inline]
     pub fn db_name(&self) -> &str {
-        "all"
+        "_all"
     }
 
     #[inline]
@@ -149,8 +143,18 @@ impl<I> From<&'_ Zipper<I>> for CountAllAggregationSelection {
 
 pub struct SelectionIdentifier<'a> {
     pub name: &'a str,
-    pub db_alias: Cow<'a, str>,
     pub field_db_name: &'a str,
+    pub aggregation_name: Option<&'static str>,
     pub typ: Type,
     pub arity: FieldArity,
+}
+
+impl<'a> SelectionIdentifier<'a> {
+    pub fn db_alias(&self) -> Cow<'a, str> {
+        const FIELD_SEPARATOR: &str = "$";
+        self.aggregation_name
+            .map_or(Cow::Borrowed(self.field_db_name), |aggregation| {
+                Cow::Owned(format!("{aggregation}{FIELD_SEPARATOR}{}", self.field_db_name))
+            })
+    }
 }

@@ -296,13 +296,9 @@ fn get_result_node_for_aggregation(
         .iter()
         .flat_map(|sel| {
             sel.identifiers().map(move |ident| {
-                let name = if matches!(&sel, AggregationSelection::Count { all: Some(_), .. }) && ident.name == "all" {
-                    "_all"
-                } else {
-                    ident.name
-                };
+                let db_alias = ident.db_alias();
                 let type_info = FieldTypeInformation::new(ident.typ, ident.arity, None);
-                (name, sel.aggregation_name(), ident.db_alias, type_info)
+                (ident.name, sel.aggregation_name(), db_alias, type_info)
             })
         })
         .sorted_by_key(|(name, prefix, _, _)| ordered_set.get_index_of(&(*prefix, *name)))

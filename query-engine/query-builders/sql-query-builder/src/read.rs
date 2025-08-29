@@ -226,20 +226,22 @@ fn apply_aggregate_selections(
         AggregationSelection::Field(field) => select.column(field.as_column(ctx).set_is_selected(true)),
 
         AggregationSelection::Count { all, .. } => selection.identifiers().fold(select, |select, next_field| {
-            let expr = if all.is_some() && next_field.name == "all" {
+            let expr = if all.is_some() && next_field.name == "_all" {
                 asterisk()
             } else {
-                Column::from(next_field.name.to_owned()).into()
+                Column::from(next_field.field_db_name.to_owned()).into()
             };
-            select.value(count(expr).alias(next_field.db_alias.into_owned()))
+            select.value(count(expr).alias(next_field.db_alias().into_owned()))
         }),
 
         AggregationSelection::Average(_) => selection.identifiers().fold(select, |select, next_field| {
-            select.value(avg(Column::from(next_field.field_db_name.to_owned())).alias(next_field.db_alias.into_owned()))
+            select
+                .value(avg(Column::from(next_field.field_db_name.to_owned())).alias(next_field.db_alias().into_owned()))
         }),
 
         AggregationSelection::Sum(_) => selection.identifiers().fold(select, |select, next_field| {
-            select.value(sum(Column::from(next_field.field_db_name.to_owned())).alias(next_field.db_alias.into_owned()))
+            select
+                .value(sum(Column::from(next_field.field_db_name.to_owned())).alias(next_field.db_alias().into_owned()))
         }),
 
         AggregationSelection::Min(_) => selection.identifiers().fold(select, |select, next_field| {
@@ -247,7 +249,7 @@ fn apply_aggregate_selections(
                 min(Column::from(next_field.field_db_name.to_owned())
                     .set_is_enum(next_field.typ.id.is_enum())
                     .set_is_selected(true))
-                .alias(next_field.db_alias.into_owned()),
+                .alias(next_field.db_alias().into_owned()),
             )
         }),
 
@@ -256,7 +258,7 @@ fn apply_aggregate_selections(
                 max(Column::from(next_field.field_db_name.to_owned())
                     .set_is_enum(next_field.typ.id.is_enum())
                     .set_is_selected(true))
-                .alias(next_field.db_alias.into_owned()),
+                .alias(next_field.db_alias().into_owned()),
             )
         }),
     }
