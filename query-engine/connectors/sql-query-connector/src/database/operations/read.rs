@@ -10,10 +10,7 @@ use futures::stream::{FuturesUnordered, StreamExt};
 use quaint::ast::*;
 use query_builder::QueryArgumentsExt;
 use query_structure::*;
-use sql_query_builder::{
-    AsColumns, AsTable, Context, RelationFieldExt, column_metadata,
-    read::{self, no_alias},
-};
+use sql_query_builder::{AsColumns, AsTable, Context, RelationFieldExt, column_metadata, read};
 
 pub(crate) async fn get_single_record(
     conn: &dyn Queryable,
@@ -384,7 +381,7 @@ async fn plain_aggregate(
     selections: Vec<AggregationSelection>,
     ctx: &Context<'_>,
 ) -> crate::Result<Vec<AggregationResult>> {
-    let query = read::aggregate(model, &selections, query_arguments, no_alias(), ctx);
+    let query = read::aggregate(model, &selections, query_arguments, ctx);
 
     let idents: Vec<_> = selections
         .iter()
@@ -411,7 +408,7 @@ async fn group_by_aggregate(
     having: Option<Filter>,
     ctx: &Context<'_>,
 ) -> crate::Result<Vec<AggregationRow>> {
-    let query = read::group_by_aggregate(model, query_arguments, &selections, group_by, having, no_alias(), ctx);
+    let query = read::group_by_aggregate(model, query_arguments, &selections, group_by, having, ctx);
 
     let idents: Vec<_> = selections
         .iter()

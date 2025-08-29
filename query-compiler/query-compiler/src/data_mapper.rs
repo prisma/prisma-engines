@@ -8,7 +8,7 @@ use itertools::Itertools;
 use psl::datamodel_connector::Flavour;
 use query_core::{
     CreateManyRecordsFields, DeleteRecordFields, Node, Query, QueryGraph, ReadQuery, UpdateManyRecordsFields,
-    UpdateRecord, WriteQuery, schema::constants::aggregations,
+    UpdateRecord, WriteQuery,
 };
 use query_structure::{
     AggregationSelection, FieldArity, FieldSelection, FieldTypeInformation, ScalarField, SelectedField, Type,
@@ -292,25 +292,20 @@ fn get_result_node_for_aggregation(
 
     let mut node = ResultNodeBuilder::new_object(object_name);
 
-    for (underscore_name, name, db_name, typ) in selectors
+    for (name, prefix, db_alias, typ) in selectors
         .iter()
         .flat_map(|sel| {
             sel.identifiers().map(move |ident| {
-                let (name, db_name) =
-                    if matches!(&sel, AggregationSelection::Count { all: Some(_), .. }) && ident.name == "all" {
-                        ("_all", "_all")
-                    } else {
-                        (ident.name, ident.db_name)
-                    };
+                let db_alias = ident.db_alias();
                 let type_info = FieldTypeInformation::new(ident.typ, ident.arity, None);
-                (aggregate_underscore_name(sel), name, db_name, type_info)
+                (ident.name, sel.aggregation_name(), db_alias, type_info)
             })
         })
-        .sorted_by_key(|(underscore_name, name, _, _)| ordered_set.get_index_of(&(*underscore_name, *name)))
+        .sorted_by_key(|(name, prefix, _, _)| ordered_set.get_index_of(&(*prefix, *name)))
     {
-        let value = builder.new_value(db_name.to_owned(), typ);
-        if let Some(undescore_name) = underscore_name {
-            node.entry_or_insert_nested(undescore_name)
+        let value = builder.new_value(db_alias.into_owned(), typ);
+        if let Some(prefix) = prefix {
+            node.entry_or_insert(prefix, None::<&str>)
                 .add_field(name.to_owned(), value);
         } else {
             node.add_field(name.to_owned(), value);
@@ -318,17 +313,6 @@ fn get_result_node_for_aggregation(
     }
 
     Some(node.build())
-}
-
-fn aggregate_underscore_name(sel: &AggregationSelection) -> Option<&'static str> {
-    match sel {
-        AggregationSelection::Field(_) => None,
-        AggregationSelection::Count { .. } => Some(aggregations::UNDERSCORE_COUNT),
-        AggregationSelection::Average(_) => Some(aggregations::UNDERSCORE_AVG),
-        AggregationSelection::Sum(_) => Some(aggregations::UNDERSCORE_SUM),
-        AggregationSelection::Min(_) => Some(aggregations::UNDERSCORE_MIN),
-        AggregationSelection::Max(_) => Some(aggregations::UNDERSCORE_MAX),
-    }
 }
 
 fn get_result_node_for_create_many(

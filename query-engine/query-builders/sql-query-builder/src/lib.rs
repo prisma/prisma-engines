@@ -39,7 +39,6 @@ pub use context::Context;
 pub use convert::opaque_type_to_prisma_type;
 pub use filter::FilterBuilder;
 pub use model_extensions::{AsColumn, AsColumns, AsTable, RelationFieldExt, SelectionResultExt};
-use read::alias_with_db_name;
 pub use sql_trace::SqlTraceComment;
 use value::GeneratorCall;
 
@@ -226,17 +225,9 @@ impl<'a, V: Visitor<'a>> QueryBuilder for SqlQueryBuilder<'a, V> {
         having: Option<Filter>,
     ) -> Result<DbQuery, Box<dyn std::error::Error + Send + Sync>> {
         let query = if group_by.is_empty() {
-            read::aggregate(model, selections, args, alias_with_db_name(), &self.context)
+            read::aggregate(model, selections, args, &self.context)
         } else {
-            read::group_by_aggregate(
-                model,
-                args,
-                selections,
-                group_by,
-                having,
-                alias_with_db_name(),
-                &self.context,
-            )
+            read::group_by_aggregate(model, args, selections, group_by, having, &self.context)
         };
         self.convert_query(query, Chunkable::No)
     }

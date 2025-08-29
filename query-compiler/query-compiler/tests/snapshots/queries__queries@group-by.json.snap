@@ -4,16 +4,15 @@ expression: pretty
 input_file: query-compiler/query-compiler/tests/data/group-by.json
 ---
 dataMap {
-    _count (from _count): {
-        id: Int (id)
-        title: Int (title)
-        userId: Int (userId)
-        _all: Int (_all)
+    _count (inlined): {
+        id: Int (_count$id)
+        title: Int (_count$title)
+        userId: Int (_count$userId)
+        _all: Int (_count$_all)
     }
 }
-query «SELECT COUNT("public"."Post"."id") AS "_count.id",
-       COUNT("public"."Post"."title") AS "_count.title",
-       COUNT("public"."Post"."userId") AS "_count.userId", COUNT(*) AS
-       "_count._all" FROM "public"."Post" WHERE "public"."Post"."title"::text
-       LIKE $1 GROUP BY "public"."Post"."title" OFFSET $2»
+query «SELECT COUNT("id") AS "_count$id", COUNT("title") AS "_count$title",
+       COUNT("userId") AS "_count$userId", COUNT(*) AS "_count$_all" FROM
+       "public"."Post" WHERE "public"."Post"."title"::text LIKE $1 GROUP BY
+       "public"."Post"."title" OFFSET $2»
 params [const(String("%something%")), const(BigInt(0))]

@@ -100,7 +100,7 @@ fn to_aggregation_rows(
                 }
                 AggregationSelection::Count { all, fields } => {
                     if all.is_some() {
-                        let meta = selection_meta.get("all").unwrap();
+                        let meta = selection_meta.get("_all").unwrap();
                         let field_val = value_from_bson(doc.remove("count_all").unwrap(), meta)?;
 
                         row.push(AggregationResult::Count(None, field_val));
