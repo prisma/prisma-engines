@@ -184,7 +184,7 @@ pub fn aggregate(
     let sub_table = Table::from(sub_query).alias("sub");
     selections.iter().fold(
         Select::from_table(sub_table).add_traceparent(ctx.traceparent),
-        apply_aggregate_selections,
+        |acc, sel| apply_aggregate_selections(acc, sel, ctx),
     )
 }
 
@@ -197,7 +197,9 @@ pub fn group_by_aggregate(
     ctx: &Context<'_>,
 ) -> Select<'static> {
     let (base_query, _) = args.into_select(model, &[], ctx);
-    let select_query = selections.iter().fold(base_query, apply_aggregate_selections);
+    let select_query = selections
+        .iter()
+        .fold(base_query, |acc, sel| apply_aggregate_selections(acc, sel, ctx));
 
     let grouped = group_by
         .into_iter()
@@ -215,13 +217,13 @@ pub fn group_by_aggregate(
     }
 }
 
-fn apply_aggregate_selections(select: Select<'static>, selection: &AggregationSelection) -> Select<'static> {
+fn apply_aggregate_selections(
+    select: Select<'static>,
+    selection: &AggregationSelection,
+    ctx: &Context,
+) -> Select<'static> {
     match selection {
-        AggregationSelection::Field(field) => select.column(
-            Column::from(field.db_name().to_owned())
-                .set_is_enum(field.type_identifier().is_enum())
-                .set_is_selected(true),
-        ),
+        AggregationSelection::Field(field) => select.column(field.as_column(ctx).set_is_selected(true)),
 
         AggregationSelection::Count { all, .. } => selection.identifiers().fold(select, |select, next_field| {
             let expr = if all.is_some() && next_field.name == "all" {
