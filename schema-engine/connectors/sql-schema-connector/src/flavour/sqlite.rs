@@ -255,15 +255,7 @@ impl SqlConnector for SqliteConnector {
                         return Ok(Err(schema_connector::PersistenceNotInitializedError));
                     }
 
-                    // TODO: this is a workaround, as currently the errors thrown by D1 and LibSQL do not
-                    // match the known user-facing errors we expect for SQLite.
-                    // We should fix this in the future.
-                    //
-                    // We used to actually yield:
-                    // ```
-                    // return Err(err)
-                    // ```
-                    return Ok(Err(schema_connector::PersistenceNotInitializedError));
+                    return Err(err);
                 }
             };
 
