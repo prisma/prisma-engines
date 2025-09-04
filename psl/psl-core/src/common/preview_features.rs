@@ -80,6 +80,7 @@ features!(
     ReferentialActions,
     ReferentialIntegrity,
     RelationJoins,
+    SchemaEngineDriverAdapters,
     SelectRelationCount,
     ShardKeys,
     StrictUndefinedChecks,
@@ -156,12 +157,11 @@ impl<'a> FeatureMapWithProvider<'a> {
         // Generator preview features (alphabetically sorted)
         let feature_map: FeatureMap = FeatureMap {
             active: enumflags2::make_bitflags!(PreviewFeature::{
-                 DriverAdapters
-                 | Metrics
+                  Metrics
                  | NativeDistinct
                  | PostgresqlExtensions
-                 | QueryCompiler
                  | RelationJoins
+                 | SchemaEngineDriverAdapters
                  | ShardKeys
                  | StrictUndefinedChecks
                  | Views
@@ -201,6 +201,7 @@ impl<'a> FeatureMapWithProvider<'a> {
                 | DataProxy
                 | Deno
                 | Distinct
+                | DriverAdapters
                 | ExtendedIndexes
                 | ExtendedWhereUnique
                 | FieldReference
@@ -224,6 +225,7 @@ impl<'a> FeatureMapWithProvider<'a> {
                 | OrderByNulls
                 | OrderByRelation
                 | PrismaSchemaFolder
+                | QueryCompiler
                 | ReferentialActions
                 | ReferentialIntegrity
                 | SelectRelationCount
