@@ -14,7 +14,7 @@ pkgs.mkShell {
     llvmPackages_latest.bintools
     nodejs
     nodePackages.prettier
-    pnpm_9
+    pnpm_10
     rustup
     wabt
     wasm-bindgen-cli_0_2_100
