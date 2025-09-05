@@ -1,14 +1,12 @@
 generator client {
   provider = "prisma-client"
   output = "../lib/.generated/prisma"
-  previewFeatures = ["driverAdapters", "queryCompiler"]
 }
 
 generator edge {
   provider = "prisma-client"
   output = "../lib/.generated/prisma-edge"
   runtime = "edge-light"
-  previewFeatures = ["driverAdapters", "queryCompiler"]
 }
 
 datasource db {

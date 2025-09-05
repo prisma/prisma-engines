@@ -1,7 +1,6 @@
 generator client {
   provider = "prisma-client"
   output = "../lib/.generated/prisma"
-  previewFeatures = ["driverAdapters", "queryCompiler"]
 }
 
 generator client {
@@ -16,8 +15,8 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 // [1;91merror[0m: [1mThe generator "client" cannot be defined because a generator with that name already exists.[0m
-//   [1;94m-->[0m  [4mschema.prisma:7[0m
+//   [1;94m-->[0m  [4mschema.prisma:6[0m
 // [1;94m   | [0m
-// [1;94m 6 | [0m
-// [1;94m 7 | [0mgenerator [1;91mclient[0m {
+// [1;94m 5 | [0m
+// [1;94m 6 | [0mgenerator [1;91mclient[0m {
 // [1;94m   | [0m

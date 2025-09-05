@@ -27,12 +27,12 @@ pub(crate) fn load_datasources_from_ast(
     ast_schema: &ast::SchemaAst,
     diagnostics: &mut Diagnostics,
     connectors: crate::ConnectorRegistry<'_>,
-    is_using_driver_adapters: bool,
+    is_using_schema_engine_driver_adapters: bool,
 ) -> Vec<Datasource> {
     let mut sources = Vec::new();
 
     for src in ast_schema.sources() {
-        if let Some(source) = lift_datasource(src, diagnostics, connectors, is_using_driver_adapters) {
+        if let Some(source) = lift_datasource(src, diagnostics, connectors, is_using_schema_engine_driver_adapters) {
             sources.push(source);
         }
     }
@@ -54,7 +54,7 @@ fn lift_datasource(
     ast_source: &ast::SourceConfig,
     diagnostics: &mut Diagnostics,
     connectors: crate::ConnectorRegistry<'_>,
-    is_using_driver_adapters: bool,
+    is_using_schema_engine_driver_adapters: bool,
 ) -> Option<Datasource> {
     let source_name = ast_source.name();
     let mut args: HashMap<_, (_, &Expression)> = ast_source
@@ -134,7 +134,8 @@ fn lift_datasource(
     // We however cannot forbid it as we don't know if the user is actually using Driver Adapters at runtime and in the CLI yet!
     // In the future, we'll roll out support for PostgreSQL and other database providers as well.
     // Once that's the case, we should update the logic here.
-    let is_using_driver_adapters = is_using_driver_adapters && ["sqlite"].contains(&active_connector.name());
+    let is_using_driver_adapters =
+        is_using_schema_engine_driver_adapters && ["sqlite"].contains(&active_connector.name());
 
     let relation_mode = get_relation_mode(&mut args, ast_source, diagnostics, active_connector);
 

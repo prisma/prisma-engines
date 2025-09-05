@@ -14,7 +14,7 @@ model Blog {
   title   String
   @@fulltext([content, title])
 }
-// [1;91merror[0m: [1mThe preview feature "fullTextSearchPostgres" is not known. Expected one of: driverAdapters, metrics, nativeDistinct, postgresqlExtensions, queryCompiler, relationJoins, shardKeys, strictUndefinedChecks, views[0m
+// [1;91merror[0m: [1mThe preview feature "fullTextSearchPostgres" is not known. Expected one of: metrics, nativeDistinct, postgresqlExtensions, relationJoins, schemaEngineDriverAdapters, shardKeys, strictUndefinedChecks, views[0m
 //   [1;94m-->[0m  [4mschema.prisma:3[0m
 // [1;94m   | [0m
 // [1;94m 2 | [0m  provider        = "prisma-client-js"
