@@ -173,10 +173,14 @@ fn validate_configuration(
     connectors: ConnectorRegistry<'_>,
 ) -> Configuration {
     // TODO: set `is_using_driver_adapters` to the `true` constant for Prisma 7.0.0.
-    let is_using_driver_adapters = has_preview_feature_driver_adapters(schema_ast);
+    let is_using_schema_engine_driver_adapters = has_preview_feature_schema_engine_driver_adapters(schema_ast);
 
-    let datasources =
-        datasource_loader::load_datasources_from_ast(schema_ast, diagnostics, connectors, is_using_driver_adapters);
+    let datasources = datasource_loader::load_datasources_from_ast(
+        schema_ast,
+        diagnostics,
+        connectors,
+        is_using_schema_engine_driver_adapters,
+    );
 
     // We need to know the active provider to determine which features are active.
     // This was originally introduced because the `fullTextSearch` preview feature will hit GA stage
@@ -192,7 +196,7 @@ fn validate_configuration(
     Configuration::new(generators, datasources, diagnostics.warnings().to_owned())
 }
 
-fn has_preview_feature_driver_adapters(schema_ast: &ast::SchemaAst) -> bool {
+fn has_preview_feature_schema_engine_driver_adapters(schema_ast: &ast::SchemaAst) -> bool {
     // Out of band check for `previewFeatures` because we need to know about the driver adapter feature before we parse the datasource block.
     // But we also need to parse the datasource block before the full generator block parsing.
     // So we ignore the diagnostics from the `previewFeatures` parsing as that will be properly validated down the line.
@@ -207,7 +211,7 @@ fn has_preview_feature_driver_adapters(schema_ast: &ast::SchemaAst) -> bool {
             .is_some_and(|value| {
                 value
                     .iter()
-                    .any(|item| *item == PreviewFeature::DriverAdapters.to_string())
+                    .any(|item| *item == PreviewFeature::SchemaEngineDriverAdapters.to_string())
             })
     })
 }
