@@ -138,7 +138,7 @@ async fn diff_target_to_dialect(
         DiffTarget::SchemaDatamodel(schemas) => {
             let sources = schemas.to_psl_input();
             let dialect = schema_to_dialect(&sources)?;
-            let schema = dialect.schema_from_datamodel(sources, connector.default_runtime_namespace())?;
+            let schema = dialect.schema_from_datamodel(sources)?;
             Ok(Some((dialect, schema)))
         }
         DiffTarget::Url(UrlContainer { .. }) => Err(ConnectorError::from_msg(

@@ -130,15 +130,11 @@ impl SchemaDialect for SqlSchemaDialect {
         )
     }
 
-    fn schema_from_datamodel(
-        &self,
-        sources: Vec<(String, SourceFile)>,
-        default_namespace: Option<&str>,
-    ) -> ConnectorResult<DatabaseSchema> {
+    fn schema_from_datamodel(&self, sources: Vec<(String, SourceFile)>) -> ConnectorResult<DatabaseSchema> {
         let schema = psl::parse_schema_multi(&sources).map_err(ConnectorError::new_schema_parser_error)?;
         self.dialect.check_schema_features(&schema)?;
         let calculator = self.dialect.schema_calculator();
-        Ok(sql_schema_calculator::calculate_sql_schema(&schema, default_namespace, &*calculator).into())
+        Ok(sql_schema_calculator::calculate_sql_schema(&schema, &*calculator).into())
     }
 
     #[tracing::instrument(skip(self, migrations, target))]

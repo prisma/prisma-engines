@@ -52,11 +52,7 @@ pub trait SchemaDialect: Send + Sync + 'static {
     ///
     /// Note: The `default_namespace` should be taken from the connector's runtime
     /// configuration, which might be different from the dialect's default!
-    fn schema_from_datamodel(
-        &self,
-        sources: Vec<(String, SourceFile)>,
-        default_namespace: Option<&str>,
-    ) -> ConnectorResult<DatabaseSchema>;
+    fn schema_from_datamodel(&self, sources: Vec<(String, SourceFile)>) -> ConnectorResult<DatabaseSchema>;
 
     /// If possible, check that the passed in migrations apply cleanly.
     fn validate_migrations_with_target<'a>(
@@ -197,14 +193,11 @@ pub trait SchemaConnector: Send + Sync + 'static {
         &'a mut self,
         diff_target: DiffTarget<'a>,
         namespaces: Option<Namespaces>,
-        default_namespace: Option<&'a str>,
         filter: &'a SchemaFilter,
     ) -> BoxFuture<'a, ConnectorResult<DatabaseSchema>> {
         Box::pin(async move {
             match diff_target {
-                DiffTarget::Datamodel(sources) => {
-                    self.schema_dialect().schema_from_datamodel(sources, default_namespace)
-                }
+                DiffTarget::Datamodel(sources) => self.schema_dialect().schema_from_datamodel(sources),
                 DiffTarget::Migrations(migrations) => self.schema_from_migrations(migrations, namespaces, filter).await,
                 DiffTarget::Database => self.schema_from_database(namespaces).await,
                 DiffTarget::Empty => Ok(self.schema_dialect().empty_database_schema()),
