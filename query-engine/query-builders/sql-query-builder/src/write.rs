@@ -191,6 +191,10 @@ pub fn build_update_and_set_query(
                     e / field.value(rhs, ctx).into()
                 }
 
+                ScalarWriteOperation::Now => {
+                    native_now()
+                },
+
                 ScalarWriteOperation::Unset(_) => unreachable!("Unset is not supported on SQL connectors"),
             };
 
