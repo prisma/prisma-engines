@@ -30,7 +30,10 @@ impl<'a> ModelPair<'a> {
 
     /// The namespace of the model, if using the multi-schema feature.
     pub(crate) fn namespace(self) -> Option<&'a str> {
-        self.context.uses_namespaces().then(|| self.next.explicit_namespace()).flatten()
+        self.context
+            .uses_namespaces()
+            .then(|| self.next.explicit_namespace())
+            .flatten()
     }
 
     /// Whether the model is a partition table or not.

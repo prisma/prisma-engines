@@ -357,7 +357,11 @@ impl SqlRenderer for MssqlRenderer {
             result.extend(self.render_drop_table(tables.previous.explicit_namespace(), tables.previous.name()));
 
             // Rename the temporary table with the name defined in the migration.
-            result.push(self.render_rename_table(tables.next.explicit_namespace(), &temporary_table_name, tables.next.name()));
+            result.push(self.render_rename_table(
+                tables.next.explicit_namespace(),
+                &temporary_table_name,
+                tables.next.name(),
+            ));
 
             // Recreate the indexes.
             for index in tables.next.indexes().filter(|i| !i.is_unique() && !i.is_primary_key()) {
@@ -470,7 +474,11 @@ impl SqlRenderer for MssqlRenderer {
     fn render_rename_foreign_key(&self, fks: MigrationPair<sql::ForeignKeyWalker<'_>>) -> String {
         format!(
             r#"EXEC sp_rename '{schema}.{previous}', '{next}', 'OBJECT'"#,
-            schema = fks.previous.table().explicit_namespace().unwrap_or_else(|| self.schema_name()),
+            schema = fks
+                .previous
+                .table()
+                .explicit_namespace()
+                .unwrap_or_else(|| self.schema_name()),
             previous = fks.previous.constraint_name().unwrap(),
             next = fks.next.constraint_name().unwrap(),
         )
