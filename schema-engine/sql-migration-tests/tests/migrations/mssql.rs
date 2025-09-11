@@ -313,9 +313,6 @@ fn bigint_defaults_work(api: TestApi) {
 
         BEGIN TRAN;
 
-        -- CreateSchema
-        IF NOT EXISTS (SELECT * FROM sys.schemas WHERE name = N'dbo') EXEC sp_executesql N'CREATE SCHEMA [dbo];';
-
         -- CreateTable
         CREATE TABLE [dbo].[foo] (
             [id] NVARCHAR(1000) NOT NULL,
@@ -361,9 +358,6 @@ fn float_columns(api: TestApi) {
         BEGIN TRY
 
         BEGIN TRAN;
-
-        -- CreateSchema
-        IF NOT EXISTS (SELECT * FROM sys.schemas WHERE name = N'dbo') EXEC sp_executesql N'CREATE SCHEMA [dbo];';
 
         -- CreateTable
         CREATE TABLE [dbo].[foo] (
