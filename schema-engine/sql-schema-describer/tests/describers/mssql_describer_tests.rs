@@ -701,6 +701,7 @@ fn all_mssql_column_types_must_work(api: TestApi) {
             procedures: [],
             user_defined_types: [],
             connector_data: <ConnectorData>,
+            default_namespace: None,
         }
     "#]];
     api.expect_schema(expectation);
@@ -993,6 +994,7 @@ fn multiple_schemas_with_same_table_names_are_described(api: TestApi) {
             procedures: [],
             user_defined_types: [],
             connector_data: <ConnectorData>,
+            default_namespace: None,
         }
     "#]];
 
@@ -1415,6 +1417,7 @@ fn multiple_schemas_with_same_foreign_key_are_described(api: TestApi) {
             procedures: [],
             user_defined_types: [],
             connector_data: <ConnectorData>,
+            default_namespace: None,
         }
     "#]];
 
