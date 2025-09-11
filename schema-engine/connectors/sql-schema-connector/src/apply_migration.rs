@@ -48,6 +48,7 @@ pub(crate) fn render_script(
 
     // Note: it would be much nicer if we could place the warnings next to
     // the SQL for the steps that triggered them.
+    //
     if diagnostics.has_warnings() || !diagnostics.unexecutable_migrations.is_empty() {
         script.push_str("/*\n  Warnings:\n\n");
 
