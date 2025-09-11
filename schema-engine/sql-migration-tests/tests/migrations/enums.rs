@@ -597,18 +597,15 @@ fn mapped_enum_defaults_must_work(api: TestApi) {
     "#;
 
     let expect = expect![[r#"
-        -- CreateSchema
-        CREATE SCHEMA IF NOT EXISTS "public";
-
         -- CreateEnum
-        CREATE TYPE "public"."Color" AS ENUM ('0', 'Grün', 'Blu', 'pfuh 🙄...');
+        CREATE TYPE "Color" AS ENUM ('0', 'Grün', 'Blu', 'pfuh 🙄...');
 
         -- CreateTable
-        CREATE TABLE "public"."Test" (
+        CREATE TABLE "Test" (
             "id" INTEGER NOT NULL,
-            "mainColor" "public"."Color" NOT NULL DEFAULT 'Grün',
-            "secondaryColor" "public"."Color" NOT NULL DEFAULT '0',
-            "colorOrdering" "public"."Color"[] DEFAULT ARRAY['Blu', '0', 'Grün', '0', 'Blu', '0']::"public"."Color"[],
+            "mainColor" "Color" NOT NULL DEFAULT 'Grün',
+            "secondaryColor" "Color" NOT NULL DEFAULT '0',
+            "colorOrdering" "Color"[] DEFAULT ARRAY['Blu', '0', 'Grün', '0', 'Blu', '0']::"Color"[],
 
             CONSTRAINT "Test_pkey" PRIMARY KEY ("id")
         );
@@ -685,17 +682,17 @@ fn alter_enum_and_change_default_must_work(api: TestApi) {
                 */
                 -- AlterEnum
                 BEGIN;
-                CREATE TYPE "public"."Mood_new" AS ENUM ('HUNGRY', 'SLEEPY');
+                CREATE TYPE "Mood_new" AS ENUM ('HUNGRY', 'SLEEPY');
                 ALTER TABLE "public"."Cat" ALTER COLUMN "moods" DROP DEFAULT;
-                ALTER TABLE "public"."Cat" ALTER COLUMN "moods" TYPE "public"."Mood_new"[] USING ("moods"::text::"public"."Mood_new"[]);
+                ALTER TABLE "Cat" ALTER COLUMN "moods" TYPE "Mood_new"[] USING ("moods"::text::"Mood_new"[]);
                 ALTER TYPE "public"."Mood" RENAME TO "Mood_old";
-                ALTER TYPE "public"."Mood_new" RENAME TO "Mood";
+                ALTER TYPE "Mood_new" RENAME TO "Mood";
                 DROP TYPE "public"."Mood_old";
-                ALTER TABLE "public"."Cat" ALTER COLUMN "moods" SET DEFAULT ARRAY['SLEEPY']::"public"."Mood"[];
+                ALTER TABLE "public"."Cat" ALTER COLUMN "moods" SET DEFAULT ARRAY['SLEEPY']::"Mood"[];
                 COMMIT;
 
                 -- AlterTable
-                ALTER TABLE "public"."Cat" ALTER COLUMN "moods" SET DEFAULT ARRAY['SLEEPY']::"public"."Mood"[];
+                ALTER TABLE "public"."Cat" ALTER COLUMN "moods" SET DEFAULT ARRAY['SLEEPY']::"Mood"[];
             "#]];
             migration.expect_contents(expected_script)
         });

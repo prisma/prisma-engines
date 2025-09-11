@@ -98,7 +98,7 @@ impl AlterTableConstructor<'_> {
                 "{}.{}",
                 self.tables
                     .previous
-                    .namespace()
+                    .explicit_namespace()
                     .unwrap_or_else(|| self.renderer.schema_name()),
                 self.tables.previous.primary_key().unwrap().name()
             );

@@ -205,7 +205,7 @@ fn schema_filter_migration_adding_external_tables_incl_relations(api: TestApi) {
             let expected_script = if is_postgres {
                 expect![[r#"
                     -- CreateTable
-                    CREATE TABLE "public"."Cat" (
+                    CREATE TABLE "Cat" (
                         "id" INTEGER NOT NULL,
                         "name" TEXT NOT NULL,
                         "externalTableId" INTEGER,
@@ -214,7 +214,7 @@ fn schema_filter_migration_adding_external_tables_incl_relations(api: TestApi) {
                     );
 
                     -- AddForeignKey
-                    ALTER TABLE "public"."Cat" ADD CONSTRAINT "Cat_externalTableId_fkey" FOREIGN KEY ("externalTableId") REFERENCES "public"."ExternalTableA"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+                    ALTER TABLE "Cat" ADD CONSTRAINT "Cat_externalTableId_fkey" FOREIGN KEY ("externalTableId") REFERENCES "ExternalTableA"("id") ON DELETE SET NULL ON UPDATE CASCADE;
                 "#]]
             } else if is_mysql {
                 expect![[r#"
@@ -488,7 +488,7 @@ fn schema_filter_migration_modifying_external_tables_incl_relations(mut api: Tes
                     ALTER TABLE "public"."cat" ADD COLUMN     "externalTableId" INTEGER;
 
                     -- AddForeignKey
-                    ALTER TABLE "public"."cat" ADD CONSTRAINT "cat_externalTableId_fkey" FOREIGN KEY ("externalTableId") REFERENCES "public"."ExternalTableA"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+                    ALTER TABLE "cat" ADD CONSTRAINT "cat_externalTableId_fkey" FOREIGN KEY ("externalTableId") REFERENCES "ExternalTableA"("id") ON DELETE SET NULL ON UPDATE CASCADE;
                 "#]]
             } else if is_mysql {
                 expect![[r#"
@@ -589,7 +589,7 @@ fn schema_filter_leveraging_init_script(api: TestApi) {
             let expected_script = if is_postgres {
                 expect![[r#"
                     -- CreateTable
-                    CREATE TABLE "public"."Cat" (
+                    CREATE TABLE "Cat" (
                         "id" INTEGER NOT NULL,
                         "name" TEXT NOT NULL,
                         "externalTableId" INTEGER,
@@ -598,7 +598,7 @@ fn schema_filter_leveraging_init_script(api: TestApi) {
                     );
 
                     -- AddForeignKey
-                    ALTER TABLE "public"."Cat" ADD CONSTRAINT "Cat_externalTableId_fkey" FOREIGN KEY ("externalTableId") REFERENCES "public"."external"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+                    ALTER TABLE "Cat" ADD CONSTRAINT "Cat_externalTableId_fkey" FOREIGN KEY ("externalTableId") REFERENCES "external"("id") ON DELETE SET NULL ON UPDATE CASCADE;
                 "#]]
             } else if is_mysql {
                 expect![[r#"

@@ -29,7 +29,7 @@ impl MssqlRenderer {
     fn table_name<'a>(&'a self, table: sql::TableWalker<'a>) -> QuotedWithPrefix<&'a str> {
         QuotedWithPrefix(
             Some(Quoted::mssql_ident(
-                table.namespace().unwrap_or_else(|| self.schema_name()),
+                table.explicit_namespace().unwrap_or_else(|| self.schema_name()),
             )),
             Quoted::mssql_ident(table.name()),
         )
@@ -109,7 +109,7 @@ impl SqlRenderer for MssqlRenderer {
             indexes
                 .previous
                 .table()
-                .namespace()
+                .explicit_namespace()
                 .unwrap_or_else(|| &self.schema_name),
             indexes.previous.table().name(),
             indexes.previous.name()
@@ -318,12 +318,12 @@ impl SqlRenderer for MssqlRenderer {
                 EXEC sp_executesql @SQL
             "#,
             table = tables.previous.name(),
-            schema = tables.previous.namespace().unwrap_or_else(|| self.schema_name())});
+            schema = tables.previous.explicit_namespace().unwrap_or_else(|| self.schema_name())});
 
             // Create the new table.
             result.push(self.render_create_table_as(
                 tables.next,
-                self.quote_with_schema(tables.next.namespace(), &temporary_table_name),
+                self.quote_with_schema(tables.next.explicit_namespace(), &temporary_table_name),
             ));
 
             // We cannot insert into autoincrement columns by default. If we
@@ -332,7 +332,7 @@ impl SqlRenderer for MssqlRenderer {
             if needs_autoincrement {
                 result.push(format!(
                     r#"SET IDENTITY_INSERT {} ON"#,
-                    self.quote_with_schema(tables.next.namespace(), &temporary_table_name)
+                    self.quote_with_schema(tables.next.explicit_namespace(), &temporary_table_name)
                 ));
             }
 
@@ -342,22 +342,22 @@ impl SqlRenderer for MssqlRenderer {
                     EXEC('INSERT INTO {tmp_table} ({columns}) SELECT {columns} FROM {table} WITH (holdlock tablockx)')"#,
                                     columns = columns.join(","),
                                     table = self.table_name(tables.previous),
-                                    tmp_table = self.quote_with_schema(tables.next.namespace(), &temporary_table_name),
+                                    tmp_table = self.quote_with_schema(tables.next.explicit_namespace(), &temporary_table_name),
             });
 
             // When done copying, disallow identity inserts again if needed.
             if needs_autoincrement {
                 result.push(format!(
                     r#"SET IDENTITY_INSERT {} OFF"#,
-                    self.quote_with_schema(tables.next.namespace(), &temporary_table_name)
+                    self.quote_with_schema(tables.next.explicit_namespace(), &temporary_table_name)
                 ));
             }
 
             // Drop the old, now empty table.
-            result.extend(self.render_drop_table(tables.previous.namespace(), tables.previous.name()));
+            result.extend(self.render_drop_table(tables.previous.explicit_namespace(), tables.previous.name()));
 
             // Rename the temporary table with the name defined in the migration.
-            result.push(self.render_rename_table(tables.next.namespace(), &temporary_table_name, tables.next.name()));
+            result.push(self.render_rename_table(tables.next.explicit_namespace(), &temporary_table_name, tables.next.name()));
 
             // Recreate the indexes.
             for index in tables.next.indexes().filter(|i| !i.is_unique() && !i.is_primary_key()) {
@@ -470,7 +470,7 @@ impl SqlRenderer for MssqlRenderer {
     fn render_rename_foreign_key(&self, fks: MigrationPair<sql::ForeignKeyWalker<'_>>) -> String {
         format!(
             r#"EXEC sp_rename '{schema}.{previous}', '{next}', 'OBJECT'"#,
-            schema = fks.previous.table().namespace().unwrap_or_else(|| self.schema_name()),
+            schema = fks.previous.table().explicit_namespace().unwrap_or_else(|| self.schema_name()),
             previous = fks.previous.constraint_name().unwrap(),
             next = fks.next.constraint_name().unwrap(),
         )

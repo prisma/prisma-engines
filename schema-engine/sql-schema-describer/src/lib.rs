@@ -78,6 +78,8 @@ pub struct SqlSchema {
     user_defined_types: Vec<UserDefinedType>,
     /// Connector-specific data
     connector_data: connector_data::ConnectorData,
+    /// The default namespace, if any.
+    default_namespace: Option<String>,
 }
 
 impl SqlSchema {
@@ -456,6 +458,16 @@ impl SqlSchema {
     /// No tables or enums in the catalog.
     pub fn is_empty(&self) -> bool {
         self.tables.is_empty() && self.enums.is_empty()
+    }
+
+    /// Get the default namespace, if any.
+    pub fn default_namespace(&self) -> Option<&str> {
+        self.default_namespace.as_deref()
+    }
+
+    /// Set the default namespace.
+    pub fn set_default_namespace(&mut self, namespace: String) {
+        self.default_namespace = Some(namespace);
     }
 }
 

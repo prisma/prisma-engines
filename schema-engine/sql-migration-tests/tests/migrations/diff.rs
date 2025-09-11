@@ -97,7 +97,7 @@ fn from_unique_index_to_without(mut api: TestApi) {
     } else if api.is_postgres() || api.is_cockroach() {
         expect![[r#"
             [
-                "-- DropIndex\nDROP INDEX \"public\".\"Post_authorId_key\";\n",
+                "-- DropIndex\nDROP INDEX \"Post_authorId_key\";\n",
             ]
         "#]]
     } else if api.is_mssql() {
@@ -214,20 +214,20 @@ fn from_unique_index_to_pk(mut api: TestApi) {
             [
                 [
                     "-- DropIndex",
-                    "DROP INDEX \"public\".\"C_secondary_key\";",
+                    "DROP INDEX \"C_secondary_key\";",
                     "",
                     "-- AlterTable",
-                    "ALTER TABLE \"public\".\"A\" DROP COLUMN \"name\",",
+                    "ALTER TABLE \"A\" DROP COLUMN \"name\",",
                     "ADD CONSTRAINT \"A_pkey\" PRIMARY KEY (\"id\");",
                     "",
                     "-- DropIndex",
-                    "DROP INDEX \"public\".\"A_id_key\";",
+                    "DROP INDEX \"A_id_key\";",
                     "",
                     "-- AlterTable",
-                    "ALTER TABLE \"public\".\"B\" ADD CONSTRAINT \"B_pkey\" PRIMARY KEY (\"x\", \"y\");",
+                    "ALTER TABLE \"B\" ADD CONSTRAINT \"B_pkey\" PRIMARY KEY (\"x\", \"y\");",
                     "",
                     "-- DropIndex",
-                    "DROP INDEX \"public\".\"B_x_y_key\";",
+                    "DROP INDEX \"B_x_y_key\";",
                     "",
                 ],
             ]

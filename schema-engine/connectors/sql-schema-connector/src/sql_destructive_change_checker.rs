@@ -57,7 +57,7 @@ impl SqlSchemaConnector {
         plan.push_warning(
             SqlMigrationWarningCheck::NonEmptyColumnDrop {
                 table: column.table().name().to_owned(),
-                namespace: column.table().namespace().map(str::to_owned),
+                namespace: column.table().explicit_namespace().map(str::to_owned),
                 column: column.name().to_owned(),
             },
             step_index,
@@ -86,13 +86,13 @@ impl SqlSchemaConnector {
         let typed_unexecutable = if has_virtual_default {
             UnexecutableStepCheck::AddedRequiredFieldToTableWithPrismaLevelDefault(Column {
                 table: column.table().name().to_owned(),
-                namespace: column.table().namespace().map(str::to_owned),
+                namespace: column.table().explicit_namespace().map(str::to_owned),
                 column: column.name().to_owned(),
             })
         } else {
             UnexecutableStepCheck::AddedRequiredFieldToTable(Column {
                 table: column.table().name().to_owned(),
-                namespace: column.table().namespace().map(str::to_owned),
+                namespace: column.table().explicit_namespace().map(str::to_owned),
                 column: column.name().to_owned(),
             })
         };
@@ -139,7 +139,7 @@ impl SqlSchemaConnector {
                             TableChange::DropPrimaryKey => plan.push_warning(
                                 SqlMigrationWarningCheck::PrimaryKeyChange {
                                     table: tables.previous.name().to_owned(),
-                                    namespace: tables.previous.namespace().map(str::to_owned),
+                                    namespace: tables.previous.explicit_namespace().map(str::to_owned),
                                 },
                                 step_index,
                             ),
@@ -161,7 +161,7 @@ impl SqlSchemaConnector {
                             plan.push_warning(
                                 SqlMigrationWarningCheck::PrimaryKeyChange {
                                     table: tables.previous.name().to_owned(),
-                                    namespace: tables.previous.namespace().map(str::to_owned),
+                                    namespace: tables.previous.explicit_namespace().map(str::to_owned),
                                 },
                                 step_index,
                             )
@@ -207,7 +207,7 @@ impl SqlSchemaConnector {
                                 plan.push_unexecutable(
                                     UnexecutableStepCheck::MadeOptionalFieldRequired(Column {
                                         table: columns.previous.table().name().to_owned(),
-                                        namespace: columns.previous.table().namespace().map(str::to_owned),
+                                        namespace: columns.previous.table().explicit_namespace().map(str::to_owned),
                                         column: columns.previous.name().to_owned(),
                                     }),
                                     step_index,
@@ -220,7 +220,7 @@ impl SqlSchemaConnector {
                                     plan.push_warning(
                                         SqlMigrationWarningCheck::RiskyCast {
                                             table: columns.previous.table().name().to_owned(),
-                                            namespace: columns.previous.table().namespace().map(str::to_owned),
+                                            namespace: columns.previous.table().explicit_namespace().map(str::to_owned),
                                             column: columns.previous.name().to_owned(),
                                             previous_type: format!("{:?}", columns.previous.column_type_family()),
                                             next_type: format!("{:?}", columns.next.column_type_family()),
@@ -231,7 +231,7 @@ impl SqlSchemaConnector {
                                 Some(ColumnTypeChange::NotCastable) => plan.push_warning(
                                     SqlMigrationWarningCheck::NotCastable {
                                         table: columns.previous.table().name().to_owned(),
-                                        namespace: columns.previous.table().namespace().map(str::to_owned),
+                                        namespace: columns.previous.table().explicit_namespace().map(str::to_owned),
                                         column: columns.previous.name().to_owned(),
                                         previous_type: format!("{:?}", columns.previous.column_type_family()),
                                         next_type: format!("{:?}", columns.next.column_type_family()),
@@ -244,7 +244,7 @@ impl SqlSchemaConnector {
                 }
                 SqlMigrationStep::DropTable { table_id } => {
                     let table = schemas.previous.walk(*table_id);
-                    self.check_table_drop(table.name(), table.namespace(), &mut plan, step_index);
+                    self.check_table_drop(table.name(), table.explicit_namespace(), &mut plan, step_index);
                 }
                 SqlMigrationStep::CreateIndex {
                     table_id: (Some(_), _),
