@@ -390,7 +390,7 @@ fn foreign_key_renaming_to_default_works(api: TestApi) {
     );
     let expected = expect![[r#"
         -- RenameForeignKey
-        ALTER TABLE "public"."Dog" RENAME CONSTRAINT "favouriteFood" TO "Dog_favourite_food_id_fkey";
+        ALTER TABLE "Dog" RENAME CONSTRAINT "favouriteFood" TO "Dog_favourite_food_id_fkey";
     "#]];
 
     expected.assert_eq(&migration);

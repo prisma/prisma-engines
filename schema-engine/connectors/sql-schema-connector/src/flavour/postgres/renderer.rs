@@ -210,7 +210,7 @@ impl SqlRenderer for PostgresRenderer {
         render_step(&mut |step| {
             step.render_statement(&mut |stmt| {
                 stmt.push_str("ALTER TABLE ");
-                stmt.push_display(&QuotedWithPrefix::pg_from_table_walker(tables.previous));
+                stmt.push_display(&quoted_alter_table_name(tables));
                 stmt.push_str(" ALTER PRIMARY KEY USING COLUMNS (");
                 let column_names = tables
                     .next
@@ -227,9 +227,8 @@ impl SqlRenderer for PostgresRenderer {
     fn render_rename_index(&self, indexes: MigrationPair<IndexWalker<'_>>) -> Vec<String> {
         render_step(&mut |step| {
             step.render_statement(&mut |stmt| {
-                let previous_table = indexes.previous.table();
                 let index_previous_name =
-                    QuotedWithPrefix::pg_new(previous_table.explicit_namespace(), indexes.previous.name());
+                    QuotedWithPrefix::pg_new(indexes.next.table().explicit_namespace(), indexes.previous.name());
                 stmt.push_str("ALTER INDEX ");
                 stmt.push_str(&index_previous_name.to_string());
                 stmt.push_str(" RENAME TO ");
@@ -324,20 +323,12 @@ impl SqlRenderer for PostgresRenderer {
             let mut out = Vec::with_capacity(before_statements.len() + after_statements.len() + lines.len());
             out.extend(before_statements);
             for line in lines {
-                out.push(format!(
-                    "ALTER TABLE {} {}",
-                    QuotedWithPrefix::pg_from_table_walker(tables.previous),
-                    line
-                ))
+                out.push(format!("ALTER TABLE {} {}", quoted_alter_table_name(tables), line))
             }
             out.extend(after_statements);
             out
         } else {
-            let alter_table = format!(
-                "ALTER TABLE {} {}",
-                QuotedWithPrefix::pg_new(tables.previous.explicit_namespace(), tables.previous.name()),
-                lines.join(",\n")
-            );
+            let alter_table = format!("ALTER TABLE {} {}", quoted_alter_table_name(tables), lines.join(",\n"));
 
             before_statements
                 .into_iter()
@@ -542,7 +533,7 @@ impl SqlRenderer for PostgresRenderer {
     fn render_rename_foreign_key(&self, fks: MigrationPair<ForeignKeyWalker<'_>>) -> String {
         format!(
             r#"ALTER TABLE {table} RENAME CONSTRAINT {previous} TO {next}"#,
-            table = QuotedWithPrefix::pg_from_table_walker(fks.previous.table()),
+            table = quoted_alter_table_name(fks.map(ForeignKeyWalker::table)),
             previous = self.quote(fks.previous.constraint_name().unwrap()),
             next = self.quote(fks.next.constraint_name().unwrap()),
         )
@@ -706,7 +697,7 @@ fn render_alter_column(
     renderer: &PostgresRenderer,
 ) {
     let steps = expand_alter_column(columns, column_changes);
-    let table_name = QuotedWithPrefix::pg_from_table_walker(columns.previous.table());
+    let table_name = quoted_alter_table_name(columns.map(TableColumnWalker::table));
     let column_name = Quoted::postgres_ident(columns.previous.name());
 
     let alter_column_prefix = format!("ALTER COLUMN {column_name}");
@@ -901,10 +892,7 @@ fn render_postgres_alter_enum(
             .map(|created_value| {
                 format!(
                     "ALTER TYPE {enum_name} ADD VALUE {value}",
-                    enum_name = QuotedWithPrefix::pg_new(
-                        schemas.walk(alter_enum.id).previous.explicit_namespace(),
-                        schemas.walk(alter_enum.id).previous.name()
-                    ),
+                    enum_name = quoted_alter_enum_name(schemas.walk(alter_enum.id)),
                     value = Quoted::postgres_string(created_value)
                 )
             })
@@ -989,7 +977,7 @@ fn render_postgres_alter_enum(
     {
         let sql = format!(
             "ALTER TYPE {enum_name} RENAME TO {tmp_old_name}",
-            enum_name = QuotedWithPrefix::pg_new(enums.previous.explicit_namespace(), enums.previous.name()),
+            enum_name = quoted_alter_enum_name(enums),
             tmp_old_name = Quoted::postgres_ident(&tmp_old_name)
         );
 
@@ -1024,14 +1012,14 @@ fn render_postgres_alter_enum(
             .filter_map(|(prev, next)| next.map(|next| schemas.walk(MigrationPair::new(*prev, next))))
             .filter_map(|columns| columns.next.default().map(|next_default| (columns, next_default)))
         {
-            let table_name = columns.previous.table().name();
             let column_name = columns.previous.name();
             let data_type = render_column_type(columns.next, renderer);
             let default_str = render_default(next_default.inner(), &data_type);
+            let tables = columns.map(TableColumnWalker::table);
 
             let set_default = format!(
                 "ALTER TABLE {table_name} ALTER COLUMN {column_name} SET DEFAULT {default}",
-                table_name = QuotedWithPrefix::pg_new(columns.previous.table().explicit_namespace(), table_name),
+                table_name = quoted_alter_table_name(tables),
                 column_name = Quoted::postgres_ident(&column_name),
                 default = default_str,
             );
@@ -1053,11 +1041,7 @@ fn render_cockroach_alter_enum(
     let enums = schemas.walk(alter_enum.id);
     let mut prefix = String::new();
     prefix.push_str("ALTER TYPE ");
-    prefix.push_str(
-        QuotedWithPrefix::pg_new(enums.previous.explicit_namespace(), enums.previous.name())
-            .to_string()
-            .as_str(),
-    );
+    prefix.push_str(quoted_alter_enum_name(enums).to_string().as_str());
 
     // Defaults that use a dropped value will need to be recreated after the alter enum.
     let defaults_to_drop = alter_enum
@@ -1148,4 +1132,20 @@ fn render_column_identity_str(column: TableColumnWalker<'_>, renderer: &Postgres
     } else {
         format!(" GENERATED BY DEFAULT AS IDENTITY ({})", options.join(" "))
     }
+}
+
+/// Quotes a table name for use in an `ALTER TABLE` statement.
+/// The namespace is taken from the next schema and only applied if it was explicit
+/// (which is valid because we do not support moving tables between schemas).
+/// The table name is always taken from the previous schema to handle renames correctly.
+fn quoted_alter_table_name(table: MigrationPair<TableWalker<'_>>) -> QuotedWithPrefix<&str> {
+    QuotedWithPrefix::pg_new(table.next.explicit_namespace(), table.previous.name())
+}
+
+/// Quotes an enum name for use in an `ALTER TYPE` statement.
+/// The namespace is taken from the next schema and only applied if it was explicit
+/// (which is valid because we do not support moving enums between schemas).
+/// The enum name is always taken from the previous schema to handle renames correctly.
+fn quoted_alter_enum_name(enm: MigrationPair<EnumWalker<'_>>) -> QuotedWithPrefix<&str> {
+    QuotedWithPrefix::pg_new(enm.next.explicit_namespace(), enm.previous.name())
 }
