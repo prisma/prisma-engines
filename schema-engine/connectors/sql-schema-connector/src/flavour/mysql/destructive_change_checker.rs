@@ -52,7 +52,7 @@ impl DestructiveChangeCheckerFlavour for MysqlDestructiveChangeCheckerFlavour {
             plan.push_unexecutable(
                 UnexecutableStepCheck::MadeOptionalFieldRequired(Column {
                     table: columns.previous.table().name().to_owned(),
-                    namespace: columns.previous.table().namespace().map(str::to_owned),
+                    namespace: columns.previous.table().explicit_namespace().map(str::to_owned),
                     column: columns.previous.name().to_owned(),
                 }),
                 step_index,
@@ -74,7 +74,7 @@ impl DestructiveChangeCheckerFlavour for MysqlDestructiveChangeCheckerFlavour {
                 plan.push_warning(
                     SqlMigrationWarningCheck::RiskyCast {
                         table: columns.previous.table().name().to_owned(),
-                        namespace: columns.previous.table().namespace().map(str::to_owned),
+                        namespace: columns.previous.table().explicit_namespace().map(str::to_owned),
                         column: columns.previous.name().to_owned(),
                         previous_type,
                         next_type,
@@ -86,7 +86,7 @@ impl DestructiveChangeCheckerFlavour for MysqlDestructiveChangeCheckerFlavour {
                 plan.push_warning(
                     SqlMigrationWarningCheck::NotCastable {
                         table: columns.previous.table().name().to_owned(),
-                        namespace: columns.previous.table().namespace().map(str::to_owned),
+                        namespace: columns.previous.table().explicit_namespace().map(str::to_owned),
                         column: columns.previous.name().to_owned(),
                         previous_type,
                         next_type,
@@ -113,7 +113,7 @@ impl DestructiveChangeCheckerFlavour for MysqlDestructiveChangeCheckerFlavour {
             plan.push_unexecutable(
                 UnexecutableStepCheck::AddedRequiredFieldToTable(Column {
                     table: columns.previous.table().name().to_owned(),
-                    namespace: columns.previous.table().namespace().map(str::to_owned),
+                    namespace: columns.previous.table().explicit_namespace().map(str::to_owned),
                     column: columns.previous.name().to_owned(),
                 }),
                 step_index,
@@ -122,7 +122,7 @@ impl DestructiveChangeCheckerFlavour for MysqlDestructiveChangeCheckerFlavour {
             plan.push_unexecutable(
                 UnexecutableStepCheck::DropAndRecreateRequiredColumn(Column {
                     table: columns.previous.table().name().to_owned(),
-                    namespace: columns.previous.table().namespace().map(str::to_owned),
+                    namespace: columns.previous.table().explicit_namespace().map(str::to_owned),
                     column: columns.previous.name().to_owned(),
                 }),
                 step_index,
@@ -133,7 +133,7 @@ impl DestructiveChangeCheckerFlavour for MysqlDestructiveChangeCheckerFlavour {
                 SqlMigrationWarningCheck::DropAndRecreateColumn {
                     column: columns.previous.name().to_owned(),
                     table: columns.previous.table().name().to_owned(),
-                    namespace: columns.previous.table().namespace().map(str::to_owned),
+                    namespace: columns.previous.table().explicit_namespace().map(str::to_owned),
                 },
                 step_index,
             )

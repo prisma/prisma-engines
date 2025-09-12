@@ -17,17 +17,14 @@ enum Status {
     ERROR
 }
 // Expected Migration:
-// -- CreateSchema
-// CREATE SCHEMA IF NOT EXISTS "public";
-// 
 // -- CreateEnum
-// CREATE TYPE "public"."Status" AS ENUM ('OK', 'ERROR');
+// CREATE TYPE "Status" AS ENUM ('OK', 'ERROR');
 // 
 // -- CreateTable
-// CREATE TABLE "public"."A" (
+// CREATE TABLE "A" (
 //     "id" INTEGER NOT NULL,
 //     "strings" TEXT[],
-//     "enums" "public"."Status"[],
+//     "enums" "Status"[],
 // 
 //     CONSTRAINT "A_pkey" PRIMARY KEY ("id")
 // );

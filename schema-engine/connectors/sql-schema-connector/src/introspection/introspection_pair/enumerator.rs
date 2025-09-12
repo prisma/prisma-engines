@@ -74,7 +74,7 @@ impl<'a> EnumPair<'a> {
     pub fn namespace(&self) -> Option<&'a str> {
         self.ctx
             .uses_namespaces()
-            .then(|| self.as_pair_ref().right()?.namespace())
+            .then(|| self.as_pair_ref().right()?.explicit_namespace())
             .flatten()
     }
 

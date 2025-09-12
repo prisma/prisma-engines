@@ -31,24 +31,21 @@ enum Kind {
 }
 
 // Expected Migration:
-// -- CreateSchema
-// CREATE SCHEMA IF NOT EXISTS "public";
+// -- CreateEnum
+// CREATE TYPE "Result" AS ENUM ('succeeded', 'failed');
 // 
 // -- CreateEnum
-// CREATE TYPE "public"."Result" AS ENUM ('succeeded', 'failed');
+// CREATE TYPE "Activity" AS ENUM ('DANCING', 'SLEEPING', 'READING');
 // 
 // -- CreateEnum
-// CREATE TYPE "public"."Activity" AS ENUM ('DANCING', 'SLEEPING', 'READING');
-// 
-// -- CreateEnum
-// CREATE TYPE "public"."Kind" AS ENUM ('info', 'warning', 'error');
+// CREATE TYPE "Kind" AS ENUM ('info', 'warning', 'error');
 // 
 // -- CreateTable
-// CREATE TABLE "public"."MyTable" (
+// CREATE TABLE "MyTable" (
 //     "id" INTEGER NOT NULL,
-//     "a" "public"."Activity" NOT NULL DEFAULT 'SLEEPING',
-//     "k" "public"."Kind" DEFAULT 'error',
-//     "r" "public"."Result" NOT NULL DEFAULT 'succeeded',
+//     "a" "Activity" NOT NULL DEFAULT 'SLEEPING',
+//     "k" "Kind" DEFAULT 'error',
+//     "r" "Result" NOT NULL DEFAULT 'succeeded',
 // 
 //     CONSTRAINT "MyTable_pkey" PRIMARY KEY ("id")
 // );

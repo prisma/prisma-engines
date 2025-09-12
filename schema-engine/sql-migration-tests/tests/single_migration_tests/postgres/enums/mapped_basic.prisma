@@ -18,16 +18,13 @@ enum Ripeness {
     @@map("avocado_ripeness_status")
 }
 // Expected Migration:
-// -- CreateSchema
-// CREATE SCHEMA IF NOT EXISTS "public";
-// 
 // -- CreateEnum
-// CREATE TYPE "public"."avocado_ripeness_status" AS ENUM ('NOT_RIPE_ENOUGH', 'TOO_RIPE');
+// CREATE TYPE "avocado_ripeness_status" AS ENUM ('NOT_RIPE_ENOUGH', 'TOO_RIPE');
 // 
 // -- CreateTable
-// CREATE TABLE "public"."Avocado" (
+// CREATE TABLE "Avocado" (
 //     "id" TEXT NOT NULL,
-//     "status" "public"."avocado_ripeness_status" NOT NULL,
+//     "status" "avocado_ripeness_status" NOT NULL,
 // 
 //     CONSTRAINT "Avocado_pkey" PRIMARY KEY ("id")
 // );
