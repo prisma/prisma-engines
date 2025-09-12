@@ -1263,25 +1263,25 @@ fn alter_constraint_name(mut api: TestApi) {
             } else if is_postgres {
                 expect![[r#"
                     -- AlterTable
-                    ALTER TABLE "public"."A" RENAME CONSTRAINT "A_pkey" TO "CustomId";
+                    ALTER TABLE "A" RENAME CONSTRAINT "A_pkey" TO "CustomId";
 
                     -- AlterTable
-                    ALTER TABLE "public"."B" RENAME CONSTRAINT "B_pkey" TO "CustomCompoundId";
+                    ALTER TABLE "B" RENAME CONSTRAINT "B_pkey" TO "CustomCompoundId";
 
                     -- RenameForeignKey
-                    ALTER TABLE "public"."B" RENAME CONSTRAINT "B_aId_fkey" TO "CustomFK";
+                    ALTER TABLE "B" RENAME CONSTRAINT "B_aId_fkey" TO "CustomFK";
 
                     -- RenameIndex
-                    ALTER INDEX "public"."A_a_b_key" RENAME TO "CustomCompoundUnique";
+                    ALTER INDEX "A_a_b_key" RENAME TO "CustomCompoundUnique";
 
                     -- RenameIndex
-                    ALTER INDEX "public"."A_a_idx" RENAME TO "CustomIndex";
+                    ALTER INDEX "A_a_idx" RENAME TO "CustomIndex";
 
                     -- RenameIndex
-                    ALTER INDEX "public"."A_name_key" RENAME TO "CustomUnique";
+                    ALTER INDEX "A_name_key" RENAME TO "CustomUnique";
 
                     -- RenameIndex
-                    ALTER INDEX "public"."B_a_b_idx" RENAME TO "AnotherCustomIndex";
+                    ALTER INDEX "B_a_b_idx" RENAME TO "AnotherCustomIndex";
                 "#]]
             } else if is_sqlite {
                 expect![[r#"

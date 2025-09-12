@@ -685,14 +685,14 @@ fn alter_enum_and_change_default_must_work(api: TestApi) {
                 CREATE TYPE "Mood_new" AS ENUM ('HUNGRY', 'SLEEPY');
                 ALTER TABLE "public"."Cat" ALTER COLUMN "moods" DROP DEFAULT;
                 ALTER TABLE "Cat" ALTER COLUMN "moods" TYPE "Mood_new"[] USING ("moods"::text::"Mood_new"[]);
-                ALTER TYPE "public"."Mood" RENAME TO "Mood_old";
+                ALTER TYPE "Mood" RENAME TO "Mood_old";
                 ALTER TYPE "Mood_new" RENAME TO "Mood";
                 DROP TYPE "public"."Mood_old";
-                ALTER TABLE "public"."Cat" ALTER COLUMN "moods" SET DEFAULT ARRAY['SLEEPY']::"Mood"[];
+                ALTER TABLE "Cat" ALTER COLUMN "moods" SET DEFAULT ARRAY['SLEEPY']::"Mood"[];
                 COMMIT;
 
                 -- AlterTable
-                ALTER TABLE "public"."Cat" ALTER COLUMN "moods" SET DEFAULT ARRAY['SLEEPY']::"Mood"[];
+                ALTER TABLE "Cat" ALTER COLUMN "moods" SET DEFAULT ARRAY['SLEEPY']::"Mood"[];
             "#]];
             migration.expect_contents(expected_script)
         });

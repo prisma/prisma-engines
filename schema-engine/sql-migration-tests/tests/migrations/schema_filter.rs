@@ -343,7 +343,7 @@ fn schema_filter_migration_removing_external_tables_incl_relations(mut api: Test
                     ALTER TABLE "public"."cat" DROP CONSTRAINT "cat_externalTableId_fkey";
 
                     -- AlterTable
-                    ALTER TABLE "public"."cat" DROP COLUMN "externalTableId";
+                    ALTER TABLE "cat" DROP COLUMN "externalTableId";
                 "#]]
             } else if is_mysql {
                 expect![[r#"
@@ -485,7 +485,7 @@ fn schema_filter_migration_modifying_external_tables_incl_relations(mut api: Tes
             let expected_script = if is_postgres {
                 expect![[r#"
                     -- AlterTable
-                    ALTER TABLE "public"."cat" ADD COLUMN     "externalTableId" INTEGER;
+                    ALTER TABLE "cat" ADD COLUMN     "externalTableId" INTEGER;
 
                     -- AddForeignKey
                     ALTER TABLE "cat" ADD CONSTRAINT "cat_externalTableId_fkey" FOREIGN KEY ("externalTableId") REFERENCES "ExternalTableA"("id") ON DELETE SET NULL ON UPDATE CASCADE;
