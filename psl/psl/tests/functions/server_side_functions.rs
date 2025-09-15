@@ -10,7 +10,7 @@ fn correctly_handle_server_side_now_function() {
         }
     "#};
 
-    psl::parse_schema(dml)
+    psl::parse_schema_without_extensions(dml)
         .unwrap()
         .assert_has_model("User")
         .assert_has_scalar_field("signupDate")
@@ -28,7 +28,7 @@ fn correctly_handle_server_side_cuid_function() {
         }
     "#};
 
-    psl::parse_schema(dml)
+    psl::parse_schema_without_extensions(dml)
         .unwrap()
         .assert_has_model("User")
         .assert_has_scalar_field("someId")
@@ -46,7 +46,7 @@ fn correctly_handle_server_side_uuid_function() {
         }
     "#};
 
-    psl::parse_schema(dml)
+    psl::parse_schema_without_extensions(dml)
         .unwrap()
         .assert_has_model("User")
         .assert_has_scalar_field("someId")

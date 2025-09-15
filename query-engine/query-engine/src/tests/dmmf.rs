@@ -8,7 +8,7 @@ use serial_test::serial;
 use std::sync::Arc;
 
 pub fn get_query_schema(datamodel_string: &str) -> QuerySchema {
-    let dm = psl::parse_schema(datamodel_string).unwrap();
+    let dm = psl::parse_schema_without_extensions(datamodel_string).unwrap();
     schema::build(Arc::new(dm), false)
 }
 

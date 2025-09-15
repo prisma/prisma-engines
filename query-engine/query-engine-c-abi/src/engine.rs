@@ -134,7 +134,7 @@ impl QueryEngine {
             .collect();
 
         let datamodel = get_cstr_safe(constructor_options.datamodel).expect("Datamodel must be present");
-        let mut schema = psl::validate(datamodel.into());
+        let mut schema = psl::validate_without_extensions(datamodel.into());
 
         let config = &mut schema.configuration;
         config

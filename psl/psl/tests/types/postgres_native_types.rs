@@ -225,7 +225,7 @@ fn xml_should_work_with_string_scalar_type() {
         }
     "#};
 
-    let datamodel = psl::parse_schema(dml).unwrap();
+    let datamodel = psl::parse_schema_without_extensions(dml).unwrap();
     let user_model = datamodel.assert_has_model("Blog");
 
     user_model

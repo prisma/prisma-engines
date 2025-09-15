@@ -30,7 +30,7 @@ async fn introspecting_cockroach_db_with_postgres_provider_fails(api: TestApi) {
 
     api.raw_cmd(setup).await;
 
-    let schema = psl::parse_schema(schema).unwrap();
+    let schema = psl::parse_schema_without_extensions(schema).unwrap();
     let ctx =
         IntrospectionContext::new_config_only(schema, CompositeTypeDepth::Infinite, None, PathBuf::new()).unwrap();
 

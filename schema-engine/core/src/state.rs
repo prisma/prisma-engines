@@ -77,7 +77,9 @@ impl EngineState {
         host: Option<Arc<dyn ConnectorHost>>,
     ) -> Self {
         EngineState {
-            initial_datamodel: initial_datamodels.as_deref().map(psl::validate_multi_file),
+            initial_datamodel: initial_datamodels
+                .as_deref()
+                .map(psl::validate_multi_file_without_extensions),
             host: host.unwrap_or_else(|| Arc::new(schema_connector::EmptyHost)),
             connectors: Default::default(),
             migration_schema_cache: Arc::new(Mutex::new(Default::default())),
@@ -368,7 +370,7 @@ impl GenericApi for EngineState {
         let composite_type_depth = From::from(params.composite_type_depth);
 
         let ctx = if params.force {
-            let previous_schema = psl::validate_multi_file(&source_files);
+            let previous_schema = psl::validate_multi_file_without_extensions(&source_files);
 
             schema_connector::IntrospectionContext::new_config_only(
                 previous_schema,
@@ -377,7 +379,7 @@ impl GenericApi for EngineState {
                 PathBuf::new().join(&params.base_directory_path),
             )
         } else {
-            psl::parse_schema_multi(&source_files).map(|previous_schema| {
+            psl::parse_schema_multi_without_extensions(&source_files).map(|previous_schema| {
                 schema_connector::IntrospectionContext::new(
                     previous_schema,
                     composite_type_depth,

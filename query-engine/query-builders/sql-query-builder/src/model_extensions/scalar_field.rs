@@ -61,6 +61,7 @@ impl ScalarFieldExt for ScalarField {
                     let schema_name = enum_walker.schema_name().or(ctx.schema_name()).map(ToOwned::to_owned);
                     ValueType::Enum(None, Some(EnumName::new(enum_name, schema_name))).into_value()
                 }
+                TypeIdentifier::Extension(_) => unreachable!("No extension field should reach this path"),
                 TypeIdentifier::Json => Value::null_json(),
                 TypeIdentifier::DateTime => Value::null_datetime(),
                 TypeIdentifier::UUID => Value::null_uuid(),
@@ -100,11 +101,12 @@ impl ScalarFieldExt for ScalarField {
             }
             TypeIdentifier::Boolean => TypeFamily::Boolean,
             TypeIdentifier::Enum(_) => TypeFamily::Text(Some(TypeDataLength::Constant(8000))),
+            TypeIdentifier::Extension(_) => unreachable!("No extension field should reach this path"),
             TypeIdentifier::UUID => TypeFamily::Uuid,
             TypeIdentifier::Json => TypeFamily::Text(Some(TypeDataLength::Maximum)),
             TypeIdentifier::DateTime => TypeFamily::DateTime,
             TypeIdentifier::Bytes => TypeFamily::Text(parse_scalar_length(self)),
-            TypeIdentifier::Unsupported => unreachable!("No unsupported field should reach that path"),
+            TypeIdentifier::Unsupported => unreachable!("No unsupported field should reach this path"),
         }
     }
 }

@@ -389,7 +389,7 @@ async fn missing_select_rights(api: &mut TestApi) -> TestResult {
     "#
     );
 
-    let config = psl::parse_schema(datasource).unwrap();
+    let config = psl::parse_schema_without_extensions(datasource).unwrap();
 
     let ctx = IntrospectionContext::new(config, Default::default(), None, PathBuf::new());
 

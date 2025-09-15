@@ -4,7 +4,9 @@ use base64::prelude::*;
 use either::Either::{Left, Right};
 use psl::datamodel_connector::Connector;
 use psl::diagnostics::DatamodelWarning;
-use psl::parser_database::{IndexAlgorithm, ModelId, OperatorClass, ReferentialAction, ScalarType, SortOrder, walkers};
+use psl::parser_database::{
+    IndexAlgorithm, ModelId, OperatorClass, ReferentialAction, ScalarFieldType, ScalarType, SortOrder, walkers,
+};
 use psl::schema_ast::ast::WithDocumentation;
 use psl::schema_ast::ast::{self, FieldArity};
 use psl::{Diagnostics, StringFromEnvVar};
@@ -42,6 +44,7 @@ pub(crate) trait TypeAssert<'a> {
 }
 
 pub(crate) trait ScalarFieldAssert {
+    fn assert_scalar_field_type(&self, t: ScalarFieldType) -> &Self;
     fn assert_scalar_type(&self, t: ScalarType) -> &Self;
     fn assert_is_single_field_id(&self) -> walkers::PrimaryKeyWalker<'_>;
     fn assert_is_single_field_unique(&self) -> walkers::IndexWalker<'_>;
@@ -279,9 +282,14 @@ impl ScalarFieldAssert for walkers::ScalarFieldWalker<'_> {
     }
 
     #[track_caller]
-    fn assert_scalar_type(&self, t: ScalarType) -> &Self {
-        assert_eq!(self.scalar_type(), Some(t));
+    fn assert_scalar_field_type(&self, t: ScalarFieldType) -> &Self {
+        assert_eq!(self.scalar_field_type(), t);
         self
+    }
+
+    #[track_caller]
+    fn assert_scalar_type(&self, t: ScalarType) -> &Self {
+        self.assert_scalar_field_type(ScalarFieldType::BuiltInScalar(t))
     }
 
     #[track_caller]

@@ -297,7 +297,8 @@ fn row_value_to_prisma_value(p_value: Value, meta: ColumnMetadata<'_>) -> Result
             ValueType::Bytes(Some(bytes)) => PrismaValue::Bytes(bytes.into()),
             _ => return Err(create_error(&p_value)),
         },
-        TypeIdentifier::Unsupported => unreachable!("No unsupported field should reach that path"),
+        TypeIdentifier::Extension(_) => unreachable!("No extension field should reach this path"),
+        TypeIdentifier::Unsupported => unreachable!("No unsupported field should reach this path"),
     })
 }
 

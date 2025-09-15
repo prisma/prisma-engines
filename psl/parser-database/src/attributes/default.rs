@@ -65,6 +65,9 @@ pub(super) fn visit_model_field_default(
             (model_id, field_id),
             ctx,
         ),
+        ScalarFieldType::Extension(_) => {
+            ctx.push_attribute_validation_error("Only @default(dbgenerated(\"...\")) can be used for extension types.");
+        }
         ScalarFieldType::Unsupported(_) => {
             ctx.push_attribute_validation_error(
                 "Only @default(dbgenerated(\"...\")) can be used for Unsupported types.",
@@ -129,6 +132,9 @@ pub(super) fn visit_composite_field_default(
         }
         ScalarFieldType::BuiltInScalar(scalar_type) => {
             validate_composite_builtin_scalar_type_default(scalar_type, value, &mut accept, ast_field.arity, ctx)
+        }
+        ScalarFieldType::Extension(_) => {
+            ctx.push_attribute_validation_error("Composite field with extension type cannot have default values.")
         }
         ScalarFieldType::Unsupported(_) => {
             ctx.push_attribute_validation_error("Composite field of type `Unsupported` cannot have default values.")

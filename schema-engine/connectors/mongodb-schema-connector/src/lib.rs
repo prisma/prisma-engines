@@ -99,7 +99,7 @@ impl SchemaDialect for MongoDbSchemaDialect {
         sources: Vec<(String, psl::SourceFile)>,
         _default_namespace: Option<&str>,
     ) -> ConnectorResult<DatabaseSchema> {
-        let validated_schema = psl::parse_schema_multi(&sources).map_err(ConnectorError::new_schema_parser_error)?;
+        let validated_schema = psl::parse_schema_multi_without_extensions(&sources).map_err(ConnectorError::new_schema_parser_error)?;
         Ok(DatabaseSchema::new(schema_calculator::calculate(&validated_schema)))
     }
 

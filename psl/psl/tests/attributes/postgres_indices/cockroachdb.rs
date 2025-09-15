@@ -13,7 +13,7 @@ fn array_field_default_ops() {
         }
     "#};
 
-    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+    psl::parse_schema_without_extensions(with_header(dml, Provider::Postgres, &[]))
         .unwrap()
         .assert_has_model("A")
         .assert_index_on_fields(&["a"])
@@ -31,7 +31,7 @@ fn no_ops_json_prisma_type() {
         }
     "#};
 
-    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+    psl::parse_schema_without_extensions(with_header(dml, Provider::Postgres, &[]))
         .unwrap()
         .assert_has_model("A")
         .assert_index_on_fields(&["a"])
@@ -49,7 +49,7 @@ fn with_raw_unsupported() {
         }
     "#};
 
-    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+    psl::parse_schema_without_extensions(with_header(dml, Provider::Postgres, &[]))
         .unwrap()
         .assert_has_model("A")
         .assert_index_on_fields(&["a"])
@@ -68,7 +68,7 @@ fn jsonb_column_as_the_last_in_index() {
         }
     "#};
 
-    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+    psl::parse_schema_without_extensions(with_header(dml, Provider::Postgres, &[]))
         .unwrap()
         .assert_has_model("A")
         .assert_index_on_fields(&["b", "a"])

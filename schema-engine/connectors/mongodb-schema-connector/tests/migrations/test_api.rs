@@ -172,7 +172,7 @@ pub(crate) fn test_scenario(scenario_name: &str) {
 
     RT.block_on(async move {
         let schema = SourceFile::new_allocated(Arc::from(schema.into_boxed_str()));
-        let parsed_schema = psl::parse_schema(schema.clone()).unwrap();
+        let parsed_schema = psl::parse_schema_without_extensions(schema.clone()).unwrap();
         let (db_name, mut connector) = new_connector(parsed_schema.configuration.preview_features());
         let client = client().await;
         let db = client.database(&db_name);

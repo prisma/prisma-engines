@@ -13,7 +13,7 @@ fn with_raw_unsupported() {
         }
     "#};
 
-    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+    psl::parse_schema_without_extensions(with_header(dml, Provider::Postgres, &[]))
         .unwrap()
         .assert_has_model("A")
         .assert_index_on_fields(&["a"])
@@ -33,7 +33,7 @@ fn with_unsupported_no_ops() {
         }
     "#};
 
-    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+    psl::parse_schema_without_extensions(with_header(dml, Provider::Postgres, &[]))
         .unwrap()
         .assert_has_model("A")
         .assert_index_on_fields(&["a"])
@@ -53,7 +53,7 @@ fn no_ops_json_prisma_type() {
         }
     "#};
 
-    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+    psl::parse_schema_without_extensions(with_header(dml, Provider::Postgres, &[]))
         .unwrap()
         .assert_has_model("A")
         .assert_index_on_fields(&["a"])
@@ -71,7 +71,7 @@ fn no_ops_jsonb_native_type() {
         }
     "#};
 
-    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+    psl::parse_schema_without_extensions(with_header(dml, Provider::Postgres, &[]))
         .unwrap()
         .assert_has_model("A")
         .assert_index_on_fields(&["a"])
@@ -89,7 +89,7 @@ fn valid_jsonb_ops_with_native_type() {
         }
     "#};
 
-    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+    psl::parse_schema_without_extensions(with_header(dml, Provider::Postgres, &[]))
         .unwrap()
         .assert_has_model("A")
         .assert_index_on_fields(&["a"])
@@ -109,7 +109,7 @@ fn valid_jsonb_ops_without_native_type() {
         }
     "#};
 
-    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+    psl::parse_schema_without_extensions(with_header(dml, Provider::Postgres, &[]))
         .unwrap()
         .assert_has_model("A")
         .assert_index_on_fields(&["a"])
@@ -209,7 +209,7 @@ fn valid_jsonb_path_ops_with_native_type() {
         }
     "#};
 
-    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+    psl::parse_schema_without_extensions(with_header(dml, Provider::Postgres, &[]))
         .unwrap()
         .assert_has_model("A")
         .assert_index_on_fields(&["a"])
@@ -229,7 +229,7 @@ fn valid_jsonb_path_ops_without_native_type() {
         }
     "#};
 
-    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+    psl::parse_schema_without_extensions(with_header(dml, Provider::Postgres, &[]))
         .unwrap()
         .assert_has_model("A")
         .assert_index_on_fields(&["a"])
@@ -329,7 +329,7 @@ fn array_field_default_ops() {
         }
     "#};
 
-    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+    psl::parse_schema_without_extensions(with_header(dml, Provider::Postgres, &[]))
         .unwrap()
         .assert_has_model("A")
         .assert_index_on_fields(&["a"])
@@ -347,7 +347,7 @@ fn array_field_array_ops() {
         }
     "#};
 
-    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+    psl::parse_schema_without_extensions(with_header(dml, Provider::Postgres, &[]))
         .unwrap()
         .assert_has_model("A")
         .assert_index_on_fields(&["a"])
@@ -393,7 +393,7 @@ fn gin_raw_ops_to_supported_type() {
         }
     "#;
 
-    psl::parse_schema(with_header(dm, Provider::Postgres, &[]))
+    psl::parse_schema_without_extensions(with_header(dm, Provider::Postgres, &[]))
         .unwrap()
         .assert_has_model("A")
         .assert_index_on_fields(&["data"])

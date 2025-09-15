@@ -185,7 +185,7 @@ source .test_database_urls/mysql_5_6
 
     let config = format!("{datasource}\n\n{generator}");
 
-    let psl = psl::validate(config.into());
+    let psl = psl::validate_without_extensions(config.into());
 
     let ctx = IntrospectionContext::new(psl, CompositeTypeDepth::Infinite, namespaces.clone(), PathBuf::new());
 
@@ -206,7 +206,7 @@ source .test_database_urls/mysql_5_6
         .trim_end_matches("*/\n");
 
     if last_comment == introspected {
-        let introspected_schema = match psl::parse_schema(&introspected) {
+        let introspected_schema = match psl::parse_schema_without_extensions(&introspected) {
             Ok(s) => s,
             Err(_err) => {
                 eprintln!("The introspected schema is invalid.");

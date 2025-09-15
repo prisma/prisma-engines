@@ -1,6 +1,8 @@
 pub(crate) mod index_fields;
 
-use crate::{DatamodelError, context::Context, interner::StringId, walkers::IndexFieldWalker};
+use crate::{
+    DatamodelError, context::Context, extension::ExtensionTypeId, interner::StringId, walkers::IndexFieldWalker,
+};
 use either::Either;
 use enumflags2::bitflags;
 use rustc_hash::FxHashMap as HashMap;
@@ -40,6 +42,7 @@ pub(super) struct Types {
     /// not part of the base Prisma ones. This is meant for later validation in the datamodel
     /// connector.
     pub(super) unknown_function_defaults: Vec<ScalarFieldId>,
+    pub(super) extension_types: HashMap<ExtensionTypeId, StringId>,
 }
 
 impl Types {
@@ -188,6 +191,8 @@ pub enum ScalarFieldType {
     CompositeType(crate::CompositeTypeId),
     /// An enum
     Enum(crate::EnumId),
+    /// A type defined in an extension
+    Extension(ExtensionTypeId),
     /// A Prisma scalar type
     BuiltInScalar(ScalarType),
     /// An `Unsupported("...")` type
@@ -756,12 +761,12 @@ fn field_type<'db>(field: &'db ast::Field, ctx: &mut Context<'db>) -> Result<Fie
             return Ok(FieldType::Scalar(ScalarFieldType::Unsupported(unsupported)));
         }
     };
-    let supported_string_id = ctx.interner.intern(supported);
 
     if let Some(tpe) = ScalarType::try_from_str(supported, false) {
         return Ok(FieldType::Scalar(ScalarFieldType::BuiltInScalar(tpe)));
     }
 
+    let supported_string_id = ctx.interner.intern(supported);
     match ctx
         .names
         .tops
@@ -776,7 +781,14 @@ fn field_type<'db>(field: &'db ast::Field, ctx: &mut Context<'db>) -> Result<Fie
             Ok(FieldType::Scalar(ScalarFieldType::CompositeType((file_id, ctid))))
         }
         Some((_, _, ast::Top::Generator(_))) | Some((_, _, ast::Top::Source(_))) => unreachable!(),
-        None => Err(supported),
+        None => {
+            if let Some(tpe) = ctx.extension_types().extension_type_by_name(supported) {
+                ctx.types.extension_types.insert(tpe, supported_string_id);
+                Ok(FieldType::Scalar(ScalarFieldType::Extension(tpe)))
+            } else {
+                Err(supported)
+            }
+        }
         _ => unreachable!(),
     }
 }

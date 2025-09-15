@@ -38,6 +38,7 @@ impl DataInputFieldMapper for UpdateDataInputFieldMapper {
                     false,
                 ))
             }
+            TypeIdentifier::Extension(_) => unreachable!("No extension field should reach this path"),
             TypeIdentifier::Json => map_scalar_input_type_for_field(ctx, &sf),
             TypeIdentifier::DateTime => {
                 InputType::object(update_operations_object_type(ctx, "DateTime", sf.clone(), false))
@@ -45,7 +46,7 @@ impl DataInputFieldMapper for UpdateDataInputFieldMapper {
             TypeIdentifier::UUID => InputType::object(update_operations_object_type(ctx, "Uuid", sf.clone(), false)),
             TypeIdentifier::Bytes => InputType::object(update_operations_object_type(ctx, "Bytes", sf.clone(), false)),
 
-            TypeIdentifier::Unsupported => unreachable!("No unsupported field should reach that path"),
+            TypeIdentifier::Unsupported => unreachable!("No unsupported field should reach this path"),
         };
 
         let has_adv_json = ctx.has_capability(ConnectorCapability::AdvancedJsonNullability);
