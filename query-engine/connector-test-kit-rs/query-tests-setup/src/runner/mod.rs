@@ -238,7 +238,7 @@ impl Runner {
         log_capture: TestLogCapture,
     ) -> TestResult<Self> {
         let protocol = EngineProtocol::from(&ENGINE_PROTOCOL.to_string());
-        let schema = psl::parse_schema(&datamodel).unwrap();
+        let schema = psl::parse_schema_without_extensions(&datamodel).unwrap();
         let datasource = schema.configuration.datasources.first().unwrap();
         let url = datasource.load_url(|key| env::var(key).ok()).unwrap();
 

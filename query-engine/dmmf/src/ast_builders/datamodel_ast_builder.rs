@@ -87,7 +87,7 @@ fn composite_type_field_to_dmmf(field: walkers::CompositeTypeFieldWalker<'_>) ->
             ScalarFieldType::CompositeType(_) => "object",
             ScalarFieldType::Enum(_) => "enum",
             ScalarFieldType::BuiltInScalar(_) => "scalar",
-            ScalarFieldType::Unsupported(_) => unreachable!(),
+            ScalarFieldType::Extension(_) | ScalarFieldType::Unsupported(_) => unreachable!(),
         },
         db_name: field.mapped_name().map(ToOwned::to_owned),
         is_required: field.arity() == FieldArity::Required || field.arity() == FieldArity::List,
@@ -111,7 +111,7 @@ fn composite_type_field_to_dmmf(field: walkers::CompositeTypeFieldWalker<'_>) ->
             ScalarFieldType::CompositeType(ct) => field.walk(ct).name().to_owned(),
             ScalarFieldType::Enum(enm) => field.walk(enm).name().to_owned(),
             ScalarFieldType::BuiltInScalar(st) => st.as_str().to_owned(),
-            ScalarFieldType::Unsupported(_) => unreachable!(),
+            ScalarFieldType::Extension(_) | ScalarFieldType::Unsupported(_) => unreachable!(),
         },
         is_generated: None,
         is_updated_at: None,
@@ -182,7 +182,7 @@ fn scalar_field_to_dmmf(field: walkers::ScalarFieldWalker<'_>) -> Field {
             ScalarFieldType::CompositeType(_) => "object",
             ScalarFieldType::Enum(_) => "enum",
             ScalarFieldType::BuiltInScalar(_) => "scalar",
-            ScalarFieldType::Unsupported(_) => unreachable!(),
+            ScalarFieldType::Extension(_) | ScalarFieldType::Unsupported(_) => unreachable!(),
         },
         is_list: ast_field.arity.is_list(),
         is_required: matches!(ast_field.arity, FieldArity::Required | FieldArity::List),
@@ -199,7 +199,7 @@ fn scalar_field_to_dmmf(field: walkers::ScalarFieldWalker<'_>) -> Field {
             ScalarFieldType::CompositeType(ct) => field_walker.walk(ct).name().to_owned(),
             ScalarFieldType::Enum(enm) => field_walker.walk(enm).name().to_owned(),
             ScalarFieldType::BuiltInScalar(st) => st.as_str().to_owned(),
-            ScalarFieldType::Unsupported(_) => unreachable!(),
+            ScalarFieldType::Extension(_) | ScalarFieldType::Unsupported(_) => unreachable!(),
         },
         native_type: field
             .raw_native_type()
@@ -358,7 +358,7 @@ mod tests {
     use std::fs;
 
     fn render_to_dmmf(schema: &str) -> String {
-        let schema = psl::parse_schema(schema).unwrap();
+        let schema = psl::parse_schema_without_extensions(schema).unwrap();
         let dmmf = schema_to_dmmf(&schema);
         serde_json::to_string_pretty(&dmmf).expect("Failed to render JSON")
     }

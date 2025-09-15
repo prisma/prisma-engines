@@ -9,10 +9,10 @@ fn criterion_benchmark(c: &mut Criterion) {
         let source_file: psl::SourceFile = prisma_schema.into();
 
         c.bench_function(&format!("psl::validate ({name})"), |b| {
-            b.iter(|| black_box(psl::validate(source_file.clone())))
+            b.iter(|| black_box(psl::validate_without_extensions(source_file.clone())))
         });
 
-        let validated_schema = std::sync::Arc::new(psl::validate(source_file));
+        let validated_schema = std::sync::Arc::new(psl::validate_without_extensions(source_file));
 
         c.bench_function(&format!("schema_builder::build ({name})"), |b| {
             b.iter(|| black_box(schema::build(validated_schema.clone(), true)));

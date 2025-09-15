@@ -2,8 +2,8 @@ mod attributes;
 
 use self::attributes::AttributesValidationState;
 use crate::{
-    DatamodelError, Diagnostics, InFile, StringId, ast, interner::StringInterner, names::Names, relations::Relations,
-    types::Types,
+    DatamodelError, Diagnostics, InFile, StringId, ast, extension::ExtensionTypes, interner::StringInterner,
+    names::Names, relations::Relations, types::Types,
 };
 use schema_ast::ast::{EnumValueId, Expression, WithName};
 use std::collections::{HashMap, HashSet};
@@ -27,6 +27,7 @@ pub(crate) struct Context<'db> {
     pub(crate) types: &'db mut Types,
     pub(crate) relations: &'db mut Relations,
     pub(crate) diagnostics: &'db mut Diagnostics,
+    extension_types: &'db dyn ExtensionTypes,
     attributes: AttributesValidationState, // state machine for attribute validation
 
     // @map'ed names indexes. These are not in the db because they are only used for validation.
@@ -44,6 +45,7 @@ impl<'db> Context<'db> {
         types: &'db mut Types,
         relations: &'db mut Relations,
         diagnostics: &'db mut Diagnostics,
+        extension_types: &'db dyn ExtensionTypes,
     ) -> Self {
         Context {
             asts,
@@ -52,6 +54,7 @@ impl<'db> Context<'db> {
             types,
             relations,
             diagnostics,
+            extension_types,
             attributes: AttributesValidationState::default(),
 
             mapped_model_scalar_field_names: Default::default(),
@@ -437,6 +440,10 @@ impl<'db> Context<'db> {
         }
 
         true
+    }
+
+    pub(super) fn extension_types(&self) -> &dyn ExtensionTypes {
+        self.extension_types
     }
 }
 

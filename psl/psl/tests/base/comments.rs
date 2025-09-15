@@ -14,7 +14,7 @@ fn comments_must_work_in_models() {
         }
     "#};
 
-    let schema = psl::parse_schema(dml).unwrap();
+    let schema = psl::parse_schema_without_extensions(dml).unwrap();
 
     let user_model = schema.assert_has_model("User");
     user_model.assert_with_documentation("comment 1");
@@ -92,7 +92,7 @@ fn comments_must_work_in_enums() {
       PIZZAIOLO /// they make the pizza
     }"#;
 
-    let schema = psl::parse_schema(dml).unwrap();
+    let schema = psl::parse_schema_without_extensions(dml).unwrap();
     let role_enum = schema.db.find_enum("Role").unwrap();
     assert_eq!(role_enum.ast_enum().documentation(), Some("Documentation Comment Enum"));
     let vals: Vec<(_, _)> = role_enum.values().map(|v| (v.name(), v.documentation())).collect();
@@ -113,7 +113,7 @@ fn accept_a_comment_at_the_end() {
     }
     // This is a comment"#;
 
-    let schema = psl::parse_schema(dml).unwrap();
+    let schema = psl::parse_schema_without_extensions(dml).unwrap();
     let user_model = schema.assert_has_model("User");
 
     user_model
@@ -129,7 +129,7 @@ fn accept_a_doc_comment_at_the_end() {
     }
     /// This is a doc comment"#;
 
-    let schema = psl::parse_schema(dml).unwrap();
+    let schema = psl::parse_schema_without_extensions(dml).unwrap();
     let user_model = schema.assert_has_model("User");
 
     user_model
@@ -171,7 +171,7 @@ fn two_slash_comments_should_not_lead_to_empty_comments() {
         id        String    @id @default(uuid())
     }"#;
 
-    let schema = psl::parse_schema(dml).unwrap();
+    let schema = psl::parse_schema_without_extensions(dml).unwrap();
     let user_model = schema.assert_has_model("User2");
 
     assert_eq!(user_model.ast_model().documentation(), None);

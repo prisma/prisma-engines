@@ -221,7 +221,7 @@ pub fn type_identifier_to_opaque_type(identifier: &TypeIdentifier) -> OpaqueType
         TypeIdentifier::Json => OpaqueType::Json,
         TypeIdentifier::DateTime => OpaqueType::DateTime,
         TypeIdentifier::Bytes => OpaqueType::Bytes,
-        TypeIdentifier::Unsupported => OpaqueType::Unknown,
+        TypeIdentifier::Extension(_) | TypeIdentifier::Unsupported => OpaqueType::Unknown,
     }
 }
 

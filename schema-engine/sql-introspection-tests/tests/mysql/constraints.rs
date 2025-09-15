@@ -51,7 +51,7 @@ async fn check_constraints_stopgap(api: &mut TestApi) -> TestResult {
     api.expect_datamodel(&schema).await;
 
     // ensure the introspected schema is valid
-    psl::parse_schema(schema.data()).unwrap();
+    psl::parse_schema_without_extensions(schema.data()).unwrap();
 
     let expectation = expect![[r#"
         *** WARNING ***

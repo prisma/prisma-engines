@@ -96,6 +96,7 @@ impl ScalarField {
                 unreachable!("This shouldn't be reached; composite types are not supported in compound unique indices.",)
             }
             ScalarFieldType::Enum(x) => TypeIdentifier::Enum(x),
+            ScalarFieldType::Extension(udt) => TypeIdentifier::Extension(udt),
             ScalarFieldType::BuiltInScalar(scalar) => scalar.into(),
             ScalarFieldType::Unsupported(_) => TypeIdentifier::Unsupported,
         }

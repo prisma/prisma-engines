@@ -12,7 +12,7 @@ fn basic_index_must_work() {
     }
     "#;
 
-    psl::parse_schema(dml)
+    psl::parse_schema_without_extensions(dml)
         .unwrap()
         .assert_has_model("User")
         .assert_index_on_fields(&["firstName", "lastName"]);
@@ -34,7 +34,7 @@ fn indexes_on_enum_fields_must_work() {
         }
     "#;
 
-    psl::parse_schema(dml)
+    psl::parse_schema_without_extensions(dml)
         .unwrap()
         .assert_has_model("User")
         .assert_index_on_fields(&["role"]);
@@ -53,7 +53,7 @@ fn the_name_argument_must_work() {
     }
     "#;
 
-    psl::parse_schema(dml)
+    psl::parse_schema_without_extensions(dml)
         .unwrap()
         .assert_has_model("User")
         .assert_index_on_fields(&["firstName", "lastName"])
@@ -77,7 +77,7 @@ fn the_map_argument_must_work() {
         }
     "#;
 
-    psl::parse_schema(dml)
+    psl::parse_schema_without_extensions(dml)
         .unwrap()
         .assert_has_model("User")
         .assert_index_on_fields(&["firstName", "lastName"])
@@ -97,7 +97,7 @@ fn multiple_index_must_work() {
     }
     "#;
 
-    psl::parse_schema(dml).unwrap();
+    psl::parse_schema_without_extensions(dml).unwrap();
 }
 
 #[test]
@@ -121,7 +121,7 @@ fn index_accepts_three_different_notations() {
         &[],
     );
 
-    psl::parse_schema(dml).unwrap();
+    psl::parse_schema_without_extensions(dml).unwrap();
 }
 
 #[test]
@@ -132,7 +132,7 @@ fn mysql_allows_unique_length_prefix() {
         }
     "#};
 
-    psl::parse_schema(with_header(dml, Provider::Mysql, &[]))
+    psl::parse_schema_without_extensions(with_header(dml, Provider::Mysql, &[]))
         .unwrap()
         .assert_has_model("A")
         .assert_unique_on_fields(&["id"])
@@ -304,7 +304,7 @@ fn mysql_fulltext_index() {
         }
     "#};
 
-    psl::parse_schema(with_header(dml, Provider::Mysql, &[]))
+    psl::parse_schema_without_extensions(with_header(dml, Provider::Mysql, &[]))
         .unwrap()
         .assert_has_model("A")
         .assert_fulltext_on_fields(&["a", "b"]);
@@ -322,7 +322,7 @@ fn mysql_fulltext_index_map() {
         }
     "#};
 
-    psl::parse_schema(with_header(dml, Provider::Mysql, &[]))
+    psl::parse_schema_without_extensions(with_header(dml, Provider::Mysql, &[]))
         .unwrap()
         .assert_has_model("A")
         .assert_fulltext_on_fields(&["a", "b"])
@@ -341,7 +341,7 @@ fn fulltext_index_mongodb() {
         }
     "#};
 
-    psl::parse_schema(with_header(dml, Provider::Mongo, &[]))
+    psl::parse_schema_without_extensions(with_header(dml, Provider::Mongo, &[]))
         .unwrap()
         .assert_has_model("A")
         .assert_fulltext_on_fields(&["a", "b"]);
@@ -359,7 +359,7 @@ fn duplicate_index_different_sort_order_mongodb() {
         }
     "#};
 
-    psl::parse_schema(with_header(dml, Provider::Mongo, &[]))
+    psl::parse_schema_without_extensions(with_header(dml, Provider::Mongo, &[]))
         .unwrap()
         .assert_has_model("A")
         .assert_index_on_fields(&["a"])
@@ -380,7 +380,7 @@ fn fulltext_index_sort_mongodb() {
         }
     "#};
 
-    psl::parse_schema(with_header(dml, Provider::Mongo, &[]))
+    psl::parse_schema_without_extensions(with_header(dml, Provider::Mongo, &[]))
         .unwrap()
         .assert_has_model("A")
         .assert_fulltext_on_fields(&["a", "b"])
@@ -403,7 +403,7 @@ fn multiple_fulltext_indexes_allowed_per_model_in_mysql() {
         }
     "#};
 
-    let schema = psl::parse_schema(with_header(dml, Provider::Mysql, &[])).unwrap();
+    let schema = psl::parse_schema_without_extensions(with_header(dml, Provider::Mysql, &[])).unwrap();
     let a = schema.assert_has_model("A");
 
     a.assert_fulltext_on_fields(&["a", "b"]);

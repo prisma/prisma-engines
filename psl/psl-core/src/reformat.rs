@@ -1,6 +1,6 @@
 use crate::{ParserDatabase, ValidatedSchema};
 use diagnostics::FileId;
-use parser_database::{ast::WithSpan, walkers};
+use parser_database::{ExtensionTypeId, ExtensionTypes, ast::WithSpan, walkers};
 use schema_ast::{SourceFile, ast};
 use std::{borrow::Cow, collections::HashMap};
 
@@ -26,7 +26,7 @@ pub fn reformat_validated_schema_into_single(schema: ValidatedSchema, indent_wid
 
 pub fn reformat_multiple(sources: Vec<(String, SourceFile)>, indent_width: usize) -> Vec<(String, String)> {
     let mut diagnostics = diagnostics::Diagnostics::new();
-    let db = parser_database::ParserDatabase::new(&sources, &mut diagnostics);
+    let db = parser_database::ParserDatabase::new(&sources, &mut diagnostics, &NeverFailingExtensionTypes);
 
     if diagnostics.has_errors() {
         db.iter_file_ids()
@@ -397,4 +397,14 @@ fn after_type(type_span_end: usize, original_schema: &str) -> usize {
         .position(|chr| !['[', ']', '?', '!'].contains(&chr))
         .map(|pos| type_span_end + pos)
         .unwrap_or(type_span_end)
+}
+
+/// An `ExtensionTypes` implementation that always returns a dummy extension type.
+/// This is used only to ensure that reformatting never fails due to unknown extension types.
+struct NeverFailingExtensionTypes;
+
+impl ExtensionTypes for NeverFailingExtensionTypes {
+    fn extension_type_by_name(&self, _name: &str) -> Option<ExtensionTypeId> {
+        Some(ExtensionTypeId::from(0))
+    }
 }

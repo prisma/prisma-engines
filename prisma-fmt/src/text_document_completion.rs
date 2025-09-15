@@ -6,7 +6,7 @@ use psl::{
     Diagnostics, PreviewFeature,
     diagnostics::Span,
     error_tolerant_parse_configuration,
-    parser_database::{ParserDatabase, SourceFile, ast},
+    parser_database::{NoExtensions, ParserDatabase, SourceFile, ast},
     schema_ast::ast::AttributePosition,
 };
 
@@ -55,7 +55,7 @@ pub(crate) fn completion(schema_files: Vec<(String, SourceFile)>, params: Comple
 
     let db = {
         let mut diag = Diagnostics::new();
-        ParserDatabase::new(&schema_files, &mut diag)
+        ParserDatabase::new(&schema_files, &mut diag, &NoExtensions)
     };
 
     let Some(initiating_file_id) = db.file_id(params.text_document_position.text_document.uri.as_str()) else {

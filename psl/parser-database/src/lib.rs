@@ -31,6 +31,7 @@ pub mod walkers;
 mod attributes;
 mod coerce_expression;
 mod context;
+mod extension;
 mod files;
 pub mod generators;
 mod ids;
@@ -43,6 +44,7 @@ use self::{context::Context, interner::StringId, relations::Relations, types::Ty
 pub use coerce_expression::{coerce, coerce_array, coerce_opt};
 pub use diagnostics::FileId;
 use diagnostics::{DatamodelError, Diagnostics};
+pub use extension::{ExtensionTypeId, ExtensionTypes, NoExtensions};
 pub use files::Files;
 pub use ids::*;
 use names::Names;
@@ -84,12 +86,20 @@ pub struct ParserDatabase {
 
 impl ParserDatabase {
     /// See the docs on [ParserDatabase](/struct.ParserDatabase.html).
-    pub fn new_single_file(file: SourceFile, diagnostics: &mut Diagnostics) -> Self {
-        Self::new(&[("schema.prisma".to_owned(), file)], diagnostics)
+    pub fn new_single_file(
+        file: SourceFile,
+        diagnostics: &mut Diagnostics,
+        extension_types: &dyn ExtensionTypes,
+    ) -> Self {
+        Self::new(&[("schema.prisma".to_owned(), file)], diagnostics, extension_types)
     }
 
     /// See the docs on [ParserDatabase](/struct.ParserDatabase.html).
-    pub fn new(schemas: &[(String, schema_ast::SourceFile)], diagnostics: &mut Diagnostics) -> Self {
+    pub fn new(
+        schemas: &[(String, schema_ast::SourceFile)],
+        diagnostics: &mut Diagnostics,
+        extension_types: &dyn ExtensionTypes,
+    ) -> Self {
         let asts = Files::new(schemas, diagnostics);
 
         let mut interner = Default::default();
@@ -103,6 +113,7 @@ impl ParserDatabase {
             &mut types,
             &mut relations,
             diagnostics,
+            extension_types,
         );
 
         // First pass: resolve names.
@@ -220,6 +231,12 @@ impl ParserDatabase {
     /// Iterate all generators defined in the schema
     pub fn generators(&self) -> impl Iterator<Item = &GeneratorConfig> {
         self.iter_asts().flat_map(|ast| ast.generators())
+    }
+
+    /// Get the name of an extension type by its ID.
+    pub fn get_extension_type_name(&self, id: ExtensionTypeId) -> Option<&str> {
+        let &id = self.types.extension_types.get(&id)?;
+        self.interner.get(id)
     }
 }
 

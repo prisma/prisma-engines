@@ -7,7 +7,7 @@ const TESTS_ROOT: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/validation"
 
 /// Parse and analyze a Prisma schema, returning Err if there are any diagnostics (warnings or errors).
 fn parse_schema_fail_on_diagnostics(file: impl Into<SourceFile>) -> Result<ValidatedSchema, String> {
-    let schema = psl::validate(file.into());
+    let schema = psl::validate_without_extensions(file.into());
 
     let file_name = "schema.prisma";
     let datamodel_string = schema.db.source_assert_single();

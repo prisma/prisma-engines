@@ -374,6 +374,7 @@ fn push_relation_tables(ctx: &mut Context<'_>) {
 fn push_column_for_scalar_field(field: ScalarFieldWalker<'_>, table_id: sql::TableId, ctx: &mut Context<'_>) {
     match field.scalar_field_type() {
         ScalarFieldType::Enum(enum_id) => push_column_for_model_enum_scalar_field(field, enum_id, table_id, ctx),
+        ScalarFieldType::Extension(_) => todo!("extension scalars are not yet supported in SQL connectors"),
         ScalarFieldType::CompositeType(_) => {
             push_column_for_builtin_scalar_type(field, ScalarType::Json, table_id, ctx)
         }

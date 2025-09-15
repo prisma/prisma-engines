@@ -16,7 +16,7 @@ fn should_be_able_to_handle_native_type_combined_with_default_autoincrement_attr
 
     "#;
 
-    let datamodel = psl::parse_schema(dml).unwrap();
+    let datamodel = psl::parse_schema_without_extensions(dml).unwrap();
 
     let user_model = datamodel.assert_has_model("User");
 
@@ -39,7 +39,7 @@ fn should_be_able_to_handle_native_type_combined_with_default_attribute() {
         }
     "#;
 
-    let datamodel = psl::parse_schema(dml).unwrap();
+    let datamodel = psl::parse_schema_without_extensions(dml).unwrap();
     let user_model = datamodel.assert_has_model("User");
 
     user_model
@@ -62,7 +62,7 @@ fn should_handle_type_specifications_on_postgres() {
         }
     "#;
 
-    let datamodel = psl::parse_schema(dml).unwrap();
+    let datamodel = psl::parse_schema_without_extensions(dml).unwrap();
     let user_model = datamodel.assert_has_model("Blog");
 
     user_model
@@ -91,7 +91,7 @@ fn should_handle_type_specifications_on_mysql() {
         }
     "#;
 
-    let datamodel = psl::parse_schema(dml).unwrap();
+    let datamodel = psl::parse_schema_without_extensions(dml).unwrap();
     let user_model = datamodel.assert_has_model("Blog");
 
     user_model

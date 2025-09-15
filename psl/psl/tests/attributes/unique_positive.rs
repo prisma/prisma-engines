@@ -12,7 +12,7 @@ fn basic_unique_index_must_work() {
     }
     "#;
 
-    psl::parse_schema(dml)
+    psl::parse_schema_without_extensions(dml)
         .unwrap()
         .assert_has_model("User")
         .assert_unique_on_fields(&["firstName", "lastName"]);
@@ -25,7 +25,7 @@ fn must_succeed_on_model_with_unique_criteria() {
         id String @id
     }
     "#;
-    psl::parse_schema(dml1).unwrap();
+    psl::parse_schema_without_extensions(dml1).unwrap();
 
     let dml2 = r#"
     model Model {
@@ -34,14 +34,14 @@ fn must_succeed_on_model_with_unique_criteria() {
         @@id([a,b])
     }
     "#;
-    psl::parse_schema(dml2).unwrap();
+    psl::parse_schema_without_extensions(dml2).unwrap();
 
     let dml3 = r#"
     model Model {
         unique String @unique
     }
     "#;
-    psl::parse_schema(dml3).unwrap();
+    psl::parse_schema_without_extensions(dml3).unwrap();
 
     let dml4 = r#"
     model Model {
@@ -50,7 +50,7 @@ fn must_succeed_on_model_with_unique_criteria() {
         @@unique([a,b])
     }
     "#;
-    psl::parse_schema(dml4).unwrap();
+    psl::parse_schema_without_extensions(dml4).unwrap();
 }
 
 #[test]
@@ -67,7 +67,7 @@ fn single_field_unique_on_enum_field_must_work() {
     }
     "#;
 
-    psl::parse_schema(dml)
+    psl::parse_schema_without_extensions(dml)
         .unwrap()
         .assert_has_model("User")
         .assert_unique_on_fields(&["role"]);
@@ -85,7 +85,7 @@ fn the_name_argument_must_work() {
     }
     "#;
 
-    psl::parse_schema(dml)
+    psl::parse_schema_without_extensions(dml)
         .unwrap()
         .assert_has_model("User")
         .assert_unique_on_fields(&["firstName", "lastName"])
@@ -105,7 +105,7 @@ fn multiple_unique_must_work() {
         }
     "#;
 
-    let schema = psl::parse_schema(dml).unwrap();
+    let schema = psl::parse_schema_without_extensions(dml).unwrap();
     let user_model = schema.assert_has_model("User");
 
     user_model.assert_unique_on_fields(&["firstName", "lastName"]);
@@ -129,7 +129,7 @@ fn multi_field_unique_on_native_type_fields_fields_must_work() {
     }
     "#;
 
-    psl::parse_schema(dml).unwrap();
+    psl::parse_schema_without_extensions(dml).unwrap();
 }
 
 #[test]
@@ -148,7 +148,7 @@ fn multi_field_unique_indexes_on_enum_fields_must_work() {
     }
     "#;
 
-    psl::parse_schema(dml)
+    psl::parse_schema_without_extensions(dml)
         .unwrap()
         .assert_has_model("User")
         .assert_unique_on_fields(&["role"]);
@@ -168,7 +168,7 @@ fn single_field_unique_indexes_on_enum_fields_must_work() {
     }
     "#;
 
-    psl::parse_schema(dml)
+    psl::parse_schema_without_extensions(dml)
         .unwrap()
         .assert_has_model("User")
         .assert_unique_on_fields(&["role"]);
@@ -184,7 +184,7 @@ fn named_multi_field_unique_must_work() {
         }
     "#};
 
-    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+    psl::parse_schema_without_extensions(with_header(dml, Provider::Postgres, &[]))
         .unwrap()
         .assert_has_model("User")
         .assert_unique_on_fields(&["a", "b"])
@@ -201,7 +201,7 @@ fn mapped_multi_field_unique_must_work() {
         }
     "#};
 
-    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+    psl::parse_schema_without_extensions(with_header(dml, Provider::Postgres, &[]))
         .unwrap()
         .assert_has_model("User")
         .assert_unique_on_fields(&["a", "b"])
@@ -214,13 +214,13 @@ fn mapped_singular_unique_must_work() {
         model Model {
           a String @unique(map: "test")
         }
-     
+
         model Model2 {
           a String @unique(map: "test2")
         }
     "#};
 
-    let schema = psl::parse_schema(with_header(dml, Provider::Postgres, &[])).unwrap();
+    let schema = psl::parse_schema_without_extensions(with_header(dml, Provider::Postgres, &[])).unwrap();
 
     schema
         .assert_has_model("Model")
@@ -244,7 +244,7 @@ fn named_and_mapped_multi_field_unique_must_work() {
         }
     "#};
 
-    let schema = psl::parse_schema(with_header(dml, Provider::Postgres, &[])).unwrap();
+    let schema = psl::parse_schema_without_extensions(with_header(dml, Provider::Postgres, &[])).unwrap();
 
     schema
         .assert_has_model("Model")
@@ -258,14 +258,14 @@ fn mapping_unique_to_a_field_name_should_work() {
     let dml = indoc! {r#"
         model User {
           used           Int
-          name           String            
+          name           String
           identification Int
 
           @@unique([name, identification], name: "usedUnique", map: "used")
         }
     "#};
 
-    psl::parse_schema(dml)
+    psl::parse_schema_without_extensions(dml)
         .unwrap()
         .assert_has_model("User")
         .assert_unique_on_fields(&["name", "identification"])
@@ -277,21 +277,21 @@ fn mapping_unique_to_a_field_name_should_work() {
 fn duplicate_custom_names_on_different_model_should_work() {
     let dml = indoc! {r#"
         model User {
-          name           String            
+          name           String
           identification Int
 
           @@unique([name, identification], name: "duplicateUnique", map: "onUser")
         }
-    
+
         model Post {
-          name           String            
+          name           String
           identification Int
 
           @@unique([name, identification], name: "duplicateUnique", map: "onPost")
         }
     "#};
 
-    let schema = psl::parse_schema(dml).unwrap();
+    let schema = psl::parse_schema_without_extensions(dml).unwrap();
     let user = schema.assert_has_model("User");
     let post = schema.assert_has_model("Post");
 
