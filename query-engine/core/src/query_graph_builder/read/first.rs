@@ -28,9 +28,11 @@ fn try_limit_to_one(mut query: ReadQuery) -> QueryGraphBuilderResult<ReadQuery> 
         ReadQuery::ManyRecordsQuery(ref mut m) => {
             if matches!(m.args.take, Take::All | Take::Some(1)) {
                 m.args.take = Take::One;
+            } else if let Take::Some(take) = m.args.take && take == -1 {
+                m.args.take = Take::Some(take);
             } else {
                 return Err(QueryGraphBuilderError::InputError(
-                    "The 'findFirst' operation cannot be used with a 'take' argument that isn't 1".into(),
+                    "The 'findFirst' operation cannot be used with a 'take' argument that isn't 1 or -1".into(),
                 ));
             }
             Ok(query)
