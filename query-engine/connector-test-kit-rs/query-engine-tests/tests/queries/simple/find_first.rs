@@ -32,6 +32,30 @@ mod find_first_query {
             r#"{"data":{"findFirstTestModel":{"id":2}}}"#
         );
 
+        assert_query!(
+            runner,
+            "query { findFirstTestModel(where: { field: { not: null }}, orderBy: { id: asc }, take: -1) { id }}",
+            r#"{"data":{"findFirstTestModel":{"id":5}}}"#
+        );
+
+        assert_query!(
+            runner,
+            "query { findFirstTestModel(where: { field: { not: null }}, cursor: { id: 2 }, orderBy: { id: asc }, take: -1, skip: 1) { id }}",
+            r#"{"data":{"findFirstTestModel":{"id":1}}}"#
+        );
+
+        assert_query!(
+            runner,
+            "query { findFirstTestModel(where: { field: { not: null }}, orderBy: { id: desc }, take: -1) { id }}",
+            r#"{"data":{"findFirstTestModel":{"id":1}}}"#
+        );
+
+        assert_query!(
+            runner,
+            "query { findFirstTestModel(where: { field: { not: null }}, cursor: { id: 2 }, orderBy: { id: desc }, take: -1, skip: 1) { id }}",
+            r#"{"data":{"findFirstTestModel":{"id":5}}}"#
+        );
+
         Ok(())
     }
 
@@ -43,32 +67,6 @@ mod find_first_query {
             runner,
             "query { findFirstTestModel(where: { id: 6 }) { id }}",
             r#"{"data":{"findFirstTestModel":null}}"#
-        );
-
-        Ok(())
-    }
-
-    #[connector_test]
-    async fn find_first_with_take_negative_one_asc(runner: Runner) -> TestResult<()> {
-        test_data(&runner).await?;
-
-        assert_query!(
-            runner,
-            "query { findFirstTestModel(where: { field: { not: null }}, orderBy: { id: asc }, take: -1) { id }}",
-            r#"{"data":{"findFirstTestModel":{"id":5}}}"#
-        );
-
-        Ok(())
-    }
-
-    #[connector_test]
-    async fn find_first_with_take_negative_one_desc(runner: Runner) -> TestResult<()> {
-        test_data(&runner).await?;
-
-        assert_query!(
-            runner,
-            "query { findFirstTestModel(where: { field: { not: null }}, orderBy: { id: desc }, take: -1) { id }}",
-            r#"{"data":{"findFirstTestModel":{"id":1}}}"#
         );
 
         Ok(())
