@@ -19,8 +19,8 @@ impl ReadQuery {
     pub fn is_unique(&self) -> bool {
         match self {
             ReadQuery::RecordQuery(_) => true,
-            ReadQuery::ManyRecordsQuery(q) => q.args.take == Take::One,
-            ReadQuery::RelatedRecordsQuery(q) => q.args.take == Take::One,
+            ReadQuery::ManyRecordsQuery(q) => q.args.take == Take::One || q.args.take == Take::NegativeOne,
+            ReadQuery::RelatedRecordsQuery(q) => q.args.take == Take::One || q.args.take == Take::NegativeOne,
             ReadQuery::AggregateRecordsQuery(_) => false,
         }
     }

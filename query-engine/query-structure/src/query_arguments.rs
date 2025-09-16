@@ -32,6 +32,7 @@ pub struct QueryArguments {
 pub enum Take {
     All,
     One,
+    NegativeOne,
     Some(i64),
 }
 
@@ -47,15 +48,15 @@ impl Take {
     pub fn abs(self) -> Option<i64> {
         match self {
             Take::All => None,
-            Take::One => Some(1),
+            Take::One | Take::NegativeOne => Some(1),
             Take::Some(n) => Some(n.abs()),
         }
     }
 
     pub fn is_reversed(self) -> bool {
         match self {
-            Take::All => false,
-            Take::One => false,
+            Take::All | Take::One => false,
+            Take::NegativeOne => true,
             Take::Some(n) => n < 0,
         }
     }
