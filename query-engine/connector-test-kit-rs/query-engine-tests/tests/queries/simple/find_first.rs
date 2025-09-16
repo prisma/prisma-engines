@@ -48,6 +48,19 @@ mod find_first_query {
         Ok(())
     }
 
+    #[connector_test]
+    async fn find_first_with_take_negative_one(runner: Runner) -> TestResult<()> {
+        test_data(&runner).await?;
+
+        assert_query!(
+            runner,
+            "query { findFirstTestModel(where: { field: { not: null }}, orderBy: { id: asc }, take: -1) { id }}",
+            r#"{"data":{"findFirstTestModel":{"id":5}}}"#
+        );
+
+        Ok(())
+    }
+
     async fn test_data(runner: &Runner) -> TestResult<()> {
         test_row(runner, r#"{ id: 1, field: "test1" }"#).await?;
         test_row(runner, r#"{ id: 2, field: "test2" }"#).await?;
