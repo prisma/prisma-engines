@@ -49,13 +49,54 @@ mod find_first_query {
     }
 
     #[connector_test]
-    async fn find_first_with_take_negative_one(runner: Runner) -> TestResult<()> {
+    async fn find_first_with_take_negative_one_asc(runner: Runner) -> TestResult<()> {
         test_data(&runner).await?;
 
         assert_query!(
             runner,
             "query { findFirstTestModel(where: { field: { not: null }}, orderBy: { id: asc }, take: -1) { id }}",
             r#"{"data":{"findFirstTestModel":{"id":5}}}"#
+        );
+
+        Ok(())
+    }
+
+    #[connector_test]
+    async fn find_first_with_take_negative_one_desc(runner: Runner) -> TestResult<()> {
+        test_data(&runner).await?;
+
+        assert_query!(
+            runner,
+            "query { findFirstTestModel(where: { field: { not: null }}, orderBy: { id: desc }, take: -1) { id }}",
+            r#"{"data":{"findFirstTestModel":{"id":1}}}"#
+        );
+
+        Ok(())
+    }
+
+    #[connector_test]
+    async fn find_first_with_invalid_take_value(runner: Runner) -> TestResult<()> {
+        test_data(&runner).await?;
+
+        assert_error!(
+            runner,
+            r#"query { findFirstTestModel(orderBy: { id: asc }, take: 0) { id }}"#,
+            2019,
+            "The 'findFirst' operation cannot be used with a 'take' argument that isn't 1 or -1"
+        );
+
+        assert_error!(
+            runner,
+            r#"query { findFirstTestModel(orderBy: { id: asc }, take: 2) { id }}"#,
+            2019,
+            "The 'findFirst' operation cannot be used with a 'take' argument that isn't 1 or -1"
+        );
+
+        assert_error!(
+            runner,
+            r#"query { findFirstTestModel(orderBy: { id: asc }, take: -2) { id }}"#,
+            2019,
+            "The 'findFirst' operation cannot be used with a 'take' argument that isn't 1 or -1"
         );
 
         Ok(())
