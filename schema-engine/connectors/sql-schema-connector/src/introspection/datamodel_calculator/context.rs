@@ -13,7 +13,7 @@ use psl::{
     Configuration, PreviewFeature,
     builtin_connectors::*,
     datamodel_connector::Connector,
-    parser_database::{self as db, walkers},
+    parser_database::{self as db, ExtensionTypes, walkers},
 };
 use quaint::prelude::SqlFamily;
 use schema_connector::IntrospectionContext;
@@ -32,10 +32,16 @@ pub(crate) struct DatamodelCalculatorContext<'a> {
     pub(crate) force_namespaces: Option<&'a [String]>,
     pub(crate) flavour: Box<dyn IntrospectionFlavour>,
     pub(crate) search_path: &'a str,
+    pub(crate) extension_types: &'a dyn ExtensionTypes,
 }
 
 impl<'a> DatamodelCalculatorContext<'a> {
-    pub(crate) fn new(ctx: &'a IntrospectionContext, sql_schema: &'a sql::SqlSchema, search_path: &'a str) -> Self {
+    pub(crate) fn new(
+        ctx: &'a IntrospectionContext,
+        sql_schema: &'a sql::SqlSchema,
+        search_path: &'a str,
+        extension_types: &'a dyn ExtensionTypes,
+    ) -> Self {
         let flavour: Box<dyn IntrospectionFlavour> = match ctx.sql_family() {
             #[cfg(any(feature = "postgresql", feature = "cockroachdb"))]
             SqlFamily::Postgres => Box::new(flavour::PostgresIntrospectionFlavour),
@@ -59,6 +65,7 @@ impl<'a> DatamodelCalculatorContext<'a> {
             force_namespaces: ctx.namespaces(),
             flavour,
             search_path,
+            extension_types,
         };
 
         ctx.introspection_map = IntrospectionMap::new(&ctx);

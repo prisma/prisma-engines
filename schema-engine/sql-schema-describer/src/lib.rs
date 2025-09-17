@@ -135,6 +135,16 @@ impl SqlSchema {
             .map(|i| EnumId(i as u32))
     }
 
+    /// Try to find a UDT by name.
+    pub fn find_udt(&self, name: &str, namespace: Option<&str>) -> Option<UdtId> {
+        let ns_id = namespace.and_then(|ns| self.get_namespace(ns));
+
+        self.user_defined_types
+            .iter()
+            .position(|u| u.name == name && ns_id.map(|id| id == u.namespace_id).unwrap_or(true))
+            .map(|i| UdtId(i as u32))
+    }
+
     fn get_namespace(&self, name: &str) -> Option<NamespaceId> {
         self.namespaces
             .iter()
@@ -222,6 +232,19 @@ impl SqlSchema {
     pub fn push_enum_variant(&mut self, enum_id: EnumId, variant_name: String) -> EnumVariantId {
         let id = EnumVariantId(self.enum_variants.len() as u32);
         self.enum_variants.push(EnumVariant { enum_id, variant_name });
+        id
+    }
+
+    /// Add a UDT to the schema.
+    pub fn push_udt(&mut self, namespace_id: NamespaceId, name: String, definition: Option<String>) -> UdtId {
+        let id = UdtId(self.user_defined_types.len() as u32);
+
+        self.user_defined_types.push(UserDefinedType {
+            namespace_id,
+            name,
+            definition,
+        });
+
         id
     }
 
@@ -548,8 +571,8 @@ pub struct Procedure {
 /// A user-defined type. Can map to another type, or be declared as assembly.
 #[derive(Serialize, Deserialize, PartialEq, Debug, Clone)]
 pub struct UserDefinedType {
-    ///Namespace of the procedure
-    namespace_id: NamespaceId,
+    /// Namespace of the UDT.
+    pub namespace_id: NamespaceId,
     /// Type name
     pub name: String,
     /// Type mapping
@@ -627,6 +650,8 @@ pub enum ColumnTypeFamily {
     Uuid,
     /// Enum
     Enum(EnumId),
+    /// User-defined type
+    Udt(UdtId),
     /// Unsupported
     Unsupported(String),
 }

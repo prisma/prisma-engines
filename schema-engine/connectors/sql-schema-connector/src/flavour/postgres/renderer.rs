@@ -10,7 +10,8 @@ use crate::{
     },
     sql_schema_differ::{ColumnChange, ColumnChanges},
 };
-use psl::builtin_connectors::{CockroachType, PostgresType};
+use itertools::Itertools;
+use psl::builtin_connectors::{CockroachType, KnownPostgresType, PostgresType};
 use sql_ddl::{
     IndexColumn, SortOrder,
     postgres::{self as ddl, PostgresIdentifier},
@@ -530,8 +531,11 @@ impl SqlRenderer for PostgresRenderer {
         )
     }
 
-    fn render_drop_user_defined_type(&self, _: &UserDefinedTypeWalker<'_>) -> String {
-        unreachable!("render_drop_user_defined_type on PostgreSQL")
+    fn render_drop_user_defined_type(&self, type_: &UserDefinedTypeWalker<'_>) -> String {
+        ddl::DropType {
+            type_name: PostgresIdentifier::new(type_.namespace(), type_.name()),
+        }
+        .to_string()
     }
 
     fn render_rename_foreign_key(&self, fks: MigrationPair<ForeignKeyWalker<'_>>) -> String {
@@ -567,40 +571,44 @@ fn render_column_type_postgres(col: TableColumnWalker<'_>) -> Cow<'static, str> 
     let t = col.column_type();
     let is_autoincrement = col.is_autoincrement();
 
-    let native_type: &PostgresType = col
+    let native_type: &KnownPostgresType = match col
         .column_native_type()
-        .expect("Missing native type in postgres_renderer::render_column_type()");
+        .expect("Missing native type in postgres_renderer::render_column_type()")
+    {
+        PostgresType::Known(known) => known,
+        PostgresType::Unknown(name, args) => return format!("{}({})", name, args.iter().format(", ")).into(),
+    };
 
     let tpe: Cow<'_, str> = match native_type {
-        PostgresType::Citext => "CITEXT".into(),
-        PostgresType::Oid => "OID".into(),
-        PostgresType::Inet => "INET".into(),
-        PostgresType::Money => "MONEY".into(),
-        PostgresType::SmallInt if is_autoincrement => "SMALLSERIAL".into(),
-        PostgresType::SmallInt => "SMALLINT".into(),
-        PostgresType::Integer if is_autoincrement => "SERIAL".into(),
-        PostgresType::Integer => "INTEGER".into(),
-        PostgresType::BigInt if is_autoincrement => "BIGSERIAL".into(),
-        PostgresType::BigInt => "BIGINT".into(),
-        PostgresType::Decimal(precision) => format!("DECIMAL{}", render_decimal_args(*precision)).into(),
-        PostgresType::Real => "REAL".into(),
-        PostgresType::DoublePrecision => "DOUBLE PRECISION".into(),
-        PostgresType::VarChar(length) => format!("VARCHAR{}", render_optional_args(*length)).into(),
-        PostgresType::Char(length) => format!("CHAR{}", render_optional_args(*length)).into(),
-        PostgresType::Text => "TEXT".into(),
-        PostgresType::ByteA => "BYTEA".into(),
-        PostgresType::Date => "DATE".into(),
-        PostgresType::Timestamp(precision) => format!("TIMESTAMP{}", render_optional_args(*precision)).into(),
-        PostgresType::Timestamptz(precision) => format!("TIMESTAMPTZ{}", render_optional_args(*precision)).into(),
-        PostgresType::Time(precision) => format!("TIME{}", render_optional_args(*precision)).into(),
-        PostgresType::Timetz(precision) => format!("TIMETZ{}", render_optional_args(*precision)).into(),
-        PostgresType::Boolean => "BOOLEAN".into(),
-        PostgresType::Bit(length) => format!("BIT{}", render_optional_args(*length)).into(),
-        PostgresType::VarBit(length) => format!("VARBIT{}", render_optional_args(*length)).into(),
-        PostgresType::Uuid => "UUID".into(),
-        PostgresType::Xml => "XML".into(),
-        PostgresType::Json => "JSON".into(),
-        PostgresType::JsonB => "JSONB".into(),
+        KnownPostgresType::Citext => "CITEXT".into(),
+        KnownPostgresType::Oid => "OID".into(),
+        KnownPostgresType::Inet => "INET".into(),
+        KnownPostgresType::Money => "MONEY".into(),
+        KnownPostgresType::SmallInt if is_autoincrement => "SMALLSERIAL".into(),
+        KnownPostgresType::SmallInt => "SMALLINT".into(),
+        KnownPostgresType::Integer if is_autoincrement => "SERIAL".into(),
+        KnownPostgresType::Integer => "INTEGER".into(),
+        KnownPostgresType::BigInt if is_autoincrement => "BIGSERIAL".into(),
+        KnownPostgresType::BigInt => "BIGINT".into(),
+        KnownPostgresType::Decimal(precision) => format!("DECIMAL{}", render_decimal_args(*precision)).into(),
+        KnownPostgresType::Real => "REAL".into(),
+        KnownPostgresType::DoublePrecision => "DOUBLE PRECISION".into(),
+        KnownPostgresType::VarChar(length) => format!("VARCHAR{}", render_optional_args(*length)).into(),
+        KnownPostgresType::Char(length) => format!("CHAR{}", render_optional_args(*length)).into(),
+        KnownPostgresType::Text => "TEXT".into(),
+        KnownPostgresType::ByteA => "BYTEA".into(),
+        KnownPostgresType::Date => "DATE".into(),
+        KnownPostgresType::Timestamp(precision) => format!("TIMESTAMP{}", render_optional_args(*precision)).into(),
+        KnownPostgresType::Timestamptz(precision) => format!("TIMESTAMPTZ{}", render_optional_args(*precision)).into(),
+        KnownPostgresType::Time(precision) => format!("TIME{}", render_optional_args(*precision)).into(),
+        KnownPostgresType::Timetz(precision) => format!("TIMETZ{}", render_optional_args(*precision)).into(),
+        KnownPostgresType::Boolean => "BOOLEAN".into(),
+        KnownPostgresType::Bit(length) => format!("BIT{}", render_optional_args(*length)).into(),
+        KnownPostgresType::VarBit(length) => format!("VARBIT{}", render_optional_args(*length)).into(),
+        KnownPostgresType::Uuid => "UUID".into(),
+        KnownPostgresType::Xml => "XML".into(),
+        KnownPostgresType::Json => "JSON".into(),
+        KnownPostgresType::JsonB => "JSONB".into(),
     };
 
     if t.arity.is_list() {

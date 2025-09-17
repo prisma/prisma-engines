@@ -21,7 +21,11 @@ use database_schema::SqlDatabaseSchema;
 use enumflags2::BitFlags;
 use flavour::{SqlConnector, SqlDialect, UsingExternalShadowDb};
 use migration_pair::MigrationPair;
-use psl::{SourceFile, ValidatedSchema, datamodel_connector::NativeTypeInstance, parser_database::ScalarType};
+use psl::{
+    SourceFile, ValidatedSchema,
+    datamodel_connector::NativeTypeInstance,
+    parser_database::{ExtensionTypes, ScalarFieldType},
+};
 use quaint::connector::DescribedQuery;
 use schema_connector::{migrations_directory::Migrations, *};
 use sql_doc_parser::{parse_sql_doc, sanitize_sql};
@@ -134,12 +138,16 @@ impl SchemaDialect for SqlSchemaDialect {
         &self,
         sources: Vec<(String, SourceFile)>,
         default_namespace: Option<&str>,
+        extension_types: &dyn ExtensionTypes,
     ) -> ConnectorResult<DatabaseSchema> {
         let schema =
-            psl::parse_schema_multi_without_extensions(&sources).map_err(ConnectorError::new_schema_parser_error)?;
+            psl::parse_schema_multi(&sources, extension_types).map_err(ConnectorError::new_schema_parser_error)?;
         self.dialect.check_schema_features(&schema)?;
         let calculator = self.dialect.schema_calculator();
-        Ok(sql_schema_calculator::calculate_sql_schema(&schema, default_namespace, &*calculator).into())
+        Ok(
+            sql_schema_calculator::calculate_sql_schema(&schema, default_namespace, &*calculator, extension_types)
+                .into(),
+        )
     }
 
     #[tracing::instrument(skip(self, migrations, target))]
@@ -344,11 +352,15 @@ impl SqlSchemaConnector {
     }
 
     /// Returns the native types that can be used to represent the given scalar type.
-    pub fn scalar_type_for_native_type(&self, native_type: &NativeTypeInstance) -> ScalarType {
+    pub fn scalar_type_for_native_type(
+        &self,
+        native_type: &NativeTypeInstance,
+        extension_types: &dyn ExtensionTypes,
+    ) -> Option<ScalarFieldType> {
         self.inner
             .dialect()
             .datamodel_connector()
-            .scalar_type_for_native_type(native_type)
+            .scalar_type_for_native_type(native_type, extension_types)
     }
 }
 
@@ -472,6 +484,7 @@ impl SchemaConnector for SqlSchemaConnector {
     fn introspect<'a>(
         &'a mut self,
         ctx: &'a IntrospectionContext,
+        extension_types: &'a dyn ExtensionTypes,
     ) -> BoxFuture<'a, ConnectorResult<IntrospectionResult>> {
         Box::pin(async move {
             let mut namespace_names = match ctx.namespaces() {
@@ -483,7 +496,8 @@ impl SchemaConnector for SqlSchemaConnector {
             let sql_schema = self.inner.introspect(namespaces, ctx).await?;
             let search_path = self.inner.search_path();
 
-            let datamodel = introspection::datamodel_calculator::calculate(&sql_schema, ctx, search_path);
+            let datamodel =
+                introspection::datamodel_calculator::calculate(&sql_schema, ctx, search_path, extension_types);
 
             Ok(datamodel)
         })

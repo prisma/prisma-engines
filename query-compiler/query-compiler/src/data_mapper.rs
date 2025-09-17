@@ -449,7 +449,7 @@ impl From<&Type> for FieldScalarType {
                     .dm
                     .schema
                     .db
-                    .get_extension_type_name(id)
+                    .get_extension_type_prisma_name(id)
                     .expect("extension type not found")
                     .to_owned(),
             },

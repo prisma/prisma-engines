@@ -1,5 +1,5 @@
 use crate::common::*;
-use psl::builtin_connectors::PostgresType;
+use psl::builtin_connectors::{KnownPostgresType, PostgresType};
 
 #[test]
 fn xml_data_type_should_fail_on_index() {
@@ -230,5 +230,5 @@ fn xml_should_work_with_string_scalar_type() {
 
     user_model
         .assert_has_scalar_field("dec")
-        .assert_native_type(datamodel.connector, &PostgresType::Xml);
+        .assert_native_type(datamodel.connector, &PostgresType::Known(KnownPostgresType::Xml));
 }

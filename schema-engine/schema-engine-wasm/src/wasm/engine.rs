@@ -7,6 +7,7 @@ use driver_adapters::{JsObject, adapter_factory_from_js};
 use js_sys::Function as JsFunction;
 use json_rpc::types::*;
 use psl::SourceFile;
+use psl::parser_database::NoExtensionTypes;
 use quaint::connector::ExternalConnectorFactory;
 use serde::Deserialize;
 use sql_schema_connector::SqlSchemaConnector;
@@ -181,9 +182,14 @@ impl SchemaEngine {
                 migration_name = input.migration_name.as_str(),
                 draft = input.draft,
             );
-            let result = commands::create_migration(input, &mut self.connector, &mut self.migration_schema_cache)
-                .instrument(span)
-                .await?;
+            let result = commands::create_migration(
+                input,
+                &mut self.connector,
+                &mut self.migration_schema_cache,
+                &NoExtensionTypes,
+            )
+            .instrument(span)
+            .await?;
             Ok(result)
         }
         .with_subscriber(dispatch)
@@ -227,9 +233,14 @@ impl SchemaEngine {
     pub async fn diff(&mut self, params: DiffParams) -> Result<DiffResult, JsValue> {
         let dispatch = self.dispatch.clone();
         async move {
-            let result = commands::diff(params, &mut self.connector, self.adapter_factory.clone())
-                .instrument(tracing::info_span!("Diff"))
-                .await?;
+            let result = commands::diff(
+                params,
+                &mut self.connector,
+                self.adapter_factory.clone(),
+                &NoExtensionTypes,
+            )
+            .instrument(tracing::info_span!("Diff"))
+            .await?;
             Ok(result)
         }
         .with_subscriber(dispatch)
@@ -284,9 +295,14 @@ impl SchemaEngine {
     ) -> Result<EvaluateDataLossOutput, JsValue> {
         let dispatch = self.dispatch.clone();
         async move {
-            let result = commands::evaluate_data_loss(input, &mut self.connector, &mut self.migration_schema_cache)
-                .instrument(tracing::info_span!("EvaluateDataLoss"))
-                .await?;
+            let result = commands::evaluate_data_loss(
+                input,
+                &mut self.connector,
+                &mut self.migration_schema_cache,
+                &NoExtensionTypes,
+            )
+            .instrument(tracing::info_span!("EvaluateDataLoss"))
+            .await?;
             Ok(result)
         }
         .with_subscriber(dispatch)
@@ -329,7 +345,7 @@ impl SchemaEngine {
                 views,
                 warnings,
                 is_empty,
-            } = self.connector.introspect(&ctx).await?;
+            } = self.connector.introspect(&ctx, &NoExtensionTypes).await?;
 
             if is_empty {
                 Err(ConnectorError::into_introspection_result_empty_error().into())
@@ -463,7 +479,7 @@ impl SchemaEngine {
     pub async fn schema_push(&mut self, input: SchemaPushInput) -> Result<SchemaPushOutput, JsValue> {
         let dispatch = self.dispatch.clone();
         async move {
-            let result = commands::schema_push(input, &mut self.connector)
+            let result = commands::schema_push(input, &mut self.connector, &NoExtensionTypes)
                 .instrument(tracing::info_span!("SchemaPush"))
                 .await?;
             Ok(result)

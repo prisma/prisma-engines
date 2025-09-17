@@ -1,4 +1,4 @@
-use psl::{ConnectorRegistry, parser_database::NoExtensions};
+use psl::{ConnectorRegistry, parser_database::NoExtensionTypes};
 use quaint::connector::ConnectionInfo;
 use query_compiler::{CompileError, Expression, TranslateError};
 use query_core::{
@@ -83,7 +83,7 @@ impl QueryCompiler {
         let schema = Arc::new(psl::parse_without_validation(
             datamodel.into(),
             CONNECTOR_REGISTRY,
-            &NoExtensions,
+            &NoExtensionTypes,
         ));
         let schema = Arc::new(
             schema::build(schema, true).with_db_version_supports_join_strategy(connection_info.supports_relation_joins),

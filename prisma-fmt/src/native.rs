@@ -19,33 +19,38 @@ pub(crate) fn run(input: &str) -> String {
 
     let datasource = &validated_configuration.datasources[0];
     let available_native_type_constructors = datasource.active_connector.available_native_type_constructors();
-    let available_native_type_constructors: Vec<SerializableNativeTypeConstructor> =
-        available_native_type_constructors.iter().map(From::from).collect();
+    let available_native_type_constructors: Vec<_> = available_native_type_constructors
+        .iter()
+        .filter_map(SerializableNativeTypeConstructor::new)
+        .collect();
 
     serde_json::to_string(&available_native_type_constructors).expect("Failed to render JSON")
 }
 
 #[derive(serde::Serialize)]
 struct SerializableNativeTypeConstructor {
-    pub name: &'static str,
+    pub name: String,
     pub _number_of_args: usize,
     pub _number_of_optional_args: usize,
     pub prisma_types: Vec<&'static str>,
 }
 
-impl From<&NativeTypeConstructor> for SerializableNativeTypeConstructor {
-    fn from(nt: &NativeTypeConstructor) -> Self {
+impl SerializableNativeTypeConstructor {
+    fn new(nt: &NativeTypeConstructor) -> Option<Self> {
         let NativeTypeConstructor {
             name,
             number_of_args,
             number_of_optional_args,
-            prisma_types,
+            allowed_types,
         } = nt;
-        SerializableNativeTypeConstructor {
-            name,
+        Some(SerializableNativeTypeConstructor {
+            name: name.to_string(),
             _number_of_args: *number_of_args,
             _number_of_optional_args: *number_of_optional_args,
-            prisma_types: prisma_types.iter().map(|st| st.as_str()).collect(),
-        }
+            prisma_types: allowed_types
+                .iter()
+                .map(|st| Some(st.field_type.as_builtin_scalar()?.as_str()))
+                .collect::<Option<Vec<_>>>()?,
+        })
     }
 }

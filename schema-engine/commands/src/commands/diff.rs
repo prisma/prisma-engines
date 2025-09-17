@@ -7,7 +7,7 @@ use crate::{
     json_rpc::types::{DiffParams, DiffResult, DiffTarget, UrlContainer},
 };
 use enumflags2::BitFlags;
-use psl::SourceFile;
+use psl::{SourceFile, parser_database::ExtensionTypes};
 use quaint::connector::ExternalConnectorFactory;
 use schema_connector::{
     ConnectorError, DatabaseSchema, ExternalShadowDatabase, Namespaces, SchemaConnector, SchemaDialect, SchemaFilter,
@@ -18,6 +18,7 @@ pub async fn diff(
     params: DiffParams,
     connector: &mut dyn SchemaConnector,
     adapter_factory: Arc<dyn ExternalConnectorFactory>,
+    extension_types: &dyn ExtensionTypes,
 ) -> CoreResult<DiffResult> {
     // In order to properly handle MultiSchema, we need to make sure the preview feature is
     // correctly set, and we need to grab the namespaces from the Schema, if any.
@@ -35,6 +36,7 @@ pub async fn diff(
         namespaces.clone(),
         &filter,
         preview_features,
+        extension_types,
     )
     .await?
     .unzip();
@@ -46,6 +48,7 @@ pub async fn diff(
         namespaces,
         &filter,
         preview_features,
+        extension_types,
     )
     .await?
     .unzip();
@@ -118,6 +121,7 @@ async fn diff_target_to_dialect(
     namespaces: Option<Namespaces>,
     filter: &SchemaFilter,
     preview_features: BitFlags<psl::PreviewFeature>,
+    extension_types: &dyn ExtensionTypes,
 ) -> CoreResult<Option<(Box<dyn SchemaDialect>, DatabaseSchema)>> {
     match target {
         DiffTarget::Empty => Ok(None),
@@ -138,7 +142,8 @@ async fn diff_target_to_dialect(
         DiffTarget::SchemaDatamodel(schemas) => {
             let sources = schemas.to_psl_input();
             let dialect = schema_to_dialect(&sources)?;
-            let schema = dialect.schema_from_datamodel(sources, connector.default_runtime_namespace())?;
+            let schema =
+                dialect.schema_from_datamodel(sources, connector.default_runtime_namespace(), extension_types)?;
             Ok(Some((dialect, schema)))
         }
         DiffTarget::Url(UrlContainer { .. }) => Err(ConnectorError::from_msg(

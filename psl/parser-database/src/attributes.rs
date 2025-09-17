@@ -254,7 +254,7 @@ fn visit_scalar_field_attributes(
         ctx.validate_visited_arguments();
     }
 
-    if let ScalarFieldType::BuiltInScalar(_scalar_type) = r#type {
+    if let ScalarFieldType::BuiltInScalar(_) | ScalarFieldType::Extension(_) = r#type {
         // native type attributes
         if let Some((datasource_name, type_name, attribute_id)) = ctx.visit_datasource_scoped() {
             let attribute = &ctx.asts[attribute_id];

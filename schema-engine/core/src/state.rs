@@ -8,7 +8,7 @@ use ::commands::MigrationSchemaCache;
 use enumflags2::BitFlags;
 use futures::stream::{FuturesUnordered, StreamExt};
 use json_rpc::types::*;
-use psl::parser_database::SourceFile;
+use psl::parser_database::{NoExtensionTypes, SourceFile};
 use schema_connector::{ConnectorError, ConnectorHost, IntrospectionResult, Namespaces, SchemaConnector};
 use std::{
     collections::HashMap,
@@ -264,7 +264,7 @@ impl GenericApi for EngineState {
             );
             Box::pin(async move {
                 let mut migration_schema_cache = migration_schema_cache.lock().await;
-                commands::create_migration(input, connector, &mut migration_schema_cache)
+                commands::create_migration(input, connector, &mut migration_schema_cache, &NoExtensionTypes)
                     .instrument(span)
                     .await
             })
@@ -301,7 +301,7 @@ impl GenericApi for EngineState {
     }
 
     async fn diff(&self, params: DiffParams) -> CoreResult<DiffResult> {
-        commands::diff_cli(params, self.host.clone()).await
+        commands::diff_cli(params, self.host.clone(), &NoExtensionTypes).await
     }
 
     async fn drop_database(&self, url: String) -> CoreResult<()> {
@@ -354,7 +354,7 @@ impl GenericApi for EngineState {
         self.with_default_connector(Box::new(|connector| {
             Box::pin(async move {
                 let mut migration_schema_cache = migration_schema_cache.lock().await;
-                commands::evaluate_data_loss(input, connector, &mut migration_schema_cache)
+                commands::evaluate_data_loss(input, connector, &mut migration_schema_cache, &NoExtensionTypes)
                     .instrument(tracing::info_span!("EvaluateDataLoss"))
                     .await
             })
@@ -400,7 +400,7 @@ impl GenericApi for EngineState {
                         views,
                         warnings,
                         is_empty,
-                    } = connector.introspect(&ctx).await?;
+                    } = connector.introspect(&ctx, &NoExtensionTypes).await?;
 
                     if is_empty {
                         Err(ConnectorError::into_introspection_result_empty_error())
@@ -514,7 +514,10 @@ impl GenericApi for EngineState {
 
     async fn schema_push(&self, input: SchemaPushInput) -> CoreResult<SchemaPushOutput> {
         self.with_default_connector(Box::new(move |connector| {
-            Box::pin(commands::schema_push(input, connector).instrument(tracing::info_span!("SchemaPush")))
+            Box::pin(
+                commands::schema_push(input, connector, &NoExtensionTypes)
+                    .instrument(tracing::info_span!("SchemaPush")),
+            )
         }))
         .await
     }

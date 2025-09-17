@@ -186,7 +186,7 @@ impl Type {
                 .dm
                 .schema
                 .db
-                .get_extension_type_name(ext_id)
+                .get_extension_type_prisma_name(ext_id)
                 .expect("extension type name should be present")
                 .to_owned()
                 .into(),

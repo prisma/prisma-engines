@@ -40,13 +40,16 @@ mod names;
 mod relations;
 mod types;
 
+use std::collections::HashMap;
+
 use self::{context::Context, interner::StringId, relations::Relations, types::Types};
 pub use coerce_expression::{coerce, coerce_array, coerce_opt};
 pub use diagnostics::FileId;
 use diagnostics::{DatamodelError, Diagnostics};
-pub use extension::{ExtensionTypeId, ExtensionTypes, NoExtensions};
+pub use extension::{ExtensionTypeEntry, ExtensionTypeId, ExtensionTypes, NoExtensionTypes};
 pub use files::Files;
 pub use ids::*;
+use interner::StringInterner;
 use names::Names;
 pub use names::is_reserved_type_name;
 pub use relations::{ManyToManyRelationId, ReferentialAction, RelationId};
@@ -82,6 +85,7 @@ pub struct ParserDatabase {
     names: Names,
     types: Types,
     relations: Relations,
+    extension_metadata: ExtensionMetadata,
 }
 
 impl ParserDatabase {
@@ -102,10 +106,11 @@ impl ParserDatabase {
     ) -> Self {
         let asts = Files::new(schemas, diagnostics);
 
-        let mut interner = Default::default();
+        let mut interner = StringInterner::default();
         let mut names = Default::default();
-        let mut types = Default::default();
+        let mut types = Types::default();
         let mut relations = Default::default();
+
         let mut ctx = Context::new(
             &asts,
             &mut interner,
@@ -130,12 +135,15 @@ impl ParserDatabase {
         // Fourth step: relation inference
         relations::infer_relations(&mut ctx);
 
+        let extension_metadata = ExtensionMetadata::new(extension_types, &mut interner);
+
         ParserDatabase {
             asts,
             interner,
             names,
             types,
             relations,
+            extension_metadata,
         }
     }
 
@@ -234,9 +242,15 @@ impl ParserDatabase {
     }
 
     /// Get the name of an extension type by its ID.
-    pub fn get_extension_type_name(&self, id: ExtensionTypeId) -> Option<&str> {
-        let &id = self.types.extension_types.get(&id)?;
+    pub fn get_extension_type_prisma_name(&self, id: ExtensionTypeId) -> Option<&str> {
+        let &id = self.extension_metadata.id_to_prisma_name.get(&id)?;
         self.interner.get(id)
+    }
+
+    /// Get the database name of an extension type by its ID, along with any modifiers it may have.
+    pub fn get_extension_type_db_name_with_modifiers(&self, id: ExtensionTypeId) -> Option<(&str, &[String])> {
+        let (name, modifiers) = self.extension_metadata.id_to_db_name.get(&id)?;
+        Some((name, modifiers))
     }
 }
 
@@ -259,5 +273,29 @@ impl std::ops::Index<StringId> for ParserDatabase {
 
     fn index(&self, index: StringId) -> &Self::Output {
         self.interner.get(index).unwrap()
+    }
+}
+
+struct ExtensionMetadata {
+    id_to_prisma_name: HashMap<ExtensionTypeId, StringId>,
+    id_to_db_name: HashMap<ExtensionTypeId, (String, Vec<String>)>,
+}
+
+impl ExtensionMetadata {
+    pub fn new(extension_types: &dyn ExtensionTypes, interner: &mut StringInterner) -> Self {
+        let mut id_to_prisma_name = HashMap::new();
+        let mut id_to_db_name = HashMap::new();
+
+        for entry in extension_types.enumerate() {
+            id_to_prisma_name.insert(entry.id, interner.intern(entry.prisma_name));
+            if let Some(modifiers) = &entry.db_type_modifiers {
+                id_to_db_name.insert(entry.id, (entry.db_name.to_owned(), modifiers.to_vec()));
+            }
+        }
+
+        ExtensionMetadata {
+            id_to_prisma_name,
+            id_to_db_name,
+        }
     }
 }

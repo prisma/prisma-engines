@@ -1,7 +1,7 @@
 use crate::common::*;
 use psl::{
     builtin_connectors::{MsSqlType, MsSqlTypeParameter::*},
-    parser_database::NoExtensions,
+    parser_database::NoExtensionTypes,
 };
 
 #[test]
@@ -885,7 +885,7 @@ macro_rules! test_type {
                         }}
                     "#);
 
-                    let schema = psl::parse_schema(&dml, &NoExtensions).unwrap();
+                    let schema = psl::parse_schema(&dml, &NoExtensionTypes).unwrap();
 
                     schema
                         .assert_has_model("Blog")

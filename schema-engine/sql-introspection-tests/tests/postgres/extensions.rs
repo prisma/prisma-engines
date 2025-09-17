@@ -1,4 +1,6 @@
+use barrel::types;
 use indoc::indoc;
+use psl::parser_database::{ExtensionTypeEntry, ExtensionTypeId, ExtensionTypes};
 use sql_introspection_tests::test_api::*;
 use test_macros::test_connector;
 
@@ -355,4 +357,172 @@ async fn no_extensions_means_no_extensions(api: &mut TestApi) -> TestResult {
     api.expect_datamodel(&expectation).await;
 
     Ok(())
+}
+
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
+async fn introspect_extension_type(api: &mut TestApi) -> TestResult {
+    api.barrel()
+        .execute(|migration| {
+            migration.inject_custom("CREATE EXTENSION IF NOT EXISTS vector;");
+
+            migration.create_table("A", |t| {
+                t.add_column("id", types::primary());
+                t.add_column("data", types::custom("vector(3)").nullable(false));
+            });
+        })
+        .await?;
+
+    let expectation = expect![[r#"
+        generator client {
+          provider = "prisma-client-js"
+        }
+
+        datasource db {
+          provider = "postgresql"
+          url      = "env(TEST_DATABASE_URL)"
+        }
+
+        model A {
+          id   Int     @id @default(autoincrement())
+          data Vector3
+        }
+    "#]];
+
+    let extensions = TestExtensions {
+        types: vec![("Vector3".into(), "vector".into(), 1, Some(vec!["3".into()]))],
+    };
+
+    expectation.assert_eq(&api.introspect_with_extensions(&extensions).await?);
+
+    Ok(())
+}
+
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
+async fn introspect_specific_extension_type_by_type_modifier(api: &mut TestApi) -> TestResult {
+    api.barrel()
+        .execute(|migration| {
+            migration.inject_custom("CREATE EXTENSION IF NOT EXISTS vector;");
+
+            migration.create_table("A", |t| {
+                t.add_column("id", types::primary());
+                t.add_column("data", types::custom("vector(3)").nullable(false));
+            });
+        })
+        .await?;
+
+    let expectation = expect![[r#"
+        generator client {
+          provider = "prisma-client-js"
+        }
+
+        datasource db {
+          provider = "postgresql"
+          url      = "env(TEST_DATABASE_URL)"
+        }
+
+        model A {
+          id   Int     @id @default(autoincrement())
+          data Vector3
+        }
+    "#]];
+
+    let extensions = TestExtensions {
+        types: vec![
+            ("Vector3".into(), "vector".into(), 1, Some(vec!["3".into()])),
+            ("VectorN".into(), "vector".into(), 1, None),
+        ],
+    };
+
+    expectation.assert_eq(&api.introspect_with_extensions(&extensions).await?);
+
+    Ok(())
+}
+
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
+async fn introspect_extension_type_with_modifier(api: &mut TestApi) -> TestResult {
+    api.barrel()
+        .execute(|migration| {
+            migration.inject_custom("CREATE EXTENSION IF NOT EXISTS vector;");
+
+            migration.create_table("A", |t| {
+                t.add_column("id", types::primary());
+                t.add_column("data", types::custom("vector(3)").nullable(false));
+            });
+        })
+        .await?;
+
+    let expectation = expect![[r#"
+        generator client {
+          provider = "prisma-client-js"
+        }
+
+        datasource db {
+          provider = "postgresql"
+          url      = "env(TEST_DATABASE_URL)"
+        }
+
+        model A {
+          id   Int     @id @default(autoincrement())
+          data VectorN @db.vector(3)
+        }
+    "#]];
+
+    let extensions = TestExtensions {
+        types: vec![("VectorN".into(), "vector".into(), 1, None)],
+    };
+
+    expectation.assert_eq(&api.introspect_with_extensions(&extensions).await?);
+
+    Ok(())
+}
+
+struct TestExtensions {
+    types: Vec<(String, String, usize, Option<Vec<String>>)>,
+}
+
+impl ExtensionTypes for TestExtensions {
+    fn get_by_prisma_name(&self, name: &str) -> Option<ExtensionTypeId> {
+        self.types
+            .iter()
+            .position(|(t, _, _, _)| t == name)
+            .map(ExtensionTypeId::from)
+    }
+
+    fn get_by_db_name_and_modifiers(&self, name: &str, modifiers: Option<&[String]>) -> Option<ExtensionTypeEntry<'_>> {
+        self.types
+            .iter()
+            .enumerate()
+            .find(|(_, (_, db_name, _, db_type_modifiers))| {
+                db_name == name && db_type_modifiers.as_deref() == modifiers
+            })
+            .or_else(|| {
+                self.types
+                    .iter()
+                    .enumerate()
+                    .find(|(_, (_, db_name, _, db_type_modifiers))| db_name == name && db_type_modifiers.is_none())
+            })
+            .map(
+                |(i, (prisma_name, db_name, number_of_args, expected_db_type_modifiers))| ExtensionTypeEntry {
+                    id: ExtensionTypeId::from(i),
+                    prisma_name: prisma_name.as_str(),
+                    db_namespace: None,
+                    db_name: db_name.as_str(),
+                    number_of_args: *number_of_args,
+                    db_type_modifiers: expected_db_type_modifiers.as_deref(),
+                },
+            )
+    }
+
+    fn enumerate(&self) -> Box<dyn Iterator<Item = psl::parser_database::ExtensionTypeEntry<'_>> + '_> {
+        Box::new(self.types.iter().enumerate().map(
+            |(i, (prisma_name, db_name, number_of_args, expected_db_type_modifiers))| ExtensionTypeEntry {
+                id: ExtensionTypeId::from(i),
+                prisma_name: prisma_name.as_str(),
+                db_namespace: None,
+                db_name: db_name.as_str(),
+                number_of_args: *number_of_args,
+                db_type_modifiers: expected_db_type_modifiers.as_deref(),
+            },
+        ))
+    }
 }

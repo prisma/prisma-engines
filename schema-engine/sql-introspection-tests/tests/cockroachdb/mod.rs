@@ -4,6 +4,7 @@ mod gin;
 use std::path::PathBuf;
 
 use indoc::indoc;
+use psl::parser_database::NoExtensionTypes;
 use schema_connector::{CompositeTypeDepth, ConnectorParams, IntrospectionContext, SchemaConnector};
 use sql_introspection_tests::test_api::*;
 use sql_schema_connector::SqlSchemaConnector;
@@ -44,7 +45,11 @@ async fn introspecting_cockroach_db_with_postgres_provider_fails(api: TestApi) {
     };
     let mut engine = SqlSchemaConnector::new_postgres(params).unwrap();
 
-    let err = engine.introspect(&ctx).await.unwrap_err().to_string();
+    let err = engine
+        .introspect(&ctx, &NoExtensionTypes)
+        .await
+        .unwrap_err()
+        .to_string();
 
     let expected_err = expect![[r#"
         You are trying to connect to a CockroachDB database, but the provider in your Prisma schema is `postgresql`. Please change it to `cockroachdb`.

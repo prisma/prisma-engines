@@ -2,7 +2,7 @@ mod extensions;
 mod introspection;
 mod multi_schema;
 
-use psl::parser_database::SourceFile;
+use psl::parser_database::{NoExtensionTypes, SourceFile};
 use quaint::Value;
 use schema_core::{json_rpc::types::SchemasContainer, schema_connector::DiffTarget};
 use sql_migration_tests::test_api::*;
@@ -382,10 +382,10 @@ fn foreign_key_renaming_to_default_works(api: TestApi) {
 
     let migration = api.connector_diff(
         DiffTarget::Database,
-        DiffTarget::Datamodel(vec![(
-            "schema.prisma".to_string(),
-            SourceFile::new_static(target_schema),
-        )]),
+        DiffTarget::Datamodel(
+            vec![("schema.prisma".to_string(), SourceFile::new_static(target_schema))],
+            &NoExtensionTypes,
+        ),
         None,
     );
     let expected = expect![[r#"
@@ -624,8 +624,14 @@ fn scalar_list_default_diffing(api: TestApi) {
     "#;
 
     let migration = api.connector_diff(
-        DiffTarget::Datamodel(vec![("schema.prisma".to_string(), SourceFile::new_static(schema_1))]),
-        DiffTarget::Datamodel(vec![("schema.prisma".to_string(), SourceFile::new_static(schema_2))]),
+        DiffTarget::Datamodel(
+            vec![("schema.prisma".to_string(), SourceFile::new_static(schema_1))],
+            &NoExtensionTypes,
+        ),
+        DiffTarget::Datamodel(
+            vec![("schema.prisma".to_string(), SourceFile::new_static(schema_2))],
+            &NoExtensionTypes,
+        ),
         None,
     );
 

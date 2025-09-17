@@ -146,12 +146,12 @@ impl<'a> Field<'a> {
         &mut self,
         prefix: impl Into<Cow<'a, str>>,
         r#type: impl Into<Cow<'a, str>>,
-        params: Vec<String>,
+        params: impl IntoIterator<Item = impl Into<String>>,
     ) {
         let mut native_type = FieldAttribute::new(Function::new(r#type));
 
         for param in params {
-            native_type.push_param(Constant::new_no_validate(param));
+            native_type.push_param(Constant::new_no_validate(param.into()));
         }
 
         native_type.prefix(prefix);

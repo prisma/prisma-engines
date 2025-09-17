@@ -1,6 +1,9 @@
 use std::any::Any;
 
-use psl::{datamodel_connector::NativeTypeInstance, parser_database::ScalarType};
+use psl::{
+    datamodel_connector::NativeTypeInstance,
+    parser_database::{NoExtensionTypes, ScalarType},
+};
 use sql_migration_tests::test_api::TestApi;
 
 pub(crate) const SIMPLE_SCHEMA: &str = r#"
@@ -69,13 +72,14 @@ pub(crate) fn render_scalar_type_datamodel(datasource: &str, prisma_type: Scalar
     )
 }
 
-pub(crate) fn render_native_type_datamodel<T: Any + Send + Sync + 'static>(
+pub(crate) fn render_native_type_datamodel<T: Any + Send + Sync + PartialEq + 'static>(
     api: &TestApi,
     datasource: &str,
-    nt_parts: (&str, Vec<String>),
+    nt_parts: (&str, impl AsRef<[String]>),
     nt: T,
 ) -> String {
     let (nt_name, rest) = nt_parts;
+    let rest = rest.as_ref();
     let args = if rest.is_empty() {
         "".to_string()
     } else {
@@ -83,7 +87,13 @@ pub(crate) fn render_native_type_datamodel<T: Any + Send + Sync + 'static>(
     };
 
     let instance = NativeTypeInstance::new::<T>(nt);
-    let prisma_type = api.connector.scalar_type_for_native_type(&instance).as_str();
+    let prisma_type = api
+        .connector
+        .scalar_type_for_native_type(&instance, &NoExtensionTypes)
+        .unwrap()
+        .as_builtin_scalar()
+        .unwrap()
+        .as_str();
 
     format!(
         r#"

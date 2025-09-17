@@ -188,7 +188,10 @@ services:
       retries: 10
 
   postgres14:
-    image: postgres:14
+    build:
+      context: ./docker/postgres-ext
+      args:
+        POSTGRES_VERSION: 14
     restart: unless-stopped
     command: postgres -c 'max_connections=1000'
     environment:
@@ -201,7 +204,10 @@ services:
       - databases
 
   postgres15:
-    image: postgres:15
+    build:
+      context: ./docker/postgres-ext
+      args:
+        POSTGRES_VERSION: 15
     restart: unless-stopped
     command: postgres -c 'max_connections=1000'
     environment:
@@ -214,7 +220,10 @@ services:
       - databases
 
   postgres16:
-    image: postgres:16
+    build:
+      context: ./docker/postgres-ext
+      args:
+        POSTGRES_VERSION: 16
     restart: unless-stopped
     command: postgres -c 'max_connections=1000'
     environment:

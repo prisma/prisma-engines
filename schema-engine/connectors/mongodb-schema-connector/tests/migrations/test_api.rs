@@ -2,7 +2,10 @@ use bson::{self, doc};
 use enumflags2::BitFlags;
 use futures::TryStreamExt;
 use mongodb_schema_connector::MongoDbSchemaConnector;
-use psl::{PreviewFeature, parser_database::SourceFile};
+use psl::{
+    PreviewFeature,
+    parser_database::{NoExtensionTypes, SourceFile},
+};
 use schema_connector::{ConnectorParams, SchemaConnector, SchemaFilter};
 use std::{
     collections::BTreeMap,
@@ -182,7 +185,11 @@ pub(crate) fn test_scenario(scenario_name: &str) {
         let dialect = connector.schema_dialect();
         let from = connector.schema_from_database(None).await.unwrap();
         let to = dialect
-            .schema_from_datamodel(vec![("schema.prisma".to_string(), schema.clone())], None)
+            .schema_from_datamodel(
+                vec![("schema.prisma".to_string(), schema.clone())],
+                None,
+                &NoExtensionTypes,
+            )
             .unwrap();
         let migration = dialect.diff(from, to, &SchemaFilter::default());
 
@@ -220,7 +227,11 @@ Snapshot comparison failed. Run the test again with UPDATE_EXPECT=1 in the envir
         // Check that the migration is idempotent.
         let from = connector.schema_from_database(None).await.unwrap();
         let to = dialect
-            .schema_from_datamodel(vec![("schema.prisma".to_string(), schema.clone())], None)
+            .schema_from_datamodel(
+                vec![("schema.prisma".to_string(), schema.clone())],
+                None,
+                &NoExtensionTypes,
+            )
             .unwrap();
         let migration = dialect.diff(from, to, &SchemaFilter::default());
 

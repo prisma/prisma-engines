@@ -2,7 +2,7 @@
 #![deny(rust_2018_idioms, unsafe_code, missing_docs)]
 
 pub use psl_core::builtin_connectors;
-use psl_core::parser_database::{ExtensionTypes, Files, NoExtensions};
+use psl_core::parser_database::{ExtensionTypes, Files, NoExtensionTypes};
 pub use psl_core::{
     ALL_PREVIEW_FEATURES,
     Configuration,
@@ -75,7 +75,7 @@ pub fn parse_schema(
 /// Parse and analyze a Prisma schema.
 /// This variant does not support extensions.
 pub fn parse_schema_without_extensions(file: impl Into<SourceFile>) -> Result<ValidatedSchema, String> {
-    parse_schema(file, &NoExtensions)
+    parse_schema(file, &NoExtensionTypes)
 }
 
 /// Parse and analyze a Prisma schema.
@@ -96,7 +96,7 @@ pub fn parse_schema_multi(
 /// Parse and analyze a Prisma schema.
 /// This variant does not support extensions.
 pub fn parse_schema_multi_without_extensions(files: &[(String, SourceFile)]) -> Result<ValidatedSchema, String> {
-    parse_schema_multi(files, &NoExtensions)
+    parse_schema_multi(files, &NoExtensionTypes)
 }
 
 /// The most general API for dealing with Prisma schemas. It accumulates what analysis and
@@ -109,7 +109,7 @@ pub fn validate(file: SourceFile, extension_types: &dyn ExtensionTypes) -> Valid
 /// validation information it can, and returns it along with any error and warning diagnostics.
 /// This variant does not support extensions.
 pub fn validate_without_extensions(file: SourceFile) -> ValidatedSchema {
-    validate(file, &NoExtensions)
+    validate(file, &NoExtensionTypes)
 }
 
 /// Parse a Prisma schema, but skip validations.
@@ -131,5 +131,5 @@ pub fn validate_multi_file(files: &[(String, SourceFile)], extension_types: &dyn
 /// validation information it can, and returns it along with any error and warning diagnostics.
 /// This variant does not support extensions.
 pub fn validate_multi_file_without_extensions(files: &[(String, SourceFile)]) -> ValidatedSchema {
-    validate_multi_file(files, &NoExtensions)
+    validate_multi_file(files, &NoExtensionTypes)
 }

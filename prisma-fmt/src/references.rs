@@ -4,7 +4,7 @@ use psl::{
     Diagnostics, SourceFile,
     diagnostics::{FileId, Span},
     error_tolerant_parse_configuration,
-    parser_database::{NoExtensions, ParserDatabase},
+    parser_database::{NoExtensionTypes, ParserDatabase},
     schema_ast::ast::{
         AttributePosition, CompositeTypePosition, EnumPosition, Field, FieldId, FieldPosition, FieldType, ModelId,
         ModelPosition, SchemaPosition, SourcePosition, Top, WithAttributes, WithIdentifier, WithName, WithSpan,
@@ -27,7 +27,7 @@ pub(crate) fn references(schema_files: Vec<(String, SourceFile)>, params: Refere
 
     let db = {
         let mut diag = Diagnostics::new();
-        ParserDatabase::new(&schema_files, &mut diag, &NoExtensions)
+        ParserDatabase::new(&schema_files, &mut diag, &NoExtensionTypes)
     };
 
     let Some(initiating_file_id) = db.file_id(params.text_document_position.text_document.uri.as_str()) else {

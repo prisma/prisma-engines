@@ -1,7 +1,8 @@
 pub(crate) mod index_fields;
 
 use crate::{
-    DatamodelError, context::Context, extension::ExtensionTypeId, interner::StringId, walkers::IndexFieldWalker,
+    DatamodelError, ParserDatabase, context::Context, extension::ExtensionTypeId, interner::StringId,
+    walkers::IndexFieldWalker,
 };
 use either::Either;
 use enumflags2::bitflags;
@@ -42,7 +43,6 @@ pub(super) struct Types {
     /// not part of the base Prisma ones. This is meant for later validation in the datamodel
     /// connector.
     pub(super) unknown_function_defaults: Vec<ScalarFieldId>,
-    pub(super) extension_types: HashMap<ExtensionTypeId, StringId>,
 }
 
 impl Types {
@@ -216,6 +216,14 @@ impl ScalarFieldType {
         }
     }
 
+    /// Try to interpret this field type as an Extension type.
+    pub fn as_extension_type(self) -> Option<ExtensionTypeId> {
+        match self {
+            ScalarFieldType::Extension(id) => Some(id),
+            _ => None,
+        }
+    }
+
     /// Try to interpret this field type as an enum.
     pub fn as_enum(self) -> Option<crate::EnumId> {
         match self {
@@ -267,6 +275,42 @@ impl ScalarFieldType {
     /// True if the field's type is Decimal.
     pub fn is_decimal(self) -> bool {
         matches!(self, Self::BuiltInScalar(ScalarType::Decimal))
+    }
+
+    /// Display the field type as it would appear in the Prisma schema.
+    pub fn display<'a>(&'a self, db: &'a ParserDatabase) -> impl fmt::Display + 'a {
+        DisplayScalarFieldType { field_type: self, db }
+    }
+}
+
+struct DisplayScalarFieldType<'a> {
+    pub field_type: &'a ScalarFieldType,
+    pub db: &'a ParserDatabase,
+}
+
+impl fmt::Display for DisplayScalarFieldType<'_> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self.field_type {
+            ScalarFieldType::BuiltInScalar(t) => write!(f, "{}", t.as_str()),
+            ScalarFieldType::Enum(id) => {
+                write!(f, "{}", self.db.walk(*id).name())
+            }
+            ScalarFieldType::CompositeType(id) => {
+                write!(f, "{}", self.db.walk(*id).name())
+            }
+            ScalarFieldType::Extension(ext_id) => {
+                let name = self
+                    .db
+                    .extension_metadata
+                    .id_to_prisma_name
+                    .get(ext_id)
+                    .expect("extension type id to have a name");
+                write!(f, "{}", self.db.interner.get(*name).unwrap())
+            }
+            ScalarFieldType::Unsupported(ut) => {
+                write!(f, "Unsupported(\"{}\")", self.db.interner.get(ut.name).unwrap())
+            }
+        }
     }
 }
 
@@ -782,9 +826,8 @@ fn field_type<'db>(field: &'db ast::Field, ctx: &mut Context<'db>) -> Result<Fie
         }
         Some((_, _, ast::Top::Generator(_))) | Some((_, _, ast::Top::Source(_))) => unreachable!(),
         None => {
-            if let Some(tpe) = ctx.extension_types().extension_type_by_name(supported) {
-                ctx.types.extension_types.insert(tpe, supported_string_id);
-                Ok(FieldType::Scalar(ScalarFieldType::Extension(tpe)))
+            if let Some(type_id) = ctx.extension_types().get_by_prisma_name(supported) {
+                Ok(FieldType::Scalar(ScalarFieldType::Extension(type_id)))
             } else {
                 Err(supported)
             }

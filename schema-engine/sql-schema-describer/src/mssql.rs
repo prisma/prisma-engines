@@ -323,7 +323,9 @@ impl<'a> SqlSchemaDescriber<'a> {
                             ColumnTypeFamily::Binary => DefaultValue::db_generated(default_string),
                             ColumnTypeFamily::Json => DefaultValue::db_generated(default_string),
                             ColumnTypeFamily::Uuid => DefaultValue::db_generated(default_string),
-                            ColumnTypeFamily::Unsupported(_) => DefaultValue::db_generated(default_string),
+                            ColumnTypeFamily::Udt(_) | ColumnTypeFamily::Unsupported(_) => {
+                                DefaultValue::db_generated(default_string)
+                            }
                             ColumnTypeFamily::Enum(_) => unreachable!("No enums in MSSQL"),
                         };
 

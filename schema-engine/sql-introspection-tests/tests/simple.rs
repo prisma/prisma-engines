@@ -1,7 +1,7 @@
 use connection_string::JdbcString;
 use enumflags2::BitFlags;
 use indoc::formatdoc;
-use psl::PreviewFeature;
+use psl::{PreviewFeature, parser_database::NoExtensionTypes};
 use quaint::single::Quaint;
 use schema_connector::{CompositeTypeDepth, ConnectorParams, IntrospectionContext, SchemaConnector};
 use sql_introspection_tests::test_api::{Queryable, ToIntrospectionTestResult};
@@ -189,7 +189,7 @@ source .test_database_urls/mysql_5_6
 
     let ctx = IntrospectionContext::new(psl, CompositeTypeDepth::Infinite, namespaces.clone(), PathBuf::new());
 
-    let introspected = tok(api.introspect(&ctx))
+    let introspected = tok(api.introspect(&ctx, &NoExtensionTypes))
         .map(ToIntrospectionTestResult::to_single_test_result)
         .unwrap_or_else(|err| panic!("{}", err))
         .datamodel;
@@ -222,7 +222,7 @@ source .test_database_urls/mysql_5_6
                 PathBuf::new(),
             );
 
-            tok(api.introspect(&ctx))
+            tok(api.introspect(&ctx, &NoExtensionTypes))
                 .map(ToIntrospectionTestResult::to_single_test_result)
                 .unwrap_or_else(|err| panic!("{}", err))
                 .datamodel

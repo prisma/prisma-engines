@@ -1,6 +1,6 @@
 use std::sync::Arc;
 
-use psl::{PreviewFeatures, SourceFile, ValidatedSchema};
+use psl::{PreviewFeatures, SourceFile, ValidatedSchema, parser_database::ExtensionTypes};
 use quaint::connector::ExternalConnectorFactory;
 
 use crate::{
@@ -56,6 +56,7 @@ pub trait SchemaDialect: Send + Sync + 'static {
         &self,
         sources: Vec<(String, SourceFile)>,
         default_namespace: Option<&str>,
+        extension_types: &dyn ExtensionTypes,
     ) -> ConnectorResult<DatabaseSchema>;
 
     /// If possible, check that the passed in migrations apply cleanly.
@@ -176,6 +177,7 @@ pub trait SchemaConnector: Send + Sync + 'static {
     fn introspect<'a>(
         &'a mut self,
         ctx: &'a IntrospectionContext,
+        extension_types: &'a dyn ExtensionTypes,
     ) -> BoxFuture<'a, ConnectorResult<IntrospectionResult>>;
 
     /// Introspect queries and returns type information.
@@ -202,8 +204,9 @@ pub trait SchemaConnector: Send + Sync + 'static {
     ) -> BoxFuture<'a, ConnectorResult<DatabaseSchema>> {
         Box::pin(async move {
             match diff_target {
-                DiffTarget::Datamodel(sources) => {
-                    self.schema_dialect().schema_from_datamodel(sources, default_namespace)
+                DiffTarget::Datamodel(sources, extension_types) => {
+                    self.schema_dialect()
+                        .schema_from_datamodel(sources, default_namespace, extension_types)
                 }
                 DiffTarget::Migrations(migrations) => self.schema_from_migrations(migrations, namespaces, filter).await,
                 DiffTarget::Database => self.schema_from_database(namespaces).await,

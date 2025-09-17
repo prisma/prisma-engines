@@ -72,7 +72,13 @@ pub fn validate(
     let db = ParserDatabase::new_single_file(file, &mut diagnostics, extension_types);
     let configuration = validate_configuration(db.ast_assert_single(), &mut diagnostics, connectors);
     let datasources = &configuration.datasources;
-    let out = validate::validate(db, datasources, configuration.preview_features(), diagnostics);
+    let out = validate::validate(
+        db,
+        datasources,
+        configuration.preview_features(),
+        diagnostics,
+        extension_types,
+    );
 
     ValidatedSchema {
         diagnostics: out.diagnostics,
@@ -106,7 +112,13 @@ pub fn validate_multi_file(
     }
 
     let datasources = &configuration.datasources;
-    let out = validate::validate(db, datasources, configuration.preview_features(), diagnostics);
+    let out = validate::validate(
+        db,
+        datasources,
+        configuration.preview_features(),
+        diagnostics,
+        extension_types,
+    );
 
     ValidatedSchema {
         diagnostics: out.diagnostics,
