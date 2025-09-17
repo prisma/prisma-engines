@@ -463,7 +463,7 @@ fn take(take: Take, ignore: bool) -> Option<i64> {
     } else {
         match take {
             Take::All => None,
-            Take::One => Some(1),
+            Take::One | Take::NegativeOne => Some(1),
             Take::Some(n) => Some(n.abs()),
         }
     }
