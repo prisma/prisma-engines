@@ -2527,7 +2527,7 @@ fn all_mysql_8_column_types_must_work(api: TestApi) {
             procedures: [],
             user_defined_types: [],
             connector_data: <ConnectorData>,
-            default_namespace: None,
+            runtime_namespace: None,
         }
     "#]];
     api.expect_schema(expectation);
@@ -2826,7 +2826,7 @@ fn constraints_from_other_databases_should_not_be_introspected(api: TestApi) {
             procedures: [],
             user_defined_types: [],
             connector_data: <ConnectorData>,
-            default_namespace: None,
+            runtime_namespace: None,
         }
     "#]];
     api.expect_schema(expectation);
@@ -2904,7 +2904,7 @@ fn introspected_default_strings_should_be_unescaped(api: TestApi) {
             procedures: [],
             user_defined_types: [],
             connector_data: <ConnectorData>,
-            default_namespace: None,
+            runtime_namespace: None,
         }
     "#]];
     api.expect_schema(expectation);
@@ -3014,7 +3014,7 @@ fn escaped_quotes_in_string_defaults_must_be_unescaped(api: TestApi) {
             procedures: [],
             user_defined_types: [],
             connector_data: <ConnectorData>,
-            default_namespace: None,
+            runtime_namespace: None,
         }
     "#]];
     api.expect_schema(expectation);
@@ -3093,7 +3093,7 @@ fn escaped_backslashes_in_string_literals_must_be_unescaped(api: TestApi) {
             procedures: [],
             user_defined_types: [],
             connector_data: <ConnectorData>,
-            default_namespace: None,
+            runtime_namespace: None,
         }
     "#]];
     api.expect_schema(expectation);
@@ -3535,7 +3535,7 @@ fn function_expression_defaults_are_described_as_dbgenerated(api: TestApi) {
             procedures: [],
             user_defined_types: [],
             connector_data: <ConnectorData>,
-            default_namespace: None,
+            runtime_namespace: None,
         }
     "#]];
     api.expect_schema(expectation);
