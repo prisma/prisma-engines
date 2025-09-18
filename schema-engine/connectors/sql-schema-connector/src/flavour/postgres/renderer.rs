@@ -531,11 +531,8 @@ impl SqlRenderer for PostgresRenderer {
         )
     }
 
-    fn render_drop_user_defined_type(&self, type_: &UserDefinedTypeWalker<'_>) -> String {
-        ddl::DropType {
-            type_name: PostgresIdentifier::new(type_.namespace(), type_.name()),
-        }
-        .to_string()
+    fn render_drop_user_defined_type(&self, _: &UserDefinedTypeWalker<'_>) -> String {
+        unreachable!("render_drop_user_defined_type on PostgreSQL")
     }
 
     fn render_rename_foreign_key(&self, fks: MigrationPair<ForeignKeyWalker<'_>>) -> String {

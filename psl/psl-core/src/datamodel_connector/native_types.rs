@@ -23,7 +23,7 @@ impl From<&ExtensionTypeEntry<'_>> for NativeTypeConstructor {
     fn from(value: &ExtensionTypeEntry<'_>) -> Self {
         NativeTypeConstructor {
             name: value.prisma_name.to_owned().into(),
-            number_of_args: value.number_of_args,
+            number_of_args: value.number_of_db_type_modifiers,
             number_of_optional_args: 0,
             allowed_types: Cow::Owned(vec![AllowedType {
                 field_type: ScalarFieldType::Extension(value.id),

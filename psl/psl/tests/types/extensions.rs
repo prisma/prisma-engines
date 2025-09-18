@@ -147,7 +147,7 @@ impl ExtensionTypes for TestExtensions {
                     prisma_name: prisma_name.as_str(),
                     db_namespace: None,
                     db_name: db_name.as_str(),
-                    number_of_args: *number_of_args,
+                    number_of_db_type_modifiers: *number_of_args,
                     db_type_modifiers: expected_db_type_modifiers.as_deref(),
                 },
             )
@@ -160,7 +160,7 @@ impl ExtensionTypes for TestExtensions {
                 prisma_name: prisma_name.as_str(),
                 db_namespace: None,
                 db_name: db_name.as_str(),
-                number_of_args: *number_of_args,
+                number_of_db_type_modifiers: *number_of_args,
                 db_type_modifiers: expected_db_type_modifiers.as_deref(),
             },
         ))

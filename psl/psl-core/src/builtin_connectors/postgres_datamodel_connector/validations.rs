@@ -15,7 +15,7 @@ pub(super) fn compatible_native_types(index: IndexWalker<'_>, connector: &dyn Co
         if let Some(native_type) = field.native_type_instance(connector) {
             let span = field.ast_field().span();
             let PostgresType::Known(r#type) = native_type.downcast_ref() else {
-                return;
+                continue;
             };
             let error = connector.native_instance_error(&native_type);
 

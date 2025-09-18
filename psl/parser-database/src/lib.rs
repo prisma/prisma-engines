@@ -249,7 +249,8 @@ impl ParserDatabase {
 
     /// Get the database name of an extension type by its ID, along with any modifiers it may have.
     pub fn get_extension_type_db_name_with_modifiers(&self, id: ExtensionTypeId) -> Option<(&str, &[String])> {
-        let (name, modifiers) = self.extension_metadata.id_to_db_name.get(&id)?;
+        let (name, modifiers) = self.extension_metadata.id_to_db_name_with_modifiers.get(&id)?;
+        let name = self.interner.get(*name)?;
         Some((name, modifiers))
     }
 }
@@ -278,24 +279,26 @@ impl std::ops::Index<StringId> for ParserDatabase {
 
 struct ExtensionMetadata {
     id_to_prisma_name: HashMap<ExtensionTypeId, StringId>,
-    id_to_db_name: HashMap<ExtensionTypeId, (String, Vec<String>)>,
+    id_to_db_name_with_modifiers: HashMap<ExtensionTypeId, (StringId, Vec<String>)>,
 }
 
 impl ExtensionMetadata {
     pub fn new(extension_types: &dyn ExtensionTypes, interner: &mut StringInterner) -> Self {
         let mut id_to_prisma_name = HashMap::new();
-        let mut id_to_db_name = HashMap::new();
+        let mut id_to_db_name_and_modifiers = HashMap::new();
 
         for entry in extension_types.enumerate() {
-            id_to_prisma_name.insert(entry.id, interner.intern(entry.prisma_name));
+            let prisma_name = interner.intern(entry.prisma_name);
+            id_to_prisma_name.insert(entry.id, prisma_name);
             if let Some(modifiers) = &entry.db_type_modifiers {
-                id_to_db_name.insert(entry.id, (entry.db_name.to_owned(), modifiers.to_vec()));
+                let db_name = interner.intern(entry.db_name);
+                id_to_db_name_and_modifiers.insert(entry.id, (db_name, modifiers.to_vec()));
             }
         }
 
         ExtensionMetadata {
             id_to_prisma_name,
-            id_to_db_name,
+            id_to_db_name_with_modifiers: id_to_db_name_and_modifiers,
         }
     }
 }

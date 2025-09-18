@@ -26,8 +26,8 @@ pub struct ExtensionTypeEntry<'a> {
     /// The expected modifiers for the database type, if this type requires them to have
     /// specific values.
     pub db_type_modifiers: Option<&'a [String]>,
-    /// The number of arguments that must be provided when using this extension type.
-    pub number_of_args: usize,
+    /// The number of modifiers that the database type expects.
+    pub number_of_db_type_modifiers: usize,
 }
 
 /// An identifier for an extension type.
