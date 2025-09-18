@@ -78,7 +78,7 @@ pub(crate) fn translate_read_query(query: ReadQuery, builder: &dyn QueryBuilder)
             }
 
             match take {
-                Take::One => Expression::Unique(Box::new(expr)),
+                Take::One | Take::NegativeOne => Expression::Unique(Box::new(expr)),
                 _ => expr,
             }
         }
