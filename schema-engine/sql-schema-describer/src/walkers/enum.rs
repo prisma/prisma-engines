@@ -20,9 +20,9 @@ impl<'a> EnumWalker<'a> {
     }
 
     /// The namespace the enum belongs to, if defined.
-    /// If not, falls back to the schema's default namespace, if any.
+    /// If not, falls back to the default runtime namespace, if one is set.
     pub fn namespace(self) -> Option<&'a str> {
-        self.explicit_namespace().or(self.schema.default_namespace.as_deref())
+        self.explicit_namespace().or(self.schema.runtime_namespace.as_deref())
     }
 
     /// The name of the enum. This is a made up name on MySQL.
