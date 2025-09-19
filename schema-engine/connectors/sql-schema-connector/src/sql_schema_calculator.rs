@@ -49,7 +49,7 @@ pub(crate) fn calculate_sql_schema(
 }
 
 fn push_namespaces<'a>(ctx: &mut Context<'a>, default_namespace: Option<&'a str>) {
-    // We either use the explicit namespaces from the datamodel
+    // Define the explicit namespaces from the datamodel
     if let Some(ds) = ctx.datamodel.configuration.datasources.first() {
         for (schema, _) in ds.namespaces.iter() {
             ctx.schemas
