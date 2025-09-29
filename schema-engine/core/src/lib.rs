@@ -12,11 +12,13 @@ pub use ::commands::{CoreError, CoreResult, GenericApi};
 pub use json_rpc;
 
 mod core_error;
+mod extensions;
 mod rpc;
 mod state;
 mod timings;
 
 pub use self::{rpc::RpcApi, timings::TimingsLayer};
+pub use extensions::ExtensionTypeConfig;
 use json_rpc::types::{SchemaContainer, SchemasContainer, SchemasWithConfigDir};
 pub use schema_connector;
 
@@ -27,7 +29,7 @@ use psl::{
 };
 use schema_connector::ConnectorParams;
 use sql_schema_connector::SqlSchemaConnector;
-use std::{env, path::Path};
+use std::{env, path::Path, sync::Arc};
 use user_facing_errors::common::InvalidConnectionString;
 
 fn connector_for_connection_string(
@@ -151,9 +153,19 @@ fn connector_for_provider(
 }
 
 /// Top-level constructor for the schema engine API.
+/// This variant does not support extensions.
+pub fn schema_api_without_extensions(
+    datamodel: Option<String>,
+    host: Option<std::sync::Arc<dyn schema_connector::ConnectorHost>>,
+) -> CoreResult<Box<dyn GenericApi>> {
+    schema_api(datamodel, host, Arc::new(ExtensionTypeConfig::default()))
+}
+
+/// Top-level constructor for the schema engine API.
 pub fn schema_api(
     datamodel: Option<String>,
     host: Option<std::sync::Arc<dyn schema_connector::ConnectorHost>>,
+    extension_config: Arc<ExtensionTypeConfig>,
 ) -> CoreResult<Box<dyn GenericApi>> {
     // Eagerly load the default schema, for validation errors.
     if let Some(datamodel) = &datamodel {
@@ -161,7 +173,7 @@ pub fn schema_api(
     }
 
     let datamodel = datamodel.map(|datamodel| vec![("schema.prisma".to_owned(), SourceFile::from(datamodel))]);
-    let state = state::EngineState::new(datamodel, host);
+    let state = state::EngineState::new(datamodel, host, extension_config);
     Ok(Box::new(state))
 }
 
