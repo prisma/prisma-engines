@@ -296,7 +296,7 @@ pub struct EnumAssertion<'a>(sql::EnumWalker<'a>);
 
 impl EnumAssertion<'_> {
     pub fn assert_namespace(self, namespace: &'static str) -> Self {
-        assert_eq!(self.0.namespace(), Some(namespace));
+        assert_eq!(self.0.explicit_namespace(), Some(namespace));
         self
     }
 
@@ -332,7 +332,7 @@ impl<'a> TableAssertion<'a> {
     }
 
     pub fn assert_namespace(self, namespace: &str) -> Self {
-        if self.table.namespace() != Some(namespace) {
+        if self.table.explicit_namespace() != Some(namespace) {
             self.print_context();
             println!(
                 "\n  {} has failed because table {}.{} {}",
@@ -1046,7 +1046,7 @@ fn print_tables(schema: &SqlSchema) {
     println!("\n  {}", "Tables in database:".italic());
     schema
         .table_walkers()
-        .map(|table| (table.name(), table.namespace()))
+        .map(|table| (table.name(), table.explicit_namespace()))
         .for_each(|(t, ns)| {
             println!(
                 "\t - {}",
