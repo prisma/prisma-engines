@@ -23,7 +23,7 @@ pub(crate) async fn mssql_setup(url: String, prisma_schema: &str, db_schemas: &[
         );
         conn.raw_cmd(&sql).await.unwrap();
     } else {
-        let mut api = schema_core::schema_api(Some(prisma_schema.to_owned()), None)?;
+        let mut api = schema_core::schema_api_without_extensions(Some(prisma_schema.to_owned()), None)?;
         api.reset(ResetInput {
             filter: SchemaFilter::default(),
         })

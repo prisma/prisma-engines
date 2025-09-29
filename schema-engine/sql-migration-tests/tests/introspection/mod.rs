@@ -28,7 +28,7 @@ fn introspect_force_with_invalid_schema() {
     "#
     );
 
-    let api = schema_core::schema_api(Some(schema.clone()), None).unwrap();
+    let api = schema_core::schema_api_without_extensions(Some(schema.clone()), None).unwrap();
 
     let params = IntrospectParams {
         schema: SchemasContainer {
@@ -93,7 +93,7 @@ fn introspect_no_force_with_invalid_schema() {
     "#
     );
 
-    let api = schema_core::schema_api(Some(schema.clone()), None).unwrap();
+    let api = schema_core::schema_api_without_extensions(Some(schema.clone()), None).unwrap();
 
     let params = IntrospectParams {
         schema: SchemasContainer {
