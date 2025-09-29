@@ -58,12 +58,14 @@ build() {
     local CARGO_TARGET_DIR
     CARGO_TARGET_DIR=$(cargo metadata --format-version 1 | jq -r .target_directory)
     echo "🔨 Building $CONNECTOR"
-    RUSTFLAGS="-Zlocation-detail=none" CARGO_PROFILE_RELEASE_OPT_LEVEL="z" cargo build \
+    RUSTFLAGS="-Zlocation-detail=none -Zunstable-options -Cpanic=immediate-abort" \
+    CARGO_PROFILE_RELEASE_OPT_LEVEL="z" \
+    cargo build \
         -p query-engine-wasm \
         --profile "$WASM_BUILD_PROFILE" \
         --features "$CONNECTOR" \
         --target wasm32-unknown-unknown \
-        -Zbuild-std=std,panic_abort -Zbuild-std-features=panic_immediate_abort
+        -Zbuild-std=std,panic_abort
 
     local IN_FILE="$CARGO_TARGET_DIR/wasm32-unknown-unknown/$WASM_TARGET_SUBDIR/query_engine_wasm.wasm"
     local OUT_FILE="$OUT_FOLDER/$PROVIDER/query_engine_bg.wasm"
