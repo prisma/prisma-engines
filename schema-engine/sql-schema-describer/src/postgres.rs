@@ -653,7 +653,7 @@ impl<'a> SqlSchemaDescriber<'a> {
 
         let rows = self.conn.query_raw(sql, &[Value::array(namespaces)]).await?;
 
-        let names = rows.into_iter().map(|row| (row.get_expect_string("namespace_name")));
+        let names = rows.into_iter().map(|row| row.get_expect_string("namespace_name"));
 
         for namespace in names {
             sql_schema.push_namespace(namespace);
