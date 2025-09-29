@@ -33,6 +33,7 @@ tracing.workspace = true
 tracing-subscriber.workspace = true
 tracing-futures.workspace = true
 url.workspace = true
+bon.workspace = true
 
 [features]
 vendored-openssl = ["sql-schema-connector/vendored-openssl"]
