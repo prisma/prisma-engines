@@ -18,7 +18,7 @@ mod state;
 mod timings;
 
 pub use self::{rpc::RpcApi, timings::TimingsLayer};
-pub use extensions::ExtensionTypeConfig;
+pub use extensions::{ExtensionType, ExtensionTypeConfig};
 use json_rpc::types::{SchemaContainer, SchemasContainer, SchemasWithConfigDir};
 pub use schema_connector;
 

@@ -1,5 +1,6 @@
 use std::collections::HashMap;
 
+use bon::bon;
 use psl::parser_database::{ExtensionTypeEntry, ExtensionTypeId, ExtensionTypes};
 use serde::Deserialize;
 
@@ -10,6 +11,25 @@ pub struct ExtensionTypeConfig {
     types: Vec<ExtensionType>,
     by_prisma_name: HashMap<String, usize>,
     by_db_name_and_modifiers: HashMap<(String, Option<Vec<String>>), usize>,
+}
+
+impl ExtensionTypeConfig {
+    /// Create a new `ExtensionTypeConfig` from a list of `ExtensionType`.
+    pub fn new(types: Vec<ExtensionType>) -> Self {
+        let mut by_prisma_name = HashMap::new();
+        let mut by_db_name_and_modifiers = HashMap::new();
+
+        for (i, ext) in types.iter().enumerate() {
+            by_prisma_name.insert(ext.prisma_name.clone(), i);
+            by_db_name_and_modifiers.insert((ext.db_name.clone(), ext.db_type_modifiers.clone()), i);
+        }
+
+        Self {
+            types,
+            by_prisma_name,
+            by_db_name_and_modifiers,
+        }
+    }
 }
 
 impl ExtensionTypes for ExtensionTypeConfig {
@@ -29,9 +49,10 @@ impl ExtensionTypes for ExtensionTypeConfig {
     }
 }
 
+/// Represents a single extension type.
 #[derive(Debug, Clone, Deserialize)]
 #[serde(rename_all = "camelCase")]
-struct ExtensionType {
+pub struct ExtensionType {
     prisma_name: String,
     db_name: String,
     db_namespace: Option<String>,
@@ -39,7 +60,26 @@ struct ExtensionType {
     number_of_db_type_modifiers: usize,
 }
 
+#[bon]
 impl ExtensionType {
+    /// Create a new `ExtensionType`.
+    #[builder]
+    pub fn new(
+        #[builder(into)] prisma_name: String,
+        #[builder(into)] db_name: String,
+        #[builder(into)] db_namespace: Option<String>,
+        db_type_modifiers: Option<Vec<String>>,
+        number_of_db_type_modifiers: usize,
+    ) -> Self {
+        Self {
+            prisma_name,
+            db_name,
+            db_namespace,
+            db_type_modifiers,
+            number_of_db_type_modifiers,
+        }
+    }
+
     fn entry(&self, id: usize) -> ExtensionTypeEntry<'_> {
         ExtensionTypeEntry {
             id: ExtensionTypeId::from(id),
@@ -59,18 +99,6 @@ pub struct ExtensionTypeConfigJson {
 
 impl From<ExtensionTypeConfigJson> for ExtensionTypeConfig {
     fn from(json: ExtensionTypeConfigJson) -> Self {
-        let mut by_prisma_name = HashMap::new();
-        let mut by_db_name_and_modifiers = HashMap::new();
-
-        for (i, ext) in json.types.iter().enumerate() {
-            by_prisma_name.insert(ext.prisma_name.clone(), i);
-            by_db_name_and_modifiers.insert((ext.db_name.clone(), ext.db_type_modifiers.clone()), i);
-        }
-
-        Self {
-            types: json.types,
-            by_prisma_name,
-            by_db_name_and_modifiers,
-        }
+        ExtensionTypeConfig::new(json.types)
     }
 }
