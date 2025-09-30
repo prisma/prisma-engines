@@ -197,7 +197,7 @@ impl<'a> DatamodelCalculatorContext<'a> {
         }
 
         let r#enum = self.sql_schema.walk(id);
-        ModelName::new_from_sql(r#enum.name(), r#enum.namespace(), self)
+        ModelName::new_from_sql(r#enum.name(), r#enum.explicit_namespace(), self)
     }
 
     /// Given a SQL enum variant from the database catalog, this method returns the name it will be
@@ -301,7 +301,7 @@ impl<'a> DatamodelCalculatorContext<'a> {
         }
 
         let table = self.sql_schema.walk(id);
-        ModelName::new_from_sql(table.name(), table.namespace(), self)
+        ModelName::new_from_sql(table.name(), table.explicit_namespace(), self)
     }
 
     // Use the existing view name when available.

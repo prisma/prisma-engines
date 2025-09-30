@@ -98,7 +98,7 @@ fn from_unique_index_to_without(mut api: TestApi) {
     } else if api.is_postgres() || api.is_cockroach() {
         expect![[r#"
             [
-                "-- DropIndex\nDROP INDEX \"public\".\"Post_authorId_key\";\n",
+                "-- DropIndex\nDROP INDEX \"Post_authorId_key\";\n",
             ]
         "#]]
     } else if api.is_mssql() {
@@ -215,20 +215,20 @@ fn from_unique_index_to_pk(mut api: TestApi) {
             [
                 [
                     "-- DropIndex",
-                    "DROP INDEX \"public\".\"C_secondary_key\";",
+                    "DROP INDEX \"C_secondary_key\";",
                     "",
                     "-- AlterTable",
-                    "ALTER TABLE \"public\".\"A\" DROP COLUMN \"name\",",
+                    "ALTER TABLE \"A\" DROP COLUMN \"name\",",
                     "ADD CONSTRAINT \"A_pkey\" PRIMARY KEY (\"id\");",
                     "",
                     "-- DropIndex",
-                    "DROP INDEX \"public\".\"A_id_key\";",
+                    "DROP INDEX \"A_id_key\";",
                     "",
                     "-- AlterTable",
-                    "ALTER TABLE \"public\".\"B\" ADD CONSTRAINT \"B_pkey\" PRIMARY KEY (\"x\", \"y\");",
+                    "ALTER TABLE \"B\" ADD CONSTRAINT \"B_pkey\" PRIMARY KEY (\"x\", \"y\");",
                     "",
                     "-- DropIndex",
-                    "DROP INDEX \"public\".\"B_x_y_key\";",
+                    "DROP INDEX \"B_x_y_key\";",
                     "",
                 ],
             ]
@@ -425,7 +425,7 @@ fn diffing_postgres_schemas_when_initialized_on_sqlite(mut api: TestApi) {
 
     let expected_printed_messages = expect![[r#"
         [
-            "-- AlterTable\nALTER TABLE \"public\".\"TestModel\" DROP COLUMN \"names\",\nADD COLUMN     \"names\" TEXT[];\n\n-- CreateTable\nCREATE TABLE \"public\".\"TestModel2\" (\n    \"id\" SERIAL NOT NULL,\n\n    CONSTRAINT \"TestModel2_pkey\" PRIMARY KEY (\"id\")\n);\n",
+            "-- AlterTable\nALTER TABLE \"TestModel\" DROP COLUMN \"names\",\nADD COLUMN     \"names\" TEXT[];\n\n-- CreateTable\nCREATE TABLE \"TestModel2\" (\n    \"id\" SERIAL NOT NULL,\n\n    CONSTRAINT \"TestModel2_pkey\" PRIMARY KEY (\"id\")\n);\n",
             "\n[+] Added tables\n  - TestModel2\n\n[*] Changed the `TestModel` table\n  [*] Column `names` would be dropped and recreated (changed from Required to List, type changed)\n",
         ]
     "#]];
