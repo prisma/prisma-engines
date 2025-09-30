@@ -405,7 +405,7 @@ async fn northwind(api: TestApi) {
     api.raw_cmd(setup).await;
     let expectation = expect![[r#"
         generator client {
-          provider = "prisma-client-js"
+          provider = "prisma-client"
         }
 
         datasource db {
@@ -796,7 +796,7 @@ async fn commenting_stopgap(api: &mut TestApi) -> TestResult {
 
     let expectation = expect![[r#"
         generator client {
-          provider = "prisma-client-js"
+          provider = "prisma-client"
         }
 
         datasource db {

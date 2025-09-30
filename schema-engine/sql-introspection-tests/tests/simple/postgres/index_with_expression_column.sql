@@ -22,7 +22,7 @@ CREATE INDEX index_communication_channels_on_confirmation_code ON communication_
 
 /*
 generator js {
-  provider = "prisma-client-js"
+  provider = "prisma-client"
 }
 
 datasource db {

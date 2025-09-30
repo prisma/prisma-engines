@@ -65,7 +65,7 @@ fn multi_file_errors_relation() {
             "b.prisma",
             r#"
 generator client {
-    provider = "prisma-client-js"
+    provider = "prisma-client"
 }
 
 model Post {

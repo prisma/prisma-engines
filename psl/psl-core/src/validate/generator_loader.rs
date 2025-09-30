@@ -72,7 +72,7 @@ fn lift_generator(
         ))
     }
 
-    // E.g., "prisma-client-js"
+    // E.g., "prisma-client"
     let provider = match args.remove(PROVIDER_KEY) {
         Some(val) => StringFromEnvVar::coerce(val, diagnostics)?,
         None => {

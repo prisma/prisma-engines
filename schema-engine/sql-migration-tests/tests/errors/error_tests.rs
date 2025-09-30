@@ -533,7 +533,7 @@ async fn bad_connection_string_in_datamodel_returns_nice_error() {
         }
 
         generator client {
-          provider = "prisma-client-js"
+          provider = "prisma-client"
         }
     "#};
 

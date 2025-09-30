@@ -195,7 +195,7 @@ async fn scalar_list_defaults_work_on_22_1(api: &mut TestApi) -> TestResult {
 
     let expectation = expect![[r#"
         generator client {
-          provider = "prisma-client-js"
+          provider = "prisma-client"
         }
 
         datasource db {
@@ -249,7 +249,7 @@ async fn scalar_list_defaults_work_on_22_2(api: &mut TestApi) -> TestResult {
 
     let expectation = expect![[r#"
         generator client {
-          provider = "prisma-client-js"
+          provider = "prisma-client"
         }
 
         datasource db {
@@ -312,7 +312,7 @@ async fn string_col_with_length(api: &mut TestApi) -> TestResult {
 
     let expectation = expect![[r#"
         generator client {
-          provider = "prisma-client-js"
+          provider = "prisma-client"
         }
 
         datasource db {
@@ -367,7 +367,7 @@ async fn row_level_ttl_stopgap(api: &mut TestApi) -> TestResult {
 
     let expectation = expect![[r#"
         generator client {
-          provider = "prisma-client-js"
+          provider = "prisma-client"
         }
 
         datasource db {
@@ -433,7 +433,7 @@ async fn commenting_stopgap(api: &mut TestApi) -> TestResult {
 
     let expectation = expect![[r#"
         generator client {
-          provider        = "prisma-client-js"
+          provider        = "prisma-client"
           previewFeatures = ["views"]
         }
 

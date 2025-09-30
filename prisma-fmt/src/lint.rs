@@ -105,7 +105,7 @@ mod tests {
             }
 
             generator client {
-              provider = "prisma-client-js"
+              provider = "prisma-client"
               previewFeatures = ["createMany"]
             }
 
@@ -138,7 +138,7 @@ mod tests {
             }
 
             generator client {
-              provider = "prisma-client-js"
+              provider = "prisma-client"
               previewFeatures = ["createMany"]
             }
         "#};

@@ -1047,7 +1047,7 @@ fn should_fail_if_not_using_unique_constraint_with_single_one_to_many() {
 fn multiple_relation_validation_errors_do_not_prevent_each_other_across_models() {
     let schema = r#"
         generator client {
-          provider      = "prisma-client-js"
+          provider      = "prisma-client"
           binaryTargets = ["darwin"]
         }
 

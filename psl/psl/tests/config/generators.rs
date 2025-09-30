@@ -245,7 +245,7 @@ fn fail_to_load_generator_with_options_missing() {
 fn nice_error_for_unknown_generator_preview_feature() {
     let schema = indoc! {r#"
         generator client {
-          provider = "prisma-client-js"
+          provider = "prisma-client"
           previewFeatures = ["foo"]
         }
     "#};
@@ -259,7 +259,7 @@ fn nice_error_for_unknown_generator_preview_feature() {
         [1;91merror[0m: [1mThe preview feature "foo" is not known. Expected one of: metrics, nativeDistinct, postgresqlExtensions, relationJoins, schemaEngineDriverAdapters, shardKeys, strictUndefinedChecks, views[0m
           [1;94m-->[0m  [4mschema.prisma:3[0m
         [1;94m   | [0m
-        [1;94m 2 | [0m  provider = "prisma-client-js"
+        [1;94m 2 | [0m  provider = "prisma-client"
         [1;94m 3 | [0m  previewFeatures = [1;91m["foo"][0m
         [1;94m   | [0m
     "#]];
@@ -276,7 +276,7 @@ fn binary_targets_from_env_var_should_work() {
         }
 
         generator client {
-          provider      = "prisma-client-js"
+          provider      = "prisma-client"
           binaryTargets = env("BINARY_TARGETS")
         }
 
@@ -291,7 +291,7 @@ fn binary_targets_from_env_var_should_work() {
             "name": "client",
             "provider": {
               "fromEnvVar": null,
-              "value": "prisma-client-js"
+              "value": "prisma-client"
             },
             "output": null,
             "config": {},
@@ -348,14 +348,14 @@ fn retain_env_var_definitions_in_generator_block() {
 fn env_in_preview_features_must_be_rejected() {
     let schema_1 = indoc! {r#"
         generator client {
-          provider = "prisma-client-js"
+          provider = "prisma-client"
           previewFeatures = [env("MY_PREVIEW_FEATURE")]
         }
     "#};
 
     let schema_2 = indoc! {r#"
         generator client {
-          provider = "prisma-client-js"
+          provider = "prisma-client"
           previewFeatures = env("MY_PREVIEW_FEATURE")
         }
     "#};
@@ -364,7 +364,7 @@ fn env_in_preview_features_must_be_rejected() {
         [1;91merror[0m: [1mExpected a string value, but received functional value `env("MY_PREVIEW_FEATURE")`.[0m
           [1;94m-->[0m  [4mschema.prisma:3[0m
         [1;94m   | [0m
-        [1;94m 2 | [0m  provider = "prisma-client-js"
+        [1;94m 2 | [0m  provider = "prisma-client"
         [1;94m 3 | [0m  previewFeatures = [[1;91menv("MY_PREVIEW_FEATURE")[0m]
         [1;94m   | [0m
     "#]];
@@ -373,7 +373,7 @@ fn env_in_preview_features_must_be_rejected() {
         [1;91merror[0m: [1mExpected a string value, but received functional value `env("MY_PREVIEW_FEATURE")`.[0m
           [1;94m-->[0m  [4mschema.prisma:3[0m
         [1;94m   | [0m
-        [1;94m 2 | [0m  provider = "prisma-client-js"
+        [1;94m 2 | [0m  provider = "prisma-client"
         [1;94m 3 | [0m  previewFeatures = [1;91menv("MY_PREVIEW_FEATURE")[0m
         [1;94m   | [0m
     "#]];
@@ -391,7 +391,7 @@ fn empty_preview_features_array_should_work() {
         }
 
         generator js {
-            provider = "prisma-client-js"
+            provider = "prisma-client"
             previewFeatures = []
         }
     "#;
@@ -409,7 +409,7 @@ fn empty_preview_features_array_with_empty_space_should_work() {
         }
 
         generator js {
-            provider = "prisma-client-js"
+            provider = "prisma-client"
             previewFeatures = [ ]
         }
     "#;
@@ -422,7 +422,7 @@ fn empty_preview_features_array_with_empty_space_should_work() {
 fn engine_type_must_be_a_string() {
     let with_string = indoc! {r#"
         generator client {
-          provider = "prisma-client-js"
+          provider = "prisma-client"
           engineType = "binary"
         }
     "#};
@@ -431,7 +431,7 @@ fn engine_type_must_be_a_string() {
 
     let with_array = indoc! {r#"
         generator client {
-          provider = "prisma-client-js"
+          provider = "prisma-client"
           engineType = ["binary"]
         }
     "#};
@@ -440,7 +440,7 @@ fn engine_type_must_be_a_string() {
         [1;91merror[0m: [1mExpected a String value, but received array value `["binary"]`.[0m
           [1;94m-->[0m  [4mschema.prisma:3[0m
         [1;94m   | [0m
-        [1;94m 2 | [0m  provider = "prisma-client-js"
+        [1;94m 2 | [0m  provider = "prisma-client"
         [1;94m 3 | [0m  engineType = [1;91m["binary"][0m
         [1;94m   | [0m
     "#]];

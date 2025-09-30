@@ -22,7 +22,7 @@ async fn aragon_test_postgres(api: &mut TestApi) -> TestResult {
 
     let schema = expect![[r#"
         generator client {
-          provider = "prisma-client-js"
+          provider = "prisma-client"
         }
 
         datasource db {
@@ -87,7 +87,7 @@ async fn noalyss_folder_test_postgres(api: &mut TestApi) -> TestResult {
 
     let schema = expect![[r#"
         generator client {
-          provider = "prisma-client-js"
+          provider = "prisma-client"
         }
 
         datasource db {
@@ -161,7 +161,7 @@ async fn check_and_exclusion_constraints_stopgap(api: &mut TestApi) -> TestResul
 
     let schema = expect![[r#"
         generator client {
-          provider = "prisma-client-js"
+          provider = "prisma-client"
         }
 
         datasource db {
@@ -250,7 +250,7 @@ async fn exclusion_constraints_stopgap(api: &mut TestApi) -> TestResult {
 
     let schema = expect![[r#"
         generator client {
-          provider = "prisma-client-js"
+          provider = "prisma-client"
         }
 
         datasource db {
@@ -329,7 +329,7 @@ async fn exclusion_constraints_without_where_stopgap(api: &mut TestApi) -> TestR
 
     let schema = expect![[r#"
         generator client {
-          provider = "prisma-client-js"
+          provider = "prisma-client"
         }
 
         datasource db {
@@ -403,7 +403,7 @@ async fn exclusion_constraints_without_where_and_expressions_stopgap(api: &mut T
 
     let schema = expect![[r#"
         generator client {
-          provider = "prisma-client-js"
+          provider = "prisma-client"
         }
 
         datasource db {
@@ -468,7 +468,7 @@ async fn check_constraints_stopgap(api: &mut TestApi) -> TestResult {
 
     let schema = expect![[r#"
         generator client {
-          provider = "prisma-client-js"
+          provider = "prisma-client"
         }
 
         datasource db {

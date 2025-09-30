@@ -65,7 +65,7 @@ pub fn render_test_datamodel(
             {}
 
             generator client {{
-                provider = "prisma-client-js"
+                provider = "prisma-client"
                 previewFeatures = [{}]
             }}
         "#},

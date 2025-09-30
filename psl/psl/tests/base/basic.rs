@@ -267,7 +267,7 @@ fn must_return_good_error_message_for_type_match() {
         }
 
         generator js {
-          provider        = "prisma-client-js"
+          provider        = "prisma-client"
           previewFeatures = ["postgresqlExtensions"]
         }
     "#};

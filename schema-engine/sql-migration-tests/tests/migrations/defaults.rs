@@ -381,7 +381,7 @@ fn column_defaults_must_be_migrated(api: TestApi) {
 fn default_constraint_names_should_work(api: TestApi) {
     let dm = r#"
         generator js {
-            provider = "prisma-client-js"
+            provider = "prisma-client"
         }
 
         model A {
@@ -406,7 +406,7 @@ fn default_constraint_names_should_work(api: TestApi) {
 fn default_constraint_name_default_values_should_work(api: TestApi) {
     let dm = r#"
         generator js {
-            provider = "prisma-client-js"
+            provider = "prisma-client"
         }
 
         model A {
@@ -431,7 +431,7 @@ fn default_constraint_name_default_values_should_work(api: TestApi) {
 fn default_constraint_name_default_values_with_mapping_should_work(api: TestApi) {
     let dm = r#"
         generator js {
-            provider = "prisma-client-js"
+            provider = "prisma-client"
         }
 
         model A {

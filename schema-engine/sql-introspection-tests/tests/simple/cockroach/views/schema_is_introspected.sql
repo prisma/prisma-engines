@@ -6,7 +6,7 @@ CREATE VIEW public."A" AS SELECT 1 AS id;
 
 /*
 generator js {
-  provider = "prisma-client-js"
+  provider = "prisma-client"
   previewFeatures = ["views"]
 }
 

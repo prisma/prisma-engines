@@ -101,7 +101,7 @@ fn multi_schema_reset(mut api: TestApi) {
             {}
 
             generator js {{
-                provider = "prisma-client-js"
+                provider = "prisma-client"
                 previewFeatures = []
             }}
 

@@ -2,7 +2,7 @@ use query_engine_tests::*;
 
 // validates fix for
 //https://github.com/prisma/prisma/issues/3078
-//https://github.com/prisma/prisma-client-js/issues/550
+//https://github.com/prisma/prisma-client/issues/550
 
 // The relationfilter logic for Selfrelations was sensitive to the side from which the filter traversed as well as the
 // naming of the relationfields since this fed into the RelationSide logic. This tests traversal from both sides as well

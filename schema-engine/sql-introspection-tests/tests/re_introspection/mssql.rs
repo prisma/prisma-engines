@@ -427,7 +427,7 @@ async fn direct_url(api: &mut TestApi) {
 
     let input_dm = indoc! {r#"
         generator client {
-          provider = "prisma-client-js"
+          provider = "prisma-client"
         }
 
         datasource db {
@@ -445,7 +445,7 @@ async fn direct_url(api: &mut TestApi) {
 
     let final_dm = indoc! {r#"
         generator client {
-          provider = "prisma-client-js"
+          provider = "prisma-client"
         }
 
         datasource db {

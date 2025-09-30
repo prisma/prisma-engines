@@ -12,7 +12,7 @@ async fn should_work_with_the_preview_feature_enabled(api: &mut TestApi) -> Test
 
     let expectation = expect![[r#"
         generator client {
-          provider        = "prisma-client-js"
+          provider        = "prisma-client"
           previewFeatures = ["postgresqlExtensions"]
         }
 
@@ -38,7 +38,7 @@ async fn sanitizes_problematic_extension_names(api: &mut TestApi) -> TestResult 
 
     let expectation = expect![[r#"
         generator client {
-          provider        = "prisma-client-js"
+          provider        = "prisma-client"
           previewFeatures = ["postgresqlExtensions"]
         }
 
@@ -68,7 +68,7 @@ async fn should_not_list_any_extensions_outside_of_allow_list(api: &mut TestApi)
 
     let expectation = expect![[r#"
         generator client {
-          provider        = "prisma-client-js"
+          provider        = "prisma-client"
           previewFeatures = ["postgresqlExtensions"]
         }
 
@@ -97,7 +97,7 @@ async fn should_not_remove_any_extensions_outside_of_allow_list(api: &mut TestAp
 
     let schema = indoc! {r#"
         generator client {
-          provider        = "prisma-client-js"
+          provider        = "prisma-client"
           previewFeatures = ["postgresqlExtensions"]
         }
 
@@ -110,7 +110,7 @@ async fn should_not_remove_any_extensions_outside_of_allow_list(api: &mut TestAp
 
     let expectation = expect![[r#"
         generator client {
-          provider        = "prisma-client-js"
+          provider        = "prisma-client"
           previewFeatures = ["postgresqlExtensions"]
         }
 
@@ -136,7 +136,7 @@ async fn should_not_list_extensions_without_the_preview_feature(api: &mut TestAp
 
     let expectation = expect![[r#"
         generator client {
-          provider = "prisma-client-js"
+          provider = "prisma-client"
         }
 
         datasource db {
@@ -160,7 +160,7 @@ async fn should_keep_version_attribute_if_same_as_db(api: &mut TestApi) -> TestR
 
     let schema = indoc! {r#"
         generator client {
-          provider        = "prisma-client-js"
+          provider        = "prisma-client"
           previewFeatures = ["postgresqlExtensions"]
         }
 
@@ -173,7 +173,7 @@ async fn should_keep_version_attribute_if_same_as_db(api: &mut TestApi) -> TestR
 
     let expectation = expect![[r#"
         generator client {
-          provider        = "prisma-client-js"
+          provider        = "prisma-client"
           previewFeatures = ["postgresqlExtensions"]
         }
 
@@ -199,7 +199,7 @@ async fn should_update_version_attribute_if_different_than_db(api: &mut TestApi)
 
     let schema = indoc! {r#"
         generator client {
-          provider        = "prisma-client-js"
+          provider        = "prisma-client"
           previewFeatures = ["postgresqlExtensions"]
         }
 
@@ -212,7 +212,7 @@ async fn should_update_version_attribute_if_different_than_db(api: &mut TestApi)
 
     let expectation = expect![[r#"
         generator client {
-          provider        = "prisma-client-js"
+          provider        = "prisma-client"
           previewFeatures = ["postgresqlExtensions"]
         }
 
@@ -238,7 +238,7 @@ async fn should_keep_schema_attribute_if_same_as_db(api: &mut TestApi) -> TestRe
 
     let schema = indoc! {r#"
         generator client {
-          provider        = "prisma-client-js"
+          provider        = "prisma-client"
           previewFeatures = ["postgresqlExtensions"]
         }
 
@@ -251,7 +251,7 @@ async fn should_keep_schema_attribute_if_same_as_db(api: &mut TestApi) -> TestRe
 
     let expectation = expect![[r#"
         generator client {
-          provider        = "prisma-client-js"
+          provider        = "prisma-client"
           previewFeatures = ["postgresqlExtensions"]
         }
 
@@ -277,7 +277,7 @@ async fn should_update_schema_attribute_if_different_than_db(api: &mut TestApi) 
 
     let schema = indoc! {r#"
         generator client {
-          provider        = "prisma-client-js"
+          provider        = "prisma-client"
           previewFeatures = ["postgresqlExtensions"]
         }
 
@@ -290,7 +290,7 @@ async fn should_update_schema_attribute_if_different_than_db(api: &mut TestApi) 
 
     let expectation = expect![[r#"
         generator client {
-          provider        = "prisma-client-js"
+          provider        = "prisma-client"
           previewFeatures = ["postgresqlExtensions"]
         }
 
@@ -310,7 +310,7 @@ async fn should_update_schema_attribute_if_different_than_db(api: &mut TestApi) 
 async fn should_remove_missing_extensions(api: &mut TestApi) -> TestResult {
     let schema = indoc! {r#"
         generator client {
-          provider        = "prisma-client-js"
+          provider        = "prisma-client"
           previewFeatures = ["postgresqlExtensions"]
         }
 
@@ -323,7 +323,7 @@ async fn should_remove_missing_extensions(api: &mut TestApi) -> TestResult {
 
     let expectation = expect![[r#"
         generator client {
-          provider        = "prisma-client-js"
+          provider        = "prisma-client"
           previewFeatures = ["postgresqlExtensions"]
         }
 
@@ -342,7 +342,7 @@ async fn should_remove_missing_extensions(api: &mut TestApi) -> TestResult {
 async fn no_extensions_means_no_extensions(api: &mut TestApi) -> TestResult {
     let expectation = expect![[r#"
         generator client {
-          provider        = "prisma-client-js"
+          provider        = "prisma-client"
           previewFeatures = ["postgresqlExtensions"]
         }
 

@@ -191,7 +191,7 @@ fn postgresql_extension_parsing() {
         }
 
         generator js {
-          provider = "prisma-client-js"
+          provider = "prisma-client"
           previewFeatures = ["postgresqlExtensions"]
         }
     "#};
@@ -227,7 +227,7 @@ fn postgresql_extension_parsing() {
 fn empty_schema_property_should_error() {
     let schema = indoc! {r#"
         generator js {
-          provider        = "prisma-client-js"
+          provider        = "prisma-client"
           previewFeatures = []
         }
 
@@ -254,7 +254,7 @@ fn empty_schema_property_should_error() {
 fn parse_direct_url_should_work() {
     let schema = indoc! {r#"
         generator js {
-          provider        = "prisma-client-js"
+          provider        = "prisma-client"
         }
 
         datasource ds {
@@ -281,7 +281,7 @@ fn parse_direct_url_should_work() {
 fn parse_multi_schema_for_unsupported_connector_should_error() {
     let schema = indoc! {r#"
         generator js {
-          provider        = "prisma-client-js"
+          provider        = "prisma-client"
         }
 
         datasource ds {

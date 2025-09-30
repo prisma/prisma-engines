@@ -531,7 +531,7 @@ async fn a_self_relation(api: &mut TestApi) -> TestResult {
 
     let expected = expect![[r#"
         generator client {
-          provider = "prisma-client-js"
+          provider = "prisma-client"
         }
 
         datasource db {

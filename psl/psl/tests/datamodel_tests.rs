@@ -54,7 +54,7 @@ fn with_header(dm: &str, provider: Provider, preview_features: &[&str]) -> Strin
         }}
         
         generator client {{
-          provider = "prisma-client-js"
+          provider = "prisma-client"
           {}
         }}
         "#,

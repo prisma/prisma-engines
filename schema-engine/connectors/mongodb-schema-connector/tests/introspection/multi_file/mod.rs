@@ -18,7 +18,7 @@ fn reintrospect_new_model_single_file() {
         let expected = expect![[r#"
             // file: main.prisma
             generator js {
-              provider        = "prisma-client-js"
+              provider        = "prisma-client"
               previewFeatures = []
             }
 
@@ -64,7 +64,7 @@ fn reintrospect_new_model_multi_file() {
         let expected = expect![[r#"
             // file: a.prisma
             generator js {
-              provider        = "prisma-client-js"
+              provider        = "prisma-client"
               previewFeatures = []
             }
 
@@ -116,7 +116,7 @@ fn reintrospect_removed_model_single_file() {
         let expected = expect![[r#"
             // file: main.prisma
             generator js {
-              provider        = "prisma-client-js"
+              provider        = "prisma-client"
               previewFeatures = []
             }
 
@@ -162,7 +162,7 @@ fn reintrospect_removed_model_multi_file() {
         let expected = expect![[r#"
             // file: a.prisma
             generator js {
-              provider        = "prisma-client-js"
+              provider        = "prisma-client"
               previewFeatures = []
             }
 
@@ -210,7 +210,7 @@ fn reintrospect_new_composite_single_file() {
         let expected = expect![[r#"
             // file: main.prisma
             generator js {
-              provider        = "prisma-client-js"
+              provider        = "prisma-client"
               previewFeatures = []
             }
 
@@ -266,7 +266,7 @@ fn reintrospect_new_composite_multi_file() {
         let expected = expect![[r#"
             // file: a.prisma
             generator js {
-              provider        = "prisma-client-js"
+              provider        = "prisma-client"
               previewFeatures = []
             }
 
@@ -338,7 +338,7 @@ fn reintrospect_composite_model_single_file() {
         let expected = expect![[r#"
             // file: main.prisma
             generator js {
-              provider        = "prisma-client-js"
+              provider        = "prisma-client"
               previewFeatures = []
             }
 
@@ -394,7 +394,7 @@ fn reintrospect_removed_composite_multi_file() {
         let expected = expect![[r#"
             // file: a.prisma
             generator js {
-              provider        = "prisma-client-js"
+              provider        = "prisma-client"
               previewFeatures = []
             }
 
@@ -476,7 +476,7 @@ fn reintrospect_with_existing_composite_type() {
         let expected = expect![[r#"
             // file: a.prisma
             generator js {
-              provider        = "prisma-client-js"
+              provider        = "prisma-client"
               previewFeatures = []
             }
 
@@ -541,7 +541,7 @@ fn reintrospect_keep_configuration_when_spread_across_files() {
             ------
             // file: b.prisma
             generator js {
-              provider        = "prisma-client-js"
+              provider        = "prisma-client"
               previewFeatures = []
             }
 
@@ -563,7 +563,7 @@ fn reintrospect_keep_configuration_when_spread_across_files() {
         let expected = expect![[r#"
             // file: a.prisma
             generator js {
-              provider        = "prisma-client-js"
+              provider        = "prisma-client"
               previewFeatures = []
             }
 
@@ -626,7 +626,7 @@ fn reintrospect_keep_configuration_when_no_models() {
             ------
             // file: b.prisma
             generator js {
-              provider        = "prisma-client-js"
+              provider        = "prisma-client"
               previewFeatures = []
             }
         "#]];
@@ -659,7 +659,7 @@ fn reintrospect_empty_multi_file() {
             ------
             // file: b.prisma
             generator js {
-              provider        = "prisma-client-js"
+              provider        = "prisma-client"
               previewFeatures = []
             }
         "#]];

@@ -11,7 +11,7 @@ fn extensions_can_be_created(api: TestApi) {
         }
 
         generator js {
-          provider        = "prisma-client-js"
+          provider        = "prisma-client"
           previewFeatures = ["postgresqlExtensions"]
         }
     "#};
@@ -31,7 +31,7 @@ fn multiple_extensions_can_be_created(api: TestApi) {
         }
 
         generator js {
-          provider        = "prisma-client-js"
+          provider        = "prisma-client"
           previewFeatures = ["postgresqlExtensions"]
         }
     "#};
@@ -52,7 +52,7 @@ fn mapped_extensions_can_be_created(api: TestApi) {
         }
 
         generator js {
-          provider        = "prisma-client-js"
+          provider        = "prisma-client"
           previewFeatures = ["postgresqlExtensions"]
         }
     "#};
@@ -72,7 +72,7 @@ fn extensions_can_be_created_with_a_version(api: TestApi) {
         }
 
         generator js {
-          provider        = "prisma-client-js"
+          provider        = "prisma-client"
           previewFeatures = ["postgresqlExtensions"]
         }
     "#};
@@ -92,7 +92,7 @@ fn extension_version_can_be_changed(api: TestApi) {
         }
 
         generator js {
-          provider        = "prisma-client-js"
+          provider        = "prisma-client"
           previewFeatures = ["postgresqlExtensions"]
         }
     "#};
@@ -109,7 +109,7 @@ fn extension_version_can_be_changed(api: TestApi) {
         }
 
         generator js {
-          provider        = "prisma-client-js"
+          provider        = "prisma-client"
           previewFeatures = ["postgresqlExtensions"]
         }
     "#};
@@ -129,7 +129,7 @@ fn extension_version_does_not_change_on_empty(api: TestApi) {
         }
 
         generator js {
-          provider        = "prisma-client-js"
+          provider        = "prisma-client"
           previewFeatures = ["postgresqlExtensions"]
         }
     "#};
@@ -146,7 +146,7 @@ fn extension_version_does_not_change_on_empty(api: TestApi) {
         }
 
         generator js {
-          provider        = "prisma-client-js"
+          provider        = "prisma-client"
           previewFeatures = ["postgresqlExtensions"]
         }
     "#};
@@ -168,7 +168,7 @@ fn extension_schema_can_be_defined(api: TestApi) {
         }
 
         generator js {
-          provider        = "prisma-client-js"
+          provider        = "prisma-client"
           previewFeatures = ["postgresqlExtensions"]
         }
     "#};
@@ -192,7 +192,7 @@ fn relocatable_extension_can_be_relocated(api: TestApi) {
         }
 
         generator js {
-          provider        = "prisma-client-js"
+          provider        = "prisma-client"
           previewFeatures = ["postgresqlExtensions"]
         }
     "#};
@@ -211,7 +211,7 @@ fn relocatable_extension_can_be_relocated(api: TestApi) {
         }
 
         generator js {
-          provider        = "prisma-client-js"
+          provider        = "prisma-client"
           previewFeatures = ["postgresqlExtensions"]
         }
     "#};
@@ -235,7 +235,7 @@ fn non_relocatable_extension_can_be_relocated(api: TestApi) {
         }
 
         generator js {
-          provider        = "prisma-client-js"
+          provider        = "prisma-client"
           previewFeatures = ["postgresqlExtensions"]
         }
     "#};
@@ -252,7 +252,7 @@ fn non_relocatable_extension_can_be_relocated(api: TestApi) {
         }
 
         generator js {
-          provider        = "prisma-client-js"
+          provider        = "prisma-client"
           previewFeatures = ["postgresqlExtensions"]
         }
     "#};
@@ -274,7 +274,7 @@ fn removing_schema_definition_does_nothing(api: TestApi) {
         }
 
         generator js {
-          provider        = "prisma-client-js"
+          provider        = "prisma-client"
           previewFeatures = ["postgresqlExtensions"]
         }
     "#};
@@ -293,7 +293,7 @@ fn removing_schema_definition_does_nothing(api: TestApi) {
         }
 
         generator js {
-          provider        = "prisma-client-js"
+          provider        = "prisma-client"
           previewFeatures = ["postgresqlExtensions"]
         }
     "#};
@@ -315,7 +315,7 @@ fn extension_functions_can_be_used_in_the_same_migration(api: TestApi) {
         }
 
         generator js {
-          provider        = "prisma-client-js"
+          provider        = "prisma-client"
           previewFeatures = ["postgresqlExtensions"]
         }
 

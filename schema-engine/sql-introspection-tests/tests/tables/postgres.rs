@@ -20,7 +20,7 @@ $$
 
     let expected = expect![[r#"
         generator client {
-          provider = "prisma-client-js"
+          provider = "prisma-client"
         }
 
         datasource db {
@@ -228,7 +228,7 @@ async fn a_table_with_json_columns(api: &mut TestApi) -> TestResult {
 
     let expected = expect![[r#"
         generator client {
-          provider = "prisma-client-js"
+          provider = "prisma-client"
         }
 
         datasource db {
@@ -261,7 +261,7 @@ async fn datetime_default_expressions_are_not_truncated(api: &mut TestApi) -> Te
 
     let expected = expect![[r#"
         generator client {
-          provider = "prisma-client-js"
+          provider = "prisma-client"
         }
 
         datasource db {
@@ -285,7 +285,7 @@ async fn northwind(api: TestApi) {
     api.raw_cmd(setup).await;
     let expectation = expect![[r#"
         generator client {
-          provider = "prisma-client-js"
+          provider = "prisma-client"
         }
 
         datasource db {
