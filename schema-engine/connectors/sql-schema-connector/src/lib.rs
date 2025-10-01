@@ -23,7 +23,7 @@ use flavour::{SqlConnector, SqlDialect, UsingExternalShadowDb};
 use migration_pair::MigrationPair;
 use psl::{
     SourceFile, ValidatedSchema,
-    datamodel_connector::{Flavour, NativeTypeInstance},
+    datamodel_connector::NativeTypeInstance,
     parser_database::{ExtensionTypes, ScalarFieldType},
 };
 use quaint::connector::DescribedQuery;
@@ -649,8 +649,7 @@ async fn best_effort_reset_impl(
     ));
     let (source_schema, target_schema) = diffables.map(|s| s.describer_schema).into_tuple();
 
-    if connector.dialect().datamodel_connector().flavour() == Flavour::Sqlserver {
-        // We manage UDTs ourselves in SQL Server.
+    if connector.dialect().datamodel_connector().does_manage_udts() {
         let drop_udts = source_schema
             .udt_walkers()
             .map(|udtw| udtw.id)

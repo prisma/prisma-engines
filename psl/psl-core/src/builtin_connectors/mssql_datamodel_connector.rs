@@ -295,6 +295,10 @@ impl Connector for MsSqlDatamodelConnector {
     fn flavour(&self) -> Flavour {
         Flavour::Sqlserver
     }
+
+    fn does_manage_udts(&self) -> bool {
+        true
+    }
 }
 
 /// A collection of types stored outside of the row to the heap, having

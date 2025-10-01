@@ -305,6 +305,10 @@ pub trait Connector: Send + Sync {
     fn supports_shard_keys(&self) -> bool {
         false
     }
+
+    fn does_manage_udts(&self) -> bool {
+        false
+    }
 }
 
 #[derive(Copy, Clone, Debug, PartialEq)]
