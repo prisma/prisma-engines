@@ -119,8 +119,8 @@ mod tests {
             [
               {
                 "file_name": "schema.prisma",
-                "start": 149,
-                "end": 163,
+                "start": 146,
+                "end": 160,
                 "text": "Preview feature \"createMany\" is deprecated. The functionality can be used without specifying it as a preview feature.",
                 "is_warning": true
               }
@@ -158,8 +158,8 @@ mod tests {
             [
               {
                 "file_name": "schema1.prisma",
-                "start": 149,
-                "end": 163,
+                "start": 146,
+                "end": 160,
                 "text": "Preview feature \"createMany\" is deprecated. The functionality can be used without specifying it as a preview feature.",
                 "is_warning": true
               }

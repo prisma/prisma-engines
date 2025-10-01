@@ -119,10 +119,7 @@ mod tests {
         let mut config = Configuration::default();
         let file_name = "schema.prisma";
 
-        config.push_generator(
-            file_name.to_owned(),
-            Generator::new("js", Env::value("prisma-client")),
-        );
+        config.push_generator(file_name.to_owned(), Generator::new("js", Env::value("prisma-client")));
         config.push_generator(
             file_name.to_owned(),
             Generator::new("go", Env::value("prisma-client-go")),
