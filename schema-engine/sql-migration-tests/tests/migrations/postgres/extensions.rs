@@ -431,7 +431,7 @@ fn diff_extension_type_changed_modifiers(api: TestApi) {
 
     expect![[r#"
         -- AlterTable
-        ALTER TABLE "public"."A" ALTER COLUMN "data" SET DATA TYPE vector(4);
+        ALTER TABLE "A" ALTER COLUMN "data" SET DATA TYPE vector(4);
     "#]]
     .assert_eq(&diff);
 }
@@ -519,7 +519,7 @@ fn diff_extension_type_changed_db_type_modifiers(api: TestApi) {
 
     expect![[r#"
         -- AlterTable
-        ALTER TABLE "public"."A" ALTER COLUMN "data" SET DATA TYPE vector(4);
+        ALTER TABLE "A" ALTER COLUMN "data" SET DATA TYPE vector(4);
     "#]]
     .assert_eq(&diff);
 }
