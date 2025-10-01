@@ -285,20 +285,20 @@ struct ExtensionMetadata {
 impl ExtensionMetadata {
     pub fn new(extension_types: &dyn ExtensionTypes, interner: &mut StringInterner) -> Self {
         let mut id_to_prisma_name = HashMap::new();
-        let mut id_to_db_name_and_modifiers = HashMap::new();
+        let mut id_to_db_name_with_modifiers = HashMap::new();
 
         for entry in extension_types.enumerate() {
             let prisma_name = interner.intern(entry.prisma_name);
             id_to_prisma_name.insert(entry.id, prisma_name);
             if let Some(modifiers) = &entry.db_type_modifiers {
                 let db_name = interner.intern(entry.db_name);
-                id_to_db_name_and_modifiers.insert(entry.id, (db_name, modifiers.to_vec()));
+                id_to_db_name_with_modifiers.insert(entry.id, (db_name, modifiers.to_vec()));
             }
         }
 
         ExtensionMetadata {
             id_to_prisma_name,
-            id_to_db_name_with_modifiers: id_to_db_name_and_modifiers,
+            id_to_db_name_with_modifiers,
         }
     }
 }

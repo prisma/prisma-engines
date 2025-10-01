@@ -284,14 +284,14 @@ impl ScalarFieldType {
 }
 
 struct DisplayScalarFieldType<'a> {
-    pub field_type: &'a ScalarFieldType,
-    pub db: &'a ParserDatabase,
+    field_type: &'a ScalarFieldType,
+    db: &'a ParserDatabase,
 }
 
 impl fmt::Display for DisplayScalarFieldType<'_> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self.field_type {
-            ScalarFieldType::BuiltInScalar(t) => write!(f, "{}", t.as_str()),
+            ScalarFieldType::BuiltInScalar(t) => write!(f, "{t}"),
             ScalarFieldType::Enum(id) => {
                 write!(f, "{}", self.db.walk(*id).name())
             }
@@ -1572,6 +1572,12 @@ impl ScalarType {
                 _ => None,
             },
         }
+    }
+}
+
+impl fmt::Display for ScalarType {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.write_str(self.as_str())
     }
 }
 

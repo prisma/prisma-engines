@@ -1,3 +1,5 @@
+use std::borrow::Cow;
+
 use psl::datamodel_connector::NativeTypeConstructor;
 
 use crate::schema_file_input::SchemaFileInput;
@@ -29,7 +31,7 @@ pub(crate) fn run(input: &str) -> String {
 
 #[derive(serde::Serialize)]
 struct SerializableNativeTypeConstructor {
-    pub name: String,
+    pub name: Cow<'static, str>,
     pub _number_of_args: usize,
     pub _number_of_optional_args: usize,
     pub prisma_types: Vec<&'static str>,
@@ -44,7 +46,7 @@ impl SerializableNativeTypeConstructor {
             allowed_types,
         } = nt;
         Some(SerializableNativeTypeConstructor {
-            name: name.to_string(),
+            name: name.clone(),
             _number_of_args: *number_of_args,
             _number_of_optional_args: *number_of_optional_args,
             prisma_types: allowed_types
