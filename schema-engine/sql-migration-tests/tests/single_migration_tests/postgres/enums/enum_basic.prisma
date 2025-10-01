@@ -17,16 +17,13 @@ enum MyEnum {
 }
 
 // Expected Migration:
-// -- CreateSchema
-// CREATE SCHEMA IF NOT EXISTS "public";
-// 
 // -- CreateEnum
-// CREATE TYPE "public"."MyEnum" AS ENUM ('A', 'B');
+// CREATE TYPE "MyEnum" AS ENUM ('A', 'B');
 // 
 // -- CreateTable
-// CREATE TABLE "public"."Test" (
+// CREATE TABLE "Test" (
 //     "id" TEXT NOT NULL,
-//     "enum" "public"."MyEnum" NOT NULL,
+//     "enum" "MyEnum" NOT NULL,
 // 
 //     CONSTRAINT "Test_pkey" PRIMARY KEY ("id")
 // );

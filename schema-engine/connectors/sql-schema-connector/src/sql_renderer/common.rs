@@ -14,7 +14,7 @@ impl QuotedWithPrefix<&str> {
 
     pub(crate) fn pg_from_table_walker(table: TableWalker<'_>) -> QuotedWithPrefix<&str> {
         QuotedWithPrefix(
-            table.namespace().map(Quoted::postgres_ident),
+            table.explicit_namespace().map(Quoted::postgres_ident),
             Quoted::postgres_ident(table.name()),
         )
     }

@@ -12,13 +12,10 @@ model table {
     hereBeDragons String @default(dbgenerated())
 }
 // Expected Migration:
-// -- CreateSchema
-// CREATE SCHEMA IF NOT EXISTS "public";
-// 
 // -- CreateTable
-// CREATE TABLE "public"."table" (
+// CREATE TABLE "table" (
 //     "id" TEXT NOT NULL,
 //     "hereBeDragons" TEXT NOT NULL,
-
+// 
 //     CONSTRAINT "table_pkey" PRIMARY KEY ("id")
 // );

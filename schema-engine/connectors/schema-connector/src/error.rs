@@ -28,7 +28,7 @@ struct ConnectorErrorImpl {
     /// Additional context.
     message: Option<Box<str>>,
     /// The source of the error.
-    source: Option<Arc<(dyn StdError + Send + Sync + 'static)>>,
+    source: Option<Arc<dyn StdError + Send + Sync + 'static>>,
     /// See the tracing-error docs.
     context: SpanTrace,
 }
