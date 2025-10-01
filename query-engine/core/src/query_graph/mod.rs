@@ -96,19 +96,29 @@ pub enum Computation {
 }
 
 impl Computation {
-    pub fn empty_diff_left_to_right() -> Self {
-        Self::DiffLeftToRight(DiffNode::default())
+    pub fn empty_diff_left_to_right(fields: FieldSelection) -> Self {
+        Self::DiffLeftToRight(DiffNode::new_empty(fields))
     }
 
-    pub fn empty_diff_right_to_left() -> Self {
-        Self::DiffRightToLeft(DiffNode::default())
+    pub fn empty_diff_right_to_left(fields: FieldSelection) -> Self {
+        Self::DiffRightToLeft(DiffNode::new_empty(fields))
     }
 }
 
-#[derive(Default)]
 pub struct DiffNode {
     pub left: Vec<SelectionResult>,
     pub right: Vec<SelectionResult>,
+    pub fields: FieldSelection,
+}
+
+impl DiffNode {
+    pub fn new_empty(fields: FieldSelection) -> Self {
+        Self {
+            left: Vec::new(),
+            right: Vec::new(),
+            fields,
+        }
+    }
 }
 
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone, Copy)]

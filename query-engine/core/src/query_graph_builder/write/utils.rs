@@ -166,7 +166,9 @@ pub fn insert_1to1_idempotent_connect_checks(
     let child_model = parent_relation_field.related_model();
     let child_model_identifier = child_model.shard_aware_primary_identifier();
 
-    let diff_node = graph.create_node(Node::Computation(Computation::empty_diff_left_to_right()));
+    let diff_node = graph.create_node(Node::Computation(Computation::empty_diff_left_to_right(
+        child_model_identifier.clone(),
+    )));
 
     graph.create_edge(
         read_new_child_node,

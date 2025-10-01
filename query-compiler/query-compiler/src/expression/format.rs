@@ -76,7 +76,7 @@ where
                 r#else,
             } => self.r#if(value, rule, then, r#else),
             Expression::Unit => self.keyword("()"),
-            Expression::Diff { from, to } => self.diff(from, to),
+            Expression::Diff { from, to, .. } => self.diff(from, to),
             Expression::InitializeRecord { expr, fields } => self.initialize_record(expr, fields),
             Expression::MapRecord { expr, fields } => self.map_record(expr, fields),
             Expression::Process { expr, operations } => self.process(expr, operations),

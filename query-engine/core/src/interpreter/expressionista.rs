@@ -171,7 +171,7 @@ impl Expressionista {
         let into_expr = Box::new(move |node: Node| {
             Ok(Expression::Func {
                 func: Box::new(move |_| match node {
-                    Node::Computation(Computation::DiffLeftToRight(DiffNode { left, right })) => {
+                    Node::Computation(Computation::DiffLeftToRight(DiffNode { left, right, .. })) => {
                         let left: HashSet<_> = left.into_iter().collect();
                         let right: HashSet<_> = right.into_iter().collect();
 
@@ -182,7 +182,7 @@ impl Expressionista {
                         })
                     }
 
-                    Node::Computation(Computation::DiffRightToLeft(DiffNode { left, right })) => {
+                    Node::Computation(Computation::DiffRightToLeft(DiffNode { left, right, .. })) => {
                         let left: HashSet<_> = left.into_iter().collect();
                         let right: HashSet<_> = right.into_iter().collect();
 
