@@ -1,6 +1,5 @@
-use std::collections::HashMap;
-
 use bon::bon;
+use hashbrown::{Equivalent, HashMap};
 use psl::parser_database::{ExtensionTypeEntry, ExtensionTypeId, ExtensionTypes};
 use serde::Deserialize;
 
@@ -10,7 +9,7 @@ use serde::Deserialize;
 pub struct ExtensionTypeConfig {
     types: Vec<ExtensionType>,
     by_prisma_name: HashMap<String, usize>,
-    by_db_name_and_modifiers: HashMap<(String, Option<Vec<String>>), usize>,
+    by_db_name_and_modifiers: HashMap<ExtensionTypeDbKey, usize>,
 }
 
 impl ExtensionTypeConfig {
@@ -21,7 +20,8 @@ impl ExtensionTypeConfig {
 
         for (i, ext) in types.iter().enumerate() {
             by_prisma_name.insert(ext.prisma_name.clone(), i);
-            by_db_name_and_modifiers.insert((ext.db_name.clone(), ext.db_type_modifiers.clone()), i);
+            let db_key = ExtensionTypeDbKey(ext.db_name.clone(), ext.db_type_modifiers.clone());
+            by_db_name_and_modifiers.insert(db_key, i);
         }
 
         Self {
@@ -39,8 +39,8 @@ impl ExtensionTypes for ExtensionTypeConfig {
 
     fn get_by_db_name_and_modifiers(&self, name: &str, modifiers: Option<&[String]>) -> Option<ExtensionTypeEntry<'_>> {
         self.by_db_name_and_modifiers
-            .get(&(name.to_string(), modifiers.map(|m| m.to_vec())))
-            .or_else(|| self.by_db_name_and_modifiers.get(&(name.to_string(), None)))
+            .get(&(name, modifiers))
+            .or_else(|| self.by_db_name_and_modifiers.get(&(name, None)))
             .map(|&i| self.types[i].entry(i))
     }
 
@@ -100,5 +100,14 @@ pub struct ExtensionTypeConfigJson {
 impl From<ExtensionTypeConfigJson> for ExtensionTypeConfig {
     fn from(json: ExtensionTypeConfigJson) -> Self {
         ExtensionTypeConfig::new(json.types)
+    }
+}
+
+#[derive(Debug, PartialEq, Eq, Hash)]
+struct ExtensionTypeDbKey(String, Option<Vec<String>>);
+
+impl Equivalent<ExtensionTypeDbKey> for (&str, Option<&[String]>) {
+    fn equivalent(&self, key: &ExtensionTypeDbKey) -> bool {
+        self.0 == key.0 && self.1 == key.1.as_deref()
     }
 }
