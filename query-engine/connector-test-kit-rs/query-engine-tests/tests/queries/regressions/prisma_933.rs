@@ -1,7 +1,7 @@
 use query_engine_tests::*;
 
 // validates fix for
-// https://github.com/prisma/prisma-client/issues/933
+// https://github.com/prisma/prisma-client-js/issues/933
 
 #[test_suite(schema(schema))]
 mod prisma_933_spec {
