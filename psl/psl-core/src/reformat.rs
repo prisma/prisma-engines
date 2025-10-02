@@ -1,6 +1,6 @@
 use crate::{ParserDatabase, ValidatedSchema};
 use diagnostics::FileId;
-use parser_database::{ast::WithSpan, walkers};
+use parser_database::{NoExtensionTypes, ast::WithSpan, walkers};
 use schema_ast::{SourceFile, ast};
 use std::{borrow::Cow, collections::HashMap};
 
@@ -26,7 +26,7 @@ pub fn reformat_validated_schema_into_single(schema: ValidatedSchema, indent_wid
 
 pub fn reformat_multiple(sources: Vec<(String, SourceFile)>, indent_width: usize) -> Vec<(String, String)> {
     let mut diagnostics = diagnostics::Diagnostics::new();
-    let db = parser_database::ParserDatabase::new(&sources, &mut diagnostics);
+    let db = parser_database::ParserDatabase::new(&sources, &mut diagnostics, &NoExtensionTypes);
 
     if diagnostics.has_errors() {
         db.iter_file_ids()

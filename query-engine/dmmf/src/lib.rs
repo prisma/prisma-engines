@@ -22,7 +22,7 @@ pub fn dmmf_json_from_validated_schema(schema: ValidatedSchema) -> String {
 }
 
 pub fn dmmf_from_schema(schema: &str) -> DataModelMetaFormat {
-    let schema = Arc::new(psl::parse_schema(schema).unwrap());
+    let schema = Arc::new(psl::parse_schema_without_extensions(schema).unwrap());
     from_precomputed_parts(&schema::build(schema, true))
 }
 

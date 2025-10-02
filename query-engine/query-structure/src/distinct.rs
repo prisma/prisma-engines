@@ -64,7 +64,7 @@ mod tests {
                 }
             "#;
 
-            let psl_schema = psl::validate(schema_str.into());
+            let psl_schema = psl::validate_without_extensions(schema_str.into());
             let internal_datamodel = crate::InternalDataModel {
                 schema: Arc::new(psl_schema),
             };

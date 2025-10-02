@@ -1,6 +1,6 @@
 use crate::{Context, model_extensions::ScalarFieldExt};
 use itertools::Itertools;
-use quaint::ast::Column;
+use quaint::ast::{Column, NativeColumnType};
 use query_structure::{Field, ModelProjection, RelationField, ScalarField};
 
 pub struct ColumnIterator {
@@ -96,7 +96,7 @@ impl AsColumn for ScalarField {
 
         Column::from((full_table_name, col))
             .type_family(self.type_family())
-            .native_column_type(self.native_type().map(|nt| nt.name()))
+            .native_column_type(self.native_type().map(|nt| NativeColumnType::from(nt.name())))
             .set_is_enum(self.type_identifier().is_enum())
             .set_is_list(self.is_list())
             .default(quaint::ast::DefaultValue::Generated)

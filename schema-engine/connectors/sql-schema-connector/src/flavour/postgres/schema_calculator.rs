@@ -9,7 +9,7 @@ use enumflags2::BitFlags;
 use psl::{
     builtin_connectors::{PostgresDatasourceProperties, cockroach_datamodel_connector::SequenceFunction},
     datamodel_connector::walker_ext_traits::IndexWalkerExt,
-    parser_database::{IndexAlgorithm, OperatorClass, walkers::EnumWalker},
+    parser_database::{ExtensionTypes, IndexAlgorithm, OperatorClass, walkers::EnumWalker},
 };
 use sql::postgres::DatabaseExtension;
 use sql_schema_describer::{self as sql, postgres::PostgresSchemaExt};
@@ -54,6 +54,24 @@ impl SqlSchemaCalculatorFlavour for PostgresSchemaCalculatorFlavour {
                 let value_name = value.database_name().to_owned();
                 ctx.schema.describer_schema.push_enum_variant(sql_enum_id, value_name);
             }
+        }
+    }
+
+    fn calculate_extension_types(
+        &self,
+        ctx: &mut crate::sql_schema_calculator::Context<'_>,
+        extension_types: &dyn ExtensionTypes,
+    ) {
+        for entry in extension_types.enumerate() {
+            let sql_namespace_id: sql::NamespaceId = entry
+                .db_namespace
+                .and_then(|name| ctx.schemas.get(name).cloned())
+                .unwrap_or_default();
+            let udt_id = ctx
+                .schema
+                .describer_schema
+                .push_udt(sql_namespace_id, entry.db_name.to_owned(), None);
+            ctx.extension_type_ids.insert(entry.id, udt_id);
         }
     }
 

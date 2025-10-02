@@ -96,6 +96,7 @@ impl ScalarField {
                 unreachable!("This shouldn't be reached; composite types are not supported in compound unique indices.",)
             }
             ScalarFieldType::Enum(x) => TypeIdentifier::Enum(x),
+            ScalarFieldType::Extension(udt) => TypeIdentifier::Extension(udt),
             ScalarFieldType::BuiltInScalar(scalar) => scalar.into(),
             ScalarFieldType::Unsupported(_) => TypeIdentifier::Unsupported,
         }
@@ -179,11 +180,11 @@ impl ScalarField {
             .and_then(|(_, name, args, span)| connector.parse_native_type(name, args, span, &mut Default::default()));
 
         let scalar_type = match self.id {
-            ScalarFieldId::InModel(id) => self.dm.walk(id).scalar_type(),
-            ScalarFieldId::InCompositeType(id) => self.dm.walk(id).scalar_type(),
+            ScalarFieldId::InModel(id) => self.dm.walk(id).scalar_field_type(),
+            ScalarFieldId::InCompositeType(id) => self.dm.walk(id).r#type(),
         };
 
-        let nt = psl_nt.or_else(|| scalar_type.and_then(|st| connector.default_native_type_for_scalar_type(&st)))?;
+        let nt = psl_nt.or_else(|| connector.default_native_type_for_scalar_type(&scalar_type, &self.dm.schema))?;
 
         Some(NativeTypeInstance {
             native_type: nt,

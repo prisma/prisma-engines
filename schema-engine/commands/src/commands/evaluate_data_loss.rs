@@ -1,4 +1,5 @@
 use crate::{CoreResult, MigrationSchemaCache, SchemaContainerExt, json_rpc::types::*};
+use psl::parser_database::ExtensionTypes;
 use schema_connector::{SchemaConnector, migrations_directory::*};
 
 /// Development command for migrations. Evaluate the data loss induced by the
@@ -10,6 +11,7 @@ pub async fn evaluate_data_loss(
     input: EvaluateDataLossInput,
     connector: &mut dyn SchemaConnector,
     migration_schema_cache: &mut MigrationSchemaCache,
+    extension_types: &dyn ExtensionTypes,
 ) -> CoreResult<EvaluateDataLossOutput> {
     error_on_changed_provider(&input.migrations_list.lockfile, connector.connector_type())?;
     let sources: Vec<_> = input.schema.to_psl_input();
@@ -18,7 +20,7 @@ pub async fn evaluate_data_loss(
     let dialect = connector.schema_dialect();
     let filter: schema_connector::SchemaFilter = input.filters.into();
 
-    let to = dialect.schema_from_datamodel(sources, connector.default_runtime_namespace())?;
+    let to = dialect.schema_from_datamodel(sources, connector.default_runtime_namespace(), extension_types)?;
 
     let from = migration_schema_cache
         .get_or_insert(&input.migrations_list.migration_directories, || async {

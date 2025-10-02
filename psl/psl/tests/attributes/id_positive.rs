@@ -10,7 +10,7 @@ fn int_id_without_default_should_have_strategy_none() {
         }
     "#};
 
-    psl::parse_schema(dml)
+    psl::parse_schema_without_extensions(dml)
         .unwrap()
         .assert_has_model("Model")
         .assert_id_on_fields(&["id"]);
@@ -24,7 +24,7 @@ fn int_id_with_default_autoincrement_should_have_strategy_auto() {
         }
     "#};
 
-    psl::parse_schema(dml)
+    psl::parse_schema_without_extensions(dml)
         .unwrap()
         .assert_has_model("Model")
         .assert_id_on_fields(&["id"]);
@@ -38,7 +38,7 @@ fn should_allow_string_ids_with_cuid() {
         }
     "#};
 
-    let schema = psl::parse_schema(dml).unwrap();
+    let schema = psl::parse_schema_without_extensions(dml).unwrap();
     let model = schema.assert_has_model("Model");
 
     model
@@ -62,7 +62,7 @@ fn should_allow_string_ids_with_cuid_version_specified() {
         }
     "#};
 
-    let schema = psl::parse_schema(dml).unwrap();
+    let schema = psl::parse_schema_without_extensions(dml).unwrap();
 
     {
         let model = schema.assert_has_model("ModelA");
@@ -97,7 +97,7 @@ fn should_allow_string_ids_with_uuid() {
         }
     "#};
 
-    let schema = psl::parse_schema(dml).unwrap();
+    let schema = psl::parse_schema_without_extensions(dml).unwrap();
     let model = schema.assert_has_model("Model");
 
     model
@@ -121,7 +121,7 @@ fn should_allow_string_ids_with_uuid_version_specified() {
         }
     "#};
 
-    let schema = psl::parse_schema(dml).unwrap();
+    let schema = psl::parse_schema_without_extensions(dml).unwrap();
 
     {
         let model = schema.assert_has_model("ModelA");
@@ -156,7 +156,7 @@ fn should_allow_string_ids_with_ulid() {
         }
     "#};
 
-    let schema = psl::parse_schema(dml).unwrap();
+    let schema = psl::parse_schema_without_extensions(dml).unwrap();
     let model = schema.assert_has_model("Model");
 
     model
@@ -176,7 +176,7 @@ fn should_allow_string_ids_without_default() {
         }
     "#};
 
-    let schema = psl::parse_schema(dml).unwrap();
+    let schema = psl::parse_schema_without_extensions(dml).unwrap();
     let model = schema.assert_has_model("Model");
     model.assert_id_on_fields(&["id"]);
 
@@ -193,7 +193,7 @@ fn should_allow_string_ids_with_static_default() {
         }
     "#};
 
-    let schema = psl::parse_schema(dml).unwrap();
+    let schema = psl::parse_schema_without_extensions(dml).unwrap();
     let model = schema.assert_has_model("Model");
     model.assert_id_on_fields(&["id"]);
 
@@ -212,7 +212,7 @@ fn should_allow_int_ids_with_static_default() {
         }
     "#};
 
-    let schema = psl::parse_schema(dml).unwrap();
+    let schema = psl::parse_schema_without_extensions(dml).unwrap();
     let model = schema.assert_has_model("Model");
     model.assert_id_on_fields(&["id"]);
 
@@ -233,7 +233,7 @@ fn multi_field_ids_must_work() {
         }
     "#};
 
-    let schema = psl::parse_schema(dml).unwrap();
+    let schema = psl::parse_schema_without_extensions(dml).unwrap();
     let model = schema.assert_has_model("Model");
     model.assert_id_on_fields(&["a", "b"]);
 }
@@ -246,7 +246,7 @@ fn should_allow_unique_and_id_on_same_field() {
         }
     "#};
 
-    let schema = psl::parse_schema(dml).unwrap();
+    let schema = psl::parse_schema_without_extensions(dml).unwrap();
     let model = schema.assert_has_model("Model");
 
     model.assert_id_on_fields(&["id"]);
@@ -263,7 +263,7 @@ fn named_multi_field_ids_must_work() {
         }
     "#};
 
-    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+    psl::parse_schema_without_extensions(with_header(dml, Provider::Postgres, &[]))
         .unwrap()
         .assert_has_model("Model")
         .assert_id_on_fields(&["a", "b"])
@@ -280,7 +280,7 @@ fn mapped_multi_field_ids_must_work() {
         }
     "#};
 
-    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+    psl::parse_schema_without_extensions(with_header(dml, Provider::Postgres, &[]))
         .unwrap()
         .assert_has_model("Model")
         .assert_id_on_fields(&["a", "b"])
@@ -299,7 +299,7 @@ fn mapped_singular_id_must_work() {
         }
     "#};
 
-    let datamodel = psl::parse_schema(with_header(dml, Provider::Postgres, &[])).unwrap();
+    let datamodel = psl::parse_schema_without_extensions(with_header(dml, Provider::Postgres, &[])).unwrap();
 
     datamodel
         .assert_has_model("Model")
@@ -322,7 +322,7 @@ fn named_and_mapped_multi_field_ids_must_work() {
         }
     "#};
 
-    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+    psl::parse_schema_without_extensions(with_header(dml, Provider::Postgres, &[]))
         .unwrap()
         .assert_has_model("Model")
         .assert_id_on_fields(&["a", "b"])
@@ -346,7 +346,7 @@ fn id_accepts_length_arg_on_mysql() {
          }
      "#};
 
-    let schema = psl::parse_schema(with_header(dml, Provider::Mysql, &[])).unwrap();
+    let schema = psl::parse_schema_without_extensions(with_header(dml, Provider::Mysql, &[])).unwrap();
 
     schema
         .assert_has_model("User")
@@ -377,7 +377,7 @@ fn id_accepts_sort_arg_on_sqlserver() {
         }
     "#};
 
-    let schema = psl::parse_schema(with_header(dml, Provider::SqlServer, &[])).unwrap();
+    let schema = psl::parse_schema_without_extensions(with_header(dml, Provider::SqlServer, &[])).unwrap();
 
     schema
         .assert_has_model("User")

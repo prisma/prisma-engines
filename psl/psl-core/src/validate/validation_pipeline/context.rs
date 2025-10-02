@@ -5,6 +5,7 @@ use crate::{
 };
 use diagnostics::{DatamodelError, DatamodelWarning, Diagnostics};
 use enumflags2::BitFlags;
+use parser_database::ExtensionTypes;
 
 /// The validation context. The lifetime parameter is _not_ the AST lifetime, but the subtype of
 /// all relevant lifetimes. No data escapes for validations, so the context only need to be valid
@@ -18,6 +19,7 @@ pub(crate) struct Context<'a> {
     /// it's more consistent to resolve it once, here.
     pub(super) relation_mode: RelationMode,
     pub(super) diagnostics: &'a mut Diagnostics,
+    pub(super) extension_types: &'a dyn ExtensionTypes,
 }
 
 impl Context<'_> {

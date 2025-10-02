@@ -85,7 +85,7 @@ mod tests {
         composite_type.documentation("...so many tears 🎵");
 
         let mut field = Field::new("Street", "String");
-        field.native_type("db", "VarChar", vec!["255".into()]);
+        field.native_type("db", "VarChar", vec!["255"]);
         field.default(DefaultValue::text("Prenzlauer Allee 193"));
         field.map("Shield");
         composite_type.push_field(field);

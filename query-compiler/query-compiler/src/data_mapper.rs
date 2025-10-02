@@ -399,6 +399,9 @@ pub enum FieldScalarType {
     Enum {
         name: String,
     },
+    Extension {
+        name: String,
+    },
     Json,
     Object,
     #[serde(rename = "datetime")]
@@ -419,6 +422,7 @@ impl fmt::Display for FieldScalarType {
             Self::Decimal => write!(f, "Decimal"),
             Self::Boolean => write!(f, "Boolean"),
             Self::Enum { name } => write!(f, "Enum<{name}>"),
+            Self::Extension { name } => write!(f, "{name}"),
             Self::Json => write!(f, "Json"),
             Self::Object => write!(f, "Object"),
             Self::DateTime => write!(f, "DateTime"),
@@ -439,6 +443,15 @@ impl From<&Type> for FieldScalarType {
             TypeIdentifier::Boolean => Self::Boolean,
             TypeIdentifier::Enum(id) => Self::Enum {
                 name: typ.dm.clone().zip(id).name().to_owned(),
+            },
+            TypeIdentifier::Extension(id) => Self::Extension {
+                name: typ
+                    .dm
+                    .schema
+                    .db
+                    .get_extension_type_prisma_name(id)
+                    .expect("extension type not found")
+                    .to_owned(),
             },
             TypeIdentifier::UUID => Self::String,
             TypeIdentifier::Json => Self::Json,

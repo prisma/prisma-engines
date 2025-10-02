@@ -2,18 +2,19 @@ mod datasource;
 mod native_types;
 mod validations;
 
-pub use native_types::PostgresType;
+pub use native_types::{KnownPostgresType, PostgresType};
+use parser_database::{ExtensionTypes, ScalarFieldType};
 
 use crate::{
-    Configuration, Datasource, DatasourceConnectorData, PreviewFeature,
+    Configuration, Datasource, DatasourceConnectorData, PreviewFeature, ValidatedSchema,
     datamodel_connector::{
         Connector, ConnectorCapabilities, ConnectorCapability, ConstraintScope, Flavour, NativeTypeConstructor,
-        NativeTypeInstance, RelationMode, StringFilter,
+        NativeTypeInstance, NativeTypeParseError, RelationMode, StringFilter,
     },
     diagnostics::Diagnostics,
     parser_database::{IndexAlgorithm, OperatorClass, ParserDatabase, ReferentialAction, ScalarType, ast, walkers},
 };
-use PostgresType::*;
+use KnownPostgresType::*;
 use chrono::*;
 use enumflags2::BitFlags;
 use lsp_types::{CompletionItem, CompletionItemKind, CompletionList, InsertTextFormat};
@@ -77,16 +78,19 @@ pub const CAPABILITIES: ConnectorCapabilities = enumflags2::make_bitflags!(Conne
 
 pub struct PostgresDatamodelConnector;
 
-const SCALAR_TYPE_DEFAULTS: &[(ScalarType, PostgresType)] = &[
-    (ScalarType::Int, PostgresType::Integer),
-    (ScalarType::BigInt, PostgresType::BigInt),
-    (ScalarType::Float, PostgresType::DoublePrecision),
-    (ScalarType::Decimal, PostgresType::Decimal(Some((65, 30)))),
-    (ScalarType::Boolean, PostgresType::Boolean),
-    (ScalarType::String, PostgresType::Text),
-    (ScalarType::DateTime, PostgresType::Timestamp(Some(3))),
-    (ScalarType::Bytes, PostgresType::ByteA),
-    (ScalarType::Json, PostgresType::JsonB),
+const DATE_TIME_DEFAULT: KnownPostgresType = KnownPostgresType::Timestamp(Some(3));
+const BYTES_DEFAULT: KnownPostgresType = KnownPostgresType::ByteA;
+
+const SCALAR_TYPE_DEFAULTS: &[(ScalarType, KnownPostgresType)] = &[
+    (ScalarType::Int, KnownPostgresType::Integer),
+    (ScalarType::BigInt, KnownPostgresType::BigInt),
+    (ScalarType::Float, KnownPostgresType::DoublePrecision),
+    (ScalarType::Decimal, KnownPostgresType::Decimal(Some((65, 30)))),
+    (ScalarType::Boolean, KnownPostgresType::Boolean),
+    (ScalarType::String, KnownPostgresType::Text),
+    (ScalarType::DateTime, DATE_TIME_DEFAULT),
+    (ScalarType::Bytes, BYTES_DEFAULT),
+    (ScalarType::Json, KnownPostgresType::JsonB),
 ];
 
 /// Postgres-specific properties in the datasource block.
@@ -296,10 +300,21 @@ impl Connector for PostgresDatamodelConnector {
         relation_mode.uses_foreign_keys()
     }
 
-    fn scalar_type_for_native_type(&self, native_type: &NativeTypeInstance) -> ScalarType {
-        let native_type: &PostgresType = native_type.downcast_ref();
+    fn scalar_type_for_native_type(
+        &self,
+        native_type: &NativeTypeInstance,
+        extension_types: &dyn ExtensionTypes,
+    ) -> Option<ScalarFieldType> {
+        let native_type = match native_type.downcast_ref() {
+            PostgresType::Known(st) => st,
+            PostgresType::Unknown(name, modifiers) => {
+                return extension_types
+                    .get_by_db_name_and_modifiers(name, Some(modifiers))
+                    .map(|e| ScalarFieldType::Extension(e.id));
+            }
+        };
 
-        match native_type {
+        let res = match native_type {
             // String
             Text => ScalarType::String,
             Char(_) => ScalarType::String,
@@ -335,40 +350,47 @@ impl Connector for PostgresDatamodelConnector {
             JsonB => ScalarType::Json,
             // Bytes
             ByteA => ScalarType::Bytes,
-        }
+        };
+        Some(ScalarFieldType::BuiltInScalar(res))
     }
 
-    fn default_native_type_for_scalar_type(&self, scalar_type: &ScalarType) -> Option<NativeTypeInstance> {
-        let native_type = SCALAR_TYPE_DEFAULTS
-            .iter()
-            .find(|(st, _)| st == scalar_type)
-            .map(|(_, native_type)| native_type)
-            .ok_or_else(|| format!("Could not find scalar type {scalar_type:?} in SCALAR_TYPE_DEFAULTS"))
-            .unwrap();
-
-        Some(NativeTypeInstance::new::<PostgresType>(*native_type))
-    }
-
-    fn native_type_is_default_for_scalar_type(
+    fn default_native_type_for_scalar_type(
         &self,
-        native_type: &NativeTypeInstance,
-        scalar_type: &ScalarType,
-    ) -> bool {
-        let native_type: &PostgresType = native_type.downcast_ref();
+        scalar_type: &ScalarFieldType,
+        schema: &ValidatedSchema,
+    ) -> Option<NativeTypeInstance> {
+        let native_type = match scalar_type {
+            ScalarFieldType::BuiltInScalar(scalar_type) => PostgresType::Known(
+                *SCALAR_TYPE_DEFAULTS
+                    .iter()
+                    .find(|(st, _)| st == scalar_type)
+                    .map(|(_, native_type)| native_type)
+                    .ok_or_else(|| format!("Could not find scalar type {scalar_type:?} in SCALAR_TYPE_DEFAULTS"))
+                    .unwrap(),
+            ),
+            ScalarFieldType::Extension(id) => {
+                let (name, modifiers) = schema.db.get_extension_type_db_name_with_modifiers(*id)?;
+                let native_type = PostgresType::Unknown(name.to_owned(), modifiers.to_vec());
+                return Some(NativeTypeInstance::new::<PostgresType>(native_type));
+            }
+            ScalarFieldType::CompositeType(_) | ScalarFieldType::Enum(_) | ScalarFieldType::Unsupported(_) => {
+                return None;
+            }
+        };
 
-        SCALAR_TYPE_DEFAULTS
-            .iter()
-            .any(|(st, nt)| scalar_type == st && native_type == nt)
+        Some(NativeTypeInstance::new::<PostgresType>(native_type))
     }
 
     fn validate_native_type_arguments(
         &self,
         native_type_instance: &NativeTypeInstance,
-        _scalar_type: &ScalarType,
+        _scalar_type: Option<ScalarType>,
         span: ast::Span,
         errors: &mut Diagnostics,
     ) {
-        let native_type: &PostgresType = native_type_instance.downcast_ref();
+        let PostgresType::Known(native_type) = native_type_instance.downcast_ref() else {
+            return;
+        };
         let error = self.native_instance_error(native_type_instance);
 
         match native_type {
@@ -395,7 +417,7 @@ impl Connector for PostgresDatamodelConnector {
         let native_type: Option<&PostgresType> = nt.as_ref().map(|nt| nt.downcast_ref());
 
         match native_type {
-            Some(pt) => !matches!(pt, Citext),
+            Some(pt) => !matches!(pt, PostgresType::Known(Citext)),
             None => true,
         }
     }
@@ -445,11 +467,18 @@ impl Connector for PostgresDatamodelConnector {
         span: ast::Span,
         diagnostics: &mut Diagnostics,
     ) -> Option<NativeTypeInstance> {
-        let native_type = PostgresType::from_parts(name, args, span, diagnostics)?;
-        Some(NativeTypeInstance::new::<PostgresType>(native_type))
+        let nt = match KnownPostgresType::from_parts(name, args) {
+            Ok(res) => PostgresType::Known(res),
+            Err(NativeTypeParseError::UnknownType { .. }) => PostgresType::Unknown(name.to_owned(), args.to_owned()),
+            Err(err) => {
+                diagnostics.push_error(err.into_datamodel_error(span));
+                return None;
+            }
+        };
+        Some(NativeTypeInstance::new(nt))
     }
 
-    fn native_type_to_parts(&self, native_type: &NativeTypeInstance) -> (&'static str, Vec<String>) {
+    fn native_type_to_parts<'t>(&self, native_type: &'t NativeTypeInstance) -> (&'t str, Cow<'t, [String]>) {
         native_type.downcast_ref::<PostgresType>().to_parts()
     }
 
@@ -595,7 +624,7 @@ impl Connector for PostgresDatamodelConnector {
         str: &str,
         nt: Option<NativeTypeInstance>,
     ) -> chrono::ParseResult<chrono::DateTime<FixedOffset>> {
-        let native_type: Option<&PostgresType> = nt.as_ref().map(|nt| nt.downcast_ref());
+        let native_type = nt.as_ref().and_then(|nt| nt.downcast_ref::<PostgresType>().as_known());
 
         match native_type {
             Some(pt) => match pt {
@@ -606,16 +635,19 @@ impl Connector for PostgresDatamodelConnector {
                 Timetz(_) => super::utils::postgres::parse_timetz(str),
                 _ => unreachable!(),
             },
-            None => self.parse_json_datetime(str, self.default_native_type_for_scalar_type(&ScalarType::DateTime)),
+            None => self.parse_json_datetime(
+                str,
+                Some(NativeTypeInstance::new(PostgresType::Known(DATE_TIME_DEFAULT))),
+            ),
         }
     }
 
     fn parse_json_bytes(&self, str: &str, nt: Option<NativeTypeInstance>) -> prisma_value::PrismaValueResult<Vec<u8>> {
-        let native_type: Option<&PostgresType> = nt.as_ref().map(|nt| nt.downcast_ref());
+        let native_type = nt.as_ref().and_then(|nt| nt.downcast_ref::<PostgresType>().as_known());
 
         match native_type {
             Some(ct) => match ct {
-                PostgresType::ByteA => {
+                KnownPostgresType::ByteA => {
                     super::utils::postgres::parse_bytes(str).map_err(|_| prisma_value::ConversionFailure {
                         from: "hex".into(),
                         to: "bytes".into(),
@@ -623,7 +655,7 @@ impl Connector for PostgresDatamodelConnector {
                 }
                 _ => unreachable!(),
             },
-            None => self.parse_json_bytes(str, self.default_native_type_for_scalar_type(&ScalarType::Bytes)),
+            None => self.parse_json_bytes(str, Some(NativeTypeInstance::new(PostgresType::Known(BYTES_DEFAULT)))),
         }
     }
 }

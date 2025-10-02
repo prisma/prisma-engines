@@ -50,7 +50,7 @@ const QUERIES: &[(&str, &str)] = &[
 ];
 
 fn criterion_benchmark(c: &mut Criterion) {
-    let validated_schema = psl::parse_schema(SCHEMA).unwrap();
+    let validated_schema = psl::parse_schema_without_extensions(SCHEMA).unwrap();
     let query_schema = schema::build(Arc::new(validated_schema), true);
 
     for (name, query) in QUERIES {

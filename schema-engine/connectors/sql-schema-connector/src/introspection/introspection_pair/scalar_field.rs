@@ -2,7 +2,7 @@ use crate::introspection::sanitize_datamodel_names;
 use either::Either;
 use psl::{
     datamodel_connector::{Flavour, walker_ext_traits::IndexWalkerExt},
-    parser_database::walkers,
+    parser_database::{ExtensionTypeEntry, ScalarFieldType, walkers},
     schema_ast::ast::WithDocumentation,
 };
 use sql::ColumnArity;
@@ -77,6 +77,10 @@ impl<'a> ScalarFieldPair<'a> {
     /// If we cannot support the field type in the client.
     pub fn is_unsupported(self) -> bool {
         self.next.column_type_family().is_unsupported()
+            || matches!(
+                self.next.column_type_family(),
+                sql::ColumnTypeFamily::Udt(_) if self.extension_type().is_none()
+            )
     }
 
     /// The client type.
@@ -104,36 +108,27 @@ impl<'a> ScalarFieldPair<'a> {
             sql::ColumnTypeFamily::Json => Cow::from("Json"),
             sql::ColumnTypeFamily::Uuid => Cow::from("String"),
             sql::ColumnTypeFamily::Enum(id) => self.context.enum_prisma_name(*id).prisma_name(),
+            &sql::ColumnTypeFamily::Udt(id) => self
+                .extension_type()
+                .map(|entry| entry.prisma_name.to_owned().into())
+                .unwrap_or_else(|| Cow::from(self.context.sql_schema.walk(id).name())),
             sql::ColumnTypeFamily::Unsupported(typ) => Cow::from(typ),
         }
     }
 
     /// The database type, if non-default.
-    pub fn native_type(self) -> Option<(&'a str, &'static str, Vec<String>)> {
-        let scalar_type = match self.column_type_family() {
-            sql::ColumnTypeFamily::Int => Some(psl::parser_database::ScalarType::Int),
-            sql::ColumnTypeFamily::BigInt => Some(psl::parser_database::ScalarType::BigInt),
-            sql::ColumnTypeFamily::Float => Some(psl::parser_database::ScalarType::Float),
-            sql::ColumnTypeFamily::Decimal => Some(psl::parser_database::ScalarType::Decimal),
-            sql::ColumnTypeFamily::Boolean => Some(psl::parser_database::ScalarType::Boolean),
-            sql::ColumnTypeFamily::String => Some(psl::parser_database::ScalarType::String),
-            sql::ColumnTypeFamily::DateTime => Some(psl::parser_database::ScalarType::DateTime),
-            sql::ColumnTypeFamily::Json => Some(psl::parser_database::ScalarType::Json),
-            sql::ColumnTypeFamily::Uuid => Some(psl::parser_database::ScalarType::String),
-            sql::ColumnTypeFamily::Binary => Some(psl::parser_database::ScalarType::Bytes),
-            sql::ColumnTypeFamily::Enum(_) => None,
-            sql::ColumnTypeFamily::Unsupported(_) => None,
-        };
+    pub fn native_type(self) -> Option<(&'a str, &'a str, Cow<'a, [String]>)> {
+        let scalar_type = self.scalar_type();
 
         let native_type = self.next.column_type().native_type.as_ref();
 
-        if let Some((scalar_type, native_type)) = scalar_type.and_then(|st| native_type.map(|nt| (st, nt))) {
-            let is_default = self
+        if let Some((scalar_type, native_type)) = scalar_type.zip(native_type) {
+            let default = self
                 .context
                 .active_connector()
-                .native_type_is_default_for_scalar_type(native_type, &scalar_type);
+                .default_native_type_for_scalar_type(&scalar_type, self.context.previous_schema);
 
-            if is_default {
+            if default.is_some_and(|nt| nt == *native_type) {
                 None
             } else {
                 let (r#type, params) = self.context.active_connector().native_type_to_parts(native_type);
@@ -144,6 +139,39 @@ impl<'a> ScalarFieldPair<'a> {
         } else {
             None
         }
+    }
+
+    fn scalar_type(&self) -> Option<psl::parser_database::ScalarFieldType> {
+        let st = match self.column_type_family() {
+            sql::ColumnTypeFamily::Int => psl::parser_database::ScalarType::Int,
+            sql::ColumnTypeFamily::BigInt => psl::parser_database::ScalarType::BigInt,
+            sql::ColumnTypeFamily::Float => psl::parser_database::ScalarType::Float,
+            sql::ColumnTypeFamily::Decimal => psl::parser_database::ScalarType::Decimal,
+            sql::ColumnTypeFamily::Boolean => psl::parser_database::ScalarType::Boolean,
+            sql::ColumnTypeFamily::String => psl::parser_database::ScalarType::String,
+            sql::ColumnTypeFamily::DateTime => psl::parser_database::ScalarType::DateTime,
+            sql::ColumnTypeFamily::Json => psl::parser_database::ScalarType::Json,
+            sql::ColumnTypeFamily::Uuid => psl::parser_database::ScalarType::String,
+            sql::ColumnTypeFamily::Binary => psl::parser_database::ScalarType::Bytes,
+            sql::ColumnTypeFamily::Udt(_) => {
+                let entry = self.extension_type()?;
+                return Some(ScalarFieldType::Extension(entry.id));
+            }
+            sql::ColumnTypeFamily::Enum(_) | sql::ColumnTypeFamily::Unsupported(_) => {
+                return None;
+            }
+        };
+        Some(ScalarFieldType::BuiltInScalar(st))
+    }
+
+    fn extension_type(&self) -> Option<ExtensionTypeEntry<'_>> {
+        let native_type = self.next.column_type().native_type.as_ref()?;
+        let (name, modifiers) = self.context.active_connector().native_type_to_parts(native_type);
+        let entry = self
+            .context
+            .extension_types
+            .get_by_db_name_and_modifiers(name, Some(&modifiers))?;
+        Some(entry)
     }
 
     /// The primary key of the field.

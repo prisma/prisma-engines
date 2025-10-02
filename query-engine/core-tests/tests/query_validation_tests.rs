@@ -18,7 +18,7 @@ fn run_query_validation_test(query_file_path: &str) {
         .iter()
         .chain(ALL_PREVIEW_FEATURES.hidden_features())
         .collect();
-    let parsed_schema = psl::parse_schema(schema).unwrap();
+    let parsed_schema = psl::parse_schema_without_extensions(schema).unwrap();
     let schema = Arc::new(schema::build_with_features(Arc::new(parsed_schema), all_features, true));
 
     let err_string = match validate(&query, &schema) {

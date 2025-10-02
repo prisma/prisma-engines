@@ -1,7 +1,7 @@
 use std::fmt;
 
 use crate::{
-    OperatorClass, ParserDatabase, ScalarFieldId, ScalarFieldType,
+    ExtensionTypeId, OperatorClass, ParserDatabase, ScalarFieldId, ScalarFieldType,
     ast::{self, WithName},
     types::{DefaultAttribute, FieldWithArgs, OperatorClassStore, ScalarField, ScalarType, SortOrder},
     walkers::*,
@@ -113,6 +113,11 @@ impl<'db> ScalarFieldWalker<'db> {
     /// Is this field's type a composite type? If yes, walk the composite type.
     pub fn field_type_as_composite_type(self) -> Option<CompositeTypeWalker<'db>> {
         self.scalar_field_type().as_composite_type().map(|id| self.db.walk(id))
+    }
+
+    /// Is this field's type an extension type? If yes, return its ID.
+    pub fn field_type_as_extension_type(self) -> Option<ExtensionTypeId> {
+        self.scalar_field_type().as_extension_type()
     }
 
     /// The name in the `@map(<name>)` attribute.

@@ -1,4 +1,7 @@
-use psl::{PreviewFeatures, parser_database::SourceFile};
+use psl::{
+    PreviewFeatures,
+    parser_database::{NoExtensionTypes, SourceFile},
+};
 use schema_core::schema_connector::{ConnectorParams, DiffTarget};
 use sql_migration_tests::test_api::*;
 use sql_schema_connector::SqlSchemaConnector;
@@ -207,10 +210,10 @@ fn foreign_key_renaming_to_default_works(api: TestApi) {
 
     let migration = api.connector_diff(
         DiffTarget::Database,
-        DiffTarget::Datamodel(vec![(
-            "schema.prisma".to_string(),
-            SourceFile::new_static(target_schema),
-        )]),
+        DiffTarget::Datamodel(
+            vec![("schema.prisma".to_string(), SourceFile::new_static(target_schema))],
+            &NoExtensionTypes,
+        ),
         None,
     );
     let expected = expect![[r#"

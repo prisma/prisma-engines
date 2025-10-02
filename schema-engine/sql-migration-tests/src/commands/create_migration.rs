@@ -1,4 +1,5 @@
 use pretty_assertions::assert_eq;
+use psl::parser_database::{ExtensionTypes, NoExtensionTypes};
 use schema_core::{
     CoreError, CoreResult, commands::create_migration, json_rpc::types::*, schema_connector::SchemaConnector,
 };
@@ -16,6 +17,7 @@ pub struct CreateMigration<'a> {
     name: &'a str,
     filter: SchemaFilter,
     init_script: &'a str,
+    extension_types: &'a dyn ExtensionTypes,
 }
 
 /// The file name for migration scripts, not including the file extension.
@@ -113,12 +115,18 @@ impl<'a> CreateMigration<'a> {
             name,
             filter,
             init_script,
+            extension_types: &NoExtensionTypes,
         }
     }
 
     pub fn draft(mut self, draft: bool) -> Self {
         self.draft = draft;
 
+        self
+    }
+
+    pub fn extension_types(mut self, extension_types: &'a dyn ExtensionTypes) -> Self {
+        self.extension_types = extension_types;
         self
     }
 
@@ -137,6 +145,7 @@ impl<'a> CreateMigration<'a> {
             },
             self.api,
             &mut migration_schema_cache,
+            self.extension_types,
         )
         .await?;
 

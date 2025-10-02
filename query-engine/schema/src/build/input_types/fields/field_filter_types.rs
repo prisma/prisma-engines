@@ -269,7 +269,9 @@ fn full_scalar_filter_type(
                 .chain(inclusion_filters(ctx, mapped_scalar_type.clone(), nullable))
                 .collect(),
 
-            TypeIdentifier::Unsupported => unreachable!("No unsupported field should reach that path"),
+            TypeIdentifier::Extension(_) => unreachable!("No extension field should reach this path"),
+
+            TypeIdentifier::Unsupported => unreachable!("No unsupported field should reach this path"),
         };
 
         fields.push(not_filter_field(

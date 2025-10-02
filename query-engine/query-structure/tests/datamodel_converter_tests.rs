@@ -41,7 +41,7 @@ fn converting_enums() {
 // region: composite
 #[test]
 fn converting_composite_types_compound() {
-    let res = psl::parse_schema(
+    let res = psl::parse_schema_without_extensions(
         r#"
         datasource db {
             provider = "mongodb"
@@ -75,7 +75,7 @@ fn converting_composite_types_compound() {
 
 #[test]
 fn converting_composite_types_compound_unique() {
-    let res = psl::parse_schema(
+    let res = psl::parse_schema_without_extensions(
         r#"
         datasource db {
             provider = "mongodb"
@@ -113,7 +113,7 @@ fn converting_composite_types_compound_unique() {
 
 #[test]
 fn converting_composite_types_nested() {
-    let res = psl::parse_schema(
+    let res = psl::parse_schema_without_extensions(
         r#"
         datasource db {
             provider = "mongodb"
@@ -153,7 +153,7 @@ fn converting_composite_types_nested() {
 
 #[test]
 fn converting_composite_types_nested_scalar() {
-    let res = psl::parse_schema(
+    let res = psl::parse_schema_without_extensions(
         r#"
         datasource db {
             provider = "mongodb"
@@ -503,7 +503,7 @@ fn duplicate_relation_name() {
 }
 
 fn convert(datamodel: &str) -> InternalDataModel {
-    let schema = psl::parse_schema(datamodel).unwrap();
+    let schema = psl::parse_schema_without_extensions(datamodel).unwrap();
     query_structure::convert(Arc::new(schema))
 }
 

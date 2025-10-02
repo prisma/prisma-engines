@@ -37,7 +37,7 @@ pub struct ForeignKeyId(pub(crate) u32);
 pub struct NamespaceId(pub(crate) u32);
 
 /// The identifier for a user defined type in the database.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
 pub struct UdtId(pub(crate) u32);
 
 /// The identifier for a view in the database.

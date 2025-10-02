@@ -141,7 +141,7 @@ impl PrismaOpt {
 
     pub(crate) fn schema(&self, ignore_env_errors: bool) -> PrismaResult<psl::ValidatedSchema> {
         let datamodel_str = self.datamodel_str()?;
-        let mut schema = psl::validate(datamodel_str.into());
+        let mut schema = psl::validate_without_extensions(datamodel_str.into());
 
         schema
             .diagnostics

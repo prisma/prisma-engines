@@ -19,7 +19,7 @@ fn parse_schema_diagnostics(files: &[(String, String)], initiating_file_name: &s
         .iter()
         .map(|(name, content)| (name.to_owned(), SourceFile::from(content)))
         .collect();
-    let schema = psl::validate_multi_file(&sources);
+    let schema = psl::validate_multi_file_without_extensions(&sources);
 
     let file_id = schema.db.file_id(initiating_file_name).unwrap();
     let source = schema.db.source(file_id);

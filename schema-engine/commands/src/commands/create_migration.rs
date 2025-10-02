@@ -1,5 +1,6 @@
 use crate::{CoreError, CoreResult, MigrationSchemaCache, SchemaContainerExt, json_rpc::types::*};
 use crosstarget_utils::time::format_utc_now;
+use psl::parser_database::ExtensionTypes;
 use schema_connector::{SchemaConnector, migrations_directory::*};
 use user_facing_errors::schema_engine::MigrationNameTooLong;
 
@@ -15,6 +16,7 @@ pub async fn create_migration(
     input: CreateMigrationInput,
     connector: &mut dyn SchemaConnector,
     migration_schema_cache: &mut MigrationSchemaCache,
+    extension_types: &dyn ExtensionTypes,
 ) -> CoreResult<CreateMigrationOutput> {
     let connector_type = connector.connector_type();
 
@@ -35,7 +37,7 @@ pub async fn create_migration(
     let default_namespace = connector.default_runtime_namespace();
     // We need to start with the 'to', which is the Schema, in order to grab the
     // namespaces, in case we've got MultiSchema enabled.
-    let to = dialect.schema_from_datamodel(sources, default_namespace)?;
+    let to = dialect.schema_from_datamodel(sources, default_namespace, extension_types)?;
     let namespaces = dialect.extract_namespaces(&to);
     filter.validate(&*dialect)?;
 

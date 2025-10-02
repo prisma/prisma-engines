@@ -3,7 +3,7 @@ use lsp_types::{Hover, HoverContents, HoverParams, MarkupContent, MarkupKind};
 use psl::{
     Diagnostics, SourceFile, error_tolerant_parse_configuration,
     parser_database::{
-        ParserDatabase, RelationFieldId, ScalarFieldType,
+        NoExtensionTypes, ParserDatabase, RelationFieldId, ScalarFieldType,
         walkers::{self, Walker},
     },
     schema_ast::ast::{
@@ -30,7 +30,7 @@ pub fn run(schema_files: Vec<(String, SourceFile)>, params: HoverParams) -> Opti
 
     let db = {
         let mut diag = Diagnostics::new();
-        ParserDatabase::new(&schema_files, &mut diag)
+        ParserDatabase::new(&schema_files, &mut diag, &NoExtensionTypes)
     };
 
     let Some(initiating_file_id) = db.file_id(params.text_document_position_params.text_document.uri.as_str()) else {

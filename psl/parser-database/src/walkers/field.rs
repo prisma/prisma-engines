@@ -1,6 +1,6 @@
 use super::{CompositeTypeFieldWalker, ModelWalker, RelationFieldWalker, ScalarFieldWalker, Walker};
 use crate::{
-    ScalarType,
+    ScalarFieldType, ScalarType,
     types::{RefinedFieldVariant, RelationField, ScalarField},
 };
 use schema_ast::ast;
@@ -93,6 +93,14 @@ pub struct TypedFieldWalker<'db> {
 }
 
 impl<'db> TypedFieldWalker<'db> {
+    /// The type of the field, either scalar or composite.
+    pub fn scalar_field_type(self) -> ScalarFieldType {
+        match self.inner {
+            InnerTypedFieldWalker::Scalar(field) => field.scalar_field_type(),
+            InnerTypedFieldWalker::Composite(field) => field.r#type(),
+        }
+    }
+
     /// The type of the field in case it is a scalar type (not an enum, not a composite type).
     pub fn scalar_type(self) -> Option<ScalarType> {
         match self.inner {

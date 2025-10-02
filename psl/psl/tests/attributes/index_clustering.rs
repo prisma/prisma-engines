@@ -11,7 +11,7 @@ fn clustered_index_works_on_sql_server() {
         }
     "#};
 
-    psl::parse_schema(with_header(dml, Provider::SqlServer, &[]))
+    psl::parse_schema_without_extensions(with_header(dml, Provider::SqlServer, &[]))
         .unwrap()
         .assert_has_model("A")
         .assert_index_on_fields(&["a"])
@@ -27,7 +27,7 @@ fn clustered_unique_index_works_on_sql_server() {
         }
     "#};
 
-    psl::parse_schema(with_header(dml, Provider::SqlServer, &[]))
+    psl::parse_schema_without_extensions(with_header(dml, Provider::SqlServer, &[]))
         .unwrap()
         .assert_has_model("A")
         .assert_unique_on_fields(&["a"])
@@ -46,7 +46,7 @@ fn clustered_compound_unique_index_works_on_sql_server() {
         }
     "#};
 
-    psl::parse_schema(with_header(dml, Provider::SqlServer, &[]))
+    psl::parse_schema_without_extensions(with_header(dml, Provider::SqlServer, &[]))
         .unwrap()
         .assert_has_model("A")
         .assert_unique_on_fields(&["a", "b"])
@@ -61,7 +61,7 @@ fn non_clustered_id_works_on_sql_server() {
         }
     "#};
 
-    psl::parse_schema(with_header(dml, Provider::SqlServer, &[]))
+    psl::parse_schema_without_extensions(with_header(dml, Provider::SqlServer, &[]))
         .unwrap()
         .assert_has_model("A")
         .assert_id_on_fields(&["id"])
@@ -79,7 +79,7 @@ fn non_clustered_compound_id_works_on_sql_server() {
         }
     "#};
 
-    psl::parse_schema(with_header(dml, Provider::SqlServer, &[]))
+    psl::parse_schema_without_extensions(with_header(dml, Provider::SqlServer, &[]))
         .unwrap()
         .assert_has_model("A")
         .assert_id_on_fields(&["left", "right"])

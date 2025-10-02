@@ -1,3 +1,4 @@
+use psl::parser_database::{ExtensionTypes, NoExtensionTypes};
 use schema_core::{CoreResult, commands::evaluate_data_loss, json_rpc::types::*, schema_connector::SchemaConnector};
 use std::borrow::Cow;
 use tempfile::TempDir;
@@ -10,6 +11,7 @@ pub struct EvaluateDataLoss<'a> {
     migrations_directory: &'a TempDir,
     files: Vec<SchemaContainer>,
     filter: SchemaFilter,
+    extension_types: &'a dyn ExtensionTypes,
 }
 
 impl<'a> EvaluateDataLoss<'a> {
@@ -30,7 +32,13 @@ impl<'a> EvaluateDataLoss<'a> {
                 })
                 .collect(),
             filter,
+            extension_types: &NoExtensionTypes,
         }
+    }
+
+    pub fn extension_types(mut self, extension_types: &'a dyn ExtensionTypes) -> Self {
+        self.extension_types = extension_types;
+        self
     }
 
     fn send_impl(self) -> CoreResult<EvaluateDataLossAssertion<'a>> {
@@ -44,6 +52,7 @@ impl<'a> EvaluateDataLoss<'a> {
             },
             self.api,
             &mut migration_schema_cache,
+            self.extension_types,
         );
         let output = test_setup::runtime::run_with_thread_local_runtime(fut)?;
 

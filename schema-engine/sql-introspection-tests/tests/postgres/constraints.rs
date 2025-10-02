@@ -143,7 +143,7 @@ async fn noalyss_folder_test_postgres(api: &mut TestApi) -> TestResult {
 async fn check_and_exclusion_constraints_stopgap(api: &mut TestApi) -> TestResult {
     let raw_sql = indoc! {r#"
         CREATE EXTENSION btree_gist;
-    
+
         CREATE TABLE room_reservation (
             room_reservation_id serial PRIMARY KEY,
             room_id integer NOT NULL, -- this could e.g. be a foreign key to a `room` table
@@ -184,7 +184,7 @@ async fn check_and_exclusion_constraints_stopgap(api: &mut TestApi) -> TestResul
     api.expect_datamodel(&schema).await;
 
     // ensure the introspected schema is valid
-    psl::parse_schema(schema.data()).unwrap();
+    psl::parse_schema_without_extensions(schema.data()).unwrap();
 
     let expectation = expect![[r#"
         *** WARNING ***
@@ -233,7 +233,7 @@ async fn check_and_exclusion_constraints_stopgap(api: &mut TestApi) -> TestResul
 async fn exclusion_constraints_stopgap(api: &mut TestApi) -> TestResult {
     let raw_sql = indoc! {r#"
         CREATE EXTENSION btree_gist;
-  
+
         CREATE TABLE room_reservation (
             room_reservation_id serial PRIMARY KEY,
             room_id integer NOT NULL, -- this could e.g. be a foreign key to a `room` table
@@ -271,7 +271,7 @@ async fn exclusion_constraints_stopgap(api: &mut TestApi) -> TestResult {
     api.expect_datamodel(&schema).await;
 
     // ensure the introspected schema is valid
-    psl::parse_schema(schema.data()).unwrap();
+    psl::parse_schema_without_extensions(schema.data()).unwrap();
 
     let expectation = expect![[r#"
         *** WARNING ***
@@ -313,7 +313,7 @@ async fn exclusion_constraints_stopgap(api: &mut TestApi) -> TestResult {
 async fn exclusion_constraints_without_where_stopgap(api: &mut TestApi) -> TestResult {
     let raw_sql = indoc! {r#"
         CREATE EXTENSION btree_gist;
-  
+
         CREATE TABLE room_reservation (
             room_reservation_id serial PRIMARY KEY,
             room_id integer NOT NULL, -- this could e.g. be a foreign key to a `room` table
@@ -349,7 +349,7 @@ async fn exclusion_constraints_without_where_stopgap(api: &mut TestApi) -> TestR
     api.expect_datamodel(&schema).await;
 
     // ensure the introspected schema is valid
-    psl::parse_schema(schema.data()).unwrap();
+    psl::parse_schema_without_extensions(schema.data()).unwrap();
 
     let expectation = expect![[r#"
         *** WARNING ***
@@ -389,7 +389,7 @@ async fn exclusion_constraints_without_where_stopgap(api: &mut TestApi) -> TestR
 async fn exclusion_constraints_without_where_and_expressions_stopgap(api: &mut TestApi) -> TestResult {
     let raw_sql = indoc! {r#"
         CREATE EXTENSION btree_gist;
-    
+
         CREATE TABLE room_reservation (
             room_reservation_id serial PRIMARY KEY,
             room_id integer NOT NULL, -- this could e.g. be a foreign key to a `room` table
@@ -421,7 +421,7 @@ async fn exclusion_constraints_without_where_and_expressions_stopgap(api: &mut T
     api.expect_datamodel(&schema).await;
 
     // ensure the introspected schema is valid
-    psl::parse_schema(schema.data()).unwrap();
+    psl::parse_schema_without_extensions(schema.data()).unwrap();
 
     let expectation = expect![[r#"
         *** WARNING ***
@@ -487,7 +487,7 @@ async fn check_constraints_stopgap(api: &mut TestApi) -> TestResult {
     api.expect_datamodel(&schema).await;
 
     // ensure the introspected schema is valid
-    psl::parse_schema(schema.data()).unwrap();
+    psl::parse_schema_without_extensions(schema.data()).unwrap();
 
     let expectation = expect![[r#"
         *** WARNING ***

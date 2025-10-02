@@ -1,6 +1,6 @@
 use super::utils::*;
 
-use psl::builtin_connectors::{CockroachType, PostgresType};
+use psl::builtin_connectors::{CockroachType, KnownPostgresType, PostgresType};
 use quaint::prelude::ColumnType;
 use sql_migration_tests::test_api::*;
 
@@ -632,9 +632,9 @@ mod postgres {
                 paste::paste! {
                     #[test_connector(tags(Postgres), exclude(CockroachDb))]
                     fn $test_name(api: TestApi) {
-                        let dm = render_native_type_datamodel::<PostgresType>(&api, PG_DATASOURCE, $nt.to_parts(), $nt);
+                        let dm = render_native_type_datamodel::<PostgresType>(&api, PG_DATASOURCE, $nt.to_parts(), PostgresType::Known($nt));
 
-                        if PostgresType::Citext == $nt {
+                        if KnownPostgresType::Citext == $nt {
                             api.raw_cmd("CREATE EXTENSION IF NOT EXISTS citext;");
                         }
 
@@ -653,32 +653,32 @@ mod postgres {
     }
 
     test_native_types_pg! {
-        small_int(PostgresType::SmallInt) => Int32,
-        integer(PostgresType::Integer) => Int32,
-        big_int(PostgresType::BigInt) => Int64,
-        nt_decimal(PostgresType::Decimal(Some((4, 4)))) => Numeric,
-        money(PostgresType::Money) => Numeric,
-        inet(PostgresType::Inet) => Text,
-        oid(PostgresType::Oid) => Int64,
-        citext(PostgresType::Citext) => Text,
-        real(PostgresType::Real) => Float,
-        double(PostgresType::DoublePrecision) => Double,
-        var_char(PostgresType::VarChar(Some(255))) => Text,
-        char(PostgresType::Char(Some(255))) => Text,
-        text(PostgresType::Text) => Text,
-        byte(PostgresType::ByteA) => Bytes,
-        timestamp(PostgresType::Timestamp(Some(1))) => DateTime,
-        timestamptz(PostgresType::Timestamptz(Some(1))) => DateTime,
-        date(PostgresType::Date) => Date,
-        time(PostgresType::Time(Some(1))) => Time,
-        timetz(PostgresType::Timetz(Some(1))) => Time,
-        boolean(PostgresType::Boolean) => Boolean,
-        bit(PostgresType::Bit(Some(1))) => Text,
-        var_bit(PostgresType::VarBit(Some(1))) => Text,
-        uuid(PostgresType::Uuid) => Uuid,
-        xml(PostgresType::Xml) => Xml,
-        json(PostgresType::Json) => Json,
-        json_b(PostgresType::JsonB) => Json,
+        small_int(KnownPostgresType::SmallInt) => Int32,
+        integer(KnownPostgresType::Integer) => Int32,
+        big_int(KnownPostgresType::BigInt) => Int64,
+        nt_decimal(KnownPostgresType::Decimal(Some((4, 4)))) => Numeric,
+        money(KnownPostgresType::Money) => Numeric,
+        inet(KnownPostgresType::Inet) => Text,
+        oid(KnownPostgresType::Oid) => Int64,
+        citext(KnownPostgresType::Citext) => Text,
+        real(KnownPostgresType::Real) => Float,
+        double(KnownPostgresType::DoublePrecision) => Double,
+        var_char(KnownPostgresType::VarChar(Some(255))) => Text,
+        char(KnownPostgresType::Char(Some(255))) => Text,
+        text(KnownPostgresType::Text) => Text,
+        byte(KnownPostgresType::ByteA) => Bytes,
+        timestamp(KnownPostgresType::Timestamp(Some(1))) => DateTime,
+        timestamptz(KnownPostgresType::Timestamptz(Some(1))) => DateTime,
+        date(KnownPostgresType::Date) => Date,
+        time(KnownPostgresType::Time(Some(1))) => Time,
+        timetz(KnownPostgresType::Timetz(Some(1))) => Time,
+        boolean(KnownPostgresType::Boolean) => Boolean,
+        bit(KnownPostgresType::Bit(Some(1))) => Text,
+        var_bit(KnownPostgresType::VarBit(Some(1))) => Text,
+        uuid(KnownPostgresType::Uuid) => Uuid,
+        xml(KnownPostgresType::Xml) => Xml,
+        json(KnownPostgresType::Json) => Json,
+        json_b(KnownPostgresType::JsonB) => Json,
     }
 }
 

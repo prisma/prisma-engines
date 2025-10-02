@@ -52,8 +52,8 @@ impl std::ops::Deref for NativeColumnType<'_> {
     }
 }
 
-impl<'a> From<&'a str> for NativeColumnType<'a> {
-    fn from(s: &'a str) -> Self {
+impl From<&str> for NativeColumnType<'static> {
+    fn from(s: &str) -> Self {
         Self {
             name: Cow::Owned(s.to_uppercase()),
             length: None,
@@ -61,8 +61,8 @@ impl<'a> From<&'a str> for NativeColumnType<'a> {
     }
 }
 
-impl<'a> From<(&'a str, Option<TypeDataLength>)> for NativeColumnType<'a> {
-    fn from((name, length): (&'a str, Option<TypeDataLength>)) -> Self {
+impl From<(&str, Option<TypeDataLength>)> for NativeColumnType<'static> {
+    fn from((name, length): (&str, Option<TypeDataLength>)) -> Self {
         Self {
             name: Cow::Owned(name.to_uppercase()),
             length,

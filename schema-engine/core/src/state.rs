@@ -8,7 +8,7 @@ use ::commands::MigrationSchemaCache;
 use enumflags2::BitFlags;
 use futures::stream::{FuturesUnordered, StreamExt};
 use json_rpc::types::*;
-use psl::parser_database::SourceFile;
+use psl::parser_database::{NoExtensionTypes, SourceFile};
 use schema_connector::{ConnectorError, ConnectorHost, IntrospectionResult, Namespaces, SchemaConnector};
 use std::{
     collections::HashMap,
@@ -77,7 +77,9 @@ impl EngineState {
         host: Option<Arc<dyn ConnectorHost>>,
     ) -> Self {
         EngineState {
-            initial_datamodel: initial_datamodels.as_deref().map(psl::validate_multi_file),
+            initial_datamodel: initial_datamodels
+                .as_deref()
+                .map(psl::validate_multi_file_without_extensions),
             host: host.unwrap_or_else(|| Arc::new(schema_connector::EmptyHost)),
             connectors: Default::default(),
             migration_schema_cache: Arc::new(Mutex::new(Default::default())),
@@ -262,7 +264,7 @@ impl GenericApi for EngineState {
             );
             Box::pin(async move {
                 let mut migration_schema_cache = migration_schema_cache.lock().await;
-                commands::create_migration(input, connector, &mut migration_schema_cache)
+                commands::create_migration(input, connector, &mut migration_schema_cache, &NoExtensionTypes)
                     .instrument(span)
                     .await
             })
@@ -299,7 +301,7 @@ impl GenericApi for EngineState {
     }
 
     async fn diff(&self, params: DiffParams) -> CoreResult<DiffResult> {
-        commands::diff_cli(params, self.host.clone()).await
+        commands::diff_cli(params, self.host.clone(), &NoExtensionTypes).await
     }
 
     async fn drop_database(&self, url: String) -> CoreResult<()> {
@@ -352,7 +354,7 @@ impl GenericApi for EngineState {
         self.with_default_connector(Box::new(|connector| {
             Box::pin(async move {
                 let mut migration_schema_cache = migration_schema_cache.lock().await;
-                commands::evaluate_data_loss(input, connector, &mut migration_schema_cache)
+                commands::evaluate_data_loss(input, connector, &mut migration_schema_cache, &NoExtensionTypes)
                     .instrument(tracing::info_span!("EvaluateDataLoss"))
                     .await
             })
@@ -368,7 +370,7 @@ impl GenericApi for EngineState {
         let composite_type_depth = From::from(params.composite_type_depth);
 
         let ctx = if params.force {
-            let previous_schema = psl::validate_multi_file(&source_files);
+            let previous_schema = psl::validate_multi_file_without_extensions(&source_files);
 
             schema_connector::IntrospectionContext::new_config_only(
                 previous_schema,
@@ -377,7 +379,7 @@ impl GenericApi for EngineState {
                 PathBuf::new().join(&params.base_directory_path),
             )
         } else {
-            psl::parse_schema_multi(&source_files).map(|previous_schema| {
+            psl::parse_schema_multi_without_extensions(&source_files).map(|previous_schema| {
                 schema_connector::IntrospectionContext::new(
                     previous_schema,
                     composite_type_depth,
@@ -398,7 +400,7 @@ impl GenericApi for EngineState {
                         views,
                         warnings,
                         is_empty,
-                    } = connector.introspect(&ctx).await?;
+                    } = connector.introspect(&ctx, &NoExtensionTypes).await?;
 
                     if is_empty {
                         Err(ConnectorError::into_introspection_result_empty_error())
@@ -512,7 +514,10 @@ impl GenericApi for EngineState {
 
     async fn schema_push(&self, input: SchemaPushInput) -> CoreResult<SchemaPushOutput> {
         self.with_default_connector(Box::new(move |connector| {
-            Box::pin(commands::schema_push(input, connector).instrument(tracing::info_span!("SchemaPush")))
+            Box::pin(
+                commands::schema_push(input, connector, &NoExtensionTypes)
+                    .instrument(tracing::info_span!("SchemaPush")),
+            )
         }))
         .await
     }

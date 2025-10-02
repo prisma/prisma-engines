@@ -25,7 +25,10 @@ pub use migration_schema_cache::MigrationSchemaCache;
 pub use schema_connector;
 
 use psl::{
-    ValidatedSchema, builtin_connectors::BUILTIN_CONNECTORS, datamodel_connector::Flavour, parser_database::SourceFile,
+    ValidatedSchema,
+    builtin_connectors::BUILTIN_CONNECTORS,
+    datamodel_connector::Flavour,
+    parser_database::{ExtensionTypes, SourceFile},
 };
 
 /// Creates the [`SqlSchemaDialect`](SqlSchemaDialect) matching the given provider.
@@ -70,7 +73,7 @@ pub fn extract_namespaces(
     namespaces: &mut Vec<String>,
     preview_features: &mut BitFlags<psl::PreviewFeature>,
 ) {
-    let validated_schema = psl::validate_multi_file(files);
+    let validated_schema = psl::validate_multi_file_without_extensions(files);
 
     for (namespace, _span) in validated_schema
         .configuration
@@ -86,8 +89,11 @@ pub fn extract_namespaces(
     }
 }
 
-fn parse_schema_multi(files: &[(String, SourceFile)]) -> CoreResult<ValidatedSchema> {
-    psl::parse_schema_multi(files).map_err(CoreError::new_schema_parser_error)
+fn parse_schema_multi(
+    files: &[(String, SourceFile)],
+    extension_types: &dyn ExtensionTypes,
+) -> CoreResult<ValidatedSchema> {
+    psl::parse_schema_multi(files, extension_types).map_err(CoreError::new_schema_parser_error)
 }
 
 /// Wrapper trait for `SchemaContainer` and related types.

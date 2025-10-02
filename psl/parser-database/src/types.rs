@@ -1,6 +1,9 @@
 pub(crate) mod index_fields;
 
-use crate::{DatamodelError, context::Context, interner::StringId, walkers::IndexFieldWalker};
+use crate::{
+    DatamodelError, ParserDatabase, context::Context, extension::ExtensionTypeId, interner::StringId,
+    walkers::IndexFieldWalker,
+};
 use either::Either;
 use enumflags2::bitflags;
 use rustc_hash::FxHashMap as HashMap;
@@ -188,6 +191,8 @@ pub enum ScalarFieldType {
     CompositeType(crate::CompositeTypeId),
     /// An enum
     Enum(crate::EnumId),
+    /// A type defined in an extension
+    Extension(ExtensionTypeId),
     /// A Prisma scalar type
     BuiltInScalar(ScalarType),
     /// An `Unsupported("...")` type
@@ -207,6 +212,14 @@ impl ScalarFieldType {
     pub fn as_composite_type(self) -> Option<crate::CompositeTypeId> {
         match self {
             ScalarFieldType::CompositeType(id) => Some(id),
+            _ => None,
+        }
+    }
+
+    /// Try to interpret this field type as an Extension type.
+    pub fn as_extension_type(self) -> Option<ExtensionTypeId> {
+        match self {
+            ScalarFieldType::Extension(id) => Some(id),
             _ => None,
         }
     }
@@ -262,6 +275,42 @@ impl ScalarFieldType {
     /// True if the field's type is Decimal.
     pub fn is_decimal(self) -> bool {
         matches!(self, Self::BuiltInScalar(ScalarType::Decimal))
+    }
+
+    /// Display the field type as it would appear in the Prisma schema.
+    pub fn display<'a>(&'a self, db: &'a ParserDatabase) -> impl fmt::Display + 'a {
+        DisplayScalarFieldType { field_type: self, db }
+    }
+}
+
+struct DisplayScalarFieldType<'a> {
+    field_type: &'a ScalarFieldType,
+    db: &'a ParserDatabase,
+}
+
+impl fmt::Display for DisplayScalarFieldType<'_> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self.field_type {
+            ScalarFieldType::BuiltInScalar(t) => write!(f, "{t}"),
+            ScalarFieldType::Enum(id) => {
+                write!(f, "{}", self.db.walk(*id).name())
+            }
+            ScalarFieldType::CompositeType(id) => {
+                write!(f, "{}", self.db.walk(*id).name())
+            }
+            ScalarFieldType::Extension(ext_id) => {
+                let name = self
+                    .db
+                    .extension_metadata
+                    .id_to_prisma_name
+                    .get(ext_id)
+                    .expect("extension type id to have a name");
+                write!(f, "{}", self.db.interner.get(*name).unwrap())
+            }
+            ScalarFieldType::Unsupported(ut) => {
+                write!(f, "Unsupported(\"{}\")", self.db.interner.get(ut.name).unwrap())
+            }
+        }
     }
 }
 
@@ -756,12 +805,12 @@ fn field_type<'db>(field: &'db ast::Field, ctx: &mut Context<'db>) -> Result<Fie
             return Ok(FieldType::Scalar(ScalarFieldType::Unsupported(unsupported)));
         }
     };
-    let supported_string_id = ctx.interner.intern(supported);
 
     if let Some(tpe) = ScalarType::try_from_str(supported, false) {
         return Ok(FieldType::Scalar(ScalarFieldType::BuiltInScalar(tpe)));
     }
 
+    let supported_string_id = ctx.interner.intern(supported);
     match ctx
         .names
         .tops
@@ -776,7 +825,13 @@ fn field_type<'db>(field: &'db ast::Field, ctx: &mut Context<'db>) -> Result<Fie
             Ok(FieldType::Scalar(ScalarFieldType::CompositeType((file_id, ctid))))
         }
         Some((_, _, ast::Top::Generator(_))) | Some((_, _, ast::Top::Source(_))) => unreachable!(),
-        None => Err(supported),
+        None => {
+            if let Some(type_id) = ctx.extension_types().get_by_prisma_name(supported) {
+                Ok(FieldType::Scalar(ScalarFieldType::Extension(type_id)))
+            } else {
+                Err(supported)
+            }
+        }
         _ => unreachable!(),
     }
 }
@@ -1517,6 +1572,12 @@ impl ScalarType {
                 _ => None,
             },
         }
+    }
+}
+
+impl fmt::Display for ScalarType {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.write_str(self.as_str())
     }
 }
 

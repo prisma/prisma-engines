@@ -341,7 +341,9 @@ async fn push_columns(
                         ColumnTypeFamily::Binary => DefaultValue::db_generated(default_string),
                         ColumnTypeFamily::Uuid => DefaultValue::db_generated(default_string),
                         ColumnTypeFamily::Enum(_) => DefaultValue::value(PrismaValue::Enum(default_string)),
-                        ColumnTypeFamily::Unsupported(_) => DefaultValue::db_generated(default_string),
+                        ColumnTypeFamily::Udt(_) | ColumnTypeFamily::Unsupported(_) => {
+                            DefaultValue::db_generated(default_string)
+                        }
                     })
                 }
             }

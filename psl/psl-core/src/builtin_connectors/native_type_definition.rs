@@ -37,7 +37,7 @@ macro_rules! native_type_definition {
         );
 
         impl $enumName {
-            pub fn to_parts(&self) -> (&'static str, Vec<String>) {
+            pub fn to_parts(&self) -> (&'static str, ::std::borrow::Cow<'static, [String]>) {
                 use $enumName::*;
 
                 $crate::native_type_definition!(
@@ -49,17 +49,15 @@ macro_rules! native_type_definition {
             }
 
             #[allow(unused_variables)] // some impls (mongo) don't use the arguments param
-            pub fn from_parts(
-                name: &str,
+            pub fn from_parts<'a>(
+                name: &'a str,
                 arguments: &[String],
-                span: $crate::parser_database::ast::Span,
-                diagnostics: &mut $crate::diagnostics::Diagnostics
-            ) -> Option<Self> {
+            ) -> ::std::result::Result<Self, $crate::datamodel_connector::NativeTypeParseError<'a>> {
                 use $enumName::*;
 
                 $crate::native_type_definition!(
                     @from_parts
-                    name, arguments, span, diagnostics,
+                    name, arguments,
                     {}
                     $($variants)*
                 )
@@ -130,7 +128,7 @@ macro_rules! native_type_definition {
             $self,
             {
                 $($body)*
-                $variant(arg) => (stringify!($variant), <$param as $crate::datamodel_connector::NativeTypeArguments>::to_parts(arg)),
+                $variant(arg) => (stringify!($variant), <$param as $crate::datamodel_connector::NativeTypeArguments>::to_parts(arg).into()),
             }
             $($tail)*
         }
@@ -148,7 +146,7 @@ macro_rules! native_type_definition {
             $self,
             {
                 $($body)*
-                $variant => (stringify!($variant), Vec::new()),
+                $variant => (stringify!($variant), Vec::new().into()),
             }
             $($tail)*
         }
@@ -157,38 +155,34 @@ macro_rules! native_type_definition {
     // Base case
     (
         @from_parts
-        $name:ident, $arguments:ident, $span:ident, $diagnostics:ident,
+        $name:ident, $arguments:ident,
         { $($body:tt)* }
     ) => {
         match $name {
             $($body)*
-            _ => {
-                $diagnostics.push_error($crate::diagnostics::DatamodelError::new_native_type_parser_error($name, $span));
-                None
-            },
+            _ => Err($crate::datamodel_connector::NativeTypeParseError::UnknownType { name: $name }),
         }
     };
 
     (
         @from_parts
-        $name:ident, $arguments:ident, $span:ident, $diagnostics:ident,
+        $name:ident, $arguments:ident,
         { $($body:tt)* }
         $($(#[$variantDocs:meta])+)? $variant:ident ($params:ty) -> $($skip:ident)|*,
         $($tail:tt)*
     ) => {
         $crate::native_type_definition!(
             @from_parts
-            $name, $arguments, $span, $diagnostics,
+            $name, $arguments,
             {
                 $($body)*
                 name if name == stringify!($variant) => {
                     let args  = <$params as $crate::datamodel_connector::NativeTypeArguments>::from_parts($arguments);
                     match args {
-                        Some(args) => Some($variant(args)),
+                        Some(args) => Ok($variant(args)),
                         None => {
                             let rendered_args = format!("({})", $arguments.join(", "));
-                            $diagnostics.push_error($crate::diagnostics::DatamodelError::new_value_parser_error(<$params as $crate::datamodel_connector::NativeTypeArguments>::DESCRIPTION, &rendered_args, $span));
-                            None
+                            Err($crate::datamodel_connector::NativeTypeParseError::InvalidArgs { expected: <$params as $crate::datamodel_connector::NativeTypeArguments>::DESCRIPTION, found: rendered_args })
                         }
                     }
                 },
@@ -199,17 +193,17 @@ macro_rules! native_type_definition {
 
     (
         @from_parts
-        $name:ident, $arguments:ident, $span:ident, $diagnostics:ident,
+        $name:ident, $arguments:ident,
         { $($body:tt)* }
         $($(#[$variantDocs:meta])+)? $variant:ident -> $($skip:ident)|*,
         $($tail:tt)*
     ) => {
         $crate::native_type_definition!(
             @from_parts
-            $name, $arguments, $span, $diagnostics,
+            $name, $arguments,
             {
                 $($body)*
-                name if name == stringify!($variant) => Some($variant),
+                name if name == stringify!($variant) => Ok($variant),
             }
             $($tail)*
         )
@@ -239,10 +233,10 @@ macro_rules! native_type_definition {
             {
                 $($body)*
                 NativeTypeConstructor {
-                    name: stringify!($variant),
+                    name: ::std::borrow::Cow::Borrowed(stringify!($variant)),
                     number_of_args: 0,
                     number_of_optional_args: 0,
-                    prisma_types: &[$($crate::parser_database::ScalarType::$scalar),*],
+                    allowed_types: ::std::borrow::Cow::Borrowed(&[$($crate::datamodel_connector::AllowedType::plain($crate::parser_database::ScalarFieldType::BuiltInScalar($crate::parser_database::ScalarType::$scalar))),*]),
                 },
             }
             $($tail)*
@@ -260,10 +254,10 @@ macro_rules! native_type_definition {
             {
                 $($body)*
                 NativeTypeConstructor {
-                    name: stringify!($variant),
+                    name: ::std::borrow::Cow::Borrowed(stringify!($variant)),
                     number_of_args: <$params as $crate::datamodel_connector::NativeTypeArguments>::REQUIRED_ARGUMENTS_COUNT,
                     number_of_optional_args: <$params as $crate::datamodel_connector::NativeTypeArguments>::OPTIONAL_ARGUMENTS_COUNT,
-                    prisma_types: &[$($crate::parser_database::ScalarType::$scalar),*],
+                    allowed_types: ::std::borrow::Cow::Borrowed(&[$($crate::datamodel_connector::AllowedType::plain($crate::parser_database::ScalarFieldType::BuiltInScalar($crate::parser_database::ScalarType::$scalar))),*]),
                 },
             }
             $($tail)*

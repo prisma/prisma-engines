@@ -6,13 +6,18 @@ use crate::{
     json_rpc::types::{DiffParams, DiffResult, DiffTarget, UrlContainer},
 };
 use enumflags2::BitFlags;
+use psl::parser_database::ExtensionTypes;
 use schema_connector::{
     ConnectorError, ConnectorHost, DatabaseSchema, ExternalShadowDatabase, Namespaces, SchemaConnector, SchemaDialect,
     SchemaFilter, migrations_directory::Migrations,
 };
 use sql_schema_connector::SqlSchemaConnector;
 
-pub async fn diff_cli(params: DiffParams, host: Arc<dyn ConnectorHost>) -> CoreResult<DiffResult> {
+pub async fn diff_cli(
+    params: DiffParams,
+    host: Arc<dyn ConnectorHost>,
+    extension_types: &dyn ExtensionTypes,
+) -> CoreResult<DiffResult> {
     // In order to properly handle MultiSchema, we need to make sure the preview feature is
     // correctly set, and we need to grab the namespaces from the Schema, if any.
     // Note that currently, we union all namespaces and preview features. This may not be correct.
@@ -29,6 +34,7 @@ pub async fn diff_cli(params: DiffParams, host: Arc<dyn ConnectorHost>) -> CoreR
         namespaces.clone(),
         &filter,
         preview_features,
+        extension_types,
     )
     .await?;
     let to = json_rpc_diff_target_to_dialect(
@@ -37,6 +43,7 @@ pub async fn diff_cli(params: DiffParams, host: Arc<dyn ConnectorHost>) -> CoreR
         namespaces,
         &filter,
         preview_features,
+        extension_types,
     )
     .await?;
 
@@ -123,6 +130,7 @@ async fn json_rpc_diff_target_to_dialect(
     namespaces: Option<Namespaces>,
     filter: &SchemaFilter,
     preview_features: BitFlags<psl::PreviewFeature>,
+    extension_types: &dyn ExtensionTypes,
 ) -> CoreResult<Option<(Box<dyn SchemaDialect>, DatabaseSchema)>> {
     match target {
         DiffTarget::Empty => Ok(None),
@@ -159,7 +167,7 @@ async fn json_rpc_diff_target_to_dialect(
 
             filter.validate(&*dialect)?;
 
-            let schema = dialect.schema_from_datamodel(sources, default_namespace.as_deref())?;
+            let schema = dialect.schema_from_datamodel(sources, default_namespace.as_deref(), extension_types)?;
 
             Ok(Some((dialect, schema)))
         }

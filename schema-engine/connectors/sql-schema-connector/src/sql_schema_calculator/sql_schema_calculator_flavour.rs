@@ -1,10 +1,12 @@
-use psl::parser_database::{ast::FieldArity, walkers::*};
+use psl::parser_database::{ExtensionTypes, ast::FieldArity, walkers::*};
 use sql_schema_describer::{self as sql, ColumnArity, ColumnType, ColumnTypeFamily};
 
 pub(crate) trait SqlSchemaCalculatorFlavour {
     fn datamodel_connector(&self) -> &dyn psl::datamodel_connector::Connector;
 
     fn calculate_enums(&self, _ctx: &mut super::Context<'_>) {}
+
+    fn calculate_extension_types(&self, _ctx: &mut super::Context<'_>, _extension_types: &dyn ExtensionTypes) {}
 
     fn column_type_for_enum(&self, _enm: EnumWalker<'_>, _ctx: &super::Context<'_>) -> Option<sql::ColumnTypeFamily> {
         None

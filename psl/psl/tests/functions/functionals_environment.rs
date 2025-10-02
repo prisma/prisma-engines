@@ -13,5 +13,5 @@ fn skipping_of_env_vars() {
     "#;
 
     // must not fail without env var
-    psl::parse_schema(dml).unwrap();
+    psl::parse_schema_without_extensions(dml).unwrap();
 }

@@ -7,7 +7,7 @@ use crate::{
     diagnostics::Diagnostics,
 };
 use enumflags2::BitFlags;
-use parser_database::ParserDatabase;
+use parser_database::{ExtensionTypes, ParserDatabase};
 
 pub struct ParseOutput {
     pub(crate) db: ParserDatabase,
@@ -41,6 +41,7 @@ pub(crate) fn validate(
     sources: &[configuration::Datasource],
     preview_features: BitFlags<PreviewFeature>,
     diagnostics: Diagnostics,
+    extension_types: &dyn ExtensionTypes,
 ) -> ValidateOutput {
     let ParseOutput {
         connector,
@@ -69,6 +70,7 @@ pub(crate) fn validate(
         connector,
         relation_mode,
         diagnostics: &mut output.diagnostics,
+        extension_types,
     };
 
     validations::validate(&mut context);

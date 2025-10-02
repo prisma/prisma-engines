@@ -11,7 +11,7 @@ fn parse_basic_model() {
         }
     "#};
 
-    let schema = psl::parse_schema(dml).unwrap();
+    let schema = psl::parse_schema_without_extensions(dml).unwrap();
     let user_model = schema.assert_has_model("User");
 
     user_model
@@ -37,7 +37,7 @@ fn parse_basic_enum() {
         }
     "#};
 
-    let schema = psl::parse_schema(dml).unwrap();
+    let schema = psl::parse_schema_without_extensions(dml).unwrap();
     let role_enum = schema.db.find_enum("Roles").unwrap();
     let values: Vec<_> = role_enum.values().map(|v| v.name()).collect();
 
@@ -60,7 +60,7 @@ fn parse_comments() {
         }
     "#};
 
-    let schema = psl::parse_schema(dml).unwrap();
+    let schema = psl::parse_schema_without_extensions(dml).unwrap();
 
     let user_model = schema.assert_has_model("User");
     user_model.assert_with_documentation("The user model.");

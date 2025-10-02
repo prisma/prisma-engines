@@ -187,5 +187,5 @@ fn cockroach_specific_native_types_are_valid() {
         }
     "#};
 
-    psl::parse_schema(schema).unwrap();
+    psl::parse_schema_without_extensions(schema).unwrap();
 }

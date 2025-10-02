@@ -1,3 +1,5 @@
+use std::borrow::Cow;
+
 use psl::datamodel_connector::{Connector, NativeTypeInstance as PslNativeTypeInstance};
 
 /// Represents an instance of a native type declared in the Prisma schema.
@@ -16,11 +18,11 @@ impl NativeTypeInstance {
         self.native_type.downcast_ref()
     }
 
-    pub fn name(&self) -> &'static str {
+    pub fn name(&self) -> &str {
         self.connector.native_type_to_parts(&self.native_type).0
     }
 
-    pub fn args(&self) -> Vec<String> {
+    pub fn args(&self) -> Cow<'_, [String]> {
         self.connector.native_type_to_parts(&self.native_type).1
     }
 }

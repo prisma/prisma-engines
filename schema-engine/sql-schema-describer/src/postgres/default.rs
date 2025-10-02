@@ -101,7 +101,7 @@ fn parser_for_family(family: &ColumnTypeFamily) -> &'static dyn Fn(&mut Parser<'
         ColumnTypeFamily::Boolean => &parse_bool_default,
         ColumnTypeFamily::DateTime => &parse_datetime_default,
         ColumnTypeFamily::Binary => &parse_binary_default,
-        ColumnTypeFamily::Unsupported(_) | ColumnTypeFamily::Uuid => &parse_unsupported,
+        ColumnTypeFamily::Udt(_) | ColumnTypeFamily::Unsupported(_) | ColumnTypeFamily::Uuid => &parse_unsupported,
     }
 }
 
