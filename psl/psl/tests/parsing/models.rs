@@ -10,7 +10,7 @@ fn default_spacing() {
         }
     "#};
 
-    let db = psl::parse_schema(input).unwrap().db;
+    let db = psl::parse_schema_without_extensions(input).unwrap().db;
     let model = db.walk_models().next().unwrap();
 
     assert_eq!(IndentationType::Spaces(2), model.indentation())
@@ -25,7 +25,7 @@ fn four_space_indentation() {
         }
     "#};
 
-    let db = psl::parse_schema(input).unwrap().db;
+    let db = psl::parse_schema_without_extensions(input).unwrap().db;
     let model = db.walk_models().next().unwrap();
 
     assert_eq!(IndentationType::Spaces(4), model.indentation())
@@ -40,7 +40,7 @@ fn tab_indentation() {
         }
     "#};
 
-    let db = psl::parse_schema(input).unwrap().db;
+    let db = psl::parse_schema_without_extensions(input).unwrap().db;
     let model = db.walk_models().next().unwrap();
 
     assert_eq!(IndentationType::Tabs, model.indentation())
@@ -50,7 +50,7 @@ fn tab_indentation() {
 fn unix_newline() {
     let input = "model Category {\n  id Int @id\n}";
 
-    let db = psl::parse_schema(input).unwrap().db;
+    let db = psl::parse_schema_without_extensions(input).unwrap().db;
     let model = db.walk_models().next().unwrap();
 
     assert_eq!(NewlineType::Unix, model.newline())
@@ -60,7 +60,7 @@ fn unix_newline() {
 fn windows_newline() {
     let input = "model Category {\r\n  id Int @id\r\n}";
 
-    let db = psl::parse_schema(input).unwrap().db;
+    let db = psl::parse_schema_without_extensions(input).unwrap().db;
     let model = db.walk_models().next().unwrap();
 
     assert_eq!(NewlineType::Windows, model.newline())

@@ -123,7 +123,11 @@ pub enum Expression {
 
     /// Difference between the sets of rows in `from` and `to` (i.e. `from - to`,
     /// or the set of rows that are in `from` but not in `to`).
-    Diff { from: Box<Expression>, to: Box<Expression> },
+    Diff {
+        from: Box<Expression>,
+        to: Box<Expression>,
+        fields: Vec<String>,
+    },
 
     /// Initializes a record with a set of initializers.
     InitializeRecord {
@@ -214,7 +218,7 @@ impl Expression {
                 r#else.simplify();
             }
             Expression::Unit => {}
-            Expression::Diff { from, to } => {
+            Expression::Diff { from, to, .. } => {
                 from.simplify();
                 to.simplify();
             }

@@ -57,7 +57,7 @@ pub(crate) fn available_actions(
 ) -> Vec<CodeActionOrCommand> {
     let mut actions = Vec::new();
 
-    let validated_schema = psl::validate_multi_file(&schema_files);
+    let validated_schema = psl::validate_multi_file_without_extensions(&schema_files);
 
     let config = &validated_schema.configuration;
 

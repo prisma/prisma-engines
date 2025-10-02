@@ -20,17 +20,17 @@ pub use self::{
     completions::format_completion_docs,
     empty_connector::EmptyDatamodelConnector,
     filters::*,
-    native_types::{NativeTypeArguments, NativeTypeConstructor, NativeTypeInstance},
+    native_types::{AllowedType, NativeTypeArguments, NativeTypeConstructor, NativeTypeInstance, NativeTypeParseError},
     relation_mode::RelationMode,
 };
 
-use crate::{Configuration, Datasource, PreviewFeature, configuration::DatasourceConnectorData};
+use crate::{Configuration, Datasource, PreviewFeature, ValidatedSchema, configuration::DatasourceConnectorData};
 use chrono::{DateTime, FixedOffset};
 use diagnostics::{DatamodelError, Diagnostics, NativeTypeErrorFactory, Span};
 use enumflags2::BitFlags;
 use lsp_types::CompletionList;
 use parser_database::{
-    IndexAlgorithm, ParserDatabase, ReferentialAction, ScalarType,
+    ExtensionTypes, IndexAlgorithm, ParserDatabase, ReferentialAction, ScalarFieldType, ScalarType,
     ast::{self, SchemaPosition},
     walkers,
 };
@@ -147,7 +147,7 @@ pub trait Connector: Send + Sync {
     fn validate_native_type_arguments(
         &self,
         _native_type: &NativeTypeInstance,
-        _scalar_type: &ScalarType,
+        _scalar_type: Option<ScalarType>,
         _span: Span,
         _: &mut Diagnostics,
     ) {
@@ -178,24 +178,25 @@ pub trait Connector: Send + Sync {
 
     /// Returns all available native type constructors available through this connector.
     /// Powers the auto completion of the VSCode plugin.
-    fn available_native_type_constructors(&self) -> &'static [NativeTypeConstructor];
+    fn available_native_type_constructors(&self) -> &[NativeTypeConstructor];
 
     /// Returns the default scalar type for the given native type
-    fn scalar_type_for_native_type(&self, native_type: &NativeTypeInstance) -> ScalarType;
+    fn scalar_type_for_native_type(
+        &self,
+        native_type: &NativeTypeInstance,
+        extension_types: &dyn ExtensionTypes,
+    ) -> Option<ScalarFieldType>;
 
     /// On each connector, each built-in Prisma scalar type (`Boolean`,
     /// `String`, `Float`, etc.) has a corresponding native type.
-    fn default_native_type_for_scalar_type(&self, scalar_type: &ScalarType) -> Option<NativeTypeInstance>;
-
-    /// Same mapping as `default_native_type_for_scalar_type()`, but in the opposite direction.
-    fn native_type_is_default_for_scalar_type(
+    fn default_native_type_for_scalar_type(
         &self,
-        native_type: &NativeTypeInstance,
-        scalar_type: &ScalarType,
-    ) -> bool;
+        scalar_type: &ScalarFieldType,
+        schema: &ValidatedSchema,
+    ) -> Option<NativeTypeInstance>;
 
     /// Debug/error representation of a native type.
-    fn native_type_to_parts(&self, native_type: &NativeTypeInstance) -> (&'static str, Vec<String>);
+    fn native_type_to_parts<'t>(&self, native_type: &'t NativeTypeInstance) -> (&'t str, Cow<'t, [String]>);
 
     fn find_native_type_constructor(&self, name: &str) -> Option<&NativeTypeConstructor> {
         self.available_native_type_constructors()
@@ -302,6 +303,10 @@ pub trait Connector: Send + Sync {
     }
 
     fn supports_shard_keys(&self) -> bool {
+        false
+    }
+
+    fn does_manage_udts(&self) -> bool {
         false
     }
 }

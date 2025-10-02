@@ -10,7 +10,7 @@ fn unique_attribute() {
         }
     "#;
 
-    let schema = psl::parse_schema(dml).unwrap();
+    let schema = psl::parse_schema_without_extensions(dml).unwrap();
     let model = schema.assert_has_model("Test");
 
     model

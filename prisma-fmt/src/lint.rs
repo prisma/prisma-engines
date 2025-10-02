@@ -17,8 +17,8 @@ pub struct MiniError {
 
 pub(crate) fn run(schema: SchemaFileInput) -> String {
     let validated_schema = match schema {
-        SchemaFileInput::Single(file) => psl::validate(file.into()),
-        SchemaFileInput::Multiple(files) => psl::validate_multi_file(&files),
+        SchemaFileInput::Single(file) => psl::validate_without_extensions(file.into()),
+        SchemaFileInput::Multiple(files) => psl::validate_multi_file_without_extensions(&files),
     };
     let ValidatedSchema { diagnostics, db, .. } = &validated_schema;
 

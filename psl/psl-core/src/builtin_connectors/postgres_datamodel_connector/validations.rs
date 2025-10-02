@@ -1,6 +1,7 @@
-use super::PostgresType;
+use super::KnownPostgresType;
 use crate::{
     PreviewFeature,
+    builtin_connectors::PostgresType,
     datamodel_connector::{Connector, walker_ext_traits::*},
     diagnostics::{DatamodelError, Diagnostics},
     parser_database::{IndexAlgorithm, OperatorClass, ast::WithSpan, walkers::IndexWalker},
@@ -13,10 +14,12 @@ pub(super) fn compatible_native_types(index: IndexWalker<'_>, connector: &dyn Co
     for field in index.fields() {
         if let Some(native_type) = field.native_type_instance(connector) {
             let span = field.ast_field().span();
-            let r#type: &PostgresType = native_type.downcast_ref();
+            let PostgresType::Known(r#type) = native_type.downcast_ref() else {
+                continue;
+            };
             let error = connector.native_instance_error(&native_type);
 
-            if r#type == &PostgresType::Xml {
+            if r#type == &KnownPostgresType::Xml {
                 if index.is_unique() {
                     errors.push_error(error.new_incompatible_native_type_with_unique("", span))
                 } else {
@@ -63,7 +66,9 @@ pub(super) fn generalized_index_validations(
         }
 
         let native_type_instance = field.as_index_field().native_type_instance(connector);
-        let native_type: Option<&PostgresType> = native_type_instance.as_ref().map(|t| t.downcast_ref());
+        let native_type = native_type_instance
+            .as_ref()
+            .and_then(|t| t.downcast_ref::<PostgresType>().as_known());
         let native_type_name = native_type_instance
             .as_ref()
             .map(|nt| connector.native_type_to_parts(nt).0);
@@ -140,7 +145,7 @@ pub(super) fn generalized_index_validations(
         if algo.is_gist() {
             match (&native_type, opclass) {
                 // Inet / InetOps
-                (Some(PostgresType::Inet), Some(InetOps)) => (),
+                (Some(KnownPostgresType::Inet), Some(InetOps)) => (),
                 _ => err_f(native_type_name, opclass),
             }
         } else if algo.is_gin() {
@@ -151,7 +156,7 @@ pub(super) fn generalized_index_validations(
                 // Array fields + ArrayOps
                 (_, None) if field.as_index_field().is_list() => (),
 
-                (Some(PostgresType::JsonB), Some(JsonbOps | JsonbPathOps) | None) => (),
+                (Some(KnownPostgresType::JsonB), Some(JsonbOps | JsonbPathOps) | None) => (),
 
                 (None, Some(JsonbOps | JsonbPathOps)) => {
                     if !r#type.is_json() {
@@ -198,7 +203,7 @@ pub(super) fn generalized_index_validations(
         } else if algo.is_spgist() {
             match (&native_type, opclass) {
                 // Inet
-                (Some(PostgresType::Inet), Some(InetOps) | None) => (),
+                (Some(KnownPostgresType::Inet), Some(InetOps) | None) => (),
 
                 // Text / TextOps
                 (None, None) if r#type.is_string() => (),
@@ -218,42 +223,42 @@ pub(super) fn generalized_index_validations(
                         ));
                     }
                 }
-                (Some(PostgresType::Text), Some(TextOps) | None) => (),
-                (Some(PostgresType::VarChar(_)), Some(TextOps) | None) => (),
-                (Some(PostgresType::Char(_)), Some(TextOps) | None) => (),
+                (Some(KnownPostgresType::Text), Some(TextOps) | None) => (),
+                (Some(KnownPostgresType::VarChar(_)), Some(TextOps) | None) => (),
+                (Some(KnownPostgresType::Char(_)), Some(TextOps) | None) => (),
 
                 _ => err_f(native_type_name, opclass),
             }
         } else if algo.is_brin() {
             match (&native_type, opclass) {
                 // Bit
-                (Some(PostgresType::Bit(_)), Some(BitMinMaxOps) | None) => (),
+                (Some(KnownPostgresType::Bit(_)), Some(BitMinMaxOps) | None) => (),
 
                 // VarBit
-                (Some(PostgresType::VarBit(_)), Some(VarBitMinMaxOps) | None) => (),
+                (Some(KnownPostgresType::VarBit(_)), Some(VarBitMinMaxOps) | None) => (),
 
                 // Char
-                (Some(PostgresType::Char(_)), None) => (),
-                (Some(PostgresType::Char(_)), Some(BpcharBloomOps)) => (),
-                (Some(PostgresType::Char(_)), Some(BpcharMinMaxOps)) => (),
+                (Some(KnownPostgresType::Char(_)), None) => (),
+                (Some(KnownPostgresType::Char(_)), Some(BpcharBloomOps)) => (),
+                (Some(KnownPostgresType::Char(_)), Some(BpcharMinMaxOps)) => (),
 
                 // Date
-                (Some(PostgresType::Date), None) => (),
-                (Some(PostgresType::Date), Some(DateBloomOps)) => (),
-                (Some(PostgresType::Date), Some(DateMinMaxOps)) => (),
-                (Some(PostgresType::Date), Some(DateMinMaxMultiOps)) => (),
+                (Some(KnownPostgresType::Date), None) => (),
+                (Some(KnownPostgresType::Date), Some(DateBloomOps)) => (),
+                (Some(KnownPostgresType::Date), Some(DateMinMaxOps)) => (),
+                (Some(KnownPostgresType::Date), Some(DateMinMaxMultiOps)) => (),
 
                 // Float4
-                (Some(PostgresType::Real), None) => (),
-                (Some(PostgresType::Real), Some(Float4BloomOps)) => (),
-                (Some(PostgresType::Real), Some(Float4MinMaxOps)) => (),
-                (Some(PostgresType::Real), Some(Float4MinMaxMultiOps)) => (),
+                (Some(KnownPostgresType::Real), None) => (),
+                (Some(KnownPostgresType::Real), Some(Float4BloomOps)) => (),
+                (Some(KnownPostgresType::Real), Some(Float4MinMaxOps)) => (),
+                (Some(KnownPostgresType::Real), Some(Float4MinMaxMultiOps)) => (),
 
                 // Float8
-                (Some(PostgresType::DoublePrecision), None) => (),
-                (Some(PostgresType::DoublePrecision), Some(Float8BloomOps)) => (),
-                (Some(PostgresType::DoublePrecision), Some(Float8MinMaxOps)) => (),
-                (Some(PostgresType::DoublePrecision), Some(Float8MinMaxMultiOps)) => (),
+                (Some(KnownPostgresType::DoublePrecision), None) => (),
+                (Some(KnownPostgresType::DoublePrecision), Some(Float8BloomOps)) => (),
+                (Some(KnownPostgresType::DoublePrecision), Some(Float8MinMaxOps)) => (),
+                (Some(KnownPostgresType::DoublePrecision), Some(Float8MinMaxMultiOps)) => (),
                 (None, None) if r#type.is_float() => (),
                 (None, Some(Float8BloomOps | Float8MinMaxOps | Float8MinMaxMultiOps)) => {
                     if !r#type.is_float() {
@@ -273,23 +278,23 @@ pub(super) fn generalized_index_validations(
                 }
 
                 // Inet
-                (Some(PostgresType::Inet), None) => (),
-                (Some(PostgresType::Inet), Some(InetInclusionOps)) => (),
-                (Some(PostgresType::Inet), Some(InetBloomOps)) => (),
-                (Some(PostgresType::Inet), Some(InetMinMaxOps)) => (),
-                (Some(PostgresType::Inet), Some(InetMinMaxMultiOps)) => (),
+                (Some(KnownPostgresType::Inet), None) => (),
+                (Some(KnownPostgresType::Inet), Some(InetInclusionOps)) => (),
+                (Some(KnownPostgresType::Inet), Some(InetBloomOps)) => (),
+                (Some(KnownPostgresType::Inet), Some(InetMinMaxOps)) => (),
+                (Some(KnownPostgresType::Inet), Some(InetMinMaxMultiOps)) => (),
 
                 // Int2
-                (Some(PostgresType::SmallInt), None) => (),
-                (Some(PostgresType::SmallInt), Some(Int2BloomOps)) => (),
-                (Some(PostgresType::SmallInt), Some(Int2MinMaxOps)) => (),
-                (Some(PostgresType::SmallInt), Some(Int2MinMaxMultiOps)) => (),
+                (Some(KnownPostgresType::SmallInt), None) => (),
+                (Some(KnownPostgresType::SmallInt), Some(Int2BloomOps)) => (),
+                (Some(KnownPostgresType::SmallInt), Some(Int2MinMaxOps)) => (),
+                (Some(KnownPostgresType::SmallInt), Some(Int2MinMaxMultiOps)) => (),
 
                 // Int4
-                (Some(PostgresType::Integer), None) => (),
-                (Some(PostgresType::Integer), Some(Int4BloomOps)) => (),
-                (Some(PostgresType::Integer), Some(Int4MinMaxOps)) => (),
-                (Some(PostgresType::Integer), Some(Int4MinMaxMultiOps)) => (),
+                (Some(KnownPostgresType::Integer), None) => (),
+                (Some(KnownPostgresType::Integer), Some(Int4BloomOps)) => (),
+                (Some(KnownPostgresType::Integer), Some(Int4MinMaxOps)) => (),
+                (Some(KnownPostgresType::Integer), Some(Int4MinMaxMultiOps)) => (),
                 (None, None) if r#type.is_int() => (),
                 (None, Some(Int4BloomOps | Int4MinMaxOps | Int4MinMaxMultiOps)) => {
                     if !r#type.is_int() {
@@ -309,10 +314,10 @@ pub(super) fn generalized_index_validations(
                 }
 
                 // Int8
-                (Some(PostgresType::BigInt), None) => (),
-                (Some(PostgresType::BigInt), Some(Int8BloomOps)) => (),
-                (Some(PostgresType::BigInt), Some(Int8MinMaxOps)) => (),
-                (Some(PostgresType::BigInt), Some(Int8MinMaxMultiOps)) => (),
+                (Some(KnownPostgresType::BigInt), None) => (),
+                (Some(KnownPostgresType::BigInt), Some(Int8BloomOps)) => (),
+                (Some(KnownPostgresType::BigInt), Some(Int8MinMaxOps)) => (),
+                (Some(KnownPostgresType::BigInt), Some(Int8MinMaxMultiOps)) => (),
                 (None, None) if r#type.is_bigint() => (),
                 (None, Some(Int8BloomOps | Int8MinMaxOps | Int8MinMaxMultiOps)) => {
                     if !r#type.is_bigint() {
@@ -332,10 +337,10 @@ pub(super) fn generalized_index_validations(
                 }
 
                 // Numeric
-                (Some(PostgresType::Decimal(_)), None) => (),
-                (Some(PostgresType::Decimal(_)), Some(NumericBloomOps)) => (),
-                (Some(PostgresType::Decimal(_)), Some(NumericMinMaxOps)) => (),
-                (Some(PostgresType::Decimal(_)), Some(NumericMinMaxMultiOps)) => (),
+                (Some(KnownPostgresType::Decimal(_)), None) => (),
+                (Some(KnownPostgresType::Decimal(_)), Some(NumericBloomOps)) => (),
+                (Some(KnownPostgresType::Decimal(_)), Some(NumericMinMaxOps)) => (),
+                (Some(KnownPostgresType::Decimal(_)), Some(NumericMinMaxMultiOps)) => (),
                 (None, None) if r#type.is_decimal() => (),
                 (None, Some(NumericBloomOps | NumericMinMaxOps | NumericMinMaxMultiOps)) => {
                     if !r#type.is_decimal() {
@@ -355,15 +360,15 @@ pub(super) fn generalized_index_validations(
                 }
 
                 // Oid
-                (Some(PostgresType::Oid), None) => (),
-                (Some(PostgresType::Oid), Some(OidBloomOps)) => (),
-                (Some(PostgresType::Oid), Some(OidMinMaxOps)) => (),
-                (Some(PostgresType::Oid), Some(OidMinMaxMultiOps)) => (),
+                (Some(KnownPostgresType::Oid), None) => (),
+                (Some(KnownPostgresType::Oid), Some(OidBloomOps)) => (),
+                (Some(KnownPostgresType::Oid), Some(OidMinMaxOps)) => (),
+                (Some(KnownPostgresType::Oid), Some(OidMinMaxMultiOps)) => (),
 
                 // Bytes
-                (Some(PostgresType::ByteA), None) => (),
-                (Some(PostgresType::ByteA), Some(ByteaBloomOps)) => (),
-                (Some(PostgresType::ByteA), Some(ByteaMinMaxOps)) => (),
+                (Some(KnownPostgresType::ByteA), None) => (),
+                (Some(KnownPostgresType::ByteA), Some(ByteaBloomOps)) => (),
+                (Some(KnownPostgresType::ByteA), Some(ByteaMinMaxOps)) => (),
                 (None, None) if r#type.is_bytes() => (),
                 (None, Some(ByteaBloomOps | ByteaMinMaxOps)) => {
                     if !r#type.is_bytes() {
@@ -383,12 +388,12 @@ pub(super) fn generalized_index_validations(
                 }
 
                 // Text
-                (Some(PostgresType::Text), None) => (),
-                (Some(PostgresType::Text), Some(TextBloomOps)) => (),
-                (Some(PostgresType::Text), Some(TextMinMaxOps)) => (),
-                (Some(PostgresType::VarChar(_)), None) => (),
-                (Some(PostgresType::VarChar(_)), Some(TextBloomOps)) => (),
-                (Some(PostgresType::VarChar(_)), Some(TextMinMaxOps)) => (),
+                (Some(KnownPostgresType::Text), None) => (),
+                (Some(KnownPostgresType::Text), Some(TextBloomOps)) => (),
+                (Some(KnownPostgresType::Text), Some(TextMinMaxOps)) => (),
+                (Some(KnownPostgresType::VarChar(_)), None) => (),
+                (Some(KnownPostgresType::VarChar(_)), Some(TextBloomOps)) => (),
+                (Some(KnownPostgresType::VarChar(_)), Some(TextMinMaxOps)) => (),
                 (None, None) if r#type.is_string() => (),
                 (None, Some(TextBloomOps | TextMinMaxOps)) => {
                     if !r#type.is_string() {
@@ -408,10 +413,10 @@ pub(super) fn generalized_index_validations(
                 }
 
                 // Timestamp
-                (Some(PostgresType::Timestamp(_)), None) => (),
-                (Some(PostgresType::Timestamp(_)), Some(TimestampBloomOps)) => (),
-                (Some(PostgresType::Timestamp(_)), Some(TimestampMinMaxOps)) => (),
-                (Some(PostgresType::Timestamp(_)), Some(TimestampMinMaxMultiOps)) => (),
+                (Some(KnownPostgresType::Timestamp(_)), None) => (),
+                (Some(KnownPostgresType::Timestamp(_)), Some(TimestampBloomOps)) => (),
+                (Some(KnownPostgresType::Timestamp(_)), Some(TimestampMinMaxOps)) => (),
+                (Some(KnownPostgresType::Timestamp(_)), Some(TimestampMinMaxMultiOps)) => (),
                 (None, None) if r#type.is_datetime() => (),
                 (None, Some(TimestampBloomOps | TimestampMinMaxOps | TimestampMinMaxMultiOps)) => {
                     if !r#type.is_datetime() {
@@ -431,28 +436,28 @@ pub(super) fn generalized_index_validations(
                 }
 
                 // Timestamptz
-                (Some(PostgresType::Timestamptz(_)), None) => (),
-                (Some(PostgresType::Timestamptz(_)), Some(TimestampTzBloomOps)) => (),
-                (Some(PostgresType::Timestamptz(_)), Some(TimestampTzMinMaxOps)) => (),
-                (Some(PostgresType::Timestamptz(_)), Some(TimestampTzMinMaxMultiOps)) => (),
+                (Some(KnownPostgresType::Timestamptz(_)), None) => (),
+                (Some(KnownPostgresType::Timestamptz(_)), Some(TimestampTzBloomOps)) => (),
+                (Some(KnownPostgresType::Timestamptz(_)), Some(TimestampTzMinMaxOps)) => (),
+                (Some(KnownPostgresType::Timestamptz(_)), Some(TimestampTzMinMaxMultiOps)) => (),
 
                 // Time
-                (Some(PostgresType::Time(_)), None) => (),
-                (Some(PostgresType::Time(_)), Some(TimeBloomOps)) => (),
-                (Some(PostgresType::Time(_)), Some(TimeMinMaxOps)) => (),
-                (Some(PostgresType::Time(_)), Some(TimeMinMaxMultiOps)) => (),
+                (Some(KnownPostgresType::Time(_)), None) => (),
+                (Some(KnownPostgresType::Time(_)), Some(TimeBloomOps)) => (),
+                (Some(KnownPostgresType::Time(_)), Some(TimeMinMaxOps)) => (),
+                (Some(KnownPostgresType::Time(_)), Some(TimeMinMaxMultiOps)) => (),
 
                 // Timetz
-                (Some(PostgresType::Timetz(_)), None) => (),
-                (Some(PostgresType::Timetz(_)), Some(TimeTzBloomOps)) => (),
-                (Some(PostgresType::Timetz(_)), Some(TimeTzMinMaxOps)) => (),
-                (Some(PostgresType::Timetz(_)), Some(TimeTzMinMaxMultiOps)) => (),
+                (Some(KnownPostgresType::Timetz(_)), None) => (),
+                (Some(KnownPostgresType::Timetz(_)), Some(TimeTzBloomOps)) => (),
+                (Some(KnownPostgresType::Timetz(_)), Some(TimeTzMinMaxOps)) => (),
+                (Some(KnownPostgresType::Timetz(_)), Some(TimeTzMinMaxMultiOps)) => (),
 
                 // Uuid
-                (Some(PostgresType::Uuid), None) => (),
-                (Some(PostgresType::Uuid), Some(UuidBloomOps)) => (),
-                (Some(PostgresType::Uuid), Some(UuidMinMaxOps)) => (),
-                (Some(PostgresType::Uuid), Some(UuidMinMaxMultiOps)) => (),
+                (Some(KnownPostgresType::Uuid), None) => (),
+                (Some(KnownPostgresType::Uuid), Some(UuidBloomOps)) => (),
+                (Some(KnownPostgresType::Uuid), Some(UuidMinMaxOps)) => (),
+                (Some(KnownPostgresType::Uuid), Some(UuidMinMaxMultiOps)) => (),
 
                 _ => err_f(native_type_name, opclass),
             }

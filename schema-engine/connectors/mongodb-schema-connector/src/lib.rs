@@ -16,7 +16,7 @@ use client_wrapper::{Client, mongo_error_to_connector_error};
 use enumflags2::BitFlags;
 use migration::MongoDbMigration;
 use mongodb_schema_describer::MongoSchema;
-use psl::PreviewFeature;
+use psl::{PreviewFeature, parser_database::ExtensionTypes};
 use schema_connector::{migrations_directory::Migrations, *};
 use std::{future, sync::Arc};
 use tokio::sync::OnceCell;
@@ -98,8 +98,10 @@ impl SchemaDialect for MongoDbSchemaDialect {
         &self,
         sources: Vec<(String, psl::SourceFile)>,
         _default_namespace: Option<&str>,
+        extension_types: &dyn ExtensionTypes,
     ) -> ConnectorResult<DatabaseSchema> {
-        let validated_schema = psl::parse_schema_multi(&sources).map_err(ConnectorError::new_schema_parser_error)?;
+        let validated_schema =
+            psl::parse_schema_multi(&sources, extension_types).map_err(ConnectorError::new_schema_parser_error)?;
         Ok(DatabaseSchema::new(schema_calculator::calculate(&validated_schema)))
     }
 
@@ -199,6 +201,7 @@ impl SchemaConnector for MongoDbSchemaConnector {
     fn introspect<'a>(
         &'a mut self,
         ctx: &'a IntrospectionContext,
+        _extension_types: &dyn ExtensionTypes,
     ) -> BoxFuture<'a, ConnectorResult<IntrospectionResult>> {
         Box::pin(async move {
             let client = self.client().await?;

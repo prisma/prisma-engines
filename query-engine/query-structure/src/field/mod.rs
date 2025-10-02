@@ -9,7 +9,7 @@ pub use scalar::*;
 
 use crate::{Model, NativeTypeInstance, Zipper, parent_container::ParentContainer};
 use psl::{
-    parser_database::{EnumId, ScalarType, walkers},
+    parser_database::{EnumId, ExtensionTypeId, ScalarType, walkers},
     schema_ast::ast::FieldArity,
 };
 use std::{borrow::Cow, hash::Hash};
@@ -140,6 +140,7 @@ pub enum TypeIdentifier {
     Decimal,
     Boolean,
     Enum(EnumId),
+    Extension(ExtensionTypeId),
     UUID,
     Json,
     DateTime,
@@ -181,6 +182,14 @@ impl Type {
                 let enum_name = self.dm.walk(enum_id).name();
                 format!("Enum{enum_name}").into()
             }
+            TypeIdentifier::Extension(ext_id) => self
+                .dm
+                .schema
+                .db
+                .get_extension_type_prisma_name(ext_id)
+                .expect("extension type name should be present")
+                .to_owned()
+                .into(),
             TypeIdentifier::UUID => "UUID".into(),
             TypeIdentifier::Json => "Json".into(),
             TypeIdentifier::DateTime => "DateTime".into(),
@@ -202,7 +211,7 @@ impl Type {
             TypeIdentifier::Json => PrismaValueType::Json,
             TypeIdentifier::DateTime => PrismaValueType::DateTime,
             TypeIdentifier::Bytes => PrismaValueType::Bytes,
-            TypeIdentifier::Unsupported => PrismaValueType::Any,
+            TypeIdentifier::Extension(_) | TypeIdentifier::Unsupported => PrismaValueType::Any,
         }
     }
 }

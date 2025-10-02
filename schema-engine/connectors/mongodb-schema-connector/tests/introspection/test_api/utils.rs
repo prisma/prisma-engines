@@ -73,5 +73,5 @@ pub(crate) fn parse_datamodels(datamodels: &[(&str, String)]) -> psl::ValidatedS
         .map(|(file_name, dm)| (file_name.to_string(), psl::SourceFile::from(dm)))
         .collect();
 
-    psl::validate_multi_file(&datamodels)
+    psl::validate_multi_file_without_extensions(&datamodels)
 }

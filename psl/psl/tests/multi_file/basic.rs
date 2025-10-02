@@ -1,7 +1,7 @@
 use crate::common::expect;
 
 fn expect_errors(schemas: &[[&'static str; 2]], expectation: expect_test::Expect) {
-    let out = psl::validate_multi_file(
+    let out = psl::validate_multi_file_without_extensions(
         &schemas
             .iter()
             .map(|[file_name, contents]| ((*file_name).into(), (*contents).into()))

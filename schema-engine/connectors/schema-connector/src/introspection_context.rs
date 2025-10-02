@@ -57,7 +57,7 @@ impl IntrospectionContext {
             config_blocks.push('\n');
         }
 
-        let previous_schema_config_only = psl::parse_schema_multi(&[(
+        let previous_schema_config_only = psl::parse_schema_multi_without_extensions(&[(
             Self::introspection_file_path_impl(&previous_schema, &base_directory_path).to_string(),
             config_blocks.into(),
         )])?;

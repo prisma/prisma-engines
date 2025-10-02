@@ -6,7 +6,7 @@ pub use expect_test::expect;
 use itertools::Itertools;
 use mongodb::Database;
 use mongodb_schema_connector::MongoDbSchemaConnector;
-use psl::{FeatureMapWithProvider, PreviewFeature};
+use psl::{FeatureMapWithProvider, PreviewFeature, parser_database::NoExtensionTypes};
 use schema_connector::{
     CompositeTypeDepth, ConnectorParams, IntrospectionContext, IntrospectionResult, SchemaConnector,
 };
@@ -79,16 +79,16 @@ impl TestApi {
     pub async fn re_introspect_multi(&mut self, datamodels: &[(&str, String)], expectation: expect_test::Expect) {
         let schema = parse_datamodels(datamodels);
         let ctx = IntrospectionContext::new(schema, CompositeTypeDepth::Infinite, None, PathBuf::new());
-        let reintrospected = self.connector.introspect(&ctx).await.unwrap();
+        let reintrospected = self.connector.introspect(&ctx, &NoExtensionTypes).await.unwrap();
         let reintrospected = TestMultiResult::from(reintrospected);
 
         expectation.assert_eq(reintrospected.datamodels());
     }
 
     pub async fn expect_warnings(&mut self, expectation: &expect_test::Expect) {
-        let previous_schema = psl::validate(config_block_string(self.features).into());
+        let previous_schema = psl::validate_without_extensions(config_block_string(self.features).into());
         let ctx = IntrospectionContext::new(previous_schema, CompositeTypeDepth::Infinite, None, PathBuf::new());
-        let result = self.connector.introspect(&ctx).await.unwrap();
+        let result = self.connector.introspect(&ctx, &NoExtensionTypes).await.unwrap();
         let result = TestMultiResult::from(result);
 
         expectation.assert_eq(&result.warnings);
@@ -150,14 +150,14 @@ where
     U: Future<Output = mongodb::error::Result<()>>,
 {
     let datamodel_string = config_block_string(preview_features);
-    let validated_schema = psl::parse_schema(datamodel_string).unwrap();
+    let validated_schema = psl::parse_schema_without_extensions(datamodel_string).unwrap();
     let ctx = IntrospectionContext::new(validated_schema, composite_type_depth, None, PathBuf::new())
         .without_config_rendering();
     let res = with_database_features(
         |mut api| async move {
             init_database(api.db).await.unwrap();
 
-            let res = api.connector.introspect(&ctx).await.unwrap();
+            let res = api.connector.introspect(&ctx, &NoExtensionTypes).await.unwrap();
 
             Ok(res)
         },

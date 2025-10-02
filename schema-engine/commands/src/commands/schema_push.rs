@@ -1,12 +1,17 @@
 use crate::{CoreResult, SchemaContainerExt, json_rpc::types::*, parse_schema_multi};
+use psl::parser_database::ExtensionTypes;
 use schema_connector::{ConnectorError, SchemaConnector};
 use tracing_futures::Instrument;
 
 /// Command to bring the local database in sync with the prisma schema, without
 /// interacting with the migrations directory nor the migrations table.
-pub async fn schema_push(input: SchemaPushInput, connector: &mut dyn SchemaConnector) -> CoreResult<SchemaPushOutput> {
+pub async fn schema_push(
+    input: SchemaPushInput,
+    connector: &mut dyn SchemaConnector,
+    extension_types: &dyn ExtensionTypes,
+) -> CoreResult<SchemaPushOutput> {
     let sources = input.schema.to_psl_input();
-    let datamodel = parse_schema_multi(&sources)?;
+    let datamodel = parse_schema_multi(&sources, extension_types)?;
 
     if let Some(err) = connector.check_database_version_compatibility(&datamodel) {
         return Err(ConnectorError::user_facing(err));
@@ -24,7 +29,7 @@ pub async fn schema_push(input: SchemaPushInput, connector: &mut dyn SchemaConne
     let dialect = connector.schema_dialect();
     let filter: schema_connector::SchemaFilter = input.filters.into();
 
-    let to = dialect.schema_from_datamodel(sources, connector.default_runtime_namespace())?;
+    let to = dialect.schema_from_datamodel(sources, connector.default_runtime_namespace(), extension_types)?;
     // We only consider the namespaces present in the "to" schema aka the PSL file for the introspection of the "from" schema.
     // So when the user removes a previously existing namespace from their PSL file we will not modify that namespace in the database.
     let namespaces = dialect.extract_namespaces(&to);

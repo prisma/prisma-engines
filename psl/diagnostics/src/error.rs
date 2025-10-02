@@ -4,7 +4,7 @@ use crate::{
     Span,
     pretty_print::{DiagnosticColorer, pretty_print},
 };
-use std::borrow::Cow;
+use std::{borrow::Cow, fmt};
 
 #[derive(Debug, Clone)]
 pub struct DatamodelError {
@@ -90,8 +90,8 @@ impl DatamodelError {
 
     pub fn new_incompatible_native_type(
         native_type: &str,
-        field_type: &str,
-        expected_types: &str,
+        field_type: impl fmt::Display,
+        expected_types: impl fmt::Display,
         span: Span,
     ) -> DatamodelError {
         let msg = format!(

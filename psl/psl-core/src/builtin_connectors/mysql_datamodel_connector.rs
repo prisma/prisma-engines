@@ -1,11 +1,15 @@
 mod native_types;
 mod validations;
 
+use std::borrow::Cow;
+
 use chrono::FixedOffset;
 pub use native_types::MySqlType;
+use parser_database::{ExtensionTypes, ScalarFieldType};
 use prisma_value::{PrismaValueResult, decode_bytes};
 
 use crate::{
+    ValidatedSchema,
     datamodel_connector::{
         Connector, ConnectorCapabilities, ConnectorCapability, ConstraintScope, Flavour, JoinStrategySupport,
         NativeTypeConstructor, NativeTypeInstance, RelationMode,
@@ -68,6 +72,7 @@ const CONSTRAINT_SCOPES: &[ConstraintScope] = &[ConstraintScope::GlobalForeignKe
 
 pub struct MySqlDatamodelConnector;
 
+const DATE_TIME_DEFAULT: MySqlType = MySqlType::DateTime(Some(3));
 const SCALAR_TYPE_DEFAULTS: &[(ScalarType, MySqlType)] = &[
     (ScalarType::Int, MySqlType::Int),
     (ScalarType::BigInt, MySqlType::BigInt),
@@ -75,7 +80,7 @@ const SCALAR_TYPE_DEFAULTS: &[(ScalarType, MySqlType)] = &[
     (ScalarType::Decimal, MySqlType::Decimal(Some((65, 30)))),
     (ScalarType::Boolean, MySqlType::TinyInt),
     (ScalarType::String, MySqlType::VarChar(191)),
-    (ScalarType::DateTime, MySqlType::DateTime(Some(3))),
+    (ScalarType::DateTime, DATE_TIME_DEFAULT),
     (ScalarType::Bytes, MySqlType::LongBlob),
     (ScalarType::Json, MySqlType::Json),
 ];
@@ -107,11 +112,14 @@ impl Connector for MySqlDatamodelConnector {
         Restrict | Cascade | SetNull | NoAction | SetDefault
     }
 
-    fn scalar_type_for_native_type(&self, native_type: &NativeTypeInstance) -> ScalarType {
+    fn scalar_type_for_native_type(
+        &self,
+        native_type: &NativeTypeInstance,
+        _extension_types: &dyn ExtensionTypes,
+    ) -> Option<ScalarFieldType> {
         let native_type: &MySqlType = native_type.downcast_ref();
 
-        match native_type {
-            //String
+        let res = match native_type {
             VarChar(_) => ScalarType::String,
             Text => ScalarType::String,
             Char(_) => ScalarType::String,
@@ -154,13 +162,20 @@ impl Connector for MySqlDatamodelConnector {
             UnsignedTinyInt => ScalarType::Int,
             UnsignedMediumInt => ScalarType::Int,
             UnsignedBigInt => ScalarType::BigInt,
-        }
+        };
+        Some(ScalarFieldType::BuiltInScalar(res))
     }
 
-    fn default_native_type_for_scalar_type(&self, scalar_type: &ScalarType) -> Option<NativeTypeInstance> {
+    fn default_native_type_for_scalar_type(
+        &self,
+        scalar_type: &ScalarFieldType,
+        _schema: &ValidatedSchema,
+    ) -> Option<NativeTypeInstance> {
+        let scalar_type = scalar_type.as_builtin_scalar()?;
+
         let native_type = SCALAR_TYPE_DEFAULTS
             .iter()
-            .find(|(st, _)| st == scalar_type)
+            .find(|(st, _)| st == &scalar_type)
             .map(|(_, native_type)| native_type)
             .ok_or_else(|| format!("Could not find scalar type {scalar_type:?} in SCALAR_TYPE_DEFAULTS"))
             .unwrap();
@@ -168,22 +183,10 @@ impl Connector for MySqlDatamodelConnector {
         Some(NativeTypeInstance::new::<MySqlType>(*native_type))
     }
 
-    fn native_type_is_default_for_scalar_type(
-        &self,
-        native_type: &NativeTypeInstance,
-        scalar_type: &ScalarType,
-    ) -> bool {
-        let native_type: &MySqlType = native_type.downcast_ref();
-
-        SCALAR_TYPE_DEFAULTS
-            .iter()
-            .any(|(st, nt)| scalar_type == st && native_type == nt)
-    }
-
     fn validate_native_type_arguments(
         &self,
         native_type_instance: &NativeTypeInstance,
-        scalar_type: &ScalarType,
+        scalar_type: Option<ScalarType>,
         span: Span,
         errors: &mut Diagnostics,
     ) {
@@ -209,7 +212,7 @@ impl Connector for MySqlDatamodelConnector {
             VarChar(length) if *length > 65535 => {
                 errors.push_error(error.new_argument_m_out_of_range_error("M can range from 0 to 65,535.", span))
             }
-            Bit(n) if *n > 1 && matches!(scalar_type, ScalarType::Boolean) => {
+            Bit(n) if *n > 1 && matches!(scalar_type, Some(ScalarType::Boolean)) => {
                 errors.push_error(error.new_argument_m_out_of_range_error("only Bit(1) can be used as Boolean.", span))
             }
             _ => (),
@@ -247,11 +250,16 @@ impl Connector for MySqlDatamodelConnector {
         span: Span,
         diagnostics: &mut Diagnostics,
     ) -> Option<NativeTypeInstance> {
-        let native_type = MySqlType::from_parts(name, args, span, diagnostics)?;
-        Some(NativeTypeInstance::new::<MySqlType>(native_type))
+        match MySqlType::from_parts(name, args) {
+            Ok(res) => Some(NativeTypeInstance::new(res)),
+            Err(err) => {
+                diagnostics.push_error(err.into_datamodel_error(span));
+                None
+            }
+        }
     }
 
-    fn native_type_to_parts(&self, native_type: &NativeTypeInstance) -> (&'static str, Vec<String>) {
+    fn native_type_to_parts<'t>(&self, native_type: &'t NativeTypeInstance) -> (&'t str, Cow<'t, [String]>) {
         native_type.downcast_ref::<MySqlType>().to_parts()
     }
 
@@ -282,7 +290,7 @@ impl Connector for MySqlDatamodelConnector {
                 Timestamp(_) => super::utils::mysql::parse_timestamp(str),
                 _ => unreachable!(),
             },
-            None => self.parse_json_datetime(str, self.default_native_type_for_scalar_type(&ScalarType::DateTime)),
+            None => self.parse_json_datetime(str, Some(NativeTypeInstance::new::<MySqlType>(DATE_TIME_DEFAULT))),
         }
     }
 

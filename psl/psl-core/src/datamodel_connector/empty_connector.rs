@@ -1,6 +1,7 @@
 pub(crate) use crate::datamodel_connector::*;
 use diagnostics::{DatamodelError, Span};
 use enumflags2::BitFlags;
+use parser_database::ScalarFieldType;
 
 /// A [Connector](/trait.Connector.html) implementor meant to
 /// be used as a default when no datasource is defined.
@@ -37,23 +38,23 @@ impl Connector for EmptyDatamodelConnector {
         &[]
     }
 
-    fn scalar_type_for_native_type(&self, _native_type: &NativeTypeInstance) -> ScalarType {
-        ScalarType::String
+    fn scalar_type_for_native_type(
+        &self,
+        _native_type: &NativeTypeInstance,
+        _extension_types: &dyn ExtensionTypes,
+    ) -> Option<ScalarFieldType> {
+        Some(ScalarFieldType::BuiltInScalar(ScalarType::String))
     }
 
-    fn default_native_type_for_scalar_type(&self, _scalar_type: &ScalarType) -> Option<NativeTypeInstance> {
+    fn default_native_type_for_scalar_type(
+        &self,
+        _scalar_type: &ScalarFieldType,
+        _schema: &ValidatedSchema,
+    ) -> Option<NativeTypeInstance> {
         None
     }
 
-    fn native_type_is_default_for_scalar_type(
-        &self,
-        _native_type: &NativeTypeInstance,
-        _scalar_type: &ScalarType,
-    ) -> bool {
-        false
-    }
-
-    fn native_type_to_parts(&self, _native_type: &NativeTypeInstance) -> (&'static str, Vec<String>) {
+    fn native_type_to_parts<'t>(&self, _native_type: &'t NativeTypeInstance) -> (&'t str, Cow<'t, [String]>) {
         unreachable!("EmptyDatamodelConnector::native_type_to_string()")
     }
 

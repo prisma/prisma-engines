@@ -331,7 +331,7 @@ fn typescript_starter_schema_with_different_native_types_is_idempotent(api: Test
         }
 
         model User {
-            id    Int     @id 
+            id    Int     @id
             email String  @unique
             name  String?
             posts Post[]
@@ -501,7 +501,7 @@ fn decimal_to_boolean_migrations_work(api: TestApi) {
             provider = "cockroachdb"
             url = env("TEST_DATABASE_URL")
         }
-        
+
         model Cat {
             id  BigInt @id @default(autoincrement())
             tag Boolean
@@ -1344,8 +1344,8 @@ fn alter_type_works(api: TestApi) {
     "#;
 
     let migration = api.connector_diff(
-        DiffTarget::Datamodel(vec![("schema.prisma".to_string(), schema.into())]),
-        DiffTarget::Datamodel(vec![("schema.prisma".to_string(), to_schema.into())]),
+        DiffTarget::Datamodel(vec![("schema.prisma".to_string(), schema.into())], &NoExtensionTypes),
+        DiffTarget::Datamodel(vec![("schema.prisma".to_string(), to_schema.into())], &NoExtensionTypes),
         None,
     );
 
@@ -1415,10 +1415,10 @@ fn schema_from_introspection_docs_works(api: TestApi) {
 
     let migration = api.connector_diff(
         DiffTarget::Database,
-        DiffTarget::Datamodel(vec![(
-            "schema.prisma".to_string(),
-            SourceFile::new_static(introspected_schema),
-        )]),
+        DiffTarget::Datamodel(
+            vec![("schema.prisma".to_string(), SourceFile::new_static(introspected_schema))],
+            &NoExtensionTypes,
+        ),
         None,
     );
 

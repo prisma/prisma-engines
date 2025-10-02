@@ -1,7 +1,7 @@
 #![allow(dead_code)]
 
 use indoc::indoc;
-use psl::SourceFile;
+use psl::{SourceFile, parser_database::NoExtensionTypes};
 use schema_core::{json_rpc::types::*, schema_connector};
 use sql_migration_tests::test_api::*;
 use std::fmt::Write as _;
@@ -718,8 +718,14 @@ fn foreign_keys_covered_by_deleted_index_are_recreated(api: TestApi) {
     });
 
     let diff = api.connector_diff(
-        schema_connector::DiffTarget::Datamodel(vec![("schema.prisma".to_string(), SourceFile::new_static(schema_a))]),
-        schema_connector::DiffTarget::Datamodel(vec![("schema.prisma".to_string(), SourceFile::new_static(schema_b))]),
+        schema_connector::DiffTarget::Datamodel(
+            vec![("schema.prisma".to_string(), SourceFile::new_static(schema_a))],
+            &NoExtensionTypes,
+        ),
+        schema_connector::DiffTarget::Datamodel(
+            vec![("schema.prisma".to_string(), SourceFile::new_static(schema_b))],
+            &NoExtensionTypes,
+        ),
         None,
     );
     expect![[r#"
@@ -810,8 +816,14 @@ fn foreign_keys_covered_by_deleted_index_are_also_deleted(api: TestApi) {
     });
 
     let diff = api.connector_diff(
-        schema_connector::DiffTarget::Datamodel(vec![("schema.prisma".to_string(), SourceFile::new_static(schema_a))]),
-        schema_connector::DiffTarget::Datamodel(vec![("schema.prisma".to_string(), SourceFile::new_static(schema_b))]),
+        schema_connector::DiffTarget::Datamodel(
+            vec![("schema.prisma".to_string(), SourceFile::new_static(schema_a))],
+            &NoExtensionTypes,
+        ),
+        schema_connector::DiffTarget::Datamodel(
+            vec![("schema.prisma".to_string(), SourceFile::new_static(schema_b))],
+            &NoExtensionTypes,
+        ),
         None,
     );
     expect![[r#"

@@ -17,7 +17,7 @@ use self::{cockroachdb::*, mongodb::*, mssql::*, mysql::*, postgres::*};
 use driver_adapters::DriverAdapter;
 use enumflags2::BitFlags;
 use providers::Provider;
-use psl::{Datasource, builtin_connectors::*};
+use psl::{Datasource, builtin_connectors::*, parser_database::NoExtensionTypes};
 use schema_core::schema_connector::{ConnectorResult, SchemaConnector, SchemaDialect, SchemaFilter};
 use std::env;
 
@@ -154,7 +154,11 @@ pub(crate) async fn diff(
     default_namespace: Option<&str>,
 ) -> ConnectorResult<String> {
     let from = dialect.empty_database_schema();
-    let to = dialect.schema_from_datamodel(vec![("schema.prisma".to_string(), schema.into())], default_namespace)?;
+    let to = dialect.schema_from_datamodel(
+        vec![("schema.prisma".to_string(), schema.into())],
+        default_namespace,
+        &NoExtensionTypes,
+    )?;
     let migration = dialect.diff(from, to, &SchemaFilter::default());
     dialect.render_script(&migration, &Default::default())
 }

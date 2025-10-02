@@ -23,7 +23,7 @@ fn multiple_indexes_with_same_name_on_different_models_are_supported_by_mysql() 
         }
     "#};
 
-    let schema = psl::parse_schema(dml).unwrap();
+    let schema = psl::parse_schema_without_extensions(dml).unwrap();
 
     schema
         .assert_has_model("User")
@@ -48,17 +48,17 @@ fn foreign_keys_and_indexes_with_same_name_on_same_table_are_not_supported_on_my
           id  Int @id
           bId Int
           b   B   @relation(fields: [bId], references: [id], map: "foo")
-          
+
           @@index([bId], map: "foo")
         }
-        
+
         model B {
           id Int @id
           as A[]
         }
     "#};
 
-    psl::parse_schema(dml)
+    psl::parse_schema_without_extensions(dml)
         .unwrap()
         .assert_has_model("A")
         .assert_index_on_fields(&["bId"])
@@ -88,7 +88,7 @@ fn multiple_indexes_with_same_name_on_different_models_are_supported_by_mssql() 
         }
     "#};
 
-    let schema = psl::parse_schema(dml).unwrap();
+    let schema = psl::parse_schema_without_extensions(dml).unwrap();
 
     schema
         .assert_has_model("User")
@@ -126,7 +126,7 @@ fn multiple_constraints_with_same_name_in_different_namespaces_are_supported_by_
         }
     "#};
 
-    let schema = psl::parse_schema(dml).unwrap();
+    let schema = psl::parse_schema_without_extensions(dml).unwrap();
 
     schema
         .assert_has_model("User")

@@ -12,7 +12,7 @@ pub use test_setup::{BitFlags, Capabilities, Tags, runtime::run_with_thread_loca
 use crate::{commands::*, multi_engine_test_api::TestApi as RootTestApi};
 use psl::{
     datamodel_connector::NativeTypeInstance,
-    parser_database::{ScalarType, SourceFile},
+    parser_database::{ExtensionTypes, NoExtensionTypes, ScalarFieldType, SourceFile},
 };
 use quaint::{
     Value,
@@ -187,7 +187,11 @@ impl TestApi {
     }
 
     pub fn diff(&self, params: DiffParams) -> ConnectorResult<DiffResult> {
-        test_setup::runtime::run_with_thread_local_runtime(diff_cli(params, self.connector.host().clone()))
+        test_setup::runtime::run_with_thread_local_runtime(diff_cli(
+            params,
+            self.connector.host().clone(),
+            &NoExtensionTypes,
+        ))
     }
 
     pub fn dump_table(&mut self, table_name: &str) -> ResultSet {
@@ -483,7 +487,10 @@ impl TestApi {
     pub fn expect_sql_for_schema(&mut self, schema: &'static str, sql: &expect_test::Expect) {
         let found = self.connector_diff(
             DiffTarget::Empty,
-            DiffTarget::Datamodel(vec![("schema.prisma".to_string(), SourceFile::new_static(schema))]),
+            DiffTarget::Datamodel(
+                vec![("schema.prisma".to_string(), SourceFile::new_static(schema))],
+                &NoExtensionTypes,
+            ),
             None,
         );
         sql.assert_eq(&found);
@@ -606,8 +613,12 @@ impl TestApi {
         out
     }
 
-    pub fn scalar_type_for_native_type(&self, typ: &NativeTypeInstance) -> ScalarType {
-        self.connector.scalar_type_for_native_type(typ)
+    pub fn scalar_type_for_native_type(
+        &self,
+        typ: &NativeTypeInstance,
+        extension_types: &dyn ExtensionTypes,
+    ) -> Option<ScalarFieldType> {
+        self.connector.scalar_type_for_native_type(typ, extension_types)
     }
 }
 

@@ -11,12 +11,12 @@ fn should_treat_single_values_as_arrays_of_length_one() {
     model Post {
         id     Int @id
         userId Int
-        
+
         user   User @relation(fields: userId, references: id)
     }
     "#;
 
-    let schema = psl::parse_schema(dml).unwrap();
+    let schema = psl::parse_schema_without_extensions(dml).unwrap();
 
     let user_model = schema.assert_has_model("User");
     let post_model = schema.assert_has_model("Post");

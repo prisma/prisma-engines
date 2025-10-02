@@ -2,8 +2,10 @@ mod native_types;
 mod validations;
 
 pub use native_types::CockroachType;
+use parser_database::{ExtensionTypes, ScalarFieldType};
 
 use crate::{
+    ValidatedSchema,
     datamodel_connector::{
         Connector, ConnectorCapabilities, ConnectorCapability, ConstraintScope, Flavour, NativeTypeConstructor,
         NativeTypeInstance, RelationMode, StringFilter,
@@ -65,6 +67,8 @@ const CAPABILITIES: ConnectorCapabilities = enumflags2::make_bitflags!(Connector
     SupportsTxIsolationReadCommitted
 });
 
+const DATE_TIME_DEFAULT: CockroachType = CockroachType::Timestamp(Some(3));
+const BYTES_DEFAULT: CockroachType = CockroachType::Bytes;
 const SCALAR_TYPE_DEFAULTS: &[(ScalarType, CockroachType)] = &[
     (ScalarType::Int, CockroachType::Int4),
     (ScalarType::BigInt, CockroachType::Int8),
@@ -72,8 +76,8 @@ const SCALAR_TYPE_DEFAULTS: &[(ScalarType, CockroachType)] = &[
     (ScalarType::Decimal, CockroachType::Decimal(Some((65, 30)))),
     (ScalarType::Boolean, CockroachType::Bool),
     (ScalarType::String, CockroachType::String(None)),
-    (ScalarType::DateTime, CockroachType::Timestamp(Some(3))),
-    (ScalarType::Bytes, CockroachType::Bytes),
+    (ScalarType::DateTime, DATE_TIME_DEFAULT),
+    (ScalarType::Bytes, BYTES_DEFAULT),
     (ScalarType::Json, CockroachType::JsonB),
 ];
 
@@ -105,10 +109,14 @@ impl Connector for CockroachDatamodelConnector {
         NoAction | Restrict | Cascade | SetNull | SetDefault
     }
 
-    fn scalar_type_for_native_type(&self, native_type: &NativeTypeInstance) -> ScalarType {
+    fn scalar_type_for_native_type(
+        &self,
+        native_type: &NativeTypeInstance,
+        _extension_types: &dyn ExtensionTypes,
+    ) -> Option<ScalarFieldType> {
         let native_type: &CockroachType = native_type.downcast_ref();
 
-        match native_type {
+        let res = match native_type {
             // String
             CockroachType::Char(_) => ScalarType::String,
             CockroachType::CatalogSingleChar => ScalarType::String,
@@ -140,13 +148,19 @@ impl Connector for CockroachDatamodelConnector {
             CockroachType::JsonB => ScalarType::Json,
             // Bytes
             CockroachType::Bytes => ScalarType::Bytes,
-        }
+        };
+        Some(ScalarFieldType::BuiltInScalar(res))
     }
 
-    fn default_native_type_for_scalar_type(&self, scalar_type: &ScalarType) -> Option<NativeTypeInstance> {
+    fn default_native_type_for_scalar_type(
+        &self,
+        scalar_type: &ScalarFieldType,
+        _schema: &ValidatedSchema,
+    ) -> Option<NativeTypeInstance> {
+        let scalar_type = scalar_type.as_builtin_scalar()?;
         let native_type = SCALAR_TYPE_DEFAULTS
             .iter()
-            .find(|(st, _)| st == scalar_type)
+            .find(|(st, _)| st == &scalar_type)
             .map(|(_, native_type)| native_type)
             .ok_or_else(|| format!("Could not find scalar type {scalar_type:?} in SCALAR_TYPE_DEFAULTS"))
             .unwrap();
@@ -154,26 +168,14 @@ impl Connector for CockroachDatamodelConnector {
         Some(NativeTypeInstance::new::<CockroachType>(*native_type))
     }
 
-    fn native_type_is_default_for_scalar_type(
-        &self,
-        native_type: &NativeTypeInstance,
-        scalar_type: &ScalarType,
-    ) -> bool {
-        let native_type: &CockroachType = native_type.downcast_ref();
-
-        SCALAR_TYPE_DEFAULTS
-            .iter()
-            .any(|(st, nt)| scalar_type == st && native_type == nt)
-    }
-
-    fn native_type_to_parts(&self, native_type: &NativeTypeInstance) -> (&'static str, Vec<String>) {
+    fn native_type_to_parts<'t>(&self, native_type: &'t NativeTypeInstance) -> (&'t str, Cow<'t, [String]>) {
         native_type.downcast_ref::<CockroachType>().to_parts()
     }
 
     fn validate_native_type_arguments(
         &self,
         native_type_instance: &NativeTypeInstance,
-        _scalar_type: &ScalarType,
+        _scalar_type: Option<ScalarType>,
         span: ast::Span,
         errors: &mut Diagnostics,
     ) {
@@ -248,8 +250,13 @@ impl Connector for CockroachDatamodelConnector {
         span: ast::Span,
         diagnostics: &mut Diagnostics,
     ) -> Option<NativeTypeInstance> {
-        let native_type = CockroachType::from_parts(name, args, span, diagnostics)?;
-        Some(NativeTypeInstance::new::<CockroachType>(native_type))
+        match CockroachType::from_parts(name, args) {
+            Ok(res) => Some(NativeTypeInstance::new(res)),
+            Err(err) => {
+                diagnostics.push_error(err.into_datamodel_error(span));
+                None
+            }
+        }
     }
 
     fn scalar_filter_name(&self, scalar_type_name: String, native_type_name: Option<&str>) -> Cow<'_, str> {
@@ -327,7 +334,7 @@ impl Connector for CockroachDatamodelConnector {
                 CockroachType::Timetz(_) => super::utils::postgres::parse_timetz(str),
                 _ => unreachable!(),
             },
-            None => self.parse_json_datetime(str, self.default_native_type_for_scalar_type(&ScalarType::DateTime)),
+            None => self.parse_json_datetime(str, Some(NativeTypeInstance::new::<CockroachType>(DATE_TIME_DEFAULT))),
         }
     }
 
@@ -344,7 +351,7 @@ impl Connector for CockroachDatamodelConnector {
                 }
                 _ => unreachable!(),
             },
-            None => self.parse_json_bytes(str, self.default_native_type_for_scalar_type(&ScalarType::Bytes)),
+            None => self.parse_json_bytes(str, Some(NativeTypeInstance::new::<CockroachType>(BYTES_DEFAULT))),
         }
     }
 }

@@ -11,7 +11,7 @@ use sql_query_builder::{Context, SqlQueryBuilder};
 
 pub fn main() -> anyhow::Result<()> {
     let schema_string = include_str!("./schema.prisma");
-    let schema = psl::validate(schema_string.into());
+    let schema = psl::validate_without_extensions(schema_string.into());
 
     if schema.diagnostics.has_errors() {
         anyhow::bail!("invalid schema");

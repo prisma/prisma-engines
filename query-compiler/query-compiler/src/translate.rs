@@ -252,6 +252,7 @@ impl<'a, 'b> NodeTranslator<'a, 'b> {
                 name: SelectionResults::new(diff.right).into_placeholder()?.name,
             }
             .into(),
+            fields: diff.fields.db_names().collect(),
         };
 
         Ok(self.wrap_children_with_expr(expr, children))
@@ -276,6 +277,7 @@ impl<'a, 'b> NodeTranslator<'a, 'b> {
                 name: SelectionResults::new(diff.left).into_placeholder()?.name,
             }
             .into(),
+            fields: diff.fields.db_names().collect(),
         };
 
         Ok(self.wrap_children_with_expr(expr, children))

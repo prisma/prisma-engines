@@ -467,7 +467,7 @@ mod tests {
             User
           }
         "#;
-        let mut schema = psl::validate(schema_str.into());
+        let mut schema = psl::validate_without_extensions(schema_str.into());
 
         schema.diagnostics.to_result().unwrap();
 
@@ -1425,7 +1425,7 @@ mod tests {
             userId String
           }
         "#;
-        let mut schema = psl::validate(schema_str.into());
+        let mut schema = psl::validate_without_extensions(schema_str.into());
 
         schema.diagnostics.to_result().unwrap();
 
@@ -1559,7 +1559,7 @@ mod tests {
             next ListNode?
           }
         "#;
-        let mut schema = psl::validate(schema_str.into());
+        let mut schema = psl::validate_without_extensions(schema_str.into());
 
         schema.diagnostics.to_result().unwrap();
 
@@ -1616,7 +1616,7 @@ mod tests {
             zipCode Int
           }
         "#;
-        let mut schema = psl::validate(schema_str.into());
+        let mut schema = psl::validate_without_extensions(schema_str.into());
 
         schema.diagnostics.to_result().unwrap();
 
@@ -1709,7 +1709,7 @@ mod tests {
             houseNumber String
           }
         "#;
-        let mut schema = psl::validate(schema_str.into());
+        let mut schema = psl::validate_without_extensions(schema_str.into());
 
         schema.diagnostics.to_result().unwrap();
 

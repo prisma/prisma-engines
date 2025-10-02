@@ -165,7 +165,7 @@ impl<'a> Statistics<'a> {
                     let mut field = renderer::datamodel::Field::new("id", "String");
 
                     field.map("_id");
-                    field.native_type(&ctx.datasource().name, "ObjectId", Vec::new());
+                    field.native_type(&ctx.datasource().name, "ObjectId", Vec::<String>::new());
                     field.default(renderer::datamodel::DefaultValue::function(Function::new("auto")));
                     field.id(IdFieldDefinition::new());
 
@@ -286,7 +286,7 @@ impl<'a> Statistics<'a> {
             }
 
             if let Some(native_type) = field_type.native_type() {
-                field.native_type(&ctx.datasource().name, native_type.to_string(), Vec::new());
+                field.native_type(&ctx.datasource().name, native_type.to_string(), Vec::<String>::new());
             }
 
             if field_type.is_array() {

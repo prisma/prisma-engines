@@ -1,4 +1,5 @@
 use colored::Colorize;
+use psl::parser_database::{ExtensionTypes, NoExtensionTypes};
 use schema_core::{
     CoreError, CoreResult, commands::schema_push, json_rpc::types::*, schema_connector::SchemaConnector,
 };
@@ -15,6 +16,7 @@ pub struct SchemaPush<'a> {
     // In eventually-consistent systems, we might need to wait for a while before the system refreshes
     max_ddl_refresh_delay: Option<Duration>,
     schema_filter: SchemaFilter,
+    extensions: &'a dyn ExtensionTypes,
 }
 
 impl<'a> SchemaPush<'a> {
@@ -37,6 +39,7 @@ impl<'a> SchemaPush<'a> {
             migration_id: None,
             max_ddl_refresh_delay: max_refresh_delay,
             schema_filter,
+            extensions: &NoExtensionTypes,
         }
     }
 
@@ -50,6 +53,11 @@ impl<'a> SchemaPush<'a> {
         self
     }
 
+    pub fn extensions(mut self, extensions: &'a dyn ExtensionTypes) -> Self {
+        self.extensions = extensions;
+        self
+    }
+
     fn send_impl(self) -> CoreResult<SchemaPushAssertion> {
         let input = SchemaPushInput {
             schema: SchemasContainer { files: self.files },
@@ -57,7 +65,7 @@ impl<'a> SchemaPush<'a> {
             filters: self.schema_filter,
         };
 
-        let fut = schema_push(input, self.api)
+        let fut = schema_push(input, self.api, self.extensions)
             .instrument(tracing::info_span!("SchemaPush", migration_id = ?self.migration_id));
 
         let output = test_setup::runtime::run_with_thread_local_runtime(fut)?;

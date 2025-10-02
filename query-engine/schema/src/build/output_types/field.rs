@@ -33,13 +33,14 @@ pub(crate) fn map_scalar_output_type<'a>(ctx: &'a QuerySchema, typ: &TypeIdentif
         TypeIdentifier::Decimal => OutputType::decimal(),
         TypeIdentifier::Boolean => OutputType::boolean(),
         TypeIdentifier::Enum(e) => OutputType::enum_type(map_schema_enum_type(ctx, *e)),
+        TypeIdentifier::Extension(_) => unreachable!("No extension field should reach this path"),
         TypeIdentifier::Json => OutputType::json(),
         TypeIdentifier::DateTime => OutputType::date_time(),
         TypeIdentifier::UUID => OutputType::uuid(),
         TypeIdentifier::Int => OutputType::int(),
         TypeIdentifier::Bytes => OutputType::bytes(),
         TypeIdentifier::BigInt => OutputType::bigint(),
-        TypeIdentifier::Unsupported => unreachable!("No unsupported field should reach that path"),
+        TypeIdentifier::Unsupported => unreachable!("No unsupported field should reach this path"),
     };
 
     if list {

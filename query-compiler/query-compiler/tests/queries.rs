@@ -15,7 +15,7 @@ fn queries() {
         println!("running: {test_name}");
 
         let schema_string = include_str!("data/schema.prisma");
-        let schema = psl::validate(schema_string.into());
+        let schema = psl::validate_without_extensions(schema_string.into());
 
         assert!(!schema.diagnostics.has_errors(), "{:?}", schema.diagnostics);
 

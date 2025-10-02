@@ -8,7 +8,7 @@ use psl::{
     ValidatedSchema,
     datamodel_connector::walker_ext_traits::*,
     parser_database::{
-        self as db, ReferentialAction, ScalarFieldType, ScalarType, SortOrder, ast,
+        self as db, ExtensionTypeId, ExtensionTypes, ReferentialAction, ScalarFieldType, ScalarType, SortOrder, ast,
         walkers::{ModelWalker, ScalarFieldWalker},
     },
 };
@@ -19,6 +19,7 @@ pub(crate) fn calculate_sql_schema(
     datamodel: &ValidatedSchema,
     default_namespace: Option<&str>,
     flavour: &dyn SqlSchemaCalculatorFlavour,
+    extension_types: &dyn ExtensionTypes,
 ) -> SqlDatabaseSchema {
     let mut schema = SqlDatabaseSchema::default();
 
@@ -28,12 +29,14 @@ pub(crate) fn calculate_sql_schema(
         flavour,
         model_id_to_table_id: HashMap::with_capacity(datamodel.db.models_count()),
         enum_ids: HashMap::with_capacity(datamodel.db.enums_count()),
+        extension_type_ids: HashMap::new(),
         schemas: Default::default(),
     };
 
     push_namespaces(&mut context, default_namespace);
 
     flavour.calculate_enums(&mut context);
+    flavour.calculate_extension_types(&mut context, extension_types);
 
     // Two types of tables: model tables and implicit M2M relation tables (a.k.a. join tables.).
     push_model_tables(&mut context);
@@ -368,6 +371,7 @@ fn push_relation_tables(ctx: &mut Context<'_>) {
 fn push_column_for_scalar_field(field: ScalarFieldWalker<'_>, table_id: sql::TableId, ctx: &mut Context<'_>) {
     match field.scalar_field_type() {
         ScalarFieldType::Enum(enum_id) => push_column_for_model_enum_scalar_field(field, enum_id, table_id, ctx),
+        ScalarFieldType::Extension(id) => push_column_for_extension_type(field, id, table_id, ctx),
         ScalarFieldType::CompositeType(_) => {
             push_column_for_builtin_scalar_type(field, ScalarType::Json, table_id, ctx)
         }
@@ -466,6 +470,43 @@ fn push_column_for_model_unsupported_scalar_field(
     ctx.schema.describer_schema.push_table_column(table_id, column);
 }
 
+fn push_column_for_extension_type(
+    field: ScalarFieldWalker<'_>,
+    id: ExtensionTypeId,
+    table_id: sql::TableId,
+    ctx: &mut Context<'_>,
+) {
+    let connector = ctx.flavour.datamodel_connector();
+    let native_type = field
+        .native_type_instance(connector)
+        .or_else(|| connector.default_native_type_for_scalar_type(&field.scalar_field_type(), ctx.datamodel));
+
+    let default = field.default_value().map(|def| {
+        // This is validated as @default(dbgenerated("...")), we can unwrap.
+        sql::DefaultValue::db_generated::<String>(unwrap_dbgenerated(def.value()))
+            .with_constraint_name(ctx.flavour.default_constraint_name(def))
+    });
+
+    if let Some(default) = default {
+        let column_id = ctx.schema.describer_schema.next_table_column_id();
+        ctx.schema.describer_schema.push_table_default_value(column_id, default);
+    }
+
+    let column = sql::Column {
+        name: field.database_name().to_owned(),
+        tpe: sql::ColumnType {
+            family: sql::ColumnTypeFamily::Udt(ctx.extension_type_ids[&id]),
+            full_data_type: String::new(),
+            arity: column_arity(field.ast_field().arity),
+            native_type,
+        },
+        auto_increment: field.is_autoincrement() || ctx.flavour.field_is_implicit_autoincrement_primary_key(field),
+        description: None,
+    };
+
+    ctx.schema.describer_schema.push_table_column(table_id, column);
+}
+
 fn push_column_for_builtin_scalar_type(
     field: ScalarFieldWalker<'_>,
     scalar_type: ScalarType,
@@ -485,9 +526,9 @@ fn push_column_for_builtin_scalar_type(
         ScalarType::BigInt => sql::ColumnTypeFamily::BigInt,
     };
 
-    let native_type = field
-        .native_type_instance(connector)
-        .or_else(|| connector.default_native_type_for_scalar_type(&scalar_type));
+    let native_type = field.native_type_instance(connector).or_else(|| {
+        connector.default_native_type_for_scalar_type(&ScalarFieldType::BuiltInScalar(scalar_type), ctx.datamodel)
+    });
 
     enum ColumnDefault {
         Available(sql::DefaultValue),
@@ -606,6 +647,7 @@ pub(crate) struct Context<'a> {
     pub schemas: HashMap<&'a str, sql::NamespaceId>,
     pub model_id_to_table_id: HashMap<db::ModelId, sql::TableId>,
     pub enum_ids: HashMap<db::EnumId, sql::EnumId>,
+    pub extension_type_ids: HashMap<db::ExtensionTypeId, sql::UdtId>,
 }
 
 impl Context<'_> {

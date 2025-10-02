@@ -108,7 +108,7 @@ mod tests {
     }
 
     async fn mongodb_connector(url: &str) -> connector_interface::Result<MongoDb> {
-        let schema = psl::validate(test_schema(url).into());
+        let schema = psl::validate_without_extensions(test_schema(url).into());
         let datasource = &schema.configuration.datasources[0];
         MongoDb::new(datasource, url).await
     }

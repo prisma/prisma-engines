@@ -8,17 +8,17 @@ async fn introspect_set_default_should_warn(api: &mut TestApi) -> TestResult {
     let setup = r#"
       CREATE TABLE `SomeUser` (
           `id` INTEGER NOT NULL AUTO_INCREMENT,
-      
+
           PRIMARY KEY (`id`)
       ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-      
+
       CREATE TABLE `Post` (
           `id` INTEGER NOT NULL AUTO_INCREMENT,
           `userId` INTEGER NULL DEFAULT 3,
-      
+
           PRIMARY KEY (`id`)
       ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-      
+
       ALTER TABLE `Post` ADD CONSTRAINT `Post_userId_fkey`
         FOREIGN KEY (`userId`) REFERENCES `SomeUser`(`id`)
         ON DELETE SET DEFAULT ON UPDATE SET DEFAULT;
@@ -51,7 +51,7 @@ async fn introspect_set_default_should_warn(api: &mut TestApi) -> TestResult {
     "#]];
 
     expected_schema.assert_eq(&api.introspect().await?);
-    let schema = psl::parse_schema(expected_schema.data())?;
+    let schema = psl::parse_schema_without_extensions(expected_schema.data())?;
 
     let warning_messages = schema
         .diagnostics

@@ -18,7 +18,7 @@ fn map_attribute() {
     }
     "#;
 
-    let schema = psl::parse_schema(dml).unwrap();
+    let schema = psl::parse_schema_without_extensions(dml).unwrap();
 
     let user = schema.assert_has_model("User");
     user.assert_mapped_name("user");
@@ -43,7 +43,7 @@ fn map_on_composite_type_field() {
         }
    "#;
 
-    psl::parse_schema(dml)
+    psl::parse_schema_without_extensions(dml)
         .unwrap()
         .assert_has_type("Address")
         .assert_has_scalar_field("fullName")

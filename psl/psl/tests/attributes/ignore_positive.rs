@@ -32,7 +32,7 @@ fn allow_ignore_on_valid_model() {
     }
     "#;
 
-    let datamodel = psl::parse_schema(dml).unwrap();
+    let datamodel = psl::parse_schema_without_extensions(dml).unwrap();
     datamodel.assert_has_model("ModelId").assert_ignored(true);
     datamodel.assert_has_model("ModelUnique").assert_ignored(true);
     datamodel.assert_has_model("ModelCompoundId").assert_ignored(true);
@@ -74,7 +74,7 @@ fn allow_ignore_on_invalid_models() {
     }
     "#;
 
-    let datamodel = psl::parse_schema(dml).unwrap();
+    let datamodel = psl::parse_schema_without_extensions(dml).unwrap();
     datamodel.assert_has_model("ModelNoFields").assert_ignored(true);
     datamodel.assert_has_model("ModelNoId").assert_ignored(true);
     datamodel.assert_has_model("ModelOptionalId").assert_ignored(true);
@@ -114,7 +114,7 @@ fn allow_ignore_on_valid_models_in_relations() {
     }
     "#;
 
-    let datamodel = psl::parse_schema(dml).unwrap();
+    let datamodel = psl::parse_schema_without_extensions(dml).unwrap();
     datamodel
         .assert_has_model("ModelValidA")
         .assert_ignored(true)

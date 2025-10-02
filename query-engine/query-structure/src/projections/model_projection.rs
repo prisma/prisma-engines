@@ -76,7 +76,14 @@ impl ModelProjection {
         self.fields
             .iter()
             .flat_map(|field| match field {
-                Field::Scalar(sf) if matches!(sf.type_identifier(), TypeIdentifier::Unsupported) => Vec::new(),
+                Field::Scalar(sf)
+                    if matches!(
+                        sf.type_identifier(),
+                        TypeIdentifier::Unsupported | TypeIdentifier::Extension(_)
+                    ) =>
+                {
+                    Vec::new()
+                }
                 Field::Scalar(sf) => vec![sf.clone()],
                 Field::Relation(rf) => rf.scalar_fields(),
                 Field::Composite(_) => todo!(), // [Composites] todo

@@ -14,7 +14,7 @@ fn strings_with_quotes_are_unescaped() {
         }
     "#};
 
-    psl::parse_schema(input)
+    psl::parse_schema_without_extensions(input)
         .unwrap()
         .assert_has_model("Category")
         .assert_has_scalar_field("name")
@@ -31,7 +31,7 @@ fn strings_with_newlines_are_unescaped() {
         }
     "#};
 
-    psl::parse_schema(input)
+    psl::parse_schema_without_extensions(input)
         .unwrap()
         .assert_has_model("Category")
         .assert_has_scalar_field("name")
@@ -50,7 +50,7 @@ fn strings_with_escaped_unicode_codepoints_are_unescaped() {
         }
     "#};
 
-    let dml = psl::parse_schema(input).unwrap();
+    let dml = psl::parse_schema_without_extensions(input).unwrap();
     let cat = dml.assert_has_model("Category");
 
     cat.assert_has_scalar_field("name")

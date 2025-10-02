@@ -61,6 +61,7 @@ impl ScalarFieldExt for ScalarField {
                     let schema_name = enum_walker.schema_name().or(ctx.schema_name()).map(ToOwned::to_owned);
                     ValueType::Enum(None, Some(EnumName::new(enum_name, schema_name))).into_value()
                 }
+                TypeIdentifier::Extension(_) => unreachable!("No extension field should reach this path"),
                 TypeIdentifier::Json => Value::null_json(),
                 TypeIdentifier::DateTime => Value::null_datetime(),
                 TypeIdentifier::UUID => Value::null_uuid(),
@@ -78,9 +79,10 @@ impl ScalarFieldExt for ScalarField {
             ),
         };
 
-        let nt_col_type = self.native_type().map(|nt| (nt.name(), parse_scalar_length(self)));
-
-        value.with_native_column_type(nt_col_type)
+        match self.native_type() {
+            Some(nt) => value.with_native_column_type(Some((nt.name(), parse_scalar_length(self)))),
+            None => value,
+        }
     }
 
     fn type_family(&self) -> TypeFamily {
@@ -90,29 +92,29 @@ impl ScalarFieldExt for ScalarField {
             TypeIdentifier::BigInt => TypeFamily::Int,
             TypeIdentifier::Float => TypeFamily::Double,
             TypeIdentifier::Decimal => {
-                let params = self
-                    .native_type()
-                    .map(|nt| nt.args().into_iter())
-                    .and_then(|mut args| Some((args.next()?, args.next()?)))
-                    .and_then(|(p, s)| Some((p.parse::<u8>().ok()?, s.parse::<u8>().ok()?)));
+                let params = self.native_type().and_then(|nt| {
+                    let args = nt.args();
+                    let (p, s) = (args.first()?, args.get(1)?);
+                    Some((p.parse::<u8>().ok()?, s.parse::<u8>().ok()?))
+                });
 
                 TypeFamily::Decimal(params)
             }
             TypeIdentifier::Boolean => TypeFamily::Boolean,
             TypeIdentifier::Enum(_) => TypeFamily::Text(Some(TypeDataLength::Constant(8000))),
+            TypeIdentifier::Extension(_) => unreachable!("No extension field should reach this path"),
             TypeIdentifier::UUID => TypeFamily::Uuid,
             TypeIdentifier::Json => TypeFamily::Text(Some(TypeDataLength::Maximum)),
             TypeIdentifier::DateTime => TypeFamily::DateTime,
             TypeIdentifier::Bytes => TypeFamily::Text(parse_scalar_length(self)),
-            TypeIdentifier::Unsupported => unreachable!("No unsupported field should reach that path"),
+            TypeIdentifier::Unsupported => unreachable!("No unsupported field should reach this path"),
         }
     }
 }
 
 fn parse_scalar_length(sf: &ScalarField) -> Option<TypeDataLength> {
     sf.native_type()
-        .and_then(|nt| nt.args().into_iter().next())
-        .and_then(|len| match len.to_lowercase().as_str() {
+        .and_then(|nt| match nt.args().first()?.to_lowercase().as_str() {
             "max" => Some(TypeDataLength::Maximum),
             num => num.parse().map(TypeDataLength::Constant).ok(),
         })

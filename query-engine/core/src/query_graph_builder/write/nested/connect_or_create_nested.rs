@@ -799,7 +799,9 @@ fn one_to_one_inlined_child(
         // Edge: If node -> read old child node
         graph.create_edge(&if_node, &read_old_child_node, QueryGraphDependency::Then)?;
 
-        let diff_node = graph.create_node(Node::Computation(Computation::empty_diff_left_to_right()));
+        let diff_node = graph.create_node(Node::Computation(Computation::empty_diff_left_to_right(
+            child_model_identifier.clone(),
+        )));
 
         // Edge: Read old child node -> diff node
         graph.create_edge(

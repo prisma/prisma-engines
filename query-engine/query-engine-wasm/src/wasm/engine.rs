@@ -7,7 +7,7 @@ use crate::{
 };
 use driver_adapters::JsObject;
 use js_sys::Function as JsFunction;
-use psl::ConnectorRegistry;
+use psl::{ConnectorRegistry, parser_database::NoExtensionTypes};
 use quaint::connector::ExternalConnector;
 use query_core::{
     TransactionOptions, TxId,
@@ -68,7 +68,7 @@ impl QueryEngine {
         } = options;
 
         // Note: if we used `psl::validate`, we'd add ~1MB to the Wasm artifact (before gzip).
-        let schema = psl::parse_without_validation(datamodel.into(), CONNECTOR_REGISTRY);
+        let schema = psl::parse_without_validation(datamodel.into(), CONNECTOR_REGISTRY, &NoExtensionTypes);
 
         let js_queryable = Arc::new(driver_adapters::queryable_from_js(adapter));
 
