@@ -218,8 +218,12 @@ fn handle_one_to_many(
 
     let read_new_query = utils::read_ids_infallible(child_model.clone(), child_model_identifier.clone(), filter);
     let read_new_node = graph.create_node(read_new_query);
-    let diff_left_to_right_node = graph.create_node(Node::Computation(Computation::empty_diff_left_to_right()));
-    let diff_right_to_left_node = graph.create_node(Node::Computation(Computation::empty_diff_right_to_left()));
+    let diff_left_to_right_node = graph.create_node(Node::Computation(Computation::empty_diff_left_to_right(
+        child_model_identifier.clone(),
+    )));
+    let diff_right_to_left_node = graph.create_node(Node::Computation(Computation::empty_diff_right_to_left(
+        child_model_identifier.clone(),
+    )));
 
     graph.create_edge(&read_old_node, &read_new_node, QueryGraphDependency::ExecutionOrder)?;
 
