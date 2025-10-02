@@ -643,7 +643,7 @@ fn fulltext_index_fields_must_follow_each_other_in_mongo() {
 fn index_without_fields_must_error() {
     let schema = r#"
         generator js {
-          provider = "prisma-client-js"
+          provider = "prisma-client"
         }
 
         datasource db {

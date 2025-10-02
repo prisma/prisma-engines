@@ -58,7 +58,7 @@ async fn remapping_field_names_to_empty(api: &mut TestApi) -> TestResult {
 
     let dm = expect![[r#"
         generator client {
-          provider = "prisma-client-js"
+          provider = "prisma-client"
         }
 
         datasource db {

@@ -11,7 +11,7 @@ fn should_set_default_for_all_scalar_types() {
         }
 
         generator js {
-          provider = "prisma-client-js"
+          provider = "prisma-client"
         }
 
         model Model {
@@ -152,7 +152,7 @@ fn named_default_constraints_should_work_on_sql_server() {
         }
 
         generator js {
-          provider = "prisma-client-js"
+          provider = "prisma-client"
         }
 
         model A {

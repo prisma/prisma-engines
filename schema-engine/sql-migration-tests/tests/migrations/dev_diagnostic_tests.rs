@@ -779,7 +779,7 @@ fn dev_diagnostic_multi_schema_does_not_panic() {
         }}
 
         generator js {{
-            provider = "prisma-client-js"
+            provider = "prisma-client"
             previewFeatures = []
         }}
 

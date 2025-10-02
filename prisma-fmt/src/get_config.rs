@@ -120,7 +120,7 @@ mod tests {
     fn valid_generator_block() {
         let schema = r#"
             generator js {
-                provider = "prisma-client-js"
+                provider = "prisma-client"
             }
         "#;
 
@@ -129,7 +129,7 @@ mod tests {
         });
 
         let expected = expect![[
-            r#"{"config":{"generators":[{"name":"js","provider":{"fromEnvVar":null,"value":"prisma-client-js"},"output":null,"config":{},"binaryTargets":[],"previewFeatures":[],"sourceFilePath":"schema.prisma"}],"datasources":[],"warnings":[]},"errors":[]}"#
+            r#"{"config":{"generators":[{"name":"js","provider":{"fromEnvVar":null,"value":"prisma-client"},"output":null,"config":{},"binaryTargets":[],"previewFeatures":[],"sourceFilePath":"schema.prisma"}],"datasources":[],"warnings":[]},"errors":[]}"#
         ]];
         let response = get_config(&request.to_string());
         expected.assert_eq(&response);
@@ -139,7 +139,7 @@ mod tests {
     fn valid_generator_block_invalid_model() {
         let schema = r#"
             generator js {
-                provider = "prisma-client-js"
+                provider = "prisma-client"
             }
 
             model M {
@@ -150,7 +150,7 @@ mod tests {
         });
 
         let expected = expect![[
-            r#"{"config":{"generators":[{"name":"js","provider":{"fromEnvVar":null,"value":"prisma-client-js"},"output":null,"config":{},"binaryTargets":[],"previewFeatures":[],"sourceFilePath":"schema.prisma"}],"datasources":[],"warnings":[]},"errors":[{"file_name":"schema.prisma","message":"\u001b[1;91merror\u001b[0m: \u001b[1mError validating: This line is invalid. It does not start with any known Prisma schema keyword.\u001b[0m\n  \u001b[1;94m-->\u001b[0m  \u001b[4mschema.prisma:6\u001b[0m\n\u001b[1;94m   | \u001b[0m\n\u001b[1;94m 5 | \u001b[0m\n\u001b[1;94m 6 | \u001b[0m            \u001b[1;91mmodel M {\u001b[0m\n\u001b[1;94m 7 | \u001b[0m        \n\u001b[1;94m   | \u001b[0m\n"}]}"#
+            r#"{"config":{"generators":[{"name":"js","provider":{"fromEnvVar":null,"value":"prisma-client"},"output":null,"config":{},"binaryTargets":[],"previewFeatures":[],"sourceFilePath":"schema.prisma"}],"datasources":[],"warnings":[]},"errors":[{"file_name":"schema.prisma","message":"\u001b[1;91merror\u001b[0m: \u001b[1mError validating: This line is invalid. It does not start with any known Prisma schema keyword.\u001b[0m\n  \u001b[1;94m-->\u001b[0m  \u001b[4mschema.prisma:6\u001b[0m\n\u001b[1;94m   | \u001b[0m\n\u001b[1;94m 5 | \u001b[0m\n\u001b[1;94m 6 | \u001b[0m            \u001b[1;91mmodel M {\u001b[0m\n\u001b[1;94m 7 | \u001b[0m        \n\u001b[1;94m   | \u001b[0m\n"}]}"#
         ]];
         let response = get_config(&request.to_string());
         expected.assert_eq(&response);
@@ -160,7 +160,7 @@ mod tests {
     fn valid_generator_block_invalid_model_field() {
         let schema = r#"
             generator js {
-                provider = "prisma-client-js"
+                provider = "prisma-client"
             }
 
             model M {
@@ -173,7 +173,7 @@ mod tests {
         });
 
         let expected = expect![[
-            r#"{"config":{"generators":[{"name":"js","provider":{"fromEnvVar":null,"value":"prisma-client-js"},"output":null,"config":{},"binaryTargets":[],"previewFeatures":[],"sourceFilePath":"schema.prisma"}],"datasources":[],"warnings":[]},"errors":[{"file_name":"schema.prisma","message":"\u001b[1;91merror\u001b[0m: \u001b[1mError validating model \"M\": This field declaration is invalid. It is either missing a name or a type.\u001b[0m\n  \u001b[1;94m-->\u001b[0m  \u001b[4mschema.prisma:7\u001b[0m\n\u001b[1;94m   | \u001b[0m\n\u001b[1;94m 6 | \u001b[0m            model M {\n\u001b[1;94m 7 | \u001b[0m                \u001b[1;91mfield\u001b[0m\n\u001b[1;94m 8 | \u001b[0m            }\n\u001b[1;94m   | \u001b[0m\n"}]}"#
+            r#"{"config":{"generators":[{"name":"js","provider":{"fromEnvVar":null,"value":"prisma-client"},"output":null,"config":{},"binaryTargets":[],"previewFeatures":[],"sourceFilePath":"schema.prisma"}],"datasources":[],"warnings":[]},"errors":[{"file_name":"schema.prisma","message":"\u001b[1;91merror\u001b[0m: \u001b[1mError validating model \"M\": This field declaration is invalid. It is either missing a name or a type.\u001b[0m\n  \u001b[1;94m-->\u001b[0m  \u001b[4mschema.prisma:7\u001b[0m\n\u001b[1;94m   | \u001b[0m\n\u001b[1;94m 6 | \u001b[0m            model M {\n\u001b[1;94m 7 | \u001b[0m                \u001b[1;91mfield\u001b[0m\n\u001b[1;94m 8 | \u001b[0m            }\n\u001b[1;94m   | \u001b[0m\n"}]}"#
         ]];
         let response = get_config(&request.to_string());
         expected.assert_eq(&response);
@@ -183,7 +183,7 @@ mod tests {
     fn valid_generator_block_invalid_datasource() {
         let schema = r#"
             generator js {
-                provider = "prisma-client-js"
+                provider = "prisma-client"
             }
 
             datasource D {
@@ -194,7 +194,7 @@ mod tests {
         });
 
         let expected = expect![[
-            r#"{"config":{"generators":[{"name":"js","provider":{"fromEnvVar":null,"value":"prisma-client-js"},"output":null,"config":{},"binaryTargets":[],"previewFeatures":[],"sourceFilePath":"schema.prisma"}],"datasources":[],"warnings":[]},"errors":[{"file_name":"schema.prisma","message":"\u001b[1;91merror\u001b[0m: \u001b[1mError validating: This line is invalid. It does not start with any known Prisma schema keyword.\u001b[0m\n  \u001b[1;94m-->\u001b[0m  \u001b[4mschema.prisma:6\u001b[0m\n\u001b[1;94m   | \u001b[0m\n\u001b[1;94m 5 | \u001b[0m\n\u001b[1;94m 6 | \u001b[0m            \u001b[1;91mdatasource D {\u001b[0m\n\u001b[1;94m 7 | \u001b[0m        \n\u001b[1;94m   | \u001b[0m\n"}]}"#
+            r#"{"config":{"generators":[{"name":"js","provider":{"fromEnvVar":null,"value":"prisma-client"},"output":null,"config":{},"binaryTargets":[],"previewFeatures":[],"sourceFilePath":"schema.prisma"}],"datasources":[],"warnings":[]},"errors":[{"file_name":"schema.prisma","message":"\u001b[1;91merror\u001b[0m: \u001b[1mError validating: This line is invalid. It does not start with any known Prisma schema keyword.\u001b[0m\n  \u001b[1;94m-->\u001b[0m  \u001b[4mschema.prisma:6\u001b[0m\n\u001b[1;94m   | \u001b[0m\n\u001b[1;94m 5 | \u001b[0m\n\u001b[1;94m 6 | \u001b[0m            \u001b[1;91mdatasource D {\u001b[0m\n\u001b[1;94m 7 | \u001b[0m        \n\u001b[1;94m   | \u001b[0m\n"}]}"#
         ]];
         let response = get_config(&request.to_string());
         expected.assert_eq(&response);
@@ -206,7 +206,7 @@ mod tests {
             (
                 "generator.prisma",
                 r#"generator js {
-                    provider = "prisma-client-js"
+                    provider = "prisma-client"
                 }"#,
             ),
             (
@@ -223,7 +223,7 @@ mod tests {
         });
 
         let expected = expect![[
-            r#"{"config":{"generators":[{"name":"js","provider":{"fromEnvVar":null,"value":"prisma-client-js"},"output":null,"config":{},"binaryTargets":[],"previewFeatures":[],"sourceFilePath":"generator.prisma"}],"datasources":[{"name":"db","provider":"postgresql","activeProvider":"postgresql","url":{"fromEnvVar":null,"value":"postgresql://example.com/db"},"schemas":[],"sourceFilePath":"datasource.prisma"}],"warnings":[]},"errors":[]}"#
+            r#"{"config":{"generators":[{"name":"js","provider":{"fromEnvVar":null,"value":"prisma-client"},"output":null,"config":{},"binaryTargets":[],"previewFeatures":[],"sourceFilePath":"generator.prisma"}],"datasources":[{"name":"db","provider":"postgresql","activeProvider":"postgresql","url":{"fromEnvVar":null,"value":"postgresql://example.com/db"},"schemas":[],"sourceFilePath":"datasource.prisma"}],"warnings":[]},"errors":[]}"#
         ]];
         let response = get_config(&request.to_string());
         expected.assert_eq(&response);

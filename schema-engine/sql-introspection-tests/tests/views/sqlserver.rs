@@ -22,7 +22,7 @@ async fn simple_view_from_one_table(api: &mut TestApi) -> TestResult {
 
     let expected = expect![[r#"
         generator client {
-          provider        = "prisma-client-js"
+          provider        = "prisma-client"
           previewFeatures = ["views"]
         }
 
@@ -71,7 +71,7 @@ async fn simple_view_with_cte(api: &mut TestApi) -> TestResult {
 
     let expected = expect![[r#"
         generator client {
-          provider        = "prisma-client-js"
+          provider        = "prisma-client"
           previewFeatures = ["views"]
         }
 
@@ -136,7 +136,7 @@ async fn simple_view_from_two_tables(api: &mut TestApi) -> TestResult {
 
     let expected = expect![[r#"
         generator client {
-          provider        = "prisma-client-js"
+          provider        = "prisma-client"
           previewFeatures = ["views"]
         }
 
@@ -242,7 +242,7 @@ async fn views_cannot_have_default_values(api: &mut TestApi) -> TestResult {
 
     let expected = expect![[r#"
         generator client {
-          provider        = "prisma-client-js"
+          provider        = "prisma-client"
           previewFeatures = ["views"]
         }
 

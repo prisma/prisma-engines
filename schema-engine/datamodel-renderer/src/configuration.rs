@@ -91,7 +91,7 @@ mod tests {
 
         config.push_generator(
             file_name.to_owned(),
-            Generator::new("client", Env::value("prisma-client-js")),
+            Generator::new("client", Env::value("prisma-client")),
         );
         config.push_datasource(
             file_name.to_owned(),
@@ -102,7 +102,7 @@ mod tests {
 
         let expected = expect![[r#"
             generator client {
-              provider = "prisma-client-js"
+              provider = "prisma-client"
             }
 
             datasource db {
@@ -119,10 +119,7 @@ mod tests {
         let mut config = Configuration::default();
         let file_name = "schema.prisma";
 
-        config.push_generator(
-            file_name.to_owned(),
-            Generator::new("js", Env::value("prisma-client-js")),
-        );
+        config.push_generator(file_name.to_owned(), Generator::new("js", Env::value("prisma-client")));
         config.push_generator(
             file_name.to_owned(),
             Generator::new("go", Env::value("prisma-client-go")),
@@ -138,7 +135,7 @@ mod tests {
 
         let expected = expect![[r#"
             generator js {
-              provider = "prisma-client-js"
+              provider = "prisma-client"
             }
 
             generator go {

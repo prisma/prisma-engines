@@ -11,7 +11,7 @@ EXEC('/* This is a comment */' +
 EXEC('sp_bindefault ''NEARLY_NOTHING'', ''a.savings''');
 /*
 generator js {
-  provider = "prisma-client-js"
+  provider = "prisma-client"
 }
 
 datasource db {

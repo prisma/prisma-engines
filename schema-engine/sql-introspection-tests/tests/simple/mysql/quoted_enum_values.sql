@@ -7,7 +7,7 @@ CREATE TABLE A (
 )
 /*
 generator js {
-  provider = "prisma-client-js"
+  provider = "prisma-client"
 }
 
 datasource db {

@@ -28,7 +28,7 @@ async fn introspect_set_default_should_warn(api: &mut TestApi) -> TestResult {
 
     let expected_schema = expect![[r#"
         generator client {
-          provider = "prisma-client-js"
+          provider = "prisma-client"
         }
 
         datasource db {

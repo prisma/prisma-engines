@@ -444,7 +444,7 @@ fn bytes_should_not_be_allowed_as_id_on_sql_server() {
         }
 
         generator client {
-            provider = "prisma-client-js"
+            provider = "prisma-client"
         }
 
         model A {
@@ -1004,7 +1004,7 @@ fn length_argument_does_not_work_with_int() {
 fn empty_fields_must_error() {
     let schema = r#"
         generator js {
-          provider = "prisma-client-js"
+          provider = "prisma-client"
         }
 
         datasource db {

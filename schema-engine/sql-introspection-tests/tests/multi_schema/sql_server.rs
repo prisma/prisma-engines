@@ -21,7 +21,7 @@ async fn multiple_schemas_without_schema_property_are_not_introspected(api: &mut
 
     let expected = expect![[r#"
         generator client {
-          provider = "prisma-client-js"
+          provider = "prisma-client"
         }
 
         datasource db {
@@ -91,7 +91,7 @@ async fn multiple_schemas_w_tables_are_introspected(api: &mut TestApi) -> TestRe
 
     let expected = expect![[r#"
         generator client {
-          provider = "prisma-client-js"
+          provider = "prisma-client"
         }
 
         datasource db {
@@ -219,7 +219,7 @@ async fn multiple_schemas_w_duplicate_table_names_are_introspected(api: &mut Tes
 
     let expected = expect![[r#"
         generator client {
-          provider = "prisma-client-js"
+          provider = "prisma-client"
         }
 
         datasource db {
@@ -273,7 +273,7 @@ async fn multiple_schemas_w_cross_schema_are_introspected(api: &mut TestApi) -> 
 
     let expected = expect![[r#"
         generator client {
-          provider = "prisma-client-js"
+          provider = "prisma-client"
         }
 
         datasource db {
@@ -390,7 +390,7 @@ async fn multiple_schemas_w_cross_schema_fks_w_duplicate_names_are_introspected(
 
     let expected = expect![[r#"
         generator client {
-          provider = "prisma-client-js"
+          provider = "prisma-client"
         }
 
         datasource db {
@@ -485,7 +485,7 @@ async fn schemas_with_varying_case(api: &mut TestApi) -> TestResult {
 
     let expected = expect![[r#"
         generator client {
-          provider = "prisma-client-js"
+          provider = "prisma-client"
         }
 
         datasource db {
@@ -588,7 +588,7 @@ async fn defaults_are_introspected(api: &mut TestApi) -> TestResult {
 
     let expected = expect![[r#"
         generator client {
-          provider = "prisma-client-js"
+          provider = "prisma-client"
         }
 
         datasource db {

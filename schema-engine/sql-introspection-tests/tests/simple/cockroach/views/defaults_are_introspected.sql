@@ -7,7 +7,7 @@ CREATE VIEW "B" AS SELECT id, val FROM "A";
 
 /*
 generator js {
-  provider = "prisma-client-js"
+  provider = "prisma-client"
   previewFeatures = ["views"]
 }
 

@@ -860,7 +860,7 @@ fn fulltext_index(api: TestApi) {
         {}
 
         generator client {{
-          provider = "prisma-client-js"
+          provider = "prisma-client"
         }}
 
         model A {{
@@ -888,7 +888,7 @@ fn fulltext_index_with_map(api: TestApi) {
         }
 
         generator client {
-          provider = "prisma-client-js"
+          provider = "prisma-client"
         }
 
         model A {

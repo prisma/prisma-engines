@@ -21,7 +21,7 @@ impl<'a> Generator<'a> {
     /// ```ignore
     /// generator js {
     /// //        ^^ name
-    ///   provider = "prisma-client-js"
+    ///   provider = "prisma-client"
     /// //            ^^^^^^^^^^^^^^^^ provider
     /// }
     /// ```
@@ -79,7 +79,7 @@ impl<'a> Generator<'a> {
     /// ```ignore
     /// /// This here is the documentation.
     /// generator js {
-    ///   provider = "prisma-client-js"
+    ///   provider = "prisma-client"
     /// }
     /// ```
     pub fn documentation(&mut self, docs: impl Into<Cow<'a, str>>) {
@@ -90,7 +90,7 @@ impl<'a> Generator<'a> {
     ///
     /// ```ignore
     /// generator js {
-    ///   provider = "prisma-client-js"
+    ///   provider = "prisma-client"
     ///   custom   = "foo"
     /// //           ^^^^^ value
     /// //^^^^^^ key
@@ -162,7 +162,7 @@ mod tests {
 
     #[test]
     fn kitchen_sink() {
-        let mut generator = Generator::new("client", Env::value("prisma-client-js"));
+        let mut generator = Generator::new("client", Env::value("prisma-client"));
 
         generator.documentation("Here comes the sun.\n\nAnd I say,\nIt's alright.");
 
@@ -196,7 +196,7 @@ mod tests {
             /// And I say,
             /// It's alright.
             generator client {
-              provider        = "prisma-client-js"
+              provider        = "prisma-client"
               output          = "/dev/null"
               previewFeatures = ["postgresqlExtensions"]
               binaryTargets   = [env("BINARY TARGET")]
@@ -214,19 +214,19 @@ mod tests {
 
     #[test]
     fn creates_consistent_ordering() {
-        let mut generator1 = Generator::new("client", Env::value("prisma-client-js"));
+        let mut generator1 = Generator::new("client", Env::value("prisma-client"));
         generator1.push_config_value("first", "A");
         generator1.push_config_value("second", "B");
         let rendered1 = psl::reformat(&format!("{generator1}"), 2).unwrap();
 
-        let mut generator2 = Generator::new("client", Env::value("prisma-client-js"));
+        let mut generator2 = Generator::new("client", Env::value("prisma-client"));
         generator2.push_config_value("second", "B");
         generator2.push_config_value("first", "A");
         let rendered2 = psl::reformat(&format!("{generator2}"), 2).unwrap();
 
         let expected = expect![[r#"
             generator client {
-              provider = "prisma-client-js"
+              provider = "prisma-client"
               first    = "A"
               second   = "B"
             }

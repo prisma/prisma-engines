@@ -12,7 +12,7 @@ CREATE VIEW B AS SELECT id, first_name, last_name FROM A;
 
 /*
 generator js {
-  provider        = "prisma-client-js"
+  provider        = "prisma-client"
   previewFeatures = ["views"]
 }
 

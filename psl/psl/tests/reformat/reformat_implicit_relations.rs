@@ -1022,7 +1022,7 @@ fn mongodb_inline_relations_reformat_as_expected() {
         }
 
         generator js {
-          provider = "prisma-client-js"
+          provider = "prisma-client"
           previewFeatures = ["mongoDb"]
         }
 
@@ -1044,7 +1044,7 @@ fn mongodb_inline_relations_reformat_as_expected() {
         }
 
         generator js {
-          provider        = "prisma-client-js"
+          provider        = "prisma-client"
           previewFeatures = ["mongoDb"]
         }
 
@@ -1068,7 +1068,7 @@ fn mongodb_inline_relations_reformat_as_expected() {
 fn reformat_missing_forward_relation_arguments_with_crln() {
     let schema = r#"
     generator client {
-      provider = "prisma-client-js"
+      provider = "prisma-client"
       output   = "../generated/client"
     }
 
@@ -1090,7 +1090,7 @@ fn reformat_missing_forward_relation_arguments_with_crln() {
 
     let expected = expect![[r#"
         generator client {
-          provider = "prisma-client-js"
+          provider = "prisma-client"
           output   = "../generated/client"
         }
 

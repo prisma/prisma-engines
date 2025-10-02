@@ -39,7 +39,7 @@ pub(crate) fn validate_enum_name(ast_enum: &ast::Enum, diagnostics: &mut Diagnos
 ));
 }
 
-// The source of the following list is from prisma-client-js. Any edit should be done in both places.
+// The source of the following list is from prisma-client. Any edit should be done in both places.
 // https://github.com/prisma/prisma/blob/master/src/packages/client/src/generation/generateClient.ts#L443
 const RESERVED_NAMES: &[&str] = &[
     "PrismaClient",

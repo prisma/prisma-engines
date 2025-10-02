@@ -18,7 +18,7 @@ async fn basic_view_intro(api: &mut TestApi) -> TestResult {
 
     let expected = expect![[r#"
         generator client {
-          provider        = "prisma-client-js"
+          provider        = "prisma-client"
           previewFeatures = ["views"]
         }
 
@@ -114,7 +114,7 @@ async fn defaults_are_introspected(api: &mut TestApi) -> TestResult {
 
     let expected = expect![[r#"
         generator client {
-          provider        = "prisma-client-js"
+          provider        = "prisma-client"
           previewFeatures = ["views"]
         }
 

@@ -430,7 +430,7 @@ mod tests {
     fn schema() -> schema::QuerySchema {
         let schema_str = r#"
           generator client {
-            provider        = "prisma-client-js"
+            provider        = "prisma-client"
           }
 
           datasource db {
@@ -1400,7 +1400,7 @@ mod tests {
     fn composite_schema() -> schema::QuerySchema {
         let schema_str = r#"
           generator client {
-            provider        = "prisma-client-js"
+            provider        = "prisma-client"
           }
 
           datasource db {
@@ -1541,7 +1541,7 @@ mod tests {
     fn recursive_composite_schema() -> schema::QuerySchema {
         let schema_str = r#"
           generator client {
-            provider        = "prisma-client-js"
+            provider        = "prisma-client"
           }
 
           datasource db {
@@ -1595,7 +1595,7 @@ mod tests {
     fn sibling_composite_schema() -> schema::QuerySchema {
         let schema_str = r#"
           generator client {
-            provider        = "prisma-client-js"
+            provider        = "prisma-client"
           }
 
           datasource db {
@@ -1684,7 +1684,7 @@ mod tests {
     fn nested_sibling_composite_schema() -> schema::QuerySchema {
         let schema_str = r#"
           generator client {
-            provider        = "prisma-client-js"
+            provider        = "prisma-client"
           }
 
           datasource db {

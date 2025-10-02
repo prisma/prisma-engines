@@ -237,7 +237,7 @@ fn generator_block(preview_features: &'static [&'static str]) -> String {
 
     format!(
         r#"generator generated_test_preview_flags {{
-                 provider = "prisma-client-js"{preview_feature_string}
+                 provider = "prisma-client"{preview_feature_string}
                }}"#
     )
 }

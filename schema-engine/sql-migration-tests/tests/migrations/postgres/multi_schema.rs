@@ -55,7 +55,7 @@ fn multi_schema_tests(_api: TestApi) {
         }
 
         generator js {
-          provider = "prisma-client-js"
+          provider = "prisma-client"
         }
     "#};
 

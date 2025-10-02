@@ -2,7 +2,7 @@
 fn code_actions_should_not_crash_on_validation_errors_with_multi_schema() {
     let schema = r#"
         generator client {
-          provider        = "prisma-client-js"
+          provider        = "prisma-client"
           previewFeatures = []
         }
 

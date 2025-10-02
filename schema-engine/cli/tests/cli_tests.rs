@@ -614,7 +614,7 @@ fn introspect_single_postgres_force(api: TestApi) {
         }
 
         generator js {
-          provider        = "prisma-client-js"
+          provider        = "prisma-client"
           previewFeatures = ["views"]
         }
     "#};
@@ -689,7 +689,7 @@ fn introspect_single_postgres_force(api: TestApi) {
         stdout.read_line(&mut response).unwrap();
 
         let expected = expect![[r#"
-            {"jsonrpc":"2.0","result":{"schema":{"files":[{"content":"generator js {\n  provider        = \"prisma-client-js\"\n  previewFeatures = [\"views\"]\n}\n\ndatasource db {\n  provider = \"postgres\"\n  url      = env(\"TEST_DATABASE_URL\")\n}\n\nmodel A {\n  id   Int     @id @default(autoincrement())\n  data String?\n}\n\nview B {\n  col Int?\n}\n","path":"./prisma/schema.prisma"}]},"views":[{"definition":"SELECT\n  1 AS col;","name":"B","schema":"public"}],"warnings":null},"id":1}
+            {"jsonrpc":"2.0","result":{"schema":{"files":[{"content":"generator js {\n  provider        = \"prisma-client\"\n  previewFeatures = [\"views\"]\n}\n\ndatasource db {\n  provider = \"postgres\"\n  url      = env(\"TEST_DATABASE_URL\")\n}\n\nmodel A {\n  id   Int     @id @default(autoincrement())\n  data String?\n}\n\nview B {\n  col Int?\n}\n","path":"./prisma/schema.prisma"}]},"views":[{"definition":"SELECT\n  1 AS col;","name":"B","schema":"public"}],"warnings":null},"id":1}
         "#]];
 
         expected.assert_eq(&response);
