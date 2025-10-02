@@ -2,7 +2,7 @@ use pretty_assertions::assert_eq;
 use schema_core::{
     commands::{DiagnoseMigrationHistoryInput, DiagnoseMigrationHistoryOutput, DriftDiagnostic, HistoryDiagnostic},
     json_rpc::types::{CreateMigrationOutput, SchemaFilter},
-    schema_api,
+    schema_api_without_extensions,
 };
 use sql_migration_tests::{test_api::*, utils::list_migrations};
 use std::io::Write;
@@ -811,7 +811,7 @@ fn shadow_database_creation_error_is_special_cased_mysql(api: TestApi) {
         dbport = api.connection_info().port().unwrap_or(3306),
     );
 
-    let migration_api = schema_api(Some(datamodel), None).unwrap();
+    let migration_api = schema_api_without_extensions(Some(datamodel), None).unwrap();
     let migrations_list = list_migrations(&directory.keep()).unwrap();
 
     let output = tok(migration_api.diagnose_migration_history(DiagnoseMigrationHistoryInput {
@@ -862,7 +862,7 @@ fn shadow_database_creation_error_is_special_cased_postgres(api: TestApi) {
     let migrations_list = list_migrations(&directory.keep()).unwrap();
 
     let output = tok(async {
-        schema_api(Some(datamodel.clone()), None)
+        schema_api_without_extensions(Some(datamodel.clone()), None)
             .unwrap()
             .diagnose_migration_history(DiagnoseMigrationHistoryInput {
                 migrations_list,
@@ -921,7 +921,7 @@ fn shadow_database_creation_error_is_special_cased_mssql(api: TestApi) {
             panic!("Failed to connect to mssql more than five times.");
         }
 
-        let result = schema_api(Some(datamodel.clone()), None);
+        let result = schema_api_without_extensions(Some(datamodel.clone()), None);
 
         match result {
             Ok(api) => break api,

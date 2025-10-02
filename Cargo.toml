@@ -74,6 +74,7 @@ env_logger = "0.11"
 futures = "0.3"
 getrandom = "0.2"
 graphql-parser = { git = "https://github.com/prisma/graphql-parser" }
+hashbrown = "0.16"
 heck = "0.4"
 hex = "0.4"
 hyper = "0.14"

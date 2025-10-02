@@ -4,6 +4,7 @@ version = "0.1.0"
 edition.workspace = true
 
 [dependencies]
+schema-core.workspace = true
 schema-connector = { workspace = true, features = [
     "all-native",
 ] }

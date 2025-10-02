@@ -1435,6 +1435,12 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a0d2fde1f7b3d48b8395d5f2de76c18a528bd6a9cdde438df747bfcba3e05d6f"
 
 [[package]]
+name = "foldhash"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "77ce24cb58228fbb8aa041425bb1050850ac19177686ea6e0f41a70416f56fdb"
+
+[[package]]
 name = "foreign-types"
 version = "0.3.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1760,7 +1766,18 @@ checksum = "bf151400ff0baff5465007dd2f3e717f3fe502074ca563069ce3a6629d07b289"
 dependencies = [
  "allocator-api2",
  "equivalent",
- "foldhash",
+ "foldhash 0.1.4",
+]
+
+[[package]]
+name = "hashbrown"
+version = "0.16.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5419bdc4f6a9207fbeba6d11b604d481addf78ecd10c11ad51e76c2f6482748d"
+dependencies = [
+ "allocator-api2",
+ "equivalent",
+ "foldhash 0.2.0",
 ]
 
 [[package]]
@@ -4884,10 +4901,12 @@ name = "schema-core"
 version = "0.1.0"
 dependencies = [
  "async-trait",
+ "bon",
  "chrono",
  "crosstarget-utils",
  "enumflags2",
  "futures",
+ "hashbrown 0.16.0",
  "json-rpc-api",
  "jsonrpc-core",
  "mongodb-schema-connector",
@@ -5336,6 +5355,7 @@ dependencies = [
  "psl",
  "quaint",
  "schema-connector",
+ "schema-core",
  "sql-schema-connector",
  "sql-schema-describer",
  "test-macros",

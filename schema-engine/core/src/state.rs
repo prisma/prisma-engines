@@ -3,12 +3,15 @@
 //! Why this rather than using connectors directly? We must be able to use the schema engine
 //! without a valid schema or database connection for commands like createDatabase and diff.
 
-use crate::{CoreError, CoreResult, GenericApi, SchemaContainerExt, commands, parse_configuration_multi};
+use crate::{
+    CoreError, CoreResult, GenericApi, SchemaContainerExt, commands, extensions::ExtensionTypeConfig,
+    parse_configuration_multi,
+};
 use ::commands::MigrationSchemaCache;
 use enumflags2::BitFlags;
 use futures::stream::{FuturesUnordered, StreamExt};
 use json_rpc::types::*;
-use psl::parser_database::{NoExtensionTypes, SourceFile};
+use psl::parser_database::SourceFile;
 use schema_connector::{ConnectorError, ConnectorHost, IntrospectionResult, Namespaces, SchemaConnector};
 use std::{
     collections::HashMap,
@@ -30,6 +33,7 @@ use tracing_futures::{Instrument, WithSubscriber};
 pub(crate) struct EngineState {
     initial_datamodel: Option<psl::ValidatedSchema>,
     host: Arc<dyn ConnectorHost>,
+    extensions: Arc<ExtensionTypeConfig>,
     // A map from either:
     //
     // - a connection string / url
@@ -75,12 +79,14 @@ impl EngineState {
     pub(crate) fn new(
         initial_datamodels: Option<Vec<(String, SourceFile)>>,
         host: Option<Arc<dyn ConnectorHost>>,
+        extensions: Arc<ExtensionTypeConfig>,
     ) -> Self {
         EngineState {
             initial_datamodel: initial_datamodels
                 .as_deref()
-                .map(psl::validate_multi_file_without_extensions),
+                .map(|dm| psl::validate_multi_file(dm, &*extensions)),
             host: host.unwrap_or_else(|| Arc::new(schema_connector::EmptyHost)),
+            extensions,
             connectors: Default::default(),
             migration_schema_cache: Arc::new(Mutex::new(Default::default())),
         }
@@ -256,6 +262,7 @@ impl GenericApi for EngineState {
 
     async fn create_migration(&self, input: CreateMigrationInput) -> CoreResult<CreateMigrationOutput> {
         let migration_schema_cache: Arc<Mutex<MigrationSchemaCache>> = self.migration_schema_cache.clone();
+        let extensions = Arc::clone(&self.extensions);
         self.with_default_connector(Box::new(move |connector| {
             let span = tracing::info_span!(
                 "CreateMigration",
@@ -264,7 +271,7 @@ impl GenericApi for EngineState {
             );
             Box::pin(async move {
                 let mut migration_schema_cache = migration_schema_cache.lock().await;
-                commands::create_migration(input, connector, &mut migration_schema_cache, &NoExtensionTypes)
+                commands::create_migration(input, connector, &mut migration_schema_cache, &*extensions)
                     .instrument(span)
                     .await
             })
@@ -301,7 +308,7 @@ impl GenericApi for EngineState {
     }
 
     async fn diff(&self, params: DiffParams) -> CoreResult<DiffResult> {
-        commands::diff_cli(params, self.host.clone(), &NoExtensionTypes).await
+        commands::diff_cli(params, self.host.clone(), &*self.extensions).await
     }
 
     async fn drop_database(&self, url: String) -> CoreResult<()> {
@@ -351,10 +358,11 @@ impl GenericApi for EngineState {
 
     async fn evaluate_data_loss(&self, input: EvaluateDataLossInput) -> CoreResult<EvaluateDataLossOutput> {
         let migration_schema_cache: Arc<Mutex<MigrationSchemaCache>> = self.migration_schema_cache.clone();
+        let extensions = Arc::clone(&self.extensions);
         self.with_default_connector(Box::new(|connector| {
             Box::pin(async move {
                 let mut migration_schema_cache = migration_schema_cache.lock().await;
-                commands::evaluate_data_loss(input, connector, &mut migration_schema_cache, &NoExtensionTypes)
+                commands::evaluate_data_loss(input, connector, &mut migration_schema_cache, &*extensions)
                     .instrument(tracing::info_span!("EvaluateDataLoss"))
                     .await
             })
@@ -370,7 +378,7 @@ impl GenericApi for EngineState {
         let composite_type_depth = From::from(params.composite_type_depth);
 
         let ctx = if params.force {
-            let previous_schema = psl::validate_multi_file_without_extensions(&source_files);
+            let previous_schema = psl::validate_multi_file(&source_files, &*self.extensions);
 
             schema_connector::IntrospectionContext::new_config_only(
                 previous_schema,
@@ -379,7 +387,7 @@ impl GenericApi for EngineState {
                 PathBuf::new().join(&params.base_directory_path),
             )
         } else {
-            psl::parse_schema_multi_without_extensions(&source_files).map(|previous_schema| {
+            psl::parse_schema_multi(&source_files, &*self.extensions).map(|previous_schema| {
                 schema_connector::IntrospectionContext::new(
                     previous_schema,
                     composite_type_depth,
@@ -390,6 +398,7 @@ impl GenericApi for EngineState {
         }
         .map_err(ConnectorError::new_schema_parser_error)?;
 
+        let extensions = Arc::clone(&self.extensions);
         self.with_connector_for_schema(
             source_files,
             None,
@@ -400,7 +409,7 @@ impl GenericApi for EngineState {
                         views,
                         warnings,
                         is_empty,
-                    } = connector.introspect(&ctx, &NoExtensionTypes).await?;
+                    } = connector.introspect(&ctx, &*extensions).await?;
 
                     if is_empty {
                         Err(ConnectorError::into_introspection_result_empty_error())
@@ -513,11 +522,13 @@ impl GenericApi for EngineState {
     }
 
     async fn schema_push(&self, input: SchemaPushInput) -> CoreResult<SchemaPushOutput> {
+        let extensions = Arc::clone(&self.extensions);
         self.with_default_connector(Box::new(move |connector| {
-            Box::pin(
-                commands::schema_push(input, connector, &NoExtensionTypes)
-                    .instrument(tracing::info_span!("SchemaPush")),
-            )
+            Box::pin(async move {
+                commands::schema_push(input, connector, &*extensions)
+                    .instrument(tracing::info_span!("SchemaPush"))
+                    .await
+            })
         }))
         .await
     }

@@ -12,7 +12,7 @@ fn introspect_partition_tables() {
     ))
     .unwrap();
 
-    let me = schema_core::schema_api(None, None).unwrap();
+    let me = schema_core::schema_api_without_extensions(None, None).unwrap();
 
     let script = r#"
 CREATE TABLE IF NOT EXISTS blocks
@@ -97,7 +97,7 @@ fn inherited_table_regression_fix() {
     ))
     .unwrap();
 
-    let me = schema_core::schema_api(None, None).unwrap();
+    let me = schema_core::schema_api_without_extensions(None, None).unwrap();
 
     let script = r#"
 CREATE TABLE cities (
@@ -173,7 +173,7 @@ fn inherited_table_detect_primary_key() {
     ))
     .unwrap();
 
-    let me = schema_core::schema_api(None, None).unwrap();
+    let me = schema_core::schema_api_without_extensions(None, None).unwrap();
 
     let script = r#"
 CREATE TABLE cities (

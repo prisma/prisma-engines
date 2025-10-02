@@ -12,7 +12,7 @@ use std::str::FromStr;
 use url::Url;
 
 pub(crate) async fn connection_error(schema: String) -> ConnectorError {
-    let mut api = match schema_core::schema_api(Some(schema.clone()), None) {
+    let mut api = match schema_core::schema_api_without_extensions(Some(schema.clone()), None) {
         Ok(api) => api,
         Err(err) => return err,
     };
@@ -474,7 +474,7 @@ async fn connection_string_problems_give_a_nice_error() {
             provider.1
         );
 
-        let mut api = schema_core::schema_api(Some(dm.clone()), None).unwrap();
+        let mut api = schema_core::schema_api_without_extensions(Some(dm.clone()), None).unwrap();
         let error = api
             .ensure_connection_validity(EnsureConnectionValidityParams {
                 datasource: DatasourceParam::Schema(SchemasContainer {
@@ -537,7 +537,7 @@ async fn bad_connection_string_in_datamodel_returns_nice_error() {
         }
     "#};
 
-    let error = match schema_core::schema_api(Some(schema.to_string()), None) {
+    let error = match schema_core::schema_api_without_extensions(Some(schema.to_string()), None) {
         Ok(_) => panic!("Did not error"),
         Err(e) => e,
     };

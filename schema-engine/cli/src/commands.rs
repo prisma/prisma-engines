@@ -1,7 +1,12 @@
+use std::sync::Arc;
+
 use crate::logger::log_error_and_exit;
 use base64::prelude::*;
 use schema_connector::ConnectorError;
-use schema_core::json_rpc::types::{DatasourceParam, UrlContainer};
+use schema_core::{
+    ExtensionTypeConfig,
+    json_rpc::types::{DatasourceParam, UrlContainer},
+};
 use structopt::StructOpt;
 use tokio_util::sync::CancellationToken;
 use user_facing_errors::common::SchemaParserError;
@@ -16,8 +21,8 @@ pub(crate) struct Cli {
 }
 
 impl Cli {
-    pub(crate) async fn run(self, shutdown_token: CancellationToken) {
-        match self.run_inner(shutdown_token).await {
+    pub(crate) async fn run(self, shutdown_token: CancellationToken, extensions: Arc<ExtensionTypeConfig>) {
+        match self.run_inner(shutdown_token, extensions).await {
             Ok(msg) => {
                 tracing::info!("{}", msg);
             }
@@ -25,8 +30,12 @@ impl Cli {
         }
     }
 
-    pub(crate) async fn run_inner(self, shutdown_token: CancellationToken) -> Result<String, ConnectorError> {
-        let mut api = schema_core::schema_api(None, None)?;
+    pub(crate) async fn run_inner(
+        self,
+        shutdown_token: CancellationToken,
+        extensions: Arc<ExtensionTypeConfig>,
+    ) -> Result<String, ConnectorError> {
+        let mut api = schema_core::schema_api(None, None, extensions)?;
 
         let work = async {
             match self.command {

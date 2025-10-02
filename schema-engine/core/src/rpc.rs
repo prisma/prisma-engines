@@ -1,4 +1,4 @@
-use crate::{CoreError, CoreResult, GenericApi};
+use crate::{CoreError, CoreResult, GenericApi, extensions::ExtensionTypeConfig};
 use json_rpc::method_names::*;
 use jsonrpc_core::{IoHandler, Params, types::error::Error as JsonRpcError};
 use psl::SourceFile;
@@ -16,6 +16,7 @@ impl RpcApi {
     pub fn new(
         initial_datamodels: Option<Vec<(String, String)>>,
         host: Arc<dyn schema_connector::ConnectorHost>,
+        extension_config: Arc<ExtensionTypeConfig>,
     ) -> Self {
         let mut io_handler = IoHandler::default();
         let initial_datamodels = initial_datamodels.map(|schemas| {
@@ -28,6 +29,7 @@ impl RpcApi {
         let api = Arc::new(RwLock::new(crate::state::EngineState::new(
             initial_datamodels,
             Some(host),
+            extension_config,
         )));
 
         for cmd in METHOD_NAMES {
