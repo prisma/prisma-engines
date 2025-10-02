@@ -250,6 +250,7 @@ pub enum FieldOperation {
     Subtract(PrismaValue),
     Multiply(PrismaValue),
     Divide(PrismaValue),
+    Now,
 }
 
 impl TryFrom<ScalarWriteOperation> for FieldOperation {
@@ -262,6 +263,7 @@ impl TryFrom<ScalarWriteOperation> for FieldOperation {
             ScalarWriteOperation::Subtract(val) => Ok(Self::Subtract(val)),
             ScalarWriteOperation::Multiply(val) => Ok(Self::Multiply(val)),
             ScalarWriteOperation::Divide(val) => Ok(Self::Divide(val)),
+            ScalarWriteOperation::Now => Ok(Self::Now),
             ScalarWriteOperation::Field(_) | ScalarWriteOperation::Unset(_) => Err(UnsupportedScalarWriteOperation(op)),
         }
     }
