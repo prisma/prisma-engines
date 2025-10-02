@@ -164,7 +164,7 @@ async fn a_table_with_enum_default_values(api: &mut TestApi) -> TestResult {
 
     let dm = expect![[r#"
         generator client {
-          provider = "prisma-client-js"
+          provider = "prisma-client"
         }
 
         datasource db {
@@ -270,7 +270,7 @@ async fn an_enum_with_invalid_value_names_should_have_them_commented_out(api: &m
     api.raw_cmd(sql).await;
     let expected = expect![[r#"
         generator client {
-          provider = "prisma-client-js"
+          provider = "prisma-client"
         }
 
         datasource db {
@@ -305,7 +305,7 @@ async fn enum_array_type(api: &mut TestApi) -> TestResult {
 
     let expectation = expect![[r#"
         generator client {
-          provider = "prisma-client-js"
+          provider = "prisma-client"
         }
 
         datasource db {

@@ -10,7 +10,7 @@ fn trailing_comments_allowed_in_configuration_blocks() {
       }
 
       generator js {
-        provider        = "prisma-client-js" // optional
+        provider        = "prisma-client" // optional
         previewFeatures = ["referentialIntegrity"] /* [] */
       }     
     "#;

@@ -55,7 +55,7 @@ pub(crate) fn generator_block_string(features: BitFlags<PreviewFeature>) -> Stri
     format!(
         r#"
           generator js {{
-            provider        = "prisma-client-js"
+            provider        = "prisma-client"
             previewFeatures = [{features}]
           }}
       "#,

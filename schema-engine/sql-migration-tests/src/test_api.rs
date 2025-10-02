@@ -580,7 +580,7 @@ impl TestApi {
 
         let generator_block = format!(
             r#"generator client {{
-                 provider = "prisma-client-js"{preview_feature_string}
+                 provider = "prisma-client"{preview_feature_string}
                }}"#
         );
         generator_block

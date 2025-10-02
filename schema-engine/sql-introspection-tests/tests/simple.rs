@@ -162,7 +162,7 @@ source .test_database_urls/mysql_5_6
     let generator = if preview_features.is_empty() {
         r#"
             generator js {
-                provider = "prisma-client-js"
+                provider = "prisma-client"
             }
         "#
         .to_string()
@@ -176,7 +176,7 @@ source .test_database_urls/mysql_5_6
         formatdoc!(
             r#"
             generator js {{
-                provider = "prisma-client-js"
+                provider = "prisma-client"
                 previewFeatures = [{features}]
             }}
         "#

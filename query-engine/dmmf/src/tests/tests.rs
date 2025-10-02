@@ -69,7 +69,7 @@ fn enum_docs() {
 fn unsupported_in_composite_type() {
     let schema = r#"
         generator client {
-            provider = "prisma-client-js"
+            provider = "prisma-client"
         }
 
         datasource db {

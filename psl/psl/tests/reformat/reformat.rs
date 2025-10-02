@@ -873,7 +873,7 @@ fn composite_types_are_not_reformatted_into_models() {
 fn reformatting_extended_indexes_works() {
     let input = indoc! {r#"
         generator client {
-          provider        = "prisma-client-js"
+          provider        = "prisma-client"
           binaryTargets   = ["darwin"]
         }
         
@@ -906,7 +906,7 @@ fn reformatting_extended_indexes_works() {
 
     let expected = expect![[r#"
         generator client {
-          provider      = "prisma-client-js"
+          provider      = "prisma-client"
           binaryTargets = ["darwin"]
         }
 
@@ -944,7 +944,7 @@ fn reformatting_extended_indexes_works() {
 fn reformatting_with_empty_indexes() {
     let schema = r#"
         generator js {
-          provider = "prisma-client-js"
+          provider = "prisma-client"
         }
 
         datasource db {
@@ -965,7 +965,7 @@ fn reformatting_with_empty_indexes() {
 
     let expected = expect![[r#"
         generator js {
-          provider = "prisma-client-js"
+          provider = "prisma-client"
         }
 
         datasource db {
@@ -997,7 +997,7 @@ fn test_composite_types_in_models() {
 
         generator js {
           previewFeatures = ["mongodb"]
-          provider        = "prisma-client-js"
+          provider        = "prisma-client"
         }
 
         model A {
@@ -1025,7 +1025,7 @@ fn test_composite_types_in_models() {
 
         generator js {
           previewFeatures = ["mongodb"]
-          provider        = "prisma-client-js"
+          provider        = "prisma-client"
         }
 
         model A {
@@ -1100,7 +1100,7 @@ fn composite_type_native_types_roundtrip() {
         }
 
         generator client {
-            provider        = "prisma-client-js"
+            provider        = "prisma-client"
             previewFeatures = ["mongoDb"]
         }
 
@@ -1124,7 +1124,7 @@ fn composite_type_native_types_roundtrip() {
         }
 
         generator client {
-          provider        = "prisma-client-js"
+          provider        = "prisma-client"
           previewFeatures = ["mongoDb"]
         }
 
@@ -1186,7 +1186,7 @@ fn rewrites_legacy_list_and_required_type_arities() {
 fn attribute_arguments_reformatting_is_idempotent() {
     let schema = r#"
         generator client {
-          provider        = "prisma-client-js"
+          provider        = "prisma-client"
           previewFeatures = "mongodb"
         }
 
@@ -1220,7 +1220,7 @@ fn attribute_arguments_reformatting_is_idempotent() {
 
     let expected = expect![[r#"
         generator client {
-          provider        = "prisma-client-js"
+          provider        = "prisma-client"
           previewFeatures = "mongodb"
         }
 

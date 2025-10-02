@@ -22,7 +22,7 @@ async fn aragon_test_cockroachdb(api: &mut TestApi) -> TestResult {
 
     let schema = expect![[r#"
         generator client {
-          provider = "prisma-client-js"
+          provider = "prisma-client"
         }
 
         datasource db {
@@ -89,7 +89,7 @@ async fn noalyss_folder_test_cockroachdb(api: &mut TestApi) -> TestResult {
 
     let schema = expect![[r#"
         generator client {
-          provider = "prisma-client-js"
+          provider = "prisma-client"
         }
 
         datasource db {

@@ -17,7 +17,7 @@ async fn simple_view_from_one_table(api: &mut TestApi) -> TestResult {
 
     let expected = expect![[r#"
         generator client {
-          provider        = "prisma-client-js"
+          provider        = "prisma-client"
           previewFeatures = ["views"]
         }
 
@@ -84,7 +84,7 @@ async fn simple_view_from_two_tables(api: &mut TestApi) -> TestResult {
 
     let expected = expect![[r#"
         generator client {
-          provider        = "prisma-client-js"
+          provider        = "prisma-client"
           previewFeatures = ["views"]
         }
 
@@ -182,7 +182,7 @@ async fn defaults_are_introspected(api: &mut TestApi) -> TestResult {
 
     let expected = expect![[r#"
         generator client {
-          provider        = "prisma-client-js"
+          provider        = "prisma-client"
           previewFeatures = ["views"]
         }
 
@@ -222,7 +222,7 @@ async fn views_are_rendered_with_enums(api: &mut TestApi) -> TestResult {
 
     let expected = expect![[r#"
         generator client {
-          provider        = "prisma-client-js"
+          provider        = "prisma-client"
           previewFeatures = ["views"]
         }
 
@@ -297,7 +297,7 @@ async fn invalid_field_names_trigger_warnings(api: &mut TestApi) -> TestResult {
 
     let expected = expect![[r#"
         generator client {
-          provider        = "prisma-client-js"
+          provider        = "prisma-client"
           previewFeatures = ["views"]
         }
 

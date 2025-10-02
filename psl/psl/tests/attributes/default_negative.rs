@@ -521,7 +521,7 @@ fn named_default_constraints_should_not_work_on_non_sql_server() {
         }
 
         generator js {
-          provider = "prisma-client-js"
+          provider = "prisma-client"
         }
 
         model A {
@@ -553,7 +553,7 @@ fn named_default_constraints_are_not_allowed_on_identity() {
         }
 
         generator js {
-          provider = "prisma-client-js"
+          provider = "prisma-client"
         }
 
         model A {
@@ -584,7 +584,7 @@ fn named_default_constraints_cannot_have_duplicate_names() {
         }
 
         generator js {
-          provider = "prisma-client-js"
+          provider = "prisma-client"
         }
 
         model A {
@@ -627,7 +627,7 @@ fn named_default_constraints_cannot_clash_with_pk_names() {
         }
 
         generator js {
-          provider = "prisma-client-js"
+          provider = "prisma-client"
         }
 
         model A {

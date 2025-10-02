@@ -155,7 +155,7 @@ async fn multiple_schemas_w_duplicate_table_names_are_introspected(api: &mut Tes
 
     let expected = expect![[r#"
         generator client {
-          provider = "prisma-client-js"
+          provider = "prisma-client"
         }
 
         datasource db {
@@ -211,7 +211,7 @@ async fn multiple_schemas_w_duplicate_sanitized_table_names_are_introspected(api
 
     let expected = expect![[r#"
         generator client {
-          provider = "prisma-client-js"
+          provider = "prisma-client"
         }
 
         datasource db {
@@ -408,7 +408,7 @@ async fn multiple_schemas_w_enums_are_introspected(api: &mut TestApi) -> TestRes
 
     let expected = expect![[r#"
         generator client {
-          provider = "prisma-client-js"
+          provider = "prisma-client"
         }
 
         datasource db {
@@ -456,7 +456,7 @@ async fn multiple_schemas_w_duplicate_enums_are_introspected(api: &mut TestApi) 
 
     let expected = expect![[r#"
         generator client {
-          provider = "prisma-client-js"
+          provider = "prisma-client"
         }
 
         datasource db {
@@ -725,7 +725,7 @@ async fn same_table_name_with_relation_in_two_schemas(api: &mut TestApi) -> Test
 
     let expected = expect![[r#"
         generator client {
-          provider = "prisma-client-js"
+          provider = "prisma-client"
         }
 
         datasource db {

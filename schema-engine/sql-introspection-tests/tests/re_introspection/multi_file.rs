@@ -315,7 +315,7 @@ async fn reintrospect_force_invalid_config(api: &mut TestApi) -> TestResult {
       }
 
       generator client {
-        provider = "prisma-client-js"
+        provider = "prisma-client"
         previewFeatures = []
       }
     "#};
@@ -544,7 +544,7 @@ async fn introspect_multi_view_preview_feature_is_required(api: &mut TestApi) ->
     let expected = expect![[r#"
         // file: schema.prisma
         generator client {
-          provider = "prisma-client-js"
+          provider = "prisma-client"
         }
 
         datasource db {
@@ -835,7 +835,7 @@ async fn reintrospect_keep_configuration_in_same_file(api: &mut TestApi) -> Test
         ------
         // file: user.prisma
         generator client {
-          provider = "prisma-client-js"
+          provider = "prisma-client"
         }
 
         datasource db {
@@ -860,7 +860,7 @@ async fn reintrospect_keep_configuration_in_same_file(api: &mut TestApi) -> Test
     let expected = expect![[r#"
         // file: post.prisma
         generator client {
-          provider = "prisma-client-js"
+          provider = "prisma-client"
         }
 
         datasource db {
@@ -920,7 +920,7 @@ async fn reintrospect_keep_configuration_when_spread_across_files(api: &mut Test
     let expected = expect![[r#"
         // file: post.prisma
         generator client {
-          provider = "prisma-client-js"
+          provider = "prisma-client"
         }
 
         model Post {
@@ -960,7 +960,7 @@ async fn reintrospect_keep_configuration_when_spread_across_files(api: &mut Test
         ------
         // file: user.prisma
         generator client {
-          provider = "prisma-client-js"
+          provider = "prisma-client"
         }
 
         model User {
@@ -1005,7 +1005,7 @@ async fn reintrospect_keep_configuration_when_no_models(api: &mut TestApi) -> Te
     let expected = expect![[r#"
         // file: post.prisma
         generator client {
-          provider = "prisma-client-js"
+          provider = "prisma-client"
         }
         ------
         // file: user.prisma
@@ -1037,7 +1037,7 @@ async fn reintrospect_keep_configuration_when_no_models(api: &mut TestApi) -> Te
         ------
         // file: user.prisma
         generator client {
-          provider = "prisma-client-js"
+          provider = "prisma-client"
         }
 
         model User {
@@ -1083,7 +1083,7 @@ async fn reintrospect_empty_multi_file(api: &mut TestApi) -> TestResult {
         ------
         // file: user.prisma
         generator client {
-          provider = "prisma-client-js"
+          provider = "prisma-client"
         }
 
         datasource db {

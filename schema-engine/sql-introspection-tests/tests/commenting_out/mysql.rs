@@ -83,7 +83,7 @@ async fn remapping_field_names_to_empty_mysql(api: &mut TestApi) -> TestResult {
 
     let dm = expect![[r#"
         generator client {
-          provider = "prisma-client-js"
+          provider = "prisma-client"
         }
 
         datasource db {
@@ -129,7 +129,7 @@ PARTITIONS 2; "#,
 
     let expected = expect![[r#"
         generator client {
-          provider = "prisma-client-js"
+          provider = "prisma-client"
         }
 
         datasource db {

@@ -9,7 +9,7 @@ CREATE TABLE [dbo].[User] (
 
 /*
 generator js {
-  provider = "prisma-client-js"
+  provider = "prisma-client"
 }
 
 datasource db {

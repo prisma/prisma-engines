@@ -746,7 +746,7 @@ async fn casing_should_not_lead_to_mix_ups(api: &mut TestApi) -> TestResult {
 
     let expectation = expect![[r#"
         generator client {
-          provider = "prisma-client-js"
+          provider = "prisma-client"
         }
 
         datasource db {

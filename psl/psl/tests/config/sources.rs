@@ -420,7 +420,7 @@ fn new_lines_in_source_must_work() {
 fn multischema_must_work() {
     let schema = indoc! {r#"
       generator client {
-        provider        = "prisma-client-js"
+        provider        = "prisma-client"
         previewFeatures = []
       }
 
@@ -687,7 +687,7 @@ fn referential_integrity_works() {
         }
 
         generator client {
-          provider = "prisma-client-js"
+          provider = "prisma-client"
         }
     "#};
 
@@ -706,7 +706,7 @@ fn relation_mode_works() {
         }
 
         generator client {
-          provider = "prisma-client-js"
+          provider = "prisma-client"
         }
     "#};
 
@@ -724,7 +724,7 @@ fn relation_mode_default() {
         }
 
         generator client {
-          provider = "prisma-client-js"
+          provider = "prisma-client"
         }
     "#};
 

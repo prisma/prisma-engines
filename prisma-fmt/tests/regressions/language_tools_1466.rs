@@ -7,7 +7,7 @@ fn code_actions_should_not_crash_on_validation_errors_with_mongodb() {
         }
 
         generator client {
-          provider = "prisma-client-js"
+          provider = "prisma-client"
         }
 
         model A {
