@@ -15,7 +15,7 @@ jobs:
     uses: ./.github/workflows/select-prisma-branch.yml
 
   rust-query-engine-tests:
-    name: '${{ matrix.partition }}'
+    name: ${{ matrix.relation_load_strategy }} ${{ matrix.partition }}
     needs: select_prisma_branch
 
     strategy:

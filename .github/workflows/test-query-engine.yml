@@ -250,3 +250,4 @@ jobs:
     uses: ./.github/workflows/test-driver-adapters-template.yml
     with:
       setup_task: ${{ matrix.adapter.setup_task }}
+      relation_load_strategy: ${{ matrix.adapter.relation_load_strategy }}
