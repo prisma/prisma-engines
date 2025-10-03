@@ -237,6 +237,8 @@ jobs:
             setup_task: 'dev-mssql-wasm'
           - name: 'mariadb (wasm)'
             setup_task: 'dev-mariadb-wasm'
+          - name: 'mariadb-mysql (wasm)'
+            setup_task: 'dev-mariadb-mysql-wasm'
           - name: 'pg-cockroachdb (wasm)'
             setup_task: 'dev-pg-cockroachdb-wasm'
     name: ${{ matrix.adapter.name }}
