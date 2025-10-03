@@ -285,6 +285,7 @@ impl ConnectorVersion {
                 | Self::Sqlite(Some(SqliteVersion::BetterSQLite3))
                 | Self::SqlServer(Some(SqlServerVersion::MssqlJsWasm))
                 | Self::MySql(Some(MySqlVersion::MariaDbJsWasm))
+                | Self::MySql(Some(MySqlVersion::MariaDbMysqlJsWasm))
                 | Self::CockroachDb(Some(CockroachDbVersion::PgJsWasm))
         )
     }
