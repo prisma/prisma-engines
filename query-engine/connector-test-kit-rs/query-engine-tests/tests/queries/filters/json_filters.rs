@@ -242,7 +242,7 @@ mod json_filters {
 
         match runner.connector_version() {
             // MariaDB does not support finding arrays in arrays, unlike MySQL
-            ConnectorVersion::MySql(Some(MySqlVersion::MariaDb)) => {
+            ConnectorVersion::MySql(Some(MySqlVersion::MariaDb | MySqlVersion::MariaDbJsWasm)) => {
                 let res = run_query!(runner, jsonq(&runner, r#"array_contains: "[[1, 2]]" "#, None));
                 insta::allow_duplicates! {
                     insta::assert_snapshot!(
