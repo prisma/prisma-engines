@@ -5,7 +5,7 @@ datasource db {
 }
 
 generator js {
-    provider        = "prisma-client-js" // optional
+    provider        = "prisma-client" // optional
     previewFeatures = ["referentialIntegrity"] /* [] */
 }     
 
