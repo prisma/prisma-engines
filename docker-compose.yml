@@ -297,7 +297,6 @@ services:
       MYSQL_USER: root
       MYSQL_ROOT_PASSWORD: prisma
       MYSQL_DATABASE: prisma
-    command: --max-connections=256
     ports:
       - '3308:3306'
     networks:
@@ -311,7 +310,6 @@ services:
       MYSQL_USER: root
       MYSQL_ROOT_PASSWORD: prisma
       MYSQL_DATABASE: prisma
-    command: --max-connections=256
     ports:
       - '3308:3306'
     networks:
