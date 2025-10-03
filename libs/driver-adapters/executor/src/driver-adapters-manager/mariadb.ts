@@ -32,8 +32,7 @@ export class MariaDbManager implements DriverAdaptersManager {
   }
 
   async connect() {
-    this.#adapter = await this.#factory.connect()
-    return this.#adapter
+    return (this.#adapter ??= await this.#factory.connect())
   }
 
   async teardown() {
@@ -56,6 +55,6 @@ function mariadbOptions(urlStr: string) {
     database,
     host,
     port: Number(port),
-    connectionLimit: 4,
+    connectionLimit: 2,
   }
 }

@@ -68,7 +68,10 @@ mod relation_load_strategy_batch {
         compacted_query(runner).await
     }
 
-    #[connector_test(capabilities(CorrelatedSubqueries), exclude(Mysql("5.6", "5.7", "mariadb")))]
+    #[connector_test(
+        capabilities(CorrelatedSubqueries),
+        exclude(Mysql("5.6", "5.7", "mariadb", "mariadb.js.wasm"))
+    )]
     async fn compacted_query_subquery(runner: Runner) -> TestResult<()> {
         compacted_query(runner).await
     }
@@ -104,7 +107,10 @@ mod relation_load_strategy_batch {
         compacted_join(runner).await
     }
 
-    #[connector_test(capabilities(CorrelatedSubqueries), exclude(Mysql("5.6", "5.7", "mariadb")))]
+    #[connector_test(
+        capabilities(CorrelatedSubqueries),
+        exclude(Mysql("5.6", "5.7", "mariadb", "mariadb.js.wasm"))
+    )]
     async fn compacted_join_subquery(runner: Runner) -> TestResult<()> {
         compacted_join(runner).await
     }
@@ -140,7 +146,10 @@ mod relation_load_strategy_batch {
         mixed_rls_does_not_compact(runner).await
     }
 
-    #[connector_test(capabilities(CorrelatedSubqueries), exclude(Mysql("5.6", "5.7", "mariadb")))]
+    #[connector_test(
+        capabilities(CorrelatedSubqueries),
+        exclude(Mysql("5.6", "5.7", "mariadb", "mariadb.js.wasm"))
+    )]
     async fn mixed_rls_does_not_compact_subquery(runner: Runner) -> TestResult<()> {
         mixed_rls_does_not_compact(runner).await
     }
