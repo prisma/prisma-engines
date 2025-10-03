@@ -374,7 +374,7 @@ async fn introspect_extension_type(api: &mut TestApi) -> TestResult {
 
     let expectation = expect![[r#"
         generator client {
-          provider = "prisma-client-js"
+          provider = "prisma-client"
         }
 
         datasource db {
@@ -412,7 +412,7 @@ async fn introspect_specific_extension_type_by_type_modifier(api: &mut TestApi) 
 
     let expectation = expect![[r#"
         generator client {
-          provider = "prisma-client-js"
+          provider = "prisma-client"
         }
 
         datasource db {
@@ -453,7 +453,7 @@ async fn introspect_extension_type_with_modifier(api: &mut TestApi) -> TestResul
 
     let expectation = expect![[r#"
         generator client {
-          provider = "prisma-client-js"
+          provider = "prisma-client"
         }
 
         datasource db {

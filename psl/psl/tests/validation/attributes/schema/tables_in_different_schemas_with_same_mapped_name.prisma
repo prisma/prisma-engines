@@ -1,7 +1,7 @@
 // issue: https://github.com/prisma/prisma/issues/15009
 
 generator client {
-  provider        = "prisma-client-js"
+  provider        = "prisma-client"
   previewFeatures = []
 }
 
