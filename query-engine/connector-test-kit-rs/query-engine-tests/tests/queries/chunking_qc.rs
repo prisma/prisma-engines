@@ -5,7 +5,12 @@ use query_engine_tests::*;
 // Planetscale and MySQL via MariaDB driver consistently time out when running this test.
 #[test_suite(
     schema(schema),
-    exclude(MongoDb, Vitess("planetscale.js.wasm"), Mysql("mariadb.js.wasm"))
+    exclude(
+        MongoDb,
+        Vitess("planetscale.js.wasm"),
+        Mysql("mariadb.js.wasm"),
+        Mysql("mariadb-mysql.js.wasm")
+    )
 )]
 mod chunking_qc {
     use indoc::indoc;

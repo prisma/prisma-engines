@@ -5,6 +5,9 @@ on:
       setup_task:
         type: string
         required: true
+      relation_load_strategy:
+        type: string
+        default: '["join", "query"]'
 
 jobs:
   select_prisma_branch:
@@ -20,6 +23,8 @@ jobs:
       matrix:
         node_version: ['20']
         partition: ['1/4', '2/4', '3/4', '4/4']
+        relation_load_strategy: ${{ fromJson(inputs.relation_load_strategy) }}
+
     env:
       LOG_LEVEL: 'info' # Set to "debug" to trace the query engine and node process running the driver adapter
       LOG_QUERIES: 'y'
@@ -32,6 +37,7 @@ jobs:
       QUERY_BATCH_SIZE: '10'
       WASM_BUILD_PROFILE: 'profiling' # Include debug info for proper backtraces
       WORKSPACE_ROOT: ${{ github.workspace }}
+      PRISMA_RELATION_LOAD_STRATEGY: ${{ matrix.relation_load_strategy }}
 
     runs-on: ubuntu-latest
     steps:
