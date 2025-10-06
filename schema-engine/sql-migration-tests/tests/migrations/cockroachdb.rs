@@ -30,7 +30,7 @@ fn db_push_on_cockroach_db_with_postgres_provider_fails(api: TestApi) {
         api.connection_string()
     );
 
-    let connector = schema_core::schema_api(Some(schema.clone()), None).unwrap();
+    let connector = schema_core::schema_api_without_extensions(Some(schema.clone()), None).unwrap();
     let error = tok(connector.schema_push(schema_core::json_rpc::types::SchemaPushInput {
         force: false,
         schema: schema_core::json_rpc::types::SchemasContainer {
@@ -442,7 +442,7 @@ fn connecting_to_a_cockroachdb_database_with_the_postgresql_connector_fails(_api
         }
     "#;
 
-    let engine = schema_core::schema_api(None, None).unwrap();
+    let engine = schema_core::schema_api_without_extensions(None, None).unwrap();
     let err = tok(
         engine.ensure_connection_validity(schema_core::json_rpc::types::EnsureConnectionValidityParams {
             datasource: schema_core::json_rpc::types::DatasourceParam::Schema(SchemasContainer {
@@ -1435,7 +1435,7 @@ fn cockroach_introspection_with_postgres_provider_fails() {
     ))
     .unwrap();
 
-    let me = schema_core::schema_api(None, None).unwrap();
+    let me = schema_core::schema_api_without_extensions(None, None).unwrap();
 
     tok(me.db_execute(DbExecuteParams {
         datasource_type: DbExecuteDatasourceType::Url(UrlContainer { url: url_str.clone() }),

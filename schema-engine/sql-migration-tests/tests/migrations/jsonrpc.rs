@@ -1,5 +1,5 @@
 use expect_test::expect;
-use schema_core::RpcApi;
+use schema_core::{ExtensionTypeConfig, RpcApi};
 use std::sync::Arc;
 use test_macros::test_connector;
 use test_setup::*;
@@ -16,7 +16,7 @@ impl TestApi {
         let rt = tokio::runtime::Runtime::new().unwrap();
         TestApi {
             _args,
-            api: RpcApi::new(None, host),
+            api: RpcApi::new(None, host, Arc::new(ExtensionTypeConfig::default())),
             rt,
         }
     }

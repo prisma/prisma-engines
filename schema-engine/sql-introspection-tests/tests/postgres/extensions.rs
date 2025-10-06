@@ -1,6 +1,6 @@
 use barrel::types;
 use indoc::indoc;
-use psl::parser_database::{ExtensionTypeEntry, ExtensionTypeId, ExtensionTypes};
+use schema_core::{ExtensionType, ExtensionTypeConfig};
 use sql_introspection_tests::test_api::*;
 use test_macros::test_connector;
 
@@ -388,9 +388,14 @@ async fn introspect_extension_type(api: &mut TestApi) -> TestResult {
         }
     "#]];
 
-    let extensions = TestExtensions {
-        types: vec![("Vector3".into(), "vector".into(), 1, Some(vec!["3".into()]))],
-    };
+    let extensions = ExtensionTypeConfig::new(vec![
+        ExtensionType::builder()
+            .prisma_name("Vector3")
+            .db_name("vector")
+            .db_type_modifiers(vec!["3".into()])
+            .number_of_db_type_modifiers(1)
+            .build(),
+    ]);
 
     expectation.assert_eq(&api.introspect_with_extensions(&extensions).await?);
 
@@ -426,12 +431,19 @@ async fn introspect_specific_extension_type_by_type_modifier(api: &mut TestApi) 
         }
     "#]];
 
-    let extensions = TestExtensions {
-        types: vec![
-            ("Vector3".into(), "vector".into(), 1, Some(vec!["3".into()])),
-            ("VectorN".into(), "vector".into(), 1, None),
-        ],
-    };
+    let extensions = ExtensionTypeConfig::new(vec![
+        ExtensionType::builder()
+            .prisma_name("Vector3")
+            .db_name("vector")
+            .db_type_modifiers(vec!["3".into()])
+            .number_of_db_type_modifiers(1)
+            .build(),
+        ExtensionType::builder()
+            .prisma_name("VectorN")
+            .db_name("vector")
+            .number_of_db_type_modifiers(1)
+            .build(),
+    ]);
 
     expectation.assert_eq(&api.introspect_with_extensions(&extensions).await?);
 
@@ -467,62 +479,15 @@ async fn introspect_extension_type_with_modifier(api: &mut TestApi) -> TestResul
         }
     "#]];
 
-    let extensions = TestExtensions {
-        types: vec![("VectorN".into(), "vector".into(), 1, None)],
-    };
+    let extensions = ExtensionTypeConfig::new(vec![
+        ExtensionType::builder()
+            .prisma_name("VectorN")
+            .db_name("vector")
+            .number_of_db_type_modifiers(1)
+            .build(),
+    ]);
 
     expectation.assert_eq(&api.introspect_with_extensions(&extensions).await?);
 
     Ok(())
-}
-
-struct TestExtensions {
-    types: Vec<(String, String, usize, Option<Vec<String>>)>,
-}
-
-impl ExtensionTypes for TestExtensions {
-    fn get_by_prisma_name(&self, name: &str) -> Option<ExtensionTypeId> {
-        self.types
-            .iter()
-            .position(|(t, _, _, _)| t == name)
-            .map(ExtensionTypeId::from)
-    }
-
-    fn get_by_db_name_and_modifiers(&self, name: &str, modifiers: Option<&[String]>) -> Option<ExtensionTypeEntry<'_>> {
-        self.types
-            .iter()
-            .enumerate()
-            .find(|(_, (_, db_name, _, db_type_modifiers))| {
-                db_name == name && db_type_modifiers.as_deref() == modifiers
-            })
-            .or_else(|| {
-                self.types
-                    .iter()
-                    .enumerate()
-                    .find(|(_, (_, db_name, _, db_type_modifiers))| db_name == name && db_type_modifiers.is_none())
-            })
-            .map(
-                |(i, (prisma_name, db_name, number_of_args, expected_db_type_modifiers))| ExtensionTypeEntry {
-                    id: ExtensionTypeId::from(i),
-                    prisma_name: prisma_name.as_str(),
-                    db_namespace: None,
-                    db_name: db_name.as_str(),
-                    number_of_db_type_modifiers: *number_of_args,
-                    db_type_modifiers: expected_db_type_modifiers.as_deref(),
-                },
-            )
-    }
-
-    fn enumerate(&self) -> Box<dyn Iterator<Item = psl::parser_database::ExtensionTypeEntry<'_>> + '_> {
-        Box::new(self.types.iter().enumerate().map(
-            |(i, (prisma_name, db_name, number_of_args, expected_db_type_modifiers))| ExtensionTypeEntry {
-                id: ExtensionTypeId::from(i),
-                prisma_name: prisma_name.as_str(),
-                db_namespace: None,
-                db_name: db_name.as_str(),
-                number_of_db_type_modifiers: *number_of_args,
-                db_type_modifiers: expected_db_type_modifiers.as_deref(),
-            },
-        ))
-    }
 }
