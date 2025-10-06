@@ -5,7 +5,7 @@ datasource testds {
 }
 
 generator js {
-    provider = "prisma-client-js"
+    provider = "prisma-client"
     previewFeatures = []
 }
 

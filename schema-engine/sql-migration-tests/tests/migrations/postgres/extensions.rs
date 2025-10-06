@@ -342,7 +342,7 @@ fn create_table_with_extension_types(api: TestApi) {
     let dm = indoc![
         r#"
         generator client {
-          provider        = "prisma-client-js"
+          provider        = "prisma-client"
         }
 
         datasource db {
@@ -386,7 +386,7 @@ fn create_table_with_extension_types(api: TestApi) {
 fn diff_extension_type_changed_modifiers(api: TestApi) {
     let dm1 = indoc! {r#"
         generator client {
-          provider = "prisma-client-js"
+          provider = "prisma-client"
         }
 
         datasource db {
@@ -402,7 +402,7 @@ fn diff_extension_type_changed_modifiers(api: TestApi) {
 
     let dm2 = indoc! {r#"
         generator client {
-          provider = "prisma-client-js"
+          provider = "prisma-client"
         }
 
         datasource db {
@@ -450,7 +450,7 @@ fn diff_extension_type_changed_modifiers(api: TestApi) {
 fn diff_extension_type_unchanged_modifiers(api: TestApi) {
     let dm = indoc! {r#"
         generator client {
-          provider = "prisma-client-js"
+          provider = "prisma-client"
         }
 
         datasource db {
@@ -490,7 +490,7 @@ fn diff_extension_type_unchanged_modifiers(api: TestApi) {
 fn diff_extension_type_changed_db_type_modifiers(api: TestApi) {
     let dm1 = indoc! {r#"
         generator client {
-          provider = "prisma-client-js"
+          provider = "prisma-client"
         }
 
         datasource db {
@@ -506,7 +506,7 @@ fn diff_extension_type_changed_db_type_modifiers(api: TestApi) {
 
     let dm2 = indoc! {r#"
         generator client {
-          provider = "prisma-client-js"
+          provider = "prisma-client"
         }
 
         datasource db {
@@ -547,7 +547,7 @@ fn diff_extension_type_changed_db_type_modifiers(api: TestApi) {
 fn diff_extension_type_unchanged_db_type_modifiers(api: TestApi) {
     let dm = indoc! {r#"
         generator client {
-          provider = "prisma-client-js"
+          provider = "prisma-client"
         }
 
         datasource db {
