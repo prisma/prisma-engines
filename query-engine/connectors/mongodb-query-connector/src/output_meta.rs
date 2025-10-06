@@ -118,7 +118,7 @@ pub fn from_aggregation_selection(selection: &AggregationSelection) -> OutputMet
 
     for ident in selection.identifiers() {
         map.insert(
-            ident.field_db_name.into(),
+            ident.field.db_name().into(),
             OutputMeta::Scalar(ScalarOutputMeta {
                 ident: ident.typ.id,
                 default: None,

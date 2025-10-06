@@ -6,7 +6,7 @@ use crate::{
     context::Context,
     cursor_condition,
     filter::FilterBuilder,
-    model_extensions::{AsColumn, AsColumns, AsTable},
+    model_extensions::{AsColumn, AsColumns, AsTable, ColumnStyle},
     nested_aggregations,
     ordering::OrderByBuilder,
     sql_trace::SqlTraceComment,
@@ -184,7 +184,7 @@ pub fn aggregate(
     let sub_table = Table::from(sub_query).alias("sub");
     selections.iter().fold(
         Select::from_table(sub_table).add_traceparent(ctx.traceparent),
-        |acc, sel| apply_aggregate_selections(acc, sel, ctx),
+        |acc, sel| apply_aggregate_selections(acc, sel, ctx, ColumnStyle::ImplicitTable),
     )
 }
 
@@ -197,9 +197,9 @@ pub fn group_by_aggregate(
     ctx: &Context<'_>,
 ) -> Select<'static> {
     let (base_query, _) = args.into_select(model, &[], ctx);
-    let select_query = selections
-        .iter()
-        .fold(base_query, |acc, sel| apply_aggregate_selections(acc, sel, ctx));
+    let select_query = selections.iter().fold(base_query, |acc, sel| {
+        apply_aggregate_selections(acc, sel, ctx, ColumnStyle::ExplicitTable)
+    });
 
     let grouped = group_by
         .into_iter()
@@ -221,32 +221,50 @@ fn apply_aggregate_selections(
     select: Select<'static>,
     selection: &AggregationSelection,
     ctx: &Context,
+    col_style: ColumnStyle,
 ) -> Select<'static> {
     match selection {
-        AggregationSelection::Field(field) => select.column(field.as_column(ctx).set_is_selected(true)),
+        AggregationSelection::Field(field) => {
+            select.column(field.as_column_with_style(ctx, col_style).set_is_selected(true))
+        }
 
-        AggregationSelection::Count { all, .. } => selection.identifiers().fold(select, |select, next_field| {
-            let expr = if all.is_some() && next_field.name == "_all" {
-                asterisk()
-            } else {
-                Column::from(next_field.field_db_name.to_owned()).into()
+        AggregationSelection::Count { .. } => selection.identifiers().fold(select, |select, next_field| {
+            let expr = match next_field.field {
+                SelectionField::All => asterisk(),
+                SelectionField::Scalar(field) => field.as_column_with_style(ctx, col_style).into(),
             };
             select.value(count(expr).alias(next_field.db_alias().into_owned()))
         }),
 
         AggregationSelection::Average(_) => selection.identifiers().fold(select, |select, next_field| {
-            select
-                .value(avg(Column::from(next_field.field_db_name.to_owned())).alias(next_field.db_alias().into_owned()))
+            select.value(
+                avg(next_field
+                    .field
+                    .as_scalar()
+                    .unwrap()
+                    .as_column_with_style(ctx, col_style))
+                .alias(next_field.db_alias().into_owned()),
+            )
         }),
 
         AggregationSelection::Sum(_) => selection.identifiers().fold(select, |select, next_field| {
-            select
-                .value(sum(Column::from(next_field.field_db_name.to_owned())).alias(next_field.db_alias().into_owned()))
+            select.value(
+                sum(next_field
+                    .field
+                    .as_scalar()
+                    .unwrap()
+                    .as_column_with_style(ctx, col_style))
+                .alias(next_field.db_alias().into_owned()),
+            )
         }),
 
         AggregationSelection::Min(_) => selection.identifiers().fold(select, |select, next_field| {
             select.value(
-                min(Column::from(next_field.field_db_name.to_owned())
+                min(next_field
+                    .field
+                    .as_scalar()
+                    .unwrap()
+                    .as_column_with_style(ctx, col_style)
                     .set_is_enum(next_field.typ.id.is_enum())
                     .set_is_selected(true))
                 .alias(next_field.db_alias().into_owned()),
@@ -255,7 +273,11 @@ fn apply_aggregate_selections(
 
         AggregationSelection::Max(_) => selection.identifiers().fold(select, |select, next_field| {
             select.value(
-                max(Column::from(next_field.field_db_name.to_owned())
+                max(next_field
+                    .field
+                    .as_scalar()
+                    .unwrap()
+                    .as_column_with_style(ctx, col_style)
                     .set_is_enum(next_field.typ.id.is_enum())
                     .set_is_selected(true))
                 .alias(next_field.db_alias().into_owned()),
