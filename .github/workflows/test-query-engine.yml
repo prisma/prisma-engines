@@ -229,17 +229,25 @@ jobs:
             setup_task: 'dev-neon-wasm'
           - name: 'libsql (wasm)'
             setup_task: 'dev-libsql-wasm'
+            relation_load_strategy: '["query"]'
           - name: 'd1 (wasm)'
             setup_task: 'dev-d1'
+            relation_load_strategy: '["query"]'
           - name: 'better-sqlite3 (wasm)'
             setup_task: 'dev-better-sqlite3-wasm'
+            relation_load_strategy: '["query"]'
           - name: 'mssql (wasm)'
             setup_task: 'dev-mssql-wasm'
+            relation_load_strategy: '["query"]'
           - name: 'mariadb (wasm)'
             setup_task: 'dev-mariadb-wasm'
+            relation_load_strategy: '["query"]'
+          - name: 'mariadb-mysql (wasm)'
+            setup_task: 'dev-mariadb-mysql-wasm'
           - name: 'pg-cockroachdb (wasm)'
             setup_task: 'dev-pg-cockroachdb-wasm'
     name: ${{ matrix.adapter.name }}
     uses: ./.github/workflows/test-driver-adapters-template.yml
     with:
       setup_task: ${{ matrix.adapter.setup_task }}
+      relation_load_strategy: ${{ matrix.adapter.relation_load_strategy }}

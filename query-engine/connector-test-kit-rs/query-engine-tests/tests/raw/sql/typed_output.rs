@@ -337,7 +337,7 @@ mod typed_output {
         Ok(())
     }
 
-    #[connector_test(schema(schema_mysql), only(MySql("mariadb.js.wasm")))]
+    #[connector_test(schema(schema_mysql), only(MySql("mariadb.js.wasm", "mariadb-mysql.js.wasm")))]
     async fn all_scalars_mariadb_js(runner: Runner) -> TestResult<()> {
         create_row(
             &runner,
