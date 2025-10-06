@@ -496,12 +496,25 @@ test-planetscale-qc: dev-planetscale-qc test-qe-st
 test-driver-adapter-planetscale: test-planetscale-js
 test-driver-adapter-planetscale-wasm: test-planetscale-wasm
 
-dev-mariadb-wasm: start-mysql_8 build-qe-wasm build-driver-adapters-kit-qe
+dev-mariadb-mysql-wasm: start-mysql_8 build-qe-wasm build-driver-adapters-kit-qe
+	cp $(CONFIG_PATH)/mariadb-mysql-wasm $(CONFIG_FILE)
+
+test-mariadb-mysql-wasm: dev-mariadb-mysql-wasm test-qe-st
+
+dev-mariadb-mysql-qc: start-mysql_8 build-qc-wasm build-driver-adapters-kit-qc
+	cp $(CONFIG_PATH)/mariadb-mysql-qc $(CONFIG_FILE)
+
+test-mariadb-mysql-qc: dev-mariadb-mysql-qc test-qe-st
+
+test-driver-adapter-mariadb-mysql: test-mariadb-mysql-js
+test-driver-adapter-mariadb-mysql-wasm: test-mariadb-mysql-wasm
+
+dev-mariadb-wasm: start-mysql_mariadb build-qe-wasm build-driver-adapters-kit-qe
 	cp $(CONFIG_PATH)/mariadb-wasm $(CONFIG_FILE)
 
 test-mariadb-wasm: dev-mariadb-wasm test-qe-st
 
-dev-mariadb-qc: start-mysql_8 build-qc-wasm build-driver-adapters-kit-qc
+dev-mariadb-qc: start-mysql_mariadb build-qc-wasm build-driver-adapters-kit-qc
 	cp $(CONFIG_PATH)/mariadb-qc $(CONFIG_FILE)
 
 test-mariadb-qc: dev-mariadb-qc test-qe-st
