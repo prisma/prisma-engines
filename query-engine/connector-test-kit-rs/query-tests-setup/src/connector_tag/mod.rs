@@ -109,10 +109,10 @@ pub(crate) fn connection_string(
         ConnectorVersion::MySql(v) => match v {
             Some(MySqlVersion::V5_6) => format!("mysql://root:prisma@127.0.0.1:3309/{database}"),
             Some(MySqlVersion::V5_7) => format!("mysql://root:prisma@127.0.0.1:3306/{database}"),
-            Some(MySqlVersion::V8 | MySqlVersion::MariaDbJsWasm) => {
+            Some(MySqlVersion::V8 | MySqlVersion::MariaDbMysqlJsWasm) => {
                 format!("mysql://root:prisma@127.0.0.1:3307/{database}")
             }
-            Some(MySqlVersion::MariaDb) => {
+            Some(MySqlVersion::MariaDb | MySqlVersion::MariaDbJsWasm) => {
                 format!("mysql://root:prisma@127.0.0.1:3308/{database}")
             }
 
@@ -285,6 +285,7 @@ impl ConnectorVersion {
                 | Self::Sqlite(Some(SqliteVersion::BetterSQLite3))
                 | Self::SqlServer(Some(SqlServerVersion::MssqlJsWasm))
                 | Self::MySql(Some(MySqlVersion::MariaDbJsWasm))
+                | Self::MySql(Some(MySqlVersion::MariaDbMysqlJsWasm))
                 | Self::CockroachDb(Some(CockroachDbVersion::PgJsWasm))
         )
     }

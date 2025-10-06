@@ -38,8 +38,7 @@ export class PlanetScaleManager implements DriverAdaptersManager {
   }
 
   async connect() {
-    this.#adapter = await this.#factory.connect()
-    return this.#adapter
+    return (this.#adapter ??= await this.#factory.connect())
   }
 
   async teardown() {}

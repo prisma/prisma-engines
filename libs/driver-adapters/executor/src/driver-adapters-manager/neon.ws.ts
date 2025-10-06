@@ -46,9 +46,7 @@ export class NeonWsManager implements DriverAdaptersManager {
     neonConfig.useSecureWebSocket = false
     neonConfig.pipelineConnect = false
 
-    this.#adapter = await this.#factory.connect()
-
-    return this.#adapter
+    return (this.#adapter ??= await this.#factory.connect())
   }
 
   async teardown() {

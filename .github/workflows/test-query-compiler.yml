@@ -55,6 +55,10 @@ jobs:
 
           - name: mariadb
             setup_task: dev-mariadb-qc
+            relation_load_strategy: '["query"]'
+
+          - name: mariadb-mysql
+            setup_task: dev-mariadb-mysql-qc
             relation_load_strategy: '["join", "query"]'
 
           - name: pg-cockroachdb
