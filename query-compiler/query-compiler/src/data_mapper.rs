@@ -298,7 +298,7 @@ fn get_result_node_for_aggregation(
             sel.identifiers().map(move |ident| {
                 let db_alias = ident.db_alias();
                 let type_info = FieldTypeInformation::new(ident.typ, ident.arity, None);
-                (ident.name, sel.aggregation_name(), db_alias, type_info)
+                (ident.field.name(), sel.aggregation_name(), db_alias, type_info)
             })
         })
         .sorted_by_key(|(name, prefix, _, _)| ordered_set.get_index_of(&(*prefix, *name)))

@@ -11,8 +11,9 @@ dataMap {
         _all: Int (_count$_all)
     }
 }
-query «SELECT COUNT("id") AS "_count$id", COUNT("title") AS "_count$title",
-       COUNT("userId") AS "_count$userId", COUNT(*) AS "_count$_all" FROM
-       "public"."Post" WHERE "public"."Post"."title"::text LIKE $1 GROUP BY
-       "public"."Post"."title" OFFSET $2»
+query «SELECT COUNT("public"."Post"."id") AS "_count$id",
+       COUNT("public"."Post"."title") AS "_count$title",
+       COUNT("public"."Post"."userId") AS "_count$userId", COUNT(*) AS
+       "_count$_all" FROM "public"."Post" WHERE "public"."Post"."title"::text
+       LIKE $1 GROUP BY "public"."Post"."title" OFFSET $2»
 params [const(String("%something%")), const(BigInt(0))]

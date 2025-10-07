@@ -50,6 +50,7 @@ impl AsColumns for ModelProjection {
 
 pub trait AsColumn {
     fn as_column(&self, ctx: &Context<'_>) -> Column<'static>;
+    fn as_column_with_style(&self, ctx: &Context<'_>, style: ColumnStyle) -> Column<'static>;
 }
 
 impl AsColumns for Field {
@@ -90,15 +91,33 @@ where
 
 impl AsColumn for ScalarField {
     fn as_column(&self, ctx: &Context<'_>) -> Column<'static> {
-        // Unwrap is safe: SQL connectors do not anything other than models as field containers.
-        let full_table_name = super::table::db_name_with_schema(&self.container().as_model().unwrap(), ctx);
-        let col = self.db_name().to_string();
+        self.as_column_with_style(ctx, ColumnStyle::ExplicitTable)
+    }
 
-        Column::from((full_table_name, col))
-            .type_family(self.type_family())
+    fn as_column_with_style(&self, ctx: &Context<'_>, style: ColumnStyle) -> Column<'static> {
+        let col = match style {
+            ColumnStyle::ExplicitTable => {
+                // Unwrap is safe: SQL connectors do not anything other than models as field containers.
+                let full_table_name = super::table::db_name_with_schema(&self.container().as_model().unwrap(), ctx);
+                let col = self.db_name().to_string();
+                Column::from((full_table_name, col))
+            }
+            ColumnStyle::ImplicitTable => Column::new(self.db_name().to_owned()),
+        };
+
+        col.type_family(self.type_family())
             .native_column_type(self.native_type().map(|nt| NativeColumnType::from(nt.name())))
             .set_is_enum(self.type_identifier().is_enum())
             .set_is_list(self.is_list())
             .default(quaint::ast::DefaultValue::Generated)
     }
+}
+
+/// The style of column rendering.
+#[derive(Debug, Clone, Copy)]
+pub enum ColumnStyle {
+    /// The column is rendered with an explicit table name, e.g. `User.id`.
+    ExplicitTable,
+    /// The column is rendered without a table name, e.g. `id`.
+    ImplicitTable,
 }

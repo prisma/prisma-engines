@@ -62,9 +62,8 @@ impl AggregationSelection {
             AggregationSelection::Count { all, fields } => Either::Right(
                 self.map_field_types(fields, |_| TypeIdentifier::Int, |_| FieldArity::Required)
                     .chain(all.iter().map(|all| SelectionIdentifier {
-                        name: all.name(),
+                        field: SelectionField::All,
                         aggregation_name: self.aggregation_name(),
-                        field_db_name: all.db_name(),
                         typ: all.r#type(),
                         arity: all.arity(),
                     })),
@@ -90,12 +89,11 @@ impl AggregationSelection {
         arity_mapper: fn(FieldArity) -> FieldArity,
     ) -> impl Iterator<Item = SelectionIdentifier<'a>> {
         let aggregation_name = self.aggregation_name();
-        fields.iter().map(move |f| SelectionIdentifier {
-            name: f.name(),
+        fields.iter().map(move |field| SelectionIdentifier {
+            field: SelectionField::Scalar(field),
             aggregation_name,
-            field_db_name: f.db_name(),
-            typ: f.dm.clone().zip(type_mapper(f.type_identifier())),
-            arity: arity_mapper(f.arity()),
+            typ: field.dm.clone().zip(type_mapper(field.type_identifier())),
+            arity: arity_mapper(field.arity()),
         })
     }
 }
@@ -108,16 +106,6 @@ pub struct CountAllAggregationSelection {
 impl CountAllAggregationSelection {
     pub fn new(dm: InternalDataModelRef) -> Self {
         CountAllAggregationSelection { dm }
-    }
-
-    #[inline]
-    pub fn name(&self) -> &str {
-        "_all"
-    }
-
-    #[inline]
-    pub fn db_name(&self) -> &str {
-        "_all"
     }
 
     #[inline]
@@ -142,8 +130,7 @@ impl<I> From<&'_ Zipper<I>> for CountAllAggregationSelection {
 }
 
 pub struct SelectionIdentifier<'a> {
-    pub name: &'a str,
-    pub field_db_name: &'a str,
+    pub field: SelectionField<'a>,
     pub aggregation_name: Option<&'static str>,
     pub typ: Type,
     pub arity: FieldArity,
@@ -153,8 +140,36 @@ impl<'a> SelectionIdentifier<'a> {
     pub fn db_alias(&self) -> Cow<'a, str> {
         const FIELD_SEPARATOR: &str = "$";
         self.aggregation_name
-            .map_or(Cow::Borrowed(self.field_db_name), |aggregation| {
-                Cow::Owned(format!("{aggregation}{FIELD_SEPARATOR}{}", self.field_db_name))
+            .map_or(Cow::Borrowed(self.field.db_name()), |aggregation| {
+                Cow::Owned(format!("{aggregation}{FIELD_SEPARATOR}{}", self.field.db_name()))
             })
+    }
+}
+
+pub enum SelectionField<'a> {
+    Scalar(&'a ScalarFieldRef),
+    All,
+}
+
+impl<'a> SelectionField<'a> {
+    pub fn name(&self) -> &'a str {
+        match self {
+            Self::Scalar(f) => f.name(),
+            Self::All => "_all",
+        }
+    }
+
+    pub fn db_name(&self) -> &'a str {
+        match self {
+            Self::Scalar(f) => f.db_name(),
+            Self::All => "_all",
+        }
+    }
+
+    pub fn as_scalar(&self) -> Option<&'a ScalarFieldRef> {
+        match self {
+            Self::Scalar(f) => Some(f),
+            Self::All => None,
+        }
     }
 }

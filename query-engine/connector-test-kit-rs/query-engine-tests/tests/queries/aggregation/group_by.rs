@@ -577,6 +577,48 @@ mod aggregation_group_by {
         Ok(())
     }
 
+    fn schema_28084() -> String {
+        let schema = indoc! {
+            r#"model Teacher {
+              #id(id, String, @id)
+              name      String
+              age       Int
+              assistant Assistant?
+            }
+
+            model Assistant {
+              #id(id, String, @id)
+              name      String
+              age       Int?
+              teacher   Teacher @relation(fields: [teacherId], references: [id])
+              teacherId String  @unique
+            }
+            "#
+        };
+
+        schema.to_owned()
+    }
+
+    // regression test for https://github.com/prisma/prisma/issues/28084
+    #[connector_test(schema(schema_28084))]
+    async fn regression_28084(runner: Runner) -> TestResult<()> {
+        run_query!(
+            &runner,
+            r#"mutation { createOneTeacher(data: {
+                id: "a1",
+                name: "Alice",
+                age: 30,
+                assistant: { create: { id: "j1", name: "John" } } }
+            ) { id } }"#
+        );
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"{ groupByTeacher(by: [name], where: { assistant: { name: { contains: "John" } } }) { _sum { age } } }"#),
+          @r###"{"data":{"groupByTeacher":[{"_sum":{"age":30}}]}}"###
+        );
+
+        Ok(())
+    }
     /// Error cases
 
     #[connector_test]
