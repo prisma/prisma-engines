@@ -206,6 +206,32 @@ impl CompactedDocument {
             .map(|op| op.into_read().expect("Trying to compact a write operation."))
             .collect();
 
+        // Convert the selections into a map of arguments. This defines the
+        // response order and how we fetch the right data from the response set.
+        let arguments = selections
+            .iter()
+            .map(|selection| {
+                // findUnique always has a `where` argument which is an object (validated during query parsing).
+                let where_obj = selection
+                    .argument(args::WHERE)
+                    .and_then(|arg| arg.to_owned().into_object())
+                    .expect("findUnique must contain `where` object argument");
+                extract_filter(where_obj, &model)
+            })
+            .collect_vec();
+
+        // Gets the argument keys for later mapping.
+        let keys = arguments
+            .iter()
+            .flat_map(|map| {
+                map.iter().flat_map(|(key, value)| match value {
+                    ArgumentValue::Object(obj) => obj.keys().map(ToOwned::to_owned).collect_vec(),
+                    _ => vec![key.to_owned()],
+                })
+            })
+            .unique()
+            .collect_vec();
+
         // This block creates the findMany query from the separate findUnique queries.
         let selection = {
             // The name of the query should be findManyX if the first query
@@ -223,22 +249,7 @@ impl CompactedDocument {
             // query. Otherwise we fail hard here.
             builder.set_nested_selections(selections[0].nested_selections().to_vec());
 
-            // The query arguments are extracted here. Combine all query
-            // arguments from the different queries into a one large argument.
-            let query_filters = selections
-                .iter()
-                .map(|selection| {
-                    // findUnique always has a `where` argument which is an object (validated during query parsing).
-                    let where_obj = selection
-                        .argument(args::WHERE)
-                        .and_then(|arg| arg.to_owned().into_object())
-                        .expect("findUnique must contain `where` object argument");
-                    let filters = extract_filter(where_obj, &model);
-
-                    QueryFilters::new(filters)
-                })
-                .collect();
-            let selection_set = SelectionSet::new(query_filters);
+            let selection_set = SelectionSet::new(arguments.iter().cloned().map(QueryFilters::new).collect());
 
             // We must select all unique fields in the query so we can
             // match the right response back to the right request later on.
@@ -283,35 +294,10 @@ impl CompactedDocument {
             QueryOptions::none()
         };
 
-        // Convert the selections into a map of arguments. This defines the
-        // response order and how we fetch the right data from the response set.
-        let arguments: Vec<HashMap<String, ArgumentValue>> = selections
-            .into_iter()
-            .map(|mut sel| {
-                let where_obj = sel.pop_argument().unwrap().1.into_object().unwrap();
-                let filter_map: HashMap<String, ArgumentValue> =
-                    extract_filter(where_obj, &model).into_iter().collect();
-
-                filter_map
-            })
-            .collect();
-
-        // Gets the argument keys for later mapping.
-        let keys: Vec<_> = arguments
-            .iter()
-            .flat_map(|map| {
-                map.iter().flat_map(|(key, value)| match value {
-                    ArgumentValue::Object(obj) => obj.keys().map(ToOwned::to_owned).collect::<Vec<_>>(),
-                    _ => vec![key.to_owned()],
-                })
-            })
-            .unique()
-            .collect();
-
         Self {
             operation: Operation::Read(selection),
             name,
-            arguments,
+            arguments: arguments.into_iter().map(HashMap::from_iter).collect(),
             nested_selection,
             keys,
             original_query_options,
