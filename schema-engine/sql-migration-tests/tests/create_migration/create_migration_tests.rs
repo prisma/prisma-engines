@@ -1308,3 +1308,22 @@ fn alter_constraint_name(mut api: TestApi) {
             migration.expect_contents(expected_script)
         });
 }
+
+#[test_connector]
+fn create_migration_with_empty_name_has_timestamp_directory(mut api: TestApi) {
+    let dm = api.datamodel_with_provider(
+        r#"
+        model Cat {
+            id   Int @id
+            name String
+        }
+    "#,
+    );
+    let dir = api.create_migrations_directory();
+    let res = api.create_migration("", &dm, &dir).send_sync();
+    let created_dir_name = res.output.generated_migration_name.clone();
+    res.assert_migration_directories_count(1);
+    // Check it is exactly a 14-digit timestamp, no underscore.
+    assert_eq!(created_dir_name.len(), 14);
+    assert!(created_dir_name.chars().all(|c| c.is_ascii_digit()));
+}
