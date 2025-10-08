@@ -218,19 +218,19 @@ impl CompactedDocument {
                     .expect("findUnique must contain `where` object argument");
                 extract_filter(where_obj, &model)
             })
-            .collect::<Vec<_>>();
+            .collect_vec();
 
         // Gets the argument keys for later mapping.
-        let keys: Vec<_> = arguments
+        let keys = arguments
             .iter()
             .flat_map(|map| {
                 map.iter().flat_map(|(key, value)| match value {
-                    ArgumentValue::Object(obj) => obj.keys().map(ToOwned::to_owned).collect::<Vec<_>>(),
+                    ArgumentValue::Object(obj) => obj.keys().map(ToOwned::to_owned).collect_vec(),
                     _ => vec![key.to_owned()],
                 })
             })
             .unique()
-            .collect();
+            .collect_vec();
 
         // This block creates the findMany query from the separate findUnique queries.
         let selection = {
