@@ -7,10 +7,10 @@ use user_facing_errors::schema_engine::MigrationNameTooLong;
 /// Create a directory name for a new migration.
 pub fn generate_migration_directory_name(migration_name: &str) -> String {
     let timestamp = format_utc_now("%Y%m%d%H%M%S");
-    let directory_name = if migration_name.is_empty(){
-       timestamp
-    } else{
-      format!("{timestamp}_{migration_name}")
+    let directory_name = if migration_name.is_empty() {
+        timestamp
+    } else {
+        format!("{timestamp}_{migration_name}")
     };
     directory_name
 }
