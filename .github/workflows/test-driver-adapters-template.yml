@@ -7,7 +7,6 @@ on:
         required: true
       relation_load_strategy:
         type: string
-        default: '["join", "query"]'
 
 jobs:
   select_prisma_branch:
