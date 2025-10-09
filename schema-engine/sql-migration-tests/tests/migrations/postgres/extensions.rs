@@ -1,5 +1,5 @@
 use indoc::indoc;
-use psl::SourceFile;
+use psl::{SourceFile, parser_database::NoExtensionTypes};
 use schema_core::{ExtensionType, ExtensionTypeConfig, schema_connector::DiffTarget};
 use sql_migration_tests::test_api::*;
 
@@ -580,4 +580,73 @@ fn diff_extension_type_unchanged_db_type_modifiers(api: TestApi) {
     expect![[r#"
     -- This is an empty migration."#]]
     .assert_eq(&diff);
+}
+
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
+fn diff_unchanged_unsupported_type(api: TestApi) {
+    let dm = indoc! {r#"
+        generator client {
+          provider = "prisma-client"
+        }
+
+        datasource db {
+          provider = "postgresql"
+          url      = "env(TEST_DATABASE_URL)"
+        }
+
+        model A {
+          id   Int     @id @default(autoincrement())
+          data Unsupported("vector")?
+        }
+    "#};
+
+    let extensions = NoExtensionTypes;
+
+    api.raw_cmd("CREATE EXTENSION IF NOT EXISTS vector");
+    api.raw_cmd("CREATE TABLE \"A\" (\"id\" SERIAL PRIMARY KEY, \"data\" vector(3))");
+
+    let diff = api.connector_diff(
+        DiffTarget::Database,
+        DiffTarget::Datamodel(vec![("schema.prisma".into(), SourceFile::new_static(dm))], &extensions),
+        None,
+    );
+
+    expect![[r#"
+    -- This is an empty migration."#]]
+    .assert_eq(&diff);
+}
+
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
+fn diff_changed_unsupported_type(api: TestApi) {
+    let dm = indoc! {r#"
+        generator client {
+          provider = "prisma-client"
+        }
+
+        datasource db {
+          provider = "postgresql"
+          url      = "env(TEST_DATABASE_URL)"
+        }
+
+        model A {
+          id   Int     @id @default(autoincrement())
+          data Unsupported("vector")?
+        }
+    "#};
+
+    let extensions = NoExtensionTypes;
+
+    api.raw_cmd("CREATE EXTENSION IF NOT EXISTS vector");
+    api.raw_cmd("CREATE EXTENSION IF NOT EXISTS postgis");
+    api.raw_cmd("CREATE TABLE \"A\" (\"id\" SERIAL PRIMARY KEY, \"data\" geometry)");
+
+    let diff = api.connector_diff(
+        DiffTarget::Database,
+        DiffTarget::Datamodel(vec![("schema.prisma".into(), SourceFile::new_static(dm))], &extensions),
+        None,
+    );
+
+    // TODO: this should produce 'ALTER TABLE "A" ALTER COLUMN "data" SET DATA TYPE geometry;',
+    // but unsupported column diffing is currently broken.
+    expect!["-- This is an empty migration."].assert_eq(&diff);
 }
