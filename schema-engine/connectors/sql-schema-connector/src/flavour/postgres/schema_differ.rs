@@ -382,10 +382,10 @@ fn postgres_column_type_change(columns: MigrationPair<TableColumnWalker<'_>>) ->
                 Some(RiskyCast)
             }
         }
-        // Unsupported types will have None as Native type
-        (None, Some(_)) => Some(RiskyCast),
-        (Some(_), None) => Some(RiskyCast),
-        (None, None)
+        // Unsupported types will have None as Native type when defined in the Prisma schema.
+        // When introspected, we get an Unknown type with name and args.
+        (None | Some(PostgresType::Unknown(_, _)), None | Some(PostgresType::Unknown(_, _)))
+        // TODO: this diffs columns.previous with columns.previous, which is incorrect
             if columns.previous.column_type().full_data_type == columns.previous.column_type().full_data_type =>
         {
             None
