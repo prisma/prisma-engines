@@ -132,8 +132,8 @@ jobs:
       database_name: ${{ matrix.database.name }}
       database_url: ${{ matrix.database.url }}
       shadow_database_url: ${{ matrix.database.shadow_database_url }}
-      is_vitess: ${{ matrix.database.is_vitess }}
-      single_threaded: ${{ matrix.database.single_threaded }}
+      is_vitess: ${{ matrix.database.is_vitess || false }}
+      single_threaded: ${{ matrix.database.single_threaded || false }}
 
   test-windows:
     if: github.event_name == 'push' ||

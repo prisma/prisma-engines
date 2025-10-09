@@ -13,11 +13,9 @@ on:
       is_vitess:
         required: false
         type: boolean
-        default: false
       single_threaded:
         required: false
         type: boolean
-        default: false
       shadow_database_url:
         required: false
         type: string
