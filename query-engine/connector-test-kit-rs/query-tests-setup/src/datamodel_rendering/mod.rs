@@ -47,14 +47,15 @@ pub fn render_test_datamodel(
 
     let is_multi_schema = !db_schemas.is_empty();
 
+    let url = connection_string(&version, test_database, is_multi_schema, isolation_level);
     let datasource = DatasourceBuilder::new("test")
         .provider(tag.datamodel_provider())
-        .url("dummy-url")
+        // only needed for blackbox tests, the real URL is not used anywhere else
+        .url(&url)
         .relation_mode(relation_mode_override.unwrap_or_else(|| tag.relation_mode().to_string()))
         .schemas_if_not_empty(db_schemas)
         .extensions_if_not_empty(db_extensions)
         .render();
-    let url = connection_string(&version, test_database, is_multi_schema, isolation_level);
 
     let datasource_with_generator = format!(
         indoc! {r#"

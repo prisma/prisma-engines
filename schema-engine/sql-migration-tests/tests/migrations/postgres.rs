@@ -476,7 +476,7 @@ fn connecting_to_a_postgres_database_with_the_cockroach_connector_fails(_api: Te
     let dm = r#"
         datasource crdb {
             provider = "cockroachdb"
-            url = "dummy-url"
+            url = env("TEST_DATABASE_URL")
         }
     "#;
 
