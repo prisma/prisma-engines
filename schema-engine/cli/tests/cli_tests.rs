@@ -444,15 +444,19 @@ fn basic_jsonrpc_roundtrip_works_with_params(_api: TestApi) {
 #[test]
 fn introspect_sqlite_empty_database() {
     let tmpdir = tempfile::tempdir().unwrap();
-    let schema = r#"
-        datasource db {
+    let path = tmpdir.path().join("dev.db");
+    let schema = format!(
+        r#"
+        datasource db {{
             provider = "sqlite"
-            url = "file:./dev.db"
-        }
+            url = "file:{}"
+        }}
 
-    "#;
+    "#,
+        path.display()
+    );
 
-    fs::File::create(tmpdir.path().join("dev.db")).unwrap();
+    fs::File::create(path).unwrap();
 
     let mut command = Command::new(schema_engine_bin_path());
     command.env(
@@ -489,18 +493,22 @@ fn introspect_sqlite_empty_database() {
 #[test]
 fn introspect_sqlite_invalid_empty_database() {
     let tmpdir = tempfile::tempdir().unwrap();
-    let schema = r#"
-        datasource db {
+    let path = tmpdir.path().join("dev.db");
+    let schema = format!(
+        r#"
+        datasource db {{
             provider = "sqlite"
-            url = "file:./dev.db"
-        }
+            url = "file:{}"
+        }}
 
-        model something {
+        model something {{
             id Int
-        }
-    "#;
+        }}
+    "#,
+        path.display()
+    );
 
-    fs::File::create(tmpdir.path().join("dev.db")).unwrap();
+    fs::File::create(path).unwrap();
 
     let mut command = Command::new(schema_engine_bin_path());
     command.env(
