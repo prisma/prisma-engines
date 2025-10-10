@@ -8,6 +8,7 @@ psl.workspace = true
 quaint.workspace = true
 mongodb-client.workspace = true
 schema-core.workspace = true
+schema-connector.workspace = true
 sql-schema-connector = { workspace = true, features = [
     "all-native",
 ] }
