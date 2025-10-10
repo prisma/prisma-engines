@@ -5,7 +5,7 @@ fn test_native_types_list_on_crdb() {
     let schema = r#"
         datasource mydb {
             provider = "cockroachdb"
-            url = env("TEST_DATABASE_URL")
+            url = "dummy-url"
         }
     "#;
 
@@ -24,7 +24,7 @@ fn test_native_types_multifile() {
             r#"
         datasource mydb {
             provider = "postgresql"
-            url = env("TEST_DATABASE_URL")
+            url = "dummy-url"
         }"#,
         ),
         (

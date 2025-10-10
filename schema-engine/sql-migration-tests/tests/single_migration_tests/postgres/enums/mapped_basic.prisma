@@ -3,7 +3,7 @@
 
 datasource pg {
     provider = "postgresql"
-    url = env("TEST_DATABASE_URL")
+    url = "dummy-url"
 }
 
 model Avocado {

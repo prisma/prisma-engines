@@ -438,7 +438,7 @@ fn connecting_to_a_cockroachdb_database_with_the_postgresql_connector_fails(_api
     let dm = r#"
         datasource crdb {
             provider = "postgresql"
-            url = env("TEST_DATABASE_URL")
+            url = "dummy-url"
         }
     "#;
 
@@ -470,7 +470,7 @@ fn decimal_to_boolean_migrations_work(api: TestApi) {
     let dm1 = r#"
         datasource db {
             provider = "cockroachdb"
-            url = env("TEST_DATABASE_URL")
+            url = "dummy-url"
         }
 
         model Cat {
@@ -499,7 +499,7 @@ fn decimal_to_boolean_migrations_work(api: TestApi) {
     let dm2 = r#"
         datasource db {
             provider = "cockroachdb"
-            url = env("TEST_DATABASE_URL")
+            url = "dummy-url"
         }
 
         model Cat {
@@ -994,7 +994,7 @@ fn sequences_without_options_can_be_created(api: TestApi) {
     let dm = r#"
         datasource test {
             provider = "cockroachdb"
-            url = env("TEST_DATABASE_URL")
+            url = "dummy-url"
         }
 
         model Test {
@@ -1021,7 +1021,7 @@ fn sequences_with_options_can_be_created(api: TestApi) {
     let dm = r#"
         datasource test {
             provider = "cockroachdb"
-            url = env("TEST_DATABASE_URL")
+            url = "dummy-url"
         }
 
         model Test {
@@ -1048,7 +1048,7 @@ fn sequences_without_options_can_be_created_on_non_id_fields(api: TestApi) {
     let dm = r#"
         datasource test {
             provider = "cockroachdb"
-            url = env("TEST_DATABASE_URL")
+            url = "dummy-url"
         }
 
         model Test {
@@ -1091,7 +1091,7 @@ fn alter_sequence_to_default(api: TestApi) {
     let schema1 = r#"
         datasource db {
             provider = "cockroachdb"
-            url = env("TEST_DATABASE_URL")
+            url = "dummy-url"
         }
 
         model Test {
@@ -1102,7 +1102,7 @@ fn alter_sequence_to_default(api: TestApi) {
     let schema2 = r#"
         datasource db {
             provider = "cockroachdb"
-            url = env("TEST_DATABASE_URL")
+            url = "dummy-url"
         }
 
         model Test {
@@ -1128,7 +1128,7 @@ fn alter_sequence(api: TestApi) {
     let schema1 = r#"
         datasource db {
             provider = "cockroachdb"
-            url = env("TEST_DATABASE_URL")
+            url = "dummy-url"
         }
 
         model Test {
@@ -1139,7 +1139,7 @@ fn alter_sequence(api: TestApi) {
     let schema2 = r#"
         datasource db {
             provider = "cockroachdb"
-            url = env("TEST_DATABASE_URL")
+            url = "dummy-url"
         }
 
         model Test {
@@ -1287,7 +1287,7 @@ fn bigint_defaults_work(api: TestApi) {
     let schema = r#"
         datasource mypg {
             provider = "cockroachdb"
-            url = env("TEST_DATABASE_URL")
+            url = "dummy-url"
         }
 
         model foo {
@@ -1316,7 +1316,7 @@ fn alter_type_works(api: TestApi) {
     let schema = r#"
         datasource db {
             provider = "cockroachdb"
-            url = env("TEST_DATABASE_URL")
+            url = "dummy-url"
         }
 
         model test {
@@ -1332,7 +1332,7 @@ fn alter_type_works(api: TestApi) {
     let to_schema = r#"
         datasource db {
             provider = "cockroachdb"
-            url = env("TEST_DATABASE_URL")
+            url = "dummy-url"
         }
 
         model test {
@@ -1382,7 +1382,7 @@ fn schema_from_introspection_docs_works(api: TestApi) {
     let introspected_schema = r#"
         datasource crdb {
             provider = "cockroachdb"
-            url = env("TEST_DATABASE_URL")
+            url = "dummy-url"
         }
 
         model Post {

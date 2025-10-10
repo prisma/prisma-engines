@@ -96,7 +96,7 @@ fn unusupported_in_compound_unique_must_not_panic() {
     let schema = r#"
         datasource db {
             provider = "postgresql"
-            url      = env("TEST_DATABASE_URL")
+            url      = "dummy-url"
         }
 
         generator client {
@@ -120,7 +120,7 @@ fn unusupported_in_compound_id_must_not_panic() {
     let schema = r#"
         datasource db {
             provider = "postgresql"
-            url      = env("TEST_DATABASE_URL")
+            url      = "dummy-url"
         }
 
         generator client {

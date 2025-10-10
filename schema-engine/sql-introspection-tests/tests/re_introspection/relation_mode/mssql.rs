@@ -27,7 +27,7 @@ async fn referential_integrity_prisma(api: &mut TestApi) -> TestResult {
 
         datasource db {
             provider             = "sqlserver"
-            url                  = env("TEST_DATABASE_URL")
+            url                  = "dummy-url"
             referentialIntegrity = "prisma"
         }
 
@@ -50,7 +50,7 @@ async fn referential_integrity_prisma(api: &mut TestApi) -> TestResult {
 
         datasource db {
           provider     = "sqlserver"
-          url          = env("TEST_DATABASE_URL")
+          url          = "dummy-url"
           relationMode = "prisma"
         }
 
@@ -100,7 +100,7 @@ async fn referential_integrity_foreign_keys(api: &mut TestApi) -> TestResult {
 
         datasource db {
             provider             = "sqlserver"
-            url                  = env("TEST_DATABASE_URL")
+            url                  = "dummy-url"
             referentialIntegrity = "foreignKeys"
         }
 
@@ -123,7 +123,7 @@ async fn referential_integrity_foreign_keys(api: &mut TestApi) -> TestResult {
 
         datasource db {
           provider     = "sqlserver"
-          url          = env("TEST_DATABASE_URL")
+          url          = "dummy-url"
           relationMode = "foreignKeys"
         }
 
@@ -171,7 +171,7 @@ async fn relation_mode_prisma(api: &mut TestApi) -> TestResult {
 
         datasource db {
             provider     = "sqlserver"
-            url          = env("TEST_DATABASE_URL")
+            url          = "dummy-url"
             relationMode = "prisma"
         }
 
@@ -194,7 +194,7 @@ async fn relation_mode_prisma(api: &mut TestApi) -> TestResult {
 
         datasource db {
           provider     = "sqlserver"
-          url          = env("TEST_DATABASE_URL")
+          url          = "dummy-url"
           relationMode = "prisma"
         }
 
@@ -244,7 +244,7 @@ async fn relation_mode_foreign_keys(api: &mut TestApi) -> TestResult {
 
         datasource db {
             provider     = "sqlserver"
-            url          = env("TEST_DATABASE_URL")
+            url          = "dummy-url"
             relationMode = "foreignKeys"
         }
 
@@ -267,7 +267,7 @@ async fn relation_mode_foreign_keys(api: &mut TestApi) -> TestResult {
 
         datasource db {
           provider     = "sqlserver"
-          url          = env("TEST_DATABASE_URL")
+          url          = "dummy-url"
           relationMode = "foreignKeys"
         }
 
@@ -320,7 +320,7 @@ mod at_at_map {
 
             datasource db {
                 provider             = "sqlserver"
-                url                  = env("TEST_DATABASE_URL")
+                url                  = "dummy-url"
                 referentialIntegrity = "prisma"
             }
 
@@ -347,7 +347,7 @@ mod at_at_map {
 
             datasource db {
               provider     = "sqlserver"
-              url          = env("TEST_DATABASE_URL")
+              url          = "dummy-url"
               relationMode = "prisma"
             }
 
@@ -401,7 +401,7 @@ mod at_at_map {
 
             datasource db {
                 provider             = "sqlserver"
-                url                  = env("TEST_DATABASE_URL")
+                url                  = "dummy-url"
                 referentialIntegrity = "foreignKeys"
             }
 
@@ -428,7 +428,7 @@ mod at_at_map {
 
             datasource db {
               provider     = "sqlserver"
-              url          = env("TEST_DATABASE_URL")
+              url          = "dummy-url"
               relationMode = "foreignKeys"
             }
 
@@ -480,7 +480,7 @@ mod at_at_map {
 
             datasource db {
                 provider     = "sqlserver"
-                url          = env("TEST_DATABASE_URL")
+                url          = "dummy-url"
                 relationMode = "prisma"
             }
 
@@ -507,7 +507,7 @@ mod at_at_map {
 
             datasource db {
               provider     = "sqlserver"
-              url          = env("TEST_DATABASE_URL")
+              url          = "dummy-url"
               relationMode = "prisma"
             }
 
@@ -561,7 +561,7 @@ mod at_at_map {
 
             datasource db {
                 provider     = "sqlserver"
-                url          = env("TEST_DATABASE_URL")
+                url          = "dummy-url"
                 relationMode = "foreignKeys"
             }
 
@@ -588,7 +588,7 @@ mod at_at_map {
 
             datasource db {
               provider     = "sqlserver"
-              url          = env("TEST_DATABASE_URL")
+              url          = "dummy-url"
               relationMode = "foreignKeys"
             }
 

@@ -355,7 +355,7 @@ fn basic_jsonrpc_roundtrip_works_with_no_params(_api: TestApi) {
     let datamodel = r#"
         datasource db {
             provider = "postgres"
-            url = env("TEST_DATABASE_URL")
+            url = "dummy-url"
         }
     "#;
 
@@ -392,7 +392,7 @@ fn basic_jsonrpc_roundtrip_works_with_params(_api: TestApi) {
     let datamodel = indoc! {r#"
         datasource db {
             provider = "postgres"
-            url = env("TEST_DATABASE_URL")
+            url = "dummy-url"
         }
     "#};
 
@@ -447,7 +447,7 @@ fn introspect_sqlite_empty_database() {
     let schema = r#"
         datasource db {
             provider = "sqlite"
-            url = env("TEST_DATABASE_URL")
+            url = "dummy-url"
         }
 
     "#;
@@ -492,7 +492,7 @@ fn introspect_sqlite_invalid_empty_database() {
     let schema = r#"
         datasource db {
             provider = "sqlite"
-            url = env("TEST_DATABASE_URL")
+            url = "dummy-url"
         }
 
         model something {
@@ -551,7 +551,7 @@ fn execute_postgres(api: TestApi) {
     let schema = r#"
         datasource db {
             provider = "postgres"
-            url = env("TEST_DATABASE_URL")
+            url = "dummy-url"
         }
     "#;
 
@@ -610,7 +610,7 @@ fn introspect_single_postgres_force(api: TestApi) {
     let schema = indoc! {r#"
         datasource db {
           provider = "postgres"
-          url = env("TEST_DATABASE_URL")
+          url = "dummy-url"
         }
 
         generator js {
@@ -712,7 +712,7 @@ fn introspect_multi_postgres_force(api: TestApi) {
         "a.prisma" => r#"
             datasource db {
                 provider = "postgres"
-                url = env("TEST_DATABASE_URL")
+                url = "dummy-url"
             }
         "#,
         "b.prisma" => r#"
@@ -817,7 +817,7 @@ fn introspect_e2e() {
     let schema = r#"
         datasource db {
             provider = "sqlite"
-            url = env("TEST_DATABASE_URL")
+            url = "dummy-url"
         }
 
     "#;
@@ -880,7 +880,7 @@ fn get_database_version_multi_file(_api: TestApi) {
         "a.prisma" => r#"
             datasource db {
                 provider = "postgres"
-                url = env("TEST_DATABASE_URL")
+                url = "dummy-url"
             }
         "#,
         "b.prisma" => r#"

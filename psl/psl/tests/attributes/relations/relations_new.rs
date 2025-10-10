@@ -890,7 +890,7 @@ fn a_one_on_one_relation_with_fields_on_the_wrong_side_should_not_pass() {
     let dml = r#"
 datasource db {
   provider = "postgresql"
-  url      = env("TEST_DATABASE_URL")
+  url      = "dummy-url"
 }
 
 model Boom {
