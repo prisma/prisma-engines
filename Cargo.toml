@@ -145,7 +145,7 @@ tokio = { version = "1", features = ["sync"] }
 tokio-postgres = { git = "https://github.com/prisma/rust-postgres", branch = "pgbouncer-mode" }
 tokio-tungstenite = "0.26"
 tokio-util = "0.7"
-toml = "0.5"
+toml = "0.8"
 tracing = "0.1"
 tracing-core = "0.1"
 tracing-error = "0.2"
