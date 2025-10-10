@@ -27,7 +27,7 @@ fn composite_types_must_have_at_least_one_visible_field() {
     let schema = indoc! {r#"
         datasource mongodb {
             provider = "mongodb"
-            url = env("TEST_DATABASE_URL")
+            url = "dummy-url"
         }
 
         type Address {
@@ -186,7 +186,7 @@ fn unsupported_should_work() {
     let schema = indoc! {r#"
         datasource mongodb {
             provider = "mongodb"
-            url = env("TEST_DATABASE_URL")
+            url = "dummy-url"
         }
 
         type A {

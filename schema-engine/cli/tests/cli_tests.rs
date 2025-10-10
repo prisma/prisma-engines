@@ -447,7 +447,7 @@ fn introspect_sqlite_empty_database() {
     let schema = r#"
         datasource db {
             provider = "sqlite"
-            url = env("TEST_DATABASE_URL")
+            url = "dummy-url"
         }
 
     "#;
@@ -492,7 +492,7 @@ fn introspect_sqlite_invalid_empty_database() {
     let schema = r#"
         datasource db {
             provider = "sqlite"
-            url = env("TEST_DATABASE_URL")
+            url = "dummy-url"
         }
 
         model something {
@@ -817,7 +817,7 @@ fn introspect_e2e() {
     let schema = r#"
         datasource db {
             provider = "sqlite"
-            url = env("TEST_DATABASE_URL")
+            url = "dummy-url"
         }
 
     "#;

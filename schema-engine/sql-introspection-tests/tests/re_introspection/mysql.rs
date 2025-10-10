@@ -11,7 +11,7 @@ async fn empty_preview_features_are_kept(api: &mut TestApi) -> TestResult {
 
         datasource db {
           provider   = "mysql"
-          url        = "env(TEST_DATABASE_URL)"
+          url        = "dummy-url"
         }
     "#};
 
@@ -22,7 +22,7 @@ async fn empty_preview_features_are_kept(api: &mut TestApi) -> TestResult {
 
         datasource db {
           provider = "mysql"
-          url      = "env(TEST_DATABASE_URL)"
+          url      = "dummy-url"
         }
     "#]];
 

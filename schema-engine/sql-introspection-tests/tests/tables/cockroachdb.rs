@@ -25,7 +25,7 @@ async fn negative_default_values_should_work(api: &mut TestApi) -> TestResult {
 
         datasource db {
           provider = "cockroachdb"
-          url      = "env(TEST_DATABASE_URL)"
+          url      = "dummy-url"
         }
 
         model Blog {
@@ -91,7 +91,7 @@ async fn should_ignore_prisma_helper_tables(api: &mut TestApi) -> TestResult {
 
         datasource db {
           provider = "cockroachdb"
-          url      = "env(TEST_DATABASE_URL)"
+          url      = "dummy-url"
         }
 
         model Blog {
@@ -128,7 +128,7 @@ async fn default_values(api: &mut TestApi) -> TestResult {
 
         datasource db {
           provider = "cockroachdb"
-          url      = "env(TEST_DATABASE_URL)"
+          url      = "dummy-url"
         }
 
         model Test {
@@ -171,7 +171,7 @@ async fn a_simple_table_with_gql_types(api: &mut TestApi) -> TestResult {
 
         datasource db {
           provider = "cockroachdb"
-          url      = "env(TEST_DATABASE_URL)"
+          url      = "dummy-url"
         }
 
         model Blog {
@@ -296,7 +296,7 @@ $$
 
         datasource db {
           provider = "cockroachdb"
-          url      = "env(TEST_DATABASE_URL)"
+          url      = "dummy-url"
         }
 
         model stringstest {
@@ -330,7 +330,7 @@ async fn datetime_default_expressions_are_not_truncated(api: &mut TestApi) -> Te
 
         datasource db {
           provider = "cockroachdb"
-          url      = "env(TEST_DATABASE_URL)"
+          url      = "dummy-url"
         }
 
         model Foo {
@@ -354,7 +354,7 @@ async fn northwind(api: TestApi) {
 
         datasource db {
           provider = "cockroachdb"
-          url      = "env(TEST_DATABASE_URL)"
+          url      = "dummy-url"
         }
 
         model categories {

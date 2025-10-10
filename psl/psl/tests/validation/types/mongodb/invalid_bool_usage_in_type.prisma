@@ -1,6 +1,6 @@
 datasource test {
   provider = "mongodb"
-  url = env("TEST_DATABASE_URL")
+  url = "dummy-url"
 }
 
 type B {

@@ -3,7 +3,7 @@
 
 datasource testds {
     provider = "postgresql"
-    url = env("TEST_DATABASE_URL")
+    url = "dummy-url"
     schemas = ["public", "security", "users"]
 }
 

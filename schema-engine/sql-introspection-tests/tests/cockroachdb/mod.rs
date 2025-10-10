@@ -205,7 +205,7 @@ async fn scalar_list_defaults_work_on_22_1(api: &mut TestApi) -> TestResult {
 
         datasource db {
           provider = "cockroachdb"
-          url      = "env(TEST_DATABASE_URL)"
+          url      = "dummy-url"
         }
 
         model defaults {
@@ -259,7 +259,7 @@ async fn scalar_list_defaults_work_on_22_2(api: &mut TestApi) -> TestResult {
 
         datasource db {
           provider = "cockroachdb"
-          url      = "env(TEST_DATABASE_URL)"
+          url      = "dummy-url"
         }
 
         model defaults {
@@ -322,7 +322,7 @@ async fn string_col_with_length(api: &mut TestApi) -> TestResult {
 
         datasource db {
           provider = "cockroachdb"
-          url      = "env(TEST_DATABASE_URL)"
+          url      = "dummy-url"
         }
 
         model Post {
@@ -377,7 +377,7 @@ async fn row_level_ttl_stopgap(api: &mut TestApi) -> TestResult {
 
         datasource db {
           provider = "cockroachdb"
-          url      = "env(TEST_DATABASE_URL)"
+          url      = "dummy-url"
         }
 
         /// This model is using a row level TTL in the database, and requires an additional setup in migrations. Read more: https://pris.ly/d/row-level-ttl
@@ -444,7 +444,7 @@ async fn commenting_stopgap(api: &mut TestApi) -> TestResult {
 
         datasource db {
           provider = "cockroachdb"
-          url      = "env(TEST_DATABASE_URL)"
+          url      = "dummy-url"
         }
 
         /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments

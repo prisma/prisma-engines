@@ -88,7 +88,7 @@ async fn remapping_field_names_to_empty_mysql(api: &mut TestApi) -> TestResult {
 
         datasource db {
           provider = "mysql"
-          url      = "env(TEST_DATABASE_URL)"
+          url      = "dummy-url"
         }
 
         model User {
@@ -134,7 +134,7 @@ PARTITIONS 2; "#,
 
         datasource db {
           provider = "mysql"
-          url      = "env(TEST_DATABASE_URL)"
+          url      = "dummy-url"
         }
 
         /// This table is a partition table and requires additional setup for migrations. Visit https://pris.ly/d/partition-tables for more info.

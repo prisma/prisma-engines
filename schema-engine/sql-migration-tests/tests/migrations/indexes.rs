@@ -884,7 +884,7 @@ fn fulltext_index_with_map(api: TestApi) {
     let dm = indoc! {r#"
         datasource db {
             provider = "mysql"
-            url = env("TEST_DATABASE_URL")
+            url = "dummy-url"
         }
 
         generator client {
