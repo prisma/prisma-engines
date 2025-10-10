@@ -347,7 +347,7 @@ fn create_table_with_extension_types(api: TestApi) {
 
         datasource db {
           provider = "postgresql"
-          url      = "env(TEST_DATABASE_URL)"
+          url      = "dummy-url"
         }
 
         model A {
@@ -391,7 +391,7 @@ fn diff_extension_type_changed_modifiers(api: TestApi) {
 
         datasource db {
           provider = "postgresql"
-          url      = "env(TEST_DATABASE_URL)"
+          url      = "dummy-url"
         }
 
         model A {
@@ -407,7 +407,7 @@ fn diff_extension_type_changed_modifiers(api: TestApi) {
 
         datasource db {
           provider = "postgresql"
-          url      = "env(TEST_DATABASE_URL)"
+          url      = "dummy-url"
         }
 
         model A {
@@ -455,7 +455,7 @@ fn diff_extension_type_unchanged_modifiers(api: TestApi) {
 
         datasource db {
           provider = "postgresql"
-          url = "env(TEST_DATABASE_URL)"
+          url = "dummy-url"
         }
 
         model A {
@@ -495,7 +495,7 @@ fn diff_extension_type_changed_db_type_modifiers(api: TestApi) {
 
         datasource db {
           provider = "postgresql"
-          url      = "env(TEST_DATABASE_URL)"
+          url      = "dummy-url"
         }
 
         model A {
@@ -511,7 +511,7 @@ fn diff_extension_type_changed_db_type_modifiers(api: TestApi) {
 
         datasource db {
           provider = "postgresql"
-          url      = "env(TEST_DATABASE_URL)"
+          url      = "dummy-url"
         }
 
         model A {
@@ -552,7 +552,7 @@ fn diff_extension_type_unchanged_db_type_modifiers(api: TestApi) {
 
         datasource db {
           provider = "postgresql"
-          url      = "env(TEST_DATABASE_URL)"
+          url      = "dummy-url"
         }
 
         model A {
@@ -591,7 +591,7 @@ fn diff_unchanged_unsupported_type(api: TestApi) {
 
         datasource db {
           provider = "postgresql"
-          url      = "env(TEST_DATABASE_URL)"
+          url      = "dummy-url"
         }
 
         model A {
@@ -625,7 +625,7 @@ fn diff_changed_unsupported_type(api: TestApi) {
 
         datasource db {
           provider = "postgresql"
-          url      = "env(TEST_DATABASE_URL)"
+          url      = "dummy-url"
         }
 
         model A {

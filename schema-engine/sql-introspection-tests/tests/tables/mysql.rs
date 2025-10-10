@@ -411,7 +411,7 @@ async fn northwind(api: TestApi) {
 
         datasource db {
           provider = "mysql"
-          url      = "env(TEST_DATABASE_URL)"
+          url      = "dummy-url"
         }
 
         model customers {
@@ -802,7 +802,7 @@ async fn commenting_stopgap(api: &mut TestApi) -> TestResult {
 
         datasource db {
           provider = "mysql"
-          url      = "env(TEST_DATABASE_URL)"
+          url      = "dummy-url"
         }
 
         /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments

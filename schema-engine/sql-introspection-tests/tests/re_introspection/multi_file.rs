@@ -549,7 +549,7 @@ async fn introspect_multi_view_preview_feature_is_required(api: &mut TestApi) ->
 
         datasource db {
           provider = "postgresql"
-          url      = "env(TEST_DATABASE_URL)"
+          url      = "dummy-url"
         }
 
         model User {
@@ -840,7 +840,7 @@ async fn reintrospect_keep_configuration_in_same_file(api: &mut TestApi) -> Test
 
         datasource db {
           provider = "postgresql"
-          url      = "env(TEST_DATABASE_URL)"
+          url      = "dummy-url"
         }
 
         model User {
@@ -865,7 +865,7 @@ async fn reintrospect_keep_configuration_in_same_file(api: &mut TestApi) -> Test
 
         datasource db {
           provider = "postgresql"
-          url      = "env(TEST_DATABASE_URL)"
+          url      = "dummy-url"
         }
 
         model Post {
@@ -930,7 +930,7 @@ async fn reintrospect_keep_configuration_when_spread_across_files(api: &mut Test
         // file: user.prisma
         datasource db {
           provider = "postgresql"
-          url      = "env(TEST_DATABASE_URL)"
+          url      = "dummy-url"
         }
 
         model User {
@@ -951,7 +951,7 @@ async fn reintrospect_keep_configuration_when_spread_across_files(api: &mut Test
         // file: post.prisma
         datasource db {
           provider = "postgresql"
-          url      = "env(TEST_DATABASE_URL)"
+          url      = "dummy-url"
         }
 
         model Post {
@@ -1011,7 +1011,7 @@ async fn reintrospect_keep_configuration_when_no_models(api: &mut TestApi) -> Te
         // file: user.prisma
         datasource db {
           provider = "postgresql"
-          url      = "env(TEST_DATABASE_URL)"
+          url      = "dummy-url"
         }
 
         model User {
@@ -1032,7 +1032,7 @@ async fn reintrospect_keep_configuration_when_no_models(api: &mut TestApi) -> Te
         // file: post.prisma
         datasource db {
           provider = "postgresql"
-          url      = "env(TEST_DATABASE_URL)"
+          url      = "dummy-url"
         }
         ------
         // file: user.prisma
@@ -1088,7 +1088,7 @@ async fn reintrospect_empty_multi_file(api: &mut TestApi) -> TestResult {
 
         datasource db {
           provider = "postgresql"
-          url      = "env(TEST_DATABASE_URL)"
+          url      = "dummy-url"
         }
     "#]];
 

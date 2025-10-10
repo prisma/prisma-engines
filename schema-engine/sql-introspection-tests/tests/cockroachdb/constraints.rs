@@ -27,7 +27,7 @@ async fn aragon_test_cockroachdb(api: &mut TestApi) -> TestResult {
 
         datasource db {
           provider = "cockroachdb"
-          url      = "env(TEST_DATABASE_URL)"
+          url      = "dummy-url"
         }
 
         /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
@@ -94,7 +94,7 @@ async fn noalyss_folder_test_cockroachdb(api: &mut TestApi) -> TestResult {
 
         datasource db {
           provider = "cockroachdb"
-          url      = "env(TEST_DATABASE_URL)"
+          url      = "dummy-url"
         }
 
         /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
