@@ -4,7 +4,7 @@
 datasource testds {
     provider = "postgresql"
     url = "bad url"
-    directUrl = "dummy-url"
+    directUrl = env("TEST_DATABASE_URL")
 }
 
 model table {

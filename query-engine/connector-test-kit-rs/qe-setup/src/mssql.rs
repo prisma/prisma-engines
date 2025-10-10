@@ -1,9 +1,6 @@
 use connection_string::JdbcString;
-use quaint::{prelude::*, single::Quaint};
-use schema_core::{
-    json_rpc::types::{ResetInput, SchemaFilter},
-    schema_connector::{ConnectorError, ConnectorParams, ConnectorResult},
-};
+use schema_connector::{Namespaces, SchemaFilter};
+use schema_core::schema_connector::{ConnectorError, ConnectorParams, ConnectorResult, SchemaConnector};
 use std::str::FromStr;
 
 pub(crate) async fn mssql_setup(url: String, prisma_schema: &str, db_schemas: &[&str]) -> ConnectorResult<()> {
@@ -12,7 +9,9 @@ pub(crate) async fn mssql_setup(url: String, prisma_schema: &str, db_schemas: &[
     let params = conn.properties_mut();
 
     let db_name = params.remove("database").unwrap_or_else(|| String::from("master"));
-    let conn = Quaint::new(&conn.to_string()).await.unwrap();
+    let schema = params.remove("schema").unwrap_or_else(|| String::from("dbo"));
+    let params = ConnectorParams::new(url, Default::default(), None);
+    let mut conn = sql_schema_connector::SqlSchemaConnector::new_mssql(params)?;
 
     if !db_schemas.is_empty() {
         let sql = format!(
@@ -23,34 +22,19 @@ pub(crate) async fn mssql_setup(url: String, prisma_schema: &str, db_schemas: &[
         );
         conn.raw_cmd(&sql).await.unwrap();
     } else {
-        let mut api = schema_core::schema_api_without_extensions(Some(prisma_schema.to_owned()), None)?;
-        api.reset(ResetInput {
-            filter: SchemaFilter::default(),
-        })
-        .await
-        .ok();
-        api.dispose().await.ok();
+        let ns = Namespaces::from_vec(&mut db_schemas.iter().map(|s| s.to_string()).collect());
+        conn.reset(false, ns, &SchemaFilter::default()).await.ok();
         // Without these, our poor connection gets deadlocks if other schemas
         // are modified while we introspect.
         let allow_snapshot_isolation = format!("ALTER DATABASE [{db_name}] SET ALLOW_SNAPSHOT_ISOLATION ON");
         conn.raw_cmd(&allow_snapshot_isolation).await.unwrap();
 
-        conn.raw_cmd(&format!(
-            "DROP SCHEMA IF EXISTS {}",
-            conn.connection_info().schema_name().unwrap()
-        ))
-        .await
-        .unwrap();
+        conn.raw_cmd(&format!("DROP SCHEMA IF EXISTS {}", schema))
+            .await
+            .unwrap();
 
-        conn.raw_cmd(&format!(
-            "CREATE SCHEMA {}",
-            conn.connection_info().schema_name().unwrap()
-        ))
-        .await
-        .unwrap();
+        conn.raw_cmd(&format!("CREATE SCHEMA {}", schema)).await.unwrap();
     }
 
-    let params = ConnectorParams::new(url, Default::default(), None);
-    let mut connector = sql_schema_connector::SqlSchemaConnector::new_mssql(params)?;
-    crate::diff_and_apply(prisma_schema, &mut connector).await
+    crate::diff_and_apply(prisma_schema, &mut conn).await
 }

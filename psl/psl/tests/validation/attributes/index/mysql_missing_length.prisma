@@ -6,7 +6,7 @@ datasource test {
 model User {
  id         Int    @id
  firstName  String @unique @test.Text
-
+ 
  @@index([firstName])
 }
 
