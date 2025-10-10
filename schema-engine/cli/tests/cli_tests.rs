@@ -355,7 +355,7 @@ fn basic_jsonrpc_roundtrip_works_with_no_params(_api: TestApi) {
     let datamodel = r#"
         datasource db {
             provider = "postgres"
-            url = "dummy-url"
+            url = env("TEST_DATABASE_URL")
         }
     "#;
 
@@ -392,7 +392,7 @@ fn basic_jsonrpc_roundtrip_works_with_params(_api: TestApi) {
     let datamodel = indoc! {r#"
         datasource db {
             provider = "postgres"
-            url = "dummy-url"
+            url = env("TEST_DATABASE_URL")
         }
     "#};
 
@@ -559,7 +559,7 @@ fn execute_postgres(api: TestApi) {
     let schema = r#"
         datasource db {
             provider = "postgres"
-            url = "dummy-url"
+            url = env("TEST_DATABASE_URL")
         }
     "#;
 
@@ -618,7 +618,7 @@ fn introspect_single_postgres_force(api: TestApi) {
     let schema = indoc! {r#"
         datasource db {
           provider = "postgres"
-          url = "dummy-url"
+          url = env("TEST_DATABASE_URL")
         }
 
         generator js {
@@ -720,7 +720,7 @@ fn introspect_multi_postgres_force(api: TestApi) {
         "a.prisma" => r#"
             datasource db {
                 provider = "postgres"
-                url = "dummy-url"
+                url = env("TEST_DATABASE_URL")
             }
         "#,
         "b.prisma" => r#"
@@ -888,7 +888,7 @@ fn get_database_version_multi_file(_api: TestApi) {
         "a.prisma" => r#"
             datasource db {
                 provider = "postgres"
-                url = "dummy-url"
+                url = env("TEST_DATABASE_URL")
             }
         "#,
         "b.prisma" => r#"
