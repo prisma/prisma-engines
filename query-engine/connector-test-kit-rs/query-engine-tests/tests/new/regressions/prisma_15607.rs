@@ -73,7 +73,7 @@ impl Actor {
             Some("READ COMMITTED"),
         );
 
-        let mut runner = Runner::load(datamodel, &[], version, tag, None, metrics, log_capture).await?;
+        let mut runner = Runner::load(&datamodel, &[], version, tag, None, metrics, log_capture).await?;
 
         tokio::spawn(async move {
             while let Some(message) = query_receiver.recv().await {

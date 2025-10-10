@@ -19,7 +19,6 @@ use enumflags2::BitFlags;
 use providers::Provider;
 use psl::{Datasource, builtin_connectors::*, parser_database::NoExtensionTypes};
 use schema_core::schema_connector::{ConnectorResult, SchemaConnector, SchemaDialect, SchemaFilter};
-use std::env;
 
 #[derive(Debug, serde::Deserialize, PartialEq)]
 pub struct InitResult {
@@ -41,12 +40,8 @@ where
     fn datamodel(&self) -> &'a str;
 }
 
-fn parse_configuration(datamodel: &str) -> ConnectorResult<(Datasource, String, BitFlags<psl::PreviewFeature>)> {
+fn parse_configuration(datamodel: &str) -> ConnectorResult<(Datasource, BitFlags<psl::PreviewFeature>)> {
     let config = psl::parse_configuration(datamodel)
-        .map_err(|err| ConnectorError::new_schema_parser_error(err.to_pretty_string("schema.prisma", datamodel)))?;
-
-    let url = config.datasources[0]
-        .load_url(|key| env::var(key).ok())
         .map_err(|err| ConnectorError::new_schema_parser_error(err.to_pretty_string("schema.prisma", datamodel)))?;
 
     let preview_features = config.preview_features();
@@ -57,7 +52,7 @@ fn parse_configuration(datamodel: &str) -> ConnectorResult<(Datasource, String, 
         .next()
         .ok_or_else(|| ConnectorError::from_msg("There is no datasource in the schema.".into()))?;
 
-    Ok((source, url, preview_features))
+    Ok((source, preview_features))
 }
 
 /// Database setup for connector-test-kit-rs with Driver Adapters.
@@ -71,7 +66,7 @@ pub async fn setup_external<'a>(
     db_schemas: &[&str],
 ) -> ConnectorResult<InitResult> {
     let prisma_schema = initializer.datamodel();
-    let (source, _, _preview_features) = parse_configuration(prisma_schema)?;
+    let (source, _preview_features) = parse_configuration(prisma_schema)?;
 
     let init_result = match driver_adapter {
         DriverAdapter::D1 => {
@@ -90,7 +85,7 @@ pub async fn setup_external<'a>(
                 .map_err(|err| ConnectorError::from_msg(format!("Error migrating with D1 adapter: {err}")))
         }
         _ => {
-            setup(prisma_schema, db_schemas).await?;
+            setup(initializer.url().to_owned(), prisma_schema, db_schemas).await?;
 
             // 3. Tell JavaScript to initialize the external test session.
             //    The schema migration is taken care of by the Schema Engine.
@@ -105,8 +100,8 @@ pub async fn setup_external<'a>(
 }
 
 /// Database setup for connector-test-kit-rs.
-pub async fn setup(prisma_schema: &str, db_schemas: &[&str]) -> ConnectorResult<()> {
-    let (source, url, _preview_features) = parse_configuration(prisma_schema)?;
+pub async fn setup(url: String, prisma_schema: &str, db_schemas: &[&str]) -> ConnectorResult<()> {
+    let (source, _preview_features) = parse_configuration(prisma_schema)?;
 
     let provider = Provider::try_from(source.active_provider).ok();
 
@@ -122,12 +117,12 @@ pub async fn setup(prisma_schema: &str, db_schemas: &[&str]) -> ConnectorResult<
 }
 
 /// Database teardown for connector-test-kit-rs.
-pub async fn teardown(prisma_schema: &str, db_schemas: &[&str]) -> ConnectorResult<()> {
-    let (source, url, _) = parse_configuration(prisma_schema)?;
+pub async fn teardown(url: &str, prisma_schema: &str, db_schemas: &[&str]) -> ConnectorResult<()> {
+    let (source, _) = parse_configuration(prisma_schema)?;
 
     match &source.active_provider {
         provider if [POSTGRES.provider_name()].contains(provider) => {
-            postgres_teardown(&url, db_schemas).await?;
+            postgres_teardown(url, db_schemas).await?;
         }
 
         provider

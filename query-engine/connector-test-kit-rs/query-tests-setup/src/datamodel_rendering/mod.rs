@@ -41,7 +41,7 @@ pub fn render_test_datamodel(
     db_schemas: &[&str],
     db_extensions: &[&str],
     isolation_level: Option<&'static str>,
-) -> String {
+) -> RenderedDatamodel {
     let (tag, version) = CONFIG.test_connector().unwrap();
     let preview_features = render_preview_features(tag.datamodel_provider(), excluded_features);
 
@@ -49,16 +49,12 @@ pub fn render_test_datamodel(
 
     let datasource = DatasourceBuilder::new("test")
         .provider(tag.datamodel_provider())
-        .url(connection_string(
-            &version,
-            test_database,
-            is_multi_schema,
-            isolation_level,
-        ))
+        .url("dummy-url")
         .relation_mode(relation_mode_override.unwrap_or_else(|| tag.relation_mode().to_string()))
         .schemas_if_not_empty(db_schemas)
         .extensions_if_not_empty(db_extensions)
         .render();
+    let url = connection_string(&version, test_database, is_multi_schema, isolation_level);
 
     let datasource_with_generator = format!(
         indoc! {r#"
@@ -75,7 +71,8 @@ pub fn render_test_datamodel(
     let renderer = tag.datamodel_renderer();
     let models = process_template(template, renderer);
 
-    format!("{datasource_with_generator}\n\n{models}")
+    let schema = format!("{datasource_with_generator}\n\n{models}");
+    RenderedDatamodel { schema, url }
 }
 
 fn process_template(template: String, renderer: Box<dyn DatamodelRenderer>) -> String {
@@ -104,4 +101,10 @@ fn render_preview_features(provider: &str, excluded_features: &[&str]) -> String
         .map(|f| format!(r#""{f}""#))
         .filter(|f| !excluded_features.contains(f))
         .join(", ")
+}
+
+#[derive(Debug)]
+pub struct RenderedDatamodel {
+    pub schema: String,
+    pub url: String,
 }
