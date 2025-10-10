@@ -169,7 +169,7 @@ async fn a_table_with_enum_default_values(api: &mut TestApi) -> TestResult {
 
         datasource db {
           provider = "cockroachdb"
-          url      = "env(TEST_DATABASE_URL)"
+          url      = "dummy-url"
         }
 
         model Book {
@@ -275,7 +275,7 @@ async fn an_enum_with_invalid_value_names_should_have_them_commented_out(api: &m
 
         datasource db {
           provider = "cockroachdb"
-          url      = "env(TEST_DATABASE_URL)"
+          url      = "dummy-url"
         }
 
         enum threechars {
@@ -310,7 +310,7 @@ async fn enum_array_type(api: &mut TestApi) -> TestResult {
 
         datasource db {
           provider = "cockroachdb"
-          url      = "env(TEST_DATABASE_URL)"
+          url      = "dummy-url"
         }
 
         model Post {

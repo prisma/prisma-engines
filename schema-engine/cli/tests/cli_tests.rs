@@ -817,7 +817,7 @@ fn introspect_e2e() {
     let schema = r#"
         datasource db {
             provider = "sqlite"
-            url = env("TEST_DATABASE_URL")
+            url = "dummy-url"
         }
 
     "#;

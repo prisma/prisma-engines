@@ -156,7 +156,7 @@ fn cockroach_specific_native_types_are_valid() {
     let schema = indoc! {r#"
         datasource db {
           provider = "cockroachdb"
-          url = env("TEST_DATABASE_URL")
+          url = "dummy-url"
         }
 
         model NativeTypesTest {

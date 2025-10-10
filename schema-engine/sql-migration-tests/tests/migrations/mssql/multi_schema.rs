@@ -12,7 +12,7 @@ fn multi_schema_tests(_api: TestApi) {
     let base_schema = indoc! {r#"
         datasource db {
           provider   = "sqlserver"
-          url        = env("TEST_DATABASE_URL")
+          url        = "dummy-url"
           schemas    = ["one", "two"]
         }
 
@@ -1125,7 +1125,7 @@ fn multi_schema_migration(api: TestApi) {
     let dm = indoc! {r#"
         datasource db {
           provider = "sqlserver"
-          url      = env("TEST_DATABASE_URL")
+          url      = "dummy-url"
           schemas  = ["one", "two"]
         }
 

@@ -20,7 +20,7 @@ async fn should_work_with_the_preview_feature_enabled(api: &mut TestApi) -> Test
 
         datasource db {
           provider   = "postgresql"
-          url        = "env(TEST_DATABASE_URL)"
+          url        = "dummy-url"
           extensions = [citext(schema: "public")]
         }
     "#]];
@@ -46,7 +46,7 @@ async fn sanitizes_problematic_extension_names(api: &mut TestApi) -> TestResult 
 
         datasource db {
           provider   = "postgresql"
-          url        = "env(TEST_DATABASE_URL)"
+          url        = "dummy-url"
           extensions = [uuid_ossp(map: "uuid-ossp", schema: "public")]
         }
     "#]];
@@ -76,7 +76,7 @@ async fn should_not_list_any_extensions_outside_of_allow_list(api: &mut TestApi)
 
         datasource db {
           provider = "postgresql"
-          url      = "env(TEST_DATABASE_URL)"
+          url      = "dummy-url"
         }
     "#]];
 
@@ -105,7 +105,7 @@ async fn should_not_remove_any_extensions_outside_of_allow_list(api: &mut TestAp
 
         datasource db {
           provider   = "postgresql"
-          url        = "env(TEST_DATABASE_URL)"
+          url        = "dummy-url"
           extensions = [amcheck]
         }
     "#};
@@ -118,7 +118,7 @@ async fn should_not_remove_any_extensions_outside_of_allow_list(api: &mut TestAp
 
         datasource db {
           provider   = "postgresql"
-          url        = "env(TEST_DATABASE_URL)"
+          url        = "dummy-url"
           extensions = [amcheck]
         }
     "#]];
@@ -143,7 +143,7 @@ async fn should_not_list_extensions_without_the_preview_feature(api: &mut TestAp
 
         datasource db {
           provider = "postgresql"
-          url      = "env(TEST_DATABASE_URL)"
+          url      = "dummy-url"
         }
     "#]];
 
@@ -168,7 +168,7 @@ async fn should_keep_version_attribute_if_same_as_db(api: &mut TestApi) -> TestR
 
         datasource db {
           provider   = "postgresql"
-          url        = "env(TEST_DATABASE_URL)"
+          url        = "dummy-url"
           extensions = [citext(version: "1.6")]
         }
     "#};
@@ -181,7 +181,7 @@ async fn should_keep_version_attribute_if_same_as_db(api: &mut TestApi) -> TestR
 
         datasource db {
           provider   = "postgresql"
-          url        = "env(TEST_DATABASE_URL)"
+          url        = "dummy-url"
           extensions = [citext(version: "1.6")]
         }
     "#]];
@@ -207,7 +207,7 @@ async fn should_update_version_attribute_if_different_than_db(api: &mut TestApi)
 
         datasource db {
           provider   = "postgresql"
-          url        = "env(TEST_DATABASE_URL)"
+          url        = "dummy-url"
           extensions = [citext(version: "1.4")]
         }
     "#};
@@ -220,7 +220,7 @@ async fn should_update_version_attribute_if_different_than_db(api: &mut TestApi)
 
         datasource db {
           provider   = "postgresql"
-          url        = "env(TEST_DATABASE_URL)"
+          url        = "dummy-url"
           extensions = [citext(version: "1.6")]
         }
     "#]];
@@ -246,7 +246,7 @@ async fn should_keep_schema_attribute_if_same_as_db(api: &mut TestApi) -> TestRe
 
         datasource db {
           provider   = "postgresql"
-          url        = "env(TEST_DATABASE_URL)"
+          url        = "dummy-url"
           extensions = [citext(schema: "public")]
         }
     "#};
@@ -259,7 +259,7 @@ async fn should_keep_schema_attribute_if_same_as_db(api: &mut TestApi) -> TestRe
 
         datasource db {
           provider   = "postgresql"
-          url        = "env(TEST_DATABASE_URL)"
+          url        = "dummy-url"
           extensions = [citext(schema: "public")]
         }
     "#]];
@@ -285,7 +285,7 @@ async fn should_update_schema_attribute_if_different_than_db(api: &mut TestApi) 
 
         datasource db {
           provider   = "postgresql"
-          url        = "env(TEST_DATABASE_URL)"
+          url        = "dummy-url"
           extensions = [citext(schema: "meow")]
         }
     "#};
@@ -298,7 +298,7 @@ async fn should_update_schema_attribute_if_different_than_db(api: &mut TestApi) 
 
         datasource db {
           provider   = "postgresql"
-          url        = "env(TEST_DATABASE_URL)"
+          url        = "dummy-url"
           extensions = [citext(schema: "public")]
         }
     "#]];
@@ -318,7 +318,7 @@ async fn should_remove_missing_extensions(api: &mut TestApi) -> TestResult {
 
         datasource db {
           provider   = "postgresql"
-          url        = "env(TEST_DATABASE_URL)"
+          url        = "dummy-url"
           extensions = [citext]
         }
     "#};
@@ -331,7 +331,7 @@ async fn should_remove_missing_extensions(api: &mut TestApi) -> TestResult {
 
         datasource db {
           provider = "postgresql"
-          url      = "env(TEST_DATABASE_URL)"
+          url      = "dummy-url"
         }
     "#]];
 
@@ -350,7 +350,7 @@ async fn no_extensions_means_no_extensions(api: &mut TestApi) -> TestResult {
 
         datasource db {
           provider = "postgresql"
-          url      = "env(TEST_DATABASE_URL)"
+          url      = "dummy-url"
         }
     "#]];
 
@@ -379,7 +379,7 @@ async fn introspect_extension_type(api: &mut TestApi) -> TestResult {
 
         datasource db {
           provider = "postgresql"
-          url      = "env(TEST_DATABASE_URL)"
+          url      = "dummy-url"
         }
 
         model A {
@@ -422,7 +422,7 @@ async fn introspect_specific_extension_type_by_type_modifier(api: &mut TestApi) 
 
         datasource db {
           provider = "postgresql"
-          url      = "env(TEST_DATABASE_URL)"
+          url      = "dummy-url"
         }
 
         model A {
@@ -470,7 +470,7 @@ async fn introspect_extension_type_with_modifier(api: &mut TestApi) -> TestResul
 
         datasource db {
           provider = "postgresql"
-          url      = "env(TEST_DATABASE_URL)"
+          url      = "dummy-url"
         }
 
         model A {

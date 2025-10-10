@@ -104,7 +104,7 @@ fn bigint_defaults_work(api: TestApi) {
     let schema = r#"
         datasource mypg {
             provider = "sqlite"
-            url = env("TEST_DATABASE_URL")
+            url = "dummy-url"
         }
 
         model foo {
@@ -130,7 +130,7 @@ fn default_string_with_escaped_unicode(api: TestApi) {
     let dm = r#"
         datasource mypg {
             provider = "sqlite"
-            url = env("TEST_DATABASE_URL")
+            url = "dummy-url"
         }
 
         model test {

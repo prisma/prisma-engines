@@ -25,7 +25,7 @@ $$
 
         datasource db {
           provider = "postgresql"
-          url      = "env(TEST_DATABASE_URL)"
+          url      = "dummy-url"
         }
 
         model stringstest {
@@ -233,7 +233,7 @@ async fn a_table_with_json_columns(api: &mut TestApi) -> TestResult {
 
         datasource db {
           provider = "postgresql"
-          url      = "env(TEST_DATABASE_URL)"
+          url      = "dummy-url"
         }
 
         model Foo {
@@ -266,7 +266,7 @@ async fn datetime_default_expressions_are_not_truncated(api: &mut TestApi) -> Te
 
         datasource db {
           provider = "postgresql"
-          url      = "env(TEST_DATABASE_URL)"
+          url      = "dummy-url"
         }
 
         model Foo {
@@ -290,7 +290,7 @@ async fn northwind(api: TestApi) {
 
         datasource db {
           provider = "postgresql"
-          url      = "env(TEST_DATABASE_URL)"
+          url      = "dummy-url"
         }
 
         model categories {

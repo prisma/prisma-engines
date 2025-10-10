@@ -2,7 +2,7 @@
 
 datasource db {
     provider = "sqlite"
-    url = env("TEST_DATABASE_URL")
+    url = "dummy-url"
 }
 
 model A {

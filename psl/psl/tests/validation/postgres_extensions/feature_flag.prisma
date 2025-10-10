@@ -5,5 +5,5 @@ generator js {
 
 datasource mypg {
   provider   = "postgresql"
-  url        = env("TEST_DATABASE_URL")
+  url        = "dummy-url"
 }

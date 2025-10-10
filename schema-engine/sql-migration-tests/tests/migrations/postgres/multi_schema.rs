@@ -50,7 +50,7 @@ fn multi_schema_tests(_api: TestApi) {
     let base_schema = indoc! {r#"
         datasource db {
           provider   = "postgresql"
-          url        = env("TEST_DATABASE_URL")
+          url        = "dummy-url"
           schemas    = ["one", "two"]
         }
 
@@ -1679,7 +1679,7 @@ fn migration_without_schema_change(api: TestApi) {
     let datasource = formatdoc! {r#"
             datasource db {{
               provider   = "postgresql"
-              url        = env("TEST_DATABASE_URL")
+              url        = "dummy-url"
             }}
 
             generator js {{
@@ -1734,7 +1734,7 @@ fn schema_push_with_multi_schema_should_ignore_default_schema(api: TestApi) {
     let dm = r#"
         datasource db {
           provider   = "postgresql"
-          url        = env("TEST_DATABASE_URL")
+          url        = "dummy-url"
           schemas    = ["one"]
         }
 
