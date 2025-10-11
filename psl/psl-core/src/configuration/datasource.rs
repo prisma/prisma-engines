@@ -78,7 +78,6 @@ impl std::fmt::Debug for Datasource {
             .field("provider", &self.provider)
             .field("active_provider", &self.active_provider)
             // .field("url", &"<url>")
-            .field("url", &self.url)
             .field("documentation", &self.documentation)
             .field("active_connector", &&"...")
             .field("shadow_database_url", &"<shadow_database_url>")

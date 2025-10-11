@@ -37,11 +37,6 @@ fn connector_for_connection_string(
     shadow_database_connection_string: Option<String>,
     preview_features: BitFlags<PreviewFeature>,
 ) -> CoreResult<Box<dyn schema_connector::SchemaConnector>> {
-    println!(
-        "[connector_for_connection_string] connection_string: {}",
-        &connection_string
-    );
-
     match connection_string.split(':').next() {
         Some("postgres") | Some("postgresql") | Some("prisma+postgres") => {
             let params = ConnectorParams {
@@ -105,8 +100,6 @@ fn schema_to_dialect(schema_files: &[(String, SourceFile)]) -> CoreResult<Box<dy
         .next()
         .ok_or_else(|| CoreError::from_msg("There is no datasource in the schema.".into()))?;
 
-    println!("[schema_to_dialect] datasource.load_direct_url");
-
     if let Ok(connection_string) = datasource.load_direct_url(|key| env::var(key).ok()) {
         // TODO: remove conditional branch in Prisma 7.
         let connector_params = ConnectorParams {
@@ -122,7 +115,6 @@ fn schema_to_dialect(schema_files: &[(String, SourceFile)]) -> CoreResult<Box<dy
 }
 
 /// Go from a schema to a connector.
-/// TODO: this is the problematic entrypoint.
 fn schema_to_connector(
     files: &[(String, SourceFile)],
     config_dir: Option<&Path>,
@@ -185,7 +177,6 @@ pub fn schema_api_without_extensions(
     datamodel: Option<String>,
     host: Option<std::sync::Arc<dyn schema_connector::ConnectorHost>>,
 ) -> CoreResult<Box<dyn GenericApi>> {
-    println!("[schema_api_without_extensions] calling [schema_api]");
     schema_api(datamodel, host, Arc::new(ExtensionTypeConfig::default()))
 }
 
@@ -202,7 +193,6 @@ pub fn schema_api(
 
     let datamodel = datamodel.map(|datamodel| vec![("schema.prisma".to_owned(), SourceFile::from(datamodel))]);
 
-    println!("[schema_api] creating EngineState without overrides");
     let state = state::EngineState::new(datamodel, None, host, extension_config);
     Ok(Box::new(state))
 }
