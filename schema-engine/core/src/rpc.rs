@@ -15,6 +15,7 @@ impl RpcApi {
     /// Initializes a JSON-RPC ready schema engine API.
     pub fn new(
         initial_datamodels: Option<Vec<(String, String)>>,
+        datasource_urls_override: Option<psl::DatasourceUrls>,
         host: Arc<dyn schema_connector::ConnectorHost>,
         extension_config: Arc<ExtensionTypeConfig>,
     ) -> Self {
@@ -28,6 +29,7 @@ impl RpcApi {
 
         let api = Arc::new(RwLock::new(crate::state::EngineState::new(
             initial_datamodels,
+            datasource_urls_override,
             Some(host),
             extension_config,
         )));

@@ -37,6 +37,11 @@ fn connector_for_connection_string(
     shadow_database_connection_string: Option<String>,
     preview_features: BitFlags<PreviewFeature>,
 ) -> CoreResult<Box<dyn schema_connector::SchemaConnector>> {
+    println!(
+        "[connector_for_connection_string] connection_string: {}",
+        &connection_string
+    );
+
     match connection_string.split(':').next() {
         Some("postgres") | Some("postgresql") | Some("prisma+postgres") => {
             let params = ConnectorParams {
@@ -87,40 +92,45 @@ fn connector_for_connection_string(
 }
 
 /// Same as schema_to_connector, but it will only read the provider, not the connector params.
-fn schema_to_dialect(files: &[(String, SourceFile)]) -> CoreResult<Box<dyn schema_connector::SchemaDialect>> {
-    let (_, config) = psl::parse_configuration_multi_file(files)
+/// This uses `schema_files` to read `preview_features` and the `datasource` block.
+/// TODO: pass `datasource_urls_override`, and override the URL-like fields in the extracted `datasource` value accordingly.
+fn schema_to_dialect(schema_files: &[(String, SourceFile)]) -> CoreResult<Box<dyn schema_connector::SchemaDialect>> {
+    let (_, config) = psl::parse_configuration_multi_file(schema_files)
         .map_err(|(files, err)| CoreError::new_schema_parser_error(files.render_diagnostics(&err)))?;
 
     let preview_features = config.preview_features();
-    let source = config
+    let datasource = config
         .datasources
         .into_iter()
         .next()
         .ok_or_else(|| CoreError::from_msg("There is no datasource in the schema.".into()))?;
 
-    if let Ok(connection_string) = source.load_direct_url(|key| env::var(key).ok()) {
+    println!("[schema_to_dialect] datasource.load_direct_url");
+
+    if let Ok(connection_string) = datasource.load_direct_url(|key| env::var(key).ok()) {
         // TODO: remove conditional branch in Prisma 7.
         let connector_params = ConnectorParams {
             connection_string,
             preview_features,
-            shadow_database_connection_string: source.load_shadow_database_url().ok().flatten(),
+            shadow_database_connection_string: datasource.load_shadow_database_url().ok().flatten(),
         };
-        let conn = connector_for_provider(source.active_provider, connector_params)?;
+        let conn = connector_for_provider(datasource.active_provider, connector_params)?;
         Ok(conn.schema_dialect())
     } else {
-        ::commands::dialect_for_provider(source.active_provider)
+        ::commands::dialect_for_provider(datasource.active_provider)
     }
 }
 
-/// Go from a schema to a connector
+/// Go from a schema to a connector.
+/// TODO: this is the problematic entrypoint.
 fn schema_to_connector(
     files: &[(String, SourceFile)],
     config_dir: Option<&Path>,
 ) -> CoreResult<Box<dyn schema_connector::SchemaConnector>> {
-    let (source, url, preview_features, shadow_database_url) = parse_configuration_multi(files)?;
+    let (datasource, url, preview_features, shadow_database_url) = parse_configuration_multi(files)?;
 
     let url = config_dir
-        .map(|config_dir| psl::set_config_dir(source.active_connector.flavour(), config_dir, &url).into_owned())
+        .map(|config_dir| psl::set_config_dir(datasource.active_connector.flavour(), config_dir, &url).into_owned())
         .unwrap_or(url);
 
     let params = ConnectorParams {
@@ -129,7 +139,7 @@ fn schema_to_connector(
         shadow_database_connection_string: shadow_database_url,
     };
 
-    connector_for_provider(source.active_provider, params)
+    connector_for_provider(datasource.active_provider, params)
 }
 
 fn connector_for_provider(
@@ -158,6 +168,7 @@ pub fn schema_api_without_extensions(
     datamodel: Option<String>,
     host: Option<std::sync::Arc<dyn schema_connector::ConnectorHost>>,
 ) -> CoreResult<Box<dyn GenericApi>> {
+    println!("[schema_api_without_extensions] calling [schema_api]");
     schema_api(datamodel, host, Arc::new(ExtensionTypeConfig::default()))
 }
 
@@ -173,7 +184,9 @@ pub fn schema_api(
     }
 
     let datamodel = datamodel.map(|datamodel| vec![("schema.prisma".to_owned(), SourceFile::from(datamodel))]);
-    let state = state::EngineState::new(datamodel, host, extension_config);
+
+    println!("[schema_api] creating EngineState without overrides");
+    let state = state::EngineState::new(datamodel, None, host, extension_config);
     Ok(Box::new(state))
 }
 

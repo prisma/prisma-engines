@@ -31,6 +31,8 @@ use tracing_futures::{Instrument, WithSubscriber};
 /// channels. That ensures that each connector is handling requests one at a time to avoid
 /// synchronization issues. You can think of it in terms of the actor model.
 pub(crate) struct EngineState {
+    // The initial Prisma schema for the engine state.
+    // Its datasource URL-like attributes may be overridden with CLI flags.
     initial_datamodel: Option<psl::ValidatedSchema>,
     host: Arc<dyn ConnectorHost>,
     extensions: Arc<ExtensionTypeConfig>,
@@ -78,13 +80,25 @@ type ErasedConnectorRequest = Box<
 impl EngineState {
     pub(crate) fn new(
         initial_datamodels: Option<Vec<(String, SourceFile)>>,
+        datasource_urls_override: Option<psl::DatasourceUrls>,
         host: Option<Arc<dyn ConnectorHost>>,
         extensions: Arc<ExtensionTypeConfig>,
     ) -> Self {
+        let initial_datamodel = initial_datamodels
+            .as_deref()
+            .map(|dm| psl::validate_multi_file(dm, &*extensions))
+            .map(|mut validated_schema| {
+                validated_schema.configuration.datasources = validated_schema
+                    .configuration
+                    .datasources
+                    .into_iter()
+                    .map(|ds| ds.r#override(datasource_urls_override.clone()))
+                    .collect();
+                validated_schema
+            });
+
         EngineState {
-            initial_datamodel: initial_datamodels
-                .as_deref()
-                .map(|dm| psl::validate_multi_file(dm, &*extensions)),
+            initial_datamodel,
             host: host.unwrap_or_else(|| Arc::new(schema_connector::EmptyHost)),
             extensions,
             connectors: Default::default(),
@@ -102,6 +116,7 @@ impl EngineState {
             })
     }
 
+    /// TODO: this is the problematic entrypoint.
     async fn with_connector_for_schema<O: Send + 'static>(
         &self,
         schemas: Vec<(String, SourceFile)>,
@@ -150,6 +165,10 @@ impl EngineState {
         response_receiver.await.expect("receiver boomed")
     }
 
+    // Note: this method is used by:
+    // - `prisma db pull` via `EngineState::introspect_sql`
+    // - `prisma db execute` via `EngineState::db_execute`
+    // - `prisma/prisma tests` via `EngineState::drop_database`
     async fn with_connector_for_url<O: Send + 'static>(&self, url: String, f: ConnectorRequest<O>) -> CoreResult<O> {
         let (response_sender, response_receiver) = tokio::sync::oneshot::channel::<CoreResult<O>>();
         let erased: ErasedConnectorRequest = Box::new(move |connector| {
@@ -204,6 +223,10 @@ impl EngineState {
         }
     }
 
+    // TODO: this function decomposes the `initial_datamodel` input parameter of `EngineState`.
+    // It's like calling `f(x)` in the constructor, and `f^{-1}(x)` here.
+    // I understand this is done because `ValidatedSchema` is not cloneable nor hash-able, but what's the point
+    // of `with_connector_for_schema` cloning and hashing in the first place?
     async fn with_default_connector<O>(&self, f: ConnectorRequest<O>) -> CoreResult<O>
     where
         O: Sized + Send + 'static,
