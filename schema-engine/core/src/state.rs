@@ -65,6 +65,7 @@ impl EngineState {
 enum ConnectorRequestType {
     Schema(Vec<(String, SourceFile)>),
     Url(String),
+    InitialDatamodel,
 }
 
 /// A request from the core to a connector, in the form of an async closure.
@@ -231,19 +232,52 @@ impl EngineState {
     where
         O: Sized + Send + 'static,
     {
-        let schema = if let Some(initial_datamodel) = &self.initial_datamodel {
+        let initial_datamodel = if let Some(initial_datamodel) = &self.initial_datamodel {
             initial_datamodel
         } else {
             return Err(ConnectorError::from_msg("Missing --datamodels".to_owned()));
         };
 
-        let schemas = schema
-            .db
-            .iter_file_sources()
-            .map(|(name, content)| (name.to_string(), content.clone()))
-            .collect::<Vec<_>>();
+        let (response_sender, response_receiver) = tokio::sync::oneshot::channel::<CoreResult<O>>();
+        let erased: ErasedConnectorRequest = Box::new(move |connector| {
+            Box::pin(async move {
+                let output = f(connector).await;
+                response_sender
+                    .send(output)
+                    .map_err(|_| ())
+                    .expect("failed to send back response in schema-engine state");
+            })
+        });
 
-        self.with_connector_for_schema(schemas, None, f).await
+        let mut connectors = self.connectors.lock().await;
+
+        match connectors.get(&ConnectorRequestType::InitialDatamodel) {
+            Some(request_sender) => match request_sender.send(erased).await {
+                Ok(()) => (),
+                Err(_) => return Err(ConnectorError::from_msg("tokio mpsc send error".to_owned())),
+            },
+            None => {
+                let mut connector = crate::initial_datamodel_to_connector(initial_datamodel)?;
+
+                connector.set_host(self.host.clone());
+                let (erased_sender, mut erased_receiver) = mpsc::channel::<ErasedConnectorRequest>(12);
+                tokio::spawn(
+                    async move {
+                        while let Some(req) = erased_receiver.recv().await {
+                            req(connector.as_mut()).await;
+                        }
+                    }
+                    .with_current_subscriber(),
+                );
+                match erased_sender.send(erased).await {
+                    Ok(()) => (),
+                    Err(_) => return Err(ConnectorError::from_msg("erased sender send error".to_owned())),
+                };
+                connectors.insert(ConnectorRequestType::InitialDatamodel, erased_sender);
+            }
+        }
+
+        response_receiver.await.expect("receiver boomed")
     }
 }
 

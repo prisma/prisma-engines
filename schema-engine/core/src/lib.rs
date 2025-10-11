@@ -142,6 +142,23 @@ fn schema_to_connector(
     connector_for_provider(datasource.active_provider, params)
 }
 
+fn initial_datamodel_to_connector(
+    inital_datamodel: &psl::ValidatedSchema,
+) -> CoreResult<Box<dyn schema_connector::SchemaConnector>> {
+    let configuration = &inital_datamodel.configuration;
+    let (datasource, url, preview_features, shadow_database_url) = extract_configuration_ref(configuration, |_| {
+        CoreError::new_schema_parser_error(inital_datamodel.render_own_diagnostics())
+    })?;
+
+    let params = ConnectorParams {
+        connection_string: url,
+        preview_features,
+        shadow_database_connection_string: shadow_database_url,
+    };
+
+    connector_for_provider(datasource.active_provider, params)
+}
+
 fn connector_for_provider(
     provider: &str,
     params: ConnectorParams,
@@ -219,6 +236,27 @@ fn extract_configuration(
     let source = config
         .datasources
         .into_iter()
+        .next()
+        .ok_or_else(|| CoreError::from_msg("There is no datasource in the schema.".into()))?;
+
+    let url = source
+        .load_direct_url(|key| env::var(key).ok())
+        .map_err(&mut err_handler)?;
+
+    let shadow_database_url = source.load_shadow_database_url().map_err(err_handler)?;
+
+    Ok((source, url, preview_features, shadow_database_url))
+}
+
+fn extract_configuration_ref(
+    config: &psl::Configuration,
+    mut err_handler: impl Fn(psl::Diagnostics) -> CoreError,
+) -> CoreResult<(&Datasource, String, BitFlags<PreviewFeature>, Option<String>)> {
+    let preview_features = config.preview_features();
+
+    let source = config
+        .datasources
+        .iter()
         .next()
         .ok_or_else(|| CoreError::from_msg("There is no datasource in the schema.".into()))?;
 
