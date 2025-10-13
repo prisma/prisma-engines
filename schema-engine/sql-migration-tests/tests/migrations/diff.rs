@@ -793,7 +793,7 @@ fn with_invalid_schema_filter_sqlite(mut api: TestApi) {
     assert_eq!(err.error_code(), Some("P3024"));
 }
 
-#[test_connector(tags(Postgres))]
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
 fn with_invalid_schema_filter_postgres(mut api: TestApi) {
     let tempdir = tempfile::tempdir().unwrap();
     let connection_string = api.connection_string();
