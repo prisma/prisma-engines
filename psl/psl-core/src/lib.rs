@@ -20,7 +20,8 @@ use std::sync::Arc;
 pub use crate::{
     common::{ALL_PREVIEW_FEATURES, FeatureMapWithProvider, PreviewFeature, PreviewFeatures},
     configuration::{
-        Configuration, Datasource, DatasourceConnectorData, Generator, GeneratorConfigValue, StringFromEnvVar,
+        Configuration, Datasource, DatasourceConnectorData, DatasourceUrls, Generator, GeneratorConfigValue,
+        StringFromEnvVar,
     },
     reformat::{reformat, reformat_multiple, reformat_validated_schema_into_single},
 };

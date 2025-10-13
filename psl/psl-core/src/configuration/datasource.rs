@@ -1,4 +1,5 @@
 use schema_ast::ast::WithSpan;
+use serde::Deserialize;
 
 use crate::{
     configuration::StringFromEnvVar,
@@ -6,9 +7,18 @@ use crate::{
     diagnostics::{DatamodelError, Diagnostics, Span},
     set_config_dir,
 };
-use std::{any::Any, borrow::Cow, path::Path};
+use std::{any::Any, borrow::Cow, path::Path, sync::Arc};
+
+#[derive(Debug, Clone, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct DatasourceUrls {
+    pub url: String,
+    pub shadow_database_url: Option<String>,
+    pub direct_url: Option<String>,
+}
 
 /// a `datasource` from the prisma schema.
+#[derive(Clone)]
 pub struct Datasource {
     pub name: String,
     /// Span of the whole datasource block (including `datasource` keyword and braces)
@@ -17,21 +27,24 @@ pub struct Datasource {
     pub provider: String,
     /// The provider that was selected as active from all specified providers
     pub active_provider: &'static str,
-    pub url: StringFromEnvVar,
-    pub url_span: Span,
-    pub direct_url: Option<StringFromEnvVar>,
-    pub direct_url_span: Option<Span>,
     pub documentation: Option<String>,
     /// the connector of the active provider
     pub active_connector: &'static dyn Connector,
-    /// An optional user-defined shadow database URL.
-    pub shadow_database_url: Option<(StringFromEnvVar, Span)>,
     /// In which layer referential actions are handled.
     pub relation_mode: Option<RelationMode>,
     /// _Sorted_ vec of schemas defined in the schemas property.
     pub namespaces: Vec<(String, Span)>,
     pub schemas_span: Option<Span>,
     pub connector_data: DatasourceConnectorData,
+
+    /// URL-related fields will no longer be parsed from Prisma Schemas in
+    /// Prisma 7.0.0.
+    pub url: StringFromEnvVar,
+    pub url_span: Span,
+    pub direct_url: Option<StringFromEnvVar>,
+    pub direct_url_span: Option<Span>,
+    /// An optional user-defined shadow database URL.
+    pub shadow_database_url: Option<(StringFromEnvVar, Span)>,
 }
 
 pub enum UrlValidationError {
@@ -41,13 +54,13 @@ pub enum UrlValidationError {
     NoUrlOrEnv,
 }
 
-#[derive(Default)]
+#[derive(Clone, Default)]
 pub struct DatasourceConnectorData {
-    data: Option<Box<dyn Any + Send + Sync + 'static>>,
+    data: Option<Arc<dyn Any + Send + Sync + 'static>>,
 }
 
 impl DatasourceConnectorData {
-    pub fn new(data: Box<dyn Any + Send + Sync + 'static>) -> Self {
+    pub fn new(data: Arc<dyn Any + Send + Sync + 'static>) -> Self {
         Self { data: Some(data) }
     }
 
@@ -74,6 +87,26 @@ impl std::fmt::Debug for Datasource {
 }
 
 impl Datasource {
+    pub fn r#override(&mut self, datasource_urls_override: DatasourceUrls) {
+        self.url = StringFromEnvVar {
+            value: Some(datasource_urls_override.url),
+            from_env_var: None,
+        };
+        self.direct_url = datasource_urls_override.direct_url.map(|url| StringFromEnvVar {
+            value: Some(url),
+            from_env_var: None,
+        });
+        self.shadow_database_url = datasource_urls_override.shadow_database_url.map(|url| {
+            (
+                StringFromEnvVar {
+                    value: Some(url),
+                    from_env_var: None,
+                },
+                self.url_span,
+            )
+        });
+    }
+
     /// Extract connector-specific constructs. The type parameter must be the right one.
     #[track_caller]
     pub fn downcast_connector_data<T: 'static>(&self) -> Option<&T> {

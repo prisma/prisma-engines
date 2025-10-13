@@ -16,7 +16,7 @@ impl TestApi {
         let rt = tokio::runtime::Runtime::new().unwrap();
         TestApi {
             _args,
-            api: RpcApi::new(None, host, Arc::new(ExtensionTypeConfig::default())),
+            api: RpcApi::new(None, None, host, Arc::new(ExtensionTypeConfig::default())),
             rt,
         }
     }
