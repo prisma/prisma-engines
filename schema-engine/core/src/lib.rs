@@ -117,9 +117,11 @@ fn schema_to_dialect(schema_files: &[(String, SourceFile)]) -> CoreResult<Box<dy
 /// Go from a schema to a connector.
 fn schema_to_connector(
     files: &[(String, SourceFile)],
+    datasource_urls_override: Option<&psl::DatasourceUrls>,
     config_dir: Option<&Path>,
 ) -> CoreResult<Box<dyn schema_connector::SchemaConnector>> {
-    let (datasource, url, preview_features, shadow_database_url) = parse_configuration_multi(files)?;
+    let (datasource, url, preview_features, shadow_database_url) =
+        parse_configuration_multi(files, datasource_urls_override)?;
 
     let url = config_dir
         .map(|config_dir| psl::set_config_dir(datasource.active_connector.flavour(), config_dir, &url).into_owned())
@@ -208,9 +210,16 @@ fn parse_configuration(datamodel: &str) -> CoreResult<(Datasource, String, BitFl
 
 fn parse_configuration_multi(
     files: &[(String, SourceFile)],
+    datasource_urls_override: Option<&psl::DatasourceUrls>,
 ) -> CoreResult<(Datasource, String, BitFlags<PreviewFeature>, Option<String>)> {
-    let (files, config) = psl::parse_configuration_multi_file(files)
+    let (files, mut config) = psl::parse_configuration_multi_file(files)
         .map_err(|(files, err)| CoreError::new_schema_parser_error(files.render_diagnostics(&err)))?;
+
+    if let Some(override_urls) = datasource_urls_override {
+        for ds in &mut config.datasources {
+            ds.r#override(override_urls.clone());
+        }
+    }
 
     extract_configuration(config, |err| {
         CoreError::new_schema_parser_error(files.render_diagnostics(&err))

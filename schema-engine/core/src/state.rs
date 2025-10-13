@@ -32,8 +32,10 @@ use tracing_futures::{Instrument, WithSubscriber};
 /// synchronization issues. You can think of it in terms of the actor model.
 pub(crate) struct EngineState {
     // The initial Prisma schema for the engine state.
-    // Its datasource URL-like attributes may be overridden with CLI flags.
+    // Its datasource URL-like attributes are overridden by `datasource_urls_override`, if provided.
     initial_datamodel: Option<psl::ValidatedSchema>,
+    // Override the URL-like attributes of the initial datamodel's datasources, if provided.
+    datasource_urls_override: Option<psl::DatasourceUrls>,
     host: Arc<dyn ConnectorHost>,
     extensions: Arc<ExtensionTypeConfig>,
     // A map from either:
@@ -50,7 +52,7 @@ pub(crate) struct EngineState {
 impl EngineState {
     fn get_url_from_schemas(&self, container: &SchemasWithConfigDir) -> CoreResult<String> {
         let sources = container.to_psl_input();
-        let (datasource, url, _, _) = parse_configuration_multi(&sources)?;
+        let (datasource, url, _, _) = parse_configuration_multi(&sources, self.datasource_urls_override.as_ref())?;
 
         Ok(psl::set_config_dir(
             datasource.active_connector.flavour(),
@@ -88,18 +90,25 @@ impl EngineState {
         let initial_datamodel = initial_datamodels
             .as_deref()
             .map(|dm| psl::validate_multi_file(dm, &*extensions))
-            .map(|mut validated_schema| {
-                validated_schema.configuration.datasources = validated_schema
-                    .configuration
-                    .datasources
-                    .into_iter()
-                    .map(|ds| ds.r#override(datasource_urls_override.clone()))
-                    .collect();
-                validated_schema
+            .map(|mut schema| {
+                datasource_urls_override.clone().map(|override_urls| {
+                    schema.configuration.datasources = schema
+                        .configuration
+                        .datasources
+                        .iter()
+                        .cloned()
+                        .map(|mut ds| {
+                            ds.r#override(override_urls.clone());
+                            ds
+                        })
+                        .collect();
+                });
+                schema
             });
 
         EngineState {
             initial_datamodel,
+            datasource_urls_override,
             host: host.unwrap_or_else(|| Arc::new(schema_connector::EmptyHost)),
             extensions,
             connectors: Default::default(),
@@ -143,7 +152,8 @@ impl EngineState {
                 Err(_) => return Err(ConnectorError::from_msg("tokio mpsc send error".to_owned())),
             },
             None => {
-                let mut connector = crate::schema_to_connector(&schemas, config_dir)?;
+                let mut connector =
+                    crate::schema_to_connector(&schemas, self.datasource_urls_override.as_ref(), config_dir)?;
 
                 connector.set_host(self.host.clone());
                 let (erased_sender, mut erased_receiver) = mpsc::channel::<ErasedConnectorRequest>(12);

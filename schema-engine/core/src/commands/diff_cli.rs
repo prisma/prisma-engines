@@ -141,7 +141,7 @@ async fn json_rpc_diff_target_to_dialect(
             // actually, just use the given `connector`. Verify that the provider is the same
             // as the one assumed by the connector.
 
-            let mut connector = crate::schema_to_connector(&sources, Some(config_dir))?;
+            let mut connector = crate::schema_to_connector(&sources, None, Some(config_dir))?;
             connector.ensure_connection_validity().await?;
             connector.set_preview_features(preview_features);
             filter.validate(&*connector.schema_dialect())?;
@@ -154,7 +154,7 @@ async fn json_rpc_diff_target_to_dialect(
 
             // Connector only needed to infer the default namespace.
             // If connector cannot be created (e.g. due to invalid or missing URL) we use the dialect's default namespace.
-            let (default_namespace, dialect) = match crate::schema_to_connector(&sources, None) {
+            let (default_namespace, dialect) = match crate::schema_to_connector(&sources, None, None) {
                 Ok(connector) => (
                     connector.default_runtime_namespace().map(|ns| ns.to_string()),
                     connector.schema_dialect(),
