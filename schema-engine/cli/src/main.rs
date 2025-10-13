@@ -229,8 +229,7 @@ async fn start_engine(
 
     let datasource_urls_override = datasource_urls_override
         .as_deref()
-        .map(|str| serde_json::from_str::<DatasourceUrls>(str).ok())
-        .flatten();
+        .and_then(|str| serde_json::from_str::<DatasourceUrls>(str).ok());
 
     let (client, adapter) = json_rpc_stdio::new_client();
     let host = JsonRpcHost { client };

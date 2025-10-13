@@ -135,11 +135,11 @@ fn schema_to_connector(
 }
 
 fn initial_datamodel_to_connector(
-    inital_datamodel: &psl::ValidatedSchema,
+    initial_datamodel: &psl::ValidatedSchema,
 ) -> CoreResult<Box<dyn schema_connector::SchemaConnector>> {
-    let configuration = &inital_datamodel.configuration;
+    let configuration = &initial_datamodel.configuration;
     let (datasource, url, preview_features, shadow_database_url) = extract_configuration_ref(configuration, |_| {
-        CoreError::new_schema_parser_error(inital_datamodel.render_own_diagnostics())
+        CoreError::new_schema_parser_error(initial_datamodel.render_own_diagnostics())
     })?;
 
     let params = ConnectorParams {
@@ -246,8 +246,7 @@ fn extract_configuration_ref(
 
     let source = config
         .datasources
-        .iter()
-        .next()
+        .first()
         .ok_or_else(|| CoreError::from_msg("There is no datasource in the schema.".into()))?;
 
     let url = source

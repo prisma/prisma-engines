@@ -26,26 +26,24 @@ pub struct Datasource {
     pub provider: String,
     /// The provider that was selected as active from all specified providers
     pub active_provider: &'static str,
-    #[deprecated(since = "6.17.0", note = "will be removed in 7.0.0")]
-    pub url: StringFromEnvVar,
-    #[deprecated(since = "6.17.0", note = "will be removed in 7.0.0")]
-    pub url_span: Span,
-    #[deprecated(since = "6.17.0", note = "will be removed in 7.0.0")]
-    pub direct_url: Option<StringFromEnvVar>,
-    #[deprecated(since = "6.17.0", note = "will be removed in 7.0.0")]
-    pub direct_url_span: Option<Span>,
     pub documentation: Option<String>,
     /// the connector of the active provider
     pub active_connector: &'static dyn Connector,
-    /// An optional user-defined shadow database URL.
-    #[deprecated(since = "6.17.0", note = "will be removed in 7.0.0")]
-    pub shadow_database_url: Option<(StringFromEnvVar, Span)>,
     /// In which layer referential actions are handled.
     pub relation_mode: Option<RelationMode>,
     /// _Sorted_ vec of schemas defined in the schemas property.
     pub namespaces: Vec<(String, Span)>,
     pub schemas_span: Option<Span>,
     pub connector_data: DatasourceConnectorData,
+
+    /// URL-related fields will no longer be parsed from Prisma Schemas in
+    /// Prisma 7.0.0.
+    pub url: StringFromEnvVar,
+    pub url_span: Span,
+    pub direct_url: Option<StringFromEnvVar>,
+    pub direct_url_span: Option<Span>,
+    /// An optional user-defined shadow database URL.
+    pub shadow_database_url: Option<(StringFromEnvVar, Span)>,
 }
 
 pub enum UrlValidationError {
@@ -77,7 +75,7 @@ impl std::fmt::Debug for Datasource {
             .field("name", &self.name)
             .field("provider", &self.provider)
             .field("active_provider", &self.active_provider)
-            // .field("url", &"<url>")
+            .field("url", &"<url>")
             .field("documentation", &self.documentation)
             .field("active_connector", &&"...")
             .field("shadow_database_url", &"<shadow_database_url>")
