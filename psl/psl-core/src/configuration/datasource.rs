@@ -7,7 +7,7 @@ use crate::{
     diagnostics::{DatamodelError, Diagnostics, Span},
     set_config_dir,
 };
-use std::{any::Any, borrow::Cow, path::Path};
+use std::{any::Any, borrow::Cow, path::Path, sync::Arc};
 
 #[derive(Debug, Clone, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -18,6 +18,7 @@ pub struct DatasourceUrls {
 }
 
 /// a `datasource` from the prisma schema.
+#[derive(Clone)]
 pub struct Datasource {
     pub name: String,
     /// Span of the whole datasource block (including `datasource` keyword and braces)
@@ -53,13 +54,13 @@ pub enum UrlValidationError {
     NoUrlOrEnv,
 }
 
-#[derive(Default)]
+#[derive(Clone, Default)]
 pub struct DatasourceConnectorData {
-    data: Option<Box<dyn Any + Send + Sync + 'static>>,
+    data: Option<Arc<dyn Any + Send + Sync + 'static>>,
 }
 
 impl DatasourceConnectorData {
-    pub fn new(data: Box<dyn Any + Send + Sync + 'static>) -> Self {
+    pub fn new(data: Arc<dyn Any + Send + Sync + 'static>) -> Self {
         Self { data: Some(data) }
     }
 
@@ -86,20 +87,16 @@ impl std::fmt::Debug for Datasource {
 }
 
 impl Datasource {
-    pub fn r#override(mut self, datasource_urls_override: Option<DatasourceUrls>) -> Self {
-        let Some(urls) = datasource_urls_override else {
-            return self;
-        };
-
+    pub fn r#override(&mut self, datasource_urls_override: DatasourceUrls) {
         self.url = StringFromEnvVar {
-            value: Some(urls.url),
+            value: Some(datasource_urls_override.url),
             from_env_var: None,
         };
-        self.direct_url = urls.direct_url.map(|url| StringFromEnvVar {
+        self.direct_url = datasource_urls_override.direct_url.map(|url| StringFromEnvVar {
             value: Some(url),
             from_env_var: None,
         });
-        self.shadow_database_url = urls.shadow_database_url.map(|url| {
+        self.shadow_database_url = datasource_urls_override.shadow_database_url.map(|url| {
             (
                 StringFromEnvVar {
                     value: Some(url),
@@ -108,8 +105,6 @@ impl Datasource {
                 self.url_span,
             )
         });
-
-        self
     }
 
     /// Extract connector-specific constructs. The type parameter must be the right one.
