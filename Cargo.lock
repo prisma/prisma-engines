@@ -4935,6 +4935,7 @@ dependencies = [
  "indoc",
  "jsonrpc-core",
  "panic-utils",
+ "psl",
  "quaint",
  "schema-connector",
  "schema-core",
