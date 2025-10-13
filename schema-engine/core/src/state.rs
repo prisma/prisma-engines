@@ -91,7 +91,7 @@ impl EngineState {
             .as_deref()
             .map(|dm| psl::validate_multi_file(dm, &*extensions))
             .map(|mut schema| {
-                datasource_urls_override.clone().map(|override_urls| {
+                if let Some(override_urls) = datasource_urls_override.clone() {
                     schema.configuration.datasources = schema
                         .configuration
                         .datasources
@@ -102,7 +102,8 @@ impl EngineState {
                             ds
                         })
                         .collect();
-                });
+                }
+
                 schema
             });
 
