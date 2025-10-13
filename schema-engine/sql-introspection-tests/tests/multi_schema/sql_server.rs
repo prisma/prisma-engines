@@ -26,7 +26,7 @@ async fn multiple_schemas_without_schema_property_are_not_introspected(api: &mut
 
         datasource db {
           provider = "sqlserver"
-          url      = "env(TEST_DATABASE_URL)"
+          url      = "dummy-url"
         }
 
         model A {
@@ -96,7 +96,7 @@ async fn multiple_schemas_w_tables_are_introspected(api: &mut TestApi) -> TestRe
 
         datasource db {
           provider = "sqlserver"
-          url      = "env(TEST_DATABASE_URL)"
+          url      = "dummy-url"
           schemas  = ["first", "second"]
         }
 
@@ -224,7 +224,7 @@ async fn multiple_schemas_w_duplicate_table_names_are_introspected(api: &mut Tes
 
         datasource db {
           provider = "sqlserver"
-          url      = "env(TEST_DATABASE_URL)"
+          url      = "dummy-url"
           schemas  = ["first", "second"]
         }
 
@@ -278,7 +278,7 @@ async fn multiple_schemas_w_cross_schema_are_introspected(api: &mut TestApi) -> 
 
         datasource db {
           provider = "sqlserver"
-          url      = "env(TEST_DATABASE_URL)"
+          url      = "dummy-url"
           schemas  = ["first", "second"]
         }
 
@@ -395,7 +395,7 @@ async fn multiple_schemas_w_cross_schema_fks_w_duplicate_names_are_introspected(
 
         datasource db {
           provider = "sqlserver"
-          url      = "env(TEST_DATABASE_URL)"
+          url      = "dummy-url"
           schemas  = ["first", "second"]
         }
 
@@ -490,7 +490,7 @@ async fn schemas_with_varying_case(api: &mut TestApi) -> TestResult {
 
         datasource db {
           provider = "sqlserver"
-          url      = "env(TEST_DATABASE_URL)"
+          url      = "dummy-url"
           schemas  = ["Appointments", "Trips", "core"]
         }
 
@@ -593,7 +593,7 @@ async fn defaults_are_introspected(api: &mut TestApi) -> TestResult {
 
         datasource db {
           provider = "sqlserver"
-          url      = "env(TEST_DATABASE_URL)"
+          url      = "dummy-url"
           schemas  = ["first", "second"]
         }
 

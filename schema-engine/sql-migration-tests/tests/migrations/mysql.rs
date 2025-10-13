@@ -613,7 +613,7 @@ fn bigint_defaults_work(api: TestApi) {
     let schema = r#"
         datasource mypg {
             provider = "mysql"
-            url = env("TEST_DATABASE_URL")
+            url = "dummy-url"
         }
 
         model foo {

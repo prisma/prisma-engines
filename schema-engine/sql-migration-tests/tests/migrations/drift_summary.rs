@@ -53,7 +53,7 @@ fn empty_schemas() {
         r#"
         datasource db {
             provider = "postgresql"
-            url = env("TEST_DATABASE_URL")
+            url = "dummy-url"
         }
         "#,
         expect![[r#"

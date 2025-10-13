@@ -10,7 +10,7 @@ fn extensions_can_be_created(api: TestApi) {
     let dm = indoc! {r#"
         datasource db {
           provider   = "postgresql"
-          url        = env("TEST_DATABASE_URL")
+          url        = "dummy-url"
           extensions = [citext]
         }
 
@@ -30,7 +30,7 @@ fn multiple_extensions_can_be_created(api: TestApi) {
     let dm = indoc! {r#"
         datasource db {
           provider   = "postgresql"
-          url        = env("TEST_DATABASE_URL")
+          url        = "dummy-url"
           extensions = [citext, pg_trgm]
         }
 
@@ -51,7 +51,7 @@ fn mapped_extensions_can_be_created(api: TestApi) {
     let dm = indoc! {r#"
         datasource db {
           provider   = "postgresql"
-          url        = env("TEST_DATABASE_URL")
+          url        = "dummy-url"
           extensions = [uuid_ossp(map: "uuid-ossp")]
         }
 
@@ -71,7 +71,7 @@ fn extensions_can_be_created_with_a_version(api: TestApi) {
     let dm = indoc! {r#"
         datasource db {
           provider   = "postgresql"
-          url        = env("TEST_DATABASE_URL")
+          url        = "dummy-url"
           extensions = [citext(version: "1.5")]
         }
 
@@ -91,7 +91,7 @@ fn extension_version_can_be_changed(api: TestApi) {
     let dm = indoc! {r#"
         datasource db {
           provider   = "postgresql"
-          url        = env("TEST_DATABASE_URL")
+          url        = "dummy-url"
           extensions = [citext(version: "1.5")]
         }
 
@@ -108,7 +108,7 @@ fn extension_version_can_be_changed(api: TestApi) {
     let dm = indoc! {r#"
         datasource db {
           provider   = "postgresql"
-          url        = env("TEST_DATABASE_URL")
+          url        = "dummy-url"
           extensions = [citext(version: "1.6")]
         }
 
@@ -128,7 +128,7 @@ fn extension_version_does_not_change_on_empty(api: TestApi) {
     let dm = indoc! {r#"
         datasource db {
           provider   = "postgresql"
-          url        = env("TEST_DATABASE_URL")
+          url        = "dummy-url"
           extensions = [citext(version: "1.5")]
         }
 
@@ -145,7 +145,7 @@ fn extension_version_does_not_change_on_empty(api: TestApi) {
     let dm = indoc! {r#"
         datasource db {
           provider   = "postgresql"
-          url        = env("TEST_DATABASE_URL")
+          url        = "dummy-url"
           extensions = [citext]
         }
 
@@ -167,7 +167,7 @@ fn extension_schema_can_be_defined(api: TestApi) {
     let dm = indoc! {r#"
         datasource db {
           provider   = "postgresql"
-          url        = env("TEST_DATABASE_URL")
+          url        = "dummy-url"
           extensions = [citext(schema: "public-temp")]
         }
 
@@ -191,7 +191,7 @@ fn relocatable_extension_can_be_relocated(api: TestApi) {
     let dm = indoc! {r#"
         datasource db {
           provider   = "postgresql"
-          url        = env("TEST_DATABASE_URL")
+          url        = "dummy-url"
           extensions = [citext(schema: "public")]
         }
 
@@ -210,7 +210,7 @@ fn relocatable_extension_can_be_relocated(api: TestApi) {
     let dm = indoc! {r#"
         datasource db {
           provider   = "postgresql"
-          url        = env("TEST_DATABASE_URL")
+          url        = "dummy-url"
           extensions = [citext(schema: "public-temp")]
         }
 
@@ -234,7 +234,7 @@ fn non_relocatable_extension_can_be_relocated(api: TestApi) {
     let dm = indoc! {r#"
         datasource db {
           provider   = "postgresql"
-          url        = env("TEST_DATABASE_URL")
+          url        = "dummy-url"
           extensions = [xml2(schema: "public")]
         }
 
@@ -251,7 +251,7 @@ fn non_relocatable_extension_can_be_relocated(api: TestApi) {
     let dm = indoc! {r#"
         datasource db {
           provider   = "postgresql"
-          url        = env("TEST_DATABASE_URL")
+          url        = "dummy-url"
           extensions = [xml2(schema: "public-temp")]
         }
 
@@ -273,7 +273,7 @@ fn removing_schema_definition_does_nothing(api: TestApi) {
     let dm = indoc! {r#"
         datasource db {
           provider   = "postgresql"
-          url        = env("TEST_DATABASE_URL")
+          url        = "dummy-url"
           extensions = [citext(schema: "public")]
         }
 
@@ -292,7 +292,7 @@ fn removing_schema_definition_does_nothing(api: TestApi) {
     let dm = indoc! {r#"
         datasource db {
           provider   = "postgresql"
-          url        = env("TEST_DATABASE_URL")
+          url        = "dummy-url"
           extensions = [citext]
         }
 
@@ -314,7 +314,7 @@ fn extension_functions_can_be_used_in_the_same_migration(api: TestApi) {
     let dm = indoc! {r#"
         datasource db {
           provider   = "postgresql"
-          url        = env("TEST_DATABASE_URL")
+          url        = "dummy-url"
           extensions = [uuid_ossp(map: "uuid-ossp")]
         }
 
@@ -347,7 +347,7 @@ fn create_table_with_extension_types(api: TestApi) {
 
         datasource db {
           provider = "postgresql"
-          url      = "env(TEST_DATABASE_URL)"
+          url      = "dummy-url"
         }
 
         model A {
@@ -391,7 +391,7 @@ fn diff_extension_type_changed_modifiers(api: TestApi) {
 
         datasource db {
           provider = "postgresql"
-          url      = "env(TEST_DATABASE_URL)"
+          url      = "dummy-url"
         }
 
         model A {
@@ -407,7 +407,7 @@ fn diff_extension_type_changed_modifiers(api: TestApi) {
 
         datasource db {
           provider = "postgresql"
-          url      = "env(TEST_DATABASE_URL)"
+          url      = "dummy-url"
         }
 
         model A {
@@ -455,7 +455,7 @@ fn diff_extension_type_unchanged_modifiers(api: TestApi) {
 
         datasource db {
           provider = "postgresql"
-          url = "env(TEST_DATABASE_URL)"
+          url = "dummy-url"
         }
 
         model A {
@@ -495,7 +495,7 @@ fn diff_extension_type_changed_db_type_modifiers(api: TestApi) {
 
         datasource db {
           provider = "postgresql"
-          url      = "env(TEST_DATABASE_URL)"
+          url      = "dummy-url"
         }
 
         model A {
@@ -511,7 +511,7 @@ fn diff_extension_type_changed_db_type_modifiers(api: TestApi) {
 
         datasource db {
           provider = "postgresql"
-          url      = "env(TEST_DATABASE_URL)"
+          url      = "dummy-url"
         }
 
         model A {
@@ -552,7 +552,7 @@ fn diff_extension_type_unchanged_db_type_modifiers(api: TestApi) {
 
         datasource db {
           provider = "postgresql"
-          url      = "env(TEST_DATABASE_URL)"
+          url      = "dummy-url"
         }
 
         model A {
@@ -591,7 +591,7 @@ fn diff_unchanged_unsupported_type(api: TestApi) {
 
         datasource db {
           provider = "postgresql"
-          url      = "env(TEST_DATABASE_URL)"
+          url      = "dummy-url"
         }
 
         model A {
@@ -625,7 +625,7 @@ fn diff_changed_unsupported_type(api: TestApi) {
 
         datasource db {
           provider = "postgresql"
-          url      = "env(TEST_DATABASE_URL)"
+          url      = "dummy-url"
         }
 
         model A {

@@ -365,7 +365,7 @@ fn foreign_key_renaming_to_default_works(api: TestApi) {
     let target_schema = r#"
         datasource db {
             provider = "postgresql"
-            url = env("TEST_DATABASE_URL")
+            url = "dummy-url"
         }
 
         model Dog {
@@ -694,7 +694,7 @@ fn bigint_defaults_work(api: TestApi) {
     let schema = r#"
         datasource mypg {
             provider = "postgresql"
-            url = env("TEST_DATABASE_URL")
+            url = "dummy-url"
         }
 
         model foo {
@@ -734,7 +734,7 @@ fn dbgenerated_on_generated_columns_is_idempotent(api: TestApi) {
     let schema = r#"
         datasource db {
             provider = "postgresql"
-            url = env("TEST_DATABASE_URL")
+            url = "dummy-url"
         }
 
         model table {
@@ -766,7 +766,7 @@ fn dbgenerated_on_generated_unsupported_columns_is_idempotent(api: TestApi) {
     let schema = r#"
         datasource db {
             provider = "postgresql"
-            url = env("TEST_DATABASE_URL")
+            url = "dummy-url"
         }
 
         model table {

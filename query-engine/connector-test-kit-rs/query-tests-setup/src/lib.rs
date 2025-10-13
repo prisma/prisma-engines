@@ -44,13 +44,17 @@ pub static ENGINE_PROTOCOL: LazyLock<String> =
     LazyLock::new(|| std::env::var("PRISMA_ENGINE_PROTOCOL").unwrap_or_else(|_| "graphql".to_owned()));
 
 /// Teardown of a test setup.
-async fn teardown_project(datamodel: &str, db_schemas: &[&str], schema_id: Option<usize>) -> TestResult<()> {
+async fn teardown_project(
+    datamodel: &RenderedDatamodel,
+    db_schemas: &[&str],
+    schema_id: Option<usize>,
+) -> TestResult<()> {
     if let Some(schema_id) = schema_id {
         let params = serde_json::json!({ "schemaId": schema_id });
         executor_process_request::<serde_json::Value>("teardown", params).await?;
     }
 
-    Ok(qe_setup::teardown(datamodel, db_schemas).await?)
+    Ok(qe_setup::teardown(&datamodel.url, &datamodel.schema, db_schemas).await?)
 }
 
 /// Helper method to allow a sync shell function to run the async test blocks.
@@ -202,9 +206,9 @@ fn run_relation_link_test_impl(
 
             run_with_tokio(
                 async move {
-                    println!("Used datamodel:\n {}", datamodel.yellow());
+                    println!("Used datamodel:\n {}", datamodel.schema.yellow());
                     let override_local_max_bind_values = None;
-                    let runner = Runner::load(datamodel.clone(), &[], version, connector_tag, override_local_max_bind_values, metrics, log_capture)
+                    let runner = Runner::load(&datamodel, &[], version, connector_tag, override_local_max_bind_values, metrics, log_capture)
                         .await
                         .unwrap();
 
@@ -349,10 +353,10 @@ fn run_connector_test_impl(
     let (log_capture, log_tx) = TestLogCapture::new();
 
     crate::run_with_tokio(async {
-        println!("Used datamodel:\n {}", datamodel.yellow());
+        println!("Used datamodel:\n {}", datamodel.schema.yellow());
         let override_local_max_bind_values = None;
         let runner = Runner::load(
-            datamodel.clone(),
+            &datamodel,
             db_schemas,
             version,
             connector_tag,

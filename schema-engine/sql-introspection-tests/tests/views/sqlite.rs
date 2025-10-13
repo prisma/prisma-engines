@@ -24,7 +24,7 @@ async fn basic_view_intro(api: &mut TestApi) -> TestResult {
 
         datasource db {
           provider = "sqlite"
-          url      = "env(TEST_DATABASE_URL)"
+          url      = "dummy-url"
         }
 
         model User {
@@ -120,7 +120,7 @@ async fn defaults_are_introspected(api: &mut TestApi) -> TestResult {
 
         datasource db {
           provider = "sqlite"
-          url      = "env(TEST_DATABASE_URL)"
+          url      = "dummy-url"
         }
 
         model A {

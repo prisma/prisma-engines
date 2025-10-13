@@ -3755,6 +3755,7 @@ dependencies = [
  "mongodb-client",
  "psl",
  "quaint",
+ "schema-connector",
  "schema-core",
  "serde",
  "serde_json",

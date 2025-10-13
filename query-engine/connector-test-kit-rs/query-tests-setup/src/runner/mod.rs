@@ -5,8 +5,8 @@ use serde::{Deserialize, Serialize};
 use telemetry::TraceParent;
 
 use crate::{
-    ConnectorTag, ConnectorVersion, ENGINE_PROTOCOL, QueryResult, TestError, TestLogCapture, TestResult,
-    executor_process_request,
+    ConnectorTag, ConnectorVersion, ENGINE_PROTOCOL, QueryResult, RenderedDatamodel, TestError, TestLogCapture,
+    TestResult, executor_process_request,
 };
 use colored::Colorize;
 use prisma_metrics::MetricRegistry;
@@ -22,7 +22,6 @@ use request_handlers::{
 };
 use serde_json::json;
 use std::{
-    env,
     fmt::Display,
     sync::{Arc, atomic::AtomicUsize},
 };
@@ -229,7 +228,7 @@ impl Runner {
     }
 
     pub async fn load(
-        datamodel: String,
+        datamodel: &RenderedDatamodel,
         db_schemas: &[&str],
         connector_version: ConnectorVersion,
         connector_tag: ConnectorTag,
@@ -238,15 +237,14 @@ impl Runner {
         log_capture: TestLogCapture,
     ) -> TestResult<Self> {
         let protocol = EngineProtocol::from(&ENGINE_PROTOCOL.to_string());
-        let schema = psl::parse_schema_without_extensions(&datamodel).unwrap();
+        let schema = psl::parse_schema_without_extensions(&datamodel.schema).unwrap();
         let datasource = schema.configuration.datasources.first().unwrap();
-        let url = datasource.load_url(|key| env::var(key).ok()).unwrap();
 
         let (executor, db_version, init_external_result) = match crate::CONFIG.with_driver_adapter() {
             Some(with_driver_adapter) => {
                 let external_executor = ExternalExecutor::new();
 
-                let external_initializer = external_executor.init(&datamodel, url.as_str());
+                let external_initializer = external_executor.init(&datamodel.schema, &datamodel.url);
 
                 let init_external_result =
                     qe_setup::setup_external(with_driver_adapter.adapter, external_initializer, db_schemas).await?;
@@ -257,11 +255,11 @@ impl Runner {
                 (executor, database_version, Some(init_external_result))
             }
             None => {
-                qe_setup::setup(&datamodel, db_schemas).await?;
+                qe_setup::setup(datamodel.url.clone(), &datamodel.schema, db_schemas).await?;
 
                 let query_executor = request_handlers::load_executor(
                     ConnectorKind::Rust {
-                        url: url.to_owned(),
+                        url: datamodel.url.clone(),
                         datasource,
                     },
                     schema.configuration.preview_features(),
@@ -299,7 +297,7 @@ impl Runner {
             executor,
             query_schema: Arc::new(query_schema),
             connector_tag,
-            connection_url: url,
+            connection_url: datamodel.url.clone(),
             current_tx_id: None,
             metrics,
             protocol,

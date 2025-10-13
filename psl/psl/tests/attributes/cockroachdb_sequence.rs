@@ -5,7 +5,7 @@ fn default_sequence_is_not_valid_on_postgres() {
     let schema = r#"
         datasource db {
             provider = "postgresql"
-            url = env("TEST_DATABASE_URL")
+            url = "dummy-url"
         }
 
         model Test {
@@ -30,7 +30,7 @@ fn default_sequence_is_valid_on_cockroachdb() {
     let schema = r#"
         datasource db {
             provider = "cockroachdb"
-            url = env("TEST_DATABASE_URL")
+            url = "dummy-url"
         }
 
         model Test {
@@ -46,7 +46,7 @@ fn default_sequence_with_one_argument_of_the_wrong_type_on_cockroachdb() {
     let schema = r#"
         datasource db {
             provider = "cockroachdb"
-            url = env("TEST_DATABASE_URL")
+            url = "dummy-url"
         }
 
         model Test {
@@ -71,7 +71,7 @@ fn default_sequence_with_one_argument_is_valid_on_cockroachdb() {
     let schema = r#"
         datasource db {
             provider = "cockroachdb"
-            url = env("TEST_DATABASE_URL")
+            url = "dummy-url"
         }
 
         model Test {
@@ -87,7 +87,7 @@ fn default_sequence_with_all_arguments_is_valid_on_cockroachdb() {
     let schema = r#"
         datasource db {
             provider = "cockroachdb"
-            url = env("TEST_DATABASE_URL")
+            url = "dummy-url"
         }
 
         model Test {
@@ -103,7 +103,7 @@ fn default_sequence_with_unknown_argument() {
     let schema = r#"
         datasource db {
             provider = "cockroachdb"
-            url = env("TEST_DATABASE_URL")
+            url = "dummy-url"
         }
 
         model Test {
