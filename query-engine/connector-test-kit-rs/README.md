@@ -58,7 +58,7 @@ As previously stated, the above can be omitted in favor of the `.test_config` co
 
 The config file must be either in the current working folder from which you invoke a test run or in `$WORKSPACE_ROOT`.
 It's recommended to use the file-based config as it's easier to switch between providers with an open IDE (reloading env vars would usually require reloading the IDE).
-The workspace root makefile contains a series of convenience commands to setup different connector test configs, e.g. `make dev-postgres10` sets up the correct test config file for the tests to pick up.
+The workspace root makefile contains a series of convenience commands to setup different connector test configs, e.g. `make dev-postgres12` sets up the correct test config file for the tests to pick up.
 
 On the note of docker containers: Most connectors require an endpoint to run against (notable exception at the moment is SQLite), so you need to provide one. The `docker-compose.yml` in the workspace root offers all possible databases and versions we actively test. The aforementioned `make` commands also set up the container for you together with the .
 

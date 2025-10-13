@@ -30,7 +30,6 @@ model User {
   last_name  String? @db.String(255)
 }
 
-/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 view Schwuser {
   id         BigInt?
   first_name String? @db.String(255)

@@ -52,41 +52,11 @@ services:
     ports:
       - '6432:6432'
 
-  postgres9:
-    image: postgres:9.6
-    restart: unless-stopped
-    command: postgres -c 'max_connections=1000'
-    environment:
-      POSTGRES_PASSWORD: 'prisma'
-    ports:
-      - '5431:5432'
-    networks:
-      - databases
-
-  postgres10:
-    image: postgres:10
-    restart: unless-stopped
-    command: postgres -c 'max_connections=1000'
-    environment:
-      POSTGRES_PASSWORD: 'prisma'
-    ports:
-      - '5432:5432'
-    networks:
-      - databases
-
-  postgres11:
-    image: postgres:11
-    restart: unless-stopped
-    command: postgres -c 'max_connections=1000'
-    environment:
-      POSTGRES_PASSWORD: 'prisma'
-    ports:
-      - '5433:5432'
-    networks:
-      - databases
-
   postgres12:
-    image: postgres:12
+    build:
+      context: ./docker/postgres-ext
+      args:
+        POSTGRES_VERSION: 12
     restart: unless-stopped
     command: postgres -c 'max_connections=1000'
     environment:
@@ -97,7 +67,10 @@ services:
       - databases
 
   postgres13:
-    image: postgres:13
+    build:
+      context: ./docker/postgres-ext
+      args:
+        POSTGRES_VERSION: 13
     restart: unless-stopped
     command: postgres -c 'max_connections=1000'
     environment:

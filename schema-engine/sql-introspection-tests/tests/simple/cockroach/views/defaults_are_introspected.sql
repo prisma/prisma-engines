@@ -21,7 +21,6 @@ model A {
   val BigInt? @default(3)
 }
 
-/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 view B {
   id  BigInt?
   val BigInt?

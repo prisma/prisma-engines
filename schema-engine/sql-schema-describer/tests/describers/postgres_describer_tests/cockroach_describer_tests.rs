@@ -396,6 +396,7 @@ fn multi_field_indexes_must_be_inferred_in_the_right_order(api: TestApi) {
             procedures: [],
             user_defined_types: [],
             connector_data: <ConnectorData>,
+            runtime_namespace: None,
         }
     "#]];
     api.expect_schema(expectation);

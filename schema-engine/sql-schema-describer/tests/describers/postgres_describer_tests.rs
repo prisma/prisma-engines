@@ -2991,6 +2991,7 @@ fn multiple_schemas_are_described(api: TestApi) {
             ],
             user_defined_types: [],
             connector_data: <ConnectorData>,
+            runtime_namespace: None,
         }
     "#]];
 

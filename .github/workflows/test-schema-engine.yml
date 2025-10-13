@@ -100,12 +100,6 @@ jobs:
             url: 'mysql://root:prisma@localhost:3306'
           - name: mysql_mariadb
             url: 'mysql://root:prisma@localhost:3308'
-          - name: postgres9
-            url: 'postgresql://postgres:prisma@localhost:5431'
-          - name: postgres10
-            url: 'postgresql://postgres:prisma@localhost:5432'
-          - name: postgres11
-            url: 'postgresql://postgres:prisma@localhost:5433'
           - name: postgres12
             url: 'postgresql://postgres:prisma@localhost:5434'
           - name: postgres13
