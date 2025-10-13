@@ -217,7 +217,7 @@ fn parse_configuration_multi(
 
     if let Some(override_urls) = datasource_urls_override {
         for ds in &mut config.datasources {
-            ds.r#override(override_urls.clone());
+            ds.override_urls(override_urls.clone());
         }
     }
 

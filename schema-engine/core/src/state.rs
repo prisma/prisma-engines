@@ -98,7 +98,7 @@ impl EngineState {
                         .iter()
                         .cloned()
                         .map(|mut ds| {
-                            ds.r#override(override_urls.clone());
+                            ds.override_urls(override_urls.clone());
                             ds
                         })
                         .collect();
@@ -127,7 +127,6 @@ impl EngineState {
             })
     }
 
-    /// TODO: this is the problematic entrypoint.
     async fn with_connector_for_schema<O: Send + 'static>(
         &self,
         schemas: Vec<(String, SourceFile)>,
@@ -235,10 +234,6 @@ impl EngineState {
         }
     }
 
-    // TODO: this function decomposes the `initial_datamodel` input parameter of `EngineState`.
-    // It's like calling `f(x)` in the constructor, and `f^{-1}(x)` here.
-    // I understand this is done because `ValidatedSchema` is not cloneable nor hash-able, but what's the point
-    // of `with_connector_for_schema` cloning and hashing in the first place?
     async fn with_default_connector<O>(&self, f: ConnectorRequest<O>) -> CoreResult<O>
     where
         O: Sized + Send + 'static,

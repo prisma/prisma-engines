@@ -46,8 +46,8 @@ struct SchemaEngineCli {
     /// Optional JSON string to override the `datasource` block's URLs in the schema.
     /// This is derived from a Prisma Config file with `engines: 'classic'`.
     /// TODO: in Prisma 7, this will be the only way to pass the datasource URLs.
-    #[structopt(long = "datasource", name = "JSON")]
-    datasource_urls_override: Option<String>,
+    #[structopt(long = "datasource", name = "JSON", parse(try_from_str = serde_json::from_str))]
+    datasource_urls_override: Option<DatasourceUrls>,
     #[structopt(subcommand)]
     cli_subcommand: Option<SubCommand>,
     #[structopt(short = "e", long, parse(try_from_str = serde_json::from_str))]
@@ -199,7 +199,7 @@ impl ConnectorHost for JsonRpcHost {
 
 async fn start_engine(
     datamodel_locations: Option<Vec<String>>,
-    datasource_urls_override: Option<String>,
+    datasource_urls_override: Option<DatasourceUrls>,
     shutdown_token: CancellationToken,
     extensions: Arc<ExtensionTypeConfig>,
 ) {
@@ -226,10 +226,6 @@ async fn start_engine(
             })
             .collect::<Vec<_>>()
     });
-
-    let datasource_urls_override = datasource_urls_override
-        .as_deref()
-        .and_then(|str| serde_json::from_str::<DatasourceUrls>(str).ok());
 
     let (client, adapter) = json_rpc_stdio::new_client();
     let host = JsonRpcHost { client };

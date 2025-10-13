@@ -87,7 +87,7 @@ impl std::fmt::Debug for Datasource {
 }
 
 impl Datasource {
-    pub fn r#override(&mut self, datasource_urls_override: DatasourceUrls) {
+    pub fn override_urls(&mut self, datasource_urls_override: DatasourceUrls) {
         self.url = StringFromEnvVar {
             value: Some(datasource_urls_override.url),
             from_env_var: None,
