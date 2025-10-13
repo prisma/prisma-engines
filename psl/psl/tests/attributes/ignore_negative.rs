@@ -236,3 +236,24 @@ fn disallow_ignore_on_ignored_model() {
 
     expectation.assert_eq(&error)
 }
+
+// #[test]
+// fn disallow_ignore_on_ignored_enum_value() {
+
+//       let dml = indoc! {r#"
+//         enum SupportedCarType {
+//           COUPE @ignore
+//     }
+//     "#};
+
+//     let error = parse_unwrap_err(dml);
+//     let expectation = expect![[r#"
+//         [1;91merror[0m: [1mError parsing attribute "@ignore": Enum values on an already ignored Enum do not need an `@ignore` annotation.[0m
+//           [1;94m-->[0m  [4mschema.prisma:2[0m
+//         [1;94m   | [0m
+//         [1;94m 1 | [0m    enum SupportedCarType {
+//         [1;94m 2 | [0m      COUPE [1;91m@ignore[0m
+//         [1;94m   | [0m
+//     "#]];
+//     expectation.assert_eq(&error);
+// }

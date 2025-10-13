@@ -9,6 +9,7 @@ pub struct EnumVariant<'a> {
     comment_out: bool,
     map: Option<FieldAttribute<'a>>,
     documentation: Option<Documentation<'a>>,
+    ignore: Option<FieldAttribute<'a>>,
 }
 
 impl<'a> EnumVariant<'a> {
@@ -26,6 +27,7 @@ impl<'a> EnumVariant<'a> {
             comment_out: false,
             map: None,
             documentation: None,
+            ignore: None,
         }
     }
 
@@ -53,6 +55,18 @@ impl<'a> EnumVariant<'a> {
     /// ```
     pub fn comment_out(&mut self) {
         self.comment_out = true;
+    }
+
+    /// Ignores the variant.
+    ///
+    /// ```ignore
+    /// enum Foo {
+    ///   Bar @ignore
+    ///         ^^^^^ this
+    /// }
+    /// ```
+    pub fn ignore(&mut self) {
+        self.ignore = Some(FieldAttribute::new(Function::new("ignore")));
     }
 
     /// Documentation of a variant.
@@ -89,6 +103,11 @@ impl fmt::Display for EnumVariant<'_> {
         if let Some(ref map) = self.map {
             f.write_str(" ")?;
             map.fmt(f)?;
+        }
+
+        if let Some(ref ignore) = self.ignore {
+            f.write_str(" ")?;
+            ignore.fmt(f)?;
         }
 
         Ok(())
