@@ -5,9 +5,10 @@ CREATE TABLE "A" (id SERIAL PRIMARY KEY, val INT DEFAULT 3);
 CREATE VIEW "B" AS SELECT id, val FROM "A";
 
 
+
 /*
 generator js {
-  provider = "prisma-client"
+  provider        = "prisma-client"
   previewFeatures = ["views"]
 }
 
@@ -24,7 +25,5 @@ model A {
 view B {
   id  BigInt?
   val BigInt?
-
-  @@ignore
 }
 */

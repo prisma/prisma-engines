@@ -24,9 +24,10 @@ CREATE VIEW "Schwuser" AS
 
 
 
+
 /*
 generator js {
-  provider = "prisma-client"
+  provider        = "prisma-client"
   previewFeatures = ["views"]
 }
 
@@ -52,7 +53,5 @@ view Schwuser {
   id           BigInt?
   name         String?
   introduction String?
-
-  @@ignore
 }
 */

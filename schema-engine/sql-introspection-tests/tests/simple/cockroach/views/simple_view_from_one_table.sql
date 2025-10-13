@@ -13,9 +13,10 @@ CREATE VIEW "Schwuser" AS
 
 
 
+
 /*
 generator js {
-  provider = "prisma-client"
+  provider        = "prisma-client"
   previewFeatures = ["views"]
 }
 
@@ -34,7 +35,5 @@ view Schwuser {
   id         BigInt?
   first_name String? @db.String(255)
   last_name  String? @db.String(255)
-
-  @@ignore
 }
 */

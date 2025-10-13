@@ -4,9 +4,10 @@
 
 CREATE VIEW public."A" AS SELECT 1 AS id;
 
+
 /*
 generator js {
-  provider = "prisma-client"
+  provider        = "prisma-client"
   previewFeatures = ["views"]
 }
 
@@ -19,7 +20,6 @@ datasource db {
 view A {
   id BigInt?
 
-  @@ignore
   @@schema("public")
 }
 */
