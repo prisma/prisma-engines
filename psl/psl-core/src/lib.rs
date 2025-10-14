@@ -214,7 +214,6 @@ fn validate_configuration(
     diagnostics: &mut Diagnostics,
     connectors: ConnectorRegistry<'_>,
 ) -> Configuration {
-    // TODO: set `is_using_driver_adapters` to the `true` constant for Prisma 7.0.0.
     let is_using_schema_engine_driver_adapters = has_preview_feature_schema_engine_driver_adapters(schema_ast);
 
     let datasources = datasource_loader::load_datasources_from_ast(

@@ -88,7 +88,9 @@ mod tests {
             "prismaSchema": schema,
         });
 
-        let expected = expect![[r#"{"generators":[],"errors":[{"file_name":"schema.prisma","message":"\u001b[1;91merror\u001b[0m: \u001b[1mError validating: This line is invalid. It does not start with any known Prisma schema keyword.\u001b[0m\n  \u001b[1;94m-->\u001b[0m  \u001b[4mschema.prisma:5\u001b[0m\n\u001b[1;94m   | \u001b[0m\n\u001b[1;94m 4 | \u001b[0m\n\u001b[1;94m 5 | \u001b[0m            \u001b[1;91mdatasøurce yolo {\u001b[0m\n\u001b[1;94m 6 | \u001b[0m            }\n\u001b[1;94m   | \u001b[0m\n"},{"file_name":"schema.prisma","message":"\u001b[1;91merror\u001b[0m: \u001b[1mError validating: This line is invalid. It does not start with any known Prisma schema keyword.\u001b[0m\n  \u001b[1;94m-->\u001b[0m  \u001b[4mschema.prisma:6\u001b[0m\n\u001b[1;94m   | \u001b[0m\n\u001b[1;94m 5 | \u001b[0m            datasøurce yolo {\n\u001b[1;94m 6 | \u001b[0m            \u001b[1;91m}\u001b[0m\n\u001b[1;94m 7 | \u001b[0m        \n\u001b[1;94m   | \u001b[0m\n"},{"file_name":"schema.prisma","message":"\u001b[1;91merror\u001b[0m: \u001b[1mArgument \"provider\" is missing in generator block \"js\".\u001b[0m\n  \u001b[1;94m-->\u001b[0m  \u001b[4mschema.prisma:2\u001b[0m\n\u001b[1;94m   | \u001b[0m\n\u001b[1;94m 1 | \u001b[0m\n\u001b[1;94m 2 | \u001b[0m            \u001b[1;91mgenerator js {\u001b[0m\n\u001b[1;94m 3 | \u001b[0m            }\n\u001b[1;94m   | \u001b[0m\n"}]}"#]];
+        let expected = expect![[
+            r#"{"generators":[],"errors":[{"file_name":"schema.prisma","message":"\u001b[1;91merror\u001b[0m: \u001b[1mError validating: This line is invalid. It does not start with any known Prisma schema keyword.\u001b[0m\n  \u001b[1;94m-->\u001b[0m  \u001b[4mschema.prisma:5\u001b[0m\n\u001b[1;94m   | \u001b[0m\n\u001b[1;94m 4 | \u001b[0m\n\u001b[1;94m 5 | \u001b[0m            \u001b[1;91mdatasøurce yolo {\u001b[0m\n\u001b[1;94m 6 | \u001b[0m            }\n\u001b[1;94m   | \u001b[0m\n"},{"file_name":"schema.prisma","message":"\u001b[1;91merror\u001b[0m: \u001b[1mError validating: This line is invalid. It does not start with any known Prisma schema keyword.\u001b[0m\n  \u001b[1;94m-->\u001b[0m  \u001b[4mschema.prisma:6\u001b[0m\n\u001b[1;94m   | \u001b[0m\n\u001b[1;94m 5 | \u001b[0m            datasøurce yolo {\n\u001b[1;94m 6 | \u001b[0m            \u001b[1;91m}\u001b[0m\n\u001b[1;94m 7 | \u001b[0m        \n\u001b[1;94m   | \u001b[0m\n"},{"file_name":"schema.prisma","message":"\u001b[1;91merror\u001b[0m: \u001b[1mArgument \"provider\" is missing in generator block \"js\".\u001b[0m\n  \u001b[1;94m-->\u001b[0m  \u001b[4mschema.prisma:2\u001b[0m\n\u001b[1;94m   | \u001b[0m\n\u001b[1;94m 1 | \u001b[0m\n\u001b[1;94m 2 | \u001b[0m            \u001b[1;91mgenerator js {\u001b[0m\n\u001b[1;94m 3 | \u001b[0m            }\n\u001b[1;94m   | \u001b[0m\n"}]}"#
+        ]];
         let response = get_generators(&request.to_string());
         expected.assert_eq(&response);
     }
@@ -126,7 +128,9 @@ mod tests {
             "prismaSchema": schema,
         });
 
-        let expected = expect![[r#"{"generators":[{"name":"js","provider":{"fromEnvVar":null,"value":"prisma-client"},"output":null,"config":{},"binaryTargets":[],"previewFeatures":[]}],"errors":[{"file_name":"schema.prisma","message":"\u001b[1;91merror\u001b[0m: \u001b[1mError validating: This line is invalid. It does not start with any known Prisma schema keyword.\u001b[0m\n  \u001b[1;94m-->\u001b[0m  \u001b[4mschema.prisma:6\u001b[0m\n\u001b[1;94m   | \u001b[0m\n\u001b[1;94m 5 | \u001b[0m\n\u001b[1;94m 6 | \u001b[0m            \u001b[1;91mmodel M {\u001b[0m\n\u001b[1;94m 7 | \u001b[0m        \n\u001b[1;94m   | \u001b[0m\n"}]}"#]];
+        let expected = expect![[
+            r#"{"generators":[{"name":"js","provider":{"fromEnvVar":null,"value":"prisma-client"},"output":null,"config":{},"binaryTargets":[],"previewFeatures":[]}],"errors":[{"file_name":"schema.prisma","message":"\u001b[1;91merror\u001b[0m: \u001b[1mError validating: This line is invalid. It does not start with any known Prisma schema keyword.\u001b[0m\n  \u001b[1;94m-->\u001b[0m  \u001b[4mschema.prisma:6\u001b[0m\n\u001b[1;94m   | \u001b[0m\n\u001b[1;94m 5 | \u001b[0m\n\u001b[1;94m 6 | \u001b[0m            \u001b[1;91mmodel M {\u001b[0m\n\u001b[1;94m 7 | \u001b[0m        \n\u001b[1;94m   | \u001b[0m\n"}]}"#
+        ]];
         let response = get_generators(&request.to_string());
         expected.assert_eq(&response);
     }
@@ -147,7 +151,9 @@ mod tests {
             "prismaSchema": schema,
         });
 
-        let expected = expect![[r#"{"generators":[{"name":"js","provider":{"fromEnvVar":null,"value":"prisma-client"},"output":null,"config":{},"binaryTargets":[],"previewFeatures":[]}],"errors":[{"file_name":"schema.prisma","message":"\u001b[1;91merror\u001b[0m: \u001b[1mError validating model \"M\": This field declaration is invalid. It is either missing a name or a type.\u001b[0m\n  \u001b[1;94m-->\u001b[0m  \u001b[4mschema.prisma:7\u001b[0m\n\u001b[1;94m   | \u001b[0m\n\u001b[1;94m 6 | \u001b[0m            model M {\n\u001b[1;94m 7 | \u001b[0m                \u001b[1;91mfield\u001b[0m\n\u001b[1;94m 8 | \u001b[0m            }\n\u001b[1;94m   | \u001b[0m\n"}]}"#]];
+        let expected = expect![[
+            r#"{"generators":[{"name":"js","provider":{"fromEnvVar":null,"value":"prisma-client"},"output":null,"config":{},"binaryTargets":[],"previewFeatures":[]}],"errors":[{"file_name":"schema.prisma","message":"\u001b[1;91merror\u001b[0m: \u001b[1mError validating model \"M\": This field declaration is invalid. It is either missing a name or a type.\u001b[0m\n  \u001b[1;94m-->\u001b[0m  \u001b[4mschema.prisma:7\u001b[0m\n\u001b[1;94m   | \u001b[0m\n\u001b[1;94m 6 | \u001b[0m            model M {\n\u001b[1;94m 7 | \u001b[0m                \u001b[1;91mfield\u001b[0m\n\u001b[1;94m 8 | \u001b[0m            }\n\u001b[1;94m   | \u001b[0m\n"}]}"#
+        ]];
         let response = get_generators(&request.to_string());
         expected.assert_eq(&response);
     }
@@ -166,7 +172,9 @@ mod tests {
             "prismaSchema": schema,
         });
 
-        let expected = expect![[r#"{"generators":[{"name":"js","provider":{"fromEnvVar":null,"value":"prisma-client"},"output":null,"config":{},"binaryTargets":[],"previewFeatures":[]}],"errors":[{"file_name":"schema.prisma","message":"\u001b[1;91merror\u001b[0m: \u001b[1mError validating: This line is invalid. It does not start with any known Prisma schema keyword.\u001b[0m\n  \u001b[1;94m-->\u001b[0m  \u001b[4mschema.prisma:6\u001b[0m\n\u001b[1;94m   | \u001b[0m\n\u001b[1;94m 5 | \u001b[0m\n\u001b[1;94m 6 | \u001b[0m            \u001b[1;91mdatasource D {\u001b[0m\n\u001b[1;94m 7 | \u001b[0m        \n\u001b[1;94m   | \u001b[0m\n"}]}"#]];
+        let expected = expect![[
+            r#"{"generators":[{"name":"js","provider":{"fromEnvVar":null,"value":"prisma-client"},"output":null,"config":{},"binaryTargets":[],"previewFeatures":[]}],"errors":[{"file_name":"schema.prisma","message":"\u001b[1;91merror\u001b[0m: \u001b[1mError validating: This line is invalid. It does not start with any known Prisma schema keyword.\u001b[0m\n  \u001b[1;94m-->\u001b[0m  \u001b[4mschema.prisma:6\u001b[0m\n\u001b[1;94m   | \u001b[0m\n\u001b[1;94m 5 | \u001b[0m\n\u001b[1;94m 6 | \u001b[0m            \u001b[1;91mdatasource D {\u001b[0m\n\u001b[1;94m 7 | \u001b[0m        \n\u001b[1;94m   | \u001b[0m\n"}]}"#
+        ]];
         let response = get_generators(&request.to_string());
         expected.assert_eq(&response);
     }
@@ -215,7 +223,9 @@ mod tests {
         let request = json!({
             "prismaSchema": schema,
         });
-        let expected = expect![[r#"{"generators":[{"name":"js","provider":{"fromEnvVar":null,"value":"prisma-client"},"output":null,"config":{"engineType":"client"},"binaryTargets":[],"previewFeatures":[]}],"errors":[]}"#]];
+        let expected = expect![[
+            r#"{"generators":[{"name":"js","provider":{"fromEnvVar":null,"value":"prisma-client"},"output":null,"config":{"engineType":"client"},"binaryTargets":[],"previewFeatures":[]}],"errors":[]}"#
+        ]];
         let response = get_generators(&request.to_string());
         expected.assert_eq(&response);
     }
