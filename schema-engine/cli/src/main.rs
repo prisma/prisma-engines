@@ -10,6 +10,7 @@ use std::{
     time::Duration,
 };
 
+use psl::DatasourceUrls;
 use schema_connector::{BoxFuture, ConnectorHost, ConnectorResult};
 use schema_core::{ExtensionTypeConfig, RpcApi};
 use structopt::StructOpt;
@@ -42,6 +43,11 @@ struct SchemaEngineCli {
     /// List of paths to the Prisma schema files.
     #[structopt(short = "d", long, name = "FILE")]
     datamodels: Option<Vec<String>>,
+    /// Optional JSON string to override the `datasource` block's URLs in the schema.
+    /// This is derived from a Prisma Config file with `engines: 'classic'`.
+    /// TODO: in Prisma 7, this will be the only way to pass the datasource URLs.
+    #[structopt(long = "datasource", name = "JSON", parse(try_from_str = serde_json::from_str))]
+    datasource_urls_override: Option<DatasourceUrls>,
     #[structopt(subcommand)]
     cli_subcommand: Option<SubCommand>,
     #[structopt(short = "e", long, parse(try_from_str = serde_json::from_str))]
@@ -88,7 +94,15 @@ async fn async_main() {
         async {
             let extensions = Arc::new(input.extension_types.unwrap_or_default());
             match input.cli_subcommand {
-                None => start_engine(input.datamodels, shutdown_token, extensions).await,
+                None => {
+                    start_engine(
+                        input.datamodels,
+                        input.datasource_urls_override,
+                        shutdown_token,
+                        extensions,
+                    )
+                    .await
+                }
                 Some(SubCommand::Cli(cli_command)) => {
                     tracing::info!(git_hash = env!("GIT_HASH"), "Starting schema engine CLI");
                     cli_command.run(shutdown_token, extensions).await;
@@ -185,6 +199,7 @@ impl ConnectorHost for JsonRpcHost {
 
 async fn start_engine(
     datamodel_locations: Option<Vec<String>>,
+    datasource_urls_override: Option<DatasourceUrls>,
     shutdown_token: CancellationToken,
     extensions: Arc<ExtensionTypeConfig>,
 ) {
@@ -192,7 +207,7 @@ async fn start_engine(
 
     tracing::info!(git_hash = env!("GIT_HASH"), "Starting schema engine RPC server",);
 
-    let datamodel_locations = datamodel_locations.map(|datamodel_locations| {
+    let initial_datamodels = datamodel_locations.map(|datamodel_locations| {
         datamodel_locations
             .into_iter()
             .map(|location| {
@@ -215,7 +230,7 @@ async fn start_engine(
     let (client, adapter) = json_rpc_stdio::new_client();
     let host = JsonRpcHost { client };
 
-    let api = RpcApi::new(datamodel_locations, Arc::new(host), extensions);
+    let api = RpcApi::new(initial_datamodels, datasource_urls_override, Arc::new(host), extensions);
 
     // Handle IO in async until EOF or cancelled. Note that the even if the
     // [`json_rpc_stdio::run_with_client`] future is cancelled, a separate
