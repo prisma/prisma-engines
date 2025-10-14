@@ -219,24 +219,6 @@ dev-better-sqlite3-wasm: build-qe-wasm build-se-wasm build-driver-adapters-kit-q
 test-better-sqlite3-wasm: dev-better-sqlite3-wasm test-qe-st
 test-driver-adapter-better-sqlite3-wasm: test-better-sqlite3-wasm
 
-start-postgres9:
-	docker compose -f docker-compose.yml up --wait -d --remove-orphans postgres9
-
-dev-postgres9: start-postgres9
-	cp $(CONFIG_PATH)/postgres9 $(CONFIG_FILE)
-
-start-postgres10:
-	docker compose -f docker-compose.yml up --wait -d --remove-orphans postgres10
-
-dev-postgres10: start-postgres10
-	cp $(CONFIG_PATH)/postgres10 $(CONFIG_FILE)
-
-start-postgres11:
-	docker compose -f docker-compose.yml up --wait -d --remove-orphans postgres11
-
-dev-postgres11: start-postgres11
-	cp $(CONFIG_PATH)/postgres11 $(CONFIG_FILE)
-
 start-postgres12:
 	docker compose -f docker-compose.yml up --wait -d --remove-orphans postgres12
 

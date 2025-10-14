@@ -49,12 +49,6 @@ jobs:
             version: '13'
           - name: 'postgres12'
             version: '12'
-          - name: 'postgres11'
-            version: '11'
-          - name: 'postgres10'
-            version: '10'
-          - name: 'postgres9'
-            version: '9'
     name: 'Postgres Old v${{ matrix.database.version}}'
     uses: ./.github/workflows/test-query-engine-template.yml
     with:
