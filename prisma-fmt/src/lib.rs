@@ -3,6 +3,7 @@ mod code_actions;
 mod get_config;
 mod get_datamodel;
 mod get_dmmf;
+mod get_generators;
 mod hover;
 mod lint;
 mod merge_schemas;
@@ -265,6 +266,42 @@ pub fn referential_actions(schema: String) -> String {
 /// ```
 pub fn get_config(get_config_params: String) -> String {
     get_config::get_config(&get_config_params)
+}
+
+/// This command returns the list of generators defined in the schema, with their provider and output.
+///
+/// Params is a JSON string with the following shape:
+/// ```typescript
+/// interface GetPrismaGeneratorsParams {
+///   prismaSchema: string
+/// }
+/// ```
+///
+/// Params example:
+///
+/// ```json
+/// {
+///   "prismaSchema": <the prisma schema>
+/// }
+/// ```
+///
+/// The response is a array of JSON strings with the following shape:
+///
+/// ```typescript
+/// interface GeneratorConfig {
+///   name: string; // The name of the generator
+///   provider: string; // The provider of the generator
+///   config: { [key: string]: string }; // The config of the generator
+/// }
+///
+/// type GetGeneratorsResult = {
+///   generators: GeneratorConfig[];
+///   errors: { message: string; file_name: string }[];
+/// }
+/// ```
+///
+pub fn get_generators(params: String) -> String {
+    get_generators::get_generators(&params)
 }
 
 /// This is the same command as get_dmmf()
