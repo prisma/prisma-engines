@@ -872,6 +872,7 @@ fn all_mysql_column_types_must_work(api: TestApi) {
             procedures: [],
             user_defined_types: [],
             connector_data: <ConnectorData>,
+            runtime_namespace: None,
         }
     "#]];
     api.expect_schema(expectation);
@@ -1698,6 +1699,7 @@ fn all_mariadb_column_types_must_work(api: TestApi) {
             procedures: [],
             user_defined_types: [],
             connector_data: <ConnectorData>,
+            runtime_namespace: None,
         }
     "#]];
     api.expect_schema(expectation);

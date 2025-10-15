@@ -31,7 +31,11 @@ use tracing_futures::{Instrument, WithSubscriber};
 /// channels. That ensures that each connector is handling requests one at a time to avoid
 /// synchronization issues. You can think of it in terms of the actor model.
 pub(crate) struct EngineState {
+    // The initial Prisma schema for the engine state.
+    // Its datasource URL-like attributes are overridden by `datasource_urls_override`, if provided.
     initial_datamodel: Option<psl::ValidatedSchema>,
+    // Override the URL-like attributes of the initial datamodel's datasources, if provided.
+    datasource_urls_override: Option<psl::DatasourceUrls>,
     host: Arc<dyn ConnectorHost>,
     extensions: Arc<ExtensionTypeConfig>,
     // A map from either:
@@ -48,7 +52,7 @@ pub(crate) struct EngineState {
 impl EngineState {
     fn get_url_from_schemas(&self, container: &SchemasWithConfigDir) -> CoreResult<String> {
         let sources = container.to_psl_input();
-        let (datasource, url, _, _) = parse_configuration_multi(&sources)?;
+        let (datasource, url, _, _) = parse_configuration_multi(&sources, self.datasource_urls_override.as_ref())?;
 
         Ok(psl::set_config_dir(
             datasource.active_connector.flavour(),
@@ -59,10 +63,32 @@ impl EngineState {
     }
 }
 
-#[derive(Debug, Eq, Hash, PartialEq)]
+#[derive(Clone, Debug, Eq, Hash, PartialEq)]
 enum ConnectorRequestType {
     Schema(Vec<(String, SourceFile)>),
     Url(String),
+    InitialDatamodel,
+}
+
+impl ConnectorRequestType {
+    pub fn into_connector(
+        self,
+        initial_datamodel: Option<&psl::ValidatedSchema>,
+        datasource_urls_override: Option<&psl::DatasourceUrls>,
+        config_dir: Option<&Path>,
+    ) -> CoreResult<Box<dyn SchemaConnector>> {
+        match self {
+            Self::Schema(schemas) => crate::schema_to_connector(&schemas, datasource_urls_override, config_dir),
+            Self::Url(url) => crate::connector_for_connection_string(url, None, BitFlags::default()),
+            Self::InitialDatamodel => {
+                if let Some(initial_datamodel) = initial_datamodel {
+                    Ok(crate::initial_datamodel_to_connector(initial_datamodel)?)
+                } else {
+                    Err(ConnectorError::from_msg("Missing --datamodels".to_owned()))
+                }
+            }
+        }
+    }
 }
 
 /// A request from the core to a connector, in the form of an async closure.
@@ -78,13 +104,33 @@ type ErasedConnectorRequest = Box<
 impl EngineState {
     pub(crate) fn new(
         initial_datamodels: Option<Vec<(String, SourceFile)>>,
+        datasource_urls_override: Option<psl::DatasourceUrls>,
         host: Option<Arc<dyn ConnectorHost>>,
         extensions: Arc<ExtensionTypeConfig>,
     ) -> Self {
+        let initial_datamodel = initial_datamodels
+            .as_deref()
+            .map(|dm| psl::validate_multi_file(dm, &*extensions))
+            .map(|mut schema| {
+                if let Some(override_urls) = datasource_urls_override.clone() {
+                    schema.configuration.datasources = schema
+                        .configuration
+                        .datasources
+                        .iter()
+                        .cloned()
+                        .map(|mut ds| {
+                            ds.override_urls(override_urls.clone());
+                            ds
+                        })
+                        .collect();
+                }
+
+                schema
+            });
+
         EngineState {
-            initial_datamodel: initial_datamodels
-                .as_deref()
-                .map(|dm| psl::validate_multi_file(dm, &*extensions)),
+            initial_datamodel,
+            datasource_urls_override,
             host: host.unwrap_or_else(|| Arc::new(schema_connector::EmptyHost)),
             extensions,
             connectors: Default::default(),
@@ -102,9 +148,9 @@ impl EngineState {
             })
     }
 
-    async fn with_connector_for_schema<O: Send + 'static>(
+    async fn with_connector_for_request<O: Send + 'static>(
         &self,
-        schemas: Vec<(String, SourceFile)>,
+        request: ConnectorRequestType,
         config_dir: Option<&Path>,
         f: ConnectorRequest<O>,
     ) -> CoreResult<O> {
@@ -121,13 +167,18 @@ impl EngineState {
 
         let mut connectors = self.connectors.lock().await;
 
-        match connectors.get(&ConnectorRequestType::Schema(schemas.clone())) {
+        match connectors.get(&request) {
             Some(request_sender) => match request_sender.send(erased).await {
                 Ok(()) => (),
                 Err(_) => return Err(ConnectorError::from_msg("tokio mpsc send error".to_owned())),
             },
             None => {
-                let mut connector = crate::schema_to_connector(&schemas, config_dir)?;
+                let request_key = request.clone();
+                let mut connector = request.into_connector(
+                    self.initial_datamodel.as_ref(),
+                    self.datasource_urls_override.as_ref(),
+                    config_dir,
+                )?;
 
                 connector.set_host(self.host.clone());
                 let (erased_sender, mut erased_receiver) = mpsc::channel::<ErasedConnectorRequest>(12);
@@ -143,54 +194,30 @@ impl EngineState {
                     Ok(()) => (),
                     Err(_) => return Err(ConnectorError::from_msg("erased sender send error".to_owned())),
                 };
-                connectors.insert(ConnectorRequestType::Schema(schemas), erased_sender);
+                connectors.insert(request_key, erased_sender);
             }
         }
 
         response_receiver.await.expect("receiver boomed")
     }
 
+    async fn with_connector_for_schema<O: Send + 'static>(
+        &self,
+        schemas: Vec<(String, SourceFile)>,
+        config_dir: Option<&Path>,
+        f: ConnectorRequest<O>,
+    ) -> CoreResult<O> {
+        self.with_connector_for_request::<O>(ConnectorRequestType::Schema(schemas.clone()), config_dir, f)
+            .await
+    }
+
+    // Note: this method is used by:
+    // - `prisma db pull` via `EngineState::introspect_sql`
+    // - `prisma db execute` via `EngineState::db_execute`
+    // - `prisma/prisma tests` via `EngineState::drop_database`
     async fn with_connector_for_url<O: Send + 'static>(&self, url: String, f: ConnectorRequest<O>) -> CoreResult<O> {
-        let (response_sender, response_receiver) = tokio::sync::oneshot::channel::<CoreResult<O>>();
-        let erased: ErasedConnectorRequest = Box::new(move |connector| {
-            Box::pin(async move {
-                let output = f(connector).await;
-                response_sender
-                    .send(output)
-                    .map_err(|_| ())
-                    .expect("failed to send back response in schema-engine state");
-            })
-        });
-
-        let mut connectors = self.connectors.lock().await;
-        match connectors.get(&ConnectorRequestType::Url(url.clone())) {
-            Some(request_sender) => match request_sender.send(erased).await {
-                Ok(()) => (),
-                Err(_) => return Err(ConnectorError::from_msg("tokio mpsc send error".to_owned())),
-            },
-            None => {
-                let mut connector = crate::connector_for_connection_string(url.clone(), None, BitFlags::default())?;
-                connector.set_host(self.host.clone());
-
-                let (erased_sender, mut erased_receiver) = mpsc::channel::<ErasedConnectorRequest>(12);
-                tokio::spawn(
-                    async move {
-                        while let Some(req) = erased_receiver.recv().await {
-                            req(connector.as_mut()).await;
-                        }
-                    }
-                    .with_current_subscriber(),
-                );
-                match erased_sender.send(erased).await {
-                    Ok(()) => (),
-                    Err(_) => return Err(ConnectorError::from_msg("erased sender send error".to_owned())),
-                };
-
-                connectors.insert(ConnectorRequestType::Url(url), erased_sender);
-            }
-        }
-
-        response_receiver.await.expect("receiver boomed")
+        self.with_connector_for_request::<O>(ConnectorRequestType::Url(url.clone()), None, f)
+            .await
     }
 
     async fn with_connector_from_datasource_param<O: Send + 'static>(
@@ -208,19 +235,8 @@ impl EngineState {
     where
         O: Sized + Send + 'static,
     {
-        let schema = if let Some(initial_datamodel) = &self.initial_datamodel {
-            initial_datamodel
-        } else {
-            return Err(ConnectorError::from_msg("Missing --datamodels".to_owned()));
-        };
-
-        let schemas = schema
-            .db
-            .iter_file_sources()
-            .map(|(name, content)| (name.to_string(), content.clone()))
-            .collect::<Vec<_>>();
-
-        self.with_connector_for_schema(schemas, None, f).await
+        self.with_connector_for_request::<O>(ConnectorRequestType::InitialDatamodel, None, f)
+            .await
     }
 }
 

@@ -438,7 +438,7 @@ fn connecting_to_a_cockroachdb_database_with_the_postgresql_connector_fails(_api
     let dm = r#"
         datasource crdb {
             provider = "postgresql"
-            url = "dummy-url"
+            url = env("TEST_DATABASE_URL")
         }
     "#;
 

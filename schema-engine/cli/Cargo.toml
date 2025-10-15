@@ -4,6 +4,7 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
+psl = { workspace = true, features = ["all"] }
 schema-connector = { workspace = true, features = ["all-native"] }
 schema-core.workspace = true
 user-facing-errors = { workspace = true, features = ["all-native"] }

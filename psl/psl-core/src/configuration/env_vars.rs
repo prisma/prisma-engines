@@ -4,6 +4,7 @@ use schema_ast::ast::WithSpan;
 use serde::Serialize;
 
 /// Either an env var or a string literal.
+/// TODO: From Prisma 7 onwards, this struct will not be needed, as the value will always be a plain String.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct StringFromEnvVar {

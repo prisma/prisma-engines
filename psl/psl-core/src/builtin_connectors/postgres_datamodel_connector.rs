@@ -18,7 +18,7 @@ use KnownPostgresType::*;
 use chrono::*;
 use enumflags2::BitFlags;
 use lsp_types::{CompletionItem, CompletionItemKind, CompletionList, InsertTextFormat};
-use std::{borrow::Cow, collections::HashMap};
+use std::{borrow::Cow, collections::HashMap, sync::Arc};
 
 use super::completions;
 
@@ -94,7 +94,7 @@ const SCALAR_TYPE_DEFAULTS: &[(ScalarType, KnownPostgresType)] = &[
 ];
 
 /// Postgres-specific properties in the datasource block.
-#[derive(Default, Debug)]
+#[derive(Default, Debug, Clone)]
 pub struct PostgresDatasourceProperties {
     extensions: Option<PostgresExtensions>,
 }
@@ -612,7 +612,7 @@ impl Connector for PostgresDatamodelConnector {
         let extensions = datasource::parse_extensions(args, diagnostics);
         let properties = PostgresDatasourceProperties { extensions };
 
-        DatasourceConnectorData::new(Box::new(properties))
+        DatasourceConnectorData::new(Arc::new(properties))
     }
 
     fn flavour(&self) -> Flavour {

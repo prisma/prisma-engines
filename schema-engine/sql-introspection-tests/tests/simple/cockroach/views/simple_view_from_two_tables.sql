@@ -24,9 +24,10 @@ CREATE VIEW "Schwuser" AS
 
 
 
+
 /*
 generator js {
-  provider = "prisma-client"
+  provider        = "prisma-client"
   previewFeatures = ["views"]
 }
 
@@ -48,12 +49,9 @@ model User {
   Profile    Profile?
 }
 
-/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 view Schwuser {
   id           BigInt?
   name         String?
   introduction String?
-
-  @@ignore
 }
 */

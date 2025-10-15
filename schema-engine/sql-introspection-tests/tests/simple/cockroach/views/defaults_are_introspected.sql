@@ -5,9 +5,10 @@ CREATE TABLE "A" (id SERIAL PRIMARY KEY, val INT DEFAULT 3);
 CREATE VIEW "B" AS SELECT id, val FROM "A";
 
 
+
 /*
 generator js {
-  provider = "prisma-client"
+  provider        = "prisma-client"
   previewFeatures = ["views"]
 }
 
@@ -21,11 +22,8 @@ model A {
   val BigInt? @default(3)
 }
 
-/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 view B {
   id  BigInt?
   val BigInt?
-
-  @@ignore
 }
 */
