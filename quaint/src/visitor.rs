@@ -1205,6 +1205,7 @@ pub trait Visitor<'a> {
                 self.write("uuid_to_bin(uuid(), 1)")?;
             }
             FunctionType::Uuid => self.write("uuid()")?,
+            FunctionType::Now => self.write("NOW()")?,
             FunctionType::Concat(concat) => {
                 self.visit_concat(concat)?;
             }

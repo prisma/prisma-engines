@@ -44,6 +44,10 @@ impl IntoUpdateOperation for ScalarWriteOperation {
                 field_path,
                 doc! { "$divide": [dollar_field_path, (field, rhs).into_bson()?] },
             )),
+            ScalarWriteOperation::Now => Some(UpdateOperation::generic(
+                field_path,
+                doc! { "$currentDate": true },
+            )),
             ScalarWriteOperation::Unset(true) => Some(UpdateOperation::unset(field_path)),
             ScalarWriteOperation::Unset(false) => None,
             ScalarWriteOperation::Field(_) => unimplemented!(),
