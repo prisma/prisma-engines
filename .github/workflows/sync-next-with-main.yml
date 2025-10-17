@@ -1,0 +1,241 @@
+name: Sync Next With Main
+
+on:
+  push:
+    branches:
+      - next
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+jobs:
+  merge-main-into-next:
+    name: Merge main into next
+    if: >
+      github.event.sender.login != 'prisma-bot' &&
+      github.event.sender.login != 'prisma-bot[bot]' &&
+      github.event.sender.login != 'prismabots'
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: next
+          fetch-depth: 0
+
+      - name: Identify triggering pull request
+        id: pr
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { owner, repo } = context.repo
+            const commitSha = context.sha
+            const { data } = await github.rest.repos.listPullRequestsAssociatedWithCommit({
+              owner,
+              repo,
+              commit_sha: commitSha,
+            })
+
+            if (!data.length) {
+              core.info(`No pull request found for commit ${commitSha}`)
+              return
+            }
+
+            const pr = data[0]
+            core.setOutput('number', pr.number.toString())
+            core.setOutput('url', pr.html_url)
+            core.setOutput('title', pr.title)
+
+      - name: Configure git
+        run: |
+          git config user.email "prismabots@gmail.com"
+          git config user.name "prisma-bot"
+          git fetch origin main
+
+      - name: Check if sync is required
+        id: divergence
+        run: |
+          if git merge-base --is-ancestor origin/main HEAD; then
+            echo "needs=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "needs=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Merge main (no commit)
+        id: merge
+        if: steps.divergence.outputs.needs == 'true'
+        run: |
+          set -o pipefail
+
+          if git merge --no-ff --no-commit origin/main; then
+            echo "status=clean" >> "$GITHUB_OUTPUT"
+          else
+            echo "status=conflict" >> "$GITHUB_OUTPUT"
+            conflicts=$(git diff --name-only --diff-filter=U)
+            if [ -n "$conflicts" ]; then
+              {
+                echo 'conflicts<<EOF'
+                echo "$conflicts"
+                echo 'EOF'
+              } >> "$GITHUB_OUTPUT"
+            fi
+          fi
+
+      - name: Abort merge (manual resolution required)
+        if: steps.merge.outputs.status == 'conflict'
+        run: git merge --abort
+
+      - name: Create merge commit
+        id: commit
+        if: steps.divergence.outputs.needs == 'true' && steps.merge.outputs.status == 'clean'
+        run: |
+          set -eo pipefail
+          git status
+
+          if git diff --name-only --diff-filter=U | grep -q .; then
+            echo "Merge still has unresolved conflicts"
+            exit 1
+          fi
+
+          if git diff --cached --quiet; then
+            echo "No staged changes after merge attempt, nothing to commit."
+            exit 0
+          fi
+
+          if [ -n "${{ steps.pr.outputs.number }}" ]; then
+            msg="chore: merge main into next (#${{ steps.pr.outputs.number }})"
+          else
+            msg="chore: merge main into next"
+          fi
+
+          git commit -m "$msg"
+          echo "commit_sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+
+      - name: Push merge commit
+        if: steps.commit.outputs.commit_sha != ''
+        env:
+          PUSH_TOKEN: ${{ secrets.BOT_TOKEN != '' && secrets.BOT_TOKEN || github.token }}
+        run: |
+          git remote set-url origin "https://x-access-token:${PUSH_TOKEN}@github.com/${{ github.repository }}.git"
+          git push origin HEAD:next
+
+      - name: Comment on unresolved conflicts
+        if: steps.merge.outputs.status == 'conflict' && steps.pr.outputs.number != ''
+        uses: actions/github-script@v7
+        env:
+          MERGE_TRIGGER_SHA: ${{ github.sha }}
+          MERGE_CONFLICTS: ${{ steps.merge.outputs.conflicts }}
+        with:
+          script: |
+            const marker = `<!-- sync-next-conflict:${process.env.MERGE_TRIGGER_SHA} -->`
+            const { owner, repo } = context.repo
+            const issue_number = Number.parseInt('${{ steps.pr.outputs.number }}', 10)
+            const conflicts = (process.env.MERGE_CONFLICTS || '')
+              .split('\n')
+              .map((line) => line.trim())
+              .filter(Boolean)
+
+            const lines = conflicts.length
+              ? conflicts.map((file) => `- \`${file}\``)
+              : ['- (Git did not report individual paths)']
+
+            const body = `${marker}
+Hi there! I tried to merge \`main\` into \`next\` automatically after this PR was merged, but Git reported conflicts.
+
+Conflicting files:
+${lines.join('\n')}
+
+Please pull the latest \`next\`, merge \`main\` locally, resolve the conflicts, and push the updated branch. Ping us if you need a hand!`
+
+            const { data: comments } = await github.rest.issues.listComments({
+              owner,
+              repo,
+              issue_number,
+              per_page: 100,
+            })
+
+            if (!comments.some((comment) => comment.body?.includes(marker))) {
+              await github.rest.issues.createComment({
+                owner,
+                repo,
+                issue_number,
+                body,
+              })
+            } else {
+              core.info('Conflict comment already exists, skipping.')
+            }
+
+
+      - name: Wait for merge commit checks
+        id: wait
+        if: steps.commit.outputs.commit_sha != ''
+        env:
+          COMMIT_SHA: ${{ steps.commit.outputs.commit_sha }}
+          GITHUB_OWNER: ${{ github.repository_owner }}
+          GITHUB_REPO: ${{ github.event.repository.name }}
+          GITHUB_TOKEN: ${{ secrets.BOT_TOKEN != '' && secrets.BOT_TOKEN || github.token }}
+          TIMEOUT_MINUTES: '90'
+        run: |
+          node .github/scripts/wait-for-commit-checks.js > check-result.json
+          status=$(node -e "const fs=require('fs');const data=JSON.parse(fs.readFileSync('check-result.json','utf8'));console.log(data.status);")
+          echo "status=$status" >> "$GITHUB_OUTPUT"
+          if [ "$status" = "failure" ]; then
+            echo "failure_path=check-result.json" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Comment on failing checks
+        if: steps.wait.outputs.status == 'failure' && steps.pr.outputs.number != ''
+        uses: actions/github-script@v7
+        env:
+          FAILURE_PATH: ${{ steps.wait.outputs.failure_path }}
+          MERGE_COMMIT_SHA: ${{ steps.commit.outputs.commit_sha }}
+          MERGE_TRIGGER_SHA: ${{ github.sha }}
+        with:
+          script: |
+            const marker = `<!-- sync-next-checks:${process.env.MERGE_COMMIT_SHA} -->`
+            const { owner, repo } = context.repo
+            const issue_number = Number.parseInt('${{ steps.pr.outputs.number }}', 10)
+            const fs = require('fs')
+            let failures = []
+
+            if (process.env.FAILURE_PATH) {
+              const data = JSON.parse(fs.readFileSync(process.env.FAILURE_PATH, 'utf8'))
+              failures = data.failures || []
+            }
+
+            if (!failures.length) {
+              core.info('No failing checks to report.')
+              return
+            }
+
+            const lines = failures.map(
+              (failure) =>
+                `- [${failure.name}](${failure.url}) — ${failure.conclusion}`,
+            )
+
+            const body = `${marker}
+The automatic merge of \`main\` into \`next\` succeeded, but some checks failed on the merge commit (${process.env.MERGE_COMMIT_SHA}):
+
+${lines.join('\n')}
+
+Please investigate and fix the failing workflow(s).`
+
+            const { data: comments } = await github.rest.issues.listComments({
+              owner,
+              repo,
+              issue_number,
+              per_page: 100,
+            })
+
+            if (!comments.some((comment) => comment.body?.includes(marker))) {
+              await github.rest.issues.createComment({
+                owner,
+                repo,
+                issue_number,
+                body,
+              })
+            } else {
+              core.info('Check-failure comment already exists, skipping.')
+            }
