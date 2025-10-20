@@ -12,13 +12,21 @@ pub struct StringFromEnvVar {
     pub from_env_var: Option<String>,
     /// Contains the string literal, when it was directly in the parsed schema.
     pub value: Option<String>,
+    /// Contains the default value string if provided as the second argument to the `env()` function,
+    /// used when the environment variable is not set.
+    pub default: Option<String>,
 }
 
 impl StringFromEnvVar {
     pub(crate) fn coerce(expr: &ast::Expression, diagnostics: &mut Diagnostics) -> Option<Self> {
         match expr {
-            ast::Expression::Function(name, _, _) if name == "env" => EnvFunction::from_ast(expr, diagnostics)
-                .map(|env_function| StringFromEnvVar::new_from_env_var(env_function.var_name().to_owned())),
+            ast::Expression::Function(name, _, _) if name == "env" => {
+                let env_function = EnvFunction::from_ast(expr, diagnostics)?;
+                let var_name = env_function.var_name().to_owned();
+                let default_val = env_function.default().map(|s| s.to_owned());
+
+                Some(StringFromEnvVar::new_from_env_var(var_name, default_val))
+            }
             ast::Expression::StringValue(value, _) => Some(StringFromEnvVar::new_literal(value.clone())),
             _ => {
                 diagnostics.push_error(DatamodelError::new_type_mismatch_error(
@@ -32,10 +40,11 @@ impl StringFromEnvVar {
         }
     }
 
-    pub fn new_from_env_var(env_var_name: String) -> StringFromEnvVar {
+    pub fn new_from_env_var(env_var_name: String, default: Option<String>) -> StringFromEnvVar {
         StringFromEnvVar {
             from_env_var: Some(env_var_name),
             value: None,
+            default,
         }
     }
 
@@ -43,6 +52,7 @@ impl StringFromEnvVar {
         StringFromEnvVar {
             from_env_var: None,
             value: Some(value),
+            default: None,
         }
     }
 
@@ -55,10 +65,15 @@ impl StringFromEnvVar {
     pub fn as_literal(&self) -> Option<&str> {
         self.value.as_deref()
     }
+
+    pub fn default(&self) -> Option<&str> {
+        self.default.as_deref()
+    }
 }
 
 pub(crate) struct EnvFunction {
     var_name: String,
+    default: Option<String>,
 }
 
 impl EnvFunction {
@@ -91,29 +106,48 @@ impl EnvFunction {
             return None;
         };
 
-        if args.arguments.len() + args.empty_arguments.len() != 1 {
-            diagnostics.push_error(DatamodelError::new_functional_evaluation_error(
-                "Exactly one string parameter must be passed to the env function.",
-                expr.span(),
-            ));
-            return None;
-        }
+        let (var_name_expr, default_value_expr) = match args.arguments.len() {
+            1 => {
+                let var_wrapped = &args.arguments[0];
+                let var_name = coerce::string(&var_wrapped.value, diagnostics)?.to_owned();
+                (var_name, None)
+            }
+            2 => {
+                let var_wrapped = &args.arguments[0];
+                let var_name = coerce::string(&var_wrapped.value, diagnostics)?.to_owned();
 
-        if args.trailing_comma.is_some() {
-            diagnostics.push_error(DatamodelError::new_functional_evaluation_error(
-                "Exactly one string parameter must be passed to the env function.",
-                expr.span(),
-            ));
-            return None;
-        }
+                let default_arg = &args.arguments[1];
+                if default_arg.name.as_ref().map(|s| s.name.as_str()) != Some("default") {
+                    diagnostics.push_error(DatamodelError::new_functional_evaluation_error(
+                        "The second argument to env() must be named `default`.",
+                        default_arg.span(),
+                    ));
+                    return None;
+                }
 
-        let var_wrapped = &args.arguments[0];
-        let var_name = coerce::string(&var_wrapped.value, diagnostics)?.to_owned();
+                let default_value = coerce::string(&default_arg.value, diagnostics)?.to_owned();
+                (var_name, Some(default_value))
+            }
+            _ => {
+                diagnostics.push_error(DatamodelError::new_functional_evaluation_error(
+                    "The `env` function takes one or two arguments. The first argument is the environment variable name, and the optional second argument is the default value, which must be a named argument `default`.",
+                    expr.span(),
+                ));
+                return None;
+            }
+        };
 
-        Some(Self { var_name })
+        Some(Self {
+            var_name: var_name_expr,
+            default: default_value_expr,
+        })
     }
 
     pub(crate) fn var_name(&self) -> &str {
         &self.var_name
+    }
+
+    pub(crate) fn default(&self) -> Option<&str> {
+        self.default.as_deref()
     }
 }

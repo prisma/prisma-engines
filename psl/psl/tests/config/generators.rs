@@ -21,11 +21,13 @@ fn serialize_generators_to_cmf() {
             "name": "js1",
             "provider": {
               "fromEnvVar": null,
-              "value": "javascript"
+              "value": "javascript",
+              "default": null
             },
             "output": {
               "fromEnvVar": null,
-              "value": "../../js"
+              "value": "../../js",
+              "default": null
             },
             "config": {
               "engineType": "binary"
@@ -37,18 +39,21 @@ fn serialize_generators_to_cmf() {
             "name": "go",
             "provider": {
               "fromEnvVar": null,
-              "value": "go"
+              "value": "go",
+              "default": null
             },
             "output": null,
             "config": {},
             "binaryTargets": [
               {
                 "fromEnvVar": null,
-                "value": "a"
+                "value": "a",
+                "default": null
               },
               {
                 "fromEnvVar": null,
-                "value": "b"
+                "value": "b",
+                "default": null
               }
             ],
             "previewFeatures": []
@@ -82,7 +87,8 @@ fn preview_features_setting_must_work() {
             "name": "js",
             "provider": {
               "fromEnvVar": null,
-              "value": "javascript"
+              "value": "javascript",
+              "default": null
             },
             "output": null,
             "config": {},
@@ -95,7 +101,8 @@ fn preview_features_setting_must_work() {
             "name": "go",
             "provider": {
               "fromEnvVar": null,
-              "value": "go"
+              "value": "go",
+              "default": null
             },
             "output": null,
             "config": {},
@@ -128,7 +135,8 @@ fn hidden_preview_features_setting_must_work() {
             "name": "go",
             "provider": {
               "fromEnvVar": null,
-              "value": "go"
+              "value": "go",
+              "default": null
             },
             "output": null,
             "config": {},
@@ -157,7 +165,8 @@ fn back_slashes_in_providers_must_work() {
             "name": "mygen",
             "provider": {
               "fromEnvVar": null,
-              "value": "../folder\twith\ttabs/my\tgenerator.js"
+              "value": "../folder\twith\ttabs/my\tgenerator.js",
+              "default": null
             },
             "output": null,
             "config": {},
@@ -188,18 +197,21 @@ fn new_lines_in_generator_must_work() {
             "name": "go",
             "provider": {
               "fromEnvVar": null,
-              "value": "go"
+              "value": "go",
+              "default": null
             },
             "output": null,
             "config": {},
             "binaryTargets": [
               {
                 "fromEnvVar": null,
-                "value": "b"
+                "value": "b",
+                "default": null
               },
               {
                 "fromEnvVar": null,
-                "value": "c"
+                "value": "c",
+                "default": null
               }
             ],
             "previewFeatures": []
@@ -291,14 +303,16 @@ fn binary_targets_from_env_var_should_work() {
             "name": "client",
             "provider": {
               "fromEnvVar": null,
-              "value": "prisma-client"
+              "value": "prisma-client",
+              "default": null
             },
             "output": null,
             "config": {},
             "binaryTargets": [
               {
                 "fromEnvVar": "BINARY_TARGETS",
-                "value": null
+                "value": null,
+                "default": null
               }
             ],
             "previewFeatures": []
@@ -326,11 +340,13 @@ fn retain_env_var_definitions_in_generator_block() {
             "name": "js1",
             "provider": {
               "fromEnvVar": "PROVIDER",
-              "value": null
+              "value": null,
+              "default": null
             },
             "output": {
               "fromEnvVar": "OUTPUT",
-              "value": null
+              "value": null,
+              "default": null
             },
             "config": {},
             "binaryTargets": [],

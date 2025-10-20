@@ -38,7 +38,8 @@ fn serialize_builtin_sources_to_dmmf() {
             "activeProvider": "postgresql",
             "url": {
               "fromEnvVar": null,
-              "value": "postgresql://localhost/postgres1"
+              "value": "postgresql://localhost/postgres1",
+              "default": null
             },
             "schemas": [],
             "sourceFilePath": "schema.prisma"
@@ -62,7 +63,8 @@ fn serialize_builtin_sources_to_dmmf() {
             "activeProvider": "postgresql",
             "url": {
               "fromEnvVar": "pg2",
-              "value": null
+              "value": null,
+              "default": null
             },
             "schemas": [],
             "sourceFilePath": "schema.prisma"
@@ -86,7 +88,8 @@ fn serialize_builtin_sources_to_dmmf() {
             "activeProvider": "sqlite",
             "url": {
               "fromEnvVar": null,
-              "value": "file://file.db"
+              "value": "file://file.db",
+              "default": null
             },
             "schemas": [],
             "sourceFilePath": "schema.prisma"
@@ -110,7 +113,8 @@ fn serialize_builtin_sources_to_dmmf() {
             "activeProvider": "mysql",
             "url": {
               "fromEnvVar": null,
-              "value": "mysql://localhost"
+              "value": "mysql://localhost",
+              "default": null
             },
             "schemas": [],
             "sourceFilePath": "schema.prisma"

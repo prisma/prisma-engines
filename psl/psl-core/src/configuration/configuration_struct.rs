@@ -80,7 +80,9 @@ impl Configuration {
                 datasource.url.from_env_var = None;
             }
 
-            if datasource.url.from_env_var.is_some() && datasource.url.value.is_none() {
+            if (datasource.url.from_env_var.is_some() || datasource.url.default.is_some())
+                && datasource.url.value.is_none()
+            {
                 datasource.url.value = match datasource.load_url(env) {
                     Ok(url) => Some(url),
                     Err(_) if ignore_env_errors => None,
@@ -95,6 +97,7 @@ impl Configuration {
                 datasource.direct_url = Some(crate::StringFromEnvVar {
                     from_env_var: direct_url.from_env_var.clone(),
                     value: result,
+                    default: direct_url.default.clone(),
                 });
             }
         }
@@ -158,12 +161,15 @@ impl Configuration {
                 datasource.direct_url = Some(crate::StringFromEnvVar {
                     from_env_var: direct_url.from_env_var.clone(),
                     value: result,
+                    default: direct_url.default.clone(),
                 });
             }
 
             // We probably just need to improve validation, especially around allowing 'prisma://'
             // urls.
-            if datasource.url.from_env_var.is_some() && datasource.url.value.is_none() {
+            if (datasource.url.from_env_var.is_some() || datasource.url.default.is_some())
+                && datasource.url.value.is_none()
+            {
                 if has_direct_url {
                     datasource.url.value = Some(datasource.load_url_no_validation(env)?);
                 } else {

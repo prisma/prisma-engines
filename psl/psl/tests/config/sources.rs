@@ -250,7 +250,7 @@ fn must_error_if_wrong_protocol_is_used_for_mysql_shadow_database_url() {
     let config = parse_config(dml).unwrap();
 
     let error = config.datasources[0]
-        .load_shadow_database_url()
+        .load_shadow_database_url(load_env_var)
         .map_err(|e| e.to_pretty_string("schema.prisma", dml))
         .unwrap_err();
 
@@ -279,7 +279,7 @@ fn must_not_error_for_empty_shadow_database_urls_derived_load_env_vars() {
     "#};
 
     let config = parse_configuration(schema);
-    let shadow_database_url = config.datasources[0].load_shadow_database_url().unwrap();
+    let shadow_database_url = config.datasources[0].load_shadow_database_url(load_env_var).unwrap();
 
     unsafe { std::env::remove_var("EMPTY_SHADOW_DB URL_0129") };
     assert!(shadow_database_url.is_none());
@@ -296,7 +296,7 @@ fn must_not_error_for_shadow_database_urls_derived_from_missing_env_vars() {
     "#};
 
     let config = parse_configuration(schema);
-    let shadow_database_url = config.datasources[0].load_shadow_database_url().unwrap();
+    let shadow_database_url = config.datasources[0].load_shadow_database_url(load_env_var).unwrap();
 
     assert!(shadow_database_url.is_none());
 }
@@ -342,7 +342,7 @@ fn must_error_if_wrong_protocol_is_used_for_postgresql_shadow_database_url() {
     let config = parse_config(dml).unwrap();
 
     let error = config.datasources[0]
-        .load_shadow_database_url()
+        .load_shadow_database_url(load_env_var)
         .map_err(|e| e.to_pretty_string("schema.prisma", dml))
         .unwrap_err();
 
@@ -406,7 +406,8 @@ fn new_lines_in_source_must_work() {
             "activeProvider": "postgresql",
             "url": {
               "fromEnvVar": null,
-              "value": "postgresql://localhost"
+              "value": "postgresql://localhost",
+              "default": null
             },
             "schemas": [],
             "sourceFilePath": "schema.prisma"
@@ -442,7 +443,8 @@ fn multischema_must_work() {
             "activeProvider": "postgresql",
             "url": {
               "fromEnvVar": null,
-              "value": "postgresql://localhost"
+              "value": "postgresql://localhost",
+              "default": null
             },
             "schemas": [
               "public",
@@ -504,6 +506,7 @@ fn must_succeed_if_env_var_is_missing_but_override_was_provided() {
     data_source.assert_url(StringFromEnvVar {
         value: Some(url.to_string()),
         from_env_var: None,
+        default: None,
     });
 }
 
@@ -579,6 +582,7 @@ fn must_succeed_when_ignoring_env_errors_and_retain_env_var_name() {
     data_source.assert_url(StringFromEnvVar {
         value: None,
         from_env_var: Some("MISSING_DATABASE_URL_0003".to_string()),
+        default: None,
     });
 }
 
@@ -605,6 +609,7 @@ fn must_process_overrides_when_ignoring_env_errors() {
     data_source.assert_url(StringFromEnvVar {
         value: Some(url),
         from_env_var: None,
+        default: None,
     });
 }
 

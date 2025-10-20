@@ -91,16 +91,19 @@ impl Datasource {
         self.url = StringFromEnvVar {
             value: Some(datasource_urls_override.url),
             from_env_var: None,
+            default: None,
         };
         self.direct_url = datasource_urls_override.direct_url.map(|url| StringFromEnvVar {
             value: Some(url),
             from_env_var: None,
+            default: None,
         });
         self.shadow_database_url = datasource_urls_override.shadow_database_url.map(|url| {
             (
                 StringFromEnvVar {
                     value: Some(url),
                     from_env_var: None,
+                    default: None,
                 },
                 self.url_span,
             )
@@ -252,22 +255,26 @@ impl Datasource {
     }
 
     /// Load the shadow database URL, validating it and resolving env vars in the process.
-    pub fn load_shadow_database_url(&self) -> Result<Option<String>, Diagnostics> {
+    pub fn load_shadow_database_url<F>(&self, env: F) -> Result<Option<String>, Diagnostics>
+    where
+        F: Fn(&str) -> Option<String>,
+    {
         let (url, url_span) = match self
             .shadow_database_url
             .as_ref()
-            .map(|(url, span)| (&url.value, &url.from_env_var, span))
+            .map(|(url, span)| (&url.value, &url.from_env_var, &url.default, span))
         {
             None => return Ok(None),
-            Some((Some(lit), _, span)) => (lit.clone(), span),
-            Some((None, Some(env_var), span)) => match std::env::var(env_var) {
-                // We explicitly ignore empty and missing env vars, because the same schema (with the same env function) has to be usable for dev and deployment alike.
-                Ok(var) if var.trim().is_empty() => return Ok(None),
-                Err(_) => return Ok(None),
-
-                Ok(var) => (var, span),
+            Some((Some(lit), _, _, span)) => (lit.clone(), span),
+            Some((None, Some(env_var), default, span)) => match env(env_var) {
+                Some(var) if var.trim().is_empty() => return Ok(None),
+                None => match default {
+                    Some(default_val) => (default_val.clone(), span),
+                    None => return Ok(None),
+                },
+                Some(var) => (var, span),
             },
-            Some((None, None, _span)) => unreachable!("Missing url in datasource"),
+            Some((None, None, _, _span)) => unreachable!("Missing url in datasource"),
         };
 
         if !url.trim().is_empty() {
@@ -329,7 +336,10 @@ where
                 return Err(UrlValidationError::EmptyEnvValue(env_var.clone()));
             }
             Some(var) => var,
-            None => return Err(UrlValidationError::NoEnvValue(env_var.clone())),
+            None => match &url.default {
+                Some(default_val) => default_val.clone(),
+                None => return Err(UrlValidationError::NoEnvValue(env_var.clone())),
+            },
         },
         (None, None) => return Err(UrlValidationError::NoUrlOrEnv),
     };

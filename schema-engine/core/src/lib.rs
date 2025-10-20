@@ -100,17 +100,20 @@ fn schema_to_dialect(schema_files: &[(String, SourceFile)]) -> CoreResult<Box<dy
         .next()
         .ok_or_else(|| CoreError::from_msg("There is no datasource in the schema.".into()))?;
 
-    if let Ok(connection_string) = datasource.load_direct_url(|key| env::var(key).ok()) {
-        // TODO: remove conditional branch in Prisma 7.
-        let connector_params = ConnectorParams {
-            connection_string,
-            preview_features,
-            shadow_database_connection_string: datasource.load_shadow_database_url().ok().flatten(),
-        };
-        let conn = connector_for_provider(datasource.active_provider, connector_params)?;
-        Ok(conn.schema_dialect())
-    } else {
-        ::commands::dialect_for_provider(datasource.active_provider)
+    let env_closure = |key: &str| env::var(key).ok();
+
+    match datasource.load_direct_url(env_closure) {
+        Ok(connection_string) => {
+            // TODO: remove conditional branch in Prisma 7.
+            let connector_params = ConnectorParams {
+                connection_string,
+                preview_features,
+                shadow_database_connection_string: datasource.load_shadow_database_url(env_closure).ok().flatten(),
+            };
+            let conn = connector_for_provider(datasource.active_provider, connector_params)?;
+            Ok(conn.schema_dialect())
+        }
+        Err(e) => Err(CoreError::new_schema_parser_error(e.to_pretty_string("schema.prisma", "schema.prisma"))),
     }
 }
 
@@ -238,11 +241,13 @@ fn extract_configuration(
         .next()
         .ok_or_else(|| CoreError::from_msg("There is no datasource in the schema.".into()))?;
 
+    let env_closure = |key: &str| env::var(key).ok();
+
     let url = source
-        .load_direct_url(|key| env::var(key).ok())
+        .load_direct_url(env_closure)
         .map_err(&mut err_handler)?;
 
-    let shadow_database_url = source.load_shadow_database_url().map_err(err_handler)?;
+    let shadow_database_url = source.load_shadow_database_url(env_closure).map_err(&mut err_handler)?;
 
     Ok((source, url, preview_features, shadow_database_url))
 }
@@ -258,11 +263,13 @@ fn extract_configuration_ref(
         .first()
         .ok_or_else(|| CoreError::from_msg("There is no datasource in the schema.".into()))?;
 
+    let env_closure = |key: &str| env::var(key).ok();
+
     let url = source
-        .load_direct_url(|key| env::var(key).ok())
+        .load_direct_url(env_closure)
         .map_err(&mut err_handler)?;
 
-    let shadow_database_url = source.load_shadow_database_url().map_err(err_handler)?;
+    let shadow_database_url = source.load_shadow_database_url(env_closure).map_err(&mut err_handler)?;
 
     Ok((source, url, preview_features, shadow_database_url))
 }
