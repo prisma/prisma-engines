@@ -42,11 +42,16 @@ fn env_function_with_env_var_and_no_default() {
     "#;
 
     let schema = psl::parse_schema_without_extensions(dml).unwrap();
-    let url = schema.configuration.datasources.get(0).unwrap().load_url(|key| std::env::var(key).ok()).unwrap();
+    let url = schema
+        .configuration
+        .datasources
+        .get(0)
+        .unwrap()
+        .load_url(|key| std::env::var(key).ok())
+        .unwrap();
     assert_eq!(url, "postgresql://real@localhost/realdb");
     unsafe { std::env::remove_var("DB_URL_SET") };
 }
-
 
 #[test]
 fn env_function_with_default_value() {
@@ -59,7 +64,13 @@ fn env_function_with_default_value() {
         }
     "#;
     let schema_present = psl::parse_schema_without_extensions(dml_present).unwrap();
-    let url_present = schema_present.configuration.datasources.get(0).unwrap().load_url(|key| std::env::var(key).ok()).unwrap();
+    let url_present = schema_present
+        .configuration
+        .datasources
+        .get(0)
+        .unwrap()
+        .load_url(|key| std::env::var(key).ok())
+        .unwrap();
     assert_eq!(url_present, "postgresql://env_user@localhost/env_db");
     unsafe { std::env::remove_var("POSTGRES_URL") };
 
@@ -71,14 +82,28 @@ fn env_function_with_default_value() {
         }
     "#;
     let schema_absent_with_default = psl::parse_schema_without_extensions(dml_absent_with_default).unwrap();
-    let url_absent_with_default = schema_absent_with_default.configuration.datasources.get(0).unwrap().load_url(|_| None).unwrap();
-    assert_eq!(url_absent_with_default, "postgresql://default_user@localhost/default_db");
+    let url_absent_with_default = schema_absent_with_default
+        .configuration
+        .datasources
+        .get(0)
+        .unwrap()
+        .load_url(|_| None)
+        .unwrap();
+    assert_eq!(
+        url_absent_with_default,
+        "postgresql://default_user@localhost/default_db"
+    );
 }
 
 #[test]
 fn env_function_with_default_value_for_direct_url() {
     // Case 1: Environment variable is present, default should be ignored.
-    unsafe { std::env::set_var("DIRECT_DATABASE_URL_WITH_DEFAULT", "postgresql://env_direct_user@localhost/env_direct_db") };
+    unsafe {
+        std::env::set_var(
+            "DIRECT_DATABASE_URL_WITH_DEFAULT",
+            "postgresql://env_direct_user@localhost/env_direct_db",
+        )
+    };
     let dml_present = r#"
         datasource db {
             provider = "postgresql"
@@ -87,8 +112,17 @@ fn env_function_with_default_value_for_direct_url() {
         }
     "#;
     let schema_present = psl::parse_schema_without_extensions(dml_present).unwrap();
-    let direct_url_present = schema_present.configuration.datasources.get(0).unwrap().load_direct_url(|key| std::env::var(key).ok()).unwrap();
-    assert_eq!(direct_url_present, "postgresql://env_direct_user@localhost/env_direct_db");
+    let direct_url_present = schema_present
+        .configuration
+        .datasources
+        .get(0)
+        .unwrap()
+        .load_direct_url(|key| std::env::var(key).ok())
+        .unwrap();
+    assert_eq!(
+        direct_url_present,
+        "postgresql://env_direct_user@localhost/env_direct_db"
+    );
     unsafe { std::env::remove_var("DIRECT_DATABASE_URL_WITH_DEFAULT") };
 
     // Case 2: Environment variable is absent, default should be used.
@@ -100,7 +134,15 @@ fn env_function_with_default_value_for_direct_url() {
         }
     "#;
     let schema_absent_with_default = psl::parse_schema_without_extensions(dml_absent_with_default).unwrap();
-    let direct_url_absent_with_default = schema_absent_with_default.configuration.datasources.get(0).unwrap().load_direct_url(|_| None).unwrap();
-    assert_eq!(direct_url_absent_with_default, "postgresql://default_direct_user@localhost/default_direct_db");
-
+    let direct_url_absent_with_default = schema_absent_with_default
+        .configuration
+        .datasources
+        .get(0)
+        .unwrap()
+        .load_direct_url(|_| None)
+        .unwrap();
+    assert_eq!(
+        direct_url_absent_with_default,
+        "postgresql://default_direct_user@localhost/default_direct_db"
+    );
 }

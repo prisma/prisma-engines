@@ -113,7 +113,9 @@ fn schema_to_dialect(schema_files: &[(String, SourceFile)]) -> CoreResult<Box<dy
             let conn = connector_for_provider(datasource.active_provider, connector_params)?;
             Ok(conn.schema_dialect())
         }
-        Err(e) => Err(CoreError::new_schema_parser_error(e.to_pretty_string("schema.prisma", "schema.prisma"))),
+        Err(e) => Err(CoreError::new_schema_parser_error(
+            e.to_pretty_string("schema.prisma", "schema.prisma"),
+        )),
     }
 }
 
@@ -243,9 +245,7 @@ fn extract_configuration(
 
     let env_closure = |key: &str| env::var(key).ok();
 
-    let url = source
-        .load_direct_url(env_closure)
-        .map_err(&mut err_handler)?;
+    let url = source.load_direct_url(env_closure).map_err(&mut err_handler)?;
 
     let shadow_database_url = source.load_shadow_database_url(env_closure).map_err(&mut err_handler)?;
 
@@ -265,9 +265,7 @@ fn extract_configuration_ref(
 
     let env_closure = |key: &str| env::var(key).ok();
 
-    let url = source
-        .load_direct_url(env_closure)
-        .map_err(&mut err_handler)?;
+    let url = source.load_direct_url(env_closure).map_err(&mut err_handler)?;
 
     let shadow_database_url = source.load_shadow_database_url(env_closure).map_err(&mut err_handler)?;
 
