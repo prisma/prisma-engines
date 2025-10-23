@@ -22,26 +22,6 @@
       "insertTextFormat": 2
     },
     {
-      "label": "shadowDatabaseUrl",
-      "kind": 5,
-      "documentation": {
-        "kind": "markdown",
-        "value": "```prisma\nshadowDatabaseUrl = \"String\" | env(\"ENVIRONMENT_VARIABLE\")\n```\n___\nConnection URL including authentication info to use for Migrate's [shadow database](https://pris.ly/d/migrate-shadow).\n\n"
-      },
-      "insertText": "shadowDatabaseUrl = $0",
-      "insertTextFormat": 2
-    },
-    {
-      "label": "directUrl",
-      "kind": 5,
-      "documentation": {
-        "kind": "markdown",
-        "value": "```prisma\ndirectUrl = \"String\" | env(\"ENVIRONMENT_VARIABLE\")\n```\n___\nConnection URL for direct connection to the database. [Learn more](https://pris.ly/d/data-proxy-cli).\n\n"
-      },
-      "insertText": "directUrl = $0",
-      "insertTextFormat": 2
-    },
-    {
       "label": "relationMode",
       "kind": 5,
       "documentation": {

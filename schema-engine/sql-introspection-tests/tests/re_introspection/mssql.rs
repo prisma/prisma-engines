@@ -431,9 +431,8 @@ async fn direct_url(api: &mut TestApi) {
         }
 
         datasource db {
-          provider  = "sqlserver"
-          url       = "bad url"
-          directUrl = "dummy-url"
+          provider = "sqlserver"
+          url      = "bad url"
         }
 
         model User {
@@ -449,9 +448,8 @@ async fn direct_url(api: &mut TestApi) {
         }
 
         datasource db {
-          provider  = "sqlserver"
-          url       = "bad url"
-          directUrl = "dummy-url"
+          provider = "sqlserver"
+          url      = "bad url"
         }
 
         model User {

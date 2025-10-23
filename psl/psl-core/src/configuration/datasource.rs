@@ -96,6 +96,7 @@ impl Datasource {
             value: Some(url),
             from_env_var: None,
         });
+        self.direct_url_span = self.direct_url.as_ref().map(|_| self.url_span);
         self.shadow_database_url = datasource_urls_override.shadow_database_url.map(|url| {
             (
                 StringFromEnvVar {
@@ -223,10 +224,12 @@ impl Datasource {
             }
         };
 
-        self.direct_url
-            .clone()
-            .and_then(|url| self.direct_url_span.map(|span| (url, span)))
-            .map_or_else(|| self.load_url(&env), validate_direct_url)
+        if let Some(direct_url) = self.direct_url.clone() {
+            let span = self.direct_url_span.unwrap_or(self.url_span);
+            validate_direct_url((direct_url, span))
+        } else {
+            self.load_url(&env)
+        }
     }
 
     /// Same as `load_url()`, with the following difference.
