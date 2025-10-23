@@ -16,9 +16,6 @@ use tokio::{
 };
 use tracing_futures::WithSubscriber;
 
-#[cfg(not(feature = "metrics"))]
-use crate::metrics::MetricsInstrumentationStub;
-
 use super::{TransactionError, TxId};
 
 pub static CLOSED_TX_CACHE_SIZE: LazyLock<usize> = LazyLock::new(|| match std::env::var("CLOSED_TX_CACHE_SIZE") {

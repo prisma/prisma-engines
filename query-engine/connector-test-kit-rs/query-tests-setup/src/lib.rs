@@ -64,8 +64,6 @@ fn run_with_tokio<O, F: std::future::Future<Output = O>>(fut: F) -> O {
         .block_on(fut)
 }
 
-
-
 /// Taken from Reddit. Enables taking an async function pointer which takes references as param
 /// https://www.reddit.com/r/rust/comments/jvqorj/hrtb_with_async_functions/
 pub trait AsyncFn<'a, A: 'a, B: 'a, T>: Copy + 'static {
@@ -195,7 +193,7 @@ fn run_relation_link_test_impl(
 
             let datamodel = render_test_datamodel(&test_db_name, template, &[], None, Default::default(), Default::default(), None);
             let (connector_tag, version) = CONFIG.test_connector().unwrap();
-            let (log_capture, log_tx) = TestLogCapture::new();
+            let (log_capture, _log_tx) = TestLogCapture::new();
 
             run_with_tokio(
                 async move {
@@ -338,7 +336,7 @@ fn run_connector_test_impl(
     );
     let (connector_tag, version) = CONFIG.test_connector().unwrap();
 
-    let (log_capture, log_tx) = TestLogCapture::new();
+    let (log_capture, _log_tx) = TestLogCapture::new();
 
     crate::run_with_tokio(async {
         println!("Used datamodel:\n {}", datamodel.schema.yellow());
@@ -355,8 +353,7 @@ fn run_connector_test_impl(
         .unwrap();
         let schema_id = runner.schema_id();
 
-        if let Err(err) = test_fn(runner).await
-        {
+        if let Err(err) = test_fn(runner).await {
             // Print any traceback directly to stdout, so it remains readable
             eprintln!("Test failed due to an error:");
             eprintln!("=====");

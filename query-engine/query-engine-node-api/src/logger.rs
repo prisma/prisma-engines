@@ -28,7 +28,7 @@ impl Logger {
         log_queries: bool,
         log_level: LevelFilter,
         log_callback: LogCallback,
-        enable_metrics: bool,
+        _enable_metrics: bool,
         enable_tracing: bool,
     ) -> Self {
         let is_sql_query = filter_fn(|meta| {

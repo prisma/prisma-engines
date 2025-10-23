@@ -28,7 +28,7 @@ where
     do_query(tag, query, params, f).instrument(span).await
 }
 
-async fn do_query<'a, F, T, U>(tag: &'static str, query: &'a str, params: &'a [Value<'_>], f: F) -> crate::Result<T>
+async fn do_query<'a, F, T, U>(_tag: &'static str, query: &'a str, params: &'a [Value<'_>], f: F) -> crate::Result<T>
 where
     F: FnOnce() -> U + 'a,
     U: Future<Output = crate::Result<T>>,

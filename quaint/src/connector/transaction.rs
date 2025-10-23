@@ -79,9 +79,7 @@ impl<'a> DefaultTransaction<'a> {
         begin_stmt: &str,
         tx_opts: TransactionOptions,
     ) -> crate::Result<DefaultTransaction<'a>> {
-        let this = Self {
-            inner,
-        };
+        let this = Self { inner };
 
         if tx_opts.isolation_first
             && let Some(isolation) = tx_opts.isolation_level

@@ -5,8 +5,7 @@
 
 use indoc::indoc;
 use query_engine_tests::{
-    CONFIG, QueryResult, Runner, TestError, TestLogCapture, TestResult,
-    query_core::TxId, render_test_datamodel,
+    CONFIG, QueryResult, Runner, TestError, TestLogCapture, TestResult, query_core::TxId, render_test_datamodel,
 };
 use tokio::sync::mpsc;
 

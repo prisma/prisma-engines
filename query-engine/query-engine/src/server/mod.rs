@@ -8,7 +8,7 @@ use query_core::{ExtendedUserFacingError, TransactionOptions, TxId};
 use request_handlers::{RequestBody, RequestHandler, dmmf, render_graphql_schema};
 use serde::Serialize;
 use serde_json::json;
-use std::collections::HashMap;
+
 use std::net::SocketAddr;
 use std::sync::Arc;
 use std::time::{Duration, Instant};
@@ -212,9 +212,7 @@ fn playground_handler() -> Response<Body> {
         .unwrap()
 }
 
-async fn metrics_handler(cx: Arc<PrismaContext>, req: Request<Body>) -> Result<Response<Body>, hyper::Error> {
-    let requested_json = req.uri().query().map(|q| q.contains("format=json")).unwrap_or_default();
-    let body_start = req.into_body();
+async fn metrics_handler(_cx: Arc<PrismaContext>, _req: Request<Body>) -> Result<Response<Body>, hyper::Error> {
     let response = Response::builder()
         .status(StatusCode::GONE)
         .body(Body::from("Metrics endpoint has been removed"))
