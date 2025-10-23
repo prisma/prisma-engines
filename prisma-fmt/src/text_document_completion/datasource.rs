@@ -25,42 +25,6 @@ pub(super) fn relation_mode_completion(completion_list: &mut CompletionList) {
     })
 }
 
-pub(super) fn direct_url_completion(completion_list: &mut CompletionList) {
-    completion_list.items.push(CompletionItem {
-        label: "directUrl".to_owned(),
-        insert_text: Some(r#"directUrl = $0"#.to_owned()),
-        insert_text_format: Some(InsertTextFormat::SNIPPET),
-        kind: Some(CompletionItemKind::FIELD),
-        documentation: Some(Documentation::MarkupContent(MarkupContent {
-            kind: MarkupKind::Markdown,
-            value: format_completion_docs(
-                r#"directUrl = "String" | env("ENVIRONMENT_VARIABLE")"#,
-                r#"Connection URL for direct connection to the database. [Learn more](https://pris.ly/d/data-proxy-cli)."#,
-                None,
-            )
-        })),
-        ..Default::default()
-    })
-}
-
-pub(super) fn shadow_db_completion(completion_list: &mut CompletionList) {
-    completion_list.items.push(CompletionItem {
-        label: "shadowDatabaseUrl".to_owned(),
-        insert_text: Some(r#"shadowDatabaseUrl = $0"#.to_owned()),
-        insert_text_format: Some(InsertTextFormat::SNIPPET),
-        kind: Some(CompletionItemKind::FIELD),
-        documentation: Some(Documentation::MarkupContent(MarkupContent {
-            kind: MarkupKind::Markdown,
-            value: format_completion_docs(
-                r#"shadowDatabaseUrl = "String" | env("ENVIRONMENT_VARIABLE")"#,
-                r#"Connection URL including authentication info to use for Migrate's [shadow database](https://pris.ly/d/migrate-shadow)."#,
-                None,
-            ),
-        })),
-        ..Default::default()
-    })
-}
-
 pub(super) fn url_completion(completion_list: &mut CompletionList) {
     completion_list.items.push(CompletionItem {
         label: "url".to_owned(),
@@ -139,9 +103,7 @@ pub(super) fn url_quotes_completion(completion_list: &mut CompletionList) {
 pub(super) fn url_env_db_completion(completion_list: &mut CompletionList, kind: &str, ctx: CompletionContext<'_>) {
     let text = match kind {
         "url" => "DATABASE_URL",
-        "directUrl" => "DIRECT_URL",
-        "shadowDatabaseUrl" => "SHADOW_DATABASE_URL",
-        _ => unreachable!(),
+        _ => panic!(r#"invalid `kind` passed to `url_db_completion`: "{kind}""#),
     };
 
     let insert_text = if add_quotes(ctx.params, ctx.db.source(ctx.initiating_file_id)) {

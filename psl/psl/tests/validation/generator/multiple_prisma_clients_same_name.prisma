@@ -12,7 +12,6 @@ generator client {
 datasource db {
   provider  = "postgresql"
   url       = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL")
 }
 // [1;91merror[0m: [1mThe generator "client" cannot be defined because a generator with that name already exists.[0m
 //   [1;94m-->[0m  [4mschema.prisma:6[0m
