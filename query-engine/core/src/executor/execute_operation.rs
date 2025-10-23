@@ -12,11 +12,6 @@ use futures::future;
 
 #[cfg(not(feature = "metrics"))]
 use crate::metrics::MetricsInstrumentationStub;
-#[cfg(feature = "metrics")]
-use prisma_metrics::{
-    PRISMA_CLIENT_QUERIES_DURATION_HISTOGRAM_MS, PRISMA_CLIENT_QUERIES_TOTAL, WithMetricsInstrumentation, counter,
-    histogram,
-};
 
 use schema::{QuerySchema, QuerySchemaRef};
 use std::time::Duration;
@@ -30,13 +25,8 @@ pub async fn execute_single_operation(
     operation: &Operation,
     traceparent: Option<TraceParent>,
 ) -> crate::Result<ResponseData> {
-    let operation_timer = ElapsedTimeCounter::start();
-
     let (graph, serializer) = build_graph(&query_schema, operation.clone())?;
     let result = execute_on(conn, graph, serializer, query_schema.as_ref(), traceparent).await;
-
-    #[cfg(feature = "metrics")]
-    histogram!(PRISMA_CLIENT_QUERIES_DURATION_HISTOGRAM_MS).record(operation_timer.elapsed_time());
 
     result
 }
@@ -55,11 +45,7 @@ pub async fn execute_many_operations(
     let mut results = Vec::with_capacity(queries.len());
 
     for (i, (graph, serializer)) in queries.into_iter().enumerate() {
-        let operation_timer = ElapsedTimeCounter::start();
         let result = execute_on(conn, graph, serializer, query_schema.as_ref(), traceparent).await;
-
-        #[cfg(feature = "metrics")]
-        histogram!(PRISMA_CLIENT_QUERIES_DURATION_HISTOGRAM_MS).record(operation_timer.elapsed_time());
 
         match result {
             Ok(result) => results.push(Ok(result)),
@@ -111,9 +97,6 @@ pub async fn execute_many_self_contained<C: Connector + Send + Sync>(
     let mut futures = Vec::with_capacity(operations.len());
 
     for op in operations {
-        #[cfg(feature = "metrics")]
-        counter!(PRISMA_CLIENT_QUERIES_TOTAL).increment(1);
-
         let conn_span = info_span!(
             "prisma:engine:connection",
             user_facing = true,
@@ -133,8 +116,7 @@ pub async fn execute_many_self_contained<C: Connector + Send + Sync>(
                     traceparent,
                 ),
             )
-            .with_current_subscriber()
-            .with_current_recorder(),
+            .with_current_subscriber(),
         ));
     }
 
@@ -156,7 +138,6 @@ async fn execute_self_contained(
     retry_on_transient_error: bool,
     traceparent: Option<TraceParent>,
 ) -> crate::Result<ResponseData> {
-    let operation_timer = ElapsedTimeCounter::start();
     let result = if retry_on_transient_error {
         execute_self_contained_with_retry(
             &mut conn,
@@ -173,9 +154,6 @@ async fn execute_self_contained(
         execute_self_contained_without_retry(conn, graph, serializer, force_transactions, &query_schema, traceparent)
             .await
     };
-
-    #[cfg(feature = "metrics")]
-    histogram!(PRISMA_CLIENT_QUERIES_DURATION_HISTOGRAM_MS).record(operation_timer.elapsed_time());
 
     result
 }
@@ -269,9 +247,6 @@ async fn execute_on<'a>(
     query_schema: &'a QuerySchema,
     traceparent: Option<TraceParent>,
 ) -> crate::Result<ResponseData> {
-    #[cfg(feature = "metrics")]
-    counter!(PRISMA_CLIENT_QUERIES_TOTAL).increment(1);
-
     let interpreter = QueryInterpreter::new(conn);
     QueryPipeline::new(graph, interpreter, serializer)
         .execute(query_schema, traceparent)

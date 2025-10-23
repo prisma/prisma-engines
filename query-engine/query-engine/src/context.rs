@@ -1,8 +1,7 @@
 use crate::features::{EnabledFeatures, Feature};
 use crate::{PrismaError, PrismaResult};
 use crate::{logger::Logger, opt::PrismaOpt};
-use prisma_metrics::{MetricRecorder, MetricRegistry};
-use psl::PreviewFeature;
+
 use query_core::{
     QueryExecutor,
     protocol::EngineProtocol,
@@ -20,8 +19,6 @@ use tracing::Instrument;
 pub struct PrismaContext {
     /// The api query schema.
     query_schema: QuerySchemaRef,
-    /// The metrics registry
-    pub(crate) metrics: MetricRegistry,
     /// Central query executor.
     pub(crate) executor: Box<dyn QueryExecutor + Send + Sync + 'static>,
     /// The engine protocol in use
@@ -45,7 +42,6 @@ impl PrismaContext {
         schema: psl::ValidatedSchema,
         protocol: EngineProtocol,
         enabled_features: EnabledFeatures,
-        metrics: Option<MetricRegistry>,
         logger: Logger,
         boot_request_id: RequestId,
     ) -> PrismaResult<PrismaContext> {
@@ -103,7 +99,6 @@ impl PrismaContext {
         let context = Self {
             query_schema: Arc::new(query_schema),
             executor,
-            metrics: metrics.unwrap_or_default(),
             engine_protocol: protocol,
             enabled_features,
             logger,
@@ -133,16 +128,6 @@ impl PrismaContext {
 pub async fn setup(opts: &PrismaOpt) -> PrismaResult<Arc<PrismaContext>> {
     let logger = Logger::new(opts).install().expect("failed to install the logger");
 
-    let metrics = if opts.enable_metrics || opts.dataproxy_metric_override {
-        let metrics = MetricRegistry::new();
-        let recorder = MetricRecorder::new(metrics.clone());
-        recorder.install_globally().expect("setup must be called only once");
-        recorder.init_prisma_metrics();
-        Some(metrics)
-    } else {
-        None
-    };
-
     let datamodel = opts.schema(false)?;
     let config = &datamodel.configuration;
     let protocol = opts.engine_protocol();
@@ -165,11 +150,11 @@ pub async fn setup(opts: &PrismaOpt) -> PrismaResult<Arc<PrismaContext>> {
 
     let mut features = EnabledFeatures::from(opts);
 
-    if config.preview_features().contains(PreviewFeature::Metrics) || opts.dataproxy_metric_override {
+    if opts.dataproxy_metric_override {
         features |= Feature::Metrics
     }
 
-    let cx = PrismaContext::new(datamodel, protocol, features, metrics, logger, initial_request_id)
+    let cx = PrismaContext::new(datamodel, protocol, features, logger, initial_request_id)
         .instrument(span)
         .await?;
 

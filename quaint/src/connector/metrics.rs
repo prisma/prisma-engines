@@ -1,7 +1,6 @@
 use std::future::Future;
 
 use crosstarget_utils::time::ElapsedTimeCounter;
-use prisma_metrics::{counter, histogram};
 use telemetry::formatting::QueryForTracing;
 use tracing::{Instrument, info_span};
 
@@ -62,10 +61,6 @@ where
         trace_query(query, params, result, &start);
     }
 
-    histogram!(format!("{tag}.query.time")).record(start.elapsed_time());
-    histogram!("prisma_datasource_queries_duration_histogram_ms").record(start.elapsed_time());
-    counter!("prisma_datasource_queries_total").increment(1);
-
     res
 }
 
@@ -88,8 +83,6 @@ where
         is_query = true,
         result,
     );
-
-    histogram!("pool.check_out").record(start.elapsed_time());
 
     res
 }

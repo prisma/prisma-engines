@@ -60,7 +60,7 @@ pub struct EngineBuilder {
 pub struct ConnectedEngineNative {
     pub config_dir: PathBuf,
     pub env: HashMap<String, String>,
-    pub metrics: Option<prisma_metrics::MetricRegistry>,
+    
 }
 
 /// Internal structure for querying and reconnecting with the engine.

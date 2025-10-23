@@ -60,7 +60,6 @@ features!(
     ImprovedQueryRaw,
     InteractiveTransactions,
     JsonProtocol,
-    Metrics,
     MicrosoftSqlServer,
     Middlewares,
     MongoDb,
@@ -157,8 +156,7 @@ impl<'a> FeatureMapWithProvider<'a> {
         // Generator preview features (alphabetically sorted)
         let feature_map: FeatureMap = FeatureMap {
             active: enumflags2::make_bitflags!(PreviewFeature::{
-                  Metrics
-                 | NativeDistinct
+                  NativeDistinct
                  | PostgresqlExtensions
                  | RelationJoins
                  | SchemaEngineDriverAdapters
@@ -188,9 +186,7 @@ impl<'a> FeatureMapWithProvider<'a> {
                     },
                 ),
             ]),
-            deprecated: enumflags2::make_bitflags!(PreviewFeature::{
-                Metrics
-            }),
+            deprecated: PreviewFeatures::empty(),
             stabilized: enumflags2::make_bitflags!(PreviewFeature::{
                 AtomicNumberOperations
                 | AggregateApi

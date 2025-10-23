@@ -34,7 +34,6 @@ use futures::future::FutureExt;
 use native_tls::{Certificate, Identity, TlsConnector};
 use postgres_native_tls::MakeTlsConnector;
 use postgres_types::{Kind as PostgresKind, Type as PostgresType};
-use prisma_metrics::WithMetricsInstrumentation;
 use query::PreparedQuery;
 use std::{
     fmt::{Debug, Display},
@@ -270,8 +269,7 @@ impl<Cache: QueryCache> PostgreSql<Cache> {
                     tracing::error!("Error in PostgreSQL connection: {e:?}");
                 }
             })
-            .with_current_subscriber()
-            .with_current_recorder(),
+            .with_current_subscriber(),
         );
 
         // On Postgres, we set the SEARCH_PATH and client-encoding through client connection parameters to save a network roundtrip on connection.

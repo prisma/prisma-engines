@@ -1,7 +1,6 @@
 use std::{fmt, str::FromStr};
 
 use async_trait::async_trait;
-use prisma_metrics::guards::GaugeGuard;
 
 use super::*;
 use crate::{
@@ -57,7 +56,6 @@ impl TransactionOptions {
 /// transaction object will panic.
 pub struct DefaultTransaction<'a> {
     pub inner: &'a dyn Queryable,
-    gauge: GaugeGuard,
 }
 
 #[cfg_attr(
@@ -83,7 +81,6 @@ impl<'a> DefaultTransaction<'a> {
     ) -> crate::Result<DefaultTransaction<'a>> {
         let this = Self {
             inner,
-            gauge: GaugeGuard::increment("prisma_client_queries_active"),
         };
 
         if tx_opts.isolation_first
@@ -110,7 +107,6 @@ impl<'a> DefaultTransaction<'a> {
 impl Transaction for DefaultTransaction<'_> {
     /// Commit the changes to the database and consume the transaction.
     async fn commit(&self) -> crate::Result<()> {
-        self.gauge.decrement();
         self.inner.raw_cmd("COMMIT").await?;
 
         Ok(())
@@ -118,7 +114,6 @@ impl Transaction for DefaultTransaction<'_> {
 
     /// Rolls back the changes to the database.
     async fn rollback(&self) -> crate::Result<()> {
-        self.gauge.decrement();
         self.inner.raw_cmd("ROLLBACK").await?;
 
         Ok(())

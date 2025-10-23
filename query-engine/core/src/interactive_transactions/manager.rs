@@ -18,8 +18,6 @@ use tracing_futures::WithSubscriber;
 
 #[cfg(not(feature = "metrics"))]
 use crate::metrics::MetricsInstrumentationStub;
-#[cfg(feature = "metrics")]
-use prisma_metrics::WithMetricsInstrumentation;
 
 use super::{TransactionError, TxId};
 
@@ -93,7 +91,6 @@ impl ItxManager {
                 }
             }
             .with_current_subscriber()
-            .with_current_recorder()
         });
 
         Self {

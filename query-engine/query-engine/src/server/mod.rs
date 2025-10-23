@@ -215,24 +215,10 @@ fn playground_handler() -> Response<Body> {
 async fn metrics_handler(cx: Arc<PrismaContext>, req: Request<Body>) -> Result<Response<Body>, hyper::Error> {
     let requested_json = req.uri().query().map(|q| q.contains("format=json")).unwrap_or_default();
     let body_start = req.into_body();
-    // block and buffer request until the request has completed
-    let full_body = hyper::body::to_bytes(body_start).await?;
-
-    let global_labels: HashMap<String, String> = serde_json::from_slice(full_body.as_ref()).unwrap_or_default();
-
-    let response = if requested_json {
-        let metrics = cx.metrics.to_json(global_labels);
-
-        build_json_response(StatusCode::OK, &metrics)
-    } else {
-        let metrics = cx.metrics.to_prometheus(global_labels);
-
-        Response::builder()
-            .status(StatusCode::OK)
-            .header(CONTENT_TYPE, "text/plain; version=0.0.4")
-            .body(Body::from(metrics))
-            .unwrap()
-    };
+    let response = Response::builder()
+        .status(StatusCode::GONE)
+        .body(Body::from("Metrics endpoint has been removed"))
+        .unwrap();
 
     Ok(response)
 }

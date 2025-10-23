@@ -22,13 +22,11 @@ pub use schema_gen::*;
 pub use templating::*;
 
 use colored::Colorize;
-use prisma_metrics::{MetricRecorder, MetricRegistry, WithMetricsInstrumentation};
 use psl::datamodel_connector::ConnectorCapabilities;
 use std::future::Future;
 use std::sync::LazyLock;
 use tokio::runtime::Builder;
 use tokio::sync::mpsc::{UnboundedReceiver, UnboundedSender, unbounded_channel};
-use tracing_futures::WithSubscriber;
 
 pub type TestResult<T> = Result<T, TestError>;
 
@@ -66,11 +64,7 @@ fn run_with_tokio<O, F: std::future::Future<Output = O>>(fut: F) -> O {
         .block_on(fut)
 }
 
-pub fn setup_metrics() -> (MetricRegistry, MetricRecorder) {
-    let metrics = MetricRegistry::new();
-    let recorder = MetricRecorder::new(metrics.clone()).with_initialized_prisma_metrics();
-    (metrics, recorder)
-}
+
 
 /// Taken from Reddit. Enables taking an async function pointer which takes references as param
 /// https://www.reddit.com/r/rust/comments/jvqorj/hrtb_with_async_functions/
@@ -201,22 +195,17 @@ fn run_relation_link_test_impl(
 
             let datamodel = render_test_datamodel(&test_db_name, template, &[], None, Default::default(), Default::default(), None);
             let (connector_tag, version) = CONFIG.test_connector().unwrap();
-            let (metrics, recorder) = setup_metrics();
             let (log_capture, log_tx) = TestLogCapture::new();
 
             run_with_tokio(
                 async move {
                     println!("Used datamodel:\n {}", datamodel.schema.yellow());
                     let override_local_max_bind_values = None;
-                    let runner = Runner::load(&datamodel, &[], version, connector_tag, override_local_max_bind_values, metrics, log_capture)
+                    let runner = Runner::load(&datamodel, &[], version, connector_tag, override_local_max_bind_values, log_capture)
                         .await
                         .unwrap();
 
-                    test_fn(&runner, &dm).with_subscriber(test_tracing_subscriber(
-                        ENV_LOG_LEVEL.to_string(),
-                        log_tx,
-                    )).with_recorder(recorder)
-                    .await.unwrap();
+                    test_fn(&runner, &dm).await.unwrap();
 
                     teardown_project(&datamodel, Default::default(), runner.schema_id())
                         .await
@@ -348,7 +337,6 @@ fn run_connector_test_impl(
         None,
     );
     let (connector_tag, version) = CONFIG.test_connector().unwrap();
-    let (metrics, recorder) = crate::setup_metrics();
 
     let (log_capture, log_tx) = TestLogCapture::new();
 
@@ -361,17 +349,13 @@ fn run_connector_test_impl(
             version,
             connector_tag,
             override_local_max_bind_values,
-            metrics,
             log_capture,
         )
         .await
         .unwrap();
         let schema_id = runner.schema_id();
 
-        if let Err(err) = test_fn(runner)
-            .with_subscriber(test_tracing_subscriber(ENV_LOG_LEVEL.to_string(), log_tx))
-            .with_recorder(recorder)
-            .await
+        if let Err(err) = test_fn(runner).await
         {
             // Print any traceback directly to stdout, so it remains readable
             eprintln!("Test failed due to an error:");
