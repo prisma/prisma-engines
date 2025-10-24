@@ -13,7 +13,7 @@ OUT_FOLDER="${2:-"query-compiler/query-compiler-wasm/pkg"}"
 OUT_TARGET="bundler"
 # wasm-opt pass
 WASM_OPT_ARGS=(
-    "-Os"                                 # execute size-focused optimization passes (-Oz actually increases size by 1KB)
+    "-Oz"                                 # execute size-focused optimization passes
     "--vacuum"                            # removes obviously unneeded code
     "--duplicate-function-elimination"    # removes duplicate functions
     "--duplicate-import-elimination"      # removes duplicate imports
