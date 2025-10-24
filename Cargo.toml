@@ -66,6 +66,7 @@ concat-idents = "1"
 connection-string = "0.2"
 convert_case = "0.6"
 crossbeam-channel = "0.5"
+cruet = "0.15"
 cuid = { git = "https://github.com/prisma/cuid-rust", branch = "v1.3.3-wasm32-unknown-unknown" }
 derive_more = "0.99"
 either = "1"

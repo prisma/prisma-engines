@@ -970,6 +970,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "cruet"
+version = "0.15.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b7a9ae414b9768aada1b316493261653e41af05c9d2ccc9c504a8fc051c6a790"
+dependencies = [
+ "once_cell",
+ "regex",
+]
+
+[[package]]
 name = "crypto-common"
 version = "0.1.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3592,6 +3602,7 @@ version = "0.1.0"
 dependencies = [
  "build-utils",
  "colored 3.0.0",
+ "cruet",
  "dissimilar",
  "dmmf",
  "enumflags2",
