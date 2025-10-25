@@ -238,13 +238,13 @@ fn push_missing_relation_fields(inline: walkers::InlineRelationWalker<'_>, ctx: 
 
     if inline.forward_relation_field().is_none() {
         let referenced_model_name = inline.referenced_model().name();
-        let field_name = inline.referenced_model().name();
 
         let arity = render_arity(forward_relation_field_arity(inline));
+
         let field_name = if arity == "[]" {
-            field_name.to_plural().to_camel_case()
+            referenced_model_name.to_plural().to_camel_case()
         } else {
-            field_name.to_camel_case()
+            referenced_model_name.to_camel_case()
         };
 
         let fields_arg = fields_argument(inline);
