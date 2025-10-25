@@ -26,7 +26,7 @@ fn back_relation_fields_missing_attributes_should_not_add_attributes_multiple_ti
         }
 
         model Post {
-          id   Int    @id
+          id    Int    @id
           users User[]
           cats  Cat[]
         }
@@ -62,7 +62,7 @@ fn back_relations_must_be_added_when_attribute_is_present_with_no_arguments() {
         }
 
         model Post {
-          id   Int    @id
+          id    Int    @id
           users User[]
         }
     "#]];
@@ -130,7 +130,7 @@ fn scalar_field_and_attribute_must_be_added_even_when_attribute_is_missing_and_o
         model Post {
           id   Int    @id
           User User[]
-          cats  Cat[]
+          cats Cat[]
         }
 
         model Cat {
@@ -319,7 +319,7 @@ fn must_add_back_relation_fields_for_given_singular_field() {
 
         model Post {
           post_id Int    @id
-          users[]    User[]
+          users   User[]
         }
     "#]];
 
@@ -338,9 +338,9 @@ fn must_add_back_relation_fields_for_self_relations() {
 
     let expected = expect![[r#"
         model Human {
-          id    Int     @id
-          sonId Int?
-          son   Human?  @relation(fields: [sonId], references: [id])
+          id     Int     @id
+          sonId  Int?
+          son    Human?  @relation(fields: [sonId], references: [id])
           humans Human[]
         }
     "#]];
@@ -400,7 +400,7 @@ fn add_backrelation_for_unambiguous_self_relations_in_presence_of_unrelated_othe
           motherId    Int
           mother      User       @relation(fields: motherId, references: id)
           subscribers Follower[]
-          users        User[]
+          users       User[]
         }
 
         model Follower {

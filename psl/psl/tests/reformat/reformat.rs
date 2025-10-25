@@ -828,8 +828,8 @@ fn reformatting_ignore_with_relations_works() {
     let expected = expect![[r#"
         model client {
           client_id Int     @id
-          orders     order[] @ignore
-          bills      bill[]  @ignore
+          orders    order[] @ignore
+          bills     bill[]  @ignore
         }
 
         /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
