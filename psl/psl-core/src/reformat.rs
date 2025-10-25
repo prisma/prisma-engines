@@ -1,4 +1,5 @@
 use crate::{ParserDatabase, ValidatedSchema};
+use cruet::Inflector;
 use diagnostics::FileId;
 use parser_database::{NoExtensionTypes, ast::WithSpan, walkers};
 use schema_ast::{SourceFile, ast};
@@ -217,22 +218,35 @@ fn push_missing_relation_fields(inline: walkers::InlineRelationWalker<'_>, ctx: 
         } else {
             ""
         };
+
         let arity = if inline.is_one_to_one() { "?" } else { "[]" };
+        let field_name = if arity == "?" {
+            referencing_model_name.to_camel_case()
+        } else {
+            referencing_model_name.to_plural().to_camel_case()
+        };
 
         let span = inline.referenced_model().ast_model().span();
         ctx.add_missing_bit(
             span.file_id,
             MissingBit {
                 position: span.end - 1,
-                content: format!("{referencing_model_name} {referencing_model_name}{arity} {ignore}\n"),
+                content: format!("{field_name} {referencing_model_name}{arity} {ignore}\n"),
             },
         );
     }
 
     if inline.forward_relation_field().is_none() {
+        let referenced_model_name = inline.referenced_model().name();
         let field_name = inline.referenced_model().name();
-        let field_type = field_name;
+
         let arity = render_arity(forward_relation_field_arity(inline));
+        let field_name = if arity == "[]" {
+            field_name.to_plural().to_camel_case()
+        } else {
+            field_name.to_camel_case()
+        };
+
         let fields_arg = fields_argument(inline);
         let references_arg = references_argument(inline);
         let span = inline.referencing_model().ast_model().span();
@@ -240,7 +254,9 @@ fn push_missing_relation_fields(inline: walkers::InlineRelationWalker<'_>, ctx: 
             span.file_id,
             MissingBit {
                 position: span.end - 1,
-                content: format!("{field_name} {field_type}{arity} @relation({fields_arg}, {references_arg})\n"),
+                content: format!(
+                    "{field_name} {referenced_model_name}{arity} @relation({fields_arg}, {references_arg})\n"
+                ),
             },
         )
     }

@@ -3720,6 +3720,7 @@ dependencies = [
  "cfg-if",
  "chrono",
  "connection-string",
+ "cruet",
  "diagnostics",
  "either",
  "enumflags2",
