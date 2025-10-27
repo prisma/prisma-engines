@@ -91,7 +91,7 @@ metrics = "0.23.0"
 metrics-util = "0.17.0"
 metrics-exporter-prometheus = { version = "0.15.3", default-features = false }
 mobc = "0.8"
-mongodb = { git = "https://github.com/prisma/mongo-rust-driver.git", branch = "RUST-1994/happy-eyeballs", features = [
+mongodb = { version = "3", features = [
     "zstd-compression",
     "zlib-compression",
     "snappy-compression",
