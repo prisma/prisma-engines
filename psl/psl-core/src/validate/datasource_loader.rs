@@ -159,42 +159,12 @@ fn lift_datasource(
         }
     };
 
-    let shadow_database_url = match args.remove(SHADOW_DATABASE_URL_KEY) {
-        Some((_span, shadow_db_url_arg)) => match StringFromEnvVar::coerce(shadow_db_url_arg, diagnostics) {
-            Some(shadow_db_url) => Some(shadow_db_url)
-                .filter(|s| !s.as_literal().map(|literal| literal.is_empty()).unwrap_or(false))
-                .map(|url| (url, shadow_db_url_arg.span())),
-            None => None,
-        },
+    if let Some((span, _)) = args.remove(SHADOW_DATABASE_URL_KEY) {
+        diagnostics.push_error(DatamodelError::new_datasource_shadow_database_url_removed_error(span));
+    }
 
-        _ => None,
-    };
-
-    let (direct_url, direct_url_span) = match args.remove(DIRECT_URL_KEY) {
-        Some((_, direct_url)) => (
-            StringFromEnvVar::coerce(direct_url, diagnostics),
-            Some(direct_url.span()),
-        ),
-
-        None => (None, None),
-    };
-
-    if let Some((shadow_url, _)) = &shadow_database_url {
-        if let (Some(direct_url), Some(direct_url_span)) = (&direct_url, direct_url_span)
-            && shadow_url == direct_url
-        {
-            diagnostics.push_error(DatamodelError::new_shadow_database_is_same_as_direct_url_error(
-                source_name,
-                direct_url_span,
-            ));
-        }
-
-        if shadow_url == &url {
-            diagnostics.push_error(DatamodelError::new_shadow_database_is_same_as_main_url_error(
-                source_name,
-                url_span,
-            ));
-        }
+    if let Some((span, _)) = args.remove(DIRECT_URL_KEY) {
+        diagnostics.push_error(DatamodelError::new_datasource_direct_url_removed_error(span));
     }
 
     preview_features_guardrail(&mut args, diagnostics);
@@ -253,11 +223,11 @@ fn lift_datasource(
         active_provider: active_connector.provider_name(),
         url,
         url_span,
-        direct_url,
-        direct_url_span,
+        direct_url: None,
+        direct_url_span: None,
         documentation,
         active_connector,
-        shadow_database_url,
+        shadow_database_url: None,
         relation_mode,
         connector_data,
     })

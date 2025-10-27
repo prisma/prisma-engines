@@ -251,7 +251,7 @@ fn empty_schema_property_should_error() {
 }
 
 #[test]
-fn parse_direct_url_should_work() {
+fn parse_direct_url_should_error() {
     let schema = indoc! {r#"
         generator js {
           provider        = "prisma-client"
@@ -264,17 +264,16 @@ fn parse_direct_url_should_work() {
         }
     "#};
 
-    // assert_valid(schema);
-    let config = parse_configuration(schema);
+    let expect = expect![[r#"
+        [1;91merror[0m: [1mThe datasource property `directUrl` is no longer supported in schema files. Move connection URLs to `prisma.config.ts`. See https://pris.ly/d/config-datasource[0m
+          [1;94m-->[0m  [4mschema.prisma:8[0m
+        [1;94m   | [0m
+        [1;94m 7 | [0m  url        = env("DATABASE_URL")
+        [1;94m 8 | [0m  [1;91mdirectUrl = env("DIRECT_DATABASE_URL")[0m
+        [1;94m   | [0m
+    "#]];
 
-    let result = config
-        .datasources
-        .first()
-        .and_then(|ds| ds.direct_url.clone())
-        .and_then(|url| url.from_env_var)
-        .unwrap();
-
-    assert_eq!("DIRECT_DATABASE_URL", result);
+    expect_error(schema, &expect);
 }
 
 #[test]
