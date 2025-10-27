@@ -348,18 +348,14 @@ impl DatamodelError {
         Self::new(format!("Datasource provider not known: \"{provider}\"."), span)
     }
 
-    pub fn new_shadow_database_is_same_as_main_url_error(source_name: &str, span: Span) -> DatamodelError {
-        let msg = format!(
-            "shadowDatabaseUrl is the same as url for datasource \"{source_name}\". Please specify a different database as shadow database to avoid data loss."
-        );
-        Self::new(msg, span)
+    pub fn new_datasource_direct_url_removed_error(span: Span) -> DatamodelError {
+        let msg = "The datasource property `directUrl` is no longer supported in schema files. Move connection URLs to `prisma.config.ts`. See https://pris.ly/d/config-datasource";
+        Self::new(msg.to_string(), span)
     }
 
-    pub fn new_shadow_database_is_same_as_direct_url_error(source_name: &str, span: Span) -> DatamodelError {
-        let msg = format!(
-            "shadowDatabaseUrl is the same as directUrl for datasource \"{source_name}\". Please specify a different database as shadow database to avoid data loss."
-        );
-        Self::new(msg, span)
+    pub fn new_datasource_shadow_database_url_removed_error(span: Span) -> DatamodelError {
+        let msg = "The datasource property `shadowDatabaseUrl` is no longer supported in schema files. Move connection URLs to `prisma.config.ts`. See https://pris.ly/d/config-datasource";
+        Self::new(msg.to_string(), span)
     }
 
     pub fn new_preview_feature_not_known_error(
