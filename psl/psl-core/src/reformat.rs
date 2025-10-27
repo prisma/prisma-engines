@@ -220,10 +220,10 @@ fn push_missing_relation_fields(inline: walkers::InlineRelationWalker<'_>, ctx: 
         };
 
         let arity = if inline.is_one_to_one() { "?" } else { "[]" };
-        let field_name = if arity == "?" {
-            referencing_model_name.to_camel_case()
-        } else {
+        let field_name = if arity == "[]" {
             referencing_model_name.to_camel_case().to_plural()
+        } else {
+            referencing_model_name.to_camel_case()
         };
 
         let span = inline.referenced_model().ast_model().span();
