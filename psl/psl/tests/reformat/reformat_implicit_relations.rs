@@ -26,9 +26,9 @@ fn back_relation_fields_missing_attributes_should_not_add_attributes_multiple_ti
         }
 
         model Post {
-          id   Int    @id
-          User User[]
-          Cat  Cat[]
+          id    Int    @id
+          users User[]
+          cats  Cat[]
         }
 
         model Cat {
@@ -62,8 +62,8 @@ fn back_relations_must_be_added_when_attribute_is_present_with_no_arguments() {
         }
 
         model Post {
-          id   Int    @id
-          User User[]
+          id    Int    @id
+          users User[]
         }
     "#]];
 
@@ -123,14 +123,14 @@ fn scalar_field_and_attribute_must_be_added_even_when_attribute_is_missing_and_o
     let expected = expect![[r#"
         model User {
           id     Int   @id
-          Post   Post? @relation(fields: [postId], references: [id])
+          post   Post? @relation(fields: [postId], references: [id])
           postId Int?
         }
 
         model Post {
           id   Int    @id
           User User[]
-          Cat  Cat[]
+          cats Cat[]
         }
 
         model Cat {
@@ -288,7 +288,7 @@ fn must_add_back_relation_fields_for_given_list_field() {
 
         model Post {
           post_id Int   @id
-          User    User? @relation(fields: [userId], references: [id])
+          user    User? @relation(fields: [userId], references: [id])
           userId  Int?
         }
     "#]];
@@ -319,7 +319,7 @@ fn must_add_back_relation_fields_for_given_singular_field() {
 
         model Post {
           post_id Int    @id
-          User    User[]
+          users   User[]
         }
     "#]];
 
@@ -338,10 +338,10 @@ fn must_add_back_relation_fields_for_self_relations() {
 
     let expected = expect![[r#"
         model Human {
-          id    Int     @id
-          sonId Int?
-          son   Human?  @relation(fields: [sonId], references: [id])
-          Human Human[]
+          id     Int     @id
+          sonId  Int?
+          son    Human?  @relation(fields: [sonId], references: [id])
+          humans Human[]
         }
     "#]];
 
@@ -369,7 +369,7 @@ fn should_camel_case_back_relation_field_name() {
 
         model Post {
           post_id       Int          @id
-          OhWhatAUser   OhWhatAUser? @relation(fields: [ohWhatAUserId], references: [id])
+          ohWhatAUser   OhWhatAUser? @relation(fields: [ohWhatAUserId], references: [id])
           ohWhatAUserId Int?
         }
     "#]];
@@ -400,7 +400,7 @@ fn add_backrelation_for_unambiguous_self_relations_in_presence_of_unrelated_othe
           motherId    Int
           mother      User       @relation(fields: motherId, references: id)
           subscribers Follower[]
-          User        User[]
+          users       User[]
         }
 
         model Follower {
@@ -581,7 +581,7 @@ fn must_handle_conflicts_with_existing_fields_if_types_are_compatible() {
         model Post {
           id     String  @id
           blogId String?
-          Blog   Blog?   @relation(fields: [blogId], references: [id])
+          blog   Blog?   @relation(fields: [blogId], references: [id])
         }
     "#]];
 
@@ -611,7 +611,7 @@ fn forward_relation_field_generation_picks_up_types_of_existing_underlying_scala
         model Post {
           id     String @id
           blogId Int? // this is not compatible with Blog.id
-          Blog   Blog?  @relation(fields: [blogId], references: [id])
+          blog   Blog?  @relation(fields: [blogId], references: [id])
         }
     "#]];
 
@@ -662,13 +662,13 @@ fn should_add_back_relations_for_more_complex_cases() {
           post_id    Int              @id
           comments   Comment[]
           categories PostToCategory[]
-          User       User?            @relation(fields: [userId], references: [id])
+          user       User?            @relation(fields: [userId], references: [id])
           userId     Int?
         }
 
         model Comment {
           comment_id  Int   @id
-          Post        Post? @relation(fields: [postPost_id], references: [post_id])
+          post        Post? @relation(fields: [postPost_id], references: [post_id])
           postPost_id Int?
         }
 
@@ -875,7 +875,7 @@ fn back_relations_must_be_added_even_when_env_vars_are_missing() {
 
         model Post {
           id     Int   @id
-          Blog   Blog? @relation(fields: [blogId], references: [id])
+          blog   Blog? @relation(fields: [blogId], references: [id])
           blogId Int?
         }
     "#]];
@@ -929,7 +929,7 @@ fn must_add_required_relation_field_if_underlying_scalar_is_required() {
         model Session {
           id     Int  @id
           userId Int
-          User   User @relation(fields: [userId], references: [id])
+          user   User @relation(fields: [userId], references: [id])
         }
 
         model User {
@@ -941,7 +941,7 @@ fn must_add_required_relation_field_if_underlying_scalar_is_required() {
           id       Int   @id
           user2Id  Int
           user2Id2 Int
-          User2    User2 @relation(fields: [user2Id, user2Id2], references: [id, id2])
+          user2    User2 @relation(fields: [user2Id, user2Id2], references: [id, id2])
         }
 
         model User2 {
@@ -956,7 +956,7 @@ fn must_add_required_relation_field_if_underlying_scalar_is_required() {
           id       Int    @id
           user3Id  Int?
           user3Id2 Int
-          User3    User3? @relation(fields: [user3Id, user3Id2], references: [id, id2])
+          user3    User3? @relation(fields: [user3Id, user3Id2], references: [id, id2])
         }
 
         model User3 {
@@ -1056,7 +1056,7 @@ fn mongodb_inline_relations_reformat_as_expected() {
 
         model B {
           id  String  @id @default(auto()) @map("_id") @db.ObjectId
-          A   A?      @relation(fields: [aId], references: [id])
+          a   A?      @relation(fields: [aId], references: [id])
           aId String? @db.ObjectId
         }
     "#]];
