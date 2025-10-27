@@ -9,7 +9,10 @@ pub use schema_core::{
 pub use test_macros::test_connector;
 pub use test_setup::{BitFlags, Capabilities, Tags, runtime::run_with_thread_local_runtime as tok};
 
-use crate::{commands::*, multi_engine_test_api::TestApi as RootTestApi};
+use crate::{
+    commands::*,
+    multi_engine_test_api::{EngineTestApi, TestApi as RootTestApi},
+};
 use psl::{
     datamodel_connector::NativeTypeInstance,
     parser_database::{ExtensionTypes, NoExtensionTypes, ScalarFieldType, SourceFile},
@@ -88,6 +91,15 @@ impl TestApi {
 
     pub fn connection_info(&self) -> ConnectionInfo {
         self.root.connection_info()
+    }
+
+    pub fn new_engine_with_connection_strings(
+        &self,
+        connection_string: String,
+        shadow_database_connection_string: Option<String>,
+    ) -> EngineTestApi {
+        self.root
+            .new_engine_with_connection_strings(connection_string, shadow_database_connection_string)
     }
 
     pub fn ensure_connection_validity(&mut self) -> ConnectorResult<()> {

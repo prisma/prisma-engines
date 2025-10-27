@@ -148,14 +148,6 @@ fn push_ast_completions(ctx: CompletionContext<'_>, completion_list: &mut Comple
                 datasource::url_completion(completion_list);
             }
 
-            if !ds_has_prop(&ctx, "shadowDatabaseUrl") {
-                datasource::shadow_db_completion(completion_list);
-            }
-
-            if !ds_has_prop(&ctx, "directUrl") {
-                datasource::direct_url_completion(completion_list);
-            }
-
             if !ds_has_prop(&ctx, "relationMode") {
                 datasource::relation_mode_completion(completion_list);
             }
@@ -168,19 +160,7 @@ fn push_ast_completions(ctx: CompletionContext<'_>, completion_list: &mut Comple
             ast::SourcePosition::Property("url", ast::PropertyPosition::FunctionValue("env")),
         ) => datasource::url_env_db_completion(completion_list, "url", ctx),
 
-        ast::SchemaPosition::DataSource(
-            _source_id,
-            ast::SourcePosition::Property("directUrl", ast::PropertyPosition::FunctionValue("env")),
-        ) => datasource::url_env_db_completion(completion_list, "directUrl", ctx),
-
-        ast::SchemaPosition::DataSource(
-            _source_id,
-            ast::SourcePosition::Property("shadowDatabaseUrl", ast::PropertyPosition::FunctionValue("env")),
-        ) => datasource::url_env_db_completion(completion_list, "shadowDatabaseUrl", ctx),
-
-        ast::SchemaPosition::DataSource(_source_id, ast::SourcePosition::Property("url", _))
-        | ast::SchemaPosition::DataSource(_source_id, ast::SourcePosition::Property("directUrl", _))
-        | ast::SchemaPosition::DataSource(_source_id, ast::SourcePosition::Property("shadowDatabaseUrl", _)) => {
+        ast::SchemaPosition::DataSource(_source_id, ast::SourcePosition::Property("url", _)) => {
             datasource::url_env_completion(completion_list);
             datasource::url_quotes_completion(completion_list);
         }
@@ -193,8 +173,6 @@ fn ds_has_prop(ctx: &CompletionContext<'_>, prop: &str) -> bool {
     if let Some(ds) = ctx.datasource() {
         match prop {
             "relationMode" => ds.relation_mode_defined(),
-            "directurl" => ds.direct_url_defined(),
-            "shadowDatabaseUrl" => ds.shadow_url_defined(),
             "url" => ds.url_defined(),
             "provider" => ds.provider_defined(),
             _ => false,

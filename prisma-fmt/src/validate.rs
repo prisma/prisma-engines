@@ -116,7 +116,8 @@ mod tests {
             "prismaSchema": schema,
         });
 
-        validate(&request.to_string()).unwrap();
+        let response = validate(&request.to_string());
+        assert!(response.is_ok())
     }
 
     #[test]
@@ -133,7 +134,12 @@ mod tests {
             "prismaSchema": schema,
         });
 
-        validate(&request.to_string()).unwrap();
+        let expected = expect![[
+            r#"{"error_code":"P1012","message":"\u001b[1;91merror\u001b[0m: \u001b[1mThe datasource property `directUrl` is no longer supported in schema files. Move connection URLs to `prisma.config.ts`. See https://pris.ly/d/config-datasource\u001b[0m\n  \u001b[1;94m-->\u001b[0m  \u001b[4mschema.prisma:5\u001b[0m\n\u001b[1;94m   | \u001b[0m\n\u001b[1;94m 4 | \u001b[0m                url = env(\"DBURL\")\n\u001b[1;94m 5 | \u001b[0m                \u001b[1;91mdirectUrl = \"\"\u001b[0m\n\u001b[1;94m   | \u001b[0m\n\nValidation Error Count: 1"}"#
+        ]];
+
+        let response = validate(&request.to_string()).unwrap_err();
+        expected.assert_eq(&response);
     }
 
     #[test]
