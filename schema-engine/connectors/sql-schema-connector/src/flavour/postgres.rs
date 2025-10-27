@@ -680,15 +680,6 @@ async fn sql_schema_from_migrations_and_db(
     circumstances: BitFlags<Circumstances>,
     preview_features: BitFlags<PreviewFeature>,
 ) -> ConnectorResult<SqlSchema> {
-    if circumstances.contains(Circumstances::IsCockroachDb) {
-        // CockroachDB is very slow in applying DDL statements.
-        // A workaround to it is to run the statements in a transaction block. This comes with some
-        // drawbacks and limitations though, so we only apply this when creating a shadow db.
-        // See https://www.cockroachlabs.com/docs/stable/online-schema-changes#limitations
-        // Original GitHub issue with context: https://github.com/prisma/prisma/issues/12384#issuecomment-1152523689
-        conn.raw_cmd("BEGIN;").await.map_err(imp::quaint_error_mapper(params))?;
-    }
-
     if !migrations.shadow_db_init_script.trim().is_empty() {
         conn.raw_cmd(&migrations.shadow_db_init_script)
             .await
@@ -709,12 +700,6 @@ async fn sql_schema_from_migrations_and_db(
             .map_err(|connector_error| {
                 connector_error.into_migration_does_not_apply_cleanly(migration.migration_name().to_owned())
             })?;
-    }
-
-    if circumstances.contains(Circumstances::IsCockroachDb) {
-        conn.raw_cmd("COMMIT;")
-            .await
-            .map_err(imp::quaint_error_mapper(params))?;
     }
 
     describe_schema_with(conn, params, circumstances, preview_features, namespaces, schema).await
