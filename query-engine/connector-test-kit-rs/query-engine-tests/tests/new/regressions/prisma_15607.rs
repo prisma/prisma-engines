@@ -4,10 +4,9 @@
 //! actors to allow test to continue even if one query is blocking.
 
 use indoc::indoc;
-use prisma_metrics::{MetricRecorder, WithMetricsInstrumentation};
 use query_engine_tests::{
     CONFIG, ENV_LOG_LEVEL, LogEmit, QueryResult, Runner, TestError, TestLogCapture, TestResult, WithSubscriber,
-    query_core::TxId, render_test_datamodel, setup_metrics, test_tracing_subscriber,
+    query_core::TxId, render_test_datamodel, test_tracing_subscriber,
 };
 use std::future::Future;
 use tokio::sync::mpsc;
@@ -51,11 +50,9 @@ impl Actor {
     /// Spawns a new query engine to the runtime.
     pub async fn spawn() -> TestResult<Self> {
         let (log_capture, log_tx) = TestLogCapture::new();
-        let (metrics, recorder) = setup_metrics();
 
-        async fn with_observability<T>(fut: impl Future<Output = T>, log_tx: LogEmit, recorder: MetricRecorder) -> T {
+        async fn with_tracing<T>(fut: impl Future<Output = T>, log_tx: LogEmit) -> T {
             fut.with_subscriber(test_tracing_subscriber(ENV_LOG_LEVEL.to_string(), log_tx))
-                .with_recorder(recorder)
                 .await
         }
 
@@ -73,24 +70,21 @@ impl Actor {
             Some("READ COMMITTED"),
         );
 
-        let mut runner = Runner::load(&datamodel, &[], version, tag, None, metrics, log_capture).await?;
+        let mut runner = Runner::load(&datamodel, &[], version, tag, None, log_capture).await?;
 
         tokio::spawn(async move {
             while let Some(message) = query_receiver.recv().await {
                 match message {
                     Message::Query(query) => {
-                        let result = with_observability(runner.query(query), log_tx.clone(), recorder.clone()).await;
+                        let result = with_tracing(runner.query(query), log_tx.clone()).await;
                         response_sender.send(Response::Query(result)).await.unwrap();
                     }
                     Message::BeginTransaction => {
-                        let response =
-                            with_observability(runner.start_tx(10000, 10000, None), log_tx.clone(), recorder.clone())
-                                .await;
+                        let response = with_tracing(runner.start_tx(10000, 10000, None), log_tx.clone()).await;
                         response_sender.send(Response::Tx(response)).await.unwrap();
                     }
                     Message::RollbackTransaction(tx_id) => {
-                        let response =
-                            with_observability(runner.rollback_tx(tx_id), log_tx.clone(), recorder.clone()).await?;
+                        let response = with_tracing(runner.rollback_tx(tx_id), log_tx.clone()).await?;
                         response_sender.send(Response::Rollback(response)).await.unwrap();
                     }
                     Message::SetActiveTx(tx_id) => {

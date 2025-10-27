@@ -77,7 +77,6 @@ tracing-futures.workspace = true
 async-trait.workspace = true
 thiserror.workspace = true
 num_cpus.workspace = true
-prisma-metrics.workspace = true
 futures.workspace = true
 url.workspace = true
 hex.workspace = true

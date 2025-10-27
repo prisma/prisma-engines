@@ -2,8 +2,6 @@ use crate::{error::ApiError, logger::Logger};
 use futures::FutureExt;
 use napi::{Env, JsFunction, JsObject, JsUnknown, threadsafe_function::ThreadSafeCallContext};
 use napi_derive::napi;
-use prisma_metrics::{MetricFormat, WithMetricsInstrumentation};
-use psl::PreviewFeature;
 use quaint::{connector::ExternalConnector, prelude::ConnectionInfo};
 use query_core::{QueryDocument, TransactionOptions, TxId, protocol::EngineProtocol, relation_load_strategy, schema};
 use query_engine_common::{
@@ -14,9 +12,8 @@ use query_engine_common::{
     tracer::start_trace,
 };
 use request_handlers::{ConnectorKind, RequestBody, RequestHandler, load_executor, render_graphql_schema};
-use serde::Deserialize;
 use serde_json::json;
-use std::{collections::HashMap, future::Future, marker::PhantomData, panic::AssertUnwindSafe, sync::Arc};
+use std::{future::Future, marker::PhantomData, panic::AssertUnwindSafe, sync::Arc};
 use tokio::sync::RwLock;
 use tracing_futures::{Instrument, WithSubscriber};
 use tracing_subscriber::filter::LevelFilter;
@@ -33,20 +30,6 @@ pub struct QueryEngine {
     connector_mode: ConnectorMode,
     inner: RwLock<Inner>,
     logger: Logger,
-}
-
-#[derive(Debug, Deserialize)]
-#[serde(rename_all = "camelCase")]
-struct MetricOptions {
-    format: MetricFormat,
-    #[serde(default)]
-    global_labels: HashMap<String, String>,
-}
-
-impl MetricOptions {
-    fn is_json_format(&self) -> bool {
-        self.format == MetricFormat::Json
-    }
 }
 
 #[napi]
@@ -132,7 +115,6 @@ impl QueryEngine {
             .validate_that_one_datasource_is_provided()
             .map_err(|errors| ApiError::conversion(errors, schema.db.source_assert_single()))?;
 
-        let enable_metrics = config.preview_features().contains(PreviewFeature::Metrics);
         let engine_protocol = engine_protocol.unwrap_or(EngineProtocol::Json);
 
         let builder = EngineBuilder {
@@ -143,7 +125,7 @@ impl QueryEngine {
         };
 
         let log_level = log_level.parse::<LevelFilter>().unwrap();
-        let logger = Logger::new(log_queries, log_level, log_callback, enable_metrics, enable_tracing);
+        let logger = Logger::new(log_queries, log_level, log_callback, enable_tracing);
 
         Ok(Self {
             connector_mode,
@@ -156,7 +138,6 @@ impl QueryEngine {
     #[napi]
     pub async fn connect(&self, trace: String, request_id: String) -> napi::Result<()> {
         let dispatcher = self.logger.dispatcher();
-        let recorder = self.logger.recorder();
         let exporter = self.logger.exporter();
 
         async_panic_to_js_error(async {
@@ -244,7 +225,6 @@ impl QueryEngine {
                     native: ConnectedEngineNative {
                         config_dir: builder.native.config_dir.clone(),
                         env: builder.native.env.clone(),
-                        metrics: self.logger.metrics(),
                     },
                 }) as crate::Result<ConnectedEngine>
             }
@@ -256,7 +236,6 @@ impl QueryEngine {
             Ok(())
         })
         .with_subscriber(dispatcher)
-        .with_optional_recorder(recorder)
         .await?;
 
         Ok(())
@@ -266,7 +245,6 @@ impl QueryEngine {
     #[napi]
     pub async fn disconnect(&self, trace: String, request_id: String) -> napi::Result<()> {
         let dispatcher = self.logger.dispatcher();
-        let recorder = self.logger.recorder();
         let exporter = self.logger.exporter();
 
         async_panic_to_js_error(async {
@@ -301,7 +279,6 @@ impl QueryEngine {
             .await
         })
         .with_subscriber(dispatcher)
-        .with_optional_recorder(recorder)
         .await
     }
 
@@ -315,7 +292,6 @@ impl QueryEngine {
         request_id: String,
     ) -> napi::Result<String> {
         let dispatcher = self.logger.dispatcher();
-        let recorder = self.logger.recorder();
         let exporter = self.logger.exporter();
 
         async_panic_to_js_error(async {
@@ -342,14 +318,12 @@ impl QueryEngine {
             .await
         })
         .with_subscriber(dispatcher)
-        .with_optional_recorder(recorder)
         .await
     }
 
     #[napi]
     pub async fn compile(&self, request: String, human_readable: bool) -> napi::Result<String> {
         let dispatcher = self.logger.dispatcher();
-        let recorder = self.logger.recorder();
 
         async_panic_to_js_error(async {
             let inner = self.inner.read().await;
@@ -389,7 +363,6 @@ impl QueryEngine {
             Ok(response)
         })
         .with_subscriber(dispatcher)
-        .with_optional_recorder(recorder)
         .await
     }
 
@@ -397,7 +370,6 @@ impl QueryEngine {
     #[napi]
     pub async fn start_transaction(&self, input: String, trace: String, request_id: String) -> napi::Result<String> {
         let dispatcher = self.logger.dispatcher();
-        let recorder = self.logger.recorder();
         let exporter = self.logger.exporter();
 
         async_panic_to_js_error(async {
@@ -426,7 +398,6 @@ impl QueryEngine {
             .await
         })
         .with_subscriber(dispatcher)
-        .with_optional_recorder(recorder)
         .await
     }
 
@@ -438,7 +409,6 @@ impl QueryEngine {
             let engine = inner.as_engine()?;
 
             let dispatcher = self.logger.dispatcher();
-            let recorder = self.logger.recorder();
             let exporter = self.logger.exporter();
 
             async move {
@@ -455,7 +425,6 @@ impl QueryEngine {
                 }
             }
             .with_subscriber(dispatcher)
-            .with_optional_recorder(recorder)
             .await
         })
         .await
@@ -469,7 +438,6 @@ impl QueryEngine {
             let engine = inner.as_engine()?;
 
             let dispatcher = self.logger.dispatcher();
-            let recorder = self.logger.recorder();
             let exporter = self.logger.exporter();
 
             async move {
@@ -486,7 +454,6 @@ impl QueryEngine {
                 }
             }
             .with_subscriber(dispatcher)
-            .with_optional_recorder(recorder)
             .await
         })
         .await
@@ -496,7 +463,6 @@ impl QueryEngine {
     #[napi]
     pub async fn sdl_schema(&self) -> napi::Result<String> {
         let dispatcher = self.logger.dispatcher();
-        let recorder = self.logger.recorder();
 
         async_panic_to_js_error(async move {
             let inner = self.inner.read().await;
@@ -505,37 +471,6 @@ impl QueryEngine {
             Ok(render_graphql_schema(engine.query_schema()))
         })
         .with_subscriber(dispatcher)
-        .with_optional_recorder(recorder)
-        .await
-    }
-
-    #[napi]
-    pub async fn metrics(&self, json_options: String) -> napi::Result<String> {
-        let dispatcher = self.logger.dispatcher();
-        let recorder = self.logger.recorder();
-
-        async_panic_to_js_error(async move {
-            let inner = self.inner.read().await;
-            let engine = inner.as_engine()?;
-            let options: MetricOptions = serde_json::from_str(&json_options)?;
-
-            if let Some(metrics) = &engine.native.metrics {
-                if options.is_json_format() {
-                    let engine_metrics = metrics.to_json(options.global_labels);
-                    let res = serde_json::to_string(&engine_metrics)?;
-                    Ok(res)
-                } else {
-                    Ok(metrics.to_prometheus(options.global_labels))
-                }
-            } else {
-                Err(ApiError::Configuration(
-                    "Metrics is not enabled. First set it in the preview features.".to_string(),
-                )
-                .into())
-            }
-        })
-        .with_subscriber(dispatcher)
-        .with_optional_recorder(recorder)
         .await
     }
 
@@ -557,7 +492,6 @@ impl QueryEngine {
                 .transpose()?)
         })
         .with_subscriber(self.logger.dispatcher())
-        .with_optional_recorder(self.logger.recorder())
         .await
     }
 }
