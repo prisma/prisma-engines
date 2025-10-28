@@ -8,7 +8,6 @@ use query_core::{ExtendedUserFacingError, TransactionOptions, TxId};
 use request_handlers::{RequestBody, RequestHandler, dmmf, render_graphql_schema};
 use serde::Serialize;
 use serde_json::json;
-use std::collections::HashMap;
 use std::net::SocketAddr;
 use std::sync::Arc;
 use std::time::{Duration, Instant};
@@ -49,13 +48,6 @@ pub(crate) async fn routes(cx: Arc<PrismaContext>, req: Request<Body>) -> Result
 
     if req.method() == Method::POST && req.uri().path().starts_with("/transaction") {
         return transaction_handler(cx, req).await;
-    }
-
-    if [Method::POST, Method::GET].contains(req.method())
-        && req.uri().path().starts_with("/metrics")
-        && cx.enabled_features.contains(Feature::Metrics)
-    {
-        return metrics_handler(cx, req).await;
     }
 
     let mut res = match (req.method(), req.uri().path()) {
@@ -210,31 +202,6 @@ fn playground_handler() -> Response<Body> {
         .header(CONTENT_TYPE, "text/html")
         .body(Body::from(playground))
         .unwrap()
-}
-
-async fn metrics_handler(cx: Arc<PrismaContext>, req: Request<Body>) -> Result<Response<Body>, hyper::Error> {
-    let requested_json = req.uri().query().map(|q| q.contains("format=json")).unwrap_or_default();
-    let body_start = req.into_body();
-    // block and buffer request until the request has completed
-    let full_body = hyper::body::to_bytes(body_start).await?;
-
-    let global_labels: HashMap<String, String> = serde_json::from_slice(full_body.as_ref()).unwrap_or_default();
-
-    let response = if requested_json {
-        let metrics = cx.metrics.to_json(global_labels);
-
-        build_json_response(StatusCode::OK, &metrics)
-    } else {
-        let metrics = cx.metrics.to_prometheus(global_labels);
-
-        Response::builder()
-            .status(StatusCode::OK)
-            .header(CONTENT_TYPE, "text/plain; version=0.0.4")
-            .body(Body::from(metrics))
-            .unwrap()
-    };
-
-    Ok(response)
 }
 
 /// Sadly the routing doesn't make it obvious what the transaction routes are:

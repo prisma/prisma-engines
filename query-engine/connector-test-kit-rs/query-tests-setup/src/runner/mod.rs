@@ -9,7 +9,6 @@ use crate::{
     TestResult, executor_process_request,
 };
 use colored::Colorize;
-use prisma_metrics::MetricRegistry;
 use query_core::{
     QueryExecutor, TransactionOptions, TxId,
     protocol::EngineProtocol,
@@ -204,7 +203,6 @@ pub struct Runner {
     connector_tag: ConnectorTag,
     connection_url: String,
     current_tx_id: Option<TxId>,
-    metrics: MetricRegistry,
     protocol: EngineProtocol,
     log_capture: TestLogCapture,
     local_max_bind_values: Option<usize>,
@@ -233,7 +231,6 @@ impl Runner {
         connector_version: ConnectorVersion,
         connector_tag: ConnectorTag,
         override_local_max_bind_values: Option<usize>,
-        metrics: MetricRegistry,
         log_capture: TestLogCapture,
     ) -> TestResult<Self> {
         let protocol = EngineProtocol::from(&ENGINE_PROTOCOL.to_string());
@@ -299,7 +296,6 @@ impl Runner {
             connector_tag,
             connection_url: datamodel.url.clone(),
             current_tx_id: None,
-            metrics,
             protocol,
             log_capture,
             local_max_bind_values,
@@ -598,10 +594,6 @@ impl Runner {
 
     pub fn clear_active_tx(&mut self) {
         self.current_tx_id = None;
-    }
-
-    pub fn get_metrics(&self) -> MetricRegistry {
-        self.metrics.clone()
     }
 
     pub fn query_schema(&self) -> &QuerySchemaRef {

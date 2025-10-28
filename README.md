@@ -145,13 +145,6 @@ whatever command that starts with `./query-engine` with `cargo run --bin query-e
 
 You can also pass `--help` to find out more options to run the engine.
 
-### Metrics
-
-Running `make show-metrics` will start Prometheus and Grafana with a default metrics dashboard.
-Prometheus will scrape the `/metrics` endpoint to collect the engine's metrics
-
-Navigate to `http://localhost:3000` to view the Grafana dashboard.
-
 ## Schema Engine
 
 The _Schema Engine_ does a couple of things:

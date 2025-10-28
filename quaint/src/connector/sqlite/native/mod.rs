@@ -12,7 +12,7 @@ pub use rusqlite::{params_from_iter, version as sqlite_version};
 
 use crate::{
     ast::{Query, Value},
-    connector::{ResultSet, metrics, queryable::*},
+    connector::{ResultSet, queryable::*, trace},
     error::{Error, ErrorKind},
     visitor::{self, Visitor},
 };
@@ -102,7 +102,7 @@ impl Queryable for Sqlite {
     }
 
     async fn query_raw(&self, sql: &str, params: &[Value<'_>]) -> crate::Result<ResultSet> {
-        metrics::query("sqlite.query_raw", DB_SYSTEM_NAME, sql, params, move || async move {
+        trace::query(DB_SYSTEM_NAME, sql, params, move || async move {
             let client = self.client.lock().await;
 
             let mut stmt = client.prepare_cached(sql)?;
@@ -136,7 +136,7 @@ impl Queryable for Sqlite {
     }
 
     async fn execute_raw(&self, sql: &str, params: &[Value<'_>]) -> crate::Result<u64> {
-        metrics::query("sqlite.query_raw", DB_SYSTEM_NAME, sql, params, move || async move {
+        trace::query(DB_SYSTEM_NAME, sql, params, move || async move {
             let client = self.client.lock().await;
             let mut stmt = client.prepare_cached(sql)?;
             let res = u64::try_from(stmt.execute(params_from_iter(params.iter()))?)?;
@@ -151,7 +151,7 @@ impl Queryable for Sqlite {
     }
 
     async fn raw_cmd(&self, cmd: &str) -> crate::Result<()> {
-        metrics::query("sqlite.raw_cmd", DB_SYSTEM_NAME, cmd, &[], move || async move {
+        trace::query(DB_SYSTEM_NAME, cmd, &[], move || async move {
             let client = self.client.lock().await;
             client.execute_batch(cmd)?;
             Ok(())
