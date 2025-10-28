@@ -17,7 +17,7 @@ pkgs.mkShell {
     pnpm_10
     rustup
     wabt
-    wasm-bindgen-cli_0_2_100
+    wasm-bindgen-cli_0_2_105
     wasm-pack
   ];
 

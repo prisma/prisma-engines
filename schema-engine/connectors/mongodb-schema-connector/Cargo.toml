@@ -20,7 +20,7 @@ bson.workspace = true
 serde_json.workspace = true
 tokio.workspace = true
 tracing.workspace = true
-convert_case.workspace = true
+cruet.workspace = true
 regex.workspace = true
 indoc.workspace = true
 

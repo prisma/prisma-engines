@@ -5,6 +5,7 @@ edition.workspace = true
 
 [dependencies]
 colored.workspace = true
+cruet.workspace = true
 dmmf.workspace = true
 psl = { workspace = true, features = ["all"] }
 serde_json.workspace = true

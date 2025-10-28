@@ -1,12 +1,12 @@
 model Blog {
-  id    Int     @id
-  posts Post[]
-  Post2 Post2[]
+  id     Int     @id
+  posts  Post[]
+  post2s Post2[]
 }
 
 model Post {
   id     Int   @id
-  Blog   Blog? @relation(fields: [blogId], references: [id])
+  blog   Blog? @relation(fields: [blogId], references: [id])
   blogId Int?
 }
 

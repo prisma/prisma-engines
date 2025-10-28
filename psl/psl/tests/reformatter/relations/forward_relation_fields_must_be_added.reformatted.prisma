@@ -1,6 +1,6 @@
 model PostableEntity {
   id     String  @id
-  Post   Post?   @relation(fields: [postId], references: [id])
+  post   Post?   @relation(fields: [postId], references: [id])
   postId String?
 }
 

@@ -4,14 +4,14 @@ datasource pg {
 }
 
 model Blog {
-  id    Int     @id @pg.SmallInt
-  posts Post[]
-  Post2 Post2[]
+  id     Int     @id @pg.SmallInt
+  posts  Post[]
+  post2s Post2[]
 }
 
 model Post {
   id     Int   @id @pg.SmallInt
-  Blog   Blog? @relation(fields: [blogId], references: [id])
+  blog   Blog? @relation(fields: [blogId], references: [id])
   blogId Int?  @pg.SmallInt
 }
 

@@ -1,5 +1,5 @@
 model Post {
   id    Int    @id @default(autoincrement())
   title String
-  User  User?
+  user  User?
 }
