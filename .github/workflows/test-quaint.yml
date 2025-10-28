@@ -6,7 +6,7 @@ on:
   pull_request:
     paths:
       - 'quaint/**'
-      - '!.github/workflows/test-quaint.yml'
+      - '.github/workflows/test-quaint.yml'
 
 jobs:
   tests:
