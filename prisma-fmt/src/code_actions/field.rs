@@ -1,3 +1,4 @@
+use cruet::Inflector;
 use lsp_types::{CodeAction, CodeActionKind, CodeActionOrCommand};
 use psl::{
     diagnostics::Span,
@@ -58,7 +59,8 @@ pub(super) fn add_missing_opposite_relation(
 
     let relation = name_arg.map_or(Default::default(), |arg| format!(" @relation({arg})"));
 
-    let formatted_content = format!("{separator}{indentation}{name} {name}[]{relation}{newline}");
+    let field_name = name.to_camel_case().to_plural();
+    let formatted_content = format!("{separator}{indentation}{field_name} {name}[]{relation}{newline}");
 
     let Ok(edit) = super::create_text_edit(
         context.db.file_name(target_file_id),

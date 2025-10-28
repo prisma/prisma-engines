@@ -132,6 +132,6 @@ mod tests {
         let url = "mongodb://localhost:C2y6yDjf5/R+ob0N8A7Cgv30VRDJIWEHLM+4QDU5DE2nQ9nDuVTqobD4b8mGGyPMbIZnqyMsEcaGQy67XIw/Jw==@localhost:10255/e2e-tests?ssl=true";
         let error = mongodb_connector(url).await.err().unwrap();
 
-        assert!(error.to_string().contains("illegal character in database name"));
+        assert!(error.to_string().contains("password must be URL encoded"));
     }
 }
