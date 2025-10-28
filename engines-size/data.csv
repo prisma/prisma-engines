@@ -6421,3 +6421,15 @@ date_time,branch,commit,file,size_bytes
 2025-10-28T08:42:45+00:00,main,9602fb1c23773887901e77bef1ebe272d5ea2415,query-engine-sqlserver.wasm,2233006
 2025-10-28T08:42:45+00:00,main,9602fb1c23773887901e77bef1ebe272d5ea2415,query-engine-cockroachdb.wasm.gz,898349
 2025-10-28T08:42:45+00:00,main,9602fb1c23773887901e77bef1ebe272d5ea2415,query-engine-cockroachdb.wasm,2321153
+2025-10-28T10:20:58+00:00,main,08761ddce3e1b2107c76ee662fbd0520fc1110dc,query-engine,17926200
+2025-10-28T10:20:58+00:00,main,08761ddce3e1b2107c76ee662fbd0520fc1110dc,libquery_engine.node,17605152
+2025-10-28T10:20:58+00:00,main,08761ddce3e1b2107c76ee662fbd0520fc1110dc,query-engine-postgresql.wasm.gz,889265
+2025-10-28T10:20:58+00:00,main,08761ddce3e1b2107c76ee662fbd0520fc1110dc,query-engine-postgresql.wasm,2297591
+2025-10-28T10:20:58+00:00,main,08761ddce3e1b2107c76ee662fbd0520fc1110dc,query-engine-mysql.wasm.gz,876064
+2025-10-28T10:20:58+00:00,main,08761ddce3e1b2107c76ee662fbd0520fc1110dc,query-engine-mysql.wasm,2264031
+2025-10-28T10:20:58+00:00,main,08761ddce3e1b2107c76ee662fbd0520fc1110dc,query-engine-sqlite.wasm.gz,840575
+2025-10-28T10:20:58+00:00,main,08761ddce3e1b2107c76ee662fbd0520fc1110dc,query-engine-sqlite.wasm,2172192
+2025-10-28T10:20:58+00:00,main,08761ddce3e1b2107c76ee662fbd0520fc1110dc,query-engine-sqlserver.wasm.gz,865979
+2025-10-28T10:20:58+00:00,main,08761ddce3e1b2107c76ee662fbd0520fc1110dc,query-engine-sqlserver.wasm,2233006
+2025-10-28T10:20:58+00:00,main,08761ddce3e1b2107c76ee662fbd0520fc1110dc,query-engine-cockroachdb.wasm.gz,898349
+2025-10-28T10:20:58+00:00,main,08761ddce3e1b2107c76ee662fbd0520fc1110dc,query-engine-cockroachdb.wasm,2321153
