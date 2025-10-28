@@ -43,7 +43,7 @@
     "ts-pattern": "5.1.1",
     "undici": "6.13.0",
     "wrangler": "^4.4.0",
-    "ws": "8.16.0"
+    "ws": "8.17.1"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "4.20250320.0",
