@@ -40,7 +40,6 @@ async fn connection_string_problems_give_a_nice_error() {
             dml,
             EngineProtocol::Graphql,
             features,
-            None,
             Logger::default(),
             RequestId::next(),
         )

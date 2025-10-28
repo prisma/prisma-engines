@@ -1,6 +1,5 @@
 use core::fmt;
 use napi::threadsafe_function::{ErrorStrategy, ThreadsafeFunction, ThreadsafeFunctionCallMode};
-use prisma_metrics::{MetricRecorder, MetricRegistry};
 use query_engine_common::logger::StringCallback;
 use serde_json::Value;
 use std::{collections::BTreeMap, fmt::Display};
@@ -20,22 +19,14 @@ pub(crate) type LogCallback = ThreadsafeFunction<String, ErrorStrategy::Fatal>;
 
 pub(crate) struct Logger {
     dispatcher: Dispatch,
-    metrics: Option<MetricRegistry>,
-    recorder: Option<MetricRecorder>,
     exporter: Exporter,
 }
 
 impl Logger {
     /// Creates a new logger using a call layer
-    pub fn new(
-        log_queries: bool,
-        log_level: LevelFilter,
-        log_callback: LogCallback,
-        enable_metrics: bool,
-        enable_tracing: bool,
-    ) -> Self {
+    pub fn new(log_queries: bool, log_level: LevelFilter, log_callback: LogCallback, enable_tracing: bool) -> Self {
         let is_sql_query = filter_fn(|meta| {
-            meta.target() == "quaint::connector::metrics" && meta.fields().iter().any(|f| f.name() == "query")
+            meta.target() == "quaint::connector::trace" && meta.fields().iter().any(|f| f.name() == "query")
         });
 
         // is a mongodb query?
@@ -57,32 +48,14 @@ impl Logger {
         let tracing_layer = enable_tracing
             .then(|| telemetry::layer(exporter.clone()).with_filter(telemetry::filter::user_facing_spans()));
 
-        let (metrics, recorder) = if enable_metrics {
-            let registry = MetricRegistry::new();
-            let recorder = MetricRecorder::new(registry.clone()).with_initialized_prisma_metrics();
-            (Some(registry), Some(recorder))
-        } else {
-            (None, None)
-        };
-
         Self {
             dispatcher: Dispatch::new(Registry::default().with(tracing_layer).with(log_layer)),
-            metrics,
-            recorder,
             exporter,
         }
     }
 
     pub fn dispatcher(&self) -> Dispatch {
         self.dispatcher.clone()
-    }
-
-    pub fn metrics(&self) -> Option<MetricRegistry> {
-        self.metrics.clone()
-    }
-
-    pub fn recorder(&self) -> Option<MetricRecorder> {
-        self.recorder.clone()
     }
 
     pub fn exporter(&self) -> Exporter {

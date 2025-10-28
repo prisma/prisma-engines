@@ -22,7 +22,6 @@ ulid.workspace = true
 tokio.workspace = true
 user-facing-errors.workspace = true
 prisma-value.workspace = true
-prisma-metrics.workspace = true
 futures.workspace = true
 paste.workspace = true
 

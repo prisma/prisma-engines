@@ -9,7 +9,7 @@ query-structure.workspace = true
 qe-setup = { path = "../qe-setup" }
 request-handlers.workspace = true
 tokio.workspace = true
-query-core = { workspace = true, features = ["metrics"] }
+query-core.workspace = true
 sql-query-connector.workspace = true
 query-engine.workspace = true
 psl.workspace = true
@@ -30,7 +30,6 @@ indoc.workspace = true
 enumflags2.workspace = true
 hyper = { workspace = true, features = ["full"] }
 indexmap.workspace = true
-prisma-metrics.workspace = true
 quaint.workspace = true
 jsonrpc-core.workspace = true
 insta.workspace = true

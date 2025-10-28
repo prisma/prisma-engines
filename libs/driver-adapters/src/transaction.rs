@@ -1,5 +1,4 @@
 use async_trait::async_trait;
-use prisma_metrics::gauge;
 use quaint::{
     Value,
     connector::{DescribedQuery, IsolationLevel, Transaction as QuaintTransaction},
@@ -29,23 +28,13 @@ impl JsTransaction {
 
     pub async fn raw_phantom_cmd(&self, cmd: &str) -> quaint::Result<()> {
         let params = &[];
-        quaint::connector::metrics::query(
-            "js.raw_phantom_cmd",
-            self.inner.db_system_name,
-            cmd,
-            params,
-            move || async move { Ok(()) },
-        )
-        .await
+        quaint::connector::trace::query(self.inner.db_system_name, cmd, params, move || async move { Ok(()) }).await
     }
 }
 
 #[async_trait]
 impl QuaintTransaction for JsTransaction {
     async fn commit(&self) -> quaint::Result<()> {
-        // increment of this gauge is done in DriverProxy::startTransaction
-        gauge!("prisma_client_queries_active").decrement(1.0);
-
         let commit_stmt = "COMMIT";
 
         if self.options().use_phantom_query {
@@ -59,9 +48,6 @@ impl QuaintTransaction for JsTransaction {
     }
 
     async fn rollback(&self) -> quaint::Result<()> {
-        // increment of this gauge is done in DriverProxy::startTransaction
-        gauge!("prisma_client_queries_active").decrement(1.0);
-
         let rollback_stmt = "ROLLBACK";
 
         if self.options().use_phantom_query {

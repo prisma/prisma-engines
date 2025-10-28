@@ -9,7 +9,6 @@ use bytes::Bytes;
 use futures::{FutureExt, Sink, SinkExt, Stream};
 use pin_project::pin_project;
 use postgres_native_tls::TlsConnector;
-use prisma_metrics::WithMetricsInstrumentation;
 use tokio::{
     io::{AsyncBufRead, AsyncRead, AsyncWrite, ReadBuf},
     net::TcpStream,
@@ -58,8 +57,7 @@ pub(crate) async fn connect_via_websocket(url: PostgresWebSocketUrl) -> crate::R
                     tracing::error!("Error in PostgreSQL WebSocket connection: {err:?}");
                 }
             })
-            .with_current_subscriber()
-            .with_current_recorder(),
+            .with_current_subscriber(),
     );
 
     Ok((client, handle))

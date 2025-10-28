@@ -8,7 +8,6 @@ use crate::{
 use crate::{conversion::MaybeDefined, queryable::JsQueryable};
 
 use futures::Future;
-use prisma_metrics::gauge;
 use quaint::connector::{AdapterName, AdapterProvider, IsolationLevel};
 use std::sync::atomic::{AtomicBool, Ordering};
 
@@ -161,11 +160,6 @@ impl DriverProxy {
             .call_as_async(isolation.map(|lvl| lvl.to_string()).into())
             .await?;
 
-        // Decrement for this gauge is done in JsTransaction::commit/JsTransaction::rollback
-        // Previously, it was done in JsTransaction::new, similar to the native Transaction.
-        // However, correct Dispatcher is lost there and increment does not register, so we moved
-        // it here instead.
-        gauge!("prisma_client_queries_active").increment(1.0);
         Ok(Box::new(tx))
     }
 

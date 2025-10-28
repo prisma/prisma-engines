@@ -20,11 +20,10 @@ Key directories:
 - `psl/` – Prisma Schema Language parser, validator, config tooling.
 - `schema-engine/` – Migration/introspection engine plus test suites.
 - `prisma-fmt/` – Language server & formatter entry point (tests rely on `expect!` snapshots).
-- `libs/` – Shared libraries (metrics, value types, test setup).
 - `schema-engine/sql-migration-tests` / `sql-introspection-tests` – Heavy integration suites (require DBs).
 - `query-engine/` – Legacy query execution stack (Rust).
 - `query-compiler/` – New query planner + associated WASM + playground.
-- `libs/` – Shared libraries (metrics, value types, driver adapters, test setup).
+- `libs/` – Shared libraries (value types, driver adapters, test setup).
 - `driver-adapters/` – Rust-side adapter utilities for the new query interpreter.
 
 Supporting infra:
