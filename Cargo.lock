@@ -801,6 +801,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "convert_case"
+version = "0.8.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "baaaa0ecca5b51987b9423ccdc971514dd8b0bb7b4060b983d3664dad3f1f89f"
+dependencies = [
+ "unicode-segmentation",
+]
+
+[[package]]
 name = "core-foundation"
 version = "0.9.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -991,6 +1000,22 @@ dependencies = [
  "quote",
  "syn 2.0.104",
 ]
+
+[[package]]
+name = "ctor"
+version = "0.6.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "59c9b8bdf64ee849747c1b12eb861d21aa47fa161564f48332f1afe2373bf899"
+dependencies = [
+ "ctor-proc-macro",
+ "dtor",
+]
+
+[[package]]
+name = "ctor-proc-macro"
+version = "0.0.7"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "52560adf09603e58c9a7ee1fe1dcb95a16927b17c127f0ac02d6e768a0e25bc1"
 
 [[package]]
 name = "cuid"
@@ -1210,7 +1235,7 @@ dependencies = [
  "futures",
  "js-sys",
  "napi",
- "napi-derive",
+ "napi-derive 3.3.0",
  "panic-utils",
  "pin-project",
  "prisma-metrics",
@@ -1230,6 +1255,21 @@ dependencies = [
  "wasm-bindgen-futures",
  "wasm-rs-dbg",
 ]
+
+[[package]]
+name = "dtor"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e58a0764cddb55ab28955347b45be00ade43d4d6f3ba4bf3dc354e4ec9432934"
+dependencies = [
+ "dtor-proc-macro",
+]
+
+[[package]]
+name = "dtor-proc-macro"
+version = "0.0.6"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f678cf4a922c215c63e0de95eb1ff08a958a81d47e485cf9da1e27bf6305cfa5"
 
 [[package]]
 name = "either"
@@ -2945,8 +2985,8 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "214f07a80874bb96a8433b3cdfc84980d56c7b02e1a0d7ba4ba0db5cef785e2b"
 dependencies = [
  "bitflags 2.9.1",
- "ctor",
- "napi-derive",
+ "ctor 0.2.9",
+ "napi-derive 2.16.13",
  "napi-sys",
  "once_cell",
  "serde",
@@ -2968,7 +3008,21 @@ checksum = "7cbe2585d8ac223f7d34f13701434b9d5f4eb9c332cccce8dee57ea18ab8ab0c"
 dependencies = [
  "cfg-if",
  "convert_case 0.6.0",
- "napi-derive-backend",
+ "napi-derive-backend 1.0.75",
+ "proc-macro2",
+ "quote",
+ "syn 2.0.104",
+]
+
+[[package]]
+name = "napi-derive"
+version = "3.3.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "78665d6bdf10e9a4e6b38123efb0f66962e6197c1aea2f07cff3f159a374696d"
+dependencies = [
+ "convert_case 0.8.0",
+ "ctor 0.6.0",
+ "napi-derive-backend 3.0.0",
  "proc-macro2",
  "quote",
  "syn 2.0.104",
@@ -2984,7 +3038,18 @@ dependencies = [
  "once_cell",
  "proc-macro2",
  "quote",
- "regex",
+ "syn 2.0.104",
+]
+
+[[package]]
+name = "napi-derive-backend"
+version = "3.0.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "42d55d01423e7264de3acc13b258fa48ca7cf38a4d25db848908ec3c1304a85a"
+dependencies = [
+ "convert_case 0.8.0",
+ "proc-macro2",
+ "quote",
  "semver",
  "syn 2.0.104",
 ]
@@ -4090,7 +4155,7 @@ dependencies = [
  "futures",
  "napi",
  "napi-build",
- "napi-derive",
+ "napi-derive 3.3.0",
  "prisma-metrics",
  "psl",
  "quaint",

@@ -103,7 +103,7 @@ napi = { version = "2", default-features = false, features = [
     "tokio_rt",
     "serde-json",
 ] }
-napi-derive = "2"
+napi-derive = "3"
 native-tls = "0.2"
 nom = "7"
 num_cpus = "1"
