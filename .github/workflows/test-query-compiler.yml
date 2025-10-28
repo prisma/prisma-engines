@@ -8,6 +8,7 @@ on:
       - '.github/**'
       - '!.github/workflows/test-query-compiler.yml'
       - '!.github/workflows/test-query-compiler-template.yml'
+      - '!.github/workflows/include/rust-wasm-setup/action.yml'
       - '*.md'
       - 'LICENSE'
       - 'CODEOWNERS'

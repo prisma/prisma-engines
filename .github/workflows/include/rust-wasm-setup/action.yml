@@ -21,8 +21,8 @@ runs:
       uses: jaxxstorm/action-install-gh-release@v1.14.0
       with:
         repo: WebAssembly/binaryen
-        tag: version_122
-        binaries-location: binaryen-version_122/bin
+        tag: version_124
+        binaries-location: binaryen-version_124/bin
         cache: true
 
     - name: Install bc
