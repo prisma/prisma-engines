@@ -13,7 +13,7 @@ use schema_connector::{
 
 use super::field_type::FieldType;
 use bson::{Bson, Document};
-use convert_case::{Case, Casing};
+use cruet::Inflector;
 use datamodel_renderer as renderer;
 use mongodb_schema_describer::{CollectionWalker, IndexWalker};
 use psl::datamodel_connector::constraint_names::ConstraintNames;
@@ -63,7 +63,7 @@ impl<'a> Statistics<'a> {
     fn composite_type_name(&self, model: &str, field: &str) -> Name {
         let combined: String = format!("{model}_{field}").chars().filter(|c| c.is_ascii()).collect();
 
-        let name = Name::Model(combined.to_case(Case::Pascal));
+        let name = Name::Model(combined.to_pascal_case());
 
         let name = if self.models.contains_key(&name) {
             format!("{name}_")
@@ -521,7 +521,7 @@ impl<'a> Statistics<'a> {
                         (name, field.clone())
                     };
 
-                    let type_name = format!("{container_name}_{field}").to_case(Case::Pascal);
+                    let type_name = format!("{container_name}_{field}").to_pascal_case();
                     let type_name = sanitize_string(&type_name).unwrap_or(type_name);
                     container_name.clone_from(&type_name);
 
