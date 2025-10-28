@@ -84,7 +84,6 @@ fn test_dmmf_cli_command(schema: &str) -> PrismaResult<()> {
         enable_debug_mode: false,
         enable_raw_queries: false,
         enable_playground: false,
-        enable_metrics: true,
         log_format: None,
         log_queries: true,
         overwrite_datasources: None,
@@ -93,7 +92,6 @@ fn test_dmmf_cli_command(schema: &str) -> PrismaResult<()> {
         subcommand: Some(Subcommand::Cli(CliOpt::Dmmf)),
         enable_open_telemetry: false,
         enable_telemetry_in_response: false,
-        dataproxy_metric_override: false,
         engine_protocol: None,
     };
 

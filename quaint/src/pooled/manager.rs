@@ -2,7 +2,6 @@ use std::future::Future;
 
 use async_trait::async_trait;
 use mobc::{Connection as MobcPooled, Manager};
-use prisma_metrics::WithMetricsInstrumentation;
 use tracing_futures::WithSubscriber;
 
 #[cfg(feature = "mssql-native")]
@@ -193,7 +192,7 @@ impl Manager for QuaintManager {
         T: Future + Send + 'static,
         T::Output: Send + 'static,
     {
-        tokio::spawn(task.with_current_subscriber().with_current_recorder());
+        tokio::spawn(task.with_current_subscriber());
     }
 }
 

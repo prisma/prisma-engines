@@ -504,8 +504,8 @@ impl Quaint {
     /// Reserve a connection from the pool.
     pub async fn check_out(&self) -> crate::Result<PooledConnection> {
         let res = match self.pool_timeout {
-            Some(duration) => crate::connector::metrics::check_out(self.inner.get_timeout(duration)).await,
-            None => crate::connector::metrics::check_out(self.inner.get()).await,
+            Some(duration) => crate::connector::trace::check_out(self.inner.get_timeout(duration)).await,
+            None => crate::connector::trace::check_out(self.inner.get()).await,
         };
 
         let inner = match res {
