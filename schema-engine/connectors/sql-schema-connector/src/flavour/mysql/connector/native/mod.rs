@@ -45,23 +45,17 @@ impl Connection {
             describer_circumstances |= describer::Circumstances::MariaDb;
         }
 
-        if circumstances.contains(super::Circumstances::IsMysql56) {
-            describer_circumstances |= describer::Circumstances::MySql56;
-        }
-
         if circumstances.contains(super::Circumstances::IsMysql57) {
             describer_circumstances |= describer::Circumstances::MySql57;
         }
 
         if circumstances.contains(super::Circumstances::CheckConstraints)
             && !describer_circumstances.intersects(
-                describer::Circumstances::MySql56
-                    | describer::Circumstances::MySql57
-                    | describer::Circumstances::MariaDb,
+                describer::Circumstances::MySql57 | describer::Circumstances::MariaDb,
             )
         {
             // MySQL 8.0.16 and above supports check constraints.
-            // MySQL 5.6 and 5.7 do not have a CHECK_CONSTRAINTS table we can query.
+            // MySQL 5.7 does not have a CHECK_CONSTRAINTS table we can query.
             // MariaDB, although it supports check constraints, adds them unexpectedly.
             // E.g., MariaDB 10 adds the `json_valid(\`Priv\`)` check constraint on every JSON column;
             // this creates a noisy, unexpected diff when comparing the introspected schema with the prisma schema.
@@ -123,9 +117,7 @@ impl Connection {
         tracing::debug!(query_type = "describe_query", sql);
         let mut parsed = self.0.describe_query(sql).await.map_err(quaint_err(url))?;
 
-        if circumstances.contains(super::Circumstances::IsMysql56)
-            || circumstances.contains(super::Circumstances::IsMysql57)
-        {
+        if circumstances.contains(super::Circumstances::IsMysql57) {
             parsed.parameters = parsed
                 .parameters
                 .into_iter()

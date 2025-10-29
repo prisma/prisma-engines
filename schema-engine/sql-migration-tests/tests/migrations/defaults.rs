@@ -25,7 +25,7 @@ fn datetime_defaults_work(api: TestApi) {
         df
     } else if api.is_mysql_mariadb() {
         DefaultValue::db_generated("'2018-01-27T08:00:00+00:00'")
-    } else if api.is_mysql_8() || api.is_mysql_5_6() {
+    } else if api.is_mysql_8() {
         DefaultValue::db_generated("'2018-01-27 08:00:00.000'")
     } else {
         DefaultValue::db_generated("'2018-01-27 08:00:00 +00:00'")

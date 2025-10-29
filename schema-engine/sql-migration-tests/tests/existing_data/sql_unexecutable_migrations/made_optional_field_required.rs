@@ -99,8 +99,7 @@ fn making_an_optional_field_required_with_data_with_a_default_works(api: TestApi
 }
 
 // CONFIRMED: this is unexecutable on postgres
-// CONFIRMED: all mysql versions except 5.6 will return an error. 5.6 will just insert 0s, which
-// seems very wrong, so we should warn against it.
+// CONFIRMED: all supported MySQL versions will return an error.
 #[test_connector(exclude(Sqlite))]
 fn making_an_optional_field_required_with_data_with_a_default_is_unexecutable(api: TestApi) {
     let dm1 = r#"

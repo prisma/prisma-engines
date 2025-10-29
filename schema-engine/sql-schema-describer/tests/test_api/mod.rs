@@ -106,8 +106,6 @@ impl TestApi {
                     &self.database,
                     if self.tags.contains(Tags::Mariadb) {
                         Circumstances::MariaDb.into()
-                    } else if self.tags.contains(Tags::Mysql56) {
-                        Circumstances::MySql56.into()
                     } else if self.tags.contains(Tags::Mysql57) {
                         Circumstances::MySql57.into()
                     } else {

@@ -208,26 +208,6 @@ services:
       - '5439:5432'
     networks:
       - databases
-
-  mysql-5-6:
-    image: mysql:5.6.50
-    command: mysqld --table_definition_cache=2000
-    restart: unless-stopped
-    platform: linux/x86_64
-    environment:
-      MYSQL_USER: root
-      MYSQL_ROOT_PASSWORD: prisma
-      MYSQL_DATABASE: prisma
-    ports:
-      - '3309:3306'
-    networks:
-      - databases
-    tmpfs: /var/lib/mysql
-    healthcheck:
-      test: ['CMD', 'mysqladmin', 'ping', '-h', 'localhost']
-      timeout: 20s
-      retries: 10
-
   mysql-5-7:
     image: mysql:5.7.44
     command: mysqld

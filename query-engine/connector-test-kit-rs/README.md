@@ -211,14 +211,14 @@ Mutually exclusive properties that constrain tests to run only for a set of conn
 
 Connectors are at the time of writing:
 - `Postgres`: 12, 13, 14, 15, 16
-- `MySql`: 5.6, 5.7, 8, mariadb
+- `MySql`: 5.7, 8, mariadb
 - `SqlServer`: 2017, 2019, 2022
 - `Sqlite`: No versions
 - `MongoDb`: 4
 
 Connector tags can be written all lowercase, uppercase, camel, doesn't matter. Versions can be written as literal, string, float, int. A few examples:
 
-`only(Postgres, MySql(5.7, "5.6"))`: All Postgres versions + MySql 5.6 and 5.7
+`only(Postgres, MySql(5.7))`: All Postgres versions + MySql 5.7
 `exclude(SqlServer)`: All connectors except all versions of SqlServer.
 `only(SQLSERVER)`: All versions of SQL Server, nothing else.
 
