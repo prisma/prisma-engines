@@ -48,6 +48,9 @@ fn enum_to_dmmf(en: walkers::EnumWalker<'_>) -> Enum {
     };
 
     for enum_value in en.values() {
+        if enum_value.is_ignored() {
+            continue;
+        }
         enm.values.push(enum_value_to_dmmf(enum_value));
     }
 
