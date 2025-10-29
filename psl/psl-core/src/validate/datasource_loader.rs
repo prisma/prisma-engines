@@ -142,7 +142,13 @@ fn lift_datasource(
     let connector_data = active_connector.parse_datasource_properties(&mut args, diagnostics);
 
     let (url, url_span) = match args.remove(URL_KEY) {
-        Some((_span, url_arg)) => (StringFromEnvVar::coerce(url_arg, diagnostics)?, url_arg.span()),
+        Some((span, url_arg)) => {
+            diagnostics.push_warning(DatamodelWarning::new_datasource_attr_moved_to_prisma_config(
+                URL_KEY, span,
+            ));
+
+            (StringFromEnvVar::coerce(url_arg, diagnostics)?, url_arg.span())
+        }
 
         None => {
             if is_using_driver_adapters {
@@ -160,10 +166,17 @@ fn lift_datasource(
     };
 
     let shadow_database_url = match args.remove(SHADOW_DATABASE_URL_KEY) {
-        Some((_span, shadow_db_url_arg)) => match StringFromEnvVar::coerce(shadow_db_url_arg, diagnostics) {
-            Some(shadow_db_url) => Some(shadow_db_url)
-                .filter(|s| !s.as_literal().map(|literal| literal.is_empty()).unwrap_or(false))
-                .map(|url| (url, shadow_db_url_arg.span())),
+        Some((span, shadow_db_url_arg)) => match StringFromEnvVar::coerce(shadow_db_url_arg, diagnostics) {
+            Some(shadow_db_url) => {
+                diagnostics.push_warning(DatamodelWarning::new_datasource_attr_moved_to_prisma_config(
+                    SHADOW_DATABASE_URL_KEY,
+                    span,
+                ));
+
+                Some(shadow_db_url)
+                    .filter(|s| !s.as_literal().map(|literal| literal.is_empty()).unwrap_or(false))
+                    .map(|url| (url, shadow_db_url_arg.span()))
+            }
             None => None,
         },
 
@@ -171,10 +184,17 @@ fn lift_datasource(
     };
 
     let (direct_url, direct_url_span) = match args.remove(DIRECT_URL_KEY) {
-        Some((_, direct_url)) => (
-            StringFromEnvVar::coerce(direct_url, diagnostics),
-            Some(direct_url.span()),
-        ),
+        Some((span, direct_url)) => {
+            diagnostics.push_warning(DatamodelWarning::new_datasource_attr_moved_to_prisma_config(
+                DIRECT_URL_KEY,
+                span,
+            ));
+
+            (
+                StringFromEnvVar::coerce(direct_url, diagnostics),
+                Some(direct_url.span()),
+            )
+        }
 
         None => (None, None),
     };

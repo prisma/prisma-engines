@@ -24,6 +24,7 @@ pub use psl_core::{
     is_reserved_type_name,
     mcf::config_to_mcf_json_value as get_config,
     mcf::{generators_to_json, render_sources_to_json}, // for tests
+    parse_generators,
     parser_database::{self, SourceFile},
     reachable_only_with_capability,
     reformat,

@@ -175,6 +175,23 @@ pub fn parse_configuration_multi_file(
     }
 }
 
+/// Loads all `generator` blocks from a datamodel using the built-in source definitions.
+/// It completely disregards any errors in the rest of the schema and returns them as part of the diagnostics.
+pub fn parse_generators(files: &[(String, SourceFile)]) -> (Files, Vec<Generator>, diagnostics::Diagnostics) {
+    let mut diagnostics = Diagnostics::new();
+    let asts = Files::new(files, &mut diagnostics);
+
+    let mut generators = Vec::new();
+    let feature_map_with_provider = (*ALL_PREVIEW_FEATURES).clone();
+
+    for (_, _, _, ast) in asts.iter() {
+        let mut out = generator_loader::load_generators_from_ast(ast, &mut diagnostics, &feature_map_with_provider);
+        generators.append(&mut out);
+    }
+
+    (asts, generators, diagnostics)
+}
+
 pub fn error_tolerant_parse_configuration(
     files: &[(String, SourceFile)],
     connectors: ConnectorRegistry<'_>,
@@ -197,7 +214,6 @@ fn validate_configuration(
     diagnostics: &mut Diagnostics,
     connectors: ConnectorRegistry<'_>,
 ) -> Configuration {
-    // TODO: set `is_using_driver_adapters` to the `true` constant for Prisma 7.0.0.
     let is_using_schema_engine_driver_adapters = has_preview_feature_schema_engine_driver_adapters(schema_ast);
 
     let datasources = datasource_loader::load_datasources_from_ast(
