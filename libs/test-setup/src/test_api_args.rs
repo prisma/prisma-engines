@@ -22,7 +22,7 @@ If you are developing with the docker compose based setup, you can find the envi
 
 Example usage:
 
-source .test_database_urls/mysql_5_6
+source .test_database_urls/mysql_5_7
 "#;
 
 /// How long to wait for a schema change to propagate in Vitess.

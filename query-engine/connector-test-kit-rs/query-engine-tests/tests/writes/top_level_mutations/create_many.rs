@@ -533,7 +533,7 @@ mod create_many {
     }
 }
 
-#[test_suite(schema(json_opt), exclude(MySql(5.6)), capabilities(CreateMany, Json))]
+#[test_suite(schema(json_opt), capabilities(CreateMany, Json))]
 mod json_create_many {
     use query_engine_tests::{assert_error, run_query};
 

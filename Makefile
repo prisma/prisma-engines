@@ -368,12 +368,6 @@ start-mysql_5_7:
 dev-mysql: start-mysql_5_7
 	cp $(CONFIG_PATH)/mysql57 $(CONFIG_FILE)
 
-start-mysql_5_6:
-	docker compose -f docker-compose.yml up --wait -d --remove-orphans mysql-5-6
-
-dev-mysql_5_6: start-mysql_5_6
-	cp $(CONFIG_PATH)/mysql56 $(CONFIG_FILE)
-
 start-mysql_8:
 	docker compose -f docker-compose.yml up --wait -d --remove-orphans mysql-8-0
 

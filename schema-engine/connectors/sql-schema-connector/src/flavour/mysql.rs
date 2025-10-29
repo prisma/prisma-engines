@@ -10,7 +10,7 @@ use connector::{Connection, shadow_db};
 use destructive_change_checker::MysqlDestructiveChangeCheckerFlavour;
 use enumflags2::BitFlags;
 use indoc::indoc;
-use psl::{ValidatedSchema, datamodel_connector, parser_database::ScalarType};
+use psl::{ValidatedSchema, datamodel_connector};
 use quaint::connector::MysqlUrl;
 use regex::{Regex, RegexSet};
 use renderer::MysqlRenderer;
@@ -122,10 +122,6 @@ impl MysqlConnector {
         Ok(MysqlConnector {
             state: State::WithParams(Params::new(params)?),
         })
-    }
-
-    pub(crate) fn is_mysql_5_6(&self) -> bool {
-        self.circumstances().contains(Circumstances::IsMysql56)
     }
 
     pub(crate) fn database_name(&self) -> &str {
@@ -244,30 +240,8 @@ impl SqlConnector for MysqlConnector {
         &self,
         datamodel: &ValidatedSchema,
     ) -> Option<user_facing_errors::common::DatabaseVersionIncompatibility> {
-        if self.is_mysql_5_6() {
-            let mut errors = Vec::new();
-
-            check_datamodel_for_mysql_5_6(datamodel, &mut errors);
-
-            if errors.is_empty() {
-                return None;
-            }
-
-            let mut errors_string = String::with_capacity(errors.iter().map(|err| err.len() + 3).sum());
-
-            for error in &errors {
-                errors_string.push_str("- ");
-                errors_string.push_str(error);
-                errors_string.push('\n');
-            }
-
-            Some(user_facing_errors::common::DatabaseVersionIncompatibility {
-                errors: errors_string,
-                database_version: "MySQL 5.6".into(),
-            })
-        } else {
-            None
-        }
+        let _ = datamodel;
+        None
     }
 
     fn create_database(&mut self) -> BoxFuture<'_, ConnectorResult<String>> {
@@ -482,31 +456,10 @@ impl SqlConnector for MysqlConnector {
 #[repr(u8)]
 pub(crate) enum Circumstances {
     LowerCasesTableNames,
-    IsMysql56,
     IsMysql57,
     IsMariadb,
     IsVitess,
     CheckConstraints,
-}
-
-fn check_datamodel_for_mysql_5_6(datamodel: &ValidatedSchema, errors: &mut Vec<String>) {
-    datamodel
-        .db
-        .walk_models()
-        .flat_map(|model| model.scalar_fields())
-        .for_each(|field| {
-            if field
-                .scalar_type()
-                .map(|t| matches!(t, ScalarType::Json))
-                .unwrap_or(false)
-            {
-                errors.push(format!(
-                    "The `Json` data type used in {}.{} is not supported on MySQL 5.6.",
-                    field.model().name(),
-                    field.name()
-                ))
-            }
-        });
 }
 
 fn with_connection<'a, O, F, C>(state: &'a mut State, f: C) -> BoxFuture<'a, ConnectorResult<O>>
@@ -560,7 +513,12 @@ where
                             }
 
                             if global_version.starts_with("5.6") {
-                                circumstances |= Circumstances::IsMysql56;
+                                let incompatibility = user_facing_errors::common::DatabaseVersionIncompatibility {
+                                    errors: "MySQL 5.6 is no longer supported. Please upgrade to at least MySQL 5.7."
+                                        .to_owned(),
+                                    database_version: global_version.clone(),
+                                };
+                                return Err(ConnectorError::user_facing(incompatibility));
                             }
 
                             if global_version.starts_with("5.7") {

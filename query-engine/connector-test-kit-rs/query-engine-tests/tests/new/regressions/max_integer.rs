@@ -156,7 +156,6 @@ mod max_integer {
     // We just assert that a basic overflowing int errors without checking specifically for the message.
     // Specific messages are asserted down below for native types.
     // MongoDB is excluded because it automatically upcasts a value as an i64 if doesn't fit in an i32.
-    // MySQL 5.6 is excluded because it never overflows but inserts the min or max of the range of the column type instead.
     // D1 doesn't fail.
     //
     // On D1, this panics with
@@ -173,7 +172,6 @@ mod max_integer {
     // adapter but are rejected by the native connector in quaint which still considers Int to be 32-bit.
     #[connector_test(exclude(
         MongoDb,
-        MySql(5.6),
         Sqlite("cfd1", "better-sqlite3.js.wasm", "libsql.js.wasm"),
         CockroachDb("pg.js.wasm")
     ))]
@@ -364,7 +362,7 @@ mod max_integer {
         schema.to_owned()
     }
 
-    #[connector_test(schema(overflow_mysql), only(MySql), exclude(MySql(5.6)))]
+    #[connector_test(schema(overflow_mysql), only(MySql))]
     async fn unfitted_int_should_fail_mysql(runner: Runner) -> TestResult<()> {
         // tinyint
         assert_error!(

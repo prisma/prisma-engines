@@ -30,7 +30,6 @@ impl ConnectorTagInterface for MySqlConnectorTag {
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum MySqlVersion {
-    V5_6,
     V5_7,
     V8,
     MariaDb,
@@ -44,7 +43,6 @@ impl TryFrom<&str> for MySqlVersion {
 
     fn try_from(s: &str) -> Result<Self, Self::Error> {
         let version = match s {
-            "5.6" => Self::V5_6,
             "5.7" => Self::V5_7,
             "8" => Self::V8,
             "mariadb" => Self::MariaDb,
@@ -60,7 +58,6 @@ impl TryFrom<&str> for MySqlVersion {
 impl Display for MySqlVersion {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            MySqlVersion::V5_6 => f.write_str("5.6"),
             MySqlVersion::V5_7 => f.write_str("5.7"),
             MySqlVersion::V8 => f.write_str("8"),
             MySqlVersion::MariaDb => f.write_str("mariadb"),
