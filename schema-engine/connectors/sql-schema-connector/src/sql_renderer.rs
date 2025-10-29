@@ -65,13 +65,13 @@ pub(crate) trait SqlRenderer: Send + Sync {
     }
 
     /// Render a `DropEnum` step.
-    fn render_drop_enum(&self, dropped_enum: EnumWalker<'_>) -> Vec<String>;
+    fn render_drop_enum(&self, namespace: Option<&str>, dropped_enum: EnumWalker<'_>) -> Vec<String>;
 
     /// Render a `DropForeignKey` step.
-    fn render_drop_foreign_key(&self, foreign_key: ForeignKeyWalker<'_>) -> String;
+    fn render_drop_foreign_key(&self, namespace: Option<&str>, foreign_key: ForeignKeyWalker<'_>) -> String;
 
     /// Render a `DropIndex` step.
-    fn render_drop_index(&self, index: IndexWalker<'_>) -> String;
+    fn render_drop_index(&self, namespace: Option<&str>, index: IndexWalker<'_>) -> String;
 
     /// Render a `DropTable` step.
     fn render_drop_table(&self, namespace: Option<&str>, table_name: &str) -> Vec<String> {
@@ -89,10 +89,10 @@ pub(crate) trait SqlRenderer: Send + Sync {
     fn render_rename_table(&self, namespace: Option<&str>, name: &str, new_name: &str) -> String;
 
     /// Render a drop view step.
-    fn render_drop_view(&self, view: ViewWalker<'_>) -> String;
+    fn render_drop_view(&self, namespace: Option<&str>, view: ViewWalker<'_>) -> String;
 
     /// Render a drop type step.
-    fn render_drop_user_defined_type(&self, udt: &UserDefinedTypeWalker<'_>) -> String;
+    fn render_drop_user_defined_type(&self, namespace: Option<&str>, udt: &UserDefinedTypeWalker<'_>) -> String;
 
     /// Render a transaction start.
     fn render_begin_transaction(&self) -> Option<&'static str> {

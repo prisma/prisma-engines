@@ -242,11 +242,11 @@ impl SqlRenderer for MssqlRenderer {
         )
     }
 
-    fn render_drop_enum(&self, _: sql::EnumWalker<'_>) -> Vec<String> {
+    fn render_drop_enum(&self, _namespace: Option<&str>, _: sql::EnumWalker<'_>) -> Vec<String> {
         unreachable!("render_drop_enum on MSSQL")
     }
 
-    fn render_drop_foreign_key(&self, foreign_key: sql::ForeignKeyWalker<'_>) -> String {
+    fn render_drop_foreign_key(&self, _namespace: Option<&str>, foreign_key: sql::ForeignKeyWalker<'_>) -> String {
         format!(
             "ALTER TABLE {table} DROP CONSTRAINT {constraint_name}",
             table = self.table_name(foreign_key.table()),
@@ -254,7 +254,7 @@ impl SqlRenderer for MssqlRenderer {
         )
     }
 
-    fn render_drop_index(&self, index: sql::IndexWalker<'_>) -> String {
+    fn render_drop_index(&self, _namespace: Option<&str>, index: sql::IndexWalker<'_>) -> String {
         let ext: &MssqlSchemaExt = index.schema.downcast_connector_data();
 
         if ext.index_is_a_constraint(index.id) {
@@ -297,7 +297,7 @@ impl SqlRenderer for MssqlRenderer {
 
             // Drop the indexes on the table.
             for index in tables.previous.indexes().filter(|idx| !idx.is_primary_key()) {
-                result.push(self.render_drop_index(index));
+                result.push(self.render_drop_index(None, index));
             }
 
             // Remove all constraints from our original table. This will allow
@@ -426,12 +426,12 @@ impl SqlRenderer for MssqlRenderer {
         vec![format!("DROP TABLE {}", self.quote_with_schema(namespace, table_name))]
     }
 
-    fn render_drop_view(&self, view: sql::ViewWalker<'_>) -> String {
-        format!("DROP VIEW {}", self.quote_with_schema(view.namespace(), view.name()))
+    fn render_drop_view(&self, namespace: Option<&str>, view: sql::ViewWalker<'_>) -> String {
+        format!("DROP VIEW {}", self.quote_with_schema(namespace, view.name()))
     }
 
-    fn render_drop_user_defined_type(&self, udt: &sql::UserDefinedTypeWalker<'_>) -> String {
-        format!("DROP TYPE {}", self.quote_with_schema(udt.namespace(), udt.name()))
+    fn render_drop_user_defined_type(&self, namespace: Option<&str>, udt: &sql::UserDefinedTypeWalker<'_>) -> String {
+        format!("DROP TYPE {}", self.quote_with_schema(namespace, udt.name()))
     }
 
     fn render_begin_transaction(&self) -> Option<&'static str> {
