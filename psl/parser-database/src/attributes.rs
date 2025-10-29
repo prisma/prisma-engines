@@ -98,11 +98,15 @@ fn resolve_enum_attributes<'db>(enum_id: crate::EnumId, ast_enum: &'db ast::Enum
             }
             ctx.validate_visited_arguments();
         }
+
+        // @ignore
+        if ctx.visit_optional_single_attr("ignore") {
+            enum_attributes.ignored_values.insert(value_id);
+            ctx.validate_visited_arguments();
+        }
         ctx.validate_visited_attributes();
     }
-
     // Now validate the enum attributes.
-
     ctx.visit_attributes(enum_id);
 
     // @@map
