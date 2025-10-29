@@ -30,9 +30,6 @@ impl ConnectorTagInterface for PostgresConnectorTag {
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum PostgresVersion {
-    V9,
-    V10,
-    V11,
     V12,
     V13,
     V14,
@@ -48,9 +45,6 @@ impl TryFrom<&str> for PostgresVersion {
 
     fn try_from(s: &str) -> Result<Self, Self::Error> {
         let version = match s {
-            "9" => Self::V9,
-            "10" => Self::V10,
-            "11" => Self::V11,
             "12" => Self::V12,
             "13" => Self::V13,
             "14" => Self::V14,
@@ -69,9 +63,6 @@ impl TryFrom<&str> for PostgresVersion {
 impl Display for PostgresVersion {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            PostgresVersion::V9 => f.write_str("9"),
-            PostgresVersion::V10 => f.write_str("10"),
-            PostgresVersion::V11 => f.write_str("11"),
             PostgresVersion::V12 => f.write_str("12"),
             PostgresVersion::V13 => f.write_str("13"),
             PostgresVersion::V14 => f.write_str("14"),

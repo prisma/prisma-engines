@@ -1006,10 +1006,6 @@ fn all_postgres_column_types_must_work(api: TestApi) {
     "#]];
     api.expect_schema(expectation);
 
-    if api.connector_tags().contains(Tags::Postgres9) {
-        return; // sequence max values work differently on postgres 9
-    }
-
     let result = api.describe();
     let ext = extract_ext(&result);
     let expected_ext = expect![[r#"
@@ -2556,7 +2552,7 @@ fn multiple_schemas_with_same_foreign_key_are_described(api: TestApi) {
     expected_schema.assert_debug_eq(&schema);
 }
 
-#[test_connector(tags(Postgres11))]
+#[test_connector(tags(Postgres12, Postgres13, Postgres14, Postgres15, Postgres16))]
 fn multiple_schemas_are_described(api: TestApi) {
     let schema = r#"
            CREATE Schema "schema_0";

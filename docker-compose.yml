@@ -41,7 +41,8 @@ services:
     image: brainsam/pgbouncer:latest
     restart: unless-stopped
     environment:
-      DB_HOST: 'postgres11'
+      # Use the PostgreSQL 13 service as the upstream target for PgBouncer tests.
+      DB_HOST: 'postgres13'
       DB_PORT: '5432'
       DB_USER: 'postgres'
       DB_PASSWORD: 'prisma'

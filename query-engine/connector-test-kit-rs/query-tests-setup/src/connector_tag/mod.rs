@@ -89,9 +89,6 @@ pub(crate) fn connection_string(
             };
 
             match v {
-                Some(PostgresVersion::V9) => format!("postgresql://postgres:prisma@127.0.0.1:5431/{database}"),
-                Some(PostgresVersion::V10) => format!("postgresql://postgres:prisma@127.0.0.1:5432/{database}"),
-                Some(PostgresVersion::V11) => format!("postgresql://postgres:prisma@127.0.0.1:5433/{database}"),
                 Some(PostgresVersion::V12) => format!("postgresql://postgres:prisma@127.0.0.1:5434/{database}"),
                 Some(PostgresVersion::V13) | Some(PostgresVersion::PgJsWasm) | Some(PostgresVersion::NeonJsWasm) => {
                     format!("postgresql://postgres:prisma@127.0.0.1:5435/{database}")
