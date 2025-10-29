@@ -33,15 +33,13 @@ tags![
     Mssql = 1 << 11,
     Vitess = 1 << 12,
     CockroachDb = 1 << 13,
-    Postgres14 = 1 << 14,
-    Postgres9 = 1 << 15,
+    Postgres13 = 1 << 14,
+    Postgres14 = 1 << 15,
     Postgres15 = 1 << 16,
-    Postgres11 = 1 << 17,
-    Postgres13 = 1 << 18,
-    CockroachDb221 = 1 << 19,
-    CockroachDb222 = 1 << 20,
-    CockroachDb231 = 1 << 21,
-    Postgres16 = 1 << 22,
+    Postgres16 = 1 << 17,
+    CockroachDb221 = 1 << 18,
+    CockroachDb222 = 1 << 19,
+    CockroachDb231 = 1 << 20,
 ];
 
 pub fn tags_from_comma_separated_list(input: &str) -> BitFlags<Tags> {

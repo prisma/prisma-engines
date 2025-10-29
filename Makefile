@@ -360,7 +360,7 @@ dev-cockroach_21_2_0_patched: start-cockroach_21_2_0_patched
 	cp $(CONFIG_PATH)/cockroach_21_2_0_patched $(CONFIG_FILE)
 
 dev-pgbouncer:
-	docker compose -f docker-compose.yml up --wait -d --remove-orphans pgbouncer postgres11
+	docker compose -f docker-compose.yml up --wait -d --remove-orphans pgbouncer postgres13
 
 start-mysql_5_7:
 	docker compose -f docker-compose.yml up --wait -d --remove-orphans mysql-5-7

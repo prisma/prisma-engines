@@ -58,7 +58,7 @@ async fn sanitizes_problematic_extension_names(api: &mut TestApi) -> TestResult 
 
 #[test_connector(
     tags(Postgres),
-    exclude(CockroachDb, Postgres9),
+    exclude(CockroachDb),
     preview_features("postgresqlExtensions")
 )]
 async fn should_not_list_any_extensions_outside_of_allow_list(api: &mut TestApi) -> TestResult {
@@ -87,7 +87,7 @@ async fn should_not_list_any_extensions_outside_of_allow_list(api: &mut TestApi)
 
 #[test_connector(
     tags(Postgres),
-    exclude(CockroachDb, Postgres9),
+    exclude(CockroachDb),
     preview_features("postgresqlExtensions")
 )]
 async fn should_not_remove_any_extensions_outside_of_allow_list(api: &mut TestApi) -> TestResult {

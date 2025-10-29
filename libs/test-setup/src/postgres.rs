@@ -14,12 +14,12 @@ pub(crate) fn get_postgres_tags(database_url: &str) -> Result<BitFlags<Tags>, St
             Some(version) => {
                 eprintln!("version: {version:?}");
 
-                if version.contains("PostgreSQL 9") {
-                    tags |= Tags::Postgres9;
-                }
-
                 if version.contains("PostgreSQL 12") {
                     tags |= Tags::Postgres12;
+                }
+
+                if version.contains("PostgreSQL 13") {
+                    tags |= Tags::Postgres13;
                 }
 
                 if version.contains("PostgreSQL 14") {
