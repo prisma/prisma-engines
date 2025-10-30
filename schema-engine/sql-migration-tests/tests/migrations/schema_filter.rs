@@ -340,7 +340,7 @@ fn schema_filter_migration_removing_external_tables_incl_relations(mut api: Test
 
                     */
                     -- DropForeignKey
-                    ALTER TABLE "public"."cat" DROP CONSTRAINT "cat_externalTableId_fkey";
+                    ALTER TABLE "cat" DROP CONSTRAINT "cat_externalTableId_fkey";
 
                     -- AlterTable
                     ALTER TABLE "cat" DROP COLUMN "externalTableId";

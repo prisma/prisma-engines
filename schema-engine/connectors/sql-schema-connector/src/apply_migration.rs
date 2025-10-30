@@ -140,7 +140,13 @@ fn render_raw_sql(
         SqlMigrationStep::CreateSchema(namespace_id) => {
             renderer.render_create_namespace(schemas.next.walk(*namespace_id))
         }
-        SqlMigrationStep::DropEnum(enum_id) => renderer.render_drop_enum(schemas.previous.walk(*enum_id)),
+        SqlMigrationStep::DropEnum(enum_id) => {
+            let enum_ = schemas.previous.walk(*enum_id);
+            let rendered_ns = enum_
+                .namespace()
+                .filter(|&ns| !is_default_namespace_in_schema(ns, schemas.next));
+            renderer.render_drop_enum(rendered_ns, enum_)
+        }
         SqlMigrationStep::CreateTable { table_id } => {
             let table = schemas.next.walk(*table_id);
 
@@ -148,8 +154,10 @@ fn render_raw_sql(
         }
         SqlMigrationStep::DropTable { table_id } => {
             let table = schemas.previous.walk(*table_id);
-
-            renderer.render_drop_table(table.explicit_namespace(), table.name())
+            let rendered_ns = table
+                .namespace()
+                .filter(|&ns| !is_default_namespace_in_schema(ns, schemas.next));
+            renderer.render_drop_table(rendered_ns, table.name())
         }
         SqlMigrationStep::RedefineIndex { index } => renderer.render_drop_and_recreate_index(schemas.walk(*index)),
         SqlMigrationStep::AddForeignKey { foreign_key_id } => {
@@ -158,7 +166,11 @@ fn render_raw_sql(
         }
         SqlMigrationStep::DropForeignKey { foreign_key_id } => {
             let foreign_key = schemas.previous.walk(*foreign_key_id);
-            vec![renderer.render_drop_foreign_key(foreign_key)]
+            let rendered_ns = foreign_key
+                .table()
+                .namespace()
+                .filter(|&ns| !is_default_namespace_in_schema(ns, schemas.next));
+            vec![renderer.render_drop_foreign_key(rendered_ns, foreign_key)]
         }
         SqlMigrationStep::AlterTable(alter_table) => renderer.render_alter_table(alter_table, schemas),
         SqlMigrationStep::CreateIndex {
@@ -166,17 +178,30 @@ fn render_raw_sql(
             index_id,
             from_drop_and_recreate: _,
         } => vec![renderer.render_create_index(schemas.next.walk(*index_id))],
-        SqlMigrationStep::DropIndex { index_id } => vec![renderer.render_drop_index(schemas.previous.walk(*index_id))],
+        SqlMigrationStep::DropIndex { index_id } => {
+            let index = schemas.previous.walk(*index_id);
+            let rendered_ns = index
+                .table()
+                .namespace()
+                .filter(|&ns| !is_default_namespace_in_schema(ns, schemas.next));
+            vec![renderer.render_drop_index(rendered_ns, index)]
+        }
         SqlMigrationStep::RenameIndex { index } => renderer.render_rename_index(schemas.walk(*index)),
         SqlMigrationStep::DropView(drop_view) => {
             let view = schemas.previous.walk(drop_view.view_id);
+            let rendered_ns = view
+                .namespace()
+                .filter(|&ns| !is_default_namespace_in_schema(ns, schemas.next));
 
-            vec![renderer.render_drop_view(view)]
+            vec![renderer.render_drop_view(rendered_ns, view)]
         }
         SqlMigrationStep::DropUserDefinedType(drop_udt) => {
             let udt = schemas.previous.walk(drop_udt.udt_id);
+            let rendered_ns = udt
+                .namespace()
+                .filter(|&ns| !is_default_namespace_in_schema(ns, schemas.next));
 
-            vec![renderer.render_drop_user_defined_type(&udt)]
+            vec![renderer.render_drop_user_defined_type(rendered_ns, &udt)]
         }
         SqlMigrationStep::RenameForeignKey { foreign_key_id } => {
             let fks = schemas.walk(*foreign_key_id);
@@ -192,4 +217,12 @@ fn render_raw_sql(
             renderer.render_drop_extension(drop_extension, schemas.previous)
         }
     }
+}
+
+/// Returns true if the given namespace is the default namespace in the given schema.
+/// This is used to avoid rendering the default namespace when dropping items, which
+/// is needed because we cannot know whether the namespace was explicitly set
+/// based on the introspected schema alone.
+pub(super) fn is_default_namespace_in_schema(namespace: &str, schema: &SqlSchema) -> bool {
+    schema.default_namespace() == Some(namespace)
 }
