@@ -98,7 +98,7 @@ async fn identity_introspects_to_sequence_with_default_settings_v_24_3(api: Test
 
     let expected = expect![[r#"
         model myTable {
-          id   Int    @id @default(sequence())
+          id   Int    @id @default(sequence(maxValue: 2147483647))
           name String
         }
     "#]];
@@ -217,7 +217,7 @@ async fn scalar_list_defaults_work_on_24_3(api: &mut TestApi) -> TestResult {
           int_defaults      Int[]      @default([9, 12999, -4, 0, 1249849])
           float_defaults    Float[]    @default([0, 9.12, 3.14, 0.1242, 124949.124949])
           bool_defaults     Boolean[]  @default([true, true, true, false])
-          datetime_defaults DateTime[] @default(dbgenerated("'{\"''2022-09-01 08:00:00+00:00''::TIMESTAMPTZ\",\"''2021-09-01 08:00:00+00:00''::TIMESTAMPTZ\"}'::TIMESTAMPTZ[]")) @db.Timestamptz
+          datetime_defaults DateTime[] @default(dbgenerated("'{\"2022-09-01 08:00:00+00\",\"2021-09-01 08:00:00+00\"}'::TIMESTAMPTZ[]")) @db.Timestamptz
         }
 
         enum color {

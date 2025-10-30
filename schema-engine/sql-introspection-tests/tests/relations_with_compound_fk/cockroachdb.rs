@@ -22,7 +22,7 @@ async fn compound_foreign_keys_with_defaults_v_24_3(api: &mut TestApi) -> TestRe
 
     let expected = expect![[r#"
         model Person {
-          id           BigInt   @id @default(sequence())
+          id           BigInt   @id @default(sequence(maxValue: 2147483647))
           age          Int
           partner_id   Int      @default(0)
           partner_age  Int      @default(0)
