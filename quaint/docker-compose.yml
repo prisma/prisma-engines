@@ -71,7 +71,7 @@ services:
     restart: unless-stopped
     command: start-single-node --insecure
     ports:
-      - '26262:26257'
+      - '26259:26257'
     networks:
       - databases
 
