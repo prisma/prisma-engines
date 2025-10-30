@@ -64,6 +64,7 @@ chrono = "0.4"
 colored = "3"
 concat-idents = "1"
 connection-string = "0.2"
+convert_case = "0.8"
 crossbeam-channel = "0.5"
 cruet = "0.15"
 cuid = { git = "https://github.com/prisma/cuid-rust", branch = "v1.3.3-wasm32-unknown-unknown" }
@@ -87,7 +88,7 @@ lru = "0.7"
 lru-cache = "0.1"
 lsp-types = "0.95"
 mobc = "0.8"
-mongodb = { git = "https://github.com/prisma/mongo-rust-driver.git", branch = "RUST-1994/happy-eyeballs", features = [
+mongodb = { version = "3", features = [
     "zstd-compression",
     "zlib-compression",
     "snappy-compression",
@@ -114,7 +115,7 @@ pin-project = "1"
 postgres-native-tls = { git = "https://github.com/prisma/rust-postgres", branch = "pgbouncer-mode" }
 postgres-types = { git = "https://github.com/prisma/rust-postgres", branch = "pgbouncer-mode" }
 pretty = "0.12"
-rustc-hash = "1"
+rustc-hash = "2"
 rand = "0.8"
 regex = "1"
 reqwest = "0.11"

@@ -283,13 +283,13 @@ impl SqlRenderer for MysqlRenderer {
         ]
     }
 
-    fn render_drop_enum(&self, _: EnumWalker<'_>) -> Vec<String> {
+    fn render_drop_enum(&self, _namespace: Option<&str>, _: EnumWalker<'_>) -> Vec<String> {
         unreachable!(
             "Unreachable render_drop_enum() on MySQL. enums are defined on each column that uses them on MySQL"
         )
     }
 
-    fn render_drop_foreign_key(&self, foreign_key: ForeignKeyWalker<'_>) -> String {
+    fn render_drop_foreign_key(&self, _namespace: Option<&str>, foreign_key: ForeignKeyWalker<'_>) -> String {
         format!(
             "ALTER TABLE {table} DROP FOREIGN KEY {constraint_name}",
             table = self.quote(foreign_key.table().name()),
@@ -297,7 +297,7 @@ impl SqlRenderer for MysqlRenderer {
         )
     }
 
-    fn render_drop_index(&self, index: IndexWalker<'_>) -> String {
+    fn render_drop_index(&self, _namespace: Option<&str>, index: IndexWalker<'_>) -> String {
         sql_ddl::mysql::DropIndex {
             table_name: index.table().name().into(),
             index_name: index.name().into(),
@@ -333,7 +333,7 @@ impl SqlRenderer for MysqlRenderer {
         self.render_create_table_as(table, QuotedWithPrefix(None, Quoted::mysql_ident(table.name())))
     }
 
-    fn render_drop_view(&self, view: ViewWalker<'_>) -> String {
+    fn render_drop_view(&self, _namespace: Option<&str>, view: ViewWalker<'_>) -> String {
         format!("DROP VIEW {}", Quoted::mysql_ident(view.name()))
     }
 
@@ -344,7 +344,7 @@ impl SqlRenderer for MysqlRenderer {
         vec![]
     }
 
-    fn render_drop_user_defined_type(&self, _: &UserDefinedTypeWalker<'_>) -> String {
+    fn render_drop_user_defined_type(&self, _namespace: Option<&str>, _: &UserDefinedTypeWalker<'_>) -> String {
         unreachable!("render_drop_user_defined_type on MySQL")
     }
 

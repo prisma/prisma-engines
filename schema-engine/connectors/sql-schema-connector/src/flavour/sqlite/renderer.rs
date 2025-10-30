@@ -145,21 +145,21 @@ impl SqlRenderer for SqliteRenderer {
         create_table.to_string()
     }
 
-    fn render_drop_enum(&self, _: EnumWalker<'_>) -> Vec<String> {
+    fn render_drop_enum(&self, _namespace: Option<&str>, _: EnumWalker<'_>) -> Vec<String> {
         unreachable!("Unreachable render_drop_enum() on SQLite. SQLite does not have enums.")
     }
 
-    fn render_drop_foreign_key(&self, _foreign_key: ForeignKeyWalker<'_>) -> String {
+    fn render_drop_foreign_key(&self, _namespace: Option<&str>, _foreign_key: ForeignKeyWalker<'_>) -> String {
         unreachable!("render_drop_foreign_key on SQLite")
     }
 
-    fn render_drop_index(&self, index: IndexWalker<'_>) -> String {
+    fn render_drop_index(&self, _namespace: Option<&str>, index: IndexWalker<'_>) -> String {
         format!("DROP INDEX {}", self.quote(index.name()))
     }
 
     fn render_drop_and_recreate_index(&self, indexes: MigrationPair<IndexWalker<'_>>) -> Vec<String> {
         vec![
-            self.render_drop_index(indexes.previous),
+            self.render_drop_index(None, indexes.previous),
             self.render_create_index(indexes.next),
         ]
     }
@@ -241,11 +241,11 @@ impl SqlRenderer for SqliteRenderer {
         format!(r#"ALTER TABLE "{name}" RENAME TO "{new_name}""#)
     }
 
-    fn render_drop_view(&self, view: ViewWalker<'_>) -> String {
+    fn render_drop_view(&self, _namespace: Option<&str>, view: ViewWalker<'_>) -> String {
         format!(r#"DROP VIEW "{}""#, view.name())
     }
 
-    fn render_drop_user_defined_type(&self, _: &UserDefinedTypeWalker<'_>) -> String {
+    fn render_drop_user_defined_type(&self, _namespace: Option<&str>, _: &UserDefinedTypeWalker<'_>) -> String {
         unreachable!("render_drop_user_defined_type on SQLite")
     }
 
