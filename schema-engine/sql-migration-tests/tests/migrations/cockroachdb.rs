@@ -989,6 +989,7 @@ fn created_at_does_not_get_arbitrarily_migrated(api: TestApi) {
         .assert_no_steps();
 }
 
+// TODO: verify
 #[test_connector(tags(CockroachDb))]
 fn sequences_without_options_can_be_created(api: TestApi) {
     let dm = r#"

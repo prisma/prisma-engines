@@ -38,7 +38,7 @@ fn failing_migration_after_migration_dropping_data(api: TestApi) {
         Database error:
         ERROR: column "is_good_dog" does not exist
 
-        DbError { severity: "ERROR", parsed_severity: Some(Error), code: SqlState(E42703), message: "column \"is_good_dog\" does not exist", detail: None, hint: None, position: None, where_: None, schema: None, table: None, column: None, datatype: None, constraint: None, file: Some("column_resolver.go"), line: Some(196), routine: Some("NewUndefinedColumnError") }
+        DbError { severity: "ERROR", parsed_severity: Some(Error), code: SqlState(E42703), message: "column \"is_good_dog\" does not exist", detail: None, hint: None, position: None, where_: None, schema: None, table: None, column: None, datatype: None, constraint: None, file: Some("table_elements.go"), line: Some(1265), routine: Some("MustFindColumnByTreeName") }
     "#]];
     expectation.assert_eq(err.message().unwrap());
 }
@@ -79,7 +79,7 @@ fn failing_step_in_migration_dropping_data(api: TestApi) {
         Database error:
         ERROR: column "is_good_dog" does not exist
 
-        DbError { severity: "ERROR", parsed_severity: Some(Error), code: SqlState(E42703), message: "column \"is_good_dog\" does not exist", detail: None, hint: None, position: None, where_: None, schema: None, table: None, column: None, datatype: None, constraint: None, file: Some("column_resolver.go"), line: Some(196), routine: Some("NewUndefinedColumnError") }
+        DbError { severity: "ERROR", parsed_severity: Some(Error), code: SqlState(E42703), message: "column \"is_good_dog\" does not exist", detail: None, hint: None, position: None, where_: None, schema: None, table: None, column: None, datatype: None, constraint: None, file: Some("table_elements.go"), line: Some(1265), routine: Some("MustFindColumnByTreeName") }
     "#]];
     expectation.assert_eq(err.message().unwrap());
 }
@@ -186,7 +186,7 @@ fn syntax_errors_return_error_position(api: TestApi) {
                         ^
         HINT: try \h CREATE TABLE
 
-        DbError { severity: "ERROR", parsed_severity: Some(Error), code: SqlState(E42601), message: "at or near \"is_good_dog\": syntax error", detail: Some("source SQL:\nCREATE TABLE \"Dog\" (\n                id              SERIAL PRIMARY KEY,\n                name            TEXT NOT NULL\n                is_good_dog     BOOLEAN NOT NULL DEFAULT TRUE\n                ^"), hint: Some("try \\h CREATE TABLE"), position: None, where_: None, schema: None, table: None, column: None, datatype: None, constraint: None, file: Some("lexer.go"), line: Some(271), routine: Some("Error") }
+        DbError { severity: "ERROR", parsed_severity: Some(Error), code: SqlState(E42601), message: "at or near \"is_good_dog\": syntax error", detail: Some("source SQL:\nCREATE TABLE \"Dog\" (\n                id              SERIAL PRIMARY KEY,\n                name            TEXT NOT NULL\n                is_good_dog     BOOLEAN NOT NULL DEFAULT TRUE\n                ^"), hint: Some("try \\h CREATE TABLE"), position: None, where_: None, schema: None, table: None, column: None, datatype: None, constraint: None, file: Some("lexer.go"), line: Some(399), routine: Some("Error") }
     "#]];
     expectation.assert_eq(err.message().unwrap());
 }
