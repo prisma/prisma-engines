@@ -61,6 +61,7 @@ impl TestApi {
         tok(f)
     }
 
+    #[allow(dead_code)]
     pub(crate) fn connector_tags(&self) -> BitFlags<Tags> {
         self.tags
     }

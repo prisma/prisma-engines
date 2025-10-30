@@ -428,9 +428,9 @@ fn escaped_characters_in_string_defaults(api: TestApi) {
     expect_col("sideNames", "top\ndown");
 }
 
-#[test_connector(tags(CockroachDb221))]
-fn cockroachdb_22_1_sequences_must_work(api: TestApi) {
-    // https://www.cockroachlabs.com/docs/v21.2/create-sequence.html
+#[test_connector(tags(CockroachDb243))]
+fn cockroachdb_24_3_sequences_must_work(api: TestApi) {
+    // https://www.cockroachlabs.com/docs/v24.3/create-sequence.html
     let sql = r#"
         -- Defaults
         CREATE SEQUENCE "test";
@@ -501,9 +501,9 @@ fn cockroachdb_22_1_sequences_must_work(api: TestApi) {
     expected_ext.assert_debug_eq(&ext);
 }
 
-#[test_connector(tags(CockroachDb222))]
-fn cockroachdb_22_2_sequences_must_work(api: TestApi) {
-    // https://www.cockroachlabs.com/docs/v21.2/create-sequence.html
+#[test_connector(tags(CockroachDb251))]
+fn cockroachdb_25_1_sequences_must_work(api: TestApi) {
+    // https://www.cockroachlabs.com/docs/v25.1/create-sequence.html
     let sql = r#"
         -- Defaults
         CREATE SEQUENCE "test";

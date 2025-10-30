@@ -697,7 +697,7 @@ mod max_integer {
         schema.to_owned()
     }
 
-    #[connector_test(schema(overflow_cockroach), only(CockroachDb("23.1", "22.2", "22.1")))]
+    #[connector_test(schema(overflow_cockroach), only(CockroachDb("25.2", "25.1", "24.3")))]
     async fn unfitted_int_should_fail_cockroach(runner: Runner) -> TestResult<()> {
         // int4
         assert_error!(

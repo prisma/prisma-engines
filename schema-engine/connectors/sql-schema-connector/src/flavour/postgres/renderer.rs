@@ -891,7 +891,7 @@ fn render_postgres_alter_enum(
     renderer: &PostgresRenderer,
 ) -> Vec<String> {
     if alter_enum.dropped_variants.is_empty() {
-        let mut stmts: Vec<String> = alter_enum
+        let stmts: Vec<String> = alter_enum
             .created_variants
             .iter()
             .map(|created_value| {

@@ -142,14 +142,14 @@ pub(crate) fn connection_string(
             // Use the same database and schema name for CockroachDB - unfortunately CockroachDB
             // can't handle 1 schema per test in a database well at this point in time.
             match v {
-                Some(CockroachDbVersion::V221) => {
-                    format!("postgresql://prisma@127.0.0.1:26257/{database}?schema={database}")
-                }
-                Some(CockroachDbVersion::V222) => {
-                    format!("postgresql://prisma@127.0.0.1:26259/{database}?schema={database}")
-                }
-                Some(CockroachDbVersion::V231 | CockroachDbVersion::PgJsWasm) => {
+                Some(CockroachDbVersion::V243) => {
                     format!("postgresql://prisma@127.0.0.1:26260/{database}?schema={database}")
+                }
+                Some(CockroachDbVersion::V251) => {
+                    format!("postgresql://prisma@127.0.0.1:26261/{database}?schema={database}")
+                }
+                Some(CockroachDbVersion::V252 | CockroachDbVersion::PgJsWasm) => {
+                    format!("postgresql://prisma@127.0.0.1:26262/{database}?schema={database}")
                 }
 
                 None => unreachable!("A versioned connector must have a concrete version to run."),
