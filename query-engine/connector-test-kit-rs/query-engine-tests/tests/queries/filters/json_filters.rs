@@ -1,6 +1,6 @@
 use query_engine_tests::*;
 
-#[test_suite(schema(schemas::json), capabilities(JsonFiltering), exclude(MySql(5.6)))]
+#[test_suite(schema(schemas::json), capabilities(JsonFiltering))]
 mod json_filters {
     use indoc::indoc;
     use query_engine_tests::{Runner, assert_error, is_one_of, run_query};
@@ -27,7 +27,7 @@ mod json_filters {
         schema.to_owned()
     }
 
-    #[connector_test(exclude(MySQL(5.6)))]
+    #[connector_test]
     async fn no_path_without_filter(runner: Runner) -> TestResult<()> {
         assert_error!(
             runner,
@@ -280,7 +280,7 @@ mod json_filters {
         Ok(())
     }
 
-    #[connector_test(exclude(MySQL(5.6), Sqlite))]
+    #[connector_test(exclude(Sqlite))]
     async fn array_contains(runner: Runner) -> TestResult<()> {
         array_contains_runner(runner).await?;
 
@@ -389,7 +389,7 @@ mod json_filters {
         Ok(())
     }
 
-    #[connector_test(exclude(MySQL(5.6)))]
+    #[connector_test]
     async fn array_starts_with(runner: Runner) -> TestResult<()> {
         array_starts_with_runner(runner).await?;
 
@@ -496,7 +496,7 @@ mod json_filters {
         Ok(())
     }
 
-    #[connector_test(exclude(MySQL(5.6)))]
+    #[connector_test]
     async fn array_ends_with(runner: Runner) -> TestResult<()> {
         array_ends_with_runner(runner).await?;
 
@@ -547,7 +547,7 @@ mod json_filters {
         Ok(())
     }
 
-    #[connector_test(exclude(MySQL(5.6)))]
+    #[connector_test]
     async fn string_contains(runner: Runner) -> TestResult<()> {
         string_contains_runner(runner).await?;
 
@@ -599,7 +599,7 @@ mod json_filters {
         Ok(())
     }
 
-    #[connector_test(exclude(MySQL(5.6)))]
+    #[connector_test]
     async fn string_starts_with(runner: Runner) -> TestResult<()> {
         string_starts_with_runner(runner).await?;
 
@@ -650,7 +650,7 @@ mod json_filters {
         Ok(())
     }
 
-    #[connector_test(exclude(MySQL(5.6)))]
+    #[connector_test]
     async fn string_ends_with(runner: Runner) -> TestResult<()> {
         string_ends_with_runner(runner).await?;
 

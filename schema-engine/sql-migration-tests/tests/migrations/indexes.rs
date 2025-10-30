@@ -692,7 +692,7 @@ fn removal_length_prefix_index(api: TestApi) {
     });
 }
 
-#[test_connector(exclude(Mysql56, Mysql57, Mariadb))]
+#[test_connector(exclude(Mysql57, Mariadb))]
 fn descending_compound_index(api: TestApi) {
     let dm = formatdoc! {r#"
         {}
@@ -718,7 +718,7 @@ fn descending_compound_index(api: TestApi) {
     });
 }
 
-#[test_connector(exclude(Mysql56, Mysql57, Mariadb))]
+#[test_connector(exclude(Mysql57, Mariadb))]
 fn descending_compound_unique(api: TestApi) {
     let dm = formatdoc! {r#"
         {}
@@ -744,7 +744,7 @@ fn descending_compound_unique(api: TestApi) {
     });
 }
 
-#[test_connector(exclude(Mysql56, Mysql57, Mariadb))]
+#[test_connector(exclude(Mysql57, Mariadb))]
 fn descending_unique(api: TestApi) {
     let dm = formatdoc! {r#"
         {}
@@ -766,7 +766,7 @@ fn descending_unique(api: TestApi) {
     });
 }
 
-#[test_connector(exclude(Mysql56, Mysql57, Mariadb))]
+#[test_connector(exclude(Mysql57, Mariadb))]
 fn removal_descending_unique(api: TestApi) {
     let dm = formatdoc! {r#"
         {}
@@ -939,7 +939,7 @@ fn adding_fulltext_index_to_an_existing_column(api: TestApi) {
     });
 }
 
-#[test_connector(tags(Mysql), exclude(Mysql56))]
+#[test_connector(tags(Mysql))]
 fn changing_normal_index_to_a_fulltext_index(api: TestApi) {
     let dm = indoc! {r#"
         model A {

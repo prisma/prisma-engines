@@ -1,6 +1,6 @@
 use sql_migration_tests::test_api::*;
 
-#[test_connector(tags(CockroachDb), exclude(CockroachDb231))]
+#[test_connector(tags(CockroachDb))]
 fn failing_migration_after_migration_dropping_data(api: TestApi) {
     let migrations = &[
         r#"
@@ -43,7 +43,7 @@ fn failing_migration_after_migration_dropping_data(api: TestApi) {
     expectation.assert_eq(err.message().unwrap());
 }
 
-#[test_connector(tags(CockroachDb), exclude(CockroachDb231))]
+#[test_connector(tags(CockroachDb))]
 fn failing_step_in_migration_dropping_data(api: TestApi) {
     let migrations = &[
         r#"
@@ -84,8 +84,7 @@ fn failing_step_in_migration_dropping_data(api: TestApi) {
     expectation.assert_eq(err.message().unwrap());
 }
 
-// Skipped on CRDB 23.1 because of https://github.com/prisma/prisma/issues/20851
-#[test_connector(tags(CockroachDb), exclude(CockroachDb231))]
+#[test_connector(tags(CockroachDb))]
 fn multiple_alter_tables_in_one_migration_works(api: TestApi) {
     let migrations = &[
         r#"
@@ -159,7 +158,7 @@ fn multiple_alter_tables_in_multiple_migration_works(api: TestApi) {
     api.apply_migrations(&dir).send_sync();
 }
 
-#[test_connector(tags(CockroachDb), exclude(CockroachDb231))]
+#[test_connector(tags(CockroachDb))]
 fn syntax_errors_return_error_position(api: TestApi) {
     let migrations = &[r#"
             CREATE TABLE "Dog" (

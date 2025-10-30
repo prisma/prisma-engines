@@ -324,10 +324,9 @@ async fn ignore_on_back_relation_field_if_pointing_to_ignored_model(api: &mut Te
     Ok(())
 }
 
-// Postgres9 does not support partition tables, and Postgres10 does not support primary keys on
-// partition tables without an workaround (see the following tests for details).
+// PostgreSQL 10 does not support primary keys on partition tables without a workaround (see the following tests for details).
 #[test_connector(
-    tags(Postgres11, Postgres12, Postgres13, Postgres14, Postgres15, Postgres16),
+    tags(Postgres12, Postgres13, Postgres14, Postgres15, Postgres16),
     exclude(CockroachDb)
 )]
 async fn partition_table_gets_comment(api: &mut TestApi) -> TestResult {
@@ -396,7 +395,7 @@ ALTER TABLE blocks
 // constraints on each of the parttions, but we are not allowed to define one on the main table.
 // Our introspection currently only reads the propertieds/index properties for the main table, so
 // these models will always be ignored.
-#[test_connector(tags(Postgres), exclude(Postgres9, CockroachDb))]
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
 async fn partition_table_gets_postgres10(api: &mut TestApi) -> TestResult {
     api.raw_cmd(
         r#"
@@ -451,8 +450,7 @@ ALTER TABLE blocks_p2_0 ADD CONSTRAINT b2_unique UNIQUE (id);
     Ok(())
 }
 
-// Postgres9 does not support row level security
-#[test_connector(tags(Postgres), exclude(CockroachDb, Postgres9))]
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
 async fn row_level_security_warning(api: &mut TestApi) -> TestResult {
     api.raw_cmd(
         r#"

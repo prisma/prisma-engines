@@ -1,0 +1,2 @@
+export TEST_DATABASE_URL="postgresql://root@localhost:26262"
+unset TEST_SHADOW_DATABASE_URL

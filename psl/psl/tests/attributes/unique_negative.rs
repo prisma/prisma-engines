@@ -289,7 +289,7 @@ fn invalid_name_for_compound_unique_must_error() {
     let dml = indoc! {r#"
         datasource test {
           provider = "mysql"
-          url = "mysql://root:prisma@127.0.0.1:3309/ReproIndexNames?connection_limit=1"
+          url = "mysql://root:prisma@127.0.0.1:3306/ReproIndexNames?connection_limit=1"
         }
 
         model User {
@@ -319,7 +319,7 @@ fn mapping_unique_with_a_name_that_is_too_long_should_error() {
     let dml = indoc! {r#"
         datasource test {
           provider = "mysql"
-          url = "mysql://root:prisma@127.0.0.1:3309/ReproIndexNames?connection_limit=1"
+          url = "mysql://root:prisma@127.0.0.1:3306/ReproIndexNames?connection_limit=1"
         }
 
         model User {

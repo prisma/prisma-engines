@@ -75,7 +75,7 @@ mod scalar_relations {
         schema.to_owned()
     }
 
-    #[connector_test(schema(schema_json), capabilities(Json), exclude(Mysql(5.6)))]
+    #[connector_test(schema(schema_json), capabilities(Json))]
     async fn json_type(runner: Runner) -> TestResult<()> {
         create_child(&runner, r#"{ childId: 1, json: "1" }"#).await?;
         create_child(&runner, r#"{ childId: 2, json: "{}" }"#).await?;
