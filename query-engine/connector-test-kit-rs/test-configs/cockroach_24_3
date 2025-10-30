@@ -1,0 +1,4 @@
+{
+  "connector": "cockroachdb",
+  "version": "24.3"
+}

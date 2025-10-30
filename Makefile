@@ -261,12 +261,12 @@ start-pg-bench:
 
 setup-pg-bench: start-pg-bench build-qe-napi build-qe-wasm build-driver-adapters-kit-qe
 
-dev-pg-cockroachdb-wasm: start-cockroach_23_1 build-qe-wasm build-driver-adapters-kit-qe
+dev-pg-cockroachdb-wasm: start-cockroach_25_2 build-qe-wasm build-driver-adapters-kit-qe
 	cp $(CONFIG_PATH)/pg-cockroachdb-wasm $(CONFIG_FILE)
 
 test-pg-cockroachdb-wasm: dev-pg-cockroachdb-wasm test-qe-st
 
-dev-pg-cockroachdb-qc: start-cockroach_23_1 build-qc-wasm build-driver-adapters-kit-qc
+dev-pg-cockroachdb-qc: start-cockroach_25_2 build-qc-wasm build-driver-adapters-kit-qc
 	cp $(CONFIG_PATH)/pg-cockroachdb-qc $(CONFIG_FILE)
 
 dev-pg-cockroachdb-qc-join:
@@ -335,29 +335,23 @@ start-postgres16:
 dev-postgres16: start-postgres16
 	cp $(CONFIG_PATH)/postgres16 $(CONFIG_FILE)
 
-start-cockroach_23_1:
-	docker compose -f docker-compose.yml up --wait -d --remove-orphans cockroach_23_1
+start-cockroach_24_3:
+	docker compose -f docker-compose.yml up --wait -d --remove-orphans cockroach_24_3
 
-dev-cockroach_23_1: start-cockroach_23_1
-	cp $(CONFIG_PATH)/cockroach_23_1 $(CONFIG_FILE)
+dev-cockroach_24_3: start-cockroach_24_3
+	cp $(CONFIG_PATH)/cockroach_24_3 $(CONFIG_FILE)
 
-start-cockroach_22_2:
-	docker compose -f docker-compose.yml up --wait -d --remove-orphans cockroach_22_2
+start-cockroach_25_1:
+	docker compose -f docker-compose.yml up --wait -d --remove-orphans cockroach_25_1
 
-dev-cockroach_22_2: start-cockroach_22_2
-	cp $(CONFIG_PATH)/cockroach_22_2 $(CONFIG_FILE)
+dev-cockroach_25_1: start-cockroach_25_1
+	cp $(CONFIG_PATH)/cockroach_25_1 $(CONFIG_FILE)
 
-start-cockroach_22_1_0:
-	docker compose -f docker-compose.yml up --wait -d --remove-orphans cockroach_22_1_0
+start-cockroach_25_2:
+	docker compose -f docker-compose.yml up --wait -d --remove-orphans cockroach_25_2
 
-dev-cockroach_22_1_0: start-cockroach_22_1_0
-	cp $(CONFIG_PATH)/cockroach_22_1 $(CONFIG_FILE)
-
-start-cockroach_21_2_0_patched:
-	docker compose -f docker-compose.yml up --wait -d --remove-orphans cockroach_21_2_0_patched
-
-dev-cockroach_21_2_0_patched: start-cockroach_21_2_0_patched
-	cp $(CONFIG_PATH)/cockroach_21_2_0_patched $(CONFIG_FILE)
+dev-cockroach_25_2: start-cockroach_25_2
+	cp $(CONFIG_PATH)/cockroach_25_2 $(CONFIG_FILE)
 
 dev-pgbouncer:
 	docker compose -f docker-compose.yml up --wait -d --remove-orphans pgbouncer postgres13

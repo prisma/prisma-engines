@@ -50,9 +50,8 @@ impl Connection {
         }
 
         if circumstances.contains(super::Circumstances::CheckConstraints)
-            && !describer_circumstances.intersects(
-                describer::Circumstances::MySql57 | describer::Circumstances::MariaDb,
-            )
+            && !describer_circumstances
+                .intersects(describer::Circumstances::MySql57 | describer::Circumstances::MariaDb)
         {
             // MySQL 8.0.16 and above supports check constraints.
             // MySQL 5.7 does not have a CHECK_CONSTRAINTS table we can query.
