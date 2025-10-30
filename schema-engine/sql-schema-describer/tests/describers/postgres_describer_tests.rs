@@ -2597,24 +2597,40 @@ fn multiple_schemas_are_described(api: TestApi) {
                         0,
                     ),
                     name: "Table_0",
+                    properties: BitFlags<TableProperties> {
+                        bits: 0b0,
+                    },
+                    description: None,
                 },
                 Table {
                     namespace_id: NamespaceId(
                         0,
                     ),
                     name: "Table_1",
+                    properties: BitFlags<TableProperties> {
+                        bits: 0b0,
+                    },
+                    description: None,
                 },
                 Table {
                     namespace_id: NamespaceId(
                         1,
                     ),
                     name: "Table_2",
+                    properties: BitFlags<TableProperties> {
+                        bits: 0b0,
+                    },
+                    description: None,
                 },
                 Table {
                     namespace_id: NamespaceId(
                         1,
                     ),
                     name: "Table_3",
+                    properties: BitFlags<TableProperties> {
+                        bits: 0b0,
+                    },
+                    description: None,
                 },
             ],
             enums: [
@@ -2623,21 +2639,31 @@ fn multiple_schemas_are_described(api: TestApi) {
                         0,
                     ),
                     name: "Type_0",
-                    values: [
-                        "happy",
-                    ],
+                    description: None,
                 },
                 Enum {
                     namespace_id: NamespaceId(
                         1,
                     ),
                     name: "Type_1",
-                    values: [
-                        "happy",
-                    ],
+                    description: None,
                 },
             ],
-            columns: [
+            enum_variants: [
+                EnumVariant {
+                    enum_id: EnumId(
+                        0,
+                    ),
+                    variant_name: "happy",
+                },
+                EnumVariant {
+                    enum_id: EnumId(
+                        1,
+                    ),
+                    variant_name: "happy",
+                },
+            ],
+            table_columns: [
                 (
                     TableId(
                         0,
@@ -2649,18 +2675,11 @@ fn multiple_schemas_are_described(api: TestApi) {
                             family: Int,
                             arity: Required,
                             native_type: Some(
-                                String("Integer"),
+                                NativeTypeInstance(..),
                             ),
                         },
-                        default: Some(
-                            DefaultValue {
-                                kind: Sequence(
-                                    "Table_0_id_0_seq",
-                                ),
-                                constraint_name: None,
-                            },
-                        ),
                         auto_increment: true,
+                        description: None,
                     },
                 ),
                 (
@@ -2674,18 +2693,11 @@ fn multiple_schemas_are_described(api: TestApi) {
                             family: Int,
                             arity: Required,
                             native_type: Some(
-                                String("Integer"),
+                                NativeTypeInstance(..),
                             ),
                         },
-                        default: Some(
-                            DefaultValue {
-                                kind: Sequence(
-                                    "Table_1_id_1_seq",
-                                ),
-                                constraint_name: None,
-                            },
-                        ),
                         auto_increment: true,
+                        description: None,
                     },
                 ),
                 (
@@ -2699,11 +2711,11 @@ fn multiple_schemas_are_described(api: TestApi) {
                             family: Int,
                             arity: Nullable,
                             native_type: Some(
-                                String("Integer"),
+                                NativeTypeInstance(..),
                             ),
                         },
-                        default: None,
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -2717,18 +2729,11 @@ fn multiple_schemas_are_described(api: TestApi) {
                             family: Int,
                             arity: Required,
                             native_type: Some(
-                                String("Integer"),
+                                NativeTypeInstance(..),
                             ),
                         },
-                        default: Some(
-                            DefaultValue {
-                                kind: Sequence(
-                                    "Table_2_id_2_seq",
-                                ),
-                                constraint_name: None,
-                            },
-                        ),
                         auto_increment: true,
+                        description: None,
                     },
                 ),
                 (
@@ -2742,18 +2747,11 @@ fn multiple_schemas_are_described(api: TestApi) {
                             family: Int,
                             arity: Required,
                             native_type: Some(
-                                String("Integer"),
+                                NativeTypeInstance(..),
                             ),
                         },
-                        default: Some(
-                            DefaultValue {
-                                kind: Sequence(
-                                    "Table_3_id_3_seq",
-                                ),
-                                constraint_name: None,
-                            },
-                        ),
                         auto_increment: true,
+                        description: None,
                     },
                 ),
                 (
@@ -2767,11 +2765,11 @@ fn multiple_schemas_are_described(api: TestApi) {
                             family: Int,
                             arity: Nullable,
                             native_type: Some(
-                                String("Integer"),
+                                NativeTypeInstance(..),
                             ),
                         },
-                        default: None,
                         auto_increment: false,
+                        description: None,
                     },
                 ),
             ],
@@ -2803,15 +2801,62 @@ fn multiple_schemas_are_described(api: TestApi) {
                     on_update_action: NoAction,
                 },
             ],
+            table_default_values: [
+                (
+                    TableColumnId(
+                        0,
+                    ),
+                    DefaultValue {
+                        kind: Sequence(
+                            "Table_0_id_0_seq",
+                        ),
+                        constraint_name: None,
+                    },
+                ),
+                (
+                    TableColumnId(
+                        1,
+                    ),
+                    DefaultValue {
+                        kind: Sequence(
+                            "Table_1_id_1_seq",
+                        ),
+                        constraint_name: None,
+                    },
+                ),
+                (
+                    TableColumnId(
+                        3,
+                    ),
+                    DefaultValue {
+                        kind: Sequence(
+                            "Table_2_id_2_seq",
+                        ),
+                        constraint_name: None,
+                    },
+                ),
+                (
+                    TableColumnId(
+                        4,
+                    ),
+                    DefaultValue {
+                        kind: Sequence(
+                            "Table_3_id_3_seq",
+                        ),
+                        constraint_name: None,
+                    },
+                ),
+            ],
+            view_default_values: [],
             foreign_key_columns: [
                 ForeignKeyColumn {
                     foreign_key_id: ForeignKeyId(
                         0,
                     ),
-                    constrained_column: ColumnId(
+                    constrained_column: TableColumnId(
                         2,
                     ),
-                    referenced_column: ColumnId(
+                    referenced_column: TableColumnId(
                         0,
                     ),
                 },
@@ -2819,10 +2864,10 @@ fn multiple_schemas_are_described(api: TestApi) {
                     foreign_key_id: ForeignKeyId(
                         1,
                     ),
-                    constrained_column: ColumnId(
+                    constrained_column: TableColumnId(
                         5,
                     ),
-                    referenced_column: ColumnId(
+                    referenced_column: TableColumnId(
                         3,
                     ),
                 },
@@ -2876,7 +2921,7 @@ fn multiple_schemas_are_described(api: TestApi) {
                     index_id: IndexId(
                         0,
                     ),
-                    column_id: ColumnId(
+                    column_id: TableColumnId(
                         0,
                     ),
                     sort_order: Some(
@@ -2888,7 +2933,7 @@ fn multiple_schemas_are_described(api: TestApi) {
                     index_id: IndexId(
                         1,
                     ),
-                    column_id: ColumnId(
+                    column_id: TableColumnId(
                         2,
                     ),
                     sort_order: Some(
@@ -2900,7 +2945,7 @@ fn multiple_schemas_are_described(api: TestApi) {
                     index_id: IndexId(
                         2,
                     ),
-                    column_id: ColumnId(
+                    column_id: TableColumnId(
                         1,
                     ),
                     sort_order: Some(
@@ -2912,7 +2957,7 @@ fn multiple_schemas_are_described(api: TestApi) {
                     index_id: IndexId(
                         3,
                     ),
-                    column_id: ColumnId(
+                    column_id: TableColumnId(
                         3,
                     ),
                     sort_order: Some(
@@ -2924,7 +2969,7 @@ fn multiple_schemas_are_described(api: TestApi) {
                     index_id: IndexId(
                         4,
                     ),
-                    column_id: ColumnId(
+                    column_id: TableColumnId(
                         5,
                     ),
                     sort_order: Some(
@@ -2936,7 +2981,7 @@ fn multiple_schemas_are_described(api: TestApi) {
                     index_id: IndexId(
                         5,
                     ),
-                    column_id: ColumnId(
+                    column_id: TableColumnId(
                         4,
                     ),
                     sort_order: Some(
@@ -2945,6 +2990,7 @@ fn multiple_schemas_are_described(api: TestApi) {
                     length: None,
                 },
             ],
+            check_constraints: [],
             views: [
                 View {
                     namespace_id: NamespaceId(
@@ -2952,8 +2998,9 @@ fn multiple_schemas_are_described(api: TestApi) {
                     ),
                     name: "View_0",
                     definition: Some(
-                        " SELECT 0;",
+                        " SELECT 0 AS \"?column?\";",
                     ),
+                    description: None,
                 },
                 View {
                     namespace_id: NamespaceId(
@@ -2961,9 +3008,48 @@ fn multiple_schemas_are_described(api: TestApi) {
                     ),
                     name: "View_1",
                     definition: Some(
-                        " SELECT 1;",
+                        " SELECT 1 AS \"?column?\";",
                     ),
+                    description: None,
                 },
+            ],
+            view_columns: [
+                (
+                    ViewId(
+                        0,
+                    ),
+                    Column {
+                        name: "?column?",
+                        tpe: ColumnType {
+                            full_data_type: "int4",
+                            family: Int,
+                            arity: Nullable,
+                            native_type: Some(
+                                NativeTypeInstance(..),
+                            ),
+                        },
+                        auto_increment: false,
+                        description: None,
+                    },
+                ),
+                (
+                    ViewId(
+                        1,
+                    ),
+                    Column {
+                        name: "?column?",
+                        tpe: ColumnType {
+                            full_data_type: "int4",
+                            family: Int,
+                            arity: Nullable,
+                            native_type: Some(
+                                NativeTypeInstance(..),
+                            ),
+                        },
+                        auto_increment: false,
+                        description: None,
+                    },
+                ),
             ],
             procedures: [
                 Procedure {
