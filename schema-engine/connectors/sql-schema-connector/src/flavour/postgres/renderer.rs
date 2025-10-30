@@ -1,3 +1,4 @@
+use crate::apply_migration::is_default_namespace_in_schema;
 use crate::sql_renderer::{
     IteratorJoin, Quoted, QuotedWithPrefix, SQL_INDENTATION, SqlRenderer, StepRenderer, format_hex, render_nullability,
     render_step,
@@ -418,27 +419,27 @@ impl SqlRenderer for PostgresRenderer {
         format!("CREATE TABLE {table_name} (\n{columns}{pk}\n)")
     }
 
-    fn render_drop_enum(&self, dropped_enum: EnumWalker<'_>) -> Vec<String> {
+    fn render_drop_enum(&self, namespace: Option<&str>, dropped_enum: EnumWalker<'_>) -> Vec<String> {
         render_step(&mut |step| {
             step.render_statement(&mut |stmt| {
                 stmt.push_display(&ddl::DropType {
-                    type_name: PostgresIdentifier::new(dropped_enum.explicit_namespace(), dropped_enum.name()),
+                    type_name: PostgresIdentifier::new(namespace, dropped_enum.name()),
                 })
             })
         })
     }
 
-    fn render_drop_foreign_key(&self, foreign_key: ForeignKeyWalker<'_>) -> String {
+    fn render_drop_foreign_key(&self, namespace: Option<&str>, foreign_key: ForeignKeyWalker<'_>) -> String {
         format!(
             "ALTER TABLE {table} DROP CONSTRAINT {constraint_name}",
-            table = PostgresIdentifier::new(foreign_key.table().explicit_namespace(), foreign_key.table().name()),
+            table = PostgresIdentifier::new(namespace, foreign_key.table().name()),
             constraint_name = Quoted::postgres_ident(foreign_key.constraint_name().unwrap()),
         )
     }
 
-    fn render_drop_index(&self, index: IndexWalker<'_>) -> String {
+    fn render_drop_index(&self, namespace: Option<&str>, index: IndexWalker<'_>) -> String {
         ddl::DropIndex {
-            index_name: PostgresIdentifier::new(index.table().explicit_namespace(), index.name()),
+            index_name: PostgresIdentifier::new(namespace, index.name()),
         }
         .to_string()
     }
@@ -454,9 +455,9 @@ impl SqlRenderer for PostgresRenderer {
         })
     }
 
-    fn render_drop_view(&self, view: ViewWalker<'_>) -> String {
+    fn render_drop_view(&self, namespace: Option<&str>, view: ViewWalker<'_>) -> String {
         ddl::DropView {
-            view_name: PostgresIdentifier::new(view.namespace(), view.name()),
+            view_name: PostgresIdentifier::new(namespace, view.name()),
         }
         .to_string()
     }
@@ -483,7 +484,11 @@ impl SqlRenderer for PostgresRenderer {
             let table = tables.previous.name();
 
             for index in tables.previous.indexes().filter(|idx| !idx.is_primary_key()) {
-                result.push(self.render_drop_index(index));
+                let rendered_ns = index
+                    .table()
+                    .namespace()
+                    .filter(|&ns| !is_default_namespace_in_schema(ns, schemas.next));
+                result.push(self.render_drop_index(rendered_ns, index));
             }
 
             if !columns.is_empty() {
@@ -527,7 +532,7 @@ impl SqlRenderer for PostgresRenderer {
         )
     }
 
-    fn render_drop_user_defined_type(&self, _: &UserDefinedTypeWalker<'_>) -> String {
+    fn render_drop_user_defined_type(&self, _namespace: Option<&str>, _: &UserDefinedTypeWalker<'_>) -> String {
         unreachable!("render_drop_user_defined_type on PostgreSQL")
     }
 

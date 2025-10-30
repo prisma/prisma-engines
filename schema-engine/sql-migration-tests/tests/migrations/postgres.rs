@@ -777,3 +777,141 @@ fn dbgenerated_on_generated_unsupported_columns_is_idempotent(api: TestApi) {
 
     api.schema_push(schema).send().assert_green().assert_no_steps();
 }
+
+#[test_connector(tags(Postgres), preview_features("views"))]
+fn default_schema_not_included_when_dropping_items(api: TestApi) {
+    let full_schema = r#"
+        generator client {
+          provider = "prisma-client"
+          previewFeatures = ["views"]
+        }
+
+        datasource db {
+          provider = "postgresql"
+          url = env("DATABASE_URL")
+        }
+
+        enum Color {
+            RED
+            GREEN
+            BLUE
+        }
+
+        model Model {
+            id Int @id
+            name String
+            related Related[]
+            @@index([id, name])
+        }
+
+
+        model Related {
+            id Int @id
+            modelId Int
+            model Model @relation(fields: [modelId], references: [id])
+        }
+
+
+        view View {
+            id Int
+        }
+    "#;
+
+    api.raw_cmd(r#"CREATE VIEW "View" AS SELECT 1 AS id"#);
+
+    api.schema_push(full_schema)
+        .send()
+        .assert_green()
+        .assert_has_executed_steps();
+    api.schema_push(full_schema).send().assert_green().assert_no_steps();
+
+    let schema_wo_index = r#"
+        generator client {
+          provider = "prisma-client"
+          previewFeatures = ["views"]
+        }
+
+        datasource db {
+          provider = "postgresql"
+          url = env("DATABASE_URL")
+        }
+
+        enum Color {
+            RED
+            GREEN
+            BLUE
+        }
+
+        model Model {
+            id Int @id
+            name String
+            related Related[]
+        }
+
+
+        model Related {
+            id Int @id
+            modelId Int
+            model Model @relation(fields: [modelId], references: [id])
+        }
+
+
+        view View {
+            id Int
+        }
+    "#;
+
+    let migration = api.connector_diff(
+        DiffTarget::Datamodel(
+            vec![("schema.prisma".to_string(), SourceFile::new_static(full_schema))],
+            &NoExtensionTypes,
+        ),
+        DiffTarget::Datamodel(
+            vec![("schema.prisma".to_string(), SourceFile::new_static(schema_wo_index))],
+            &NoExtensionTypes,
+        ),
+        None,
+    );
+
+    let expected_migration = expect![[r#"
+        -- DropIndex
+        DROP INDEX "Model_id_name_idx";
+    "#]];
+
+    expected_migration.assert_eq(&migration);
+
+    let empty_schema = r#"
+        datasource db {
+          provider = "postgresql"
+          url = env("DATABASE_URL")
+        }
+    "#;
+
+    let migration = api.connector_diff(
+        DiffTarget::Datamodel(
+            vec![("schema.prisma".to_string(), SourceFile::new_static(full_schema))],
+            &NoExtensionTypes,
+        ),
+        DiffTarget::Datamodel(
+            vec![("schema.prisma".to_string(), SourceFile::new_static(empty_schema))],
+            &NoExtensionTypes,
+        ),
+        None,
+    );
+
+    let expected_migration = expect![[r#"
+        -- DropForeignKey
+        ALTER TABLE "Related" DROP CONSTRAINT "Related_modelId_fkey";
+
+        -- DropTable
+        DROP TABLE "Model";
+
+        -- DropTable
+        DROP TABLE "Related";
+
+        -- DropEnum
+        DROP TYPE "Color";
+    "#]];
+
+    expected_migration.assert_eq(&migration);
+}

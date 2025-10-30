@@ -257,7 +257,7 @@ fn single_column_fulltext_index() {
           age  Int
           name String
 
-          @@fulltext([name], map: "name_\"text\"")
+          @@fulltext([name], map: "name_text")
         }
     "#]];
 
@@ -295,7 +295,7 @@ fn single_column_fulltext_composite_index() {
           address CatAddress
           name    String
 
-          @@fulltext([address.street], map: "address.street_\"text\"")
+          @@fulltext([address.street], map: "address.street_text")
         }
     "#]];
 
@@ -334,7 +334,7 @@ fn single_array_column_fulltext_composite_index() {
           addresses CatAddresses[]
           name      String
 
-          @@fulltext([addresses.street], map: "addresses.street_\"text\"")
+          @@fulltext([addresses.street], map: "addresses.street_text")
         }
     "#]];
 
@@ -369,7 +369,7 @@ fn multi_column_fulltext_index() {
           name  String
           title String
 
-          @@fulltext([name, title], map: "name_\"text\"_title_\"text\"")
+          @@fulltext([name, title], map: "name_text_title_text")
         }
     "#]];
 
@@ -408,7 +408,7 @@ fn multi_column_fulltext_composite_index() {
           address CatAddress
           name    String
 
-          @@fulltext([address.city, address.street], map: "address.street_\"text\"_address.city_\"text\"")
+          @@fulltext([address.city, address.street], map: "address.street_text_address.city_text")
         }
     "#]];
 
@@ -443,7 +443,7 @@ fn multi_column_fulltext_index_with_desc_in_end() {
           name  String
           title String
 
-          @@fulltext([name, title, age(sort: Desc)], map: "name_\"text\"_title_\"text\"_age_-1")
+          @@fulltext([name, title, age(sort: Desc)], map: "name_text_title_text_age_-1")
         }
     "#]];
 
@@ -482,7 +482,7 @@ fn multi_column_fulltext_composite_index_with_desc_in_end() {
           address CatAddress
           name    String
 
-          @@fulltext([address.street, name, address.number(sort: Desc)], map: "name_\"text\"_address.street_\"text\"_address.number_-1")
+          @@fulltext([address.street, name, address.number(sort: Desc)], map: "name_text_address.street_text_address.number_-1")
         }
     "#]];
 
@@ -517,7 +517,7 @@ fn multi_column_fulltext_index_with_desc_in_beginning() {
           name  String
           title String
 
-          @@fulltext([age(sort: Desc), name, title], map: "age_-1_name_\"text\"_title_\"text\"")
+          @@fulltext([age(sort: Desc), name, title], map: "age_-1_name_text_title_text")
         }
     "#]];
 
@@ -556,7 +556,7 @@ fn multi_column_fulltext_composite_index_with_desc_in_beginning() {
           address CatAddress
           name    String
 
-          @@fulltext([address.number(sort: Desc), address.street, name], map: "address.number_-1_address.street_\"text\"_name_\"text\"")
+          @@fulltext([address.number(sort: Desc), address.street, name], map: "address.number_-1_address.street_text_name_text")
         }
     "#]];
 
@@ -591,7 +591,7 @@ fn multi_column_fulltext_index_with_asc_in_end() {
           name  String
           title String
 
-          @@fulltext([name, title, age(sort: Asc)], map: "name_\"text\"_title_\"text\"_age_1")
+          @@fulltext([name, title, age(sort: Asc)], map: "name_text_title_text_age_1")
         }
     "#]];
 
@@ -626,7 +626,7 @@ fn multi_column_fulltext_index_with_asc_in_beginning() {
           name  String
           title String
 
-          @@fulltext([age(sort: Asc), name, title], map: "age_1_name_\"text\"_title_\"text\"")
+          @@fulltext([age(sort: Asc), name, title], map: "age_1_name_text_title_text")
         }
     "#]];
 
@@ -702,7 +702,7 @@ fn fultext_index() {
           age  Int
           name String
 
-          @@fulltext([name], map: "name_\"text\"")
+          @@fulltext([name], map: "name_text")
         }
     "#]];
 
@@ -742,7 +742,7 @@ fn fultext_composite_index() {
           address CatAddress
           name    String
 
-          @@fulltext([address.street], map: "address.street_\"text\"")
+          @@fulltext([address.street], map: "address.street_text")
         }
     "#]];
 
