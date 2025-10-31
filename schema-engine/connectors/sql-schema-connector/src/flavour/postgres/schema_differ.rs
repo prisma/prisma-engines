@@ -134,20 +134,44 @@ impl SqlSchemaDifferFlavour for PostgresSchemaDifferFlavour {
                         .as_ref()
                         .and_then(|d| d.as_sequence())
                         .and_then(|sequence_name| ext.get_sequence(sequence_name))
+                        .map(|(seq_idx, seq)| (seq_idx, seq, col))
                 })
                 .transpose()
             });
 
         for pair in sequence_pairs {
-            let prev = pair.previous.1;
-            let next = pair.next.1;
+            let (_prev_idx, prev, _prev_col) = pair.previous;
+            let (_next_idx, next, next_col) = pair.next;
             let mut changes: BitFlags<SequenceChange> = BitFlags::default();
 
             if prev.min_value != next.min_value {
                 changes |= SequenceChange::MinValue;
             }
 
-            if prev.max_value != next.max_value {
+            // CockroachDB 24.3+ reports type-specific max values (INT4::MAX = 2147483647)
+            // Normalize both sides: if either reports the column type's default max, treat it as i64::MAX
+            let (prev_max, next_max) = if self.is_cockroachdb() {
+                let type_default_max = match next_col.column_type_family() {
+                    sql_schema_describer::ColumnTypeFamily::Int => i32::MAX as i64,
+                    sql_schema_describer::ColumnTypeFamily::BigInt => i64::MAX,
+                    _ => i64::MAX,
+                };
+                let normalized_prev = if prev.max_value == type_default_max {
+                    i64::MAX
+                } else {
+                    prev.max_value
+                };
+                let normalized_next = if next.max_value == type_default_max {
+                    i64::MAX
+                } else {
+                    next.max_value
+                };
+                (normalized_prev, normalized_next)
+            } else {
+                (prev.max_value, next.max_value)
+            };
+
+            if prev_max != next_max {
                 changes |= SequenceChange::MaxValue;
             }
 
@@ -165,7 +189,7 @@ impl SqlSchemaDifferFlavour for PostgresSchemaDifferFlavour {
 
             if !changes.is_empty() {
                 steps.push(SqlMigrationStep::AlterSequence(
-                    pair.map(|p| p.0 as u32),
+                    pair.map(|(idx, _, _)| idx as u32),
                     SequenceChanges(changes),
                 ));
             }
