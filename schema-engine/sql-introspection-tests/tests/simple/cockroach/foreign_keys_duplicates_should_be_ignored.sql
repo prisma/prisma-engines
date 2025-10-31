@@ -17,6 +17,7 @@ ALTER TABLE "Post"
         REFERENCES "User"(id);
 
 
+
 /*
 generator js {
   provider = "prisma-client"
@@ -28,13 +29,13 @@ datasource db {
 }
 
 model Post {
-  id      Int   @id @default(sequence(maxValue: 2147483647))
+  id      Int   @id @default(sequence())
   user_id Int?
   User    User? @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
 
 model User {
-  id   Int    @id @default(sequence(maxValue: 2147483647))
+  id   Int    @id @default(sequence())
   Post Post[]
 }
 */

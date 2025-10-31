@@ -98,7 +98,7 @@ async fn identity_introspects_to_sequence_with_default_settings_v_24_3(api: Test
 
     let expected = expect![[r#"
         model myTable {
-          id   Int    @id @default(sequence(maxValue: 2147483647))
+          id   Int    @id @default(sequence())
           name String
         }
     "#]];
