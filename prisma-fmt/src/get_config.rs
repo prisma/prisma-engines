@@ -1,6 +1,5 @@
-use psl::{Diagnostics, diagnostics::DatamodelError, error_tolerant_parse_configuration, parser_database::Files};
+use psl::{diagnostics::DatamodelError, error_tolerant_parse_configuration, parser_database::Files};
 use serde::{Deserialize, Serialize};
-use std::collections::HashMap;
 
 use crate::schema_file_input::SchemaFileInput;
 
@@ -8,12 +7,6 @@ use crate::schema_file_input::SchemaFileInput;
 #[serde(rename_all = "camelCase")]
 struct GetConfigParams {
     prisma_schema: SchemaFileInput,
-    #[serde(default)]
-    ignore_env_var_errors: bool,
-    #[serde(default)]
-    env: HashMap<String, String>,
-    #[serde(default)]
-    datasource_overrides: HashMap<String, String>,
 }
 
 #[derive(Serialize)]
@@ -38,37 +31,24 @@ pub(crate) fn get_config(params: &str) -> String {
 
     let schema: Vec<_> = params.prisma_schema.into();
 
-    let (files, mut configuration, diagnostics) = error_tolerant_parse_configuration(&schema);
-
-    let override_diagnostics = if params.ignore_env_var_errors {
-        Diagnostics::default()
-    } else {
-        let overrides: Vec<(_, _)> = params.datasource_overrides.into_iter().collect();
-        let override_result =
-            configuration.resolve_datasource_urls_prisma_fmt(&overrides, |key| params.env.get(key).map(String::from));
-
-        match override_result {
-            Err(diagnostics) => diagnostics,
-            _ => Diagnostics::default(),
-        }
-    };
+    let (files, configuration, diagnostics) = error_tolerant_parse_configuration(&schema);
 
     let config = psl::get_config(&configuration, &files);
-    let all_errors = diagnostics.errors().iter().chain(override_diagnostics.errors().iter());
 
     let result = GetConfigResult {
         config,
-        errors: serialize_errors(all_errors, &files),
+        errors: serialize_errors(diagnostics.errors(), &files),
     };
 
     serde_json::to_string(&result).unwrap()
 }
 
 fn serialize_errors<'a>(
-    errors: impl Iterator<Item = &'a DatamodelError>,
+    errors: impl IntoIterator<Item = &'a DatamodelError>,
     files: &'a Files,
 ) -> Vec<ValidationError<'a>> {
     errors
+        .into_iter()
         .map(move |error| {
             let file_id = error.span().file_id;
             let (file_name, source, _) = &files[file_id];
@@ -230,11 +210,11 @@ mod tests {
     }
 
     #[test]
-    fn get_config_missing_env_var() {
+    fn get_config_env_var() {
         let schema = r#"
             datasource thedb {
                 provider = "postgresql"
-                url = env("NON_EXISTING_ENV_VAR_WE_COUNT_ON_IT_AT_LEAST")
+                url = env("IGNORED")
             }
         "#;
 
@@ -242,49 +222,7 @@ mod tests {
             "prismaSchema": schema,
         });
         let expected = expect![[
-            r#"{"config":{"generators":[],"datasources":[{"name":"thedb","provider":"postgresql","activeProvider":"postgresql","url":{"fromEnvVar":"NON_EXISTING_ENV_VAR_WE_COUNT_ON_IT_AT_LEAST","value":null},"schemas":[],"sourceFilePath":"schema.prisma"}],"warnings":[]},"errors":[{"file_name":"schema.prisma","message":"\u001b[1;91merror\u001b[0m: \u001b[1mEnvironment variable not found: NON_EXISTING_ENV_VAR_WE_COUNT_ON_IT_AT_LEAST.\u001b[0m\n  \u001b[1;94m-->\u001b[0m  \u001b[4mschema.prisma:4\u001b[0m\n\u001b[1;94m   | \u001b[0m\n\u001b[1;94m 3 | \u001b[0m                provider = \"postgresql\"\n\u001b[1;94m 4 | \u001b[0m                url = \u001b[1;91menv(\"NON_EXISTING_ENV_VAR_WE_COUNT_ON_IT_AT_LEAST\")\u001b[0m\n\u001b[1;94m   | \u001b[0m\n"}]}"#
-        ]];
-        let response = get_config(&request.to_string());
-        expected.assert_eq(&response);
-    }
-
-    #[test]
-    fn get_config_missing_env_var_with_ignore_env_var_error() {
-        let schema = r#"
-            datasource thedb {
-                provider = "postgresql"
-                url = env("NON_EXISTING_ENV_VAR_WE_COUNT_ON_IT_AT_LEAST")
-            }
-        "#;
-
-        let request = json!({
-            "prismaSchema": schema,
-            "ignoreEnvVarErrors": true,
-        });
-        let expected = expect![[
-            r#"{"config":{"generators":[],"datasources":[{"name":"thedb","provider":"postgresql","activeProvider":"postgresql","url":{"fromEnvVar":"NON_EXISTING_ENV_VAR_WE_COUNT_ON_IT_AT_LEAST","value":null},"schemas":[],"sourceFilePath":"schema.prisma"}],"warnings":[]},"errors":[]}"#
-        ]];
-        let response = get_config(&request.to_string());
-        expected.assert_eq(&response);
-    }
-
-    #[test]
-    fn get_config_with_env_vars() {
-        let schema = r#"
-            datasource thedb {
-                provider = "postgresql"
-                url = env("DBURL")
-            }
-        "#;
-
-        let request = json!({
-            "prismaSchema": schema,
-            "env": {
-                "DBURL": "postgresql://example.com/mydb"
-            }
-        });
-        let expected = expect![[
-            r#"{"config":{"generators":[],"datasources":[{"name":"thedb","provider":"postgresql","activeProvider":"postgresql","url":{"fromEnvVar":"DBURL","value":"postgresql://example.com/mydb"},"schemas":[],"sourceFilePath":"schema.prisma"}],"warnings":[]},"errors":[]}"#
+            r#"{"config":{"generators":[],"datasources":[{"name":"thedb","provider":"postgresql","activeProvider":"postgresql","url":{"fromEnvVar":"IGNORED","value":null},"schemas":[],"sourceFilePath":"schema.prisma"}],"warnings":[]},"errors":[]}"#
         ]];
         let response = get_config(&request.to_string());
         expected.assert_eq(&response);
@@ -307,7 +245,7 @@ mod tests {
             }
         });
         let expected = expect![[
-            r#"{"config":{"generators":[],"datasources":[{"name":"thedb","provider":"postgresql","activeProvider":"postgresql","url":{"fromEnvVar":"DBURL","value":"postgresql://example.com/mydb"},"schemas":[],"sourceFilePath":"schema.prisma"}],"warnings":[]},"errors":[{"file_name":"schema.prisma","message":"\u001b[1;91merror\u001b[0m: \u001b[1mThe datasource property `directUrl` is no longer supported in schema files. Move connection URLs to `prisma.config.ts`. See https://pris.ly/d/config-datasource\u001b[0m\n  \u001b[1;94m-->\u001b[0m  \u001b[4mschema.prisma:5\u001b[0m\n\u001b[1;94m   | \u001b[0m\n\u001b[1;94m 4 | \u001b[0m                url = env(\"DBURL\")\n\u001b[1;94m 5 | \u001b[0m                \u001b[1;91mdirectUrl = \"postgresql://example.com/direct\"\u001b[0m\n\u001b[1;94m   | \u001b[0m\n"}]}"#
+            r#"{"config":{"generators":[],"datasources":[{"name":"thedb","provider":"postgresql","activeProvider":"postgresql","url":{"fromEnvVar":"DBURL","value":null},"schemas":[],"sourceFilePath":"schema.prisma"}],"warnings":[]},"errors":[{"file_name":"schema.prisma","message":"\u001b[1;91merror\u001b[0m: \u001b[1mThe datasource property `directUrl` is no longer supported in schema files. Move connection URLs to `prisma.config.ts`. See https://pris.ly/d/config-datasource\u001b[0m\n  \u001b[1;94m-->\u001b[0m  \u001b[4mschema.prisma:5\u001b[0m\n\u001b[1;94m   | \u001b[0m\n\u001b[1;94m 4 | \u001b[0m                url = env(\"DBURL\")\n\u001b[1;94m 5 | \u001b[0m                \u001b[1;91mdirectUrl = \"postgresql://example.com/direct\"\u001b[0m\n\u001b[1;94m   | \u001b[0m\n"}]}"#
         ]];
         let response = get_config(&request.to_string());
         expected.assert_eq(&response);
