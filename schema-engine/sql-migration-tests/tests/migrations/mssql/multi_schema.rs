@@ -1179,7 +1179,6 @@ fn migration_with_shadow_database(api: TestApi) {
         datasource db {{
           provider          = "sqlserver"
           url               = "{conn_str}"
-          shadowDatabaseUrl = "{shadow_str}"
           schemas           = ["one", "two"]
         }}
 
@@ -1187,6 +1186,8 @@ fn migration_with_shadow_database(api: TestApi) {
           provider        = "prisma-client-javascript"
         }}
     "#};
+
+    let mut engine = api.new_engine_with_connection_strings(conn_str.clone(), Some(shadow_str.clone()));
 
     let namespaces = Namespaces::from_vec(&mut vec![String::from("dbo"), String::from("one"), String::from("two")]);
 
@@ -1218,7 +1219,8 @@ fn migration_with_shadow_database(api: TestApi) {
 
     let dir = api.create_migrations_directory();
 
-    api.create_migration("init", &dm, &dir)
+    engine
+        .create_migration("init", &dm, &dir)
         .send_sync()
         .assert_migration_directories_count(1)
         .assert_migration("init", move |migration| {
@@ -1270,7 +1272,8 @@ fn migration_with_shadow_database(api: TestApi) {
             migration.expect_contents(expected_script)
         });
 
-    api.apply_migrations(&dir)
+    engine
+        .apply_migrations(&dir)
         .send_sync()
         .assert_applied_migrations(&["init"]);
 }

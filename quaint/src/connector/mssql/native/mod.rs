@@ -10,7 +10,7 @@ use crate::connector::{DescribedQuery, IsolationLevel, Transaction, TransactionO
 
 use crate::{
     ast::{Query, Value},
-    connector::{ColumnType as QuaintColumnType, DefaultTransaction, ResultSet, metrics, queryable::*},
+    connector::{ColumnType as QuaintColumnType, DefaultTransaction, ResultSet, queryable::*, trace},
     visitor::{self, Visitor},
 };
 use async_trait::async_trait;
@@ -131,7 +131,7 @@ impl Queryable for Mssql {
     }
 
     async fn query_raw(&self, sql: &str, params: &[Value<'_>]) -> crate::Result<ResultSet> {
-        metrics::query("mssql.query_raw", DB_SYSTEM_NAME, sql, params, move || async move {
+        trace::query(DB_SYSTEM_NAME, sql, params, move || async move {
             let mut client = self.client.lock().await;
 
             let mut query = tiberius::Query::new(sql);
@@ -194,7 +194,7 @@ impl Queryable for Mssql {
     }
 
     async fn execute_raw(&self, sql: &str, params: &[Value<'_>]) -> crate::Result<u64> {
-        metrics::query("mssql.execute_raw", DB_SYSTEM_NAME, sql, params, move || async move {
+        trace::query(DB_SYSTEM_NAME, sql, params, move || async move {
             let mut query = tiberius::Query::new(sql);
 
             for param in params {
@@ -214,7 +214,7 @@ impl Queryable for Mssql {
     }
 
     async fn raw_cmd(&self, cmd: &str) -> crate::Result<()> {
-        metrics::query("mssql.raw_cmd", DB_SYSTEM_NAME, cmd, &[], move || async move {
+        trace::query(DB_SYSTEM_NAME, cmd, &[], move || async move {
             let mut client = self.client.lock().await;
             self.perform_io(client.simple_query(cmd)).await?.into_results().await?;
             Ok(())

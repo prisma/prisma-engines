@@ -116,8 +116,12 @@
           "type": "User",
           "nativeType": null,
           "relationName": "ProfileToUser",
-          "relationFromFields": ["userId"],
-          "relationToFields": ["id"],
+          "relationFromFields": [
+            "userId"
+          ],
+          "relationToFields": [
+            "id"
+          ],
           "isGenerated": false,
           "isUpdatedAt": false
         },

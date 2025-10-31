@@ -1,6 +1,5 @@
 mod batch;
 mod json;
-pub mod metrics;
 mod querying;
 mod raw;
 mod string;

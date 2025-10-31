@@ -477,21 +477,5 @@ services:
       - 14269:14269
       - 9411:9411
 
-  prometheus:
-    image: prom/prometheus
-    restart: unless-stopped
-    volumes:
-      - ${PWD}/metrics/prometheus:/prometheus-data
-    command: --config.file=/prometheus-data/prometheus.yml
-    ports:
-      - 9090:9090
-  grafana:
-    image: grafana/grafana
-    volumes:
-      - ${PWD}/metrics/grafana/datasources:/etc/grafana/provisioning/datasources/
-      - ${PWD}/metrics/grafana/dashboards:/etc/grafana/provisioning/dashboards/
-    ports:
-      - 3000:3000
-
 networks:
   databases: null

@@ -14,11 +14,11 @@ mod connection_info;
 
 mod describe;
 pub mod external;
-pub mod metrics;
 mod queryable;
 mod result_set;
 #[cfg(any(feature = "mssql-native", feature = "postgresql-native", feature = "mysql-native"))]
 mod timeout;
+pub mod trace;
 mod transaction;
 #[cfg(not(target_arch = "wasm32"))]
 mod type_identifier;
@@ -36,7 +36,7 @@ pub use transaction::*;
 #[allow(unused_imports)]
 pub(crate) use type_identifier::*;
 
-pub use self::metrics::query;
+pub use self::trace::query;
 
 #[cfg(feature = "postgresql")]
 pub(crate) mod postgres;

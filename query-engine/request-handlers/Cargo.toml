@@ -71,7 +71,6 @@ all = [
     "mssql-native",
     "graphql-protocol",
     "psl/all",
-    "query-core/metrics",
 ]
 graphql-protocol = ["query-core/graphql-protocol", "dep:graphql-parser"]
 

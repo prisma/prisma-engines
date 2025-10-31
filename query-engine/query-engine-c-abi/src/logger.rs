@@ -27,7 +27,7 @@ impl Logger {
     /// Creates a new logger using a call layer
     pub fn new(log_queries: bool, log_level: LevelFilter, log_callback: LogCallback, enable_tracing: bool) -> Self {
         let is_sql_query = filter_fn(|meta| {
-            meta.target() == "quaint::connector::metrics" && meta.fields().iter().any(|f| f.name() == "query")
+            meta.target() == "quaint::connector::trace" && meta.fields().iter().any(|f| f.name() == "query")
         });
 
         // is a mongodb query?

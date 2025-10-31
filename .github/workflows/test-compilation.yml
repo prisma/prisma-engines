@@ -2,9 +2,9 @@ name: 'All crates'
 on:
   pull_request:
     paths-ignore:
+      - '.github/**'
       - '!.github/workflows/test-compilation.yml'
       - '!.github/workflows/test-compilation-template.yml'
-      - '.github/**'
       - '*.md'
       - 'LICENSE'
       - 'CODEOWNERS'

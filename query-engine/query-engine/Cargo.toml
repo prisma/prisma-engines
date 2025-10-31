@@ -18,7 +18,7 @@ enumflags2.workspace = true
 psl = { workspace = true, features = ["all"] }
 graphql-parser.workspace = true
 mongodb-connector = { path = "../connectors/mongodb-query-connector", optional = true, package = "mongodb-query-connector" }
-query-core = { workspace = true, features = ["metrics"] }
+query-core.workspace = true
 request-handlers = { workspace = true, features = ["all"] }
 serde.workspace = true
 serde_json.workspace = true
@@ -29,7 +29,6 @@ url.workspace = true
 hyper = { workspace = true, features = ["server", "http1", "http2", "runtime"] }
 tracing.workspace = true
 tracing-subscriber = { workspace = true, features = ["json", "env-filter"] }
-prisma-metrics.workspace = true
 panic-utils.workspace = true
 
 user-facing-errors.workspace = true

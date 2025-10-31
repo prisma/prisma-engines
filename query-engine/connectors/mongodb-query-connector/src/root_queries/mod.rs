@@ -13,9 +13,7 @@ use crate::{
 use bson::Bson;
 use bson::Document;
 use futures::Future;
-use prisma_metrics::{
-    PRISMA_DATASOURCE_QUERIES_DURATION_HISTOGRAM_MS, PRISMA_DATASOURCE_QUERIES_TOTAL, counter, histogram,
-};
+
 use query_structure::*;
 use std::sync::Arc;
 use std::time::Instant;
@@ -50,7 +48,7 @@ fn pick_singular_id(model: &Model) -> ScalarFieldRef {
         .unwrap()
 }
 
-/// Logs the query and updates metrics for an operation performed by a passed function.
+/// Logs the query and its duration for an operation performed by a passed function.
 ///
 /// NOTE:
 /// 1. `dyn QueryString` is used instead of a `String` to skip expensive query serialization when
@@ -83,9 +81,6 @@ where
     let start = Instant::now();
     let res = f().instrument(span).await;
     let elapsed = start.elapsed().as_millis() as f64;
-
-    histogram!(PRISMA_DATASOURCE_QUERIES_DURATION_HISTOGRAM_MS).record(elapsed);
-    counter!(PRISMA_DATASOURCE_QUERIES_TOTAL).increment(1);
 
     // TODO prisma/team-orm#136: fix log subscription.
     // NOTE: `params` is a part of the interface for query logs.

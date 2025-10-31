@@ -1,4 +1,4 @@
-import { PrismaBetterSQLite3 } from '@prisma/adapter-better-sqlite3'
+import { PrismaBetterSqlite3 } from '@prisma/adapter-better-sqlite3'
 import type {
   SqlDriverAdapter,
   SqlMigrationAwareDriverAdapterFactory,
@@ -20,7 +20,7 @@ export class BetterSQLite3Manager implements DriverAdaptersManager {
     private env: EnvForAdapter<TAG>,
     { url }: SetupDriverAdaptersInput,
   ) {
-    this.#factory = new PrismaBetterSQLite3({
+    this.#factory = new PrismaBetterSqlite3({
       url,
     })
   }

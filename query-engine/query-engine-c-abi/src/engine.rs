@@ -273,7 +273,6 @@ impl QueryEngine {
                 native: ConnectedEngineNative {
                     config_dir: builder.native.config_dir.clone(),
                     env: builder.native.env.clone(),
-                    metrics: None,
                 },
             }) as Result<ConnectedEngine>
         }

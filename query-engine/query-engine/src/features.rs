@@ -6,10 +6,8 @@ use crate::opt::PrismaOpt;
 #[derive(Clone, Copy, Debug)]
 #[repr(u8)]
 pub enum Feature {
-    DataProxyMetricOverride,
     DebugMode,
     LogQueries,
-    Metrics,
     OpenTelemetry,
     Playground,
     RawQueries,
@@ -23,17 +21,11 @@ impl From<&PrismaOpt> for EnabledFeatures {
     fn from(opts: &PrismaOpt) -> Self {
         let mut features: EnabledFeatures = Self::default();
 
-        if opts.dataproxy_metric_override {
-            features |= Feature::DataProxyMetricOverride
-        }
         if opts.enable_debug_mode {
             features |= Feature::DebugMode
         }
         if opts.log_queries {
             features |= Feature::LogQueries
-        }
-        if opts.enable_metrics {
-            features |= Feature::Metrics
         }
         if opts.enable_open_telemetry {
             features |= Feature::OpenTelemetry

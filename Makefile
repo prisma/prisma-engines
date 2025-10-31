@@ -145,7 +145,7 @@ test-qe-st:
 test-qe-verbose-st:
 	cargo test --package query-engine-tests -- --nocapture --test-threads 1
 
-# Black-box tests, exercising the query engine HTTP apis (metrics, tracing, etc)
+# Black-box tests, exercising the query engine HTTP apis
 test-qe-black-box: build-qe
 	cargo test --package black-box-tests -- --test-threads 1
 
@@ -552,19 +552,16 @@ ensure-prisma-present:
 	fi;
 
 qe:
-	cargo run --bin query-engine -- --engine-protocol json --enable-raw-queries --enable-metrics --enable-open-telemetry --enable-telemetry-in-response
+	cargo run --bin query-engine -- --engine-protocol json --enable-raw-queries --enable-open-telemetry --enable-telemetry-in-response
 
 qe-graphql:
-	cargo run --bin query-engine -- --engine-protocol graphql --enable-playground --enable-raw-queries --enable-metrics --enable-open-telemetry --enable-telemetry-in-response
+	cargo run --bin query-engine -- --engine-protocol graphql --enable-playground --enable-raw-queries --enable-open-telemetry --enable-telemetry-in-response
 
 qe-dmmf:
 	cargo run --bin query-engine -- cli dmmf > dmmf.json
 
 qe-dev-mongo_4_4: start-mongodb_4_4
 	cp $(SCHEMA_EXAMPLES_PATH)/generic_mongo4.prisma $(DEV_SCHEMA_FILE)
-
-show-metrics:
-	docker compose -f docker-compose.yml up --wait -d --remove-orphans grafana prometheus
 
 ## OpenTelemetry
 otel:

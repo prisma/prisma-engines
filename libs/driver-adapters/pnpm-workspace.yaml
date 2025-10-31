@@ -9,6 +9,7 @@ packages:
   - '../../../prisma/packages/adapter-mariadb'
   - '../../../prisma/packages/bundled-js-drivers'
   - '../../../prisma/packages/client-engine-runtime'
+  - '../../../prisma/packages/client-runtime-utils'
   - '../../../prisma/packages/debug'
   - '../../../prisma/packages/driver-adapter-utils'
   - './executor'

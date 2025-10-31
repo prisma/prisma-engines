@@ -1,14 +1,12 @@
 use std::future::Future;
 
 use crosstarget_utils::time::ElapsedTimeCounter;
-use prisma_metrics::{counter, histogram};
 use telemetry::formatting::QueryForTracing;
 use tracing::{Instrument, info_span};
 
 use crate::ast::{Params, Value};
 
 pub async fn query<'a, F, T, U>(
-    tag: &'static str,
     db_system_name: &'static str,
     query: &'a str,
     params: &'a [Value<'_>],
@@ -26,10 +24,10 @@ where
         "otel.name" = "prisma:engine:db_query",
         user_facing = true,
     );
-    do_query(tag, query, params, f).instrument(span).await
+    do_query(query, params, f).instrument(span).await
 }
 
-async fn do_query<'a, F, T, U>(tag: &'static str, query: &'a str, params: &'a [Value<'_>], f: F) -> crate::Result<T>
+async fn do_query<'a, F, T, U>(query: &'a str, params: &'a [Value<'_>], f: F) -> crate::Result<T>
 where
     F: FnOnce() -> U + 'a,
     U: Future<Output = crate::Result<T>>,
@@ -62,10 +60,6 @@ where
         trace_query(query, params, result, &start);
     }
 
-    histogram!(format!("{tag}.query.time")).record(start.elapsed_time());
-    histogram!("prisma_datasource_queries_duration_histogram_ms").record(start.elapsed_time());
-    counter!("prisma_datasource_queries_total").increment(1);
-
     res
 }
 
@@ -88,8 +82,6 @@ where
         is_query = true,
         result,
     );
-
-    histogram!("pool.check_out").record(start.elapsed_time());
 
     res
 }

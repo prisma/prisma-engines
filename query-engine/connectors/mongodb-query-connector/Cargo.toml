@@ -20,7 +20,6 @@ tracing.workspace = true
 tracing-futures.workspace = true
 uuid.workspace = true
 indexmap.workspace = true
-prisma-metrics.workspace = true
 derive_more.workspace = true
 
 [dependencies.query-structure]

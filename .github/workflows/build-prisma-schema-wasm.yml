@@ -5,9 +5,9 @@ on:
       - main
   pull_request:
     paths-ignore:
+      - '.github/**'
       - '!.github/workflows/build-prisma-schema-wasm.yml'
       - '!.github/workflows/include/rust-wasm-setup/action.yml'
-      - '.github/**'
       - '*.md'
       - 'LICENSE'
       - 'CODEOWNERS'

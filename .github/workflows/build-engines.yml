@@ -10,8 +10,8 @@ on:
       - '*.*.x'
       - 'integration/*'
     paths-ignore:
-      - '!.github/workflows/build-engines*'
       - '.github/**'
+      - '!.github/workflows/build-engines*'
       - '*.md'
       - 'LICENSE'
       - 'CODEOWNERS'

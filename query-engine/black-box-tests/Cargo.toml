@@ -14,5 +14,4 @@ tokio.workspace = true
 user-facing-errors.workspace = true
 insta.workspace = true
 enumflags2.workspace = true
-prisma-metrics.workspace = true
 regex.workspace = true

@@ -31,7 +31,6 @@ export type QueryEngineInstance = {
     traceHeaders: string,
     requestId: string,
   ): Promise<string>
-  metrics(options: string): Promise<string>
 }
 
 export interface QueryEngineConstructor {

@@ -2,7 +2,6 @@ use std::collections::HashMap;
 
 use connector_interface::{ConnectionLike, ReadOperations, Transaction, UpdateType, WriteOperations};
 use mongodb::options::{Acknowledgment, ReadConcern, TransactionOptions, WriteConcern};
-use prisma_metrics::{PRISMA_CLIENT_QUERIES_ACTIVE, guards::GaugeGuard};
 use query_structure::{RelationLoadStrategy, SelectionResult};
 use telemetry::TraceParent;
 
@@ -14,7 +13,6 @@ use crate::{
 
 pub struct MongoDbTransaction<'conn> {
     connection: &'conn mut MongoDbConnection,
-    gauge: GaugeGuard,
 }
 
 impl ConnectionLike for MongoDbTransaction<'_> {}
@@ -35,18 +33,13 @@ impl<'conn> MongoDbTransaction<'conn> {
             .await
             .map_err(|err| MongoError::from(err).into_connector_error())?;
 
-        Ok(Self {
-            connection,
-            gauge: GaugeGuard::increment(PRISMA_CLIENT_QUERIES_ACTIVE),
-        })
+        Ok(Self { connection })
     }
 }
 
 #[async_trait]
 impl Transaction for MongoDbTransaction<'_> {
     async fn commit(&mut self) -> connector_interface::Result<()> {
-        self.gauge.decrement();
-
         utils::commit_with_retry(&mut self.connection.session)
             .await
             .map_err(|err| MongoError::from(err).into_connector_error())?;
@@ -55,8 +48,6 @@ impl Transaction for MongoDbTransaction<'_> {
     }
 
     async fn rollback(&mut self) -> connector_interface::Result<()> {
-        self.gauge.decrement();
-
         self.connection
             .session
             .abort_transaction()

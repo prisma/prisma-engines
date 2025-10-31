@@ -137,7 +137,6 @@ impl CliCommand {
             request.schema,
             request.engine_protocol,
             features,
-            None,
             Logger::default().install().unwrap(),
             RequestId::next(),
         )

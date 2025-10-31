@@ -256,7 +256,7 @@ fn nice_error_for_unknown_generator_preview_feature() {
         .unwrap_err();
 
     let expectation = expect![[r#"
-        [1;91merror[0m: [1mThe preview feature "foo" is not known. Expected one of: metrics, nativeDistinct, postgresqlExtensions, relationJoins, schemaEngineDriverAdapters, shardKeys, strictUndefinedChecks, views[0m
+        [1;91merror[0m: [1mThe preview feature "foo" is not known. Expected one of: nativeDistinct, postgresqlExtensions, relationJoins, schemaEngineDriverAdapters, shardKeys, strictUndefinedChecks, views[0m
           [1;94m-->[0m  [4mschema.prisma:3[0m
         [1;94m   | [0m
         [1;94m 2 | [0m  provider = "prisma-client"
