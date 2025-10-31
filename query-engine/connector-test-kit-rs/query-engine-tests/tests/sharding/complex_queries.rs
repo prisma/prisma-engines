@@ -1,6 +1,6 @@
 use query_engine_tests::*;
 
-#[test_suite(only(MySql), exclude(MySql("5.6")))]
+#[test_suite(only(MySql))]
 mod shard_complex {
     use indoc::indoc;
 

@@ -45,14 +45,14 @@ export WORKSPACE_ROOT=/path/to/engines/repository/root
 Test run env vars:
 ```shell
 export TEST_CONNECTOR="postgres" # One of the supported providers.
-export TEST_CONNECTOR_VERSION="10" # One of the supported versions.
+export TEST_CONNECTOR_VERSION="16" # One of the supported versions.
 ```
 
 As previously stated, the above can be omitted in favor of the `.test_config` config file:
 ```json
 {
     "connector": "postgres",
-    "version": "10"
+    "version": "16"
 }
 ```
 
@@ -210,15 +210,15 @@ Note that the schema handlers can be located anywhere, the only important bit is
 Mutually exclusive properties that constrain tests to run only for a set of connectors. By default (when none of the two are given), _all_ possible connectors are run for a test. `only` sets a whitelist of connectors to run, `exclude` sets a blacklist. The values used in both are identical in form: `Connector` or `Connector(Version, Version, ...)`. If no version is given, the entire connector family (all versions) is included or excluded.
 
 Connectors are at the time of writing:
-- `Postgres`: 9.6, 10, 11, 12, 13, 14, 15
-- `MySql`: 5.6, 5.7, 8, mariadb
+- `Postgres`: 12, 13, 14, 15, 16
+- `MySql`: 5.7, 8, mariadb
 - `SqlServer`: 2017, 2019, 2022
 - `Sqlite`: No versions
 - `MongoDb`: 4
 
 Connector tags can be written all lowercase, uppercase, camel, doesn't matter. Versions can be written as literal, string, float, int. A few examples:
 
-`only(Postgres, MySql(5.7, "5.6"))`: All Postgres versions + MySql 5.6 and 5.7
+`only(Postgres, MySql(5.7))`: All Postgres versions + MySql 5.7
 `exclude(SqlServer)`: All connectors except all versions of SqlServer.
 `only(SQLSERVER)`: All versions of SQL Server, nothing else.
 

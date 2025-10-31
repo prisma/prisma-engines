@@ -18,17 +18,13 @@ mod insert_null {
     }
 
     // "Updating a required value to null" should "throw a proper error"
-    #[connector_test(schema(schema_1), exclude(MySql(5.6)))]
+    #[connector_test(schema(schema_1))]
     async fn update_required_val_to_null(runner: Runner) -> TestResult<()> {
         create_row(&runner, r#"{ id: 1, b: "abc" key: "abc" }"#).await?;
 
-        if !matches!(
-            runner.connector_version(),
-            ConnectorVersion::MySql(Some(MySqlVersion::V5_6))
-        ) {
-            assert_error!(
-                runner,
-                r#"mutation {
+        assert_error!(
+            runner,
+            r#"mutation {
                 updateOneA(
                   where: { b: "abc" }
                   data: {
@@ -37,10 +33,9 @@ mod insert_null {
                   id
                 }
               }"#,
-                2009,
-                "A value is required but not set"
-            );
-        }
+            2009,
+            "A value is required but not set"
+        );
 
         Ok(())
     }

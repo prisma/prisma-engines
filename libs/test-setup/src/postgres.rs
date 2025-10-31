@@ -14,12 +14,12 @@ pub(crate) fn get_postgres_tags(database_url: &str) -> Result<BitFlags<Tags>, St
             Some(version) => {
                 eprintln!("version: {version:?}");
 
-                if version.contains("PostgreSQL 9") {
-                    tags |= Tags::Postgres9;
-                }
-
                 if version.contains("PostgreSQL 12") {
                     tags |= Tags::Postgres12;
+                }
+
+                if version.contains("PostgreSQL 13") {
+                    tags |= Tags::Postgres13;
                 }
 
                 if version.contains("PostgreSQL 14") {
@@ -35,14 +35,13 @@ pub(crate) fn get_postgres_tags(database_url: &str) -> Result<BitFlags<Tags>, St
                 }
 
                 if version.contains("CockroachDB") {
-                    if version.contains("v23.1") {
-                        tags |= Tags::CockroachDb231;
-                    } else if version.contains("v22.2") {
-                        tags |= Tags::CockroachDb222;
-                    } else if version.contains("v21.2") {
-                        tags |= Tags::CockroachDb221;
+                    if version.contains("v25.2") {
+                        tags |= Tags::CockroachDb252;
+                    } else if version.contains("v25.1") {
+                        tags |= Tags::CockroachDb251;
+                    } else if version.contains("v24.3") {
+                        tags |= Tags::CockroachDb243;
                     }
-
                     tags |= Tags::CockroachDb;
                 }
 

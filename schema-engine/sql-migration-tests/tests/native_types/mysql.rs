@@ -688,26 +688,12 @@ fn type_is_unsupported_mariadb(ty: &str) -> bool {
     ty == "Time(0)" || ty == "Json"
 }
 
-fn type_is_unsupported_mysql_5_6(ty: &str) -> bool {
-    type_is_unsupported_mariadb(ty)
-}
-
 fn filter_from_types(api: &TestApi, cases: Cases) -> Cow<'static, [Case]> {
     if api.is_mariadb() {
         return Cow::Owned(
             cases
                 .iter()
                 .filter(|&(ty, _, _)| !type_is_unsupported_mariadb(ty))
-                .cloned()
-                .collect(),
-        );
-    }
-
-    if api.is_mysql_5_6() {
-        return Cow::Owned(
-            cases
-                .iter()
-                .filter(|&(ty, _, _)| !type_is_unsupported_mysql_5_6(ty))
                 .cloned()
                 .collect(),
         );
@@ -723,16 +709,6 @@ fn filter_to_types(api: &TestApi, to_types: &'static [&'static str]) -> Cow<'sta
                 .iter()
                 .cloned()
                 .filter(|ty| !type_is_unsupported_mariadb(ty))
-                .collect(),
-        );
-    }
-
-    if api.is_mysql_5_6() {
-        return Cow::Owned(
-            to_types
-                .iter()
-                .cloned()
-                .filter(|ty| !type_is_unsupported_mysql_5_6(ty))
                 .collect(),
         );
     }

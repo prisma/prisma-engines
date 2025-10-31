@@ -26,7 +26,7 @@ mod compound_fks {
     }
 
     // "A One to Many relation with mixed requiredness" should "be writable and readable"
-    #[connector_test(exclude(MySql(5.6), MongoDb))]
+    #[connector_test(exclude(MongoDb))]
     async fn one2m_mix_required_writable_readable(runner: Runner) -> TestResult<()> {
         use query_tests_setup::{ConnectorVersion, VitessVersion::*};
 

@@ -193,7 +193,7 @@ mod failure {
         Ok(())
     }
 
-    #[connector_test(schema(schemas::json), capabilities(JsonFiltering), exclude(MySql(5.6)))]
+    #[connector_test(schema(schemas::json), capabilities(JsonFiltering))]
     async fn json_string_expect_string_field_ref(runner: Runner) -> TestResult<()> {
         assert_error!(
             runner,

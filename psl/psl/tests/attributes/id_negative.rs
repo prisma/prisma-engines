@@ -252,7 +252,7 @@ fn mapped_id_must_error_on_mysql() {
     let dml = indoc! {r#"
         datasource test {
           provider = "mysql"
-          url = "mysql://root:prisma@127.0.0.1:3309/NoNamedPKsOnMysql"
+          url = "mysql://root:prisma@127.0.0.1:3306/NoNamedPKsOnMysql"
         }
 
         model User {

@@ -2,7 +2,7 @@ use prisma_value::PrismaValue;
 use sql_migration_tests::test_api::*;
 use sql_schema_describer::{ColumnTypeFamily, DefaultValue};
 
-#[test_connector(capabilities(Json), exclude(Mysql56))]
+#[test_connector(capabilities(Json))]
 fn json_fields_can_be_created(api: TestApi) {
     let dm = r#"
             model Test {
@@ -27,7 +27,7 @@ fn json_fields_can_be_created(api: TestApi) {
     api.schema_push_w_datasource(dm).send().assert_green().assert_no_steps();
 }
 
-#[test_connector(capabilities(Json), exclude(Mysql56))]
+#[test_connector(capabilities(Json))]
 fn database_level_json_defaults_can_be_defined(api: TestApi) {
     let dm = r#"
             model Dog {

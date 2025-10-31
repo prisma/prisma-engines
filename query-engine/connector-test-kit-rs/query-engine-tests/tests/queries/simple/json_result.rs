@@ -1,6 +1,6 @@
 use query_engine_tests::*;
 
-#[test_suite(schema(json), capabilities(Json), exclude(MySQL(5.6)))]
+#[test_suite(schema(json), capabilities(Json))]
 mod json_as_result {
     use query_engine_tests::Runner;
 

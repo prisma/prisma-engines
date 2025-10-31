@@ -242,7 +242,11 @@ tests:
 - `make dev-mariadb11`: MariaDB 11
 - `make dev-mysql`: MySQL 5.7
 - `make dev-mysql8`: MySQL 8
-- `make dev-postgres`: PostgreSQL 10
+- `make dev-postgres12`: PostgreSQL 12
+- `make dev-postgres13`: PostgreSQL 13
+- `make dev-postgres14`: PostgreSQL 14
+- `make dev-postgres15`: PostgreSQL 15
+- `make dev-postgres16`: PostgreSQL 16
 - `make dev-sqlite`: SQLite
 - `make dev-mongodb_5`: MongoDB 5
 

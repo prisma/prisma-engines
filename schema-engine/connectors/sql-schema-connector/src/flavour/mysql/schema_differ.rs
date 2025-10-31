@@ -27,7 +27,7 @@ impl SqlSchemaDifferFlavour for MysqlSchemaDifferFlavour {
     }
 
     fn can_rename_index(&self) -> bool {
-        !self.circumstances.contains(Circumstances::IsMariadb) && !self.circumstances.contains(Circumstances::IsMysql56)
+        !self.circumstances.contains(Circumstances::IsMariadb)
     }
 
     fn can_cope_with_foreign_key_column_becoming_non_nullable(&self) -> bool {

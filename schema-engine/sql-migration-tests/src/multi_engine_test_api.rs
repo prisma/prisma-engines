@@ -124,11 +124,6 @@ impl TestApi {
         self.tags().contains(Tags::Mariadb)
     }
 
-    /// Returns true only when testing on MySQL 5.6.
-    pub fn is_mysql_5_6(&self) -> bool {
-        self.tags().contains(Tags::Mysql56)
-    }
-
     /// Returns true only when testing on MySQL 8.
     pub fn is_mysql_8(&self) -> bool {
         self.tags().contains(Tags::Mysql8)

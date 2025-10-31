@@ -8,9 +8,9 @@ pub(crate) struct CockroachDbConnectorTag;
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum CockroachDbVersion {
-    V231,
-    V222,
-    V221,
+    V243,
+    V251,
+    V252,
     PgJsWasm,
 }
 
@@ -19,9 +19,9 @@ impl TryFrom<&str> for CockroachDbVersion {
 
     fn try_from(s: &str) -> Result<Self, Self::Error> {
         let version = match s {
-            "22.1" => Self::V221,
-            "22.2" => Self::V222,
-            "23.1" => Self::V231,
+            "24.3" => Self::V243,
+            "25.1" => Self::V251,
+            "25.2" => Self::V252,
             "pg.js.wasm" => Self::PgJsWasm,
             _ => return Err(TestError::parse_error(format!("Unknown CockroachDB version `{s}`"))),
         };
@@ -33,9 +33,9 @@ impl TryFrom<&str> for CockroachDbVersion {
 impl fmt::Display for CockroachDbVersion {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            CockroachDbVersion::V231 => f.write_str("23.1"),
-            CockroachDbVersion::V222 => f.write_str("22.2"),
-            CockroachDbVersion::V221 => f.write_str("22.1"),
+            CockroachDbVersion::V243 => f.write_str("24.3"),
+            CockroachDbVersion::V251 => f.write_str("25.1"),
+            CockroachDbVersion::V252 => f.write_str("25.2"),
             CockroachDbVersion::PgJsWasm => f.write_str("pg.js.wasm"),
         }
     }
@@ -43,7 +43,7 @@ impl fmt::Display for CockroachDbVersion {
 
 impl Default for CockroachDbVersion {
     fn default() -> Self {
-        Self::V221
+        Self::V243
     }
 }
 

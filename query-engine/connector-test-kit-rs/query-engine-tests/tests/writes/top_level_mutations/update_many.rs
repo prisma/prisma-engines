@@ -377,7 +377,7 @@ mod update_many {
     }
 }
 
-#[test_suite(schema(json_opt), exclude(MySql(5.6)), capabilities(Json))]
+#[test_suite(schema(json_opt), capabilities(Json))]
 mod json_update_many {
     use query_engine_tests::{assert_error, run_query};
 

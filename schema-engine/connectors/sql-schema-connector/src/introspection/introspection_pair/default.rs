@@ -11,7 +11,7 @@ pub(crate) type DefaultValuePair<'a> =
     IntrospectionPair<'a, Option<walkers::DefaultValueWalker<'a>>, sql::ColumnWalker<'a>>;
 
 pub(crate) enum DefaultKind<'a> {
-    Sequence(&'a sql::postgres::Sequence),
+    Sequence(&'a sql::postgres::Sequence, sql::ColumnTypeFamily),
     DbGenerated(Option<&'a str>),
     Autoincrement,
     Uuid(Option<u8>),
@@ -22,6 +22,7 @@ pub(crate) enum DefaultKind<'a> {
     String(&'a str),
     StringList(Vec<&'a str>),
     EnumVariant(Cow<'a, str>),
+    EnumVariantList(Vec<Cow<'a, str>>),
     Constant(&'a dyn fmt::Display),
     ConstantList(Vec<&'a dyn fmt::Display>),
     Bytes(&'a [u8]),
@@ -43,7 +44,10 @@ impl<'a> DefaultValuePair<'a> {
                     .binary_search_by_key(&name, |s| &s.name)
                     .unwrap();
 
-                Some(DefaultKind::Sequence(&connector_data.sequences[sequence_idx]))
+                Some(DefaultKind::Sequence(
+                    &connector_data.sequences[sequence_idx],
+                    family.clone(),
+                ))
             }
             (_, sql::ColumnTypeFamily::Int | sql::ColumnTypeFamily::BigInt) if self.next.is_autoincrement() => {
                 Some(DefaultKind::Autoincrement)
@@ -86,6 +90,34 @@ impl<'a> DefaultValuePair<'a> {
             (Some(sql::DefaultKind::Value(PrismaValue::BigInt(val))), _) => Some(DefaultKind::Constant(val)),
 
             (Some(sql::DefaultKind::Value(PrismaValue::Bytes(val))), _) => Some(DefaultKind::Bytes(val)),
+
+            // Special handling for enum arrays: map database values to Prisma variant names
+            (Some(sql::DefaultKind::Value(PrismaValue::List(vals))), sql::ColumnTypeFamily::Enum(enum_id)) => {
+                if vals.is_empty() {
+                    return Some(DefaultKind::EnumVariantList(Vec::new()));
+                }
+
+                let enum_walker = self.context.sql_schema.walk(*enum_id);
+                let mut out: Vec<Cow<'a, str>> = Vec::with_capacity(vals.len());
+
+                for val in vals {
+                    let PrismaValue::Enum(db_val) = val else {
+                        return None;
+                    };
+
+                    let variant = enum_walker.variants().find(|v| v.name() == db_val).unwrap();
+
+                    let variant_name = self.context.enum_variant_name(variant.id);
+
+                    if variant_name.prisma_name().is_empty() {
+                        return Some(DefaultKind::DbGenerated(variant_name.mapped_name()));
+                    }
+
+                    out.push(variant_name.prisma_name());
+                }
+
+                Some(DefaultKind::EnumVariantList(out))
+            }
 
             (Some(sql::DefaultKind::Value(PrismaValue::List(vals))), _) => match vals.first() {
                 None => Some(DefaultKind::ConstantList(Vec::new())),

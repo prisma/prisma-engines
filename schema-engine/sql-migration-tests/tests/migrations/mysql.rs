@@ -550,14 +550,13 @@ fn alter_constraint_name(mut api: TestApi) {
      "#,
     );
 
-    let is_mysql_5_6 = api.is_mysql_5_6();
     let is_mariadb = api.is_mariadb();
 
     api.create_migration("custom", &custom_dm, &dir)
         .send_sync()
         .assert_migration_directories_count(2)
         .assert_migration("custom",move |migration| {
-            let expected_script = if is_mysql_5_6 || is_mariadb {
+            let expected_script = if is_mariadb {
                 expect![[
                      r#"
                  -- DropForeignKey

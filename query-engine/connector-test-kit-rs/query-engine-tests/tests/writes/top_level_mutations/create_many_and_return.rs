@@ -775,7 +775,6 @@ mod create_many_and_return {
 
 #[test_suite(
     schema(json_opt),
-    exclude(MySql(5.6)),
     capabilities(Json, AdvancedJsonNullability, CreateMany, InsertReturning)
 )]
 mod json_create_many_and_return {

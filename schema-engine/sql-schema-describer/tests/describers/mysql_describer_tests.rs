@@ -41,7 +41,7 @@ fn procedures_can_be_described(api: TestApi) {
     assert_eq!(Some("SELECT 1 INTO res"), procedure.definition.as_deref());
 }
 
-#[test_connector(tags(Mysql), exclude(Mysql8, Mysql56, Mariadb))]
+#[test_connector(tags(Mysql), exclude(Mysql8, Mariadb))]
 fn all_mysql_column_types_must_work(api: TestApi) {
     let sql = r#"
         CREATE TABLE `User` (

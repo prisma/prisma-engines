@@ -1,6 +1,6 @@
 use query_engine_tests::*;
 
-#[test_suite(schema(json_opt), capabilities(Json), exclude(MySql(5.6)))]
+#[test_suite(schema(json_opt), capabilities(Json))]
 mod json {
     use query_engine_tests::{EngineProtocol, Runner, run_query};
 
@@ -359,11 +359,7 @@ mod json {
         schema.to_owned()
     }
 
-    #[connector_test(
-        schema(schema_json_list),
-        capabilities(Json, ScalarLists),
-        exclude(Mysql(5.6), CockroachDb)
-    )]
+    #[connector_test(schema(schema_json_list), capabilities(Json, ScalarLists), exclude(CockroachDb))]
     async fn json_list(runner: Runner) -> TestResult<()> {
         create_row(
             &runner,

@@ -500,7 +500,14 @@ fn get_list_default_value(parser: &mut Parser<'_>, tpe: &ColumnType) -> DefaultV
         Some(Token::CStyleStringLiteral) | Some(Token::StringLiteral) => {
             parse_string_value(parser).and_then(|value| c_style_scalar_lists::parse_array_literal(&value, tpe))
         }
-        Some(Token::Identifier) | Some(Token::OpeningBrace) => parse_array_constructor(parser, &tpe.family),
+        Some(Token::Identifier) | Some(Token::OpeningBrace) => {
+            let result = parse_array_constructor(parser, &tpe.family);
+            // Consume array-level cast if present (e.g., ::\"Color\"[])
+            if result.is_some() {
+                let _ = eat_cast(parser);
+            }
+            result
+        }
         _ => None,
     };
 
@@ -587,6 +594,33 @@ mod tests {
                     ),
                     String(
                         "def",
+                    ),
+                ],
+            )
+        "#]];
+
+        expected.assert_debug_eq(&out);
+    }
+
+    #[test]
+    fn parse_enum_array_default_with_array_level_cast() {
+        let input = "ARRAY['Blu', '0', 'Grün']::\"Color\"[]";
+        let tokens = tokenize(input);
+        let mut parser = Parser::new(input, &tokens);
+
+        let out = parse_array_constructor(&mut parser, &ColumnTypeFamily::Enum(crate::EnumId(0)));
+
+        let expected = expect![[r#"
+            Some(
+                [
+                    Enum(
+                        "Blu",
+                    ),
+                    Enum(
+                        "0",
+                    ),
+                    Enum(
+                        "Grün",
                     ),
                 ],
             )

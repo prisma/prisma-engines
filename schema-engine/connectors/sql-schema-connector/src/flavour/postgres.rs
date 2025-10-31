@@ -646,9 +646,6 @@ async fn describe_schema_with(
         describer_circumstances |= describer::Circumstances::CockroachWithPostgresNativeTypes;
     }
 
-    if circumstances.contains(Circumstances::CanPartitionTables) {
-        describer_circumstances |= describer::Circumstances::CanPartitionTables;
-    }
     let namespaces_vec = Namespaces::to_vec(namespaces, schema);
     let namespaces_str: Vec<&str> = namespaces_vec.iter().map(AsRef::as_ref).collect();
 
@@ -726,7 +723,6 @@ async fn sql_schema_from_migrations_and_db(
 pub(crate) enum Circumstances {
     IsCockroachDb,
     CockroachWithPostgresNativeTypes, // FIXME: we should really break and remove this
-    CanPartitionTables,
 }
 
 async fn setup_connection(
@@ -760,7 +756,7 @@ async fn setup_connection(
         });
 
     match version {
-        Some((version, version_num)) => {
+        Some((version, _version_num)) => {
             let db_is_cockroach = version.contains("CockroachDB");
 
             if db_is_cockroach && provider == PostgresProvider::PostgreSql {
@@ -781,8 +777,6 @@ async fn setup_connection(
                     .raw_cmd(COCKROACHDB_PRELUDE)
                     .await
                     .map_err(imp::quaint_error_mapper(params))?;
-            } else if version_num >= 100000 {
-                circumstances |= Circumstances::CanPartitionTables;
             }
         }
         None => {

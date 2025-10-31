@@ -989,6 +989,7 @@ fn created_at_does_not_get_arbitrarily_migrated(api: TestApi) {
         .assert_no_steps();
 }
 
+// TODO: verify
 #[test_connector(tags(CockroachDb))]
 fn sequences_without_options_can_be_created(api: TestApi) {
     let dm = r#"
@@ -1311,7 +1312,7 @@ fn bigint_defaults_work(api: TestApi) {
 }
 
 // regression test for https://github.com/prisma/prisma/issues/20557
-#[test_connector(tags(CockroachDb), exclude(CockroachDb231))]
+#[test_connector(tags(CockroachDb))]
 fn alter_type_works(api: TestApi) {
     let schema = r#"
         datasource db {

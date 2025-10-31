@@ -1,6 +1,6 @@
 use sql_introspection_tests::test_api::*;
 
-// Older versions of MySQL (5.6+) raise a syntax error on `CREATE TABLE` declarations with `SET DEFAULT` referential actions,
+// Older versions of MySQL (5.7 and below) raise a syntax error on `CREATE TABLE` declarations with `SET DEFAULT` referential actions,
 // so we can skip introspecting those. MariaDb 10.0 suffers from the same issue.
 // We should see validation warnings on MySQL 8+.
 #[test_connector(tags(Mysql8), exclude(Vitess))]

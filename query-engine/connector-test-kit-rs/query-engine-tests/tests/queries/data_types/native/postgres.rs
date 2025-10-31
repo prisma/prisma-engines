@@ -212,10 +212,7 @@ mod postgres_string {
     }
 }
 
-#[test_suite(
-    schema(schema),
-    only(Postgres("9", "10", "11", "12", "13", "14", "15", "pg.js.wasm", "neon.js.wasm"))
-)]
+#[test_suite(schema(schema), only(Postgres("12", "13", "14", "15", "pg.js.wasm", "neon.js.wasm")))]
 mod postgres_others {
     fn schema_other_types() -> String {
         let schema = indoc! {

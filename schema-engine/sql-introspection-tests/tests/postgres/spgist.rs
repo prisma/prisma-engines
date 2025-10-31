@@ -27,7 +27,7 @@ async fn spgist_raw_ops(api: &mut TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(tags(Postgres), exclude(CockroachDb, Postgres9))]
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
 async fn spgist_inet_ops(api: &mut TestApi) -> TestResult {
     let schema_name = api.schema_name();
     let create_table = format!("CREATE TABLE \"{schema_name}\".\"A\" (id SERIAL PRIMARY KEY, data inet)",);

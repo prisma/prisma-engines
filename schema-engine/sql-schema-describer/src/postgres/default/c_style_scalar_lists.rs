@@ -40,6 +40,10 @@ pub(super) fn parse_array_literal(input: &str, tpe: &ColumnType) -> Option<Vec<P
                     let value = super::parse_float_default(&mut parser)?;
                     values.push(value.as_value().unwrap().to_owned());
                 }
+                ColumnTypeFamily::Enum(_) => {
+                    let s = parser.expect(Token::Digits)?;
+                    values.push(parse_literal(s, tpe)?);
+                }
                 _ => return None,
             },
             _ => return None,

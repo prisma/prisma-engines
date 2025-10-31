@@ -38,7 +38,7 @@ fn spgist_change_from_btree(api: TestApi) {
     });
 }
 
-#[test_connector(tags(Postgres), exclude(CockroachDb, Postgres9))]
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
 fn spgist_inet_ops(api: TestApi) {
     let dm = r#"
         model A {
@@ -63,7 +63,7 @@ fn spgist_inet_ops(api: TestApi) {
     api.schema_push_w_datasource(dm).send().assert_no_steps();
 }
 
-#[test_connector(tags(Postgres), exclude(CockroachDb, Postgres9))]
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
 fn spgist_inet_ops_default(api: TestApi) {
     let dm = r#"
         model A {
