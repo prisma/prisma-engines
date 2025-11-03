@@ -1,6 +1,5 @@
 datasource testds {
     provider = "postgresql"
-    url = "dummy-url"
     schemas = ["public"]
 }
 

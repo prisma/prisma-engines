@@ -1,4 +1,3 @@
 datasource pg1 {
   provider = "postgresql"
-  url      = "postgresql://"
 }

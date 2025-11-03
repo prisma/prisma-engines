@@ -7,7 +7,6 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = "dummy-url"
   schemas  = ["base", "transactional"]
 }
 

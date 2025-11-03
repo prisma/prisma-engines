@@ -1,6 +1,5 @@
 datasource db {
   provider = "sqlserver"
-  url      = "sqlserver://"
 }
 
 model Example {

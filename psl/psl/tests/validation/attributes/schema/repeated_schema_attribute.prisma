@@ -1,6 +1,5 @@
 datasource testds {
     provider = "postgresql"
-    url = "dummy-url"
     schemas = ["public", "private"]
 }
 
@@ -25,14 +24,14 @@ enum toggle {
 
 
 // [1;91merror[0m: [1mAttribute "@schema" can only be defined once.[0m
-//   [1;94m-->[0m  [4mschema.prisma:21[0m
+//   [1;94m-->[0m  [4mschema.prisma:20[0m
 // [1;94m   | [0m
-// [1;94m20 | [0m
-// [1;94m21 | [0m  [1;91m@@schema("public")[0m
+// [1;94m19 | [0m
+// [1;94m20 | [0m  [1;91m@@schema("public")[0m
 // [1;94m   | [0m
 // [1;91merror[0m: [1mAttribute "@schema" can only be defined once.[0m
-//   [1;94m-->[0m  [4mschema.prisma:22[0m
+//   [1;94m-->[0m  [4mschema.prisma:21[0m
 // [1;94m   | [0m
-// [1;94m21 | [0m  @@schema("public")
-// [1;94m22 | [0m  [1;91m@@schema("private")[0m
+// [1;94m20 | [0m  @@schema("public")
+// [1;94m21 | [0m  [1;91m@@schema("private")[0m
 // [1;94m   | [0m

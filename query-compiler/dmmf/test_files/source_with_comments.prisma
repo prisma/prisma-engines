@@ -1,7 +1,6 @@
 /// Super cool postgres source.
 datasource pg1 {
   provider = "postgresql"
-  url      = "postgresql://"
 }
 
 /// My author model.

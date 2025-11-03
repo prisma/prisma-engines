@@ -1,6 +1,5 @@
 datasource mydb {
   provider = "sqlserver"
-  url = env("TEST_DB_URL")
   schemas  = ["base", "transactional"]
 }
 
@@ -25,8 +24,8 @@ model Cat {
 }
 
 // [1;91merror[0m: [1mThe model with database name "pets" could not be defined because another model or view with this name exists: "Dog"[0m
-//   [1;94m-->[0m  [4mschema.prisma:23[0m
+//   [1;94m-->[0m  [4mschema.prisma:22[0m
 // [1;94m   | [0m
-// [1;94m22 | [0m
-// [1;94m23 | [0m  [1;91m@@map("pets")[0m
+// [1;94m21 | [0m
+// [1;94m22 | [0m  [1;91m@@map("pets")[0m
 // [1;94m   | [0m

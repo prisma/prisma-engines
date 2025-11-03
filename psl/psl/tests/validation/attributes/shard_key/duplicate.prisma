@@ -1,6 +1,5 @@
 datasource db {
   provider = "mysql"
-  url      = env("url")
 }
 
 generator client {
@@ -24,25 +23,25 @@ model B {
 }
 
 // [1;91merror[0m: [1mError validating model "A": At most one field must be marked as the shard key with the `@shardKey` attribute.[0m
-//   [1;94m-->[0m  [4mschema.prisma:11[0m
+//   [1;94m-->[0m  [4mschema.prisma:10[0m
 // [1;94m   | [0m
-// [1;94m10 | [0m
-// [1;94m11 | [0m[1;91mmodel A {[0m
-// [1;94m12 | [0m  a String @id
-// [1;94m13 | [0m  b String @shardKey
-// [1;94m14 | [0m  c String @shardKey
-// [1;94m15 | [0m}
+// [1;94m 9 | [0m
+// [1;94m10 | [0m[1;91mmodel A {[0m
+// [1;94m11 | [0m  a String @id
+// [1;94m12 | [0m  b String @shardKey
+// [1;94m13 | [0m  c String @shardKey
+// [1;94m14 | [0m}
 // [1;94m   | [0m
 // [1;91merror[0m: [1mError validating model "B": Each model must have at most one shard key. You can't have `@shardKey` and `@@shardKey` at the same time.[0m
-//   [1;94m-->[0m  [4mschema.prisma:17[0m
+//   [1;94m-->[0m  [4mschema.prisma:16[0m
 // [1;94m   | [0m
-// [1;94m16 | [0m
-// [1;94m17 | [0m[1;91mmodel B {[0m
-// [1;94m18 | [0m  a String @id
-// [1;94m19 | [0m  b String @shardKey
-// [1;94m20 | [0m  c String
-// [1;94m21 | [0m  d String
-// [1;94m22 | [0m
-// [1;94m23 | [0m  @@shardKey([b, c])
-// [1;94m24 | [0m}
+// [1;94m15 | [0m
+// [1;94m16 | [0m[1;91mmodel B {[0m
+// [1;94m17 | [0m  a String @id
+// [1;94m18 | [0m  b String @shardKey
+// [1;94m19 | [0m  c String
+// [1;94m20 | [0m  d String
+// [1;94m21 | [0m
+// [1;94m22 | [0m  @@shardKey([b, c])
+// [1;94m23 | [0m}
 // [1;94m   | [0m

@@ -1,6 +1,5 @@
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
 }
 
 generator js {
@@ -21,20 +20,20 @@ view Mountain {
 }
 
 // [1;91merror[0m: [1mError validating: @@unique annotations on views are not backed by unique indexes in the database and cannot specify a mapped database name.[0m
-//   [1;94m-->[0m  [4mschema.prisma:16[0m
+//   [1;94m-->[0m  [4mschema.prisma:15[0m
 // [1;94m   | [0m
-// [1;94m15 | [0mview Mountain {
-// [1;94m16 | [0m  name   String [1;91m@unique(map: "name_idx")[0m
+// [1;94m14 | [0mview Mountain {
+// [1;94m15 | [0m  name   String [1;91m@unique(map: "name_idx")[0m
 // [1;94m   | [0m
 // [1;91merror[0m: [1mError validating: Views cannot have indexes.[0m
-//   [1;94m-->[0m  [4mschema.prisma:20[0m
-// [1;94m   | [0m
-// [1;94m19 | [0m  @@unique([region(length: 10)])
-// [1;94m20 | [0m  [1;91m@@index([name, region], type: Gin)[0m
-// [1;94m   | [0m
-// [1;91merror[0m: [1mError parsing attribute "@@unique": Scalar fields in @@unique attributes in views cannot have arguments.[0m
 //   [1;94m-->[0m  [4mschema.prisma:19[0m
 // [1;94m   | [0m
-// [1;94m18 | [0m
-// [1;94m19 | [0m  [1;91m@@unique([region(length: 10)])[0m
+// [1;94m18 | [0m  @@unique([region(length: 10)])
+// [1;94m19 | [0m  [1;91m@@index([name, region], type: Gin)[0m
+// [1;94m   | [0m
+// [1;91merror[0m: [1mError parsing attribute "@@unique": Scalar fields in @@unique attributes in views cannot have arguments.[0m
+//   [1;94m-->[0m  [4mschema.prisma:18[0m
+// [1;94m   | [0m
+// [1;94m17 | [0m
+// [1;94m18 | [0m  [1;91m@@unique([region(length: 10)])[0m
 // [1;94m   | [0m

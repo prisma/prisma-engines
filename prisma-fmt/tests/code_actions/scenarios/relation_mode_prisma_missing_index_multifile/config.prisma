@@ -4,6 +4,5 @@ generator client {
 
 datasource db {
     provider     = "mysql"
-    url          = "dummy-url"
     relationMode = "prisma"
 }

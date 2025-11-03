@@ -1,6 +1,5 @@
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
 }
 
 generator js {
@@ -19,8 +18,8 @@ view Mountain {
 }
 
 // [1;91merror[0m: [1mThe view "Mountain" cannot be defined because a model with that name already exists.[0m
-//   [1;94m-->[0m  [4mschema.prisma:16[0m
+//   [1;94m-->[0m  [4mschema.prisma:15[0m
 // [1;94m   | [0m
-// [1;94m15 | [0m
-// [1;94m16 | [0mview [1;91mMountain[0m {
+// [1;94m14 | [0m
+// [1;94m15 | [0mview [1;91mMountain[0m {
 // [1;94m   | [0m

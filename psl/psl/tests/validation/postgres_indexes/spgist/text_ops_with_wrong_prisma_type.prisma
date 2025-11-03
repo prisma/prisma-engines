@@ -1,6 +1,5 @@
 datasource test {
   provider = "postgresql"
-  url = "dummy-url"
 }
 
 model A {
@@ -11,8 +10,8 @@ model A {
 }
 
 // [1;91merror[0m: [1mError parsing attribute "@@index": The given operator class `TextOps` points to the field `a` that is not of String type.[0m
-//   [1;94m-->[0m  [4mschema.prisma:10[0m
+//   [1;94m-->[0m  [4mschema.prisma:9[0m
 // [1;94m   | [0m
-// [1;94m 9 | [0m
-// [1;94m10 | [0m  [1;91m@@index([a(ops: TextOps)], type: SpGist)[0m
+// [1;94m 8 | [0m
+// [1;94m 9 | [0m  [1;91m@@index([a(ops: TextOps)], type: SpGist)[0m
 // [1;94m   | [0m

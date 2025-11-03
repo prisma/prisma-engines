@@ -1,6 +1,5 @@
 datasource pg {
   provider = "postgresql"
-  url      = "postgresql://"
   schemas  = ["public", "test"]
 }
 
