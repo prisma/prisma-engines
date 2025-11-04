@@ -108,7 +108,6 @@ impl fmt::Display for SqlIndexAlgorithm {
 pub enum Circumstances {
     Cockroach,
     CockroachWithPostgresNativeTypes, // TODO: this is a temporary workaround
-    CanPartitionTables,
 }
 
 pub struct SqlSchemaDescriber<'a> {
@@ -668,10 +667,10 @@ impl<'a> SqlSchemaDescriber<'a> {
         sql_schema: &mut SqlSchema,
         pg_ext: &mut PostgresSchemaExt,
     ) -> DescriberResult<IndexMap<(String, String), TableId>> {
-        let sql = if self.circumstances.contains(Circumstances::CanPartitionTables) {
-            include_str!("postgres/tables_query.sql")
+        let sql = if self.is_cockroach() {
+            include_str!("postgres/tables_query_cockroachdb.sql")
         } else {
-            include_str!("postgres/tables_query_simple.sql")
+            include_str!("postgres/tables_query.sql")
         };
 
         let namespaces = &sql_schema.namespaces;

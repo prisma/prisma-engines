@@ -346,7 +346,6 @@ fn migrations_should_fail_when_the_script_is_invalid(api: TestApi) {
                     DETAIL: source SQL:
                     SELECT (^.^)_n
                             ^
-                    HINT: try \h SELECT
                 "#},
                 t if t.contains(Tags::Vitess) => "syntax error at position 10",
                 t if t.contains(Tags::Mariadb) =>

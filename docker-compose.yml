@@ -1,39 +1,29 @@
 version: '3'
 services:
-  cockroach_23_1:
-    image: prismagraphql/cockroachdb-custom:23.1@sha256:c5a97355d56a7692ed34d835dfd8e3663d642219ea90736658a24840ea26862d
+  cockroach_24_3:
+    image: cockroachdb/cockroach:v24.3.0
     restart: unless-stopped
-    command: |
-      start-single-node --insecure
+    command: start-single-node --insecure
     ports:
       - '26260:26257'
     networks:
       - databases
 
-  cockroach_22_2:
-    image: prismagraphql/cockroachdb-custom:22.2
+  cockroach_25_1:
+    image: cockroachdb/cockroach:v25.1.0
     restart: unless-stopped
     command: start-single-node --insecure
     ports:
-      - '26259:26257'
+      - '26261:26257'
     networks:
       - databases
 
-  cockroach_22_1_0:
-    image: prismagraphql/cockroachdb-custom:22.1.0
+  cockroach_25_2:
+    image: cockroachdb/cockroach:v25.2.0
     restart: unless-stopped
     command: start-single-node --insecure
     ports:
-      - '26257:26257'
-    networks:
-      - databases
-
-  cockroach_21_2_0_patched:
-    image: prismagraphql/cockroachdb-custom:21.2.0-patched
-    restart: unless-stopped
-    command: start-single-node --insecure
-    ports:
-      - '26258:26257'
+      - '26262:26257'
     networks:
       - databases
 
@@ -41,7 +31,8 @@ services:
     image: brainsam/pgbouncer:latest
     restart: unless-stopped
     environment:
-      DB_HOST: 'postgres11'
+      # Use the PostgreSQL 13 service as the upstream target for PgBouncer tests.
+      DB_HOST: 'postgres13'
       DB_PORT: '5432'
       DB_USER: 'postgres'
       DB_PASSWORD: 'prisma'
@@ -207,26 +198,6 @@ services:
       - '5439:5432'
     networks:
       - databases
-
-  mysql-5-6:
-    image: mysql:5.6.50
-    command: mysqld --table_definition_cache=2000
-    restart: unless-stopped
-    platform: linux/x86_64
-    environment:
-      MYSQL_USER: root
-      MYSQL_ROOT_PASSWORD: prisma
-      MYSQL_DATABASE: prisma
-    ports:
-      - '3309:3306'
-    networks:
-      - databases
-    tmpfs: /var/lib/mysql
-    healthcheck:
-      test: ['CMD', 'mysqladmin', 'ping', '-h', 'localhost']
-      timeout: 20s
-      retries: 10
-
   mysql-5-7:
     image: mysql:5.7.44
     command: mysqld

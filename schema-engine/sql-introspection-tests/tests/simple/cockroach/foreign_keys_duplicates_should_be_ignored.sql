@@ -17,6 +17,7 @@ ALTER TABLE "Post"
         REFERENCES "User"(id);
 
 
+
 /*
 generator js {
   provider = "prisma-client"

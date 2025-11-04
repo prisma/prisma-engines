@@ -327,11 +327,6 @@ impl TestApi {
         self.root.is_mysql_mariadb()
     }
 
-    /// Returns true only when testing on MySQL 5.6.
-    pub fn is_mysql_5_6(&self) -> bool {
-        self.root.is_mysql_5_6()
-    }
-
     /// Returns true only when testing on MySQL 8.
     pub fn is_mysql_8(&self) -> bool {
         self.root.is_mysql_8()

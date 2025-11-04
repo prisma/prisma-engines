@@ -2,8 +2,8 @@ use expect_test::expect;
 use sql_introspection_tests::test_api::*;
 use test_macros::test_connector;
 
-#[test_connector(tags(CockroachDb221))]
-async fn compound_foreign_keys_with_defaults_v_22_1(api: &mut TestApi) -> TestResult {
+#[test_connector(tags(CockroachDb243))]
+async fn compound_foreign_keys_with_defaults_v_24_3(api: &mut TestApi) -> TestResult {
     api.raw_cmd(
         r#"
         CREATE TABLE "Person" (
@@ -22,7 +22,7 @@ async fn compound_foreign_keys_with_defaults_v_22_1(api: &mut TestApi) -> TestRe
 
     let expected = expect![[r#"
         model Person {
-          id           BigInt   @id @default(sequence())
+          id           BigInt   @id @default(sequence(maxValue: 2147483647))
           age          Int
           partner_id   Int      @default(0)
           partner_age  Int      @default(0)
@@ -38,8 +38,8 @@ async fn compound_foreign_keys_with_defaults_v_22_1(api: &mut TestApi) -> TestRe
     Ok(())
 }
 
-#[test_connector(tags(CockroachDb222))]
-async fn compound_foreign_keys_with_defaults_v_22_2(api: &mut TestApi) -> TestResult {
+#[test_connector(tags(CockroachDb251))]
+async fn compound_foreign_keys_with_defaults_v_25_1(api: &mut TestApi) -> TestResult {
     api.raw_cmd(
         r#"
         CREATE TABLE "Person" (

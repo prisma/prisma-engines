@@ -181,9 +181,9 @@ fn soft_resets_work_on_sql_server(api: TestApi) {
     }
 }
 
-// MySQL 5.6 doesn't have `DROP USER IF EXISTS`...
+// Older MySQL versions didn't have `DROP USER IF EXISTS`...
 // Neither does Vitess
-#[test_connector(tags(Mysql), exclude(Mysql56, Vitess))]
+#[test_connector(tags(Mysql), exclude(Vitess))]
 fn soft_resets_work_on_mysql(api: TestApi) {
     let migrations_directory = api.create_migrations_directory();
     let mut url: url::Url = api.connection_string().parse().unwrap();

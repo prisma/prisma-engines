@@ -44,7 +44,6 @@ impl Flavour {
 #[repr(u8)]
 pub enum Circumstances {
     MariaDb,
-    MySql56,
     MySql57,
     CheckConstraints,
 }

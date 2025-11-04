@@ -52,10 +52,6 @@ pub(crate) fn get_mysql_tags(database_url: &str) -> Result<BitFlags<Tags>, Strin
                         tags |= Tags::Vitess;
                     }
 
-                    if version.contains("5.6") {
-                        tags |= Tags::Mysql56
-                    }
-
                     if version.contains("5.7") {
                         tags |= Tags::Mysql57
                     }

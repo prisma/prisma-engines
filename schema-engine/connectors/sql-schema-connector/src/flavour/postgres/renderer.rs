@@ -246,6 +246,7 @@ impl SqlRenderer for PostgresRenderer {
         let mut lines = Vec::new();
         let mut before_statements = Vec::new();
         let mut after_statements = Vec::new();
+        let mut type_change_indices = Vec::new();
         let tables = schemas.walk(*table_ids);
 
         for change in changes {
@@ -292,9 +293,10 @@ impl SqlRenderer for PostgresRenderer {
                 TableChange::AlterColumn(AlterColumn {
                     column_id,
                     changes,
-                    type_change: _,
+                    type_change,
                 }) => {
                     let columns = schemas.walk(*column_id);
+                    let original_lines_len = lines.len();
 
                     render_alter_column(
                         columns,
@@ -304,6 +306,16 @@ impl SqlRenderer for PostgresRenderer {
                         &mut after_statements,
                         self,
                     );
+
+                    // For CockroachDB, track lines that contain type changes
+                    if self.is_cockroach && type_change.is_some() {
+                        let new_lines_len = lines.len();
+                        for i in original_lines_len..new_lines_len {
+                            if lines[i].contains("SET DATA TYPE") {
+                                type_change_indices.push(i);
+                            }
+                        }
+                    }
                 }
                 TableChange::DropAndRecreateColumn { column_id, changes: _ } => {
                     let columns = schemas.walk(*column_id);
@@ -322,11 +334,33 @@ impl SqlRenderer for PostgresRenderer {
         }
 
         if self.is_cockroach {
-            let mut out = Vec::with_capacity(before_statements.len() + after_statements.len() + lines.len());
+            let mut out = Vec::with_capacity(before_statements.len() + after_statements.len() + lines.len() + type_change_indices.len() * 2);
             out.extend(before_statements);
-            for line in lines {
-                out.push(format!("ALTER TABLE {} {}", quoted_alter_table_name(tables), line))
+            
+            // For CockroachDB, wrap type change statements with declarative schema changer setting
+            let mut current_line_index = 0;
+            for &type_change_idx in &type_change_indices {
+                // Add non-type-change lines before this type change
+                while current_line_index < type_change_idx {
+                    out.push(format!("ALTER TABLE {} {}", quoted_alter_table_name(tables), lines[current_line_index]));
+                    current_line_index += 1;
+                }
+                
+                // Add declarative schema changer setting before the type change
+                out.push("SET use_declarative_schema_changer=on".to_string());
+                // Add the type change statement
+                out.push(format!("ALTER TABLE {} {}", quoted_alter_table_name(tables), lines[type_change_idx]));
+                // Reset the declarative schema changer setting after the type change
+                out.push("SET use_declarative_schema_changer=off".to_string());
+                current_line_index = type_change_idx + 1;
             }
+            
+            // Add remaining lines
+            while current_line_index < lines.len() {
+                out.push(format!("ALTER TABLE {} {}", quoted_alter_table_name(tables), lines[current_line_index]));
+                current_line_index += 1;
+            }
+            
             out.extend(after_statements);
             out
         } else {
@@ -896,7 +930,7 @@ fn render_postgres_alter_enum(
     renderer: &PostgresRenderer,
 ) -> Vec<String> {
     if alter_enum.dropped_variants.is_empty() {
-        let mut stmts: Vec<String> = alter_enum
+        let stmts: Vec<String> = alter_enum
             .created_variants
             .iter()
             .map(|created_value| {
@@ -907,20 +941,6 @@ fn render_postgres_alter_enum(
                 )
             })
             .collect();
-
-        if stmts.len() > 1 {
-            let warning = indoc::indoc! {
-                r#"
-                    -- This migration adds more than one value to an enum.
-                    -- With PostgreSQL versions 11 and earlier, this is not possible
-                    -- in a single migration. This can be worked around by creating
-                    -- multiple migrations, each migration adding only one value to
-                    -- the enum.
-                    "#
-            };
-
-            stmts[0] = format!("{}\n\n{}", warning, stmts[0]);
-        }
 
         return stmts;
     }

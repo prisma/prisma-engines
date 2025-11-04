@@ -1,6 +1,6 @@
 use query_engine_tests::*;
 
-#[test_suite(capabilities(JsonFiltering), exclude(MySQL(5.6)))]
+#[test_suite(capabilities(JsonFiltering))]
 mod json_filter {
     use query_engine_tests::run_query;
 
@@ -18,7 +18,7 @@ mod json_filter {
     }
 
     // Note: testing the absence of "JSON-null stripping" in Napi.rs Driver Adapters requires patching napi.rs.
-    #[connector_test(schema(schema), exclude(MySQL(5.6)))]
+    #[connector_test(schema(schema))]
     async fn does_not_strip_nulls_in_json(runner: Runner) -> TestResult<()> {
         run_query!(
             &runner,
@@ -147,7 +147,7 @@ mod json_filter {
         Ok(())
     }
 
-    #[connector_test(schema(schema), exclude(MySQL(5.6)))]
+    #[connector_test(schema(schema))]
     async fn string_comparison_filters(runner: Runner) -> TestResult<()> {
         test_string_data(&runner).await?;
 
@@ -190,7 +190,7 @@ mod json_filter {
         Ok(())
     }
 
-    #[connector_test(schema(schema), exclude(MySQL(5.6), Sqlite))]
+    #[connector_test(schema(schema), exclude(Sqlite))]
     async fn array_comparison_filters(runner: Runner) -> TestResult<()> {
         test_array_data(&runner).await?;
 

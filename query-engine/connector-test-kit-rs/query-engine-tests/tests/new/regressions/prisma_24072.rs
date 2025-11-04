@@ -2,10 +2,7 @@ use indoc::indoc;
 use query_engine_tests::*;
 
 // Skip databases that don't support `onDelete: SetDefault`
-#[test_suite(
-    schema(schema),
-    exclude(MongoDb, MySql(5.6), MySql(5.7), Vitess("planetscale.js.wasm"))
-)]
+#[test_suite(schema(schema), exclude(MongoDb, MySql(5.7), Vitess("planetscale.js.wasm")))]
 mod prisma_24072 {
     fn schema() -> String {
         let schema = indoc! {

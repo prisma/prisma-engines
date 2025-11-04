@@ -10,14 +10,23 @@ use datamodel_renderer::{
 pub(crate) fn render(default: DefaultValuePair<'_>) -> Option<renderer::DefaultValue<'_>> {
     let mut rendered = match default.kind() {
         Some(kind) => match kind {
-            DefaultKind::Sequence(sequence) => {
+            DefaultKind::Sequence(sequence, column_type_family) => {
                 let mut fun = Function::new("sequence");
 
                 if sequence.min_value != 1 {
                     fun.push_param(("minValue", Constant::from(sequence.min_value)));
                 }
 
-                if sequence.max_value != i64::MAX {
+                // Determine the default max value based on column type
+                // CockroachDB 24.3+ reports type-specific max values (e.g., INT4::MAX = 2147483647)
+                // We skip the maxValue parameter if it matches the column type's default max
+                let default_max = match column_type_family {
+                    sql_schema_describer::ColumnTypeFamily::Int => i32::MAX as i64,
+                    sql_schema_describer::ColumnTypeFamily::BigInt => i64::MAX,
+                    _ => i64::MAX,
+                };
+
+                if sequence.max_value != default_max {
                     fun.push_param(("maxValue", Constant::from(sequence.max_value)));
                 }
 
@@ -77,6 +86,10 @@ pub(crate) fn render(default: DefaultValuePair<'_>) -> Option<renderer::DefaultV
             DefaultKind::String(s) => Some(renderer::DefaultValue::text(s)),
             DefaultKind::Constant(c) => Some(renderer::DefaultValue::constant(c)),
             DefaultKind::EnumVariant(c) => Some(renderer::DefaultValue::constant(c)),
+            DefaultKind::EnumVariantList(vals) => {
+                let vals: Vec<Constant<_>> = vals.into_iter().map(Constant::from).collect();
+                Some(renderer::DefaultValue::array(vals))
+            }
             DefaultKind::Bytes(b) => Some(renderer::DefaultValue::bytes(b)),
             DefaultKind::StringList(vals) => {
                 let vals = vals.into_iter().map(Text::new).collect();

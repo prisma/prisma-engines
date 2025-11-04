@@ -134,7 +134,9 @@ fn specifying_a_db_name_for_an_inline_relation_must_work(api: TestApi) {
     });
 }
 
-#[test_connector(exclude(Vitess))]
+// TODO: on CockroachDB 25.1, 25.2, this test fails with "ERROR: ALTER COLUMN TYPE is only implemented in the declarative schema changer",
+// which may be connected to https://github.com/prisma/prisma/issues/26864.
+#[test_connector(exclude(Vitess, CockroachDb252))]
 fn changing_the_type_of_a_field_referenced_by_a_fk_must_work(api: TestApi) {
     let dm1 = r#"
         model A {
@@ -571,10 +573,10 @@ fn on_delete_referential_actions_should_work(api: TestApi) {
     }
 }
 
-// 5.6 and 5.7 doesn't let you `SET DEFAULT` without setting the default value
+// MySQL 5.7 doesn't let you `SET DEFAULT` without setting the default value
 // (even if nullable). MySQL 8.0+ & MariaDB 10.0 allow you to create a table with
 // `SET DEFAULT`, but will silently use `NO ACTION` / `RESTRICT` instead.
-#[test_connector(exclude(Mysql56, Mysql57, Mariadb, Mssql, Vitess, CockroachDb))]
+#[test_connector(exclude(Mysql57, Mariadb, Mssql, Vitess, CockroachDb))]
 fn on_delete_set_default_should_work(api: TestApi) {
     let dm = r#"
         model A {
@@ -659,10 +661,10 @@ fn on_update_referential_actions_should_work(api: TestApi) {
     }
 }
 
-// 5.6 and 5.7 doesn't let you `SET DEFAULT` without setting the default value
+// MySQL 5.7 doesn't let you `SET DEFAULT` without setting the default value
 // (even if nullable). MySQL 8.0+ & MariaDB 10.0 allow you to create a table with
 // `SET DEFAULT`, but will silently use `NO ACTION` / `RESTRICT` instead.
-#[test_connector(exclude(Mysql56, Mysql57, Mariadb, Mssql, Vitess, CockroachDb))]
+#[test_connector(exclude(Mysql57, Mariadb, Mssql, Vitess, CockroachDb))]
 fn on_update_set_default_should_work(api: TestApi) {
     let dm = r#"
         model A {

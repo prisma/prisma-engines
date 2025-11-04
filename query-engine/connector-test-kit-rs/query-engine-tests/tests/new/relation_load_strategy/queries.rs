@@ -129,7 +129,7 @@ mod relation_load_strategy {
                     $query,
                     $result,
                     capabilities(CorrelatedSubqueries),
-                    exclude(Mysql("5.6", "5.7", "mariadb", "mariadb.js.wasm"))
+                    exclude(Mysql("5.7", "mariadb", "mariadb.js.wasm"))
                 );
                 relation_load_strategy_test!(
                     [<$name _lateral>],
@@ -456,7 +456,7 @@ mod relation_load_strategy {
         "#
     );
 
-    #[connector_test(schema(schema), only(Mysql(5.6, 5.7, "mariadb")))]
+    #[connector_test(schema(schema), only(Mysql(5.7, "mariadb")))]
     async fn unsupported_join_strategy(runner: Runner) -> TestResult<()> {
         seed(&runner).await?;
 

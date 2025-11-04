@@ -420,36 +420,6 @@ fn unique_constraint_errors_in_migrations_must_return_a_known_error(api: TestApi
     assert_eq!(json_error, expected_json);
 }
 
-#[test_connector(tags(Mysql56))]
-fn json_fields_must_be_rejected_on_mysql_5_6(api: TestApi) {
-    let dm = r#"
-        model Test {
-            id Int @id
-            j Json
-        }
-        "#;
-
-    api.ensure_connection_validity().unwrap();
-
-    let result = api
-        .schema_push_w_datasource(dm)
-        .send_unwrap_err()
-        .to_user_facing()
-        .unwrap_known();
-
-    assert_eq!(result.error_code, "P1015");
-    assert!(
-        result
-            .message
-            .contains("Your Prisma schema is using features that are not supported for the version of the database")
-    );
-    assert!(
-        result
-            .message
-            .contains("- The `Json` data type used in Test.j is not supported on MySQL 5.6.\n")
-    );
-}
-
 #[tokio::test]
 async fn connection_string_problems_give_a_nice_error() {
     let providers = &[
