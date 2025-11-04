@@ -39,18 +39,7 @@ jobs:
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
 
       - run: |
-          cargo build --release -p query-engine -p query-engine-node-api -p schema-engine-cli -p prisma-fmt
-
-      - name: Rename files
-        working-directory: ${{ github.workspace }}/target/release/
-        run: |
-          echo "Files in target/release before renaming"
-          ls -la .
-
-          mv libquery_engine.dylib libquery_engine.dylib.node
-
-          echo "Files in target/release after renaming"
-          ls -la .
+          cargo build --release -p schema-engine-cli -p prisma-fmt
 
       - uses: actions/upload-artifact@v4
         with:
@@ -58,5 +47,3 @@ jobs:
           path: |
             ${{ github.workspace }}/target/release/schema-engine
             ${{ github.workspace }}/target/release/prisma-fmt
-            ${{ github.workspace }}/target/release/query-engine
-            ${{ github.workspace }}/target/release/libquery_engine.dylib.node

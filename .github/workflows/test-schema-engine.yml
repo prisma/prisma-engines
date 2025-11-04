@@ -12,7 +12,7 @@ on:
       - 'LICENSE'
       - 'CODEOWNERS'
       # Specific
-      - 'query-engine/**'
+      - 'query-compiler/**'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}

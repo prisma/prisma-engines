@@ -74,7 +74,7 @@ pub fn main() -> anyhow::Result<()> {
         anyhow::bail!("expected single query");
     };
 
-    let (graph, _serializer) = QueryGraphBuilder::new(&query_schema)
+    let graph = QueryGraphBuilder::new(&query_schema)
         .without_eager_default_evaluation()
         .build(query)?;
 

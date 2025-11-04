@@ -17,21 +17,16 @@ members = [
     "query-engine/connector-test-kit-rs/query-engine-tests",
     "query-engine/connector-test-kit-rs/query-test-macros",
     "query-engine/connector-test-kit-rs/query-tests-setup",
-    "query-engine/core",
-    "query-engine/core-tests",
-    "query-engine/black-box-tests",
-    "query-engine/dmmf",
-    "query-engine/query-structure",
-    "query-engine/query-engine",
-    "query-engine/query-engine-node-api",
-    "query-engine/query-engine-wasm",
-    "query-engine/query-engine-c-abi",
-    "query-engine/request-handlers",
-    "query-engine/schema",
-    "query-engine/query-builders/*",
+    "query-compiler/core",
+    "query-compiler/core-tests",
+    "query-compiler/dmmf",
+    "query-compiler/query-builders/*",
     "query-compiler/query-compiler",
     "query-compiler/query-compiler-playground",
     "query-compiler/query-compiler-wasm",
+    "query-compiler/query-structure",
+    "query-compiler/request-handlers",
+    "query-compiler/schema",
     "libs/*",
     "prisma-fmt",
     "prisma-schema-wasm",
@@ -80,7 +75,7 @@ heck = "0.4"
 hex = "0.4"
 hyper = "0.14"
 indoc = "2"
-indexmap = "2"
+indexmap = { version = "2", features = ["serde"] }
 itertools = "0.13"
 jsonrpc-core = "17"
 log = "0.4"
@@ -197,7 +192,6 @@ user-facing-error-macros.path = "./libs/user-facing-error-macros"
 mongodb-client.path = "./libs/mongodb-client"
 test-setup.path = "./libs/test-setup"
 test-macros.path = "./libs/test-macros"
-query-engine-common.path = "./libs/query-engine-common"
 shared-wasm.path = "./libs/shared-wasm"
 driver-adapters.path = "./libs/driver-adapters"
 sql-ddl.path = "./libs/sql-ddl"
@@ -209,15 +203,7 @@ diagnostics.path = "./psl/diagnostics"
 schema-ast.path = "./psl/schema-ast"
 parser-database.path = "./psl/parser-database"
 
-query-engine.path = "./query-engine/query-engine"
-query-core.path = "./query-engine/core"
-schema.path = "./query-engine/schema"
-query-structure.path = "./query-engine/query-structure"
 query-connector.path = "./query-engine/connectors/query-connector"
-query-builder.path = "./query-engine/query-builders/query-builder"
-sql-query-builder.path = "./query-engine/query-builders/sql-query-builder"
-dmmf.path = "./query-engine/dmmf"
-request-handlers = { path = "./query-engine/request-handlers", default-features = false }
 sql-query-connector = { path = "./query-engine/connectors/sql-query-connector", default-features = false }
 mongodb-query-connector = { path = "./query-engine/connectors/mongodb-query-connector", default-features = false }
 
@@ -229,19 +215,19 @@ mongodb-schema-connector.path = "./schema-engine/connectors/mongodb-schema-conne
 sql-schema-describer.path = "./schema-engine/sql-schema-describer"
 mongodb-schema-describer.path = "./schema-engine/mongodb-schema-describer"
 
+dmmf.path = "./query-compiler/dmmf"
+query-builder.path = "./query-compiler/query-builders/query-builder"
 query-compiler = { path = "./query-compiler/query-compiler", default-features = false }
+query-core.path = "./query-compiler/core"
+query-structure.path = "./query-compiler/query-structure"
+# TODO: rename `request_handlers` to `query-protocol`
+request-handlers = { path = "./query-compiler/request-handlers", default-features = false }
+# TODO: rename `schema` to `query-schema`
+schema.path = "./query-compiler/schema"
+sql-query-builder.path = "./query-compiler/query-builders/sql-query-builder"
 
 [profile.dev.package.backtrace]
 opt-level = 3
-
-[profile.release.package.query-engine-node-api]
-strip = "symbols"
-
-[profile.release.package.query-engine]
-strip = "symbols"
-
-[profile.release.package.query-engine-c-abi]
-strip = "symbols"
 
 [profile.release]
 lto = "fat"

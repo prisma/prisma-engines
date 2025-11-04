@@ -43,15 +43,9 @@ pub static ENGINE_PROTOCOL: LazyLock<String> =
     LazyLock::new(|| std::env::var("PRISMA_ENGINE_PROTOCOL").unwrap_or_else(|_| "graphql".to_owned()));
 
 /// Teardown of a test setup.
-async fn teardown_project(
-    datamodel: &RenderedDatamodel,
-    db_schemas: &[&str],
-    schema_id: Option<usize>,
-) -> TestResult<()> {
-    if let Some(schema_id) = schema_id {
-        let params = serde_json::json!({ "schemaId": schema_id });
-        executor_process_request::<serde_json::Value>("teardown", params).await?;
-    }
+async fn teardown_project(datamodel: &RenderedDatamodel, db_schemas: &[&str], schema_id: usize) -> TestResult<()> {
+    let params = serde_json::json!({ "schemaId": schema_id });
+    executor_process_request::<serde_json::Value>("teardown", params).await?;
 
     Ok(qe_setup::teardown(&datamodel.url, &datamodel.schema, db_schemas).await?)
 }
@@ -148,21 +142,11 @@ fn run_relation_link_test_impl(
     test_fn_full_name: &'static str,
     original_test_function_name: &'static str,
 ) {
-    if CONFIG.with_driver_adapter().is_some_and(|da| {
-        excluded_executors
-            .iter()
-            .any(|exec| exec.parse::<TestExecutor>() == Ok(da.test_executor))
-    }) {
+    if !excluded_executors.is_empty() && excluded_executors.contains(&"QueryCompiler") {
         return;
     }
 
-    if !only_executors.is_empty()
-        && !CONFIG.with_driver_adapter().is_some_and(|da| {
-            only_executors
-                .iter()
-                .any(|exec| exec.parse::<TestExecutor>() == Ok(da.test_executor))
-        })
-    {
+    if !only_executors.is_empty() && !only_executors.contains(&"QueryCompiler") {
         return;
     }
 
@@ -299,21 +283,11 @@ fn run_connector_test_impl(
     test_fn_full_name: &'static str,
     original_test_function_name: &'static str,
 ) {
-    if CONFIG.with_driver_adapter().is_some_and(|da| {
-        excluded_executors
-            .iter()
-            .any(|exec| exec.parse::<TestExecutor>() == Ok(da.test_executor))
-    }) {
+    if !excluded_executors.is_empty() && excluded_executors.contains(&"QueryCompiler") {
         return;
     }
 
-    if !only_executors.is_empty()
-        && !CONFIG.with_driver_adapter().is_some_and(|da| {
-            only_executors
-                .iter()
-                .any(|exec| exec.parse::<TestExecutor>() == Ok(da.test_executor))
-        })
-    {
+    if !only_executors.is_empty() && !only_executors.contains(&"QueryCompiler") {
         return;
     }
 

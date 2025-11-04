@@ -21,7 +21,7 @@ Key directories:
 - `schema-engine/` – Migration/introspection engine plus test suites.
 - `prisma-fmt/` – Language server & formatter entry point (tests rely on `expect!` snapshots).
 - `schema-engine/sql-migration-tests` / `sql-introspection-tests` – Heavy integration suites (require DBs).
-- `query-engine/` – Legacy query execution stack (Rust).
+- `query-engine/` – Parts of the legacy query execution stack that haven't been ported to the new architecture, as well as the integration tests that are being run against QC using a compatibility layer.
 - `query-compiler/` – New query planner + associated WASM + playground.
 - `libs/` – Shared libraries (value types, driver adapters, test setup).
 - `driver-adapters/` – Rust-side adapter utilities for the new query interpreter.
@@ -82,8 +82,6 @@ Supporting infra:
   Use this one if you can't figure out the correct cargo features for a specific crate.
   Some library crates may be tricky to compile in isolation without feature unification.
   Unit tests are very fast so there's no problem running them for the whole workspace.
-  Note that `cargo test` for the whole workspace won't work because of the Node-API
-  symbol dependencies in the `query-engine-node-api` crate, use the makefile target.
 
 3. **Schema engine SQL tests**
    Require DB env vars (see `.test_database_urls/` in repo root). Example:
@@ -125,7 +123,7 @@ Ensure diffs make sense and rerun without `UPDATE_EXPECT` to confirm.
 - **Linear tickets**: two key Prisma 7 projects – *Breaking Changes* and *New Features*. Search via Linear MCP server if context needed.
 - **Feature flags**: driver adapters live behind configuration (`prisma.config.ts` with `engine: 'classic' | 'js'`). Schema engine CLI accepts `--datasource` JSON payload – reuse the structure from commit `34b5a69…`.
 - **Graphviz (`dot`)**: optional but useful for rendering query graphs (required if `RENDER_DOT_TO_PNG` set in QC tests/playground).
-- **Node.js**: required when working with query-engine Node bindings or QC interpreter harness.
+- **Node.js**: required when working with QC interpreter harness.
 - **Docker**: used for local DBs via `docker-compose.yml`; make targets (`make dev-postgres15`, `make start-mongo6`, etc.) orchestrate containers + config files.
 
 ---
@@ -153,8 +151,6 @@ Ensure diffs make sense and rerun without `UPDATE_EXPECT` to confirm.
   `cargo build -p schema-engine-cli`
 - Build query compiler WASM:
   `make build-qc-wasm`
-- Build legacy query engine binary:
-  `cargo build -p query-engine`
 - Query compiler playground (generate plan + graph):
   `cargo run -p query-compiler-playground`
 

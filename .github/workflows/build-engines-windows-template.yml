@@ -38,19 +38,7 @@ jobs:
 
       - uses: actions-rust-lang/setup-rust-toolchain@v1
 
-      - run: cargo build --release -p query-engine -p query-engine-node-api -p schema-engine-cli -p prisma-fmt
-
-      - name: Rename files
-        working-directory: ${{ github.workspace }}/target/release/
-        run: |
-          echo "Files in target/release before renaming"
-          ls .
-
-          mv query_engine.dll query_engine.dll.node
-          mv query-engine.exe query-engine.exe
-
-          echo "Files in target/release after renaming"
-          ls .
+      - run: cargo build --release -p schema-engine-cli -p prisma-fmt
 
       - uses: actions/upload-artifact@v4
         with:
@@ -58,5 +46,3 @@ jobs:
           path: |
             ${{ github.workspace }}/target/release/prisma-fmt.exe
             ${{ github.workspace }}/target/release/schema-engine.exe
-            ${{ github.workspace }}/target/release/query-engine.exe
-            ${{ github.workspace }}/target/release/query_engine.dll.node

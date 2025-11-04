@@ -1,0 +1,25 @@
+[package]
+edition.workspace = true
+name = "sql-query-builder"
+version = "0.1.0"
+
+[dependencies]
+quaint.workspace = true
+query-structure.workspace = true
+schema.workspace = true
+query-builder.workspace = true
+telemetry.workspace = true
+prisma-value.workspace = true
+psl.workspace = true
+
+itertools.workspace = true
+chrono.workspace = true
+bigdecimal.workspace = true
+serde_json.workspace = true
+
+[dev-dependencies]
+quaint = { workspace = true, features = ["mysql", "mssql", "postgresql", "sqlite"] }
+
+[features]
+relation_joins = ["query-builder/relation_joins"]
+default_generators = ["query-structure/default_generators"]

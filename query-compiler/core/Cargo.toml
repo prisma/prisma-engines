@@ -1,0 +1,29 @@
+[package]
+edition.workspace = true
+name = "query-core"
+version = "0.1.0"
+
+[features]
+graphql-protocol = []
+
+[dependencies]
+bigdecimal.workspace = true
+bon.workspace = true
+chrono.workspace = true
+psl.workspace = true
+indexmap.workspace = true
+itertools.workspace = true
+petgraph.workspace = true
+query-structure = { workspace = true, features = [
+    "default_generators",
+] }
+serde.workspace = true
+serde_json.workspace = true
+smallvec.workspace = true
+thiserror.workspace = true
+tokio = { workspace = true, features = ["macros", "rt", "time"] }
+tracing = { workspace = true, features = ["attributes"] }
+user-facing-errors.workspace = true
+uuid.workspace = true
+schema.workspace = true
+enumflags2.workspace = true

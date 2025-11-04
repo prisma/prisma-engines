@@ -1,0 +1,42 @@
+[package]
+name = "request-handlers"
+version = "0.1.0"
+edition.workspace = true
+
+[dependencies]
+psl.workspace = true
+query-structure.workspace = true
+query-core.workspace = true
+user-facing-errors.workspace = true
+graphql-parser = { workspace = true, optional = true }
+serde.workspace = true
+serde_json.workspace = true
+indexmap.workspace = true
+bigdecimal.workspace = true
+thiserror.workspace = true
+tracing.workspace = true
+
+[dev-dependencies]
+insta.workspace = true
+
+[features]
+mongodb = ["psl/mongodb"]
+postgresql = ["psl/postgresql"]
+mysql = ["psl/mysql"]
+sqlite = ["psl/sqlite"]
+cockroachdb = ["psl/cockroachdb"]
+mssql = ["psl/mssql"]
+all = [
+    "mongodb",
+    "mysql",
+    "sqlite",
+    "postgresql",
+    "cockroachdb",
+    "mssql",
+    "graphql-protocol",
+    "psl/all",
+]
+graphql-protocol = ["query-core/graphql-protocol", "dep:graphql-parser"]
+
+[build-dependencies]
+cfg_aliases.workspace = true

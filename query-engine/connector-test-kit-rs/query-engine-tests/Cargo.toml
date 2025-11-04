@@ -24,6 +24,7 @@ user-facing-errors.workspace = true
 prisma-value.workspace = true
 futures.workspace = true
 paste.workspace = true
+telemetry.workspace = true
 
 [dev-dependencies]
 insta = { workspace = true, features = ["json", "redactions"] }
