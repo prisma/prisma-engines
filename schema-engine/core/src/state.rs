@@ -324,7 +324,13 @@ impl GenericApi for EngineState {
     }
 
     async fn diff(&self, params: DiffParams) -> CoreResult<DiffResult> {
-        commands::diff_cli(params, self.host.clone(), &*self.extensions).await
+        commands::diff_cli(
+            params,
+            self.host.clone(),
+            self.datasource_urls_override.as_ref(),
+            &*self.extensions,
+        )
+        .await
     }
 
     async fn drop_database(&self, url: String) -> CoreResult<()> {
