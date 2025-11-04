@@ -16,6 +16,7 @@ use sql_schema_connector::SqlSchemaConnector;
 pub async fn diff_cli(
     params: DiffParams,
     host: Arc<dyn ConnectorHost>,
+    datasource_urls_override: Option<&psl::DatasourceUrls>,
     extension_types: &dyn ExtensionTypes,
 ) -> CoreResult<DiffResult> {
     // In order to properly handle MultiSchema, we need to make sure the preview feature is
@@ -34,6 +35,7 @@ pub async fn diff_cli(
         namespaces.clone(),
         &filter,
         preview_features,
+        datasource_urls_override,
         extension_types,
     )
     .await?;
@@ -43,6 +45,7 @@ pub async fn diff_cli(
         namespaces,
         &filter,
         preview_features,
+        datasource_urls_override,
         extension_types,
     )
     .await?;
@@ -130,6 +133,7 @@ async fn json_rpc_diff_target_to_dialect(
     namespaces: Option<Namespaces>,
     filter: &SchemaFilter,
     preview_features: BitFlags<psl::PreviewFeature>,
+    datasource_urls_override: Option<&psl::DatasourceUrls>,
     extension_types: &dyn ExtensionTypes,
 ) -> CoreResult<Option<(Box<dyn SchemaDialect>, DatabaseSchema)>> {
     match target {
@@ -141,7 +145,7 @@ async fn json_rpc_diff_target_to_dialect(
             // actually, just use the given `connector`. Verify that the provider is the same
             // as the one assumed by the connector.
 
-            let mut connector = crate::schema_to_connector(&sources, None, Some(config_dir))?;
+            let mut connector = crate::schema_to_connector(&sources, datasource_urls_override, Some(config_dir))?;
             connector.ensure_connection_validity().await?;
             connector.set_preview_features(preview_features);
             filter.validate(&*connector.schema_dialect())?;

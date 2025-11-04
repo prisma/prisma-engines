@@ -202,6 +202,7 @@ impl TestApi {
         test_setup::runtime::run_with_thread_local_runtime(diff_cli(
             params,
             self.connector.host().clone(),
+            None,
             &NoExtensionTypes,
         ))
     }

@@ -463,7 +463,7 @@ fn from_empty_to_migrations_directory(mut api: TestApi) {
     };
 
     let host = Arc::new(TestConnectorHost::default());
-    tok(diff_cli(params, host.clone(), &NoExtensionTypes)).unwrap();
+    tok(diff_cli(params, host.clone(), None, &NoExtensionTypes)).unwrap();
 
     let expected_printed_messages = expect![[r#"
         [
