@@ -4,6 +4,7 @@ version = "0.1.0"
 edition.workspace = true
 
 [features]
+default = ["mysql", "sqlite", "postgresql", "mssql"]
 mysql = ["quaint/mysql"]
 sqlite = ["quaint/sqlite"]
 postgresql = ["quaint/postgresql"]
@@ -15,27 +16,13 @@ workspace = true
 [dependencies]
 async-trait.workspace = true
 futures.workspace = true
-panic-utils.workspace = true
 serde.workspace = true
 serde_json.workspace = true
 telemetry.workspace = true
 tracing.workspace = true
-tracing-core.workspace = true
 uuid.workspace = true
 pin-project.workspace = true
 serde_repr.workspace = true
-
-[dev-dependencies]
-expect-test.workspace = true
-tokio = { workspace = true, features = ["macros", "time", "sync"] }
-wasm-rs-dbg.workspace = true
-
-[target.'cfg(not(target_arch = "wasm32"))'.dependencies]
-napi.workspace = true
-napi-derive.workspace = true
-quaint.workspace = true
-
-[target.'cfg(target_arch = "wasm32")'.dependencies]
 quaint.workspace = true
 js-sys.workspace = true
 serde-wasm-bindgen.workspace = true

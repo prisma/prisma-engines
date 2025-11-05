@@ -91,12 +91,6 @@ mongodb = { version = "3", features = [
 mysql_async = { git = "https://github.com/prisma/mysql_async", branch = "vendored-openssl" }
 names = { version = "0.11", default-features = false }
 nanoid = "0.4"
-napi = { version = "2", default-features = false, features = [
-    "napi9",
-    "tokio_rt",
-    "serde-json",
-] }
-napi-derive = "2"
 native-tls = "0.2"
 nom = "7"
 num_cpus = "1"
