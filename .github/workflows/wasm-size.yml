@@ -129,7 +129,7 @@ jobs:
           issue-number: ${{ github.event.pull_request.number }}
           body: |
             <!-- wasm-size -->
-            ### WASM Query Compiler File Size
+            ### Wasm Query Compiler File Size
 
             | Engine             | This PR                                             | Base branch                                         | Diff                                                |
             |--------------------|-----------------------------------------------------|-----------------------------------------------------|-----------------------------------------------------|

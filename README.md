@@ -75,7 +75,7 @@ the repository root in the `target/debug` (without `--release`) or `target/relea
 | Schema Engine    | `./target/[debug\|release]/schema-engine` |
 | Prisma Format    | `./target/[debug\|release]/prisma-fmt`    |
 
-The query compiler is a library crate. To produce the WASM bundles that power the JS runtime, use
+The query compiler is a library crate. To produce the Wasm bundles that power the JS runtime, use
 `make build-qc-wasm`. Driver adapters are compiled via `make build-driver-adapters-kit-qc`.
 
 ## Prisma Schema Language
@@ -128,7 +128,7 @@ The engine uses:
 
 ## Prisma format
 
-Prisma format can format prisma schema files. It also comes as a WASM module via
+Prisma format can format prisma schema files. It also comes as a Wasm module via
 a node package. You can read more [here](./prisma-schema-wasm/README.md).
 
 ## Debugging
@@ -188,7 +188,7 @@ exclusions used in the Makefile when invoking `cargo test --workspace --all-feat
 
 **Setup:**
 
-Use the `dev-*-qc` helpers to spin up a database (when needed), build the query-compiler WASM, build
+Use the `dev-*-qc` helpers to spin up a database (when needed), build the query-compiler Wasm, build
 the driver adapters, and write the `.test_config` consumed by the connector test kit:
 
 - `make dev-pg-qc`

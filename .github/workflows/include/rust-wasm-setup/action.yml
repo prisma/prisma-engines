@@ -1,4 +1,4 @@
-name: Rust + WASM common deps
+name: Rust + Wasm common deps
 
 runs:
   using: 'composite'
@@ -7,7 +7,7 @@ runs:
       shell: bash
       run: rustup default stable
 
-    - name: Add WASM target
+    - name: Add Wasm target
       shell: bash
       run: rustup target add wasm32-unknown-unknown
 
