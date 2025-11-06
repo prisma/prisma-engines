@@ -1,17 +1,17 @@
 # Agent Playbook — Prisma Engines
 
 ## 1. Big Picture
-- This repo hosts the **Prisma Engines**: PSL (schema parser/validator), schema-engine (migrate, introspect), query components (legacy query engine, new query compiler), driver adapters, and utilities shared with Prisma Client.
+- This repo hosts the **Prisma Engines**: PSL (schema parser/validator), schema-engine (migrate, introspect), query components (query compiler, driver adapters, compatibility harnesses), and utilities shared with Prisma Client.
 - Prisma 7 roadmap status:
   - `directUrl` and `shadowDatabaseUrl` are **invalid** in PSL.
-  - `url` remains temporarily (legacy query engine still consumes it); removal is a follow-up.
+  - `url` remains temporarily while downstream tooling finishes migrating to external datasource overrides; removal is tracked separately.
   - CLI/tests override connection info via schema-engine CLI (`--datasource`) or shared `TestApi::new_engine_with_connection_strings`.
   - Reference commit: `34b5a692b7bd79939a9a2c3ef97d816e749cda2f` (driver adapter override plumbing).
-- Prisma is deprecating the **native Rust query engine** in favor of the **Query Compiler (QC)** architecture:
+- Prisma has removed the **native Rust query engine** in favor of the **Query Compiler (QC)** architecture:
   - Query planning happens in Rust (`query-compiler` crate). Output: an expression tree (“query plan”).
   - Query interpretation/execution runs in Prisma Client TypeScript using driver adapters. The interpreter has no knowledge of connection strings or even whether it talks to a real DB.
-  - A compatibility harness (`qc-test-runner.ts` in the main repo) emulates legacy query engine behavior for the test suite until QE removal is complete.
-  - MongoDB support is not yet implemented for QC; Prisma 7 will ship without MongoDB, to be added later.
+  - A compatibility harness (`qc-test-runner.ts` in the main repo) still emulates the legacy GraphQL protocol so the CLI and tests behave as before while consumers migrate.
+  - MongoDB support is not yet implemented for QC; Prisma 7 will ship without MongoDB, to be added later once a driver adapter exists.
 
 ---
 
@@ -21,8 +21,8 @@ Key directories:
 - `schema-engine/` – Migration/introspection engine plus test suites.
 - `prisma-fmt/` – Language server & formatter entry point (tests rely on `expect!` snapshots).
 - `schema-engine/sql-migration-tests` / `sql-introspection-tests` – Heavy integration suites (require DBs).
-- `query-engine/` – Parts of the legacy query execution stack that haven't been ported to the new architecture, as well as the integration tests that are being run against QC using a compatibility layer.
-- `query-compiler/` – New query planner + associated WASM + playground.
+- `query-engine/` – Unused MongoDB connector crate left for future reference and the connector test kit (integration tests exercise QC through the driver adapter executor here).
+- `query-compiler/` – Query planner + associated WASM, playground, and the new `core-tests` crate.
 - `libs/` – Shared libraries (value types, driver adapters, test setup).
 - `driver-adapters/` – Rust-side adapter utilities for the new query interpreter.
 
@@ -50,7 +50,7 @@ Supporting infra:
 - Many tests assert on colored output via `expect!`. Always regenerate expectations when diagnostics wording changes.
 - Integration tests around multi-schema migrations still need real DB URLs; without them they skip/fail early.
 - Query compiler tests use insta snapshots (`query-compiler/tests`). Regenerate with `UPDATE_EXPECT=1 cargo test -p query-compiler`.
-- Query engine connector tests rely on `cargo insta` snapshots too (see `connector-test-kit-rs` README).
+- The connector test kit (`query-engine-tests`) relies on `cargo insta` snapshots too (see `connector-test-kit-rs` README).
 
 ---
 
@@ -83,32 +83,28 @@ Supporting infra:
   Some library crates may be tricky to compile in isolation without feature unification.
   Unit tests are very fast so there's no problem running them for the whole workspace.
 
-3. **Schema engine SQL tests**
+4. **Schema engine SQL tests**
    Require DB env vars (see `.test_database_urls/` in repo root). Example:
    ```bash
    source .test_database_urls/postgres
    cargo test -p sql-migration-tests migration_with_shadow_database -- --nocapture
    ```
 
-4. **Schema engine integration**
+5. **Schema engine integration**
   Similar pattern; rely on generated DB URLs. Without env vars tests will refuse to run (by design).
 
-5. **Query compiler snapshots**
+6. **Query compiler snapshots**
    ```bash
    UPDATE_EXPECT=1 cargo test -p query-compiler
    ```
    Graphviz (`dot`) optional; set `RENDER_DOT_TO_PNG` for visuals (requires Graphviz installed).
 
-6. **Query engine connector tests**
+7. **Connector test kit (driver adapters + QC)**
    ```bash
-   make dev-postgres15   # or appropriate make target to spin up DB & config
+   make dev-pg-qc    # or another dev-*-qc helper; builds QC WASM + driver adapters and writes .test_config
    cargo test -p query-engine-tests -- --nocapture
    ```
-   Requires `.test_config` or env vars; see `query-engine/connector-test-kit-rs/README.md`.
-
-7. **Query engine Node API / C-ABI builds**
-   - Node addon: `cargo build -p query-engine-node-api`.
-   - C-ABI (used by React Native): `cargo build -p query-engine-c-abi`.
+   Set `DRIVER_ADAPTER=<adapter>` (see Makefile) when you want to run against a specific adapter target. See `query-engine/connector-test-kit-rs/README.md` for env vars and adapter-specific notes.
 
 ### Updating expect! snapshots
 ```bash
@@ -123,7 +119,7 @@ Ensure diffs make sense and rerun without `UPDATE_EXPECT` to confirm.
 - **Linear tickets**: two key Prisma 7 projects – *Breaking Changes* and *New Features*. Search via Linear MCP server if context needed.
 - **Feature flags**: driver adapters live behind configuration (`prisma.config.ts` with `engine: 'classic' | 'js'`). Schema engine CLI accepts `--datasource` JSON payload – reuse the structure from commit `34b5a69…`.
 - **Graphviz (`dot`)**: optional but useful for rendering query graphs (required if `RENDER_DOT_TO_PNG` set in QC tests/playground).
-- **Node.js**: required when working with QC interpreter harness.
+- **Node.js & pnpm**: required to build the driver adapters kit (`make build-driver-adapters-kit-qc`) and run the QC interpreter harness.
 - **Docker**: used for local DBs via `docker-compose.yml`; make targets (`make dev-postgres15`, `make start-mongo6`, etc.) orchestrate containers + config files.
 
 ---
@@ -134,9 +130,8 @@ Ensure diffs make sense and rerun without `UPDATE_EXPECT` to confirm.
 - Integration tests bail with “Missing TEST_DATABASE_URL”. Set env vars or skip running them locally.
 - `TestApi` inside `sql-migration-tests` exposes `new_engine_with_connection_strings`; use it to pass overrides.
 - When touching overrides, update both PSL and schema-engine sides; they share assumptions about spans and optional URLs.
-- Query compiler shares substantial code with query engine (e.g., `query_core`, `query_structure`). Changes in shared crates affect both paths—be mindful of feature flags.
-- Many query engine tests still assume native QE; the `qc-test-runner` harness (in main repo) ensures QC behaves like QE for now. Expect follow-up cleanup once QE removal completes.
-- MongoDB currently runs only on legacy QE; QC MongoDB support is pending. Avoid regressing existing QE tests until QC parity is achieved.
+- The connector test kit relies on code from the main repo. Keep it in sync when you change request/response shapes or query plan types.
+- MongoDB currently has no QC driver adapter; related tests are skipped. Avoid surprising regressions until an adapter lands.
 
 ---
 
@@ -151,6 +146,8 @@ Ensure diffs make sense and rerun without `UPDATE_EXPECT` to confirm.
   `cargo build -p schema-engine-cli`
 - Build query compiler WASM:
   `make build-qc-wasm`
+- Build driver adapters kit for QC:
+  `make build-driver-adapters-kit-qc`
 - Query compiler playground (generate plan + graph):
   `cargo run -p query-compiler-playground`
 
@@ -160,11 +157,11 @@ Prefer using Makefile targets that take care of setting up the environment corre
 
 ## 8. Open Themes / Future Tasks
 - Removing `url` from PSL will be a follow-up; expect similar pattern (PSL error + override path).
-- Query engine removal: remaining QE dependencies/tests need to migrate to QC or be deleted once QE is gone.
+- Scrub remaining `query-engine` terminology and unused scaffolding now that the native engine is gone.
 - Additional schema-engine tests may need migration to the new override helper.
 - Documentation updates (internal + public) should mirror code changes; check when editing diagnostics to keep docs consistent.
 - Query compiler MongoDB support: implement translation path + driver adapters, update tests once ready.
-- Post-QE cleanup: strip QE-specific branches in shared crates (`query_core`, `query_structure`), simplify driver adapter plumbing.
+- Post-QE cleanup: strip no-longer-needed feature flags/branches in shared crates (`query_core`, `query_structure`), simplify driver adapter plumbing.
 
 ---
 
@@ -172,7 +169,7 @@ Prefer using Makefile targets that take care of setting up the environment corre
 - Prisma Config (`prisma.config.ts`) implementation lives in the main Prisma repo (`@prisma/config` package).
 - Linear roadmap items for Prisma 7 (Breaking Changes, New Features) hold context.
 - Commit `34b5a69…` – canonical example for datasource override wiring.
-- Query engine connector test guide: `query-engine/connector-test-kit-rs/README.md`.
+- Connector test kit guide: `query-engine/connector-test-kit-rs/README.md`.
 - QC playground usage: `query-compiler/query-compiler-playground/`.
 - QC harness in Prisma repo: `packages/cli/src/__tests__/queryCompiler/qc-test-runner.ts` (mirrors QE behavior).
 

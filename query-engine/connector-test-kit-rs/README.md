@@ -1,5 +1,10 @@
 # Query Engine Test Kit - A Full Guide
-The test kit is focused on integration testing the query engine through request-response assertions.
+The test kit focuses on integration testing the Prisma query stack (query compiler + driver adapters)
+through request-response assertions.
+
+> [!NOTE]
+> The crate names still carry the historical `query-engine` prefix even though the native engine has
+> been removed. All tests run through the query compiler and driver adapter executor.
 
 ## Test organization
 
@@ -58,7 +63,7 @@ As previously stated, the above can be omitted in favor of the `.test_config` co
 
 The config file must be either in the current working folder from which you invoke a test run or in `$WORKSPACE_ROOT`.
 It's recommended to use the file-based config as it's easier to switch between providers with an open IDE (reloading env vars would usually require reloading the IDE).
-The workspace root makefile contains a series of convenience commands to setup different connector test configs, e.g. `make dev-postgres12` sets up the correct test config file for the tests to pick up.
+The workspace root makefile contains a series of convenience commands to set up different connector test configs, e.g. `make dev-postgres12` (database only) or `make dev-pg-qc` (database + driver adapters) writes the correct `.test_config` for the tests to pick up.
 
 On the note of docker containers: Most connectors require an endpoint to run against (notable exception at the moment is SQLite), so you need to provide one. The `docker-compose.yml` in the workspace root offers all possible databases and versions we actively test. The aforementioned `make` commands also set up the container for you together with the .
 
@@ -76,9 +81,8 @@ Note that by default tests run concurrently.
 
 #### Running tests through driver adapters
 
-The query engine is able to delegate query execution to javascript through driver adapters.
-This means that instead of drivers being implemented in Rust, it's a layer of adapters over NodeJs
-drivers the code that actually communicates with the databases. See [`adapter-*` packages in prisma/prisma](https://github.com/prisma/prisma/tree/main/packages)
+The query stack delegates query execution to JavaScript driver adapters.
+Instead of query execution being implemented in Rust, the query plan interpreter in TypeScript loads the query compiler's plans and routes them through Node.js driver adapters. See the [`client-engine-runtime` and `adapter-*` packages in prisma/prisma](https://github.com/prisma/prisma/tree/main/packages) for the client-side pieces.
 
 To run tests through a driver adapters, you should also configure the following environment variables:
 
@@ -88,19 +92,19 @@ To run tests through a driver adapters, you should also configure the following 
 Example:
 
 ```shell
-export EXTERNAL_TEST_EXECUTOR="$WORKSPACE_ROOT/libs/driver-adapters/executor/script/testd-qe.sh"
+export EXTERNAL_TEST_EXECUTOR="$WORKSPACE_ROOT/libs/driver-adapters/executor/script/testd-qc.sh"
 export DRIVER_ADAPTER=neon
-export DRIVER_ADAPTER_CONFIG ='{ "proxyUrl": "127.0.0.1:5488/v1" }'
+export DRIVER_ADAPTER_CONFIG='{"proxyUrl":"127.0.0.1:5488/v1"}'
 ````
 
-We have provided helpers to run the query-engine tests with driver adapters, these helpers set all the required environment
-variables for you:
+We have provided helpers to run the connector tests with driver adapters; these helpers set all the
+required environment variables for you:
 
 ```shell
 DRIVER_ADAPTER=$adapter make test-qe
 ```
 
-Where `$adapter` is one of the supported adapters: `neon`, `planetscale`, `libsql`.
+Where `$adapter` is one of the supported adapters (see the `Makefile` for the current list).
 
 
 ## Authoring tests
@@ -351,7 +355,7 @@ Let's say you already have connector tests for MongoDB but right now it runs onl
 1. Add the container image for your new data store source to the `docker-compose.yml` file, name it to something you will remember, for example `mongo5`
 2. Create a connector file in the `query-engine/connector-test-kit-rs/test-configs/` with the connector data (see other examples in that director), name it with something that makes sense, for example `mongo5`
 3. Add the credentials to access the _data store service_ from the docker compose file, this is done creating the required file in `.test_database_urls`, for example `.test_database_urls/mongo5`
-4. Make sure this image is available to build and prepare the environment in the `Makefile`, in the query engine we depend in two Make targets, `dev-` and `start-`
+4. Make sure this image is available to build and prepare the environment in the `Makefile`. The connector test kit relies on paired `dev-` and `start-` targets.
    - The `start-` target (for example `start-mongo5`) will execute the _data store service_ in docker compose, for example `docker compose -f docker-compose.yml up -d --remove-orphans mongo5`
    - The `dev-` target (for example `dev-mongo5`) will depend on the `start-` target and copy the correct _connector file_, for example `cp $(CONFIG_PATH)/mongodb5 $(CONFIG_FILE)`
 5. Add the new test data store source to the `query-engine/connector-test-kit-rs/query-test-setup/src/connector_tag` file, if it is a completely new data store create the required file, in our case we need to modify `mongodb.rs`
