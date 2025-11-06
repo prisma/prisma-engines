@@ -81,16 +81,6 @@ impl DefaultKind {
             }),
         }
     }
-
-    /// Returns either a copy of the contained single value or produces a new
-    /// value as defined by the expression.
-    #[cfg(feature = "default_generators")]
-    pub fn get_evaluated(&self) -> Option<PrismaValue> {
-        match self {
-            DefaultKind::Single(v) => Some(v.clone()),
-            DefaultKind::Expression(g) => g.generate(),
-        }
-    }
 }
 
 impl DefaultValue {
@@ -247,11 +237,6 @@ impl ValueGenerator {
         self.args.first().and_then(|v| v.as_string())
     }
 
-    #[cfg(feature = "default_generators")]
-    pub fn generate(&self) -> Option<PrismaValue> {
-        self.generator.invoke()
-    }
-
     pub fn is_dbgenerated(&self) -> bool {
         self.name == "dbgenerated"
     }
@@ -300,56 +285,6 @@ impl ValueGeneratorFn {
             "auto" => Ok(Self::Auto),
             _ => Err(format!("The function {name} is not a known function.")),
         }
-    }
-
-    #[cfg(feature = "default_generators")]
-    fn invoke(&self) -> Option<PrismaValue> {
-        match self {
-            Self::Uuid(version) => Some(Self::generate_uuid(*version)),
-            Self::Cuid(version) => Some(Self::generate_cuid(*version)),
-            Self::Ulid => Some(Self::generate_ulid()),
-            Self::Nanoid(length) => Some(Self::generate_nanoid(length)),
-            Self::Now => Some(Self::generate_now()),
-            Self::Autoincrement | Self::DbGenerated | Self::Auto => None,
-        }
-    }
-
-    #[cfg(feature = "default_generators")]
-    fn generate_ulid() -> PrismaValue {
-        PrismaValue::String(ulid::Ulid::new().to_string())
-    }
-
-    #[cfg(feature = "default_generators")]
-    fn generate_cuid(version: u8) -> PrismaValue {
-        PrismaValue::String(match version {
-            1 => cuid::cuid1(),
-            2 => cuid::cuid2(),
-            _ => panic!("Unknown `cuid` version: {version}"),
-        })
-    }
-
-    #[cfg(feature = "default_generators")]
-    fn generate_uuid(version: u8) -> PrismaValue {
-        PrismaValue::Uuid(match version {
-            4 => uuid::Uuid::new_v4(),
-            7 => uuid::Uuid::now_v7(),
-            _ => panic!("Unknown UUID version: {version}"),
-        })
-    }
-
-    #[cfg(feature = "default_generators")]
-    fn generate_nanoid(length: &Option<u8>) -> PrismaValue {
-        if length.is_some() {
-            let value: usize = usize::from(length.unwrap());
-            PrismaValue::String(nanoid::nanoid!(value))
-        } else {
-            PrismaValue::String(nanoid::nanoid!())
-        }
-    }
-
-    #[cfg(feature = "default_generators")]
-    fn generate_now() -> PrismaValue {
-        PrismaValue::DateTime(chrono::Utc::now().into())
     }
 
     pub fn return_type(&self) -> Option<PrismaValueType> {

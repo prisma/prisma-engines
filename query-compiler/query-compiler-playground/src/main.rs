@@ -74,9 +74,7 @@ pub fn main() -> anyhow::Result<()> {
         anyhow::bail!("expected single query");
     };
 
-    let graph = QueryGraphBuilder::new(&query_schema)
-        .without_eager_default_evaluation()
-        .build(query)?;
+    let graph = QueryGraphBuilder::new(&query_schema).build(query)?;
 
     println!("{graph}");
     render_query_graph(&graph)?;

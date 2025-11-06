@@ -40,7 +40,6 @@ fn queries() {
         };
 
         let graph = QueryGraphBuilder::new(&query_schema)
-            .without_eager_default_evaluation()
             .build(query)
             .map_err(|err| format!("{test_name} failed: {err}"))
             .unwrap();

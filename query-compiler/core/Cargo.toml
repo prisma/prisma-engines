@@ -14,9 +14,7 @@ psl.workspace = true
 indexmap.workspace = true
 itertools.workspace = true
 petgraph.workspace = true
-query-structure = { workspace = true, features = [
-    "default_generators",
-] }
+query-structure.workspace = true
 serde.workspace = true
 serde_json.workspace = true
 smallvec.workspace = true

@@ -10,13 +10,5 @@ prisma-value.workspace = true
 bigdecimal.workspace = true
 thiserror.workspace = true
 
-uuid = { workspace = true, optional = true }
-cuid = { workspace = true, optional = true }
-ulid = { workspace = true, optional = true }
-nanoid = { workspace = true, optional = true }
 chrono.workspace = true
 indexmap.workspace = true
-
-[features]
-# Support for generating default UUID, CUID, ULID, nanoid and datetime values.
-default_generators = ["uuid/v4", "uuid/v7", "cuid", "ulid", "nanoid"]

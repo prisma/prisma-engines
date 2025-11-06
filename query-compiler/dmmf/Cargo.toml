@@ -11,9 +11,7 @@ serde.workspace = true
 serde_json.workspace = true
 schema.workspace = true
 indexmap = { workspace = true, features = ["serde"] }
-query-structure = { workspace = true, features = [
-    "default_generators",
-] }
+query-structure.workspace = true
 
 [dev-dependencies]
 expect-test.workspace = true

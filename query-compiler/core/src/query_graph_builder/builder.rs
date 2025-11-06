@@ -32,8 +32,6 @@ static PRISMA_DOT_PATH: LazyLock<Option<String>> = LazyLock::new(|| {
 
 pub struct QueryGraphBuilder<'a> {
     query_schema: &'a QuerySchema,
-    // TODO: remove this mode, it was only used by QE
-    eager_default_evaluation: bool,
 }
 
 impl fmt::Debug for QueryGraphBuilder<'_> {
@@ -44,17 +42,7 @@ impl fmt::Debug for QueryGraphBuilder<'_> {
 
 impl<'a> QueryGraphBuilder<'a> {
     pub fn new(query_schema: &'a QuerySchema) -> Self {
-        Self {
-            query_schema,
-            eager_default_evaluation: true,
-        }
-    }
-
-    /// Disables eager evaluation of default values of columns. Instead of passing through
-    /// evaluated defaults, they are passed through as reified generator calls.
-    pub fn without_eager_default_evaluation(mut self) -> Self {
-        self.eager_default_evaluation = false;
-        self
+        Self { query_schema }
     }
 
     /// Maps an operation to a query.
@@ -76,11 +64,7 @@ impl<'a> QueryGraphBuilder<'a> {
         root_object: ObjectType<'a>, // Either the query or mutation object.
         root_object_fields: &dyn Fn(&str) -> Option<OutputField<'a>>,
     ) -> QueryGraphBuilderResult<QueryGraph> {
-        let parser = if self.eager_default_evaluation {
-            QueryDocumentParser::with_eager_default_evaluation()
-        } else {
-            QueryDocumentParser::without_eager_default_evaluation()
-        };
+        let parser = QueryDocumentParser::new();
 
         let mut parsed_object = parser.parse(
             slice::from_ref(&selection),

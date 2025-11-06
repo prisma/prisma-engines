@@ -2778,15 +2778,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "nanoid"
-version = "0.4.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3ffa00dec017b5b1a8b7cf5e2c008bfda1aa7e0697ac1508b491fdf2622fb4d8"
-dependencies = [
- "rand 0.8.5",
-]
-
-[[package]]
 name = "native-tls"
 version = "0.2.14"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3730,15 +3721,11 @@ version = "0.0.0"
 dependencies = [
  "bigdecimal",
  "chrono",
- "cuid",
  "indexmap 2.10.0",
  "itertools 0.13.0",
- "nanoid",
  "prisma-value",
  "psl",
  "thiserror 2.0.12",
- "ulid",
- "uuid",
 ]
 
 [[package]]
@@ -5625,12 +5612,11 @@ checksum = "ed646292ffc8188ef8ea4d1e0e0150fb15a5c2e12ad9b8fc191ae7a8a7f3c4b9"
 
 [[package]]
 name = "ulid"
-version = "1.1.3"
+version = "1.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "04f903f293d11f31c0c29e4148f6dc0d033a7f80cebc0282bea147611667d289"
+checksum = "470dbf6591da1b39d43c14523b2b469c86879a53e8b758c8e090a470fe7b1fbe"
 dependencies = [
- "getrandom 0.2.11",
- "rand 0.8.5",
+ "rand 0.9.1",
  "web-time",
 ]
 

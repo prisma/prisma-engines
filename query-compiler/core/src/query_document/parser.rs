@@ -4,30 +4,18 @@ use bigdecimal::{BigDecimal, ToPrimitive};
 use chrono::prelude::*;
 use core::fmt;
 use indexmap::{IndexMap, IndexSet};
-use query_structure::{DefaultKind, PrismaValue, ValueGeneratorFn};
+use query_structure::PrismaValue;
 use std::{borrow::Cow, convert::TryFrom, rc::Rc, str::FromStr};
 use user_facing_errors::query_engine::validation::ValidationError;
 use uuid::Uuid;
 
-pub(crate) enum QueryDocumentParser {
-    WithEagerDefaultEvaluation {
-        /// NOW() default value that's reused for all NOW() defaults on a single query
-        default_now: PrismaValue,
-    },
-    WithoutEagerDefaultEvaluation,
-}
+pub(crate) struct QueryDocumentParser;
 
 type ResolveField<'a, 'b> = &'b dyn Fn(&str) -> Option<OutputField<'a>>;
 
 impl QueryDocumentParser {
-    pub(crate) fn with_eager_default_evaluation() -> Self {
-        QueryDocumentParser::WithEagerDefaultEvaluation {
-            default_now: crate::request_context::get_request_now(),
-        }
-    }
-
-    pub(crate) fn without_eager_default_evaluation() -> Self {
-        QueryDocumentParser::WithoutEagerDefaultEvaluation
+    pub(crate) fn new() -> Self {
+        Self
     }
 
     // Public entry point to parsing the query document (as denoted by `selections`) against the `schema_object`.
@@ -712,20 +700,10 @@ impl QueryDocumentParser {
                 // If it's not optional and has no default, a required field has not been provided.
                 match &field.default_value {
                     Some(default_value) => {
-                        let default_pv = match self {
-                            Self::WithEagerDefaultEvaluation { default_now } => match default_value {
-                                DefaultKind::Expression(expr) if matches!(expr.generator(), ValueGeneratorFn::Now) => {
-                                    default_now.clone()
-                                }
-                                _ => default_value.get_evaluated()?,
-                            },
-                            Self::WithoutEagerDefaultEvaluation => default_value.get()?,
-                        };
-
                         match self.parse_input_value(
                             selection_path.clone(),
                             argument_path,
-                            default_pv.into(),
+                            default_value.get()?.into(),
                             field.field_types(),
                             query_schema,
                         ) {
