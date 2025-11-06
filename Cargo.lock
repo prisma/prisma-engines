@@ -4800,40 +4800,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "sql-query-connector"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "async-trait",
- "base64 0.22.1",
- "bigdecimal",
- "chrono",
- "cuid",
- "expect-test",
- "futures",
- "itertools 0.13.0",
- "panic-utils",
- "prisma-value",
- "psl",
- "quaint",
- "query-builder",
- "query-connector",
- "query-structure",
- "rand 0.8.5",
- "serde",
- "serde_json",
- "sql-query-builder",
- "telemetry",
- "thiserror 2.0.12",
- "tokio",
- "tracing",
- "tracing-futures",
- "ulid",
- "user-facing-errors",
- "uuid",
-]
-
-[[package]]
 name = "sql-schema-connector"
 version = "0.1.0"
 dependencies = [

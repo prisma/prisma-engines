@@ -187,7 +187,6 @@ schema-ast.path = "./psl/schema-ast"
 parser-database.path = "./psl/parser-database"
 
 query-connector.path = "./query-engine/connectors/query-connector"
-sql-query-connector = { path = "./query-engine/connectors/sql-query-connector", default-features = false }
 mongodb-query-connector = { path = "./query-engine/connectors/mongodb-query-connector", default-features = false }
 
 schema-core.path = "./schema-engine/core"
