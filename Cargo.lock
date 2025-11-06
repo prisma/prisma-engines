@@ -1037,7 +1037,6 @@ dependencies = [
  "indoc",
  "itertools 0.13.0",
  "psl",
- "regex",
 ]
 
 [[package]]
@@ -2149,7 +2148,6 @@ dependencies = [
 name = "json-rpc-api"
 version = "0.1.0"
 dependencies = [
- "heck 0.4.1",
  "serde",
  "tsify",
  "wasm-bindgen",
@@ -3390,7 +3388,6 @@ dependencies = [
  "base64 0.22.1",
  "bigdecimal",
  "chrono",
- "regex",
  "serde",
  "serde_json",
  "uuid",
@@ -3460,7 +3457,6 @@ dependencies = [
  "connection-string",
  "cruet",
  "diagnostics",
- "either",
  "enumflags2",
  "hex",
  "indoc",
@@ -3534,7 +3530,6 @@ dependencies = [
  "enumflags2",
  "expect-test",
  "futures",
- "getrandom 0.2.11",
  "hex",
  "indoc",
  "itertools 0.13.0",
@@ -3552,7 +3547,6 @@ dependencies = [
  "quaint-test-macros",
  "quaint-test-setup",
  "query-template",
- "regex",
  "rusqlite",
  "serde",
  "serde_json",
@@ -3586,9 +3580,7 @@ dependencies = [
 name = "quaint-test-setup"
 version = "0.1.0"
 dependencies = [
- "async-trait",
  "bitflags 2.9.1",
- "names",
  "quaint",
  "tokio",
 ]
@@ -3739,7 +3731,6 @@ dependencies = [
  "bigdecimal",
  "chrono",
  "cuid",
- "getrandom 0.2.11",
  "indexmap 2.10.0",
  "itertools 0.13.0",
  "nanoid",
@@ -4298,7 +4289,6 @@ dependencies = [
  "codspeed-criterion-compat",
  "psl",
  "query-structure",
- "rustc-hash 2.1.1",
 ]
 
 [[package]]
@@ -4309,7 +4299,6 @@ dependencies = [
  "pest",
  "pest_derive",
  "serde",
- "serde_json",
 ]
 
 [[package]]
@@ -5130,7 +5119,6 @@ dependencies = [
  "thiserror 2.0.12",
  "tokio",
  "tracing",
- "tracing-futures",
  "tracing-subscriber",
 ]
 
@@ -5756,7 +5744,6 @@ dependencies = [
 name = "user-facing-error-macros"
 version = "0.1.0"
 dependencies = [
- "proc-macro2",
  "quote",
  "syn 2.0.104",
 ]

@@ -6,7 +6,6 @@ edition.workspace = true
 [dependencies]
 query-structure.workspace = true
 psl.workspace = true
-rustc-hash.workspace = true
 
 [dev-dependencies]
 codspeed-criterion-compat.workspace = true
