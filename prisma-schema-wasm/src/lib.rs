@@ -42,6 +42,12 @@ pub fn get_config(params: String) -> String {
     prisma_fmt::get_config(params)
 }
 
+#[wasm_bindgen]
+pub fn get_generators(params: String) -> String {
+    register_panic_hook();
+    prisma_fmt::get_generators(params)
+}
+
 /// Docs: https://prisma.github.io/prisma-engines/doc/prisma_fmt/fn.get_dmmf.html
 #[wasm_bindgen]
 pub fn get_dmmf(params: String) -> Result<String, JsError> {

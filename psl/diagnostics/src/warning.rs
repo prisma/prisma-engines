@@ -21,6 +21,13 @@ impl DatamodelWarning {
         DatamodelWarning { message, span }
     }
 
+    pub fn new_datasource_attr_moved_to_prisma_config(attr_name: &str, span: Span) -> DatamodelWarning {
+        let message = format!(
+            "The datasource attribute \"{attr_name}\" is also available to the Prisma Config file, and will be removed from the datasource in Prisma 7.0.0. See https://pris.ly/prisma-config for more information."
+        );
+        Self::new(message, span)
+    }
+
     pub fn new_preview_feature_deprecated(feature: &str, span: Span) -> DatamodelWarning {
         let message =
             format!("Preview feature \"{feature}\" is deprecated. It will be removed in a future version of Prisma.");
