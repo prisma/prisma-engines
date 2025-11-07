@@ -1597,6 +1597,7 @@ mod tests {
 
           datasource db {
             provider = "mongodb"
+          }
 
           model User {
             id String @id @default(auto()) @map("_id") @db.ObjectId

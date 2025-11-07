@@ -162,9 +162,9 @@ mod tests {
             /// Everybody's laughing,
             /// Everybody's happy!
             datasource db {
-              provider          = "postgres"
-              relationMode      = "foreignKeys"
-              extensions        = [postgis, uuid_ossp(map: "uuid-ossp")]
+              provider     = "postgres"
+              relationMode = "foreignKeys"
+              extensions   = [postgis, uuid_ossp(map: "uuid-ossp")]
             }
         "#]];
 

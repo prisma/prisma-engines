@@ -13,7 +13,6 @@
 //! let datasource = Datasource::new(
 //!     "db",
 //!     "postgres",
-//!     Env::variable("DATABASE_URL")
 //! );
 //!
 //! // We get a string rendering without proper formatting
