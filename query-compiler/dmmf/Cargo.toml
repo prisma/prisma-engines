@@ -1,0 +1,23 @@
+[package]
+name = "dmmf"
+version = "0.1.0"
+edition.workspace = true
+
+[dependencies]
+bigdecimal.workspace = true
+itertools.workspace = true
+psl.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+schema.workspace = true
+indexmap = { workspace = true, features = ["serde"] }
+query-structure.workspace = true
+
+[dev-dependencies]
+expect-test.workspace = true
+indoc.workspace = true
+pretty_assertions.workspace = true
+flate2.workspace = true
+similar = { workspace = true, features = ["text", "inline", "bytes"] }
+colored.workspace = true
+itertools.workspace = true

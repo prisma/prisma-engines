@@ -27,7 +27,6 @@ serde.workspace = true
 serde_json.workspace = true
 enumflags2.workspace = true
 indoc.workspace = true
-either.workspace = true
 hex.workspace = true
 
 # For the connector API.

@@ -1,9 +1,6 @@
-use query_core::{
-    constants::custom_types,
-    response_ir::{Item, ItemRef, Map},
-};
+use query_core::constants::custom_types;
 use query_structure::PrismaValue;
-use request_handlers::{GQLBatchResponse, GQLResponse, PrismaResponse};
+use request_handlers::{GQLBatchResponse, GQLResponse, Item, ItemRef, Map, PrismaResponse};
 
 pub struct JsonResponse;
 
@@ -44,12 +41,7 @@ fn graphql_item_to_json_item(item: Item) -> Item {
     match item {
         Item::Value(pv) => Item::Value(unwrap_tagged_value(pv)),
         Item::Map(map) => Item::Map(graphql_map_to_json_map(map)),
-        Item::List(list) => Item::List(
-            list.into_iter()
-                .map(graphql_item_to_json_item)
-                .collect::<Vec<_>>()
-                .into(),
-        ),
+        Item::List(list) => Item::List(list.into_iter().map(graphql_item_to_json_item).collect::<Vec<_>>()),
         Item::Ref(ref_item) => graphql_item_to_json_item(item_ref_to_owned_item(ref_item)),
         _ => item,
     }

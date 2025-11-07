@@ -131,21 +131,11 @@ jobs:
           TARGET_NAME: ${{ matrix.target.name }}
           RELEASE_DIR: ${{ github.workspace }}/target/release
         run: |
-          echo "Files in target/release before renaming"
+          echo "Files in target/release"
           ls -la $RELEASE_DIR
 
           echo "Copying files to engines-artifacts"
           cp -r $RELEASE_DIR/ engines-artifacts
-
-          echo "Rename libquery_engine.so to libquery_engine.so.node for non-static targets"
-          if [[ "$TARGET_NAME" == *-static-* ]]; then
-            echo "Current target is static. Skipping."
-          else
-            mv engines-artifacts/libquery_engine.so engines-artifacts/libquery_engine.so.node
-          fi
-
-          echo "Files in engines-artifacts after renaming"
-          ls -la engines-artifacts
 
       - name: Upload artifacts for "release" target
         uses: actions/upload-artifact@v4
@@ -153,9 +143,7 @@ jobs:
         with:
           name: '${{ matrix.target.name }}'
           path: |
-            ${{ github.workspace }}/engines-artifacts/libquery_engine.so.node
             ${{ github.workspace }}/engines-artifacts/schema-engine
-            ${{ github.workspace }}/engines-artifacts/query-engine
             ${{ github.workspace }}/engines-artifacts/prisma-fmt
 
       - name: Prepare files for "${{ matrix.target.name }}" target
@@ -164,21 +152,11 @@ jobs:
           TARGET_NAME: ${{ matrix.target.name }}
           RELEASE_DIR: ${{ github.workspace }}/target/${{ matrix.target.target_path }}/release
         run: |
-          echo "Files in target/release before renaming"
+          echo "Files in target/release"
           ls -la $RELEASE_DIR
 
           echo "Copying files to engines-artifacts"
           cp -r $RELEASE_DIR/ engines-artifacts
-
-          echo "Rename libquery_engine.so to libquery_engine.so.node for non-static targets"
-          if [[ "$TARGET_NAME" == *-static-* ]]; then
-            echo "Current target is static. Skipping."
-          else
-            mv engines-artifacts/libquery_engine.so engines-artifacts/libquery_engine.so.node
-          fi
-
-          echo "Files in engines-artifacts after renaming"
-          ls -la engines-artifacts
 
       - name: Upload artifacts for "${{ matrix.target.name }}" target
         uses: actions/upload-artifact@v4
@@ -186,7 +164,5 @@ jobs:
         with:
           name: ${{ matrix.target.name }}
           path: |
-            ${{ github.workspace }}/engines-artifacts/libquery_engine.so.node
             ${{ github.workspace }}/engines-artifacts/schema-engine
-            ${{ github.workspace }}/engines-artifacts/query-engine
             ${{ github.workspace }}/engines-artifacts/prisma-fmt

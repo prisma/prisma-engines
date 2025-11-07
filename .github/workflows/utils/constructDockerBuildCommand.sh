@@ -22,16 +22,8 @@ bash -c \
     \" \
     git config --global --add safe.directory ${DOCKER_WORKSPACE} \
     && cargo clean \
-    && cargo build --release -p query-engine          --manifest-path query-engine/query-engine/Cargo.toml          $TARGET_STRING $FEATURES_STRING \
-    && cargo build --release -p query-engine-node-api --manifest-path query-engine/query-engine-node-api/Cargo.toml $TARGET_STRING $FEATURES_STRING \
-    && cargo build --release -p schema-engine-cli     --manifest-path schema-engine/cli/Cargo.toml                  $TARGET_STRING $FEATURES_STRING \
-    && cargo build --release -p prisma-fmt            --manifest-path prisma-fmt/Cargo.toml                         $TARGET_STRING $FEATURES_STRING \
+    && cargo build --release -p schema-engine-cli --manifest-path schema-engine/cli/Cargo.toml $TARGET_STRING $FEATURES_STRING \
+    && cargo build --release -p prisma-fmt        --manifest-path prisma-fmt/Cargo.toml        $TARGET_STRING $FEATURES_STRING \
     \" \
 "
-# remove query-engine-node-api for "static" targets
-if [[ "$TARGET_NAME" == *-static-* ]]; then
-    substring_to_replace="&& cargo build --release -p query-engine-node-api --manifest-path query-engine/query-engine-node-api/Cargo.toml $TARGET_STRING $FEATURES_STRING"
-    command="${command/$substring_to_replace/}"
-fi
-
 echo "$command"

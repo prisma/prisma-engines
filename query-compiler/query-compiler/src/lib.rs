@@ -35,9 +35,7 @@ pub fn compile(
     connection_info: &ConnectionInfo,
 ) -> Result<Expression, CompileError> {
     let ctx = Context::new(connection_info, None);
-    let (graph, _serializer) = QueryGraphBuilder::new(query_schema)
-        .without_eager_default_evaluation()
-        .build(query)?;
+    let graph = QueryGraphBuilder::new(query_schema).build(query)?;
 
     let res: Result<Expression, TranslateError> = match connection_info.sql_family() {
         #[cfg(feature = "postgresql")]

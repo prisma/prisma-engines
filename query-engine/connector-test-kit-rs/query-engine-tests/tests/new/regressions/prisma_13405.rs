@@ -2,7 +2,7 @@ use query_engine_tests::*;
 
 #[test_suite(schema(generic), only(MongoDb))]
 mod mongodb {
-    use query_engine_tests::query_core::TxId;
+    use query_engine_tests::TxId;
     use serde_json::json;
     use std::{future::Future, rc::Rc};
 

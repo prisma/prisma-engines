@@ -24,8 +24,6 @@ jobs:
         crate:
           - schema-engine-cli
           - prisma-fmt
-          - query-engine
-          - query-engine-node-api
 
     uses: ./.github/workflows/test-compilation-template.yml
     with:
@@ -42,8 +40,6 @@ jobs:
         crate:
           - schema-engine-cli
           - prisma-fmt
-          - query-engine
-          - query-engine-node-api
 
     uses: ./.github/workflows/test-compilation-template.yml
     with:
