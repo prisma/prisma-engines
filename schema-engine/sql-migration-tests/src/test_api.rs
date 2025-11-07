@@ -70,19 +70,6 @@ impl TestApi {
         TestApi { root, connector }
     }
 
-    /// Initializes a new [`TestApi`] with a clone of the current [`TestApiArgs`] but with different database URLs.
-    /// The types of `database_url` and `shadow_database_url` are tied together because it's unlikely that a single
-    /// call site would need two different kinds of strings for each of them, while making both generics independent
-    /// from each other makes it impossible to automatically infer the type of `shadow_database_url` when `None` is
-    /// passed and requires explicit type annotations.
-    pub fn with_new_connection_strings<S: Into<String>>(self, database_url: S, shadow_database_url: Option<S>) -> Self {
-        Self::new(
-            self.root
-                .args
-                .with_new_connection_strings(database_url, shadow_database_url),
-        )
-    }
-
     pub fn args(&self) -> &TestApiArgs {
         &self.root.args
     }
@@ -101,6 +88,10 @@ impl TestApi {
 
     pub fn connection_string(&self) -> &str {
         self.root.connection_string()
+    }
+
+    pub fn shadow_database_connection_string(&self) -> Option<&str> {
+        self.root.shadow_database_connection_string()
     }
 
     pub fn connection_info(&self) -> ConnectionInfo {
@@ -213,9 +204,23 @@ impl TestApi {
     }
 
     pub fn diff(&self, params: DiffParams) -> ConnectorResult<DiffResult> {
+        self.diff_with_datasource(
+            DatasourceUrls {
+                url: self.connection_string().to_owned(),
+                shadow_database_url: self.shadow_database_connection_string().map(<_>::to_owned),
+            },
+            params,
+        )
+    }
+
+    pub fn diff_with_datasource(
+        &self,
+        datasource_urls: DatasourceUrls,
+        params: DiffParams,
+    ) -> ConnectorResult<DiffResult> {
         test_setup::runtime::run_with_thread_local_runtime(diff_cli(
             params,
-            &DatasourceUrls::from_url(self.root.connection_string()).try_into()?,
+            &datasource_urls.try_into()?,
             self.connector.host().clone(),
             &NoExtensionTypes,
         ))

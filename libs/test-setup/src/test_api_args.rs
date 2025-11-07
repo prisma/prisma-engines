@@ -1,7 +1,6 @@
 use crate::{Capabilities, Tags, logging, mssql, mysql, postgres};
 use enumflags2::BitFlags;
 use quaint::single::Quaint;
-use std::borrow::Cow;
 use std::sync::LazyLock;
 use std::time::Duration;
 use std::{fmt::Display, io::Write as _};
@@ -128,7 +127,7 @@ pub struct TestApiArgs {
     test_function_name: &'static str,
     preview_features: &'static [&'static str],
     namespaces: &'static [&'static str],
-    db: Cow<'static, DbUnderTest>,
+    db: &'static DbUnderTest,
 }
 
 impl TestApiArgs {
@@ -141,18 +140,7 @@ impl TestApiArgs {
             test_function_name,
             preview_features,
             namespaces,
-            db: Cow::Borrowed(db_under_test()),
-        }
-    }
-
-    pub fn with_new_connection_strings<S: Into<String>>(self, database_url: S, shadow_database_url: Option<S>) -> Self {
-        TestApiArgs {
-            db: Cow::Owned(DbUnderTest {
-                database_url: database_url.into(),
-                shadow_database_url: shadow_database_url.map(Into::into),
-                ..self.db.as_ref().clone()
-            }),
-            ..self
+            db: db_under_test(),
         }
     }
 

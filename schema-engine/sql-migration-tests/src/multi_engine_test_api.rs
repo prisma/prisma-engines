@@ -94,6 +94,11 @@ impl TestApi {
         &self.connection_string
     }
 
+    /// The connection string for the shadow database associated with the test.
+    pub fn shadow_database_connection_string(&self) -> Option<&str> {
+        self.args.shadow_database_url()
+    }
+
     /// The ConnectionInfo based on the connection string
     pub fn connection_info(&self) -> ConnectionInfo {
         ConnectionInfo::from_url(self.connection_string()).unwrap()
