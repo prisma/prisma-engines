@@ -17,7 +17,6 @@ mod json_filter {
         schema.to_owned()
     }
 
-    // Note: testing the absence of "JSON-null stripping" in Napi.rs Driver Adapters requires patching napi.rs.
     #[connector_test(schema(schema), exclude(MySQL(5.6)))]
     async fn does_not_strip_nulls_in_json(runner: Runner) -> TestResult<()> {
         run_query!(

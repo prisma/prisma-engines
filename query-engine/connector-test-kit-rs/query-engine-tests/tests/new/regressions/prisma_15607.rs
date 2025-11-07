@@ -5,8 +5,8 @@
 
 use indoc::indoc;
 use query_engine_tests::{
-    CONFIG, ENV_LOG_LEVEL, LogEmit, QueryResult, Runner, TestError, TestLogCapture, TestResult, WithSubscriber,
-    query_core::TxId, render_test_datamodel, test_tracing_subscriber,
+    CONFIG, ENV_LOG_LEVEL, LogEmit, QueryResult, Runner, TestError, TestLogCapture, TestResult, TxId, WithSubscriber,
+    render_test_datamodel, test_tracing_subscriber,
 };
 use std::future::Future;
 use tokio::sync::mpsc;

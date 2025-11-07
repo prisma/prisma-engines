@@ -61,23 +61,12 @@ impl<'a> EnvFilterBuilder<'a> {
     pub fn build(self) -> EnvFilter {
         let level = self.log_level.level().unwrap_or("info".into());
 
-        let mut filter = EnvFilter::from_default_env()
-            .add_directive("h2=error".parse().unwrap())
-            .add_directive("hyper=error".parse().unwrap())
-            .add_directive("tower=error".parse().unwrap())
-            .add_directive(format!("query_engine={level}").parse().unwrap())
+        EnvFilter::from_default_env()
+            .add_directive(format!("query_compiler={level}").parse().unwrap())
+            .add_directive(format!("query_compiler_wasm={level}").parse().unwrap())
             .add_directive(format!("query_core={level}").parse().unwrap())
-            .add_directive(format!("query_connector={level}").parse().unwrap())
-            .add_directive(format!("sql_query_connector={level}").parse().unwrap())
-            .add_directive(format!("mongodb_query_connector={level}").parse().unwrap());
-
-        if self.log_queries {
-            filter = filter
-                .add_directive("quaint[{is_query}]=trace".parse().unwrap())
-                .add_directive("mongodb_query_connector[{is_query}]=debug".parse().unwrap());
-        }
-
-        filter
+            .add_directive(format!("query_builder={level}").parse().unwrap())
+            .add_directive(format!("sql_query_builder={level}").parse().unwrap())
     }
 }
 

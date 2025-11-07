@@ -12,7 +12,7 @@ use quaint::connector::{AdapterName, AdapterProvider, IsolationLevel};
 use std::sync::atomic::{AtomicBool, Ordering};
 
 /// Proxy is a struct wrapping a javascript object that exhibits basic primitives for
-/// querying and executing SQL (i.e. a client connector). The Proxy uses Napi/Wasm's JsFunction
+/// querying and executing SQL (i.e. a client connector). The Proxy uses Wasm's JsFunction
 /// to invoke the code within the node runtime that implements the client connector.
 pub(crate) struct CommonProxy {
     /// Execute a query given as SQL, interpolating the given parameters.
@@ -262,9 +262,7 @@ impl Drop for TransactionProxy {
 
 macro_rules! impl_send_sync_on_wasm {
     ($struct:ident) => {
-        #[cfg(target_arch = "wasm32")]
         unsafe impl Send for $struct {}
-        #[cfg(target_arch = "wasm32")]
         unsafe impl Sync for $struct {}
     };
 }

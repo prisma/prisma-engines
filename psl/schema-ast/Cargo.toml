@@ -9,4 +9,3 @@ diagnostics.workspace = true
 pest.workspace = true
 pest_derive.workspace = true
 serde.workspace = true
-serde_json.workspace = true

@@ -15,7 +15,7 @@ Prepare the test environment specific to your target. For example:
 make dev-sqlite
 ```
 
-Run the Query Engine tests using Nextest to produce `libtest-json` output.
+Run the connector test kit (`query-engine-tests`, which exercises the query compiler + driver adapters) using Nextest to produce `libtest-json` output.
 It is an experimental feature of Nextest at the time of writing, which needs
 to be enabled by the `NEXTEST_EXPERIMENTAL_LIBTEST_JSON` environment variable.
 

@@ -1,6 +1,6 @@
 //! Query Engine Driver Adapters
 //! This crate is responsible for defining a `quaint::Connector` implementation that uses functions
-//! exposed by client connectors via either `napi-rs` (on native targets) or `wasm_bindgen` / `js_sys` (on Wasm targets).
+//! exposed by client `wasm_bindgen` / `js_sys`.
 //!
 //! A driver adapter is an object defined in javascript that uses a driver
 //! (ex. '@planetscale/database') to provide a similar implementation of that of a `quaint::Connector`. i.e. the ability to query and execute SQL
@@ -19,11 +19,7 @@ pub(crate) mod types;
 use crate::error::{DriverAdapterError, MappedDriverAdapterError};
 use quaint::error::{DatabaseConstraint, Error as QuaintError, ErrorKind};
 
-#[cfg(target_arch = "wasm32")]
 pub(crate) use wasm::result::AdapterResult;
-
-#[cfg(not(target_arch = "wasm32"))]
-pub(crate) use napi::result::AdapterResult;
 
 impl From<DriverAdapterError> for QuaintError {
     fn from(
@@ -128,25 +124,12 @@ pub use queryable::{JsQueryable, queryable_from_js};
 pub(crate) use transaction::JsTransaction;
 pub use types::AdapterProvider;
 
-#[cfg(target_arch = "wasm32")]
 pub use wasm::JsObjectExtern as JsObject;
 
-#[cfg(not(target_arch = "wasm32"))]
-pub use ::napi::JsObject;
-
-#[cfg(not(target_arch = "wasm32"))]
-pub mod napi;
-
-#[cfg(not(target_arch = "wasm32"))]
-pub(crate) use napi::*;
-
-#[cfg(target_arch = "wasm32")]
 pub mod wasm;
 
-#[cfg(target_arch = "wasm32")]
 pub(crate) use wasm::*;
 
-#[cfg(target_arch = "wasm32")]
 mod arch {
     pub(crate) use js_sys::JsString;
     use std::str::FromStr;
@@ -189,43 +172,6 @@ mod arch {
     }
 
     pub(crate) type JsResult<T> = core::result::Result<T, wasm_bindgen::JsValue>;
-}
-
-#[cfg(not(target_arch = "wasm32"))]
-mod arch {
-    pub(crate) use ::napi::JsString;
-
-    pub(crate) fn get_named_property<T>(object: &::napi::JsObject, name: &str) -> JsResult<T>
-    where
-        T: ::napi::bindgen_prelude::FromNapiValue + ::napi::bindgen_prelude::ValidateNapiValue,
-    {
-        object.get_named_property(name)
-    }
-
-    pub(crate) fn get_optional_named_property<T>(object: &::napi::JsObject, name: &str) -> JsResult<Option<T>>
-    where
-        T: ::napi::bindgen_prelude::FromNapiValue + ::napi::bindgen_prelude::ValidateNapiValue,
-    {
-        if has_named_property(object, name)? {
-            Ok(Some(get_named_property(object, name)?))
-        } else {
-            Ok(None)
-        }
-    }
-
-    fn has_named_property(object: &::napi::JsObject, name: &str) -> JsResult<bool> {
-        object.has_named_property(name)
-    }
-
-    pub(crate) fn to_rust_str(value: JsString) -> JsResult<String> {
-        Ok(value.into_utf8()?.as_str()?.to_string())
-    }
-
-    pub(crate) fn from_js_value<C>(value: C) -> C {
-        value
-    }
-
-    pub(crate) type JsResult<T> = ::napi::Result<T>;
 }
 
 pub(crate) use arch::*;

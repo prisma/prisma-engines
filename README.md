@@ -1,6 +1,5 @@
 # Prisma Engines
 
-[![Query Engine](https://github.com/prisma/prisma-engines/actions/workflows/test-query-engine.yml/badge.svg)](https://github.com/prisma/prisma-engines/actions/workflows/test-query-engine.yml)
 [![Schema Engine + sql_schema_describer](https://github.com/prisma/prisma-engines/actions/workflows/test-schema-engine.yml/badge.svg)](https://github.com/prisma/prisma-engines/actions/workflows/test-schema-engine.yml)
 [![Cargo docs](https://github.com/prisma/prisma-engines/actions/workflows/on-push-to-main.yml/badge.svg)](https://github.com/prisma/prisma-engines/actions/workflows/on-push-to-main.yml)
 
@@ -17,19 +16,17 @@ and test them.
 
 ## What's in this repository
 
-This repository contains four engines:
+This repository contains the following core components:
 
-- _Query engine_, used by the client to run database queries from Prisma Client
-- _Query compiler_, an actively developed replacement for the query engine, used
-  to compile Prisma Client queries into query plans containing SQL statements
-  and other operations, which the client can use to execute Prisma queries
-  entirely in JS land
-- _Schema engine_, used to create and run migrations and introspection
-- _Prisma Format_, historically used to format prisma files (hence the name),
-  now powers other LSP functionality as well
+- _Query compiler_ – compiles Prisma Client queries into executable plans (SQL + orchestration)
+  that the client runs through driver adapters in JavaScript land.
+- _Driver adapters & executor harness_ – TypeScript utilities that load query plans, talk to
+  database drivers, and expose the legacy protocol for existing tooling.
+- _Schema engine_ – creates and runs migrations, and performs introspection.
+- _Prisma Format_ – historically a formatter for Prisma schemas, now also serves LSP features.
 
-Additionally, the _psl_ (Prisma Schema Language) is the library that defines how
-the language looks like, how it's parsed, etc.
+Additionally, the _psl_ (Prisma Schema Language) is the library that defines how the language looks,
+how it's parsed, etc.
 
 You'll also find:
 
@@ -69,15 +66,17 @@ To build all engines, simply execute `cargo build` on the repository root. This
 builds non-production debug binaries. If you want to build the optimized
 binaries in release mode, the command is `cargo build --release`.
 
-Depending on how you invoked `cargo` in the previous step, you can find the
-compiled binaries inside the repository root in the `target/debug` (without
-`--release`) or `target/release` directories (with `--release`):
+Depending on how you invoked `cargo` in the previous step, you can find the compiled binaries inside
+the repository root in the `target/debug` (without `--release`) or `target/release` directories (with
+`--release`):
 
 | Prisma Component | Path to Binary                            |
 | ---------------- | ----------------------------------------- |
-| Query Engine     | `./target/[debug\|release]/query-engine`  |
 | Schema Engine    | `./target/[debug\|release]/schema-engine` |
 | Prisma Format    | `./target/[debug\|release]/prisma-fmt`    |
+
+The query compiler is a library crate. To produce the WASM bundles that power the JS runtime, use
+`make build-qc-wasm`. Driver adapters are compiled via `make build-driver-adapters-kit-qc`.
 
 ## Prisma Schema Language
 
@@ -85,65 +84,30 @@ The _Prisma Schema Language_ is a library which defines the data structures and
 parsing rules for prisma files, including the available database connectors. For
 more technical details, please check the [library README](./psl/README.md).
 
-The PSL is used throughout the schema engine, as well as
-prisma format. The DataModeL (DML), which is an annotated version of the PSL is
-also used as input for the query engine.
+The PSL is used throughout the schema engine, as well as prisma format. The DataModel (DML), which
+is an annotated version of the PSL, is also used as input for the query compiler and driver adapters.
 
-## Query Engine
+## Query Compiler & Driver Adapters
 
-The _Query Engine_ is how Prisma Client queries are executed. Here's a brief
-description of what it does:
+Prisma Client now executes queries through the query compiler and TypeScript driver adapters:
 
-- takes as inputs an annotated version of the Prisma Schema file called the
-  DataModeL (DML),
-- using the DML (specifically, the datasources and providers), it builds up a
-  [GraphQL](https://graphql.org) model for queries and responses,
-- runs as a server listening for GraphQL queries,
-- it translates the queries to the respective native datasource(s) and
-  returns GraphQL responses, and
-- handles all connections and communication with the native databases.
+- The Rust query compiler consumes the DML and produces query plans describing the SQL and
+  orchestration steps required to satisfy a Prisma query.
+- Driver adapters (see `libs/driver-adapters`) wrap database drivers in JavaScript. They are
+  used by the `@prisma/client-engine-runtime` package in the main repo which implements the
+  query plan interpreter and transaction management. Driver adapters are also used directly
+  from Rust by the early stage work-in-progress Wasm port of the schema engine.
+- The connector test kit (`query-engine/connector-test-kit-rs`) exercises this end-to-end by spawning the
+  executor process and driving requests through the adapters.
 
-When used through Prisma Client, there are two ways for the Query Engine to
-be executed:
+You will typically touch three layers when working on the query stack:
 
-- as a binary, downloaded during installation, launched at runtime;
-  communication happens via HTTP (`./query-engine/query-engine`)
-- as a native, platform-specific Node.js addon; also downloaded during
-  installation (`./query-engine/query-engine-node-api`)
+- Rust planner logic (`query-compiler`, `query-core`, `query-structure`, etc.).
+- The driver adapter executor (`libs/driver-adapters/executor`).
+- Integration tests (`cargo test -p query-engine-tests`, usually via `make dev-*-qc`).
 
-### Usage
-
-You can also run the Query Engine as a stand-alone GraphQL server.
-
-**Warning**: There is no guaranteed API stability. If using it on production
-please be aware the api and the query language can change any time.
-
-Notable environment flags:
-
-- `RUST_LOG_FORMAT=(devel|json)` sets the log format. By default outputs `json`.
-- `QE_LOG_LEVEL=(info|debug|trace)` sets the log level for the Query Engine. If
-  you need Query Graph debugging logs, set it to "trace"
-- `FMT_SQL=1` enables logging _formatted_ SQL queries
-- `PRISMA_DML_PATH=[path_to_datamodel_file]` should point to the datamodel file
-  location. This or `PRISMA_DML` is required for the Query Engine to run.
-- `PRISMA_DML=[base64_encoded_datamodel]` an alternative way to provide a
-  datamodel for the server.
-- `RUST_BACKTRACE=(0|1)` if set to 1, the error backtraces will be printed to
-  the STDERR.
-- `LOG_QUERIES=[anything]` if set, the SQL queries will be written to the `INFO`
-  log. Needs the right log level enabled to be seen from the terminal.
-- `RUST_LOG=[filter]` sets the filter for the logger. Can be either `trace`,
-  `debug`, `info`, `warning` or `error`, that will output ALL logs from every
-  crate from that level. The `.envrc` in this repo shows how to log different
-  parts of the system in a more granular way.
-
-Starting the Query Engine:
-
-The engine can be started either with using the `cargo` build tool, or
-pre-building a binary and running it directly. If using `cargo`, replace
-whatever command that starts with `./query-engine` with `cargo run --bin query-engine --`.
-
-You can also pass `--help` to find out more options to run the engine.
+There is no standalone query engine binary anymore. The compatibility harness lives in JavaScript and is
+bundled from this repository using `make build-driver-adapters-kit-qc`.
 
 ## Schema Engine
 
@@ -189,8 +153,8 @@ integration tests.
   the root of modules. These tests can be executed via `cargo test`. Note that
   some of them will require the `TEST_DATABASE_URL` enviornment variable set up.
 
-- **Integration tests**: They run GraphQL queries against isolated
-  instances of the Query Engine and asserts that the responses are correct.
+- **Integration tests**: They run GraphQL/JSON requests through the driver adapter executor
+  (wrapping the query compiler) and assert that the responses match expectations.
 
   You can find them at `./query-engine/connector-test-kit-rs`.
 
@@ -203,80 +167,80 @@ integration tests.
 
 ### Run unit tests
 
-To run unit tests for the whole workspace (except `quaint`, which requires
-additional steps), skipping the packages with heavy integration tests (you
-probably want to run them separately) as well as the `query-engine-node-api`
-package, use this command:
+To run unit tests for the whole workspace (except crates that require external services such as
+`quaint`, `sql-migration-tests`, or the connector test kit), use:
 
 ```bash
 make test-unit
 ```
 
-> [!WARNING]
-> Running just `cargo test` for the whole workspace will not work because the
-> `query-engine-node-api` package can only be compiled as a library crate and
-> can't be linked into a test binary due to the dependency on external Node.js
-> symbols. Additionally, some crates require passing explicit cargo features to
-> enable database connectors.
->
-> If you really want to run *all* tests for the whole workspace, use
-> `cargo test --workspace --exclude=query-engine-node-api --all-features`.
+This target wires up the appropriate `--exclude` list. If you prefer plain cargo, replicate the
+exclusions used in the Makefile when invoking `cargo test --workspace --all-features`.
 
-### Set up & run query engine integration tests:
+### Set up & run connector test kit (QC)
 
 **Prerequisites:**
 
-- Installed Rust toolchain.
-- Installed Docker.
-- Installed `direnv`, then `direnv allow` on the repository root.
-  - Alternatively: Load the defined environment in `./.envrc` manually in your shell.
+- Rust toolchain
+- Docker (for SQL connectors)
+- Node.js ≥ 20 and pnpm (driver adapters)
+- `direnv allow` in the repository root, or load `.envrc` manually
 
 **Setup:**
 
-There are helper `make` commands to set up a test environment for a specific
-database connector you want to test. The commands set up a container (if needed)
-and write the `.test_config` file, which is picked up by the integration
-tests:
+Use the `dev-*-qc` helpers to spin up a database (when needed), build the query-compiler WASM, build
+the driver adapters, and write the `.test_config` consumed by the connector test kit:
 
-- `make dev-mariadb`: MariaDB 10
-- `make dev-mariadb11`: MariaDB 11
-- `make dev-mysql`: MySQL 5.7
-- `make dev-mysql8`: MySQL 8
-- `make dev-postgres`: PostgreSQL 10
-- `make dev-sqlite`: SQLite
-- `make dev-mongodb_5`: MongoDB 5
+- `make dev-pg-qc`
+- `make dev-pg-cockroachdb-qc`
+- `make dev-mssql-qc`
+- `make dev-planetscale-qc`
+- `make dev-mariadb-qc`
+- `make dev-libsql-qc`
+- `make dev-better-sqlite3-qc`
+- `make dev-d1-qc`
+- `make dev-neon-qc`
 
-\*_On windows:_
-If not using WSL, `make` is not available and you should just see what your
-command does and do it manually. Basically this means editing the
-`.test_config` file and starting the needed Docker containers.
+The non-`*-qc` helpers (e.g. `make dev-postgres13`) are still available when you only need a database,
+but they do not build driver adapters for you.
 
-To actually get the tests working, read the contents of `.envrc`. Then `Edit environment variables for your account` from Windows settings, and add at least
-the correct values for the following variables:
-
-- `WORKSPACE_ROOT` should point to the root directory of `prisma-engines` project.
-
-Other variables may or may not be useful.
+_On Windows without WSL:_ replicate what the Make targets do manually (start the container, run
+`make build-qc-wasm`, run `make build-driver-adapters-kit-qc`, and create `.test_config`).
 
 **Run:**
 
-Run `cargo test -p query-engine-tests` in the repository root.
+```bash
+cargo test -p query-engine-tests -- --nocapture
+```
+
+Set `DRIVER_ADAPTER=<adapter>` when invoking `make test-qe` to run against a specific adapter, e.g.:
+
+```bash
+DRIVER_ADAPTER=pg make test-qe
+```
+
+Refer to the [connector test kit guide](./query-engine/connector-test-kit-rs/README.md) for the full
+list of adapters, environment variables, and troubleshooting notes.
 
 ### Testing driver adapters
 
-Please refer to the [Testing driver adapters](./query-engine/connector-test-kit-rs/README.md) section in the connector-test-kit-rs README.
+Please refer to the [Testing driver adapters](./query-engine/connector-test-kit-rs/README.md)
+section in the connector-test-kit-rs README.
 
-**ℹ️ Important note on developing features that require changes to the both the query engine, and driver adapters code**
+**ℹ️ Important note on developing features that require changes to both the query compiler and driver adapter code**
 
-As explained in [Testing driver adapters](./query-engine/connector-test-kit-rs/README.md), running `DRIVER_ADAPTER=$adapter make qe-test`
-will ensure you have prisma checked out in your filesystem in the same directory as prisma-engines. This is needed because the driver adapters code is symlinked in prisma-engines.
+`make test-qe` (optionally with `DRIVER_ADAPTER=...`) ensures you have `prisma/prisma` checked out
+next to this repository. The driver adapter sources are symlinked from there so that engines and
+client stay in lockstep.
 
-When working on a feature or bugfix spanning adapters code and query-engine code, you will need to open sibling PRs in `prisma/prisma` and `prisma/prisma-engines` respectively.
-Locally, each time you run `DRIVER_ADAPTER=$adapter make test-qe` tests will run using the driver adapters built from the source code in the working copy of prisma/prisma. All good.
+When working on a feature or bugfix spanning adapters and query-compiler code, you will need sibling
+PRs in `prisma/prisma` and `prisma/prisma-engines`. Locally, each time you run
+`DRIVER_ADAPTER=$adapter make test-qe`, tests use the adapters built from your local `../prisma`
+clone.
 
-In CI, tho', we need to denote which branch of prisma/prisma we want to use for tests. In CI, there's no working copy of prisma/prisma before tests run.
-The CI jobs clones prisma/prisma `main` branch by default, which doesn't include your local changes. To test in integration, we can tell CI to use the branch of prisma/prisma containing
-the changes in adapters. To do it, add the following tag to your PR's description on a separate line:
+In CI we need to denote which branch of `prisma/prisma` should be consumed. By default CI clones the
+`main` branch, which will not include your local adapter changes. To test in integration, add the
+following tag to your PR description on a separate line:
 
 ```
 /prisma-branch your/branch

@@ -441,7 +441,7 @@ these issues in Migrate.
 ### I want to customize a many-to-many relation table (e.g. to add a primary key)
 
 Unfortunately the schema of these tables is a very deep assumption in all of
-migrate, introspection and the query engine, so it's not possible. The long
+migrate, introspection and the query stack, so it's not possible. The long
 term solution is that we want to replace the current system with more explicit
 many-to-many relations where the join table can be specified.
 

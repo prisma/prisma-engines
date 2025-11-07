@@ -3,11 +3,7 @@
 
 use std::str::FromStr;
 
-#[cfg(not(target_arch = "wasm32"))]
-use napi::bindgen_prelude::{FromNapiValue, ToNapiValue};
-
 use quaint::connector::{ColumnType as QuaintColumnType, ExternalConnectionInfo, SqlFamily};
-#[cfg(target_arch = "wasm32")]
 use tsify::Tsify;
 
 use crate::conversion::{JSArg, JSArgType};
@@ -15,10 +11,8 @@ pub use quaint::connector::external::AdapterProvider;
 use serde::{Deserialize, Serialize};
 use serde_repr::{Deserialize_repr, Serialize_repr};
 
-#[cfg_attr(not(target_arch = "wasm32"), napi_derive::napi(object))]
-#[cfg_attr(target_arch = "wasm32", derive(Deserialize))]
-#[cfg_attr(target_arch = "wasm32", serde(rename_all = "camelCase"))]
-#[derive(Default)]
+#[derive(Default, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub(crate) struct JsConnectionInfo {
     pub schema_name: Option<String>,
     pub max_bind_values: Option<u32>,
@@ -69,10 +63,8 @@ impl JsConnectionInfo {
 /// the FromNapiValue and ToNapiValue traits for quaint::Value, and use a different custom type
 /// representing the Value in javascript.
 ///
-#[cfg_attr(not(target_arch = "wasm32"), napi_derive::napi(object))]
-#[cfg_attr(target_arch = "wasm32", derive(Deserialize))]
-#[cfg_attr(target_arch = "wasm32", serde(rename_all = "camelCase"))]
-#[derive(Debug)]
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct JsResultSet {
     pub column_types: Vec<ColumnType>,
     pub column_names: Vec<String>,
@@ -89,10 +81,8 @@ impl JsResultSet {
 
 macro_rules! js_column_type {
     ($($(#[$($attrss:tt)*])*$name:ident($val:expr) => $quaint_name:ident,)*) => {
-        #[cfg_attr(not(target_arch = "wasm32"), napi_derive::napi)]
-        #[cfg_attr(target_arch = "wasm32", derive(Clone, Copy, Deserialize_repr))]
+        #[derive(Clone, Copy, Debug, Deserialize_repr)]
         #[repr(u8)]
-        #[derive(Debug)]
         pub enum ColumnType {
             $(
                 $(#[$($attrss)*])*
@@ -244,7 +234,6 @@ js_column_type! {
     UnknownNumber(128) => Unknown,
 }
 
-#[cfg_attr(not(target_arch = "wasm32"), napi_derive::napi(object))]
 #[derive(Debug, Default)]
 pub struct Query {
     pub sql: String,
@@ -252,10 +241,8 @@ pub struct Query {
     pub arg_types: Vec<JSArgType>,
 }
 
-#[cfg_attr(not(target_arch = "wasm32"), napi_derive::napi(object))]
-#[cfg_attr(target_arch = "wasm32", derive(Deserialize, Tsify))]
-#[cfg_attr(target_arch = "wasm32", serde(rename_all = "camelCase"))]
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Deserialize, Tsify)]
+#[serde(rename_all = "camelCase")]
 pub struct TransactionOptions {
     /// Whether or not to run a phantom query (i.e., a query that only influences Prisma event logs, but not the database itself)
     /// before opening a transaction, committing, or rollbacking.

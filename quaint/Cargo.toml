@@ -81,7 +81,6 @@ futures.workspace = true
 url.workspace = true
 hex.workspace = true
 itertools.workspace = true
-regex.workspace = true
 enumflags2.workspace = true
 pin-project.workspace = true
 
@@ -99,7 +98,6 @@ sqlformat = { workspace = true, optional = true }
 uuid.workspace = true
 crosstarget-utils.workspace = true
 concat-idents.workspace = true
-getrandom = { workspace = true, optional = true }
 
 [dev-dependencies]
 indoc.workspace = true
@@ -111,9 +109,6 @@ quaint-test-setup = { path = "quaint-test-setup" }
 tokio = { workspace = true, features = ["macros", "time"] }
 expect-test.workspace = true
 tracing-test.workspace = true
-
-[target.'cfg(target_arch = "wasm32")'.dependencies]
-getrandom = { workspace = true, features = ["js"] }
 
 [dependencies.tokio-tungstenite]
 workspace = true

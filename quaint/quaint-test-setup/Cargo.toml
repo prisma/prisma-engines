@@ -6,7 +6,5 @@ edition = "2018"
 
 [dependencies]
 bitflags.workspace = true
-async-trait.workspace = true
-names.workspace = true
 tokio = { workspace = true, features = ["rt-multi-thread"] }
 quaint = { workspace = true, features = ["all-native", "pooled"] }
