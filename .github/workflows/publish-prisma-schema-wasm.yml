@@ -3,6 +3,9 @@ run-name: npm - release @prisma/prisma-schema-wasm@${{ github.event.inputs.engin
 
 concurrency: publish-prisma-schema-wasm
 
+permissions:
+  id-token: write # required for OIDC / Trusted Publishers
+
 on:
   # usually triggered via GH Actions Workflow in prisma/engines-wrapper repo
   workflow_dispatch:
@@ -42,9 +45,8 @@ jobs:
         with:
           node-version: '20.x'
 
-      # This is needed to be done manually because of `PACKAGE_DIR` used later
-      - name: Set up NPM token for publishing later
-        run: echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
+      - name: Update npm to support Trusted Publishers
+        run: npm install -g npm@^11.5
 
       - name: Publish @prisma/prisma-schema-wasm
         run: npm publish --access public --tag ${{ github.event.inputs.npmDistTag }}
