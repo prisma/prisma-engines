@@ -5,9 +5,6 @@ use super::from_js::FromJsValue;
 use crate::{JsObjectExtern, error::DriverAdapterError};
 
 /// Wrapper for JS-side result type.
-/// This Wasm-specific implementation has the same shape and API as the Napi implementation,
-/// but it asks for a `FromJsValue` bound on the generic type.
-/// The duplication is needed as it's currently impossible to have target-specific generic bounds in Rust.
 pub(crate) enum AdapterResult<T>
 where
     T: FromJsValue,

@@ -5,53 +5,14 @@ use crate::{
 use log::warn;
 use qe_setup::driver_adapters::DriverAdapter;
 use serde::{Deserialize, Serialize};
-use std::{convert::TryFrom, env, fmt::Display, fs::File, io::Read, path::PathBuf, str::FromStr};
-use thiserror::Error;
+use std::{convert::TryFrom, env, fs::File, io::Read, path::PathBuf};
 
 static TEST_CONFIG_FILE_NAME: &str = ".test_config";
-
-#[derive(Debug, Deserialize, Default, Clone, Copy, PartialEq)]
-pub enum TestExecutor {
-    #[default]
-    Napi,
-    Wasm,
-    Mobile,
-    QueryCompiler,
-}
-
-impl FromStr for TestExecutor {
-    type Err = InvalidTestExecutor;
-
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s {
-            "Napi" => Ok(TestExecutor::Napi),
-            "Wasm" => Ok(TestExecutor::Wasm),
-            "Mobile" => Ok(TestExecutor::Mobile),
-            "QueryCompiler" => Ok(TestExecutor::QueryCompiler),
-            _ => Err(InvalidTestExecutor(s.to_string())),
-        }
-    }
-}
-
-impl Display for TestExecutor {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            TestExecutor::Napi => f.write_str("Napi"),
-            TestExecutor::Wasm => f.write_str("Wasm"),
-            TestExecutor::Mobile => f.write_str("Mobile"),
-            TestExecutor::QueryCompiler => f.write_str("QueryCompiler"),
-        }
-    }
-}
-
-#[derive(Debug, PartialEq, Error)]
-#[error("received an invalid test executor: {0}")]
-pub struct InvalidTestExecutor(String);
 
 /// The central test configuration.
 /// This struct is a 1:1 mapping to the test config file.
 /// After validation, this is used to generate [`TestConfig`]
-#[derive(Debug, Default, Deserialize)]
+#[derive(Debug, Deserialize)]
 pub struct TestConfigFromSerde {
     /// The connector that tests should run for.
     /// Env key: `TEST_CONNECTOR`
@@ -63,29 +24,16 @@ pub struct TestConfigFromSerde {
     #[serde(rename = "version")]
     pub(crate) connector_version: Option<String>,
 
-    /// An external process to execute the test queries and produced responses for assertion
-    /// Used when testing driver adapters, this process is expected to be a javascript process
-    /// loading the library engine (as a library, or WASM modules) and providing it with a
-    /// driver adapter.
-    /// Env key: `EXTERNAL_TEST_EXECUTOR`.
-    /// Correctness: if set, [`TestConfigFromSerde::driver_adapter`] must be set as well.
-    pub(crate) external_test_executor: Option<TestExecutor>,
-
     /// The driver adapter to use when running tests, will be forwarded to the external test
     /// executor by setting the `DRIVER_ADAPTER` env var when spawning the executor process.
     /// Correctness: if set, [`TestConfigFromSerde::external_test_executor`] and
     /// [`TestConfigFromSerde::driver_adapter_config`] must be set as well.
-    pub(crate) driver_adapter: Option<DriverAdapter>,
+    pub(crate) driver_adapter: DriverAdapter,
 
     /// The driver adapter configuration to forward as a stringified JSON object to the external
     /// test executor by setting the `DRIVER_ADAPTER_CONFIG` env var when spawning the executor.
     /// Correctness: if set, [`TestConfigFromSerde::driver_adapter`] must be set as well.
     pub(crate) driver_adapter_config: Option<DriverAdapterConfig>,
-
-    /// For mobile tests a running device with a valid http server is required.
-    /// This is the URL to the mobile emulator which will execute the queries against
-    /// the instances of the engine running on the device.
-    pub(crate) mobile_emulator_url: Option<String>,
 
     /// The maximum number of bind values to use in a query for a driver adapter test runner.
     pub(crate) driver_adapter_max_bind_values: Option<usize>,
@@ -131,32 +79,6 @@ impl TestConfigFromSerde {
             | Ok(ConnectorVersion::Sqlite(Some(_))) => (),
             Err(err) => exit_with_message(&err.to_string()),
         }
-
-        if self.external_test_executor.is_some() {
-            if self.external_test_executor.unwrap() == TestExecutor::Mobile && self.mobile_emulator_url.is_none() {
-                exit_with_message(
-                    "When using the mobile external test executor, the mobile emulator URL (MOBILE_EMULATOR_URL env var) must be set.",
-                );
-            }
-
-            if self.external_test_executor.unwrap() != TestExecutor::Mobile && self.driver_adapter.is_none() {
-                exit_with_message(
-                    "When using an external test executor, the driver adapter (DRIVER_ADAPTER env var) must be set.",
-                );
-            }
-        }
-
-        if self.driver_adapter.is_some() && self.external_test_executor.is_none() {
-            exit_with_message(
-                "When using a driver adapter, the external test executor (EXTERNAL_TEST_EXECUTOR env var) must be set.",
-            );
-        }
-
-        if self.driver_adapter.is_none() && self.driver_adapter_config.is_some() {
-            exit_with_message(
-                "When using a driver adapter config, the driver adapter (DRIVER_ADAPTER env var) must be set.",
-            );
-        }
     }
 }
 
@@ -165,13 +87,6 @@ pub(crate) struct WithDriverAdapter {
     /// The driver adapter to use when running tests, will be forwarded to the external test
     /// executor by setting the `DRIVER_ADAPTER` env var when spawning the executor process.
     pub(crate) adapter: DriverAdapter,
-
-    /// An external process to execute the test queries and produced responses for assertion
-    /// Used when testing driver adapters, this process is expected to be a javascript process
-    /// loading the library engine (as a library, or WASM modules) and providing it with a
-    /// driver adapter.
-    /// Env key: `EXTERNAL_TEST_EXECUTOR`.
-    pub(crate) test_executor: TestExecutor,
 
     /// The driver adapter configuration to forward as a stringified JSON object to the external
     /// test executor by setting the `DRIVER_ADAPTER_CONFIG` env var when spawning the executor.
@@ -190,29 +105,23 @@ impl WithDriverAdapter {
 pub struct TestConfig {
     pub(crate) connector: String,
     pub(crate) connector_version: Option<String>,
-    pub(crate) with_driver_adapter: Option<WithDriverAdapter>,
-    pub(crate) mobile_emulator_url: Option<String>,
+    pub(crate) with_driver_adapter: WithDriverAdapter,
 }
 
 impl From<TestConfigFromSerde> for TestConfig {
     fn from(config: TestConfigFromSerde) -> Self {
         config.validate();
 
-        let with_driver_adapter = match config.driver_adapter {
-            Some(adapter) => Some(WithDriverAdapter {
-                adapter,
-                test_executor: config.external_test_executor.unwrap(),
-                config: config.driver_adapter_config,
-                max_bind_values: config.driver_adapter_max_bind_values,
-            }),
-            None => None,
+        let with_driver_adapter = WithDriverAdapter {
+            adapter: config.driver_adapter,
+            config: config.driver_adapter_config,
+            max_bind_values: config.driver_adapter_max_bind_values,
         };
 
         Self {
             connector: config.connector,
             connector_version: config.connector_version,
             with_driver_adapter,
-            mobile_emulator_url: config.mobile_emulator_url,
         }
     }
 }
@@ -252,7 +161,7 @@ And optionally, to test driver adapters
 - EXTERNAL_TEST_EXECUTOR
 - DRIVER_ADAPTER
 - DRIVER_ADAPTER_CONFIG (optional, not required by all driver adapters)
-- MOBILE_EMULATOR_URL (optional, only required by mobile external test executor)
+
 
 📁 Config file
 
@@ -286,8 +195,8 @@ impl TestConfig {
         config
     }
 
-    pub(crate) fn with_driver_adapter(&self) -> Option<&WithDriverAdapter> {
-        self.with_driver_adapter.as_ref()
+    pub(crate) fn with_driver_adapter(&self) -> &WithDriverAdapter {
+        &self.with_driver_adapter
     }
 
     #[rustfmt::skip]
@@ -299,20 +208,14 @@ impl TestConfig {
             self.connector,
             self.connector_version().unwrap_or_default()
         );
-        if let Some(with_driver_adapter) = self.with_driver_adapter() {
-            println!("* External test executor: {}", with_driver_adapter.test_executor);
-            println!("* Driver adapter: {}", with_driver_adapter.adapter);
-            println!("* Driver adapter config: {}", with_driver_adapter.json_stringify_config());
-        }
+        println!("* Driver adapter: {}", self.with_driver_adapter.adapter);
+        println!("* Driver adapter config: {}", self.with_driver_adapter.json_stringify_config());
         println!("******************************");
     }
 
     fn from_env() -> Option<Self> {
         let connector = std::env::var("TEST_CONNECTOR").ok();
         let connector_version = std::env::var("TEST_CONNECTOR_VERSION").ok();
-        let external_test_executor = std::env::var("EXTERNAL_TEST_EXECUTOR")
-            .map(|value| serde_json::from_str::<TestExecutor>(&value).ok())
-            .unwrap_or_default();
 
         let driver_adapter = std::env::var("DRIVER_ADAPTER").ok().map(DriverAdapter::from);
         let driver_adapter_config = std::env::var("DRIVER_ADAPTER_CONFIG")
@@ -322,19 +225,13 @@ impl TestConfig {
             .ok()
             .map(|v| v.parse::<usize>().unwrap());
 
-        let mobile_emulator_url = std::env::var("MOBILE_EMULATOR_URL").ok();
-
-        connector
-            .map(|connector| TestConfigFromSerde {
-                connector,
-                connector_version,
-                external_test_executor,
-                driver_adapter,
-                driver_adapter_config,
-                mobile_emulator_url,
-                driver_adapter_max_bind_values,
-            })
-            .map(Self::from)
+        Some(Self::from(TestConfigFromSerde {
+            connector: connector?,
+            connector_version,
+            driver_adapter: driver_adapter?,
+            driver_adapter_config,
+            driver_adapter_max_bind_values,
+        }))
     }
 
     fn from_file() -> Option<Self> {
@@ -374,27 +271,15 @@ impl TestConfig {
     }
 
     pub fn external_test_executor_path(&self) -> Option<String> {
-        const TEST_EXECUTOR_ROOT_PATH: &str = "libs/driver-adapters/executor/script";
-        const QUERY_ENGINE_TEST_EXECUTOR: &str = "testd-qe.sh";
-        const QUERY_COMPILER_TEST_EXECUTOR: &str = "testd-qc.sh";
+        const QUERY_COMPILER_TEST_EXECUTOR: &str = "libs/driver-adapters/executor/script/testd-qc.sh";
 
-        self.with_driver_adapter()
-            .and_then(|da| {
-                Self::workspace_root()
-                    .or_else(|| {
-                        exit_with_message(
-                            "WORKSPACE_ROOT needs to be correctly set to the root of the prisma-engines repository",
-                        )
-                    })
-                    .map(|path| path.join(TEST_EXECUTOR_ROOT_PATH))
-                    .map(|path| {
-                        path.join(if da.test_executor == TestExecutor::QueryCompiler {
-                            QUERY_COMPILER_TEST_EXECUTOR
-                        } else {
-                            QUERY_ENGINE_TEST_EXECUTOR
-                        })
-                    })
+        Self::workspace_root()
+            .or_else(|| {
+                exit_with_message(
+                    "WORKSPACE_ROOT needs to be correctly set to the root of the prisma-engines repository",
+                )
             })
+            .map(|path| path.join(QUERY_COMPILER_TEST_EXECUTOR))
             .and_then(|path| path.to_str().map(|s| s.to_owned()))
     }
 
@@ -446,7 +331,7 @@ impl TestConfig {
 
     pub fn max_bind_values(&self) -> Option<usize> {
         let version = self.parse_connector_version().unwrap();
-        let local_mbv = self.with_driver_adapter().and_then(|config| config.max_bind_values);
+        let local_mbv = self.with_driver_adapter().max_bind_values;
 
         local_mbv.or_else(|| version.max_bind_values())
     }
@@ -457,12 +342,16 @@ impl TestConfig {
 
     #[rustfmt::skip]
     pub fn for_external_executor(&self) -> Vec<(String, String)> {
-        let with_driver_adapter = self.with_driver_adapter().unwrap();
+        let with_driver_adapter = self.with_driver_adapter();
 
         vec!(
             (
                 "CONNECTOR".to_string(),
                 self.connector().to_string()
+            ),
+            (
+                "CONNECTOR_VERSION".to_string(),
+                self.connector_version().unwrap_or("").to_string()
             ),
             (
                 "DRIVER_ADAPTER".to_string(),
@@ -473,16 +362,8 @@ impl TestConfig {
                 with_driver_adapter.json_stringify_config(),
             ),
             (
-                "EXTERNAL_TEST_EXECUTOR".to_string(),
-                with_driver_adapter.test_executor.to_string(),
-            ),
-            (
                 "PRISMA_DISABLE_QUAINT_EXECUTORS".to_string(),
                 "1".to_string(),
-            ),
-            (
-                "MOBILE_EMULATOR_URL".to_string(),
-                self.mobile_emulator_url.clone().unwrap_or_default()
             ),
         )
     }

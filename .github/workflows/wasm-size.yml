@@ -1,4 +1,4 @@
-name: 'QE: WASM Query Engine size'
+name: 'QC: Wasm size'
 on:
   pull_request:
     paths-ignore:
@@ -18,16 +18,6 @@ jobs:
     name: calculate module sizes (pr)
     runs-on: ubuntu-latest
     outputs:
-      postgresql_qe_size: ${{ steps.measure-qe.outputs.postgresql_qe_size }}
-      postgresql_qe_size_gz: ${{ steps.measure-qe.outputs.postgresql_qe_size_gz }}
-      mysql_qe_size: ${{ steps.measure-qe.outputs.mysql_qe_size }}
-      mysql_qe_size_gz: ${{ steps.measure-qe.outputs.mysql_qe_size_gz }}
-      sqlite_qe_size: ${{ steps.measure-qe.outputs.sqlite_qe_size }}
-      sqlite_qe_size_gz: ${{ steps.measure-qe.outputs.sqlite_qe_size_gz }}
-      sqlserver_qe_size: ${{ steps.measure-qe.outputs.sqlserver_qe_size }}
-      sqlserver_qe_size_gz: ${{ steps.measure-qe.outputs.sqlserver_qe_size_gz }}
-      cockroachdb_qe_size: ${{ steps.measure-qe.outputs.cockroachdb_qe_size }}
-      cockroachdb_qe_size_gz: ${{ steps.measure-qe.outputs.cockroachdb_qe_size_gz }}
       postgresql_qc_size: ${{ steps.measure-qc.outputs.postgresql_qc_size }}
       postgresql_qc_size_gz: ${{ steps.measure-qc.outputs.postgresql_qc_size_gz }}
       mysql_qc_size: ${{ steps.measure-qc.outputs.mysql_qc_size }}
@@ -44,12 +34,6 @@ jobs:
 
       - uses: ./.github/workflows/include/rust-wasm-setup
 
-      - name: Build and measure QE on PR branch
-        id: measure-qe
-        run: |
-          export ENGINE_SIZE_OUTPUT=$GITHUB_OUTPUT
-          make measure-qe-wasm
-
       - name: Build and measure QC on PR branch
         id: measure-qc
         run: |
@@ -60,16 +44,6 @@ jobs:
     name: calculate module sizes (base branch)
     runs-on: ubuntu-latest
     outputs:
-      postgresql_qe_size: ${{ steps.measure-qe.outputs.postgresql_qe_size }}
-      postgresql_qe_size_gz: ${{ steps.measure-qe.outputs.postgresql_qe_size_gz }}
-      mysql_qe_size: ${{ steps.measure-qe.outputs.mysql_qe_size }}
-      mysql_qe_size_gz: ${{ steps.measure-qe.outputs.mysql_qe_size_gz }}
-      sqlite_qe_size: ${{ steps.measure-qe.outputs.sqlite_qe_size }}
-      sqlite_qe_size_gz: ${{ steps.measure-qe.outputs.sqlite_qe_size_gz }}
-      sqlserver_qe_size: ${{ steps.measure-qe.outputs.sqlserver_qe_size }}
-      sqlserver_qe_size_gz: ${{ steps.measure-qe.outputs.sqlserver_qe_size_gz }}
-      cockroachdb_qe_size: ${{ steps.measure-qe.outputs.cockroachdb_qe_size }}
-      cockroachdb_qe_size_gz: ${{ steps.measure-qe.outputs.cockroachdb_qe_size_gz }}
       postgresql_qc_size: ${{ steps.measure-qc.outputs.postgresql_qc_size }}
       postgresql_qc_size_gz: ${{ steps.measure-qc.outputs.postgresql_qc_size_gz }}
       mysql_qc_size: ${{ steps.measure-qc.outputs.mysql_qc_size }}
@@ -87,12 +61,6 @@ jobs:
           ref: ${{ github.event.pull_request.base.sha }}
 
       - uses: ./.github/workflows/include/rust-wasm-setup
-
-      - name: Build and measure QE on base branch
-        id: measure-qe
-        run: |
-          export ENGINE_SIZE_OUTPUT=$GITHUB_OUTPUT
-          make measure-qe-wasm
 
       - name: Build and measure QC on base branch
         id: measure-qc
@@ -129,28 +97,18 @@ jobs:
             echo "${provider}_diff=$diff" >> $GITHUB_OUTPUT
           }
 
-          compute_diff "postgresql_qe" "${{ needs.base-wasm-size.outputs.postgresql_qe_size }}" "${{ needs.pr-wasm-size.outputs.postgresql_qe_size }}"
-          compute_diff "postgresql_qe_gz" "${{ needs.base-wasm-size.outputs.postgresql_qe_size_gz }}" "${{ needs.pr-wasm-size.outputs.postgresql_qe_size_gz }}"
           compute_diff "postgresql_qc" "${{ needs.base-wasm-size.outputs.postgresql_qc_size }}" "${{ needs.pr-wasm-size.outputs.postgresql_qc_size }}"
           compute_diff "postgresql_qc_gz" "${{ needs.base-wasm-size.outputs.postgresql_qc_size_gz }}" "${{ needs.pr-wasm-size.outputs.postgresql_qc_size_gz }}"
 
-          compute_diff "mysql_qe" "${{ needs.base-wasm-size.outputs.mysql_qe_size }}" "${{ needs.pr-wasm-size.outputs.mysql_qe_size }}"
-          compute_diff "mysql_qe_gz" "${{ needs.base-wasm-size.outputs.mysql_qe_size_gz }}" "${{ needs.pr-wasm-size.outputs.mysql_qe_size_gz }}"
           compute_diff "mysql_qc" "${{ needs.base-wasm-size.outputs.mysql_qc_size }}" "${{ needs.pr-wasm-size.outputs.mysql_qc_size }}"
           compute_diff "mysql_qc_gz" "${{ needs.base-wasm-size.outputs.mysql_qc_size_gz }}" "${{ needs.pr-wasm-size.outputs.mysql_qc_size_gz }}"
 
-          compute_diff "sqlite_qe" "${{ needs.base-wasm-size.outputs.sqlite_qe_size }}" "${{ needs.pr-wasm-size.outputs.sqlite_qe_size }}"
-          compute_diff "sqlite_qe_gz" "${{ needs.base-wasm-size.outputs.sqlite_qe_size_gz }}" "${{ needs.pr-wasm-size.outputs.sqlite_qe_size_gz }}"
           compute_diff "sqlite_qc" "${{ needs.base-wasm-size.outputs.sqlite_qc_size }}" "${{ needs.pr-wasm-size.outputs.sqlite_qc_size }}"
           compute_diff "sqlite_qc_gz" "${{ needs.base-wasm-size.outputs.sqlite_qc_size_gz }}" "${{ needs.pr-wasm-size.outputs.sqlite_qc_size_gz }}"
 
-          compute_diff "sqlserver_qe" "${{ needs.base-wasm-size.outputs.sqlserver_qe_size }}" "${{ needs.pr-wasm-size.outputs.sqlserver_qe_size }}"
-          compute_diff "sqlserver_qe_gz" "${{ needs.base-wasm-size.outputs.sqlserver_qe_size_gz }}" "${{ needs.pr-wasm-size.outputs.sqlserver_qe_size_gz }}"
           compute_diff "sqlserver_qc" "${{ needs.base-wasm-size.outputs.sqlserver_qc_size }}" "${{ needs.pr-wasm-size.outputs.sqlserver_qc_size }}"
           compute_diff "sqlserver_qc_gz" "${{ needs.base-wasm-size.outputs.sqlserver_qc_size_gz }}" "${{ needs.pr-wasm-size.outputs.sqlserver_qc_size_gz }}"
 
-          compute_diff "cockroachdb_qe" "${{ needs.base-wasm-size.outputs.cockroachdb_qe_size }}" "${{ needs.pr-wasm-size.outputs.cockroachdb_qe_size }}"
-          compute_diff "cockroachdb_qe_gz" "${{ needs.base-wasm-size.outputs.cockroachdb_qe_size_gz }}" "${{ needs.pr-wasm-size.outputs.cockroachdb_qe_size_gz }}"
           compute_diff "cockroachdb_qc" "${{ needs.base-wasm-size.outputs.cockroachdb_qc_size }}" "${{ needs.pr-wasm-size.outputs.cockroachdb_qc_size }}"
           compute_diff "cockroachdb_qc_gz" "${{ needs.base-wasm-size.outputs.cockroachdb_qc_size_gz }}" "${{ needs.pr-wasm-size.outputs.cockroachdb_qc_size_gz }}"
 
@@ -171,21 +129,6 @@ jobs:
           issue-number: ${{ github.event.pull_request.number }}
           body: |
             <!-- wasm-size -->
-            ### WASM Query Engine File Size
-
-            | Engine             | This PR                                             | Base branch                                         | Diff                                                |
-            |--------------------|-----------------------------------------------------|-----------------------------------------------------|-----------------------------------------------------|
-            | Postgres           | ${{ steps.compute.outputs.postgresql_qe_pr }}       | ${{ steps.compute.outputs.postgresql_qe_base }}     | ${{ steps.compute.outputs.postgresql_qe_diff }}     |
-            | Postgres (gzip)    | ${{ steps.compute.outputs.postgresql_qe_gz_pr }}    | ${{ steps.compute.outputs.postgresql_qe_gz_base }}  | ${{ steps.compute.outputs.postgresql_qe_gz_diff }}  |
-            | Mysql              | ${{ steps.compute.outputs.mysql_qe_pr }}            | ${{ steps.compute.outputs.mysql_qe_base }}          | ${{ steps.compute.outputs.mysql_qe_diff }}          |
-            | Mysql (gzip)       | ${{ steps.compute.outputs.mysql_qe_gz_pr }}         | ${{ steps.compute.outputs.mysql_qe_gz_base }}       | ${{ steps.compute.outputs.mysql_qe_gz_diff }}       |
-            | Sqlite             | ${{ steps.compute.outputs.sqlite_qe_pr }}           | ${{ steps.compute.outputs.sqlite_qe_base }}         | ${{ steps.compute.outputs.sqlite_qe_diff }}         |
-            | Sqlite (gzip)      | ${{ steps.compute.outputs.sqlite_qe_gz_pr }}        | ${{ steps.compute.outputs.sqlite_qe_gz_base }}      | ${{ steps.compute.outputs.sqlite_qe_gz_diff }}      |
-            | SQL Server         | ${{ steps.compute.outputs.sqlserver_qe_pr }}        | ${{ steps.compute.outputs.sqlserver_qe_base }}      | ${{ steps.compute.outputs.sqlserver_qe_diff }}      |
-            | SQL Server (gzip)  | ${{ steps.compute.outputs.sqlserver_qe_gz_pr }}     | ${{ steps.compute.outputs.sqlserver_qe_gz_base }}   | ${{ steps.compute.outputs.sqlserver_qe_gz_diff }}   |
-            | CockroachDB        | ${{ steps.compute.outputs.cockroachdb_qe_pr }}      | ${{ steps.compute.outputs.cockroachdb_qe_base }}    | ${{ steps.compute.outputs.cockroachdb_qe_diff }}    |
-            | CockroachDB (gzip) | ${{ steps.compute.outputs.cockroachdb_qe_gz_pr }}   | ${{ steps.compute.outputs.cockroachdb_qe_gz_base }} | ${{ steps.compute.outputs.cockroachdb_qe_gz_diff }} |
-
             ### WASM Query Compiler File Size
 
             | Engine             | This PR                                             | Base branch                                         | Diff                                                |

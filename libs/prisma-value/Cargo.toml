@@ -6,7 +6,6 @@ version = "0.1.0"
 [dependencies]
 base64.workspace = true
 chrono = { workspace = true, features = ["serde"] }
-regex.workspace = true
 bigdecimal.workspace = true
 serde.workspace = true
 serde_json.workspace = true

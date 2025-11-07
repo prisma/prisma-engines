@@ -179,21 +179,11 @@ impl QuaintQueryable for JsQueryableDropGuard {
     }
 }
 
-#[cfg(target_arch = "wasm32")]
 impl super::wasm::FromJsValue for JsAdapterFactory {
     fn from_js_value(value: wasm_bindgen::prelude::JsValue) -> JsResult<Self> {
         use wasm_bindgen::JsCast;
 
         let object = value.dyn_into::<JsObject>()?;
-        let common_proxy = AdapterFactoryProxy::new(&object)?;
-        Ok(Self::new(common_proxy))
-    }
-}
-
-#[cfg(not(target_arch = "wasm32"))]
-impl ::napi::bindgen_prelude::FromNapiValue for JsAdapterFactory {
-    unsafe fn from_napi_value(env: napi::sys::napi_env, napi_val: napi::sys::napi_value) -> JsResult<Self> {
-        let object = unsafe { JsObject::from_napi_value(env, napi_val) }?;
         let common_proxy = AdapterFactoryProxy::new(&object)?;
         Ok(Self::new(common_proxy))
     }

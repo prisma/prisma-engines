@@ -10,7 +10,6 @@ serde_json.workspace = true
 thiserror.workspace = true
 tokio = { workspace = true, features = ["macros", "time"] }
 tracing = { workspace = true, features = ["attributes"] }
-tracing-futures.workspace = true
 tracing-subscriber = { workspace = true, features = ["env-filter"] }
 crosstarget-utils.workspace = true
 enumflags2.workspace = true

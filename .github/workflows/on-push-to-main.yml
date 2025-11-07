@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - next
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -21,23 +22,18 @@ jobs:
 
       - uses: ./.github/workflows/include/rust-wasm-setup
 
-      - name: Build native engines
-        run: |
-          cargo build --release -p query-engine -p query-engine-node-api
-          mv target/release/libquery_engine.{so,node}
-
-      - name: Build WASM engines
+      - name: Build WASM modules
         env:
           WASM_BUILD_PROFILE: release
-          PKG_DIR: query-engine/query-engine-wasm/pkg
-          TARGET_DIR: target/query-engine-wasm
+          PKG_DIR: query-compiler/query-compiler-wasm/pkg
+          TARGET_DIR: target/query-compiler-wasm
         run: |
-          make build-qe-wasm-gz
+          make build-qc-wasm-gz
           mkdir -p $TARGET_DIR
 
           for provider in "postgresql" "mysql" "sqlite" "sqlserver" "cockroachdb"; do
-            cp $PKG_DIR/$provider/query_engine_bg.wasm $TARGET_DIR/query-engine-$provider.wasm
-            cp $PKG_DIR/$provider.gz $TARGET_DIR/query-engine-$provider.wasm.gz
+            cp $PKG_DIR/$provider/query_compiler_bg.wasm $TARGET_DIR/query-compiler-$provider.wasm
+            cp $PKG_DIR/$provider.gz $TARGET_DIR/query-compiler-$provider.wasm.gz
           done
 
       - name: Check out gh-pages branch
@@ -48,18 +44,16 @@ jobs:
       - name: Update engines size
         run: |
           files=(
-            target/release/query-engine
-            target/release/libquery_engine.node
-            target/query-engine-wasm/query-engine-postgresql.wasm.gz
-            target/query-engine-wasm/query-engine-postgresql.wasm
-            target/query-engine-wasm/query-engine-mysql.wasm.gz
-            target/query-engine-wasm/query-engine-mysql.wasm
-            target/query-engine-wasm/query-engine-sqlite.wasm.gz
-            target/query-engine-wasm/query-engine-sqlite.wasm
-            target/query-engine-wasm/query-engine-sqlserver.wasm.gz
-            target/query-engine-wasm/query-engine-sqlserver.wasm
-            target/query-engine-wasm/query-engine-cockroachdb.wasm.gz
-            target/query-engine-wasm/query-engine-cockroachdb.wasm
+            target/query-compiler-wasm/query-compiler-postgresql.wasm.gz
+            target/query-compiler-wasm/query-compiler-postgresql.wasm
+            target/query-compiler-wasm/query-compiler-mysql.wasm.gz
+            target/query-compiler-wasm/query-compiler-mysql.wasm
+            target/query-compiler-wasm/query-compiler-sqlite.wasm.gz
+            target/query-compiler-wasm/query-compiler-sqlite.wasm
+            target/query-compiler-wasm/query-compiler-sqlserver.wasm.gz
+            target/query-compiler-wasm/query-compiler-sqlserver.wasm
+            target/query-compiler-wasm/query-compiler-cockroachdb.wasm.gz
+            target/query-compiler-wasm/query-compiler-cockroachdb.wasm
           )
 
           DATE_TIME="$(date -u --iso-8601=seconds)"

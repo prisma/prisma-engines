@@ -1,4 +1,4 @@
-name: 'QE: Codespeed benchmarks'
+name: 'QC: Codespeed benchmarks'
 on:
   push:
     branches:
@@ -28,8 +28,8 @@ jobs:
       - name: 'Build the benchmark targets: schema'
         run: cargo codspeed build -p schema --features all_connectors
 
-      - name: 'Build the benchmark targets: request-handlers'
-        run: cargo codspeed build -p request-handlers --features all
+      - name: 'Build the benchmark targets: core-tests'
+        run: cargo codspeed build -p core-tests
 
       - name: Run the benchmarks
         uses: CodSpeedHQ/action@v3

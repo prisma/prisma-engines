@@ -5,7 +5,6 @@ edition.workspace = true
 
 [dependencies]
 psl.workspace = true
-regex.workspace = true
 itertools.workspace = true
 base64.workspace = true
 

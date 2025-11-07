@@ -368,9 +368,7 @@ pub(crate) fn should_run(
         return inclusions.iter().any(|incl| incl.matches_pattern(version));
     }
 
-    // FIXME: This skips vitess unless explicitly opted in. Replace with `true` when fixing
-    // https://github.com/prisma/client-planning/issues/332
-    CONFIG.with_driver_adapter().is_some() || !matches!(version, ConnectorVersion::Vitess(_))
+    true
 }
 
 impl TryFrom<(&str, Option<&str>)> for ConnectorVersion {
