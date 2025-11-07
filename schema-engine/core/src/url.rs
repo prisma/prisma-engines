@@ -13,10 +13,6 @@ use crate::core_error::CoreError;
 pub struct DatasourceUrls {
     /// Direct URL to the database.
     pub url: String,
-    /// Also the direct URL to the database, it's the same thing as `url`.
-    /// TODO: remove it. It's only still here because it's exposed in TS.
-    #[deprecated = "TML-1539"]
-    pub direct_url: Option<String>,
     /// The URL to a live shadow database, if Prisma should use it instead of creating one.
     pub shadow_database_url: Option<String>,
 }
@@ -26,8 +22,6 @@ impl DatasourceUrls {
     pub fn from_url(url: impl Into<String>) -> Self {
         Self {
             url: url.into(),
-            #[allow(deprecated)]
-            direct_url: None,
             shadow_database_url: None,
         }
     }
@@ -36,8 +30,6 @@ impl DatasourceUrls {
     pub fn from_url_and_shadow_database_url(url: impl Into<String>, shadow_database_url: impl Into<String>) -> Self {
         Self {
             url: url.into(),
-            #[allow(deprecated)]
-            direct_url: None,
             shadow_database_url: Some(shadow_database_url.into()),
         }
     }
@@ -47,8 +39,6 @@ impl From<ValidatedDatasourceUrls> for DatasourceUrls {
     fn from(urls: ValidatedDatasourceUrls) -> Self {
         Self {
             url: urls.url,
-            #[allow(deprecated)]
-            direct_url: None,
             shadow_database_url: urls.shadow_database_url,
         }
     }
@@ -71,9 +61,6 @@ pub enum DatasourceError {
         "`datasource.{_0}` in `prisma.config.ts` must be a direct URL that points directly to the database. Using `prisma:` in the URL scheme is not allowed."
     )]
     AccelerateUrl(&'static str),
-
-    #[error("Use `datasource.url` instead of `datasource.directUrl` in `prisma.config.ts`")]
-    DeprecatedDirectUrl,
 }
 
 impl From<&DatasourceError> for CoreError {
@@ -92,11 +79,6 @@ impl TryFrom<DatasourceUrls> for ValidatedDatasourceUrls {
     type Error = DatasourceError;
 
     fn try_from(urls: DatasourceUrls) -> Result<Self, Self::Error> {
-        #[allow(deprecated)]
-        if urls.direct_url.is_some() {
-            return Err(DatasourceError::DeprecatedDirectUrl);
-        }
-
         validate_datasource_url(&urls.url, "url")?;
 
         if let Some(shadow_database_url) = &urls.shadow_database_url {

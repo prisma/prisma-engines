@@ -33,7 +33,6 @@ async fn introspect_set_default_should_warn(api: &mut TestApi) -> TestResult {
 
         datasource db {
           provider = "mysql"
-          url      = "dummy-url"
         }
 
         model Post {

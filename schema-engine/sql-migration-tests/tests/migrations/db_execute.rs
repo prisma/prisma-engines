@@ -1,4 +1,6 @@
+use indoc::indoc;
 use quaint::{prelude::Queryable, single::Quaint};
+use schema_core::DatasourceUrls;
 use schema_core::json_rpc::types::SchemasWithConfigDir;
 use sql_migration_tests::test_api::*;
 use sql_migration_tests::utils::to_schema_containers;
@@ -35,7 +37,7 @@ fn db_execute_happy_path_with_literal_url() {
     "#;
 
     // Execute the command.
-    let generic_api = schema_core::schema_api_without_extensions(None, None).unwrap();
+    let generic_api = schema_core::schema_api_without_extensions(None, DatasourceUrls::from_url(&url), None).unwrap();
     tok(generic_api.db_execute(DbExecuteParams {
         datasource_type: DbExecuteDatasourceType::Url(UrlContainer { url: url.clone() }),
         script: script.to_owned(),
@@ -54,24 +56,22 @@ fn db_execute_happy_path_with_literal_url() {
 fn db_execute_happy_path_with_prisma_schema() {
     let tmpdir = tempfile::TempDir::new().unwrap();
     let url = format!("file:{}/dbfromschema.sqlite", tmpdir.path().to_string_lossy());
-    let prisma_schema = format!(
+    let prisma_schema = indoc!(
         r#"
-        datasource dbtest {{
-            url = "{}"
+        datasource dbtest {
             provider = "sqlite"
-        }}
+        }
     "#,
-        url.replace('\\', "\\\\")
     );
     let schema_path = tmpdir.path().join("schema.prisma");
-    std::fs::write(&schema_path, prisma_schema.clone()).unwrap();
+    std::fs::write(&schema_path, prisma_schema).unwrap();
     let script = r#"
         CREATE TABLE "dogs" ( id INTEGER PRIMARY KEY, name TEXT );
         INSERT INTO "dogs" ("name") VALUES ('snoopy'), ('marmaduke');
     "#;
 
     // Execute the command.
-    let generic_api = schema_core::schema_api_without_extensions(None, None).unwrap();
+    let generic_api = schema_core::schema_api_without_extensions(None, DatasourceUrls::from_url(&url), None).unwrap();
     tok(generic_api.db_execute(DbExecuteParams {
         datasource_type: DbExecuteDatasourceType::Schema(SchemasWithConfigDir {
             files: vec![SchemaContainer {
@@ -100,7 +100,8 @@ fn mysql_incomplete_script_works(api: TestApi) {
     "#;
 
     let url = api.connection_string().to_owned();
-    let generic_api = schema_core::schema_api_without_extensions(None, None).unwrap();
+    let generic_api =
+        schema_core::schema_api_without_extensions(None, DatasourceUrls::from_url(url.clone()), None).unwrap();
     tok(generic_api.db_execute(DbExecuteParams {
         datasource_type: DbExecuteDatasourceType::Url(UrlContainer { url: url.clone() }),
         script: script.to_owned(),
@@ -122,7 +123,9 @@ fn db_execute_error_path(api: TestApi) {
         CREATE TABLE "dogs" ( id INTEGER AUTO_INCREMENT PRIMARY KEY, name TEXT );
     "#;
 
-    let generic_api = schema_core::schema_api_without_extensions(None, None).unwrap();
+    let generic_api =
+        schema_core::schema_api_without_extensions(None, DatasourceUrls::from_url(api.connection_string()), None)
+            .unwrap();
     let result = tok(generic_api.db_execute(DbExecuteParams {
         datasource_type: DbExecuteDatasourceType::Url(UrlContainer {
             url: api.connection_string().to_owned(),
@@ -139,7 +142,9 @@ fn db_execute_drop_database_that_doesnt_exist_error(api: TestApi) {
         DROP DATABASE "thisisadatabaseweassumedoesntexist";
     "#;
 
-    let generic_api = schema_core::schema_api_without_extensions(None, None).unwrap();
+    let generic_api =
+        schema_core::schema_api_without_extensions(None, DatasourceUrls::from_url(api.connection_string()), None)
+            .unwrap();
     let result = tok(generic_api.db_execute(DbExecuteParams {
         datasource_type: DbExecuteDatasourceType::Url(UrlContainer {
             url: api.connection_string().to_owned(),
@@ -163,7 +168,6 @@ fn sqlite_db_execute_with_schema_datasource_resolves_relative_paths_correctly() 
     let schema = r#"
         datasource sqlitedb {
             provider = "sqlite"
-            url = "file:./dev.db"
         }
     "#;
     std::fs::write(&schema_path, schema).unwrap();
@@ -171,7 +175,9 @@ fn sqlite_db_execute_with_schema_datasource_resolves_relative_paths_correctly() 
     let expected_sqlite_path = prisma_dir.join("dev.db");
     assert!(!expected_sqlite_path.exists());
 
-    let api = schema_core::schema_api_without_extensions(None, None).unwrap();
+    let api =
+        schema_core::schema_api_without_extensions(None, DatasourceUrls::from_url("file:./dev.db"), None).unwrap();
+
     tok(api.db_execute(DbExecuteParams {
         datasource_type: DbExecuteDatasourceType::Schema(SchemasWithConfigDir {
             files: vec![SchemaContainer {
@@ -193,7 +199,6 @@ fn db_execute_multi_file() {
         "a.prisma" => r#"
             datasource dbtest {
                 provider = "sqlite"
-                url = "file:db1.sqlite"
             }
         "#,
         "b.prisma" => r#"
@@ -210,7 +215,8 @@ fn db_execute_multi_file() {
     "#;
 
     // Execute the command.
-    let generic_api = schema_core::schema_api_without_extensions(None, None).unwrap();
+    let generic_api =
+        schema_core::schema_api_without_extensions(None, DatasourceUrls::from_url("file:db1.sqlite"), None).unwrap();
     tok(generic_api.db_execute(DbExecuteParams {
         datasource_type: DbExecuteDatasourceType::Schema(SchemasWithConfigDir {
             files: to_schema_containers(&files),

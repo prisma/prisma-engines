@@ -23,7 +23,7 @@ trait CommandExt {
 impl CommandExt for Command {
     fn datasource_url(&mut self, url: impl Into<String>) -> &mut Self {
         self.arg("--datasource")
-            .arg(&serde_json::to_string(&DatasourceUrls::from_url(url)).unwrap())
+            .arg(serde_json::to_string(&DatasourceUrls::from_url(url)).unwrap())
     }
 }
 
@@ -865,7 +865,9 @@ fn introspect_e2e() {
 
         dbg!("response: {:?}", &response);
 
-        assert!(response.starts_with(r#"{"jsonrpc":"2.0","result":{"datamodel":"datasource db {\n  provider = \"sqlite\"\n  url      = env(\"TEST_DATABASE_URL\")\n}\n","warnings":[]},"#));
+        assert!(response.starts_with(
+            r#"{"jsonrpc":"2.0","result":{"datamodel":"datasource db {\n  provider = \"sqlite\"\n}\n","warnings":[]},"#
+        ));
     });
 }
 

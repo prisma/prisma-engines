@@ -53,7 +53,6 @@ mod tests {
             let schema_str = r#"
                 datasource db {
                     provider = "postgresql"
-                    url = "postgres://stub"
                 }
 
                 model Test {

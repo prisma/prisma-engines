@@ -154,7 +154,6 @@ source .test_database_urls/mysql_5_6
         r#"
         datasource db {{
             provider = "{provider}"
-            url = env("DATABASE_URL")
         }}
     "#
     );

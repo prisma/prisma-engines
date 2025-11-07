@@ -22,7 +22,6 @@ async fn remapping_enum_names(api: &mut TestApi) -> TestResult {
 
         datasource db {
           provider = "mysql"
-          url      = "dummy-url"
         }
 
         model Book {

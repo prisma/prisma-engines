@@ -50,7 +50,6 @@ fn multi_schema_tests(_api: TestApi) {
     let base_schema = indoc! {r#"
         datasource db {
           provider   = "postgresql"
-          url        = "dummy-url"
           schemas    = ["one", "two"]
         }
 
@@ -1586,17 +1585,16 @@ fn migration_with_shadow_database(api: TestApi) {
 
     let shadow_str = shadow_str.to_string();
 
-    let datasource = formatdoc! {r#"
-            datasource db {{
+    let datasource = indoc! {r#"
+            datasource db {
               provider          = "postgresql"
-              url               = "{conn_str}"
               schemas           = ["one", "two"]
-            }}
+            }
 
-            generator js {{
+            generator js {
               provider        = "prisma-client-javascript"
               previewFeatures = []
-            }}
+            }
         "#};
 
     let mut engine = api.new_engine_with_connection_strings(conn_str.clone(), Some(shadow_str.clone()));
@@ -1679,16 +1677,15 @@ fn migration_with_shadow_database(api: TestApi) {
 
 #[test_connector(tags(Postgres), exclude(CockroachDb), preview_features("multiSchema"))]
 fn migration_without_schema_change(api: TestApi) {
-    let datasource = formatdoc! {r#"
-            datasource db {{
+    let datasource = indoc! {r#"
+            datasource db {
               provider   = "postgresql"
-              url        = "dummy-url"
-            }}
+            }
 
-            generator js {{
+            generator js {
               provider        = "prisma-client-javascript"
               previewFeatures = ["multiSchema"]
-            }}
+            }
         "#};
 
     let dm = formatdoc! {r#"
@@ -1737,7 +1734,6 @@ fn schema_push_with_multi_schema_should_ignore_default_schema(api: TestApi) {
     let dm = r#"
         datasource db {
           provider   = "postgresql"
-          url        = "dummy-url"
           schemas    = ["one"]
         }
 

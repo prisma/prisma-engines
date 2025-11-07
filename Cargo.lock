@@ -2638,6 +2638,7 @@ dependencies = [
  "derive_more",
  "futures",
  "indexmap 2.10.0",
+ "indoc",
  "itertools 0.13.0",
  "mongodb",
  "mongodb-client",

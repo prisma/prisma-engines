@@ -8,14 +8,14 @@ async fn referential_integrity_prisma(api: &mut TestApi) -> TestResult {
         CREATE TABLE `Foo` (
             `id` INTEGER NOT NULL,
             `bar_id` INTEGER NOT NULL,
-        
+
             UNIQUE INDEX `Foo_bar_id_key`(`bar_id`),
             PRIMARY KEY (`id`)
         );
 
         CREATE TABLE `Bar` (
             `id` INTEGER NOT NULL,
-        
+
             PRIMARY KEY (`id`)
         );
     "#};
@@ -29,7 +29,6 @@ async fn referential_integrity_prisma(api: &mut TestApi) -> TestResult {
 
         datasource db {
             provider             = "mysql"
-            url                  = "dummy-url"
             referentialIntegrity = "prisma"
         }
 
@@ -52,7 +51,6 @@ async fn referential_integrity_prisma(api: &mut TestApi) -> TestResult {
 
         datasource db {
           provider     = "mysql"
-          url          = "dummy-url"
           relationMode = "prisma"
         }
 
@@ -81,14 +79,14 @@ async fn referential_integrity_foreign_keys(api: &mut TestApi) -> TestResult {
         CREATE TABLE `Foo` (
             `id` INTEGER NOT NULL,
             `bar_id` INTEGER NOT NULL,
-        
+
             UNIQUE INDEX `Foo_bar_id_key`(`bar_id`),
             PRIMARY KEY (`id`)
         );
 
         CREATE TABLE `Bar` (
             `id` INTEGER NOT NULL,
-        
+
             PRIMARY KEY (`id`)
         );
 
@@ -104,7 +102,6 @@ async fn referential_integrity_foreign_keys(api: &mut TestApi) -> TestResult {
 
         datasource db {
             provider             = "mysql"
-            url                  = "dummy-url"
             referentialIntegrity = "foreignKeys"
         }
 
@@ -127,7 +124,6 @@ async fn referential_integrity_foreign_keys(api: &mut TestApi) -> TestResult {
 
         datasource db {
           provider     = "mysql"
-          url          = "dummy-url"
           relationMode = "foreignKeys"
         }
 
@@ -156,14 +152,14 @@ async fn relation_mode_prisma(api: &mut TestApi) -> TestResult {
         CREATE TABLE `Foo` (
             `id` INTEGER NOT NULL,
             `bar_id` INTEGER NOT NULL,
-        
+
             UNIQUE INDEX `Foo_bar_id_key`(`bar_id`),
             PRIMARY KEY (`id`)
         );
 
         CREATE TABLE `Bar` (
             `id` INTEGER NOT NULL,
-        
+
             PRIMARY KEY (`id`)
         );
     "#};
@@ -177,7 +173,6 @@ async fn relation_mode_prisma(api: &mut TestApi) -> TestResult {
 
         datasource db {
             provider     = "mysql"
-            url          = "dummy-url"
             relationMode = "prisma"
         }
 
@@ -200,7 +195,6 @@ async fn relation_mode_prisma(api: &mut TestApi) -> TestResult {
 
         datasource db {
           provider     = "mysql"
-          url          = "dummy-url"
           relationMode = "prisma"
         }
 
@@ -229,14 +223,14 @@ async fn relation_mode_foreign_keys(api: &mut TestApi) -> TestResult {
         CREATE TABLE `Foo` (
             `id` INTEGER NOT NULL,
             `bar_id` INTEGER NOT NULL,
-        
+
             UNIQUE INDEX `Foo_bar_id_key`(`bar_id`),
             PRIMARY KEY (`id`)
         );
 
         CREATE TABLE `Bar` (
             `id` INTEGER NOT NULL,
-        
+
             PRIMARY KEY (`id`)
         );
 
@@ -252,7 +246,6 @@ async fn relation_mode_foreign_keys(api: &mut TestApi) -> TestResult {
 
         datasource db {
             provider     = "mysql"
-            url          = "dummy-url"
             relationMode = "foreignKeys"
         }
 
@@ -275,7 +268,6 @@ async fn relation_mode_foreign_keys(api: &mut TestApi) -> TestResult {
 
         datasource db {
           provider     = "mysql"
-          url          = "dummy-url"
           relationMode = "foreignKeys"
         }
 
@@ -309,14 +301,14 @@ mod at_at_map {
             CREATE TABLE `foo_table` (
                 `id` INTEGER NOT NULL,
                 `bar_id` INTEGER NOT NULL,
-            
+
                 UNIQUE INDEX `foo_table_bar_id_key`(`bar_id`),
                 PRIMARY KEY (`id`)
             );
 
             CREATE TABLE `bar_table` (
                 `id` INTEGER NOT NULL,
-            
+
                 PRIMARY KEY (`id`)
             );
         "#};
@@ -330,7 +322,6 @@ mod at_at_map {
 
             datasource db {
                 provider             = "mysql"
-                url                  = "dummy-url"
                 referentialIntegrity = "prisma"
             }
 
@@ -357,7 +348,6 @@ mod at_at_map {
 
             datasource db {
               provider     = "mysql"
-              url          = "dummy-url"
               relationMode = "prisma"
             }
 
@@ -390,14 +380,14 @@ mod at_at_map {
             CREATE TABLE `foo_table` (
                 `id` INTEGER NOT NULL,
                 `bar_id` INTEGER NOT NULL,
-            
+
                 UNIQUE INDEX `foo_table_bar_id_key`(`bar_id`),
                 PRIMARY KEY (`id`)
             );
 
             CREATE TABLE `bar_table` (
                 `id` INTEGER NOT NULL,
-            
+
                 PRIMARY KEY (`id`)
             );
 
@@ -413,7 +403,6 @@ mod at_at_map {
 
             datasource db {
                 provider             = "mysql"
-                url                  = "dummy-url"
                 referentialIntegrity = "foreignKeys"
             }
 
@@ -440,7 +429,6 @@ mod at_at_map {
 
             datasource db {
               provider     = "mysql"
-              url          = "dummy-url"
               relationMode = "foreignKeys"
             }
 
@@ -473,14 +461,14 @@ mod at_at_map {
             CREATE TABLE `foo_table` (
                 `id` INTEGER NOT NULL,
                 `bar_id` INTEGER NOT NULL,
-            
+
                 UNIQUE INDEX `foo_table_bar_id_key`(`bar_id`),
                 PRIMARY KEY (`id`)
             );
 
             CREATE TABLE `bar_table` (
                 `id` INTEGER NOT NULL,
-            
+
                 PRIMARY KEY (`id`)
             );
         "#};
@@ -494,7 +482,6 @@ mod at_at_map {
 
             datasource db {
                 provider     = "mysql"
-                url          = "dummy-url"
                 relationMode = "prisma"
             }
 
@@ -521,7 +508,6 @@ mod at_at_map {
 
             datasource db {
               provider     = "mysql"
-              url          = "dummy-url"
               relationMode = "prisma"
             }
 
@@ -554,14 +540,14 @@ mod at_at_map {
             CREATE TABLE `foo_table` (
                 `id` INTEGER NOT NULL,
                 `bar_id` INTEGER NOT NULL,
-            
+
                 UNIQUE INDEX `foo_table_bar_id_key`(`bar_id`),
                 PRIMARY KEY (`id`)
             );
 
             CREATE TABLE `bar_table` (
                 `id` INTEGER NOT NULL,
-            
+
                 PRIMARY KEY (`id`)
             );
 
@@ -577,7 +563,6 @@ mod at_at_map {
 
             datasource db {
                 provider     = "mysql"
-                url          = "dummy-url"
                 relationMode = "foreignKeys"
             }
 
@@ -604,7 +589,6 @@ mod at_at_map {
 
             datasource db {
               provider     = "mysql"
-              url          = "dummy-url"
               relationMode = "foreignKeys"
             }
 

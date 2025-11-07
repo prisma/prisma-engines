@@ -1,4 +1,5 @@
 use schema_core::{
+    DatasourceUrls,
     json_rpc::types::{SchemaFilter, SchemasContainer},
     schema_connector::{ConnectorParams, SchemaConnector},
 };
@@ -95,7 +96,12 @@ fn run_single_migration_test(test_file_path: &str, test_function_name: &'static 
     };
 
     let host = Arc::new(sql_migration_tests::test_api::TestConnectorHost::default());
-    let schema_engine = schema_core::schema_api_without_extensions(None, Some(host.clone())).unwrap();
+    let schema_engine = schema_core::schema_api_without_extensions(
+        None,
+        DatasourceUrls::from_url(&connection_string),
+        Some(host.clone()),
+    )
+    .unwrap();
 
     tok(schema_engine.diff(schema_core::json_rpc::types::DiffParams {
         exit_code: None,

@@ -27,7 +27,6 @@
 //! let expected = indoc! {r#"
 //!     datasource db {
 //!       provider = "postgres"
-//!       url      = env("DATABASE_URL")
 //!     }
 //! "#};
 //!
@@ -50,7 +49,6 @@
 //! let expected = indoc! {r#"
 //!     datasource db {
 //!       provider = "postgres"
-//!       url      = env("DATABASE_URL")
 //!     }
 //!
 //!     model A {

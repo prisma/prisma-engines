@@ -40,7 +40,6 @@ impl<'a> Datasource<'a> {
     /// ```ignore
     /// datasource db {
     ///   provider     = "postgresql"
-    ///   url          = env("DATABASE_URL")
     ///   relationMode = "foreignKeys"
     /// //                ^^^^^^^^^^^ this
     /// }
@@ -59,7 +58,6 @@ impl<'a> Datasource<'a> {
     /// ```ignore
     /// datasource db {
     ///   provider   = "postgresql"
-    ///   url          = env("DATABASE_URL")
     ///   extensions = [citext(version: "2.1")]
     /// //             ^^^^^^^^^^^^^^^^^^^^^^^^ value
     /// //^^^^^^^^^^ key
@@ -75,7 +73,6 @@ impl<'a> Datasource<'a> {
     /// /// This here is the documentation.
     /// datasource db {
     ///   provider = "postgresql"
-    ///   url      = env("DATABASE_URL")
     /// }
     /// ```
     pub fn documentation(&mut self, documentation: impl Into<Cow<'a, str>>) {

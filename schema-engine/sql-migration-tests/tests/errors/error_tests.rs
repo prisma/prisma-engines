@@ -3,6 +3,7 @@ use indoc::{formatdoc, indoc};
 use pretty_assertions::assert_eq;
 use quaint::prelude::Insert;
 use schema_core::{
+    DatasourceUrls,
     json_rpc::types::{DatasourceParam, EnsureConnectionValidityParams, SchemasContainer},
     schema_connector::ConnectorError,
 };
@@ -11,11 +12,12 @@ use sql_migration_tests::test_api::*;
 use std::str::FromStr;
 use url::Url;
 
-pub(crate) async fn connection_error(schema: String) -> ConnectorError {
-    let mut api = match schema_core::schema_api_without_extensions(Some(schema.clone()), None) {
-        Ok(api) => api,
-        Err(err) => return err,
-    };
+pub(crate) async fn connection_error(url: impl Into<String>, schema: String) -> ConnectorError {
+    let mut api =
+        match schema_core::schema_api_without_extensions(Some(schema.clone()), DatasourceUrls::from_url(url), None) {
+            Ok(api) => api,
+            Err(err) => return err,
+        };
 
     let err = api
         .ensure_connection_validity(EnsureConnectionValidityParams {
@@ -42,16 +44,14 @@ fn authentication_failure_must_return_a_known_error_on_postgres(api: TestApi) {
 
     db_url.set_password(Some("obviously-not-right")).unwrap();
 
-    let dm = format!(
-        r#"
-            datasource db {{
-              provider = "postgres"
-              url      = "{db_url}"
-            }}
-        "#
-    );
+    let dm = r#"
+        datasource db {
+            provider = "postgres"
+        }
+    "#
+    .into();
 
-    let error = tok(connection_error(dm));
+    let error = tok(connection_error(db_url.as_str(), dm));
 
     let user = db_url.username();
 
@@ -74,16 +74,14 @@ fn authentication_failure_must_return_a_known_error_on_mysql(api: TestApi) {
 
     url.set_password(Some("obviously-not-right")).unwrap();
 
-    let dm = format!(
-        r#"
-            datasource db {{
-              provider = "mysql"
-              url      = "{url}"
-            }}
-        "#
-    );
+    let dm = r#"
+        datasource db {
+            provider = "mysql"
+        }
+    "#
+    .into();
 
-    let error = tok(connection_error(dm));
+    let error = tok(connection_error(url.as_str(), dm));
 
     let user = url.username();
 
@@ -108,17 +106,14 @@ fn authentication_failure_must_return_a_known_error_on_mssql(api: TestApi) {
 
     *properties.get_mut("password").unwrap() = "obviously-not-right".to_string();
 
-    let dm = format!(
-        r#"
-            datasource db {{
-              provider = "sqlserver"
-              url      = "{}"
-            }}
-        "#,
-        url.to_string().replace("jdbc:", "")
-    );
+    let dm = r#"
+        datasource db {
+            provider = "sqlserver"
+        }
+    "#
+    .into();
 
-    let error = tok(connection_error(dm));
+    let error = tok(connection_error(url.to_string().replace("jdbc:", ""), dm));
 
     let json_error = serde_json::to_value(error.to_user_facing()).unwrap();
     let expected = json!({
@@ -143,16 +138,14 @@ fn unreachable_database_must_return_a_proper_error_on_mysql(api: TestApi) {
 
     url.set_port(Some(8787)).unwrap();
 
-    let dm = format!(
-        r#"
-            datasource db {{
-              provider = "mysql"
-              url      = "{url}"
-            }}
-        "#
-    );
+    let dm = r#"
+        datasource db {
+            provider = "mysql"
+        }
+    "#
+    .into();
 
-    let error = tok(connection_error(dm));
+    let error = tok(connection_error(url.as_str(), dm));
 
     let port = url.port().unwrap();
     let host = url.host().unwrap().to_string();
@@ -176,16 +169,14 @@ fn unreachable_database_must_return_a_proper_error_on_postgres(api: TestApi) {
 
     url.set_port(Some(8787)).unwrap();
 
-    let dm = format!(
-        r#"
-            datasource db {{
-              provider = "postgres"
-              url      = "{url}"
-            }}
-        "#
-    );
+    let dm = r#"
+        datasource db {
+            provider = "postgres"
+        }
+    "#
+    .into();
 
-    let error = tok(connection_error(dm));
+    let error = tok(connection_error(url.as_str(), dm));
 
     let host = url.host().unwrap().to_string();
     let port = url.port().unwrap();
@@ -210,16 +201,14 @@ fn database_does_not_exist_must_return_a_proper_error(api: TestApi) {
 
     url.set_path(&format!("/{database_name}"));
 
-    let dm = format!(
-        r#"
-            datasource db {{
-              provider = "mysql"
-              url      = "{url}"
-            }}
-        "#
-    );
+    let dm = r#"
+        datasource db {
+            provider = "mysql"
+        }
+    "#
+    .into();
 
-    let error = tok(connection_error(dm));
+    let error = tok(connection_error(url.as_str(), dm));
 
     let json_error = serde_json::to_value(error.to_user_facing()).unwrap();
     let expected = json!({
@@ -241,16 +230,14 @@ fn database_does_not_exist_must_return_a_proper_error_in_vitess(api: TestApi) {
 
     url.set_path(&format!("/{database_name}"));
 
-    let dm = format!(
-        r#"
-            datasource db {{
-              provider = "mysql"
-              url      = "{url}"
-            }}
-        "#
-    );
+    let dm = r#"
+        datasource db {
+            provider = "mysql"
+        }
+    "#
+    .into();
 
-    let error = tok(connection_error(dm));
+    let error = tok(connection_error(url.as_str(), dm));
 
     let json_error = serde_json::to_value(error.to_user_facing()).unwrap();
     let expected = json!({
@@ -267,17 +254,14 @@ fn database_does_not_exist_must_return_a_proper_error_in_vitess(api: TestApi) {
 
 #[test_connector(tags(Postgres))]
 fn bad_datasource_url_and_provider_combinations_must_return_a_proper_error(api: TestApi) {
-    let dm = format!(
-        r#"
-            datasource db {{
-                provider = "sqlite"
-                url = "{}"
-            }}
-        "#,
-        api.connection_string()
-    );
+    let dm = r#"
+        datasource db {
+            provider = "sqlite"
+        }
+    "#
+    .into();
 
-    let error = tok(connection_error(dm));
+    let error = tok(connection_error(api.connection_string(), dm));
 
     let json_error = serde_json::to_value(error.to_user_facing()).unwrap();
 
@@ -308,19 +292,17 @@ fn connections_to_system_databases_must_be_rejected(api: TestApi) {
         let mut url: url::Url = api.connection_string().parse().unwrap();
         url.set_path(name);
 
-        let dm = format!(
-            r#"
-                datasource db {{
-                    provider = "mysql"
-                    url = "{url}"
-                }}
-            "#
-        );
+        let dm = r#"
+            datasource db {
+                provider = "mysql"
+            }
+        "#
+        .into();
 
         // "mysql" is the default in Quaint.
         let name = if name == &"" { "mysql" } else { name };
 
-        let error = tok(connection_error(dm));
+        let error = tok(connection_error(url.as_str(), dm));
         let json_error = serde_json::to_value(error.to_user_facing()).unwrap();
 
         let expected = json!({
@@ -452,7 +434,7 @@ fn json_fields_must_be_rejected_on_mysql_5_6(api: TestApi) {
 
 #[tokio::test]
 async fn connection_string_problems_give_a_nice_error() {
-    let providers = &[
+    let providers = [
         ("mysql", "mysql://root:password-with-#@localhost:3306/database"),
         (
             "postgresql",
@@ -461,20 +443,20 @@ async fn connection_string_problems_give_a_nice_error() {
         ("sqlserver", "sqlserver://root:password-with-#@localhost:5432/postgres"),
     ];
 
-    for provider in providers {
-        eprintln!("Provider: {}", provider.0);
+    for (provider, url) in providers {
+        eprintln!("Provider: {provider}");
         let dm = formatdoc!(
             r#"
                 datasource db {{
                   provider = "{}"
-                  url = "{}"
                 }}
         "#,
-            provider.0,
-            provider.1
+            provider,
         );
 
-        let mut api = schema_core::schema_api_without_extensions(Some(dm.clone()), None).unwrap();
+        let mut api =
+            schema_core::schema_api_without_extensions(Some(dm.clone()), DatasourceUrls::from_url(url), None).unwrap();
+
         let error = api
             .ensure_connection_validity(EnsureConnectionValidityParams {
                 datasource: DatasourceParam::Schema(SchemasContainer {
@@ -490,7 +472,7 @@ async fn connection_string_problems_give_a_nice_error() {
 
         let json_error = serde_json::to_value(error.to_user_facing()).unwrap();
 
-        let details = match provider.0 {
+        let details = match provider {
             "sqlserver" => {
                 indoc!(
                     "Error parsing connection string: Conversion error: invalid digit found in string in database URL.
@@ -529,7 +511,6 @@ async fn bad_connection_string_in_datamodel_returns_nice_error() {
     let schema = indoc! {r#"
         datasource db {
           provider = "postgresql"
-          url      = "sqlserver:/localhost:1433;database=prisma-demo;user=SA;password=Pr1sm4_Pr1sm4;trustServerCertificate=true;encrypt=true"
         }
 
         generator client {
@@ -537,7 +518,13 @@ async fn bad_connection_string_in_datamodel_returns_nice_error() {
         }
     "#};
 
-    let error = match schema_core::schema_api_without_extensions(Some(schema.to_string()), None) {
+    let error = match schema_core::schema_api_without_extensions(
+        Some(schema.to_string()),
+        DatasourceUrls::from_url(
+            "sqlserver:/localhost:1433;database=prisma-demo;user=SA;password=Pr1sm4_Pr1sm4;trustServerCertificate=true;encrypt=true",
+        ),
+        None,
+    ) {
         Ok(_) => panic!("Did not error"),
         Err(e) => e,
     };

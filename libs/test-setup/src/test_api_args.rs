@@ -1,11 +1,12 @@
 use crate::{Capabilities, Tags, logging, mssql, mysql, postgres};
 use enumflags2::BitFlags;
 use quaint::single::Quaint;
+use std::borrow::Cow;
 use std::sync::LazyLock;
 use std::time::Duration;
 use std::{fmt::Display, io::Write as _};
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub(crate) struct DbUnderTest {
     pub(crate) capabilities: BitFlags<Capabilities>,
     pub(crate) database_url: String,
@@ -127,7 +128,7 @@ pub struct TestApiArgs {
     test_function_name: &'static str,
     preview_features: &'static [&'static str],
     namespaces: &'static [&'static str],
-    db: &'static DbUnderTest,
+    db: Cow<'static, DbUnderTest>,
 }
 
 impl TestApiArgs {
@@ -140,7 +141,17 @@ impl TestApiArgs {
             test_function_name,
             preview_features,
             namespaces,
-            db: db_under_test(),
+            db: Cow::Borrowed(db_under_test()),
+        }
+    }
+
+    pub fn with_new_url(self, url: impl Into<String>) -> Self {
+        TestApiArgs {
+            db: Cow::Owned(DbUnderTest {
+                database_url: url.into(),
+                ..self.db.as_ref().clone()
+            }),
+            ..self
         }
     }
 
@@ -185,13 +196,11 @@ impl TestApiArgs {
 
     pub fn datasource_block<'a>(
         &'a self,
-        url: &'a str,
         params: &'a [(&'a str, &'a str)],
         preview_features: &'static [&'static str],
     ) -> DatasourceBlock<'a> {
         DatasourceBlock {
             provider: self.db.provider,
-            url,
             params,
             preview_features,
         }
@@ -201,7 +210,7 @@ impl TestApiArgs {
         self.db.provider
     }
 
-    pub fn shadow_database_url(&self) -> Option<&'static str> {
+    pub fn shadow_database_url(&self) -> Option<&str> {
         self.db.shadow_database_url.as_deref()
     }
 
@@ -216,16 +225,10 @@ impl TestApiArgs {
 
 pub struct DatasourceBlock<'a> {
     provider: &'a str,
-    url: &'a str,
     params: &'a [(&'a str, &'a str)],
     preview_features: &'static [&'static str],
 }
 
-impl DatasourceBlock<'_> {
-    pub fn url(&self) -> &str {
-        self.url
-    }
-}
 fn generator_block(preview_features: &'static [&'static str]) -> String {
     let preview_features: Vec<String> = preview_features.iter().map(|pf| format!(r#""{pf}""#)).collect();
 
@@ -251,8 +254,6 @@ impl Display for DatasourceBlock<'_> {
 
         f.write_str("datasource db {\n    provider = \"")?;
         f.write_str(self.provider)?;
-        f.write_str("\"\n    url = \"")?;
-        f.write_str(self.url)?;
         f.write_str("\"\n")?;
 
         for (param_name, param_value) in self.params {

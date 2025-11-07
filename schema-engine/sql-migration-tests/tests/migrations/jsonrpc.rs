@@ -1,22 +1,28 @@
 use expect_test::expect;
-use schema_core::{ExtensionTypeConfig, RpcApi};
+use schema_core::{DatasourceUrls, ExtensionTypeConfig, RpcApi};
 use std::sync::Arc;
 use test_macros::test_connector;
 use test_setup::*;
 
 struct TestApi {
-    _args: TestApiArgs,
     api: RpcApi,
     rt: tokio::runtime::Runtime,
 }
 
 impl TestApi {
-    fn new(_args: TestApiArgs) -> Self {
+    fn new(args: TestApiArgs) -> Self {
         let host = Arc::new(schema_core::schema_connector::EmptyHost);
         let rt = tokio::runtime::Runtime::new().unwrap();
         TestApi {
-            _args,
-            api: RpcApi::new(None, None, host, Arc::new(ExtensionTypeConfig::default())),
+            api: RpcApi::new(
+                None,
+                DatasourceUrls {
+                    url: args.database_url().to_owned(),
+                    shadow_database_url: args.shadow_database_url().map(ToOwned::to_owned),
+                },
+                host,
+                Arc::new(ExtensionTypeConfig::default()),
+            ),
             rt,
         }
     }

@@ -70,6 +70,10 @@ impl TestApi {
         TestApi { root, connector }
     }
 
+    pub fn with_new_connection_string(self, connection_string: impl Into<String>) -> Self {
+        Self::new(self.root.args.with_new_url(connection_string))
+    }
+
     pub fn args(&self) -> &TestApiArgs {
         &self.root.args
     }
@@ -204,7 +208,6 @@ impl TestApi {
             params,
             &DatasourceUrls::from_url(self.root.connection_string()).try_into()?,
             self.connector.host().clone(),
-            None,
             &NoExtensionTypes,
         ))
     }
@@ -422,9 +425,7 @@ impl TestApi {
     }
 
     pub fn datasource_block_with<'a>(&'a self, params: &'a [(&'a str, &'a str)]) -> DatasourceBlock<'a> {
-        self.root
-            .args
-            .datasource_block(self.root.connection_string(), params, &[])
+        self.root.args.datasource_block(params, &[])
     }
 
     /// Generate a migration script using `MigrationConnector::diff()`.
@@ -571,10 +572,7 @@ impl TestApi {
             params.to_vec()
         };
 
-        let ds_block = self
-            .root
-            .args
-            .datasource_block(self.root.args.database_url(), &used_params, preview_features);
+        let ds_block = self.root.args.datasource_block(&used_params, preview_features);
 
         write!(out, "{ds_block}").unwrap()
     }

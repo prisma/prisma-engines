@@ -536,7 +536,6 @@ async fn a_self_relation(api: &mut TestApi) -> TestResult {
 
         datasource db {
           provider = "sqlserver"
-          url      = "dummy-url"
         }
 
         model User {

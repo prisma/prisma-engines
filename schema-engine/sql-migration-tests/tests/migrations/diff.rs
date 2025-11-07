@@ -1,3 +1,4 @@
+use indoc::indoc;
 use psl::parser_database::NoExtensionTypes;
 use quaint::{prelude::Queryable, single::Quaint};
 use schema_core::{
@@ -355,7 +356,6 @@ fn diffing_postgres_schemas_when_initialized_on_sqlite(mut api: TestApi) {
     let from_schema = r#"
         datasource db {
             provider = "postgresql"
-            url = "postgresql://example.com/test"
         }
 
         model TestModel {
@@ -369,7 +369,6 @@ fn diffing_postgres_schemas_when_initialized_on_sqlite(mut api: TestApi) {
     let to_schema = r#"
         datasource db {
             provider = "postgresql"
-            url = "postgresql://example.com/test"
         }
 
         model TestModel {
@@ -466,7 +465,9 @@ fn from_empty_to_migrations_directory(mut api: TestApi) {
     let host = Arc::new(TestConnectorHost::default());
     tok(diff_cli(
         params,
-        DatasourceUrls::from_url_and_shadow_database_url("postgres://not-used", api.connection_string()),
+        &DatasourceUrls::from_url_and_shadow_database_url("postgres://not-used", api.connection_string())
+            .try_into()
+            .unwrap(),
         host.clone(),
         &NoExtensionTypes,
     ))
@@ -530,7 +531,6 @@ fn from_schema_datamodel_to_url(mut api: TestApi) {
     let first_schema = r#"
         datasource db {
             provider = "sqlite"
-            url = "file:dev.db"
         }
 
         model cows {
@@ -573,7 +573,9 @@ fn from_schema_datamodel_to_url(mut api: TestApi) {
 }
 
 #[test_connector(tags(Sqlite))]
-fn from_schema_datasource_relative(mut api: TestApi) {
+fn from_schema_datasource_relative(api: TestApi) {
+    let mut api = api.with_new_connection_string("file:./dev.db");
+
     let host = Arc::new(TestConnectorHost::default());
     api.connector.set_host(host.clone());
 
@@ -584,7 +586,6 @@ fn from_schema_datasource_relative(mut api: TestApi) {
     let schema = r#"
         datasource db {
           provider = "sqlite"
-          url = "file:./dev.db"
         }
     "#;
 
@@ -650,16 +651,14 @@ fn from_schema_datasource_to_url(mut api: TestApi) {
             .unwrap();
     });
 
-    let schema_content = format!(
+    let schema_content = indoc!(
         r#"
-          datasource db {{
+          datasource db {
               provider = "sqlite"
-              url = "{}"
-          }}
+          }
         "#,
-        first_url.replace('\\', "\\\\")
     );
-    let schema_path = write_file_to_tmp(&schema_content, &tempdir, "schema.prisma");
+    let schema_path = write_file_to_tmp(schema_content, &tempdir, "schema.prisma");
 
     let input = DiffParams {
         exit_code: None,
@@ -676,7 +675,7 @@ fn from_schema_datasource_to_url(mut api: TestApi) {
         filters: SchemaFilter::default(),
     };
 
-    api.diff(input).unwrap();
+    api.with_new_connection_string(first_url).diff(input).unwrap();
 
     let expected_printed_messages = expect![[r#"
         [
@@ -710,16 +709,14 @@ fn with_schema_filters(mut api: TestApi) {
         q.raw_cmd("SELECT 1;").await.unwrap();
     });
 
-    let schema_content = format!(
+    let schema_content = indoc!(
         r#"
-          datasource db {{
+          datasource db {
               provider = "sqlite"
-              url = "{}"
-          }}
+          }
         "#,
-        first_url.replace('\\', "\\\\")
     );
-    let schema_path = write_file_to_tmp(&schema_content, &tempdir, "schema.prisma");
+    let schema_path = write_file_to_tmp(schema_content, &tempdir, "schema.prisma");
 
     let input = DiffParams {
         exit_code: None,
@@ -739,7 +736,7 @@ fn with_schema_filters(mut api: TestApi) {
         },
     };
 
-    api.diff(input).unwrap();
+    api.with_new_connection_string(first_url).diff(input).unwrap();
 
     let expected_printed_messages = expect![[r#"
         [
@@ -766,16 +763,14 @@ fn with_invalid_schema_filter_sqlite(mut api: TestApi) {
         q.raw_cmd("SELECT 1;").await.unwrap();
     });
 
-    let schema_content = format!(
+    let schema_content = indoc!(
         r#"
-          datasource db {{
+          datasource db {
               provider = "sqlite"
-              url = "{}"
-          }}
+          }
         "#,
-        first_url.replace('\\', "\\\\")
     );
-    let schema_path = write_file_to_tmp(&schema_content, &tempdir, "schema.prisma");
+    let schema_path = write_file_to_tmp(schema_content, &tempdir, "schema.prisma");
 
     let input = DiffParams {
         exit_code: None,
@@ -795,7 +790,7 @@ fn with_invalid_schema_filter_sqlite(mut api: TestApi) {
         },
     };
 
-    let err = api.diff(input).unwrap_err();
+    let err = api.with_new_connection_string(first_url).diff(input).unwrap_err();
 
     assert_eq!(err.error_code(), Some("P3024"));
 }
@@ -805,15 +800,14 @@ fn with_invalid_schema_filter_postgres(mut api: TestApi) {
     let tempdir = tempfile::tempdir().unwrap();
     let connection_string = api.connection_string();
 
-    let schema_content = format!(
+    let schema_content = indoc!(
         r#"
-          datasource db {{
+          datasource db {
               provider = "postgresql"
-              url = "{connection_string}"
-          }}
+          }
         "#
     );
-    let schema_path = write_file_to_tmp(&schema_content, &tempdir, "schema.prisma");
+    let schema_path = write_file_to_tmp(schema_content, &tempdir, "schema.prisma");
 
     let input = DiffParams {
         exit_code: None,
@@ -890,7 +884,6 @@ fn diffing_mongo_schemas_to_script_returns_a_nice_error() {
     let from = r#"
         datasource db {
             provider = "mongodb"
-            url = "mongo+srv://test"
         }
 
         model TestModel {
@@ -904,7 +897,6 @@ fn diffing_mongo_schemas_to_script_returns_a_nice_error() {
     let to = r#"
         datasource db {
             provider = "mongodb"
-            url = "mongo+srv://test"
         }
 
         model TestModel {
@@ -943,7 +935,7 @@ fn diffing_mongo_schemas_to_script_returns_a_nice_error() {
     let expected = expect![[r#"
         Rendering to a script is not supported on MongoDB.
     "#]];
-    expected.assert_eq(&diff_error(params));
+    expected.assert_eq(&diff_error(DatasourceUrls::from_url("mongodb+srv://test"), params));
 }
 
 #[test]
@@ -968,9 +960,11 @@ fn diff_sqlite_migration_directories() {
         filters: SchemaFilter::default(),
     };
 
-    tok(schema_core::schema_api_without_extensions(None, None)
-        .unwrap()
-        .diff(params))
+    tok(
+        schema_core::schema_api_without_extensions(None, DatasourceUrls::from_url("file:dummy.db"), None)
+            .unwrap()
+            .diff(params),
+    )
     .unwrap();
     // it's ok!
 }
@@ -982,7 +976,6 @@ fn diffing_mongo_schemas_works() {
     let from = r#"
         datasource db {
             provider = "mongodb"
-            url = "mongo+srv://test"
         }
 
         model TestModel {
@@ -996,7 +989,6 @@ fn diffing_mongo_schemas_works() {
     let to = r#"
         datasource db {
             provider = "mongodb"
-            url = "mongo+srv://test"
         }
 
         model TestModel {
@@ -1037,62 +1029,7 @@ fn diffing_mongo_schemas_works() {
         [+] Index `TestModel_names_idx` on ({"names":1})
     "#]];
 
-    expected_printed_messages.assert_eq(&diff_output(params));
-}
-
-#[test]
-fn diffing_two_schema_datamodels_with_missing_datasource_env_vars() {
-    for provider in ["sqlite", "postgresql", "postgres", "mysql", "sqlserver"] {
-        let schema_a = format!(
-            r#"
-            datasource db {{
-                provider = "{provider}"
-                url = env("HELLO_THIS_ENV_VAR_IS_NOT_D3F1N3D")
-            }}
-        "#
-        );
-
-        let schema_b = format!(
-            r#"
-            datasource db {{
-                provider = "{provider}"
-                url = env("THIS_ENV_VAR_DO3S_N0T_EXiST_EITHER")
-            }}
-
-            model Particle {{
-                id Int @id
-            }}
-        "#
-        );
-
-        let tmpdir = tempfile::tempdir().unwrap();
-        let schema_a_path = write_file_to_tmp(&schema_a, &tmpdir, "schema_a");
-        let schema_b_path = write_file_to_tmp(&schema_b, &tmpdir, "schema_b");
-
-        let expected = expect![[r#"
-
-            [+] Added tables
-              - Particle
-        "#]];
-        expected.assert_eq(&diff_output(DiffParams {
-            exit_code: None,
-            from: DiffTarget::SchemaDatamodel(SchemasContainer {
-                files: vec![SchemaContainer {
-                    path: schema_a_path.to_str().unwrap().to_owned(),
-                    content: schema_a.to_string(),
-                }],
-            }),
-            script: false,
-            shadow_database_url: None,
-            to: DiffTarget::SchemaDatamodel(SchemasContainer {
-                files: vec![SchemaContainer {
-                    path: schema_b_path.to_str().unwrap().to_owned(),
-                    content: schema_b.to_string(),
-                }],
-            }),
-            filters: SchemaFilter::default(),
-        }))
-    }
+    expected_printed_messages.assert_eq(&diff_output(DatasourceUrls::from_url("mongodb+srv://test"), params));
 }
 
 #[test]
@@ -1100,7 +1037,6 @@ fn diff_with_exit_code_and_empty_diff_returns_zero() {
     let schema = r#"
         datasource db {
             provider = "sqlite"
-            url = "file:dev.db"
         }
 
         model Puppy {
@@ -1111,25 +1047,29 @@ fn diff_with_exit_code_and_empty_diff_returns_zero() {
 
     let tmpdir = tempfile::tempdir().unwrap();
     let path = write_file_to_tmp(schema, &tmpdir, "schema.prisma");
+    let datasource_urls = DatasourceUrls::from_url("file:dev.db");
 
-    let (result, diff) = diff_result(DiffParams {
-        exit_code: Some(true),
-        from: DiffTarget::SchemaDatamodel(SchemasContainer {
-            files: vec![SchemaContainer {
-                path: path.to_str().unwrap().to_owned(),
-                content: schema.to_string(),
-            }],
-        }),
-        to: DiffTarget::SchemaDatamodel(SchemasContainer {
-            files: vec![SchemaContainer {
-                path: path.to_str().unwrap().to_owned(),
-                content: schema.to_string(),
-            }],
-        }),
-        script: false,
-        shadow_database_url: None,
-        filters: SchemaFilter::default(),
-    });
+    let (result, diff) = diff_result(
+        datasource_urls,
+        DiffParams {
+            exit_code: Some(true),
+            from: DiffTarget::SchemaDatamodel(SchemasContainer {
+                files: vec![SchemaContainer {
+                    path: path.to_str().unwrap().to_owned(),
+                    content: schema.to_string(),
+                }],
+            }),
+            to: DiffTarget::SchemaDatamodel(SchemasContainer {
+                files: vec![SchemaContainer {
+                    path: path.to_str().unwrap().to_owned(),
+                    content: schema.to_string(),
+                }],
+            }),
+            script: false,
+            shadow_database_url: None,
+            filters: SchemaFilter::default(),
+        },
+    );
 
     assert_eq!(result.exit_code, 0);
     let expected_diff = expect![[r#"
@@ -1143,7 +1083,6 @@ fn diff_with_exit_code_and_non_empty_diff_returns_two() {
     let schema = r#"
         datasource db {
             provider = "sqlite"
-            url = "file:dev.db"
         }
 
         model Puppy {
@@ -1154,20 +1093,24 @@ fn diff_with_exit_code_and_non_empty_diff_returns_two() {
 
     let tmpdir = tempfile::tempdir().unwrap();
     let path = write_file_to_tmp(schema, &tmpdir, "schema.prisma");
+    let datasource_urls = DatasourceUrls::from_url("file:dev.db");
 
-    let (result, diff) = diff_result(DiffParams {
-        exit_code: Some(true),
-        from: DiffTarget::Empty,
-        to: DiffTarget::SchemaDatamodel(SchemasContainer {
-            files: vec![SchemaContainer {
-                path: path.to_str().unwrap().to_owned(),
-                content: schema.to_string(),
-            }],
-        }),
-        script: false,
-        shadow_database_url: None,
-        filters: SchemaFilter::default(),
-    });
+    let (result, diff) = diff_result(
+        datasource_urls,
+        DiffParams {
+            exit_code: Some(true),
+            from: DiffTarget::Empty,
+            to: DiffTarget::SchemaDatamodel(SchemasContainer {
+                files: vec![SchemaContainer {
+                    path: path.to_str().unwrap().to_owned(),
+                    content: schema.to_string(),
+                }],
+            }),
+            script: false,
+            shadow_database_url: None,
+            filters: SchemaFilter::default(),
+        },
+    );
 
     assert_eq!(result.exit_code, 2);
     let expected_diff = expect![[r#"
@@ -1180,21 +1123,25 @@ fn diff_with_exit_code_and_non_empty_diff_returns_two() {
 
 #[test]
 fn diff_with_non_existing_sqlite_database_from_url() {
+    let datasource_urls = DatasourceUrls::from_url("file:db.sqlite");
     let expected = expect![[r#"
         Database `db.sqlite` does not exist
     "#]];
     let tmpdir = tempfile::tempdir().unwrap();
 
-    let error = diff_error(DiffParams {
-        exit_code: Some(true),
-        from: DiffTarget::Empty,
-        script: false,
-        shadow_database_url: None,
-        to: DiffTarget::Url(UrlContainer {
-            url: format!("file:{}", tmpdir.path().join("db.sqlite").to_string_lossy()),
-        }),
-        filters: SchemaFilter::default(),
-    });
+    let error = diff_error(
+        datasource_urls,
+        DiffParams {
+            exit_code: Some(true),
+            from: DiffTarget::Empty,
+            script: false,
+            shadow_database_url: None,
+            to: DiffTarget::Url(UrlContainer {
+                url: format!("file:{}", tmpdir.path().join("db.sqlite").to_string_lossy()),
+            }),
+            filters: SchemaFilter::default(),
+        },
+    );
 
     let error = error
         .replace(tmpdir.path().to_str().unwrap(), "<the-tmpdir-path>")
@@ -1212,27 +1159,29 @@ fn diff_with_non_existing_sqlite_database_from_datasource() {
     let schema = r#"
         datasource db {
             provider = "sqlite"
-            url = "file:/this/file/doesnt/exist/we/assume.sqlite"
         }
     "#;
     let tmpdir = tempfile::tempdir().unwrap();
 
     let schema_path = write_file_to_tmp(schema, &tmpdir, "schema.prisma");
 
-    let error = diff_error(DiffParams {
-        exit_code: Some(true),
-        from: DiffTarget::Empty,
-        script: false,
-        shadow_database_url: None,
-        to: DiffTarget::SchemaDatasource(SchemasWithConfigDir {
-            files: vec![SchemaContainer {
-                path: schema_path.to_string_lossy().into_owned(),
-                content: schema.to_string(),
-            }],
-            config_dir: schema_path.parent().unwrap().to_string_lossy().into_owned(),
-        }),
-        filters: SchemaFilter::default(),
-    });
+    let error = diff_error(
+        DatasourceUrls::from_url("file:/this/file/doesnt/exist/we/assume.sqlite"),
+        DiffParams {
+            exit_code: Some(true),
+            from: DiffTarget::Empty,
+            script: false,
+            shadow_database_url: None,
+            to: DiffTarget::SchemaDatasource(SchemasWithConfigDir {
+                files: vec![SchemaContainer {
+                    path: schema_path.to_string_lossy().into_owned(),
+                    content: schema.to_string(),
+                }],
+                config_dir: schema_path.parent().unwrap().to_string_lossy().into_owned(),
+            }),
+            filters: SchemaFilter::default(),
+        },
+    );
 
     if cfg!(target_os = "windows") {
         return; // path in error looks different
@@ -1265,16 +1214,14 @@ fn from_multi_file_schema_datasource_to_url(mut api: TestApi) {
             .unwrap();
     });
 
-    let schema_a = format!(
+    let schema_a = indoc!(
         r#"
-          datasource db {{
+          datasource db {
               provider = "sqlite"
-              url = "{}"
-          }}
+          }
         "#,
-        first_url.replace('\\', "\\\\")
     );
-    let schema_a_path = write_file_to_tmp(&schema_a, &base_dir, "a.prisma");
+    let schema_a_path = write_file_to_tmp(schema_a, &base_dir, "a.prisma");
 
     let schema_b = r#"
           model cats {
@@ -1285,7 +1232,7 @@ fn from_multi_file_schema_datasource_to_url(mut api: TestApi) {
     let schema_b_path = write_file_to_tmp(schema_b, &base_dir, "b.prisma");
 
     let files = to_schema_containers(&[
-        (schema_a_path.to_string_lossy().into_owned(), &schema_a),
+        (schema_a_path.to_string_lossy().into_owned(), schema_a),
         (schema_b_path.to_string_lossy().into_owned(), schema_b),
     ]);
 
@@ -1301,7 +1248,7 @@ fn from_multi_file_schema_datasource_to_url(mut api: TestApi) {
         filters: SchemaFilter::default(),
     };
 
-    api.diff(input).unwrap();
+    api.with_new_connection_string(first_url).diff(input).unwrap();
 
     let expected_printed_messages = expect![[r#"
         [
@@ -1329,21 +1276,19 @@ fn from_multi_file_schema_datamodel_to_url(mut api: TestApi) {
     });
 
     let from_files = {
-        let schema_a = format!(
+        let schema_a = indoc!(
             r#"
-              datasource db {{
+              datasource db {
                   provider = "sqlite"
-                  url = "{}"
-              }}
+              }
 
-              model cows {{
+              model cows {
                 id Int @id
                 meows Boolean
-              }}
+              }
             "#,
-            first_url.replace('\\', "\\\\")
         );
-        let schema_a_path = write_file_to_tmp(&schema_a, &base_dir, "a.prisma");
+        let schema_a_path = write_file_to_tmp(schema_a, &base_dir, "a.prisma");
 
         let schema_b = r#"
               model dogs {
@@ -1354,7 +1299,7 @@ fn from_multi_file_schema_datamodel_to_url(mut api: TestApi) {
         let schema_b_path = write_file_to_tmp(schema_b, &base_dir, "b.prisma");
 
         to_schema_containers(&[
-            (schema_a_path.to_string_lossy().into_owned(), &schema_a),
+            (schema_a_path.to_string_lossy().into_owned(), schema_a),
             (schema_b_path.to_string_lossy().into_owned(), schema_b),
         ])
     };
@@ -1368,7 +1313,7 @@ fn from_multi_file_schema_datamodel_to_url(mut api: TestApi) {
         filters: SchemaFilter::default(),
     };
 
-    api.diff(input).unwrap();
+    api.with_new_connection_string(first_url).diff(input).unwrap();
 
     let expected_printed_messages = expect![[r#"
         [
@@ -1379,16 +1324,16 @@ fn from_multi_file_schema_datamodel_to_url(mut api: TestApi) {
 }
 
 // Call diff, and expect it to error. Return the error.
-pub(crate) fn diff_error(params: DiffParams) -> String {
-    let api = schema_core::schema_api_without_extensions(None, None).unwrap();
+pub(crate) fn diff_error(datasource_urls: DatasourceUrls, params: DiffParams) -> String {
+    let api = schema_core::schema_api_without_extensions(None, datasource_urls, None).unwrap();
     let result = test_setup::runtime::run_with_thread_local_runtime(api.diff(params));
     result.unwrap_err().to_string()
 }
 
 // Call diff, and expect it to succeed. Return the result and what would be printed to stdout.
-pub(crate) fn diff_result(params: DiffParams) -> (DiffResult, String) {
+pub(crate) fn diff_result(datasource_urls: DatasourceUrls, params: DiffParams) -> (DiffResult, String) {
     let host = Arc::new(TestConnectorHost::default());
-    let api = schema_core::schema_api_without_extensions(None, Some(host.clone())).unwrap();
+    let api = schema_core::schema_api_without_extensions(None, datasource_urls, Some(host.clone())).unwrap();
     let result = test_setup::runtime::run_with_thread_local_runtime(api.diff(params)).unwrap();
     let printed_messages = host.printed_messages.lock().unwrap();
     assert!(printed_messages.len() == 1, "{printed_messages:?}");
@@ -1396,8 +1341,8 @@ pub(crate) fn diff_result(params: DiffParams) -> (DiffResult, String) {
 }
 
 // Call diff, and expect it to succeed. Return what would be printed to stdout.
-fn diff_output(params: DiffParams) -> String {
-    diff_result(params).1
+fn diff_output(datasource_urls: DatasourceUrls, params: DiffParams) -> String {
+    diff_result(datasource_urls, params).1
 }
 
 pub(crate) fn write_file_to_tmp(contents: &str, tempdir: &tempfile::TempDir, name: &str) -> std::path::PathBuf {

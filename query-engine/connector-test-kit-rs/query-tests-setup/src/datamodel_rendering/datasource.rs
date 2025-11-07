@@ -92,7 +92,6 @@ mod test {
                 r#"
                 datasource test {
                     provider = "postgresql"
-                    url = "postgres://test"
                     relationMode = "foreignKeys"
                     schemas = ["public"]
                     extensions = [citext, postgis(version: "2.1")]
@@ -114,7 +113,6 @@ mod test {
             indoc! {
                 r#"
                 datasource db {
-                    url = "mysql://test"
                     provider = "mysql"
                 }
                 "#
