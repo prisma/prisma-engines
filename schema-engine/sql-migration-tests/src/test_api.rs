@@ -22,6 +22,7 @@ use quaint::{
     prelude::{ConnectionInfo, ResultSet},
 };
 use schema_core::{
+    DatasourceUrls,
     commands::diff_cli,
     json_rpc::types::SchemaFilter,
     schema_connector::{BoxFuture, ConnectorHost, ConnectorResult, DiffTarget, MigrationPersistence, SchemaConnector},
@@ -201,6 +202,7 @@ impl TestApi {
     pub fn diff(&self, params: DiffParams) -> ConnectorResult<DiffResult> {
         test_setup::runtime::run_with_thread_local_runtime(diff_cli(
             params,
+            &DatasourceUrls::from_url(self.root.connection_string()).try_into()?,
             self.connector.host().clone(),
             None,
             &NoExtensionTypes,

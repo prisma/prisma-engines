@@ -156,7 +156,6 @@ fn comments_in_a_datasource_must_work() {
         datasource db {
             provider = "postgresql"
             // Like, postgresql://user:password@localhost:5432/database/schema
-            url      = env("PARCEL_PG_URL")
         }
     "#;
 

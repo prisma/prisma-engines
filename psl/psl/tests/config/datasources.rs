@@ -7,7 +7,6 @@ fn missing_native_type_should_still_allow_config_parsing() {
     let schema = indoc! { r#"
         datasource db {
             provider = "postgresql"
-            url  = env("DATABASE_URL")
         }
 
         model A {
@@ -26,7 +25,6 @@ fn serialize_builtin_sources_to_dmmf() {
     let schema = indoc! { r#"
         datasource pg1 {
             provider = "postgresql"
-            url = "postgresql://localhost/postgres1"
         }
     "#};
 
@@ -36,10 +34,6 @@ fn serialize_builtin_sources_to_dmmf() {
             "name": "pg1",
             "provider": "postgresql",
             "activeProvider": "postgresql",
-            "url": {
-              "fromEnvVar": null,
-              "value": "postgresql://localhost/postgres1"
-            },
             "schemas": [],
             "sourceFilePath": "schema.prisma"
           }
@@ -50,7 +44,6 @@ fn serialize_builtin_sources_to_dmmf() {
     let schema = indoc! {r#"
         datasource pg2 {
             provider = "postgresql"
-            url = env("pg2")
         }
     "#};
 
@@ -60,10 +53,6 @@ fn serialize_builtin_sources_to_dmmf() {
             "name": "pg2",
             "provider": "postgresql",
             "activeProvider": "postgresql",
-            "url": {
-              "fromEnvVar": "pg2",
-              "value": null
-            },
             "schemas": [],
             "sourceFilePath": "schema.prisma"
           }
@@ -74,7 +63,6 @@ fn serialize_builtin_sources_to_dmmf() {
     let schema = indoc! {r#"
         datasource sqlite1 {
             provider = "sqlite"
-            url = "file://file.db"
         }
     "#};
 
@@ -84,10 +72,6 @@ fn serialize_builtin_sources_to_dmmf() {
             "name": "sqlite1",
             "provider": "sqlite",
             "activeProvider": "sqlite",
-            "url": {
-              "fromEnvVar": null,
-              "value": "file://file.db"
-            },
             "schemas": [],
             "sourceFilePath": "schema.prisma"
           }
@@ -98,7 +82,6 @@ fn serialize_builtin_sources_to_dmmf() {
     let schema = indoc! {r#"
         datasource mysql1 {
             provider = "mysql"
-            url = "mysql://localhost"
         }
     "#};
 
@@ -108,10 +91,6 @@ fn serialize_builtin_sources_to_dmmf() {
             "name": "mysql1",
             "provider": "mysql",
             "activeProvider": "mysql",
-            "url": {
-              "fromEnvVar": null,
-              "value": "mysql://localhost"
-            },
             "schemas": [],
             "sourceFilePath": "schema.prisma"
           }
@@ -125,44 +104,16 @@ fn datasource_should_not_allow_arbitrary_parameters() {
     let schema = indoc! {r#"
         datasource ds {
           provider = "mysql"
-          url = "mysql://localhost"
           foo = "bar"
         }
     "#};
 
     let expect = expect![[r#"
         [1;91merror[0m: [1mProperty not known: "foo".[0m
-          [1;94m-->[0m  [4mschema.prisma:4[0m
-        [1;94m   | [0m
-        [1;94m 3 | [0m  url = "mysql://localhost"
-        [1;94m 4 | [0m  [1;91mfoo = "bar"[0m
-        [1;94m   | [0m
-    "#]];
-
-    expect.assert_eq(&parse_unwrap_err(schema));
-}
-
-#[test]
-fn unescaped_windows_paths_give_a_good_error() {
-    let schema = indoc! {r#"
-        datasource ds {
-          provider = "sqlite"
-          url = "file:c:\Windows32\data.db"
-        }
-    "#};
-
-    let expect = expect![[r#"
-        [1;91merror[0m: [1mUnknown escape sequence. If the value is a windows-style path, `\` must be escaped as `\\`.[0m
           [1;94m-->[0m  [4mschema.prisma:3[0m
         [1;94m   | [0m
-        [1;94m 2 | [0m  provider = "sqlite"
-        [1;94m 3 | [0m  url = "file:c:[1;91m\W[0mindows32\data.db"
-        [1;94m   | [0m
-        [1;91merror[0m: [1mUnknown escape sequence. If the value is a windows-style path, `\` must be escaped as `\\`.[0m
-          [1;94m-->[0m  [4mschema.prisma:3[0m
-        [1;94m   | [0m
-        [1;94m 2 | [0m  provider = "sqlite"
-        [1;94m 3 | [0m  url = "file:c:\Windows32[1;91m\d[0mata.db"
+        [1;94m 2 | [0m  provider = "mysql"
+        [1;94m 3 | [0m  [1;91mfoo = "bar"[0m
         [1;94m   | [0m
     "#]];
 
@@ -174,7 +125,6 @@ fn escaped_windows_paths_should_work() {
     let schema = indoc! {r#"
         datasource ds {
           provider = "sqlite"
-          url = "file:c:\\Windows32\\data.db"
         }
     "#};
 
@@ -186,7 +136,6 @@ fn postgresql_extension_parsing() {
     let schema = indoc! {r#"
         datasource ds {
           provider = "postgres"
-          url = env("DATABASE_URL")
           extensions = [postgis(version: "2.1", schema: "public"), uuidOssp(map: "uuid-ossp"), meow]
         }
 
@@ -233,17 +182,16 @@ fn empty_schema_property_should_error() {
 
         datasource ds {
           provider   = "postgres"
-          url        = env("DATABASE_URL")
           schemas = []
         }
     "#};
 
     let expect = expect![[r#"
         [1;91merror[0m: [1mIf provided, the schemas array can not be empty.[0m
-          [1;94m-->[0m  [4mschema.prisma:9[0m
+          [1;94m-->[0m  [4mschema.prisma:8[0m
         [1;94m   | [0m
-        [1;94m 8 | [0m  url        = env("DATABASE_URL")
-        [1;94m 9 | [0m  schemas = [1;91m[][0m
+        [1;94m 7 | [0m  provider   = "postgres"
+        [1;94m 8 | [0m  schemas = [1;91m[][0m
         [1;94m   | [0m
     "#]];
 
@@ -259,17 +207,16 @@ fn parse_direct_url_should_error() {
 
         datasource ds {
           provider   = "postgres"
-          url        = env("DATABASE_URL")
           directUrl = env("DIRECT_DATABASE_URL")
         }
     "#};
 
     let expect = expect![[r#"
         [1;91merror[0m: [1mThe datasource property `directUrl` is no longer supported in schema files. Move connection URLs to `prisma.config.ts`. See https://pris.ly/d/config-datasource[0m
-          [1;94m-->[0m  [4mschema.prisma:8[0m
+          [1;94m-->[0m  [4mschema.prisma:7[0m
         [1;94m   | [0m
-        [1;94m 7 | [0m  url        = env("DATABASE_URL")
-        [1;94m 8 | [0m  [1;91mdirectUrl = env("DIRECT_DATABASE_URL")[0m
+        [1;94m 6 | [0m  provider   = "postgres"
+        [1;94m 7 | [0m  [1;91mdirectUrl = env("DIRECT_DATABASE_URL")[0m
         [1;94m   | [0m
     "#]];
 
@@ -285,7 +232,6 @@ fn parse_multi_schema_for_unsupported_connector_should_error() {
 
         datasource ds {
           provider   = "mysql"
-          url        = env("DATABASE_URL")
           schemas = ["test"]
         }
     "#};
@@ -293,10 +239,10 @@ fn parse_multi_schema_for_unsupported_connector_should_error() {
     let actual = parse_config(schema).unwrap_err();
     let expect = expect![[r#"
         [1;91merror[0m: [1mThe `schemas` property is not supported on the current connector.[0m
-          [1;94m-->[0m  [4mschema.prisma:8[0m
+          [1;94m-->[0m  [4mschema.prisma:7[0m
         [1;94m   | [0m
-        [1;94m 7 | [0m  url        = env("DATABASE_URL")
-        [1;94m 8 | [0m  schemas = [1;91m["test"][0m
+        [1;94m 6 | [0m  provider   = "mysql"
+        [1;94m 7 | [0m  schemas = [1;91m["test"][0m
         [1;94m   | [0m
     "#]];
 

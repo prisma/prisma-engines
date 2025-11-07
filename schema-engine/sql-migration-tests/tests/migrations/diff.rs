@@ -1,6 +1,7 @@
 use psl::parser_database::NoExtensionTypes;
 use quaint::{prelude::Queryable, single::Quaint};
 use schema_core::{
+    DatasourceUrls,
     commands::diff_cli,
     json_rpc::types::{DiffTarget, SchemaFilter, SchemasContainer, SchemasWithConfigDir},
     schema_connector::SchemaConnector,
@@ -463,7 +464,13 @@ fn from_empty_to_migrations_directory(mut api: TestApi) {
     };
 
     let host = Arc::new(TestConnectorHost::default());
-    tok(diff_cli(params, host.clone(), None, &NoExtensionTypes)).unwrap();
+    tok(diff_cli(
+        params,
+        DatasourceUrls::from_url_and_shadow_database_url("postgres://not-used", api.connection_string()),
+        host.clone(),
+        &NoExtensionTypes,
+    ))
+    .unwrap();
 
     let expected_printed_messages = expect![[r#"
         [

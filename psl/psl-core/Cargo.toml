@@ -19,7 +19,6 @@ schema-ast.workspace = true
 
 bigdecimal.workspace = true
 chrono.workspace = true
-connection-string.workspace = true
 cruet.workspace = true
 itertools.workspace = true
 regex.workspace = true

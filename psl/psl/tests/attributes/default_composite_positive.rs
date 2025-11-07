@@ -7,7 +7,6 @@ fn should_set_default_for_all_scalar_types() {
     let dml = indoc! {r#"
         datasource db {
           provider = "mongodb"
-          url      = "mongodb://"
         }
 
         type Composite {
@@ -68,7 +67,6 @@ fn should_set_default_an_enum_type() {
     let dml = indoc! {r#"
         datasource db {
           provider = "mongodb"
-          url      = "mongodb://"
         }
 
         type Composite {
@@ -96,7 +94,6 @@ fn should_set_default_on_remapped_enum_type() {
     let dml = indoc! {r#"
         datasource db {
           provider = "mongodb"
-          url      = "mongodb://"
         }
 
         type Composite {
@@ -124,7 +121,6 @@ fn string_literals_with_double_quotes_work() {
     let schema = indoc! {r#"
         datasource db {
           provider = "mongodb"
-          url      = "mongodb://"
         }
 
         type Test {

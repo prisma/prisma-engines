@@ -8,7 +8,6 @@ fn code_actions_should_not_crash_on_validation_errors_with_multi_schema() {
 
         datasource db {
           provider = "postgresql"
-          url      = env("DATABASE_URL")
           schemas  = ["auth", "public"]
         }
 

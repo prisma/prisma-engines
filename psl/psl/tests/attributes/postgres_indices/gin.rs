@@ -134,10 +134,10 @@ fn jsonb_ops_with_wrong_prisma_type() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@index": The given operator class `JsonbOps` points to the field `a` that is not of Json type.[0m
-          [1;94m-->[0m  [4mschema.prisma:15[0m
+          [1;94m-->[0m  [4mschema.prisma:14[0m
         [1;94m   | [0m
-        [1;94m14 | [0m
-        [1;94m15 | [0m  [1;91m@@index([a(ops: JsonbOps)], type: Gin)[0m
+        [1;94m13 | [0m
+        [1;94m14 | [0m  [1;91m@@index([a(ops: JsonbOps)], type: Gin)[0m
         [1;94m   | [0m
     "#]];
 
@@ -160,10 +160,10 @@ fn jsonb_ops_invalid_native_type() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@index": The given operator class `JsonbOps` does not support native type `Json` of field `a`.[0m
-          [1;94m-->[0m  [4mschema.prisma:15[0m
+          [1;94m-->[0m  [4mschema.prisma:14[0m
         [1;94m   | [0m
-        [1;94m14 | [0m
-        [1;94m15 | [0m  [1;91m@@index([a(ops: JsonbOps)], type: Gin)[0m
+        [1;94m13 | [0m
+        [1;94m14 | [0m  [1;91m@@index([a(ops: JsonbOps)], type: Gin)[0m
         [1;94m   | [0m
     "#]];
 
@@ -186,10 +186,10 @@ fn jsonb_ops_invalid_index_type() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@index": The given operator class `JsonbOps` is not supported with the `Gist` index type.[0m
-          [1;94m-->[0m  [4mschema.prisma:15[0m
+          [1;94m-->[0m  [4mschema.prisma:14[0m
         [1;94m   | [0m
-        [1;94m14 | [0m
-        [1;94m15 | [0m  [1;91m@@index([a(ops: JsonbOps)], type: Gist)[0m
+        [1;94m13 | [0m
+        [1;94m14 | [0m  [1;91m@@index([a(ops: JsonbOps)], type: Gist)[0m
         [1;94m   | [0m
     "#]];
 
@@ -254,10 +254,10 @@ fn jsonb_path_ops_invalid_native_type() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@index": The given operator class `JsonbPathOps` does not support native type `Json` of field `a`.[0m
-          [1;94m-->[0m  [4mschema.prisma:15[0m
+          [1;94m-->[0m  [4mschema.prisma:14[0m
         [1;94m   | [0m
-        [1;94m14 | [0m
-        [1;94m15 | [0m  [1;91m@@index([a(ops: JsonbPathOps)], type: Gin)[0m
+        [1;94m13 | [0m
+        [1;94m14 | [0m  [1;91m@@index([a(ops: JsonbPathOps)], type: Gin)[0m
         [1;94m   | [0m
     "#]];
 
@@ -280,10 +280,10 @@ fn jsonb_path_ops_with_wrong_prisma_type() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@index": The given operator class `JsonbPathOps` points to the field `a` that is not of Json type.[0m
-          [1;94m-->[0m  [4mschema.prisma:15[0m
+          [1;94m-->[0m  [4mschema.prisma:14[0m
         [1;94m   | [0m
-        [1;94m14 | [0m
-        [1;94m15 | [0m  [1;91m@@index([a(ops: JsonbPathOps)], type: Gin)[0m
+        [1;94m13 | [0m
+        [1;94m14 | [0m  [1;91m@@index([a(ops: JsonbPathOps)], type: Gin)[0m
         [1;94m   | [0m
     "#]];
 
@@ -306,10 +306,10 @@ fn jsonb_path_ops_invalid_index_type() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@index": The given operator class `JsonbPathOps` is not supported with the `Gist` index type.[0m
-          [1;94m-->[0m  [4mschema.prisma:15[0m
+          [1;94m-->[0m  [4mschema.prisma:14[0m
         [1;94m   | [0m
-        [1;94m14 | [0m
-        [1;94m15 | [0m  [1;91m@@index([a(ops: JsonbPathOps)], type: Gist)[0m
+        [1;94m13 | [0m
+        [1;94m14 | [0m  [1;91m@@index([a(ops: JsonbPathOps)], type: Gist)[0m
         [1;94m   | [0m
     "#]];
 
@@ -372,10 +372,10 @@ fn non_array_field_array_ops() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@index": The given operator class `ArrayOps` expects the type of field `a` to be an array.[0m
-          [1;94m-->[0m  [4mschema.prisma:15[0m
+          [1;94m-->[0m  [4mschema.prisma:14[0m
         [1;94m   | [0m
-        [1;94m14 | [0m
-        [1;94m15 | [0m  [1;91m@@index([a(ops: ArrayOps)], type: Gin)[0m
+        [1;94m13 | [0m
+        [1;94m14 | [0m  [1;91m@@index([a(ops: ArrayOps)], type: Gin)[0m
         [1;94m   | [0m
     "#]];
 

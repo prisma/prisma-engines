@@ -144,25 +144,11 @@ fn push_ast_completions(ctx: CompletionContext<'_>, completion_list: &mut Comple
                 datasource::provider_completion(completion_list);
             }
 
-            if !ds_has_prop(&ctx, "url") {
-                datasource::url_completion(completion_list);
-            }
-
             if !ds_has_prop(&ctx, "relationMode") {
                 datasource::relation_mode_completion(completion_list);
             }
 
             ctx.connector().datasource_completions(ctx.config, completion_list);
-        }
-
-        ast::SchemaPosition::DataSource(
-            _source_id,
-            ast::SourcePosition::Property("url", ast::PropertyPosition::FunctionValue("env")),
-        ) => datasource::url_env_db_completion(completion_list, "url", ctx),
-
-        ast::SchemaPosition::DataSource(_source_id, ast::SourcePosition::Property("url", _)) => {
-            datasource::url_env_completion(completion_list);
-            datasource::url_quotes_completion(completion_list);
         }
 
         position => ctx.connector().datamodel_completions(ctx.db, position, completion_list),
@@ -173,7 +159,6 @@ fn ds_has_prop(ctx: &CompletionContext<'_>, prop: &str) -> bool {
     if let Some(ds) = ctx.datasource() {
         match prop {
             "relationMode" => ds.relation_mode_defined(),
-            "url" => ds.url_defined(),
             "provider" => ds.provider_defined(),
             _ => false,
         }

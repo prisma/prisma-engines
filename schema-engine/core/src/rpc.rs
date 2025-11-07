@@ -1,4 +1,4 @@
-use crate::{CoreError, CoreResult, GenericApi, extensions::ExtensionTypeConfig};
+use crate::{CoreError, CoreResult, GenericApi, extensions::ExtensionTypeConfig, url::DatasourceUrls};
 use json_rpc::method_names::*;
 use jsonrpc_core::{IoHandler, Params, types::error::Error as JsonRpcError};
 use psl::SourceFile;
@@ -15,7 +15,7 @@ impl RpcApi {
     /// Initializes a JSON-RPC ready schema engine API.
     pub fn new(
         initial_datamodels: Option<Vec<(String, String)>>,
-        datasource_urls_override: Option<psl::DatasourceUrls>,
+        datasource_urls: DatasourceUrls,
         host: Arc<dyn schema_connector::ConnectorHost>,
         extension_config: Arc<ExtensionTypeConfig>,
     ) -> Self {
@@ -29,7 +29,7 @@ impl RpcApi {
 
         let api = Arc::new(RwLock::new(crate::state::EngineState::new(
             initial_datamodels,
-            datasource_urls_override,
+            datasource_urls,
             Some(host),
             extension_config,
         )));

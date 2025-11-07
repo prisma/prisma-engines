@@ -3,11 +3,11 @@
     "uri": "file:///path/to/schema.prisma",
     "range": {
       "start": {
-        "line": 11,
+        "line": 10,
         "character": 4
       },
       "end": {
-        "line": 11,
+        "line": 10,
         "character": 8
       }
     }
@@ -16,11 +16,11 @@
     "uri": "file:///path/to/schema.prisma",
     "range": {
       "start": {
-        "line": 13,
+        "line": 12,
         "character": 26
       },
       "end": {
-        "line": 13,
+        "line": 12,
         "character": 30
       }
     }

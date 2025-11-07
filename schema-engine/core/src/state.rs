@@ -4,8 +4,10 @@
 //! without a valid schema or database connection for commands like createDatabase and diff.
 
 use crate::{
-    CoreError, CoreResult, GenericApi, SchemaContainerExt, commands, extensions::ExtensionTypeConfig,
+    CoreError, CoreResult, GenericApi, SchemaContainerExt, commands,
+    extensions::ExtensionTypeConfig,
     parse_configuration_multi,
+    url::{DatasourceError, DatasourceUrls, ValidatedDatasourceUrls},
 };
 use ::commands::MigrationSchemaCache;
 use enumflags2::BitFlags;
@@ -31,36 +33,26 @@ use tracing_futures::{Instrument, WithSubscriber};
 /// channels. That ensures that each connector is handling requests one at a time to avoid
 /// synchronization issues. You can think of it in terms of the actor model.
 pub(crate) struct EngineState {
-    // The initial Prisma schema for the engine state.
-    // Its datasource URL-like attributes are overridden by `datasource_urls_override`, if provided.
+    /// The initial Prisma schema for the engine state.
     initial_datamodel: Option<psl::ValidatedSchema>,
-    // Override the URL-like attributes of the initial datamodel's datasources, if provided.
-    datasource_urls_override: Option<psl::DatasourceUrls>,
+    /// Direct URL and shadow database URL associated with the schemas (either
+    /// the initial datamodel or the schemas passed later via RPC requests).
+    /// Connector-indepenent validation (like rejecting Accelerate URLs) is
+    /// performed eagerly when creating `EngineState` (which is an infallible
+    /// operation), and any errors are propagated to a later stage when actual
+    /// operations are performed.
+    datasource_urls: Result<ValidatedDatasourceUrls, DatasourceError>,
     host: Arc<dyn ConnectorHost>,
     extensions: Arc<ExtensionTypeConfig>,
-    // A map from either:
-    //
-    // - a connection string / url
-    // - a full schema
-    //
-    // To a channel leading to a spawned MigrationConnector.
+    /// A map from either:
+    ///
+    /// - a connection string / url
+    /// - a full schema
+    ///
+    /// to a channel leading to a spawned MigrationConnector.
     connectors: Mutex<HashMap<ConnectorRequestType, mpsc::Sender<ErasedConnectorRequest>>>,
     /// The cache for DatabaseSchemas based of migration directories to avoid redundant work during `prisma migrate dev`.
     migration_schema_cache: Arc<Mutex<MigrationSchemaCache>>,
-}
-
-impl EngineState {
-    fn get_url_from_schemas(&self, container: &SchemasWithConfigDir) -> CoreResult<String> {
-        let sources = container.to_psl_input();
-        let (datasource, url, _, _) = parse_configuration_multi(&sources, self.datasource_urls_override.as_ref())?;
-
-        Ok(psl::set_config_dir(
-            datasource.active_connector.flavour(),
-            std::path::Path::new(&container.config_dir),
-            &url,
-        )
-        .into_owned())
-    }
 }
 
 #[derive(Clone, Debug, Eq, Hash, PartialEq)]
@@ -74,15 +66,18 @@ impl ConnectorRequestType {
     pub fn into_connector(
         self,
         initial_datamodel: Option<&psl::ValidatedSchema>,
-        datasource_urls_override: Option<&psl::DatasourceUrls>,
+        datasource_urls: &ValidatedDatasourceUrls,
         config_dir: Option<&Path>,
     ) -> CoreResult<Box<dyn SchemaConnector>> {
         match self {
-            Self::Schema(schemas) => crate::schema_to_connector(&schemas, datasource_urls_override, config_dir),
+            Self::Schema(schemas) => crate::schema_to_connector(&schemas, datasource_urls, config_dir),
             Self::Url(url) => crate::connector_for_connection_string(url, None, BitFlags::default()),
             Self::InitialDatamodel => {
                 if let Some(initial_datamodel) = initial_datamodel {
-                    Ok(crate::initial_datamodel_to_connector(initial_datamodel)?)
+                    Ok(crate::initial_datamodel_to_connector(
+                        initial_datamodel,
+                        datasource_urls,
+                    )?)
                 } else {
                     Err(ConnectorError::from_msg("Missing --datamodels".to_owned()))
                 }
@@ -104,33 +99,17 @@ type ErasedConnectorRequest = Box<
 impl EngineState {
     pub(crate) fn new(
         initial_datamodels: Option<Vec<(String, SourceFile)>>,
-        datasource_urls_override: Option<psl::DatasourceUrls>,
+        datasource_urls: DatasourceUrls,
         host: Option<Arc<dyn ConnectorHost>>,
         extensions: Arc<ExtensionTypeConfig>,
     ) -> Self {
         let initial_datamodel = initial_datamodels
             .as_deref()
-            .map(|dm| psl::validate_multi_file(dm, &*extensions))
-            .map(|mut schema| {
-                if let Some(override_urls) = datasource_urls_override.clone() {
-                    schema.configuration.datasources = schema
-                        .configuration
-                        .datasources
-                        .iter()
-                        .cloned()
-                        .map(|mut ds| {
-                            ds.override_urls(override_urls.clone());
-                            ds
-                        })
-                        .collect();
-                }
-
-                schema
-            });
+            .map(|dm| psl::validate_multi_file(dm, &*extensions));
 
         EngineState {
             initial_datamodel,
-            datasource_urls_override,
+            datasource_urls: datasource_urls.try_into(),
             host: host.unwrap_or_else(|| Arc::new(schema_connector::EmptyHost)),
             extensions,
             connectors: Default::default(),
@@ -174,11 +153,8 @@ impl EngineState {
             },
             None => {
                 let request_key = request.clone();
-                let mut connector = request.into_connector(
-                    self.initial_datamodel.as_ref(),
-                    self.datasource_urls_override.as_ref(),
-                    config_dir,
-                )?;
+                let mut connector =
+                    request.into_connector(self.initial_datamodel.as_ref(), self.datasource_urls()?, config_dir)?;
 
                 connector.set_host(self.host.clone());
                 let (erased_sender, mut erased_receiver) = mpsc::channel::<ErasedConnectorRequest>(12);
@@ -237,6 +213,20 @@ impl EngineState {
     {
         self.with_connector_for_request::<O>(ConnectorRequestType::InitialDatamodel, None, f)
             .await
+    }
+
+    fn get_url_from_schemas(&self, container: &SchemasWithConfigDir) -> CoreResult<String> {
+        let sources = container.to_psl_input();
+        let (datasource, _) = parse_configuration_multi(&sources)?;
+
+        Ok(self
+            .datasource_urls()?
+            .url_with_config_dir(datasource.active_connector.flavour(), Path::new(&container.config_dir))
+            .into_owned())
+    }
+
+    fn datasource_urls(&self) -> CoreResult<&ValidatedDatasourceUrls> {
+        Ok(self.datasource_urls.as_ref()?)
     }
 }
 
@@ -324,13 +314,7 @@ impl GenericApi for EngineState {
     }
 
     async fn diff(&self, params: DiffParams) -> CoreResult<DiffResult> {
-        commands::diff_cli(
-            params,
-            self.host.clone(),
-            self.datasource_urls_override.as_ref(),
-            &*self.extensions,
-        )
-        .await
+        commands::diff_cli(params, self.datasource_urls()?, self.host.clone(), &*self.extensions).await
     }
 
     async fn drop_database(&self, url: String) -> CoreResult<()> {
