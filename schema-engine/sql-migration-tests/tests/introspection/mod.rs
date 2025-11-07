@@ -111,10 +111,10 @@ fn introspect_no_force_with_invalid_schema() {
 
     let expected = expect![[r#"
         [1;91merror[0m: [1mAttribute not known: "@unknownAttributeThisIsNotValid".[0m
-          [1;94m-->[0m  [4mschema.prisma:7[0m
+          [1;94m-->[0m  [4mschema.prisma:6[0m
         [1;94m   | [0m
-        [1;94m 6 | [0mmodel This_Is_Blatantly_Not_Valid_and_An_Outrage {
-        [1;94m 7 | [0m  pk Bytes [1;91m@unknownAttributeThisIsNotValid[0m
+        [1;94m 5 | [0mmodel This_Is_Blatantly_Not_Valid_and_An_Outrage {
+        [1;94m 6 | [0m  pk Bytes [1;91m@unknownAttributeThisIsNotValid[0m
         [1;94m   | [0m
     "#]];
 

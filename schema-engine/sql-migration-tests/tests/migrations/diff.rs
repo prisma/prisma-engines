@@ -1324,6 +1324,7 @@ fn from_multi_file_schema_datamodel_to_url(mut api: TestApi) {
 }
 
 // Call diff, and expect it to error. Return the error.
+#[track_caller]
 pub(crate) fn diff_error(datasource_urls: DatasourceUrls, params: DiffParams) -> String {
     let api = schema_core::schema_api_without_extensions(None, datasource_urls, None).unwrap();
     let result = test_setup::runtime::run_with_thread_local_runtime(api.diff(params));
@@ -1331,6 +1332,7 @@ pub(crate) fn diff_error(datasource_urls: DatasourceUrls, params: DiffParams) ->
 }
 
 // Call diff, and expect it to succeed. Return the result and what would be printed to stdout.
+#[track_caller]
 pub(crate) fn diff_result(datasource_urls: DatasourceUrls, params: DiffParams) -> (DiffResult, String) {
     let host = Arc::new(TestConnectorHost::default());
     let api = schema_core::schema_api_without_extensions(None, datasource_urls, Some(host.clone())).unwrap();
@@ -1341,6 +1343,7 @@ pub(crate) fn diff_result(datasource_urls: DatasourceUrls, params: DiffParams) -
 }
 
 // Call diff, and expect it to succeed. Return what would be printed to stdout.
+#[track_caller]
 fn diff_output(datasource_urls: DatasourceUrls, params: DiffParams) -> String {
     diff_result(datasource_urls, params).1
 }

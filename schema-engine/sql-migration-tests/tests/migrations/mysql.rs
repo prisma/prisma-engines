@@ -467,7 +467,7 @@ fn dropping_m2m_relation_from_datamodel_works() {
     let path2 = super::diff::write_file_to_tmp(schema2, &tmpdir, "schema2.prisma");
 
     let (_result, diff) = super::diff::diff_result(
-        DatasourceUrls::from_url("unused"),
+        DatasourceUrls::from_url("mysql://unused"),
         DiffParams {
             exit_code: None,
             from: DiffTarget::SchemaDatamodel(SchemasContainer {
