@@ -574,7 +574,7 @@ fn from_schema_datamodel_to_url(mut api: TestApi) {
 
 #[test_connector(tags(Sqlite))]
 fn from_schema_datasource_relative(api: TestApi) {
-    let mut api = api.with_new_connection_string("file:./dev.db");
+    let mut api = api.with_new_connection_strings("file:./dev.db", None);
 
     let host = Arc::new(TestConnectorHost::default());
     api.connector.set_host(host.clone());
@@ -675,7 +675,7 @@ fn from_schema_datasource_to_url(mut api: TestApi) {
         filters: SchemaFilter::default(),
     };
 
-    api.with_new_connection_string(first_url).diff(input).unwrap();
+    api.with_new_connection_strings(first_url, None).diff(input).unwrap();
 
     let expected_printed_messages = expect![[r#"
         [
@@ -736,7 +736,7 @@ fn with_schema_filters(mut api: TestApi) {
         },
     };
 
-    api.with_new_connection_string(first_url).diff(input).unwrap();
+    api.with_new_connection_strings(first_url, None).diff(input).unwrap();
 
     let expected_printed_messages = expect![[r#"
         [
@@ -790,7 +790,10 @@ fn with_invalid_schema_filter_sqlite(mut api: TestApi) {
         },
     };
 
-    let err = api.with_new_connection_string(first_url).diff(input).unwrap_err();
+    let err = api
+        .with_new_connection_strings(first_url, None)
+        .diff(input)
+        .unwrap_err();
 
     assert_eq!(err.error_code(), Some("P3024"));
 }
@@ -1248,7 +1251,7 @@ fn from_multi_file_schema_datasource_to_url(mut api: TestApi) {
         filters: SchemaFilter::default(),
     };
 
-    api.with_new_connection_string(first_url).diff(input).unwrap();
+    api.with_new_connection_strings(first_url, None).diff(input).unwrap();
 
     let expected_printed_messages = expect![[r#"
         [
@@ -1313,7 +1316,7 @@ fn from_multi_file_schema_datamodel_to_url(mut api: TestApi) {
         filters: SchemaFilter::default(),
     };
 
-    api.with_new_connection_string(first_url).diff(input).unwrap();
+    api.with_new_connection_strings(first_url, None).diff(input).unwrap();
 
     let expected_printed_messages = expect![[r#"
         [

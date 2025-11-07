@@ -145,10 +145,11 @@ impl TestApiArgs {
         }
     }
 
-    pub fn with_new_url(self, url: impl Into<String>) -> Self {
+    pub fn with_new_connection_strings<S: Into<String>>(self, database_url: S, shadow_database_url: Option<S>) -> Self {
         TestApiArgs {
             db: Cow::Owned(DbUnderTest {
-                database_url: url.into(),
+                database_url: database_url.into(),
+                shadow_database_url: shadow_database_url.map(Into::into),
                 ..self.db.as_ref().clone()
             }),
             ..self

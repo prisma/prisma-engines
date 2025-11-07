@@ -70,8 +70,17 @@ impl TestApi {
         TestApi { root, connector }
     }
 
-    pub fn with_new_connection_string(self, connection_string: impl Into<String>) -> Self {
-        Self::new(self.root.args.with_new_url(connection_string))
+    /// Initializes a new [`TestApi`] with a clone of the current [`TestApiArgs`] but with different database URLs.
+    /// The types of `database_url` and `shadow_database_url` are tied together because it's unlikely that a single
+    /// call site would need two different kinds of strings for each of them, while making both generics independent
+    /// from each other makes it impossible to automatically infer the type of `shadow_database_url` when `None` is
+    /// passed and requires explicit type annotations.
+    pub fn with_new_connection_strings<S: Into<String>>(self, database_url: S, shadow_database_url: Option<S>) -> Self {
+        Self::new(
+            self.root
+                .args
+                .with_new_connection_strings(database_url, shadow_database_url),
+        )
     }
 
     pub fn args(&self) -> &TestApiArgs {

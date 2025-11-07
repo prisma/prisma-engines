@@ -368,7 +368,7 @@ fn switching_databases_must_work(api: TestApi) {
         }
     "#;
 
-    let mut api = api.with_new_connection_string("file:dev.db");
+    let mut api = api.with_new_connection_strings("file:dev.db", None);
     api.schema_push(dm1).send().assert_green();
 
     let dm2 = r#"
@@ -382,7 +382,7 @@ fn switching_databases_must_work(api: TestApi) {
         }
     "#;
 
-    let mut api = api.with_new_connection_string("file:hiya.db");
+    let mut api = api.with_new_connection_strings("file:hiya.db", None);
     api.schema_push(dm2).migration_id(Some("mig2")).send().assert_green();
 }
 
