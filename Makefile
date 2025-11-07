@@ -5,7 +5,7 @@ CONFIG_FILE = .test_config
 DEV_SCHEMA_FILE = dev_datamodel.prisma
 PRISMA_BRANCH ?= main
 ENGINE_SIZE_OUTPUT ?= /dev/stdout
-QC_WASM_VERSION ?= 0.0.0
+QE_WASM_VERSION ?= 0.0.0
 SCHEMA_WASM_VERSION ?= 0.0.0
 
 LIBRARY_EXT := $(shell                            \
@@ -60,7 +60,7 @@ build-se-wasm:
 
 build-qc-wasm:
 	cd query-compiler/query-compiler-wasm && \
-	./build.sh $(QC_WASM_VERSION) query-compiler/query-compiler-wasm/pkg
+	./build.sh $(QE_WASM_VERSION) query-compiler/query-compiler-wasm/pkg
 
 build-qc-wasm-gz: build-qc-wasm
 	@cd query-compiler/query-compiler-wasm/pkg && \
