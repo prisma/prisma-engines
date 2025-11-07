@@ -515,7 +515,7 @@ fn from_empty_to_migrations_folder_without_shadow_db_url_must_error(mut api: Tes
     let err = api.diff(params).unwrap_err();
 
     let expected_error = expect![[r#"
-        You must pass the --shadow-database-url if you want to diff a migrations directory.
+        You must pass the `--shadow-database-url` flag or set `datasource.shadowDatabaseUrl` in your `prisma.config.ts` if you want to diff a migrations directory.
     "#]];
     expected_error.assert_eq(&err.to_string());
 }
