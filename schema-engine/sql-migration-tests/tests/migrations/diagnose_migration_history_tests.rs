@@ -804,6 +804,7 @@ fn shadow_database_creation_error_is_special_cased_mysql(api: TestApi) {
     let datamodel = indoc!(
         r#"
         datasource db {
+            provider = "mysql"
         }
         "#,
     );
