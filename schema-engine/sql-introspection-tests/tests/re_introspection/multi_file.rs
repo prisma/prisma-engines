@@ -323,8 +323,9 @@ async fn reintrospect_force_invalid_config(api: &mut TestApi) -> TestResult {
 
     let expected = expect![[r#"
         [1;91merror[0m: [1mThe `schemas` property is not supported on the current connector.[0m
-          [1;94m-->[0m  [4mfoo.prisma:4[0m
+          [1;94m-->[0m  [4mfoo.prisma:3[0m
         [1;94m   | [0m
+        [1;94m 2 | [0m  provider = "mysql"
         [1;94m 3 | [0m  schemas  = [1;91m["foo"][0m
         [1;94m   | [0m
 
