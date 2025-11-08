@@ -6,8 +6,7 @@ use schema_core::{
 use sql_migration_tests::test_api::*;
 use std::sync::Arc;
 
-#[track_caller]
-fn check(from: &str, to: &str, expectation: Expect) {
+fn check(provider: &str, from: &str, to: &str, expectation: Expect) {
     let tmpdir = tempfile::tempdir().unwrap();
     let from_schema = write_file_to_tmp(from, &tmpdir, "from.prisma");
     let to_schema = write_file_to_tmp(to, &tmpdir, "to.prisma");
@@ -32,9 +31,15 @@ fn check(from: &str, to: &str, expectation: Expect) {
     };
 
     let host = Arc::new(TestConnectorHost::default());
-    let api =
-        schema_core::schema_api_without_extensions(None, DatasourceUrls::from_url("file:unused"), Some(host.clone()))
-            .unwrap();
+    let api = schema_core::schema_api_without_extensions(
+        None,
+        DatasourceUrls::from_url(match provider {
+            "sqlite" => "file:unused".into(),
+            _ => format!("{provider}://unused"),
+        }),
+        Some(host.clone()),
+    )
+    .unwrap();
 
     test_setup::runtime::run_with_thread_local_runtime(api.diff(params)).unwrap();
     let printed_messages = host.printed_messages.lock().unwrap();
@@ -51,6 +56,7 @@ fn write_file_to_tmp(contents: &str, tempdir: &tempfile::TempDir, name: &str) ->
 #[test]
 fn empty_schemas() {
     check(
+        "sqlite",
         r#"
         datasource db {
             provider = "sqlite"
@@ -58,7 +64,7 @@ fn empty_schemas() {
         "#,
         r#"
         datasource db {
-            provider = "postgresql"
+            provider = "sqlite"
         }
         "#,
         expect![[r#"
@@ -70,6 +76,7 @@ fn empty_schemas() {
 #[test]
 fn additions_table() {
     check(
+        "sqlite",
         r#"
         datasource db {
             provider = "sqlite"
@@ -95,6 +102,7 @@ fn additions_table() {
 #[test]
 fn additions_column() {
     check(
+        "sqlite",
         r#"
         datasource db {
             provider = "sqlite"
@@ -125,6 +133,7 @@ fn additions_column() {
 #[test]
 fn additions_enum() {
     check(
+        "postgres",
         r#"
         datasource db {
             provider = "postgres"
@@ -152,6 +161,7 @@ fn additions_enum() {
 #[test]
 fn additions_mixed() {
     check(
+        "postgres",
         r#"
         datasource db {
             provider = "postgres"
@@ -187,6 +197,7 @@ fn additions_mixed() {
 #[test]
 fn deletions_table() {
     check(
+        "sqlite",
         r#"
         datasource db {
             provider = "sqlite"
@@ -212,6 +223,7 @@ fn deletions_table() {
 #[test]
 fn deletions_enum() {
     check(
+        "postgres",
         r#"
         datasource db {
             provider = "postgres"
@@ -239,6 +251,7 @@ fn deletions_enum() {
 #[test]
 fn deletions_mixed() {
     check(
+        "postgres",
         r#"
         datasource db {
             provider = "postgres"
@@ -274,6 +287,7 @@ fn deletions_mixed() {
 #[test]
 fn deletions_column() {
     check(
+        "mysql",
         r#"
         datasource db {
             provider = "mysql"
@@ -304,6 +318,7 @@ fn deletions_column() {
 #[test]
 fn additions_and_deletions_mixed() {
     check(
+        "postgres",
         r#"
         datasource db {
             provider = "postgres"
@@ -347,6 +362,7 @@ fn additions_and_deletions_mixed() {
 #[test]
 fn multiple_changed_tables_and_enums() {
     check(
+        "postgres",
         r#"
         datasource db {
             provider = "postgres"
