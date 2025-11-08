@@ -1,4 +1,4 @@
-name: Prisma Schema (WASM)
+name: Prisma Schema (Wasm)
 on:
   push:
     branches:

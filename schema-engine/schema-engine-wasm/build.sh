@@ -56,7 +56,7 @@ fi
 
 
 build() {
-    echo "ℹ️  Note that schema-engine compiled to WASM uses a different Rust toolchain"
+    echo "ℹ️  Note that schema-engine compiled to Wasm uses a different Rust toolchain"
     cargo --version
 
     local CARGO_TARGET_DIR

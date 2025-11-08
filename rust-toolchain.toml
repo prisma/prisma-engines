@@ -2,7 +2,7 @@
 channel = "1.90.0"
 components = ["clippy", "rustfmt", "rust-src"]
 targets = [
-    # WASM target for serverless and edge environments.
+    # Wasm target for serverless and edge environments.
     "wasm32-unknown-unknown",
 
     # React Native targets we support.

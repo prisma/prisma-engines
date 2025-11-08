@@ -24,7 +24,7 @@ pub(crate) fn get_request_now() -> PrismaValue {
             // At the moment of writing, this happens only in query validation test suite.
             // In that case, we want to fall back to realtime value. On the other hand, if task local is
             // set, we want to use it, even if we are not running inside of tokio runtime (for example,
-            // in WASM case)
+            // in Wasm case)
             //
             // Eventually, this will go away when we have a plain query context reference we pass around.
             PrismaValue::DateTime(chrono::Utc::now().into()))

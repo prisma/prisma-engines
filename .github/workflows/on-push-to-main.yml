@@ -22,7 +22,7 @@ jobs:
 
       - uses: ./.github/workflows/include/rust-wasm-setup
 
-      - name: Build WASM modules
+      - name: Build Wasm modules
         env:
           WASM_BUILD_PROFILE: release
           PKG_DIR: query-compiler/query-compiler-wasm/pkg

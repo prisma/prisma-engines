@@ -232,9 +232,9 @@ impl ConnectorVersion {
 
     /// The maximum number of rows allowed in a single insert query.
     ///
-    /// max_bind_values is overriden by the QUERY_BATCH_SIZE env var in targets other than WASM.
+    /// max_bind_values is overriden by the QUERY_BATCH_SIZE env var in targets other than Wasm.
     ///
-    /// Connectors which underyling implementation is WASM don't have any max_bind_values override
+    /// Connectors which underyling implementation is Wasm don't have any max_bind_values override
     /// as there's no such thing as runtime environment.
     ///
     /// From the PoV of the test binary, the target architecture is that of where the test runs,
@@ -242,10 +242,10 @@ impl ConnectorVersion {
     ///
     /// As a consequence there is a mismatch between the max_bind_values as seen by the test
     /// binary (overriden by the QUERY_BATCH_SIZE env var) and the max_bind_values as seen by the
-    /// WASM engine being exercised in those tests, through the RunnerExecutor::External test runner.
+    /// Wasm engine being exercised in those tests, through the RunnerExecutor::External test runner.
     ///
     /// What we do in here, is returning the number of max_bind_values that the connector under test
-    /// will use. i.e. if it's a WASM connector, the default, not overridable one. Otherwise the one
+    /// will use. i.e. if it's a Wasm connector, the default, not overridable one. Otherwise the one
     /// as seen by the test binary (which will be the same as the engine exercised)
     pub fn max_bind_values(&self) -> Option<usize> {
         if matches!(self, Self::Sqlite(Some(SqliteVersion::CloudflareD1))) {
