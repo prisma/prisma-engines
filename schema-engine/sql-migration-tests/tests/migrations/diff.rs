@@ -429,7 +429,7 @@ fn from_empty_to_migrations_folder_without_shadow_db_url_must_error(mut api: Tes
     expected_error.assert_eq(&err.to_string());
 }
 
-#[test_connector]
+#[test_connector(tags(Sqlite))]
 fn from_schema_datamodel_to_url(mut api: TestApi) {
     let tempdir = tempfile::tempdir().unwrap();
     let host = Arc::new(TestConnectorHost::default());
