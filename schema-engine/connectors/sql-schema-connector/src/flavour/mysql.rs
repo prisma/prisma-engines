@@ -103,7 +103,7 @@ impl SqlDialect for MysqlDialect {
         &self,
         _factory: std::sync::Arc<dyn quaint::connector::ExternalConnectorFactory>,
     ) -> BoxFuture<'_, ConnectorResult<Box<dyn SqlConnector>>> {
-        todo!("MySQL WASM shadow database not supported yet")
+        todo!("MySQL Wasm shadow database not supported yet")
     }
 }
 
