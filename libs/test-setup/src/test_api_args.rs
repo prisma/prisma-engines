@@ -5,7 +5,7 @@ use std::sync::LazyLock;
 use std::time::Duration;
 use std::{fmt::Display, io::Write as _};
 
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub(crate) struct DbUnderTest {
     pub(crate) capabilities: BitFlags<Capabilities>,
     pub(crate) database_url: String,

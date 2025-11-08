@@ -190,7 +190,7 @@ impl ConnectorError {
 
     /// Creates a new P1013 user facing error due to an invalid datasource
     /// connection string.
-    pub fn new_invalid_datasource_error(details: impl Display) -> Self {
+    pub fn new_invalid_datasource_error(details: impl ToString) -> Self {
         ConnectorError::user_facing(InvalidConnectionString {
             details: details.to_string(),
         })
