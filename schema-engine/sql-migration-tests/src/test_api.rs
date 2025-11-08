@@ -205,7 +205,7 @@ impl TestApi {
 
     pub fn diff(&self, params: DiffParams) -> ConnectorResult<DiffResult> {
         self.diff_with_datasource(
-            DatasourceUrls {
+            &DatasourceUrls {
                 url: self.connection_string().to_owned(),
                 shadow_database_url: self.shadow_database_connection_string().map(<_>::to_owned),
             },
@@ -215,12 +215,12 @@ impl TestApi {
 
     pub fn diff_with_datasource(
         &self,
-        datasource_urls: DatasourceUrls,
+        datasource_urls: &DatasourceUrls,
         params: DiffParams,
     ) -> ConnectorResult<DiffResult> {
         test_setup::runtime::run_with_thread_local_runtime(diff_cli(
             params,
-            &datasource_urls.try_into()?,
+            datasource_urls,
             self.connector.host().clone(),
             &NoExtensionTypes,
         ))

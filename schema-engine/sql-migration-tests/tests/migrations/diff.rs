@@ -465,9 +465,7 @@ fn from_empty_to_migrations_directory(mut api: TestApi) {
     let host = Arc::new(TestConnectorHost::default());
     tok(diff_cli(
         params,
-        &DatasourceUrls::from_url_and_shadow_database_url("postgres://not-used", api.connection_string())
-            .try_into()
-            .unwrap(),
+        &DatasourceUrls::from_url_and_shadow_database_url("postgres://not-used", api.connection_string()),
         host.clone(),
         &NoExtensionTypes,
     ))
@@ -614,7 +612,7 @@ fn from_schema_datasource_relative(api: TestApi) {
         filters: SchemaFilter::default(),
     };
 
-    api.diff_with_datasource(DatasourceUrls::from_url("file:./dev.db"), params)
+    api.diff_with_datasource(&DatasourceUrls::from_url("file:./dev.db"), params)
         .unwrap();
 
     let expected_printed_messages = expect![[r#"
@@ -674,7 +672,7 @@ fn from_schema_datasource_to_url(mut api: TestApi) {
         filters: SchemaFilter::default(),
     };
 
-    api.diff_with_datasource(DatasourceUrls::from_url(first_url), input)
+    api.diff_with_datasource(&DatasourceUrls::from_url(first_url), input)
         .unwrap();
 
     let expected_printed_messages = expect![[r#"
@@ -736,7 +734,7 @@ fn with_schema_filters(api: TestApi) {
         },
     };
 
-    api.diff_with_datasource(DatasourceUrls::from_url(first_url), input)
+    api.diff_with_datasource(&DatasourceUrls::from_url(first_url), input)
         .unwrap();
 
     let expected_printed_messages = expect![[r#"
@@ -792,7 +790,7 @@ fn with_invalid_schema_filter_sqlite(mut api: TestApi) {
     };
 
     let err = api
-        .diff_with_datasource(DatasourceUrls::from_url(first_url), input)
+        .diff_with_datasource(&DatasourceUrls::from_url(first_url), input)
         .unwrap_err();
 
     assert_eq!(err.error_code(), Some("P3024"));
@@ -1251,7 +1249,7 @@ fn from_multi_file_schema_datasource_to_url(mut api: TestApi) {
         filters: SchemaFilter::default(),
     };
 
-    api.diff_with_datasource(DatasourceUrls::from_url(first_url), input)
+    api.diff_with_datasource(&DatasourceUrls::from_url(first_url), input)
         .unwrap();
 
     let expected_printed_messages = expect![[r#"
@@ -1317,7 +1315,7 @@ fn from_multi_file_schema_datamodel_to_url(mut api: TestApi) {
         filters: SchemaFilter::default(),
     };
 
-    api.diff_with_datasource(DatasourceUrls::from_url(first_url), input)
+    api.diff_with_datasource(&DatasourceUrls::from_url(first_url), input)
         .unwrap();
 
     let expected_printed_messages = expect![[r#"

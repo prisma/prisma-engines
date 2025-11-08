@@ -7,7 +7,7 @@ use crate::{
     CoreError, CoreResult, GenericApi, SchemaContainerExt, commands,
     extensions::ExtensionTypeConfig,
     parse_configuration_multi,
-    url::{DatasourceError, DatasourceUrls, ValidatedDatasourceUrls},
+    url::{DatasourceUrls, ValidatedDatasourceUrls},
 };
 use ::commands::MigrationSchemaCache;
 use enumflags2::BitFlags;
@@ -37,11 +37,7 @@ pub(crate) struct EngineState {
     initial_datamodel: Option<psl::ValidatedSchema>,
     /// Direct URL and shadow database URL associated with the schemas (either
     /// the initial datamodel or the schemas passed later via RPC requests).
-    /// Connector-indepenent validation (like rejecting Accelerate URLs) is
-    /// performed eagerly when creating `EngineState` (which is an infallible
-    /// operation), and any errors are propagated to a later stage when actual
-    /// operations are performed.
-    datasource_urls: Result<ValidatedDatasourceUrls, DatasourceError>,
+    datasource_urls: DatasourceUrls,
     host: Arc<dyn ConnectorHost>,
     extensions: Arc<ExtensionTypeConfig>,
     /// A map from either:
@@ -66,7 +62,7 @@ impl ConnectorRequestType {
     pub fn into_connector(
         self,
         initial_datamodel: Option<&psl::ValidatedSchema>,
-        datasource_urls: &ValidatedDatasourceUrls,
+        datasource_urls: &DatasourceUrls,
         config_dir: Option<&Path>,
     ) -> CoreResult<Box<dyn SchemaConnector>> {
         match self {
@@ -76,7 +72,7 @@ impl ConnectorRequestType {
                 if let Some(initial_datamodel) = initial_datamodel {
                     Ok(crate::initial_datamodel_to_connector(
                         initial_datamodel,
-                        datasource_urls,
+                        &datasource_urls.validate(initial_datamodel.connector)?,
                     )?)
                 } else {
                     Err(ConnectorError::from_msg("Missing --datamodels".to_owned()))
@@ -109,7 +105,7 @@ impl EngineState {
 
         EngineState {
             initial_datamodel,
-            datasource_urls: datasource_urls.try_into(),
+            datasource_urls,
             host: host.unwrap_or_else(|| Arc::new(schema_connector::EmptyHost)),
             extensions,
             connectors: Default::default(),
@@ -154,7 +150,7 @@ impl EngineState {
             None => {
                 let request_key = request.clone();
                 let mut connector =
-                    request.into_connector(self.initial_datamodel.as_ref(), self.datasource_urls()?, config_dir)?;
+                    request.into_connector(self.initial_datamodel.as_ref(), &self.datasource_urls, config_dir)?;
 
                 connector.set_host(self.host.clone());
                 let (erased_sender, mut erased_receiver) = mpsc::channel::<ErasedConnectorRequest>(12);
@@ -220,13 +216,13 @@ impl EngineState {
         let (datasource, _) = parse_configuration_multi(&sources)?;
 
         Ok(self
-            .datasource_urls()?
+            .validate_datasource_urls(&datasource)?
             .url_with_config_dir(datasource.active_connector.flavour(), Path::new(&container.config_dir))
             .into_owned())
     }
 
-    fn datasource_urls(&self) -> CoreResult<&ValidatedDatasourceUrls> {
-        Ok(self.datasource_urls.as_ref()?)
+    fn validate_datasource_urls(&self, datasource: &psl::Datasource) -> CoreResult<ValidatedDatasourceUrls> {
+        Ok(self.datasource_urls.validate(datasource.active_connector)?)
     }
 }
 
@@ -314,7 +310,7 @@ impl GenericApi for EngineState {
     }
 
     async fn diff(&self, params: DiffParams) -> CoreResult<DiffResult> {
-        commands::diff_cli(params, self.datasource_urls()?, self.host.clone(), &*self.extensions).await
+        commands::diff_cli(params, &self.datasource_urls, self.host.clone(), &*self.extensions).await
     }
 
     async fn drop_database(&self, url: String) -> CoreResult<()> {

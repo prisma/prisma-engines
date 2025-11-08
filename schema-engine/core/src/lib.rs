@@ -18,9 +18,11 @@ mod state;
 mod timings;
 mod url;
 
-use crate::url::ValidatedDatasourceUrls;
-
-pub use self::{rpc::RpcApi, timings::TimingsLayer, url::DatasourceUrls};
+pub use self::{
+    rpc::RpcApi,
+    timings::TimingsLayer,
+    url::{DatasourceUrls, ValidatedDatasourceUrls},
+};
 pub use extensions::{ExtensionType, ExtensionTypeConfig};
 use json_rpc::types::{SchemaContainer, SchemasContainer, SchemasWithConfigDir};
 pub use schema_connector;
@@ -90,7 +92,7 @@ fn connector_for_connection_string(
 /// This uses `schema_files` to read `preview_features` and the `datasource` block.
 fn schema_to_dialect(
     schema_files: &[(String, SourceFile)],
-    datasource_urls: &ValidatedDatasourceUrls,
+    datasource_urls: &DatasourceUrls,
 ) -> CoreResult<Box<dyn schema_connector::SchemaDialect>> {
     let (_, config) = psl::parse_configuration_multi_file(schema_files)
         .map_err(|(files, err)| CoreError::new_schema_parser_error(files.render_diagnostics(&err)))?;
@@ -101,6 +103,8 @@ fn schema_to_dialect(
         .into_iter()
         .next()
         .ok_or_else(|| CoreError::from_msg("There is no datasource in the schema.".into()))?;
+
+    let datasource_urls = datasource_urls.validate(datasource.active_connector)?;
 
     let connector_params = ConnectorParams {
         connection_string: datasource_urls.url().to_owned(),
@@ -116,10 +120,11 @@ fn schema_to_dialect(
 /// Go from a schema to a connector.
 fn schema_to_connector(
     files: &[(String, SourceFile)],
-    datasource_urls: &ValidatedDatasourceUrls,
+    datasource_urls: &DatasourceUrls,
     config_dir: Option<&Path>,
 ) -> CoreResult<Box<dyn schema_connector::SchemaConnector>> {
     let (datasource, preview_features) = parse_configuration_multi(files)?;
+    let datasource_urls = datasource_urls.validate(datasource.active_connector)?;
 
     let (connection_string, shadow_database_connection_string) = if let Some(config_dir) = config_dir {
         let urls = datasource_urls.with_config_dir(datasource.active_connector.flavour(), config_dir);

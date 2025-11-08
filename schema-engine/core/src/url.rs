@@ -17,33 +17,6 @@ pub struct DatasourceUrls {
     pub shadow_database_url: Option<String>,
 }
 
-impl DatasourceUrls {
-    /// Creates a `DatasourceUrls` instance containing only a primary URL.
-    pub fn from_url(url: impl Into<String>) -> Self {
-        Self {
-            url: url.into(),
-            shadow_database_url: None,
-        }
-    }
-
-    /// Creates a `DatasourceUrls` instance with both primary and shadow database URLs.
-    pub fn from_url_and_shadow_database_url(url: impl Into<String>, shadow_database_url: impl Into<String>) -> Self {
-        Self {
-            url: url.into(),
-            shadow_database_url: Some(shadow_database_url.into()),
-        }
-    }
-}
-
-impl From<ValidatedDatasourceUrls> for DatasourceUrls {
-    fn from(urls: ValidatedDatasourceUrls) -> Self {
-        Self {
-            url: urls.url,
-            shadow_database_url: urls.shadow_database_url,
-        }
-    }
-}
-
 /// Datasource URLs that have passed validation and are safe to consume by the schema engine.
 #[derive(Debug, Clone)]
 pub struct ValidatedDatasourceUrls {
@@ -61,6 +34,71 @@ pub enum DatasourceError {
         "`datasource.{_0}` in `prisma.config.ts` must be a direct URL that points directly to the database. Using `prisma:` in the URL scheme is not allowed."
     )]
     AccelerateUrl(&'static str),
+
+    #[error("`datasource.{_0}` in `prisma.config.ts` is invalid: {_1}")]
+    ConnectorError(&'static str, String),
+}
+
+impl DatasourceUrls {
+    /// Creates a `DatasourceUrls` instance containing only a primary URL.
+    pub fn from_url(url: impl Into<String>) -> Self {
+        Self {
+            url: url.into(),
+            shadow_database_url: None,
+        }
+    }
+
+    /// Creates a `DatasourceUrls` instance with both primary and shadow database URLs.
+    pub fn from_url_and_shadow_database_url(url: impl Into<String>, shadow_database_url: impl Into<String>) -> Self {
+        Self {
+            url: url.into(),
+            shadow_database_url: Some(shadow_database_url.into()),
+        }
+    }
+
+    /// Validates the URLs.
+    pub fn validate(
+        &self,
+        connector: &dyn psl::datamodel_connector::Connector,
+    ) -> Result<ValidatedDatasourceUrls, DatasourceError> {
+        validate_datasource_url(&self.url, connector, "url")?;
+
+        if let Some(shadow_database_url) = &self.shadow_database_url {
+            validate_datasource_url(shadow_database_url, connector, "shadowDatabaseUrl")?;
+        }
+
+        Ok(ValidatedDatasourceUrls {
+            url: self.url.clone(),
+            shadow_database_url: self.shadow_database_url.clone(),
+        })
+    }
+}
+
+fn validate_datasource_url(
+    url: &str,
+    connector: &dyn psl::datamodel_connector::Connector,
+    name: &'static str,
+) -> Result<(), DatasourceError> {
+    if url.is_empty() {
+        return Err(DatasourceError::Empty(name));
+    }
+
+    if url.starts_with("prisma://") {
+        return Err(DatasourceError::AccelerateUrl(name));
+    }
+
+    connector
+        .validate_url(url)
+        .map_err(|msg| DatasourceError::ConnectorError(name, msg))
+}
+
+impl From<ValidatedDatasourceUrls> for DatasourceUrls {
+    fn from(urls: ValidatedDatasourceUrls) -> Self {
+        Self {
+            url: urls.url,
+            shadow_database_url: urls.shadow_database_url,
+        }
+    }
 }
 
 impl From<&DatasourceError> for CoreError {
@@ -73,35 +111,6 @@ impl From<DatasourceError> for CoreError {
     fn from(error: DatasourceError) -> Self {
         Self::from(&error)
     }
-}
-
-impl TryFrom<DatasourceUrls> for ValidatedDatasourceUrls {
-    type Error = DatasourceError;
-
-    fn try_from(urls: DatasourceUrls) -> Result<Self, Self::Error> {
-        validate_datasource_url(&urls.url, "url")?;
-
-        if let Some(shadow_database_url) = &urls.shadow_database_url {
-            validate_datasource_url(shadow_database_url, "shadowDatabaseUrl")?;
-        }
-
-        Ok(ValidatedDatasourceUrls {
-            url: urls.url,
-            shadow_database_url: urls.shadow_database_url,
-        })
-    }
-}
-
-fn validate_datasource_url(url: &str, name: &'static str) -> Result<(), DatasourceError> {
-    if url.is_empty() {
-        return Err(DatasourceError::Empty(name));
-    }
-
-    if url.starts_with("prisma://") {
-        return Err(DatasourceError::AccelerateUrl(name));
-    }
-
-    Ok(())
 }
 
 impl ValidatedDatasourceUrls {

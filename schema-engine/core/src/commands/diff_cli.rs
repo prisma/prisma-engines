@@ -4,7 +4,6 @@ use crate::{
     DatasourceUrls, SchemaContainerExt,
     core_error::CoreResult,
     json_rpc::types::{DiffParams, DiffResult, DiffTarget, UrlContainer},
-    url::ValidatedDatasourceUrls,
 };
 use enumflags2::BitFlags;
 use psl::parser_database::ExtensionTypes;
@@ -16,7 +15,7 @@ use sql_schema_connector::SqlSchemaConnector;
 
 pub async fn diff_cli(
     params: DiffParams,
-    datasource_urls: &ValidatedDatasourceUrls,
+    datasource_urls: &DatasourceUrls,
     host: Arc<dyn ConnectorHost>,
     extension_types: &dyn ExtensionTypes,
 ) -> CoreResult<DiffResult> {
@@ -130,7 +129,7 @@ fn namespaces_and_preview_features_from_diff_targets(
 // `None` in case the target is empty
 async fn json_rpc_diff_target_to_dialect(
     target: &DiffTarget,
-    datasource_urls: &ValidatedDatasourceUrls,
+    datasource_urls: &DatasourceUrls,
     shadow_database_url: Option<&str>, // TODO: delete the parameter
     namespaces: Option<Namespaces>,
     filter: &SchemaFilter,
@@ -138,7 +137,7 @@ async fn json_rpc_diff_target_to_dialect(
     extension_types: &dyn ExtensionTypes,
 ) -> CoreResult<Option<(Box<dyn SchemaDialect>, DatabaseSchema)>> {
     let datasource_urls = if let Some(shadow_database_url) = shadow_database_url {
-        &DatasourceUrls::from_url_and_shadow_database_url(datasource_urls.url(), shadow_database_url).try_into()?
+        &DatasourceUrls::from_url_and_shadow_database_url(&datasource_urls.url, shadow_database_url)
     } else {
         datasource_urls
     };
@@ -200,7 +199,8 @@ async fn json_rpc_diff_target_to_dialect(
         DiffTarget::Migrations(migration_list) => {
             let provider =
                 schema_connector::migrations_directory::read_provider_from_lock_file(&migration_list.lockfile);
-            match (provider.as_deref(), datasource_urls.shadow_database_url()) {
+
+            match (provider.as_deref(), datasource_urls.shadow_database_url.as_deref()) {
                 (Some(provider), Some(shadow_database_url)) => {
                     let dialect = ::commands::dialect_for_provider(provider)?;
                     let migrations = Migrations::from_migration_list(migration_list);

@@ -265,21 +265,20 @@ fn bad_datasource_url_and_provider_combinations_must_return_a_proper_error(api: 
 
     let json_error = serde_json::to_value(error.to_user_facing()).unwrap();
 
-    let err_message: String = json_error["message"].as_str().unwrap().into();
+    let err_message = json_error["meta"].as_object().unwrap()["details"].as_str().unwrap();
 
     assert!(
-        err_message.contains("the URL must start with the protocol `file:`"),
-        "{}",
-        err_message
+        err_message.contains("`datasource.url` in `prisma.config.ts` is invalid: must start with the protocol `file:`"),
+        "{err_message}",
     );
 
     let expected = json!({
         "is_panic": false,
-        "message": err_message,
+        "message": format!("The provided database string is invalid. {err_message}"),
         "meta": {
-            "full_error": err_message,
+            "details": err_message,
         },
-        "error_code": "P1012",
+        "error_code": "P1013",
     });
 
     assert_eq!(json_error, expected);
