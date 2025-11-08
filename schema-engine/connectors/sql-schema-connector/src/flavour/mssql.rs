@@ -123,7 +123,7 @@ impl SqlDialect for MssqlDialect {
         &self,
         factory: Arc<dyn ExternalConnectorFactory>,
     ) -> BoxFuture<'_, ConnectorResult<Box<dyn SqlConnector>>> {
-        todo!("MSSQL WASM shadow database not supported yet")
+        todo!("MSSQL Wasm shadow database not supported yet")
     }
 }
 

@@ -35,7 +35,7 @@ export function withLocalPanicHandler<T>(fn: () => T): T {
 
 export class PanicError extends Error {
   constructor(message: string) {
-    super('Panic in WASM module: ' + message)
+    super('Panic in Wasm module: ' + message)
     this.name = 'PanicError'
   }
 }
