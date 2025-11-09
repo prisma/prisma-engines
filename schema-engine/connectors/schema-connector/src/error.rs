@@ -9,7 +9,9 @@ use std::{
 };
 use tracing_error::SpanTrace;
 use user_facing_errors::{
-    KnownError, UserFacingError, common::SchemaParserError, schema_engine::MigrationFileNotFound,
+    KnownError, UserFacingError,
+    common::{InvalidConnectionString, SchemaParserError},
+    schema_engine::MigrationFileNotFound,
 };
 use wasm_bindgen::JsValue;
 
@@ -184,6 +186,14 @@ impl ConnectorError {
     /// Create a new P1012 user facing error from the rendered datamodel parser error.
     pub fn new_schema_parser_error(full_error: String) -> Self {
         ConnectorError::user_facing(SchemaParserError { full_error })
+    }
+
+    /// Creates a new P1013 user facing error due to an invalid datasource
+    /// connection string.
+    pub fn new_invalid_datasource_error(details: impl ToString) -> Self {
+        ConnectorError::user_facing(InvalidConnectionString {
+            details: details.to_string(),
+        })
     }
 
     /// Try to downcast the source to a specific type.

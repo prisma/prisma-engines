@@ -1,5 +1,6 @@
+use indoc::indoc;
 use pretty_assertions::assert_eq;
-use schema_core::{json_rpc::types::*, schema_api_without_extensions};
+use schema_core::{DatasourceUrls, json_rpc::types::*, schema_api_without_extensions};
 use sql_migration_tests::{test_api::*, utils::list_migrations};
 use std::io::Write;
 use user_facing_errors::{UserFacingError, schema_engine::MigrationDoesNotApplyCleanly};
@@ -602,13 +603,16 @@ fn dev_diagnostic_shadow_database_creation_error_is_special_cased_mysql(api: Tes
 
     let db_url: url::Url = api.connection_string().parse().unwrap();
 
-    let datamodel = format!(
+    let datamodel = indoc!(
         r#"
-        datasource db {{
+        datasource db {
             provider = "mysql"
-            url = "mysql://prismashadowdbtestuser:1234batman@{dbhost}:{dbport}/{dbname}"
-        }}
+        }
         "#,
+    );
+
+    let url = format!(
+        "mysql://prismashadowdbtestuser:1234batman@{dbhost}:{dbport}/{dbname}",
         dbhost = db_url.host().unwrap(),
         dbname = api.connection_info().dbname().unwrap(),
         dbport = db_url.port().unwrap_or(3306),
@@ -617,8 +621,8 @@ fn dev_diagnostic_shadow_database_creation_error_is_special_cased_mysql(api: Tes
     let migrations_list = list_migrations(&directory.keep()).unwrap();
 
     let err = tok(async {
-        let migration_api = schema_api_without_extensions(Some(datamodel), None).unwrap();
-        migration_api
+        schema_api_without_extensions(Some(datamodel.to_owned()), DatasourceUrls::from_url(url), None)
+            .unwrap()
             .dev_diagnostic(DevDiagnosticInput {
                 migrations_list,
                 filters: SchemaFilter::default(),
@@ -653,13 +657,16 @@ fn dev_diagnostic_shadow_database_creation_error_is_special_cased_postgres(api: 
 
     let db_url: url::Url = api.connection_string().parse().unwrap();
 
-    let datamodel = format!(
+    let datamodel = indoc!(
         r#"
-        datasource db {{
+        datasource db {
             provider = "postgresql"
-            url = "postgresql://prismashadowdbtestuser:1234batman@{dbhost}:{dbport}/{dbname}"
-        }}
+        }
         "#,
+    );
+
+    let url = format!(
+        "postgresql://prismashadowdbtestuser:1234batman@{dbhost}:{dbport}/{dbname}",
         dbhost = db_url.host().unwrap(),
         dbname = api.connection_info().dbname().unwrap(),
         dbport = db_url.port().unwrap(),
@@ -668,8 +675,8 @@ fn dev_diagnostic_shadow_database_creation_error_is_special_cased_postgres(api: 
     let migrations_list = list_migrations(&directory.keep()).unwrap();
 
     let err = tok(async move {
-        let migration_api = schema_api_without_extensions(Some(datamodel), None).unwrap();
-        migration_api
+        schema_api_without_extensions(Some(datamodel.to_owned()), DatasourceUrls::from_url(url), None)
+            .unwrap()
             .dev_diagnostic(DevDiagnosticInput {
                 migrations_list,
                 filters: SchemaFilter::default(),
@@ -774,7 +781,6 @@ fn dev_diagnostic_multi_schema_does_not_panic() {
     let schema = format! {r#"
         datasource db {{
             provider = "{provider}"
-            url = "{url}"
             schemas = ["public", "auth"]
         }}
 
@@ -822,7 +828,7 @@ ALTER TABLE "public".profiles ADD CONSTRAINT profiles_id_fkey FOREIGN KEY (id) R
     let tempdir = tempfile::tempdir().unwrap();
     std::fs::write(tempdir.path().join("schema.prisma"), &schema).unwrap();
 
-    let api = schema_core::schema_api_without_extensions(Some(schema), None).unwrap();
+    let api = schema_core::schema_api_without_extensions(Some(schema), DatasourceUrls::from_url(&url), None).unwrap();
 
     tok(api.db_execute(DbExecuteParams {
         datasource_type: DbExecuteDatasourceType::Url(UrlContainer { url }),

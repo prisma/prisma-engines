@@ -93,10 +93,7 @@ mod tests {
             file_name.to_owned(),
             Generator::new("client", Env::value("prisma-client")),
         );
-        config.push_datasource(
-            file_name.to_owned(),
-            Datasource::new("db", "postgres", Env::variable("DATABASE_URL")),
-        );
+        config.push_datasource(file_name.to_owned(), Datasource::new("db", "postgres"));
 
         let rendered = psl::reformat(&format!("{config}"), 2).unwrap();
 
@@ -107,7 +104,6 @@ mod tests {
 
             datasource db {
               provider = "postgres"
-              url      = env("DATABASE_URL")
             }
         "#]];
 
@@ -124,14 +120,8 @@ mod tests {
             file_name.to_owned(),
             Generator::new("go", Env::value("prisma-client-go")),
         );
-        config.push_datasource(
-            file_name.to_owned(),
-            Datasource::new("pg", "postgres", Env::variable("PG_DATABASE_URL")),
-        );
-        config.push_datasource(
-            file_name.to_owned(),
-            Datasource::new("my", "mysql", Env::variable("MY_DATABASE_URL")),
-        );
+        config.push_datasource(file_name.to_owned(), Datasource::new("pg", "postgres"));
+        config.push_datasource(file_name.to_owned(), Datasource::new("my", "mysql"));
 
         let expected = expect![[r#"
             generator js {
@@ -144,12 +134,10 @@ mod tests {
 
             datasource pg {
               provider = "postgres"
-              url      = env("PG_DATABASE_URL")
             }
 
             datasource my {
               provider = "mysql"
-              url      = env("MY_DATABASE_URL")
             }
         "#]];
 

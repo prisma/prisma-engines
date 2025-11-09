@@ -8,8 +8,7 @@ pub use mongodb_renderer::*;
 pub use sql_renderer::*;
 
 use crate::{
-    CONFIG, DatamodelFragment, IdFragment, M2mFragment, connection_string,
-    datamodel_rendering::datasource::DatasourceBuilder, templating,
+    CONFIG, DatamodelFragment, IdFragment, M2mFragment, datamodel_rendering::datasource::DatasourceBuilder, templating,
 };
 use indoc::indoc;
 use itertools::Itertools;
@@ -34,24 +33,17 @@ pub trait DatamodelRenderer {
 
 /// Render the complete datamodel with all bells and whistles.
 pub fn render_test_datamodel(
-    test_database: &str,
     template: String,
     excluded_features: &[&str],
     relation_mode_override: Option<String>,
     db_schemas: &[&str],
     db_extensions: &[&str],
-    isolation_level: Option<&'static str>,
 ) -> RenderedDatamodel {
-    let (tag, version) = CONFIG.test_connector().unwrap();
+    let (tag, _) = CONFIG.test_connector().unwrap();
     let preview_features = render_preview_features(tag.datamodel_provider(), excluded_features);
 
-    let is_multi_schema = !db_schemas.is_empty();
-
-    let url = connection_string(&version, test_database, is_multi_schema, isolation_level);
     let datasource = DatasourceBuilder::new("test")
         .provider(tag.datamodel_provider())
-        // only needed for blackbox tests, the real URL is not used anywhere else
-        .url(&url)
         .relation_mode(relation_mode_override.unwrap_or_else(|| tag.relation_mode().to_string()))
         .schemas_if_not_empty(db_schemas)
         .extensions_if_not_empty(db_extensions)
@@ -73,7 +65,7 @@ pub fn render_test_datamodel(
     let models = process_template(template, renderer);
 
     let schema = format!("{datasource_with_generator}\n\n{models}");
-    RenderedDatamodel { schema, url }
+    RenderedDatamodel { schema }
 }
 
 fn process_template(template: String, renderer: Box<dyn DatamodelRenderer>) -> String {
@@ -107,5 +99,4 @@ fn render_preview_features(provider: &str, excluded_features: &[&str]) -> String
 #[derive(Debug)]
 pub struct RenderedDatamodel {
     pub schema: String,
-    pub url: String,
 }

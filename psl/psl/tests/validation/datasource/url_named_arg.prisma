@@ -1,11 +1,4 @@
 datasource testds {
     provider = "mysql"
-    url      = env(named: "DATABASE_URL")
 }
 
-// [1;93mwarning[0m: [1mThe env function doesn't expect named arguments[0m
-//   [1;94m-->[0m  [4mschema.prisma:3[0m
-// [1;94m   | [0m
-// [1;94m 2 | [0m    provider = "mysql"
-// [1;94m 3 | [0m    url      = env([1;93mnamed: "DATABASE_URL"[0m)
-// [1;94m   | [0m

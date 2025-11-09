@@ -3,7 +3,6 @@
 
 datasource testds {
     provider = "postgresql"
-    url      = "dummy-url"
     schemas  = ["public", "security", "users"]
 }
 
@@ -26,28 +25,28 @@ enum UserType {
     Eukaryote
 }
 // [1;91merror[0m: [1mError validating model "Test": This model is missing an `@@schema` attribute.[0m
-//   [1;94m-->[0m  [4mschema.prisma:15[0m
+//   [1;94m-->[0m  [4mschema.prisma:14[0m
 // [1;94m   | [0m
-// [1;94m14 | [0m
-// [1;94m15 | [0m[1;91mmodel Test {[0m
-// [1;94m16 | [0m    id Int @id
-// [1;94m17 | [0m}
+// [1;94m13 | [0m
+// [1;94m14 | [0m[1;91mmodel Test {[0m
+// [1;94m15 | [0m    id Int @id
+// [1;94m16 | [0m}
 // [1;94m   | [0m
 // [1;91merror[0m: [1mError validating model "Test2": This model is missing an `@@schema` attribute.[0m
-//   [1;94m-->[0m  [4mschema.prisma:19[0m
+//   [1;94m-->[0m  [4mschema.prisma:18[0m
 // [1;94m   | [0m
-// [1;94m18 | [0m
-// [1;94m19 | [0m[1;91mmodel Test2 {[0m
-// [1;94m20 | [0m    id Int @id
-// [1;94m21 | [0m}
+// [1;94m17 | [0m
+// [1;94m18 | [0m[1;91mmodel Test2 {[0m
+// [1;94m19 | [0m    id Int @id
+// [1;94m20 | [0m}
 // [1;94m   | [0m
 // [1;91merror[0m: [1mThis enum is missing an `@@schema` attribute.[0m
-//   [1;94m-->[0m  [4mschema.prisma:23[0m
+//   [1;94m-->[0m  [4mschema.prisma:22[0m
 // [1;94m   | [0m
-// [1;94m22 | [0m
-// [1;94m23 | [0m[1;91menum UserType {[0m
-// [1;94m24 | [0m    Bacteria
-// [1;94m25 | [0m    Archea
-// [1;94m26 | [0m    Eukaryote
-// [1;94m27 | [0m}
+// [1;94m21 | [0m
+// [1;94m22 | [0m[1;91menum UserType {[0m
+// [1;94m23 | [0m    Bacteria
+// [1;94m24 | [0m    Archea
+// [1;94m25 | [0m    Eukaryote
+// [1;94m26 | [0m}
 // [1;94m   | [0m

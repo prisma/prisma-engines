@@ -1,6 +1,5 @@
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
 }
 
 view 1foo {
@@ -8,8 +7,8 @@ view 1foo {
 }
 
 // [1;91merror[0m: [1mError validating: The name of a view must not start with a number.[0m
-//   [1;94m-->[0m  [4mschema.prisma:6[0m
+//   [1;94m-->[0m  [4mschema.prisma:5[0m
 // [1;94m   | [0m
-// [1;94m 5 | [0m
-// [1;94m 6 | [0mview [1;91m1foo[0m {
+// [1;94m 4 | [0m
+// [1;94m 5 | [0mview [1;91m1foo[0m {
 // [1;94m   | [0m

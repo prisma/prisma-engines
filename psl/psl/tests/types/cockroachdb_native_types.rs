@@ -6,7 +6,6 @@ fn should_fail_on_invalid_precision_for_decimal_type() {
     let schema = indoc! {r#"
         datasource db {
           provider = "cockroachdb"
-          url      = env("DATABASE_URL")
         }
 
         model User {
@@ -17,10 +16,10 @@ fn should_fail_on_invalid_precision_for_decimal_type() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mArgument M is out of range for native type `Decimal(1001,3)` of CockroachDB: Precision must be positive with a maximum value of 1000.[0m
-          [1;94m-->[0m  [4mschema.prisma:8[0m
+          [1;94m-->[0m  [4mschema.prisma:7[0m
         [1;94m   | [0m
-        [1;94m 7 | [0m  id        Int     @id
-        [1;94m 8 | [0m  firstName Decimal [1;91m@db.Decimal(1001,3)[0m
+        [1;94m 6 | [0m  id        Int     @id
+        [1;94m 7 | [0m  firstName Decimal [1;91m@db.Decimal(1001,3)[0m
         [1;94m   | [0m
     "#]];
 
@@ -32,7 +31,6 @@ fn should_fail_on_invalid_precision_for_time_types() {
     let schema = indoc! {r#"
         datasource db {
           provider = "cockroachdb"
-          url      = env("DATABASE_URL")
         }
 
         model User {
@@ -43,10 +41,10 @@ fn should_fail_on_invalid_precision_for_time_types() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mArgument M is out of range for native type `Time(7)` of CockroachDB: M can range from 0 to 6.[0m
-          [1;94m-->[0m  [4mschema.prisma:8[0m
+          [1;94m-->[0m  [4mschema.prisma:7[0m
         [1;94m   | [0m
-        [1;94m 7 | [0m  id  Int      @id
-        [1;94m 8 | [0m  val DateTime [1;91m@db.Time(7)[0m
+        [1;94m 6 | [0m  id  Int      @id
+        [1;94m 7 | [0m  val DateTime [1;91m@db.Time(7)[0m
         [1;94m   | [0m
     "#]];
 
@@ -55,7 +53,6 @@ fn should_fail_on_invalid_precision_for_time_types() {
     let schema = indoc! {r#"
         datasource db {
           provider = "cockroachdb"
-          url      = env("DATABASE_URL")
         }
 
         model User {
@@ -66,10 +63,10 @@ fn should_fail_on_invalid_precision_for_time_types() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mArgument M is out of range for native type `Timestamp(7)` of CockroachDB: M can range from 0 to 6.[0m
-          [1;94m-->[0m  [4mschema.prisma:8[0m
+          [1;94m-->[0m  [4mschema.prisma:7[0m
         [1;94m   | [0m
-        [1;94m 7 | [0m  id  Int      @id
-        [1;94m 8 | [0m  val DateTime [1;91m@db.Timestamp(7)[0m
+        [1;94m 6 | [0m  id  Int      @id
+        [1;94m 7 | [0m  val DateTime [1;91m@db.Timestamp(7)[0m
         [1;94m   | [0m
     "#]];
 
@@ -81,7 +78,6 @@ fn should_fail_on_argument_out_of_range_for_bit_data_types() {
     let schema = indoc! {r#"
         datasource db {
           provider = "cockroachdb"
-          url      = env("DATABASE_URL")
         }
 
         model User {
@@ -92,10 +88,10 @@ fn should_fail_on_argument_out_of_range_for_bit_data_types() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mNative type Bit is not compatible with declared field type Bytes, expected field type String.[0m
-          [1;94m-->[0m  [4mschema.prisma:8[0m
+          [1;94m-->[0m  [4mschema.prisma:7[0m
         [1;94m   | [0m
-        [1;94m 7 | [0m  id  Int   @id
-        [1;94m 8 | [0m  val Bytes [1;91m@db.Bit(0)[0m
+        [1;94m 6 | [0m  id  Int   @id
+        [1;94m 7 | [0m  val Bytes [1;91m@db.Bit(0)[0m
         [1;94m   | [0m
     "#]];
 
@@ -104,7 +100,6 @@ fn should_fail_on_argument_out_of_range_for_bit_data_types() {
     let schema = indoc! {r#"
         datasource db {
           provider = "cockroachdb"
-          url      = env("DATABASE_URL")
         }
 
         model User {
@@ -115,10 +110,10 @@ fn should_fail_on_argument_out_of_range_for_bit_data_types() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mNative type VarBit is not compatible with declared field type Bytes, expected field type String.[0m
-          [1;94m-->[0m  [4mschema.prisma:8[0m
+          [1;94m-->[0m  [4mschema.prisma:7[0m
         [1;94m   | [0m
-        [1;94m 7 | [0m  id  Int   @id
-        [1;94m 8 | [0m  val Bytes [1;91m@db.VarBit(0)[0m
+        [1;94m 6 | [0m  id  Int   @id
+        [1;94m 7 | [0m  val Bytes [1;91m@db.VarBit(0)[0m
         [1;94m   | [0m
     "#]];
 
@@ -130,7 +125,6 @@ fn should_fail_on_native_type_decimal_when_scale_is_bigger_than_precision() {
     let dml = indoc! {r#"
         datasource db {
           provider = "cockroachdb"
-          url      = env("DATABASE_URL")
         }
 
         model Blog {
@@ -141,10 +135,10 @@ fn should_fail_on_native_type_decimal_when_scale_is_bigger_than_precision() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mThe scale must not be larger than the precision for the Decimal(2,4) native type in CockroachDB.[0m
-          [1;94m-->[0m  [4mschema.prisma:8[0m
+          [1;94m-->[0m  [4mschema.prisma:7[0m
         [1;94m   | [0m
-        [1;94m 7 | [0m  id  Int     @id
-        [1;94m 8 | [0m  dec Decimal [1;91m@db.Decimal(2, 4)[0m
+        [1;94m 6 | [0m  id  Int     @id
+        [1;94m 7 | [0m  dec Decimal [1;91m@db.Decimal(2, 4)[0m
         [1;94m   | [0m
     "#]];
 
@@ -156,7 +150,6 @@ fn cockroach_specific_native_types_are_valid() {
     let schema = indoc! {r#"
         datasource db {
           provider = "cockroachdb"
-          url = "dummy-url"
         }
 
         model NativeTypesTest {

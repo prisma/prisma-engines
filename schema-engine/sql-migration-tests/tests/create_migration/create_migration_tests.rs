@@ -545,7 +545,6 @@ fn create_enum_renders_correctly(api: TestApi) {
     let dm = r#"
         datasource test {
           provider = "postgresql"
-          url = "postgresql://unreachable:unreachable@example.com/unreachable"
         }
 
         model Cat {
@@ -589,7 +588,6 @@ fn unsupported_type_renders_correctly(api: TestApi) {
     let dm = r#"
         datasource test {
           provider = "postgresql"
-          url = "postgresql://unreachable:unreachable@example.com/unreachable"
         }
 
         model Cat {
@@ -625,7 +623,6 @@ fn no_additional_unique_created(api: TestApi) {
     let dm = r#"
         datasource test {
           provider = "postgresql"
-          url = "postgresql://unreachable:unreachable@example.com/unreachable"
         }
 
         model Cat {

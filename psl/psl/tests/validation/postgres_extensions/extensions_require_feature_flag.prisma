@@ -4,12 +4,11 @@ generator js {
 
 datasource mypg {
   provider   = "postgresql"
-  url        = "dummy-url"
   extensions = [ postgis ]
 }
 // [1;91merror[0m: [1mThe `extensions` property is only available with the `postgresqlExtensions` preview feature.[0m
-//   [1;94m-->[0m  [4mschema.prisma:8[0m
+//   [1;94m-->[0m  [4mschema.prisma:7[0m
 // [1;94m   | [0m
-// [1;94m 7 | [0m  url        = "dummy-url"
-// [1;94m 8 | [0m  [1;91mextensions = [ postgis ][0m
+// [1;94m 6 | [0m  provider   = "postgresql"
+// [1;94m 7 | [0m  [1;91mextensions = [ postgis ][0m
 // [1;94m   | [0m

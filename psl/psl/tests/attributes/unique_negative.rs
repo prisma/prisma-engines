@@ -289,7 +289,6 @@ fn invalid_name_for_compound_unique_must_error() {
     let dml = indoc! {r#"
         datasource test {
           provider = "mysql"
-          url = "mysql://root:prisma@127.0.0.1:3309/ReproIndexNames?connection_limit=1"
         }
 
         model User {
@@ -304,10 +303,10 @@ fn invalid_name_for_compound_unique_must_error() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError validating model "User": The `name` property within the `@@unique` attribute only allows for the following characters: `_a-zA-Z0-9`.[0m
-          [1;94m-->[0m  [4mschema.prisma:10[0m
+          [1;94m-->[0m  [4mschema.prisma:9[0m
         [1;94m   | [0m
-        [1;94m 9 | [0m
-        [1;94m10 | [0m  [1;91m@@unique([name, identification], name: "Test.User")[0m
+        [1;94m 8 | [0m
+        [1;94m 9 | [0m  [1;91m@@unique([name, identification], name: "Test.User")[0m
         [1;94m   | [0m
     "#]];
 
@@ -319,7 +318,6 @@ fn mapping_unique_with_a_name_that_is_too_long_should_error() {
     let dml = indoc! {r#"
         datasource test {
           provider = "mysql"
-          url = "mysql://root:prisma@127.0.0.1:3309/ReproIndexNames?connection_limit=1"
         }
 
         model User {
@@ -339,16 +337,16 @@ fn mapping_unique_with_a_name_that_is_too_long_should_error() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError validating model "User": The constraint name 'IfYouAreGoingToPickTheNameYourselfYouShouldReallyPickSomethingShortAndSweetInsteadOfASuperLongNameViolatingLengthLimits' specified in the `map` argument for the `@@unique` constraint is too long for your chosen provider. The maximum allowed length is 64 bytes.[0m
-          [1;94m-->[0m  [4mschema.prisma:10[0m
+          [1;94m-->[0m  [4mschema.prisma:9[0m
         [1;94m   | [0m
-        [1;94m 9 | [0m
-        [1;94m10 | [0m  [1;91m@@unique([name, identification], map: "IfYouAreGoingToPickTheNameYourselfYouShouldReallyPickSomethingShortAndSweetInsteadOfASuperLongNameViolatingLengthLimits")[0m
+        [1;94m 8 | [0m
+        [1;94m 9 | [0m  [1;91m@@unique([name, identification], map: "IfYouAreGoingToPickTheNameYourselfYouShouldReallyPickSomethingShortAndSweetInsteadOfASuperLongNameViolatingLengthLimits")[0m
         [1;94m   | [0m
         [1;91merror[0m: [1mError validating model "User1": The constraint name 'IfYouAreGoingToPickTheNameYourselfYouShouldReallyPickSomethingShortAndSweetInsteadOfASuperLongNameViolatingLengthLimitsHereAsWell' specified in the `map` argument for the `@unique` constraint is too long for your chosen provider. The maximum allowed length is 64 bytes.[0m
-          [1;94m-->[0m  [4mschema.prisma:14[0m
+          [1;94m-->[0m  [4mschema.prisma:13[0m
         [1;94m   | [0m
-        [1;94m13 | [0mmodel User1 {
-        [1;94m14 | [0m  name           String [1;91m@unique(map: "IfYouAreGoingToPickTheNameYourselfYouShouldReallyPickSomethingShortAndSweetInsteadOfASuperLongNameViolatingLengthLimitsHereAsWell")[0m            
+        [1;94m12 | [0mmodel User1 {
+        [1;94m13 | [0m  name           String [1;91m@unique(map: "IfYouAreGoingToPickTheNameYourselfYouShouldReallyPickSomethingShortAndSweetInsteadOfASuperLongNameViolatingLengthLimitsHereAsWell")[0m            
         [1;94m   | [0m
     "#]];
 
@@ -375,16 +373,16 @@ fn naming_unique_to_a_field_name_should_error() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError validating model "User": The custom name `used` specified for the `@@unique` attribute is already used as a name for a field. Please choose a different name.[0m
-          [1;94m-->[0m  [4mschema.prisma:11[0m
+          [1;94m-->[0m  [4mschema.prisma:10[0m
         [1;94m   | [0m
-        [1;94m10 | [0m
-        [1;94m11 | [0m[1;91mmodel User {[0m
-        [1;94m12 | [0m  used           Int
-        [1;94m13 | [0m  name           String            
-        [1;94m14 | [0m  identification Int
-        [1;94m15 | [0m
-        [1;94m16 | [0m  @@unique([name, identification], name: "used")
-        [1;94m17 | [0m}
+        [1;94m 9 | [0m
+        [1;94m10 | [0m[1;91mmodel User {[0m
+        [1;94m11 | [0m  used           Int
+        [1;94m12 | [0m  name           String            
+        [1;94m13 | [0m  identification Int
+        [1;94m14 | [0m
+        [1;94m15 | [0m  @@unique([name, identification], name: "used")
+        [1;94m16 | [0m}
         [1;94m   | [0m
     "#]];
 
@@ -407,10 +405,10 @@ fn naming_field_level_unique_should_error() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mNo such argument.[0m
-          [1;94m-->[0m  [4mschema.prisma:12[0m
+          [1;94m-->[0m  [4mschema.prisma:11[0m
         [1;94m   | [0m
-        [1;94m11 | [0mmodel User {
-        [1;94m12 | [0m  used           Int @unique([1;91mname: "INVALID ON FIELD LEVEL"[0m)
+        [1;94m10 | [0mmodel User {
+        [1;94m11 | [0m  used           Int @unique([1;91mname: "INVALID ON FIELD LEVEL"[0m)
         [1;94m   | [0m
     "#]];
 
@@ -435,16 +433,16 @@ fn duplicate_implicit_names_should_error() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@unique": The given constraint name `User_used_key` has to be unique in the following namespace: global for primary key, indexes and unique constraints. Please provide a different name using the `map` argument.[0m
-          [1;94m-->[0m  [4mschema.prisma:12[0m
+          [1;94m-->[0m  [4mschema.prisma:11[0m
         [1;94m   | [0m
-        [1;94m11 | [0mmodel User {
-        [1;94m12 | [0m  used           Int [1;91m@unique[0m
+        [1;94m10 | [0mmodel User {
+        [1;94m11 | [0m  used           Int [1;91m@unique[0m
         [1;94m   | [0m
         [1;91merror[0m: [1mError parsing attribute "@@unique": The given constraint name `User_used_key` has to be unique in the following namespace: global for primary key, indexes and unique constraints. Please provide a different name using the `map` argument.[0m
-          [1;94m-->[0m  [4mschema.prisma:14[0m
+          [1;94m-->[0m  [4mschema.prisma:13[0m
         [1;94m   | [0m
-        [1;94m13 | [0m
-        [1;94m14 | [0m  [1;91m@@unique([used])[0m
+        [1;94m12 | [0m
+        [1;94m13 | [0m  [1;91m@@unique([used])[0m
         [1;94m   | [0m
     "#]];
 
@@ -479,28 +477,28 @@ fn duplicate_custom_names_on_same_model_should_error() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@unique": The given custom name `foo` has to be unique on the model. Please provide a different name for the `name` argument.[0m
+          [1;94m-->[0m  [4mschema.prisma:14[0m
+        [1;94m   | [0m
+        [1;94m13 | [0m    
+        [1;94m14 | [0m    @@unique([id, id2], [1;91mname: "foo"[0m, map: "bar")
+        [1;94m   | [0m
+        [1;91merror[0m: [1mError parsing attribute "@@unique": The given custom name `foo` has to be unique on the model. Please provide a different name for the `name` argument.[0m
           [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
-        [1;94m14 | [0m    
-        [1;94m15 | [0m    @@unique([id, id2], [1;91mname: "foo"[0m, map: "bar")
-        [1;94m   | [0m
-        [1;91merror[0m: [1mError parsing attribute "@@unique": The given custom name `foo` has to be unique on the model. Please provide a different name for the `name` argument.[0m
-          [1;94m-->[0m  [4mschema.prisma:16[0m
-        [1;94m   | [0m
-        [1;94m15 | [0m    @@unique([id, id2], name: "foo", map: "bar")
-        [1;94m16 | [0m    @@unique([id, id2], [1;91mname: "foo"[0m)
+        [1;94m14 | [0m    @@unique([id, id2], name: "foo", map: "bar")
+        [1;94m15 | [0m    @@unique([id, id2], [1;91mname: "foo"[0m)
         [1;94m   | [0m
         [1;91merror[0m: [1mError parsing attribute "@@id": The given custom name `foo` has to be unique on the model. Please provide a different name for the `name` argument.[0m
-          [1;94m-->[0m  [4mschema.prisma:24[0m
-        [1;94m   | [0m
-        [1;94m23 | [0m    @@unique([id, id2], name: "foo", map: "bar2")
-        [1;94m24 | [0m    @@id([id, id2], [1;91mname: "foo"[0m)
-        [1;94m   | [0m
-        [1;91merror[0m: [1mError parsing attribute "@@unique": The given custom name `foo` has to be unique on the model. Please provide a different name for the `name` argument.[0m
           [1;94m-->[0m  [4mschema.prisma:23[0m
         [1;94m   | [0m
-        [1;94m22 | [0m    
-        [1;94m23 | [0m    @@unique([id, id2], [1;91mname: "foo"[0m, map: "bar2")
+        [1;94m22 | [0m    @@unique([id, id2], name: "foo", map: "bar2")
+        [1;94m23 | [0m    @@id([id, id2], [1;91mname: "foo"[0m)
+        [1;94m   | [0m
+        [1;91merror[0m: [1mError parsing attribute "@@unique": The given custom name `foo` has to be unique on the model. Please provide a different name for the `name` argument.[0m
+          [1;94m-->[0m  [4mschema.prisma:22[0m
+        [1;94m   | [0m
+        [1;94m21 | [0m    
+        [1;94m22 | [0m    @@unique([id, id2], [1;91mname: "foo"[0m, map: "bar2")
         [1;94m   | [0m
     "#]];
 

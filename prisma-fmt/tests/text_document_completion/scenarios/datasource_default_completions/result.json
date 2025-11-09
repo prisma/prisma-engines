@@ -12,16 +12,6 @@
       "insertTextFormat": 2
     },
     {
-      "label": "url",
-      "kind": 5,
-      "documentation": {
-        "kind": "markdown",
-        "value": "```prisma\nurl = \"String\" | env(\"ENVIRONMENT_VARIABLE\")\n```\n___\nConnection URL including authentication info. Each datasource provider documents the URL syntax. Most providers use the syntax provided by the database. [Learn more](https://pris.ly/d/connection-strings).\n\n"
-      },
-      "insertText": "url = $0",
-      "insertTextFormat": 2
-    },
-    {
       "label": "relationMode",
       "kind": 5,
       "documentation": {

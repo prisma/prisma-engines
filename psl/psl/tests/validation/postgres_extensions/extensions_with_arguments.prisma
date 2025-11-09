@@ -5,6 +5,5 @@ generator js {
 
 datasource mypg {
   provider   = "postgresql"
-  url        = "dummy-url"
   extensions = [uuid_ossp(map: "uuid-ossp", schema: "meow", version: "2.1")]
 }

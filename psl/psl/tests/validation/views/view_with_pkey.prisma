@@ -1,6 +1,5 @@
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
 }
 
 generator js {
@@ -12,8 +11,8 @@ view Mountain {
   id Int @id
 }
 // [1;91merror[0m: [1mError validating: Views cannot have primary keys.[0m
-//   [1;94m-->[0m  [4mschema.prisma:12[0m
+//   [1;94m-->[0m  [4mschema.prisma:11[0m
 // [1;94m   | [0m
-// [1;94m11 | [0mview Mountain {
-// [1;94m12 | [0m  id Int [1;91m@id[0m
+// [1;94m10 | [0mview Mountain {
+// [1;94m11 | [0m  id Int [1;91m@id[0m
 // [1;94m   | [0m

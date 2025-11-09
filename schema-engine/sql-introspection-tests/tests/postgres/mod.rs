@@ -35,7 +35,6 @@ async fn sequences_should_work(api: &mut TestApi) -> TestResult {
 
         datasource db {
           provider = "postgresql"
-          url      = "dummy-url"
         }
 
         model Test {
@@ -130,7 +129,6 @@ async fn scalar_list_defaults_work(api: &mut TestApi) -> TestResult {
 
         datasource db {
           provider = "postgresql"
-          url      = "dummy-url"
         }
 
         model defaults {
@@ -187,7 +185,6 @@ async fn index_sort_order_stopgap(api: &mut TestApi) -> TestResult {
 
         datasource db {
           provider = "postgresql"
-          url      = "dummy-url"
         }
 
         /// This model contains an index with non-default null sort order and requires additional setup for migrations. Visit https://pris.ly/d/default-index-null-ordering for more info.
@@ -288,7 +285,6 @@ async fn deferrable_stopgap(api: &mut TestApi) -> TestResult {
 
         datasource db {
           provider = "postgresql"
-          url      = "dummy-url"
         }
 
         /// This model has constraints using non-default deferring rules and requires additional setup for migrations. Visit https://pris.ly/d/constraint-deferring for more info.
@@ -384,7 +380,6 @@ async fn commenting_stopgap(api: &mut TestApi) -> TestResult {
 
         datasource db {
           provider = "postgresql"
-          url      = "dummy-url"
         }
 
         /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments

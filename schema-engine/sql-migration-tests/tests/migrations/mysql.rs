@@ -2,7 +2,7 @@
 
 use indoc::indoc;
 use psl::{SourceFile, parser_database::NoExtensionTypes};
-use schema_core::{json_rpc::types::*, schema_connector};
+use schema_core::{DatasourceUrls, json_rpc::types::*, schema_connector};
 use sql_migration_tests::test_api::*;
 use std::fmt::Write as _;
 
@@ -430,7 +430,6 @@ fn dropping_m2m_relation_from_datamodel_works() {
     let schema = r#"
         datasource db {
             provider = "mysql"
-            url = env("DBURL")
         }
 
         model Puppy {
@@ -449,7 +448,6 @@ fn dropping_m2m_relation_from_datamodel_works() {
     let schema2 = r#"
         datasource db {
             provider = "mysql"
-            url = env("DBURL")
         }
 
         model Puppy {
@@ -468,24 +466,27 @@ fn dropping_m2m_relation_from_datamodel_works() {
     let path = super::diff::write_file_to_tmp(schema, &tmpdir, "schema.prisma");
     let path2 = super::diff::write_file_to_tmp(schema2, &tmpdir, "schema2.prisma");
 
-    let (_result, diff) = super::diff::diff_result(DiffParams {
-        exit_code: None,
-        from: DiffTarget::SchemaDatamodel(SchemasContainer {
-            files: vec![SchemaContainer {
-                path: path.to_str().unwrap().to_owned(),
-                content: schema.to_string(),
-            }],
-        }),
-        to: DiffTarget::SchemaDatamodel(SchemasContainer {
-            files: vec![SchemaContainer {
-                path: path2.to_str().unwrap().to_owned(),
-                content: schema2.to_string(),
-            }],
-        }),
-        script: true,
-        shadow_database_url: None,
-        filters: SchemaFilter::default(),
-    });
+    let (_result, diff) = super::diff::diff_result(
+        DatasourceUrls::from_url("mysql://unused"),
+        DiffParams {
+            exit_code: None,
+            from: DiffTarget::SchemaDatamodel(SchemasContainer {
+                files: vec![SchemaContainer {
+                    path: path.to_str().unwrap().to_owned(),
+                    content: schema.to_string(),
+                }],
+            }),
+            to: DiffTarget::SchemaDatamodel(SchemasContainer {
+                files: vec![SchemaContainer {
+                    path: path2.to_str().unwrap().to_owned(),
+                    content: schema2.to_string(),
+                }],
+            }),
+            script: true,
+            shadow_database_url: None,
+            filters: SchemaFilter::default(),
+        },
+    );
 
     let expected = expect![[r#"
         -- DropForeignKey
@@ -613,7 +614,6 @@ fn bigint_defaults_work(api: TestApi) {
     let schema = r#"
         datasource mypg {
             provider = "mysql"
-            url = "dummy-url"
         }
 
         model foo {

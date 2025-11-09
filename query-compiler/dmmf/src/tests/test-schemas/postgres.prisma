@@ -6,7 +6,6 @@ generator client {
 
 datasource db {
   provider = "postgres"
-  url      = "file:dev.db"
 }
 
 /// User model comment

@@ -5,7 +5,6 @@ generator client {
 
 datasource db {
     provider     = "postgresql"
-    url          = "dummy-url"
     relationMode = "prisma"
     schemas      = ["one", "two"]
 }

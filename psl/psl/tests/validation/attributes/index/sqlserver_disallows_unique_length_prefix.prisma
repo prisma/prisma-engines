@@ -1,6 +1,5 @@
 datasource test {
     provider = "sqlserver"
-    url = "dummy-url"
 }
 
 model A {
@@ -8,8 +7,8 @@ model A {
 }
 
 // [1;91merror[0m: [1mError parsing attribute "@unique": The length argument is not supported in an index definition with the current connector[0m
-//   [1;94m-->[0m  [4mschema.prisma:7[0m
+//   [1;94m-->[0m  [4mschema.prisma:6[0m
 // [1;94m   | [0m
-// [1;94m 6 | [0mmodel A {
-// [1;94m 7 | [0m  id String [1;91m@unique(length: 30)[0m @test.VarChar(255)
+// [1;94m 5 | [0mmodel A {
+// [1;94m 6 | [0m  id String [1;91m@unique(length: 30)[0m @test.VarChar(255)
 // [1;94m   | [0m

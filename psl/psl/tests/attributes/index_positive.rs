@@ -65,7 +65,6 @@ fn the_map_argument_must_work() {
     let dml = r#"
         datasource test {
             provider = "postgres"
-            url = "postgresql://"
         }
 
         model User {

@@ -49,7 +49,7 @@ pub trait ConnectorTagInterface {
 /// The connection string to use to connect to the test database and version.
 /// - `test_database` is the database to connect to, which is an implementation detail of the
 ///   implementing connector, like a file or a schema.
-pub(crate) fn connection_string(
+pub fn connection_string(
     version: &ConnectorVersion,
     database: &str,
     is_multi_schema: bool,

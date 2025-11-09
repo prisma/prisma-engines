@@ -101,7 +101,6 @@ mod tests {
         let schema = indoc! {r#"
             datasource db {
               provider = "postgresql"
-              url      = env("DATABASE_URL")
             }
 
             generator client {
@@ -119,8 +118,8 @@ mod tests {
             [
               {
                 "file_name": "schema.prisma",
-                "start": 146,
-                "end": 160,
+                "start": 113,
+                "end": 127,
                 "text": "Preview feature \"createMany\" is deprecated. The functionality can be used without specifying it as a preview feature.",
                 "is_warning": true
               }
@@ -134,7 +133,6 @@ mod tests {
         let schema1 = indoc! {r#"
             datasource db {
               provider = "postgresql"
-              url      = env("DATABASE_URL")
             }
 
             generator client {
@@ -158,8 +156,8 @@ mod tests {
             [
               {
                 "file_name": "schema1.prisma",
-                "start": 146,
-                "end": 160,
+                "start": 113,
+                "end": 127,
                 "text": "Preview feature \"createMany\" is deprecated. The functionality can be used without specifying it as a preview feature.",
                 "is_warning": true
               }

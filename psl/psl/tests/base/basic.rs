@@ -262,7 +262,6 @@ fn must_return_good_error_message_for_type_match() {
 
         datasource db {
           provider   = "postgresql"
-          url        = "dummy-url"
           extensions = [citext, pg_trgm]
         }
 

@@ -1,12 +1,11 @@
 datasource testds {
     provider = "mysql"
-    url = "mysql://testurl"
     shadowDatabaseUrl = "mysql://testurl"
 }
 
 // [1;91merror[0m: [1mThe datasource property `shadowDatabaseUrl` is no longer supported in schema files. Move connection URLs to `prisma.config.ts`. See https://pris.ly/d/config-datasource[0m
-//   [1;94m-->[0m  [4mschema.prisma:4[0m
+//   [1;94m-->[0m  [4mschema.prisma:3[0m
 // [1;94m   | [0m
-// [1;94m 3 | [0m    url = "mysql://testurl"
-// [1;94m 4 | [0m    [1;91mshadowDatabaseUrl = "mysql://testurl"[0m
+// [1;94m 2 | [0m    provider = "mysql"
+// [1;94m 3 | [0m    [1;91mshadowDatabaseUrl = "mysql://testurl"[0m
 // [1;94m   | [0m

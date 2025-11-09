@@ -1691,7 +1691,6 @@ async fn re_introspecting_with_schemas_property(api: &mut TestApi) -> TestResult
 
          datasource myds {
            provider = "postgresql"
-           url      = env("DATABASE_URL")
            schemas  = ["first", "second"]
          }
     "#};
@@ -1706,7 +1705,6 @@ async fn re_introspecting_with_schemas_property(api: &mut TestApi) -> TestResult
 
         datasource myds {
           provider = "postgresql"
-          url      = env("DATABASE_URL")
           schemas  = ["first", "second"]
         }
 

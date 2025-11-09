@@ -5,7 +5,6 @@ generator client {
 
 datasource d<|>b {
 provider = "mongodb"
-url      = env("DATABASE_URL")
 }
 
 enum Pet {

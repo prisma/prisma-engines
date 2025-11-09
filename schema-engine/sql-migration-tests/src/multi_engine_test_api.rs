@@ -94,6 +94,11 @@ impl TestApi {
         &self.connection_string
     }
 
+    /// The connection string for the shadow database associated with the test.
+    pub fn shadow_database_connection_string(&self) -> Option<&str> {
+        self.args.shadow_database_url()
+    }
+
     /// The ConnectionInfo based on the connection string
     pub fn connection_info(&self) -> ConnectionInfo {
         ConnectionInfo::from_url(self.connection_string()).unwrap()
@@ -106,7 +111,7 @@ impl TestApi {
 
     /// Render a valid datasource block, including database URL.
     pub fn datasource_block(&self) -> DatasourceBlock<'_> {
-        self.args.datasource_block(self.args.database_url(), &[], &[])
+        self.args.datasource_block(&[], &[])
     }
 
     /// Returns true only when testing on MSSQL.
@@ -259,12 +264,7 @@ impl TestApi {
 
     /// Render a valid datasource block, including database URL.
     pub fn write_datasource_block(&self, out: &mut dyn std::fmt::Write) {
-        write!(
-            out,
-            "{}",
-            self.args.datasource_block(self.args.database_url(), &[], &[])
-        )
-        .unwrap()
+        write!(out, "{}", self.args.datasource_block(&[], &[])).unwrap()
     }
 
     /// Currently enabled preview features.

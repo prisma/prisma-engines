@@ -64,7 +64,6 @@ mod tests {
         let schema = r#"
         datasource db {
             provider = "postgresql"
-            url = env("DBURL")
         }
 
         model Lööps {
@@ -104,29 +103,13 @@ mod tests {
     }
 
     #[test]
-    fn validate_missing_env_var() {
-        let schema = r#"
-            datasource thedb {
-                provider = "postgresql"
-                url = env("NON_EXISTING_ENV_VAR_WE_COUNT_ON_IT_AT_LEAST")
-            }
-        "#;
-
-        let request = json!({
-            "prismaSchema": schema,
-        });
-
-        let response = validate(&request.to_string());
-        assert!(response.is_ok())
-    }
-
-    #[test]
-    fn validate_direct_url_direct_empty() {
+    fn validate_url_not_allowed() {
         let schema = r#"
             datasource thedb {
                 provider = "postgresql"
                 url = env("DBURL")
-                directUrl = ""
+                directUrl = env("DBURL")
+                shadowDatabaseUrl = env("DBURL")
             }
         "#;
 
@@ -135,7 +118,7 @@ mod tests {
         });
 
         let expected = expect![[
-            r#"{"error_code":"P1012","message":"\u001b[1;91merror\u001b[0m: \u001b[1mThe datasource property `directUrl` is no longer supported in schema files. Move connection URLs to `prisma.config.ts`. See https://pris.ly/d/config-datasource\u001b[0m\n  \u001b[1;94m-->\u001b[0m  \u001b[4mschema.prisma:5\u001b[0m\n\u001b[1;94m   | \u001b[0m\n\u001b[1;94m 4 | \u001b[0m                url = env(\"DBURL\")\n\u001b[1;94m 5 | \u001b[0m                \u001b[1;91mdirectUrl = \"\"\u001b[0m\n\u001b[1;94m   | \u001b[0m\n\nValidation Error Count: 1"}"#
+            r#"{"error_code":"P1012","message":"\u001b[1;91merror\u001b[0m: \u001b[1mThe datasource property `url` is no longer supported in schema files. Move connection URLs for Migrate to `prisma.config.ts` and pass either `adapter` for a direct database connection or `accelerateUrl` for Accelerate to the `PrismaClient` constructor. See https://pris.ly/d/config-datasource and https://pris.ly/d/prisma7-client-config\u001b[0m\n  \u001b[1;94m-->\u001b[0m  \u001b[4mschema.prisma:4\u001b[0m\n\u001b[1;94m   | \u001b[0m\n\u001b[1;94m 3 | \u001b[0m                provider = \"postgresql\"\n\u001b[1;94m 4 | \u001b[0m                \u001b[1;91murl = env(\"DBURL\")\u001b[0m\n\u001b[1;94m   | \u001b[0m\n\u001b[1;91merror\u001b[0m: \u001b[1mThe datasource property `shadowDatabaseUrl` is no longer supported in schema files. Move connection URLs to `prisma.config.ts`. See https://pris.ly/d/config-datasource\u001b[0m\n  \u001b[1;94m-->\u001b[0m  \u001b[4mschema.prisma:6\u001b[0m\n\u001b[1;94m   | \u001b[0m\n\u001b[1;94m 5 | \u001b[0m                directUrl = env(\"DBURL\")\n\u001b[1;94m 6 | \u001b[0m                \u001b[1;91mshadowDatabaseUrl = env(\"DBURL\")\u001b[0m\n\u001b[1;94m   | \u001b[0m\n\u001b[1;91merror\u001b[0m: \u001b[1mThe datasource property `directUrl` is no longer supported in schema files. Move connection URLs to `prisma.config.ts`. See https://pris.ly/d/config-datasource\u001b[0m\n  \u001b[1;94m-->\u001b[0m  \u001b[4mschema.prisma:5\u001b[0m\n\u001b[1;94m   | \u001b[0m\n\u001b[1;94m 4 | \u001b[0m                url = env(\"DBURL\")\n\u001b[1;94m 5 | \u001b[0m                \u001b[1;91mdirectUrl = env(\"DBURL\")\u001b[0m\n\u001b[1;94m   | \u001b[0m\n\nValidation Error Count: 3"}"#
         ]];
 
         let response = validate(&request.to_string()).unwrap_err();
@@ -150,7 +133,6 @@ mod tests {
                 r#"
                 datasource thedb {
                     provider = "postgresql"
-                    url = env("DBURL")
                 }
 
                 model A {
@@ -186,7 +168,6 @@ mod tests {
                 r#"
                 datasource thedb {
                     provider = "postgresql"
-                    url = env("DBURL")
                 }
 
                 model A {
@@ -224,7 +205,6 @@ mod tests {
         let schema = r#"
           datasource db {
               provider = "sqlite"
-              url = "sqlite"
               relationMode = "prisma"
               referentialIntegrity = "foreignKeys"
           }
@@ -235,7 +215,7 @@ mod tests {
         });
 
         let expected = expect![[
-            r#"{"error_code":"P1012","message":"\u001b[1;91merror\u001b[0m: \u001b[1mThe `referentialIntegrity` and `relationMode` attributes cannot be used together. Please use only `relationMode` instead.\u001b[0m\n  \u001b[1;94m-->\u001b[0m  \u001b[4mschema.prisma:6\u001b[0m\n\u001b[1;94m   | \u001b[0m\n\u001b[1;94m 5 | \u001b[0m              relationMode = \"prisma\"\n\u001b[1;94m 6 | \u001b[0m              \u001b[1;91mreferentialIntegrity = \"foreignKeys\"\u001b[0m\n\u001b[1;94m   | \u001b[0m\n\nValidation Error Count: 1"}"#
+            r#"{"error_code":"P1012","message":"\u001b[1;91merror\u001b[0m: \u001b[1mThe `referentialIntegrity` and `relationMode` attributes cannot be used together. Please use only `relationMode` instead.\u001b[0m\n  \u001b[1;94m-->\u001b[0m  \u001b[4mschema.prisma:5\u001b[0m\n\u001b[1;94m   | \u001b[0m\n\u001b[1;94m 4 | \u001b[0m              relationMode = \"prisma\"\n\u001b[1;94m 5 | \u001b[0m              \u001b[1;91mreferentialIntegrity = \"foreignKeys\"\u001b[0m\n\u001b[1;94m   | \u001b[0m\n\nValidation Error Count: 1"}"#
         ]];
 
         let response = validate(&request.to_string()).unwrap_err();

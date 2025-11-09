@@ -18,15 +18,13 @@ async fn introspecting_cockroach_db_with_postgres_provider_fails(api: TestApi) {
        );
     "#;
 
-    let schema = format!(
+    let schema = indoc!(
         r#"
-        datasource mypg {{
+        datasource mypg {
             provider = "postgresql"
-            url = "{}"
-        }}
+        }
 
     "#,
-        api.connection_string()
     );
 
     api.raw_cmd(setup).await;
@@ -205,7 +203,6 @@ async fn scalar_list_defaults_work_on_22_1(api: &mut TestApi) -> TestResult {
 
         datasource db {
           provider = "cockroachdb"
-          url      = "dummy-url"
         }
 
         model defaults {
@@ -259,7 +256,6 @@ async fn scalar_list_defaults_work_on_22_2(api: &mut TestApi) -> TestResult {
 
         datasource db {
           provider = "cockroachdb"
-          url      = "dummy-url"
         }
 
         model defaults {
@@ -322,7 +318,6 @@ async fn string_col_with_length(api: &mut TestApi) -> TestResult {
 
         datasource db {
           provider = "cockroachdb"
-          url      = "dummy-url"
         }
 
         model Post {
@@ -377,7 +372,6 @@ async fn row_level_ttl_stopgap(api: &mut TestApi) -> TestResult {
 
         datasource db {
           provider = "cockroachdb"
-          url      = "dummy-url"
         }
 
         /// This model is using a row level TTL in the database, and requires an additional setup in migrations. Read more: https://pris.ly/d/row-level-ttl
@@ -444,7 +438,6 @@ async fn commenting_stopgap(api: &mut TestApi) -> TestResult {
 
         datasource db {
           provider = "cockroachdb"
-          url      = "dummy-url"
         }
 
         /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments

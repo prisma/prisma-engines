@@ -7,7 +7,6 @@ fn should_set_default_for_all_scalar_types() {
     let dml = indoc! {r#"
         datasource test {
           provider = "postgresql"
-          url = "postgresql://"
         }
 
         generator js {
@@ -148,7 +147,6 @@ fn named_default_constraints_should_work_on_sql_server() {
     let dml = indoc! { r#"
         datasource test {
           provider = "sqlserver"
-          url = "sqlserver://"
         }
 
         generator js {
@@ -207,7 +205,6 @@ fn mongodb_auto_id() {
     let dml = indoc! {r#"
         datasource db {
           provider = "mongodb"
-          url = env("DATABASE_URL")
         }
 
         model a {
@@ -228,7 +225,6 @@ fn scalar_list_defaults_with_decimal() {
     let dml = indoc! {r#"
         datasource db {
           provider = "postgresql"
-          url = "postgres://"
         }
 
         enum Color {
@@ -261,7 +257,6 @@ fn scalar_list_defaults_with_composite_types() {
     let dml = indoc! {r#"
         datasource db {
           provider = "mongodb"
-          url = "mongodb://"
         }
 
         enum Color {

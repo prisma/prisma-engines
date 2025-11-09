@@ -32,7 +32,6 @@ async fn check_constraints_stopgap(api: &mut TestApi) -> TestResult {
 
         datasource db {
           provider = "mysql"
-          url      = "dummy-url"
         }
 
         model some_user {

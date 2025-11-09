@@ -1,6 +1,5 @@
 datasource test {
     provider = "postgresql"
-    url = "dummy-url"
 }
 
 model Post {
@@ -11,14 +10,14 @@ model Post {
 }
 
 // [1;91merror[0m: [1mExpected a constant value, but received string value `"Desc"`.[0m
-//   [1;94m-->[0m  [4mschema.prisma:8[0m
+//   [1;94m-->[0m  [4mschema.prisma:7[0m
 // [1;94m   | [0m
-// [1;94m 7 | [0m  title      String   @db.VarChar(300)
-// [1;94m 8 | [0m  slug       String   @unique(sort: [1;91m"Desc"[0m, length: 42) @db.VarChar(3000)
+// [1;94m 6 | [0m  title      String   @db.VarChar(300)
+// [1;94m 7 | [0m  slug       String   @unique(sort: [1;91m"Desc"[0m, length: 42) @db.VarChar(3000)
 // [1;94m   | [0m
 // [1;91merror[0m: [1mExpected a constant value, but received string value `"Desc"`.[0m
-//   [1;94m-->[0m  [4mschema.prisma:10[0m
+//   [1;94m-->[0m  [4mschema.prisma:9[0m
 // [1;94m   | [0m
-// [1;94m 9 | [0m
-// [1;94m10 | [0m  @@unique([title(length: 100, sort: [1;91m"Desc"[0m)])
+// [1;94m 8 | [0m
+// [1;94m 9 | [0m  @@unique([title(length: 100, sort: [1;91m"Desc"[0m)])
 // [1;94m   | [0m

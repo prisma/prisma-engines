@@ -28,7 +28,6 @@ async fn simple_view_from_one_table(api: &mut TestApi) -> TestResult {
 
         datasource db {
           provider = "sqlserver"
-          url      = "dummy-url"
         }
 
         model A {
@@ -77,7 +76,6 @@ async fn simple_view_with_cte(api: &mut TestApi) -> TestResult {
 
         datasource db {
           provider = "sqlserver"
-          url      = "dummy-url"
         }
 
         view A {
@@ -142,7 +140,6 @@ async fn simple_view_from_two_tables(api: &mut TestApi) -> TestResult {
 
         datasource db {
           provider = "sqlserver"
-          url      = "dummy-url"
         }
 
         model A {
@@ -248,7 +245,6 @@ async fn views_cannot_have_default_values(api: &mut TestApi) -> TestResult {
 
         datasource db {
           provider = "sqlserver"
-          url      = "dummy-url"
         }
 
         model A {

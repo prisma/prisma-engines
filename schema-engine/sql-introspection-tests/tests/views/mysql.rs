@@ -23,7 +23,6 @@ async fn simple_view_from_one_table(api: &mut TestApi) -> TestResult {
 
         datasource db {
           provider = "mysql"
-          url      = "dummy-url"
         }
 
         model A {
@@ -90,7 +89,6 @@ async fn simple_view_from_two_tables(api: &mut TestApi) -> TestResult {
 
         datasource db {
           provider = "mysql"
-          url      = "dummy-url"
         }
 
         model Profile {
@@ -188,7 +186,6 @@ async fn defaults_are_introspected(api: &mut TestApi) -> TestResult {
 
         datasource db {
           provider = "mysql"
-          url      = "dummy-url"
         }
 
         model A {
@@ -228,7 +225,6 @@ async fn views_are_rendered_with_enums(api: &mut TestApi) -> TestResult {
 
         datasource db {
           provider = "mysql"
-          url      = "dummy-url"
         }
 
         model A {
@@ -303,7 +299,6 @@ async fn invalid_field_names_trigger_warnings(api: &mut TestApi) -> TestResult {
 
         datasource db {
           provider = "mysql"
-          url      = "dummy-url"
         }
 
         /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.

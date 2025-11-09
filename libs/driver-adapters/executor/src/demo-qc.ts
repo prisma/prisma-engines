@@ -27,7 +27,6 @@ async function main(): Promise<void> {
 
     datasource db {
       provider = "sqlite"
-      url      = "file:./db.sqlite"
     }
 
     model User {

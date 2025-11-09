@@ -10,7 +10,12 @@ pub(super) fn render<'a>(
     schema: &'a SqlSchema,
     force_namespaces: Option<&'a [String]>,
 ) -> render::Configuration<'a> {
-    let prev_ds = previous_schema.configuration.first_datasource();
+    let prev_ds = previous_schema
+        .configuration
+        .datasources
+        .first()
+        .expect("Expected a datasource to exist.");
+
     let prev_ds_file_name = previous_schema.db.file_name(prev_ds.span.file_id);
 
     let mut output = render::Configuration::default();
