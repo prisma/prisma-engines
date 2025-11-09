@@ -1,5 +1,6 @@
 use super::error_tests::connection_error;
 use expect_test::expect;
+use indoc::indoc;
 use sql_migration_tests::multi_engine_test_api::*;
 use test_macros::test_connector;
 use url::Url;
@@ -14,16 +15,15 @@ fn database_access_denied_must_return_a_proper_error_in_rpc(api: TestApi) {
     url.set_password(Some("1234")).unwrap();
     url.set_path("/access_denied_test");
 
-    let dm = format!(
+    let dm = indoc!(
         r#"
-            datasource db {{
+            datasource db {
               provider = "mysql"
-              url      = "{url}"
-            }}
+            }
         "#,
     );
 
-    let error = tok(connection_error(dm));
+    let error = tok(connection_error(url.as_str(), dm.to_owned()));
     let json_error = serde_json::to_string_pretty(&error.to_user_facing()).unwrap();
 
     let expected = expect![[r#"

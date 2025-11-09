@@ -185,13 +185,11 @@ impl TestApiArgs {
 
     pub fn datasource_block<'a>(
         &'a self,
-        url: &'a str,
         params: &'a [(&'a str, &'a str)],
         preview_features: &'static [&'static str],
     ) -> DatasourceBlock<'a> {
         DatasourceBlock {
             provider: self.db.provider,
-            url,
             params,
             preview_features,
         }
@@ -201,7 +199,7 @@ impl TestApiArgs {
         self.db.provider
     }
 
-    pub fn shadow_database_url(&self) -> Option<&'static str> {
+    pub fn shadow_database_url(&self) -> Option<&str> {
         self.db.shadow_database_url.as_deref()
     }
 
@@ -216,16 +214,10 @@ impl TestApiArgs {
 
 pub struct DatasourceBlock<'a> {
     provider: &'a str,
-    url: &'a str,
     params: &'a [(&'a str, &'a str)],
     preview_features: &'static [&'static str],
 }
 
-impl DatasourceBlock<'_> {
-    pub fn url(&self) -> &str {
-        self.url
-    }
-}
 fn generator_block(preview_features: &'static [&'static str]) -> String {
     let preview_features: Vec<String> = preview_features.iter().map(|pf| format!(r#""{pf}""#)).collect();
 
@@ -251,8 +243,6 @@ impl Display for DatasourceBlock<'_> {
 
         f.write_str("datasource db {\n    provider = \"")?;
         f.write_str(self.provider)?;
-        f.write_str("\"\n    url = \"")?;
-        f.write_str(self.url)?;
         f.write_str("\"\n")?;
 
         for (param_name, param_value) in self.params {

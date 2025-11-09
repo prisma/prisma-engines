@@ -5,7 +5,6 @@ fn enum_support() {
     let dml = indoc! {r#"
         datasource db {
           provider = "sqlite"
-          url = "file:test.db"
         }
 
         model Todo {
@@ -27,7 +26,6 @@ fn json_support() {
     let dml = indoc! {r#"
         datasource db {
           provider = "sqlite"
-          url = "file:test.db"
         }
         model User {
           id   Int @id
@@ -43,7 +41,6 @@ fn scalar_list_support() {
     let dml = indoc! {r#"
         datasource db {
           provider = "sqlite"
-          url = "file:test.db"
         }
 
         model Todo {
@@ -56,11 +53,11 @@ fn scalar_list_support() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mField "val" in model "Todo" can't be a list. The current connector does not support lists of primitive types.[0m
-          [1;94m-->[0m  [4mschema.prisma:8[0m
+          [1;94m-->[0m  [4mschema.prisma:7[0m
         [1;94m   | [0m
-        [1;94m 7 | [0m  id     Int    @id
-        [1;94m 8 | [0m  [1;91mval    String[][0m
-        [1;94m 9 | [0m}
+        [1;94m 6 | [0m  id     Int    @id
+        [1;94m 7 | [0m  [1;91mval    String[][0m
+        [1;94m 8 | [0m}
         [1;94m   | [0m
     "#]];
 
@@ -72,7 +69,6 @@ fn unique_index_names_support() {
     let dml = indoc! {r#"
         datasource db {
           provider = "sqlite"
-          url = "file:test.db"
         }
 
         model User {
@@ -94,16 +90,16 @@ fn unique_index_names_support() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@index": The given constraint name `metaId` has to be unique in the following namespace: global for indexes and unique constraints. Please provide a different name using the `map` argument.[0m
-          [1;94m-->[0m  [4mschema.prisma:10[0m
+          [1;94m-->[0m  [4mschema.prisma:9[0m
         [1;94m   | [0m
-        [1;94m 9 | [0m
-        [1;94m10 | [0m  @@index([id], [1;91mname: "metaId"[0m)
+        [1;94m 8 | [0m
+        [1;94m 9 | [0m  @@index([id], [1;91mname: "metaId"[0m)
         [1;94m   | [0m
         [1;91merror[0m: [1mError parsing attribute "@@index": The given constraint name `metaId` has to be unique in the following namespace: global for indexes and unique constraints. Please provide a different name using the `map` argument.[0m
-          [1;94m-->[0m  [4mschema.prisma:17[0m
+          [1;94m-->[0m  [4mschema.prisma:16[0m
         [1;94m   | [0m
-        [1;94m16 | [0m
-        [1;94m17 | [0m  @@index([id], [1;91mname: "metaId"[0m)
+        [1;94m15 | [0m
+        [1;94m16 | [0m  @@index([id], [1;91mname: "metaId"[0m)
         [1;94m   | [0m
     "#]];
 
@@ -115,7 +111,6 @@ fn non_unique_relation_criteria_support() {
     let dml = indoc! {r#"
         datasource db {
           provider = "sqlite"
-          url = "file:test.db"
         }
 
         model Todo {
@@ -135,11 +130,11 @@ fn non_unique_relation_criteria_support() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@relation": The argument `references` must refer to a unique criterion in the related model. Consider adding an `@unique` attribute to the field `name` in the model `User`.[0m
-          [1;94m-->[0m  [4mschema.prisma:9[0m
+          [1;94m-->[0m  [4mschema.prisma:8[0m
         [1;94m   | [0m
-        [1;94m 8 | [0m  assigneeName String
-        [1;94m 9 | [0m  [1;91massignee     User   @relation(fields: [assigneeName], references: [name])[0m
-        [1;94m10 | [0m}
+        [1;94m 7 | [0m  assigneeName String
+        [1;94m 8 | [0m  [1;91massignee     User   @relation(fields: [assigneeName], references: [name])[0m
+        [1;94m 9 | [0m}
         [1;94m   | [0m
     "#]];
 
@@ -151,7 +146,6 @@ fn auto_increment_on_non_primary_column_support() {
     let dml = indoc! {r#"
         datasource db {
           provider = "sqlite"
-          url = "file:test.db"
         }
 
         model Todo {
@@ -164,11 +158,11 @@ fn auto_increment_on_non_primary_column_support() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@default": The `autoincrement()` default value is used on a non-id field even though the datasource does not support this.[0m
-          [1;94m-->[0m  [4mschema.prisma:8[0m
+          [1;94m-->[0m  [4mschema.prisma:7[0m
         [1;94m   | [0m
-        [1;94m 7 | [0m  id           Int    @id
-        [1;94m 8 | [0m  [1;91mnon_primary  Int    @default(autoincrement()) @unique[0m
-        [1;94m 9 | [0m}
+        [1;94m 6 | [0m  id           Int    @id
+        [1;94m 7 | [0m  [1;91mnon_primary  Int    @default(autoincrement()) @unique[0m
+        [1;94m 8 | [0m}
         [1;94m   | [0m
     "#]];
 
@@ -180,7 +174,6 @@ fn key_order_enforcement_support() {
     let dml = indoc! {r#"
         datasource db {
           provider = "sqlite"
-          url = "file:test.db"
         }
 
         model  Todo {
@@ -209,7 +202,6 @@ fn sqlite_does_not_support_composite_types() {
         r#"
         datasource db {
             provider = "sqlite"
-            url = "file:dev.db"
         }
 
         type Address {
@@ -222,12 +214,12 @@ fn sqlite_does_not_support_composite_types() {
 
     let expected = expect![[r#"
         [1;91merror[0m: [1mError validating: Composite types are not supported on sqlite.[0m
-          [1;94m-->[0m  [4mschema.prisma:6[0m
+          [1;94m-->[0m  [4mschema.prisma:5[0m
         [1;94m   | [0m
-        [1;94m 5 | [0m
-        [1;94m 6 | [0m[1;91mtype Address {[0m
-        [1;94m 7 | [0m    street String
-        [1;94m 8 | [0m}
+        [1;94m 4 | [0m
+        [1;94m 5 | [0m[1;91mtype Address {[0m
+        [1;94m 6 | [0m    street String
+        [1;94m 7 | [0m}
         [1;94m   | [0m
     "#]];
 

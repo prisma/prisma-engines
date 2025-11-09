@@ -45,7 +45,6 @@ fn converting_composite_types_compound() {
         r#"
         datasource db {
             provider = "mongodb"
-            url      = "mongodb://localhost:27017/hello"
         }
 
         model Post {
@@ -79,7 +78,6 @@ fn converting_composite_types_compound_unique() {
         r#"
         datasource db {
             provider = "mongodb"
-            url      = "mongodb://localhost:27017/hello"
         }
 
         model Post {
@@ -117,7 +115,6 @@ fn converting_composite_types_nested() {
         r#"
         datasource db {
             provider = "mongodb"
-            url      = "mongodb://localhost:27017/hello"
         }
 
         type TheatersLocation {
@@ -157,7 +154,6 @@ fn converting_composite_types_nested_scalar() {
         r#"
         datasource db {
             provider = "mongodb"
-            url      = "mongodb://localhost:27017/hello"
         }
 
         type TheatersLocation {
@@ -198,7 +194,6 @@ fn models_with_only_scalar_fields() {
         r#"
             datasource mydb {
                 provider = "postgres"
-                url = "postgresql://localhost:5432"
             }
 
             model Test {
@@ -286,7 +281,6 @@ fn scalar_lists_work() {
         r#"
             datasource pg {
                 provider = "postgres"
-                url = "postgres://localhost/postgres"
             }
 
             model Test {

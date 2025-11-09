@@ -1,7 +1,7 @@
 use std::sync::Arc;
 
 use crate::{
-    SchemaContainerExt,
+    DatasourceUrls, SchemaContainerExt,
     core_error::CoreResult,
     json_rpc::types::{DiffParams, DiffResult, DiffTarget, UrlContainer},
 };
@@ -15,8 +15,8 @@ use sql_schema_connector::SqlSchemaConnector;
 
 pub async fn diff_cli(
     params: DiffParams,
+    datasource_urls: &DatasourceUrls,
     host: Arc<dyn ConnectorHost>,
-    datasource_urls_override: Option<&psl::DatasourceUrls>,
     extension_types: &dyn ExtensionTypes,
 ) -> CoreResult<DiffResult> {
     // In order to properly handle MultiSchema, we need to make sure the preview feature is
@@ -31,21 +31,21 @@ pub async fn diff_cli(
 
     let from = json_rpc_diff_target_to_dialect(
         &params.from,
+        datasource_urls,
         params.shadow_database_url.as_deref(),
         namespaces.clone(),
         &filter,
         preview_features,
-        datasource_urls_override,
         extension_types,
     )
     .await?;
     let to = json_rpc_diff_target_to_dialect(
         &params.to,
+        datasource_urls,
         params.shadow_database_url.as_deref(),
         namespaces,
         &filter,
         preview_features,
-        datasource_urls_override,
         extension_types,
     )
     .await?;
@@ -129,13 +129,19 @@ fn namespaces_and_preview_features_from_diff_targets(
 // `None` in case the target is empty
 async fn json_rpc_diff_target_to_dialect(
     target: &DiffTarget,
+    datasource_urls: &DatasourceUrls,
     shadow_database_url: Option<&str>, // TODO: delete the parameter
     namespaces: Option<Namespaces>,
     filter: &SchemaFilter,
     preview_features: BitFlags<psl::PreviewFeature>,
-    datasource_urls_override: Option<&psl::DatasourceUrls>,
     extension_types: &dyn ExtensionTypes,
 ) -> CoreResult<Option<(Box<dyn SchemaDialect>, DatabaseSchema)>> {
+    let datasource_urls = if let Some(shadow_database_url) = shadow_database_url {
+        &DatasourceUrls::from_url_and_shadow_database_url(&datasource_urls.url, shadow_database_url)
+    } else {
+        datasource_urls
+    };
+
     match target {
         DiffTarget::Empty => Ok(None),
         DiffTarget::SchemaDatasource(schemas) => {
@@ -145,7 +151,7 @@ async fn json_rpc_diff_target_to_dialect(
             // actually, just use the given `connector`. Verify that the provider is the same
             // as the one assumed by the connector.
 
-            let mut connector = crate::schema_to_connector(&sources, datasource_urls_override, Some(config_dir))?;
+            let mut connector = crate::schema_to_connector(&sources, datasource_urls, Some(config_dir))?;
             connector.ensure_connection_validity().await?;
             connector.set_preview_features(preview_features);
             filter.validate(&*connector.schema_dialect())?;
@@ -158,13 +164,13 @@ async fn json_rpc_diff_target_to_dialect(
 
             // Connector only needed to infer the default namespace.
             // If connector cannot be created (e.g. due to invalid or missing URL) we use the dialect's default namespace.
-            let (default_namespace, dialect) = match crate::schema_to_connector(&sources, None, None) {
+            let (default_namespace, dialect) = match crate::schema_to_connector(&sources, datasource_urls, None) {
                 Ok(connector) => (
                     connector.default_runtime_namespace().map(|ns| ns.to_string()),
                     connector.schema_dialect(),
                 ),
                 Err(_) => {
-                    let dialect = crate::schema_to_dialect(&sources)?;
+                    let dialect = crate::schema_to_dialect(&sources, datasource_urls)?;
                     (dialect.default_namespace().map(|ns| ns.to_string()), dialect)
                 }
             };
@@ -193,7 +199,8 @@ async fn json_rpc_diff_target_to_dialect(
         DiffTarget::Migrations(migration_list) => {
             let provider =
                 schema_connector::migrations_directory::read_provider_from_lock_file(&migration_list.lockfile);
-            match (provider.as_deref(), shadow_database_url) {
+
+            match (provider.as_deref(), datasource_urls.shadow_database_url.as_deref()) {
                 (Some(provider), Some(shadow_database_url)) => {
                     let dialect = ::commands::dialect_for_provider(provider)?;
                     let migrations = Migrations::from_migration_list(migration_list);
@@ -225,7 +232,7 @@ async fn json_rpc_diff_target_to_dialect(
                     Ok(Some((connector.schema_dialect(), schema)))
                 }
                 (Some(_), None) => Err(ConnectorError::from_msg(
-                    "You must pass the --shadow-database-url if you want to diff a migrations directory.".to_owned(),
+                    "You must pass the `--shadow-database-url` flag or set `datasource.shadowDatabaseUrl` in your `prisma.config.ts` if you want to diff a migrations directory.".to_owned(),
                 )),
                 (None, _) => Err(ConnectorError::from_msg(
                     "Could not determine the connector from the migrations directory (missing migration_lock.toml)."

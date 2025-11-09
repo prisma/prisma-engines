@@ -16,10 +16,10 @@ fn not_allowed_with_unique() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mNo such argument.[0m
-          [1;94m-->[0m  [4mschema.prisma:13[0m
+          [1;94m-->[0m  [4mschema.prisma:12[0m
         [1;94m   | [0m
-        [1;94m12 | [0m  id Int @id
-        [1;94m13 | [0m  a  Int @unique([1;91mtype: Gist[0m)
+        [1;94m11 | [0m  id Int @id
+        [1;94m12 | [0m  a  Int @unique([1;91mtype: Gist[0m)
         [1;94m   | [0m
     "#]];
 
@@ -43,10 +43,10 @@ fn not_allowed_with_compound_unique() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mNo such argument.[0m
-          [1;94m-->[0m  [4mschema.prisma:16[0m
+          [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
-        [1;94m15 | [0m
-        [1;94m16 | [0m  @@unique([a, b], [1;91mtype: Gist[0m)
+        [1;94m14 | [0m
+        [1;94m15 | [0m  @@unique([a, b], [1;91mtype: Gist[0m)
         [1;94m   | [0m
     "#]];
 
@@ -69,10 +69,10 @@ fn on_mysql() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@index": The given index type is not supported with the current connector[0m
-          [1;94m-->[0m  [4mschema.prisma:15[0m
+          [1;94m-->[0m  [4mschema.prisma:14[0m
         [1;94m   | [0m
-        [1;94m14 | [0m
-        [1;94m15 | [0m  @@index([a(ops: raw("test_ops"))], [1;91mtype: Gist[0m)
+        [1;94m13 | [0m
+        [1;94m14 | [0m  @@index([a(ops: raw("test_ops"))], [1;91mtype: Gist[0m)
         [1;94m   | [0m
     "#]];
 
@@ -153,10 +153,10 @@ fn wrong_ops_native_type() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@index": The given operator class `InetOps` does not support native type `VarChar` of field `a`.[0m
-          [1;94m-->[0m  [4mschema.prisma:15[0m
+          [1;94m-->[0m  [4mschema.prisma:14[0m
         [1;94m   | [0m
-        [1;94m14 | [0m
-        [1;94m15 | [0m  [1;91m@@index([a(ops: InetOps)], type: Gist)[0m
+        [1;94m13 | [0m
+        [1;94m14 | [0m  [1;91m@@index([a(ops: InetOps)], type: Gist)[0m
         [1;94m   | [0m
     "#]];
 
@@ -179,10 +179,10 @@ fn wrong_ops_index_type() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@index": The given operator class `InetOps` is not supported with the `Hash` index type.[0m
-          [1;94m-->[0m  [4mschema.prisma:15[0m
+          [1;94m-->[0m  [4mschema.prisma:14[0m
         [1;94m   | [0m
-        [1;94m14 | [0m
-        [1;94m15 | [0m  [1;91m@@index([a(ops: InetOps)], type: Hash)[0m
+        [1;94m13 | [0m
+        [1;94m14 | [0m  [1;91m@@index([a(ops: InetOps)], type: Hash)[0m
         [1;94m   | [0m
     "#]];
 
@@ -205,10 +205,10 @@ fn wrong_ops_no_native_type() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@index": The given operator class `InetOps` expects the field `a` to define a valid native type.[0m
-          [1;94m-->[0m  [4mschema.prisma:15[0m
+          [1;94m-->[0m  [4mschema.prisma:14[0m
         [1;94m   | [0m
-        [1;94m14 | [0m
-        [1;94m15 | [0m  [1;91m@@index([a(ops: InetOps)], type: Gist)[0m
+        [1;94m13 | [0m
+        [1;94m14 | [0m  [1;91m@@index([a(ops: InetOps)], type: Gist)[0m
         [1;94m   | [0m
     "#]];
 

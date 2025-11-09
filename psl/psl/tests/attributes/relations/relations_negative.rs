@@ -770,10 +770,10 @@ fn mapping_foreign_keys_with_a_name_that_is_too_long_should_error() {
 
     let expect = expect![[r#"
         [1;91merror[0m: [1mError validating model "Post": The constraint name 'IfYouAreGoingToPickTheNameYourselfYouShouldReallyPickSomethingShortAndSweetInsteadOfASuperLongNameViolatingLengthLimits' specified in the `map` argument for the `@relation` constraint is too long for your chosen provider. The maximum allowed length is 63 bytes.[0m
-          [1;94m-->[0m  [4mschema.prisma:19[0m
+          [1;94m-->[0m  [4mschema.prisma:18[0m
         [1;94m   | [0m
-        [1;94m18 | [0m  user_id Int
-        [1;94m19 | [0m  user    User   [1;91m@relation(fields:[post_id], references: [id], map: "IfYouAreGoingToPickTheNameYourselfYouShouldReallyPickSomethingShortAndSweetInsteadOfASuperLongNameViolatingLengthLimits")[0m
+        [1;94m17 | [0m  user_id Int
+        [1;94m18 | [0m  user    User   [1;91m@relation(fields:[post_id], references: [id], map: "IfYouAreGoingToPickTheNameYourselfYouShouldReallyPickSomethingShortAndSweetInsteadOfASuperLongNameViolatingLengthLimits")[0m
         [1;94m   | [0m
     "#]];
 
@@ -785,7 +785,6 @@ fn mapping_foreign_keys_on_sqlite_should_error() {
     let dml = indoc! {r#"
         datasource test {
           provider = "sqlite"
-          url = "file:."
         }
 
         model User {
@@ -802,10 +801,10 @@ fn mapping_foreign_keys_on_sqlite_should_error() {
 
     let expect = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@relation": Your provider does not support named foreign keys.[0m
-          [1;94m-->[0m  [4mschema.prisma:14[0m
+          [1;94m-->[0m  [4mschema.prisma:13[0m
         [1;94m   | [0m
-        [1;94m13 | [0m  user_id Int
-        [1;94m14 | [0m  user    User   [1;91m@relation(fields:[post_id], references: [id], map: "NoNamedForeignKeysOnSQLite")[0m
+        [1;94m12 | [0m  user_id Int
+        [1;94m13 | [0m  user    User   [1;91m@relation(fields:[post_id], references: [id], map: "NoNamedForeignKeysOnSQLite")[0m
         [1;94m   | [0m
     "#]];
 
@@ -817,7 +816,6 @@ fn relation_field_in_composite_type_errors() {
     let schema = r#"
         datasource db {
             provider = "mongodb"
-            url = "mongodb://"
         }
 
         type Address {
@@ -832,10 +830,10 @@ fn relation_field_in_composite_type_errors() {
 
     let expect = expect![[r#"
         [1;91merror[0m: [1mError validating composite type "Address": Test refers to a model, making this a relation field. Relation fields inside composite types are not supported.[0m
-          [1;94m-->[0m  [4mschema.prisma:9[0m
+          [1;94m-->[0m  [4mschema.prisma:8[0m
         [1;94m   | [0m
-        [1;94m 8 | [0m            street String
-        [1;94m 9 | [0m            test [1;91mTest[0m
+        [1;94m 7 | [0m            street String
+        [1;94m 8 | [0m            test [1;91mTest[0m
         [1;94m   | [0m
     "#]];
 
@@ -847,7 +845,6 @@ fn relation_attribute_on_a_composite_field_errors() {
     let schema = r#"
         datasource db {
             provider = "mongodb"
-            url = "mongodb://"
         }
 
         type Address {
@@ -862,16 +859,16 @@ fn relation_attribute_on_a_composite_field_errors() {
 
     let expect = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@relation": Invalid field type, not a relation.[0m
-          [1;94m-->[0m  [4mschema.prisma:13[0m
+          [1;94m-->[0m  [4mschema.prisma:12[0m
         [1;94m   | [0m
-        [1;94m12 | [0m            id Int @id
-        [1;94m13 | [0m            addres Address? [1;91m@relation("TestAddress")[0m
+        [1;94m11 | [0m            id Int @id
+        [1;94m12 | [0m            addres Address? [1;91m@relation("TestAddress")[0m
         [1;94m   | [0m
         [1;91merror[0m: [1mNo such argument.[0m
-          [1;94m-->[0m  [4mschema.prisma:13[0m
+          [1;94m-->[0m  [4mschema.prisma:12[0m
         [1;94m   | [0m
-        [1;94m12 | [0m            id Int @id
-        [1;94m13 | [0m            addres Address? @relation([1;91m"TestAddress"[0m)
+        [1;94m11 | [0m            id Int @id
+        [1;94m12 | [0m            addres Address? @relation([1;91m"TestAddress"[0m)
         [1;94m   | [0m
     "#]];
 
@@ -883,7 +880,6 @@ fn a_typoed_relation_should_fail_gracefully() {
     let dml = indoc! {r#"
         datasource db {
           provider = "sqlserver"
-          url      = env("DATABASE_URL")
         }
 
         model Test {
@@ -903,11 +899,11 @@ fn a_typoed_relation_should_fail_gracefully() {
 
     let expect = expect![[r#"
         [1;91merror[0m: [1mError validating field `self` in model `TestParent`: The relation field `self` on model `TestParent` is missing an opposite relation field on the model `TestParent`. Either run `prisma format` or add it manually.[0m
-          [1;94m-->[0m  [4mschema.prisma:17[0m
+          [1;94m-->[0m  [4mschema.prisma:16[0m
         [1;94m   | [0m
-        [1;94m16 | [0m  fk   Int
-        [1;94m17 | [0m  [1;91mself TestParent @relation(fields: [fk], references: [id])[0m
-        [1;94m18 | [0m}
+        [1;94m15 | [0m  fk   Int
+        [1;94m16 | [0m  [1;91mself TestParent @relation(fields: [fk], references: [id])[0m
+        [1;94m17 | [0m}
         [1;94m   | [0m
     "#]];
 
@@ -1030,11 +1026,11 @@ fn should_fail_if_not_using_unique_constraint_with_single_one_to_many() {
 
     let expect = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@relation": The argument `references` must refer to a unique criterion in the related model. Consider adding an `@unique` attribute to the field `custom_id` in the model `A`.[0m
-          [1;94m-->[0m  [4mschema.prisma:22[0m
+          [1;94m-->[0m  [4mschema.prisma:21[0m
         [1;94m   | [0m
-        [1;94m21 | [0m  a_id String
-        [1;94m22 | [0m  [1;91mA         A @relation(fields: [a_id], references: [custom_id])[0m
-        [1;94m23 | [0m}
+        [1;94m20 | [0m  a_id String
+        [1;94m21 | [0m  [1;91mA         A @relation(fields: [a_id], references: [custom_id])[0m
+        [1;94m22 | [0m}
         [1;94m   | [0m
     "#]];
 
@@ -1053,7 +1049,6 @@ fn multiple_relation_validation_errors_do_not_prevent_each_other_across_models()
 
         datasource db {
           provider = "mysql"
-          url      = env("DATABASE_URL")
         }
 
         model Post {
@@ -1088,18 +1083,18 @@ fn multiple_relation_validation_errors_do_not_prevent_each_other_across_models()
 
     let expected_error = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@relation": The argument `references` must refer to a unique criterion in the related model. Consider adding an `@unique` attribute to the field `USER_NON_UNIQUE_ID` in the model `User`.[0m
-          [1;94m-->[0m  [4mschema.prisma:15[0m
+          [1;94m-->[0m  [4mschema.prisma:14[0m
         [1;94m   | [0m
-        [1;94m14 | [0m          USER_NON_UNIQUE_ID Int  @db.UnsignedInt
-        [1;94m15 | [0m          [1;91mUser               User @relation(fields: [USER_NON_UNIQUE_ID], references: [USER_NON_UNIQUE_ID], onUpdate: Restrict, map: "FK_USER_NON_UNIQUE_ID")[0m
-        [1;94m16 | [0m
+        [1;94m13 | [0m          USER_NON_UNIQUE_ID Int  @db.UnsignedInt
+        [1;94m14 | [0m          [1;91mUser               User @relation(fields: [USER_NON_UNIQUE_ID], references: [USER_NON_UNIQUE_ID], onUpdate: Restrict, map: "FK_USER_NON_UNIQUE_ID")[0m
+        [1;94m15 | [0m
         [1;94m   | [0m
         [1;91merror[0m: [1mError parsing attribute "@relation": The argument `references` must refer to a unique criterion in the related model. Consider adding an `@unique` attribute to the field `STOCK_NON_UNIQUE_ID` in the model `stock`.[0m
-          [1;94m-->[0m  [4mschema.prisma:38[0m
+          [1;94m-->[0m  [4mschema.prisma:37[0m
         [1;94m   | [0m
-        [1;94m37 | [0m          STOCK_ID Int   @id @db.UnsignedInt
-        [1;94m38 | [0m          [1;91mstock    stock @relation(fields: [STOCK_ID], references: [STOCK_NON_UNIQUE_ID], onUpdate: Restrict, map: "FK_STOCK_NON_UNIQUE_ID")[0m
-        [1;94m39 | [0m        }
+        [1;94m36 | [0m          STOCK_ID Int   @id @db.UnsignedInt
+        [1;94m37 | [0m          [1;91mstock    stock @relation(fields: [STOCK_ID], references: [STOCK_NON_UNIQUE_ID], onUpdate: Restrict, map: "FK_STOCK_NON_UNIQUE_ID")[0m
+        [1;94m38 | [0m        }
         [1;94m   | [0m
     "#]];
 

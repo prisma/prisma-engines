@@ -5,12 +5,11 @@ generator js {
 
 datasource mypg {
   provider   = "postgresql"
-  url        = "dummy-url"
   extensions = [ 1 ]
 }
 // [1;91merror[0m: [1mExpected a constant or function value, but received numeric value `1`.[0m
-//   [1;94m-->[0m  [4mschema.prisma:9[0m
+//   [1;94m-->[0m  [4mschema.prisma:8[0m
 // [1;94m   | [0m
-// [1;94m 8 | [0m  url        = "dummy-url"
-// [1;94m 9 | [0m  extensions = [ [1;91m1[0m ]
+// [1;94m 7 | [0m  provider   = "postgresql"
+// [1;94m 8 | [0m  extensions = [ [1;91m1[0m ]
 // [1;94m   | [0m

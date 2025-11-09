@@ -63,7 +63,6 @@ async fn remapping_field_names_to_empty(api: &mut TestApi) -> TestResult {
 
         datasource db {
           provider = "sqlserver"
-          url      = "dummy-url"
         }
 
         model User {

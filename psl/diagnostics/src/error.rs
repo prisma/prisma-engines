@@ -348,6 +348,11 @@ impl DatamodelError {
         Self::new(format!("Datasource provider not known: \"{provider}\"."), span)
     }
 
+    pub fn new_datasource_url_removed_error(span: Span) -> DatamodelError {
+        let msg = "The datasource property `url` is no longer supported in schema files. Move connection URLs for Migrate to `prisma.config.ts` and pass either `adapter` for a direct database connection or `accelerateUrl` for Accelerate to the `PrismaClient` constructor. See https://pris.ly/d/config-datasource and https://pris.ly/d/prisma7-client-config";
+        Self::new(msg.to_string(), span)
+    }
+
     pub fn new_datasource_direct_url_removed_error(span: Span) -> DatamodelError {
         let msg = "The datasource property `directUrl` is no longer supported in schema files. Move connection URLs to `prisma.config.ts`. See https://pris.ly/d/config-datasource";
         Self::new(msg.to_string(), span)

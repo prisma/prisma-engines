@@ -381,17 +381,15 @@ impl TestApi {
         let provider = &self.args.provider();
         let datasource_block = format!(
             r#"datasource db {{
-                 provider = "{}"
-                 url = "{}"{}{}
+                 provider = "{provider}"
+                 {namespaces}{relation_mode}
                }}"#,
-            provider, "dummy-url", namespaces, relation_mode
         );
         datasource_block
     }
 
     pub fn datasource_block(&self) -> DatasourceBlock<'_> {
         self.args.datasource_block(
-            "dummy-url",
             if self.is_vitess() {
                 &[("relationMode", r#""prisma""#)]
             } else {

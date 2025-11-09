@@ -23,7 +23,6 @@ async fn preview_feature_is_required(api: &mut TestApi) -> TestResult {
 
         datasource db {
           provider = "postgresql"
-          url      = "dummy-url"
         }
 
         model User {
@@ -62,7 +61,6 @@ async fn simple_view_from_one_table(api: &mut TestApi) -> TestResult {
 
         datasource db {
           provider = "postgresql"
-          url      = "dummy-url"
         }
 
         model User {
@@ -120,7 +118,6 @@ async fn simple_view_from_one_table_postgres16(api: &mut TestApi) -> TestResult 
 
         datasource db {
           provider = "postgresql"
-          url      = "dummy-url"
         }
 
         model User {
@@ -194,7 +191,6 @@ async fn simple_view_from_two_tables(api: &mut TestApi) -> TestResult {
 
         datasource db {
           provider = "postgresql"
-          url      = "dummy-url"
         }
 
         model Profile {
@@ -624,7 +620,6 @@ async fn reserved_name_gets_mapped(api: &mut TestApi) -> TestResult {
 
         datasource db {
           provider = "postgresql"
-          url      = "dummy-url"
         }
 
         /// This view has been renamed to 'Renamedif' during introspection, because the original name 'if' is reserved.
@@ -768,7 +763,6 @@ async fn schema_is_introspected(api: &mut TestApi) -> TestResult {
 
         datasource db {
           provider = "postgresql"
-          url      = "dummy-url"
           schemas  = ["public"]
         }
 
@@ -807,7 +801,6 @@ async fn defaults_are_introspected(api: &mut TestApi) -> TestResult {
 
         datasource db {
           provider = "postgresql"
-          url      = "dummy-url"
         }
 
         view A {
@@ -836,7 +829,6 @@ async fn invalid_field_names_trigger_warnings(api: &mut TestApi) -> TestResult {
 
         datasource db {
           provider = "postgresql"
-          url      = "dummy-url"
         }
 
         view A {
@@ -883,7 +875,6 @@ async fn dupes_are_renamed(api: &mut TestApi) -> TestResult {
 
         datasource db {
           provider = "postgresql"
-          url      = "dummy-url"
           schemas  = ["private", "public"]
         }
 
@@ -934,7 +925,6 @@ async fn dupe_views_are_not_considered_without_preview_feature(api: &mut TestApi
 
         datasource db {
           provider = "postgresql"
-          url      = "dummy-url"
           schemas  = ["private", "public"]
         }
 

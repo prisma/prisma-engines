@@ -50,11 +50,11 @@ fn rejects_an_extension_type_marked_unsupported() {
     let datamodel = psl::parse_schema(schema, &extensions).unwrap_err();
     expect![[r#"
         [1;91merror[0m: [1mError validating: The type `Unsupported("vector")` you specified in the type definition for the field `a` is supported as a native type by Prisma. Please use the native type notation `VectorN @test.vector` for full support.[0m
-          [1;94m-->[0m  [4mschema.prisma:13[0m
+          [1;94m-->[0m  [4mschema.prisma:12[0m
         [1;94m   | [0m
-        [1;94m12 | [0m  id Int   @id @map("_id")
-        [1;94m13 | [0m  [1;91ma  Unsupported("vector")[0m
-        [1;94m14 | [0m}
+        [1;94m11 | [0m  id Int   @id @map("_id")
+        [1;94m12 | [0m  [1;91ma  Unsupported("vector")[0m
+        [1;94m13 | [0m}
         [1;94m   | [0m
     "#]]
         .assert_eq(&datamodel.to_string());
@@ -79,10 +79,10 @@ fn rejects_invalid_extension_modifier() {
     let datamodel = psl::parse_schema(schema, &extensions).unwrap_err();
     expect![[r#"
         [1;91merror[0m: [1mNative type vector is not compatible with declared field type Vector3, expected field type VectorN.[0m
-          [1;94m-->[0m  [4mschema.prisma:13[0m
+          [1;94m-->[0m  [4mschema.prisma:12[0m
         [1;94m   | [0m
-        [1;94m12 | [0m  id Int     @id @map("_id")
-        [1;94m13 | [0m  a  Vector3 [1;91m@test.vector(100)[0m
+        [1;94m11 | [0m  id Int     @id @map("_id")
+        [1;94m12 | [0m  a  Vector3 [1;91m@test.vector(100)[0m
         [1;94m   | [0m
     "#]]
         .assert_eq(&datamodel.to_string());
@@ -107,10 +107,10 @@ fn rejects_missing_extension_modifier() {
     let datamodel = psl::parse_schema(schema, &extensions).unwrap_err();
     expect![[r#"
         [1;91merror[0m: [1mFunction "vector" takes 1 arguments, but received 0.[0m
-          [1;94m-->[0m  [4mschema.prisma:13[0m
+          [1;94m-->[0m  [4mschema.prisma:12[0m
         [1;94m   | [0m
-        [1;94m12 | [0m  id Int     @id @map("_id")
-        [1;94m13 | [0m  a  VectorN [1;91m@test.vector[0m
+        [1;94m11 | [0m  id Int     @id @map("_id")
+        [1;94m12 | [0m  a  VectorN [1;91m@test.vector[0m
         [1;94m   | [0m
     "#]]
     .assert_eq(&datamodel.to_string());

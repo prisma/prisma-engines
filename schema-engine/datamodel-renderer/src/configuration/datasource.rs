@@ -1,4 +1,4 @@
-use crate::value::{Array, Documentation, Env, Text, Value};
+use crate::value::{Array, Documentation, Text, Value};
 use core::fmt;
 use psl::datamodel_connector::RelationMode;
 use std::{borrow::Cow, default::Default};
@@ -8,9 +8,6 @@ use std::{borrow::Cow, default::Default};
 pub struct Datasource<'a> {
     name: &'a str,
     provider: Text<&'a str>,
-    url: Env<'a>,
-    direct_url: Option<Env<'a>>,
-    shadow_database_url: Option<Env<'a>>,
     relation_mode: Option<RelationMode>,
     custom_properties: Vec<(&'a str, Value<'a>)>,
     documentation: Option<Documentation<'a>>,
@@ -25,17 +22,12 @@ impl<'a> Datasource<'a> {
     /// //         ^^ name
     ///   provider = "postgresql"
     /// //            ^^^^^^^^^^ provider
-    ///   url      = env("DATABASE_URL")
-    /// //                ^^^^^^^^^^^^ url
     /// }
     /// ```
-    pub fn new(name: &'a str, provider: &'a str, url: impl Into<Env<'a>>) -> Self {
+    pub fn new(name: &'a str, provider: &'a str) -> Self {
         Self {
             name,
             provider: Text(provider),
-            url: url.into(),
-            direct_url: None,
-            shadow_database_url: None,
             relation_mode: None,
             custom_properties: Default::default(),
             documentation: None,
@@ -43,27 +35,11 @@ impl<'a> Datasource<'a> {
         }
     }
 
-    /// Used for schema engine to reflect the contents of migrations directory
-    /// to diff against the actual database.
-    ///
-    /// ```ignore
-    /// datasource db {
-    ///   provider          = "postgresql"
-    ///   url               = env("DATABASE_URL")
-    ///   shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
-    /// //                         ^^^^^^^^^^^^^^^^^^^ this
-    /// }
-    /// ```
-    pub fn shadow_database_url(&mut self, url: impl Into<Env<'a>>) {
-        self.shadow_database_url = Some(url.into());
-    }
-
     /// Who handles referential integrity.
     ///
     /// ```ignore
     /// datasource db {
     ///   provider     = "postgresql"
-    ///   url          = env("DATABASE_URL")
     ///   relationMode = "foreignKeys"
     /// //                ^^^^^^^^^^^ this
     /// }
@@ -82,7 +58,6 @@ impl<'a> Datasource<'a> {
     /// ```ignore
     /// datasource db {
     ///   provider   = "postgresql"
-    ///   url          = env("DATABASE_URL")
     ///   extensions = [citext(version: "2.1")]
     /// //             ^^^^^^^^^^^^^^^^^^^^^^^^ value
     /// //^^^^^^^^^^ key
@@ -98,7 +73,6 @@ impl<'a> Datasource<'a> {
     /// /// This here is the documentation.
     /// datasource db {
     ///   provider = "postgresql"
-    ///   url      = env("DATABASE_URL")
     /// }
     /// ```
     pub fn documentation(&mut self, documentation: impl Into<Cow<'a, str>>) {
@@ -107,8 +81,6 @@ impl<'a> Datasource<'a> {
 
     /// Create a rendering from a PSL datasource.
     pub fn from_psl(psl_ds: &'a psl::Datasource, force_namespaces: Option<&'a [String]>) -> Self {
-        let shadow_database_url = psl_ds.shadow_database_url.as_ref().map(|(url, _)| Env::from(url));
-
         let namespaces: Vec<Text<_>> = match force_namespaces {
             Some(namespaces) => namespaces
                 .iter()
@@ -126,9 +98,6 @@ impl<'a> Datasource<'a> {
         Self {
             name: &psl_ds.name,
             provider: Text(&psl_ds.provider),
-            url: Env::from(&psl_ds.url),
-            direct_url: psl_ds.direct_url.as_ref().map(Env::from),
-            shadow_database_url,
             relation_mode: psl_ds.relation_mode,
             documentation: psl_ds.documentation.as_deref().map(Cow::Borrowed).map(Documentation),
             custom_properties: Default::default(),
@@ -145,14 +114,6 @@ impl fmt::Display for Datasource<'_> {
 
         writeln!(f, "datasource {} {{", self.name)?;
         writeln!(f, "provider = {}", self.provider)?;
-        writeln!(f, "url = {}", self.url)?;
-        if let Some(direct_url) = self.direct_url {
-            writeln!(f, "directUrl = {direct_url}")?;
-        }
-
-        if let Some(url) = self.shadow_database_url {
-            writeln!(f, "shadowDatabaseUrl = {url}")?;
-        }
 
         if let Some(relation_mode) = self.relation_mode {
             writeln!(f, "relationMode = \"{relation_mode}\"")?;
@@ -180,10 +141,9 @@ mod tests {
 
     #[test]
     fn kitchen_sink() {
-        let mut datasource = Datasource::new("db", "postgres", Env::variable("DATABASE_URL"));
+        let mut datasource = Datasource::new("db", "postgres");
 
         datasource.documentation("Here comes the sun king...\n\nEverybody's laughing,\nEverybody's happy!");
-        datasource.shadow_database_url(Env::variable("SHADOW_DATABASE_URL"));
         datasource.relation_mode(RelationMode::ForeignKeys);
 
         let mut extensions = Array::new();
@@ -202,11 +162,9 @@ mod tests {
             /// Everybody's laughing,
             /// Everybody's happy!
             datasource db {
-              provider          = "postgres"
-              url               = env("DATABASE_URL")
-              shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
-              relationMode      = "foreignKeys"
-              extensions        = [postgis, uuid_ossp(map: "uuid-ossp")]
+              provider     = "postgres"
+              relationMode = "foreignKeys"
+              extensions   = [postgis, uuid_ossp(map: "uuid-ossp")]
             }
         "#]];
 

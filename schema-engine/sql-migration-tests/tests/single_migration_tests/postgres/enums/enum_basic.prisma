@@ -3,7 +3,6 @@
 
 datasource pg {
     provider = "postgresql"
-    url = "dummy-url"
 }
 
 model Test {

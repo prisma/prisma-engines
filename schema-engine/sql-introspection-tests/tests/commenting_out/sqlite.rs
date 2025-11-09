@@ -113,7 +113,6 @@ async fn remapping_field_names_to_empty(api: &mut TestApi) -> TestResult {
 
         datasource db {
           provider = "sqlite"
-          url      = "dummy-url"
         }
 
         model User {

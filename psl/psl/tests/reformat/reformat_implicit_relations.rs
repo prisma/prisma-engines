@@ -849,7 +849,6 @@ fn back_relations_must_be_added_even_when_env_vars_are_missing() {
     let input = indoc! {r#"
         datasource db {
           provider = "sqlite"
-          url      = env("DATABASE_URL")
         }
 
         model Blog {
@@ -865,7 +864,6 @@ fn back_relations_must_be_added_even_when_env_vars_are_missing() {
     let expected = expect![[r#"
         datasource db {
           provider = "sqlite"
-          url      = env("DATABASE_URL")
         }
 
         model Blog {
@@ -977,7 +975,6 @@ fn issue_10118() {
     let schema = r#"
         datasource db {
           provider = "postgres"
-          url = "postgres://"
         }
 
         model User {
@@ -995,7 +992,6 @@ fn issue_10118() {
     let expected = expect![[r#"
         datasource db {
           provider = "postgres"
-          url      = "postgres://"
         }
 
         model User {
@@ -1018,7 +1014,6 @@ fn mongodb_inline_relations_reformat_as_expected() {
     let schema = indoc! {r#"
         datasource db {
           provider = "mongodb"
-          url = "mongodb://"
         }
 
         generator js {
@@ -1040,7 +1035,6 @@ fn mongodb_inline_relations_reformat_as_expected() {
     let expected = expect![[r#"
         datasource db {
           provider = "mongodb"
-          url      = "mongodb://"
         }
 
         generator js {
@@ -1074,7 +1068,6 @@ fn reformat_missing_forward_relation_arguments_with_crln() {
 
     datasource db {
       provider = "sqlite"
-      url      = "file:dev.db"
     }
 
     model Post {
@@ -1096,7 +1089,6 @@ fn reformat_missing_forward_relation_arguments_with_crln() {
 
         datasource db {
           provider = "sqlite"
-          url      = "file:dev.db"
         }
 
         model Post {

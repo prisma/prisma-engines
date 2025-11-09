@@ -14,7 +14,6 @@ generator js {
 
 datasource db {
   provider = "sqlserver"
-  url      = env("DATABASE_URL")
 }
 
 model User {

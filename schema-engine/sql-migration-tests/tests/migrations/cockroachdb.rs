@@ -1,10 +1,12 @@
 /// Test cockroachdb failure modes
 mod failure_modes;
 
+use indoc::indoc;
 use prisma_value::PrismaValue;
 use psl::parser_database::*;
 use quaint::prelude::Insert;
 use schema_core::{
+    DatasourceUrls,
     json_rpc::types::{SchemaFilter, SchemasContainer},
     schema_connector::DiffTarget,
 };
@@ -15,28 +17,32 @@ use std::fmt::Write as _;
 
 #[test_connector(tags(CockroachDb))]
 fn db_push_on_cockroach_db_with_postgres_provider_fails(api: TestApi) {
-    let schema = format!(
+    let schema = indoc!(
         r#"
-        datasource mypg {{
+        datasource mypg {
             provider = "postgresql"
-            url = "{}"
-        }}
+       }
 
-        model Test {{
+        model Test {
             id      Int @id
             name    String
-        }}
+       }
     "#,
-        api.connection_string()
     );
 
-    let connector = schema_core::schema_api_without_extensions(Some(schema.clone()), None).unwrap();
+    let connector = schema_core::schema_api_without_extensions(
+        Some(schema.to_owned()),
+        DatasourceUrls::from_url(api.connection_string()),
+        None,
+    )
+    .unwrap();
+
     let error = tok(connector.schema_push(schema_core::json_rpc::types::SchemaPushInput {
         force: false,
         schema: schema_core::json_rpc::types::SchemasContainer {
             files: vec![schema_core::json_rpc::types::SchemaContainer {
                 path: "schema.prisma".to_string(),
-                content: schema,
+                content: schema.to_owned(),
             }],
         },
         filters: SchemaFilter::default(),
@@ -434,15 +440,17 @@ fn typescript_starter_schema_with_native_types_is_idempotent(api: TestApi) {
 }
 
 #[test_connector(tags(CockroachDb))]
-fn connecting_to_a_cockroachdb_database_with_the_postgresql_connector_fails(_api: TestApi) {
+fn connecting_to_a_cockroachdb_database_with_the_postgresql_connector_fails(api: TestApi) {
     let dm = r#"
         datasource crdb {
             provider = "postgresql"
-            url = env("TEST_DATABASE_URL")
         }
     "#;
 
-    let engine = schema_core::schema_api_without_extensions(None, None).unwrap();
+    let engine =
+        schema_core::schema_api_without_extensions(None, DatasourceUrls::from_url(api.connection_string()), None)
+            .unwrap();
+
     let err = tok(
         engine.ensure_connection_validity(schema_core::json_rpc::types::EnsureConnectionValidityParams {
             datasource: schema_core::json_rpc::types::DatasourceParam::Schema(SchemasContainer {
@@ -470,7 +478,6 @@ fn decimal_to_boolean_migrations_work(api: TestApi) {
     let dm1 = r#"
         datasource db {
             provider = "cockroachdb"
-            url = "dummy-url"
         }
 
         model Cat {
@@ -499,7 +506,6 @@ fn decimal_to_boolean_migrations_work(api: TestApi) {
     let dm2 = r#"
         datasource db {
             provider = "cockroachdb"
-            url = "dummy-url"
         }
 
         model Cat {
@@ -994,7 +1000,6 @@ fn sequences_without_options_can_be_created(api: TestApi) {
     let dm = r#"
         datasource test {
             provider = "cockroachdb"
-            url = "dummy-url"
         }
 
         model Test {
@@ -1021,7 +1026,6 @@ fn sequences_with_options_can_be_created(api: TestApi) {
     let dm = r#"
         datasource test {
             provider = "cockroachdb"
-            url = "dummy-url"
         }
 
         model Test {
@@ -1048,7 +1052,6 @@ fn sequences_without_options_can_be_created_on_non_id_fields(api: TestApi) {
     let dm = r#"
         datasource test {
             provider = "cockroachdb"
-            url = "dummy-url"
         }
 
         model Test {
@@ -1091,7 +1094,6 @@ fn alter_sequence_to_default(api: TestApi) {
     let schema1 = r#"
         datasource db {
             provider = "cockroachdb"
-            url = "dummy-url"
         }
 
         model Test {
@@ -1102,7 +1104,6 @@ fn alter_sequence_to_default(api: TestApi) {
     let schema2 = r#"
         datasource db {
             provider = "cockroachdb"
-            url = "dummy-url"
         }
 
         model Test {
@@ -1128,7 +1129,6 @@ fn alter_sequence(api: TestApi) {
     let schema1 = r#"
         datasource db {
             provider = "cockroachdb"
-            url = "dummy-url"
         }
 
         model Test {
@@ -1139,7 +1139,6 @@ fn alter_sequence(api: TestApi) {
     let schema2 = r#"
         datasource db {
             provider = "cockroachdb"
-            url = "dummy-url"
         }
 
         model Test {
@@ -1166,7 +1165,6 @@ fn mapped_enum_defaults_must_work(api: TestApi) {
     let schema = r#"
         datasource db {
             provider = "cockroachdb"
-            url = "postgres://meowmeowmeow"
         }
 
         enum Color {
@@ -1213,7 +1211,6 @@ fn json_defaults_with_escaped_quotes_work(api: TestApi) {
     let schema = r#"
         datasource db {
           provider = "cockroachdb"
-          url      = env("DATABASE_URL")
         }
 
         model Foo {
@@ -1246,7 +1243,6 @@ fn sequence_with_multiple_models_works(api: TestApi) {
     let schema = r#"
         datasource db {
           provider = "cockroachdb"
-          url      = env("DATABASE_URL")
         }
 
         model TestModel {
@@ -1287,7 +1283,6 @@ fn bigint_defaults_work(api: TestApi) {
     let schema = r#"
         datasource mypg {
             provider = "cockroachdb"
-            url = "dummy-url"
         }
 
         model foo {
@@ -1316,7 +1311,6 @@ fn alter_type_works(api: TestApi) {
     let schema = r#"
         datasource db {
             provider = "cockroachdb"
-            url = "dummy-url"
         }
 
         model test {
@@ -1332,7 +1326,6 @@ fn alter_type_works(api: TestApi) {
     let to_schema = r#"
         datasource db {
             provider = "cockroachdb"
-            url = "dummy-url"
         }
 
         model test {
@@ -1382,7 +1375,6 @@ fn schema_from_introspection_docs_works(api: TestApi) {
     let introspected_schema = r#"
         datasource crdb {
             provider = "cockroachdb"
-            url = "dummy-url"
         }
 
         model Post {
@@ -1435,10 +1427,10 @@ fn cockroach_introspection_with_postgres_provider_fails() {
     ))
     .unwrap();
 
-    let me = schema_core::schema_api_without_extensions(None, None).unwrap();
+    let me = schema_core::schema_api_without_extensions(None, DatasourceUrls::from_url(url_str.clone()), None).unwrap();
 
     tok(me.db_execute(DbExecuteParams {
-        datasource_type: DbExecuteDatasourceType::Url(UrlContainer { url: url_str.clone() }),
+        datasource_type: DbExecuteDatasourceType::Url(UrlContainer { url: url_str }),
         script: r#"
             CREATE TABLE "public"."Post" (
                 "id" TEXT NOT NULL,
@@ -1463,12 +1455,11 @@ fn cockroach_introspection_with_postgres_provider_fails() {
     }))
     .unwrap();
 
-    let schema = format! {
+    let schema = indoc! {
         r#"
-            datasource db {{
+            datasource db {
                 provider = "postgres"
-                url = "{url_str}"
-            }}
+            }
         "#,
     };
 
@@ -1478,7 +1469,7 @@ fn cockroach_introspection_with_postgres_provider_fails() {
         schema: SchemasContainer {
             files: vec![SchemaContainer {
                 path: "schema.prisma".to_string(),
-                content: schema,
+                content: schema.to_owned(),
             }],
         },
         base_directory_path: "/".to_string(),

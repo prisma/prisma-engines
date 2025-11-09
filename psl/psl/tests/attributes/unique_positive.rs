@@ -117,7 +117,6 @@ fn multi_field_unique_on_native_type_fields_fields_must_work() {
     let dml = r#"
     datasource ds {
         provider = "mysql"
-        url = "mysql://"
     }
 
     model User {

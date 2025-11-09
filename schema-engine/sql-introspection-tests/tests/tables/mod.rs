@@ -751,7 +751,6 @@ async fn casing_should_not_lead_to_mix_ups(api: &mut TestApi) -> TestResult {
 
         datasource db {
           provider = "mysql"
-          url      = "dummy-url"
         }
 
         model ADDRESS {

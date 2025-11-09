@@ -1,6 +1,5 @@
 datasource db {
   provider = "mysql"
-  url      = env("url")
 }
 
 generator client {
@@ -22,8 +21,8 @@ model Identification {
 }
 
 // [1;91merror[0m: [1mError validating model "User": The shard key definition refers to the relation field `identification`. Shard key definitions must reference only scalar fields.[0m
-//   [1;94m-->[0m  [4mschema.prisma:17[0m
+//   [1;94m-->[0m  [4mschema.prisma:16[0m
 // [1;94m   | [0m
-// [1;94m16 | [0m
-// [1;94m17 | [0m  [1;91m@@shardKey([identification])[0m
+// [1;94m15 | [0m
+// [1;94m16 | [0m  [1;91m@@shardKey([identification])[0m
 // [1;94m   | [0m

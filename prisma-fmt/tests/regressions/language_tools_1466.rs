@@ -3,7 +3,6 @@ fn code_actions_should_not_crash_on_validation_errors_with_mongodb() {
     let schema = r#"
         datasource db {
           provider = "mongodb"
-          url      = env("DATABASE_URL")
         }
 
         generator client {

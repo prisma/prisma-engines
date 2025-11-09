@@ -5,7 +5,6 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = "dummy-url"
   schemas  = ["base", "transactional"]
 }
 
@@ -29,16 +28,16 @@ enum Size {
 }
 
 // [1;91merror[0m: [1mAn enum with the same database name is already defined.[0m
-//   [1;94m-->[0m  [4mschema.prisma:21[0m
+//   [1;94m-->[0m  [4mschema.prisma:20[0m
 // [1;94m   | [0m
-// [1;94m20 | [0m
-// [1;94m21 | [0m[1;91menum Size {[0m
-// [1;94m22 | [0m    SMALL
-// [1;94m23 | [0m    MEDIUM
-// [1;94m24 | [0m    LARGE
-// [1;94m25 | [0m    VENTI
-// [1;94m26 | [0m
-// [1;94m27 | [0m    @@map("attribute")
-// [1;94m28 | [0m    @@schema("transactional")
-// [1;94m29 | [0m}
+// [1;94m19 | [0m
+// [1;94m20 | [0m[1;91menum Size {[0m
+// [1;94m21 | [0m    SMALL
+// [1;94m22 | [0m    MEDIUM
+// [1;94m23 | [0m    LARGE
+// [1;94m24 | [0m    VENTI
+// [1;94m25 | [0m
+// [1;94m26 | [0m    @@map("attribute")
+// [1;94m27 | [0m    @@schema("transactional")
+// [1;94m28 | [0m}
 // [1;94m   | [0m

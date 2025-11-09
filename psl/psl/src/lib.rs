@@ -9,7 +9,6 @@ pub use psl_core::{
     ConnectorRegistry,
     Datasource,
     DatasourceConnectorData,
-    DatasourceUrls,
     FeatureMapWithProvider,
     Generator,
     GeneratorConfigValue,
@@ -30,7 +29,6 @@ pub use psl_core::{
     reformat_multiple,
     reformat_validated_schema_into_single,
     schema_ast,
-    set_config_dir,
 };
 
 /// The implementation of the CLI getConfig() utility and its JSON format.

@@ -1,6 +1,5 @@
 datasource test {
   provider = "postgresql"
-  url = "dummy-url"
 }
 
 model A {
@@ -10,8 +9,8 @@ model A {
   @@index([a(ops: BitMinMaxOps)], type: Brin)
 }
 // [1;91merror[0m: [1mError parsing attribute "@@index": The given operator class `BitMinMaxOps` does not support native type `VarBit` of field `a`.[0m
-//   [1;94m-->[0m  [4mschema.prisma:10[0m
+//   [1;94m-->[0m  [4mschema.prisma:9[0m
 // [1;94m   | [0m
-// [1;94m 9 | [0m
-// [1;94m10 | [0m  [1;91m@@index([a(ops: BitMinMaxOps)], type: Brin)[0m
+// [1;94m 8 | [0m
+// [1;94m 9 | [0m  [1;91m@@index([a(ops: BitMinMaxOps)], type: Brin)[0m
 // [1;94m   | [0m

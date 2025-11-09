@@ -12,7 +12,6 @@ fn multi_schema_tests(_api: TestApi) {
     let base_schema = indoc! {r#"
         datasource db {
           provider   = "sqlserver"
-          url        = "dummy-url"
           schemas    = ["one", "two"]
         }
 
@@ -1125,7 +1124,6 @@ fn multi_schema_migration(api: TestApi) {
     let dm = indoc! {r#"
         datasource db {
           provider = "sqlserver"
-          url      = "dummy-url"
           schemas  = ["one", "two"]
         }
 
@@ -1175,16 +1173,15 @@ fn migration_with_shadow_database(api: TestApi) {
 
     let shadow_str = shadow_str.to_string().replace("jdbc:", "");
 
-    let datasource = formatdoc! {r#"
-        datasource db {{
+    let datasource = indoc! {r#"
+        datasource db {
           provider          = "sqlserver"
-          url               = "{conn_str}"
           schemas           = ["one", "two"]
-        }}
+        }
 
-        generator js {{
+        generator js {
           provider        = "prisma-client-javascript"
-        }}
+        }
     "#};
 
     let mut engine = api.new_engine_with_connection_strings(conn_str.clone(), Some(shadow_str.clone()));

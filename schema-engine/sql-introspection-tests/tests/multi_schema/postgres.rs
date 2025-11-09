@@ -160,7 +160,6 @@ async fn multiple_schemas_w_duplicate_table_names_are_introspected(api: &mut Tes
 
         datasource db {
           provider = "postgresql"
-          url      = "dummy-url"
           schemas  = ["first", "second"]
         }
 
@@ -216,7 +215,6 @@ async fn multiple_schemas_w_duplicate_sanitized_table_names_are_introspected(api
 
         datasource db {
           provider = "postgresql"
-          url      = "dummy-url"
           schemas  = ["1first", "2second"]
         }
 
@@ -413,7 +411,6 @@ async fn multiple_schemas_w_enums_are_introspected(api: &mut TestApi) -> TestRes
 
         datasource db {
           provider = "postgresql"
-          url      = "dummy-url"
           schemas  = ["first", "second_schema"]
         }
 
@@ -461,7 +458,6 @@ async fn multiple_schemas_w_duplicate_enums_are_introspected(api: &mut TestApi) 
 
         datasource db {
           provider = "postgresql"
-          url      = "dummy-url"
           schemas  = ["first", "second"]
         }
 
@@ -730,7 +726,6 @@ async fn same_table_name_with_relation_in_two_schemas(api: &mut TestApi) -> Test
 
         datasource db {
           provider = "postgresql"
-          url      = "dummy-url"
           schemas  = ["first", "second_schema"]
         }
 

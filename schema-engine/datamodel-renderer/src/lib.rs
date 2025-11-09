@@ -13,7 +13,6 @@
 //! let datasource = Datasource::new(
 //!     "db",
 //!     "postgres",
-//!     Env::variable("DATABASE_URL")
 //! );
 //!
 //! // We get a string rendering without proper formatting
@@ -27,7 +26,6 @@
 //! let expected = indoc! {r#"
 //!     datasource db {
 //!       provider = "postgres"
-//!       url      = env("DATABASE_URL")
 //!     }
 //! "#};
 //!
@@ -50,7 +48,6 @@
 //! let expected = indoc! {r#"
 //!     datasource db {
 //!       provider = "postgres"
-//!       url      = env("DATABASE_URL")
 //!     }
 //!
 //!     model A {

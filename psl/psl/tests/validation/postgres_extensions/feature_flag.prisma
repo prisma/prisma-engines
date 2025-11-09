@@ -5,5 +5,4 @@ generator js {
 
 datasource mypg {
   provider   = "postgresql"
-  url        = "dummy-url"
 }

@@ -3,7 +3,6 @@
 
 datasource mydb {
     provider = "postgresql"
-    url = "dummy-url"
 }
 
 model MyTable {

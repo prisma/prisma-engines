@@ -2,7 +2,6 @@
 
 datasource db {
     provider = "mysql"
-    url = "dummy-url"
 }
 
 model SomeUser {

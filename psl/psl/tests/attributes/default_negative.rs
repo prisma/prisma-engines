@@ -32,7 +32,6 @@ fn must_error_on_list_default_value_for_singular() {
     let dml = indoc! {r#"
         datasource db {
           provider = "postgres"
-          url = "postgres://"
         }
 
         model Model {
@@ -43,10 +42,10 @@ fn must_error_on_list_default_value_for_singular() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@default": The default value of a non-list field cannot be a list.[0m
-          [1;94m-->[0m  [4mschema.prisma:8[0m
+          [1;94m-->[0m  [4mschema.prisma:7[0m
         [1;94m   | [0m
-        [1;94m 7 | [0m  id Int @id
-        [1;94m 8 | [0m  rel String [1;91m@default(["hello"])[0m
+        [1;94m 6 | [0m  id Int @id
+        [1;94m 7 | [0m  rel String [1;91m@default(["hello"])[0m
         [1;94m   | [0m
     "#]];
     expect_error(dml, &expectation);
@@ -57,7 +56,6 @@ fn must_error_on_singular_default_value_for_list() {
     let dml = indoc! {r#"
         datasource db {
           provider = "postgres"
-          url = "postgres://"
         }
 
         model Model {
@@ -68,10 +66,10 @@ fn must_error_on_singular_default_value_for_list() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@default": The default value of a list field must be a list.[0m
-          [1;94m-->[0m  [4mschema.prisma:8[0m
+          [1;94m-->[0m  [4mschema.prisma:7[0m
         [1;94m   | [0m
-        [1;94m 7 | [0m  id Int @id
-        [1;94m 8 | [0m  rel String[] [1;91m@default("hello")[0m
+        [1;94m 6 | [0m  id Int @id
+        [1;94m 7 | [0m  rel String[] [1;91m@default("hello")[0m
         [1;94m   | [0m
     "#]];
     expect_error(dml, &expectation);
@@ -82,7 +80,6 @@ fn must_error_on_bad_value_inside_list_default() {
     let dml = indoc! {r#"
         datasource db {
           provider = "postgres"
-          url = "postgres://"
         }
 
         model Model {
@@ -94,10 +91,10 @@ fn must_error_on_bad_value_inside_list_default() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@default": Expected a String value, but found `101`.[0m
-          [1;94m-->[0m  [4mschema.prisma:8[0m
+          [1;94m-->[0m  [4mschema.prisma:7[0m
         [1;94m   | [0m
-        [1;94m 7 | [0m  id Int @id
-        [1;94m 8 | [0m  rel String[] [1;91m@default(["hello", 101, "dalmatians"])[0m
+        [1;94m 6 | [0m  id Int @id
+        [1;94m 7 | [0m  rel String[] [1;91m@default(["hello", 101, "dalmatians"])[0m
         [1;94m   | [0m
     "#]];
     expect_error(dml, &expectation);
@@ -277,7 +274,6 @@ fn must_error_if_using_non_id_auto_increment_on_sqlite() {
     let dml = indoc! {r#"
         datasource db1 {
           provider = "sqlite"
-          url = "file://test.db"
         }
 
         model Model {
@@ -290,11 +286,11 @@ fn must_error_if_using_non_id_auto_increment_on_sqlite() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@default": The `autoincrement()` default value is used on a non-id field even though the datasource does not support this.[0m
-          [1;94m-->[0m  [4mschema.prisma:8[0m
+          [1;94m-->[0m  [4mschema.prisma:7[0m
         [1;94m   | [0m
-        [1;94m 7 | [0m  id      Int @id
-        [1;94m 8 | [0m  [1;91mnon_id  Int @default(autoincrement()) @unique[0m
-        [1;94m 9 | [0m}
+        [1;94m 6 | [0m  id      Int @id
+        [1;94m 7 | [0m  [1;91mnon_id  Int @default(autoincrement()) @unique[0m
+        [1;94m 8 | [0m}
         [1;94m   | [0m
     "#]];
 
@@ -306,7 +302,6 @@ fn must_error_if_using_multiple_auto_increment_on_mysql() {
     let dml = indoc! {r#"
         datasource db1 {
           provider = "mysql"
-          url = "mysql://"
         }
 
         model Model {
@@ -320,14 +315,14 @@ fn must_error_if_using_multiple_auto_increment_on_mysql() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@default": The `autoincrement()` default value is used multiple times on this model even though the underlying datasource only supports one instance per table.[0m
-          [1;94m-->[0m  [4mschema.prisma:6[0m
+          [1;94m-->[0m  [4mschema.prisma:5[0m
         [1;94m   | [0m
-        [1;94m 5 | [0m
-        [1;94m 6 | [0m[1;91mmodel Model {[0m
-        [1;94m 7 | [0m  id      Int @id
-        [1;94m 8 | [0m  non_id  Int @default(autoincrement()) @unique
-        [1;94m 9 | [0m  non_id2  Int @default(autoincrement()) @unique
-        [1;94m10 | [0m}
+        [1;94m 4 | [0m
+        [1;94m 5 | [0m[1;91mmodel Model {[0m
+        [1;94m 6 | [0m  id      Int @id
+        [1;94m 7 | [0m  non_id  Int @default(autoincrement()) @unique
+        [1;94m 8 | [0m  non_id2  Int @default(autoincrement()) @unique
+        [1;94m 9 | [0m}
         [1;94m   | [0m
     "#]];
 
@@ -339,7 +334,6 @@ fn must_error_if_using_non_indexed_auto_increment_on_mysql() {
     let dml = indoc! {r#"
         datasource db1 {
           provider = "mysql"
-          url = "mysql://"
         }
 
         model Model {
@@ -352,11 +346,11 @@ fn must_error_if_using_non_indexed_auto_increment_on_mysql() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@default": The `autoincrement()` default value is used on a non-indexed field even though the datasource does not support this.[0m
-          [1;94m-->[0m  [4mschema.prisma:8[0m
+          [1;94m-->[0m  [4mschema.prisma:7[0m
         [1;94m   | [0m
-        [1;94m 7 | [0m  id      Int @id
-        [1;94m 8 | [0m  [1;91mnon_id  Int @default(autoincrement())[0m
-        [1;94m 9 | [0m}
+        [1;94m 6 | [0m  id      Int @id
+        [1;94m 7 | [0m  [1;91mnon_id  Int @default(autoincrement())[0m
+        [1;94m 8 | [0m}
         [1;94m   | [0m
     "#]];
 
@@ -389,7 +383,6 @@ fn must_error_if_scalar_default_on_unsupported() {
     let dml = indoc! {r#"
         datasource db1 {
           provider = "postgresql"
-          url = "postgresql://"
         }
 
         model Model {
@@ -402,10 +395,10 @@ fn must_error_if_scalar_default_on_unsupported() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@default": Only @default(dbgenerated("...")) can be used for Unsupported types.[0m
-          [1;94m-->[0m  [4mschema.prisma:8[0m
+          [1;94m-->[0m  [4mschema.prisma:7[0m
         [1;94m   | [0m
-        [1;94m 7 | [0m  id      Int @id
-        [1;94m 8 | [0m  balance Unsupported("some random stuff") [1;91m@default(12)[0m
+        [1;94m 6 | [0m  id      Int @id
+        [1;94m 7 | [0m  balance Unsupported("some random stuff") [1;91m@default(12)[0m
         [1;94m   | [0m
     "#]];
 
@@ -486,7 +479,6 @@ fn dbgenerated_default_errors_must_not_cascade_into_other_errors() {
     let dml = indoc! {r#"
         datasource ds {
           provider = "mysql"
-          url = "mysql://"
         }
 
         model User {
@@ -502,10 +494,10 @@ fn dbgenerated_default_errors_must_not_cascade_into_other_errors() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@default": dbgenerated() takes either no argument, or a single nonempty string argument.[0m
-          [1;94m-->[0m  [4mschema.prisma:9[0m
+          [1;94m-->[0m  [4mschema.prisma:8[0m
         [1;94m   | [0m
-        [1;94m 8 | [0m  role      Bytes
-        [1;94m 9 | [0m  role2     Bytes @ds.VarBinary(40) [1;91m@default(dbgenerated(""))[0m
+        [1;94m 7 | [0m  role      Bytes
+        [1;94m 8 | [0m  role2     Bytes @ds.VarBinary(40) [1;91m@default(dbgenerated(""))[0m
         [1;94m   | [0m
     "#]];
 
@@ -517,7 +509,6 @@ fn named_default_constraints_should_not_work_on_non_sql_server() {
     let dml = indoc! { r#"
         datasource test {
           provider = "postgres"
-          url = "postgres://"
         }
 
         generator js {
@@ -534,10 +525,10 @@ fn named_default_constraints_should_not_work_on_non_sql_server() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@default": You defined a database name for the default value of a field on the model. This is not supported by the provider.[0m
-          [1;94m-->[0m  [4mschema.prisma:12[0m
+          [1;94m-->[0m  [4mschema.prisma:11[0m
         [1;94m   | [0m
-        [1;94m11 | [0m  id Int @id @default(autoincrement())
-        [1;94m12 | [0m  data String [1;91m@default("beeb buub", map: "meow")[0m
+        [1;94m10 | [0m  id Int @id @default(autoincrement())
+        [1;94m11 | [0m  data String [1;91m@default("beeb buub", map: "meow")[0m
         [1;94m   | [0m
     "#]];
 
@@ -549,7 +540,6 @@ fn named_default_constraints_are_not_allowed_on_identity() {
     let dml = indoc! { r#"
         datasource test {
           provider = "sqlserver"
-          url = "sqlserver://"
         }
 
         generator js {
@@ -565,10 +555,10 @@ fn named_default_constraints_are_not_allowed_on_identity() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@default": Naming an autoincrement default value is not allowed.[0m
-          [1;94m-->[0m  [4mschema.prisma:11[0m
+          [1;94m-->[0m  [4mschema.prisma:10[0m
         [1;94m   | [0m
-        [1;94m10 | [0mmodel A {
-        [1;94m11 | [0m  id Int @id [1;91m@default(autoincrement(), map: "nope__nope__nope")[0m
+        [1;94m 9 | [0mmodel A {
+        [1;94m10 | [0m  id Int @id [1;91m@default(autoincrement(), map: "nope__nope__nope")[0m
         [1;94m   | [0m
     "#]];
 
@@ -580,7 +570,6 @@ fn named_default_constraints_cannot_have_duplicate_names() {
     let dml = indoc! { r#"
         datasource test {
           provider = "sqlserver"
-          url = "sqlserver://"
         }
 
         generator js {
@@ -602,16 +591,16 @@ fn named_default_constraints_cannot_have_duplicate_names() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@default": The given constraint name `reserved` has to be unique in the following namespace: global for primary keys, foreign keys and default constraints. Please provide a different name using the `map` argument.[0m
-          [1;94m-->[0m  [4mschema.prisma:12[0m
+          [1;94m-->[0m  [4mschema.prisma:11[0m
         [1;94m   | [0m
-        [1;94m11 | [0m  id Int @id @default(autoincrement())
-        [1;94m12 | [0m  a  String @default("asdf", [1;91mmap: "reserved"[0m)
+        [1;94m10 | [0m  id Int @id @default(autoincrement())
+        [1;94m11 | [0m  a  String @default("asdf", [1;91mmap: "reserved"[0m)
         [1;94m   | [0m
         [1;91merror[0m: [1mError parsing attribute "@default": The given constraint name `reserved` has to be unique in the following namespace: global for primary keys, foreign keys and default constraints. Please provide a different name using the `map` argument.[0m
-          [1;94m-->[0m  [4mschema.prisma:17[0m
+          [1;94m-->[0m  [4mschema.prisma:16[0m
         [1;94m   | [0m
-        [1;94m16 | [0m  id Int @id @default(autoincrement())
-        [1;94m17 | [0m  b  String @default("asdf", [1;91mmap: "reserved"[0m)
+        [1;94m15 | [0m  id Int @id @default(autoincrement())
+        [1;94m16 | [0m  b  String @default("asdf", [1;91mmap: "reserved"[0m)
         [1;94m   | [0m
     "#]];
 
@@ -623,7 +612,6 @@ fn named_default_constraints_cannot_clash_with_pk_names() {
     let dml = indoc! { r#"
         datasource test {
           provider = "sqlserver"
-          url = "sqlserver://"
         }
 
         generator js {
@@ -644,16 +632,16 @@ fn named_default_constraints_cannot_clash_with_pk_names() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@default": The given constraint name `reserved` has to be unique in the following namespace: global for primary keys, foreign keys and default constraints. Please provide a different name using the `map` argument.[0m
-          [1;94m-->[0m  [4mschema.prisma:12[0m
+          [1;94m-->[0m  [4mschema.prisma:11[0m
         [1;94m   | [0m
-        [1;94m11 | [0m  id Int @id @default(autoincrement())
-        [1;94m12 | [0m  a  String @default("asdf", [1;91mmap: "reserved"[0m)
+        [1;94m10 | [0m  id Int @id @default(autoincrement())
+        [1;94m11 | [0m  a  String @default("asdf", [1;91mmap: "reserved"[0m)
         [1;94m   | [0m
         [1;91merror[0m: [1mError parsing attribute "@id": The given constraint name `reserved` has to be unique in the following namespace: global for primary keys, foreign keys and default constraints. Please provide a different name using the `map` argument.[0m
-          [1;94m-->[0m  [4mschema.prisma:16[0m
+          [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
-        [1;94m15 | [0mmodel B {
-        [1;94m16 | [0m  id Int @id([1;91mmap: "reserved"[0m) @default(autoincrement())
+        [1;94m14 | [0mmodel B {
+        [1;94m15 | [0m  id Int @id([1;91mmap: "reserved"[0m) @default(autoincrement())
         [1;94m   | [0m
     "#]];
 
@@ -665,7 +653,6 @@ fn named_default_constraints_cannot_clash_with_fk_names() {
     let dml = indoc! { r#"
         datasource test {
           provider = "sqlserver"
-          url = "sqlserver://"
         }
 
         model A {
@@ -685,16 +672,16 @@ fn named_default_constraints_cannot_clash_with_fk_names() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@default": The given constraint name `reserved` has to be unique in the following namespace: global for primary keys, foreign keys and default constraints. Please provide a different name using the `map` argument.[0m
-          [1;94m-->[0m  [4mschema.prisma:8[0m
+          [1;94m-->[0m  [4mschema.prisma:7[0m
         [1;94m   | [0m
-        [1;94m 7 | [0m  id  Int @id @default(autoincrement())
-        [1;94m 8 | [0m  a   String  @default("asdf", [1;91mmap: "reserved"[0m)
+        [1;94m 6 | [0m  id  Int @id @default(autoincrement())
+        [1;94m 7 | [0m  a   String  @default("asdf", [1;91mmap: "reserved"[0m)
         [1;94m   | [0m
         [1;91merror[0m: [1mError parsing attribute "@relation": The given constraint name `reserved` has to be unique in the following namespace: global for primary keys, foreign keys and default constraints. Please provide a different name using the `map` argument.[0m
-          [1;94m-->[0m  [4mschema.prisma:9[0m
+          [1;94m-->[0m  [4mschema.prisma:8[0m
         [1;94m   | [0m
-        [1;94m 8 | [0m  a   String  @default("asdf", map: "reserved")
-        [1;94m 9 | [0m  b   B       @relation(fields: [bId], references: [id], [1;91mmap: "reserved"[0m)
+        [1;94m 7 | [0m  a   String  @default("asdf", map: "reserved")
+        [1;94m 8 | [0m  b   B       @relation(fields: [bId], references: [id], [1;91mmap: "reserved"[0m)
         [1;94m   | [0m
     "#]];
 
@@ -734,7 +721,6 @@ fn must_error_on_auto_default_on_non_native_type_on_mongodb() {
     let schema = r#"
         datasource db {
             provider = "mongodb"
-            url = "mongodb://"
         }
 
         model User {
@@ -747,18 +733,18 @@ fn must_error_on_auto_default_on_non_native_type_on_mongodb() {
 
     let expected = expect![[r#"
         [1;91merror[0m: [1mError validating field `nickname` in model `User`: MongoDB `@default(auto())` fields must have `ObjectId` native type.[0m
-          [1;94m-->[0m  [4mschema.prisma:9[0m
+          [1;94m-->[0m  [4mschema.prisma:8[0m
         [1;94m   | [0m
-        [1;94m 8 | [0m            id Int @id @map("_id")
-        [1;94m 9 | [0m            [1;91mnickname String @default(auto())[0m
-        [1;94m10 | [0m        }
+        [1;94m 7 | [0m            id Int @id @map("_id")
+        [1;94m 8 | [0m            [1;91mnickname String @default(auto())[0m
+        [1;94m 9 | [0m        }
         [1;94m   | [0m
         [1;91merror[0m: [1mError validating field `nickname` in model `User`: MongoDB `@default(auto())` fields must have the `@id` attribute.[0m
-          [1;94m-->[0m  [4mschema.prisma:9[0m
+          [1;94m-->[0m  [4mschema.prisma:8[0m
         [1;94m   | [0m
-        [1;94m 8 | [0m            id Int @id @map("_id")
-        [1;94m 9 | [0m            [1;91mnickname String @default(auto())[0m
-        [1;94m10 | [0m        }
+        [1;94m 7 | [0m            id Int @id @map("_id")
+        [1;94m 8 | [0m            [1;91mnickname String @default(auto())[0m
+        [1;94m 9 | [0m        }
         [1;94m   | [0m
     "#]];
 
@@ -770,7 +756,6 @@ fn must_error_on_auto_default_on_non_object_id_on_mongodb() {
     let schema = r#"
         datasource db {
             provider = "mongodb"
-            url = "mongodb://"
         }
 
         model User {
@@ -783,11 +768,11 @@ fn must_error_on_auto_default_on_non_object_id_on_mongodb() {
 
     let expected = expect![[r#"
         [1;91merror[0m: [1mError validating field `id` in model `User`: MongoDB `@default(auto())` fields must have `ObjectId` native type.[0m
-          [1;94m-->[0m  [4mschema.prisma:8[0m
+          [1;94m-->[0m  [4mschema.prisma:7[0m
         [1;94m   | [0m
-        [1;94m 7 | [0m        model User {
-        [1;94m 8 | [0m            [1;91mid Int @id @map("_id") @default(auto()) @db.Int[0m
-        [1;94m 9 | [0m            nickname String
+        [1;94m 6 | [0m        model User {
+        [1;94m 7 | [0m            [1;91mid Int @id @map("_id") @default(auto()) @db.Int[0m
+        [1;94m 8 | [0m            nickname String
         [1;94m   | [0m
     "#]];
 
@@ -799,7 +784,6 @@ fn must_error_on_auto_default_on_mongodb_composite() {
     let schema = r#"
         datasource db {
             provider = "mongodb"
-            url = "mongodb://"
         }
 
         model User {
@@ -816,10 +800,10 @@ fn must_error_on_auto_default_on_mongodb_composite() {
 
     let expected = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@default": The function `auto()` is not supported on composite fields.[0m
-          [1;94m-->[0m  [4mschema.prisma:13[0m
+          [1;94m-->[0m  [4mschema.prisma:12[0m
         [1;94m   | [0m
-        [1;94m12 | [0m        type Meow {
-        [1;94m13 | [0m            id String [1;91m@default(auto())[0m @db.ObjectId
+        [1;94m11 | [0m        type Meow {
+        [1;94m12 | [0m            id String [1;91m@default(auto())[0m @db.ObjectId
         [1;94m   | [0m
     "#]];
 
@@ -831,7 +815,6 @@ fn must_error_on_dbgenerated_default_on_mongodb() {
     let schema = r#"
         datasource db {
             provider = "mongodb"
-            url = "mongodb://"
         }
 
         model User {
@@ -843,11 +826,11 @@ fn must_error_on_dbgenerated_default_on_mongodb() {
 
     let expected = expect![[r#"
         [1;91merror[0m: [1mError validating field `id` in model `User`: The `dbgenerated()` function is not allowed with MongoDB. Please use `auto()` instead.[0m
-          [1;94m-->[0m  [4mschema.prisma:8[0m
+          [1;94m-->[0m  [4mschema.prisma:7[0m
         [1;94m   | [0m
-        [1;94m 7 | [0m        model User {
-        [1;94m 8 | [0m            [1;91mid String @id @map("_id") @default(dbgenerated()) @db.ObjectId[0m
-        [1;94m 9 | [0m        }
+        [1;94m 6 | [0m        model User {
+        [1;94m 7 | [0m            [1;91mid String @id @map("_id") @default(dbgenerated()) @db.ObjectId[0m
+        [1;94m 8 | [0m        }
         [1;94m   | [0m
     "#]];
 
@@ -859,7 +842,6 @@ fn must_error_with_auto_params_on_mongodb() {
     let schema = r#"
         datasource db {
             provider = "mongodb"
-            url = "mongodb://"
         }
 
         model User {
@@ -871,10 +853,10 @@ fn must_error_with_auto_params_on_mongodb() {
 
     let expected = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@default": `auto()` takes no arguments[0m
-          [1;94m-->[0m  [4mschema.prisma:8[0m
+          [1;94m-->[0m  [4mschema.prisma:7[0m
         [1;94m   | [0m
-        [1;94m 7 | [0m        model User {
-        [1;94m 8 | [0m            id String @id @map("_id") [1;91m@default(auto("meow"))[0m @db.ObjectId
+        [1;94m 6 | [0m        model User {
+        [1;94m 7 | [0m            id String @id @map("_id") [1;91m@default(auto("meow"))[0m @db.ObjectId
         [1;94m   | [0m
     "#]];
 
@@ -886,7 +868,6 @@ fn must_error_if_using_auto_with_postgres() {
     let schema = r#"
         datasource db {
             provider = "postgres"
-            url = "postgres://"
         }
 
         model User {
@@ -898,10 +879,10 @@ fn must_error_if_using_auto_with_postgres() {
 
     let expected = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@default": The current connector does not support the `auto()` function.[0m
-          [1;94m-->[0m  [4mschema.prisma:8[0m
+          [1;94m-->[0m  [4mschema.prisma:7[0m
         [1;94m   | [0m
-        [1;94m 7 | [0m        model User {
-        [1;94m 8 | [0m            id String @id @default([1;91mauto()[0m)
+        [1;94m 6 | [0m        model User {
+        [1;94m 7 | [0m            id String @id @default([1;91mauto()[0m)
         [1;94m   | [0m
     "#]];
 
@@ -913,7 +894,6 @@ fn must_error_if_using_auto_with_mysql() {
     let schema = r#"
         datasource db {
             provider = "mysql"
-            url = "mysql://"
         }
 
         model User {
@@ -925,10 +905,10 @@ fn must_error_if_using_auto_with_mysql() {
 
     let expected = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@default": The current connector does not support the `auto()` function.[0m
-          [1;94m-->[0m  [4mschema.prisma:8[0m
+          [1;94m-->[0m  [4mschema.prisma:7[0m
         [1;94m   | [0m
-        [1;94m 7 | [0m        model User {
-        [1;94m 8 | [0m            id String @id @default([1;91mauto()[0m)
+        [1;94m 6 | [0m        model User {
+        [1;94m 7 | [0m            id String @id @default([1;91mauto()[0m)
         [1;94m   | [0m
     "#]];
 
@@ -940,7 +920,6 @@ fn must_error_if_using_auto_with_sql_server() {
     let schema = r#"
         datasource db {
             provider = "sqlserver"
-            url = "sqlserver://"
         }
 
         model User {
@@ -952,10 +931,10 @@ fn must_error_if_using_auto_with_sql_server() {
 
     let expected = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@default": The current connector does not support the `auto()` function.[0m
-          [1;94m-->[0m  [4mschema.prisma:8[0m
+          [1;94m-->[0m  [4mschema.prisma:7[0m
         [1;94m   | [0m
-        [1;94m 7 | [0m        model User {
-        [1;94m 8 | [0m            id String @id @default([1;91mauto()[0m)
+        [1;94m 6 | [0m        model User {
+        [1;94m 7 | [0m            id String @id @default([1;91mauto()[0m)
         [1;94m   | [0m
     "#]];
 
@@ -967,7 +946,6 @@ fn must_error_if_using_auto_with_sqlite() {
     let schema = r#"
         datasource db {
             provider = "sqlite"
-            url = "file:dev.db"
         }
 
         model User {
@@ -979,10 +957,10 @@ fn must_error_if_using_auto_with_sqlite() {
 
     let expected = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@default": The current connector does not support the `auto()` function.[0m
-          [1;94m-->[0m  [4mschema.prisma:8[0m
+          [1;94m-->[0m  [4mschema.prisma:7[0m
         [1;94m   | [0m
-        [1;94m 7 | [0m        model User {
-        [1;94m 8 | [0m            id String @id @default([1;91mauto()[0m)
+        [1;94m 6 | [0m        model User {
+        [1;94m 7 | [0m            id String @id @default([1;91mauto()[0m)
         [1;94m   | [0m
     "#]];
 
@@ -994,7 +972,6 @@ fn must_error_on_auto_default_on_non_id_on_mongodb() {
     let schema = r#"
         datasource db {
             provider = "mongodb"
-            url = "mongodb://"
         }
 
         model User {
@@ -1007,11 +984,11 @@ fn must_error_on_auto_default_on_non_id_on_mongodb() {
 
     let expected = expect![[r#"
         [1;91merror[0m: [1mError validating field `nickname` in model `User`: MongoDB `@default(auto())` fields must have the `@id` attribute.[0m
-          [1;94m-->[0m  [4mschema.prisma:9[0m
+          [1;94m-->[0m  [4mschema.prisma:8[0m
         [1;94m   | [0m
-        [1;94m 8 | [0m            id Int @id @map("_id")
-        [1;94m 9 | [0m            [1;91mnickname String @default(auto()) @db.ObjectId[0m
-        [1;94m10 | [0m        }
+        [1;94m 7 | [0m            id Int @id @map("_id")
+        [1;94m 8 | [0m            [1;91mnickname String @default(auto()) @db.ObjectId[0m
+        [1;94m 9 | [0m        }
         [1;94m   | [0m
     "#]];
 
@@ -1136,7 +1113,6 @@ fn nested_scalar_list_defaults_are_disallowed() {
     let schema = r#"
         datasource db {
             provider = "postgresql"
-            url = env("DBURL")
         }
 
         model Pizza {
@@ -1147,10 +1123,10 @@ fn nested_scalar_list_defaults_are_disallowed() {
 
     let expected = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@default": Expected a String value, but found `["potato","with","rosmarin"]`.[0m
-          [1;94m-->[0m  [4mschema.prisma:9[0m
+          [1;94m-->[0m  [4mschema.prisma:8[0m
         [1;94m   | [0m
-        [1;94m 8 | [0m            id Int @id
-        [1;94m 9 | [0m            toppings String[] [1;91m@default(["reblochon cheese", ["potato", "with", "rosmarin"], "onions"])[0m
+        [1;94m 7 | [0m            id Int @id
+        [1;94m 8 | [0m            toppings String[] [1;91m@default(["reblochon cheese", ["potato", "with", "rosmarin"], "onions"])[0m
         [1;94m   | [0m
     "#]];
 
@@ -1162,7 +1138,6 @@ fn scalar_list_default_on_connector_without_scalar_lists() {
     let schema = r#"
         datasource db {
             provider = "sqlserver"
-            url = env("DBURL")
         }
 
         model Pizza {
@@ -1173,11 +1148,11 @@ fn scalar_list_default_on_connector_without_scalar_lists() {
 
     let expected = expect![[r#"
         [1;91merror[0m: [1mField "toppings" in model "Pizza" can't be a list. The current connector does not support lists of primitive types.[0m
-          [1;94m-->[0m  [4mschema.prisma:9[0m
+          [1;94m-->[0m  [4mschema.prisma:8[0m
         [1;94m   | [0m
-        [1;94m 8 | [0m            id Int @id
-        [1;94m 9 | [0m            [1;91mtoppings String[] @default(["reblochon cheese", "potato", "rosmarin", "onions"])[0m
-        [1;94m10 | [0m        }
+        [1;94m 7 | [0m            id Int @id
+        [1;94m 8 | [0m            [1;91mtoppings String[] @default(["reblochon cheese", "potato", "rosmarin", "onions"])[0m
+        [1;94m 9 | [0m        }
         [1;94m   | [0m
     "#]];
 
@@ -1189,7 +1164,6 @@ fn scalar_list_default_on_non_list_field() {
     let schema = r#"
         datasource db {
             provider = "postgresql"
-            url = env("DBURL")
         }
 
         model Pizza {
@@ -1200,10 +1174,10 @@ fn scalar_list_default_on_non_list_field() {
 
     let expected = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@default": The default value of a non-list field cannot be a list.[0m
-          [1;94m-->[0m  [4mschema.prisma:9[0m
+          [1;94m-->[0m  [4mschema.prisma:8[0m
         [1;94m   | [0m
-        [1;94m 8 | [0m            id Int @id
-        [1;94m 9 | [0m            toppings String [1;91m@default(["reblochon cheese", "potato", "rosmarin", "onions"])[0m
+        [1;94m 7 | [0m            id Int @id
+        [1;94m 8 | [0m            toppings String [1;91m@default(["reblochon cheese", "potato", "rosmarin", "onions"])[0m
         [1;94m   | [0m
     "#]];
 
@@ -1215,7 +1189,6 @@ fn dbgenerated_inside_scalar_list_default() {
     let schema = r#"
         datasource db {
             provider = "postgresql"
-            url = env("DBURL")
         }
 
         model Pizza {
@@ -1226,10 +1199,10 @@ fn dbgenerated_inside_scalar_list_default() {
 
     let expected = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@default": Expected a String value, but found `dbgenerated("potato")`.[0m
-          [1;94m-->[0m  [4mschema.prisma:9[0m
+          [1;94m-->[0m  [4mschema.prisma:8[0m
         [1;94m   | [0m
-        [1;94m 8 | [0m            id Int @id
-        [1;94m 9 | [0m            toppings String[] [1;91m@default(["reblochon cheese", dbgenerated("potato"), "rosmarin", "onions"])[0m
+        [1;94m 7 | [0m            id Int @id
+        [1;94m 8 | [0m            toppings String[] [1;91m@default(["reblochon cheese", dbgenerated("potato"), "rosmarin", "onions"])[0m
         [1;94m   | [0m
     "#]];
 

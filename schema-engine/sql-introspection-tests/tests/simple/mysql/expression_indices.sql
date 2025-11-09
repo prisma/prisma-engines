@@ -16,7 +16,6 @@ generator js {
 
 datasource db {
   provider = "mysql"
-  url      = env("DATABASE_URL")
 }
 
 model customers {

@@ -21,11 +21,6 @@ impl<'a> DatasourceBuilder<'a> {
         self
     }
 
-    pub fn url(mut self, url: impl AsRef<str>) -> Self {
-        self.add_debug("url", url.as_ref());
-        self
-    }
-
     pub fn relation_mode(mut self, relation_mode: impl AsRef<str>) -> Self {
         self.add_debug("relationMode", relation_mode.as_ref());
         self
@@ -80,7 +75,6 @@ mod test {
     fn all() {
         let datasource = DatasourceBuilder::new("test")
             .provider("postgresql")
-            .url("postgres://test")
             .relation_mode("foreignKeys")
             .schemas(&["public"])
             .extensions(&["citext", r#"postgis(version: "2.1")"#])
@@ -92,7 +86,6 @@ mod test {
                 r#"
                 datasource test {
                     provider = "postgresql"
-                    url = "postgres://test"
                     relationMode = "foreignKeys"
                     schemas = ["public"]
                     extensions = [citext, postgis(version: "2.1")]
@@ -104,17 +97,13 @@ mod test {
 
     #[test]
     fn partial_mixed() {
-        let datasource = DatasourceBuilder::new("db")
-            .url("mysql://test")
-            .provider("mysql")
-            .render();
+        let datasource = DatasourceBuilder::new("db").provider("mysql").render();
 
         assert_eq!(
             datasource,
             indoc! {
                 r#"
                 datasource db {
-                    url = "mysql://test"
                     provider = "mysql"
                 }
                 "#

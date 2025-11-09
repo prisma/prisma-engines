@@ -5,7 +5,6 @@ fn implicit_many_to_many_relation_fields_with_referential_actions() {
     let schema = indoc! {r#"
         datasource db {
           provider = "sqlite"
-          url      = "file:./dev.db"
         }
 
         model Track {
@@ -23,28 +22,28 @@ fn implicit_many_to_many_relation_fields_with_referential_actions() {
 
     let expect = expect![[r#"
         [1;91merror[0m: [1mError validating: Referential actions on implicit many-to-many relations are not supported[0m
-          [1;94m-->[0m  [4mschema.prisma:15[0m
+          [1;94m-->[0m  [4mschema.prisma:14[0m
         [1;94m   | [0m
-        [1;94m14 | [0m  name   String
-        [1;94m15 | [0m  tracks Track[] @relation(onDelete: [1;91mRestrict[0m, onUpdate: Restrict)
-        [1;94m   | [0m
-        [1;91merror[0m: [1mError validating: Referential actions on implicit many-to-many relations are not supported[0m
-          [1;94m-->[0m  [4mschema.prisma:15[0m
-        [1;94m   | [0m
-        [1;94m14 | [0m  name   String
-        [1;94m15 | [0m  tracks Track[] @relation(onDelete: Restrict, onUpdate: [1;91mRestrict[0m)
+        [1;94m13 | [0m  name   String
+        [1;94m14 | [0m  tracks Track[] @relation(onDelete: [1;91mRestrict[0m, onUpdate: Restrict)
         [1;94m   | [0m
         [1;91merror[0m: [1mError validating: Referential actions on implicit many-to-many relations are not supported[0m
-          [1;94m-->[0m  [4mschema.prisma:9[0m
+          [1;94m-->[0m  [4mschema.prisma:14[0m
         [1;94m   | [0m
-        [1;94m 8 | [0m  title     String
-        [1;94m 9 | [0m  playlists Playlist[] @relation(onDelete: [1;91mRestrict[0m, onUpdate: Restrict)
+        [1;94m13 | [0m  name   String
+        [1;94m14 | [0m  tracks Track[] @relation(onDelete: Restrict, onUpdate: [1;91mRestrict[0m)
         [1;94m   | [0m
         [1;91merror[0m: [1mError validating: Referential actions on implicit many-to-many relations are not supported[0m
-          [1;94m-->[0m  [4mschema.prisma:9[0m
+          [1;94m-->[0m  [4mschema.prisma:8[0m
         [1;94m   | [0m
-        [1;94m 8 | [0m  title     String
-        [1;94m 9 | [0m  playlists Playlist[] @relation(onDelete: Restrict, onUpdate: [1;91mRestrict[0m)
+        [1;94m 7 | [0m  title     String
+        [1;94m 8 | [0m  playlists Playlist[] @relation(onDelete: [1;91mRestrict[0m, onUpdate: Restrict)
+        [1;94m   | [0m
+        [1;91merror[0m: [1mError validating: Referential actions on implicit many-to-many relations are not supported[0m
+          [1;94m-->[0m  [4mschema.prisma:8[0m
+        [1;94m   | [0m
+        [1;94m 7 | [0m  title     String
+        [1;94m 8 | [0m  playlists Playlist[] @relation(onDelete: Restrict, onUpdate: [1;91mRestrict[0m)
         [1;94m   | [0m
     "#]];
 
@@ -69,28 +68,28 @@ fn embedded_many_to_many_relation_fields_with_referential_actions() {
 
     let expect = expect![[r#"
         [1;91merror[0m: [1mError validating: Referential actions on two-way embedded many-to-many relations are not supported[0m
-          [1;94m-->[0m  [4mschema.prisma:14[0m
+          [1;94m-->[0m  [4mschema.prisma:13[0m
         [1;94m   | [0m
-        [1;94m13 | [0m  b_ids Int[]
-        [1;94m14 | [0m  bs    B[]   @relation(fields: [b_ids], references: [id], onDelete: [1;91mRestrict[0m, onUpdate: Restrict)
-        [1;94m   | [0m
-        [1;91merror[0m: [1mError validating: Referential actions on two-way embedded many-to-many relations are not supported[0m
-          [1;94m-->[0m  [4mschema.prisma:14[0m
-        [1;94m   | [0m
-        [1;94m13 | [0m  b_ids Int[]
-        [1;94m14 | [0m  bs    B[]   @relation(fields: [b_ids], references: [id], onDelete: Restrict, onUpdate: [1;91mRestrict[0m)
+        [1;94m12 | [0m  b_ids Int[]
+        [1;94m13 | [0m  bs    B[]   @relation(fields: [b_ids], references: [id], onDelete: [1;91mRestrict[0m, onUpdate: Restrict)
         [1;94m   | [0m
         [1;91merror[0m: [1mError validating: Referential actions on two-way embedded many-to-many relations are not supported[0m
-          [1;94m-->[0m  [4mschema.prisma:20[0m
+          [1;94m-->[0m  [4mschema.prisma:13[0m
         [1;94m   | [0m
-        [1;94m19 | [0m  a_ids Int[]
-        [1;94m20 | [0m  as    A[]   @relation(fields: [a_ids], references: [id], onDelete: [1;91mRestrict[0m, onUpdate: Restrict)
+        [1;94m12 | [0m  b_ids Int[]
+        [1;94m13 | [0m  bs    B[]   @relation(fields: [b_ids], references: [id], onDelete: Restrict, onUpdate: [1;91mRestrict[0m)
         [1;94m   | [0m
         [1;91merror[0m: [1mError validating: Referential actions on two-way embedded many-to-many relations are not supported[0m
-          [1;94m-->[0m  [4mschema.prisma:20[0m
+          [1;94m-->[0m  [4mschema.prisma:19[0m
         [1;94m   | [0m
-        [1;94m19 | [0m  a_ids Int[]
-        [1;94m20 | [0m  as    A[]   @relation(fields: [a_ids], references: [id], onDelete: Restrict, onUpdate: [1;91mRestrict[0m)
+        [1;94m18 | [0m  a_ids Int[]
+        [1;94m19 | [0m  as    A[]   @relation(fields: [a_ids], references: [id], onDelete: [1;91mRestrict[0m, onUpdate: Restrict)
+        [1;94m   | [0m
+        [1;91merror[0m: [1mError validating: Referential actions on two-way embedded many-to-many relations are not supported[0m
+          [1;94m-->[0m  [4mschema.prisma:19[0m
+        [1;94m   | [0m
+        [1;94m18 | [0m  a_ids Int[]
+        [1;94m19 | [0m  as    A[]   @relation(fields: [a_ids], references: [id], onDelete: Restrict, onUpdate: [1;91mRestrict[0m)
         [1;94m   | [0m
     "#]];
 
@@ -116,18 +115,18 @@ fn embedded_many_to_many_relation_fields_with_referential_actions_postgres() {
 
     let expect = expect![[r#"
         [1;91merror[0m: [1mError validating: Embedded many-to-many relations are not supported on Postgres. Please use the syntax defined in https://pris.ly/d/relational-database-many-to-many[0m
-          [1;94m-->[0m  [4mschema.prisma:14[0m
+          [1;94m-->[0m  [4mschema.prisma:13[0m
         [1;94m   | [0m
-        [1;94m13 | [0m  b_ids Int[]
-        [1;94m14 | [0m  [1;91mbs    B[]   @relation(fields: [b_ids], references: [id], onDelete: Restrict, onUpdate: Restrict)[0m
-        [1;94m15 | [0m}
+        [1;94m12 | [0m  b_ids Int[]
+        [1;94m13 | [0m  [1;91mbs    B[]   @relation(fields: [b_ids], references: [id], onDelete: Restrict, onUpdate: Restrict)[0m
+        [1;94m14 | [0m}
         [1;94m   | [0m
         [1;91merror[0m: [1mError validating: Embedded many-to-many relations are not supported on Postgres. Please use the syntax defined in https://pris.ly/d/relational-database-many-to-many[0m
-          [1;94m-->[0m  [4mschema.prisma:20[0m
+          [1;94m-->[0m  [4mschema.prisma:19[0m
         [1;94m   | [0m
-        [1;94m19 | [0m  a_ids Int[]
-        [1;94m20 | [0m  [1;91mas    A[]   @relation(fields: [a_ids], references: [id], onDelete: Restrict, onUpdate: Restrict)[0m
-        [1;94m21 | [0m}
+        [1;94m18 | [0m  a_ids Int[]
+        [1;94m19 | [0m  [1;91mas    A[]   @relation(fields: [a_ids], references: [id], onDelete: Restrict, onUpdate: Restrict)[0m
+        [1;94m20 | [0m}
         [1;94m   | [0m
     "#]];
 
@@ -153,10 +152,10 @@ fn embedded_many_to_many_must_define_references_on_both_sides() {
 
     let expect = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@relation": The `references` argument must be defined and must point to exactly one scalar field. https://pris.ly/d/many-to-many-relations[0m
-          [1;94m-->[0m  [4mschema.prisma:20[0m
+          [1;94m-->[0m  [4mschema.prisma:19[0m
         [1;94m   | [0m
-        [1;94m19 | [0m  a_ids Int[]
-        [1;94m20 | [0m  as    A[]   [1;91m@relation(fields: [a_ids])[0m
+        [1;94m18 | [0m  a_ids Int[]
+        [1;94m19 | [0m  as    A[]   [1;91m@relation(fields: [a_ids])[0m
         [1;94m   | [0m
     "#]];
 
@@ -179,10 +178,10 @@ fn embedded_many_to_many_must_define_references_on_both_sides() {
 
     let expect = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@relation": The `references` argument must be defined and must point to exactly one scalar field. https://pris.ly/d/many-to-many-relations[0m
-          [1;94m-->[0m  [4mschema.prisma:14[0m
+          [1;94m-->[0m  [4mschema.prisma:13[0m
         [1;94m   | [0m
-        [1;94m13 | [0m  b_ids Int[]
-        [1;94m14 | [0m  bs    B[]   [1;91m@relation(fields: [b_ids])[0m
+        [1;94m12 | [0m  b_ids Int[]
+        [1;94m13 | [0m  bs    B[]   [1;91m@relation(fields: [b_ids])[0m
         [1;94m   | [0m
     "#]];
 
@@ -205,16 +204,16 @@ fn embedded_many_to_many_must_define_references_on_both_sides() {
 
     let expect = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@relation": The `references` argument must be defined and must point to exactly one scalar field. https://pris.ly/d/many-to-many-relations[0m
-          [1;94m-->[0m  [4mschema.prisma:14[0m
+          [1;94m-->[0m  [4mschema.prisma:13[0m
         [1;94m   | [0m
-        [1;94m13 | [0m  b_ids Int[]
-        [1;94m14 | [0m  bs    B[]   [1;91m@relation(fields: [b_ids])[0m
+        [1;94m12 | [0m  b_ids Int[]
+        [1;94m13 | [0m  bs    B[]   [1;91m@relation(fields: [b_ids])[0m
         [1;94m   | [0m
         [1;91merror[0m: [1mError parsing attribute "@relation": The `references` argument must be defined and must point to exactly one scalar field. https://pris.ly/d/many-to-many-relations[0m
-          [1;94m-->[0m  [4mschema.prisma:20[0m
+          [1;94m-->[0m  [4mschema.prisma:19[0m
         [1;94m   | [0m
-        [1;94m19 | [0m  a_ids Int[]
-        [1;94m20 | [0m  as    A[]   [1;91m@relation(fields: [a_ids])[0m
+        [1;94m18 | [0m  a_ids Int[]
+        [1;94m19 | [0m  as    A[]   [1;91m@relation(fields: [a_ids])[0m
         [1;94m   | [0m
     "#]];
 
@@ -240,18 +239,18 @@ fn embedded_many_to_many_must_define_references_on_both_sides_postgres() {
 
     let expect = expect![[r#"
         [1;91merror[0m: [1mError validating: Embedded many-to-many relations are not supported on Postgres. Please use the syntax defined in https://pris.ly/d/relational-database-many-to-many[0m
-          [1;94m-->[0m  [4mschema.prisma:14[0m
+          [1;94m-->[0m  [4mschema.prisma:13[0m
         [1;94m   | [0m
-        [1;94m13 | [0m  b_ids Int[]
-        [1;94m14 | [0m  [1;91mbs    B[]   @relation(fields: [b_ids], references: [id])[0m
-        [1;94m15 | [0m}
+        [1;94m12 | [0m  b_ids Int[]
+        [1;94m13 | [0m  [1;91mbs    B[]   @relation(fields: [b_ids], references: [id])[0m
+        [1;94m14 | [0m}
         [1;94m   | [0m
         [1;91merror[0m: [1mError validating: Embedded many-to-many relations are not supported on Postgres. Please use the syntax defined in https://pris.ly/d/relational-database-many-to-many[0m
-          [1;94m-->[0m  [4mschema.prisma:20[0m
+          [1;94m-->[0m  [4mschema.prisma:19[0m
         [1;94m   | [0m
-        [1;94m19 | [0m  a_ids Int[]
-        [1;94m20 | [0m  [1;91mas    A[]   @relation(fields: [a_ids])[0m
-        [1;94m21 | [0m}
+        [1;94m18 | [0m  a_ids Int[]
+        [1;94m19 | [0m  [1;91mas    A[]   @relation(fields: [a_ids])[0m
+        [1;94m20 | [0m}
         [1;94m   | [0m
     "#]];
 
@@ -274,18 +273,18 @@ fn embedded_many_to_many_must_define_references_on_both_sides_postgres() {
 
     let expect = expect![[r#"
         [1;91merror[0m: [1mError validating: Embedded many-to-many relations are not supported on Postgres. Please use the syntax defined in https://pris.ly/d/relational-database-many-to-many[0m
-          [1;94m-->[0m  [4mschema.prisma:14[0m
+          [1;94m-->[0m  [4mschema.prisma:13[0m
         [1;94m   | [0m
-        [1;94m13 | [0m  b_ids Int[]
-        [1;94m14 | [0m  [1;91mbs    B[]   @relation(fields: [b_ids])[0m
-        [1;94m15 | [0m}
+        [1;94m12 | [0m  b_ids Int[]
+        [1;94m13 | [0m  [1;91mbs    B[]   @relation(fields: [b_ids])[0m
+        [1;94m14 | [0m}
         [1;94m   | [0m
         [1;91merror[0m: [1mError validating: Embedded many-to-many relations are not supported on Postgres. Please use the syntax defined in https://pris.ly/d/relational-database-many-to-many[0m
-          [1;94m-->[0m  [4mschema.prisma:20[0m
+          [1;94m-->[0m  [4mschema.prisma:19[0m
         [1;94m   | [0m
-        [1;94m19 | [0m  a_ids Int[]
-        [1;94m20 | [0m  [1;91mas    A[]   @relation(fields: [a_ids], references: [id])[0m
-        [1;94m21 | [0m}
+        [1;94m18 | [0m  a_ids Int[]
+        [1;94m19 | [0m  [1;91mas    A[]   @relation(fields: [a_ids], references: [id])[0m
+        [1;94m20 | [0m}
         [1;94m   | [0m
     "#]];
 
@@ -308,18 +307,18 @@ fn embedded_many_to_many_must_define_references_on_both_sides_postgres() {
 
     let expect = expect![[r#"
         [1;91merror[0m: [1mError validating: Embedded many-to-many relations are not supported on Postgres. Please use the syntax defined in https://pris.ly/d/relational-database-many-to-many[0m
-          [1;94m-->[0m  [4mschema.prisma:14[0m
+          [1;94m-->[0m  [4mschema.prisma:13[0m
         [1;94m   | [0m
-        [1;94m13 | [0m  b_ids Int[]
-        [1;94m14 | [0m  [1;91mbs    B[]   @relation(fields: [b_ids])[0m
-        [1;94m15 | [0m}
+        [1;94m12 | [0m  b_ids Int[]
+        [1;94m13 | [0m  [1;91mbs    B[]   @relation(fields: [b_ids])[0m
+        [1;94m14 | [0m}
         [1;94m   | [0m
         [1;91merror[0m: [1mError validating: Embedded many-to-many relations are not supported on Postgres. Please use the syntax defined in https://pris.ly/d/relational-database-many-to-many[0m
-          [1;94m-->[0m  [4mschema.prisma:20[0m
+          [1;94m-->[0m  [4mschema.prisma:19[0m
         [1;94m   | [0m
-        [1;94m19 | [0m  a_ids Int[]
-        [1;94m20 | [0m  [1;91mas    A[]   @relation(fields: [a_ids])[0m
-        [1;94m21 | [0m}
+        [1;94m18 | [0m  a_ids Int[]
+        [1;94m19 | [0m  [1;91mas    A[]   @relation(fields: [a_ids])[0m
+        [1;94m20 | [0m}
         [1;94m   | [0m
     "#]];
 
@@ -345,10 +344,10 @@ fn embedded_many_to_many_must_define_fields_on_both_sides() {
 
     let expect = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@relation": The `fields` argument must be defined and must point to exactly one scalar field. https://pris.ly/d/many-to-many-relations[0m
-          [1;94m-->[0m  [4mschema.prisma:20[0m
+          [1;94m-->[0m  [4mschema.prisma:19[0m
         [1;94m   | [0m
-        [1;94m19 | [0m  a_ids Int[]
-        [1;94m20 | [0m  as    A[]   [1;91m@relation(references: [id])[0m
+        [1;94m18 | [0m  a_ids Int[]
+        [1;94m19 | [0m  as    A[]   [1;91m@relation(references: [id])[0m
         [1;94m   | [0m
     "#]];
 
@@ -371,10 +370,10 @@ fn embedded_many_to_many_must_define_fields_on_both_sides() {
 
     let expect = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@relation": The `fields` argument must be defined and must point to exactly one scalar field. https://pris.ly/d/many-to-many-relations[0m
-          [1;94m-->[0m  [4mschema.prisma:14[0m
+          [1;94m-->[0m  [4mschema.prisma:13[0m
         [1;94m   | [0m
-        [1;94m13 | [0m  b_ids Int[]
-        [1;94m14 | [0m  bs    B[]   [1;91m@relation(references: [id])[0m
+        [1;94m12 | [0m  b_ids Int[]
+        [1;94m13 | [0m  bs    B[]   [1;91m@relation(references: [id])[0m
         [1;94m   | [0m
     "#]];
 
@@ -400,18 +399,18 @@ fn embedded_many_to_many_must_define_fields_on_both_sides_postgres() {
 
     let expect = expect![[r#"
         [1;91merror[0m: [1mError validating: Embedded many-to-many relations are not supported on Postgres. Please use the syntax defined in https://pris.ly/d/relational-database-many-to-many[0m
-          [1;94m-->[0m  [4mschema.prisma:14[0m
+          [1;94m-->[0m  [4mschema.prisma:13[0m
         [1;94m   | [0m
-        [1;94m13 | [0m  b_ids Int[]
-        [1;94m14 | [0m  [1;91mbs    B[]   @relation(fields: [b_ids], references: [id])[0m
-        [1;94m15 | [0m}
+        [1;94m12 | [0m  b_ids Int[]
+        [1;94m13 | [0m  [1;91mbs    B[]   @relation(fields: [b_ids], references: [id])[0m
+        [1;94m14 | [0m}
         [1;94m   | [0m
         [1;91merror[0m: [1mError validating: Embedded many-to-many relations are not supported on Postgres. Please use the syntax defined in https://pris.ly/d/relational-database-many-to-many[0m
-          [1;94m-->[0m  [4mschema.prisma:20[0m
+          [1;94m-->[0m  [4mschema.prisma:19[0m
         [1;94m   | [0m
-        [1;94m19 | [0m  a_ids Int[]
-        [1;94m20 | [0m  [1;91mas    A[]   @relation(references: [id])[0m
-        [1;94m21 | [0m}
+        [1;94m18 | [0m  a_ids Int[]
+        [1;94m19 | [0m  [1;91mas    A[]   @relation(references: [id])[0m
+        [1;94m20 | [0m}
         [1;94m   | [0m
     "#]];
 
@@ -434,18 +433,18 @@ fn embedded_many_to_many_must_define_fields_on_both_sides_postgres() {
 
     let expect = expect![[r#"
         [1;91merror[0m: [1mError validating: Embedded many-to-many relations are not supported on Postgres. Please use the syntax defined in https://pris.ly/d/relational-database-many-to-many[0m
-          [1;94m-->[0m  [4mschema.prisma:14[0m
+          [1;94m-->[0m  [4mschema.prisma:13[0m
         [1;94m   | [0m
-        [1;94m13 | [0m  b_ids Int[]
-        [1;94m14 | [0m  [1;91mbs    B[]   @relation(references: [id])[0m
-        [1;94m15 | [0m}
+        [1;94m12 | [0m  b_ids Int[]
+        [1;94m13 | [0m  [1;91mbs    B[]   @relation(references: [id])[0m
+        [1;94m14 | [0m}
         [1;94m   | [0m
         [1;91merror[0m: [1mError validating: Embedded many-to-many relations are not supported on Postgres. Please use the syntax defined in https://pris.ly/d/relational-database-many-to-many[0m
-          [1;94m-->[0m  [4mschema.prisma:20[0m
+          [1;94m-->[0m  [4mschema.prisma:19[0m
         [1;94m   | [0m
-        [1;94m19 | [0m  a_ids Int[]
-        [1;94m20 | [0m  [1;91mas    A[]   @relation(fields: [a_ids], references: [id])[0m
-        [1;94m21 | [0m}
+        [1;94m18 | [0m  a_ids Int[]
+        [1;94m19 | [0m  [1;91mas    A[]   @relation(fields: [a_ids], references: [id])[0m
+        [1;94m20 | [0m}
         [1;94m   | [0m
     "#]];
 
@@ -471,18 +470,18 @@ fn embedded_many_to_many_relations_do_not_work_on_postgresql() {
 
     let expect = expect![[r#"
         [1;91merror[0m: [1mError validating: Embedded many-to-many relations are not supported on Postgres. Please use the syntax defined in https://pris.ly/d/relational-database-many-to-many[0m
-          [1;94m-->[0m  [4mschema.prisma:14[0m
+          [1;94m-->[0m  [4mschema.prisma:13[0m
         [1;94m   | [0m
-        [1;94m13 | [0m  b_ids Int[]
-        [1;94m14 | [0m  [1;91mbs    B[]      @relation(fields: [b_ids], references: [id])[0m
-        [1;94m15 | [0m}
+        [1;94m12 | [0m  b_ids Int[]
+        [1;94m13 | [0m  [1;91mbs    B[]      @relation(fields: [b_ids], references: [id])[0m
+        [1;94m14 | [0m}
         [1;94m   | [0m
         [1;91merror[0m: [1mError validating: Embedded many-to-many relations are not supported on Postgres. Please use the syntax defined in https://pris.ly/d/relational-database-many-to-many[0m
-          [1;94m-->[0m  [4mschema.prisma:20[0m
+          [1;94m-->[0m  [4mschema.prisma:19[0m
         [1;94m   | [0m
-        [1;94m19 | [0m  a_ids Int[]
-        [1;94m20 | [0m  [1;91mas    A[]      @relation(fields: [a_ids], references: [id])[0m
-        [1;94m21 | [0m}
+        [1;94m18 | [0m  a_ids Int[]
+        [1;94m19 | [0m  [1;91mas    A[]      @relation(fields: [a_ids], references: [id])[0m
+        [1;94m20 | [0m}
         [1;94m   | [0m
     "#]];
 
@@ -508,18 +507,18 @@ fn embedded_many_to_many_relations_do_not_work_on_postgresql_with_mongo_preview_
 
     let expect = expect![[r#"
         [1;91merror[0m: [1mError validating: Embedded many-to-many relations are not supported on Postgres. Please use the syntax defined in https://pris.ly/d/relational-database-many-to-many[0m
-          [1;94m-->[0m  [4mschema.prisma:14[0m
+          [1;94m-->[0m  [4mschema.prisma:13[0m
         [1;94m   | [0m
-        [1;94m13 | [0m  b_ids Int[]
-        [1;94m14 | [0m  [1;91mbs    B[]      @relation(fields: [b_ids], references: [id])[0m
-        [1;94m15 | [0m}
+        [1;94m12 | [0m  b_ids Int[]
+        [1;94m13 | [0m  [1;91mbs    B[]      @relation(fields: [b_ids], references: [id])[0m
+        [1;94m14 | [0m}
         [1;94m   | [0m
         [1;91merror[0m: [1mError validating: Embedded many-to-many relations are not supported on Postgres. Please use the syntax defined in https://pris.ly/d/relational-database-many-to-many[0m
-          [1;94m-->[0m  [4mschema.prisma:20[0m
+          [1;94m-->[0m  [4mschema.prisma:19[0m
         [1;94m   | [0m
-        [1;94m19 | [0m  a_ids Int[]
-        [1;94m20 | [0m  [1;91mas    A[]      @relation(fields: [a_ids], references: [id])[0m
-        [1;94m21 | [0m}
+        [1;94m18 | [0m  a_ids Int[]
+        [1;94m19 | [0m  [1;91mas    A[]      @relation(fields: [a_ids], references: [id])[0m
+        [1;94m20 | [0m}
         [1;94m   | [0m
     "#]];
 
@@ -547,16 +546,16 @@ fn embedded_many_to_many_relations_must_refer_an_id_from_both_sides() {
 
     let expect = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@relation": The `references` argument must point to a singular `id` field[0m
-          [1;94m-->[0m  [4mschema.prisma:15[0m
+          [1;94m-->[0m  [4mschema.prisma:14[0m
         [1;94m   | [0m
-        [1;94m14 | [0m  b_ids Int[]
-        [1;94m15 | [0m  bs    B[]   @relation(fields: [b_ids], [1;91mreferences: [u2][0m)
+        [1;94m13 | [0m  b_ids Int[]
+        [1;94m14 | [0m  bs    B[]   @relation(fields: [b_ids], [1;91mreferences: [u2][0m)
         [1;94m   | [0m
         [1;91merror[0m: [1mError parsing attribute "@relation": The `references` argument must point to a singular `id` field[0m
-          [1;94m-->[0m  [4mschema.prisma:22[0m
+          [1;94m-->[0m  [4mschema.prisma:21[0m
         [1;94m   | [0m
-        [1;94m21 | [0m  a_ids Int[]
-        [1;94m22 | [0m  as    A[]   @relation(fields: [a_ids], [1;91mreferences: [u1][0m)
+        [1;94m20 | [0m  a_ids Int[]
+        [1;94m21 | [0m  as    A[]   @relation(fields: [a_ids], [1;91mreferences: [u1][0m)
         [1;94m   | [0m
     "#]];
 
@@ -584,18 +583,18 @@ fn embedded_many_to_many_relations_must_refer_an_id_from_both_sides_postgres() {
 
     let expect = expect![[r#"
         [1;91merror[0m: [1mError validating: Embedded many-to-many relations are not supported on Postgres. Please use the syntax defined in https://pris.ly/d/relational-database-many-to-many[0m
-          [1;94m-->[0m  [4mschema.prisma:15[0m
+          [1;94m-->[0m  [4mschema.prisma:14[0m
         [1;94m   | [0m
-        [1;94m14 | [0m  b_ids Int[]
-        [1;94m15 | [0m  [1;91mbs    B[]   @relation(fields: [b_ids], references: [u2])[0m
-        [1;94m16 | [0m}
+        [1;94m13 | [0m  b_ids Int[]
+        [1;94m14 | [0m  [1;91mbs    B[]   @relation(fields: [b_ids], references: [u2])[0m
+        [1;94m15 | [0m}
         [1;94m   | [0m
         [1;91merror[0m: [1mError validating: Embedded many-to-many relations are not supported on Postgres. Please use the syntax defined in https://pris.ly/d/relational-database-many-to-many[0m
-          [1;94m-->[0m  [4mschema.prisma:22[0m
+          [1;94m-->[0m  [4mschema.prisma:21[0m
         [1;94m   | [0m
-        [1;94m21 | [0m  a_ids Int[]
-        [1;94m22 | [0m  [1;91mas    A[]   @relation(fields: [a_ids], references: [u1])[0m
-        [1;94m23 | [0m}
+        [1;94m20 | [0m  a_ids Int[]
+        [1;94m21 | [0m  [1;91mas    A[]   @relation(fields: [a_ids], references: [u1])[0m
+        [1;94m22 | [0m}
         [1;94m   | [0m
     "#]];
 
@@ -619,18 +618,18 @@ fn implicit_many_to_many_relations_do_not_work_on_mongo() {
 
     let expect = expect![[r#"
         [1;91merror[0m: [1mError validating: Implicit many-to-many relations are not supported on MongoDB. Please use the syntax defined in https://pris.ly/d/document-database-many-to-many[0m
-          [1;94m-->[0m  [4mschema.prisma:13[0m
+          [1;94m-->[0m  [4mschema.prisma:12[0m
         [1;94m   | [0m
-        [1;94m12 | [0m  id    Int @id @map("_id")
-        [1;94m13 | [0m  [1;91mbs    B[] @relation("foo")[0m
-        [1;94m14 | [0m}
+        [1;94m11 | [0m  id    Int @id @map("_id")
+        [1;94m12 | [0m  [1;91mbs    B[] @relation("foo")[0m
+        [1;94m13 | [0m}
         [1;94m   | [0m
         [1;91merror[0m: [1mError validating: Implicit many-to-many relations are not supported on MongoDB. Please use the syntax defined in https://pris.ly/d/document-database-many-to-many[0m
-          [1;94m-->[0m  [4mschema.prisma:18[0m
+          [1;94m-->[0m  [4mschema.prisma:17[0m
         [1;94m   | [0m
-        [1;94m17 | [0m  id    Int @id @map("_id")
-        [1;94m18 | [0m  [1;91mas    A[] @relation("foo")[0m
-        [1;94m19 | [0m}
+        [1;94m16 | [0m  id    Int @id @map("_id")
+        [1;94m17 | [0m  [1;91mas    A[] @relation("foo")[0m
+        [1;94m18 | [0m}
         [1;94m   | [0m
     "#]];
 
@@ -656,10 +655,10 @@ fn embedded_many_to_many_fields_must_be_an_array_of_correct_type() {
 
     let expect = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@relation": The scalar field defined in `fields` argument must be an array of the same type defined in `references`[0m
-          [1;94m-->[0m  [4mschema.prisma:14[0m
+          [1;94m-->[0m  [4mschema.prisma:13[0m
         [1;94m   | [0m
-        [1;94m13 | [0m  b_ids Int[]
-        [1;94m14 | [0m  bs    B[]   [1;91m@relation(fields: [b_ids], references: [id])[0m
+        [1;94m12 | [0m  b_ids Int[]
+        [1;94m13 | [0m  bs    B[]   [1;91m@relation(fields: [b_ids], references: [id])[0m
         [1;94m   | [0m
     "#]];
 
@@ -685,18 +684,18 @@ fn embedded_many_to_many_fields_must_be_an_array_of_correct_type_postgres() {
 
     let expect = expect![[r#"
         [1;91merror[0m: [1mError validating: Embedded many-to-many relations are not supported on Postgres. Please use the syntax defined in https://pris.ly/d/relational-database-many-to-many[0m
-          [1;94m-->[0m  [4mschema.prisma:14[0m
+          [1;94m-->[0m  [4mschema.prisma:13[0m
         [1;94m   | [0m
-        [1;94m13 | [0m  b_ids Int[]
-        [1;94m14 | [0m  [1;91mbs    B[]   @relation(fields: [b_ids], references: [id])[0m
-        [1;94m15 | [0m}
+        [1;94m12 | [0m  b_ids Int[]
+        [1;94m13 | [0m  [1;91mbs    B[]   @relation(fields: [b_ids], references: [id])[0m
+        [1;94m14 | [0m}
         [1;94m   | [0m
         [1;91merror[0m: [1mError validating: Embedded many-to-many relations are not supported on Postgres. Please use the syntax defined in https://pris.ly/d/relational-database-many-to-many[0m
-          [1;94m-->[0m  [4mschema.prisma:20[0m
+          [1;94m-->[0m  [4mschema.prisma:19[0m
         [1;94m   | [0m
-        [1;94m19 | [0m  a_ids Int[]
-        [1;94m20 | [0m  [1;91mas    A[]    @relation(fields: [a_ids], references: [id])[0m
-        [1;94m21 | [0m}
+        [1;94m18 | [0m  a_ids Int[]
+        [1;94m19 | [0m  [1;91mas    A[]    @relation(fields: [a_ids], references: [id])[0m
+        [1;94m20 | [0m}
         [1;94m   | [0m
     "#]];
 
@@ -722,10 +721,10 @@ fn embedded_many_to_many_fields_must_be_an_array_of_correct_native_type() {
 
     let expect = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@relation": The scalar field defined in `fields` argument must be an array of the same type defined in `references`[0m
-          [1;94m-->[0m  [4mschema.prisma:14[0m
+          [1;94m-->[0m  [4mschema.prisma:13[0m
         [1;94m   | [0m
-        [1;94m13 | [0m  b_ids String[] @test.ObjectId
-        [1;94m14 | [0m  bs    B[]      [1;91m@relation(fields: [b_ids], references: [id])[0m
+        [1;94m12 | [0m  b_ids String[] @test.ObjectId
+        [1;94m13 | [0m  bs    B[]      [1;91m@relation(fields: [b_ids], references: [id])[0m
         [1;94m   | [0m
     "#]];
 
@@ -751,18 +750,18 @@ fn embedded_many_to_many_fields_must_be_an_array_of_correct_native_type_postgres
 
     let expect = expect![[r#"
         [1;91merror[0m: [1mError validating: Embedded many-to-many relations are not supported on Postgres. Please use the syntax defined in https://pris.ly/d/relational-database-many-to-many[0m
-          [1;94m-->[0m  [4mschema.prisma:14[0m
+          [1;94m-->[0m  [4mschema.prisma:13[0m
         [1;94m   | [0m
-        [1;94m13 | [0m  b_ids String[] @test.VarChar(255)
-        [1;94m14 | [0m  [1;91mbs    B[]      @relation(fields: [b_ids], references: [id])[0m
-        [1;94m15 | [0m}
+        [1;94m12 | [0m  b_ids String[] @test.VarChar(255)
+        [1;94m13 | [0m  [1;91mbs    B[]      @relation(fields: [b_ids], references: [id])[0m
+        [1;94m14 | [0m}
         [1;94m   | [0m
         [1;91merror[0m: [1mError validating: Embedded many-to-many relations are not supported on Postgres. Please use the syntax defined in https://pris.ly/d/relational-database-many-to-many[0m
-          [1;94m-->[0m  [4mschema.prisma:20[0m
+          [1;94m-->[0m  [4mschema.prisma:19[0m
         [1;94m   | [0m
-        [1;94m19 | [0m  a_ids String[] @test.VarChar(255)
-        [1;94m20 | [0m  [1;91mas    A[]      @relation(fields: [a_ids], references: [id])[0m
-        [1;94m21 | [0m}
+        [1;94m18 | [0m  a_ids String[] @test.VarChar(255)
+        [1;94m19 | [0m  [1;91mas    A[]      @relation(fields: [a_ids], references: [id])[0m
+        [1;94m20 | [0m}
         [1;94m   | [0m
     "#]];
 
@@ -788,18 +787,18 @@ fn embedded_many_to_many_fields_must_be_an_array_postgres() {
 
     let expect = expect![[r#"
         [1;91merror[0m: [1mError validating: Embedded many-to-many relations are not supported on Postgres. Please use the syntax defined in https://pris.ly/d/relational-database-many-to-many[0m
-          [1;94m-->[0m  [4mschema.prisma:14[0m
+          [1;94m-->[0m  [4mschema.prisma:13[0m
         [1;94m   | [0m
-        [1;94m13 | [0m  b_ids String
-        [1;94m14 | [0m  [1;91mbs    B[]    @relation(fields: [b_ids], references: [id])[0m
-        [1;94m15 | [0m}
+        [1;94m12 | [0m  b_ids String
+        [1;94m13 | [0m  [1;91mbs    B[]    @relation(fields: [b_ids], references: [id])[0m
+        [1;94m14 | [0m}
         [1;94m   | [0m
         [1;91merror[0m: [1mError validating: Embedded many-to-many relations are not supported on Postgres. Please use the syntax defined in https://pris.ly/d/relational-database-many-to-many[0m
-          [1;94m-->[0m  [4mschema.prisma:20[0m
+          [1;94m-->[0m  [4mschema.prisma:19[0m
         [1;94m   | [0m
-        [1;94m19 | [0m  a_ids Int[]
-        [1;94m20 | [0m  [1;91mas    A[]    @relation(fields: [a_ids], references: [id])[0m
-        [1;94m21 | [0m}
+        [1;94m18 | [0m  a_ids Int[]
+        [1;94m19 | [0m  [1;91mas    A[]    @relation(fields: [a_ids], references: [id])[0m
+        [1;94m20 | [0m}
         [1;94m   | [0m
     "#]];
 

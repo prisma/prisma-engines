@@ -435,7 +435,6 @@ mod tests {
 
           datasource db {
             provider = "mongodb"
-            url      = "mongodb://"
           }
 
           model User {
@@ -1405,7 +1404,6 @@ mod tests {
 
           datasource db {
             provider = "mongodb"
-            url      = "mongodb://"
           }
 
           model Comment {
@@ -1546,7 +1544,6 @@ mod tests {
 
           datasource db {
             provider = "mongodb"
-            url      = "mongodb://"
           }
 
           model List {
@@ -1600,7 +1597,6 @@ mod tests {
 
           datasource db {
             provider = "mongodb"
-            url      = "mongodb://"
           }
 
           model User {
@@ -1689,7 +1685,6 @@ mod tests {
 
           datasource db {
             provider = "mongodb"
-            url      = "mongodb://"
           }
 
           model User {

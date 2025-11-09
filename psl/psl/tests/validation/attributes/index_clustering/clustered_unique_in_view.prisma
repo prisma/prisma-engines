@@ -1,6 +1,5 @@
 datasource test {
   provider = "sqlserver"
-  url      = "dummy-url"
 }
 
 generator js {
@@ -15,8 +14,8 @@ view A {
   @@unique([a, b], clustered: true)
 }
 // [1;91merror[0m: [1mError validating: @@unique annotations on views are not backed by unique indexes in the database and cannot be clustered.[0m
-//   [1;94m-->[0m  [4mschema.prisma:15[0m
+//   [1;94m-->[0m  [4mschema.prisma:14[0m
 // [1;94m   | [0m
-// [1;94m14 | [0m
-// [1;94m15 | [0m  [1;91m@@unique([a, b], clustered: true)[0m
+// [1;94m13 | [0m
+// [1;94m14 | [0m  [1;91m@@unique([a, b], clustered: true)[0m
 // [1;94m   | [0m

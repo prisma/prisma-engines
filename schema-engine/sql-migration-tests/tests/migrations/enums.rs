@@ -522,7 +522,6 @@ fn enum_array_modification_should_work(api: TestApi) {
     let dm = r#"
         datasource test {
             provider = "postgres"
-            url = "postgres://meowmeowmeow"
         }
 
         enum Position {
@@ -546,7 +545,6 @@ fn enum_array_modification_should_work(api: TestApi) {
     let dm = r#"
         datasource test {
             provider = "postgres"
-            url = "postgres://meowmeowmeow"
         }
 
         enum Position {
@@ -578,7 +576,6 @@ fn mapped_enum_defaults_must_work(api: TestApi) {
     let schema = r#"
         datasource db {
             provider = "postgres"
-            url = "postgres://meowmeowmeow"
         }
 
         enum Color {
@@ -621,7 +618,6 @@ fn alter_enum_and_change_default_must_work(api: TestApi) {
     let plain_dm = r#"
         datasource db {
             provider = "postgres"
-            url = "postgres://meowmeowmeow"
         }
         model Cat {
             id      Int    @id
@@ -638,7 +634,6 @@ fn alter_enum_and_change_default_must_work(api: TestApi) {
     let custom_dm = r#"
         datasource test {
             provider = "postgres"
-            url = "postgres://meowmeowmeow"
         }
         model Cat {
             id      Int    @id

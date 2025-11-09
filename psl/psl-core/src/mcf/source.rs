@@ -1,7 +1,7 @@
 use parser_database::Files;
 use schema_ast::ast::WithSpan;
 
-use crate::configuration::{self, StringFromEnvVar};
+use crate::configuration;
 
 #[derive(Debug, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -9,9 +9,6 @@ pub struct SourceConfig {
     pub name: String,
     pub provider: String,
     pub active_provider: String,
-    pub url: StringFromEnvVar,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub direct_url: Option<StringFromEnvVar>,
     pub schemas: Vec<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub documentation: Option<String>,
@@ -49,8 +46,6 @@ fn source_to_json_struct(source: &configuration::Datasource, files: &Files) -> S
         name: source.name.clone(),
         provider: source.provider.clone(),
         active_provider: source.active_provider.to_string(),
-        url: source.url.clone(),
-        direct_url: source.direct_url.clone(),
         documentation: source.documentation.clone(),
         schemas,
         source_file_path: files[source.span().file_id].0.clone(),

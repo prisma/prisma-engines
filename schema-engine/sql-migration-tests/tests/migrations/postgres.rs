@@ -4,7 +4,7 @@ mod multi_schema;
 
 use psl::parser_database::{NoExtensionTypes, SourceFile};
 use quaint::Value;
-use schema_core::{json_rpc::types::SchemasContainer, schema_connector::DiffTarget};
+use schema_core::{DatasourceUrls, json_rpc::types::SchemasContainer, schema_connector::DiffTarget};
 use sql_migration_tests::test_api::*;
 use std::fmt::Write;
 
@@ -365,7 +365,6 @@ fn foreign_key_renaming_to_default_works(api: TestApi) {
     let target_schema = r#"
         datasource db {
             provider = "postgresql"
-            url = "dummy-url"
         }
 
         model Dog {
@@ -472,15 +471,17 @@ fn failing_enum_migrations_should_not_be_partially_applied(api: TestApi) {
 }
 
 #[test_connector(tags(Postgres), exclude(CockroachDb))]
-fn connecting_to_a_postgres_database_with_the_cockroach_connector_fails(_api: TestApi) {
+fn connecting_to_a_postgres_database_with_the_cockroach_connector_fails(api: TestApi) {
     let dm = r#"
         datasource crdb {
             provider = "cockroachdb"
-            url = env("TEST_DATABASE_URL")
         }
     "#;
 
-    let engine = schema_core::schema_api_without_extensions(None, None).unwrap();
+    let engine =
+        schema_core::schema_api_without_extensions(None, DatasourceUrls::from_url(api.connection_string()), None)
+            .unwrap();
+
     let err = tok(
         engine.ensure_connection_validity(schema_core::json_rpc::types::EnsureConnectionValidityParams {
             datasource: schema_core::json_rpc::types::DatasourceParam::Schema(SchemasContainer {
@@ -505,7 +506,6 @@ fn scalar_list_defaults_work(api: TestApi) {
     let schema = r#"
         datasource db {
           provider = "postgresql"
-          url = "postgres://"
         }
 
         enum Color {
@@ -567,7 +567,6 @@ fn scalar_list_default_diffing(api: TestApi) {
     let schema_1 = r#"
         datasource db {
           provider = "postgresql"
-          url = env("DATABASE_URL")
         }
 
         enum Color {
@@ -595,7 +594,6 @@ fn scalar_list_default_diffing(api: TestApi) {
     let schema_2 = r#"
         datasource db {
           provider = "postgresql"
-          url = env("DATABASE_URL")
         }
 
         enum Color {
@@ -661,7 +659,6 @@ fn json_defaults_with_escaped_quotes_work(api: TestApi) {
     let schema = r#"
         datasource db {
           provider = "postgresql"
-          url      = env("DATABASE_URL")
         }
 
         model Foo {
@@ -694,7 +691,6 @@ fn bigint_defaults_work(api: TestApi) {
     let schema = r#"
         datasource mypg {
             provider = "postgresql"
-            url = "dummy-url"
         }
 
         model foo {
@@ -734,7 +730,6 @@ fn dbgenerated_on_generated_columns_is_idempotent(api: TestApi) {
     let schema = r#"
         datasource db {
             provider = "postgresql"
-            url = "dummy-url"
         }
 
         model table {
@@ -766,7 +761,6 @@ fn dbgenerated_on_generated_unsupported_columns_is_idempotent(api: TestApi) {
     let schema = r#"
         datasource db {
             provider = "postgresql"
-            url = "dummy-url"
         }
 
         model table {
@@ -788,7 +782,6 @@ fn default_schema_not_included_when_dropping_items(api: TestApi) {
 
         datasource db {
           provider = "postgresql"
-          url = env("DATABASE_URL")
         }
 
         enum Color {
@@ -833,7 +826,6 @@ fn default_schema_not_included_when_dropping_items(api: TestApi) {
 
         datasource db {
           provider = "postgresql"
-          url = env("DATABASE_URL")
         }
 
         enum Color {
@@ -883,7 +875,6 @@ fn default_schema_not_included_when_dropping_items(api: TestApi) {
     let empty_schema = r#"
         datasource db {
           provider = "postgresql"
-          url = env("DATABASE_URL")
         }
     "#;
 
