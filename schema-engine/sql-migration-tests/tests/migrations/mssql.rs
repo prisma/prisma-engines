@@ -193,7 +193,6 @@ fn foreign_key_renaming_to_default_works(api: TestApi) {
     let target_schema = r#"
         datasource db {
             provider = "sqlserver"
-            url = "dummy-url"
         }
 
         model Dog {
@@ -255,7 +254,6 @@ fn prisma_9537(api: TestApi) {
     let schema = r#"
         datasource db {
             provider = "sqlserver"
-            url = env("DBURL")
         }
 
         model User {
@@ -272,7 +270,6 @@ fn prisma_9537(api: TestApi) {
     let schema = r#"
         datasource db {
             provider = "sqlserver"
-            url = env("DBURL")
         }
 
         model User {
@@ -303,7 +300,6 @@ fn bigint_defaults_work(api: TestApi) {
     let schema = r#"
         datasource mypg {
             provider = "sqlserver"
-            url = "dummy-url"
         }
 
         model foo {
@@ -347,7 +343,6 @@ fn float_columns(api: TestApi) {
     let schema = r#"
         datasource mypg {
             provider = "sqlserver"
-            url = "dummy-url"
         }
 
         model foo {
@@ -403,7 +398,6 @@ fn apply_migrations_with_a_schema_in_url(mut api: TestApi) {
     let schema = r#"
         datasource mypg {
             provider = "sqlserver"
-            url = "dummy-url"
         }
 
         model foo {

@@ -1,5 +1,7 @@
+use indoc::indoc;
 use pretty_assertions::assert_eq;
 use schema_core::{
+    DatasourceUrls,
     commands::{DiagnoseMigrationHistoryInput, DiagnoseMigrationHistoryOutput, DriftDiagnostic, HistoryDiagnostic},
     json_rpc::types::{CreateMigrationOutput, SchemaFilter},
     schema_api_without_extensions,
@@ -799,19 +801,24 @@ fn shadow_database_creation_error_is_special_cased_mysql(api: TestApi) {
         api.connection_info().dbname().unwrap(),
     ));
 
-    let datamodel = format!(
+    let datamodel = indoc!(
         r#"
-        datasource db {{
+        datasource db {
             provider = "mysql"
-            url = "mysql://prismashadowdbtestuser2:1234batman@{dbhost}:{dbport}/{dbname}"
-        }}
+        }
         "#,
+    );
+
+    let url = format!(
+        "mysql://prismashadowdbtestuser2:1234batman@{dbhost}:{dbport}/{dbname}",
         dbhost = api.connection_info().host(),
         dbname = api.connection_info().dbname().unwrap(),
         dbport = api.connection_info().port().unwrap_or(3306),
     );
 
-    let migration_api = schema_api_without_extensions(Some(datamodel), None).unwrap();
+    let migration_api =
+        schema_api_without_extensions(Some(datamodel.to_owned()), DatasourceUrls::from_url(url), None).unwrap();
+
     let migrations_list = list_migrations(&directory.keep()).unwrap();
 
     let output = tok(migration_api.diagnose_migration_history(DiagnoseMigrationHistoryInput {
@@ -847,13 +854,16 @@ fn shadow_database_creation_error_is_special_cased_postgres(api: TestApi) {
             ",
     );
 
-    let datamodel = format!(
+    let datamodel = indoc!(
         r#"
-        datasource db {{
+        datasource db {
             provider = "postgresql"
-            url = "postgresql://prismashadowdbtestuser2:1234batman@{dbhost}:{dbport}/{dbname}"
-        }}
+        }
         "#,
+    );
+
+    let url = format!(
+        "postgresql://prismashadowdbtestuser2:1234batman@{dbhost}:{dbport}/{dbname}",
         dbhost = api.connection_info().host(),
         dbname = api.connection_info().dbname().unwrap(),
         dbport = api.connection_info().port().unwrap_or(5432),
@@ -862,7 +872,7 @@ fn shadow_database_creation_error_is_special_cased_postgres(api: TestApi) {
     let migrations_list = list_migrations(&directory.keep()).unwrap();
 
     let output = tok(async {
-        schema_api_without_extensions(Some(datamodel.clone()), None)
+        schema_api_without_extensions(Some(datamodel.to_owned()), DatasourceUrls::from_url(url), None)
             .unwrap()
             .diagnose_migration_history(DiagnoseMigrationHistoryInput {
                 migrations_list,
@@ -903,16 +913,21 @@ fn shadow_database_creation_error_is_special_cased_mssql(api: TestApi) {
             ",
     );
 
-    let datamodel = format!(
+    let datamodel = indoc!(
         r#"
-        datasource db {{
+        datasource db {
             provider = "sqlserver"
-            url = "sqlserver://{dbhost}:{dbport};user=prismashadowdbtestuser;password=1234batmanZ;trustservercertificate=true"
-        }}
+        }
         "#,
+    );
+
+    let url = format!(
+        "sqlserver://{dbhost}:{dbport};user=prismashadowdbtestuser;password=1234batmanZ;trustservercertificate=true",
         dbhost = api.connection_info().host(),
         dbport = api.connection_info().port().unwrap(),
     );
+
+    let datasource_urls = DatasourceUrls::from_url(url);
 
     let mut tries = 0;
 
@@ -921,7 +936,7 @@ fn shadow_database_creation_error_is_special_cased_mssql(api: TestApi) {
             panic!("Failed to connect to mssql more than five times.");
         }
 
-        let result = schema_api_without_extensions(Some(datamodel.clone()), None);
+        let result = schema_api_without_extensions(Some(datamodel.to_owned()), datasource_urls.clone(), None);
 
         match result {
             Ok(api) => break api,

@@ -348,7 +348,6 @@ fn mixed_expr_cast(api: TestApi) {
 const DATASOURCE: &str = r#"
   datasource db {
     provider = "mysql"
-    url      = "mysql://localhost:5432"
 }
 "#;
 

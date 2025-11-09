@@ -83,7 +83,6 @@ async fn multiple_schemas_w_duplicate_table_names_are_introspected(api: &mut Tes
 
         datasource db {
           provider = "cockroachdb"
-          url      = "dummy-url"
           schemas  = ["first", "second"]
         }
 
@@ -185,7 +184,6 @@ async fn multiple_schemas_w_enums_are_introspected(api: &mut TestApi) -> TestRes
 
         datasource db {
           provider = "cockroachdb"
-          url      = "dummy-url"
           schemas  = ["first", "second_schema"]
         }
 
@@ -233,7 +231,6 @@ async fn multiple_schemas_w_duplicate_enums_are_introspected(api: &mut TestApi) 
 
         datasource db {
           provider = "cockroachdb"
-          url      = "dummy-url"
           schemas  = ["first", "second"]
         }
 
@@ -294,7 +291,6 @@ async fn same_table_name_with_relation_in_two_schemas(api: &mut TestApi) -> Test
 
         datasource db {
           provider = "cockroachdb"
-          url      = "dummy-url"
           schemas  = ["first", "second_schema"]
         }
 

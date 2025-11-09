@@ -1,5 +1,4 @@
 datasource db {
     provider = "postgresql"
-    url      = "dummy-url"
     schemas  = ["one", "two"]
 }

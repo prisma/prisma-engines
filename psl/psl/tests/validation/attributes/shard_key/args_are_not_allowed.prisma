@@ -1,6 +1,5 @@
 datasource db {
   provider = "mysql"
-  url      = env("url")
 }
 
 generator client {
@@ -16,14 +15,14 @@ model A {
 }
 
 // [1;91merror[0m: [1mExpected a constant value, but received functional value `a(length: 10)`.[0m
-//   [1;94m-->[0m  [4mschema.prisma:15[0m
+//   [1;94m-->[0m  [4mschema.prisma:14[0m
 // [1;94m   | [0m
-// [1;94m14 | [0m
-// [1;94m15 | [0m  @@shardKey([[1;91ma(length: 10)[0m, b(length: 30)])
+// [1;94m13 | [0m
+// [1;94m14 | [0m  @@shardKey([[1;91ma(length: 10)[0m, b(length: 30)])
 // [1;94m   | [0m
 // [1;91merror[0m: [1mExpected a constant value, but received functional value `b(length: 30)`.[0m
-//   [1;94m-->[0m  [4mschema.prisma:15[0m
+//   [1;94m-->[0m  [4mschema.prisma:14[0m
 // [1;94m   | [0m
-// [1;94m14 | [0m
-// [1;94m15 | [0m  @@shardKey([a(length: 10), [1;91mb(length: 30)[0m])
+// [1;94m13 | [0m
+// [1;94m14 | [0m  @@shardKey([a(length: 10), [1;91mb(length: 30)[0m])
 // [1;94m   | [0m

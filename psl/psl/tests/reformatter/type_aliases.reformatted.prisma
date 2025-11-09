@@ -4,7 +4,6 @@ generator client {
 
 datasource db {
   provider = "mongodb"
-  url      = env("TEST_DB_URL")
 }
 
 type MongoID = String @id @default(dbgenerated()) @map("_id") @db.ObjectId

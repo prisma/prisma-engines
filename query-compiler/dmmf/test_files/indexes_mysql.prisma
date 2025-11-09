@@ -1,6 +1,5 @@
 datasource db {
   provider = "mysql"
-  url      = "mysql://"
 }
 
 model Post {

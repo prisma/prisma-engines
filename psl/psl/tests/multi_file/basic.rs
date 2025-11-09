@@ -81,7 +81,6 @@ model Post {
             r#"
 datasource db {
     provider = "postgresql"
-    url = "dummy-url"
 }
 
 model User {
@@ -97,10 +96,10 @@ model User {
 
     let expected = expect![[r#"
         [1;91merror[0m: [1mNative type FunnyText is not supported for postgresql connector.[0m
-          [1;94m-->[0m  [4ma.prisma:9[0m
+          [1;94m-->[0m  [4ma.prisma:8[0m
         [1;94m   | [0m
-        [1;94m 8 | [0m    id Int @id
-        [1;94m 9 | [0m    test String [1;91m@db.FunnyText[0m
+        [1;94m 7 | [0m    id Int @id
+        [1;94m 8 | [0m    test String [1;91m@db.FunnyText[0m
         [1;94m   | [0m
         [1;91merror[0m: [1mError parsing attribute "@relation": A one-to-one relation must use unique fields on the defining side. Either add an `@unique` attribute to the field `user_id`, or change the relation to one-to-many.[0m
           [1;94m-->[0m  [4mb.prisma:10[0m

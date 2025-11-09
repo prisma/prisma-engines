@@ -193,7 +193,6 @@ mod tests {
                 "datasource.prisma",
                 r#"datasource db {
                     provider = "postgresql"
-                    url = "postgresql://example.com/db"
                 }"#,
             ),
         ];
@@ -203,33 +202,14 @@ mod tests {
         });
 
         let expected = expect![[
-            r#"{"config":{"generators":[{"name":"js","provider":{"fromEnvVar":null,"value":"prisma-client"},"output":null,"config":{},"binaryTargets":[],"previewFeatures":[],"sourceFilePath":"generator.prisma"}],"datasources":[{"name":"db","provider":"postgresql","activeProvider":"postgresql","url":{"fromEnvVar":null,"value":"postgresql://example.com/db"},"schemas":[],"sourceFilePath":"datasource.prisma"}],"warnings":[]},"errors":[]}"#
+            r#"{"config":{"generators":[{"name":"js","provider":{"fromEnvVar":null,"value":"prisma-client"},"output":null,"config":{},"binaryTargets":[],"previewFeatures":[],"sourceFilePath":"generator.prisma"}],"datasources":[{"name":"db","provider":"postgresql","activeProvider":"postgresql","schemas":[],"sourceFilePath":"datasource.prisma"}],"warnings":[]},"errors":[]}"#
         ]];
         let response = get_config(&request.to_string());
         expected.assert_eq(&response);
     }
 
     #[test]
-    fn get_config_env_var() {
-        let schema = r#"
-            datasource thedb {
-                provider = "postgresql"
-                url = env("IGNORED")
-            }
-        "#;
-
-        let request = json!({
-            "prismaSchema": schema,
-        });
-        let expected = expect![[
-            r#"{"config":{"generators":[],"datasources":[{"name":"thedb","provider":"postgresql","activeProvider":"postgresql","url":{"fromEnvVar":"IGNORED","value":null},"schemas":[],"sourceFilePath":"schema.prisma"}],"warnings":[]},"errors":[]}"#
-        ]];
-        let response = get_config(&request.to_string());
-        expected.assert_eq(&response);
-    }
-
-    #[test]
-    fn get_config_direct_url_should_error() {
+    fn get_config_urls_should_error() {
         let schema = r#"
             datasource thedb {
                 provider = "postgresql"
@@ -245,7 +225,7 @@ mod tests {
             }
         });
         let expected = expect![[
-            r#"{"config":{"generators":[],"datasources":[{"name":"thedb","provider":"postgresql","activeProvider":"postgresql","url":{"fromEnvVar":"DBURL","value":null},"schemas":[],"sourceFilePath":"schema.prisma"}],"warnings":[]},"errors":[{"file_name":"schema.prisma","message":"\u001b[1;91merror\u001b[0m: \u001b[1mThe datasource property `directUrl` is no longer supported in schema files. Move connection URLs to `prisma.config.ts`. See https://pris.ly/d/config-datasource\u001b[0m\n  \u001b[1;94m-->\u001b[0m  \u001b[4mschema.prisma:5\u001b[0m\n\u001b[1;94m   | \u001b[0m\n\u001b[1;94m 4 | \u001b[0m                url = env(\"DBURL\")\n\u001b[1;94m 5 | \u001b[0m                \u001b[1;91mdirectUrl = \"postgresql://example.com/direct\"\u001b[0m\n\u001b[1;94m   | \u001b[0m\n"}]}"#
+            r#"{"config":{"generators":[],"datasources":[{"name":"thedb","provider":"postgresql","activeProvider":"postgresql","schemas":[],"sourceFilePath":"schema.prisma"}],"warnings":[]},"errors":[{"file_name":"schema.prisma","message":"\u001b[1;91merror\u001b[0m: \u001b[1mThe datasource property `url` is no longer supported in schema files. Move connection URLs for Migrate to `prisma.config.ts` and pass either `adapter` for a direct database connection or `accelerateUrl` for Accelerate to the `PrismaClient` constructor. See https://pris.ly/d/config-datasource and https://pris.ly/d/prisma7-client-config\u001b[0m\n  \u001b[1;94m-->\u001b[0m  \u001b[4mschema.prisma:4\u001b[0m\n\u001b[1;94m   | \u001b[0m\n\u001b[1;94m 3 | \u001b[0m                provider = \"postgresql\"\n\u001b[1;94m 4 | \u001b[0m                \u001b[1;91murl = env(\"DBURL\")\u001b[0m\n\u001b[1;94m   | \u001b[0m\n"},{"file_name":"schema.prisma","message":"\u001b[1;91merror\u001b[0m: \u001b[1mThe datasource property `directUrl` is no longer supported in schema files. Move connection URLs to `prisma.config.ts`. See https://pris.ly/d/config-datasource\u001b[0m\n  \u001b[1;94m-->\u001b[0m  \u001b[4mschema.prisma:5\u001b[0m\n\u001b[1;94m   | \u001b[0m\n\u001b[1;94m 4 | \u001b[0m                url = env(\"DBURL\")\n\u001b[1;94m 5 | \u001b[0m                \u001b[1;91mdirectUrl = \"postgresql://example.com/direct\"\u001b[0m\n\u001b[1;94m   | \u001b[0m\n"}]}"#
         ]];
         let response = get_config(&request.to_string());
         expected.assert_eq(&response);

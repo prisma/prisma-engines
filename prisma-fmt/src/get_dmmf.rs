@@ -50,11 +50,10 @@ mod tests {
     }
 
     #[test]
-    fn get_dmmf_missing_env_var() {
+    fn get_dmmf_single_file() {
         let schema = r#"
             datasource thedb {
                 provider = "postgresql"
-                url = env("NON_EXISTING_ENV_VAR_WE_COUNT_ON_IT_AT_LEAST")
             }
         "#;
 
@@ -191,28 +190,6 @@ mod tests {
     }
 
     #[test]
-    fn get_dmmf_direct_url_direct_empty() {
-        let schema = r#"
-            datasource thedb {
-                provider = "postgresql"
-                url = env("DBURL")
-                directUrl = ""
-            }
-        "#;
-
-        let request = json!({
-            "prismaSchema": schema,
-        });
-
-        let expected = expect![[
-            r#"{"error_code":"P1012","message":"\u001b[1;91merror\u001b[0m: \u001b[1mThe datasource property `directUrl` is no longer supported in schema files. Move connection URLs to `prisma.config.ts`. See https://pris.ly/d/config-datasource\u001b[0m\n  \u001b[1;94m-->\u001b[0m  \u001b[4mschema.prisma:5\u001b[0m\n\u001b[1;94m   | \u001b[0m\n\u001b[1;94m 4 | \u001b[0m                url = env(\"DBURL\")\n\u001b[1;94m 5 | \u001b[0m                \u001b[1;91mdirectUrl = \"\"\u001b[0m\n\u001b[1;94m   | \u001b[0m\n\nValidation Error Count: 1"}"#
-        ]];
-
-        let response = get_dmmf(&request.to_string()).unwrap_err();
-        expected.assert_eq(&response);
-    }
-
-    #[test]
     fn get_dmmf_multiple_files() {
         let schema = vec![
             (
@@ -220,7 +197,6 @@ mod tests {
                 r#"
                 datasource thedb {
                     provider = "postgresql"
-                    url = env("DBURL")
                 }
 
                 model A {
@@ -6907,7 +6883,6 @@ mod tests {
         let schema = r#"
           datasource db {
               provider = "sqlite"
-              url = "sqlite"
               relationMode = "prisma"
               referentialIntegrity = "foreignKeys"
           }
@@ -6918,7 +6893,7 @@ mod tests {
         });
 
         let expected = expect![[
-            r#"{"error_code":"P1012","message":"\u001b[1;91merror\u001b[0m: \u001b[1mThe `referentialIntegrity` and `relationMode` attributes cannot be used together. Please use only `relationMode` instead.\u001b[0m\n  \u001b[1;94m-->\u001b[0m  \u001b[4mschema.prisma:6\u001b[0m\n\u001b[1;94m   | \u001b[0m\n\u001b[1;94m 5 | \u001b[0m              relationMode = \"prisma\"\n\u001b[1;94m 6 | \u001b[0m              \u001b[1;91mreferentialIntegrity = \"foreignKeys\"\u001b[0m\n\u001b[1;94m   | \u001b[0m\n\nValidation Error Count: 1"}"#
+            r#"{"error_code":"P1012","message":"\u001b[1;91merror\u001b[0m: \u001b[1mThe `referentialIntegrity` and `relationMode` attributes cannot be used together. Please use only `relationMode` instead.\u001b[0m\n  \u001b[1;94m-->\u001b[0m  \u001b[4mschema.prisma:5\u001b[0m\n\u001b[1;94m   | \u001b[0m\n\u001b[1;94m 4 | \u001b[0m              relationMode = \"prisma\"\n\u001b[1;94m 5 | \u001b[0m              \u001b[1;91mreferentialIntegrity = \"foreignKeys\"\u001b[0m\n\u001b[1;94m   | \u001b[0m\n\nValidation Error Count: 1"}"#
         ]];
         let response = get_dmmf(&request.to_string()).unwrap_err();
         expected.assert_eq(&response);

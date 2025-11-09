@@ -9,11 +9,11 @@ async fn referential_integrity_prisma(api: &mut TestApi) -> TestResult {
             "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
             "bar_id" INTEGER NOT NULL
         );
-        
+
         CREATE TABLE "Bar" (
             "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT
         );
-        
+
         CREATE UNIQUE INDEX "Foo_bar_id_key" ON "Foo"("bar_id");
     "#};
 
@@ -26,7 +26,6 @@ async fn referential_integrity_prisma(api: &mut TestApi) -> TestResult {
 
         datasource db {
             provider             = "sqlite"
-            url                  = "dummy-url"
             referentialIntegrity = "prisma"
         }
 
@@ -49,7 +48,6 @@ async fn referential_integrity_prisma(api: &mut TestApi) -> TestResult {
 
         datasource db {
           provider     = "sqlite"
-          url          = "dummy-url"
           relationMode = "prisma"
         }
 
@@ -80,11 +78,11 @@ async fn referential_integrity_foreign_keys(api: &mut TestApi) -> TestResult {
             "bar_id" INTEGER NOT NULL,
             CONSTRAINT "Foo_bar_id_fkey" FOREIGN KEY ("bar_id") REFERENCES "Bar" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
         );
-        
+
         CREATE TABLE "Bar" (
             "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT
         );
-        
+
         CREATE UNIQUE INDEX "Foo_bar_id_key" ON "Foo"("bar_id");
     "#};
 
@@ -97,7 +95,6 @@ async fn referential_integrity_foreign_keys(api: &mut TestApi) -> TestResult {
 
         datasource db {
             provider             = "sqlite"
-            url                  = "dummy-url"
             referentialIntegrity = "foreignKeys"
         }
 
@@ -120,7 +117,6 @@ async fn referential_integrity_foreign_keys(api: &mut TestApi) -> TestResult {
 
         datasource db {
           provider     = "sqlite"
-          url          = "dummy-url"
           relationMode = "foreignKeys"
         }
 
@@ -150,11 +146,11 @@ async fn relation_mode_prisma(api: &mut TestApi) -> TestResult {
             "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
             "bar_id" INTEGER NOT NULL
         );
-        
+
         CREATE TABLE "Bar" (
             "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT
         );
-        
+
         CREATE UNIQUE INDEX "Foo_bar_id_key" ON "Foo"("bar_id");
     "#};
 
@@ -167,7 +163,6 @@ async fn relation_mode_prisma(api: &mut TestApi) -> TestResult {
 
         datasource db {
             provider     = "sqlite"
-            url          = "dummy-url"
             relationMode = "prisma"
         }
 
@@ -190,7 +185,6 @@ async fn relation_mode_prisma(api: &mut TestApi) -> TestResult {
 
         datasource db {
           provider     = "sqlite"
-          url          = "dummy-url"
           relationMode = "prisma"
         }
 
@@ -221,11 +215,11 @@ async fn relation_mode_foreign_keys(api: &mut TestApi) -> TestResult {
             "bar_id" INTEGER NOT NULL,
             CONSTRAINT "Foo_bar_id_fkey" FOREIGN KEY ("bar_id") REFERENCES "Bar" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
         );
-        
+
         CREATE TABLE "Bar" (
             "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT
         );
-        
+
         CREATE UNIQUE INDEX "Foo_bar_id_key" ON "Foo"("bar_id");
     "#};
 
@@ -238,7 +232,6 @@ async fn relation_mode_foreign_keys(api: &mut TestApi) -> TestResult {
 
         datasource db {
             provider     = "sqlite"
-            url          = "dummy-url"
             relationMode = "foreignKeys"
         }
 
@@ -261,7 +254,6 @@ async fn relation_mode_foreign_keys(api: &mut TestApi) -> TestResult {
 
         datasource db {
           provider     = "sqlite"
-          url          = "dummy-url"
           relationMode = "foreignKeys"
         }
 
@@ -296,11 +288,11 @@ mod at_at_map {
                 "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
                 "bar_id" INTEGER NOT NULL
             );
-            
+
             CREATE TABLE "bar_table" (
                 "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT
             );
-            
+
             CREATE UNIQUE INDEX "foo_table_bar_id_key" ON "foo_table"("bar_id");
         "#};
 
@@ -313,7 +305,6 @@ mod at_at_map {
 
             datasource db {
                 provider             = "sqlite"
-                url                  = "dummy-url"
                 referentialIntegrity = "prisma"
             }
 
@@ -340,7 +331,6 @@ mod at_at_map {
 
             datasource db {
               provider     = "sqlite"
-              url          = "dummy-url"
               relationMode = "prisma"
             }
 
@@ -375,11 +365,11 @@ mod at_at_map {
                 "bar_id" INTEGER NOT NULL,
                 CONSTRAINT "foo_table_bar_id_fkey" FOREIGN KEY ("bar_id") REFERENCES "bar_table" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
             );
-            
+
             CREATE TABLE "bar_table" (
                 "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT
             );
-            
+
             CREATE UNIQUE INDEX "foo_table_bar_id_key" ON "foo_table"("bar_id");
         "#};
 
@@ -392,7 +382,6 @@ mod at_at_map {
 
             datasource db {
                 provider             = "sqlite"
-                url                  = "dummy-url"
                 referentialIntegrity = "foreignKeys"
             }
 
@@ -419,7 +408,6 @@ mod at_at_map {
 
             datasource db {
               provider     = "sqlite"
-              url          = "dummy-url"
               relationMode = "foreignKeys"
             }
 
@@ -453,11 +441,11 @@ mod at_at_map {
                 "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
                 "bar_id" INTEGER NOT NULL
             );
-            
+
             CREATE TABLE "bar_table" (
                 "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT
             );
-            
+
             CREATE UNIQUE INDEX "foo_table_bar_id_key" ON "foo_table"("bar_id");
         "#};
 
@@ -470,7 +458,6 @@ mod at_at_map {
 
             datasource db {
                 provider     = "sqlite"
-                url          = "dummy-url"
                 relationMode = "prisma"
             }
 
@@ -497,7 +484,6 @@ mod at_at_map {
 
             datasource db {
               provider     = "sqlite"
-              url          = "dummy-url"
               relationMode = "prisma"
             }
 
@@ -532,11 +518,11 @@ mod at_at_map {
                 "bar_id" INTEGER NOT NULL,
                 CONSTRAINT "foo_table_bar_id_fkey" FOREIGN KEY ("bar_id") REFERENCES "bar_table" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
             );
-            
+
             CREATE TABLE "bar_table" (
                 "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT
             );
-            
+
             CREATE UNIQUE INDEX "foo_table_bar_id_key" ON "foo_table"("bar_id");
         "#};
 
@@ -549,7 +535,6 @@ mod at_at_map {
 
             datasource db {
                 provider     = "sqlite"
-                url          = "dummy-url"
                 relationMode = "foreignKeys"
             }
 
@@ -576,7 +561,6 @@ mod at_at_map {
 
             datasource db {
               provider     = "sqlite"
-              url          = "dummy-url"
               relationMode = "foreignKeys"
             }
 

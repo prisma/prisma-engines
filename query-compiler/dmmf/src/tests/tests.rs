@@ -74,7 +74,6 @@ fn unsupported_in_composite_type() {
 
         datasource db {
             provider = "mongodb"
-            url      = env("DATABASE_URL")
         }
 
         type NestedType {
@@ -96,7 +95,6 @@ fn unusupported_in_compound_unique_must_not_panic() {
     let schema = r#"
         datasource db {
             provider = "postgresql"
-            url      = "dummy-url"
         }
 
         generator client {
@@ -120,7 +118,6 @@ fn unusupported_in_compound_id_must_not_panic() {
     let schema = r#"
         datasource db {
             provider = "postgresql"
-            url      = "dummy-url"
         }
 
         generator client {

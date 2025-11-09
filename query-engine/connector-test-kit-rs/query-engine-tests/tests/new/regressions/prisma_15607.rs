@@ -60,17 +60,12 @@ impl Actor {
         let (response_sender, response_receiver) = mpsc::channel(100);
         let (tag, version) = query_tests_setup::CONFIG.test_connector()?;
 
-        let datamodel = render_test_datamodel(
-            "sql_server_deadlocks_test",
-            SCHEMA.to_owned(),
-            &[],
-            None,
-            &[],
-            &[],
-            Some("READ COMMITTED"),
-        );
+        let url =
+            query_tests_setup::connection_string(&version, "sql_server_deadlocks_test", false, Some("READ COMMITTED"));
 
-        let mut runner = Runner::load(&datamodel, &[], version, tag, None, log_capture).await?;
+        let datamodel = render_test_datamodel(SCHEMA.to_owned(), &[], None, &[], &[]);
+
+        let mut runner = Runner::load(&url, &datamodel, &[], version, tag, None, log_capture).await?;
 
         tokio::spawn(async move {
             while let Some(message) = query_receiver.recv().await {

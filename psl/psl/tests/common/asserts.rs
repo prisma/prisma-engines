@@ -2,6 +2,7 @@ use std::fmt::Debug;
 
 use base64::prelude::*;
 use either::Either::{Left, Right};
+use psl::Diagnostics;
 use psl::datamodel_connector::Connector;
 use psl::diagnostics::DatamodelWarning;
 use psl::parser_database::{
@@ -9,16 +10,10 @@ use psl::parser_database::{
 };
 use psl::schema_ast::ast::WithDocumentation;
 use psl::schema_ast::ast::{self, FieldArity};
-use psl::{Diagnostics, StringFromEnvVar};
 
 pub(crate) trait DatamodelAssert<'a> {
     fn assert_has_model(&'a self, name: &str) -> walkers::ModelWalker<'a>;
     fn assert_has_type(&'a self, name: &str) -> walkers::CompositeTypeWalker<'a>;
-}
-
-pub(crate) trait DatasourceAsserts {
-    fn assert_name(&self, name: &str) -> &Self;
-    fn assert_url(&self, url: StringFromEnvVar) -> &Self;
 }
 
 pub(crate) trait WarningAsserts {
@@ -108,20 +103,6 @@ pub(crate) trait IndexFieldAssert {
     fn assert_length(&self, length: u32) -> &Self;
     fn assert_ops(&self, ops: OperatorClass) -> &Self;
     fn assert_raw_ops(&self, ops: &str) -> &Self;
-}
-
-impl DatasourceAsserts for psl::Datasource {
-    #[track_caller]
-    fn assert_name(&self, name: &str) -> &Self {
-        assert_eq!(&self.name, name);
-        self
-    }
-
-    #[track_caller]
-    fn assert_url(&self, url: StringFromEnvVar) -> &Self {
-        assert_eq!(self.url, url);
-        self
-    }
 }
 
 impl WarningAsserts for Vec<DatamodelWarning> {

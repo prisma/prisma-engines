@@ -207,6 +207,7 @@ impl Runner {
     }
 
     pub async fn load(
+        url: &str,
         datamodel: &RenderedDatamodel,
         db_schemas: &[&str],
         connector_version: ConnectorVersion,
@@ -219,7 +220,7 @@ impl Runner {
 
         let executor = ExternalExecutor::new();
 
-        let external_initializer = executor.init(&datamodel.schema, &datamodel.url);
+        let external_initializer = executor.init(&datamodel.schema, url);
 
         let init_external_result = qe_setup::setup_external(
             crate::CONFIG.with_driver_adapter().adapter,
@@ -260,7 +261,7 @@ impl Runner {
             executor,
             query_schema: Arc::new(query_schema),
             connector_tag,
-            connection_url: datamodel.url.clone(),
+            connection_url: url.to_owned(),
             current_tx_id: None,
             protocol,
             log_capture,

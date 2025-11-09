@@ -35,7 +35,6 @@ fn map_on_composite_type_field() {
     let dml = r#"
         datasource db {
             provider = "mongodb"
-            url = "mongodb://"
         }
 
         type Address {

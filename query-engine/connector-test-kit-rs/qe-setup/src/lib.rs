@@ -66,12 +66,10 @@ pub async fn setup_external<'a>(
     db_schemas: &[&str],
 ) -> ConnectorResult<InitResult> {
     let prisma_schema = initializer.datamodel();
-    let (source, _preview_features) = parse_configuration(prisma_schema)?;
 
     let init_result = match driver_adapter {
         DriverAdapter::D1 => {
             // 1. Compute the diff migration script.
-            std::fs::remove_file(source.url.as_literal().unwrap().trim_start_matches("file:")).ok();
             let dialect = sql_schema_connector::SqlSchemaDialect::sqlite();
             let migration_script = crate::diff(prisma_schema, &dialect, None).await?;
 
@@ -111,7 +109,7 @@ pub async fn setup(url: String, prisma_schema: &str, db_schemas: &[&str]) -> Con
         Some(Provider::Cockroach) => cockroach_setup(url, prisma_schema).await,
         Some(Provider::Mysql) => mysql_setup(url, prisma_schema).await,
         Some(Provider::Mongo) => mongo_setup(prisma_schema, &url).await,
-        Some(Provider::Sqlite) => sqlite_setup(source, url, prisma_schema).await,
+        Some(Provider::Sqlite) => sqlite_setup(url, prisma_schema).await,
         None => unimplemented!("Connector is not supported yet"),
     }
 }

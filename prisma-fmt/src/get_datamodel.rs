@@ -37,7 +37,6 @@ mod tests {
 
             datasource db {
                 provider = "postgresql"
-                url      = env("DATABASE_URL")
             }
 
             model User {

@@ -91,24 +91,25 @@ async fn catch<O>(
 #[cfg(test)]
 mod tests {
     use super::*;
+    use indoc::indoc;
 
-    fn test_schema(url: &str) -> String {
-        format!(
+    fn test_schema() -> String {
+        indoc!(
             r#"
-            datasource db {{
+            datasource db {
               provider = "mongodb"
-              url      = "{url}"
-            }}
+            }
 
-            model User {{
+            model User {
               id    String @id @map("_id") @default(auto()) @db.ObjectId
-            }}
+            }
             "#
         )
+        .into()
     }
 
     async fn mongodb_connector(url: &str) -> connector_interface::Result<MongoDb> {
-        let schema = psl::validate_without_extensions(test_schema(url).into());
+        let schema = psl::validate_without_extensions(test_schema().into());
         let datasource = &schema.configuration.datasources[0];
         MongoDb::new(datasource, url).await
     }

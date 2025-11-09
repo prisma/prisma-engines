@@ -1,5 +1,5 @@
 use quaint::prelude::Insert;
-use schema_core::json_rpc::types::SchemasContainer;
+use schema_core::{DatasourceUrls, json_rpc::types::SchemasContainer};
 use sql_migration_tests::test_api::*;
 
 #[test_connector(tags(Sqlite))]
@@ -104,7 +104,6 @@ fn bigint_defaults_work(api: TestApi) {
     let schema = r#"
         datasource mypg {
             provider = "sqlite"
-            url = "dummy-url"
         }
 
         model foo {
@@ -130,7 +129,6 @@ fn default_string_with_escaped_unicode(api: TestApi) {
     let dm = r#"
         datasource mypg {
             provider = "sqlite"
-            url = "dummy-url"
         }
 
         model test {
@@ -197,11 +195,16 @@ fn introspecting_a_non_existing_db_fails() {
     let dm = r#"
         datasource db {
             provider = "sqlite"
-            url = "file:/tmp/definitelies-does-not-exist.sqlite"
         }
     "#;
 
-    let api = schema_core::schema_api_without_extensions(None, None).unwrap();
+    let api = schema_core::schema_api_without_extensions(
+        None,
+        DatasourceUrls::from_url("file:/tmp/definitelies-does-not-exist.sqlite"),
+        None,
+    )
+    .unwrap();
+
     let err = tok(api.introspect(schema_core::json_rpc::types::IntrospectParams {
         composite_type_depth: -1,
         force: false,

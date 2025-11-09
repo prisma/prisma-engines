@@ -48,7 +48,6 @@ async fn a_table_enums_array(api: &mut TestApi) -> TestResult {
 
         datasource db {
           provider = "postgresql"
-          url      = "dummy-url"
         }
 
         model Book {
@@ -78,7 +77,6 @@ async fn an_enum_with_invalid_value_names_should_have_them_commented_out(api: &m
 
         datasource db {
           provider = "postgresql"
-          url      = "dummy-url"
         }
 
         enum threechars {
@@ -111,7 +109,6 @@ async fn a_table_with_an_enum_default_value_that_is_an_empty_string(api: &mut Te
 
         datasource db {
           provider = "postgresql"
-          url      = "dummy-url"
         }
 
         model Book {
@@ -150,7 +147,6 @@ async fn a_table_with_enum_default_values_that_look_like_booleans(api: &mut Test
 
         datasource db {
           provider = "postgresql"
-          url      = "dummy-url"
         }
 
         model News {
@@ -190,7 +186,6 @@ async fn invalid_enum_variants_regression(api: &mut TestApi) -> TestResult {
 
         datasource db {
           provider = "postgresql"
-          url      = "dummy-url"
         }
 
         model invalid_enum_value_name {
@@ -241,7 +236,6 @@ async fn a_variant_that_cannot_be_sanitized_triggers_dbgenerated_in_defaults(api
 
         datasource db {
           provider = "postgresql"
-          url      = "dummy-url"
         }
 
         model B {
@@ -280,7 +274,6 @@ async fn a_mapped_variant_will_not_warn(api: &mut TestApi) -> TestResult {
 
         datasource db {
           provider = "postgresql"
-          url      = "dummy-url"
         }
 
         model B {
@@ -320,7 +313,6 @@ async fn a_mapped_enum_will_not_warn(api: &mut TestApi) -> TestResult {
 
         datasource db {
           provider = "postgresql"
-          url      = "dummy-url"
         }
 
         model B {
@@ -364,7 +356,6 @@ async fn enum_array_type(api: &mut TestApi) -> TestResult {
 
         datasource db {
           provider = "postgresql"
-          url      = "dummy-url"
         }
 
         model Post {

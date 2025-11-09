@@ -9,7 +9,6 @@ fn text_type_should_fail_on_unique() {
     let schema = indoc! {r#"
         datasource db {
           provider = "sqlserver"
-          url      = env("DATABASE_URL")
         }
 
         model User {
@@ -23,10 +22,10 @@ fn text_type_should_fail_on_unique() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mNative type `Text` cannot be unique in SQL Server.[0m
-          [1;94m-->[0m  [4mschema.prisma:11[0m
+          [1;94m-->[0m  [4mschema.prisma:10[0m
         [1;94m   | [0m
-        [1;94m10 | [0m
-        [1;94m11 | [0m  [1;91m@@unique([firstName, lastName])[0m
+        [1;94m 9 | [0m
+        [1;94m10 | [0m  [1;91m@@unique([firstName, lastName])[0m
         [1;94m   | [0m
     "#]];
 
@@ -38,7 +37,6 @@ fn ntext_type_should_fail_on_unique() {
     let schema = indoc! {r#"
         datasource db {
           provider = "sqlserver"
-          url      = env("DATABASE_URL")
         }
 
         model User {
@@ -52,10 +50,10 @@ fn ntext_type_should_fail_on_unique() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mNative type `NText` cannot be unique in SQL Server.[0m
-          [1;94m-->[0m  [4mschema.prisma:11[0m
+          [1;94m-->[0m  [4mschema.prisma:10[0m
         [1;94m   | [0m
-        [1;94m10 | [0m
-        [1;94m11 | [0m  [1;91m@@unique([firstName, lastName])[0m
+        [1;94m 9 | [0m
+        [1;94m10 | [0m  [1;91m@@unique([firstName, lastName])[0m
         [1;94m   | [0m
     "#]];
 
@@ -67,7 +65,6 @@ fn varchar_max_type_should_fail_on_unique() {
     let schema = indoc! {r#"
         datasource db {
           provider = "sqlserver"
-          url      = env("DATABASE_URL")
         }
 
         model User {
@@ -81,10 +78,10 @@ fn varchar_max_type_should_fail_on_unique() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mNative type `VarChar(Max)` cannot be unique in SQL Server.[0m
-          [1;94m-->[0m  [4mschema.prisma:11[0m
+          [1;94m-->[0m  [4mschema.prisma:10[0m
         [1;94m   | [0m
-        [1;94m10 | [0m
-        [1;94m11 | [0m  [1;91m@@unique([firstName, lastName])[0m
+        [1;94m 9 | [0m
+        [1;94m10 | [0m  [1;91m@@unique([firstName, lastName])[0m
         [1;94m   | [0m
     "#]];
 
@@ -96,7 +93,6 @@ fn nvarchar_max_type_should_fail_on_unique() {
     let schema = indoc! {r#"
         datasource db {
           provider = "sqlserver"
-          url      = env("DATABASE_URL")
         }
 
         model User {
@@ -110,10 +106,10 @@ fn nvarchar_max_type_should_fail_on_unique() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mNative type `NVarChar(Max)` cannot be unique in SQL Server.[0m
-          [1;94m-->[0m  [4mschema.prisma:11[0m
+          [1;94m-->[0m  [4mschema.prisma:10[0m
         [1;94m   | [0m
-        [1;94m10 | [0m
-        [1;94m11 | [0m  [1;91m@@unique([firstName, lastName])[0m
+        [1;94m 9 | [0m
+        [1;94m10 | [0m  [1;91m@@unique([firstName, lastName])[0m
         [1;94m   | [0m
     "#]];
 
@@ -125,7 +121,6 @@ fn xml_type_should_fail_on_unique() {
     let schema = indoc! {r#"
         datasource db {
           provider = "sqlserver"
-          url      = env("DATABASE_URL")
         }
 
         model User {
@@ -139,10 +134,10 @@ fn xml_type_should_fail_on_unique() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mNative type `Xml` cannot be unique in SQL Server.[0m
-          [1;94m-->[0m  [4mschema.prisma:11[0m
+          [1;94m-->[0m  [4mschema.prisma:10[0m
         [1;94m   | [0m
-        [1;94m10 | [0m
-        [1;94m11 | [0m  [1;91m@@unique([firstName, lastName])[0m
+        [1;94m 9 | [0m
+        [1;94m10 | [0m  [1;91m@@unique([firstName, lastName])[0m
         [1;94m   | [0m
     "#]];
 
@@ -154,7 +149,6 @@ fn varbinary_max_type_should_fail_on_unique() {
     let schema = indoc! {r#"
         datasource db {
           provider = "sqlserver"
-          url      = env("DATABASE_URL")
         }
 
         model User {
@@ -168,10 +162,10 @@ fn varbinary_max_type_should_fail_on_unique() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mNative type `VarBinary(Max)` cannot be unique in SQL Server.[0m
-          [1;94m-->[0m  [4mschema.prisma:11[0m
+          [1;94m-->[0m  [4mschema.prisma:10[0m
         [1;94m   | [0m
-        [1;94m10 | [0m
-        [1;94m11 | [0m  [1;91m@@unique([firstName, lastName])[0m
+        [1;94m 9 | [0m
+        [1;94m10 | [0m  [1;91m@@unique([firstName, lastName])[0m
         [1;94m   | [0m
     "#]];
 
@@ -183,7 +177,6 @@ fn image_type_should_fail_on_unique() {
     let schema = indoc! {r#"
         datasource db {
           provider = "sqlserver"
-          url      = env("DATABASE_URL")
         }
 
         model User {
@@ -197,10 +190,10 @@ fn image_type_should_fail_on_unique() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mNative type `Image` cannot be unique in SQL Server.[0m
-          [1;94m-->[0m  [4mschema.prisma:11[0m
+          [1;94m-->[0m  [4mschema.prisma:10[0m
         [1;94m   | [0m
-        [1;94m10 | [0m
-        [1;94m11 | [0m  [1;91m@@unique([firstName, lastName])[0m
+        [1;94m 9 | [0m
+        [1;94m10 | [0m  [1;91m@@unique([firstName, lastName])[0m
         [1;94m   | [0m
     "#]];
 
@@ -212,7 +205,6 @@ fn text_type_should_fail_on_index() {
     let schema = indoc! {r#"
         datasource db {
           provider = "sqlserver"
-          url      = env("DATABASE_URL")
         }
 
         model User {
@@ -226,10 +218,10 @@ fn text_type_should_fail_on_index() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mYou cannot define an index on fields with native type `Text` of SQL Server.[0m
-          [1;94m-->[0m  [4mschema.prisma:11[0m
+          [1;94m-->[0m  [4mschema.prisma:10[0m
         [1;94m   | [0m
-        [1;94m10 | [0m
-        [1;94m11 | [0m  [1;91m@@index([firstName, lastName])[0m
+        [1;94m 9 | [0m
+        [1;94m10 | [0m  [1;91m@@index([firstName, lastName])[0m
         [1;94m   | [0m
     "#]];
 
@@ -241,7 +233,6 @@ fn ntext_type_should_fail_on_index() {
     let schema = indoc! {r#"
         datasource db {
           provider = "sqlserver"
-          url      = env("DATABASE_URL")
         }
 
         model User {
@@ -255,10 +246,10 @@ fn ntext_type_should_fail_on_index() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mYou cannot define an index on fields with native type `NText` of SQL Server.[0m
-          [1;94m-->[0m  [4mschema.prisma:11[0m
+          [1;94m-->[0m  [4mschema.prisma:10[0m
         [1;94m   | [0m
-        [1;94m10 | [0m
-        [1;94m11 | [0m  [1;91m@@index([firstName, lastName])[0m
+        [1;94m 9 | [0m
+        [1;94m10 | [0m  [1;91m@@index([firstName, lastName])[0m
         [1;94m   | [0m
     "#]];
 
@@ -270,7 +261,6 @@ fn varchar_max_type_should_fail_on_index() {
     let schema = indoc! {r#"
         datasource db {
           provider = "sqlserver"
-          url      = env("DATABASE_URL")
         }
 
         model User {
@@ -284,10 +274,10 @@ fn varchar_max_type_should_fail_on_index() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mYou cannot define an index on fields with native type `VarChar(Max)` of SQL Server.[0m
-          [1;94m-->[0m  [4mschema.prisma:11[0m
+          [1;94m-->[0m  [4mschema.prisma:10[0m
         [1;94m   | [0m
-        [1;94m10 | [0m
-        [1;94m11 | [0m  [1;91m@@index([firstName, lastName])[0m
+        [1;94m 9 | [0m
+        [1;94m10 | [0m  [1;91m@@index([firstName, lastName])[0m
         [1;94m   | [0m
     "#]];
 
@@ -299,7 +289,6 @@ fn nvarchar_max_type_should_fail_on_index() {
     let schema = indoc! {r#"
         datasource db {
           provider = "sqlserver"
-          url      = env("DATABASE_URL")
         }
 
         model User {
@@ -313,10 +302,10 @@ fn nvarchar_max_type_should_fail_on_index() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mYou cannot define an index on fields with native type `NVarChar(Max)` of SQL Server.[0m
-          [1;94m-->[0m  [4mschema.prisma:11[0m
+          [1;94m-->[0m  [4mschema.prisma:10[0m
         [1;94m   | [0m
-        [1;94m10 | [0m
-        [1;94m11 | [0m  [1;91m@@index([firstName, lastName])[0m
+        [1;94m 9 | [0m
+        [1;94m10 | [0m  [1;91m@@index([firstName, lastName])[0m
         [1;94m   | [0m
     "#]];
 
@@ -328,7 +317,6 @@ fn xml_type_should_fail_on_index() {
     let schema = indoc! {r#"
         datasource db {
           provider = "sqlserver"
-          url      = env("DATABASE_URL")
         }
 
         model User {
@@ -342,10 +330,10 @@ fn xml_type_should_fail_on_index() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mYou cannot define an index on fields with native type `Xml` of SQL Server.[0m
-          [1;94m-->[0m  [4mschema.prisma:11[0m
+          [1;94m-->[0m  [4mschema.prisma:10[0m
         [1;94m   | [0m
-        [1;94m10 | [0m
-        [1;94m11 | [0m  [1;91m@@index([firstName, lastName])[0m
+        [1;94m 9 | [0m
+        [1;94m10 | [0m  [1;91m@@index([firstName, lastName])[0m
         [1;94m   | [0m
     "#]];
 
@@ -357,7 +345,6 @@ fn varbinary_max_type_should_fail_on_index() {
     let schema = indoc! {r#"
         datasource db {
           provider = "sqlserver"
-          url      = env("DATABASE_URL")
         }
 
         model User {
@@ -371,10 +358,10 @@ fn varbinary_max_type_should_fail_on_index() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mYou cannot define an index on fields with native type `VarBinary(Max)` of SQL Server.[0m
-          [1;94m-->[0m  [4mschema.prisma:11[0m
+          [1;94m-->[0m  [4mschema.prisma:10[0m
         [1;94m   | [0m
-        [1;94m10 | [0m
-        [1;94m11 | [0m  [1;91m@@index([firstName, lastName])[0m
+        [1;94m 9 | [0m
+        [1;94m10 | [0m  [1;91m@@index([firstName, lastName])[0m
         [1;94m   | [0m
     "#]];
 
@@ -386,7 +373,6 @@ fn image_type_should_fail_on_index() {
     let schema = indoc! {r#"
         datasource db {
           provider = "sqlserver"
-          url      = env("DATABASE_URL")
         }
 
         model User {
@@ -400,10 +386,10 @@ fn image_type_should_fail_on_index() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mYou cannot define an index on fields with native type `Image` of SQL Server.[0m
-          [1;94m-->[0m  [4mschema.prisma:11[0m
+          [1;94m-->[0m  [4mschema.prisma:10[0m
         [1;94m   | [0m
-        [1;94m10 | [0m
-        [1;94m11 | [0m  [1;91m@@index([firstName, lastName])[0m
+        [1;94m 9 | [0m
+        [1;94m10 | [0m  [1;91m@@index([firstName, lastName])[0m
         [1;94m   | [0m
     "#]];
 
@@ -415,7 +401,6 @@ fn text_type_should_fail_on_id() {
     let schema = indoc! {r#"
         datasource db {
           provider = "sqlserver"
-          url      = env("DATABASE_URL")
         }
 
         model User {
@@ -428,10 +413,10 @@ fn text_type_should_fail_on_id() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mNative type `Text` of SQL Server cannot be used on a field that is `@id` or `@@id`.[0m
-          [1;94m-->[0m  [4mschema.prisma:10[0m
+          [1;94m-->[0m  [4mschema.prisma:9[0m
         [1;94m   | [0m
-        [1;94m 9 | [0m
-        [1;94m10 | [0m  [1;91m@@id([firstName, lastName])[0m
+        [1;94m 8 | [0m
+        [1;94m 9 | [0m  [1;91m@@id([firstName, lastName])[0m
         [1;94m   | [0m
     "#]];
 
@@ -443,7 +428,6 @@ fn ntext_type_should_fail_on_id() {
     let schema = indoc! {r#"
         datasource db {
           provider = "sqlserver"
-          url      = env("DATABASE_URL")
         }
 
         model User {
@@ -456,10 +440,10 @@ fn ntext_type_should_fail_on_id() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mNative type `NText` of SQL Server cannot be used on a field that is `@id` or `@@id`.[0m
-          [1;94m-->[0m  [4mschema.prisma:10[0m
+          [1;94m-->[0m  [4mschema.prisma:9[0m
         [1;94m   | [0m
-        [1;94m 9 | [0m
-        [1;94m10 | [0m  [1;91m@@id([firstName, lastName])[0m
+        [1;94m 8 | [0m
+        [1;94m 9 | [0m  [1;91m@@id([firstName, lastName])[0m
         [1;94m   | [0m
     "#]];
 
@@ -471,7 +455,6 @@ fn varchar_max_type_should_fail_on_id() {
     let schema = indoc! {r#"
         datasource db {
           provider = "sqlserver"
-          url      = env("DATABASE_URL")
         }
 
         model User {
@@ -484,10 +467,10 @@ fn varchar_max_type_should_fail_on_id() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mNative type `VarChar(Max)` of SQL Server cannot be used on a field that is `@id` or `@@id`.[0m
-          [1;94m-->[0m  [4mschema.prisma:10[0m
+          [1;94m-->[0m  [4mschema.prisma:9[0m
         [1;94m   | [0m
-        [1;94m 9 | [0m
-        [1;94m10 | [0m  [1;91m@@id([firstName, lastName])[0m
+        [1;94m 8 | [0m
+        [1;94m 9 | [0m  [1;91m@@id([firstName, lastName])[0m
         [1;94m   | [0m
     "#]];
 
@@ -499,7 +482,6 @@ fn nvarchar_max_type_should_fail_on_id() {
     let schema = indoc! {r#"
         datasource db {
           provider = "sqlserver"
-          url      = env("DATABASE_URL")
         }
 
         model User {
@@ -512,10 +494,10 @@ fn nvarchar_max_type_should_fail_on_id() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mNative type `NVarChar(Max)` of SQL Server cannot be used on a field that is `@id` or `@@id`.[0m
-          [1;94m-->[0m  [4mschema.prisma:10[0m
+          [1;94m-->[0m  [4mschema.prisma:9[0m
         [1;94m   | [0m
-        [1;94m 9 | [0m
-        [1;94m10 | [0m  [1;91m@@id([firstName, lastName])[0m
+        [1;94m 8 | [0m
+        [1;94m 9 | [0m  [1;91m@@id([firstName, lastName])[0m
         [1;94m   | [0m
     "#]];
 
@@ -527,7 +509,6 @@ fn xml_type_should_fail_on_id() {
     let schema = indoc! {r#"
         datasource db {
           provider = "sqlserver"
-          url      = env("DATABASE_URL")
         }
 
         model User {
@@ -540,10 +521,10 @@ fn xml_type_should_fail_on_id() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mNative type `Xml` of SQL Server cannot be used on a field that is `@id` or `@@id`.[0m
-          [1;94m-->[0m  [4mschema.prisma:10[0m
+          [1;94m-->[0m  [4mschema.prisma:9[0m
         [1;94m   | [0m
-        [1;94m 9 | [0m
-        [1;94m10 | [0m  [1;91m@@id([firstName, lastName])[0m
+        [1;94m 8 | [0m
+        [1;94m 9 | [0m  [1;91m@@id([firstName, lastName])[0m
         [1;94m   | [0m
     "#]];
 
@@ -555,7 +536,6 @@ fn varbinary_max_type_should_fail_on_id() {
     let schema = indoc! {r#"
         datasource db {
           provider = "sqlserver"
-          url      = env("DATABASE_URL")
         }
 
         model User {
@@ -568,10 +548,10 @@ fn varbinary_max_type_should_fail_on_id() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mNative type `VarBinary(Max)` of SQL Server cannot be used on a field that is `@id` or `@@id`.[0m
-          [1;94m-->[0m  [4mschema.prisma:10[0m
+          [1;94m-->[0m  [4mschema.prisma:9[0m
         [1;94m   | [0m
-        [1;94m 9 | [0m
-        [1;94m10 | [0m  [1;91m@@id([firstName, lastName])[0m
+        [1;94m 8 | [0m
+        [1;94m 9 | [0m  [1;91m@@id([firstName, lastName])[0m
         [1;94m   | [0m
     "#]];
 
@@ -583,7 +563,6 @@ fn image_type_should_fail_on_id() {
     let schema = indoc! {r#"
         datasource db {
           provider = "sqlserver"
-          url      = env("DATABASE_URL")
         }
 
         model User {
@@ -596,10 +575,10 @@ fn image_type_should_fail_on_id() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mNative type `Image` of SQL Server cannot be used on a field that is `@id` or `@@id`.[0m
-          [1;94m-->[0m  [4mschema.prisma:10[0m
+          [1;94m-->[0m  [4mschema.prisma:9[0m
         [1;94m   | [0m
-        [1;94m 9 | [0m
-        [1;94m10 | [0m  [1;91m@@id([firstName, lastName])[0m
+        [1;94m 8 | [0m
+        [1;94m 9 | [0m  [1;91m@@id([firstName, lastName])[0m
         [1;94m   | [0m
     "#]];
 
@@ -611,7 +590,6 @@ fn should_fail_on_native_type_decimal_when_scale_is_bigger_than_precision() {
     let schema = indoc! {r#"
         datasource db {
           provider = "sqlserver"
-          url      = env("DATABASE_URL")
         }
 
         model Blog {
@@ -622,10 +600,10 @@ fn should_fail_on_native_type_decimal_when_scale_is_bigger_than_precision() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mThe scale must not be larger than the precision for the Decimal(2,4) native type in SQL Server.[0m
-          [1;94m-->[0m  [4mschema.prisma:8[0m
+          [1;94m-->[0m  [4mschema.prisma:7[0m
         [1;94m   | [0m
-        [1;94m 7 | [0m  id  Int     @id
-        [1;94m 8 | [0m  dec Decimal [1;91m@db.Decimal(2,4)[0m
+        [1;94m 6 | [0m  id  Int     @id
+        [1;94m 7 | [0m  dec Decimal [1;91m@db.Decimal(2,4)[0m
         [1;94m   | [0m
     "#]];
 
@@ -637,7 +615,6 @@ fn should_fail_on_argument_out_of_range_for_char_type() {
     let schema = indoc! {r#"
         datasource db {
           provider = "sqlserver"
-          url      = env("DATABASE_URL")
         }
 
         model Blog {
@@ -648,10 +625,10 @@ fn should_fail_on_argument_out_of_range_for_char_type() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mArgument M is out of range for native type `Char(8001)` of SQL Server: Length can range from 1 to 8000.[0m
-          [1;94m-->[0m  [4mschema.prisma:8[0m
+          [1;94m-->[0m  [4mschema.prisma:7[0m
         [1;94m   | [0m
-        [1;94m 7 | [0m  id  Int    @id
-        [1;94m 8 | [0m  dec String [1;91m@db.Char(8001)[0m
+        [1;94m 6 | [0m  id  Int    @id
+        [1;94m 7 | [0m  dec String [1;91m@db.Char(8001)[0m
         [1;94m   | [0m
     "#]];
 
@@ -663,7 +640,6 @@ fn should_fail_on_argument_out_of_range_for_nchar_type() {
     let schema = indoc! {r#"
         datasource db {
           provider = "sqlserver"
-          url      = env("DATABASE_URL")
         }
 
         model Blog {
@@ -674,10 +650,10 @@ fn should_fail_on_argument_out_of_range_for_nchar_type() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mArgument M is out of range for native type `NChar(4001)` of SQL Server: Length can range from 1 to 4000.[0m
-          [1;94m-->[0m  [4mschema.prisma:8[0m
+          [1;94m-->[0m  [4mschema.prisma:7[0m
         [1;94m   | [0m
-        [1;94m 7 | [0m  id  Int    @id
-        [1;94m 8 | [0m  dec String [1;91m@db.NChar(4001)[0m
+        [1;94m 6 | [0m  id  Int    @id
+        [1;94m 7 | [0m  dec String [1;91m@db.NChar(4001)[0m
         [1;94m   | [0m
     "#]];
 
@@ -689,7 +665,6 @@ fn should_fail_on_argument_out_of_range_for_varchar_type() {
     let schema = indoc! {r#"
         datasource db {
           provider = "sqlserver"
-          url      = env("DATABASE_URL")
         }
 
         model Blog {
@@ -700,10 +675,10 @@ fn should_fail_on_argument_out_of_range_for_varchar_type() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mArgument M is out of range for native type `VarChar(8001)` of SQL Server: Length can range from 1 to 8000. For larger sizes, use the `Max` variant.[0m
-          [1;94m-->[0m  [4mschema.prisma:8[0m
+          [1;94m-->[0m  [4mschema.prisma:7[0m
         [1;94m   | [0m
-        [1;94m 7 | [0m  id  Int    @id
-        [1;94m 8 | [0m  dec String [1;91m@db.VarChar(8001)[0m
+        [1;94m 6 | [0m  id  Int    @id
+        [1;94m 7 | [0m  dec String [1;91m@db.VarChar(8001)[0m
         [1;94m   | [0m
     "#]];
 
@@ -715,7 +690,6 @@ fn should_fail_on_argument_out_of_range_for_nvarchar_type() {
     let schema = indoc! {r#"
         datasource db {
           provider = "sqlserver"
-          url      = env("DATABASE_URL")
         }
 
         model Blog {
@@ -726,10 +700,10 @@ fn should_fail_on_argument_out_of_range_for_nvarchar_type() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mArgument M is out of range for native type `NVarChar(4001)` of SQL Server: Length can range from 1 to 4000. For larger sizes, use the `Max` variant.[0m
-          [1;94m-->[0m  [4mschema.prisma:8[0m
+          [1;94m-->[0m  [4mschema.prisma:7[0m
         [1;94m   | [0m
-        [1;94m 7 | [0m  id  Int    @id
-        [1;94m 8 | [0m  dec String [1;91m@db.NVarChar(4001)[0m
+        [1;94m 6 | [0m  id  Int    @id
+        [1;94m 7 | [0m  dec String [1;91m@db.NVarChar(4001)[0m
         [1;94m   | [0m
     "#]];
 
@@ -741,7 +715,6 @@ fn should_fail_on_argument_out_of_range_for_varbinary_type() {
     let schema = indoc! {r#"
         datasource db {
           provider = "sqlserver"
-          url      = env("DATABASE_URL")
         }
 
         model Blog {
@@ -752,10 +725,10 @@ fn should_fail_on_argument_out_of_range_for_varbinary_type() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mArgument M is out of range for native type `VarBinary(8001)` of SQL Server: Length can range from 1 to 8000. For larger sizes, use the `Max` variant.[0m
-          [1;94m-->[0m  [4mschema.prisma:8[0m
+          [1;94m-->[0m  [4mschema.prisma:7[0m
         [1;94m   | [0m
-        [1;94m 7 | [0m  id  Int   @id
-        [1;94m 8 | [0m  dec Bytes [1;91m@db.VarBinary(8001)[0m
+        [1;94m 6 | [0m  id  Int   @id
+        [1;94m 7 | [0m  dec Bytes [1;91m@db.VarBinary(8001)[0m
         [1;94m   | [0m
     "#]];
 
@@ -767,7 +740,6 @@ fn should_fail_on_argument_out_of_range_for_binary_type() {
     let schema = indoc! {r#"
         datasource db {
           provider = "sqlserver"
-          url      = env("DATABASE_URL")
         }
 
         model Blog {
@@ -778,10 +750,10 @@ fn should_fail_on_argument_out_of_range_for_binary_type() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mArgument M is out of range for native type `Binary(8001)` of SQL Server: Length can range from 1 to 8000.[0m
-          [1;94m-->[0m  [4mschema.prisma:8[0m
+          [1;94m-->[0m  [4mschema.prisma:7[0m
         [1;94m   | [0m
-        [1;94m 7 | [0m  id  Int   @id
-        [1;94m 8 | [0m  dec Bytes [1;91m@db.Binary(8001)[0m
+        [1;94m 6 | [0m  id  Int   @id
+        [1;94m 7 | [0m  dec Bytes [1;91m@db.Binary(8001)[0m
         [1;94m   | [0m
     "#]];
 
@@ -793,7 +765,6 @@ fn should_fail_on_incompatible_scalar_type_with_tiny_int() {
     let schema = indoc! {r#"
         datasource db {
           provider = "sqlserver"
-          url      = env("DATABASE_URL")
         }
 
         model Blog {
@@ -804,10 +775,10 @@ fn should_fail_on_incompatible_scalar_type_with_tiny_int() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mNative type Bit is not compatible with declared field type DateTime, expected field type Boolean or Int.[0m
-          [1;94m-->[0m  [4mschema.prisma:8[0m
+          [1;94m-->[0m  [4mschema.prisma:7[0m
         [1;94m   | [0m
-        [1;94m 7 | [0m  id     Int      @id
-        [1;94m 8 | [0m  bigInt DateTime [1;91m@db.Bit[0m
+        [1;94m 6 | [0m  id     Int      @id
+        [1;94m 7 | [0m  bigInt DateTime [1;91m@db.Bit[0m
         [1;94m   | [0m
     "#]];
 
@@ -819,7 +790,6 @@ fn should_fail_on_bad_type_params() {
     let schema = indoc! {r#"
         datasource db {
           provider = "sqlserver"
-          url      = env("DATABASE_URL")
         }
 
         model Blog {
@@ -830,10 +800,10 @@ fn should_fail_on_bad_type_params() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mExpected an integer or `Max`, but found (Ma).[0m
-          [1;94m-->[0m  [4mschema.prisma:8[0m
+          [1;94m-->[0m  [4mschema.prisma:7[0m
         [1;94m   | [0m
-        [1;94m 7 | [0m  id     Int    @id
-        [1;94m 8 | [0m  s      String [1;91m@db.NVarChar(Ma)[0m
+        [1;94m 6 | [0m  id     Int    @id
+        [1;94m 7 | [0m  s      String [1;91m@db.NVarChar(Ma)[0m
         [1;94m   | [0m
     "#]];
 
@@ -845,7 +815,6 @@ fn should_fail_on_too_many_type_params() {
     let schema = indoc! {r#"
         datasource db {
           provider = "sqlserver"
-          url      = env("DATABASE_URL")
         }
 
         model Blog {
@@ -856,10 +825,10 @@ fn should_fail_on_too_many_type_params() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mNative type NVarChar takes 1 optional arguments, but received 2.[0m
-          [1;94m-->[0m  [4mschema.prisma:8[0m
+          [1;94m-->[0m  [4mschema.prisma:7[0m
         [1;94m   | [0m
-        [1;94m 7 | [0m  id     Int    @id
-        [1;94m 8 | [0m  s      String [1;91m@db.NVarChar(1, 2)[0m
+        [1;94m 6 | [0m  id     Int    @id
+        [1;94m 7 | [0m  s      String [1;91m@db.NVarChar(1, 2)[0m
         [1;94m   | [0m
     "#]];
 
@@ -876,7 +845,6 @@ macro_rules! test_type {
                     let dml = formatdoc!(r#"
                         datasource db {{
                           provider = "sqlserver"
-                          url      = env("DATABASE_URL")
                         }}
 
                         model Blog {{

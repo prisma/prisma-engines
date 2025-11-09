@@ -1,4 +1,5 @@
-use schema_core::json_rpc::types::SchemasContainer;
+use indoc::indoc;
+use schema_core::{DatasourceUrls, json_rpc::types::SchemasContainer};
 use sql_migration_tests::test_api::*;
 
 #[test]
@@ -12,7 +13,7 @@ fn introspect_partition_tables() {
     ))
     .unwrap();
 
-    let me = schema_core::schema_api_without_extensions(None, None).unwrap();
+    let me = schema_core::schema_api_without_extensions(None, DatasourceUrls::from_url(&url_str), None).unwrap();
 
     let script = r#"
 CREATE TABLE IF NOT EXISTS blocks
@@ -42,12 +43,11 @@ ALTER TABLE blocks
     }))
     .unwrap();
 
-    let schema = format! {
+    let schema = indoc! {
         r#"
-            datasource db {{
+            datasource db {
                 provider = "postgres"
-                url = "{url_str}"
-            }}
+            }
         "#,
     };
 
@@ -57,7 +57,7 @@ ALTER TABLE blocks
         schema: SchemasContainer {
             files: vec![SchemaContainer {
                 path: "schema.prisma".to_string(),
-                content: schema,
+                content: schema.to_owned(),
             }],
         },
         base_directory_path: "/".to_string(),
@@ -65,14 +65,12 @@ ALTER TABLE blocks
     }))
     .unwrap();
 
-    let expected = format!(
-        r#"datasource db {{
+    let expected = r#"datasource db {
   provider = "postgres"
-  url      = "{url_str}"
-}}
+}
 
 /// This table is a partition table and requires additional setup for migrations. Visit https://pris.ly/d/partition-tables for more info.
-model blocks {{
+model blocks {
   id              Int
   account         String
   block_source_id Int?
@@ -80,9 +78,8 @@ model blocks {{
   other_blocks    blocks[] @relation("blocksToblocks")
 
   @@id([account, id])
-}}
-"#
-    );
+}
+"#;
     pretty_assertions::assert_eq!(expected, result.schema.files.first().unwrap().content.as_str());
 }
 
@@ -97,7 +94,7 @@ fn inherited_table_regression_fix() {
     ))
     .unwrap();
 
-    let me = schema_core::schema_api_without_extensions(None, None).unwrap();
+    let me = schema_core::schema_api_without_extensions(None, DatasourceUrls::from_url(&url_str), None).unwrap();
 
     let script = r#"
 CREATE TABLE cities (
@@ -117,12 +114,11 @@ CREATE TABLE capitals (
     }))
     .unwrap();
 
-    let schema = format! {
+    let schema = indoc! {
         r#"
-            datasource db {{
+            datasource db {
                 provider = "postgres"
-                url = "{url_str}"
-            }}
+            }
         "#,
     };
 
@@ -132,7 +128,7 @@ CREATE TABLE capitals (
         schema: SchemasContainer {
             files: vec![SchemaContainer {
                 path: "schema.prisma".to_string(),
-                content: schema,
+                content: schema.to_owned(),
             }],
         },
         base_directory_path: "/".to_string(),
@@ -140,27 +136,24 @@ CREATE TABLE capitals (
     }))
     .unwrap();
 
-    let expected = format!(
-        r#"datasource db {{
+    let expected = r#"datasource db {
   provider = "postgres"
-  url      = "{url_str}"
-}}
+}
 
-model capitals {{
+model capitals {
   name       String
   population Float? @db.Real
   elevation  Int?
   state      String @unique @db.Char(2)
-}}
+}
 
 /// This table has subclasses and requires additional setup for migrations. Visit https://pris.ly/d/table-inheritance for more info.
-model cities {{
+model cities {
   name       String @unique
   population Float? @db.Real
   elevation  Int?
-}}
-"#
-    );
+}
+"#;
     pretty_assertions::assert_eq!(expected, result.schema.files.first().unwrap().content.as_str());
 }
 
@@ -173,7 +166,7 @@ fn inherited_table_detect_primary_key() {
     ))
     .unwrap();
 
-    let me = schema_core::schema_api_without_extensions(None, None).unwrap();
+    let me = schema_core::schema_api_without_extensions(None, DatasourceUrls::from_url(&url_str), None).unwrap();
 
     let script = r#"
 CREATE TABLE cities (
@@ -193,12 +186,11 @@ CREATE TABLE capitals (
     }))
     .unwrap();
 
-    let schema = format! {
+    let schema = indoc! {
         r#"
-            datasource db {{
+            datasource db {
                 provider = "postgres"
-                url = "{url_str}"
-            }}
+            }
         "#,
     };
 
@@ -208,7 +200,7 @@ CREATE TABLE capitals (
         schema: SchemasContainer {
             files: vec![SchemaContainer {
                 path: "schema.prisma".to_string(),
-                content: schema,
+                content: schema.to_owned(),
             }],
         },
         base_directory_path: "/".to_string(),
@@ -216,29 +208,26 @@ CREATE TABLE capitals (
     }))
     .unwrap();
 
-    let expected = format!(
-        r#"datasource db {{
+    let expected = r#"datasource db {
   provider = "postgres"
-  url      = "{url_str}"
-}}
+}
 
 /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
-model capitals {{
+model capitals {
   name       String
   population Float?  @db.Real
   elevation  Int?
   state      String? @db.Char(2)
 
   @@ignore
-}}
+}
 
 /// This table has subclasses and requires additional setup for migrations. Visit https://pris.ly/d/table-inheritance for more info.
-model cities {{
+model cities {
   name       String @unique
   population Float? @db.Real
   elevation  Int?
-}}
-"#
-    );
+}
+"#;
     pretty_assertions::assert_eq!(expected, result.schema.files.first().unwrap().content.as_str());
 }

@@ -167,7 +167,6 @@ fn a_comment_in_datasource_must_not_add_extra_newlines() {
     let input = indoc! {r#"
         datasource pg {
           provider = "postgresql"
-          url = "postgresql://"
           // a comment
         }
     "#};
@@ -175,7 +174,6 @@ fn a_comment_in_datasource_must_not_add_extra_newlines() {
     let expected = expect![[r#"
         datasource pg {
           provider = "postgresql"
-          url      = "postgresql://"
           // a comment
         }
     "#]];
@@ -207,14 +205,12 @@ fn test_reformat_config() {
     let input = indoc! {r#"
         datasource pg {
           provider = "postgresql"
-          url = "postgresql://"
         }
     "#};
 
     let expected = expect![[r#"
         datasource pg {
           provider = "postgresql"
-          url      = "postgresql://"
         }
     "#]];
 
@@ -226,14 +222,12 @@ fn test_reformat_tabs() {
     let input = indoc! {r#"
         datasource pg {
           provider\t=\t"postgresql"
-          url = "postgresql://"
         }
     "#};
 
     let expected = expect![[r#"
         datasource pg {
           provider = "postgresql"
-          url      = "postgresql://"
         }
     "#]];
 
@@ -337,14 +331,12 @@ fn reformatting_must_work_when_env_var_is_missing() {
     let input = indoc! {r#"
         datasource pg {
           provider = "postgresql"
-          url = env("DATABASE_URL")
         }
     "#};
 
     let expected = expect![[r#"
         datasource pg {
           provider = "postgresql"
-          url      = env("DATABASE_URL")
         }
     "#]];
 
@@ -375,7 +367,6 @@ fn reformatting_an_invalid_datasource_block_must_work() {
     let input = indoc! {r#"
         datasource db {
           provider = "postgresql"
-          url = env("POSTGRESQL_URL")
           test
         }
     "#};
@@ -383,7 +374,6 @@ fn reformatting_an_invalid_datasource_block_must_work() {
     let expected = expect![[r#"
         datasource db {
           provider = "postgresql"
-          url      = env("POSTGRESQL_URL")
           test
         }
     "#]];
@@ -417,7 +407,6 @@ fn reformatting_a_model_with_native_type_definitions_must_work() {
     let input = indoc! {r#"
         datasource pg {
           provider = "postgres"
-          url      = "postgresql://"
         }
 
         model Blog {
@@ -430,7 +419,6 @@ fn reformatting_a_model_with_native_type_definitions_must_work() {
     let expected = expect![[r#"
         datasource pg {
           provider = "postgres"
-          url      = "postgresql://"
         }
 
         model Blog {
@@ -602,7 +590,6 @@ fn multiple_new_lines_between_top_level_elements_must_be_reduced_to_a_single_one
         // source comment
         datasource mydb {
           provider = "sqlite"
-          url      = "file:dev.db"
         }
 
 
@@ -658,7 +645,6 @@ fn multiple_new_lines_between_top_level_elements_must_be_reduced_to_a_single_one
         // source comment
         datasource mydb {
           provider = "sqlite"
-          url      = "file:dev.db"
         }
 
         // free floating comment
@@ -879,7 +865,6 @@ fn reformatting_extended_indexes_works() {
         
         datasource db {
           provider = "mysql"
-          url      = env("DATABASE_URL")
         }
         
         model A {
@@ -912,7 +897,6 @@ fn reformatting_extended_indexes_works() {
 
         datasource db {
           provider = "mysql"
-          url      = env("DATABASE_URL")
         }
 
         model A {
@@ -949,7 +933,6 @@ fn reformatting_with_empty_indexes() {
 
         datasource db {
           provider = "mysql"
-          url      = env("DATABASE_URL")
         }
 
         model Fulltext {
@@ -970,7 +953,6 @@ fn reformatting_with_empty_indexes() {
 
         datasource db {
           provider = "mysql"
-          url      = env("DATABASE_URL")
         }
 
         model Fulltext {
@@ -992,7 +974,6 @@ fn test_composite_types_in_models() {
     let input = indoc! {r#"
         datasource db {
           provider = "mongodb"
-          url      = "mongodb://prisma:prisma@127.0.0.1:27017/test?authSource=admin"
         }
 
         generator js {
@@ -1020,7 +1001,6 @@ fn test_composite_types_in_models() {
     let expected = expect![[r#"
         datasource db {
           provider = "mongodb"
-          url      = "mongodb://prisma:prisma@127.0.0.1:27017/test?authSource=admin"
         }
 
         generator js {
@@ -1096,7 +1076,6 @@ fn composite_type_native_types_roundtrip() {
     let schema = r#"
         datasource db{
             provider = "mongodb"
-            url = "mongo+srv:/...."
         }
 
         generator client {
@@ -1120,7 +1099,6 @@ fn composite_type_native_types_roundtrip() {
     let expected = expect![[r#"
         datasource db {
           provider = "mongodb"
-          url      = "mongo+srv:/...."
         }
 
         generator client {
@@ -1192,7 +1170,6 @@ fn attribute_arguments_reformatting_is_idempotent() {
 
         datasource db {
           provider = "mongodb"
-          url      = "m...ty"
         }
 
         model Foo {
@@ -1226,7 +1203,6 @@ fn attribute_arguments_reformatting_is_idempotent() {
 
         datasource db {
           provider = "mongodb"
-          url      = "m...ty"
         }
 
         model Foo {

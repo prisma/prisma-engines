@@ -5,7 +5,6 @@ fn multiple_indexes_with_same_name_on_different_models_are_supported_by_mysql() 
     let dml = indoc! {r#"
         datasource mysql {
           provider = "mysql"
-          url = "mysql://asdlj"
         }
 
         model User {
@@ -41,7 +40,6 @@ fn foreign_keys_and_indexes_with_same_name_on_same_table_are_not_supported_on_my
     let dml = indoc! {r#"
         datasource mysql {
           provider = "mysql"
-          url = "mysql://asdlj"
         }
 
         model A {
@@ -70,7 +68,6 @@ fn multiple_indexes_with_same_name_on_different_models_are_supported_by_mssql() 
     let dml = indoc! {r#"
         datasource sqlserver {
           provider = "sqlserver"
-          url = "sqlserver://asdlj"
         }
 
         model User {
@@ -106,7 +103,6 @@ fn multiple_constraints_with_same_name_in_different_namespaces_are_supported_by_
     let dml = indoc! {r#"
         datasource sqlserver {
           provider = "sqlserver"
-          url = "sqlserver://asdlj"
         }
 
         model User {

@@ -272,7 +272,6 @@ fn binary_targets_from_env_var_should_work() {
     let schema = indoc! {r#"
         datasource db {
           provider = "mysql"
-          url      = env("DATABASE_URL")
         }
 
         generator client {
@@ -387,7 +386,6 @@ fn empty_preview_features_array_should_work() {
     let schema = r#"
         datasource db {
             provider = "postgresql"
-            url = env("DBURL")
         }
 
         generator js {
@@ -405,7 +403,6 @@ fn empty_preview_features_array_with_empty_space_should_work() {
     let schema = r#"
         datasource db {
             provider = "postgresql"
-            url = env("DBURL")
         }
 
         generator js {

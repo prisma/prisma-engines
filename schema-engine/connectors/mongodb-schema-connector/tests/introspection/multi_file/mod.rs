@@ -24,7 +24,6 @@ fn reintrospect_new_model_single_file() {
 
             datasource db {
               provider = "mongodb"
-              url      = "dummy-url"
             }
 
             model A {
@@ -70,7 +69,6 @@ fn reintrospect_new_model_multi_file() {
 
             datasource db {
               provider = "mongodb"
-              url      = "dummy-url"
             }
 
             model A {
@@ -122,7 +120,6 @@ fn reintrospect_removed_model_single_file() {
 
             datasource db {
               provider = "mongodb"
-              url      = "dummy-url"
             }
 
             model A {
@@ -168,7 +165,6 @@ fn reintrospect_removed_model_multi_file() {
 
             datasource db {
               provider = "mongodb"
-              url      = "dummy-url"
             }
 
             model A {
@@ -216,7 +212,6 @@ fn reintrospect_new_composite_single_file() {
 
             datasource db {
               provider = "mongodb"
-              url      = "dummy-url"
             }
 
             type AIdentity {
@@ -272,7 +267,6 @@ fn reintrospect_new_composite_multi_file() {
 
             datasource db {
               provider = "mongodb"
-              url      = "dummy-url"
             }
 
             type AIdentity {
@@ -344,7 +338,6 @@ fn reintrospect_composite_model_single_file() {
 
             datasource db {
               provider = "mongodb"
-              url      = "dummy-url"
             }
 
             type AIdentity {
@@ -400,7 +393,6 @@ fn reintrospect_removed_composite_multi_file() {
 
             datasource db {
               provider = "mongodb"
-              url      = "dummy-url"
             }
 
             type AIdentity {
@@ -482,7 +474,6 @@ fn reintrospect_with_existing_composite_type() {
 
             datasource db {
               provider = "mongodb"
-              url      = "dummy-url"
             }
 
             model A {
@@ -531,7 +522,6 @@ fn reintrospect_keep_configuration_when_spread_across_files() {
             // file: a.prisma
             datasource db {
               provider = "mongodb"
-              url      = "dummy-url"
             }
 
             model A {
@@ -575,7 +565,6 @@ fn reintrospect_keep_configuration_when_spread_across_files() {
             // file: b.prisma
             datasource db {
               provider = "mongodb"
-              url      = "dummy-url"
             }
 
             model B {
@@ -616,7 +605,6 @@ fn reintrospect_keep_configuration_when_no_models() {
             // file: a.prisma
             datasource db {
               provider = "mongodb"
-              url      = "dummy-url"
             }
 
             model A {
@@ -654,7 +642,6 @@ fn reintrospect_empty_multi_file() {
             // file: a.prisma
             datasource db {
               provider = "mongodb"
-              url      = "dummy-url"
             }
             ------
             // file: b.prisma

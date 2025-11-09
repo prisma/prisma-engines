@@ -161,11 +161,8 @@ pub(super) fn add_schema_to_schemas(
             )
         }
         None => {
-            let has_properties = datasource.provider_defined() | datasource.url_defined()
-                || datasource.direct_url_defined()
-                || datasource.shadow_url_defined()
-                || datasource.relation_mode_defined()
-                || datasource.schemas_defined();
+            let has_properties =
+                datasource.provider_defined() || datasource.relation_mode_defined() || datasource.schemas_defined();
 
             let formatted_attribute = super::format_block_property(
                 "schemas",
@@ -180,7 +177,7 @@ pub(super) fn add_schema_to_schemas(
                 datasource_content,
                 formatted_attribute,
                 true,
-                datasource.url_span,
+                datasource.provider_span,
             )
         }
     };

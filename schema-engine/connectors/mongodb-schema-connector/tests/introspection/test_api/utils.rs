@@ -39,7 +39,6 @@ pub(crate) fn datasource_block_string() -> String {
         r#"
           datasource db {{
             provider = "mongodb"
-            url      = "dummy-url"
           }}
       "#
     )

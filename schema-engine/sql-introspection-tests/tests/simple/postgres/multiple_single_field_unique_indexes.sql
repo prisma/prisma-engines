@@ -18,7 +18,6 @@ generator js {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
 }
 
 model mymodel {

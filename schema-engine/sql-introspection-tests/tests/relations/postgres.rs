@@ -196,7 +196,6 @@ async fn name_ambiguity_with_a_scalar_field(api: &mut TestApi) -> TestResult {
 
         datasource db {
           provider = "postgresql"
-          url      = "dummy-url"
         }
 
         model a {
@@ -248,7 +247,6 @@ async fn legacy_prisma_many_to_many_relation(api: &mut TestApi) -> TestResult {
 
         datasource db {
           provider = "postgresql"
-          url      = "dummy-url"
         }
 
         model Post {
@@ -298,7 +296,6 @@ async fn new_prisma_many_to_many_relation(api: &mut TestApi) -> TestResult {
 
         datasource db {
           provider = "postgresql"
-          url      = "dummy-url"
         }
 
         model Post {

@@ -10,6 +10,7 @@ pub(crate) fn reformat(input: &str) -> String {
     psl::reformat(input, 2).unwrap_or_else(|| input.to_owned())
 }
 
+#[track_caller]
 pub(crate) fn parse_unwrap_err(schema: &str) -> String {
     psl::parse_schema_without_extensions(schema).map(drop).unwrap_err()
 }
@@ -68,20 +69,17 @@ pub(crate) fn assert_valid(schema: &str) {
 pub(crate) const POSTGRES_SOURCE: &str = r#"
     datasource db {
         provider = "postgres"
-        url      = "postgresql://localhost:5432"
     }
 "#;
 
 pub(crate) const MYSQL_SOURCE: &str = r#"
     datasource db {
         provider = "mysql"
-        url      = "mysql://localhost:3306"
     }
 "#;
 
 pub(crate) const MSSQL_SOURCE: &str = r#"
     datasource db {
         provider = "sqlserver"
-        url      = "jdbc:sqlserver://localhost:3306"
     }
 "#;

@@ -18,7 +18,6 @@ generator js {
 
 datasource db {
   provider = "cockroachdb"
-  url      = env("DATABASE_URL")
 }
 
 model pages {

@@ -22,6 +22,7 @@ use quaint::{
     prelude::{ConnectionInfo, ResultSet},
 };
 use schema_core::{
+    DatasourceUrls,
     commands::diff_cli,
     json_rpc::types::SchemaFilter,
     schema_connector::{BoxFuture, ConnectorHost, ConnectorResult, DiffTarget, MigrationPersistence, SchemaConnector},
@@ -87,6 +88,10 @@ impl TestApi {
 
     pub fn connection_string(&self) -> &str {
         self.root.connection_string()
+    }
+
+    pub fn shadow_database_connection_string(&self) -> Option<&str> {
+        self.root.shadow_database_connection_string()
     }
 
     pub fn connection_info(&self) -> ConnectionInfo {
@@ -199,10 +204,24 @@ impl TestApi {
     }
 
     pub fn diff(&self, params: DiffParams) -> ConnectorResult<DiffResult> {
+        self.diff_with_datasource(
+            &DatasourceUrls {
+                url: self.connection_string().to_owned(),
+                shadow_database_url: self.shadow_database_connection_string().map(<_>::to_owned),
+            },
+            params,
+        )
+    }
+
+    pub fn diff_with_datasource(
+        &self,
+        datasource_urls: &DatasourceUrls,
+        params: DiffParams,
+    ) -> ConnectorResult<DiffResult> {
         test_setup::runtime::run_with_thread_local_runtime(diff_cli(
             params,
+            datasource_urls,
             self.connector.host().clone(),
-            None,
             &NoExtensionTypes,
         ))
     }
@@ -420,9 +439,7 @@ impl TestApi {
     }
 
     pub fn datasource_block_with<'a>(&'a self, params: &'a [(&'a str, &'a str)]) -> DatasourceBlock<'a> {
-        self.root
-            .args
-            .datasource_block(self.root.connection_string(), params, &[])
+        self.root.args.datasource_block(params, &[])
     }
 
     /// Generate a migration script using `MigrationConnector::diff()`.
@@ -569,10 +586,7 @@ impl TestApi {
             params.to_vec()
         };
 
-        let ds_block = self
-            .root
-            .args
-            .datasource_block(self.root.args.database_url(), &used_params, preview_features);
+        let ds_block = self.root.args.datasource_block(&used_params, preview_features);
 
         write!(out, "{ds_block}").unwrap()
     }

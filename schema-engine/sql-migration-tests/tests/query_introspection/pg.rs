@@ -290,7 +290,6 @@ mod postgres {
     const PG_DATASOURCE: &str = r#"
         datasource db {
             provider = "postgres"
-            url      = "postgresql://localhost:5432"
         }
     "#;
 
@@ -1042,7 +1041,6 @@ mod crdb {
     const CRDB_DATASOURCE: &str = r#"
   datasource db {
     provider = "cockroachdb"
-    url      = "postgresql://localhost:5432"
 }
 "#;
 
