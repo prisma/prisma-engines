@@ -526,16 +526,11 @@ pub enum IndexType {
 }
 
 /// The sort order of an index.
-#[derive(Serialize, Deserialize, PartialEq, Debug, Copy, Clone)]
+#[derive(Serialize, Deserialize, PartialEq, Debug, Copy, Clone, Default)]
 pub enum SQLSortOrder {
+    #[default]
     Asc,
     Desc,
-}
-
-impl Default for SQLSortOrder {
-    fn default() -> Self {
-        Self::Asc
-    }
 }
 
 impl AsRef<str> for SQLSortOrder {

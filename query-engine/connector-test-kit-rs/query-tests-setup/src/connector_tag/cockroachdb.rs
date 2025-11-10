@@ -6,10 +6,11 @@ use quaint::{prelude::Queryable, single::Quaint};
 #[derive(Debug, Default, Clone)]
 pub(crate) struct CockroachDbConnectorTag;
 
-#[derive(Debug, Clone, Copy, PartialEq)]
+#[derive(Debug, Clone, Copy, PartialEq, Default)]
 pub enum CockroachDbVersion {
     V231,
     V222,
+    #[default]
     V221,
     PgJsWasm,
 }
@@ -38,12 +39,6 @@ impl fmt::Display for CockroachDbVersion {
             CockroachDbVersion::V221 => f.write_str("22.1"),
             CockroachDbVersion::PgJsWasm => f.write_str("pg.js.wasm"),
         }
-    }
-}
-
-impl Default for CockroachDbVersion {
-    fn default() -> Self {
-        Self::V221
     }
 }
 

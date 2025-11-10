@@ -152,13 +152,14 @@ impl IntrospectionContext {
 }
 
 /// Control type for composite type traversal.
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, Default)]
 pub enum CompositeTypeDepth {
     /// Allow maximum of n layers of nested types.
     Level(usize),
     /// Unrestricted traversal.
     Infinite,
     /// No traversal, typing into dynamic Json.
+    #[default]
     None,
 }
 
@@ -169,12 +170,6 @@ impl From<isize> for CompositeTypeDepth {
             0 => Self::None,
             _ => Self::Level(size as usize),
         }
-    }
-}
-
-impl Default for CompositeTypeDepth {
-    fn default() -> Self {
-        Self::None
     }
 }
 
