@@ -326,7 +326,7 @@ mod create_list {
           }
         }
         "#),
-          @r###"{"data":{"createOneTestModel":{"to_many_as":[],"to_one_b":null}}}"###
+          @r###"{"data":{"createOneTestModel":{"to_many_as":null,"to_one_b":null}}}"###
         );
 
         Ok(())

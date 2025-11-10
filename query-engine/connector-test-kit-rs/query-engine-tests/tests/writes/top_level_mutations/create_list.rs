@@ -27,7 +27,7 @@ mod create_list {
 
         insta::assert_snapshot!(
           run_query!(&runner, r#"mutation { createOneUser(data: { id: 1 }){ id, test }}"#),
-          @r###"{"data":{"createOneUser":{"id":1,"test":[]}}}"###
+          @r###"{"data":{"createOneUser":{"id":1,"test":null}}}"###
         );
 
         Ok(())
