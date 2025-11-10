@@ -14,6 +14,7 @@ use psl::{Diagnostics, StringFromEnvVar};
 pub(crate) trait DatamodelAssert<'a> {
     fn assert_has_model(&'a self, name: &str) -> walkers::ModelWalker<'a>;
     fn assert_has_type(&'a self, name: &str) -> walkers::CompositeTypeWalker<'a>;
+    fn assert_has_enum(&'a self, name: &str) -> walkers::EnumWalker<'a>;
 }
 
 pub(crate) trait DatasourceAsserts {
@@ -153,6 +154,14 @@ impl<'a> DatamodelAssert<'a> for psl::ValidatedSchema {
             .walk_composite_types()
             .find(|m| m.name() == name)
             .expect("Type {name} not found")
+    }
+
+    #[track_caller]
+    fn assert_has_enum(&'a self, name: &str) -> walkers::EnumWalker<'a> {
+        self.db
+            .walk_enums()
+            .find(|e| e.name() == name)
+            .expect("Enum {name} not found")
     }
 }
 
@@ -753,5 +762,29 @@ impl IndexAssert for walkers::PrimaryKeyWalker<'_> {
     #[track_caller]
     fn assert_type(&self, _type: IndexAlgorithm) -> &Self {
         unreachable!("Primary key cannot define the index type.");
+    }
+}
+pub(crate) trait EnumAssert<'a> {
+    fn assert_has_value(&'a self, name: &str) -> walkers::EnumValueWalker<'a>;
+}
+
+impl<'a> EnumAssert<'a> for walkers::EnumWalker<'a> {
+    #[track_caller]
+    fn assert_has_value(&'a self, name: &str) -> walkers::EnumValueWalker<'a> {
+        self.values()
+            .find(|v| v.name() == name)
+            .expect("Enum value {name} not found")
+    }
+}
+
+pub(crate) trait EnumValueAssert {
+    fn assert_ignored(&self, ignored: bool) -> &Self;
+}
+
+impl EnumValueAssert for walkers::EnumValueWalker<'_> {
+    #[track_caller]
+    fn assert_ignored(&self, ignored: bool) -> &Self {
+        assert_eq!(self.is_ignored(), ignored);
+        self
     }
 }
