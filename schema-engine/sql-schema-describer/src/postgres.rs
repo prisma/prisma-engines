@@ -67,20 +67,15 @@ impl Default for Sequence {
     }
 }
 
-#[derive(PartialEq, Debug, Clone, Copy)]
+#[derive(PartialEq, Debug, Clone, Copy, Default)]
 pub enum SqlIndexAlgorithm {
+    #[default]
     BTree,
     Hash,
     Gist,
     Gin,
     SpGist,
     Brin,
-}
-
-impl Default for SqlIndexAlgorithm {
-    fn default() -> Self {
-        Self::BTree
-    }
 }
 
 impl AsRef<str> for SqlIndexAlgorithm {

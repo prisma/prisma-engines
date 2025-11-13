@@ -314,17 +314,12 @@ impl Display for DropIndex<'_> {
     }
 }
 
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Copy, Clone, Default)]
 pub enum IndexType {
+    #[default]
     Normal,
     Unique,
     Fulltext,
-}
-
-impl Default for IndexType {
-    fn default() -> Self {
-        Self::Normal
-    }
 }
 
 #[derive(Debug)]

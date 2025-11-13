@@ -32,6 +32,7 @@ impl RelationMode {
     }
 }
 
+#[allow(clippy::derivable_impls)] // `#[default]` attribute can't be used in bitflags macro
 impl Default for RelationMode {
     fn default() -> Self {
         Self::ForeignKeys
