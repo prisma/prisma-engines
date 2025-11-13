@@ -43,18 +43,13 @@ pub struct Column<'a> {
 }
 
 /// Defines a default value for a `Column`.
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq, Default)]
 pub enum DefaultValue<'a> {
     /// A static value.
     Provided(Value<'a>),
     /// Generated in the database.
+    #[default]
     Generated,
-}
-
-impl Default for DefaultValue<'_> {
-    fn default() -> Self {
-        Self::Generated
-    }
 }
 
 impl<'a, V> From<V> for DefaultValue<'a>

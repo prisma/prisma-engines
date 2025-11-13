@@ -191,10 +191,11 @@ impl QueryFilters {
     }
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Default)]
 pub enum SelectionSet {
     Single(QuerySingle),
     Many(Vec<QueryFilters>),
+    #[default]
     Empty,
 }
 
@@ -247,12 +248,6 @@ impl QuerySingle {
                 None
             }
         }
-    }
-}
-
-impl Default for SelectionSet {
-    fn default() -> Self {
-        Self::Empty
     }
 }
 
@@ -332,23 +327,18 @@ impl From<In> for ArgumentValue {
     }
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Default)]
 pub enum Conjuctive {
     Or(Vec<Conjuctive>),
     And(Vec<Conjuctive>),
     Single(ArgumentValueObject),
+    #[default]
     None,
 }
 
 impl From<ArgumentValueObject> for Conjuctive {
     fn from(map: ArgumentValueObject) -> Self {
         Self::Single(map)
-    }
-}
-
-impl Default for Conjuctive {
-    fn default() -> Self {
-        Self::None
     }
 }
 

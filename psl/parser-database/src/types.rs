@@ -404,9 +404,10 @@ pub(crate) struct ModelAttributes {
 /// ```
 #[bitflags]
 #[repr(u8)]
-#[derive(Debug, Clone, Copy, PartialEq)]
+#[derive(Debug, Clone, Copy, PartialEq, Default)]
 pub enum IndexAlgorithm {
     /// Binary tree index (the default in most databases)
+    #[default]
     BTree,
     /// Hash index
     Hash,
@@ -512,12 +513,6 @@ impl IndexAlgorithm {
                 "Block Range Index. If the data has some natural correlation with their physical location within the table, can compress very large amount of data into a small space."
             }
         }
-    }
-}
-
-impl Default for IndexAlgorithm {
-    fn default() -> Self {
-        Self::BTree
     }
 }
 
@@ -1494,18 +1489,13 @@ impl OperatorClassStore {
 }
 
 /// The sort order of an index.
-#[derive(Debug, Clone, Copy, PartialEq)]
+#[derive(Debug, Clone, Copy, PartialEq, Default)]
 pub enum SortOrder {
     /// ASCending
+    #[default]
     Asc,
     /// DESCending
     Desc,
-}
-
-impl Default for SortOrder {
-    fn default() -> Self {
-        Self::Asc
-    }
 }
 
 /// Prisma's builtin scalar types.
