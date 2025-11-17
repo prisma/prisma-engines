@@ -453,6 +453,7 @@ where
                             self.keyword("mul").append(self.space()).append(self.value(val))
                         }
                         FieldOperation::Divide(val) => self.keyword("div").append(self.space()).append(self.value(val)),
+                        FieldOperation::Now => self.keyword("now"),
                     },
                 )
             })))

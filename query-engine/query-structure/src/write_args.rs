@@ -150,6 +150,9 @@ pub enum ScalarWriteOperation {
 
     /// Divide field by value.
     Divide(PrismaValue),
+
+    /// Set field to the current date-time
+    Now,
 }
 
 #[derive(Debug, PartialEq, Clone)]
@@ -487,5 +490,6 @@ pub fn apply_expression(val: PrismaValue, scalar_write: ScalarWriteOperation) ->
         ScalarWriteOperation::Multiply(rhs) => val * rhs,
         ScalarWriteOperation::Divide(rhs) => val / rhs,
         ScalarWriteOperation::Unset(_) => unimplemented!(),
+        ScalarWriteOperation::Now => PrismaValue::generator_now(),
     }
 }

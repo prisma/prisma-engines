@@ -51,6 +51,9 @@ pub mod operations {
     pub const DECREMENT: &str = "decrement";
     pub const MULTIPLY: &str = "multiply";
     pub const DIVIDE: &str = "divide";
+
+    // date-time
+    pub const NOW: &str = "now";
 }
 
 pub mod filters {
