@@ -156,7 +156,7 @@ impl Connector for MongoDbDatamodelConnector {
     }
 
     fn allowed_relation_mode_settings(&self) -> enumflags2::BitFlags<RelationMode> {
-        RelationMode::Prisma.into()
+        RelationMode::Prisma | RelationMode::PrismaSkipIntegrity
     }
 
     /// Avoid checking whether the fields appearing in a `@relation` attribute are included in an index.

@@ -88,6 +88,8 @@ pub trait Connector: Send + Sync {
         match relation_mode {
             RelationMode::ForeignKeys => self.foreign_key_referential_actions(),
             RelationMode::Prisma => self.emulated_referential_actions(),
+            // PrismaSkipIntegrity does not support any referential action, cause it is used to skip any integrity check.
+            RelationMode::PrismaSkipIntegrity => BitFlags::empty(),
         }
     }
 

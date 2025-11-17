@@ -399,8 +399,11 @@ pub(crate) fn insert_emulated_on_delete(
     model_to_delete: &Model,
     node_providing_ids: &NodeRef,
 ) -> QueryGraphBuilderResult<Vec<NodeRef>> {
-    // If the connector uses the `RelationMode::ForeignKeys` mode, we do not do any checks / emulation.
-    if query_schema.relation_mode().uses_foreign_keys() {
+    // If the connector uses the `RelationMode::ForeignKeys` or `RelationMode::PrismaSkipIntegrity` mode, we do not do any checks / emulation.
+    if query_schema
+        .relation_mode()
+        .should_skip_emulated_referential_integrity()
+    {
         return Ok(vec![]);
     }
 
@@ -913,8 +916,11 @@ pub fn insert_emulated_on_update_with_intermediary_node(
     parent_node: &NodeRef,
     child_node: &NodeRef,
 ) -> QueryGraphBuilderResult<Option<NodeRef>> {
-    // If the connector uses the `RelationMode::ForeignKeys` mode, we do not do any checks / emulation.
-    if query_schema.relation_mode().uses_foreign_keys() {
+    // If the connector uses the `RelationMode::ForeignKeys` mode or the `RelationMode::PrismaSkipIntegrity`, we do not do any checks / emulation.
+    if query_schema
+        .relation_mode()
+        .should_skip_emulated_referential_integrity()
+    {
         return Ok(None);
     }
 
@@ -955,8 +961,11 @@ pub fn insert_emulated_on_update(
     parent_node: &NodeRef,
     child_node: &NodeRef,
 ) -> QueryGraphBuilderResult<()> {
-    // If the connector uses the `RelationMode::ForeignKeys` mode, we do not do any checks / emulation.
-    if query_schema.relation_mode().uses_foreign_keys() {
+    // If the connector uses the `RelationMode::ForeignKeys` mode or the `RelationMode::PrismaSkipIntegrity` mode, we do not do any checks / emulation.
+    if query_schema
+        .relation_mode()
+        .should_skip_emulated_referential_integrity()
+    {
         return Ok(());
     }
 
