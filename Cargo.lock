@@ -3054,14 +3054,14 @@ dependencies = [
 
 [[package]]
 name = "parse-hyperlinks"
-version = "0.23.4"
+version = "0.29.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0181d37c4d5ae35cc8be7cf823c1a933005661da6a08bcb2855aa392c9a54b8e"
+checksum = "9b3cbc5588d5e45fd918a6923688b1e0a0b7bed82c19570596158b4027617374"
 dependencies = [
  "html-escape",
- "nom 7.1.3",
+ "nom 8.0.0",
  "percent-encoding",
- "thiserror 1.0.69",
+ "thiserror 2.0.17",
 ]
 
 [[package]]
@@ -3109,9 +3109,9 @@ dependencies = [
 
 [[package]]
 name = "percent-encoding"
-version = "2.3.1"
+version = "2.3.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e3148f5046208a5d56bcfc03053e3ca6334e51da8dfb19b6cdc8b306fae3283e"
+checksum = "9b4f627cb1b25917193a259e49bdad08f671f8d9708acfd5fe0a8c1455d87220"
 
 [[package]]
 name = "pest"
