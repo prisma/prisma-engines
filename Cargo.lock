@@ -2611,7 +2611,7 @@ version = "0.1.0"
 dependencies = [
  "mongodb",
  "percent-encoding",
- "thiserror 2.0.12",
+ "thiserror 2.0.17",
 ]
 
 [[package]]
@@ -2652,7 +2652,7 @@ dependencies = [
  "serde",
  "serde_json",
  "telemetry",
- "thiserror 2.0.12",
+ "thiserror 2.0.17",
  "tokio",
  "tracing",
  "tracing-futures",
@@ -3102,7 +3102,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "1db05f56d34358a8b1066f67cbb203ee3e7ed2ba674a6263a1d5ec6db2204323"
 dependencies = [
  "memchr",
- "thiserror 2.0.12",
+ "thiserror 2.0.17",
  "ucd-trie",
 ]
 
@@ -3543,7 +3543,7 @@ dependencies = [
  "serde_json",
  "sqlformat",
  "telemetry",
- "thiserror 2.0.12",
+ "thiserror 2.0.17",
  "tiberius",
  "tokio",
  "tokio-postgres",
@@ -3603,7 +3603,7 @@ dependencies = [
  "serde",
  "serde_json",
  "sql-query-builder",
- "thiserror 2.0.12",
+ "thiserror 2.0.17",
 ]
 
 [[package]]
@@ -3657,7 +3657,7 @@ dependencies = [
  "serde",
  "serde_json",
  "telemetry",
- "thiserror 2.0.12",
+ "thiserror 2.0.17",
  "user-facing-errors",
  "uuid",
 ]
@@ -3679,7 +3679,7 @@ dependencies = [
  "serde",
  "serde_json",
  "smallvec",
- "thiserror 2.0.12",
+ "thiserror 2.0.17",
  "tokio",
  "tracing",
  "user-facing-errors",
@@ -3725,7 +3725,7 @@ dependencies = [
  "itertools 0.13.0",
  "prisma-value",
  "psl",
- "thiserror 2.0.12",
+ "thiserror 2.0.17",
 ]
 
 [[package]]
@@ -3773,7 +3773,7 @@ dependencies = [
  "serde_json",
  "strip-ansi-escapes",
  "telemetry",
- "thiserror 2.0.12",
+ "thiserror 2.0.17",
  "tokio",
  "tracing",
  "tracing-error",
@@ -4048,7 +4048,7 @@ dependencies = [
  "query-structure",
  "serde",
  "serde_json",
- "thiserror 2.0.12",
+ "thiserror 2.0.17",
  "tracing",
  "user-facing-errors",
 ]
@@ -4353,7 +4353,7 @@ dependencies = [
  "serde",
  "serde_json",
  "sql-schema-connector",
- "thiserror 2.0.12",
+ "thiserror 2.0.17",
  "tokio",
  "tracing",
  "tracing-futures",
@@ -4892,7 +4892,7 @@ dependencies = [
  "once_cell",
  "percent-encoding",
  "smallvec",
- "thiserror 2.0.12",
+ "thiserror 2.0.17",
  "tracing",
  "url",
 ]
@@ -5071,7 +5071,7 @@ dependencies = [
  "rand 0.8.5",
  "serde",
  "serde_json",
- "thiserror 2.0.12",
+ "thiserror 2.0.17",
  "tokio",
  "tracing",
  "tracing-subscriber",
@@ -5150,11 +5150,11 @@ dependencies = [
 
 [[package]]
 name = "thiserror"
-version = "2.0.12"
+version = "2.0.17"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "567b8a2dae586314f7be2a752ec7474332959c6460e02bde30d702a66d488708"
+checksum = "f63587ca0f12b72a0600bcba1d40081f830876000bb46dd2337a3051618f4fc8"
 dependencies = [
- "thiserror-impl 2.0.12",
+ "thiserror-impl 2.0.17",
 ]
 
 [[package]]
@@ -5170,9 +5170,9 @@ dependencies = [
 
 [[package]]
 name = "thiserror-impl"
-version = "2.0.12"
+version = "2.0.17"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7f7cf42b4507d8ea322120659672cf1b9dbb93f8f2d4ecfd6e51350ff5b17a1d"
+checksum = "3ff15c8ecd7de3849db632e14d18d2571fa09dfc5ed93479bc4485c7a517c913"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -5559,7 +5559,7 @@ dependencies = [
  "native-tls",
  "rand 0.8.5",
  "sha1",
- "thiserror 2.0.12",
+ "thiserror 2.0.17",
  "utf-8",
 ]
 
