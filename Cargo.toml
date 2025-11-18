@@ -133,7 +133,7 @@ thiserror = "2"
 url = "2"
 ulid = "1"
 uuid = { version = "1", features = ["v4", "v7", "js"] }
-versions = "6"
+versions = "7"
 
 js-sys = "0.3"
 wasm-bindgen = "0.2"
