@@ -73,12 +73,16 @@ impl<'a> TableWalker<'a> {
             .namespaces
             .get_index(self.table().namespace_id.0 as usize)
             .map(|s| s.as_str())
+            .filter(|s| Some(*s) != self.schema.runtime_namespace.as_deref())
     }
 
     /// The namespace the table belongs to, if defined.
     /// If not, falls back to the default runtime namespace, if one is set.
     pub fn namespace(self) -> Option<&'a str> {
-        self.explicit_namespace().or(self.schema.runtime_namespace.as_deref())
+        self.schema
+            .namespaces
+            .get_index(self.table().namespace_id.0 as usize)
+            .map(|s| s.as_str())
     }
 
     /// The namespace the table belongs to.

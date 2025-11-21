@@ -17,6 +17,9 @@ enum Ripeness {
     @@map("avocado_ripeness_status")
 }
 // Expected Migration:
+// -- CreateSchema
+// CREATE SCHEMA IF NOT EXISTS "public";
+// 
 // -- CreateEnum
 // CREATE TYPE "avocado_ripeness_status" AS ENUM ('NOT_RIPE_ENOUGH', 'TOO_RIPE');
 // 
