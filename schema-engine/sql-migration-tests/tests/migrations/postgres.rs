@@ -537,6 +537,9 @@ fn scalar_list_defaults_work(api: TestApi) {
     api.schema_push(schema).send().assert_green().assert_no_steps();
 
     let expected_sql = expect![[r#"
+        -- CreateSchema
+        CREATE SCHEMA IF NOT EXISTS "public";
+
         -- CreateEnum
         CREATE TYPE "Color" AS ENUM ('RED', 'GREEN', 'BLUE');
 
@@ -677,6 +680,9 @@ fn json_defaults_with_escaped_quotes_work(api: TestApi) {
     api.schema_push(schema).send().assert_green().assert_no_steps();
 
     let sql = expect![[r#"
+        -- CreateSchema
+        CREATE SCHEMA IF NOT EXISTS "public";
+
         -- CreateTable
         CREATE TABLE "Foo" (
             "id" INTEGER NOT NULL,
@@ -703,6 +709,9 @@ fn bigint_defaults_work(api: TestApi) {
         }
     "#;
     let sql = expect![[r#"
+        -- CreateSchema
+        CREATE SCHEMA IF NOT EXISTS "public";
+
         -- CreateTable
         CREATE TABLE "foo" (
             "id" TEXT NOT NULL,
