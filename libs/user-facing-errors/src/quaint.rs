@@ -34,7 +34,7 @@ impl From<quaint::error::DatabaseConstraint> for query_engine::DatabaseConstrain
 }
 
 pub fn invalid_connection_string_description(error_details: &str) -> String {
-    let docs = r#"https://www.prisma.io/docs/reference/database-reference/connection-urls"#;
+    let docs = r#"https://pris.ly/d/config-url"#;
 
     let details = formatdoc! {r#"
             {} in database URL. Please refer to the documentation in {} for constructing a correct

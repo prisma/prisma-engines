@@ -475,7 +475,7 @@ async fn connection_string_problems_give_a_nice_error() {
             "sqlserver" => {
                 indoc!(
                     "Error parsing connection string: Conversion error: invalid digit found in string in database URL.
-                    Please refer to the documentation in https://www.prisma.io/docs/reference/database-reference/connection-urls
+                    Please refer to the documentation in https://pris.ly/d/config-url
                     for constructing a correct connection string. In some cases, certain characters must be escaped.
                     Please check the string for any illegal characters.",
                 ).replace('\n', " ")
@@ -483,7 +483,7 @@ async fn connection_string_problems_give_a_nice_error() {
             _ => {
                 indoc!(
                     "invalid port number in database URL.
-                    Please refer to the documentation in https://www.prisma.io/docs/reference/database-reference/connection-urls
+                    Please refer to the documentation in https://pris.ly/d/config-url
                     for constructing a correct connection string. In some cases, certain characters must be escaped.
                     Please check the string for any illegal characters.",
                 ).replace('\n', " ")
