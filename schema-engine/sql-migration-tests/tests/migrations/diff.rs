@@ -421,7 +421,15 @@ fn from_empty_to_migrations_folder_without_shadow_db_url_must_error(mut api: Tes
         filters: SchemaFilter::default(),
     };
 
-    let err = api.diff(params).unwrap_err();
+    let err = api
+        .diff_with_datasource(
+            &DatasourceUrls {
+                url: api.connection_string().to_owned(),
+                shadow_database_url: None,
+            },
+            params,
+        )
+        .unwrap_err();
 
     let expected_error = expect![[r#"
         You must pass the `--shadow-database-url` flag or set `datasource.shadowDatabaseUrl` in your `prisma.config.ts` if you want to diff a migrations directory.
