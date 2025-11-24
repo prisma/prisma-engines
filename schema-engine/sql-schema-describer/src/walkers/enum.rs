@@ -17,12 +17,16 @@ impl<'a> EnumWalker<'a> {
             .namespaces
             .get_index(self.get().namespace_id.0 as usize)
             .map(|s| s.as_str())
+            .filter(|s| Some(*s) != self.schema.runtime_namespace.as_deref())
     }
 
     /// The namespace the enum belongs to, if defined.
     /// If not, falls back to the default runtime namespace, if one is set.
     pub fn namespace(self) -> Option<&'a str> {
-        self.explicit_namespace().or(self.schema.runtime_namespace.as_deref())
+        self.schema
+            .namespaces
+            .get_index(self.get().namespace_id.0 as usize)
+            .map(|s| s.as_str())
     }
 
     /// The name of the enum. This is a made up name on MySQL.

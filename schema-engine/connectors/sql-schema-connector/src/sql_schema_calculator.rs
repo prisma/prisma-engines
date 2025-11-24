@@ -61,6 +61,15 @@ fn push_namespaces<'a>(ctx: &mut Context<'a>, default_namespace: Option<&'a str>
     }
 
     if let Some(default_namespace) = default_namespace {
+        if ctx.schemas.is_empty() {
+            ctx.schemas.insert(
+                default_namespace,
+                ctx.schema
+                    .describer_schema
+                    .push_namespace(default_namespace.to_string()),
+            );
+        }
+
         ctx.schema
             .describer_schema
             .set_default_namespace(default_namespace.to_owned());

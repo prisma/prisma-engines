@@ -16,6 +16,9 @@ enum Status {
     ERROR
 }
 // Expected Migration:
+// -- CreateSchema
+// CREATE SCHEMA IF NOT EXISTS "public";
+// 
 // -- CreateEnum
 // CREATE TYPE "Status" AS ENUM ('OK', 'ERROR');
 // 
