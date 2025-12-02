@@ -12,6 +12,7 @@ packages:
   - '../../../prisma/packages/client-runtime-utils'
   - '../../../prisma/packages/debug'
   - '../../../prisma/packages/driver-adapter-utils'
+  - '../../../prisma/packages/sqlcommenter'
   - './executor'
 
 onlyBuiltDependencies:
