@@ -227,7 +227,7 @@ mod m2m {
         insta::assert_snapshot!(
           run_query!(&runner, r#"{
                 findUniqueItem(relationLoadStrategy: join, where: { id: 1 })
-                { id categories { id } } 
+                { id categories { id } }
             }"#),
           @r###"{"data":{"findUniqueItem":null}}"###
         );
@@ -240,6 +240,46 @@ mod m2m {
           @r###"{"data":{"findUniqueCategory":{"id":1,"items":[]}}}"###
         );
 
+        Ok(())
+    }
+
+    fn schema_28304() -> String {
+        let schema = indoc! {
+            r#"model AReallyLongModelName {
+              id Int @id @default(autoincrement())
+
+              verys AVeryVeryLongModelName[]
+            }
+
+            model AVeryVeryLongModelName {
+              id Int @id @default(autoincrement())
+
+              reallys AReallyLongModelName[]
+            }"#
+        };
+
+        schema.to_owned()
+    }
+
+    // ! (https://github.com/prisma/prisma/issues/28304) - Many-to-many alias character limit
+    #[connector_test(schema(schema_28304), only(Postgres))]
+    async fn repro_28304(runner: Runner) -> TestResult<()> {
+        run_query!(
+            &runner,
+            r#"mutation { createOneAReallyLongModelName(data: { verys: { create: {} } }) { id } }"#
+        );
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"{
+                findFirstAReallyLongModelName(relationLoadStrategy: query) {
+                    id
+                    verys {
+                        id
+                    }
+                }
+            }"#),
+          @r###"{"data":{"findFirstAReallyLongModelName":{"id":1,"verys":[{"id":1}]}}}"###
+        );
         Ok(())
     }
 

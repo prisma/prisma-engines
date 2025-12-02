@@ -16,7 +16,7 @@ pub mod update;
 pub mod value;
 pub mod write;
 
-use std::{collections::HashMap, iter, marker::PhantomData};
+use std::{collections::HashMap, iter, marker::PhantomData, sync::atomic::AtomicUsize};
 
 use itertools::{Either, Itertools};
 use model_extensions::ScalarFieldExt;
@@ -28,6 +28,8 @@ use quaint::{
     },
     visitor::Visitor,
 };
+#[cfg(feature = "relation_joins")]
+use query_builder::GetRelatedRecordsQuery;
 use query_builder::{Chunkable, CreateRecord, CreateRecordDefaultsQuery, DbQuery, QueryBuilder};
 use query_structure::{
     AggregationSelection, DatasourceFieldName, FieldSelection, Filter, Model, ModelProjection, QueryArguments,
@@ -43,6 +45,8 @@ pub use sql_trace::SqlTraceComment;
 use value::GeneratorCall;
 
 const PARAMETER_LIMIT: usize = 2000;
+// The smallest identifier length limit among our primary databases (PostgreSQL, MySQL, SQLite).
+const IDENTIFIER_LENGTH_LIMIT: usize = 63;
 
 // The number of parameters that are used for take and limit in a query.
 const TAKE_AND_LIMIT_PARAM_COUNT: usize = 2;
@@ -50,6 +54,7 @@ const TAKE_AND_LIMIT_PARAM_COUNT: usize = 2;
 pub struct SqlQueryBuilder<'a, Visitor> {
     context: Context<'a>,
     phantom: PhantomData<fn(Visitor)>,
+    linking_field_alias_counter: AtomicUsize,
 }
 
 impl<'a, V> SqlQueryBuilder<'a, V> {
@@ -57,6 +62,7 @@ impl<'a, V> SqlQueryBuilder<'a, V> {
         Self {
             context,
             phantom: PhantomData,
+            linking_field_alias_counter: AtomicUsize::new(0),
         }
     }
 
@@ -88,6 +94,18 @@ impl<'a, V> SqlQueryBuilder<'a, V> {
             arg_types,
             chunkable,
         })
+    }
+
+    fn generate_linking_field_alias(&self, linkage: &query_builder::RelationLinkage) -> String {
+        let full_name = linkage.to_string();
+        // use full name if it fits within the limit
+        if full_name.len() <= IDENTIFIER_LENGTH_LIMIT {
+            return full_name;
+        }
+        let index = self
+            .linking_field_alias_counter
+            .fetch_add(1, std::sync::atomic::Ordering::Relaxed);
+        format!("@link${index}")
     }
 }
 
@@ -153,7 +171,7 @@ impl<'a, V: Visitor<'a>> QueryBuilder for SqlQueryBuilder<'a, V> {
         linkage: query_builder::RelationLinkage,
         query_arguments: QueryArguments,
         selected_fields: &FieldSelection,
-    ) -> Result<DbQuery, Box<dyn std::error::Error + Send + Sync>> {
+    ) -> Result<GetRelatedRecordsQuery, Box<dyn std::error::Error + Send + Sync>> {
         use std::slice;
 
         use crate::read::SelectDefinition;
@@ -163,7 +181,7 @@ impl<'a, V: Visitor<'a>> QueryBuilder for SqlQueryBuilder<'a, V> {
         use select::JoinConditionExt;
 
         let chunkable = Chunkable::from(&query_arguments);
-        let link_alias = linkage.to_string();
+        let linking_field_alias = self.generate_linking_field_alias(&linkage);
         let (rf, conditions_per_field) = linkage.into_parent_field_and_conditions();
 
         let m2m_alias = self.context.next_table_alias();
@@ -197,7 +215,7 @@ impl<'a, V: Visitor<'a>> QueryBuilder for SqlQueryBuilder<'a, V> {
             .map(|col| col.table(rf.related_model().as_table(&self.context)))
             // Add an m2m column with an alias to make it possible to join it outside of this
             // function.
-            .chain([m2m_col.alias(link_alias)]);
+            .chain([m2m_col.alias(linking_field_alias.clone())]);
 
         let join_condition = rf.m2m_join_conditions(Some(m2m_alias), None, &self.context);
 
@@ -213,7 +231,11 @@ impl<'a, V: Visitor<'a>> QueryBuilder for SqlQueryBuilder<'a, V> {
             .into_iter()
             .fold(select, |acc, val| acc.value(val));
 
-        self.convert_query(select, chunkable)
+        let query = self.convert_query(select, chunkable)?;
+        Ok(GetRelatedRecordsQuery {
+            query,
+            linking_field_alias,
+        })
     }
 
     fn build_aggregate(
