@@ -28,7 +28,7 @@ pub trait QueryBuilder {
         linkage: RelationLinkage,
         query_arguments: QueryArguments,
         selected_fields: &FieldSelection,
-    ) -> Result<DbQuery, Box<dyn std::error::Error + Send + Sync>>;
+    ) -> Result<GetRelatedRecordsQuery, Box<dyn std::error::Error + Send + Sync>>;
 
     fn build_aggregate(
         &self,
@@ -139,6 +139,15 @@ pub struct CreateRecordDefaultsQuery {
     /// The fields that are selected in the query and their corresponding placeholders.
     /// These placeholders are referred to by the subsequent insert query.
     pub field_placeholders: Vec<(ScalarField, Placeholder)>,
+}
+
+/// A query that retrieves related records through an M2M relation.
+#[cfg(feature = "relation_joins")]
+pub struct GetRelatedRecordsQuery {
+    /// The query that retrieves the related records.
+    pub query: DbQuery,
+    /// The alias used for the linking field in the query.
+    pub linking_field_alias: String,
 }
 
 #[derive(Debug)]

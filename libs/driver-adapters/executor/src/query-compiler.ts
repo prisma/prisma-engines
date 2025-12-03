@@ -21,9 +21,8 @@ export async function initQueryCompiler(
   params: QueryCompilerParams,
   connector: Env['CONNECTOR'],
 ): Promise<QueryCompiler> {
-  const { getQueryCompilerForConnector } = await import(
-    './query-compiler-wasm.js'
-  )
+  const { getQueryCompilerForConnector } =
+    await import('./query-compiler-wasm.js')
   const WasmQueryCompiler = (await getQueryCompilerForConnector(
     connector,
   )) as QueryCompiler

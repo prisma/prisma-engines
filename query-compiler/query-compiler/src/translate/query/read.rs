@@ -282,16 +282,14 @@ fn build_read_m2m_query(
     selected_fields: &FieldSelection,
     builder: &dyn QueryBuilder,
 ) -> TranslateResult<(Expression, JoinMetadata)> {
-    let link_name = linkage.to_string();
-
-    let query = builder
+    let result = builder
         .build_get_related_records(linkage, args, selected_fields)
         .map_err(TranslateError::QueryBuildFailure)?;
 
     Ok((
-        Expression::Query(query),
+        Expression::Query(result.query),
         JoinMetadata {
-            fields: vec![link_name],
+            fields: vec![result.linking_field_alias],
             is_relation_unique: false,
         },
     ))
