@@ -135,6 +135,37 @@ mod postgres_decimal {
 }
 
 #[test_suite(only(Postgres))]
+mod postgres_money {
+    fn schema_decimal() -> String {
+        let schema = indoc! {
+            r#"
+            model Table {
+              #id(id, Int, @id)
+
+              money     Decimal   @test.Money
+              moneyList Decimal[] @test.Money
+            }"#
+        };
+
+        schema.to_owned()
+    }
+
+    #[connector_test(schema(schema_decimal))]
+    async fn native_money_type(runner: Runner) -> TestResult<()> {
+        runner.raw_execute(
+            r#"INSERT INTO "Table" ("id", "money", "moneyList") VALUES (1, '$300,000.52', array['$100,000.00', '$200.25']::money[]);"#,
+        ).await?;
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"{ findManyTable { id money moneyList } }"#),
+          @r###"{"data":{"findManyTable":[{"id":1,"money":"300000.52","moneyList":["100000","200.25"]}]}}"###
+        );
+
+        Ok(())
+    }
+}
+
+#[test_suite(only(Postgres))]
 mod postgres_string {
     fn schema_string() -> String {
         let schema = indoc! {

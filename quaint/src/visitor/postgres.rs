@@ -151,6 +151,8 @@ impl<'a> Visitor<'a> for Postgres<'a> {
 
     /// A database column identifier
     fn visit_column(&mut self, column: Column<'a>) -> visitor::Result {
+        let cast_target = get_column_cast_target(&column);
+
         match column.table {
             Some(table) => {
                 self.visit_table(table, false)?;
@@ -160,11 +162,11 @@ impl<'a> Visitor<'a> for Postgres<'a> {
             _ => self.delimited_identifiers(&[&*column.name])?,
         };
 
-        if column.is_enum && column.is_selected {
+        if let Some(cast) = cast_target {
+            self.write("::")?;
+            self.write(cast)?;
             if column.is_list {
-                self.write("::text[]")?;
-            } else {
-                self.write("::text")?;
+                self.write("[]")?;
             }
         }
 
@@ -739,13 +741,14 @@ impl<'a> Visitor<'a> for Postgres<'a> {
 
     fn visit_min(&mut self, min: Minimum<'a>) -> visitor::Result {
         // If the inner column is a selected enum, then we cast the result of MIN(enum)::text instead of casting the inner enum column, which changes the behavior of MIN.
-        let should_cast = min.column.is_enum && min.column.is_selected;
+        let cast_target = get_column_cast_target(&min.column);
 
         self.write("MIN")?;
         self.surround_with("(", ")", |ref mut s| s.visit_column(min.column.set_is_selected(false)))?;
 
-        if should_cast {
-            self.write("::text")?;
+        if let Some(cast_target) = cast_target {
+            self.write("::")?;
+            self.write(cast_target)?;
         }
 
         Ok(())
@@ -753,13 +756,14 @@ impl<'a> Visitor<'a> for Postgres<'a> {
 
     fn visit_max(&mut self, max: Maximum<'a>) -> visitor::Result {
         // If the inner column is a selected enum, then we cast the result of MAX(enum)::text instead of casting the inner enum column, which changes the behavior of MAX.
-        let should_cast = max.column.is_enum && max.column.is_selected;
+        let cast_target = get_column_cast_target(&max.column);
 
         self.write("MAX")?;
         self.surround_with("(", ")", |ref mut s| s.visit_column(max.column.set_is_selected(false)))?;
 
-        if should_cast {
-            self.write("::text")?;
+        if let Some(cast_target) = cast_target {
+            self.write("::")?;
+            self.write(cast_target)?;
         }
 
         Ok(())
@@ -782,6 +786,20 @@ impl<'a> Visitor<'a> for Postgres<'a> {
         }
 
         Ok(())
+    }
+}
+
+fn get_column_cast_target(column: &Column<'_>) -> Option<&'static str> {
+    if !column.is_selected {
+        return None;
+    }
+
+    if column.is_enum {
+        Some("text")
+    } else if column.native_type.as_deref() == Some("MONEY") || column.native_type.as_deref() == Some("MONEY[]") {
+        Some("numeric")
+    } else {
+        None
     }
 }
 
