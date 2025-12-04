@@ -6657,3 +6657,13 @@ date_time,branch,commit,file,size_bytes
 2025-12-03T09:09:36+00:00,main,ab635e6b9d606fa5c8fb8b1a7f909c3c3c1c98ba,query-compiler-sqlserver.wasm,1848321
 2025-12-03T09:09:36+00:00,main,ab635e6b9d606fa5c8fb8b1a7f909c3c3c1c98ba,query-compiler-cockroachdb.wasm.gz,718860
 2025-12-03T09:09:36+00:00,main,ab635e6b9d606fa5c8fb8b1a7f909c3c3c1c98ba,query-compiler-cockroachdb.wasm,1875176
+2025-12-04T08:56:52+00:00,main,3f298657b368429158ee75de33d3dc7ca4b307a5,query-compiler-postgresql.wasm.gz,709458
+2025-12-04T08:56:52+00:00,main,3f298657b368429158ee75de33d3dc7ca4b307a5,query-compiler-postgresql.wasm,1851058
+2025-12-04T08:56:52+00:00,main,3f298657b368429158ee75de33d3dc7ca4b307a5,query-compiler-mysql.wasm.gz,697711
+2025-12-04T08:56:52+00:00,main,3f298657b368429158ee75de33d3dc7ca4b307a5,query-compiler-mysql.wasm,1816718
+2025-12-04T08:56:52+00:00,main,3f298657b368429158ee75de33d3dc7ca4b307a5,query-compiler-sqlite.wasm.gz,680900
+2025-12-04T08:56:52+00:00,main,3f298657b368429158ee75de33d3dc7ca4b307a5,query-compiler-sqlite.wasm,1771169
+2025-12-04T08:56:52+00:00,main,3f298657b368429158ee75de33d3dc7ca4b307a5,query-compiler-sqlserver.wasm.gz,711815
+2025-12-04T08:56:52+00:00,main,3f298657b368429158ee75de33d3dc7ca4b307a5,query-compiler-sqlserver.wasm,1848321
+2025-12-04T08:56:52+00:00,main,3f298657b368429158ee75de33d3dc7ca4b307a5,query-compiler-cockroachdb.wasm.gz,718910
+2025-12-04T08:56:52+00:00,main,3f298657b368429158ee75de33d3dc7ca4b307a5,query-compiler-cockroachdb.wasm,1875631
