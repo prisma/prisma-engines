@@ -152,7 +152,7 @@ mod enum_type {
                 let res = runner
                     .query(r#"{ findUniqueTestModel(where: { id: 1 }) { my_enum } }"#)
                     .await?;
-                res.assert_failure(None, Some("Value 'D' not found in enum 'MyEnum'".to_owned()));
+                res.assert_failure(2023, Some("Value 'D' not found in enum 'MyEnum'".to_owned()));
             }
             EngineProtocol::Json => {
                 let res = runner
@@ -172,7 +172,7 @@ mod enum_type {
                     )
                     .await?;
 
-                res.assert_failure(None, Some("Value 'D' not found in enum 'MyEnum'".to_owned()));
+                res.assert_failure(2023, Some("Value 'D' not found in enum 'MyEnum'".to_owned()));
             }
         }
 
