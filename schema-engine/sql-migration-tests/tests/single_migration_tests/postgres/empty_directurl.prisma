@@ -12,6 +12,9 @@ model table {
     hereBeDragons String @default(dbgenerated())
 }
 // Expected Migration:
+// -- CreateSchema
+// CREATE SCHEMA IF NOT EXISTS "public";
+// 
 // -- CreateTable
 // CREATE TABLE "table" (
 //     "id" TEXT NOT NULL,
