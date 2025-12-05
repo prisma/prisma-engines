@@ -597,6 +597,9 @@ fn mapped_enum_defaults_must_work(api: TestApi) {
     "#;
 
     let expect = expect![[r#"
+        -- CreateSchema
+        CREATE SCHEMA IF NOT EXISTS "public";
+
         -- CreateEnum
         CREATE TYPE "Color" AS ENUM ('0', 'Grün', 'Blu', 'pfuh 🙄...');
 

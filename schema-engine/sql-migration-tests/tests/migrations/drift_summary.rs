@@ -63,6 +63,47 @@ fn empty_schemas() {
 }
 
 #[test]
+fn additions_schemas() {
+    check(
+        r#"
+        datasource db {
+            provider = "postgres"
+            url = "postgres://localhost:5432/testdb"
+        }
+        "#,
+        r#"
+        datasource db {
+            provider = "postgres"
+            url = "postgres://localhost:5432/testdb"
+            schemas = ["one", "two"]
+        }
+
+        model Cat {
+            id Int @id
+
+            @@schema("one")
+        }
+
+        model Dog {
+            id Int @id
+
+            @@schema("two")
+        }
+        "#,
+        expect![[r#"
+
+            [+] Added Schemas
+              - one
+              - two
+
+            [+] Added tables
+              - Cat
+              - Dog
+        "#]],
+    );
+}
+
+#[test]
 fn additions_table() {
     check(
         r#"

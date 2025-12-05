@@ -17,6 +17,9 @@ enum MyEnum {
 }
 
 // Expected Migration:
+// -- CreateSchema
+// CREATE SCHEMA IF NOT EXISTS "public";
+// 
 // -- CreateEnum
 // CREATE TYPE "MyEnum" AS ENUM ('A', 'B');
 // 
