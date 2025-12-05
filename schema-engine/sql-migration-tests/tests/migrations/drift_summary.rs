@@ -65,15 +65,16 @@ fn empty_schemas() {
 #[test]
 fn additions_schemas() {
     check(
-        "postgres",
         r#"
         datasource db {
             provider = "postgres"
+            url = "postgres://localhost:5432/testdb"
         }
         "#,
         r#"
         datasource db {
             provider = "postgres"
+            url = "postgres://localhost:5432/testdb"
             schemas = ["one", "two"]
         }
 
