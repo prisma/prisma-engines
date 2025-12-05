@@ -5,7 +5,7 @@ use crate::{
 use constants::*;
 use input_types::fields::{arguments, data_input_mapper::*};
 use output_types::objects;
-use query_structure::{Model, RelationFieldRef};
+use query_structure::{DefaultKind, Model, PrismaValue, RelationFieldRef};
 
 /// Builds a create mutation field (e.g. createUser) for given model.
 pub(crate) fn create_one(ctx: &QuerySchema, model: Model) -> OutputField<'_> {
@@ -33,7 +33,12 @@ pub(crate) fn create_one_arguments(ctx: &QuerySchema, model: Model) -> Vec<Input
         .any(|f| f.is_required() && f.as_scalar().map(|f| f.default_value().is_none()).unwrap_or(true));
 
     let create_types = create_one_input_types(ctx, model, None);
-    let data_field = input_field(args::DATA, create_types, None).optional_if(!any_field_required);
+    let data_field = input_field(
+        args::DATA,
+        create_types,
+        Some(DefaultKind::Single(PrismaValue::Object(vec![]))),
+    )
+    .optional_if(!any_field_required);
 
     std::iter::once(data_field)
         .chain(arguments::relation_load_strategy_argument(ctx))
