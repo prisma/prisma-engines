@@ -804,8 +804,6 @@ mod tests {
 
     #[test]
     fn test_in_values_2_tuple() {
-        use crate::{col, values};
-
         let expected_sql = "SELECT `test`.* FROM `test` WHERE (`id1`,`id2`) IN ((?,?),(?,?))";
         let query = Select::from_table("test")
             .so_that(Row::from((col!("id1"), col!("id2"))).in_selection(values!((1, 2), (3, 4))));
