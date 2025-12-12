@@ -355,10 +355,12 @@ pub(crate) fn composite_type_in_compound_unique_index(index: IndexWalker<'_>, ct
         .fields()
         .find(|f| f.scalar_field_type().as_composite_type().is_some());
 
-    if index.fields().len() > 1 && composite_type.is_some() {
+    if index.fields().len() > 1
+        && let Some(composite_type) = composite_type
+    {
         let message = format!(
             "Prisma does not currently support composite types in compound unique indices, please remove {:?} from the index. See https://pris.ly/d/mongodb-composite-compound-indices for more details",
-            composite_type.unwrap().name()
+            composite_type.name()
         );
         ctx.push_error(DatamodelError::new_attribute_validation_error(
             &message,

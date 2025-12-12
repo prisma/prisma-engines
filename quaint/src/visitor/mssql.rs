@@ -856,7 +856,6 @@ impl<'a> Visitor<'a> for Mssql<'a> {
 mod tests {
     use crate::{
         ast::*,
-        val,
         visitor::{Mssql, Visitor},
     };
     use indoc::indoc;
@@ -922,8 +921,6 @@ mod tests {
 
     #[test]
     fn test_in_values() {
-        use crate::{col, values};
-
         let expected_sql =
             "SELECT [test].* FROM [test] WHERE (([id1] = @P1 AND [id2] = @P2) OR ([id1] = @P3 AND [id2] = @P4))";
 
@@ -941,8 +938,6 @@ mod tests {
 
     #[test]
     fn test_not_in_values() {
-        use crate::{col, values};
-
         let expected_sql =
             "SELECT [test].* FROM [test] WHERE NOT (([id1] = @P1 AND [id2] = @P2) OR ([id1] = @P3 AND [id2] = @P4))";
 
