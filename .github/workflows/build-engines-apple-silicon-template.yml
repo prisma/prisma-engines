@@ -14,7 +14,7 @@ jobs:
     env:
       SQLITE_MAX_VARIABLE_NUMBER: 250000
       SQLITE_MAX_EXPR_DEPTH: 10000
-    runs-on: macos-13
+    runs-on: macos-15
 
     steps:
       - name: Output link to real commit
