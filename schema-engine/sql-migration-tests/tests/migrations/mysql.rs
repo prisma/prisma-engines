@@ -304,6 +304,36 @@ fn default_current_timestamp_precision_follows_column_precision(api: TestApi) {
 }
 
 #[test_connector(tags(Mysql))]
+fn default_current_timestamp_precision_follows_column_precision_when_unspecified(api: TestApi) {
+    let migrations_directory = api.create_migrations_directory();
+
+    let dm = api.datamodel_with_provider(
+        "
+        model A {
+            id Int @id
+            createdAt DateTime @db.DateTime() @default(now())
+        }
+        ",
+    );
+
+    let expected_migration = indoc!(
+        r#"
+        -- CreateTable
+        CREATE TABLE `A` (
+            `id` INTEGER NOT NULL,
+            `createdAt` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+            PRIMARY KEY (`id`)
+        ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+        "#
+    );
+
+    api.create_migration("01init", &dm, &migrations_directory)
+        .send_sync()
+        .assert_migration("01init", |migration| migration.assert_contents(expected_migration));
+}
+
+#[test_connector(tags(Mysql))]
 fn datetime_dbgenerated_defaults(api: TestApi) {
     let migrations_directory = api.create_migrations_directory();
 

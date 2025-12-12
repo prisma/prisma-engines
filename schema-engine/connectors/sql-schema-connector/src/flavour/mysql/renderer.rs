@@ -511,14 +511,11 @@ fn render_default<'a>(column: TableColumnWalker<'a>, default: &'a DefaultValue) 
         DefaultKind::Value(PrismaValue::String(val)) | DefaultKind::Value(PrismaValue::Enum(val)) => {
             Quoted::mysql_string(escape_string_literal(val)).to_string().into()
         }
-        DefaultKind::Now => {
-            let precision = column
-                .column_native_type()
-                .and_then(MySqlType::timestamp_precision)
-                .unwrap_or(3);
-
-            format!("CURRENT_TIMESTAMP({precision})").into()
-        }
+        DefaultKind::Now => column
+            .column_native_type()
+            .and_then(MySqlType::timestamp_precision)
+            .map(|p| format!("CURRENT_TIMESTAMP({p})").into())
+            .unwrap_or_else(|| "CURRENT_TIMESTAMP".into()),
         DefaultKind::Value(PrismaValue::DateTime(dt)) if column.column_type_family().is_datetime() => {
             Quoted::mysql_string(dt.to_rfc3339()).to_string().into()
         }
