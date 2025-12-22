@@ -7,6 +7,7 @@ pub use mappings_ast::*;
 pub use schema_ast::*;
 
 use serde::Serialize;
+use crate::parameterization::ParameterizationRules;
 
 /// The main DMMF serialization struct.
 #[derive(Debug, Serialize)]
@@ -21,4 +22,7 @@ pub struct DataModelMetaFormat {
 
     /// The operations map. Derived from the `schema`.
     pub mappings: DmmfOperationMappings,
+
+    /// Parameterization rules for query plan caching.
+    pub parameterization_rules: ParameterizationRules,
 }
