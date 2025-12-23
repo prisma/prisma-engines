@@ -13,7 +13,7 @@ OUT_FOLDER="${2:-"query-compiler/query-compiler-wasm/pkg"}"
 OUT_TARGET="bundler"
 # wasm-opt pass
 WASM_OPT_ARGS=(
-    "-Os"                                 # execute size-focused optimization passes (-Oz actually increases size by 1KB)
+    "-O4"                                 # execute size-focused optimization passes (-Oz actually increases size by 1KB)
     "--vacuum"                            # removes obviously unneeded code
     "--duplicate-function-elimination"    # removes duplicate functions
     "--duplicate-import-elimination"      # removes duplicate imports
@@ -63,7 +63,7 @@ build() {
     CARGO_TARGET_DIR=$(cargo metadata --format-version 1 | jq -r .target_directory)
 
     echo "🔨 Building $CONNECTOR"
-    CARGO_PROFILE_RELEASE_OPT_LEVEL="z" cargo build \
+    CARGO_PROFILE_RELEASE_OPT_LEVEL="3" cargo build \
         -p query-compiler-wasm \
         --profile "$WASM_BUILD_PROFILE" \
         --features "$CONNECTOR" \
