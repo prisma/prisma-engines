@@ -65,3 +65,6 @@ package-lock.json
 *.pyc
 __pycache__
 .venv
+
+# Performance profiles written by `samply record`
+profile.json.gz
