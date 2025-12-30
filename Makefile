@@ -58,15 +58,19 @@ build-se-wasm:
 	cd schema-engine/schema-engine-wasm && \
 	./build.sh $(SCHEMA_ENGINE_WASM_VERSION) schema-engine/schema-engine-wasm/pkg
 
-build-qc-wasm:
+build-qc-wasm-%:
 	cd query-compiler/query-compiler-wasm && \
-	./build.sh $(QE_WASM_VERSION) query-compiler/query-compiler-wasm/pkg
+	./build.sh $(QE_WASM_VERSION) query-compiler/query-compiler-wasm/pkg $*
 
-build-qc-wasm-gz: build-qc-wasm
-	@cd query-compiler/query-compiler-wasm/pkg && \
+build-qc-wasm: build-qc-wasm-fast build-qc-wasm-small
+
+build-qc-gz-%: build-qc-wasm-%
+		@cd query-compiler/query-compiler-wasm/pkg && \
     for provider in postgresql mysql sqlite sqlserver cockroachdb; do \
-        gzip -knc $$provider/query_compiler_bg.wasm > $$provider.gz; \
+        gzip -knc $$provider/query_compiler_$*_bg.wasm > $$provider_$*.gz; \
     done;
+
+build-qc-gz: build-qc-gz-fast build-qc-gz-small
 
 build-schema-wasm:
 	@printf '%s\n' "🛠️  Building the Rust crate"
@@ -400,11 +404,13 @@ test-mariadb-qc: dev-mariadb-qc test-qe-st
 # Local dev commands #
 ######################
 
-measure-qc-wasm: build-qc-wasm-gz
+measure-qc-wasm: measure-qc-wasm-fast measure-qc-wasm-small
+
+measure-qc-wasm-%: build-qc-gz-%
 	@cd query-compiler/query-compiler-wasm/pkg; \
 	for provider in postgresql mysql sqlite sqlserver cockroachdb; do \
-		echo "$${provider}_qc_size=$$(cat $$provider/query_compiler_bg.wasm | wc -c | tr -d ' ')" >> $(ENGINE_SIZE_OUTPUT); \
-		echo "$${provider}_qc_size_gz=$$(cat $$provider.gz | wc -c | tr -d ' ')" >> $(ENGINE_SIZE_OUTPUT); \
+		echo "$${provider}_$*_qc_size=$$(cat $$provider/query_compiler_$*_bg.wasm | wc -c | tr -d ' ')" >> $(ENGINE_SIZE_OUTPUT); \
+		echo "$${provider}_$*_qc_size_gz=$$(cat $$provider_$*.gz | wc -c | tr -d ' ')" >> $(ENGINE_SIZE_OUTPUT); \
 	done;
 
 install-driver-adapters-kit-deps: build-driver-adapters

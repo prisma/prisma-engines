@@ -10,10 +10,20 @@ CURRENT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 REPO_ROOT="$( cd "$( dirname "$CURRENT_DIR/../../../" )" >/dev/null 2>&1 && pwd )"
 OUT_VERSION="${1:-"0.0.0"}"
 OUT_FOLDER="${2:-"query-compiler/query-compiler-wasm/pkg"}"
+OPT_MODE="${3:-"fast"}" # small | fast
 OUT_TARGET="bundler"
+
+if [[ "$OPT_MODE" != "small" && "$OPT_MODE" != "fast" ]]; then
+    echo "Invalid optimization mode: $OPT_MODE"
+    echo "Valid options are: small, fast"
+    exit 1
+fi
+
+OUT_BG_WASM="query_compiler_${OPT_MODE}_bg.wasm"
+
 # wasm-opt pass
 WASM_OPT_ARGS=(
-    "-Os"                                 # execute size-focused optimization passes (-Oz actually increases size by 1KB)
+    "$([[ "$OPT_MODE" == "fast" ]] && echo "-O4" || echo "-Os")"
     "--vacuum"                            # removes obviously unneeded code
     "--duplicate-function-elimination"    # removes duplicate functions
     "--duplicate-import-elimination"      # removes duplicate imports
@@ -63,16 +73,17 @@ build() {
     CARGO_TARGET_DIR=$(cargo metadata --format-version 1 | jq -r .target_directory)
 
     echo "🔨 Building $CONNECTOR"
-    CARGO_PROFILE_RELEASE_OPT_LEVEL="z" cargo build \
+    CARGO_PROFILE_RELEASE_OPT_LEVEL=$([[ "$OPT_MODE" == "fast" ]] && echo "3" || echo "z") \
+    cargo build \
         -p query-compiler-wasm \
         --profile "$WASM_BUILD_PROFILE" \
         --features "$CONNECTOR" \
         --target wasm32-unknown-unknown
 
     local IN_FILE="$CARGO_TARGET_DIR/wasm32-unknown-unknown/$WASM_TARGET_SUBDIR/query_compiler_wasm.wasm"
-    local OUT_FILE="$OUT_FOLDER/$PROVIDER/query_compiler_bg.wasm"
+    local OUT_FILE="$OUT_FOLDER/$PROVIDER/$OUT_BG_WASM"
 
-    wasm-bindgen --target "$OUT_TARGET" --out-name query_compiler --out-dir "$OUT_FOLDER/$PROVIDER" "$IN_FILE"
+    wasm-bindgen --target "$OUT_TARGET" --out-name "query_compiler_$OPT_MODE" --out-dir "$OUT_FOLDER/$PROVIDER" "$IN_FILE"
     optimize "$OUT_FILE"
 
     if ! command -v wasm2wat &> /dev/null; then
@@ -112,11 +123,11 @@ report_size() {
     local FORMATTED_GZ_SIZE
 
     PROVIDER="$1"
-    GZ_SIZE=$(gzip -c "${OUT_FOLDER}/$PROVIDER/query_compiler_bg.wasm" | wc -c)
+    GZ_SIZE=$(gzip -c "${OUT_FOLDER}/$PROVIDER/$OUT_BG_WASM" | wc -c)
     FORMATTED_GZ_SIZE=$(echo "$GZ_SIZE"|numfmt --format '%.3f' --to=iec-i --suffix=B)
 
     echo "$PROVIDER:"
-    echo "ℹ️  raw: $(du -h "${OUT_FOLDER}/$PROVIDER/query_compiler_bg.wasm")"
+    echo "ℹ️  raw: $(du -h "${OUT_FOLDER}/$PROVIDER/$OUT_BG_WASM")"
     echo "ℹ️  zip: $GZ_SIZE bytes ($FORMATTED_GZ_SIZE)"
     echo ""
 }
