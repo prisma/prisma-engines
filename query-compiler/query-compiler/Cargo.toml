@@ -20,11 +20,21 @@ pretty = { workspace = true, features = ["termcolor"] }
 indexmap = { workspace = true, features = ["serde"] }
 
 [dev-dependencies]
+codspeed-criterion-compat.workspace = true
 insta = { workspace = true, features = ["glob"] }
-request-handlers.workspace = true
+request-handlers = { workspace = true, features = ["all"] }
+schema.workspace = true
 # pull all connectors for testing
 psl = { workspace = true, features = ["sqlite", "mysql", "postgresql", "mssql", "cockroachdb"] }
 quaint = { workspace = true, features = ["sqlite", "mysql", "postgresql", "mssql"] }
+sql-query-builder = { workspace = true, features = ["relation_joins"] }
+
+[[example]]
+name = "profile_query"
+
+[[bench]]
+name = "compilation_bench"
+harness = false
 
 [features]
 default = ["all"]

@@ -139,6 +139,34 @@ check-schema-wasm-package: build-schema-wasm
 	NODE=$(shell which node) \
 	./prisma-schema-wasm/scripts/check.sh
 
+######################
+# Benchmark commands #
+######################
+
+# Run query compiler benchmarks
+bench-qc:
+	cargo bench -p query-compiler --profile profiling
+
+# Run query graph building benchmarks
+bench-qc-graph:
+	cargo bench -p core-tests --profile profiling --bench query_graph_bench
+
+# Run schema building benchmarks
+bench-schema:
+	cargo bench -p schema --profile profiling --bench schema_builder_bench
+
+# Save benchmark baseline (usage: make bench-baseline NAME=main)
+bench-qc-baseline:
+	cargo bench -p query-compiler --profile profiling -- --save-baseline $(NAME)
+
+# Compare against baseline (usage: make bench-compare NAME=main)
+bench-qc-compare:
+	cargo bench -p query-compiler --profile profiling -- --baseline $(NAME)
+
+# Run profile_query example for profiling
+profile-qc:
+	cargo run -p query-compiler --example profile_query --profile profiling
+
 ###########################
 # Database setup commands #
 ###########################

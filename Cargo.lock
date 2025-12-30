@@ -3608,6 +3608,7 @@ name = "query-compiler"
 version = "0.1.0"
 dependencies = [
  "bon",
+ "codspeed-criterion-compat",
  "indexmap 2.10.0",
  "insta",
  "itertools 0.13.0",
@@ -3618,6 +3619,7 @@ dependencies = [
  "query-core",
  "query-structure",
  "request-handlers",
+ "schema",
  "serde",
  "serde_json",
  "sql-query-builder",
