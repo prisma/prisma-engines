@@ -34,7 +34,7 @@ jobs:
           for provider in "postgresql" "mysql" "sqlite" "sqlserver" "cockroachdb"; do
             for build in "fast" "small"; do
               cp $PKG_DIR/$provider/query_compiler_${build}_bg.wasm $TARGET_DIR/query-compiler-$build-$provider.wasm
-              cp $PKG_DIR/$provider_${build}.gz $TARGET_DIR/query-compiler-$build-$provider.wasm.gz
+              cp $PKG_DIR/${provider}_${build}.gz $TARGET_DIR/query-compiler-$build-$provider.wasm.gz
             done
           done
 
