@@ -12,7 +12,6 @@ import {
   type QueryInterpreterTransactionManager,
   QueryPlanNode,
   RawResponse,
-  safeJsonStringify,
   type TransactionManager,
   UserFacingError,
 } from '@prisma/client-engine-runtime'
@@ -301,4 +300,37 @@ function getFullOperationName(query: JsonProtocolQuery): string {
         return query.action
       }
   }
+}
+
+/**
+ * `JSON.stringify` wrapper with custom replacer function that handles nested
+ * BigInt and Buffer values.
+ */
+export function safeJsonStringify(obj: unknown): string {
+  // Recursively convert any values that we cannot pass
+  // to JSON.stringify to a serializable format.
+  // We cannot use the JSON.serialize(obj, transform), because it calls
+  // `toJSON` methods on objects, which we want to avoid.
+  function transformValue(value: unknown): unknown {
+    if (typeof value === 'bigint') {
+      return value.toString()
+    } else if (ArrayBuffer.isView(value)) {
+      return Buffer.from(
+        value.buffer,
+        value.byteOffset,
+        value.byteLength,
+      ).toString('base64')
+    } else if (Array.isArray(value)) {
+      return value.map(transformValue)
+    } else if (value !== null && typeof value === 'object') {
+      const result: Record<string, unknown> = {}
+      for (const [key, val] of Object.entries(value)) {
+        result[key] = transformValue(val)
+      }
+      return result
+    }
+    return value
+  }
+
+  return JSON.stringify(transformValue(obj))
 }
