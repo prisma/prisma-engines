@@ -182,17 +182,17 @@ start-sqlite:
 dev-sqlite:
 	cp $(CONFIG_PATH)/sqlite $(CONFIG_FILE)
 
-dev-libsql-qc: build-qc-wasm build-driver-adapters-kit-qc
+dev-libsql-qc: build-qc-wasm-fast build-driver-adapters-kit-qc
 	cp $(CONFIG_PATH)/libsql-qc $(CONFIG_FILE)
 
 test-libsql-qc: dev-libsql-qc test-qe-st
 
-dev-better-sqlite3-qc: build-qc-wasm build-driver-adapters-kit-qc
+dev-better-sqlite3-qc: build-qc-wasm-fast build-driver-adapters-kit-qc
 	cp $(CONFIG_PATH)/better-sqlite3-qc $(CONFIG_FILE)
 
 test-better-sqlite3-qc: dev-better-sqlite3-qc test-qe-st
 
-dev-d1-qc: build-qc-wasm build-driver-adapters-kit-qc
+dev-d1-qc: build-qc-wasm-fast build-driver-adapters-kit-qc
 	cp $(CONFIG_PATH)/d1-qc $(CONFIG_FILE)
 
 test-d1-qc: dev-d1-qc test-qe-st
@@ -209,7 +209,7 @@ start-postgres13:
 dev-postgres13: start-postgres13
 	cp $(CONFIG_PATH)/postgres13 $(CONFIG_FILE)
 
-dev-pg-qc: start-postgres13 build-qc-wasm build-driver-adapters-kit-qc
+dev-pg-qc: start-postgres13 build-qc-wasm-fast build-driver-adapters-kit-qc
 	cp $(CONFIG_PATH)/pg-qc $(CONFIG_FILE)
 
 dev-pg-qc-join:
@@ -229,7 +229,7 @@ test-pg-qc-query:
 start-pg-bench:
 	docker compose -f libs/driver-adapters/executor/bench/docker-compose.yml up --wait -d --remove-orphans postgres
 
-dev-pg-cockroachdb-qc: start-cockroach_23_1 build-qc-wasm build-driver-adapters-kit-qc
+dev-pg-cockroachdb-qc: start-cockroach_23_1 build-qc-wasm-fast build-driver-adapters-kit-qc
 	cp $(CONFIG_PATH)/pg-cockroachdb-qc $(CONFIG_FILE)
 
 dev-pg-cockroachdb-qc-join:
@@ -251,7 +251,7 @@ bench-pg-js: setup-pg-bench run-bench
 start-neon:
 	docker compose -f docker-compose.yml up --wait -d --remove-orphans neon-proxy
 
-dev-neon-qc: start-neon build-qc-wasm build-driver-adapters-kit-qc
+dev-neon-qc: start-neon build-qc-wasm-fast build-driver-adapters-kit-qc
 	cp $(CONFIG_PATH)/neon-qc $(CONFIG_FILE)
 
 dev-neon-qc-join:
@@ -361,7 +361,7 @@ start-mssql_edge:
 dev-mssql_edge: start-mssql_edge
 	cp $(CONFIG_PATH)/sqlserver2019 $(CONFIG_FILE)
 
-dev-mssql-qc: start-mssql_2022 build-qc-wasm build-driver-adapters-kit-qc
+dev-mssql-qc: start-mssql_2022 build-qc-wasm-fast build-driver-adapters-kit-qc
 	cp $(CONFIG_PATH)/sqlserver-qc $(CONFIG_FILE)
 
 test-mssql-qc: dev-mssql-qc test-qe
@@ -413,17 +413,17 @@ dev-vitess_8_0: start-vitess_8_0
 start-planetscale:
 	docker compose -f docker-compose.yml up -d --remove-orphans planetscale-proxy
 
-dev-planetscale-qc: start-planetscale build-qc-wasm build-driver-adapters-kit-qc
+dev-planetscale-qc: start-planetscale build-qc-wasm-fast build-driver-adapters-kit-qc
 	cp $(CONFIG_PATH)/planetscale-qc $(CONFIG_FILE)
 
 test-planetscale-qc: dev-planetscale-qc test-qe-st
 
-dev-mariadb-mysql-qc: start-mysql_8 build-qc-wasm build-driver-adapters-kit-qc
+dev-mariadb-mysql-qc: start-mysql_8 build-qc-wasm-fast build-driver-adapters-kit-qc
 	cp $(CONFIG_PATH)/mariadb-mysql-qc $(CONFIG_FILE)
 
 test-mariadb-mysql-qc: dev-mariadb-mysql-qc test-qe-st
 
-dev-mariadb-qc: start-mysql_mariadb build-qc-wasm build-driver-adapters-kit-qc
+dev-mariadb-qc: start-mysql_mariadb build-qc-wasm-fast build-driver-adapters-kit-qc
 	cp $(CONFIG_PATH)/mariadb-qc $(CONFIG_FILE)
 
 test-mariadb-qc: dev-mariadb-qc test-qe-st
