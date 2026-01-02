@@ -80,18 +80,18 @@ impl DatabaseEnumType {
             self.internal_enum
                 .walker()
                 .values()
-                .find(|ev| ev.name() == val)?
+                .find(|ev| ev.database_name() == val)?
                 .database_name()
                 .to_owned(),
         ))
     }
 
-    pub fn map_output_value(&self, val: &str) -> Option<PrismaValue> {
+    pub fn resolve_database_name(&self, val: &str) -> Option<&str> {
         self.internal_enum
             .walker()
             .values()
-            .find(|ev| ev.database_name() == val)
-            .map(|ev| PrismaValue::Enum(ev.name().to_owned()))
+            .find(|ev| ev.name() == val)
+            .map(|ev| ev.database_name())
     }
 
     pub fn external_values(&self) -> Vec<String> {
