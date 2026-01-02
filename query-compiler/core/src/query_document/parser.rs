@@ -325,6 +325,19 @@ impl QueryDocumentParser {
                     ),
 
                     // Enum handling
+                    (PrismaValue::Enum(str), InputType::Enum(et @ EnumType::Database(db))) => {
+                        let mapped_name = db.resolve_database_name(&str).ok_or_else(|| {
+                            ValidationError::invalid_argument_value(
+                                selection_path.segments(),
+                                argument_path.segments(),
+                                str,
+                                &et.name(),
+                                None,
+                            )
+                        })?;
+                        let val = PrismaValue::String(mapped_name.into());
+                        try_this!(self.parse_enum(&selection_path, &argument_path, val, et))
+                    }
                     (pv @ PrismaValue::Enum(_), InputType::Enum(et)) => {
                         try_this!(self.parse_enum(&selection_path, &argument_path, pv, et))
                     }
