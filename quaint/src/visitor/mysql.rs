@@ -593,7 +593,8 @@ impl<'a> Visitor<'a> for Mysql<'a> {
 
         let text_search = TextSearch { exprs };
 
-        self.visit_matches(text_search.into(), query, false)?;
+        self.visit_expression(text_search.into())?;
+        self.surround_with("AGAINST (", " IN BOOLEAN MODE)", |s| s.visit_expression(query))?;
 
         Ok(())
     }
