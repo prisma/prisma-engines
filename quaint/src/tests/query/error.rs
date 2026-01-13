@@ -117,7 +117,7 @@ async fn expression_based_unique_index(api: &mut dyn TestApi) -> crate::Result<(
     let table = api.create_temp_table("id1 int, json_data JSONB").await?;
     let index = api.create_index(&table, "id1, (json_data->>'field')").await?;
 
-    let insert = Insert::single_into(&table).value("id1", 1).value("json_data", Value::json(serde_json::json!({"field": "a"})))
+    let insert = Insert::single_into(&table).value("id1", 1).value("json_data", Value::json(serde_json::json!({"field": "a"})));
     api.conn().insert(insert.clone().into()).await?;
 
     let res = api.conn().insert(insert.clone().into()).await;
