@@ -1,0 +1,23 @@
+{
+  "action": "findMany",
+  "modelName": "User",
+  "query": {
+    "arguments": {
+      "where": {
+        "id": {
+          "in": [
+            1,
+            2,
+            {
+              "$type": "Param",
+              "value": { "name": "id", "type": "Int" }
+            }
+          ]
+        }
+      }
+    },
+    "selection": {
+      "$scalars": true
+    }
+  }
+}
