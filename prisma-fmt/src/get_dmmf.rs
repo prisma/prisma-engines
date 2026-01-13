@@ -1855,7 +1855,7 @@ mod tests {
                               "isList": false
                             }
                           ],
-                          "isParameterizable": false
+                          "isParameterizable": true
                         },
                         {
                           "name": "notIn",
@@ -1874,7 +1874,7 @@ mod tests {
                               "isList": false
                             }
                           ],
-                          "isParameterizable": false
+                          "isParameterizable": true
                         },
                         {
                           "name": "lt",
@@ -2247,7 +2247,7 @@ mod tests {
                               "isList": false
                             }
                           ],
-                          "isParameterizable": false
+                          "isParameterizable": true
                         },
                         {
                           "name": "notIn",
@@ -2266,7 +2266,7 @@ mod tests {
                               "isList": false
                             }
                           ],
-                          "isParameterizable": false
+                          "isParameterizable": true
                         },
                         {
                           "name": "lt",
@@ -3230,7 +3230,7 @@ mod tests {
                               "isList": false
                             }
                           ],
-                          "isParameterizable": false
+                          "isParameterizable": true
                         },
                         {
                           "name": "notIn",
@@ -3249,7 +3249,7 @@ mod tests {
                               "isList": false
                             }
                           ],
-                          "isParameterizable": false
+                          "isParameterizable": true
                         },
                         {
                           "name": "lt",
@@ -3448,7 +3448,7 @@ mod tests {
                               "isList": false
                             }
                           ],
-                          "isParameterizable": false
+                          "isParameterizable": true
                         },
                         {
                           "name": "notIn",
@@ -3467,7 +3467,7 @@ mod tests {
                               "isList": false
                             }
                           ],
-                          "isParameterizable": false
+                          "isParameterizable": true
                         },
                         {
                           "name": "lt",
@@ -3708,7 +3708,7 @@ mod tests {
                               "isList": false
                             }
                           ],
-                          "isParameterizable": false
+                          "isParameterizable": true
                         },
                         {
                           "name": "notIn",
@@ -3727,7 +3727,7 @@ mod tests {
                               "isList": false
                             }
                           ],
-                          "isParameterizable": false
+                          "isParameterizable": true
                         },
                         {
                           "name": "lt",

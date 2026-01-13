@@ -1129,7 +1129,7 @@ fn insensitive_scalar_filter(
         ScalarCondition::NotInTemplate(ConditionValue::Value(value)) => {
             let comparable = Expression::from(lower(comparable));
             let sql_value = convert_first_value(fields, value, alias, ctx);
-            comparable.in_selection(sql_value.into_parameterized_row())
+            comparable.not_in_selection(sql_value.into_parameterized_row())
         }
         ScalarCondition::NotInTemplate(ConditionValue::FieldRef(_)) => todo!(),
         ScalarCondition::Search(value, _) => {

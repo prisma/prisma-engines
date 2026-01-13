@@ -396,10 +396,12 @@ fn inclusion_filters<'a>(
     vec![
         input_field(filters::IN, field_types.clone(), None)
             .optional()
-            .nullable_if(nullable),
+            .nullable_if(nullable)
+            .parameterizable(),
         input_field(filters::NOT_IN, field_types, None)
             .optional()
-            .nullable_if(nullable), // Kept for legacy reasons!
+            .nullable_if(nullable)
+            .parameterizable(),
     ]
     .into_iter()
 }
