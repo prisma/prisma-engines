@@ -13,6 +13,10 @@ pub trait ScalarCompare {
     where
         T: Into<ConditionValue>;
 
+    fn not_in_template<T>(&self, val: T) -> Filter
+    where
+        T: Into<ConditionValue>;
+
     fn not_in<T>(&self, val: T) -> Filter
     where
         T: Into<ConditionListValue>;
