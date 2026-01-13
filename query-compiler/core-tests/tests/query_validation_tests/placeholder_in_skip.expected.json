@@ -1,0 +1,21 @@
+{
+  "is_panic": false,
+  "message": "Invalid argument value. `Placeholder<Int>` is not a valid `Int`. Underlying error: The query was incorrectly parameterized by Prisma Client. This is a bug.",
+  "meta": {
+    "kind": "InvalidArgumentValue",
+    "argumentPath": [
+      "skip"
+    ],
+    "argument": {
+      "name": "skip",
+      "typeNames": [
+        "Int"
+      ]
+    },
+    "selectionPath": [
+      "findManyUser"
+    ],
+    "underlyingError": "The query was incorrectly parameterized by Prisma Client. This is a bug."
+  },
+  "error_code": "P2009"
+}
