@@ -1,0 +1,68 @@
+{
+  "is_panic": false,
+  "message": "Unable to match input value to any allowed input type for the field. Parse errors: [Unable to match input value to any allowed input type for the field. Parse errors: [Invalid argument value. `Placeholder<Int>` is not a valid `Int`. Underlying error: The query was incorrectly parameterized by Prisma Client. This is a bug., Invalid argument type. `in` should be of any of the following types: `ListIntFieldRefInput`], Invalid argument type. `id` should be of any of the following types: `Int`]",
+  "meta": {
+    "kind": "Union",
+    "errors": [
+      {
+        "kind": "Union",
+        "errors": [
+          {
+            "kind": "InvalidArgumentValue",
+            "argumentPath": [
+              "where",
+              "id",
+              "in"
+            ],
+            "argument": {
+              "name": "in",
+              "typeNames": [
+                "Int"
+              ]
+            },
+            "selectionPath": [
+              "findManyUser"
+            ],
+            "underlyingError": "The query was incorrectly parameterized by Prisma Client. This is a bug."
+          },
+          {
+            "kind": "InvalidArgumentType",
+            "argumentPath": [
+              "where",
+              "id",
+              "in"
+            ],
+            "argument": {
+              "name": "in",
+              "typeNames": [
+                "ListIntFieldRefInput"
+              ]
+            },
+            "selectionPath": [
+              "findManyUser"
+            ],
+            "inferredType": "(Int, Int, Int)"
+          }
+        ]
+      },
+      {
+        "kind": "InvalidArgumentType",
+        "argumentPath": [
+          "where",
+          "id"
+        ],
+        "argument": {
+          "name": "id",
+          "typeNames": [
+            "Int"
+          ]
+        },
+        "selectionPath": [
+          "findManyUser"
+        ],
+        "inferredType": "Object"
+      }
+    ]
+  },
+  "error_code": "P2009"
+}
