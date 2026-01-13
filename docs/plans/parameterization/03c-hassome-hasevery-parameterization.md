@@ -69,8 +69,9 @@ pub enum ScalarListCondition {
 }
 
 pub enum ConditionListValue {
-    List(PrismaListValue),      // Vec<PrismaValue>
+    List(PrismaListValue),              // Vec<PrismaValue>
     FieldRef(ScalarFieldRef),
+    Placeholder(prisma_value::Placeholder),  // Added in Phase 3b refactoring
 }
 ```
 
@@ -86,99 +87,41 @@ ScalarListCondition::ContainsSome(ConditionListValue::List(vals)) => {
 
 ---
 
-## The Challenge
+## Prerequisites (Completed in Phase 3b)
 
-`ConditionListValue` currently has two variants:
-1. `List(Vec<PrismaValue>)` - for literal list values
-2. `FieldRef(ScalarFieldRef)` - for field references
+As part of the Phase 3b refactoring that consolidated `InTemplate`/`NotInTemplate` into `ConditionListValue::Placeholder`, the following is already done:
 
-Neither can represent a **placeholder for the entire list**. We need a way to pass through `PrismaValue::Placeholder` as the whole list value.
-
-### Options
-
-**Option A: Add `Placeholder` variant to `ConditionListValue`**
+✅ **`ConditionListValue::Placeholder` variant exists:**
 ```rust
 pub enum ConditionListValue {
     List(PrismaListValue),
     FieldRef(ScalarFieldRef),
-    Placeholder(PrismaValue),  // New: entire list as placeholder
+    Placeholder(prisma_value::Placeholder),  // Already added!
 }
 ```
 
-**Option B: Use single-element list with placeholder**
-- Pass `ConditionListValue::List(vec![PrismaValue::Placeholder(...)])`
-- Detect in SQL generation and handle specially
+✅ **Stub implementations in SQL visitor** - `unimplemented!()` stubs for `ContainsEvery(Placeholder(_))` and `ContainsSome(Placeholder(_))`
 
-**Option C: Add Template variants (like `InTemplate`)**
-```rust
-pub enum ScalarListCondition {
-    ContainsEveryTemplate(ConditionValue),  // New
-    ContainsSomeTemplate(ConditionValue),   // New
-    // ...
-}
-```
+✅ **MongoDB connector stubs** - `unimplemented!()` for placeholder variants
 
-### Recommended: Option A
-
-Option A is cleanest because:
-1. Explicit representation of the placeholder case
-2. No ambiguity (Option B could confuse single-placeholder with single-element list)
-3. Less invasive than Option C (no new SQL generation branches needed)
-4. SQL generation can simply use the placeholder value directly as an array parameter
+What remains is:
+1. Update filter parsing to create `ConditionListValue::Placeholder` for `hasSome`/`hasEvery`
+2. Implement actual SQL generation (replace `unimplemented!()` stubs)
+3. Mark fields as parameterizable in schema
 
 ---
 
 ## Implementation
 
-### Task 3c.1: Add `Placeholder` Variant to `ConditionListValue`
+### Task 3c.1: ~~Add `Placeholder` Variant to `ConditionListValue`~~ ✅ DONE
 
-**File:** `query-compiler/query-structure/src/filter/scalar/condition/value.rs`
-
-```rust
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum ConditionListValue {
-    List(PrismaListValue),
-    FieldRef(ScalarFieldRef),
-    Placeholder(PrismaValue),  // NEW
-}
-
-impl ConditionListValue {
-    // Update existing methods...
-    
-    pub fn placeholder(pv: PrismaValue) -> Self {
-        Self::Placeholder(pv)
-    }
-    
-    pub fn len(&self) -> usize {
-        match self {
-            ConditionListValue::List(list) => list.len(),
-            ConditionListValue::FieldRef(_) => 1,
-            ConditionListValue::Placeholder(_) => 1,  // Unknown at compile time
-        }
-    }
-
-    pub fn is_empty(&self) -> bool {
-        match self {
-            ConditionListValue::List(list) => list.is_empty(),
-            _ => false,  // Can't know for FieldRef/Placeholder
-        }
-    }
-
-    pub fn as_field_ref(&self) -> Option<&ScalarFieldRef> {
-        if let Self::FieldRef(v) = self { Some(v) } else { None }
-    }
-    
-    pub fn as_placeholder(&self) -> Option<&PrismaValue> {
-        if let Self::Placeholder(v) = self { Some(v) } else { None }
-    }
-}
-```
+**Completed in Phase 3b refactoring.** The variant uses `prisma_value::Placeholder` directly (not `PrismaValue`) for better type safety.
 
 ### Task 3c.2: Update Filter Parsing
 
 **File:** `query-compiler/core/src/query_graph_builder/extractors/filters/scalar.rs`
 
-Update `as_condition_list_value` to handle placeholders:
+Update `as_condition_list_value` to handle placeholders. Extract the inner `Placeholder` from `PrismaValue::Placeholder`:
 
 ```rust
 fn as_condition_list_value(&self, input: ParsedInputValue<'_>) -> QueryGraphBuilderResult<ConditionListValue> {
@@ -192,7 +135,7 @@ fn as_condition_list_value(&self, input: ParsedInputValue<'_>) -> QueryGraphBuil
         
         // NEW: Handle placeholder for entire list
         ParsedInputValue::Single(PrismaValue::Placeholder(p)) => {
-            Ok(ConditionListValue::Placeholder(PrismaValue::Placeholder(p)))
+            Ok(ConditionListValue::Placeholder(p))  // Use inner Placeholder directly
         }
         
         // Literal list case (existing)
@@ -208,90 +151,53 @@ fn as_condition_list_value(&self, input: ParsedInputValue<'_>) -> QueryGraphBuil
 
 **File:** `query-compiler/query-builders/sql-query-builder/src/filter/visitor.rs`
 
-Add handling for `Placeholder` variant in `visit_scalar_list_filter`:
+Replace the `unimplemented!()` stubs (added in Phase 3b) with actual implementations:
 
 ```rust
-fn visit_scalar_list_filter(
-    &mut self,
-    filter: ScalarListFilter,
-    // ...
-) -> ConditionTree<'static> {
-    let condition = match cond {
-        // Existing: Contains with literal value
-        ScalarListCondition::Contains(ConditionValue::Value(val)) => {
-            comparable.compare_raw("@>", convert_list_pv(field, vec![val], ctx))
-        }
-        // Existing: Contains with field ref
-        ScalarListCondition::Contains(ConditionValue::FieldRef(field_ref)) => {
-            let field_ref_expr: Expression = field_ref.aliased_col(alias, ctx).into();
-            field_ref_expr.equals(comparable.any())
-        }
-        
-        // Existing: ContainsEvery with literal list
-        ScalarListCondition::ContainsEvery(ConditionListValue::List(vals)) => {
-            comparable.compare_raw("@>", convert_list_pv(field, vals, ctx))
-        }
-        // Existing: ContainsEvery with field ref
-        ScalarListCondition::ContainsEvery(ConditionListValue::FieldRef(field_ref)) => {
-            comparable.compare_raw("@>", field_ref.aliased_col(alias, ctx))
-        }
-        // NEW: ContainsEvery with placeholder
-        ScalarListCondition::ContainsEvery(ConditionListValue::Placeholder(pv)) => {
-            let param = convert_placeholder_to_array(field, pv, ctx);
-            comparable.compare_raw("@>", param)
-        }
-        
-        // Existing: ContainsSome with literal list
-        ScalarListCondition::ContainsSome(ConditionListValue::List(vals)) => {
-            comparable.compare_raw("&&", convert_list_pv(field, vals, ctx))
-        }
-        // Existing: ContainsSome with field ref
-        ScalarListCondition::ContainsSome(ConditionListValue::FieldRef(field_ref)) => {
-            comparable.compare_raw("&&", field_ref.aliased_col(alias, ctx))
-        }
-        // NEW: ContainsSome with placeholder
-        ScalarListCondition::ContainsSome(ConditionListValue::Placeholder(pv)) => {
-            let param = convert_placeholder_to_array(field, pv, ctx);
-            comparable.compare_raw("&&", param)
-        }
-        
-        // ... isEmpty cases ...
-    };
-
-    ConditionTree::single(condition)
+// Current stub (to be replaced):
+ScalarListCondition::ContainsEvery(ConditionListValue::Placeholder(_)) => {
+    unimplemented!("Placeholder support for hasSome/hasEvery not yet implemented")
+}
+ScalarListCondition::ContainsSome(ConditionListValue::Placeholder(_)) => {
+    unimplemented!("Placeholder support for hasSome/hasEvery not yet implemented")
 }
 
-/// Convert a placeholder PrismaValue to an array-typed Expression
+// Replace with:
+ScalarListCondition::ContainsEvery(ConditionListValue::Placeholder(placeholder)) => {
+    let param = convert_placeholder_to_array(field, placeholder, ctx);
+    comparable.compare_raw("@>", param)
+}
+ScalarListCondition::ContainsSome(ConditionListValue::Placeholder(placeholder)) => {
+    let param = convert_placeholder_to_array(field, placeholder, ctx);
+    comparable.compare_raw("&&", param)
+}
+
+/// Convert a Placeholder to an array-typed Expression
 fn convert_placeholder_to_array<'a>(
     field: &ScalarFieldRef,
-    pv: PrismaValue,
+    placeholder: prisma_value::Placeholder,
     ctx: &Context<'_>,
 ) -> Expression<'a> {
-    // The placeholder represents the entire array
-    // Create a parameterized expression with the placeholder value
-    Expression::from(field.value(pv, ctx))
+    // Wrap the Placeholder back into PrismaValue for the field.value() call
+    Expression::from(field.value(placeholder.into(), ctx))
 }
 ```
 
-### Task 3c.4: Verify `ScalarFieldExt::value()` Handles Placeholders
+Note: The `Placeholder` here is `prisma_value::Placeholder`, not `PrismaValue`. We wrap it back into `PrismaValue::Placeholder` when calling `field.value()`.
 
-**File:** Check implementation location (likely in sql-query-builder or query-structure)
+### Task 3c.4: ~~Verify `ScalarFieldExt::value()` Handles Placeholders~~ ✅ Already Verified
 
-Ensure `ScalarFieldExt::value(pv, ctx)` can handle `PrismaValue::Placeholder`:
+**File:** `query-compiler/query-builders/sql-query-builder/src/model_extensions/scalar_field.rs`
+
+This is already implemented and used by `in`/`notIn` parameterization:
 
 ```rust
-fn value(&self, pv: PrismaValue, ctx: &Context<'_>) -> Value<'static> {
-    match pv {
-        PrismaValue::Placeholder(p) => {
-            // Return a placeholder Value that will be serialized correctly
-            Value::placeholder(p.name, /* type info */)
-        }
-        // ... other cases ...
-    }
+(PrismaValue::Placeholder(PrismaValuePlaceholder { name, .. }), ident) => {
+    Value::opaque(Placeholder::new(name), convert::type_identifier_to_opaque_type(&ident))
 }
 ```
 
-### Task 3c.5: Mark Fields as Parameterizable
+### Task 3c.5: Mark Fields as Parameterizable (TODO)
 
 **File:** `query-compiler/schema/src/build/input_types/fields/field_filter_types.rs`
 
@@ -309,13 +215,29 @@ fields.push(input_field(filters::HAS_SOME, mapped_list_type_with_field_ref_input
     .parameterizable());
 ```
 
-### Task 3c.6: Update Condition Inversion if Needed
+### Task 3c.6: ~~Update Condition Inversion if Needed~~ ✅ Not Required
 
 **File:** `query-compiler/query-structure/src/filter/list.rs`
 
-Ensure `ScalarListCondition` handles `Placeholder` variant in any inversion or transformation methods.
+`ScalarListCondition` doesn't have an `invert()` method like `ScalarCondition` does. The NOT modifier is handled at the filter tree level, not the condition level. No changes needed.
 
-### Task 3c.7: Add Tests
+### Task 3c.7: Update MongoDB Connector (TODO)
+
+**File:** `query-engine/connectors/mongodb-query-connector/src/filter.rs`
+
+Replace the `unimplemented!()` stubs (added in Phase 3b) when MongoDB QC support is implemented:
+
+```rust
+// Current stubs:
+ScalarListCondition::ContainsEvery(ConditionListValue::Placeholder(_)) => {
+    unimplemented!("query compiler not supported with mongodb yet")
+}
+ScalarListCondition::ContainsSome(ConditionListValue::Placeholder(_)) => {
+    unimplemented!("query compiler not supported with mongodb yet")
+}
+```
+
+### Task 3c.8: Add Tests
 
 **Integration tests:**
 
@@ -385,16 +307,18 @@ Final SQL:
 ## Verification Checklist
 
 ### Code Changes
-- [ ] Add `Placeholder` variant to `ConditionListValue`
+- [x] Add `Placeholder` variant to `ConditionListValue` *(Done in Phase 3b)*
+- [x] Add stub implementations in SQL visitor *(Done in Phase 3b)*
+- [x] Add stub implementations in MongoDB connector *(Done in Phase 3b)*
+- [x] Verify `ScalarFieldExt::value()` handles placeholders *(Already works)*
 - [ ] Update `as_condition_list_value()` to handle placeholders
-- [ ] Update `visit_scalar_list_filter()` for `ContainsEvery(Placeholder(...))`
-- [ ] Update `visit_scalar_list_filter()` for `ContainsSome(Placeholder(...))`
-- [ ] Verify/update `ScalarFieldExt::value()` for placeholders
+- [ ] Replace SQL visitor stubs with actual `ContainsEvery(Placeholder(...))` implementation
+- [ ] Replace SQL visitor stubs with actual `ContainsSome(Placeholder(...))` implementation
 - [ ] Mark `hasEvery` as `.parameterizable()`
 - [ ] Mark `hasSome` as `.parameterizable()`
 
 ### Verification
-- [ ] `ConditionListValue::Placeholder` serializes correctly
+- [x] `ConditionListValue::Placeholder` type exists and compiles
 - [ ] SQL generation produces `col && $1` / `col @> $1`
 - [ ] PostgreSQL receives array as single parameter
 - [ ] Empty array edge cases handled correctly
@@ -412,7 +336,7 @@ Final SQL:
 
 ## Risk Assessment
 
-**Medium Risk**
+**Low Risk** (reduced from Medium due to Phase 3b groundwork)
 
 ### Advantages over `in`/`notIn`
 1. **No dynamic SQL expansion** - PostgreSQL handles arrays natively
@@ -420,13 +344,13 @@ Final SQL:
 3. **Fixed SQL structure** - `col && $1` regardless of array size
 
 ### Potential Issues
-1. **New enum variant** - Need to update all pattern matches on `ConditionListValue`
+1. ~~**New enum variant** - Need to update all pattern matches on `ConditionListValue`~~ ✅ Done in Phase 3b
 2. **Type handling** - Placeholder must be list-typed, array element types must match
 3. **Database support** - Only PostgreSQL/CockroachDB have `ScalarLists` capability
 4. **Empty array semantics** - Different behavior for `hasSome` vs `hasEvery`
 
 ### Mitigation
-1. Compiler will catch missing pattern matches when adding new variant
+1. ~~Compiler will catch missing pattern matches when adding new variant~~ ✅ Already addressed
 2. Add type validation in parser
 3. Feature is already gated by capability checks
 4. Document empty array behavior clearly in tests
@@ -435,8 +359,9 @@ Final SQL:
 
 ## Dependencies
 
-- Phase 1 (Schema Infrastructure) - `is_parameterizable` flag exists
-- Phase 2 (DMMF Output) - flag exposed in DMMF
+- Phase 1 (Schema Infrastructure) - `is_parameterizable` flag exists ✅
+- Phase 2 (DMMF Output) - flag exposed in DMMF ✅
+- Phase 3b (`in`/`notIn` Parameterization) - `ConditionListValue::Placeholder` variant added ✅
 - Phase 4 (Parser Validation) - validates placeholder usage
 
 ## Related Code
