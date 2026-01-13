@@ -598,12 +598,13 @@ impl FilterVisitorExt for FilterVisitor {
             ScalarListCondition::ContainsSome(ConditionListValue::FieldRef(field_ref)) => {
                 comparable.compare_raw("&&", field_ref.aliased_col(alias, ctx))
             }
-            // TODO: Implement placeholder support for scalar list filters (follow-up work)
-            ScalarListCondition::ContainsEvery(ConditionListValue::Placeholder(_)) => {
-                unimplemented!("Placeholder support for hasSome/hasEvery not yet implemented")
+            ScalarListCondition::ContainsEvery(ConditionListValue::Placeholder(placeholder)) => {
+                let param: Expression = field.value(placeholder.into(), ctx).into();
+                comparable.compare_raw("@>", param)
             }
-            ScalarListCondition::ContainsSome(ConditionListValue::Placeholder(_)) => {
-                unimplemented!("Placeholder support for hasSome/hasEvery not yet implemented")
+            ScalarListCondition::ContainsSome(ConditionListValue::Placeholder(placeholder)) => {
+                let param: Expression = field.value(placeholder.into(), ctx).into();
+                comparable.compare_raw("&&", param)
             }
             ScalarListCondition::IsEmpty(true) => comparable.compare_raw("=", ValueType::Array(Some(vec![])).raw()),
             ScalarListCondition::IsEmpty(false) => comparable.compare_raw("<>", ValueType::Array(Some(vec![])).raw()),
