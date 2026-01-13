@@ -1,5 +1,4 @@
 use crate::prelude::*;
-use std::borrow::Cow;
 
 #[derive(Debug, Clone, PartialEq)]
 /// Holds the expressions on which to perform a full-text search
@@ -39,7 +38,7 @@ where
 /// Holds the expressions & query on which to perform a text-search ranking compute
 pub struct TextSearchRelevance<'a> {
     pub(crate) exprs: Vec<Expression<'a>>,
-    pub(crate) query: Cow<'a, str>,
+    pub(crate) query: Expression<'a>,
 }
 
 /// Computes the relevance score of a full-text search query against some expressions.
@@ -63,7 +62,7 @@ pub struct TextSearchRelevance<'a> {
 pub fn text_search_relevance<'a, E, Q>(exprs: &[E], query: Q) -> super::Function<'a>
 where
     E: Clone + Into<Expression<'a>>,
-    Q: Into<Cow<'a, str>>,
+    Q: Into<Expression<'a>>,
 {
     let exprs: Vec<Expression> = exprs.iter().map(|c| c.clone().into()).collect();
     let fun = TextSearchRelevance {
