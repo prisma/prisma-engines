@@ -40,6 +40,7 @@ export function query(
 class QueryPipeline {
   private compiler: QueryCompiler
   private driverAdapter: SqlDriverAdapter
+  private interpreter: QueryInterpreter
   private transactionManager: TransactionManager
 
   constructor(
@@ -49,6 +50,14 @@ class QueryPipeline {
     this.compiler = state.compiler
     this.driverAdapter = state.driverAdapter
     this.transactionManager = state.transactionManager
+    this.interpreter = QueryInterpreter.forSql({
+      onQuery: (event) => {
+        this.logs.push(safeJsonStringify(event))
+      },
+      tracingHelper: noopTracingHelper,
+      provider: this.driverAdapter.provider,
+      connectionInfo: this.driverAdapter.getConnectionInfo?.(),
+    })
   }
 
   async run(query: QueryParams['query'], txId: QueryParams['txId']) {
@@ -151,20 +160,11 @@ class QueryPipeline {
         : { enabled: false }
     ) satisfies QueryInterpreterTransactionManager
 
-    const interpreterOpts = {
+    return this.interpreter.run(queryPlan, {
+      queryable,
       transactionManager: qiTransactionManager,
-      placeholderValues: {},
-      onQuery: (event: QueryEvent) => {
-        this.logs.push(safeJsonStringify(event))
-      },
-      tracingHelper: noopTracingHelper,
-      provider: this.driverAdapter.provider,
-      connectionInfo: this.driverAdapter.getConnectionInfo?.(),
-    }
-
-    const interpreter = QueryInterpreter.forSql(interpreterOpts)
-
-    return interpreter.run(queryPlan, queryable)
+      scope: {},
+    })
   }
 
   private async executeIndependentBatch(
