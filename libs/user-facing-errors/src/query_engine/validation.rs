@@ -61,6 +61,8 @@ pub enum ValidationErrorKind {
     UnknownSelectionField,
     /// See [`ValidationError::value_too_large`]
     ValueTooLarge,
+    /// See [`ValidationError::placeholder_not_allowed`]
+    PlaceholderNotAllowed,
 }
 
 impl ValidationErrorKind {
@@ -521,6 +523,48 @@ impl ValidationError {
             kind: ValidationErrorKind::ValueTooLarge,
             message,
             meta: Some(json!({"argumentPath": argument_path, "argument": argument, "selectionPath": selection_path})),
+        }
+    }
+
+    /// Creates a [`ValidationErrorKind::PlaceholderNotAllowed`] kind of error, which happens when
+    /// a placeholder value is used in a field that doesn't support parameterization.
+    ///
+    /// Placeholders can only be used in fields that accept user data values, such as filter
+    /// conditions (where, equals, contains, etc.) and data fields in create/update operations.
+    /// Structural fields like `take`, `skip`, and `orderBy` do not support placeholders because
+    /// they affect the structure of the query plan.
+    ///
+    /// Example json query:
+    ///
+    /// {
+    ///     "action": "findMany",
+    ///     "modelName": "User",
+    ///     "query": {
+    ///         "arguments": {
+    ///             "take": { "$type": "Param", "value": "limit" }
+    ///         },
+    ///         "selection": {
+    ///             "$scalars": true
+    ///         }
+    ///     }
+    /// }
+    ///
+    pub fn placeholder_not_allowed(selection_path: Vec<&str>, argument_path: Vec<&str>, field_name: &str) -> Self {
+        let message = format!(
+            "Placeholder not allowed in field `{field_name}`. \
+            The field `{field_name}` does not support query parameter placeholders because it affects \
+            the structure of the query plan. Placeholders can only be used in fields that accept \
+            user data values, such as filter conditions (equals, contains, in, etc.) and \
+            data fields in create/update operations."
+        );
+        ValidationError {
+            kind: ValidationErrorKind::PlaceholderNotAllowed,
+            message,
+            meta: Some(json!({
+                "argumentPath": argument_path,
+                "selectionPath": selection_path,
+                "fieldName": field_name
+            })),
         }
     }
 }

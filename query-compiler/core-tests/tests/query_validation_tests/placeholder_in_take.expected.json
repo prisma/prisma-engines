@@ -1,0 +1,15 @@
+{
+  "is_panic": false,
+  "message": "Placeholder not allowed in field `take`. The field `take` does not support query parameter placeholders because it affects the structure of the query plan. Placeholders can only be used in fields that accept user data values, such as filter conditions (equals, contains, in, etc.) and data fields in create/update operations.",
+  "meta": {
+    "kind": "PlaceholderNotAllowed",
+    "argumentPath": [
+      "take"
+    ],
+    "selectionPath": [
+      "findManyUser"
+    ],
+    "fieldName": "take"
+  },
+  "error_code": "P2009"
+}
