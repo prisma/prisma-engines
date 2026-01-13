@@ -224,6 +224,7 @@ impl QueryDocumentParser {
                             value,
                             input_field.field_types(),
                             query_schema,
+                            input_field.is_parameterizable(),
                         )
                         .map(|value| ParsedArgument {
                             name: input_field.name.clone().into_owned(),
@@ -250,10 +251,16 @@ impl QueryDocumentParser {
         value: ArgumentValue,
         possible_input_types: &[InputType<'a>],
         query_schema: &'a QuerySchema,
+        is_parameterizable: bool,
     ) -> QueryParserResult<ParsedInputValue<'a>> {
-        // TODO: make query parsing aware of whether we are using the query compiler,
-        // and disallow placeholders and generator calls in the query document if we are not.
         if let ArgumentValue::Scalar(pv @ PrismaValue::Placeholder { .. }) = &value {
+            if !is_parameterizable {
+                return Err(ValidationError::placeholder_not_allowed(
+                    selection_path.segments(),
+                    argument_path.segments(),
+                    argument_path.last().unwrap_or_default(),
+                ));
+            }
             return Ok(ParsedInputValue::Single(pv.clone()));
         }
         if let ArgumentValue::Scalar(pv @ PrismaValue::GeneratorCall { .. }) = &value {
@@ -627,6 +634,7 @@ impl QueryDocumentParser {
                     val,
                     std::slice::from_ref(value_type),
                     query_schema,
+                    false,
                 )
             })
             .collect::<QueryParserResult<Vec<ParsedInputValue<'a>>>>()
@@ -713,6 +721,7 @@ impl QueryDocumentParser {
                             default_value.get()?.into(),
                             field.field_types(),
                             query_schema,
+                            field.is_parameterizable(),
                         ) {
                             Ok(value) => Some(Ok((field.name.clone(), value))),
                             Err(err) => Some(Err(err)),
@@ -753,6 +762,7 @@ impl QueryDocumentParser {
                     value,
                     field.field_types(),
                     query_schema,
+                    field.is_parameterizable(),
                 )?;
 
                 Ok((Cow::Owned(field_name), parsed))

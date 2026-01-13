@@ -1,0 +1,15 @@
+{
+  "action": "findMany",
+  "modelName": "User",
+  "query": {
+    "arguments": {
+      "take": {
+        "$type": "Param",
+        "value": "limit"
+      }
+    },
+    "selection": {
+      "$scalars": true
+    }
+  }
+}

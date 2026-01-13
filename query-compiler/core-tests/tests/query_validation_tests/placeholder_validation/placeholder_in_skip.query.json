@@ -1,0 +1,15 @@
+{
+  "action": "findMany",
+  "modelName": "User",
+  "query": {
+    "arguments": {
+      "skip": {
+        "$type": "Param",
+        "value": "offset"
+      }
+    },
+    "selection": {
+      "$scalars": true
+    }
+  }
+}

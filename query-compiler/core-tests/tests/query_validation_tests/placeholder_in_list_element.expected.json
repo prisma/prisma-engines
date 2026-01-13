@@ -1,0 +1,62 @@
+{
+  "is_panic": false,
+  "message": "Unable to match input value to any allowed input type for the field. Parse errors: [Unable to match input value to any allowed input type for the field. Parse errors: [Placeholder not allowed in field `in`. The field `in` does not support query parameter placeholders because it affects the structure of the query plan. Placeholders can only be used in fields that accept user data values, such as filter conditions (equals, contains, in, etc.) and data fields in create/update operations., Invalid argument type. `in` should be of any of the following types: `ListIntFieldRefInput`], Invalid argument type. `id` should be of any of the following types: `Int`]",
+  "meta": {
+    "kind": "Union",
+    "errors": [
+      {
+        "kind": "Union",
+        "errors": [
+          {
+            "kind": "PlaceholderNotAllowed",
+            "argumentPath": [
+              "where",
+              "id",
+              "in"
+            ],
+            "selectionPath": [
+              "findManyUser"
+            ],
+            "fieldName": "in"
+          },
+          {
+            "kind": "InvalidArgumentType",
+            "argumentPath": [
+              "where",
+              "id",
+              "in"
+            ],
+            "argument": {
+              "name": "in",
+              "typeNames": [
+                "ListIntFieldRefInput"
+              ]
+            },
+            "selectionPath": [
+              "findManyUser"
+            ],
+            "inferredType": "(Int, Int, Any)"
+          }
+        ]
+      },
+      {
+        "kind": "InvalidArgumentType",
+        "argumentPath": [
+          "where",
+          "id"
+        ],
+        "argument": {
+          "name": "id",
+          "typeNames": [
+            "Int"
+          ]
+        },
+        "selectionPath": [
+          "findManyUser"
+        ],
+        "inferredType": "Object"
+      }
+    ]
+  },
+  "error_code": "P2009"
+}
