@@ -197,8 +197,16 @@ fn scalar_list_filter_type(ctx: &'_ QuerySchema, sf: ScalarFieldRef) -> InputObj
         );
 
         let mapped_list_type_with_field_ref_input = mapped_list_type.with_field_ref_input();
-        fields.push(input_field(filters::HAS_EVERY, mapped_list_type_with_field_ref_input.clone(), None).optional());
-        fields.push(input_field(filters::HAS_SOME, mapped_list_type_with_field_ref_input, None).optional());
+        fields.push(
+            input_field(filters::HAS_EVERY, mapped_list_type_with_field_ref_input.clone(), None)
+                .optional()
+                .parameterizable(),
+        );
+        fields.push(
+            input_field(filters::HAS_SOME, mapped_list_type_with_field_ref_input, None)
+                .optional()
+                .parameterizable(),
+        );
         fields.push(simple_input_field(filters::IS_EMPTY, InputType::boolean(), None).optional());
         fields
     });

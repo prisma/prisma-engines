@@ -535,6 +535,9 @@ impl<'a> ScalarFilterParser<'a> {
                     ))),
                 }
             }
+
+            ParsedInputValue::Single(PrismaValue::Placeholder(p)) => Ok(ConditionListValue::Placeholder(p)),
+
             _ => {
                 let vals: Vec<PrismaValue> = input.try_into()?;
 
