@@ -36,7 +36,7 @@
     "@prisma/driver-adapter-utils": "workspace:*",
     "decimal.js": "10.5.0",
     "ts-pattern": "5.1.1",
-    "undici": "6.21.2",
+    "undici": "6.23.0",
     "wrangler": "^4.4.0",
     "ws": "8.17.1"
   },
