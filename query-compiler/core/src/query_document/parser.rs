@@ -4,6 +4,8 @@ use bigdecimal::{BigDecimal, ToPrimitive};
 use chrono::prelude::*;
 use core::fmt;
 use indexmap::{IndexMap, IndexSet};
+#[cfg(debug_assertions)]
+use query_structure::PrismaValueType;
 use query_structure::{DefaultKind, PrismaValue};
 use std::{borrow::Cow, convert::TryFrom, rc::Rc, str::FromStr};
 use user_facing_errors::query_engine::validation::ValidationError;
@@ -256,9 +258,6 @@ impl QueryDocumentParser {
         if let ArgumentValue::Scalar(pv @ PrismaValue::Placeholder { .. }) = &value {
             return Ok(ParsedInputValue::Single(pv.clone()));
         }
-        if let ArgumentValue::Scalar(pv @ PrismaValue::GeneratorCall { .. }) = &value {
-            return Ok(ParsedInputValue::Single(pv.clone()));
-        }
 
         let mut failures = Vec::new();
 
@@ -441,6 +440,28 @@ impl QueryDocumentParser {
 
             // UUID coercion matchers
             (PrismaValue::Uuid(uuid), ScalarType::String) => Ok(PrismaValue::String(uuid.to_string())),
+
+            // Generator calls cannot be encoded in the JSON protocol and can
+            // only be injected by the query parser when evaluating the default
+            // values of optional fields, so it should not be possible for them
+            // to be used in unexpected places or with wrong types. Therefore
+            // we only verify the return type in debug builds and in tests but
+            // not in release builds.
+            #[cfg(debug_assertions)]
+            (
+                PrismaValue::GeneratorCall {
+                    name,
+                    args,
+                    return_type,
+                },
+                scalar_type,
+            ) if prisma_value_type_matches_scalar_type(&return_type, scalar_type) => Ok(PrismaValue::GeneratorCall {
+                name,
+                args,
+                return_type,
+            }),
+            #[cfg(not(debug_assertions))]
+            (pv @ PrismaValue::GeneratorCall { .. }, _) => Ok(pv),
 
             // All other combinations are value type mismatches.
             (_, _) => Err(ValidationError::invalid_argument_type(
@@ -814,6 +835,28 @@ impl QueryDocumentParser {
         map.set_tag(schema_object.tag().cloned());
 
         Ok(map)
+    }
+}
+
+#[cfg(debug_assertions)]
+fn prisma_value_type_matches_scalar_type(pv_type: &PrismaValueType, scalar_type: ScalarType) -> bool {
+    match pv_type {
+        PrismaValueType::String => scalar_type == ScalarType::String,
+        PrismaValueType::Boolean => scalar_type == ScalarType::Boolean,
+        PrismaValueType::Enum => false,
+        PrismaValueType::Int => scalar_type == ScalarType::Int,
+        PrismaValueType::Uuid => scalar_type == ScalarType::UUID,
+        PrismaValueType::List(prisma_value_type) => {
+            matches!(**prisma_value_type, PrismaValueType::Json | PrismaValueType::Object)
+                && scalar_type == ScalarType::JsonList
+        }
+        PrismaValueType::Json => scalar_type == ScalarType::Json,
+        PrismaValueType::Object => scalar_type == ScalarType::Json,
+        PrismaValueType::DateTime => scalar_type == ScalarType::DateTime,
+        PrismaValueType::Float => scalar_type == ScalarType::Float,
+        PrismaValueType::BigInt => scalar_type == ScalarType::BigInt,
+        PrismaValueType::Bytes => scalar_type == ScalarType::Bytes,
+        PrismaValueType::Any => true,
     }
 }
 
