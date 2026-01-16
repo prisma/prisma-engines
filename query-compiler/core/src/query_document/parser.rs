@@ -442,8 +442,6 @@ impl QueryDocumentParser {
             // UUID coercion matchers
             (PrismaValue::Uuid(uuid), ScalarType::String) => Ok(PrismaValue::String(uuid.to_string())),
 
-            (pv @ PrismaValue::Placeholder { .. }, ScalarType::Param) => Ok(pv),
-
             // All other combinations are value type mismatches.
             (_, _) => Err(ValidationError::invalid_argument_type(
                 selection_path.segments(),
