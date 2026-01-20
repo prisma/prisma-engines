@@ -157,7 +157,7 @@ pub trait Visitor<'a> {
 
     fn visit_text_search(&mut self, text_search: TextSearch<'a>) -> Result;
 
-    fn visit_matches(&mut self, left: Expression<'a>, right: std::borrow::Cow<'a, str>, not: bool) -> Result;
+    fn visit_matches(&mut self, left: Expression<'a>, right: Expression<'a>, not: bool) -> Result;
 
     fn visit_text_search_relevance(&mut self, text_search_relevance: TextSearchRelevance<'a>) -> Result;
 
@@ -1058,8 +1058,8 @@ pub trait Visitor<'a> {
                 JsonCompare::TypeEquals(left, json_type) => self.visit_json_type_equals(*left, json_type, false),
                 JsonCompare::TypeNotEquals(left, json_type) => self.visit_json_type_equals(*left, json_type, true),
             },
-            Compare::Matches(left, right) => self.visit_matches(*left, right, false),
-            Compare::NotMatches(left, right) => self.visit_matches(*left, right, true),
+            Compare::Matches(left, right) => self.visit_matches(*left, *right, false),
+            Compare::NotMatches(left, right) => self.visit_matches(*left, *right, true),
             Compare::Any(left) => {
                 self.write("ANY")?;
                 self.surround_with("(", ")", |s| s.visit_expression(*left))

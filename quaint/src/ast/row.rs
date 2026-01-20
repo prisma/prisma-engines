@@ -385,7 +385,7 @@ impl<'a> Comparable<'a> for Row<'a> {
 
     fn matches<T>(self, query: T) -> Compare<'a>
     where
-        T: Into<Cow<'a, str>>,
+        T: Into<Expression<'a>>,
     {
         let value: Expression<'a> = self.into();
 
@@ -394,7 +394,7 @@ impl<'a> Comparable<'a> for Row<'a> {
 
     fn not_matches<T>(self, query: T) -> Compare<'a>
     where
-        T: Into<Cow<'a, str>>,
+        T: Into<Expression<'a>>,
     {
         let value: Expression<'a> = self.into();
 
