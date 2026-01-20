@@ -1,7 +1,9 @@
 use super::alias::*;
 use crate::join_utils::{AliasedJoin, compute_one2m_join};
+use crate::value::Placeholder;
 use crate::{Context, model_extensions::*};
 
+use prisma_value::Placeholder as PrismaValuePlaceholder;
 use psl::datamodel_connector::ConnectorCapability;
 use psl::reachable_only_with_capability;
 use quaint::ast::concat;
@@ -946,21 +948,13 @@ pub(crate) fn default_scalar_filter(
         }
         ScalarCondition::Search(value, _) => {
             reachable_only_with_capability!(ConnectorCapability::NativeFullTextSearch);
-            let query: String = value
-                .into_value()
-                .unwrap()
-                .try_into()
-                .unwrap_or_else(|err: ConversionFailure| panic!("{}", err));
+            let query = prisma_value_to_search_expression(value.into_value().unwrap());
 
             comparable.matches(query)
         }
         ScalarCondition::NotSearch(value, _) => {
             reachable_only_with_capability!(ConnectorCapability::NativeFullTextSearch);
-            let query: String = value
-                .into_value()
-                .unwrap()
-                .try_into()
-                .unwrap_or_else(|err: ConversionFailure| panic!("{}", err));
+            let query = prisma_value_to_search_expression(value.into_value().unwrap());
 
             comparable.not_matches(query)
         }
@@ -969,6 +963,16 @@ pub(crate) fn default_scalar_filter(
     };
 
     ConditionTree::single(condition)
+}
+
+fn prisma_value_to_search_expression(pv: PrismaValue) -> Expression<'static> {
+    match pv {
+        PrismaValue::String(s) => Value::text(s).into(),
+        PrismaValue::Placeholder(PrismaValuePlaceholder { name, .. }) => {
+            Value::opaque(Placeholder::new(name), OpaqueType::Text).into()
+        }
+        _ => panic!("Search field should only contain String or Placeholder values"),
+    }
 }
 
 fn insensitive_scalar_filter(

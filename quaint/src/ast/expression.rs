@@ -532,16 +532,16 @@ impl<'a> Comparable<'a> for Expression<'a> {
 
     fn matches<T>(self, query: T) -> Compare<'a>
     where
-        T: Into<Cow<'a, str>>,
+        T: Into<Expression<'a>>,
     {
-        Compare::Matches(Box::new(self), query.into())
+        Compare::Matches(Box::new(self), Box::new(query.into()))
     }
 
     fn not_matches<T>(self, query: T) -> Compare<'a>
     where
-        T: Into<Cow<'a, str>>,
+        T: Into<Expression<'a>>,
     {
-        Compare::NotMatches(Box::new(self), query.into())
+        Compare::NotMatches(Box::new(self), Box::new(query.into()))
     }
 
     fn any(self) -> Compare<'a> {
