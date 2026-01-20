@@ -1,6 +1,6 @@
 {
   "is_panic": false,
-  "message": "Unable to match input value to any allowed input type for the field. Parse errors: [Unable to match input value to any allowed input type for the field. Parse errors: [Invalid argument agument value. `Placeholder<Int>` is not a valid `Int`. Underlying error: The query was incorrectly parameterized by Prisma Client. This is a bug., Invalid argument type. `in` should be of any of the following types: `ListIntFieldRefInput`], Invalid argument type. `id` should be of any of the following types: `Int`]",
+  "message": "Unable to match input value to any allowed input type for the field. Parse errors: [Unable to match input value to any allowed input type for the field. Parse errors: [Invalid argument value. `Placeholder<Int>` is not a valid `Int`. Underlying error: The query was incorrectly parameterized by Prisma Client. This is a bug., Invalid argument type. `in` should be of any of the following types: `ListIntFieldRefInput`], Invalid argument type. `id` should be of any of the following types: `Int`]",
   "meta": {
     "kind": "Union",
     "errors": [
