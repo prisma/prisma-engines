@@ -33,7 +33,7 @@ impl<'a> Postgres<'a> {
                 }
                 // Cast BigInt to text to preserve precision when parsed by JavaScript.
                 // JavaScript's JSON.parse loses precision for integers > 2^53-1.
-                (Some(TypeFamily::Int), Some("BigInt")) => {
+                (Some(TypeFamily::Int), Some("BIGINT")) => {
                     self.visit_expression(expr)?;
                     self.write("::text")?;
 
