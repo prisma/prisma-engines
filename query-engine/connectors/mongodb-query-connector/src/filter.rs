@@ -272,7 +272,10 @@ impl MongoFilterVisitor {
             ScalarCondition::NotSearch(_, _) => unimplemented!("Full-text search is not supported yet on MongoDB"),
         };
 
-        let filter_doc = if !is_set_cond {
+        // Only add $$REMOVE check for optional fields. Required fields and _id cannot
+        // be missing by definition, and adding this check prevents MongoDB from using indexes.
+        // See: https://github.com/prisma/prisma/issues/29000
+        let filter_doc = if !is_set_cond && !field.is_required() {
             exclude_undefineds(&field_name, self.invert_undefined_exclusion(), filter_doc)
         } else {
             filter_doc
@@ -413,7 +416,10 @@ impl MongoFilterVisitor {
             )),
         }?;
 
-        let filter_doc = if !is_set_cond {
+        // Only add $$REMOVE check for optional fields. Required fields and _id cannot
+        // be missing by definition, and adding this check prevents MongoDB from using indexes.
+        // See: https://github.com/prisma/prisma/issues/29000
+        let filter_doc = if !is_set_cond && !field.is_required() {
             exclude_undefineds(&field_name, self.invert_undefined_exclusion(), filter_doc)
         } else {
             filter_doc
