@@ -10,7 +10,7 @@ use query_core::{
     QueryOptions, ReadQuery, RelatedRecordsQuery,
 };
 use query_structure::{
-    ConditionValue, FieldSelection, Filter, Model, PrismaValue, QueryArguments, QueryMode, RelationField,
+    ConditionValue, FieldSelection, Filter, Model, Placeholder, PrismaValue, QueryArguments, QueryMode, RelationField,
     RelationLoadStrategy, ScalarCondition, ScalarField, ScalarFilter, ScalarProjection, Take,
 };
 use std::slice;
@@ -158,14 +158,14 @@ pub(super) fn add_inmemory_join(
                 .iter()
                 .zip(get_relation_scalars_for_filters(&rrq.parent_field))
                 .map(|(parent_scalar, child_scalar)| {
-                    let placeholder = PrismaValue::placeholder(
-                        binding::join_parent_field(parent_scalar),
-                        parent_scalar.type_info().to_prisma_type(),
-                    );
+                    let placeholder = Placeholder {
+                        name: binding::join_parent_field(parent_scalar),
+                        r#type: parent_scalar.type_info().to_prisma_type(),
+                    };
                     let condition = if has_unique_parent {
-                        ScalarCondition::Equals(ConditionValue::value(placeholder))
+                        ScalarCondition::Equals(ConditionValue::value(PrismaValue::from(placeholder)))
                     } else {
-                        ScalarCondition::InTemplate(ConditionValue::value(placeholder))
+                        ScalarCondition::In(placeholder.into())
                     };
                     ConditionalLink::new(child_scalar.clone(), vec![condition])
                 })
@@ -232,7 +232,8 @@ fn build_read_related_records(
             .into_iter()
         {
             let Some(sf) = field.as_scalar() else { continue };
-            linkage.add_condition(sf.clone(), ScalarCondition::InTemplate(val.into()));
+            let p = val.into_placeholder().expect("expected placeholder in parent results");
+            linkage.add_condition(sf.clone(), ScalarCondition::In(p.into()));
         }
     }
 

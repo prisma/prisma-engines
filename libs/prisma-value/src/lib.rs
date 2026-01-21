@@ -129,6 +129,7 @@ impl std::fmt::Display for PrismaValueType {
 #[derive(Debug, Clone, Eq, PartialEq, Hash, Deserialize, PartialOrd, Ord)]
 pub struct Placeholder {
     pub name: Cow<'static, str>,
+    #[serde(flatten)]
     pub r#type: PrismaValueType,
 }
 
@@ -454,6 +455,13 @@ impl PrismaValue {
         }
     }
 
+    pub fn into_placeholder(self) -> Option<Placeholder> {
+        match self {
+            PrismaValue::Placeholder(p) => Some(p),
+            _ => None,
+        }
+    }
+
     pub fn new_float(float: f64) -> PrismaValue {
         PrismaValue::Float(BigDecimal::from_f64(float).unwrap())
     }
@@ -583,6 +591,12 @@ impl From<Uuid> for PrismaValue {
 impl From<PrismaListValue> for PrismaValue {
     fn from(s: PrismaListValue) -> Self {
         PrismaValue::List(s)
+    }
+}
+
+impl From<Placeholder> for PrismaValue {
+    fn from(p: Placeholder) -> Self {
+        PrismaValue::Placeholder(p)
     }
 }
 

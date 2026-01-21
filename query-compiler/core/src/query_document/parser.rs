@@ -4,7 +4,7 @@ use bigdecimal::{BigDecimal, ToPrimitive};
 use chrono::prelude::*;
 use core::fmt;
 use indexmap::{IndexMap, IndexSet};
-use query_structure::{DefaultKind, PrismaValue};
+use query_structure::{DefaultKind, Placeholder, PrismaValue, PrismaValueType};
 use std::{borrow::Cow, convert::TryFrom, rc::Rc, str::FromStr};
 use user_facing_errors::query_engine::validation::ValidationError;
 use uuid::Uuid;
@@ -224,6 +224,7 @@ impl QueryDocumentParser {
                             value,
                             input_field.field_types(),
                             query_schema,
+                            input_field.is_parameterizable(),
                         )
                         .map(|value| ParsedArgument {
                             name: input_field.name.clone().into_owned(),
@@ -250,16 +251,8 @@ impl QueryDocumentParser {
         value: ArgumentValue,
         possible_input_types: &[InputType<'a>],
         query_schema: &'a QuerySchema,
+        is_parameterizable: bool,
     ) -> QueryParserResult<ParsedInputValue<'a>> {
-        // TODO: make query parsing aware of whether we are using the query compiler,
-        // and disallow placeholders and generator calls in the query document if we are not.
-        if let ArgumentValue::Scalar(pv @ PrismaValue::Placeholder { .. }) = &value {
-            return Ok(ParsedInputValue::Single(pv.clone()));
-        }
-        if let ArgumentValue::Scalar(pv @ PrismaValue::GeneratorCall { .. }) = &value {
-            return Ok(ParsedInputValue::Single(pv.clone()));
-        }
-
         let mut failures = Vec::new();
 
         macro_rules! try_this {
@@ -278,8 +271,8 @@ impl QueryDocumentParser {
                 // With the JSON protocol, JSON values are sent as deserialized values.
                 // This means JSON can match with pretty much anything. A string, an int, an object, an array.
                 // This is an early catch-all.
-                // We do not get into this catch-all _if_ the value is already Json, if it's a FieldRef or if it's an Enum.
-                // We don't because they've already been desambiguified at the procotol adapter level.
+                // We do not get into this catch-all if the value is already Json, or if it's a FieldRef,
+                // Enum or Placeholder, because they've already been disambiguated at the procotol level.
                 (value, InputType::<'a>::Scalar(ScalarType::Json))
                     if value.should_be_parsed_as_json() && get_engine_protocol().is_json() =>
                 {
@@ -320,7 +313,7 @@ impl QueryDocumentParser {
                     ))),
                     // Scalar handling
                     (pv, InputType::Scalar(st)) => try_this!(
-                        self.parse_scalar(&selection_path, &argument_path, pv, *st, &value)
+                        self.parse_scalar(&selection_path, &argument_path, pv, *st, &value, is_parameterizable)
                             .map(ParsedInputValue::Single)
                     ),
 
@@ -334,22 +327,49 @@ impl QueryDocumentParser {
                     (pv @ PrismaValue::Boolean(_), InputType::Enum(et)) => {
                         try_this!(self.parse_enum(&selection_path, &argument_path, pv, et))
                     }
+                    (PrismaValue::Placeholder(placeholder), InputType::Enum(et)) => {
+                        try_this!(self.parse_parameterized_enum(
+                            &selection_path,
+                            &argument_path,
+                            &value,
+                            placeholder,
+                            et,
+                            is_parameterizable
+                        ))
+                    }
+
+                    // Parameterized list handling
+                    (PrismaValue::Placeholder(placeholder), InputType::List(elem_type)) => {
+                        try_this!(self.parse_parameterized_list(
+                            &selection_path,
+                            &argument_path,
+                            &value,
+                            placeholder,
+                            elem_type,
+                            is_parameterizable
+                        ))
+                    }
+
                     // Invalid combinations
-                    (_, input_type) => try_this!(Err(ValidationError::invalid_argument_type(
-                        selection_path.segments(),
-                        argument_path.segments(),
-                        conversions::input_type_to_argument_description(
-                            argument_path.last().unwrap_or_default(),
-                            input_type,
-                        ),
-                        conversions::argument_value_to_type_name(&value),
+                    (_, input_type) => try_this!(Err(invalid_argument_type_error(
+                        &selection_path,
+                        &argument_path,
+                        input_type,
+                        &value,
                     ))),
                 },
 
-                // List handling.
+                // Non-parameterized list handling
                 (ArgumentValue::List(values), InputType::List(l)) => try_this!(
-                    self.parse_list(&selection_path, &argument_path, values.clone(), l, query_schema)
-                        .map(ParsedInputValue::List)
+                    self.parse_list(
+                        &selection_path,
+                        &argument_path,
+                        values.clone(),
+                        l,
+                        query_schema,
+                        is_parameterizable
+                    )
+                    .map(ParsedInputValue::List)
                 ),
 
                 // Object handling
@@ -365,14 +385,11 @@ impl QueryDocumentParser {
                 ),
 
                 // Invalid combinations
-                (_, input_type) => try_this!(Err(ValidationError::invalid_argument_type(
-                    selection_path.segments(),
-                    argument_path.segments(),
-                    conversions::input_type_to_argument_description(
-                        argument_path.last().unwrap_or_default(),
-                        input_type,
-                    ),
-                    conversions::argument_value_to_type_name(&value),
+                (_, input_type) => try_this!(Err(invalid_argument_type_error(
+                    &selection_path,
+                    &argument_path,
+                    input_type,
+                    &value,
                 ))),
             };
         }
@@ -392,6 +409,7 @@ impl QueryDocumentParser {
         value: PrismaValue,
         scalar_type: ScalarType,
         argument_value: &ArgumentValue,
+        is_parameterizable: bool,
     ) -> QueryParserResult<PrismaValue> {
         match (value, scalar_type) {
             // Identity matchers
@@ -442,17 +460,55 @@ impl QueryDocumentParser {
             // UUID coercion matchers
             (PrismaValue::Uuid(uuid), ScalarType::String) => Ok(PrismaValue::String(uuid.to_string())),
 
-            (pv @ PrismaValue::Placeholder { .. }, ScalarType::Param) => Ok(pv),
+            // Generator calls cannot be encoded in the JSON protocol and can
+            // only be injected by the query parser when evaluating the default
+            // values of optional fields, so it should not be possible for them
+            // to be used in unexpected places or with wrong types. Therefore
+            // we only verify the return type in debug builds and in tests but
+            // not in release builds.
+            #[cfg(debug_assertions)]
+            (
+                PrismaValue::GeneratorCall {
+                    name,
+                    args,
+                    return_type,
+                },
+                scalar_type,
+            ) if prisma_value_type_matches_scalar_type(&return_type, scalar_type) => Ok(PrismaValue::GeneratorCall {
+                name,
+                args,
+                return_type,
+            }),
+            #[cfg(not(debug_assertions))]
+            (pv @ PrismaValue::GeneratorCall { .. }, _) => Ok(pv),
+
+            // Placeholders are allowed if the current location is parameterizable
+            // and the provided placeholder has a compatible type. We check the
+            // type compatibility as part of the pattern and not in the `if` statement
+            // within the match arm because we want to fall back to the final match
+            // arm on type mismatch and get a generic "invalid argument type error"
+            // that doesn't mention placeholders.
+            (PrismaValue::Placeholder(placeholder), scalar_type)
+                if prisma_value_type_matches_scalar_type(&placeholder.r#type, scalar_type) =>
+            {
+                if is_parameterizable {
+                    Ok(placeholder.into())
+                } else {
+                    Err(unexpected_placeholder_error(
+                        selection_path,
+                        argument_path,
+                        &placeholder,
+                        &scalar_type.to_string(),
+                    ))
+                }
+            }
 
             // All other combinations are value type mismatches.
-            (_, _) => Err(ValidationError::invalid_argument_type(
-                selection_path.segments(),
-                argument_path.segments(),
-                conversions::input_type_to_argument_description(
-                    argument_path.last().unwrap_or_default(),
-                    &InputType::Scalar(scalar_type),
-                ),
-                conversions::argument_value_to_type_name(argument_value),
+            (_, _) => Err(invalid_argument_type_error(
+                selection_path,
+                argument_path,
+                &InputType::Scalar(scalar_type),
+                argument_value,
             )),
         }
     }
@@ -617,6 +673,7 @@ impl QueryDocumentParser {
         values: Vec<ArgumentValue>,
         value_type: &InputType<'a>,
         query_schema: &'a QuerySchema,
+        is_parameterizable: bool,
     ) -> QueryParserResult<Vec<ParsedInputValue<'a>>> {
         values
             .into_iter()
@@ -627,9 +684,58 @@ impl QueryDocumentParser {
                     val,
                     std::slice::from_ref(value_type),
                     query_schema,
+                    is_parameterizable,
                 )
             })
             .collect::<QueryParserResult<Vec<ParsedInputValue<'a>>>>()
+    }
+
+    fn parse_parameterized_list<'a>(
+        &self,
+        selection_path: &Path,
+        argument_path: &Path,
+        argument_value: &ArgumentValue,
+        placeholder: Placeholder,
+        element_input_type: &InputType<'a>,
+        is_parameterizable: bool,
+    ) -> QueryParserResult<ParsedInputValue<'a>> {
+        if !is_parameterizable {
+            return Err(unexpected_placeholder_error(
+                selection_path,
+                argument_path,
+                &placeholder,
+                "List",
+            ));
+        }
+
+        let error = || {
+            invalid_argument_type_error(
+                selection_path,
+                argument_path,
+                &InputType::List(element_input_type.to_owned().into()),
+                argument_value,
+            )
+        };
+
+        let PrismaValueType::List(inner_type) = &placeholder.r#type else {
+            return Err(error());
+        };
+
+        let element_type_matches = match element_input_type {
+            InputType::Scalar(scalar_type) => prisma_value_type_matches_scalar_type(inner_type, *scalar_type),
+            InputType::Enum(_) => matches!(**inner_type, PrismaValueType::Enum),
+            InputType::List(_) | InputType::Object(_) => {
+                return Err(ValidationError::unexpected_runtime_error(
+                    "Lists of lists or objects must not be parameterizable, this is a bug".into(),
+                ));
+            }
+        };
+
+        if element_type_matches {
+            Ok(ParsedInputValue::Single(placeholder.into()))
+        } else {
+            Err(error())
+        }
     }
 
     fn parse_enum<'a>(
@@ -680,6 +786,36 @@ impl QueryDocumentParser {
         }
     }
 
+    fn parse_parameterized_enum<'a>(
+        &self,
+        selection_path: &Path,
+        argument_path: &Path,
+        argument_value: &ArgumentValue,
+        placeholder: Placeholder,
+        enum_type: &EnumType,
+        is_parameterizable: bool,
+    ) -> QueryParserResult<ParsedInputValue<'a>> {
+        if !is_parameterizable {
+            return Err(unexpected_placeholder_error(
+                selection_path,
+                argument_path,
+                &placeholder,
+                &enum_type.name(),
+            ));
+        }
+
+        if matches!(placeholder.r#type, PrismaValueType::Enum) {
+            Ok(ParsedInputValue::Single(placeholder.into()))
+        } else {
+            Err(invalid_argument_type_error(
+                selection_path,
+                argument_path,
+                &InputType::Enum(enum_type.to_owned()),
+                argument_value,
+            ))
+        }
+    }
+
     /// Parses and validates an input object recursively.
     fn parse_input_object<'a>(
         &self,
@@ -713,6 +849,7 @@ impl QueryDocumentParser {
                             default_value.get()?.into(),
                             field.field_types(),
                             query_schema,
+                            field.is_parameterizable(),
                         ) {
                             Ok(value) => Some(Ok((field.name.clone(), value))),
                             Err(err) => Some(Err(err)),
@@ -753,6 +890,7 @@ impl QueryDocumentParser {
                     value,
                     field.field_types(),
                     query_schema,
+                    field.is_parameterizable(),
                 )?;
 
                 Ok((Cow::Owned(field_name), parsed))
@@ -817,6 +955,57 @@ impl QueryDocumentParser {
 
         Ok(map)
     }
+}
+
+fn prisma_value_type_matches_scalar_type(pv_type: &PrismaValueType, scalar_type: ScalarType) -> bool {
+    match pv_type {
+        PrismaValueType::String => matches!(scalar_type, ScalarType::String | ScalarType::UUID),
+        PrismaValueType::Boolean => scalar_type == ScalarType::Boolean,
+        PrismaValueType::Enum => scalar_type == ScalarType::String,
+        PrismaValueType::Int => matches!(scalar_type, ScalarType::Int | ScalarType::BigInt | ScalarType::Float),
+        PrismaValueType::Uuid => matches!(scalar_type, ScalarType::UUID | ScalarType::String),
+        PrismaValueType::List(prisma_value_type) => {
+            matches!(**prisma_value_type, PrismaValueType::Json | PrismaValueType::Object)
+                && scalar_type == ScalarType::JsonList
+        }
+        PrismaValueType::Json | PrismaValueType::Object => scalar_type == ScalarType::Json,
+        PrismaValueType::DateTime => scalar_type == ScalarType::DateTime,
+        PrismaValueType::Float => matches!(scalar_type, ScalarType::Float | ScalarType::Decimal),
+        PrismaValueType::BigInt => scalar_type == ScalarType::BigInt,
+        PrismaValueType::Bytes => scalar_type == ScalarType::Bytes,
+        PrismaValueType::Any => true,
+    }
+}
+
+#[inline(never)]
+fn invalid_argument_type_error(
+    selection_path: &Path,
+    argument_path: &Path,
+    input_type: &InputType<'_>,
+    argument_value: &ArgumentValue,
+) -> ValidationError {
+    ValidationError::invalid_argument_type(
+        selection_path.segments(),
+        argument_path.segments(),
+        conversions::input_type_to_argument_description(argument_path.last().unwrap_or_default(), input_type),
+        conversions::argument_value_to_type_name(argument_value),
+    )
+}
+
+#[inline(never)]
+fn unexpected_placeholder_error(
+    selection_path: &Path,
+    argument_path: &Path,
+    placeholder: &Placeholder,
+    input_type: &str,
+) -> ValidationError {
+    ValidationError::invalid_argument_value(
+        selection_path.segments(),
+        argument_path.segments(),
+        format!("Placeholder<{}>", placeholder.r#type),
+        input_type,
+        Some("The query was incorrectly parameterized by Prisma Client. This is a bug.".into()),
+    )
 }
 
 pub(crate) mod conversions {

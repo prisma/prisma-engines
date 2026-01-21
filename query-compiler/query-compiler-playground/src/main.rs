@@ -45,7 +45,10 @@ pub fn main() -> anyhow::Result<()> {
                 "where": {
                     "email": {
                         "$type": "Param",
-                        "value": "userEmail"
+                        "value": {
+                            "name": "userEmail",
+                            "type": "String"
+                        }
                     }
                 }
             },

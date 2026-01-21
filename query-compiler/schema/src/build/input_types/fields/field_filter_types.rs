@@ -192,12 +192,21 @@ fn scalar_list_filter_type(ctx: &'_ QuerySchema, sf: ScalarFieldRef) -> InputObj
         fields.push(
             input_field(filters::HAS, mapped_nonlist_type_with_field_ref_input, None)
                 .optional()
-                .nullable_if(!sf.is_required()),
+                .nullable_if(!sf.is_required())
+                .parameterizable(),
         );
 
         let mapped_list_type_with_field_ref_input = mapped_list_type.with_field_ref_input();
-        fields.push(input_field(filters::HAS_EVERY, mapped_list_type_with_field_ref_input.clone(), None).optional());
-        fields.push(input_field(filters::HAS_SOME, mapped_list_type_with_field_ref_input, None).optional());
+        fields.push(
+            input_field(filters::HAS_EVERY, mapped_list_type_with_field_ref_input.clone(), None)
+                .optional()
+                .parameterizable(),
+        );
+        fields.push(
+            input_field(filters::HAS_SOME, mapped_list_type_with_field_ref_input, None)
+                .optional()
+                .parameterizable(),
+        );
         fields.push(simple_input_field(filters::IS_EMPTY, InputType::boolean(), None).optional());
         fields
     });
@@ -350,7 +359,8 @@ fn equality_filters(mapped_type: InputType<'_>, nullable: bool) -> impl Iterator
     std::iter::once(
         input_field(filters::EQUALS, types, None)
             .optional()
-            .nullable_if(nullable),
+            .nullable_if(nullable)
+            .parameterizable(),
     )
 }
 
@@ -364,12 +374,15 @@ fn json_equality_filters<'a>(
         let mut field_types = mapped_type.with_field_ref_input();
         field_types.push(InputType::Enum(enum_type));
 
-        input_field(filters::EQUALS, field_types, None).optional()
+        input_field(filters::EQUALS, field_types, None)
+            .optional()
+            .parameterizable()
     } else {
         let inner = mapped_type.with_field_ref_input();
         input_field(filters::EQUALS, inner, None)
             .optional()
             .nullable_if(nullable)
+            .parameterizable()
     };
 
     std::iter::once(field)
@@ -391,10 +404,12 @@ fn inclusion_filters<'a>(
     vec![
         input_field(filters::IN, field_types.clone(), None)
             .optional()
-            .nullable_if(nullable),
+            .nullable_if(nullable)
+            .parameterizable(),
         input_field(filters::NOT_IN, field_types, None)
             .optional()
-            .nullable_if(nullable), // Kept for legacy reasons!
+            .nullable_if(nullable)
+            .parameterizable(),
     ]
     .into_iter()
 }
@@ -410,10 +425,18 @@ fn alphanumeric_filters<'a>(ctx: &'a QuerySchema, mapped_type: InputType<'a>) ->
         };
 
     vec![
-        input_field(filters::LOWER_THAN, field_types.clone(), None).optional(),
-        input_field(filters::LOWER_THAN_OR_EQUAL, field_types.clone(), None).optional(),
-        input_field(filters::GREATER_THAN, field_types.clone(), None).optional(),
-        input_field(filters::GREATER_THAN_OR_EQUAL, field_types, None).optional(),
+        input_field(filters::LOWER_THAN, field_types.clone(), None)
+            .optional()
+            .parameterizable(),
+        input_field(filters::LOWER_THAN_OR_EQUAL, field_types.clone(), None)
+            .optional()
+            .parameterizable(),
+        input_field(filters::GREATER_THAN, field_types.clone(), None)
+            .optional()
+            .parameterizable(),
+        input_field(filters::GREATER_THAN_OR_EQUAL, field_types, None)
+            .optional()
+            .parameterizable(),
     ]
     .into_iter()
 }
@@ -428,11 +451,19 @@ fn string_filters<'a>(
     let string_filters = ctx.connector.string_filters(input_object_type_name);
     let mut string_filters: Vec<_> = string_filters
         .iter()
-        .map(|filter| input_field(filter.name(), field_types.clone(), None).optional())
+        .map(|filter| {
+            input_field(filter.name(), field_types.clone(), None)
+                .optional()
+                .parameterizable()
+        })
         .collect();
 
     if ctx.can_full_text_search() {
-        string_filters.push(simple_input_field(filters::SEARCH, mapped_type, None).optional());
+        string_filters.push(
+            simple_input_field(filters::SEARCH, mapped_type, None)
+                .optional()
+                .parameterizable(),
+        );
     }
 
     string_filters.into_iter()
@@ -460,22 +491,31 @@ fn json_filters(ctx: &'_ QuerySchema) -> impl Iterator<Item = InputField<'_>> {
             Some(DefaultKind::Single(PrismaValue::Enum(filters::DEFAULT.to_owned()))),
         )
         .optional(),
-        input_field(filters::STRING_CONTAINS, string_with_field_ref_input.clone(), None).optional(),
-        input_field(filters::STRING_STARTS_WITH, string_with_field_ref_input.clone(), None).optional(),
-        input_field(filters::STRING_ENDS_WITH, string_with_field_ref_input, None).optional(),
+        input_field(filters::STRING_CONTAINS, string_with_field_ref_input.clone(), None)
+            .optional()
+            .parameterizable(),
+        input_field(filters::STRING_STARTS_WITH, string_with_field_ref_input.clone(), None)
+            .optional()
+            .parameterizable(),
+        input_field(filters::STRING_ENDS_WITH, string_with_field_ref_input, None)
+            .optional()
+            .parameterizable(),
         input_field(filters::ARRAY_STARTS_WITH, json_with_field_ref_input.clone(), None)
             .optional()
-            .nullable(),
+            .nullable()
+            .parameterizable(),
         input_field(filters::ARRAY_ENDS_WITH, json_with_field_ref_input.clone(), None)
             .optional()
-            .nullable(),
+            .nullable()
+            .parameterizable(),
     ];
 
     if ctx.has_capability(ConnectorCapability::JsonArrayContains) {
         base.push(
             input_field(filters::ARRAY_CONTAINS, json_with_field_ref_input.clone(), None)
                 .optional()
-                .nullable(),
+                .nullable()
+                .parameterizable(),
         )
     }
 
@@ -540,7 +580,9 @@ fn not_filter_field<'a>(
             let mut field_types = mapped_scalar_type.with_field_ref_input();
             field_types.push(InputType::Enum(enum_type));
 
-            input_field(filters::NOT_LOWERCASE, field_types, None).optional()
+            input_field(filters::NOT_LOWERCASE, field_types, None)
+                .optional()
+                .parameterizable()
         }
 
         TypeIdentifier::Json => {
@@ -548,6 +590,7 @@ fn not_filter_field<'a>(
             input_field(filters::NOT_LOWERCASE, ty, None)
                 .optional()
                 .nullable_if(is_nullable)
+                .parameterizable()
         }
 
         _ => {
@@ -565,6 +608,7 @@ fn not_filter_field<'a>(
             input_field(filters::NOT_LOWERCASE, vec![mapped_scalar_type, shorthand], None)
                 .optional()
                 .nullable_if(is_nullable)
+                .parameterizable()
         }
     }
 }
