@@ -40,7 +40,8 @@ impl IntoFilter for Vec<SelectionResult> {
                     .into_iter()
                     .map(|(sf, val)| {
                         let PrismaValue::Placeholder(p) = val else {
-                            unreachable!("as_placeholders guarantees all values are placeholders")
+                            // as_placeholders guarantees all values are placeholders
+                            unreachable!()
                         };
                         sf.is_in(p.clone())
                     })

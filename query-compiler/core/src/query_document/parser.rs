@@ -1004,7 +1004,7 @@ fn unexpected_placeholder_error(
         argument_path.segments(),
         format!("Placeholder<{}>", placeholder.r#type),
         input_type,
-        Some("The query was incorrectly parameterized by Prisma Client. This is a bug".into()),
+        Some("The query was incorrectly parameterized by Prisma Client. This is a bug.".into()),
     )
 }
 
