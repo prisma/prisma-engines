@@ -270,6 +270,18 @@ impl<'a> SqlSchemaDescriber<'a> {
     }
 }
 
+/// Wraps the given string in parentheses if it is not already.
+/// The result of `PRAGMA table_info` removes parentheses from default values,
+/// so we need to add parentheses when generating prisma schema.
+/// See <https://github.com/prisma/prisma/issues/29064>
+fn wrap_in_parentheses(s: &str) -> Cow<'_, str> {
+    if s[0..1] != *"(" && s[s.len() - 1..] == *")" {
+        format!("({})", s).into()
+    } else {
+        s.into()
+    }
+}
+
 async fn push_columns(
     table_name: &str,
     container_id: Either<TableId, ViewId>,
@@ -306,26 +318,26 @@ async fn push_columns(
                     Some(match &tpe.family {
                         ColumnTypeFamily::Int => match SqlSchemaDescriber::parse_int(&default_string) {
                             Some(int_value) => DefaultValue::value(int_value),
-                            None => DefaultValue::db_generated(default_string),
+                            None => DefaultValue::db_generated(wrap_in_parentheses(&default_string)),
                         },
                         ColumnTypeFamily::BigInt => match SqlSchemaDescriber::parse_big_int(&default_string) {
                             Some(int_value) => DefaultValue::value(int_value),
-                            None => DefaultValue::db_generated(default_string),
+                            None => DefaultValue::db_generated(wrap_in_parentheses(&default_string)),
                         },
                         ColumnTypeFamily::Float => match SqlSchemaDescriber::parse_float(&default_string) {
                             Some(float_value) => DefaultValue::value(float_value),
-                            None => DefaultValue::db_generated(default_string),
+                            None => DefaultValue::db_generated(wrap_in_parentheses(&default_string)),
                         },
                         ColumnTypeFamily::Decimal => match SqlSchemaDescriber::parse_float(&default_string) {
                             Some(float_value) => DefaultValue::value(float_value),
-                            None => DefaultValue::db_generated(default_string),
+                            None => DefaultValue::db_generated(wrap_in_parentheses(&default_string)),
                         },
                         ColumnTypeFamily::Boolean => match SqlSchemaDescriber::parse_int(&default_string) {
                             Some(PrismaValue::Int(1)) => DefaultValue::value(true),
                             Some(PrismaValue::Int(0)) => DefaultValue::value(false),
                             _ => match SqlSchemaDescriber::parse_bool(&default_string) {
                                 Some(bool_value) => DefaultValue::value(bool_value),
-                                None => DefaultValue::db_generated(default_string),
+                                None => DefaultValue::db_generated(wrap_in_parentheses(&default_string)),
                             },
                         },
                         ColumnTypeFamily::String => {
@@ -335,7 +347,7 @@ async fn push_columns(
                             "current_timestamp" | "datetime(\'now\')" | "datetime(\'now\', \'localtime\')" => {
                                 DefaultValue::now()
                             }
-                            _ => DefaultValue::db_generated(default_string),
+                            _ => DefaultValue::db_generated(wrap_in_parentheses(&default_string)),
                         },
                         ColumnTypeFamily::Json => DefaultValue::value(default_string),
                         ColumnTypeFamily::Binary => DefaultValue::db_generated(default_string),
