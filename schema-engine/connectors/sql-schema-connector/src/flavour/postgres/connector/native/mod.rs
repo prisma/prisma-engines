@@ -260,7 +260,7 @@ pub async fn create_database(state: &State) -> ConnectorResult<String> {
 
     conn.close().await;
 
-    Ok(db_name.to_owned())
+    Ok(db_name.into_owned())
 }
 
 pub async fn drop_database(state: &State) -> ConnectorResult<()> {
