@@ -54,7 +54,8 @@ const CAPABILITIES: ConnectorCapabilities = enumflags2::make_bitflags!(Connector
     SupportsTxIsolationSerializable |
     SupportsTxIsolationSnapshot |
     SupportsFiltersOnRelationsWithoutJoins |
-    SupportsDefaultInInsert
+    SupportsDefaultInInsert |
+    PartialIndex
     // InsertReturning | DeleteReturning - unimplemented.
 });
 

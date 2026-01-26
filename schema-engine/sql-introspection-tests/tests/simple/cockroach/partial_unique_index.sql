@@ -11,9 +11,11 @@ CREATE TABLE "pages" (
 );
 
 
+
 /*
 generator js {
-  provider = "prisma-client"
+  provider        = "prisma-client"
+  previewFeatures = ["partialIndexes"]
 }
 
 datasource db {
@@ -22,7 +24,7 @@ datasource db {
 
 model pages {
   id       BigInt @id @default(autoincrement())
-  staticId Int
+  staticId Int    @unique(map: "partial", where: raw("latest = 1"))
   latest   Int
   other    Int    @unique(map: "full")
 }

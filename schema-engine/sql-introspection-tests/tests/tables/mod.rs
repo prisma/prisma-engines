@@ -589,9 +589,48 @@ async fn a_table_with_an_index_that_contains_expressions_should_be_ignored(api: 
     Ok(())
 }
 
-// MySQL doesn't have partial indices.
-#[test_connector(exclude(Mysql, CockroachDb))]
-async fn a_table_with_partial_indexes_should_ignore_them(api: &mut TestApi) -> TestResult {
+// MySQL doesn't have partial indices. CockroachDB doesn't return predicate text.
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
+async fn a_table_with_partial_indexes_should_introspect_them(api: &mut TestApi) -> TestResult {
+    let setup = indoc! {r#"
+        CREATE TABLE "pages" (
+            id SERIAL PRIMARY KEY,
+            "staticId" INTEGER NOT NULL,
+            latest INTEGER NOT NULL,
+            other INTEGER NOT NULL
+        );
+        CREATE UNIQUE INDEX "full" ON "pages" (other);
+        CREATE UNIQUE INDEX "partial" ON "pages" ("staticId") WHERE (latest = 1);
+    "#};
+
+    api.raw_cmd(setup).await;
+
+    let expected = expect![[r#"
+        generator client {
+          provider        = "prisma-client"
+          previewFeatures = ["partialIndexes"]
+        }
+
+        datasource db {
+          provider = "postgresql"
+        }
+
+        model pages {
+          id       Int @id @default(autoincrement())
+          staticId Int @unique(map: "partial", where: raw("(latest = 1)"))
+          latest   Int
+          other    Int @unique(map: "full")
+        }
+    "#]];
+
+    api.expect_datamodel(&expected).await;
+
+    Ok(())
+}
+
+// SQLite supports partial indexes.
+#[test_connector(tags(Sqlite))]
+async fn a_table_with_partial_indexes_should_introspect_them_sqlite(api: &mut TestApi) -> TestResult {
     api.barrel()
         .execute(move |migration| {
             migration.create_table("pages", move |t| {
@@ -607,19 +646,25 @@ async fn a_table_with_partial_indexes_should_ignore_them(api: &mut TestApi) -> T
         })
         .await?;
 
-    let dm = indoc! {
-        r#"
-        model pages {
-            id       Int     @id @default(autoincrement())
-            staticId Int
-            latest   Int
-            other    Int     @unique(map: "full")
+    let expected = expect![[r#"
+        generator client {
+          provider        = "prisma-client"
+          previewFeatures = ["partialIndexes"]
         }
-        "#
-    };
 
-    let result = api.introspect().await?;
-    api.assert_eq_datamodels(dm, &result);
+        datasource db {
+          provider = "sqlite"
+        }
+
+        model pages {
+          id       Int @id @default(autoincrement())
+          staticId Int @unique(map: "partial", where: raw("latest = 1"))
+          latest   Int
+          other    Int @unique(map: "full")
+        }
+    "#]];
+
+    api.expect_datamodel(&expected).await;
 
     Ok(())
 }

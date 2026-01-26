@@ -979,6 +979,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                     ),
                     index_name: "User_pkey",
                     tpe: PrimaryKey,
+                    predicate: None,
                 },
             ],
             index_columns: [
@@ -1452,6 +1453,7 @@ fn escaped_quotes_in_string_defaults_must_be_unescaped(api: TestApi) {
                     ),
                     index_name: "string_defaults_test_pkey",
                     tpe: PrimaryKey,
+                    predicate: None,
                 },
             ],
             index_columns: [
@@ -2018,6 +2020,7 @@ fn multiple_schemas_with_same_table_names_are_described(api: TestApi) {
                     ),
                     index_name: "Table_0_pkey",
                     tpe: PrimaryKey,
+                    predicate: None,
                 },
                 Index {
                     table_id: TableId(
@@ -2025,6 +2028,7 @@ fn multiple_schemas_with_same_table_names_are_described(api: TestApi) {
                     ),
                     index_name: "Table_0_pkey",
                     tpe: PrimaryKey,
+                    predicate: None,
                 },
             ],
             index_columns: [
@@ -2451,6 +2455,7 @@ fn multiple_schemas_with_same_foreign_key_are_described(api: TestApi) {
                     ),
                     index_name: "Table_0_pkey",
                     tpe: PrimaryKey,
+                    predicate: None,
                 },
                 Index {
                     table_id: TableId(
@@ -2458,6 +2463,7 @@ fn multiple_schemas_with_same_foreign_key_are_described(api: TestApi) {
                     ),
                     index_name: "Table_1_pkey",
                     tpe: PrimaryKey,
+                    predicate: None,
                 },
                 Index {
                     table_id: TableId(
@@ -2465,6 +2471,7 @@ fn multiple_schemas_with_same_foreign_key_are_described(api: TestApi) {
                     ),
                     index_name: "Table_0_pkey",
                     tpe: PrimaryKey,
+                    predicate: None,
                 },
                 Index {
                     table_id: TableId(
@@ -2472,6 +2479,7 @@ fn multiple_schemas_with_same_foreign_key_are_described(api: TestApi) {
                     ),
                     index_name: "Table_1_pkey",
                     tpe: PrimaryKey,
+                    predicate: None,
                 },
                 Index {
                     table_id: TableId(
@@ -2479,6 +2487,7 @@ fn multiple_schemas_with_same_foreign_key_are_described(api: TestApi) {
                     ),
                     index_name: "Table_2_pkey",
                     tpe: PrimaryKey,
+                    predicate: None,
                 },
             ],
             index_columns: [

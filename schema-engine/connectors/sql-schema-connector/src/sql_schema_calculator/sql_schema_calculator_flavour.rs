@@ -46,6 +46,10 @@ pub(crate) trait SqlSchemaCalculatorFlavour {
     fn m2m_join_table_constraint(&self) -> JoinTableUniquenessConstraint {
         JoinTableUniquenessConstraint::UniqueIndex
     }
+
+    fn normalize_index_predicate(&self, predicate: String) -> String {
+        predicate
+    }
 }
 
 pub(crate) enum JoinTableUniquenessConstraint {

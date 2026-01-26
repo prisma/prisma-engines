@@ -411,6 +411,13 @@ async fn push_columns(
     Ok(())
 }
 
+struct PendingIndex {
+    name: String,
+    is_unique: bool,
+    is_partial: bool,
+    columns: Vec<(TableColumnId, SQLSortOrder)>,
+}
+
 async fn push_indexes(
     table: &str,
     table_id: TableId,
@@ -419,19 +426,21 @@ async fn push_indexes(
 ) -> DescriberResult<()> {
     let sql = format!(r#"PRAGMA index_list("{table}");"#);
     let result_set = conn.query_raw(&sql, &[]).await?;
-    let mut indexes = Vec::new(); // (index_name, is_unique, columns)
+    let mut indexes: Vec<PendingIndex> = Vec::new();
 
     let filtered_rows = result_set
         .into_iter()
         // Exclude primary keys, they are inferred separately.
-        .filter(|row| row.get("origin").and_then(|origin| origin.as_str()).unwrap() != "pk")
-        // Exclude partial indices
-        .filter(|row| !row.get("partial").and_then(|partial| partial.as_bool()).unwrap());
+        .filter(|row| row.get("origin").and_then(|origin| origin.as_str()).unwrap() != "pk");
 
     for row in filtered_rows {
         let mut valid_index = true;
 
         let is_unique = row.get_expect_bool("unique");
+        let is_partial = row
+            .get("partial")
+            .and_then(|partial| partial.as_bool())
+            .unwrap_or(false);
         let index_name = row.get_expect_string("name");
         let mut columns = Vec::new();
 
@@ -472,18 +481,40 @@ async fn push_indexes(
         }
 
         if valid_index {
-            indexes.push((index_name, is_unique, columns))
+            indexes.push(PendingIndex {
+                name: index_name,
+                is_unique,
+                is_partial,
+                columns,
+            });
         }
     }
 
-    for (index_name, unique, columns) in indexes {
-        let index_id = if unique {
-            schema.push_unique_constraint(table_id, index_name)
+    for index in indexes {
+        // For partial indexes, extract the WHERE clause from sqlite_master
+        let predicate = if index.is_partial {
+            let sql = format!(
+                r#"SELECT sql FROM sqlite_master WHERE type = 'index' AND name = "{}";"#,
+                index.name
+            );
+            let result_set = conn.query_raw(&sql, &[]).await?;
+            result_set
+                .into_iter()
+                .next()
+                .and_then(|row| row.get_string("sql"))
+                .and_then(|sql| extract_where_clause(&sql))
         } else {
-            schema.push_index(table_id, index_name)
+            None
         };
 
-        for (column_id, sort_order) in columns {
+        let index_id = match (index.is_unique, predicate) {
+            (true, Some(pred)) => schema.push_partial_unique_constraint(table_id, index.name, pred),
+            (true, None) => schema.push_unique_constraint(table_id, index.name),
+            (false, Some(pred)) => schema.push_partial_index(table_id, index.name, pred),
+            (false, None) => schema.push_index(table_id, index.name),
+        };
+
+        for (column_id, sort_order) in index.columns {
             schema.push_index_column(crate::IndexColumn {
                 index_id,
                 column_id,
@@ -494,6 +525,22 @@ async fn push_indexes(
     }
 
     Ok(())
+}
+
+/// Extract the WHERE clause from a SQLite CREATE INDEX statement.
+fn extract_where_clause(sql: &str) -> Option<String> {
+    const WHERE_KEYWORD: &str = " WHERE ";
+
+    // SQLite stores the full CREATE INDEX statement.
+    // We need to find the WHERE keyword and extract everything after it.
+    let upper = sql.to_uppercase();
+    if let Some(pos) = upper.rfind(WHERE_KEYWORD) {
+        let predicate = sql[pos + WHERE_KEYWORD.len()..].trim();
+        if !predicate.is_empty() {
+            return Some(predicate.to_string());
+        }
+    }
+    None
 }
 
 fn get_column_type(mut tpe: String, arity: ColumnArity) -> ColumnType {

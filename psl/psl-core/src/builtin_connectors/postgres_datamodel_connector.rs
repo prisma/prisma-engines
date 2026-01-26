@@ -73,7 +73,8 @@ pub const CAPABILITIES: ConnectorCapabilities = enumflags2::make_bitflags!(Conne
     DeleteReturning |
     SupportsFiltersOnRelationsWithoutJoins |
     LateralJoin |
-    SupportsDefaultInInsert
+    SupportsDefaultInInsert |
+    PartialIndex
 });
 
 pub struct PostgresDatamodelConnector;

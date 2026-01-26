@@ -40,6 +40,7 @@ impl GeneratorConfigValue {
                     .map(|element| Self::try_from_expression(element, diagnostics))
                     .collect::<Option<Vec<_>>>()?,
             ),
+            Expression::Object(_, _) => Self::String(expr.to_string()),
         })
     }
 }

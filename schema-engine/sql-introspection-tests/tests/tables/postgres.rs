@@ -152,8 +152,8 @@ async fn a_table_with_a_hash_index(api: &mut TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(tags(Postgres))]
-async fn ignoring_of_partial_indices(api: &mut TestApi) -> TestResult {
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
+async fn introspection_of_partial_indices(api: &mut TestApi) -> TestResult {
     let setup = indoc! {r#"
        CREATE TABLE "A" (
            id INTEGER NOT NULL,
@@ -170,6 +170,8 @@ async fn ignoring_of_partial_indices(api: &mut TestApi) -> TestResult {
         model A {
           id Int  @id(map: "a_pkey")
           a  Int?
+
+          @@index([a], where: raw("(a IS NOT NULL)"))
         }
     "#]];
 

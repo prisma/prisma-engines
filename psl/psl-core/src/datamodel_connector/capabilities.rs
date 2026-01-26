@@ -69,6 +69,7 @@ capabilities!(
     SortOrderInFullTextIndex,
     MultipleFullTextAttributesPerModel,
     ClusteringSetting,
+    PartialIndex, // Connector supports partial indexes with WHERE clause.
     // Start of query-engine-only Capabilities
     EnumArrayPush, // implies the ScalarList capability. Necessary, as CockroachDB supports pushing to a list of scalars, but not to the particular case of an enum list. See https://github.com/cockroachdb/cockroach/issues/71388
     InsensitiveFilters,

@@ -124,16 +124,35 @@ fn push_model_indexes(model: ModelWalker<'_>, table_id: sql::TableId, ctx: &mut 
 
     for index in model.indexes() {
         let constraint_name = index.constraint_name(ctx.flavour.datamodel_connector()).into_owned();
-        let index_id = if index.is_unique() {
-            ctx.schema
+        let where_clause = index
+            .where_clause_as_sql()
+            .map(|p| ctx.flavour.normalize_index_predicate(p));
+
+        let index_id = match (index.is_unique(), index.is_fulltext(), where_clause) {
+            // Partial unique constraint
+            (true, _, Some(predicate)) => {
+                ctx.schema
+                    .describer_schema
+                    .push_partial_unique_constraint(table_id, constraint_name, predicate)
+            }
+            // Non-partial unique constraint
+            (true, _, None) => ctx
+                .schema
                 .describer_schema
-                .push_unique_constraint(table_id, constraint_name)
-        } else if index.is_fulltext() {
-            ctx.schema
+                .push_unique_constraint(table_id, constraint_name),
+            // Fulltext index (cannot be partial)
+            (_, true, _) => ctx
+                .schema
                 .describer_schema
-                .push_fulltext_index(table_id, constraint_name)
-        } else {
-            ctx.schema.describer_schema.push_index(table_id, constraint_name)
+                .push_fulltext_index(table_id, constraint_name),
+            // Partial normal index
+            (false, false, Some(predicate)) => {
+                ctx.schema
+                    .describer_schema
+                    .push_partial_index(table_id, constraint_name, predicate)
+            }
+            // Non-partial normal index
+            (false, false, None) => ctx.schema.describer_schema.push_index(table_id, constraint_name),
         };
 
         for sf in index.scalar_field_attributes() {
@@ -638,6 +657,9 @@ fn constant_expression_to_sql_default(expr: &ast::Expression, scalar_type: Scala
 
         // Handled before this function is called.
         ast::Expression::Function(_, _, _) => unreachable!(),
+
+        // Object expressions are not valid as default values.
+        ast::Expression::Object(_, _) => unreachable!(),
     }
 }
 

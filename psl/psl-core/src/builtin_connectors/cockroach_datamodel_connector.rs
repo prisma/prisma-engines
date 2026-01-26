@@ -64,7 +64,8 @@ const CAPABILITIES: ConnectorCapabilities = enumflags2::make_bitflags!(Connector
     SupportsFiltersOnRelationsWithoutJoins |
     LateralJoin |
     SupportsDefaultInInsert |
-    SupportsTxIsolationReadCommitted
+    SupportsTxIsolationReadCommitted |
+    PartialIndex
 });
 
 const DATE_TIME_DEFAULT: CockroachType = CockroachType::Timestamp(Some(3));

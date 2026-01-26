@@ -96,6 +96,8 @@ pub(crate) trait IndexAssert {
     fn assert_mapped_name(&self, name: &str) -> &Self;
     fn assert_clustered(&self, clustered: bool) -> &Self;
     fn assert_type(&self, r#type: IndexAlgorithm) -> &Self;
+    fn assert_where_clause(&self, predicate: &str) -> &Self;
+    fn assert_no_where_clause(&self) -> &Self;
 }
 
 pub(crate) trait IndexFieldAssert {
@@ -499,6 +501,18 @@ impl IndexAssert for walkers::IndexWalker<'_> {
         assert_eq!(Some(r#type), self.algorithm());
         self
     }
+
+    #[track_caller]
+    fn assert_where_clause(&self, predicate: &str) -> &Self {
+        assert_eq!(Some(predicate.to_string()), self.where_clause_as_sql());
+        self
+    }
+
+    #[track_caller]
+    fn assert_no_where_clause(&self) -> &Self {
+        assert!(self.where_clause_as_sql().is_none());
+        self
+    }
 }
 
 impl IndexFieldAssert for walkers::ScalarFieldAttributeWalker<'_> {
@@ -734,5 +748,16 @@ impl IndexAssert for walkers::PrimaryKeyWalker<'_> {
     #[track_caller]
     fn assert_type(&self, _type: IndexAlgorithm) -> &Self {
         unreachable!("Primary key cannot define the index type.");
+    }
+
+    #[track_caller]
+    fn assert_where_clause(&self, _predicate: &str) -> &Self {
+        unreachable!("Primary key cannot define a where clause.");
+    }
+
+    #[track_caller]
+    fn assert_no_where_clause(&self) -> &Self {
+        // Primary keys never have a where clause
+        self
     }
 }

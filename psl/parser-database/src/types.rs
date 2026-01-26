@@ -528,6 +528,54 @@ pub enum IndexType {
     Fulltext,
 }
 
+#[derive(Debug, Clone, PartialEq)]
+pub(crate) enum WhereCondition {
+    IsNull,
+    IsNotNull,
+    Equals(WhereValue),
+    NotEquals(WhereValue),
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub(crate) enum WhereValue {
+    String(StringId),
+    Number(StringId),
+    Boolean(bool),
+}
+
+impl WhereValue {
+    pub(crate) fn to_sql(&self, db: &ParserDatabase) -> String {
+        match self {
+            WhereValue::String(s) => format!("'{}'", db[*s].replace('\'', "''")),
+            WhereValue::Number(n) => db[*n].to_string(),
+            WhereValue::Boolean(b) => b.to_string(),
+        }
+    }
+}
+
+impl WhereCondition {
+    pub(crate) fn to_sql(&self, field_name: &str, db: &ParserDatabase) -> String {
+        match self {
+            WhereCondition::IsNull => format!("\"{field_name}\" IS NULL"),
+            WhereCondition::IsNotNull => format!("\"{field_name}\" IS NOT NULL"),
+            WhereCondition::Equals(v) => format!("\"{field_name}\" = {}", v.to_sql(db)),
+            WhereCondition::NotEquals(v) => format!("\"{field_name}\" != {}", v.to_sql(db)),
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
+pub(crate) struct WhereFieldCondition {
+    pub(crate) field_name: StringId,
+    pub(crate) condition: WhereCondition,
+}
+
+#[derive(Debug, Clone)]
+pub(crate) enum WhereClause {
+    Raw(StringId),
+    Object(Vec<WhereFieldCondition>),
+}
+
 #[derive(Debug, Default)]
 pub(crate) struct IndexAttribute {
     pub(crate) r#type: IndexType,
@@ -537,6 +585,7 @@ pub(crate) struct IndexAttribute {
     pub(crate) mapped_name: Option<StringId>,
     pub(crate) algorithm: Option<IndexAlgorithm>,
     pub(crate) clustered: Option<bool>,
+    pub(crate) where_clause: Option<WhereClause>,
 }
 
 impl IndexAttribute {
