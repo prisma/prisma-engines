@@ -695,6 +695,8 @@ pub(super) struct EnumAttributes {
     pub(super) mapped_name: Option<StringId>,
     /// @map on enum values.
     pub(super) mapped_values: HashMap<EnumValueId, StringId>,
+    /// @ignore on enum values.
+    pub(super) ignored_values: std::collections::HashSet<EnumValueId>,
     /// ```ignore
     /// @@schema("public")
     ///          ^^^^^^^^
