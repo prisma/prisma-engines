@@ -207,7 +207,7 @@ impl QueryDocumentParser {
                 };
 
                 // If optional and not present ignore the field.
-                // If present, parse normally.
+                // If present or has a default, process the value.
                 // If not present but required, throw a validation error.
                 match selection_arg {
                     Some((name, value)) => Some(validate_other_required_args(&name).and_then(|_| {

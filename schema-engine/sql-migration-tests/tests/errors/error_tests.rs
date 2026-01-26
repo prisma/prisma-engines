@@ -472,22 +472,20 @@ async fn connection_string_problems_give_a_nice_error() {
         let json_error = serde_json::to_value(error.to_user_facing()).unwrap();
 
         let details = match provider {
-            "sqlserver" => {
-                indoc!(
-                    "Error parsing connection string: Conversion error: invalid digit found in string in database URL.
-                    Please refer to the documentation in https://www.prisma.io/docs/reference/database-reference/connection-urls
+            "sqlserver" => indoc!(
+                "Error parsing connection string: Conversion error: invalid digit found in string in database URL.
+                    Please refer to the documentation in https://pris.ly/d/config-url
                     for constructing a correct connection string. In some cases, certain characters must be escaped.
                     Please check the string for any illegal characters.",
-                ).replace('\n', " ")
-            },
-            _ => {
-                indoc!(
-                    "invalid port number in database URL.
-                    Please refer to the documentation in https://www.prisma.io/docs/reference/database-reference/connection-urls
+            )
+            .replace('\n', " "),
+            _ => indoc!(
+                "invalid port number in database URL.
+                    Please refer to the documentation in https://pris.ly/d/config-url
                     for constructing a correct connection string. In some cases, certain characters must be escaped.
                     Please check the string for any illegal characters.",
-                ).replace('\n', " ")
-            }
+            )
+            .replace('\n', " "),
         };
 
         let expected = json!({

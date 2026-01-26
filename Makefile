@@ -5,7 +5,7 @@ CONFIG_FILE = .test_config
 DEV_SCHEMA_FILE = dev_datamodel.prisma
 PRISMA_BRANCH ?= main
 ENGINE_SIZE_OUTPUT ?= /dev/stdout
-QC_WASM_VERSION ?= 0.0.0
+QE_WASM_VERSION ?= 0.0.0
 SCHEMA_WASM_VERSION ?= 0.0.0
 
 LIBRARY_EXT := $(shell                            \
@@ -58,15 +58,19 @@ build-se-wasm:
 	cd schema-engine/schema-engine-wasm && \
 	./build.sh $(SCHEMA_ENGINE_WASM_VERSION) schema-engine/schema-engine-wasm/pkg
 
-build-qc-wasm:
+build-qc-wasm-%:
 	cd query-compiler/query-compiler-wasm && \
-	./build.sh $(QC_WASM_VERSION) query-compiler/query-compiler-wasm/pkg
+	./build.sh $(QE_WASM_VERSION) query-compiler/query-compiler-wasm/pkg $*
 
-build-qc-wasm-gz: build-qc-wasm
-	@cd query-compiler/query-compiler-wasm/pkg && \
+build-qc-wasm: build-qc-wasm-fast build-qc-wasm-small
+
+build-qc-gz-%: build-qc-wasm-%
+		@cd query-compiler/query-compiler-wasm/pkg && \
     for provider in postgresql mysql sqlite sqlserver cockroachdb; do \
-        gzip -knc $$provider/query_compiler_bg.wasm > $$provider.gz; \
+        gzip -knc $$provider/query_compiler_$*_bg.wasm > $${provider}_$*.gz; \
     done;
+
+build-qc-gz: build-qc-gz-fast build-qc-gz-small
 
 build-schema-wasm:
 	@printf '%s\n' "🛠️  Building the Rust crate"
@@ -135,6 +139,34 @@ check-schema-wasm-package: build-schema-wasm
 	NODE=$(shell which node) \
 	./prisma-schema-wasm/scripts/check.sh
 
+######################
+# Benchmark commands #
+######################
+
+# Run query compiler benchmarks
+bench-qc:
+	cargo bench -p query-compiler --profile profiling
+
+# Run query graph building benchmarks
+bench-qc-graph:
+	cargo bench -p core-tests --profile profiling --bench query_graph_bench
+
+# Run schema building benchmarks
+bench-schema:
+	cargo bench -p schema --profile profiling --bench schema_builder_bench
+
+# Save benchmark baseline (usage: make bench-baseline NAME=main)
+bench-qc-baseline:
+	cargo bench -p query-compiler --profile profiling -- --save-baseline $(NAME)
+
+# Compare against baseline (usage: make bench-compare NAME=main)
+bench-qc-compare:
+	cargo bench -p query-compiler --profile profiling -- --baseline $(NAME)
+
+# Run profile_query example for profiling
+profile-qc:
+	cargo run -p query-compiler --example profile_query --profile profiling
+
 ###########################
 # Database setup commands #
 ###########################
@@ -150,17 +182,17 @@ start-sqlite:
 dev-sqlite:
 	cp $(CONFIG_PATH)/sqlite $(CONFIG_FILE)
 
-dev-libsql-qc: build-qc-wasm build-driver-adapters-kit-qc
+dev-libsql-qc: build-qc-wasm-fast build-driver-adapters-kit-qc
 	cp $(CONFIG_PATH)/libsql-qc $(CONFIG_FILE)
 
 test-libsql-qc: dev-libsql-qc test-qe-st
 
-dev-better-sqlite3-qc: build-qc-wasm build-driver-adapters-kit-qc
+dev-better-sqlite3-qc: build-qc-wasm-fast build-driver-adapters-kit-qc
 	cp $(CONFIG_PATH)/better-sqlite3-qc $(CONFIG_FILE)
 
 test-better-sqlite3-qc: dev-better-sqlite3-qc test-qe-st
 
-dev-d1-qc: build-qc-wasm build-driver-adapters-kit-qc
+dev-d1-qc: build-qc-wasm-fast build-driver-adapters-kit-qc
 	cp $(CONFIG_PATH)/d1-qc $(CONFIG_FILE)
 
 test-d1-qc: dev-d1-qc test-qe-st
@@ -177,7 +209,7 @@ start-postgres13:
 dev-postgres13: start-postgres13
 	cp $(CONFIG_PATH)/postgres13 $(CONFIG_FILE)
 
-dev-pg-qc: start-postgres13 build-qc-wasm build-driver-adapters-kit-qc
+dev-pg-qc: start-postgres13 build-qc-wasm-fast build-driver-adapters-kit-qc
 	cp $(CONFIG_PATH)/pg-qc $(CONFIG_FILE)
 
 dev-pg-qc-join:
@@ -197,7 +229,7 @@ test-pg-qc-query:
 start-pg-bench:
 	docker compose -f libs/driver-adapters/executor/bench/docker-compose.yml up --wait -d --remove-orphans postgres
 
-dev-pg-cockroachdb-qc: start-cockroach_23_1 build-qc-wasm build-driver-adapters-kit-qc
+dev-pg-cockroachdb-qc: start-cockroach_23_1 build-qc-wasm-fast build-driver-adapters-kit-qc
 	cp $(CONFIG_PATH)/pg-cockroachdb-qc $(CONFIG_FILE)
 
 dev-pg-cockroachdb-qc-join:
@@ -219,7 +251,7 @@ bench-pg-js: setup-pg-bench run-bench
 start-neon:
 	docker compose -f docker-compose.yml up --wait -d --remove-orphans neon-proxy
 
-dev-neon-qc: start-neon build-qc-wasm build-driver-adapters-kit-qc
+dev-neon-qc: start-neon build-qc-wasm-fast build-driver-adapters-kit-qc
 	cp $(CONFIG_PATH)/neon-qc $(CONFIG_FILE)
 
 dev-neon-qc-join:
@@ -329,7 +361,7 @@ start-mssql_edge:
 dev-mssql_edge: start-mssql_edge
 	cp $(CONFIG_PATH)/sqlserver2019 $(CONFIG_FILE)
 
-dev-mssql-qc: start-mssql_2022 build-qc-wasm build-driver-adapters-kit-qc
+dev-mssql-qc: start-mssql_2022 build-qc-wasm-fast build-driver-adapters-kit-qc
 	cp $(CONFIG_PATH)/sqlserver-qc $(CONFIG_FILE)
 
 test-mssql-qc: dev-mssql-qc test-qe
@@ -381,17 +413,17 @@ dev-vitess_8_0: start-vitess_8_0
 start-planetscale:
 	docker compose -f docker-compose.yml up -d --remove-orphans planetscale-proxy
 
-dev-planetscale-qc: start-planetscale build-qc-wasm build-driver-adapters-kit-qc
+dev-planetscale-qc: start-planetscale build-qc-wasm-fast build-driver-adapters-kit-qc
 	cp $(CONFIG_PATH)/planetscale-qc $(CONFIG_FILE)
 
 test-planetscale-qc: dev-planetscale-qc test-qe-st
 
-dev-mariadb-mysql-qc: start-mysql_8 build-qc-wasm build-driver-adapters-kit-qc
+dev-mariadb-mysql-qc: start-mysql_8 build-qc-wasm-fast build-driver-adapters-kit-qc
 	cp $(CONFIG_PATH)/mariadb-mysql-qc $(CONFIG_FILE)
 
 test-mariadb-mysql-qc: dev-mariadb-mysql-qc test-qe-st
 
-dev-mariadb-qc: start-mysql_mariadb build-qc-wasm build-driver-adapters-kit-qc
+dev-mariadb-qc: start-mysql_mariadb build-qc-wasm-fast build-driver-adapters-kit-qc
 	cp $(CONFIG_PATH)/mariadb-qc $(CONFIG_FILE)
 
 test-mariadb-qc: dev-mariadb-qc test-qe-st
@@ -400,11 +432,13 @@ test-mariadb-qc: dev-mariadb-qc test-qe-st
 # Local dev commands #
 ######################
 
-measure-qc-wasm: build-qc-wasm-gz
+measure-qc-wasm: measure-qc-wasm-fast measure-qc-wasm-small
+
+measure-qc-wasm-%: build-qc-gz-%
 	@cd query-compiler/query-compiler-wasm/pkg; \
 	for provider in postgresql mysql sqlite sqlserver cockroachdb; do \
-		echo "$${provider}_qc_size=$$(cat $$provider/query_compiler_bg.wasm | wc -c | tr -d ' ')" >> $(ENGINE_SIZE_OUTPUT); \
-		echo "$${provider}_qc_size_gz=$$(cat $$provider.gz | wc -c | tr -d ' ')" >> $(ENGINE_SIZE_OUTPUT); \
+		echo "$${provider}_$*_qc_size=$$(cat $$provider/query_compiler_$*_bg.wasm | wc -c | tr -d ' ')" >> $(ENGINE_SIZE_OUTPUT); \
+		echo "$${provider}_$*_qc_size_gz=$$(cat $${provider}_$*.gz | wc -c | tr -d ' ')" >> $(ENGINE_SIZE_OUTPUT); \
 	done;
 
 install-driver-adapters-kit-deps: build-driver-adapters

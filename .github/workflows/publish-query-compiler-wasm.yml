@@ -38,7 +38,7 @@ jobs:
       - name: Build @prisma/query-compiler-wasm
         run: make build-qc-wasm-fast build-qc-wasm-small
         env:
-          QC_WASM_VERSION: ${{ github.event.inputs.packageVersion }}
+          QE_WASM_VERSION: ${{ github.event.inputs.packageVersion }}
 
       - name: Install Node.js
         uses: actions/setup-node@v4

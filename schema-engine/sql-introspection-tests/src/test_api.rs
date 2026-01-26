@@ -381,8 +381,7 @@ impl TestApi {
         let provider = &self.args.provider();
         let datasource_block = format!(
             r#"datasource db {{
-                 provider = "{provider}"
-                 {namespaces}{relation_mode}
+                 provider = "{provider}"{namespaces}{relation_mode}
                }}"#,
         );
         datasource_block
