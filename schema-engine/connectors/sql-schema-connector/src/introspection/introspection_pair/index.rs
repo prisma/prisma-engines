@@ -161,6 +161,14 @@ impl<'a> IndexPair<'a> {
         }
     }
 
+    /// The predicate/WHERE clause for partial indexes.
+    pub(crate) fn predicate(self) -> Option<String> {
+        match self.next {
+            Some(next) => next.predicate().map(|s| s.to_owned()),
+            None => self.previous.and_then(|prev| prev.where_clause_as_sql()),
+        }
+    }
+
     fn defined_in_a_field(self) -> bool {
         if !matches!(self.index_type(), sql::IndexType::Unique) {
             return false;

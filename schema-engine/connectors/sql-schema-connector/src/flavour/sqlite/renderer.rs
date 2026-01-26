@@ -37,13 +37,19 @@ impl SqlRenderer for SqliteRenderer {
             rendered
         });
 
-        let index_create = format!(
+        let mut index_create = format!(
             "CREATE {index_type}INDEX {index_name} ON {table_reference}({columns})",
             index_type = index_type,
             index_name = index_name,
             table_reference = table_reference,
             columns = columns.join(", ")
         );
+
+        // Add WHERE clause for partial indexes
+        if let Some(predicate) = index.predicate() {
+            index_create.push_str(" WHERE ");
+            index_create.push_str(predicate);
+        }
 
         if index.name().starts_with("sqlite_") {
             formatdoc!(

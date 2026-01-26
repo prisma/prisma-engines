@@ -347,6 +347,7 @@ pub struct CreateIndex<'a> {
     pub table_reference: &'a dyn Display,
     pub columns: Vec<IndexColumn<'a>>,
     pub using: Option<IndexAlgorithm>,
+    pub where_clause: Option<Cow<'a, str>>,
 }
 
 impl Display for CreateIndex<'_> {
@@ -388,7 +389,13 @@ impl Display for CreateIndex<'_> {
             })
             .join(", ", f)?;
 
-        f.write_str(")")
+        f.write_str(")")?;
+
+        if let Some(predicate) = &self.where_clause {
+            write!(f, " WHERE {}", predicate)?;
+        }
+
+        Ok(())
     }
 }
 
@@ -432,6 +439,7 @@ mod tests {
             table_reference: &PostgresIdentifier::Simple(Cow::Borrowed("Cat")),
             columns,
             using: None,
+            where_clause: None,
         };
 
         assert_eq!(
@@ -450,6 +458,7 @@ mod tests {
             table_reference: &PostgresIdentifier::Simple(Cow::Borrowed("Cat")),
             columns,
             using: Some(IndexAlgorithm::Hash),
+            where_clause: None,
         };
 
         assert_eq!(
@@ -479,11 +488,31 @@ mod tests {
             table_reference: &PostgresIdentifier::Simple("Cat".into()),
             columns,
             using: None,
+            where_clause: None,
         };
 
         assert_eq!(
             create_index.to_string(),
             "CREATE UNIQUE INDEX \"meow_idx\" ON \"Cat\"(\"name\" ASC, \"age\" DESC)"
+        )
+    }
+
+    #[test]
+    fn create_partial_unique_index() {
+        let columns = vec![IndexColumn::new("name")];
+
+        let create_index = CreateIndex {
+            is_unique: true,
+            index_name: "meow_idx".into(),
+            table_reference: &PostgresIdentifier::Simple(Cow::Borrowed("Cat")),
+            columns,
+            using: None,
+            where_clause: Some("status = 'active'".into()),
+        };
+
+        assert_eq!(
+            create_index.to_string(),
+            "CREATE UNIQUE INDEX \"meow_idx\" ON \"Cat\"(\"name\") WHERE status = 'active'"
         )
     }
 

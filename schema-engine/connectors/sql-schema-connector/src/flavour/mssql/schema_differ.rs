@@ -22,10 +22,11 @@ impl SqlSchemaDifferFlavour for MssqlSchemaDifferFlavour {
         let mssql_ext_next: &MssqlSchemaExt = b.schema.downcast_connector_data();
 
         mssql_ext_previous.index_is_clustered(a.id) == mssql_ext_next.index_is_clustered(b.id)
+            && a.predicate() == b.predicate()
     }
 
     fn should_skip_index_for_new_table(&self, index: sql::IndexWalker<'_>) -> bool {
-        index.is_unique()
+        index.is_unique() && index.predicate().is_none()
     }
 
     fn should_recreate_the_primary_key_on_column_recreate(&self) -> bool {

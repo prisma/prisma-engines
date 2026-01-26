@@ -108,5 +108,9 @@ fn render_unique(unique: IndexPair<'_>) -> renderer::UniqueFieldAttribute<'_> {
         opts.length(length);
     }
 
+    if let Some(predicate) = unique.predicate() {
+        opts.where_clause(predicate);
+    }
+
     opts
 }

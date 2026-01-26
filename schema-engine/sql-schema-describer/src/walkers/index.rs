@@ -53,4 +53,15 @@ impl<'a> IndexWalker<'a> {
     pub fn table(self) -> TableWalker<'a> {
         self.walk(self.get().table_id)
     }
+
+    /// The predicate for partial indexes (WHERE clause).
+    /// Returns `None` for non-partial indexes.
+    pub fn predicate(self) -> Option<&'a str> {
+        self.get().predicate.as_deref()
+    }
+
+    /// Returns true if this is a partial index (has a WHERE clause predicate).
+    pub fn is_partial(self) -> bool {
+        self.get().predicate.is_some()
+    }
 }
