@@ -43,16 +43,11 @@ pub static ENGINE_PROTOCOL: LazyLock<String> =
     LazyLock::new(|| std::env::var("PRISMA_ENGINE_PROTOCOL").unwrap_or_else(|_| "graphql".to_owned()));
 
 /// Teardown of a test setup.
-async fn teardown_project(
-    url: &str,
-    datamodel: &RenderedDatamodel,
-    db_schemas: &[&str],
-    schema_id: usize,
-) -> TestResult<()> {
+async fn teardown_project(datamodel: &RenderedDatamodel, db_schemas: &[&str], schema_id: usize) -> TestResult<()> {
     let params = serde_json::json!({ "schemaId": schema_id });
     executor_process_request::<serde_json::Value>("teardown", params).await?;
 
-    Ok(qe_setup::teardown(url, &datamodel.schema, db_schemas).await?)
+    Ok(qe_setup::teardown(&datamodel.url, &datamodel.schema, db_schemas).await?)
 }
 
 /// Helper method to allow a sync shell function to run the async test blocks.
@@ -181,15 +176,15 @@ fn run_relation_link_test_impl(
                 continue;
             }
 
-            let url = connection_string(&version, &test_db_name, false, None);
-            let datamodel = render_test_datamodel(template, &[], None, &[], &[]);
+            let datamodel = render_test_datamodel(&test_db_name, template, &[], None, Default::default(), Default::default(), None);
+            let (connector_tag, version) = CONFIG.test_connector().unwrap();
             let (log_capture, log_tx) = TestLogCapture::new();
 
             run_with_tokio(
                 async move {
                     println!("Used datamodel:\n {}", datamodel.schema.yellow());
                     let override_local_max_bind_values = None;
-                    let runner = Runner::load(&url, &datamodel, &[], version, connector, override_local_max_bind_values, log_capture)
+                    let runner = Runner::load(&datamodel, &[], version, connector_tag, override_local_max_bind_values, log_capture)
                         .await
                         .unwrap();
 
@@ -199,7 +194,7 @@ fn run_relation_link_test_impl(
                     ))
                     .await.unwrap();
 
-                    teardown_project(&url, &datamodel, &[], runner.schema_id())
+                    teardown_project(&datamodel, Default::default(), runner.schema_id())
                         .await
                         .unwrap();
 
@@ -308,15 +303,15 @@ fn run_connector_test_impl(
         return;
     }
 
-    let url = connection_string(&version, test_database_name, !db_schemas.is_empty(), None);
-
     let template = handler();
     let datamodel = crate::render_test_datamodel(
+        test_database_name,
         template,
         excluded_features,
         referential_override,
         db_schemas,
         db_extensions,
+        None,
     );
     let (connector_tag, version) = CONFIG.test_connector().unwrap();
 
@@ -326,7 +321,6 @@ fn run_connector_test_impl(
         println!("Used datamodel:\n {}", datamodel.schema.yellow());
         let override_local_max_bind_values = None;
         let runner = Runner::load(
-            &url,
             &datamodel,
             db_schemas,
             version,
@@ -350,7 +344,7 @@ fn run_connector_test_impl(
             panic!("💥 Test failed due to an error (see above)");
         }
 
-        crate::teardown_project(&url, &datamodel, db_schemas, schema_id)
+        crate::teardown_project(&datamodel, db_schemas, schema_id)
             .await
             .unwrap();
     });

@@ -22,20 +22,18 @@ jobs:
 
       - uses: ./.github/workflows/include/rust-wasm-setup
 
-      - name: Build Wasm modules
+      - name: Build WASM modules
         env:
           WASM_BUILD_PROFILE: release
           PKG_DIR: query-compiler/query-compiler-wasm/pkg
           TARGET_DIR: target/query-compiler-wasm
         run: |
-          make build-qc-gz
+          make build-qc-wasm-gz
           mkdir -p $TARGET_DIR
 
           for provider in "postgresql" "mysql" "sqlite" "sqlserver" "cockroachdb"; do
-            for build in "fast" "small"; do
-              cp $PKG_DIR/$provider/query_compiler_${build}_bg.wasm $TARGET_DIR/query-compiler-$build-$provider.wasm
-              cp $PKG_DIR/${provider}_${build}.gz $TARGET_DIR/query-compiler-$build-$provider.wasm.gz
-            done
+            cp $PKG_DIR/$provider/query_compiler_bg.wasm $TARGET_DIR/query-compiler-$provider.wasm
+            cp $PKG_DIR/$provider.gz $TARGET_DIR/query-compiler-$provider.wasm.gz
           done
 
       - name: Check out gh-pages branch
@@ -46,7 +44,16 @@ jobs:
       - name: Update engines size
         run: |
           files=(
-            target/query-compiler-wasm/query-compiler-{fast,small}-{postgresql,mysql,sqlite,sqlserver,cockroachdb}.{wasm,wasm.gz}
+            target/query-compiler-wasm/query-compiler-postgresql.wasm.gz
+            target/query-compiler-wasm/query-compiler-postgresql.wasm
+            target/query-compiler-wasm/query-compiler-mysql.wasm.gz
+            target/query-compiler-wasm/query-compiler-mysql.wasm
+            target/query-compiler-wasm/query-compiler-sqlite.wasm.gz
+            target/query-compiler-wasm/query-compiler-sqlite.wasm
+            target/query-compiler-wasm/query-compiler-sqlserver.wasm.gz
+            target/query-compiler-wasm/query-compiler-sqlserver.wasm
+            target/query-compiler-wasm/query-compiler-cockroachdb.wasm.gz
+            target/query-compiler-wasm/query-compiler-cockroachdb.wasm
           )
 
           DATE_TIME="$(date -u --iso-8601=seconds)"

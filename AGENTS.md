@@ -3,7 +3,8 @@
 ## 1. Big Picture
 - This repo hosts the **Prisma Engines**: PSL (schema parser/validator), schema-engine (migrate, introspect), query components (query compiler, driver adapters, compatibility harnesses), and utilities shared with Prisma Client.
 - Prisma 7 roadmap status:
-  - `url`, `directUrl` and `shadowDatabaseUrl` are **invalid** in PSL.
+  - `directUrl` and `shadowDatabaseUrl` are **invalid** in PSL.
+  - `url` remains temporarily while downstream tooling finishes migrating to external datasource overrides; removal is tracked separately.
   - CLI/tests override connection info via schema-engine CLI (`--datasource`) or shared `TestApi::new_engine_with_connection_strings`.
   - Reference commit: `34b5a692b7bd79939a9a2c3ef97d816e749cda2f` (driver adapter override plumbing).
 - Prisma has removed the **native Rust query engine** in favor of the **Query Compiler (QC)** architecture:
@@ -21,7 +22,7 @@ Key directories:
 - `prisma-fmt/` – Language server & formatter entry point (tests rely on `expect!` snapshots).
 - `schema-engine/sql-migration-tests` / `sql-introspection-tests` – Heavy integration suites (require DBs).
 - `query-engine/` – Unused MongoDB connector crate left for future reference and the connector test kit (integration tests exercise QC through the driver adapter executor here).
-- `query-compiler/` – Query planner + associated Wasm, playground, and the new `core-tests` crate.
+- `query-compiler/` – Query planner + associated WASM, playground, and the new `core-tests` crate.
 - `libs/` – Shared libraries (value types, driver adapters, test setup).
 - `driver-adapters/` – Rust-side adapter utilities for the new query interpreter.
 
@@ -100,7 +101,7 @@ Supporting infra:
 
 7. **Connector test kit (driver adapters + QC)**
    ```bash
-   make dev-pg-qc    # or another dev-*-qc helper; builds QC Wasm + driver adapters and writes .test_config
+   make dev-pg-qc    # or another dev-*-qc helper; builds QC WASM + driver adapters and writes .test_config
    cargo test -p query-engine-tests -- --nocapture
    ```
    Set `DRIVER_ADAPTER=<adapter>` (see Makefile) when you want to run against a specific adapter target. See `query-engine/connector-test-kit-rs/README.md` for env vars and adapter-specific notes.
@@ -143,7 +144,7 @@ Ensure diffs make sense and rerun without `UPDATE_EXPECT` to confirm.
   `rg "directUrl"`, `rg "shadowDatabaseUrl"`
 - Build schema-engine CLI:
   `cargo build -p schema-engine-cli`
-- Build query compiler Wasm:
+- Build query compiler WASM:
   `make build-qc-wasm`
 - Build driver adapters kit for QC:
   `make build-driver-adapters-kit-qc`
@@ -175,4 +176,3 @@ Prefer using Makefile targets that take care of setting up the environment corre
 ---
 
 **When modifying anything involving diagnostics or fixtures:** run relevant tests, refresh expectations, and ensure Git diffs are readable (no accidental CRLF/encoding swaps). Keep this file updated whenever we discover new traps.***
-s, and ensure Git diffs are readable (no accidental CRLF/encoding swaps). Keep this file updated whenever we discover new traps.***

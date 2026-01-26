@@ -4,7 +4,7 @@ use bigdecimal::{BigDecimal, ToPrimitive};
 use chrono::prelude::*;
 use core::fmt;
 use indexmap::{IndexMap, IndexSet};
-use query_structure::{DefaultKind, PrismaValue};
+use query_structure::PrismaValue;
 use std::{borrow::Cow, convert::TryFrom, rc::Rc, str::FromStr};
 use user_facing_errors::query_engine::validation::ValidationError;
 use uuid::Uuid;
@@ -182,19 +182,18 @@ impl QueryDocumentParser {
             .iter()
             .filter_map(|input_field| {
                 // Match schema argument field to an argument field in the incoming document.
-                let selection_arg = given_arguments
+                let selection_arg: Option<(String, ArgumentValue)> = given_arguments
                     .iter()
                     .find(|given_argument| given_argument.0 == input_field.name)
-                    .map(|(_, value)| value)
                     .cloned();
 
                 let argument_path = argument_path.add(input_field.name.clone().into_owned());
 
-                let validate_other_required_args = || {
+                let validate_other_required_args = |name: &str| {
                     for req_name in input_field.requires_other_fields() {
                         if !given_arguments.iter().any(|(name, _)| name == req_name) {
                             let Some(req_field) = schema_field.arguments().iter().find(|f| f.name == *req_name) else {
-                                panic!("argument {} requires unknown argument {req_name}", input_field.name)
+                                panic!("argument {name} requires unknown argument {req_name}")
                             };
                             return Err(ValidationError::conditionally_required_argument_missing(
                                 &selection_path.segments(),
@@ -208,16 +207,10 @@ impl QueryDocumentParser {
                 };
 
                 // If optional and not present ignore the field.
-                // If present or has a default, process the value.
+                // If present, parse normally.
                 // If not present but required, throw a validation error.
-                match selection_arg.or_else(|| {
-                    input_field
-                        .default_value
-                        .as_ref()
-                        .and_then(DefaultKind::get)
-                        .map(ArgumentValue::from)
-                }) {
-                    Some(value) => Some(validate_other_required_args().and_then(|_| {
+                match selection_arg {
+                    Some((name, value)) => Some(validate_other_required_args(&name).and_then(|_| {
                         self.parse_input_value(
                             selection_path.clone(),
                             argument_path,

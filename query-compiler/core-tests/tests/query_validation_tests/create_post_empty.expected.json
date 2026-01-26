@@ -1,42 +1,143 @@
 {
   "is_panic": false,
-  "message": "Unable to match input value to any allowed input type for the field. Parse errors: [`data.published`: A value is required but not set, `data.published`: A value is required but not set]",
+  "message": "`data`: A value is required but not set",
   "meta": {
-    "kind": "Union",
-    "errors": [
+    "kind": "RequiredArgumentMissing",
+    "inputTypes": [
       {
-        "kind": "RequiredArgumentMissing",
-        "inputTypes": [
+        "kind": "object",
+        "name": "PostCreateInput",
+        "fields": [
           {
-            "kind": "scalar",
-            "name": "Boolean"
+            "name": "id",
+            "typeNames": [
+              "String"
+            ],
+            "required": false
+          },
+          {
+            "name": "createdAt",
+            "typeNames": [
+              "DateTime"
+            ],
+            "required": false
+          },
+          {
+            "name": "updatedAt",
+            "typeNames": [
+              "DateTime"
+            ],
+            "required": false
+          },
+          {
+            "name": "published",
+            "typeNames": [
+              "Boolean"
+            ],
+            "required": true
+          },
+          {
+            "name": "title",
+            "typeNames": [
+              "String"
+            ],
+            "required": true
+          },
+          {
+            "name": "content",
+            "typeNames": [
+              "String",
+              "Null"
+            ],
+            "required": false
+          },
+          {
+            "name": "author",
+            "typeNames": [
+              "UserCreateNestedOneWithoutPostsInput"
+            ],
+            "required": false
+          },
+          {
+            "name": "Like",
+            "typeNames": [
+              "LikeCreateNestedManyWithoutPostInput"
+            ],
+            "required": false
           }
-        ],
-        "argumentPath": [
-          "data",
-          "published"
-        ],
-        "selectionPath": [
-          "createOnePost"
         ]
       },
       {
-        "kind": "RequiredArgumentMissing",
-        "inputTypes": [
+        "kind": "object",
+        "name": "PostUncheckedCreateInput",
+        "fields": [
           {
-            "kind": "scalar",
-            "name": "Boolean"
+            "name": "id",
+            "typeNames": [
+              "String"
+            ],
+            "required": false
+          },
+          {
+            "name": "createdAt",
+            "typeNames": [
+              "DateTime"
+            ],
+            "required": false
+          },
+          {
+            "name": "updatedAt",
+            "typeNames": [
+              "DateTime"
+            ],
+            "required": false
+          },
+          {
+            "name": "published",
+            "typeNames": [
+              "Boolean"
+            ],
+            "required": true
+          },
+          {
+            "name": "title",
+            "typeNames": [
+              "String"
+            ],
+            "required": true
+          },
+          {
+            "name": "content",
+            "typeNames": [
+              "String",
+              "Null"
+            ],
+            "required": false
+          },
+          {
+            "name": "authorId",
+            "typeNames": [
+              "String",
+              "Null"
+            ],
+            "required": false
+          },
+          {
+            "name": "Like",
+            "typeNames": [
+              "LikeUncheckedCreateNestedManyWithoutPostInput"
+            ],
+            "required": false
           }
-        ],
-        "argumentPath": [
-          "data",
-          "published"
-        ],
-        "selectionPath": [
-          "createOnePost"
         ]
       }
+    ],
+    "argumentPath": [
+      "data"
+    ],
+    "selectionPath": [
+      "createOnePost"
     ]
   },
-  "error_code": "P2009"
+  "error_code": "P2012"
 }
