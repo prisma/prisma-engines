@@ -334,14 +334,11 @@ impl QueryDocumentParser {
                         try_this!(self.parse_enum(&selection_path, &argument_path, pv, et))
                     }
                     // Invalid combinations
-                    (_, input_type) => try_this!(Err(ValidationError::invalid_argument_type(
-                        selection_path.segments(),
-                        argument_path.segments(),
-                        conversions::input_type_to_argument_description(
-                            argument_path.last().unwrap_or_default(),
-                            input_type,
-                        ),
-                        conversions::argument_value_to_type_name(&value),
+                    (_, input_type) => try_this!(Err(invalid_argument_type_error(
+                        &selection_path,
+                        &argument_path,
+                        input_type,
+                        &value,
                     ))),
                 },
 
@@ -364,14 +361,11 @@ impl QueryDocumentParser {
                 ),
 
                 // Invalid combinations
-                (_, input_type) => try_this!(Err(ValidationError::invalid_argument_type(
-                    selection_path.segments(),
-                    argument_path.segments(),
-                    conversions::input_type_to_argument_description(
-                        argument_path.last().unwrap_or_default(),
-                        input_type,
-                    ),
-                    conversions::argument_value_to_type_name(&value),
+                (_, input_type) => try_this!(Err(invalid_argument_type_error(
+                    &selection_path,
+                    &argument_path,
+                    input_type,
+                    &value,
                 ))),
             };
         }
@@ -464,14 +458,11 @@ impl QueryDocumentParser {
             (pv @ PrismaValue::GeneratorCall { .. }, _) => Ok(pv),
 
             // All other combinations are value type mismatches.
-            (_, _) => Err(ValidationError::invalid_argument_type(
-                selection_path.segments(),
-                argument_path.segments(),
-                conversions::input_type_to_argument_description(
-                    argument_path.last().unwrap_or_default(),
-                    &InputType::Scalar(scalar_type),
-                ),
-                conversions::argument_value_to_type_name(argument_value),
+            (_, _) => Err(invalid_argument_type_error(
+                selection_path,
+                argument_path,
+                &InputType::Scalar(scalar_type),
+                argument_value,
             )),
         }
     }
@@ -858,6 +849,21 @@ fn prisma_value_type_matches_scalar_type(pv_type: &PrismaValueType, scalar_type:
         PrismaValueType::Bytes => scalar_type == ScalarType::Bytes,
         PrismaValueType::Any => true,
     }
+}
+
+#[inline(never)]
+fn invalid_argument_type_error(
+    selection_path: &Path,
+    argument_path: &Path,
+    input_type: &InputType<'_>,
+    argument_value: &ArgumentValue,
+) -> ValidationError {
+    ValidationError::invalid_argument_type(
+        selection_path.segments(),
+        argument_path.segments(),
+        conversions::input_type_to_argument_description(argument_path.last().unwrap_or_default(), input_type),
+        conversions::argument_value_to_type_name(argument_value),
+    )
 }
 
 pub(crate) mod conversions {
