@@ -821,12 +821,7 @@ impl<'a> Visitor<'a> for Mssql<'a> {
         unimplemented!("Full-text search is not yet supported on MSSQL")
     }
 
-    fn visit_matches(
-        &mut self,
-        _left: Expression<'a>,
-        _right: std::borrow::Cow<'a, str>,
-        _not: bool,
-    ) -> visitor::Result {
+    fn visit_matches(&mut self, _left: Expression<'a>, _right: Expression<'a>, _not: bool) -> visitor::Result {
         unimplemented!("Full-text search is not yet supported on MSSQL")
     }
 
