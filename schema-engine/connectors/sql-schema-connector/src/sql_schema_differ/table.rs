@@ -201,5 +201,6 @@ fn indexes_match(first: IndexWalker<'_>, second: IndexWalker<'_>, flavour: &dyn 
             names_match && lengths_match && orders_match
         })
         && first.index_type() == second.index_type()
+        && flavour.predicates_match(first.predicate(), second.predicate())
         && flavour.indexes_match(first, second)
 }

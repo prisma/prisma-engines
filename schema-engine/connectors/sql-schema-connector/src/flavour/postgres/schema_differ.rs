@@ -198,6 +198,13 @@ impl SqlSchemaDifferFlavour for PostgresSchemaDifferFlavour {
             })
     }
 
+    fn predicates_match(&self, a: Option<&str>, b: Option<&str>) -> bool {
+        if self.is_cockroachdb() {
+            return true;
+        }
+        a == b
+    }
+
     fn indexes_should_be_recreated_after_column_drop(&self) -> bool {
         true
     }

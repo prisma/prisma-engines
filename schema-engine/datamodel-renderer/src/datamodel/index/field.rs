@@ -139,6 +139,18 @@ impl<'a> UniqueFieldAttribute<'a> {
     pub fn map(&mut self, value: impl Into<Cow<'a, str>>) {
         self.0.push_param(("map", Text::new(value.into())))
     }
+
+    /// Define the where clause for partial unique indexes.
+    ///
+    /// ```ignore
+    /// @unique(where: raw("status = 'active'"))
+    /// //             ^^^^^^^^^^^^^^^^^^^^^^^^ here
+    /// ```
+    pub fn where_clause(&mut self, predicate: impl Into<Cow<'a, str>>) {
+        let mut raw_fn = crate::value::Function::new("raw");
+        raw_fn.push_param(crate::value::Value::Text(Text::new(predicate)));
+        self.0.push_param(("where", crate::value::Value::Function(raw_fn)));
+    }
 }
 
 impl fmt::Display for UniqueFieldAttribute<'_> {

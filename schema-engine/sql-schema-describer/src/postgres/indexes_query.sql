@@ -4,14 +4,14 @@ WITH rawindex AS (
         indexrelid,
         indisunique,
         indisprimary,
+        indpred,
         unnest(indkey) AS indkeyid,
         generate_subscripts(indkey, 1) AS indkeyidx,
         unnest(indclass) AS indclass,
         unnest(indoption) AS indoption
     FROM pg_index -- https://www.postgresql.org/docs/current/catalog-pg-index.html
     WHERE
-        indpred IS NULL -- filter out partial indexes
-        AND NOT indisexclusion -- filter out exclusion constraints
+        NOT indisexclusion -- filter out exclusion constraints
 )
 SELECT
     schemainfo.nspname AS namespace,
@@ -33,7 +33,8 @@ SELECT
         ELSE false END
         AS nulls_first,
     pc.condeferrable AS condeferrable,
-    pc.condeferred AS condeferred
+    pc.condeferred AS condeferred,
+    pg_get_expr(rawindex.indpred, rawindex.indrelid) AS predicate
 FROM
     rawindex
     INNER JOIN pg_class AS tableinfo ON tableinfo.oid = rawindex.indrelid

@@ -72,6 +72,7 @@ features!(
     OrderByAggregateGroup,
     OrderByNulls,
     OrderByRelation,
+    PartialIndexes,
     PostgresqlExtensions,
     PrismaSchemaFolder,
     QueryCompiler,
@@ -157,6 +158,7 @@ impl<'a> FeatureMapWithProvider<'a> {
         let feature_map: FeatureMap = FeatureMap {
             active: enumflags2::make_bitflags!(PreviewFeature::{
                  NativeDistinct
+                 | PartialIndexes
                  | PostgresqlExtensions
                  | RelationJoins
                  | SchemaEngineDriverAdapters

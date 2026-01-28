@@ -12,7 +12,8 @@ use crate::{
     context::Context,
     types::{
         CompositeTypeField, EnumAttributes, FieldWithArgs, IndexAlgorithm, IndexAttribute, IndexFieldPath, IndexType,
-        ModelAttributes, OperatorClassStore, RelationField, ScalarField, ScalarFieldType, SortOrder,
+        ModelAttributes, OperatorClassStore, RelationField, ScalarField, ScalarFieldType, SortOrder, WhereClause,
+        WhereCondition, WhereFieldCondition, WhereValue,
     },
     walkers::RelationFieldId,
 };
@@ -536,6 +537,7 @@ fn model_index(data: &mut ModelAttributes, model_id: crate::ModelId, ctx: &mut C
 
     index_attribute.algorithm = algo;
     index_attribute.clustered = validate_clustering_setting(ctx);
+    index_attribute.where_clause = parse_where_clause(model_id, ctx);
 
     data.ast_indexes.push((ctx.current_attribute_id().1, index_attribute));
 }
@@ -592,8 +594,149 @@ fn model_unique(data: &mut ModelAttributes, model_id: crate::ModelId, ctx: &mut 
     index_attribute.name = name;
     index_attribute.mapped_name = mapped_name;
     index_attribute.clustered = validate_clustering_setting(ctx);
+    index_attribute.where_clause = parse_where_clause(model_id, ctx);
 
     data.ast_indexes.push((current_attribute_id.1, index_attribute));
+}
+
+/// Parse the `where` argument for partial indexes.
+fn parse_where_clause(model_id: crate::ModelId, ctx: &mut Context<'_>) -> Option<WhereClause> {
+    let expression = ctx.visit_optional_arg("where")?;
+
+    // Object syntax: { field: value, ... }
+    if let Some((members, _span)) = expression.as_object() {
+        if members.is_empty() {
+            ctx.push_attribute_validation_error("The `where` argument cannot be an empty object.");
+            return None;
+        }
+
+        let mut conditions = Vec::new();
+
+        for member in members {
+            conditions.push(parse_where_object_member(member, model_id, ctx)?);
+        }
+
+        return Some(WhereClause::Object(conditions));
+    }
+
+    // raw("...") function call
+    if let Some(("raw", args)) = coerce::function(expression, ctx.diagnostics) {
+        return parse_raw_where_clause(args, ctx);
+    }
+
+    ctx.push_attribute_validation_error(
+        "The `where` argument must be either a raw() function call or an object literal, e.g. `where: raw(\"status = 'active'\")` or `where: { active: true }`.",
+    );
+
+    None
+}
+
+/// Parse raw("...") where clause.
+fn parse_raw_where_clause(args: &[ast::Argument], ctx: &mut Context<'_>) -> Option<WhereClause> {
+    let Some(first_arg) = args.first() else {
+        ctx.push_attribute_validation_error(
+            "The `where` argument must be a raw() function with a string argument, e.g. `where: raw(\"status = 'active'\")`.",
+        );
+        return None;
+    };
+
+    let Some(predicate) = coerce::string(&first_arg.value, ctx.diagnostics) else {
+        ctx.push_attribute_validation_error(
+            "The `where` argument must be a raw() function with a string argument, e.g. `where: raw(\"status = 'active'\")`.",
+        );
+        return None;
+    };
+
+    if predicate.is_empty() {
+        ctx.push_attribute_validation_error("The `where` argument cannot contain an empty string.");
+        return None;
+    }
+
+    Some(WhereClause::Raw(ctx.interner.intern(predicate)))
+}
+
+fn parse_where_object_member(
+    member: &ast::ObjectMember,
+    model_id: crate::ModelId,
+    ctx: &mut Context<'_>,
+) -> Option<WhereFieldCondition> {
+    let field_name_str = &member.key;
+    let ast_model = &ctx.asts[model_id];
+    let field_exists = ast_model.iter_fields().any(|(_, field)| field.name() == field_name_str);
+
+    if !field_exists {
+        ctx.push_attribute_validation_error(&format!(
+            "Field '{}' does not exist in model '{}'.",
+            field_name_str,
+            ast_model.name()
+        ));
+        return None;
+    }
+
+    let field_name = ctx.interner.intern(field_name_str);
+
+    let condition = match &member.value {
+        ast::Expression::ConstantValue(val, _) => match val.as_str() {
+            "true" => WhereCondition::Equals(WhereValue::Boolean(true)),
+            "false" => WhereCondition::Equals(WhereValue::Boolean(false)),
+            "null" => WhereCondition::IsNull,
+            other => {
+                ctx.push_attribute_validation_error(&format!(
+                    "Invalid value '{other}' in where clause. Expected true, false, null, a string, a number, or an object like {{ not: null }}."
+                ));
+                return None;
+            }
+        },
+        ast::Expression::StringValue(val, _) => WhereCondition::Equals(WhereValue::String(ctx.interner.intern(val))),
+        ast::Expression::NumericValue(val, _) => WhereCondition::Equals(WhereValue::Number(ctx.interner.intern(val))),
+        ast::Expression::Object(inner_members, _) => {
+            if inner_members.len() != 1 {
+                ctx.push_attribute_validation_error(
+                    "Nested object in where clause must have exactly one key. Use `{ not: null }` or `{ not: \"value\" }`.",
+                );
+                return None;
+            }
+
+            let inner = &inner_members[0];
+            if inner.key != "not" {
+                ctx.push_attribute_validation_error(&format!(
+                    "Unknown key '{}' in nested where clause object. Only 'not' is supported.",
+                    inner.key
+                ));
+                return None;
+            }
+
+            match &inner.value {
+                ast::Expression::ConstantValue(val, _) if val == "null" => WhereCondition::IsNotNull,
+                ast::Expression::StringValue(val, _) => {
+                    WhereCondition::NotEquals(WhereValue::String(ctx.interner.intern(val)))
+                }
+                ast::Expression::NumericValue(val, _) => {
+                    WhereCondition::NotEquals(WhereValue::Number(ctx.interner.intern(val)))
+                }
+                ast::Expression::ConstantValue(val, _) if val == "true" => {
+                    WhereCondition::NotEquals(WhereValue::Boolean(true))
+                }
+                ast::Expression::ConstantValue(val, _) if val == "false" => {
+                    WhereCondition::NotEquals(WhereValue::Boolean(false))
+                }
+                _ => {
+                    ctx.push_attribute_validation_error(
+                        "Invalid value for 'not' in where clause. Expected null, a string, a number, or a boolean.",
+                    );
+                    return None;
+                }
+            }
+        }
+        _ => {
+            ctx.push_attribute_validation_error(
+                "Invalid value in where clause. Expected true, false, null, a string, a number, or an object like { not: null }.",
+            );
+            return None;
+        }
+    };
+
+    Some(WhereFieldCondition { field_name, condition })
 }
 
 fn common_index_validations(

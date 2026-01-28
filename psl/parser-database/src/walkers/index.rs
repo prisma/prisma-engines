@@ -3,7 +3,7 @@ use either::Either;
 use super::CompositeTypeFieldWalker;
 use crate::{
     ParserDatabase, ScalarFieldType, ast,
-    types::{IndexAlgorithm, IndexAttribute},
+    types::{IndexAlgorithm, IndexAttribute, WhereClause},
     walkers::{ModelWalker, ScalarFieldAttributeWalker, ScalarFieldWalker},
 };
 
@@ -175,6 +175,38 @@ impl<'db> IndexWalker<'db> {
     /// matters on SQL Server where one can change the clustering.
     pub fn clustered(self) -> Option<bool> {
         self.index_attribute.clustered
+    }
+
+    /// The raw SQL predicate for partial indexes.
+    pub fn where_clause(self) -> Option<&'db str> {
+        match &self.index_attribute.where_clause {
+            Some(WhereClause::Raw(id)) => Some(&self.db[*id]),
+            _ => None,
+        }
+    }
+
+    /// Returns true if this is a partial index (has a WHERE clause).
+    pub fn is_partial(self) -> bool {
+        self.index_attribute.where_clause.is_some()
+    }
+
+    /// Converts the WHERE clause to a SQL predicate string.
+    pub fn where_clause_as_sql(self) -> Option<String> {
+        match &self.index_attribute.where_clause {
+            Some(WhereClause::Raw(id)) => Some(self.db[*id].to_string()),
+            Some(WhereClause::Object(conditions)) => {
+                let sql = conditions
+                    .iter()
+                    .map(|field_condition| {
+                        let field_name = &self.db[field_condition.field_name];
+                        field_condition.condition.to_sql(field_name, self.db)
+                    })
+                    .collect::<Vec<_>>()
+                    .join(" AND ");
+                Some(sql)
+            }
+            None => None,
+        }
     }
 
     /// The model the index is defined on.
