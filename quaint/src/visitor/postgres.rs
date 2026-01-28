@@ -667,7 +667,7 @@ impl<'a> Visitor<'a> for Postgres<'a> {
             Ok(())
         })?;
         self.write(", ")?;
-        self.surround_with("to_tsquery(", ")", |s| s.visit_parameterized(Value::text(query)))?;
+        self.surround_with("to_tsquery(", ")", |s| s.visit_expression(query))?;
         self.write(")")?;
 
         Ok(())

@@ -1,4 +1,5 @@
 use crate::{CompositeFieldRef, RelationFieldRef, ScalarFieldRef};
+use prisma_value::PrismaValue;
 use std::fmt::Display;
 
 #[derive(Clone, Copy, PartialEq, Debug, Eq, Hash)]
@@ -101,7 +102,7 @@ impl OrderBy {
 
     pub fn relevance(
         fields: Vec<ScalarFieldRef>,
-        search: String,
+        search: PrismaValue,
         sort_order: SortOrder,
         path: Vec<OrderByHop>,
     ) -> Self {
@@ -206,7 +207,7 @@ impl OrderByToManyAggregation {
 pub struct OrderByRelevance {
     pub fields: Vec<ScalarFieldRef>,
     pub sort_order: SortOrder,
-    pub search: String,
+    pub search: PrismaValue,
     pub path: Vec<OrderByHop>,
 }
 
