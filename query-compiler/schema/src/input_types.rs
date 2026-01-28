@@ -217,7 +217,6 @@ impl<'a> InputField<'a> {
     /// Parameterizable fields can have their values substituted with placeholders
     /// for query plan caching. This is typically used for filter values and data
     /// fields, but not for structural fields like `take`, `skip`, `orderBy`, etc.
-    #[allow(dead_code)] // Used in a follow-up change
     pub(crate) fn parameterizable(mut self) -> Self {
         self.is_parameterizable = true;
         self
@@ -226,7 +225,6 @@ impl<'a> InputField<'a> {
     /// Marks the field as parameterizable if the condition is true.
     ///
     /// See [`Self::parameterizable`].
-    #[allow(dead_code)] // Used in a follow-up change
     pub(crate) fn parameterizable_if(self, condition: bool) -> Self {
         if condition { self.parameterizable() } else { self }
     }
