@@ -13,6 +13,10 @@ async fn multiple_changed_relation_names_due_to_mapped_models(api: &mut TestApi)
                 t.add_column("id", types::primary());
                 t.add_column("user_id", types::integer().nullable(false).unique(true));
                 t.add_column("user_id2", types::integer().nullable(false).unique(true));
+                t.add_column(
+                    "createdAt",
+                    types::custom("INTEGER NOT NULL DEFAULT (CAST(unixepoch('subsec') * 1000 AS INTEGER))"),
+                );
 
                 t.add_foreign_key(&["user_id"], "User", &["id"]);
                 t.add_foreign_key(&["user_id2"], "User", &["id"]);
@@ -29,6 +33,7 @@ async fn multiple_changed_relation_names_due_to_mapped_models(api: &mut TestApi)
             id               Int @id @default(autoincrement())
             user_id          Int  @unique
             user_id2         Int  @unique
+            createdAt        Int  @default(dbgenerated("(CAST(unixepoch('subsec') * 1000 AS INTEGER))"))
             custom_User      Custom_User @relation("CustomRelationName", fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
             custom_User2     Custom_User @relation("AnotherCustomRelationName", fields: [user_id2], references: [id], onDelete: NoAction, onUpdate: NoAction)
         }
@@ -47,6 +52,7 @@ async fn multiple_changed_relation_names_due_to_mapped_models(api: &mut TestApi)
           id           Int         @id @default(autoincrement())
           user_id      Int         @unique(map: "sqlite_autoindex_Post_1")
           user_id2     Int         @unique(map: "sqlite_autoindex_Post_2")
+          createdAt    Int         @default(dbgenerated("(CAST(unixepoch('subsec') * 1000 AS INTEGER))"))
           custom_User2 Custom_User @relation("AnotherCustomRelationName", fields: [user_id2], references: [id], onDelete: NoAction, onUpdate: NoAction)
           custom_User  Custom_User @relation("CustomRelationName", fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
         }
