@@ -127,6 +127,7 @@ pub struct InputField<'a> {
     field_types: Vec<InputType<'a>>,
     is_required: bool,
     requires_other_fields: Vec<Cow<'a, str>>,
+    is_parameterizable: bool,
 }
 
 impl<'a> InputField<'a> {
@@ -142,6 +143,7 @@ impl<'a> InputField<'a> {
             field_types,
             is_required,
             requires_other_fields: Vec::new(),
+            is_parameterizable: false,
         }
     }
 
@@ -203,6 +205,30 @@ impl<'a> InputField<'a> {
     /// Sets the field as nullable if the condition is true.
     pub(crate) fn nullable_if(self, condition: bool) -> Self {
         if condition { self.nullable() } else { self }
+    }
+
+    /// Returns whether this field accepts placeholder values for parameterized queries.
+    pub fn is_parameterizable(&self) -> bool {
+        self.is_parameterizable
+    }
+
+    /// Marks the field as parameterizable (accepts placeholder values in queries).
+    ///
+    /// Parameterizable fields can have their values substituted with placeholders
+    /// for query plan caching. This is typically used for filter values and data
+    /// fields, but not for structural fields like `take`, `skip`, `orderBy`, etc.
+    #[allow(dead_code)] // Used in a follow-up change
+    pub(crate) fn parameterizable(mut self) -> Self {
+        self.is_parameterizable = true;
+        self
+    }
+
+    /// Marks the field as parameterizable if the condition is true.
+    ///
+    /// See [`Self::parameterizable`].
+    #[allow(dead_code)] // Used in a follow-up change
+    pub(crate) fn parameterizable_if(self, condition: bool) -> Self {
+        if condition { self.parameterizable() } else { self }
     }
 }
 
@@ -318,5 +344,45 @@ impl<'a> InputType<'a> {
             InputType::Object(obj) => Some(obj),
             _ => None,
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn input_field_default_not_parameterizable() {
+        let field = InputField::new("test".into(), vec![InputType::int()], None, true);
+        assert!(!field.is_parameterizable());
+    }
+
+    #[test]
+    fn input_field_parameterizable_builder() {
+        let field = InputField::new("test".into(), vec![InputType::int()], None, true).parameterizable();
+        assert!(field.is_parameterizable());
+    }
+
+    #[test]
+    fn input_field_parameterizable_if_true() {
+        let field = InputField::new("test".into(), vec![InputType::int()], None, true).parameterizable_if(true);
+        assert!(field.is_parameterizable());
+    }
+
+    #[test]
+    fn input_field_parameterizable_if_false() {
+        let field = InputField::new("test".into(), vec![InputType::int()], None, true).parameterizable_if(false);
+        assert!(!field.is_parameterizable());
+    }
+
+    #[test]
+    fn input_field_builder_chain_preserves_parameterizable() {
+        let field = InputField::new("test".into(), vec![InputType::int()], None, true)
+            .parameterizable()
+            .optional()
+            .nullable();
+
+        assert!(field.is_parameterizable());
+        assert!(!field.is_required());
     }
 }
