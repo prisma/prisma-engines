@@ -94,8 +94,8 @@ impl<'a> ScalarFilterParser<'a> {
                         PrismaValue::Null => field.equals(value),
                         PrismaValue::List(values) => field.is_in(values),
 
-                        pv @ PrismaValue::Placeholder(_) if self.reverse() => field.not_in_template(pv),
-                        pv @ PrismaValue::Placeholder(_) => field.is_in_template(pv),
+                        PrismaValue::Placeholder(p) if self.reverse() => field.not_in(p),
+                        PrismaValue::Placeholder(p) => field.is_in(p),
 
                         _ => unreachable!(), // Validation guarantees this.
                     },
@@ -118,8 +118,8 @@ impl<'a> ScalarFilterParser<'a> {
                         PrismaValue::Null => field.not_equals(value),
                         PrismaValue::List(values) => field.not_in(values),
 
-                        pv @ PrismaValue::Placeholder(_) if self.reverse() => field.is_in_template(pv), // not not in => in
-                        pv @ PrismaValue::Placeholder(_) => field.not_in_template(pv),
+                        PrismaValue::Placeholder(p) if self.reverse() => field.is_in(p), // not not in => in
+                        PrismaValue::Placeholder(p) => field.not_in(p),
 
                         _ => unreachable!(), // Validation guarantees this.
                     },

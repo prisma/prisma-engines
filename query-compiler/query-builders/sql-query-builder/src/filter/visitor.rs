@@ -598,6 +598,13 @@ impl FilterVisitorExt for FilterVisitor {
             ScalarListCondition::ContainsSome(ConditionListValue::FieldRef(field_ref)) => {
                 comparable.compare_raw("&&", field_ref.aliased_col(alias, ctx))
             }
+            // TODO: Implement placeholder support for scalar list filters (follow-up work)
+            ScalarListCondition::ContainsEvery(ConditionListValue::Placeholder(_)) => {
+                unimplemented!("Placeholder support for hasSome/hasEvery not yet implemented")
+            }
+            ScalarListCondition::ContainsSome(ConditionListValue::Placeholder(_)) => {
+                unimplemented!("Placeholder support for hasSome/hasEvery not yet implemented")
+            }
             ScalarListCondition::IsEmpty(true) => comparable.compare_raw("=", ValueType::Array(Some(vec![])).raw()),
             ScalarListCondition::IsEmpty(false) => comparable.compare_raw("<>", ValueType::Array(Some(vec![])).raw()),
         };
@@ -911,6 +918,10 @@ pub(crate) fn default_scalar_filter(
             // This code path is only reachable for connectors with `ScalarLists` capability
             comparable.equals(Expression::from(field_ref.aliased_col(alias, ctx)).any())
         }
+        ScalarCondition::In(ConditionListValue::Placeholder(placeholder)) => {
+            let sql_value = convert_first_value(fields, PrismaValue::from(placeholder), alias, ctx);
+            comparable.in_selection(sql_value.into_parameterized_row())
+        }
         ScalarCondition::NotIn(ConditionListValue::List(values)) => match values.split_first() {
             Some((PrismaValue::List(_), _)) => {
                 let mut sql_values = Values::with_capacity(values.len());
@@ -928,16 +939,10 @@ pub(crate) fn default_scalar_filter(
             // This code path is only reachable for connectors with `ScalarLists` capability
             comparable.not_equals(Expression::from(field_ref.aliased_col(alias, ctx)).all())
         }
-        ScalarCondition::InTemplate(ConditionValue::Value(value)) => {
-            let sql_value = convert_first_value(fields, value, alias, ctx);
-            comparable.in_selection(sql_value.into_parameterized_row())
-        }
-        ScalarCondition::InTemplate(ConditionValue::FieldRef(_)) => todo!(),
-        ScalarCondition::NotInTemplate(ConditionValue::Value(value)) => {
-            let sql_value = convert_first_value(fields, value, alias, ctx);
+        ScalarCondition::NotIn(ConditionListValue::Placeholder(placeholder)) => {
+            let sql_value = convert_first_value(fields, PrismaValue::from(placeholder), alias, ctx);
             comparable.not_in_selection(sql_value.into_parameterized_row())
         }
-        ScalarCondition::NotInTemplate(ConditionValue::FieldRef(_)) => todo!(),
         ScalarCondition::Search(value, _) => {
             reachable_only_with_capability!(ConnectorCapability::NativeFullTextSearch);
             let query: String = value
@@ -1089,6 +1094,11 @@ fn insensitive_scalar_filter(
             // This code path is only reachable for connectors with `ScalarLists` capability
             comparable.compare_raw("ILIKE", Expression::from(field_ref.aliased_col(alias, ctx)).any())
         }
+        ScalarCondition::In(ConditionListValue::Placeholder(placeholder)) => {
+            let comparable = Expression::from(lower(comparable));
+            let sql_value = convert_first_value(fields, PrismaValue::from(placeholder), alias, ctx);
+            comparable.in_selection(sql_value.into_parameterized_row())
+        }
         ScalarCondition::NotIn(ConditionListValue::List(values)) => match values.split_first() {
             Some((PrismaValue::List(_), _)) => {
                 let mut sql_values = Values::with_capacity(values.len());
@@ -1120,18 +1130,11 @@ fn insensitive_scalar_filter(
             // This code path is only reachable for connectors with `ScalarLists` capability
             comparable.compare_raw("NOT ILIKE", Expression::from(field_ref.aliased_col(alias, ctx)).all())
         }
-        ScalarCondition::InTemplate(ConditionValue::Value(value)) => {
+        ScalarCondition::NotIn(ConditionListValue::Placeholder(placeholder)) => {
             let comparable = Expression::from(lower(comparable));
-            let sql_value = convert_first_value(fields, value, alias, ctx);
-            comparable.in_selection(sql_value.into_parameterized_row())
-        }
-        ScalarCondition::InTemplate(ConditionValue::FieldRef(_)) => todo!(),
-        ScalarCondition::NotInTemplate(ConditionValue::Value(value)) => {
-            let comparable = Expression::from(lower(comparable));
-            let sql_value = convert_first_value(fields, value, alias, ctx);
+            let sql_value = convert_first_value(fields, PrismaValue::from(placeholder), alias, ctx);
             comparable.not_in_selection(sql_value.into_parameterized_row())
         }
-        ScalarCondition::NotInTemplate(ConditionValue::FieldRef(_)) => todo!(),
         ScalarCondition::Search(value, _) => {
             reachable_only_with_capability!(ConnectorCapability::NativeFullTextSearch);
             let query: String = value

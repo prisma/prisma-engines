@@ -14,30 +14,6 @@ impl ScalarCompare for ScalarFieldRef {
         })
     }
 
-    /// Field is in a given template value
-    fn is_in_template<T>(&self, value: T) -> Filter
-    where
-        T: Into<ConditionValue>,
-    {
-        Filter::from(ScalarFilter {
-            projection: ScalarProjection::Single(self.clone()),
-            condition: ScalarCondition::InTemplate(value.into()),
-            mode: QueryMode::Default,
-        })
-    }
-
-    /// Field is not in a given template value
-    fn not_in_template<T>(&self, value: T) -> Filter
-    where
-        T: Into<ConditionValue>,
-    {
-        Filter::from(ScalarFilter {
-            projection: ScalarProjection::Single(self.clone()),
-            condition: ScalarCondition::NotInTemplate(value.into()),
-            mode: QueryMode::Default,
-        })
-    }
-
     /// Field is not in a given value
     fn not_in<T>(&self, values: T) -> Filter
     where
@@ -238,30 +214,6 @@ impl ScalarCompare for ModelProjection {
         })
     }
 
-    /// Field is in a given template
-    fn is_in_template<T>(&self, value: T) -> Filter
-    where
-        T: Into<ConditionValue>,
-    {
-        Filter::from(ScalarFilter {
-            projection: ScalarProjection::Compound(self.scalar_fields().collect()),
-            condition: ScalarCondition::InTemplate(value.into()),
-            mode: QueryMode::Default,
-        })
-    }
-
-    /// Field is not in a given template
-    fn not_in_template<T>(&self, value: T) -> Filter
-    where
-        T: Into<ConditionValue>,
-    {
-        Filter::from(ScalarFilter {
-            projection: ScalarProjection::Compound(self.scalar_fields().collect()),
-            condition: ScalarCondition::NotInTemplate(value.into()),
-            mode: QueryMode::Default,
-        })
-    }
-
     /// Field is not in a given value
     fn not_in<T>(&self, values: T) -> Filter
     where
@@ -458,30 +410,6 @@ impl ScalarCompare for FieldSelection {
         Filter::from(ScalarFilter {
             projection: ScalarProjection::Compound(self.as_scalar_fields().expect("Todo composites in filters.")),
             condition: ScalarCondition::In(values.into()),
-            mode: QueryMode::Default,
-        })
-    }
-
-    /// Field is in a given template
-    fn is_in_template<T>(&self, value: T) -> Filter
-    where
-        T: Into<ConditionValue>,
-    {
-        Filter::from(ScalarFilter {
-            projection: ScalarProjection::Compound(self.as_scalar_fields().expect("Todo composites in filters.")),
-            condition: ScalarCondition::InTemplate(value.into()),
-            mode: QueryMode::Default,
-        })
-    }
-
-    /// Field is not in a given template
-    fn not_in_template<T>(&self, value: T) -> Filter
-    where
-        T: Into<ConditionValue>,
-    {
-        Filter::from(ScalarFilter {
-            projection: ScalarProjection::Compound(self.as_scalar_fields().expect("Todo composites in filters.")),
-            condition: ScalarCondition::NotInTemplate(value.into()),
             mode: QueryMode::Default,
         })
     }
