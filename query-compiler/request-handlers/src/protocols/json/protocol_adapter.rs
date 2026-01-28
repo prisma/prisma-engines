@@ -6,7 +6,7 @@ use query_core::{
     constants::custom_types,
     schema::{ObjectType, OutputField, QuerySchema},
 };
-use query_structure::{Field, PrismaValue, PrismaValueType, decode_bytes, parse_datetime, prelude::ParentContainer};
+use query_structure::{Field, PrismaValue, decode_bytes, parse_datetime, prelude::ParentContainer};
 use serde_json::Value as JsonValue;
 use std::str::FromStr;
 
@@ -244,15 +244,11 @@ impl<'a> JsonProtocolAdapter<'a> {
                     Ok(ArgumentValue::FieldRef(values))
                 }
                 Some(custom_types::PARAM) => {
-                    let name = obj
-                        .get(custom_types::VALUE)
-                        .and_then(|v| v.as_str())
-                        .ok_or_else(build_err)?
-                        .to_owned();
+                    let value = obj.remove(custom_types::VALUE).ok_or_else(build_err)?;
+                    let placeholder =
+                        serde_json::from_value(value).map_err(|e| HandlerError::QueryConversion(e.to_string()))?;
 
-                    let placeholder = PrismaValue::placeholder(name, PrismaValueType::Any);
-
-                    Ok(ArgumentValue::Scalar(placeholder))
+                    Ok(ArgumentValue::Scalar(PrismaValue::Placeholder(placeholder)))
                 }
                 _ => {
                     let values = obj

@@ -129,6 +129,7 @@ impl std::fmt::Display for PrismaValueType {
 #[derive(Debug, Clone, Eq, PartialEq, Hash, Deserialize, PartialOrd, Ord)]
 pub struct Placeholder {
     pub name: Cow<'static, str>,
+    #[serde(flatten)]
     pub r#type: PrismaValueType,
 }
 
