@@ -727,8 +727,8 @@ fn get_target_table<'a>(query: &Query<'a>) -> Option<Table<'a>> {
 
 #[cfg(test)]
 mod tests {
-    use crate::visitor::*;
     use crate::ast::*;
+    use crate::visitor::*;
 
     fn expected_values<'a, T>(sql: &'static str, params: Vec<T>) -> (String, Vec<Value<'a>>)
     where
