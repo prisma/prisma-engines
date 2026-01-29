@@ -33,7 +33,7 @@ impl<'a> Postgres<'a> {
                 }
                 // Cast BigInt to text to preserve precision when parsed by JavaScript.
                 // JavaScript's JSON.parse loses precision for integers > 2^53-1.
-                (Some(TypeFamily::Int), Some("BIGINT")) => {
+                (Some(TypeFamily::Int), Some("BIGINT" | "INT8")) => {
                     self.visit_expression(expr)?;
                     self.write("::text")?;
 
@@ -1425,6 +1425,20 @@ mod tests {
             assert_eq!(sql, "SELECT JSONB_BUILD_OBJECT('id', \"id\"::text)");
         }
 
+        #[test]
+        fn int8() {
+            let build_json = json_build_object(vec![(
+                "id".into(),
+                Column::from("id")
+                    .native_column_type(Some("INT8"))
+                    .type_family(TypeFamily::Int)
+                    .into(),
+            )]);
+            let query = Select::default().value(build_json);
+            let (sql, _) = Postgres::build(query).unwrap();
+
+            assert_eq!(sql, "SELECT JSONB_BUILD_OBJECT('id', \"id\"::text)");
+        }
         fn build_json_object(num_fields: u32) -> JsonBuildObject<'static> {
             let fields = (1..=num_fields)
                 .map(|i| (format!("f{i}").into(), Expression::from(i as i64)))
