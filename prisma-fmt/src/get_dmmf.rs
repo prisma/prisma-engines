@@ -93,7 +93,8 @@ mod tests {
                                   "location": "scalar",
                                   "isList": false
                                 }
-                              ]
+                              ],
+                              "isParameterizable": false
                             },
                             {
                               "name": "parameters",
@@ -105,7 +106,8 @@ mod tests {
                                   "location": "scalar",
                                   "isList": false
                                 }
-                              ]
+                              ],
+                              "isParameterizable": false
                             }
                           ],
                           "isNullable": false,
@@ -128,7 +130,8 @@ mod tests {
                                   "location": "scalar",
                                   "isList": false
                                 }
-                              ]
+                              ],
+                              "isParameterizable": false
                             },
                             {
                               "name": "parameters",
@@ -140,7 +143,8 @@ mod tests {
                                   "location": "scalar",
                                   "isList": false
                                 }
-                              ]
+                              ],
+                              "isParameterizable": false
                             }
                           ],
                           "isNullable": false,
@@ -394,7 +398,8 @@ mod tests {
                               "location": "inputObjectTypes",
                               "isList": true
                             }
-                          ]
+                          ],
+                          "isParameterizable": false
                         },
                         {
                           "name": "OR",
@@ -407,7 +412,8 @@ mod tests {
                               "location": "inputObjectTypes",
                               "isList": true
                             }
-                          ]
+                          ],
+                          "isParameterizable": false
                         },
                         {
                           "name": "NOT",
@@ -426,7 +432,8 @@ mod tests {
                               "location": "inputObjectTypes",
                               "isList": true
                             }
-                          ]
+                          ],
+                          "isParameterizable": false
                         },
                         {
                           "name": "id",
@@ -444,7 +451,8 @@ mod tests {
                               "location": "scalar",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": true
                         },
                         {
                           "name": "b_id",
@@ -462,7 +470,8 @@ mod tests {
                               "location": "scalar",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": true
                         },
                         {
                           "name": "b",
@@ -481,7 +490,8 @@ mod tests {
                               "location": "inputObjectTypes",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": false
                         }
                       ]
                     },
@@ -506,7 +516,8 @@ mod tests {
                               "location": "enumTypes",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": false
                         },
                         {
                           "name": "b_id",
@@ -519,7 +530,8 @@ mod tests {
                               "location": "enumTypes",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": false
                         },
                         {
                           "name": "b",
@@ -532,7 +544,8 @@ mod tests {
                               "location": "inputObjectTypes",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": false
                         }
                       ]
                     },
@@ -561,7 +574,8 @@ mod tests {
                               "location": "scalar",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": true
                         },
                         {
                           "name": "b_id",
@@ -573,7 +587,8 @@ mod tests {
                               "location": "scalar",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": true
                         },
                         {
                           "name": "AND",
@@ -592,7 +607,8 @@ mod tests {
                               "location": "inputObjectTypes",
                               "isList": true
                             }
-                          ]
+                          ],
+                          "isParameterizable": false
                         },
                         {
                           "name": "OR",
@@ -605,7 +621,8 @@ mod tests {
                               "location": "inputObjectTypes",
                               "isList": true
                             }
-                          ]
+                          ],
+                          "isParameterizable": false
                         },
                         {
                           "name": "NOT",
@@ -624,7 +641,8 @@ mod tests {
                               "location": "inputObjectTypes",
                               "isList": true
                             }
-                          ]
+                          ],
+                          "isParameterizable": false
                         },
                         {
                           "name": "b",
@@ -643,7 +661,8 @@ mod tests {
                               "location": "inputObjectTypes",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": false
                         }
                       ]
                     },
@@ -668,7 +687,8 @@ mod tests {
                               "location": "enumTypes",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": false
                         },
                         {
                           "name": "b_id",
@@ -681,7 +701,8 @@ mod tests {
                               "location": "enumTypes",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": false
                         },
                         {
                           "name": "_count",
@@ -694,7 +715,8 @@ mod tests {
                               "location": "inputObjectTypes",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": false
                         },
                         {
                           "name": "_max",
@@ -707,7 +729,8 @@ mod tests {
                               "location": "inputObjectTypes",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": false
                         },
                         {
                           "name": "_min",
@@ -720,7 +743,8 @@ mod tests {
                               "location": "inputObjectTypes",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": false
                         }
                       ]
                     },
@@ -752,7 +776,8 @@ mod tests {
                               "location": "inputObjectTypes",
                               "isList": true
                             }
-                          ]
+                          ],
+                          "isParameterizable": false
                         },
                         {
                           "name": "OR",
@@ -765,7 +790,8 @@ mod tests {
                               "location": "inputObjectTypes",
                               "isList": true
                             }
-                          ]
+                          ],
+                          "isParameterizable": false
                         },
                         {
                           "name": "NOT",
@@ -784,7 +810,8 @@ mod tests {
                               "location": "inputObjectTypes",
                               "isList": true
                             }
-                          ]
+                          ],
+                          "isParameterizable": false
                         },
                         {
                           "name": "id",
@@ -802,7 +829,8 @@ mod tests {
                               "location": "scalar",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": true
                         },
                         {
                           "name": "b_id",
@@ -820,7 +848,8 @@ mod tests {
                               "location": "scalar",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": true
                         }
                       ]
                     },
@@ -852,7 +881,8 @@ mod tests {
                               "location": "inputObjectTypes",
                               "isList": true
                             }
-                          ]
+                          ],
+                          "isParameterizable": false
                         },
                         {
                           "name": "OR",
@@ -865,7 +895,8 @@ mod tests {
                               "location": "inputObjectTypes",
                               "isList": true
                             }
-                          ]
+                          ],
+                          "isParameterizable": false
                         },
                         {
                           "name": "NOT",
@@ -884,7 +915,8 @@ mod tests {
                               "location": "inputObjectTypes",
                               "isList": true
                             }
-                          ]
+                          ],
+                          "isParameterizable": false
                         },
                         {
                           "name": "id",
@@ -902,7 +934,8 @@ mod tests {
                               "location": "scalar",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": true
                         },
                         {
                           "name": "a",
@@ -926,7 +959,8 @@ mod tests {
                               "location": "scalar",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": false
                         }
                       ]
                     },
@@ -951,7 +985,8 @@ mod tests {
                               "location": "enumTypes",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": false
                         },
                         {
                           "name": "a",
@@ -964,7 +999,8 @@ mod tests {
                               "location": "inputObjectTypes",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": false
                         }
                       ]
                     },
@@ -992,7 +1028,8 @@ mod tests {
                               "location": "scalar",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": true
                         },
                         {
                           "name": "AND",
@@ -1011,7 +1048,8 @@ mod tests {
                               "location": "inputObjectTypes",
                               "isList": true
                             }
-                          ]
+                          ],
+                          "isParameterizable": false
                         },
                         {
                           "name": "OR",
@@ -1024,7 +1062,8 @@ mod tests {
                               "location": "inputObjectTypes",
                               "isList": true
                             }
-                          ]
+                          ],
+                          "isParameterizable": false
                         },
                         {
                           "name": "NOT",
@@ -1043,7 +1082,8 @@ mod tests {
                               "location": "inputObjectTypes",
                               "isList": true
                             }
-                          ]
+                          ],
+                          "isParameterizable": false
                         },
                         {
                           "name": "a",
@@ -1067,7 +1107,8 @@ mod tests {
                               "location": "scalar",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": false
                         }
                       ]
                     },
@@ -1092,7 +1133,8 @@ mod tests {
                               "location": "enumTypes",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": false
                         },
                         {
                           "name": "_count",
@@ -1105,7 +1147,8 @@ mod tests {
                               "location": "inputObjectTypes",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": false
                         },
                         {
                           "name": "_max",
@@ -1118,7 +1161,8 @@ mod tests {
                               "location": "inputObjectTypes",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": false
                         },
                         {
                           "name": "_min",
@@ -1131,7 +1175,8 @@ mod tests {
                               "location": "inputObjectTypes",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": false
                         }
                       ]
                     },
@@ -1163,7 +1208,8 @@ mod tests {
                               "location": "inputObjectTypes",
                               "isList": true
                             }
-                          ]
+                          ],
+                          "isParameterizable": false
                         },
                         {
                           "name": "OR",
@@ -1176,7 +1222,8 @@ mod tests {
                               "location": "inputObjectTypes",
                               "isList": true
                             }
-                          ]
+                          ],
+                          "isParameterizable": false
                         },
                         {
                           "name": "NOT",
@@ -1195,7 +1242,8 @@ mod tests {
                               "location": "inputObjectTypes",
                               "isList": true
                             }
-                          ]
+                          ],
+                          "isParameterizable": false
                         },
                         {
                           "name": "id",
@@ -1213,7 +1261,8 @@ mod tests {
                               "location": "scalar",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": true
                         }
                       ]
                     },
@@ -1237,7 +1286,8 @@ mod tests {
                               "location": "scalar",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": true
                         },
                         {
                           "name": "b",
@@ -1250,7 +1300,8 @@ mod tests {
                               "location": "inputObjectTypes",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": false
                         }
                       ]
                     },
@@ -1274,7 +1325,8 @@ mod tests {
                               "location": "scalar",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": true
                         },
                         {
                           "name": "b_id",
@@ -1286,7 +1338,8 @@ mod tests {
                               "location": "scalar",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": true
                         }
                       ]
                     },
@@ -1316,7 +1369,8 @@ mod tests {
                               "location": "inputObjectTypes",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": true
                         },
                         {
                           "name": "b",
@@ -1329,7 +1383,8 @@ mod tests {
                               "location": "inputObjectTypes",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": false
                         }
                       ]
                     },
@@ -1359,7 +1414,8 @@ mod tests {
                               "location": "inputObjectTypes",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": true
                         },
                         {
                           "name": "b_id",
@@ -1377,7 +1433,8 @@ mod tests {
                               "location": "inputObjectTypes",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": true
                         }
                       ]
                     },
@@ -1401,7 +1458,8 @@ mod tests {
                               "location": "scalar",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": true
                         },
                         {
                           "name": "b_id",
@@ -1413,7 +1471,8 @@ mod tests {
                               "location": "scalar",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": true
                         }
                       ]
                     },
@@ -1443,7 +1502,8 @@ mod tests {
                               "location": "inputObjectTypes",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": true
                         }
                       ]
                     },
@@ -1473,7 +1533,8 @@ mod tests {
                               "location": "inputObjectTypes",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": true
                         },
                         {
                           "name": "b_id",
@@ -1491,7 +1552,8 @@ mod tests {
                               "location": "inputObjectTypes",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": true
                         }
                       ]
                     },
@@ -1515,7 +1577,8 @@ mod tests {
                               "location": "scalar",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": true
                         },
                         {
                           "name": "a",
@@ -1528,7 +1591,8 @@ mod tests {
                               "location": "inputObjectTypes",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": false
                         }
                       ]
                     },
@@ -1552,7 +1616,8 @@ mod tests {
                               "location": "scalar",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": true
                         },
                         {
                           "name": "a",
@@ -1565,7 +1630,8 @@ mod tests {
                               "location": "inputObjectTypes",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": false
                         }
                       ]
                     },
@@ -1595,7 +1661,8 @@ mod tests {
                               "location": "inputObjectTypes",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": true
                         },
                         {
                           "name": "a",
@@ -1608,7 +1675,8 @@ mod tests {
                               "location": "inputObjectTypes",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": false
                         }
                       ]
                     },
@@ -1638,7 +1706,8 @@ mod tests {
                               "location": "inputObjectTypes",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": true
                         },
                         {
                           "name": "a",
@@ -1651,7 +1720,8 @@ mod tests {
                               "location": "inputObjectTypes",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": false
                         }
                       ]
                     },
@@ -1675,7 +1745,8 @@ mod tests {
                               "location": "scalar",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": true
                         }
                       ]
                     },
@@ -1705,7 +1776,8 @@ mod tests {
                               "location": "inputObjectTypes",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": true
                         }
                       ]
                     },
@@ -1735,7 +1807,8 @@ mod tests {
                               "location": "inputObjectTypes",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": true
                         }
                       ]
                     },
@@ -1762,7 +1835,8 @@ mod tests {
                               "location": "fieldRefTypes",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": true
                         },
                         {
                           "name": "in",
@@ -1780,7 +1854,8 @@ mod tests {
                               "location": "fieldRefTypes",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": true
                         },
                         {
                           "name": "notIn",
@@ -1798,7 +1873,8 @@ mod tests {
                               "location": "fieldRefTypes",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": true
                         },
                         {
                           "name": "lt",
@@ -1816,7 +1892,8 @@ mod tests {
                               "location": "fieldRefTypes",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": true
                         },
                         {
                           "name": "lte",
@@ -1834,7 +1911,8 @@ mod tests {
                               "location": "fieldRefTypes",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": true
                         },
                         {
                           "name": "gt",
@@ -1852,7 +1930,8 @@ mod tests {
                               "location": "fieldRefTypes",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": true
                         },
                         {
                           "name": "gte",
@@ -1870,7 +1949,8 @@ mod tests {
                               "location": "fieldRefTypes",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": true
                         },
                         {
                           "name": "contains",
@@ -1888,7 +1968,8 @@ mod tests {
                               "location": "fieldRefTypes",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": true
                         },
                         {
                           "name": "startsWith",
@@ -1906,7 +1987,8 @@ mod tests {
                               "location": "fieldRefTypes",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": true
                         },
                         {
                           "name": "endsWith",
@@ -1924,7 +2006,8 @@ mod tests {
                               "location": "fieldRefTypes",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": true
                         },
                         {
                           "name": "mode",
@@ -1937,7 +2020,8 @@ mod tests {
                               "location": "enumTypes",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": false
                         },
                         {
                           "name": "not",
@@ -1955,7 +2039,8 @@ mod tests {
                               "location": "inputObjectTypes",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": true
                         }
                       ]
                     },
@@ -1980,7 +2065,8 @@ mod tests {
                               "location": "inputObjectTypes",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": false
                         },
                         {
                           "name": "isNot",
@@ -1993,7 +2079,8 @@ mod tests {
                               "location": "inputObjectTypes",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": false
                         }
                       ]
                     },
@@ -2018,7 +2105,8 @@ mod tests {
                               "location": "enumTypes",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": false
                         },
                         {
                           "name": "b_id",
@@ -2031,7 +2119,8 @@ mod tests {
                               "location": "enumTypes",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": false
                         }
                       ]
                     },
@@ -2056,7 +2145,8 @@ mod tests {
                               "location": "enumTypes",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": false
                         },
                         {
                           "name": "b_id",
@@ -2069,7 +2159,8 @@ mod tests {
                               "location": "enumTypes",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": false
                         }
                       ]
                     },
@@ -2094,7 +2185,8 @@ mod tests {
                               "location": "enumTypes",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": false
                         },
                         {
                           "name": "b_id",
@@ -2107,7 +2199,8 @@ mod tests {
                               "location": "enumTypes",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": false
                         }
                       ]
                     },
@@ -2134,7 +2227,8 @@ mod tests {
                               "location": "fieldRefTypes",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": true
                         },
                         {
                           "name": "in",
@@ -2152,7 +2246,8 @@ mod tests {
                               "location": "fieldRefTypes",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": true
                         },
                         {
                           "name": "notIn",
@@ -2170,7 +2265,8 @@ mod tests {
                               "location": "fieldRefTypes",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": true
                         },
                         {
                           "name": "lt",
@@ -2188,7 +2284,8 @@ mod tests {
                               "location": "fieldRefTypes",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": true
                         },
                         {
                           "name": "lte",
@@ -2206,7 +2303,8 @@ mod tests {
                               "location": "fieldRefTypes",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": true
                         },
                         {
                           "name": "gt",
@@ -2224,7 +2322,8 @@ mod tests {
                               "location": "fieldRefTypes",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": true
                         },
                         {
                           "name": "gte",
@@ -2242,7 +2341,8 @@ mod tests {
                               "location": "fieldRefTypes",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": true
                         },
                         {
                           "name": "contains",
@@ -2260,7 +2360,8 @@ mod tests {
                               "location": "fieldRefTypes",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": true
                         },
                         {
                           "name": "startsWith",
@@ -2278,7 +2379,8 @@ mod tests {
                               "location": "fieldRefTypes",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": true
                         },
                         {
                           "name": "endsWith",
@@ -2296,7 +2398,8 @@ mod tests {
                               "location": "fieldRefTypes",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": true
                         },
                         {
                           "name": "mode",
@@ -2309,7 +2412,8 @@ mod tests {
                               "location": "enumTypes",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": false
                         },
                         {
                           "name": "not",
@@ -2327,7 +2431,8 @@ mod tests {
                               "location": "inputObjectTypes",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": true
                         },
                         {
                           "name": "_count",
@@ -2340,7 +2445,8 @@ mod tests {
                               "location": "inputObjectTypes",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": false
                         },
                         {
                           "name": "_min",
@@ -2353,7 +2459,8 @@ mod tests {
                               "location": "inputObjectTypes",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": false
                         },
                         {
                           "name": "_max",
@@ -2366,7 +2473,8 @@ mod tests {
                               "location": "inputObjectTypes",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": false
                         }
                       ]
                     },
@@ -2396,7 +2504,8 @@ mod tests {
                               "location": "scalar",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": false
                         },
                         {
                           "name": "isNot",
@@ -2414,7 +2523,8 @@ mod tests {
                               "location": "scalar",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": false
                         }
                       ]
                     },
@@ -2439,7 +2549,8 @@ mod tests {
                               "location": "enumTypes",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": false
                         }
                       ]
                     },
@@ -2464,7 +2575,8 @@ mod tests {
                               "location": "enumTypes",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": false
                         }
                       ]
                     },
@@ -2489,7 +2601,8 @@ mod tests {
                               "location": "enumTypes",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": false
                         }
                       ]
                     },
@@ -2520,7 +2633,8 @@ mod tests {
                               "location": "inputObjectTypes",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": false
                         },
                         {
                           "name": "connectOrCreate",
@@ -2533,7 +2647,8 @@ mod tests {
                               "location": "inputObjectTypes",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": false
                         },
                         {
                           "name": "connect",
@@ -2546,7 +2661,8 @@ mod tests {
                               "location": "inputObjectTypes",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": false
                         }
                       ]
                     },
@@ -2570,7 +2686,8 @@ mod tests {
                               "location": "scalar",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": true
                         }
                       ]
                     },
@@ -2601,7 +2718,8 @@ mod tests {
                               "location": "inputObjectTypes",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": false
                         },
                         {
                           "name": "connectOrCreate",
@@ -2614,7 +2732,8 @@ mod tests {
                               "location": "inputObjectTypes",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": false
                         },
                         {
                           "name": "upsert",
@@ -2627,7 +2746,8 @@ mod tests {
                               "location": "inputObjectTypes",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": false
                         },
                         {
                           "name": "connect",
@@ -2640,7 +2760,8 @@ mod tests {
                               "location": "inputObjectTypes",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": false
                         },
                         {
                           "name": "update",
@@ -2665,7 +2786,8 @@ mod tests {
                               "location": "inputObjectTypes",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": false
                         }
                       ]
                     },
@@ -2696,7 +2818,8 @@ mod tests {
                               "location": "inputObjectTypes",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": false
                         },
                         {
                           "name": "connectOrCreate",
@@ -2709,7 +2832,8 @@ mod tests {
                               "location": "inputObjectTypes",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": false
                         },
                         {
                           "name": "connect",
@@ -2722,7 +2846,8 @@ mod tests {
                               "location": "inputObjectTypes",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": false
                         }
                       ]
                     },
@@ -2753,7 +2878,8 @@ mod tests {
                               "location": "inputObjectTypes",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": false
                         },
                         {
                           "name": "connectOrCreate",
@@ -2766,7 +2892,8 @@ mod tests {
                               "location": "inputObjectTypes",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": false
                         },
                         {
                           "name": "connect",
@@ -2779,7 +2906,8 @@ mod tests {
                               "location": "inputObjectTypes",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": false
                         }
                       ]
                     },
@@ -2810,7 +2938,8 @@ mod tests {
                               "location": "inputObjectTypes",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": false
                         },
                         {
                           "name": "connectOrCreate",
@@ -2823,7 +2952,8 @@ mod tests {
                               "location": "inputObjectTypes",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": false
                         },
                         {
                           "name": "upsert",
@@ -2836,7 +2966,8 @@ mod tests {
                               "location": "inputObjectTypes",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": false
                         },
                         {
                           "name": "disconnect",
@@ -2854,7 +2985,8 @@ mod tests {
                               "location": "inputObjectTypes",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": false
                         },
                         {
                           "name": "delete",
@@ -2872,7 +3004,8 @@ mod tests {
                               "location": "inputObjectTypes",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": false
                         },
                         {
                           "name": "connect",
@@ -2885,7 +3018,8 @@ mod tests {
                               "location": "inputObjectTypes",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": false
                         },
                         {
                           "name": "update",
@@ -2910,7 +3044,8 @@ mod tests {
                               "location": "inputObjectTypes",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": false
                         }
                       ]
                     },
@@ -2941,7 +3076,8 @@ mod tests {
                               "location": "inputObjectTypes",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": false
                         },
                         {
                           "name": "connectOrCreate",
@@ -2954,7 +3090,8 @@ mod tests {
                               "location": "inputObjectTypes",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": false
                         },
                         {
                           "name": "upsert",
@@ -2967,7 +3104,8 @@ mod tests {
                               "location": "inputObjectTypes",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": false
                         },
                         {
                           "name": "disconnect",
@@ -2985,7 +3123,8 @@ mod tests {
                               "location": "inputObjectTypes",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": false
                         },
                         {
                           "name": "delete",
@@ -3003,7 +3142,8 @@ mod tests {
                               "location": "inputObjectTypes",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": false
                         },
                         {
                           "name": "connect",
@@ -3016,7 +3156,8 @@ mod tests {
                               "location": "inputObjectTypes",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": false
                         },
                         {
                           "name": "update",
@@ -3041,7 +3182,8 @@ mod tests {
                               "location": "inputObjectTypes",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": false
                         }
                       ]
                     },
@@ -3068,7 +3210,8 @@ mod tests {
                               "location": "fieldRefTypes",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": true
                         },
                         {
                           "name": "in",
@@ -3086,7 +3229,8 @@ mod tests {
                               "location": "fieldRefTypes",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": true
                         },
                         {
                           "name": "notIn",
@@ -3104,7 +3248,8 @@ mod tests {
                               "location": "fieldRefTypes",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": true
                         },
                         {
                           "name": "lt",
@@ -3122,7 +3267,8 @@ mod tests {
                               "location": "fieldRefTypes",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": true
                         },
                         {
                           "name": "lte",
@@ -3140,7 +3286,8 @@ mod tests {
                               "location": "fieldRefTypes",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": true
                         },
                         {
                           "name": "gt",
@@ -3158,7 +3305,8 @@ mod tests {
                               "location": "fieldRefTypes",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": true
                         },
                         {
                           "name": "gte",
@@ -3176,7 +3324,8 @@ mod tests {
                               "location": "fieldRefTypes",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": true
                         },
                         {
                           "name": "contains",
@@ -3194,7 +3343,8 @@ mod tests {
                               "location": "fieldRefTypes",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": true
                         },
                         {
                           "name": "startsWith",
@@ -3212,7 +3362,8 @@ mod tests {
                               "location": "fieldRefTypes",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": true
                         },
                         {
                           "name": "endsWith",
@@ -3230,7 +3381,8 @@ mod tests {
                               "location": "fieldRefTypes",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": true
                         },
                         {
                           "name": "not",
@@ -3248,7 +3400,8 @@ mod tests {
                               "location": "inputObjectTypes",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": true
                         }
                       ]
                     },
@@ -3275,7 +3428,8 @@ mod tests {
                               "location": "fieldRefTypes",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": true
                         },
                         {
                           "name": "in",
@@ -3293,7 +3447,8 @@ mod tests {
                               "location": "fieldRefTypes",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": true
                         },
                         {
                           "name": "notIn",
@@ -3311,7 +3466,8 @@ mod tests {
                               "location": "fieldRefTypes",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": true
                         },
                         {
                           "name": "lt",
@@ -3329,7 +3485,8 @@ mod tests {
                               "location": "fieldRefTypes",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": true
                         },
                         {
                           "name": "lte",
@@ -3347,7 +3504,8 @@ mod tests {
                               "location": "fieldRefTypes",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": true
                         },
                         {
                           "name": "gt",
@@ -3365,7 +3523,8 @@ mod tests {
                               "location": "fieldRefTypes",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": true
                         },
                         {
                           "name": "gte",
@@ -3383,7 +3542,8 @@ mod tests {
                               "location": "fieldRefTypes",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": true
                         },
                         {
                           "name": "contains",
@@ -3401,7 +3561,8 @@ mod tests {
                               "location": "fieldRefTypes",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": true
                         },
                         {
                           "name": "startsWith",
@@ -3419,7 +3580,8 @@ mod tests {
                               "location": "fieldRefTypes",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": true
                         },
                         {
                           "name": "endsWith",
@@ -3437,7 +3599,8 @@ mod tests {
                               "location": "fieldRefTypes",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": true
                         },
                         {
                           "name": "not",
@@ -3455,7 +3618,8 @@ mod tests {
                               "location": "inputObjectTypes",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": true
                         },
                         {
                           "name": "_count",
@@ -3468,7 +3632,8 @@ mod tests {
                               "location": "inputObjectTypes",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": false
                         },
                         {
                           "name": "_min",
@@ -3481,7 +3646,8 @@ mod tests {
                               "location": "inputObjectTypes",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": false
                         },
                         {
                           "name": "_max",
@@ -3494,7 +3660,8 @@ mod tests {
                               "location": "inputObjectTypes",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": false
                         }
                       ]
                     },
@@ -3521,7 +3688,8 @@ mod tests {
                               "location": "fieldRefTypes",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": true
                         },
                         {
                           "name": "in",
@@ -3539,7 +3707,8 @@ mod tests {
                               "location": "fieldRefTypes",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": true
                         },
                         {
                           "name": "notIn",
@@ -3557,7 +3726,8 @@ mod tests {
                               "location": "fieldRefTypes",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": true
                         },
                         {
                           "name": "lt",
@@ -3575,7 +3745,8 @@ mod tests {
                               "location": "fieldRefTypes",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": true
                         },
                         {
                           "name": "lte",
@@ -3593,7 +3764,8 @@ mod tests {
                               "location": "fieldRefTypes",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": true
                         },
                         {
                           "name": "gt",
@@ -3611,7 +3783,8 @@ mod tests {
                               "location": "fieldRefTypes",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": true
                         },
                         {
                           "name": "gte",
@@ -3629,7 +3802,8 @@ mod tests {
                               "location": "fieldRefTypes",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": true
                         },
                         {
                           "name": "not",
@@ -3647,7 +3821,8 @@ mod tests {
                               "location": "inputObjectTypes",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": true
                         }
                       ]
                     },
@@ -3671,7 +3846,8 @@ mod tests {
                               "location": "scalar",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": true
                         }
                       ]
                     },
@@ -3695,7 +3871,8 @@ mod tests {
                               "location": "scalar",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": true
                         }
                       ]
                     },
@@ -3720,7 +3897,8 @@ mod tests {
                               "location": "inputObjectTypes",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": false
                         },
                         {
                           "name": "create",
@@ -3739,7 +3917,8 @@ mod tests {
                               "location": "inputObjectTypes",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": false
                         }
                       ]
                     },
@@ -3770,7 +3949,8 @@ mod tests {
                               "location": "inputObjectTypes",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": false
                         },
                         {
                           "name": "create",
@@ -3789,7 +3969,8 @@ mod tests {
                               "location": "inputObjectTypes",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": false
                         },
                         {
                           "name": "where",
@@ -3802,7 +3983,8 @@ mod tests {
                               "location": "inputObjectTypes",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": false
                         }
                       ]
                     },
@@ -3827,7 +4009,8 @@ mod tests {
                               "location": "inputObjectTypes",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": false
                         },
                         {
                           "name": "data",
@@ -3846,7 +4029,8 @@ mod tests {
                               "location": "inputObjectTypes",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": false
                         }
                       ]
                     },
@@ -3876,7 +4060,8 @@ mod tests {
                               "location": "inputObjectTypes",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": true
                         }
                       ]
                     },
@@ -3906,7 +4091,8 @@ mod tests {
                               "location": "inputObjectTypes",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": true
                         }
                       ]
                     },
@@ -3930,7 +4116,8 @@ mod tests {
                               "location": "scalar",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": true
                         }
                       ]
                     },
@@ -3954,7 +4141,8 @@ mod tests {
                               "location": "scalar",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": true
                         }
                       ]
                     },
@@ -3979,7 +4167,8 @@ mod tests {
                               "location": "inputObjectTypes",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": false
                         },
                         {
                           "name": "create",
@@ -3998,7 +4187,8 @@ mod tests {
                               "location": "inputObjectTypes",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": false
                         }
                       ]
                     },
@@ -4029,7 +4219,8 @@ mod tests {
                               "location": "inputObjectTypes",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": false
                         },
                         {
                           "name": "create",
@@ -4048,7 +4239,8 @@ mod tests {
                               "location": "inputObjectTypes",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": false
                         },
                         {
                           "name": "where",
@@ -4061,7 +4253,8 @@ mod tests {
                               "location": "inputObjectTypes",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": false
                         }
                       ]
                     },
@@ -4086,7 +4279,8 @@ mod tests {
                               "location": "inputObjectTypes",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": false
                         },
                         {
                           "name": "data",
@@ -4105,7 +4299,8 @@ mod tests {
                               "location": "inputObjectTypes",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": false
                         }
                       ]
                     },
@@ -4135,7 +4330,8 @@ mod tests {
                               "location": "inputObjectTypes",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": true
                         }
                       ]
                     },
@@ -4165,7 +4361,8 @@ mod tests {
                               "location": "inputObjectTypes",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": true
                         }
                       ]
                     }
@@ -4190,7 +4387,8 @@ mod tests {
                                   "location": "inputObjectTypes",
                                   "isList": false
                                 }
-                              ]
+                              ],
+                              "isParameterizable": false
                             },
                             {
                               "name": "orderBy",
@@ -4209,7 +4407,8 @@ mod tests {
                                   "location": "inputObjectTypes",
                                   "isList": false
                                 }
-                              ]
+                              ],
+                              "isParameterizable": false
                             },
                             {
                               "name": "cursor",
@@ -4222,7 +4421,8 @@ mod tests {
                                   "location": "inputObjectTypes",
                                   "isList": false
                                 }
-                              ]
+                              ],
+                              "isParameterizable": false
                             },
                             {
                               "name": "take",
@@ -4234,7 +4434,8 @@ mod tests {
                                   "location": "scalar",
                                   "isList": false
                                 }
-                              ]
+                              ],
+                              "isParameterizable": false
                             },
                             {
                               "name": "skip",
@@ -4246,7 +4447,8 @@ mod tests {
                                   "location": "scalar",
                                   "isList": false
                                 }
-                              ]
+                              ],
+                              "isParameterizable": false
                             },
                             {
                               "name": "distinct",
@@ -4265,7 +4467,8 @@ mod tests {
                                   "location": "enumTypes",
                                   "isList": true
                                 }
-                              ]
+                              ],
+                              "isParameterizable": false
                             }
                           ],
                           "isNullable": true,
@@ -4290,7 +4493,8 @@ mod tests {
                                   "location": "inputObjectTypes",
                                   "isList": false
                                 }
-                              ]
+                              ],
+                              "isParameterizable": false
                             },
                             {
                               "name": "orderBy",
@@ -4309,7 +4513,8 @@ mod tests {
                                   "location": "inputObjectTypes",
                                   "isList": false
                                 }
-                              ]
+                              ],
+                              "isParameterizable": false
                             },
                             {
                               "name": "cursor",
@@ -4322,7 +4527,8 @@ mod tests {
                                   "location": "inputObjectTypes",
                                   "isList": false
                                 }
-                              ]
+                              ],
+                              "isParameterizable": false
                             },
                             {
                               "name": "take",
@@ -4334,7 +4540,8 @@ mod tests {
                                   "location": "scalar",
                                   "isList": false
                                 }
-                              ]
+                              ],
+                              "isParameterizable": false
                             },
                             {
                               "name": "skip",
@@ -4346,7 +4553,8 @@ mod tests {
                                   "location": "scalar",
                                   "isList": false
                                 }
-                              ]
+                              ],
+                              "isParameterizable": false
                             },
                             {
                               "name": "distinct",
@@ -4365,7 +4573,8 @@ mod tests {
                                   "location": "enumTypes",
                                   "isList": true
                                 }
-                              ]
+                              ],
+                              "isParameterizable": false
                             }
                           ],
                           "isNullable": true,
@@ -4390,7 +4599,8 @@ mod tests {
                                   "location": "inputObjectTypes",
                                   "isList": false
                                 }
-                              ]
+                              ],
+                              "isParameterizable": false
                             },
                             {
                               "name": "orderBy",
@@ -4409,7 +4619,8 @@ mod tests {
                                   "location": "inputObjectTypes",
                                   "isList": false
                                 }
-                              ]
+                              ],
+                              "isParameterizable": false
                             },
                             {
                               "name": "cursor",
@@ -4422,7 +4633,8 @@ mod tests {
                                   "location": "inputObjectTypes",
                                   "isList": false
                                 }
-                              ]
+                              ],
+                              "isParameterizable": false
                             },
                             {
                               "name": "take",
@@ -4434,7 +4646,8 @@ mod tests {
                                   "location": "scalar",
                                   "isList": false
                                 }
-                              ]
+                              ],
+                              "isParameterizable": false
                             },
                             {
                               "name": "skip",
@@ -4446,7 +4659,8 @@ mod tests {
                                   "location": "scalar",
                                   "isList": false
                                 }
-                              ]
+                              ],
+                              "isParameterizable": false
                             },
                             {
                               "name": "distinct",
@@ -4465,7 +4679,8 @@ mod tests {
                                   "location": "enumTypes",
                                   "isList": true
                                 }
-                              ]
+                              ],
+                              "isParameterizable": false
                             }
                           ],
                           "isNullable": false,
@@ -4490,7 +4705,8 @@ mod tests {
                                   "location": "inputObjectTypes",
                                   "isList": false
                                 }
-                              ]
+                              ],
+                              "isParameterizable": false
                             },
                             {
                               "name": "orderBy",
@@ -4509,7 +4725,8 @@ mod tests {
                                   "location": "inputObjectTypes",
                                   "isList": false
                                 }
-                              ]
+                              ],
+                              "isParameterizable": false
                             },
                             {
                               "name": "cursor",
@@ -4522,7 +4739,8 @@ mod tests {
                                   "location": "inputObjectTypes",
                                   "isList": false
                                 }
-                              ]
+                              ],
+                              "isParameterizable": false
                             },
                             {
                               "name": "take",
@@ -4534,7 +4752,8 @@ mod tests {
                                   "location": "scalar",
                                   "isList": false
                                 }
-                              ]
+                              ],
+                              "isParameterizable": false
                             },
                             {
                               "name": "skip",
@@ -4546,7 +4765,8 @@ mod tests {
                                   "location": "scalar",
                                   "isList": false
                                 }
-                              ]
+                              ],
+                              "isParameterizable": false
                             }
                           ],
                           "isNullable": false,
@@ -4571,7 +4791,8 @@ mod tests {
                                   "location": "inputObjectTypes",
                                   "isList": false
                                 }
-                              ]
+                              ],
+                              "isParameterizable": false
                             },
                             {
                               "name": "orderBy",
@@ -4590,7 +4811,8 @@ mod tests {
                                   "location": "inputObjectTypes",
                                   "isList": false
                                 }
-                              ]
+                              ],
+                              "isParameterizable": false
                             },
                             {
                               "name": "by",
@@ -4609,7 +4831,8 @@ mod tests {
                                   "location": "enumTypes",
                                   "isList": false
                                 }
-                              ]
+                              ],
+                              "isParameterizable": false
                             },
                             {
                               "name": "having",
@@ -4622,7 +4845,8 @@ mod tests {
                                   "location": "inputObjectTypes",
                                   "isList": false
                                 }
-                              ]
+                              ],
+                              "isParameterizable": false
                             },
                             {
                               "name": "take",
@@ -4634,7 +4858,8 @@ mod tests {
                                   "location": "scalar",
                                   "isList": false
                                 }
-                              ]
+                              ],
+                              "isParameterizable": false
                             },
                             {
                               "name": "skip",
@@ -4646,7 +4871,8 @@ mod tests {
                                   "location": "scalar",
                                   "isList": false
                                 }
-                              ]
+                              ],
+                              "isParameterizable": false
                             }
                           ],
                           "isNullable": false,
@@ -4671,7 +4897,8 @@ mod tests {
                                   "location": "inputObjectTypes",
                                   "isList": false
                                 }
-                              ]
+                              ],
+                              "isParameterizable": false
                             }
                           ],
                           "isNullable": true,
@@ -4696,7 +4923,8 @@ mod tests {
                                   "location": "inputObjectTypes",
                                   "isList": false
                                 }
-                              ]
+                              ],
+                              "isParameterizable": false
                             }
                           ],
                           "isNullable": true,
@@ -4721,7 +4949,8 @@ mod tests {
                                   "location": "inputObjectTypes",
                                   "isList": false
                                 }
-                              ]
+                              ],
+                              "isParameterizable": false
                             },
                             {
                               "name": "orderBy",
@@ -4740,7 +4969,8 @@ mod tests {
                                   "location": "inputObjectTypes",
                                   "isList": false
                                 }
-                              ]
+                              ],
+                              "isParameterizable": false
                             },
                             {
                               "name": "cursor",
@@ -4753,7 +4983,8 @@ mod tests {
                                   "location": "inputObjectTypes",
                                   "isList": false
                                 }
-                              ]
+                              ],
+                              "isParameterizable": false
                             },
                             {
                               "name": "take",
@@ -4765,7 +4996,8 @@ mod tests {
                                   "location": "scalar",
                                   "isList": false
                                 }
-                              ]
+                              ],
+                              "isParameterizable": false
                             },
                             {
                               "name": "skip",
@@ -4777,7 +5009,8 @@ mod tests {
                                   "location": "scalar",
                                   "isList": false
                                 }
-                              ]
+                              ],
+                              "isParameterizable": false
                             },
                             {
                               "name": "distinct",
@@ -4796,7 +5029,8 @@ mod tests {
                                   "location": "enumTypes",
                                   "isList": true
                                 }
-                              ]
+                              ],
+                              "isParameterizable": false
                             }
                           ],
                           "isNullable": true,
@@ -4821,7 +5055,8 @@ mod tests {
                                   "location": "inputObjectTypes",
                                   "isList": false
                                 }
-                              ]
+                              ],
+                              "isParameterizable": false
                             },
                             {
                               "name": "orderBy",
@@ -4840,7 +5075,8 @@ mod tests {
                                   "location": "inputObjectTypes",
                                   "isList": false
                                 }
-                              ]
+                              ],
+                              "isParameterizable": false
                             },
                             {
                               "name": "cursor",
@@ -4853,7 +5089,8 @@ mod tests {
                                   "location": "inputObjectTypes",
                                   "isList": false
                                 }
-                              ]
+                              ],
+                              "isParameterizable": false
                             },
                             {
                               "name": "take",
@@ -4865,7 +5102,8 @@ mod tests {
                                   "location": "scalar",
                                   "isList": false
                                 }
-                              ]
+                              ],
+                              "isParameterizable": false
                             },
                             {
                               "name": "skip",
@@ -4877,7 +5115,8 @@ mod tests {
                                   "location": "scalar",
                                   "isList": false
                                 }
-                              ]
+                              ],
+                              "isParameterizable": false
                             },
                             {
                               "name": "distinct",
@@ -4896,7 +5135,8 @@ mod tests {
                                   "location": "enumTypes",
                                   "isList": true
                                 }
-                              ]
+                              ],
+                              "isParameterizable": false
                             }
                           ],
                           "isNullable": true,
@@ -4921,7 +5161,8 @@ mod tests {
                                   "location": "inputObjectTypes",
                                   "isList": false
                                 }
-                              ]
+                              ],
+                              "isParameterizable": false
                             },
                             {
                               "name": "orderBy",
@@ -4940,7 +5181,8 @@ mod tests {
                                   "location": "inputObjectTypes",
                                   "isList": false
                                 }
-                              ]
+                              ],
+                              "isParameterizable": false
                             },
                             {
                               "name": "cursor",
@@ -4953,7 +5195,8 @@ mod tests {
                                   "location": "inputObjectTypes",
                                   "isList": false
                                 }
-                              ]
+                              ],
+                              "isParameterizable": false
                             },
                             {
                               "name": "take",
@@ -4965,7 +5208,8 @@ mod tests {
                                   "location": "scalar",
                                   "isList": false
                                 }
-                              ]
+                              ],
+                              "isParameterizable": false
                             },
                             {
                               "name": "skip",
@@ -4977,7 +5221,8 @@ mod tests {
                                   "location": "scalar",
                                   "isList": false
                                 }
-                              ]
+                              ],
+                              "isParameterizable": false
                             },
                             {
                               "name": "distinct",
@@ -4996,7 +5241,8 @@ mod tests {
                                   "location": "enumTypes",
                                   "isList": true
                                 }
-                              ]
+                              ],
+                              "isParameterizable": false
                             }
                           ],
                           "isNullable": false,
@@ -5021,7 +5267,8 @@ mod tests {
                                   "location": "inputObjectTypes",
                                   "isList": false
                                 }
-                              ]
+                              ],
+                              "isParameterizable": false
                             },
                             {
                               "name": "orderBy",
@@ -5040,7 +5287,8 @@ mod tests {
                                   "location": "inputObjectTypes",
                                   "isList": false
                                 }
-                              ]
+                              ],
+                              "isParameterizable": false
                             },
                             {
                               "name": "cursor",
@@ -5053,7 +5301,8 @@ mod tests {
                                   "location": "inputObjectTypes",
                                   "isList": false
                                 }
-                              ]
+                              ],
+                              "isParameterizable": false
                             },
                             {
                               "name": "take",
@@ -5065,7 +5314,8 @@ mod tests {
                                   "location": "scalar",
                                   "isList": false
                                 }
-                              ]
+                              ],
+                              "isParameterizable": false
                             },
                             {
                               "name": "skip",
@@ -5077,7 +5327,8 @@ mod tests {
                                   "location": "scalar",
                                   "isList": false
                                 }
-                              ]
+                              ],
+                              "isParameterizable": false
                             }
                           ],
                           "isNullable": false,
@@ -5102,7 +5353,8 @@ mod tests {
                                   "location": "inputObjectTypes",
                                   "isList": false
                                 }
-                              ]
+                              ],
+                              "isParameterizable": false
                             },
                             {
                               "name": "orderBy",
@@ -5121,7 +5373,8 @@ mod tests {
                                   "location": "inputObjectTypes",
                                   "isList": false
                                 }
-                              ]
+                              ],
+                              "isParameterizable": false
                             },
                             {
                               "name": "by",
@@ -5140,7 +5393,8 @@ mod tests {
                                   "location": "enumTypes",
                                   "isList": false
                                 }
-                              ]
+                              ],
+                              "isParameterizable": false
                             },
                             {
                               "name": "having",
@@ -5153,7 +5407,8 @@ mod tests {
                                   "location": "inputObjectTypes",
                                   "isList": false
                                 }
-                              ]
+                              ],
+                              "isParameterizable": false
                             },
                             {
                               "name": "take",
@@ -5165,7 +5420,8 @@ mod tests {
                                   "location": "scalar",
                                   "isList": false
                                 }
-                              ]
+                              ],
+                              "isParameterizable": false
                             },
                             {
                               "name": "skip",
@@ -5177,7 +5433,8 @@ mod tests {
                                   "location": "scalar",
                                   "isList": false
                                 }
-                              ]
+                              ],
+                              "isParameterizable": false
                             }
                           ],
                           "isNullable": false,
@@ -5202,7 +5459,8 @@ mod tests {
                                   "location": "inputObjectTypes",
                                   "isList": false
                                 }
-                              ]
+                              ],
+                              "isParameterizable": false
                             }
                           ],
                           "isNullable": true,
@@ -5227,7 +5485,8 @@ mod tests {
                                   "location": "inputObjectTypes",
                                   "isList": false
                                 }
-                              ]
+                              ],
+                              "isParameterizable": false
                             }
                           ],
                           "isNullable": true,
@@ -5263,7 +5522,8 @@ mod tests {
                                   "location": "inputObjectTypes",
                                   "isList": false
                                 }
-                              ]
+                              ],
+                              "isParameterizable": false
                             }
                           ],
                           "isNullable": false,
@@ -5288,7 +5548,8 @@ mod tests {
                                   "location": "inputObjectTypes",
                                   "isList": false
                                 }
-                              ]
+                              ],
+                              "isParameterizable": false
                             },
                             {
                               "name": "create",
@@ -5307,7 +5568,8 @@ mod tests {
                                   "location": "inputObjectTypes",
                                   "isList": false
                                 }
-                              ]
+                              ],
+                              "isParameterizable": false
                             },
                             {
                               "name": "update",
@@ -5326,7 +5588,8 @@ mod tests {
                                   "location": "inputObjectTypes",
                                   "isList": false
                                 }
-                              ]
+                              ],
+                              "isParameterizable": false
                             }
                           ],
                           "isNullable": false,
@@ -5357,7 +5620,8 @@ mod tests {
                                   "location": "inputObjectTypes",
                                   "isList": true
                                 }
-                              ]
+                              ],
+                              "isParameterizable": false
                             },
                             {
                               "name": "skipDuplicates",
@@ -5369,7 +5633,8 @@ mod tests {
                                   "location": "scalar",
                                   "isList": false
                                 }
-                              ]
+                              ],
+                              "isParameterizable": false
                             }
                           ],
                           "isNullable": false,
@@ -5400,7 +5665,8 @@ mod tests {
                                   "location": "inputObjectTypes",
                                   "isList": true
                                 }
-                              ]
+                              ],
+                              "isParameterizable": false
                             },
                             {
                               "name": "skipDuplicates",
@@ -5412,7 +5678,8 @@ mod tests {
                                   "location": "scalar",
                                   "isList": false
                                 }
-                              ]
+                              ],
+                              "isParameterizable": false
                             }
                           ],
                           "isNullable": false,
@@ -5437,7 +5704,8 @@ mod tests {
                                   "location": "inputObjectTypes",
                                   "isList": false
                                 }
-                              ]
+                              ],
+                              "isParameterizable": false
                             }
                           ],
                           "isNullable": true,
@@ -5468,7 +5736,8 @@ mod tests {
                                   "location": "inputObjectTypes",
                                   "isList": false
                                 }
-                              ]
+                              ],
+                              "isParameterizable": false
                             },
                             {
                               "name": "where",
@@ -5481,7 +5750,8 @@ mod tests {
                                   "location": "inputObjectTypes",
                                   "isList": false
                                 }
-                              ]
+                              ],
+                              "isParameterizable": false
                             }
                           ],
                           "isNullable": true,
@@ -5512,7 +5782,8 @@ mod tests {
                                   "location": "inputObjectTypes",
                                   "isList": false
                                 }
-                              ]
+                              ],
+                              "isParameterizable": false
                             },
                             {
                               "name": "where",
@@ -5525,7 +5796,8 @@ mod tests {
                                   "location": "inputObjectTypes",
                                   "isList": false
                                 }
-                              ]
+                              ],
+                              "isParameterizable": false
                             },
                             {
                               "name": "limit",
@@ -5537,7 +5809,8 @@ mod tests {
                                   "location": "scalar",
                                   "isList": false
                                 }
-                              ]
+                              ],
+                              "isParameterizable": false
                             }
                           ],
                           "isNullable": false,
@@ -5568,7 +5841,8 @@ mod tests {
                                   "location": "inputObjectTypes",
                                   "isList": false
                                 }
-                              ]
+                              ],
+                              "isParameterizable": false
                             },
                             {
                               "name": "where",
@@ -5581,7 +5855,8 @@ mod tests {
                                   "location": "inputObjectTypes",
                                   "isList": false
                                 }
-                              ]
+                              ],
+                              "isParameterizable": false
                             },
                             {
                               "name": "limit",
@@ -5593,7 +5868,8 @@ mod tests {
                                   "location": "scalar",
                                   "isList": false
                                 }
-                              ]
+                              ],
+                              "isParameterizable": false
                             }
                           ],
                           "isNullable": false,
@@ -5618,7 +5894,8 @@ mod tests {
                                   "location": "inputObjectTypes",
                                   "isList": false
                                 }
-                              ]
+                              ],
+                              "isParameterizable": false
                             },
                             {
                               "name": "limit",
@@ -5630,7 +5907,8 @@ mod tests {
                                   "location": "scalar",
                                   "isList": false
                                 }
-                              ]
+                              ],
+                              "isParameterizable": false
                             }
                           ],
                           "isNullable": false,
@@ -5661,7 +5939,8 @@ mod tests {
                                   "location": "inputObjectTypes",
                                   "isList": false
                                 }
-                              ]
+                              ],
+                              "isParameterizable": false
                             }
                           ],
                           "isNullable": false,
@@ -5686,7 +5965,8 @@ mod tests {
                                   "location": "inputObjectTypes",
                                   "isList": false
                                 }
-                              ]
+                              ],
+                              "isParameterizable": false
                             },
                             {
                               "name": "create",
@@ -5705,7 +5985,8 @@ mod tests {
                                   "location": "inputObjectTypes",
                                   "isList": false
                                 }
-                              ]
+                              ],
+                              "isParameterizable": false
                             },
                             {
                               "name": "update",
@@ -5724,7 +6005,8 @@ mod tests {
                                   "location": "inputObjectTypes",
                                   "isList": false
                                 }
-                              ]
+                              ],
+                              "isParameterizable": false
                             }
                           ],
                           "isNullable": false,
@@ -5755,7 +6037,8 @@ mod tests {
                                   "location": "inputObjectTypes",
                                   "isList": true
                                 }
-                              ]
+                              ],
+                              "isParameterizable": false
                             },
                             {
                               "name": "skipDuplicates",
@@ -5767,7 +6050,8 @@ mod tests {
                                   "location": "scalar",
                                   "isList": false
                                 }
-                              ]
+                              ],
+                              "isParameterizable": false
                             }
                           ],
                           "isNullable": false,
@@ -5798,7 +6082,8 @@ mod tests {
                                   "location": "inputObjectTypes",
                                   "isList": true
                                 }
-                              ]
+                              ],
+                              "isParameterizable": false
                             },
                             {
                               "name": "skipDuplicates",
@@ -5810,7 +6095,8 @@ mod tests {
                                   "location": "scalar",
                                   "isList": false
                                 }
-                              ]
+                              ],
+                              "isParameterizable": false
                             }
                           ],
                           "isNullable": false,
@@ -5835,7 +6121,8 @@ mod tests {
                                   "location": "inputObjectTypes",
                                   "isList": false
                                 }
-                              ]
+                              ],
+                              "isParameterizable": false
                             }
                           ],
                           "isNullable": true,
@@ -5866,7 +6153,8 @@ mod tests {
                                   "location": "inputObjectTypes",
                                   "isList": false
                                 }
-                              ]
+                              ],
+                              "isParameterizable": false
                             },
                             {
                               "name": "where",
@@ -5879,7 +6167,8 @@ mod tests {
                                   "location": "inputObjectTypes",
                                   "isList": false
                                 }
-                              ]
+                              ],
+                              "isParameterizable": false
                             }
                           ],
                           "isNullable": true,
@@ -5910,7 +6199,8 @@ mod tests {
                                   "location": "inputObjectTypes",
                                   "isList": false
                                 }
-                              ]
+                              ],
+                              "isParameterizable": false
                             },
                             {
                               "name": "where",
@@ -5923,7 +6213,8 @@ mod tests {
                                   "location": "inputObjectTypes",
                                   "isList": false
                                 }
-                              ]
+                              ],
+                              "isParameterizable": false
                             },
                             {
                               "name": "limit",
@@ -5935,7 +6226,8 @@ mod tests {
                                   "location": "scalar",
                                   "isList": false
                                 }
-                              ]
+                              ],
+                              "isParameterizable": false
                             }
                           ],
                           "isNullable": false,
@@ -5966,7 +6258,8 @@ mod tests {
                                   "location": "inputObjectTypes",
                                   "isList": false
                                 }
-                              ]
+                              ],
+                              "isParameterizable": false
                             },
                             {
                               "name": "where",
@@ -5979,7 +6272,8 @@ mod tests {
                                   "location": "inputObjectTypes",
                                   "isList": false
                                 }
-                              ]
+                              ],
+                              "isParameterizable": false
                             },
                             {
                               "name": "limit",
@@ -5991,7 +6285,8 @@ mod tests {
                                   "location": "scalar",
                                   "isList": false
                                 }
-                              ]
+                              ],
+                              "isParameterizable": false
                             }
                           ],
                           "isNullable": false,
@@ -6016,7 +6311,8 @@ mod tests {
                                   "location": "inputObjectTypes",
                                   "isList": false
                                 }
-                              ]
+                              ],
+                              "isParameterizable": false
                             },
                             {
                               "name": "limit",
@@ -6028,7 +6324,8 @@ mod tests {
                                   "location": "scalar",
                                   "isList": false
                                 }
-                              ]
+                              ],
+                              "isParameterizable": false
                             }
                           ],
                           "isNullable": false,
@@ -6052,7 +6349,8 @@ mod tests {
                                   "location": "scalar",
                                   "isList": false
                                 }
-                              ]
+                              ],
+                              "isParameterizable": false
                             },
                             {
                               "name": "parameters",
@@ -6064,7 +6362,8 @@ mod tests {
                                   "location": "scalar",
                                   "isList": false
                                 }
-                              ]
+                              ],
+                              "isParameterizable": false
                             }
                           ],
                           "isNullable": false,
@@ -6087,7 +6386,8 @@ mod tests {
                                   "location": "scalar",
                                   "isList": false
                                 }
-                              ]
+                              ],
+                              "isParameterizable": false
                             },
                             {
                               "name": "parameters",
@@ -6099,7 +6399,8 @@ mod tests {
                                   "location": "scalar",
                                   "isList": false
                                 }
-                              ]
+                              ],
+                              "isParameterizable": false
                             }
                           ],
                           "isNullable": false,
@@ -6513,7 +6814,8 @@ mod tests {
                                   "location": "inputObjectTypes",
                                   "isList": false
                                 }
-                              ]
+                              ],
+                              "isParameterizable": false
                             }
                           ],
                           "isNullable": true,
@@ -6692,7 +6994,8 @@ mod tests {
                               "location": "scalar",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": false
                         },
                         {
                           "name": "_container",
@@ -6704,7 +7007,8 @@ mod tests {
                               "location": "scalar",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": false
                         }
                       ]
                     },
@@ -6728,7 +7032,8 @@ mod tests {
                               "location": "scalar",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": false
                         },
                         {
                           "name": "_container",
@@ -6740,7 +7045,8 @@ mod tests {
                               "location": "scalar",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": false
                         }
                       ]
                     },
@@ -6764,7 +7070,8 @@ mod tests {
                               "location": "scalar",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": false
                         },
                         {
                           "name": "_container",
@@ -6776,7 +7083,8 @@ mod tests {
                               "location": "scalar",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": false
                         }
                       ]
                     },
@@ -6800,7 +7108,8 @@ mod tests {
                               "location": "scalar",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": false
                         },
                         {
                           "name": "_container",
@@ -6812,7 +7121,8 @@ mod tests {
                               "location": "scalar",
                               "isList": false
                             }
-                          ]
+                          ],
+                          "isParameterizable": false
                         }
                       ]
                     }

@@ -16,6 +16,7 @@ pub(super) fn render_input_field<'a>(input_field: &InputField<'a>, ctx: &mut Ren
         input_types: type_references,
         is_required: input_field.is_required(),
         is_nullable: nullable,
+        is_parameterizable: input_field.is_parameterizable(),
         requires_other_fields: input_field
             .requires_other_fields()
             .iter()

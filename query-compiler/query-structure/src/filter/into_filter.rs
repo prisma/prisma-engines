@@ -1,4 +1,5 @@
 use itertools::Itertools;
+use prisma_value::PrismaValue;
 
 use super::*;
 
@@ -28,23 +29,24 @@ impl IntoFilter for SelectionResult {
 
 impl IntoFilter for Vec<SelectionResult> {
     fn filter(self) -> Filter {
-        if let Some(pairs) = self
+        match self
             .iter()
             .exactly_one()
             .ok()
             .and_then(SelectionResult::as_placeholders)
         {
-            return Filter::and(pairs.into_iter().fold(vec![], |mut acc, (sf, val)| {
-                acc.push(sf.is_in_template(val.clone()));
-                acc
-            }));
+            Some(pairs) => Filter::and(
+                pairs
+                    .into_iter()
+                    .map(|(sf, val)| {
+                        let PrismaValue::Placeholder(p) = val else {
+                            unreachable!("as_placeholders guarantees all values are placeholders")
+                        };
+                        sf.is_in(p.clone())
+                    })
+                    .collect(),
+            ),
+            None => Filter::or(self.into_iter().map(|id| id.filter()).collect()),
         }
-
-        let filters = self.into_iter().fold(vec![], |mut acc, id| {
-            acc.push(id.filter());
-            acc
-        });
-
-        Filter::or(filters)
     }
 }

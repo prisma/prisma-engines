@@ -373,7 +373,6 @@ pub enum ScalarType {
     JsonList,
     UUID,
     Bytes,
-    Param,
 }
 
 impl fmt::Display for ScalarType {
@@ -391,7 +390,6 @@ impl fmt::Display for ScalarType {
             ScalarType::UUID => "UUID",
             ScalarType::JsonList => "Json",
             ScalarType::Bytes => "Bytes",
-            ScalarType::Param => "Param",
         };
 
         f.write_str(typ)

@@ -149,7 +149,7 @@ pub(crate) fn where_unique_object_type(ctx: &'_ QuerySchema, model: Model) -> In
                 let name = sf.borrowed_name(&ctx.internal_data_model.schema);
                 let typ = map_scalar_input_type_for_field(ctx, sf);
 
-                simple_input_field(name, typ, None).optional()
+                simple_input_field(name, typ, None).optional().parameterizable()
             })
             .collect();
 
@@ -222,7 +222,7 @@ fn compound_field_unique_object_type<'a>(
                 let name = field.name().to_owned();
                 let typ = map_scalar_input_type_for_field(ctx, &field);
 
-                simple_input_field(name, typ, None)
+                simple_input_field(name, typ, None).parameterizable()
             })
             .collect()
     });
@@ -246,6 +246,7 @@ pub(crate) fn composite_equality_object(ctx: &'_ QuerySchema, cf: CompositeField
                 simple_input_field(sf.name().to_owned(), map_scalar_input_type_for_field, None)
                     .optional_if(!sf.is_required())
                     .nullable_if(!sf.is_required() && !sf.is_list())
+                    .parameterizable()
             }
 
             ModelField::Composite(cf) => {

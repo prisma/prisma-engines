@@ -1,5 +1,5 @@
 use crate::field::*;
-use prisma_value::{PrismaListValue, PrismaValue};
+use prisma_value::{Placeholder, PrismaListValue, PrismaValue};
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum ConditionValue {
@@ -55,6 +55,7 @@ impl From<&ScalarFieldRef> for ConditionValue {
 pub enum ConditionListValue {
     List(PrismaListValue),
     FieldRef(ScalarFieldRef),
+    Placeholder(Placeholder),
 }
 
 impl ConditionListValue {
@@ -73,6 +74,10 @@ impl ConditionListValue {
         match self {
             ConditionListValue::List(list) => list.len(),
             ConditionListValue::FieldRef(_) => 1,
+            // TODO: Remove chunking logic from QC completely after parameterization is fully
+            // implemented and always used by the Client. Chunking should be handled by the
+            // QueryInterpreter on the Prisma Client side.
+            ConditionListValue::Placeholder(_) => 1,
         }
     }
 
@@ -82,6 +87,10 @@ impl ConditionListValue {
 
     pub fn as_field_ref(&self) -> Option<&ScalarFieldRef> {
         if let Self::FieldRef(v) = self { Some(v) } else { None }
+    }
+
+    pub fn as_placeholder(&self) -> Option<&Placeholder> {
+        if let Self::Placeholder(v) = self { Some(v) } else { None }
     }
 }
 
@@ -94,5 +103,11 @@ impl From<PrismaListValue> for ConditionListValue {
 impl From<ScalarFieldRef> for ConditionListValue {
     fn from(sf: ScalarFieldRef) -> Self {
         Self::reference(sf)
+    }
+}
+
+impl From<Placeholder> for ConditionListValue {
+    fn from(p: Placeholder) -> Self {
+        Self::Placeholder(p)
     }
 }

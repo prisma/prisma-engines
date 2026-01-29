@@ -122,7 +122,7 @@ impl<'a> Mysql<'a> {
                     Ok(())
                 }
                 // Convert BigInt to string to preserve precision when parsed by JavaScript.
-                (Some(TypeFamily::Int), Some("BigInt" | "UnsignedBigInt")) => {
+                (Some(TypeFamily::Int), Some("BIGINT" | "UNSIGNEDBIGINT")) => {
                     self.write("CONVERT")?;
                     self.surround_with("(", ")", |s| {
                         s.visit_expression(expr)?;
@@ -580,15 +580,13 @@ impl<'a> Visitor<'a> for Mysql<'a> {
         })
     }
 
-    fn visit_matches(&mut self, left: Expression<'a>, right: std::borrow::Cow<'a, str>, not: bool) -> visitor::Result {
+    fn visit_matches(&mut self, left: Expression<'a>, right: Expression<'a>, not: bool) -> visitor::Result {
         if not {
             self.write("(NOT ")?;
         }
 
         self.visit_expression(left)?;
-        self.surround_with("AGAINST (", " IN BOOLEAN MODE)", |s| {
-            s.visit_parameterized(Value::text(right))
-        })?;
+        self.surround_with("AGAINST (", " IN BOOLEAN MODE)", |s| s.visit_expression(right))?;
 
         if not {
             self.write(")")?;
@@ -603,7 +601,8 @@ impl<'a> Visitor<'a> for Mysql<'a> {
 
         let text_search = TextSearch { exprs };
 
-        self.visit_matches(text_search.into(), query, false)?;
+        self.visit_expression(text_search.into())?;
+        self.surround_with("AGAINST (", " IN BOOLEAN MODE)", |s| s.visit_expression(query))?;
 
         Ok(())
     }
@@ -832,10 +831,10 @@ mod tests {
     fn json_build_object_casts_bigint_to_string() {
         let build_json = json_build_object(vec![(
             "id".into(),
-            Column::from("id")
-                .native_column_type(Some("BigInt"))
-                .type_family(TypeFamily::Int)
-                .into(),
+                Column::from("id")
+                    .native_column_type(Some("BIGINT"))
+                    .type_family(TypeFamily::Int)
+                    .into(),
         )]);
         let query = Select::default().value(build_json);
         let (sql, _) = Mysql::build(query).unwrap();
