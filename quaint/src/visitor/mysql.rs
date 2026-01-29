@@ -831,10 +831,25 @@ mod tests {
     fn json_build_object_casts_bigint_to_string() {
         let build_json = json_build_object(vec![(
             "id".into(),
-                Column::from("id")
-                    .native_column_type(Some("BIGINT"))
-                    .type_family(TypeFamily::Int)
-                    .into(),
+            Column::from("id")
+                .native_column_type(Some("BIGINT"))
+                .type_family(TypeFamily::Int)
+                .into(),
+        )]);
+        let query = Select::default().value(build_json);
+        let (sql, _) = Mysql::build(query).unwrap();
+
+        assert_eq!("SELECT JSON_OBJECT('id', CONVERT(`id`, CHAR))", sql);
+    }
+
+    #[test]
+    fn json_build_object_casts_unsigned_bigint_to_string() {
+        let build_json = json_build_object(vec![(
+            "id".into(),
+            Column::from("id")
+                .native_column_type(Some("UNSIGNEDBIGINT"))
+                .type_family(TypeFamily::Int)
+                .into(),
         )]);
         let query = Select::default().value(build_json);
         let (sql, _) = Mysql::build(query).unwrap();
