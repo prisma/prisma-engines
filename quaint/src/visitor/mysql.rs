@@ -121,6 +121,16 @@ impl<'a> Mysql<'a> {
                     })?;
                     Ok(())
                 }
+                // Convert BigInt to string to preserve precision when parsed by JavaScript.
+                (Some(TypeFamily::Int), Some("BIGINT" | "UNSIGNEDBIGINT")) => {
+                    self.write("CONVERT")?;
+                    self.surround_with("(", ")", |s| {
+                        s.visit_expression(expr)?;
+                        s.write(", ")?;
+                        s.write("CHAR")
+                    })?;
+                    Ok(())
+                }
                 _ => self.visit_expression(expr),
             },
             _ => self.visit_expression(expr),
@@ -717,6 +727,7 @@ fn get_target_table<'a>(query: &Query<'a>) -> Option<Table<'a>> {
 
 #[cfg(test)]
 mod tests {
+    use crate::ast::*;
     use crate::visitor::*;
 
     fn expected_values<'a, T>(sql: &'static str, params: Vec<T>) -> (String, Vec<Value<'a>>)
@@ -814,6 +825,36 @@ mod tests {
             vec![Value::int32(1), Value::int32(2), Value::int32(3), Value::int32(4),],
             params
         );
+    }
+
+    #[test]
+    fn json_build_object_casts_bigint_to_string() {
+        let build_json = json_build_object(vec![(
+            "id".into(),
+            Column::from("id")
+                .native_column_type(Some("BIGINT"))
+                .type_family(TypeFamily::Int)
+                .into(),
+        )]);
+        let query = Select::default().value(build_json);
+        let (sql, _) = Mysql::build(query).unwrap();
+
+        assert_eq!("SELECT JSON_OBJECT('id', CONVERT(`id`, CHAR))", sql);
+    }
+
+    #[test]
+    fn json_build_object_casts_unsigned_bigint_to_string() {
+        let build_json = json_build_object(vec![(
+            "id".into(),
+            Column::from("id")
+                .native_column_type(Some("UNSIGNEDBIGINT"))
+                .type_family(TypeFamily::Int)
+                .into(),
+        )]);
+        let query = Select::default().value(build_json);
+        let (sql, _) = Mysql::build(query).unwrap();
+
+        assert_eq!("SELECT JSON_OBJECT('id', CONVERT(`id`, CHAR))", sql);
     }
 
     #[test]
