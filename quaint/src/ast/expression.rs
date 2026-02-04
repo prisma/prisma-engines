@@ -50,10 +50,20 @@ impl<'a> Expression<'a> {
                 ..
             }) => true,
 
+            ExpressionKind::Parameterized(Value {
+                typed: ValueType::Opaque(opaque),
+                ..
+            }) => matches!(opaque.typ(), OpaqueType::Json),
+
             ExpressionKind::ParameterizedRow(Value {
                 typed: ValueType::Json(_),
                 ..
             }) => true,
+
+            ExpressionKind::ParameterizedRow(Value {
+                typed: ValueType::Opaque(opaque),
+                ..
+            }) => matches!(opaque.typ(), OpaqueType::Json),
 
             ExpressionKind::Value(expr) => expr.is_json_value(),
 
@@ -70,12 +80,44 @@ impl<'a> Expression<'a> {
                 ..
             }) => true,
 
+            ExpressionKind::Parameterized(Value {
+                typed: ValueType::Opaque(opaque),
+                ..
+            }) => matches!(opaque.typ(), OpaqueType::Json),
+
             ExpressionKind::ParameterizedRow(Value {
                 typed: ValueType::Json(_),
                 ..
             }) => true,
 
+            ExpressionKind::ParameterizedRow(Value {
+                typed: ValueType::Opaque(opaque),
+                ..
+            }) => matches!(opaque.typ(), OpaqueType::Json),
+
             ExpressionKind::Value(expr) => expr.is_json_value(),
+            _ => false,
+        }
+    }
+
+    /// Returns true if this expression contains an extractable JSON value.
+    /// Unlike `is_json_value()`, this returns false for opaque JSON placeholders
+    /// which are typed as JSON but don't contain actual JSON data to extract.
+    #[allow(dead_code)]
+    #[cfg(feature = "mysql")]
+    pub(crate) fn is_extractable_json_value(&self) -> bool {
+        match &self.kind {
+            ExpressionKind::Parameterized(Value {
+                typed: ValueType::Json(_),
+                ..
+            }) => true,
+
+            ExpressionKind::ParameterizedRow(Value {
+                typed: ValueType::Json(_),
+                ..
+            }) => true,
+
+            ExpressionKind::Value(expr) => expr.is_extractable_json_value(),
             _ => false,
         }
     }

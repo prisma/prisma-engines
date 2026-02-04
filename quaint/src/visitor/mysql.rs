@@ -65,7 +65,7 @@ impl<'a> Mysql<'a> {
         }
 
         match (left, right) {
-            (left, right) if left.is_json_value() && right.is_fun_retuning_json() => {
+            (left, right) if left.is_extractable_json_value() && right.is_fun_retuning_json() => {
                 let quaint_value = json_to_quaint_value(left.into_json_value().unwrap())?;
 
                 self.visit_parameterized(quaint_value)?;
@@ -73,7 +73,7 @@ impl<'a> Mysql<'a> {
                 self.visit_expression(right)?;
             }
 
-            (left, right) if left.is_fun_retuning_json() && right.is_json_value() => {
+            (left, right) if left.is_fun_retuning_json() && right.is_extractable_json_value() => {
                 let quaint_value = json_to_quaint_value(right.into_json_value().unwrap())?;
 
                 self.visit_expression(left)?;
