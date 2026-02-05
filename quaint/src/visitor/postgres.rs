@@ -31,6 +31,14 @@ impl<'a> Postgres<'a> {
 
                     Ok(())
                 }
+                // Cast BigInt to text to preserve precision when parsed by JavaScript.
+                // JavaScript's JSON.parse loses precision for integers > 2^53-1.
+                (Some(TypeFamily::Int), Some("BIGINT" | "INT8")) => {
+                    self.visit_expression(expr)?;
+                    self.write("::text")?;
+
+                    Ok(())
+                }
                 _ => self.visit_expression(expr),
             },
             _ => self.visit_expression(expr),
@@ -625,14 +633,14 @@ impl<'a> Visitor<'a> for Postgres<'a> {
         })
     }
 
-    fn visit_matches(&mut self, left: Expression<'a>, right: std::borrow::Cow<'a, str>, not: bool) -> visitor::Result {
+    fn visit_matches(&mut self, left: Expression<'a>, right: Expression<'a>, not: bool) -> visitor::Result {
         if not {
             self.write("(NOT ")?;
         }
 
         self.visit_expression(left)?;
         self.write(" @@ ")?;
-        self.surround_with("to_tsquery(", ")", |s| s.visit_parameterized(Value::text(right)))?;
+        self.surround_with("to_tsquery(", ")", |s| s.visit_expression(right))?;
 
         if not {
             self.write(")")?;
@@ -659,7 +667,7 @@ impl<'a> Visitor<'a> for Postgres<'a> {
             Ok(())
         })?;
         self.write(", ")?;
-        self.surround_with("to_tsquery(", ")", |s| s.visit_parameterized(Value::text(query)))?;
+        self.surround_with("to_tsquery(", ")", |s| s.visit_expression(query))?;
         self.write(")")?;
 
         Ok(())
@@ -1402,6 +1410,35 @@ mod tests {
             assert_eq!(sql, "SELECT JSONB_BUILD_OBJECT('money', \"money\"::numeric)");
         }
 
+        #[test]
+        fn bigint() {
+            let build_json = json_build_object(vec![(
+                "id".into(),
+                Column::from("id")
+                    .native_column_type(Some("BigInt"))
+                    .type_family(TypeFamily::Int)
+                    .into(),
+            )]);
+            let query = Select::default().value(build_json);
+            let (sql, _) = Postgres::build(query).unwrap();
+
+            assert_eq!(sql, "SELECT JSONB_BUILD_OBJECT('id', \"id\"::text)");
+        }
+
+        #[test]
+        fn int8() {
+            let build_json = json_build_object(vec![(
+                "id".into(),
+                Column::from("id")
+                    .native_column_type(Some("INT8"))
+                    .type_family(TypeFamily::Int)
+                    .into(),
+            )]);
+            let query = Select::default().value(build_json);
+            let (sql, _) = Postgres::build(query).unwrap();
+
+            assert_eq!(sql, "SELECT JSONB_BUILD_OBJECT('id', \"id\"::text)");
+        }
         fn build_json_object(num_fields: u32) -> JsonBuildObject<'static> {
             let fields = (1..=num_fields)
                 .map(|i| (format!("f{i}").into(), Expression::from(i as i64)))

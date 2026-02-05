@@ -224,6 +224,9 @@ impl MongoFilterVisitor {
                     // In this context, `field_ref` refers to an array field, so we actually need an `$in` operator.
                     doc! { "$in": [&field_name, coerce_as_array(self.prefixed_field_ref(&field_ref)?)] }
                 }
+                ConditionListValue::Placeholder(_) => {
+                    unimplemented!("query compiler not supported with mongodb yet")
+                }
             },
             ScalarCondition::NotIn(vals) => match vals {
                 ConditionListValue::List(vals) => {
@@ -245,9 +248,10 @@ impl MongoFilterVisitor {
                     // In this context, `field_ref` refers to an array field, so we actually need an `$in` operator.
                     doc! { "$not": { "$in": [&field_name, coerce_as_array(self.prefixed_field_ref(&field_ref)?)] } }
                 }
+                ConditionListValue::Placeholder(_) => {
+                    unimplemented!("query compiler not supported with mongodb yet")
+                }
             },
-            ScalarCondition::InTemplate(_) => unimplemented!("query compiler not supported with mongodb yet"),
-            ScalarCondition::NotInTemplate(_) => unimplemented!("query compiler not supported with mongodb yet"),
             ScalarCondition::JsonCompare(jc) => match *jc.condition {
                 ScalarCondition::Equals(value) => {
                     let bson = match value {
@@ -381,6 +385,9 @@ impl MongoFilterVisitor {
                     self.regex_match(&Bson::from("$$elem"), field, "^", field, "$", true)?,
                     true,
                 )),
+                ConditionListValue::Placeholder(_) => {
+                    unimplemented!("query compiler not supported with mongodb yet")
+                }
             },
             ScalarCondition::NotIn(vals) => match vals {
                 ConditionListValue::List(vals) => {
@@ -401,9 +408,10 @@ impl MongoFilterVisitor {
                         .map(|rgx_doc| doc! { "$not": rgx_doc })?,
                     true,
                 )),
+                ConditionListValue::Placeholder(_) => {
+                    unimplemented!("query compiler not supported with mongodb yet")
+                }
             },
-            ScalarCondition::InTemplate(_) => unimplemented!("query compiler not supported with mongodb yet"),
-            ScalarCondition::NotInTemplate(_) => unimplemented!("query compiler not supported with mongodb yet"),
             ScalarCondition::IsSet(is_set) => Ok(render_is_set(&field_name, is_set)),
             ScalarCondition::JsonCompare(_) => Err(MongoError::Unsupported(
                 "JSON filtering is not yet supported on MongoDB".to_string(),
@@ -470,6 +478,9 @@ impl MongoFilterVisitor {
                 doc! { "$in": ["$$elem", coerce_as_array((self.prefix(), &field_ref).into_bson()?)] },
                 true,
             ),
+            ScalarListCondition::ContainsEvery(ConditionListValue::Placeholder(_)) => {
+                unimplemented!("query compiler not supported with mongodb yet")
+            }
 
             ScalarListCondition::ContainsSome(vals) if vals.is_empty() => {
                 // Empty hasSome: Return no records.
@@ -493,6 +504,9 @@ impl MongoFilterVisitor {
                 doc! { "$in": ["$$elem", coerce_as_array((self.prefix(), &field_ref).into_bson()?)] },
                 true,
             ),
+            ScalarListCondition::ContainsSome(ConditionListValue::Placeholder(_)) => {
+                unimplemented!("query compiler not supported with mongodb yet")
+            }
 
             ScalarListCondition::IsEmpty(true) => {
                 doc! { "$eq": [render_size(&field_name, true), 0] }
