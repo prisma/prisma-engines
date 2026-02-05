@@ -73,7 +73,7 @@ hex = "0.4"
 indoc = "2"
 indexmap = { version = "2", features = ["serde"] }
 itertools = "0.13"
-jsonrpc-core = "17"
+jsonrpc-core = "18"
 log = "0.4"
 lru-cache = "0.1"
 lsp-types = "0.95"
