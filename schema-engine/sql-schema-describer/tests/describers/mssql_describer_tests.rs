@@ -1431,3 +1431,167 @@ fn multiple_schemas_with_same_foreign_key_are_described(api: TestApi) {
 
     expected_schema.assert_debug_eq(&schema);
 }
+
+#[test_connector(tags(Mssql))]
+fn partial_indexes_are_described(api: TestApi) {
+    let sql = r#"
+        CREATE TABLE [User] (
+            id INT PRIMARY KEY,
+            email NVARCHAR(255) NOT NULL,
+            active BIT NOT NULL DEFAULT 1
+        );
+
+        CREATE UNIQUE INDEX [User_email_active_idx] ON [User] (email) WHERE active = 1;
+    "#;
+
+    api.raw_cmd(sql);
+    let expected = expect![[r#"
+        SqlSchema {
+            namespaces: {},
+            tables: [
+                Table {
+                    namespace_id: NamespaceId(
+                        0,
+                    ),
+                    name: "User",
+                    properties: BitFlags<TableProperties> {
+                        bits: 0b0,
+                    },
+                    description: None,
+                },
+            ],
+            enums: [],
+            enum_variants: [],
+            table_columns: [
+                (
+                    TableId(
+                        0,
+                    ),
+                    Column {
+                        name: "id",
+                        tpe: ColumnType {
+                            full_data_type: "int",
+                            family: Int,
+                            arity: Required,
+                            native_type: Some(
+                                NativeTypeInstance(..),
+                            ),
+                        },
+                        auto_increment: false,
+                        description: None,
+                    },
+                ),
+                (
+                    TableId(
+                        0,
+                    ),
+                    Column {
+                        name: "email",
+                        tpe: ColumnType {
+                            full_data_type: "nvarchar(255)",
+                            family: String,
+                            arity: Required,
+                            native_type: Some(
+                                NativeTypeInstance(..),
+                            ),
+                        },
+                        auto_increment: false,
+                        description: None,
+                    },
+                ),
+                (
+                    TableId(
+                        0,
+                    ),
+                    Column {
+                        name: "active",
+                        tpe: ColumnType {
+                            full_data_type: "bit",
+                            family: Boolean,
+                            arity: Required,
+                            native_type: Some(
+                                NativeTypeInstance(..),
+                            ),
+                        },
+                        auto_increment: false,
+                        description: None,
+                    },
+                ),
+            ],
+            foreign_keys: [],
+            table_default_values: [
+                (
+                    TableColumnId(
+                        2,
+                    ),
+                    DefaultValue {
+                        kind: Value(
+                            Int(
+                                1,
+                            ),
+                        ),
+                        constraint_name: Some(
+                            "User_active_df",
+                        ),
+                    },
+                ),
+            ],
+            view_default_values: [],
+            foreign_key_columns: [],
+            indexes: [
+                Index {
+                    table_id: TableId(
+                        0,
+                    ),
+                    index_name: "User_email_active_idx",
+                    tpe: Unique,
+                    predicate: Some(
+                        "([active]=(1))",
+                    ),
+                },
+                Index {
+                    table_id: TableId(
+                        0,
+                    ),
+                    index_name: "PK__User__3213E83F",
+                    tpe: PrimaryKey,
+                    predicate: None,
+                },
+            ],
+            index_columns: [
+                IndexColumn {
+                    index_id: IndexId(
+                        0,
+                    ),
+                    column_id: TableColumnId(
+                        1,
+                    ),
+                    sort_order: Some(
+                        Asc,
+                    ),
+                    length: None,
+                },
+                IndexColumn {
+                    index_id: IndexId(
+                        1,
+                    ),
+                    column_id: TableColumnId(
+                        0,
+                    ),
+                    sort_order: Some(
+                        Asc,
+                    ),
+                    length: None,
+                },
+            ],
+            check_constraints: [],
+            views: [],
+            view_columns: [],
+            procedures: [],
+            user_defined_types: [],
+            connector_data: <ConnectorData>,
+            runtime_namespace: None,
+        }
+    "#]];
+    expected.assert_debug_eq(&api.describe());
+}
