@@ -21,6 +21,21 @@ pub(crate) fn get_dmmf(params: &str) -> Result<String, String> {
     validate::run(params.prisma_schema, params.no_color).map(dmmf::dmmf_json_from_validated_schema)
 }
 
+/// Stream DMMF JSON directly to a writer. No intermediate String/Vec allocation.
+/// This enables the CLI binary to pipe DMMF to stdout without hitting any memory limit.
+/// See: https://github.com/prisma/prisma/issues/29111
+pub(crate) fn get_dmmf_to_writer<W: std::io::Write>(params: &str, writer: W) -> Result<(), String> {
+    let params: GetDmmfParams = match serde_json::from_str(params) {
+        Ok(params) => params,
+        Err(serde_err) => {
+            panic!("Failed to deserialize GetDmmfParams: {serde_err}");
+        }
+    };
+
+    validate::run(params.prisma_schema, params.no_color)
+        .and_then(|schema| dmmf::dmmf_json_to_writer(schema, writer).map_err(|e| e.to_string()))
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
