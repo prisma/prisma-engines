@@ -1,5 +1,12 @@
 use std::panic;
+use std::sync::Mutex;
 use wasm_bindgen::prelude::*;
+
+/// Global buffer for storing DMMF bytes when using the buffered API.
+/// This allows JS to read the DMMF in chunks via Uint8Array, bypassing
+/// V8's string length limit of ~536MB.
+/// See: https://github.com/prisma/prisma/issues/29111
+static DMMF_BUFFER: Mutex<Vec<u8>> = Mutex::new(Vec::new());
 
 #[wasm_bindgen]
 extern "C" {
@@ -130,6 +137,46 @@ pub fn references(schema: String, params: String) -> String {
 pub fn hover(schema_files: String, params: String) -> String {
     register_panic_hook();
     prisma_fmt::hover(schema_files, &params)
+}
+
+/// Serialize DMMF to an internal buffer and return the total byte count.
+/// Use `read_dmmf_chunk()` to read portions as Uint8Array, then `free_dmmf_buffer()` to release.
+///
+/// This bypasses V8's string length limit (~536MB / 0x1fffffe8 chars) by keeping the
+/// serialized JSON as bytes in WASM linear memory. The JS side reads chunks as Uint8Array
+/// (which has no V8 string limit) and can use a streaming JSON parser.
+///
+/// See: https://github.com/prisma/prisma/issues/29111
+#[wasm_bindgen]
+pub fn get_dmmf_buffered(params: String) -> Result<usize, JsError> {
+    register_panic_hook();
+    let bytes = prisma_fmt::get_dmmf_bytes(params).map_err(|e| JsError::new(&e))?;
+    let len = bytes.len();
+    let mut buf = DMMF_BUFFER.lock().unwrap();
+    *buf = bytes;
+    Ok(len)
+}
+
+/// Read a chunk of the DMMF buffer as Uint8Array.
+/// `offset` is the byte offset, `length` is the number of bytes to read.
+/// Returns a Vec<u8> which wasm-bindgen converts to Uint8Array on the JS side.
+#[wasm_bindgen]
+pub fn read_dmmf_chunk(offset: usize, length: usize) -> Result<Vec<u8>, JsError> {
+    register_panic_hook();
+    let buf = DMMF_BUFFER.lock().unwrap();
+    if offset >= buf.len() {
+        return Err(JsError::new("Offset beyond buffer length"));
+    }
+    let end = std::cmp::min(offset + length, buf.len());
+    Ok(buf[offset..end].to_vec())
+}
+
+/// Free the internal DMMF buffer. Call this after reading all chunks.
+#[wasm_bindgen]
+pub fn free_dmmf_buffer() {
+    register_panic_hook();
+    let mut buf = DMMF_BUFFER.lock().unwrap();
+    *buf = Vec::new();
 }
 
 /// Trigger a panic inside the wasm module. This is only useful in development for testing panic
