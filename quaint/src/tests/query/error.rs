@@ -112,6 +112,39 @@ async fn unique_constraint_violation(api: &mut dyn TestApi) -> crate::Result<()>
     Ok(())
 }
 
+#[test_each_connector(tags("postgresql"))]
+async fn expression_based_unique_index(api: &mut dyn TestApi) -> crate::Result<()> {
+    let table = api.create_temp_table("id1 int, json_data JSONB").await?;
+    let index = api.create_index(&table, "id1, (json_data->>'field')").await?;
+
+    let insert = Insert::single_into(&table)
+        .value("id1", 1)
+        .value("json_data", Value::json(serde_json::json!({"field": "a"})));
+    api.conn().insert(insert.clone().into()).await?;
+
+    let res = api.conn().insert(insert.clone().into()).await;
+
+    assert!(res.is_err());
+
+    let err = res.unwrap_err();
+
+    match &err.kind() {
+        ErrorKind::UniqueConstraintViolation { constraint } => match constraint {
+            DatabaseConstraint::Index(idx) => assert_eq!(&index, idx),
+            DatabaseConstraint::Fields(fields) => {
+                let fields = fields.iter().map(|s| s.as_str()).collect::<Vec<_>>();
+                // PostgreSQL normalizes the expression: json_data->>'field' becomes (json_data ->> 'field'::text)
+                assert_eq!(vec!["id1", "(json_data ->> 'field'::text)"], fields)
+            }
+            DatabaseConstraint::ForeignKey => panic!("Expecting index or field constraints."),
+            DatabaseConstraint::CannotParse => panic!("Couldn't parse the error message."),
+        },
+        _ => panic!("{}", err),
+    }
+
+    Ok(())
+}
+
 #[test_each_connector]
 async fn null_constraint_violation(api: &mut dyn TestApi) -> crate::Result<()> {
     let table = api.create_temp_table("id1 int not null, id2 int not null").await?;
