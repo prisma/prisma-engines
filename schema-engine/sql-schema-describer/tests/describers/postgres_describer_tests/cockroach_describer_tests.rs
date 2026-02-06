@@ -313,6 +313,7 @@ fn multi_field_indexes_must_be_inferred_in_the_right_order(api: TestApi) {
                     ),
                     index_name: "indexes_test_pkey",
                     tpe: PrimaryKey,
+                    predicate: None,
                 },
                 Index {
                     table_id: TableId(
@@ -320,6 +321,7 @@ fn multi_field_indexes_must_be_inferred_in_the_right_order(api: TestApi) {
                     ),
                     index_name: "my_idx",
                     tpe: Unique,
+                    predicate: None,
                 },
                 Index {
                     table_id: TableId(
@@ -327,6 +329,7 @@ fn multi_field_indexes_must_be_inferred_in_the_right_order(api: TestApi) {
                     ),
                     index_name: "my_idx2",
                     tpe: Normal,
+                    predicate: None,
                 },
             ],
             index_columns: [

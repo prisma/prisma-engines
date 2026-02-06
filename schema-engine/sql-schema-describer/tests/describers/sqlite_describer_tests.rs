@@ -186,6 +186,7 @@ fn sqlite_column_types_must_work(api: TestApi) {
                     ),
                     index_name: "",
                     tpe: PrimaryKey,
+                    predicate: None,
                 },
             ],
             index_columns: [
@@ -617,6 +618,7 @@ fn broken_relations_are_filtered_out(api: TestApi) {
                     ),
                     index_name: "",
                     tpe: PrimaryKey,
+                    predicate: None,
                 },
                 Index {
                     table_id: TableId(
@@ -624,6 +626,7 @@ fn broken_relations_are_filtered_out(api: TestApi) {
                     ),
                     index_name: "",
                     tpe: PrimaryKey,
+                    predicate: None,
                 },
             ],
             index_columns: [
