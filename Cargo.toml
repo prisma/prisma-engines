@@ -59,7 +59,7 @@ chrono = "0.4"
 colored = "3"
 concat-idents = "1"
 connection-string = "0.2"
-convert_case = "0.8"
+convert_case = "0.11"
 cruet = "0.15"
 cuid = { git = "https://github.com/prisma/cuid-rust", branch = "v1.3.3-wasm32-unknown-unknown" }
 derive_more = "0.99"
