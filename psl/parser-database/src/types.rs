@@ -572,7 +572,7 @@ pub(crate) struct WhereFieldCondition {
 
 #[derive(Debug, Clone)]
 pub(crate) enum WhereClause {
-    Raw(StringId),
+    Raw(String),
     Object(Vec<WhereFieldCondition>),
 }
 

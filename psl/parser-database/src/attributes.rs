@@ -652,7 +652,7 @@ fn parse_raw_where_clause(args: &[ast::Argument], ctx: &mut Context<'_>) -> Opti
         return None;
     }
 
-    Some(WhereClause::Raw(ctx.interner.intern(predicate)))
+    Some(WhereClause::Raw(predicate.to_string()))
 }
 
 fn parse_where_object_member(

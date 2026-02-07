@@ -504,7 +504,7 @@ impl IndexAssert for walkers::IndexWalker<'_> {
 
     #[track_caller]
     fn assert_where_clause(&self, predicate: &str) -> &Self {
-        assert_eq!(Some(predicate.to_string()), self.where_clause_as_sql());
+        assert_eq!(self.where_clause_as_sql().as_deref(), Some(predicate));
         self
     }
 

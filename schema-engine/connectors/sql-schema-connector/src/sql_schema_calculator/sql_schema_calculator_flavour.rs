@@ -47,7 +47,7 @@ pub(crate) trait SqlSchemaCalculatorFlavour {
         JoinTableUniquenessConstraint::UniqueIndex
     }
 
-    fn normalize_index_predicate(&self, predicate: String) -> String {
+    fn normalize_index_predicate(&self, predicate: String, _is_raw: bool) -> String {
         predicate
     }
 }

@@ -124,9 +124,10 @@ fn push_model_indexes(model: ModelWalker<'_>, table_id: sql::TableId, ctx: &mut 
 
     for index in model.indexes() {
         let constraint_name = index.constraint_name(ctx.flavour.datamodel_connector()).into_owned();
+        let is_raw_predicate = index.where_clause().is_some();
         let where_clause = index
             .where_clause_as_sql()
-            .map(|p| ctx.flavour.normalize_index_predicate(p));
+            .map(|p| ctx.flavour.normalize_index_predicate(p.into_owned(), is_raw_predicate));
 
         let index_id = match (index.is_unique(), index.is_fulltext(), where_clause) {
             // Partial unique constraint

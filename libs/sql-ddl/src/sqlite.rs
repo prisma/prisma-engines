@@ -175,17 +175,15 @@ impl Display for CreateIndex<'_> {
             table_name = self.table_name,
         )?;
 
-        self.columns
-            .iter()
-            .map(|c| {
-                let mut rendered = format!("\"{}\"", c.name);
-                if let Some(sort_order) = c.sort_order {
-                    rendered.push(' ');
-                    rendered.push_str(sort_order.as_ref());
-                }
-                rendered
-            })
-            .join(", ", f)?;
+        for (i, c) in self.columns.iter().enumerate() {
+            if i > 0 {
+                f.write_str(", ")?;
+            }
+            write!(f, "\"{}\"", c.name)?;
+            if let Some(sort_order) = c.sort_order {
+                write!(f, " {}", sort_order.as_ref())?;
+            }
+        }
 
         f.write_str(")")?;
 

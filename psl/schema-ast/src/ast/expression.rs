@@ -92,6 +92,13 @@ impl Expression {
         }
     }
 
+    pub fn as_object(&self) -> Option<(&[ObjectMember], Span)> {
+        match self {
+            Expression::Object(members, span) => Some((members, *span)),
+            _ => None,
+        }
+    }
+
     pub fn span(&self) -> Span {
         match &self {
             Self::NumericValue(_, span) => *span,
@@ -132,13 +139,6 @@ impl Expression {
 
     pub fn is_string(&self) -> bool {
         matches!(self, Expression::StringValue(_, _))
-    }
-
-    pub fn as_object(&self) -> Option<(&[ObjectMember], Span)> {
-        match self {
-            Expression::Object(members, span) => Some((members, *span)),
-            _ => None,
-        }
     }
 
     pub fn is_object(&self) -> bool {

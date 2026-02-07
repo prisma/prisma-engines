@@ -1,3 +1,5 @@
+use std::borrow::Cow;
+
 use psl::{
     datamodel_connector::constraint_names::ConstraintNames,
     parser_database::{IndexType, walkers},
@@ -162,9 +164,9 @@ impl<'a> IndexPair<'a> {
     }
 
     /// The predicate/WHERE clause for partial indexes.
-    pub(crate) fn predicate(self) -> Option<String> {
+    pub(crate) fn predicate(self) -> Option<Cow<'a, str>> {
         match self.next {
-            Some(next) => next.predicate().map(|s| s.to_owned()),
+            Some(next) => next.predicate().map(Cow::Borrowed),
             None => self.previous.and_then(|prev| prev.where_clause_as_sql()),
         }
     }

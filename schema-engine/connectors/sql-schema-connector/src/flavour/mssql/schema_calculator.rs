@@ -21,26 +21,30 @@ impl SqlSchemaCalculatorFlavour for MssqlSchemaCalculatorFlavour {
         Some(default_value.constraint_name(self.datamodel_connector()).into_owned())
     }
 
-    fn normalize_index_predicate(&self, predicate: String) -> String {
-        let mut quote_idx = 0;
+    fn normalize_index_predicate(&self, predicate: String, is_raw: bool) -> String {
+        let predicate = if is_raw {
+            predicate
+        } else {
+            let mut quote_idx = 0;
 
-        let predicate: String = predicate
-            .chars()
-            .map(|char| {
-                if char == '"' {
-                    quote_idx += 1;
-                    if quote_idx % 2 == 1 { '[' } else { ']' }
-                } else {
-                    char
-                }
-            })
-            .collect();
+            let predicate: String = predicate
+                .chars()
+                .map(|char| {
+                    if char == '"' {
+                        quote_idx += 1;
+                        if quote_idx % 2 == 1 { '[' } else { ']' }
+                    } else {
+                        char
+                    }
+                })
+                .collect();
 
-        let predicate = predicate
-            .replace(" = true", "=(1)")
-            .replace(" = false", "=(0)")
-            .replace(" != true", "!=(1)")
-            .replace(" != false", "!=(0)");
+            predicate
+                .replace(" = true", "=(1)")
+                .replace(" = false", "=(0)")
+                .replace(" != true", "!=(1)")
+                .replace(" != false", "!=(0)")
+        };
 
         if predicate.starts_with('(') && predicate.ends_with(')') {
             predicate

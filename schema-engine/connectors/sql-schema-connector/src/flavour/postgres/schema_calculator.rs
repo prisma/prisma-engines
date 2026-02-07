@@ -221,7 +221,7 @@ impl SqlSchemaCalculatorFlavour for PostgresSchemaCalculatorFlavour {
         }
     }
 
-    fn normalize_index_predicate(&self, predicate: String) -> String {
+    fn normalize_index_predicate(&self, predicate: String, _is_raw: bool) -> String {
         if predicate.starts_with('(') && predicate.ends_with(')') {
             predicate
         } else {

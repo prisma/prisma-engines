@@ -1,4 +1,7 @@
+use std::borrow::Cow;
+
 use either::Either;
+use itertools::Itertools;
 
 use super::CompositeTypeFieldWalker;
 use crate::{
@@ -180,7 +183,7 @@ impl<'db> IndexWalker<'db> {
     /// The raw SQL predicate for partial indexes.
     pub fn where_clause(self) -> Option<&'db str> {
         match &self.index_attribute.where_clause {
-            Some(WhereClause::Raw(id)) => Some(&self.db[*id]),
+            Some(WhereClause::Raw(s)) => Some(s),
             _ => None,
         }
     }
@@ -191,9 +194,9 @@ impl<'db> IndexWalker<'db> {
     }
 
     /// Converts the WHERE clause to a SQL predicate string.
-    pub fn where_clause_as_sql(self) -> Option<String> {
+    pub fn where_clause_as_sql(self) -> Option<Cow<'db, str>> {
         match &self.index_attribute.where_clause {
-            Some(WhereClause::Raw(id)) => Some(self.db[*id].to_string()),
+            Some(WhereClause::Raw(s)) => Some(Cow::Borrowed(s)),
             Some(WhereClause::Object(conditions)) => {
                 let sql = conditions
                     .iter()
@@ -201,9 +204,8 @@ impl<'db> IndexWalker<'db> {
                         let field_name = &self.db[field_condition.field_name];
                         field_condition.condition.to_sql(field_name, self.db)
                     })
-                    .collect::<Vec<_>>()
                     .join(" AND ");
-                Some(sql)
+                Some(Cow::Owned(sql))
             }
             None => None,
         }
