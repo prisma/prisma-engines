@@ -1436,9 +1436,10 @@ fn multiple_schemas_with_same_foreign_key_are_described(api: TestApi) {
 fn partial_indexes_are_described(api: TestApi) {
     let sql = r#"
         CREATE TABLE [User] (
-            id INT PRIMARY KEY,
+            id INT NOT NULL,
             email NVARCHAR(255) NOT NULL,
-            active BIT NOT NULL DEFAULT 1
+            active BIT NOT NULL CONSTRAINT [User_active_df] DEFAULT 1,
+            CONSTRAINT [User_pkey] PRIMARY KEY (id)
         );
 
         CREATE UNIQUE INDEX [User_email_active_idx] ON [User] (email) WHERE active = 1;
@@ -1447,7 +1448,9 @@ fn partial_indexes_are_described(api: TestApi) {
     api.raw_cmd(sql);
     let expected = expect![[r#"
         SqlSchema {
-            namespaces: {},
+            namespaces: {
+                "dbo",
+            },
             tables: [
                 Table {
                     namespace_id: NamespaceId(
@@ -1526,8 +1529,8 @@ fn partial_indexes_are_described(api: TestApi) {
                     ),
                     DefaultValue {
                         kind: Value(
-                            Int(
-                                1,
+                            Boolean(
+                                true,
                             ),
                         ),
                         constraint_name: Some(
@@ -1553,7 +1556,7 @@ fn partial_indexes_are_described(api: TestApi) {
                     table_id: TableId(
                         0,
                     ),
-                    index_name: "PK__User__3213E83F",
+                    index_name: "User_pkey",
                     tpe: PrimaryKey,
                     predicate: None,
                 },

@@ -3026,7 +3026,9 @@ fn partial_indexes_are_described(api: TestApi) {
     api.raw_cmd(sql);
     let expected = expect![[r#"
         SqlSchema {
-            namespaces: {},
+            namespaces: {
+                "public",
+            },
             tables: [
                 Table {
                     namespace_id: NamespaceId(
@@ -3120,19 +3122,19 @@ fn partial_indexes_are_described(api: TestApi) {
                     table_id: TableId(
                         0,
                     ),
-                    index_name: "User_pkey",
-                    tpe: PrimaryKey,
-                    predicate: None,
-                },
-                Index {
-                    table_id: TableId(
-                        0,
-                    ),
                     index_name: "User_email_active_idx",
                     tpe: Unique,
                     predicate: Some(
                         "(active = true)",
                     ),
+                },
+                Index {
+                    table_id: TableId(
+                        0,
+                    ),
+                    index_name: "User_pkey",
+                    tpe: PrimaryKey,
+                    predicate: None,
                 },
             ],
             index_columns: [
@@ -3141,7 +3143,7 @@ fn partial_indexes_are_described(api: TestApi) {
                         0,
                     ),
                     column_id: TableColumnId(
-                        0,
+                        1,
                     ),
                     sort_order: Some(
                         Asc,
@@ -3153,7 +3155,7 @@ fn partial_indexes_are_described(api: TestApi) {
                         1,
                     ),
                     column_id: TableColumnId(
-                        1,
+                        0,
                     ),
                     sort_order: Some(
                         Asc,

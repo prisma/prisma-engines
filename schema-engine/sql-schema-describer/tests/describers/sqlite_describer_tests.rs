@@ -791,7 +791,7 @@ fn partial_indexes_are_described(api: TestApi) {
                     Column {
                         name: "id",
                         tpe: ColumnType {
-                            full_data_type: "INTEGER",
+                            full_data_type: "integer",
                             family: Int,
                             arity: Required,
                             native_type: None,
@@ -807,7 +807,7 @@ fn partial_indexes_are_described(api: TestApi) {
                     Column {
                         name: "email",
                         tpe: ColumnType {
-                            full_data_type: "TEXT",
+                            full_data_type: "text",
                             family: String,
                             arity: Required,
                             native_type: None,
@@ -823,7 +823,7 @@ fn partial_indexes_are_described(api: TestApi) {
                     Column {
                         name: "active",
                         tpe: ColumnType {
-                            full_data_type: "INTEGER",
+                            full_data_type: "integer",
                             family: Int,
                             arity: Required,
                             native_type: None,
@@ -856,6 +856,14 @@ fn partial_indexes_are_described(api: TestApi) {
                     table_id: TableId(
                         0,
                     ),
+                    index_name: "",
+                    tpe: PrimaryKey,
+                    predicate: None,
+                },
+                Index {
+                    table_id: TableId(
+                        0,
+                    ),
                     index_name: "User_email_active_idx",
                     tpe: Unique,
                     predicate: Some(
@@ -869,9 +877,21 @@ fn partial_indexes_are_described(api: TestApi) {
                         0,
                     ),
                     column_id: TableColumnId(
-                        1,
+                        0,
                     ),
                     sort_order: None,
+                    length: None,
+                },
+                IndexColumn {
+                    index_id: IndexId(
+                        1,
+                    ),
+                    column_id: TableColumnId(
+                        1,
+                    ),
+                    sort_order: Some(
+                        Asc,
+                    ),
                     length: None,
                 },
             ],
