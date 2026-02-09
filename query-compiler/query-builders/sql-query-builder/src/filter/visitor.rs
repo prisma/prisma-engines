@@ -847,7 +847,7 @@ pub(crate) fn default_scalar_filter(
         ScalarCondition::Equals(value) => comparable.equals(convert_first_value(fields, value, alias, ctx)),
         ScalarCondition::NotEquals(value) => comparable.not_equals(convert_first_value(fields, value, alias, ctx)),
         ScalarCondition::Contains(value) => match value {
-            ConditionValue::Value(value) => comparable.like(format!("%{value}%")),
+            ConditionValue::Value(value) => comparable.like(like_contains_pattern(value)),
             ConditionValue::FieldRef(field_ref) => comparable.like(quaint::ast::concat::<'_, Expression<'_>>(vec![
                 Value::text("%").raw().into(),
                 field_ref.aliased_col(alias, ctx).into(),
@@ -855,7 +855,7 @@ pub(crate) fn default_scalar_filter(
             ])),
         },
         ScalarCondition::NotContains(value) => match value {
-            ConditionValue::Value(value) => comparable.not_like(format!("%{value}%")),
+            ConditionValue::Value(value) => comparable.not_like(like_contains_pattern(value)),
             ConditionValue::FieldRef(field_ref) => {
                 comparable.not_like(quaint::ast::concat::<'_, Expression<'_>>(vec![
                     Value::text("%").raw().into(),
@@ -865,14 +865,14 @@ pub(crate) fn default_scalar_filter(
             }
         },
         ScalarCondition::StartsWith(value) => match value {
-            ConditionValue::Value(value) => comparable.like(format!("{value}%")),
+            ConditionValue::Value(value) => comparable.like(like_starts_with_pattern(value)),
             ConditionValue::FieldRef(field_ref) => comparable.like(quaint::ast::concat::<'_, Expression<'_>>(vec![
                 field_ref.aliased_col(alias, ctx).into(),
                 Value::text("%").raw().into(),
             ])),
         },
         ScalarCondition::NotStartsWith(value) => match value {
-            ConditionValue::Value(value) => comparable.not_like(format!("{value}%")),
+            ConditionValue::Value(value) => comparable.not_like(like_starts_with_pattern(value)),
             ConditionValue::FieldRef(field_ref) => {
                 comparable.not_like(quaint::ast::concat::<'_, Expression<'_>>(vec![
                     field_ref.aliased_col(alias, ctx).into(),
@@ -881,14 +881,14 @@ pub(crate) fn default_scalar_filter(
             }
         },
         ScalarCondition::EndsWith(value) => match value {
-            ConditionValue::Value(value) => comparable.like(format!("%{value}")),
+            ConditionValue::Value(value) => comparable.like(like_ends_with_pattern(value)),
             ConditionValue::FieldRef(field_ref) => comparable.like(quaint::ast::concat::<'_, Expression<'_>>(vec![
                 Value::text("%").raw().into(),
                 field_ref.aliased_col(alias, ctx).into(),
             ])),
         },
         ScalarCondition::NotEndsWith(value) => match value {
-            ConditionValue::Value(value) => comparable.not_like(format!("%{value}")),
+            ConditionValue::Value(value) => comparable.not_like(like_ends_with_pattern(value)),
             ConditionValue::FieldRef(field_ref) => {
                 comparable.not_like(quaint::ast::concat::<'_, Expression<'_>>(vec![
                     Value::text("%").raw().into(),
@@ -975,6 +975,63 @@ fn prisma_value_to_search_expression(pv: PrismaValue) -> Expression<'static> {
     }
 }
 
+/// Converts a PrismaValue to an Expression for use in LIKE patterns.
+fn prisma_value_to_like_expression(pv: PrismaValue) -> Expression<'static> {
+    match pv {
+        PrismaValue::String(s) => Value::text(s).into(),
+        PrismaValue::Placeholder(PrismaValuePlaceholder { name, .. }) => {
+            Value::opaque(Placeholder::new(name), OpaqueType::Text).into()
+        }
+        _ => panic!("LIKE filter value should be String or Placeholder"),
+    }
+}
+
+/// Creates a LIKE pattern expression for "contains" filter (%value%).
+/// For concrete strings, returns a simple formatted string.
+/// For placeholders, returns CONCAT('%', $placeholder, '%').
+fn like_contains_pattern(value: PrismaValue) -> Expression<'static> {
+    match value {
+        PrismaValue::String(s) => format!("%{s}%").into(),
+        PrismaValue::Placeholder(_) => concat(vec![
+            Value::text("%").raw().into(),
+            prisma_value_to_like_expression(value),
+            Value::text("%").raw().into(),
+        ])
+        .into(),
+        _ => panic!("LIKE filter value should be String or Placeholder"),
+    }
+}
+
+/// Creates a LIKE pattern expression for "starts with" filter (value%).
+/// For concrete strings, returns a simple formatted string.
+/// For placeholders, returns CONCAT($placeholder, '%').
+fn like_starts_with_pattern(value: PrismaValue) -> Expression<'static> {
+    match value {
+        PrismaValue::String(s) => format!("{s}%").into(),
+        PrismaValue::Placeholder(_) => concat(vec![
+            prisma_value_to_like_expression(value),
+            Value::text("%").raw().into(),
+        ])
+        .into(),
+        _ => panic!("LIKE filter value should be String or Placeholder"),
+    }
+}
+
+/// Creates a LIKE pattern expression for "ends with" filter (%value).
+/// For concrete strings, returns a simple formatted string.
+/// For placeholders, returns CONCAT('%', $placeholder).
+fn like_ends_with_pattern(value: PrismaValue) -> Expression<'static> {
+    match value {
+        PrismaValue::String(s) => format!("%{s}").into(),
+        PrismaValue::Placeholder(_) => concat(vec![
+            Value::text("%").raw().into(),
+            prisma_value_to_like_expression(value),
+        ])
+        .into(),
+        _ => panic!("LIKE filter value should be String or Placeholder"),
+    }
+}
+
 fn insensitive_scalar_filter(
     comparable: Expression<'static>,
     cond: ScalarCondition,
@@ -988,18 +1045,18 @@ fn insensitive_scalar_filter(
     let condition = match cond {
         ScalarCondition::Equals(ConditionValue::Value(PrismaValue::Null)) => comparable.is_null(),
         ScalarCondition::Equals(value) => match value {
-            ConditionValue::Value(value) => comparable.compare_raw("ILIKE", format!("{value}")),
+            ConditionValue::Value(value) => comparable.compare_raw("ILIKE", prisma_value_to_like_expression(value)),
             ConditionValue::FieldRef(field_ref) => comparable.compare_raw("ILIKE", field_ref.aliased_col(alias, ctx)),
         },
         ScalarCondition::NotEquals(ConditionValue::Value(PrismaValue::Null)) => comparable.is_not_null(),
         ScalarCondition::NotEquals(value) => match value {
-            ConditionValue::Value(value) => comparable.compare_raw("NOT ILIKE", format!("{value}")),
+            ConditionValue::Value(value) => comparable.compare_raw("NOT ILIKE", prisma_value_to_like_expression(value)),
             ConditionValue::FieldRef(field_ref) => {
                 comparable.compare_raw("NOT ILIKE", field_ref.aliased_col(alias, ctx))
             }
         },
         ScalarCondition::Contains(value) => match value {
-            ConditionValue::Value(value) => comparable.compare_raw("ILIKE", format!("%{value}%")),
+            ConditionValue::Value(value) => comparable.compare_raw("ILIKE", like_contains_pattern(value)),
             ConditionValue::FieldRef(field_ref) => comparable.compare_raw(
                 "ILIKE",
                 concat::<'_, Expression<'_>>(vec![
@@ -1010,7 +1067,7 @@ fn insensitive_scalar_filter(
             ),
         },
         ScalarCondition::NotContains(value) => match value {
-            ConditionValue::Value(value) => comparable.compare_raw("NOT ILIKE", format!("%{value}%")),
+            ConditionValue::Value(value) => comparable.compare_raw("NOT ILIKE", like_contains_pattern(value)),
             ConditionValue::FieldRef(field_ref) => comparable.compare_raw(
                 "NOT ILIKE",
                 concat::<'_, Expression<'_>>(vec![
@@ -1021,28 +1078,28 @@ fn insensitive_scalar_filter(
             ),
         },
         ScalarCondition::StartsWith(value) => match value {
-            ConditionValue::Value(value) => comparable.compare_raw("ILIKE", format!("{value}%")),
+            ConditionValue::Value(value) => comparable.compare_raw("ILIKE", like_starts_with_pattern(value)),
             ConditionValue::FieldRef(field_ref) => comparable.compare_raw(
                 "ILIKE",
                 concat::<'_, Expression<'_>>(vec![field_ref.aliased_col(alias, ctx).into(), Value::text("%").into()]),
             ),
         },
         ScalarCondition::NotStartsWith(value) => match value {
-            ConditionValue::Value(value) => comparable.compare_raw("NOT ILIKE", format!("{value}%")),
+            ConditionValue::Value(value) => comparable.compare_raw("NOT ILIKE", like_starts_with_pattern(value)),
             ConditionValue::FieldRef(field_ref) => comparable.compare_raw(
                 "NOT ILIKE",
                 concat::<'_, Expression<'_>>(vec![field_ref.aliased_col(alias, ctx).into(), Value::text("%").into()]),
             ),
         },
         ScalarCondition::EndsWith(value) => match value {
-            ConditionValue::Value(value) => comparable.compare_raw("ILIKE", format!("%{value}")),
+            ConditionValue::Value(value) => comparable.compare_raw("ILIKE", like_ends_with_pattern(value)),
             ConditionValue::FieldRef(field_ref) => comparable.compare_raw(
                 "ILIKE",
                 concat::<'_, Expression<'_>>(vec![Value::text("%").into(), field_ref.aliased_col(alias, ctx).into()]),
             ),
         },
         ScalarCondition::NotEndsWith(value) => match value {
-            ConditionValue::Value(value) => comparable.compare_raw("NOT ILIKE", format!("%{value}")),
+            ConditionValue::Value(value) => comparable.compare_raw("NOT ILIKE", like_ends_with_pattern(value)),
             ConditionValue::FieldRef(field_ref) => comparable.compare_raw(
                 "NOT ILIKE",
                 concat::<'_, Expression<'_>>(vec![Value::text("%").into(), field_ref.aliased_col(alias, ctx).into()]),
@@ -1271,8 +1328,10 @@ impl JsonFilterExt for (Expression<'static>, Expression<'static>) {
             // string_contains (value)
             (ConditionValue::Value(value), JsonTargetType::String) => {
                 let contains = match query_mode {
-                    QueryMode::Default => expr_string.like(format!("%{value}%")),
-                    QueryMode::Insensitive => Expression::from(lower(expr_string)).like(lower(format!("%{value}%"))),
+                    QueryMode::Default => expr_string.like(like_contains_pattern(value)),
+                    QueryMode::Insensitive => {
+                        Expression::from(lower(expr_string)).like(lower(like_contains_pattern(value)))
+                    }
                 };
 
                 if reverse {
@@ -1347,8 +1406,10 @@ impl JsonFilterExt for (Expression<'static>, Expression<'static>) {
             // string_starts_with (value)
             (ConditionValue::Value(value), JsonTargetType::String) => {
                 let starts_with = match query_mode {
-                    QueryMode::Default => expr_string.like(format!("{value}%")),
-                    QueryMode::Insensitive => Expression::from(lower(expr_string)).like(lower(format!("{value}%"))),
+                    QueryMode::Default => expr_string.like(like_starts_with_pattern(value)),
+                    QueryMode::Insensitive => {
+                        Expression::from(lower(expr_string)).like(lower(like_starts_with_pattern(value)))
+                    }
                 };
 
                 if reverse {
@@ -1418,8 +1479,10 @@ impl JsonFilterExt for (Expression<'static>, Expression<'static>) {
             // string_ends_with (value)
             (ConditionValue::Value(value), JsonTargetType::String) => {
                 let ends_with = match query_mode {
-                    QueryMode::Default => expr_string.like(format!("%{value}")),
-                    QueryMode::Insensitive => Expression::from(lower(expr_string)).like(lower(format!("%{value}"))),
+                    QueryMode::Default => expr_string.like(like_ends_with_pattern(value)),
+                    QueryMode::Insensitive => {
+                        Expression::from(lower(expr_string)).like(lower(like_ends_with_pattern(value)))
+                    }
                 };
 
                 if reverse {
