@@ -148,6 +148,10 @@ impl Connection {
         let client = self.0.client();
 
         let mut stmt_offset = 0;
+        // We split the script into statements rather than submitting it all at once.
+        // The reason is that the Postgres simple protocol automatically wraps the script
+        // in a transaction, which is sometimes undesirable (e.g. when the script contains
+        // statements that cannot be run inside a transaction like `CREATE INDEX CONCURRENTLY`).
         for stmt in split_script_into_statements(script) {
             match client.simple_query(stmt).await {
                 Ok(_) => stmt_offset += stmt.len(),
@@ -229,6 +233,8 @@ impl Connection {
     }
 }
 
+/// Splits a SQL script into individual statements using sqlparser.
+/// If the script cannot be parsed, returns an iterator with the original script as the only item.
 fn split_script_into_statements(script: &str) -> impl Iterator<Item = &str> {
     use sqlparser::dialect::PostgreSqlDialect;
     use sqlparser::parser::{Parser, ParserError};
@@ -237,6 +243,10 @@ fn split_script_into_statements(script: &str) -> impl Iterator<Item = &str> {
     fn detect_statement_terminators(mut parser: Parser<'_>) -> Result<Vec<Location>, ParserError> {
         let mut terminators = vec![];
         while parser.peek_token_ref() != &Token::EOF {
+            // We ignore the actual statement and just record the location of the semicolon,
+            // because the `span` in the returned AST does not actually represent the entire
+            // statement. It only accounts for a union of the spans of all user-provided
+            // identifiers and constants, excluding keywords and some other tokens.
             parser.parse_statement()?;
             terminators.push(parser.peek_token_ref().span.start);
             let _ = parser.consume_token(&Token::SemiColon);
@@ -258,6 +268,8 @@ fn split_script_into_statements(script: &str) -> impl Iterator<Item = &str> {
                 script.len()
             } else {
                 let end_line_offset = line_offsets[offset.line as usize - 1];
+                // Iterate over the characters rather than slicing directly to account for
+                // multi-byte characters.
                 let end_line_length = script[end_line_offset..]
                     .char_indices()
                     .nth(offset.column as usize - 1)

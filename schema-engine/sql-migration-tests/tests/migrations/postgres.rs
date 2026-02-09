@@ -246,6 +246,178 @@ fn postgres_apply_migrations_errors_give_precise_location(api: TestApi) {
 }
 
 #[test_connector(tags(Postgres), exclude(CockroachDb))]
+fn postgres_apply_migrations_errors_give_precise_location_without_final_semicolon(api: TestApi) {
+    let dm = "";
+    let migrations_directory = api.create_migrations_directory();
+
+    let migration = r#"
+        CREATE TABLE "Cat" (
+            id INTEGER PRIMARY KEY,
+            name TEXT NOT NULL
+        );
+
+        SELECT id FROM "Dog";
+
+        CREATE TABLE "Emu" (
+            size INTEGER
+        )
+    "#;
+
+    let migration_name = api
+        .create_migration("01init", dm, &migrations_directory)
+        .draft(true)
+        .send_sync()
+        .modify_migration(|contents| {
+            contents.clear();
+            contents.push_str(migration);
+        })
+        .into_output()
+        .generated_migration_name;
+
+    let err = api
+        .apply_migrations(&migrations_directory)
+        .send_unwrap_err()
+        .to_string()
+        .replace(&migration_name, "<migration-name>");
+
+    let expectation = expect![[r#"
+        A migration failed to apply. New migrations cannot be applied before the error is recovered from. Read more about how to resolve migration issues in a production database: https://pris.ly/d/migrate-resolve
+
+        Migration name: <migration-name>
+
+        Database error code: 42P01
+
+        Database error:
+        ERROR: relation "Dog" does not exist
+
+        Position:
+        [1m  2[0m         CREATE TABLE "Cat" (
+        [1m  3[0m             id INTEGER PRIMARY KEY,
+        [1m  4[0m             name TEXT NOT NULL
+        [1m  5[0m         );
+        [1m  6[0m
+        [1m  7[1;31m         SELECT id FROM "Dog";[0m
+
+    "#]];
+    let first_segment = err.split_terminator("DbError {").next().unwrap();
+    expectation.assert_eq(first_segment)
+}
+
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
+fn postgres_apply_migrations_errors_give_precise_location_with_immediate_eof(api: TestApi) {
+    let dm = "";
+    let migrations_directory = api.create_migrations_directory();
+
+    let migration = r#"
+        CREATE TABLE "Cat" (
+            id INTEGER PRIMARY KEY,
+            name TEXT NOT NULL
+        );
+
+        SELECT id FROM "Dog";
+
+        CREATE TABLE "Emu" (
+            size INTEGER
+        )"#;
+
+    let migration_name = api
+        .create_migration("01init", dm, &migrations_directory)
+        .draft(true)
+        .send_sync()
+        .modify_migration(|contents| {
+            contents.clear();
+            contents.push_str(migration);
+        })
+        .into_output()
+        .generated_migration_name;
+
+    let err = api
+        .apply_migrations(&migrations_directory)
+        .send_unwrap_err()
+        .to_string()
+        .replace(&migration_name, "<migration-name>");
+
+    let expectation = expect![[r#"
+        A migration failed to apply. New migrations cannot be applied before the error is recovered from. Read more about how to resolve migration issues in a production database: https://pris.ly/d/migrate-resolve
+
+        Migration name: <migration-name>
+
+        Database error code: 42P01
+
+        Database error:
+        ERROR: relation "Dog" does not exist
+
+        Position:
+        [1m  2[0m         CREATE TABLE "Cat" (
+        [1m  3[0m             id INTEGER PRIMARY KEY,
+        [1m  4[0m             name TEXT NOT NULL
+        [1m  5[0m         );
+        [1m  6[0m
+        [1m  7[1;31m         SELECT id FROM "Dog";[0m
+
+    "#]];
+    let first_segment = err.split_terminator("DbError {").next().unwrap();
+    expectation.assert_eq(first_segment)
+}
+
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
+fn postgres_apply_migrations_errors_give_precise_location_with_invalid_syntax(api: TestApi) {
+    let dm = "";
+    let migrations_directory = api.create_migrations_directory();
+
+    let migration = r#"
+        CREATE TABLE "Cat" (
+            id INTEGER PRIMARY KEY,
+            name TEXT NOT NULL
+        );
+
+        SELECT id FROM "Dog";
+
+        CREATE TABLE "Emu" (
+            size INTEGER
+        )A"#;
+
+    let migration_name = api
+        .create_migration("01init", dm, &migrations_directory)
+        .draft(true)
+        .send_sync()
+        .modify_migration(|contents| {
+            contents.clear();
+            contents.push_str(migration);
+        })
+        .into_output()
+        .generated_migration_name;
+
+    let err = api
+        .apply_migrations(&migrations_directory)
+        .send_unwrap_err()
+        .to_string()
+        .replace(&migration_name, "<migration-name>");
+
+    let expectation = expect![[r#"
+        A migration failed to apply. New migrations cannot be applied before the error is recovered from. Read more about how to resolve migration issues in a production database: https://pris.ly/d/migrate-resolve
+
+        Migration name: <migration-name>
+
+        Database error code: 42601
+
+        Database error:
+        ERROR: syntax error at or near "A"
+
+        Position:
+        [1m  6[0m
+        [1m  7[0m         SELECT id FROM "Dog";
+        [1m  8[0m
+        [1m  9[0m         CREATE TABLE "Emu" (
+        [1m 10[0m             size INTEGER
+        [1m 11[1;31m         )A[0m
+
+    "#]];
+    let first_segment = err.split_terminator("DbError {").next().unwrap();
+    expectation.assert_eq(first_segment)
+}
+
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
 fn postgres_apply_migrations_errors_give_precise_location_at_the_beginning_of_files(api: TestApi) {
     let dm = "";
     let migrations_directory = api.create_migrations_directory();
@@ -927,7 +1099,8 @@ fn postgres_create_index_concurrently_works(api: TestApi) {
             name TEXT NOT NULL
         );
 
-        CREATE INDEX CONCURRENTLY "Cat_name_idx" ON "Cat"(name)"#;
+        CREATE INDEX CONCURRENTLY "Cat_name_idx" ON "Cat"(name);
+    "#;
 
     api.create_migration("01init", dm, &migrations_directory)
         .draft(true)
