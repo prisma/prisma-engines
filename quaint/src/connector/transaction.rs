@@ -1,5 +1,4 @@
 use async_trait::async_trait;
-use prisma_metrics::guards::GaugeGuard;
 
 use super::*;
 use crate::{
@@ -75,7 +74,6 @@ impl TransactionOptions {
 pub struct DefaultTransaction<'a> {
     pub inner: &'a dyn Queryable,
     pub depth: AtomicI32,
-    gauge: GaugeGuard,
 }
 
 #[cfg_attr(
@@ -100,7 +98,6 @@ impl<'a> DefaultTransaction<'a> {
     ) -> crate::Result<DefaultTransaction<'a>> {
         let this = Self {
             inner,
-            gauge: GaugeGuard::increment("prisma_client_queries_active"),
             depth: AtomicI32::new(0),
         };
 
@@ -145,7 +142,6 @@ impl Transaction for DefaultTransaction<'_> {
         self.depth.store(0, Ordering::Relaxed);
 
         self.inner.raw_cmd("COMMIT").await?;
-        self.gauge.decrement();
 
         Ok(())
     }
@@ -153,7 +149,7 @@ impl Transaction for DefaultTransaction<'_> {
     /// Rolls back the changes to the database.
     async fn rollback(&self) -> crate::Result<()> {
         self.depth.fetch_sub(1, Ordering::Relaxed);
-        self.gauge.decrement();
+        self.inner.raw_cmd("ROLLBACK").await?;
 
         Ok(())
     }

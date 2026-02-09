@@ -275,10 +275,16 @@ pub enum ErrorKind {
     #[error("External connector error")]
     ExternalError(i32),
 
-    #[error("No savepoint to release in transaction for depth '{}', make sure to call create_savepoint before release_savepoint", _0)]
+    #[error(
+        "No savepoint to release in transaction for depth '{}', make sure to call create_savepoint before release_savepoint",
+        _0
+    )]
     NoSavepointToRelease(i32),
 
-    #[error("No savepoint to rollback to in transaction for depth '{}', make sure to call create_savepoint before rollback_to_savepoint", _0)]
+    #[error(
+        "No savepoint to rollback to in transaction for depth '{}', make sure to call create_savepoint before rollback_to_savepoint",
+        _0
+    )]
     NoSavepointToRollbackTo(i32),
 
     #[error("Invalid driver adapter: {0}")]

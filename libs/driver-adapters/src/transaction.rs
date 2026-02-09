@@ -11,8 +11,8 @@ use quaint::{
 };
 
 use crate::proxy::{TransactionOptions, TransactionProxy};
-use crate::{proxy::CommonProxy, queryable::JsBaseQueryable, send_future::UnsafeFuture};
 use crate::{JsObject, JsResult};
+use crate::{proxy::CommonProxy, queryable::JsBaseQueryable, send_future::UnsafeFuture};
 
 // Wrapper around JS transaction objects that implements Queryable and quaint::Transaction.
 // It delegates the underlying transaction lifecycle to the JS driver adapter.
@@ -52,9 +52,6 @@ impl QuaintTransaction for JsTransaction {
     }
 
     async fn begin(&self) -> quaint::Result<()> {
-        // increment of this gauge is done in DriverProxy::startTransaction
-        gauge!("prisma_client_queries_active").decrement(1.0);
-
         self.depth.fetch_add(1, Ordering::Relaxed);
 
         let begin_stmt = self.begin_statement();
@@ -70,9 +67,6 @@ impl QuaintTransaction for JsTransaction {
     }
 
     async fn commit(&self) -> quaint::Result<()> {
-        // increment of this gauge is done in DriverProxy::startTransaction
-        gauge!("prisma_client_queries_active").decrement(1.0);
-
         // Reset the depth to 0 on commit.
         self.depth.store(0, Ordering::Relaxed);
 
@@ -91,9 +85,6 @@ impl QuaintTransaction for JsTransaction {
     }
 
     async fn rollback(&self) -> quaint::Result<()> {
-        // increment of this gauge is done in DriverProxy::startTransaction
-        gauge!("prisma_client_queries_active").decrement(1.0);
-
         self.depth.fetch_sub(1, Ordering::Relaxed);
 
         let rollback_stmt = "ROLLBACK";
