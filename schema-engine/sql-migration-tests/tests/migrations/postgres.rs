@@ -915,3 +915,29 @@ fn default_schema_not_included_when_dropping_items(api: TestApi) {
 
     expected_migration.assert_eq(&migration);
 }
+
+#[test_connector(tags(Postgres))]
+fn postgres_create_index_concurrently_works(api: TestApi) {
+    let dm = "";
+    let migrations_directory = api.create_migrations_directory();
+
+    let migration = r#"
+        CREATE TABLE "Cat" (
+            id INTEGER PRIMARY KEY,
+            name TEXT NOT NULL
+        );
+
+        CREATE INDEX CONCURRENTLY "Cat_name_idx" ON "Cat"(name)"#;
+
+    api.create_migration("01init", dm, &migrations_directory)
+        .draft(true)
+        .send_sync()
+        .modify_migration(|contents| {
+            contents.clear();
+            contents.push_str(migration);
+        });
+
+    api.apply_migrations(&migrations_directory)
+        .send_sync()
+        .assert_applied_migrations(&["01init"]);
+}
