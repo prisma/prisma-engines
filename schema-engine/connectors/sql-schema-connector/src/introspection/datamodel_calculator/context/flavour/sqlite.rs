@@ -1,7 +1,10 @@
 use std::borrow::Cow;
 
 use sql_schema_describer as sql;
-use sqlparser::{ast::Statement, parser::Parser};
+use sqlparser::{
+    ast::{CreateView, Statement},
+    parser::Parser,
+};
 
 pub(crate) struct SqliteIntrospectionFlavour;
 
@@ -21,7 +24,7 @@ impl super::IntrospectionFlavour for SqliteIntrospectionFlavour {
             // SQLite stores the definition as `CREATE VIEW`,
             // but we only want the query part in the definition
             // file as we do with the other databases.
-            Ok(Statement::CreateView { query, .. }) => Cow::Owned(format!("{query};")),
+            Ok(Statement::CreateView(CreateView { query, .. })) => Cow::Owned(format!("{query};")),
             // If we get anything else than `CREATE VIEW`,
             // we just print it to a file and hope to get an issue
             // filed if it's wrong.
