@@ -477,3 +477,123 @@ fn strip_schema_param_from_url(url: &mut Url) {
     let params: String = params.join("&");
     url.set_query(Some(&params));
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn split_script_into_statements_single_statement() {
+        let script = "CREATE TABLE users (id SERIAL PRIMARY KEY, name VARCHAR(255));";
+        let statements: Vec<&str> = split_script_into_statements(script).collect();
+        assert_eq!(statements, vec![script]);
+    }
+
+    #[test]
+    fn split_script_into_statements_multiple_statements() {
+        let script =
+            "CREATE TABLE users (id SERIAL PRIMARY KEY);\nINSERT INTO users (id) VALUES (1);\nDROP TABLE users;";
+        let statements: Vec<&str> = split_script_into_statements(script).collect();
+        assert_eq!(
+            statements,
+            vec![
+                "CREATE TABLE users (id SERIAL PRIMARY KEY);",
+                "\nINSERT INTO users (id) VALUES (1);",
+                "\nDROP TABLE users;"
+            ]
+        );
+    }
+
+    #[test]
+    fn split_script_into_statements_with_whitespace() {
+        let script = "  CREATE TABLE test (id INT);  \n  \n  INSERT INTO test VALUES (1);  ";
+        let statements: Vec<&str> = split_script_into_statements(script).collect();
+        assert_eq!(
+            statements,
+            vec![
+                "  CREATE TABLE test (id INT);",
+                "  \n  \n  INSERT INTO test VALUES (1);"
+            ]
+        );
+    }
+
+    #[test]
+    fn split_script_into_statements_no_semicolon() {
+        let script = "CREATE TABLE test (id INT)";
+        let statements: Vec<&str> = split_script_into_statements(script).collect();
+        assert_eq!(statements, vec!["CREATE TABLE test (id INT)"]);
+    }
+
+    #[test]
+    fn split_script_into_statements_empty_script() {
+        let script = "";
+        let statements: Vec<&str> = split_script_into_statements(script).collect();
+        assert_eq!(statements, Vec::<&str>::new());
+    }
+
+    #[test]
+    fn split_script_into_statements_semicolon_only() {
+        let script = ";";
+        let statements: Vec<&str> = split_script_into_statements(script).collect();
+        assert_eq!(statements, vec![";"]);
+    }
+
+    #[test]
+    fn split_script_into_statements_complex_multiline() {
+        let script = indoc! {"
+            CREATE TABLE users (
+                id SERIAL PRIMARY KEY,
+                name VARCHAR(255) NOT NULL
+            );
+
+            INSERT INTO users (name)
+            VALUES ('Alice'), ('Bob');
+
+            CREATE INDEX idx_users_name ON users(name);
+        "};
+        let statements: Vec<&str> = split_script_into_statements(script).collect();
+        assert_eq!(
+            statements,
+            vec![
+                indoc! {"
+                    CREATE TABLE users (
+                        id SERIAL PRIMARY KEY,
+                        name VARCHAR(255) NOT NULL
+                    );"},
+                indoc! {"
+
+
+                    INSERT INTO users (name)
+                    VALUES ('Alice'), ('Bob');"},
+                indoc! {"
+
+
+                    CREATE INDEX idx_users_name ON users(name);"}
+            ]
+        );
+    }
+
+    #[test]
+    fn split_script_into_statements_invalid_sql_fallback() {
+        // This should fall back to returning the entire script as one statement
+        // since it contains invalid SQL that can't be parsed
+        let script = "CREATE TABLE invalid syntax here; MORE invalid stuff;";
+        let statements: Vec<&str> = split_script_into_statements(script).collect();
+        // When parsing fails, it should return the entire script as a single statement
+        assert_eq!(statements, vec![script]);
+    }
+
+    #[test]
+    fn split_script_into_statements_with_comments() {
+        let script =
+            "-- This is a comment\nCREATE TABLE test (id INT); /* block comment */\nINSERT INTO test VALUES (1);";
+        let statements: Vec<&str> = split_script_into_statements(script).collect();
+        assert_eq!(
+            statements,
+            vec![
+                "-- This is a comment\nCREATE TABLE test (id INT);",
+                " /* block comment */\nINSERT INTO test VALUES (1);"
+            ]
+        );
+    }
+}
