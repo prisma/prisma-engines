@@ -86,7 +86,7 @@ fn replace_identifier_quotes(sql: &str) -> String {
 
     use sqlparser::{
         ast::{Expr, Ident, VisitMut, VisitorMut},
-        dialect::GenericDialect,
+        dialect::MsSqlDialect,
         parser::Parser,
     };
 
@@ -115,7 +115,7 @@ fn replace_identifier_quotes(sql: &str) -> String {
         }
     }
 
-    let dialect = GenericDialect {};
+    let dialect = MsSqlDialect {};
     match Parser::new(&dialect).try_with_sql(sql).and_then(|mut p| p.parse_expr()) {
         Ok(mut expr) => {
             let _ = expr.visit(&mut QuoteConverter);

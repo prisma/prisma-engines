@@ -555,7 +555,7 @@ fn extract_where_clause(sql: &str) -> Option<String> {
 
     let char_offset = last_where_char_offset?;
     let byte_offset = sql.char_indices().nth(char_offset).map(|(i, _)| i)?;
-    let predicate = sql[byte_offset + 5..].trim();
+    let predicate = sql[byte_offset + "WHERE".len()..].trim();
 
     if predicate.is_empty() {
         None
