@@ -543,7 +543,9 @@ fn extract_where_clause(sql: &str) -> Option<String> {
                 loop {
                     match chars.next() {
                         Some((_, '\'')) => match chars.peek() {
-                            Some(&(_, '\'')) => { chars.next(); }
+                            Some(&(_, '\'')) => {
+                                chars.next();
+                            }
                             _ => break,
                         },
                         Some(_) => continue,
@@ -555,13 +557,15 @@ fn extract_where_clause(sql: &str) -> Option<String> {
                 chars.next();
                 while matches!(chars.next(), Some((_, char)) if char != '"') {}
             }
-            _ if sql[i..].len() >= WHERE_LEN
-                && sql[i..i + WHERE_LEN].eq_ignore_ascii_case(WHERE) =>
-            {
+            _ if sql[i..].len() >= WHERE_LEN && sql[i..i + WHERE_LEN].eq_ignore_ascii_case(WHERE) => {
                 last_where_pos = Some(i);
-                for _ in 0..WHERE_LEN { chars.next(); }
+                for _ in 0..WHERE_LEN {
+                    chars.next();
+                }
             }
-            _ => { chars.next(); }
+            _ => {
+                chars.next();
+            }
         }
     }
 
@@ -682,28 +686,19 @@ mod tests {
     #[test]
     fn extract_where_clause_with_quoted_identifier() {
         let sql = r#"CREATE UNIQUE INDEX "idx" ON "User" ("email") WHERE "deletedAt" IS NULL"#;
-        assert_eq!(
-            extract_where_clause(sql),
-            Some("\"deletedAt\" IS NULL".to_string())
-        );
+        assert_eq!(extract_where_clause(sql), Some("\"deletedAt\" IS NULL".to_string()));
     }
 
     #[test]
     fn extract_where_clause_with_where_in_string_literal() {
         let sql = r#"CREATE INDEX "idx" ON "t" ("col") WHERE my_field = ' WHERE '"#;
-        assert_eq!(
-            extract_where_clause(sql),
-            Some("my_field = ' WHERE '".to_string())
-        );
+        assert_eq!(extract_where_clause(sql), Some("my_field = ' WHERE '".to_string()));
     }
 
     #[test]
     fn extract_where_clause_with_escaped_quotes_in_string() {
         let sql = r#"CREATE INDEX "idx" ON "t" ("col") WHERE name = 'it''s WHERE ok'"#;
-        assert_eq!(
-            extract_where_clause(sql),
-            Some("name = 'it''s WHERE ok'".to_string())
-        );
+        assert_eq!(extract_where_clause(sql), Some("name = 'it''s WHERE ok'".to_string()));
     }
 
     #[test]

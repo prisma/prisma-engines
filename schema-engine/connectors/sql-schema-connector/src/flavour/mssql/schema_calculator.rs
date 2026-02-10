@@ -25,19 +25,7 @@ impl SqlSchemaCalculatorFlavour for MssqlSchemaCalculatorFlavour {
         let predicate = if is_raw {
             predicate
         } else {
-            let mut quote_idx = 0;
-
-            let predicate: String = predicate
-                .chars()
-                .map(|char| {
-                    if char == '"' {
-                        quote_idx += 1;
-                        if quote_idx % 2 == 1 { '[' } else { ']' }
-                    } else {
-                        char
-                    }
-                })
-                .collect();
+            let predicate = replace_identifier_quotes(&predicate);
 
             predicate
                 .replace(" = true", "=(1)")
@@ -89,5 +77,76 @@ impl SqlSchemaCalculatorFlavour for MssqlSchemaCalculatorFlavour {
         }
 
         context.schema.describer_schema.set_connector_data(Box::new(data));
+    }
+}
+
+/// Replace `"` identifier quotes with MSSQL `[]` brackets,
+/// skipping over single-quoted string literals.
+fn replace_identifier_quotes(sql: &str) -> String {
+    let mut out = String::with_capacity(sql.len());
+    let mut chars = sql.chars().peekable();
+    let mut in_identifier = false;
+
+    while let Some(character) = chars.next() {
+        match character {
+            '\'' => {
+                out.push(character);
+                loop {
+                    match chars.next() {
+                        Some('\'') => {
+                            out.push('\'');
+                            if chars.peek() == Some(&'\'') {
+                                out.push(chars.next().unwrap());
+                            } else {
+                                break;
+                            }
+                        }
+                        Some(char) => out.push(char),
+                        None => break,
+                    }
+                }
+            }
+            '"' => {
+                in_identifier = !in_identifier;
+                out.push(if in_identifier { '[' } else { ']' });
+            }
+            char => out.push(char),
+        }
+    }
+
+    out
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn replaces_identifier_quotes() {
+        assert_eq!(replace_identifier_quotes(r#""col" = 1"#), "[col] = 1");
+    }
+
+    #[test]
+    fn preserves_quotes_inside_string_literals() {
+        assert_eq!(
+            replace_identifier_quotes(r#""col" = '"whatever"'"#),
+            r#"[col] = '"whatever"'"#
+        );
+    }
+
+    #[test]
+    fn handles_escaped_single_quotes() {
+        assert_eq!(
+            replace_identifier_quotes(r#""col" = 'it''s "fine"'"#),
+            r#"[col] = 'it''s "fine"'"#
+        );
+    }
+
+    #[test]
+    fn multiple_identifiers() {
+        assert_eq!(
+            replace_identifier_quotes(r#""a" = true AND "b" IS NULL"#),
+            "[a] = true AND [b] IS NULL"
+        );
     }
 }
