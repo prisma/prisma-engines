@@ -1,7 +1,7 @@
 use std::borrow::Cow;
 
 use psl::{
-    datamodel_connector::constraint_names::ConstraintNames,
+    datamodel_connector::{constraint_names::ConstraintNames, walker_ext_traits::IndexWalkerExt},
     parser_database::{IndexType, walkers},
     schema_ast::ast,
 };

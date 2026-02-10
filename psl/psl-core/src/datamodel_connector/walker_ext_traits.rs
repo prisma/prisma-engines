@@ -4,7 +4,9 @@ use crate::{
         Connector, NativeTypeInstance, ReferentialAction, RelationMode, constraint_names::ConstraintNames,
     },
 };
+use itertools::Itertools;
 use parser_database::{
+    WhereClause, WhereCondition, WhereValue,
     ast::{self, WithSpan},
     walkers::*,
 };
@@ -14,6 +16,7 @@ use super::ConnectorCapability;
 
 pub trait IndexWalkerExt<'db> {
     fn constraint_name(self, connector: &dyn Connector) -> Cow<'db, str>;
+    fn where_clause_as_sql(self) -> Option<Cow<'db, str>>;
 }
 
 impl<'db> IndexWalkerExt<'db> for IndexWalker<'db> {
@@ -36,6 +39,40 @@ impl<'db> IndexWalkerExt<'db> for IndexWalker<'db> {
         } else {
             ConstraintNames::non_unique_index_name(model_db_name, &field_db_names, connector).into()
         }
+    }
+
+    fn where_clause_as_sql(self) -> Option<Cow<'db, str>> {
+        match self.where_clause_attribute()? {
+            WhereClause::Raw(s) => Some(Cow::Borrowed(s.as_str())),
+            WhereClause::Object(conditions) => {
+                let model = self.model();
+                let sql = conditions
+                    .iter()
+                    .map(|cond| {
+                        let col = model.walk(cond.scalar_field_id).database_name();
+                        render_condition(&cond.condition, col)
+                    })
+                    .join(" AND ");
+                Some(Cow::Owned(sql))
+            }
+        }
+    }
+}
+
+fn render_value(value: &WhereValue) -> String {
+    match value {
+        WhereValue::String(s) => format!("'{}'", s.replace('\'', "''")),
+        WhereValue::Number(n) => n.clone(),
+        WhereValue::Boolean(b) => b.to_string(),
+    }
+}
+
+fn render_condition(condition: &WhereCondition, col: &str) -> String {
+    match condition {
+        WhereCondition::IsNull => format!("\"{col}\" IS NULL"),
+        WhereCondition::IsNotNull => format!("\"{col}\" IS NOT NULL"),
+        WhereCondition::Equals(v) => format!("\"{col}\" = {}", render_value(v)),
+        WhereCondition::NotEquals(v) => format!("\"{col}\" != {}", render_value(v)),
     }
 }
 

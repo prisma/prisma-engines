@@ -1,7 +1,4 @@
-use std::borrow::Cow;
-
 use either::Either;
-use itertools::Itertools;
 
 use super::CompositeTypeFieldWalker;
 use crate::{
@@ -193,28 +190,9 @@ impl<'db> IndexWalker<'db> {
         self.index_attribute.where_clause.is_some()
     }
 
-    /// Converts the WHERE clause to a SQL predicate string.
-    pub fn where_clause_as_sql(self) -> Option<Cow<'db, str>> {
-        match &self.index_attribute.where_clause {
-            Some(WhereClause::Raw(s)) => Some(Cow::Borrowed(s)),
-            Some(WhereClause::Object(conditions)) => {
-                let model = self.model();
-                let sql = conditions
-                    .iter()
-                    .map(|field_condition| {
-                        let field_name = &self.db[field_condition.field_name];
-                        let column_name = model
-                            .scalar_fields()
-                            .find(|f| f.name() == field_name)
-                            .map(|f| f.database_name())
-                            .unwrap_or(field_name);
-                        field_condition.condition.to_sql(column_name, self.db)
-                    })
-                    .join(" AND ");
-                Some(Cow::Owned(sql))
-            }
-            None => None,
-        }
+    /// The structured WHERE clause for this index, if any.
+    pub fn where_clause_attribute(self) -> Option<&'db WhereClause> {
+        self.index_attribute.where_clause.as_ref()
     }
 
     /// The model the index is defined on.

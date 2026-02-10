@@ -528,51 +528,45 @@ pub enum IndexType {
     Fulltext,
 }
 
+/// A condition operator in a partial index WHERE clause.
 #[derive(Debug, Clone, PartialEq)]
-pub(crate) enum WhereCondition {
+pub enum WhereCondition {
+    /// `IS NULL`
     IsNull,
+    /// `IS NOT NULL`
     IsNotNull,
+    /// `= value`
     Equals(WhereValue),
+    /// `!= value`
     NotEquals(WhereValue),
 }
 
+/// A literal value in a partial index WHERE condition.
 #[derive(Debug, Clone, PartialEq)]
-pub(crate) enum WhereValue {
-    String(StringId),
-    Number(StringId),
+pub enum WhereValue {
+    /// A string literal.
+    String(std::string::String),
+    /// A numeric literal.
+    Number(std::string::String),
+    /// A boolean literal.
     Boolean(bool),
 }
 
-impl WhereValue {
-    pub(crate) fn to_sql(&self, db: &ParserDatabase) -> String {
-        match self {
-            WhereValue::String(s) => format!("'{}'", db[*s].replace('\'', "''")),
-            WhereValue::Number(n) => db[*n].to_string(),
-            WhereValue::Boolean(b) => b.to_string(),
-        }
-    }
-}
-
-impl WhereCondition {
-    pub(crate) fn to_sql(&self, field_name: &str, db: &ParserDatabase) -> String {
-        match self {
-            WhereCondition::IsNull => format!("\"{field_name}\" IS NULL"),
-            WhereCondition::IsNotNull => format!("\"{field_name}\" IS NOT NULL"),
-            WhereCondition::Equals(v) => format!("\"{field_name}\" = {}", v.to_sql(db)),
-            WhereCondition::NotEquals(v) => format!("\"{field_name}\" != {}", v.to_sql(db)),
-        }
-    }
-}
-
+/// A field condition in an object-syntax WHERE clause.
 #[derive(Debug, Clone)]
-pub(crate) struct WhereFieldCondition {
-    pub(crate) field_name: StringId,
-    pub(crate) condition: WhereCondition,
+pub struct WhereFieldCondition {
+    /// The scalar field referenced by this condition.
+    pub scalar_field_id: ScalarFieldId,
+    /// The condition to apply.
+    pub condition: WhereCondition,
 }
 
+/// The WHERE clause of a partial index.
 #[derive(Debug, Clone)]
-pub(crate) enum WhereClause {
+pub enum WhereClause {
+    /// A raw SQL predicate string.
     Raw(String),
+    /// Structured conditions from the object syntax.
     Object(Vec<WhereFieldCondition>),
 }
 

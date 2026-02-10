@@ -687,11 +687,13 @@ fn parse_where_object_member(
     };
 
     let scalar_type = ctx.types[scalar_field_id].r#type;
-    let field_name = ctx.interner.intern(field_name_str);
 
     let condition = parse_where_value(&member.value, field_name_str, scalar_type, false, ctx)?;
 
-    Some(WhereFieldCondition { field_name, condition })
+    Some(WhereFieldCondition {
+        scalar_field_id,
+        condition,
+    })
 }
 
 fn parse_where_value(
@@ -735,7 +737,7 @@ fn parse_where_value(
                 "a String",
                 ctx,
             )?;
-            Some(wrap(WhereValue::String(ctx.interner.intern(val))))
+            Some(wrap(WhereValue::String(val.clone())))
         }
         ast::Expression::NumericValue(val, _) => {
             check_type(
@@ -750,7 +752,7 @@ fn parse_where_value(
                 "a Number",
                 ctx,
             )?;
-            Some(wrap(WhereValue::Number(ctx.interner.intern(val))))
+            Some(wrap(WhereValue::Number(val.clone())))
         }
         ast::Expression::Object(inner_members, _) if !negated => {
             if inner_members.len() != 1 {

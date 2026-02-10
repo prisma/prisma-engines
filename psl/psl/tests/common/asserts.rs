@@ -4,6 +4,7 @@ use base64::prelude::*;
 use either::Either::{Left, Right};
 use psl::Diagnostics;
 use psl::datamodel_connector::Connector;
+use psl::datamodel_connector::walker_ext_traits::IndexWalkerExt;
 use psl::diagnostics::DatamodelWarning;
 use psl::parser_database::{
     IndexAlgorithm, ModelId, OperatorClass, ReferentialAction, ScalarFieldType, ScalarType, SortOrder, walkers,
