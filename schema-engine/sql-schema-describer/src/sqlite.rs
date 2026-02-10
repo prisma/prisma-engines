@@ -527,20 +527,47 @@ async fn push_indexes(
     Ok(())
 }
 
-/// Extract the WHERE clause from a SQLite CREATE INDEX statement.
+/// Extract the WHERE clause from a SQLite CREATE INDEX statement,
+/// skipping over quoted regions to avoid false matches.
 fn extract_where_clause(sql: &str) -> Option<String> {
-    const WHERE_KEYWORD: &str = " WHERE ";
+    const WHERE: &str = " WHERE ";
+    const WHERE_LEN: usize = WHERE.len();
 
-    // SQLite stores the full CREATE INDEX statement.
-    // We need to find the WHERE keyword and extract everything after it.
-    let upper = sql.to_uppercase();
-    if let Some(pos) = upper.rfind(WHERE_KEYWORD) {
-        let predicate = sql[pos + WHERE_KEYWORD.len()..].trim();
-        if !predicate.is_empty() {
-            return Some(predicate.to_string());
+    let mut chars = sql.char_indices().peekable();
+    let mut last_where_pos = None;
+
+    while let Some(&(i, character)) = chars.peek() {
+        match character {
+            '\'' => {
+                chars.next();
+                loop {
+                    match chars.next() {
+                        Some((_, '\'')) => match chars.peek() {
+                            Some(&(_, '\'')) => { chars.next(); }
+                            _ => break,
+                        },
+                        Some(_) => continue,
+                        None => break,
+                    }
+                }
+            }
+            '"' => {
+                chars.next();
+                while matches!(chars.next(), Some((_, char)) if char != '"') {}
+            }
+            _ if sql[i..].len() >= WHERE_LEN
+                && sql[i..i + WHERE_LEN].eq_ignore_ascii_case(WHERE) =>
+            {
+                last_where_pos = Some(i);
+                for _ in 0..WHERE_LEN { chars.next(); }
+            }
+            _ => { chars.next(); }
         }
     }
-    None
+
+    last_where_pos
+        .map(|pos| sql[pos + WHERE_LEN..].trim().to_string())
+        .filter(|s| !s.is_empty())
 }
 
 fn get_column_type(mut tpe: String, arity: ColumnArity) -> ColumnType {
@@ -641,3 +668,62 @@ const SQLITE_IGNORED_TABLES: &[&str] = &[
     // This is the default but can be configured by the user
     "d1_migrations",
 ];
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn extract_simple_where_clause() {
+        let sql = r#"CREATE UNIQUE INDEX "idx" ON "User" ("email") WHERE active = 1"#;
+        assert_eq!(extract_where_clause(sql), Some("active = 1".to_string()));
+    }
+
+    #[test]
+    fn extract_where_clause_with_quoted_identifier() {
+        let sql = r#"CREATE UNIQUE INDEX "idx" ON "User" ("email") WHERE "deletedAt" IS NULL"#;
+        assert_eq!(
+            extract_where_clause(sql),
+            Some("\"deletedAt\" IS NULL".to_string())
+        );
+    }
+
+    #[test]
+    fn extract_where_clause_with_where_in_string_literal() {
+        let sql = r#"CREATE INDEX "idx" ON "t" ("col") WHERE my_field = ' WHERE '"#;
+        assert_eq!(
+            extract_where_clause(sql),
+            Some("my_field = ' WHERE '".to_string())
+        );
+    }
+
+    #[test]
+    fn extract_where_clause_with_escaped_quotes_in_string() {
+        let sql = r#"CREATE INDEX "idx" ON "t" ("col") WHERE name = 'it''s WHERE ok'"#;
+        assert_eq!(
+            extract_where_clause(sql),
+            Some("name = 'it''s WHERE ok'".to_string())
+        );
+    }
+
+    #[test]
+    fn no_where_clause() {
+        let sql = r#"CREATE INDEX "idx" ON "User" ("email")"#;
+        assert_eq!(extract_where_clause(sql), None);
+    }
+
+    #[test]
+    fn extract_where_clause_multiple_where_in_strings() {
+        let sql = r#"CREATE INDEX "idx" ON "t" ("col") WHERE a = ' WHERE ' AND b = ' WHERE '"#;
+        assert_eq!(
+            extract_where_clause(sql),
+            Some("a = ' WHERE ' AND b = ' WHERE '".to_string())
+        );
+    }
+
+    #[test]
+    fn extract_where_clause_no_real_where_only_in_string() {
+        let sql = r#"CREATE INDEX "idx" ON "t" ("col WHERE ")"#;
+        assert_eq!(extract_where_clause(sql), None);
+    }
+}
