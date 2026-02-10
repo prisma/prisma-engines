@@ -80,41 +80,49 @@ impl SqlSchemaCalculatorFlavour for MssqlSchemaCalculatorFlavour {
     }
 }
 
-/// Replace `"` identifier quotes with MSSQL `[]` brackets,
-/// skipping over single-quoted string literals.
+/// Replace `"` identifier quotes with MSSQL `[]` brackets using the SQL parser.
 fn replace_identifier_quotes(sql: &str) -> String {
-    let mut out = String::with_capacity(sql.len());
-    let mut chars = sql.chars().peekable();
-    let mut in_identifier = false;
+    use std::ops::ControlFlow;
 
-    while let Some(character) = chars.next() {
-        match character {
-            '\'' => {
-                out.push(character);
-                loop {
-                    match chars.next() {
-                        Some('\'') => {
-                            out.push('\'');
-                            if chars.peek() == Some(&'\'') {
-                                out.push(chars.next().unwrap());
-                            } else {
-                                break;
-                            }
-                        }
-                        Some(char) => out.push(char),
-                        None => break,
-                    }
+    use sqlparser::{
+        ast::{Expr, Ident, VisitMut, VisitorMut},
+        dialect::GenericDialect,
+        parser::Parser,
+    };
+
+    struct QuoteConverter;
+
+    impl VisitorMut for QuoteConverter {
+        type Break = ();
+
+        fn post_visit_expr(&mut self, expr: &mut Expr) -> ControlFlow<Self::Break> {
+            match expr {
+                Expr::Identifier(ident) => {
+                    convert_ident(ident);
                 }
+                Expr::CompoundIdentifier(idents) => {
+                    idents.iter_mut().for_each(convert_ident);
+                }
+                _ => {}
             }
-            '"' => {
-                in_identifier = !in_identifier;
-                out.push(if in_identifier { '[' } else { ']' });
-            }
-            char => out.push(char),
+            ControlFlow::Continue(())
         }
     }
 
-    out
+    fn convert_ident(ident: &mut Ident) {
+        if ident.quote_style == Some('"') {
+            ident.quote_style = Some('[');
+        }
+    }
+
+    let dialect = GenericDialect {};
+    match Parser::new(&dialect).try_with_sql(sql).and_then(|mut p| p.parse_expr()) {
+        Ok(mut expr) => {
+            let _ = expr.visit(&mut QuoteConverter);
+            expr.to_string()
+        }
+        Err(_) => sql.to_string(),
+    }
 }
 
 #[cfg(test)]
@@ -148,5 +156,10 @@ mod tests {
             replace_identifier_quotes(r#""a" = true AND "b" IS NULL"#),
             "[a] = true AND [b] IS NULL"
         );
+    }
+
+    #[test]
+    fn handles_escaped_double_quotes_in_identifiers() {
+        assert_eq!(replace_identifier_quotes(r#""col""name" = 1"#), r#"[col"name] = 1"#);
     }
 }

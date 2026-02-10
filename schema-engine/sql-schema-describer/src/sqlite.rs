@@ -528,50 +528,40 @@ async fn push_indexes(
 }
 
 /// Extract the WHERE clause from a SQLite CREATE INDEX statement,
-/// skipping over quoted regions to avoid false matches.
+/// using the SQL tokenizer to correctly handle quoted/escaped regions.
 fn extract_where_clause(sql: &str) -> Option<String> {
-    const WHERE: &str = " WHERE ";
-    const WHERE_LEN: usize = WHERE.len();
+    use sqlparser::{
+        dialect::SQLiteDialect,
+        keywords::Keyword,
+        tokenizer::{Token, Tokenizer},
+    };
 
-    let mut chars = sql.char_indices().peekable();
-    let mut last_where_pos = None;
+    let dialect = SQLiteDialect {};
+    let tokens = Tokenizer::new(&dialect, sql).tokenize_with_location().ok()?;
 
-    while let Some(&(i, character)) = chars.peek() {
-        match character {
-            '\'' => {
-                chars.next();
-                loop {
-                    match chars.next() {
-                        Some((_, '\'')) => match chars.peek() {
-                            Some(&(_, '\'')) => {
-                                chars.next();
-                            }
-                            _ => break,
-                        },
-                        Some(_) => continue,
-                        None => break,
-                    }
-                }
+    let mut depth: i32 = 0;
+    let mut last_where_char_offset = None;
+
+    for tok in &tokens {
+        match &tok.token {
+            Token::LParen => depth += 1,
+            Token::RParen => depth -= 1,
+            Token::Word(w) if w.keyword == Keyword::WHERE && depth == 0 => {
+                last_where_char_offset = Some(tok.location.column as usize - 1);
             }
-            '"' => {
-                chars.next();
-                while matches!(chars.next(), Some((_, char)) if char != '"') {}
-            }
-            _ if sql[i..].len() >= WHERE_LEN && sql[i..i + WHERE_LEN].eq_ignore_ascii_case(WHERE) => {
-                last_where_pos = Some(i);
-                for _ in 0..WHERE_LEN {
-                    chars.next();
-                }
-            }
-            _ => {
-                chars.next();
-            }
+            _ => {}
         }
     }
 
-    last_where_pos
-        .map(|pos| sql[pos + WHERE_LEN..].trim().to_string())
-        .filter(|s| !s.is_empty())
+    let char_offset = last_where_char_offset?;
+    let byte_offset = sql.char_indices().nth(char_offset).map(|(i, _)| i)?;
+    let predicate = sql[byte_offset + 5..].trim();
+
+    if predicate.is_empty() {
+        None
+    } else {
+        Some(predicate.to_string())
+    }
 }
 
 fn get_column_type(mut tpe: String, arity: ColumnArity) -> ColumnType {
