@@ -198,11 +198,17 @@ impl<'db> IndexWalker<'db> {
         match &self.index_attribute.where_clause {
             Some(WhereClause::Raw(s)) => Some(Cow::Borrowed(s)),
             Some(WhereClause::Object(conditions)) => {
+                let model = self.model();
                 let sql = conditions
                     .iter()
                     .map(|field_condition| {
                         let field_name = &self.db[field_condition.field_name];
-                        field_condition.condition.to_sql(field_name, self.db)
+                        let column_name = model
+                            .scalar_fields()
+                            .find(|f| f.name() == field_name)
+                            .map(|f| f.database_name())
+                            .unwrap_or(field_name);
+                        field_condition.condition.to_sql(column_name, self.db)
                     })
                     .join(" AND ");
                 Some(Cow::Owned(sql))

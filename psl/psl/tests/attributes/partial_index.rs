@@ -702,3 +702,21 @@ fn partial_index_requires_preview_feature() {
     "#]];
     expected.assert_eq(&err);
 }
+
+#[test]
+fn partial_index_object_syntax_uses_database_name() {
+    let dml = indoc! {r#"
+        model User {
+            id       Int     @id
+            isActive Boolean @map("is_active")
+
+            @@unique([id], where: { isActive: true })
+        }
+    "#};
+
+    psl::parse_schema_without_extensions(with_header(dml, Provider::Postgres, &["partialIndexes"]))
+        .unwrap()
+        .assert_has_model("User")
+        .assert_unique_on_fields(&["id"])
+        .assert_where_clause("\"is_active\" = true");
+}
