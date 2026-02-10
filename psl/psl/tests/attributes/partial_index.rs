@@ -1,3 +1,5 @@
+use psl::parser_database::{WhereCondition, WhereValue};
+
 use crate::{Provider, common::*, with_header};
 
 #[test]
@@ -16,7 +18,7 @@ fn partial_unique_index_on_postgres() {
         .unwrap()
         .assert_has_model("User")
         .assert_unique_on_fields(&["email"])
-        .assert_where_clause("status = 'active'");
+        .assert_raw_where_clause("status = 'active'");
 }
 
 #[test]
@@ -36,7 +38,7 @@ fn partial_unique_index_with_name_on_postgres() {
         .assert_has_model("User")
         .assert_unique_on_fields(&["email"])
         .assert_name("email_active_unique")
-        .assert_where_clause("status = 'active'");
+        .assert_raw_where_clause("status = 'active'");
 }
 
 #[test]
@@ -55,7 +57,7 @@ fn partial_index_on_postgres() {
         .unwrap()
         .assert_has_model("User")
         .assert_index_on_fields(&["email"])
-        .assert_where_clause("status IS NOT NULL");
+        .assert_raw_where_clause("status IS NOT NULL");
 }
 
 #[test]
@@ -74,7 +76,7 @@ fn partial_unique_index_on_sqlite() {
         .unwrap()
         .assert_has_model("User")
         .assert_unique_on_fields(&["email"])
-        .assert_where_clause("status = 'active'");
+        .assert_raw_where_clause("status = 'active'");
 }
 
 #[test]
@@ -93,7 +95,7 @@ fn partial_index_on_sqlite() {
         .unwrap()
         .assert_has_model("User")
         .assert_index_on_fields(&["email"])
-        .assert_where_clause("status = 'active'");
+        .assert_raw_where_clause("status = 'active'");
 }
 
 #[test]
@@ -233,7 +235,7 @@ fn compound_partial_unique_index() {
         .unwrap()
         .assert_has_model("User")
         .assert_unique_on_fields(&["firstName", "lastName"])
-        .assert_where_clause("status = 'active'");
+        .assert_raw_where_clause("status = 'active'");
 }
 
 #[test]
@@ -252,7 +254,7 @@ fn partial_unique_index_with_object_syntax_boolean_true() {
         .unwrap()
         .assert_has_model("User")
         .assert_unique_on_fields(&["email"])
-        .assert_where_clause("\"active\" = true");
+        .assert_where_object(&[("active", WhereCondition::Equals(WhereValue::Boolean(true)))]);
 }
 
 #[test]
@@ -271,7 +273,7 @@ fn partial_unique_index_with_object_syntax_boolean_false() {
         .unwrap()
         .assert_has_model("User")
         .assert_unique_on_fields(&["email"])
-        .assert_where_clause("\"deleted\" = false");
+        .assert_where_object(&[("deleted", WhereCondition::Equals(WhereValue::Boolean(false)))]);
 }
 
 #[test]
@@ -290,7 +292,7 @@ fn partial_unique_index_with_object_syntax_null() {
         .unwrap()
         .assert_has_model("User")
         .assert_unique_on_fields(&["email"])
-        .assert_where_clause("\"deletedAt\" IS NULL");
+        .assert_where_object(&[("deletedAt", WhereCondition::IsNull)]);
 }
 
 #[test]
@@ -309,7 +311,7 @@ fn partial_unique_index_with_object_syntax_not_null() {
         .unwrap()
         .assert_has_model("User")
         .assert_unique_on_fields(&["email"])
-        .assert_where_clause("\"deletedAt\" IS NOT NULL");
+        .assert_where_object(&[("deletedAt", WhereCondition::IsNotNull)]);
 }
 
 #[test]
@@ -328,7 +330,7 @@ fn partial_unique_index_with_object_syntax_string_value() {
         .unwrap()
         .assert_has_model("User")
         .assert_unique_on_fields(&["email"])
-        .assert_where_clause("\"status\" = 'active'");
+        .assert_where_object(&[("status", WhereCondition::Equals(WhereValue::String("active".into())))]);
 }
 
 #[test]
@@ -347,7 +349,7 @@ fn partial_unique_index_with_object_syntax_number_value() {
         .unwrap()
         .assert_has_model("User")
         .assert_unique_on_fields(&["email"])
-        .assert_where_clause("\"priority\" = 1");
+        .assert_where_object(&[("priority", WhereCondition::Equals(WhereValue::Number("1".into())))]);
 }
 
 #[test]
@@ -367,7 +369,10 @@ fn partial_unique_index_with_object_syntax_multiple_conditions() {
         .unwrap()
         .assert_has_model("User")
         .assert_unique_on_fields(&["email"])
-        .assert_where_clause("\"active\" = true AND \"deletedAt\" IS NULL");
+        .assert_where_object(&[
+            ("active", WhereCondition::Equals(WhereValue::Boolean(true))),
+            ("deletedAt", WhereCondition::IsNull),
+        ]);
 }
 
 #[test]
@@ -386,7 +391,7 @@ fn partial_index_with_object_syntax_on_sqlite() {
         .unwrap()
         .assert_has_model("User")
         .assert_index_on_fields(&["email"])
-        .assert_where_clause("\"active\" = true");
+        .assert_where_object(&[("active", WhereCondition::Equals(WhereValue::Boolean(true)))]);
 }
 
 #[test]
@@ -476,7 +481,10 @@ fn partial_index_with_not_string_value() {
         .unwrap()
         .assert_has_model("User")
         .assert_unique_on_fields(&["email"])
-        .assert_where_clause("\"status\" != 'deleted'");
+        .assert_where_object(&[(
+            "status",
+            WhereCondition::NotEquals(WhereValue::String("deleted".into())),
+        )]);
 }
 
 #[test]
@@ -495,7 +503,7 @@ fn partial_unique_index_on_cockroachdb() {
         .unwrap()
         .assert_has_model("User")
         .assert_unique_on_fields(&["email"])
-        .assert_where_clause("status = 'active'");
+        .assert_raw_where_clause("status = 'active'");
 }
 
 #[test]
@@ -514,7 +522,7 @@ fn partial_index_with_object_syntax_on_cockroachdb() {
         .unwrap()
         .assert_has_model("User")
         .assert_index_on_fields(&["email"])
-        .assert_where_clause("\"active\" = true");
+        .assert_where_object(&[("active", WhereCondition::Equals(WhereValue::Boolean(true)))]);
 }
 
 #[test]
@@ -533,7 +541,10 @@ fn partial_index_with_special_characters_in_string() {
         .unwrap()
         .assert_has_model("User")
         .assert_unique_on_fields(&["email"])
-        .assert_where_clause("\"status\" = 'it''s active'");
+        .assert_where_object(&[(
+            "status",
+            WhereCondition::Equals(WhereValue::String("it's active".into())),
+        )]);
 }
 
 #[test]
@@ -552,7 +563,7 @@ fn partial_index_object_syntax_on_index() {
         .unwrap()
         .assert_has_model("User")
         .assert_index_on_fields(&["email"])
-        .assert_where_clause("\"active\" = true");
+        .assert_where_object(&[("active", WhereCondition::Equals(WhereValue::Boolean(true)))]);
 }
 
 #[test]
@@ -571,7 +582,7 @@ fn partial_index_with_not_true() {
         .unwrap()
         .assert_has_model("User")
         .assert_unique_on_fields(&["email"])
-        .assert_where_clause("\"active\" != true");
+        .assert_where_object(&[("active", WhereCondition::NotEquals(WhereValue::Boolean(true)))]);
 }
 
 #[test]
@@ -590,7 +601,7 @@ fn partial_index_with_not_false() {
         .unwrap()
         .assert_has_model("User")
         .assert_unique_on_fields(&["email"])
-        .assert_where_clause("\"active\" != false");
+        .assert_where_object(&[("active", WhereCondition::NotEquals(WhereValue::Boolean(false)))]);
 }
 
 #[test]
@@ -609,7 +620,7 @@ fn partial_index_with_negative_number() {
         .unwrap()
         .assert_has_model("User")
         .assert_unique_on_fields(&["email"])
-        .assert_where_clause("\"priority\" = -1");
+        .assert_where_object(&[("priority", WhereCondition::Equals(WhereValue::Number("-1".into())))]);
 }
 
 #[test]
@@ -628,7 +639,7 @@ fn partial_index_with_decimal_number() {
         .unwrap()
         .assert_has_model("User")
         .assert_unique_on_fields(&["email"])
-        .assert_where_clause("\"score\" = 1.5");
+        .assert_where_object(&[("score", WhereCondition::Equals(WhereValue::Number("1.5".into())))]);
 }
 
 #[test]
@@ -718,7 +729,7 @@ fn partial_index_object_syntax_uses_database_name() {
         .unwrap()
         .assert_has_model("User")
         .assert_unique_on_fields(&["id"])
-        .assert_where_clause("\"is_active\" = true");
+        .assert_where_object(&[("is_active", WhereCondition::Equals(WhereValue::Boolean(true)))]);
 }
 
 #[test]
@@ -851,7 +862,7 @@ fn partial_index_object_syntax_accepts_number_for_int_field() {
         .unwrap()
         .assert_has_model("User")
         .assert_unique_on_fields(&["id"])
-        .assert_where_clause("\"priority\" = 1");
+        .assert_where_object(&[("priority", WhereCondition::Equals(WhereValue::Number("1".into())))]);
 }
 
 #[test]
@@ -966,7 +977,7 @@ fn partial_index_object_syntax_accepts_string_for_enum_field() {
         .unwrap()
         .assert_has_model("User")
         .assert_unique_on_fields(&["id"])
-        .assert_where_clause("\"role\" = 'ADMIN'");
+        .assert_where_object(&[("role", WhereCondition::Equals(WhereValue::String("ADMIN".into())))]);
 }
 
 #[test]

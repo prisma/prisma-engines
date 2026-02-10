@@ -4,12 +4,16 @@ use sql_schema_calculator_flavour::JoinTableUniquenessConstraint;
 pub(super) use sql_schema_calculator_flavour::SqlSchemaCalculatorFlavour;
 
 use crate::SqlDatabaseSchema;
+use std::borrow::Cow;
+
+use itertools::Itertools;
 use psl::{
     ValidatedSchema,
     datamodel_connector::walker_ext_traits::*,
     parser_database::{
-        self as db, ExtensionTypeId, ExtensionTypes, ReferentialAction, ScalarFieldType, ScalarType, SortOrder, ast,
-        walkers::{ModelWalker, ScalarFieldWalker},
+        self as db, ExtensionTypeId, ExtensionTypes, ReferentialAction, ScalarFieldType, ScalarType, SortOrder,
+        WhereClause, WhereCondition, WhereValue, ast,
+        walkers::{IndexWalker, ModelWalker, ScalarFieldWalker},
     },
 };
 use sql_schema_describer::{self as sql, PrismaValue, SqlSchema};
@@ -125,9 +129,8 @@ fn push_model_indexes(model: ModelWalker<'_>, table_id: sql::TableId, ctx: &mut 
     for index in model.indexes() {
         let constraint_name = index.constraint_name(ctx.flavour.datamodel_connector()).into_owned();
         let is_raw_predicate = index.where_clause().is_some();
-        let where_clause = index
-            .where_clause_as_sql()
-            .map(|p| ctx.flavour.normalize_index_predicate(p.into_owned(), is_raw_predicate));
+        let where_clause =
+            where_clause_as_sql(index).map(|p| ctx.flavour.normalize_index_predicate(p.into_owned(), is_raw_predicate));
 
         let index_id = match (index.is_unique(), index.is_fulltext(), where_clause) {
             // Partial unique constraint
@@ -172,6 +175,40 @@ fn push_model_indexes(model: ModelWalker<'_>, table_id: sql::TableId, ctx: &mut 
                 length: sf.length(),
             });
         }
+    }
+}
+
+pub(crate) fn where_clause_as_sql<'db>(index: IndexWalker<'db>) -> Option<Cow<'db, str>> {
+    match index.where_clause_attribute()? {
+        WhereClause::Raw(s) => Some(Cow::Borrowed(s.as_str())),
+        WhereClause::Object(conditions) => {
+            let model = index.model();
+            let sql = conditions
+                .iter()
+                .map(|cond| {
+                    let col = model.walk(cond.scalar_field_id).database_name();
+                    render_condition(&cond.condition, col)
+                })
+                .join(" AND ");
+            Some(Cow::Owned(sql))
+        }
+    }
+}
+
+fn render_value(value: &WhereValue) -> String {
+    match value {
+        WhereValue::String(s) => format!("'{}'", s.replace('\'', "''")),
+        WhereValue::Number(n) => n.clone(),
+        WhereValue::Boolean(b) => b.to_string(),
+    }
+}
+
+fn render_condition(condition: &WhereCondition, col: &str) -> String {
+    match condition {
+        WhereCondition::IsNull => format!("\"{col}\" IS NULL"),
+        WhereCondition::IsNotNull => format!("\"{col}\" IS NOT NULL"),
+        WhereCondition::Equals(v) => format!("\"{col}\" = {}", render_value(v)),
+        WhereCondition::NotEquals(v) => format!("\"{col}\" != {}", render_value(v)),
     }
 }
 

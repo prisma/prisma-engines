@@ -4,10 +4,10 @@ use base64::prelude::*;
 use either::Either::{Left, Right};
 use psl::Diagnostics;
 use psl::datamodel_connector::Connector;
-use psl::datamodel_connector::walker_ext_traits::IndexWalkerExt;
 use psl::diagnostics::DatamodelWarning;
 use psl::parser_database::{
-    IndexAlgorithm, ModelId, OperatorClass, ReferentialAction, ScalarFieldType, ScalarType, SortOrder, walkers,
+    IndexAlgorithm, ModelId, OperatorClass, ReferentialAction, ScalarFieldType, ScalarType, SortOrder, WhereClause,
+    WhereCondition, walkers,
 };
 use psl::schema_ast::ast::WithDocumentation;
 use psl::schema_ast::ast::{self, FieldArity};
@@ -97,7 +97,8 @@ pub(crate) trait IndexAssert {
     fn assert_mapped_name(&self, name: &str) -> &Self;
     fn assert_clustered(&self, clustered: bool) -> &Self;
     fn assert_type(&self, r#type: IndexAlgorithm) -> &Self;
-    fn assert_where_clause(&self, predicate: &str) -> &Self;
+    fn assert_raw_where_clause(&self, predicate: &str) -> &Self;
+    fn assert_where_object(&self, expected: &[(&str, WhereCondition)]) -> &Self;
     fn assert_no_where_clause(&self) -> &Self;
 }
 
@@ -504,14 +505,38 @@ impl IndexAssert for walkers::IndexWalker<'_> {
     }
 
     #[track_caller]
-    fn assert_where_clause(&self, predicate: &str) -> &Self {
-        assert_eq!(self.where_clause_as_sql().as_deref(), Some(predicate));
+    fn assert_raw_where_clause(&self, predicate: &str) -> &Self {
+        assert_eq!(self.where_clause(), Some(predicate));
+        self
+    }
+
+    #[track_caller]
+    fn assert_where_object(&self, expected: &[(&str, WhereCondition)]) -> &Self {
+        match self.where_clause_attribute() {
+            Some(WhereClause::Object(conditions)) => {
+                assert_eq!(
+                    conditions.len(),
+                    expected.len(),
+                    "Wrong number of conditions in where clause"
+                );
+                let model = self.model();
+                for (cond, (exp_name, exp_condition)) in conditions.iter().zip(expected) {
+                    let db_name = model.walk(cond.scalar_field_id).database_name();
+                    assert_eq!(db_name, *exp_name, "Field name mismatch");
+                    assert_eq!(
+                        &cond.condition, exp_condition,
+                        "Condition mismatch for field '{exp_name}'"
+                    );
+                }
+            }
+            other => panic!("Expected Object where clause, got: {other:?}"),
+        }
         self
     }
 
     #[track_caller]
     fn assert_no_where_clause(&self) -> &Self {
-        assert!(self.where_clause_as_sql().is_none());
+        assert!(self.where_clause_attribute().is_none());
         self
     }
 }
@@ -752,7 +777,12 @@ impl IndexAssert for walkers::PrimaryKeyWalker<'_> {
     }
 
     #[track_caller]
-    fn assert_where_clause(&self, _predicate: &str) -> &Self {
+    fn assert_raw_where_clause(&self, _predicate: &str) -> &Self {
+        unreachable!("Primary key cannot define a where clause.");
+    }
+
+    #[track_caller]
+    fn assert_where_object(&self, _expected: &[(&str, WhereCondition)]) -> &Self {
         unreachable!("Primary key cannot define a where clause.");
     }
 
