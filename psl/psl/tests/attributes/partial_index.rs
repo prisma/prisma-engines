@@ -720,3 +720,302 @@ fn partial_index_object_syntax_uses_database_name() {
         .assert_unique_on_fields(&["id"])
         .assert_where_clause("\"is_active\" = true");
 }
+
+#[test]
+fn partial_index_object_syntax_rejects_relation_field() {
+    let dml = indoc! {r#"
+        model User {
+            id    Int    @id
+            posts Post[]
+
+            @@unique([id], where: { posts: true })
+        }
+
+        model Post {
+            id     Int  @id
+            userId Int
+            user   User @relation(fields: [userId], references: [id])
+        }
+    "#};
+
+    let err = parse_unwrap_err(&with_header(dml, Provider::Postgres, &["partialIndexes"]));
+    let expected = expect![[r#"
+        [1;91merror[0m: [1mError parsing attribute "@unique": Field 'posts' is a relation field. Only scalar fields can be used in the where clause.[0m
+          [1;94m-->[0m  [4mschema.prisma:14[0m
+        [1;94m   | [0m
+        [1;94m13 | [0m
+        [1;94m14 | [0m    [1;91m@@unique([id], where: { posts: true })[0m
+        [1;94m   | [0m
+    "#]];
+    expected.assert_eq(&err);
+}
+
+#[test]
+fn partial_index_object_syntax_rejects_boolean_value_for_string_field() {
+    let dml = indoc! {r#"
+        model User {
+            id     Int    @id
+            status String
+
+            @@unique([id], where: { status: true })
+        }
+    "#};
+
+    let err = parse_unwrap_err(&with_header(dml, Provider::Postgres, &["partialIndexes"]));
+    let expected = expect![[r#"
+        [1;91merror[0m: [1mError parsing attribute "@unique": Type mismatch: field 'status' is of type String, but the value is Boolean.[0m
+          [1;94m-->[0m  [4mschema.prisma:14[0m
+        [1;94m   | [0m
+        [1;94m13 | [0m
+        [1;94m14 | [0m    [1;91m@@unique([id], where: { status: true })[0m
+        [1;94m   | [0m
+    "#]];
+    expected.assert_eq(&err);
+}
+
+#[test]
+fn partial_index_object_syntax_rejects_string_value_for_boolean_field() {
+    let dml = indoc! {r#"
+        model User {
+            id     Int     @id
+            active Boolean
+
+            @@unique([id], where: { active: "yes" })
+        }
+    "#};
+
+    let err = parse_unwrap_err(&with_header(dml, Provider::Postgres, &["partialIndexes"]));
+    let expected = expect![[r#"
+        [1;91merror[0m: [1mError parsing attribute "@unique": Type mismatch: field 'active' is of type Boolean, but the value is a String.[0m
+          [1;94m-->[0m  [4mschema.prisma:14[0m
+        [1;94m   | [0m
+        [1;94m13 | [0m
+        [1;94m14 | [0m    [1;91m@@unique([id], where: { active: "yes" })[0m
+        [1;94m   | [0m
+    "#]];
+    expected.assert_eq(&err);
+}
+
+#[test]
+fn partial_index_object_syntax_rejects_number_value_for_string_field() {
+    let dml = indoc! {r#"
+        model User {
+            id     Int    @id
+            status String
+
+            @@unique([id], where: { status: 123 })
+        }
+    "#};
+
+    let err = parse_unwrap_err(&with_header(dml, Provider::Postgres, &["partialIndexes"]));
+    let expected = expect![[r#"
+        [1;91merror[0m: [1mError parsing attribute "@unique": Type mismatch: field 'status' is of type String, but the value is a Number.[0m
+          [1;94m-->[0m  [4mschema.prisma:14[0m
+        [1;94m   | [0m
+        [1;94m13 | [0m
+        [1;94m14 | [0m    [1;91m@@unique([id], where: { status: 123 })[0m
+        [1;94m   | [0m
+    "#]];
+    expected.assert_eq(&err);
+}
+
+#[test]
+fn partial_index_object_syntax_accepts_null_for_any_field() {
+    let dml = indoc! {r#"
+        model User {
+            id     Int     @id
+            name   String?
+            active Boolean?
+            count  Int?
+
+            @@unique([id], where: { name: null })
+            @@index([id], where: { active: { not: null } })
+        }
+    "#};
+
+    psl::parse_schema_without_extensions(with_header(dml, Provider::Postgres, &["partialIndexes"])).unwrap();
+}
+
+#[test]
+fn partial_index_object_syntax_accepts_number_for_int_field() {
+    let dml = indoc! {r#"
+        model User {
+            id       Int @id
+            priority Int
+
+            @@unique([id], where: { priority: 1 })
+        }
+    "#};
+
+    psl::parse_schema_without_extensions(with_header(dml, Provider::Postgres, &["partialIndexes"]))
+        .unwrap()
+        .assert_has_model("User")
+        .assert_unique_on_fields(&["id"])
+        .assert_where_clause("\"priority\" = 1");
+}
+
+#[test]
+fn partial_index_object_syntax_rejects_type_mismatch_in_not() {
+    let dml = indoc! {r#"
+        model User {
+            id     Int    @id
+            status String
+
+            @@unique([id], where: { status: { not: true } })
+        }
+    "#};
+
+    let err = parse_unwrap_err(&with_header(dml, Provider::Postgres, &["partialIndexes"]));
+    let expected = expect![[r#"
+        [1;91merror[0m: [1mError parsing attribute "@unique": Type mismatch: field 'status' is of type String, but the value is Boolean.[0m
+          [1;94m-->[0m  [4mschema.prisma:14[0m
+        [1;94m   | [0m
+        [1;94m13 | [0m
+        [1;94m14 | [0m    [1;91m@@unique([id], where: { status: { not: true } })[0m
+        [1;94m   | [0m
+    "#]];
+    expected.assert_eq(&err);
+}
+
+#[test]
+fn partial_index_object_syntax_rejects_number_for_boolean_field() {
+    let dml = indoc! {r#"
+        model User {
+            id     Int     @id
+            active Boolean
+
+            @@unique([id], where: { active: 1 })
+        }
+    "#};
+
+    let err = parse_unwrap_err(&with_header(dml, Provider::Postgres, &["partialIndexes"]));
+    let expected = expect![[r#"
+        [1;91merror[0m: [1mError parsing attribute "@unique": Type mismatch: field 'active' is of type Boolean, but the value is a Number.[0m
+          [1;94m-->[0m  [4mschema.prisma:14[0m
+        [1;94m   | [0m
+        [1;94m13 | [0m
+        [1;94m14 | [0m    [1;91m@@unique([id], where: { active: 1 })[0m
+        [1;94m   | [0m
+    "#]];
+    expected.assert_eq(&err);
+}
+
+#[test]
+fn partial_index_object_syntax_rejects_boolean_for_int_field() {
+    let dml = indoc! {r#"
+        model User {
+            id    Int @id
+            count Int
+
+            @@unique([id], where: { count: true })
+        }
+    "#};
+
+    let err = parse_unwrap_err(&with_header(dml, Provider::Postgres, &["partialIndexes"]));
+    let expected = expect![[r#"
+        [1;91merror[0m: [1mError parsing attribute "@unique": Type mismatch: field 'count' is of type Int, but the value is Boolean.[0m
+          [1;94m-->[0m  [4mschema.prisma:14[0m
+        [1;94m   | [0m
+        [1;94m13 | [0m
+        [1;94m14 | [0m    [1;91m@@unique([id], where: { count: true })[0m
+        [1;94m   | [0m
+    "#]];
+    expected.assert_eq(&err);
+}
+
+#[test]
+fn partial_index_object_syntax_rejects_string_for_int_field() {
+    let dml = indoc! {r#"
+        model User {
+            id    Int @id
+            count Int
+
+            @@unique([id], where: { count: "high" })
+        }
+    "#};
+
+    let err = parse_unwrap_err(&with_header(dml, Provider::Postgres, &["partialIndexes"]));
+    let expected = expect![[r#"
+        [1;91merror[0m: [1mError parsing attribute "@unique": Type mismatch: field 'count' is of type Int, but the value is a String.[0m
+          [1;94m-->[0m  [4mschema.prisma:14[0m
+        [1;94m   | [0m
+        [1;94m13 | [0m
+        [1;94m14 | [0m    [1;91m@@unique([id], where: { count: "high" })[0m
+        [1;94m   | [0m
+    "#]];
+    expected.assert_eq(&err);
+}
+
+#[test]
+fn partial_index_object_syntax_accepts_string_for_enum_field() {
+    let dml = indoc! {r#"
+        model User {
+            id     Int    @id
+            role   Role
+
+            @@unique([id], where: { role: "ADMIN" })
+        }
+
+        enum Role {
+            ADMIN
+            USER
+        }
+    "#};
+
+    psl::parse_schema_without_extensions(with_header(dml, Provider::Postgres, &["partialIndexes"]))
+        .unwrap()
+        .assert_has_model("User")
+        .assert_unique_on_fields(&["id"])
+        .assert_where_clause("\"role\" = 'ADMIN'");
+}
+
+#[test]
+fn partial_index_object_syntax_rejects_unsupported_type_field() {
+    let dml = indoc! {r#"
+        model User {
+            id   Int                      @id
+            geom Unsupported("geometry")
+
+            @@unique([id], where: { geom: "point" })
+        }
+    "#};
+
+    let err = parse_unwrap_err(&with_header(dml, Provider::Postgres, &["partialIndexes"]));
+    let expected = expect![[r#"
+        [1;91merror[0m: [1mError parsing attribute "@unique": Field 'geom' is an unsupported type and cannot be used in the object syntax of a where clause. Use raw() instead.[0m
+          [1;94m-->[0m  [4mschema.prisma:14[0m
+        [1;94m   | [0m
+        [1;94m13 | [0m
+        [1;94m14 | [0m    [1;91m@@unique([id], where: { geom: "point" })[0m
+        [1;94m   | [0m
+    "#]];
+    expected.assert_eq(&err);
+}
+
+#[test]
+fn partial_index_object_syntax_rejects_boolean_for_enum_field() {
+    let dml = indoc! {r#"
+        model User {
+            id   Int  @id
+            role Role
+
+            @@unique([id], where: { role: true })
+        }
+
+        enum Role {
+            ADMIN
+            USER
+        }
+    "#};
+
+    let err = parse_unwrap_err(&with_header(dml, Provider::Postgres, &["partialIndexes"]));
+    let expected = expect![[r#"
+        [1;91merror[0m: [1mError parsing attribute "@unique": Type mismatch: field 'role' is an Enum and only accepts String values in the where clause.[0m
+          [1;94m-->[0m  [4mschema.prisma:14[0m
+        [1;94m   | [0m
+        [1;94m13 | [0m
+        [1;94m14 | [0m    [1;91m@@unique([id], where: { role: true })[0m
+        [1;94m   | [0m
+    "#]];
+    expected.assert_eq(&err);
+}
