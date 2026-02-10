@@ -350,11 +350,11 @@ async fn push_columns(
                             _ => DefaultValue::db_generated(wrap_in_parentheses(&default_string)),
                         },
                         ColumnTypeFamily::Json => DefaultValue::value(default_string),
-                        ColumnTypeFamily::Binary => DefaultValue::db_generated(default_string),
-                        ColumnTypeFamily::Uuid => DefaultValue::db_generated(default_string),
+                        ColumnTypeFamily::Binary => DefaultValue::db_generated(wrap_in_parentheses(&default_string)),
+                        ColumnTypeFamily::Uuid => DefaultValue::db_generated(wrap_in_parentheses(&default_string)),
                         ColumnTypeFamily::Enum(_) => DefaultValue::value(PrismaValue::Enum(default_string)),
                         ColumnTypeFamily::Udt(_) | ColumnTypeFamily::Unsupported(_) => {
-                            DefaultValue::db_generated(default_string)
+                            DefaultValue::db_generated(wrap_in_parentheses(&default_string))
                         }
                     })
                 }
