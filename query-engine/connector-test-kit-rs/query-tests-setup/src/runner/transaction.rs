@@ -3,7 +3,7 @@ use derive_more::Display;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Hash, Eq, PartialEq, Serialize, Deserialize, Display)]
-#[display(fmt = "{_0}")]
+#[display("{_0}")]
 pub struct TxId(String);
 
 impl Default for TxId {

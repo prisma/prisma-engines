@@ -67,7 +67,7 @@ impl std::ops::Add<Duration> for SystemTime {
 }
 
 #[derive(Clone, Debug, Display)]
-#[display(fmt = "second time provided was later than self")]
+#[display("second time provided was later than self")]
 pub struct SystemTimeError(Duration);
 
 impl SystemTimeError {
