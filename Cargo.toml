@@ -47,7 +47,7 @@ anyhow = "1"
 async-trait = "0.1"
 barrel = { git = "https://github.com/prisma/barrel.git", branch = "mssql-support" }
 base64 = "0.22"
-bigdecimal = "0.3"
+bigdecimal = "0.4"
 bitflags = "2"
 bit-vec = "0.6"
 bon = "3"
