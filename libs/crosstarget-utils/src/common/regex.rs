@@ -1,7 +1,7 @@
 use derive_more::Display;
 
 #[derive(Debug, Display)]
-#[display(fmt = "Regular expression error: {message}")]
+#[display("Regular expression error: {message}")]
 pub struct RegExpError {
     pub message: String,
 }
