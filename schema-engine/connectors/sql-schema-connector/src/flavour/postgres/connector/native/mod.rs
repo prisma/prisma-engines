@@ -2,8 +2,9 @@
 
 pub mod shadow_db;
 
-use std::collections::HashMap;
+use std::{collections::HashMap, iter};
 
+use either::Either;
 use enumflags2::BitFlags;
 use indoc::indoc;
 use psl::PreviewFeature;
@@ -146,79 +147,151 @@ impl Connection {
         tracing::debug!(query_type = "raw_cmd", script);
         let client = self.0.client();
 
-        match client.simple_query(script).await {
-            Ok(_) => Ok(()),
-            Err(err) => {
-                let (database_error_code, database_error): (Option<&str>, _) = if let Some(db_error) = err.as_db_error()
-                {
-                    let position = if let Some(ErrorPosition::Original(position)) = db_error.position() {
-                        let mut previous_lines = [""; 5];
-                        let mut byte_index = 0;
-                        let mut error_position = String::new();
+        let mut stmt_offset = 0;
+        // We split the script into statements rather than submitting it all at once.
+        // The reason is that the Postgres simple protocol automatically wraps the script
+        // in a transaction, which is sometimes undesirable (e.g. when the script contains
+        // statements that cannot be run inside a transaction like `CREATE INDEX CONCURRENTLY`).
+        for stmt in split_script_into_statements(script) {
+            match client.simple_query(stmt).await {
+                Ok(_) => stmt_offset += stmt.len(),
+                Err(err) => {
+                    let (database_error_code, database_error): (Option<&str>, _) = if let Some(db_error) =
+                        err.as_db_error()
+                    {
+                        let position = if let Some(&ErrorPosition::Original(position)) = db_error.position() {
+                            // Adjust the error position to be relative to the start of the script.
+                            let position = stmt_offset + position as usize;
+                            let mut previous_lines = [""; 5];
+                            let mut byte_index = 0;
+                            let mut error_position = String::new();
 
-                        for (line_idx, line) in script.lines().enumerate() {
-                            // Line numbers start at 1, not 0.
-                            let line_number = line_idx + 1;
-                            byte_index += line.len() + 1; // + 1 for the \n character.
+                            for (line_idx, line) in script.lines().enumerate() {
+                                // Line numbers start at 1, not 0.
+                                let line_number = line_idx + 1;
+                                byte_index += line.len() + 1; // + 1 for the \n character.
 
-                            if *position as usize <= byte_index {
-                                let numbered_lines = previous_lines
-                                    .iter()
-                                    .enumerate()
-                                    .filter_map(|(idx, line)| {
-                                        line_number
-                                            .checked_sub(previous_lines.len() - idx)
-                                            .map(|idx| (idx, line))
-                                    })
-                                    .map(|(idx, line)| {
-                                        format!(
-                                            "\x1b[1m{:>3}\x1b[0m{}{}",
-                                            idx,
-                                            if line.is_empty() { "" } else { " " },
-                                            line
-                                        )
-                                    })
-                                    .join("\n");
+                                if position <= byte_index {
+                                    let numbered_lines = previous_lines
+                                        .iter()
+                                        .enumerate()
+                                        .filter_map(|(idx, line)| {
+                                            line_number
+                                                .checked_sub(previous_lines.len() - idx)
+                                                .map(|idx| (idx, line))
+                                        })
+                                        .map(|(idx, line)| {
+                                            format!(
+                                                "\x1b[1m{:>3}\x1b[0m{}{}",
+                                                idx,
+                                                if line.is_empty() { "" } else { " " },
+                                                line
+                                            )
+                                        })
+                                        .join("\n");
 
-                                error_position = format!(
-                                    "\n\nPosition:\n{numbered_lines}\n\x1b[1m{line_number:>3}\x1b[1;31m {line}\x1b[0m"
-                                );
-                                break;
-                            } else {
-                                previous_lines = [
-                                    previous_lines[1],
-                                    previous_lines[2],
-                                    previous_lines[3],
-                                    previous_lines[4],
-                                    line,
-                                ];
+                                    error_position = format!(
+                                        "\n\nPosition:\n{numbered_lines}\n\x1b[1m{line_number:>3}\x1b[1;31m {line}\x1b[0m"
+                                    );
+                                    break;
+                                } else {
+                                    previous_lines = [
+                                        previous_lines[1],
+                                        previous_lines[2],
+                                        previous_lines[3],
+                                        previous_lines[4],
+                                        line,
+                                    ];
+                                }
                             }
-                        }
 
-                        error_position
+                            error_position
+                        } else {
+                            String::new()
+                        };
+
+                        let database_error = format!("{db_error}{position}\n\n{db_error:?}");
+
+                        (Some(db_error.code().code()), database_error)
                     } else {
-                        String::new()
+                        (err.code().map(|c| c.code()), err.to_string())
                     };
 
-                    let database_error = format!("{db_error}{position}\n\n{db_error:?}");
-
-                    (Some(db_error.code().code()), database_error)
-                } else {
-                    (err.code().map(|c| c.code()), err.to_string())
-                };
-
-                Err(ConnectorError::user_facing(ApplyMigrationError {
-                    migration_name: migration_name.to_owned(),
-                    database_error_code: database_error_code.unwrap_or("none").to_owned(),
-                    database_error,
-                }))
+                    return Err(ConnectorError::user_facing(ApplyMigrationError {
+                        migration_name: migration_name.to_owned(),
+                        database_error_code: database_error_code.unwrap_or("none").to_owned(),
+                        database_error,
+                    }));
+                }
             }
         }
+        Ok(())
     }
 
     pub async fn close(self) {
         self.0.close().await
     }
+}
+
+/// Splits a SQL script into individual statements using sqlparser.
+/// If the script cannot be parsed, returns an iterator with the original script as the only item.
+fn split_script_into_statements(script: &str) -> impl Iterator<Item = &str> {
+    use sqlparser::dialect::PostgreSqlDialect;
+    use sqlparser::parser::{Parser, ParserError};
+    use sqlparser::tokenizer::{Location, Token};
+
+    fn detect_statement_terminators(mut parser: Parser<'_>) -> Result<Vec<Location>, ParserError> {
+        let mut terminators = vec![];
+        while parser.peek_token_ref() != &Token::EOF {
+            // We ignore the actual statement and just record the location of the semicolon,
+            // because the `span` in the returned AST does not actually represent the entire
+            // statement. It only accounts for a union of the spans of all user-provided
+            // identifiers and constants, excluding keywords and some other tokens.
+            parser.parse_statement()?;
+            terminators.push(parser.peek_token_ref().span.start);
+            let _ = parser.consume_token(&Token::SemiColon);
+        }
+        Ok(terminators)
+    }
+
+    fn split_by_locations(script: &str, locations: Vec<Location>) -> impl Iterator<Item = &str> {
+        // Precompute byte offsets for the start of every line for efficient span lookup.
+        let line_offsets = iter::once(0)
+            .chain(script.match_indices('\n').map(|(idx, _)| idx + 1))
+            .collect::<Vec<_>>();
+
+        let mut current_offset = 0;
+        locations.into_iter().map(move |offset| {
+            let start = current_offset;
+            let end = if offset == Location::empty() {
+                // The EOF token is marked with an empty location.
+                script.len()
+            } else {
+                let end_line_offset = line_offsets[offset.line as usize - 1];
+                // Iterate over the characters rather than slicing directly to account for
+                // multi-byte characters.
+                let end_line_length = script[end_line_offset..]
+                    .char_indices()
+                    .nth(offset.column as usize - 1)
+                    .map(|(idx, ch)| idx + ch.len_utf8())
+                    .expect("offset column should be within the line");
+                end_line_offset + end_line_length
+            };
+
+            current_offset = end;
+            &script[start..end]
+        })
+    }
+
+    Parser::new(&PostgreSqlDialect {})
+        .try_with_sql(script)
+        .and_then(detect_statement_terminators)
+        .map_or(
+            // If we can't parse the script, we attempt to submit it to Postgres anyway,
+            // to make sure we do not break any existing behavior not supported by the parser.
+            Either::Left(iter::once(script)),
+            |stmt_terminators| Either::Right(split_by_locations(script, stmt_terminators)),
+        )
 }
 
 pub async fn create_database(state: &State) -> ConnectorResult<String> {
@@ -403,4 +476,124 @@ fn strip_schema_param_from_url(url: &mut Url) {
     let params: Vec<String> = params.into_iter().map(|(k, v)| format!("{k}={v}")).collect();
     let params: String = params.join("&");
     url.set_query(Some(&params));
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn split_script_into_statements_single_statement() {
+        let script = "CREATE TABLE users (id SERIAL PRIMARY KEY, name VARCHAR(255));";
+        let statements: Vec<&str> = split_script_into_statements(script).collect();
+        assert_eq!(statements, vec![script]);
+    }
+
+    #[test]
+    fn split_script_into_statements_multiple_statements() {
+        let script =
+            "CREATE TABLE users (id SERIAL PRIMARY KEY);\nINSERT INTO users (id) VALUES (1);\nDROP TABLE users;";
+        let statements: Vec<&str> = split_script_into_statements(script).collect();
+        assert_eq!(
+            statements,
+            vec![
+                "CREATE TABLE users (id SERIAL PRIMARY KEY);",
+                "\nINSERT INTO users (id) VALUES (1);",
+                "\nDROP TABLE users;"
+            ]
+        );
+    }
+
+    #[test]
+    fn split_script_into_statements_with_whitespace() {
+        let script = "  CREATE TABLE test (id INT);  \n  \n  INSERT INTO test VALUES (1);  ";
+        let statements: Vec<&str> = split_script_into_statements(script).collect();
+        assert_eq!(
+            statements,
+            vec![
+                "  CREATE TABLE test (id INT);",
+                "  \n  \n  INSERT INTO test VALUES (1);"
+            ]
+        );
+    }
+
+    #[test]
+    fn split_script_into_statements_no_semicolon() {
+        let script = "CREATE TABLE test (id INT)";
+        let statements: Vec<&str> = split_script_into_statements(script).collect();
+        assert_eq!(statements, vec!["CREATE TABLE test (id INT)"]);
+    }
+
+    #[test]
+    fn split_script_into_statements_empty_script() {
+        let script = "";
+        let statements: Vec<&str> = split_script_into_statements(script).collect();
+        assert_eq!(statements, Vec::<&str>::new());
+    }
+
+    #[test]
+    fn split_script_into_statements_semicolon_only() {
+        let script = ";";
+        let statements: Vec<&str> = split_script_into_statements(script).collect();
+        assert_eq!(statements, vec![";"]);
+    }
+
+    #[test]
+    fn split_script_into_statements_complex_multiline() {
+        let script = indoc! {"
+            CREATE TABLE users (
+                id SERIAL PRIMARY KEY,
+                name VARCHAR(255) NOT NULL
+            );
+
+            INSERT INTO users (name)
+            VALUES ('Alice'), ('Bob');
+
+            CREATE INDEX idx_users_name ON users(name);
+        "};
+        let statements: Vec<&str> = split_script_into_statements(script).collect();
+        assert_eq!(
+            statements,
+            vec![
+                indoc! {"
+                    CREATE TABLE users (
+                        id SERIAL PRIMARY KEY,
+                        name VARCHAR(255) NOT NULL
+                    );"},
+                indoc! {"
+
+
+                    INSERT INTO users (name)
+                    VALUES ('Alice'), ('Bob');"},
+                indoc! {"
+
+
+                    CREATE INDEX idx_users_name ON users(name);"}
+            ]
+        );
+    }
+
+    #[test]
+    fn split_script_into_statements_invalid_sql_fallback() {
+        // This should fall back to returning the entire script as one statement
+        // since it contains invalid SQL that can't be parsed
+        let script = "CREATE TABLE invalid syntax here; MORE invalid stuff;";
+        let statements: Vec<&str> = split_script_into_statements(script).collect();
+        // When parsing fails, it should return the entire script as a single statement
+        assert_eq!(statements, vec![script]);
+    }
+
+    #[test]
+    fn split_script_into_statements_with_comments() {
+        let script =
+            "-- This is a comment\nCREATE TABLE test (id INT); /* block comment */\nINSERT INTO test VALUES (1);";
+        let statements: Vec<&str> = split_script_into_statements(script).collect();
+        assert_eq!(
+            statements,
+            vec![
+                "-- This is a comment\nCREATE TABLE test (id INT);",
+                " /* block comment */\nINSERT INTO test VALUES (1);"
+            ]
+        );
+    }
 }
