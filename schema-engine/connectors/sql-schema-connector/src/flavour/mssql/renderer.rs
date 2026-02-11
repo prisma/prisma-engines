@@ -150,14 +150,24 @@ impl SqlRenderer for MssqlRenderer {
 
         let columns = columns.join(", ");
 
+        let where_clause = index.predicate().map(|p| format!(" WHERE {p}")).unwrap_or_default();
+
         match index.index_type() {
             sql::IndexType::Unique => {
-                let constraint_name = Quoted::mssql_ident(index.name());
-
-                format!("ALTER TABLE {table_reference} ADD CONSTRAINT {constraint_name} UNIQUE {clustering}({columns})")
+                // SQL Server: filtered indexes must use CREATE INDEX, not ADD CONSTRAINT
+                if index.predicate().is_some() {
+                    format!(
+                        "CREATE UNIQUE {clustering}INDEX {index_name} ON {table_reference}({columns}){where_clause}"
+                    )
+                } else {
+                    let constraint_name = Quoted::mssql_ident(index.name());
+                    format!(
+                        "ALTER TABLE {table_reference} ADD CONSTRAINT {constraint_name} UNIQUE {clustering}({columns})"
+                    )
+                }
             }
             sql::IndexType::Normal => {
-                format!("CREATE {clustering}INDEX {index_name} ON {table_reference}({columns})",)
+                format!("CREATE {clustering}INDEX {index_name} ON {table_reference}({columns}){where_clause}")
             }
             sql::IndexType::Fulltext | sql::IndexType::PrimaryKey => unreachable!(),
         }
@@ -199,7 +209,11 @@ impl SqlRenderer for MssqlRenderer {
             String::new()
         };
 
-        let constraints = table.indexes().filter(|index| index.is_unique()).collect::<Vec<_>>();
+        // Filtered unique indexes must be created separately with CREATE INDEX, not as constraints
+        let constraints = table
+            .indexes()
+            .filter(|index| index.is_unique() && index.predicate().is_none())
+            .collect::<Vec<_>>();
 
         let constraints = if !constraints.is_empty() {
             let constraints = constraints

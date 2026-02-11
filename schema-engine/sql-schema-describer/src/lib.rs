@@ -252,11 +252,23 @@ impl SqlSchema {
 
     /// Add an index of a certain type to the schema.
     pub fn push_index_of_type(&mut self, table_id: TableId, index_name: String, tpe: IndexType) -> IndexId {
+        self.push_index_with_predicate(table_id, index_name, tpe, None)
+    }
+
+    /// Add an index of a certain type with an optional predicate (for partial indexes).
+    pub fn push_index_with_predicate(
+        &mut self,
+        table_id: TableId,
+        index_name: String,
+        tpe: IndexType,
+        predicate: Option<String>,
+    ) -> IndexId {
         let id = IndexId(self.indexes.len() as u32);
         self.indexes.push(Index {
             table_id,
             index_name,
             tpe,
+            predicate,
         });
         id
     }
@@ -269,6 +281,21 @@ impl SqlSchema {
     /// Add an index to the schema.
     pub fn push_index(&mut self, table_id: TableId, index_name: String) -> IndexId {
         self.push_index_of_type(table_id, index_name, IndexType::Normal)
+    }
+
+    /// Add a partial index to the schema (with a WHERE clause predicate).
+    pub fn push_partial_index(&mut self, table_id: TableId, index_name: String, predicate: String) -> IndexId {
+        self.push_index_with_predicate(table_id, index_name, IndexType::Normal, Some(predicate))
+    }
+
+    /// Add a partial unique constraint/index to the schema (with a WHERE clause predicate).
+    pub fn push_partial_unique_constraint(
+        &mut self,
+        table_id: TableId,
+        index_name: String,
+        predicate: String,
+    ) -> IndexId {
+        self.push_index_with_predicate(table_id, index_name, IndexType::Unique, Some(predicate))
     }
 
     /// Add table default value to the schema.
@@ -562,6 +589,7 @@ struct Index {
     table_id: TableId,
     index_name: String,
     tpe: IndexType,
+    predicate: Option<String>,
 }
 
 /// A stored procedure (like, the function inside your database).

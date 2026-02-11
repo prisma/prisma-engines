@@ -56,6 +56,11 @@ pub(crate) trait SqlSchemaDifferFlavour {
         true
     }
 
+    /// Connector-specific criteria for predicate matching.
+    fn predicates_match(&self, a: Option<&str>, b: Option<&str>) -> bool {
+        a == b
+    }
+
     /// Returns whether the underlying database implicitly drops indexes on dropped (and potentially recreated) columns.
     fn indexes_should_be_recreated_after_column_drop(&self) -> bool {
         false

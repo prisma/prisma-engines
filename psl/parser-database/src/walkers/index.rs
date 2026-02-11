@@ -3,7 +3,7 @@ use either::Either;
 use super::CompositeTypeFieldWalker;
 use crate::{
     ParserDatabase, ScalarFieldType, ast,
-    types::{IndexAlgorithm, IndexAttribute},
+    types::{IndexAlgorithm, IndexAttribute, WhereClause},
     walkers::{ModelWalker, ScalarFieldAttributeWalker, ScalarFieldWalker},
 };
 
@@ -175,6 +175,24 @@ impl<'db> IndexWalker<'db> {
     /// matters on SQL Server where one can change the clustering.
     pub fn clustered(self) -> Option<bool> {
         self.index_attribute.clustered
+    }
+
+    /// The raw SQL predicate for partial indexes.
+    pub fn where_clause(self) -> Option<&'db str> {
+        match &self.index_attribute.where_clause {
+            Some(WhereClause::Raw(s)) => Some(s),
+            _ => None,
+        }
+    }
+
+    /// Returns true if this is a partial index (has a WHERE clause).
+    pub fn is_partial(self) -> bool {
+        self.index_attribute.where_clause.is_some()
+    }
+
+    /// The structured WHERE clause for this index, if any.
+    pub fn where_clause_attribute(self) -> Option<&'db WhereClause> {
+        self.index_attribute.where_clause.as_ref()
     }
 
     /// The model the index is defined on.

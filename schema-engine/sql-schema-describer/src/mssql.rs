@@ -391,6 +391,7 @@ impl<'a> SqlSchemaDescriber<'a> {
                 ind.is_unique_constraint AS is_unique_constraint,
                 ind.is_primary_key AS is_primary_key,
                 ind.type_desc AS clustering,
+                ind.filter_definition AS predicate,
                 col.name AS column_name,
                 ic.key_ordinal AS seq_in_index,
                 ic.is_descending_key AS is_descending,
@@ -407,7 +408,6 @@ impl<'a> SqlSchemaDescriber<'a> {
             WHERE t.is_ms_shipped = 0
                 -- https://docs.microsoft.com/en-us/sql/relational-databases/system-catalog-views/sys-index-columns-transact-sql?view=sql-server-ver16
                 AND ic.key_ordinal != 0
-                AND ind.filter_definition IS NULL
                 AND ind.name IS NOT NULL
                 AND ind.type_desc IN (
                     'CLUSTERED',
@@ -451,15 +451,22 @@ impl<'a> SqlSchemaDescriber<'a> {
             let is_unique = row.get_expect_bool("is_unique");
             let is_unique_constraint = row.get_expect_bool("is_unique_constraint");
             let is_pk = row.get_expect_bool("is_primary_key");
+            let predicate = row.get_string("predicate");
 
             if seq_in_index == 1 {
                 // new index!
                 let id = if is_pk {
                     sql_schema.push_primary_key(table_id, index_name)
                 } else if is_unique {
-                    sql_schema.push_unique_constraint(table_id, index_name)
+                    match predicate {
+                        Some(pred) => sql_schema.push_partial_unique_constraint(table_id, index_name, pred),
+                        None => sql_schema.push_unique_constraint(table_id, index_name),
+                    }
                 } else {
-                    sql_schema.push_index(table_id, index_name)
+                    match predicate {
+                        Some(pred) => sql_schema.push_partial_index(table_id, index_name, pred),
+                        None => sql_schema.push_index(table_id, index_name),
+                    }
                 };
 
                 let mut bits = BitFlags::empty();

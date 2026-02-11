@@ -1,3 +1,5 @@
+use std::borrow::Cow;
+
 use psl::{
     datamodel_connector::constraint_names::ConstraintNames,
     parser_database::{IndexType, walkers},
@@ -7,6 +9,7 @@ use sql::{mssql::MssqlSchemaExt, postgres::PostgresSchemaExt};
 use sql_schema_describer as sql;
 
 use super::{IndexFieldPair, IntrospectionPair};
+use crate::sql_schema_calculator::where_clause_as_sql;
 
 /// Pairing a PSL index to a database index. Both values are
 /// optional, due to in some cases we plainly just copy
@@ -158,6 +161,14 @@ impl<'a> IndexPair<'a> {
                 .flavour
                 .uses_non_default_index_deferring(self.context, next),
             _ => false,
+        }
+    }
+
+    /// The predicate/WHERE clause for partial indexes.
+    pub(crate) fn predicate(self) -> Option<Cow<'a, str>> {
+        match self.next {
+            Some(next) => next.predicate().map(Cow::Borrowed),
+            None => self.previous.and_then(|prev| where_clause_as_sql(prev)),
         }
     }
 

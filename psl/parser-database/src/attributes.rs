@@ -6,13 +6,14 @@ mod schema;
 mod shard_key;
 
 use crate::{
-    DatamodelError, ScalarFieldId, StringId,
+    DatamodelError, ScalarFieldId, ScalarType, StringId,
     ast::{self, WithName, WithSpan},
     coerce, coerce_array,
     context::Context,
     types::{
         CompositeTypeField, EnumAttributes, FieldWithArgs, IndexAlgorithm, IndexAttribute, IndexFieldPath, IndexType,
-        ModelAttributes, OperatorClassStore, RelationField, ScalarField, ScalarFieldType, SortOrder,
+        ModelAttributes, OperatorClassStore, RelationField, ScalarField, ScalarFieldType, SortOrder, WhereClause,
+        WhereCondition, WhereFieldCondition, WhereValue,
     },
     walkers::RelationFieldId,
 };
@@ -536,6 +537,7 @@ fn model_index(data: &mut ModelAttributes, model_id: crate::ModelId, ctx: &mut C
 
     index_attribute.algorithm = algo;
     index_attribute.clustered = validate_clustering_setting(ctx);
+    index_attribute.where_clause = parse_where_clause(model_id, ctx);
 
     data.ast_indexes.push((ctx.current_attribute_id().1, index_attribute));
 }
@@ -592,8 +594,233 @@ fn model_unique(data: &mut ModelAttributes, model_id: crate::ModelId, ctx: &mut 
     index_attribute.name = name;
     index_attribute.mapped_name = mapped_name;
     index_attribute.clustered = validate_clustering_setting(ctx);
+    index_attribute.where_clause = parse_where_clause(model_id, ctx);
 
     data.ast_indexes.push((current_attribute_id.1, index_attribute));
+}
+
+/// Parse the `where` argument for partial indexes.
+fn parse_where_clause(model_id: crate::ModelId, ctx: &mut Context<'_>) -> Option<WhereClause> {
+    let expression = ctx.visit_optional_arg("where")?;
+
+    // Object syntax: { field: value, ... }
+    if let Some((members, _span)) = expression.as_object() {
+        if members.is_empty() {
+            ctx.push_attribute_validation_error("The `where` argument cannot be an empty object.");
+            return None;
+        }
+
+        let mut conditions = Vec::new();
+
+        for member in members {
+            conditions.push(parse_where_object_member(member, model_id, ctx)?);
+        }
+
+        return Some(WhereClause::Object(conditions));
+    }
+
+    // raw("...") function call
+    if let Some(("raw", args)) = coerce::function(expression, ctx.diagnostics) {
+        return parse_raw_where_clause(args, ctx);
+    }
+
+    ctx.push_attribute_validation_error(
+        "The `where` argument must be either a raw() function call or an object literal, e.g. `where: raw(\"status = 'active'\")` or `where: { active: true }`.",
+    );
+
+    None
+}
+
+/// Parse raw("...") where clause.
+fn parse_raw_where_clause(args: &[ast::Argument], ctx: &mut Context<'_>) -> Option<WhereClause> {
+    let Some(first_arg) = args.first() else {
+        ctx.push_attribute_validation_error(
+            "The `where` argument must be a raw() function with a string argument, e.g. `where: raw(\"status = 'active'\")`.",
+        );
+        return None;
+    };
+
+    let Some(predicate) = coerce::string(&first_arg.value, ctx.diagnostics) else {
+        ctx.push_attribute_validation_error(
+            "The `where` argument must be a raw() function with a string argument, e.g. `where: raw(\"status = 'active'\")`.",
+        );
+        return None;
+    };
+
+    if predicate.is_empty() {
+        ctx.push_attribute_validation_error("The `where` argument cannot contain an empty string.");
+        return None;
+    }
+
+    Some(WhereClause::Raw(predicate.to_string()))
+}
+
+fn parse_where_object_member(
+    member: &ast::ObjectMember,
+    model_id: crate::ModelId,
+    ctx: &mut Context<'_>,
+) -> Option<WhereFieldCondition> {
+    let field_name_str = &member.key;
+    let ast_model = &ctx.asts[model_id];
+
+    let field_id = match ctx.find_model_field(model_id, field_name_str) {
+        Some(id) => id,
+        None => {
+            ctx.push_attribute_validation_error(&format!(
+                "Field '{}' does not exist in model '{}'.",
+                field_name_str,
+                ast_model.name()
+            ));
+            return None;
+        }
+    };
+
+    let scalar_field_id = match ctx.types.find_model_scalar_field(model_id, field_id) {
+        Some(id) => id,
+        None => {
+            ctx.push_attribute_validation_error(&format!(
+                "Field '{}' is a relation field. Only scalar fields can be used in the where clause.",
+                field_name_str,
+            ));
+            return None;
+        }
+    };
+
+    let scalar_type = ctx.types[scalar_field_id].r#type;
+
+    let condition = parse_where_value(&member.value, field_name_str, scalar_type, false, ctx)?;
+
+    Some(WhereFieldCondition {
+        scalar_field_id,
+        condition,
+    })
+}
+
+fn parse_where_value(
+    expr: &ast::Expression,
+    field_name: &str,
+    scalar_type: ScalarFieldType,
+    negated: bool,
+    ctx: &mut Context<'_>,
+) -> Option<WhereCondition> {
+    let wrap = |value| {
+        if negated {
+            WhereCondition::NotEquals(value)
+        } else {
+            WhereCondition::Equals(value)
+        }
+    };
+
+    match expr {
+        ast::Expression::ConstantValue(val, _) => match val.as_str() {
+            "true" | "false" => {
+                check_type(field_name, scalar_type, &[ScalarType::Boolean], "Boolean", ctx)?;
+                Some(wrap(WhereValue::Boolean(val == "true")))
+            }
+            "null" => Some(if negated {
+                WhereCondition::IsNotNull
+            } else {
+                WhereCondition::IsNull
+            }),
+            other => {
+                ctx.push_attribute_validation_error(&format!(
+                    "Invalid value '{other}' in where clause. Expected true, false, null, a string, a number, or an object like {{ not: null }}."
+                ));
+                None
+            }
+        },
+        ast::Expression::StringValue(val, _) => {
+            check_type(
+                field_name,
+                scalar_type,
+                &[ScalarType::String, ScalarType::DateTime],
+                "a String",
+                ctx,
+            )?;
+            Some(wrap(WhereValue::String(val.clone())))
+        }
+        ast::Expression::NumericValue(val, _) => {
+            check_type(
+                field_name,
+                scalar_type,
+                &[
+                    ScalarType::Int,
+                    ScalarType::BigInt,
+                    ScalarType::Float,
+                    ScalarType::Decimal,
+                ],
+                "a Number",
+                ctx,
+            )?;
+            Some(wrap(WhereValue::Number(val.clone())))
+        }
+        ast::Expression::Object(inner_members, _) if !negated => {
+            if inner_members.len() != 1 {
+                ctx.push_attribute_validation_error(
+                    "Nested object in where clause must have exactly one key. Use `{ not: null }` or `{ not: \"value\" }`.",
+                );
+                return None;
+            }
+
+            let inner = &inner_members[0];
+            if inner.key != "not" {
+                ctx.push_attribute_validation_error(&format!(
+                    "Unknown key '{}' in nested where clause object. Only 'not' is supported.",
+                    inner.key
+                ));
+                return None;
+            }
+
+            parse_where_value(&inner.value, field_name, scalar_type, true, ctx)
+        }
+        _ => {
+            ctx.push_attribute_validation_error(
+                "Invalid value in where clause. Expected true, false, null, a string, a number, or an object like { not: null }.",
+            );
+            None
+        }
+    }
+}
+
+fn check_type(
+    field_name: &str,
+    scalar_type: ScalarFieldType,
+    accepted: &[ScalarType],
+    value_type: &str,
+    ctx: &mut Context<'_>,
+) -> Option<()> {
+    match scalar_type {
+        ScalarFieldType::BuiltInScalar(t) if accepted.contains(&t) => Some(()),
+        ScalarFieldType::BuiltInScalar(t) => {
+            ctx.push_attribute_validation_error(&format!(
+                "Type mismatch: field '{}' is of type {}, but the value is {}.",
+                field_name,
+                t.as_str(),
+                value_type,
+            ));
+            None
+        }
+        ScalarFieldType::Enum(_) if accepted.contains(&ScalarType::String) => Some(()),
+        ScalarFieldType::Enum(_) => {
+            ctx.push_attribute_validation_error(&format!(
+                "Type mismatch: field '{}' is an Enum and only accepts String values in the where clause.",
+                field_name,
+            ));
+            None
+        }
+        _ => {
+            let type_name = match scalar_type {
+                ScalarFieldType::CompositeType(_) => "a composite type",
+                ScalarFieldType::Unsupported(_) => "an unsupported type",
+                _ => "a non-scalar type",
+            };
+            ctx.push_attribute_validation_error(&format!(
+                "Field '{}' is {} and cannot be used in the object syntax of a where clause. Use raw() instead.",
+                field_name, type_name,
+            ));
+            None
+        }
+    }
 }
 
 fn common_index_validations(

@@ -1011,6 +1011,40 @@ impl IndexAssertion<'_> {
 
         self
     }
+
+    #[track_caller]
+    pub fn assert_predicate(self, expected_predicate: &str) -> Self {
+        assert_eq!(
+            self.index.predicate(),
+            Some(expected_predicate),
+            "Assertion failed. Expected predicate to be `{}`, but was `{:?}`.",
+            expected_predicate,
+            self.index.predicate()
+        );
+
+        self
+    }
+
+    #[track_caller]
+    pub fn assert_no_predicate(self) -> Self {
+        assert!(
+            self.index.predicate().is_none(),
+            "Assertion failed. Expected no predicate, but found `{:?}`.",
+            self.index.predicate()
+        );
+
+        self
+    }
+
+    #[track_caller]
+    pub fn assert_is_partial(self) -> Self {
+        assert!(
+            self.index.is_partial(),
+            "Assertion failed. Expected index to be a partial index, but it was not."
+        );
+
+        self
+    }
 }
 
 #[derive(Clone, Copy)]

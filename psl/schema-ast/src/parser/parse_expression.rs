@@ -19,6 +19,7 @@ pub(crate) fn parse_expression(
         Rule::path => Expression::ConstantValue(first_child.as_str().to_string(), span),
         Rule::function_call => parse_function(first_child, diagnostics, file_id),
         Rule::array_expression => parse_array(first_child, diagnostics, file_id),
+        Rule::object_expression => parse_object(first_child, diagnostics, file_id),
         _ => unreachable!(
             "Encountered impossible literal during parsing: {:?}",
             first_child.tokens()
@@ -57,6 +58,43 @@ fn parse_array(token: Pair<'_>, diagnostics: &mut Diagnostics, file_id: FileId) 
     }
 
     Expression::Array(elements, Span::from((file_id, span)))
+}
+
+fn parse_object(token: Pair<'_>, diagnostics: &mut Diagnostics, file_id: FileId) -> Expression {
+    let mut members: Vec<ObjectMember> = vec![];
+    let span = token.as_span();
+
+    for current in token.into_inner() {
+        match current.as_rule() {
+            Rule::object_member => {
+                let member = parse_object_member(current, diagnostics, file_id);
+                members.push(member);
+            }
+            _ => parsing_catch_all(&current, "object"),
+        }
+    }
+
+    Expression::Object(members, Span::from((file_id, span)))
+}
+
+fn parse_object_member(token: Pair<'_>, diagnostics: &mut Diagnostics, file_id: FileId) -> ObjectMember {
+    let span = Span::from((file_id, token.as_span()));
+    let mut key: Option<String> = None;
+    let mut value: Option<Expression> = None;
+
+    for current in token.into_inner() {
+        match current.as_rule() {
+            Rule::identifier => key = Some(current.as_str().to_string()),
+            Rule::expression => value = Some(parse_expression(current, diagnostics, file_id)),
+            _ => parsing_catch_all(&current, "object_member"),
+        }
+    }
+
+    ObjectMember {
+        key: key.expect("Object member must have a key"),
+        value: value.expect("Object member must have a value"),
+        span,
+    }
 }
 
 fn parse_string_literal(token: Pair<'_>, diagnostics: &mut Diagnostics, file_id: FileId) -> String {
