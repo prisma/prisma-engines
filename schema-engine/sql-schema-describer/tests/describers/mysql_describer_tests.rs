@@ -850,6 +850,7 @@ fn all_mysql_column_types_must_work(api: TestApi) {
                     ),
                     index_name: "",
                     tpe: PrimaryKey,
+                    predicate: None,
                 },
             ],
             index_columns: [
@@ -1677,6 +1678,7 @@ fn all_mariadb_column_types_must_work(api: TestApi) {
                     ),
                     index_name: "",
                     tpe: PrimaryKey,
+                    predicate: None,
                 },
             ],
             index_columns: [
