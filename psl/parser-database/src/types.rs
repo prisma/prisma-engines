@@ -545,9 +545,9 @@ pub enum WhereCondition {
 #[derive(Debug, Clone, PartialEq)]
 pub enum WhereValue {
     /// A string literal.
-    String(std::string::String),
+    String(String),
     /// A numeric literal.
-    Number(std::string::String),
+    Number(String),
     /// A boolean literal.
     Boolean(bool),
 }

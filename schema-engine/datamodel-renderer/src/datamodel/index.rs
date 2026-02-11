@@ -62,8 +62,8 @@ impl<'a> IndexDefinition<'a> {
     /// ```
     pub fn where_clause(&mut self, predicate: impl Into<Cow<'a, str>>) {
         let mut raw_fn = Function::new("raw");
-        raw_fn.push_param(Value::Text(Text::new(predicate)));
-        self.0.push_param(("where", Value::Function(raw_fn)));
+        raw_fn.push_param(predicate.into());
+        self.0.push_param(("where", raw_fn));
     }
 
     fn new(index_type: &'static str, fields: impl Iterator<Item = IndexFieldInput<'a>>) -> Self {

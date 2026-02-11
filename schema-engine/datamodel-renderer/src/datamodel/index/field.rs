@@ -147,9 +147,9 @@ impl<'a> UniqueFieldAttribute<'a> {
     /// //             ^^^^^^^^^^^^^^^^^^^^^^^^ here
     /// ```
     pub fn where_clause(&mut self, predicate: impl Into<Cow<'a, str>>) {
-        let mut raw_fn = crate::value::Function::new("raw");
-        raw_fn.push_param(crate::value::Value::Text(Text::new(predicate)));
-        self.0.push_param(("where", crate::value::Value::Function(raw_fn)));
+        let mut raw_fn = Function::new("raw");
+        raw_fn.push_param(predicate.into());
+        self.0.push_param(("where", raw_fn));
     }
 }
 
