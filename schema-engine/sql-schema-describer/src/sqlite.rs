@@ -547,7 +547,7 @@ fn extract_where_clause(sql: &str) -> Option<String> {
             Token::LParen => depth += 1,
             Token::RParen => depth -= 1,
             Token::Word(w) if w.keyword == Keyword::WHERE && depth == 0 => {
-                last_where_char_offset = Some(tok.location.column as usize - 1);
+                last_where_char_offset = Some(tok.span.start.column as usize - 1);
             }
             _ => {}
         }

@@ -115,7 +115,7 @@ smallvec = "1"
 strip-ansi-escapes = "0.1"
 structopt = "0.3"
 sqlformat = "0.2"
-sqlparser = "0.60"
+sqlparser = { version = "0.60", features = ["visitor"] }
 sqlx-core = "0.8"
 sqlx-sqlite = "0.8"
 tempfile = "3"
