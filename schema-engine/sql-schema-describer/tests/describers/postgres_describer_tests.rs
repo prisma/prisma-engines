@@ -2847,6 +2847,7 @@ fn multiple_schemas_are_described(api: TestApi) {
                     ),
                     index_name: "Table_0_pkey",
                     tpe: PrimaryKey,
+                    predicate: None,
                 },
                 Index {
                     table_id: TableId(
@@ -2861,6 +2862,7 @@ fn multiple_schemas_are_described(api: TestApi) {
                     ),
                     index_name: "Table_1_pkey",
                     tpe: PrimaryKey,
+                    predicate: None,
                 },
                 Index {
                     table_id: TableId(
@@ -2868,6 +2870,7 @@ fn multiple_schemas_are_described(api: TestApi) {
                     ),
                     index_name: "Table_2_pkey",
                     tpe: PrimaryKey,
+                    predicate: None,
                 },
                 Index {
                     table_id: TableId(
@@ -2882,6 +2885,7 @@ fn multiple_schemas_are_described(api: TestApi) {
                     ),
                     index_name: "Table_3_pkey",
                     tpe: PrimaryKey,
+                    predicate: None,
                 },
             ],
             index_columns: [

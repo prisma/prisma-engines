@@ -1,4 +1,5 @@
 -- tags=postgres
+-- exclude=cockroachdb
 
 CREATE TABLE "User" (
     id INTEGER PRIMARY KEY,
