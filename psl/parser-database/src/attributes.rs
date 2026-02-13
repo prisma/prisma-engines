@@ -271,7 +271,7 @@ fn visit_scalar_field_attributes(
 
     // @unique
     if ctx.visit_optional_single_attr("unique") {
-        visit_field_unique(scalar_field_id, model_data, ctx);
+        visit_field_unique(scalar_field_id, model_id, model_data, ctx);
         ctx.validate_visited_arguments();
     }
 
@@ -284,7 +284,12 @@ fn visit_scalar_field_attributes(
     ctx.validate_visited_attributes();
 }
 
-fn visit_field_unique(scalar_field_id: ScalarFieldId, model_data: &mut ModelAttributes, ctx: &mut Context<'_>) {
+fn visit_field_unique(
+    scalar_field_id: ScalarFieldId,
+    model_id: crate::ModelId,
+    model_data: &mut ModelAttributes,
+    ctx: &mut Context<'_>,
+) {
     let mapped_name = match ctx
         .visit_optional_arg("map")
         .and_then(|arg| coerce::string(arg, ctx.diagnostics))
@@ -318,6 +323,7 @@ fn visit_field_unique(scalar_field_id: ScalarFieldId, model_data: &mut ModelAttr
     };
 
     let clustered = validate_clustering_setting(ctx);
+    let where_clause = parse_where_clause(model_id, ctx);
 
     let attribute_id = ctx.current_attribute_id();
     model_data.ast_indexes.push((
@@ -333,6 +339,7 @@ fn visit_field_unique(scalar_field_id: ScalarFieldId, model_data: &mut ModelAttr
             source_field: Some(scalar_field_id),
             mapped_name,
             clustered,
+            where_clause,
             ..Default::default()
         },
     ))

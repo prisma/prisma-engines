@@ -1030,3 +1030,76 @@ fn partial_index_object_syntax_rejects_boolean_for_enum_field() {
     "#]];
     expected.assert_eq(&err);
 }
+
+#[test]
+fn field_level_partial_unique_with_raw_on_postgres() {
+    let dml = indoc! {r#"
+        model User {
+            id     Int    @id
+            email  String @unique(where: raw("status = 'active'"))
+            status String
+        }
+    "#};
+
+    psl::parse_schema_without_extensions(with_header(dml, Provider::Postgres, &["partialIndexes"]))
+        .unwrap()
+        .assert_has_model("User")
+        .assert_unique_on_fields(&["email"])
+        .assert_raw_where_clause("status = 'active'");
+}
+
+#[test]
+fn field_level_partial_unique_with_object_syntax() {
+    let dml = indoc! {r#"
+        model User {
+            id     Int     @id
+            email  String  @unique(where: { active: true })
+            active Boolean
+        }
+    "#};
+
+    psl::parse_schema_without_extensions(with_header(dml, Provider::Postgres, &["partialIndexes"]))
+        .unwrap()
+        .assert_has_model("User")
+        .assert_unique_on_fields(&["email"])
+        .assert_where_object(&[("active", WhereCondition::Equals(WhereValue::Boolean(true)))]);
+}
+
+#[test]
+fn field_level_partial_unique_requires_preview_feature() {
+    let dml = indoc! {r#"
+        model User {
+            id     Int    @id
+            email  String @unique(where: raw("status = 'active'"))
+            status String
+        }
+    "#};
+
+    let err = parse_unwrap_err(&with_header(dml, Provider::Postgres, &[]));
+    let expected = expect![[r#"
+        [1;91merror[0m: [1mError parsing attribute "@unique": Partial indexes are a preview feature. Add "partialIndexes" to previewFeatures in your generator block.[0m
+          [1;94m-->[0m  [4mschema.prisma:12[0m
+        [1;94m   | [0m
+        [1;94m11 | [0m    id     Int    @id
+        [1;94m12 | [0m    email  String @unique([1;91mwhere: raw("status = 'active'")[0m)
+        [1;94m   | [0m
+    "#]];
+    expected.assert_eq(&err);
+}
+
+#[test]
+fn field_level_partial_unique_with_map() {
+    let dml = indoc! {r#"
+        model User {
+            id     Int    @id
+            email  String @unique(map: "email_active_idx", where: raw("status = 'active'"))
+            status String
+        }
+    "#};
+
+    psl::parse_schema_without_extensions(with_header(dml, Provider::Postgres, &["partialIndexes"]))
+        .unwrap()
+        .assert_has_model("User")
+        .assert_unique_on_fields(&["email"])
+        .assert_raw_where_clause("status = 'active'");
+}
