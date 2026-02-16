@@ -377,6 +377,40 @@ fn reformat_expression(pair: Pair<'_>, target: &mut dyn LineWriteable) {
             Rule::path => target.write(current.as_str()),
             Rule::function_call => reformat_function_call(current, target),
             Rule::array_expression => reformat_array_expression(current, target),
+            Rule::object_expression => reformat_object_expression(current, target),
+            _ => unreachable(&current),
+        }
+    }
+}
+
+fn reformat_object_expression(pair: Pair<'_>, target: &mut dyn LineWriteable) {
+    target.write("{ ");
+    let mut member_count = 0;
+
+    for current in pair.into_inner() {
+        match current.as_rule() {
+            Rule::object_member => {
+                if member_count > 0 {
+                    target.write(", ");
+                }
+                reformat_object_member(current, target);
+                member_count += 1;
+            }
+            _ => unreachable(&current),
+        }
+    }
+
+    target.write(" }");
+}
+
+fn reformat_object_member(pair: Pair<'_>, target: &mut dyn LineWriteable) {
+    for current in pair.into_inner() {
+        match current.as_rule() {
+            Rule::identifier => {
+                target.write(current.as_str());
+                target.write(": ");
+            }
+            Rule::expression => reformat_expression(current, target),
             _ => unreachable(&current),
         }
     }

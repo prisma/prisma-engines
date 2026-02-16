@@ -1,0 +1,29 @@
+datasource db {
+  provider = "postgresql"
+}
+
+generator client {
+  provider        = "prisma-client"
+  engineType      = "client"
+  output          = "../src/prisma-types"
+  previewFeatures = ["partialIndexes"]
+}
+
+model User {
+  id       Int     @id
+  email    String
+  status   String
+
+  @@index([email], where: raw("deletedAt IS NULL"))
+  @@unique([email], where: raw("status = 'active'"))
+}
+
+model Post {
+  id        Int      @id
+  title     String
+  published Boolean
+
+  @@index([title], where:{published:true})
+  @@unique([title], where:{published:{not:false}})
+    @@index([title], where:{published:{not: false},id:{not: null}})
+}
