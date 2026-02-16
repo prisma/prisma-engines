@@ -385,16 +385,16 @@ fn reformat_expression(pair: Pair<'_>, target: &mut dyn LineWriteable) {
 
 fn reformat_object_expression(pair: Pair<'_>, target: &mut dyn LineWriteable) {
     target.write("{ ");
-    let mut member_count = 0;
+    let mut is_first_member = true;
 
     for current in pair.into_inner() {
         match current.as_rule() {
             Rule::object_member => {
-                if member_count > 0 {
+                if !is_first_member {
                     target.write(", ");
                 }
                 reformat_object_member(current, target);
-                member_count += 1;
+                is_first_member = false;
             }
             _ => unreachable(&current),
         }
