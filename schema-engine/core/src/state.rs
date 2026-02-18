@@ -218,6 +218,7 @@ impl EngineState {
         Ok(self
             .validate_datasource_urls(&datasource)?
             .url_with_config_dir(datasource.active_connector.flavour(), Path::new(&container.config_dir))
+            .ok_or_else(|| CoreError::from_msg("No URL defined in the configured datasource".to_owned()))?
             .into_owned())
     }
 

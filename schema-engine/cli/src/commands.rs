@@ -38,13 +38,15 @@ impl Cli {
     ) -> Result<String, ConnectorError> {
         let mut api = schema_core::schema_api(None, datasource_urls.clone(), None, extensions)?;
 
+        let url = datasource_urls
+            .url
+            .ok_or_else(|| ConnectorError::from_msg("No URL defined in the configured datasource".to_owned()))?;
+
         let work = async {
             match self.command {
                 CliCommand::CreateDatabase => api
                     .create_database(schema_core::json_rpc::types::CreateDatabaseParams {
-                        datasource: DatasourceParam::ConnectionString(UrlContainer {
-                            url: datasource_urls.url.clone(),
-                        }),
+                        datasource: DatasourceParam::ConnectionString(UrlContainer { url }),
                     })
                     .await
                     .map(|schema_core::json_rpc::types::CreateDatabaseResult { database_name }| {
@@ -52,14 +54,12 @@ impl Cli {
                     }),
                 CliCommand::CanConnectToDatabase => api
                     .ensure_connection_validity(schema_core::json_rpc::types::EnsureConnectionValidityParams {
-                        datasource: DatasourceParam::ConnectionString(UrlContainer {
-                            url: datasource_urls.url.clone(),
-                        }),
+                        datasource: DatasourceParam::ConnectionString(UrlContainer { url }),
                     })
                     .await
                     .map(|_| "Connection successful".to_owned()),
                 CliCommand::DropDatabase => api
-                    .drop_database(datasource_urls.url.clone())
+                    .drop_database(url)
                     .await
                     .map(|_| "The database was successfully dropped.".to_owned()),
             }

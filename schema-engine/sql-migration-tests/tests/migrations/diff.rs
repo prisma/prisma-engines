@@ -424,7 +424,7 @@ fn from_empty_to_migrations_folder_without_shadow_db_url_must_error(mut api: Tes
     let err = api
         .diff_with_datasource(
             &DatasourceUrls {
-                url: api.connection_string().to_owned(),
+                url: Some(api.connection_string().to_owned()),
                 shadow_database_url: None,
             },
             params,
