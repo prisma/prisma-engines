@@ -44,11 +44,6 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Cache Docker images.
-        uses: ScribeMD/docker-cache@0.5.0
-        with:
-          key: docker-${{ inputs.database_name }}-${{ hashFiles('docker-compose.yaml') }}
-
       #
       # Multithreaded tests
       #
