@@ -376,7 +376,10 @@ fn from_empty_to_migrations_directory(mut api: TestApi) {
     let host = Arc::new(TestConnectorHost::default());
     tok(diff_cli(
         params,
-        &DatasourceUrls::from_url_and_shadow_database_url("postgres://not-used", api.connection_string()),
+        &DatasourceUrls {
+            url: Some("postgres://not-used".to_string()),
+            shadow_database_url: Some(api.connection_string().to_owned()),
+        },
         host.clone(),
         &NoExtensionTypes,
     ))

@@ -314,6 +314,10 @@ pub struct DatabaseSchemaInconsistent {
     pub explanation: String,
 }
 
+#[derive(Debug, SimpleUserFacingError)]
+#[user_facing(code = "P4003", message = "No URL defined in the configured datasource")]
+pub struct MissingConfigDatasourceUrl;
+
 #[cfg(test)]
 mod tests {
     use super::*;

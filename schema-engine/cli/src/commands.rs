@@ -8,6 +8,7 @@ use schema_core::{
 };
 use structopt::StructOpt;
 use tokio_util::sync::CancellationToken;
+use user_facing_errors::schema_engine::MissingConfigDatasourceUrl;
 
 #[derive(Debug, StructOpt)]
 pub(crate) struct Cli {
@@ -40,7 +41,7 @@ impl Cli {
 
         let url = datasource_urls
             .url
-            .ok_or_else(|| ConnectorError::from_msg("No URL defined in the configured datasource".to_owned()))?;
+            .ok_or_else(|| ConnectorError::user_facing(MissingConfigDatasourceUrl))?;
 
         let work = async {
             match self.command {

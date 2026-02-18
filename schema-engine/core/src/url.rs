@@ -48,14 +48,6 @@ impl DatasourceUrls {
         }
     }
 
-    /// Creates a `DatasourceUrls` instance with both primary and shadow database URLs.
-    pub fn from_url_and_shadow_database_url(url: impl Into<String>, shadow_database_url: impl Into<String>) -> Self {
-        Self {
-            url: Some(url.into()),
-            shadow_database_url: Some(shadow_database_url.into()),
-        }
-    }
-
     /// Validates the URLs.
     pub fn validate(
         &self,

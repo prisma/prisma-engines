@@ -10,6 +10,7 @@ pub mod commands;
 
 pub use ::commands::{CoreError, CoreResult, GenericApi};
 pub use json_rpc;
+use user_facing_errors::schema_engine::MissingConfigDatasourceUrl;
 
 mod core_error;
 mod extensions;
@@ -126,8 +127,7 @@ fn schema_to_connector(
         )
     };
 
-    let connection_string = connection_string
-        .ok_or_else(|| CoreError::from_msg("No URL defined in the configured datasource".to_owned()))?;
+    let connection_string = connection_string.ok_or_else(|| CoreError::user_facing(MissingConfigDatasourceUrl))?;
 
     let params = ConnectorParams {
         connection_string,
@@ -148,7 +148,7 @@ fn initial_datamodel_to_connector(
     let params = ConnectorParams {
         connection_string: datasource_urls
             .url()
-            .ok_or_else(|| CoreError::from_msg("No URL defined in the configured datasource".to_owned()))?
+            .ok_or_else(|| CoreError::user_facing(MissingConfigDatasourceUrl))?
             .to_owned(),
         preview_features,
         shadow_database_connection_string: datasource_urls.shadow_database_url().map(<_>::to_owned),

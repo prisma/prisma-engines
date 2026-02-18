@@ -24,6 +24,7 @@ use std::{
 };
 use tokio::sync::{Mutex, mpsc, oneshot};
 use tracing_futures::{Instrument, WithSubscriber};
+use user_facing_errors::schema_engine::MissingConfigDatasourceUrl;
 
 /// The container for the state of the schema engine. It can contain one or more connectors
 /// corresponding to a database to be reached or that we are already connected to.
@@ -218,7 +219,7 @@ impl EngineState {
         Ok(self
             .validate_datasource_urls(&datasource)?
             .url_with_config_dir(datasource.active_connector.flavour(), Path::new(&container.config_dir))
-            .ok_or_else(|| CoreError::from_msg("No URL defined in the configured datasource".to_owned()))?
+            .ok_or_else(|| CoreError::user_facing(MissingConfigDatasourceUrl))?
             .into_owned())
     }
 
