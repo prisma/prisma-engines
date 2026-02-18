@@ -76,11 +76,6 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Cache Docker images.
-        uses: ScribeMD/docker-cache@0.5.0
-        with:
-          key: docker-${{ inputs.setup_task }}-${{hashFiles('docker-compose.yaml')}}
-
       - name: Set Prisma branch
         id: set-prisma-branch
         run: |
