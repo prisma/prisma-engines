@@ -762,14 +762,12 @@ fn pg_predicates_semantically_equal(a: &str, b: &str) -> bool {
             let placeholder = || Expr::Value(Value::Null.into());
             match expr {
                 Expr::Nested(_) => {
-                    let Expr::Nested(inner) = std::mem::replace(expr, placeholder()) else {
-                        unreachable!()
-                    };
-                    *expr = *inner;
+                    if let Expr::Nested(inner) = std::mem::replace(expr, placeholder()) {
+                        *expr = *inner;
+                    }
                 }
                 Expr::Cast { expr: inner, .. } if matches!(inner.as_ref(), Expr::Value(_)) => {
-                    let val = std::mem::replace(inner.as_mut(), placeholder());
-                    *expr = val;
+                    *expr = std::mem::replace(inner.as_mut(), placeholder());
                 }
                 _ => {}
             }

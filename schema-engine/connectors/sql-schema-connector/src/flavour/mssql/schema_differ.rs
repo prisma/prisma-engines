@@ -1176,15 +1176,11 @@ fn mssql_predicates_semantically_equal(a: &str, b: &str) -> bool {
         type Break = ();
 
         fn post_visit_expr(&mut self, expr: &mut Expr) -> ControlFlow<()> {
-            let placeholder = || Expr::Value(Value::Null.into());
-            match expr {
-                Expr::Nested(_) => {
-                    let Expr::Nested(inner) = std::mem::replace(expr, placeholder()) else {
-                        unreachable!()
-                    };
+            if let Expr::Nested(_) = expr {
+                let placeholder = || Expr::Value(Value::Null.into());
+                if let Expr::Nested(inner) = std::mem::replace(expr, placeholder()) {
                     *expr = *inner;
                 }
-                _ => {}
             }
             ControlFlow::Continue(())
         }
