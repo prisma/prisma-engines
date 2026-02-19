@@ -362,6 +362,20 @@ impl SqlSchemaConnector {
             .datamodel_connector()
             .scalar_type_for_native_type(native_type, extension_types)
     }
+
+    /// Erase index predicates when `partialIndexes` preview feature is off.
+    fn normalize_index_predicates(&self, db_schema: DatabaseSchema) -> DatabaseSchema {
+        if self
+            .inner
+            .preview_features()
+            .contains(psl::PreviewFeature::PartialIndexes)
+        {
+            return db_schema;
+        }
+        let mut inner = SqlDatabaseSchema::from_erased(db_schema);
+        inner.describer_schema.clear_index_predicates();
+        DatabaseSchema::new(*inner)
+    }
 }
 
 impl SchemaConnector for SqlSchemaConnector {
@@ -438,15 +452,12 @@ impl SchemaConnector for SqlSchemaConnector {
         namespaces: Option<Namespaces>,
     ) -> BoxFuture<'_, ConnectorResult<DatabaseSchema>> {
         Box::pin(async move {
-            let mut schema = self.inner.describe_schema(namespaces).await?;
-            if !self
-                .inner
-                .preview_features()
-                .contains(psl::PreviewFeature::PartialIndexes)
-            {
-                schema.clear_index_predicates();
-            }
-            Ok(DatabaseSchema::new(SqlDatabaseSchema::from(schema)))
+            self.inner
+                .describe_schema(namespaces)
+                .await
+                .map(SqlDatabaseSchema::from)
+                .map(DatabaseSchema::new)
+                .map(|db| self.normalize_index_predicates(db))
         })
     }
 
@@ -457,7 +468,7 @@ impl SchemaConnector for SqlSchemaConnector {
         filter: &'a SchemaFilter,
     ) -> BoxFuture<'a, ConnectorResult<DatabaseSchema>> {
         Box::pin(async move {
-            match self.inner.shadow_db_url() {
+            let db_schema = match self.inner.shadow_db_url() {
                 Some(connection_string) => {
                     let target = ExternalShadowDatabase::ConnectionString {
                         connection_string: connection_string.to_owned(),
@@ -465,23 +476,16 @@ impl SchemaConnector for SqlSchemaConnector {
                     };
                     self.schema_dialect()
                         .schema_from_migrations_with_target(migrations, namespaces, filter, target)
-                        .await
+                        .await?
                 }
-                None => {
-                    let mut schema = self
-                        .inner
-                        .sql_schema_from_migration_history(migrations, namespaces, filter, UsingExternalShadowDb::No)
-                        .await?;
-                    if !self
-                        .inner
-                        .preview_features()
-                        .contains(psl::PreviewFeature::PartialIndexes)
-                    {
-                        schema.clear_index_predicates();
-                    }
-                    Ok(DatabaseSchema::new(SqlDatabaseSchema::from(schema)))
-                }
-            }
+                None => self
+                    .inner
+                    .sql_schema_from_migration_history(migrations, namespaces, filter, UsingExternalShadowDb::No)
+                    .await
+                    .map(SqlDatabaseSchema::from)
+                    .map(DatabaseSchema::new)?,
+            };
+            Ok(self.normalize_index_predicates(db_schema))
         })
     }
 
