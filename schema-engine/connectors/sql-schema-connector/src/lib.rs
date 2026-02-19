@@ -438,11 +438,15 @@ impl SchemaConnector for SqlSchemaConnector {
         namespaces: Option<Namespaces>,
     ) -> BoxFuture<'_, ConnectorResult<DatabaseSchema>> {
         Box::pin(async move {
-            self.inner
-                .describe_schema(namespaces)
-                .await
-                .map(SqlDatabaseSchema::from)
-                .map(DatabaseSchema::new)
+            let mut schema = self.inner.describe_schema(namespaces).await?;
+            if !self
+                .inner
+                .preview_features()
+                .contains(psl::PreviewFeature::PartialIndexes)
+            {
+                schema.clear_index_predicates();
+            }
+            Ok(DatabaseSchema::new(SqlDatabaseSchema::from(schema)))
         })
     }
 
@@ -463,12 +467,20 @@ impl SchemaConnector for SqlSchemaConnector {
                         .schema_from_migrations_with_target(migrations, namespaces, filter, target)
                         .await
                 }
-                None => self
-                    .inner
-                    .sql_schema_from_migration_history(migrations, namespaces, filter, UsingExternalShadowDb::No)
-                    .await
-                    .map(SqlDatabaseSchema::from)
-                    .map(DatabaseSchema::new),
+                None => {
+                    let mut schema = self
+                        .inner
+                        .sql_schema_from_migration_history(migrations, namespaces, filter, UsingExternalShadowDb::No)
+                        .await?;
+                    if !self
+                        .inner
+                        .preview_features()
+                        .contains(psl::PreviewFeature::PartialIndexes)
+                    {
+                        schema.clear_index_predicates();
+                    }
+                    Ok(DatabaseSchema::new(SqlDatabaseSchema::from(schema)))
+                }
             }
         })
     }
