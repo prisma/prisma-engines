@@ -10,6 +10,7 @@ pub mod commands;
 
 pub use ::commands::{CoreError, CoreResult, GenericApi};
 pub use json_rpc;
+use user_facing_errors::schema_engine::MissingConfigDatasourceUrl;
 
 mod core_error;
 mod extensions;
@@ -27,6 +28,7 @@ pub use extensions::{ExtensionType, ExtensionTypeConfig};
 use json_rpc::types::{SchemaContainer, SchemasContainer, SchemasWithConfigDir};
 pub use schema_connector;
 
+use ::commands::dialect_for_provider;
 use enumflags2::BitFlags;
 use mongodb_schema_connector::MongoDbSchemaConnector;
 use psl::{
@@ -89,32 +91,18 @@ fn connector_for_connection_string(
 }
 
 /// Same as schema_to_connector, but it will only read the provider, not the connector params.
-/// This uses `schema_files` to read `preview_features` and the `datasource` block.
-fn schema_to_dialect(
-    schema_files: &[(String, SourceFile)],
-    datasource_urls: &DatasourceUrls,
-) -> CoreResult<Box<dyn schema_connector::SchemaDialect>> {
+/// This uses `schema_files` to read the `datasource` block.
+fn schema_to_dialect(schema_files: &[(String, SourceFile)]) -> CoreResult<Box<dyn schema_connector::SchemaDialect>> {
     let (_, config) = psl::parse_configuration_multi_file(schema_files)
         .map_err(|(files, err)| CoreError::new_schema_parser_error(files.render_diagnostics(&err)))?;
 
-    let preview_features = config.preview_features();
     let datasource = config
         .datasources
         .into_iter()
         .next()
         .ok_or_else(|| CoreError::from_msg("There is no datasource in the schema.".into()))?;
 
-    let datasource_urls = datasource_urls.validate(datasource.active_connector)?;
-
-    let connector_params = ConnectorParams {
-        connection_string: datasource_urls.url().to_owned(),
-        preview_features,
-        shadow_database_connection_string: datasource_urls.shadow_database_url().map(<_>::to_owned),
-    };
-
-    let conn = connector_for_provider(datasource.active_provider, connector_params)?;
-
-    Ok(conn.schema_dialect())
+    dialect_for_provider(datasource.active_provider)
 }
 
 /// Go from a schema to a connector.
@@ -128,13 +116,18 @@ fn schema_to_connector(
 
     let (connection_string, shadow_database_connection_string) = if let Some(config_dir) = config_dir {
         let urls = datasource_urls.with_config_dir(datasource.active_connector.flavour(), config_dir);
-        (urls.url().to_owned(), urls.shadow_database_url().map(<_>::to_owned))
+        (
+            urls.url().map(<_>::to_owned),
+            urls.shadow_database_url().map(<_>::to_owned),
+        )
     } else {
         (
-            datasource_urls.url().to_owned(),
+            datasource_urls.url().map(<_>::to_owned),
             datasource_urls.shadow_database_url().map(<_>::to_owned),
         )
     };
+
+    let connection_string = connection_string.ok_or_else(|| CoreError::user_facing(MissingConfigDatasourceUrl))?;
 
     let params = ConnectorParams {
         connection_string,
@@ -153,7 +146,10 @@ fn initial_datamodel_to_connector(
     let (datasource, preview_features) = extract_configuration_ref(configuration)?;
 
     let params = ConnectorParams {
-        connection_string: datasource_urls.url().to_owned(),
+        connection_string: datasource_urls
+            .url()
+            .ok_or_else(|| CoreError::user_facing(MissingConfigDatasourceUrl))?
+            .to_owned(),
         preview_features,
         shadow_database_connection_string: datasource_urls.shadow_database_url().map(<_>::to_owned),
     };

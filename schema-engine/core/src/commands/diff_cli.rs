@@ -137,7 +137,10 @@ async fn json_rpc_diff_target_to_dialect(
     extension_types: &dyn ExtensionTypes,
 ) -> CoreResult<Option<(Box<dyn SchemaDialect>, DatabaseSchema)>> {
     let datasource_urls = if let Some(shadow_database_url) = shadow_database_url {
-        &DatasourceUrls::from_url_and_shadow_database_url(&datasource_urls.url, shadow_database_url)
+        &DatasourceUrls {
+            url: datasource_urls.url.clone(),
+            shadow_database_url: Some(shadow_database_url.to_owned()),
+        }
     } else {
         datasource_urls
     };
@@ -170,7 +173,7 @@ async fn json_rpc_diff_target_to_dialect(
                     connector.schema_dialect(),
                 ),
                 Err(_) => {
-                    let dialect = crate::schema_to_dialect(&sources, datasource_urls)?;
+                    let dialect = crate::schema_to_dialect(&sources)?;
                     (dialect.default_namespace().map(|ns| ns.to_string()), dialect)
                 }
             };
