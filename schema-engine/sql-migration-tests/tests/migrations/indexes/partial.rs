@@ -704,6 +704,44 @@ fn partial_index_object_literal_camel_case_mssql(api: TestApi) {
     api.schema_push(&dm).send().assert_no_steps();
 }
 
+#[test_connector(tags(Mssql))]
+fn partial_index_with_whitespace_normalization_is_idempotent_mssql(api: TestApi) {
+    let dm = api.datamodel_with_provider_and_features(
+        r#"model User {
+            id     Int    @id
+            email  String
+            status String
+
+            @@index([email], where: raw("[status] = 'active'"))
+        }"#,
+        &[],
+        PREVIEW_FEATURES,
+    );
+
+    api.schema_push(&dm).send().assert_green();
+    api.schema_push(&dm).send().assert_no_steps();
+}
+
+#[test_connector(tags(Mssql))]
+fn partial_index_with_comparison_normalization_is_idempotent_mssql(api: TestApi) {
+    let dm = api.datamodel_with_provider_and_features(
+        r#"model OrderLineItemAllocation {
+            id                Int     @id
+            lineItemId        Int     @map("line_item_id")
+            containerQuantity Decimal @map("container_quantity")
+            pulledQuantity    Decimal @map("pulled_quantity")
+
+            @@index([lineItemId, containerQuantity, pulledQuantity], where: raw("[container_quantity] > 0"))
+            @@map("order_line_item_allocation")
+        }"#,
+        &[],
+        PREVIEW_FEATURES,
+    );
+
+    api.schema_push(&dm).send().assert_green();
+    api.schema_push(&dm).send().assert_no_steps();
+}
+
 #[test_connector(tags(Postgres), exclude(CockroachDb))]
 fn partial_index_with_enum_cast_is_idempotent_postgres(api: TestApi) {
     let dm = api.datamodel_with_provider_and_features(

@@ -22,7 +22,14 @@ impl SqlSchemaDifferFlavour for MssqlSchemaDifferFlavour {
         let mssql_ext_next: &MssqlSchemaExt = b.schema.downcast_connector_data();
 
         mssql_ext_previous.index_is_clustered(a.id) == mssql_ext_next.index_is_clustered(b.id)
-            && a.predicate() == b.predicate()
+    }
+
+    fn predicates_match(&self, a: Option<&str>, b: Option<&str>) -> bool {
+        match (a, b) {
+            (Some(a), Some(b)) => a == b || mssql_predicates_semantically_equal(a, b),
+            (None, None) => true,
+            _ => false,
+        }
     }
 
     fn should_skip_index_for_new_table(&self, index: sql::IndexWalker<'_>) -> bool {
@@ -1154,4 +1161,47 @@ fn native_type_change_riskyness(previous: &MsSqlType, next: &MsSqlType) -> Optio
         | (MsSqlType::Real, MsSqlType::Float(Some(24))) => None,
         _ => Some(cast()),
     }
+}
+
+// Accounts for MSSQL expression normalization (parens wrapping, whitespace collapsing).
+fn mssql_predicates_semantically_equal(a: &str, b: &str) -> bool {
+    use sqlparser::ast::{Expr, Value, VisitMut, VisitorMut};
+    use sqlparser::dialect::MsSqlDialect;
+    use sqlparser::parser::Parser;
+    use std::ops::ControlFlow;
+
+    struct StripMssqlNormalization;
+
+    impl VisitorMut for StripMssqlNormalization {
+        type Break = ();
+
+        fn post_visit_expr(&mut self, expr: &mut Expr) -> ControlFlow<()> {
+            let placeholder = || Expr::Value(Value::Null.into());
+            match expr {
+                Expr::Nested(_) => {
+                    let Expr::Nested(inner) = std::mem::replace(expr, placeholder()) else {
+                        unreachable!()
+                    };
+                    *expr = *inner;
+                }
+                _ => {}
+            }
+            ControlFlow::Continue(())
+        }
+    }
+
+    let dialect = MsSqlDialect {};
+    let mut ast_a = match Parser::new(&dialect).try_with_sql(a).and_then(|mut p| p.parse_expr()) {
+        Ok(expr) => expr,
+        Err(_) => return false,
+    };
+    let mut ast_b = match Parser::new(&dialect).try_with_sql(b).and_then(|mut p| p.parse_expr()) {
+        Ok(expr) => expr,
+        Err(_) => return false,
+    };
+
+    let _ = ast_a.visit(&mut StripMssqlNormalization);
+    let _ = ast_b.visit(&mut StripMssqlNormalization);
+
+    ast_a == ast_b
 }
