@@ -748,7 +748,7 @@ fn push_alter_enum_previous_usages_as_default(db: &DifferDatabase<'_>, alter_enu
 
 // Accounts for PG expression normalization (operator aliases, parens, implicit literal casts).
 fn pg_predicates_semantically_equal(a: &str, b: &str) -> bool {
-    use sqlparser::ast::{Expr, Value, VisitMut, VisitorMut};
+    use sqlparser::ast::{CastKind, Expr, Value, VisitMut, VisitorMut};
     use sqlparser::dialect::PostgreSqlDialect;
     use sqlparser::parser::Parser;
     use std::ops::ControlFlow;
@@ -766,7 +766,11 @@ fn pg_predicates_semantically_equal(a: &str, b: &str) -> bool {
                         *expr = *inner;
                     }
                 }
-                Expr::Cast { expr: inner, .. } if matches!(inner.as_ref(), Expr::Value(_)) => {
+                Expr::Cast {
+                    kind: CastKind::DoubleColon,
+                    expr: inner,
+                    ..
+                } if matches!(inner.as_ref(), Expr::Value(_)) => {
                     *expr = std::mem::replace(inner.as_mut(), placeholder());
                 }
                 _ => {}
