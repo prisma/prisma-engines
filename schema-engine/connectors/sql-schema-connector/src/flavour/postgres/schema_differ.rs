@@ -202,7 +202,11 @@ impl SqlSchemaDifferFlavour for PostgresSchemaDifferFlavour {
         if self.is_cockroachdb() {
             return true;
         }
-        a == b
+        match (a, b) {
+            (Some(a), Some(b)) => a == b || pg_predicates_semantically_equal(a, b),
+            (None, None) => true,
+            _ => false,
+        }
     }
 
     fn indexes_should_be_recreated_after_column_drop(&self) -> bool {
@@ -740,4 +744,51 @@ fn push_alter_enum_previous_usages_as_default(db: &DifferDatabase<'_>, alter_enu
     }
 
     alter_enum.previous_usages_as_default = previous_usages_as_default;
+}
+
+// Accounts for PG expression normalization (operator aliases, parens, implicit literal casts).
+fn pg_predicates_semantically_equal(a: &str, b: &str) -> bool {
+    use sqlparser::ast::{Expr, Value, VisitMut, VisitorMut};
+    use sqlparser::dialect::PostgreSqlDialect;
+    use sqlparser::parser::Parser;
+    use std::ops::ControlFlow;
+
+    struct StripPgNormalization;
+
+    impl VisitorMut for StripPgNormalization {
+        type Break = ();
+
+        fn post_visit_expr(&mut self, expr: &mut Expr) -> ControlFlow<()> {
+            let placeholder = || Expr::Value(Value::Null.into());
+            match expr {
+                Expr::Nested(_) => {
+                    let Expr::Nested(inner) = std::mem::replace(expr, placeholder()) else {
+                        unreachable!()
+                    };
+                    *expr = *inner;
+                }
+                Expr::Cast { expr: inner, .. } if matches!(inner.as_ref(), Expr::Value(_)) => {
+                    let val = std::mem::replace(inner.as_mut(), placeholder());
+                    *expr = val;
+                }
+                _ => {}
+            }
+            ControlFlow::Continue(())
+        }
+    }
+
+    let dialect = PostgreSqlDialect {};
+    let mut ast_a = match Parser::new(&dialect).try_with_sql(a).and_then(|mut p| p.parse_expr()) {
+        Ok(expr) => expr,
+        Err(_) => return false,
+    };
+    let mut ast_b = match Parser::new(&dialect).try_with_sql(b).and_then(|mut p| p.parse_expr()) {
+        Ok(expr) => expr,
+        Err(_) => return false,
+    };
+
+    let _ = ast_a.visit(&mut StripPgNormalization);
+    let _ = ast_b.visit(&mut StripPgNormalization);
+
+    ast_a == ast_b
 }
