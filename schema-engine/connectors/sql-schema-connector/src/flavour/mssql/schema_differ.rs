@@ -1165,9 +1165,11 @@ fn native_type_change_riskyness(previous: &MsSqlType, next: &MsSqlType) -> Optio
 
 // Accounts for MSSQL expression normalization (parens wrapping, whitespace collapsing).
 fn mssql_predicates_semantically_equal(a: &str, b: &str) -> bool {
-    use sqlparser::ast::{Expr, Value, VisitMut, VisitorMut};
-    use sqlparser::dialect::MsSqlDialect;
-    use sqlparser::parser::Parser;
+    use sqlparser::{
+        ast::{Expr, Value, VisitMut, VisitorMut},
+        dialect::MsSqlDialect,
+        parser::Parser,
+    };
     use std::ops::ControlFlow;
 
     struct StripMssqlNormalization;
@@ -1176,24 +1178,28 @@ fn mssql_predicates_semantically_equal(a: &str, b: &str) -> bool {
         type Break = ();
 
         fn post_visit_expr(&mut self, expr: &mut Expr) -> ControlFlow<()> {
-            if matches!(expr, Expr::Nested(_)) {
-                let placeholder = || Expr::Value(Value::Null.into());
-                if let Expr::Nested(inner) = std::mem::replace(expr, placeholder()) {
-                    *expr = *inner;
-                }
+            if !matches!(expr, Expr::Nested(_)) {
+                return ControlFlow::Continue(());
             }
+
+            let placeholder = Expr::value(Value::Null);
+
+            if let Expr::Nested(inner) = std::mem::replace(expr, placeholder) {
+                *expr = *inner;
+            }
+
             ControlFlow::Continue(())
         }
     }
 
-    let dialect = MsSqlDialect {};
-    let mut ast_a = match Parser::new(&dialect).try_with_sql(a).and_then(|mut p| p.parse_expr()) {
-        Ok(expr) => expr,
-        Err(_) => return false,
+    let parse = |s: &str| {
+        Parser::new(&MsSqlDialect {})
+            .try_with_sql(s)
+            .and_then(|mut p| p.parse_expr())
     };
-    let mut ast_b = match Parser::new(&dialect).try_with_sql(b).and_then(|mut p| p.parse_expr()) {
-        Ok(expr) => expr,
-        Err(_) => return false,
+
+    let (Ok(mut ast_a), Ok(mut ast_b)) = (parse(a), parse(b)) else {
+        return false;
     };
 
     let _ = ast_a.visit(&mut StripMssqlNormalization);

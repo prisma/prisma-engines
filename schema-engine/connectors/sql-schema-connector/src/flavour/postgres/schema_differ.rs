@@ -17,6 +17,7 @@ use sql_schema_describer::{
     postgres::PostgresSchemaExt,
     walkers::{IndexWalker, TableColumnWalker},
 };
+use sqlparser::ast::Expr;
 
 /// These can be tables or views, depending on the PostGIS version. In both cases, they should be ignored.
 static POSTGIS_TABLES_OR_VIEWS: LazyLock<RegexSet> = LazyLock::new(|| {
@@ -748,45 +749,107 @@ fn push_alter_enum_previous_usages_as_default(db: &DifferDatabase<'_>, alter_enu
 
 // Accounts for PG expression normalization (operator aliases, parens, implicit literal casts).
 fn pg_predicates_semantically_equal(a: &str, b: &str) -> bool {
-    use sqlparser::ast::{Expr, Value, VisitMut, VisitorMut};
-    use sqlparser::dialect::PostgreSqlDialect;
-    use sqlparser::parser::Parser;
+    use sqlparser::{
+        ast::{BinaryOperator, Value, VisitMut, VisitorMut},
+        dialect::PostgreSqlDialect,
+        parser::Parser,
+    };
     use std::ops::ControlFlow;
 
-    struct StripNested;
+    struct StripPgNormalization;
 
-    impl VisitorMut for StripNested {
+    impl VisitorMut for StripPgNormalization {
         type Break = ();
 
         fn post_visit_expr(&mut self, expr: &mut Expr) -> ControlFlow<()> {
-            if matches!(expr, Expr::Nested(_)) {
-                let placeholder = Expr::Value(Value::Null.into());
-                if let Expr::Nested(inner) = std::mem::replace(expr, placeholder) {
-                    *expr = *inner;
-                }
+            if !matches!(
+                expr,
+                Expr::Nested(_)
+                    | Expr::AnyOp {
+                        compare_op: BinaryOperator::Eq,
+                        is_some: false,
+                        ..
+                    }
+                    | Expr::AllOp {
+                        compare_op: BinaryOperator::NotEq,
+                        ..
+                    }
+            ) {
+                return ControlFlow::Continue(());
             }
+
+            let placeholder = Expr::value(Value::Null);
+
+            match std::mem::replace(expr, placeholder) {
+                Expr::Nested(inner) => *expr = *inner,
+                // PG rewrites `x IN (v1, v2)` to `x = ANY(ARRAY[v1::t, v2::t])`.
+                Expr::AnyOp {
+                    left,
+                    right,
+                    compare_op,
+                    is_some,
+                } => {
+                    if let Expr::Array(arr) = *right {
+                        *expr = Expr::InList {
+                            expr: left,
+                            list: arr.elem,
+                            negated: false,
+                        };
+                    } else {
+                        *expr = Expr::AnyOp {
+                            left,
+                            compare_op,
+                            right,
+                            is_some,
+                        };
+                    }
+                }
+                // PG rewrites `x NOT IN (v1, v2)` to `x <> ALL(ARRAY[v1::t, v2::t])`.
+                Expr::AllOp {
+                    left,
+                    right,
+                    compare_op,
+                } => {
+                    if let Expr::Array(arr) = *right {
+                        *expr = Expr::InList {
+                            expr: left,
+                            list: arr.elem,
+                            negated: true,
+                        };
+                    } else {
+                        *expr = Expr::AllOp {
+                            left,
+                            compare_op,
+                            right,
+                        };
+                    }
+                }
+                other => *expr = other,
+            }
+
             ControlFlow::Continue(())
         }
     }
 
-    let dialect = PostgreSqlDialect {};
-    let mut ast_a = match Parser::new(&dialect).try_with_sql(a).and_then(|mut p| p.parse_expr()) {
-        Ok(expr) => expr,
-        Err(_) => return false,
-    };
-    let mut ast_b = match Parser::new(&dialect).try_with_sql(b).and_then(|mut p| p.parse_expr()) {
-        Ok(expr) => expr,
-        Err(_) => return false,
+    let parse = |s: &str| {
+        Parser::new(&PostgreSqlDialect {})
+            .try_with_sql(s)
+            .and_then(|mut p| p.parse_expr())
     };
 
-    let _ = ast_a.visit(&mut StripNested);
-    let _ = ast_b.visit(&mut StripNested);
+    let (Ok(mut ast_a), Ok(mut ast_b)) = (parse(a), parse(b)) else {
+        return false;
+    };
+
+    let _ = ast_a.visit(&mut StripPgNormalization);
+    let _ = ast_b.visit(&mut StripPgNormalization);
 
     exprs_semantically_eq(&ast_a, &ast_b)
 }
 
-fn exprs_semantically_eq(a: &sqlparser::ast::Expr, b: &sqlparser::ast::Expr) -> bool {
-    use sqlparser::ast::{CastKind, Expr};
+// Compares two expressions that have already been normalized by `StripPgNormalization`.
+fn exprs_semantically_eq(a: &Expr, b: &Expr) -> bool {
+    use sqlparser::ast::CastKind;
 
     if a == b {
         return true;

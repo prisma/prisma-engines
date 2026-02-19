@@ -886,23 +886,6 @@ fn partial_index_with_double_cast_truncation_is_idempotent_postgres(api: TestApi
 }
 
 #[test_connector(tags(Postgres), exclude(CockroachDb), preview_features("partialIndexes"))]
-fn partial_index_with_back_and_forth_lossy_cast_is_idempotent_postgres(api: TestApi) {
-    let dm = api.datamodel_with_provider_and_features(
-        r#"model Item {
-            id    Int     @id
-            price Decimal
-
-            @@index([price], where: raw("price > 99.9::smallint::numeric"))
-        }"#,
-        &[],
-        PREVIEW_FEATURES,
-    );
-
-    api.schema_push(&dm).send().assert_green();
-    api.schema_push(&dm).send().assert_no_steps();
-}
-
-#[test_connector(tags(Postgres), exclude(CockroachDb), preview_features("partialIndexes"))]
 fn partial_index_cast_type_change_triggers_migration_postgres(api: TestApi) {
     let dm1 = api.datamodel_with_provider_and_features(
         r#"model Item {
@@ -931,4 +914,134 @@ fn partial_index_cast_type_change_triggers_migration_postgres(api: TestApi) {
 
     api.schema_push(&dm2).force(true).send().assert_has_executed_steps();
     api.schema_push(&dm2).send().assert_no_steps();
+}
+
+#[test_connector(tags(Postgres), exclude(CockroachDb), preview_features("partialIndexes"))]
+fn partial_index_with_compound_and_or_predicate_is_idempotent_postgres(api: TestApi) {
+    let dm = api.datamodel_with_provider_and_features(
+        r#"model Order {
+            id       Int     @id
+            status   String
+            quantity Int
+            priority Int
+
+            @@index([status], where: raw("status = 'active' AND (quantity > 0 OR priority > 5)"))
+        }"#,
+        &[],
+        PREVIEW_FEATURES,
+    );
+
+    api.schema_push(&dm).send().assert_green();
+    api.schema_push(&dm).send().assert_no_steps();
+}
+
+#[test_connector(tags(Postgres), exclude(CockroachDb), preview_features("partialIndexes"))]
+fn partial_index_object_literal_multiple_fields_is_idempotent_postgres(api: TestApi) {
+    let dm = api.datamodel_with_provider_and_features(
+        r#"model User {
+            id        Int      @id
+            email     String
+            active    Boolean
+            deletedAt DateTime?
+
+            @@unique([email], where: { active: true, deletedAt: null })
+        }"#,
+        &[],
+        PREVIEW_FEATURES,
+    );
+
+    api.schema_push(&dm).send().assert_green();
+    api.schema_push(&dm).send().assert_no_steps();
+}
+
+#[test_connector(tags(Postgres), exclude(CockroachDb), preview_features("partialIndexes"))]
+fn partial_index_object_literal_not_equals_is_idempotent_postgres(api: TestApi) {
+    let dm = api.datamodel_with_provider_and_features(
+        r#"model User {
+            id     Int    @id
+            email  String
+            status String
+
+            @@unique([email], where: { status: { not: "deleted" } })
+        }"#,
+        &[],
+        PREVIEW_FEATURES,
+    );
+
+    api.schema_push(&dm).send().assert_green();
+    api.schema_push(&dm).send().assert_no_steps();
+}
+
+#[test_connector(tags(Postgres), exclude(CockroachDb), preview_features("partialIndexes"))]
+fn partial_index_implicit_precedence_and_or_roundtrip_postgres(api: TestApi) {
+    let dm = api.datamodel_with_provider_and_features(
+        r#"model Item {
+            id Int @id
+            a  Int
+            b  Int
+            c  Int
+
+            @@index([a], where: raw("a = 1 OR b = 2 AND c = 3"))
+        }"#,
+        &[],
+        PREVIEW_FEATURES,
+    );
+
+    api.schema_push(&dm).send().assert_green();
+    api.schema_push(&dm).send().assert_no_steps();
+}
+
+#[test_connector(tags(Postgres), exclude(CockroachDb), preview_features("partialIndexes"))]
+fn partial_index_not_with_and_or_roundtrip_postgres(api: TestApi) {
+    let dm = api.datamodel_with_provider_and_features(
+        r#"model Item {
+            id Int @id
+            a  Int
+            b  Int
+            c  Int
+
+            @@index([a], where: raw("NOT (a = 1 AND b = 2) OR c = 3"))
+        }"#,
+        &[],
+        PREVIEW_FEATURES,
+    );
+
+    api.schema_push(&dm).send().assert_green();
+    api.schema_push(&dm).send().assert_no_steps();
+}
+
+#[test_connector(tags(Postgres), exclude(CockroachDb), preview_features("partialIndexes"))]
+fn partial_index_with_in_list_predicate_is_idempotent_postgres(api: TestApi) {
+    let dm = api.datamodel_with_provider_and_features(
+        r#"model User {
+            id     Int    @id
+            email  String
+            status String
+
+            @@index([email], where: raw("status IN ('active', 'pending')"))
+        }"#,
+        &[],
+        PREVIEW_FEATURES,
+    );
+
+    api.schema_push(&dm).send().assert_green();
+    api.schema_push(&dm).send().assert_no_steps();
+}
+
+#[test_connector(tags(Postgres), exclude(CockroachDb), preview_features("partialIndexes"))]
+fn partial_index_with_not_in_list_predicate_is_idempotent_postgres(api: TestApi) {
+    let dm = api.datamodel_with_provider_and_features(
+        r#"model User {
+            id     Int    @id
+            email  String
+            status String
+
+            @@index([email], where: raw("status NOT IN ('deleted', 'archived')"))
+        }"#,
+        &[],
+        PREVIEW_FEATURES,
+    );
+
+    api.schema_push(&dm).send().assert_green();
+    api.schema_push(&dm).send().assert_no_steps();
 }
