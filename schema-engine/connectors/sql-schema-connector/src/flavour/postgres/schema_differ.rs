@@ -748,32 +748,22 @@ fn push_alter_enum_previous_usages_as_default(db: &DifferDatabase<'_>, alter_enu
 
 // Accounts for PG expression normalization (operator aliases, parens, implicit literal casts).
 fn pg_predicates_semantically_equal(a: &str, b: &str) -> bool {
-    use sqlparser::ast::{CastKind, Expr, Value, VisitMut, VisitorMut};
+    use sqlparser::ast::{Expr, Value, VisitMut, VisitorMut};
     use sqlparser::dialect::PostgreSqlDialect;
     use sqlparser::parser::Parser;
     use std::ops::ControlFlow;
 
-    struct StripPgNormalization;
+    struct StripNested;
 
-    impl VisitorMut for StripPgNormalization {
+    impl VisitorMut for StripNested {
         type Break = ();
 
         fn post_visit_expr(&mut self, expr: &mut Expr) -> ControlFlow<()> {
-            let placeholder = || Expr::Value(Value::Null.into());
-            match expr {
-                Expr::Nested(_) => {
-                    if let Expr::Nested(inner) = std::mem::replace(expr, placeholder()) {
-                        *expr = *inner;
-                    }
+            if matches!(expr, Expr::Nested(_)) {
+                let placeholder = Expr::Value(Value::Null.into());
+                if let Expr::Nested(inner) = std::mem::replace(expr, placeholder) {
+                    *expr = *inner;
                 }
-                Expr::Cast {
-                    kind: CastKind::DoubleColon,
-                    expr: inner,
-                    ..
-                } if matches!(inner.as_ref(), Expr::Value(_)) => {
-                    *expr = std::mem::replace(inner.as_mut(), placeholder());
-                }
-                _ => {}
             }
             ControlFlow::Continue(())
         }
@@ -789,8 +779,136 @@ fn pg_predicates_semantically_equal(a: &str, b: &str) -> bool {
         Err(_) => return false,
     };
 
-    let _ = ast_a.visit(&mut StripPgNormalization);
-    let _ = ast_b.visit(&mut StripPgNormalization);
+    let _ = ast_a.visit(&mut StripNested);
+    let _ = ast_b.visit(&mut StripNested);
 
-    ast_a == ast_b
+    exprs_semantically_eq(&ast_a, &ast_b)
+}
+
+fn exprs_semantically_eq(a: &sqlparser::ast::Expr, b: &sqlparser::ast::Expr) -> bool {
+    use sqlparser::ast::{CastKind, Expr};
+
+    if a == b {
+        return true;
+    }
+
+    match (a, b) {
+        // Value(x) matches Cast(::, Value(x), _): PG's single-level annotation on a bare literal.
+        (
+            Expr::Value(va),
+            Expr::Cast {
+                kind: CastKind::DoubleColon,
+                expr,
+                ..
+            },
+        )
+        | (
+            Expr::Cast {
+                kind: CastKind::DoubleColon,
+                expr,
+                ..
+            },
+            Expr::Value(va),
+        ) if matches!(expr.as_ref(), Expr::Value(vb) if vb == va) => true,
+
+        // Unwrap outer :: cast when inner is also a :: cast (PG annotation wrapping user cast).
+        (
+            inner,
+            Expr::Cast {
+                kind: CastKind::DoubleColon,
+                expr: outer_inner,
+                ..
+            },
+        )
+        | (
+            Expr::Cast {
+                kind: CastKind::DoubleColon,
+                expr: outer_inner,
+                ..
+            },
+            inner,
+        ) if matches!(
+            outer_inner.as_ref(),
+            Expr::Cast {
+                kind: CastKind::DoubleColon,
+                ..
+            }
+        ) =>
+        {
+            exprs_semantically_eq(inner, outer_inner)
+        }
+
+        (
+            Expr::BinaryOp {
+                left: la,
+                op: oa,
+                right: ra,
+            },
+            Expr::BinaryOp {
+                left: lb,
+                op: ob,
+                right: rb,
+            },
+        ) if oa == ob => exprs_semantically_eq(la, lb) && exprs_semantically_eq(ra, rb),
+
+        (Expr::UnaryOp { op: oa, expr: ea }, Expr::UnaryOp { op: ob, expr: eb }) if oa == ob => {
+            exprs_semantically_eq(ea, eb)
+        }
+
+        (Expr::IsNull(ea), Expr::IsNull(eb))
+        | (Expr::IsNotNull(ea), Expr::IsNotNull(eb))
+        | (Expr::IsTrue(ea), Expr::IsTrue(eb))
+        | (Expr::IsNotTrue(ea), Expr::IsNotTrue(eb))
+        | (Expr::IsFalse(ea), Expr::IsFalse(eb))
+        | (Expr::IsNotFalse(ea), Expr::IsNotFalse(eb)) => exprs_semantically_eq(ea, eb),
+
+        (
+            Expr::Between {
+                expr: ea,
+                negated: na,
+                low: la,
+                high: ha,
+            },
+            Expr::Between {
+                expr: eb,
+                negated: nb,
+                low: lb,
+                high: hb,
+            },
+        ) if na == nb => {
+            exprs_semantically_eq(ea, eb) && exprs_semantically_eq(la, lb) && exprs_semantically_eq(ha, hb)
+        }
+
+        (
+            Expr::InList {
+                expr: ea,
+                list: la,
+                negated: na,
+            },
+            Expr::InList {
+                expr: eb,
+                list: lb,
+                negated: nb,
+            },
+        ) if na == nb && la.len() == lb.len() => {
+            exprs_semantically_eq(ea, eb) && la.iter().zip(lb).all(|(a, b)| exprs_semantically_eq(a, b))
+        }
+
+        (
+            Expr::Cast {
+                kind: ka,
+                expr: ea,
+                data_type: ta,
+                ..
+            },
+            Expr::Cast {
+                kind: kb,
+                expr: eb,
+                data_type: tb,
+                ..
+            },
+        ) if ka == kb && ta == tb => exprs_semantically_eq(ea, eb),
+
+        _ => false,
+    }
 }

@@ -850,3 +850,85 @@ fn partial_index_with_numeric_literal_cast_is_idempotent_postgres(api: TestApi) 
     api.schema_push(&dm).send().assert_green();
     api.schema_push(&dm).send().assert_no_steps();
 }
+
+#[test_connector(tags(Postgres), exclude(CockroachDb), preview_features("partialIndexes"))]
+fn partial_index_with_lossy_float_to_int_cast_is_idempotent_postgres(api: TestApi) {
+    let dm = api.datamodel_with_provider_and_features(
+        r#"model Item {
+            id    Int     @id
+            price Decimal
+
+            @@index([price], where: raw("price > 3.14::integer"))
+        }"#,
+        &[],
+        PREVIEW_FEATURES,
+    );
+
+    api.schema_push(&dm).send().assert_green();
+    api.schema_push(&dm).send().assert_no_steps();
+}
+
+#[test_connector(tags(Postgres), exclude(CockroachDb), preview_features("partialIndexes"))]
+fn partial_index_with_double_cast_truncation_is_idempotent_postgres(api: TestApi) {
+    let dm = api.datamodel_with_provider_and_features(
+        r#"model Item {
+            id    Int     @id
+            price Decimal
+
+            @@index([price], where: raw("price > 3.14::integer::numeric"))
+        }"#,
+        &[],
+        PREVIEW_FEATURES,
+    );
+
+    api.schema_push(&dm).send().assert_green();
+    api.schema_push(&dm).send().assert_no_steps();
+}
+
+#[test_connector(tags(Postgres), exclude(CockroachDb), preview_features("partialIndexes"))]
+fn partial_index_with_back_and_forth_lossy_cast_is_idempotent_postgres(api: TestApi) {
+    let dm = api.datamodel_with_provider_and_features(
+        r#"model Item {
+            id    Int     @id
+            price Decimal
+
+            @@index([price], where: raw("price > 99.9::smallint::numeric"))
+        }"#,
+        &[],
+        PREVIEW_FEATURES,
+    );
+
+    api.schema_push(&dm).send().assert_green();
+    api.schema_push(&dm).send().assert_no_steps();
+}
+
+#[test_connector(tags(Postgres), exclude(CockroachDb), preview_features("partialIndexes"))]
+fn partial_index_cast_type_change_triggers_migration_postgres(api: TestApi) {
+    let dm1 = api.datamodel_with_provider_and_features(
+        r#"model Item {
+            id    Int     @id
+            price Decimal
+
+            @@index([price], where: raw("price > 3.14::integer"))
+        }"#,
+        &[],
+        PREVIEW_FEATURES,
+    );
+
+    api.schema_push(&dm1).send().assert_green();
+    api.schema_push(&dm1).send().assert_no_steps();
+
+    let dm2 = api.datamodel_with_provider_and_features(
+        r#"model Item {
+            id    Int     @id
+            price Decimal
+
+            @@index([price], where: raw("price > 3.14::numeric"))
+        }"#,
+        &[],
+        PREVIEW_FEATURES,
+    );
+
+    api.schema_push(&dm2).force(true).send().assert_has_executed_steps();
+    api.schema_push(&dm2).send().assert_no_steps();
+}
