@@ -203,6 +203,13 @@ impl SqlSchema {
         }
     }
 
+    /// Clear all index predicates so the differ ignores partial indexes when the feature is disabled.
+    pub fn clear_index_predicates(&mut self) {
+        for idx in self.indexes.iter_mut() {
+            idx.predicate = None;
+        }
+    }
+
     /// Add a table column to the schema.
     pub fn push_table_column(&mut self, table_id: TableId, column: Column) -> TableColumnId {
         let id = TableColumnId(self.table_columns.len() as u32);

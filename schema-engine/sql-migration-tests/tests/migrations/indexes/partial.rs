@@ -2,7 +2,7 @@ use sql_migration_tests::test_api::*;
 
 const PREVIEW_FEATURES: &[&str] = &["partialIndexes"];
 
-#[test_connector(tags(Postgres), exclude(CockroachDb))]
+#[test_connector(tags(Postgres), exclude(CockroachDb), preview_features("partialIndexes"))]
 fn partial_unique_index_on_postgres(api: TestApi) {
     let dm = api.datamodel_with_provider_and_features(
         r#"model User {
@@ -27,7 +27,7 @@ fn partial_unique_index_on_postgres(api: TestApi) {
     api.schema_push(&dm).send().assert_no_steps();
 }
 
-#[test_connector(tags(Postgres), exclude(CockroachDb))]
+#[test_connector(tags(Postgres), exclude(CockroachDb), preview_features("partialIndexes"))]
 fn partial_normal_index_on_postgres(api: TestApi) {
     let dm = api.datamodel_with_provider_and_features(
         r#"model User {
@@ -52,7 +52,7 @@ fn partial_normal_index_on_postgres(api: TestApi) {
     api.schema_push(&dm).send().assert_no_steps();
 }
 
-#[test_connector(tags(Postgres), exclude(CockroachDb))]
+#[test_connector(tags(Postgres), exclude(CockroachDb), preview_features("partialIndexes"))]
 fn compound_partial_unique_index_on_postgres(api: TestApi) {
     let dm = api.datamodel_with_provider_and_features(
         r#"model User {
@@ -78,7 +78,7 @@ fn compound_partial_unique_index_on_postgres(api: TestApi) {
     api.schema_push(&dm).send().assert_no_steps();
 }
 
-#[test_connector(tags(Postgres), exclude(CockroachDb))]
+#[test_connector(tags(Postgres), exclude(CockroachDb), preview_features("partialIndexes"))]
 fn modify_partial_index_predicate_postgres(api: TestApi) {
     let dm1 = api.datamodel_with_provider_and_features(
         r#"model User {
@@ -115,7 +115,7 @@ fn modify_partial_index_predicate_postgres(api: TestApi) {
     });
 }
 
-#[test_connector(tags(Postgres), exclude(CockroachDb))]
+#[test_connector(tags(Postgres), exclude(CockroachDb), preview_features("partialIndexes"))]
 fn remove_partial_index_predicate_postgres(api: TestApi) {
     let dm1 = api.datamodel_with_provider_and_features(
         r#"model User {
@@ -150,7 +150,7 @@ fn remove_partial_index_predicate_postgres(api: TestApi) {
     });
 }
 
-#[test_connector(tags(Postgres), exclude(CockroachDb))]
+#[test_connector(tags(Postgres), exclude(CockroachDb), preview_features("partialIndexes"))]
 fn add_partial_index_predicate_postgres(api: TestApi) {
     let dm1 = api.datamodel_with_provider_and_features(
         r#"model User {
@@ -187,7 +187,7 @@ fn add_partial_index_predicate_postgres(api: TestApi) {
     });
 }
 
-#[test_connector(tags(Sqlite))]
+#[test_connector(tags(Sqlite), preview_features("partialIndexes"))]
 fn partial_unique_index_on_sqlite(api: TestApi) {
     let dm = api.datamodel_with_provider_and_features(
         r#"model User {
@@ -212,7 +212,7 @@ fn partial_unique_index_on_sqlite(api: TestApi) {
     api.schema_push(&dm).send().assert_no_steps();
 }
 
-#[test_connector(tags(Sqlite))]
+#[test_connector(tags(Sqlite), preview_features("partialIndexes"))]
 fn partial_normal_index_on_sqlite(api: TestApi) {
     let dm = api.datamodel_with_provider_and_features(
         r#"model User {
@@ -237,7 +237,7 @@ fn partial_normal_index_on_sqlite(api: TestApi) {
     api.schema_push(&dm).send().assert_no_steps();
 }
 
-#[test_connector(tags(Sqlite))]
+#[test_connector(tags(Sqlite), preview_features("partialIndexes"))]
 fn compound_partial_unique_index_on_sqlite(api: TestApi) {
     let dm = api.datamodel_with_provider_and_features(
         r#"model User {
@@ -263,7 +263,7 @@ fn compound_partial_unique_index_on_sqlite(api: TestApi) {
     api.schema_push(&dm).send().assert_no_steps();
 }
 
-#[test_connector(tags(Sqlite))]
+#[test_connector(tags(Sqlite), preview_features("partialIndexes"))]
 fn modify_partial_index_predicate_sqlite(api: TestApi) {
     let dm1 = api.datamodel_with_provider_and_features(
         r#"model User {
@@ -300,7 +300,7 @@ fn modify_partial_index_predicate_sqlite(api: TestApi) {
     });
 }
 
-#[test_connector(tags(Sqlite))]
+#[test_connector(tags(Sqlite), preview_features("partialIndexes"))]
 fn remove_partial_index_predicate_sqlite(api: TestApi) {
     let dm1 = api.datamodel_with_provider_and_features(
         r#"model User {
@@ -335,7 +335,7 @@ fn remove_partial_index_predicate_sqlite(api: TestApi) {
     });
 }
 
-#[test_connector(tags(Sqlite))]
+#[test_connector(tags(Sqlite), preview_features("partialIndexes"))]
 fn add_partial_index_predicate_sqlite(api: TestApi) {
     let dm1 = api.datamodel_with_provider_and_features(
         r#"model User {
@@ -372,7 +372,7 @@ fn add_partial_index_predicate_sqlite(api: TestApi) {
     });
 }
 
-#[test_connector(tags(Mssql))]
+#[test_connector(tags(Mssql), preview_features("partialIndexes"))]
 fn partial_unique_index_on_mssql(api: TestApi) {
     let dm = api.datamodel_with_provider_and_features(
         r#"model User {
@@ -397,7 +397,7 @@ fn partial_unique_index_on_mssql(api: TestApi) {
     api.schema_push(&dm).send().assert_no_steps();
 }
 
-#[test_connector(tags(Mssql))]
+#[test_connector(tags(Mssql), preview_features("partialIndexes"))]
 fn partial_normal_index_on_mssql(api: TestApi) {
     let dm = api.datamodel_with_provider_and_features(
         r#"model User {
@@ -422,7 +422,7 @@ fn partial_normal_index_on_mssql(api: TestApi) {
     api.schema_push(&dm).send().assert_no_steps();
 }
 
-#[test_connector(tags(Mssql))]
+#[test_connector(tags(Mssql), preview_features("partialIndexes"))]
 fn compound_partial_unique_index_on_mssql(api: TestApi) {
     let dm = api.datamodel_with_provider_and_features(
         r#"model User {
@@ -448,7 +448,7 @@ fn compound_partial_unique_index_on_mssql(api: TestApi) {
     api.schema_push(&dm).send().assert_no_steps();
 }
 
-#[test_connector(tags(Mssql))]
+#[test_connector(tags(Mssql), preview_features("partialIndexes"))]
 fn modify_partial_index_predicate_mssql(api: TestApi) {
     let dm1 = api.datamodel_with_provider_and_features(
         r#"model User {
@@ -485,7 +485,7 @@ fn modify_partial_index_predicate_mssql(api: TestApi) {
     });
 }
 
-#[test_connector(tags(Mssql))]
+#[test_connector(tags(Mssql), preview_features("partialIndexes"))]
 fn remove_partial_index_predicate_mssql(api: TestApi) {
     let dm1 = api.datamodel_with_provider_and_features(
         r#"model User {
@@ -520,7 +520,7 @@ fn remove_partial_index_predicate_mssql(api: TestApi) {
     });
 }
 
-#[test_connector(tags(Mssql))]
+#[test_connector(tags(Mssql), preview_features("partialIndexes"))]
 fn add_partial_index_predicate_mssql(api: TestApi) {
     let dm1 = api.datamodel_with_provider_and_features(
         r#"model User {
@@ -557,7 +557,7 @@ fn add_partial_index_predicate_mssql(api: TestApi) {
     });
 }
 
-#[test_connector(tags(CockroachDb))]
+#[test_connector(tags(CockroachDb), preview_features("partialIndexes"))]
 fn partial_unique_index_on_cockroachdb(api: TestApi) {
     let dm = api.datamodel_with_provider_and_features(
         r#"model User {
@@ -580,7 +580,7 @@ fn partial_unique_index_on_cockroachdb(api: TestApi) {
     api.schema_push(&dm).send().assert_no_steps();
 }
 
-#[test_connector(tags(CockroachDb))]
+#[test_connector(tags(CockroachDb), preview_features("partialIndexes"))]
 fn partial_normal_index_on_cockroachdb(api: TestApi) {
     let dm = api.datamodel_with_provider_and_features(
         r#"model User {
@@ -603,7 +603,7 @@ fn partial_normal_index_on_cockroachdb(api: TestApi) {
     api.schema_push(&dm).send().assert_no_steps();
 }
 
-#[test_connector(tags(CockroachDb))]
+#[test_connector(tags(CockroachDb), preview_features("partialIndexes"))]
 fn compound_partial_unique_index_on_cockroachdb(api: TestApi) {
     let dm = api.datamodel_with_provider_and_features(
         r#"model User {
@@ -629,7 +629,7 @@ fn compound_partial_unique_index_on_cockroachdb(api: TestApi) {
     api.schema_push(&dm).send().assert_no_steps();
 }
 
-#[test_connector(tags(Postgres), exclude(CockroachDb))]
+#[test_connector(tags(Postgres), exclude(CockroachDb), preview_features("partialIndexes"))]
 fn partial_index_object_literal_camel_case_postgres(api: TestApi) {
     let dm = api.datamodel_with_provider_and_features(
         r#"model User {
@@ -654,7 +654,7 @@ fn partial_index_object_literal_camel_case_postgres(api: TestApi) {
     api.schema_push(&dm).send().assert_no_steps();
 }
 
-#[test_connector(tags(Sqlite))]
+#[test_connector(tags(Sqlite), preview_features("partialIndexes"))]
 fn partial_index_object_literal_camel_case_sqlite(api: TestApi) {
     let dm = api.datamodel_with_provider_and_features(
         r#"model User {
@@ -679,7 +679,7 @@ fn partial_index_object_literal_camel_case_sqlite(api: TestApi) {
     api.schema_push(&dm).send().assert_no_steps();
 }
 
-#[test_connector(tags(Mssql))]
+#[test_connector(tags(Mssql), preview_features("partialIndexes"))]
 fn partial_index_object_literal_camel_case_mssql(api: TestApi) {
     let dm = api.datamodel_with_provider_and_features(
         r#"model User {
@@ -701,5 +701,311 @@ fn partial_index_object_literal_camel_case_mssql(api: TestApi) {
         })
     });
 
+    api.schema_push(&dm).send().assert_no_steps();
+}
+
+#[test_connector(tags(Mssql), preview_features("partialIndexes"))]
+fn partial_index_with_whitespace_normalization_is_idempotent_mssql(api: TestApi) {
+    let dm = api.datamodel_with_provider_and_features(
+        r#"model User {
+            id     Int    @id
+            email  String
+            status String
+
+            @@index([email], where: raw("[status] = 'active'"))
+        }"#,
+        &[],
+        PREVIEW_FEATURES,
+    );
+
+    api.schema_push(&dm).send().assert_green();
+    api.schema_push(&dm).send().assert_no_steps();
+}
+
+#[test_connector(tags(Mssql), preview_features("partialIndexes"))]
+fn partial_index_with_comparison_normalization_is_idempotent_mssql(api: TestApi) {
+    let dm = api.datamodel_with_provider_and_features(
+        r#"model OrderLineItemAllocation {
+            id                Int     @id
+            lineItemId        Int     @map("line_item_id")
+            containerQuantity Decimal @map("container_quantity")
+            pulledQuantity    Decimal @map("pulled_quantity")
+
+            @@index([lineItemId, containerQuantity, pulledQuantity], where: raw("[container_quantity] > 0"))
+            @@map("order_line_item_allocation")
+        }"#,
+        &[],
+        PREVIEW_FEATURES,
+    );
+
+    api.schema_push(&dm).send().assert_green();
+    api.schema_push(&dm).send().assert_no_steps();
+}
+
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
+fn db_partial_index_not_recreated_without_preview_feature_postgres(api: TestApi) {
+    let schema_name = api.schema_name();
+    let dm = api.datamodel_with_provider(
+        r#"model User {
+            id    Int    @id
+            email String
+
+            @@index([email])
+        }"#,
+    );
+
+    api.schema_push(&dm).send().assert_green();
+
+    api.raw_cmd(&format!(
+        "DROP INDEX \"{schema_name}\".\"User_email_idx\"; CREATE INDEX \"User_email_idx\" ON \"{schema_name}\".\"User\" (email) WHERE email IS NOT NULL;"
+    ));
+
+    api.schema_push(&dm).send().assert_no_steps();
+}
+
+#[test_connector(tags(Mssql))]
+fn db_partial_index_not_recreated_without_preview_feature_mssql(api: TestApi) {
+    let schema = api.schema_name();
+    let dm = api.datamodel_with_provider(
+        r#"model User {
+            id    Int    @id
+            email String
+
+            @@index([email])
+        }"#,
+    );
+
+    api.schema_push(&dm).send().assert_green();
+
+    api.raw_cmd(&format!(
+        "DROP INDEX [User_email_idx] ON [{schema}].[User]; CREATE INDEX [User_email_idx] ON [{schema}].[User] ([email]) WHERE [email] IS NOT NULL;"
+    ));
+
+    api.schema_push(&dm).send().assert_no_steps();
+}
+
+#[test_connector(tags(Sqlite))]
+fn db_partial_index_not_recreated_without_preview_feature_sqlite(api: TestApi) {
+    let dm = api.datamodel_with_provider(
+        r#"model User {
+            id    Int    @id
+            email String
+
+            @@index([email])
+        }"#,
+    );
+
+    api.schema_push(&dm).send().assert_green();
+
+    api.raw_cmd(
+        "DROP INDEX \"User_email_idx\"; CREATE INDEX \"User_email_idx\" ON \"User\" (email) WHERE email IS NOT NULL;",
+    );
+
+    api.schema_push(&dm).send().assert_no_steps();
+}
+
+#[test_connector(tags(Postgres), exclude(CockroachDb), preview_features("partialIndexes"))]
+fn partial_index_with_enum_cast_is_idempotent_postgres(api: TestApi) {
+    let dm = api.datamodel_with_provider_and_features(
+        r#"model ProductionItem {
+            id     Int              @id
+            status ProductionStatus @default(PLANNED)
+
+            @@index([status], where: raw("status != 'COMPLETED'::production_status"))
+            @@map("production_item")
+        }
+
+        enum ProductionStatus {
+            PLANNED
+            IN_PRODUCTION
+            READY
+            COMPLETED
+
+            @@map("production_status")
+        }"#,
+        &[],
+        PREVIEW_FEATURES,
+    );
+
+    api.schema_push(&dm).send().assert_green();
+    api.schema_push(&dm).send().assert_no_steps();
+}
+
+#[test_connector(tags(Postgres), exclude(CockroachDb), preview_features("partialIndexes"))]
+fn partial_index_with_numeric_literal_cast_is_idempotent_postgres(api: TestApi) {
+    let dm = api.datamodel_with_provider_and_features(
+        r#"model OrderLineItemAllocation {
+            id                Int     @id
+            lineItemId        Int     @map("line_item_id")
+            containerQuantity Decimal @map("container_quantity")
+            pulledQuantity    Decimal @map("pulled_quantity")
+
+            @@index([lineItemId, containerQuantity, pulledQuantity], where: raw("container_quantity > 0"))
+            @@map("order_line_item_allocation")
+        }"#,
+        &[],
+        PREVIEW_FEATURES,
+    );
+
+    api.schema_push(&dm).send().assert_green();
+    api.schema_push(&dm).send().assert_no_steps();
+}
+
+#[test_connector(tags(Postgres), exclude(CockroachDb), preview_features("partialIndexes"))]
+fn partial_index_with_lossy_float_to_int_cast_is_idempotent_postgres(api: TestApi) {
+    let dm = api.datamodel_with_provider_and_features(
+        r#"model Item {
+            id    Int     @id
+            price Decimal
+
+            @@index([price], where: raw("price > 3.14::integer"))
+        }"#,
+        &[],
+        PREVIEW_FEATURES,
+    );
+
+    api.schema_push(&dm).send().assert_green();
+    api.schema_push(&dm).send().assert_no_steps();
+}
+
+#[test_connector(tags(Postgres), exclude(CockroachDb), preview_features("partialIndexes"))]
+fn partial_index_with_double_cast_truncation_is_idempotent_postgres(api: TestApi) {
+    let dm = api.datamodel_with_provider_and_features(
+        r#"model Item {
+            id    Int     @id
+            price Decimal
+
+            @@index([price], where: raw("price > 3.14::integer::numeric"))
+        }"#,
+        &[],
+        PREVIEW_FEATURES,
+    );
+
+    api.schema_push(&dm).send().assert_green();
+    api.schema_push(&dm).send().assert_no_steps();
+}
+
+#[test_connector(tags(Postgres), exclude(CockroachDb), preview_features("partialIndexes"))]
+fn partial_index_cast_type_change_triggers_migration_postgres(api: TestApi) {
+    let dm1 = api.datamodel_with_provider_and_features(
+        r#"model Item {
+            id    Int     @id
+            price Decimal
+
+            @@index([price], where: raw("price > 3.14::integer"))
+        }"#,
+        &[],
+        PREVIEW_FEATURES,
+    );
+
+    api.schema_push(&dm1).send().assert_green();
+    api.schema_push(&dm1).send().assert_no_steps();
+
+    let dm2 = api.datamodel_with_provider_and_features(
+        r#"model Item {
+            id    Int     @id
+            price Decimal
+
+            @@index([price], where: raw("price > 3.14::numeric"))
+        }"#,
+        &[],
+        PREVIEW_FEATURES,
+    );
+
+    api.schema_push(&dm2).force(true).send().assert_has_executed_steps();
+    api.schema_push(&dm2).send().assert_no_steps();
+}
+
+#[test_connector(tags(Postgres), exclude(CockroachDb), preview_features("partialIndexes"))]
+fn partial_index_with_compound_and_or_predicate_is_idempotent_postgres(api: TestApi) {
+    let dm = api.datamodel_with_provider_and_features(
+        r#"model Order {
+            id       Int     @id
+            status   String
+            quantity Int
+            priority Int
+
+            @@index([status], where: raw("status = 'active' AND (quantity > 0 OR priority > 5)"))
+        }"#,
+        &[],
+        PREVIEW_FEATURES,
+    );
+
+    api.schema_push(&dm).send().assert_green();
+    api.schema_push(&dm).send().assert_no_steps();
+}
+
+#[test_connector(tags(Postgres), exclude(CockroachDb), preview_features("partialIndexes"))]
+fn partial_index_object_literal_multiple_fields_is_idempotent_postgres(api: TestApi) {
+    let dm = api.datamodel_with_provider_and_features(
+        r#"model User {
+            id        Int      @id
+            email     String
+            active    Boolean
+            deletedAt DateTime?
+
+            @@unique([email], where: { active: true, deletedAt: null })
+        }"#,
+        &[],
+        PREVIEW_FEATURES,
+    );
+
+    api.schema_push(&dm).send().assert_green();
+    api.schema_push(&dm).send().assert_no_steps();
+}
+
+#[test_connector(tags(Postgres), exclude(CockroachDb), preview_features("partialIndexes"))]
+fn partial_index_object_literal_not_equals_is_idempotent_postgres(api: TestApi) {
+    let dm = api.datamodel_with_provider_and_features(
+        r#"model User {
+            id     Int    @id
+            email  String
+            status String
+
+            @@unique([email], where: { status: { not: "deleted" } })
+        }"#,
+        &[],
+        PREVIEW_FEATURES,
+    );
+
+    api.schema_push(&dm).send().assert_green();
+    api.schema_push(&dm).send().assert_no_steps();
+}
+
+#[test_connector(tags(Postgres), exclude(CockroachDb), preview_features("partialIndexes"))]
+fn partial_index_implicit_precedence_and_or_roundtrip_postgres(api: TestApi) {
+    let dm = api.datamodel_with_provider_and_features(
+        r#"model Item {
+            id Int @id
+            a  Int
+            b  Int
+            c  Int
+
+            @@index([a], where: raw("a = 1 OR b = 2 AND c = 3"))
+        }"#,
+        &[],
+        PREVIEW_FEATURES,
+    );
+
+    api.schema_push(&dm).send().assert_green();
+    api.schema_push(&dm).send().assert_no_steps();
+}
+
+#[test_connector(tags(Postgres), exclude(CockroachDb), preview_features("partialIndexes"))]
+fn partial_index_not_with_and_or_roundtrip_postgres(api: TestApi) {
+    let dm = api.datamodel_with_provider_and_features(
+        r#"model Item {
+            id Int @id
+            a  Int
+            b  Int
+            c  Int
+
+            @@index([a], where: raw("NOT (a = 1 AND b = 2) OR c = 3"))
+        }"#,
+        &[],
+        PREVIEW_FEATURES,
+    );
+
+    api.schema_push(&dm).send().assert_green();
     api.schema_push(&dm).send().assert_no_steps();
 }
