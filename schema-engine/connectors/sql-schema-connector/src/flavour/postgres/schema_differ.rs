@@ -750,7 +750,7 @@ fn push_alter_enum_previous_usages_as_default(db: &DifferDatabase<'_>, alter_enu
 // Accounts for PG expression normalization (operator aliases, parens, implicit literal casts).
 fn pg_predicates_semantically_equal(a: &str, b: &str) -> bool {
     use sqlparser::{
-        ast::{BinaryOperator, Value, VisitMut, VisitorMut},
+        ast::{Value, VisitMut, VisitorMut},
         dialect::PostgreSqlDialect,
         parser::Parser,
     };
@@ -762,69 +762,14 @@ fn pg_predicates_semantically_equal(a: &str, b: &str) -> bool {
         type Break = ();
 
         fn post_visit_expr(&mut self, expr: &mut Expr) -> ControlFlow<()> {
-            if !matches!(
-                expr,
-                Expr::Nested(_)
-                    | Expr::AnyOp {
-                        compare_op: BinaryOperator::Eq,
-                        is_some: false,
-                        ..
-                    }
-                    | Expr::AllOp {
-                        compare_op: BinaryOperator::NotEq,
-                        ..
-                    }
-            ) {
+            if !matches!(expr, Expr::Nested(_)) {
                 return ControlFlow::Continue(());
             }
 
             let placeholder = Expr::value(Value::Null);
 
-            match std::mem::replace(expr, placeholder) {
-                Expr::Nested(inner) => *expr = *inner,
-                // PG rewrites `x IN (v1, v2)` to `x = ANY(ARRAY[v1::t, v2::t])`.
-                Expr::AnyOp {
-                    left,
-                    right,
-                    compare_op,
-                    is_some,
-                } => {
-                    if let Expr::Array(arr) = *right {
-                        *expr = Expr::InList {
-                            expr: left,
-                            list: arr.elem,
-                            negated: false,
-                        };
-                    } else {
-                        *expr = Expr::AnyOp {
-                            left,
-                            compare_op,
-                            right,
-                            is_some,
-                        };
-                    }
-                }
-                // PG rewrites `x NOT IN (v1, v2)` to `x <> ALL(ARRAY[v1::t, v2::t])`.
-                Expr::AllOp {
-                    left,
-                    right,
-                    compare_op,
-                } => {
-                    if let Expr::Array(arr) = *right {
-                        *expr = Expr::InList {
-                            expr: left,
-                            list: arr.elem,
-                            negated: true,
-                        };
-                    } else {
-                        *expr = Expr::AllOp {
-                            left,
-                            compare_op,
-                            right,
-                        };
-                    }
-                }
-                other => *expr = other,
+            if let Expr::Nested(inner) = std::mem::replace(expr, placeholder) {
+                *expr = *inner;
             }
 
             ControlFlow::Continue(())
@@ -940,21 +885,6 @@ fn exprs_semantically_eq(a: &Expr, b: &Expr) -> bool {
             },
         ) if na == nb => {
             exprs_semantically_eq(ea, eb) && exprs_semantically_eq(la, lb) && exprs_semantically_eq(ha, hb)
-        }
-
-        (
-            Expr::InList {
-                expr: ea,
-                list: la,
-                negated: na,
-            },
-            Expr::InList {
-                expr: eb,
-                list: lb,
-                negated: nb,
-            },
-        ) if na == nb && la.len() == lb.len() => {
-            exprs_semantically_eq(ea, eb) && la.iter().zip(lb).all(|(a, b)| exprs_semantically_eq(a, b))
         }
 
         (

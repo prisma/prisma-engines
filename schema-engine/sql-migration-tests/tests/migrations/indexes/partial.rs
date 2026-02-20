@@ -1009,39 +1009,3 @@ fn partial_index_not_with_and_or_roundtrip_postgres(api: TestApi) {
     api.schema_push(&dm).send().assert_green();
     api.schema_push(&dm).send().assert_no_steps();
 }
-
-#[test_connector(tags(Postgres), exclude(CockroachDb), preview_features("partialIndexes"))]
-fn partial_index_with_in_list_predicate_is_idempotent_postgres(api: TestApi) {
-    let dm = api.datamodel_with_provider_and_features(
-        r#"model User {
-            id     Int    @id
-            email  String
-            status String
-
-            @@index([email], where: raw("status IN ('active', 'pending')"))
-        }"#,
-        &[],
-        PREVIEW_FEATURES,
-    );
-
-    api.schema_push(&dm).send().assert_green();
-    api.schema_push(&dm).send().assert_no_steps();
-}
-
-#[test_connector(tags(Postgres), exclude(CockroachDb), preview_features("partialIndexes"))]
-fn partial_index_with_not_in_list_predicate_is_idempotent_postgres(api: TestApi) {
-    let dm = api.datamodel_with_provider_and_features(
-        r#"model User {
-            id     Int    @id
-            email  String
-            status String
-
-            @@index([email], where: raw("status NOT IN ('deleted', 'archived')"))
-        }"#,
-        &[],
-        PREVIEW_FEATURES,
-    );
-
-    api.schema_push(&dm).send().assert_green();
-    api.schema_push(&dm).send().assert_no_steps();
-}
