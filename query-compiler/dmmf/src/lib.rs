@@ -21,6 +21,15 @@ pub fn dmmf_json_from_validated_schema(schema: ValidatedSchema) -> String {
     serde_json::to_string(&dmmf).unwrap()
 }
 
+/// Serialize DMMF JSON directly to a writer without building an intermediate String or Vec.
+/// Uses serde_json::to_writer() which streams JSON tokens incrementally.
+/// This avoids both V8's string limit and WASM memory limits.
+/// See: https://github.com/prisma/prisma/issues/29111
+pub fn dmmf_json_to_writer<W: std::io::Write>(schema: ValidatedSchema, writer: W) -> serde_json::Result<()> {
+    let dmmf = from_precomputed_parts(&schema::build(Arc::new(schema), true));
+    serde_json::to_writer(writer, &dmmf)
+}
+
 pub fn dmmf_from_schema(schema: &str) -> DataModelMetaFormat {
     let schema = Arc::new(psl::parse_schema_without_extensions(schema).unwrap());
     from_precomputed_parts(&schema::build(schema, true))

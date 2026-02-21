@@ -41,6 +41,11 @@ pub enum FmtOpts {
     PreviewFeatures,
     /// Artificially panic (for testing the CLI)
     DebugPanic,
+    /// Generate DMMF JSON from schema, streaming to stdout.
+    /// Reads JSON params from stdin, streams DMMF to stdout via serde_json::to_writer().
+    /// This has no memory ceiling — unlike WASM, the binary can stream arbitrarily large DMMF.
+    /// See: https://github.com/prisma/prisma/issues/29111
+    GetDmmf,
 }
 
 fn main() {
@@ -51,6 +56,18 @@ fn main() {
         FmtOpts::NativeTypes => plug(native::run),
         FmtOpts::ReferentialActions => plug(actions::run),
         FmtOpts::PreviewFeatures => plug(|_s| preview::run()),
+        FmtOpts::GetDmmf => {
+            let mut input = String::new();
+            io::stdin()
+                .read_to_string(&mut input)
+                .expect("Unable to read from stdin.");
+            let stdout = io::stdout();
+            let writer = io::BufWriter::new(stdout.lock());
+            if let Err(e) = prisma_fmt::get_dmmf_to_writer(&input, writer) {
+                eprintln!("{e}");
+                std::process::exit(1);
+            }
+        }
     }
 }
 

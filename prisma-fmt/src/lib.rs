@@ -303,6 +303,12 @@ pub fn get_dmmf(get_dmmf_params: String) -> Result<String, String> {
     get_dmmf::get_dmmf(&get_dmmf_params)
 }
 
+/// Stream DMMF JSON directly to a writer. No intermediate allocation.
+/// See: https://github.com/prisma/prisma/issues/29111
+pub fn get_dmmf_to_writer<W: std::io::Write>(get_dmmf_params: &str, writer: W) -> Result<(), String> {
+    get_dmmf::get_dmmf_to_writer(get_dmmf_params, writer)
+}
+
 pub fn get_datamodel(get_datamodel_params: String) -> Result<String, String> {
     get_datamodel::get_datamodel(&get_datamodel_params)
 }
