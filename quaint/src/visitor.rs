@@ -624,7 +624,7 @@ pub trait Visitor<'a> {
             ExpressionKind::ConditionTree(tree) => self.visit_conditions(tree)?,
             ExpressionKind::Compare(compare) => self.visit_compare(compare)?,
             ExpressionKind::Parameterized(val) => self.visit_parameterized(val)?,
-            ExpressionKind::ParameterizedRow(val) => self.visit_parameterized_row(val, "(", ",", ")")?,
+            ExpressionKind::ParameterizedRow(val) => self.visit_parameterized_row(val, "", ",", "")?,
             ExpressionKind::RawValue(val) => self.visit_raw_value(val.0)?,
             ExpressionKind::Column(column) => self.visit_column(*column)?,
             ExpressionKind::Row(row) => self.visit_row(row)?,
@@ -902,7 +902,7 @@ pub trait Visitor<'a> {
                 ) => {
                     self.visit_expression(left)?;
                     self.write(" IN ")?;
-                    self.visit_parameterized_row(value, "(", ",", ")")
+                    self.visit_parameterized_row(value, "", ",", "")
                 }
 
                 // expr IN (CALL(?), CALL(?), ..., CALL(?))
@@ -1021,6 +1021,30 @@ pub trait Visitor<'a> {
                     self.visit_compare(Compare::NotIn(Box::new(col), Box::new(rhs)))
                 }
 
+                // expr NOT IN (?, ?, ..., ?)
+                (
+                    left,
+                    Expression {
+                        kind: ExpressionKind::ParameterizedRow(value),
+                        ..
+                    },
+                ) => {
+                    self.visit_expression(left)?;
+                    self.write(" NOT IN ")?;
+                    self.visit_parameterized_row(value, "", ",", "")
+                }
+
+                (
+                    Expression {
+                        kind: ExpressionKind::Row(row),
+                        ..
+                    },
+                    Expression {
+                        kind: ExpressionKind::Values(values),
+                        ..
+                    },
+                ) => self.visit_multiple_tuple_comparison(row, *values, true),
+
                 // expr NOT IN (CALL(?), CALL(?), ..., CALL(?))
                 (
                     left,
@@ -1049,30 +1073,6 @@ pub trait Visitor<'a> {
 
                     self.visit_parameterized_row(val.clone(), format!("{function_name}("), ",", ")")
                 }
-
-                // expr NOT IN (?, ?, ..., ?)
-                (
-                    left,
-                    Expression {
-                        kind: ExpressionKind::ParameterizedRow(value),
-                        ..
-                    },
-                ) => {
-                    self.visit_expression(left)?;
-                    self.write(" NOT IN ")?;
-                    self.visit_parameterized_row(value, "(", ",", ")")
-                }
-
-                (
-                    Expression {
-                        kind: ExpressionKind::Row(row),
-                        ..
-                    },
-                    Expression {
-                        kind: ExpressionKind::Values(values),
-                        ..
-                    },
-                ) => self.visit_multiple_tuple_comparison(row, *values, true),
 
                 // expr IN (..)
                 (left, right) => {
