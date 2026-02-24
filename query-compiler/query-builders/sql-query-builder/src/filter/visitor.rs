@@ -1159,7 +1159,7 @@ fn insensitive_scalar_filter(
         ScalarCondition::In(ConditionListValue::Placeholder(placeholder)) => {
             let comparable = Expression::from(lower(comparable));
             let sql_value = convert_first_value(fields, PrismaValue::from(placeholder), alias, ctx);
-            comparable.in_selection(sql_value.into_parameterized_row())
+            comparable.in_selection(lower(sql_value.into_parameterized_row()))
         }
         ScalarCondition::NotIn(ConditionListValue::List(values)) => match values.split_first() {
             Some((PrismaValue::List(_), _)) => {
@@ -1195,7 +1195,7 @@ fn insensitive_scalar_filter(
         ScalarCondition::NotIn(ConditionListValue::Placeholder(placeholder)) => {
             let comparable = Expression::from(lower(comparable));
             let sql_value = convert_first_value(fields, PrismaValue::from(placeholder), alias, ctx);
-            comparable.not_in_selection(sql_value.into_parameterized_row())
+            comparable.not_in_selection(lower(sql_value.into_parameterized_row()))
         }
         ScalarCondition::Search(value, _) => {
             reachable_only_with_capability!(ConnectorCapability::NativeFullTextSearch);
