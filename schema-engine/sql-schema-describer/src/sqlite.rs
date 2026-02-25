@@ -275,7 +275,7 @@ impl<'a> SqlSchemaDescriber<'a> {
 /// so we need to add parentheses when generating prisma schema.
 /// See <https://github.com/prisma/prisma/issues/29064>
 fn wrap_in_parentheses(s: &str) -> Cow<'_, str> {
-    if !s.starts_with('(') && s.ends_with(')') {
+    if !(s.starts_with('(') && s.ends_with(')')) {
         format!("({})", s).into()
     } else {
         s.into()
