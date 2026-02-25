@@ -83,6 +83,7 @@ pub enum Expression {
     Required(Box<Expression>),
 
     /// Application-level join.
+    #[serde(rename_all = "camelCase")]
     Join {
         parent: Box<Expression>,
         children: Vec<JoinExpression>,
@@ -104,6 +105,7 @@ pub enum Expression {
     },
 
     /// Validates the expression according to the data rule and throws an error if it doesn't match.
+    #[serde(rename_all = "camelCase")]
     Validate {
         expr: Box<Expression>,
         rules: Vec<DataRule>,
