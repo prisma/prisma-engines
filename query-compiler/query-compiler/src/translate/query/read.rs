@@ -143,6 +143,9 @@ pub(super) fn add_inmemory_join(
         })
         .collect();
 
+    let can_assume_strict_equality = nested
+        .iter()
+        .all(|nested| nested.model().dm.schema.connector.can_assume_strict_equality_in_joins());
     let join_expressions = nested
         .into_iter()
         .filter_map(|nested| match nested {
@@ -197,6 +200,7 @@ pub(super) fn add_inmemory_join(
                     name: binding::join_parent(),
                 }),
                 children: join_expressions,
+                can_assume_strict_equality,
             }),
         }),
     })

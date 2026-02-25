@@ -86,6 +86,7 @@ pub enum Expression {
     Join {
         parent: Box<Expression>,
         children: Vec<JoinExpression>,
+        can_assume_strict_equality: bool,
     },
 
     /// Get a field from a record or records. If the argument is a list of records,
@@ -194,7 +195,7 @@ impl Expression {
             Expression::Required(expr) => {
                 expr.simplify();
             }
-            Expression::Join { parent, children } => {
+            Expression::Join { parent, children, .. } => {
                 parent.simplify();
                 children.iter_mut().for_each(|child| child.child.simplify());
             }
