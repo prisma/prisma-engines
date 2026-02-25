@@ -311,7 +311,7 @@ pub trait Connector: Send + Sync {
     }
 
     fn can_assume_strict_equality_in_joins(&self) -> bool {
-        true
+        false
     }
 }
 

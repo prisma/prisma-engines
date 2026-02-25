@@ -314,10 +314,6 @@ impl Connector for MySqlDatamodelConnector {
     fn supports_shard_keys(&self) -> bool {
         true
     }
-
-    fn can_assume_strict_equality_in_joins(&self) -> bool {
-        false
-    }
 }
 
 /// Removes newlines from a base64 string.
