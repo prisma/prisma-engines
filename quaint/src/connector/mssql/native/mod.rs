@@ -66,7 +66,8 @@ pub struct Mssql {
 impl Mssql {
     /// Creates a new connection to SQL Server.
     pub async fn new(url: MssqlUrl) -> crate::Result<Self> {
-        let config = Config::from_jdbc_string(&url.connection_string)?;
+        let mut config = Config::from_jdbc_string(&url.connection_string)?;
+        config.database(url.dbname());
         let tcp = TcpStream::connect_named(&config).await?;
         let socket_timeout = url.socket_timeout();
 
@@ -75,6 +76,7 @@ impl Mssql {
                 Ok(client) => Ok(client),
                 Err(tiberius::error::Error::Routing { host, port }) => {
                     let mut config = Config::from_jdbc_string(&url.connection_string)?;
+                    config.database(url.dbname());
                     config.host(host);
                     config.port(port);
 
