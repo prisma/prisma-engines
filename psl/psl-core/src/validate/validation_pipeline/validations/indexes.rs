@@ -1,5 +1,6 @@
 use super::{constraint_namespace::ConstraintName, database_name::validate_db_name};
 use crate::{
+    PreviewFeature,
     datamodel_connector::{ConnectorCapability, walker_ext_traits::*},
     diagnostics::DatamodelError,
     validate::validation_pipeline::context::Context,
@@ -396,6 +397,35 @@ pub(super) fn unique_client_name_does_not_clash_with_field(index: IndexWalker<'_
             container_type,
             index.model().name(),
             index.ast_attribute().span,
+        ));
+    }
+}
+
+/// The database must support partial indexes for the `where` clause to be allowed.
+pub(crate) fn partial_index_supported(index: IndexWalker<'_>, ctx: &mut Context<'_>) {
+    if !index.is_partial() {
+        return;
+    }
+
+    let span = index
+        .ast_attribute()
+        .span_for_argument("where")
+        .unwrap_or_else(|| index.ast_attribute().span);
+
+    if !ctx.preview_features.contains(PreviewFeature::PartialIndexes) {
+        ctx.push_error(DatamodelError::new_attribute_validation_error(
+            "Partial indexes are a preview feature. Add \"partialIndexes\" to previewFeatures in your generator block.",
+            index.attribute_name(),
+            span,
+        ));
+        return;
+    }
+
+    if !ctx.has_capability(ConnectorCapability::PartialIndex) {
+        ctx.push_error(DatamodelError::new_attribute_validation_error(
+            "Partial indexes (with a `where` clause) are not supported by the current connector.",
+            index.attribute_name(),
+            span,
         ));
     }
 }

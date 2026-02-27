@@ -39,9 +39,9 @@ pub enum Compare<'a> {
     /// All json related comparators
     JsonCompare(JsonCompare<'a>),
     /// `left` @@ to_tsquery(`value`)
-    Matches(Box<Expression<'a>>, Cow<'a, str>),
+    Matches(Box<Expression<'a>>, Box<Expression<'a>>),
     /// (NOT `left` @@ to_tsquery(`value`))
-    NotMatches(Box<Expression<'a>>, Cow<'a, str>),
+    NotMatches(Box<Expression<'a>>, Box<Expression<'a>>),
     /// ANY (`left`)
     Any(Box<Expression<'a>>),
     /// ALL (`left`)
@@ -750,7 +750,7 @@ pub trait Comparable<'a> {
     /// ```
     fn matches<T>(self, query: T) -> Compare<'a>
     where
-        T: Into<Cow<'a, str>>;
+        T: Into<Expression<'a>>;
 
     /// Tests if a full-text search does not match a certain query. Use it in combination with the `text_search()` function
     ///
@@ -773,7 +773,7 @@ pub trait Comparable<'a> {
     /// ```
     fn not_matches<T>(self, query: T) -> Compare<'a>
     where
-        T: Into<Cow<'a, str>>;
+        T: Into<Expression<'a>>;
 
     /// Matches at least one elem of a list of values.
     ///
@@ -1047,7 +1047,7 @@ where
 
     fn matches<T>(self, query: T) -> Compare<'a>
     where
-        T: Into<Cow<'a, str>>,
+        T: Into<Expression<'a>>,
     {
         let col: Column<'a> = self.into();
         let val: Expression<'a> = col.into();
@@ -1057,7 +1057,7 @@ where
 
     fn not_matches<T>(self, query: T) -> Compare<'a>
     where
-        T: Into<Cow<'a, str>>,
+        T: Into<Expression<'a>>,
     {
         let col: Column<'a> = self.into();
         let val: Expression<'a> = col.into();

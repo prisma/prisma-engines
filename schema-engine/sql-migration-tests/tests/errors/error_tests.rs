@@ -500,3 +500,95 @@ async fn connection_string_problems_give_a_nice_error() {
         assert_eq!(expected, json_error);
     }
 }
+
+#[tokio::test]
+async fn missing_datasource_url_gives_proper_error() {
+    let dm = r#"
+        datasource db {
+            provider = "postgresql"
+        }
+
+        model User {
+            id Int @id
+        }
+    "#;
+
+    let datasource_urls = DatasourceUrls {
+        url: None,
+        shadow_database_url: None,
+    };
+
+    let mut api = schema_core::schema_api_without_extensions(Some(dm.to_owned()), datasource_urls, None).unwrap();
+
+    let error = api
+        .ensure_connection_validity(EnsureConnectionValidityParams {
+            datasource: DatasourceParam::Schema(SchemasContainer {
+                files: vec![SchemaContainer {
+                    path: "schema.prisma".to_string(),
+                    content: dm.to_string(),
+                }],
+            }),
+        })
+        .await
+        .unwrap_err();
+
+    api.dispose().await.unwrap();
+
+    let json_error = serde_json::to_value(error.to_user_facing()).unwrap();
+    assert!(
+        json_error["message"]
+            .as_str()
+            .unwrap()
+            .contains("No URL defined in the configured datasource"),
+        "Expected error message about missing URL, got: {}",
+        json_error["message"]
+    );
+}
+
+#[tokio::test]
+async fn diff_from_empty_schema_to_datamodel_should_not_require_url() {
+    use schema_core::json_rpc::types::{DiffParams, DiffTarget, SchemaContainer, SchemaFilter, SchemasContainer};
+
+    let dm = r#"
+        datasource db {
+            provider = "postgresql"
+        }
+
+        model User {
+            id Int @id
+            name String
+        }
+    "#;
+
+    let datasource_urls = DatasourceUrls {
+        url: None,
+        shadow_database_url: None,
+    };
+
+    let mut api = schema_core::schema_api_without_extensions(Some(dm.to_owned()), datasource_urls, None).unwrap();
+
+    // This should succeed because we're doing a schema-only diff that doesn't require database connection
+    let result = api
+        .diff(DiffParams {
+            from: DiffTarget::Empty,
+            to: DiffTarget::SchemaDatamodel(SchemasContainer {
+                files: vec![SchemaContainer {
+                    path: "schema.prisma".to_string(),
+                    content: dm.to_string(),
+                }],
+            }),
+            shadow_database_url: None,
+            script: false,
+            exit_code: None,
+            filters: SchemaFilter::default(),
+        })
+        .await;
+
+    api.dispose().await.unwrap();
+
+    assert!(
+        result.is_ok(),
+        "Schema-only diff should not require datasource URL, but got error: {:?}",
+        result
+    );
+}

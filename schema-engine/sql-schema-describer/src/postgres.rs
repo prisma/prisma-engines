@@ -1427,6 +1427,7 @@ fn index_from_row(
         let is_primary_key = row.get_expect_bool("is_primary_key");
         let column_index = row.get_expect_i64("column_index");
         let index_algo = row.get_expect_string("index_algo");
+        let predicate = row.get_string("predicate");
 
         let sort_order = row.get_string("column_order").map(|v| match v.as_ref() {
             "ASC" => SQLSortOrder::Asc,
@@ -1460,9 +1461,15 @@ fn index_from_row(
             let index_id = if is_primary_key {
                 sql_schema.push_primary_key(table_id, index_name)
             } else if is_unique {
-                sql_schema.push_unique_constraint(table_id, index_name)
+                match predicate {
+                    Some(pred) => sql_schema.push_partial_unique_constraint(table_id, index_name, pred),
+                    None => sql_schema.push_unique_constraint(table_id, index_name),
+                }
             } else {
-                sql_schema.push_index(table_id, index_name)
+                match predicate {
+                    Some(pred) => sql_schema.push_partial_index(table_id, index_name, pred),
+                    None => sql_schema.push_index(table_id, index_name),
+                }
             };
 
             if is_primary_key || is_unique {

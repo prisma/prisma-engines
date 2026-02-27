@@ -24,7 +24,7 @@ pub use composite_type::{CompositeType, CompositeTypeId};
 pub use config::ConfigBlockProperty;
 pub use diagnostics::Span;
 pub use r#enum::{Enum, EnumValue, EnumValueId};
-pub use expression::Expression;
+pub use expression::{Expression, ObjectMember};
 pub use field::{Field, FieldArity, FieldType};
 pub use find_at_position::*;
 pub use generator_config::GeneratorConfig;

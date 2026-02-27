@@ -179,7 +179,6 @@ fn extract_order_by_relevance(
 ) -> QueryGraphBuilderResult<Option<OrderBy>> {
     let (sort_order, _) = extract_order_by_args(object.get(ordering::SORT).unwrap().clone())?;
     let search: PrismaValue = object.get(ordering::SEARCH).unwrap().clone().try_into()?;
-    let search = search.into_string().unwrap();
     let fields: PrismaValue = object.get(ordering::FIELDS).unwrap().clone().try_into()?;
 
     let fields = match fields {

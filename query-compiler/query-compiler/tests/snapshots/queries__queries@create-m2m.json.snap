@@ -46,7 +46,7 @@ transaction
                    ] orRaise "INCOMPLETE_CONNECT_INPUT";
                    2$id = mapField id (get 2)
                in execute «INSERT INTO "public"."_CategoryToPost" ("B","A")
-                           VALUES [($1)] ON CONFLICT DO NOTHING»
+                           VALUES [($1),*],* ON CONFLICT DO NOTHING»
                   params [product(var(1$id as Int[]), var(2$id as Int[]))];
       let 0 = unique (validate (get 0)
           [ rowCountNeq 0

@@ -17,7 +17,7 @@ impl TestApi {
             api: RpcApi::new(
                 None,
                 DatasourceUrls {
-                    url: args.database_url().to_owned(),
+                    url: Some(args.database_url().to_owned()),
                     shadow_database_url: args.shadow_database_url().map(ToOwned::to_owned),
                 },
                 host,

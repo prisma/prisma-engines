@@ -220,6 +220,14 @@ impl SqlSchemaCalculatorFlavour for PostgresSchemaCalculatorFlavour {
             JoinTableUniquenessConstraint::PrimaryKey
         }
     }
+
+    fn normalize_index_predicate(&self, predicate: String, _is_raw: bool) -> String {
+        if predicate.starts_with('(') && predicate.ends_with(')') {
+            predicate
+        } else {
+            format!("({predicate})")
+        }
+    }
 }
 
 fn convert_opclass(opclass: OperatorClass, algo: Option<IndexAlgorithm>) -> sql::postgres::SQLOperatorClass {

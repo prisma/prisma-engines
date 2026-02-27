@@ -54,7 +54,8 @@ const CAPABILITIES: ConnectorCapabilities = enumflags2::make_bitflags!(Connector
     SupportsTxIsolationSerializable |
     SupportsTxIsolationSnapshot |
     SupportsFiltersOnRelationsWithoutJoins |
-    SupportsDefaultInInsert
+    SupportsDefaultInInsert |
+    PartialIndex
     // InsertReturning | DeleteReturning - unimplemented.
 });
 
@@ -297,6 +298,10 @@ impl Connector for MsSqlDatamodelConnector {
     }
 
     fn does_manage_udts(&self) -> bool {
+        true
+    }
+
+    fn can_assume_strict_equality_in_joins(&self) -> bool {
         true
     }
 }

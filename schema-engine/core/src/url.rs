@@ -12,7 +12,7 @@ use crate::core_error::CoreError;
 #[serde(rename_all = "camelCase")]
 pub struct DatasourceUrls {
     /// Direct URL to the database.
-    pub url: String,
+    pub url: Option<String>,
     /// The URL to a live shadow database, if Prisma should use it instead of creating one.
     pub shadow_database_url: Option<String>,
 }
@@ -20,7 +20,7 @@ pub struct DatasourceUrls {
 /// Datasource URLs that have passed validation and are safe to consume by the schema engine.
 #[derive(Debug, Clone)]
 pub struct ValidatedDatasourceUrls {
-    url: String,
+    url: Option<String>,
     shadow_database_url: Option<String>,
 }
 
@@ -43,16 +43,8 @@ impl DatasourceUrls {
     /// Creates a `DatasourceUrls` instance containing only a primary URL.
     pub fn from_url(url: impl Into<String>) -> Self {
         Self {
-            url: url.into(),
+            url: Some(url.into()),
             shadow_database_url: None,
-        }
-    }
-
-    /// Creates a `DatasourceUrls` instance with both primary and shadow database URLs.
-    pub fn from_url_and_shadow_database_url(url: impl Into<String>, shadow_database_url: impl Into<String>) -> Self {
-        Self {
-            url: url.into(),
-            shadow_database_url: Some(shadow_database_url.into()),
         }
     }
 
@@ -61,7 +53,9 @@ impl DatasourceUrls {
         &self,
         connector: &dyn psl::datamodel_connector::Connector,
     ) -> Result<ValidatedDatasourceUrls, DatasourceError> {
-        validate_datasource_url(&self.url, connector, "url")?;
+        if let Some(url) = &self.url {
+            validate_datasource_url(url, connector, "url")?;
+        }
 
         if let Some(shadow_database_url) = &self.shadow_database_url {
             validate_datasource_url(shadow_database_url, connector, "shadowDatabaseUrl")?;
@@ -115,8 +109,8 @@ impl From<DatasourceError> for CoreError {
 
 impl ValidatedDatasourceUrls {
     /// Returns the validated primary datasource URL.
-    pub fn url(&self) -> &str {
-        &self.url
+    pub fn url(&self) -> Option<&str> {
+        self.url.as_deref()
     }
 
     /// Returns the validated shadow database URL, if any.
@@ -125,14 +119,14 @@ impl ValidatedDatasourceUrls {
     }
 
     /// Resolves relative paths in the URL against the provided configuration directory.
-    pub fn url_with_config_dir(&self, flavour: Flavour, config_dir: &Path) -> Cow<'_, str> {
-        set_config_dir(flavour, config_dir, &self.url)
+    pub fn url_with_config_dir(&self, flavour: Flavour, config_dir: &Path) -> Option<Cow<'_, str>> {
+        self.url.as_deref().map(|url| set_config_dir(flavour, config_dir, url))
     }
 
     /// Returns both URLs with relative file paths rewritten relative to the configuration directory.
     pub fn with_config_dir(&self, flavour: Flavour, config_dir: &Path) -> DatasourceUrlsWithConfigDir<'_> {
         DatasourceUrlsWithConfigDir {
-            url: set_config_dir(flavour, config_dir, &self.url),
+            url: self.url_with_config_dir(flavour, config_dir),
             shadow_database_url: self
                 .shadow_database_url
                 .as_deref()
@@ -144,14 +138,14 @@ impl ValidatedDatasourceUrls {
 /// Datasource URLs with relative paths resolved against the configuration directory.
 #[derive(Debug, Clone)]
 pub struct DatasourceUrlsWithConfigDir<'a> {
-    url: Cow<'a, str>,
+    url: Option<Cow<'a, str>>,
     shadow_database_url: Option<Cow<'a, str>>,
 }
 
 impl DatasourceUrlsWithConfigDir<'_> {
     /// Returns the primary datasource URL, with resolved paths if needed.
-    pub fn url(&self) -> &str {
-        &self.url
+    pub fn url(&self) -> Option<&str> {
+        self.url.as_deref()
     }
 
     /// Returns the shadow database URL, with resolved paths if present.

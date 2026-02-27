@@ -166,7 +166,7 @@ impl MigratePostgresUrl {
         Ok(Self(postgres_url))
     }
 
-    pub(super) fn dbname(&self) -> &str {
+    pub(super) fn dbname(&self) -> Cow<'_, str> {
         self.0.dbname()
     }
 

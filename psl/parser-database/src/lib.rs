@@ -57,7 +57,7 @@ use schema_ast::ast::{GeneratorConfig, SourceConfig};
 pub use schema_ast::{SourceFile, ast};
 pub use types::{
     IndexAlgorithm, IndexFieldPath, IndexType, OperatorClass, RelationFieldId, ScalarFieldId, ScalarFieldType,
-    ScalarType, SortOrder,
+    ScalarType, SortOrder, WhereClause, WhereCondition, WhereValue,
 };
 
 /// ParserDatabase is a container for a Schema AST, together with information

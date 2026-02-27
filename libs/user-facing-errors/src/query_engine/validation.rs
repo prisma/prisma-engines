@@ -203,7 +203,7 @@ impl ValidationError {
         let (message, meta) = if let Some(err) = underlying_err {
             let err_msg = err.to_string();
             let message = format!(
-                "Invalid argument agument value. `{}` is not a valid `{}`. Underlying error: {}",
+                "Invalid argument value. `{}` is not a valid `{}`. Underlying error: {}",
                 value, expected_argument_type, &err_msg
             );
             let argument = ArgumentDescription::new(*argument_name, vec![Cow::Borrowed(expected_argument_type)]);
@@ -211,7 +211,7 @@ impl ValidationError {
             (message, Some(meta))
         } else {
             let message = format!(
-                "Invalid argument agument value. `{}` is not a valid `{}`",
+                "Invalid argument value. `{}` is not a valid `{}`",
                 value, &expected_argument_type
             );
             let argument = ArgumentDescription::new(*argument_name, vec![Cow::Borrowed(expected_argument_type)]);

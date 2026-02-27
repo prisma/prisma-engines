@@ -165,7 +165,9 @@ BLOCK_LEVEL_CATCH_ALL = { !BLOCK_CLOSE ~ CATCH_ALL }
 // ######################################
 function_call = { path ~ arguments_list }
 array_expression = { "[" ~ (expression ~ ( "," ~ expression )*)? ~ "]" }
-expression = { function_call | array_expression | numeric_literal | string_literal | path }
+object_expression = { "{" ~ (object_member ~ ( "," ~ object_member )*)? ~ "}" }
+object_member = { identifier ~ ":" ~ expression }
+expression = { function_call | array_expression | object_expression | numeric_literal | string_literal | path }
 
 // ######################################
 // Literals / Values

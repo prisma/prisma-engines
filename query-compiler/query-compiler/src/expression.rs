@@ -83,9 +83,11 @@ pub enum Expression {
     Required(Box<Expression>),
 
     /// Application-level join.
+    #[serde(rename_all = "camelCase")]
     Join {
         parent: Box<Expression>,
         children: Vec<JoinExpression>,
+        can_assume_strict_equality: bool,
     },
 
     /// Get a field from a record or records. If the argument is a list of records,
@@ -103,6 +105,7 @@ pub enum Expression {
     },
 
     /// Validates the expression according to the data rule and throws an error if it doesn't match.
+    #[serde(rename_all = "camelCase")]
     Validate {
         expr: Box<Expression>,
         rules: Vec<DataRule>,
@@ -194,7 +197,7 @@ impl Expression {
             Expression::Required(expr) => {
                 expr.simplify();
             }
-            Expression::Join { parent, children } => {
+            Expression::Join { parent, children, .. } => {
                 parent.simplify();
                 children.iter_mut().for_each(|child| child.child.simplify());
             }

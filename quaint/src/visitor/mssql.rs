@@ -231,8 +231,15 @@ impl<'a> Visitor<'a> for Mssql<'a> {
         Ok(())
     }
 
-    fn visit_parameterized_row(&mut self, value: Value<'a>) -> visitor::Result {
-        self.query_template.write_parameter_tuple();
+    fn visit_parameterized_row(
+        &mut self,
+        value: Value<'a>,
+        item_prefix: impl Into<Cow<'static, str>>,
+        separator: impl Into<Cow<'static, str>>,
+        item_suffix: impl Into<Cow<'static, str>>,
+    ) -> visitor::Result {
+        self.query_template
+            .write_parameter_tuple(item_prefix, separator, item_suffix);
         self.query_template.parameters.push(value);
         Ok(())
     }
@@ -821,12 +828,7 @@ impl<'a> Visitor<'a> for Mssql<'a> {
         unimplemented!("Full-text search is not yet supported on MSSQL")
     }
 
-    fn visit_matches(
-        &mut self,
-        _left: Expression<'a>,
-        _right: std::borrow::Cow<'a, str>,
-        _not: bool,
-    ) -> visitor::Result {
+    fn visit_matches(&mut self, _left: Expression<'a>, _right: Expression<'a>, _not: bool) -> visitor::Result {
         unimplemented!("Full-text search is not yet supported on MSSQL")
     }
 

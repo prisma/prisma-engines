@@ -1,0 +1,9 @@
+model Post {
+  id        Int     @id
+  title     String
+  published Boolean
+
+  @@unique([title], where: { published: { not: false } })
+  @@index([title], where: { published: true })
+  @@index([title], where: { published: { not: false }, id: { not: null } })
+}

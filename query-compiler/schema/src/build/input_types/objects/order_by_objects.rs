@@ -268,7 +268,7 @@ fn order_by_object_type_text_search<'a>(
                 None,
             ),
             simple_input_field(ordering::SORT, InputType::Enum(sort_order_enum), None),
-            simple_input_field(ordering::SEARCH, InputType::string(), None),
+            simple_input_field(ordering::SEARCH, InputType::string(), None).parameterizable(),
         ]
     });
     input_object

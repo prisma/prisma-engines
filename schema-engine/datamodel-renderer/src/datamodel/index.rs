@@ -54,6 +54,18 @@ impl<'a> IndexDefinition<'a> {
             .push_param(("type", Constant::new_no_validate(index_type.into())));
     }
 
+    /// Defines the `where` argument for partial indexes (WHERE clause).
+    ///
+    /// ```ignore
+    /// @@unique([a, b], where: raw("status = 'active'"))
+    /// //              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    /// ```
+    pub fn where_clause(&mut self, predicate: impl Into<Cow<'a, str>>) {
+        let mut raw_fn = Function::new("raw");
+        raw_fn.push_param(predicate.into());
+        self.0.push_param(("where", raw_fn));
+    }
+
     fn new(index_type: &'static str, fields: impl Iterator<Item = IndexFieldInput<'a>>) -> Self {
         let mut inner = Function::new(index_type);
 

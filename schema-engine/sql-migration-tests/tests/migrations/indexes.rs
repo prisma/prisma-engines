@@ -1,5 +1,6 @@
 mod cockroachdb;
 mod mssql;
+mod partial;
 mod postgres;
 
 use indoc::{formatdoc, indoc};

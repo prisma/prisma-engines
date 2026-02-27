@@ -850,6 +850,7 @@ fn all_mysql_column_types_must_work(api: TestApi) {
                     ),
                     index_name: "",
                     tpe: PrimaryKey,
+                    predicate: None,
                 },
             ],
             index_columns: [
@@ -1677,6 +1678,7 @@ fn all_mariadb_column_types_must_work(api: TestApi) {
                     ),
                     index_name: "",
                     tpe: PrimaryKey,
+                    predicate: None,
                 },
             ],
             index_columns: [
@@ -2507,6 +2509,7 @@ fn all_mysql_8_column_types_must_work(api: TestApi) {
                     ),
                     index_name: "",
                     tpe: PrimaryKey,
+                    predicate: None,
                 },
             ],
             index_columns: [
@@ -2768,6 +2771,7 @@ fn constraints_from_other_databases_should_not_be_introspected(api: TestApi) {
                     ),
                     index_name: "",
                     tpe: PrimaryKey,
+                    predicate: None,
                 },
                 Index {
                     table_id: TableId(
@@ -2775,6 +2779,7 @@ fn constraints_from_other_databases_should_not_be_introspected(api: TestApi) {
                     ),
                     index_name: "user_id",
                     tpe: Normal,
+                    predicate: None,
                 },
                 Index {
                     table_id: TableId(
@@ -2782,6 +2787,7 @@ fn constraints_from_other_databases_should_not_be_introspected(api: TestApi) {
                     ),
                     index_name: "",
                     tpe: PrimaryKey,
+                    predicate: None,
                 },
             ],
             index_columns: [

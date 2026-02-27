@@ -1,0 +1,22 @@
+---
+source: query-compiler/query-compiler/tests/queries.rs
+expression: pretty
+input_file: query-compiler/query-compiler/tests/data/update-push.json
+---
+dataMap {
+    id: Bytes (id)
+    optString: String? (optString)
+    intArray: Int[] (intArray)
+}
+let 0 = unique (query «UPDATE "public"."DataTypes" SET "intArray" =
+                       "public"."DataTypes"."intArray" || $1 WHERE
+                       ("public"."DataTypes"."id" = $2 AND 1=1) RETURNING
+                       "public"."DataTypes"."id",
+                       "public"."DataTypes"."optString",
+                       "public"."DataTypes"."intArray"»
+                params [var(intArray as Int), const(Bytes([]))])
+in let 0 = validate (get 0)
+       [ rowCountNeq 0
+       ] orRaise "MISSING_RECORD"
+   in ();
+   get 0

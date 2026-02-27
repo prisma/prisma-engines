@@ -1,6 +1,6 @@
 {
   "is_panic": false,
-  "message": "Unable to match input value to any allowed input type for the field. Parse errors: [Unable to match input value to any allowed input type for the field. Parse errors: [Invalid argument agument value. `1983-10-31R10:20:00.000Z` is not a valid `ISO-8601 DateTime`. Underlying error: input contains invalid characters, Invalid argument type. `dob` should be of any of the following types: `Null`], Unable to match input value to any allowed input type for the field. Parse errors: [Invalid argument agument value. `1983-10-31R10:20:00.000Z` is not a valid `ISO-8601 DateTime`. Underlying error: input contains invalid characters, Invalid argument type. `dob` should be of any of the following types: `Null`]]",
+  "message": "Unable to match input value to any allowed input type for the field. Parse errors: [Unable to match input value to any allowed input type for the field. Parse errors: [Invalid argument value. `1983-10-31R10:20:00.000Z` is not a valid `ISO-8601 DateTime`. Underlying error: input contains invalid characters, Invalid argument type. `dob` should be of any of the following types: `Null`], Unable to match input value to any allowed input type for the field. Parse errors: [Invalid argument value. `1983-10-31R10:20:00.000Z` is not a valid `ISO-8601 DateTime`. Underlying error: input contains invalid characters, Invalid argument type. `dob` should be of any of the following types: `Null`]]",
   "meta": {
     "kind": "Union",
     "errors": [

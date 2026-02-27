@@ -207,7 +207,7 @@ impl PostgresNativeUrl {
         config.password(self.password().as_ref());
         config.host(self.host());
         config.port(self.port());
-        config.dbname(self.dbname());
+        config.dbname(self.dbname().as_ref());
         config.pgbouncer_mode(self.query_params.pg_bouncer);
 
         if let Some(options) = self.options() {

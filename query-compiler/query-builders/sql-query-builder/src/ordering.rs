@@ -1,5 +1,6 @@
-use crate::{Context, join_utils::*, model_extensions::*};
+use crate::{Context, join_utils::*, model_extensions::*, value::Placeholder};
 use itertools::Itertools;
+use prisma_value::{Placeholder as PrismaValuePlaceholder, PrismaValue};
 use psl::{datamodel_connector::ConnectorCapability, reachable_only_with_capability};
 use quaint::ast::*;
 use query_builder::QueryArgumentsExt;
@@ -240,7 +241,8 @@ impl OrderByBuilder {
             .map(|sf| sf.as_column(ctx).opt_table(parent_table.clone()))
             .map(Expression::from)
             .collect();
-        let text_search_expr = text_search_relevance(&order_by_columns, order_by.search.clone());
+        let search_expr = prisma_value_to_search_expression(order_by.search.clone());
+        let text_search_expr = text_search_relevance(&order_by_columns, search_expr);
 
         (joins, text_search_expr.into())
     }
@@ -276,6 +278,16 @@ impl OrderByBuilder {
         self.join_counter += 1;
 
         format!("{}{}", ORDER_JOIN_PREFIX, self.join_counter)
+    }
+}
+
+fn prisma_value_to_search_expression(pv: PrismaValue) -> Expression<'static> {
+    match pv {
+        PrismaValue::String(s) => Value::text(s).into(),
+        PrismaValue::Placeholder(PrismaValuePlaceholder { name, .. }) => {
+            Value::opaque(Placeholder::new(name), OpaqueType::Text).into()
+        }
+        _ => panic!("Search field should only contain String or Placeholder values"),
     }
 }
 

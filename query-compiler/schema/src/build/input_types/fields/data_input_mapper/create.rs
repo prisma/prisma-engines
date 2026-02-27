@@ -27,11 +27,13 @@ impl DataInputFieldMapper for CreateDataInputFieldMapper {
 
                 input_field(sf.name().to_owned(), vec![enum_type, typ], sf.default_value())
                     .optional_if(!sf.is_required() || sf.default_value().is_some() || sf.is_updated_at())
+                    .parameterizable()
             }
 
             _ => input_field(sf.name().to_owned(), vec![typ], sf.default_value())
                 .optional_if(!sf.is_required() || sf.default_value().is_some() || sf.is_updated_at())
-                .nullable_if(!sf.is_required()),
+                .nullable_if(!sf.is_required())
+                .parameterizable(),
         }
     }
 
@@ -43,7 +45,8 @@ impl DataInputFieldMapper for CreateDataInputFieldMapper {
         let mut input_object = init_input_object_type(ident);
         input_object.set_container(sf.container());
         input_object.require_exactly_one_field();
-        input_object.set_fields(move || vec![simple_input_field(operations::SET, cloned_typ.clone(), None)]);
+        input_object
+            .set_fields(move || vec![simple_input_field(operations::SET, cloned_typ.clone(), None).parameterizable()]);
 
         let input_type = InputType::object(input_object);
 
