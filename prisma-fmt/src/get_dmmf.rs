@@ -21,6 +21,19 @@ pub(crate) fn get_dmmf(params: &str) -> Result<String, String> {
     validate::run(params.prisma_schema, params.no_color).map(dmmf::dmmf_json_from_validated_schema)
 }
 
+/// Returns DMMF JSON as bytes instead of String to avoid V8 string length limit.
+/// See: https://github.com/prisma/prisma/issues/29111
+pub(crate) fn get_dmmf_bytes(params: &str) -> Result<Vec<u8>, String> {
+    let params: GetDmmfParams = match serde_json::from_str(params) {
+        Ok(params) => params,
+        Err(serde_err) => {
+            panic!("Failed to deserialize GetDmmfParams: {serde_err}");
+        }
+    };
+
+    validate::run(params.prisma_schema, params.no_color).map(dmmf::dmmf_json_bytes_from_validated_schema)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
