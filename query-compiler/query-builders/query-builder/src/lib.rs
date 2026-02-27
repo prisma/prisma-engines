@@ -266,15 +266,24 @@ impl fmt::Display for DbQuery {
                         Fragment::Parameter => {
                             placeholder_format.write(formatter, &mut number)?;
                         }
-                        Fragment::ParameterTuple => {
-                            write!(formatter, "[")?;
+                        Fragment::ParameterTuple {
+                            item_prefix,
+                            item_separator,
+                            item_suffix,
+                        } => {
+                            write!(formatter, "[{item_prefix}")?;
                             placeholder_format.write(formatter, &mut number)?;
-                            write!(formatter, "]")?;
+                            write!(formatter, "{item_suffix}{item_separator}*]")?;
                         }
-                        Fragment::ParameterTupleList { .. } => {
-                            write!(formatter, "[(")?;
+                        Fragment::ParameterTupleList {
+                            item_prefix,
+                            item_separator,
+                            item_suffix,
+                            group_separator,
+                        } => {
+                            write!(formatter, "[{item_prefix}")?;
                             placeholder_format.write(formatter, &mut number)?;
-                            write!(formatter, ")]")?;
+                            write!(formatter, "{item_suffix}{item_separator}*]{group_separator}*")?;
                         }
                     };
                 }

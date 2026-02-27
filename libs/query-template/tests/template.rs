@@ -47,7 +47,11 @@ fn new_query_template_with_parameter_tuple(pf: PlaceholderFormat) -> QueryTempla
     qt.fragments.push(Fragment::StringChunk {
         chunk: " AND status IN ".to_string(),
     });
-    qt.fragments.push(Fragment::ParameterTuple);
+    qt.fragments.push(Fragment::ParameterTuple {
+        item_prefix: "".into(),
+        item_separator: ", ".into(),
+        item_suffix: "".into(),
+    });
     qt
 }
 

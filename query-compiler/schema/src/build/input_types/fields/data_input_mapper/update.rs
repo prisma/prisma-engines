@@ -55,14 +55,14 @@ impl DataInputFieldMapper for UpdateDataInputFieldMapper {
                 let enum_type = InputType::enum_type(json_null_input_enum(!sf.is_required()));
                 let input_field = input_field(sf.name().to_owned(), vec![enum_type, base_update_type], None);
 
-                input_field.optional()
+                input_field.optional().parameterizable()
             }
 
             _ => {
                 let types = vec![map_scalar_input_type_for_field(ctx, &sf), base_update_type];
 
                 let input_field = input_field(sf.name().to_owned(), types, None);
-                input_field.optional().nullable_if(!sf.is_required())
+                input_field.optional().nullable_if(!sf.is_required()).parameterizable()
             }
         }
     }
@@ -76,14 +76,20 @@ impl DataInputFieldMapper for UpdateDataInputFieldMapper {
         let mut input_object = init_input_object_type(ident);
         input_object.set_container(sf.container());
         input_object.set_fields(move || {
-            let mut object_fields = vec![simple_input_field(operations::SET, list_input_type.clone(), None).optional()];
+            let mut object_fields = vec![
+                simple_input_field(operations::SET, list_input_type.clone(), None)
+                    .optional()
+                    .parameterizable(),
+            ];
 
             if ctx.has_capability(ConnectorCapability::ScalarLists)
                 && (ctx.has_capability(ConnectorCapability::EnumArrayPush) || !type_identifier.is_enum())
             {
                 let map_scalar_type = map_scalar_input_type(ctx, type_identifier, false);
                 object_fields.push(
-                    input_field(operations::PUSH, vec![map_scalar_type, list_input_type.clone()], None).optional(),
+                    input_field(operations::PUSH, vec![map_scalar_type, list_input_type.clone()], None)
+                        .optional()
+                        .parameterizable(),
                 )
             }
 
@@ -175,14 +181,31 @@ fn update_operations_object_type<'a>(
         let mut fields = vec![
             simple_input_field(operations::SET, typ.clone(), None)
                 .optional()
-                .nullable_if(!sf.is_required()),
+                .nullable_if(!sf.is_required())
+                .parameterizable(),
         ];
 
         if with_number_operators {
-            fields.push(simple_input_field(operations::INCREMENT, typ.clone(), None).optional());
-            fields.push(simple_input_field(operations::DECREMENT, typ.clone(), None).optional());
-            fields.push(simple_input_field(operations::MULTIPLY, typ.clone(), None).optional());
-            fields.push(simple_input_field(operations::DIVIDE, typ, None).optional());
+            fields.push(
+                simple_input_field(operations::INCREMENT, typ.clone(), None)
+                    .optional()
+                    .parameterizable(),
+            );
+            fields.push(
+                simple_input_field(operations::DECREMENT, typ.clone(), None)
+                    .optional()
+                    .parameterizable(),
+            );
+            fields.push(
+                simple_input_field(operations::MULTIPLY, typ.clone(), None)
+                    .optional()
+                    .parameterizable(),
+            );
+            fields.push(
+                simple_input_field(operations::DIVIDE, typ, None)
+                    .optional()
+                    .parameterizable(),
+            );
         }
 
         if ctx.has_capability(ConnectorCapability::UndefinedType) && !sf.is_required() {
@@ -274,6 +297,7 @@ fn composite_set_update_input_field<'a>(ctx: &'a QuerySchema, cf: &CompositeFiel
     input_field(operations::SET, input_types, None)
         .nullable_if(!cf.is_required() && !cf.is_list())
         .optional()
+        .parameterizable()
 }
 
 // Builds an `push` input field. Should only be used in the envelope type.
@@ -282,7 +306,11 @@ fn composite_push_update_input_field<'a>(ctx: &'a QuerySchema, cf: &CompositeFie
         let set_object_type = InputType::Object(create::composite_create_object_type(ctx, cf.clone()));
         let input_types = vec![set_object_type.clone(), InputType::list(set_object_type)];
 
-        Some(input_field(operations::PUSH, input_types, None).optional())
+        Some(
+            input_field(operations::PUSH, input_types, None)
+                .optional()
+                .parameterizable(),
+        )
     } else {
         None
     }

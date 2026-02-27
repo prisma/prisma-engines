@@ -94,6 +94,9 @@ impl<'a> ScalarFilterParser<'a> {
                         PrismaValue::Null => field.equals(value),
                         PrismaValue::List(values) => field.is_in(values),
 
+                        PrismaValue::Placeholder(p) if self.reverse() => field.not_in(p),
+                        PrismaValue::Placeholder(p) => field.is_in(p),
+
                         _ => unreachable!(), // Validation guarantees this.
                     },
                     ConditionValue::FieldRef(field_ref) if self.reverse() => field.not_in(field_ref),
@@ -114,6 +117,9 @@ impl<'a> ScalarFilterParser<'a> {
 
                         PrismaValue::Null => field.not_equals(value),
                         PrismaValue::List(values) => field.not_in(values),
+
+                        PrismaValue::Placeholder(p) if self.reverse() => field.is_in(p), // not not in => in
+                        PrismaValue::Placeholder(p) => field.not_in(p),
 
                         _ => unreachable!(), // Validation guarantees this.
                     },
@@ -529,6 +535,9 @@ impl<'a> ScalarFilterParser<'a> {
                     ))),
                 }
             }
+
+            ParsedInputValue::Single(PrismaValue::Placeholder(p)) => Ok(ConditionListValue::Placeholder(p)),
+
             _ => {
                 let vals: Vec<PrismaValue> = input.try_into()?;
 

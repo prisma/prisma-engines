@@ -7,7 +7,7 @@ use thiserror::Error;
 ///
 /// [W3C Trace Context spec]: https://www.w3.org/TR/trace-context/#traceparent-header-field-values
 #[derive(Display, Debug, Copy, Clone, PartialEq, Eq, Hash)]
-#[display(fmt = "00-{trace_id}-{span_id}-{flags}")]
+#[display("00-{trace_id}-{span_id}-{flags}")]
 pub struct TraceParent {
     trace_id: TraceId,
     span_id: SpanId,
@@ -88,17 +88,17 @@ macro_rules! parseable_from_hex {
 }
 
 #[derive(Display, Debug, Copy, Clone, PartialEq, Eq, Hash)]
-#[display(fmt = "{_0:032x}")]
+#[display("{_0:032x}")]
 pub struct TraceId(u128);
 parseable_from_hex!(TraceId, u128);
 
 #[derive(Display, Debug, Copy, Clone, PartialEq, Eq, Hash)]
-#[display(fmt = "{_0:016x}")]
+#[display("{_0:016x}")]
 pub struct SpanId(u64);
 parseable_from_hex!(SpanId, u64);
 
 #[derive(Display, Debug, Copy, Clone, PartialEq, Eq, Hash)]
-#[display(fmt = "{_0:02x}")]
+#[display("{_0:02x}")]
 pub struct TraceFlags(u8);
 parseable_from_hex!(TraceFlags, u8);
 

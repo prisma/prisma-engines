@@ -42,6 +42,7 @@ pub use self::uuid::*;
 
 use super::{Aliasable, Expression};
 use std::borrow::Cow;
+use std::slice;
 
 /// A database function definition
 #[derive(Debug, Clone, PartialEq)]
@@ -90,6 +91,70 @@ pub(crate) enum FunctionType<'a> {
     UuidToBin,
     UuidToBinSwapped,
     Uuid,
+}
+
+impl<'a> FunctionType<'a> {
+    /// Returns the arguments of the function as a slice of expressions.
+    /// Only returns a non-empty slice for functions that accept arbitrary expressions.
+    pub fn arguments(&self) -> &[Expression<'a>] {
+        match self {
+            Self::Count(count) => &count.exprs,
+            Self::AggregateToString(agg) => slice::from_ref(&agg.value),
+            Self::Sum(avg) => slice::from_ref(&avg.expr),
+            Self::Lower(f) => slice::from_ref(&f.expression),
+            Self::Upper(f) => slice::from_ref(&f.expression),
+            Self::Coalesce(f) => &f.exprs,
+            Self::Concat(f) => &f.exprs,
+            Self::JsonExtract(f) => slice::from_ref(&f.column),
+            Self::JsonExtractLastArrayElem(f) => slice::from_ref(&f.expr),
+            Self::JsonExtractFirstArrayElem(f) => slice::from_ref(&f.expr),
+            Self::JsonUnquote(f) => slice::from_ref(&f.expr),
+            Self::JsonArrayAgg(f) => slice::from_ref(&f.expr),
+            Self::TextSearch(f) => &f.exprs,
+            Self::TextSearchRelevance(f) => &f.exprs,
+            Self::RowToJson(_)
+            | Self::RowNumber(_)
+            | Self::Average(_)
+            | Self::Minimum(_)
+            | Self::Maximum(_)
+            | Self::JsonBuildObject(_)
+            | Self::UuidToBin
+            | Self::UuidToBinSwapped
+            | Self::Uuid => &[],
+        }
+    }
+
+    /// Returns the name of the function, if it has an unambiguous name that can be used
+    /// in all of the databases.
+    pub fn name(&self) -> Option<&'static str> {
+        // The list is based on the default `Visitor::visit_function`.
+        let name = match self {
+            Self::RowToJson(_) => "ROW_TO_JSON",
+            Self::RowNumber(_) => "ROW_NUMBER",
+            Self::Count(_) => "COUNT",
+            Self::Sum(_) => "SUM",
+            Self::Lower(_) => "LOWER",
+            Self::Upper(_) => "UPPER",
+            Self::Coalesce(_) => "COALESCE",
+            Self::Concat(_)
+            | Self::AggregateToString(_)
+            | Self::Average(_)
+            | Self::Minimum(_)
+            | Self::Maximum(_)
+            | Self::JsonExtract(_)
+            | Self::JsonExtractLastArrayElem(_)
+            | Self::JsonExtractFirstArrayElem(_)
+            | Self::JsonUnquote(_)
+            | Self::JsonArrayAgg(_)
+            | Self::JsonBuildObject(_)
+            | Self::TextSearch(_)
+            | Self::TextSearchRelevance(_)
+            | Self::UuidToBin
+            | Self::UuidToBinSwapped
+            | Self::Uuid => return None,
+        };
+        Some(name)
+    }
 }
 
 impl<'a> Aliasable<'a> for Function<'a> {

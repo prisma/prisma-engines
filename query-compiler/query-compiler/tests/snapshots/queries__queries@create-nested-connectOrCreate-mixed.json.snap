@@ -59,7 +59,7 @@ transaction
                            ] orRaise "INCOMPLETE_CONNECT_INPUT";
                            6$id = mapField id (get 6)
                        in execute «INSERT INTO "public"."_CategoryToPost"
-                                   ("B","A") VALUES [($1)] ON CONFLICT DO
+                                   ("B","A") VALUES [($1),*],* ON CONFLICT DO
                                    NOTHING»
                           params [product(var(0$id as Int[]),
                                           var(6$id as Int[]))]
@@ -78,7 +78,7 @@ transaction
                               ] orRaise "INCOMPLETE_CONNECT_INPUT";
                               7$id = mapField id (get 7)
                           in execute «INSERT INTO "public"."_CategoryToPost"
-                                      ("B","A") VALUES [($1)] ON CONFLICT DO
+                                      ("B","A") VALUES [($1),*],* ON CONFLICT DO
                                       NOTHING»
                              params [product(var(0$id as Int[]),
                                              var(7$id as Int[]))];

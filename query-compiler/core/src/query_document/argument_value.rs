@@ -83,7 +83,10 @@ impl ArgumentValue {
             ArgumentValue::Object(_) => true,
             ArgumentValue::Raw(_) => true,
             ArgumentValue::List(l) => l.iter().all(|v| v.should_be_parsed_as_json()),
-            ArgumentValue::Scalar(pv) => !matches!(pv, PrismaValue::Enum(_) | PrismaValue::Json(_)),
+            ArgumentValue::Scalar(pv) => !matches!(
+                pv,
+                PrismaValue::Enum(_) | PrismaValue::Json(_) | PrismaValue::Placeholder(_)
+            ),
             ArgumentValue::FieldRef(_) => false,
         }
     }

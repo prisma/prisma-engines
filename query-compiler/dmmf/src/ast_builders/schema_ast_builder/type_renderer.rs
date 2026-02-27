@@ -46,7 +46,6 @@ pub(super) fn render_output_type<'a>(output_type: &OutputType<'a>, ctx: &mut Ren
                 ScalarType::UUID => "UUID",
                 ScalarType::JsonList => "Json",
                 ScalarType::Bytes => "Bytes",
-                ScalarType::Param => unreachable!("output type must not be Param"),
             };
 
             DmmfTypeReference {

@@ -170,8 +170,8 @@ async fn simple_view_from_two_tables(api: &mut TestApi) -> TestResult {
           CONCAT(a.first_name, ' ', a.last_name) AS name,
           b.introduction
         FROM
-          A AS a
-          JOIN B AS b ON a.id = b.user_id;"#]];
+          A a
+          INNER JOIN B b ON a.id = b.user_id;"#]];
 
     api.expect_view_definition("AB", &expected).await;
 

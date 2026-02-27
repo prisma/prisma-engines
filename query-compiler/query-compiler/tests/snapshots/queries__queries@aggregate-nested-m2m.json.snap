@@ -29,7 +29,7 @@ in let @parent$id = mapField id (get @parent)
                    "public"."_CategoryToPost"."B") AS
                    "aggr_selection_0_Category" ON ("public"."Post"."id" =
                    "aggr_selection_0_Category"."B") WHERE
-                   "public"."Post"."userId" IN [$2] ORDER BY
+                   "public"."Post"."userId" IN [$2,*] ORDER BY
                    "public"."Post"."id" ASC OFFSET $3»
             params [const(String("%tech%")), var(@parent$id as Int),
                     const(BigInt(0))]) on left.(id) = right.(userId) as @nested$posts)

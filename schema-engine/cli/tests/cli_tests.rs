@@ -938,3 +938,27 @@ fn get_database_version_multi_file(_api: TestApi) {
         }
     });
 }
+
+#[tokio::test]
+async fn test_missing_datasource_url_gives_proper_error() {
+    let datasource_urls = DatasourceUrls {
+        url: None,
+        shadow_database_url: None,
+    };
+
+    let output = Command::new(schema_engine_bin_path())
+        .arg("--datasource")
+        .arg(serde_json::to_string(&datasource_urls).unwrap())
+        .arg("cli")
+        .arg("can-connect-to-database")
+        .output()
+        .unwrap();
+
+    assert_eq!(output.status.code(), Some(1));
+    let stderr = String::from_utf8_lossy(&output.stderr);
+    assert!(
+        stderr.contains("No URL defined in the configured datasource"),
+        "Expected error message about missing URL, got: {}",
+        stderr
+    );
+}

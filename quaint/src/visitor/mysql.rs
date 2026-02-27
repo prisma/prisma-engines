@@ -5,6 +5,7 @@ use crate::{
     visitor::{self, Visitor},
 };
 use query_template::{PlaceholderFormat, QueryTemplate};
+use std::borrow::Cow;
 use std::fmt;
 
 /// A visitor to generate queries for the MySQL database.
@@ -65,7 +66,7 @@ impl<'a> Mysql<'a> {
         }
 
         match (left, right) {
-            (left, right) if left.is_json_value() && right.is_fun_retuning_json() => {
+            (left, right) if left.is_extractable_json_value() && right.is_fun_retuning_json() => {
                 let quaint_value = json_to_quaint_value(left.into_json_value().unwrap())?;
 
                 self.visit_parameterized(quaint_value)?;
@@ -73,7 +74,7 @@ impl<'a> Mysql<'a> {
                 self.visit_expression(right)?;
             }
 
-            (left, right) if left.is_fun_retuning_json() && right.is_json_value() => {
+            (left, right) if left.is_fun_retuning_json() && right.is_extractable_json_value() => {
                 let quaint_value = json_to_quaint_value(right.into_json_value().unwrap())?;
 
                 self.visit_expression(left)?;
@@ -113,6 +114,16 @@ impl<'a> Mysql<'a> {
                 }
                 // Convert floats to string to avoid losing precision
                 (_, Some("FLOAT")) => {
+                    self.write("CONVERT")?;
+                    self.surround_with("(", ")", |s| {
+                        s.visit_expression(expr)?;
+                        s.write(", ")?;
+                        s.write("CHAR")
+                    })?;
+                    Ok(())
+                }
+                // Convert BigInt to string to preserve precision when parsed by JavaScript.
+                (Some(TypeFamily::Int), Some("BIGINT" | "UNSIGNEDBIGINT")) => {
                     self.write("CONVERT")?;
                     self.surround_with("(", ")", |s| {
                         s.visit_expression(expr)?;
@@ -346,8 +357,15 @@ impl<'a> Visitor<'a> for Mysql<'a> {
         Ok(())
     }
 
-    fn visit_parameterized_row(&mut self, value: Value<'a>) -> visitor::Result {
-        self.query_template.write_parameter_tuple();
+    fn visit_parameterized_row(
+        &mut self,
+        value: Value<'a>,
+        item_prefix: impl Into<Cow<'static, str>>,
+        separator: impl Into<Cow<'static, str>>,
+        item_suffix: impl Into<Cow<'static, str>>,
+    ) -> visitor::Result {
+        self.query_template
+            .write_parameter_tuple(item_prefix, separator, item_suffix);
         self.query_template.parameters.push(value);
         Ok(())
     }
@@ -570,15 +588,13 @@ impl<'a> Visitor<'a> for Mysql<'a> {
         })
     }
 
-    fn visit_matches(&mut self, left: Expression<'a>, right: std::borrow::Cow<'a, str>, not: bool) -> visitor::Result {
+    fn visit_matches(&mut self, left: Expression<'a>, right: Expression<'a>, not: bool) -> visitor::Result {
         if not {
             self.write("(NOT ")?;
         }
 
         self.visit_expression(left)?;
-        self.surround_with("AGAINST (", " IN BOOLEAN MODE)", |s| {
-            s.visit_parameterized(Value::text(right))
-        })?;
+        self.surround_with("AGAINST (", " IN BOOLEAN MODE)", |s| s.visit_expression(right))?;
 
         if not {
             self.write(")")?;
@@ -593,7 +609,8 @@ impl<'a> Visitor<'a> for Mysql<'a> {
 
         let text_search = TextSearch { exprs };
 
-        self.visit_matches(text_search.into(), query, false)?;
+        self.visit_expression(text_search.into())?;
+        self.surround_with("AGAINST (", " IN BOOLEAN MODE)", |s| s.visit_expression(query))?;
 
         Ok(())
     }
@@ -718,6 +735,7 @@ fn get_target_table<'a>(query: &Query<'a>) -> Option<Table<'a>> {
 
 #[cfg(test)]
 mod tests {
+    use crate::ast::*;
     use crate::visitor::*;
 
     fn expected_values<'a, T>(sql: &'static str, params: Vec<T>) -> (String, Vec<Value<'a>>)
@@ -815,6 +833,36 @@ mod tests {
             vec![Value::int32(1), Value::int32(2), Value::int32(3), Value::int32(4),],
             params
         );
+    }
+
+    #[test]
+    fn json_build_object_casts_bigint_to_string() {
+        let build_json = json_build_object(vec![(
+            "id".into(),
+            Column::from("id")
+                .native_column_type(Some("BIGINT"))
+                .type_family(TypeFamily::Int)
+                .into(),
+        )]);
+        let query = Select::default().value(build_json);
+        let (sql, _) = Mysql::build(query).unwrap();
+
+        assert_eq!("SELECT JSON_OBJECT('id', CONVERT(`id`, CHAR))", sql);
+    }
+
+    #[test]
+    fn json_build_object_casts_unsigned_bigint_to_string() {
+        let build_json = json_build_object(vec![(
+            "id".into(),
+            Column::from("id")
+                .native_column_type(Some("UNSIGNEDBIGINT"))
+                .type_family(TypeFamily::Int)
+                .into(),
+        )]);
+        let query = Select::default().value(build_json);
+        let (sql, _) = Mysql::build(query).unwrap();
+
+        assert_eq!("SELECT JSON_OBJECT('id', CONVERT(`id`, CHAR))", sql);
     }
 
     #[test]

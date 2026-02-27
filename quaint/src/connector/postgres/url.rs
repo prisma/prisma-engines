@@ -78,10 +78,10 @@ impl PostgresUrl {
         Ok(Self::WebSocket(PostgresWebSocketUrl::new(url, api_key)))
     }
 
-    pub fn dbname(&self) -> &str {
+    pub fn dbname(&self) -> Cow<'_, str> {
         match self {
             Self::Native(url) => url.dbname(),
-            Self::WebSocket(url) => url.dbname(),
+            Self::WebSocket(url) => Cow::Borrowed(url.dbname()),
         }
     }
 
@@ -193,11 +193,20 @@ impl PostgresNativeUrl {
         is_url_localhost(&self.url)
     }
 
-    /// Name of the database connected. Defaults to `postgres`.
-    pub fn dbname(&self) -> &str {
+    /// decoded database name. Defaults to `postgres`.
+    pub fn dbname(&self) -> Cow<'_, str> {
         match self.url.path_segments() {
-            Some(mut segments) => segments.next().unwrap_or("postgres"),
-            None => "postgres",
+            Some(mut segments) => {
+                let segment = segments.next().unwrap_or("postgres");
+                match percent_decode(segment.as_bytes()).decode_utf8() {
+                    Ok(dbname) => dbname,
+                    Err(_) => {
+                        tracing::warn!("Couldn't decode dbname to UTF-8, using the non-decoded version.");
+                        segment.into()
+                    }
+                }
+            }
+            None => Cow::Borrowed("postgres"),
         }
     }
 
@@ -596,6 +605,31 @@ mod tests {
     }
 
     #[test]
+    fn should_decode_percent_encoded_dbname() {
+        // Chinese characters: 测试库 (test database)
+        let url = PostgresNativeUrl::new(
+            Url::parse("postgresql://user:pass@localhost:5432/%E6%B5%8B%E8%AF%95%E5%BA%93").unwrap(),
+        )
+        .unwrap();
+        assert_eq!("测试库", url.dbname());
+    }
+
+    #[test]
+    fn should_decode_dbname_with_spaces() {
+        let url =
+            PostgresNativeUrl::new(Url::parse("postgresql://user:pass@localhost:5432/my%20database").unwrap()).unwrap();
+        assert_eq!("my database", url.dbname());
+    }
+
+    #[test]
+    fn should_decode_dbname_with_special_characters() {
+        // test-db_name
+        let url = PostgresNativeUrl::new(Url::parse("postgresql://user:pass@localhost:5432/test%2Ddb%5Fname").unwrap())
+            .unwrap();
+        assert_eq!("test-db_name", url.dbname());
+    }
+
+    #[test]
     fn should_allow_changing_of_cache_size() {
         let url =
             PostgresNativeUrl::new(Url::parse("postgresql:///localhost:5432/foo?statement_cache_size=420").unwrap())
@@ -814,5 +848,49 @@ mod tests {
 
         // CRDB does NOT support setting the search_path via a connection parameter if the identifier is unsafe.
         assert_eq!(config.get_search_path(), None);
+    }
+
+    /// Tests that connecting to a database with a percent-encoded name works correctly.
+    ///
+    /// This test verifies:
+    /// 1. A database with Chinese characters (测试库) can be created
+    /// 2. The percent-encoded URL correctly connects to the database
+    /// 3. The `dbname()` function returns the decoded database name
+    #[tokio::test]
+    async fn should_connect_to_db_with_percent_encoded_name() {
+        use percent_encoding::{NON_ALPHANUMERIC, utf8_percent_encode};
+
+        let base_url = Url::parse(&CONN_STR).unwrap();
+        let conn = Quaint::new(base_url.as_str()).await.unwrap();
+
+        // Create a database with Chinese characters: 测试库 (meaning "test database")
+        let test_db_name = "测试库";
+        let _ = conn
+            .raw_cmd(&format!(r#"DROP DATABASE IF EXISTS "{test_db_name}""#))
+            .await;
+        conn.raw_cmd(&format!(r#"CREATE DATABASE "{test_db_name}""#))
+            .await
+            .unwrap();
+
+        // Build URL with percent-encoded database name
+        // 测试库 -> %E6%B5%8B%E8%AF%95%E5%BA%93
+        let encoded_db_name = utf8_percent_encode(test_db_name, NON_ALPHANUMERIC).to_string();
+        let mut test_url = base_url.clone();
+        test_url.set_path(&format!("/{encoded_db_name}"));
+
+        // Connect using percent-encoded URL and verify dbname() returns decoded value
+        let test_conn = Quaint::new(test_url.as_str()).await.unwrap();
+        let pg_url = PostgresNativeUrl::new(test_url).unwrap();
+        assert_eq!(test_db_name, pg_url.dbname());
+
+        // Verify the connection actually works by executing a simple query
+        let result = test_conn.query_raw("SELECT 1 as test", &[]).await.unwrap();
+        assert_eq!(1, result.len());
+
+        // Cleanup: drop the test database
+        drop(test_conn);
+        conn.raw_cmd(&format!(r#"DROP DATABASE IF EXISTS "{test_db_name}""#))
+            .await
+            .unwrap();
     }
 }

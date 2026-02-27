@@ -6,6 +6,7 @@ use crate::{
 };
 use itertools::Itertools;
 use query_template::{PlaceholderFormat, QueryTemplate};
+use std::borrow::Cow;
 use std::{fmt, ops::Deref};
 
 /// A visitor to generate queries for the PostgreSQL database.
@@ -33,7 +34,7 @@ impl<'a> Postgres<'a> {
                 }
                 // Cast BigInt to text to preserve precision when parsed by JavaScript.
                 // JavaScript's JSON.parse loses precision for integers > 2^53-1.
-                (Some(TypeFamily::Int), Some("BIGINT")) => {
+                (Some(TypeFamily::Int), Some("BIGINT" | "INT8")) => {
                     self.visit_expression(expr)?;
                     self.write("::text")?;
 
@@ -92,8 +93,15 @@ impl<'a> Visitor<'a> for Postgres<'a> {
         Ok(())
     }
 
-    fn visit_parameterized_row(&mut self, value: Value<'a>) -> visitor::Result {
-        self.query_template.write_parameter_tuple();
+    fn visit_parameterized_row(
+        &mut self,
+        value: Value<'a>,
+        item_prefix: impl Into<Cow<'static, str>>,
+        separator: impl Into<Cow<'static, str>>,
+        item_suffix: impl Into<Cow<'static, str>>,
+    ) -> visitor::Result {
+        self.query_template
+            .write_parameter_tuple(item_prefix, separator, item_suffix);
         self.query_template.parameters.push(value);
         Ok(())
     }
@@ -633,14 +641,14 @@ impl<'a> Visitor<'a> for Postgres<'a> {
         })
     }
 
-    fn visit_matches(&mut self, left: Expression<'a>, right: std::borrow::Cow<'a, str>, not: bool) -> visitor::Result {
+    fn visit_matches(&mut self, left: Expression<'a>, right: Expression<'a>, not: bool) -> visitor::Result {
         if not {
             self.write("(NOT ")?;
         }
 
         self.visit_expression(left)?;
         self.write(" @@ ")?;
-        self.surround_with("to_tsquery(", ")", |s| s.visit_parameterized(Value::text(right)))?;
+        self.surround_with("to_tsquery(", ")", |s| s.visit_expression(right))?;
 
         if not {
             self.write(")")?;
@@ -667,7 +675,7 @@ impl<'a> Visitor<'a> for Postgres<'a> {
             Ok(())
         })?;
         self.write(", ")?;
-        self.surround_with("to_tsquery(", ")", |s| s.visit_parameterized(Value::text(query)))?;
+        self.surround_with("to_tsquery(", ")", |s| s.visit_expression(query))?;
         self.write(")")?;
 
         Ok(())
@@ -1425,6 +1433,20 @@ mod tests {
             assert_eq!(sql, "SELECT JSONB_BUILD_OBJECT('id', \"id\"::text)");
         }
 
+        #[test]
+        fn int8() {
+            let build_json = json_build_object(vec![(
+                "id".into(),
+                Column::from("id")
+                    .native_column_type(Some("INT8"))
+                    .type_family(TypeFamily::Int)
+                    .into(),
+            )]);
+            let query = Select::default().value(build_json);
+            let (sql, _) = Postgres::build(query).unwrap();
+
+            assert_eq!(sql, "SELECT JSONB_BUILD_OBJECT('id', \"id\"::text)");
+        }
         fn build_json_object(num_fields: u32) -> JsonBuildObject<'static> {
             let fields = (1..=num_fields)
                 .map(|i| (format!("f{i}").into(), Expression::from(i as i64)))

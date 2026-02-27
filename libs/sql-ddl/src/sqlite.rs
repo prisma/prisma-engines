@@ -148,6 +148,53 @@ impl Display for Column<'_> {
     }
 }
 
+/// A column in an index definition.
+#[derive(Debug, Default)]
+pub struct IndexColumn<'a> {
+    pub name: Cow<'a, str>,
+    pub sort_order: Option<crate::SortOrder>,
+}
+
+/// Create an index statement.
+#[derive(Debug)]
+pub struct CreateIndex<'a> {
+    pub index_name: Cow<'a, str>,
+    pub table_name: Cow<'a, str>,
+    pub columns: Vec<IndexColumn<'a>>,
+    pub is_unique: bool,
+    pub where_clause: Option<Cow<'a, str>>,
+}
+
+impl Display for CreateIndex<'_> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "CREATE {uniqueness}INDEX \"{index_name}\" ON \"{table_name}\"(",
+            uniqueness = if self.is_unique { "UNIQUE " } else { "" },
+            index_name = self.index_name,
+            table_name = self.table_name,
+        )?;
+
+        for (i, c) in self.columns.iter().enumerate() {
+            if i > 0 {
+                f.write_str(", ")?;
+            }
+            write!(f, "\"{}\"", c.name)?;
+            if let Some(sort_order) = c.sort_order {
+                write!(f, " {}", sort_order.as_ref())?;
+            }
+        }
+
+        f.write_str(")")?;
+
+        if let Some(predicate) = &self.where_clause {
+            write!(f, " WHERE {}", predicate)?;
+        }
+
+        Ok(())
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -269,5 +316,43 @@ mod tests {
         );
 
         assert_eq!(create_table.to_string(), expected.trim_matches('\n'))
+    }
+
+    #[test]
+    fn create_unique_index() {
+        let create_index = CreateIndex {
+            index_name: "idx_name".into(),
+            table_name: "Cat".into(),
+            columns: vec![IndexColumn {
+                name: "name".into(),
+                sort_order: None,
+            }],
+            is_unique: true,
+            where_clause: None,
+        };
+
+        assert_eq!(
+            create_index.to_string(),
+            r#"CREATE UNIQUE INDEX "idx_name" ON "Cat"("name")"#
+        )
+    }
+
+    #[test]
+    fn create_partial_unique_index() {
+        let create_index = CreateIndex {
+            index_name: "idx_name".into(),
+            table_name: "Cat".into(),
+            columns: vec![IndexColumn {
+                name: "name".into(),
+                sort_order: None,
+            }],
+            is_unique: true,
+            where_clause: Some("status = 'active'".into()),
+        };
+
+        assert_eq!(
+            create_index.to_string(),
+            r#"CREATE UNIQUE INDEX "idx_name" ON "Cat"("name") WHERE status = 'active'"#
+        )
     }
 }

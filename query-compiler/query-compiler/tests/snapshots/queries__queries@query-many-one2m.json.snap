@@ -27,6 +27,6 @@ in let @parent$userId = mapField userId (get @parent)
    in join (get @parent)
       with (query «SELECT "public"."User"."id", "public"."User"."email",
                    "public"."User"."role"::text FROM "public"."User" WHERE
-                   "public"."User"."id" IN [$1] OFFSET $2»
+                   "public"."User"."id" IN [$1,*] OFFSET $2»
             params [var(@parent$userId as Int),
                     const(BigInt(0))]) on unique left.(userId) = right.(id) as @nested$user

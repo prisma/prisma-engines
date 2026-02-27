@@ -13,9 +13,15 @@ pub(crate) fn filter_input_field(ctx: &'_ QuerySchema, field: ModelField, includ
             _ => true,
         };
 
+    let has_scalar_shorthand = match &field {
+        ModelField::Scalar(sf) => !field.is_list() && sf.type_identifier() != TypeIdentifier::Json,
+        _ => false,
+    };
+
     input_field(field.name().to_owned(), types, None)
         .optional()
         .nullable_if(nullable)
+        .parameterizable_if(has_scalar_shorthand)
 }
 
 pub(crate) fn nested_create_one_input_field(ctx: &'_ QuerySchema, parent_field: RelationFieldRef) -> InputField<'_> {

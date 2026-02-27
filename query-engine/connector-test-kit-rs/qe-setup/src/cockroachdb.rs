@@ -21,7 +21,7 @@ pub(crate) async fn cockroach_setup(url: String, prisma_schema: &str) -> Connect
 
     conn.raw_cmd(&query).await.unwrap();
 
-    drop_db_when_thread_exits(parsed_url, db_name);
+    drop_db_when_thread_exits(parsed_url, &db_name);
     let params = ConnectorParams::new(url, Default::default(), None);
     let mut connector = sql_schema_connector::SqlSchemaConnector::new_cockroach(params)?;
     crate::diff_and_apply(prisma_schema, &mut connector).await

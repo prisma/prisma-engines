@@ -411,6 +411,13 @@ async fn push_columns(
     Ok(())
 }
 
+struct PendingIndex {
+    name: String,
+    is_unique: bool,
+    is_partial: bool,
+    columns: Vec<(TableColumnId, SQLSortOrder)>,
+}
+
 async fn push_indexes(
     table: &str,
     table_id: TableId,
@@ -419,19 +426,21 @@ async fn push_indexes(
 ) -> DescriberResult<()> {
     let sql = format!(r#"PRAGMA index_list("{table}");"#);
     let result_set = conn.query_raw(&sql, &[]).await?;
-    let mut indexes = Vec::new(); // (index_name, is_unique, columns)
+    let mut indexes: Vec<PendingIndex> = Vec::new();
 
     let filtered_rows = result_set
         .into_iter()
         // Exclude primary keys, they are inferred separately.
-        .filter(|row| row.get("origin").and_then(|origin| origin.as_str()).unwrap() != "pk")
-        // Exclude partial indices
-        .filter(|row| !row.get("partial").and_then(|partial| partial.as_bool()).unwrap());
+        .filter(|row| row.get("origin").and_then(|origin| origin.as_str()).unwrap() != "pk");
 
     for row in filtered_rows {
         let mut valid_index = true;
 
         let is_unique = row.get_expect_bool("unique");
+        let is_partial = row
+            .get("partial")
+            .and_then(|partial| partial.as_bool())
+            .unwrap_or(false);
         let index_name = row.get_expect_string("name");
         let mut columns = Vec::new();
 
@@ -472,18 +481,40 @@ async fn push_indexes(
         }
 
         if valid_index {
-            indexes.push((index_name, is_unique, columns))
+            indexes.push(PendingIndex {
+                name: index_name,
+                is_unique,
+                is_partial,
+                columns,
+            });
         }
     }
 
-    for (index_name, unique, columns) in indexes {
-        let index_id = if unique {
-            schema.push_unique_constraint(table_id, index_name)
+    for index in indexes {
+        // For partial indexes, extract the WHERE clause from sqlite_master
+        let predicate = if index.is_partial {
+            let sql = format!(
+                r#"SELECT sql FROM sqlite_master WHERE type = 'index' AND name = "{}";"#,
+                index.name
+            );
+            let result_set = conn.query_raw(&sql, &[]).await?;
+            result_set
+                .into_iter()
+                .next()
+                .and_then(|row| row.get_string("sql"))
+                .and_then(|sql| extract_where_clause(&sql))
         } else {
-            schema.push_index(table_id, index_name)
+            None
         };
 
-        for (column_id, sort_order) in columns {
+        let index_id = match (index.is_unique, predicate) {
+            (true, Some(pred)) => schema.push_partial_unique_constraint(table_id, index.name, pred),
+            (true, None) => schema.push_unique_constraint(table_id, index.name),
+            (false, Some(pred)) => schema.push_partial_index(table_id, index.name, pred),
+            (false, None) => schema.push_index(table_id, index.name),
+        };
+
+        for (column_id, sort_order) in index.columns {
             schema.push_index_column(crate::IndexColumn {
                 index_id,
                 column_id,
@@ -494,6 +525,43 @@ async fn push_indexes(
     }
 
     Ok(())
+}
+
+/// Extract the WHERE clause from a SQLite CREATE INDEX statement,
+/// using the SQL tokenizer to correctly handle quoted/escaped regions.
+fn extract_where_clause(sql: &str) -> Option<String> {
+    use sqlparser::{
+        dialect::SQLiteDialect,
+        keywords::Keyword,
+        tokenizer::{Token, Tokenizer},
+    };
+
+    let dialect = SQLiteDialect {};
+    let tokens = Tokenizer::new(&dialect, sql).tokenize_with_location().ok()?;
+
+    let mut depth: i32 = 0;
+    let mut last_where_char_offset = None;
+
+    for tok in &tokens {
+        match &tok.token {
+            Token::LParen => depth += 1,
+            Token::RParen => depth -= 1,
+            Token::Word(w) if w.keyword == Keyword::WHERE && depth == 0 => {
+                last_where_char_offset = Some(tok.span.start.column as usize - 1);
+            }
+            _ => {}
+        }
+    }
+
+    let char_offset = last_where_char_offset?;
+    let byte_offset = sql.char_indices().nth(char_offset).map(|(i, _)| i)?;
+    let predicate = sql[byte_offset + "WHERE".len()..].trim();
+
+    if predicate.is_empty() {
+        None
+    } else {
+        Some(predicate.to_string())
+    }
 }
 
 fn get_column_type(mut tpe: String, arity: ColumnArity) -> ColumnType {
@@ -594,3 +662,53 @@ const SQLITE_IGNORED_TABLES: &[&str] = &[
     // This is the default but can be configured by the user
     "d1_migrations",
 ];
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn extract_simple_where_clause() {
+        let sql = r#"CREATE UNIQUE INDEX "idx" ON "User" ("email") WHERE active = 1"#;
+        assert_eq!(extract_where_clause(sql), Some("active = 1".to_string()));
+    }
+
+    #[test]
+    fn extract_where_clause_with_quoted_identifier() {
+        let sql = r#"CREATE UNIQUE INDEX "idx" ON "User" ("email") WHERE "deletedAt" IS NULL"#;
+        assert_eq!(extract_where_clause(sql), Some("\"deletedAt\" IS NULL".to_string()));
+    }
+
+    #[test]
+    fn extract_where_clause_with_where_in_string_literal() {
+        let sql = r#"CREATE INDEX "idx" ON "t" ("col") WHERE my_field = ' WHERE '"#;
+        assert_eq!(extract_where_clause(sql), Some("my_field = ' WHERE '".to_string()));
+    }
+
+    #[test]
+    fn extract_where_clause_with_escaped_quotes_in_string() {
+        let sql = r#"CREATE INDEX "idx" ON "t" ("col") WHERE name = 'it''s WHERE ok'"#;
+        assert_eq!(extract_where_clause(sql), Some("name = 'it''s WHERE ok'".to_string()));
+    }
+
+    #[test]
+    fn no_where_clause() {
+        let sql = r#"CREATE INDEX "idx" ON "User" ("email")"#;
+        assert_eq!(extract_where_clause(sql), None);
+    }
+
+    #[test]
+    fn extract_where_clause_multiple_where_in_strings() {
+        let sql = r#"CREATE INDEX "idx" ON "t" ("col") WHERE a = ' WHERE ' AND b = ' WHERE '"#;
+        assert_eq!(
+            extract_where_clause(sql),
+            Some("a = ' WHERE ' AND b = ' WHERE '".to_string())
+        );
+    }
+
+    #[test]
+    fn extract_where_clause_no_real_where_only_in_string() {
+        let sql = r#"CREATE INDEX "idx" ON "t" ("col WHERE ")"#;
+        assert_eq!(extract_where_clause(sql), None);
+    }
+}

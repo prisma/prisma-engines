@@ -1,0 +1,19 @@
+---
+source: query-compiler/query-compiler/tests/queries.rs
+expression: pretty
+input_file: query-compiler/query-compiler/tests/data/filter-in-param-insensitive.json
+---
+dataMap {
+    id: Int (id)
+    email: String (email)
+    role: Enum<Role> (role)
+}
+enums {
+    Role: {
+        admin: ADMIN
+        user: USER
+    }
+}
+query «SELECT "t0"."id", "t0"."email", "t0"."role"::text FROM "public"."User" AS
+       "t0" WHERE LOWER("t0"."email") IN [LOWER($1),*]»
+params [var(searchTerm as String)]

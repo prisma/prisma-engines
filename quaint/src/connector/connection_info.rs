@@ -111,7 +111,7 @@ impl ConnectionInfo {
     }
 
     /// The provided database name. This will be `None` on SQLite.
-    pub fn dbname(&self) -> Option<&str> {
+    pub fn dbname(&self) -> Option<Cow<'_, str>> {
         match self {
             #[cfg(any(
                 feature = "sqlite-native",
@@ -123,9 +123,9 @@ impl ConnectionInfo {
                 #[cfg(feature = "postgresql-native")]
                 NativeConnectionInfo::Postgres(url) => Some(url.dbname()),
                 #[cfg(feature = "mysql-native")]
-                NativeConnectionInfo::Mysql(url) => url.dbname(),
+                NativeConnectionInfo::Mysql(url) => url.dbname().map(Cow::Borrowed),
                 #[cfg(feature = "mssql-native")]
-                NativeConnectionInfo::Mssql(url) => Some(url.dbname()),
+                NativeConnectionInfo::Mssql(url) => Some(Cow::Borrowed(url.dbname())),
                 #[cfg(feature = "sqlite-native")]
                 NativeConnectionInfo::Sqlite { .. } | NativeConnectionInfo::InMemorySqlite { .. } => None,
             },
