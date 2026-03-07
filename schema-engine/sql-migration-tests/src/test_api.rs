@@ -14,6 +14,7 @@ use crate::{
     multi_engine_test_api::{EngineTestApi, TestApi as RootTestApi},
 };
 use psl::{
+    PreviewFeature,
     datamodel_connector::NativeTypeInstance,
     parser_database::{ExtensionTypes, NoExtensionTypes, ScalarFieldType, SourceFile},
 };
@@ -92,6 +93,10 @@ impl TestApi {
 
     pub fn shadow_database_connection_string(&self) -> Option<&str> {
         self.root.shadow_database_connection_string()
+    }
+
+    pub fn preview_features(&self) -> BitFlags<PreviewFeature> {
+        self.root.preview_features()
     }
 
     pub fn connection_info(&self) -> ConnectionInfo {
@@ -222,7 +227,7 @@ impl TestApi {
             params,
             datasource_urls,
             self.connector.host().clone(),
-            BitFlags::empty(),
+            self.preview_features(),
             &NoExtensionTypes,
         ))
     }
