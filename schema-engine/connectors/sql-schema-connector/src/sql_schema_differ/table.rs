@@ -65,6 +65,7 @@ impl<'schema> TableDiffer<'schema, '_> {
             !self
                 .next_indexes()
                 .any(|next_index| indexes_match(*previous_index, next_index, self.db.flavour))
+                && !previous_index.is_stripped_partial()
         })
     }
 
@@ -167,15 +168,11 @@ impl<'schema> TableDiffer<'schema, '_> {
     }
 
     fn previous_indexes(&self) -> impl Iterator<Item = IndexWalker<'schema>> {
-        self.previous()
-            .indexes()
-            .filter(|idx| !idx.is_primary_key() && !idx.is_stripped_partial())
+        self.previous().indexes().filter(|idx| !idx.is_primary_key())
     }
 
     fn next_indexes(&self) -> impl Iterator<Item = IndexWalker<'schema>> {
-        self.next()
-            .indexes()
-            .filter(|idx| !idx.is_primary_key() && !idx.is_stripped_partial())
+        self.next().indexes().filter(|idx| !idx.is_primary_key())
     }
 
     pub fn previous(&self) -> TableWalker<'schema> {
