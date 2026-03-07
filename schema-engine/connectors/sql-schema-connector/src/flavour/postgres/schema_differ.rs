@@ -17,7 +17,11 @@ use sql_schema_describer::{
     postgres::PostgresSchemaExt,
     walkers::{IndexWalker, TableColumnWalker},
 };
-use sqlparser::ast::Expr;
+use sqlparser::{
+    ast::{Expr, Ident},
+    dialect::PostgreSqlDialect,
+    parser::Parser,
+};
 
 /// These can be tables or views, depending on the PostGIS version. In both cases, they should be ignored.
 static POSTGIS_TABLES_OR_VIEWS: LazyLock<RegexSet> = LazyLock::new(|| {
@@ -749,11 +753,7 @@ fn push_alter_enum_previous_usages_as_default(db: &DifferDatabase<'_>, alter_enu
 
 // Accounts for PG expression normalization (operator aliases, parens, implicit literal casts).
 fn pg_predicates_semantically_equal(a: &str, b: &str) -> bool {
-    use sqlparser::{
-        ast::{Value, VisitMut, VisitorMut},
-        dialect::PostgreSqlDialect,
-        parser::Parser,
-    };
+    use sqlparser::ast::{Value, VisitMut, VisitorMut};
     use std::ops::ControlFlow;
 
     struct StripPgNormalization;
@@ -792,6 +792,20 @@ fn pg_predicates_semantically_equal(a: &str, b: &str) -> bool {
     exprs_semantically_eq(&ast_a, &ast_b)
 }
 
+// Compares two identifiers semantically.
+fn idents_semantically_eq(a: &Ident, b: &Ident) -> bool {
+    if a == b {
+        return true;
+    }
+
+    matches!((a.quote_style, b.quote_style), (Some('"'), None) | (None, Some('"')))
+        && a.value == b.value
+        && Parser::new(&PostgreSqlDialect {})
+            .try_with_sql(&a.value)
+            .and_then(|mut parser| parser.parse_expr())
+            .is_ok_and(|expr| matches!(expr, Expr::Identifier(ident) if ident == *a || ident == *b))
+}
+
 // Compares two expressions that have already been normalized by `StripPgNormalization`.
 fn exprs_semantically_eq(a: &Expr, b: &Expr) -> bool {
     use sqlparser::ast::CastKind;
@@ -801,6 +815,12 @@ fn exprs_semantically_eq(a: &Expr, b: &Expr) -> bool {
     }
 
     match (a, b) {
+        (Expr::Identifier(ia), Expr::Identifier(ib)) => idents_semantically_eq(ia, ib),
+
+        (Expr::CompoundIdentifier(ia), Expr::CompoundIdentifier(ib)) if ia.len() == ib.len() => {
+            ia.iter().zip(ib.iter()).all(|(a, b)| idents_semantically_eq(a, b))
+        }
+
         // Value(x) matches Cast(::, Value(x), _): PG's single-level annotation on a bare literal.
         (
             Expr::Value(va),
