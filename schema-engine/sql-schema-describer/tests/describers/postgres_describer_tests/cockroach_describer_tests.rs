@@ -332,7 +332,7 @@ fn multi_field_indexes_must_be_inferred_in_the_right_order(api: TestApi) {
                     predicate: None,
                 },
             ],
-            feature_gated_partial_indexes: <FeatureGatedPartialIndexes>,
+            stripped_partial_indexes: <StrippedPartialIndexes>,
             index_columns: [
                 IndexColumn {
                     index_id: IndexId(
@@ -793,7 +793,7 @@ fn partial_indexes_are_described(api: TestApi) {
                     predicate: None,
                 },
             ],
-            feature_gated_partial_indexes: <FeatureGatedPartialIndexes>,
+            stripped_partial_indexes: <StrippedPartialIndexes>,
             index_columns: [
                 IndexColumn {
                     index_id: IndexId(

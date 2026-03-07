@@ -12,10 +12,10 @@ pub mod walkers;
 mod cloneable_any;
 mod connector_data;
 mod error;
-mod feature_gated_partial_indexes;
 mod getters;
 mod ids;
 mod parsers;
+mod stripped_partial_indexes;
 
 use crate::cloneable_any::CloneableAny;
 
@@ -65,8 +65,8 @@ pub struct SqlSchema {
     foreign_key_columns: Vec<ForeignKeyColumn>,
     /// All indexes and unique constraints.
     indexes: Vec<Index>,
-    /// Index ids for partial indexes hidden because the feature is disabled.
-    feature_gated_partial_indexes: feature_gated_partial_indexes::FeatureGatedPartialIndexes,
+    /// Index ids for partial indexes stripped because the feature is disabled.
+    stripped_partial_indexes: stripped_partial_indexes::StrippedPartialIndexes,
     /// All columns of indexes.
     index_columns: Vec<IndexColumn>,
     /// Check constraints for every table.
@@ -207,17 +207,17 @@ impl SqlSchema {
     }
 
     /// Strip partial-index predicates when the feature is disabled.
-    pub fn strip_partial_index_predicates_for_feature_gating(&mut self) {
+    pub fn strip_partial_index_predicates(&mut self) {
         for (idx, index) in self.indexes.iter_mut().enumerate() {
             if index.predicate.take().is_some() {
-                self.feature_gated_partial_indexes.insert(IndexId(idx as u32));
+                self.stripped_partial_indexes.insert(IndexId(idx as u32));
             }
         }
     }
 
-    /// Returns whether this index is a partial index hidden by feature gating.
-    pub fn index_is_feature_gated_partial(&self, index_id: IndexId) -> bool {
-        self.feature_gated_partial_indexes.contains(&index_id)
+    /// Returns whether this index is a stripped partial index.
+    pub fn index_is_stripped_partial(&self, index_id: IndexId) -> bool {
+        self.stripped_partial_indexes.contains(&index_id)
     }
 
     /// Add a table column to the schema.

@@ -189,7 +189,7 @@ fn sqlite_column_types_must_work(api: TestApi) {
                     predicate: None,
                 },
             ],
-            feature_gated_partial_indexes: <FeatureGatedPartialIndexes>,
+            stripped_partial_indexes: <StrippedPartialIndexes>,
             index_columns: [
                 IndexColumn {
                     index_id: IndexId(
@@ -363,7 +363,7 @@ fn escaped_quotes_in_string_defaults_must_be_unescaped(api: TestApi) {
             view_default_values: [],
             foreign_key_columns: [],
             indexes: [],
-            feature_gated_partial_indexes: <FeatureGatedPartialIndexes>,
+            stripped_partial_indexes: <StrippedPartialIndexes>,
             index_columns: [],
             check_constraints: [],
             views: [],
@@ -441,7 +441,7 @@ fn backslashes_in_string_literals(api: TestApi) {
             view_default_values: [],
             foreign_key_columns: [],
             indexes: [],
-            feature_gated_partial_indexes: <FeatureGatedPartialIndexes>,
+            stripped_partial_indexes: <StrippedPartialIndexes>,
             index_columns: [],
             check_constraints: [],
             views: [],
@@ -632,7 +632,7 @@ fn broken_relations_are_filtered_out(api: TestApi) {
                     predicate: None,
                 },
             ],
-            feature_gated_partial_indexes: <FeatureGatedPartialIndexes>,
+            stripped_partial_indexes: <StrippedPartialIndexes>,
             index_columns: [
                 IndexColumn {
                     index_id: IndexId(
@@ -875,7 +875,7 @@ fn partial_indexes_are_described(api: TestApi) {
                     ),
                 },
             ],
-            feature_gated_partial_indexes: <FeatureGatedPartialIndexes>,
+            stripped_partial_indexes: <StrippedPartialIndexes>,
             index_columns: [
                 IndexColumn {
                     index_id: IndexId(

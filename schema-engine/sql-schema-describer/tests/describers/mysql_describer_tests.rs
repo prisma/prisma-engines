@@ -2512,7 +2512,7 @@ fn all_mysql_8_column_types_must_work(api: TestApi) {
                     predicate: None,
                 },
             ],
-            feature_gated_partial_indexes: <FeatureGatedPartialIndexes>,
+            stripped_partial_indexes: <StrippedPartialIndexes>,
             index_columns: [
                 IndexColumn {
                     index_id: IndexId(
@@ -2791,7 +2791,7 @@ fn constraints_from_other_databases_should_not_be_introspected(api: TestApi) {
                     predicate: None,
                 },
             ],
-            feature_gated_partial_indexes: <FeatureGatedPartialIndexes>,
+            stripped_partial_indexes: <StrippedPartialIndexes>,
             index_columns: [
                 IndexColumn {
                     index_id: IndexId(
@@ -2907,7 +2907,7 @@ fn introspected_default_strings_should_be_unescaped(api: TestApi) {
             view_default_values: [],
             foreign_key_columns: [],
             indexes: [],
-            feature_gated_partial_indexes: <FeatureGatedPartialIndexes>,
+            stripped_partial_indexes: <StrippedPartialIndexes>,
             index_columns: [],
             check_constraints: [],
             views: [],
@@ -3018,7 +3018,7 @@ fn escaped_quotes_in_string_defaults_must_be_unescaped(api: TestApi) {
             view_default_values: [],
             foreign_key_columns: [],
             indexes: [],
-            feature_gated_partial_indexes: <FeatureGatedPartialIndexes>,
+            stripped_partial_indexes: <StrippedPartialIndexes>,
             index_columns: [],
             check_constraints: [],
             views: [],
@@ -3098,7 +3098,7 @@ fn escaped_backslashes_in_string_literals_must_be_unescaped(api: TestApi) {
             view_default_values: [],
             foreign_key_columns: [],
             indexes: [],
-            feature_gated_partial_indexes: <FeatureGatedPartialIndexes>,
+            stripped_partial_indexes: <StrippedPartialIndexes>,
             index_columns: [],
             check_constraints: [],
             views: [],
@@ -3541,7 +3541,7 @@ fn function_expression_defaults_are_described_as_dbgenerated(api: TestApi) {
             view_default_values: [],
             foreign_key_columns: [],
             indexes: [],
-            feature_gated_partial_indexes: <FeatureGatedPartialIndexes>,
+            stripped_partial_indexes: <StrippedPartialIndexes>,
             index_columns: [],
             check_constraints: [],
             views: [],

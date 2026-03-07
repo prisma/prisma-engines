@@ -229,9 +229,7 @@ fn apply_partial_index_feature_gating(
     }
 
     let mut inner = SqlDatabaseSchema::from_erased(db_schema);
-    inner
-        .describer_schema
-        .strip_partial_index_predicates_for_feature_gating();
+    inner.describer_schema.strip_partial_index_predicates();
 
     DatabaseSchema::new(*inner)
 }

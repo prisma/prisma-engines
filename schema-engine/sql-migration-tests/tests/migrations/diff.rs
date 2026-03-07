@@ -958,6 +958,79 @@ fn from_migrations_to_schema_datamodel_ignores_manual_partial_indexes_without_pr
     expected_diff.assert_eq(&diff);
 }
 
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
+fn from_migrations_to_url_ignores_manual_partial_indexes_with_engine_seeded_schema(api: TestApi) {
+    let migrations_dir = tempfile::tempdir().unwrap();
+    let migration_dir = migrations_dir.path().join("01init");
+    let migration_file = migration_dir.join("migration.sql");
+    let schema_name = api.schema_name();
+
+    std::fs::write(
+        migrations_dir.path().join("migration_lock.toml"),
+        format!("provider = \"{}\"", api.args().provider()),
+    )
+    .unwrap();
+    std::fs::create_dir_all(&migration_dir).unwrap();
+    std::fs::write(
+        migration_file,
+        format!(
+            "CREATE SCHEMA IF NOT EXISTS \"{schema_name}\";\n\
+             CREATE TABLE \"{schema_name}\".\"User\" (\n\
+                 \"id\" INTEGER NOT NULL,\n\
+                 \"email\" TEXT NOT NULL,\n\
+                 CONSTRAINT \"User_pkey\" PRIMARY KEY (\"id\")\n\
+             );\n\
+             CREATE INDEX \"User_email_partial_idx\" ON \"{schema_name}\".\"User\" (\"email\") WHERE \"email\" IS NOT NULL;\n"
+        ),
+    )
+    .unwrap();
+
+    // Initial datamodel seeded into the engine (without partialIndexes preview feature).
+    // This exercises the EngineState::preview_features() -> diff_cli path.
+    let initial_datamodel = api.datamodel_with_provider(
+        r#"
+        model User {
+            id    Int    @id
+            email String
+        }
+    "#,
+    );
+
+    // Apply the migration to create the table + partial index
+    api.raw_cmd(&format!(
+        "CREATE TABLE \"{schema_name}\".\"User\" (\n\
+             \"id\" INTEGER NOT NULL,\n\
+             \"email\" TEXT NOT NULL,\n\
+             CONSTRAINT \"User_pkey\" PRIMARY KEY (\"id\")\n\
+         );\n\
+         CREATE INDEX \"User_email_partial_idx\" ON \"{schema_name}\".\"User\" (\"email\") WHERE \"email\" IS NOT NULL;\n"
+    ));
+
+    let (result, diff) = diff_result_with_initial_datamodel(
+        Some(initial_datamodel),
+        DatasourceUrls {
+            url: Some(api.connection_string().to_owned()),
+            shadow_database_url: Some(api.connection_string().to_owned()),
+        },
+        DiffParams {
+            exit_code: Some(true),
+            from: DiffTarget::Migrations(list_migrations(migrations_dir.path()).unwrap()),
+            to: DiffTarget::Url(UrlContainer {
+                url: api.connection_string().to_owned(),
+            }),
+            script: false,
+            shadow_database_url: Some(api.connection_string().to_owned()),
+            filters: SchemaFilter::default(),
+        },
+    );
+
+    assert_eq!(result.exit_code, 0);
+    let expected_diff = expect![[r#"
+        No difference detected.
+    "#]];
+    expected_diff.assert_eq(&diff);
+}
+
 #[test]
 fn diffing_mongo_schemas_works() {
     let tempdir = tempfile::tempdir().unwrap();
@@ -1325,8 +1398,19 @@ pub(crate) fn diff_error(datasource_urls: DatasourceUrls, params: DiffParams) ->
 // Call diff, and expect it to succeed. Return the result and what would be printed to stdout.
 #[track_caller]
 pub(crate) fn diff_result(datasource_urls: DatasourceUrls, params: DiffParams) -> (DiffResult, String) {
+    diff_result_with_initial_datamodel(None, datasource_urls, params)
+}
+
+// Call diff with an initial datamodel seeded into the engine state.
+#[track_caller]
+pub(crate) fn diff_result_with_initial_datamodel(
+    initial_datamodel: Option<String>,
+    datasource_urls: DatasourceUrls,
+    params: DiffParams,
+) -> (DiffResult, String) {
     let host = Arc::new(TestConnectorHost::default());
-    let api = schema_core::schema_api_without_extensions(None, datasource_urls, Some(host.clone())).unwrap();
+    let api =
+        schema_core::schema_api_without_extensions(initial_datamodel, datasource_urls, Some(host.clone())).unwrap();
     let result = test_setup::runtime::run_with_thread_local_runtime(api.diff(params)).unwrap();
     let printed_messages = host.printed_messages.lock().unwrap();
     assert!(printed_messages.len() == 1, "{printed_messages:?}");
