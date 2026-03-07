@@ -64,4 +64,9 @@ impl<'a> IndexWalker<'a> {
     pub fn is_partial(self) -> bool {
         self.get().predicate.is_some()
     }
+
+    /// Returns true if this is a partial index hidden by feature gating.
+    pub fn is_feature_gated_partial(self) -> bool {
+        self.schema.index_is_feature_gated_partial(self.id)
+    }
 }

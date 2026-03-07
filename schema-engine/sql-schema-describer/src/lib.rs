@@ -30,7 +30,10 @@ pub use prisma_value::PrismaValue;
 use enumflags2::{BitFlag, BitFlags};
 use regex::Regex;
 use serde::{Deserialize, Serialize};
-use std::fmt::{self, Debug};
+use std::{
+    collections::HashSet,
+    fmt::{self, Debug},
+};
 
 /// A database description connector.
 #[async_trait::async_trait]
@@ -64,6 +67,8 @@ pub struct SqlSchema {
     foreign_key_columns: Vec<ForeignKeyColumn>,
     /// All indexes and unique constraints.
     indexes: Vec<Index>,
+    /// Index ids for partial indexes hidden because the feature is disabled.
+    feature_gated_partial_indexes: HashSet<IndexId>,
     /// All columns of indexes.
     index_columns: Vec<IndexColumn>,
     /// Check constraints for every table.
@@ -203,11 +208,18 @@ impl SqlSchema {
         }
     }
 
-    /// Clear all index predicates so the differ ignores partial indexes when the feature is disabled.
-    pub fn clear_index_predicates(&mut self) {
-        for idx in self.indexes.iter_mut() {
-            idx.predicate = None;
+    /// Strip partial-index predicates when the feature is disabled.
+    pub fn strip_partial_index_predicates_for_feature_gating(&mut self) {
+        for (idx, index) in self.indexes.iter_mut().enumerate() {
+            if index.predicate.take().is_some() {
+                self.feature_gated_partial_indexes.insert(IndexId(idx as u32));
+            }
         }
+    }
+
+    /// Returns whether this index is a partial index hidden by feature gating.
+    pub fn index_is_feature_gated_partial(&self, index_id: IndexId) -> bool {
+        self.feature_gated_partial_indexes.contains(&index_id)
     }
 
     /// Add a table column to the schema.

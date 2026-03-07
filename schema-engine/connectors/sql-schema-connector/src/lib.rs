@@ -363,8 +363,8 @@ impl SqlSchemaConnector {
             .scalar_type_for_native_type(native_type, extension_types)
     }
 
-    /// Erase index predicates when `partialIndexes` preview feature is off.
-    fn normalize_index_predicates(&self, db_schema: DatabaseSchema) -> DatabaseSchema {
+    /// Strip partial-index predicates when `partialIndexes` is off.
+    fn apply_partial_index_feature_gating(&self, db_schema: DatabaseSchema) -> DatabaseSchema {
         if self
             .inner
             .preview_features()
@@ -373,7 +373,9 @@ impl SqlSchemaConnector {
             return db_schema;
         }
         let mut inner = SqlDatabaseSchema::from_erased(db_schema);
-        inner.describer_schema.clear_index_predicates();
+        inner
+            .describer_schema
+            .strip_partial_index_predicates_for_feature_gating();
         DatabaseSchema::new(*inner)
     }
 }
@@ -457,7 +459,7 @@ impl SchemaConnector for SqlSchemaConnector {
                 .await
                 .map(SqlDatabaseSchema::from)
                 .map(DatabaseSchema::new)
-                .map(|db| self.normalize_index_predicates(db))
+                .map(|db| self.apply_partial_index_feature_gating(db))
         })
     }
 
@@ -485,7 +487,7 @@ impl SchemaConnector for SqlSchemaConnector {
                     .map(SqlDatabaseSchema::from)
                     .map(DatabaseSchema::new)?,
             };
-            Ok(self.normalize_index_predicates(db_schema))
+            Ok(self.apply_partial_index_feature_gating(db_schema))
         })
     }
 
