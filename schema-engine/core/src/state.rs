@@ -124,6 +124,13 @@ impl EngineState {
             })
     }
 
+    fn preview_features(&self) -> psl::PreviewFeatures {
+        self.initial_datamodel
+            .as_ref()
+            .map(|schema| schema.configuration.preview_features())
+            .unwrap_or_default()
+    }
+
     async fn with_connector_for_request<O: Send + 'static>(
         &self,
         request: ConnectorRequestType,
@@ -312,7 +319,14 @@ impl GenericApi for EngineState {
     }
 
     async fn diff(&self, params: DiffParams) -> CoreResult<DiffResult> {
-        commands::diff_cli(params, &self.datasource_urls, self.host.clone(), &*self.extensions).await
+        commands::diff_cli(
+            params,
+            &self.datasource_urls,
+            self.host.clone(),
+            self.preview_features(),
+            &*self.extensions,
+        )
+        .await
     }
 
     async fn drop_database(&self, url: String) -> CoreResult<()> {
