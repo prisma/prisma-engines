@@ -1009,3 +1009,21 @@ fn partial_index_not_with_and_or_roundtrip_postgres(api: TestApi) {
     api.schema_push(&dm).send().assert_green();
     api.schema_push(&dm).send().assert_no_steps();
 }
+
+#[test_connector(tags(Postgres), exclude(CockroachDb), preview_features("partialIndexes"))]
+fn partial_index_object_literal_null_and_not_null_is_idempotent_postgres(api: TestApi) {
+    let dm = api.datamodel_with_provider_and_features(
+        r#"model Shop {
+            id        BigInt   @id
+            postcode  String?
+            deletedAt DateTime?
+
+            @@index([postcode], where: { deletedAt: null, postcode: { not: null } })
+        }"#,
+        &[],
+        PREVIEW_FEATURES,
+    );
+
+    api.schema_push(&dm).send().assert_green();
+    api.schema_push(&dm).send().assert_no_steps();
+}
