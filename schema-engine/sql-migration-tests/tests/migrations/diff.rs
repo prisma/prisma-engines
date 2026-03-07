@@ -381,6 +381,7 @@ fn from_empty_to_migrations_directory(mut api: TestApi) {
             shadow_database_url: Some(api.connection_string().to_owned()),
         },
         host.clone(),
+        BitFlags::empty(),
         &NoExtensionTypes,
     ))
     .unwrap();

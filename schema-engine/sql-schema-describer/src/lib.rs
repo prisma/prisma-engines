@@ -12,6 +12,7 @@ pub mod walkers;
 mod cloneable_any;
 mod connector_data;
 mod error;
+mod feature_gated_partial_indexes;
 mod getters;
 mod ids;
 mod parsers;
@@ -30,10 +31,7 @@ pub use prisma_value::PrismaValue;
 use enumflags2::{BitFlag, BitFlags};
 use regex::Regex;
 use serde::{Deserialize, Serialize};
-use std::{
-    collections::HashSet,
-    fmt::{self, Debug},
-};
+use std::fmt::{self, Debug};
 
 /// A database description connector.
 #[async_trait::async_trait]
@@ -68,8 +66,7 @@ pub struct SqlSchema {
     /// All indexes and unique constraints.
     indexes: Vec<Index>,
     /// Index ids for partial indexes hidden because the feature is disabled.
-    #[serde(skip)]
-    feature_gated_partial_indexes: HashSet<IndexId>,
+    feature_gated_partial_indexes: feature_gated_partial_indexes::FeatureGatedPartialIndexes,
     /// All columns of indexes.
     index_columns: Vec<IndexColumn>,
     /// Check constraints for every table.

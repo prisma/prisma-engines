@@ -222,6 +222,7 @@ impl TestApi {
             params,
             datasource_urls,
             self.connector.host().clone(),
+            BitFlags::empty(),
             &NoExtensionTypes,
         ))
     }

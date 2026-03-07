@@ -25,6 +25,7 @@ pub async fn diff(
     // Note that currently, we union all namespaces and preview features. This may not be correct.
     let (namespaces, preview_features) =
         namespaces_and_preview_features_from_diff_targets(&[&params.from, &params.to])?;
+    let preview_features = preview_features | connector.preview_features();
 
     let filter: SchemaFilter = params.filters.into();
     filter.validate(&*connector.schema_dialect())?;
