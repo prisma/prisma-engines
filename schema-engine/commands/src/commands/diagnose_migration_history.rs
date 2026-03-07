@@ -142,7 +142,10 @@ pub async fn diagnose_migration_history(
         let filter: schema_connector::SchemaFilter = input.filters.into();
         if input.opt_in_to_shadow_database {
             let mut dialect = connector.schema_dialect();
-            let target = ExternalShadowDatabase::DriverAdapter(adapter_factory);
+            let target = ExternalShadowDatabase::DriverAdapter {
+                factory: adapter_factory,
+                preview_features: connector.preview_features(),
+            };
             let from = migration_schema_cache
                 .get_or_insert(&applied_migrations.migration_directories, || async {
                     connector

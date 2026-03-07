@@ -163,7 +163,10 @@ async fn diff_target_to_dialect(
                             &migrations,
                             namespaces,
                             filter,
-                            ExternalShadowDatabase::DriverAdapter(adapter_factory),
+                            ExternalShadowDatabase::DriverAdapter {
+                                factory: adapter_factory,
+                                preview_features,
+                            },
                         )
                         .await?;
                     Ok(Some((dialect, schema)))

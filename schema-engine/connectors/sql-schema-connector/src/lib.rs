@@ -173,6 +173,11 @@ impl SchemaDialect for SqlSchemaDialect {
         target: ExternalShadowDatabase,
     ) -> BoxFuture<'a, ConnectorResult<DatabaseSchema>> {
         Box::pin(async move {
+            let preview_features = match &target {
+                ExternalShadowDatabase::DriverAdapter { preview_features, .. }
+                | ExternalShadowDatabase::ConnectionString { preview_features, .. } => *preview_features,
+            };
+
             let mut connector = match target {
                 #[cfg(not(any(
                     feature = "mssql-native",
@@ -180,7 +185,10 @@ impl SchemaDialect for SqlSchemaDialect {
                     feature = "postgresql-native",
                     feature = "sqlite-native"
                 )))]
-                ExternalShadowDatabase::DriverAdapter(factory) => self.dialect.connect_to_shadow_db(factory).await?,
+                ExternalShadowDatabase::DriverAdapter {
+                    factory,
+                    preview_features: _,
+                } => self.dialect.connect_to_shadow_db(factory).await?,
                 #[cfg(any(
                     feature = "mssql-native",
                     feature = "mysql-native",
@@ -206,9 +214,26 @@ impl SchemaDialect for SqlSchemaDialect {
                 .await;
             // dispose of the connector regardless of the result
             connector.dispose().await?;
-            Ok(DatabaseSchema::new(SqlDatabaseSchema::from(schema?)))
+            let schema = DatabaseSchema::new(SqlDatabaseSchema::from(schema?));
+            Ok(apply_partial_index_feature_gating(schema, preview_features))
         })
     }
+}
+
+fn apply_partial_index_feature_gating(
+    db_schema: DatabaseSchema,
+    preview_features: BitFlags<psl::PreviewFeature>,
+) -> DatabaseSchema {
+    if preview_features.contains(psl::PreviewFeature::PartialIndexes) {
+        return db_schema;
+    }
+
+    let mut inner = SqlDatabaseSchema::from_erased(db_schema);
+    inner
+        .describer_schema
+        .strip_partial_index_predicates_for_feature_gating();
+
+    DatabaseSchema::new(*inner)
 }
 
 /// The top-level SQL migration connector.
@@ -365,18 +390,7 @@ impl SqlSchemaConnector {
 
     /// Strip partial-index predicates when `partialIndexes` is off.
     fn apply_partial_index_feature_gating(&self, db_schema: DatabaseSchema) -> DatabaseSchema {
-        if self
-            .inner
-            .preview_features()
-            .contains(psl::PreviewFeature::PartialIndexes)
-        {
-            return db_schema;
-        }
-        let mut inner = SqlDatabaseSchema::from_erased(db_schema);
-        inner
-            .describer_schema
-            .strip_partial_index_predicates_for_feature_gating();
-        DatabaseSchema::new(*inner)
+        apply_partial_index_feature_gating(db_schema, self.inner.preview_features())
     }
 }
 
@@ -396,6 +410,10 @@ impl SchemaConnector for SqlSchemaConnector {
 
     fn set_preview_features(&mut self, preview_features: BitFlags<psl::PreviewFeature>) {
         self.inner.set_preview_features(preview_features)
+    }
+
+    fn preview_features(&self) -> BitFlags<psl::PreviewFeature> {
+        self.inner.preview_features()
     }
 
     fn connector_type(&self) -> &'static str {
