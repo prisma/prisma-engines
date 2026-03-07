@@ -68,6 +68,7 @@ pub struct SqlSchema {
     /// All indexes and unique constraints.
     indexes: Vec<Index>,
     /// Index ids for partial indexes hidden because the feature is disabled.
+    #[serde(skip)]
     feature_gated_partial_indexes: HashSet<IndexId>,
     /// All columns of indexes.
     index_columns: Vec<IndexColumn>,
