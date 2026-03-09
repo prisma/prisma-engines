@@ -44,6 +44,20 @@ impl<'db> ScalarFieldWalker<'db> {
         })
     }
 
+    /// Is this field's unique constraint partial? This method will return true if:
+    ///
+    /// - The field has an `@unique` attribute with a `where` clause.
+    /// - There is a `@@unique` on the model that contains __only__ this field and has a `where` clause.
+    pub fn is_partial_unique(self) -> bool {
+        self.model().indexes().any(|idx| {
+            let mut fields = idx.fields();
+            idx.is_unique()
+                && idx.is_partial()
+                && fields.len() == 1
+                && fields.next().map(|f| f.field_id()) == Some(self.field_id())
+        })
+    }
+
     /// The name of the field.
     pub fn name(self) -> &'db str {
         self.ast_field().name()
