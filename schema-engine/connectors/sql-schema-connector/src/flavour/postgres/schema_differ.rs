@@ -803,7 +803,7 @@ fn idents_semantically_eq(a: &Ident, b: &Ident) -> bool {
         && Parser::new(&PostgreSqlDialect {})
             .try_with_sql(&a.value)
             .and_then(|mut parser| parser.parse_expr())
-            .is_ok_and(|expr| matches!(expr, Expr::Identifier(ident) if ident == *a || ident == *b))
+            .is_ok_and(|expr| matches!(expr, Expr::Identifier(_)))
 }
 
 // Compares two expressions that have already been normalized by `StripPgNormalization`.
