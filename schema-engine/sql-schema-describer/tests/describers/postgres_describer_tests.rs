@@ -2893,6 +2893,7 @@ fn multiple_schemas_are_described(api: TestApi) {
                     predicate: None,
                 },
             ],
+            stripped_partial_indexes: <StrippedPartialIndexes>,
             index_columns: [
                 IndexColumn {
                     index_id: IndexId(
