@@ -982,6 +982,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                     predicate: None,
                 },
             ],
+            stripped_partial_indexes: <StrippedPartialIndexes>,
             index_columns: [
                 IndexColumn {
                     index_id: IndexId(
@@ -1456,6 +1457,7 @@ fn escaped_quotes_in_string_defaults_must_be_unescaped(api: TestApi) {
                     predicate: None,
                 },
             ],
+            stripped_partial_indexes: <StrippedPartialIndexes>,
             index_columns: [
                 IndexColumn {
                     index_id: IndexId(
@@ -1550,6 +1552,7 @@ fn seemingly_escaped_backslashes_in_string_literals_must_not_be_unescaped(api: T
             view_default_values: [],
             foreign_key_columns: [],
             indexes: [],
+            stripped_partial_indexes: <StrippedPartialIndexes>,
             index_columns: [],
             check_constraints: [],
             views: [],
@@ -2031,6 +2034,7 @@ fn multiple_schemas_with_same_table_names_are_described(api: TestApi) {
                     predicate: None,
                 },
             ],
+            stripped_partial_indexes: <StrippedPartialIndexes>,
             index_columns: [
                 IndexColumn {
                     index_id: IndexId(
@@ -2490,6 +2494,7 @@ fn multiple_schemas_with_same_foreign_key_are_described(api: TestApi) {
                     predicate: None,
                 },
             ],
+            stripped_partial_indexes: <StrippedPartialIndexes>,
             index_columns: [
                 IndexColumn {
                     index_id: IndexId(
@@ -3141,6 +3146,7 @@ fn partial_indexes_are_described(api: TestApi) {
                     predicate: None,
                 },
             ],
+            stripped_partial_indexes: <StrippedPartialIndexes>,
             index_columns: [
                 IndexColumn {
                     index_id: IndexId(

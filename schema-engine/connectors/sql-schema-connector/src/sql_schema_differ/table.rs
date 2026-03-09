@@ -65,6 +65,7 @@ impl<'schema> TableDiffer<'schema, '_> {
             !self
                 .next_indexes()
                 .any(|next_index| indexes_match(*previous_index, next_index, self.db.flavour))
+                && !previous_index.is_stripped_partial()
         })
     }
 

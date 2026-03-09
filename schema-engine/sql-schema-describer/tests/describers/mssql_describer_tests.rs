@@ -682,6 +682,7 @@ fn all_mssql_column_types_must_work(api: TestApi) {
                     predicate: None,
                 },
             ],
+            stripped_partial_indexes: <StrippedPartialIndexes>,
             index_columns: [
                 IndexColumn {
                     index_id: IndexId(
@@ -965,6 +966,7 @@ fn multiple_schemas_with_same_table_names_are_described(api: TestApi) {
                     predicate: None,
                 },
             ],
+            stripped_partial_indexes: <StrippedPartialIndexes>,
             index_columns: [
                 IndexColumn {
                     index_id: IndexId(
@@ -1357,6 +1359,7 @@ fn multiple_schemas_with_same_foreign_key_are_described(api: TestApi) {
                     predicate: None,
                 },
             ],
+            stripped_partial_indexes: <StrippedPartialIndexes>,
             index_columns: [
                 IndexColumn {
                     index_id: IndexId(
@@ -1561,6 +1564,7 @@ fn partial_indexes_are_described(api: TestApi) {
                     predicate: None,
                 },
             ],
+            stripped_partial_indexes: <StrippedPartialIndexes>,
             index_columns: [
                 IndexColumn {
                     index_id: IndexId(
