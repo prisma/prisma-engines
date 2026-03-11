@@ -153,11 +153,13 @@ impl MssqlConnector {
 
     /// Get the url as a JDBC string, extract the database name, and re-encode the string.
     fn master_url(input: &str) -> ConnectorResult<(String, String)> {
+        let url = MssqlUrl::new(input).map_err(ConnectorError::url_parse_error)?;
+        let db_name = url.dbname().into_owned();
+
         let mut conn = JdbcString::from_str(&format!("jdbc:{input}"))
             .map_err(|e| ConnectorError::from_source(e, "JDBC string parse error"))?;
-        let params = conn.properties_mut();
+        conn.properties_mut().remove("database");
 
-        let db_name = params.remove("database").unwrap_or_else(|| String::from("master"));
         Ok((db_name, conn.to_string()))
     }
 }
@@ -255,22 +257,8 @@ impl SqlConnector for MssqlConnector {
     fn drop_database(&mut self) -> BoxFuture<'_, ConnectorResult<()>> {
         Box::pin(async {
             let params = self.state.get_unwrapped_params();
-            let connection_string = &params.connector_params.connection_string;
-            {
-                let conn_str: JdbcString = format!("jdbc:{connection_string}")
-                    .parse()
-                    .map_err(ConnectorError::url_parse_error)?;
-
-                let db_name = conn_str
-                    .properties()
-                    .get("database")
-                    .map(|s| s.to_owned())
-                    .unwrap_or_else(|| "master".to_owned());
-
-                assert!(db_name != "master", "Cannot drop the `master` database.");
-            }
-
             let (db_name, master_uri) = Self::master_url(&params.connector_params.connection_string)?;
+            assert!(db_name != "master", "Cannot drop the `master` database.");
             let mut conn = Connection::new(&master_uri.to_string()).await?;
 
             let query = format!("DROP DATABASE IF EXISTS [{db_name}]");
