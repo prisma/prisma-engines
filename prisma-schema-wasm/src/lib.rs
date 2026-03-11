@@ -132,6 +132,71 @@ pub fn hover(schema_files: String, params: String) -> String {
     prisma_fmt::hover(schema_files, &params)
 }
 
+/// Handle-based DMMF buffer that holds serialized DMMF JSON as bytes.
+///
+/// This bypasses V8's string length limit (~536MB / 0x1fffffe8 chars) by keeping the
+/// serialized JSON as bytes in WASM linear memory. The JS side reads chunks as `Uint8Array`
+/// (which has no V8 string limit) and can reassemble them with a streaming JSON parser.
+///
+/// Usage from JS:
+/// ```js
+/// const buffer = get_dmmf_buffered(params);
+/// const totalLen = buffer.len();
+/// const chunks = [];
+/// for (let offset = 0; offset < totalLen; offset += CHUNK_SIZE) {
+///     chunks.push(buffer.read_chunk(offset, CHUNK_SIZE));
+/// }
+/// buffer.free(); // release WASM memory
+/// ```
+///
+/// See: https://github.com/prisma/prisma/issues/29111
+#[wasm_bindgen]
+pub struct DmmfBuffer {
+    data: Vec<u8>,
+}
+
+#[wasm_bindgen]
+impl DmmfBuffer {
+    /// Returns the total byte length of the serialized DMMF JSON.
+    pub fn len(&self) -> usize {
+        self.data.len()
+    }
+
+    /// Returns `true` if the buffer is empty.
+    pub fn is_empty(&self) -> bool {
+        self.data.is_empty()
+    }
+
+    /// Read a chunk of the buffer as `Uint8Array`.
+    /// `offset` is the byte offset, `length` is the max number of bytes to read.
+    /// Returns a `Vec<u8>` which wasm-bindgen converts to `Uint8Array` on the JS side.
+    pub fn read_chunk(&self, offset: usize, length: usize) -> Result<Vec<u8>, JsError> {
+        if offset >= self.data.len() {
+            return Err(JsError::new("Offset beyond buffer length"));
+        }
+        if length == 0 {
+            return Ok(Vec::new());
+        }
+        // Use saturating_add to avoid overflow on wasm32 (usize is 32-bit)
+        let end = std::cmp::min(offset.saturating_add(length), self.data.len());
+        Ok(self.data[offset..end].to_vec())
+    }
+}
+
+/// Serialize DMMF to a caller-owned buffer and return it as a handle.
+/// Use `DmmfBuffer.read_chunk()` to read portions as `Uint8Array`, then
+/// `DmmfBuffer.free()` (auto-provided by wasm-bindgen) to release WASM memory.
+///
+/// This avoids implicit global state — each call returns an independent buffer.
+///
+/// See: https://github.com/prisma/prisma/issues/29111
+#[wasm_bindgen]
+pub fn get_dmmf_buffered(params: String) -> Result<DmmfBuffer, JsError> {
+    register_panic_hook();
+    let data = prisma_fmt::get_dmmf_bytes(params).map_err(|e| JsError::new(&e))?;
+    Ok(DmmfBuffer { data })
+}
+
 /// Trigger a panic inside the wasm module. This is only useful in development for testing panic
 /// handling.
 #[wasm_bindgen]
