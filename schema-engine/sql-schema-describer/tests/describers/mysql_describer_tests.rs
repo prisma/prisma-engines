@@ -853,6 +853,7 @@ fn all_mysql_column_types_must_work(api: TestApi) {
                     predicate: None,
                 },
             ],
+            stripped_partial_indexes: <StrippedPartialIndexes>,
             index_columns: [
                 IndexColumn {
                     index_id: IndexId(
@@ -1681,6 +1682,7 @@ fn all_mariadb_column_types_must_work(api: TestApi) {
                     predicate: None,
                 },
             ],
+            stripped_partial_indexes: <StrippedPartialIndexes>,
             index_columns: [
                 IndexColumn {
                     index_id: IndexId(

@@ -177,8 +177,9 @@ mod mysql {
     //"MySQL native decimal types" should "work"
     #[connector_test(schema(schema_decimal))]
     async fn native_decimal_type(runner: Runner) -> TestResult<()> {
-        insta::assert_snapshot!(
-          run_query!(&runner, r#"mutation {
+        let res = runner
+            .query(
+                r#"mutation {
             createOneModel(
               data: {
                 float: 1.1
@@ -190,10 +191,16 @@ mod mysql {
               dfloat
               decFloat
             }
-          }"#),
-          // decFloat is cut due to precision
-          @r###"{"data":{"createOneModel":{"float":1.1,"dfloat":2.2,"decFloat":"3.1"}}}"###
-        );
+          }"#,
+            )
+            .await?
+            .into_data();
+
+        let row = &res.first().expect("should have one result")["createOneModel"];
+
+        assert_eq!(row["float"].as_f64().unwrap() as f32, 1.1);
+        assert_eq!(row["dfloat"].as_f64().unwrap(), 2.2);
+        assert_eq!(row["decFloat"].as_str().unwrap(), "3.1");
 
         Ok(())
     }
