@@ -909,13 +909,13 @@ fn from_migrations_to_schema_datamodel_ignores_manual_partial_indexes_without_pr
     std::fs::write(
         migration_file,
         format!(
-            "CREATE SCHEMA IF NOT EXISTS \"{schema_name}\";\n\
-             CREATE TABLE \"{schema_name}\".\"User\" (\n\
-                 \"id\" INTEGER NOT NULL,\n\
-                 \"email\" TEXT NOT NULL,\n\
-                 CONSTRAINT \"User_pkey\" PRIMARY KEY (\"id\")\n\
-             );\n\
-             CREATE INDEX \"User_email_partial_idx\" ON \"{schema_name}\".\"User\" (\"email\") WHERE \"email\" IS NOT NULL;\n"
+            r#"CREATE SCHEMA IF NOT EXISTS "{schema_name}";
+             CREATE TABLE "{schema_name}"."User" (
+                 "id" INTEGER NOT NULL,
+                 "email" TEXT NOT NULL,
+                 CONSTRAINT "User_pkey" PRIMARY KEY ("id")
+             );
+             CREATE INDEX "User_email_partial_idx" ON "{schema_name}"."User" ("email") WHERE "email" IS NOT NULL;"#
         ),
     )
     .unwrap();
@@ -959,6 +959,71 @@ fn from_migrations_to_schema_datamodel_ignores_manual_partial_indexes_without_pr
 }
 
 #[test_connector(tags(Postgres), exclude(CockroachDb))]
+fn from_schema_datamodel_to_migrations_ignores_manual_partial_indexes_without_preview_feature(api: TestApi) {
+    let migrations_dir = tempfile::tempdir().unwrap();
+    let migration_dir = migrations_dir.path().join("01init");
+    let migration_file = migration_dir.join("migration.sql");
+    let schema_name = api.schema_name();
+
+    std::fs::write(
+        migrations_dir.path().join("migration_lock.toml"),
+        format!("provider = \"{}\"", api.args().provider()),
+    )
+    .unwrap();
+    std::fs::create_dir_all(&migration_dir).unwrap();
+    std::fs::write(
+        migration_file,
+        format!(
+            r#"CREATE SCHEMA IF NOT EXISTS "{schema_name}";
+             CREATE TABLE "{schema_name}"."User" (
+                 "id" INTEGER NOT NULL,
+                 "email" TEXT NOT NULL,
+                 CONSTRAINT "User_pkey" PRIMARY KEY ("id")
+             );
+             CREATE INDEX "User_email_partial_idx" ON "{schema_name}"."User" ("email") WHERE "email" IS NOT NULL;"#
+        ),
+    )
+    .unwrap();
+
+    let datamodel = api.datamodel_with_provider(
+        r#"
+        model User {
+            id    Int    @id
+            email String
+        }
+    "#,
+    );
+    let datamodel_dir = tempfile::tempdir().unwrap();
+    let datamodel_path = write_file_to_tmp(&datamodel, &datamodel_dir, "schema.prisma");
+
+    let (result, diff) = diff_result(
+        DatasourceUrls {
+            url: Some(api.connection_string().to_owned()),
+            shadow_database_url: Some(api.connection_string().to_owned()),
+        },
+        DiffParams {
+            exit_code: Some(true),
+            from: DiffTarget::SchemaDatamodel(SchemasContainer {
+                files: vec![SchemaContainer {
+                    path: datamodel_path.to_string_lossy().into_owned(),
+                    content: datamodel,
+                }],
+            }),
+            to: DiffTarget::Migrations(list_migrations(migrations_dir.path()).unwrap()),
+            script: false,
+            shadow_database_url: Some(api.connection_string().to_owned()),
+            filters: SchemaFilter::default(),
+        },
+    );
+
+    let expected_diff = expect![[r#"
+        No difference detected.
+    "#]];
+    expected_diff.assert_eq(&diff);
+    assert_eq!(result.exit_code, 0);
+}
+
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
 fn from_migrations_to_url_ignores_manual_partial_indexes_with_engine_seeded_schema(api: TestApi) {
     let migrations_dir = tempfile::tempdir().unwrap();
     let migration_dir = migrations_dir.path().join("01init");
@@ -974,13 +1039,13 @@ fn from_migrations_to_url_ignores_manual_partial_indexes_with_engine_seeded_sche
     std::fs::write(
         migration_file,
         format!(
-            "CREATE SCHEMA IF NOT EXISTS \"{schema_name}\";\n\
-             CREATE TABLE \"{schema_name}\".\"User\" (\n\
-                 \"id\" INTEGER NOT NULL,\n\
-                 \"email\" TEXT NOT NULL,\n\
-                 CONSTRAINT \"User_pkey\" PRIMARY KEY (\"id\")\n\
-             );\n\
-             CREATE INDEX \"User_email_partial_idx\" ON \"{schema_name}\".\"User\" (\"email\") WHERE \"email\" IS NOT NULL;\n"
+            r#"CREATE SCHEMA IF NOT EXISTS "{schema_name}";
+             CREATE TABLE "{schema_name}"."User" (
+                 "id" INTEGER NOT NULL,
+                 "email" TEXT NOT NULL,
+                 CONSTRAINT "User_pkey" PRIMARY KEY ("id")
+             );
+             CREATE INDEX "User_email_partial_idx" ON "{schema_name}"."User" ("email") WHERE "email" IS NOT NULL;"#
         ),
     )
     .unwrap();
@@ -998,12 +1063,12 @@ fn from_migrations_to_url_ignores_manual_partial_indexes_with_engine_seeded_sche
 
     // Apply the migration to create the table + partial index
     api.raw_cmd(&format!(
-        "CREATE TABLE \"{schema_name}\".\"User\" (\n\
-             \"id\" INTEGER NOT NULL,\n\
-             \"email\" TEXT NOT NULL,\n\
-             CONSTRAINT \"User_pkey\" PRIMARY KEY (\"id\")\n\
-         );\n\
-         CREATE INDEX \"User_email_partial_idx\" ON \"{schema_name}\".\"User\" (\"email\") WHERE \"email\" IS NOT NULL;\n"
+        r#"CREATE TABLE "{schema_name}"."User" (
+             "id" INTEGER NOT NULL,
+             "email" TEXT NOT NULL,
+             CONSTRAINT "User_pkey" PRIMARY KEY ("id")
+         );
+         CREATE INDEX "User_email_partial_idx" ON "{schema_name}"."User" ("email") WHERE "email" IS NOT NULL;"#,
     ));
 
     let (result, diff) = diff_result_with_initial_datamodel(
