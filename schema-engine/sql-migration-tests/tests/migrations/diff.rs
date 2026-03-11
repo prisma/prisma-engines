@@ -909,13 +909,13 @@ fn from_migrations_to_schema_datamodel_ignores_manual_partial_indexes_without_pr
     std::fs::write(
         migration_file,
         format!(
-            "CREATE SCHEMA IF NOT EXISTS \"{schema_name}\";\n\
-             CREATE TABLE \"{schema_name}\".\"User\" (\n\
-                 \"id\" INTEGER NOT NULL,\n\
-                 \"email\" TEXT NOT NULL,\n\
-                 CONSTRAINT \"User_pkey\" PRIMARY KEY (\"id\")\n\
-             );\n\
-             CREATE INDEX \"User_email_partial_idx\" ON \"{schema_name}\".\"User\" (\"email\") WHERE \"email\" IS NOT NULL;\n"
+            r#"CREATE SCHEMA IF NOT EXISTS "{schema_name}";
+             CREATE TABLE "{schema_name}"."User" (
+                 "id" INTEGER NOT NULL,
+                 "email" TEXT NOT NULL,
+                 CONSTRAINT "User_pkey" PRIMARY KEY ("id")
+             );
+             CREATE INDEX "User_email_partial_idx" ON "{schema_name}"."User" ("email") WHERE "email" IS NOT NULL;"#
         ),
     )
     .unwrap();
@@ -974,13 +974,13 @@ fn from_schema_datamodel_to_migrations_ignores_manual_partial_indexes_without_pr
     std::fs::write(
         migration_file,
         format!(
-            "CREATE SCHEMA IF NOT EXISTS \"{schema_name}\";\n\
-             CREATE TABLE \"{schema_name}\".\"User\" (\n\
-                 \"id\" INTEGER NOT NULL,\n\
-                 \"email\" TEXT NOT NULL,\n\
-                 CONSTRAINT \"User_pkey\" PRIMARY KEY (\"id\")\n\
-             );\n\
-             CREATE INDEX \"User_email_partial_idx\" ON \"{schema_name}\".\"User\" (\"email\") WHERE \"email\" IS NOT NULL;\n"
+            r#"CREATE SCHEMA IF NOT EXISTS "{schema_name}";
+             CREATE TABLE "{schema_name}"."User" (
+                 "id" INTEGER NOT NULL,
+                 "email" TEXT NOT NULL,
+                 CONSTRAINT "User_pkey" PRIMARY KEY ("id")
+             );
+             CREATE INDEX "User_email_partial_idx" ON "{schema_name}"."User" ("email") WHERE "email" IS NOT NULL;"#
         ),
     )
     .unwrap();
@@ -1039,13 +1039,13 @@ fn from_migrations_to_url_ignores_manual_partial_indexes_with_engine_seeded_sche
     std::fs::write(
         migration_file,
         format!(
-            "CREATE SCHEMA IF NOT EXISTS \"{schema_name}\";\n\
-             CREATE TABLE \"{schema_name}\".\"User\" (\n\
-                 \"id\" INTEGER NOT NULL,\n\
-                 \"email\" TEXT NOT NULL,\n\
-                 CONSTRAINT \"User_pkey\" PRIMARY KEY (\"id\")\n\
-             );\n\
-             CREATE INDEX \"User_email_partial_idx\" ON \"{schema_name}\".\"User\" (\"email\") WHERE \"email\" IS NOT NULL;\n"
+            r#"CREATE SCHEMA IF NOT EXISTS "{schema_name}";
+             CREATE TABLE "{schema_name}"."User" (
+                 "id" INTEGER NOT NULL,
+                 "email" TEXT NOT NULL,
+                 CONSTRAINT "User_pkey" PRIMARY KEY ("id")
+             );
+             CREATE INDEX "User_email_partial_idx" ON "{schema_name}"."User" ("email") WHERE "email" IS NOT NULL;"#
         ),
     )
     .unwrap();
@@ -1063,12 +1063,12 @@ fn from_migrations_to_url_ignores_manual_partial_indexes_with_engine_seeded_sche
 
     // Apply the migration to create the table + partial index
     api.raw_cmd(&format!(
-        "CREATE TABLE \"{schema_name}\".\"User\" (\n\
-             \"id\" INTEGER NOT NULL,\n\
-             \"email\" TEXT NOT NULL,\n\
-             CONSTRAINT \"User_pkey\" PRIMARY KEY (\"id\")\n\
-         );\n\
-         CREATE INDEX \"User_email_partial_idx\" ON \"{schema_name}\".\"User\" (\"email\") WHERE \"email\" IS NOT NULL;\n"
+        r#"CREATE TABLE "{schema_name}"."User" (
+             "id" INTEGER NOT NULL,
+             "email" TEXT NOT NULL,
+             CONSTRAINT "User_pkey" PRIMARY KEY ("id")
+         );
+         CREATE INDEX "User_email_partial_idx" ON "{schema_name}"."User" ("email") WHERE "email" IS NOT NULL;"#,
     ));
 
     let (result, diff) = diff_result_with_initial_datamodel(
