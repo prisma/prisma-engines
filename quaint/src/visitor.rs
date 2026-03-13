@@ -83,8 +83,8 @@ pub trait Visitor<'a> {
 
     /// A point to modify an incoming query to make it compatible with the
     /// underlying database.
-    fn compatibility_modifications(&self, query: Query<'a>) -> Query<'a> {
-        query
+    fn compatibility_modifications(&self, query: Query<'a>) -> crate::Result<Query<'a>> {
+        Ok(query)
     }
 
     fn surround_with<F>(&mut self, begin: &str, end: &str, f: F) -> Result
@@ -512,7 +512,7 @@ pub trait Visitor<'a> {
 
     /// A walk through a complete `Query` statement
     fn visit_query(&mut self, mut query: Query<'a>) -> Result {
-        query = self.compatibility_modifications(query);
+        query = self.compatibility_modifications(query)?;
 
         match query {
             Query::Select(select) => self.visit_select(*select),
