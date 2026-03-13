@@ -211,26 +211,17 @@ impl Queryable for Mysql {
                 let mut columns_set = false;
 
                 for mut row in rows {
-                    let row = row.take_result_row()?;
-
                     if !columns_set {
-                        for (idx, _) in row.iter().enumerate() {
-                            let maybe_column = stmt.columns().get(idx);
-                            // `mysql_async` does not return columns in `ResultSet` when a call to a stored procedure is done
-                            // See https://github.com/prisma/prisma/issues/6173
-                            let column = maybe_column
-                                .map(|col| col.name_str().into_owned())
-                                .unwrap_or_else(|| format!("f{idx}"));
-                            let column_type = maybe_column.map(ColumnType::from).unwrap_or(ColumnType::Unknown);
-
-                            columns.push(column);
-                            column_types.push(column_type);
-                        }
-
+                        columns = row
+                            .columns_ref()
+                            .iter()
+                            .map(|col| col.name_str().into_owned())
+                            .collect();
+                        column_types = row.columns_ref().iter().map(ColumnType::from).collect();
                         columns_set = true;
                     }
 
-                    result_rows.push(row);
+                    result_rows.push(row.take_result_row()?);
                 }
 
                 let mut result_set = ResultSet::new(columns, column_types, result_rows);
