@@ -306,7 +306,7 @@ pub fn get_dmmf(get_dmmf_params: String) -> Result<String, String> {
 /// Returns DMMF JSON as bytes instead of String to avoid V8 string length limit.
 /// See: https://github.com/prisma/prisma/issues/29111
 pub fn get_dmmf_bytes(get_dmmf_params: String) -> Result<Vec<u8>, String> {
-    get_dmmf::get_dmmf_bytes(&get_dmmf_params)
+    get_dmmf::get_dmmf(&get_dmmf_params).map(String::into_bytes)
 }
 
 pub fn get_datamodel(get_datamodel_params: String) -> Result<String, String> {
