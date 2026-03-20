@@ -478,7 +478,9 @@ impl<'a> SqlSchemaDescriber<'a> {
                                     )))
                                 }
                             }
-                            ColumnTypeFamily::Udt(_) | ColumnTypeFamily::Unsupported(_) => match default_expression {
+                            ColumnTypeFamily::Udt(_)
+                            | ColumnTypeFamily::Unsupported(_)
+                            | ColumnTypeFamily::Geometry(_) => match default_expression {
                                 true => Self::dbgenerated_expression(&default_string),
                                 false => DefaultValue::db_generated(default_string),
                             },

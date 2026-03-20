@@ -209,6 +209,11 @@ impl<'a> JsonProtocolAdapter<'a> {
 
                     decode_bytes(value).map(ArgumentValue::bytes).map_err(|_| build_err())
                 }
+                Some(custom_types::GEOMETRY) => {
+                    let value = obj.get(custom_types::VALUE).ok_or_else(build_err)?;
+                    let bytes = serde_json::to_vec(value).map_err(|_| build_err())?;
+                    Ok(ArgumentValue::bytes(bytes))
+                }
                 Some(custom_types::JSON) => {
                     let value = obj
                         .remove(custom_types::VALUE)
@@ -1230,6 +1235,96 @@ mod tests {
                             2,
                             3,
                             4,
+                        ],
+                    ),
+                ),
+            },
+        )
+        "###);
+    }
+
+    #[test]
+    fn custom_arg_geometry() {
+        let query: JsonSingleQuery = serde_json::from_str(
+            r#"{
+            "modelName": "User",
+            "action": "updateOne",
+            "query": {
+                "arguments": {
+                    "data": {
+                        "x": { "$type": "Geometry", "value": { "type": "Point", "coordinates": [13.4, 52.5], "srid": 4326 } }
+                    }
+                },
+                "selection": {
+                    "$scalars": true
+                }
+            }
+        }"#,
+        )
+        .unwrap();
+
+        let operation = JsonProtocolAdapter::new(&schema()).convert_single(query).unwrap();
+
+        assert_debug_snapshot!(operation.arguments()[0].1, @r###"
+        Object(
+            {
+                "x": Scalar(
+                    Bytes(
+                        [
+                            123,
+                            34,
+                            116,
+                            121,
+                            112,
+                            101,
+                            34,
+                            58,
+                            34,
+                            80,
+                            111,
+                            105,
+                            110,
+                            116,
+                            34,
+                            44,
+                            34,
+                            99,
+                            111,
+                            111,
+                            114,
+                            100,
+                            105,
+                            110,
+                            97,
+                            116,
+                            101,
+                            115,
+                            34,
+                            58,
+                            91,
+                            49,
+                            51,
+                            46,
+                            52,
+                            44,
+                            53,
+                            50,
+                            46,
+                            53,
+                            93,
+                            44,
+                            34,
+                            115,
+                            114,
+                            105,
+                            100,
+                            34,
+                            58,
+                            52,
+                            51,
+                            50,
+                            54,
+                            125,
                         ],
                     ),
                 ),

@@ -549,6 +549,10 @@ impl SqlRenderer for PostgresRenderer {
 
 fn render_column_type(col: TableColumnWalker<'_>, renderer: &PostgresRenderer) -> Cow<'static, str> {
     let t = col.column_type();
+    if let ColumnTypeFamily::Geometry(spec) = &t.family {
+        let sql = spec.postgres_sql_type();
+        return format!("{sql}{}", if t.arity.is_list() { "[]" } else { "" }).into();
+    }
     if let Some(enm) = col.column_type_family_as_enum() {
         let name = QuotedWithPrefix::pg_new(enm.explicit_namespace(), enm.name());
         let arity = if t.arity.is_list() { "[]" } else { "" };
@@ -575,7 +579,12 @@ fn render_column_type_postgres(col: TableColumnWalker<'_>) -> Cow<'static, str> 
         .expect("Missing native type in postgres_renderer::render_column_type()")
     {
         PostgresType::Known(known) => known,
-        PostgresType::Unknown(name, args) => return format!("{}({})", name, args.iter().format(", ")).into(),
+        PostgresType::Unknown(name, args) => {
+            if args.is_empty() {
+                return name.clone().into();
+            }
+            return format!("{}({})", name, args.iter().format(", ")).into();
+        }
     };
 
     let tpe: Cow<'_, str> = match native_type {

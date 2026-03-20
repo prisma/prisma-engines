@@ -33,23 +33,24 @@ pub(super) fn render_output_type<'a>(output_type: &OutputType<'a>, ctx: &mut Ren
         }
 
         InnerOutputType::Scalar(scalar) => {
-            let stringified = match scalar {
-                ScalarType::Null => "Null",
-                ScalarType::String => "String",
-                ScalarType::Int => "Int",
-                ScalarType::BigInt => "BigInt",
-                ScalarType::Boolean => "Boolean",
-                ScalarType::Float => "Float",
-                ScalarType::Decimal => "Decimal",
-                ScalarType::DateTime => "DateTime",
-                ScalarType::Json => "Json",
-                ScalarType::UUID => "UUID",
-                ScalarType::JsonList => "Json",
-                ScalarType::Bytes => "Bytes",
+            let stringified: String = match scalar {
+                ScalarType::Null => "Null".into(),
+                ScalarType::String => "String".into(),
+                ScalarType::Int => "Int".into(),
+                ScalarType::BigInt => "BigInt".into(),
+                ScalarType::Boolean => "Boolean".into(),
+                ScalarType::Float => "Float".into(),
+                ScalarType::Decimal => "Decimal".into(),
+                ScalarType::DateTime => "DateTime".into(),
+                ScalarType::Json => "Json".into(),
+                ScalarType::UUID => "UUID".into(),
+                ScalarType::JsonList => "Json".into(),
+                ScalarType::Bytes => "Bytes".into(),
+                ScalarType::Geometry(s) => s.clone(),
             };
 
             DmmfTypeReference {
-                typ: stringified.into(),
+                typ: stringified,
                 namespace: None,
                 location: TypeLocation::Scalar,
                 is_list: false,

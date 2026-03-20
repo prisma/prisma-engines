@@ -313,7 +313,7 @@ impl QueryDocumentParser {
                     ))),
                     // Scalar handling
                     (pv, InputType::Scalar(st)) => try_this!(
-                        self.parse_scalar(&selection_path, &argument_path, pv, *st, &value, is_parameterizable)
+                        self.parse_scalar(&selection_path, &argument_path, pv, st, &value, is_parameterizable)
                             .map(ParsedInputValue::Single)
                     ),
 
@@ -407,48 +407,51 @@ impl QueryDocumentParser {
         selection_path: &Path,
         argument_path: &Path,
         value: PrismaValue,
-        scalar_type: ScalarType,
+        scalar_type: &ScalarType,
         argument_value: &ArgumentValue,
         is_parameterizable: bool,
     ) -> QueryParserResult<PrismaValue> {
         match (value, scalar_type) {
             // Identity matchers
-            (PrismaValue::String(s), ScalarType::String) => Ok(PrismaValue::String(s)),
-            (PrismaValue::Boolean(b), ScalarType::Boolean) => Ok(PrismaValue::Boolean(b)),
-            (PrismaValue::Json(json), ScalarType::Json) => Ok(PrismaValue::Json(json)),
-            (PrismaValue::Uuid(uuid), ScalarType::UUID) => Ok(PrismaValue::Uuid(uuid)),
-            (PrismaValue::Bytes(bytes), ScalarType::Bytes) => Ok(PrismaValue::Bytes(bytes)),
-            (PrismaValue::BigInt(b_int), ScalarType::BigInt) => Ok(PrismaValue::BigInt(b_int)),
-            (PrismaValue::DateTime(s), ScalarType::DateTime) => Ok(PrismaValue::DateTime(s)),
-            (PrismaValue::Null, ScalarType::Null) => Ok(PrismaValue::Null),
+            (PrismaValue::String(s), &ScalarType::String) => Ok(PrismaValue::String(s)),
+            (PrismaValue::Boolean(b), &ScalarType::Boolean) => Ok(PrismaValue::Boolean(b)),
+            (PrismaValue::Json(json), &ScalarType::Json) => Ok(PrismaValue::Json(json)),
+            (PrismaValue::Uuid(uuid), &ScalarType::UUID) => Ok(PrismaValue::Uuid(uuid)),
+            (PrismaValue::Bytes(bytes), &ScalarType::Bytes) => Ok(PrismaValue::Bytes(bytes)),
+            (pv @ PrismaValue::Bytes(_), &ScalarType::Geometry(_)) => Ok(pv),
+            (pv @ PrismaValue::String(_), &ScalarType::Geometry(_)) => Ok(pv),
+            (PrismaValue::Json(s), &ScalarType::Geometry(_)) => Ok(PrismaValue::Bytes(s.into_bytes())),
+            (PrismaValue::BigInt(b_int), &ScalarType::BigInt) => Ok(PrismaValue::BigInt(b_int)),
+            (PrismaValue::DateTime(s), &ScalarType::DateTime) => Ok(PrismaValue::DateTime(s)),
+            (PrismaValue::Null, &ScalarType::Null) => Ok(PrismaValue::Null),
 
             // String coercion matchers
-            (PrismaValue::String(s), ScalarType::JsonList) => {
+            (PrismaValue::String(s), &ScalarType::JsonList) => {
                 self.parse_json_list_from_str(selection_path, argument_path, &s)
             }
-            (PrismaValue::String(s), ScalarType::Bytes) => self.parse_bytes(selection_path, argument_path, s),
-            (PrismaValue::String(s), ScalarType::Decimal) => self.parse_decimal(selection_path, argument_path, s),
-            (PrismaValue::String(s), ScalarType::BigInt) => self.parse_bigint(selection_path, argument_path, s),
-            (PrismaValue::String(s), ScalarType::UUID) => self
+            (PrismaValue::String(s), &ScalarType::Bytes) => self.parse_bytes(selection_path, argument_path, s),
+            (PrismaValue::String(s), &ScalarType::Decimal) => self.parse_decimal(selection_path, argument_path, s),
+            (PrismaValue::String(s), &ScalarType::BigInt) => self.parse_bigint(selection_path, argument_path, s),
+            (PrismaValue::String(s), &ScalarType::UUID) => self
                 .parse_uuid(selection_path, argument_path, s.as_str())
                 .map(PrismaValue::Uuid),
-            (PrismaValue::String(s), ScalarType::Json) => Ok(PrismaValue::Json(
+            (PrismaValue::String(s), &ScalarType::Json) => Ok(PrismaValue::Json(
                 self.parse_json(selection_path, argument_path, &s).map(|_| s)?,
             )),
-            (PrismaValue::String(s), ScalarType::DateTime) => self
+            (PrismaValue::String(s), &ScalarType::DateTime) => self
                 .parse_datetime(selection_path, argument_path, s.as_str())
                 .map(PrismaValue::DateTime),
 
             // Int coercion matchers
-            (PrismaValue::Int(i), ScalarType::Int) => Ok(PrismaValue::Int(i)),
-            (PrismaValue::Int(i), ScalarType::Float) => Ok(PrismaValue::Float(BigDecimal::from(i))),
-            (PrismaValue::Int(i), ScalarType::Decimal) => Ok(PrismaValue::Float(BigDecimal::from(i))),
-            (PrismaValue::Int(i), ScalarType::BigInt) => Ok(PrismaValue::BigInt(i)),
+            (PrismaValue::Int(i), &ScalarType::Int) => Ok(PrismaValue::Int(i)),
+            (PrismaValue::Int(i), &ScalarType::Float) => Ok(PrismaValue::Float(BigDecimal::from(i))),
+            (PrismaValue::Int(i), &ScalarType::Decimal) => Ok(PrismaValue::Float(BigDecimal::from(i))),
+            (PrismaValue::Int(i), &ScalarType::BigInt) => Ok(PrismaValue::BigInt(i)),
 
             // Float coercion matchers
-            (PrismaValue::Float(f), ScalarType::Float) => Ok(PrismaValue::Float(f)),
-            (PrismaValue::Float(f), ScalarType::Decimal) => Ok(PrismaValue::Float(f)),
-            (PrismaValue::Float(f), ScalarType::Int) => match f.to_i64() {
+            (PrismaValue::Float(f), &ScalarType::Float) => Ok(PrismaValue::Float(f)),
+            (PrismaValue::Float(f), &ScalarType::Decimal) => Ok(PrismaValue::Float(f)),
+            (PrismaValue::Float(f), &ScalarType::Int) => match f.to_i64() {
                 Some(converted) => Ok(PrismaValue::Int(converted)),
                 None => Err(ValidationError::value_too_large(
                     selection_path.segments(),
@@ -458,7 +461,7 @@ impl QueryDocumentParser {
             },
 
             // UUID coercion matchers
-            (PrismaValue::Uuid(uuid), ScalarType::String) => Ok(PrismaValue::String(uuid.to_string())),
+            (PrismaValue::Uuid(uuid), &ScalarType::String) => Ok(PrismaValue::String(uuid.to_string())),
 
             // Generator calls cannot be encoded in the JSON protocol and can
             // only be injected by the query parser when evaluating the default
@@ -507,7 +510,7 @@ impl QueryDocumentParser {
             (_, _) => Err(invalid_argument_type_error(
                 selection_path,
                 argument_path,
-                &InputType::Scalar(scalar_type),
+                &InputType::Scalar(scalar_type.clone()),
                 argument_value,
             )),
         }
@@ -722,7 +725,7 @@ impl QueryDocumentParser {
         };
 
         let element_type_matches = match element_input_type {
-            InputType::Scalar(scalar_type) => prisma_value_type_matches_scalar_type(inner_type, *scalar_type),
+            InputType::Scalar(scalar_type) => prisma_value_type_matches_scalar_type(inner_type, scalar_type),
             InputType::Enum(_) => matches!(**inner_type, PrismaValueType::Enum),
             InputType::List(_) | InputType::Object(_) => {
                 return Err(ValidationError::unexpected_runtime_error(
@@ -957,22 +960,27 @@ impl QueryDocumentParser {
     }
 }
 
-fn prisma_value_type_matches_scalar_type(pv_type: &PrismaValueType, scalar_type: ScalarType) -> bool {
+fn prisma_value_type_matches_scalar_type(pv_type: &PrismaValueType, scalar_type: &ScalarType) -> bool {
     match pv_type {
-        PrismaValueType::String => matches!(scalar_type, ScalarType::String | ScalarType::UUID),
-        PrismaValueType::Boolean => scalar_type == ScalarType::Boolean,
-        PrismaValueType::Enum => scalar_type == ScalarType::String,
+        PrismaValueType::String => {
+            matches!(
+                scalar_type,
+                ScalarType::String | ScalarType::UUID | ScalarType::Geometry(_)
+            )
+        }
+        PrismaValueType::Boolean => scalar_type == &ScalarType::Boolean,
+        PrismaValueType::Enum => scalar_type == &ScalarType::String,
         PrismaValueType::Int => matches!(scalar_type, ScalarType::Int | ScalarType::BigInt | ScalarType::Float),
         PrismaValueType::Uuid => matches!(scalar_type, ScalarType::UUID | ScalarType::String),
         PrismaValueType::List(prisma_value_type) => {
             matches!(**prisma_value_type, PrismaValueType::Json | PrismaValueType::Object)
-                && scalar_type == ScalarType::JsonList
+                && scalar_type == &ScalarType::JsonList
         }
-        PrismaValueType::Json | PrismaValueType::Object => scalar_type == ScalarType::Json,
-        PrismaValueType::DateTime => scalar_type == ScalarType::DateTime,
+        PrismaValueType::Json | PrismaValueType::Object => scalar_type == &ScalarType::Json,
+        PrismaValueType::DateTime => scalar_type == &ScalarType::DateTime,
         PrismaValueType::Float => matches!(scalar_type, ScalarType::Float | ScalarType::Decimal),
-        PrismaValueType::BigInt => scalar_type == ScalarType::BigInt,
-        PrismaValueType::Bytes => scalar_type == ScalarType::Bytes,
+        PrismaValueType::BigInt => scalar_type == &ScalarType::BigInt,
+        PrismaValueType::Bytes => matches!(scalar_type, ScalarType::Bytes | ScalarType::Geometry(_)),
         PrismaValueType::Any => true,
     }
 }

@@ -11,8 +11,8 @@ use psl::{
     ValidatedSchema,
     datamodel_connector::walker_ext_traits::*,
     parser_database::{
-        self as db, ExtensionTypeId, ExtensionTypes, ReferentialAction, ScalarFieldType, ScalarType, SortOrder,
-        WhereClause, WhereCondition, WhereValue, ast,
+        self as db, ExtensionTypeId, ExtensionTypes, GeometrySpec, ReferentialAction, ScalarFieldType, ScalarType,
+        SortOrder, WhereClause, WhereCondition, WhereValue, ast,
         walkers::{IndexWalker, ModelWalker, ScalarFieldWalker},
     },
 };
@@ -444,8 +444,45 @@ fn push_column_for_scalar_field(field: ScalarFieldWalker<'_>, table_id: sql::Tab
         ScalarFieldType::BuiltInScalar(scalar_type) => {
             push_column_for_builtin_scalar_type(field, scalar_type, table_id, ctx)
         }
+        ScalarFieldType::Geometry(spec) => push_column_for_geometry_field(field, spec, table_id, ctx),
         ScalarFieldType::Unsupported(_) => push_column_for_model_unsupported_scalar_field(field, table_id, ctx),
     }
+}
+
+fn push_column_for_geometry_field(
+    field: ScalarFieldWalker<'_>,
+    spec: GeometrySpec,
+    table_id: sql::TableId,
+    ctx: &mut Context<'_>,
+) {
+    let connector = ctx.flavour.datamodel_connector();
+    let native_type = field
+        .native_type_instance(connector)
+        .or_else(|| connector.default_native_type_for_scalar_type(&ScalarFieldType::Geometry(spec), ctx.datamodel));
+
+    let default = field.default_value().map(|def| {
+        sql::DefaultValue::db_generated::<String>(unwrap_dbgenerated(def.value()))
+            .with_constraint_name(ctx.flavour.default_constraint_name(def))
+    });
+
+    if let Some(default) = default {
+        let column_id = ctx.schema.describer_schema.next_table_column_id();
+        ctx.schema.describer_schema.push_table_default_value(column_id, default);
+    }
+
+    let column = sql::Column {
+        name: field.database_name().to_owned(),
+        tpe: sql::ColumnType {
+            family: sql::ColumnTypeFamily::Geometry(spec),
+            full_data_type: String::new(),
+            arity: column_arity(field.ast_field().arity),
+            native_type,
+        },
+        auto_increment: false,
+        description: None,
+    };
+
+    ctx.schema.describer_schema.push_table_column(table_id, column);
 }
 
 fn push_column_for_model_enum_scalar_field(

@@ -223,7 +223,12 @@ fn full_scalar_filter_type(
     include_aggregates: bool,
 ) -> InputObjectType<'_> {
     let native_type_name = native_type.as_ref().map(|nt| nt.name());
-    let scalar_type_name = ctx.internal_data_model.clone().zip(typ).type_name().into_owned();
+    let scalar_type_name = ctx
+        .internal_data_model
+        .clone()
+        .zip(typ.clone())
+        .type_name()
+        .into_owned();
     let type_name = ctx.connector.scalar_filter_name(scalar_type_name, native_type_name);
     let ident = Identifier::new_prisma(scalar_filter_name(
         &type_name,
@@ -236,8 +241,8 @@ fn full_scalar_filter_type(
     let mut object = init_input_object_type(ident);
 
     object.set_fields(move || {
-        let mapped_scalar_type = map_scalar_input_type(ctx, typ, list);
-        let mut fields: Vec<_> = match typ {
+        let mapped_scalar_type = map_scalar_input_type(ctx, typ.clone(), list);
+        let mut fields: Vec<_> = match &typ {
             TypeIdentifier::String | TypeIdentifier::UUID => equality_filters(mapped_scalar_type.clone(), nullable)
                 .chain(inclusion_filters(ctx, mapped_scalar_type.clone(), nullable))
                 .chain(alphanumeric_filters(ctx, mapped_scalar_type.clone()))
@@ -274,6 +279,8 @@ fn full_scalar_filter_type(
 
             TypeIdentifier::Boolean => equality_filters(mapped_scalar_type.clone(), nullable).collect(),
 
+            TypeIdentifier::Geometry(_) => equality_filters(mapped_scalar_type.clone(), nullable).collect(),
+
             TypeIdentifier::Bytes | TypeIdentifier::Enum(_) => equality_filters(mapped_scalar_type.clone(), nullable)
                 .chain(inclusion_filters(ctx, mapped_scalar_type.clone(), nullable))
                 .collect(),
@@ -285,7 +292,7 @@ fn full_scalar_filter_type(
 
         fields.push(not_filter_field(
             ctx,
-            typ,
+            typ.clone(),
             native_type.clone(),
             mapped_scalar_type,
             nullable,
@@ -303,7 +310,7 @@ fn full_scalar_filter_type(
             ));
 
             if typ.is_numeric() {
-                let avg_type = map_avg_type_ident(typ);
+                let avg_type = map_avg_type_ident(typ.clone());
                 fields.push(aggregate_filter_field(
                     ctx,
                     aggregations::UNDERSCORE_AVG,
@@ -315,7 +322,7 @@ fn full_scalar_filter_type(
                 fields.push(aggregate_filter_field(
                     ctx,
                     aggregations::UNDERSCORE_SUM,
-                    typ,
+                    typ.clone(),
                     nullable,
                     list,
                 ));
@@ -325,7 +332,7 @@ fn full_scalar_filter_type(
                 fields.push(aggregate_filter_field(
                     ctx,
                     aggregations::UNDERSCORE_MIN,
-                    typ,
+                    typ.clone(),
                     nullable,
                     list,
                 ));
@@ -333,7 +340,7 @@ fn full_scalar_filter_type(
                 fields.push(aggregate_filter_field(
                     ctx,
                     aggregations::UNDERSCORE_MAX,
-                    typ,
+                    typ.clone(),
                     nullable,
                     list,
                 ));

@@ -8,6 +8,7 @@ pub mod custom_types {
     pub const BIGINT: &str = "BigInt";
     pub const DECIMAL: &str = "Decimal";
     pub const BYTES: &str = "Bytes";
+    pub const GEOMETRY: &str = "Geometry";
     pub const JSON: &str = "Json";
     pub const ENUM: &str = "Enum";
     pub const FIELD_REF: &str = "FieldRef";
