@@ -138,10 +138,17 @@ fn process_order_object(
                 }
 
                 Field::Scalar(sf) => {
+                    if matches!(sf.type_identifier(), TypeIdentifier::Geometry(_)) {
+                        if let ParsedInputValue::Map(ref map) = field_value {
+                            if let Some(distance_from_value) = map.get(ordering::DISTANCE_FROM) {
+                                return extract_geometry_distance_from(&sf, distance_from_value.clone(), path);
+                            }
+                        }
+                    }
+
                     let (sort_order, nulls_order) = extract_order_by_args(field_value)?;
 
                     if let Some(sort_aggr) = parent_sort_aggregation {
-                        // If the parent is a sort aggregation then this scalar is part of that one.
                         Ok(Some(OrderBy::scalar_aggregation(sf, sort_order, sort_aggr)))
                     } else {
                         Ok(Some(OrderBy::scalar(sf, path, sort_order, nulls_order)))
@@ -361,4 +368,60 @@ fn finalize_arguments(mut args: QueryArguments, model: &Model) -> QueryGraphBuil
     }
 
     Ok(args)
+}
+
+fn extract_geometry_distance_from(
+    field: &ScalarFieldRef,
+    value: ParsedInputValue<'_>,
+    path: Vec<OrderByHop>,
+) -> QueryGraphBuilderResult<Option<OrderBy>> {
+    let mut object: ParsedInputMap<'_> = value.try_into()?;
+
+    let point_value = object
+        .swap_remove(schema::constants::filters::POINT)
+        .ok_or_else(|| QueryGraphBuilderError::InputError("distanceFrom requires 'point' field".to_owned()))?;
+    let direction_value = object
+        .swap_remove(ordering::DIRECTION)
+        .ok_or_else(|| QueryGraphBuilderError::InputError("distanceFrom requires 'direction' field".to_owned()))?;
+    let srid_value = object.swap_remove(schema::constants::filters::SRID);
+
+    let point_list: Vec<PrismaValue> = point_value.try_into()?;
+    if point_list.len() != 2 {
+        return Err(QueryGraphBuilderError::InputError(
+            "distanceFrom point must have exactly 2 coordinates".to_owned(),
+        ));
+    }
+
+    let lon = extract_float_from_pv(&point_list[0])?;
+    let lat = extract_float_from_pv(&point_list[1])?;
+    let sort_order = pv_to_sort_order(direction_value.try_into()?)?;
+    let srid = srid_value.map(|v| extract_int_from_pv(&v.try_into()?)).transpose()?;
+
+    Ok(Some(OrderBy::geometry(field.clone(), path, (lon, lat), sort_order, srid)))
+}
+
+fn extract_float_from_pv(value: &PrismaValue) -> QueryGraphBuilderResult<f64> {
+    match value {
+        PrismaValue::Int(i) => Ok(*i as f64),
+        PrismaValue::BigInt(i) => Ok(*i as f64),
+        PrismaValue::Float(d) => d
+            .to_string()
+            .parse::<f64>()
+            .map_err(|e| QueryGraphBuilderError::InputError(format!("Invalid float value: {}", e))),
+        _ => Err(QueryGraphBuilderError::InputError(format!(
+            "Expected numeric value, got {:?}",
+            value
+        ))),
+    }
+}
+
+fn extract_int_from_pv(value: &PrismaValue) -> QueryGraphBuilderResult<i32> {
+    match value {
+        PrismaValue::Int(i) => Ok(*i as i32),
+        PrismaValue::BigInt(i) => Ok(*i as i32),
+        _ => Err(QueryGraphBuilderError::InputError(format!(
+            "Expected integer value, got {:?}",
+            value
+        ))),
+    }
 }

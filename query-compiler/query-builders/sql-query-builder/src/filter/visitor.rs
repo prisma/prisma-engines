@@ -21,6 +21,7 @@ pub(crate) trait FilterVisitorExt {
     ) -> (ConditionTree<'static>, Option<Vec<AliasedJoin>>);
     fn visit_scalar_filter(&mut self, filter: ScalarFilter, ctx: &Context<'_>) -> ConditionTree<'static>;
     fn visit_scalar_list_filter(&mut self, filter: ScalarListFilter, ctx: &Context<'_>) -> ConditionTree<'static>;
+    fn visit_geometry_filter(&mut self, filter: GeometryFilter, ctx: &Context<'_>) -> ConditionTree<'static>;
     fn visit_one_relation_is_null_filter(
         &mut self,
         filter: OneRelationIsNullFilter,
@@ -315,6 +316,7 @@ impl FilterVisitorExt for FilterVisitor {
                 }
             },
             Filter::Scalar(filter) => (self.visit_scalar_filter(filter, ctx), None),
+            Filter::Geometry(filter) => (self.visit_geometry_filter(filter, ctx), None),
             Filter::OneRelationIsNull(filter) => self.visit_one_relation_is_null_filter(filter, ctx),
             Filter::Relation(filter) => self.visit_relation_filter(filter, ctx),
             Filter::BoolFilter(b) => {
@@ -613,6 +615,89 @@ impl FilterVisitorExt for FilterVisitor {
         };
 
         ConditionTree::single(condition)
+    }
+
+    fn visit_geometry_filter(&mut self, filter: GeometryFilter, ctx: &Context<'_>) -> ConditionTree<'static> {
+        let field_column = filter.field.as_column(ctx);
+        let field_ref = format!("\"{}\"", field_column.name);
+        
+        let srid = match &filter.condition {
+            GeometryFilterCondition::Near { srid, .. }
+            | GeometryFilterCondition::Within { srid, .. }
+            | GeometryFilterCondition::Intersects { srid, .. } => srid.unwrap_or(4326),
+        };
+
+        let use_geography = srid == 4326 || srid == 4269 || srid == 4167;
+        
+        let sql = match filter.condition {
+            GeometryFilterCondition::Near {
+                point,
+                max_distance,
+                ..
+            } => {
+                let (lon, lat) = point;
+                if use_geography {
+                    format!(
+                        "ST_DWithin({}::geography, ST_SetSRID(ST_MakePoint({}, {}), {})::geography, {})",
+                        field_ref, lon, lat, srid, max_distance
+                    )
+                } else {
+                    format!(
+                        "ST_DWithin({}, ST_SetSRID(ST_MakePoint({}, {}), {}), {})",
+                        field_ref, lon, lat, srid, max_distance
+                    )
+                }
+            }
+            GeometryFilterCondition::Within { polygon, .. } => {
+                let wkt = format_polygon_wkt(&polygon);
+                let escaped_wkt = wkt.replace('\'', "''");
+                format!(
+                    "ST_Within({}, ST_GeomFromText('{}', {}))",
+                    field_ref, escaped_wkt, srid
+                )
+            }
+            GeometryFilterCondition::Intersects { geometry, .. } => {
+                let geom_type = geometry.get("type").and_then(|v| v.as_str()).unwrap_or("");
+                let wkt = match geom_type {
+                    "Polygon" => {
+                        if let Some(coords) = geometry.get("coordinates").and_then(|v| v.as_array()) {
+                            let ring_strs: Vec<String> = coords.iter()
+                                .filter_map(|ring| {
+                                    ring.as_array().map(|points| {
+                                        let point_strs: Vec<String> = points.iter()
+                                            .filter_map(|p| {
+                                                p.as_array().and_then(|arr| {
+                                                    if arr.len() >= 2 {
+                                                        Some(format!("{} {}",
+                                                            arr[0].as_f64().unwrap_or(0.0),
+                                                            arr[1].as_f64().unwrap_or(0.0)))
+                                                    } else {
+                                                        None
+                                                    }
+                                                })
+                                            })
+                                            .collect();
+                                        format!("({})", point_strs.join(", "))
+                                    })
+                                })
+                                .collect();
+                            format!("POLYGON({})", ring_strs.join(", "))
+                        } else {
+                            "POLYGON EMPTY".to_string()
+                        }
+                    }
+                    _ => format!("POINT(0 0)"),
+                };
+                let escaped_wkt = wkt.replace('\'', "''");
+                format!(
+                    "ST_Intersects({}, ST_GeomFromText('{}', {}))",
+                    field_ref, escaped_wkt, srid
+                )
+            }
+        };
+
+        let raw_expr: Expression = Value::enum_variant(sql).raw().into();
+        ConditionTree::single(raw_expr)
     }
 }
 
@@ -1535,4 +1620,13 @@ impl JsonFilterExt for (Expression<'static>, Expression<'static>) {
             }
         }
     }
+}
+
+fn format_polygon_wkt(polygon: &[(f64, f64)]) -> String {
+    let coords = polygon
+        .iter()
+        .map(|(x, y)| format!("{} {}", x, y))
+        .collect::<Vec<_>>()
+        .join(", ");
+    format!("POLYGON(({}))", coords)
 }

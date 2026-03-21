@@ -110,6 +110,16 @@ pub mod filters {
     pub const STRING_STARTS_WITH: &str = "string_starts_with";
     pub const STRING_ENDS_WITH: &str = "string_ends_with";
     pub const JSON_TYPE: &str = "json_type";
+
+    // geometry filters
+    pub const NEAR: &str = "near";
+    pub const WITHIN: &str = "within";
+    pub const INTERSECTS: &str = "intersects";
+    pub const POINT: &str = "point";
+    pub const MAX_DISTANCE: &str = "maxDistance";
+    pub const POLYGON: &str = "polygon";
+    pub const GEOMETRY: &str = "geometry";
+    pub const SRID: &str = "srid";
 }
 
 pub mod aggregations {
@@ -140,6 +150,10 @@ pub mod ordering {
     pub const SORT: &str = "sort";
     pub const NULLS: &str = "nulls";
     pub const FIELDS: &str = "fields";
+
+    // geometry ordering
+    pub const DISTANCE_FROM: &str = "distanceFrom";
+    pub const DIRECTION: &str = "direction";
 }
 
 pub mod json_null {

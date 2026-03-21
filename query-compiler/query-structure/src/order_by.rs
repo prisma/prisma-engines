@@ -29,6 +29,7 @@ pub enum OrderBy {
     ScalarAggregation(OrderByScalarAggregation),
     ToManyAggregation(OrderByToManyAggregation),
     Relevance(OrderByRelevance),
+    Geometry(OrderByGeometry),
 }
 
 impl OrderBy {
@@ -38,6 +39,7 @@ impl OrderBy {
             OrderBy::ToManyAggregation(o) => Some(&o.path),
             OrderBy::ScalarAggregation(_) => None,
             OrderBy::Relevance(_) => None,
+            OrderBy::Geometry(o) => Some(&o.path),
         }
     }
 
@@ -47,6 +49,7 @@ impl OrderBy {
             OrderBy::ScalarAggregation(o) => o.sort_order,
             OrderBy::ToManyAggregation(o) => o.sort_order,
             OrderBy::Relevance(o) => o.sort_order,
+            OrderBy::Geometry(o) => o.sort_order,
         }
     }
 
@@ -56,6 +59,7 @@ impl OrderBy {
             OrderBy::ScalarAggregation(o) => Some(o.field.clone()),
             OrderBy::ToManyAggregation(_) => None,
             OrderBy::Relevance(_) => None,
+            OrderBy::Geometry(o) => Some(o.field.clone()),
         }
     }
 
@@ -111,6 +115,22 @@ impl OrderBy {
             sort_order,
             search,
             path,
+        })
+    }
+
+    pub fn geometry(
+        field: ScalarFieldRef,
+        path: Vec<OrderByHop>,
+        point: (f64, f64),
+        sort_order: SortOrder,
+        srid: Option<i32>,
+    ) -> Self {
+        Self::Geometry(OrderByGeometry {
+            field,
+            path,
+            point,
+            sort_order,
+            srid,
         })
     }
 }
@@ -210,6 +230,40 @@ pub struct OrderByRelevance {
     pub search: PrismaValue,
     pub path: Vec<OrderByHop>,
 }
+
+#[derive(Clone, PartialEq)]
+pub struct OrderByGeometry {
+    pub field: ScalarFieldRef,
+    pub path: Vec<OrderByHop>,
+    pub point: (f64, f64),
+    pub sort_order: SortOrder,
+    pub srid: Option<i32>,
+}
+
+impl std::fmt::Debug for OrderByGeometry {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("OrderByGeometry")
+            .field("field", &format!("{}", self.field))
+            .field("path", &self.path)
+            .field("point", &self.point)
+            .field("sort_order", &self.sort_order)
+            .field("srid", &self.srid)
+            .finish()
+    }
+}
+
+impl std::hash::Hash for OrderByGeometry {
+    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+        self.field.hash(state);
+        self.path.hash(state);
+        self.point.0.to_bits().hash(state);
+        self.point.1.to_bits().hash(state);
+        self.sort_order.hash(state);
+        self.srid.hash(state);
+    }
+}
+
+impl Eq for OrderByGeometry {}
 
 impl Display for SortOrder {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {

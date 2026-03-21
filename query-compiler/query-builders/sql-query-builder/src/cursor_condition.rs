@@ -442,6 +442,7 @@ fn order_definitions(
             OrderBy::ScalarAggregation(order_by) => cursor_order_def_aggregation_scalar(order_by, order_by_def),
             OrderBy::ToManyAggregation(order_by) => cursor_order_def_aggregation_rel(order_by, order_by_def),
             OrderBy::Relevance(order_by) => cursor_order_def_relevance(order_by, order_by_def),
+            OrderBy::Geometry(_) => unimplemented!("Cursor-based pagination with geometry orderBy is not yet supported"),
         })
         .collect_vec()
 }

@@ -279,7 +279,10 @@ fn full_scalar_filter_type(
 
             TypeIdentifier::Boolean => equality_filters(mapped_scalar_type.clone(), nullable).collect(),
 
-            TypeIdentifier::Geometry(_) => equality_filters(mapped_scalar_type.clone(), nullable).collect(),
+            TypeIdentifier::Geometry(_) => equality_filters(mapped_scalar_type.clone(), nullable)
+                .chain(inclusion_filters(ctx, mapped_scalar_type.clone(), nullable))
+                .chain(geometry_filters())
+                .collect(),
 
             TypeIdentifier::Bytes | TypeIdentifier::Enum(_) => equality_filters(mapped_scalar_type.clone(), nullable)
                 .chain(inclusion_filters(ctx, mapped_scalar_type.clone(), nullable))
@@ -618,4 +621,61 @@ fn not_filter_field<'a>(
                 .parameterizable()
         }
     }
+}
+
+fn geometry_near_input<'a>() -> InputObjectType<'a> {
+    let ident = Identifier::new_prisma(IdentifierType::GeometryNearInput);
+    let mut object = init_input_object_type(ident);
+
+    object.set_fields(|| {
+        vec![
+            simple_input_field(filters::POINT, InputType::list(InputType::float()), None).required(),
+            simple_input_field(filters::MAX_DISTANCE, InputType::float(), None).required(),
+            simple_input_field(filters::SRID, InputType::int(), None).optional(),
+        ]
+    });
+
+    object
+}
+
+fn geometry_within_input<'a>() -> InputObjectType<'a> {
+    let ident = Identifier::new_prisma(IdentifierType::GeometryWithinInput);
+    let mut object = init_input_object_type(ident);
+
+    object.set_fields(|| {
+        vec![
+            simple_input_field(
+                filters::POLYGON,
+                InputType::list(InputType::list(InputType::float())),
+                None,
+            )
+            .required(),
+            simple_input_field(filters::SRID, InputType::int(), None).optional(),
+        ]
+    });
+
+    object
+}
+
+fn geometry_intersects_input<'a>() -> InputObjectType<'a> {
+    let ident = Identifier::new_prisma(IdentifierType::GeometryIntersectsInput);
+    let mut object = init_input_object_type(ident);
+
+    object.set_fields(|| {
+        vec![
+            simple_input_field(filters::GEOMETRY, InputType::json(), None).required(),
+            simple_input_field(filters::SRID, InputType::int(), None).optional(),
+        ]
+    });
+
+    object
+}
+
+fn geometry_filters<'a>() -> impl Iterator<Item = InputField<'a>> {
+    vec![
+        simple_input_field(filters::NEAR, InputType::object(geometry_near_input()), None).optional(),
+        simple_input_field(filters::WITHIN, InputType::object(geometry_within_input()), None).optional(),
+        simple_input_field(filters::INTERSECTS, InputType::object(geometry_intersects_input()), None).optional(),
+    ]
+    .into_iter()
 }
