@@ -1,0 +1,26 @@
+{
+  "modelName": "Location",
+  "action": "findMany",
+  "query": {
+    "arguments": {
+      "where": {
+        "position": {
+          "within": {
+            "polygon": [
+              [-1, -1],
+              [-1, 5],
+              [5, 5],
+              [5, -1],
+              [-1, -1]
+            ]
+          }
+        }
+      },
+      "take": 10
+    },
+    "selection": {
+      "$composites": true,
+      "$scalars": true
+    }
+  }
+}
