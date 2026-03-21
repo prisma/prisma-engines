@@ -189,14 +189,29 @@ impl<'a> ScalarFilterParser<'a> {
 
             // Geometry filters
             filters::NEAR => {
+                if self.reverse() {
+                    return Err(QueryGraphBuilderError::InputError(
+                        "Negation (NOT) is not supported for geometry 'near' filters".to_string(),
+                    ));
+                }
                 let input_map: ParsedInputMap<'_> = input.try_into()?;
                 Ok(vec![parse_geometry_near(field, input_map)?])
             }
             filters::WITHIN => {
+                if self.reverse() {
+                    return Err(QueryGraphBuilderError::InputError(
+                        "Negation (NOT) is not supported for geometry 'within' filters".to_string(),
+                    ));
+                }
                 let input_map: ParsedInputMap<'_> = input.try_into()?;
                 Ok(vec![parse_geometry_within(field, input_map)?])
             }
             filters::INTERSECTS => {
+                if self.reverse() {
+                    return Err(QueryGraphBuilderError::InputError(
+                        "Negation (NOT) is not supported for geometry 'intersects' filters".to_string(),
+                    ));
+                }
                 let input_map: ParsedInputMap<'_> = input.try_into()?;
                 Ok(vec![parse_geometry_intersects(field, input_map)?])
             }

@@ -76,7 +76,13 @@ fn parse_geometry_type(pair: Pair<'_>, file_id: FileId) -> Result<FieldType, Dat
         debug_assert_eq!(srid_pair.as_rule(), Rule::geometry_srid);
         let raw = srid_pair.as_str();
         match raw.parse::<i32>() {
-            Ok(v) => Some(v),
+            Ok(v) if v >= 0 && v <= 999_999 => Some(v),
+            Ok(v) => {
+                return Err(DatamodelError::new_validation_error(
+                    &format!("Invalid SRID: expected a value between 0 and 999999, got {}.", v),
+                    (file_id, srid_pair.as_span()).into(),
+                ));
+            }
             Err(_) => {
                 return Err(DatamodelError::new_validation_error(
                     "Invalid SRID: expected a valid 32-bit integer.",

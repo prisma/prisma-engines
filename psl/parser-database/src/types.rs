@@ -270,8 +270,10 @@ impl GeometrySpec {
             PostgisSpatialKind::Geography => "geography",
         };
         let subtype = self.subtype.as_str();
-        let srid = self.srid.unwrap_or(0);
-        format!("{base}({subtype},{srid})")
+        match self.srid {
+            Some(srid) => format!("{base}({subtype},{srid})"),
+            None => format!("{base}({subtype})"),
+        }
     }
 }
 

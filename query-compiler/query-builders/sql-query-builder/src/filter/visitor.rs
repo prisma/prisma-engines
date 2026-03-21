@@ -659,6 +659,39 @@ impl FilterVisitorExt for FilterVisitor {
             GeometryFilterCondition::Intersects { geometry, .. } => {
                 let geom_type = geometry.get("type").and_then(|v| v.as_str()).unwrap_or("");
                 let wkt = match geom_type {
+                    "Point" => {
+                        if let Some(coords) = geometry.get("coordinates").and_then(|v| v.as_array()) {
+                            if coords.len() >= 2 {
+                                format!("POINT({} {})",
+                                    coords[0].as_f64().unwrap_or(0.0),
+                                    coords[1].as_f64().unwrap_or(0.0))
+                            } else {
+                                panic!("Invalid Point coordinates: expected at least 2 values, got {}", coords.len())
+                            }
+                        } else {
+                            panic!("Invalid Point geometry: missing or invalid 'coordinates' array")
+                        }
+                    }
+                    "LineString" => {
+                        if let Some(coords) = geometry.get("coordinates").and_then(|v| v.as_array()) {
+                            let point_strs: Vec<String> = coords.iter()
+                                .filter_map(|p| {
+                                    p.as_array().and_then(|arr| {
+                                        if arr.len() >= 2 {
+                                            Some(format!("{} {}",
+                                                arr[0].as_f64().unwrap_or(0.0),
+                                                arr[1].as_f64().unwrap_or(0.0)))
+                                        } else {
+                                            None
+                                        }
+                                    })
+                                })
+                                .collect();
+                            format!("LINESTRING({})", point_strs.join(", "))
+                        } else {
+                            panic!("Invalid LineString geometry: missing or invalid 'coordinates' array")
+                        }
+                    }
                     "Polygon" => {
                         if let Some(coords) = geometry.get("coordinates").and_then(|v| v.as_array()) {
                             let ring_strs: Vec<String> = coords.iter()
@@ -686,7 +719,8 @@ impl FilterVisitorExt for FilterVisitor {
                             "POLYGON EMPTY".to_string()
                         }
                     }
-                    _ => format!("POINT(0 0)"),
+                    "" => panic!("Missing 'type' field in GeoJSON geometry"),
+                    unsupported => panic!("Unsupported GeoJSON geometry type '{}' for intersects filter. Supported types: Point, LineString, Polygon", unsupported),
                 };
                 let escaped_wkt = wkt.replace('\'', "''");
                 format!(

@@ -231,13 +231,24 @@ pub struct OrderByRelevance {
     pub path: Vec<OrderByHop>,
 }
 
-#[derive(Clone, PartialEq)]
+#[derive(Clone)]
 pub struct OrderByGeometry {
     pub field: ScalarFieldRef,
     pub path: Vec<OrderByHop>,
     pub point: (f64, f64),
     pub sort_order: SortOrder,
     pub srid: Option<i32>,
+}
+
+impl PartialEq for OrderByGeometry {
+    fn eq(&self, other: &Self) -> bool {
+        self.field == other.field
+            && self.path == other.path
+            && self.point.0.to_bits() == other.point.0.to_bits()
+            && self.point.1.to_bits() == other.point.1.to_bits()
+            && self.sort_order == other.sort_order
+            && self.srid == other.srid
+    }
 }
 
 impl std::fmt::Debug for OrderByGeometry {
