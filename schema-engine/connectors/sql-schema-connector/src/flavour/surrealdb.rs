@@ -126,10 +126,13 @@ impl SqlConnector for SurrealDbConnector {
         imp::get_shadow_db_url(&self.state)
     }
 
-    // TODO: SurrealDB does not provide advisory locking. Concurrent migrations
-    // are not safe. Implement CAS-based locking when SurrealDB supports it.
     fn acquire_lock(&mut self) -> BoxFuture<'_, ConnectorResult<()>> {
-        Box::pin(async { Ok(()) })
+        self.raw_cmd(concat!(
+            "DEFINE TABLE IF NOT EXISTS _prisma_lock SCHEMAFULL;",
+            "DEFINE FIELD IF NOT EXISTS locked_by ON TABLE _prisma_lock TYPE string;",
+            "DEFINE FIELD IF NOT EXISTS locked_at ON TABLE _prisma_lock TYPE datetime DEFAULT time::now();",
+            "UPSERT _prisma_lock:migration_lock SET locked_by = 'prisma', locked_at = time::now();",
+        ))
     }
 
     fn connector_type(&self) -> &'static str {
@@ -217,18 +220,37 @@ impl SqlConnector for SurrealDbConnector {
         self.with_connection(|conn, params| conn.reset(params))
     }
 
-    // TODO: implement full shadow DB / migration-history-based schema reconstruction
     fn sql_schema_from_migration_history<'a>(
         &'a mut self,
-        _migrations: &'a Migrations,
+        migrations: &'a Migrations,
         _namespaces: Option<Namespaces>,
         _filter: &'a SchemaFilter,
         _external_shadow_db: UsingExternalShadowDb,
     ) -> BoxFuture<'a, ConnectorResult<SqlSchema>> {
-        Box::pin(async {
-            Err(ConnectorError::from_msg(
-                "SurrealDB migration history replay is not yet implemented. Use `prisma db push` instead.".to_owned(),
-            ))
+        Box::pin(async move {
+            let (conn, _) = imp::get_connection_and_params(&mut self.state)?;
+
+            // Apply init script if present
+            if !migrations.shadow_db_init_script.trim().is_empty() {
+                conn.raw_cmd(&migrations.shadow_db_init_script).await?;
+            }
+
+            // Apply each migration in order
+            for migration in migrations.migration_directories.iter() {
+                let script = migration.read_migration_script()?;
+
+                tracing::debug!(
+                    "Applying migration `{}` to SurrealDB.",
+                    migration.migration_name()
+                );
+
+                conn.raw_cmd(&script).await.map_err(|connector_error| {
+                    connector_error.into_migration_does_not_apply_cleanly(migration.migration_name().to_owned())
+                })?;
+            }
+
+            // Introspect the resulting schema
+            imp::introspect(&mut self.state).await
         })
     }
 
