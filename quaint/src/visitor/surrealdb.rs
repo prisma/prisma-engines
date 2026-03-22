@@ -97,11 +97,11 @@ impl<'a> Visitor<'a> for SurrealDb<'a> {
         let res = match &value.typed {
             ValueType::Int32(i) => i.map(|i| self.write(i)),
             ValueType::Int64(i) => i.map(|i| self.write(i)),
-            ValueType::Text(t) => t.as_ref().map(|t| self.write(format!("'{t}'"))),
-            ValueType::Enum(e, _) => e.as_ref().map(|e| self.write(e)),
+            ValueType::Text(t) => t.as_ref().map(|t| self.write(format!("'{}'", escape_squote(t)))),
+            ValueType::Enum(e, _) => e.as_ref().map(|e| self.write(format!("'{}'", escape_squote(e)))),
             ValueType::Bytes(b) => b.as_ref().map(|b| self.write(format!("x'{}'", hex::encode(b)))),
             ValueType::Boolean(b) => b.map(|b| self.write(b)),
-            ValueType::Char(c) => c.map(|c| self.write(format!("'{c}'"))),
+            ValueType::Char(c) => c.map(|c| self.write(format!("'{}'", escape_squote(&c.to_string())))),
             ValueType::Float(d) => d.map(|f| match f {
                 f if f.is_nan() => self.write("'NaN'"),
                 f if f == f32::INFINITY => self.write("'Infinity'"),
@@ -124,16 +124,16 @@ impl<'a> Visitor<'a> for SurrealDb<'a> {
             ValueType::Json(j) => match j {
                 Some(j) => {
                     let s = serde_json::to_string(j)?;
-                    Some(self.write(format!("'{s}'")))
+                    Some(self.write(format!("'{}'", escape_squote(&s))))
                 }
                 None => None,
             },
             ValueType::Numeric(r) => r.as_ref().map(|r| self.write(r)),
             ValueType::Uuid(uuid) => uuid.map(|uuid| self.write(format!("'{}'", uuid.hyphenated()))),
             ValueType::DateTime(dt) => dt.map(|dt| self.write(format!("'{}'", dt.to_rfc3339()))),
-            ValueType::Date(date) => date.map(|date| self.write(format!("'{date}'"))),
-            ValueType::Time(time) => time.map(|time| self.write(format!("'{time}'"))),
-            ValueType::Xml(cow) => cow.as_ref().map(|cow| self.write(format!("'{cow}'"))),
+            ValueType::Date(date) => date.map(|date| self.write(format!("'{}'", escape_squote(&date.to_string())))),
+            ValueType::Time(time) => time.map(|time| self.write(format!("'{}'", escape_squote(&time.to_string())))),
+            ValueType::Xml(cow) => cow.as_ref().map(|cow| self.write(format!("'{}'", escape_squote(cow)))),
             ValueType::Opaque(opaque) => Some(Err(
                 Error::builder(ErrorKind::OpaqueAsRawValue(opaque.to_string())).build()
             )),
@@ -521,6 +521,15 @@ impl<'a> Visitor<'a> for SurrealDb<'a> {
         }
 
         Ok(())
+    }
+}
+
+/// Escape single quotes in string literals for SurrealQL.
+fn escape_squote(s: &str) -> Cow<'_, str> {
+    if s.contains('\'') {
+        Cow::Owned(s.replace('\'', "\\'"))
+    } else {
+        Cow::Borrowed(s)
     }
 }
 

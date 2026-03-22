@@ -98,12 +98,14 @@ impl DestructiveChangeCheckerFlavour for SurrealDbDestructiveChangeCheckerFlavou
         }
     }
 
+    // Conservative fallback: assume tables are populated so destructive checks
+    // surface warnings rather than silently skipping them.
     fn count_rows_in_table<'a>(
         &'a mut self,
         _connector: &'a mut dyn SqlConnector,
         _table: &'a Table,
     ) -> BoxFuture<'a, ConnectorResult<i64>> {
-        Box::pin(async { Ok(0) })
+        Box::pin(async { Ok(1) })
     }
 
     fn count_values_in_column<'a>(
@@ -111,6 +113,6 @@ impl DestructiveChangeCheckerFlavour for SurrealDbDestructiveChangeCheckerFlavou
         _connector: &'a mut dyn SqlConnector,
         _column: &'a Column,
     ) -> BoxFuture<'a, ConnectorResult<i64>> {
-        Box::pin(async { Ok(0) })
+        Box::pin(async { Ok(1) })
     }
 }
