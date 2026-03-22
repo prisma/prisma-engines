@@ -101,7 +101,10 @@ impl<'a> Visitor<'a> for SurrealDb<'a> {
             ValueType::Int64(i) => i.map(|i| self.write(i)),
             ValueType::Text(t) => t.as_ref().map(|t| self.write(format!("'{}'", escape_squote(t)))),
             ValueType::Enum(e, _) => e.as_ref().map(|e| self.write(format!("'{}'", escape_squote(e)))),
-            ValueType::Bytes(b) => b.as_ref().map(|b| self.write(format!("x'{}'", hex::encode(b)))),
+            ValueType::Bytes(b) => b.as_ref().map(|b| {
+                use base64::Engine;
+                self.write(format!("encoding::base64::decode('{}')", base64::prelude::BASE64_STANDARD.encode(b)))
+            }),
             ValueType::Boolean(b) => b.map(|b| self.write(b)),
             ValueType::Char(c) => c.map(|c| self.write(format!("'{}'", escape_squote(&c.to_string())))),
             ValueType::Float(d) => d.map(|f| match f {
@@ -131,8 +134,8 @@ impl<'a> Visitor<'a> for SurrealDb<'a> {
                 None => None,
             },
             ValueType::Numeric(r) => r.as_ref().map(|r| self.write(r)),
-            ValueType::Uuid(uuid) => uuid.map(|uuid| self.write(format!("'{}'", uuid.hyphenated()))),
-            ValueType::DateTime(dt) => dt.map(|dt| self.write(format!("'{}'", dt.to_rfc3339()))),
+            ValueType::Uuid(uuid) => uuid.map(|uuid| self.write(format!("u\"{}\"", uuid.hyphenated()))),
+            ValueType::DateTime(dt) => dt.map(|dt| self.write(format!("d\"{}\"", dt.to_rfc3339()))),
             ValueType::Date(date) => date.map(|date| self.write(format!("'{}'", escape_squote(&date.to_string())))),
             ValueType::Time(time) => time.map(|time| self.write(format!("'{}'", escape_squote(&time.to_string())))),
             ValueType::Xml(cow) => cow.as_ref().map(|cow| self.write(format!("'{}'", escape_squote(cow)))),

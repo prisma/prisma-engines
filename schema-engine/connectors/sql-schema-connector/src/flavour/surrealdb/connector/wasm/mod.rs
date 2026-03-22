@@ -10,6 +10,8 @@ pub struct State {
     connection: Connection,
     params: Params,
     preview_features: BitFlags<PreviewFeature>,
+    namespace: String,
+    database: String,
 }
 
 impl State {
@@ -18,7 +20,15 @@ impl State {
             preview_features,
             connection: Connection { adapter },
             params: Params,
+            namespace: "default".to_owned(),
+            database: "default".to_owned(),
         }
+    }
+
+    pub fn with_ns_db(mut self, namespace: String, database: String) -> Self {
+        self.namespace = namespace;
+        self.database = database;
+        self
     }
 }
 
@@ -129,17 +139,22 @@ pub fn connect_to_shadow_db() -> ConnectorResult<Connection> {
 }
 
 pub async fn create_database(state: &State) -> ConnectorResult<String> {
+    let ns = &state.namespace;
+    let db = &state.database;
     state
         .connection
-        .raw_cmd("DEFINE NAMESPACE IF NOT EXISTS prisma; DEFINE DATABASE IF NOT EXISTS prisma")
+        .raw_cmd(&format!(
+            "DEFINE NAMESPACE IF NOT EXISTS `{ns}`; DEFINE DATABASE IF NOT EXISTS `{db}`"
+        ))
         .await?;
-    Ok("Database created via DEFINE NAMESPACE + DEFINE DATABASE".to_owned())
+    Ok(format!("Created namespace `{ns}` and database `{db}`"))
 }
 
 pub async fn drop_database(state: &State) -> ConnectorResult<()> {
+    let db = &state.database;
     state
         .connection
-        .raw_cmd("REMOVE DATABASE IF EXISTS prisma")
+        .raw_cmd(&format!("REMOVE DATABASE IF EXISTS `{db}`"))
         .await
 }
 
@@ -208,6 +223,7 @@ fn parse_surreal_field_type(def: &str) -> sql_schema_describer::ColumnType {
     let family = match type_str {
         "bool" => ColumnTypeFamily::Boolean,
         "int" => ColumnTypeFamily::Int,
+        "bigint" => ColumnTypeFamily::BigInt,
         "float" => ColumnTypeFamily::Float,
         "decimal" => ColumnTypeFamily::Decimal,
         "string" => ColumnTypeFamily::String,

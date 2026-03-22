@@ -109,20 +109,28 @@ impl SqlRenderer for SurrealDbRenderer {
                         field_name = self.quote(previous_column.name()),
                         table_name = self.quote(tables.previous.name()),
                     ));
-                    statements.push(format!(
+                    let mut field_def = format!(
                         "DEFINE FIELD {field_name} ON TABLE {table_name} TYPE {field_type}{nullable}",
                         field_name = self.quote(next_column.name()),
                         table_name = self.quote(tables.previous.name()),
                         field_type = col_type,
                         nullable = nullable,
-                    ));
+                    );
+                    if let Some(default) = next_column.default() {
+                        if !matches!(default.kind(), DefaultKind::Sequence(_) | DefaultKind::DbGenerated(None) | DefaultKind::UniqueRowid) {
+                            field_def.push_str(&format!(" DEFAULT {}", render_default(default.inner())));
+                        }
+                    }
+                    statements.push(field_def);
                 }
                 TableChange::AddPrimaryKey => {
                     // SurrealDB primary keys are managed via UNIQUE indexes in render_create_table_as
                 }
                 TableChange::DropPrimaryKey => {
+                    let pk_name = format!("{}_pk", tables.previous.name());
                     statements.push(format!(
-                        "REMOVE INDEX {table_name}_pk ON TABLE {table_name}",
+                        "REMOVE INDEX {index_name} ON TABLE {table_name}",
+                        index_name = self.quote(&pk_name),
                         table_name = self.quote(tables.previous.name()),
                     ));
                 }
@@ -175,8 +183,10 @@ impl SqlRenderer for SurrealDbRenderer {
 
         if let Some(pk_columns) = table.primary_key_columns() {
             let pk_fields: Vec<String> = pk_columns.map(|c| format!("{}", Quoted::Backticks(c.name()))).collect();
+            let pk_name = format!("{}_pk", table.name());
             lines.push(format!(
-                "DEFINE INDEX {table_name}_pk ON TABLE {table_name} FIELDS {fields} UNIQUE",
+                "DEFINE INDEX {index_name} ON TABLE {table_name} FIELDS {fields} UNIQUE",
+                index_name = Quoted::Backticks(&pk_name),
                 table_name = table_name,
                 fields = pk_fields.join(", "),
             ));
@@ -217,10 +227,76 @@ impl SqlRenderer for SurrealDbRenderer {
 
         for redefine_table in tables {
             let tables = schemas.walk(redefine_table.table_ids);
+            let old_name = tables.previous.name();
+            let temp_name = format!("_new_{}", old_name);
 
-            result.push(format!("REMOVE TABLE {}", self.quote(tables.previous.name())));
+            // 1. Create temporary table with new schema
+            result.push(
+                self.render_create_table_as(
+                    tables.next,
+                    QuotedWithPrefix(None, self.quote(&temp_name)),
+                ),
+            );
+
+            // 2. Copy data from old table to temp (only columns that exist in both)
+            if !redefine_table.column_pairs.is_empty() {
+                let cols: Vec<String> = redefine_table
+                    .column_pairs
+                    .iter()
+                    .map(|(col_ids, _, _)| {
+                        let col_name = tables.next.walk(col_ids.next).name();
+                        format!("{}", self.quote(col_name))
+                    })
+                    .collect();
+
+                let src_cols: Vec<String> = redefine_table
+                    .column_pairs
+                    .iter()
+                    .map(|(col_ids, _, _)| {
+                        let col_name = tables.previous.walk(col_ids.previous).name();
+                        format!("{}", self.quote(col_name))
+                    })
+                    .collect();
+
+                result.push(format!(
+                    "INSERT INTO {} ({}) SELECT {} FROM {}",
+                    self.quote(&temp_name),
+                    cols.join(", "),
+                    src_cols.join(", "),
+                    self.quote(old_name),
+                ));
+            }
+
+            // 3. Drop old table
+            result.push(format!("REMOVE TABLE {}", self.quote(old_name)));
+
+            // 4. SurrealDB has no RENAME TABLE; create final table and copy from temp
             result.push(self.render_create_table(tables.next));
 
+            if !redefine_table.column_pairs.is_empty() {
+                let cols: Vec<String> = redefine_table
+                    .column_pairs
+                    .iter()
+                    .map(|(col_ids, _, _)| {
+                        let col_name = tables.next.walk(col_ids.next).name();
+                        format!("{}", self.quote(col_name))
+                    })
+                    .collect();
+                let col_list = cols.join(", ");
+
+                result.push(format!(
+                    "INSERT INTO {} ({}) SELECT {} FROM {}",
+                    self.quote(old_name),
+                    col_list,
+                    col_list,
+                    self.quote(&temp_name),
+                ));
+            }
+
+            // 5. Drop temp table
+            result.push(format!("REMOVE TABLE {}", self.quote(&temp_name)));
+
+            // 6. Recreate non-PK indexes
             for index in tables.next.indexes().filter(|idx| !idx.is_primary_key()) {
                 result.push(self.render_create_index(index));
             }
@@ -230,10 +306,9 @@ impl SqlRenderer for SurrealDbRenderer {
     }
 
     fn render_rename_table(&self, _namespace: Option<&str>, name: &str, new_name: &str) -> String {
-        // SurrealDB does not support RENAME TABLE. This generates a comment
-        // that will cause a migration error, forcing manual intervention.
+        // Emit a deliberately invalid statement so the migration fails instead of silently succeeding
         format!(
-            "-- ERROR: SurrealDB does not support RENAME TABLE. Manual migration required: {} -> {}",
+            "THROW 'SurrealDB does not support RENAME TABLE. Manual migration required: {} -> {}'",
             name, new_name
         )
     }
@@ -258,8 +333,7 @@ fn render_column_type(t: &ColumnType) -> &str {
         ColumnTypeFamily::Float => "float",
         ColumnTypeFamily::Decimal => "decimal",
         ColumnTypeFamily::Int => "int",
-        // SurrealDB int is 64-bit; BigInt maps directly
-        ColumnTypeFamily::BigInt => "int",
+        ColumnTypeFamily::BigInt => "bigint",
         ColumnTypeFamily::String => "string",
         ColumnTypeFamily::Binary => "bytes",
         ColumnTypeFamily::Json => "object",
