@@ -30,8 +30,6 @@ pub const CAPABILITIES: ConnectorCapabilities = enumflags2::make_bitflags!(Conne
     SupportsFiltersOnRelationsWithoutJoins |
     CreateMany |
     Json |
-    JsonFiltering |
-    JsonFilteringJsonPath |
     AdvancedJsonNullability
 });
 

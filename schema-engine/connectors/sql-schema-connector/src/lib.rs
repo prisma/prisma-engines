@@ -254,6 +254,8 @@ impl SqlSchemaConnector {
             quaint::connector::AdapterProvider::Postgres => Self::new_postgres_external(adapter).await,
             #[cfg(all(feature = "sqlite", not(feature = "sqlite-native")))]
             quaint::connector::AdapterProvider::Sqlite => Ok(Self::new_sqlite_external(adapter).await),
+            #[cfg(feature = "surrealdb")]
+            quaint::connector::AdapterProvider::SurrealDb => Ok(Self::new_surrealdb_external(adapter)),
             #[allow(unreachable_patterns)]
             _ => panic!("Unsupported adapter provider: {:?}", adapter.provider()),
         }

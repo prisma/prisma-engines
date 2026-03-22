@@ -58,6 +58,7 @@ pub enum AdapterProvider {
     #[serde(rename = "sqlserver")]
     SqlServer,
     #[cfg(feature = "surrealdb")]
+    #[serde(rename = "surrealdb")]
     SurrealDb,
 }
 

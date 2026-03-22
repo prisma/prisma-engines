@@ -1,4 +1,4 @@
-use crate::sql_renderer::{IteratorJoin, Quoted, QuotedWithPrefix, SqlRenderer, render_step};
+use crate::sql_renderer::{IteratorJoin, Quoted, QuotedWithPrefix, SqlRenderer};
 use crate::{
     migration_pair::MigrationPair,
     sql_migration::{AlterEnum, AlterTable, RedefineTable, TableChange},
@@ -67,21 +67,21 @@ impl SqlRenderer for SurrealDbRenderer {
                         ""
                     };
 
-                    statements.push(format!(
+                    let mut field_def = format!(
                         "DEFINE FIELD {field_name} ON TABLE {table_name} TYPE {field_type}{nullable}",
                         field_name = self.quote(column.name()),
                         table_name = self.quote(tables.previous.name()),
                         field_type = col_type,
                         nullable = nullable,
-                    ));
+                    );
 
                     if let Some(default) = column.default() {
-                        statements.push(format!(
-                            "-- Default value for {field_name}: {default_val}",
-                            field_name = column.name(),
-                            default_val = render_default(default.inner()),
-                        ));
+                        if !matches!(default.kind(), DefaultKind::Sequence(_) | DefaultKind::DbGenerated(None)) {
+                            field_def.push_str(&format!(" DEFAULT {}", render_default(default.inner())));
+                        }
                     }
+
+                    statements.push(field_def);
                 }
                 TableChange::DropColumn { column_id } => {
                     let column = schemas.previous.walk(*column_id);
@@ -93,7 +93,6 @@ impl SqlRenderer for SurrealDbRenderer {
                 }
                 TableChange::AlterColumn(_alter_column) => {
                     // SurrealDB handles field redefinition by re-issuing DEFINE FIELD
-                    // For now, we skip complex column alterations
                 }
                 TableChange::DropAndRecreateColumn { column_id, .. } => {
                     let previous_column = schemas.previous.walk(column_id.previous);
@@ -113,7 +112,7 @@ impl SqlRenderer for SurrealDbRenderer {
                     statements.push(format!(
                         "DEFINE FIELD {field_name} ON TABLE {table_name} TYPE {field_type}{nullable}",
                         field_name = self.quote(next_column.name()),
-                        table_name = self.quote(tables.next.name()),
+                        table_name = self.quote(tables.previous.name()),
                         field_type = col_type,
                         nullable = nullable,
                     ));
@@ -138,10 +137,8 @@ impl SqlRenderer for SurrealDbRenderer {
     fn render_create_table_as(&self, table: TableWalker<'_>, table_name: QuotedWithPrefix<&str>) -> String {
         let mut lines: Vec<String> = Vec::new();
 
-        // DEFINE TABLE with SCHEMAFULL mode
         lines.push(format!("DEFINE TABLE {table_name} SCHEMAFULL"));
 
-        // DEFINE FIELD for each column
         for column in table.columns() {
             let col_type = render_column_type(column.column_type());
             let nullable = if column.arity().is_nullable() {
@@ -159,15 +156,14 @@ impl SqlRenderer for SurrealDbRenderer {
             );
 
             if let Some(default) = column.default() {
-                if !matches!(default.kind(), DefaultKind::Sequence(_) | DefaultKind::DbGenerated(None)) {
-                    field_def.push_str(&format!(" VALUE {}", render_default(default.inner())));
+                if !matches!(default.kind(), DefaultKind::Sequence(_) | DefaultKind::DbGenerated(None) | DefaultKind::UniqueRowid) {
+                    field_def.push_str(&format!(" DEFAULT {}", render_default(default.inner())));
                 }
             }
 
             lines.push(field_def);
         }
 
-        // DEFINE INDEX for primary key
         if let Some(pk_columns) = table.primary_key_columns() {
             let pk_fields: Vec<String> = pk_columns.map(|c| format!("{}", Quoted::Backticks(c.name()))).collect();
             lines.push(format!(
@@ -185,7 +181,6 @@ impl SqlRenderer for SurrealDbRenderer {
     }
 
     fn render_drop_foreign_key(&self, _namespace: Option<&str>, _foreign_key: ForeignKeyWalker<'_>) -> String {
-        // SurrealDB does not support foreign keys
         String::new()
     }
 
@@ -214,11 +209,9 @@ impl SqlRenderer for SurrealDbRenderer {
         for redefine_table in tables {
             let tables = schemas.walk(redefine_table.table_ids);
 
-            // Drop old table, create new one
             result.push(format!("REMOVE TABLE {}", self.quote(tables.previous.name())));
             result.push(self.render_create_table(tables.next));
 
-            // Re-create indexes
             for index in tables.next.indexes().filter(|idx| !idx.is_primary_key()) {
                 result.push(self.render_create_index(index));
             }
@@ -228,10 +221,10 @@ impl SqlRenderer for SurrealDbRenderer {
     }
 
     fn render_rename_table(&self, _namespace: Option<&str>, name: &str, new_name: &str) -> String {
-        // SurrealDB doesn't support RENAME TABLE directly;
-        // this would require a table recreation in practice
+        // SurrealDB does not support RENAME TABLE. This generates a comment
+        // that will cause a migration error, forcing manual intervention.
         format!(
-            "-- SurrealDB does not support RENAME TABLE. Manual migration required: {} -> {}",
+            "-- ERROR: SurrealDB does not support RENAME TABLE. Manual migration required: {} -> {}",
             name, new_name
         )
     }
@@ -245,7 +238,6 @@ impl SqlRenderer for SurrealDbRenderer {
     }
 
     fn render_rename_foreign_key(&self, _fks: MigrationPair<ForeignKeyWalker<'_>>) -> String {
-        // SurrealDB does not support foreign keys
         String::new()
     }
 }
@@ -257,12 +249,13 @@ fn render_column_type(t: &ColumnType) -> &str {
         ColumnTypeFamily::Float => "float",
         ColumnTypeFamily::Decimal => "decimal",
         ColumnTypeFamily::Int => "int",
+        // SurrealDB int is 64-bit; BigInt maps directly
         ColumnTypeFamily::BigInt => "int",
         ColumnTypeFamily::String => "string",
         ColumnTypeFamily::Binary => "bytes",
         ColumnTypeFamily::Json => "object",
         ColumnTypeFamily::Enum(_) => "string",
-        ColumnTypeFamily::Uuid => "string",
+        ColumnTypeFamily::Uuid => "uuid",
         ColumnTypeFamily::Udt(_) => "object",
         ColumnTypeFamily::Unsupported(x) => x.as_ref(),
     }
@@ -272,7 +265,7 @@ fn render_default(default: &DefaultValue) -> Cow<'_, str> {
     match default.kind() {
         DefaultKind::DbGenerated(Some(val)) => val.as_str().into(),
         DefaultKind::Value(PrismaValue::String(val)) | DefaultKind::Value(PrismaValue::Enum(val)) => {
-            format!("'{val}'").into()
+            format!("'{}'", val.replace('\'', "\\'")).into()
         }
         DefaultKind::Value(PrismaValue::Bytes(b)) => {
             format!("encoding::base64::decode('{}')", base64::Engine::encode(&base64::prelude::BASE64_STANDARD, b)).into()
@@ -283,6 +276,8 @@ fn render_default(default: &DefaultValue) -> Cow<'_, str> {
             if *val { "true".into() } else { "false".into() }
         }
         DefaultKind::Value(val) => val.to_string().into(),
-        DefaultKind::DbGenerated(None) | DefaultKind::Sequence(_) | DefaultKind::UniqueRowid => unreachable!(),
+        // UniqueRowid is not supported by SurrealDB (no autoincrement)
+        DefaultKind::UniqueRowid => "rand::ulid()".into(),
+        DefaultKind::DbGenerated(None) | DefaultKind::Sequence(_) => unreachable!(),
     }
 }

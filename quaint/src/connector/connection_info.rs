@@ -509,6 +509,8 @@ impl SqlFamily {
             SqlFamily::Sqlite => 999,
             #[cfg(feature = "mssql")]
             SqlFamily::Mssql => 2098,
+            // SurrealDB has no documented parameter limit; this is a conservative
+            // transport-based fallback (HTTP/WebSocket body size dependent).
             #[cfg(feature = "surrealdb")]
             SqlFamily::SurrealDb => 32766,
         }
@@ -564,6 +566,18 @@ impl SqlFamily {
     /// True, if family is SQL Server.
     #[cfg(not(feature = "mssql"))]
     pub fn is_mssql(&self) -> bool {
+        false
+    }
+
+    /// True, if family is SurrealDB.
+    #[cfg(feature = "surrealdb")]
+    pub fn is_surrealdb(&self) -> bool {
+        matches!(self, SqlFamily::SurrealDb)
+    }
+
+    /// True, if family is SurrealDB.
+    #[cfg(not(feature = "surrealdb"))]
+    pub fn is_surrealdb(&self) -> bool {
         false
     }
 }

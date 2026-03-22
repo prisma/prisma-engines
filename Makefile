@@ -436,7 +436,7 @@ measure-qc-wasm: measure-qc-wasm-fast measure-qc-wasm-small
 
 measure-qc-wasm-%: build-qc-gz-%
 	@cd query-compiler/query-compiler-wasm/pkg; \
-	for provider in postgresql mysql sqlite sqlserver cockroachdb; do \
+	for provider in postgresql mysql sqlite sqlserver cockroachdb surrealdb; do \
 		echo "$${provider}_$*_qc_size=$$(cat $$provider/query_compiler_$*_bg.wasm | wc -c | tr -d ' ')" >> $(ENGINE_SIZE_OUTPUT); \
 		echo "$${provider}_$*_qc_size_gz=$$(cat $${provider}_$*.gz | wc -c | tr -d ' ')" >> $(ENGINE_SIZE_OUTPUT); \
 	done;

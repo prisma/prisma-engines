@@ -1,7 +1,7 @@
 use crate::BitFlags;
 use crate::flavour::quaint_error_to_connector_error;
 use psl::PreviewFeature;
-use quaint::connector::{ConnectionInfo, ExternalConnectionInfo, ExternalConnector};
+use quaint::connector::ExternalConnector;
 use schema_connector::{ConnectorError, ConnectorResult};
 use sql_schema_describer::SqlSchema;
 use std::sync::Arc;
@@ -38,7 +38,8 @@ impl Connection {
 
     pub async fn query(&self, query: quaint::ast::Query<'_>) -> ConnectorResult<quaint::prelude::ResultSet> {
         use quaint::visitor::Visitor;
-        let (sql, params) = quaint::visitor::SurrealDb::build(query).unwrap();
+        let (sql, params) = quaint::visitor::SurrealDb::build(query)
+            .map_err(|e| ConnectorError::from_msg(format!("Failed to build SurrealQL query: {e}")))?;
         self.query_raw(&sql, &params).await
     }
 
@@ -69,16 +70,10 @@ impl Connection {
     }
 
     pub async fn reset(&self, _params: &Params) -> ConnectorResult<()> {
-        // SurrealDB: use INFO FOR DB to list tables and remove them
-        let result = self
-            .adapter
-            .query_raw("INFO FOR DB", &[])
-            .await
-            .map_err(convert_error)?;
-
-        // For now, a simplified reset that drops known tables
-        // In production, this would introspect the DB and drop all tables
-        Ok(())
+        // TODO: implement full reset by parsing INFO FOR DB and dropping all tables
+        Err(ConnectorError::from_msg(
+            "SurrealDB reset is not yet fully implemented".to_owned(),
+        ))
     }
 
     async fn dispose(&self) -> ConnectorResult<()> {
@@ -98,8 +93,10 @@ pub async fn create_database(_state: &State) -> ConnectorResult<String> {
 }
 
 pub async fn drop_database(_state: &State) -> ConnectorResult<()> {
-    // SurrealDB: REMOVE DATABASE would be used
-    Ok(())
+    // TODO: implement using REMOVE DATABASE via the adapter
+    Err(ConnectorError::from_msg(
+        "SurrealDB drop_database is not yet implemented".to_owned(),
+    ))
 }
 
 pub async fn ensure_connection_validity(state: &mut State) -> ConnectorResult<()> {
@@ -108,10 +105,11 @@ pub async fn ensure_connection_validity(state: &mut State) -> ConnectorResult<()
     Ok(())
 }
 
-pub async fn introspect(state: &mut State) -> ConnectorResult<SqlSchema> {
-    // SurrealDB introspection via INFO FOR DB / INFO FOR TABLE
-    // For now, return an empty schema — full introspection requires parsing SurrealDB's schema info
-    Ok(SqlSchema::default())
+pub async fn introspect(_state: &mut State) -> ConnectorResult<SqlSchema> {
+    // TODO: implement using INFO FOR DB / INFO FOR TABLE
+    Err(ConnectorError::from_msg(
+        "SurrealDB introspection is not yet implemented".to_owned(),
+    ))
 }
 
 pub fn get_connection_and_params(state: &mut State) -> ConnectorResult<(&Connection, &Params)> {

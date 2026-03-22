@@ -126,6 +126,8 @@ impl SqlConnector for SurrealDbConnector {
         imp::get_shadow_db_url(&self.state)
     }
 
+    // TODO: SurrealDB does not provide advisory locking. Concurrent migrations
+    // are not safe. Implement CAS-based locking when SurrealDB supports it.
     fn acquire_lock(&mut self) -> BoxFuture<'_, ConnectorResult<()>> {
         Box::pin(async { Ok(()) })
     }
@@ -142,6 +144,7 @@ impl SqlConnector for SurrealDbConnector {
         self.with_connection(|conn, _| conn.apply_migration_script(migration_name, script))
     }
 
+    // TODO: implement using INFO FOR DB to enumerate tables
     fn table_names(
         &mut self,
         _namespaces: Option<Namespaces>,
@@ -163,8 +166,8 @@ impl SqlConnector for SurrealDbConnector {
             DEFINE FIELD migration_name ON TABLE _prisma_migrations TYPE string;
             DEFINE FIELD logs ON TABLE _prisma_migrations TYPE option<string>;
             DEFINE FIELD rolled_back_at ON TABLE _prisma_migrations TYPE option<datetime>;
-            DEFINE FIELD started_at ON TABLE _prisma_migrations TYPE datetime VALUE time::now();
-            DEFINE FIELD applied_steps_count ON TABLE _prisma_migrations TYPE int VALUE 0;
+            DEFINE FIELD started_at ON TABLE _prisma_migrations TYPE datetime DEFAULT time::now();
+            DEFINE FIELD applied_steps_count ON TABLE _prisma_migrations TYPE int DEFAULT 0;
             DEFINE INDEX _prisma_migrations_pk ON TABLE _prisma_migrations FIELDS id UNIQUE;
         "#})
     }
@@ -215,6 +218,7 @@ impl SqlConnector for SurrealDbConnector {
         self.with_connection(|conn, params| conn.reset(params))
     }
 
+    // TODO: implement full shadow DB / migration-history-based schema reconstruction
     fn sql_schema_from_migration_history<'a>(
         &'a mut self,
         _migrations: &'a Migrations,
@@ -222,8 +226,11 @@ impl SqlConnector for SurrealDbConnector {
         _filter: &'a SchemaFilter,
         _external_shadow_db: UsingExternalShadowDb,
     ) -> BoxFuture<'a, ConnectorResult<SqlSchema>> {
-        // SurrealDB: for now return empty schema — full shadow DB support needed
-        Box::pin(async { Ok(SqlSchema::default()) })
+        Box::pin(async {
+            Err(ConnectorError::from_msg(
+                "SurrealDB migration history replay is not yet implemented. Use `prisma db push` instead.".to_owned(),
+            ))
+        })
     }
 
     fn set_preview_features(&mut self, features: psl::PreviewFeatures) {

@@ -302,17 +302,20 @@ impl<'a> Visitor<'a> for SurrealDb<'a> {
 
     #[cfg(any(feature = "postgresql", feature = "mysql", feature = "sqlite", feature = "surrealdb"))]
     fn visit_json_extract(&mut self, json_extract: JsonExtract<'a>) -> visitor::Result {
+        // SurrealDB uses dot-notation for field access: column.path
         self.visit_expression(*json_extract.column)?;
 
-        if json_extract.extract_as_string {
-            self.write("->>")?;
-        } else {
-            self.write("->")?;
-        }
-
         match json_extract.path {
-            JsonPath::Array(_) => panic!("JSON path array notation is not supported for SurrealDB"),
-            JsonPath::String(path) => self.visit_parameterized(Value::text(path))?,
+            JsonPath::String(path) => {
+                self.write(".")?;
+                self.write(path)?;
+            }
+            JsonPath::Array(parts) => {
+                for part in parts {
+                    self.write(".")?;
+                    self.write(part)?;
+                }
+            }
         }
 
         Ok(())
@@ -320,39 +323,38 @@ impl<'a> Visitor<'a> for SurrealDb<'a> {
 
     fn visit_json_array_contains(
         &mut self,
-        _left: Expression<'a>,
-        _right: Expression<'a>,
-        _not: bool,
+        left: Expression<'a>,
+        right: Expression<'a>,
+        not: bool,
     ) -> visitor::Result {
-        unimplemented!("JSON contains is not yet supported on SurrealDB")
+        // SurrealDB: <array> CONTAINS <value>
+        self.visit_expression(left)?;
+        if not {
+            self.write(" CONTAINSNOT ")?;
+        } else {
+            self.write(" CONTAINS ")?;
+        }
+        self.visit_expression(right)
     }
 
     #[cfg(any(feature = "postgresql", feature = "mysql", feature = "sqlite", feature = "surrealdb"))]
     fn visit_json_type_equals(&mut self, left: Expression<'a>, json_type: JsonType<'a>, not: bool) -> visitor::Result {
-        self.write("(")?;
-        self.write("type::is::string")?;
-        self.surround_with("(", ")", |s| s.visit_expression(left.clone()))?;
+        // SurrealDB: type::is_<type>(value) returns bool
+        let type_fn = match json_type {
+            JsonType::Array => "type::is_array",
+            JsonType::Boolean => "type::is_bool",
+            JsonType::Number => "type::is_number",
+            JsonType::Object => "type::is_object",
+            JsonType::String => "type::is_string",
+            JsonType::Null => "type::is_null",
+            JsonType::ColumnRef(_) => "type::is_string", // fallback
+        };
 
         if not {
-            self.write(" != ")?;
-        } else {
-            self.write(" = ")?;
+            self.write("NOT ")?;
         }
-
-        match json_type {
-            JsonType::Array => self.visit_expression(Expression::from(Value::text("array")))?,
-            JsonType::Boolean => self.visit_expression(Expression::from(Value::text("bool")))?,
-            JsonType::Number => self.visit_expression(Expression::from(Value::text("number")))?,
-            JsonType::Object => self.visit_expression(Expression::from(Value::text("object")))?,
-            JsonType::String => self.visit_expression(Expression::from(Value::text("string")))?,
-            JsonType::Null => self.visit_expression(Expression::from(Value::text("null")))?,
-            JsonType::ColumnRef(column) => {
-                self.write("type::is::string")?;
-                self.surround_with("(", ")", |s| s.visit_column(*column))?;
-            }
-        }
-
-        self.write(")")
+        self.write(type_fn)?;
+        self.surround_with("(", ")", |s| s.visit_expression(left))
     }
 
     fn visit_text_search(&mut self, _text_search: crate::prelude::TextSearch<'a>) -> visitor::Result {
@@ -369,20 +371,21 @@ impl<'a> Visitor<'a> for SurrealDb<'a> {
 
     #[cfg(any(feature = "postgresql", feature = "mysql", feature = "sqlite", feature = "surrealdb"))]
     fn visit_json_extract_last_array_item(&mut self, extract: JsonExtractLastArrayElem<'a>) -> visitor::Result {
-        self.visit_expression(*extract.expr)?;
-        self.write("->")?;
-        self.visit_parameterized(Value::text("$[#-1]"))
+        // SurrealDB: array::last(expr)
+        self.write("array::last")?;
+        self.surround_with("(", ")", |s| s.visit_expression(*extract.expr))
     }
 
     #[cfg(any(feature = "postgresql", feature = "mysql", feature = "sqlite", feature = "surrealdb"))]
     fn visit_json_extract_first_array_item(&mut self, extract: JsonExtractFirstArrayElem<'a>) -> visitor::Result {
-        self.visit_expression(*extract.expr)?;
-        self.write("->")?;
-        self.visit_parameterized(Value::text("$[0]"))
+        // SurrealDB: array::first(expr)
+        self.write("array::first")?;
+        self.surround_with("(", ")", |s| s.visit_expression(*extract.expr))
     }
 
     #[cfg(any(feature = "postgresql", feature = "mysql", feature = "sqlite", feature = "surrealdb"))]
     fn visit_json_unquote(&mut self, json_unquote: JsonUnquote<'a>) -> visitor::Result {
+        // SurrealDB: <string> expr or type::string(expr)
         self.write("type::string")?;
         self.surround_with("(", ")", |s| s.visit_expression(*json_unquote.expr))
     }
