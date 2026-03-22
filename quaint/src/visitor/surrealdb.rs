@@ -77,8 +77,10 @@ impl<'a> Visitor<'a> for SurrealDb<'a> {
         Q: Into<Query<'a>>,
     {
         let mut this = SurrealDb {
+            // SurrealDB requires parameter names to start with a letter.
+            // We use "$p" prefix with numbering: $p1, $p2, ...
             query_template: QueryTemplate::new(PlaceholderFormat {
-                prefix: "$",
+                prefix: "$p",
                 has_numbering: true,
             }),
         };
@@ -554,7 +556,7 @@ mod tests {
 
     #[test]
     fn test_select_1() {
-        let expected = expected_values("SELECT $1", vec![1]);
+        let expected = expected_values("SELECT $p1", vec![1]);
         let query = Select::default().value(1);
         let (sql, params) = SurrealDb::build(query).unwrap();
 
@@ -574,7 +576,7 @@ mod tests {
 
     #[test]
     fn test_select_where_equals() {
-        let expected = expected_values("SELECT `naukio`.* FROM `naukio` WHERE `word` = $1", vec!["meow"]);
+        let expected = expected_values("SELECT `naukio`.* FROM `naukio` WHERE `word` = $p1", vec!["meow"]);
         let query = Select::from_table("naukio").so_that("word".equals("meow"));
         let (sql, params) = SurrealDb::build(query).unwrap();
 
@@ -584,7 +586,7 @@ mod tests {
 
     #[test]
     fn test_delete_without_from() {
-        let expected_sql = "DELETE `users` WHERE `id` = $1";
+        let expected_sql = "DELETE `users` WHERE `id` = $p1";
         let query = Delete::from_table("users").so_that("id".equals(1));
         let (sql, params) = SurrealDb::build(query).unwrap();
 
@@ -594,7 +596,7 @@ mod tests {
 
     #[test]
     fn test_update() {
-        let expected_sql = "UPDATE `users` SET `name` = $1 WHERE `id` = $2";
+        let expected_sql = "UPDATE `users` SET `name` = $p1 WHERE `id` = $p2";
         let query = Update::table("users").set("name", "Alice").so_that("id".equals(1));
         let (sql, params) = SurrealDb::build(query).unwrap();
 
@@ -607,13 +609,13 @@ mod tests {
         let insert = Insert::single_into("users").value("name", "Alice").value("age", 30);
         let (sql, params) = SurrealDb::build(insert).unwrap();
 
-        assert_eq!("INSERT INTO `users` (`name`, `age`) VALUES ($1,$2)", sql);
+        assert_eq!("INSERT INTO `users` (`name`, `age`) VALUES ($p1,$p2)", sql);
         assert_eq!(vec![Value::text("Alice"), Value::int32(30)], params);
     }
 
     #[test]
     fn test_limit_and_offset_uses_start() {
-        let expected_sql = "SELECT `users`.* FROM `users` LIMIT $1 START $2";
+        let expected_sql = "SELECT `users`.* FROM `users` LIMIT $p1 START $p2";
         let query = Select::from_table("users").limit(10).offset(20);
         let (sql, params) = SurrealDb::build(query).unwrap();
 
