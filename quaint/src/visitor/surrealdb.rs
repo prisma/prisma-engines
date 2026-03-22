@@ -629,4 +629,210 @@ mod tests {
         assert_eq!(expected_sql, sql);
         assert_eq!(vec![Value::int64(10), Value::int64(20)], params);
     }
+
+    #[test]
+    fn test_select_order_by() {
+        let expected_sql = "SELECT `users`.* FROM `users` ORDER BY `name` ASC, `age` DESC";
+        let query = Select::from_table("users")
+            .order_by("name".ascend())
+            .order_by("age".descend());
+        let (sql, _) = SurrealDb::build(query).unwrap();
+        assert_eq!(expected_sql, sql);
+    }
+
+    #[test]
+    fn test_select_fields() {
+        let expected_sql = "SELECT `name`, `email` FROM `users`";
+        let query = Select::from_table("users").column("name").column("email");
+        let (sql, _) = SurrealDb::build(query).unwrap();
+        assert_eq!(expected_sql, sql);
+    }
+
+    #[test]
+    fn test_select_and_conditions() {
+        let expected_sql = "SELECT `users`.* FROM `users` WHERE (`name` = $p1 AND `age` > $p2)";
+        let query = Select::from_table("users")
+            .so_that("name".equals("Alice").and("age".greater_than(20)));
+        let (sql, params) = SurrealDb::build(query).unwrap();
+        assert_eq!(expected_sql, sql);
+        assert_eq!(vec![Value::text("Alice"), Value::int32(20)], params);
+    }
+
+    #[test]
+    fn test_select_or_conditions() {
+        let expected_sql = "SELECT `users`.* FROM `users` WHERE (`name` = $p1 OR `name` = $p2)";
+        let query = Select::from_table("users")
+            .so_that("name".equals("Alice").or("name".equals("Bob")));
+        let (sql, params) = SurrealDb::build(query).unwrap();
+        assert_eq!(expected_sql, sql);
+        assert_eq!(vec![Value::text("Alice"), Value::text("Bob")], params);
+    }
+
+    #[test]
+    fn test_select_not() {
+        let expected_sql = "SELECT `users`.* FROM `users` WHERE (NOT `active` = $p1)";
+        let query = Select::from_table("users").so_that("active".equals(false).not());
+        let (sql, params) = SurrealDb::build(query).unwrap();
+        assert_eq!(expected_sql, sql);
+        assert_eq!(vec![Value::boolean(false)], params);
+    }
+
+    #[test]
+    fn test_inner_join() {
+        let expected_sql = "SELECT `users`.* FROM `users` INNER JOIN `posts` ON `users`.`id` = `posts`.`user_id`";
+        let query = Select::from_table("users")
+            .inner_join("posts".on(("users", "id").equals(Column::from(("posts", "user_id")))));
+        let (sql, _) = SurrealDb::build(query).unwrap();
+        assert_eq!(expected_sql, sql);
+    }
+
+    #[test]
+    fn test_left_join() {
+        let expected_sql = "SELECT `users`.* FROM `users` LEFT JOIN `posts` ON `users`.`id` = `posts`.`user_id`";
+        let query = Select::from_table("users")
+            .left_join("posts".on(("users", "id").equals(Column::from(("posts", "user_id")))));
+        let (sql, _) = SurrealDb::build(query).unwrap();
+        assert_eq!(expected_sql, sql);
+    }
+
+    #[test]
+    fn test_aliased_column() {
+        let expected_sql = "SELECT `name` AS `user_name` FROM `users`";
+        let query = Select::from_table("users").column(Column::new("name").alias("user_name"));
+        let (sql, _) = SurrealDb::build(query).unwrap();
+        assert_eq!(expected_sql, sql);
+    }
+
+    #[test]
+    fn test_distinct() {
+        let expected_sql = "SELECT DISTINCT `name` FROM `users`";
+        let query = Select::from_table("users").column(Column::new("name")).distinct();
+        let (sql, _) = SurrealDb::build(query).unwrap();
+        assert_eq!(expected_sql, sql);
+    }
+
+    #[test]
+    fn test_in_values() {
+        let expected_sql = "SELECT `users`.* FROM `users` WHERE `id` IN ($p1,$p2,$p3)";
+        let query = Select::from_table("users").so_that("id".in_selection(vec![1, 2, 3]));
+        let (sql, params) = SurrealDb::build(query).unwrap();
+        assert_eq!(expected_sql, sql);
+        assert_eq!(
+            vec![Value::int32(1), Value::int32(2), Value::int32(3)],
+            params
+        );
+    }
+
+    #[test]
+    fn test_is_null() {
+        let expected_sql = "SELECT `users`.* FROM `users` WHERE `name` IS NULL";
+        let query = Select::from_table("users").so_that("name".is_null());
+        let (sql, _) = SurrealDb::build(query).unwrap();
+        assert_eq!(expected_sql, sql);
+    }
+
+    #[test]
+    fn test_is_not_null() {
+        let expected_sql = "SELECT `users`.* FROM `users` WHERE `name` IS NOT NULL";
+        let query = Select::from_table("users").so_that("name".is_not_null());
+        let (sql, _) = SurrealDb::build(query).unwrap();
+        assert_eq!(expected_sql, sql);
+    }
+
+    #[test]
+    fn test_like() {
+        let expected = expected_values(
+            "SELECT `users`.* FROM `users` WHERE `name` LIKE $p1",
+            vec!["%alice%"],
+        );
+        let query = Select::from_table("users").so_that("name".like("%alice%"));
+        let (sql, params) = SurrealDb::build(query).unwrap();
+        assert_eq!(expected.0, sql);
+        assert_eq!(expected.1, params);
+    }
+
+    #[test]
+    fn test_raw_null() {
+        let (sql, params) = SurrealDb::build(Select::default().value(Value::null_text().raw())).unwrap();
+        assert_eq!("SELECT null", sql);
+        assert!(params.is_empty());
+    }
+
+    #[test]
+    fn test_raw_int() {
+        let (sql, params) = SurrealDb::build(Select::default().value(1.raw())).unwrap();
+        assert_eq!("SELECT 1", sql);
+        assert!(params.is_empty());
+    }
+
+    #[test]
+    fn test_raw_text_with_quotes() {
+        let (sql, params) = SurrealDb::build(Select::default().value("O'Reilly".raw())).unwrap();
+        assert_eq!("SELECT 'O\\'Reilly'", sql);
+        assert!(params.is_empty());
+    }
+
+    #[test]
+    fn test_raw_text_with_backslash() {
+        let (sql, params) = SurrealDb::build(Select::default().value("back\\slash".raw())).unwrap();
+        assert_eq!("SELECT 'back\\\\slash'", sql);
+        assert!(params.is_empty());
+    }
+
+    #[test]
+    fn test_raw_boolean() {
+        let (sql, params) = SurrealDb::build(Select::default().value(true.raw())).unwrap();
+        assert_eq!("SELECT true", sql);
+        assert!(params.is_empty());
+    }
+
+    #[test]
+    fn test_insert_default_values() {
+        let insert = Insert::single_into("users");
+        let (sql, _) = SurrealDb::build(insert).unwrap();
+        assert_eq!("INSERT INTO `users` DEFAULT VALUES", sql);
+    }
+
+    #[test]
+    fn test_insert_on_duplicate_key_update() {
+        let update = Update::table("users").set("name", "Alice Updated").so_that(("users", "id").equals(1));
+        let query: Insert = Insert::single_into("users").value("name", "Alice").into();
+        let query = query.on_conflict(OnConflict::Update(update, Vec::from(["name".into()])));
+        let (sql, _) = SurrealDb::build(query).unwrap();
+        assert!(sql.contains("ON DUPLICATE KEY UPDATE"), "Expected ON DUPLICATE KEY UPDATE, got: {sql}");
+    }
+
+    #[test]
+    fn test_comment() {
+        let expected_sql = "INSERT INTO `users` DEFAULT VALUES /* trace_id='abc123' */";
+        let query = Insert::single_into("users");
+        let insert = Insert::from(query).comment("trace_id='abc123'");
+        let (sql, _) = SurrealDb::build(insert).unwrap();
+        assert_eq!(expected_sql, sql);
+    }
+
+    #[test]
+    fn test_returning() {
+        let insert = Insert::single_into("test").value("name", "hello");
+        let insert: Insert = Insert::from(insert).returning(["name"]);
+        let (sql, _) = SurrealDb::build(insert).unwrap();
+        assert!(sql.contains("RETURN `name`"), "Expected RETURN clause, got: {sql}");
+    }
+
+    #[test]
+    fn test_update_without_where() {
+        let expected_sql = "UPDATE `users` SET `active` = $p1";
+        let query = Update::table("users").set("active", true);
+        let (sql, params) = SurrealDb::build(query).unwrap();
+        assert_eq!(expected_sql, sql);
+        assert_eq!(vec![Value::boolean(true)], params);
+    }
+
+    #[test]
+    fn test_delete_all() {
+        let expected_sql = "DELETE `users`";
+        let query = Delete::from_table("users");
+        let (sql, _) = SurrealDb::build(query).unwrap();
+        assert_eq!(expected_sql, sql);
+    }
 }
