@@ -72,10 +72,49 @@ impl Connection {
     }
 
     pub async fn reset(&self, _params: &Params) -> ConnectorResult<()> {
-        // TODO: implement full reset by parsing INFO FOR DB and dropping all tables
-        Err(ConnectorError::from_msg(
-            "SurrealDB reset is not yet fully implemented".to_owned(),
-        ))
+        let tables = self.list_tables().await?;
+
+        if tables.is_empty() {
+            return Ok(());
+        }
+
+        let drop_statements: Vec<String> = tables
+            .iter()
+            .map(|table| format!("REMOVE TABLE `{table}`"))
+            .collect();
+
+        self.adapter
+            .execute_script(&drop_statements.join("; "))
+            .await
+            .map_err(convert_error)
+    }
+
+    pub async fn list_tables(&self) -> ConnectorResult<Vec<String>> {
+        let result = self
+            .adapter
+            .query_raw("INFO FOR DB", &[])
+            .await
+            .map_err(convert_error)?;
+
+        let mut tables = Vec::new();
+
+        // INFO FOR DB returns a result set where first row contains a "tables" field
+        // with a JSON object mapping table_name => definition_string.
+        for row in result.into_iter() {
+            if let Some(tables_val) = row.get("tables") {
+                if let Some(s) = tables_val.to_string() {
+                    if let Ok(obj) = serde_json::from_str::<serde_json::Value>(&s) {
+                        if let Some(map) = obj.as_object() {
+                            for key in map.keys() {
+                                tables.push(key.clone());
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        Ok(tables)
     }
 
     async fn dispose(&self) -> ConnectorResult<()> {
@@ -90,9 +129,6 @@ pub fn connect_to_shadow_db() -> ConnectorResult<Connection> {
 }
 
 pub async fn create_database(state: &State) -> ConnectorResult<String> {
-    // SurrealDB requires explicit DEFINE NAMESPACE and DEFINE DATABASE.
-    // The adapter's use() call sets ns/db context, so we issue DEFINE statements
-    // to ensure they exist.
     state
         .connection
         .raw_cmd("DEFINE NAMESPACE IF NOT EXISTS prisma; DEFINE DATABASE IF NOT EXISTS prisma")
@@ -100,11 +136,11 @@ pub async fn create_database(state: &State) -> ConnectorResult<String> {
     Ok("Database created via DEFINE NAMESPACE + DEFINE DATABASE".to_owned())
 }
 
-pub async fn drop_database(_state: &State) -> ConnectorResult<()> {
-    // TODO: implement using REMOVE DATABASE via the adapter
-    Err(ConnectorError::from_msg(
-        "SurrealDB drop_database is not yet implemented".to_owned(),
-    ))
+pub async fn drop_database(state: &State) -> ConnectorResult<()> {
+    state
+        .connection
+        .raw_cmd("REMOVE DATABASE IF EXISTS prisma")
+        .await
 }
 
 pub async fn ensure_connection_validity(state: &mut State) -> ConnectorResult<()> {
@@ -113,11 +149,87 @@ pub async fn ensure_connection_validity(state: &mut State) -> ConnectorResult<()
     Ok(())
 }
 
-pub async fn introspect(_state: &mut State) -> ConnectorResult<SqlSchema> {
-    // TODO: implement using INFO FOR DB / INFO FOR TABLE
-    Err(ConnectorError::from_msg(
-        "SurrealDB introspection is not yet implemented".to_owned(),
-    ))
+pub async fn introspect(state: &mut State) -> ConnectorResult<SqlSchema> {
+    use sql_schema_describer::*;
+
+    let conn = &state.connection;
+    let table_names = conn.list_tables().await?;
+
+    let mut schema = SqlSchema::default();
+    let ns_id = schema.push_namespace("default".to_owned());
+
+    for table_name in &table_names {
+        let result = conn
+            .query_raw(&format!("INFO FOR TABLE `{table_name}`"), &[])
+            .await?;
+
+        let table_id = schema.push_table(table_name.clone(), ns_id, None);
+
+        for row in result.into_iter() {
+            // Parse fields from INFO FOR TABLE response
+            if let Some(fields_val) = row.get("fields") {
+                if let Some(s) = fields_val.to_string() {
+                    if let Ok(obj) = serde_json::from_str::<serde_json::Value>(&s) {
+                        if let Some(map) = obj.as_object() {
+                            for (field_name, def_val) in map {
+                                let def_str = def_val.as_str().unwrap_or("");
+                                let col_type = parse_surreal_field_type(def_str);
+                                schema.push_table_column(table_id, Column {
+                                    name: field_name.clone(),
+                                    tpe: col_type,
+                                    auto_increment: false,
+                                    description: None,
+                                });
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    Ok(schema)
+}
+
+fn parse_surreal_field_type(def: &str) -> sql_schema_describer::ColumnType {
+    use sql_schema_describer::*;
+
+    // Extract type from "DEFINE FIELD name ON table TYPE <type> ..."
+    let type_str = def
+        .split("TYPE ")
+        .nth(1)
+        .unwrap_or("string")
+        .split_whitespace()
+        .next()
+        .unwrap_or("string")
+        .trim_start_matches("option<")
+        .trim_end_matches('>');
+
+    let family = match type_str {
+        "bool" => ColumnTypeFamily::Boolean,
+        "int" => ColumnTypeFamily::Int,
+        "float" => ColumnTypeFamily::Float,
+        "decimal" => ColumnTypeFamily::Decimal,
+        "string" => ColumnTypeFamily::String,
+        "datetime" => ColumnTypeFamily::DateTime,
+        "bytes" => ColumnTypeFamily::Binary,
+        "object" | "record" => ColumnTypeFamily::Json,
+        "uuid" => ColumnTypeFamily::Uuid,
+        _ => ColumnTypeFamily::String,
+    };
+
+    let arity = if def.contains("| NONE") || def.contains("option<") {
+        ColumnArity::Nullable
+    } else {
+        ColumnArity::Required
+    };
+
+    ColumnType {
+        full_data_type: type_str.to_owned(),
+        family,
+        arity,
+        native_type: None,
+    }
 }
 
 pub fn get_connection_and_params(state: &mut State) -> ConnectorResult<(&Connection, &Params)> {

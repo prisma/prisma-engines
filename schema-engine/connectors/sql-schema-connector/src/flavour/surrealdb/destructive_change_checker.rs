@@ -100,28 +100,38 @@ impl DestructiveChangeCheckerFlavour for SurrealDbDestructiveChangeCheckerFlavou
 
     fn count_rows_in_table<'a>(
         &'a mut self,
-        _connector: &'a mut dyn SqlConnector,
-        _table: &'a Table,
+        connector: &'a mut dyn SqlConnector,
+        table: &'a Table,
     ) -> BoxFuture<'a, ConnectorResult<i64>> {
-        // Cannot query row counts yet; fail closed so destructive checks
-        // do not silently skip warnings for populated tables.
-        Box::pin(async {
-            Err(ConnectorError::from_msg(
-                "SurrealDB row counting is not yet implemented; cannot verify destructive changes are safe.".to_owned(),
-            ))
+        Box::pin(async move {
+            let sql = format!("SELECT count() FROM `{}` GROUP ALL", table.table);
+            let result = connector.query_raw(&sql, &[]).await?;
+            let count = result
+                .into_iter()
+                .next()
+                .and_then(|row| row.get("count").and_then(|v| v.as_integer()))
+                .unwrap_or(0);
+            Ok(count)
         })
     }
 
     fn count_values_in_column<'a>(
         &'a mut self,
-        _connector: &'a mut dyn SqlConnector,
-        _column: &'a Column,
+        connector: &'a mut dyn SqlConnector,
+        column: &'a Column,
     ) -> BoxFuture<'a, ConnectorResult<i64>> {
-        Box::pin(async {
-            Err(ConnectorError::from_msg(
-                "SurrealDB column value counting is not yet implemented; cannot verify destructive changes are safe."
-                    .to_owned(),
-            ))
+        Box::pin(async move {
+            let sql = format!(
+                "SELECT count() FROM `{}` WHERE `{}` IS NOT NONE GROUP ALL",
+                column.table, column.column
+            );
+            let result = connector.query_raw(&sql, &[]).await?;
+            let count = result
+                .into_iter()
+                .next()
+                .and_then(|row| row.get("count").and_then(|v| v.as_integer()))
+                .unwrap_or(0);
+            Ok(count)
         })
     }
 }

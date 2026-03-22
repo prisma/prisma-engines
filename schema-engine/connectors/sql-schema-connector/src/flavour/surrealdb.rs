@@ -144,17 +144,12 @@ impl SqlConnector for SurrealDbConnector {
         self.with_connection(|conn, _| conn.apply_migration_script(migration_name, script))
     }
 
-    // TODO: implement using INFO FOR DB to enumerate tables
     fn table_names(
         &mut self,
         _namespaces: Option<Namespaces>,
         _filters: SchemaFilter,
     ) -> BoxFuture<'_, ConnectorResult<Vec<String>>> {
-        Box::pin(async move {
-            Err(ConnectorError::from_msg(
-                "SurrealDB table enumeration is not yet implemented. Use `prisma db push` instead.".to_owned(),
-            ))
-        })
+        self.with_connection(|conn, _| conn.list_tables())
     }
 
     fn create_database(&mut self) -> BoxFuture<'_, ConnectorResult<String>> {
