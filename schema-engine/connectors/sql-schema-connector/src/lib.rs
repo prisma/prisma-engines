@@ -71,6 +71,12 @@ impl SqlSchemaDialect {
         Self::new(Box::new(flavour::MssqlDialect::default()))
     }
 
+    /// Creates a SurrealDB schema dialect with the default settings.
+    #[cfg(feature = "surrealdb")]
+    pub fn surrealdb() -> Self {
+        Self::new(Box::new(flavour::SurrealDbDialect))
+    }
+
     fn new(flavour: Box<dyn SqlDialect>) -> Self {
         Self { dialect: flavour }
     }
@@ -337,6 +343,15 @@ impl SqlSchemaConnector {
             inner: Box::new(flavour::MssqlConnector::new_with_params(params)?),
             host: Arc::new(EmptyHost),
         })
+    }
+
+    /// Initialize a SurrealDB migration connector via external adapter.
+    #[cfg(feature = "surrealdb")]
+    pub fn new_surrealdb_external(adapter: Arc<dyn quaint::connector::ExternalConnector>) -> Self {
+        SqlSchemaConnector {
+            inner: Box::new(flavour::SurrealDbConnector::new_external(adapter)),
+            host: Arc::new(EmptyHost),
+        }
     }
 
     /// Returns the SQL dialect used by the connector.

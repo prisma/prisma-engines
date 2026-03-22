@@ -59,6 +59,9 @@ pub fn dialect_for_provider(provider: &str) -> CoreResult<Box<dyn schema_connect
             #[cfg(feature = "mysql")]
             Flavour::Mysql => Ok(Box::new(SqlSchemaDialect::mysql())),
 
+            #[cfg(feature = "surrealdb")]
+            Flavour::SurrealDb => Ok(Box::new(SqlSchemaDialect::surrealdb())),
+
             #[allow(unreachable_patterns)]
             _ => error(),
         }

@@ -14,6 +14,7 @@ mssql = ["psl/mssql", "quaint/mssql"]
 mssql-native = ["mssql", "quaint/mssql-native", "quaint/pooled"]
 cockroachdb = ["psl/cockroachdb", "quaint/postgresql"]
 cockroachdb-native = ["cockroachdb", "quaint/postgresql-native", "quaint/pooled"]
+surrealdb = ["psl/surrealdb", "quaint/surrealdb"]
 all-native = [
     "postgresql-native",
     "sqlite-native",

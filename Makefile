@@ -66,7 +66,7 @@ build-qc-wasm: build-qc-wasm-fast build-qc-wasm-small
 
 build-qc-gz-%: build-qc-wasm-%
 		@cd query-compiler/query-compiler-wasm/pkg && \
-    for provider in postgresql mysql sqlite sqlserver cockroachdb; do \
+    for provider in postgresql mysql sqlite sqlserver cockroachdb surrealdb; do \
         gzip -knc $$provider/query_compiler_$*_bg.wasm > $${provider}_$*.gz; \
     done;
 

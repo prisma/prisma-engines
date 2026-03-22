@@ -414,6 +414,8 @@ pub enum SqlFamily {
     Sqlite,
     #[cfg(feature = "mssql")]
     Mssql,
+    #[cfg(feature = "surrealdb")]
+    SurrealDb,
 }
 
 impl SqlFamily {
@@ -428,6 +430,8 @@ impl SqlFamily {
             SqlFamily::Sqlite => "sqlite",
             #[cfg(feature = "mssql")]
             SqlFamily::Mssql => "mssql",
+            #[cfg(feature = "surrealdb")]
+            SqlFamily::SurrealDb => "surrealdb",
         }
     }
 
@@ -440,6 +444,8 @@ impl SqlFamily {
             "postgres" | "postgresql" => Some(SqlFamily::Postgres),
             #[cfg(feature = "mysql")]
             "mysql" => Some(SqlFamily::Mysql),
+            #[cfg(feature = "surrealdb")]
+            "surrealdb" | "ws" | "wss" => Some(SqlFamily::SurrealDb),
             _ => None,
         }
     }
@@ -455,6 +461,8 @@ impl SqlFamily {
             SqlFamily::Sqlite => Some(999),
             #[cfg(feature = "mssql")]
             SqlFamily::Mssql => Some(1000),
+            #[cfg(feature = "surrealdb")]
+            SqlFamily::SurrealDb => None,
         }
     }
 
@@ -501,6 +509,8 @@ impl SqlFamily {
             SqlFamily::Sqlite => 999,
             #[cfg(feature = "mssql")]
             SqlFamily::Mssql => 2098,
+            #[cfg(feature = "surrealdb")]
+            SqlFamily::SurrealDb => 32766,
         }
     }
 
