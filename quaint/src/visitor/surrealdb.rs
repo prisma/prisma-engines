@@ -225,11 +225,10 @@ impl<'a> Visitor<'a> for SurrealDb<'a> {
             expr => self.visit_expression(expr)?,
         }
 
-        if let Some(OnConflict::Update(update, constraints)) = insert.on_conflict {
-            self.write(" ON CONFLICT ")?;
-            self.columns_to_bracket_list(constraints)?;
-            self.write(" DO ")?;
-            self.visit_upsert(update)?;
+        if let Some(OnConflict::Update(update, _constraints)) = insert.on_conflict {
+            // SurrealDB uses ON DUPLICATE KEY UPDATE (not PostgreSQL ON CONFLICT DO)
+            self.write(" ON DUPLICATE KEY UPDATE ")?;
+            self.visit_update_set(update)?;
         }
 
         self.returning(insert.returning)?;
@@ -537,8 +536,11 @@ impl<'a> Visitor<'a> for SurrealDb<'a> {
 
 /// Escape single quotes in string literals for SurrealQL.
 fn escape_squote(s: &str) -> Cow<'_, str> {
-    if s.contains('\'') {
-        Cow::Owned(s.replace('\'', "\\'"))
+    let needs_escape = s.contains('\\') || s.contains('\'');
+    if needs_escape {
+        // Escape backslashes first, then single quotes, to prevent injection
+        // via sequences like \' which would otherwise become \\' (breaking out).
+        Cow::Owned(s.replace('\\', "\\\\").replace('\'', "\\'"))
     } else {
         Cow::Borrowed(s)
     }
