@@ -363,15 +363,21 @@ impl<'a> Visitor<'a> for SurrealDb<'a> {
     }
 
     fn visit_text_search(&mut self, _text_search: crate::prelude::TextSearch<'a>) -> visitor::Result {
-        unimplemented!("Full-text search is not yet supported on SurrealDB via this visitor")
+        Err(Error::builder(ErrorKind::conversion(
+            "Full-text search is not yet supported for SurrealDB",
+        )).build())
     }
 
     fn visit_matches(&mut self, _left: Expression<'a>, _right: Expression<'a>, _not: bool) -> visitor::Result {
-        unimplemented!("Full-text search is not yet supported on SurrealDB via this visitor")
+        Err(Error::builder(ErrorKind::conversion(
+            "Full-text search MATCHES is not yet supported for SurrealDB",
+        )).build())
     }
 
     fn visit_text_search_relevance(&mut self, _text_search_relevance: TextSearchRelevance<'a>) -> visitor::Result {
-        unimplemented!("Full-text search is not yet supported on SurrealDB via this visitor")
+        Err(Error::builder(ErrorKind::conversion(
+            "Full-text search relevance is not yet supported for SurrealDB",
+        )).build())
     }
 
     #[cfg(any(feature = "postgresql", feature = "mysql", feature = "sqlite", feature = "surrealdb"))]
@@ -549,12 +555,8 @@ mod tests {
         (String::from(sql), params.into_iter().map(|p| p.into()).collect())
     }
 
-    fn default_params(mut additional: Vec<Value<'_>>) -> Vec<Value<'_>> {
-        let mut result = Vec::new();
-        for param in additional.drain(0..) {
-            result.push(param)
-        }
-        result
+    fn default_params(additional: Vec<Value<'_>>) -> Vec<Value<'_>> {
+        additional
     }
 
     #[test]

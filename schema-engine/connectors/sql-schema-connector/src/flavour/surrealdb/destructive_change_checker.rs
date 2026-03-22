@@ -11,7 +11,7 @@ use crate::{
     sql_migration::{AlterColumn, ColumnTypeChange},
     sql_schema_differ::ColumnChanges,
 };
-use schema_connector::{BoxFuture, ConnectorResult};
+use schema_connector::{BoxFuture, ConnectorError, ConnectorResult};
 use sql_schema_describer::{ColumnArity, walkers::TableColumnWalker};
 
 #[derive(Debug, Default)]
@@ -98,14 +98,18 @@ impl DestructiveChangeCheckerFlavour for SurrealDbDestructiveChangeCheckerFlavou
         }
     }
 
-    // Conservative fallback: assume tables are populated so destructive checks
-    // surface warnings rather than silently skipping them.
     fn count_rows_in_table<'a>(
         &'a mut self,
         _connector: &'a mut dyn SqlConnector,
         _table: &'a Table,
     ) -> BoxFuture<'a, ConnectorResult<i64>> {
-        Box::pin(async { Ok(1) })
+        // Cannot query row counts yet; fail closed so destructive checks
+        // do not silently skip warnings for populated tables.
+        Box::pin(async {
+            Err(ConnectorError::from_msg(
+                "SurrealDB row counting is not yet implemented; cannot verify destructive changes are safe.".to_owned(),
+            ))
+        })
     }
 
     fn count_values_in_column<'a>(
@@ -113,6 +117,11 @@ impl DestructiveChangeCheckerFlavour for SurrealDbDestructiveChangeCheckerFlavou
         _connector: &'a mut dyn SqlConnector,
         _column: &'a Column,
     ) -> BoxFuture<'a, ConnectorResult<i64>> {
-        Box::pin(async { Ok(1) })
+        Box::pin(async {
+            Err(ConnectorError::from_msg(
+                "SurrealDB column value counting is not yet implemented; cannot verify destructive changes are safe."
+                    .to_owned(),
+            ))
+        })
     }
 }
