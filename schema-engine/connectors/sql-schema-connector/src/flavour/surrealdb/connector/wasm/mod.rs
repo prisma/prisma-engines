@@ -8,6 +8,7 @@ use std::sync::Arc;
 
 pub struct State {
     connection: Connection,
+    params: Params,
     preview_features: BitFlags<PreviewFeature>,
 }
 
@@ -16,6 +17,7 @@ impl State {
         Self {
             preview_features,
             connection: Connection { adapter },
+            params: Params,
         }
     }
 }
@@ -87,9 +89,15 @@ pub fn connect_to_shadow_db() -> ConnectorResult<Connection> {
     ))
 }
 
-pub async fn create_database(_state: &State) -> ConnectorResult<String> {
-    // SurrealDB databases are created automatically on first use
-    Ok("Database created".to_owned())
+pub async fn create_database(state: &State) -> ConnectorResult<String> {
+    // SurrealDB requires explicit DEFINE NAMESPACE and DEFINE DATABASE.
+    // The adapter's use() call sets ns/db context, so we issue DEFINE statements
+    // to ensure they exist.
+    state
+        .connection
+        .raw_cmd("DEFINE NAMESPACE IF NOT EXISTS prisma; DEFINE DATABASE IF NOT EXISTS prisma")
+        .await?;
+    Ok("Database created via DEFINE NAMESPACE + DEFINE DATABASE".to_owned())
 }
 
 pub async fn drop_database(_state: &State) -> ConnectorResult<()> {
@@ -113,7 +121,7 @@ pub async fn introspect(_state: &mut State) -> ConnectorResult<SqlSchema> {
 }
 
 pub fn get_connection_and_params(state: &mut State) -> ConnectorResult<(&Connection, &Params)> {
-    Ok((&state.connection, &Params))
+    Ok((&state.connection, &state.params))
 }
 
 pub fn set_preview_features(state: &mut State, features: BitFlags<PreviewFeature>) {

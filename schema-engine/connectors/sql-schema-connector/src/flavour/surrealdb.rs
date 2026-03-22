@@ -150,7 +150,11 @@ impl SqlConnector for SurrealDbConnector {
         _namespaces: Option<Namespaces>,
         _filters: SchemaFilter,
     ) -> BoxFuture<'_, ConnectorResult<Vec<String>>> {
-        Box::pin(async move { Ok(Vec::new()) })
+        Box::pin(async move {
+            Err(ConnectorError::from_msg(
+                "SurrealDB table enumeration is not yet implemented. Use `prisma db push` instead.".to_owned(),
+            ))
+        })
     }
 
     fn create_database(&mut self) -> BoxFuture<'_, ConnectorResult<String>> {

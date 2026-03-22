@@ -69,7 +69,9 @@ impl Connector for SurrealDbDatamodelConnector {
         _native_type: &NativeTypeInstance,
         _extension_types: &dyn ExtensionTypes,
     ) -> Option<ScalarFieldType> {
-        // SurrealDB does not use native type annotations (like SQLite)
+        // Unreachable: parse_native_type() always returns None and
+        // available_native_type_constructors() is empty, so the validation
+        // pipeline in fields.rs never calls this method for SurrealDB.
         unreachable!("No native types on SurrealDB");
     }
 
@@ -108,10 +110,11 @@ impl Connector for SurrealDbDatamodelConnector {
     }
 
     fn validate_url(&self, url: &str) -> Result<(), String> {
-        if url.starts_with("surrealdb://") || url.starts_with("ws://") || url.starts_with("wss://") || url.starts_with("http://") || url.starts_with("https://") {
+        // surrealdb:// is the canonical scheme; http(s):// accepted for direct HTTP API access.
+        if url.starts_with("surrealdb://") || url.starts_with("http://") || url.starts_with("https://") {
             Ok(())
         } else {
-            Err("must start with the protocol `surrealdb://`, `ws://`, `wss://`, `http://`, or `https://`.".to_string())
+            Err("must start with the protocol `surrealdb://`, `http://`, or `https://`.".to_string())
         }
     }
 

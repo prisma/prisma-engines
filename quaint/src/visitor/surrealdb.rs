@@ -349,7 +349,10 @@ impl<'a> Visitor<'a> for SurrealDb<'a> {
             JsonType::Object => "type::is_object",
             JsonType::String => "type::is_string",
             JsonType::Null => "type::is_null",
-            JsonType::ColumnRef(_) => "type::is_string", // fallback
+            JsonType::ColumnRef(_) => {
+                let msg = "Dynamic JSON type comparison via column reference is not supported in SurrealDB";
+                return Err(Error::builder(ErrorKind::conversion(msg)).build());
+            }
         };
 
         if not {

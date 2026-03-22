@@ -117,9 +117,18 @@ impl SqlRenderer for SurrealDbRenderer {
                         nullable = nullable,
                     ));
                 }
-                TableChange::AddPrimaryKey => {}
-                TableChange::DropPrimaryKey => {}
-                TableChange::RenamePrimaryKey => {}
+                TableChange::AddPrimaryKey => {
+                    // SurrealDB primary keys are managed via UNIQUE indexes in render_create_table_as
+                }
+                TableChange::DropPrimaryKey => {
+                    statements.push(format!(
+                        "REMOVE INDEX {table_name}_pk ON TABLE {table_name}",
+                        table_name = self.quote(tables.previous.name()),
+                    ));
+                }
+                TableChange::RenamePrimaryKey => {
+                    // SurrealDB does not support renaming indexes directly
+                }
             };
         }
 
