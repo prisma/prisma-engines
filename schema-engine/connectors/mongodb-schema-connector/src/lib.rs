@@ -217,6 +217,10 @@ impl SchemaConnector for MongoDbSchemaConnector {
         self.preview_features = preview_features;
     }
 
+    fn preview_features(&self) -> BitFlags<psl::PreviewFeature> {
+        self.preview_features
+    }
+
     fn set_host(&mut self, host: Arc<dyn schema_connector::ConnectorHost>) {
         self.host = host;
     }

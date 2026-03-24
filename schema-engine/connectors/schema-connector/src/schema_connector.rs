@@ -96,6 +96,9 @@ pub trait SchemaConnector: Send + Sync + 'static {
     /// Accept a new set of enabled preview features.
     fn set_preview_features(&mut self, preview_features: PreviewFeatures);
 
+    /// Get the currently enabled preview features.
+    fn preview_features(&self) -> PreviewFeatures;
+
     // Connector methods
 
     /// If possible on the target connector, acquire an advisory lock, so multiple instances of migrate do not run concurrently.
@@ -223,7 +226,12 @@ pub trait SchemaConnector: Send + Sync + 'static {
 /// An external shadow database to be used for schema operations.
 pub enum ExternalShadowDatabase {
     /// A driver adapter factory.
-    DriverAdapter(Arc<dyn ExternalConnectorFactory>),
+    DriverAdapter {
+        /// The adapter factory to create the shadow database connector.
+        factory: Arc<dyn ExternalConnectorFactory>,
+        /// The preview features to use while building the shadow schema.
+        preview_features: PreviewFeatures,
+    },
     /// A shadow database connection string and preview features.
     ConnectionString {
         /// The shadow database connection string.

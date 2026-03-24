@@ -659,6 +659,10 @@ impl Connector for PostgresDatamodelConnector {
             None => self.parse_json_bytes(str, Some(NativeTypeInstance::new(PostgresType::Known(BYTES_DEFAULT)))),
         }
     }
+
+    fn can_assume_strict_equality_in_joins(&self) -> bool {
+        true
+    }
 }
 
 fn allowed_index_operator_classes(algo: IndexAlgorithm, field: walkers::ScalarFieldWalker<'_>) -> Vec<OperatorClass> {

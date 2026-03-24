@@ -129,7 +129,13 @@ pub trait Visitor<'a> {
     fn parameter_substitution(&mut self) -> Result;
 
     /// What to use to substitute a list of parameters of variable length
-    fn visit_parameterized_row(&mut self, value: Value<'a>) -> Result;
+    fn visit_parameterized_row(
+        &mut self,
+        value: Value<'a>,
+        item_prefix: impl Into<Cow<'static, str>>,
+        separator: impl Into<Cow<'static, str>>,
+        item_suffix: impl Into<Cow<'static, str>>,
+    ) -> Result;
 
     /// What to use to aggregate an array of values into a string
     fn visit_aggregate_to_string(&mut self, value: Expression<'a>) -> Result;
@@ -618,7 +624,7 @@ pub trait Visitor<'a> {
             ExpressionKind::ConditionTree(tree) => self.visit_conditions(tree)?,
             ExpressionKind::Compare(compare) => self.visit_compare(compare)?,
             ExpressionKind::Parameterized(val) => self.visit_parameterized(val)?,
-            ExpressionKind::ParameterizedRow(val) => self.visit_parameterized_row(val)?,
+            ExpressionKind::ParameterizedRow(val) => self.visit_parameterized_row(val, "", ",", "")?,
             ExpressionKind::RawValue(val) => self.visit_raw_value(val.0)?,
             ExpressionKind::Column(column) => self.visit_column(*column)?,
             ExpressionKind::Row(row) => self.visit_row(row)?,
@@ -877,15 +883,13 @@ pub trait Visitor<'a> {
                         kind: ExpressionKind::Row(mut cols),
                         ..
                     },
-                    Expression {
-                        kind: ExpressionKind::ParameterizedRow(value),
+                    rhs @ Expression {
+                        kind: ExpressionKind::ParameterizedRow(_),
                         ..
                     },
                 ) if cols.len() == 1 => {
                     let col = cols.pop().unwrap();
-                    self.visit_expression(col)?;
-                    self.write(" IN ")?;
-                    self.visit_parameterized_row(value)
+                    self.visit_compare(Compare::In(Box::new(col), Box::new(rhs)))
                 }
 
                 // expr IN (?, ?, ..., ?)
@@ -898,7 +902,36 @@ pub trait Visitor<'a> {
                 ) => {
                     self.visit_expression(left)?;
                     self.write(" IN ")?;
-                    self.visit_parameterized_row(value)
+                    self.visit_parameterized_row(value, "", ",", "")
+                }
+
+                // expr IN (CALL(?), CALL(?), ..., CALL(?))
+                (
+                    left,
+                    Expression {
+                        kind: ExpressionKind::Function(value),
+                        ..
+                    },
+                ) if value.typ_.arguments().len() == 1
+                    && value
+                        .typ_
+                        .arguments()
+                        .iter()
+                        .all(|arg| matches!(arg.kind, ExpressionKind::ParameterizedRow(_))) =>
+                {
+                    self.visit_expression(left)?;
+                    self.write(" IN ")?;
+
+                    let Some(ExpressionKind::ParameterizedRow(val)) =
+                        value.typ_.arguments().first().map(|arg| &arg.kind)
+                    else {
+                        unreachable!()
+                    };
+                    let Some(function_name) = &value.typ_.name() else {
+                        panic!("function call against a row of expressions must have a name")
+                    };
+
+                    self.visit_parameterized_row(val.clone(), format!("{function_name}("), ",", ")")
                 }
 
                 (
@@ -979,15 +1012,13 @@ pub trait Visitor<'a> {
                         kind: ExpressionKind::Row(mut cols),
                         ..
                     },
-                    Expression {
-                        kind: ExpressionKind::ParameterizedRow(value),
+                    rhs @ Expression {
+                        kind: ExpressionKind::ParameterizedRow(_),
                         ..
                     },
                 ) if cols.len() == 1 => {
                     let col = cols.pop().unwrap();
-                    self.visit_expression(col)?;
-                    self.write(" NOT IN ")?;
-                    self.visit_parameterized_row(value)
+                    self.visit_compare(Compare::NotIn(Box::new(col), Box::new(rhs)))
                 }
 
                 // expr NOT IN (?, ?, ..., ?)
@@ -1000,7 +1031,7 @@ pub trait Visitor<'a> {
                 ) => {
                     self.visit_expression(left)?;
                     self.write(" NOT IN ")?;
-                    self.visit_parameterized_row(value)
+                    self.visit_parameterized_row(value, "", ",", "")
                 }
 
                 (
@@ -1013,6 +1044,35 @@ pub trait Visitor<'a> {
                         ..
                     },
                 ) => self.visit_multiple_tuple_comparison(row, *values, true),
+
+                // expr NOT IN (CALL(?), CALL(?), ..., CALL(?))
+                (
+                    left,
+                    Expression {
+                        kind: ExpressionKind::Function(value),
+                        ..
+                    },
+                ) if value.typ_.arguments().len() == 1
+                    && value
+                        .typ_
+                        .arguments()
+                        .iter()
+                        .all(|arg| matches!(arg.kind, ExpressionKind::ParameterizedRow(_))) =>
+                {
+                    self.visit_expression(left)?;
+                    self.write(" NOT IN ")?;
+
+                    let Some(ExpressionKind::ParameterizedRow(val)) =
+                        value.typ_.arguments().first().map(|arg| &arg.kind)
+                    else {
+                        unreachable!()
+                    };
+                    let Some(function_name) = &value.typ_.name() else {
+                        panic!("function call against a row of expressions must have a name")
+                    };
+
+                    self.visit_parameterized_row(val.clone(), format!("{function_name}("), ",", ")")
+                }
 
                 // expr IN (..)
                 (left, right) => {

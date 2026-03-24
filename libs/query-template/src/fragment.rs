@@ -9,7 +9,12 @@ pub enum Fragment {
         chunk: String,
     },
     Parameter,
-    ParameterTuple,
+    #[serde(rename_all = "camelCase")]
+    ParameterTuple {
+        item_prefix: Cow<'static, str>,
+        item_separator: Cow<'static, str>,
+        item_suffix: Cow<'static, str>,
+    },
     #[serde(rename_all = "camelCase")]
     ParameterTupleList {
         item_prefix: Cow<'static, str>,

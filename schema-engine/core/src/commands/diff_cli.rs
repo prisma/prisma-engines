@@ -17,6 +17,7 @@ pub async fn diff_cli(
     params: DiffParams,
     datasource_urls: &DatasourceUrls,
     host: Arc<dyn ConnectorHost>,
+    initial_preview_features: BitFlags<psl::PreviewFeature>,
     extension_types: &dyn ExtensionTypes,
 ) -> CoreResult<DiffResult> {
     // In order to properly handle MultiSchema, we need to make sure the preview feature is
@@ -26,6 +27,7 @@ pub async fn diff_cli(
     // below, when defining 'from'/'to'. We should revisit this.
     let (namespaces, preview_features) =
         namespaces_and_preview_features_from_diff_targets(&[&params.from, &params.to])?;
+    let preview_features = preview_features | initial_preview_features;
 
     let filter: SchemaFilter = params.filters.into();
 

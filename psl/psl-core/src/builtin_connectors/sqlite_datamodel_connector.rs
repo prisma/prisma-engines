@@ -126,4 +126,8 @@ impl Connector for SqliteDatamodelConnector {
     fn flavour(&self) -> Flavour {
         Flavour::Sqlite
     }
+
+    fn can_assume_strict_equality_in_joins(&self) -> bool {
+        true
+    }
 }

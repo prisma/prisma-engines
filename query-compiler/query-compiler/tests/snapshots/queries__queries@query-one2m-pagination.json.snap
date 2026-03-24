@@ -37,6 +37,6 @@ in let @parent$id = mapField id (get @parent)
                      "public"."Category"."id" WHERE ("public"."Category"."id" >=
                      (SELECT "public"."Category"."id" FROM "public"."Category"
                      WHERE ("public"."Category"."id") = ($1)) AND "t0"."B" IN
-                     [$2]) ORDER BY "public"."Category"."id" ASC OFFSET $3»
+                     [$2,*]) ORDER BY "public"."Category"."id" ASC OFFSET $3»
               params [const(BigInt(1)), var(@parent$id as Int),
                       const(BigInt(0))])) on left.(id) = right.(CategoryToPost@Post) as @nested$categories

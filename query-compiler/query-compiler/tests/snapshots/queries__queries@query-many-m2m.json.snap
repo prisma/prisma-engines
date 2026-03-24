@@ -21,7 +21,7 @@ in let @parent$id = mapField id (get @parent)
       with (query «SELECT "public"."Category"."id", "public"."Category"."name",
                    "t0"."B" AS "CategoryToPost@Post" FROM "public"."Category"
                    INNER JOIN "public"."_CategoryToPost" AS "t0" ON "t0"."A" =
-                   "public"."Category"."id" WHERE (1=1 AND "t0"."B" IN [$1])
+                   "public"."Category"."id" WHERE (1=1 AND "t0"."B" IN [$1,*])
                    OFFSET $2»
             params [var(@parent$id as Int),
                     const(BigInt(0))]) on left.(id) = right.(CategoryToPost@Post) as @nested$categories

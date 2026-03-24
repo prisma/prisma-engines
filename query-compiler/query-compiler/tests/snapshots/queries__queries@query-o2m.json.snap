@@ -21,6 +21,6 @@ in let @parent$id = mapField id (get @parent)
                    "public"."Activation"."issued",
                    "public"."Activation"."secret", "public"."Activation"."done",
                    "public"."Activation"."userId" FROM "public"."Activation"
-                   WHERE "public"."Activation"."userId" IN [$1] OFFSET $2»
+                   WHERE "public"."Activation"."userId" IN [$1,*] OFFSET $2»
             params [var(@parent$id as Int),
                     const(BigInt(0))]) on left.(id) = right.(userId) as @nested$activations

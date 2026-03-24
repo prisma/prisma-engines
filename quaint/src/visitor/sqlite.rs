@@ -6,7 +6,7 @@ use crate::{
 
 use crate::visitor::query_writer::QueryWriter;
 use query_template::{PlaceholderFormat, QueryTemplate};
-use std::fmt;
+use std::{borrow::Cow, fmt};
 
 /// A visitor to generate queries for the SQLite database.
 ///
@@ -272,8 +272,15 @@ impl<'a> Visitor<'a> for Sqlite<'a> {
         Ok(())
     }
 
-    fn visit_parameterized_row(&mut self, value: Value<'a>) -> visitor::Result {
-        self.query_template.write_parameter_tuple();
+    fn visit_parameterized_row(
+        &mut self,
+        value: Value<'a>,
+        item_prefix: impl Into<Cow<'static, str>>,
+        separator: impl Into<Cow<'static, str>>,
+        item_suffix: impl Into<Cow<'static, str>>,
+    ) -> visitor::Result {
+        self.query_template
+            .write_parameter_tuple(item_prefix, separator, item_suffix);
         self.query_template.parameters.push(value);
         Ok(())
     }

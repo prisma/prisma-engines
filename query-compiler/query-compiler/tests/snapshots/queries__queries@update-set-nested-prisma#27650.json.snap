@@ -17,7 +17,7 @@ transaction
    in let 0$id = mapField id (get 0);
           0$userId = mapField userId (get 0)
       in let 1 = unique (query «SELECT "public"."User"."id" FROM "public"."User"
-                                WHERE (1=1 AND "public"."User"."id" IN [$1])
+                                WHERE (1=1 AND "public"."User"."id" IN [$1,*])
                                 OFFSET $2»
                          params [var(0$userId as Int), const(BigInt(0))])
          in let 1 = unique (validate (get 1)
@@ -26,7 +26,7 @@ transaction
                 1$id = mapField id (get 1)
             in let 2 = unique (query «SELECT "public"."User"."id" FROM
                                       "public"."User" WHERE (1=1 AND
-                                      "public"."User"."id" IN [$1]) LIMIT $2
+                                      "public"."User"."id" IN [$1,*]) LIMIT $2
                                       OFFSET $3»
                                params [var(1$id as Int), const(BigInt(1)),
                                        const(BigInt(0))])
@@ -36,7 +36,7 @@ transaction
                                             FROM "public"."NotificationSettings"
                                             WHERE (1=1 AND
                                             "public"."NotificationSettings"."userId"
-                                            IN [$1]) OFFSET $2»
+                                            IN [$1,*]) OFFSET $2»
                                      params [var(2$id as Int),
                                              const(BigInt(0))])
                      in let 3 = unique (validate (get 3)
@@ -47,7 +47,7 @@ transaction
                                           SET "emailMarketing" = $1,
                                           "smsMarketing" = $2 WHERE
                                           ("public"."NotificationSettings"."userId"
-                                          IN [$3] AND 1=1) RETURNING
+                                          IN [$3,*] AND 1=1) RETURNING
                                           "public"."NotificationSettings"."userId"»
                                    params [const(Boolean(true)),
                                            const(Boolean(false)),

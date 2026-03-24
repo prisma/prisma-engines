@@ -6,7 +6,12 @@ use query_template::{Fragment, QueryTemplate};
 pub(crate) trait QueryWriter {
     fn write_string_chunk(&mut self, value: String);
     fn write_parameter(&mut self);
-    fn write_parameter_tuple(&mut self);
+    fn write_parameter_tuple(
+        &mut self,
+        item_prefix: impl Into<Cow<'static, str>>,
+        item_separator: impl Into<Cow<'static, str>>,
+        item_suffix: impl Into<Cow<'static, str>>,
+    );
     fn write_parameter_tuple_list(
         &mut self,
         item_prefix: impl Into<Cow<'static, str>>,
@@ -32,8 +37,17 @@ impl QueryWriter for QueryTemplate<Value<'_>> {
         self.fragments.push(Fragment::Parameter);
     }
 
-    fn write_parameter_tuple(&mut self) {
-        self.fragments.push(Fragment::ParameterTuple);
+    fn write_parameter_tuple(
+        &mut self,
+        item_prefix: impl Into<Cow<'static, str>>,
+        item_separator: impl Into<Cow<'static, str>>,
+        item_suffix: impl Into<Cow<'static, str>>,
+    ) {
+        self.fragments.push(Fragment::ParameterTuple {
+            item_prefix: item_prefix.into(),
+            item_separator: item_separator.into(),
+            item_suffix: item_suffix.into(),
+        });
     }
 
     fn write_parameter_tuple_list(
