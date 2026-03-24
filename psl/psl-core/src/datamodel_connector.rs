@@ -309,6 +309,10 @@ pub trait Connector: Send + Sync {
     fn does_manage_udts(&self) -> bool {
         false
     }
+
+    fn can_assume_strict_equality_in_joins(&self) -> bool {
+        false
+    }
 }
 
 #[derive(Copy, Clone, Debug, PartialEq)]

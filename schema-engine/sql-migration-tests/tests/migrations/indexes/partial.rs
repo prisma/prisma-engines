@@ -763,6 +763,79 @@ fn db_partial_index_not_recreated_without_preview_feature_postgres(api: TestApi)
     api.schema_push(&dm).send().assert_no_steps();
 }
 
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
+fn db_manual_partial_index_not_dropped_without_preview_feature_postgres(api: TestApi) {
+    let schema_name = api.schema_name();
+    let dm = api.datamodel_with_provider(
+        r#"model User {
+            id    Int    @id
+            email String
+        }"#,
+    );
+
+    api.schema_push(&dm).send().assert_green();
+
+    api.raw_cmd(&format!(
+        "CREATE INDEX \"User_email_partial_idx\" ON \"{schema_name}\".\"User\" (email) WHERE email IS NOT NULL;"
+    ));
+
+    api.schema_push(&dm).send().assert_no_steps();
+}
+
+#[test_connector(tags(Mssql))]
+fn db_manual_partial_index_not_dropped_without_preview_feature_mssql(api: TestApi) {
+    let schema = api.schema_name();
+    let dm = api.datamodel_with_provider(
+        r#"model User {
+            id    Int    @id
+            email String
+        }"#,
+    );
+
+    api.schema_push(&dm).send().assert_green();
+
+    api.raw_cmd(&format!(
+        "CREATE INDEX [User_email_partial_idx] ON [{schema}].[User] ([email]) WHERE [email] IS NOT NULL;"
+    ));
+
+    api.schema_push(&dm).send().assert_no_steps();
+}
+
+#[test_connector(tags(Sqlite))]
+fn db_manual_partial_index_not_dropped_without_preview_feature_sqlite(api: TestApi) {
+    let dm = api.datamodel_with_provider(
+        r#"model User {
+            id    Int    @id
+            email String
+        }"#,
+    );
+
+    api.schema_push(&dm).send().assert_green();
+
+    api.raw_cmd("CREATE INDEX \"User_email_partial_idx\" ON \"User\" (email) WHERE email IS NOT NULL;");
+
+    api.schema_push(&dm).send().assert_no_steps();
+}
+
+#[test_connector(tags(CockroachDb))]
+fn db_manual_partial_index_not_dropped_without_preview_feature_cockroachdb(api: TestApi) {
+    let schema_name = api.schema_name();
+    let dm = api.datamodel_with_provider(
+        r#"model User {
+            id    Int    @id
+            email String
+        }"#,
+    );
+
+    api.schema_push(&dm).send().assert_green();
+
+    api.raw_cmd(&format!(
+        "CREATE INDEX \"User_email_partial_idx\" ON \"{schema_name}\".\"User\" (email) WHERE email IS NOT NULL;"
+    ));
+
+    api.schema_push(&dm).send().assert_no_steps();
+}
+
 #[test_connector(tags(Mssql))]
 fn db_partial_index_not_recreated_without_preview_feature_mssql(api: TestApi) {
     let schema = api.schema_name();
@@ -1001,6 +1074,24 @@ fn partial_index_not_with_and_or_roundtrip_postgres(api: TestApi) {
             c  Int
 
             @@index([a], where: raw("NOT (a = 1 AND b = 2) OR c = 3"))
+        }"#,
+        &[],
+        PREVIEW_FEATURES,
+    );
+
+    api.schema_push(&dm).send().assert_green();
+    api.schema_push(&dm).send().assert_no_steps();
+}
+
+#[test_connector(tags(Postgres), exclude(CockroachDb), preview_features("partialIndexes"))]
+fn partial_index_object_literal_null_and_not_null_is_idempotent_postgres(api: TestApi) {
+    let dm = api.datamodel_with_provider_and_features(
+        r#"model Shop {
+            id        BigInt   @id
+            postcode  String?
+            deletedAt DateTime?
+
+            @@index([postcode], where: { deletedAt: null, postcode: { not: null } })
         }"#,
         &[],
         PREVIEW_FEATURES,

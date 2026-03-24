@@ -59,7 +59,7 @@ where
             Expression::Concat(vec) => self.function("concat", vec),
             Expression::Unique(expression) => self.unary_function("unique", expression),
             Expression::Required(expression) => self.unary_function("required", expression),
-            Expression::Join { parent, children } => self.join(parent, children),
+            Expression::Join { parent, children, .. } => self.join(parent, children),
             Expression::MapField { field, records } => self.map_field(field, records),
             Expression::Transaction(expression) => self.transaction(expression),
             Expression::DataMap { expr, structure, enums } => self.data_map(expr, structure, enums),

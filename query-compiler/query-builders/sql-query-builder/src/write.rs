@@ -163,13 +163,16 @@ pub fn build_update_and_set_query(
                 ScalarWriteOperation::Set(rhs) => field.value(rhs, ctx).into(),
                 ScalarWriteOperation::Add(rhs) if field.is_list() => {
                     let e: Expression = Column::from((table.clone(), name.clone())).into();
-                    let vals: Vec<_> = match rhs {
-                        PrismaValue::List(vals) => vals.into_iter().map(|val| field.value(val, ctx)).collect(),
-                        _ => vec![field.value(rhs, ctx)],
+                    let arr = match rhs {
+                        PrismaValue::List(vals) => Value::array(vals.into_iter().map(|val| field.value(val, ctx))),
+                        PrismaValue::Placeholder(ref ph) if matches!(ph.r#type, PrismaValueType::List(_)) => {
+                            field.value(rhs, ctx)
+                        }
+                        _ => Value::array(vec![field.value(rhs, ctx)]),
                     };
 
                     // Postgres only
-                    e.compare_raw("||", Value::array(vals)).into()
+                    e.compare_raw("||", arr).into()
                 }
                 ScalarWriteOperation::Add(rhs) => {
                     let e: Expression<'_> = Column::from((table.clone(), name.clone())).into();

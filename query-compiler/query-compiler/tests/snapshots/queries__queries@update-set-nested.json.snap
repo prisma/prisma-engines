@@ -29,7 +29,7 @@ transaction
    in let 0$id = mapField id (get 0)
       in let 1 = query «SELECT "public"."Post"."id", "public"."Post"."userId"
                         FROM "public"."Post" WHERE (1=1 AND
-                        "public"."Post"."userId" IN [$1]) OFFSET $2»
+                        "public"."Post"."userId" IN [$1,*]) OFFSET $2»
                  params [var(0$id as Int), const(BigInt(0))]
          in let 2 = query «SELECT "public"."Post"."id" FROM "public"."Post"
                            WHERE (("public"."Post"."id" = $1 AND 1=1) OR
@@ -44,7 +44,8 @@ transaction
                            0$id = mapField id (get 0);
                            3$id = mapField id (get 3)
                        in execute «UPDATE "public"."Post" SET "userId" = $1
-                                   WHERE ("public"."Post"."id" IN [$2] AND 1=1)»
+                                   WHERE ("public"."Post"."id" IN [$2,*] AND
+                                   1=1)»
                           params [var(0$id as Int), var(3$id as Int)]
                   else ();
                let 4 = diff (get 1) (get 2)
@@ -54,7 +55,7 @@ transaction
                   in if (rowCountNeq 0 (get 4))
                      then let 4$id = mapField id (get 4)
                           in execute «UPDATE "public"."Post" SET "userId" = $1
-                                      WHERE ("public"."Post"."id" IN [$2] AND
+                                      WHERE ("public"."Post"."id" IN [$2,*] AND
                                       1=1)»
                              params [const(Null), var(4$id as Int)]
                      else ();

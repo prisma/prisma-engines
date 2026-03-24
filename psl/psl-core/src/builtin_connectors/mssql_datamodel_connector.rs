@@ -300,6 +300,10 @@ impl Connector for MsSqlDatamodelConnector {
     fn does_manage_udts(&self) -> bool {
         true
     }
+
+    fn can_assume_strict_equality_in_joins(&self) -> bool {
+        true
+    }
 }
 
 /// A collection of types stored outside of the row to the heap, having

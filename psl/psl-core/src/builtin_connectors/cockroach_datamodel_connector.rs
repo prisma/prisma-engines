@@ -355,6 +355,10 @@ impl Connector for CockroachDatamodelConnector {
             None => self.parse_json_bytes(str, Some(NativeTypeInstance::new::<CockroachType>(BYTES_DEFAULT))),
         }
     }
+
+    fn can_assume_strict_equality_in_joins(&self) -> bool {
+        true
+    }
 }
 
 /// An `@default(sequence())` function.
