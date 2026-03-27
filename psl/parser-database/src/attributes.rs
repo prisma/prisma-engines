@@ -196,7 +196,7 @@ fn resolve_model_attributes(model_id: crate::ModelId, ctx: &mut Context<'_>) {
                 let ast_field = &ctx.asts[ctx.types[sfid].model_id][ctx.types[sfid].field_id];
                 ctx.push_error(DatamodelError::new_attribute_validation_error(
                     "Fields that are marked with @generated cannot be part of the primary key (@id or @@id).",
-                    "generated",
+                    "@generated",
                     ast_field.span(),
                 ));
             }
@@ -321,14 +321,14 @@ fn visit_scalar_field_attributes(
         if ctx.types[scalar_field_id].default.is_some() {
             ctx.push_error(DatamodelError::new_attribute_validation_error(
                 "Fields that are marked with @generated cannot have a @default value. The column value is always computed from the generation expression.",
-                "generated",
+                "@generated",
                 ast_field.span(),
             ));
         }
         if ctx.types[scalar_field_id].is_updated_at {
             ctx.push_error(DatamodelError::new_attribute_validation_error(
                 "Fields that are marked with @generated cannot also be marked with @updatedAt.",
-                "generated",
+                "@generated",
                 ast_field.span(),
             ));
         }
