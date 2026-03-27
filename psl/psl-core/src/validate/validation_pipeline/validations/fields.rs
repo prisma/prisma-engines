@@ -427,19 +427,24 @@ pub(super) fn validate_generated_column(field: ScalarFieldWalker<'_>, ctx: &mut 
         return;
     }
 
+    let span = field
+        .ast_field()
+        .span_for_attribute("generated")
+        .unwrap_or_else(|| field.ast_field().span());
+
     if !ctx.preview_features.contains(crate::PreviewFeature::GeneratedColumns) {
         ctx.push_error(DatamodelError::new_attribute_validation_error(
             "Generated columns are a preview feature. Add \"generatedColumns\" to previewFeatures in your generator block.",
-            "generated",
-            field.ast_field().span(),
+            "@generated",
+            span,
         ));
     }
 
     if !matches!(ctx.connector.flavour(), Flavour::Postgres) {
         ctx.push_error(DatamodelError::new_attribute_validation_error(
             "Generated columns are not supported by the current connector. Currently only PostgreSQL supports @generated.",
-            "generated",
-            field.ast_field().span(),
+            "@generated",
+            span,
         ));
     }
 }
