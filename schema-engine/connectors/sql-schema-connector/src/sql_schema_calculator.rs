@@ -534,7 +534,7 @@ fn push_column_for_model_unsupported_scalar_field(
         ),
         auto_increment: false,
         description: None,
-        generation_expression: None,
+        generation_expression: field.generation_expression().map(ToOwned::to_owned),
     };
 
     ctx.schema.describer_schema.push_table_column(table_id, column);

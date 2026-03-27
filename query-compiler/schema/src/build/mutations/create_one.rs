@@ -157,7 +157,7 @@ fn filter_unchecked_create_fields<'a>(
     model.fields().filter_all(move |field| match field {
         // In principle, all scalars are writable for unchecked inputs. However, it still doesn't make any sense to be able to write the scalars that
         // link the model to the parent record in case of a nested unchecked create, as this would introduce complexities we don't want to deal with right now.
-        ModelField::Scalar(sf) => !linking_fields.contains(sf),
+        ModelField::Scalar(sf) => !sf.is_generated_column() && !linking_fields.contains(sf),
 
         // If the relation field `rf` is the one that was traversed to by the parent relation field `parent_field`,
         // then exclude it for checked inputs - this prevents endless nested type circles that are useless to offer as API.

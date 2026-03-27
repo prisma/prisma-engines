@@ -28,6 +28,7 @@ fn should_fail_without_expression_argument() {
     let error = parse_unwrap_err(&with_header(dml, Provider::Postgres, &["generatedColumns"]));
 
     assert!(error.contains("@generated"));
+    assert!(error.contains("Argument"));
 }
 
 #[test]
@@ -42,6 +43,7 @@ fn should_fail_with_non_string_argument() {
     let error = parse_unwrap_err(&with_header(dml, Provider::Postgres, &["generatedColumns"]));
 
     assert!(error.contains("@generated"));
+    assert!(error.contains("string"));
 }
 
 #[test]

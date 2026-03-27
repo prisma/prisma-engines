@@ -126,7 +126,8 @@ pub(super) fn filter_unchecked_update_fields<'a>(
         // link the model to the parent record in case of a nested unchecked create, as this would introduce complexities we don't want to deal with right now.
         // 2) Exclude @@id or @id fields if not updatable
         ModelField::Scalar(sf) => {
-            !linking_fields.contains(sf)
+            !sf.is_generated_column()
+                && !linking_fields.contains(sf)
                 && if let Some(id_fields) = &id_fields {
                     // Exclude @@id or @id fields if not updatable
                     if id_fields.clone().any(|f| f.id == sf.id) {

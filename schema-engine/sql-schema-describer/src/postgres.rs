@@ -871,9 +871,8 @@ impl<'a> SqlSchemaDescriber<'a> {
 
             let description = col.get_string("description");
 
-            // attgenerated = 's' means a stored generated column (empty string for non-generated)
-            // attgenerated = 's' means a stored generated column (cast to text because pg's "char" type
-            // is not mapped to string by quaint).
+            // attgenerated = 's' means a stored generated column. Cast to text in the SQL
+            // query because pg's "char" type is not mapped to string by quaint.
             let is_generated_stored = col.get_string("attgenerated").as_deref() == Some("s");
 
             let auto_increment = is_identity
