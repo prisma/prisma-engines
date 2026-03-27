@@ -105,3 +105,18 @@ fn should_fail_on_list_field() {
     assert!(error.contains("@generated"));
     assert!(error.contains("list"));
 }
+
+#[test]
+fn should_fail_on_unsupported_connector() {
+    let dml = indoc! {r#"
+        model User {
+          id   Int  @id
+          calc Int? @generated("id * 2")
+        }
+    "#};
+
+    let error = parse_unwrap_err(&with_header(dml, Provider::Mysql, &["generatedColumns"]));
+
+    assert!(error.contains("@generated"));
+    assert!(error.contains("not supported"));
+}

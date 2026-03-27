@@ -421,6 +421,8 @@ pub(crate) fn clustering_can_be_defined_only_once(pk: PrimaryKeyWalker<'_>, ctx:
 }
 
 pub(super) fn validate_generated_column(field: ScalarFieldWalker<'_>, ctx: &mut Context<'_>) {
+    use crate::datamodel_connector::Flavour;
+
     if !field.is_generated_column() {
         return;
     }
@@ -428,6 +430,14 @@ pub(super) fn validate_generated_column(field: ScalarFieldWalker<'_>, ctx: &mut 
     if !ctx.preview_features.contains(crate::PreviewFeature::GeneratedColumns) {
         ctx.push_error(DatamodelError::new_attribute_validation_error(
             "Generated columns are a preview feature. Add \"generatedColumns\" to previewFeatures in your generator block.",
+            "generated",
+            field.ast_field().span(),
+        ));
+    }
+
+    if !matches!(ctx.connector.flavour(), Flavour::Postgres) {
+        ctx.push_error(DatamodelError::new_attribute_validation_error(
+            "Generated columns are not supported by the current connector. Currently only PostgreSQL supports @generated.",
             "generated",
             field.ast_field().span(),
         ));
