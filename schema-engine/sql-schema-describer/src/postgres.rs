@@ -104,6 +104,7 @@ pub enum Circumstances {
     Cockroach,
     CockroachWithPostgresNativeTypes, // TODO: this is a temporary workaround
     CanPartitionTables,
+    SupportsGeneratedColumns,
 }
 
 pub struct SqlSchemaDescriber<'a> {
@@ -784,6 +785,14 @@ impl<'a> SqlSchemaDescriber<'a> {
             ""
         };
 
+        // att.attgenerated exists only on PostgreSQL 12+. On older versions,
+        // select an empty string constant to avoid a parse error.
+        let attgenerated_clause = if self.circumstances.contains(Circumstances::SupportsGeneratedColumns) {
+            "att.attgenerated::text AS attgenerated"
+        } else {
+            "''::text AS attgenerated"
+        };
+
         let sql = format!(
             r#"
             SELECT
@@ -803,7 +812,7 @@ impl<'a> SqlSchemaDescriber<'a> {
                 info.is_identity,
                 info.character_maximum_length,
                 col_description(att.attrelid, ordinal_position) AS description,
-                att.attgenerated::text AS attgenerated
+                {attgenerated_clause}
             FROM information_schema.columns info
             JOIN pg_attribute att ON att.attname = info.column_name
             JOIN (

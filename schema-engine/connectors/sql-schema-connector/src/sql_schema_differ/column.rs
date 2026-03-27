@@ -28,9 +28,12 @@ pub(crate) fn all_changes(
         changes |= ColumnChange::Autoincrement;
     }
 
-    // For generated columns, only detect changes when the "generated-ness" itself changes
-    // (added or removed), not when the expression text differs. The database normalizes
-    // the expression (e.g. adding type casts), so the stored text won't match the schema text.
+    // Detect changes to generation expression "generated-ness" (added or removed).
+    // We intentionally skip comparing expression text when both sides are Some,
+    // because PostgreSQL normalizes expressions on storage (adds type casts,
+    // reformats whitespace), so the schema text and introspected text will never
+    // match. Expression text changes within a generated column require the user
+    // to manually edit the migration SQL.
     match (cols.previous.generation_expression(), cols.next.generation_expression()) {
         (Some(_), None) | (None, Some(_)) => {
             changes |= ColumnChange::GenerationExpression;

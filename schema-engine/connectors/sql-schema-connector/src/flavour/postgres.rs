@@ -649,6 +649,10 @@ async fn describe_schema_with(
     if circumstances.contains(Circumstances::CanPartitionTables) {
         describer_circumstances |= describer::Circumstances::CanPartitionTables;
     }
+
+    if circumstances.contains(Circumstances::SupportsGeneratedColumns) {
+        describer_circumstances |= describer::Circumstances::SupportsGeneratedColumns;
+    }
     let namespaces_vec = Namespaces::to_vec(namespaces, schema);
     let namespaces_str: Vec<&str> = namespaces_vec.iter().map(AsRef::as_ref).collect();
 
@@ -727,6 +731,7 @@ pub(crate) enum Circumstances {
     IsCockroachDb,
     CockroachWithPostgresNativeTypes, // FIXME: we should really break and remove this
     CanPartitionTables,
+    SupportsGeneratedColumns,
 }
 
 async fn setup_connection(
@@ -781,8 +786,13 @@ async fn setup_connection(
                     .raw_cmd(COCKROACHDB_PRELUDE)
                     .await
                     .map_err(imp::quaint_error_mapper(params))?;
-            } else if version_num >= 100000 {
-                circumstances |= Circumstances::CanPartitionTables;
+            } else {
+                if version_num >= 100000 {
+                    circumstances |= Circumstances::CanPartitionTables;
+                }
+                if version_num >= 120000 {
+                    circumstances |= Circumstances::SupportsGeneratedColumns;
+                }
             }
         }
         None => {
