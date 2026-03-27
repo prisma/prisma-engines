@@ -188,6 +188,21 @@ fn resolve_model_attributes(model_id: crate::ModelId, ctx: &mut Context<'_>) {
     id::validate_id_field_arities(model_id, &model_attributes, ctx);
     shard_key::validate_shard_key_field_arities(model_id, &model_attributes, ctx);
 
+    // Validate that generated columns are not part of the primary key (@@id or @id).
+    if let Some(pk) = &model_attributes.primary_key {
+        for pk_field in &pk.fields {
+            let sfid = pk_field.path.root();
+            if ctx.types[sfid].is_generated_column {
+                let ast_field = &ctx.asts[ctx.types[sfid].model_id][ctx.types[sfid].field_id];
+                ctx.push_error(DatamodelError::new_attribute_validation_error(
+                    "Fields that are marked with @generated cannot be part of the primary key (@id or @@id).",
+                    "generated",
+                    ast_field.span(),
+                ));
+            }
+        }
+    }
+
     ctx.types.model_attributes.insert(model_id, model_attributes);
     ctx.validate_visited_attributes();
 }
@@ -317,19 +332,8 @@ fn visit_scalar_field_attributes(
                 ast_field.span(),
             ));
         }
-        let is_id_field = model_data
-            .primary_key
-            .as_ref()
-            .and_then(|pk| pk.source_field)
-            .map(|pk_field_id| pk_field_id == field_id)
-            .unwrap_or(false);
-        if is_id_field {
-            ctx.push_error(DatamodelError::new_attribute_validation_error(
-                "Fields that are marked with @generated cannot be the primary key (@id).",
-                "generated",
-                ast_field.span(),
-            ));
-        }
+        // Note: @generated + primary key (@id / @@id) is validated at model level
+        // in resolve_model_attributes(), after @@id has been processed.
     }
 
     ctx.validate_visited_attributes();

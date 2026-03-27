@@ -92,6 +92,23 @@ fn should_fail_when_combined_with_id() {
 }
 
 #[test]
+fn should_fail_when_part_of_compound_id() {
+    let dml = indoc! {r#"
+        model User {
+          a    Int
+          b    Int @generated("a * 2")
+
+          @@id([a, b])
+        }
+    "#};
+
+    let error = parse_unwrap_err(&with_header(dml, Provider::Postgres, &["generatedColumns"]));
+
+    assert!(error.contains("@generated"));
+    assert!(error.contains("@@id"));
+}
+
+#[test]
 fn should_fail_on_list_field() {
     let dml = indoc! {r#"
         model User {
