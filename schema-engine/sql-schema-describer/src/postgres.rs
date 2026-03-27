@@ -892,14 +892,16 @@ impl<'a> SqlSchemaDescriber<'a> {
                 None
             };
 
-            if !is_generated_stored {
-                match container_id {
-                    Either::Left(table_id) => {
-                        table_defaults.push((table_id, default));
-                    }
-                    Either::Right(view_id) => {
-                        view_defaults.push((view_id, default));
-                    }
+            // For generated columns, push None instead of the default to keep
+            // the vector aligned with column IDs (they are indexed positionally).
+            let default = if is_generated_stored { None } else { default };
+
+            match container_id {
+                Either::Left(table_id) => {
+                    table_defaults.push((table_id, default));
+                }
+                Either::Right(view_id) => {
+                    view_defaults.push((view_id, default));
                 }
             }
 

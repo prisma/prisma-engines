@@ -195,10 +195,11 @@ fn alter_columns(table_differ: &TableDiffer<'_, '_>) -> Vec<TableChange> {
             let column_id = MigrationPair::new(column_differ.previous.id, column_differ.next.id);
 
             match changes.type_change {
-                // Generated column expression changes require drop+recreate.
-                // PostgreSQL 17+ supports ALTER COLUMN SET EXPRESSION, but we use
-                // DROP+ADD for compatibility with PG 12-16. Indexes on the column
-                // are cascaded by DROP and independently recreated by the differ.
+                // Adding or removing a generated column requires drop+recreate.
+                // Note: expression text changes (Some↔Some) are not detected because
+                // PG normalizes expressions. Only generated↔non-generated transitions
+                // (Some↔None) trigger this. PG 17+ supports ALTER COLUMN SET EXPRESSION,
+                // but we use DROP+ADD for compatibility with PG 12-16.
                 _ if changes.generation_expression_changed() => {
                     Some(TableChange::DropAndRecreateColumn { column_id, changes })
                 }
