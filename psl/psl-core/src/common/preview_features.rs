@@ -56,6 +56,7 @@ features!(
     FullTextIndex,
     FullTextSearch,
     FullTextSearchPostgres,
+    GeneratedColumns,
     GroupBy,
     ImprovedQueryRaw,
     InteractiveTransactions,
@@ -157,7 +158,8 @@ impl<'a> FeatureMapWithProvider<'a> {
         // Generator preview features (alphabetically sorted)
         let feature_map: FeatureMap = FeatureMap {
             active: enumflags2::make_bitflags!(PreviewFeature::{
-                 NativeDistinct
+                 GeneratedColumns
+                 | NativeDistinct
                  | PartialIndexes
                  | PostgresqlExtensions
                  | RelationJoins

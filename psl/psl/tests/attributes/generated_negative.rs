@@ -1,38 +1,45 @@
-use crate::common::*;
+use crate::{Provider, common::*, with_header};
+
+#[test]
+fn should_fail_without_preview_feature() {
+    let dml = indoc! {r#"
+        model User {
+          id   Int    @id
+          calc Int?   @generated("id * 2")
+        }
+    "#};
+
+    // No "generatedColumns" in preview features
+    let error = parse_unwrap_err(&with_header(dml, Provider::Postgres, &[]));
+
+    assert!(error.contains("preview feature"));
+    assert!(error.contains("generatedColumns"));
+}
 
 #[test]
 fn should_fail_without_expression_argument() {
     let dml = indoc! {r#"
-        datasource db {
-          provider = "postgres"
-        }
-
         model User {
           id   Int    @id
           name String @generated
         }
     "#};
 
-    let error = parse_unwrap_err(dml);
+    let error = parse_unwrap_err(&with_header(dml, Provider::Postgres, &["generatedColumns"]));
 
-    // @generated requires a string argument
     assert!(error.contains("@generated"));
 }
 
 #[test]
 fn should_fail_with_non_string_argument() {
     let dml = indoc! {r#"
-        datasource db {
-          provider = "postgres"
-        }
-
         model User {
           id   Int @id
           calc Int @generated(42)
         }
     "#};
 
-    let error = parse_unwrap_err(dml);
+    let error = parse_unwrap_err(&with_header(dml, Provider::Postgres, &["generatedColumns"]));
 
     assert!(error.contains("@generated"));
 }
@@ -46,7 +53,7 @@ fn should_fail_when_combined_with_default() {
         }
     "#};
 
-    let error = parse_unwrap_err(dml);
+    let error = parse_unwrap_err(&with_header(dml, Provider::Postgres, &["generatedColumns"]));
 
     assert!(error.contains("@generated"));
     assert!(error.contains("@default"));
@@ -61,7 +68,7 @@ fn should_fail_when_combined_with_updated_at() {
         }
     "#};
 
-    let error = parse_unwrap_err(dml);
+    let error = parse_unwrap_err(&with_header(dml, Provider::Postgres, &["generatedColumns"]));
 
     assert!(error.contains("@generated"));
     assert!(error.contains("@updatedAt"));
@@ -76,7 +83,7 @@ fn should_fail_when_combined_with_id() {
         }
     "#};
 
-    let error = parse_unwrap_err(dml);
+    let error = parse_unwrap_err(&with_header(dml, Provider::Postgres, &["generatedColumns"]));
 
     assert!(error.contains("@generated"));
     assert!(error.contains("@id"));
@@ -85,17 +92,13 @@ fn should_fail_when_combined_with_id() {
 #[test]
 fn should_fail_on_list_field() {
     let dml = indoc! {r#"
-        datasource db {
-          provider = "postgres"
-        }
-
         model User {
           id    Int   @id
           tags  Int[] @generated("ARRAY[1,2,3]")
         }
     "#};
 
-    let error = parse_unwrap_err(dml);
+    let error = parse_unwrap_err(&with_header(dml, Provider::Postgres, &["generatedColumns"]));
 
     assert!(error.contains("@generated"));
     assert!(error.contains("list"));

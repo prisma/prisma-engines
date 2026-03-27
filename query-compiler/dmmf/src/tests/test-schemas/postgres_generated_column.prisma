@@ -1,3 +1,8 @@
+generator client {
+  provider        = "prisma-client"
+  previewFeatures = ["generatedColumns"]
+}
+
 model Session {
   id             Int    @id @default(autoincrement())
   status         String

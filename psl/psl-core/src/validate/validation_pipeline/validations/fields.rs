@@ -419,3 +419,17 @@ pub(crate) fn clustering_can_be_defined_only_once(pk: PrimaryKeyWalker<'_>, ctx:
         return;
     }
 }
+
+pub(super) fn validate_generated_column(field: ScalarFieldWalker<'_>, ctx: &mut Context<'_>) {
+    if !field.is_generated_column() {
+        return;
+    }
+
+    if !ctx.preview_features.contains(crate::PreviewFeature::GeneratedColumns) {
+        ctx.push_error(DatamodelError::new_attribute_validation_error(
+            "Generated columns are a preview feature. Add \"generatedColumns\" to previewFeatures in your generator block.",
+            "generated",
+            field.ast_field().span(),
+        ));
+    }
+}

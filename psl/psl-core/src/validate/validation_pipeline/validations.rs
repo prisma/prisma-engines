@@ -96,7 +96,8 @@ pub(super) fn validate(ctx: &mut Context<'_>) {
             fields::has_a_unique_default_constraint_name(field, &names, ctx);
             fields::validate_native_type_arguments(field, ctx);
             fields::validate_default_value(field, ctx);
-            fields::validate_unsupported_field_type(field, ctx)
+            fields::validate_unsupported_field_type(field, ctx);
+            fields::validate_generated_column(field, ctx);
         }
 
         for field in model.relation_fields() {

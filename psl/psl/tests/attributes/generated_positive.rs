@@ -1,21 +1,17 @@
 use psl::parser_database::ScalarType;
 
-use crate::common::*;
+use crate::{Provider, common::*, with_header};
 
 #[test]
 fn should_accept_generated_attribute_on_int_field() {
     let dml = indoc! {r#"
-        datasource db {
-          provider = "postgres"
-        }
-
         model Session {
           id             Int    @id
           statusPriority Int?   @generated("CASE status WHEN 'A' THEN 1 WHEN 'B' THEN 2 END")
         }
     "#};
 
-    let schema = psl::parse_schema_without_extensions(dml).unwrap();
+    let schema = psl::parse_schema_without_extensions(with_header(dml, Provider::Postgres, &["generatedColumns"])).unwrap();
     let model = schema.assert_has_model("Session");
 
     model
@@ -27,10 +23,6 @@ fn should_accept_generated_attribute_on_int_field() {
 #[test]
 fn should_accept_generated_attribute_on_string_field() {
     let dml = indoc! {r#"
-        datasource db {
-          provider = "postgres"
-        }
-
         model User {
           id       Int     @id
           first    String
@@ -39,7 +31,7 @@ fn should_accept_generated_attribute_on_string_field() {
         }
     "#};
 
-    let schema = psl::parse_schema_without_extensions(dml).unwrap();
+    let schema = psl::parse_schema_without_extensions(with_header(dml, Provider::Postgres, &["generatedColumns"])).unwrap();
     let model = schema.assert_has_model("User");
 
     model
@@ -51,10 +43,6 @@ fn should_accept_generated_attribute_on_string_field() {
 #[test]
 fn generated_field_should_be_readable() {
     let dml = indoc! {r#"
-        datasource db {
-          provider = "postgres"
-        }
-
         model Item {
           id       Int    @id
           price    Float
@@ -62,10 +50,9 @@ fn generated_field_should_be_readable() {
         }
     "#};
 
-    let schema = psl::parse_schema_without_extensions(dml).unwrap();
+    let schema = psl::parse_schema_without_extensions(with_header(dml, Provider::Postgres, &["generatedColumns"])).unwrap();
     let model = schema.assert_has_model("Item");
 
-    // Generated fields should exist as scalar fields
     model
         .assert_has_scalar_field("tax")
         .assert_is_generated_column()
