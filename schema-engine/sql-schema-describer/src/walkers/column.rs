@@ -116,6 +116,11 @@ impl<'a> ColumnWalker<'a> {
         self.get().description.as_deref()
     }
 
+    /// The SQL expression for a generated (computed) column, if any.
+    pub fn generation_expression(self) -> Option<&'a str> {
+        self.get().generation_expression.as_deref()
+    }
+
     fn get(self) -> &'a Column {
         match self.id {
             Either::Left(table_column_id) => &self.schema.table_columns[table_column_id.0 as usize].1,

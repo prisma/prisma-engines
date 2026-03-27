@@ -1,0 +1,25 @@
+// tags=postgres
+// exclude=cockroachdb
+
+datasource testds {
+    provider = "postgresql"
+}
+
+model Session {
+    id             Int    @id @default(autoincrement())
+    status         String
+    statusPriority Int?   @generated("CASE status WHEN 'WAITING' THEN 1 WHEN 'FAILED' THEN 2 WHEN 'ACTIVE' THEN 3 END")
+}
+
+// Expected Migration:
+// -- CreateSchema
+// CREATE SCHEMA IF NOT EXISTS "public";
+// 
+// -- CreateTable
+// CREATE TABLE "Session" (
+//     "id" SERIAL NOT NULL,
+//     "status" TEXT NOT NULL,
+//     "statusPriority" INTEGER GENERATED ALWAYS AS (CASE status WHEN 'WAITING' THEN 1 WHEN 'FAILED' THEN 2 WHEN 'ACTIVE' THEN 3 END) STORED,
+// 
+//     CONSTRAINT "Session_pkey" PRIMARY KEY ("id")
+// );

@@ -60,6 +60,14 @@ impl ScalarField {
         relation_fields.any(|rf| rf.fields().into_iter().flatten().any(|sf2| sf.id == sf2.id))
     }
 
+    pub fn is_generated_column(&self) -> bool {
+        let sfid = match self.id {
+            ScalarFieldId::InModel(id) => id,
+            ScalarFieldId::InCompositeType(_) => return false,
+        };
+        self.dm.walk(sfid).is_generated_column()
+    }
+
     pub fn is_numeric(&self) -> bool {
         self.type_identifier().is_numeric()
     }

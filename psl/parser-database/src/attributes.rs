@@ -249,6 +249,26 @@ fn visit_scalar_field_attributes(
         ctx.validate_visited_arguments();
     }
 
+    // @generated("sql expression")
+    if ctx.visit_optional_single_attr("generated") {
+        if ast_field.arity.is_list() {
+            ctx.push_attribute_validation_error("Fields that are marked with @generated cannot be lists.");
+        }
+
+        match ctx.visit_default_arg("expression") {
+            Ok(expr) => {
+                if let Some((expr_str, _span)) = expr.as_string_value() {
+                    ctx.types[scalar_field_id].is_generated_column = true;
+                    ctx.types[scalar_field_id].generation_expression = Some(expr_str.to_owned());
+                } else {
+                    ctx.push_attribute_validation_error("The @generated attribute requires a string argument with the SQL expression.");
+                }
+            }
+            Err(err) => ctx.push_error(err),
+        }
+        ctx.validate_visited_arguments();
+    }
+
     // @default
     if ctx.visit_optional_single_attr("default") {
         default::visit_model_field_default(scalar_field_id, model_id, field_id, r#type, ctx);
@@ -279,6 +299,37 @@ fn visit_scalar_field_attributes(
     if ctx.visit_optional_single_attr("shardKey") {
         shard_key::field(ast_model, scalar_field_id, field_id, model_data, ctx);
         ctx.validate_visited_arguments();
+    }
+
+    // Cross-attribute validations for @generated
+    if ctx.types[scalar_field_id].is_generated_column {
+        if ctx.types[scalar_field_id].default.is_some() {
+            ctx.push_error(DatamodelError::new_attribute_validation_error(
+                "Fields that are marked with @generated cannot have a @default value. The column value is always computed from the generation expression.",
+                "generated",
+                ast_field.span(),
+            ));
+        }
+        if ctx.types[scalar_field_id].is_updated_at {
+            ctx.push_error(DatamodelError::new_attribute_validation_error(
+                "Fields that are marked with @generated cannot also be marked with @updatedAt.",
+                "generated",
+                ast_field.span(),
+            ));
+        }
+        let is_id_field = model_data
+            .primary_key
+            .as_ref()
+            .and_then(|pk| pk.source_field)
+            .map(|pk_field_id| pk_field_id == field_id)
+            .unwrap_or(false);
+        if is_id_field {
+            ctx.push_error(DatamodelError::new_attribute_validation_error(
+                "Fields that are marked with @generated cannot be the primary key (@id).",
+                "generated",
+                ast_field.span(),
+            ));
+        }
     }
 
     ctx.validate_visited_attributes();

@@ -37,6 +37,10 @@ pub(crate) fn render(field: ScalarFieldPair<'_>) -> renderer::Field<'_> {
         rendered.default(default);
     }
 
+    if let Some(expr) = field.generation_expression() {
+        rendered.generated(expr);
+    }
+
     if field.is_updated_at() {
         rendered.updated_at();
     }

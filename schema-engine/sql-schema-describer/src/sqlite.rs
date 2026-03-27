@@ -355,6 +355,7 @@ async fn push_columns(
             tpe,
             auto_increment: false,
             description: None,
+            generation_expression: None,
         };
 
         match container_id {

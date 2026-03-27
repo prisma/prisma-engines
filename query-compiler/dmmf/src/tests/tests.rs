@@ -167,3 +167,43 @@ fn dmmf_rendering() {
         &serde_json::to_string_pretty(&new_dmmf).unwrap(),
     );
 }
+
+#[test]
+fn generated_column_is_read_only_and_excluded_from_inputs() {
+    let dmmf = dmmf_from_schema(include_str!("./test-schemas/postgres_generated_column.prisma"));
+
+    // Find the Session model
+    let session = dmmf.data_model.models.iter().find(|m| m.name == "Session").unwrap();
+
+    // statusPriority should be present in the datamodel
+    let field = session.fields.iter().find(|f| f.name == "statusPriority").unwrap();
+    assert!(field.is_read_only, "Generated column should be read-only");
+    assert_eq!(field.is_generated, Some(true), "Generated column should have isGenerated=true");
+    assert!(!field.is_required, "Generated column should be optional");
+
+    // statusPriority should NOT be in CreateInput
+    let create_input = dmmf.schema.input_object_types.get("prisma").unwrap()
+        .iter()
+        .find(|t| t.name == "SessionCreateInput")
+        .unwrap();
+    assert!(
+        !create_input.fields.iter().any(|f| f.name == "statusPriority"),
+        "Generated column should not appear in SessionCreateInput"
+    );
+
+    // statusPriority should NOT be in UpdateInput
+    let update_input = dmmf.schema.input_object_types.get("prisma").unwrap()
+        .iter()
+        .find(|t| t.name == "SessionUpdateInput")
+        .unwrap();
+    assert!(
+        !update_input.fields.iter().any(|f| f.name == "statusPriority"),
+        "Generated column should not appear in SessionUpdateInput"
+    );
+
+    // Non-generated fields should still be in CreateInput
+    assert!(
+        create_input.fields.iter().any(|f| f.name == "status"),
+        "Non-generated field 'status' should be in CreateInput"
+    );
+}

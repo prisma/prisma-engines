@@ -24,3 +24,5 @@ mod unique_negative;
 mod unique_positive;
 mod updated_at_negative;
 mod updated_at_positive;
+mod generated_positive;
+mod generated_negative;

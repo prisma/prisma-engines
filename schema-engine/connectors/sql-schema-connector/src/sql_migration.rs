@@ -444,6 +444,11 @@ fn render_column_changes(columns: MigrationPair<TableColumnWalker<'_>>, changes:
                     "column became autoincrementing".to_owned()
                 }
             }
+            ColumnChange::GenerationExpression => format!(
+                "generation expression changed from `{:?}` to `{:?}`",
+                columns.previous.generation_expression(),
+                columns.next.generation_expression()
+            ),
         })
         .join(", ");
 

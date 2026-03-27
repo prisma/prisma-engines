@@ -110,6 +110,11 @@ impl<'a> TableColumnWalker<'a> {
             .unwrap_or(false)
     }
 
+    /// The SQL expression for a generated (computed) column, if any.
+    pub fn generation_expression(self) -> Option<&'a str> {
+        self.get().1.generation_expression.as_deref()
+    }
+
     /// Traverse to the column's table.
     pub fn table(self) -> TableWalker<'a> {
         self.walk(self.get().0)

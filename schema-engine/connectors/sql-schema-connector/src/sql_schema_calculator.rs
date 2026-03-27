@@ -333,6 +333,7 @@ fn push_relation_tables(ctx: &mut Context<'_>) {
                 tpe: column_a_type,
                 auto_increment: false,
                 description: None,
+                generation_expression: None,
             },
         );
         let column_b_id = ctx.schema.describer_schema.push_table_column(
@@ -342,6 +343,7 @@ fn push_relation_tables(ctx: &mut Context<'_>) {
                 tpe: column_b_type,
                 auto_increment: false,
                 description: None,
+                generation_expression: None,
             },
         );
 
@@ -502,6 +504,7 @@ fn push_column_for_model_enum_scalar_field(
         ),
         auto_increment: false,
         description: None,
+        generation_expression: field.generation_expression().map(ToOwned::to_owned),
     };
 
     ctx.schema.describer_schema.push_table_column(table_id, column);
@@ -531,6 +534,7 @@ fn push_column_for_model_unsupported_scalar_field(
         ),
         auto_increment: false,
         description: None,
+        generation_expression: None,
     };
 
     ctx.schema.describer_schema.push_table_column(table_id, column);
@@ -568,6 +572,7 @@ fn push_column_for_extension_type(
         },
         auto_increment: field.is_autoincrement() || ctx.flavour.field_is_implicit_autoincrement_primary_key(field),
         description: None,
+        generation_expression: field.generation_expression().map(ToOwned::to_owned),
     };
 
     ctx.schema.describer_schema.push_table_column(table_id, column);
@@ -654,6 +659,7 @@ fn push_column_for_builtin_scalar_type(
         },
         auto_increment: field.is_autoincrement() || ctx.flavour.field_is_implicit_autoincrement_primary_key(field),
         description: None,
+        generation_expression: field.generation_expression().map(ToOwned::to_owned),
     };
 
     let column_id = ctx.schema.describer_schema.push_table_column(table_id, column);

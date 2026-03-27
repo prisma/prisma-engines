@@ -1,0 +1,6 @@
+model Session {
+  id             Int    @id @default(autoincrement())
+  status         String
+  statusPriority Int?   @generated("CASE status WHEN 'WAITING' THEN 1 WHEN 'FAILED' THEN 2 END")
+  createdAt      DateTime @default(now())
+}

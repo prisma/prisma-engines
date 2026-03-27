@@ -72,6 +72,9 @@ pub struct Column<'a> {
     pub name: Cow<'a, str>,
     pub r#type: Cow<'a, str>,
     pub default: Option<Cow<'a, str>>,
+    /// SQL expression for a generated (computed) column.
+    /// When set, renders as `GENERATED ALWAYS AS (expr) STORED` instead of a DEFAULT clause.
+    pub generation_expression: Option<Cow<'a, str>>,
 }
 
 impl Display for Column<'_> {
@@ -80,7 +83,11 @@ impl Display for Column<'_> {
         f.write_str(" ")?;
         f.write_str(self.r#type.as_ref())?;
 
-        if let Some(default) = &self.default {
+        if let Some(expr) = &self.generation_expression {
+            f.write_str(" GENERATED ALWAYS AS (")?;
+            f.write_str(expr)?;
+            f.write_str(") STORED")?;
+        } else if let Some(default) = &self.default {
             f.write_str(" DEFAULT ")?;
             f.write_str(default)?;
         }
@@ -544,5 +551,48 @@ mod tests {
         };
 
         assert_eq!(alter_table.to_string(), expected);
+    }
+
+    #[test]
+    fn column_with_generation_expression() {
+        let col = Column {
+            name: "status_priority".into(),
+            r#type: "INT".into(),
+            default: None,
+            generation_expression: Some("CASE status WHEN 'A' THEN 1 WHEN 'B' THEN 2 END".into()),
+        };
+
+        assert_eq!(
+            col.to_string(),
+            r#""status_priority" INT GENERATED ALWAYS AS (CASE status WHEN 'A' THEN 1 WHEN 'B' THEN 2 END) STORED"#
+        );
+    }
+
+    #[test]
+    fn column_with_generation_expression_takes_precedence_over_default() {
+        let col = Column {
+            name: "computed".into(),
+            r#type: "TEXT".into(),
+            default: Some("'fallback'".into()),
+            generation_expression: Some("first || ' ' || last".into()),
+        };
+
+        // generation_expression should win over default
+        assert_eq!(
+            col.to_string(),
+            r#""computed" TEXT GENERATED ALWAYS AS (first || ' ' || last) STORED"#
+        );
+    }
+
+    #[test]
+    fn column_without_generation_expression_renders_default() {
+        let col = Column {
+            name: "name".into(),
+            r#type: "TEXT".into(),
+            default: Some("'unknown'".into()),
+            generation_expression: None,
+        };
+
+        assert_eq!(col.to_string(), r#""name" TEXT DEFAULT 'unknown'"#);
     }
 }

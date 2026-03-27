@@ -802,7 +802,8 @@ impl<'a> SqlSchemaDescriber<'a> {
                 info.is_nullable,
                 info.is_identity,
                 info.character_maximum_length,
-                col_description(att.attrelid, ordinal_position) AS description
+                col_description(att.attrelid, ordinal_position) AS description,
+                att.attgenerated::text AS attgenerated
             FROM information_schema.columns info
             JOIN pg_attribute att ON att.attname = info.column_name
             JOIN (
@@ -861,6 +862,11 @@ impl<'a> SqlSchemaDescriber<'a> {
 
             let description = col.get_string("description");
 
+            // attgenerated = 's' means a stored generated column (empty string for non-generated)
+            // attgenerated = 's' means a stored generated column (cast to text because pg's "char" type
+            // is not mapped to string by quaint).
+            let is_generated_stored = col.get_string("attgenerated").as_deref() == Some("s");
+
             let auto_increment = is_identity
                 || matches!(default.as_ref().map(|d| &d.kind), Some(DefaultKind::Sequence(_)))
                 || (self.is_cockroach()
@@ -869,12 +875,23 @@ impl<'a> SqlSchemaDescriber<'a> {
                         Some(DefaultKind::DbGenerated(Some(s))) if s == "unique_rowid()"
                     ));
 
-            match container_id {
-                Either::Left(table_id) => {
-                    table_defaults.push((table_id, default));
-                }
-                Either::Right(view_id) => {
-                    view_defaults.push((view_id, default));
+            // For generated columns, the raw default from pg_get_expr contains the
+            // generation expression. Extract it and skip storing it as a default.
+            let generation_expression = if is_generated_stored {
+                col.get("column_default")
+                    .and_then(|v| v.to_string())
+            } else {
+                None
+            };
+
+            if !is_generated_stored {
+                match container_id {
+                    Either::Left(table_id) => {
+                        table_defaults.push((table_id, default));
+                    }
+                    Either::Right(view_id) => {
+                        view_defaults.push((view_id, default));
+                    }
                 }
             }
 
@@ -883,6 +900,7 @@ impl<'a> SqlSchemaDescriber<'a> {
                 tpe,
                 auto_increment,
                 description,
+                generation_expression,
             };
 
             match container_id {

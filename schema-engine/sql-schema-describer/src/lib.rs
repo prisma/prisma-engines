@@ -641,6 +641,10 @@ pub struct Column {
     pub auto_increment: bool,
     /// The comment in the database
     pub description: Option<String>,
+    /// SQL expression for a generated (computed) column, e.g. "CASE status WHEN 'A' THEN 1 END".
+    /// When set, the column is rendered as GENERATED ALWAYS AS (expr) STORED.
+    #[serde(default)]
+    pub generation_expression: Option<String>,
 }
 
 /// The type of a column.

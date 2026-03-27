@@ -17,6 +17,7 @@ pub struct Field<'a> {
     unique: Option<UniqueFieldAttribute<'a>>,
     id: Option<IdFieldDefinition<'a>>,
     default: Option<DefaultValue<'a>>,
+    generated: Option<FieldAttribute<'a>>,
     map: Option<FieldAttribute<'a>>,
     relation: Option<Relation<'a>>,
     native_type: Option<FieldAttribute<'a>>,
@@ -46,6 +47,7 @@ impl<'a> Field<'a> {
             unique: None,
             id: None,
             default: None,
+            generated: None,
             relation: None,
             native_type: None,
             ignore: None,
@@ -207,6 +209,20 @@ impl<'a> Field<'a> {
         self.relation = Some(relation);
     }
 
+    /// Marks the field as a generated (computed) column.
+    ///
+    /// ```ignore
+    /// model Session {
+    ///   statusPriority Int? @generated("CASE status WHEN 'A' THEN 1 END")
+    /// //                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ this
+    /// }
+    /// ```
+    pub fn generated(&mut self, expression: impl Into<Cow<'a, str>>) {
+        let mut fun = Function::new("generated");
+        fun.push_param(crate::value::Value::from(crate::value::Text::new(expression)));
+        self.generated = Some(FieldAttribute::new(fun));
+    }
+
     /// Ignores the field.
     ///
     /// ```ignore
@@ -251,6 +267,10 @@ impl fmt::Display for Field<'_> {
 
         if let Some(ref def) = self.default {
             write!(f, " {def}")?;
+        }
+
+        if let Some(ref generated) = self.generated {
+            write!(f, " {generated}")?;
         }
 
         if let Some(ref map) = self.map {
