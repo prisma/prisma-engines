@@ -15,6 +15,7 @@ mod error;
 mod getters;
 mod ids;
 mod parsers;
+mod stripped_partial_indexes;
 
 use crate::cloneable_any::CloneableAny;
 
@@ -64,6 +65,8 @@ pub struct SqlSchema {
     foreign_key_columns: Vec<ForeignKeyColumn>,
     /// All indexes and unique constraints.
     indexes: Vec<Index>,
+    /// Index ids for partial indexes stripped because the feature is disabled.
+    stripped_partial_indexes: stripped_partial_indexes::StrippedPartialIndexes,
     /// All columns of indexes.
     index_columns: Vec<IndexColumn>,
     /// Check constraints for every table.
@@ -203,11 +206,18 @@ impl SqlSchema {
         }
     }
 
-    /// Clear all index predicates so the differ ignores partial indexes when the feature is disabled.
-    pub fn clear_index_predicates(&mut self) {
-        for idx in self.indexes.iter_mut() {
-            idx.predicate = None;
+    /// Strip partial-index predicates when the feature is disabled.
+    pub fn strip_partial_index_predicates(&mut self) {
+        for (idx, index) in self.indexes.iter_mut().enumerate() {
+            if index.predicate.take().is_some() {
+                self.stripped_partial_indexes.insert(IndexId(idx as u32));
+            }
         }
+    }
+
+    /// Returns whether this index is a stripped partial index.
+    pub fn index_is_stripped_partial(&self, index_id: IndexId) -> bool {
+        self.stripped_partial_indexes.contains(&index_id)
     }
 
     /// Add a table column to the schema.

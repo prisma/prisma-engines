@@ -64,4 +64,9 @@ impl<'a> IndexWalker<'a> {
     pub fn is_partial(self) -> bool {
         self.get().predicate.is_some()
     }
+
+    /// Returns true if this is a stripped partial index.
+    pub fn is_stripped_partial(self) -> bool {
+        self.schema.index_is_stripped_partial(self.id)
+    }
 }

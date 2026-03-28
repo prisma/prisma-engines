@@ -146,12 +146,12 @@ fn model_to_dmmf(model: walkers::ModelWalker<'_>) -> Model {
         primary_key,
         unique_fields: model
             .indexes()
-            .filter(|&i| i.is_unique() && !i.is_defined_on_field())
+            .filter(|&i| i.is_unique() && !i.is_defined_on_field() && !i.is_partial())
             .map(|i| i.fields().map(|f| f.name().to_owned()).collect())
             .collect(),
         unique_indexes: model
             .indexes()
-            .filter(|&i| i.is_unique() && !i.is_defined_on_field())
+            .filter(|&i| i.is_unique() && !i.is_defined_on_field() && !i.is_partial())
             .map(|i| UniqueIndex {
                 name: i.name().map(ToOwned::to_owned),
                 fields: i.fields().map(|f| f.name().to_owned()).collect(),
@@ -189,7 +189,7 @@ fn scalar_field_to_dmmf(field: walkers::ScalarFieldWalker<'_>) -> Field {
         },
         is_list: ast_field.arity.is_list(),
         is_required: matches!(ast_field.arity, FieldArity::Required | FieldArity::List),
-        is_unique: !is_id && field.is_unique(),
+        is_unique: !is_id && field.is_unique() && !field.is_partial_unique(),
         is_id,
         is_read_only: field.model().relation_fields().any(|rf| {
             rf.referencing_fields()
