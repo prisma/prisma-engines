@@ -172,6 +172,8 @@ fn dmmf_rendering() {
 fn generated_column_is_read_only_and_excluded_from_inputs() {
     let dmmf = dmmf_from_schema(include_str!("./test-schemas/postgres_generated_column.prisma"));
 
+    let prisma_types = dmmf.schema.input_object_types.get("prisma").unwrap();
+
     // Find the Session model
     let session = dmmf.data_model.models.iter().find(|m| m.name == "Session").unwrap();
 
@@ -181,27 +183,27 @@ fn generated_column_is_read_only_and_excluded_from_inputs() {
     assert_eq!(field.is_generated, Some(true), "Generated column should have isGenerated=true");
     assert!(!field.is_required, "Generated column should be optional");
 
-    // statusPriority should NOT be in CreateInput
-    let create_input = dmmf.schema.input_object_types.get("prisma").unwrap()
-        .iter()
-        .find(|t| t.name == "SessionCreateInput")
-        .unwrap();
-    assert!(
-        !create_input.fields.iter().any(|f| f.name == "statusPriority"),
-        "Generated column should not appear in SessionCreateInput"
-    );
+    // statusPriority should NOT appear in any writable input type.
+    let writable_input_names = [
+        "SessionCreateInput",
+        "SessionUncheckedCreateInput",
+        "SessionCreateManyInput",
+        "SessionUpdateInput",
+        "SessionUncheckedUpdateInput",
+        "SessionUpdateManyMutationInput",
+    ];
 
-    // statusPriority should NOT be in UpdateInput
-    let update_input = dmmf.schema.input_object_types.get("prisma").unwrap()
-        .iter()
-        .find(|t| t.name == "SessionUpdateInput")
-        .unwrap();
-    assert!(
-        !update_input.fields.iter().any(|f| f.name == "statusPriority"),
-        "Generated column should not appear in SessionUpdateInput"
-    );
+    for input_name in &writable_input_names {
+        if let Some(input_type) = prisma_types.iter().find(|t| t.name == *input_name) {
+            assert!(
+                !input_type.fields.iter().any(|f| f.name == "statusPriority"),
+                "Generated column should not appear in {input_name}"
+            );
+        }
+    }
 
     // Non-generated fields should still be in CreateInput
+    let create_input = prisma_types.iter().find(|t| t.name == "SessionCreateInput").unwrap();
     assert!(
         create_input.fields.iter().any(|f| f.name == "status"),
         "Non-generated field 'status' should be in CreateInput"

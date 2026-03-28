@@ -440,7 +440,7 @@ pub(super) fn validate_generated_column(field: ScalarFieldWalker<'_>, ctx: &mut 
         ));
     }
 
-    if !matches!(ctx.connector.flavour(), Flavour::Postgres) {
+    if ctx.datasource.is_some() && !matches!(ctx.connector.flavour(), Flavour::Postgres) {
         ctx.push_error(DatamodelError::new_attribute_validation_error(
             "Generated columns are not supported by the current connector. Currently only PostgreSQL supports @generated.",
             "@generated",
