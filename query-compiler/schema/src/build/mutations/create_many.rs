@@ -129,7 +129,7 @@ fn filter_create_many_fields<'a>(
     // 2) Only allow writing autoincrement fields if the connector supports it.
     fields.filter_all(move |field| match field {
         ModelField::Scalar(sf) => {
-            if linking_fields.contains(sf) {
+            if sf.is_generated_column() || linking_fields.contains(sf) {
                 false
             } else if sf.is_autoincrement() {
                 ctx.has_capability(ConnectorCapability::CreateManyWriteableAutoIncId)
