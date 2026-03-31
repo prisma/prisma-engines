@@ -7,7 +7,8 @@ import {
   noopTracingHelper,
   normalizeJsonProtocolValues,
   normalizeRawJsonProtocolResponse,
-  QueryEvent,
+  parameterizeBatch,
+  parameterizeQuery,
   QueryInterpreter,
   type QueryInterpreterTransactionManager,
   QueryPlanNode,
@@ -27,6 +28,8 @@ import { JsonProtocolQuery, QueryParams } from '../types/jsonRpc.js'
 import { debug } from '../utils.js'
 import type { State } from './worker.js'
 import { parseIsolationLevel } from './worker-transaction.js'
+import { JsonQuery } from '../engines/JsonProtocol.js'
+import { ParamGraph } from '@prisma/param-graph'
 
 export function query(
   params: QueryParams,
@@ -42,6 +45,7 @@ class QueryPipeline {
   private driverAdapter: SqlDriverAdapter
   private interpreter: QueryInterpreter
   private transactionManager: TransactionManager
+  private paramGraph: ParamGraph
 
   constructor(
     state: State,
@@ -58,6 +62,7 @@ class QueryPipeline {
       provider: this.driverAdapter.provider,
       connectionInfo: this.driverAdapter.getConnectionInfo?.(),
     })
+    this.paramGraph = state.paramGraph
   }
 
   async run(query: QueryParams['query'], txId: QueryParams['txId']) {
@@ -132,9 +137,14 @@ class QueryPipeline {
     allowTransaction: boolean,
   ) {
     let queryPlan: QueryPlanNode
+    const { parameterizedQuery, placeholderValues } = parameterizeQuery(
+      query as JsonQuery,
+      this.paramGraph,
+    )
+
     try {
       queryPlan = withLocalPanicHandler(() =>
-        this.compiler.compile(safeJsonStringify(query)),
+        this.compiler.compile(safeJsonStringify(parameterizedQuery)),
       )
     } catch (error) {
       if (typeof error.message === 'string' && typeof error.code === 'string') {
@@ -146,13 +156,19 @@ class QueryPipeline {
 
     debug('🟢 Query plan: ', util.inspect(queryPlan, false, null, true))
 
-    return this.#executeQueryPlan(queryable, queryPlan, allowTransaction)
+    return this.#executeQueryPlan(
+      queryable,
+      queryPlan,
+      allowTransaction,
+      placeholderValues,
+    )
   }
 
   async #executeQueryPlan(
     queryable: SqlQueryable,
     queryPlan: QueryPlanNode,
     allowTransaction: boolean,
+    scope: Record<string, unknown> = {},
   ) {
     const qiTransactionManager = (
       allowTransaction
@@ -163,7 +179,7 @@ class QueryPipeline {
     return this.interpreter.run(queryPlan, {
       queryable,
       transactionManager: qiTransactionManager,
-      scope: {},
+      scope,
     })
   }
 
@@ -221,9 +237,13 @@ class QueryPipeline {
     canStartNewTransaction: boolean,
   ): Promise<unknown[]> {
     let compiledBatch: BatchResponse
+    const { parameterizedBatch, placeholderValues } = parameterizeBatch(
+      { batch: queries as JsonQuery[] },
+      this.paramGraph,
+    )
     try {
       compiledBatch = withLocalPanicHandler(() =>
-        this.compiler.compileBatch(safeJsonStringify({ batch: queries })),
+        this.compiler.compileBatch(safeJsonStringify(parameterizedBatch)),
       )
     } catch (error) {
       if (typeof error.message === 'string' && typeof error.code === 'string') {
@@ -248,6 +268,7 @@ class QueryPipeline {
               queryable,
               plan,
               canStartNewTransaction,
+              placeholderValues,
             ),
           )
         }
@@ -262,9 +283,16 @@ class QueryPipeline {
           queryable,
           compiledBatch.plan,
           canStartNewTransaction,
+          placeholderValues,
         )
 
-        results.push(...convertCompactedRows(rows as {}[], compiledBatch))
+        results.push(
+          ...convertCompactedRows(
+            rows as {}[],
+            compiledBatch,
+            placeholderValues,
+          ),
+        )
       }
     }
 

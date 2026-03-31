@@ -28,6 +28,9 @@ import {
   startTransaction,
 } from './worker-transaction.js'
 import { setupDefaultPanicHandler } from '../panic.js'
+import { getInternalDMMF } from '@prisma/get-dmmf'
+import { ParamGraph } from '@prisma/param-graph'
+import { buildParamGraph } from '@prisma/param-graph-builder'
 
 const InitializeSchemaMessage = S.struct({
   type: S.literal('initializeSchema'),
@@ -87,6 +90,7 @@ export type State = {
   driverAdapterManager: DriverAdaptersManager
   driverAdapter: SqlDriverAdapter
   transactionManager: TransactionManager
+  paramGraph: ParamGraph
 }
 
 let state: State | undefined
@@ -163,6 +167,15 @@ async function initializeSchema(
   env: Env,
 ): Promise<ConnectionInfo> {
   const { url, schema, migrationScript } = params
+  const dmmf = getInternalDMMF({ datamodel: schema })
+  if ('error' in dmmf) {
+    throw new Error(`Failed to parse schema: ${dmmf.error.message}`)
+  }
+  const paramGraph = ParamGraph.fromData(buildParamGraph(dmmf), (enumName) =>
+    dmmf.datamodel.enums
+      .find((e) => e.name === enumName)
+      ?.values.map((v) => v.name),
+  )
 
   const driverAdapterManager = await setupDriverAdaptersManager(env, {
     url,
@@ -190,6 +203,7 @@ async function initializeSchema(
     driverAdapterManager,
     driverAdapter: adapter,
     transactionManager,
+    paramGraph,
   }
 
   logs.length = 0
