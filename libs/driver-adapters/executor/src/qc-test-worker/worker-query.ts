@@ -28,8 +28,8 @@ import { JsonProtocolQuery, QueryParams } from '../types/jsonRpc.js'
 import { debug } from '../utils.js'
 import type { State } from './worker.js'
 import { parseIsolationLevel } from './worker-transaction.js'
-import { JsonQuery } from '../engines/JsonProtocol.js'
-import { ParamGraph } from '@prisma/param-graph'
+import type { JsonQuery } from '../engines/JsonProtocol.js'
+import type { ParamGraph } from '@prisma/param-graph'
 
 export function query(
   params: QueryParams,
