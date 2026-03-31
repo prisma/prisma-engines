@@ -171,11 +171,14 @@ async function initializeSchema(
   if ('error' in dmmf) {
     throw new Error(`Failed to parse schema: ${dmmf.error.message}`)
   }
-  const paramGraph = ParamGraph.fromData(buildParamGraph(dmmf), (enumName) =>
-    dmmf.datamodel.enums
-      .find((e) => e.name === enumName)
-      ?.values.map((v) => v.name),
-  )
+  const paramGraph = ParamGraph.fromData(buildParamGraph(dmmf), (enumName) => {
+    const mapping = {}
+    const type = dmmf.datamodel.enums.find((e) => e.name === enumName)
+    for (const value of type?.values ?? []) {
+      mapping[value.name] = value.dbName ?? value.name
+    }
+    return mapping
+  })
 
   const driverAdapterManager = await setupDriverAdaptersManager(env, {
     url,
