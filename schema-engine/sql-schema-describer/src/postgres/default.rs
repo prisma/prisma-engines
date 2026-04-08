@@ -309,7 +309,25 @@ fn parse_int_default(parser: &mut Parser<'_>) -> Option<DefaultValue> {
                 parser.expect(Token::OpeningBrace)?;
                 parser.expect(Token::ClosingBrace)?;
                 Some(DefaultValue::unique_rowid())
-            } else if s.eq_ignore_ascii_case("nextval") {
+            } else {
+                let is_nextval = if s.eq_ignore_ascii_case("nextval") {
+                    true
+                } else if let Some(Token::Dot) = parser.peek_token() {
+                    // Accept schema-qualified function calls such as pg_catalog.nextval(...)
+                    parser.expect(Token::Dot)?;
+                    parser
+                        .expect(Token::Identifier)
+                        .is_some_and(|name| {
+                            s.eq_ignore_ascii_case("pg_catalog") && name.eq_ignore_ascii_case("nextval")
+                        })
+                } else {
+                    false
+                };
+
+                if !is_nextval {
+                    return None;
+                }
+
                 parser.expect(Token::OpeningBrace)?;
 
                 // Example: nextval(('"third_Sequence"'::text)::regclass)
@@ -351,8 +369,6 @@ fn parse_int_default(parser: &mut Parser<'_>) -> Option<DefaultValue> {
                 eat_cast(parser)?;
 
                 Some(DefaultValue::sequence(sequence_name))
-            } else {
-                None
             }
         }
         _ => None,
@@ -727,6 +743,15 @@ mod tests {
         };
 
         assert_is_sequence(r#"nextval('first_sequence'::regclass)"#, "first_sequence");
+        assert_is_sequence(r#"pg_catalog.nextval('first_sequence'::regclass)"#, "first_sequence");
+        assert!(
+            get_default_value(
+                r#"public.nextval('first_sequence'::regclass)"#,
+                &ColumnType::pure(ColumnTypeFamily::Int, crate::ColumnArity::Required)
+            )
+            .unwrap()
+            .is_db_generated()
+        );
 
         assert_is_sequence(r#"nextval('schema_name.second_sequence'::regclass)"#, "second_sequence");
 
