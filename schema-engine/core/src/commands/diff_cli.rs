@@ -34,7 +34,6 @@ pub async fn diff_cli(
     let from = json_rpc_diff_target_to_dialect(
         &params.from,
         datasource_urls,
-        params.shadow_database_url.as_deref(),
         namespaces.clone(),
         &filter,
         preview_features,
@@ -44,7 +43,6 @@ pub async fn diff_cli(
     let to = json_rpc_diff_target_to_dialect(
         &params.to,
         datasource_urls,
-        params.shadow_database_url.as_deref(),
         namespaces,
         &filter,
         preview_features,
@@ -55,7 +53,6 @@ pub async fn diff_cli(
     // The `from` connector takes precedence, because if we think of diffs as migrations, `from` is
     // the target where the migration would be applied.
     //
-    // TODO: make sure the shadow_database_url param is _always_ taken into account.
     // TODO: make sure the connectors are the same in from and to.
     let (dialect, from, to) = match (from, to) {
         (Some((connector, from)), Some((_, to))) => (connector, from, to),
@@ -132,21 +129,11 @@ fn namespaces_and_preview_features_from_diff_targets(
 async fn json_rpc_diff_target_to_dialect(
     target: &DiffTarget,
     datasource_urls: &DatasourceUrls,
-    shadow_database_url: Option<&str>, // TODO: delete the parameter
     namespaces: Option<Namespaces>,
     filter: &SchemaFilter,
     preview_features: BitFlags<psl::PreviewFeature>,
     extension_types: &dyn ExtensionTypes,
 ) -> CoreResult<Option<(Box<dyn SchemaDialect>, DatabaseSchema)>> {
-    let datasource_urls = if let Some(shadow_database_url) = shadow_database_url {
-        &DatasourceUrls {
-            url: datasource_urls.url.clone(),
-            shadow_database_url: Some(shadow_database_url.to_owned()),
-        }
-    } else {
-        datasource_urls
-    };
-
     match target {
         DiffTarget::Empty => Ok(None),
         DiffTarget::SchemaDatasource(schemas) => {

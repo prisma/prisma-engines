@@ -66,7 +66,6 @@ fn from_unique_index_to_without(mut api: TestApi) {
                 content: from_schema.to_string(),
             }],
         }),
-        shadow_database_url: None,
         to: DiffTarget::SchemaDatamodel(SchemasContainer {
             files: vec![SchemaContainer {
                 path: to_file.to_string_lossy().into_owned(),
@@ -177,7 +176,6 @@ fn from_unique_index_to_pk(mut api: TestApi) {
                 content: from_schema.to_string(),
             }],
         }),
-        shadow_database_url: None,
         to: DiffTarget::SchemaDatamodel(SchemasContainer {
             files: vec![SchemaContainer {
                 path: to_file.to_string_lossy().into_owned(),
@@ -369,7 +367,6 @@ fn from_empty_to_migrations_directory(mut api: TestApi) {
         from: DiffTarget::Empty,
         to: DiffTarget::Migrations(migrations_list),
         script: true,
-        shadow_database_url: Some(api.connection_string().to_owned()),
         filters: SchemaFilter::default(),
     };
 
@@ -421,7 +418,6 @@ fn from_empty_to_migrations_folder_without_shadow_db_url_must_error(mut api: Tes
         from: DiffTarget::Empty,
         to: DiffTarget::Migrations(migrations_list),
         script: true,
-        shadow_database_url: None, // TODO: ?
         filters: SchemaFilter::default(),
     };
 
@@ -478,7 +474,6 @@ fn from_schema_datamodel_to_url(mut api: TestApi) {
             }],
         }),
         script: true,
-        shadow_database_url: None,
         to: DiffTarget::Url(UrlContainer { url: second_url }),
         filters: SchemaFilter::default(),
     };
@@ -530,7 +525,6 @@ fn from_schema_datasource_relative(api: TestApi) {
             config_dir: schema_path.parent().unwrap().to_string_lossy().into_owned(),
         }),
         script: true,
-        shadow_database_url: None,
         to: DiffTarget::Empty,
         filters: SchemaFilter::default(),
     };
@@ -590,7 +584,6 @@ fn from_schema_datasource_to_url(mut api: TestApi) {
             config_dir: schema_path.parent().unwrap().to_string_lossy().into_owned(),
         }),
         script: true,
-        shadow_database_url: None,
         to: DiffTarget::Url(UrlContainer { url: second_url }),
         filters: SchemaFilter::default(),
     };
@@ -649,7 +642,6 @@ fn with_schema_filters(api: TestApi) {
             config_dir: schema_path.parent().unwrap().to_string_lossy().into_owned(),
         }),
         script: true,
-        shadow_database_url: None,
         to: DiffTarget::Url(UrlContainer { url: second_url }),
         filters: SchemaFilter {
             external_tables: vec!["external_table".to_string()],
@@ -704,7 +696,6 @@ fn with_invalid_schema_filter_sqlite(mut api: TestApi) {
             config_dir: schema_path.parent().unwrap().to_string_lossy().into_owned(),
         }),
         script: true,
-        shadow_database_url: None,
         to: DiffTarget::Url(UrlContainer { url: second_url }),
         filters: SchemaFilter {
             external_tables: vec!["public.external_table".to_string()],
@@ -743,7 +734,6 @@ fn with_invalid_schema_filter_postgres(mut api: TestApi) {
             config_dir: schema_path.parent().unwrap().to_string_lossy().into_owned(),
         }),
         script: true,
-        shadow_database_url: None,
         to: DiffTarget::Url(UrlContainer {
             url: connection_string.to_string(),
         }),
@@ -786,7 +776,6 @@ fn from_url_to_url(mut api: TestApi) {
         exit_code: None,
         from: DiffTarget::Url(UrlContainer { url: first_url }),
         script: true,
-        shadow_database_url: None,
         to: DiffTarget::Url(UrlContainer { url: second_url }),
         filters: SchemaFilter::default(),
     };
@@ -845,7 +834,6 @@ fn diffing_mongo_schemas_to_script_returns_a_nice_error() {
                 content: from.to_string(),
             }],
         }),
-        shadow_database_url: None,
         to: DiffTarget::SchemaDatamodel(SchemasContainer {
             files: vec![SchemaContainer {
                 path: to_file.to_string_lossy().into_owned(),
@@ -879,7 +867,6 @@ fn diff_sqlite_migration_directories() {
         exit_code: None,
         from: DiffTarget::Migrations(migrations_list),
         script: true,
-        shadow_database_url: None,
         to: DiffTarget::Migrations(migrations_list_2),
         filters: SchemaFilter::default(),
     };
@@ -946,7 +933,6 @@ fn from_migrations_to_schema_datamodel_ignores_manual_partial_indexes_without_pr
                 }],
             }),
             script: false,
-            shadow_database_url: Some(api.connection_string().to_owned()),
             filters: SchemaFilter::default(),
         },
     );
@@ -1011,7 +997,6 @@ fn from_schema_datamodel_to_migrations_ignores_manual_partial_indexes_without_pr
             }),
             to: DiffTarget::Migrations(list_migrations(migrations_dir.path()).unwrap()),
             script: false,
-            shadow_database_url: Some(api.connection_string().to_owned()),
             filters: SchemaFilter::default(),
         },
     );
@@ -1084,7 +1069,6 @@ fn from_migrations_to_url_ignores_manual_partial_indexes_with_engine_seeded_sche
                 url: api.connection_string().to_owned(),
             }),
             script: false,
-            shadow_database_url: Some(api.connection_string().to_owned()),
             filters: SchemaFilter::default(),
         },
     );
@@ -1140,7 +1124,6 @@ fn diffing_mongo_schemas_works() {
                 content: from.to_string(),
             }],
         }),
-        shadow_database_url: None,
         to: DiffTarget::SchemaDatamodel(SchemasContainer {
             files: vec![SchemaContainer {
                 path: to_file.to_string_lossy().into_owned(),
@@ -1193,7 +1176,6 @@ fn diff_with_exit_code_and_empty_diff_returns_zero() {
                 }],
             }),
             script: false,
-            shadow_database_url: None,
             filters: SchemaFilter::default(),
         },
     );
@@ -1234,7 +1216,6 @@ fn diff_with_exit_code_and_non_empty_diff_returns_two() {
                 }],
             }),
             script: false,
-            shadow_database_url: None,
             filters: SchemaFilter::default(),
         },
     );
@@ -1262,7 +1243,6 @@ fn diff_with_non_existing_sqlite_database_from_url() {
             exit_code: Some(true),
             from: DiffTarget::Empty,
             script: false,
-            shadow_database_url: None,
             to: DiffTarget::Url(UrlContainer {
                 url: format!("file:{}", tmpdir.path().join("db.sqlite").to_string_lossy()),
             }),
@@ -1298,7 +1278,6 @@ fn diff_with_non_existing_sqlite_database_from_datasource() {
             exit_code: Some(true),
             from: DiffTarget::Empty,
             script: false,
-            shadow_database_url: None,
             to: DiffTarget::SchemaDatasource(SchemasWithConfigDir {
                 files: vec![SchemaContainer {
                     path: schema_path.to_string_lossy().into_owned(),
@@ -1370,7 +1349,6 @@ fn from_multi_file_schema_datasource_to_url(mut api: TestApi) {
             config_dir: base_dir.path().to_string_lossy().into_owned(),
         }),
         script: true,
-        shadow_database_url: None,
         to: DiffTarget::Url(UrlContainer { url: second_url }),
         filters: SchemaFilter::default(),
     };
@@ -1436,7 +1414,6 @@ fn from_multi_file_schema_datamodel_to_url(mut api: TestApi) {
         exit_code: None,
         from: DiffTarget::SchemaDatamodel(SchemasContainer { files: from_files }),
         script: true,
-        shadow_database_url: None,
         to: DiffTarget::Url(UrlContainer { url: second_url }),
         filters: SchemaFilter::default(),
     };
