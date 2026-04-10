@@ -237,7 +237,7 @@ async fn json_rpc_diff_target_to_dialect(
                     Ok(Some((connector.schema_dialect(), schema)))
                 }
                 (Some(_), None) => Err(ConnectorError::from_msg(
-                    "You must pass the `--shadow-database-url` flag or set `datasource.shadowDatabaseUrl` in your `prisma.config.ts` if you want to diff a migrations directory.".to_owned(),
+                    "You must set `datasource.shadowDatabaseUrl` in your `prisma.config.ts` if you want to diff a migrations directory.".to_owned(),
                 )),
                 (None, _) => Err(ConnectorError::from_msg(
                     "Could not determine the connector from the migrations directory (missing migration_lock.toml)."
