@@ -22,5 +22,7 @@ mod postgres_indices;
 mod relations;
 mod unique_negative;
 mod unique_positive;
+mod generated_negative;
+mod generated_positive;
 mod updated_at_negative;
 mod updated_at_positive;

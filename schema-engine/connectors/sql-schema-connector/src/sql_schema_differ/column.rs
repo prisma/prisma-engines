@@ -28,6 +28,19 @@ pub(crate) fn all_changes(
         changes |= ColumnChange::Autoincrement;
     }
 
+    // Detect changes to generation expression "generated-ness" (added or removed).
+    // We intentionally skip comparing expression text when both sides are Some,
+    // because PostgreSQL normalizes expressions on storage (adds type casts,
+    // reformats whitespace), so the schema text and introspected text will never
+    // match. Expression text changes within a generated column require the user
+    // to manually edit the migration SQL.
+    match (cols.previous.generation_expression(), cols.next.generation_expression()) {
+        (Some(_), None) | (None, Some(_)) => {
+            changes |= ColumnChange::GenerationExpression;
+        }
+        _ => {}
+    }
+
     ColumnChanges { type_change, changes }
 }
 
@@ -167,6 +180,7 @@ pub(crate) enum ColumnChange {
     Default,
     TypeChanged,
     Autoincrement,
+    GenerationExpression,
 }
 
 // This should be pub(crate), but SqlMigration is exported, so it has to be
@@ -208,6 +222,10 @@ impl ColumnChanges {
 
     pub(crate) fn arity_changed(&self) -> bool {
         self.changes.contains(ColumnChange::Arity)
+    }
+
+    pub(crate) fn generation_expression_changed(&self) -> bool {
+        self.changes.contains(ColumnChange::GenerationExpression)
     }
 
     pub(crate) fn default_changed(&self) -> bool {

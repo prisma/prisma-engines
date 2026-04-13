@@ -328,6 +328,9 @@ pub(crate) struct ScalarField {
     pub(crate) r#type: ScalarFieldType,
     pub(crate) is_ignored: bool,
     pub(crate) is_updated_at: bool,
+    pub(crate) is_generated_column: bool,
+    /// The SQL expression for a generated (computed) column, e.g. "CASE status WHEN 'A' THEN 1 END"
+    pub(crate) generation_expression: Option<String>,
     pub(crate) default: Option<DefaultAttribute>,
     /// @map
     pub(crate) mapped_name: Option<StringId>,
@@ -759,6 +762,8 @@ fn visit_model<'db>(model_id: crate::ModelId, ast_model: &'db ast::Model, ctx: &
                     r#type: scalar_field_type,
                     is_ignored: false,
                     is_updated_at: false,
+                    is_generated_column: false,
+                    generation_expression: None,
                     default: None,
                     mapped_name: None,
                     native_type: None,

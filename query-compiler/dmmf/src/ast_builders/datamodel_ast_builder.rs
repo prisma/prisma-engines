@@ -188,7 +188,7 @@ fn scalar_field_to_dmmf(field: walkers::ScalarFieldWalker<'_>) -> Field {
         is_required: matches!(ast_field.arity, FieldArity::Required | FieldArity::List),
         is_unique: !is_id && field.is_unique() && !field.is_partial_unique(),
         is_id,
-        is_read_only: field.model().relation_fields().any(|rf| {
+        is_read_only: field.is_generated_column() || field.model().relation_fields().any(|rf| {
             rf.referencing_fields()
                 .into_iter()
                 .flatten()
@@ -212,7 +212,7 @@ fn scalar_field_to_dmmf(field: walkers::ScalarFieldWalker<'_>) -> Field {
         relation_to_fields: None,
         relation_on_delete: None,
         relation_on_update: None,
-        is_generated: Some(false),
+        is_generated: Some(field.is_generated_column()),
         is_updated_at: Some(field.is_updated_at()),
         documentation: ast_field.documentation().map(ToOwned::to_owned),
     }

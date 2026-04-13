@@ -53,6 +53,7 @@ pub(crate) trait ScalarFieldAssert {
     fn assert_default_value(&self) -> walkers::DefaultValueWalker<'_>;
     fn assert_mapped_name(&self, name: &str) -> &Self;
     fn assert_is_updated_at(&self) -> &Self;
+    fn assert_is_generated_column(&self) -> &Self;
 
     fn assert_native_type<T>(&self, connector: &dyn Connector, typ: &T) -> &Self
     where
@@ -365,6 +366,12 @@ impl ScalarFieldAssert for walkers::ScalarFieldWalker<'_> {
     #[track_caller]
     fn assert_is_updated_at(&self) -> &Self {
         assert!(self.is_updated_at());
+        self
+    }
+
+    #[track_caller]
+    fn assert_is_generated_column(&self) -> &Self {
+        assert!(self.is_generated_column());
         self
     }
 }

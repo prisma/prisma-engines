@@ -104,6 +104,7 @@ pub enum Circumstances {
     Cockroach,
     CockroachWithPostgresNativeTypes, // TODO: this is a temporary workaround
     CanPartitionTables,
+    SupportsGeneratedColumns,
 }
 
 pub struct SqlSchemaDescriber<'a> {
@@ -784,6 +785,14 @@ impl<'a> SqlSchemaDescriber<'a> {
             ""
         };
 
+        // att.attgenerated exists only on PostgreSQL 12+. On older versions,
+        // select an empty string constant to avoid a parse error.
+        let attgenerated_clause = if self.circumstances.contains(Circumstances::SupportsGeneratedColumns) {
+            "att.attgenerated::text AS attgenerated"
+        } else {
+            "''::text AS attgenerated"
+        };
+
         let sql = format!(
             r#"
             SELECT
@@ -802,7 +811,8 @@ impl<'a> SqlSchemaDescriber<'a> {
                 info.is_nullable,
                 info.is_identity,
                 info.character_maximum_length,
-                col_description(att.attrelid, ordinal_position) AS description
+                col_description(att.attrelid, ordinal_position) AS description,
+                {attgenerated_clause}
             FROM information_schema.columns info
             JOIN pg_attribute att ON att.attname = info.column_name
             JOIN (
@@ -861,6 +871,10 @@ impl<'a> SqlSchemaDescriber<'a> {
 
             let description = col.get_string("description");
 
+            // attgenerated = 's' means a stored generated column. Cast to text in the SQL
+            // query because pg's "char" type is not mapped to string by quaint.
+            let is_generated_stored = col.get_string("attgenerated").as_deref() == Some("s");
+
             let auto_increment = is_identity
                 || matches!(default.as_ref().map(|d| &d.kind), Some(DefaultKind::Sequence(_)))
                 || (self.is_cockroach()
@@ -868,6 +882,19 @@ impl<'a> SqlSchemaDescriber<'a> {
                         default.as_ref().map(|d| &d.kind),
                         Some(DefaultKind::DbGenerated(Some(s))) if s == "unique_rowid()"
                     ));
+
+            // For generated columns, the raw default from pg_get_expr contains the
+            // generation expression. Extract it and skip storing it as a default.
+            let generation_expression = if is_generated_stored {
+                col.get("column_default")
+                    .and_then(|v| v.to_string())
+            } else {
+                None
+            };
+
+            // For generated columns, push None instead of the default to keep
+            // the vector aligned with column IDs (they are indexed positionally).
+            let default = if is_generated_stored { None } else { default };
 
             match container_id {
                 Either::Left(table_id) => {
@@ -883,6 +910,7 @@ impl<'a> SqlSchemaDescriber<'a> {
                 tpe,
                 auto_increment,
                 description,
+                generation_expression,
             };
 
             match container_id {

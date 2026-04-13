@@ -115,6 +115,16 @@ impl<'db> ScalarFieldWalker<'db> {
         self.attributes().is_updated_at
     }
 
+    /// Is this a generated (computed) column?
+    pub fn is_generated_column(self) -> bool {
+        self.attributes().is_generated_column
+    }
+
+    /// The SQL expression for a generated column, if any.
+    pub fn generation_expression(self) -> Option<&'db str> {
+        self.attributes().generation_expression.as_deref()
+    }
+
     fn attributes(self) -> &'db ScalarField {
         &self.db.types[self.id]
     }

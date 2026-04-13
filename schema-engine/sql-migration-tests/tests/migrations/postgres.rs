@@ -1114,3 +1114,105 @@ fn postgres_create_index_concurrently_works(api: TestApi) {
         .send_sync()
         .assert_applied_migrations(&["01init"]);
 }
+
+#[test_connector(tags(Postgres), preview_features("generatedColumns"))]
+fn add_generated_column_to_existing_table(api: TestApi) {
+    let dm1 = r#"
+        model Session {
+            id     Int    @id @default(autoincrement())
+            status String
+        }
+    "#;
+
+    api.schema_push_w_datasource(dm1).send().assert_green();
+
+    let dm2 = r#"
+        model Session {
+            id             Int    @id @default(autoincrement())
+            status         String
+            statusPriority Int?   @generated("CASE status WHEN 'A' THEN 1 WHEN 'B' THEN 2 END")
+        }
+    "#;
+
+    api.schema_push_w_datasource(dm2).send().assert_green();
+
+    // Verify idempotency
+    api.schema_push_w_datasource(dm2).send().assert_green().assert_no_steps();
+}
+
+#[test_connector(tags(Postgres), preview_features("generatedColumns"))]
+fn remove_generated_column(api: TestApi) {
+    let dm1 = r#"
+        model Session {
+            id             Int    @id @default(autoincrement())
+            status         String
+            statusPriority Int?   @generated("CASE status WHEN 'A' THEN 1 END")
+        }
+    "#;
+
+    api.schema_push_w_datasource(dm1).send().assert_green();
+
+    let dm2 = r#"
+        model Session {
+            id     Int    @id @default(autoincrement())
+            status String
+        }
+    "#;
+
+    api.schema_push_w_datasource(dm2).send().assert_green();
+
+    // Verify idempotency
+    api.schema_push_w_datasource(dm2).send().assert_green().assert_no_steps();
+}
+
+#[test_connector(tags(Postgres), preview_features("generatedColumns"))]
+fn change_regular_column_to_generated(api: TestApi) {
+    let dm1 = r#"
+        model Session {
+            id       Int    @id @default(autoincrement())
+            status   String
+            priority Int?
+        }
+    "#;
+
+    api.schema_push_w_datasource(dm1).send().assert_green();
+
+    let dm2 = r#"
+        model Session {
+            id       Int    @id @default(autoincrement())
+            status   String
+            priority Int?   @generated("CASE status WHEN 'A' THEN 1 END")
+        }
+    "#;
+
+    api.schema_push_w_datasource(dm2).send().assert_green();
+
+    // Verify idempotency
+    api.schema_push_w_datasource(dm2).send().assert_green().assert_no_steps();
+}
+
+#[test_connector(tags(Postgres), preview_features("generatedColumns"))]
+fn change_generated_column_to_regular(api: TestApi) {
+    let dm1 = r#"
+        model Session {
+            id       Int    @id @default(autoincrement())
+            status   String
+            priority Int?   @generated("CASE status WHEN 'A' THEN 1 END")
+        }
+    "#;
+
+    api.schema_push_w_datasource(dm1).send().assert_green();
+
+    let dm2 = r#"
+        model Session {
+            id       Int    @id @default(autoincrement())
+            status   String
+            priority Int?
+        }
+    "#;
+
+    api.schema_push_w_datasource(dm2).send().assert_green();
+
+    // Verify idempotency
+    api.schema_push_w_datasource(dm2).send().assert_green().assert_no_steps();
+}

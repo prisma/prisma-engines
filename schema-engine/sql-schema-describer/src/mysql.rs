@@ -503,6 +503,7 @@ impl<'a> SqlSchemaDescriber<'a> {
                 tpe,
                 auto_increment,
                 description,
+                generation_expression: None,
             };
 
             match container_id {

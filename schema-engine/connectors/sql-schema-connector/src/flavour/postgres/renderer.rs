@@ -38,6 +38,14 @@ impl PostgresRenderer {
         let column_name = Quoted::postgres_ident(column.name());
         let tpe_str = render_column_type(column, self);
         let nullability_str = render_nullability(column);
+
+        // Generated (computed) columns use GENERATED ALWAYS AS instead of DEFAULT.
+        if let Some(expr) = column.generation_expression() {
+            return format!(
+                "{SQL_INDENTATION}{column_name} {tpe_str}{nullability_str} GENERATED ALWAYS AS ({expr}) STORED",
+            );
+        }
+
         let default_str = column
             .default()
             .map(|d| render_default(d.inner(), &render_column_type(column, self)))
@@ -811,6 +819,13 @@ fn expand_alter_column(
                     // The sequence should be created.
                     changes.push(PostgresAlterColumn::AddSequence)
                 }
+            }
+            ColumnChange::GenerationExpression => {
+                // Generation expression changes are handled via DropAndRecreateColumn
+                // (DROP COLUMN + ADD COLUMN) because ALTER COLUMN SET EXPRESSION is only
+                // available in PostgreSQL 17+. Prisma supports PG 12+, so we use the
+                // compatible path. This arm should not be reached in practice.
+                unreachable!("GenerationExpression changes are handled via DropAndRecreateColumn")
             }
         }
     }

@@ -46,6 +46,11 @@ impl<'a> ScalarFieldPair<'a> {
         self.previous.map(|f| f.is_ignored()).unwrap_or(false)
     }
 
+    /// The generation expression for a computed column, if any.
+    pub fn generation_expression(self) -> Option<&'a str> {
+        self.next.generation_expression()
+    }
+
     /// True if we took the name from the PSL.
     pub(crate) fn remapped_name_from_psl(&self) -> bool {
         self.previous.and_then(|p| p.mapped_name()).is_some()
