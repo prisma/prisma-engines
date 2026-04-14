@@ -63,7 +63,7 @@ pub enum OnConflict<'a> {
     ///
     /// let expected_sql = indoc!(
     ///     "
-    ///     MERGE INTO [users]
+    ///     MERGE INTO [users] WITH (HOLDLOCK)
     ///     USING (SELECT @P1 AS [id]) AS [dual] ([id])
     ///     ON [dual].[id] = [users].[id]
     ///     WHEN NOT MATCHED THEN
@@ -88,7 +88,7 @@ pub enum OnConflict<'a> {
     /// [`DefaultValue::Generated`]: enum.DefaultValue.html#variant.Generated
     /// [column has a default value]: struct.Column.html#method.default
     DoNothing,
-    /// ON CONFLICT UPDATE is supported for Sqlite and Postgres
+    /// ON CONFLICT UPDATE is supported for Sqlite, Postgres, and MSSQL (via MERGE)
     Update(Update<'a>, Vec<Column<'a>>),
 }
 
