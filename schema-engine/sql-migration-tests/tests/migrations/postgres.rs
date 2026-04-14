@@ -1120,14 +1120,14 @@ fn postgres_create_migration_works_with_multiple_create_index_concurrently_state
     let migrations_directory = api.create_migrations_directory();
     let dm = "";
     let migration = r#"
-        CREATE TABLE "Cat" (
-            id INTEGER PRIMARY KEY,
-            name TEXT NOT NULL,
-            age INTEGER NOT NULL
+        CREATE TABLE "Person" (
+            id TEXT PRIMARY KEY,
+            "firstName" TEXT NOT NULL,
+            "lastName" TEXT NOT NULL
         );
 
-        CREATE INDEX CONCURRENTLY "Cat_name_idx" ON "Cat"(name);
-        CREATE INDEX CONCURRENTLY "Cat_age_idx" ON "Cat"(age);
+        CREATE INDEX CONCURRENTLY "Person_firstName_idx" ON "Person"("firstName");
+        CREATE INDEX CONCURRENTLY "Person_lastName_idx" ON "Person"("lastName");
     "#;
 
     api.create_migration("01init", dm, &migrations_directory)
@@ -1140,25 +1140,27 @@ fn postgres_create_migration_works_with_multiple_create_index_concurrently_state
 
     let dm2 = api.datamodel_with_provider(
         r#"
-        model Cat {
-            id    Int    @id
-            name  String
-            age   Int
-            breed String?
+        model Person {
+            id String @id
+            firstName String
+            lastName String
+            role String?
 
-            @@index([name])
-            @@index([age])
+            @@index([firstName])
+            @@index([lastName])
         }
     "#,
     );
 
-    api.create_migration("02add_breed", &dm2, &migrations_directory)
+    let added_type = if api.is_cockroach() { "STRING" } else { "TEXT" };
+
+    api.create_migration("02add_role", &dm2, &migrations_directory)
         .send_sync()
-        .assert_migration("02add_breed", |migration| {
-            migration.assert_contents(
+        .assert_migration("02add_role", |migration| {
+            migration.assert_contents(&format!(
                 r#"-- AlterTable
-ALTER TABLE "Cat" ADD COLUMN     "breed" TEXT;
-"#,
-            )
+ALTER TABLE "Person" ADD COLUMN     "role" {added_type};
+"#
+            ))
         });
 }
