@@ -703,9 +703,8 @@ async fn sql_schema_from_migrations_and_db(
             migration.migration_name()
         );
 
-        conn.raw_cmd(&script)
+        conn.apply_migration_script(migration.migration_name(), &script)
             .await
-            .map_err(imp::quaint_error_mapper(params))
             .map_err(|connector_error| {
                 connector_error.into_migration_does_not_apply_cleanly(migration.migration_name().to_owned())
             })?;

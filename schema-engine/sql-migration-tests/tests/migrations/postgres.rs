@@ -1114,3 +1114,51 @@ fn postgres_create_index_concurrently_works(api: TestApi) {
         .send_sync()
         .assert_applied_migrations(&["01init"]);
 }
+
+#[test_connector(tags(Postgres))]
+fn postgres_create_migration_works_with_multiple_create_index_concurrently_statements(api: TestApi) {
+    let migrations_directory = api.create_migrations_directory();
+    let dm = "";
+    let migration = r#"
+        CREATE TABLE "Cat" (
+            id INTEGER PRIMARY KEY,
+            name TEXT NOT NULL,
+            age INTEGER NOT NULL
+        );
+
+        CREATE INDEX CONCURRENTLY "Cat_name_idx" ON "Cat"(name);
+        CREATE INDEX CONCURRENTLY "Cat_age_idx" ON "Cat"(age);
+    "#;
+
+    api.create_migration("01init", dm, &migrations_directory)
+        .draft(true)
+        .send_sync()
+        .modify_migration(|contents| {
+            contents.clear();
+            contents.push_str(migration);
+        });
+
+    let dm2 = api.datamodel_with_provider(
+        r#"
+        model Cat {
+            id    Int    @id
+            name  String
+            age   Int
+            breed String?
+
+            @@index([name])
+            @@index([age])
+        }
+    "#,
+    );
+
+    api.create_migration("02add_breed", &dm2, &migrations_directory)
+        .send_sync()
+        .assert_migration("02add_breed", |migration| {
+            migration.assert_contents(
+                r#"-- AlterTable
+ALTER TABLE "Cat" ADD COLUMN     "breed" TEXT;
+"#,
+            )
+        });
+}
