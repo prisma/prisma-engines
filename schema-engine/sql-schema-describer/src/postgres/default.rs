@@ -315,11 +315,9 @@ fn parse_int_default(parser: &mut Parser<'_>) -> Option<DefaultValue> {
                 } else if let Some(Token::Dot) = parser.peek_token() {
                     // Accept schema-qualified function calls such as pg_catalog.nextval(...)
                     parser.expect(Token::Dot)?;
-                    parser
-                        .expect(Token::Identifier)
-                        .is_some_and(|name| {
-                            s.eq_ignore_ascii_case("pg_catalog") && name.eq_ignore_ascii_case("nextval")
-                        })
+                    parser.expect(Token::Identifier).is_some_and(|name| {
+                        s.eq_ignore_ascii_case("pg_catalog") && name.eq_ignore_ascii_case("nextval")
+                    })
                 } else {
                     false
                 };
