@@ -14,6 +14,8 @@ mod mysql;
 mod postgres;
 #[cfg(feature = "sqlite")]
 mod sqlite;
+#[cfg(feature = "surrealdb")]
+mod surrealdb;
 
 // Generic query writer, used for all SQL flavors
 mod query_writer;
@@ -26,6 +28,8 @@ pub use self::mysql::Mysql;
 pub use self::postgres::Postgres;
 #[cfg(feature = "sqlite")]
 pub use self::sqlite::Sqlite;
+#[cfg(feature = "surrealdb")]
+pub use self::surrealdb::SurrealDb;
 
 use crate::ast::*;
 use query_template::QueryTemplate;

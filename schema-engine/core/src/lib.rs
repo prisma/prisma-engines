@@ -169,6 +169,9 @@ fn connector_for_provider(
             Flavour::Mysql => Ok(Box::new(SqlSchemaConnector::new_mysql(params)?)),
             Flavour::Postgres => Ok(Box::new(SqlSchemaConnector::new_postgres(params)?)),
             Flavour::Sqlite => Ok(Box::new(SqlSchemaConnector::new_sqlite(params)?)),
+            Flavour::SurrealDb => Err(CoreError::from_msg(
+                "SurrealDB requires an external adapter. Use the driver adapter pattern instead of native connections.".to_owned(),
+            )),
         }
     } else {
         Err(CoreError::from_msg(format!(
