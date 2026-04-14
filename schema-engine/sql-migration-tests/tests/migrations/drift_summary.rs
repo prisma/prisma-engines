@@ -20,7 +20,6 @@ fn check(provider: &str, from: &str, to: &str, expectation: Expect) {
             }],
         }),
         script: false,
-        shadow_database_url: None,
         to: schema_core::json_rpc::types::DiffTarget::SchemaDatamodel(SchemasContainer {
             files: vec![SchemaContainer {
                 path: to_schema.to_str().unwrap().to_owned(),

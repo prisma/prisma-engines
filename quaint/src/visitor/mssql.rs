@@ -275,36 +275,38 @@ impl<'a> Visitor<'a> for Mssql<'a> {
         Ok(())
     }
 
-    fn visit_parameterized_text(
-        &mut self,
-        txt: Option<Cow<'a, str>>,
-        nt: Option<NativeColumnType<'a>>,
-    ) -> visitor::Result {
-        match nt {
-            Some(nt) => match (nt.name.as_ref(), nt.length) {
-                // Tiberius encodes strings as NVARCHAR by default. This causes implicit coercions which avoids using indexes.
-                // This cast ensures that VARCHAR instead.
-                ("VARCHAR", length) => self.surround_with("CAST(", ")", |this| {
-                    this.visit_text(txt, Some(nt))?;
-                    this.write(" AS VARCHAR")?;
+    /// A visit to a value we parameterize
+    fn visit_parameterized(&mut self, value: Value<'a>) -> visitor::Result {
+        match value
+            .native_column_type
+            .as_ref()
+            .map(|nt| (nt.name.as_ref(), nt.length))
+        {
+            // Tiberius encodes strings as NVARCHAR by default. This causes implicit coercions which avoids using indexes.
+            // This cast ensures that VARCHAR instead.
+            Some(("VARCHAR", length)) => self.surround_with("CAST(", ")", |this| {
+                this.add_parameter(value);
+                this.parameter_substitution()?;
+                this.write(" AS VARCHAR")?;
 
-                    match length {
-                        Some(TypeDataLength::Constant(length)) => {
-                            this.write("(")?;
-                            this.write(length)?;
-                            this.write(")")?;
-                        }
-                        Some(TypeDataLength::Maximum) => {
-                            this.write("(MAX)")?;
-                        }
-                        None => (),
+                match length {
+                    Some(TypeDataLength::Constant(length)) => {
+                        this.write("(")?;
+                        this.write(length)?;
+                        this.write(")")?;
                     }
+                    Some(TypeDataLength::Maximum) => {
+                        this.write("(MAX)")?;
+                    }
+                    None => (),
+                }
 
-                    Ok(())
-                }),
-                _ => self.visit_text(txt, Some(nt)),
-            },
-            nt => self.visit_text(txt, nt),
+                Ok(())
+            }),
+            _ => {
+                self.add_parameter(value);
+                self.parameter_substitution()
+            }
         }
     }
 
