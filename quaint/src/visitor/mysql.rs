@@ -678,6 +678,12 @@ impl<'a> Visitor<'a> for Mysql<'a> {
         Ok(())
     }
 
+    #[cfg(feature = "mysql")]
+    fn visit_stringify(&mut self, stringify: Stringify<'a>) -> visitor::Result {
+        self.write("CAST")?;
+        self.surround_with("(", " AS CHAR)", |s| s.visit_expression(*stringify.expression))
+    }
+
     fn visit_ordering(&mut self, ordering: Ordering<'a>) -> visitor::Result {
         let len = ordering.0.len();
 

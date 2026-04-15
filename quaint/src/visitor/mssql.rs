@@ -1,6 +1,6 @@
 use super::{NativeColumnType, Visitor};
 use crate::ast::Update;
-use crate::prelude::{JsonArrayAgg, JsonBuildObject, JsonExtract, JsonType, JsonUnquote};
+use crate::prelude::{JsonArrayAgg, JsonBuildObject, JsonExtract, JsonType, JsonUnquote, Stringify};
 use crate::visitor::query_writer::QueryWriter;
 use crate::{
     Value, ValueType,
@@ -824,6 +824,10 @@ impl<'a> Visitor<'a> for Mssql<'a> {
 
     fn visit_json_build_object(&mut self, _build_obj: JsonBuildObject<'a>) -> visitor::Result {
         unimplemented!("JSON_BUILD_OBJECT is not yet supported on MSSQL")
+    }
+
+    fn visit_stringify(&mut self, _stringify: Stringify<'a>) -> visitor::Result {
+        unimplemented!("string conversion is not yet supported on MSSQL")
     }
 
     fn visit_text_search(&mut self, _text_search: crate::prelude::TextSearch<'a>) -> visitor::Result {

@@ -14,6 +14,7 @@ mod minimum;
 mod row_number;
 mod row_to_json;
 mod search;
+mod stringify;
 mod sum;
 mod upper;
 
@@ -35,6 +36,7 @@ pub use minimum::*;
 pub use row_number::*;
 pub use row_to_json::*;
 pub use search::*;
+pub use stringify::*;
 pub use sum::*;
 pub use upper::*;
 
@@ -91,6 +93,7 @@ pub(crate) enum FunctionType<'a> {
     UuidToBin,
     UuidToBinSwapped,
     Uuid,
+    Stringify(Stringify<'a>),
 }
 
 impl<'a> FunctionType<'a> {
@@ -112,6 +115,7 @@ impl<'a> FunctionType<'a> {
             Self::JsonArrayAgg(f) => slice::from_ref(&f.expr),
             Self::TextSearch(f) => &f.exprs,
             Self::TextSearchRelevance(f) => &f.exprs,
+            Self::Stringify(f) => slice::from_ref(&f.expression),
             Self::RowToJson(_)
             | Self::RowNumber(_)
             | Self::Average(_)
@@ -151,7 +155,8 @@ impl<'a> FunctionType<'a> {
             | Self::TextSearchRelevance(_)
             | Self::UuidToBin
             | Self::UuidToBinSwapped
-            | Self::Uuid => return None,
+            | Self::Uuid
+            | Self::Stringify(_) => return None,
         };
         Some(name)
     }
@@ -186,6 +191,8 @@ function!(TextSearchRelevance);
 function!(JsonArrayAgg);
 
 function!(JsonBuildObject);
+
+function!(Stringify);
 
 function!(
     RowNumber,
