@@ -186,10 +186,13 @@ pub(crate) trait JoinSelectBuilder {
             inner.with_columns(selection.into())
         } else {
             // select ordering, distinct, filtering & join fields from child selections to order,
-            // filter & join them on the outer query
+            // filter & join them on the outer query; include linking_fields so that correlated
+            // subqueries built by with_ordering (e.g. for OrderBy::ToManyField) can reference
+            // the parent FK/link columns via inner_alias
             let inner_selection: Vec<Column<'_>> = FieldSelection::union(vec![
                 order_by_selection(rs),
                 distinct_selection(rs),
+                linking_fields,
                 filtering_selection(rs),
                 relation_selection(rs),
             ])
@@ -588,6 +591,10 @@ fn order_by_selection(rs: &RelationSelection) -> FieldSelection {
             // Select the linking fields of the first hop so that the outer select can perform a join to traverse the relation.
             // This is necessary because the order by is done on a different join. The following hops are handled by the order by builder.
             OrderBy::ToManyAggregation(x) => first_hop_linking_fields(x.intermediary_hops()),
+            // For to-many field ordering, project the parent's linking fields (e.g. the PK
+            // referenced by the correlated subquery's WHERE clause) into the inner layer so
+            // that with_ordering can reference them via inner_alias.
+            OrderBy::ToManyField(x) => first_hop_linking_fields(&x.path),
             OrderBy::ScalarAggregation(x) => vec![x.field.clone()],
         })
         .collect();

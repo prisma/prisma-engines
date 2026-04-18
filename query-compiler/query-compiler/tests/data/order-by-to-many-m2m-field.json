@@ -1,0 +1,16 @@
+{
+  "modelName": "Post",
+  "action": "findMany",
+  "query": {
+    "arguments": {
+      "orderBy": {
+        "categories": {
+          "name": "desc"
+        }
+      }
+    },
+    "selection": {
+      "$scalars": true
+    }
+  }
+}

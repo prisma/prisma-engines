@@ -25,8 +25,8 @@ process {
           COALESCE(JSONB_AGG("__prisma_data__"), '[]') AS "__prisma_data__" FROM
           (SELECT "t3"."__prisma_data__" FROM (SELECT JSONB_BUILD_OBJECT('id',
           "t2"."id", 'title', "t2"."title") AS "__prisma_data__", "t2"."id",
-          "t2"."title" FROM (SELECT "t1".* FROM "public"."Post" AS "t1" WHERE
-          "t0"."id" = "t1"."userId" /* root select */) AS "t2" /* inner select
-          */) AS "t3" ORDER BY "t3"."id" ASC /* middle select */) AS "t4" /*
-          outer select */) AS "User_posts" ON true»
+          "t2"."title", "t2"."userId" FROM (SELECT "t1".* FROM "public"."Post"
+          AS "t1" WHERE "t0"."id" = "t1"."userId" /* root select */) AS "t2" /*
+          inner select */) AS "t3" ORDER BY "t3"."id" ASC /* middle select */)
+          AS "t4" /* outer select */) AS "User_posts" ON true»
    params [])

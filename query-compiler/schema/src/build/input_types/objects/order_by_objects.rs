@@ -115,7 +115,7 @@ fn orderby_field_mapper<'a>(
         // To-many relation field.
         ModelField::Relation(rf) if rf.is_list() && options.include_relations => {
             let related_model = rf.related_model();
-            let to_many_aggregate_type = order_by_to_many_aggregate_object_type(&related_model.into());
+            let to_many_aggregate_type = order_by_to_many_aggregate_object_type(&related_model.into(), ctx);
 
             Some(simple_input_field(rf.name().to_owned(), InputType::object(to_many_aggregate_type), None).optional())
         }
@@ -141,7 +141,7 @@ fn orderby_field_mapper<'a>(
 
         // Composite field.
         ModelField::Composite(cf) if cf.is_list() => {
-            let to_many_aggregate_type = order_by_to_many_aggregate_object_type(&(cf.typ()).into());
+            let to_many_aggregate_type = order_by_to_many_aggregate_object_type(&(cf.typ()).into(), ctx);
             Some(simple_input_field(cf.name().to_owned(), InputType::object(to_many_aggregate_type), None).optional())
         }
 
@@ -216,14 +216,44 @@ fn order_by_object_type_aggregate<'a>(
     input_object
 }
 
-fn order_by_to_many_aggregate_object_type<'a>(container: &ParentContainer) -> InputObjectType<'a> {
-    let ident = Identifier::new_prisma(IdentifierType::OrderByToManyAggregateInput(container.clone()));
+fn order_by_to_many_aggregate_object_type<'a>(container: &ParentContainer, ctx: &'a QuerySchema) -> InputObjectType<'a> {
+    // For model relations we expose both _count and individual scalar fields under a
+    // dedicated identifier so that aggregate-only consumers (composite types) continue
+    // to receive the pure-aggregate OrderByToManyAggregateInput type.
+    let ident = match container {
+        ParentContainer::Model(_) => {
+            Identifier::new_prisma(IdentifierType::OrderByToManyScalarFieldsInput(container.clone()))
+        }
+        _ => Identifier::new_prisma(IdentifierType::OrderByToManyAggregateInput(container.clone())),
+    };
     let mut input_object = init_input_object_type(ident);
     input_object.set_container(container.clone());
     input_object.require_exactly_one_field();
-    input_object.set_fields(|| {
+
+    let container = container.clone();
+    input_object.set_fields(move || {
         let sort_order_enum = InputType::Enum(sort_order_enum());
-        vec![simple_input_field(aggregations::UNDERSCORE_COUNT, sort_order_enum, None).optional()]
+        let mut fields = vec![simple_input_field(aggregations::UNDERSCORE_COUNT, sort_order_enum.clone(), None).optional()];
+
+        // For model relations (not composite types), expose individual scalar fields so callers can
+        // order by a specific field value rather than just a count. Each field uses a correlated
+        // subquery (LIMIT 1) at query compile time.
+        if let ParentContainer::Model(_) = &container {
+            for field in container.fields() {
+                if let ModelField::Scalar(sf) = &field {
+                    let mut types = vec![sort_order_enum.clone()];
+                    // The correlated subquery can always return NULL (when the parent has no
+                    // related records), so we always expose SortOrderInput (nulls ordering)
+                    // irrespective of whether the field itself is nullable.
+                    if ctx.has_capability(ConnectorCapability::OrderByNullsFirstLast) && !sf.is_list() {
+                        types.push(InputType::object(sort_nulls_object_type()));
+                    }
+                    fields.push(input_field(sf.name().to_owned(), types, None).optional());
+                }
+            }
+        }
+
+        fields
     });
     input_object
 }

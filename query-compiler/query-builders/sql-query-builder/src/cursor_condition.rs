@@ -442,6 +442,7 @@ fn order_definitions(
             OrderBy::ScalarAggregation(order_by) => cursor_order_def_aggregation_scalar(order_by, order_by_def),
             OrderBy::ToManyAggregation(order_by) => cursor_order_def_aggregation_rel(order_by, order_by_def),
             OrderBy::Relevance(order_by) => cursor_order_def_relevance(order_by, order_by_def),
+            OrderBy::ToManyField(order_by) => cursor_order_def_to_many_field(order_by, order_by_def),
         })
         .collect_vec()
 }
@@ -512,6 +513,26 @@ fn cursor_order_def_relevance(order_by: &OrderByRelevance, order_by_def: &OrderB
         order_column: order_column.clone(),
         order_fks: None,
         on_nullable_fields: false,
+    }
+}
+
+/// Build a CursorOrderDefinition for ordering by a scalar field on a to-many relation.
+/// The subquery expression may return NULL when no related records exist, so cursors treat
+/// this as a nullable ordering.
+fn cursor_order_def_to_many_field(
+    order_by: &OrderByToManyField,
+    order_by_def: &OrderByDefinition,
+) -> CursorOrderDefinition {
+    // The OrderByDefinition.joins for ToManyField only covers intermediary hops, not the
+    // final to-many hop itself, so calling foreign_keys_from_order_path would produce
+    // length mismatches and cause panics or incorrect alias references. The correlated
+    // subquery built in ordering.rs handles nullability, so we simply mark this as
+    // nullable with no extra FK predicates.
+    CursorOrderDefinition {
+        sort_order: order_by.sort_order,
+        order_column: order_by_def.order_column.clone(),
+        order_fks: None,
+        on_nullable_fields: true,
     }
 }
 

@@ -34,6 +34,11 @@ pub enum IdentifierType {
     OrderByRelevanceFieldEnum(ParentContainer),
     OrderByRelevanceInput(ParentContainer),
     OrderByToManyAggregateInput(ParentContainer),
+    /// Used for the combined orderBy input on to-many model relations, which exposes both
+    /// the aggregate `_count` field and individual scalar fields (ordered by correlated
+    /// subquery). Kept separate from `OrderByToManyAggregateInput` so aggregate-only
+    /// consumers (e.g. composite types) keep the original pure-aggregate type.
+    OrderByToManyScalarFieldsInput(ParentContainer),
     RelationCreateInput(RelationField, RelationField, bool),
     RelationLoadStrategy,
     RelationUpdateInput(RelationField, RelationField, bool),
@@ -87,6 +92,9 @@ impl std::fmt::Display for IdentifierType {
                 };
 
                 write!(f, "{}OrderBy{}AggregateInput", container.name(), container_type)
+            }
+            IdentifierType::OrderByToManyScalarFieldsInput(container) => {
+                write!(f, "{}OrderByRelationInput", container.name())
             }
             IdentifierType::OrderByRelevanceInput(container) => {
                 write!(f, "{}OrderByRelevanceInput", container.name())

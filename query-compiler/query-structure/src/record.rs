@@ -79,6 +79,15 @@ impl ManyRecords {
                 }
                 OrderBy::ScalarAggregation(_) => unimplemented!(),
                 OrderBy::ToManyAggregation(_) => unimplemented!(),
+                // ToManyField ordering is always resolved by a correlated subquery in the
+                // database layer. In-memory sorting on this variant is not supported because
+                // the subquery result is not materialized in `ManyRecords`. Reaching this
+                // branch indicates that the query planner incorrectly routed a to-many field
+                // orderBy to in-memory processing.
+                OrderBy::ToManyField(_) => panic!(
+                    "OrderBy::ToManyField cannot be applied in-memory: \
+                     to-many field ordering must be resolved by the database via a correlated subquery"
+                ),
                 OrderBy::Relevance(_) => unimplemented!(),
             });
 
