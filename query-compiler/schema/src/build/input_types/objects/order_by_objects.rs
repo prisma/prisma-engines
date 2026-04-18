@@ -115,7 +115,7 @@ fn orderby_field_mapper<'a>(
         // To-many relation field.
         ModelField::Relation(rf) if rf.is_list() && options.include_relations => {
             let related_model = rf.related_model();
-            let to_many_aggregate_type = order_by_to_many_aggregate_object_type(&related_model.into(), ctx);
+            let to_many_aggregate_type = order_by_to_many_object_type(&related_model.into(), ctx);
 
             Some(simple_input_field(rf.name().to_owned(), InputType::object(to_many_aggregate_type), None).optional())
         }
@@ -141,7 +141,7 @@ fn orderby_field_mapper<'a>(
 
         // Composite field.
         ModelField::Composite(cf) if cf.is_list() => {
-            let to_many_aggregate_type = order_by_to_many_aggregate_object_type(&(cf.typ()).into(), ctx);
+            let to_many_aggregate_type = order_by_to_many_object_type(&(cf.typ()).into(), ctx);
             Some(simple_input_field(cf.name().to_owned(), InputType::object(to_many_aggregate_type), None).optional())
         }
 
@@ -216,16 +216,8 @@ fn order_by_object_type_aggregate<'a>(
     input_object
 }
 
-fn order_by_to_many_aggregate_object_type<'a>(container: &ParentContainer, ctx: &'a QuerySchema) -> InputObjectType<'a> {
-    // For model relations we expose both _count and individual scalar fields under a
-    // dedicated identifier so that aggregate-only consumers (composite types) continue
-    // to receive the pure-aggregate OrderByToManyAggregateInput type.
-    let ident = match container {
-        ParentContainer::Model(_) => {
-            Identifier::new_prisma(IdentifierType::OrderByToManyScalarFieldsInput(container.clone()))
-        }
-        _ => Identifier::new_prisma(IdentifierType::OrderByToManyAggregateInput(container.clone())),
-    };
+fn order_by_to_many_object_type<'a>(container: &ParentContainer, ctx: &'a QuerySchema) -> InputObjectType<'a> {
+    let ident = Identifier::new_prisma(IdentifierType::OrderByToManyAggregateInput(container.clone()));
     let mut input_object = init_input_object_type(ident);
     input_object.set_container(container.clone());
     input_object.require_exactly_one_field();

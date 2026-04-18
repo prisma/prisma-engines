@@ -19,6 +19,9 @@ struct CursorOrderDefinition {
     pub(crate) order_fks: Option<Vec<CursorOrderForeignKey>>,
     /// Indicates whether the ordering is performed on nullable field(s)
     pub(crate) on_nullable_fields: bool,
+    /// Explicit nulls placement (NULLS FIRST / LAST). When set, cursor NULL
+    /// predicates are only emitted when NULLs fall on the paginated side.
+    pub(crate) nulls_order: Option<NullsOrder>,
 }
 
 #[derive(Debug)]
@@ -358,10 +361,21 @@ fn map_orderby_condition(
     // If we have null values in the ordering or comparison row, those are automatically included because we can't make a
     // statement over their order relative to the cursor.
     let order_expr = if order_definition.on_nullable_fields {
-        order_expr
-            .or(cloned_order_column.is_null())
-            .or(Expression::from(cloned_cmp_column).is_null())
-            .into()
+        // When an explicit nulls_order is provided, only include NULLs
+        // when they fall on the side we are paginating toward.
+        let include_nulls = match order_definition.nulls_order {
+            Some(NullsOrder::First) => reverse,   // NULLs at start → include when going backward
+            Some(NullsOrder::Last) => !reverse,    // NULLs at end → include when going forward
+            None => true,                          // No explicit placement → conservative inclusion
+        };
+        if include_nulls {
+            order_expr
+                .or(cloned_order_column.is_null())
+                .or(Expression::from(cloned_cmp_column).is_null())
+                .into()
+        } else {
+            order_expr
+        }
     } else {
         order_expr
     };
@@ -396,12 +410,21 @@ fn map_equality_condition(
     // If we have null values in the ordering or comparison row, those are automatically included because we can't make a
     // statement over their order relative to the cursor.
     if order_definition.on_nullable_fields {
-        order_column
-            .clone()
-            .equals(cmp_column.clone())
-            .or(Expression::from(cmp_column).is_null())
-            .or(order_column.is_null())
-            .into()
+        let include_nulls = match order_definition.nulls_order {
+            Some(NullsOrder::First) => false, // NULLs at start → equality never matches
+            Some(NullsOrder::Last) => false,  // NULLs at end → equality never matches
+            None => true,                     // No explicit placement → conservative inclusion
+        };
+        if include_nulls {
+            order_column
+                .clone()
+                .equals(cmp_column.clone())
+                .or(Expression::from(cmp_column).is_null())
+                .or(order_column.is_null())
+                .into()
+        } else {
+            order_column.equals(cmp_column).into()
+        }
     } else {
         order_column.equals(cmp_column).into()
     }
@@ -428,6 +451,7 @@ fn order_definitions(
                 order_column: f.as_column(ctx).into(),
                 order_fks: None,
                 on_nullable_fields: !f.is_required(),
+                nulls_order: None,
             })
             .collect();
     }
@@ -459,6 +483,7 @@ fn cursor_order_def_scalar(order_by: &OrderByScalar, order_by_def: &OrderByDefin
         order_column: order_by_def.order_column.clone(),
         order_fks: fks,
         on_nullable_fields: !order_by.field.is_required(),
+        nulls_order: None,
     }
 }
 
@@ -478,6 +503,7 @@ fn cursor_order_def_aggregation_scalar(
         order_column: order_column.clone(),
         order_fks: None,
         on_nullable_fields: false,
+        nulls_order: None,
     }
 }
 
@@ -501,6 +527,7 @@ fn cursor_order_def_aggregation_rel(
         order_column: order_column.clone(),
         order_fks: fks,
         on_nullable_fields: false,
+        nulls_order: None,
     }
 }
 
@@ -513,6 +540,7 @@ fn cursor_order_def_relevance(order_by: &OrderByRelevance, order_by_def: &OrderB
         order_column: order_column.clone(),
         order_fks: None,
         on_nullable_fields: false,
+        nulls_order: None,
     }
 }
 
@@ -533,6 +561,7 @@ fn cursor_order_def_to_many_field(
         order_column: order_by_def.order_column.clone(),
         order_fks: None,
         on_nullable_fields: true,
+        nulls_order: order_by.nulls_order.clone(),
     }
 }
 
