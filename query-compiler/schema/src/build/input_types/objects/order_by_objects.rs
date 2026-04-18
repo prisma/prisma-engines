@@ -241,6 +241,11 @@ fn order_by_to_many_aggregate_object_type<'a>(container: &ParentContainer, ctx: 
         if let ParentContainer::Model(_) = &container {
             for field in container.fields() {
                 if let ModelField::Scalar(sf) = &field {
+                    // Skip non-orderable types (Json, Bytes, Unsupported) — they have
+                    // no meaningful SQL ordering semantics.
+                    if matches!(sf.type_identifier(), TypeIdentifier::Json | TypeIdentifier::Bytes | TypeIdentifier::Unsupported) {
+                        continue;
+                    }
                     let mut types = vec![sort_order_enum.clone()];
                     // The correlated subquery can always return NULL (when the parent has no
                     // related records), so we always expose SortOrderInput (nulls ordering)
