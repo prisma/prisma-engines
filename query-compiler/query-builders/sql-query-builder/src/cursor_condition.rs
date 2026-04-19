@@ -528,11 +528,17 @@ fn cursor_order_def_scalar(order_by: &OrderByScalar, order_by_def: &OrderByDefin
     // cf: part #2 of the SQL query above, when a field is nullable.
     let fks = foreign_keys_from_order_path(&order_by.path, &order_by_def.joins);
 
+    // The ordering column can be NULL either because the leaf field itself is nullable,
+    // or because an optional relation hop makes the subquery return NULL.
+    let has_nullable_fks = fks
+        .as_ref()
+        .is_some_and(|fks| fks.iter().any(|fk| !fk.field.is_required()));
+
     CursorOrderDefinition {
         sort_order: order_by.sort_order,
         order_column: order_by_def.order_column.clone(),
         order_fks: fks,
-        on_nullable_fields: !order_by.field.is_required(),
+        on_nullable_fields: !order_by.field.is_required() || has_nullable_fks,
         nulls_order: order_by.nulls_order.clone(),
     }
 }
