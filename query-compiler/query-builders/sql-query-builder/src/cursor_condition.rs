@@ -373,39 +373,58 @@ fn map_orderby_condition(
                 // 1. row NULL, cursor non-NULL → include when NULLs are on the paginated side
                 // 2. row non-NULL, cursor NULL → include when non-NULLs are on the paginated side
                 // 3. both NULL → treat as equal (include for lenient comparisons)
-                let row_null_cursor_not: Expression<'static> = cloned_order_column
-                    .clone()
-                    .is_null()
-                    .and(Expression::from(cloned_cmp_column.clone()).is_not_null())
-                    .into();
-                let row_not_cursor_null: Expression<'static> = cloned_order_column
-                    .clone()
-                    .is_not_null()
-                    .and(Expression::from(cloned_cmp_column.clone()).is_null())
-                    .into();
-                let both_null: Expression<'static> = cloned_order_column
-                    .is_null()
-                    .and(Expression::from(cloned_cmp_column).is_null())
-                    .into();
-
                 let mut result: Expression<'static> = order_expr;
                 if include_nulls {
+                    let row_null_cursor_not: Expression<'static> = cloned_order_column
+                        .clone()
+                        .is_null()
+                        .and(Expression::from(cloned_cmp_column.clone()).is_not_null())
+                        .into();
                     result = result.or(row_null_cursor_not).into();
                 }
                 if !include_nulls {
+                    let row_not_cursor_null: Expression<'static> = cloned_order_column
+                        .clone()
+                        .is_not_null()
+                        .and(Expression::from(cloned_cmp_column.clone()).is_null())
+                        .into();
                     result = result.or(row_not_cursor_null).into();
                 }
                 if include_eq {
+                    let both_null: Expression<'static> = cloned_order_column
+                        .is_null()
+                        .and(Expression::from(cloned_cmp_column).is_null())
+                        .into();
                     result = result.or(both_null).into();
                 }
                 result
             }
             None => {
-                // No explicit placement → conservative inclusion
-                order_expr
-                    .or(cloned_order_column.is_null())
-                    .or(Expression::from(cloned_cmp_column).is_null())
-                    .into()
+                // No explicit placement → conservative: include rows where
+                // either side is NULL, but use the split-case pattern to avoid
+                // a NULL cursor value universally matching all candidate rows.
+                let mut result: Expression<'static> = order_expr;
+                // row NULL, cursor non-NULL
+                let row_null_cursor_not: Expression<'static> = cloned_order_column
+                    .clone()
+                    .is_null()
+                    .and(Expression::from(cloned_cmp_column.clone()).is_not_null())
+                    .into();
+                result = result.or(row_null_cursor_not).into();
+                // row non-NULL, cursor NULL
+                let row_not_cursor_null: Expression<'static> = cloned_order_column
+                    .clone()
+                    .is_not_null()
+                    .and(Expression::from(cloned_cmp_column.clone()).is_null())
+                    .into();
+                result = result.or(row_not_cursor_null).into();
+                // both NULL → treat as equal
+                let both_null: Expression<'static> = cloned_order_column
+                    .is_null()
+                    .and(Expression::from(cloned_cmp_column).is_null())
+                    .into();
+                result = result.or(both_null).into();
+                result
             }
         }
     } else {
@@ -466,12 +485,12 @@ fn map_equality_condition(
                     .into()
             }
             None => {
-                // No explicit placement → conservative inclusion
+                // No explicit placement → NULL = NULL must match for prefix
+                // equality (same as Some branch), but avoid blanket cmp IS NULL.
                 order_column
                     .clone()
                     .equals(cmp_column.clone())
-                    .or(Expression::from(cmp_column).is_null())
-                    .or(order_column.is_null())
+                    .or(order_column.is_null().and(Expression::from(cmp_column).is_null()))
                     .into()
             }
         }
