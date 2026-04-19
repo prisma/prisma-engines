@@ -412,21 +412,33 @@ fn map_orderby_condition(
         order_expr
     };
 
-    // Add OR statements for the foreign key fields too if they are nullable
+    // Add OR statements for the foreign key fields too if they are nullable.
+    // When an explicit nulls_order is set, only include FK IS NULL when NULLs
+    // fall on the paginated side; otherwise, skip the predicate.
 
     if let Some(fks) = &order_definition.order_fks {
-        fks.iter()
-            .filter(|fk| !fk.field.is_required())
-            .fold(order_expr, |acc, fk| {
-                let col = if let Some(alias) = &fk.alias {
-                    Column::from((alias.to_owned(), fk.field.db_name().to_owned()))
-                } else {
-                    fk.field.as_column(ctx)
-                }
-                .is_null();
+        let include_fk_nulls = match order_definition.nulls_order {
+            Some(NullsOrder::First) => reverse,
+            Some(NullsOrder::Last) => !reverse,
+            None => true,
+        };
 
-                acc.or(col).into()
-            })
+        if include_fk_nulls {
+            fks.iter()
+                .filter(|fk| !fk.field.is_required())
+                .fold(order_expr, |acc, fk| {
+                    let col = if let Some(alias) = &fk.alias {
+                        Column::from((alias.to_owned(), fk.field.db_name().to_owned()))
+                    } else {
+                        fk.field.as_column(ctx)
+                    }
+                    .is_null();
+
+                    acc.or(col).into()
+                })
+        } else {
+            order_expr
+        }
     } else {
         order_expr
     }
