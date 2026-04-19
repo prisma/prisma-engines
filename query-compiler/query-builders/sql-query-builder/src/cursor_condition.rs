@@ -361,20 +361,52 @@ fn map_orderby_condition(
     // If we have null values in the ordering or comparison row, those are automatically included because we can't make a
     // statement over their order relative to the cursor.
     let order_expr = if order_definition.on_nullable_fields {
-        // When an explicit nulls_order is provided, only include NULLs
-        // when they fall on the side we are paginating toward.
-        let include_nulls = match order_definition.nulls_order {
-            Some(NullsOrder::First) => reverse,   // NULLs at start → include when going backward
-            Some(NullsOrder::Last) => !reverse,    // NULLs at end → include when going forward
-            None => true,                          // No explicit placement → conservative inclusion
-        };
-        if include_nulls {
-            order_expr
-                .or(cloned_order_column.is_null())
-                .or(Expression::from(cloned_cmp_column).is_null())
-                .into()
-        } else {
-            order_expr
+        match order_definition.nulls_order {
+            Some(ref nulls_order) => {
+                let include_nulls = match nulls_order {
+                    NullsOrder::First => reverse,
+                    NullsOrder::Last => !reverse,
+                };
+
+                // Handle row-null and cursor-null cases separately to avoid
+                // a NULL cursor value matching every candidate row:
+                // 1. row NULL, cursor non-NULL → include when NULLs are on the paginated side
+                // 2. row non-NULL, cursor NULL → include when non-NULLs are on the paginated side
+                // 3. both NULL → treat as equal (include for lenient comparisons)
+                let row_null_cursor_not: Expression<'static> = cloned_order_column
+                    .clone()
+                    .is_null()
+                    .and(Expression::from(cloned_cmp_column.clone()).is_not_null())
+                    .into();
+                let row_not_cursor_null: Expression<'static> = cloned_order_column
+                    .clone()
+                    .is_not_null()
+                    .and(Expression::from(cloned_cmp_column.clone()).is_null())
+                    .into();
+                let both_null: Expression<'static> = cloned_order_column
+                    .is_null()
+                    .and(Expression::from(cloned_cmp_column).is_null())
+                    .into();
+
+                let mut result: Expression<'static> = order_expr;
+                if include_nulls {
+                    result = result.or(row_null_cursor_not).into();
+                }
+                if !include_nulls {
+                    result = result.or(row_not_cursor_null).into();
+                }
+                if include_eq {
+                    result = result.or(both_null).into();
+                }
+                result
+            }
+            None => {
+                // No explicit placement → conservative inclusion
+                order_expr
+                    .or(cloned_order_column.is_null())
+                    .or(Expression::from(cloned_cmp_column).is_null())
+                    .into()
+            }
         }
     } else {
         order_expr
@@ -410,20 +442,26 @@ fn map_equality_condition(
     // If we have null values in the ordering or comparison row, those are automatically included because we can't make a
     // statement over their order relative to the cursor.
     if order_definition.on_nullable_fields {
-        let include_nulls = match order_definition.nulls_order {
-            Some(NullsOrder::First) => false, // NULLs at start → equality never matches
-            Some(NullsOrder::Last) => false,  // NULLs at end → equality never matches
-            None => true,                     // No explicit placement → conservative inclusion
-        };
-        if include_nulls {
-            order_column
-                .clone()
-                .equals(cmp_column.clone())
-                .or(Expression::from(cmp_column).is_null())
-                .or(order_column.is_null())
-                .into()
-        } else {
-            order_column.equals(cmp_column).into()
+        match order_definition.nulls_order {
+            Some(_) => {
+                // For prefix equality with explicit nulls placement, NULL = NULL
+                // must match so multi-field cursor pagination works inside the
+                // NULL group.
+                order_column
+                    .clone()
+                    .equals(cmp_column.clone())
+                    .or(order_column.is_null().and(Expression::from(cmp_column).is_null()))
+                    .into()
+            }
+            None => {
+                // No explicit placement → conservative inclusion
+                order_column
+                    .clone()
+                    .equals(cmp_column.clone())
+                    .or(Expression::from(cmp_column).is_null())
+                    .or(order_column.is_null())
+                    .into()
+            }
         }
     } else {
         order_column.equals(cmp_column).into()
@@ -483,7 +521,7 @@ fn cursor_order_def_scalar(order_by: &OrderByScalar, order_by_def: &OrderByDefin
         order_column: order_by_def.order_column.clone(),
         order_fks: fks,
         on_nullable_fields: !order_by.field.is_required(),
-        nulls_order: None,
+        nulls_order: order_by.nulls_order.clone(),
     }
 }
 
