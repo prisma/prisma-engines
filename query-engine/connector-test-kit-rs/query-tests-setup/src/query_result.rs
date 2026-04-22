@@ -67,6 +67,7 @@ impl QueryResult {
     }
 
     /// Asserts absence of errors in the result. Panics with assertion error.
+    #[track_caller]
     pub fn assert_success(&self) {
         if self.failed() {
             panic!("{}", self.to_string());
@@ -78,6 +79,7 @@ impl QueryResult {
     /// If more than one error is contained, asserts that at least one error contains the message _and_ code.
     ///
     /// Panics with assertion error on no match.
+    #[track_caller]
     pub fn assert_failure(&self, err_code: impl Into<Option<usize>>, msg_contains: Option<String>) {
         let err_code: Option<usize> = err_code.into();
         if !self.failed() {
