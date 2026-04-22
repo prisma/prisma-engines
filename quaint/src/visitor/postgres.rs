@@ -415,47 +415,23 @@ impl<'a> Visitor<'a> for Postgres<'a> {
     }
 
     fn visit_equals(&mut self, left: Expression<'a>, right: Expression<'a>) -> visitor::Result {
-        // LHS must be cast to json/xml-text if the right is a json/xml-text value and vice versa.
-        let right_cast = match left {
-            _ if left.is_json_value() => "::jsonb",
-            _ if left.is_xml_value() => "::text",
-            _ => "",
-        };
+        let lhs_conv = EqualsOperandConversion::infer(&left, &right);
+        let rhs_conv = EqualsOperandConversion::infer(&right, &left);
 
-        let left_cast = match right {
-            _ if right.is_json_value() => "::jsonb",
-            _ if right.is_xml_value() => "::text",
-            _ => "",
-        };
-
-        self.visit_expression(left)?;
-        self.write(left_cast)?;
+        lhs_conv.write(left, self)?;
         self.write(" = ")?;
-        self.visit_expression(right)?;
-        self.write(right_cast)?;
+        rhs_conv.write(right, self)?;
 
         Ok(())
     }
 
     fn visit_not_equals(&mut self, left: Expression<'a>, right: Expression<'a>) -> visitor::Result {
-        // LHS must be cast to json/xml-text if the right is a json/xml-text value and vice versa.
-        let right_cast = match left {
-            _ if left.is_json_value() => "::jsonb",
-            _ if left.is_xml_value() => "::text",
-            _ => "",
-        };
+        let lhs_conv = EqualsOperandConversion::infer(&left, &right);
+        let rhs_conv = EqualsOperandConversion::infer(&right, &left);
 
-        let left_cast = match right {
-            _ if right.is_json_value() => "::jsonb",
-            _ if right.is_xml_value() => "::text",
-            _ => "",
-        };
-
-        self.visit_expression(left)?;
-        self.write(left_cast)?;
+        lhs_conv.write(left, self)?;
         self.write(" <> ")?;
-        self.visit_expression(right)?;
-        self.write(right_cast)?;
+        rhs_conv.write(right, self)?;
 
         Ok(())
     }
@@ -816,6 +792,48 @@ fn get_column_cast_target(column: &Column<'_>) -> Option<&'static str> {
         Some("numeric")
     } else {
         None
+    }
+}
+
+/// Utility type for equality and inequality expressions to determine if and how operands should
+/// be converted before comparison.
+#[derive(Debug, Clone, Copy)]
+enum EqualsOperandConversion {
+    JsonbCast,
+    TextCast,
+    ToJsonb,
+    Identity,
+}
+
+impl EqualsOperandConversion {
+    fn infer(this: &Expression<'_>, other: &Expression<'_>) -> Self {
+        // If we reference a JSON list column, we have to convert it to a JSON array
+        // (rather than a PostgreSQL list) before comparing it to a JSON value,
+        // otherwise the comparison would fail with a type error.
+        if other.is_json_value() && this.as_column().is_some_and(|c| c.is_list) {
+            Self::ToJsonb
+        } else if other.is_json_value() {
+            Self::JsonbCast
+        } else if other.is_xml_value() {
+            Self::TextCast
+        } else {
+            Self::Identity
+        }
+    }
+
+    fn write<'a>(self, expr: Expression<'a>, v: &mut Postgres<'a>) -> visitor::Result {
+        match self {
+            Self::JsonbCast => {
+                v.visit_expression(expr)?;
+                v.write("::jsonb")
+            }
+            Self::TextCast => {
+                v.visit_expression(expr)?;
+                v.write("::text")
+            }
+            Self::ToJsonb => v.surround_with("TO_JSONB(", ")", |v| v.visit_expression(expr)),
+            Self::Identity => v.visit_expression(expr),
+        }
     }
 }
 

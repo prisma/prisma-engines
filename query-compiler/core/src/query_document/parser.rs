@@ -717,6 +717,22 @@ impl QueryDocumentParser {
             )
         };
 
+        if placeholder.r#type == PrismaValueType::Json
+            && matches!(element_input_type, InputType::Scalar(ScalarType::Json))
+        {
+            // Allow handling a JSON placeholder as a list. This is needed to support the equality
+            // operator for JSON arrays.
+            // JSON array arguments are treated as scalars rather than arrays by default, since the
+            // code that infers their type cannot differentiate between a value that's meant to be
+            // a database-level array versus a JSON-level array. This would normally lead to a type
+            // mismatch, hence this workaround is needed.
+            return Ok(ParsedInputValue::Single(
+                placeholder
+                    .with_type(PrismaValueType::List(PrismaValueType::Json.into()))
+                    .into(),
+            ));
+        }
+
         let PrismaValueType::List(inner_type) = &placeholder.r#type else {
             return Err(error());
         };

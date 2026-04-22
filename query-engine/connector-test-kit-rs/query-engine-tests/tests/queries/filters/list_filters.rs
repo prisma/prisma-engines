@@ -900,33 +900,32 @@ mod json_lists {
         schema.to_owned()
     }
 
-    // Uncomment this test when TML-2177 is fixed
-    // #[connector_test]
-    // async fn equality(runner: Runner) -> TestResult<()> {
-    //     test_data(&runner).await?;
+    #[connector_test]
+    async fn equality(runner: Runner) -> TestResult<()> {
+        test_data(&runner).await?;
 
-    //     // equals json
-    //     insta::assert_snapshot!(
-    //       list_query(&runner, "json", "equals", r#"["{}", "{\"int\":5}", "[1, 2, 3]"]"#).await?,
-    //       @r###"{"data":{"findManyTestModel":[{"id":1}]}}"###
-    //     );
-    //     insta::assert_snapshot!(
-    //       list_query(&runner, "json", "equals", r#"["null", "\"test\""]"#).await?,
-    //       @r###"{"data":{"findManyTestModel":[{"id":3}]}}"###
-    //     );
+        // equals json
+        insta::assert_snapshot!(
+          list_query(&runner, "json", "equals", r#"["{}", "{\"int\":5}", "[1, 2, 3]"]"#).await?,
+          @r###"{"data":{"findManyTestModel":[{"id":1}]}}"###
+        );
+        insta::assert_snapshot!(
+          list_query(&runner, "json", "equals", r#"["null", "\"test\""]"#).await?,
+          @r###"{"data":{"findManyTestModel":[{"id":3}]}}"###
+        );
 
-    //     // NOT equals json
-    //     insta::assert_snapshot!(
-    //       not_list_query(&runner, "json", "equals", r#"["{}", "{\"int\":5}", "[1, 2, 3]"]"#).await?,
-    //       @r###"{"data":{"findManyTestModel":[{"id":2},{"id":3}]}}"###
-    //     );
-    //     insta::assert_snapshot!(
-    //       not_list_query(&runner, "json", "equals", r#"["null", "\"test\""]"#).await?,
-    //       @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2}]}}"###
-    //     );
+        // NOT equals json
+        insta::assert_snapshot!(
+          not_list_query(&runner, "json", "equals", r#"["{}", "{\"int\":5}", "[1, 2, 3]"]"#).await?,
+          @r###"{"data":{"findManyTestModel":[{"id":2},{"id":3}]}}"###
+        );
+        insta::assert_snapshot!(
+          not_list_query(&runner, "json", "equals", r#"["null", "\"test\""]"#).await?,
+          @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2}]}}"###
+        );
 
-    //     Ok(())
-    // }
+        Ok(())
+    }
 
     #[connector_test]
     async fn has(runner: Runner) -> TestResult<()> {
