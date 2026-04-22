@@ -25,7 +25,7 @@ pub use config::ConfigBlockProperty;
 pub use diagnostics::Span;
 pub use r#enum::{Enum, EnumValue, EnumValueId};
 pub use expression::{Expression, ObjectMember};
-pub use field::{Field, FieldArity, FieldType};
+pub use field::{Field, FieldArity, FieldType, GeometrySubtype};
 pub use find_at_position::*;
 pub use generator_config::GeneratorConfig;
 pub use identifier::Identifier;

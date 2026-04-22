@@ -85,6 +85,12 @@ model DataTypes {
   intArray  Int[]
 }
 
+model Location {
+  id       Int                    @id @default(autoincrement())
+  name     String?
+  position Geometry(Point, 4326)?
+}
+
 model Patient {
   id     Int  @id @default(autoincrement())
   userId Int  @unique

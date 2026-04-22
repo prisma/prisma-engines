@@ -130,7 +130,7 @@ impl Field {
     }
 }
 
-#[derive(Clone, Debug, PartialEq, Eq, Hash, Copy)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 #[allow(clippy::upper_case_acronyms)]
 pub enum TypeIdentifier {
     String,
@@ -145,6 +145,8 @@ pub enum TypeIdentifier {
     Json,
     DateTime,
     Bytes,
+    /// String-encoded DMMF geometry type, e.g. `geometry(Point,4326)`.
+    Geometry(String),
     Unsupported,
 }
 
@@ -171,7 +173,7 @@ pub type Type = Zipper<TypeIdentifier>;
 
 impl Type {
     pub fn type_name(&self) -> Cow<'static, str> {
-        match self.id {
+        match &self.id {
             TypeIdentifier::String => "String".into(),
             TypeIdentifier::Int => "Int".into(),
             TypeIdentifier::BigInt => "BigInt".into(),
@@ -179,14 +181,14 @@ impl Type {
             TypeIdentifier::Decimal => "Decimal".into(),
             TypeIdentifier::Boolean => "Bool".into(),
             TypeIdentifier::Enum(enum_id) => {
-                let enum_name = self.dm.walk(enum_id).name();
+                let enum_name = self.dm.walk(*enum_id).name();
                 format!("Enum{enum_name}").into()
             }
             TypeIdentifier::Extension(ext_id) => self
                 .dm
                 .schema
                 .db
-                .get_extension_type_prisma_name(ext_id)
+                .get_extension_type_prisma_name(*ext_id)
                 .expect("extension type name should be present")
                 .to_owned()
                 .into(),
@@ -194,12 +196,13 @@ impl Type {
             TypeIdentifier::Json => "Json".into(),
             TypeIdentifier::DateTime => "DateTime".into(),
             TypeIdentifier::Bytes => "Bytes".into(),
+            TypeIdentifier::Geometry(s) => s.clone().into(),
             TypeIdentifier::Unsupported => "Unsupported".into(),
         }
     }
 
     pub fn to_prisma_type(&self) -> PrismaValueType {
-        match self.id {
+        match &self.id {
             TypeIdentifier::String => PrismaValueType::String,
             TypeIdentifier::Int => PrismaValueType::Int,
             TypeIdentifier::BigInt => PrismaValueType::BigInt,
@@ -211,6 +214,7 @@ impl Type {
             TypeIdentifier::Json => PrismaValueType::Json,
             TypeIdentifier::DateTime => PrismaValueType::DateTime,
             TypeIdentifier::Bytes => PrismaValueType::Bytes,
+            TypeIdentifier::Geometry(_) => PrismaValueType::Bytes,
             TypeIdentifier::Extension(_) | TypeIdentifier::Unsupported => PrismaValueType::Any,
         }
     }

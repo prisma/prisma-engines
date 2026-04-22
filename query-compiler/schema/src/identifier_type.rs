@@ -54,6 +54,10 @@ pub enum IdentifierType {
     UpdateManyAndReturnOutput(Model),
     WhereInput(ParentContainer),
     WhereUniqueInput(Model),
+    GeometryNearInput,
+    GeometryWithinInput,
+    GeometryIntersectsInput,
+    GeometryDistanceFromInput,
     Raw(String),
 }
 
@@ -315,6 +319,10 @@ impl std::fmt::Display for IdentifierType {
             IdentifierType::UpdateManyAndReturnOutput(model) => {
                 write!(f, "UpdateMany{}AndReturnOutputType", model.name())
             }
+            IdentifierType::GeometryNearInput => f.write_str("GeometryNearInput"),
+            IdentifierType::GeometryWithinInput => f.write_str("GeometryWithinInput"),
+            IdentifierType::GeometryIntersectsInput => f.write_str("GeometryIntersectsInput"),
+            IdentifierType::GeometryDistanceFromInput => f.write_str("GeometryDistanceFromInput"),
         }
     }
 }

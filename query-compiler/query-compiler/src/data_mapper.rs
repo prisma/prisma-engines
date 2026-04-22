@@ -17,6 +17,22 @@ use query_structure::{
 use serde::Serialize;
 use std::{borrow::Cow, collections::HashMap, fmt};
 
+/// Maps a DMMF geometry field type string (e.g. `geometry(Point,4326)`) to the JSON protocol discriminator
+/// consumed by `@prisma/client-engine-runtime`.
+fn geometry_json_geometry_type(dmmf_type: &str) -> String {
+    let inner = dmmf_type.strip_prefix("geometry(").and_then(|s| s.strip_suffix(')'));
+    let subtype = inner
+        .and_then(|s| s.split(',').next())
+        .map(str::trim)
+        .unwrap_or("Geometry");
+    match subtype {
+        "Point" => "point".to_owned(),
+        "LineString" => "linestring".to_owned(),
+        "Polygon" => "polygon".to_owned(),
+        _ => "geometry".to_owned(),
+    }
+}
+
 pub fn map_result_structure(graph: &QueryGraph, builder: &mut ResultNodeBuilder) -> Option<ResultNode> {
     graph
         .result_nodes()
@@ -409,6 +425,9 @@ pub enum FieldScalarType {
     Bytes {
         encoding: ByteArrayEncoding,
     },
+    Geometry {
+        geometry_type: String,
+    },
     Unsupported,
 }
 
@@ -427,6 +446,7 @@ impl fmt::Display for FieldScalarType {
             Self::Object => write!(f, "Object"),
             Self::DateTime => write!(f, "DateTime"),
             Self::Bytes { .. } => write!(f, "Bytes"),
+            Self::Geometry { geometry_type } => write!(f, "Geometry({geometry_type})"),
             Self::Unsupported => write!(f, "Unsupported"),
         }
     }
@@ -434,7 +454,7 @@ impl fmt::Display for FieldScalarType {
 
 impl From<&Type> for FieldScalarType {
     fn from(typ: &Type) -> Self {
-        match typ.id {
+        match &typ.id {
             TypeIdentifier::String => Self::String,
             TypeIdentifier::Int => Self::Int,
             TypeIdentifier::BigInt => Self::BigInt,
@@ -442,14 +462,14 @@ impl From<&Type> for FieldScalarType {
             TypeIdentifier::Decimal => Self::Decimal,
             TypeIdentifier::Boolean => Self::Boolean,
             TypeIdentifier::Enum(id) => Self::Enum {
-                name: typ.dm.clone().zip(id).name().to_owned(),
+                name: typ.dm.clone().zip(*id).name().to_owned(),
             },
             TypeIdentifier::Extension(id) => Self::Extension {
                 name: typ
                     .dm
                     .schema
                     .db
-                    .get_extension_type_prisma_name(id)
+                    .get_extension_type_prisma_name(*id)
                     .expect("extension type not found")
                     .to_owned(),
             },
@@ -458,6 +478,9 @@ impl From<&Type> for FieldScalarType {
             TypeIdentifier::DateTime => Self::DateTime,
             TypeIdentifier::Bytes => Self::Bytes {
                 encoding: ByteArrayEncoding::default(),
+            },
+            TypeIdentifier::Geometry(dmmf) => Self::Geometry {
+                geometry_type: geometry_json_geometry_type(dmmf),
             },
             TypeIdentifier::Unsupported => Self::Unsupported,
         }

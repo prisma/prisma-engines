@@ -1,0 +1,30 @@
+{
+  "modelName": "Location",
+  "action": "findMany",
+  "query": {
+    "arguments": {
+      "where": {
+        "position": {
+          "intersects": {
+            "geometry": {
+              "type": "Polygon",
+              "coordinates": [
+                [
+                  [1, 1],
+                  [1, 3],
+                  [3, 3],
+                  [3, 1],
+                  [1, 1]
+                ]
+              ]
+            }
+          }
+        }
+      }
+    },
+    "selection": {
+      "id": true,
+      "position": true
+    }
+  }
+}

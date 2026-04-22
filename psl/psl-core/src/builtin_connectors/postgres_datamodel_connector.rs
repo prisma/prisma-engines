@@ -3,7 +3,7 @@ mod native_types;
 mod validations;
 
 pub use native_types::{KnownPostgresType, PostgresType};
-use parser_database::{ExtensionTypes, ScalarFieldType};
+use parser_database::{ExtensionTypes, GeometrySpec, ScalarFieldType};
 
 use crate::{
     Configuration, Datasource, DatasourceConnectorData, PreviewFeature, ValidatedSchema,
@@ -74,13 +74,18 @@ pub const CAPABILITIES: ConnectorCapabilities = enumflags2::make_bitflags!(Conne
     SupportsFiltersOnRelationsWithoutJoins |
     LateralJoin |
     SupportsDefaultInInsert |
-    PartialIndex
+    PartialIndex |
+    PostgisGeometry
 });
 
 pub struct PostgresDatamodelConnector;
 
 const DATE_TIME_DEFAULT: KnownPostgresType = KnownPostgresType::Timestamp(Some(3));
 const BYTES_DEFAULT: KnownPostgresType = KnownPostgresType::ByteA;
+
+fn geometry_sql_column_type(spec: &GeometrySpec) -> String {
+    spec.postgres_sql_type()
+}
 
 const SCALAR_TYPE_DEFAULTS: &[(ScalarType, KnownPostgresType)] = &[
     (ScalarType::Int, KnownPostgresType::Integer),
@@ -372,6 +377,10 @@ impl Connector for PostgresDatamodelConnector {
             ScalarFieldType::Extension(id) => {
                 let (name, modifiers) = schema.db.get_extension_type_db_name_with_modifiers(*id)?;
                 let native_type = PostgresType::Unknown(name.to_owned(), modifiers.to_vec());
+                return Some(NativeTypeInstance::new::<PostgresType>(native_type));
+            }
+            ScalarFieldType::Geometry(spec) => {
+                let native_type = PostgresType::Unknown(geometry_sql_column_type(spec), Vec::new());
                 return Some(NativeTypeInstance::new::<PostgresType>(native_type));
             }
             ScalarFieldType::CompositeType(_) | ScalarFieldType::Enum(_) | ScalarFieldType::Unsupported(_) => {

@@ -589,6 +589,13 @@ fn order_by_selection(rs: &RelationSelection) -> FieldSelection {
             // This is necessary because the order by is done on a different join. The following hops are handled by the order by builder.
             OrderBy::ToManyAggregation(x) => first_hop_linking_fields(x.intermediary_hops()),
             OrderBy::ScalarAggregation(x) => vec![x.field.clone()],
+            OrderBy::Geometry(x) => {
+                if x.path.is_empty() {
+                    vec![x.field.clone()]
+                } else {
+                    first_hop_linking_fields(&x.path)
+                }
+            }
         })
         .collect();
 

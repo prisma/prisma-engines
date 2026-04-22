@@ -1,6 +1,57 @@
 use crate::{dmmf_from_schema, tests::setup::*};
 
 #[test]
+fn geometry_fields_in_datamodel_and_schema_dmmf() {
+    let schema = r#"
+        datasource db {
+            provider = "postgresql"
+        }
+
+        generator client {
+            provider = "prisma-client"
+        }
+
+        model Location {
+            id       Int                      @id
+            position Geometry(Point, 4326)
+            path     Geometry(LineString)?
+        }
+    "#;
+
+    let dmmf = dmmf_from_schema(schema);
+    let location = dmmf
+        .data_model
+        .models
+        .iter()
+        .find(|m| m.name == "Location")
+        .expect("Location model");
+    let pos = location.fields.iter().find(|f| f.name == "position").unwrap();
+    assert_eq!(pos.field_type, "geometry(Point,4326)");
+    let path = location.fields.iter().find(|f| f.name == "path").unwrap();
+    assert_eq!(path.field_type, "geometry(LineString,0)");
+
+    let schema_json = serde_json::to_value(&dmmf.schema).unwrap();
+    let models = schema_json
+        .get("outputObjectTypes")
+        .and_then(|v| v.get("model"))
+        .and_then(|v| v.as_array())
+        .expect("model output types");
+    let location_out = models
+        .iter()
+        .find(|m| m.get("name").and_then(|n| n.as_str()) == Some("Location"))
+        .expect("Location output type");
+    let fields = location_out.get("fields").and_then(|f| f.as_array()).unwrap();
+    let pos_field = fields
+        .iter()
+        .find(|f| f.get("name").and_then(|n| n.as_str()) == Some("position"));
+    let out_pos = pos_field.and_then(|f| f.get("outputType")).expect("position output");
+    assert_eq!(
+        out_pos.get("type").and_then(|t| t.as_str()),
+        Some("geometry(Point,4326)")
+    );
+}
+
+#[test]
 fn sqlite_ignore() {
     let dmmf = dmmf_from_schema(include_str!("./test-schemas/sqlite_ignore.prisma"));
 

@@ -274,6 +274,7 @@ fn render_column_type(t: &ColumnType) -> &str {
         ColumnTypeFamily::Enum(_) => unreachable!("ColumnTypeFamily::Enum on SQLite"),
         ColumnTypeFamily::Uuid => unimplemented!("ColumnTypeFamily::Uuid on SQLite"),
         ColumnTypeFamily::Udt(_) => unimplemented!("ColumnTypeFamily::Udt on SQLite"),
+        ColumnTypeFamily::Geometry(_) => unreachable!("ColumnTypeFamily::Geometry on SQLite"),
         ColumnTypeFamily::Unsupported(x) => x.as_ref(),
     }
 }

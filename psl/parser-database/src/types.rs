@@ -8,7 +8,11 @@ use either::Either;
 use enumflags2::bitflags;
 use rustc_hash::FxHashMap as HashMap;
 use schema_ast::ast::{self, EnumValueId, WithName};
-use std::{collections::BTreeMap, fmt};
+use serde::{Deserialize, Serialize};
+use std::{
+    collections::BTreeMap,
+    fmt::{self, Write as _},
+};
 
 pub(super) fn resolve_types(ctx: &mut Context<'_>) {
     for ((file_id, top_id), top) in ctx.iter_tops() {
@@ -184,6 +188,95 @@ impl UnsupportedType {
     }
 }
 
+/// OGC / PostGIS geometry subtype for [`ScalarFieldType::Geometry`].
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+pub enum GeometrySubtype {
+    /// `POINT` subtype.
+    Point,
+    /// `LINESTRING` subtype.
+    LineString,
+    /// `POLYGON` subtype.
+    Polygon,
+    /// `MULTIPOINT` subtype.
+    MultiPoint,
+    /// `MULTILINESTRING` subtype.
+    MultiLineString,
+    /// `MULTIPOLYGON` subtype.
+    MultiPolygon,
+    /// `GEOMETRYCOLLECTION` subtype.
+    GeometryCollection,
+    /// Unrestricted `GEOMETRY` subtype.
+    Geometry,
+}
+
+impl GeometrySubtype {
+    /// PSL spelling of the subtype (e.g. `Point`).
+    pub fn as_str(self) -> &'static str {
+        match self {
+            GeometrySubtype::Point => "Point",
+            GeometrySubtype::LineString => "LineString",
+            GeometrySubtype::Polygon => "Polygon",
+            GeometrySubtype::MultiPoint => "MultiPoint",
+            GeometrySubtype::MultiLineString => "MultiLineString",
+            GeometrySubtype::MultiPolygon => "MultiPolygon",
+            GeometrySubtype::GeometryCollection => "GeometryCollection",
+            GeometrySubtype::Geometry => "Geometry",
+        }
+    }
+}
+
+impl From<ast::GeometrySubtype> for GeometrySubtype {
+    fn from(s: ast::GeometrySubtype) -> Self {
+        match s {
+            ast::GeometrySubtype::Point => Self::Point,
+            ast::GeometrySubtype::LineString => Self::LineString,
+            ast::GeometrySubtype::Polygon => Self::Polygon,
+            ast::GeometrySubtype::MultiPoint => Self::MultiPoint,
+            ast::GeometrySubtype::MultiLineString => Self::MultiLineString,
+            ast::GeometrySubtype::MultiPolygon => Self::MultiPolygon,
+            ast::GeometrySubtype::GeometryCollection => Self::GeometryCollection,
+            ast::GeometrySubtype::Geometry => Self::Geometry,
+        }
+    }
+}
+
+/// PostGIS base type for a [`GeometrySpec`] (`geometry` vs `geography` in PostgreSQL).
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, Default)]
+pub enum PostgisSpatialKind {
+    /// `geometry(...)` columns (planar).
+    #[default]
+    Geometry,
+    /// `geography(...)` columns (geodetic).
+    Geography,
+}
+
+/// Parameters for a `Geometry(subtype, srid?)` scalar field type.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+pub struct GeometrySpec {
+    /// Geometry subtype (OGC / PostGIS).
+    pub subtype: GeometrySubtype,
+    /// Spatial reference ID; `None` when omitted in the schema (distinct from SRID 0 in the database).
+    pub srid: Option<i32>,
+    /// Whether the physical column uses PostGIS `geometry` or `geography`.
+    #[serde(default)]
+    pub spatial: PostgisSpatialKind,
+}
+
+impl GeometrySpec {
+    /// SQL column type for PostgreSQL / PostGIS (e.g. `geometry(Point,4326)` or `geography(Point,4326)`).
+    pub fn postgres_sql_type(&self) -> String {
+        let base = match self.spatial {
+            PostgisSpatialKind::Geometry => "geometry",
+            PostgisSpatialKind::Geography => "geography",
+        };
+        let subtype = self.subtype.as_str();
+        match self.srid {
+            Some(srid) => format!("{base}({subtype},{srid})"),
+            None => format!("{base}({subtype})"),
+        }
+    }
+}
+
 /// The type of a scalar field, parsed and categorized.
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum ScalarFieldType {
@@ -195,6 +288,8 @@ pub enum ScalarFieldType {
     Extension(ExtensionTypeId),
     /// A Prisma scalar type
     BuiltInScalar(ScalarType),
+    /// PostGIS-style `Geometry(Point, 4326)` scalar
+    Geometry(GeometrySpec),
     /// An `Unsupported("...")` type
     Unsupported(UnsupportedType),
 }
@@ -277,6 +372,11 @@ impl ScalarFieldType {
         matches!(self, Self::BuiltInScalar(ScalarType::Decimal))
     }
 
+    /// True if the field's type is `Geometry(...)`.
+    pub fn is_geometry(self) -> bool {
+        matches!(self, Self::Geometry(_))
+    }
+
     /// Display the field type as it would appear in the Prisma schema.
     pub fn display<'a>(&'a self, db: &'a ParserDatabase) -> impl fmt::Display + 'a {
         DisplayScalarFieldType { field_type: self, db }
@@ -306,6 +406,13 @@ impl fmt::Display for DisplayScalarFieldType<'_> {
                     .get(ext_id)
                     .expect("extension type id to have a name");
                 write!(f, "{}", self.db.interner.get(*name).unwrap())
+            }
+            ScalarFieldType::Geometry(spec) => {
+                write!(f, "Geometry({}", spec.subtype.as_str())?;
+                if let Some(srid) = spec.srid {
+                    write!(f, ", {srid}")?;
+                }
+                f.write_char(')')
             }
             ScalarFieldType::Unsupported(ut) => {
                 write!(f, "Unsupported(\"{}\")", self.db.interner.get(ut.name).unwrap())
@@ -471,6 +578,10 @@ impl IndexAlgorithm {
 
         if r#type.is_unsupported() {
             return true;
+        }
+
+        if r#type.is_geometry() {
+            return matches!(self, IndexAlgorithm::BTree | IndexAlgorithm::Gist);
         }
 
         match self {
@@ -836,41 +947,52 @@ fn visit_enum<'db>(enm: &'db ast::Enum, ctx: &mut Context<'db>) {
 /// Either a structured, supported type, or an Err(unsupported) if the type name
 /// does not match any we know of.
 fn field_type<'db>(field: &'db ast::Field, ctx: &mut Context<'db>) -> Result<FieldType, &'db str> {
-    let supported = match &field.field_type {
-        ast::FieldType::Supported(ident) => &ident.name,
+    match &field.field_type {
+        ast::FieldType::Geometry { subtype, srid, .. } => {
+            Ok(FieldType::Scalar(ScalarFieldType::Geometry(GeometrySpec {
+                subtype: (*subtype).into(),
+                srid: *srid,
+                spatial: PostgisSpatialKind::Geometry,
+            })))
+        }
         ast::FieldType::Unsupported(name, _) => {
             let unsupported = UnsupportedType::new(ctx.interner.intern(name));
-            return Ok(FieldType::Scalar(ScalarFieldType::Unsupported(unsupported)));
+            Ok(FieldType::Scalar(ScalarFieldType::Unsupported(unsupported)))
         }
-    };
+        ast::FieldType::Supported(ident) => {
+            let supported = ident.name.as_str();
 
-    if let Some(tpe) = ScalarType::try_from_str(supported, false) {
-        return Ok(FieldType::Scalar(ScalarFieldType::BuiltInScalar(tpe)));
-    }
+            if let Some(tpe) = ScalarType::try_from_str(supported, false) {
+                return Ok(FieldType::Scalar(ScalarFieldType::BuiltInScalar(tpe)));
+            }
 
-    let supported_string_id = ctx.interner.intern(supported);
-    match ctx
-        .names
-        .tops
-        .get(&supported_string_id)
-        .map(|id| (id.0, id.1, &ctx.asts[*id]))
-    {
-        Some((file_id, ast::TopId::Model(model_id), ast::Top::Model(_))) => Ok(FieldType::Model((file_id, model_id))),
-        Some((file_id, ast::TopId::Enum(enum_id), ast::Top::Enum(_))) => {
-            Ok(FieldType::Scalar(ScalarFieldType::Enum((file_id, enum_id))))
-        }
-        Some((file_id, ast::TopId::CompositeType(ctid), ast::Top::CompositeType(_))) => {
-            Ok(FieldType::Scalar(ScalarFieldType::CompositeType((file_id, ctid))))
-        }
-        Some((_, _, ast::Top::Generator(_))) | Some((_, _, ast::Top::Source(_))) => unreachable!(),
-        None => {
-            if let Some(type_id) = ctx.extension_types().get_by_prisma_name(supported) {
-                Ok(FieldType::Scalar(ScalarFieldType::Extension(type_id)))
-            } else {
-                Err(supported)
+            let supported_string_id = ctx.interner.intern(supported);
+            match ctx
+                .names
+                .tops
+                .get(&supported_string_id)
+                .map(|id| (id.0, id.1, &ctx.asts[*id]))
+            {
+                Some((file_id, ast::TopId::Model(model_id), ast::Top::Model(_))) => {
+                    Ok(FieldType::Model((file_id, model_id)))
+                }
+                Some((file_id, ast::TopId::Enum(enum_id), ast::Top::Enum(_))) => {
+                    Ok(FieldType::Scalar(ScalarFieldType::Enum((file_id, enum_id))))
+                }
+                Some((file_id, ast::TopId::CompositeType(ctid), ast::Top::CompositeType(_))) => {
+                    Ok(FieldType::Scalar(ScalarFieldType::CompositeType((file_id, ctid))))
+                }
+                Some((_, _, ast::Top::Generator(_))) | Some((_, _, ast::Top::Source(_))) => unreachable!(),
+                None => {
+                    if let Some(type_id) = ctx.extension_types().get_by_prisma_name(supported) {
+                        Ok(FieldType::Scalar(ScalarFieldType::Extension(type_id)))
+                    } else {
+                        Err(supported)
+                    }
+                }
+                _ => unreachable!(),
             }
         }
-        _ => unreachable!(),
     }
 }
 
