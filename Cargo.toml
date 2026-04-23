@@ -114,7 +114,7 @@ serde-wasm-bindgen = "0.6"
 smallvec = "1"
 strip-ansi-escapes = "0.1"
 structopt = "0.3"
-sqlformat = "0.2"
+sqlformat = "0.5"
 sqlparser = { version = "0.61", features = ["visitor"] }
 sqlx-core = "0.8"
 sqlx-sqlite = "0.8"
