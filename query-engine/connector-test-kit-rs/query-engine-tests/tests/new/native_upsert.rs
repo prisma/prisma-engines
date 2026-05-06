@@ -365,13 +365,17 @@ mod native_upsert {
 
     async fn assert_used_native_upsert(runner: &mut Runner) {
         let logs = runner.get_logs().await;
-        let did_upsert = logs.iter().any(|l| l.contains("ON CONFLICT"));
+        let did_upsert = logs
+            .iter()
+            .any(|l| l.contains("ON CONFLICT") || l.contains("MERGE INTO"));
         assert!(did_upsert);
     }
 
     async fn assert_not_used_native_upsert(runner: &mut Runner) {
         let logs = runner.get_logs().await;
-        let did_upsert = logs.iter().any(|l| l.contains("ON CONFLICT"));
+        let did_upsert = logs
+            .iter()
+            .any(|l| l.contains("ON CONFLICT") || l.contains("MERGE INTO"));
         assert!(!did_upsert);
     }
 }

@@ -312,20 +312,21 @@ impl<'a> Visitor<'a> for Mssql<'a> {
 
     /// A point to modify an incoming query to make it compatible with the
     /// SQL Server.
-    fn compatibility_modifications(&self, query: Query<'a>) -> Query<'a> {
+    fn compatibility_modifications(&self, query: Query<'a>) -> crate::Result<Query<'a>> {
         match query {
             // Finding possible `(a, b) (NOT) IN (SELECT x, y ...)` comparisons,
             // and replacing them with common table expressions.
-            Query::Select(select) => select
+            Query::Select(select) => Ok(select
                 .convert_tuple_selects_to_ctes(true, &mut 0)
                 .expect_left("Top-level query was right")
-                .into(),
-            // Replacing the `ON CONFLICT DO NOTHING` clause with a `MERGE` statement.
+                .into()),
+            // Replacing `ON CONFLICT` clauses with `MERGE` statements.
             Query::Insert(insert) => match insert.on_conflict {
-                Some(OnConflict::DoNothing) => Merge::try_from(*insert).unwrap().into(),
-                _ => Query::Insert(insert),
+                Some(OnConflict::DoNothing) => Ok(Merge::try_from(*insert)?.into()),
+                Some(OnConflict::Update(_, _)) => Ok(Merge::from_insert_with_update(*insert)?.into()),
+                _ => Ok(Query::Insert(insert)),
             },
-            _ => query,
+            _ => Ok(query),
         }
     }
 
@@ -662,7 +663,13 @@ impl<'a> Visitor<'a> for Mssql<'a> {
         }
 
         self.write("MERGE INTO ")?;
-        self.visit_table(merge.table.clone(), true)?;
+        // T-SQL requires: <target_table> WITH (<hint>) [AS <alias>]
+        self.visit_table(merge.table.clone(), false)?;
+        self.write(" WITH (HOLDLOCK)")?;
+        if let Some(ref alias) = merge.table.alias {
+            self.write(" AS ")?;
+            self.delimited_identifiers(&[&*alias])?;
+        }
 
         self.write(" USING ")?;
 
@@ -676,6 +683,18 @@ impl<'a> Visitor<'a> for Mssql<'a> {
         self.visit_row(Row::from(merge.using.columns))?;
         self.write(" ON ")?;
         self.visit_conditions(merge.using.on_conditions)?;
+
+        if let Some(update) = merge.when_matched {
+            self.write(" WHEN MATCHED")?;
+
+            if let Some(conditions) = update.conditions.clone() {
+                self.write(" AND ")?;
+                self.visit_conditions(conditions)?;
+            }
+
+            self.write(" THEN UPDATE SET ")?;
+            self.visit_update_set(update)?;
+        }
 
         if let Some(query) = merge.when_not_matched {
             self.write(" WHEN NOT MATCHED THEN ")?;
@@ -1495,7 +1514,7 @@ mod tests {
 
         let expected_sql = indoc!(
             "
-            MERGE INTO [foo]
+            MERGE INTO [foo] WITH (HOLDLOCK)
             USING (SELECT @P1 AS [bar], @P2 AS [wtf]) AS [dual] ([bar],[wtf])
             ON [dual].[bar] = [foo].[bar]
             WHEN NOT MATCHED THEN
@@ -1517,7 +1536,7 @@ mod tests {
 
         let expected_sql = indoc!(
             "
-            MERGE INTO [foo]
+            MERGE INTO [foo] WITH (HOLDLOCK)
             USING (SELECT @P1 AS [wtf]) AS [dual] ([wtf])
             ON [foo].[bar] = @P2
             WHEN NOT MATCHED THEN
@@ -1548,7 +1567,7 @@ mod tests {
         let expected_sql = indoc!(
             "
             DECLARE @generated_keys table([bar] NVARCHAR(255),[wtf] NVARCHAR(255))
-            MERGE INTO [foo]
+            MERGE INTO [foo] WITH (HOLDLOCK)
             USING (SELECT @P1 AS [bar], @P2 AS [wtf]) AS [dual] ([bar],[wtf])
             ON [dual].[bar] = [foo].[bar]
             WHEN NOT MATCHED THEN
@@ -1578,7 +1597,7 @@ mod tests {
 
         let expected_sql = indoc!(
             "
-            MERGE INTO [foo]
+            MERGE INTO [foo] WITH (HOLDLOCK)
             USING (SELECT @P1 AS [bar], @P2 AS [wtf]) AS [dual] ([bar],[wtf])
             ON ([dual].[bar] = [foo].[bar] OR [dual].[wtf] = [foo].[wtf])
             WHEN NOT MATCHED THEN
@@ -1603,7 +1622,7 @@ mod tests {
 
         let expected_sql = indoc!(
             "
-            MERGE INTO [foo]
+            MERGE INTO [foo] WITH (HOLDLOCK)
             USING (SELECT @P1 AS [wtf]) AS [dual] ([wtf])
             ON ([foo].[bar] = @P2 OR [dual].[wtf] = [foo].[wtf])
             WHEN NOT MATCHED THEN
@@ -1630,7 +1649,7 @@ mod tests {
 
         let expected_sql = indoc!(
             "
-            MERGE INTO [foo]
+            MERGE INTO [foo] WITH (HOLDLOCK)
             USING (SELECT @P1 AS [wtf]) AS [dual] ([wtf])
             ON ([foo].[bar] = @P2 OR [dual].[wtf] = [foo].[wtf])
             WHEN NOT MATCHED THEN
@@ -1661,7 +1680,7 @@ mod tests {
 
         let expected_sql = indoc!(
             "
-            MERGE INTO [foo]
+            MERGE INTO [foo] WITH (HOLDLOCK)
             USING (SELECT @P1 AS [wtf], @P2 AS [lol]) AS [dual] ([wtf],[lol])
             ON ([foo].[bar] = @P3 OR [dual].[lol] = [foo].[lol] OR [dual].[wtf] = [foo].[wtf])
             WHEN NOT MATCHED THEN
@@ -1690,7 +1709,7 @@ mod tests {
 
         let expected_sql = indoc!(
             "
-            MERGE INTO [foo]
+            MERGE INTO [foo] WITH (HOLDLOCK)
             USING (SELECT @P1 AS [bar], @P2 AS [wtf]) AS [dual] ([bar],[wtf])
             ON ([dual].[bar] = [foo].[bar] AND [dual].[wtf] = [foo].[wtf])
             WHEN NOT MATCHED THEN
@@ -1713,7 +1732,7 @@ mod tests {
 
         let expected_sql = indoc!(
             "
-            MERGE INTO [foo]
+            MERGE INTO [foo] WITH (HOLDLOCK)
             USING (SELECT @P1 AS [wtf]) AS [dual] ([wtf])
             ON ([foo].[bar] = @P2 AND [dual].[wtf] = [foo].[wtf])
             WHEN NOT MATCHED THEN
@@ -1746,7 +1765,7 @@ mod tests {
 
         let expected_sql = indoc!(
             "
-            MERGE INTO [foo]
+            MERGE INTO [foo] WITH (HOLDLOCK)
             USING (SELECT @P1 AS [wtf], @P2 AS [lol]) AS [dual] ([wtf],[lol])
             ON (([foo].[bar] = @P3 AND [dual].[wtf] = [foo].[wtf]) OR (1=0 AND [dual].[lol] = [foo].[lol]))
             WHEN NOT MATCHED THEN
@@ -1958,6 +1977,282 @@ mod tests {
         assert_eq!(
             "SELECT [User].*, [Toto].* FROM [User] LEFT JOIN [Post] AS [p] ON [p].[userId] = [User].[id], [Toto]",
             sql
+        );
+    }
+
+    #[test]
+    fn test_native_upsert_single_unique() {
+        let update = Update::table("foo")
+            .set("wtf", "woof")
+            .so_that(("foo", "bar").equals("lol"));
+
+        let insert: Insert<'_> = Insert::single_into("foo")
+            .value(("foo", "bar"), "lol")
+            .value(("foo", "wtf"), "meow")
+            .into();
+
+        let insert = insert.on_conflict(OnConflict::Update(update, vec!["bar".into()]));
+        let (sql, params) = Mssql::build(insert).unwrap();
+
+        let expected_sql = indoc!(
+            "
+            MERGE INTO [foo] WITH (HOLDLOCK)
+            USING (SELECT @P1 AS [bar], @P2 AS [wtf]) AS [dual] ([bar],[wtf])
+            ON [dual].[bar] = [foo].[bar]
+            WHEN MATCHED AND [foo].[bar] = @P3 THEN
+            UPDATE SET [wtf] = @P4
+            WHEN NOT MATCHED THEN
+            INSERT ([bar],[wtf]) VALUES ([dual].[bar],[dual].[wtf]);
+        "
+        );
+
+        assert_eq!(expected_sql.replace('\n', " ").trim(), sql);
+        assert_eq!(
+            vec![
+                Value::from("lol"),
+                Value::from("meow"),
+                Value::from("lol"),
+                Value::from("woof"),
+            ],
+            params
+        );
+    }
+
+    #[test]
+    fn test_native_upsert_compound_conflict() {
+        let update = Update::table("foo").set("z", "woof");
+
+        let insert: Insert<'_> = Insert::single_into("foo")
+            .value(("foo", "a"), "val_a")
+            .value(("foo", "b"), "val_b")
+            .value(("foo", "z"), "val_z")
+            .into();
+
+        let insert = insert.on_conflict(OnConflict::Update(update, vec!["a".into(), "b".into()]));
+        let (sql, params) = Mssql::build(insert).unwrap();
+
+        let expected_sql = indoc!(
+            "
+            MERGE INTO [foo] WITH (HOLDLOCK)
+            USING (SELECT @P1 AS [a], @P2 AS [b], @P3 AS [z]) AS [dual] ([a],[b],[z])
+            ON ([dual].[a] = [foo].[a] AND [dual].[b] = [foo].[b])
+            WHEN MATCHED THEN
+            UPDATE SET [z] = @P4
+            WHEN NOT MATCHED THEN
+            INSERT ([a],[b],[z]) VALUES ([dual].[a],[dual].[b],[dual].[z]);
+        "
+        );
+
+        assert_eq!(expected_sql.replace('\n', " ").trim(), sql);
+        assert_eq!(
+            vec![
+                Value::from("val_a"),
+                Value::from("val_b"),
+                Value::from("val_z"),
+                Value::from("woof"),
+            ],
+            params
+        );
+    }
+
+    #[test]
+    fn test_native_upsert_preserves_schema_qualified_table_in_on_clause() {
+        let update = Update::table(("dbo", "foo")).set("wtf", "woof");
+
+        let insert: Insert<'_> = Insert::single_into(("dbo", "foo"))
+            .value(("foo", "bar"), "lol")
+            .value(("foo", "wtf"), "meow")
+            .into();
+
+        let insert = insert.on_conflict(OnConflict::Update(update, vec!["bar".into()]));
+        let (sql, params) = Mssql::build(insert).unwrap();
+
+        let expected_sql = indoc!(
+            "
+            MERGE INTO [dbo].[foo] WITH (HOLDLOCK)
+            USING (SELECT @P1 AS [bar], @P2 AS [wtf]) AS [dual] ([bar],[wtf])
+            ON [dual].[bar] = [dbo].[foo].[bar]
+            WHEN MATCHED THEN
+            UPDATE SET [wtf] = @P3
+            WHEN NOT MATCHED THEN
+            INSERT ([bar],[wtf]) VALUES ([dual].[bar],[dual].[wtf]);
+        "
+        );
+
+        assert_eq!(expected_sql.replace('\n', " ").trim(), sql);
+        assert_eq!(
+            vec![Value::from("lol"), Value::from("meow"), Value::from("woof"),],
+            params
+        );
+    }
+
+    #[test]
+    fn test_native_upsert_multi_row_values() {
+        let update = Update::table("foo").set("wtf", Column::from(("dual", "wtf")));
+
+        let insert: Insert<'_> = Insert::multi_into("foo", vec!["bar", "wtf"])
+            .values(vec!["lol", "meow"])
+            .values(vec!["omg", "hey"])
+            .into();
+
+        let insert = insert.on_conflict(OnConflict::Update(update, vec!["bar".into()]));
+        let (sql, params) = Mssql::build(insert).unwrap();
+
+        let expected_sql = indoc!(
+            "
+            MERGE INTO [foo] WITH (HOLDLOCK)
+            USING (SELECT @P1 AS [bar], @P2 AS [wtf] UNION ALL SELECT @P3 AS [bar], @P4 AS [wtf]) AS [dual] ([bar],[wtf])
+            ON [dual].[bar] = [foo].[bar]
+            WHEN MATCHED THEN
+            UPDATE SET [wtf] = [dual].[wtf]
+            WHEN NOT MATCHED THEN
+            INSERT ([bar],[wtf]) VALUES ([dual].[bar],[dual].[wtf]);
+        "
+        );
+
+        assert_eq!(expected_sql.replace('\n', " ").trim(), sql);
+        assert_eq!(
+            vec![
+                Value::from("lol"),
+                Value::from("meow"),
+                Value::from("omg"),
+                Value::from("hey"),
+            ],
+            params
+        );
+    }
+
+    #[test]
+    fn test_native_upsert_with_conditions() {
+        let update = Update::table("foo")
+            .set("wtf", "woof")
+            .so_that(("foo", "bar").equals("lol"));
+
+        let insert: Insert<'_> = Insert::single_into("foo")
+            .value(("foo", "bar"), "lol")
+            .value(("foo", "wtf"), "meow")
+            .into();
+
+        let insert = insert.on_conflict(OnConflict::Update(update, vec!["bar".into()]));
+        let (sql, _) = Mssql::build(insert).unwrap();
+
+        // The update conditions should appear after WHEN MATCHED AND
+        assert!(sql.contains("WHEN MATCHED AND [foo].[bar] = @P3 THEN UPDATE SET"));
+    }
+
+    #[test]
+    #[cfg(feature = "mssql")]
+    fn test_native_upsert_with_returning() {
+        let update = Update::table("foo").set("wtf", "woof");
+
+        let insert: Insert<'_> = Insert::single_into("foo")
+            .value(("foo", "bar"), "lol")
+            .value(("foo", "wtf"), "meow")
+            .into();
+
+        let insert = insert
+            .on_conflict(OnConflict::Update(update, vec!["bar".into()]))
+            .returning(vec![("foo", "bar"), ("foo", "wtf")]);
+
+        let (sql, params) = Mssql::build(insert).unwrap();
+
+        let expected_sql = indoc!(
+            "
+            DECLARE @generated_keys table([bar] NVARCHAR(255),[wtf] NVARCHAR(255))
+            MERGE INTO [foo] WITH (HOLDLOCK)
+            USING (SELECT @P1 AS [bar], @P2 AS [wtf]) AS [dual] ([bar],[wtf])
+            ON [dual].[bar] = [foo].[bar]
+            WHEN MATCHED THEN
+            UPDATE SET [wtf] = @P3
+            WHEN NOT MATCHED THEN
+            INSERT ([bar],[wtf]) VALUES ([dual].[bar],[dual].[wtf])
+            OUTPUT [Inserted].[bar],[Inserted].[wtf] INTO @generated_keys;
+            SELECT [t].[bar],[t].[wtf] FROM @generated_keys AS g
+            INNER JOIN [foo] AS [t]
+            ON ([t].[bar] = [g].[bar] AND [t].[wtf] = [g].[wtf])
+            WHERE @@ROWCOUNT > 0
+        "
+        );
+
+        assert_eq!(expected_sql.replace('\n', " ").trim(), sql);
+        assert_eq!(
+            vec![Value::from("lol"), Value::from("meow"), Value::from("woof"),],
+            params
+        );
+    }
+
+    #[test]
+    fn test_native_upsert_empty_constraints_rejected() {
+        let update = Update::table("foo").set("wtf", "woof");
+
+        let insert: Insert<'_> = Insert::single_into("foo")
+            .value(("foo", "bar"), "lol")
+            .value(("foo", "wtf"), "meow")
+            .into();
+
+        let insert = insert.on_conflict(OnConflict::Update(update, vec![]));
+        let err = Mssql::build(insert).unwrap_err();
+        assert!(err.to_string().contains("OnConflict::Update requires non-empty constraint columns"));
+    }
+
+    #[test]
+    fn test_native_upsert_missing_constraint_column_rejected() {
+        let update = Update::table("foo").set("wtf", "woof");
+
+        let insert: Insert<'_> = Insert::single_into("foo")
+            .value(("foo", "bar"), "lol")
+            .value(("foo", "wtf"), "meow")
+            .into();
+
+        let insert = insert.on_conflict(OnConflict::Update(update, vec!["missing".into()]));
+        let err = Mssql::build(insert).unwrap_err();
+        assert!(err.to_string().contains("OnConflict::Update constraint column `missing` must be present"));
+    }
+
+    #[test]
+    fn test_native_upsert_non_table_target_rejected() {
+        let update = Update::table("foo").set("wtf", "woof");
+        let table = Table::from(Select::from_table("foo"));
+
+        let insert: Insert<'_> = Insert::single_into(table)
+            .value("bar", "lol")
+            .value("wtf", "meow")
+            .into();
+
+        let insert = insert.on_conflict(OnConflict::Update(update, vec!["bar".into()]));
+        let err = Mssql::build(insert).unwrap_err();
+        assert!(err.to_string().contains("Merge target must be a simple table"));
+    }
+
+    #[test]
+    fn test_native_upsert_aliased_target_uses_alias_in_on_clause() {
+        let table = Table::from("foo").alias("t");
+        let update = Update::table("foo").set("wtf", "woof");
+
+        let insert: Insert<'_> = Insert::single_into(table)
+            .value(("foo", "bar"), "lol")
+            .value(("foo", "wtf"), "meow")
+            .into();
+
+        let insert = insert.on_conflict(OnConflict::Update(update, vec!["bar".into()]));
+        let (sql, params) = Mssql::build(insert).unwrap();
+
+        let expected_sql = indoc!(
+            "
+            MERGE INTO [foo] WITH (HOLDLOCK) AS [t]
+            USING (SELECT @P1 AS [bar], @P2 AS [wtf]) AS [dual] ([bar],[wtf])
+            ON [dual].[bar] = [t].[bar]
+            WHEN MATCHED THEN
+            UPDATE SET [wtf] = @P3
+            WHEN NOT MATCHED THEN
+            INSERT ([bar],[wtf]) VALUES ([dual].[bar],[dual].[wtf]);
+        "
+        );
+
+        assert_eq!(expected_sql.replace('\n', " ").trim(), sql);
+        assert_eq!(
+            vec![Value::from("lol"), Value::from("meow"), Value::from("woof"),],
+            params
         );
     }
 }

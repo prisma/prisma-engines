@@ -2,7 +2,7 @@ use super::test_api::*;
 use crate::{connector::Queryable, prelude::*};
 use quaint_test_macros::test_each_connector;
 
-#[test_each_connector(tags("postgresql", "sqlite"))]
+#[test_each_connector(tags("postgresql", "sqlite", "mssql"))]
 async fn upsert_on_primary_key(api: &mut dyn TestApi) -> crate::Result<()> {
     let table = api.create_temp_table("id int primary key, x int").await?;
 
@@ -39,7 +39,7 @@ fn upsert_on_primary_key_query(table: &str) -> Query<'_> {
         .into()
 }
 
-#[test_each_connector(tags("postgresql", "sqlite"))]
+#[test_each_connector(tags("postgresql", "sqlite", "mssql"))]
 async fn upsert_on_unique_field(api: &mut dyn TestApi) -> crate::Result<()> {
     let table = api.create_temp_table("id int primary key, x int UNIQUE, y int").await?;
 
@@ -82,7 +82,7 @@ fn upsert_on_unique_field_query(table: &str) -> Query<'_> {
         .into()
 }
 
-#[test_each_connector(tags("postgresql", "sqlite"))]
+#[test_each_connector(tags("postgresql", "sqlite", "mssql"))]
 async fn upsert_on_multiple_unique_fields(api: &mut dyn TestApi) -> crate::Result<()> {
     let table = api
         .create_temp_table("id int primary key, x int, y int, CONSTRAINT ux_x_y UNIQUE (x, y)")
