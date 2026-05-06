@@ -28,14 +28,11 @@ use std::{
     future::{self, Future},
     str::FromStr,
     sync::LazyLock,
-    time,
 };
 use url::Url;
 use user_facing_errors::schema_engine::DatabaseSchemaInconsistent;
 
 use super::{SqlConnector, SqlDialect, UsingExternalShadowDb};
-
-const ADVISORY_LOCK_TIMEOUT: time::Duration = time::Duration::from_secs(10);
 
 /// Connection settings applied to every new connection on CockroachDB.
 ///
@@ -370,19 +367,32 @@ impl SqlConnector for PostgresConnector {
         self.with_connection(|connection, params| async {
             // https://www.postgresql.org/docs/current/explicit-locking.html#ADVISORY-LOCKS
 
+            // We use `pg_try_advisory_lock` rather than `pg_advisory_lock` so that the
+            // call returns immediately instead of blocking. Blocking on an advisory
+            // lock can cause deadlocks when another session is running operations such
+            // as `CREATE INDEX CONCURRENTLY`, which require waiting for any open
+            // transactions/locks to finish (see issue #5755).
+            //
             // 72707369 is a unique number we chose to identify Migrate. It does not
             // have any meaning, but it should not be used by any other tool.
-            crosstarget_utils::time::timeout(
-                ADVISORY_LOCK_TIMEOUT,
-                connection.raw_cmd("SELECT pg_advisory_lock(72707369)"),
-            )
-            .await
-            .map_err(|_| ConnectorError::user_facing(user_facing_errors::common::DatabaseTimeout {
-                context: format!(
-                    "Timed out trying to acquire a postgres advisory lock (SELECT pg_advisory_lock(72707369)). Timeout: {}ms. See https://pris.ly/d/migrate-advisory-locking for details.", ADVISORY_LOCK_TIMEOUT.as_millis()
-                ),
-            }))?
-            .map_err(imp::quaint_error_mapper(params))?;
+            let result = connection
+                .query_raw("SELECT pg_try_advisory_lock(72707369)", &[])
+                .await
+                .map_err(imp::quaint_error_mapper(params))?;
+
+            let acquired = result
+                .first()
+                .and_then(|row| row.at(0).and_then(|v| v.as_bool()))
+                .unwrap_or(false);
+
+            if !acquired {
+                return Err(ConnectorError::from_msg(
+                    "Could not acquire the postgres advisory lock (SELECT pg_try_advisory_lock(72707369)). \
+                     Another instance is likely running migrations against this database. \
+                     See https://pris.ly/d/migrate-advisory-locking for details."
+                        .to_owned(),
+                ));
+            }
 
             Ok(())
         })
