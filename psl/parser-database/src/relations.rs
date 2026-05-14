@@ -440,7 +440,7 @@ pub(super) fn ingest_relation<'db>(evidence: RelationEvidence<'db>, relations: &
 /// An action describing the way referential integrity is managed in the system.
 ///
 /// An action is triggered when a relation constraint gets violated in a way
-/// that would make the the data inconsistent, e.g. deleting or updating a
+/// that would make the data inconsistent, e.g. deleting or updating a
 /// referencing record that leaves related records into a wrong state.
 ///
 /// ```ignore
