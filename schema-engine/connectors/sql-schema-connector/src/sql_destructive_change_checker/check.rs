@@ -31,7 +31,7 @@ pub(crate) trait Check {
         None
     }
 
-    /// Indicates that the the number of non-null values should be inspected for the returned table and column.
+    /// Indicates that the number of non-null values should be inspected for the returned table and column.
     fn needed_column_value_count(&self) -> Option<Column> {
         None
     }

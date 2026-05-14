@@ -98,7 +98,7 @@ impl<'a> Table<'a> {
     /// - Find the unique indices from the table that matches the inserted columns
     /// - Create a join from the virtual table with the uniques
     /// - Combine joins with `OR`
-    /// - If the the index is a compound with other columns, combine them with `AND`
+    /// - If the index is a compound with other columns, combine them with `AND`
     /// - If the column is not provided and index exists, try inserting a default value.
     /// - Otherwise the function will return an error.
     pub(crate) fn join_conditions(&self, inserted_columns: &[Column<'a>]) -> crate::Result<ConditionTree<'a>> {
