@@ -1,0 +1,25 @@
+{
+  "modelName": "Location",
+  "action": "findMany",
+  "query": {
+    "arguments": {
+      "where": {
+        "position": {
+          "within": {
+            "polygon": [
+              [0, 0],
+              [0, 2],
+              [2, 2],
+              [2, 0],
+              [0, 0]
+            ]
+          }
+        }
+      }
+    },
+    "selection": {
+      "id": true,
+      "position": true
+    }
+  }
+}

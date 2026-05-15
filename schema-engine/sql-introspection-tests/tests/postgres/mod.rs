@@ -3,6 +3,7 @@ mod constraints;
 mod extensions;
 mod gin;
 mod gist;
+mod postgis_geometry;
 mod spgist;
 
 use indoc::indoc;

@@ -23,6 +23,7 @@ fn map_scalar_input_type(ctx: &'_ QuerySchema, typ: TypeIdentifier, list: bool) 
         TypeIdentifier::Extension(_) => unreachable!("No extension field should reach this path"),
         TypeIdentifier::Bytes => InputType::bytes(),
         TypeIdentifier::BigInt => InputType::bigint(),
+        TypeIdentifier::Geometry(s) => InputType::Scalar(ScalarType::Geometry(s)),
         TypeIdentifier::Unsupported => unreachable!("No unsupported field should reach this path"),
     };
 

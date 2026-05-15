@@ -5,10 +5,14 @@ use crate::serialization_ast::{
 use bigdecimal::ToPrimitive;
 use itertools::{Either, Itertools};
 use psl::{
-    parser_database::{ScalarFieldType, walkers},
+    parser_database::{GeometrySpec, ScalarFieldType, walkers},
     schema_ast::ast::WithDocumentation,
 };
 use query_structure::{DefaultKind, FieldArity, PrismaValue, dml_default_kind, encode_bytes};
+
+fn geometry_dmmf_field_type(spec: &GeometrySpec) -> String {
+    spec.postgres_sql_type()
+}
 
 pub(crate) fn schema_to_dmmf(schema: &psl::ValidatedSchema) -> Datamodel {
     let mut datamodel = Datamodel {
@@ -86,7 +90,7 @@ fn composite_type_field_to_dmmf(field: walkers::CompositeTypeFieldWalker<'_>) ->
         kind: match field.r#type() {
             ScalarFieldType::CompositeType(_) => "object",
             ScalarFieldType::Enum(_) => "enum",
-            ScalarFieldType::BuiltInScalar(_) => "scalar",
+            ScalarFieldType::BuiltInScalar(_) | ScalarFieldType::Geometry(_) => "scalar",
             ScalarFieldType::Extension(_) | ScalarFieldType::Unsupported(_) => unreachable!(),
         },
         db_name: field.mapped_name().map(ToOwned::to_owned),
@@ -111,6 +115,7 @@ fn composite_type_field_to_dmmf(field: walkers::CompositeTypeFieldWalker<'_>) ->
             ScalarFieldType::CompositeType(ct) => field.walk(ct).name().to_owned(),
             ScalarFieldType::Enum(enm) => field.walk(enm).name().to_owned(),
             ScalarFieldType::BuiltInScalar(st) => st.as_str().to_owned(),
+            ScalarFieldType::Geometry(spec) => geometry_dmmf_field_type(&spec),
             ScalarFieldType::Extension(_) | ScalarFieldType::Unsupported(_) => unreachable!(),
         },
         is_generated: None,
@@ -181,7 +186,7 @@ fn scalar_field_to_dmmf(field: walkers::ScalarFieldWalker<'_>) -> Field {
         kind: match field.scalar_field_type() {
             ScalarFieldType::CompositeType(_) => "object",
             ScalarFieldType::Enum(_) => "enum",
-            ScalarFieldType::BuiltInScalar(_) => "scalar",
+            ScalarFieldType::BuiltInScalar(_) | ScalarFieldType::Geometry(_) => "scalar",
             ScalarFieldType::Extension(_) | ScalarFieldType::Unsupported(_) => unreachable!(),
         },
         is_list: ast_field.arity.is_list(),
@@ -199,6 +204,7 @@ fn scalar_field_to_dmmf(field: walkers::ScalarFieldWalker<'_>) -> Field {
             ScalarFieldType::CompositeType(ct) => field_walker.walk(ct).name().to_owned(),
             ScalarFieldType::Enum(enm) => field_walker.walk(enm).name().to_owned(),
             ScalarFieldType::BuiltInScalar(st) => st.as_str().to_owned(),
+            ScalarFieldType::Geometry(spec) => geometry_dmmf_field_type(&spec),
             ScalarFieldType::Extension(_) | ScalarFieldType::Unsupported(_) => unreachable!(),
         },
         native_type: field

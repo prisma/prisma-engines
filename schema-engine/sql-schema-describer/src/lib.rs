@@ -29,6 +29,7 @@ use indexmap::IndexSet;
 pub use prisma_value::PrismaValue;
 
 use enumflags2::{BitFlag, BitFlags};
+use psl::parser_database::GeometrySpec;
 use regex::Regex;
 use serde::{Deserialize, Serialize};
 use std::fmt::{self, Debug};
@@ -704,6 +705,8 @@ pub enum ColumnTypeFamily {
     Enum(EnumId),
     /// User-defined type
     Udt(UdtId),
+    /// PostGIS `geometry` type (subtype + SRID from typmod / `format_type`).
+    Geometry(GeometrySpec),
     /// Unsupported
     Unsupported(String),
 }
@@ -746,6 +749,10 @@ impl ColumnTypeFamily {
 
     pub fn is_unsupported(&self) -> bool {
         matches!(self, ColumnTypeFamily::Unsupported(_))
+    }
+
+    pub fn is_geometry(&self) -> bool {
+        matches!(self, ColumnTypeFamily::Geometry(_))
     }
 }
 

@@ -15,6 +15,7 @@ use indoc::indoc;
 use psl::{
     builtin_connectors::{CockroachType, KnownPostgresType, PostgresType},
     datamodel_connector::NativeTypeInstance,
+    parser_database::{GeometrySpec, GeometrySubtype, PostgisSpatialKind},
 };
 use quaint::{Value, connector::ResultRow, prelude::Queryable};
 use regex::Regex;
@@ -1532,6 +1533,62 @@ fn index_from_row(
     }
 }
 
+fn map_geometry_subtype(pg_name: &str) -> GeometrySubtype {
+    match pg_name.trim().to_uppercase().as_str() {
+        "POINT" => GeometrySubtype::Point,
+        "LINESTRING" => GeometrySubtype::LineString,
+        "POLYGON" => GeometrySubtype::Polygon,
+        "MULTIPOINT" => GeometrySubtype::MultiPoint,
+        "MULTILINESTRING" => GeometrySubtype::MultiLineString,
+        "MULTIPOLYGON" => GeometrySubtype::MultiPolygon,
+        "GEOMETRYCOLLECTION" => GeometrySubtype::GeometryCollection,
+        "GEOMETRY" => GeometrySubtype::Geometry,
+        _ => GeometrySubtype::Geometry,
+    }
+}
+
+/// Parse PostGIS `geometry` / `geography` from `format_type(atttypid, atttypmod)` (e.g. `geometry(Point,4326)`).
+fn parse_postgis_spatial(formatted_type: &str, spatial: PostgisSpatialKind) -> GeometrySpec {
+    static RE_TWO: LazyLock<Regex> =
+        LazyLock::new(|| Regex::new(r"(?i)^(geometry|geography)\s*\(\s*([^,()]+)\s*,\s*(-?\d+)\s*\)\s*$").unwrap());
+    static RE_ONE: LazyLock<Regex> =
+        LazyLock::new(|| Regex::new(r"(?i)^(geometry|geography)\s*\(\s*([^,()]+)\s*\)\s*$").unwrap());
+
+    let trimmed = formatted_type.trim();
+    if trimmed.eq_ignore_ascii_case("geometry") || trimmed.eq_ignore_ascii_case("geography") {
+        return GeometrySpec {
+            subtype: GeometrySubtype::Geometry,
+            srid: None,
+            spatial,
+        };
+    }
+
+    if let Some(caps) = RE_TWO.captures(trimmed) {
+        let subtype_str = caps.get(2).map(|m| m.as_str()).unwrap_or("GEOMETRY");
+        let srid: i32 = caps.get(3).and_then(|m| m.as_str().parse().ok()).unwrap_or(0);
+        return GeometrySpec {
+            subtype: map_geometry_subtype(subtype_str),
+            srid: Some(srid),
+            spatial,
+        };
+    }
+
+    if let Some(caps) = RE_ONE.captures(trimmed) {
+        let subtype_str = caps.get(2).map(|m| m.as_str()).unwrap_or("GEOMETRY");
+        return GeometrySpec {
+            subtype: map_geometry_subtype(subtype_str),
+            srid: None,
+            spatial,
+        };
+    }
+
+    GeometrySpec {
+        subtype: GeometrySubtype::Geometry,
+        srid: None,
+        spatial,
+    }
+}
+
 fn get_column_type_postgresql(row: &ResultRow, schema: &SqlSchema) -> ColumnType {
     let data_type = row.get_expect_string("data_type");
     let full_data_type = row.get_expect_string("full_data_type");
@@ -1563,6 +1620,24 @@ fn get_column_type_family(
     schema: &SqlSchema,
 ) -> (ColumnTypeFamily, Option<PostgresType>) {
     use ColumnTypeFamily::*;
+
+    if full_data_type == "geometry" && data_type == "USER-DEFINED" {
+        let spec = parse_postgis_spatial(&row.get_expect_string("formatted_type"), PostgisSpatialKind::Geometry);
+        let sql = spec.postgres_sql_type();
+        return (
+            ColumnTypeFamily::Geometry(spec),
+            Some(PostgresType::Unknown(sql, Vec::new())),
+        );
+    }
+
+    if full_data_type == "geography" && data_type == "USER-DEFINED" {
+        let spec = parse_postgis_spatial(&row.get_expect_string("formatted_type"), PostgisSpatialKind::Geography);
+        let sql = spec.postgres_sql_type();
+        return (
+            ColumnTypeFamily::Geometry(spec),
+            Some(PostgresType::Unknown(sql, Vec::new())),
+        );
+    }
 
     let precision = SqlSchemaDescriber::get_precision(row);
 
@@ -1747,5 +1822,47 @@ fn get_column_type_cockroachdb(row: &ResultRow, schema: &SqlSchema) -> ColumnTyp
         family,
         arity,
         native_type: native_type.map(NativeTypeInstance::new::<CockroachType>),
+    }
+}
+
+#[cfg(test)]
+mod postgis_geometry_tests {
+    use super::*;
+
+    #[test]
+    fn parse_unconstrained_geometry() {
+        let spec = parse_postgis_spatial("geometry", PostgisSpatialKind::Geometry);
+        assert_eq!(spec.subtype, GeometrySubtype::Geometry);
+        assert_eq!(spec.srid, None);
+        assert_eq!(spec.spatial, PostgisSpatialKind::Geometry);
+    }
+
+    #[test]
+    fn parse_geometry_point_with_srid() {
+        let spec = parse_postgis_spatial("geometry(POINT,4326)", PostgisSpatialKind::Geometry);
+        assert_eq!(spec.subtype, GeometrySubtype::Point);
+        assert_eq!(spec.srid, Some(4326));
+    }
+
+    #[test]
+    fn parse_geometry_multipolygon() {
+        let spec = parse_postgis_spatial("geometry(MULTIPOLYGON,3857)", PostgisSpatialKind::Geometry);
+        assert_eq!(spec.subtype, GeometrySubtype::MultiPolygon);
+        assert_eq!(spec.srid, Some(3857));
+    }
+
+    #[test]
+    fn parse_geography_point_with_srid() {
+        let spec = parse_postgis_spatial("geography(POINT,4326)", PostgisSpatialKind::Geography);
+        assert_eq!(spec.subtype, GeometrySubtype::Point);
+        assert_eq!(spec.srid, Some(4326));
+        assert_eq!(spec.spatial, PostgisSpatialKind::Geography);
+    }
+
+    #[test]
+    fn parse_geometry_point_subtype_only() {
+        let spec = parse_postgis_spatial("geometry(POINT)", PostgisSpatialKind::Geometry);
+        assert_eq!(spec.subtype, GeometrySubtype::Point);
+        assert_eq!(spec.srid, None);
     }
 }

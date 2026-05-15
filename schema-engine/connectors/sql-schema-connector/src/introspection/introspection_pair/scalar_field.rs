@@ -107,6 +107,16 @@ impl<'a> ScalarFieldPair<'a> {
             sql::ColumnTypeFamily::Binary => Cow::from("Bytes"),
             sql::ColumnTypeFamily::Json => Cow::from("Json"),
             sql::ColumnTypeFamily::Uuid => Cow::from("String"),
+            sql::ColumnTypeFamily::Geometry(spec) => {
+                use std::fmt::Write;
+                let mut out = String::from("Geometry(");
+                out.push_str(spec.subtype.as_str());
+                if let Some(srid) = spec.srid {
+                    write!(&mut out, ", {srid}").unwrap();
+                }
+                out.push(')');
+                Cow::Owned(out)
+            }
             sql::ColumnTypeFamily::Enum(id) => self.context.enum_prisma_name(*id).prisma_name(),
             &sql::ColumnTypeFamily::Udt(id) => self
                 .extension_type()
@@ -153,6 +163,7 @@ impl<'a> ScalarFieldPair<'a> {
             sql::ColumnTypeFamily::Json => psl::parser_database::ScalarType::Json,
             sql::ColumnTypeFamily::Uuid => psl::parser_database::ScalarType::String,
             sql::ColumnTypeFamily::Binary => psl::parser_database::ScalarType::Bytes,
+            sql::ColumnTypeFamily::Geometry(spec) => return Some(ScalarFieldType::Geometry(*spec)),
             sql::ColumnTypeFamily::Udt(_) => {
                 let entry = self.extension_type()?;
                 return Some(ScalarFieldType::Extension(entry.id));

@@ -73,6 +73,9 @@ pub(super) fn visit_model_field_default(
                 "Only @default(dbgenerated(\"...\")) can be used for Unsupported types.",
             );
         }
+        ScalarFieldType::Geometry(_) => {
+            ctx.push_attribute_validation_error("Only @default(dbgenerated(\"...\")) can be used for Geometry types.");
+        }
     }
 }
 
@@ -138,6 +141,9 @@ pub(super) fn visit_composite_field_default(
         }
         ScalarFieldType::Unsupported(_) => {
             ctx.push_attribute_validation_error("Composite field of type `Unsupported` cannot have default values.")
+        }
+        ScalarFieldType::Geometry(_) => {
+            ctx.push_attribute_validation_error("Composite field of type `Geometry` cannot have default values.")
         }
     }
 }

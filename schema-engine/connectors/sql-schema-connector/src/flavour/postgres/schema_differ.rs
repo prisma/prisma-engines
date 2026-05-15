@@ -14,6 +14,7 @@ use enumflags2::BitFlags;
 use psl::builtin_connectors::{CockroachType, KnownPostgresType, PostgresType};
 use regex::RegexSet;
 use sql_schema_describer::{
+    ColumnTypeFamily,
     postgres::PostgresSchemaExt,
     walkers::{IndexWalker, TableColumnWalker},
 };
@@ -381,6 +382,19 @@ fn postgres_column_type_change(columns: MigrationPair<TableColumnWalker<'_>>) ->
     let next_type: Option<&PostgresType> = columns.next.column_native_type();
     let from_list_to_scalar = columns.previous.arity().is_list() && !columns.next.arity().is_list();
     let from_scalar_to_list = !columns.previous.arity().is_list() && columns.next.arity().is_list();
+
+    match (columns.previous.column_type_family(), columns.next.column_type_family()) {
+        (ColumnTypeFamily::Geometry(prev), ColumnTypeFamily::Geometry(next)) => {
+            if from_list_to_scalar || from_scalar_to_list {
+                return Some(NotCastable);
+            }
+            if prev == next {
+                return None;
+            }
+            return Some(RiskyCast);
+        }
+        _ => {}
+    }
 
     match (previous_type, next_type) {
         (_, Some(PostgresType::Known(KnownPostgresType::Text))) if from_list_to_scalar => Some(SafeCast),

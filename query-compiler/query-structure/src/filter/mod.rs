@@ -7,6 +7,7 @@
 
 mod compare;
 mod composite;
+mod geometry;
 mod into_filter;
 mod json;
 mod list;
@@ -16,6 +17,7 @@ mod scalar;
 
 pub use compare::*;
 pub use composite::*;
+pub use geometry::*;
 pub use into_filter::*;
 pub use json::*;
 pub use list::*;
@@ -35,6 +37,7 @@ pub enum Filter {
     OneRelationIsNull(OneRelationIsNullFilter),
     Relation(RelationFilter),
     Composite(CompositeFilter),
+    Geometry(GeometryFilter),
     BoolFilter(bool),
     Aggregation(AggregationFilter),
     Empty,
@@ -226,7 +229,7 @@ impl Filter {
         use Filter::*;
         match self {
             Not(branches) | Or(branches) | And(branches) => branches.iter().any(|filter| filter.has_relations()),
-            Scalar(..) | ScalarList(..) | Composite(..) | BoolFilter(..) | Empty => false,
+            Scalar(..) | ScalarList(..) | Composite(..) | Geometry(..) | BoolFilter(..) | Empty => false,
             Aggregation(filter) => match filter {
                 Average(filter) | Count(filter) | Sum(filter) | Min(filter) | Max(filter) => filter.has_relations(),
             },
@@ -288,5 +291,11 @@ impl From<bool> for Filter {
 impl From<CompositeFilter> for Filter {
     fn from(cf: CompositeFilter) -> Self {
         Filter::Composite(cf)
+    }
+}
+
+impl From<GeometryFilter> for Filter {
+    fn from(gf: GeometryFilter) -> Self {
+        Filter::Geometry(gf)
     }
 }

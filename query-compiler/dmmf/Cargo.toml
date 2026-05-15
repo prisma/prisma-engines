@@ -6,7 +6,7 @@ edition.workspace = true
 [dependencies]
 bigdecimal.workspace = true
 itertools.workspace = true
-psl.workspace = true
+psl = { workspace = true, features = ["all"] }
 serde.workspace = true
 serde_json.workspace = true
 schema.workspace = true

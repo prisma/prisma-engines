@@ -55,7 +55,29 @@ model_contents = {
 field_type = { unsupported_optional_list_type | list_type | optional_type | legacy_required_type | legacy_list_type | base_type  }
 
 unsupported_type = { "Unsupported(" ~ string_literal ~ ")" }
-base_type = { unsupported_type | identifier } // Called base type to not conflict with type rust keyword
+
+geometry_subtype = {
+    "MultiPoint"
+    | "MultiLineString"
+    | "MultiPolygon"
+    | "GeometryCollection"
+    | "Point"
+    | "LineString"
+    | "Polygon"
+    | "Geometry"
+}
+
+geometry_srid = @{ ASCII_DIGIT+ }
+
+geometry_type = {
+    "Geometry"
+    ~ "("
+    ~ geometry_subtype
+    ~ ( "," ~ geometry_srid )?
+    ~ ")"
+}
+
+base_type = { unsupported_type | geometry_type | identifier } // Called base type to not conflict with type rust keyword
 unsupported_optional_list_type = { base_type ~ "[]" ~ "?" }
 list_type = { base_type ~ "[]" }
 optional_type = { base_type ~ "?" }

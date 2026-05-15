@@ -10,9 +10,12 @@ use crate::datamodel_connector::{ConnectorCapability, NativeTypeConstructor, wal
 use crate::{diagnostics::DatamodelError, validate::validation_pipeline::context::Context};
 use itertools::Itertools;
 use parser_database::{
-    ScalarFieldType, ScalarType,
+    GeometrySpec, ScalarFieldType, ScalarType,
     ast::{self, WithSpan},
-    walkers::{FieldWalker, PrimaryKeyWalker, ScalarFieldAttributeWalker, ScalarFieldWalker, TypedFieldWalker},
+    walkers::{
+        CompositeTypeFieldWalker, FieldWalker, PrimaryKeyWalker, ScalarFieldAttributeWalker, ScalarFieldWalker,
+        TypedFieldWalker,
+    },
 };
 
 pub(super) fn validate_client_name(field: FieldWalker<'_>, names: &Names<'_>, ctx: &mut Context<'_>) {
@@ -326,6 +329,84 @@ pub(super) fn validate_scalar_field_connector_specific(field: ScalarFieldWalker<
             field.ast_field().span(),
         ));
     }
+}
+
+fn validate_geometry_spec_constraints(
+    spec: GeometrySpec,
+    ctx: &mut Context<'_>,
+    container: &str,
+    container_name: &str,
+    field_name: &str,
+    field_span: ast::Span,
+    type_span: ast::Span,
+) {
+    if !ctx.has_capability(ConnectorCapability::PostgisGeometry) {
+        let msg = format!(
+            "Field `{field_name}` in {container} `{container_name}` uses type Geometry, which is only supported on PostgreSQL with PostGIS.",
+        );
+        if container == "composite type" {
+            ctx.push_error(DatamodelError::new_composite_type_validation_error(
+                &msg,
+                container_name,
+                field_span,
+            ));
+        } else {
+            ctx.push_error(DatamodelError::new_field_validation_error(
+                &msg,
+                container,
+                container_name,
+                field_name,
+                field_span,
+            ));
+        }
+    }
+
+    if let Some(srid) = spec.srid
+        && (srid < 0 || srid > 999_999)
+    {
+        ctx.push_error(DatamodelError::new_validation_error(
+            &format!("Invalid SRID {srid}. Must be between 0 and 999999 when specified."),
+            type_span,
+        ));
+    }
+}
+
+pub(super) fn validate_geometry_field(field: ScalarFieldWalker<'_>, ctx: &mut Context<'_>) {
+    let ScalarFieldType::Geometry(spec) = field.scalar_field_type() else {
+        return;
+    };
+
+    let container = if field.model().ast_model().is_view() {
+        "view"
+    } else {
+        "model"
+    };
+
+    validate_geometry_spec_constraints(
+        spec,
+        ctx,
+        container,
+        field.model().name(),
+        field.name(),
+        field.ast_field().span(),
+        field.ast_field().field_type.span(),
+    );
+}
+
+pub(super) fn validate_geometry_on_composite_field(field: CompositeTypeFieldWalker<'_>, ctx: &mut Context<'_>) {
+    let ScalarFieldType::Geometry(spec) = field.r#type() else {
+        return;
+    };
+
+    validate_geometry_spec_constraints(
+        spec,
+        ctx,
+        "composite type",
+        field.composite_type().name(),
+        field.name(),
+        field.ast_field().span(),
+        field.ast_field().field_type.span(),
+    );
 }
 
 pub(super) fn validate_unsupported_field_type(field: ScalarFieldWalker<'_>, ctx: &mut Context<'_>) {

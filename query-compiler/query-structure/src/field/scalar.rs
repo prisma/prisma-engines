@@ -2,10 +2,14 @@ use crate::{DefaultKind, NativeTypeInstance, ValueGenerator, ast, parent_contain
 use chrono::{DateTime, FixedOffset};
 use psl::{
     generators::{DEFAULT_CUID_VERSION, DEFAULT_UUID_VERSION},
-    parser_database::{self as db, ScalarFieldType, ScalarType, walkers},
+    parser_database::{self as db, GeometrySpec, ScalarFieldType, ScalarType, walkers},
     schema_ast::ast::FieldArity,
 };
 use std::fmt::{Debug, Display};
+
+fn geometry_dmmf_string(spec: &GeometrySpec) -> String {
+    spec.postgres_sql_type()
+}
 
 pub type ScalarField = crate::Zipper<ScalarFieldId>;
 pub type ScalarFieldRef = ScalarField;
@@ -98,6 +102,7 @@ impl ScalarField {
             ScalarFieldType::Enum(x) => TypeIdentifier::Enum(x),
             ScalarFieldType::Extension(udt) => TypeIdentifier::Extension(udt),
             ScalarFieldType::BuiltInScalar(scalar) => scalar.into(),
+            ScalarFieldType::Geometry(spec) => TypeIdentifier::Geometry(geometry_dmmf_string(&spec)),
             ScalarFieldType::Unsupported(_) => TypeIdentifier::Unsupported,
         }
     }

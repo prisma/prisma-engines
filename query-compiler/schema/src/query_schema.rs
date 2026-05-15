@@ -359,7 +359,7 @@ impl Identifier {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Copy)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum ScalarType {
     Null,
     String,
@@ -373,6 +373,8 @@ pub enum ScalarType {
     JsonList,
     UUID,
     Bytes,
+    /// DMMF string form, e.g. `geometry(Point,4326)`.
+    Geometry(String),
 }
 
 impl fmt::Display for ScalarType {
@@ -390,6 +392,7 @@ impl fmt::Display for ScalarType {
             ScalarType::UUID => "UUID",
             ScalarType::JsonList => "Json",
             ScalarType::Bytes => "Bytes",
+            ScalarType::Geometry(s) => s.as_str(),
         };
 
         f.write_str(typ)

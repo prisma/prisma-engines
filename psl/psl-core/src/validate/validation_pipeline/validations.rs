@@ -32,6 +32,7 @@ pub(super) fn validate(ctx: &mut Context<'_>) {
             for field in composite_type.fields() {
                 composite_types::validate_default_value(field, ctx);
                 fields::validate_native_type_arguments(field, ctx);
+                fields::validate_geometry_on_composite_field(field, ctx);
             }
         }
     }
@@ -92,6 +93,7 @@ pub(super) fn validate(ctx: &mut Context<'_>) {
 
         for field in model.scalar_fields() {
             fields::validate_scalar_field_connector_specific(field, ctx);
+            fields::validate_geometry_field(field, ctx);
             fields::validate_client_name(field.into(), &names, ctx);
             fields::has_a_unique_default_constraint_name(field, &names, ctx);
             fields::validate_native_type_arguments(field, ctx);

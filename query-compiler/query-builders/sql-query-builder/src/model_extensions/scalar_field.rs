@@ -68,6 +68,7 @@ impl ScalarFieldExt for ScalarField {
                 TypeIdentifier::Int => Value::null_int32(),
                 TypeIdentifier::BigInt => Value::null_int64(),
                 TypeIdentifier::Bytes => Value::null_bytes(),
+                TypeIdentifier::Geometry(_) => Value::null_bytes(),
                 TypeIdentifier::Unsupported => unreachable!("No unsupported field should reach this path"),
             },
             (PrismaValue::Placeholder(PrismaValuePlaceholder { name, .. }), ident) => {
@@ -107,6 +108,7 @@ impl ScalarFieldExt for ScalarField {
             TypeIdentifier::Json => TypeFamily::Text(Some(TypeDataLength::Maximum)),
             TypeIdentifier::DateTime => TypeFamily::DateTime,
             TypeIdentifier::Bytes => TypeFamily::Text(parse_scalar_length(self)),
+            TypeIdentifier::Geometry(_) => TypeFamily::Text(parse_scalar_length(self)),
             TypeIdentifier::Unsupported => unreachable!("No unsupported field should reach this path"),
         }
     }

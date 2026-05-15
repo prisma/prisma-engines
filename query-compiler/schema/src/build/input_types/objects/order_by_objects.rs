@@ -136,6 +136,10 @@ fn orderby_field_mapper<'a>(
                 types.push(InputType::object(sort_nulls_object_type()));
             }
 
+            if matches!(sf.type_identifier(), TypeIdentifier::Geometry(_)) {
+                types.push(InputType::object(geometry_order_by_object_type()));
+            }
+
             Some(input_field(sf.name().to_owned(), types, None).optional())
         }
 
@@ -272,4 +276,35 @@ fn order_by_object_type_text_search<'a>(
         ]
     });
     input_object
+}
+
+fn geometry_distance_from_input<'a>() -> InputObjectType<'a> {
+    let ident = Identifier::new_prisma(IdentifierType::GeometryDistanceFromInput);
+    let mut object = init_input_object_type(ident);
+
+    object.set_fields(|| {
+        vec![
+            simple_input_field(constants::filters::POINT, InputType::list(InputType::float()), None).required(),
+            simple_input_field(ordering::DIRECTION, InputType::Enum(sort_order_enum()), None).required(),
+            simple_input_field(constants::filters::SRID, InputType::int(), None).optional(),
+        ]
+    });
+
+    object
+}
+
+fn geometry_order_by_object_type<'a>() -> InputObjectType<'a> {
+    let ident = Identifier::new_prisma("GeometryOrderByInput");
+    let mut object = init_input_object_type(ident);
+
+    object.set_fields(|| {
+        vec![simple_input_field(
+            ordering::DISTANCE_FROM,
+            InputType::object(geometry_distance_from_input()),
+            None,
+        )
+        .optional()]
+    });
+
+    object
 }
