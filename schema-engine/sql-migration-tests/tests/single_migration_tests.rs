@@ -106,7 +106,6 @@ fn run_single_migration_test(test_file_path: &str, test_function_name: &'static 
     tok(schema_engine.diff(schema_core::json_rpc::types::DiffParams {
         exit_code: None,
         script: true,
-        shadow_database_url: None,
         from: schema_core::json_rpc::types::DiffTarget::Empty,
         to: schema_core::json_rpc::types::DiffTarget::SchemaDatamodel(SchemasContainer {
             files: vec![schema_core::json_rpc::types::SchemaContainer {
@@ -133,7 +132,6 @@ fn run_single_migration_test(test_file_path: &str, test_function_name: &'static 
     let second_migration_result = tok(schema_engine.diff(schema_core::json_rpc::types::DiffParams {
         exit_code: Some(true),
         script: true,
-        shadow_database_url: None,
         from: schema_core::json_rpc::types::DiffTarget::Url(schema_core::json_rpc::types::UrlContainer {
             url: connection_string,
         }),

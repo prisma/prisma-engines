@@ -461,6 +461,10 @@ impl<'a> Visitor<'a> for Sqlite<'a> {
         Ok(())
     }
 
+    fn visit_stringify(&mut self, _stringify: Stringify<'a>) -> visitor::Result {
+        unimplemented!("string conversion is not yet supported on SQLite")
+    }
+
     fn visit_ordering(&mut self, ordering: Ordering<'a>) -> visitor::Result {
         let len = ordering.0.len();
 

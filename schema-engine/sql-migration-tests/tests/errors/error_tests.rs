@@ -577,7 +577,6 @@ async fn diff_from_empty_schema_to_datamodel_should_not_require_url() {
                     content: dm.to_string(),
                 }],
             }),
-            shadow_database_url: None,
             script: false,
             exit_code: None,
             filters: SchemaFilter::default(),

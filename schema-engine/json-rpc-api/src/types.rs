@@ -432,14 +432,6 @@ pub struct DiffParams {
     /// end-state.
     pub to: DiffTarget,
 
-    /// The URL to a live database to use as a shadow database. The schema and data on
-    /// that database will be wiped during diffing.
-    ///
-    /// This is only necessary when one of `from` or `to` is referencing a migrations
-    /// directory as a source for the schema.
-    /// @deprecated.
-    pub shadow_database_url: Option<String>,
-
     /// By default, the response will contain a human-readable diff. If you want an
     /// executable script, pass the `"script": true` param.
     pub script: bool,

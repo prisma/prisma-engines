@@ -1115,3 +1115,53 @@ fn postgres_create_index_concurrently_works(api: TestApi) {
         .send_sync()
         .assert_applied_migrations(&["01init"]);
 }
+
+#[test_connector(tags(Postgres))]
+fn postgres_create_migration_works_with_multiple_create_index_concurrently_statements(api: TestApi) {
+    let migrations_directory = api.create_migrations_directory();
+    let dm = "";
+    let migration = r#"
+        CREATE TABLE "Person" (
+            id TEXT PRIMARY KEY,
+            "firstName" TEXT NOT NULL,
+            "lastName" TEXT NOT NULL
+        );
+
+        CREATE INDEX CONCURRENTLY "Person_firstName_idx" ON "Person"("firstName");
+        CREATE INDEX CONCURRENTLY "Person_lastName_idx" ON "Person"("lastName");
+    "#;
+
+    api.create_migration("01init", dm, &migrations_directory)
+        .draft(true)
+        .send_sync()
+        .modify_migration(|contents| {
+            contents.clear();
+            contents.push_str(migration);
+        });
+
+    let dm2 = api.datamodel_with_provider(
+        r#"
+        model Person {
+            id String @id
+            firstName String
+            lastName String
+            role String?
+
+            @@index([firstName])
+            @@index([lastName])
+        }
+    "#,
+    );
+
+    let added_type = if api.is_cockroach() { "STRING" } else { "TEXT" };
+
+    api.create_migration("02add_role", &dm2, &migrations_directory)
+        .send_sync()
+        .assert_migration("02add_role", |migration| {
+            migration.assert_contents(&format!(
+                r#"-- AlterTable
+ALTER TABLE "Person" ADD COLUMN     "role" {added_type};
+"#
+            ))
+        });
+}

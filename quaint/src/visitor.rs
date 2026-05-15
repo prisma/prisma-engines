@@ -161,6 +161,8 @@ pub trait Visitor<'a> {
 
     fn visit_json_build_object(&mut self, build_obj: JsonBuildObject<'a>) -> Result;
 
+    fn visit_stringify(&mut self, stringify: Stringify<'a>) -> Result;
+
     fn visit_text_search(&mut self, text_search: TextSearch<'a>) -> Result;
 
     fn visit_matches(&mut self, left: Expression<'a>, right: Expression<'a>, not: bool) -> Result;
@@ -1273,6 +1275,9 @@ pub trait Visitor<'a> {
             }
             FunctionType::JsonBuildObject(build_obj) => {
                 self.visit_json_build_object(build_obj)?;
+            }
+            FunctionType::Stringify(stringify) => {
+                self.visit_stringify(stringify)?;
             }
         };
 

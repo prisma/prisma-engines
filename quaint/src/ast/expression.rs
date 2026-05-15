@@ -180,6 +180,14 @@ impl<'a> Expression<'a> {
     }
 
     #[allow(dead_code)]
+    pub(crate) fn as_column(&self) -> Option<&Column<'a>> {
+        match &self.kind {
+            ExpressionKind::Column(column) => Some(column),
+            _ => None,
+        }
+    }
+
+    #[allow(dead_code)]
     pub(crate) fn into_column(self) -> Option<Column<'a>> {
         match self.kind {
             ExpressionKind::Column(column) => Some(*column),

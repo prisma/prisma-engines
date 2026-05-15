@@ -140,6 +140,13 @@ impl Placeholder {
             r#type,
         }
     }
+
+    pub fn with_type(self, r#type: PrismaValueType) -> Self {
+        Self {
+            name: self.name,
+            r#type,
+        }
+    }
 }
 
 /// Stringify a date to the following format
