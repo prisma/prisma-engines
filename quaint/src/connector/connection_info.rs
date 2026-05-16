@@ -498,7 +498,7 @@ impl SqlFamily {
             #[cfg(feature = "mysql")]
             SqlFamily::Mysql => 65535,
             #[cfg(feature = "sqlite")]
-            SqlFamily::Sqlite => 999,
+            SqlFamily::Sqlite => 32766,
             #[cfg(feature = "mssql")]
             SqlFamily::Mssql => 2098,
         }
