@@ -1103,5 +1103,8 @@ fn reformat_missing_forward_relation_arguments_with_crln() {
         }
     "#]];
 
-    expected.assert_eq(&reformat(&schema.replace('\n', "\r\n")));
+    let reformatted = reformat(&schema.replace('\n', "\r\n"));
+    expected.assert_eq(&reformatted.replace("\r\n", "\n"));
+    assert!(reformatted.ends_with("\r\n"));
+    assert!(!reformatted.replace("\r\n", "").contains('\r'));
 }

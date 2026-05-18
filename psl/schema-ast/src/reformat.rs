@@ -9,6 +9,7 @@ type Pair<'a> = pest::iterators::Pair<'a, Rule>;
 
 /// Reformat a PSL string.
 pub fn reformat(input: &str, indent_width: usize) -> Option<String> {
+    let line_ending = detect_line_ending(input);
     let mut ast = PrismaDatamodelParser::parse(Rule::schema, input).ok()?;
     let mut renderer = Renderer::new(indent_width);
     renderer.stream.reserve(input.len() / 2);
@@ -21,7 +22,24 @@ pub fn reformat(input: &str, indent_width: usize) -> Option<String> {
 
     // TODO: why do we need to use a `Some` here?
     // Also: if we really want to return an `Option<String>`, why do unwrap in `ast.next()`?
-    Some(renderer.stream)
+    Some(normalize_line_endings(renderer.stream, line_ending))
+}
+
+fn detect_line_ending(input: &str) -> &'static str {
+    match input.find('\n') {
+        Some(idx) if idx > 0 && input.as_bytes()[idx - 1] == b'\r' => "\r\n",
+        _ => "\n",
+    }
+}
+
+fn normalize_line_endings(output: String, line_ending: &str) -> String {
+    let normalized = output.replace("\r\n", "\n");
+
+    if line_ending == "\r\n" {
+        normalized.replace('\n', "\r\n")
+    } else {
+        normalized
+    }
 }
 
 fn reformat_top(target: &mut Renderer, pair: Pair<'_>) {

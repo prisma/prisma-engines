@@ -106,5 +106,18 @@ mod reformat_multi_file {
             })
     }
 
+    #[test]
+    fn reformat_multiple_preserves_line_endings_per_file() {
+        let schemas = vec![
+            ("lf.prisma".to_owned(), "model A {\n  id Int @id\n}".into()),
+            ("crlf.prisma".to_owned(), "model B {\r\n  id Int @id\r\n}".into()),
+        ];
+
+        let result: HashMap<_, _> = reformat_multiple(schemas, 2).into_iter().collect();
+
+        assert_eq!("model A {\n  id Int @id\n}\n", result["lf.prisma"]);
+        assert_eq!("model B {\r\n  id Int @id\r\n}\r\n", result["crlf.prisma"]);
+    }
+
     include!(concat!(env!("OUT_DIR"), "/reformat_multi_file_tests.rs"));
 }

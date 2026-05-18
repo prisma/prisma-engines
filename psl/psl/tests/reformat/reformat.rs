@@ -16,6 +16,22 @@ fn must_add_new_line_to_end_of_schema() {
 }
 
 #[test]
+fn must_preserve_lf_line_endings() {
+    let input = "model User {\n  id Int @id\n}";
+    let expected = "model User {\n  id Int @id\n}\n";
+
+    assert_eq!(expected, reformat(input));
+}
+
+#[test]
+fn must_preserve_crlf_line_endings() {
+    let input = "model User {\r\n  id Int @id\r\n}";
+    let expected = "model User {\r\n  id Int @id\r\n}\r\n";
+
+    assert_eq!(expected, reformat(input));
+}
+
+#[test]
 fn test_reformat_model_complex() {
     let input = indoc! {r#"
         /// model doc comment
