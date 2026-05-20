@@ -39,7 +39,7 @@
     "@prisma/schema-engine-wasm": "../../../schema-engine/schema-engine-wasm/pkg",
     "decimal.js": "10.5.0",
     "ts-pattern": "5.1.1",
-    "undici": "6.23.0",
+    "undici": "6.24.0",
     "wrangler": "^4.4.0",
     "ws": "8.17.1"
   },
