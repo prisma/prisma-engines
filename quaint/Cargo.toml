@@ -65,6 +65,8 @@ pooled = ["dep:mobc"]
 sqlite-native = ["sqlite", "rusqlite/bundled", "tokio/sync"]
 sqlite = []
 
+surrealdb = []
+
 fmt-sql = ["dep:sqlformat"]
 
 [dependencies]

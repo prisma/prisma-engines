@@ -60,6 +60,8 @@ pub enum AdapterProvider {
     #[cfg(feature = "mssql")]
     #[cfg_attr(target_arch = "wasm32", serde(rename = "sqlserver"))]
     SqlServer,
+    #[cfg(feature = "surrealdb")]
+    SurrealDb,
 }
 
 impl AdapterProvider {
@@ -73,6 +75,8 @@ impl AdapterProvider {
             Self::Sqlite => "sqlite",
             #[cfg(feature = "mssql")]
             Self::SqlServer => "mssql",
+            #[cfg(feature = "surrealdb")]
+            Self::SurrealDb => "surrealdb",
         }
     }
 }
@@ -90,6 +94,8 @@ impl FromStr for AdapterProvider {
             "sqlite" => Ok(Self::Sqlite),
             #[cfg(feature = "mssql")]
             "sqlserver" => Ok(Self::SqlServer),
+            #[cfg(feature = "surrealdb")]
+            "surrealdb" => Ok(Self::SurrealDb),
             _ => Err(format!("Unsupported adapter flavour: {s:?}")),
         }
     }
@@ -106,6 +112,8 @@ impl From<&AdapterProvider> for SqlFamily {
             AdapterProvider::Sqlite => SqlFamily::Sqlite,
             #[cfg(feature = "mssql")]
             AdapterProvider::SqlServer => SqlFamily::Mssql,
+            #[cfg(feature = "surrealdb")]
+            AdapterProvider::SurrealDb => SqlFamily::SurrealDb,
         }
     }
 }

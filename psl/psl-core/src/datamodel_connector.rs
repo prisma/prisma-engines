@@ -323,6 +323,7 @@ pub enum Flavour {
     Mysql,
     Postgres,
     Sqlite,
+    SurrealDb,
 }
 
 impl Flavour {

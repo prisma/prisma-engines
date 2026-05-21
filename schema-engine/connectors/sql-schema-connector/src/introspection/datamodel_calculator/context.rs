@@ -51,6 +51,8 @@ impl<'a> DatamodelCalculatorContext<'a> {
             SqlFamily::Sqlite => Box::new(flavour::SqliteIntrospectionFlavour),
             #[cfg(feature = "mssql")]
             SqlFamily::Mssql => Box::new(flavour::SqlServerIntrospectionFlavour),
+            #[cfg(feature = "surrealdb")]
+            SqlFamily::SurrealDb => Box::new(flavour::SurrealDbIntrospectionFlavour),
             #[allow(unreachable_patterns)]
             _ => unimplemented!("Unsupported SQL family: {:?}", ctx.sql_family()),
         };

@@ -14,6 +14,9 @@ mod postgres;
 #[cfg(feature = "sqlite")]
 mod sqlite;
 
+#[cfg(feature = "surrealdb")]
+mod surrealdb;
+
 #[cfg(feature = "mssql")]
 pub(crate) use mssql::{MssqlConnector, MssqlDialect};
 
@@ -25,6 +28,9 @@ pub(crate) use postgres::{PostgresConnector, PostgresDialect};
 
 #[cfg(feature = "sqlite")]
 pub(crate) use sqlite::{SqliteConnector, SqliteDialect};
+
+#[cfg(feature = "surrealdb")]
+pub(crate) use self::surrealdb::{SurrealDbConnector, SurrealDbDialect};
 
 use crate::{
     sql_destructive_change_checker::DestructiveChangeCheckerFlavour, sql_renderer::SqlRenderer,

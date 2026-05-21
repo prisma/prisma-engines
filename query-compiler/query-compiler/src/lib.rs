@@ -46,6 +46,8 @@ pub fn compile(
         SqlFamily::Sqlite => translate(graph, &SqlQueryBuilder::<visitor::Sqlite<'_>>::new(ctx)),
         #[cfg(feature = "mssql")]
         SqlFamily::Mssql => translate(graph, &SqlQueryBuilder::<visitor::Mssql<'_>>::new(ctx)),
+        #[cfg(feature = "surrealdb")]
+        SqlFamily::SurrealDb => translate(graph, &SqlQueryBuilder::<visitor::SurrealDb<'_>>::new(ctx)),
     };
 
     res.map_err(CompileError::TranslateError)
