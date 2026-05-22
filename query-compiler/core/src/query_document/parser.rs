@@ -420,7 +420,6 @@ impl QueryDocumentParser {
             (PrismaValue::Bytes(bytes), &ScalarType::Bytes) => Ok(PrismaValue::Bytes(bytes)),
             (pv @ PrismaValue::Bytes(_), &ScalarType::Geometry(_)) => Ok(pv),
             (pv @ PrismaValue::String(_), &ScalarType::Geometry(_)) => Ok(pv),
-            (PrismaValue::Json(s), &ScalarType::Geometry(_)) => Ok(PrismaValue::Bytes(s.into_bytes())),
             (PrismaValue::BigInt(b_int), &ScalarType::BigInt) => Ok(PrismaValue::BigInt(b_int)),
             (PrismaValue::DateTime(s), &ScalarType::DateTime) => Ok(PrismaValue::DateTime(s)),
             (PrismaValue::Null, &ScalarType::Null) => Ok(PrismaValue::Null),

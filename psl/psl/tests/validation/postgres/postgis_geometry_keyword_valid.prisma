@@ -1,0 +1,17 @@
+datasource db {
+  provider = "postgresql"
+}
+
+generator client {
+  provider = "prisma-client"
+}
+
+// SevInf #1/#4: `Geometry` and `Geography` are first-class PSL scalar types.
+// Each pairs with the matching `@db.Geometry(...)` / `@db.Geography(...)` native attribute.
+model Location {
+  id        Int       @id
+  position  Geometry  @db.Geometry(Point, 4326)
+  path      Geometry? @db.Geometry(LineString)
+  region    Geography @db.Geography(Polygon, 4326)
+  marker    Geography @db.Geography(Point)
+}

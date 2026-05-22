@@ -94,6 +94,11 @@ impl MongoFilterVisitor {
             Filter::Aggregation(filter) => self.visit_aggregation_filter(filter)?,
             Filter::Composite(filter) => self.visit_composite_filter(filter)?,
             Filter::BoolFilter(_) => unimplemented!("MongoDB boolean filter."),
+            Filter::Geometry(_) => {
+                return Err(MongoError::Unsupported(
+                    "Geometry filters are not supported on MongoDB".to_string(),
+                ));
+            }
         };
 
         Ok(filter_pair)

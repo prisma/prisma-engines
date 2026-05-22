@@ -138,12 +138,11 @@ fn process_order_object(
                 }
 
                 Field::Scalar(sf) => {
-                    if matches!(sf.type_identifier(), TypeIdentifier::Geometry(_)) {
-                        if let ParsedInputValue::Map(ref map) = field_value {
-                            if let Some(distance_from_value) = map.get(ordering::DISTANCE_FROM) {
-                                return extract_geometry_distance_from(&sf, distance_from_value.clone(), path);
-                            }
-                        }
+                    if matches!(sf.type_identifier(), TypeIdentifier::Geometry(_))
+                        && let ParsedInputValue::Map(ref map) = field_value
+                        && let Some(distance_from_value) = map.get(ordering::DISTANCE_FROM)
+                    {
+                        return extract_geometry_distance_from(&sf, distance_from_value.clone(), path);
                     }
 
                     let (sort_order, nulls_order) = extract_order_by_args(field_value)?;
@@ -343,6 +342,21 @@ fn extract_compound_cursor_field(
 
 /// Runs final transformations on the QueryArguments.
 fn finalize_arguments(mut args: QueryArguments, model: &Model) -> QueryGraphBuilderResult<QueryArguments> {
+    // Cursor-based pagination needs a deterministic, totally ordered set of cursor columns. Geometry
+    // distance ordering is not deterministic (depends on a reference point that is not part of the
+    // row), so combining the two would silently produce undefined results. Reject upfront with a clear
+    // error rather than letting the SQL builder reach the geometry-cursor code path.
+    if args.cursor.is_some()
+        && args
+            .order_by
+            .iter()
+            .any(|order_by| matches!(order_by, OrderBy::Geometry(_)))
+    {
+        return Err(QueryGraphBuilderError::InputError(
+            "Cursor-based pagination is not supported when ordering by geometry distance.".to_owned(),
+        ));
+    }
+
     // Check if the query requires an implicit ordering added to the arguments.
     // An implicit ordering is convenient for deterministic results for take and skip, for cursor it's _required_
     // as a cursor needs a direction to page. We simply take the primary identifier as a default order-by.
@@ -397,31 +411,57 @@ fn extract_geometry_distance_from(
     let sort_order = pv_to_sort_order(direction_value.try_into()?)?;
     let srid = srid_value.map(|v| extract_int_from_pv(&v.try_into()?)).transpose()?;
 
-    Ok(Some(OrderBy::geometry(field.clone(), path, (lon, lat), sort_order, srid)))
+    Ok(Some(OrderBy::geometry(
+        field.clone(),
+        path,
+        (lon, lat),
+        sort_order,
+        srid,
+    )))
 }
 
 fn extract_float_from_pv(value: &PrismaValue) -> QueryGraphBuilderResult<f64> {
-    match value {
-        PrismaValue::Int(i) => Ok(*i as f64),
-        PrismaValue::BigInt(i) => Ok(*i as f64),
+    let result = match value {
+        PrismaValue::Int(i) => *i as f64,
+        PrismaValue::BigInt(i) => *i as f64,
         PrismaValue::Float(d) => d
             .to_string()
             .parse::<f64>()
-            .map_err(|e| QueryGraphBuilderError::InputError(format!("Invalid float value: {}", e))),
-        _ => Err(QueryGraphBuilderError::InputError(format!(
-            "Expected numeric value, got {:?}",
-            value
-        ))),
+            .map_err(|e| QueryGraphBuilderError::InputError(format!("Invalid float value: {}", e)))?,
+        _ => {
+            return Err(QueryGraphBuilderError::InputError(format!(
+                "Expected numeric value, got {:?}",
+                value
+            )));
+        }
+    };
+
+    if !result.is_finite() {
+        return Err(QueryGraphBuilderError::InputError(format!(
+            "Expected finite numeric value, got {}",
+            result
+        )));
     }
+
+    Ok(result)
 }
 
 fn extract_int_from_pv(value: &PrismaValue) -> QueryGraphBuilderResult<i32> {
-    match value {
-        PrismaValue::Int(i) => Ok(*i as i32),
-        PrismaValue::BigInt(i) => Ok(*i as i32),
-        _ => Err(QueryGraphBuilderError::InputError(format!(
-            "Expected integer value, got {:?}",
-            value
-        ))),
-    }
+    let i64_value = match value {
+        PrismaValue::Int(i) => *i,
+        PrismaValue::BigInt(i) => *i,
+        _ => {
+            return Err(QueryGraphBuilderError::InputError(format!(
+                "Expected integer value, got {:?}",
+                value
+            )));
+        }
+    };
+
+    i32::try_from(i64_value).map_err(|_| {
+        QueryGraphBuilderError::InputError(format!(
+            "Integer value {} is out of range for a 32-bit signed integer",
+            i64_value
+        ))
+    })
 }

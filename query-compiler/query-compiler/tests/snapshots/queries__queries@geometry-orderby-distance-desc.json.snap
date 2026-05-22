@@ -9,6 +9,7 @@ dataMap {
     position: Geometry(point)? (position)
 }
 query «SELECT "t0"."id", "t0"."position" FROM "public"."Location" AS "t0" ORDER
-       BY ST_Distance(CAST("position" AS geography),
-       CAST(ST_SetSRID(ST_MakePoint(0, 0), 4326) AS geography)) DESC»
-params []
+       BY ST_Distance(geography("t0"."position"),
+       geography(ST_SetSRID(ST_MakePoint($1, $2), $3))) DESC»
+params [const(Float(BigDecimal("0"))), const(Float(BigDecimal("0"))),
+        const(BigInt(4326))]

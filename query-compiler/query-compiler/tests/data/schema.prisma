@@ -88,7 +88,7 @@ model DataTypes {
 model Location {
   id       Int                    @id @default(autoincrement())
   name     String?
-  position Geometry(Point, 4326)?
+  position Geometry? @db.Geometry(Point, 4326)
 }
 
 model Patient {

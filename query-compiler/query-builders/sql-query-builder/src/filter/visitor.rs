@@ -5,6 +5,7 @@ use crate::{Context, model_extensions::*};
 
 use prisma_value::Placeholder as PrismaValuePlaceholder;
 use psl::datamodel_connector::ConnectorCapability;
+use psl::parser_database::PostgisSpatialKind;
 use psl::reachable_only_with_capability;
 use quaint::ast::concat;
 use quaint::ast::*;
@@ -619,121 +620,84 @@ impl FilterVisitorExt for FilterVisitor {
     }
 
     fn visit_geometry_filter(&mut self, filter: GeometryFilter, ctx: &Context<'_>) -> ConditionTree<'static> {
-        let field_column = filter.field.as_column(ctx);
-        let field_ref = format!("\"{}\"", field_column.name);
-        
-        let srid = match &filter.condition {
+        // Resolve the column with the parent alias so that filters nested inside relation
+        // sub-queries stay qualified, matching every other `visit_*_filter` path in this file.
+        let field_column: Column<'static> = filter.field.aliased_col(self.parent_alias(), ctx);
+        let field_expr: Expression<'static> = field_column.into();
+
+        // Determine PostGIS spatial kind (geometry vs geography) and the field's declared SRID
+        // directly from the schema instead of guessing from the SRID value.
+        let field_spec = filter.field.geometry_spec();
+        let use_geography = field_spec
+            .map(|spec| matches!(spec.spatial, PostgisSpatialKind::Geography))
+            .unwrap_or(false);
+        let field_srid = field_spec.and_then(|spec| spec.srid);
+
+        // SRID chain: explicit override (filter arg) takes precedence over the field's
+        // declared SRID; fall back to 0 (PostGIS "unknown") only when neither is set.
+        let resolved_srid = match &filter.condition {
             GeometryFilterCondition::Near { srid, .. }
             | GeometryFilterCondition::Within { srid, .. }
-            | GeometryFilterCondition::Intersects { srid, .. } => srid.unwrap_or(4326),
+            | GeometryFilterCondition::Intersects { srid, .. } => srid.or(field_srid).unwrap_or(0),
         };
 
-        let use_geography = srid == 4326 || srid == 4269 || srid == 4167;
-        
-        let sql = match filter.condition {
+        let condition_expr = match filter.condition {
             GeometryFilterCondition::Near {
-                point,
-                max_distance,
-                ..
-            } => {
-                let (lon, lat) = point;
-                if use_geography {
-                    format!(
-                        "ST_DWithin({}::geography, ST_SetSRID(ST_MakePoint({}, {}), {})::geography, {})",
-                        field_ref, lon, lat, srid, max_distance
-                    )
-                } else {
-                    format!(
-                        "ST_DWithin({}, ST_SetSRID(ST_MakePoint({}, {}), {}), {})",
-                        field_ref, lon, lat, srid, max_distance
-                    )
-                }
-            }
+                point, max_distance, ..
+            } => geometry_near_condition(field_expr, point, max_distance, resolved_srid, use_geography),
             GeometryFilterCondition::Within { polygon, .. } => {
-                let wkt = format_polygon_wkt(&polygon);
-                let escaped_wkt = wkt.replace('\'', "''");
-                format!(
-                    "ST_Within({}, ST_GeomFromText('{}', {}))",
-                    field_ref, escaped_wkt, srid
-                )
+                let wkt = format_polygon_ring_wkt(&polygon);
+                geometry_within_condition(field_expr, wkt, resolved_srid)
             }
             GeometryFilterCondition::Intersects { geometry, .. } => {
-                let geom_type = geometry.get("type").and_then(|v| v.as_str()).unwrap_or("");
-                let wkt = match geom_type {
-                    "Point" => {
-                        if let Some(coords) = geometry.get("coordinates").and_then(|v| v.as_array()) {
-                            if coords.len() >= 2 {
-                                format!("POINT({} {})",
-                                    coords[0].as_f64().unwrap_or(0.0),
-                                    coords[1].as_f64().unwrap_or(0.0))
-                            } else {
-                                panic!("Invalid Point coordinates: expected at least 2 values, got {}", coords.len())
-                            }
-                        } else {
-                            panic!("Invalid Point geometry: missing or invalid 'coordinates' array")
-                        }
-                    }
-                    "LineString" => {
-                        if let Some(coords) = geometry.get("coordinates").and_then(|v| v.as_array()) {
-                            let point_strs: Vec<String> = coords.iter()
-                                .filter_map(|p| {
-                                    p.as_array().and_then(|arr| {
-                                        if arr.len() >= 2 {
-                                            Some(format!("{} {}",
-                                                arr[0].as_f64().unwrap_or(0.0),
-                                                arr[1].as_f64().unwrap_or(0.0)))
-                                        } else {
-                                            None
-                                        }
-                                    })
-                                })
-                                .collect();
-                            format!("LINESTRING({})", point_strs.join(", "))
-                        } else {
-                            panic!("Invalid LineString geometry: missing or invalid 'coordinates' array")
-                        }
-                    }
-                    "Polygon" => {
-                        if let Some(coords) = geometry.get("coordinates").and_then(|v| v.as_array()) {
-                            let ring_strs: Vec<String> = coords.iter()
-                                .filter_map(|ring| {
-                                    ring.as_array().map(|points| {
-                                        let point_strs: Vec<String> = points.iter()
-                                            .filter_map(|p| {
-                                                p.as_array().and_then(|arr| {
-                                                    if arr.len() >= 2 {
-                                                        Some(format!("{} {}",
-                                                            arr[0].as_f64().unwrap_or(0.0),
-                                                            arr[1].as_f64().unwrap_or(0.0)))
-                                                    } else {
-                                                        None
-                                                    }
-                                                })
-                                            })
-                                            .collect();
-                                        format!("({})", point_strs.join(", "))
-                                    })
-                                })
-                                .collect();
-                            format!("POLYGON({})", ring_strs.join(", "))
-                        } else {
-                            "POLYGON EMPTY".to_string()
-                        }
-                    }
-                    "" => panic!("Missing 'type' field in GeoJSON geometry"),
-                    unsupported => panic!("Unsupported GeoJSON geometry type '{}' for intersects filter. Supported types: Point, LineString, Polygon", unsupported),
-                };
-                let escaped_wkt = wkt.replace('\'', "''");
-                format!(
-                    "ST_Intersects({}, ST_GeomFromText('{}', {}))",
-                    field_ref, escaped_wkt, srid
-                )
+                // `parse_geometry_intersects` already rejected GeoJSON shapes that the SQL
+                // builder cannot lower to a single WKT (`Multi*` / `GeometryCollection`), so
+                // every value reaching this point is guaranteed to produce a `Some(wkt)`.
+                let wkt = geometry.to_wkt().unwrap_or_else(|| {
+                    unreachable!(
+                        "intersects filter received unsupported GeoJSON geometry `{}`; the extractor must reject it before reaching the SQL builder",
+                        geometry.type_tag()
+                    )
+                });
+                geometry_intersects_condition(field_expr, wkt, resolved_srid)
             }
         };
 
-        let raw_expr: Expression = Value::enum_variant(sql).raw().into();
-        ConditionTree::single(raw_expr)
+        ConditionTree::single(condition_expr)
     }
+}
+
+fn geometry_near_condition(
+    field: Expression<'static>,
+    point: GeoCoord,
+    max_distance: f64,
+    srid: i32,
+    use_geography: bool,
+) -> Expression<'static> {
+    let point_geom = st_set_srid(st_make_point(point.x, point.y), srid as i64);
+    let (lhs, rhs) = if use_geography {
+        let lhs: Expression<'static> = geography_cast(field).into();
+        let rhs: Expression<'static> = geography_cast(point_geom).into();
+        (lhs, rhs)
+    } else {
+        (field, point_geom.into())
+    };
+    st_dwithin(lhs, rhs, max_distance).into()
+}
+
+fn geometry_within_condition(field: Expression<'static>, wkt: String, srid: i32) -> Expression<'static> {
+    let geom = st_geom_from_text(wkt, srid as i64);
+    st_within(field, geom).into()
+}
+
+fn geometry_intersects_condition(field: Expression<'static>, wkt: String, srid: i32) -> Expression<'static> {
+    let geom = st_geom_from_text(wkt, srid as i64);
+    st_intersects(field, geom).into()
+}
+
+fn format_polygon_ring_wkt(positions: &[GeoCoord]) -> String {
+    let parts: Vec<_> = positions.iter().map(|c| format!("{} {}", c.x, c.y)).collect();
+    format!("POLYGON(({}))", parts.join(", "))
 }
 
 fn scalar_filter_aliased_cond(
@@ -1662,13 +1626,4 @@ impl JsonFilterExt for (Expression<'static>, Expression<'static>) {
             }
         }
     }
-}
-
-fn format_polygon_wkt(polygon: &[(f64, f64)]) -> String {
-    let coords = polygon
-        .iter()
-        .map(|(x, y)| format!("{} {}", x, y))
-        .collect::<Vec<_>>()
-        .join(", ");
-    format!("POLYGON(({}))", coords)
 }

@@ -11,13 +11,12 @@ fn geometry_find_many_builds_query_graph() {
         }
 
         generator client {
-            provider        = "prisma-client"
-            previewFeatures = ["relationJoins"]
+            provider = "prisma-client"
         }
 
         model Location {
             id       Int                    @id @default(autoincrement())
-            position Geometry(Point, 4326)
+            position Geometry @db.Geometry(Point, 4326)
         }
     "#;
 

@@ -373,8 +373,10 @@ pub enum ScalarType {
     JsonList,
     UUID,
     Bytes,
-    /// DMMF string form, e.g. `geometry(Point,4326)`.
-    Geometry(String),
+    /// PostGIS spatial type. The `GeometrySpec` records the OGC subtype, SRID and whether the
+    /// column is `geometry` or `geography`. The DMMF surface form is the PSL keyword
+    /// (`Geometry` or `Geography`); structured arguments are reported via `native_type`.
+    Geometry(db::GeometrySpec),
 }
 
 impl fmt::Display for ScalarType {
@@ -392,7 +394,7 @@ impl fmt::Display for ScalarType {
             ScalarType::UUID => "UUID",
             ScalarType::JsonList => "Json",
             ScalarType::Bytes => "Bytes",
-            ScalarType::Geometry(s) => s.as_str(),
+            ScalarType::Geometry(spec) => spec.psl_type_name(),
         };
 
         f.write_str(typ)

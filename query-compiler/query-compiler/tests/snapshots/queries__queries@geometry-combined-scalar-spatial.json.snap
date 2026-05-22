@@ -10,7 +10,8 @@ dataMap {
     position: Geometry(point)? (position)
 }
 query «SELECT "t0"."id", "t0"."name", "t0"."position" FROM "public"."Location"
-       AS "t0" WHERE (ST_DWithin("position"::geography,
-       ST_SetSRID(ST_MakePoint(0, 0), 4326)::geography, 10000) AND
-       "t0"."name"::text LIKE $1)»
-params [const(String("Paris%"))]
+       AS "t0" WHERE (ST_DWithin("t0"."position", ST_SetSRID(ST_MakePoint($1,
+       $2), $3), $4) AND "t0"."name"::text LIKE $5)»
+params [const(Float(BigDecimal("0"))), const(Float(BigDecimal("0"))),
+        const(BigInt(4326)), const(Float(BigDecimal("10000"))),
+        const(String("Paris%"))]

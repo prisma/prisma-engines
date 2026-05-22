@@ -383,17 +383,16 @@ fn postgres_column_type_change(columns: MigrationPair<TableColumnWalker<'_>>) ->
     let from_list_to_scalar = columns.previous.arity().is_list() && !columns.next.arity().is_list();
     let from_scalar_to_list = !columns.previous.arity().is_list() && columns.next.arity().is_list();
 
-    match (columns.previous.column_type_family(), columns.next.column_type_family()) {
-        (ColumnTypeFamily::Geometry(prev), ColumnTypeFamily::Geometry(next)) => {
-            if from_list_to_scalar || from_scalar_to_list {
-                return Some(NotCastable);
-            }
-            if prev == next {
-                return None;
-            }
-            return Some(RiskyCast);
+    if let (ColumnTypeFamily::Geometry(prev), ColumnTypeFamily::Geometry(next)) =
+        (columns.previous.column_type_family(), columns.next.column_type_family())
+    {
+        if from_list_to_scalar || from_scalar_to_list {
+            return Some(NotCastable);
         }
-        _ => {}
+        if prev == next {
+            return None;
+        }
+        return Some(RiskyCast);
     }
 
     match (previous_type, next_type) {

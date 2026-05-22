@@ -298,12 +298,14 @@ fn geometry_order_by_object_type<'a>() -> InputObjectType<'a> {
     let mut object = init_input_object_type(ident);
 
     object.set_fields(|| {
-        vec![simple_input_field(
-            ordering::DISTANCE_FROM,
-            InputType::object(geometry_distance_from_input()),
-            None,
-        )
-        .optional()]
+        vec![
+            simple_input_field(
+                ordering::DISTANCE_FROM,
+                InputType::object(geometry_distance_from_input()),
+                None,
+            )
+            .optional(),
+        ]
     });
 
     object

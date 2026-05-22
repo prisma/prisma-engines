@@ -9,6 +9,7 @@ dataMap {
     position: Geometry(point)? (position)
 }
 query «SELECT "t0"."id", "t0"."position" FROM "public"."Location" AS "t0" WHERE
-       ST_DWithin("position", ST_SetSRID(ST_MakePoint(1000000, 6000000), 3857),
-       5000)»
-params []
+       ST_DWithin("t0"."position", ST_SetSRID(ST_MakePoint($1, $2), $3), $4)»
+params [const(Float(BigDecimal("1000000"))),
+        const(Float(BigDecimal("6000000"))), const(BigInt(3857)),
+        const(Float(BigDecimal("5000")))]

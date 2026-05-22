@@ -30,7 +30,7 @@ use diagnostics::{DatamodelError, Diagnostics, NativeTypeErrorFactory, Span};
 use enumflags2::BitFlags;
 use lsp_types::CompletionList;
 use parser_database::{
-    ExtensionTypes, IndexAlgorithm, ParserDatabase, ReferentialAction, ScalarFieldType, ScalarType,
+    ExtensionTypes, GeometrySpec, IndexAlgorithm, ParserDatabase, ReferentialAction, ScalarFieldType, ScalarType,
     ast::{self, SchemaPosition},
     walkers,
 };
@@ -212,6 +212,16 @@ pub trait Connector: Send + Sync {
         span: Span,
         diagnostics: &mut Diagnostics,
     ) -> Option<NativeTypeInstance>;
+
+    /// If this native type expresses a PostGIS spatial column (`@db.Geometry(...)` /
+    /// `@db.Geography(...)`), return the equivalent `GeometrySpec`. Other connectors keep
+    /// the default `None` implementation.
+    ///
+    /// Used by query-structure (and downstream SQL generation) to derive the spatial
+    /// kind, subtype and SRID from the schema instead of guessing from the SRID value.
+    fn geometry_spec_for_native_type(&self, _instance: &NativeTypeInstance) -> Option<GeometrySpec> {
+        None
+    }
 
     fn native_type_supports_compacting(&self, _: Option<NativeTypeInstance>) -> bool {
         true

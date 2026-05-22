@@ -9,7 +9,9 @@ dataMap {
     position: Geometry(point)? (position)
 }
 query «SELECT "t0"."id", "t0"."position" FROM "public"."Location" AS "t0" WHERE
-       (ST_DWithin("position"::geography, ST_SetSRID(ST_MakePoint(0, 0),
-       4326)::geography, 10000) OR ST_DWithin("position"::geography,
-       ST_SetSRID(ST_MakePoint(10, 10), 4326)::geography, 5000))»
-params []
+       (ST_DWithin("t0"."position", ST_SetSRID(ST_MakePoint($1, $2), $3), $4) OR
+       ST_DWithin("t0"."position", ST_SetSRID(ST_MakePoint($5, $6), $7), $8))»
+params [const(Float(BigDecimal("0"))), const(Float(BigDecimal("0"))),
+        const(BigInt(4326)), const(Float(BigDecimal("10000"))),
+        const(Float(BigDecimal("10"))), const(Float(BigDecimal("10"))),
+        const(BigInt(4326)), const(Float(BigDecimal("5000")))]

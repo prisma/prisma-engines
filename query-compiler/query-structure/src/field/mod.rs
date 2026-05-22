@@ -9,7 +9,7 @@ pub use scalar::*;
 
 use crate::{Model, NativeTypeInstance, Zipper, parent_container::ParentContainer};
 use psl::{
-    parser_database::{EnumId, ExtensionTypeId, ScalarType, walkers},
+    parser_database::{EnumId, ExtensionTypeId, GeometrySpec, GeometrySubtype, ScalarType, walkers},
     schema_ast::ast::FieldArity,
 };
 use std::{borrow::Cow, hash::Hash};
@@ -130,7 +130,7 @@ impl Field {
     }
 }
 
-#[derive(Clone, Debug, PartialEq, Eq, Hash)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
 #[allow(clippy::upper_case_acronyms)]
 pub enum TypeIdentifier {
     String,
@@ -145,8 +145,10 @@ pub enum TypeIdentifier {
     Json,
     DateTime,
     Bytes,
-    /// String-encoded DMMF geometry type, e.g. `geometry(Point,4326)`.
-    Geometry(String),
+    /// PostGIS spatial type. The carried `GeometrySpec` records the OGC subtype, optional SRID
+    /// and whether the column is `geometry` or `geography`; the user-facing PSL type name
+    /// (`Geometry` or `Geography`) is derived via [`GeometrySpec::psl_type_name`].
+    Geometry(GeometrySpec),
     Unsupported,
 }
 
@@ -196,7 +198,7 @@ impl Type {
             TypeIdentifier::Json => "Json".into(),
             TypeIdentifier::DateTime => "DateTime".into(),
             TypeIdentifier::Bytes => "Bytes".into(),
-            TypeIdentifier::Geometry(s) => s.clone().into(),
+            TypeIdentifier::Geometry(spec) => spec.psl_type_name().into(),
             TypeIdentifier::Unsupported => "Unsupported".into(),
         }
     }
@@ -291,6 +293,19 @@ impl From<ScalarType> for TypeIdentifier {
             ScalarType::Json => Self::Json,
             ScalarType::Decimal => Self::Decimal,
             ScalarType::Bytes => Self::Bytes,
+            ScalarType::Geometry | ScalarType::Geography => {
+                // PostGIS scalars need the full `GeometrySpec` (subtype/SRID/spatial). Use
+                // `ScalarFieldRef::type_identifier()` directly so the native attribute is
+                // consulted; calling this `From` impl drops the spec by construction.
+                let spatial = st
+                    .postgis_spatial_kind()
+                    .expect("Geometry/Geography have a postgis_spatial_kind");
+                Self::Geometry(GeometrySpec {
+                    subtype: GeometrySubtype::Geometry,
+                    srid: None,
+                    spatial,
+                })
+            }
         }
     }
 }

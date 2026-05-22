@@ -5,14 +5,12 @@ use crate::serialization_ast::{
 use bigdecimal::ToPrimitive;
 use itertools::{Either, Itertools};
 use psl::{
-    parser_database::{GeometrySpec, ScalarFieldType, walkers},
+    datamodel_connector::Connector,
+    parser_database::{ScalarFieldType, walkers},
     schema_ast::ast::WithDocumentation,
 };
 use query_structure::{DefaultKind, FieldArity, PrismaValue, dml_default_kind, encode_bytes};
 
-fn geometry_dmmf_field_type(spec: &GeometrySpec) -> String {
-    spec.postgres_sql_type()
-}
 
 pub(crate) fn schema_to_dmmf(schema: &psl::ValidatedSchema) -> Datamodel {
     let mut datamodel = Datamodel {
@@ -26,18 +24,19 @@ pub(crate) fn schema_to_dmmf(schema: &psl::ValidatedSchema) -> Datamodel {
         datamodel.enums.push(enum_to_dmmf(enum_model));
     }
 
+    let connector = schema.connector;
     for model in schema
         .db
         .walk_models()
         .filter(|model| !model.is_ignored())
         .chain(schema.db.walk_views().filter(|view| !view.is_ignored()))
     {
-        datamodel.models.push(model_to_dmmf(model));
+        datamodel.models.push(model_to_dmmf(model, connector));
         datamodel.indexes.extend(model_indexes_to_dmmf(model));
     }
 
     for ct in schema.db.walk_composite_types() {
-        datamodel.types.push(composite_type_to_dmmf(ct))
+        datamodel.types.push(composite_type_to_dmmf(ct, connector))
     }
 
     datamodel
@@ -66,7 +65,7 @@ fn enum_value_to_dmmf(en: walkers::EnumValueWalker<'_>) -> EnumValue {
     }
 }
 
-fn composite_type_to_dmmf(ct: walkers::CompositeTypeWalker<'_>) -> Model {
+fn composite_type_to_dmmf(ct: walkers::CompositeTypeWalker<'_>, connector: &'static dyn Connector) -> Model {
     Model {
         name: ct.name().to_owned(),
         db_name: None,
@@ -74,7 +73,7 @@ fn composite_type_to_dmmf(ct: walkers::CompositeTypeWalker<'_>) -> Model {
         fields: ct
             .fields()
             .filter(|field| !matches!(field.r#type(), ScalarFieldType::Unsupported(_)))
-            .map(composite_type_field_to_dmmf)
+            .map(|f| composite_type_field_to_dmmf(f, connector))
             .collect(),
         is_generated: None,
         documentation: ct.ast_composite_type().documentation().map(ToOwned::to_owned),
@@ -84,13 +83,16 @@ fn composite_type_to_dmmf(ct: walkers::CompositeTypeWalker<'_>) -> Model {
     }
 }
 
-fn composite_type_field_to_dmmf(field: walkers::CompositeTypeFieldWalker<'_>) -> Field {
+fn composite_type_field_to_dmmf(
+    field: walkers::CompositeTypeFieldWalker<'_>,
+    _connector: &'static dyn Connector,
+) -> Field {
     Field {
         name: field.name().to_owned(),
         kind: match field.r#type() {
             ScalarFieldType::CompositeType(_) => "object",
             ScalarFieldType::Enum(_) => "enum",
-            ScalarFieldType::BuiltInScalar(_) | ScalarFieldType::Geometry(_) => "scalar",
+            ScalarFieldType::BuiltInScalar(_) => "scalar",
             ScalarFieldType::Extension(_) | ScalarFieldType::Unsupported(_) => unreachable!(),
         },
         db_name: field.mapped_name().map(ToOwned::to_owned),
@@ -115,7 +117,6 @@ fn composite_type_field_to_dmmf(field: walkers::CompositeTypeFieldWalker<'_>) ->
             ScalarFieldType::CompositeType(ct) => field.walk(ct).name().to_owned(),
             ScalarFieldType::Enum(enm) => field.walk(enm).name().to_owned(),
             ScalarFieldType::BuiltInScalar(st) => st.as_str().to_owned(),
-            ScalarFieldType::Geometry(spec) => geometry_dmmf_field_type(&spec),
             ScalarFieldType::Extension(_) | ScalarFieldType::Unsupported(_) => unreachable!(),
         },
         is_generated: None,
@@ -124,7 +125,7 @@ fn composite_type_field_to_dmmf(field: walkers::CompositeTypeFieldWalker<'_>) ->
     }
 }
 
-fn model_to_dmmf(model: walkers::ModelWalker<'_>) -> Model {
+fn model_to_dmmf(model: walkers::ModelWalker<'_>, connector: &'static dyn Connector) -> Model {
     let primary_key = if let Some(pk) = model.primary_key() {
         (!pk.is_defined_on_field()).then(|| PrimaryKey {
             name: pk.name().map(ToOwned::to_owned),
@@ -141,7 +142,7 @@ fn model_to_dmmf(model: walkers::ModelWalker<'_>) -> Model {
         fields: model
             .fields()
             .filter(|field| !should_skip_model_field(field))
-            .map(field_to_dmmf)
+            .map(|f| field_to_dmmf(f, connector))
             .collect(),
         is_generated: Some(false),
         documentation: model.ast_model().documentation().map(ToOwned::to_owned),
@@ -169,14 +170,14 @@ fn should_skip_model_field(field: &walkers::FieldWalker<'_>) -> bool {
     }
 }
 
-fn field_to_dmmf(field: walkers::FieldWalker<'_>) -> Field {
+fn field_to_dmmf(field: walkers::FieldWalker<'_>, connector: &'static dyn Connector) -> Field {
     match field.refine_known() {
-        walkers::RefinedFieldWalker::Scalar(sf) => scalar_field_to_dmmf(sf),
+        walkers::RefinedFieldWalker::Scalar(sf) => scalar_field_to_dmmf(sf, connector),
         walkers::RefinedFieldWalker::Relation(rf) => relation_field_to_dmmf(rf),
     }
 }
 
-fn scalar_field_to_dmmf(field: walkers::ScalarFieldWalker<'_>) -> Field {
+fn scalar_field_to_dmmf(field: walkers::ScalarFieldWalker<'_>, _connector: &'static dyn Connector) -> Field {
     let ast_field = field.ast_field();
     let field_walker = walkers::FieldWalker::from(field);
     let is_id = field.is_single_pk();
@@ -186,7 +187,7 @@ fn scalar_field_to_dmmf(field: walkers::ScalarFieldWalker<'_>) -> Field {
         kind: match field.scalar_field_type() {
             ScalarFieldType::CompositeType(_) => "object",
             ScalarFieldType::Enum(_) => "enum",
-            ScalarFieldType::BuiltInScalar(_) | ScalarFieldType::Geometry(_) => "scalar",
+            ScalarFieldType::BuiltInScalar(_) => "scalar",
             ScalarFieldType::Extension(_) | ScalarFieldType::Unsupported(_) => unreachable!(),
         },
         is_list: ast_field.arity.is_list(),
@@ -204,7 +205,6 @@ fn scalar_field_to_dmmf(field: walkers::ScalarFieldWalker<'_>) -> Field {
             ScalarFieldType::CompositeType(ct) => field_walker.walk(ct).name().to_owned(),
             ScalarFieldType::Enum(enm) => field_walker.walk(enm).name().to_owned(),
             ScalarFieldType::BuiltInScalar(st) => st.as_str().to_owned(),
-            ScalarFieldType::Geometry(spec) => geometry_dmmf_field_type(&spec),
             ScalarFieldType::Extension(_) | ScalarFieldType::Unsupported(_) => unreachable!(),
         },
         native_type: field

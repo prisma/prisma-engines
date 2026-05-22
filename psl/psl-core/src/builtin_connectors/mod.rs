@@ -11,7 +11,9 @@ pub use mssql_datamodel_connector::{MsSqlType, MsSqlTypeParameter};
 #[cfg(feature = "mysql")]
 pub use mysql_datamodel_connector::MySqlType;
 #[cfg(feature = "postgresql")]
-pub use postgres_datamodel_connector::{KnownPostgresType, PostgresDatasourceProperties, PostgresType};
+pub use postgres_datamodel_connector::{
+    GeometryNativeArgs, KnownPostgresType, PostgisNativeType, PostgresDatasourceProperties, PostgresType,
+};
 
 mod capabilities_support;
 #[cfg(feature = "mongodb")]

@@ -1,37 +1,8 @@
-use std::fmt::{Display, Write};
+use std::fmt::Display;
 
 use super::{
     Attribute, Comment, Identifier, Span, WithAttributes, WithDocumentation, WithIdentifier, WithName, WithSpan,
 };
-
-/// OGC / PostGIS geometry subtype written in `Geometry(...)` field types.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub enum GeometrySubtype {
-    Point,
-    LineString,
-    Polygon,
-    MultiPoint,
-    MultiLineString,
-    MultiPolygon,
-    GeometryCollection,
-    Geometry,
-}
-
-impl GeometrySubtype {
-    /// PSL spelling of the subtype (e.g. `Point`).
-    pub fn as_str(self) -> &'static str {
-        match self {
-            GeometrySubtype::Point => "Point",
-            GeometrySubtype::LineString => "LineString",
-            GeometrySubtype::Polygon => "Polygon",
-            GeometrySubtype::MultiPoint => "MultiPoint",
-            GeometrySubtype::MultiLineString => "MultiLineString",
-            GeometrySubtype::MultiPolygon => "MultiPolygon",
-            GeometrySubtype::GeometryCollection => "GeometryCollection",
-            GeometrySubtype::Geometry => "Geometry",
-        }
-    }
-}
 
 /// A field definition in a model or a composite type.
 #[derive(Debug, Clone)]
@@ -178,12 +149,6 @@ impl FieldArity {
 #[derive(Debug, Clone, PartialEq)]
 pub enum FieldType {
     Supported(Identifier),
-    /// `Geometry(Point, 4326)` or `Geometry(LineString)` (SRID optional).
-    Geometry {
-        subtype: GeometrySubtype,
-        srid: Option<i32>,
-        span: Span,
-    },
     /// Unsupported("...")
     Unsupported(String, Span),
 }
@@ -192,7 +157,6 @@ impl FieldType {
     pub fn span(&self) -> Span {
         match self {
             FieldType::Supported(ident) => ident.span,
-            FieldType::Geometry { span, .. } => *span,
             FieldType::Unsupported(_, span) => *span,
         }
     }
@@ -200,7 +164,6 @@ impl FieldType {
     pub fn name(&self) -> &str {
         match self {
             FieldType::Supported(supported) => &supported.name,
-            FieldType::Geometry { .. } => "Geometry",
             FieldType::Unsupported(name, _) => name,
         }
     }
@@ -208,7 +171,7 @@ impl FieldType {
     pub fn as_unsupported(&self) -> Option<(&str, &Span)> {
         match self {
             FieldType::Unsupported(name, span) => Some((name, span)),
-            FieldType::Supported(_) | FieldType::Geometry { .. } => None,
+            FieldType::Supported(_) => None,
         }
     }
 }
@@ -217,14 +180,6 @@ impl Display for FieldType {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             FieldType::Supported(ident) => f.write_str(&ident.name),
-            FieldType::Geometry { subtype, srid, .. } => {
-                f.write_str("Geometry(")?;
-                f.write_str(subtype.as_str())?;
-                if let Some(srid) = srid {
-                    write!(f, ", {srid}")?;
-                }
-                f.write_char(')')
-            }
             FieldType::Unsupported(name, _) => write!(f, "Unsupported({})", crate::string_literal(name)),
         }
     }

@@ -11,7 +11,7 @@ use schema_ast::ast::{self, EnumValueId, WithName};
 use serde::{Deserialize, Serialize};
 use std::{
     collections::BTreeMap,
-    fmt::{self, Write as _},
+    fmt,
 };
 
 pub(super) fn resolve_types(ctx: &mut Context<'_>) {
@@ -188,7 +188,9 @@ impl UnsupportedType {
     }
 }
 
-/// OGC / PostGIS geometry subtype for [`ScalarFieldType::Geometry`].
+/// OGC / PostGIS geometry subtype carried by `PostgresType::Postgis(...)` and surfaced via the
+/// `@db.Geometry(...)` / `@db.Geography(...)` native attributes. The PSL keyword side uses the
+/// unit [`ScalarType::Geometry`] / [`ScalarType::Geography`] variants.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub enum GeometrySubtype {
     /// `POINT` subtype.
@@ -225,21 +227,6 @@ impl GeometrySubtype {
     }
 }
 
-impl From<ast::GeometrySubtype> for GeometrySubtype {
-    fn from(s: ast::GeometrySubtype) -> Self {
-        match s {
-            ast::GeometrySubtype::Point => Self::Point,
-            ast::GeometrySubtype::LineString => Self::LineString,
-            ast::GeometrySubtype::Polygon => Self::Polygon,
-            ast::GeometrySubtype::MultiPoint => Self::MultiPoint,
-            ast::GeometrySubtype::MultiLineString => Self::MultiLineString,
-            ast::GeometrySubtype::MultiPolygon => Self::MultiPolygon,
-            ast::GeometrySubtype::GeometryCollection => Self::GeometryCollection,
-            ast::GeometrySubtype::Geometry => Self::Geometry,
-        }
-    }
-}
-
 /// PostGIS base type for a [`GeometrySpec`] (`geometry` vs `geography` in PostgreSQL).
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, Default)]
 pub enum PostgisSpatialKind {
@@ -263,16 +250,31 @@ pub struct GeometrySpec {
 }
 
 impl GeometrySpec {
+    /// PSL scalar type name as it appears in the schema language: either `Geometry` or
+    /// `Geography`. The casing matches the keyword the user writes in the schema.
+    pub fn psl_type_name(&self) -> &'static str {
+        match self.spatial {
+            PostgisSpatialKind::Geometry => "Geometry",
+            PostgisSpatialKind::Geography => "Geography",
+        }
+    }
+
     /// SQL column type for PostgreSQL / PostGIS (e.g. `geometry(Point,4326)` or `geography(Point,4326)`).
     pub fn postgres_sql_type(&self) -> String {
         let base = match self.spatial {
             PostgisSpatialKind::Geometry => "geometry",
             PostgisSpatialKind::Geography => "geography",
         };
+        // PostGIS rejects `geometry(Geometry)` as a column type — the unconstrained form is
+        // simply `geometry` (or `geography`). Only emit the parameter list when a concrete
+        // subtype or SRID is specified.
+        let bare_subtype = self.subtype == GeometrySubtype::Geometry;
         let subtype = self.subtype.as_str();
-        match self.srid {
-            Some(srid) => format!("{base}({subtype},{srid})"),
-            None => format!("{base}({subtype})"),
+        match (self.srid, bare_subtype) {
+            (None, true) => base.to_owned(),
+            (None, false) => format!("{base}({subtype})"),
+            (Some(srid), true) => format!("{base}(Geometry,{srid})"),
+            (Some(srid), false) => format!("{base}({subtype},{srid})"),
         }
     }
 }
@@ -288,8 +290,6 @@ pub enum ScalarFieldType {
     Extension(ExtensionTypeId),
     /// A Prisma scalar type
     BuiltInScalar(ScalarType),
-    /// PostGIS-style `Geometry(Point, 4326)` scalar
-    Geometry(GeometrySpec),
     /// An `Unsupported("...")` type
     Unsupported(UnsupportedType),
 }
@@ -372,9 +372,21 @@ impl ScalarFieldType {
         matches!(self, Self::BuiltInScalar(ScalarType::Decimal))
     }
 
-    /// True if the field's type is `Geometry(...)`.
+    /// True if the field's type is `Geometry` or `Geography` (any PostGIS spatial scalar).
     pub fn is_geometry(self) -> bool {
-        matches!(self, Self::Geometry(_))
+        matches!(
+            self,
+            Self::BuiltInScalar(ScalarType::Geometry) | Self::BuiltInScalar(ScalarType::Geography)
+        )
+    }
+
+    /// PostGIS spatial kind discriminator (`Geometry` vs `Geography`) when the field type is a
+    /// PostGIS spatial scalar; `None` for any other field type.
+    pub fn postgis_spatial_kind(self) -> Option<PostgisSpatialKind> {
+        match self {
+            Self::BuiltInScalar(scalar) => scalar.postgis_spatial_kind(),
+            _ => None,
+        }
     }
 
     /// Display the field type as it would appear in the Prisma schema.
@@ -406,13 +418,6 @@ impl fmt::Display for DisplayScalarFieldType<'_> {
                     .get(ext_id)
                     .expect("extension type id to have a name");
                 write!(f, "{}", self.db.interner.get(*name).unwrap())
-            }
-            ScalarFieldType::Geometry(spec) => {
-                write!(f, "Geometry({}", spec.subtype.as_str())?;
-                if let Some(srid) = spec.srid {
-                    write!(f, ", {srid}")?;
-                }
-                f.write_char(')')
             }
             ScalarFieldType::Unsupported(ut) => {
                 write!(f, "Unsupported(\"{}\")", self.db.interner.get(ut.name).unwrap())
@@ -948,13 +953,6 @@ fn visit_enum<'db>(enm: &'db ast::Enum, ctx: &mut Context<'db>) {
 /// does not match any we know of.
 fn field_type<'db>(field: &'db ast::Field, ctx: &mut Context<'db>) -> Result<FieldType, &'db str> {
     match &field.field_type {
-        ast::FieldType::Geometry { subtype, srid, .. } => {
-            Ok(FieldType::Scalar(ScalarFieldType::Geometry(GeometrySpec {
-                subtype: (*subtype).into(),
-                srid: *srid,
-                spatial: PostgisSpatialKind::Geometry,
-            })))
-        }
         ast::FieldType::Unsupported(name, _) => {
             let unsupported = UnsupportedType::new(ctx.interner.intern(name));
             Ok(FieldType::Scalar(ScalarFieldType::Unsupported(unsupported)))
@@ -965,6 +963,7 @@ fn field_type<'db>(field: &'db ast::Field, ctx: &mut Context<'db>) -> Result<Fie
             if let Some(tpe) = ScalarType::try_from_str(supported, false) {
                 return Ok(FieldType::Scalar(ScalarFieldType::BuiltInScalar(tpe)));
             }
+
 
             let supported_string_id = ctx.interner.intern(supported);
             match ctx
@@ -1676,6 +1675,13 @@ pub enum ScalarType {
     Json,
     Bytes,
     Decimal,
+    /// PostGIS `geometry(...)` planar scalar. The OGC subtype and SRID live in the native
+    /// attribute (`@db.Geometry(Subtype, SRID)`), mirroring how `String @db.VarChar(300)`
+    /// and `Decimal @db.Decimal(10, 2)` carry their parameters.
+    Geometry,
+    /// PostGIS `geography(...)` geodetic scalar. Same parameterization convention as
+    /// [`ScalarType::Geometry`] — the spatial kind discriminator is the variant itself.
+    Geography,
 }
 
 impl ScalarType {
@@ -1691,6 +1697,18 @@ impl ScalarType {
             ScalarType::Json => "Json",
             ScalarType::Bytes => "Bytes",
             ScalarType::Decimal => "Decimal",
+            ScalarType::Geometry => "Geometry",
+            ScalarType::Geography => "Geography",
+        }
+    }
+
+    /// PostGIS spatial kind (`Geometry` vs `Geography`) for the two PostGIS-flavored scalar
+    /// variants; `None` for any non-spatial scalar.
+    pub fn postgis_spatial_kind(&self) -> Option<PostgisSpatialKind> {
+        match self {
+            ScalarType::Geometry => Some(PostgisSpatialKind::Geometry),
+            ScalarType::Geography => Some(PostgisSpatialKind::Geography),
+            _ => None,
         }
     }
 
@@ -1712,6 +1730,8 @@ impl ScalarType {
                 "json" => Some(ScalarType::Json),
                 "bytes" => Some(ScalarType::Bytes),
                 "decimal" => Some(ScalarType::Decimal),
+                "geometry" => Some(ScalarType::Geometry),
+                "geography" => Some(ScalarType::Geography),
                 _ => None,
             },
             _ => match s {
@@ -1724,6 +1744,8 @@ impl ScalarType {
                 "Json" => Some(ScalarType::Json),
                 "Bytes" => Some(ScalarType::Bytes),
                 "Decimal" => Some(ScalarType::Decimal),
+                "Geometry" => Some(ScalarType::Geometry),
+                "Geography" => Some(ScalarType::Geography),
                 _ => None,
             },
         }

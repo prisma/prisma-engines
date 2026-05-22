@@ -9,6 +9,6 @@ dataMap {
     position: Geometry(point)? (position)
 }
 query «SELECT "t0"."id", "t0"."position" FROM "public"."Location" AS "t0" WHERE
-       ST_Within("position", ST_GeomFromText('POLYGON((0 0, 0 2, 2 2, 2 0, 0
-       0))', 4326))»
-params []
+       ST_Within("t0"."position", ST_GeomFromText($1, $2))»
+params [const(String("POLYGON((0 0, 0 2, 2 2, 2 0, 0 0))")),
+        const(BigInt(4326))]

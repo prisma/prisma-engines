@@ -585,6 +585,13 @@ fn render_column_type_postgres(col: TableColumnWalker<'_>) -> Cow<'static, str> 
             }
             return format!("{}({})", name, args.iter().format(", ")).into();
         }
+        PostgresType::Postgis(postgis) => {
+            // Emit `geometry(Subtype, SRID)` or `geography(Subtype, SRID)` directly. The lower-
+            // case spelling matches what PostGIS uses in its catalogs so the migration DDL
+            // round-trips cleanly through introspection.
+            let spec = postgis.to_geometry_spec();
+            return spec.postgres_sql_type().into();
+        }
     };
 
     let tpe: Cow<'_, str> = match native_type {

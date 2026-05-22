@@ -441,24 +441,36 @@ fn push_column_for_scalar_field(field: ScalarFieldWalker<'_>, table_id: sql::Tab
         ScalarFieldType::CompositeType(_) => {
             push_column_for_builtin_scalar_type(field, ScalarType::Json, table_id, ctx)
         }
+        ScalarFieldType::BuiltInScalar(ScalarType::Geometry | ScalarType::Geography) => {
+            push_column_for_geometry_field(field, table_id, ctx)
+        }
         ScalarFieldType::BuiltInScalar(scalar_type) => {
             push_column_for_builtin_scalar_type(field, scalar_type, table_id, ctx)
         }
-        ScalarFieldType::Geometry(spec) => push_column_for_geometry_field(field, spec, table_id, ctx),
         ScalarFieldType::Unsupported(_) => push_column_for_model_unsupported_scalar_field(field, table_id, ctx),
     }
 }
 
-fn push_column_for_geometry_field(
-    field: ScalarFieldWalker<'_>,
-    spec: GeometrySpec,
-    table_id: sql::TableId,
-    ctx: &mut Context<'_>,
-) {
+fn push_column_for_geometry_field(field: ScalarFieldWalker<'_>, table_id: sql::TableId, ctx: &mut Context<'_>) {
     let connector = ctx.flavour.datamodel_connector();
+    // Resolve `GeometrySpec` (subtype/SRID/spatial kind) from the native attribute first, then
+    // fall back to the connector default (unconstrained `geometry` / `geography`). The field type
+    // itself no longer carries a spec — it only encodes the spatial kind via the `ScalarType`
+    // variant, just like `String @db.VarChar(300)` carries the length via the native attribute.
     let native_type = field
         .native_type_instance(connector)
-        .or_else(|| connector.default_native_type_for_scalar_type(&ScalarFieldType::Geometry(spec), ctx.datamodel));
+        .or_else(|| connector.default_native_type_for_scalar_type(&field.scalar_field_type(), ctx.datamodel));
+    let spec = native_type
+        .as_ref()
+        .and_then(|nt| connector.geometry_spec_for_native_type(nt))
+        .unwrap_or(GeometrySpec {
+            subtype: db::GeometrySubtype::Geometry,
+            srid: None,
+            spatial: field
+                .scalar_field_type()
+                .postgis_spatial_kind()
+                .expect("push_column_for_geometry_field invoked on non-spatial scalar"),
+        });
 
     let default = field.default_value().map(|def| {
         sql::DefaultValue::db_generated::<String>(unwrap_dbgenerated(def.value()))
@@ -627,6 +639,13 @@ fn push_column_for_builtin_scalar_type(
         ScalarType::Bytes => sql::ColumnTypeFamily::Binary,
         ScalarType::Decimal => sql::ColumnTypeFamily::Decimal,
         ScalarType::BigInt => sql::ColumnTypeFamily::BigInt,
+        // PostGIS scalars are dispatched by `push_column_for_scalar_field` to their own
+        // helper (`push_column_for_geometry_field`); reaching here would be a routing bug.
+        ScalarType::Geometry | ScalarType::Geography => {
+            unreachable!(
+                "PostGIS scalar types must be dispatched through push_column_for_geometry_field"
+            )
+        }
     };
 
     let native_type = field.native_type_instance(connector).or_else(|| {

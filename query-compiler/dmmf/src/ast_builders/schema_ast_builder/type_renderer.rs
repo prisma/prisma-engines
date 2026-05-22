@@ -46,7 +46,7 @@ pub(super) fn render_output_type<'a>(output_type: &OutputType<'a>, ctx: &mut Ren
                 ScalarType::UUID => "UUID".into(),
                 ScalarType::JsonList => "Json".into(),
                 ScalarType::Bytes => "Bytes".into(),
-                ScalarType::Geometry(s) => s.clone(),
+                ScalarType::Geometry(spec) => spec.psl_type_name().to_owned(),
             };
 
             DmmfTypeReference {

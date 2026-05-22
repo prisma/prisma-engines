@@ -76,8 +76,8 @@ impl<'a> OutputType<'a> {
         InnerOutputType::Scalar(ScalarType::Bytes)
     }
 
-    pub(crate) fn geometry(dmmf_type: String) -> InnerOutputType<'a> {
-        InnerOutputType::Scalar(ScalarType::Geometry(dmmf_type))
+    pub(crate) fn geometry(spec: db::GeometrySpec) -> InnerOutputType<'a> {
+        InnerOutputType::Scalar(ScalarType::Geometry(spec))
     }
 
     /// Attempts to recurse through the type until an object type is found.

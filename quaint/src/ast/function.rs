@@ -11,6 +11,8 @@ mod json_unquote;
 mod lower;
 mod maximum;
 mod minimum;
+#[cfg(feature = "postgresql")]
+mod postgis;
 mod row_number;
 mod row_to_json;
 mod search;
@@ -33,6 +35,8 @@ pub use json_unquote::*;
 pub use lower::*;
 pub use maximum::*;
 pub use minimum::*;
+#[cfg(feature = "postgresql")]
+pub use postgis::*;
 pub use row_number::*;
 pub use row_to_json::*;
 pub use search::*;
@@ -90,6 +94,8 @@ pub(crate) enum FunctionType<'a> {
     JsonBuildObject(JsonBuildObject<'a>),
     TextSearch(TextSearch<'a>),
     TextSearchRelevance(TextSearchRelevance<'a>),
+    #[cfg(feature = "postgresql")]
+    Postgis(postgis::PostgisFunction<'a>),
     UuidToBin,
     UuidToBinSwapped,
     Uuid,
@@ -116,6 +122,8 @@ impl<'a> FunctionType<'a> {
             Self::TextSearch(f) => &f.exprs,
             Self::TextSearchRelevance(f) => &f.exprs,
             Self::Stringify(f) => slice::from_ref(&f.expression),
+            #[cfg(feature = "postgresql")]
+            Self::Postgis(f) => &f.args,
             Self::RowToJson(_)
             | Self::RowNumber(_)
             | Self::Average(_)
@@ -157,6 +165,8 @@ impl<'a> FunctionType<'a> {
             | Self::UuidToBinSwapped
             | Self::Uuid
             | Self::Stringify(_) => return None,
+            #[cfg(feature = "postgresql")]
+            Self::Postgis(_) => return None,
         };
         Some(name)
     }

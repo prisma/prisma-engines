@@ -5,7 +5,10 @@ use crate::{
 use bon::builder;
 use indexmap::IndexSet;
 use itertools::Itertools;
-use psl::datamodel_connector::Flavour;
+use psl::{
+    datamodel_connector::Flavour,
+    parser_database::{GeometrySpec, GeometrySubtype},
+};
 use query_core::{
     CreateManyRecordsFields, DeleteRecordFields, Node, Query, QueryGraph, ReadQuery, UpdateManyRecordsFields,
     UpdateRecord, WriteQuery,
@@ -17,18 +20,15 @@ use query_structure::{
 use serde::Serialize;
 use std::{borrow::Cow, collections::HashMap, fmt};
 
-/// Maps a DMMF geometry field type string (e.g. `geometry(Point,4326)`) to the JSON protocol discriminator
-/// consumed by `@prisma/client-engine-runtime`.
-fn geometry_json_geometry_type(dmmf_type: &str) -> String {
-    let inner = dmmf_type.strip_prefix("geometry(").and_then(|s| s.strip_suffix(')'));
-    let subtype = inner
-        .and_then(|s| s.split(',').next())
-        .map(str::trim)
-        .unwrap_or("Geometry");
-    match subtype {
-        "Point" => "point".to_owned(),
-        "LineString" => "linestring".to_owned(),
-        "Polygon" => "polygon".to_owned(),
+/// Maps a `GeometrySpec` to the JSON protocol discriminator consumed by
+/// `@prisma/client-engine-runtime`. The discriminator is derived structurally so changes to
+/// the DMMF surface form (e.g. SevInf #8 emitting just `Geometry`/`Geography`) cannot affect
+/// runtime decoding.
+fn geometry_json_geometry_type(spec: &GeometrySpec) -> String {
+    match spec.subtype {
+        GeometrySubtype::Point => "point".to_owned(),
+        GeometrySubtype::LineString => "linestring".to_owned(),
+        GeometrySubtype::Polygon => "polygon".to_owned(),
         _ => "geometry".to_owned(),
     }
 }
@@ -479,8 +479,8 @@ impl From<&Type> for FieldScalarType {
             TypeIdentifier::Bytes => Self::Bytes {
                 encoding: ByteArrayEncoding::default(),
             },
-            TypeIdentifier::Geometry(dmmf) => Self::Geometry {
-                geometry_type: geometry_json_geometry_type(dmmf),
+            TypeIdentifier::Geometry(spec) => Self::Geometry {
+                geometry_type: geometry_json_geometry_type(spec),
             },
             TypeIdentifier::Unsupported => Self::Unsupported,
         }

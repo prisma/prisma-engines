@@ -57,7 +57,7 @@ fn resolve_composite_type_attributes<'db>(
 
         ctx.visit_attributes((ctid.0, (ctid.1, field_id)));
 
-        if let ScalarFieldType::BuiltInScalar(_scalar_type) = r#type {
+        if let ScalarFieldType::BuiltInScalar(_) = r#type {
             // native type attributes
             if let Some((datasource_name, type_name, args)) = ctx.visit_datasource_scoped() {
                 native_types::visit_composite_type_field_native_type_attribute(

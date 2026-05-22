@@ -2,14 +2,14 @@ mod datasource;
 mod native_types;
 mod validations;
 
-pub use native_types::{KnownPostgresType, PostgresType};
-use parser_database::{ExtensionTypes, GeometrySpec, ScalarFieldType};
+pub use native_types::{GeometryNativeArgs, KnownPostgresType, PostgisNativeType, PostgresType};
+use parser_database::{ExtensionTypes, GeometrySpec, PostgisSpatialKind, ScalarFieldType};
 
 use crate::{
     Configuration, Datasource, DatasourceConnectorData, PreviewFeature, ValidatedSchema,
     datamodel_connector::{
-        Connector, ConnectorCapabilities, ConnectorCapability, ConstraintScope, Flavour, NativeTypeConstructor,
-        NativeTypeInstance, NativeTypeParseError, RelationMode, StringFilter,
+        AllowedType, Connector, ConnectorCapabilities, ConnectorCapability, ConstraintScope, Flavour,
+        NativeTypeConstructor, NativeTypeInstance, NativeTypeParseError, RelationMode, StringFilter,
     },
     diagnostics::Diagnostics,
     parser_database::{IndexAlgorithm, OperatorClass, ParserDatabase, ReferentialAction, ScalarType, ast, walkers},
@@ -18,7 +18,7 @@ use KnownPostgresType::*;
 use chrono::*;
 use enumflags2::BitFlags;
 use lsp_types::{CompletionItem, CompletionItemKind, CompletionList, InsertTextFormat};
-use std::{borrow::Cow, collections::HashMap, sync::Arc};
+use std::{borrow::Cow, collections::HashMap, sync::Arc, sync::LazyLock};
 
 use super::completions;
 
@@ -83,9 +83,33 @@ pub struct PostgresDatamodelConnector;
 const DATE_TIME_DEFAULT: KnownPostgresType = KnownPostgresType::Timestamp(Some(3));
 const BYTES_DEFAULT: KnownPostgresType = KnownPostgresType::ByteA;
 
-fn geometry_sql_column_type(spec: &GeometrySpec) -> String {
-    spec.postgres_sql_type()
-}
+/// Constructor list exposed to LSP/validation: the macro-generated scalar variants plus the
+/// PostGIS `@db.Geometry(...)` / `@db.Geography(...)` entries assembled on first access.
+static EXTENDED_CONSTRUCTORS: LazyLock<Vec<NativeTypeConstructor>> = LazyLock::new(|| {
+    // `AllowedType::field_type` is matched via `PartialEq` against the declared scalar field
+    // type. Each native attribute (`@db.Geometry` / `@db.Geography`) only matches the
+    // corresponding PSL scalar (`Geometry` / `Geography`), enforcing the pairing between the
+    // PSL keyword and the native attribute exactly like every other parametrized scalar
+    // (`String @db.VarChar(...)`, `Decimal @db.Decimal(p,s)`, ...).
+    let mut all = native_types::CONSTRUCTORS.to_vec();
+    all.push(NativeTypeConstructor {
+        name: Cow::Borrowed("Geometry"),
+        number_of_args: 1,
+        number_of_optional_args: 1,
+        allowed_types: Cow::Owned(vec![AllowedType::plain(ScalarFieldType::BuiltInScalar(
+            ScalarType::Geometry,
+        ))]),
+    });
+    all.push(NativeTypeConstructor {
+        name: Cow::Borrowed("Geography"),
+        number_of_args: 1,
+        number_of_optional_args: 1,
+        allowed_types: Cow::Owned(vec![AllowedType::plain(ScalarFieldType::BuiltInScalar(
+            ScalarType::Geography,
+        ))]),
+    });
+    all
+});
 
 const SCALAR_TYPE_DEFAULTS: &[(ScalarType, KnownPostgresType)] = &[
     (ScalarType::Int, KnownPostgresType::Integer),
@@ -318,6 +342,17 @@ impl Connector for PostgresDatamodelConnector {
                     .get_by_db_name_and_modifiers(name, Some(modifiers))
                     .map(|e| ScalarFieldType::Extension(e.id));
             }
+            PostgresType::Postgis(postgis) => {
+                // Map the PostGIS spatial kind back to the matching PSL keyword. The structured
+                // subtype/SRID information lives in the native attribute itself, so introspection
+                // round-trips by attaching the `PostgresType::Postgis` instance to the field; the
+                // ScalarFieldType here only carries the keyword discriminator.
+                let scalar = match postgis.to_geometry_spec().spatial {
+                    PostgisSpatialKind::Geometry => ScalarType::Geometry,
+                    PostgisSpatialKind::Geography => ScalarType::Geography,
+                };
+                return Some(ScalarFieldType::BuiltInScalar(scalar));
+            }
         };
 
         let res = match native_type {
@@ -366,6 +401,23 @@ impl Connector for PostgresDatamodelConnector {
         schema: &ValidatedSchema,
     ) -> Option<NativeTypeInstance> {
         let native_type = match scalar_type {
+            // PostGIS spatial scalars are not in `SCALAR_TYPE_DEFAULTS` (they have no
+            // `KnownPostgresType` row); fall back to the unconstrained `geometry` / `geography`
+            // column type so introspection can still surface a `@db.Geometry(...)` / `@db.Geography(...)`
+            // attribute when the user supplies one.
+            ScalarFieldType::BuiltInScalar(spatial @ (ScalarType::Geometry | ScalarType::Geography)) => {
+                let args = GeometryNativeArgs {
+                    subtype: parser_database::GeometrySubtype::Geometry,
+                    srid: None,
+                };
+                let postgis = match spatial {
+                    ScalarType::Geometry => PostgisNativeType::Geometry(args),
+                    ScalarType::Geography => PostgisNativeType::Geography(args),
+                    _ => unreachable!("matched only Geometry|Geography above"),
+                };
+                let native_type = PostgresType::Postgis(postgis);
+                return Some(NativeTypeInstance::new::<PostgresType>(native_type));
+            }
             ScalarFieldType::BuiltInScalar(scalar_type) => PostgresType::Known(
                 *SCALAR_TYPE_DEFAULTS
                     .iter()
@@ -377,10 +429,6 @@ impl Connector for PostgresDatamodelConnector {
             ScalarFieldType::Extension(id) => {
                 let (name, modifiers) = schema.db.get_extension_type_db_name_with_modifiers(*id)?;
                 let native_type = PostgresType::Unknown(name.to_owned(), modifiers.to_vec());
-                return Some(NativeTypeInstance::new::<PostgresType>(native_type));
-            }
-            ScalarFieldType::Geometry(spec) => {
-                let native_type = PostgresType::Unknown(geometry_sql_column_type(spec), Vec::new());
                 return Some(NativeTypeInstance::new::<PostgresType>(native_type));
             }
             ScalarFieldType::CompositeType(_) | ScalarFieldType::Enum(_) | ScalarFieldType::Unsupported(_) => {
@@ -398,7 +446,21 @@ impl Connector for PostgresDatamodelConnector {
         span: ast::Span,
         errors: &mut Diagnostics,
     ) {
-        let PostgresType::Known(native_type) = native_type_instance.downcast_ref() else {
+        let postgres_type: &PostgresType = native_type_instance.downcast_ref();
+
+        // Validate PostGIS SRID separately because it is enforced through GeometryNativeArgs
+        // rather than the macro-generated KnownPostgresType arguments.
+        if let PostgresType::Postgis(postgis) = postgres_type {
+            let error = self.native_instance_error(native_type_instance);
+            if let Some(srid) = postgis.args().srid
+                && !(0..=999_999).contains(&srid)
+            {
+                errors.push_error(error.new_argument_m_out_of_range_error("SRID must be between 0 and 999999.", span));
+            }
+            return;
+        }
+
+        let PostgresType::Known(native_type) = postgres_type else {
             return;
         };
         let error = self.native_instance_error(native_type_instance);
@@ -457,7 +519,9 @@ impl Connector for PostgresDatamodelConnector {
     }
 
     fn available_native_type_constructors(&self) -> &'static [NativeTypeConstructor] {
-        native_types::CONSTRUCTORS
+        // The macro-generated CONSTRUCTORS only covers built-in scalar variants. Merge the
+        // PostGIS entries on top so prisma-fmt completions surface @db.Geometry / @db.Geography.
+        &EXTENDED_CONSTRUCTORS
     }
 
     fn supported_index_types(&self) -> BitFlags<IndexAlgorithm> {
@@ -477,6 +541,19 @@ impl Connector for PostgresDatamodelConnector {
         span: ast::Span,
         diagnostics: &mut Diagnostics,
     ) -> Option<NativeTypeInstance> {
+        // Intercept the structured PostGIS native attributes before the macro-generated path so
+        // they go through GeometryNativeArgs parsing (subtype enum + bounded SRID) rather than
+        // the fallback "unknown" branch.
+        if let Some(parsed) = native_types::try_parse_postgis(name, args) {
+            return match parsed {
+                Ok(postgis) => Some(NativeTypeInstance::new(PostgresType::Postgis(postgis))),
+                Err(err) => {
+                    diagnostics.push_error(err.into_datamodel_error(span));
+                    None
+                }
+            };
+        }
+
         let nt = match KnownPostgresType::from_parts(name, args) {
             Ok(res) => PostgresType::Known(res),
             Err(NativeTypeParseError::UnknownType { .. }) => PostgresType::Unknown(name.to_owned(), args.to_owned()),
@@ -486,6 +563,13 @@ impl Connector for PostgresDatamodelConnector {
             }
         };
         Some(NativeTypeInstance::new(nt))
+    }
+
+    fn geometry_spec_for_native_type(&self, instance: &NativeTypeInstance) -> Option<GeometrySpec> {
+        instance
+            .downcast_ref::<PostgresType>()
+            .as_postgis()
+            .map(|p| p.to_geometry_spec())
     }
 
     fn native_type_to_parts<'t>(&self, native_type: &'t NativeTypeInstance) -> (&'t str, Cow<'t, [String]>) {

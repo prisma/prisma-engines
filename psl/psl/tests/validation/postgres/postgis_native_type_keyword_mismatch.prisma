@@ -1,0 +1,27 @@
+datasource db {
+  provider = "postgresql"
+}
+
+generator client {
+  provider = "prisma-client"
+}
+
+// SevInf #1/#4: the native attribute must match the PSL keyword. `@db.Geography` cannot decorate
+// a `Geometry` field, and `@db.Geometry` cannot decorate a `Geography` field.
+model Location {
+  id          Int       @id
+  bad_planar  Geometry  @db.Geography(Point, 4326)
+  bad_geodetic Geography @db.Geometry(Point, 4326)
+}
+// error: Native type Geography is not compatible with declared field type Geometry, expected field type Geography.
+//   -->  schema.prisma:13
+//    | 
+// 12 |   id          Int       @id
+// 13 |   bad_planar  Geometry  @db.Geography(Point, 4326)
+//    | 
+// error: Native type Geometry is not compatible with declared field type Geography, expected field type Geometry.
+//   -->  schema.prisma:14
+//    | 
+// 13 |   bad_planar  Geometry  @db.Geography(Point, 4326)
+// 14 |   bad_geodetic Geography @db.Geometry(Point, 4326)
+//    | 

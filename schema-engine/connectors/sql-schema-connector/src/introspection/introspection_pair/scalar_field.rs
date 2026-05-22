@@ -2,7 +2,7 @@ use crate::introspection::sanitize_datamodel_names;
 use either::Either;
 use psl::{
     datamodel_connector::{Flavour, walker_ext_traits::IndexWalkerExt},
-    parser_database::{ExtensionTypeEntry, ScalarFieldType, walkers},
+    parser_database::{ExtensionTypeEntry, PostgisSpatialKind, ScalarFieldType, walkers},
     schema_ast::ast::WithDocumentation,
 };
 use sql::ColumnArity;
@@ -108,14 +108,16 @@ impl<'a> ScalarFieldPair<'a> {
             sql::ColumnTypeFamily::Json => Cow::from("Json"),
             sql::ColumnTypeFamily::Uuid => Cow::from("String"),
             sql::ColumnTypeFamily::Geometry(spec) => {
-                use std::fmt::Write;
-                let mut out = String::from("Geometry(");
-                out.push_str(spec.subtype.as_str());
-                if let Some(srid) = spec.srid {
-                    write!(&mut out, ", {srid}").unwrap();
+                // PSL no longer uses the inline `Geometry(Subtype, SRID)` form. Subtype, SRID
+                // and the planar/geodetic kind are expressed via the @db.Geometry / @db.Geography
+                // native attributes that the renderer attaches from `native_type()`. The PSL
+                // keyword still has to match the spatial kind, otherwise the validator emits a
+                // "Native type Geography is not compatible with declared field type Geometry"
+                // error and the round-trip breaks for `geography` columns.
+                match spec.spatial {
+                    PostgisSpatialKind::Geometry => Cow::Borrowed("Geometry"),
+                    PostgisSpatialKind::Geography => Cow::Borrowed("Geography"),
                 }
-                out.push(')');
-                Cow::Owned(out)
             }
             sql::ColumnTypeFamily::Enum(id) => self.context.enum_prisma_name(*id).prisma_name(),
             &sql::ColumnTypeFamily::Udt(id) => self
@@ -163,7 +165,17 @@ impl<'a> ScalarFieldPair<'a> {
             sql::ColumnTypeFamily::Json => psl::parser_database::ScalarType::Json,
             sql::ColumnTypeFamily::Uuid => psl::parser_database::ScalarType::String,
             sql::ColumnTypeFamily::Binary => psl::parser_database::ScalarType::Bytes,
-            sql::ColumnTypeFamily::Geometry(spec) => return Some(ScalarFieldType::Geometry(*spec)),
+            sql::ColumnTypeFamily::Geometry(spec) => match spec.spatial {
+                // Map the catalog-level spatial kind back to the matching PSL keyword. Subtype
+                // and SRID surface as the `@db.Geometry(...)` / `@db.Geography(...)` native
+                // attribute, just like every other parametrized scalar.
+                PostgisSpatialKind::Geometry => {
+                    return Some(ScalarFieldType::BuiltInScalar(psl::parser_database::ScalarType::Geometry));
+                }
+                PostgisSpatialKind::Geography => {
+                    return Some(ScalarFieldType::BuiltInScalar(psl::parser_database::ScalarType::Geography));
+                }
+            },
             sql::ColumnTypeFamily::Udt(_) => {
                 let entry = self.extension_type()?;
                 return Some(ScalarFieldType::Extension(entry.id));

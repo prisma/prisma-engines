@@ -7,6 +7,7 @@
 
 mod compare;
 mod composite;
+mod geojson;
 mod geometry;
 mod into_filter;
 mod json;
@@ -17,6 +18,7 @@ mod scalar;
 
 pub use compare::*;
 pub use composite::*;
+pub use geojson::*;
 pub use geometry::*;
 pub use into_filter::*;
 pub use json::*;

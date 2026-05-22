@@ -10,7 +10,7 @@ pub(crate) trait PrismaValueExtensions {
 impl PrismaValueExtensions for PrismaValue {
     // Todo this is not exhaustive for now.
     fn coerce(self, to_type: &Type) -> crate::Result<PrismaValue> {
-        let coerced = match (self, to_type.id.clone()) {
+        let coerced = match (self, to_type.id) {
             // Trivial cases
             (PrismaValue::Null, _) => PrismaValue::Null,
             (val @ PrismaValue::String(_), TypeIdentifier::String) => val,
