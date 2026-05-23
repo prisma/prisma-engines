@@ -21,9 +21,12 @@ async fn introspect_geometry_columns(api: &mut TestApi) -> TestResult {
 
     assert!(schema.contains("extensions = [postgis"));
     assert!(schema.contains("model locations"));
-    assert!(schema.contains("position Geometry?") && schema.contains("@db.Geometry(Point, 4326)"));
-    assert!(schema.contains("path") && schema.contains("@db.Geometry(LineString)"));
-    assert!(schema.contains("area Geometry") && schema.contains("@db.Geometry(Polygon, 3857)"));
+    // The introspector pretty-prints columns with alignment padding (`name  Type   @attr`),
+    // so we normalize whitespace before the substring check instead of pinning a single layout.
+    let normalized: String = schema.split_whitespace().collect::<Vec<_>>().join(" ");
+    assert!(normalized.contains("position Geometry?") && normalized.contains("@db.Geometry(Point, 4326)"));
+    assert!(normalized.contains("path Geometry?") && normalized.contains("@db.Geometry(LineString)"));
+    assert!(normalized.contains("area Geometry") && normalized.contains("@db.Geometry(Polygon, 3857)"));
 
     Ok(())
 }
@@ -52,25 +55,29 @@ async fn introspect_geography_columns(api: &mut TestApi) -> TestResult {
     assert!(schema.contains("extensions = [postgis"));
     assert!(schema.contains("model places"));
 
+    // The renderer aligns column declarations with padding (`name  Type   @attr`); normalize
+    // whitespace so substring checks pin semantics, not formatting.
+    let normalized: String = schema.split_whitespace().collect::<Vec<_>>().join(" ");
+
     // Field type MUST be `Geography` (not `Geometry`) so the native attribute pairing validates.
     assert!(
-        schema.contains("location Geography?") && schema.contains("@db.Geography(Point, 4326)"),
+        normalized.contains("location Geography?") && normalized.contains("@db.Geography(Point, 4326)"),
         "expected `location Geography? ... @db.Geography(Point, 4326)`, got:\n{schema}",
     );
     assert!(
-        schema.contains("region Geography") && schema.contains("@db.Geography(Polygon, 4326)"),
+        normalized.contains("region Geography") && normalized.contains("@db.Geography(Polygon, 4326)"),
         "expected `region Geography ... @db.Geography(Polygon, 4326)`, got:\n{schema}",
     );
     // Untyped `geography` (no typmod) keeps the bare native form without subtype/SRID args.
     assert!(
-        schema.contains("footprint Geography?"),
+        normalized.contains("footprint Geography?"),
         "expected `footprint Geography?`, got:\n{schema}",
     );
 
     // The introspector must NEVER emit `Geometry @db.Geography(...)` — that combo is rejected by
     // PSL validation and used to be the silent failure mode for `geography` columns.
     assert!(
-        !schema.contains("Geometry @db.Geography") && !schema.contains("Geometry? @db.Geography"),
+        !normalized.contains("Geometry @db.Geography") && !normalized.contains("Geometry? @db.Geography"),
         "introspected schema must not pair `Geometry` keyword with `@db.Geography`, got:\n{schema}",
     );
 

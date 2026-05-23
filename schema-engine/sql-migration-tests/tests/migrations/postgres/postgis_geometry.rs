@@ -20,7 +20,7 @@ fn create_table_with_geometry(api: TestApi) {
     let connector = psl::builtin_connectors::POSTGRES;
     api.assert_schema().assert_table("Location", |table| {
         table.assert_column("position", |col| {
-            col.assert_native_type("geometry(Point,4326)", connector)
+            col.assert_native_type("Geometry(Point,4326)", connector)
         })
     });
 }
@@ -50,7 +50,7 @@ fn alter_geometry_srid(api: TestApi) {
     let connector = psl::builtin_connectors::POSTGRES;
     api.assert_schema().assert_table("Location", |table| {
         table.assert_column("position", |col| {
-            col.assert_native_type("geometry(Point,3857)", connector)
+            col.assert_native_type("Geometry(Point,3857)", connector)
         })
     });
 }
@@ -106,7 +106,7 @@ fn create_table_with_geography(api: TestApi) {
     let connector = psl::builtin_connectors::POSTGRES;
     api.assert_schema().assert_table("Place", |table| {
         table.assert_column("region", |col| {
-            col.assert_native_type("geography(Polygon,4326)", connector)
+            col.assert_native_type("Geography(Polygon,4326)", connector)
         })
     });
 }
