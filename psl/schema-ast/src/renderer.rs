@@ -2,6 +2,8 @@ mod table;
 
 pub(crate) use table::TableFormat;
 
+use crate::ast::NewlineType;
+
 pub(crate) trait LineWriteable {
     fn write(&mut self, param: &str);
     fn end_line(&mut self);
@@ -11,14 +13,16 @@ pub(crate) struct Renderer {
     pub stream: String,
     indent: usize,
     indent_width: usize,
+    line_ending: NewlineType,
 }
 
 impl Renderer {
-    pub(crate) fn new(indent_width: usize) -> Renderer {
+    pub(crate) fn new(indent_width: usize, line_ending: NewlineType) -> Renderer {
         Renderer {
             stream: String::new(),
             indent: 0,
             indent_width,
+            line_ending,
         }
     }
 
@@ -46,7 +50,7 @@ impl LineWriteable for Renderer {
     }
 
     fn end_line(&mut self) {
-        self.stream.push('\n');
+        self.stream.push_str(self.line_ending.as_ref());
     }
 }
 
