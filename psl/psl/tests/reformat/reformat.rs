@@ -1283,14 +1283,29 @@ mod line_endings {
 
     #[test]
     fn mixed_input_defaults_to_lf() {
-        // First line uses LF, later lines use CRLF: the first newline wins
-        // and the reformatter falls back to LF for the whole output.
+        // First line uses LF, later lines use CRLF: any bare LF in the input
+        // forces the reformatter to fall back to LF for the whole output.
         let input = format!(
             "{}\n{}\r\n{}\r\n{}\r\n",
             SCHEMA_LINES[0], SCHEMA_LINES[1], SCHEMA_LINES[2], SCHEMA_LINES[3]
         );
         let out = reformat(&input);
-        assert!(!out.contains('\r'), "mixed input should normalize to LF: {out:?}");
+        assert!(!out.contains('\r'), "LF-first mixed input should normalize to LF: {out:?}");
+    }
+
+    #[test]
+    fn mixed_input_crlf_first_then_lf_defaults_to_lf() {
+        // First line uses CRLF, later line uses bare LF: the bare LF still
+        // forces the LF fallback so the contract is symmetric.
+        let input = format!(
+            "{}\r\n{}\n{}\r\n{}\r\n",
+            SCHEMA_LINES[0], SCHEMA_LINES[1], SCHEMA_LINES[2], SCHEMA_LINES[3]
+        );
+        let out = reformat(&input);
+        assert!(
+            !out.contains('\r'),
+            "CRLF-first mixed input should still normalize to LF: {out:?}"
+        );
     }
 
     #[test]
