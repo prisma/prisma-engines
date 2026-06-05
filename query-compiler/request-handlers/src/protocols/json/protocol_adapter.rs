@@ -134,7 +134,7 @@ impl<'a> JsonProtocolAdapter<'a> {
     }
 
     fn convert_arguments(args: IndexMap<String, JsonValue>) -> crate::Result<Vec<(String, ArgumentValue)>> {
-        let mut res = vec![];
+        let mut res = Vec::with_capacity(args.len());
 
         for (name, value) in args {
             let value = Self::convert_argument(value)?;
@@ -146,9 +146,6 @@ impl<'a> JsonProtocolAdapter<'a> {
     }
 
     fn convert_argument(value: JsonValue) -> crate::Result<ArgumentValue> {
-        let err_message = format!("Could not convert argument value {:?} to ArgumentValue.", &value);
-        let build_err = || HandlerError::query_conversion(err_message.clone());
-
         match value {
             serde_json::Value::String(s) => Ok(ArgumentValue::string(s)),
             serde_json::Value::Array(v) => {
@@ -173,8 +170,8 @@ impl<'a> JsonProtocolAdapter<'a> {
                     let value = obj
                         .get(custom_types::VALUE)
                         .and_then(|v| v.as_str())
-                        .ok_or_else(build_err)?;
-                    let date = parse_datetime(value).map_err(|_| build_err())?;
+                        .ok_or_else(|| Self::argument_conversion_error_for_object(&obj))?;
+                    let date = parse_datetime(value).map_err(|_| Self::argument_conversion_error_for_object(&obj))?;
 
                     Ok(ArgumentValue::datetime(date))
                 }
@@ -182,60 +179,64 @@ impl<'a> JsonProtocolAdapter<'a> {
                     let value = obj
                         .get(custom_types::VALUE)
                         .and_then(|v| v.as_str())
-                        .ok_or_else(build_err)?;
+                        .ok_or_else(|| Self::argument_conversion_error_for_object(&obj))?;
 
-                    i64::from_str(value).map(ArgumentValue::bigint).map_err(|_| build_err())
+                    i64::from_str(value)
+                        .map(ArgumentValue::bigint)
+                        .map_err(|_| Self::argument_conversion_error_for_object(&obj))
                 }
                 Some(custom_types::DECIMAL) => {
                     let value = obj
                         .get(custom_types::VALUE)
                         .and_then(|v| v.as_str())
-                        .ok_or_else(build_err)?;
+                        .ok_or_else(|| Self::argument_conversion_error_for_object(&obj))?;
 
                     BigDecimal::from_str(value)
                         .map(ArgumentValue::float)
-                        .map_err(|_| build_err())
+                        .map_err(|_| Self::argument_conversion_error_for_object(&obj))
                 }
 
                 Some(custom_types::RAW) => {
-                    let value = obj.get(custom_types::VALUE).ok_or_else(build_err)?;
+                    let value = obj
+                        .get(custom_types::VALUE)
+                        .ok_or_else(|| Self::argument_conversion_error_for_object(&obj))?;
                     Ok(ArgumentValue::raw(value.clone()))
                 }
                 Some(custom_types::BYTES) => {
                     let value = obj
                         .get(custom_types::VALUE)
                         .and_then(|v| v.as_str())
-                        .ok_or_else(build_err)?;
+                        .ok_or_else(|| Self::argument_conversion_error_for_object(&obj))?;
 
-                    decode_bytes(value).map(ArgumentValue::bytes).map_err(|_| build_err())
+                    decode_bytes(value)
+                        .map(ArgumentValue::bytes)
+                        .map_err(|_| Self::argument_conversion_error_for_object(&obj))
                 }
-                Some(custom_types::JSON) => {
-                    let value = obj
-                        .remove(custom_types::VALUE)
-                        .and_then(|v| match v {
-                            JsonValue::String(str) => Some(str),
-                            _ => None,
-                        })
-                        .ok_or_else(build_err)?;
-
-                    Ok(ArgumentValue::json(value))
-                }
+                Some(custom_types::JSON) => match obj.remove(custom_types::VALUE) {
+                    Some(JsonValue::String(value)) => Ok(ArgumentValue::json(value)),
+                    Some(value) => {
+                        obj.insert(custom_types::VALUE.to_string(), value);
+                        Err(Self::argument_conversion_error_for_object(&obj))
+                    }
+                    None => Err(Self::argument_conversion_error_for_object(&obj)),
+                },
                 Some(custom_types::ENUM) => {
                     let value = obj
                         .get(custom_types::VALUE)
                         .and_then(|v| v.as_str())
-                        .ok_or_else(build_err)?;
+                        .ok_or_else(|| Self::argument_conversion_error_for_object(&obj))?;
 
                     Ok(ArgumentValue::r#enum(value.to_string()))
                 }
                 Some(custom_types::FIELD_REF) => {
-                    let value = obj
-                        .remove(custom_types::VALUE)
-                        .and_then(|v| match v {
-                            JsonValue::Object(obj) => Some(obj),
-                            _ => None,
-                        })
-                        .ok_or_else(build_err)?;
+                    let value = match obj.remove(custom_types::VALUE) {
+                        Some(JsonValue::Object(value)) => value,
+                        Some(value) => {
+                            obj.insert(custom_types::VALUE.to_string(), value);
+                            return Err(Self::argument_conversion_error_for_object(&obj));
+                        }
+                        None => return Err(Self::argument_conversion_error_for_object(&obj)),
+                    };
                     let values = value
                         .into_iter()
                         .map(|(k, v)| Ok((k, Self::convert_argument(v)?)))
@@ -244,7 +245,9 @@ impl<'a> JsonProtocolAdapter<'a> {
                     Ok(ArgumentValue::FieldRef(values))
                 }
                 Some(custom_types::PARAM) => {
-                    let value = obj.remove(custom_types::VALUE).ok_or_else(build_err)?;
+                    let value = obj
+                        .remove(custom_types::VALUE)
+                        .ok_or_else(|| Self::argument_conversion_error_for_object(&obj))?;
                     let placeholder =
                         serde_json::from_value(value).map_err(|e| HandlerError::QueryConversion(e.to_string()))?;
 
@@ -260,6 +263,14 @@ impl<'a> JsonProtocolAdapter<'a> {
                 }
             },
         }
+    }
+
+    fn argument_conversion_error(value: &JsonValue) -> HandlerError {
+        HandlerError::query_conversion(format!("Could not convert argument value {value:?} to ArgumentValue."))
+    }
+
+    fn argument_conversion_error_for_object(obj: &serde_json::Map<String, JsonValue>) -> HandlerError {
+        Self::argument_conversion_error(&JsonValue::Object(obj.clone()))
     }
 
     fn create_shorthand_selection(
