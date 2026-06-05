@@ -3,7 +3,6 @@ use crate::{request_context::get_engine_protocol, schema::*};
 use bigdecimal::{BigDecimal, ToPrimitive};
 use chrono::prelude::*;
 use core::fmt;
-use indexmap::{IndexMap, IndexSet};
 use query_structure::{DefaultKind, Placeholder, PrismaValue, PrismaValueType};
 use std::{borrow::Cow, convert::TryFrom, rc::Rc, str::FromStr};
 use user_facing_errors::query_engine::validation::ValidationError;
@@ -848,18 +847,17 @@ impl QueryDocumentParser {
         schema_object: &InputObjectType<'a>,
         query_schema: &'a QuerySchema,
     ) -> QueryParserResult<ParsedInputMap<'a>> {
-        let fields = schema_object.get_fields().iter();
-        let valid_field_names: IndexSet<Cow<'_, str>> = fields.clone().map(|field| field.name.clone()).collect();
-        let given_field_names: IndexSet<Cow<'_, str>> = object.iter().map(|(k, _)| Cow::Borrowed(k.as_str())).collect();
-        let missing_field_names = valid_field_names.difference(&given_field_names);
-        let schema_fields: IndexMap<Cow<'_, str>, InputField<'_>> =
-            fields.map(|f| (f.name.clone(), f.clone())).collect();
+        let fields = schema_object.get_fields();
 
         // First, filter-in those fields that are not given but have a default value in the schema.
         // As in practise, it is like if they were given with said default value.
-        let defaults = missing_field_names
-            .filter_map(|unset_field_name| {
-                let field = schema_fields.get(unset_field_name.as_ref()).unwrap();
+        let defaults = fields
+            .iter()
+            .filter_map(|field| {
+                if object.contains_key(field.name.as_ref()) {
+                    return None;
+                }
+
                 let argument_path = argument_path.add(field.name.clone().into_owned());
 
                 // If the input field has a default, add the default to the result.
@@ -898,13 +896,16 @@ impl QueryDocumentParser {
         let mut map = object
             .into_iter()
             .map(|(field_name, value)| {
-                let field = schema_fields.get(field_name.as_str()).ok_or_else(|| {
-                    ValidationError::unknown_input_field(
-                        selection_path.segments(),
-                        argument_path.add(field_name.clone()).segments(),
-                        conversions::schema_input_object_type_to_input_type_description(schema_object),
-                    )
-                })?;
+                let field = fields
+                    .iter()
+                    .find(|field| field.name.as_ref() == field_name)
+                    .ok_or_else(|| {
+                        ValidationError::unknown_input_field(
+                            selection_path.segments(),
+                            argument_path.add(field_name.clone()).segments(),
+                            conversions::schema_input_object_type_to_input_type_description(schema_object),
+                        )
+                    })?;
 
                 let argument_path = argument_path.add(field.name.clone().into_owned());
                 let parsed = self.parse_input_value(
