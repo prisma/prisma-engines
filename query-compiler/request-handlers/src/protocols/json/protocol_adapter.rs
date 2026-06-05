@@ -126,8 +126,10 @@ impl<'a> JsonProtocolAdapter<'a> {
         // Keys have to be removed after the nested selections have been created
         // because we can't guarantee that we will encounter `<field>: false` _after_ `$scalars|$composites: true`.
         // This is important because otherwise, the selection wouldn't be filled and `<field>: false` would have nothing to filter out.
-        for key in excluded_keys {
-            selection.remove_nested_selection(&key);
+        if let Some(excluded_keys) = excluded_keys {
+            for key in excluded_keys {
+                selection.remove_nested_selection(&key);
+            }
         }
 
         Ok(selection)
