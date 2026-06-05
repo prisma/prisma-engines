@@ -267,13 +267,13 @@ impl QueryDocumentParser {
         }
 
         for input_type in possible_input_types {
-            match (value.clone(), input_type) {
+            match (&value, input_type) {
                 // With the JSON protocol, JSON values are sent as deserialized values.
                 // This means JSON can match with pretty much anything. A string, an int, an object, an array.
                 // This is an early catch-all.
                 // We do not get into this catch-all if the value is already Json, or if it's a FieldRef,
                 // Enum or Placeholder, because they've already been disambiguated at the procotol level.
-                (value, InputType::<'a>::Scalar(ScalarType::Json))
+                (_, InputType::<'a>::Scalar(ScalarType::Json))
                     if value.should_be_parsed_as_json() && get_engine_protocol().is_json() =>
                 {
                     return Ok(ParsedInputValue::Single(self.to_json(
@@ -285,14 +285,14 @@ impl QueryDocumentParser {
                 // With the JSON protocol, JSON values are sent as deserialized values.
                 // This means that a JsonList([1, 2]) will be coerced as an `ArgumentValue::List([1, 2])`.
                 // We need this early matcher to make sure we coerce this array back to JSON.
-                (list @ ArgumentValue::List(_), InputType::Scalar(ScalarType::JsonList))
+                (ArgumentValue::List(_), InputType::Scalar(ScalarType::JsonList))
                     if get_engine_protocol().is_json() =>
                 {
-                    let json_val = serde_json::to_value(list.clone()).map_err(|err| {
+                    let json_val = serde_json::to_value(&value).map_err(|err| {
                         ValidationError::invalid_argument_value(
                             selection_path.segments(),
                             argument_path.segments(),
-                            format!("{list:?}"),
+                            format!("{value:?}"),
                             "JSON array",
                             Some(Box::new(err)),
                         )
@@ -313,26 +313,33 @@ impl QueryDocumentParser {
                     ))),
                     // Scalar handling
                     (pv, InputType::Scalar(st)) => try_this!(
-                        self.parse_scalar(&selection_path, &argument_path, pv, *st, &value, is_parameterizable)
-                            .map(ParsedInputValue::Single)
+                        self.parse_scalar(
+                            &selection_path,
+                            &argument_path,
+                            pv.clone(),
+                            *st,
+                            &value,
+                            is_parameterizable
+                        )
+                        .map(ParsedInputValue::Single)
                     ),
 
                     // Enum handling
                     (pv @ PrismaValue::Enum(_), InputType::Enum(et)) => {
-                        try_this!(self.parse_enum(&selection_path, &argument_path, pv, et))
+                        try_this!(self.parse_enum(&selection_path, &argument_path, pv.clone(), et))
                     }
                     (pv @ PrismaValue::String(_), InputType::Enum(et)) => {
-                        try_this!(self.parse_enum(&selection_path, &argument_path, pv, et))
+                        try_this!(self.parse_enum(&selection_path, &argument_path, pv.clone(), et))
                     }
                     (pv @ PrismaValue::Boolean(_), InputType::Enum(et)) => {
-                        try_this!(self.parse_enum(&selection_path, &argument_path, pv, et))
+                        try_this!(self.parse_enum(&selection_path, &argument_path, pv.clone(), et))
                     }
                     (PrismaValue::Placeholder(placeholder), InputType::Enum(et)) => {
                         try_this!(self.parse_parameterized_enum(
                             &selection_path,
                             &argument_path,
                             &value,
-                            placeholder,
+                            placeholder.clone(),
                             et,
                             is_parameterizable
                         ))
@@ -344,7 +351,7 @@ impl QueryDocumentParser {
                             &selection_path,
                             &argument_path,
                             &value,
-                            placeholder,
+                            placeholder.clone(),
                             elem_type,
                             is_parameterizable
                         ))
@@ -364,7 +371,7 @@ impl QueryDocumentParser {
                     self.parse_list(
                         &selection_path,
                         &argument_path,
-                        values.clone(),
+                        values.to_vec(),
                         l,
                         query_schema,
                         is_parameterizable
