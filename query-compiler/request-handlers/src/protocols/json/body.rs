@@ -127,11 +127,14 @@ impl SelectionSet {
         key == ALL_COMPOSITES
     }
 
-    pub fn get_excluded_keys(&self) -> Vec<String> {
-        self.0
-            .iter()
-            .filter_map(|(k, v)| (!v.is_selected()).then_some(k.to_owned()))
-            .collect()
+    pub fn get_excluded_keys(&self) -> Option<Vec<String>> {
+        let mut excluded_keys: Option<Vec<String>> = None;
+        for (key, value) in self.0.iter() {
+            if !value.is_selected() {
+                excluded_keys.get_or_insert_with(Vec::new).push(key.to_owned());
+            }
+        }
+        excluded_keys
     }
 
     pub(crate) fn into_selection(self) -> impl Iterator<Item = (String, SelectionSetValue)> {
