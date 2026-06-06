@@ -405,19 +405,18 @@ impl<'a, 'b> NodeTranslator<'a, 'b> {
 
     fn process_child_with_dependencies(&mut self, node: NodeRef) -> TranslateResult<Expression> {
         let create_field_bindings = matches!(self.graph.node_content(&node), Some(Node::Query(_)));
+        let incoming_edges = self.graph.incoming_edges(&node);
 
-        let validations = self
-            .graph
-            .incoming_edges(&node)
-            .into_iter()
+        let validations = incoming_edges
+            .iter()
             .filter_map(|edge| {
                 let Some(QueryGraphDependency::DataDependency(RowCountSink::Discard, expectation)) =
-                    self.graph.edge_content(&edge)
+                    self.graph.edge_content(edge)
                 else {
                     return None;
                 };
                 let mut expr = Expression::Get {
-                    name: binding::node_result(self.graph.edge_source(&edge)),
+                    name: binding::node_result(self.graph.edge_source(edge)),
                 };
                 if let Some(expectation) = expectation {
                     expr = Expression::validate_expectation(expectation, expr);
@@ -426,12 +425,10 @@ impl<'a, 'b> NodeTranslator<'a, 'b> {
             })
             .collect_vec();
 
-        let bindings = self
-            .graph
-            .incoming_edges(&node)
-            .into_iter()
+        let bindings = incoming_edges
+            .iter()
             .flat_map(|edge| {
-                let edge_content = self.graph.edge_content(&edge);
+                let edge_content = self.graph.edge_content(edge);
                 let Some(QueryGraphDependency::ProjectedDataDependency(selection, _, expectation)) = edge_content
                 else {
                     return Either::Left(std::iter::empty());
@@ -443,7 +440,7 @@ impl<'a, 'b> NodeTranslator<'a, 'b> {
                         if sink.is_unique()
                 );
 
-                let source = self.graph.edge_source(&edge);
+                let source = self.graph.edge_source(edge);
 
                 let expr = Expression::Get {
                     name: binding::node_result(source),
@@ -486,8 +483,7 @@ impl<'a, 'b> NodeTranslator<'a, 'b> {
             .collect::<Vec<_>>();
 
         // translate plucks the edges coming into node, we need to avoid accessing it afterwards
-        let edges = self.graph.incoming_edges(&node);
-        let expr = NodeTranslator::new(self.graph, node, &edges, self.query_builder).translate()?;
+        let expr = NodeTranslator::new(self.graph, node, &incoming_edges, self.query_builder).translate()?;
 
         if bindings.is_empty() && validations.is_empty() {
             return Ok(expr);
