@@ -230,6 +230,10 @@ pub(crate) fn merge_relation_selections(
         selected_fields
     };
 
+    if nested_queries.is_empty() {
+        return selected_fields;
+    }
+
     let nested: Vec<_> = nested_queries
         .iter()
         .map(|nested_query| {
