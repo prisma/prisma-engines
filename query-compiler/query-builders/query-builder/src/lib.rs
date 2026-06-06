@@ -416,6 +416,15 @@ impl Serialize for ArgType {
             return serializer.serialize_str(self.scalar_type.as_str());
         }
 
+        if self.arity == Arity::Scalar {
+            if let Some(db_type) = &self.db_type {
+                let mut tuple = serializer.serialize_tuple(2)?;
+                tuple.serialize_element(self.scalar_type.as_str())?;
+                tuple.serialize_element(db_type)?;
+                return tuple.end();
+            }
+        }
+
         let mut state = serializer.serialize_struct("ArgType", 3)?;
         state.serialize_field("arity", &self.arity)?;
         state.serialize_field("scalarType", self.scalar_type.as_str())?;
