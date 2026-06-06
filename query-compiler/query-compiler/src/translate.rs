@@ -380,20 +380,18 @@ impl<'a, 'b> NodeTranslator<'a, 'b> {
             })
             .collect::<TranslateResult<Vec<_>>>()?;
 
-        let result_nodes: Vec<NodeRef> = self.graph.result_nodes().collect();
-        let result_binding_names = bindings.iter().map(|b| b.name.clone()).collect::<Vec<_>>();
+        let has_single_result_node = self.graph.result_nodes().take(2).count() == 1;
 
-        if result_nodes.len() == 1 {
+        if has_single_result_node {
+            let result_binding_name = bindings.last().expect("no binding for result node").name.clone();
             Ok(Expression::Let {
                 bindings,
                 expr: Box::new(Expression::Get {
-                    name: result_binding_names
-                        .into_iter()
-                        .next_back()
-                        .expect("no binding for result node"),
+                    name: result_binding_name,
                 }),
             })
         } else {
+            let result_binding_names = bindings.iter().map(|b| b.name.clone()).collect::<Vec<_>>();
             Ok(Expression::Let {
                 bindings,
                 expr: Box::new(Expression::GetFirstNonEmpty {
