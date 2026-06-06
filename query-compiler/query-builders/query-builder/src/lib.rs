@@ -2,7 +2,7 @@ use query_structure::{
     AggregationSelection, FieldSelection, Filter, Model, Placeholder, PrismaValue, QueryArguments, RecordFilter,
     RelationField, RelationLoadStrategy, ScalarCondition, ScalarField, SelectedField, SelectionResult, WriteArgs,
 };
-use serde::{Serialize, Serializer, ser::SerializeSeq, ser::SerializeStruct};
+use serde::{Serialize, Serializer, ser::SerializeSeq, ser::SerializeStruct, ser::SerializeTuple};
 use std::collections::BTreeMap;
 use std::fmt::Formatter;
 use std::{collections::HashMap, fmt};
@@ -216,24 +216,53 @@ impl fmt::Display for RelationLinkage {
     }
 }
 
-#[derive(Debug, Serialize)]
-#[serde(tag = "type", rename_all = "camelCase")]
+#[derive(Debug)]
 pub enum DbQuery {
-    #[serde(rename_all = "camelCase")]
     RawSql {
         sql: String,
         args: Vec<PrismaValue>,
         arg_types: Vec<ArgType>,
     },
-    #[serde(rename_all = "camelCase")]
     TemplateSql {
-        #[serde(serialize_with = "serialize_fragments")]
         fragments: Vec<Fragment>,
         args: Vec<PrismaValue>,
         arg_types: Vec<DynamicArgType>,
         placeholder_format: PlaceholderFormat,
         chunkable: Chunkable,
     },
+}
+
+impl Serialize for DbQuery {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        match self {
+            Self::RawSql { sql, args, arg_types } => {
+                let mut state = serializer.serialize_struct("DbQuery", 4)?;
+                state.serialize_field("type", "rawSql")?;
+                state.serialize_field("sql", sql)?;
+                state.serialize_field("args", args)?;
+                state.serialize_field("argTypes", arg_types)?;
+                state.end()
+            }
+            Self::TemplateSql {
+                fragments,
+                args,
+                arg_types,
+                placeholder_format,
+                chunkable,
+            } => {
+                let mut tuple = serializer.serialize_tuple(5)?;
+                tuple.serialize_element(&SerializedFragments(fragments))?;
+                tuple.serialize_element(&SerializedPlaceholderFormat(placeholder_format))?;
+                tuple.serialize_element(args)?;
+                tuple.serialize_element(arg_types)?;
+                tuple.serialize_element(chunkable)?;
+                tuple.end()
+            }
+        }
+    }
 }
 
 impl DbQuery {
@@ -294,18 +323,36 @@ impl fmt::Display for DbQuery {
     }
 }
 
-fn serialize_fragments<S>(fragments: &Vec<Fragment>, serializer: S) -> Result<S::Ok, S::Error>
-where
-    S: Serializer,
-{
-    let mut seq = serializer.serialize_seq(Some(fragments.len()))?;
-    for fragment in fragments {
-        match fragment {
-            Fragment::StringChunk { chunk } => seq.serialize_element(chunk)?,
-            fragment => seq.serialize_element(fragment)?,
+struct SerializedFragments<'a>(&'a Vec<Fragment>);
+
+impl Serialize for SerializedFragments<'_> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        let mut seq = serializer.serialize_seq(Some(self.0.len()))?;
+        for fragment in self.0 {
+            match fragment {
+                Fragment::StringChunk { chunk } => seq.serialize_element(chunk)?,
+                fragment => seq.serialize_element(fragment)?,
+            }
         }
+        seq.end()
     }
-    seq.end()
+}
+
+struct SerializedPlaceholderFormat<'a>(&'a PlaceholderFormat);
+
+impl Serialize for SerializedPlaceholderFormat<'_> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        let mut tuple = serializer.serialize_tuple(2)?;
+        tuple.serialize_element(self.0.prefix)?;
+        tuple.serialize_element(&self.0.has_numbering)?;
+        tuple.end()
+    }
 }
 
 #[derive(Debug)]
