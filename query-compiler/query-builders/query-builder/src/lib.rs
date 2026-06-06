@@ -311,6 +311,7 @@ pub enum DynamicArgType {
 pub struct ArgType {
     pub arity: Arity,
     pub scalar_type: ArgScalarType,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub db_type: Option<String>,
 }
 
