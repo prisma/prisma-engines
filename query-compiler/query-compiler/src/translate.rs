@@ -34,18 +34,41 @@ pub enum TranslateError {
 pub type TranslateResult<T> = Result<T, TranslateError>;
 
 pub fn translate(mut graph: QueryGraph, builder: &dyn QueryBuilder) -> TranslateResult<Expression> {
+    enum RootNodes {
+        None,
+        One(NodeRef),
+        Many(Vec<NodeRef>),
+    }
+
     let mut enums = EnumsMap::new();
     let mut result_node_builder = ResultNodeBuilder::new(&mut enums);
     let structure = map_result_structure(&graph, &mut result_node_builder);
 
     // Must collect the root nodes first, because the following iteration is mutating the graph
-    let root_nodes: Vec<NodeRef> = graph.root_nodes().collect();
+    let root_nodes = {
+        let mut nodes = graph.root_nodes();
+        match (nodes.next(), nodes.next()) {
+            (None, _) => RootNodes::None,
+            (Some(node), None) => RootNodes::One(node),
+            (Some(first), Some(second)) => {
+                let mut roots = Vec::with_capacity(2 + nodes.size_hint().0);
+                roots.push(first);
+                roots.push(second);
+                roots.extend(nodes);
+                RootNodes::Many(roots)
+            }
+        }
+    };
 
-    let root = root_nodes
-        .into_iter()
-        .map(|node| NodeTranslator::new(&mut graph, node, &[], builder).translate())
-        .collect::<TranslateResult<Vec<_>>>()
-        .map(Expression::Seq)?;
+    let root = match root_nodes {
+        RootNodes::None => Expression::Seq(Vec::new()),
+        RootNodes::One(node) => NodeTranslator::new(&mut graph, node, &[], builder).translate()?,
+        RootNodes::Many(nodes) => nodes
+            .into_iter()
+            .map(|node| NodeTranslator::new(&mut graph, node, &[], builder).translate())
+            .collect::<TranslateResult<Vec<_>>>()
+            .map(Expression::Seq)?,
+    };
 
     let mut root = if let Some(structure) = structure {
         Expression::DataMap {
