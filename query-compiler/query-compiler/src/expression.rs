@@ -8,7 +8,7 @@ use bon::{Builder, bon};
 use query_builder::DbQuery;
 use query_core::{DataExpectation, DataRule};
 use query_structure::{InternalEnum, PrismaValue, PrismaValueType, ScalarWriteOperation};
-use serde::Serialize;
+use serde::{Serialize, Serializer, ser::SerializeTuple};
 use thiserror::Error;
 
 mod format;
@@ -43,8 +43,7 @@ pub struct JoinExpression {
     pub is_relation_unique: bool,
 }
 
-#[derive(Debug, Serialize)]
-#[serde(tag = "type", content = "args", rename_all = "camelCase")]
+#[derive(Debug)]
 pub enum Expression {
     /// Expression that evaluates to a plain value.
     Value(PrismaValue),
@@ -83,7 +82,6 @@ pub enum Expression {
     Required(Box<Expression>),
 
     /// Application-level join.
-    #[serde(rename_all = "camelCase")]
     Join {
         parent: Box<Expression>,
         children: Vec<JoinExpression>,
@@ -105,7 +103,6 @@ pub enum Expression {
     },
 
     /// Validates the expression according to the data rule and throws an error if it doesn't match.
-    #[serde(rename_all = "camelCase")]
     Validate {
         expr: Box<Expression>,
         rules: Vec<DataRule>,
@@ -149,6 +146,134 @@ pub enum Expression {
         expr: Box<Expression>,
         operations: InMemoryOps,
     },
+}
+
+impl Serialize for Expression {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        match self {
+            Self::Value(value) => serialize_unary("v", value, serializer),
+            Self::Seq(expressions) => serialize_unary("s", expressions, serializer),
+            Self::Get { name } => serialize_unary("g", name, serializer),
+            Self::Let { bindings, expr } => {
+                let mut tuple = serializer.serialize_tuple(3)?;
+                tuple.serialize_element("l")?;
+                tuple.serialize_element(bindings)?;
+                tuple.serialize_element(expr)?;
+                tuple.end()
+            }
+            Self::GetFirstNonEmpty { names } => serialize_unary("e", names, serializer),
+            Self::Query(query) => serialize_unary("q", query, serializer),
+            Self::Execute(query) => serialize_unary("x", query, serializer),
+            Self::Sum(expressions) => serialize_unary("+", expressions, serializer),
+            Self::Concat(expressions) => serialize_unary("c", expressions, serializer),
+            Self::Unique(expr) => serialize_unary("u", expr, serializer),
+            Self::Required(expr) => serialize_unary("r", expr, serializer),
+            Self::Join {
+                parent,
+                children,
+                can_assume_strict_equality,
+            } => {
+                let mut tuple = serializer.serialize_tuple(4)?;
+                tuple.serialize_element("j")?;
+                tuple.serialize_element(parent)?;
+                tuple.serialize_element(children)?;
+                tuple.serialize_element(can_assume_strict_equality)?;
+                tuple.end()
+            }
+            Self::MapField { field, records } => {
+                let mut tuple = serializer.serialize_tuple(3)?;
+                tuple.serialize_element("m")?;
+                tuple.serialize_element(field)?;
+                tuple.serialize_element(records)?;
+                tuple.end()
+            }
+            Self::Transaction(expr) => serialize_unary("t", expr, serializer),
+            Self::DataMap { expr, structure, enums } => {
+                let mut tuple = serializer.serialize_tuple(4)?;
+                tuple.serialize_element("d")?;
+                tuple.serialize_element(expr)?;
+                tuple.serialize_element(structure)?;
+                tuple.serialize_element(enums)?;
+                tuple.end()
+            }
+            Self::Validate {
+                expr,
+                rules,
+                error_identifier,
+                context,
+            } => {
+                let mut tuple = serializer.serialize_tuple(5)?;
+                tuple.serialize_element("V")?;
+                tuple.serialize_element(expr)?;
+                tuple.serialize_element(rules)?;
+                tuple.serialize_element(error_identifier)?;
+                tuple.serialize_element(context)?;
+                tuple.end()
+            }
+            Self::If {
+                value,
+                rule,
+                then,
+                r#else,
+            } => {
+                let mut tuple = serializer.serialize_tuple(5)?;
+                tuple.serialize_element("?")?;
+                tuple.serialize_element(value)?;
+                tuple.serialize_element(rule)?;
+                tuple.serialize_element(then)?;
+                tuple.serialize_element(r#else)?;
+                tuple.end()
+            }
+            Self::Unit => {
+                let mut tuple = serializer.serialize_tuple(1)?;
+                tuple.serialize_element("0")?;
+                tuple.end()
+            }
+            Self::Diff { from, to, fields } => {
+                let mut tuple = serializer.serialize_tuple(4)?;
+                tuple.serialize_element("-")?;
+                tuple.serialize_element(from)?;
+                tuple.serialize_element(to)?;
+                tuple.serialize_element(fields)?;
+                tuple.end()
+            }
+            Self::InitializeRecord { expr, fields } => {
+                let mut tuple = serializer.serialize_tuple(3)?;
+                tuple.serialize_element("i")?;
+                tuple.serialize_element(expr)?;
+                tuple.serialize_element(fields)?;
+                tuple.end()
+            }
+            Self::MapRecord { expr, fields } => {
+                let mut tuple = serializer.serialize_tuple(3)?;
+                tuple.serialize_element("M")?;
+                tuple.serialize_element(expr)?;
+                tuple.serialize_element(fields)?;
+                tuple.end()
+            }
+            Self::Process { expr, operations } => {
+                let mut tuple = serializer.serialize_tuple(3)?;
+                tuple.serialize_element("p")?;
+                tuple.serialize_element(expr)?;
+                tuple.serialize_element(operations)?;
+                tuple.end()
+            }
+        }
+    }
+}
+
+fn serialize_unary<S, T>(tag: &'static str, value: &T, serializer: S) -> Result<S::Ok, S::Error>
+where
+    S: Serializer,
+    T: Serialize,
+{
+    let mut tuple = serializer.serialize_tuple(2)?;
+    tuple.serialize_element(tag)?;
+    tuple.serialize_element(value)?;
+    tuple.end()
 }
 
 impl Expression {
