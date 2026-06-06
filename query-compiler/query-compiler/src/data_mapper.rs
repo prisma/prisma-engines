@@ -383,6 +383,14 @@ impl FieldType {
             r#type: r#type.into(),
         }
     }
+
+    pub fn compact_name(&self) -> Option<&'static str> {
+        if self.arity.is_not_list() {
+            self.r#type.compact_name()
+        } else {
+            None
+        }
+    }
 }
 
 impl fmt::Display for FieldType {
