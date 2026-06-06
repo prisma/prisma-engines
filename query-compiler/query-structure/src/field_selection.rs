@@ -64,6 +64,15 @@ impl FieldSelection {
         )
     }
 
+    pub fn into_without_relations(self) -> Self {
+        FieldSelection::new(
+            self.selections
+                .into_iter()
+                .filter(|field| !matches!(field, SelectedField::Relation(_)))
+                .collect(),
+        )
+    }
+
     pub fn into_virtuals_last(self) -> Self {
         let virtual_count = self
             .selections

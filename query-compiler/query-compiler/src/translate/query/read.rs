@@ -22,7 +22,7 @@ pub(crate) fn translate_read_query(query: ReadQuery, builder: &dyn QueryBuilder)
         ReadQuery::RecordQuery(mut rq) => {
             let selected_fields = match rq.relation_load_strategy {
                 RelationLoadStrategy::Join => rq.selected_fields.into_virtuals_last(),
-                RelationLoadStrategy::Query => rq.selected_fields.without_relations().into_virtuals_last(),
+                RelationLoadStrategy::Query => rq.selected_fields.into_without_relations().into_virtuals_last(),
             };
 
             let mut args = QueryArguments::from((
@@ -53,7 +53,7 @@ pub(crate) fn translate_read_query(query: ReadQuery, builder: &dyn QueryBuilder)
 
             let selected_fields = match mrq.relation_load_strategy {
                 RelationLoadStrategy::Join => mrq.selected_fields.into_virtuals_last(),
-                RelationLoadStrategy::Query => mrq.selected_fields.without_relations().into_virtuals_last(),
+                RelationLoadStrategy::Query => mrq.selected_fields.into_without_relations().into_virtuals_last(),
             };
 
             let take = mrq.args.take;
@@ -243,7 +243,7 @@ fn build_read_related_records(
         }
     }
 
-    let selected_fields = rrq.selected_fields.without_relations().into_virtuals_last();
+    let selected_fields = rrq.selected_fields.into_without_relations().into_virtuals_last();
 
     let mut in_memory_ops =
         in_memory_processing::extract_in_memory_ops_for_nested_query(&mut rrq.args, has_unique_parent);
