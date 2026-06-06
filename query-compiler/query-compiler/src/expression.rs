@@ -8,7 +8,7 @@ use bon::{Builder, bon};
 use query_builder::DbQuery;
 use query_core::{DataExpectation, DataRule};
 use query_structure::{InternalEnum, PrismaValue, PrismaValueType, ScalarWriteOperation};
-use serde::{Serialize, Serializer, ser::SerializeTuple};
+use serde::{Serialize, Serializer, ser::SerializeMap, ser::SerializeTuple};
 use thiserror::Error;
 
 mod format;
@@ -399,12 +399,32 @@ impl TryFrom<ScalarWriteOperation> for FieldOperation {
 #[error("unsupported scalar write operation: {0:?}")]
 pub struct UnsupportedScalarWriteOperation(ScalarWriteOperation);
 
-#[derive(Debug, Serialize)]
-#[serde(rename_all = "camelCase")]
+#[derive(Debug)]
 pub struct Pagination {
     cursor: Option<HashMap<String, PrismaValue>>,
     take: Option<i64>,
     skip: Option<i64>,
+}
+
+impl Serialize for Pagination {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        let len =
+            usize::from(self.cursor.is_some()) + usize::from(self.take.is_some()) + usize::from(self.skip.is_some());
+        let mut map = serializer.serialize_map(Some(len))?;
+        if let Some(cursor) = &self.cursor {
+            map.serialize_entry("cursor", cursor)?;
+        }
+        if let Some(take) = self.take {
+            map.serialize_entry("take", &take)?;
+        }
+        if let Some(skip) = self.skip {
+            map.serialize_entry("skip", &skip)?;
+        }
+        map.end()
+    }
 }
 
 #[bon]
@@ -427,8 +447,7 @@ impl Pagination {
     }
 }
 
-#[derive(Debug, Default, Serialize, Builder)]
-#[serde(rename_all = "camelCase")]
+#[derive(Debug, Default, Builder)]
 pub struct InMemoryOps {
     pub(crate) pagination: Option<Pagination>,
     pub(crate) distinct: Option<Vec<String>>,
@@ -437,6 +456,36 @@ pub struct InMemoryOps {
     #[builder(default)]
     pub(crate) nested: BTreeMap<String, InMemoryOps>,
     pub(crate) linking_fields: Option<Vec<String>>,
+}
+
+impl Serialize for InMemoryOps {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        let len = usize::from(self.pagination.is_some())
+            + usize::from(self.distinct.is_some())
+            + usize::from(self.reverse)
+            + usize::from(!self.nested.is_empty())
+            + usize::from(self.linking_fields.is_some());
+        let mut map = serializer.serialize_map(Some(len))?;
+        if let Some(pagination) = &self.pagination {
+            map.serialize_entry("pagination", pagination)?;
+        }
+        if let Some(distinct) = &self.distinct {
+            map.serialize_entry("distinct", distinct)?;
+        }
+        if self.reverse {
+            map.serialize_entry("reverse", &self.reverse)?;
+        }
+        if !self.nested.is_empty() {
+            map.serialize_entry("nested", &self.nested)?;
+        }
+        if let Some(linking_fields) = &self.linking_fields {
+            map.serialize_entry("linkingFields", linking_fields)?;
+        }
+        map.end()
+    }
 }
 
 impl InMemoryOps {
