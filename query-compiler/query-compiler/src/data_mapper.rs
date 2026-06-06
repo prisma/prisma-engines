@@ -15,7 +15,7 @@ use query_structure::{
     TypeIdentifier,
 };
 use serde::{Serialize, Serializer, ser::SerializeStruct};
-use std::{borrow::Cow, collections::HashMap, fmt};
+use std::{borrow::Cow, fmt};
 
 pub fn map_result_structure(graph: &QueryGraph, builder: &mut ResultNodeBuilder) -> Option<ResultNode> {
     graph
@@ -134,23 +134,11 @@ fn get_result_node(
     builder: &mut ResultNodeBuilder<'_>,
     original_name: Option<Cow<'static, str>>,
 ) -> Option<ResultNode> {
-    let field_map = field_selection
-        .selections()
-        .map(|fs| (fs.prisma_name_grouping_virtuals(), fs))
-        .collect::<HashMap<_, _>>();
-    let grouped_virtuals = field_selection
-        .virtuals()
-        .into_group_map_by(|vs| vs.serialized_group_name());
-    let nested_map = nested_queries
-        .iter()
-        .map(|q| (q.get_alias_or_name(), q))
-        .collect::<HashMap<_, _>>();
-
     let mut node = ResultNodeBuilder::new_object(original_name);
     node.set_skip_nulls(skip_nulls);
 
     for prisma_name in selection_order {
-        match field_map.get(prisma_name.as_str()) {
+        match find_selection(field_selection, prisma_name) {
             Some(SelectedField::Scalar(field)) => {
                 node.add_field(
                     field.name().to_owned(),
@@ -179,10 +167,9 @@ fn get_result_node(
                 }
             }
             Some(SelectedField::Virtual(f)) => {
-                for vs in grouped_virtuals
-                    .get(f.serialized_group_name())
-                    .map(Vec::as_slice)
-                    .unwrap_or_default()
+                for vs in field_selection
+                    .virtuals()
+                    .filter(|vs| vs.serialized_group_name() == f.serialized_group_name())
                 {
                     let (group_name, field_name) = vs.serialized_name();
                     let db_name = if uses_relation_joins {
@@ -196,7 +183,7 @@ fn get_result_node(
                 }
             }
             None => {
-                if let Some(q) = nested_map.get(prisma_name.as_str()) {
+                if let Some(q) = nested_queries.iter().find(|q| q.get_alias_or_name() == prisma_name) {
                     let nested_node = map_read_query(
                         q,
                         builder,
@@ -215,6 +202,12 @@ fn get_result_node(
     }
 
     Some(node.build())
+}
+
+fn find_selection<'a>(field_selection: &'a FieldSelection, prisma_name: &str) -> Option<&'a SelectedField> {
+    field_selection
+        .selections()
+        .find(|field| field.prisma_name_grouping_virtuals() == prisma_name)
 }
 
 fn get_scalar_field_result_node(
