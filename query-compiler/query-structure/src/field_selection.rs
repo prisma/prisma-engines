@@ -68,7 +68,24 @@ impl FieldSelection {
         )
     }
 
+    pub fn into_without_relations(self) -> Self {
+        FieldSelection::new(
+            self.selections
+                .into_iter()
+                .filter(|field| !matches!(field, SelectedField::Relation(_)))
+                .collect(),
+        )
+    }
+
     pub fn into_virtuals_last(self) -> Self {
+        if !self
+            .selections
+            .iter()
+            .any(|field| matches!(field, SelectedField::Virtual(_)))
+        {
+            return self;
+        }
+
         let (virtuals, non_virtuals): (Vec<_>, Vec<_>) = self
             .into_iter()
             .partition(|field| matches!(field, SelectedField::Virtual(_)));
