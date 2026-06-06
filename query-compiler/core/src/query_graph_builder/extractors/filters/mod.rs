@@ -242,7 +242,7 @@ fn merge_search_filters(filter: Filter) -> Filter {
 fn fold_search_filters(filters: &[Filter]) -> Vec<Filter> {
     let mut filters_by_val: HashMap<PrismaValue, &Filter> = HashMap::new();
     let mut projections_by_val: HashMap<PrismaValue, Vec<ScalarProjection>> = HashMap::new();
-    let mut output: Vec<Filter> = vec![];
+    let mut output: Vec<Filter> = Vec::with_capacity(filters.len());
 
     // Gather search filters that have the same condition
     for filter in filters.iter() {
