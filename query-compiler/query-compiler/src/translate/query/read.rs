@@ -310,7 +310,7 @@ fn build_read_one2m_query(
 ) -> TranslateResult<(Expression, JoinMetadata)> {
     let (field, conditions_per_field) = linkage.into_parent_field_and_conditions();
 
-    let filters = args
+    let mut filters = args
         .filter
         .take()
         .into_iter()
@@ -322,10 +322,21 @@ fn build_read_one2m_query(
                     mode: QueryMode::Default,
                 })
             })
-        }))
-        .collect_vec();
+        }));
 
-    args.filter = Some(Filter::And(filters));
+    let filter = match (filters.next(), filters.next()) {
+        (None, _) => Filter::And(Vec::new()),
+        (Some(filter), None) => filter,
+        (Some(first), Some(second)) => {
+            let mut all_filters = Vec::with_capacity(2 + filters.size_hint().0);
+            all_filters.push(first);
+            all_filters.push(second);
+            all_filters.extend(filters);
+            Filter::And(all_filters)
+        }
+    };
+
+    args.filter = Some(filter);
 
     let expr = build_get_records(
         builder,
