@@ -21,8 +21,7 @@ transaction
        }
    }
    let 1 = unique (query «SELECT "public"."User"."id" FROM "public"."User" WHERE
-                          ("public"."User"."email" = $1 AND 1=1) LIMIT $2 OFFSET
-                          $3»
+                          "public"."User"."email" = $1 LIMIT $2 OFFSET $3»
                    params [const(String("john@example.com")), const(BigInt(1)),
                            const(BigInt(0))])
    in let 2 = if (rowCountNeq 0 (get 1))
