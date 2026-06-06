@@ -2,7 +2,7 @@ use query_structure::{
     AggregationSelection, FieldSelection, Filter, Model, Placeholder, PrismaValue, QueryArguments, RecordFilter,
     RelationField, RelationLoadStrategy, ScalarCondition, ScalarField, SelectedField, SelectionResult, WriteArgs,
 };
-use serde::Serialize;
+use serde::{Serialize, Serializer, ser::SerializeSeq};
 use std::collections::BTreeMap;
 use std::fmt::Formatter;
 use std::{collections::HashMap, fmt};
@@ -227,6 +227,7 @@ pub enum DbQuery {
     },
     #[serde(rename_all = "camelCase")]
     TemplateSql {
+        #[serde(serialize_with = "serialize_fragments")]
         fragments: Vec<Fragment>,
         args: Vec<PrismaValue>,
         arg_types: Vec<DynamicArgType>,
@@ -291,6 +292,20 @@ impl fmt::Display for DbQuery {
         }
         Ok(())
     }
+}
+
+fn serialize_fragments<S>(fragments: &Vec<Fragment>, serializer: S) -> Result<S::Ok, S::Error>
+where
+    S: Serializer,
+{
+    let mut seq = serializer.serialize_seq(Some(fragments.len()))?;
+    for fragment in fragments {
+        match fragment {
+            Fragment::StringChunk { chunk } => seq.serialize_element(chunk)?,
+            fragment => seq.serialize_element(fragment)?,
+        }
+    }
+    seq.end()
 }
 
 #[derive(Debug, Serialize)]
