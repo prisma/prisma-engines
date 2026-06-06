@@ -413,13 +413,13 @@ impl Serialize for ArgType {
         S: Serializer,
     {
         if self.arity == Arity::Scalar && self.db_type.is_none() {
-            return serializer.serialize_str(self.scalar_type.as_str());
+            return serializer.serialize_str(self.scalar_type.compact_str());
         }
 
         if self.arity == Arity::Scalar {
             if let Some(db_type) = &self.db_type {
                 let mut tuple = serializer.serialize_tuple(2)?;
-                tuple.serialize_element(self.scalar_type.as_str())?;
+                tuple.serialize_element(self.scalar_type.compact_str())?;
                 tuple.serialize_element(db_type)?;
                 return tuple.end();
             }
@@ -486,6 +486,23 @@ impl ArgScalarType {
             Self::DateTime => "datetime",
             Self::Bytes => "bytes",
             Self::Unknown => "unknown",
+        }
+    }
+
+    fn compact_str(&self) -> &'static str {
+        match self {
+            Self::String => "s",
+            Self::Int => "i",
+            Self::BigInt => "I",
+            Self::Float => "f",
+            Self::Decimal => "d",
+            Self::Boolean => "b",
+            Self::Enum => "e",
+            Self::Uuid => "u",
+            Self::Json => "j",
+            Self::DateTime => "D",
+            Self::Bytes => "B",
+            Self::Unknown => "?",
         }
     }
 }
