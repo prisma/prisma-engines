@@ -393,6 +393,10 @@ impl<'a, 'b> NodeTranslator<'a, 'b> {
     }
 
     fn fold_result_scopes(&mut self, result_subgraphs: Vec<(EdgeRef, NodeRef)>) -> TranslateResult<Expression> {
+        if let [(_, node)] = &result_subgraphs[..] {
+            return self.process_child_with_dependencies(*node);
+        }
+
         // if the subgraphs all point to the same result node, we fold them in sequence
         // if not, we can separate them with a getfirstnonempty
         let bindings = result_subgraphs
