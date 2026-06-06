@@ -2,7 +2,7 @@ use std::borrow::Cow;
 
 use indexmap::IndexMap;
 use query_structure::{FieldTypeInformation, TypeIdentifier};
-use serde::Serialize;
+use serde::{Serialize, Serializer, ser::SerializeMap};
 
 use crate::{data_mapper::FieldType, expression::EnumsMap};
 
@@ -22,8 +22,43 @@ pub enum ResultNode {
 #[serde(rename_all = "camelCase")]
 pub struct Object {
     serialized_name: Option<Cow<'static, str>>,
+    #[serde(serialize_with = "serialize_fields")]
     fields: IndexMap<Cow<'static, str>, ResultNode>,
     skip_nulls: bool,
+}
+
+fn serialize_fields<S>(fields: &IndexMap<Cow<'static, str>, ResultNode>, serializer: S) -> Result<S::Ok, S::Error>
+where
+    S: Serializer,
+{
+    let mut map = serializer.serialize_map(Some(fields.len()))?;
+    for (name, node) in fields {
+        match node {
+            ResultNode::Field { db_name, field_type } if db_name == name => map.serialize_entry(
+                name,
+                &FieldNodeWithDefaultDbName {
+                    node_type: FieldNodeType::Field,
+                    field_type,
+                },
+            )?,
+            node => map.serialize_entry(name, node)?,
+        }
+    }
+    map.end()
+}
+
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+struct FieldNodeWithDefaultDbName<'a> {
+    #[serde(rename = "type")]
+    node_type: FieldNodeType,
+    field_type: &'a FieldType,
+}
+
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+enum FieldNodeType {
+    Field,
 }
 
 impl Object {
