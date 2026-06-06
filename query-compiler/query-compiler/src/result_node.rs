@@ -34,13 +34,28 @@ where
     let mut map = serializer.serialize_map(Some(fields.len()))?;
     for (name, node) in fields {
         match node {
-            ResultNode::Field { db_name, field_type } => map.serialize_entry(
-                name,
-                &FieldNodeInObject {
-                    db_name: (db_name != name).then_some(db_name),
-                    field_type,
-                },
-            )?,
+            ResultNode::Field { db_name, field_type } if db_name == name => {
+                if let Some(compact_name) = field_type.compact_name() {
+                    map.serialize_entry(name, compact_name)?;
+                } else {
+                    map.serialize_entry(
+                        name,
+                        &FieldNodeInObject {
+                            db_name: None,
+                            field_type,
+                        },
+                    )?;
+                }
+            }
+            ResultNode::Field { db_name, field_type } => {
+                map.serialize_entry(
+                    name,
+                    &FieldNodeInObject {
+                        db_name: Some(db_name),
+                        field_type,
+                    },
+                )?;
+            }
             node => map.serialize_entry(name, node)?,
         }
     }
