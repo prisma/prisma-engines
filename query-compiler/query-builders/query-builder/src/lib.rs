@@ -2,7 +2,7 @@ use query_structure::{
     AggregationSelection, FieldSelection, Filter, Model, Placeholder, PrismaValue, QueryArguments, RecordFilter,
     RelationField, RelationLoadStrategy, ScalarCondition, ScalarField, SelectedField, SelectionResult, WriteArgs,
 };
-use serde::{Serialize, Serializer, ser::SerializeSeq};
+use serde::{Serialize, Serializer, ser::SerializeSeq, ser::SerializeStruct};
 use std::collections::BTreeMap;
 use std::fmt::Formatter;
 use std::{collections::HashMap, fmt};
@@ -308,26 +308,53 @@ where
     seq.end()
 }
 
-#[derive(Debug, Serialize)]
-#[serde(tag = "arity", rename_all = "camelCase")]
+#[derive(Debug)]
 pub enum DynamicArgType {
-    Tuple {
-        elements: Vec<ArgType>,
-    },
-    #[serde(untagged)]
-    Single {
-        #[serde(flatten)]
-        r#type: ArgType,
-    },
+    Tuple { elements: Vec<ArgType> },
+    Single { r#type: ArgType },
 }
 
-#[derive(Debug, Serialize)]
-#[serde(rename_all = "camelCase")]
+impl Serialize for DynamicArgType {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        match self {
+            Self::Tuple { elements } => {
+                let mut state = serializer.serialize_struct("DynamicArgType", 2)?;
+                state.serialize_field("arity", "tuple")?;
+                state.serialize_field("elements", elements)?;
+                state.end()
+            }
+            Self::Single { r#type } => r#type.serialize(serializer),
+        }
+    }
+}
+
+#[derive(Debug)]
 pub struct ArgType {
     pub arity: Arity,
     pub scalar_type: ArgScalarType,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub db_type: Option<String>,
+}
+
+impl Serialize for ArgType {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        if self.arity == Arity::Scalar && self.db_type.is_none() {
+            return serializer.serialize_str(self.scalar_type.as_str());
+        }
+
+        let mut state = serializer.serialize_struct("ArgType", 3)?;
+        state.serialize_field("arity", &self.arity)?;
+        state.serialize_field("scalarType", self.scalar_type.as_str())?;
+        if let Some(db_type) = &self.db_type {
+            state.serialize_field("dbType", db_type)?;
+        }
+        state.end()
+    }
 }
 
 impl ArgType {
@@ -364,6 +391,25 @@ pub enum ArgScalarType {
     DateTime,
     Bytes,
     Unknown,
+}
+
+impl ArgScalarType {
+    fn as_str(&self) -> &'static str {
+        match self {
+            Self::String => "string",
+            Self::Int => "int",
+            Self::BigInt => "bigint",
+            Self::Float => "float",
+            Self::Decimal => "decimal",
+            Self::Boolean => "boolean",
+            Self::Enum => "enum",
+            Self::Uuid => "uuid",
+            Self::Json => "json",
+            Self::DateTime => "datetime",
+            Self::Bytes => "bytes",
+            Self::Unknown => "unknown",
+        }
+    }
 }
 
 /// Indicates whether the parameters of this query can be chunked into smaller queries.
