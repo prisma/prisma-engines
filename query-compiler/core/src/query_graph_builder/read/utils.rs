@@ -78,7 +78,7 @@ where
 
     let parent = parent.into();
 
-    let mut selected_fields = Vec::new();
+    let mut selected_fields = Vec::with_capacity(pairs.len());
 
     for pair in pairs {
         let field = parent.find_field(&pair.parsed_field.name);
