@@ -335,7 +335,17 @@ impl Serialize for SerializedFragments<'_> {
             match fragment {
                 Fragment::StringChunk { chunk } => seq.serialize_element(chunk)?,
                 Fragment::Parameter => seq.serialize_element(&ParameterFragment)?,
-                fragment => seq.serialize_element(fragment)?,
+                Fragment::ParameterTuple {
+                    item_prefix,
+                    item_separator,
+                    item_suffix,
+                } => seq.serialize_element(&("T", item_prefix, item_separator, item_suffix))?,
+                Fragment::ParameterTupleList {
+                    item_prefix,
+                    item_separator,
+                    item_suffix,
+                    group_separator,
+                } => seq.serialize_element(&("L", item_prefix, item_separator, item_suffix, group_separator))?,
             }
         }
         seq.end()
