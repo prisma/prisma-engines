@@ -188,10 +188,29 @@ impl FieldSelection {
     ///
     /// /!\ Important assumption: All selections are on the same model.
     pub fn union(selections: Vec<Self>) -> Self {
-        let chained = selections.into_iter().flatten();
+        Self::union_iter(selections)
+    }
+
+    /// Merges all given `FieldSelection` a set union of all.
+    ///
+    /// /!\ Important assumption: All selections are on the same model.
+    pub fn union_iter(selections: impl IntoIterator<Item = Self>) -> Self {
+        let mut selections = selections.into_iter();
+        let Some(first) = selections.next() else {
+            return Self::default();
+        };
+
+        let Some(second) = selections.next() else {
+            return first;
+        };
 
         FieldSelection {
-            selections: chained.unique().collect(),
+            selections: first
+                .into_iter()
+                .chain(second)
+                .chain(selections.flatten())
+                .unique()
+                .collect(),
         }
     }
 
