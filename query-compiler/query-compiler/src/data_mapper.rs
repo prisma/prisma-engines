@@ -14,7 +14,7 @@ use query_structure::{
     AggregationSelection, FieldArity, FieldSelection, FieldTypeInformation, ScalarField, SelectedField, Type,
     TypeIdentifier,
 };
-use serde::Serialize;
+use serde::{Serialize, Serializer, ser::SerializeStruct};
 use std::{borrow::Cow, collections::HashMap, fmt};
 
 pub fn map_result_structure(graph: &QueryGraph, builder: &mut ResultNodeBuilder) -> Option<ResultNode> {
@@ -350,13 +350,30 @@ fn get_result_node_for_update_many(
         .call()
 }
 
-#[derive(Debug, Serialize)]
-#[serde(rename_all = "camelCase")]
+#[derive(Debug)]
 pub struct FieldType {
-    #[serde(skip_serializing_if = "Arity::is_not_list")]
     arity: Arity,
-    #[serde(flatten)]
     r#type: FieldScalarType,
+}
+
+impl Serialize for FieldType {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        if self.arity.is_not_list() {
+            if let Some(name) = self.r#type.compact_name() {
+                return serializer.serialize_str(name);
+            }
+        }
+
+        let mut state = serializer.serialize_struct("FieldType", 3)?;
+        if !self.arity.is_not_list() {
+            state.serialize_field("arity", &self.arity)?;
+        }
+        self.r#type.serialize_fields(&mut state)?;
+        state.end()
+    }
 }
 
 impl FieldType {
@@ -429,6 +446,54 @@ impl fmt::Display for FieldScalarType {
             Self::DateTime => write!(f, "DateTime"),
             Self::Bytes { .. } => write!(f, "Bytes"),
             Self::Unsupported => write!(f, "Unsupported"),
+        }
+    }
+}
+
+impl FieldScalarType {
+    fn compact_name(&self) -> Option<&'static str> {
+        match self {
+            Self::String => Some("string"),
+            Self::Int => Some("int"),
+            Self::BigInt => Some("bigint"),
+            Self::Float => Some("float"),
+            Self::Decimal => Some("decimal"),
+            Self::Boolean => Some("boolean"),
+            Self::Json => Some("json"),
+            Self::Object => Some("object"),
+            Self::DateTime => Some("datetime"),
+            Self::Unsupported => Some("unsupported"),
+            Self::Enum { .. } | Self::Extension { .. } | Self::Bytes { .. } => None,
+        }
+    }
+
+    fn serialize_fields<S>(&self, state: &mut S) -> Result<(), S::Error>
+    where
+        S: SerializeStruct,
+    {
+        match self {
+            Self::String => state.serialize_field("type", "string"),
+            Self::Int => state.serialize_field("type", "int"),
+            Self::BigInt => state.serialize_field("type", "bigint"),
+            Self::Float => state.serialize_field("type", "float"),
+            Self::Decimal => state.serialize_field("type", "decimal"),
+            Self::Boolean => state.serialize_field("type", "boolean"),
+            Self::Enum { name } => {
+                state.serialize_field("type", "enum")?;
+                state.serialize_field("name", name)
+            }
+            Self::Extension { name } => {
+                state.serialize_field("type", "extension")?;
+                state.serialize_field("name", name)
+            }
+            Self::Json => state.serialize_field("type", "json"),
+            Self::Object => state.serialize_field("type", "object"),
+            Self::DateTime => state.serialize_field("type", "datetime"),
+            Self::Bytes { encoding } => {
+                state.serialize_field("type", "bytes")?;
+                state.serialize_field("encoding", encoding)
+            }
+            Self::Unsupported => state.serialize_field("type", "unsupported"),
         }
     }
 }
