@@ -34,10 +34,10 @@ where
     let mut map = serializer.serialize_map(Some(fields.len()))?;
     for (name, node) in fields {
         match node {
-            ResultNode::Field { db_name, field_type } if db_name == name => map.serialize_entry(
+            ResultNode::Field { db_name, field_type } => map.serialize_entry(
                 name,
-                &FieldNodeWithDefaultDbName {
-                    node_type: FieldNodeType::Field,
+                &FieldNodeInObject {
+                    db_name: (db_name != name).then_some(db_name),
                     field_type,
                 },
             )?,
@@ -49,16 +49,10 @@ where
 
 #[derive(Serialize)]
 #[serde(rename_all = "camelCase")]
-struct FieldNodeWithDefaultDbName<'a> {
-    #[serde(rename = "type")]
-    node_type: FieldNodeType,
+struct FieldNodeInObject<'a> {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    db_name: Option<&'a Cow<'static, str>>,
     field_type: &'a FieldType,
-}
-
-#[derive(Serialize)]
-#[serde(rename_all = "camelCase")]
-enum FieldNodeType {
-    Field,
 }
 
 impl Object {
