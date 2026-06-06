@@ -9,7 +9,6 @@ use chrono::prelude::*;
 use serde::de::Unexpected;
 use serde::ser::{SerializeMap, SerializeTuple};
 use serde::{Deserialize, Deserializer, Serialize, ser::Serializer};
-use serde_json::json;
 use std::{borrow::Cow, convert::TryFrom, fmt, str::FromStr};
 use uuid::Uuid;
 
@@ -358,24 +357,31 @@ where
 fn serialize_generator_call<S>(
     name: &str,
     args: &[PrismaValue],
-    return_type: &PrismaValueType,
+    _return_type: &PrismaValueType,
     serializer: S,
 ) -> Result<S::Ok, S::Error>
 where
     S: Serializer,
 {
-    let mut map = serializer.serialize_map(Some(2))?;
+    struct CompactGeneratorCall<'a> {
+        name: &'a str,
+        args: &'a [PrismaValue],
+    }
 
-    map.serialize_entry("prisma__type", "generatorCall")?;
-    map.serialize_entry(
-        "prisma__value",
-        &json!({
-            "name": name,
-            "args": args,
-            "returnType": return_type,
-        }),
-    )?;
+    impl Serialize for CompactGeneratorCall<'_> {
+        fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+        where
+            S: Serializer,
+        {
+            let mut tuple = serializer.serialize_tuple(2)?;
+            tuple.serialize_element(self.name)?;
+            tuple.serialize_element(self.args)?;
+            tuple.end()
+        }
+    }
 
+    let mut map = serializer.serialize_map(Some(1))?;
+    map.serialize_entry("$g", &CompactGeneratorCall { name, args })?;
     map.end()
 }
 
