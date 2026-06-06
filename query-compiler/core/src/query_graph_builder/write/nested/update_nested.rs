@@ -46,7 +46,7 @@ pub fn nested_update(
     value: ParsedInputValue<'_>,
     child_model: &Model,
 ) -> QueryGraphBuilderResult<()> {
-    for value in utils::coerce_vec(value) {
+    for value in utils::coerce_values(value) {
         let (data, filter) = if parent_relation_field.is_list() {
             // We have to have a single record filter in "where".
             // This is used to read the children first, to make sure they're actually connected.
@@ -122,7 +122,7 @@ pub fn nested_update_many(
     value: ParsedInputValue<'_>,
     child_model: &Model,
 ) -> QueryGraphBuilderResult<()> {
-    for value in utils::coerce_vec(value) {
+    for value in utils::coerce_values(value) {
         let mut map: ParsedInputMap<'_> = value.try_into()?;
         let where_arg = map.swap_remove(args::WHERE).unwrap();
         let data_value = map.swap_remove(args::DATA).unwrap();

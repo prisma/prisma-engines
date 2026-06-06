@@ -8,7 +8,6 @@ use crate::{
     query_ast::*,
     query_graph::*,
 };
-use itertools::Itertools;
 use query_structure::{Filter, Model, RelationFieldRef, SelectionResult, WriteArgs};
 use std::convert::TryInto;
 
@@ -26,17 +25,17 @@ pub fn nested_set(
 ) -> QueryGraphBuilderResult<()> {
     let relation = parent_relation_field.relation();
 
-    // Build all filters upfront.
-    let filters: Vec<Filter> = utils::coerce_vec(value)
-        .into_iter()
-        .map(|value: ParsedInputValue<'_>| {
-            let value: ParsedInputMap<'_> = value.try_into()?;
-            extract_unique_filter(value, child_model)
-        })
-        .collect::<QueryGraphBuilderResult<Vec<Filter>>>()?
-        .into_iter()
-        .unique()
-        .collect();
+    let values = utils::coerce_values(value);
+    let mut filters = Vec::with_capacity(values.len());
+
+    for value in values {
+        let value: ParsedInputMap<'_> = value.try_into()?;
+        let filter = extract_unique_filter(value, child_model)?;
+
+        if !filters.iter().any(|existing| existing == &filter) {
+            filters.push(filter);
+        }
+    }
 
     let filter = Filter::or(filters);
 
