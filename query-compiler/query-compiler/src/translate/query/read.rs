@@ -122,18 +122,20 @@ pub(super) fn add_inmemory_join(
     nested: Vec<ReadQuery>,
     builder: &dyn QueryBuilder,
 ) -> TranslateResult<Expression> {
-    let all_linking_fields = nested
+    let mut all_linking_fields = nested
         .iter()
         .flat_map(|nested| match nested {
             ReadQuery::RelatedRecordsQuery(rrq) => rrq.parent_field.left_scalars(),
             _ => unreachable!(),
         })
-        .unique()
-        .sorted_by(|a, b| a.name().cmp(b.name()));
+        .collect::<Vec<_>>();
+    all_linking_fields.sort_by(|a, b| a.name().cmp(b.name()));
+    all_linking_fields.dedup_by(|a, b| a.name() == b.name());
 
     let linking_fields_bindings = all_linking_fields
+        .iter()
         .map(|sf| Binding {
-            name: binding::join_parent_field(&sf),
+            name: binding::join_parent_field(sf),
             expr: Expression::MapField {
                 field: sf.db_name().into(),
                 records: Box::new(Expression::Get {
