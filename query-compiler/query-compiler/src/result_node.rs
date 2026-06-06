@@ -2,29 +2,79 @@ use std::borrow::Cow;
 
 use indexmap::IndexMap;
 use query_structure::{FieldTypeInformation, TypeIdentifier};
-use serde::{Serialize, Serializer, ser::SerializeMap};
+use serde::{Serialize, Serializer, ser::SerializeMap, ser::SerializeStruct, ser::SerializeTuple};
 
 use crate::{data_mapper::FieldType, expression::EnumsMap};
 
-#[derive(Debug, Serialize)]
-#[serde(tag = "type", rename_all = "camelCase")]
+#[derive(Debug)]
 pub enum ResultNode {
     AffectedRows,
     Object(Object),
-    #[serde(rename_all = "camelCase")]
     Field {
         db_name: Cow<'static, str>,
         field_type: FieldType,
     },
 }
 
-#[derive(Debug, Serialize)]
-#[serde(rename_all = "camelCase")]
+impl Serialize for ResultNode {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        match self {
+            Self::AffectedRows => {
+                let mut state = serializer.serialize_struct("ResultNode", 1)?;
+                state.serialize_field("type", "affectedRows")?;
+                state.end()
+            }
+            Self::Object(object) => object.serialize(serializer),
+            Self::Field { db_name, field_type } => {
+                let mut state = serializer.serialize_struct("ResultNode", 3)?;
+                state.serialize_field("type", "field")?;
+                state.serialize_field("dbName", db_name)?;
+                state.serialize_field("fieldType", field_type)?;
+                state.end()
+            }
+        }
+    }
+}
+
+#[derive(Debug)]
 pub struct Object {
     serialized_name: Option<Cow<'static, str>>,
-    #[serde(serialize_with = "serialize_fields")]
     fields: IndexMap<Cow<'static, str>, ResultNode>,
     skip_nulls: bool,
+}
+
+impl Serialize for Object {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        if !self.skip_nulls {
+            let mut tuple = serializer.serialize_tuple(2)?;
+            tuple.serialize_element(&self.serialized_name)?;
+            tuple.serialize_element(&SerializedObjectFields(&self.fields))?;
+            return tuple.end();
+        }
+
+        let mut tuple = serializer.serialize_tuple(3)?;
+        tuple.serialize_element(&self.serialized_name)?;
+        tuple.serialize_element(&SerializedObjectFields(&self.fields))?;
+        tuple.serialize_element(&self.skip_nulls)?;
+        tuple.end()
+    }
+}
+
+struct SerializedObjectFields<'a>(&'a IndexMap<Cow<'static, str>, ResultNode>);
+
+impl Serialize for SerializedObjectFields<'_> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        serialize_fields(self.0, serializer)
+    }
 }
 
 fn serialize_fields<S>(fields: &IndexMap<Cow<'static, str>, ResultNode>, serializer: S) -> Result<S::Ok, S::Error>
