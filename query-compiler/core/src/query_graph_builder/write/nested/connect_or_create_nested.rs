@@ -108,9 +108,10 @@ fn handle_many_to_many(
         let create_map: ParsedInputMap<'_> = create_arg.try_into()?;
 
         let filter = extract_unique_filter(where_map, child_model)?;
+        let child_model_identifier = child_model.shard_aware_primary_identifier();
         let read_node = graph.create_node(utils::read_id_infallible(
             child_model.clone(),
-            child_model.shard_aware_primary_identifier(),
+            child_model_identifier.clone(),
             filter,
         ));
 
@@ -127,11 +128,7 @@ fn handle_many_to_many(
         graph.create_edge(
             &read_node,
             &if_node,
-            QueryGraphDependency::ProjectedDataDependency(
-                child_model.shard_aware_primary_identifier(),
-                RowSink::All(&IfInput),
-                None,
-            ),
+            QueryGraphDependency::ProjectedDataDependency(child_model_identifier, RowSink::All(&IfInput), None),
         )?;
 
         graph.create_edge(&if_node, &connect_exists_node, QueryGraphDependency::Then)?;
@@ -713,11 +710,7 @@ fn one_to_one_inlined_child(
     graph.create_edge(
         &read_new_child_node,
         &if_node,
-        QueryGraphDependency::ProjectedDataDependency(
-            child_model.shard_aware_primary_identifier(),
-            RowSink::All(&IfInput),
-            None,
-        ),
+        QueryGraphDependency::ProjectedDataDependency(child_model_identifier.clone(), RowSink::All(&IfInput), None),
     )?;
 
     // *** Else branch handling ***
