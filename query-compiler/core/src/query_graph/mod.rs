@@ -847,19 +847,15 @@ impl QueryGraph {
 
         for return_node in return_nodes {
             let out_edges = self.outgoing_edges(&return_node);
-            let dependencies: Vec<FieldSelection> = out_edges
-                .into_iter()
-                .filter_map(|edge| {
-                    if let QueryGraphDependency::ProjectedDataDependency(requested_selection, _, _) =
-                        self.edge_content(&edge).unwrap()
-                    {
-                        Some(requested_selection.clone())
-                    } else {
-                        None
-                    }
-                })
-                .collect();
-            let dependencies = FieldSelection::union(dependencies);
+            let dependencies = FieldSelection::union_iter(out_edges.into_iter().filter_map(|edge| {
+                if let QueryGraphDependency::ProjectedDataDependency(requested_selection, _, _) =
+                    self.edge_content(&edge).unwrap()
+                {
+                    Some(requested_selection.clone())
+                } else {
+                    None
+                }
+            }));
 
             // Assumption: We currently always have at most one single incoming ProjectedDataDependency edge
             // connected to return nodes. This will break if we ever have more.
@@ -1085,23 +1081,23 @@ impl QueryGraph {
 
                 if let Node::Query(q) = self.node_content(&node).unwrap() {
                     let edges = self.outgoing_edges(&node);
-                    let unsatisfied_dependencies: Vec<_> = edges
-                        .into_iter()
-                        .filter_map(|edge| match self.edge_content(&edge).unwrap() {
-                            QueryGraphDependency::ProjectedDataDependency(requested_selection, _, _)
-                                if !q.satisfies(requested_selection) =>
-                            {
-                                Some(requested_selection.clone())
-                            }
-                            _ => None,
-                        })
-                        .collect();
+                    let mut unsatisfied_dependencies =
+                        edges
+                            .into_iter()
+                            .filter_map(|edge| match self.edge_content(&edge).unwrap() {
+                                QueryGraphDependency::ProjectedDataDependency(requested_selection, _, _)
+                                    if !q.satisfies(requested_selection) =>
+                                {
+                                    Some(requested_selection.clone())
+                                }
+                                _ => None,
+                            });
 
-                    if unsatisfied_dependencies.is_empty() {
-                        None
-                    } else {
-                        Some((node, FieldSelection::union(unsatisfied_dependencies)))
-                    }
+                    let first = unsatisfied_dependencies.next()?;
+                    Some((
+                        node,
+                        FieldSelection::union_iter(std::iter::once(first).chain(unsatisfied_dependencies)),
+                    ))
                 } else {
                     None
                 }
