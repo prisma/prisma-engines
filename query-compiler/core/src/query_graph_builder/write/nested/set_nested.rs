@@ -25,7 +25,7 @@ pub fn nested_set(
 ) -> QueryGraphBuilderResult<()> {
     let relation = parent_relation_field.relation();
 
-    let values = utils::coerce_vec(value);
+    let values = utils::coerce_values(value);
     let mut filters = Vec::with_capacity(values.len());
 
     for value in values {

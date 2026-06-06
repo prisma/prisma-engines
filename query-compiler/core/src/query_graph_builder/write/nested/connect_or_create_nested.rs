@@ -24,7 +24,7 @@ pub(crate) fn nested_connect_or_create(
     child_model: &Model,
 ) -> QueryGraphBuilderResult<()> {
     let relation = parent_relation_field.relation();
-    let values = utils::coerce_vec(value);
+    let values = utils::coerce_values(value);
 
     if relation.is_many_to_many() {
         handle_many_to_many(
@@ -95,7 +95,7 @@ fn handle_many_to_many(
     query_schema: &QuerySchema,
     parent_node: NodeRef,
     parent_relation_field: &RelationFieldRef,
-    values: Vec<ParsedInputValue<'_>>,
+    values: utils::CoercedParsedInputValues<'_>,
     child_model: &Model,
 ) -> QueryGraphBuilderResult<()> {
     for value in values {
@@ -144,7 +144,7 @@ fn handle_one_to_many(
     query_schema: &QuerySchema,
     parent_node: NodeRef,
     parent_relation_field: &RelationFieldRef,
-    values: Vec<ParsedInputValue<'_>>,
+    values: utils::CoercedParsedInputValues<'_>,
     child_model: &Model,
 ) -> QueryGraphBuilderResult<()> {
     if parent_relation_field.is_inlined_on_enclosing_model() {
@@ -174,7 +174,7 @@ fn handle_one_to_one(
     query_schema: &QuerySchema,
     parent_node: NodeRef,
     parent_relation_field: &RelationFieldRef,
-    mut values: Vec<ParsedInputValue<'_>>,
+    mut values: utils::CoercedParsedInputValues<'_>,
     child_model: &Model,
 ) -> QueryGraphBuilderResult<()> {
     let value = values.pop().unwrap();
@@ -245,7 +245,7 @@ fn one_to_many_inlined_child(
     query_schema: &QuerySchema,
     parent_node: NodeRef,
     parent_relation_field: &RelationFieldRef,
-    values: Vec<ParsedInputValue<'_>>,
+    values: utils::CoercedParsedInputValues<'_>,
     child_model: &Model,
 ) -> QueryGraphBuilderResult<()> {
     for value in values {
@@ -366,7 +366,7 @@ fn one_to_many_inlined_parent(
     query_schema: &QuerySchema,
     parent_node: NodeRef,
     parent_relation_field: &RelationFieldRef,
-    mut values: Vec<ParsedInputValue<'_>>,
+    mut values: utils::CoercedParsedInputValues<'_>,
     child_model: &Model,
 ) -> QueryGraphBuilderResult<()> {
     let parent_link = parent_relation_field.linking_fields();

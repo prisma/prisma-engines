@@ -1,6 +1,6 @@
 use super::*;
 use crate::{
-    ArgumentListLookup, DataExpectation, ParsedField, ParsedInputList, ParsedInputMap, RowSink,
+    ArgumentListLookup, DataExpectation, ParsedField, ParsedInputMap, RowSink,
     inputs::RecordQueryFilterInput,
     query_ast::*,
     query_graph::{NodeRef, QueryGraph, QueryGraphDependency},
@@ -63,9 +63,9 @@ pub(crate) fn create_many_records(
 ) -> QueryGraphBuilderResult<()> {
     graph.flag_transactional();
 
-    let data_list: ParsedInputList<'_> = match field.arguments.lookup(args::DATA) {
-        Some(data) => utils::coerce_vec(data.value),
-        None => vec![],
+    let data_list = match field.arguments.lookup(args::DATA) {
+        Some(data) => utils::coerce_values(data.value),
+        None => utils::CoercedParsedInputValues::empty(),
     };
 
     let skip_duplicates: bool = match field.arguments.lookup(args::SKIP_DUPLICATES) {

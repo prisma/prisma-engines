@@ -1,6 +1,6 @@
 use crate::{
-    Computation, DataExpectation, DataOperation, MissingRelatedRecord, ParsedInputValue, QueryGraphBuilderResult,
-    RelationViolation, RowSink,
+    Computation, DataExpectation, DataOperation, MissingRelatedRecord, ParsedInputList, ParsedInputValue,
+    QueryGraphBuilderResult, RelationViolation, RowSink,
     inputs::{
         DeleteManyRecordsSelectorsInput, IfInput, LeftSideDiffInput, RelatedRecordsSelectorsInput, ReturnInput,
         RightSideDiffInput, UpdateManyRecordsSelectorsInput,
@@ -16,13 +16,83 @@ use query_structure::{
 };
 use schema::QuerySchema;
 
-/// Coerces single values (`ParsedInputValue::Single` and `ParsedInputValue::Map`) into a vector.
+pub(crate) enum CoercedParsedInputValues<'a> {
+    List(ParsedInputList<'a>),
+    Single(Option<ParsedInputValue<'a>>),
+}
+
+impl<'a> CoercedParsedInputValues<'a> {
+    pub(crate) fn empty() -> Self {
+        Self::Single(None)
+    }
+
+    pub(crate) fn len(&self) -> usize {
+        match self {
+            Self::List(values) => values.len(),
+            Self::Single(Some(_)) => 1,
+            Self::Single(None) => 0,
+        }
+    }
+
+    pub(crate) fn pop(&mut self) -> Option<ParsedInputValue<'a>> {
+        match self {
+            Self::List(values) => values.pop(),
+            Self::Single(value) => value.take(),
+        }
+    }
+}
+
+pub(crate) enum CoercedParsedInputValuesIntoIter<'a> {
+    List(std::vec::IntoIter<ParsedInputValue<'a>>),
+    Single(std::option::IntoIter<ParsedInputValue<'a>>),
+}
+
+impl<'a> Iterator for CoercedParsedInputValuesIntoIter<'a> {
+    type Item = ParsedInputValue<'a>;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        match self {
+            Self::List(values) => values.next(),
+            Self::Single(value) => value.next(),
+        }
+    }
+
+    fn size_hint(&self) -> (usize, Option<usize>) {
+        match self {
+            Self::List(values) => values.size_hint(),
+            Self::Single(value) => value.size_hint(),
+        }
+    }
+}
+
+impl ExactSizeIterator for CoercedParsedInputValuesIntoIter<'_> {
+    fn len(&self) -> usize {
+        match self {
+            Self::List(values) => values.len(),
+            Self::Single(value) => value.len(),
+        }
+    }
+}
+
+impl<'a> IntoIterator for CoercedParsedInputValues<'a> {
+    type Item = ParsedInputValue<'a>;
+    type IntoIter = CoercedParsedInputValuesIntoIter<'a>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        match self {
+            Self::List(values) => CoercedParsedInputValuesIntoIter::List(values.into_iter()),
+            Self::Single(value) => CoercedParsedInputValuesIntoIter::Single(value.into_iter()),
+        }
+    }
+}
+
+/// Coerces single values (`ParsedInputValue::Single` and `ParsedInputValue::Map`) into an iterable collection.
 /// Simply unpacks `ParsedInputValue::List`.
-pub(crate) fn coerce_vec(val: ParsedInputValue<'_>) -> Vec<ParsedInputValue<'_>> {
+/// The singleton path intentionally avoids allocating a one-element `Vec`.
+pub(crate) fn coerce_values(val: ParsedInputValue<'_>) -> CoercedParsedInputValues<'_> {
     match val {
-        ParsedInputValue::List(l) => l,
-        m @ ParsedInputValue::Map(_) => vec![m],
-        single => vec![single],
+        ParsedInputValue::List(l) => CoercedParsedInputValues::List(l),
+        single => CoercedParsedInputValues::Single(Some(single)),
     }
 }
 
