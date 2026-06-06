@@ -13,10 +13,22 @@ use thiserror::Error;
 
 mod format;
 
-#[derive(Debug, Serialize)]
+#[derive(Debug)]
 pub struct Binding {
     pub name: Cow<'static, str>,
     pub expr: Expression,
+}
+
+impl Serialize for Binding {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        let mut tuple = serializer.serialize_tuple(2)?;
+        tuple.serialize_element(&self.name)?;
+        tuple.serialize_element(&self.expr)?;
+        tuple.end()
+    }
 }
 
 impl Binding {
@@ -34,13 +46,26 @@ impl std::fmt::Display for Binding {
     }
 }
 
-#[derive(Debug, Serialize)]
-#[serde(rename_all = "camelCase")]
+#[derive(Debug)]
 pub struct JoinExpression {
     pub child: Expression,
     pub on: Vec<(String, String)>,
     pub parent_field: String,
     pub is_relation_unique: bool,
+}
+
+impl Serialize for JoinExpression {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        let mut tuple = serializer.serialize_tuple(4)?;
+        tuple.serialize_element(&self.child)?;
+        tuple.serialize_element(&self.on)?;
+        tuple.serialize_element(&self.parent_field)?;
+        tuple.serialize_element(&self.is_relation_unique)?;
+        tuple.end()
+    }
 }
 
 #[derive(Debug)]
