@@ -353,6 +353,7 @@ fn get_result_node_for_update_many(
 #[derive(Debug, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct FieldType {
+    #[serde(skip_serializing_if = "Arity::is_not_list")]
     arity: Arity,
     #[serde(flatten)]
     r#type: FieldScalarType,
@@ -479,6 +480,12 @@ pub enum Arity {
     Required,
     Optional,
     List,
+}
+
+impl Arity {
+    fn is_not_list(&self) -> bool {
+        !matches!(self, Self::List)
+    }
 }
 
 impl From<FieldArity> for Arity {
