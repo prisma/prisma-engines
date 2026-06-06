@@ -461,16 +461,16 @@ impl fmt::Display for FieldScalarType {
 impl FieldScalarType {
     fn compact_name(&self) -> Option<&'static str> {
         match self {
-            Self::String => Some("string"),
-            Self::Int => Some("int"),
-            Self::BigInt => Some("bigint"),
-            Self::Float => Some("float"),
-            Self::Decimal => Some("decimal"),
-            Self::Boolean => Some("boolean"),
-            Self::Json => Some("json"),
-            Self::Object => Some("object"),
-            Self::DateTime => Some("datetime"),
-            Self::Unsupported => Some("unsupported"),
+            Self::String => Some("s"),
+            Self::Int => Some("i"),
+            Self::BigInt => Some("I"),
+            Self::Float => Some("f"),
+            Self::Decimal => Some("d"),
+            Self::Boolean => Some("b"),
+            Self::Json => Some("j"),
+            Self::Object => Some("o"),
+            Self::DateTime => Some("D"),
+            Self::Unsupported => Some("x"),
             Self::Enum { .. } | Self::Extension { .. } | Self::Bytes { .. } => None,
         }
     }
