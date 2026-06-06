@@ -334,10 +334,22 @@ impl Serialize for SerializedFragments<'_> {
         for fragment in self.0 {
             match fragment {
                 Fragment::StringChunk { chunk } => seq.serialize_element(chunk)?,
+                Fragment::Parameter => seq.serialize_element(&ParameterFragment)?,
                 fragment => seq.serialize_element(fragment)?,
             }
         }
         seq.end()
+    }
+}
+
+struct ParameterFragment;
+
+impl Serialize for ParameterFragment {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        serializer.serialize_none()
     }
 }
 
