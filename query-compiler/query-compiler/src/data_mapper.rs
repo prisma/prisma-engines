@@ -11,8 +11,7 @@ use query_core::{
     UpdateRecord, WriteQuery,
 };
 use query_structure::{
-    AggregationSelection, FieldArity, FieldSelection, FieldTypeInformation, ScalarField, SelectedField, Type,
-    TypeIdentifier,
+    AggregationSelection, FieldArity, FieldTypeInformation, ScalarField, SelectedField, Type, TypeIdentifier,
 };
 use serde::{Serialize, Serializer, ser::SerializeStruct};
 use std::{borrow::Cow, fmt};
@@ -55,7 +54,7 @@ fn map_read_query(
 ) -> Option<ResultNode> {
     match query {
         ReadQuery::RecordQuery(q) => get_result_node()
-            .field_selection(&q.selected_fields)
+            .field_selection(q.selected_fields.as_slice())
             .selection_order(&q.selection_order)
             .nested_queries(&q.nested)
             .builder(builder)
@@ -63,7 +62,7 @@ fn map_read_query(
             .uses_relation_joins(q.relation_load_strategy.is_join())
             .call(),
         ReadQuery::ManyRecordsQuery(q) => get_result_node()
-            .field_selection(&q.selected_fields)
+            .field_selection(q.selected_fields.as_slice())
             .selection_order(&q.selection_order)
             .nested_queries(&q.nested)
             .builder(builder)
@@ -71,7 +70,7 @@ fn map_read_query(
             .uses_relation_joins(q.relation_load_strategy.is_join())
             .call(),
         ReadQuery::RelatedRecordsQuery(q) => get_result_node()
-            .field_selection(&q.selected_fields)
+            .field_selection(q.selected_fields.as_slice())
             .selection_order(&q.selection_order)
             .nested_queries(&q.nested)
             .builder(builder)
@@ -86,7 +85,7 @@ fn map_read_query(
 fn map_write_query(query: &WriteQuery, builder: &mut ResultNodeBuilder) -> Option<ResultNode> {
     match query {
         WriteQuery::CreateRecord(q) => get_result_node()
-            .field_selection(&q.selected_fields)
+            .field_selection(q.selected_fields.as_slice())
             .selection_order(&q.selection_order)
             .builder(builder)
             .call(),
@@ -94,7 +93,7 @@ fn map_write_query(query: &WriteQuery, builder: &mut ResultNodeBuilder) -> Optio
         WriteQuery::UpdateRecord(u) => {
             match u {
                 UpdateRecord::WithSelection(w) => get_result_node()
-                    .field_selection(&w.selected_fields)
+                    .field_selection(w.selected_fields.as_slice())
                     .selection_order(&w.selection_order)
                     .builder(builder)
                     .call(),
@@ -109,7 +108,7 @@ fn map_write_query(query: &WriteQuery, builder: &mut ResultNodeBuilder) -> Optio
         WriteQuery::ExecuteRaw(_) => None,        // No data mapping
         WriteQuery::QueryRaw(_) => None,          // No data mapping
         WriteQuery::Upsert(q) => get_result_node()
-            .field_selection(&q.selected_fields)
+            .field_selection(q.selected_fields.as_slice())
             .selection_order(&q.selection_order)
             .builder(builder)
             .call(),
@@ -118,7 +117,7 @@ fn map_write_query(query: &WriteQuery, builder: &mut ResultNodeBuilder) -> Optio
 
 #[builder]
 fn get_result_node(
-    field_selection: &FieldSelection,
+    field_selection: &[SelectedField],
     selection_order: &[String],
     #[builder(default = &[])] nested_queries: &[ReadQuery],
     /// Indicates whether the query uses `relationJoins`. When true, the data mapper uses prisma names
@@ -147,14 +146,13 @@ fn get_result_node(
             }
             Some(SelectedField::Composite(_)) => todo!("MongoDB specific"),
             Some(SelectedField::Relation(f)) => {
-                let nested_selection = FieldSelection::new(f.selections.to_vec());
                 let original_name = if uses_relation_joins {
                     f.field.name().to_owned().into()
                 } else {
                     binding::nested_relation_field(&f.field)
                 };
                 let nested_node = get_result_node()
-                    .field_selection(&nested_selection)
+                    .field_selection(&f.selections)
                     .selection_order(&f.result_fields)
                     .builder(builder)
                     .original_name(original_name)
@@ -168,7 +166,8 @@ fn get_result_node(
             }
             Some(SelectedField::Virtual(f)) => {
                 for vs in field_selection
-                    .virtuals()
+                    .iter()
+                    .filter_map(SelectedField::as_virtual)
                     .filter(|vs| vs.serialized_group_name() == f.serialized_group_name())
                 {
                     let (group_name, field_name) = vs.serialized_name();
@@ -204,9 +203,9 @@ fn get_result_node(
     Some(node.build())
 }
 
-fn find_selection<'a>(field_selection: &'a FieldSelection, prisma_name: &str) -> Option<&'a SelectedField> {
+fn find_selection<'a>(field_selection: &'a [SelectedField], prisma_name: &str) -> Option<&'a SelectedField> {
     field_selection
-        .selections()
+        .iter()
         .find(|field| field.prisma_name_grouping_virtuals() == prisma_name)
 }
 
@@ -312,10 +311,12 @@ fn get_result_node_for_create_many(
     selected_fields: Option<&CreateManyRecordsFields>,
     builder: &mut ResultNodeBuilder,
 ) -> Option<ResultNode> {
+    let selected_fields = selected_fields?;
+
     get_result_node()
-        .field_selection(&selected_fields?.fields)
-        .selection_order(&selected_fields?.order)
-        .nested_queries(&selected_fields?.nested)
+        .field_selection(selected_fields.fields.as_slice())
+        .selection_order(&selected_fields.order)
+        .nested_queries(&selected_fields.nested)
         .builder(builder)
         .call()
 }
@@ -324,9 +325,11 @@ fn get_result_node_for_delete(
     selected_fields: Option<&DeleteRecordFields>,
     builder: &mut ResultNodeBuilder,
 ) -> Option<ResultNode> {
+    let selected_fields = selected_fields?;
+
     get_result_node()
-        .field_selection(&selected_fields?.fields)
-        .selection_order(&selected_fields?.order)
+        .field_selection(selected_fields.fields.as_slice())
+        .selection_order(&selected_fields.order)
         .builder(builder)
         .call()
 }
@@ -335,10 +338,12 @@ fn get_result_node_for_update_many(
     selected_fields: Option<&UpdateManyRecordsFields>,
     builder: &mut ResultNodeBuilder,
 ) -> Option<ResultNode> {
+    let selected_fields = selected_fields?;
+
     get_result_node()
-        .field_selection(&selected_fields?.fields)
-        .selection_order(&selected_fields?.order)
-        .nested_queries(&selected_fields?.nested)
+        .field_selection(selected_fields.fields.as_slice())
+        .selection_order(&selected_fields.order)
+        .nested_queries(&selected_fields.nested)
         .builder(builder)
         .call()
 }
