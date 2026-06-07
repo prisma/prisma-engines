@@ -218,11 +218,13 @@ impl Serialize for Expression {
             }
             Self::Transaction(expr) => serialize_unary("t", expr, serializer),
             Self::DataMap { expr, structure, enums } => {
-                let mut tuple = serializer.serialize_tuple(4)?;
+                let mut tuple = serializer.serialize_tuple(if enums.is_empty() { 3 } else { 4 })?;
                 tuple.serialize_element("d")?;
                 tuple.serialize_element(expr)?;
                 tuple.serialize_element(structure)?;
-                tuple.serialize_element(enums)?;
+                if !enums.is_empty() {
+                    tuple.serialize_element(enums)?;
+                }
                 tuple.end()
             }
             Self::Validate {
@@ -654,6 +656,10 @@ pub struct EnumsMap(BTreeMap<String, BTreeMap<String, String>>);
 impl EnumsMap {
     pub fn new() -> Self {
         Default::default()
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.0.is_empty()
     }
 
     pub fn add(&mut self, r#enum: InternalEnum) {
