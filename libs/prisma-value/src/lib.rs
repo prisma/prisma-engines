@@ -328,7 +328,7 @@ where
 {
     struct CompactPlaceholderValue<'a> {
         name: &'a Cow<'static, str>,
-        r#type: String,
+        r#type: &'a PrismaValueType,
     }
 
     impl Serialize for CompactPlaceholderValue<'_> {
@@ -338,19 +338,38 @@ where
         {
             let mut tuple = serializer.serialize_tuple(2)?;
             tuple.serialize_element(self.name)?;
-            tuple.serialize_element(&self.r#type)?;
+            tuple.serialize_element(&CompactPlaceholderType(self.r#type))?;
             tuple.end()
         }
     }
 
+    struct CompactPlaceholderType<'a>(&'a PrismaValueType);
+
+    impl Serialize for CompactPlaceholderType<'_> {
+        fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+        where
+            S: Serializer,
+        {
+            match self.0 {
+                PrismaValueType::String => serializer.serialize_str("String"),
+                PrismaValueType::Boolean => serializer.serialize_str("Boolean"),
+                PrismaValueType::Enum => serializer.serialize_str("Enum"),
+                PrismaValueType::Int => serializer.serialize_str("Int"),
+                PrismaValueType::Uuid => serializer.serialize_str("Uuid"),
+                PrismaValueType::Json => serializer.serialize_str("Json"),
+                PrismaValueType::Object => serializer.serialize_str("Object"),
+                PrismaValueType::DateTime => serializer.serialize_str("DateTime"),
+                PrismaValueType::Float => serializer.serialize_str("Float"),
+                PrismaValueType::BigInt => serializer.serialize_str("BigInt"),
+                PrismaValueType::Bytes => serializer.serialize_str("Bytes"),
+                PrismaValueType::Any => serializer.serialize_str("Any"),
+                PrismaValueType::List(_) => self.0.to_string().serialize(serializer),
+            }
+        }
+    }
+
     let mut map = serializer.serialize_map(Some(1))?;
-    map.serialize_entry(
-        "$p",
-        &CompactPlaceholderValue {
-            name,
-            r#type: r#type.to_string(),
-        },
-    )?;
+    map.serialize_entry("$p", &CompactPlaceholderValue { name, r#type })?;
     map.end()
 }
 
@@ -646,5 +665,23 @@ impl TryFrom<PrismaValue> for String {
             PrismaValue::String(s) => Ok(s),
             _ => Err(ConversionFailure::new("PrismaValue", "String")),
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use serde_json::json;
+
+    #[test]
+    fn serializes_compact_placeholders() {
+        let scalar = PrismaValue::placeholder("%1", PrismaValueType::Int);
+        let list = PrismaValue::placeholder("%2", PrismaValueType::List(PrismaValueType::String.into()));
+
+        assert_eq!(serde_json::to_value(scalar).unwrap(), json!({ "$p": ["%1", "Int"] }));
+        assert_eq!(
+            serde_json::to_value(list).unwrap(),
+            json!({ "$p": ["%2", "List<String>"] })
+        );
     }
 }
