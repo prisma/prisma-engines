@@ -9,15 +9,18 @@ use schema::{
     constants::{aggregations::*, args},
 };
 
-pub fn collect_selection_order(from: &[FieldPair<'_>]) -> Vec<String> {
-    from.iter()
-        .map(|pair| {
-            pair.parsed_field
-                .alias
-                .clone()
-                .unwrap_or_else(|| pair.parsed_field.name.clone())
-        })
+pub fn collect_selection_order_owned(from: Vec<FieldPair<'_>>) -> Vec<String> {
+    from.into_iter()
+        .map(|pair| into_selection_order_name(pair.parsed_field))
         .collect()
+}
+
+fn selection_order_name(field: &ParsedField<'_>) -> String {
+    field.alias.clone().unwrap_or_else(|| field.name.clone())
+}
+
+fn into_selection_order_name(field: ParsedField<'_>) -> String {
+    field.alias.unwrap_or(field.name)
 }
 
 /// Creates a `FieldSelection` from a query selection.
@@ -152,8 +155,8 @@ fn extract_relation_selection(
     Ok(SelectedField::Relation(RelationSelection {
         field: rf,
         args: extract_query_args(pf.arguments, &related_model)?,
-        result_fields: collect_selection_order(&object.fields),
         selections: pairs_to_selections(related_model, &object.fields, query_schema)?,
+        result_fields: collect_selection_order_owned(object.fields),
     }))
 }
 
@@ -186,31 +189,38 @@ fn extract_relation_count_selections(
         .collect()
 }
 
-pub(crate) fn collect_nested_queries(
+pub(crate) fn collect_selection_order_and_nested_queries(
     from: Vec<FieldPair<'_>>,
     model: &Model,
     query_schema: &QuerySchema,
-) -> QueryGraphBuilderResult<Vec<ReadQuery>> {
-    from.into_iter()
-        .filter_map(|pair| {
-            if is_aggr_selection(&pair) {
-                return None;
+) -> QueryGraphBuilderResult<(Vec<String>, Vec<ReadQuery>)> {
+    let mut selection_order = Vec::with_capacity(from.len());
+    let mut nested = Vec::new();
+
+    for pair in from {
+        if is_aggr_selection(&pair) {
+            selection_order.push(into_selection_order_name(pair.parsed_field));
+            continue;
+        }
+
+        let model_field = model.fields().find_from_all(&pair.parsed_field.name).unwrap();
+
+        match model_field {
+            Field::Scalar(_) | Field::Composite(_) => {
+                selection_order.push(into_selection_order_name(pair.parsed_field));
             }
+            Field::Relation(ref rf) => {
+                let model = rf.related_model();
+                let parent = rf.clone();
+                let parsed_field = pair.parsed_field;
 
-            let model_field = model.fields().find_from_all(&pair.parsed_field.name).unwrap();
-
-            match model_field {
-                Field::Scalar(_) => None,
-                Field::Composite(_) => None,
-                Field::Relation(ref rf) => {
-                    let model = rf.related_model();
-                    let parent = rf.clone();
-
-                    Some(related::find_related(pair.parsed_field, parent, model, query_schema))
-                }
+                selection_order.push(selection_order_name(&parsed_field));
+                nested.push(related::find_related(parsed_field, parent, model, query_schema)?);
             }
-        })
-        .collect::<QueryGraphBuilderResult<Vec<ReadQuery>>>()
+        }
+    }
+
+    Ok((selection_order, nested))
 }
 
 /// Performs a lookahead based on the nested queries and merges fields required
@@ -317,9 +327,9 @@ pub(crate) fn extract_selected_fields(
     model: &Model,
     query_schema: &QuerySchema,
 ) -> crate::QueryGraphBuilderResult<(FieldSelection, Vec<String>, Vec<ReadQuery>)> {
-    let selection_order = utils::collect_selection_order(&nested_fields);
     let selected_fields = utils::collect_selected_fields(&nested_fields, None, model, query_schema)?;
-    let nested = utils::collect_nested_queries(nested_fields, model, query_schema)?;
+    let (selection_order, nested) =
+        utils::collect_selection_order_and_nested_queries(nested_fields, model, query_schema)?;
     let selected_fields = utils::merge_relation_selections(selected_fields, None, &nested);
 
     Ok((selected_fields, selection_order, nested))

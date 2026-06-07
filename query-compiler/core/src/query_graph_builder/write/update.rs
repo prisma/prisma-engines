@@ -203,8 +203,8 @@ where
         // If there's a selected field, fulfill the scalar selection set.
         if let Some(field) = field.cloned() {
             let nested_fields = field.nested_fields.unwrap().fields;
-            let selection_order: Vec<String> = read::utils::collect_selection_order(&nested_fields);
             let selected_fields = read::utils::collect_selected_scalars(&nested_fields, &model);
+            let selection_order = read::utils::collect_selection_order_owned(nested_fields);
 
             Query::Write(WriteQuery::UpdateRecord(UpdateRecord::WithSelection(
                 UpdateRecordWithSelection {

@@ -13,9 +13,9 @@ pub(crate) fn find_related(
     let name = field.name;
     let alias = field.alias;
     let sub_selections = field.nested_fields.unwrap().fields;
-    let selection_order: Vec<String> = utils::collect_selection_order(&sub_selections);
     let selected_fields = utils::collect_selected_fields(&sub_selections, args.distinct.clone(), &model, query_schema)?;
-    let nested = utils::collect_nested_queries(sub_selections, &model, query_schema)?;
+    let (selection_order, nested) =
+        utils::collect_selection_order_and_nested_queries(sub_selections, &model, query_schema)?;
     let parent_field = parent;
 
     let selected_fields = utils::merge_relation_selections(selected_fields, Some(parent_field.clone()), &nested);

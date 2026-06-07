@@ -30,9 +30,9 @@ fn find_many_with_options(
     let name = field.name;
     let alias = field.alias;
     let nested_fields = field.nested_fields.unwrap().fields;
-    let selection_order: Vec<String> = utils::collect_selection_order(&nested_fields);
     let selected_fields = utils::collect_selected_fields(&nested_fields, args.distinct.clone(), &model, query_schema)?;
-    let nested = utils::collect_nested_queries(nested_fields, &model, query_schema)?;
+    let (selection_order, nested) =
+        utils::collect_selection_order_and_nested_queries(nested_fields, &model, query_schema)?;
 
     let selected_fields = utils::merge_relation_selections(selected_fields, None, &nested);
     let selected_fields = utils::merge_cursor_fields(selected_fields, &args.cursor);
