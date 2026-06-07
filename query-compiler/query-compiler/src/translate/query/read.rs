@@ -410,9 +410,6 @@ fn build_raw_nested_read_relations(
         let ReadQuery::RelatedRecordsQuery(rrq) = nested else {
             return Ok(None);
         };
-        if rrq.parent_field.relation().is_many_to_many() {
-            return Ok(None);
-        }
 
         let left_scalars = rrq.parent_field.left_scalars();
         let [parent_scalar] = &left_scalars[..] else {
@@ -475,10 +472,11 @@ fn build_raw_read_related_records(
     builder: &dyn QueryBuilder,
     enums: &mut EnumsMap,
 ) -> TranslateResult<Option<(BuiltRawNestedReadQuery, JoinMetadata)>> {
-    if rrq.args.take == Take::Some(0) || rrq.parent_field.relation().is_many_to_many() {
+    if rrq.args.take == Take::Some(0) {
         return Ok(None);
     }
 
+    let is_many_to_many = rrq.parent_field.relation().is_many_to_many();
     let mut linkage = RelationLinkage::new(rrq.parent_field.clone(), links);
 
     if let Some(results) = rrq.parent_results.take() {
@@ -513,11 +511,22 @@ fn build_raw_read_related_records(
         return Ok(None);
     }
 
-    let (child_query, join) = build_read_one2m_query(linkage, rrq.args, &selected_fields, builder)?;
+    let (child_query, join) = if is_many_to_many {
+        build_read_m2m_query(linkage, rrq.args, &selected_fields, builder)?
+    } else {
+        build_read_one2m_query(linkage, rrq.args, &selected_fields, builder)?
+    };
     let Expression::Query(db_query) = child_query else {
         return Ok(None);
     };
-    let column_indexes = raw_column_indexes(&selected_fields);
+    let column_indexes = if is_many_to_many {
+        let [linking_field_alias] = &join.fields[..] else {
+            return Ok(None);
+        };
+        raw_many_to_many_child_column_indexes(&selected_fields, linking_field_alias.clone())
+    } else {
+        raw_column_indexes(&selected_fields)
+    };
     let Some(fields) = raw_result_column_mappings(&selected_fields, &rrq.selection_order, &column_indexes, enums)
     else {
         return Ok(None);
@@ -540,6 +549,35 @@ fn build_raw_read_related_records(
         },
         join,
     )))
+}
+
+fn raw_many_to_many_child_column_indexes(
+    selected_fields: &FieldSelection,
+    linking_field_alias: String,
+) -> HashMap<String, usize> {
+    let mut column_indexes = HashMap::with_capacity(selected_fields.selections().len() + 1);
+    let mut next_index = 0;
+
+    for field in selected_fields.selections() {
+        if matches!(field, SelectedField::Scalar(_)) {
+            column_indexes.insert(field.db_name().into_owned(), next_index);
+            next_index += 1;
+        }
+    }
+
+    // `build_get_related_records()` selects scalar model columns, then the hidden m2m linking alias,
+    // then any additional virtual selections.
+    column_indexes.insert(linking_field_alias, next_index);
+    next_index += 1;
+
+    for field in selected_fields.selections() {
+        if matches!(field, SelectedField::Virtual(_)) {
+            column_indexes.insert(field.db_name().into_owned(), next_index);
+            next_index += 1;
+        }
+    }
+
+    column_indexes
 }
 
 fn build_read_related_records(
