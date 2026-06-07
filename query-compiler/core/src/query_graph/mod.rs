@@ -131,6 +131,11 @@ impl NodeRef {
     pub fn id(&self) -> String {
         self.node_ix.index().to_string()
     }
+
+    /// Returns the raw index of the Node.
+    pub fn index(&self) -> usize {
+        self.node_ix.index()
+    }
 }
 
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
