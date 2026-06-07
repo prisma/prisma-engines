@@ -18,12 +18,7 @@ pub(crate) fn group_by(mut field: ParsedField<'_>, model: Model) -> QueryGraphBu
 
     let args = extractors::extract_query_args(field.arguments, &model)?;
     let nested_fields = field.nested_fields.unwrap().fields;
-    let selection_order = collect_selection_tree(&nested_fields);
-
-    let selectors: Vec<_> = nested_fields
-        .into_iter()
-        .map(|field| resolve_query(field, &model, false))
-        .collect::<QueryGraphBuilderResult<_>>()?;
+    let (selection_order, selectors) = collect_selection_tree_and_selectors(nested_fields, &model, false)?;
 
     verify_selections(&selectors, &group_by)
         .and_then(|_| verify_orderings(&args.order_by, &group_by))
