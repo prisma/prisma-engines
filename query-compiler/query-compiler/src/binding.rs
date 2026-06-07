@@ -16,7 +16,7 @@ pub fn node_result(node: NodeRef) -> Cow<'static, str> {
 }
 
 pub fn projected_dependency(source: NodeRef, field: &SelectedField) -> Cow<'static, str> {
-    format!("{}{FIELD_SEPARATOR}{}", source.id(), field.prisma_name()).into()
+    format!("{}{FIELD_SEPARATOR}{}", source.index(), field.prisma_name()).into()
 }
 
 pub fn join_parent() -> Cow<'static, str> {
