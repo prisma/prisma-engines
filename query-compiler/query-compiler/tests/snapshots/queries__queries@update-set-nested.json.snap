@@ -1,7 +1,9 @@
 ---
 source: query-compiler/query-compiler/tests/queries.rs
+assertion_line: 76
 expression: pretty
 input_file: query-compiler/query-compiler/tests/data/update-set-nested.json
+snapshot_kind: text
 ---
 transaction
    dataMap {
@@ -62,18 +64,41 @@ transaction
           [ rowCountNeq 0
           ] orRaise "MISSING_RECORD");
           0$id = mapField id (get 0)
-      in let @parent = unique (query «SELECT "public"."User"."id",
-                                      "public"."User"."email",
-                                      "public"."User"."role"::text FROM
-                                      "public"."User" WHERE "public"."User"."id"
-                                      = $1 LIMIT $2 OFFSET $3»
-                               params [var(0$id as Int), const(BigInt(1)),
-                                       const(BigInt(0))])
-         in let @parent$id = mapField id (get @parent)
-            in join (get @parent)
-               with (query «SELECT "public"."Post"."id",
-                            "public"."Post"."title", "public"."Post"."userId"
-                            FROM "public"."Post" WHERE "public"."Post"."userId"
-                            = $1 OFFSET $2»
-                     params [var(@parent$id as Int),
-                             const(BigInt(0))]) on left.(id) = right.(userId) as @nested$posts
+      in rawNestedReadUnique (query «SELECT "public"."User"."id",
+                                     "public"."User"."email",
+                                     "public"."User"."role"::text FROM
+                                     "public"."User" WHERE "public"."User"."id"
+                                     = $1 LIMIT $2 OFFSET $3»
+                              params [var(0$id as Int), const(BigInt(1)),
+                                      const(BigInt(0))]
+                              fields {
+                                  id: id
+                                  email: email
+                                  role: role
+                              }
+                              relations [posts on left.id = right.userId many (query
+                                                                               «SELECT
+                                                                                "public"."Post"."id",
+                                                                                "public"."Post"."title",
+                                                                                "public"."Post"."userId"
+                                                                                FROM
+                                                                                "public"."Post"
+                                                                                WHERE
+                                                                                "public"."Post"."userId"
+                                                                                =
+                                                                                $1
+                                                                                OFFSET
+                                                                                $2»
+                                                                               params [var(@parent$id as Int),
+                                                                                       const(BigInt(0))]
+                                                                               fields {
+                                                                                   id: id
+                                                                                   title: title
+                                                                                   userId: userId
+                                                                               })])
+         enums {
+             Role: {
+                 admin: ADMIN
+                 user: USER
+             }
+         }

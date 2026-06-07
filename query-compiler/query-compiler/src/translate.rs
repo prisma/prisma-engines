@@ -71,10 +71,14 @@ pub fn translate(mut graph: QueryGraph, builder: &dyn QueryBuilder) -> Translate
     };
 
     let mut root = if let Some(structure) = structure {
-        Expression::DataMap {
-            expr: Box::new(root),
-            structure,
-            enums,
+        if matches!(root, Expression::RawNestedRead { .. }) {
+            root
+        } else {
+            Expression::DataMap {
+                expr: Box::new(root),
+                structure,
+                enums,
+            }
         }
     } else {
         root

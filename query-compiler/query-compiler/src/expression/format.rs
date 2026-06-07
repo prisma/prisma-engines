@@ -1,4 +1,7 @@
-use super::{Binding, DbQuery, EnumsMap, Expression, FieldOperation, JoinExpression, Pagination};
+use super::{
+    Binding, DbQuery, EnumsMap, Expression, FieldOperation, JoinExpression, Pagination, RawNestedReadQuery,
+    RawNestedReadRelation, RawResultColumnRef, RawResultFieldName,
+};
 use crate::{
     expression::{FieldInitializer, InMemoryOps},
     result_node::ResultNode,
@@ -63,6 +66,7 @@ where
             Expression::MapField { field, records } => self.map_field(field, records),
             Expression::Transaction(expression) => self.transaction(expression),
             Expression::DataMap { expr, structure, enums } => self.data_map(expr, structure, enums),
+            Expression::RawNestedRead { query, unique, enums } => self.raw_nested_read(query, *unique, enums),
             Expression::Validate {
                 expr,
                 rules,
@@ -299,6 +303,91 @@ where
         doc.append(self.expression(expr))
     }
 
+    fn raw_nested_read(&'a self, query: &'a RawNestedReadQuery, unique: bool, enums: &'a EnumsMap) -> PrettyDoc<'a, D> {
+        let mut doc = self
+            .keyword(if unique { "rawNestedReadUnique" } else { "rawNestedRead" })
+            .append(self.space())
+            .append(self.raw_nested_read_query(query));
+
+        if !enums.0.is_empty() {
+            doc = doc
+                .append(self.line())
+                .append(self.keyword("enums"))
+                .append(self.space())
+                .append(self.enum_map(enums));
+        }
+
+        doc
+    }
+
+    fn raw_nested_read_query(&'a self, query: &'a RawNestedReadQuery) -> PrettyDoc<'a, D> {
+        let fields = self.object(query.fields.iter().map(|field| {
+            let name = match &field.field_name {
+                RawResultFieldName::Field(name) => self.field_name(name),
+                RawResultFieldName::Path(path) => self
+                    .intersperse(path.iter().map(|segment| self.field_name(segment)), self.text("."))
+                    .align(),
+            };
+            (name, self.raw_result_column_ref(&field.column))
+        }));
+
+        let mut doc = self
+            .query("query", &query.query)
+            .append(self.line())
+            .append(self.keyword("fields"))
+            .append(self.space())
+            .append(fields);
+
+        if !query.relations.is_empty() {
+            doc = doc
+                .append(self.line())
+                .append(self.keyword("relations"))
+                .append(self.space())
+                .append(self.raw_nested_relations(&query.relations));
+        }
+
+        doc.align().parens()
+    }
+
+    fn raw_nested_relations(&'a self, relations: &'a [RawNestedReadRelation]) -> PrettyDoc<'a, D> {
+        self.intersperse(
+            relations.iter().map(|relation| match relation {
+                RawNestedReadRelation::Direct(relation) => self
+                    .field_name(&relation.field_name)
+                    .append(self.space())
+                    .append(self.keyword("on"))
+                    .append(self.space())
+                    .append(self.keyword("left"))
+                    .append(".")
+                    .append(self.raw_result_column_ref(&relation.parent_column))
+                    .append(self.space())
+                    .append("=")
+                    .append(self.space())
+                    .append(self.keyword("right"))
+                    .append(".")
+                    .append(self.raw_result_column_ref(&relation.child_column))
+                    .append(self.space())
+                    .append(if relation.is_relation_unique {
+                        self.keyword("unique")
+                    } else {
+                        self.keyword("many")
+                    })
+                    .append(self.space())
+                    .append(self.raw_nested_read_query(&relation.child)),
+            }),
+            self.text(",").append(self.line()),
+        )
+        .align()
+        .brackets()
+    }
+
+    fn raw_result_column_ref(&'a self, column: &'a RawResultColumnRef) -> PrettyDoc<'a, D> {
+        match column {
+            RawResultColumnRef::Index(index) => self.text(index.to_string()),
+            RawResultColumnRef::Name(name) => self.field_name(name),
+        }
+    }
+
     fn data_map_node(&'a self, node: &'a ResultNode) -> PrettyDoc<'a, D> {
         match node {
             ResultNode::AffectedRows => self.keyword("affectedRows"),
@@ -337,6 +426,11 @@ where
     }
 
     fn object(&'a self, pairs: impl IntoIterator<Item = (PrettyDoc<'a, D>, PrettyDoc<'a, D>)>) -> PrettyDoc<'a, D> {
+        let pairs = pairs.into_iter().collect::<Vec<_>>();
+        if pairs.is_empty() {
+            return self.text("{}");
+        }
+
         self.indented_braces(
             self.intersperse(
                 pairs

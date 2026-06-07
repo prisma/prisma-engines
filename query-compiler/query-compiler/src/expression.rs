@@ -3,7 +3,7 @@ use std::{
     collections::{BTreeMap, HashMap},
 };
 
-use crate::result_node::ResultNode;
+use crate::{data_mapper::FieldType, result_node::ResultNode};
 use bon::{Builder, bon};
 use query_builder::DbQuery;
 use query_core::{DataExpectation, DataRule};
@@ -70,6 +70,129 @@ impl Serialize for JoinExpression {
 }
 
 #[derive(Debug)]
+pub enum RawResultFieldName {
+    Field(String),
+    Path(Vec<String>),
+}
+
+impl Serialize for RawResultFieldName {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        match self {
+            Self::Field(name) => name.serialize(serializer),
+            Self::Path(path) => path.serialize(serializer),
+        }
+    }
+}
+
+#[derive(Debug)]
+pub struct RawResultColumnMapping {
+    pub field_name: RawResultFieldName,
+    pub column: RawResultColumnRef,
+    pub field_type: Option<FieldType>,
+}
+
+impl Serialize for RawResultColumnMapping {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        let mut tuple = serializer.serialize_tuple(if self.field_type.is_some() { 3 } else { 2 })?;
+        tuple.serialize_element(&self.field_name)?;
+        tuple.serialize_element(&self.column)?;
+        if let Some(field_type) = &self.field_type {
+            tuple.serialize_element(field_type)?;
+        }
+        tuple.end()
+    }
+}
+
+#[derive(Debug)]
+pub enum RawResultColumnRef {
+    Index(usize),
+    Name(String),
+}
+
+impl Serialize for RawResultColumnRef {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        match self {
+            Self::Index(index) => index.serialize(serializer),
+            Self::Name(name) => name.serialize(serializer),
+        }
+    }
+}
+
+#[derive(Debug)]
+pub struct RawNestedReadQuery {
+    pub query: DbQuery,
+    pub fields: Vec<RawResultColumnMapping>,
+    pub relations: Vec<RawNestedReadRelation>,
+}
+
+impl Serialize for RawNestedReadQuery {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        let mut tuple = serializer.serialize_tuple(if self.relations.is_empty() { 2 } else { 3 })?;
+        tuple.serialize_element(&self.query)?;
+        tuple.serialize_element(&self.fields)?;
+        if !self.relations.is_empty() {
+            tuple.serialize_element(&self.relations)?;
+        }
+        tuple.end()
+    }
+}
+
+#[derive(Debug)]
+pub enum RawNestedReadRelation {
+    Direct(RawNestedReadDirectRelation),
+}
+
+impl Serialize for RawNestedReadRelation {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        match self {
+            Self::Direct(relation) => relation.serialize(serializer),
+        }
+    }
+}
+
+#[derive(Debug)]
+pub struct RawNestedReadDirectRelation {
+    pub field_name: String,
+    pub child: RawNestedReadQuery,
+    pub parent_column: RawResultColumnRef,
+    pub child_column: RawResultColumnRef,
+    pub scope_name: Cow<'static, str>,
+    pub is_relation_unique: bool,
+}
+
+impl Serialize for RawNestedReadDirectRelation {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        let mut tuple = serializer.serialize_tuple(7)?;
+        tuple.serialize_element("r")?;
+        tuple.serialize_element(&self.field_name)?;
+        tuple.serialize_element(&self.child)?;
+        tuple.serialize_element(&self.parent_column)?;
+        tuple.serialize_element(&self.child_column)?;
+        tuple.serialize_element(&self.scope_name)?;
+        tuple.serialize_element(&self.is_relation_unique)?;
+        tuple.end()
+    }
+}
+
+#[derive(Debug)]
 pub enum Expression {
     /// Expression that evaluates to a plain value.
     Value(PrismaValue),
@@ -125,6 +248,13 @@ pub enum Expression {
     DataMap {
         expr: Box<Expression>,
         structure: ResultNode,
+        enums: EnumsMap,
+    },
+
+    /// Raw result-set nested read specialized for query-mode relation loading.
+    RawNestedRead {
+        query: RawNestedReadQuery,
+        unique: bool,
         enums: EnumsMap,
     },
 
@@ -222,6 +352,16 @@ impl Serialize for Expression {
                 tuple.serialize_element("d")?;
                 tuple.serialize_element(expr)?;
                 tuple.serialize_element(structure)?;
+                if !enums.is_empty() {
+                    tuple.serialize_element(enums)?;
+                }
+                tuple.end()
+            }
+            Self::RawNestedRead { query, unique, enums } => {
+                let mut tuple = serializer.serialize_tuple(if enums.is_empty() { 3 } else { 4 })?;
+                tuple.serialize_element("n")?;
+                tuple.serialize_element(query)?;
+                tuple.serialize_element(unique)?;
                 if !enums.is_empty() {
                     tuple.serialize_element(enums)?;
                 }
@@ -470,6 +610,7 @@ impl Expression {
             Expression::DataMap { expr, .. } => {
                 expr.simplify();
             }
+            Expression::RawNestedRead { .. } => {}
             Expression::Validate { expr, .. } => {
                 expr.simplify();
             }
@@ -746,6 +887,13 @@ impl Expression {
             Expression::MapField { records, .. } => records.r#type(),
             Expression::Transaction(expression) => expression.r#type(),
             Expression::DataMap { expr, .. } => expr.r#type(),
+            Expression::RawNestedRead { unique, .. } => {
+                if *unique {
+                    ExpressionType::Record
+                } else {
+                    ExpressionType::List(Box::new(ExpressionType::Record))
+                }
+            }
             Expression::Validate { expr, .. } => expr.r#type(),
             Expression::If { then, r#else, .. } => {
                 let then_type = then.r#type();
