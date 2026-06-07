@@ -10,29 +10,27 @@ rawNestedRead (query «SELECT "public"."Post"."id", "public"."Post"."title",
                       OFFSET $1»
                params [const(BigInt(0))]
                fields {
-                   id: id
-                   title: title
-                   userId: userId
+                   id: 0
+                   title: 1
+                   userId: 2
                }
-               relations [user on left.userId = right.id unique (query «SELECT
-                                                                        "public"."User"."id",
-                                                                        "public"."User"."email",
-                                                                        "public"."User"."role"::text
-                                                                        FROM
-                                                                        "public"."User"
-                                                                        WHERE
-                                                                        "public"."User"."id"
-                                                                        IN
-                                                                        [$1,*]
-                                                                        OFFSET
-                                                                        $2»
-                                                                 params [var(@parent$userId as Int),
-                                                                         const(BigInt(0))]
-                                                                 fields {
-                                                                     id: id
-                                                                     email: email
-                                                                     role: role
-                                                                 })])
+               relations [user on left.2 = right.0 unique (query «SELECT
+                                                                  "public"."User"."id",
+                                                                  "public"."User"."email",
+                                                                  "public"."User"."role"::text
+                                                                  FROM
+                                                                  "public"."User"
+                                                                  WHERE
+                                                                  "public"."User"."id"
+                                                                  IN [$1,*]
+                                                                  OFFSET $2»
+                                                           params [var(@parent$userId as Int),
+                                                                   const(BigInt(0))]
+                                                           fields {
+                                                               id: 0
+                                                               email: 1
+                                                               role: 2
+                                                           })])
 enums {
     Role: {
         admin: ADMIN

@@ -9,11 +9,10 @@ rawNestedRead (query «SELECT "public"."User"."id", "public"."User"."email" FROM
                       "public"."User" WHERE 1=1 OFFSET $1»
                params [const(BigInt(0))]
                fields {
-                   id: id
-                   email: email
+                   id: 0
+                   email: 1
                }
-               relations [activations on left.id = right.userId many (query
-                                                                      «SELECT
+               relations [activations on left.0 = right.4 many (query «SELECT
                                                                        "public"."Activation"."id",
                                                                        "public"."Activation"."issued",
                                                                        "public"."Activation"."secret",
@@ -26,10 +25,10 @@ rawNestedRead (query «SELECT "public"."User"."id", "public"."User"."email" FROM
                                                                        IN [$1,*]
                                                                        OFFSET
                                                                        $2»
-                                                                      params [var(@parent$id as Int),
-                                                                              const(BigInt(0))]
-                                                                      fields {
-                                                                          issued: issued
-                                                                          secret: secret
-                                                                          done: done
-                                                                      })])
+                                                                params [var(@parent$id as Int),
+                                                                        const(BigInt(0))]
+                                                                fields {
+                                                                    issued: 1
+                                                                    secret: 2
+                                                                    done: 3
+                                                                })])

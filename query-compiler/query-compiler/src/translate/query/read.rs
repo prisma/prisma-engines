@@ -357,10 +357,10 @@ fn raw_result_column_mappings(
 
         match selection {
             SelectedField::Scalar(field) => {
-                column_indexes.get::<str>(field.db_name().as_ref())?;
+                let column_index = column_indexes.get::<str>(field.db_name().as_ref()).copied()?;
                 mappings.push(RawResultColumnMapping {
                     field_name: RawResultFieldName::Field(field.name().to_owned()),
-                    column: RawResultColumnRef::Name(field.db_name().to_owned()),
+                    column: RawResultColumnRef::Index(column_index),
                     field_type: Some(raw_field_type(selection, enums)?),
                 });
             }
@@ -369,11 +369,11 @@ fn raw_result_column_mappings(
                     .virtuals()
                     .filter(|field| field.serialized_group_name() == virtual_selection.serialized_group_name())
                 {
-                    column_indexes.get(&virtual_selection.db_alias())?;
+                    let column_index = column_indexes.get(&virtual_selection.db_alias()).copied()?;
                     let (group_name, field_name) = virtual_selection.serialized_name();
                     mappings.push(RawResultColumnMapping {
                         field_name: RawResultFieldName::Path(vec![group_name.to_owned(), field_name.to_owned()]),
-                        column: RawResultColumnRef::Name(virtual_selection.db_alias()),
+                        column: RawResultColumnRef::Index(column_index),
                         field_type: Some(raw_field_type(
                             &SelectedField::Virtual(virtual_selection.clone()),
                             enums,
@@ -445,21 +445,21 @@ fn build_raw_nested_read_relations(
             return Ok(None);
         };
 
-        let Some(_) = parent_column_indexes
+        let Some(parent_column_index) = parent_column_indexes
             .get::<str>(parent_scalar.db_name().as_ref())
             .copied()
         else {
             return Ok(None);
         };
-        let Some(_) = child.column_indexes.get(child_field).copied() else {
+        let Some(child_column_index) = child.column_indexes.get(child_field).copied() else {
             return Ok(None);
         };
 
         relations.push(RawNestedReadRelation::Direct(RawNestedReadDirectRelation {
             field_name: rrq.alias.as_deref().unwrap_or(&rrq.name).to_owned(),
             child: child.query,
-            parent_column: RawResultColumnRef::Name(parent_scalar.db_name().to_owned()),
-            child_column: RawResultColumnRef::Name(child_field.clone()),
+            parent_column: RawResultColumnRef::Index(parent_column_index),
+            child_column: RawResultColumnRef::Index(child_column_index),
             scope_name: binding::join_parent_field(parent_scalar),
             is_relation_unique: join.is_relation_unique,
         }));

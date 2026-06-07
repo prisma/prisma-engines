@@ -11,8 +11,7 @@ rawNestedReadUnique (query «SELECT "public"."User"."id" FROM "public"."User"
                      params [const(String("%prisma.io%")), const(BigInt(1)),
                              const(BigInt(0))]
                      fields {}
-                     relations [posts on left.id = right.userId many (query
-                                                                      «SELECT
+                     relations [posts on left.0 = right.1 many (query «SELECT
                                                                        "public"."Post"."id",
                                                                        "public"."Post"."userId",
                                                                        COALESCE("aggr_selection_0_Category"."_aggr_count_categories",
@@ -53,9 +52,9 @@ rawNestedReadUnique (query «SELECT "public"."User"."id" FROM "public"."User"
                                                                        ASC
                                                                        OFFSET
                                                                        $3»
-                                                                      params [const(String("%tech%")),
-                                                                              var(@parent$id as Int),
-                                                                              const(BigInt(0))]
-                                                                      fields {
-                                                                          _count.categories: _aggr_count_categories
-                                                                      })])
+                                                                params [const(String("%tech%")),
+                                                                        var(@parent$id as Int),
+                                                                        const(BigInt(0))]
+                                                                fields {
+                                                                    _count.categories: 2
+                                                                })])

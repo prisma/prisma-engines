@@ -62,30 +62,29 @@ transaction
                               params [var(0$id as Int), const(BigInt(1)),
                                       const(BigInt(0))]
                               fields {
-                                  id: id
-                                  email: email
-                                  role: role
+                                  id: 0
+                                  email: 1
+                                  role: 2
                               }
-                              relations [posts on left.id = right.userId many (query
-                                                                               «SELECT
-                                                                                "public"."Post"."id",
-                                                                                "public"."Post"."title",
-                                                                                "public"."Post"."userId"
-                                                                                FROM
-                                                                                "public"."Post"
-                                                                                WHERE
-                                                                                "public"."Post"."userId"
-                                                                                =
-                                                                                $1
-                                                                                OFFSET
-                                                                                $2»
-                                                                               params [var(@parent$id as Int),
-                                                                                       const(BigInt(0))]
-                                                                               fields {
-                                                                                   id: id
-                                                                                   title: title
-                                                                                   userId: userId
-                                                                               })])
+                              relations [posts on left.0 = right.2 many (query
+                                                                         «SELECT
+                                                                          "public"."Post"."id",
+                                                                          "public"."Post"."title",
+                                                                          "public"."Post"."userId"
+                                                                          FROM
+                                                                          "public"."Post"
+                                                                          WHERE
+                                                                          "public"."Post"."userId"
+                                                                          = $1
+                                                                          OFFSET
+                                                                          $2»
+                                                                         params [var(@parent$id as Int),
+                                                                                 const(BigInt(0))]
+                                                                         fields {
+                                                                             id: 0
+                                                                             title: 1
+                                                                             userId: 2
+                                                                         })])
          enums {
              Role: {
                  admin: ADMIN

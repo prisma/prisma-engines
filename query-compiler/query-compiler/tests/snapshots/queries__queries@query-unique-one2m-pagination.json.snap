@@ -12,12 +12,11 @@ rawNestedReadUnique (query «SELECT "public"."User"."id",
                      params [const(BigInt(1)), const(BigInt(1)),
                              const(BigInt(0))]
                      fields {
-                         id: id
-                         email: email
-                         role: role
+                         id: 0
+                         email: 1
+                         role: 2
                      }
-                     relations [posts on left.id = right.userId many (query
-                                                                      «SELECT
+                     relations [posts on left.0 = right.1 many (query «SELECT
                                                                        "public"."Post"."id",
                                                                        "public"."Post"."userId"
                                                                        FROM
@@ -30,12 +29,12 @@ rawNestedReadUnique (query «SELECT "public"."User"."id",
                                                                        ASC LIMIT
                                                                        $2 OFFSET
                                                                        $3»
-                                                                      params [var(@parent$id as Int),
-                                                                              const(BigInt(10)),
-                                                                              const(BigInt(10))]
-                                                                      fields {
-                                                                          id: id
-                                                                      })])
+                                                                params [var(@parent$id as Int),
+                                                                        const(BigInt(10)),
+                                                                        const(BigInt(10))]
+                                                                fields {
+                                                                    id: 0
+                                                                })])
 enums {
     Role: {
         admin: ADMIN

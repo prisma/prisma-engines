@@ -13,24 +13,22 @@ rawNestedRead (query «SELECT "public"."Activation"."id",
                       WHERE 1=1 OFFSET $1»
                params [const(BigInt(0))]
                fields {
-                   issued: issued
-                   secret: secret
-                   done: done
+                   issued: 1
+                   secret: 2
+                   done: 3
                }
-               relations [user on left.userId = right.id unique (query «SELECT
-                                                                        "public"."User"."id",
-                                                                        "public"."User"."email"
-                                                                        FROM
-                                                                        "public"."User"
-                                                                        WHERE
-                                                                        "public"."User"."id"
-                                                                        IN
-                                                                        [$1,*]
-                                                                        OFFSET
-                                                                        $2»
-                                                                 params [var(@parent$userId as Int),
-                                                                         const(BigInt(0))]
-                                                                 fields {
-                                                                     id: id
-                                                                     email: email
-                                                                 })])
+               relations [user on left.4 = right.0 unique (query «SELECT
+                                                                  "public"."User"."id",
+                                                                  "public"."User"."email"
+                                                                  FROM
+                                                                  "public"."User"
+                                                                  WHERE
+                                                                  "public"."User"."id"
+                                                                  IN [$1,*]
+                                                                  OFFSET $2»
+                                                           params [var(@parent$userId as Int),
+                                                                   const(BigInt(0))]
+                                                           fields {
+                                                               id: 0
+                                                               email: 1
+                                                           })])
