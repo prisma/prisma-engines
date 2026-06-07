@@ -510,8 +510,15 @@ impl<'a, 'b> NodeTranslator<'a, 'b> {
         // translate plucks the edges coming into node, we need to avoid accessing it afterwards
         let expr = NodeTranslator::new(self.graph, node, &incoming_edges, self.query_builder).translate()?;
 
-        if bindings.is_empty() && validations.is_empty() {
-            return Ok(expr);
+        if validations.is_empty() {
+            return Ok(if bindings.is_empty() {
+                expr
+            } else {
+                Expression::Let {
+                    bindings,
+                    expr: Box::new(expr),
+                }
+            });
         }
 
         let mut children = validations;
