@@ -8,6 +8,8 @@
 //! cargo run -p query-compiler --example allocation_profile --release
 //! ALLOC_PROFILE_QUERIES=query-m2o,nested-pagination-query \
 //!   cargo run -p query-compiler --example allocation_profile --release
+//! ALLOC_PROFILE_BUCKETS=1 ALLOC_PROFILE_QUERIES=create-nested-create \
+//!   cargo run -p query-compiler --example allocation_profile --release
 //! ```
 
 use quaint::prelude::{ConnectionInfo, ExternalConnectionInfo, SqlFamily};
@@ -31,6 +33,32 @@ static ALLOCATIONS: AtomicU64 = AtomicU64::new(0);
 static DEALLOCATIONS: AtomicU64 = AtomicU64::new(0);
 static BYTES_ALLOCATED: AtomicU64 = AtomicU64::new(0);
 static BYTES_DEALLOCATED: AtomicU64 = AtomicU64::new(0);
+const ALLOC_BUCKET_LIMITS: [usize; 21] = [
+    8,
+    16,
+    24,
+    32,
+    48,
+    64,
+    96,
+    128,
+    192,
+    256,
+    384,
+    512,
+    768,
+    1024,
+    1536,
+    2048,
+    4096,
+    8192,
+    16_384,
+    65_536,
+    usize::MAX,
+];
+const ALLOC_BUCKET_COUNT: usize = ALLOC_BUCKET_LIMITS.len();
+static BUCKET_ALLOCATIONS: [AtomicU64; ALLOC_BUCKET_COUNT] = [const { AtomicU64::new(0) }; ALLOC_BUCKET_COUNT];
+static BUCKET_BYTES_ALLOCATED: [AtomicU64; ALLOC_BUCKET_COUNT] = [const { AtomicU64::new(0) }; ALLOC_BUCKET_COUNT];
 
 struct CountingAllocator;
 
@@ -40,6 +68,7 @@ unsafe impl GlobalAlloc for CountingAllocator {
         if !ptr.is_null() {
             ALLOCATIONS.fetch_add(1, Ordering::Relaxed);
             BYTES_ALLOCATED.fetch_add(layout.size() as u64, Ordering::Relaxed);
+            record_bucket_allocation(layout.size());
         }
         ptr
     }
@@ -59,9 +88,23 @@ unsafe impl GlobalAlloc for CountingAllocator {
             BYTES_DEALLOCATED.fetch_add(old_layout.size() as u64, Ordering::Relaxed);
             ALLOCATIONS.fetch_add(1, Ordering::Relaxed);
             BYTES_ALLOCATED.fetch_add(new_size as u64, Ordering::Relaxed);
+            record_bucket_allocation(new_size);
         }
         new_ptr
     }
+}
+
+fn record_bucket_allocation(size: usize) {
+    let bucket = allocation_bucket(size);
+    BUCKET_ALLOCATIONS[bucket].fetch_add(1, Ordering::Relaxed);
+    BUCKET_BYTES_ALLOCATED[bucket].fetch_add(size as u64, Ordering::Relaxed);
+}
+
+fn allocation_bucket(size: usize) -> usize {
+    ALLOC_BUCKET_LIMITS
+        .iter()
+        .position(|limit| size <= *limit)
+        .expect("last allocation bucket must be usize::MAX")
 }
 
 #[derive(Clone, Copy, Default)]
@@ -70,6 +113,8 @@ struct AllocSnapshot {
     deallocations: u64,
     bytes_allocated: u64,
     bytes_deallocated: u64,
+    bucket_allocations: [u64; ALLOC_BUCKET_COUNT],
+    bucket_bytes_allocated: [u64; ALLOC_BUCKET_COUNT],
 }
 
 impl AllocSnapshot {
@@ -78,14 +123,27 @@ impl AllocSnapshot {
         DEALLOCATIONS.store(0, Ordering::Relaxed);
         BYTES_ALLOCATED.store(0, Ordering::Relaxed);
         BYTES_DEALLOCATED.store(0, Ordering::Relaxed);
+        for bucket in 0..ALLOC_BUCKET_COUNT {
+            BUCKET_ALLOCATIONS[bucket].store(0, Ordering::Relaxed);
+            BUCKET_BYTES_ALLOCATED[bucket].store(0, Ordering::Relaxed);
+        }
     }
 
     fn current() -> Self {
+        let mut bucket_allocations = [0; ALLOC_BUCKET_COUNT];
+        let mut bucket_bytes_allocated = [0; ALLOC_BUCKET_COUNT];
+        for bucket in 0..ALLOC_BUCKET_COUNT {
+            bucket_allocations[bucket] = BUCKET_ALLOCATIONS[bucket].load(Ordering::Relaxed);
+            bucket_bytes_allocated[bucket] = BUCKET_BYTES_ALLOCATED[bucket].load(Ordering::Relaxed);
+        }
+
         Self {
             allocations: ALLOCATIONS.load(Ordering::Relaxed),
             deallocations: DEALLOCATIONS.load(Ordering::Relaxed),
             bytes_allocated: BYTES_ALLOCATED.load(Ordering::Relaxed),
             bytes_deallocated: BYTES_DEALLOCATED.load(Ordering::Relaxed),
+            bucket_allocations,
+            bucket_bytes_allocated,
         }
     }
 }
@@ -97,6 +155,8 @@ struct AllocTotals {
     deallocations: u64,
     bytes_allocated: u64,
     bytes_deallocated: u64,
+    bucket_allocations: [u64; ALLOC_BUCKET_COUNT],
+    bucket_bytes_allocated: [u64; ALLOC_BUCKET_COUNT],
 }
 
 impl AllocTotals {
@@ -106,6 +166,10 @@ impl AllocTotals {
         self.deallocations += snapshot.deallocations;
         self.bytes_allocated += snapshot.bytes_allocated;
         self.bytes_deallocated += snapshot.bytes_deallocated;
+        for bucket in 0..ALLOC_BUCKET_COUNT {
+            self.bucket_allocations[bucket] += snapshot.bucket_allocations[bucket];
+            self.bucket_bytes_allocated[bucket] += snapshot.bucket_bytes_allocated[bucket];
+        }
     }
 
     fn print(&self, phase: &str) {
@@ -123,6 +187,47 @@ impl AllocTotals {
             format_bytes(net_bytes),
         );
     }
+
+    fn print_buckets(&self) {
+        let samples = self.samples as f64;
+        let mut buckets = (0..ALLOC_BUCKET_COUNT)
+            .map(|bucket| {
+                (
+                    bucket,
+                    self.bucket_allocations[bucket] as f64 / samples,
+                    self.bucket_bytes_allocated[bucket] as f64 / samples,
+                )
+            })
+            .filter(|(_, allocations, _)| *allocations > 0.0)
+            .collect::<Vec<_>>();
+
+        buckets.sort_by(|left, right| right.2.partial_cmp(&left.2).unwrap_or(std::cmp::Ordering::Equal));
+
+        for (bucket, allocations, bytes_allocated) in buckets.into_iter().take(6) {
+            println!(
+                "    {:<14} allocs/op={allocations:>7.1} allocated/op={}",
+                bucket_label(bucket),
+                format_bytes(bytes_allocated),
+            );
+        }
+    }
+}
+
+fn bucket_label(bucket: usize) -> String {
+    let upper = ALLOC_BUCKET_LIMITS[bucket];
+    if bucket == 0 {
+        return format!("<= {}", format_bytes(upper as f64));
+    }
+
+    if upper == usize::MAX {
+        return format!("> {}", format_bytes(ALLOC_BUCKET_LIMITS[bucket - 1] as f64));
+    }
+
+    format!(
+        "{}..{}",
+        format_bytes((ALLOC_BUCKET_LIMITS[bucket - 1] + 1) as f64),
+        format_bytes(upper as f64),
+    )
 }
 
 struct ProfileContext {
@@ -230,6 +335,13 @@ fn measure_phase(iterations: usize, mut phase: impl FnMut() -> AllocSnapshot) ->
     totals
 }
 
+fn print_phase(totals: AllocTotals, phase: &str, print_buckets: bool) {
+    totals.print(phase);
+    if print_buckets {
+        totals.print_buckets();
+    }
+}
+
 fn measure_parse(ctx: &ProfileContext, query_json: &str) -> AllocSnapshot {
     AllocSnapshot::reset();
     let query = ctx.parse_query(query_json);
@@ -308,6 +420,8 @@ fn main() {
         .ok()
         .and_then(|value| value.parse().ok())
         .unwrap_or(10);
+    let print_buckets =
+        std::env::var("ALLOC_PROFILE_BUCKETS").is_ok_and(|value| value == "1" || value.eq_ignore_ascii_case("true"));
     let data_dir = get_test_data_dir();
     let ctx = ProfileContext::new();
 
@@ -315,6 +429,7 @@ fn main() {
     println!("Iterations: {iterations}");
     println!("Warmup: {warmup}");
     println!("Queries: {}", query_names().join(", "));
+    println!("Buckets: {}", if print_buckets { "on" } else { "off" });
     println!();
 
     for name in query_names() {
@@ -325,13 +440,41 @@ fn main() {
         }
 
         println!("--- {name} ---");
-        measure_phase(iterations, || measure_parse(&ctx, &query)).print("parse_json");
-        measure_phase(iterations, || measure_into_doc(&ctx, &query)).print("into_doc");
-        measure_phase(iterations, || measure_graph_build(&ctx, &query)).print("graph_build");
-        measure_phase(iterations, || measure_translate(&ctx, &query)).print("translate_ir");
-        measure_phase(iterations, || measure_compile(&ctx, &query)).print("compile_ir");
-        measure_phase(iterations, || measure_full(&ctx, &query)).print("full_compile");
-        measure_phase(iterations, || measure_serialize(&ctx, &query)).print("serialize_json");
+        print_phase(
+            measure_phase(iterations, || measure_parse(&ctx, &query)),
+            "parse_json",
+            print_buckets,
+        );
+        print_phase(
+            measure_phase(iterations, || measure_into_doc(&ctx, &query)),
+            "into_doc",
+            print_buckets,
+        );
+        print_phase(
+            measure_phase(iterations, || measure_graph_build(&ctx, &query)),
+            "graph_build",
+            print_buckets,
+        );
+        print_phase(
+            measure_phase(iterations, || measure_translate(&ctx, &query)),
+            "translate_ir",
+            print_buckets,
+        );
+        print_phase(
+            measure_phase(iterations, || measure_compile(&ctx, &query)),
+            "compile_ir",
+            print_buckets,
+        );
+        print_phase(
+            measure_phase(iterations, || measure_full(&ctx, &query)),
+            "full_compile",
+            print_buckets,
+        );
+        print_phase(
+            measure_phase(iterations, || measure_serialize(&ctx, &query)),
+            "serialize_json",
+            print_buckets,
+        );
         println!();
     }
 }
