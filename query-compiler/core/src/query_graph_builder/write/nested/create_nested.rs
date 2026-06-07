@@ -297,16 +297,16 @@ fn handle_one_to_many(
             ),
         )?;
     } else {
-        for create_node in create_nodes {
-            let parent_link = parent_relation_field.linking_fields();
-            let child_link = parent_relation_field.related_field().linking_fields();
+        let parent_link = parent_relation_field.linking_fields();
+        let child_link = parent_relation_field.related_field().linking_fields();
 
+        for create_node in create_nodes {
             graph.create_edge(
                 &parent_node,
                 &create_node,
                 QueryGraphDependency::ProjectedDataDependency(
-                    parent_link,
-                    RowSink::ExactlyOneWriteArgs(child_link, &UpdateOrCreateArgsInput),
+                    parent_link.clone(),
+                    RowSink::ExactlyOneWriteArgs(child_link.clone(), &UpdateOrCreateArgsInput),
                     Some(DataExpectation::non_empty_rows(
                         MissingRelatedRecord::builder()
                             .model(&parent_relation_field.model())
