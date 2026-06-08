@@ -32,6 +32,17 @@ impl Model {
         }
     }
 
+    pub fn single_primary_identifier_scalar(&self) -> Option<ScalarFieldRef> {
+        let mut ids = self.primary_identifier_scalars();
+        let id = ids.next()?;
+
+        if ids.next().is_some() {
+            return None;
+        }
+
+        Some(self.dm.clone().zip(ScalarFieldId::InModel(id)))
+    }
+
     pub fn shard_aware_primary_identifier(&self) -> FieldSelection {
         let id = self.primary_identifier_scalars().collect_vec();
 

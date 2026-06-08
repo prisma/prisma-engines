@@ -411,27 +411,22 @@ fn build_raw_nested_read_relations(
             return Ok(None);
         };
 
-        let left_scalars = rrq.parent_field.left_scalars();
-        let [parent_scalar] = &left_scalars[..] else {
+        let Some(parent_scalar) = rrq.parent_field.single_left_scalar() else {
             return Ok(None);
         };
-
-        let links = left_scalars
-            .iter()
-            .zip(get_relation_scalars_for_filters(&rrq.parent_field))
-            .map(|(parent_scalar, child_scalar)| {
-                let placeholder = Placeholder {
-                    name: binding::join_parent_field(parent_scalar),
-                    r#type: parent_scalar.type_info().to_prisma_type(),
-                };
-                let condition = if has_unique_parent {
-                    ScalarCondition::Equals(ConditionValue::value(PrismaValue::from(placeholder)))
-                } else {
-                    ScalarCondition::In(placeholder.into())
-                };
-                ConditionalLink::new(child_scalar.clone(), vec![condition])
-            })
-            .collect();
+        let Some(child_scalar) = get_single_relation_scalar_for_filters(&rrq.parent_field) else {
+            return Ok(None);
+        };
+        let placeholder = Placeholder {
+            name: binding::join_parent_field(&parent_scalar),
+            r#type: parent_scalar.type_info().to_prisma_type(),
+        };
+        let condition = if has_unique_parent {
+            ScalarCondition::Equals(ConditionValue::value(PrismaValue::from(placeholder)))
+        } else {
+            ScalarCondition::In(placeholder.into())
+        };
+        let links = vec![ConditionalLink::new(child_scalar, vec![condition])];
 
         let Some((child, join)) = build_raw_read_related_records(rrq, links, has_unique_parent, builder, enums)? else {
             return Ok(None);
@@ -455,7 +450,7 @@ fn build_raw_nested_read_relations(
             child: child.query,
             parent_column: RawResultColumnRef::Index(parent_column_index),
             child_column: RawResultColumnRef::Index(child_column_index),
-            scope_name: binding::join_parent_field(parent_scalar),
+            scope_name: binding::join_parent_field(&parent_scalar),
             is_relation_unique: join.is_relation_unique,
         }));
     }
@@ -651,6 +646,14 @@ fn get_relation_scalars_for_filters(rf: &RelationField) -> Vec<ScalarField> {
         rf.left_scalars()
     } else {
         rf.related_field().left_scalars()
+    }
+}
+
+fn get_single_relation_scalar_for_filters(rf: &RelationField) -> Option<ScalarField> {
+    if rf.relation().is_many_to_many() {
+        rf.single_left_scalar()
+    } else {
+        rf.related_field().single_left_scalar()
     }
 }
 

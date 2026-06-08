@@ -111,6 +111,40 @@ impl RelationField {
         self.linking_fields_impl()
     }
 
+    pub fn single_left_scalar(&self) -> Option<ScalarFieldRef> {
+        let walker = self.walker();
+        let relation = walker.relation();
+
+        match relation.refine() {
+            walkers::RefinedRelationWalker::Inline(rel) => {
+                let forward = rel.forward_relation_field().unwrap();
+                let field = if forward.id == self.id {
+                    let mut fields = forward.fields()?;
+                    let field = fields.next()?;
+
+                    if fields.next().is_some() {
+                        return None;
+                    }
+
+                    field
+                } else {
+                    let mut fields = forward.referenced_fields()?;
+                    let field = fields.next()?;
+
+                    if fields.next().is_some() {
+                        return None;
+                    }
+
+                    field
+                };
+
+                Some(self.dm.clone().zip(ScalarFieldId::InModel(field.id)))
+            }
+            walkers::RefinedRelationWalker::TwoWayEmbeddedManyToMany(_)
+            | walkers::RefinedRelationWalker::ImplicitManyToMany(_) => self.model().single_primary_identifier_scalar(),
+        }
+    }
+
     pub fn db_names(&self) -> impl Iterator<Item = String> {
         self.scalar_fields().into_iter().map(|f| f.db_name().to_owned())
     }
