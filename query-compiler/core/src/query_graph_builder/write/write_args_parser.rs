@@ -5,12 +5,15 @@ use query_structure::{
     TypeIdentifier, WriteArgs, WriteOperation,
 };
 use schema::constants::{args, json_null, operations};
+use smallvec::SmallVec;
 use std::{borrow::Cow, convert::TryInto};
+
+pub(crate) type NestedWriteOperations<'a> = SmallVec<[(RelationFieldRef, ParsedInputMap<'a>); 1]>;
 
 #[derive(Debug)]
 pub struct WriteArgsParser<'a> {
     pub(crate) args: WriteArgs,
-    pub(crate) nested: Vec<(RelationFieldRef, ParsedInputMap<'a>)>,
+    pub(crate) nested: NestedWriteOperations<'a>,
 }
 
 impl<'a> WriteArgsParser<'a> {

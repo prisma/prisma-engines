@@ -5,8 +5,8 @@ use crate::{
     query_ast::*,
     query_graph::{NodeRef, QueryGraph, QueryGraphDependency},
 };
-use psl::{datamodel_connector::ConnectorCapability, parser_database::RelationFieldId};
-use query_structure::{Model, WriteArgs, Zipper};
+use psl::datamodel_connector::ConnectorCapability;
+use query_structure::{Model, WriteArgs};
 use schema::{QuerySchema, constants::args};
 use std::convert::TryInto;
 use write_args_parser::*;
@@ -127,7 +127,7 @@ pub(crate) fn create_record_node_from_args(
     query_schema: &QuerySchema,
     model: Model,
     args: WriteArgs,
-    nested: Vec<(Zipper<RelationFieldId>, ParsedInputMap<'_>)>,
+    nested: NestedWriteOperations<'_>,
 ) -> QueryGraphBuilderResult<NodeRef> {
     let selected_fields = model.shard_aware_primary_identifier();
     let selection_order = selected_fields.db_names().collect();
