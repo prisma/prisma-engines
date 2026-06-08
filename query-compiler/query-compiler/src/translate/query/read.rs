@@ -433,9 +433,7 @@ fn build_raw_nested_read_relations(
             })
             .collect();
 
-        let Some((child, join)) =
-            build_raw_read_related_records(rrq.clone(), links, has_unique_parent, builder, enums)?
-        else {
+        let Some((child, join)) = build_raw_read_related_records(rrq, links, has_unique_parent, builder, enums)? else {
             return Ok(None);
         };
         let [child_field] = &join.fields[..] else {
@@ -466,7 +464,7 @@ fn build_raw_nested_read_relations(
 }
 
 fn build_raw_read_related_records(
-    mut rrq: RelatedRecordsQuery,
+    rrq: &RelatedRecordsQuery,
     links: Vec<ConditionalLink>,
     has_unique_parent: bool,
     builder: &dyn QueryBuilder,
@@ -479,7 +477,7 @@ fn build_raw_read_related_records(
     let is_many_to_many = rrq.parent_field.relation().is_many_to_many();
     let mut linkage = RelationLinkage::new(rrq.parent_field.clone(), links);
 
-    if let Some(results) = rrq.parent_results.take() {
+    if let Some(results) = rrq.parent_results.clone() {
         let parent_link_id = rrq.parent_field.linking_fields();
         let selection = results
             .into_iter()
@@ -506,15 +504,16 @@ fn build_raw_read_related_records(
         .clone()
         .into_without_relations()
         .into_virtuals_last();
-    let in_memory_ops = in_memory_processing::extract_in_memory_ops_for_nested_query(&mut rrq.args, has_unique_parent);
+    let mut args = rrq.args.clone();
+    let in_memory_ops = in_memory_processing::extract_in_memory_ops_for_nested_query(&mut args, has_unique_parent);
     if !in_memory_ops.is_empty() {
         return Ok(None);
     }
 
     let (child_query, join) = if is_many_to_many {
-        build_read_m2m_query(linkage, rrq.args, &selected_fields, builder)?
+        build_read_m2m_query(linkage, args, &selected_fields, builder)?
     } else {
-        build_read_one2m_query(linkage, rrq.args, &selected_fields, builder)?
+        build_read_one2m_query(linkage, args, &selected_fields, builder)?
     };
     let Expression::Query(db_query) = child_query else {
         return Ok(None);
