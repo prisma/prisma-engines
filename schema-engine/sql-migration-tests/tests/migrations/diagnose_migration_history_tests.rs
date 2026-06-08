@@ -283,6 +283,67 @@ fn diagnose_migrations_history_can_detect_when_the_database_is_behind(api: TestA
 }
 
 #[test_connector]
+fn diagnose_migrations_history_reports_rolled_back_migration_as_unapplied(api: TestApi) {
+    let directory = api.create_migrations_directory();
+
+    let dm1 = api.datamodel_with_provider(
+        r#"
+        model Cat {
+            id   Int @id
+            name String
+        }
+    "#,
+    );
+
+    api.create_migration("initial", &dm1, &directory).send_sync();
+    api.apply_migrations(&directory).send_sync();
+
+    let dm2 = api.datamodel_with_provider(
+        r#"
+        model Cat {
+            id          Int @id
+            name        String
+            fluffiness  Float
+        }
+    "#,
+    );
+
+    let rolled_back_migration_name = api
+        .create_migration("02_add_fluffiness", &dm2, &directory)
+        .send_sync()
+        .modify_migration(|script| {
+            script.clear();
+            script.push_str("SELECT YOLO;");
+        })
+        .into_output()
+        .generated_migration_name;
+
+    api.apply_migrations(&directory).send_unwrap_err();
+    api.mark_migration_rolled_back(&rolled_back_migration_name).send();
+
+    let DiagnoseMigrationHistoryOutput {
+        drift,
+        history,
+        failed_migration_names,
+        edited_migration_names,
+        has_migrations_table,
+        error_in_unapplied_migration,
+    } = api.diagnose_migration_history(&directory).send_sync().into_output();
+
+    assert!(drift.is_none());
+    assert!(failed_migration_names.is_empty());
+    assert!(edited_migration_names.is_empty());
+    assert_eq!(
+        history,
+        Some(HistoryDiagnostic::DatabaseIsBehind {
+            unapplied_migration_names: vec![rolled_back_migration_name],
+        })
+    );
+    assert!(has_migrations_table);
+    assert!(error_in_unapplied_migration.is_none());
+}
+
+#[test_connector]
 fn diagnose_migrations_history_can_detect_when_the_folder_is_behind(api: TestApi) {
     let directory = api.create_migrations_directory();
 
