@@ -17,7 +17,7 @@ use query_structure::{
     ConditionValue, FieldSelection, Filter, Model, Placeholder, PrismaValue, QueryArguments, QueryMode, RelationField,
     RelationLoadStrategy, ScalarCondition, ScalarField, ScalarFilter, ScalarProjection, SelectedField, Take,
 };
-use std::{collections::HashMap, slice};
+use std::{borrow::Cow, slice};
 
 mod in_memory_processing;
 
@@ -251,7 +251,18 @@ pub(super) fn add_inmemory_join(
 
 struct BuiltRawNestedReadQuery {
     query: RawNestedReadQuery,
-    column_indexes: HashMap<String, usize>,
+}
+
+struct RawColumnIndexes<'a> {
+    indexes: Vec<(Cow<'a, str>, usize)>,
+}
+
+impl RawColumnIndexes<'_> {
+    fn get(&self, name: &str) -> Option<usize> {
+        self.indexes
+            .iter()
+            .find_map(|(column, index)| (column.as_ref() == name).then_some(*index))
+    }
 }
 
 fn build_raw_nested_read_root(
@@ -314,7 +325,6 @@ fn build_raw_nested_read_query(
             fields,
             relations,
         },
-        column_indexes,
     }))
 }
 
@@ -331,18 +341,20 @@ fn build_get_records_query(
     }
 }
 
-fn raw_column_indexes(selected_fields: &FieldSelection) -> HashMap<String, usize> {
-    selected_fields
-        .selections()
-        .enumerate()
-        .map(|(index, field)| (field.db_name().into_owned(), index))
-        .collect()
+fn raw_column_indexes(selected_fields: &FieldSelection) -> RawColumnIndexes<'_> {
+    RawColumnIndexes {
+        indexes: selected_fields
+            .selections()
+            .enumerate()
+            .map(|(index, field)| (field.db_name(), index))
+            .collect(),
+    }
 }
 
 fn raw_result_column_mappings(
     selected_fields: &FieldSelection,
     selection_order: &[String],
-    column_indexes: &HashMap<String, usize>,
+    column_indexes: &RawColumnIndexes<'_>,
     enums: &mut EnumsMap,
 ) -> Option<Vec<RawResultColumnMapping>> {
     let mut mappings = Vec::new();
@@ -357,7 +369,7 @@ fn raw_result_column_mappings(
 
         match selection {
             SelectedField::Scalar(field) => {
-                let column_index = column_indexes.get::<str>(field.db_name().as_ref()).copied()?;
+                let column_index = column_indexes.get(field.db_name().as_ref())?;
                 mappings.push(RawResultColumnMapping {
                     field_name: RawResultFieldName::Field(field.name().to_owned()),
                     column: RawResultColumnRef::Index(column_index),
@@ -369,7 +381,7 @@ fn raw_result_column_mappings(
                     .virtuals()
                     .filter(|field| field.serialized_group_name() == virtual_selection.serialized_group_name())
                 {
-                    let column_index = column_indexes.get(&virtual_selection.db_alias()).copied()?;
+                    let column_index = column_indexes.get(&virtual_selection.db_alias())?;
                     let (group_name, field_name) = virtual_selection.serialized_name();
                     mappings.push(RawResultColumnMapping {
                         field_name: RawResultFieldName::Path(vec![group_name.to_owned(), field_name.to_owned()]),
@@ -399,7 +411,7 @@ fn raw_field_type(selection: &SelectedField, enums: &mut EnumsMap) -> Option<Fie
 
 fn build_raw_nested_read_relations(
     nested: &[ReadQuery],
-    parent_column_indexes: &HashMap<String, usize>,
+    parent_column_indexes: &RawColumnIndexes<'_>,
     has_unique_parent: bool,
     builder: &dyn QueryBuilder,
     enums: &mut EnumsMap,
@@ -428,20 +440,13 @@ fn build_raw_nested_read_relations(
         };
         let links = vec![ConditionalLink::new(child_scalar, vec![condition])];
 
-        let Some((child, join)) = build_raw_read_related_records(rrq, links, has_unique_parent, builder, enums)? else {
-            return Ok(None);
-        };
-        let [child_field] = &join.fields[..] else {
-            return Ok(None);
-        };
-
-        let Some(parent_column_index) = parent_column_indexes
-            .get::<str>(parent_scalar.db_name().as_ref())
-            .copied()
+        let Some((child, join, child_column_index)) =
+            build_raw_read_related_records(rrq, links, has_unique_parent, builder, enums)?
         else {
             return Ok(None);
         };
-        let Some(child_column_index) = child.column_indexes.get(child_field).copied() else {
+
+        let Some(parent_column_index) = parent_column_indexes.get(parent_scalar.db_name().as_ref()) else {
             return Ok(None);
         };
 
@@ -464,7 +469,7 @@ fn build_raw_read_related_records(
     has_unique_parent: bool,
     builder: &dyn QueryBuilder,
     enums: &mut EnumsMap,
-) -> TranslateResult<Option<(BuiltRawNestedReadQuery, JoinMetadata)>> {
+) -> TranslateResult<Option<(BuiltRawNestedReadQuery, JoinMetadata, usize)>> {
     if rrq.args.take == Take::Some(0) {
         return Ok(None);
     }
@@ -525,6 +530,12 @@ fn build_raw_read_related_records(
     else {
         return Ok(None);
     };
+    let [child_field] = &join.fields[..] else {
+        return Ok(None);
+    };
+    let Some(child_column_index) = column_indexes.get(child_field) else {
+        return Ok(None);
+    };
     let child_has_unique_parent = has_unique_parent && join.is_relation_unique;
     let Some(relations) =
         build_raw_nested_read_relations(&rrq.nested, &column_indexes, child_has_unique_parent, builder, enums)?
@@ -539,34 +550,38 @@ fn build_raw_read_related_records(
                 fields,
                 relations,
             },
-            column_indexes,
         },
         join,
+        child_column_index,
     )))
 }
 
 fn raw_many_to_many_child_column_indexes(
     selected_fields: &FieldSelection,
     linking_field_alias: String,
-) -> HashMap<String, usize> {
-    let mut column_indexes = HashMap::with_capacity(selected_fields.selections().len() + 1);
+) -> RawColumnIndexes<'_> {
+    let mut column_indexes = RawColumnIndexes {
+        indexes: Vec::with_capacity(selected_fields.selections().len() + 1),
+    };
     let mut next_index = 0;
 
     for field in selected_fields.selections() {
         if matches!(field, SelectedField::Scalar(_)) {
-            column_indexes.insert(field.db_name().into_owned(), next_index);
+            column_indexes.indexes.push((field.db_name(), next_index));
             next_index += 1;
         }
     }
 
     // `build_get_related_records()` selects scalar model columns, then the hidden m2m linking alias,
     // then any additional virtual selections.
-    column_indexes.insert(linking_field_alias, next_index);
+    column_indexes
+        .indexes
+        .push((Cow::Owned(linking_field_alias), next_index));
     next_index += 1;
 
     for field in selected_fields.selections() {
         if matches!(field, SelectedField::Virtual(_)) {
-            column_indexes.insert(field.db_name().into_owned(), next_index);
+            column_indexes.indexes.push((field.db_name(), next_index));
             next_index += 1;
         }
     }
