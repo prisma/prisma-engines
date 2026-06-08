@@ -1,5 +1,4 @@
 use crate::{Context, model_extensions::ScalarFieldExt};
-use itertools::Itertools;
 use quaint::ast::{Column, NativeColumnType};
 use query_structure::{Field, ModelProjection, RelationField, ScalarField};
 
@@ -38,13 +37,28 @@ pub trait AsColumns {
 
 impl AsColumns for ModelProjection {
     fn as_columns(&self, ctx: &Context<'_>) -> ColumnIterator {
-        let cols: Vec<Column<'static>> = self
-            .fields()
-            .flat_map(|f| f.as_columns(ctx))
-            .unique_by(|c| c.name.clone())
-            .collect();
+        let mut cols = Vec::with_capacity(self.fields().size_hint().0);
+
+        for field in self.fields() {
+            match field {
+                Field::Scalar(sf) => push_unique_column(&mut cols, sf.as_column(ctx)),
+                Field::Relation(rf) => {
+                    for sf in rf.scalar_fields() {
+                        push_unique_column(&mut cols, sf.as_column(ctx));
+                    }
+                }
+                Field::Composite(_) => unimplemented!(),
+            }
+        }
 
         ColumnIterator::from(cols)
+    }
+}
+
+fn push_unique_column(cols: &mut Vec<Column<'static>>, col: Column<'static>) {
+    let name = col.name.clone();
+    if !cols.iter().any(|existing| existing.name == name) {
+        cols.push(col);
     }
 }
 
