@@ -4,6 +4,7 @@ use bigdecimal::{BigDecimal, ToPrimitive};
 use chrono::prelude::*;
 use core::fmt;
 use query_structure::{DefaultKind, Placeholder, PrismaValue, PrismaValueType};
+use smallvec::SmallVec;
 use std::{borrow::Cow, convert::TryFrom, str::FromStr};
 use user_facing_errors::query_engine::validation::ValidationError;
 use uuid::Uuid;
@@ -1180,7 +1181,7 @@ pub(crate) mod conversions {
 }
 #[derive(Debug, Clone, Default)]
 pub(crate) struct Path {
-    segments: Vec<String>,
+    segments: SmallVec<[String; 8]>,
 }
 
 impl Path {
