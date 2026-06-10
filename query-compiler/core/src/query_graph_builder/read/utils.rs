@@ -244,18 +244,13 @@ pub(crate) fn merge_relation_selections(
         return selected_fields;
     }
 
-    let nested: Vec<_> = nested_queries
-        .iter()
-        .map(|nested_query| {
-            if let ReadQuery::RelatedRecordsQuery(rq) = nested_query {
-                rq.parent_field.linking_fields()
-            } else {
-                unreachable!()
-            }
-        })
-        .collect();
-
-    selected_fields.merge(FieldSelection::union(nested))
+    selected_fields.merge(FieldSelection::union_iter(nested_queries.iter().map(|nested_query| {
+        if let ReadQuery::RelatedRecordsQuery(rq) = nested_query {
+            rq.parent_field.linking_fields()
+        } else {
+            unreachable!()
+        }
+    })))
 }
 
 /// Ensures that if a cursor is provided, its fields are also selected.
