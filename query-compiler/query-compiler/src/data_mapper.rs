@@ -478,12 +478,12 @@ impl FieldScalarType {
         S: SerializeStruct,
     {
         match self {
-            Self::String => state.serialize_field("type", "string"),
-            Self::Int => state.serialize_field("type", "int"),
-            Self::BigInt => state.serialize_field("type", "bigint"),
-            Self::Float => state.serialize_field("type", "float"),
-            Self::Decimal => state.serialize_field("type", "decimal"),
-            Self::Boolean => state.serialize_field("type", "boolean"),
+            Self::String => state.serialize_field("type", "s"),
+            Self::Int => state.serialize_field("type", "i"),
+            Self::BigInt => state.serialize_field("type", "I"),
+            Self::Float => state.serialize_field("type", "f"),
+            Self::Decimal => state.serialize_field("type", "d"),
+            Self::Boolean => state.serialize_field("type", "b"),
             Self::Enum { name } => {
                 state.serialize_field("type", "enum")?;
                 state.serialize_field("name", name)
@@ -492,14 +492,14 @@ impl FieldScalarType {
                 state.serialize_field("type", "extension")?;
                 state.serialize_field("name", name)
             }
-            Self::Json => state.serialize_field("type", "json"),
-            Self::Object => state.serialize_field("type", "object"),
-            Self::DateTime => state.serialize_field("type", "datetime"),
+            Self::Json => state.serialize_field("type", "j"),
+            Self::Object => state.serialize_field("type", "o"),
+            Self::DateTime => state.serialize_field("type", "D"),
             Self::Bytes { encoding } => {
                 state.serialize_field("type", "bytes")?;
                 state.serialize_field("encoding", encoding)
             }
-            Self::Unsupported => state.serialize_field("type", "unsupported"),
+            Self::Unsupported => state.serialize_field("type", "x"),
         }
     }
 }
