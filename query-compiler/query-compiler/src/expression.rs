@@ -173,6 +173,7 @@ pub struct RawNestedReadDirectRelation {
     pub child_column: RawResultColumnRef,
     pub scope_name: Cow<'static, str>,
     pub is_relation_unique: bool,
+    pub operations: InMemoryOps,
 }
 
 impl Serialize for RawNestedReadDirectRelation {
@@ -180,7 +181,7 @@ impl Serialize for RawNestedReadDirectRelation {
     where
         S: Serializer,
     {
-        let mut tuple = serializer.serialize_tuple(7)?;
+        let mut tuple = serializer.serialize_tuple(8)?;
         tuple.serialize_element("r")?;
         tuple.serialize_element(&self.field_name)?;
         tuple.serialize_element(&self.child)?;
@@ -188,6 +189,7 @@ impl Serialize for RawNestedReadDirectRelation {
         tuple.serialize_element(&self.child_column)?;
         tuple.serialize_element(&self.scope_name)?;
         tuple.serialize_element(&self.is_relation_unique)?;
+        tuple.serialize_element(&self.operations)?;
         tuple.end()
     }
 }

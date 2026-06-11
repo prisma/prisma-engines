@@ -2,7 +2,7 @@ use crate::{
     TranslateError, binding,
     data_mapper::FieldType,
     expression::{
-        Binding, EnumsMap, Expression, JoinExpression, RawNestedReadDirectRelation, RawNestedReadQuery,
+        Binding, EnumsMap, Expression, InMemoryOps, JoinExpression, RawNestedReadDirectRelation, RawNestedReadQuery,
         RawNestedReadRelation, RawResultColumnMapping, RawResultColumnRef, RawResultFieldName,
     },
     translate::TranslateResult,
@@ -440,7 +440,7 @@ fn build_raw_nested_read_relations(
         };
         let links = vec![ConditionalLink::new(child_scalar, vec![condition])];
 
-        let Some((child, join, child_column_index)) =
+        let Some((child, join, child_column_index, operations)) =
             build_raw_read_related_records(rrq, links, has_unique_parent, builder, enums)?
         else {
             return Ok(None);
@@ -457,6 +457,7 @@ fn build_raw_nested_read_relations(
             child_column: RawResultColumnRef::Index(child_column_index),
             scope_name: binding::join_parent_field(&parent_scalar),
             is_relation_unique: join.is_relation_unique,
+            operations,
         }));
     }
 
@@ -469,7 +470,7 @@ fn build_raw_read_related_records(
     has_unique_parent: bool,
     builder: &dyn QueryBuilder,
     enums: &mut EnumsMap,
-) -> TranslateResult<Option<(BuiltRawNestedReadQuery, JoinMetadata, usize)>> {
+) -> TranslateResult<Option<(BuiltRawNestedReadQuery, JoinMetadata, usize, InMemoryOps)>> {
     if rrq.args.take == Take::Some(0) {
         return Ok(None);
     }
@@ -506,7 +507,7 @@ fn build_raw_read_related_records(
         .into_virtuals_last();
     let mut args = rrq.args.clone();
     let in_memory_ops = in_memory_processing::extract_in_memory_ops_for_nested_query(&mut args, has_unique_parent);
-    if !in_memory_ops.is_empty() {
+    if !raw_nested_relation_operations_supported(&in_memory_ops) {
         return Ok(None);
     }
 
@@ -553,7 +554,19 @@ fn build_raw_read_related_records(
         },
         join,
         child_column_index,
+        in_memory_ops,
     )))
+}
+
+fn raw_nested_relation_operations_supported(ops: &InMemoryOps) -> bool {
+    ops.distinct.is_none()
+        && !ops.reverse
+        && ops.nested.is_empty()
+        && ops.linking_fields.is_none()
+        && ops
+            .pagination
+            .as_ref()
+            .is_none_or(|pagination| pagination.cursor().is_none())
 }
 
 fn raw_many_to_many_child_column_indexes(
