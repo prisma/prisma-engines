@@ -2,6 +2,7 @@
 source: query-compiler/query-compiler/tests/queries.rs
 expression: pretty
 input_file: query-compiler/query-compiler/tests/data/update-set-nested.json
+snapshot_kind: text
 ---
 transaction
    dataMap {

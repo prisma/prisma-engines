@@ -23,7 +23,8 @@ transaction
    }
    let 0 = unique (query «SELECT "public"."User"."id", "public"."User"."email",
                           "public"."User"."role"::text FROM "public"."User"
-                          WHERE "public"."User"."email" = $1 LIMIT $2 OFFSET $3»
+                          WHERE ("public"."User"."email" = $1 AND 1=1) LIMIT $2
+                          OFFSET $3»
                    params [const(String("user.1737556028164@prisma.io")),
                            const(BigInt(1)), const(BigInt(0))])
    in let 0$id = mapField id (get 0)
@@ -31,53 +32,26 @@ transaction
                         FROM "public"."Post" WHERE (1=1 AND
                         "public"."Post"."userId" IN [$1,*]) OFFSET $2»
                  params [var(0$id as Int), const(BigInt(0))]
-         in let 1 = validate (get 1)
-                [ rowCountEq 0
-                ] orRaise "RELATION_VIOLATION"
-            in if (rowCountNeq 0 (get 1))
-               then let 1$id = mapField id (get 1)
-                    in execute «UPDATE "public"."Post" SET "userId" = $1 WHERE
-                                ("public"."Post"."id" IN [$2,*] AND 1=1)»
-                       params [const(Null), var(1$id as Int)]
-               else ();
+         in validate (get 1)
+            [ rowCountEq 0
+            ] orRaise "RELATION_VIOLATION";
+            ();
       let 0 = unique (validate (get 0)
           [ rowCountNeq 0
           ] orRaise "MISSING_RECORD");
           0$id = mapField id (get 0)
-      in rawNestedReadUnique (query «SELECT "public"."User"."id",
-                                     "public"."User"."email",
-                                     "public"."User"."role"::text FROM
-                                     "public"."User" WHERE "public"."User"."id"
-                                     = $1 LIMIT $2 OFFSET $3»
-                              params [var(0$id as Int), const(BigInt(1)),
-                                      const(BigInt(0))]
-                              fields {
-                                  id: 0
-                                  email: 1
-                                  role: 2
-                              }
-                              relations [posts on left.0 = right.2 many (query
-                                                                         «SELECT
-                                                                          "public"."Post"."id",
-                                                                          "public"."Post"."title",
-                                                                          "public"."Post"."userId"
-                                                                          FROM
-                                                                          "public"."Post"
-                                                                          WHERE
-                                                                          "public"."Post"."userId"
-                                                                          = $1
-                                                                          OFFSET
-                                                                          $2»
-                                                                         params [var(@parent$id as Int),
-                                                                                 const(BigInt(0))]
-                                                                         fields {
-                                                                             id: 0
-                                                                             title: 1
-                                                                             userId: 2
-                                                                         })])
-         enums {
-             Role: {
-                 admin: ADMIN
-                 user: USER
-             }
-         }
+      in let @parent = unique (query «SELECT "public"."User"."id",
+                                      "public"."User"."email",
+                                      "public"."User"."role"::text FROM
+                                      "public"."User" WHERE "public"."User"."id"
+                                      = $1 LIMIT $2 OFFSET $3»
+                               params [var(0$id as Int), const(BigInt(1)),
+                                       const(BigInt(0))])
+         in let @parent$id = mapField id (get @parent)
+            in join (get @parent)
+               with (query «SELECT "public"."Post"."id",
+                            "public"."Post"."title", "public"."Post"."userId"
+                            FROM "public"."Post" WHERE "public"."Post"."userId"
+                            = $1 OFFSET $2»
+                     params [var(@parent$id as Int),
+                             const(BigInt(0))]) on left.(id) = right.(userId) as @nested$posts
