@@ -228,6 +228,10 @@ where
 /// 3. We reconstruct the filter tree and merge the search filters that have the same query along the way
 ///    eg: `Filter(And([SearchFilter("query", [FieldA]), SearchFilter("query", [FieldB])]))` -> `Filter(And([SearchFilter("query", [FieldA, FieldB])]))`
 fn merge_search_filters(filter: Filter) -> Filter {
+    if matches!(filter, Filter::And(_) | Filter::Or(_) | Filter::Not(_)) && !contains_search_filter(&filter) {
+        return filter;
+    }
+
     // The filter tree _needs_ to be flattened for the merge to work properly
     let flattened = fold_filter(filter);
 
@@ -236,6 +240,19 @@ fn merge_search_filters(filter: Filter) -> Filter {
         Filter::Or(or) => Filter::Or(fold_search_filters(&or)),
         Filter::Not(not) => Filter::Not(fold_search_filters(&not)),
         _ => flattened,
+    }
+}
+
+fn contains_search_filter(filter: &Filter) -> bool {
+    match filter {
+        Filter::Scalar(sf) => matches!(
+            sf.condition,
+            ScalarCondition::Search(..) | ScalarCondition::NotSearch(..)
+        ),
+        Filter::And(filters) | Filter::Or(filters) | Filter::Not(filters) => {
+            filters.iter().any(contains_search_filter)
+        }
+        _ => false,
     }
 }
 
