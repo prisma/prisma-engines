@@ -190,6 +190,21 @@ where
     T: Clone + Into<Filter>,
 {
     let update_args = WriteArgsParser::from(&model, data_map)?;
+
+    update_record_node_from_args(graph, query_schema, filter, model, update_args, field)
+}
+
+pub(crate) fn update_record_node_from_args<T>(
+    graph: &mut QueryGraph,
+    query_schema: &QuerySchema,
+    filter: T,
+    model: Model,
+    update_args: WriteArgsParser<'_>,
+    field: Option<&ParsedField<'_>>,
+) -> QueryGraphBuilderResult<NodeRef>
+where
+    T: Clone + Into<Filter>,
+{
     let mut args = update_args.args;
 
     args.update_datetimes(&model);
