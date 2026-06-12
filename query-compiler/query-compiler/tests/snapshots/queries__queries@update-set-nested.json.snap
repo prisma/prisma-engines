@@ -50,16 +50,10 @@ transaction
                           params [var(0$id as Int), var(3$id as Int)]
                   else ();
                let 4 = diff (get 1) (get 2)
-               in let 4 = validate (get 4)
-                      [ rowCountEq 0
-                      ] orRaise "RELATION_VIOLATION"
-                  in if (rowCountNeq 0 (get 4))
-                     then let 4$id = mapField id (get 4)
-                          in execute «UPDATE "public"."Post" SET "userId" = $1
-                                      WHERE ("public"."Post"."id" IN [$2,*] AND
-                                      1=1)»
-                             params [const(Null), var(4$id as Int)]
-                     else ();
+               in validate (get 4)
+                  [ rowCountEq 0
+                  ] orRaise "RELATION_VIOLATION";
+                  ();
       let 0 = unique (validate (get 0)
           [ rowCountNeq 0
           ] orRaise "MISSING_RECORD");
