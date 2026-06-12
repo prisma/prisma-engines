@@ -133,7 +133,7 @@ fn get_result_node(
     builder: &mut ResultNodeBuilder<'_>,
     original_name: Option<Cow<'static, str>>,
 ) -> Option<ResultNode> {
-    let mut node = ResultNodeBuilder::new_object(original_name);
+    let mut node = ResultNodeBuilder::new_object_with_capacity(original_name, selection_order.len());
     node.set_skip_nulls(skip_nulls);
 
     for prisma_name in selection_order {
@@ -282,7 +282,7 @@ fn get_result_node_for_aggregation(
         }
     }
 
-    let mut node = ResultNodeBuilder::new_object(object_name);
+    let mut node = ResultNodeBuilder::new_object_with_capacity(object_name, ordered_set.len());
 
     for (name, prefix, db_alias, typ) in selectors
         .iter()

@@ -1,6 +1,5 @@
 use std::borrow::Cow;
 
-use indexmap::IndexMap;
 use query_structure::{FieldTypeInformation, TypeIdentifier};
 use serde::{Serialize, Serializer, ser::SerializeMap, ser::SerializeStruct, ser::SerializeTuple};
 
@@ -42,8 +41,14 @@ impl Serialize for ResultNode {
 #[derive(Debug)]
 pub struct Object {
     serialized_name: Option<Cow<'static, str>>,
-    fields: IndexMap<Cow<'static, str>, ResultNode>,
+    fields: Vec<ObjectField>,
     skip_nulls: bool,
+}
+
+#[derive(Debug)]
+pub struct ObjectField {
+    name: Cow<'static, str>,
+    node: ResultNode,
 }
 
 impl Serialize for Object {
@@ -66,7 +71,7 @@ impl Serialize for Object {
     }
 }
 
-struct SerializedObjectFields<'a>(&'a IndexMap<Cow<'static, str>, ResultNode>);
+struct SerializedObjectFields<'a>(&'a [ObjectField]);
 
 impl Serialize for SerializedObjectFields<'_> {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
@@ -77,12 +82,14 @@ impl Serialize for SerializedObjectFields<'_> {
     }
 }
 
-fn serialize_fields<S>(fields: &IndexMap<Cow<'static, str>, ResultNode>, serializer: S) -> Result<S::Ok, S::Error>
+fn serialize_fields<S>(fields: &[ObjectField], serializer: S) -> Result<S::Ok, S::Error>
 where
     S: Serializer,
 {
     let mut map = serializer.serialize_map(Some(fields.len()))?;
-    for (name, node) in fields {
+    for field in fields {
+        let name = &field.name;
+        let node = &field.node;
         match node {
             ResultNode::Field { db_name, field_type } if db_name == name => {
                 if let Some(compact_name) = field_type.compact_name() {
@@ -122,9 +129,13 @@ struct FieldNodeInObject<'a> {
 
 impl Object {
     fn new(serialized_name: Option<impl Into<Cow<'static, str>>>) -> Self {
+        Self::with_capacity(serialized_name, 0)
+    }
+
+    fn with_capacity(serialized_name: Option<impl Into<Cow<'static, str>>>, capacity: usize) -> Self {
         Self {
             serialized_name: serialized_name.map(Into::into),
-            fields: IndexMap::new(),
+            fields: Vec::with_capacity(capacity),
             skip_nulls: false,
         }
     }
@@ -138,8 +149,8 @@ impl Object {
         self.serialized_name.as_deref()
     }
 
-    pub fn fields(&self) -> &IndexMap<Cow<'static, str>, ResultNode> {
-        &self.fields
+    pub fn fields(&self) -> impl ExactSizeIterator<Item = (&Cow<'static, str>, &ResultNode)> {
+        self.fields.iter().map(|field| (&field.name, &field.node))
     }
 }
 
@@ -154,6 +165,13 @@ impl<'a> ResultNodeBuilder<'a> {
 
     pub fn new_object(serialized_name: Option<impl Into<Cow<'static, str>>>) -> ObjectBuilder {
         ObjectBuilder::new(serialized_name)
+    }
+
+    pub fn new_object_with_capacity(
+        serialized_name: Option<impl Into<Cow<'static, str>>>,
+        capacity: usize,
+    ) -> ObjectBuilder {
+        ObjectBuilder::with_capacity(serialized_name, capacity)
     }
 
     #[inline]
@@ -180,8 +198,12 @@ pub struct ObjectBuilder {
 
 impl ObjectBuilder {
     fn new(serialized_name: Option<impl Into<Cow<'static, str>>>) -> Self {
+        Self::with_capacity(serialized_name, 0)
+    }
+
+    fn with_capacity(serialized_name: Option<impl Into<Cow<'static, str>>>, capacity: usize) -> Self {
         Self {
-            object: Object::new(serialized_name),
+            object: Object::with_capacity(serialized_name, capacity),
         }
     }
 
@@ -212,13 +234,18 @@ impl ObjectBuilder {
         key: Cow<'static, str>,
         original_key: Option<Cow<'static, str>>,
     ) -> ObjectMutBuilder<'_> {
-        let node = self
-            .object
-            .fields
-            .entry(key)
-            .or_insert(ResultNode::Object(Object::new(original_key)));
+        let field_index = match self.object.fields.iter().position(|field| field.name == key) {
+            Some(index) => index,
+            None => {
+                self.object.fields.push(ObjectField {
+                    name: key,
+                    node: ResultNode::Object(Object::new(original_key)),
+                });
+                self.object.fields.len() - 1
+            }
+        };
 
-        let ResultNode::Object(object) = node else {
+        let ResultNode::Object(object) = &mut self.object.fields[field_index].node else {
             panic!("ObjectBuilder::entry_or_insert can only be called with key which is vacant or points at an object")
         };
 
@@ -240,6 +267,12 @@ impl<'a> ObjectMutBuilder<'a> {
     }
 
     pub fn add_field(&mut self, key: impl Into<Cow<'static, str>>, node: ResultNode) {
-        self.object.fields.insert(key.into(), node);
+        let key = key.into();
+        if let Some(field) = self.object.fields.iter_mut().find(|field| field.name == key) {
+            field.node = node;
+            return;
+        }
+
+        self.object.fields.push(ObjectField { name: key, node });
     }
 }
