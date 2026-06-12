@@ -61,9 +61,8 @@ impl<'a> JsonProtocolAdapter<'a> {
             None => vec![],
         };
 
-        let excluded_keys = query_selection.get_excluded_keys();
-
         let mut selection = Selection::new(field.name().clone(), None, arguments, Vec::new());
+        let mut excluded_keys: Option<Vec<String>> = None;
 
         for (selection_name, selected) in query_selection.into_selection() {
             match selected {
@@ -96,7 +95,8 @@ impl<'a> JsonProtocolAdapter<'a> {
                 }
                 // <field_name>: false
                 crate::SelectionSetValue::Shorthand(false) => {
-                    selection.push_nested_exclusion(selection_name);
+                    selection.push_nested_exclusion(selection_name.clone());
+                    excluded_keys.get_or_insert_with(Vec::new).push(selection_name);
                 }
                 // <field_name>: { selection: { ... }, arguments: { ... } }
                 crate::SelectionSetValue::Nested(nested_query) => {
