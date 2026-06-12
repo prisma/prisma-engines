@@ -20,16 +20,10 @@ transaction
                                 WHERE (1=1 AND "public"."User"."id" IN [$1,*])
                                 OFFSET $2»
                          params [var(0$userId as Int), const(BigInt(0))])
-         in let 1 = unique (validate (get 1)
+         in let 1 = validate (get 1)
                 [ rowCountNeq 0
-                ] orRaise "MISSING_RELATED_RECORD");
-                1$id = mapField id (get 1)
-            in let 2 = unique (query «SELECT "public"."User"."id" FROM
-                                      "public"."User" WHERE (1=1 AND
-                                      "public"."User"."id" IN [$1,*]) LIMIT $2
-                                      OFFSET $3»
-                               params [var(1$id as Int), const(BigInt(1)),
-                                       const(BigInt(0))])
+                ] orRaise "MISSING_RELATED_RECORD"
+            in let 2 = get 1
                in let 2$id = mapField id (get 2)
                   in let 3 = unique (query «SELECT
                                             "public"."NotificationSettings"."userId"
