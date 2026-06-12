@@ -786,10 +786,7 @@ impl QueryGraph {
 
                     for (_, sibling) in siblings {
                         let possible_edge = self.graph.find_edge(node.node_ix, sibling.node_ix);
-                        let is_if_node_child = self.incoming_edges(&sibling).into_iter().any(|edge| {
-                            let content = self.edge_content(&edge).unwrap();
-                            matches!(content, QueryGraphDependency::Then | QueryGraphDependency::Else)
-                        });
+                        let is_if_node_child = self.has_incoming_then_or_else_edge(&sibling);
 
                         if sibling != node
                             && possible_edge.is_none()
@@ -804,6 +801,15 @@ impl QueryGraph {
         }
 
         Ok(())
+    }
+
+    fn has_incoming_then_or_else_edge(&self, node: &NodeRef) -> bool {
+        self.graph.edges_directed(node.node_ix, Direction::Incoming).any(|edge| {
+            matches!(
+                edge.weight().borrow(),
+                Some(QueryGraphDependency::Then | QueryGraphDependency::Else)
+            )
+        })
     }
 
     /// Traverses the graph and ensures that return nodes have correct `ProjectedDataDependency`s on their incoming edges.
