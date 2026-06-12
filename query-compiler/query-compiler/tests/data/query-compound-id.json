@@ -1,0 +1,19 @@
+{
+  "modelName": "ParentModelWithCompositeId",
+  "action": "findUnique",
+  "query": {
+    "arguments": {
+      "relationLoadStrategy": "query",
+      "where": {
+        "a_b": {
+          "a": 1,
+          "b": 1
+        }
+      }
+    },
+    "selection": {
+      "$composites": true,
+      "$scalars": true
+    }
+  }
+}
