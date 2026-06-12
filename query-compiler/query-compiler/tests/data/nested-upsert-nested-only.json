@@ -1,0 +1,43 @@
+{
+  "modelName": "User",
+  "action": "updateOne",
+  "query": {
+    "arguments": {
+      "relationLoadStrategy": "query",
+      "where": { "email": "user.1737556028164@prisma.io" },
+      "data": {
+        "posts": {
+          "upsert": {
+            "where": { "id": 11 },
+            "update": {
+              "categories": {
+                "connect": { "id": 10 }
+              }
+            },
+            "create": {
+              "title": "Nested upsert created post",
+              "categories": {
+                "connect": { "id": 10 }
+              }
+            }
+          }
+        }
+      }
+    },
+    "selection": {
+      "$composites": true,
+      "$scalars": true,
+      "posts": {
+        "arguments": {},
+        "selection": {
+          "$composites": true,
+          "$scalars": true,
+          "categories": {
+            "arguments": {},
+            "selection": { "$composites": true, "$scalars": true }
+          }
+        }
+      }
+    }
+  }
+}
