@@ -108,34 +108,51 @@ fn handle_many_to_many(
         let create_map: ParsedInputMap<'_> = create_arg.try_into()?;
 
         let filter = extract_unique_filter(where_map, child_model)?;
+        let child_model_identifier = child_model.shard_aware_primary_identifier();
         let read_node = graph.create_node(utils::read_id_infallible(
             child_model.clone(),
-            child_model.shard_aware_primary_identifier(),
+            child_model_identifier.clone(),
             filter,
         ));
 
         let create_node = create::create_record_node(graph, query_schema, child_model.clone(), create_map)?;
         let if_node = graph.create_node(Flow::if_non_empty());
-
-        let connect_exists_node =
-            connect::connect_records_node(graph, &parent_node, &read_node, parent_relation_field, 1)?;
-
-        let _connect_create_node =
-            connect::connect_records_node(graph, &parent_node, &create_node, parent_relation_field, 1)?;
+        let return_existing = graph.create_node(Flow::Return(None));
+        let return_create = graph.create_node(Flow::Return(None));
 
         graph.create_edge(&parent_node, &read_node, QueryGraphDependency::ExecutionOrder)?;
         graph.create_edge(
             &read_node,
             &if_node,
             QueryGraphDependency::ProjectedDataDependency(
-                child_model.shard_aware_primary_identifier(),
+                child_model_identifier.clone(),
                 RowSink::ProjectedPlaceholder(&IfInput),
                 None,
             ),
         )?;
 
-        graph.create_edge(&if_node, &connect_exists_node, QueryGraphDependency::Then)?;
+        graph.create_edge(&if_node, &return_existing, QueryGraphDependency::Then)?;
         graph.create_edge(&if_node, &create_node, QueryGraphDependency::Else)?;
+        graph.create_edge(
+            &read_node,
+            &return_existing,
+            QueryGraphDependency::ProjectedDataDependency(
+                child_model_identifier.clone(),
+                RowSink::ProjectedPlaceholder(&ReturnInput),
+                None,
+            ),
+        )?;
+        graph.create_edge(
+            &create_node,
+            &return_create,
+            QueryGraphDependency::ProjectedDataDependency(
+                child_model_identifier,
+                RowSink::ProjectedPlaceholder(&ReturnInput),
+                None,
+            ),
+        )?;
+
+        connect::connect_records_node(graph, &parent_node, &if_node, parent_relation_field, 1)?;
     }
 
     Ok(())
