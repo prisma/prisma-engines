@@ -117,22 +117,38 @@ fn handle_many_to_many(
 
         let create_node = create::create_record_node(graph, query_schema, child_model.clone(), create_map)?;
         let if_node = graph.create_node(Flow::if_non_empty());
-
-        let connect_exists_node =
-            connect::connect_records_node(graph, &parent_node, &read_node, parent_relation_field, 1)?;
-
-        let _connect_create_node =
-            connect::connect_records_node(graph, &parent_node, &create_node, parent_relation_field, 1)?;
+        let return_existing = graph.create_node(Flow::Return(Vec::new()));
+        let return_create = graph.create_node(Flow::Return(Vec::new()));
 
         graph.create_edge(&parent_node, &read_node, QueryGraphDependency::ExecutionOrder)?;
         graph.create_edge(
             &read_node,
             &if_node,
-            QueryGraphDependency::ProjectedDataDependency(child_model_identifier, RowSink::All(&IfInput), None),
+            QueryGraphDependency::ProjectedDataDependency(
+                child_model_identifier.clone(),
+                RowSink::All(&IfInput),
+                None,
+            ),
         )?;
 
-        graph.create_edge(&if_node, &connect_exists_node, QueryGraphDependency::Then)?;
+        graph.create_edge(&if_node, &return_existing, QueryGraphDependency::Then)?;
         graph.create_edge(&if_node, &create_node, QueryGraphDependency::Else)?;
+        graph.create_edge(
+            &read_node,
+            &return_existing,
+            QueryGraphDependency::ProjectedDataDependency(
+                child_model_identifier.clone(),
+                RowSink::All(&ReturnInput),
+                None,
+            ),
+        )?;
+        graph.create_edge(
+            &create_node,
+            &return_create,
+            QueryGraphDependency::ProjectedDataDependency(child_model_identifier, RowSink::All(&ReturnInput), None),
+        )?;
+
+        connect::connect_records_node(graph, &parent_node, &if_node, parent_relation_field, 1)?;
     }
 
     Ok(())
