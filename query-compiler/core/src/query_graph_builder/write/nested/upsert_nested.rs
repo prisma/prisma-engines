@@ -1,6 +1,9 @@
 use super::*;
-use crate::inputs::{IfInput, UpdateManyRecordsSelectorsInput, UpdateOrCreateArgsInput, UpdateRecordSelectorsInput};
+use crate::inputs::{
+    IfInput, ReturnInput, UpdateManyRecordsSelectorsInput, UpdateOrCreateArgsInput, UpdateRecordSelectorsInput,
+};
 use crate::query_graph_builder::write::utils::coerce_values;
+use crate::query_graph_builder::write::write_args_parser::WriteArgsParser;
 use crate::{DataExpectation, RowSink};
 use crate::{
     ParsedInputMap, ParsedInputValue,
@@ -138,14 +141,9 @@ pub fn nested_upsert(
         let if_node = graph.create_node(Flow::if_non_empty());
         let create_node =
             create::create_record_node(graph, query_schema, child_model.clone(), create_input.try_into()?)?;
-        let update_node = update::update_record_node(
-            graph,
-            query_schema,
-            filter.clone(),
-            child_model.clone(),
-            update_input.try_into()?,
-            None,
-        )?;
+        let update_map: ParsedInputMap<'_> = update_input.try_into()?;
+        let update_args = WriteArgsParser::from(&child_model, update_map)?;
+        let is_nested_only_update = update_args.args.is_empty() && !update_args.nested.is_empty();
 
         graph.create_edge(
             &read_children_node,
@@ -153,41 +151,77 @@ pub fn nested_upsert(
             QueryGraphDependency::ProjectedDataDependency(child_model_identifier.clone(), RowSink::All(&IfInput), None),
         )?;
 
-        graph.create_edge(
-            &read_children_node,
-            &update_node,
-            QueryGraphDependency::ProjectedDataDependency(
-                child_model_identifier.clone(),
-                RowSink::ExactlyOne(&UpdateRecordSelectorsInput),
-                Some(DataExpectation::non_empty_rows(
-                    MissingRelatedRecord::builder()
-                        .model(&child_model)
-                        .relation(&parent_relation_field.relation())
-                        .needed_for(DependentOperation::nested_update())
-                        .operation(DataOperation::NestedUpsert)
-                        .build(),
-                )),
-            ),
-        )?;
+        let then_node = if is_nested_only_update {
+            let return_node = graph.create_node(Flow::Return(Vec::new()));
 
-        // In case the connector doesn't support referential integrity, we add a subtree to the graph that emulates the ON_UPDATE referential action.
-        // When that's the case, we create an intermediary node to which we connect all the nodes reponsible for emulating the referential action
-        // Then, we connect the if node to that intermediary emulation node. This enables performing the emulation only in case the graph traverses
-        // the update path (if the children already exists and goes to the THEN node).
-        // It's only after we've executed the emulation that it'll traverse the update node, hence the ExecutionOrder between
-        // the emulation node and the update node.
-        let then_node = if let Some(emulation_node) = utils::insert_emulated_on_update_with_intermediary_node(
-            graph,
-            query_schema,
-            &child_model,
-            &read_children_node,
-            &update_node,
-        )? {
-            graph.create_edge(&emulation_node, &update_node, QueryGraphDependency::ExecutionOrder)?;
+            graph.create_edge(
+                &read_children_node,
+                &return_node,
+                QueryGraphDependency::ProjectedDataDependency(
+                    child_model_identifier.clone(),
+                    RowSink::All(&ReturnInput),
+                    Some(DataExpectation::non_empty_rows(
+                        MissingRelatedRecord::builder()
+                            .model(&child_model)
+                            .relation(&parent_relation_field.relation())
+                            .needed_for(DependentOperation::nested_update())
+                            .operation(DataOperation::NestedUpsert)
+                            .build(),
+                    )),
+                ),
+            )?;
 
-            emulation_node
+            for (relation_field, data_map) in update_args.nested {
+                connect_nested_query(graph, query_schema, return_node, relation_field, data_map)?;
+            }
+
+            return_node
         } else {
-            update_node
+            let update_node = update::update_record_node_from_args(
+                graph,
+                query_schema,
+                filter.clone(),
+                child_model.clone(),
+                update_args,
+                None,
+            )?;
+
+            graph.create_edge(
+                &read_children_node,
+                &update_node,
+                QueryGraphDependency::ProjectedDataDependency(
+                    child_model_identifier.clone(),
+                    RowSink::ExactlyOne(&UpdateRecordSelectorsInput),
+                    Some(DataExpectation::non_empty_rows(
+                        MissingRelatedRecord::builder()
+                            .model(&child_model)
+                            .relation(&parent_relation_field.relation())
+                            .needed_for(DependentOperation::nested_update())
+                            .operation(DataOperation::NestedUpsert)
+                            .build(),
+                    )),
+                ),
+            )?;
+
+            // In case the connector doesn't support referential integrity, we add a subtree to the graph that emulates the ON_UPDATE referential action.
+            // When that's the case, we create an intermediary node to which we connect all the nodes reponsible for emulating the referential action
+            // Then, we connect the if node to that intermediary emulation node. This enables performing the emulation only in case the graph traverses
+            // the update path (if the children already exists and goes to the THEN node).
+            // It's only after we've executed the emulation that it'll traverse the update node, hence the ExecutionOrder between
+            // the emulation node and the update node.
+            if let Some(emulation_node) = utils::insert_emulated_on_update_with_intermediary_node(
+                graph,
+                query_schema,
+                &child_model,
+                &read_children_node,
+                &update_node,
+            )? {
+                graph.create_edge(&emulation_node, &update_node, QueryGraphDependency::ExecutionOrder)?;
+
+                emulation_node
+            } else {
+                update_node
+            }
         };
 
         graph.create_edge(&if_node, &then_node, QueryGraphDependency::Then)?;
