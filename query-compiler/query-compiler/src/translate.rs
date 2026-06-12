@@ -43,6 +43,7 @@ pub fn translate(mut graph: QueryGraph, builder: &dyn QueryBuilder) -> Translate
     let mut enums = EnumsMap::new();
     let mut result_node_builder = ResultNodeBuilder::new(&mut enums);
     let structure = map_result_structure(&graph, &mut result_node_builder);
+    let result_reachability = ResultReachability::new(&graph);
 
     // Must collect the root nodes first, because the following iteration is mutating the graph
     let root_nodes = {
@@ -62,10 +63,12 @@ pub fn translate(mut graph: QueryGraph, builder: &dyn QueryBuilder) -> Translate
 
     let root = match root_nodes {
         RootNodes::None => Expression::Seq(Vec::new()),
-        RootNodes::One(node) => NodeTranslator::new(&mut graph, node, &[], builder).translate()?,
+        RootNodes::One(node) => {
+            NodeTranslator::new(&mut graph, node, &[], builder, &result_reachability).translate()?
+        }
         RootNodes::Many(nodes) => nodes
             .into_iter()
-            .map(|node| NodeTranslator::new(&mut graph, node, &[], builder).translate())
+            .map(|node| NodeTranslator::new(&mut graph, node, &[], builder, &result_reachability).translate())
             .collect::<TranslateResult<Vec<_>>>()
             .map(Expression::Seq)?,
     };
@@ -87,11 +90,55 @@ pub fn translate(mut graph: QueryGraph, builder: &dyn QueryBuilder) -> Translate
     Ok(root)
 }
 
+struct ResultReachability {
+    can_reach_result: Vec<bool>,
+}
+
+impl ResultReachability {
+    fn new(graph: &QueryGraph) -> Self {
+        let mut can_reach_result = Vec::new();
+        let mut pending = graph.result_nodes().collect::<Vec<_>>();
+
+        for node in &pending {
+            Self::mark_reachable(&mut can_reach_result, *node);
+        }
+
+        while let Some(node) = pending.pop() {
+            for parent in graph.parent_nodes(&node) {
+                if Self::mark_reachable(&mut can_reach_result, parent) {
+                    pending.push(parent);
+                }
+            }
+        }
+
+        Self { can_reach_result }
+    }
+
+    fn contains(&self, node: &NodeRef) -> bool {
+        self.can_reach_result.get(node.index()).copied().unwrap_or(false)
+    }
+
+    fn mark_reachable(can_reach_result: &mut Vec<bool>, node: NodeRef) -> bool {
+        let index = node.index();
+        if index >= can_reach_result.len() {
+            can_reach_result.resize(index + 1, false);
+        }
+
+        if can_reach_result[index] {
+            false
+        } else {
+            can_reach_result[index] = true;
+            true
+        }
+    }
+}
+
 struct NodeTranslator<'a, 'b> {
     graph: &'a mut QueryGraph,
     node: NodeRef,
     parent_edges: &'b [EdgeRef],
     query_builder: &'b dyn QueryBuilder,
+    result_reachability: &'b ResultReachability,
 }
 
 impl<'a, 'b> NodeTranslator<'a, 'b> {
@@ -100,12 +147,14 @@ impl<'a, 'b> NodeTranslator<'a, 'b> {
         node: NodeRef,
         parent_edges: &'b [EdgeRef],
         query_builder: &'b dyn QueryBuilder,
+        result_reachability: &'b ResultReachability,
     ) -> Self {
         Self {
             graph,
             node,
             parent_edges,
             query_builder,
+            result_reachability,
         }
     }
 
@@ -359,7 +408,7 @@ impl<'a, 'b> NodeTranslator<'a, 'b> {
             .iter()
             .enumerate()
             .filter_map(|(idx, (_, child_node))| {
-                if self.graph.subgraph_contains_result(child_node) {
+                if self.result_reachability.contains(child_node) {
                     Some(idx)
                 } else {
                     None
@@ -510,7 +559,14 @@ impl<'a, 'b> NodeTranslator<'a, 'b> {
             .collect::<Vec<_>>();
 
         // translate plucks the edges coming into node, we need to avoid accessing it afterwards
-        let expr = NodeTranslator::new(self.graph, node, &incoming_edges, self.query_builder).translate()?;
+        let expr = NodeTranslator::new(
+            self.graph,
+            node,
+            &incoming_edges,
+            self.query_builder,
+            self.result_reachability,
+        )
+        .translate()?;
 
         if bindings.is_empty() && validations.is_empty() {
             return Ok(expr);

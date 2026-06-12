@@ -513,6 +513,13 @@ impl QueryGraph {
         self.collect_edges(node, Direction::Incoming)
     }
 
+    /// Returns parent nodes without allocating or sorting edge refs.
+    pub fn parent_nodes(&self, node: &NodeRef) -> impl Iterator<Item = NodeRef> + '_ {
+        self.graph
+            .edges_directed(node.node_ix, Direction::Incoming)
+            .map(|edge| NodeRef { node_ix: edge.source() })
+    }
+
     /// Removes the edge from the graph but leaves the graph intact by keeping the empty
     /// edge in the graph by plucking the content of the edge, but not the edge itself.
     /// Panics if the edge has been already been taken or plucked.
