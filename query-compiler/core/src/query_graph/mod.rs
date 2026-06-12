@@ -530,6 +530,22 @@ impl QueryGraph {
             .map(|edge| NodeRef { node_ix: edge.source() })
     }
 
+    fn outgoing_projected_data_dependencies(&self, node: &NodeRef) -> impl Iterator<Item = &FieldSelection> {
+        self.graph
+            .edges_directed(node.node_ix, Direction::Outgoing)
+            .filter_map(|edge| match edge.weight().borrow() {
+                Some(QueryGraphDependency::ProjectedDataDependency(requested_selection, _, _)) => Some(requested_selection),
+                _ => None,
+            })
+    }
+
+    fn incoming_projected_data_dependency_edge(&self, node: &NodeRef) -> Option<EdgeRef> {
+        self.graph
+            .edges_directed(node.node_ix, Direction::Incoming)
+            .find(|edge| matches!(edge.weight().borrow(), Some(QueryGraphDependency::ProjectedDataDependency(_, _, _))))
+            .map(|edge| EdgeRef { edge_ix: edge.id() })
+    }
+
     /// Removes the edge from the graph but leaves the graph intact by keeping the empty
     /// edge in the graph by plucking the content of the edge, but not the edge itself.
     /// Panics if the edge has been already been taken or plucked.
@@ -846,26 +862,12 @@ impl QueryGraph {
             .collect();
 
         for return_node in return_nodes {
-            let out_edges = self.outgoing_edges(&return_node);
-            let dependencies = FieldSelection::union_iter(out_edges.into_iter().filter_map(|edge| {
-                if let QueryGraphDependency::ProjectedDataDependency(requested_selection, _, _) =
-                    self.edge_content(&edge).unwrap()
-                {
-                    Some(requested_selection.clone())
-                } else {
-                    None
-                }
-            }));
+            let dependencies =
+                FieldSelection::union_iter(self.outgoing_projected_data_dependencies(&return_node).cloned());
 
             // Assumption: We currently always have at most one single incoming ProjectedDataDependency edge
             // connected to return nodes. This will break if we ever have more.
-            let in_edges = self.incoming_edges(&return_node);
-            let incoming_dep_edge = in_edges.into_iter().find(|edge| {
-                matches!(
-                    self.edge_content(edge),
-                    Some(QueryGraphDependency::ProjectedDataDependency(_, _, _))
-                )
-            });
+            let incoming_dep_edge = self.incoming_projected_data_dependency_edge(&return_node);
 
             if let Some(incoming_edge) = incoming_dep_edge {
                 let source = self.edge_source(&incoming_edge);
@@ -1085,18 +1087,10 @@ impl QueryGraph {
                 let node = NodeRef { node_ix: ix };
 
                 if let Node::Query(q) = self.node_content(&node).unwrap() {
-                    let edges = self.outgoing_edges(&node);
-                    let mut unsatisfied_dependencies =
-                        edges
-                            .into_iter()
-                            .filter_map(|edge| match self.edge_content(&edge).unwrap() {
-                                QueryGraphDependency::ProjectedDataDependency(requested_selection, _, _)
-                                    if !q.satisfies(requested_selection) =>
-                                {
-                                    Some(requested_selection.clone())
-                                }
-                                _ => None,
-                            });
+                    let mut unsatisfied_dependencies = self
+                        .outgoing_projected_data_dependencies(&node)
+                        .filter(|requested_selection| !q.satisfies(requested_selection))
+                        .cloned();
 
                     let first = unsatisfied_dependencies.next()?;
                     Some((
