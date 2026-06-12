@@ -969,7 +969,7 @@ impl QueryGraph {
             let primary_model_id = model.shard_aware_primary_identifier();
 
             let read_query = ReadQuery::ManyRecordsQuery(ManyRecordsQuery {
-                name: "reload".into(),
+                name: String::new(),
                 alias: None,
                 model: model.clone(),
                 args: QueryArguments::new(model),
