@@ -7,7 +7,7 @@ use crate::expression::EnumsMap;
 use crate::result_node::ResultNodeBuilder;
 use crate::{Expression::Transaction, selection::SelectionResults};
 use itertools::{Either, Itertools};
-use query::translate_query;
+use query::{query_guarantees_raw_nested_read_root, translate_query};
 use query_builder::QueryBuilder;
 use query_core::{
     Computation, EdgeRef, Flow, Node, NodeRef, Query, QueryGraph, QueryGraphBuilderError, QueryGraphDependency,
@@ -33,18 +33,13 @@ pub enum TranslateError {
 
 pub type TranslateResult<T> = Result<T, TranslateError>;
 
+enum RootNodes {
+    None,
+    One(NodeRef),
+    Many(Vec<NodeRef>),
+}
+
 pub fn translate(mut graph: QueryGraph, builder: &dyn QueryBuilder) -> TranslateResult<Expression> {
-    enum RootNodes {
-        None,
-        One(NodeRef),
-        Many(Vec<NodeRef>),
-    }
-
-    let mut enums = EnumsMap::new();
-    let mut result_node_builder = ResultNodeBuilder::new(&mut enums);
-    let structure = map_result_structure(&graph, &mut result_node_builder);
-    let result_reachability = ResultReachability::new(&graph);
-
     // Must collect the root nodes first, because the following iteration is mutating the graph
     let root_nodes = {
         let mut nodes = graph.root_nodes();
@@ -61,6 +56,16 @@ pub fn translate(mut graph: QueryGraph, builder: &dyn QueryBuilder) -> Translate
         }
     };
 
+    let skip_result_mapping = root_guarantees_raw_nested_read(&graph, &root_nodes);
+    let mut enums = EnumsMap::new();
+    let mut result_node_builder = ResultNodeBuilder::new(&mut enums);
+    let structure = if skip_result_mapping {
+        None
+    } else {
+        map_result_structure(&graph, &mut result_node_builder)
+    };
+    let result_reachability = ResultReachability::new(&graph);
+
     let root = match root_nodes {
         RootNodes::None => Expression::Seq(Vec::new()),
         RootNodes::One(node) => {
@@ -72,6 +77,14 @@ pub fn translate(mut graph: QueryGraph, builder: &dyn QueryBuilder) -> Translate
             .collect::<TranslateResult<Vec<_>>>()
             .map(Expression::Seq)?,
     };
+
+    if skip_result_mapping && !matches!(root, Expression::RawNestedRead { .. }) {
+        return Err(TranslateError::GraphBuildError(
+            QueryGraphBuilderError::QueryGraphError(QueryGraphError::InvariantViolation(
+                "raw nested read preflight did not produce a raw nested read".into(),
+            )),
+        ));
+    }
 
     let mut root = if let Some(structure) = structure {
         if matches!(root, Expression::RawNestedRead { .. }) {
@@ -92,6 +105,18 @@ pub fn translate(mut graph: QueryGraph, builder: &dyn QueryBuilder) -> Translate
         return Ok(Transaction(Box::new(root)));
     }
     Ok(root)
+}
+
+fn root_guarantees_raw_nested_read(graph: &QueryGraph, root_nodes: &RootNodes) -> bool {
+    let RootNodes::One(node) = root_nodes else {
+        return false;
+    };
+
+    let Some(Node::Query(query)) = graph.node_content(node) else {
+        return false;
+    };
+
+    query_guarantees_raw_nested_read_root(query)
 }
 
 struct ResultReachability {

@@ -8,7 +8,7 @@ use crate::{
     translate::TranslateResult,
 };
 use itertools::Itertools;
-use query_builder::{ConditionalLink, DbQuery, QueryBuilder, RelationLinkage};
+use query_builder::{ConditionalLink, DbQuery, QueryArgumentsExt, QueryBuilder, RelationLinkage};
 use query_core::{
     AggregateRecordsQuery, DataExpectation, DataOperation, MissingRecord, QueryGraphBuilderError, QueryOption,
     QueryOptions, ReadQuery, RelatedRecordsQuery,
@@ -156,6 +156,141 @@ pub(crate) fn translate_read_query(query: ReadQuery, builder: &dyn QueryBuilder)
             }
         }
     })
+}
+
+pub(crate) fn guarantees_raw_nested_read_root(query: &ReadQuery) -> bool {
+    match query {
+        ReadQuery::RecordQuery(rq) => {
+            rq.relation_load_strategy == RelationLoadStrategy::Query
+                && !rq.nested.is_empty()
+                && !rq.options.contains(QueryOption::ThrowOnEmpty)
+                && rq.filter.as_ref().is_some_and(filter_cannot_chunk)
+                && raw_result_mapping_supported(&rq.selected_fields, &rq.selection_order)
+                && raw_nested_relations_supported(&rq.nested, &rq.selected_fields, true)
+        }
+        ReadQuery::ManyRecordsQuery(mrq) => {
+            if mrq.args.take == Take::Some(0) {
+                return false;
+            }
+
+            mrq.relation_load_strategy == RelationLoadStrategy::Query
+                && !mrq.nested.is_empty()
+                && root_in_memory_ops_empty(&mrq.args)
+                && !mrq.options.contains(QueryOption::ThrowOnEmpty)
+                && args_cannot_chunk(&mrq.args)
+                && raw_result_mapping_supported(&mrq.selected_fields, &mrq.selection_order)
+                && raw_nested_relations_supported(
+                    &mrq.nested,
+                    &mrq.selected_fields,
+                    matches!(mrq.args.take, Take::One | Take::NegativeOne),
+                )
+        }
+        ReadQuery::RelatedRecordsQuery(_) | ReadQuery::AggregateRecordsQuery(_) => false,
+    }
+}
+
+fn root_in_memory_ops_empty(args: &QueryArguments) -> bool {
+    !args.needs_reversed_order()
+        && !args.requires_inmemory_pagination(RelationLoadStrategy::Query)
+        && !args.requires_inmemory_distinct(RelationLoadStrategy::Query)
+}
+
+fn raw_nested_relations_supported(
+    nested: &[ReadQuery],
+    parent_selected_fields: &FieldSelection,
+    has_unique_parent: bool,
+) -> bool {
+    nested.iter().all(|nested| {
+        let ReadQuery::RelatedRecordsQuery(rrq) = nested else {
+            return false;
+        };
+
+        let Some(parent_scalar) = rrq.parent_field.single_left_scalar() else {
+            return false;
+        };
+
+        selected_fields_contain_db_name(parent_selected_fields, parent_scalar.db_name())
+            && get_single_relation_scalar_for_filters(&rrq.parent_field).is_some()
+            && raw_related_records_supported(rrq, has_unique_parent)
+    })
+}
+
+fn raw_related_records_supported(rrq: &RelatedRecordsQuery, has_unique_parent: bool) -> bool {
+    if rrq.args.take == Take::Some(0)
+        || rrq.parent_results.is_some()
+        || !args_cannot_chunk(&rrq.args)
+        || !raw_nested_relation_operations_may_be_supported(&rrq.args, has_unique_parent)
+        || !raw_result_mapping_supported(&rrq.selected_fields, &rrq.selection_order)
+    {
+        return false;
+    }
+
+    let is_many_to_many = rrq.parent_field.relation().is_many_to_many();
+    let Some(child_scalar) = get_single_relation_scalar_for_filters(&rrq.parent_field) else {
+        return false;
+    };
+
+    if !is_many_to_many && !selected_fields_contain_db_name(&rrq.selected_fields, child_scalar.db_name()) {
+        return false;
+    }
+
+    let child_has_unique_parent = has_unique_parent && !is_many_to_many && !rrq.parent_field.arity().is_list();
+    raw_nested_relations_supported(&rrq.nested, &rrq.selected_fields, child_has_unique_parent)
+}
+
+fn raw_nested_relation_operations_may_be_supported(args: &QueryArguments, has_unique_parent: bool) -> bool {
+    if args.needs_reversed_order() {
+        return false;
+    }
+
+    let needs_pagination = args.take.is_some() || args.skip.is_some() || args.cursor.is_some();
+    let must_paginate_in_memory =
+        needs_pagination && (!has_unique_parent || args.requires_inmemory_processing(RelationLoadStrategy::Query));
+    if must_paginate_in_memory && args.cursor.is_some() {
+        return false;
+    }
+
+    let needs_distinct = args.distinct.is_some();
+    let must_distinct_in_memory =
+        needs_distinct && (!has_unique_parent || args.requires_inmemory_distinct(RelationLoadStrategy::Query));
+
+    !must_distinct_in_memory
+}
+
+fn args_cannot_chunk(args: &QueryArguments) -> bool {
+    args.filter.as_ref().is_none_or(filter_cannot_chunk)
+}
+
+fn filter_cannot_chunk(filter: &Filter) -> bool {
+    !filter.should_batch(1)
+}
+
+fn raw_result_mapping_supported(selected_fields: &FieldSelection, selection_order: &[String]) -> bool {
+    if selected_fields
+        .selections()
+        .any(|field| matches!(field, SelectedField::Composite(_)))
+    {
+        return false;
+    }
+
+    selection_order.iter().all(|prisma_name| {
+        let Some(selection) = selected_fields
+            .selections()
+            .filter(|field| !matches!(field, SelectedField::Relation(_)))
+            .find(|field| field.prisma_name_grouping_virtuals() == prisma_name.as_str())
+        else {
+            return true;
+        };
+
+        selection.type_info().is_some()
+    })
+}
+
+fn selected_fields_contain_db_name(selected_fields: &FieldSelection, db_name: &str) -> bool {
+    selected_fields
+        .selections()
+        .filter(|field| !matches!(field, SelectedField::Relation(_)))
+        .any(|field| field.db_name().as_ref() == db_name)
 }
 
 pub(super) fn add_inmemory_join(
