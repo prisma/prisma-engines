@@ -23,7 +23,7 @@ pub fn extract_unique_filter(value_map: ParsedInputMap<'_>, model: &Model) -> Qu
             .fields()
             .find_from_scalar(field_name)
             .is_ok_and(|field| field.unique())
-            || utils::resolve_compound_field(field_name, model).is_some()
+            || utils::is_compound_field(field_name, model)
     }) {
         return internal_extract_unique_filter(value_map, model);
     }
@@ -36,7 +36,7 @@ pub fn extract_unique_filter(value_map: ParsedInputMap<'_>, model: &Model) -> Qu
             .into_iter()
             .partition(|(field_name, _)| match model.fields().find_from_scalar(field_name) {
                 Ok(field) => field.unique(),
-                Err(_) => utils::resolve_compound_field(field_name, model).is_some(),
+                Err(_) => utils::is_compound_field(field_name, model),
             });
     let mut unique_map = ParsedInputMap::from(unique_map);
     let mut rest_map = ParsedInputMap::from(rest_map);
