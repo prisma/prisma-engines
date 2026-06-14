@@ -170,10 +170,14 @@ impl<'a> ScalarFieldPair<'a> {
                 // and SRID surface as the `@db.Geometry(...)` / `@db.Geography(...)` native
                 // attribute, just like every other parametrized scalar.
                 PostgisSpatialKind::Geometry => {
-                    return Some(ScalarFieldType::BuiltInScalar(psl::parser_database::ScalarType::Geometry));
+                    return Some(ScalarFieldType::BuiltInScalar(
+                        psl::parser_database::ScalarType::Geometry,
+                    ));
                 }
                 PostgisSpatialKind::Geography => {
-                    return Some(ScalarFieldType::BuiltInScalar(psl::parser_database::ScalarType::Geography));
+                    return Some(ScalarFieldType::BuiltInScalar(
+                        psl::parser_database::ScalarType::Geography,
+                    ));
                 }
             },
             sql::ColumnTypeFamily::Udt(_) => {

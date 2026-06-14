@@ -9,10 +9,7 @@ use enumflags2::bitflags;
 use rustc_hash::FxHashMap as HashMap;
 use schema_ast::ast::{self, EnumValueId, WithName};
 use serde::{Deserialize, Serialize};
-use std::{
-    collections::BTreeMap,
-    fmt,
-};
+use std::{collections::BTreeMap, fmt};
 
 pub(super) fn resolve_types(ctx: &mut Context<'_>) {
     for ((file_id, top_id), top) in ctx.iter_tops() {
@@ -963,7 +960,6 @@ fn field_type<'db>(field: &'db ast::Field, ctx: &mut Context<'db>) -> Result<Fie
             if let Some(tpe) = ScalarType::try_from_str(supported, false) {
                 return Ok(FieldType::Scalar(ScalarFieldType::BuiltInScalar(tpe)));
             }
-
 
             let supported_string_id = ctx.interner.intern(supported);
             match ctx

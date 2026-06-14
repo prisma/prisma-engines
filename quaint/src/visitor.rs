@@ -1279,7 +1279,6 @@ pub trait Visitor<'a> {
             FunctionType::Stringify(stringify) => {
                 self.visit_stringify(stringify)?;
             }
-            #[cfg(feature = "postgresql")]
             FunctionType::Postgis(postgis) => {
                 let name = postgis.name;
                 let args = postgis.args;

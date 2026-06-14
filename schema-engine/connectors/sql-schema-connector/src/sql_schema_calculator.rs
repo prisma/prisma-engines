@@ -642,9 +642,7 @@ fn push_column_for_builtin_scalar_type(
         // PostGIS scalars are dispatched by `push_column_for_scalar_field` to their own
         // helper (`push_column_for_geometry_field`); reaching here would be a routing bug.
         ScalarType::Geometry | ScalarType::Geography => {
-            unreachable!(
-                "PostGIS scalar types must be dispatched through push_column_for_geometry_field"
-            )
+            unreachable!("PostGIS scalar types must be dispatched through push_column_for_geometry_field")
         }
     };
 

@@ -11,7 +11,6 @@ use psl::{
 };
 use query_structure::{DefaultKind, FieldArity, PrismaValue, dml_default_kind, encode_bytes};
 
-
 pub(crate) fn schema_to_dmmf(schema: &psl::ValidatedSchema) -> Datamodel {
     let mut datamodel = Datamodel {
         models: Vec::with_capacity(schema.db.models_count()),
