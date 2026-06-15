@@ -13,15 +13,15 @@ model Location {
   bad_planar  Geometry  @db.Geography(Point, 4326)
   bad_geodetic Geography @db.Geometry(Point, 4326)
 }
-// error: Native type Geography is not compatible with declared field type Geometry, expected field type Geography.
-//   -->  schema.prisma:13
-//    | 
-// 12 |   id          Int       @id
-// 13 |   bad_planar  Geometry  @db.Geography(Point, 4326)
-//    | 
-// error: Native type Geometry is not compatible with declared field type Geography, expected field type Geometry.
-//   -->  schema.prisma:14
-//    | 
-// 13 |   bad_planar  Geometry  @db.Geography(Point, 4326)
-// 14 |   bad_geodetic Geography @db.Geometry(Point, 4326)
-//    | 
+// [1;91merror[0m: [1mNative type Geography is not compatible with declared field type Geometry, expected field type Geography.[0m
+//   [1;94m-->[0m  [4mschema.prisma:13[0m
+// [1;94m   | [0m
+// [1;94m12 | [0m  id          Int       @id
+// [1;94m13 | [0m  bad_planar  Geometry  [1;91m@db.Geography(Point, 4326)[0m
+// [1;94m   | [0m
+// [1;91merror[0m: [1mNative type Geometry is not compatible with declared field type Geography, expected field type Geometry.[0m
+//   [1;94m-->[0m  [4mschema.prisma:14[0m
+// [1;94m   | [0m
+// [1;94m13 | [0m  bad_planar  Geometry  @db.Geography(Point, 4326)
+// [1;94m14 | [0m  bad_geodetic Geography [1;91m@db.Geometry(Point, 4326)[0m
+// [1;94m   | [0m
