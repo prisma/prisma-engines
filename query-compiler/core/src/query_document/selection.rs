@@ -186,6 +186,10 @@ impl QueryFilters {
         self.0.len() > 1
     }
 
+    pub fn has_no_keys(&self) -> bool {
+        self.0.is_empty()
+    }
+
     pub fn get_single_key(&self) -> Option<&(String, ArgumentValue)> {
         self.0.first()
     }
@@ -204,13 +208,26 @@ pub struct QuerySingle(String, Vec<ArgumentValue>);
 
 impl QuerySingle {
     /// Attempt at building a single query filter from multiple query filters.
-    /// Returns `None` if one of the query filters have more than one key.
+    /// Returns `None` if the input is empty, if any of the query filters carry
+    /// more than one key, or if any of them carry zero keys.
+    ///
+    /// The zero-keys case fires when the TS client batches concurrent
+    /// `findUnique` calls and at least one of them has an `undefined` unique
+    /// value: validation catches that on the single-query path but the
+    /// batched path strips `undefined` keys and arrives here with an empty
+    /// `QueryFilters`. Falling through to `first.get_single_key().unwrap()`
+    /// in that state panicked on every batched concurrent call and took out
+    /// every other request sharing the batch window. See
+    /// https://github.com/prisma/prisma/issues/29642.
     pub fn new(query_filters: &[QueryFilters]) -> Option<Self> {
         if query_filters.is_empty() {
             return None;
         }
 
-        if query_filters.iter().any(|query_filters| query_filters.has_many_keys()) {
+        if query_filters
+            .iter()
+            .any(|query_filters| query_filters.has_many_keys() || query_filters.has_no_keys())
+        {
             return None;
         }
 
@@ -398,4 +415,65 @@ fn single_to_multi_filter(obj: ArgumentValueObject) -> ArgumentValueObject {
     }
 
     new_obj
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::ArgumentValue;
+
+    fn make_filter(pairs: &[(&str, i64)]) -> QueryFilters {
+        QueryFilters(
+            pairs
+                .iter()
+                .map(|(k, v)| ((*k).to_owned(), ArgumentValue::int(*v)))
+                .collect(),
+        )
+    }
+
+    // Regression for https://github.com/prisma/prisma/issues/29642.
+    //
+    // When the TS client batches concurrent `findUnique` calls and at least
+    // one has an `undefined` unique value, the value is stripped and the
+    // batched path arrives at `QuerySingle::new` with one or more empty
+    // `QueryFilters`. Before the fix, `has_many_keys()` was the only
+    // pre-condition checked, so empty filters fell through to
+    // `first.get_single_key().unwrap()` and panicked, taking out every other
+    // request sharing the batch window as collateral. Now they return None,
+    // which `SelectionSet::new` maps to `SelectionSet::Many(filters)` (or
+    // `SelectionSet::Empty` for the all-empty case) without panicking.
+    #[test]
+    fn query_single_new_returns_none_for_empty_filter_instead_of_panicking() {
+        let filters = vec![QueryFilters(Vec::new())];
+        assert!(QuerySingle::new(&filters).is_none());
+    }
+
+    #[test]
+    fn query_single_new_returns_none_when_any_filter_in_batch_is_empty() {
+        // The bug surfaces specifically when *concurrent* batched callers
+        // mix valid + invalid filters; the unwrap fires on the first empty
+        // one regardless of position.
+        let filters = vec![
+            make_filter(&[("id", 1)]),
+            QueryFilters(Vec::new()), // the bad one
+            make_filter(&[("id", 2)]),
+        ];
+        assert!(QuerySingle::new(&filters).is_none());
+    }
+
+    #[test]
+    fn query_filters_has_no_keys_distinguishes_empty_from_populated() {
+        assert!(QueryFilters(Vec::new()).has_no_keys());
+        assert!(!make_filter(&[("id", 1)]).has_no_keys());
+    }
+
+    #[test]
+    fn query_single_new_still_works_for_well_formed_single_key_batch() {
+        // Behaviour-preservation sanity check — the fix narrows what's
+        // accepted, but valid single-key batches must continue to coalesce.
+        let filters = vec![make_filter(&[("id", 1)]), make_filter(&[("id", 2)])];
+        let single = QuerySingle::new(&filters).expect("valid batch should coalesce");
+        assert_eq!(single.0, "id");
+        assert_eq!(single.1.len(), 2);
+    }
 }
