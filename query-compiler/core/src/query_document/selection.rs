@@ -440,8 +440,10 @@ mod tests {
     // pre-condition checked, so empty filters fell through to
     // `first.get_single_key().unwrap()` and panicked, taking out every other
     // request sharing the batch window as collateral. Now they return None,
-    // which `SelectionSet::new` maps to `SelectionSet::Many(filters)` (or
-    // `SelectionSet::Empty` for the all-empty case) without panicking.
+    // which `SelectionSet::new` maps to `SelectionSet::Many(filters)` for any
+    // non-empty input vector (the all-empty case falls into the same branch —
+    // `SelectionSet::Empty` is only reached when the input `Vec` itself is
+    // empty, see `SelectionSet::new` above).
     #[test]
     fn query_single_new_returns_none_for_empty_filter_instead_of_panicking() {
         let filters = vec![QueryFilters(Vec::new())];
