@@ -129,7 +129,7 @@ fn handle_many_to_many(
             &if_node,
             QueryGraphDependency::ProjectedDataDependency(
                 child_model.shard_aware_primary_identifier(),
-                RowSink::All(&IfInput),
+                RowSink::ProjectedPlaceholder(&IfInput),
                 None,
             ),
         )?;
@@ -280,7 +280,11 @@ fn one_to_many_inlined_child(
         graph.create_edge(
             &read_node,
             &if_node,
-            QueryGraphDependency::ProjectedDataDependency(child_link.clone(), RowSink::All(&IfInput), None),
+            QueryGraphDependency::ProjectedDataDependency(
+                child_link.clone(),
+                RowSink::ProjectedPlaceholder(&IfInput),
+                None,
+            ),
         )?;
 
         graph.create_edge(
@@ -392,13 +396,17 @@ fn one_to_many_inlined_parent(
 
     let if_node = graph.create_node(Flow::if_non_empty());
     let create_node = create::create_record_node(graph, query_schema, child_model.clone(), create_map)?;
-    let return_existing = graph.create_node(Flow::Return(Vec::new()));
-    let return_create = graph.create_node(Flow::Return(Vec::new()));
+    let return_existing = graph.create_node(Flow::Return(None));
+    let return_create = graph.create_node(Flow::Return(None));
 
     graph.create_edge(
         &read_node,
         &if_node,
-        QueryGraphDependency::ProjectedDataDependency(child_link.clone(), RowSink::All(&IfInput), None),
+        QueryGraphDependency::ProjectedDataDependency(
+            child_link.clone(),
+            RowSink::ProjectedPlaceholder(&IfInput),
+            None,
+        ),
     )?;
 
     graph.create_edge(&if_node, &return_existing, QueryGraphDependency::Then)?;
@@ -417,13 +425,17 @@ fn one_to_many_inlined_parent(
     graph.create_edge(
         &read_node,
         &return_existing,
-        QueryGraphDependency::ProjectedDataDependency(child_link.clone(), RowSink::All(&ReturnInput), None),
+        QueryGraphDependency::ProjectedDataDependency(
+            child_link.clone(),
+            RowSink::ProjectedPlaceholder(&ReturnInput),
+            None,
+        ),
     )?;
 
     graph.create_edge(
         &create_node,
         &return_create,
-        QueryGraphDependency::ProjectedDataDependency(child_link, RowSink::All(&ReturnInput), None),
+        QueryGraphDependency::ProjectedDataDependency(child_link, RowSink::ProjectedPlaceholder(&ReturnInput), None),
     )?;
 
     Ok(())
@@ -521,13 +533,17 @@ fn one_to_one_inlined_parent(
 
     let if_node = graph.create_node(Flow::if_non_empty());
     let create_node = create::create_record_node(graph, query_schema, child_model.clone(), create_data)?;
-    let return_existing = graph.create_node(Flow::Return(Vec::new()));
-    let return_create = graph.create_node(Flow::Return(Vec::new()));
+    let return_existing = graph.create_node(Flow::Return(None));
+    let return_create = graph.create_node(Flow::Return(None));
 
     graph.create_edge(
         &read_node,
         &if_node,
-        QueryGraphDependency::ProjectedDataDependency(child_link.clone(), RowSink::All(&IfInput), None),
+        QueryGraphDependency::ProjectedDataDependency(
+            child_link.clone(),
+            RowSink::ProjectedPlaceholder(&IfInput),
+            None,
+        ),
     )?;
 
     // Then branch handling
@@ -544,7 +560,11 @@ fn one_to_one_inlined_parent(
     graph.create_edge(
         &read_node,
         &return_existing,
-        QueryGraphDependency::ProjectedDataDependency(child_link.clone(), RowSink::All(&ReturnInput), None),
+        QueryGraphDependency::ProjectedDataDependency(
+            child_link.clone(),
+            RowSink::ProjectedPlaceholder(&ReturnInput),
+            None,
+        ),
     )?;
 
     // Else branch handling
@@ -552,7 +572,11 @@ fn one_to_one_inlined_parent(
     graph.create_edge(
         &create_node,
         &return_create,
-        QueryGraphDependency::ProjectedDataDependency(child_link.clone(), RowSink::All(&ReturnInput), None),
+        QueryGraphDependency::ProjectedDataDependency(
+            child_link.clone(),
+            RowSink::ProjectedPlaceholder(&ReturnInput),
+            None,
+        ),
     )?;
 
     if utils::node_is_create(graph, &parent_node) {
@@ -701,7 +725,11 @@ fn one_to_one_inlined_child(
     graph.create_edge(
         &read_new_child_node,
         &if_node,
-        QueryGraphDependency::ProjectedDataDependency(child_link.clone(), RowSink::All(&IfInput), None),
+        QueryGraphDependency::ProjectedDataDependency(
+            child_link.clone(),
+            RowSink::ProjectedPlaceholder(&IfInput),
+            None,
+        ),
     )?;
 
     // *** Else branch handling ***
@@ -793,7 +821,7 @@ fn one_to_one_inlined_child(
             &diff_node,
             QueryGraphDependency::ProjectedDataDependency(
                 child_model_identifier.clone(),
-                RowSink::All(&LeftSideDiffInput),
+                RowSink::ProjectedPlaceholder(&LeftSideDiffInput),
                 None,
             ),
         )?;
@@ -804,7 +832,7 @@ fn one_to_one_inlined_child(
             &diff_node,
             QueryGraphDependency::ProjectedDataDependency(
                 child_model_identifier.clone(),
-                RowSink::All(&RightSideDiffInput),
+                RowSink::ProjectedPlaceholder(&RightSideDiffInput),
                 None,
             ),
         )?;
@@ -813,7 +841,11 @@ fn one_to_one_inlined_child(
         graph.create_edge(
             &diff_node,
             &if_node,
-            QueryGraphDependency::ProjectedDataDependency(child_model_identifier.clone(), RowSink::All(&IfInput), None),
+            QueryGraphDependency::ProjectedDataDependency(
+                child_model_identifier.clone(),
+                RowSink::ProjectedPlaceholder(&IfInput),
+                None,
+            ),
         )?;
 
         // update old child, set link to null

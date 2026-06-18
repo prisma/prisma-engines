@@ -1,6 +1,6 @@
 use std::slice;
 
-use query_structure::{Filter, SelectionResult, WriteArgs};
+use query_structure::{Filter, Placeholder, SelectionResult, WriteArgs};
 
 use crate::{Computation, Flow, Node, NodeInputField, Query, ReadQuery, WriteQuery};
 
@@ -84,25 +84,25 @@ node_input_field!(
 
 node_input_field!(
     LeftSideDiffInput,
-    Vec<SelectionResult>,
+    Option<Placeholder>,
     Node::Computation(Computation::DiffLeftToRight(diff_node) | Computation::DiffRightToLeft(diff_node)) => &mut diff_node.left
 );
 
 node_input_field!(
     RightSideDiffInput,
-    Vec<SelectionResult>,
+    Option<Placeholder>,
     Node::Computation(Computation::DiffLeftToRight(diff_node) | Computation::DiffRightToLeft(diff_node)) => &mut diff_node.right
 );
 
 node_input_field!(
     IfInput,
-    Vec<SelectionResult>,
+    Option<Placeholder>,
     Node::Flow(Flow::If { data, .. }) => data
 );
 
 node_input_field!(
     ReturnInput,
-    Vec<SelectionResult>,
+    Option<Placeholder>,
     Node::Flow(Flow::Return(data)) => data
 );
 
