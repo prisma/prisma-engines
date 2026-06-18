@@ -118,7 +118,6 @@ fn handle_many_to_many(
         let create_node = create::create_record_node(graph, query_schema, child_model.clone(), create_map)?;
         let if_node = graph.create_node(Flow::if_non_empty());
         let return_existing = graph.create_node(Flow::Return(Vec::new()));
-        let return_create = graph.create_node(Flow::Return(Vec::new()));
 
         graph.create_edge(&parent_node, &read_node, QueryGraphDependency::ExecutionOrder)?;
         graph.create_edge(
@@ -141,11 +140,6 @@ fn handle_many_to_many(
                 RowSink::All(&ReturnInput),
                 None,
             ),
-        )?;
-        graph.create_edge(
-            &create_node,
-            &return_create,
-            QueryGraphDependency::ProjectedDataDependency(child_model_identifier, RowSink::All(&ReturnInput), None),
         )?;
 
         connect::connect_records_node(graph, &parent_node, &if_node, parent_relation_field, 1)?;
