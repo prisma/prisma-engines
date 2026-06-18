@@ -61,6 +61,8 @@ pub fn translate(mut graph: QueryGraph, builder: &dyn QueryBuilder) -> Translate
         }
     };
 
+    graph.reserve_visited_capacity();
+
     let root = match root_nodes {
         RootNodes::None => Expression::Seq(Vec::new()),
         RootNodes::One(node) => {

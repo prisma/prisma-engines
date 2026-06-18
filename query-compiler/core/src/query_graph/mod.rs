@@ -403,6 +403,11 @@ impl QueryGraph {
         }
     }
 
+    pub fn reserve_visited_capacity(&mut self) {
+        self.visited
+            .reserve_exact(self.graph.node_count().saturating_sub(self.visited.len()));
+    }
+
     /// Checks if the given node is marked as one of the result nodes in the graph.
     pub fn is_result_node(&self, node: &NodeRef) -> bool {
         self.result_nodes.contains(&node.node_ix)
