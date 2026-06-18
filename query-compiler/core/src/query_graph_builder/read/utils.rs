@@ -322,9 +322,51 @@ pub(crate) fn extract_selected_fields(
     model: &Model,
     query_schema: &QuerySchema,
 ) -> crate::QueryGraphBuilderResult<(FieldSelection, Vec<String>, Vec<ReadQuery>)> {
-    let selected_fields = utils::collect_selected_fields(&nested_fields, None, model, query_schema)?;
-    let (selection_order, nested) =
-        utils::collect_selection_order_and_nested_queries(nested_fields, model, query_schema)?;
+    let should_collect_relation_selection = query_schema.can_resolve_relation_with_joins();
+    let model_id = model.shard_aware_primary_identifier();
+    let mut selections = Vec::with_capacity(nested_fields.len());
+    let mut selection_order = Vec::with_capacity(nested_fields.len());
+    let mut nested = Vec::new();
+
+    for pair in nested_fields {
+        if is_aggr_selection(&pair) {
+            selection_order.push(selection_order_name(&pair.parsed_field));
+            selections.extend(extract_relation_count_selections(pair.parsed_field, model)?);
+            continue;
+        }
+
+        let model_field = model.fields().find_from_all(&pair.parsed_field.name).unwrap();
+
+        match model_field {
+            Field::Scalar(sf) => {
+                selections.push(sf.into());
+                selection_order.push(into_selection_order_name(pair.parsed_field));
+            }
+            Field::Composite(cf) => {
+                selection_order.push(selection_order_name(&pair.parsed_field));
+                selections.push(extract_composite_selection(pair.parsed_field, cf, query_schema)?);
+            }
+            Field::Relation(rf) => {
+                let related_model = rf.related_model();
+                let parsed_field = pair.parsed_field;
+
+                selection_order.push(selection_order_name(&parsed_field));
+                selections.extend(rf.scalar_fields().into_iter().map(SelectedField::from));
+
+                if should_collect_relation_selection {
+                    selections.push(extract_relation_selection(
+                        parsed_field.clone(),
+                        rf.clone(),
+                        query_schema,
+                    )?);
+                }
+
+                nested.push(related::find_related(parsed_field, rf, related_model, query_schema)?);
+            }
+        }
+    }
+
+    let selected_fields = model_id.merge(FieldSelection::new(selections));
     let selected_fields = utils::merge_relation_selections(selected_fields, None, &nested);
 
     Ok((selected_fields, selection_order, nested))
