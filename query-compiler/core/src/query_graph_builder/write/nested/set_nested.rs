@@ -230,7 +230,11 @@ fn handle_one_to_many(
         graph.create_edge(
             &read_old_node,
             &disconnect_if_node,
-            QueryGraphDependency::ProjectedDataDependency(child_model_identifier.clone(), RowSink::All(&IfInput), None),
+            QueryGraphDependency::ProjectedDataDependency(
+                child_model_identifier.clone(),
+                RowSink::ProjectedPlaceholder(&IfInput),
+                None,
+            ),
         )?;
 
         graph.create_edge(&disconnect_if_node, &update_disconnect_node, QueryGraphDependency::Then)?;
@@ -264,7 +268,7 @@ fn handle_one_to_many(
         &diff_left_to_right_node,
         QueryGraphDependency::ProjectedDataDependency(
             child_model_identifier.clone(),
-            RowSink::All(&LeftSideDiffInput),
+            RowSink::ProjectedPlaceholder(&LeftSideDiffInput),
             None,
         ),
     )?;
@@ -273,7 +277,7 @@ fn handle_one_to_many(
         &diff_right_to_left_node,
         QueryGraphDependency::ProjectedDataDependency(
             child_model_identifier.clone(),
-            RowSink::All(&LeftSideDiffInput),
+            RowSink::ProjectedPlaceholder(&LeftSideDiffInput),
             None,
         ),
     )?;
@@ -284,7 +288,7 @@ fn handle_one_to_many(
         &diff_left_to_right_node,
         QueryGraphDependency::ProjectedDataDependency(
             child_model_identifier.clone(),
-            RowSink::All(&RightSideDiffInput),
+            RowSink::ProjectedPlaceholder(&RightSideDiffInput),
             None,
         ),
     )?;
@@ -293,7 +297,7 @@ fn handle_one_to_many(
         &diff_right_to_left_node,
         QueryGraphDependency::ProjectedDataDependency(
             child_model_identifier.clone(),
-            RowSink::All(&RightSideDiffInput),
+            RowSink::ProjectedPlaceholder(&RightSideDiffInput),
             None,
         ),
     )?;
@@ -306,7 +310,11 @@ fn handle_one_to_many(
     graph.create_edge(
         &diff_left_to_right_node,
         &connect_if_node,
-        QueryGraphDependency::ProjectedDataDependency(child_model_identifier.clone(), RowSink::All(&IfInput), None),
+        QueryGraphDependency::ProjectedDataDependency(
+            child_model_identifier.clone(),
+            RowSink::ProjectedPlaceholder(&IfInput),
+            None,
+        ),
     )?;
 
     // Connect to the if node, the parent node (for the inlining ID) and the diff node (to get the IDs to update)
@@ -354,7 +362,11 @@ fn handle_one_to_many(
     graph.create_edge(
         &diff_right_to_left_node,
         &disconnect_if_node,
-        QueryGraphDependency::ProjectedDataDependency(child_model_identifier.clone(), RowSink::All(&IfInput), None),
+        QueryGraphDependency::ProjectedDataDependency(
+            child_model_identifier.clone(),
+            RowSink::ProjectedPlaceholder(&IfInput),
+            None,
+        ),
     )?;
 
     // Connect to the if node and the diff node (to get the IDs to update)

@@ -21,7 +21,7 @@ use petgraph::{
     visit::{EdgeRef as PEdgeRef, NodeIndexable},
     *,
 };
-use query_structure::{FieldSelection, Filter, QueryArguments, SelectionResult, WriteArgs};
+use query_structure::{FieldSelection, Filter, Placeholder, QueryArguments, SelectionResult, WriteArgs};
 
 pub type QueryGraphResult<T> = std::result::Result<T, QueryGraphError>;
 
@@ -67,24 +67,24 @@ impl From<Flow> for Node {
 pub enum Flow {
     /// Expresses a conditional control flow in the graph.
     /// Possible outgoing edges are `then` and `else`, each at most once, with `then` required to be present.
-    If { rule: DataRule, data: Vec<SelectionResult> },
+    If { rule: DataRule, data: Option<Placeholder> },
 
     /// Returns a fixed set of results at runtime.
-    Return(Vec<SelectionResult>),
+    Return(Option<Placeholder>),
 }
 
 impl Flow {
     pub fn if_non_empty() -> Self {
         Self::If {
             rule: DataRule::RowCountNeq(0),
-            data: Vec::new(),
+            data: None,
         }
     }
 
     pub fn if_false() -> Self {
         Self::If {
             rule: DataRule::Never,
-            data: Vec::new(),
+            data: None,
         }
     }
 }
@@ -106,16 +106,16 @@ impl Computation {
 }
 
 pub struct DiffNode {
-    pub left: Vec<SelectionResult>,
-    pub right: Vec<SelectionResult>,
+    pub left: Option<Placeholder>,
+    pub right: Option<Placeholder>,
     pub fields: FieldSelection,
 }
 
 impl DiffNode {
     pub fn new_empty(fields: FieldSelection) -> Self {
         Self {
-            left: Vec::new(),
-            right: Vec::new(),
+            left: None,
+            right: None,
             fields,
         }
     }
@@ -187,6 +187,8 @@ pub enum RowSink {
     AtMostOne(&'static dyn NodeInputField<Vec<SelectionResult>>),
     /// Store an array of exactly one row to the node input field.
     ExactlyOne(&'static dyn NodeInputField<Vec<SelectionResult>>),
+    /// Store a projected placeholder directly to the node input field.
+    ProjectedPlaceholder(&'static dyn NodeInputField<Option<Placeholder>>),
     /// Store a filter representing all rows to the node input field.
     AllFilter(&'static dyn NodeInputField<Filter>),
     /// Store a filter representing exactly one row to the node input field.

@@ -94,14 +94,14 @@ pub fn nested_update(
         let update_args = WriteArgsParser::from(child_model, data_map)?;
 
         if update_args.args.is_empty() && !update_args.nested.is_empty() {
-            let return_node = graph.create_node(Flow::Return(Vec::new()));
+            let return_node = graph.create_node(Flow::Return(None));
 
             graph.create_edge(
                 &find_child_records_node,
                 &return_node,
                 QueryGraphDependency::ProjectedDataDependency(
                     child_model_identifier,
-                    RowSink::All(&ReturnInput),
+                    RowSink::ProjectedPlaceholder(&ReturnInput),
                     Some(DataExpectation::non_empty_rows(
                         MissingRelatedRecord::builder()
                             .model(child_model)

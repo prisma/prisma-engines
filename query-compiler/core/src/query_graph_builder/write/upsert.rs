@@ -104,12 +104,16 @@ pub(crate) fn upsert_record(
     let update_args = WriteArgsParser::from(&model, update_argument)?;
     let is_noop_update = update_args.args.is_empty();
     let update_node = if is_noop_update {
-        let return_node = graph.create_node(Flow::Return(Vec::new()));
+        let return_node = graph.create_node(Flow::Return(None));
 
         graph.create_edge(
             &read_parent_records_node,
             &return_node,
-            QueryGraphDependency::ProjectedDataDependency(model_id.clone(), RowSink::All(&ReturnInput), None),
+            QueryGraphDependency::ProjectedDataDependency(
+                model_id.clone(),
+                RowSink::ProjectedPlaceholder(&ReturnInput),
+                None,
+            ),
         )?;
 
         for (relation_field, data_map) in update_args.nested {
@@ -132,7 +136,7 @@ pub(crate) fn upsert_record(
     graph.create_edge(
         &read_parent_records_node,
         &if_node,
-        QueryGraphDependency::ProjectedDataDependency(model_id.clone(), RowSink::All(&IfInput), None),
+        QueryGraphDependency::ProjectedDataDependency(model_id.clone(), RowSink::ProjectedPlaceholder(&IfInput), None),
     )?;
 
     // In case the connector doesn't support referential integrity, we add a subtree to the graph that emulates the ON_UPDATE referential action.

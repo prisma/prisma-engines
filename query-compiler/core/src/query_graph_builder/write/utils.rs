@@ -245,7 +245,7 @@ pub fn insert_1to1_idempotent_connect_checks(
         &diff_node,
         QueryGraphDependency::ProjectedDataDependency(
             child_model_identifier.clone(),
-            RowSink::All(&LeftSideDiffInput),
+            RowSink::ProjectedPlaceholder(&LeftSideDiffInput),
             Some(DataExpectation::non_empty_rows(
                 MissingRelatedRecord::builder()
                     .model(&child_model.clone())
@@ -263,7 +263,7 @@ pub fn insert_1to1_idempotent_connect_checks(
         &diff_node,
         QueryGraphDependency::ProjectedDataDependency(
             child_model_identifier.clone(),
-            RowSink::All(&RightSideDiffInput),
+            RowSink::ProjectedPlaceholder(&RightSideDiffInput),
             None,
         ),
     )?;
@@ -272,7 +272,11 @@ pub fn insert_1to1_idempotent_connect_checks(
     graph.create_edge(
         &diff_node,
         &if_node,
-        QueryGraphDependency::ProjectedDataDependency(child_model_identifier, RowSink::All(&IfInput), None),
+        QueryGraphDependency::ProjectedDataDependency(
+            child_model_identifier,
+            RowSink::ProjectedPlaceholder(&IfInput),
+            None,
+        ),
     )?;
     let empty_node = graph.create_node(Node::Empty);
 
@@ -392,7 +396,7 @@ pub fn insert_existing_1to1_related_model_checks(
         &if_node,
         QueryGraphDependency::ProjectedDataDependency(
             child_model_identifier.clone(),
-            RowSink::All(&IfInput),
+            RowSink::ProjectedPlaceholder(&IfInput),
             // If the other side ("child") requires the connection, we need to make sure that there isn't a child already connected
             // to the parent, as that would violate the other childs relation side.
             if child_side_required {
@@ -992,14 +996,14 @@ pub fn insert_emulated_on_update_with_intermediary_node(
     let internal_model = &model_to_update.dm;
     let relation_fields = internal_model.fields_pointing_to_model(model_to_update);
 
-    let join_node = graph.create_node(Flow::Return(Vec::new()));
+    let join_node = graph.create_node(Flow::Return(None));
 
     graph.create_edge(
         parent_node,
         &join_node,
         QueryGraphDependency::ProjectedDataDependency(
             model_to_update.shard_aware_primary_identifier(),
-            RowSink::All(&ReturnInput),
+            RowSink::ProjectedPlaceholder(&ReturnInput),
             None,
         ),
     )?;
