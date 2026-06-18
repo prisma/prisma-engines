@@ -65,6 +65,7 @@ pub fn translate(mut graph: QueryGraph, builder: &dyn QueryBuilder) -> Translate
         map_result_structure(&graph, &mut result_node_builder)
     };
     let result_reachability = ResultReachability::new(&graph);
+    graph.reserve_visited_capacity();
 
     let root = match root_nodes {
         RootNodes::None => Expression::Seq(Vec::new()),
