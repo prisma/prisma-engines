@@ -95,6 +95,18 @@ node_input_field!(
 );
 
 node_input_field!(
+    RequiredOneToManySetOldInput,
+    Option<Placeholder>,
+    Node::Computation(Computation::RequiredOneToManySet(set_node)) => &mut set_node.old_children
+);
+
+node_input_field!(
+    RequiredOneToManySetNewInput,
+    Option<Placeholder>,
+    Node::Computation(Computation::RequiredOneToManySet(set_node)) => &mut set_node.new_children
+);
+
+node_input_field!(
     IfInput,
     Option<Placeholder>,
     Node::Flow(Flow::If { data, .. }) => data

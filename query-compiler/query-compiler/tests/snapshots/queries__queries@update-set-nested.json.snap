@@ -39,21 +39,18 @@ transaction
                             const(BigInt(0))]
             in let 3 = diff (get 2) (get 1)
                in if (rowCountNeq 0 (get 3))
-                  then let 0 = unique (validate (get 0)
-                           [ rowCountNeq 0
-                           ] orRaise "MISSING_RELATED_RECORD");
-                           0$id = mapField id (get 0);
-                           3$id = mapField id (get 3)
-                       in execute «UPDATE "public"."Post" SET "userId" = $1
+                  then let 3$id = mapField id (get 3)
+                       in validate (get 0)
+                          [ rowCountNeq 0
+                          ] orRaise "MISSING_RELATED_RECORD";
+                          execute «UPDATE "public"."Post" SET "userId" = $1
                                    WHERE ("public"."Post"."id" IN [$2,*] AND
                                    1=1)»
                           params [var(0$id as Int), var(3$id as Int)]
                   else ();
-               let 4 = diff (get 1) (get 2)
-               in validate (get 4)
+                  validate (diff (get 1) (get 2))
                   [ rowCountEq 0
                   ] orRaise "RELATION_VIOLATION";
-                  ();
       let 0 = unique (validate (get 0)
           [ rowCountNeq 0
           ] orRaise "MISSING_RECORD");
