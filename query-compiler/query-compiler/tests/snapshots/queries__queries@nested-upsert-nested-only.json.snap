@@ -34,10 +34,8 @@ transaction
                         FROM "public"."Post" WHERE ("public"."Post"."id" = $1
                         AND "public"."Post"."userId" IN [$2,*]) OFFSET $3»
                  params [const(BigInt(11)), var(0$id as Int), const(BigInt(0))]
-         in let 2 = if (rowCountNeq 0 (get 1))
-                then validate (get 1)
-                     [ rowCountNeq 0
-                     ] orRaise "MISSING_RELATED_RECORD"
+         in let 3 = if (rowCountNeq 0 (get 1))
+                then get 1
                 else let 0 = unique (validate (get 0)
                          [ rowCountNeq 0
                          ] orRaise "MISSING_RELATED_RECORD");
@@ -47,21 +45,21 @@ transaction
                                        RETURNING "public"."Post"."id"»
                                 params [const(String("Nested upsert created post")),
                                         var(0$id as Int)])
-            in let 5 = query «SELECT "public"."Category"."id" FROM
+            in let 4 = query «SELECT "public"."Category"."id" FROM
                               "public"."Category" WHERE "public"."Category"."id"
                               = $1 OFFSET $2»
                        params [const(BigInt(10)), const(BigInt(0))]
-               in let 2 = unique (validate (get 2)
+               in let 3 = unique (validate (get 3)
                       [ rowCountNeq 0
                       ] orRaise "MISSING_RELATED_RECORD");
-                      2$id = mapField id (get 2);
-                      5 = validate (get 5)
+                      3$id = mapField id (get 3);
+                      4 = validate (get 4)
                       [ rowCountEq 1
                       ] orRaise "INCOMPLETE_CONNECT_INPUT";
-                      5$id = mapField id (get 5)
+                      4$id = mapField id (get 4)
                   in execute «INSERT INTO "public"."_CategoryToPost" ("B","A")
                               VALUES [($1),*],* ON CONFLICT DO NOTHING»
-                     params [product(var(2$id as Int[]), var(5$id as Int[]))];
+                     params [product(var(3$id as Int[]), var(4$id as Int[]))];
       let 0 = unique (validate (get 0)
           [ rowCountNeq 0
           ] orRaise "MISSING_RECORD");
