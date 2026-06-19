@@ -178,7 +178,8 @@ impl<'a, 'b> NodeTranslator<'a, 'b> {
                 })
             }
             Node::Flow(Flow::If { .. }) => self.translate_if(),
-            Node::Flow(Flow::Return(_)) => self.translate_return(),
+            Node::Flow(Flow::Return(_)) => self.translate_return(false),
+            Node::Flow(Flow::ReturnPreservingResult(_)) => self.translate_return(true),
             Node::Computation(Computation::DiffLeftToRight(_)) => self.translate_diff_left_to_right(),
             Node::Computation(Computation::DiffRightToLeft(_)) => self.translate_diff_right_to_left(),
             Node::Computation(Computation::RequiredOneToManySet(_)) => self.translate_required_one_to_many_set(),
@@ -206,6 +207,22 @@ impl<'a, 'b> NodeTranslator<'a, 'b> {
             } else {
                 Expression::Seq(children).into()
             },
+        }
+    }
+
+    fn wrap_children_preserving_expr(&self, expr: Expression, mut children: Vec<Expression>) -> Expression {
+        if children.is_empty() {
+            return expr;
+        }
+
+        let result_name = binding::node_result(self.node);
+        children.push(Expression::Get {
+            name: result_name.clone(),
+        });
+
+        Expression::Let {
+            bindings: vec![Binding::new(result_name, expr)],
+            expr: Expression::Seq(children).into(),
         }
     }
 
@@ -300,20 +317,24 @@ impl<'a, 'b> NodeTranslator<'a, 'b> {
         Ok(self.wrap_children_with_expr(expr, children))
     }
 
-    fn translate_return(&mut self) -> TranslateResult<Expression> {
+    fn translate_return(&mut self, preserve_result_after_children: bool) -> TranslateResult<Expression> {
         let children = self.translate_children()?;
 
         let node = self.graph.pluck_node(&self.node);
         let node = self.transform_node(node)?;
 
-        let Node::Flow(Flow::Return(data)) = node else {
+        let Node::Flow(Flow::Return(data) | Flow::ReturnPreservingResult(data)) = node else {
             panic!("current node must be Flow::Return");
         };
         let placeholder = projected_placeholder(data, "Return")?;
 
         let expr = Expression::Get { name: placeholder.name };
 
-        Ok(self.wrap_children_with_expr(expr, children))
+        if preserve_result_after_children {
+            Ok(self.wrap_children_preserving_expr(expr, children))
+        } else {
+            Ok(self.wrap_children_with_expr(expr, children))
+        }
     }
 
     fn translate_diff_left_to_right(&mut self) -> TranslateResult<Expression> {

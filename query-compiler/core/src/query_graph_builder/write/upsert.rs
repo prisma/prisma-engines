@@ -101,13 +101,20 @@ pub(crate) fn upsert_record(
 
     let update_args = WriteArgsParser::from(&model, update_argument)?;
     let is_noop_update = update_args.args.is_empty();
-    let update_has_nested = !update_args.nested.is_empty();
+    let update_nested_count = update_args.nested.len();
+    let update_has_nested = update_nested_count != 0;
+    let create_has_nested = WriteArgsParser::has_nested_operation(&model, &create_argument);
+    let can_preserve_update_result = update_nested_count == 1;
     let can_share_result_read =
-        is_noop_update && !update_has_nested && !WriteArgsParser::has_nested_operation(&model, &create_argument);
+        is_noop_update && !create_has_nested && (!update_has_nested || can_preserve_update_result);
 
     let create_node = create::create_record_node(graph, query_schema, model.clone(), create_argument)?;
     let update_node = if is_noop_update {
-        let return_node = graph.create_node(Flow::Return(None));
+        let return_node = if update_has_nested && can_share_result_read {
+            graph.create_node(Flow::return_preserving_result())
+        } else {
+            graph.create_node(Flow::Return(None))
+        };
 
         graph.create_edge(
             &read_parent_records_node,
