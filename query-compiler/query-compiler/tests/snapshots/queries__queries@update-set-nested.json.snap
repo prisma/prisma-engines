@@ -1,6 +1,5 @@
 ---
 source: query-compiler/query-compiler/tests/queries.rs
-assertion_line: 76
 expression: pretty
 input_file: query-compiler/query-compiler/tests/data/update-set-nested.json
 snapshot_kind: text
@@ -22,9 +21,8 @@ transaction
            user: USER
        }
    }
-   let 0 = unique (query «SELECT "public"."User"."id", "public"."User"."email",
-                          "public"."User"."role"::text FROM "public"."User"
-                          WHERE "public"."User"."email" = $1 LIMIT $2 OFFSET $3»
+   let 0 = unique (query «SELECT "public"."User"."id" FROM "public"."User" WHERE
+                          "public"."User"."email" = $1 LIMIT $2 OFFSET $3»
                    params [const(String("user.1737556028164@prisma.io")),
                            const(BigInt(1)), const(BigInt(0))])
    in let 0$id = mapField id (get 0)
