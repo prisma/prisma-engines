@@ -217,12 +217,13 @@ fn raw_nested_relations_supported(
 
 fn raw_related_records_supported(rrq: &RelatedRecordsQuery, has_unique_parent: bool) -> bool {
     let is_many_to_many = rrq.parent_field.relation().is_many_to_many();
+    let supports_parent_grouped_ops = raw_nested_relation_supports_parent_grouped_ops(rrq, is_many_to_many);
 
     if rrq.args.take == Take::Some(0)
         || rrq.parent_results.is_some()
         || !args_cannot_chunk(&rrq.args)
-        || !raw_nested_relation_operations_may_be_supported(&rrq.args, has_unique_parent, is_many_to_many)
-        || (is_many_to_many
+        || !raw_nested_relation_operations_may_be_supported(&rrq.args, has_unique_parent, supports_parent_grouped_ops)
+        || (supports_parent_grouped_ops
             && !raw_nested_relation_operation_result_fields_supported(
                 &rrq.args,
                 &rrq.selected_fields,
@@ -244,6 +245,10 @@ fn raw_related_records_supported(rrq: &RelatedRecordsQuery, has_unique_parent: b
 
     let child_has_unique_parent = has_unique_parent && !is_many_to_many && !rrq.parent_field.arity().is_list();
     raw_nested_relations_supported(&rrq.nested, &rrq.selected_fields, child_has_unique_parent)
+}
+
+fn raw_nested_relation_supports_parent_grouped_ops(rrq: &RelatedRecordsQuery, is_many_to_many: bool) -> bool {
+    is_many_to_many || rrq.parent_field.arity().is_list()
 }
 
 fn raw_nested_relation_operations_may_be_supported(
@@ -702,6 +707,7 @@ fn build_raw_read_related_records(
     }
 
     let is_many_to_many = rrq.parent_field.relation().is_many_to_many();
+    let supports_parent_grouped_ops = raw_nested_relation_supports_parent_grouped_ops(rrq, is_many_to_many);
     let mut linkage = RelationLinkage::new(rrq.parent_field.clone(), links);
 
     if let Some(results) = rrq.parent_results.clone() {
@@ -733,7 +739,7 @@ fn build_raw_read_related_records(
         .into_virtuals_last();
     let mut args = rrq.args.clone();
     let mut in_memory_ops = in_memory_processing::extract_in_memory_ops_for_nested_query(&mut args, has_unique_parent);
-    if !is_many_to_many && !raw_nested_relation_operations_supported(&in_memory_ops, false) {
+    if !raw_nested_relation_operations_supported(&in_memory_ops, supports_parent_grouped_ops) {
         return Ok(None);
     }
 
@@ -744,8 +750,10 @@ fn build_raw_read_related_records(
     };
     if is_many_to_many && !in_memory_ops.is_empty_toplevel() {
         in_memory_ops.linking_fields = Some(join.fields.clone());
+    } else if supports_parent_grouped_ops && raw_nested_relation_operations_need_record_fields(&in_memory_ops) {
+        in_memory_ops.linking_fields = Some(join.fields.clone());
     }
-    if !raw_nested_relation_operations_supported(&in_memory_ops, is_many_to_many) {
+    if !raw_nested_relation_operations_supported(&in_memory_ops, supports_parent_grouped_ops) {
         return Ok(None);
     }
 
@@ -764,7 +772,7 @@ fn build_raw_read_related_records(
     else {
         return Ok(None);
     };
-    if is_many_to_many && raw_nested_relation_operations_need_record_fields(&in_memory_ops) {
+    if supports_parent_grouped_ops && raw_nested_relation_operations_need_record_fields(&in_memory_ops) {
         let Some(field_name_mappings) =
             raw_nested_operation_field_name_mappings(&selected_fields, &rrq.selection_order)
         else {
