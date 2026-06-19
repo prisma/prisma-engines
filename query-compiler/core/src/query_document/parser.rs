@@ -262,6 +262,17 @@ impl QueryDocumentParser {
         query_schema: &'a QuerySchema,
         is_parameterizable: bool,
     ) -> QueryParserResult<ParsedInputValue<'a>> {
+        if let [input_type] = possible_input_types {
+            return self.parse_input_value_single(
+                selection_path,
+                argument_path,
+                value,
+                input_type,
+                query_schema,
+                is_parameterizable,
+            );
+        }
+
         let mut failures = Vec::new();
 
         macro_rules! try_this {
@@ -322,15 +333,8 @@ impl QueryDocumentParser {
                     ))),
                     // Scalar handling
                     (pv, InputType::Scalar(st)) => try_this!(
-                        self.parse_scalar(
-                            selection_path,
-                            &*argument_path,
-                            pv.clone(),
-                            *st,
-                            &value,
-                            is_parameterizable
-                        )
-                        .map(ParsedInputValue::Single)
+                        self.parse_scalar(selection_path, &*argument_path, pv.clone(), *st, is_parameterizable)
+                            .map(ParsedInputValue::Single)
                     ),
 
                     // Enum handling
@@ -347,7 +351,6 @@ impl QueryDocumentParser {
                         try_this!(self.parse_parameterized_enum(
                             selection_path,
                             &*argument_path,
-                            &value,
                             placeholder.clone(),
                             et,
                             is_parameterizable
@@ -359,7 +362,6 @@ impl QueryDocumentParser {
                         try_this!(self.parse_parameterized_list(
                             selection_path,
                             &*argument_path,
-                            &value,
                             placeholder.clone(),
                             elem_type,
                             is_parameterizable
@@ -411,6 +413,128 @@ impl QueryDocumentParser {
         }
     }
 
+    fn parse_input_value_single<'a>(
+        &self,
+        selection_path: &Path,
+        argument_path: &mut Path,
+        value: ArgumentValue,
+        input_type: &InputType<'a>,
+        query_schema: &'a QuerySchema,
+        is_parameterizable: bool,
+    ) -> QueryParserResult<ParsedInputValue<'a>> {
+        if matches!(input_type, InputType::Scalar(ScalarType::Json))
+            && value.should_be_parsed_as_json()
+            && get_engine_protocol().is_json()
+        {
+            return Ok(ParsedInputValue::Single(self.to_json(
+                selection_path,
+                &*argument_path,
+                &value,
+            )?));
+        }
+
+        if matches!(input_type, InputType::Scalar(ScalarType::JsonList))
+            && matches!(value, ArgumentValue::List(_))
+            && get_engine_protocol().is_json()
+        {
+            let json_val = serde_json::to_value(&value).map_err(|err| {
+                ValidationError::invalid_argument_value(
+                    selection_path.segments(),
+                    argument_path.segments(),
+                    format!("{value:?}"),
+                    "JSON array",
+                    Some(Box::new(err)),
+                )
+            })?;
+            let json_list = self.parse_json_list_from_value(selection_path, &*argument_path, json_val)?;
+
+            return Ok(ParsedInputValue::Single(json_list));
+        }
+
+        match value {
+            ArgumentValue::Scalar(pv) => match (pv, input_type) {
+                (PrismaValue::Null, InputType::Scalar(ScalarType::Null)) => {
+                    Ok(ParsedInputValue::Single(PrismaValue::Null))
+                }
+                (PrismaValue::Null, input_type) => Err(ValidationError::required_argument_missing(
+                    selection_path.segments(),
+                    argument_path.segments(),
+                    &conversions::input_types_to_input_type_descriptions(std::slice::from_ref(input_type)),
+                )),
+                (pv, InputType::Scalar(st)) => self
+                    .parse_scalar(selection_path, &*argument_path, pv, *st, is_parameterizable)
+                    .map(ParsedInputValue::Single),
+                (pv @ PrismaValue::Enum(_), InputType::Enum(et))
+                | (pv @ PrismaValue::String(_), InputType::Enum(et))
+                | (pv @ PrismaValue::Boolean(_), InputType::Enum(et)) => {
+                    self.parse_enum(selection_path, &*argument_path, pv, et)
+                }
+                (PrismaValue::Placeholder(placeholder), InputType::Enum(et)) => {
+                    self.parse_parameterized_enum(selection_path, &*argument_path, placeholder, et, is_parameterizable)
+                }
+                (PrismaValue::Placeholder(placeholder), InputType::List(elem_type)) => self.parse_parameterized_list(
+                    selection_path,
+                    &*argument_path,
+                    placeholder,
+                    elem_type,
+                    is_parameterizable,
+                ),
+                (pv, input_type) => Err(invalid_prisma_value_type_error(
+                    selection_path,
+                    &*argument_path,
+                    input_type,
+                    pv,
+                )),
+            },
+            ArgumentValue::List(values) => match input_type {
+                InputType::List(l) => self
+                    .parse_list(
+                        selection_path,
+                        argument_path,
+                        values,
+                        l,
+                        query_schema,
+                        is_parameterizable,
+                    )
+                    .map(ParsedInputValue::List),
+                input_type => Err(invalid_argument_type_error_owned(
+                    selection_path,
+                    &*argument_path,
+                    input_type,
+                    ArgumentValue::List(values),
+                )),
+            },
+            ArgumentValue::Object(o) => match input_type {
+                InputType::Object(obj) => self
+                    .parse_input_object(selection_path, argument_path, o, obj, query_schema)
+                    .map(ParsedInputValue::Map),
+                input_type => Err(invalid_argument_type_error_owned(
+                    selection_path,
+                    &*argument_path,
+                    input_type,
+                    ArgumentValue::Object(o),
+                )),
+            },
+            ArgumentValue::FieldRef(o) => match input_type {
+                InputType::Object(obj) => self
+                    .parse_input_object(selection_path, argument_path, o, obj, query_schema)
+                    .map(ParsedInputValue::Map),
+                input_type => Err(invalid_argument_type_error_owned(
+                    selection_path,
+                    &*argument_path,
+                    input_type,
+                    ArgumentValue::FieldRef(o),
+                )),
+            },
+            value => Err(invalid_argument_type_error_owned(
+                selection_path,
+                &*argument_path,
+                input_type,
+                value,
+            )),
+        }
+    }
+
     /// Attempts to parse given query value into a concrete PrismaValue based on given scalar type.
     fn parse_scalar(
         &self,
@@ -418,7 +542,6 @@ impl QueryDocumentParser {
         argument_path: &Path,
         value: PrismaValue,
         scalar_type: ScalarType,
-        argument_value: &ArgumentValue,
         is_parameterizable: bool,
     ) -> QueryParserResult<PrismaValue> {
         match (value, scalar_type) {
@@ -514,11 +637,11 @@ impl QueryDocumentParser {
             }
 
             // All other combinations are value type mismatches.
-            (_, _) => Err(invalid_argument_type_error(
+            (pv, scalar_type) => Err(invalid_prisma_value_type_error(
                 selection_path,
                 argument_path,
                 &InputType::Scalar(scalar_type),
-                argument_value,
+                pv,
             )),
         }
     }
@@ -704,7 +827,6 @@ impl QueryDocumentParser {
         &self,
         selection_path: &Path,
         argument_path: &Path,
-        argument_value: &ArgumentValue,
         placeholder: Placeholder,
         element_input_type: &InputType<'a>,
         is_parameterizable: bool,
@@ -718,12 +840,12 @@ impl QueryDocumentParser {
             ));
         }
 
-        let error = || {
-            invalid_argument_type_error(
+        let error = |placeholder| {
+            invalid_prisma_value_type_error(
                 selection_path,
                 argument_path,
                 &InputType::List(element_input_type.to_owned().into()),
-                argument_value,
+                PrismaValue::Placeholder(placeholder),
             )
         };
 
@@ -744,7 +866,7 @@ impl QueryDocumentParser {
         }
 
         let PrismaValueType::List(inner_type) = &placeholder.r#type else {
-            return Err(error());
+            return Err(error(placeholder));
         };
 
         let element_type_matches = match element_input_type {
@@ -760,7 +882,7 @@ impl QueryDocumentParser {
         if element_type_matches {
             Ok(ParsedInputValue::Single(placeholder.into()))
         } else {
-            Err(error())
+            Err(error(placeholder))
         }
     }
 
@@ -816,7 +938,6 @@ impl QueryDocumentParser {
         &self,
         selection_path: &Path,
         argument_path: &Path,
-        argument_value: &ArgumentValue,
         placeholder: Placeholder,
         enum_type: &EnumType,
         is_parameterizable: bool,
@@ -833,11 +954,11 @@ impl QueryDocumentParser {
         if matches!(placeholder.r#type, PrismaValueType::Enum) {
             Ok(ParsedInputValue::Single(placeholder.into()))
         } else {
-            Err(invalid_argument_type_error(
+            Err(invalid_prisma_value_type_error(
                 selection_path,
                 argument_path,
                 &InputType::Enum(enum_type.to_owned()),
-                argument_value,
+                PrismaValue::Placeholder(placeholder),
             ))
         }
     }
@@ -1017,6 +1138,26 @@ fn invalid_argument_type_error(
         conversions::input_type_to_argument_description(argument_path.last().unwrap_or_default(), input_type),
         conversions::argument_value_to_type_name(argument_value),
     )
+}
+
+#[inline(never)]
+fn invalid_argument_type_error_owned(
+    selection_path: &Path,
+    argument_path: &Path,
+    input_type: &InputType<'_>,
+    argument_value: ArgumentValue,
+) -> ValidationError {
+    invalid_argument_type_error(selection_path, argument_path, input_type, &argument_value)
+}
+
+#[inline(never)]
+fn invalid_prisma_value_type_error(
+    selection_path: &Path,
+    argument_path: &Path,
+    input_type: &InputType<'_>,
+    value: PrismaValue,
+) -> ValidationError {
+    invalid_argument_type_error_owned(selection_path, argument_path, input_type, ArgumentValue::Scalar(value))
 }
 
 #[inline(never)]
