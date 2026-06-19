@@ -9,9 +9,9 @@ use crate::{
     ParsedInputMap, ParsedInputValue,
     query_graph::{Flow, NodeRef, QueryGraph, QueryGraphDependency},
 };
-use query_structure::{Filter, RelationFieldRef};
-use schema::constants::args;
-use std::convert::TryInto;
+use query_structure::{Filter, Model, RelationFieldRef};
+use schema::constants::{args, operations};
+use std::{borrow::Cow, convert::TryInto};
 
 /// Handles a nested upsert.
 /// The constructed query graph can have different shapes based on the relation
@@ -114,6 +114,9 @@ pub fn nested_upsert(
         let create_input = as_map.swap_remove(args::CREATE).expect("create argument is missing");
         let update_input = as_map.swap_remove(args::UPDATE).expect("update argument is missing");
         let where_input = as_map.swap_remove(args::WHERE);
+        let mut create_map: ParsedInputMap<'_> = create_input.try_into()?;
+        let mut update_map: ParsedInputMap<'_> = update_input.try_into()?;
+        let shared_connect = extract_common_m2m_connect(&child_model, &mut create_map, &mut update_map);
 
         // Read child(ren) node
         let filter = match (where_input, parent_relation_field.is_list()) {
@@ -139,11 +142,11 @@ pub fn nested_upsert(
             utils::insert_find_children_by_parent_node(graph, &parent_node, parent_relation_field, filter.clone())?;
 
         let if_node = graph.create_node(Flow::if_non_empty());
-        let create_node =
-            create::create_record_node(graph, query_schema, child_model.clone(), create_input.try_into()?)?;
-        let update_map: ParsedInputMap<'_> = update_input.try_into()?;
+        let create_node = create::create_record_node(graph, query_schema, child_model.clone(), create_map)?;
         let update_args = WriteArgsParser::from(&child_model, update_map)?;
         let is_nested_only_update = update_args.args.is_empty() && !update_args.nested.is_empty();
+        let is_shared_connect_only_update =
+            shared_connect.is_some() && update_args.args.is_empty() && update_args.nested.is_empty();
 
         graph.create_edge(
             &read_children_node,
@@ -155,7 +158,7 @@ pub fn nested_upsert(
             ),
         )?;
 
-        let then_node = if is_nested_only_update {
+        let then_node = if is_nested_only_update || is_shared_connect_only_update {
             let return_node = graph.create_node(Flow::Return(None));
 
             graph.create_edge(
@@ -299,7 +302,71 @@ pub fn nested_upsert(
                 ),
             )?;
         }
+
+        if let Some((relation_field, connect_value)) = shared_connect {
+            connect_nested_query(
+                graph,
+                query_schema,
+                if_node,
+                relation_field,
+                [(Cow::Borrowed(operations::CONNECT), connect_value)]
+                    .into_iter()
+                    .collect(),
+            )?;
+        }
     }
 
     Ok(())
+}
+
+fn extract_common_m2m_connect<'a>(
+    child_model: &Model,
+    create_map: &mut ParsedInputMap<'a>,
+    update_map: &mut ParsedInputMap<'a>,
+) -> Option<(RelationFieldRef, ParsedInputValue<'a>)> {
+    if update_map.len() != 1 {
+        return None;
+    }
+
+    let (create_field_name, create_relation_field, create_connect) = single_m2m_connect(child_model, create_map)?;
+    let (update_field_name, _, update_connect) = single_m2m_connect(child_model, update_map)?;
+
+    if create_field_name != update_field_name || create_connect != update_connect {
+        return None;
+    }
+
+    create_map.shift_remove(create_field_name.as_ref())?;
+    update_map.shift_remove(update_field_name.as_ref())?;
+
+    Some((create_relation_field, update_connect))
+}
+
+fn single_m2m_connect<'a>(
+    model: &Model,
+    map: &ParsedInputMap<'a>,
+) -> Option<(Cow<'a, str>, RelationFieldRef, ParsedInputValue<'a>)> {
+    let mut connect = None;
+
+    for (field_name, value) in map.iter() {
+        let Ok(relation_field) = model.fields().find_from_relation_fields(field_name) else {
+            continue;
+        };
+
+        if connect.is_some() || !relation_field.relation().is_many_to_many() {
+            return None;
+        }
+
+        let ParsedInputValue::Map(envelope) = value else {
+            return None;
+        };
+
+        if envelope.len() != 1 {
+            return None;
+        }
+
+        let connect_value = envelope.get(operations::CONNECT)?.clone();
+        connect = Some((field_name.clone(), relation_field, connect_value));
+    }
+
+    connect
 }
