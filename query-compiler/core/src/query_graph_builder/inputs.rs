@@ -143,6 +143,12 @@ node_input_field!(
 );
 
 node_input_field!(
+    DisconnectAllParentInput,
+    Option<SelectionResult>,
+    Node::Query(Query::Write(WriteQuery::DisconnectAllRecords(dr))) => &mut dr.parent_id
+);
+
+node_input_field!(
     DisconnectChildrenInput,
     Vec<SelectionResult>,
     Node::Query(Query::Write(WriteQuery::DisconnectRecords(dr))) => &mut dr.child_ids

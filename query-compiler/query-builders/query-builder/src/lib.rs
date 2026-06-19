@@ -95,6 +95,12 @@ pub trait QueryBuilder {
         child_ids: &[SelectionResult],
     ) -> Result<DbQuery, Box<dyn std::error::Error + Send + Sync>>;
 
+    fn build_m2m_disconnect_all(
+        &self,
+        field: RelationField,
+        parent_id: &SelectionResult,
+    ) -> Result<DbQuery, Box<dyn std::error::Error + Send + Sync>>;
+
     fn build_delete(
         &self,
         model: &Model,
