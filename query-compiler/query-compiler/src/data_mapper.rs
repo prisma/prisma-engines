@@ -103,12 +103,12 @@ fn map_write_query(query: &WriteQuery, builder: &mut ResultNodeBuilder) -> Optio
         }
         WriteQuery::DeleteRecord(q) => get_result_node_for_delete(q.selected_fields.as_ref(), builder),
         WriteQuery::UpdateManyRecords(q) => get_result_node_for_update_many(q.selected_fields.as_ref(), builder),
-        WriteQuery::DeleteManyRecords(_) => None, // No result data
-        WriteQuery::ConnectRecords(_) => None,    // No result data
-        WriteQuery::DisconnectRecords(_) => None, // No result data
+        WriteQuery::DeleteManyRecords(_) => None,    // No result data
+        WriteQuery::ConnectRecords(_) => None,       // No result data
+        WriteQuery::DisconnectRecords(_) => None,    // No result data
         WriteQuery::DisconnectAllRecords(_) => None, // No result data
-        WriteQuery::ExecuteRaw(_) => None,        // No data mapping
-        WriteQuery::QueryRaw(_) => None,          // No data mapping
+        WriteQuery::ExecuteRaw(_) => None,           // No data mapping
+        WriteQuery::QueryRaw(_) => None,             // No data mapping
         WriteQuery::Upsert(q) => get_result_node()
             .field_selection(&q.selected_fields)
             .selection_order(&q.selection_order)
