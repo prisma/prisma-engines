@@ -216,16 +216,24 @@ fn raw_nested_relations_supported(
 }
 
 fn raw_related_records_supported(rrq: &RelatedRecordsQuery, has_unique_parent: bool) -> bool {
+    let is_many_to_many = rrq.parent_field.relation().is_many_to_many();
+
     if rrq.args.take == Take::Some(0)
         || rrq.parent_results.is_some()
         || !args_cannot_chunk(&rrq.args)
-        || !raw_nested_relation_operations_may_be_supported(&rrq.args, has_unique_parent)
+        || !raw_nested_relation_operations_may_be_supported(&rrq.args, has_unique_parent, is_many_to_many)
+        || (is_many_to_many
+            && !raw_nested_relation_operation_result_fields_supported(
+                &rrq.args,
+                &rrq.selected_fields,
+                &rrq.selection_order,
+                has_unique_parent,
+            ))
         || !raw_result_mapping_supported(&rrq.selected_fields, &rrq.selection_order)
     {
         return false;
     }
 
-    let is_many_to_many = rrq.parent_field.relation().is_many_to_many();
     let Some(child_scalar) = get_single_relation_scalar_for_filters(&rrq.parent_field) else {
         return false;
     };
@@ -238,7 +246,11 @@ fn raw_related_records_supported(rrq: &RelatedRecordsQuery, has_unique_parent: b
     raw_nested_relations_supported(&rrq.nested, &rrq.selected_fields, child_has_unique_parent)
 }
 
-fn raw_nested_relation_operations_may_be_supported(args: &QueryArguments, has_unique_parent: bool) -> bool {
+fn raw_nested_relation_operations_may_be_supported(
+    args: &QueryArguments,
+    has_unique_parent: bool,
+    supports_parent_grouped_ops: bool,
+) -> bool {
     if args.needs_reversed_order() {
         return false;
     }
@@ -246,15 +258,90 @@ fn raw_nested_relation_operations_may_be_supported(args: &QueryArguments, has_un
     let needs_pagination = args.take.is_some() || args.skip.is_some() || args.cursor.is_some();
     let must_paginate_in_memory =
         needs_pagination && (!has_unique_parent || args.requires_inmemory_processing(RelationLoadStrategy::Query));
-    if must_paginate_in_memory && args.cursor.is_some() {
+    if must_paginate_in_memory && args.cursor.is_some() && !supports_parent_grouped_ops {
         return false;
     }
-
     let needs_distinct = args.distinct.is_some();
     let must_distinct_in_memory =
         needs_distinct && (!has_unique_parent || args.requires_inmemory_distinct(RelationLoadStrategy::Query));
 
-    !must_distinct_in_memory
+    if must_distinct_in_memory && !supports_parent_grouped_ops {
+        return false;
+    }
+
+    true
+}
+
+fn raw_nested_relation_operation_result_fields_supported(
+    args: &QueryArguments,
+    selected_fields: &FieldSelection,
+    selection_order: &[String],
+    has_unique_parent: bool,
+) -> bool {
+    let needs_pagination = args.take.is_some() || args.skip.is_some() || args.cursor.is_some();
+    let must_paginate_in_memory =
+        needs_pagination && (!has_unique_parent || args.requires_inmemory_processing(RelationLoadStrategy::Query));
+    let must_match_cursor_fields = must_paginate_in_memory && args.cursor.is_some();
+    let needs_distinct = args.distinct.is_some();
+    let must_distinct_in_memory =
+        needs_distinct && (!has_unique_parent || args.requires_inmemory_distinct(RelationLoadStrategy::Query));
+
+    if !must_match_cursor_fields && !must_distinct_in_memory {
+        return true;
+    }
+
+    let Some(result_fields) = raw_nested_result_field_names(selected_fields, selection_order) else {
+        return false;
+    };
+
+    if must_match_cursor_fields
+        && !args
+            .cursor
+            .as_ref()
+            .is_none_or(|cursor| cursor.db_names().all(|field| result_fields.iter().any(|result| result == field.as_ref())))
+    {
+        return false;
+    }
+
+    if must_distinct_in_memory
+        && !args
+            .distinct
+            .as_ref()
+            .is_none_or(|distinct| distinct.db_names().all(|field| result_fields.iter().any(|result| result == &field)))
+    {
+        return false;
+    }
+
+    true
+}
+
+fn raw_nested_result_field_names(selected_fields: &FieldSelection, selection_order: &[String]) -> Option<Vec<String>> {
+    let mut result_fields = Vec::new();
+
+    for prisma_name in selection_order {
+        let Some(selection) = selected_fields
+            .selections()
+            .find(|field| field.prisma_name_grouping_virtuals() == prisma_name.as_str())
+        else {
+            continue;
+        };
+
+        match selection {
+            SelectedField::Scalar(field) => result_fields.push(field.name().to_owned()),
+            SelectedField::Virtual(virtual_selection) => {
+                result_fields.extend(
+                    selected_fields
+                        .virtuals()
+                        .filter(|field| field.serialized_group_name() == virtual_selection.serialized_group_name())
+                        .map(|field| field.serialized_field_name().to_owned()),
+                );
+            }
+            SelectedField::Relation(_) => {}
+            SelectedField::Composite(_) => return None,
+        }
+    }
+
+    Some(result_fields)
 }
 
 fn args_cannot_chunk(args: &QueryArguments) -> bool {
@@ -641,8 +728,8 @@ fn build_raw_read_related_records(
         .into_without_relations()
         .into_virtuals_last();
     let mut args = rrq.args.clone();
-    let in_memory_ops = in_memory_processing::extract_in_memory_ops_for_nested_query(&mut args, has_unique_parent);
-    if !raw_nested_relation_operations_supported(&in_memory_ops) {
+    let mut in_memory_ops = in_memory_processing::extract_in_memory_ops_for_nested_query(&mut args, has_unique_parent);
+    if !is_many_to_many && !raw_nested_relation_operations_supported(&in_memory_ops, false) {
         return Ok(None);
     }
 
@@ -651,6 +738,13 @@ fn build_raw_read_related_records(
     } else {
         build_read_one2m_query(linkage, args, &selected_fields, builder)?
     };
+    if is_many_to_many && !in_memory_ops.is_empty_toplevel() {
+        in_memory_ops.linking_fields = Some(join.fields.clone());
+    }
+    if !raw_nested_relation_operations_supported(&in_memory_ops, is_many_to_many) {
+        return Ok(None);
+    }
+
     let Expression::Query(db_query) = child_query else {
         return Ok(None);
     };
@@ -666,6 +760,9 @@ fn build_raw_read_related_records(
     else {
         return Ok(None);
     };
+    if !raw_nested_relation_operation_mappings_supported(&in_memory_ops, &fields) {
+        return Ok(None);
+    }
     let [child_field] = &join.fields[..] else {
         return Ok(None);
     };
@@ -693,15 +790,52 @@ fn build_raw_read_related_records(
     )))
 }
 
-fn raw_nested_relation_operations_supported(ops: &InMemoryOps) -> bool {
+fn raw_nested_relation_operations_supported(ops: &InMemoryOps, supports_parent_grouped_ops: bool) -> bool {
+    if ops.reverse || !ops.nested.is_empty() {
+        return false;
+    }
+
+    if supports_parent_grouped_ops {
+        return true;
+    }
+
     ops.distinct.is_none()
-        && !ops.reverse
-        && ops.nested.is_empty()
         && ops.linking_fields.is_none()
         && ops
             .pagination
             .as_ref()
             .is_none_or(|pagination| pagination.cursor().is_none())
+}
+
+fn raw_nested_relation_operation_mappings_supported(ops: &InMemoryOps, mappings: &[RawResultColumnMapping]) -> bool {
+    let has_cursor = ops
+        .pagination
+        .as_ref()
+        .is_some_and(|pagination| pagination.cursor().is_some());
+    if ops.distinct.is_none() && !has_cursor {
+        return true;
+    }
+
+    let has_record_field = |name: &str| {
+        mappings
+            .iter()
+            .any(|mapping| matches!(&mapping.field_name, RawResultFieldName::Field(field) if field == name))
+    };
+
+    if let Some(pagination) = &ops.pagination
+        && let Some(cursor) = pagination.cursor()
+        && !cursor.keys().all(|field| has_record_field(field))
+    {
+        return false;
+    }
+
+    if let Some(distinct) = &ops.distinct
+        && !distinct.iter().all(|field| has_record_field(field))
+    {
+        return false;
+    }
+
+    true
 }
 
 fn raw_many_to_many_child_column_indexes(

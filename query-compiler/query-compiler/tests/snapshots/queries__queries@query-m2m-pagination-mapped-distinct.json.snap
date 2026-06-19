@@ -1,0 +1,44 @@
+---
+source: query-compiler/query-compiler/tests/queries.rs
+expression: pretty
+input_file: query-compiler/query-compiler/tests/data/query-m2m-pagination-mapped-distinct.json
+snapshot_kind: text
+---
+dataMap {
+    id: Int (post_id)
+    categories (from @nested$categories): {
+        id: Int (cat_id)
+        name: String (name)
+    }
+}
+let @parent = query «SELECT "public"."MappedPost"."post_id" FROM
+                     "public"."MappedPost" WHERE 1=1 OFFSET $1»
+              params [const(BigInt(0))]
+in let @parent$id = mapField post_id (get @parent)
+   in join (get @parent)
+      with (process {
+               .: {
+                   linkingFields: (MappedCategoryToMappedPost@MappedPost)
+                   distinct: (cat_id)
+                   pagination: {
+                       skip: 1
+                       take: 1
+                       cursor: {
+                           cat_id: const(Int(1))
+                       }
+                   }
+               }
+           } (query «SELECT "public"."MappedCategory"."cat_id",
+                     "public"."MappedCategory"."name", "t1"."B" AS
+                     "MappedCategoryToMappedPost@MappedPost" FROM
+                     "public"."MappedCategory" INNER JOIN
+                     "public"."_MappedCategoryToMappedPost" AS "t1" ON "t1"."A"
+                     = "public"."MappedCategory"."cat_id" WHERE
+                     ("public"."MappedCategory"."cat_id" >= (SELECT
+                     "public"."MappedCategory"."cat_id" FROM
+                     "public"."MappedCategory" WHERE
+                     ("public"."MappedCategory"."cat_id") = ($1)) AND "t1"."B"
+                     IN [$2,*]) ORDER BY "public"."MappedCategory"."cat_id" ASC
+                     OFFSET $3»
+              params [const(BigInt(1)), var(@parent$id as Int),
+                      const(BigInt(0))])) on left.(post_id) = right.(MappedCategoryToMappedPost@MappedPost) as @nested$categories
