@@ -141,12 +141,16 @@ pub fn nested_upsert(
         let read_children_node =
             utils::insert_find_children_by_parent_node(graph, &parent_node, parent_relation_field, filter.clone())?;
 
-        let if_node = graph.create_node(Flow::if_non_empty());
         let create_node = create::create_record_node(graph, query_schema, child_model.clone(), create_map)?;
         let update_args = WriteArgsParser::from(&child_model, update_map)?;
         let is_nested_only_update = update_args.args.is_empty() && !update_args.nested.is_empty();
         let is_shared_connect_only_update =
             shared_connect.is_some() && update_args.args.is_empty() && update_args.nested.is_empty();
+        let if_node = graph.create_node(if is_shared_connect_only_update {
+            Flow::if_non_empty_returning_condition()
+        } else {
+            Flow::if_non_empty()
+        });
 
         graph.create_edge(
             &read_children_node,
@@ -158,7 +162,9 @@ pub fn nested_upsert(
             ),
         )?;
 
-        let then_node = if is_nested_only_update || is_shared_connect_only_update {
+        let then_node = if is_shared_connect_only_update {
+            None
+        } else if is_nested_only_update {
             let return_node = graph.create_node(Flow::Return(None));
 
             graph.create_edge(
@@ -182,7 +188,7 @@ pub fn nested_upsert(
                 connect_nested_query(graph, query_schema, return_node, relation_field, data_map)?;
             }
 
-            return_node
+            Some(return_node)
         } else {
             let update_node = update::update_record_node_from_args(
                 graph,
@@ -228,10 +234,14 @@ pub fn nested_upsert(
                 emulation_node
             } else {
                 update_node
-            }
+            };
+
+            Some(update_node)
         };
 
-        graph.create_edge(&if_node, &then_node, QueryGraphDependency::Then)?;
+        if let Some(then_node) = then_node {
+            graph.create_edge(&if_node, &then_node, QueryGraphDependency::Then)?;
+        }
         graph.create_edge(&if_node, &create_node, QueryGraphDependency::Else)?;
 
         // Specific handling based on relation type and inlining side.
