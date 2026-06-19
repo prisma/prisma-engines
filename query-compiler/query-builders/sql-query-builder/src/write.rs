@@ -373,6 +373,21 @@ pub fn delete_relation_table_records(
         .add_traceparent(ctx.traceparent)
 }
 
+pub fn delete_relation_table_records_for_parent(
+    parent_field: &RelationFieldRef,
+    parent_id: &SelectionResult,
+    ctx: &Context<'_>,
+) -> Delete<'static> {
+    let relation = parent_field.relation();
+
+    let parent_column = parent_field.related_field().m2m_column(ctx);
+    let parent_id_values = parent_id.db_values(ctx);
+
+    Delete::from_table(relation.as_table(ctx))
+        .so_that(parent_column.equals(parent_id_values))
+        .add_traceparent(ctx.traceparent)
+}
+
 /// Generates a list of insert statements to execute. If `selected_fields` is set, insert statements
 /// will return the specified columns of inserted rows.
 pub fn generate_insert_statements(

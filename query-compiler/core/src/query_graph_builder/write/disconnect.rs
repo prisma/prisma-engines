@@ -1,6 +1,6 @@
 use crate::{
     DataExpectation, DataOperation, MissingRelatedRecord, QueryGraphBuilderResult, RowSink,
-    inputs::{DisconnectChildrenInput, DisconnectParentInput},
+    inputs::{DisconnectAllParentInput, DisconnectChildrenInput, DisconnectParentInput},
     query_ast::*,
     query_graph::{NodeRef, QueryGraph, QueryGraphDependency},
 };
@@ -108,6 +108,41 @@ pub(crate) fn disconnect_records_node_with_child_ids(
                     .model(&parent_relation_field.model())
                     .relation(&parent_relation_field.relation())
                     .operation(DataOperation::Disconnect)
+                    .build(),
+            )),
+        ),
+    )?;
+
+    Ok(disconnect_node)
+}
+
+pub(crate) fn disconnect_all_records_node(
+    graph: &mut QueryGraph,
+    parent_node: &NodeRef,
+    parent_relation_field: &RelationFieldRef,
+) -> QueryGraphBuilderResult<NodeRef> {
+    assert!(parent_relation_field.relation().is_many_to_many());
+
+    let parent_model_id = parent_relation_field.model().shard_aware_primary_identifier();
+
+    let disconnect = WriteQuery::DisconnectAllRecords(DisconnectAllRecords {
+        parent_id: None,
+        relation_field: parent_relation_field.clone(),
+    });
+
+    let disconnect_node = graph.create_node(Query::Write(disconnect));
+
+    graph.create_edge(
+        parent_node,
+        &disconnect_node,
+        QueryGraphDependency::ProjectedDataDependency(
+            parent_model_id,
+            RowSink::Single(&DisconnectAllParentInput),
+            Some(DataExpectation::non_empty_rows(
+                MissingRelatedRecord::builder()
+                    .model(&parent_relation_field.model())
+                    .relation(&parent_relation_field.relation())
+                    .operation(DataOperation::NestedSet)
                     .build(),
             )),
         ),

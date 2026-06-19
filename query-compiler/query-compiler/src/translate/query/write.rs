@@ -1,8 +1,8 @@
 use itertools::{Either, Itertools};
 use query_builder::{CreateRecord, CreateRecordDefaultsQuery, QueryBuilder};
 use query_core::{
-    ConnectRecords, DeleteManyRecords, DeleteRecord, DisconnectRecords, RawQuery, UpdateManyRecords, UpdateRecord,
-    UpdateRecordWithSelection, UpdateRecordWithoutSelection, WriteQuery,
+    ConnectRecords, DeleteManyRecords, DeleteRecord, DisconnectAllRecords, DisconnectRecords, RawQuery,
+    UpdateManyRecords, UpdateRecord, UpdateRecordWithSelection, UpdateRecordWithoutSelection, WriteQuery,
 };
 use query_structure::{
     FieldSelection, Filter, IntoFilter, Model, PrismaValue, PrismaValueType, QueryArguments, RecordFilter,
@@ -362,6 +362,17 @@ pub(crate) fn translate_write_query(query: WriteQuery, builder: &dyn QueryBuilde
             let parent_id = parent_id.as_ref().expect("should have parent ID for disconnect");
             let query = builder
                 .build_m2m_disconnect(relation_field, parent_id, &child_ids)
+                .map_err(TranslateError::QueryBuildFailure)?;
+            Expression::Execute(query)
+        }
+
+        WriteQuery::DisconnectAllRecords(DisconnectAllRecords {
+            parent_id,
+            relation_field,
+        }) => {
+            let parent_id = parent_id.as_ref().expect("should have parent ID for disconnect-all");
+            let query = builder
+                .build_m2m_disconnect_all(relation_field, parent_id)
                 .map_err(TranslateError::QueryBuildFailure)?;
             Expression::Execute(query)
         }

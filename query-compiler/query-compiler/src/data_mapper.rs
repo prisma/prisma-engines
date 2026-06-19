@@ -106,6 +106,7 @@ fn map_write_query(query: &WriteQuery, builder: &mut ResultNodeBuilder) -> Optio
         WriteQuery::DeleteManyRecords(_) => None, // No result data
         WriteQuery::ConnectRecords(_) => None,    // No result data
         WriteQuery::DisconnectRecords(_) => None, // No result data
+        WriteQuery::DisconnectAllRecords(_) => None, // No result data
         WriteQuery::ExecuteRaw(_) => None,        // No data mapping
         WriteQuery::QueryRaw(_) => None,          // No data mapping
         WriteQuery::Upsert(q) => get_result_node()
