@@ -290,24 +290,26 @@ fn raw_nested_relation_operation_result_fields_supported(
         return true;
     }
 
-    let Some(result_fields) = raw_nested_result_field_names(selected_fields, selection_order) else {
+    let Some(result_fields) = raw_nested_operation_field_name_mappings(selected_fields, selection_order) else {
         return false;
     };
 
     if must_match_cursor_fields
-        && !args
-            .cursor
-            .as_ref()
-            .is_none_or(|cursor| cursor.db_names().all(|field| result_fields.iter().any(|result| result == field.as_ref())))
+        && !args.cursor.as_ref().is_none_or(|cursor| {
+            cursor
+                .db_names()
+                .all(|field| raw_nested_operation_field_name(&result_fields, field.as_ref()).is_some())
+        })
     {
         return false;
     }
 
     if must_distinct_in_memory
-        && !args
-            .distinct
-            .as_ref()
-            .is_none_or(|distinct| distinct.db_names().all(|field| result_fields.iter().any(|result| result == &field)))
+        && !args.distinct.as_ref().is_none_or(|distinct| {
+            distinct
+                .db_names()
+                .all(|field| raw_nested_operation_field_name(&result_fields, &field).is_some())
+        })
     {
         return false;
     }
@@ -315,7 +317,10 @@ fn raw_nested_relation_operation_result_fields_supported(
     true
 }
 
-fn raw_nested_result_field_names(selected_fields: &FieldSelection, selection_order: &[String]) -> Option<Vec<String>> {
+fn raw_nested_operation_field_name_mappings(
+    selected_fields: &FieldSelection,
+    selection_order: &[String],
+) -> Option<Vec<(String, String)>> {
     let mut result_fields = Vec::new();
 
     for prisma_name in selection_order {
@@ -327,21 +332,20 @@ fn raw_nested_result_field_names(selected_fields: &FieldSelection, selection_ord
         };
 
         match selection {
-            SelectedField::Scalar(field) => result_fields.push(field.name().to_owned()),
-            SelectedField::Virtual(virtual_selection) => {
-                result_fields.extend(
-                    selected_fields
-                        .virtuals()
-                        .filter(|field| field.serialized_group_name() == virtual_selection.serialized_group_name())
-                        .map(|field| field.serialized_field_name().to_owned()),
-                );
-            }
+            SelectedField::Scalar(field) => result_fields.push((field.db_name().to_owned(), field.name().to_owned())),
+            SelectedField::Virtual(_) => {}
             SelectedField::Relation(_) => {}
             SelectedField::Composite(_) => return None,
         }
     }
 
     Some(result_fields)
+}
+
+fn raw_nested_operation_field_name<'a>(mappings: &'a [(String, String)], field_name: &str) -> Option<&'a str> {
+    mappings
+        .iter()
+        .find_map(|(db_name, result_name)| (db_name == field_name).then_some(result_name.as_str()))
 }
 
 fn args_cannot_chunk(args: &QueryArguments) -> bool {
@@ -760,6 +764,19 @@ fn build_raw_read_related_records(
     else {
         return Ok(None);
     };
+    if is_many_to_many && raw_nested_relation_operations_need_record_fields(&in_memory_ops) {
+        let Some(field_name_mappings) =
+            raw_nested_operation_field_name_mappings(&selected_fields, &rrq.selection_order)
+        else {
+            return Ok(None);
+        };
+        let Some(mapped_ops) = in_memory_ops.remap_operation_field_names(|field| {
+            raw_nested_operation_field_name(&field_name_mappings, field).map(ToOwned::to_owned)
+        }) else {
+            return Ok(None);
+        };
+        in_memory_ops = mapped_ops;
+    }
     if !raw_nested_relation_operation_mappings_supported(&in_memory_ops, &fields) {
         return Ok(None);
     }
@@ -808,11 +825,7 @@ fn raw_nested_relation_operations_supported(ops: &InMemoryOps, supports_parent_g
 }
 
 fn raw_nested_relation_operation_mappings_supported(ops: &InMemoryOps, mappings: &[RawResultColumnMapping]) -> bool {
-    let has_cursor = ops
-        .pagination
-        .as_ref()
-        .is_some_and(|pagination| pagination.cursor().is_some());
-    if ops.distinct.is_none() && !has_cursor {
+    if !raw_nested_relation_operations_need_record_fields(ops) {
         return true;
     }
 
@@ -836,6 +849,14 @@ fn raw_nested_relation_operation_mappings_supported(ops: &InMemoryOps, mappings:
     }
 
     true
+}
+
+fn raw_nested_relation_operations_need_record_fields(ops: &InMemoryOps) -> bool {
+    ops.distinct.is_some()
+        || ops
+            .pagination
+            .as_ref()
+            .is_some_and(|pagination| pagination.cursor().is_some())
 }
 
 fn raw_many_to_many_child_column_indexes(

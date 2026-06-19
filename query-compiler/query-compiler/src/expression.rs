@@ -368,11 +368,7 @@ impl Serialize for Expression {
                 }
                 tuple.end()
             }
-            Self::Validate {
-                expr,
-                rules,
-                error,
-            } => {
+            Self::Validate { expr, rules, error } => {
                 let mut tuple = serializer.serialize_tuple(5)?;
                 tuple.serialize_element("V")?;
                 tuple.serialize_element(expr)?;
@@ -627,6 +623,21 @@ impl Pagination {
     pub fn skip(&self) -> Option<i64> {
         self.skip
     }
+
+    pub fn remap_cursor_field_names<F>(mut self, map_field_name: &mut F) -> Option<Self>
+    where
+        F: FnMut(&str) -> Option<String>,
+    {
+        if let Some(cursor) = self.cursor.take() {
+            let mut mapped_cursor = HashMap::with_capacity(cursor.len());
+            for (field, value) in cursor {
+                mapped_cursor.insert(map_field_name(&field)?, value);
+            }
+            self.cursor = Some(mapped_cursor);
+        }
+
+        Some(self)
+    }
 }
 
 #[derive(Debug, Default, Builder)]
@@ -688,6 +699,25 @@ impl InMemoryOps {
                 operations: self,
             }
         }
+    }
+
+    pub fn remap_operation_field_names<F>(mut self, mut map_field_name: F) -> Option<Self>
+    where
+        F: FnMut(&str) -> Option<String>,
+    {
+        if let Some(distinct) = self.distinct.take() {
+            let mut mapped_distinct = Vec::with_capacity(distinct.len());
+            for field in distinct {
+                mapped_distinct.push(map_field_name(&field)?);
+            }
+            self.distinct = Some(mapped_distinct);
+        }
+
+        if let Some(pagination) = self.pagination.take() {
+            self.pagination = Some(pagination.remap_cursor_field_names(&mut map_field_name)?);
+        }
+
+        Some(self)
     }
 }
 
