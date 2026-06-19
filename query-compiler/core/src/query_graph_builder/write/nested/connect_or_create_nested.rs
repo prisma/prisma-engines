@@ -404,7 +404,6 @@ fn one_to_many_inlined_parent(
     let if_node = graph.create_node(Flow::if_non_empty());
     let create_node = create::create_record_node(graph, query_schema, child_model.clone(), create_map)?;
     let return_existing = graph.create_node(Flow::Return(None));
-    let return_create = graph.create_node(Flow::Return(None));
 
     graph.create_edge(
         &read_node,
@@ -437,12 +436,6 @@ fn one_to_many_inlined_parent(
             RowSink::ProjectedPlaceholder(&ReturnInput),
             None,
         ),
-    )?;
-
-    graph.create_edge(
-        &create_node,
-        &return_create,
-        QueryGraphDependency::ProjectedDataDependency(child_link, RowSink::ProjectedPlaceholder(&ReturnInput), None),
     )?;
 
     Ok(())
@@ -541,7 +534,6 @@ fn one_to_one_inlined_parent(
     let if_node = graph.create_node(Flow::if_non_empty());
     let create_node = create::create_record_node(graph, query_schema, child_model.clone(), create_data)?;
     let return_existing = graph.create_node(Flow::Return(None));
-    let return_create = graph.create_node(Flow::Return(None));
 
     graph.create_edge(
         &read_node,
@@ -576,16 +568,6 @@ fn one_to_one_inlined_parent(
 
     // Else branch handling
     graph.create_edge(&if_node, &create_node, QueryGraphDependency::Else)?;
-    graph.create_edge(
-        &create_node,
-        &return_create,
-        QueryGraphDependency::ProjectedDataDependency(
-            child_link.clone(),
-            RowSink::ProjectedPlaceholder(&ReturnInput),
-            None,
-        ),
-    )?;
-
     if utils::node_is_create(graph, &parent_node) {
         // No need to perform checks, a child can't exist if the parent is just getting created. Simply inject.
         graph.create_edge(
