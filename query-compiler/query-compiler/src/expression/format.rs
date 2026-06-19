@@ -70,9 +70,9 @@ where
             Expression::Validate {
                 expr,
                 rules,
-                error_identifier,
+                error,
                 ..
-            } => self.validate(expr, rules, error_identifier),
+            } => self.validate(expr, rules, error.id()),
             Expression::If {
                 value,
                 rule,

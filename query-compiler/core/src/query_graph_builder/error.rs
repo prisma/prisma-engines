@@ -1,6 +1,6 @@
 use std::fmt;
 
-use crate::{DataDependencyError, QueryGraphError};
+use crate::{DataDependencyError, DataOperation, DependentOperation, QueryGraphError, RelationType};
 use bon::bon;
 use query_structure::{DomainError, Model, Relation, RelationFieldRef};
 use serde::Serialize;
@@ -100,13 +100,13 @@ impl From<QueryGraphError> for QueryGraphBuilderError {
     }
 }
 
-impl DataDependencyError for RelationViolation {
-    fn id(&self) -> &'static str {
-        "RELATION_VIOLATION"
-    }
-
-    fn context(&self) -> serde_json::Value {
-        serde_json::to_value(self).unwrap()
+impl From<RelationViolation> for DataDependencyError {
+    fn from(error: RelationViolation) -> Self {
+        Self::RelationViolation {
+            relation: error.relation,
+            model_a: error.model_a,
+            model_b: error.model_b,
+        }
     }
 }
 
@@ -130,13 +130,11 @@ impl fmt::Display for MissingRecord {
     }
 }
 
-impl DataDependencyError for MissingRecord {
-    fn id(&self) -> &'static str {
-        "MISSING_RECORD"
-    }
-
-    fn context(&self) -> serde_json::Value {
-        serde_json::to_value(self).unwrap()
+impl From<MissingRecord> for DataDependencyError {
+    fn from(error: MissingRecord) -> Self {
+        Self::MissingRecord {
+            operation: error.operation,
+        }
     }
 }
 
@@ -192,13 +190,15 @@ impl fmt::Display for MissingRelatedRecord {
     }
 }
 
-impl DataDependencyError for MissingRelatedRecord {
-    fn id(&self) -> &'static str {
-        "MISSING_RELATED_RECORD"
-    }
-
-    fn context(&self) -> serde_json::Value {
-        serde_json::to_value(self).unwrap()
+impl From<MissingRelatedRecord> for DataDependencyError {
+    fn from(error: MissingRelatedRecord) -> Self {
+        Self::MissingRelatedRecord {
+            model: error.model,
+            relation: error.relation,
+            relation_type: error.relation_type,
+            operation: error.operation,
+            needed_for: error.needed_for,
+        }
     }
 }
 
@@ -216,13 +216,11 @@ impl IncompleteConnectInput {
     }
 }
 
-impl DataDependencyError for IncompleteConnectInput {
-    fn id(&self) -> &'static str {
-        "INCOMPLETE_CONNECT_INPUT"
-    }
-
-    fn context(&self) -> serde_json::Value {
-        serde_json::to_value(self).unwrap()
+impl From<IncompleteConnectInput> for DataDependencyError {
+    fn from(error: IncompleteConnectInput) -> Self {
+        Self::IncompleteConnectInput {
+            expected_rows: error.expected_rows,
+        }
     }
 }
 
@@ -246,13 +244,13 @@ impl IncompleteConnectOutput {
     }
 }
 
-impl DataDependencyError for IncompleteConnectOutput {
-    fn id(&self) -> &'static str {
-        "INCOMPLETE_CONNECT_OUTPUT"
-    }
-
-    fn context(&self) -> serde_json::Value {
-        serde_json::to_value(self).unwrap()
+impl From<IncompleteConnectOutput> for DataDependencyError {
+    fn from(error: IncompleteConnectOutput) -> Self {
+        Self::IncompleteConnectOutput {
+            expected_rows: error.expected_rows,
+            relation: error.relation,
+            relation_type: error.relation_type,
+        }
     }
 }
 
@@ -275,171 +273,12 @@ impl RecordsNotConnected {
     }
 }
 
-impl DataDependencyError for RecordsNotConnected {
-    fn id(&self) -> &'static str {
-        "RECORDS_NOT_CONNECTED"
-    }
-
-    fn context(&self) -> serde_json::Value {
-        serde_json::to_value(self).unwrap()
-    }
-}
-
-#[derive(Debug, Clone, Serialize)]
-#[serde(into = "String")]
-pub enum DataOperation {
-    Query,
-    Update,
-    Upsert,
-    Delete,
-    Disconnect,
-    Connect,
-    NestedCreate,
-    NestedUpdate,
-    NestedUpsert,
-    NestedDelete,
-    NestedSet,
-    NestedConnect,
-    NestedConnectOrCreate,
-}
-
-impl fmt::Display for DataOperation {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let str = match self {
-            Self::Query => "a query",
-            Self::Update => "an update",
-            Self::Upsert => "an upsert",
-            Self::Delete => "a delete",
-            Self::Disconnect => "a disconnect",
-            Self::Connect => "a connect",
-            Self::NestedCreate => "a nested create",
-            Self::NestedUpdate => "a nested update",
-            Self::NestedUpsert => "a nested upsert",
-            Self::NestedDelete => "a nested delete",
-            Self::NestedSet => "a nested set",
-            Self::NestedConnect => "a nested connect",
-            Self::NestedConnectOrCreate => "a nested connect or create",
-        };
-        write!(f, "{str}")
-    }
-}
-
-impl From<DataOperation> for String {
-    fn from(operation: DataOperation) -> Self {
-        operation.to_string()
-    }
-}
-
-#[derive(Debug, Clone, Serialize)]
-#[serde(into = "String")]
-pub(crate) enum DependentOperation {
-    NestedUpdate,
-    DisconnectRecords,
-    FindRecords { model: String },
-    InlineRelation { model: String },
-    UpdateInlinedRelation { model: String },
-    CreateInlinedRelation { model: String },
-    ConnectOrCreateInlinedRelation { model: String },
-}
-
-impl DependentOperation {
-    pub fn nested_update() -> Self {
-        Self::NestedUpdate
-    }
-
-    pub fn disconnect_records() -> Self {
-        Self::DisconnectRecords
-    }
-
-    pub fn find_records(model: &Model) -> Self {
-        Self::FindRecords {
-            model: model.name().to_owned(),
+impl From<RecordsNotConnected> for DataDependencyError {
+    fn from(error: RecordsNotConnected) -> Self {
+        Self::RecordsNotConnected {
+            relation: error.relation,
+            parent: error.parent,
+            child: error.child,
         }
-    }
-
-    pub fn inline_relation(model: &Model) -> Self {
-        Self::InlineRelation {
-            model: model.name().to_owned(),
-        }
-    }
-
-    pub fn update_inlined_relation(model: &Model) -> Self {
-        Self::UpdateInlinedRelation {
-            model: model.name().to_owned(),
-        }
-    }
-
-    pub fn create_inlined_relation(model: &Model) -> Self {
-        Self::CreateInlinedRelation {
-            model: model.name().to_owned(),
-        }
-    }
-
-    pub fn connect_or_create_inlined_relation(model: &Model) -> Self {
-        Self::ConnectOrCreateInlinedRelation {
-            model: model.name().to_owned(),
-        }
-    }
-}
-
-impl fmt::Display for DependentOperation {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            Self::NestedUpdate => write!(f, "perform a nested update"),
-            Self::DisconnectRecords => write!(f, "disconnect existing child records"),
-            Self::FindRecords { model } => write!(f, "find '{model}' record(s)"),
-            Self::InlineRelation { model } => write!(f, "inline the relation on '{model}' record(s)"),
-            Self::UpdateInlinedRelation { model } => {
-                write!(f, "update inlined relation for '{model}' record(s)")
-            }
-            Self::CreateInlinedRelation { model } => {
-                write!(f, "create inlined relation for '{model}' record(s)")
-            }
-            Self::ConnectOrCreateInlinedRelation { model } => {
-                write!(f, "create or connect inlined relation for '{model}' record(s)")
-            }
-        }
-    }
-}
-
-impl From<DependentOperation> for String {
-    fn from(operation: DependentOperation) -> Self {
-        operation.to_string()
-    }
-}
-
-#[derive(Debug, Clone, Serialize)]
-#[serde(into = "String")]
-enum RelationType {
-    OneToOne,
-    OneToMany,
-    ManyToMany,
-}
-
-impl From<&Relation> for RelationType {
-    fn from(relation: &Relation) -> Self {
-        if relation.is_one_to_one() {
-            Self::OneToOne
-        } else if relation.is_one_to_many() {
-            Self::OneToMany
-        } else {
-            Self::ManyToMany
-        }
-    }
-}
-
-impl fmt::Display for RelationType {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            RelationType::OneToOne => write!(f, "one-to-one"),
-            RelationType::OneToMany => write!(f, "one-to-many"),
-            RelationType::ManyToMany => write!(f, "many-to-many"),
-        }
-    }
-}
-
-impl From<RelationType> for String {
-    fn from(relation_type: RelationType) -> Self {
-        relation_type.to_string()
     }
 }

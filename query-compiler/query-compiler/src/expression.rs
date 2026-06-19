@@ -6,10 +6,10 @@ use std::{
 use crate::{data_mapper::FieldType, result_node::ResultNode};
 use bon::{Builder, bon};
 use query_builder::DbQuery;
-use query_core::{DataExpectation, DataRule};
+use query_core::{DataDependencyError, DataExpectation, DataRule};
 use query_structure::{InternalEnum, PrismaValue, PrismaValueType, ScalarWriteOperation};
 use serde::{Serialize, Serializer, ser::SerializeMap, ser::SerializeTuple};
-use serde_json::Value;
+use smallvec::SmallVec;
 use thiserror::Error;
 
 mod format;
@@ -263,9 +263,8 @@ pub enum Expression {
     /// Validates the expression according to the data rule and throws an error if it doesn't match.
     Validate {
         expr: Box<Expression>,
-        rules: Vec<DataRule>,
-        error_identifier: &'static str,
-        context: serde_json::Value,
+        rules: SmallVec<[DataRule; 1]>,
+        error: DataDependencyError,
     },
 
     /// Checks if `value` satisifies the `rule`, and executes `then` if it does, or `r#else` if it doesn't.
@@ -372,18 +371,14 @@ impl Serialize for Expression {
             Self::Validate {
                 expr,
                 rules,
-                error_identifier,
-                context,
+                error,
             } => {
                 let mut tuple = serializer.serialize_tuple(5)?;
                 tuple.serialize_element("V")?;
                 tuple.serialize_element(expr)?;
-                tuple.serialize_element(rules)?;
-                tuple.serialize_element(compact_validation_error_identifier(error_identifier))?;
-                tuple.serialize_element(&CompactValidationContext {
-                    error_identifier,
-                    context,
-                })?;
+                tuple.serialize_element(rules.as_slice())?;
+                tuple.serialize_element(error.compact_id())?;
+                tuple.serialize_element(&CompactValidationContext { error })?;
                 tuple.end()
             }
             Self::If {
@@ -449,21 +444,8 @@ where
     tuple.end()
 }
 
-fn compact_validation_error_identifier(error_identifier: &'static str) -> &'static str {
-    match error_identifier {
-        "RELATION_VIOLATION" => "r",
-        "MISSING_RELATED_RECORD" => "m",
-        "MISSING_RECORD" => "M",
-        "INCOMPLETE_CONNECT_INPUT" => "i",
-        "INCOMPLETE_CONNECT_OUTPUT" => "o",
-        "RECORDS_NOT_CONNECTED" => "n",
-        _ => error_identifier,
-    }
-}
-
 struct CompactValidationContext<'a> {
-    error_identifier: &'static str,
-    context: &'a Value,
+    error: &'a DataDependencyError,
 }
 
 impl Serialize for CompactValidationContext<'_> {
@@ -471,85 +453,7 @@ impl Serialize for CompactValidationContext<'_> {
     where
         S: Serializer,
     {
-        let Value::Object(context) = self.context else {
-            return self.context.serialize(serializer);
-        };
-
-        match self.error_identifier {
-            "RELATION_VIOLATION" => {
-                if let (Some(relation), Some(model_a), Some(model_b)) =
-                    (context.get("relation"), context.get("modelA"), context.get("modelB"))
-                {
-                    let mut tuple = serializer.serialize_tuple(3)?;
-                    tuple.serialize_element(relation)?;
-                    tuple.serialize_element(model_a)?;
-                    tuple.serialize_element(model_b)?;
-                    return tuple.end();
-                }
-            }
-            "MISSING_RELATED_RECORD" => {
-                if let (Some(model), Some(relation), Some(relation_type), Some(operation)) = (
-                    context.get("model"),
-                    context.get("relation"),
-                    context.get("relationType"),
-                    context.get("operation"),
-                ) {
-                    if let Some(needed_for) = context.get("neededFor") {
-                        let mut tuple = serializer.serialize_tuple(5)?;
-                        tuple.serialize_element(model)?;
-                        tuple.serialize_element(relation)?;
-                        tuple.serialize_element(relation_type)?;
-                        tuple.serialize_element(operation)?;
-                        tuple.serialize_element(needed_for)?;
-                        return tuple.end();
-                    }
-
-                    let mut tuple = serializer.serialize_tuple(4)?;
-                    tuple.serialize_element(model)?;
-                    tuple.serialize_element(relation)?;
-                    tuple.serialize_element(relation_type)?;
-                    tuple.serialize_element(operation)?;
-                    return tuple.end();
-                }
-            }
-            "MISSING_RECORD" => {
-                if let Some(operation) = context.get("operation") {
-                    return operation.serialize(serializer);
-                }
-            }
-            "INCOMPLETE_CONNECT_INPUT" => {
-                if let Some(expected_rows) = context.get("expectedRows") {
-                    return expected_rows.serialize(serializer);
-                }
-            }
-            "INCOMPLETE_CONNECT_OUTPUT" => {
-                if let (Some(expected_rows), Some(relation), Some(relation_type)) = (
-                    context.get("expectedRows"),
-                    context.get("relation"),
-                    context.get("relationType"),
-                ) {
-                    let mut tuple = serializer.serialize_tuple(3)?;
-                    tuple.serialize_element(expected_rows)?;
-                    tuple.serialize_element(relation)?;
-                    tuple.serialize_element(relation_type)?;
-                    return tuple.end();
-                }
-            }
-            "RECORDS_NOT_CONNECTED" => {
-                if let (Some(relation), Some(parent), Some(child)) =
-                    (context.get("relation"), context.get("parent"), context.get("child"))
-                {
-                    let mut tuple = serializer.serialize_tuple(3)?;
-                    tuple.serialize_element(relation)?;
-                    tuple.serialize_element(parent)?;
-                    tuple.serialize_element(child)?;
-                    return tuple.end();
-                }
-            }
-            _ => {}
-        }
-
-        self.context.serialize(serializer)
+        self.error.serialize_compact_context(serializer)
     }
 }
 
@@ -916,9 +820,8 @@ impl Expression {
     pub fn validate_expectation(expectation: &DataExpectation, expr: Expression) -> Expression {
         Expression::Validate {
             expr: expr.into(),
-            rules: expectation.rules().to_vec(),
-            error_identifier: expectation.error().id(),
-            context: expectation.error().context(),
+            rules: expectation.rules().iter().cloned().collect(),
+            error: expectation.error().clone(),
         }
     }
 }

@@ -22,7 +22,7 @@ use petgraph::{
     *,
 };
 use query_structure::{
-    FieldSelection, Filter, Model, Placeholder, PrismaValue, QueryArguments, SelectionResult, WriteArgs,
+    FieldSelection, Filter, Model, Placeholder, PrismaValue, QueryArguments, Relation, SelectionResult, WriteArgs,
 };
 
 pub type QueryGraphResult<T> = std::result::Result<T, QueryGraphError>;
@@ -304,35 +304,35 @@ pub trait NodeInputField<R: ?Sized>: Send + Sync + fmt::Debug {
 /// An expectation for a data dependency.
 pub struct DataExpectation {
     rules: SmallVec<[DataRule; 1]>,
-    error: Box<dyn DataDependencyError>,
+    error: DataDependencyError,
 }
 
 impl DataExpectation {
-    pub fn non_empty_rows(error: impl DataDependencyError + 'static) -> Self {
+    pub fn non_empty_rows(error: impl Into<DataDependencyError>) -> Self {
         Self {
             rules: smallvec![DataRule::RowCountNeq(0)],
-            error: Box::new(error),
+            error: error.into(),
         }
     }
 
-    pub fn empty_rows(error: impl DataDependencyError + 'static) -> Self {
+    pub fn empty_rows(error: impl Into<DataDependencyError>) -> Self {
         Self {
             rules: smallvec![DataRule::RowCountEq(0)],
-            error: Box::new(error),
+            error: error.into(),
         }
     }
 
-    pub fn exact_row_count(expected: usize, error: impl DataDependencyError + 'static) -> Self {
+    pub fn exact_row_count(expected: usize, error: impl Into<DataDependencyError>) -> Self {
         Self {
             rules: smallvec![DataRule::RowCountEq(expected)],
-            error: Box::new(error),
+            error: error.into(),
         }
     }
 
-    pub fn affected_row_count(expected: usize, error: impl DataDependencyError + 'static) -> Self {
+    pub fn affected_row_count(expected: usize, error: impl Into<DataDependencyError>) -> Self {
         Self {
             rules: smallvec![DataRule::AffectedRowCountEq(expected)],
-            error: Box::new(error),
+            error: error.into(),
         }
     }
 
@@ -340,8 +340,8 @@ impl DataExpectation {
         &self.rules
     }
 
-    pub fn error(&self) -> &dyn DataDependencyError {
-        &*self.error
+    pub fn error(&self) -> &DataDependencyError {
+        &self.error
     }
 }
 
@@ -393,12 +393,306 @@ impl fmt::Display for DataRule {
     }
 }
 
+#[derive(Debug, Clone, Serialize)]
+#[serde(into = "String")]
+pub enum DataOperation {
+    Query,
+    Update,
+    Upsert,
+    Delete,
+    Disconnect,
+    Connect,
+    NestedCreate,
+    NestedUpdate,
+    NestedUpsert,
+    NestedDelete,
+    NestedSet,
+    NestedConnect,
+    NestedConnectOrCreate,
+}
+
+impl fmt::Display for DataOperation {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.write_str(self.as_str())
+    }
+}
+
+impl DataOperation {
+    pub fn as_str(&self) -> &'static str {
+        let str = match self {
+            Self::Query => "a query",
+            Self::Update => "an update",
+            Self::Upsert => "an upsert",
+            Self::Delete => "a delete",
+            Self::Disconnect => "a disconnect",
+            Self::Connect => "a connect",
+            Self::NestedCreate => "a nested create",
+            Self::NestedUpdate => "a nested update",
+            Self::NestedUpsert => "a nested upsert",
+            Self::NestedDelete => "a nested delete",
+            Self::NestedSet => "a nested set",
+            Self::NestedConnect => "a nested connect",
+            Self::NestedConnectOrCreate => "a nested connect or create",
+        };
+        str
+    }
+}
+
+impl From<DataOperation> for String {
+    fn from(operation: DataOperation) -> Self {
+        operation.to_string()
+    }
+}
+
+#[derive(Debug, Clone, Serialize)]
+#[serde(into = "String")]
+pub enum DependentOperation {
+    NestedUpdate,
+    DisconnectRecords,
+    FindRecords { model: String },
+    InlineRelation { model: String },
+    UpdateInlinedRelation { model: String },
+    CreateInlinedRelation { model: String },
+    ConnectOrCreateInlinedRelation { model: String },
+}
+
+impl DependentOperation {
+    pub fn nested_update() -> Self {
+        Self::NestedUpdate
+    }
+
+    pub fn disconnect_records() -> Self {
+        Self::DisconnectRecords
+    }
+
+    pub fn find_records(model: &Model) -> Self {
+        Self::FindRecords {
+            model: model.name().to_owned(),
+        }
+    }
+
+    pub fn inline_relation(model: &Model) -> Self {
+        Self::InlineRelation {
+            model: model.name().to_owned(),
+        }
+    }
+
+    pub fn update_inlined_relation(model: &Model) -> Self {
+        Self::UpdateInlinedRelation {
+            model: model.name().to_owned(),
+        }
+    }
+
+    pub fn create_inlined_relation(model: &Model) -> Self {
+        Self::CreateInlinedRelation {
+            model: model.name().to_owned(),
+        }
+    }
+
+    pub fn connect_or_create_inlined_relation(model: &Model) -> Self {
+        Self::ConnectOrCreateInlinedRelation {
+            model: model.name().to_owned(),
+        }
+    }
+}
+
+impl fmt::Display for DependentOperation {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Self::NestedUpdate => write!(f, "perform a nested update"),
+            Self::DisconnectRecords => write!(f, "disconnect existing child records"),
+            Self::FindRecords { model } => write!(f, "find '{model}' record(s)"),
+            Self::InlineRelation { model } => write!(f, "inline the relation on '{model}' record(s)"),
+            Self::UpdateInlinedRelation { model } => {
+                write!(f, "update inlined relation for '{model}' record(s)")
+            }
+            Self::CreateInlinedRelation { model } => {
+                write!(f, "create inlined relation for '{model}' record(s)")
+            }
+            Self::ConnectOrCreateInlinedRelation { model } => {
+                write!(f, "create or connect inlined relation for '{model}' record(s)")
+            }
+        }
+    }
+}
+
+impl From<DependentOperation> for String {
+    fn from(operation: DependentOperation) -> Self {
+        operation.to_string()
+    }
+}
+
+#[derive(Debug, Clone, Serialize)]
+#[serde(into = "String")]
+pub enum RelationType {
+    OneToOne,
+    OneToMany,
+    ManyToMany,
+}
+
+impl From<&Relation> for RelationType {
+    fn from(relation: &Relation) -> Self {
+        if relation.is_one_to_one() {
+            Self::OneToOne
+        } else if relation.is_one_to_many() {
+            Self::OneToMany
+        } else {
+            Self::ManyToMany
+        }
+    }
+}
+
+impl fmt::Display for RelationType {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.write_str(self.as_str())
+    }
+}
+
+impl RelationType {
+    pub fn as_str(&self) -> &'static str {
+        match self {
+            RelationType::OneToOne => "one-to-one",
+            RelationType::OneToMany => "one-to-many",
+            RelationType::ManyToMany => "many-to-many",
+        }
+    }
+}
+
+impl From<RelationType> for String {
+    fn from(relation_type: RelationType) -> Self {
+        relation_type.to_string()
+    }
+}
+
 /// An error that can occur during data dependency validation.
-pub trait DataDependencyError: Send + Sync {
-    /// A unique identifier for the error.
-    fn id(&self) -> &'static str;
-    /// Context with additional information used to provide more context for the error.
-    fn context(&self) -> serde_json::Value;
+#[derive(Debug, Clone)]
+pub enum DataDependencyError {
+    RelationViolation {
+        relation: String,
+        model_a: String,
+        model_b: String,
+    },
+    MissingRecord {
+        operation: DataOperation,
+    },
+    MissingRelatedRecord {
+        model: String,
+        relation: String,
+        relation_type: RelationType,
+        operation: DataOperation,
+        needed_for: Option<DependentOperation>,
+    },
+    IncompleteConnectInput {
+        expected_rows: usize,
+    },
+    IncompleteConnectOutput {
+        expected_rows: usize,
+        relation: String,
+        relation_type: RelationType,
+    },
+    RecordsNotConnected {
+        relation: String,
+        parent: String,
+        child: String,
+    },
+}
+
+impl DataDependencyError {
+    pub fn id(&self) -> &'static str {
+        match self {
+            Self::RelationViolation { .. } => "RELATION_VIOLATION",
+            Self::MissingRecord { .. } => "MISSING_RECORD",
+            Self::MissingRelatedRecord { .. } => "MISSING_RELATED_RECORD",
+            Self::IncompleteConnectInput { .. } => "INCOMPLETE_CONNECT_INPUT",
+            Self::IncompleteConnectOutput { .. } => "INCOMPLETE_CONNECT_OUTPUT",
+            Self::RecordsNotConnected { .. } => "RECORDS_NOT_CONNECTED",
+        }
+    }
+
+    pub fn compact_id(&self) -> &'static str {
+        match self {
+            Self::RelationViolation { .. } => "r",
+            Self::MissingRelatedRecord { .. } => "m",
+            Self::MissingRecord { .. } => "M",
+            Self::IncompleteConnectInput { .. } => "i",
+            Self::IncompleteConnectOutput { .. } => "o",
+            Self::RecordsNotConnected { .. } => "n",
+        }
+    }
+
+    pub fn serialize_compact_context<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        match self {
+            Self::RelationViolation {
+                relation,
+                model_a,
+                model_b,
+            } => {
+                let mut tuple = serializer.serialize_tuple(3)?;
+                tuple.serialize_element(relation)?;
+                tuple.serialize_element(model_a)?;
+                tuple.serialize_element(model_b)?;
+                tuple.end()
+            }
+            Self::MissingRelatedRecord {
+                model,
+                relation,
+                relation_type,
+                operation,
+                needed_for,
+            } => {
+                let mut tuple = serializer.serialize_tuple(if needed_for.is_some() { 5 } else { 4 })?;
+                tuple.serialize_element(model)?;
+                tuple.serialize_element(relation)?;
+                tuple.serialize_element(relation_type.as_str())?;
+                tuple.serialize_element(operation.as_str())?;
+                if let Some(needed_for) = needed_for {
+                    tuple.serialize_element(&DisplayValue(needed_for))?;
+                }
+                tuple.end()
+            }
+            Self::MissingRecord { operation } => serializer.serialize_str(operation.as_str()),
+            Self::IncompleteConnectInput { expected_rows } => expected_rows.serialize(serializer),
+            Self::IncompleteConnectOutput {
+                expected_rows,
+                relation,
+                relation_type,
+            } => {
+                let mut tuple = serializer.serialize_tuple(3)?;
+                tuple.serialize_element(expected_rows)?;
+                tuple.serialize_element(relation)?;
+                tuple.serialize_element(relation_type.as_str())?;
+                tuple.end()
+            }
+            Self::RecordsNotConnected {
+                relation,
+                parent,
+                child,
+            } => {
+                let mut tuple = serializer.serialize_tuple(3)?;
+                tuple.serialize_element(relation)?;
+                tuple.serialize_element(parent)?;
+                tuple.serialize_element(child)?;
+                tuple.end()
+            }
+        }
+    }
+}
+
+struct DisplayValue<'a, T>(&'a T);
+
+impl<T> Serialize for DisplayValue<'_, T>
+where
+    T: fmt::Display,
+{
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        serializer.collect_str(self.0)
+    }
 }
 
 /// A graph representing an abstract view of queries and their execution dependencies.
