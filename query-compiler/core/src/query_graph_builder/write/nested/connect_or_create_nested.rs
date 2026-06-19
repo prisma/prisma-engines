@@ -116,8 +116,7 @@ fn handle_many_to_many(
         ));
 
         let create_node = create::create_record_node(graph, query_schema, child_model.clone(), create_map)?;
-        let if_node = graph.create_node(Flow::if_non_empty());
-        let return_existing = graph.create_node(Flow::Return(None));
+        let if_node = graph.create_node(Flow::if_non_empty_returning_condition());
 
         graph.create_edge(&parent_node, &read_node, QueryGraphDependency::ExecutionOrder)?;
         graph.create_edge(
@@ -130,17 +129,7 @@ fn handle_many_to_many(
             ),
         )?;
 
-        graph.create_edge(&if_node, &return_existing, QueryGraphDependency::Then)?;
         graph.create_edge(&if_node, &create_node, QueryGraphDependency::Else)?;
-        graph.create_edge(
-            &read_node,
-            &return_existing,
-            QueryGraphDependency::ProjectedDataDependency(
-                child_model_identifier.clone(),
-                RowSink::ProjectedPlaceholder(&ReturnInput),
-                None,
-            ),
-        )?;
 
         connect::connect_records_node(graph, &parent_node, &if_node, parent_relation_field, 1)?;
     }
@@ -401,9 +390,8 @@ fn one_to_many_inlined_parent(
     graph.mark_nodes(&parent_node, &read_node);
     graph.create_edge(&parent_node, &read_node, QueryGraphDependency::ExecutionOrder)?;
 
-    let if_node = graph.create_node(Flow::if_non_empty());
+    let if_node = graph.create_node(Flow::if_non_empty_returning_condition());
     let create_node = create::create_record_node(graph, query_schema, child_model.clone(), create_map)?;
-    let return_existing = graph.create_node(Flow::Return(None));
 
     graph.create_edge(
         &read_node,
@@ -415,7 +403,6 @@ fn one_to_many_inlined_parent(
         ),
     )?;
 
-    graph.create_edge(&if_node, &return_existing, QueryGraphDependency::Then)?;
     graph.create_edge(&if_node, &create_node, QueryGraphDependency::Else)?;
 
     graph.create_edge(
@@ -424,16 +411,6 @@ fn one_to_many_inlined_parent(
         QueryGraphDependency::ProjectedDataDependency(
             child_link.clone(),
             RowSink::ExactlyOneWriteArgs(parent_link, &UpdateOrCreateArgsInput),
-            None,
-        ),
-    )?;
-
-    graph.create_edge(
-        &read_node,
-        &return_existing,
-        QueryGraphDependency::ProjectedDataDependency(
-            child_link.clone(),
-            RowSink::ProjectedPlaceholder(&ReturnInput),
             None,
         ),
     )?;

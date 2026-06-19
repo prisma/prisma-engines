@@ -68,8 +68,13 @@ impl From<Flow> for Node {
 
 pub enum Flow {
     /// Expresses a conditional control flow in the graph.
-    /// Possible outgoing edges are `then` and `else`, each at most once, with `then` required to be present.
-    If { rule: DataRule, data: Option<Placeholder> },
+    /// Possible outgoing edges are `then` and `else`, each at most once.
+    /// `then` is required unless `then_returns_condition` is set, in which case the condition input is also the then-branch result.
+    If {
+        rule: DataRule,
+        data: Option<Placeholder>,
+        then_returns_condition: bool,
+    },
 
     /// Returns a fixed set of results at runtime.
     Return(Option<Placeholder>),
@@ -80,6 +85,15 @@ impl Flow {
         Self::If {
             rule: DataRule::RowCountNeq(0),
             data: None,
+            then_returns_condition: false,
+        }
+    }
+
+    pub fn if_non_empty_returning_condition() -> Self {
+        Self::If {
+            rule: DataRule::RowCountNeq(0),
+            data: None,
+            then_returns_condition: true,
         }
     }
 
@@ -87,6 +101,7 @@ impl Flow {
         Self::If {
             rule: DataRule::Never,
             data: None,
+            then_returns_condition: false,
         }
     }
 }
