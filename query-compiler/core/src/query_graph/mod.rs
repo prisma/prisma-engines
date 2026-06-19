@@ -21,7 +21,9 @@ use petgraph::{
     visit::{EdgeRef as PEdgeRef, NodeIndexable},
     *,
 };
-use query_structure::{FieldSelection, Filter, Placeholder, QueryArguments, SelectionResult, WriteArgs};
+use query_structure::{
+    FieldSelection, Filter, Model, Placeholder, PrismaValue, QueryArguments, SelectionResult, WriteArgs,
+};
 
 pub type QueryGraphResult<T> = std::result::Result<T, QueryGraphError>;
 
@@ -93,6 +95,7 @@ impl Flow {
 pub enum Computation {
     DiffLeftToRight(DiffNode),
     DiffRightToLeft(DiffNode),
+    RequiredOneToManySet(RequiredOneToManySetNode),
 }
 
 impl Computation {
@@ -102,6 +105,28 @@ impl Computation {
 
     pub fn empty_diff_right_to_left(fields: FieldSelection) -> Self {
         Self::DiffRightToLeft(DiffNode::new_empty(fields))
+    }
+
+    pub fn required_one_to_many_set(
+        fields: FieldSelection,
+        parent_node: NodeRef,
+        parent_link: FieldSelection,
+        child_link: FieldSelection,
+        child_model: Model,
+        parent_expectation: DataExpectation,
+        relation_expectation: DataExpectation,
+        request_now: PrismaValue,
+    ) -> Self {
+        Self::RequiredOneToManySet(RequiredOneToManySetNode::new(
+            fields,
+            parent_node,
+            parent_link,
+            child_link,
+            child_model,
+            parent_expectation,
+            relation_expectation,
+            request_now,
+        ))
     }
 }
 
@@ -117,6 +142,45 @@ impl DiffNode {
             left: None,
             right: None,
             fields,
+        }
+    }
+}
+
+pub struct RequiredOneToManySetNode {
+    pub old_children: Option<Placeholder>,
+    pub new_children: Option<Placeholder>,
+    pub fields: FieldSelection,
+    pub parent_node: NodeRef,
+    pub parent_link: FieldSelection,
+    pub child_link: FieldSelection,
+    pub child_model: Model,
+    pub parent_expectation: DataExpectation,
+    pub relation_expectation: DataExpectation,
+    pub request_now: PrismaValue,
+}
+
+impl RequiredOneToManySetNode {
+    pub fn new(
+        fields: FieldSelection,
+        parent_node: NodeRef,
+        parent_link: FieldSelection,
+        child_link: FieldSelection,
+        child_model: Model,
+        parent_expectation: DataExpectation,
+        relation_expectation: DataExpectation,
+        request_now: PrismaValue,
+    ) -> Self {
+        Self {
+            old_children: None,
+            new_children: None,
+            fields,
+            parent_node,
+            parent_link,
+            child_link,
+            child_model,
+            parent_expectation,
+            relation_expectation,
+            request_now,
         }
     }
 }
