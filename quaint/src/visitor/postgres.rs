@@ -378,6 +378,24 @@ impl<'a> Visitor<'a> for Postgres<'a> {
                     }
                 }
             }
+            Expression {
+                kind: ExpressionKind::Selection(selection),
+                ..
+            } => {
+                let columns = insert.columns.len();
+
+                self.write(" (")?;
+                for (i, c) in insert.columns.into_iter().enumerate() {
+                    self.visit_column(c.name.into_owned().into())?;
+
+                    if i < (columns - 1) {
+                        self.write(",")?;
+                    }
+                }
+
+                self.write(") ")?;
+                self.visit_sub_selection(selection)?;
+            }
             expr => self.surround_with("(", ")", |ref mut s| s.visit_expression(expr))?,
         }
 
@@ -892,6 +910,25 @@ mod tests {
         );
         let query = Insert::single_into("users").value("foo", 10);
         let (sql, params) = Postgres::build(Insert::from(query).returning(vec!["foo"])).unwrap();
+
+        assert_eq!(expected.0, sql);
+        assert_eq!(expected.1, params);
+    }
+
+    #[test]
+    #[cfg(feature = "postgresql")]
+    fn test_insert_from_selection() {
+        let expected = expected_values(
+            "INSERT INTO \"relations\" (\"parent_id\",\"child_id\") SELECT \"parent_id\", \"child_id\" FROM \"children\" WHERE \"child_id\" = $1 ON CONFLICT DO NOTHING RETURNING \"child_id\"",
+            vec![10],
+        );
+        let selection = Select::from_table("children")
+            .columns(vec!["parent_id", "child_id"])
+            .so_that("child_id".equals(10));
+        let query = Insert::expression_into("relations", vec!["parent_id", "child_id"], selection)
+            .on_conflict(OnConflict::DoNothing)
+            .returning(vec!["child_id"]);
+        let (sql, params) = Postgres::build(query).unwrap();
 
         assert_eq!(expected.0, sql);
         assert_eq!(expected.1, params);
