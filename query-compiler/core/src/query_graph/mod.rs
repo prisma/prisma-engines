@@ -275,6 +275,8 @@ pub enum RowSink {
     ExactlyOne(&'static dyn NodeInputField<Vec<SelectionResult>>),
     /// Store a projected placeholder directly to the node input field.
     ProjectedPlaceholder(&'static dyn NodeInputField<Option<Placeholder>>),
+    /// Store a single source-field placeholder directly to the node input field.
+    ProjectedFieldPlaceholder(&'static dyn NodeInputField<Option<Placeholder>>),
     /// Store a filter representing all rows to the node input field.
     AllFilter(&'static dyn NodeInputField<Filter>),
     /// Store a filter representing exactly one row to the node input field.

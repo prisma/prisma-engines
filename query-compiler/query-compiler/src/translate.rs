@@ -558,6 +558,10 @@ impl<'a, 'b> NodeTranslator<'a, 'b> {
                         *field.node_input_field(&mut node) =
                             Some(self.process_edge_placeholder(edge, &node, projected_selection)?);
                     }
+                    RowSink::ProjectedFieldPlaceholder(field) => {
+                        *field.node_input_field(&mut node) =
+                            Some(self.process_edge_source_placeholder(edge, projected_selection)?);
+                    }
                     RowSink::AllFilter(field) | RowSink::ExactlyOneFilter(field) => {
                         let fields = self.process_edge_selections(edge, &node, projected_selection);
                         *field.node_input_field(&mut node) = SelectionResult::new(fields).filter();
@@ -836,6 +840,38 @@ impl<'a, 'b> NodeTranslator<'a, 'b> {
                 binding::projected_dependency(self.graph.edge_source(edge), field)
             } else {
                 binding::node_result(self.graph.edge_source(edge))
+            },
+            r#type,
+        })
+    }
+
+    fn process_edge_source_placeholder(
+        &mut self,
+        edge: &EdgeRef,
+        selection: FieldSelection,
+    ) -> TranslateResult<Placeholder> {
+        let source = self.graph.edge_source(edge);
+        let source_node = self
+            .graph
+            .node_content(&source)
+            .ok_or_else(|| TranslateError::NodeContentEmpty(source.to_string()))?;
+        let bindings_refer_to_fields = matches!(source_node, Node::Query(_));
+        let binding_is_unique = matches!(source_node, Node::Query(q) if q.is_unique());
+        let field = selection.selections().last().ok_or_else(|| {
+            TranslateError::GraphBuildError(QueryGraphBuilderError::QueryGraphError(
+                QueryGraphError::InvariantViolation(
+                    "Projected field placeholder sink requires at least one field".into(),
+                ),
+            ))
+        })?;
+
+        let r#type = selected_field_placeholder_type(field, !binding_is_unique);
+
+        Ok(Placeholder {
+            name: if bindings_refer_to_fields {
+                binding::projected_dependency(source, field)
+            } else {
+                binding::node_result(source)
             },
             r#type,
         })
