@@ -1350,8 +1350,11 @@ pub trait Visitor<'a> {
 
         self.write(" AS ")?;
 
-        let selection = cte.selection;
-        self.surround_with("(", ")", |ref mut s| s.visit_selection(selection))
+        let body = cte.body;
+        self.surround_with("(", ")", |ref mut s| match body {
+            CommonTableExpressionBody::Selection(selection) => s.visit_selection(selection),
+            CommonTableExpressionBody::Insert(insert) => s.visit_insert(insert),
+        })
     }
 
     fn visit_comment(&mut self, comment: Cow<'a, str>) -> Result {
