@@ -1,6 +1,6 @@
 use super::{
-    Binding, DbQuery, EnumsMap, Expression, FieldOperation, JoinExpression, Pagination, RawNestedReadQuery,
-    RawNestedReadRelation, RawResultColumnRef, RawResultFieldName,
+    Binding, DbQuery, EnumsMap, Expression, FieldOperation, JoinExpression, Pagination, RawNestedFinalOwnerSchedule,
+    RawNestedReadQuery, RawNestedReadRelation, RawResultColumnRef, RawResultFieldName,
 };
 use crate::{
     expression::{FieldInitializer, InMemoryOps},
@@ -67,12 +67,7 @@ where
             Expression::Transaction(expression) => self.transaction(expression),
             Expression::DataMap { expr, structure, enums } => self.data_map(expr, structure, enums),
             Expression::RawNestedRead { query, unique, enums } => self.raw_nested_read(query, *unique, enums),
-            Expression::Validate {
-                expr,
-                rules,
-                error,
-                ..
-            } => self.validate(expr, rules, error.id()),
+            Expression::Validate { expr, rules, error, .. } => self.validate(expr, rules, error.id()),
             Expression::If {
                 value,
                 rule,
@@ -346,7 +341,45 @@ where
                 .append(self.raw_nested_relations(&query.relations));
         }
 
+        if let Some(schedule) = &query.schedule {
+            doc = doc
+                .append(self.line())
+                .append(self.keyword("schedule"))
+                .append(self.space())
+                .append(self.raw_nested_final_owner_schedule(schedule));
+        }
+
         doc.align().parens()
+    }
+
+    fn raw_nested_final_owner_schedule(&'a self, schedule: &'a RawNestedFinalOwnerSchedule) -> PrettyDoc<'a, D> {
+        self.keyword("finalOwner").append(self.space()).append(self.object([
+            (
+                self.field_name("rootKey"),
+                self.raw_result_column_ref(&schedule.root_key_column),
+            ),
+            (
+                self.field_name("unique"),
+                self.text(format!(
+                    "[{}, {}]",
+                    schedule.unique_relations[0], schedule.unique_relations[1]
+                )),
+            ),
+            (
+                self.field_name("wrapperList"),
+                self.text(format!(
+                    "[{}, {}]",
+                    schedule.wrapper_list.relation_index, schedule.wrapper_list.child_relation_index
+                )),
+            ),
+            (
+                self.field_name("childList"),
+                self.text(format!(
+                    "[{}, {}]",
+                    schedule.child_list.relation_index, schedule.child_list.child_relation_index
+                )),
+            ),
+        ]))
     }
 
     fn raw_nested_relations(&'a self, relations: &'a [RawNestedReadRelation]) -> PrettyDoc<'a, D> {

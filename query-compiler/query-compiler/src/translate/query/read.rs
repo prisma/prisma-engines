@@ -2,8 +2,9 @@ use crate::{
     TranslateError, binding,
     data_mapper::FieldType,
     expression::{
-        Binding, EnumsMap, Expression, InMemoryOps, JoinExpression, RawNestedReadDirectRelation, RawNestedReadQuery,
-        RawNestedReadRelation, RawResultColumnMapping, RawResultColumnRef, RawResultFieldName,
+        Binding, EnumsMap, Expression, InMemoryOps, JoinExpression, RawNestedFinalOwnerNestedRelation,
+        RawNestedFinalOwnerSchedule, RawNestedReadDirectRelation, RawNestedReadQuery, RawNestedReadRelation,
+        RawResultColumnMapping, RawResultColumnRef, RawResultFieldName,
     },
     translate::TranslateResult,
 };
@@ -506,7 +507,7 @@ fn build_raw_nested_read_root(
     unique: bool,
 ) -> TranslateResult<Option<Expression>> {
     let mut enums = EnumsMap::new();
-    let Some(query) = build_raw_nested_read_query(
+    let Some(mut query) = build_raw_nested_read_query(
         builder,
         model,
         args,
@@ -519,6 +520,7 @@ fn build_raw_nested_read_root(
     else {
         return Ok(None);
     };
+    query.query.schedule = try_build_raw_nested_final_owner_schedule(&query.query, unique, &enums);
 
     Ok(Some(Expression::RawNestedRead {
         query: query.query,
@@ -555,8 +557,153 @@ fn build_raw_nested_read_query(
             query: db_query,
             fields,
             relations,
+            schedule: None,
         },
     }))
+}
+
+fn try_build_raw_nested_final_owner_schedule(
+    query: &RawNestedReadQuery,
+    _unique: bool,
+    enums: &EnumsMap,
+) -> Option<RawNestedFinalOwnerSchedule> {
+    if !enums.is_empty() || query.relations.len() != 4 {
+        return None;
+    }
+
+    let mut unique_relations = Vec::with_capacity(2);
+    let mut wrapper_list = None;
+    let mut child_list = None;
+
+    for (relation_index, relation) in query.relations.iter().enumerate() {
+        let RawNestedReadRelation::Direct(relation) = relation;
+
+        if relation.is_relation_unique {
+            if !raw_nested_final_owner_ops_are_empty(&relation.operations) || !relation.child.relations.is_empty() {
+                return None;
+            }
+            unique_relations.push(relation_index);
+            continue;
+        }
+
+        if let Some(child_relation_index) = raw_nested_final_owner_wrapper_relation_child_index(relation) {
+            if wrapper_list.is_some() {
+                return None;
+            }
+            wrapper_list = Some(RawNestedFinalOwnerNestedRelation {
+                relation_index,
+                child_relation_index,
+            });
+            continue;
+        }
+
+        if let Some(child_relation_index) = raw_nested_final_owner_child_list_relation_child_index(relation) {
+            if child_list.is_some() {
+                return None;
+            }
+            child_list = Some(RawNestedFinalOwnerNestedRelation {
+                relation_index,
+                child_relation_index,
+            });
+            continue;
+        }
+
+        return None;
+    }
+
+    let wrapper_list = wrapper_list?;
+    let child_list = child_list?;
+    let [unique0, unique1] = unique_relations.try_into().ok()?;
+    let root_key_column =
+        raw_nested_direct_relation(&query.relations[wrapper_list.relation_index])?.parent_column_index()?;
+    if root_key_column
+        != raw_nested_direct_relation(&query.relations[child_list.relation_index])?.parent_column_index()?
+    {
+        return None;
+    }
+
+    Some(RawNestedFinalOwnerSchedule {
+        root_key_column: RawResultColumnRef::Index(root_key_column),
+        unique_relations: [unique0, unique1],
+        wrapper_list,
+        child_list,
+    })
+}
+
+fn raw_nested_final_owner_wrapper_relation_child_index(relation: &RawNestedReadDirectRelation) -> Option<usize> {
+    if !raw_nested_final_owner_ops_are_empty(&relation.operations) || !relation.child.fields.is_empty() {
+        return None;
+    }
+
+    let child_relation_index = raw_nested_final_owner_single_child_relation_index(&relation.child)?;
+    let child_relation = raw_nested_direct_relation(&relation.child.relations[child_relation_index])?;
+    if child_relation.is_relation_unique
+        && raw_nested_final_owner_ops_are_empty(&child_relation.operations)
+        && child_relation.child.relations.is_empty()
+    {
+        Some(child_relation_index)
+    } else {
+        None
+    }
+}
+
+fn raw_nested_final_owner_child_list_relation_child_index(relation: &RawNestedReadDirectRelation) -> Option<usize> {
+    if !raw_nested_final_owner_row_ops_supported(&relation.operations) || relation.child.fields.is_empty() {
+        return None;
+    }
+
+    let child_relation_index = raw_nested_final_owner_single_child_relation_index(&relation.child)?;
+    let child_relation = raw_nested_direct_relation(&relation.child.relations[child_relation_index])?;
+    if child_relation.is_relation_unique
+        && raw_nested_final_owner_ops_are_empty(&child_relation.operations)
+        && child_relation.child.relations.is_empty()
+    {
+        Some(child_relation_index)
+    } else {
+        None
+    }
+}
+
+fn raw_nested_final_owner_single_child_relation_index(query: &RawNestedReadQuery) -> Option<usize> {
+    (query.relations.len() == 1).then_some(0)
+}
+
+fn raw_nested_direct_relation(relation: &RawNestedReadRelation) -> Option<&RawNestedReadDirectRelation> {
+    match relation {
+        RawNestedReadRelation::Direct(relation) => Some(relation),
+    }
+}
+
+trait RawNestedFinalOwnerColumnIndex {
+    fn parent_column_index(&self) -> Option<usize>;
+}
+
+impl RawNestedFinalOwnerColumnIndex for RawNestedReadDirectRelation {
+    fn parent_column_index(&self) -> Option<usize> {
+        match self.parent_column {
+            RawResultColumnRef::Index(index) => Some(index),
+            RawResultColumnRef::Name(_) => None,
+        }
+    }
+}
+
+fn raw_nested_final_owner_ops_are_empty(ops: &InMemoryOps) -> bool {
+    ops.pagination.is_none()
+        && ops.distinct.is_none()
+        && !ops.reverse
+        && ops.nested.is_empty()
+        && ops.linking_fields.is_none()
+}
+
+fn raw_nested_final_owner_row_ops_supported(ops: &InMemoryOps) -> bool {
+    ops.distinct.is_none()
+        && ops.linking_fields.is_none()
+        && !ops.reverse
+        && ops.nested.is_empty()
+        && ops
+            .pagination
+            .as_ref()
+            .is_none_or(|pagination| pagination.cursor().is_none())
 }
 
 fn build_get_records_query(
@@ -807,6 +954,7 @@ fn build_raw_read_related_records(
                 query: db_query,
                 fields,
                 relations,
+                schedule: None,
             },
         },
         join,

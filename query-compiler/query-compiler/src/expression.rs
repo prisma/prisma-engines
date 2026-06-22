@@ -132,6 +132,7 @@ pub struct RawNestedReadQuery {
     pub query: DbQuery,
     pub fields: Vec<RawResultColumnMapping>,
     pub relations: Vec<RawNestedReadRelation>,
+    pub schedule: Option<RawNestedFinalOwnerSchedule>,
 }
 
 impl Serialize for RawNestedReadQuery {
@@ -139,12 +140,62 @@ impl Serialize for RawNestedReadQuery {
     where
         S: Serializer,
     {
-        let mut tuple = serializer.serialize_tuple(if self.relations.is_empty() { 2 } else { 3 })?;
+        let mut tuple = serializer.serialize_tuple(if self.schedule.is_some() {
+            4
+        } else if self.relations.is_empty() {
+            2
+        } else {
+            3
+        })?;
         tuple.serialize_element(&self.query)?;
         tuple.serialize_element(&self.fields)?;
-        if !self.relations.is_empty() {
+        if !self.relations.is_empty() || self.schedule.is_some() {
             tuple.serialize_element(&self.relations)?;
         }
+        if let Some(schedule) = &self.schedule {
+            tuple.serialize_element(schedule)?;
+        }
+        tuple.end()
+    }
+}
+
+#[derive(Debug)]
+pub struct RawNestedFinalOwnerSchedule {
+    pub root_key_column: RawResultColumnRef,
+    pub unique_relations: [usize; 2],
+    pub wrapper_list: RawNestedFinalOwnerNestedRelation,
+    pub child_list: RawNestedFinalOwnerNestedRelation,
+}
+
+impl Serialize for RawNestedFinalOwnerSchedule {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        let mut tuple = serializer.serialize_tuple(5)?;
+        tuple.serialize_element("f")?;
+        tuple.serialize_element(&self.root_key_column)?;
+        tuple.serialize_element(&self.unique_relations)?;
+        tuple.serialize_element(&self.wrapper_list)?;
+        tuple.serialize_element(&self.child_list)?;
+        tuple.end()
+    }
+}
+
+#[derive(Debug)]
+pub struct RawNestedFinalOwnerNestedRelation {
+    pub relation_index: usize,
+    pub child_relation_index: usize,
+}
+
+impl Serialize for RawNestedFinalOwnerNestedRelation {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        let mut tuple = serializer.serialize_tuple(2)?;
+        tuple.serialize_element(&self.relation_index)?;
+        tuple.serialize_element(&self.child_relation_index)?;
         tuple.end()
     }
 }
