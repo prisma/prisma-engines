@@ -2,7 +2,6 @@ use crate::ast::{Expression, Query, Select};
 use std::{collections::BTreeSet, fmt};
 
 use super::CommonTableExpression;
-use super::IntoCommonTableExpression;
 
 #[derive(Debug, PartialEq, Clone, Copy)]
 pub(crate) enum UnionType {
@@ -145,5 +144,3 @@ impl<'a> Union<'a> {
         }
     }
 }
-
-impl<'a> IntoCommonTableExpression<'a> for Union<'a> {}

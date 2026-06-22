@@ -936,6 +936,28 @@ mod tests {
 
     #[test]
     #[cfg(feature = "postgresql")]
+    fn test_insert_common_table_expression() {
+        let expected = expected_values(
+            "WITH \"inserted\" AS (INSERT INTO \"relations\" (\"parent_id\",\"child_id\") SELECT \"parent_id\", \"child_id\" FROM \"children\" WHERE \"child_id\" = $1 ON CONFLICT DO NOTHING RETURNING \"child_id\") SELECT \"child_id\" FROM \"inserted\"",
+            vec![10],
+        );
+        let selection = Select::from_table("children")
+            .columns(vec!["parent_id", "child_id"])
+            .so_that("child_id".equals(10));
+        let insert = Insert::expression_into("relations", vec!["parent_id", "child_id"], selection)
+            .on_conflict(OnConflict::DoNothing)
+            .returning(vec!["child_id"]);
+        let query = Select::from_table("inserted")
+            .column("child_id")
+            .with(insert.into_cte("inserted"));
+        let (sql, params) = Postgres::build(query).unwrap();
+
+        assert_eq!(expected.0, sql);
+        assert_eq!(expected.1, params);
+    }
+
+    #[test]
+    #[cfg(feature = "postgresql")]
     fn test_insert_on_conflict_update() {
         let expected = expected_values(
             "INSERT INTO \"users\" (\"foo\") VALUES ($1) ON CONFLICT (\"foo\") DO UPDATE SET \"foo\" = $2 WHERE \"users\".\"foo\" = $3 RETURNING \"foo\"",
