@@ -12,5 +12,5 @@ JOIN pg_class AS tableinfo
 JOIN pg_namespace AS schemainfo
 	ON schemainfo.oid = tableinfo.relnamespace
 WHERE schemainfo.nspname = ANY ( $1 )
-	AND contype NOT IN ('p', 'u', 'f')
+	AND contype IN ('c', 'x')
 ORDER BY namespace, table_name, constr.contype, constraint_name;
