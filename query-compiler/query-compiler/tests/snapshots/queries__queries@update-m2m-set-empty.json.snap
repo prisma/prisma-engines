@@ -1,5 +1,6 @@
 ---
 source: query-compiler/query-compiler/tests/queries.rs
+assertion_line: 76
 expression: pretty
 input_file: query-compiler/query-compiler/tests/data/update-m2m-set-empty.json
 snapshot_kind: text
@@ -16,7 +17,8 @@ transaction
    }
    let 0 = unique (query «SELECT "public"."Post"."id", "public"."Post"."title",
                           "public"."Post"."userId" FROM "public"."Post" WHERE
-                          "public"."Post"."id" = $1 LIMIT $2 OFFSET $3»
+                          ("public"."Post"."id" = $1 AND 1=1) LIMIT $2 OFFSET
+                          $3»
                    params [const(BigInt(1)), const(BigInt(1)),
                            const(BigInt(0))])
    in let 0 = unique (validate (get 0)
@@ -30,47 +32,20 @@ transaction
           [ rowCountNeq 0
           ] orRaise "MISSING_RECORD");
           0$id = mapField id (get 0)
-      in rawNestedReadUnique (query «SELECT "public"."Post"."id",
-                                     "public"."Post"."title",
-                                     "public"."Post"."userId" FROM
-                                     "public"."Post" WHERE "public"."Post"."id"
-                                     = $1 LIMIT $2 OFFSET $3»
-                              params [var(0$id as Int), const(BigInt(1)),
-                                      const(BigInt(0))]
-                              fields {
-                                  id: 0
-                                  title: 1
-                                  userId: 2
-                              }
-                              relations [categories on left.0 = right.2 many (query
-                                                                              «SELECT
-                                                                               "public"."Category"."id",
-                                                                               "public"."Category"."name",
-                                                                               "t0"."B"
-                                                                               AS
-                                                                               "CategoryToPost@Post"
-                                                                               FROM
-                                                                               "public"."Category"
-                                                                               INNER
-                                                                               JOIN
-                                                                               "public"."_CategoryToPost"
-                                                                               AS
-                                                                               "t0"
-                                                                               ON
-                                                                               "t0"."A"
-                                                                               =
-                                                                               "public"."Category"."id"
-                                                                               WHERE
-                                                                               (1=1
-                                                                               AND
-                                                                               "t0"."B"
-                                                                               =
-                                                                               $1)
-                                                                               OFFSET
-                                                                               $2»
-                                                                              params [var(@parent$id as Int),
-                                                                                      const(BigInt(0))]
-                                                                              fields {
-                                                                                  id: 0
-                                                                                  name: 1
-                                                                              })])
+      in let @parent = unique (query «SELECT "public"."Post"."id",
+                                      "public"."Post"."title",
+                                      "public"."Post"."userId" FROM
+                                      "public"."Post" WHERE "public"."Post"."id"
+                                      = $1 LIMIT $2 OFFSET $3»
+                               params [var(0$id as Int), const(BigInt(1)),
+                                       const(BigInt(0))])
+         in let @parent$id = mapField id (get @parent)
+            in join (get @parent)
+               with (query «SELECT "public"."Category"."id",
+                            "public"."Category"."name", "t0"."B" AS
+                            "CategoryToPost@Post" FROM "public"."Category" INNER
+                            JOIN "public"."_CategoryToPost" AS "t0" ON "t0"."A"
+                            = "public"."Category"."id" WHERE (1=1 AND "t0"."B" =
+                            $1) OFFSET $2»
+                     params [var(@parent$id as Int),
+                             const(BigInt(0))]) on left.(id) = right.(CategoryToPost@Post) as @nested$categories
