@@ -17,7 +17,7 @@ transaction
        }
    }
    let 0 = query «SELECT "public"."User"."id" FROM "public"."User" WHERE
-                  "public"."User"."email" = $1 OFFSET $2»
+                  ("public"."User"."email" = $1 AND 1=1) OFFSET $2»
            params [const(String("user.1@prisma.io")), const(BigInt(0))]
    in if (rowCountNeq 0 (get 0))
       then let 2 = get 0

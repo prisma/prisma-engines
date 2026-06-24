@@ -156,14 +156,14 @@ pub fn nested_upsert(
         )?;
 
         let then_node = if is_nested_only_update {
-            let return_node = graph.create_node(Flow::Return(Vec::new()));
+            let return_node = graph.create_node(Flow::Return(None));
 
             graph.create_edge(
                 &read_children_node,
                 &return_node,
                 QueryGraphDependency::ProjectedDataDependency(
                     child_model_identifier.clone(),
-                    RowSink::All(&ReturnInput),
+                    RowSink::ProjectedPlaceholder(&ReturnInput),
                     Some(DataExpectation::non_empty_rows(
                         MissingRelatedRecord::builder()
                             .model(&child_model)
