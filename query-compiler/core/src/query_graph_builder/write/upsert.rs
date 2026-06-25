@@ -1,7 +1,7 @@
 use super::{write_args_parser::WriteArgsParser, *};
 use crate::{
     DataExpectation, ParsedField, ParsedInputMap, ParsedInputValue, ParsedObject, RowSink,
-    inputs::{IfInput, RecordQueryFilterInput, UpdateRecordSelectorsInput},
+    inputs::{IfInput, RecordQueryFilterInput, ReturnInput, UpdateRecordSelectorsInput},
     query_ast::*,
     query_graph::{Flow, QueryGraph, QueryGraphDependency},
 };
@@ -101,14 +101,29 @@ pub(crate) fn upsert_record(
 
     let create_node = create::create_record_node(graph, query_schema, model.clone(), create_argument)?;
 
-    let update_node = update::update_record_node(
-        graph,
-        query_schema,
-        filter,
-        model.clone(),
-        update_argument,
-        Some(&field),
-    )?;
+    let update_args = WriteArgsParser::from(&model, update_argument)?;
+    let is_noop_update = update_args.args.is_empty();
+    let update_node = if is_noop_update {
+        let return_node = graph.create_node(Flow::Return(None));
+
+        graph.create_edge(
+            &read_parent_records_node,
+            &return_node,
+            QueryGraphDependency::ProjectedDataDependency(
+                model_id.clone(),
+                RowSink::ProjectedPlaceholder(&ReturnInput),
+                None,
+            ),
+        )?;
+
+        for (relation_field, data_map) in update_args.nested {
+            nested::connect_nested_query(graph, query_schema, return_node, relation_field, data_map)?;
+        }
+
+        return_node
+    } else {
+        update::update_record_node_from_args(graph, query_schema, filter, model.clone(), update_args, Some(&field))?
+    };
 
     let read_node_create = graph.create_node(Query::Read(read_query.clone()));
     let read_node_update = graph.create_node(Query::Read(read_query));
@@ -130,7 +145,9 @@ pub(crate) fn upsert_record(
     // the update path (if the children already exists and goes to the THEN node).
     // It's only after we've executed the emulation that it'll traverse the update node, hence the ExecutionOrder between
     // the emulation node and the update node.
-    if let Some(emulation_node) = utils::insert_emulated_on_update_with_intermediary_node(
+    if is_noop_update {
+        graph.create_edge(&if_node, &update_node, QueryGraphDependency::Then)?;
+    } else if let Some(emulation_node) = utils::insert_emulated_on_update_with_intermediary_node(
         graph,
         query_schema,
         &model,
@@ -145,16 +162,18 @@ pub(crate) fn upsert_record(
 
     graph.create_edge(&if_node, &create_node, QueryGraphDependency::Else)?;
 
-    // Pass-in the read parent record result to the update node RecordFilter to avoid a redundant read.
-    graph.create_edge(
-        &read_parent_records_node,
-        &update_node,
-        QueryGraphDependency::ProjectedDataDependency(
-            model_id.clone(),
-            RowSink::ExactlyOne(&UpdateRecordSelectorsInput),
-            None,
-        ),
-    )?;
+    if !is_noop_update {
+        // Pass-in the read parent record result to the update node RecordFilter to avoid a redundant read.
+        graph.create_edge(
+            &read_parent_records_node,
+            &update_node,
+            QueryGraphDependency::ProjectedDataDependency(
+                model_id.clone(),
+                RowSink::ExactlyOne(&UpdateRecordSelectorsInput),
+                None,
+            ),
+        )?;
+    }
 
     graph.create_edge(
         &update_node,

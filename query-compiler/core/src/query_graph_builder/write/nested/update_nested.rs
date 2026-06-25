@@ -1,10 +1,11 @@
 use super::*;
-use crate::inputs::{UpdateManyRecordsSelectorsInput, UpdateRecordSelectorsInput};
+use crate::inputs::{ReturnInput, UpdateManyRecordsSelectorsInput, UpdateRecordSelectorsInput};
 use crate::query_graph_builder::write::update::UpdateManyRecordNodeOptionals;
+use crate::query_graph_builder::write::write_args_parser::WriteArgsParser;
 use crate::{DataExpectation, RowSink};
 use crate::{
     ParsedInputValue,
-    query_graph::{NodeRef, QueryGraph, QueryGraphDependency},
+    query_graph::{Flow, NodeRef, QueryGraph, QueryGraphDependency},
 };
 use query_structure::{Filter, Model, RelationFieldRef};
 use schema::constants::args;
@@ -89,8 +90,37 @@ pub fn nested_update(
         let find_child_records_node =
             utils::insert_find_children_by_parent_node(graph, parent, parent_relation_field, filter.clone())?;
 
-        let update_node = update::update_record_node(graph, query_schema, filter, child_model.clone(), data_map, None)?;
         let child_model_identifier = parent_relation_field.related_model().shard_aware_primary_identifier();
+        let update_args = WriteArgsParser::from(child_model, data_map)?;
+
+        if update_args.args.is_empty() && !update_args.nested.is_empty() {
+            let return_node = graph.create_node(Flow::Return(None));
+
+            graph.create_edge(
+                &find_child_records_node,
+                &return_node,
+                QueryGraphDependency::ProjectedDataDependency(
+                    child_model_identifier,
+                    RowSink::ProjectedPlaceholder(&ReturnInput),
+                    Some(DataExpectation::non_empty_rows(
+                        MissingRelatedRecord::builder()
+                            .model(child_model)
+                            .relation(&parent_relation_field.relation())
+                            .operation(DataOperation::NestedUpdate)
+                            .build(),
+                    )),
+                ),
+            )?;
+
+            for (relation_field, data_map) in update_args.nested {
+                connect_nested_query(graph, query_schema, return_node, relation_field, data_map)?;
+            }
+
+            continue;
+        }
+
+        let update_node =
+            update::update_record_node_from_args(graph, query_schema, filter, child_model.clone(), update_args, None)?;
 
         graph.create_edge(
             &find_child_records_node,

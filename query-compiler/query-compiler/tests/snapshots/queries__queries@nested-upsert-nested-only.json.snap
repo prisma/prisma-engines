@@ -1,0 +1,121 @@
+---
+source: query-compiler/query-compiler/tests/queries.rs
+expression: pretty
+input_file: query-compiler/query-compiler/tests/data/nested-upsert-nested-only.json
+snapshot_kind: text
+---
+transaction
+   dataMap {
+       id: Int (id)
+       email: String (email)
+       role: Enum<Role> (role)
+       posts (from @nested$posts): {
+           id: Int (id)
+           title: String (title)
+           userId: Int (userId)
+           categories (from @nested$categories): {
+               id: Int (id)
+               name: String (name)
+           }
+       }
+   }
+   enums {
+       Role: {
+           admin: ADMIN
+           user: USER
+       }
+   }
+   let 0 = unique (query «SELECT "public"."User"."id", "public"."User"."email",
+                          "public"."User"."role"::text FROM "public"."User"
+                          WHERE ("public"."User"."email" = $1 AND 1=1) LIMIT $2
+                          OFFSET $3»
+                   params [const(String("user.1737556028164@prisma.io")),
+                           const(BigInt(1)), const(BigInt(0))])
+   in let 0$id = mapField id (get 0)
+      in let 1 = query «SELECT "public"."Post"."id", "public"."Post"."userId"
+                        FROM "public"."Post" WHERE (("public"."Post"."id" = $1
+                        AND 1=1) AND "public"."Post"."userId" IN [$2,*]) OFFSET
+                        $3»
+                 params [const(BigInt(11)), var(0$id as Int), const(BigInt(0))]
+         in if (rowCountNeq 0 (get 1))
+            then let 1 = validate (get 1)
+                     [ rowCountNeq 0
+                     ] orRaise "MISSING_RELATED_RECORD"
+                 in let 6 = get 1
+                    in let 7 = query «SELECT "public"."Category"."id" FROM
+                                      "public"."Category" WHERE
+                                      ("public"."Category"."id" = $1 AND 1=1)
+                                      OFFSET $2»
+                               params [const(BigInt(10)), const(BigInt(0))]
+                       in let 6 = unique (validate (get 6)
+                              [ rowCountNeq 0
+                              ] orRaise "MISSING_RELATED_RECORD");
+                              6$id = mapField id (get 6);
+                              7 = validate (get 7)
+                              [ rowCountEq 1
+                              ] orRaise "INCOMPLETE_CONNECT_INPUT";
+                              7$id = mapField id (get 7)
+                          in execute «INSERT INTO "public"."_CategoryToPost"
+                                      ("B","A") VALUES [($1),*],* ON CONFLICT DO
+                                      NOTHING»
+                             params [product(var(6$id as Int[]),
+                                             var(7$id as Int[]))]
+            else let 0 = unique (validate (get 0)
+                     [ rowCountNeq 0
+                     ] orRaise "MISSING_RELATED_RECORD");
+                     0$id = mapField id (get 0)
+                 in let 3 = unique (query «INSERT INTO "public"."Post"
+                                           ("title","userId") VALUES ($1,$2)
+                                           RETURNING "public"."Post"."id"»
+                                    params [const(String("Nested upsert created post")),
+                                            var(0$id as Int)])
+                    in let 4 = query «SELECT "public"."Category"."id" FROM
+                                      "public"."Category" WHERE
+                                      ("public"."Category"."id" = $1 AND 1=1)
+                                      OFFSET $2»
+                               params [const(BigInt(10)), const(BigInt(0))]
+                       in let 3 = unique (validate (get 3)
+                              [ rowCountNeq 0
+                              ] orRaise "MISSING_RELATED_RECORD");
+                              3$id = mapField id (get 3);
+                              4 = validate (get 4)
+                              [ rowCountEq 1
+                              ] orRaise "INCOMPLETE_CONNECT_INPUT";
+                              4$id = mapField id (get 4)
+                          in execute «INSERT INTO "public"."_CategoryToPost"
+                                      ("B","A") VALUES [($1),*],* ON CONFLICT DO
+                                      NOTHING»
+                             params [product(var(3$id as Int[]),
+                                             var(4$id as Int[]))];
+      let 0 = unique (validate (get 0)
+          [ rowCountNeq 0
+          ] orRaise "MISSING_RECORD");
+          0$id = mapField id (get 0)
+      in let @parent = unique (query «SELECT "public"."User"."id",
+                                      "public"."User"."email",
+                                      "public"."User"."role"::text FROM
+                                      "public"."User" WHERE "public"."User"."id"
+                                      = $1 LIMIT $2 OFFSET $3»
+                               params [var(0$id as Int), const(BigInt(1)),
+                                       const(BigInt(0))])
+         in let @parent$id = mapField id (get @parent)
+            in join (get @parent)
+               with (let @parent = query «SELECT "public"."Post"."id",
+                                          "public"."Post"."title",
+                                          "public"."Post"."userId" FROM
+                                          "public"."Post" WHERE
+                                          "public"."Post"."userId" = $1 OFFSET
+                                          $2»
+                                   params [var(@parent$id as Int),
+                                           const(BigInt(0))]
+                    in let @parent$id = mapField id (get @parent)
+                       in join (get @parent)
+                          with (query «SELECT "public"."Category"."id",
+                                       "public"."Category"."name", "t0"."B" AS
+                                       "CategoryToPost@Post" FROM
+                                       "public"."Category" INNER JOIN
+                                       "public"."_CategoryToPost" AS "t0" ON
+                                       "t0"."A" = "public"."Category"."id" WHERE
+                                       (1=1 AND "t0"."B" IN [$1,*]) OFFSET $2»
+                                params [var(@parent$id as Int),
+                                        const(BigInt(0))]) on left.(id) = right.(CategoryToPost@Post) as @nested$categories) on left.(id) = right.(userId) as @nested$posts
