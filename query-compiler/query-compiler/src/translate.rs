@@ -61,6 +61,8 @@ pub fn translate(mut graph: QueryGraph, builder: &dyn QueryBuilder) -> Translate
         }
     };
 
+    graph.reserve_visited_capacity();
+
     let root = match root_nodes {
         RootNodes::None => Expression::Seq(Vec::new()),
         RootNodes::One(node) => {
@@ -456,20 +458,18 @@ impl<'a, 'b> NodeTranslator<'a, 'b> {
             })
             .collect::<TranslateResult<Vec<_>>>()?;
 
-        let result_nodes: Vec<NodeRef> = self.graph.result_nodes().collect();
-        let result_binding_names = bindings.iter().map(|b| b.name.clone()).collect::<Vec<_>>();
+        let has_single_result_node = self.graph.result_nodes().take(2).count() == 1;
 
-        if result_nodes.len() == 1 {
+        if has_single_result_node {
+            let result_binding_name = bindings.last().expect("no binding for result node").name.clone();
             Ok(Expression::Let {
                 bindings,
                 expr: Box::new(Expression::Get {
-                    name: result_binding_names
-                        .into_iter()
-                        .next_back()
-                        .expect("no binding for result node"),
+                    name: result_binding_name,
                 }),
             })
         } else {
+            let result_binding_names = bindings.iter().map(|b| b.name.clone()).collect::<Vec<_>>();
             Ok(Expression::Let {
                 bindings,
                 expr: Box::new(Expression::GetFirstNonEmpty {
@@ -505,36 +505,37 @@ impl<'a, 'b> NodeTranslator<'a, 'b> {
             .iter()
             .flat_map(|edge| {
                 let edge_content = self.graph.edge_content(edge);
-                let Some(QueryGraphDependency::ProjectedDataDependency(selection, _, expectation)) = edge_content
+                let Some(QueryGraphDependency::ProjectedDataDependency(selection, sink, expectation)) = edge_content
                 else {
                     return Either::Left(std::iter::empty());
                 };
 
-                let requires_unique = matches!(
-                    edge_content,
-                    Some(QueryGraphDependency::ProjectedDataDependency(_, sink, _))
-                        if sink.is_unique()
-                );
+                let requires_unique = sink.is_unique();
 
                 let source = self.graph.edge_source(edge);
 
-                let expr = Expression::Get {
-                    name: binding::node_result(source),
-                };
-                let expr = match expectation {
-                    Some(expectation) => Expression::validate_expectation(expectation, expr),
-                    None => expr,
-                };
-                let expr = if requires_unique {
-                    Expression::Unique(expr.into())
-                } else {
-                    expr
-                };
+                let needs_parent_binding = expectation.is_some() || requires_unique;
+                let parent_binding = needs_parent_binding.then(|| {
+                    let expr = Expression::Get {
+                        name: binding::node_result(source),
+                    };
+                    let expr = match expectation {
+                        Some(expectation) => Expression::validate_expectation(expectation, expr),
+                        None => expr,
+                    };
+                    let expr = if requires_unique {
+                        Expression::Unique(expr.into())
+                    } else {
+                        expr
+                    };
 
-                let parent_binding = std::iter::once(Binding::new(source.id(), expr));
+                    Binding::new(source.id(), expr)
+                });
+
+                let parent_bindings = parent_binding.into_iter();
 
                 if create_field_bindings {
-                    Either::Right(Either::Left(parent_binding.chain(selection.selections().map(
+                    Either::Right(Either::Left(parent_bindings.chain(selection.selections().map(
                         move |field| {
                             Binding::new(
                                 binding::projected_dependency(source, field),
@@ -549,12 +550,8 @@ impl<'a, 'b> NodeTranslator<'a, 'b> {
                         },
                     ))))
                 } else {
-                    Either::Right(Either::Right(parent_binding))
+                    Either::Right(Either::Right(parent_bindings))
                 }
-            })
-            .filter(|binding| match &binding.expr {
-                Expression::Get { name, .. } => name != &binding.name,
-                _ => true,
             })
             .collect::<Vec<_>>();
 
