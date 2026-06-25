@@ -334,7 +334,6 @@ impl From<DataOperation> for String {
 #[serde(into = "String")]
 pub(crate) enum DependentOperation {
     NestedUpdate,
-    DisconnectRecords,
     FindRecords { model: String },
     InlineRelation { model: String },
     UpdateInlinedRelation { model: String },
@@ -345,10 +344,6 @@ pub(crate) enum DependentOperation {
 impl DependentOperation {
     pub fn nested_update() -> Self {
         Self::NestedUpdate
-    }
-
-    pub fn disconnect_records() -> Self {
-        Self::DisconnectRecords
     }
 
     pub fn find_records(model: &Model) -> Self {
@@ -386,7 +381,6 @@ impl fmt::Display for DependentOperation {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             Self::NestedUpdate => write!(f, "perform a nested update"),
-            Self::DisconnectRecords => write!(f, "disconnect existing child records"),
             Self::FindRecords { model } => write!(f, "find '{model}' record(s)"),
             Self::InlineRelation { model } => write!(f, "inline the relation on '{model}' record(s)"),
             Self::UpdateInlinedRelation { model } => {

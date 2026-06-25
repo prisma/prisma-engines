@@ -14,6 +14,7 @@ pub enum WriteQuery {
     DeleteManyRecords(DeleteManyRecords),
     ConnectRecords(ConnectRecords),
     DisconnectRecords(DisconnectRecords),
+    DisconnectAllRecords(DisconnectAllRecords),
     ExecuteRaw(RawQuery),
     QueryRaw(RawQuery),
     Upsert(NativeUpsert),
@@ -29,6 +30,7 @@ impl WriteQuery {
             | Self::DeleteManyRecords(_)
             | Self::ConnectRecords(_)
             | Self::DisconnectRecords(_)
+            | Self::DisconnectAllRecords(_)
             | Self::ExecuteRaw(_)
             | Self::QueryRaw(_) => false,
         }
@@ -79,6 +81,7 @@ impl WriteQuery {
             Self::DeleteManyRecords(_) => None,
             Self::ConnectRecords(_) => None,
             Self::DisconnectRecords(_) => None,
+            Self::DisconnectAllRecords(_) => None,
             Self::ExecuteRaw(_) => None,
             Self::QueryRaw(_) => None,
             Self::Upsert(upsert) => Some(&upsert.selected_fields),
@@ -110,6 +113,7 @@ impl WriteQuery {
             Self::DeleteManyRecords(_) => (),
             Self::ConnectRecords(_) => (),
             Self::DisconnectRecords(_) => (),
+            Self::DisconnectAllRecords(_) => (),
             Self::ExecuteRaw(_) => (),
             Self::QueryRaw(_) => (),
             Self::Upsert(_) => (),
@@ -127,6 +131,7 @@ impl WriteQuery {
             Self::DeleteManyRecords(q) => q.model.clone(),
             Self::ConnectRecords(q) => q.relation_field.model(),
             Self::DisconnectRecords(q) => q.relation_field.model(),
+            Self::DisconnectAllRecords(q) => q.relation_field.model(),
             Self::ExecuteRaw(_) => unimplemented!(),
             Self::QueryRaw(_) => unimplemented!(),
         }
@@ -198,6 +203,7 @@ impl std::fmt::Display for WriteQuery {
             Self::DeleteManyRecords(q) => write!(f, "DeleteManyRecords: {}", q.model.name()),
             Self::ConnectRecords(_) => write!(f, "ConnectRecords"),
             Self::DisconnectRecords(_) => write!(f, "DisconnectRecords"),
+            Self::DisconnectAllRecords(_) => write!(f, "DisconnectAllRecords"),
             Self::ExecuteRaw(r) => write!(f, "ExecuteRaw: {:?}", r.inputs),
             Self::QueryRaw(r) => write!(f, "QueryRaw: {:?}", r.inputs),
             Self::Upsert(q) => write!(
@@ -236,6 +242,7 @@ impl ToGraphviz for WriteQuery {
             Self::DeleteManyRecords(q) => format!("DeleteManyRecords: {}", q.model.name()),
             Self::ConnectRecords(_) => "ConnectRecords".to_string(),
             Self::DisconnectRecords(_) => "DisconnectRecords".to_string(),
+            Self::DisconnectAllRecords(_) => "DisconnectAllRecords".to_string(),
             Self::ExecuteRaw(r) => format!("ExecuteRaw: {:#?}", r.inputs),
             Self::QueryRaw(r) => format!("QueryRaw: {:#?}", r.inputs),
             Self::Upsert(q) => format!("Upsert(model: {}", q.model().name()),
@@ -401,6 +408,12 @@ pub struct ConnectRecords {
 pub struct DisconnectRecords {
     pub parent_id: Option<SelectionResult>,
     pub child_ids: Vec<SelectionResult>,
+    pub relation_field: RelationFieldRef,
+}
+
+#[derive(Debug, Clone)]
+pub struct DisconnectAllRecords {
+    pub parent_id: Option<SelectionResult>,
     pub relation_field: RelationFieldRef,
 }
 

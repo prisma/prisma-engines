@@ -20,6 +20,17 @@ impl Model {
             .into()
     }
 
+    pub fn single_primary_identifier_scalar(&self) -> Option<ScalarFieldRef> {
+        let mut ids = self.primary_identifier_scalars();
+        let id = ids.next()?;
+
+        if ids.next().is_some() {
+            return None;
+        }
+
+        Some(self.dm.clone().zip(ScalarFieldId::InModel(id)))
+    }
+
     fn primary_identifier_scalars(&self) -> impl Iterator<Item = psl::parser_database::ScalarFieldId> + use<'_> {
         match self.walker().required_unique_criterias().next() {
             Some(unique) => Either::Left(unique.fields().map(|f| {

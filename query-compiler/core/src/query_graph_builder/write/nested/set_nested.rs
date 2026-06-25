@@ -2,10 +2,8 @@ use super::*;
 use crate::{
     ParsedInputValue,
     inputs::{
-        DisconnectChildrenInput, DisconnectParentInput, IfInput, LeftSideDiffInput, RightSideDiffInput,
-        UpdateManyRecordsSelectorsInput, UpdateOrCreateArgsInput,
+        IfInput, LeftSideDiffInput, RightSideDiffInput, UpdateManyRecordsSelectorsInput, UpdateOrCreateArgsInput,
     },
-    query_ast::*,
     query_graph::*,
 };
 use query_structure::{Filter, Model, RelationFieldRef, SelectionResult, WriteArgs};
@@ -59,16 +57,9 @@ pub fn nested_set(
 /// │           │           │
 /// │           │           │         │
 /// │           ▼           │         ▼
-/// │  ┌─────────────────┐  │  ┌ ─ ─ ─ ─ ─ ─ ┐
-/// │  │Read old children│  │      Result
-/// │  └─────────────────┘  │  └ ─ ─ ─ ─ ─ ─ ┘
-/// │           │           │
-/// │           │           │
-/// │           │           │
-/// │           ▼           │
-/// │  ┌─────────────────┐  │
-/// │  │   Disconnect    │◀─┘
-/// │  └─────────────────┘
+/// │  ┌─────────────────┐     ┌ ─ ─ ─ ─ ─ ─ ┐
+/// │  │ Disconnect all  │        Result
+/// │  └─────────────────┘     └ ─ ─ ─ ─ ─ ─ ┘
 /// │           │
 /// │           │
 /// │           │
@@ -93,64 +84,28 @@ fn handle_many_to_many(
     parent_relation_field: &RelationFieldRef,
     filter: Filter,
 ) -> QueryGraphBuilderResult<()> {
-    let parent_model_identifier = parent_relation_field.model().shard_aware_primary_identifier();
     let child_model = parent_relation_field.related_model();
-    let child_model_identifier = child_model.shard_aware_primary_identifier();
-    let read_old_node =
-        utils::insert_find_children_by_parent_node(graph, parent_node, parent_relation_field, Filter::empty())?;
 
-    let disconnect = WriteQuery::DisconnectRecords(DisconnectRecords {
-        parent_id: None,
-        child_ids: vec![],
-        relation_field: parent_relation_field.clone(),
-    });
+    let disconnect_node = disconnect::disconnect_all_records_node(graph, parent_node, parent_relation_field)?;
 
-    let disconnect_node = graph.create_node(Query::Write(disconnect));
-
-    // Edge from parent to disconnect
-    graph.create_edge(
-        parent_node,
-        &disconnect_node,
-        QueryGraphDependency::ProjectedDataDependency(
-            parent_model_identifier,
-            RowSink::Single(&DisconnectParentInput),
-            Some(DataExpectation::non_empty_rows(
-                MissingRelatedRecord::builder()
-                    .model(&parent_relation_field.model())
-                    .relation(&parent_relation_field.relation())
-                    .needed_for(DependentOperation::disconnect_records())
-                    .operation(DataOperation::NestedSet)
-                    .build(),
-            )),
-        ),
-    )?;
-
-    // Edge from read to disconnect.
-    graph.create_edge(
-        &read_old_node,
-        &disconnect_node,
-        QueryGraphDependency::ProjectedDataDependency(
-            child_model_identifier.clone(),
-            RowSink::All(&DisconnectChildrenInput),
-            None,
-        ),
-    )?;
-
-    if filter.size() > 0 {
-        let expected_connects = filter.size();
-        let read_new_query = utils::read_ids_infallible(child_model, child_model_identifier, filter);
-        let read_new_node = graph.create_node(read_new_query);
-
-        graph.create_edge(&disconnect_node, &read_new_node, QueryGraphDependency::ExecutionOrder)?;
-
-        connect::connect_records_node(
-            graph,
-            parent_node,
-            &read_new_node,
-            parent_relation_field,
-            expected_connects,
-        )?;
+    if filter.size() == 0 {
+        return Ok(());
     }
+
+    let child_model_identifier = child_model.shard_aware_primary_identifier();
+    let expected_connects = filter.size();
+    let read_new_query = utils::read_ids_infallible(child_model, child_model_identifier, filter);
+    let read_new_node = graph.create_node(read_new_query);
+
+    graph.create_edge(&disconnect_node, &read_new_node, QueryGraphDependency::ExecutionOrder)?;
+
+    connect::connect_records_node(
+        graph,
+        parent_node,
+        &read_new_node,
+        parent_relation_field,
+        expected_connects,
+    )?;
 
     Ok(())
 }
