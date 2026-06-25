@@ -1,6 +1,6 @@
 use super::*;
 use crate::inputs::{IfInput, UpdateManyRecordsSelectorsInput, UpdateOrCreateArgsInput, UpdateRecordSelectorsInput};
-use crate::query_graph_builder::write::utils::coerce_vec;
+use crate::query_graph_builder::write::utils::coerce_values;
 use crate::{DataExpectation, RowSink};
 use crate::{
     ParsedInputMap, ParsedInputValue,
@@ -103,7 +103,7 @@ pub fn nested_upsert(
     let child_model = parent_relation_field.related_model();
     let child_model_identifier = child_model.shard_aware_primary_identifier();
 
-    for value in coerce_vec(value) {
+    for value in coerce_values(value) {
         let parent_link = parent_relation_field.linking_fields();
         let child_link = parent_relation_field.related_field().linking_fields();
 
@@ -150,7 +150,11 @@ pub fn nested_upsert(
         graph.create_edge(
             &read_children_node,
             &if_node,
-            QueryGraphDependency::ProjectedDataDependency(child_model_identifier.clone(), RowSink::All(&IfInput), None),
+            QueryGraphDependency::ProjectedDataDependency(
+                child_model_identifier.clone(),
+                RowSink::ProjectedPlaceholder(&IfInput),
+                None,
+            ),
         )?;
 
         graph.create_edge(

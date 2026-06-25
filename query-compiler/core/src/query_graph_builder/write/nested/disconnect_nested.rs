@@ -23,7 +23,7 @@ pub fn nested_disconnect(
 
     if relation.is_many_to_many() {
         // Build all filters upfront.
-        let filters: Vec<Filter> = utils::coerce_vec(value)
+        let filters: Vec<Filter> = utils::coerce_values(value)
             .into_iter()
             .map(|value: ParsedInputValue<'_>| {
                 let value: ParsedInputMap<'_> = value.try_into()?;
@@ -53,7 +53,7 @@ pub fn nested_disconnect(
             // One-to-many specify a number of finders if the parent side is the to-one.
             // todo check if this if else is really still required.
             if parent_relation_field.is_list() {
-                let filters = utils::coerce_vec(value)
+                let filters = utils::coerce_values(value)
                     .into_iter()
                     .map(|value: ParsedInputValue<'_>| {
                         let value: ParsedInputMap<'_> = value.try_into()?;

@@ -5,7 +5,7 @@ use crate::binding;
 use crate::data_mapper::map_result_structure;
 use crate::expression::EnumsMap;
 use crate::result_node::ResultNodeBuilder;
-use crate::{Expression::Transaction, selection::SelectionResults};
+use crate::{Expression::Transaction, selection::projected_placeholder};
 use itertools::{Either, Itertools};
 use query::translate_query;
 use query_builder::QueryBuilder;
@@ -276,12 +276,10 @@ impl<'a, 'b> NodeTranslator<'a, 'b> {
         let Node::Flow(Flow::If { rule, data }) = node else {
             panic!("current node must be Flow::If");
         };
+        let placeholder = projected_placeholder(data, "If")?;
 
         let expr = Expression::If {
-            value: Expression::Get {
-                name: SelectionResults::new(data).into_placeholder()?.name,
-            }
-            .into(),
+            value: Expression::Get { name: placeholder.name }.into(),
             rule,
             then: then_expr.into(),
             r#else: else_expr.into(),
@@ -299,10 +297,9 @@ impl<'a, 'b> NodeTranslator<'a, 'b> {
         let Node::Flow(Flow::Return(data)) = node else {
             panic!("current node must be Flow::Return");
         };
+        let placeholder = projected_placeholder(data, "Return")?;
 
-        let expr = Expression::Get {
-            name: SelectionResults::new(data).into_placeholder()?.name,
-        };
+        let expr = Expression::Get { name: placeholder.name };
 
         Ok(self.wrap_children_with_expr(expr, children))
     }
@@ -317,15 +314,12 @@ impl<'a, 'b> NodeTranslator<'a, 'b> {
             panic!("current node must be Computation::DiffLeftToRight");
         };
 
+        let from = projected_placeholder(diff.left, "DiffLeftToRight.left")?;
+        let to = projected_placeholder(diff.right, "DiffLeftToRight.right")?;
+
         let expr = Expression::Diff {
-            from: Expression::Get {
-                name: SelectionResults::new(diff.left).into_placeholder()?.name,
-            }
-            .into(),
-            to: Expression::Get {
-                name: SelectionResults::new(diff.right).into_placeholder()?.name,
-            }
-            .into(),
+            from: Expression::Get { name: from.name }.into(),
+            to: Expression::Get { name: to.name }.into(),
             fields: diff.fields.db_names().collect(),
         };
 
@@ -342,15 +336,12 @@ impl<'a, 'b> NodeTranslator<'a, 'b> {
             panic!("current node must be Computation::DiffRightToLeft");
         };
 
+        let from = projected_placeholder(diff.right, "DiffRightToLeft.right")?;
+        let to = projected_placeholder(diff.left, "DiffRightToLeft.left")?;
+
         let expr = Expression::Diff {
-            from: Expression::Get {
-                name: SelectionResults::new(diff.right).into_placeholder()?.name,
-            }
-            .into(),
-            to: Expression::Get {
-                name: SelectionResults::new(diff.left).into_placeholder()?.name,
-            }
-            .into(),
+            from: Expression::Get { name: from.name }.into(),
+            to: Expression::Get { name: to.name }.into(),
             fields: diff.fields.db_names().collect(),
         };
 
@@ -360,35 +351,39 @@ impl<'a, 'b> NodeTranslator<'a, 'b> {
     fn transform_node(&mut self, mut node: Node) -> TranslateResult<Node> {
         for edge in self.parent_edges {
             match self.graph.take_edge(edge) {
-                Some(QueryGraphDependency::ProjectedDataDependency(selection, sink, _)) => {
-                    let fields = self.process_edge_selections(edge, &node, selection);
-
-                    match sink {
-                        RowSink::All(field) | RowSink::ExactlyOne(field) | RowSink::AtMostOne(field) => {
-                            *field.node_input_field(&mut node) = vec![SelectionResult::new(fields)];
-                        }
-                        RowSink::Single(field) => {
-                            *field.node_input_field(&mut node) = Some(SelectionResult::new(fields));
-                        }
-                        RowSink::AllFilter(field) | RowSink::ExactlyOneFilter(field) => {
-                            *field.node_input_field(&mut node) = SelectionResult::new(fields).filter();
-                        }
-                        RowSink::ExactlyOneWriteArgs(selection, field) => {
-                            let result = SelectionResult::new(fields);
-                            let model = node.as_query().map(Query::model);
-                            let args = field.node_input_field(&mut node);
-                            for arg in args {
-                                arg.inject(selection.assimilate(result.clone()).map_err(|err| {
-                                    TranslateError::GraphBuildError(QueryGraphBuilderError::DomainError(err))
-                                })?);
-                                if let Some(model) = &model {
-                                    arg.update_datetimes(model);
-                                }
+                Some(QueryGraphDependency::ProjectedDataDependency(projected_selection, sink, _)) => match sink {
+                    RowSink::All(field) | RowSink::ExactlyOne(field) | RowSink::AtMostOne(field) => {
+                        let fields = self.process_edge_selections(edge, &node, projected_selection);
+                        *field.node_input_field(&mut node) = vec![SelectionResult::new(fields)];
+                    }
+                    RowSink::Single(field) => {
+                        let fields = self.process_edge_selections(edge, &node, projected_selection);
+                        *field.node_input_field(&mut node) = Some(SelectionResult::new(fields));
+                    }
+                    RowSink::ProjectedPlaceholder(field) => {
+                        *field.node_input_field(&mut node) =
+                            Some(self.process_edge_placeholder(edge, &node, projected_selection)?);
+                    }
+                    RowSink::AllFilter(field) | RowSink::ExactlyOneFilter(field) => {
+                        let fields = self.process_edge_selections(edge, &node, projected_selection);
+                        *field.node_input_field(&mut node) = SelectionResult::new(fields).filter();
+                    }
+                    RowSink::ExactlyOneWriteArgs(write_arg_selection, field) => {
+                        let fields = self.process_edge_selections(edge, &node, projected_selection);
+                        let result = SelectionResult::new(fields);
+                        let model = node.as_query().map(Query::model);
+                        let args = field.node_input_field(&mut node);
+                        for arg in args {
+                            arg.inject(write_arg_selection.assimilate(result.clone()).map_err(|err| {
+                                TranslateError::GraphBuildError(QueryGraphBuilderError::DomainError(err))
+                            })?);
+                            if let Some(model) = &model {
+                                arg.update_datetimes(model);
                             }
                         }
-                        RowSink::Discard => {}
                     }
-                }
+                    RowSink::Discard => {}
+                },
 
                 Some(QueryGraphDependency::DataDependency(_, _)) => todo!(),
 
@@ -617,5 +612,40 @@ impl<'a, 'b> NodeTranslator<'a, 'b> {
                 )
             })
             .collect_vec()
+    }
+
+    fn process_edge_placeholder(
+        &mut self,
+        edge: &EdgeRef,
+        node: &Node,
+        selection: FieldSelection,
+    ) -> TranslateResult<Placeholder> {
+        let bindings_refer_to_fields = matches!(node, Node::Query(_));
+        let binding_is_unique = matches!(node, Node::Query(q) if q.is_unique());
+        let field = selection.selections().next().ok_or_else(|| {
+            TranslateError::GraphBuildError(QueryGraphBuilderError::QueryGraphError(
+                QueryGraphError::InvariantViolation("Projected placeholder sink requires at least one field".into()),
+            ))
+        })?;
+
+        let r#type = field
+            .type_info()
+            .as_ref()
+            .map(FieldTypeInformation::to_prisma_type)
+            .unwrap_or(PrismaValueType::Any);
+        let r#type = if binding_is_unique {
+            r#type
+        } else {
+            PrismaValueType::List(r#type.into())
+        };
+
+        Ok(Placeholder {
+            name: if bindings_refer_to_fields {
+                binding::projected_dependency(self.graph.edge_source(edge), field)
+            } else {
+                binding::node_result(self.graph.edge_source(edge))
+            },
+            r#type,
+        })
     }
 }
