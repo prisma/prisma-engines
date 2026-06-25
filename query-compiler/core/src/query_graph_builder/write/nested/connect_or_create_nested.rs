@@ -108,34 +108,30 @@ fn handle_many_to_many(
         let create_map: ParsedInputMap<'_> = create_arg.try_into()?;
 
         let filter = extract_unique_filter(where_map, child_model)?;
+        let child_model_identifier = child_model.shard_aware_primary_identifier();
         let read_node = graph.create_node(utils::read_id_infallible(
             child_model.clone(),
-            child_model.shard_aware_primary_identifier(),
+            child_model_identifier.clone(),
             filter,
         ));
 
         let create_node = create::create_record_node(graph, query_schema, child_model.clone(), create_map)?;
-        let if_node = graph.create_node(Flow::if_non_empty());
-
-        let connect_exists_node =
-            connect::connect_records_node(graph, &parent_node, &read_node, parent_relation_field, 1)?;
-
-        let _connect_create_node =
-            connect::connect_records_node(graph, &parent_node, &create_node, parent_relation_field, 1)?;
+        let if_node = graph.create_node(Flow::if_non_empty_returning_condition());
 
         graph.create_edge(&parent_node, &read_node, QueryGraphDependency::ExecutionOrder)?;
         graph.create_edge(
             &read_node,
             &if_node,
             QueryGraphDependency::ProjectedDataDependency(
-                child_model.shard_aware_primary_identifier(),
+                child_model_identifier.clone(),
                 RowSink::ProjectedPlaceholder(&IfInput),
                 None,
             ),
         )?;
 
-        graph.create_edge(&if_node, &connect_exists_node, QueryGraphDependency::Then)?;
         graph.create_edge(&if_node, &create_node, QueryGraphDependency::Else)?;
+
+        connect::connect_records_node(graph, &parent_node, &if_node, parent_relation_field, 1)?;
     }
 
     Ok(())
@@ -394,10 +390,8 @@ fn one_to_many_inlined_parent(
     graph.mark_nodes(&parent_node, &read_node);
     graph.create_edge(&parent_node, &read_node, QueryGraphDependency::ExecutionOrder)?;
 
-    let if_node = graph.create_node(Flow::if_non_empty());
+    let if_node = graph.create_node(Flow::if_non_empty_returning_condition());
     let create_node = create::create_record_node(graph, query_schema, child_model.clone(), create_map)?;
-    let return_existing = graph.create_node(Flow::Return(None));
-    let return_create = graph.create_node(Flow::Return(None));
 
     graph.create_edge(
         &read_node,
@@ -409,7 +403,6 @@ fn one_to_many_inlined_parent(
         ),
     )?;
 
-    graph.create_edge(&if_node, &return_existing, QueryGraphDependency::Then)?;
     graph.create_edge(&if_node, &create_node, QueryGraphDependency::Else)?;
 
     graph.create_edge(
@@ -420,22 +413,6 @@ fn one_to_many_inlined_parent(
             RowSink::ExactlyOneWriteArgs(parent_link, &UpdateOrCreateArgsInput),
             None,
         ),
-    )?;
-
-    graph.create_edge(
-        &read_node,
-        &return_existing,
-        QueryGraphDependency::ProjectedDataDependency(
-            child_link.clone(),
-            RowSink::ProjectedPlaceholder(&ReturnInput),
-            None,
-        ),
-    )?;
-
-    graph.create_edge(
-        &create_node,
-        &return_create,
-        QueryGraphDependency::ProjectedDataDependency(child_link, RowSink::ProjectedPlaceholder(&ReturnInput), None),
     )?;
 
     Ok(())
@@ -534,7 +511,6 @@ fn one_to_one_inlined_parent(
     let if_node = graph.create_node(Flow::if_non_empty());
     let create_node = create::create_record_node(graph, query_schema, child_model.clone(), create_data)?;
     let return_existing = graph.create_node(Flow::Return(None));
-    let return_create = graph.create_node(Flow::Return(None));
 
     graph.create_edge(
         &read_node,
@@ -569,16 +545,6 @@ fn one_to_one_inlined_parent(
 
     // Else branch handling
     graph.create_edge(&if_node, &create_node, QueryGraphDependency::Else)?;
-    graph.create_edge(
-        &create_node,
-        &return_create,
-        QueryGraphDependency::ProjectedDataDependency(
-            child_link.clone(),
-            RowSink::ProjectedPlaceholder(&ReturnInput),
-            None,
-        ),
-    )?;
-
     if utils::node_is_create(graph, &parent_node) {
         // No need to perform checks, a child can't exist if the parent is just getting created. Simply inject.
         graph.create_edge(

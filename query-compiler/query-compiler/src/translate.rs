@@ -253,8 +253,16 @@ impl<'a, 'b> NodeTranslator<'a, 'b> {
             }
         }
 
+        let then_returns_condition = match self.graph.node_content(&self.node) {
+            Some(Node::Flow(Flow::If {
+                then_returns_condition, ..
+            })) => *then_returns_condition,
+            _ => false,
+        };
+
         let then_expr = match then_node {
-            Some(node) => self.process_child_with_dependencies(node)?,
+            Some(node) => Some(self.process_child_with_dependencies(node)?),
+            None if then_returns_condition => None,
             None => {
                 return Err(TranslateError::GraphBuildError(
                     QueryGraphBuilderError::QueryGraphError(QueryGraphError::InvariantViolation(
@@ -274,10 +282,13 @@ impl<'a, 'b> NodeTranslator<'a, 'b> {
         let node = self.graph.pluck_node(&self.node);
         let node = self.transform_node(node)?;
 
-        let Node::Flow(Flow::If { rule, data }) = node else {
+        let Node::Flow(Flow::If { rule, data, .. }) = node else {
             panic!("current node must be Flow::If");
         };
         let placeholder = projected_placeholder(data, "If")?;
+        let then_expr = then_expr.unwrap_or_else(|| Expression::Get {
+            name: placeholder.name.clone(),
+        });
 
         let expr = Expression::If {
             value: Expression::Get { name: placeholder.name }.into(),
