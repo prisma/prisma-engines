@@ -1,7 +1,7 @@
 ---
 source: query-compiler/query-compiler/tests/queries.rs
 expression: pretty
-input_file: query-compiler/query-compiler/tests/data/update-set-nested.json
+input_file: query-compiler/query-compiler/tests/data/update-set-nested-empty.json
 snapshot_kind: text
 ---
 transaction
@@ -32,25 +32,10 @@ transaction
                         FROM "public"."Post" WHERE (1=1 AND
                         "public"."Post"."userId" IN [$1,*]) OFFSET $2»
                  params [var(0$id as Int), const(BigInt(0))]
-         in let 2 = query «SELECT "public"."Post"."id" FROM "public"."Post"
-                           WHERE (("public"."Post"."id" = $1 AND 1=1) OR
-                           ("public"."Post"."id" = $2 AND 1=1)) OFFSET $3»
-                    params [const(BigInt(11)), const(BigInt(12)),
-                            const(BigInt(0))]
-            in let 3 = diff (get 2) (get 1)
-               in if (rowCountNeq 0 (get 3))
-                  then let 3$id = mapField id (get 3)
-                       in validate (get 0)
-                          [ rowCountNeq 0
-                          ] orRaise "MISSING_RELATED_RECORD";
-                          execute «UPDATE "public"."Post" SET "userId" = $1
-                                   WHERE ("public"."Post"."id" IN [$2,*] AND
-                                   1=1)»
-                          params [var(0$id as Int), var(3$id as Int)]
-                  else ();
-                  validate (diff (get 1) (get 2))
-                  [ rowCountEq 0
-                  ] orRaise "RELATION_VIOLATION";
+         in validate (get 1)
+            [ rowCountEq 0
+            ] orRaise "RELATION_VIOLATION";
+            ();
       let 0 = unique (validate (get 0)
           [ rowCountNeq 0
           ] orRaise "MISSING_RECORD");
