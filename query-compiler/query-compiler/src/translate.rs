@@ -11,11 +11,11 @@ use query::translate_query;
 use query_builder::QueryBuilder;
 use query_core::{
     Computation, EdgeRef, Flow, Node, NodeRef, Query, QueryGraph, QueryGraphBuilderError, QueryGraphDependency,
-    QueryGraphError, RowCountSink, RowSink,
+    QueryGraphError, RowCountSink, RowSink, UpdateManyRecords, WriteQuery,
 };
 use query_structure::{
-    FieldSelection, FieldTypeInformation, IntoFilter, Placeholder, PrismaValue, PrismaValueType, SelectedField,
-    SelectionResult,
+    FieldSelection, FieldTypeInformation, IntoFilter, Placeholder, PrismaValue, PrismaValueType, RecordFilter,
+    SelectedField, SelectionResult, WriteArgs,
 };
 use thiserror::Error;
 
@@ -181,6 +181,7 @@ impl<'a, 'b> NodeTranslator<'a, 'b> {
             Node::Flow(Flow::Return(_)) => self.translate_return(),
             Node::Computation(Computation::DiffLeftToRight(_)) => self.translate_diff_left_to_right(),
             Node::Computation(Computation::DiffRightToLeft(_)) => self.translate_diff_right_to_left(),
+            Node::Computation(Computation::RequiredOneToManySet(_)) => self.translate_required_one_to_many_set(),
         }
     }
 
@@ -343,6 +344,139 @@ impl<'a, 'b> NodeTranslator<'a, 'b> {
             from: Expression::Get { name: from.name }.into(),
             to: Expression::Get { name: to.name }.into(),
             fields: diff.fields.db_names().collect(),
+        };
+
+        Ok(self.wrap_children_with_expr(expr, children))
+    }
+
+    fn translate_required_one_to_many_set(&mut self) -> TranslateResult<Expression> {
+        let children = self.translate_children()?;
+
+        let node = self.graph.pluck_node(&self.node);
+        let node = self.transform_node(node)?;
+
+        let Node::Computation(Computation::RequiredOneToManySet(set)) = node else {
+            panic!("current node must be Computation::RequiredOneToManySet");
+        };
+
+        let old_children = projected_placeholder(set.old_children, "RequiredOneToManySet.old_children")?;
+        let new_children = projected_placeholder(set.new_children, "RequiredOneToManySet.new_children")?;
+        let left_diff_name = binding::node_result(self.node);
+
+        let selector = SelectionResult::new(
+            set.fields
+                .selections()
+                .map(|field| {
+                    (
+                        field.clone(),
+                        PrismaValue::Placeholder(Placeholder::new(
+                            binding::projected_dependency(self.node, field),
+                            selected_field_placeholder_type(field, true),
+                        )),
+                    )
+                })
+                .collect(),
+        );
+
+        let mut update_args = WriteArgs::from_result(
+            SelectionResult::new(
+                set.parent_link
+                    .selections()
+                    .zip(set.child_link.selections())
+                    .map(|(parent_field, child_field)| {
+                        (
+                            child_field.clone(),
+                            PrismaValue::Placeholder(Placeholder::new(
+                                binding::projected_dependency(set.parent_node, parent_field),
+                                selected_field_placeholder_type(parent_field, false),
+                            )),
+                        )
+                    })
+                    .collect(),
+            ),
+            set.request_now,
+        );
+        update_args.update_datetimes(&set.child_model);
+
+        let update = UpdateManyRecords {
+            name: String::new(),
+            model: set.child_model,
+            record_filter: RecordFilter::from(vec![selector]),
+            args: update_args,
+            selected_fields: None,
+            limit: None,
+        };
+
+        let update_expr = translate_query(Query::Write(WriteQuery::UpdateManyRecords(update)), self.query_builder)?;
+        let parent_validation = Expression::validate_expectation(
+            &set.parent_expectation,
+            Expression::Get {
+                name: binding::node_result(set.parent_node),
+            },
+        );
+
+        let relation_validation = Expression::validate_expectation(
+            &set.relation_expectation,
+            Expression::Diff {
+                from: Expression::Get {
+                    name: old_children.name.clone(),
+                }
+                .into(),
+                to: Expression::Get {
+                    name: new_children.name.clone(),
+                }
+                .into(),
+                fields: set.fields.db_names().collect(),
+            },
+        );
+
+        let expr = Expression::Let {
+            bindings: vec![Binding::new(
+                left_diff_name.clone(),
+                Expression::Diff {
+                    from: Expression::Get {
+                        name: new_children.name.clone(),
+                    }
+                    .into(),
+                    to: Expression::Get {
+                        name: old_children.name.clone(),
+                    }
+                    .into(),
+                    fields: set.fields.db_names().collect(),
+                },
+            )],
+            expr: Expression::Seq(vec![
+                Expression::If {
+                    value: Expression::Get {
+                        name: left_diff_name.clone(),
+                    }
+                    .into(),
+                    rule: query_core::DataRule::RowCountNeq(0),
+                    then: Expression::Let {
+                        bindings: set
+                            .fields
+                            .selections()
+                            .map(|field| {
+                                Binding::new(
+                                    binding::projected_dependency(self.node, field),
+                                    Expression::MapField {
+                                        field: field.db_name().into(),
+                                        records: Expression::Get {
+                                            name: left_diff_name.clone(),
+                                        }
+                                        .into(),
+                                    },
+                                )
+                            })
+                            .collect(),
+                        expr: Expression::Seq(vec![parent_validation, update_expr]).into(),
+                    }
+                    .into(),
+                    r#else: Expression::Unit.into(),
+                },
+                relation_validation,
+            ])
+            .into(),
         };
 
         Ok(self.wrap_children_with_expr(expr, children))
@@ -628,16 +762,7 @@ impl<'a, 'b> NodeTranslator<'a, 'b> {
             ))
         })?;
 
-        let r#type = field
-            .type_info()
-            .as_ref()
-            .map(FieldTypeInformation::to_prisma_type)
-            .unwrap_or(PrismaValueType::Any);
-        let r#type = if binding_is_unique {
-            r#type
-        } else {
-            PrismaValueType::List(r#type.into())
-        };
+        let r#type = selected_field_placeholder_type(field, !binding_is_unique);
 
         Ok(Placeholder {
             name: if bindings_refer_to_fields {
@@ -647,5 +772,19 @@ impl<'a, 'b> NodeTranslator<'a, 'b> {
             },
             r#type,
         })
+    }
+}
+
+fn selected_field_placeholder_type(field: &SelectedField, list: bool) -> PrismaValueType {
+    let r#type = field
+        .type_info()
+        .as_ref()
+        .map(FieldTypeInformation::to_prisma_type)
+        .unwrap_or(PrismaValueType::Any);
+
+    if list {
+        PrismaValueType::List(r#type.into())
+    } else {
+        r#type
     }
 }
