@@ -22,7 +22,7 @@ pub(crate) fn translate_read_query(query: ReadQuery, builder: &dyn QueryBuilder)
         ReadQuery::RecordQuery(mut rq) => {
             let selected_fields = match rq.relation_load_strategy {
                 RelationLoadStrategy::Join => rq.selected_fields.into_virtuals_last(),
-                RelationLoadStrategy::Query => rq.selected_fields.without_relations().into_virtuals_last(),
+                RelationLoadStrategy::Query => rq.selected_fields.into_without_relations().into_virtuals_last(),
             };
 
             let mut args = QueryArguments::from((
@@ -53,7 +53,7 @@ pub(crate) fn translate_read_query(query: ReadQuery, builder: &dyn QueryBuilder)
 
             let selected_fields = match mrq.relation_load_strategy {
                 RelationLoadStrategy::Join => mrq.selected_fields.into_virtuals_last(),
-                RelationLoadStrategy::Query => mrq.selected_fields.without_relations().into_virtuals_last(),
+                RelationLoadStrategy::Query => mrq.selected_fields.into_without_relations().into_virtuals_last(),
             };
 
             let take = mrq.args.take;
@@ -122,18 +122,20 @@ pub(super) fn add_inmemory_join(
     nested: Vec<ReadQuery>,
     builder: &dyn QueryBuilder,
 ) -> TranslateResult<Expression> {
-    let all_linking_fields = nested
+    let mut all_linking_fields = nested
         .iter()
         .flat_map(|nested| match nested {
             ReadQuery::RelatedRecordsQuery(rrq) => rrq.parent_field.left_scalars(),
             _ => unreachable!(),
         })
-        .unique()
-        .sorted_by(|a, b| a.name().cmp(b.name()));
+        .collect::<Vec<_>>();
+    all_linking_fields.sort_by(|a, b| a.name().cmp(b.name()));
+    all_linking_fields.dedup_by(|a, b| a.name() == b.name());
 
     let linking_fields_bindings = all_linking_fields
+        .iter()
         .map(|sf| Binding {
-            name: binding::join_parent_field(&sf),
+            name: binding::join_parent_field(sf),
             expr: Expression::MapField {
                 field: sf.db_name().into(),
                 records: Box::new(Expression::Get {
@@ -241,7 +243,7 @@ fn build_read_related_records(
         }
     }
 
-    let selected_fields = rrq.selected_fields.without_relations().into_virtuals_last();
+    let selected_fields = rrq.selected_fields.into_without_relations().into_virtuals_last();
 
     let mut in_memory_ops =
         in_memory_processing::extract_in_memory_ops_for_nested_query(&mut rrq.args, has_unique_parent);
@@ -308,7 +310,7 @@ fn build_read_one2m_query(
 ) -> TranslateResult<(Expression, JoinMetadata)> {
     let (field, conditions_per_field) = linkage.into_parent_field_and_conditions();
 
-    let filters = args
+    let mut filters = args
         .filter
         .take()
         .into_iter()
@@ -320,10 +322,21 @@ fn build_read_one2m_query(
                     mode: QueryMode::Default,
                 })
             })
-        }))
-        .collect_vec();
+        }));
 
-    args.filter = Some(Filter::And(filters));
+    let filter = match (filters.next(), filters.next()) {
+        (None, _) => Filter::And(Vec::new()),
+        (Some(filter), None) => filter,
+        (Some(first), Some(second)) => {
+            let mut all_filters = Vec::with_capacity(2 + filters.size_hint().0);
+            all_filters.push(first);
+            all_filters.push(second);
+            all_filters.extend(filters);
+            Filter::And(all_filters)
+        }
+    };
+
+    args.filter = Some(filter);
 
     let expr = build_get_records(
         builder,

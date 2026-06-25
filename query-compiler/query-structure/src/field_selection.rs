@@ -64,6 +64,15 @@ impl FieldSelection {
         )
     }
 
+    pub fn into_without_relations(self) -> Self {
+        FieldSelection::new(
+            self.selections
+                .into_iter()
+                .filter(|field| !matches!(field, SelectedField::Relation(_)))
+                .collect(),
+        )
+    }
+
     pub fn into_virtuals_last(self) -> Self {
         let virtual_count = self
             .selections
@@ -218,6 +227,22 @@ impl FieldSelection {
     /// occurrence of the first field in order from left (`self`) to right (`other`)
     /// is retained. Assumes that both selections reason over the same model.
     pub fn merge(self, other: FieldSelection) -> FieldSelection {
+        if other.selections.is_empty() {
+            return self;
+        }
+
+        if self.selections.is_empty() {
+            return other;
+        }
+
+        if other
+            .selections
+            .iter()
+            .all(|selection| self.selections.contains(selection))
+        {
+            return self;
+        }
+
         let selections = self.selections.into_iter().chain(other.selections).unique().collect();
 
         FieldSelection { selections }

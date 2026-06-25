@@ -78,7 +78,7 @@ where
 
     let parent = parent.into();
 
-    let mut selected_fields = Vec::new();
+    let mut selected_fields = Vec::with_capacity(pairs.len());
 
     for pair in pairs {
         let field = parent.find_field(&pair.parsed_field.name);
@@ -229,6 +229,10 @@ pub(crate) fn merge_relation_selections(
     } else {
         selected_fields
     };
+
+    if nested_queries.is_empty() {
+        return selected_fields;
+    }
 
     let nested: Vec<_> = nested_queries
         .iter()
