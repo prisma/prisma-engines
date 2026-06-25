@@ -19,32 +19,19 @@ transaction
    let 0 = query «SELECT "public"."User"."id" FROM "public"."User" WHERE
                   ("public"."User"."email" = $1 AND 1=1) OFFSET $2»
            params [const(String("user.1@prisma.io")), const(BigInt(0))]
-   in if (rowCountNeq 0 (get 0))
-      then let 2 = get 0
-           in let 2 = unique (validate (get 2)
-                  [ rowCountNeq 0
-                  ] orRaise "MISSING_RECORD");
-                  2$id = mapField id (get 2)
-              in unique (query «SELECT "public"."User"."id",
-                                "public"."User"."email",
-                                "public"."User"."role"::text FROM
-                                "public"."User" WHERE "public"."User"."id" = $1
-                                LIMIT $2 OFFSET $3»
-                         params [var(2$id as Int), const(BigInt(1)),
-                                 const(BigInt(0))])
-      else let 1 = unique (query «INSERT INTO "public"."User" ("email","role")
-                                  VALUES ($1,CAST($2::text AS "public"."Role"))
-                                  RETURNING "public"."User"."id"»
-                           params [const(String("user.1@prisma.io")),
-                                   const(String("user"))])
-           in let 1 = unique (validate (get 1)
-                  [ rowCountNeq 0
-                  ] orRaise "MISSING_RECORD");
-                  1$id = mapField id (get 1)
-              in unique (query «SELECT "public"."User"."id",
-                                "public"."User"."email",
-                                "public"."User"."role"::text FROM
-                                "public"."User" WHERE "public"."User"."id" = $1
-                                LIMIT $2 OFFSET $3»
-                         params [var(1$id as Int), const(BigInt(1)),
-                                 const(BigInt(0))])
+   in let 4 = if (rowCountNeq 0 (get 0))
+          then get 0
+          else unique (query «INSERT INTO "public"."User" ("email","role")
+                              VALUES ($1,CAST($2::text AS "public"."Role"))
+                              RETURNING "public"."User"."id"»
+                       params [const(String("user.1@prisma.io")),
+                               const(String("user"))])
+      in let 4 = unique (validate (get 4)
+             [ rowCountNeq 0
+             ] orRaise "MISSING_RECORD");
+             4$id = mapField id (get 4)
+         in unique (query «SELECT "public"."User"."id", "public"."User"."email",
+                           "public"."User"."role"::text FROM "public"."User"
+                           WHERE "public"."User"."id" = $1 LIMIT $2 OFFSET $3»
+                    params [var(4$id as Int), const(BigInt(1)),
+                            const(BigInt(0))])

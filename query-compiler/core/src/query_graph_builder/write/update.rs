@@ -206,6 +206,7 @@ where
     T: Clone + Into<Filter>,
 {
     let mut args = update_args.args;
+    let nested = update_args.nested;
 
     args.update_datetimes(&model);
 
@@ -217,9 +218,19 @@ where
     let update_parent = if query_schema.has_capability(ConnectorCapability::UpdateReturning) {
         // If there's a selected field, fulfill the scalar selection set.
         if let Some(field) = field.cloned() {
-            let nested_fields = field.nested_fields.unwrap().fields;
-            let selection_order: Vec<String> = read::utils::collect_selection_order(&nested_fields);
-            let selected_fields = read::utils::collect_selected_scalars(&nested_fields, &model);
+            let (selected_fields, selection_order) =
+                if args.is_empty() && (field.has_nested_selection() || !nested.is_empty()) {
+                    let selected_fields = model.shard_aware_primary_identifier();
+                    let selection_order = selected_fields.db_names().collect();
+
+                    (selected_fields, selection_order)
+                } else {
+                    let nested_fields = field.nested_fields.unwrap().fields;
+                    let selection_order = read::utils::collect_selection_order(&nested_fields);
+                    let selected_fields = read::utils::collect_selected_scalars(&nested_fields, &model);
+
+                    (selected_fields, selection_order)
+                };
 
             Query::Write(WriteQuery::UpdateRecord(UpdateRecord::WithSelection(
                 UpdateRecordWithSelection {
@@ -259,7 +270,7 @@ where
 
     let update_node = graph.create_node(update_parent);
 
-    for (relation_field, data_map) in update_args.nested {
+    for (relation_field, data_map) in nested {
         nested::connect_nested_query(graph, query_schema, update_node, relation_field, data_map)?;
     }
 

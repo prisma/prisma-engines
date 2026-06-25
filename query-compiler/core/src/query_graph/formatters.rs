@@ -57,6 +57,7 @@ impl Display for Flow {
         match self {
             Self::If { rule, .. } => write!(f, "If {rule:?}"),
             Self::Return(_) => write!(f, "Return"),
+            Self::ReturnPreservingResult(_) => write!(f, "ReturnPreservingResult"),
         }
     }
 }

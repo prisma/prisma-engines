@@ -115,7 +115,7 @@ node_input_field!(
 node_input_field!(
     ReturnInput,
     Option<Placeholder>,
-    Node::Flow(Flow::Return(data)) => data
+    Node::Flow(Flow::Return(data) | Flow::ReturnPreservingResult(data)) => data
 );
 
 node_input_field!(

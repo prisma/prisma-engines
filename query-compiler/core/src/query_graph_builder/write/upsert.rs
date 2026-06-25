@@ -99,12 +99,22 @@ pub(crate) fn upsert_record(
     let read_parent_records = utils::read_ids_infallible(model.clone(), model_id.clone(), filter.clone());
     let read_parent_records_node = graph.create_node(read_parent_records);
 
-    let create_node = create::create_record_node(graph, query_schema, model.clone(), create_argument)?;
-
     let update_args = WriteArgsParser::from(&model, update_argument)?;
     let is_noop_update = update_args.args.is_empty();
+    let update_nested_count = update_args.nested.len();
+    let update_has_nested = update_nested_count != 0;
+    let create_has_nested = WriteArgsParser::has_nested_operation(&model, &create_argument);
+    let can_preserve_update_result = update_nested_count == 1;
+    let can_share_result_read =
+        is_noop_update && !create_has_nested && (!update_has_nested || can_preserve_update_result);
+
+    let create_node = create::create_record_node(graph, query_schema, model.clone(), create_argument)?;
     let update_node = if is_noop_update {
-        let return_node = graph.create_node(Flow::Return(None));
+        let return_node = if update_has_nested && can_share_result_read {
+            graph.create_node(Flow::return_preserving_result())
+        } else {
+            graph.create_node(Flow::Return(None))
+        };
 
         graph.create_edge(
             &read_parent_records_node,
@@ -125,11 +135,26 @@ pub(crate) fn upsert_record(
         update::update_record_node_from_args(graph, query_schema, filter, model.clone(), update_args, Some(&field))?
     };
 
-    let read_node_create = graph.create_node(Query::Read(read_query.clone()));
-    let read_node_update = graph.create_node(Query::Read(read_query));
+    let mut read_query = Some(read_query);
+    let read_node_shared = if can_share_result_read {
+        let read_node = graph.create_node(Query::Read(read_query.take().unwrap()));
+        graph.add_result_node(&read_node);
+        Some(read_node)
+    } else {
+        None
+    };
+    let branch_read_nodes = if can_share_result_read {
+        None
+    } else {
+        let read_query = read_query.take().unwrap();
+        let read_node_create = graph.create_node(Query::Read(read_query.clone()));
+        let read_node_update = graph.create_node(Query::Read(read_query));
 
-    graph.add_result_node(&read_node_create);
-    graph.add_result_node(&read_node_update);
+        graph.add_result_node(&read_node_create);
+        graph.add_result_node(&read_node_update);
+
+        Some((read_node_create, read_node_update))
+    };
 
     let if_node = graph.create_node(Flow::if_non_empty());
 
@@ -175,29 +200,43 @@ pub(crate) fn upsert_record(
         )?;
     }
 
-    graph.create_edge(
-        &update_node,
-        &read_node_update,
-        QueryGraphDependency::ProjectedDataDependency(
-            model_id.clone(),
-            RowSink::ExactlyOneFilter(&RecordQueryFilterInput),
-            Some(DataExpectation::non_empty_rows(
-                MissingRecord::builder().operation(DataOperation::Upsert).build(),
-            )),
-        ),
-    )?;
+    if let Some(read_node) = read_node_shared {
+        graph.create_edge(
+            &if_node,
+            &read_node,
+            QueryGraphDependency::ProjectedDataDependency(
+                model_id,
+                RowSink::ExactlyOneFilter(&RecordQueryFilterInput),
+                Some(DataExpectation::non_empty_rows(
+                    MissingRecord::builder().operation(DataOperation::Upsert).build(),
+                )),
+            ),
+        )?;
+    } else if let Some((read_node_create, read_node_update)) = branch_read_nodes {
+        graph.create_edge(
+            &update_node,
+            &read_node_update,
+            QueryGraphDependency::ProjectedDataDependency(
+                model_id.clone(),
+                RowSink::ExactlyOneFilter(&RecordQueryFilterInput),
+                Some(DataExpectation::non_empty_rows(
+                    MissingRecord::builder().operation(DataOperation::Upsert).build(),
+                )),
+            ),
+        )?;
 
-    graph.create_edge(
-        &create_node,
-        &read_node_create,
-        QueryGraphDependency::ProjectedDataDependency(
-            model_id,
-            RowSink::ExactlyOneFilter(&RecordQueryFilterInput),
-            Some(DataExpectation::non_empty_rows(
-                MissingRecord::builder().operation(DataOperation::Upsert).build(),
-            )),
-        ),
-    )?;
+        graph.create_edge(
+            &create_node,
+            &read_node_create,
+            QueryGraphDependency::ProjectedDataDependency(
+                model_id,
+                RowSink::ExactlyOneFilter(&RecordQueryFilterInput),
+                Some(DataExpectation::non_empty_rows(
+                    MissingRecord::builder().operation(DataOperation::Upsert).build(),
+                )),
+            ),
+        )?;
+    }
 
     Ok(())
 }

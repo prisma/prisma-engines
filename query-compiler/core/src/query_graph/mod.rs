@@ -78,6 +78,9 @@ pub enum Flow {
 
     /// Returns a fixed set of results at runtime.
     Return(Option<Placeholder>),
+
+    /// Runs child nodes, then returns the same fixed set of results.
+    ReturnPreservingResult(Option<Placeholder>),
 }
 
 impl Flow {
@@ -103,6 +106,10 @@ impl Flow {
             data: None,
             then_returns_condition: false,
         }
+    }
+
+    pub fn return_preserving_result() -> Self {
+        Self::ReturnPreservingResult(None)
     }
 }
 
@@ -945,7 +952,7 @@ impl QueryGraph {
                 let node = NodeRef { node_ix: ix };
 
                 match self.node_content(&node).unwrap() {
-                    Node::Flow(Flow::Return(_)) => Some(node),
+                    Node::Flow(Flow::Return(_) | Flow::ReturnPreservingResult(_)) => Some(node),
                     _ => None,
                 }
             })
