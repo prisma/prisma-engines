@@ -232,7 +232,7 @@ impl<'a> FeatureMapWithProvider<'a> {
                 | TransactionApi
                 | UncheckedScalarInputs
             }),
-            hidden: enumflags2::make_bitflags!(PreviewFeature::{ReactNative}),
+            hidden: enumflags2::make_bitflags!(PreviewFeature::ReactNative),
         };
 
         Self {
