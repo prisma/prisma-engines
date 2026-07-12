@@ -15,7 +15,7 @@ fn simple_composite_index() {
         }
     "#};
 
-    psl::parse_schema(with_header(schema, crate::Provider::Mongo, &[]))
+    psl::parse_schema_without_extensions(with_header(schema, crate::Provider::Mongo, &[]))
         .unwrap()
         .assert_has_model("B")
         .assert_index_on_fields(&["field"]);
@@ -36,7 +36,7 @@ fn simple_composite_unique() {
         }
     "#};
 
-    psl::parse_schema(with_header(schema, crate::Provider::Mongo, &[]))
+    psl::parse_schema_without_extensions(with_header(schema, crate::Provider::Mongo, &[]))
         .unwrap()
         .assert_has_model("B")
         .assert_unique_on_fields(&["field"]);
@@ -59,7 +59,7 @@ fn composite_unique_with_normal_unique() {
         }
     "#};
 
-    let schema = psl::parse_schema(with_header(schema, crate::Provider::Mongo, &[])).unwrap();
+    let schema = psl::parse_schema_without_extensions(with_header(schema, crate::Provider::Mongo, &[])).unwrap();
     let model = schema.assert_has_model("User");
 
     model.assert_unique_on_fields(&["number"]);
@@ -81,7 +81,7 @@ fn simple_composite_fulltext() {
         }
     "#};
 
-    psl::parse_schema(with_header(schema, crate::Provider::Mongo, &["fullTextIndex"]))
+    psl::parse_schema_without_extensions(with_header(schema, crate::Provider::Mongo, &[]))
         .unwrap()
         .assert_has_model("B")
         .assert_fulltext_on_fields(&["field"]);
@@ -102,7 +102,7 @@ fn composite_index_with_default() {
         }
     "#};
 
-    psl::parse_schema(with_header(schema, crate::Provider::Mongo, &[]))
+    psl::parse_schema_without_extensions(with_header(schema, crate::Provider::Mongo, &[]))
         .unwrap()
         .assert_has_model("B")
         .assert_index_on_fields(&["field"]);
@@ -123,7 +123,7 @@ fn composite_index_with_map() {
         }
     "#};
 
-    psl::parse_schema(with_header(schema, crate::Provider::Mongo, &[]))
+    psl::parse_schema_without_extensions(with_header(schema, crate::Provider::Mongo, &[]))
         .unwrap()
         .assert_has_model("B")
         .assert_index_on_fields(&["field"]);
@@ -144,7 +144,7 @@ fn composite_index_with_sort() {
         }
     "#};
 
-    psl::parse_schema(with_header(schema, crate::Provider::Mongo, &[]))
+    psl::parse_schema_without_extensions(with_header(schema, crate::Provider::Mongo, &[]))
         .unwrap()
         .assert_has_model("B")
         .assert_index_on_fields(&["field"])
@@ -171,18 +171,16 @@ fn reformat() {
         }
     "#};
 
-    let datamodel = with_header(schema, crate::Provider::Mongo, &["fullTextIndex"]);
+    let datamodel = with_header(schema, crate::Provider::Mongo, &[]);
     let result = psl::reformat(&datamodel, 2).unwrap_or_else(|| datamodel.to_owned());
 
     let expected = expect![[r#"
         datasource test {
           provider = "mongodb"
-          url      = "mongo://..."
         }
 
         generator client {
-          provider        = "prisma-client-js"
-          previewFeatures = ["fullTextIndex"]
+          provider = "prisma-client"
         }
 
         type A {
@@ -220,10 +218,10 @@ fn should_not_work_outside_mongo() {
 
     let expected = expect![[r#"
         [1;91merror[0m: [1mError validating model "B": The index definition refers to the unknown fields: a.field.[0m
-          [1;94m-->[0m  [4mschema.prisma:15[0m
+          [1;94m-->[0m  [4mschema.prisma:14[0m
         [1;94m   | [0m
-        [1;94m14 | [0m
-        [1;94m15 | [0m  [1;91m@@index([a.field])[0m
+        [1;94m13 | [0m
+        [1;94m14 | [0m  [1;91m@@index([a.field])[0m
         [1;94m   | [0m
     "#]];
 
@@ -250,10 +248,10 @@ fn should_not_work_outside_mongo_2() {
 
     let expected = expect![[r#"
         [1;91merror[0m: [1mError validating: The argument fields must refer only to existing fields. The following fields do not exist in this model: a.field[0m
-          [1;94m-->[0m  [4mschema.prisma:19[0m
+          [1;94m-->[0m  [4mschema.prisma:18[0m
         [1;94m   | [0m
-        [1;94m18 | [0m  field Int
-        [1;94m19 | [0m  c     C   @relation(fields: [1;91m[a.field][0m, references: [id])
+        [1;94m17 | [0m  field Int
+        [1;94m18 | [0m  c     C   @relation(fields: [1;91m[a.field][0m, references: [id])
         [1;94m   | [0m
     "#]];
 
@@ -280,11 +278,11 @@ fn a_bonkers_definition_1() {
 
     let expected = expect![[r#"
         [1;91merror[0m: [1mError validating: This line is not a valid field or attribute definition.[0m
-          [1;94m-->[0m  [4mschema.prisma:19[0m
+          [1;94m-->[0m  [4mschema.prisma:18[0m
         [1;94m   | [0m
-        [1;94m18 | [0m
-        [1;94m19 | [0m  [1;91m@@index([.field])[0m
-        [1;94m20 | [0m}
+        [1;94m17 | [0m
+        [1;94m18 | [0m  [1;91m@@index([.field])[0m
+        [1;94m19 | [0m}
         [1;94m   | [0m
     "#]];
 
@@ -311,10 +309,10 @@ fn a_bonkers_definition_2() {
 
     let expected = expect![[r#"
         [1;91merror[0m: [1mError validating model "B": The index definition refers to the unknown fields:  in type A.[0m
-          [1;94m-->[0m  [4mschema.prisma:19[0m
+          [1;94m-->[0m  [4mschema.prisma:18[0m
         [1;94m   | [0m
-        [1;94m18 | [0m
-        [1;94m19 | [0m  [1;91m@@index([a.])[0m
+        [1;94m17 | [0m
+        [1;94m18 | [0m  [1;91m@@index([a.])[0m
         [1;94m   | [0m
     "#]];
 
@@ -341,11 +339,11 @@ fn a_bonkers_definition_3() {
 
     let expected = expect![[r#"
         [1;91merror[0m: [1mError validating: This line is not a valid field or attribute definition.[0m
-          [1;94m-->[0m  [4mschema.prisma:19[0m
+          [1;94m-->[0m  [4mschema.prisma:18[0m
         [1;94m   | [0m
-        [1;94m18 | [0m
-        [1;94m19 | [0m  [1;91m@@index([.])[0m
-        [1;94m20 | [0m}
+        [1;94m17 | [0m
+        [1;94m18 | [0m  [1;91m@@index([.])[0m
+        [1;94m19 | [0m}
         [1;94m   | [0m
     "#]];
 
@@ -372,11 +370,11 @@ fn a_bonkers_definition_4() {
 
     let expected = expect![[r#"
         [1;91merror[0m: [1mError validating: This line is not a valid field or attribute definition.[0m
-          [1;94m-->[0m  [4mschema.prisma:19[0m
+          [1;94m-->[0m  [4mschema.prisma:18[0m
         [1;94m   | [0m
-        [1;94m18 | [0m
-        [1;94m19 | [0m  [1;91m@@index([....])[0m
-        [1;94m20 | [0m}
+        [1;94m17 | [0m
+        [1;94m18 | [0m  [1;91m@@index([....])[0m
+        [1;94m19 | [0m}
         [1;94m   | [0m
     "#]];
 
@@ -403,11 +401,11 @@ fn a_bonkers_definition_5() {
 
     let expected = expect![[r#"
         [1;91merror[0m: [1mError validating: This line is not a valid field or attribute definition.[0m
-          [1;94m-->[0m  [4mschema.prisma:19[0m
+          [1;94m-->[0m  [4mschema.prisma:18[0m
         [1;94m   | [0m
-        [1;94m18 | [0m
-        [1;94m19 | [0m  [1;91m@@index([a .field])[0m
-        [1;94m20 | [0m}
+        [1;94m17 | [0m
+        [1;94m18 | [0m  [1;91m@@index([a .field])[0m
+        [1;94m19 | [0m}
         [1;94m   | [0m
     "#]];
 
@@ -434,11 +432,11 @@ fn a_bonkers_definition_6() {
 
     let expected = expect![[r#"
         [1;91merror[0m: [1mError validating: This line is not a valid field or attribute definition.[0m
-          [1;94m-->[0m  [4mschema.prisma:19[0m
+          [1;94m-->[0m  [4mschema.prisma:18[0m
         [1;94m   | [0m
-        [1;94m18 | [0m
-        [1;94m19 | [0m  [1;91m@@index([a something .field])[0m
-        [1;94m20 | [0m}
+        [1;94m17 | [0m
+        [1;94m18 | [0m  [1;91m@@index([a something .field])[0m
+        [1;94m19 | [0m}
         [1;94m   | [0m
     "#]];
 
@@ -463,11 +461,11 @@ fn id_cannot_use_composite_fields() {
     let error = parse_unwrap_err(&dml);
 
     let expected = expect![[r#"
-        [1;91merror[0m: [1mError validating model "B": The multi field id declaration refers to the unknown fields a.id.[0m
-          [1;94m-->[0m  [4mschema.prisma:18[0m
+        [1;91merror[0m: [1mError validating model "B": The multi field id declaration refers to the unknown field `a.id`.[0m
+          [1;94m-->[0m  [4mschema.prisma:17[0m
         [1;94m   | [0m
-        [1;94m17 | [0m
-        [1;94m18 | [0m  @@id([1;91m[a.id][0m)
+        [1;94m16 | [0m
+        [1;94m17 | [0m  @@id([1;91m[a.id][0m)
         [1;94m   | [0m
     "#]];
 
@@ -498,10 +496,10 @@ fn relation_cannot_use_composite_fields() {
 
     let expected = expect![[r#"
         [1;91merror[0m: [1mError validating: The argument fields must refer only to existing fields. The following fields do not exist in this model: a.field[0m
-          [1;94m-->[0m  [4mschema.prisma:23[0m
+          [1;94m-->[0m  [4mschema.prisma:22[0m
         [1;94m   | [0m
-        [1;94m22 | [0m  a  A
-        [1;94m23 | [0m  c  C   @relation(fields: [1;91m[a.field][0m, references: [id])
+        [1;94m21 | [0m  a  A
+        [1;94m22 | [0m  c  C   @relation(fields: [1;91m[a.field][0m, references: [id])
         [1;94m   | [0m
     "#]];
 
@@ -528,10 +526,16 @@ fn pointing_to_a_non_existing_type() {
 
     let expected = expect![[r#"
         [1;91merror[0m: [1mType "C" is neither a built-in type, nor refers to another model, composite type, or enum.[0m
-          [1;94m-->[0m  [4mschema.prisma:17[0m
+          [1;94m-->[0m  [4mschema.prisma:16[0m
         [1;94m   | [0m
-        [1;94m16 | [0m  id Int @id @map("_id")
-        [1;94m17 | [0m  a  [1;91mC[0m
+        [1;94m15 | [0m  id Int @id @map("_id")
+        [1;94m16 | [0m  a  [1;91mC[0m
+        [1;94m   | [0m
+        [1;91merror[0m: [1mError validating model "B": The index definition refers to the relation fields a. Index definitions must reference only scalar fields.[0m
+          [1;94m-->[0m  [4mschema.prisma:18[0m
+        [1;94m   | [0m
+        [1;94m17 | [0m
+        [1;94m18 | [0m  [1;91m@@index([a.field])[0m
         [1;94m   | [0m
     "#]];
 
@@ -560,22 +564,22 @@ fn index_to_a_missing_field_in_a_composite_type() {
 
     let expected = expect![[r#"
         [1;91merror[0m: [1mError validating model "B": The index definition refers to the unknown fields: cat in type A.[0m
-          [1;94m-->[0m  [4mschema.prisma:19[0m
+          [1;94m-->[0m  [4mschema.prisma:18[0m
         [1;94m   | [0m
-        [1;94m18 | [0m
-        [1;94m19 | [0m  [1;91m@@index([a.cat])[0m
+        [1;94m17 | [0m
+        [1;94m18 | [0m  [1;91m@@index([a.cat])[0m
         [1;94m   | [0m
         [1;91merror[0m: [1mError validating model "B": The unique index definition refers to the unknown fields: cat in type A.[0m
-          [1;94m-->[0m  [4mschema.prisma:20[0m
+          [1;94m-->[0m  [4mschema.prisma:19[0m
         [1;94m   | [0m
-        [1;94m19 | [0m  @@index([a.cat])
-        [1;94m20 | [0m  [1;91m@@unique([a.cat])[0m
+        [1;94m18 | [0m  @@index([a.cat])
+        [1;94m19 | [0m  [1;91m@@unique([a.cat])[0m
         [1;94m   | [0m
         [1;91merror[0m: [1mError validating model "B": The index definition refers to the unknown fields: cat in type A.[0m
-          [1;94m-->[0m  [4mschema.prisma:21[0m
+          [1;94m-->[0m  [4mschema.prisma:20[0m
         [1;94m   | [0m
-        [1;94m20 | [0m  @@unique([a.cat])
-        [1;94m21 | [0m  [1;91m@@fulltext([a.cat])[0m
+        [1;94m19 | [0m  @@unique([a.cat])
+        [1;94m20 | [0m  [1;91m@@fulltext([a.cat])[0m
         [1;94m   | [0m
     "#]];
 
@@ -604,22 +608,22 @@ fn index_to_a_missing_composite_field() {
 
     let expected = expect![[r#"
         [1;91merror[0m: [1mError validating model "B": The index definition refers to the unknown fields: b.[0m
-          [1;94m-->[0m  [4mschema.prisma:19[0m
+          [1;94m-->[0m  [4mschema.prisma:18[0m
         [1;94m   | [0m
-        [1;94m18 | [0m
-        [1;94m19 | [0m  [1;91m@@index([b.field])[0m
+        [1;94m17 | [0m
+        [1;94m18 | [0m  [1;91m@@index([b.field])[0m
         [1;94m   | [0m
         [1;91merror[0m: [1mError validating model "B": The unique index definition refers to the unknown fields: b.[0m
-          [1;94m-->[0m  [4mschema.prisma:20[0m
+          [1;94m-->[0m  [4mschema.prisma:19[0m
         [1;94m   | [0m
-        [1;94m19 | [0m  @@index([b.field])
-        [1;94m20 | [0m  [1;91m@@unique([b.field])[0m
+        [1;94m18 | [0m  @@index([b.field])
+        [1;94m19 | [0m  [1;91m@@unique([b.field])[0m
         [1;94m   | [0m
         [1;91merror[0m: [1mError validating model "B": The index definition refers to the unknown fields: b.[0m
-          [1;94m-->[0m  [4mschema.prisma:21[0m
+          [1;94m-->[0m  [4mschema.prisma:20[0m
         [1;94m   | [0m
-        [1;94m20 | [0m  @@unique([b.field])
-        [1;94m21 | [0m  [1;91m@@fulltext([b.field])[0m
+        [1;94m19 | [0m  @@unique([b.field])
+        [1;94m20 | [0m  [1;91m@@fulltext([b.field])[0m
         [1;94m   | [0m
     "#]];
 
@@ -649,22 +653,22 @@ fn non_composite_field_in_the_path() {
 
     let expected = expect![[r#"
         [1;91merror[0m: [1mError validating model "B": The index definition refers to the unknown fields: b.field.[0m
-          [1;94m-->[0m  [4mschema.prisma:20[0m
+          [1;94m-->[0m  [4mschema.prisma:19[0m
         [1;94m   | [0m
-        [1;94m19 | [0m
-        [1;94m20 | [0m  [1;91m@@index([b.field, a.field])[0m
+        [1;94m18 | [0m
+        [1;94m19 | [0m  [1;91m@@index([b.field, a.field])[0m
         [1;94m   | [0m
         [1;91merror[0m: [1mError validating model "B": The unique index definition refers to the unknown fields: b.field.[0m
-          [1;94m-->[0m  [4mschema.prisma:21[0m
+          [1;94m-->[0m  [4mschema.prisma:20[0m
         [1;94m   | [0m
-        [1;94m20 | [0m  @@index([b.field, a.field])
-        [1;94m21 | [0m  [1;91m@@unique([b.field, a.field])[0m
+        [1;94m19 | [0m  @@index([b.field, a.field])
+        [1;94m20 | [0m  [1;91m@@unique([b.field, a.field])[0m
         [1;94m   | [0m
         [1;91merror[0m: [1mError validating model "B": The index definition refers to the unknown fields: b.field.[0m
-          [1;94m-->[0m  [4mschema.prisma:22[0m
+          [1;94m-->[0m  [4mschema.prisma:21[0m
         [1;94m   | [0m
-        [1;94m21 | [0m  @@unique([b.field, a.field])
-        [1;94m22 | [0m  [1;91m@@fulltext([b.field, a.field])[0m
+        [1;94m20 | [0m  @@unique([b.field, a.field])
+        [1;94m21 | [0m  [1;91m@@fulltext([b.field, a.field])[0m
         [1;94m   | [0m
     "#]];
 
@@ -696,10 +700,10 @@ fn non_composite_field_in_the_middle_of_the_path() {
 
     let expected = expect![[r#"
         [1;91merror[0m: [1mError validating model "B": The index definition refers to the unknown fields: c.bonk.field.[0m
-          [1;94m-->[0m  [4mschema.prisma:24[0m
+          [1;94m-->[0m  [4mschema.prisma:23[0m
         [1;94m   | [0m
-        [1;94m23 | [0m
-        [1;94m24 | [0m  [1;91m@@index([c.bonk.field])[0m
+        [1;94m22 | [0m
+        [1;94m23 | [0m  [1;91m@@index([c.bonk.field])[0m
         [1;94m   | [0m
     "#]];
 

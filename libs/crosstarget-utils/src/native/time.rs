@@ -3,8 +3,12 @@ use std::{
     time::{Duration, Instant},
 };
 
-use crate::common::TimeoutError;
+pub use crate::common::datetime::*;
+use crate::common::timeout::TimeoutError;
 
+pub use std::time::{SystemTime, SystemTimeError};
+
+#[derive(Clone, Copy)]
 pub struct ElapsedTimeCounter {
     instant: Instant,
 }

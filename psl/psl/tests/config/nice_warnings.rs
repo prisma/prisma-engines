@@ -5,15 +5,16 @@ use psl::diagnostics::{DatamodelWarning, Span};
 fn nice_warning_for_deprecated_generator_preview_feature() {
     let schema = r#"
     generator client {
-        provider = "prisma-client-js"
+        provider = "prisma-client"
         previewFeatures = ["middlewares"]
     }
     "#;
 
     let res = psl::parse_configuration(schema).unwrap();
 
-    res.warnings.assert_is(DatamodelWarning::new_feature_deprecated(
-        "middlewares",
-        Span::new(88, 103, psl_core::parser_database::FileId::ZERO),
-    ));
+    res.warnings
+        .assert_is(DatamodelWarning::new_preview_feature_is_stabilized(
+            "middlewares",
+            Span::new(85, 100, psl_core::parser_database::FileId::ZERO),
+        ));
 }

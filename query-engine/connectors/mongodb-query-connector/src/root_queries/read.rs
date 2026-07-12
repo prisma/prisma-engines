@@ -1,14 +1,14 @@
 use super::*;
 use crate::{
-    error::DecorateErrorWithFieldInformationExtension, output_meta, query_builder::MongoReadQueryBuilder,
-    query_strings::Find, vacuum_cursor, IntoBson,
+    IntoBson, error::DecorateErrorWithFieldInformationExtension, output_meta, query_builder::MongoReadQueryBuilder,
+    query_strings::Find, vacuum_cursor,
 };
-use mongodb::{bson::doc, options::FindOptions, ClientSession, Database};
+use mongodb::{ClientSession, Database, bson::doc, options::FindOptions};
 use query_structure::*;
-use tracing::{info_span, Instrument};
+use std::future::IntoFuture;
 
 /// Finds a single record. Joins are not required at the moment because the selector is always a unique one.
-pub async fn get_single_record<'conn>(
+pub async fn get_single_record(
     database: &Database,
     session: &mut ClientSession,
     model: &Model,
@@ -17,12 +17,6 @@ pub async fn get_single_record<'conn>(
 ) -> crate::Result<Option<SingleRecord>> {
     let coll = database.collection(model.db_name());
 
-    let span = info_span!(
-        "prisma:engine:db_query",
-        user_facing = true,
-        "db.statement" = &format_args!("db.{}.findOne(*)", coll.name())
-    );
-
     let meta_mapping = output_meta::from_selected_fields(selected_fields);
     let query_arguments: QueryArguments = (model.clone(), filter.clone()).into();
     let query = MongoReadQueryBuilder::from_args(query_arguments)?
@@ -30,7 +24,7 @@ pub async fn get_single_record<'conn>(
         .with_virtual_fields(selected_fields.virtuals())?
         .build()?;
 
-    let docs = query.execute(coll, session).instrument(span).await?;
+    let docs = query.execute(coll, session).await?;
 
     if docs.is_empty() {
         Ok(None)
@@ -50,7 +44,7 @@ pub async fn get_single_record<'conn>(
 // - [x] Cursor
 // - [x] Distinct select (inherently given from core).
 // - [x] Relation aggregation count
-pub async fn get_many_records<'conn>(
+pub async fn get_many_records(
     database: &Database,
     session: &mut ClientSession,
     model: &Model,
@@ -59,19 +53,13 @@ pub async fn get_many_records<'conn>(
 ) -> crate::Result<ManyRecords> {
     let coll = database.collection(model.db_name());
 
-    let span = info_span!(
-        "prisma:engine:db_query",
-        user_facing = true,
-        "db.statement" = &format_args!("db.{}.findMany(*)", coll.name())
-    );
-
-    let reverse_order = query_arguments.take.map(|t| t < 0).unwrap_or(false);
+    let reverse_order = query_arguments.take.is_reversed();
     let field_names: Vec<_> = selected_fields.db_names().collect();
 
     let meta_mapping = output_meta::from_selected_fields(selected_fields);
     let mut records = ManyRecords::new(field_names.clone());
 
-    if let Some(0) = query_arguments.take {
+    if let Take::Some(0) = query_arguments.take {
         return Ok(records);
     };
 
@@ -80,7 +68,7 @@ pub async fn get_many_records<'conn>(
         .with_virtual_fields(selected_fields.virtuals())?
         .build()?;
 
-    let docs = query.execute(coll, session).instrument(span).await?;
+    let docs = query.execute(coll, session).await?;
     for doc in docs {
         let record = document_to_record(doc, &field_names, &meta_mapping)?;
         records.push(record)
@@ -93,7 +81,7 @@ pub async fn get_many_records<'conn>(
     Ok(records)
 }
 
-pub async fn get_related_m2m_record_ids<'conn>(
+pub async fn get_related_m2m_record_ids(
     database: &Database,
     session: &mut ClientSession,
     from_field: &RelationFieldRef,
@@ -126,7 +114,10 @@ pub async fn get_related_m2m_record_ids<'conn>(
     let find_options = FindOptions::builder().projection(projection.clone()).build();
 
     let cursor = observing(&query_string_builder, || {
-        coll.find_with_session(filter.clone(), Some(find_options), session)
+        coll.find(filter.clone())
+            .with_options(find_options)
+            .session(&mut *session)
+            .into_future()
     })
     .await?;
     let docs = vacuum_cursor(cursor, session).await?;

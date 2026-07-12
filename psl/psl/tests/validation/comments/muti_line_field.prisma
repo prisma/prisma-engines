@@ -1,0 +1,9 @@
+model MyModel {
+  pk Int @id
+
+  /**
+   * Multi-line comment for
+   * field1. This can contain **asterisks**.
+   */
+  field1 Int
+}

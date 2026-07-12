@@ -1,0 +1,11 @@
+generator client {
+    provider = "prisma-client"
+}
+
+datasource db {
+    provider = "postgresql"
+}
+
+model Lööp {
+    id Int @id
+}

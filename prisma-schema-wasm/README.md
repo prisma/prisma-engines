@@ -5,7 +5,7 @@
 [![install size](https://packagephobia.com/badge?p=@prisma/prisma-schema-wasm)](https://packagephobia.com/result?p=@prisma/prisma-schema-wasm)
 
 This directory only contains build logic to package the `prisma-fmt` engine
-into a Node package as a WASM module. All the functionality is implemented in
+into a Node package as a Wasm module. All the functionality is implemented in
 other parts of prisma-engines.
 
 The published NPM package is internal to Prisma. Its API will break without prior warning.

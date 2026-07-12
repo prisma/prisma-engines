@@ -4,6 +4,8 @@ use query_engine_tests::*;
 mod updated_at {
     use indoc::indoc;
     use query_engine_tests::{run_query, run_query_json};
+    use std::time::Duration;
+    use tokio::time::sleep;
 
     fn schema() -> String {
         let schema = indoc! {
@@ -47,6 +49,9 @@ mod updated_at {
         );
         let updated_at = &res["data"]["createOneTop"]["updatedAt"];
 
+        // We have to wait a bit to avoid test flakiness due to the finite precision of the clock
+        sleep(Duration::from_millis(50)).await;
+
         let res_2 = run_query_json!(
             &runner,
             r#"mutation {
@@ -73,6 +78,9 @@ mod updated_at {
             r#"mutation {createOneTop(data: { id: "1", top: "top3" }) {updatedAt}}"#
         );
         let updated_at = &res["data"]["createOneTop"]["updatedAt"];
+
+        // We have to wait a bit to avoid test flakiness due to the finite precision of the clock
+        sleep(Duration::from_millis(50)).await;
 
         let res_2 = run_query_json!(
             &runner,
@@ -114,6 +122,9 @@ mod updated_at {
           @r###"{"data":{"updateManyTop":{"count":1}}}"###
         );
 
+        // We have to wait a bit to avoid test flakiness due to the finite precision of the clock
+        sleep(Duration::from_millis(50)).await;
+
         let res_2 = run_query_json!(
             &runner,
             r#"query {
@@ -137,6 +148,9 @@ mod updated_at {
             r#"mutation {createOneList(data: { id: "1", list: "test" }) {updatedAt}}"#
         );
         let updated_at = &res["data"]["createOneList"]["updatedAt"];
+
+        // We have to wait a bit to avoid test flakiness due to the finite precision of the clock
+        sleep(Duration::from_millis(50)).await;
 
         let res_2 = run_query_json!(
             &runner,

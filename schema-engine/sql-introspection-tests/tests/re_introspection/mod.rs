@@ -331,7 +331,7 @@ async fn mapped_field_name(api: &mut TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(capabilities(Enums), exclude(CockroachDb))]
+#[test_connector(capabilities(Enums), exclude(CockroachDb, Sqlite))]
 async fn mapped_enum_name(api: &mut TestApi) -> TestResult {
     let sql_family = api.sql_family();
 
@@ -969,20 +969,27 @@ async fn multiple_changed_relation_names_due_to_mapped_models(api: &mut TestApi)
 }
 
 #[test_connector(tags(Postgres), exclude(CockroachDb))]
-async fn virtual_cuid_default(api: &mut TestApi) {
+async fn virtual_uid_default(api: &mut TestApi) {
     api.barrel()
         .execute(|migration| {
             migration.create_table("User", |t| {
                 t.add_column("id", types::varchar(30).primary(true));
-                t.add_column("non_id", types::varchar(30));
+                t.add_column("non_id_1", types::varchar(30));
+                t.add_column("non_id_2", types::varchar(30));
             });
 
             migration.create_table("User2", |t| {
                 t.add_column("id", types::varchar(36).primary(true));
+                t.add_column("non_id_1", types::varchar(36));
+                t.add_column("non_id_2", types::varchar(36));
             });
 
             migration.create_table("User3", |t| {
                 t.add_column("id", types::varchar(21).primary(true));
+            });
+
+            migration.create_table("User4", |t| {
+                t.add_column("id", types::varchar(26).primary(true));
             });
 
             migration.create_table("Unrelated", |t| {
@@ -995,30 +1002,44 @@ async fn virtual_cuid_default(api: &mut TestApi) {
     let input_dm = r#"
         model User {
             id        String    @id @default(cuid()) @db.VarChar(30)
-            non_id    String    @default(cuid()) @db.VarChar(30)
+            non_id_1  String    @default(cuid(1)) @db.VarChar(30)
+            non_id_2  String    @default(cuid(2)) @db.VarChar(30)
         }
 
         model User2 {
             id        String    @id @default(uuid()) @db.VarChar(36)
+            non_id_1  String    @default(uuid(4)) @db.VarChar(36)
+            non_id_2  String    @default(uuid(7)) @db.VarChar(36)
         }
 
         model User3 {
             id        String    @id @default(nanoid(7)) @db.VarChar(21)
+        }
+
+        model User4 {
+            id        String    @id @default(ulid()) @db.VarChar(26)
         }
         "#;
 
     let final_dm = indoc! {r#"
         model User {
             id        String    @id @default(cuid()) @db.VarChar(30)
-            non_id    String    @default(cuid()) @db.VarChar(30)
+            non_id_1  String    @default(cuid(1)) @db.VarChar(30)
+            non_id_2  String    @default(cuid(2)) @db.VarChar(30)
         }
 
         model User2 {
             id        String    @id @default(uuid()) @db.VarChar(36)
+            non_id_1  String    @default(uuid(4)) @db.VarChar(36)
+            non_id_2  String    @default(uuid(7)) @db.VarChar(36)
         }
 
         model User3 {
             id        String    @id @default(nanoid(7)) @db.VarChar(21)
+        }
+
+        model User4 {
+            id        String    @id @default(ulid()) @db.VarChar(26)
         }
 
         model Unrelated {
@@ -1043,6 +1064,10 @@ async fn virtual_cuid_default_cockroach(api: &mut TestApi) {
                 t.add_column("id", types::varchar(36).primary(true));
             });
 
+            migration.create_table("User3", |t| {
+                t.add_column("id", types::varchar(26).primary(true));
+            });
+
             migration.create_table("Unrelated", |t| {
                 t.add_column("id", types::primary());
             });
@@ -1059,6 +1084,10 @@ async fn virtual_cuid_default_cockroach(api: &mut TestApi) {
         model User2 {
             id        String    @id @default(uuid()) @db.String(36)
         }
+
+        model User3 {
+            id        String    @id @default(ulid()) @db.String(26)
+        }
         "#;
 
     let final_dm = indoc! {r#"
@@ -1069,6 +1098,10 @@ async fn virtual_cuid_default_cockroach(api: &mut TestApi) {
 
         model User2 {
             id        String    @id @default(uuid()) @db.String(36)
+        }
+
+        model User3 {
+            id        String    @id @default(ulid()) @db.String(26)
         }
 
         model Unrelated {
@@ -1593,8 +1626,9 @@ async fn re_introspecting_custom_compound_unique_upgrade(api: &mut TestApi) -> T
 #[test_connector(tags(Postgres12))]
 async fn re_introspecting_custom_index_order(api: &mut TestApi) -> TestResult {
     let schema_name = api.schema_name();
-    let create_table =
-        format!("CREATE TABLE \"{schema_name}\".\"A\" (id SERIAL PRIMARY KEY, a jsonb not null, b jsonb not null, c jsonb not null)",);
+    let create_table = format!(
+        "CREATE TABLE \"{schema_name}\".\"A\" (id SERIAL PRIMARY KEY, a jsonb not null, b jsonb not null, c jsonb not null)",
+    );
     let create_idx_a = format!("CREATE INDEX \"aaaaaa\" ON \"{schema_name}\".\"A\" USING GIN (b);",);
     let create_idx_b = format!("CREATE INDEX \"bbbbbb\" ON \"{schema_name}\".\"A\" USING GIN (a);",);
     let create_idx_c = format!("CREATE INDEX \"cccccc\" ON \"{schema_name}\".\"A\" USING GIN (c);",);
@@ -1635,7 +1669,7 @@ async fn re_introspecting_custom_index_order(api: &mut TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(tags(Postgres), preview_features("multiSchema"))]
+#[test_connector(tags(Postgres))]
 async fn re_introspecting_with_schemas_property(api: &mut TestApi) -> TestResult {
     let create_schema = "CREATE SCHEMA \"first\"";
     let create_table = "CREATE TABLE \"first\".\"A\" (id TEXT PRIMARY KEY)";
@@ -1651,13 +1685,12 @@ async fn re_introspecting_with_schemas_property(api: &mut TestApi) -> TestResult
 
     let input_dm = indoc! {r#"
           generator client {
-           provider        = "prisma-client-js"
-           previewFeatures = ["multiSchema"]
+           provider = "prisma-client"
+           previewFeatures = []
          }
 
          datasource myds {
            provider = "postgresql"
-           url      = env("DATABASE_URL")
            schemas  = ["first", "second"]
          }
     "#};
@@ -1666,13 +1699,12 @@ async fn re_introspecting_with_schemas_property(api: &mut TestApi) -> TestResult
 
     let expected = expect![[r#"
         generator client {
-          provider        = "prisma-client-js"
-          previewFeatures = ["multiSchema"]
+          provider        = "prisma-client"
+          previewFeatures = []
         }
 
         datasource myds {
           provider = "postgresql"
-          url      = env("DATABASE_URL")
           schemas  = ["first", "second"]
         }
 

@@ -1,0 +1,28 @@
+{
+  "modelName": "DataTypes",
+  "action": "updateOne",
+  "query": {
+    "arguments": {
+      "where": {
+        "id": ""
+      },
+      "data": {
+        "intArray": {
+          "push": {
+            "$type": "Param",
+            "value": {
+              "name": "intArray",
+              "type": "List",
+              "inner": {
+                "type": "Int"
+              }
+            }
+          }
+        }
+      }
+    },
+    "selection": {
+      "$scalars": true
+    }
+  }
+}

@@ -7,16 +7,25 @@ pub use schema_core::{
     schema_connector::Namespaces,
 };
 pub use test_macros::test_connector;
-pub use test_setup::{runtime::run_with_thread_local_runtime as tok, BitFlags, Capabilities, Tags};
+pub use test_setup::{BitFlags, Capabilities, Tags, runtime::run_with_thread_local_runtime as tok};
 
-use crate::{commands::*, multi_engine_test_api::TestApi as RootTestApi};
-use psl::parser_database::SourceFile;
+use crate::{
+    commands::*,
+    multi_engine_test_api::{EngineTestApi, TestApi as RootTestApi},
+};
+use psl::{
+    PreviewFeature,
+    datamodel_connector::NativeTypeInstance,
+    parser_database::{ExtensionTypes, NoExtensionTypes, ScalarFieldType, SourceFile},
+};
 use quaint::{
-    prelude::{ConnectionInfo, ResultSet},
     Value,
+    prelude::{ConnectionInfo, ResultSet},
 };
 use schema_core::{
-    commands::diff,
+    DatasourceUrls,
+    commands::diff_cli,
+    json_rpc::types::SchemaFilter,
     schema_connector::{BoxFuture, ConnectorHost, ConnectorResult, DiffTarget, MigrationPersistence, SchemaConnector},
 };
 use sql_schema_connector::SqlSchemaConnector;
@@ -49,6 +58,11 @@ pub struct TestApi {
 }
 
 impl TestApi {
+    pub fn from_connector(connector: SqlSchemaConnector, args: TestApiArgs) -> Self {
+        let root = RootTestApi::new(args);
+        TestApi { root, connector }
+    }
+
     /// Initializer, called by the test macros.
     pub fn new(args: TestApiArgs) -> Self {
         let root = RootTestApi::new(args);
@@ -63,7 +77,7 @@ impl TestApi {
 
     /// Plan an `applyMigrations` command
     pub fn apply_migrations<'a>(&'a mut self, migrations_directory: &'a TempDir) -> ApplyMigrations<'a> {
-        let search_path = self.root.admin_conn.connection_info().schema_name();
+        let search_path = self.root.admin_conn.connection_info().schema_name().unwrap();
         let mut namespaces = vec![search_path.to_string()];
 
         for namespace in self.root.args.namespaces() {
@@ -77,8 +91,25 @@ impl TestApi {
         self.root.connection_string()
     }
 
+    pub fn shadow_database_connection_string(&self) -> Option<&str> {
+        self.root.shadow_database_connection_string()
+    }
+
+    pub fn preview_features(&self) -> BitFlags<PreviewFeature> {
+        self.root.preview_features()
+    }
+
     pub fn connection_info(&self) -> ConnectionInfo {
         self.root.connection_info()
+    }
+
+    pub fn new_engine_with_connection_strings(
+        &self,
+        connection_string: String,
+        shadow_database_connection_string: Option<String>,
+    ) -> EngineTestApi {
+        self.root
+            .new_engine_with_connection_strings(connection_string, shadow_database_connection_string)
     }
 
     pub fn ensure_connection_validity(&mut self) -> ConnectorResult<()> {
@@ -86,10 +117,22 @@ impl TestApi {
     }
 
     pub fn schema_name(&self) -> String {
-        self.connection_info().schema_name().to_owned()
+        self.connection_info().schema_name().unwrap().to_owned()
     }
 
-    /// Plan a `createMigration` command
+    /// Creates a schema filter for the given tables and prefixes them with the default namespace if applicable.
+    pub fn namespaced_schema_filter(&self, tables: &[&str]) -> SchemaFilter {
+        let default_namespace = self.connector.default_runtime_namespace();
+        SchemaFilter {
+            external_tables: tables
+                .iter()
+                .map(|table| default_namespace.map_or(table.to_string(), |ns| format!("{ns}.{table}")))
+                .collect(),
+            external_enums: vec![],
+        }
+    }
+
+    /// Plan a `createMigration` command.
     pub fn create_migration<'a>(
         &'a mut self,
         name: &'a str,
@@ -101,6 +144,26 @@ impl TestApi {
             name,
             &[("schema.prisma", schema)],
             migrations_directory,
+            SchemaFilter::default(),
+            "",
+        )
+    }
+
+    pub fn create_migration_with_filter<'a>(
+        &'a mut self,
+        name: &'a str,
+        schema: &'a str,
+        migrations_directory: &'a TempDir,
+        filter: SchemaFilter,
+        init_script: &'a str,
+    ) -> CreateMigration<'a> {
+        CreateMigration::new(
+            &mut self.connector,
+            name,
+            &[("schema.prisma", schema)],
+            migrations_directory,
+            filter,
+            init_script,
         )
     }
 
@@ -110,7 +173,14 @@ impl TestApi {
         files: &[(&'a str, &'a str)],
         migrations_directory: &'a TempDir,
     ) -> CreateMigration<'a> {
-        CreateMigration::new(&mut self.connector, name, files, migrations_directory)
+        CreateMigration::new(
+            &mut self.connector,
+            name,
+            files,
+            migrations_directory,
+            SchemaFilter::default(),
+            "",
+        )
     }
 
     /// Create a temporary directory to serve as a test migrations directory.
@@ -120,7 +190,15 @@ impl TestApi {
 
     /// Builder and assertions to call the `devDiagnostic` command.
     pub fn dev_diagnostic<'a>(&'a mut self, migrations_directory: &'a TempDir) -> DevDiagnostic<'a> {
-        DevDiagnostic::new(&mut self.connector, migrations_directory)
+        DevDiagnostic::new(&mut self.connector, migrations_directory, SchemaFilter::default())
+    }
+
+    pub fn dev_diagnostic_with_filter<'a>(
+        &'a mut self,
+        migrations_directory: &'a TempDir,
+        filter: SchemaFilter,
+    ) -> DevDiagnostic<'a> {
+        DevDiagnostic::new(&mut self.connector, migrations_directory, filter)
     }
 
     pub fn diagnose_migration_history<'a>(
@@ -131,7 +209,27 @@ impl TestApi {
     }
 
     pub fn diff(&self, params: DiffParams) -> ConnectorResult<DiffResult> {
-        test_setup::runtime::run_with_thread_local_runtime(diff(params, self.connector.host().clone()))
+        self.diff_with_datasource(
+            &DatasourceUrls {
+                url: Some(self.connection_string().to_owned()),
+                shadow_database_url: self.shadow_database_connection_string().map(<_>::to_owned),
+            },
+            params,
+        )
+    }
+
+    pub fn diff_with_datasource(
+        &self,
+        datasource_urls: &DatasourceUrls,
+        params: DiffParams,
+    ) -> ConnectorResult<DiffResult> {
+        test_setup::runtime::run_with_thread_local_runtime(diff_cli(
+            params,
+            datasource_urls,
+            self.connector.host().clone(),
+            self.preview_features(),
+            &NoExtensionTypes,
+        ))
     }
 
     pub fn dump_table(&mut self, table_name: &str) -> ResultSet {
@@ -146,7 +244,26 @@ impl TestApi {
         migrations_directory: &'a TempDir,
         schema: String,
     ) -> EvaluateDataLoss<'a> {
-        EvaluateDataLoss::new(&mut self.connector, migrations_directory, &[("schema.prisma", &schema)])
+        EvaluateDataLoss::new(
+            &mut self.connector,
+            migrations_directory,
+            &[("schema.prisma", &schema)],
+            SchemaFilter::default(),
+        )
+    }
+
+    pub fn evaluate_data_loss_with_filter<'a>(
+        &'a mut self,
+        migrations_directory: &'a TempDir,
+        schema: String,
+        filter: SchemaFilter,
+    ) -> EvaluateDataLoss<'a> {
+        EvaluateDataLoss::new(
+            &mut self.connector,
+            migrations_directory,
+            &[("schema.prisma", &schema)],
+            filter,
+        )
     }
 
     pub fn evaluate_data_loss_multi_file<'a>(
@@ -154,7 +271,65 @@ impl TestApi {
         migrations_directory: &'a TempDir,
         files: &[(&'a str, &'a str)],
     ) -> EvaluateDataLoss<'a> {
-        EvaluateDataLoss::new(&mut self.connector, migrations_directory, files)
+        EvaluateDataLoss::new(
+            &mut self.connector,
+            migrations_directory,
+            files,
+            SchemaFilter::default(),
+        )
+    }
+
+    pub fn introspect_sql<'a>(&'a mut self, name: &'a str, source: &'a str) -> IntrospectSql<'a> {
+        let sanitized = self.sanitize_sql(source);
+
+        IntrospectSql::new(&mut self.connector, name, sanitized)
+    }
+
+    // Replaces `?` with the appropriate positional parameter syntax for the current database.
+    pub fn sanitize_sql(&self, sql: &str) -> String {
+        let mut counter = 1;
+
+        if self.is_mysql() || self.is_mariadb() || self.is_sqlite() {
+            return sql.to_string();
+        }
+
+        let mut out = String::with_capacity(sql.len());
+        let mut lines = sql.lines().peekable();
+
+        while let Some(line) = lines.next() {
+            // Avoid replacing query params in comments
+            if line.trim_start().starts_with("--") {
+                out.push_str(line);
+
+                if lines.peek().is_some() {
+                    out.push('\n');
+                }
+            } else {
+                let mut line = line.to_string();
+
+                while let Some(idx) = line.find('?') {
+                    let replacer = if self.is_postgres() || self.is_cockroach() {
+                        format!("${counter}")
+                    } else if self.is_mssql() {
+                        format!("@P{counter}")
+                    } else {
+                        unimplemented!()
+                    };
+
+                    line.replace_range(idx..idx + 1, &replacer);
+
+                    counter += 1;
+                }
+
+                out.push_str(&line);
+
+                if lines.peek().is_some() {
+                    out.push('\n');
+                }
+            }
+        }
+
+        out
     }
 
     /// Returns true only when testing on MSSQL.
@@ -231,13 +406,6 @@ impl TestApi {
         }
     }
 
-    pub fn list_migration_directories<'a>(
-        &'a mut self,
-        migrations_directory: &'a TempDir,
-    ) -> ListMigrationDirectories<'a> {
-        ListMigrationDirectories::new(migrations_directory)
-    }
-
     pub fn lower_cases_table_names(&self) -> bool {
         self.root.lower_cases_table_names()
     }
@@ -254,7 +422,7 @@ impl TestApi {
         MarkMigrationRolledBack::new(&mut self.connector, migration_name.into())
     }
 
-    pub fn migration_persistence<'a>(&'a mut self) -> &mut (dyn MigrationPersistence + 'a) {
+    pub fn migration_persistence<'a>(&'a mut self) -> &'a mut (dyn MigrationPersistence + 'a) {
         &mut self.connector
     }
 
@@ -277,9 +445,7 @@ impl TestApi {
     }
 
     pub fn datasource_block_with<'a>(&'a self, params: &'a [(&'a str, &'a str)]) -> DatasourceBlock<'a> {
-        self.root
-            .args
-            .datasource_block(self.root.connection_string(), params, &[])
+        self.root.args.datasource_block(params, &[])
     }
 
     /// Generate a migration script using `MigrationConnector::diff()`.
@@ -289,13 +455,25 @@ impl TestApi {
         to: DiffTarget<'_>,
         namespaces: Option<Namespaces>,
     ) -> String {
-        let from = tok(self
-            .connector
-            .database_schema_from_diff_target(from, None, namespaces.clone()))
+        let default_namespace = self.connector.default_runtime_namespace().map(|s| s.to_string());
+
+        let from = tok(self.connector.schema_from_diff_target(
+            from,
+            namespaces.clone(),
+            default_namespace.as_deref(),
+            &SchemaFilter::default().into(),
+        ))
         .unwrap();
-        let to = tok(self.connector.database_schema_from_diff_target(to, None, namespaces)).unwrap();
-        let migration = self.connector.diff(from, to);
-        self.connector.render_script(&migration, &Default::default()).unwrap()
+        let to = tok(self.connector.schema_from_diff_target(
+            to,
+            namespaces,
+            default_namespace.as_deref(),
+            &SchemaFilter::default().into(),
+        ))
+        .unwrap();
+        let dialect = self.connector.schema_dialect();
+        let migration = dialect.diff(from, to, &SchemaFilter::default().into());
+        dialect.render_script(&migration, &Default::default()).unwrap()
     }
 
     pub fn normalize_identifier<'a>(&self, identifier: &'a str) -> Cow<'a, str> {
@@ -326,10 +504,14 @@ impl TestApi {
 
     /// Render a table name with the required prefixing for use with quaint query building.
     pub fn render_table_name(&self, table_name: &str) -> quaint::ast::Table<'static> {
+        let Some(schema_name) = self.connection_info().schema_name().map(<_>::to_owned) else {
+            return table_name.to_owned().into();
+        };
+
         if self.root.is_sqlite() {
             table_name.to_owned().into()
         } else {
-            (self.connection_info().schema_name().to_owned(), table_name.to_owned()).into()
+            (schema_name, table_name.to_owned()).into()
         }
     }
 
@@ -341,7 +523,10 @@ impl TestApi {
     pub fn expect_sql_for_schema(&mut self, schema: &'static str, sql: &expect_test::Expect) {
         let found = self.connector_diff(
             DiffTarget::Empty,
-            DiffTarget::Datamodel(vec![("schema.prisma".to_string(), SourceFile::new_static(schema))]),
+            DiffTarget::Datamodel(
+                vec![("schema.prisma".to_string(), SourceFile::new_static(schema))],
+                &NoExtensionTypes,
+            ),
             None,
         );
         sql.assert_eq(&found);
@@ -363,15 +548,29 @@ impl TestApi {
 
     /// Plan a `schemaPush` command
     pub fn schema_push(&mut self, dm: impl Into<String>) -> SchemaPush<'_> {
-        let max_ddl_refresh_delay = self.max_ddl_refresh_delay();
-        let dm: String = dm.into();
-
-        SchemaPush::new(&mut self.connector, &[("schema.prisma", &dm)], max_ddl_refresh_delay)
+        self.schema_push_with_filter(dm, SchemaFilter::default())
     }
 
     pub fn schema_push_multi_file(&mut self, files: &[(&str, &str)]) -> SchemaPush<'_> {
         let max_ddl_refresh_delay = self.max_ddl_refresh_delay();
-        SchemaPush::new(&mut self.connector, files, max_ddl_refresh_delay)
+        SchemaPush::new(
+            &mut self.connector,
+            files,
+            max_ddl_refresh_delay,
+            SchemaFilter::default(),
+        )
+    }
+
+    pub fn schema_push_with_filter(&mut self, dm: impl Into<String>, filter: SchemaFilter) -> SchemaPush<'_> {
+        let max_ddl_refresh_delay = self.max_ddl_refresh_delay();
+        let dm: String = dm.into();
+
+        SchemaPush::new(
+            &mut self.connector,
+            &[("schema.prisma", &dm)],
+            max_ddl_refresh_delay,
+            filter,
+        )
     }
 
     pub fn tags(&self) -> BitFlags<Tags> {
@@ -393,10 +592,7 @@ impl TestApi {
             params.to_vec()
         };
 
-        let ds_block = self
-            .root
-            .args
-            .datasource_block(self.root.args.database_url(), &used_params, preview_features);
+        let ds_block = self.root.args.datasource_block(&used_params, preview_features);
 
         write!(out, "{ds_block}").unwrap()
     }
@@ -417,7 +613,7 @@ impl TestApi {
 
         let generator_block = format!(
             r#"generator client {{
-                 provider = "prisma-client-js"{preview_feature_string}
+                 provider = "prisma-client"{preview_feature_string}
                }}"#
         );
         generator_block
@@ -448,6 +644,14 @@ impl TestApi {
         out.push_str(schema);
 
         out
+    }
+
+    pub fn scalar_type_for_native_type(
+        &self,
+        typ: &NativeTypeInstance,
+        extension_types: &dyn ExtensionTypes,
+    ) -> Option<ScalarFieldType> {
+        self.connector.scalar_type_for_native_type(typ, extension_types)
     }
 }
 

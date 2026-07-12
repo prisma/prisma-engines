@@ -1,4 +1,6 @@
-use crate::ast::{traits::WithSpan, CompositeType, Enum, GeneratorConfig, Identifier, Model, SourceConfig, Span};
+use crate::ast::{CompositeType, Enum, GeneratorConfig, Identifier, Model, SourceConfig, Span, traits::WithSpan};
+
+use super::WithDocumentation;
 
 /// Enum for distinguishing between top-level entries
 #[derive(Debug, Clone)]
@@ -44,6 +46,16 @@ impl Top {
         &self.identifier().name
     }
 
+    pub fn documentation(&self) -> Option<&str> {
+        match self {
+            Top::CompositeType(t) => t.documentation(),
+            Top::Enum(t) => t.documentation(),
+            Top::Model(t) => t.documentation(),
+            Top::Source(t) => t.documentation(),
+            Top::Generator(t) => t.documentation(),
+        }
+    }
+
     /// Try to interpret the item as a composite type declaration.
     pub fn as_composite_type(&self) -> Option<&CompositeType> {
         match self {
@@ -71,7 +83,7 @@ impl Top {
     /// Try to interpret the item as a generator block.
     pub fn as_generator(&self) -> Option<&GeneratorConfig> {
         match self {
-            Top::Generator(gen) => Some(gen),
+            Top::Generator(generator) => Some(generator),
             _ => None,
         }
     }
@@ -92,7 +104,7 @@ impl WithSpan for Top {
             Top::Enum(en) => en.span(),
             Top::Model(model) => model.span(),
             Top::Source(source) => source.span(),
-            Top::Generator(gen) => gen.span(),
+            Top::Generator(generator) => generator.span(),
         }
     }
 }

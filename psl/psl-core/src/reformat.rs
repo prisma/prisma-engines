@@ -1,7 +1,8 @@
 use crate::{ParserDatabase, ValidatedSchema};
+use cruet::Inflector;
 use diagnostics::FileId;
-use parser_database::{ast::WithSpan, walkers};
-use schema_ast::{ast, SourceFile};
+use parser_database::{NoExtensionTypes, ast::WithSpan, walkers};
+use schema_ast::{SourceFile, ast};
 use std::{borrow::Cow, collections::HashMap};
 
 /// Returns either the reformatted schema, or the original input if we can't reformat. This happens
@@ -26,7 +27,7 @@ pub fn reformat_validated_schema_into_single(schema: ValidatedSchema, indent_wid
 
 pub fn reformat_multiple(sources: Vec<(String, SourceFile)>, indent_width: usize) -> Vec<(String, String)> {
     let mut diagnostics = diagnostics::Diagnostics::new();
-    let db = parser_database::ParserDatabase::new(&sources, &mut diagnostics);
+    let db = parser_database::ParserDatabase::new(&sources, &mut diagnostics, &NoExtensionTypes);
 
     if diagnostics.has_errors() {
         db.iter_file_ids()
@@ -69,18 +70,14 @@ struct MagicReformatCtx<'a> {
     db: &'a ParserDatabase,
 }
 
-impl<'a> MagicReformatCtx<'a> {
+impl MagicReformatCtx<'_> {
     fn add_missing_bit(&mut self, file_id: FileId, bit: MissingBit) {
         self.missing_bits_map.entry(file_id).or_default().push(bit);
     }
 
     fn get_missing_bits(&self, file_id: FileId) -> Option<&Vec<MissingBit>> {
         let bits_vec = self.missing_bits_map.get(&file_id)?;
-        if bits_vec.is_empty() {
-            None
-        } else {
-            Some(bits_vec)
-        }
+        if bits_vec.is_empty() { None } else { Some(bits_vec) }
     }
 
     fn sort_missing_bits(&mut self) {
@@ -221,22 +218,35 @@ fn push_missing_relation_fields(inline: walkers::InlineRelationWalker<'_>, ctx: 
         } else {
             ""
         };
+
         let arity = if inline.is_one_to_one() { "?" } else { "[]" };
+        let field_name = if arity == "[]" {
+            referencing_model_name.to_camel_case().to_plural()
+        } else {
+            referencing_model_name.to_camel_case()
+        };
 
         let span = inline.referenced_model().ast_model().span();
         ctx.add_missing_bit(
             span.file_id,
             MissingBit {
                 position: span.end - 1,
-                content: format!("{referencing_model_name} {referencing_model_name}{arity} {ignore}\n"),
+                content: format!("{field_name} {referencing_model_name}{arity} {ignore}\n"),
             },
         );
     }
 
     if inline.forward_relation_field().is_none() {
-        let field_name = inline.referenced_model().name();
-        let field_type = field_name;
+        let referenced_model_name = inline.referenced_model().name();
+
         let arity = render_arity(forward_relation_field_arity(inline));
+
+        let field_name = if arity == "[]" {
+            referenced_model_name.to_camel_case().to_plural()
+        } else {
+            referenced_model_name.to_camel_case()
+        };
+
         let fields_arg = fields_argument(inline);
         let references_arg = references_argument(inline);
         let span = inline.referencing_model().ast_model().span();
@@ -244,7 +254,9 @@ fn push_missing_relation_fields(inline: walkers::InlineRelationWalker<'_>, ctx: 
             span.file_id,
             MissingBit {
                 position: span.end - 1,
-                content: format!("{field_name} {field_type}{arity} @relation({fields_arg}, {references_arg})\n"),
+                content: format!(
+                    "{field_name} {referenced_model_name}{arity} @relation({fields_arg}, {references_arg})\n"
+                ),
             },
         )
     }

@@ -2,14 +2,13 @@ use indoc::indoc;
 use sql_migration_tests::multi_engine_test_api::*;
 use std::{fs::File, io::Write};
 use test_macros::test_connector;
-use user_facing_errors::{schema_engine::ProviderSwitchedError, UserFacingError};
+use user_facing_errors::{UserFacingError, schema_engine::ProviderSwitchedError};
 
 #[test_connector(tags(Postgres), exclude(CockroachDb))]
 fn create_migration_with_new_provider_errors(api: TestApi) {
     let dm = r#"
     datasource db {
         provider = "postgresql"
-        url = "postgres://unreachable"
     }
 
     model Cat {
@@ -25,7 +24,6 @@ fn create_migration_with_new_provider_errors(api: TestApi) {
     let dm2 = r#"
         datasource db {
             provider = "sqlite"
-            url = "file:dev.db"
         }
 
         model Cat {
@@ -52,7 +50,6 @@ fn migration_lock_with_different_comment_shapes_work(api: TestApi) {
     let dm = r#"
     datasource db {
         provider = "postgresql"
-        url = "postgres://unreachable"
     }
 
     model Cat {

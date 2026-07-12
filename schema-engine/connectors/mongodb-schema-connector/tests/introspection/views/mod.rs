@@ -4,10 +4,9 @@ use mongodb::{bson::doc, options::CreateCollectionOptions};
 #[test]
 fn collection_with_view() {
     let res = introspect(|db| async move {
-        db.create_collection("A", None).await?;
-        db.create_collection(
-            "myView".to_string(),
-            Some(
+        db.create_collection("A").await?;
+        db.create_collection("myView".to_string())
+            .with_options(
                 CreateCollectionOptions::builder()
                     .view_on("A".to_string())
                     .pipeline(vec![doc! {
@@ -19,9 +18,8 @@ fn collection_with_view() {
                         },
                     }])
                     .build(),
-            ),
-        )
-        .await?;
+            )
+            .await?;
 
         Ok(())
     });

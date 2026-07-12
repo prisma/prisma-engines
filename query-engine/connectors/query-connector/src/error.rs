@@ -1,15 +1,15 @@
 use itertools::Itertools;
-use query_structure::prelude::DomainError;
 use query_structure::Filter;
+use query_structure::prelude::DomainError;
 use std::fmt::Display;
 use thiserror::Error;
-use user_facing_errors::{query_engine::DatabaseConstraint, KnownError};
+use user_facing_errors::{KnownError, query_engine::DatabaseConstraint};
 
 #[derive(Debug, Error)]
 #[error("{}", kind)]
 pub struct ConnectorError {
     /// An optional error already rendered for users.
-    pub user_facing_error: Option<KnownError>,
+    pub user_facing_error: Option<Box<KnownError>>,
     /// The error information for internal use.
     pub kind: ErrorKind,
     /// Whether an error is transient and should be retried.
@@ -21,7 +21,7 @@ impl ConnectorError {
         let user_facing_error = match &kind {
             ErrorKind::NullConstraintViolation { constraint } => Some(KnownError::new(
                 user_facing_errors::query_engine::NullConstraintViolation {
-                    constraint: constraint.to_owned(),
+                    constraint: constraint.clone(),
                 },
             )),
             ErrorKind::TableDoesNotExist { table } => {
@@ -42,15 +42,8 @@ impl ConnectorError {
                 }))
             }
             ErrorKind::ForeignKeyConstraintViolation { constraint } => {
-                let field_name = match constraint {
-                    DatabaseConstraint::Fields(fields) => fields.join(","),
-                    DatabaseConstraint::Index(index) => format!("{index} (index)"),
-                    DatabaseConstraint::ForeignKey => "foreign key".to_string(),
-                    DatabaseConstraint::CannotParse => "(not available)".to_string(),
-                };
-
                 Some(KnownError::new(user_facing_errors::query_engine::ForeignKeyViolation {
-                    field_name,
+                    constraint: constraint.clone(),
                 }))
             }
             ErrorKind::ConversionError(message) => Some(KnownError::new(
@@ -89,8 +82,8 @@ impl ConnectorError {
                 },
             )),
 
-            ErrorKind::MissingFullTextSearchIndex => Some(KnownError::new(
-                user_facing_errors::query_engine::MissingFullTextSearchIndex {},
+            ErrorKind::MissingNativeFullTextSearchIndex => Some(KnownError::new(
+                user_facing_errors::query_engine::MissingNativeFullTextSearchIndex {},
             )),
             ErrorKind::TransactionAborted { message } => Some(KnownError::new(
                 user_facing_errors::query_engine::InteractiveTransactionError { error: message.clone() },
@@ -122,14 +115,14 @@ impl ConnectorError {
 
             ErrorKind::TooManyConnections(e) => Some(user_facing_errors::KnownError::new(
                 user_facing_errors::query_engine::TooManyConnections {
-                    message: format!("{}", e),
+                    message: format!("{e}"),
                 },
             )),
             _ => None,
         };
 
         ConnectorError {
-            user_facing_error,
+            user_facing_error: user_facing_error.map(Box::new),
             kind,
             transient: false,
         }
@@ -183,7 +176,7 @@ pub enum ErrorKind {
     DomainError(DomainError),
 
     #[error("Record not found: {:?}", _0)]
-    RecordNotFoundForWhere(Filter),
+    RecordNotFoundForWhere(Box<Filter>),
 
     #[error(
         "Violating a relation {} between {} and {}",
@@ -270,8 +263,8 @@ pub enum ErrorKind {
     #[error("The query parameter limit supported by your database is exceeded: {0}.")]
     QueryParameterLimitExceeded(String),
 
-    #[error("Cannot find a fulltext index to use for the search")]
-    MissingFullTextSearchIndex,
+    #[error("Cannot find a fulltext index to use for the native search")]
+    MissingNativeFullTextSearchIndex,
 
     #[error("Replica Set required for Transactions")]
     MongoReplicaSetRequired,

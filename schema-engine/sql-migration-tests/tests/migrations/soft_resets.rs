@@ -25,7 +25,7 @@ fn soft_resets_work_on_postgres(mut api: TestApi) {
         let create_user = r#"
             DROP USER IF EXISTS softresetstestuser;
             CREATE USER softresetstestuser PASSWORD '1234batman' LOGIN;
-            GRANT USAGE, CREATE ON SCHEMA "prisma-tests" TO softresetstestuser;
+            GRANT USAGE, CREATE ON SCHEMA "public" TO softresetstestuser;
         "#;
 
         api.raw_cmd(create_user);
@@ -259,4 +259,19 @@ fn soft_resets_work_on_mysql(api: TestApi) {
         engine.reset().send_sync(None);
         engine.assert_schema().assert_tables_count(0);
     }
+}
+
+#[test_connector]
+fn soft_resets_does_not_drop_external_tables(mut api: TestApi) {
+    api.raw_cmd("CREATE TABLE external_table (id INT);");
+
+    let mut engine = api.new_engine_with_connection_strings(api.connection_string().to_string(), None);
+    let filter = engine.namespaced_schema_filter(&["external_table"]);
+
+    engine.reset().soft(true).filter(filter.into()).send_sync(None);
+
+    engine
+        .assert_schema()
+        .assert_tables_count(1)
+        .assert_has_table("external_table");
 }

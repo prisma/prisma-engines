@@ -1,4 +1,4 @@
-use crate::{common::*, with_header, Provider};
+use crate::{Provider, common::*, with_header};
 use psl::parser_database::ScalarType;
 
 #[test]
@@ -13,7 +13,7 @@ fn parse_scalar_types() {
     }
     "#;
 
-    let schema = psl::parse_schema(dml).unwrap();
+    let schema = psl::parse_schema_without_extensions(dml).unwrap();
     let user_model = schema.assert_has_model("User");
 
     user_model
@@ -38,7 +38,6 @@ fn parse_field_arity() {
     let dml = r#"
     datasource mypg {
         provider = "postgres"
-        url = "postgresql://asdlj"
     }
 
     model Post {
@@ -56,7 +55,7 @@ fn parse_field_arity() {
     }
     "#;
 
-    let schema = psl::parse_schema(dml).unwrap();
+    let schema = psl::parse_schema_without_extensions(dml).unwrap();
     let post_model = schema.assert_has_model("Post");
 
     post_model
@@ -128,7 +127,6 @@ fn scalar_list_types_are_not_supported_by_mysql() {
     let dml = indoc! {r#"
         datasource mysql {
           provider = "mysql"
-          url = "mysql://asdlj"
         }
 
         model Post {
@@ -150,18 +148,18 @@ fn scalar_list_types_are_not_supported_by_mysql() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mField "comments" in model "Post" can't be a list. The current connector does not support lists of primitive types.[0m
-          [1;94m-->[0m  [4mschema.prisma:10[0m
+          [1;94m-->[0m  [4mschema.prisma:9[0m
         [1;94m   | [0m
-        [1;94m 9 | [0m  photo String?
-        [1;94m10 | [0m  [1;91mcomments String[][0m
-        [1;94m11 | [0m  enums    Enum[]
+        [1;94m 8 | [0m  photo String?
+        [1;94m 9 | [0m  [1;91mcomments String[][0m
+        [1;94m10 | [0m  enums    Enum[]
         [1;94m   | [0m
         [1;91merror[0m: [1mField "enums" in model "Post" can't be a list. The current connector does not support lists of primitive types.[0m
-          [1;94m-->[0m  [4mschema.prisma:11[0m
+          [1;94m-->[0m  [4mschema.prisma:10[0m
         [1;94m   | [0m
-        [1;94m10 | [0m  comments String[]
-        [1;94m11 | [0m  [1;91menums    Enum[][0m
-        [1;94m12 | [0m}
+        [1;94m 9 | [0m  comments String[]
+        [1;94m10 | [0m  [1;91menums    Enum[][0m
+        [1;94m11 | [0m}
         [1;94m   | [0m
     "#]];
 
@@ -178,35 +176,35 @@ fn json_type_must_work_for_some_connectors() {
     "#};
 
     // empty connector does support it
-    psl::parse_schema(dml)
+    psl::parse_schema_without_extensions(dml)
         .unwrap()
         .assert_has_model("User")
         .assert_has_scalar_field("json")
         .assert_scalar_type(ScalarType::Json);
 
-    let error = parse_unwrap_err(&format!("{SQLITE_SOURCE}\n{dml}"));
+    let error = parse_unwrap_err(&format!("{MSSQL_SOURCE}\n{dml}"));
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError validating field `json` in model `User`: Field `json` in model `User` can't be of type Json. The current connector does not support the Json type.[0m
-          [1;94m-->[0m  [4mschema.prisma:9[0m
+          [1;94m-->[0m  [4mschema.prisma:8[0m
         [1;94m   | [0m
-        [1;94m 8 | [0m  id   Int    @id
-        [1;94m 9 | [0m  [1;91mjson Json[0m
-        [1;94m10 | [0m}
+        [1;94m 7 | [0m  id   Int    @id
+        [1;94m 8 | [0m  [1;91mjson Json[0m
+        [1;94m 9 | [0m}
         [1;94m   | [0m
     "#]];
 
     expectation.assert_eq(&error);
 
     // Postgres does support it
-    psl::parse_schema(format!("{POSTGRES_SOURCE}\n{dml}"))
+    psl::parse_schema_without_extensions(format!("{POSTGRES_SOURCE}\n{dml}"))
         .unwrap()
         .assert_has_model("User")
         .assert_has_scalar_field("json")
         .assert_scalar_type(ScalarType::Json);
 
     // MySQL does support it
-    psl::parse_schema(format!("{MYSQL_SOURCE}\n{dml}"))
+    psl::parse_schema_without_extensions(format!("{MYSQL_SOURCE}\n{dml}"))
         .unwrap()
         .assert_has_model("User")
         .assert_has_scalar_field("json")
@@ -229,7 +227,7 @@ fn resolve_enum_field() {
     }
     "#;
 
-    let schema = psl::parse_schema(dml).unwrap();
+    let schema = psl::parse_schema_without_extensions(dml).unwrap();
     let user_model = schema.assert_has_model("User");
     user_model.assert_has_scalar_field("email");
 
@@ -253,11 +251,11 @@ fn json_list_type_must_work_for_some_connectors() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError validating field `json_list` in model `User`: Field `json_list` in model `User` can't be of type Json[]. The current connector does not support the Json List type.[0m
-          [1;94m-->[0m  [4mschema.prisma:13[0m
+          [1;94m-->[0m  [4mschema.prisma:12[0m
         [1;94m   | [0m
-        [1;94m12 | [0m  id   Int    @id
-        [1;94m13 | [0m  [1;91mjson_list Json[][0m
-        [1;94m14 | [0m}
+        [1;94m11 | [0m  id   Int    @id
+        [1;94m12 | [0m  [1;91mjson_list Json[][0m
+        [1;94m13 | [0m}
         [1;94m   | [0m
     "#]];
 
@@ -266,7 +264,7 @@ fn json_list_type_must_work_for_some_connectors() {
     let schema = with_header(dml, Provider::Postgres, &[]);
 
     // Postgres does support it
-    psl::parse_schema(schema)
+    psl::parse_schema_without_extensions(schema)
         .unwrap()
         .assert_has_model("User")
         .assert_has_scalar_field("json_list")

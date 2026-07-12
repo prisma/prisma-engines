@@ -31,27 +31,33 @@ pub mod walkers;
 mod attributes;
 mod coerce_expression;
 mod context;
+mod extension;
 mod files;
+pub mod generators;
 mod ids;
 mod interner;
 mod names;
 mod relations;
 mod types;
 
+use std::collections::HashMap;
+
 use self::{context::Context, interner::StringId, relations::Relations, types::Types};
 pub use coerce_expression::{coerce, coerce_array, coerce_opt};
 pub use diagnostics::FileId;
 use diagnostics::{DatamodelError, Diagnostics};
+pub use extension::{ExtensionTypeEntry, ExtensionTypeId, ExtensionTypes, NoExtensionTypes};
 pub use files::Files;
 pub use ids::*;
-pub use names::is_reserved_type_name;
+use interner::StringInterner;
 use names::Names;
+pub use names::is_reserved_type_name;
 pub use relations::{ManyToManyRelationId, ReferentialAction, RelationId};
 use schema_ast::ast::{GeneratorConfig, SourceConfig};
-pub use schema_ast::{ast, SourceFile};
+pub use schema_ast::{SourceFile, ast};
 pub use types::{
     IndexAlgorithm, IndexFieldPath, IndexType, OperatorClass, RelationFieldId, ScalarFieldId, ScalarFieldType,
-    ScalarType, SortOrder,
+    ScalarType, SortOrder, WhereClause, WhereCondition, WhereValue,
 };
 
 /// ParserDatabase is a container for a Schema AST, together with information
@@ -79,22 +85,32 @@ pub struct ParserDatabase {
     names: Names,
     types: Types,
     relations: Relations,
+    extension_metadata: ExtensionMetadata,
 }
 
 impl ParserDatabase {
     /// See the docs on [ParserDatabase](/struct.ParserDatabase.html).
-    pub fn new_single_file(file: SourceFile, diagnostics: &mut Diagnostics) -> Self {
-        Self::new(&[("schema.prisma".to_owned(), file)], diagnostics)
+    pub fn new_single_file(
+        file: SourceFile,
+        diagnostics: &mut Diagnostics,
+        extension_types: &dyn ExtensionTypes,
+    ) -> Self {
+        Self::new(&[("schema.prisma".to_owned(), file)], diagnostics, extension_types)
     }
 
     /// See the docs on [ParserDatabase](/struct.ParserDatabase.html).
-    pub fn new(schemas: &[(String, schema_ast::SourceFile)], diagnostics: &mut Diagnostics) -> Self {
+    pub fn new(
+        schemas: &[(String, schema_ast::SourceFile)],
+        diagnostics: &mut Diagnostics,
+        extension_types: &dyn ExtensionTypes,
+    ) -> Self {
         let asts = Files::new(schemas, diagnostics);
 
-        let mut interner = Default::default();
+        let mut interner = StringInterner::default();
         let mut names = Default::default();
-        let mut types = Default::default();
+        let mut types = Types::default();
         let mut relations = Default::default();
+
         let mut ctx = Context::new(
             &asts,
             &mut interner,
@@ -102,39 +118,14 @@ impl ParserDatabase {
             &mut types,
             &mut relations,
             diagnostics,
+            extension_types,
         );
 
         // First pass: resolve names.
         names::resolve_names(&mut ctx);
 
-        // Return early on name resolution errors.
-        if ctx.diagnostics.has_errors() {
-            attributes::create_default_attributes(&mut ctx);
-
-            return ParserDatabase {
-                asts,
-                interner,
-                names,
-                types,
-                relations,
-            };
-        }
-
         // Second pass: resolve top-level items and field types.
         types::resolve_types(&mut ctx);
-
-        // Return early on type resolution errors.
-        if ctx.diagnostics.has_errors() {
-            attributes::create_default_attributes(&mut ctx);
-
-            return ParserDatabase {
-                asts,
-                interner,
-                names,
-                types,
-                relations,
-            };
-        }
 
         // Third pass: validate model and field attributes. All these
         // validations should be _order independent_ and only rely on
@@ -144,12 +135,15 @@ impl ParserDatabase {
         // Fourth step: relation inference
         relations::infer_relations(&mut ctx);
 
+        let extension_metadata = ExtensionMetadata::new(extension_types, &mut interner);
+
         ParserDatabase {
             asts,
             interner,
             names,
             types,
             relations,
+            extension_metadata,
         }
     }
 
@@ -168,11 +162,6 @@ impl ParserDatabase {
         &self.asts.0.first().unwrap().2
     }
 
-    /// Iterate all parsed ASTs.
-    pub fn iter_asts(&self) -> impl Iterator<Item = &ast::SchemaAst> {
-        self.asts.iter().map(|(_, _, _, ast)| ast)
-    }
-
     /// Returns file id by name
     pub fn file_id(&self, file_name: &str) -> Option<FileId> {
         self.asts
@@ -180,14 +169,9 @@ impl ParserDatabase {
             .find_map(|(file_id, name, _, _)| if name == file_name { Some(file_id) } else { None })
     }
 
-    /// Iterate all parsed ASTs, consuming parser database
-    pub fn into_iter_asts(self) -> impl Iterator<Item = ast::SchemaAst> {
-        self.asts.into_iter().map(|(_, _, _, ast)| ast)
-    }
-
-    /// Iterate all file ids
-    pub fn iter_file_ids(&self) -> impl Iterator<Item = FileId> + '_ {
-        self.asts.iter().map(|(file_id, _, _, _)| file_id)
+    /// The name of the file.
+    pub fn file_name(&self, file_id: FileId) -> &str {
+        self.asts[file_id].0.as_str()
     }
 
     /// A parsed AST.
@@ -223,6 +207,16 @@ impl ParserDatabase {
         self.asts[file_id].1.as_str()
     }
 
+    /// Iterate all parsed ASTs, consuming parser database
+    pub fn into_iter_asts(self) -> impl Iterator<Item = ast::SchemaAst> {
+        self.asts.into_iter().map(|(_, _, _, ast)| ast)
+    }
+
+    /// Iterate all parsed ASTs.
+    pub fn iter_asts(&self) -> impl Iterator<Item = &ast::SchemaAst> {
+        self.asts.iter().map(|(_, _, _, ast)| ast)
+    }
+
     /// Iterate all source file contents.
     pub fn iter_sources(&self) -> impl Iterator<Item = &str> {
         self.asts.iter().map(|ast| ast.2.as_str())
@@ -233,11 +227,10 @@ impl ParserDatabase {
         self.asts.iter().map(|ast| (ast.1.as_str(), ast.2))
     }
 
-    /// The name of the file.
-    pub fn file_name(&self, file_id: FileId) -> &str {
-        self.asts[file_id].0.as_str()
+    /// Iterate all file ids
+    pub fn iter_file_ids(&self) -> impl Iterator<Item = FileId> + '_ {
+        self.asts.iter().map(|(file_id, _, _, _)| file_id)
     }
-
     /// Iterate all datasources defined in the schema
     pub fn datasources(&self) -> impl Iterator<Item = &SourceConfig> {
         self.iter_asts().flat_map(|ast| ast.sources())
@@ -246,6 +239,19 @@ impl ParserDatabase {
     /// Iterate all generators defined in the schema
     pub fn generators(&self) -> impl Iterator<Item = &GeneratorConfig> {
         self.iter_asts().flat_map(|ast| ast.generators())
+    }
+
+    /// Get the name of an extension type by its ID.
+    pub fn get_extension_type_prisma_name(&self, id: ExtensionTypeId) -> Option<&str> {
+        let &id = self.extension_metadata.id_to_prisma_name.get(&id)?;
+        self.interner.get(id)
+    }
+
+    /// Get the database name of an extension type by its ID, along with any modifiers it may have.
+    pub fn get_extension_type_db_name_with_modifiers(&self, id: ExtensionTypeId) -> Option<(&str, &[String])> {
+        let (name, modifiers) = self.extension_metadata.id_to_db_name_with_modifiers.get(&id)?;
+        let name = self.interner.get(*name)?;
+        Some((name, modifiers))
     }
 }
 
@@ -268,5 +274,31 @@ impl std::ops::Index<StringId> for ParserDatabase {
 
     fn index(&self, index: StringId) -> &Self::Output {
         self.interner.get(index).unwrap()
+    }
+}
+
+struct ExtensionMetadata {
+    id_to_prisma_name: HashMap<ExtensionTypeId, StringId>,
+    id_to_db_name_with_modifiers: HashMap<ExtensionTypeId, (StringId, Vec<String>)>,
+}
+
+impl ExtensionMetadata {
+    pub fn new(extension_types: &dyn ExtensionTypes, interner: &mut StringInterner) -> Self {
+        let mut id_to_prisma_name = HashMap::new();
+        let mut id_to_db_name_with_modifiers = HashMap::new();
+
+        for entry in extension_types.enumerate() {
+            let prisma_name = interner.intern(entry.prisma_name);
+            id_to_prisma_name.insert(entry.id, prisma_name);
+            if let Some(modifiers) = &entry.db_type_modifiers {
+                let db_name = interner.intern(entry.db_name);
+                id_to_db_name_with_modifiers.insert(entry.id, (db_name, modifiers.to_vec()));
+            }
+        }
+
+        ExtensionMetadata {
+            id_to_prisma_name,
+            id_to_db_name_with_modifiers,
+        }
     }
 }

@@ -61,7 +61,7 @@ impl<'a> Configuration<'a> {
     }
 }
 
-impl<'a> fmt::Display for Configuration<'a> {
+impl fmt::Display for Configuration<'_> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         for (_, generators) in self.generators.iter() {
             for generator in generators {
@@ -91,23 +91,19 @@ mod tests {
 
         config.push_generator(
             file_name.to_owned(),
-            Generator::new("client", Env::value("prisma-client-js")),
+            Generator::new("client", Env::value("prisma-client")),
         );
-        config.push_datasource(
-            file_name.to_owned(),
-            Datasource::new("db", "postgres", Env::variable("DATABASE_URL")),
-        );
+        config.push_datasource(file_name.to_owned(), Datasource::new("db", "postgres"));
 
         let rendered = psl::reformat(&format!("{config}"), 2).unwrap();
 
         let expected = expect![[r#"
             generator client {
-              provider = "prisma-client-js"
+              provider = "prisma-client"
             }
 
             datasource db {
               provider = "postgres"
-              url      = env("DATABASE_URL")
             }
         "#]];
 
@@ -119,26 +115,17 @@ mod tests {
         let mut config = Configuration::default();
         let file_name = "schema.prisma";
 
-        config.push_generator(
-            file_name.to_owned(),
-            Generator::new("js", Env::value("prisma-client-js")),
-        );
+        config.push_generator(file_name.to_owned(), Generator::new("js", Env::value("prisma-client")));
         config.push_generator(
             file_name.to_owned(),
             Generator::new("go", Env::value("prisma-client-go")),
         );
-        config.push_datasource(
-            file_name.to_owned(),
-            Datasource::new("pg", "postgres", Env::variable("PG_DATABASE_URL")),
-        );
-        config.push_datasource(
-            file_name.to_owned(),
-            Datasource::new("my", "mysql", Env::variable("MY_DATABASE_URL")),
-        );
+        config.push_datasource(file_name.to_owned(), Datasource::new("pg", "postgres"));
+        config.push_datasource(file_name.to_owned(), Datasource::new("my", "mysql"));
 
         let expected = expect![[r#"
             generator js {
-              provider = "prisma-client-js"
+              provider = "prisma-client"
             }
 
             generator go {
@@ -147,12 +134,10 @@ mod tests {
 
             datasource pg {
               provider = "postgres"
-              url      = env("PG_DATABASE_URL")
             }
 
             datasource my {
               provider = "mysql"
-              url      = env("MY_DATABASE_URL")
             }
         "#]];
 

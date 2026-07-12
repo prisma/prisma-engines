@@ -1,10 +1,10 @@
 use super::database_name::validate_db_name;
 use crate::{
-    datamodel_connector::{walker_ext_traits::*, ConnectorCapability},
+    PreviewFeature,
+    datamodel_connector::{ConnectorCapability, walker_ext_traits::*},
     diagnostics::DatamodelError,
     parser_database::ast::{WithName, WithSpan},
     validate::validation_pipeline::context::Context,
-    PreviewFeature,
 };
 use parser_database::walkers::{ModelWalker, PrimaryKeyWalker};
 use std::{borrow::Cow, collections::HashMap};
@@ -34,8 +34,9 @@ pub(super) fn has_a_strict_unique_criteria(model: ModelWalker<'_>, ctx: &mut Con
 
     let container_type = if model.ast_model().is_view() { "view" } else { "model" };
 
-    let msg =
-        format!("Each {container_type} must have at least one unique criteria that has only required fields. Either mark a single field with `@id`, `@unique` or add a multi field criterion with `@@id([])` or `@@unique([])` to the {container_type}.");
+    let msg = format!(
+        "Each {container_type} must have at least one unique criteria that has only required fields. Either mark a single field with `@id`, `@unique` or add a multi field criterion with `@@id([])` or `@@unique([])` to the {container_type}."
+    );
 
     let msg = if loose_criterias.peek().is_some() {
         let suffix = format!(
@@ -111,26 +112,25 @@ pub(super) fn has_a_unique_custom_primary_key_name_per_model(
         None => return,
     };
 
-    if let Some(name) = pk.name() {
-        if names
+    if let Some(name) = pk.name()
+        && names
             .constraint_namespace
             .local_custom_name_scope_violations(model.id, name.as_ref())
-        {
-            let message = format!(
-                "The given custom name `{name}` has to be unique on the model. Please provide a different name for the `name` argument."
-            );
+    {
+        let message = format!(
+            "The given custom name `{name}` has to be unique on the model. Please provide a different name for the `name` argument."
+        );
 
-            let span = pk
-                .ast_attribute()
-                .span_for_argument("name")
-                .unwrap_or_else(|| pk.ast_attribute().span);
+        let span = pk
+            .ast_attribute()
+            .span_for_argument("name")
+            .unwrap_or_else(|| pk.ast_attribute().span);
 
-            ctx.push_error(DatamodelError::new_attribute_validation_error(
-                &message,
-                pk.attribute_name(),
-                span,
-            ));
-        }
+        ctx.push_error(DatamodelError::new_attribute_validation_error(
+            &message,
+            pk.attribute_name(),
+            span,
+        ));
     }
 }
 
@@ -140,17 +140,17 @@ pub(crate) fn primary_key_length_prefix_supported(model: ModelWalker<'_>, ctx: &
         return;
     }
 
-    if let Some(pk) = model.primary_key() {
-        if pk.scalar_field_attributes().any(|f| f.length().is_some()) {
-            let message = "The length argument is not supported in the primary key with the current connector";
-            let span = pk.ast_attribute().span;
+    if let Some(pk) = model.primary_key()
+        && pk.scalar_field_attributes().any(|f| f.length().is_some())
+    {
+        let message = "The length argument is not supported in the primary key with the current connector";
+        let span = pk.ast_attribute().span;
 
-            ctx.push_error(DatamodelError::new_attribute_validation_error(
-                message,
-                pk.attribute_name(),
-                span,
-            ));
-        }
+        ctx.push_error(DatamodelError::new_attribute_validation_error(
+            message,
+            pk.attribute_name(),
+            span,
+        ));
     }
 }
 
@@ -160,25 +160,21 @@ pub(crate) fn primary_key_sort_order_supported(model: ModelWalker<'_>, ctx: &mut
         return;
     }
 
-    if let Some(pk) = model.primary_key() {
-        if pk.scalar_field_attributes().any(|f| f.sort_order().is_some()) {
-            let message = "The sort argument is not supported in the primary key with the current connector";
-            let span = pk.ast_attribute().span;
+    if let Some(pk) = model.primary_key()
+        && pk.scalar_field_attributes().any(|f| f.sort_order().is_some())
+    {
+        let message = "The sort argument is not supported in the primary key with the current connector";
+        let span = pk.ast_attribute().span;
 
-            ctx.push_error(DatamodelError::new_attribute_validation_error(
-                message,
-                pk.attribute_name(),
-                span,
-            ));
-        }
+        ctx.push_error(DatamodelError::new_attribute_validation_error(
+            message,
+            pk.attribute_name(),
+            span,
+        ));
     }
 }
 
 pub(crate) fn only_one_fulltext_attribute_allowed(model: ModelWalker<'_>, ctx: &mut Context<'_>) {
-    if !ctx.preview_features.contains(PreviewFeature::FullTextIndex) {
-        return;
-    }
-
     if !ctx.has_capability(ConnectorCapability::FullTextIndex) {
         return;
     }
@@ -226,12 +222,12 @@ pub(crate) fn primary_key_connector_specific(model: ModelWalker<'_>, ctx: &mut C
     }
 
     if primary_key.fields().len() > 1 && !ctx.has_capability(ConnectorCapability::CompoundIds) {
-        return ctx.push_error(DatamodelError::new_model_validation_error(
+        ctx.push_error(DatamodelError::new_model_validation_error(
             "The current connector does not support compound ids.",
             container_type,
             model.name(),
             primary_key.ast_attribute().span,
-        ));
+        ))
     }
 }
 
@@ -240,14 +236,17 @@ pub(super) fn connector_specific(model: ModelWalker<'_>, ctx: &mut Context<'_>) 
 }
 
 pub(super) fn id_has_fields(model: ModelWalker<'_>, ctx: &mut Context<'_>) {
-    let id = if let Some(id) = model.primary_key() { id } else { return };
+    let Some(id) = model.primary_key() else { return };
 
     if id.fields().len() > 0 {
         return;
     }
 
     ctx.push_error(DatamodelError::new_attribute_validation_error(
-        "The list of fields in an `@@id()` attribute cannot be empty. Please specify at least one field.",
+        &format!(
+            "The list of fields in an `{}()` attribute cannot be empty. Please specify at least one field.",
+            id.attribute_name()
+        ),
         id.attribute_name(),
         id.ast_attribute().span,
     ))
@@ -275,10 +274,6 @@ pub(super) fn id_client_name_does_not_clash_with_field(model: ModelWalker<'_>, c
 }
 
 pub(super) fn schema_is_defined_in_the_datasource(model: ModelWalker<'_>, ctx: &mut Context<'_>) {
-    if !ctx.preview_features.contains(crate::PreviewFeature::MultiSchema) {
-        return;
-    }
-
     if !ctx.has_capability(ConnectorCapability::MultiSchema) {
         return;
     }
@@ -304,10 +299,6 @@ pub(super) fn schema_is_defined_in_the_datasource(model: ModelWalker<'_>, ctx: &
 }
 
 pub(super) fn schema_attribute_supported_in_connector(model: ModelWalker<'_>, ctx: &mut Context<'_>) {
-    if !ctx.preview_features.contains(crate::PreviewFeature::MultiSchema) {
-        return;
-    }
-
     if ctx.has_capability(ConnectorCapability::MultiSchema) {
         return;
     }
@@ -324,10 +315,6 @@ pub(super) fn schema_attribute_supported_in_connector(model: ModelWalker<'_>, ct
 }
 
 pub(super) fn schema_attribute_missing(model: ModelWalker<'_>, ctx: &mut Context<'_>) {
-    if !ctx.preview_features.contains(crate::PreviewFeature::MultiSchema) {
-        return;
-    }
-
     if !ctx.has_capability(ConnectorCapability::MultiSchema) {
         return;
     }
@@ -403,15 +390,42 @@ pub(super) fn database_name_clashes(ctx: &mut Context<'_>) {
     }
 }
 
-pub(super) fn multischema_feature_flag_needed(model: ModelWalker<'_>, ctx: &mut Context<'_>) {
-    if ctx.preview_features.contains(crate::PreviewFeature::MultiSchema) {
+pub(super) fn shard_key_has_fields(model: ModelWalker<'_>, ctx: &mut Context<'_>) {
+    let Some(shard_key) = model.shard_key() else { return };
+
+    if shard_key.fields().len() > 0 {
         return;
     }
 
-    if let Some((_, span)) = model.schema() {
-        ctx.push_error(DatamodelError::new_static(
-            "@@schema is only available with the `multiSchema` preview feature.",
-            span,
+    ctx.push_error(DatamodelError::new_attribute_validation_error(
+        &format!(
+            "The list of fields in a `{}()` attribute cannot be empty. Please specify at least one field.",
+            shard_key.attribute_name()
+        ),
+        shard_key.attribute_name(),
+        shard_key.ast_attribute().span,
+    ))
+}
+
+pub(super) fn shard_key_is_supported(model: ModelWalker<'_>, ctx: &mut Context<'_>) {
+    let Some(shard_key) = model.shard_key() else { return };
+
+    if !ctx.preview_features.contains(PreviewFeature::ShardKeys) {
+        ctx.push_error(DatamodelError::new_attribute_validation_error(
+            "Defining shard keys requires enabling the `shardKeys` preview feature",
+            shard_key.attribute_name(),
+            shard_key.ast_attribute().span,
+        ));
+    }
+
+    if !ctx.connector.supports_shard_keys() {
+        ctx.push_error(DatamodelError::new_attribute_validation_error(
+            &format!(
+                "Shard keys are not currently supported for provider {}",
+                ctx.connector.provider_name()
+            ),
+            shard_key.attribute_name(),
+            shard_key.ast_attribute().span,
         ));
     }
 }

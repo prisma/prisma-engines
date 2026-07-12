@@ -1,0 +1,13 @@
+{
+  "modelName": "UserWithGenerators",
+  "action": "createOne",
+  "query": {
+    "arguments": {
+      "relationLoadStrategy": "query",
+      "data": { "email": "user.1@prisma.io" }
+    },
+    "selection": {
+      "$scalars": true
+    }
+  }
+}

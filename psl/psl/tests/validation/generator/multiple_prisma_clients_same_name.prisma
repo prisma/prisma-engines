@@ -1,0 +1,20 @@
+generator client {
+  provider = "prisma-client"
+  output = "../lib/.generated/prisma"
+}
+
+generator client {
+  provider = "prisma-client"
+  output = "../lib/.generated/prisma-edge"
+  runtime = "edge-light"
+}
+
+datasource db {
+  provider  = "postgresql"
+}
+// [1;91merror[0m: [1mThe generator "client" cannot be defined because a generator with that name already exists.[0m
+//   [1;94m-->[0m  [4mschema.prisma:6[0m
+// [1;94m   | [0m
+// [1;94m 5 | [0m
+// [1;94m 6 | [0mgenerator [1;91mclient[0m {
+// [1;94m   | [0m

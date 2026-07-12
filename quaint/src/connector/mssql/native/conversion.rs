@@ -1,10 +1,12 @@
-use crate::ast::{Value, ValueType};
+use crate::{
+    ast::{Value, ValueType},
+    error::{Error, ErrorKind},
+};
 
 use bigdecimal::BigDecimal;
 use std::{borrow::Cow, convert::TryFrom};
 
-use tiberius::ToSql;
-use tiberius::{ColumnData, FromSql, IntoSql};
+use tiberius::{ColumnData, FromSql, IntoSql, ToSql};
 
 impl<'a> IntoSql<'a> for &'a Value<'a> {
     fn into_sql(self) -> ColumnData<'a> {
@@ -26,6 +28,12 @@ impl<'a> IntoSql<'a> for &'a Value<'a> {
             ValueType::DateTime(val) => val.into_sql(),
             ValueType::Date(val) => val.into_sql(),
             ValueType::Time(val) => val.into_sql(),
+            ValueType::Opaque(opaque) => {
+                panic!(
+                    "conversion error: {:?}",
+                    Error::builder(ErrorKind::RanQueryWithOpaqueParam(opaque.to_string())).build()
+                )
+            }
         }
     }
 }
@@ -37,8 +45,8 @@ impl TryFrom<ColumnData<'static>> for Value<'static> {
         let res = match cd {
             ColumnData::U8(num) => ValueType::Int32(num.map(i32::from)),
             ColumnData::I16(num) => ValueType::Int32(num.map(i32::from)),
-            ColumnData::I32(num) => ValueType::Int32(num.map(i32::from)),
-            ColumnData::I64(num) => ValueType::Int64(num.map(i64::from)),
+            ColumnData::I32(num) => ValueType::Int32(num),
+            ColumnData::I64(num) => ValueType::Int64(num),
             ColumnData::F32(num) => ValueType::Float(num),
             ColumnData::F64(num) => ValueType::Double(num),
             ColumnData::Bit(b) => ValueType::Boolean(b),
@@ -49,13 +57,13 @@ impl TryFrom<ColumnData<'static>> for Value<'static> {
             dt @ ColumnData::DateTime(_) => {
                 use tiberius::time::chrono::{DateTime, NaiveDateTime, Utc};
 
-                let dt = NaiveDateTime::from_sql(&dt)?.map(|dt| DateTime::<Utc>::from_utc(dt, Utc));
+                let dt = NaiveDateTime::from_sql(&dt)?.map(|dt| DateTime::<Utc>::from_naive_utc_and_offset(dt, Utc));
                 ValueType::DateTime(dt)
             }
             dt @ ColumnData::SmallDateTime(_) => {
                 use tiberius::time::chrono::{DateTime, NaiveDateTime, Utc};
 
-                let dt = NaiveDateTime::from_sql(&dt)?.map(|dt| DateTime::<Utc>::from_utc(dt, Utc));
+                let dt = NaiveDateTime::from_sql(&dt)?.map(|dt| DateTime::<Utc>::from_naive_utc_and_offset(dt, Utc));
                 ValueType::DateTime(dt)
             }
             dt @ ColumnData::Time(_) => {
@@ -70,7 +78,7 @@ impl TryFrom<ColumnData<'static>> for Value<'static> {
             dt @ ColumnData::DateTime2(_) => {
                 use tiberius::time::chrono::{DateTime, NaiveDateTime, Utc};
 
-                let dt = NaiveDateTime::from_sql(&dt)?.map(|dt| DateTime::<Utc>::from_utc(dt, Utc));
+                let dt = NaiveDateTime::from_sql(&dt)?.map(|dt| DateTime::<Utc>::from_naive_utc_and_offset(dt, Utc));
 
                 ValueType::DateTime(dt)
             }

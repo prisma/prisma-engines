@@ -1,0 +1,52 @@
+{
+  "engines": {
+    "node": ">=18.18",
+    "pnpm": "^10.15.1"
+  },
+  "name": "executor",
+  "type": "module",
+  "version": "0.0.1",
+  "description": "",
+  "private": true,
+  "scripts": {
+    "build": "tsc",
+    "build:qc": "tsc --project tsconfig.qc.json",
+    "test:qc": "node --import tsx ./src/testd-qc.ts",
+    "demo:se": "node --experimental-wasm-modules --import tsx ./src/demo-se.ts",
+    "demo:qc": "node --import tsx ./src/demo-qc.ts",
+    "clean:d1": "rm -rf ../../connector-test-kit-rs/query-engine-tests/.wrangler"
+  },
+  "keywords": [],
+  "author": "",
+  "sideEffects": false,
+  "license": "Apache-2.0",
+  "dependencies": {
+    "@effect/schema": "0.64.20",
+    "@prisma/adapter-better-sqlite3": "workspace:*",
+    "@prisma/adapter-d1": "workspace:*",
+    "@prisma/adapter-libsql": "workspace:*",
+    "@prisma/adapter-mssql": "workspace:*",
+    "@prisma/adapter-neon": "workspace:*",
+    "@prisma/adapter-pg": "workspace:*",
+    "@prisma/adapter-planetscale": "workspace:*",
+    "@prisma/adapter-mariadb": "workspace:*",
+    "@prisma/bundled-js-drivers": "workspace:*",
+    "@prisma/client-engine-runtime": "workspace:*",
+    "@prisma/driver-adapter-utils": "workspace:*",
+    "@prisma/get-dmmf": "workspace:*",
+    "@prisma/param-graph": "workspace:*",
+    "@prisma/param-graph-builder": "workspace:*",
+    "@prisma/schema-engine-wasm": "../../../schema-engine/schema-engine-wasm/pkg",
+    "decimal.js": "10.5.0",
+    "ts-pattern": "5.1.1",
+    "undici": "6.23.0",
+    "wrangler": "^4.4.0",
+    "ws": "8.17.1"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "4.20250320.0",
+    "@types/node": "20.12.7",
+    "tsx": "4.7.2",
+    "typescript": "5.8.3"
+  }
+}

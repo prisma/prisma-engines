@@ -1,5 +1,5 @@
 use crate::IntoBson;
-use mongodb::bson::{Bson, Document};
+use bson::{Bson, Document};
 use query_structure::{FieldSelection, SelectedField};
 
 /// Used as projection document for Mongo queries.

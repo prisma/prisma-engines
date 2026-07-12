@@ -4,7 +4,7 @@ use indoc::indoc;
 use sql_migration_tests::test_api::*;
 
 #[test_connector]
-fn basic_create_migration_works(api: TestApi) {
+fn basic_create_migration_works(mut api: TestApi) {
     let dm = api.datamodel_with_provider(
         r#"
         model Cat {
@@ -38,14 +38,14 @@ fn basic_create_migration_works(api: TestApi) {
                 "#]]
             } else if is_postgres {
                 expect![[r#"
-                        -- CreateTable
-                        CREATE TABLE "Cat" (
-                            "id" INTEGER NOT NULL,
-                            "name" TEXT NOT NULL,
+                    -- CreateTable
+                    CREATE TABLE "Cat" (
+                        "id" INTEGER NOT NULL,
+                        "name" TEXT NOT NULL,
 
-                            CONSTRAINT "Cat_pkey" PRIMARY KEY ("id")
-                        );
-                    "#]]
+                        CONSTRAINT "Cat_pkey" PRIMARY KEY ("id")
+                    );
+                "#]]
             } else if is_mysql {
                 expect![[r#"
                         -- CreateTable
@@ -289,14 +289,14 @@ fn creating_a_second_migration_should_have_the_previous_sql_schema_as_baseline(a
                 "#]]
             } else if is_postgres {
                 expect![[r#"
-                        -- CreateTable
-                        CREATE TABLE "Dog" (
-                            "id" INTEGER NOT NULL,
-                            "name" TEXT NOT NULL,
+                    -- CreateTable
+                    CREATE TABLE "Dog" (
+                        "id" INTEGER NOT NULL,
+                        "name" TEXT NOT NULL,
 
-                            CONSTRAINT "Dog_pkey" PRIMARY KEY ("id")
-                        );
-                        "#]]
+                        CONSTRAINT "Dog_pkey" PRIMARY KEY ("id")
+                    );
+                "#]]
             } else if is_mysql {
                 expect![[r#"
                         -- CreateTable
@@ -545,7 +545,6 @@ fn create_enum_renders_correctly(api: TestApi) {
     let dm = r#"
         datasource test {
           provider = "postgresql"
-          url = "postgresql://unreachable:unreachable@example.com/unreachable"
         }
 
         model Cat {
@@ -589,7 +588,6 @@ fn unsupported_type_renders_correctly(api: TestApi) {
     let dm = r#"
         datasource test {
           provider = "postgresql"
-          url = "postgresql://unreachable:unreachable@example.com/unreachable"
         }
 
         model Cat {
@@ -625,7 +623,6 @@ fn no_additional_unique_created(api: TestApi) {
     let dm = r#"
         datasource test {
           provider = "postgresql"
-          url = "postgresql://unreachable:unreachable@example.com/unreachable"
         }
 
         model Cat {
@@ -797,43 +794,41 @@ fn create_constraint_name_tests_w_implicit_names(api: TestApi) {
                 "#
                      ]]
             } else if is_postgres {
-                expect![[
-                     r#"
-                     -- CreateTable
-                     CREATE TABLE "A" (
-                         "id" INTEGER NOT NULL,
-                         "name" TEXT NOT NULL,
-                         "a" TEXT NOT NULL,
-                         "b" TEXT NOT NULL,
+                expect![[r#"
+                    -- CreateTable
+                    CREATE TABLE "A" (
+                        "id" INTEGER NOT NULL,
+                        "name" TEXT NOT NULL,
+                        "a" TEXT NOT NULL,
+                        "b" TEXT NOT NULL,
 
-                         CONSTRAINT "A_pkey" PRIMARY KEY ("id")
-                     );
+                        CONSTRAINT "A_pkey" PRIMARY KEY ("id")
+                    );
 
-                     -- CreateTable
-                     CREATE TABLE "B" (
-                         "a" TEXT NOT NULL,
-                         "b" TEXT NOT NULL,
-                         "aId" INTEGER NOT NULL,
+                    -- CreateTable
+                    CREATE TABLE "B" (
+                        "a" TEXT NOT NULL,
+                        "b" TEXT NOT NULL,
+                        "aId" INTEGER NOT NULL,
 
-                         CONSTRAINT "B_pkey" PRIMARY KEY ("a","b")
-                     );
+                        CONSTRAINT "B_pkey" PRIMARY KEY ("a","b")
+                    );
 
-                     -- CreateIndex
-                     CREATE UNIQUE INDEX "A_name_key" ON "A"("name");
+                    -- CreateIndex
+                    CREATE UNIQUE INDEX "A_name_key" ON "A"("name");
 
-                     -- CreateIndex
-                     CREATE INDEX "A_a_idx" ON "A"("a");
+                    -- CreateIndex
+                    CREATE INDEX "A_a_idx" ON "A"("a");
 
-                     -- CreateIndex
-                     CREATE UNIQUE INDEX "A_a_b_key" ON "A"("a", "b");
+                    -- CreateIndex
+                    CREATE UNIQUE INDEX "A_a_b_key" ON "A"("a", "b");
 
-                     -- CreateIndex
-                     CREATE INDEX "B_a_b_idx" ON "B"("a", "b");
+                    -- CreateIndex
+                    CREATE INDEX "B_a_b_idx" ON "B"("a", "b");
 
-                     -- AddForeignKey
-                     ALTER TABLE "B" ADD CONSTRAINT "B_aId_fkey" FOREIGN KEY ("aId") REFERENCES "A"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-                 "#
-                     ]]
+                    -- AddForeignKey
+                    ALTER TABLE "B" ADD CONSTRAINT "B_aId_fkey" FOREIGN KEY ("aId") REFERENCES "A"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+                "#]]
             } else if is_mysql {
                 expect![[
                      r#"
@@ -1031,46 +1026,44 @@ fn create_constraint_name_tests_w_explicit_names(api: TestApi) {
                 "#
                      ]]
             }else if is_postgres {
-                expect![[
-                     r#"
-                     -- CreateTable
-                     CREATE TABLE "A" (
-                         "id" INTEGER NOT NULL,
-                         "name" TEXT NOT NULL,
-                         "a" TEXT NOT NULL,
-                         "b" TEXT NOT NULL,
+                expect![[r#"
+                    -- CreateTable
+                    CREATE TABLE "A" (
+                        "id" INTEGER NOT NULL,
+                        "name" TEXT NOT NULL,
+                        "a" TEXT NOT NULL,
+                        "b" TEXT NOT NULL,
 
-                         CONSTRAINT "A_pkey" PRIMARY KEY ("id")
-                     );
+                        CONSTRAINT "A_pkey" PRIMARY KEY ("id")
+                    );
 
-                     -- CreateTable
-                     CREATE TABLE "B" (
-                         "a" TEXT NOT NULL,
-                         "b" TEXT NOT NULL,
-                         "aId" INTEGER NOT NULL,
+                    -- CreateTable
+                    CREATE TABLE "B" (
+                        "a" TEXT NOT NULL,
+                        "b" TEXT NOT NULL,
+                        "aId" INTEGER NOT NULL,
 
-                         CONSTRAINT "B_pkey" PRIMARY KEY ("a","b")
-                     );
+                        CONSTRAINT "B_pkey" PRIMARY KEY ("a","b")
+                    );
 
-                     -- CreateIndex
-                     CREATE UNIQUE INDEX "SingleUnique" ON "A"("name");
+                    -- CreateIndex
+                    CREATE UNIQUE INDEX "SingleUnique" ON "A"("name");
 
-                     -- CreateIndex
-                     CREATE INDEX "SingleIndex" ON "A"("a");
+                    -- CreateIndex
+                    CREATE INDEX "SingleIndex" ON "A"("a");
 
-                     -- CreateIndex
-                     CREATE UNIQUE INDEX "NamedCompoundUnique" ON "A"("a", "b");
+                    -- CreateIndex
+                    CREATE UNIQUE INDEX "NamedCompoundUnique" ON "A"("a", "b");
 
-                     -- CreateIndex
-                     CREATE UNIQUE INDEX "UnNamedCompoundUnique" ON "A"("a", "b");
+                    -- CreateIndex
+                    CREATE UNIQUE INDEX "UnNamedCompoundUnique" ON "A"("a", "b");
 
-                     -- CreateIndex
-                     CREATE INDEX "CompoundIndex" ON "B"("a", "b");
+                    -- CreateIndex
+                    CREATE INDEX "CompoundIndex" ON "B"("a", "b");
 
-                     -- AddForeignKey
-                     ALTER TABLE "B" ADD CONSTRAINT "ForeignKey" FOREIGN KEY ("aId") REFERENCES "A"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-                 "#
-                     ]]
+                    -- AddForeignKey
+                    ALTER TABLE "B" ADD CONSTRAINT "ForeignKey" FOREIGN KEY ("aId") REFERENCES "A"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+                "#]]
             } else if is_mysql {
                 expect![[
                      r#"
@@ -1266,26 +1259,26 @@ fn alter_constraint_name(mut api: TestApi) {
                 "#]]
             } else if is_postgres {
                 expect![[r#"
-                -- AlterTable
-                ALTER TABLE "A" RENAME CONSTRAINT "A_pkey" TO "CustomId";
+                    -- AlterTable
+                    ALTER TABLE "A" RENAME CONSTRAINT "A_pkey" TO "CustomId";
 
-                -- AlterTable
-                ALTER TABLE "B" RENAME CONSTRAINT "B_pkey" TO "CustomCompoundId";
+                    -- AlterTable
+                    ALTER TABLE "B" RENAME CONSTRAINT "B_pkey" TO "CustomCompoundId";
 
-                -- RenameForeignKey
-                ALTER TABLE "B" RENAME CONSTRAINT "B_aId_fkey" TO "CustomFK";
+                    -- RenameForeignKey
+                    ALTER TABLE "B" RENAME CONSTRAINT "B_aId_fkey" TO "CustomFK";
 
-                -- RenameIndex
-                ALTER INDEX "A_a_b_key" RENAME TO "CustomCompoundUnique";
+                    -- RenameIndex
+                    ALTER INDEX "A_a_b_key" RENAME TO "CustomCompoundUnique";
 
-                -- RenameIndex
-                ALTER INDEX "A_a_idx" RENAME TO "CustomIndex";
+                    -- RenameIndex
+                    ALTER INDEX "A_a_idx" RENAME TO "CustomIndex";
 
-                -- RenameIndex
-                ALTER INDEX "A_name_key" RENAME TO "CustomUnique";
+                    -- RenameIndex
+                    ALTER INDEX "A_name_key" RENAME TO "CustomUnique";
 
-                -- RenameIndex
-                ALTER INDEX "B_a_b_idx" RENAME TO "AnotherCustomIndex";
+                    -- RenameIndex
+                    ALTER INDEX "B_a_b_idx" RENAME TO "AnotherCustomIndex";
                 "#]]
             } else if is_sqlite {
                 expect![[r#"
@@ -1327,24 +1320,17 @@ fn alter_constraint_name_and_alter_columns_at_same_time(mut api: TestApi) {
     let dir = api.create_migrations_directory();
     api.create_migration("plain_migration", &plain_dm, &dir).send_sync();
 
-    let custom_dm = api.datamodel_with_provider(&format!(
+    let custom_dm = api.datamodel_with_provider(
         r#"
-         model A {{
-           id   Int     @id{}
+         model A {
+           id   Int     @id(map: "CustomId")
            a    String
            b    String?
-         }}
+         }
      "#,
-        if api.is_sqlite() || api.is_mysql() || api.is_mssql() {
-            ""
-        } else {
-            r#"(map: "CustomId")"#
-        }
-    ));
+    );
 
     let is_postgres = api.is_postgres();
-    let is_postgres15 = api.is_postgres_15();
-    let is_postgres16 = api.is_postgres_16();
     let is_cockroach = api.is_cockroach();
 
     api.create_migration("custom_migration", &custom_dm, &dir)
@@ -1357,7 +1343,7 @@ fn alter_constraint_name_and_alter_columns_at_same_time(mut api: TestApi) {
                     ALTER TABLE "A" ADD COLUMN     "b" STRING;
                     ALTER TABLE "A" RENAME CONSTRAINT "A_pkey" TO "CustomId";
                 "#]]
-            } else if is_postgres || is_postgres15 || is_postgres16 {
+            } else if is_postgres {
                 expect![[r#"
                     -- AlterTable
                     ALTER TABLE "A" ADD COLUMN     "b" TEXT;
@@ -1369,4 +1355,23 @@ fn alter_constraint_name_and_alter_columns_at_same_time(mut api: TestApi) {
 
             migration.expect_contents(expected_script)
         });
+}
+
+#[test_connector]
+fn create_migration_with_empty_name_has_timestamp_directory(mut api: TestApi) {
+    let dm = api.datamodel_with_provider(
+        r#"
+        model Cat {
+            id   Int @id
+            name String
+        }
+    "#,
+    );
+    let dir = api.create_migrations_directory();
+    let res = api.create_migration("", &dm, &dir).send_sync();
+    let created_dir_name = res.output.generated_migration_name.clone();
+    res.assert_migration_directories_count(1);
+    // Check it is exactly a 14-digit timestamp, no underscore.
+    assert_eq!(created_dir_name.len(), 14);
+    assert!(created_dir_name.chars().all(|c| c.is_ascii_digit()));
 }

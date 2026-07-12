@@ -1,31 +1,45 @@
 #![cfg_attr(target_arch = "wasm32", allow(unused_imports))]
 #![cfg_attr(not(target_arch = "wasm32"), allow(clippy::large_enum_variant))]
 
+#[cfg(any(
+    feature = "sqlite-native",
+    feature = "mysql-native",
+    feature = "postgresql-native",
+    feature = "mssql-native"
+))]
 use crate::error::{Error, ErrorKind};
 use std::{borrow::Cow, fmt};
+#[cfg(any(
+    feature = "sqlite-native",
+    feature = "mysql-native",
+    feature = "postgresql-native",
+    feature = "mssql-native"
+))]
 use url::Url;
 
-#[cfg(feature = "mssql")]
+#[cfg(feature = "mssql-native")]
 use crate::connector::MssqlUrl;
-#[cfg(feature = "mysql")]
+#[cfg(feature = "mysql-native")]
 use crate::connector::MysqlUrl;
-#[cfg(feature = "postgresql")]
+#[cfg(feature = "postgresql-native")]
 use crate::connector::PostgresUrl;
-#[cfg(feature = "sqlite")]
+#[cfg(feature = "sqlite-native")]
 use crate::connector::SqliteParams;
-#[cfg(feature = "sqlite")]
+#[cfg(feature = "sqlite-native")]
 use std::convert::TryFrom;
 
 use super::ExternalConnectionInfo;
-
-#[cfg(native)]
-use super::NativeConnectionInfo;
 
 /// General information about a SQL connection.
 #[derive(Debug, Clone)]
 #[cfg_attr(target_arch = "wasm32", repr(transparent))]
 pub enum ConnectionInfo {
-    #[cfg(not(target_arch = "wasm32"))]
+    #[cfg(any(
+        feature = "sqlite-native",
+        feature = "mysql-native",
+        feature = "postgresql-native",
+        feature = "mssql-native"
+    ))]
     Native(NativeConnectionInfo),
     External(ExternalConnectionInfo),
 }
@@ -35,13 +49,18 @@ impl ConnectionInfo {
     ///
     /// Will fail if URI is invalid or the scheme points to an unsupported
     /// database.
-    #[cfg(not(target_arch = "wasm32"))]
+    #[cfg(any(
+        feature = "sqlite-native",
+        feature = "mysql-native",
+        feature = "postgresql-native",
+        feature = "mssql-native"
+    ))]
     pub fn from_url(url_str: &str) -> crate::Result<Self> {
         let url_result: Result<Url, _> = url_str.parse();
 
         // Non-URL database strings are interpreted as SQLite file paths.
         match url_str {
-            #[cfg(feature = "sqlite")]
+            #[cfg(feature = "sqlite-native")]
             s if s.starts_with("file") => {
                 if url_result.is_err() {
                     let params = SqliteParams::try_from(s)?;
@@ -52,7 +71,7 @@ impl ConnectionInfo {
                     }));
                 }
             }
-            #[cfg(feature = "mssql")]
+            #[cfg(feature = "mssql-native")]
             s if s.starts_with("jdbc:sqlserver") || s.starts_with("sqlserver") => {
                 return Ok(ConnectionInfo::Native(NativeConnectionInfo::Mssql(MssqlUrl::new(
                     url_str,
@@ -71,9 +90,9 @@ impl ConnectionInfo {
         })?;
 
         match sql_family {
-            #[cfg(feature = "mysql")]
+            #[cfg(feature = "mysql-native")]
             SqlFamily::Mysql => Ok(ConnectionInfo::Native(NativeConnectionInfo::Mysql(MysqlUrl::new(url)?))),
-            #[cfg(feature = "sqlite")]
+            #[cfg(feature = "sqlite-native")]
             SqlFamily::Sqlite => {
                 let params = SqliteParams::try_from(url_str)?;
 
@@ -82,9 +101,9 @@ impl ConnectionInfo {
                     db_name: params.db_name,
                 }))
             }
-            #[cfg(feature = "postgresql")]
+            #[cfg(feature = "postgresql-native")]
             SqlFamily::Postgres => Ok(ConnectionInfo::Native(NativeConnectionInfo::Postgres(
-                PostgresUrl::new(url)?,
+                super::PostgresUrl::new_native(url)?,
             ))),
             #[allow(unreachable_patterns)]
             _ => unreachable!(),
@@ -92,17 +111,22 @@ impl ConnectionInfo {
     }
 
     /// The provided database name. This will be `None` on SQLite.
-    pub fn dbname(&self) -> Option<&str> {
+    pub fn dbname(&self) -> Option<Cow<'_, str>> {
         match self {
-            #[cfg(not(target_arch = "wasm32"))]
+            #[cfg(any(
+                feature = "sqlite-native",
+                feature = "mysql-native",
+                feature = "postgresql-native",
+                feature = "mssql-native"
+            ))]
             ConnectionInfo::Native(info) => match info {
-                #[cfg(feature = "postgresql")]
+                #[cfg(feature = "postgresql-native")]
                 NativeConnectionInfo::Postgres(url) => Some(url.dbname()),
-                #[cfg(feature = "mysql")]
-                NativeConnectionInfo::Mysql(url) => Some(url.dbname()),
-                #[cfg(feature = "mssql")]
-                NativeConnectionInfo::Mssql(url) => Some(url.dbname()),
-                #[cfg(feature = "sqlite")]
+                #[cfg(feature = "mysql-native")]
+                NativeConnectionInfo::Mysql(url) => url.dbname().map(Cow::Borrowed),
+                #[cfg(feature = "mssql-native")]
+                NativeConnectionInfo::Mssql(url) => Some(Cow::Borrowed(url.dbname())),
+                #[cfg(feature = "sqlite-native")]
                 NativeConnectionInfo::Sqlite { .. } | NativeConnectionInfo::InMemorySqlite { .. } => None,
             },
             ConnectionInfo::External(_) => None,
@@ -113,38 +137,48 @@ impl ConnectionInfo {
     ///
     /// - In SQLite, this is the schema name that the database file was attached as.
     /// - In Postgres, it is the selected schema inside the current database.
-    /// - In MySQL, it is the database name.
-    pub fn schema_name(&self) -> &str {
+    /// - In MySQL, it is the database name (may be empty for Vitess).
+    pub fn schema_name(&self) -> Option<&str> {
         match self {
-            #[cfg(not(target_arch = "wasm32"))]
+            #[cfg(any(
+                feature = "sqlite-native",
+                feature = "mysql-native",
+                feature = "postgresql-native",
+                feature = "mssql-native"
+            ))]
             ConnectionInfo::Native(info) => match info {
-                #[cfg(feature = "postgresql")]
-                NativeConnectionInfo::Postgres(url) => url.schema(),
-                #[cfg(feature = "mysql")]
+                #[cfg(feature = "postgresql-native")]
+                NativeConnectionInfo::Postgres(url) => Some(url.schema()),
+                #[cfg(feature = "mysql-native")]
                 NativeConnectionInfo::Mysql(url) => url.dbname(),
-                #[cfg(feature = "mssql")]
-                NativeConnectionInfo::Mssql(url) => url.schema(),
-                #[cfg(feature = "sqlite")]
-                NativeConnectionInfo::Sqlite { db_name, .. } => db_name,
-                #[cfg(feature = "sqlite")]
-                NativeConnectionInfo::InMemorySqlite { db_name } => db_name,
+                #[cfg(feature = "mssql-native")]
+                NativeConnectionInfo::Mssql(url) => Some(url.schema()),
+                #[cfg(feature = "sqlite-native")]
+                NativeConnectionInfo::Sqlite { db_name, .. } => Some(db_name),
+                #[cfg(feature = "sqlite-native")]
+                NativeConnectionInfo::InMemorySqlite { db_name } => Some(db_name),
             },
-            ConnectionInfo::External(info) => &info.schema_name,
+            ConnectionInfo::External(info) => info.schema_name.as_deref(),
         }
     }
 
     /// The provided database host. This will be `"localhost"` on SQLite.
     pub fn host(&self) -> &str {
         match self {
-            #[cfg(not(target_arch = "wasm32"))]
+            #[cfg(any(
+                feature = "sqlite-native",
+                feature = "mysql-native",
+                feature = "postgresql-native",
+                feature = "mssql-native"
+            ))]
             ConnectionInfo::Native(info) => match info {
-                #[cfg(feature = "postgresql")]
+                #[cfg(feature = "postgresql-native")]
                 NativeConnectionInfo::Postgres(url) => url.host(),
-                #[cfg(feature = "mysql")]
+                #[cfg(feature = "mysql-native")]
                 NativeConnectionInfo::Mysql(url) => url.host(),
-                #[cfg(feature = "mssql")]
+                #[cfg(feature = "mssql-native")]
                 NativeConnectionInfo::Mssql(url) => url.host(),
-                #[cfg(feature = "sqlite")]
+                #[cfg(feature = "sqlite-native")]
                 NativeConnectionInfo::Sqlite { .. } | NativeConnectionInfo::InMemorySqlite { .. } => "localhost",
             },
             ConnectionInfo::External(_) => "external",
@@ -152,18 +186,23 @@ impl ConnectionInfo {
     }
 
     /// The provided database user name. This will be `None` on SQLite.
-    pub fn username(&self) -> Option<Cow<str>> {
+    pub fn username(&self) -> Option<Cow<'_, str>> {
         // TODO: why do some of the native `.username()` methods return an `Option<&str>` and others a `Cow<str>`?
         match self {
-            #[cfg(not(target_arch = "wasm32"))]
+            #[cfg(any(
+                feature = "sqlite-native",
+                feature = "mysql-native",
+                feature = "postgresql-native",
+                feature = "mssql-native"
+            ))]
             ConnectionInfo::Native(info) => match info {
-                #[cfg(feature = "postgresql")]
+                #[cfg(feature = "postgresql-native")]
                 NativeConnectionInfo::Postgres(url) => Some(url.username()),
-                #[cfg(feature = "mysql")]
+                #[cfg(feature = "mysql-native")]
                 NativeConnectionInfo::Mysql(url) => Some(url.username()),
-                #[cfg(feature = "mssql")]
+                #[cfg(feature = "mssql-native")]
                 NativeConnectionInfo::Mssql(url) => url.username().map(Cow::from),
-                #[cfg(feature = "sqlite")]
+                #[cfg(feature = "sqlite-native")]
                 NativeConnectionInfo::Sqlite { .. } | NativeConnectionInfo::InMemorySqlite { .. } => None,
             },
             ConnectionInfo::External(_) => None,
@@ -173,17 +212,22 @@ impl ConnectionInfo {
     /// The database file for SQLite, otherwise `None`.
     pub fn file_path(&self) -> Option<&str> {
         match self {
-            #[cfg(not(target_arch = "wasm32"))]
+            #[cfg(any(
+                feature = "sqlite-native",
+                feature = "mysql-native",
+                feature = "postgresql-native",
+                feature = "mssql-native"
+            ))]
             ConnectionInfo::Native(info) => match info {
-                #[cfg(feature = "postgresql")]
+                #[cfg(feature = "postgresql-native")]
                 NativeConnectionInfo::Postgres(_) => None,
-                #[cfg(feature = "mysql")]
+                #[cfg(feature = "mysql-native")]
                 NativeConnectionInfo::Mysql(_) => None,
-                #[cfg(feature = "mssql")]
+                #[cfg(feature = "mssql-native")]
                 NativeConnectionInfo::Mssql(_) => None,
-                #[cfg(feature = "sqlite")]
+                #[cfg(feature = "sqlite-native")]
                 NativeConnectionInfo::Sqlite { file_path, .. } => Some(file_path),
-                #[cfg(feature = "sqlite")]
+                #[cfg(feature = "sqlite-native")]
                 NativeConnectionInfo::InMemorySqlite { .. } => None,
             },
             ConnectionInfo::External(_) => None,
@@ -196,7 +240,12 @@ impl ConnectionInfo {
 
     pub fn max_bind_values(&self) -> usize {
         match self {
-            #[cfg(not(target_arch = "wasm32"))]
+            #[cfg(any(
+                feature = "sqlite-native",
+                feature = "mysql-native",
+                feature = "postgresql-native",
+                feature = "mssql-native"
+            ))]
             ConnectionInfo::Native(_) => self.sql_family().max_bind_values(),
             // Wasm connectors can override the default max bind values.
             ConnectionInfo::External(info) => info.max_bind_values.unwrap_or(self.sql_family().max_bind_values()),
@@ -206,15 +255,20 @@ impl ConnectionInfo {
     /// The family of databases connected.
     pub fn sql_family(&self) -> SqlFamily {
         match self {
-            #[cfg(not(target_arch = "wasm32"))]
+            #[cfg(any(
+                feature = "sqlite-native",
+                feature = "mysql-native",
+                feature = "postgresql-native",
+                feature = "mssql-native"
+            ))]
             ConnectionInfo::Native(info) => match info {
-                #[cfg(feature = "postgresql")]
+                #[cfg(feature = "postgresql-native")]
                 NativeConnectionInfo::Postgres(_) => SqlFamily::Postgres,
-                #[cfg(feature = "mysql")]
+                #[cfg(feature = "mysql-native")]
                 NativeConnectionInfo::Mysql(_) => SqlFamily::Mysql,
-                #[cfg(feature = "mssql")]
+                #[cfg(feature = "mssql-native")]
                 NativeConnectionInfo::Mssql(_) => SqlFamily::Mssql,
-                #[cfg(feature = "sqlite")]
+                #[cfg(feature = "sqlite-native")]
                 NativeConnectionInfo::Sqlite { .. } | NativeConnectionInfo::InMemorySqlite { .. } => SqlFamily::Sqlite,
             },
             ConnectionInfo::External(info) => info.sql_family.to_owned(),
@@ -224,15 +278,20 @@ impl ConnectionInfo {
     /// The provided database port, if applicable.
     pub fn port(&self) -> Option<u16> {
         match self {
-            #[cfg(not(target_arch = "wasm32"))]
+            #[cfg(any(
+                feature = "sqlite-native",
+                feature = "mysql-native",
+                feature = "postgresql-native",
+                feature = "mssql-native"
+            ))]
             ConnectionInfo::Native(info) => match info {
-                #[cfg(feature = "postgresql")]
+                #[cfg(feature = "postgresql-native")]
                 NativeConnectionInfo::Postgres(url) => Some(url.port()),
-                #[cfg(feature = "mysql")]
+                #[cfg(feature = "mysql-native")]
                 NativeConnectionInfo::Mysql(url) => Some(url.port()),
-                #[cfg(feature = "mssql")]
+                #[cfg(feature = "mssql-native")]
                 NativeConnectionInfo::Mssql(url) => Some(url.port()),
-                #[cfg(feature = "sqlite")]
+                #[cfg(feature = "sqlite-native")]
                 NativeConnectionInfo::Sqlite { .. } | NativeConnectionInfo::InMemorySqlite { .. } => None,
             },
             ConnectionInfo::External(_) => None,
@@ -242,8 +301,8 @@ impl ConnectionInfo {
     /// Whether the pgbouncer mode is enabled.
     pub fn pg_bouncer(&self) -> bool {
         match self {
-            #[cfg(all(not(target_arch = "wasm32"), feature = "postgresql"))]
-            ConnectionInfo::Native(NativeConnectionInfo::Postgres(url)) => url.pg_bouncer(),
+            #[cfg(all(not(target_arch = "wasm32"), feature = "postgresql-native"))]
+            ConnectionInfo::Native(NativeConnectionInfo::Postgres(PostgresUrl::Native(url))) => url.pg_bouncer(),
             _ => false,
         }
     }
@@ -252,17 +311,22 @@ impl ConnectionInfo {
     /// and port on MySQL/Postgres, and the file path on SQLite.
     pub fn database_location(&self) -> String {
         match self {
-            #[cfg(not(target_arch = "wasm32"))]
+            #[cfg(any(
+                feature = "sqlite-native",
+                feature = "mysql-native",
+                feature = "postgresql-native",
+                feature = "mssql-native"
+            ))]
             ConnectionInfo::Native(info) => match info {
-                #[cfg(feature = "postgresql")]
+                #[cfg(feature = "postgresql-native")]
                 NativeConnectionInfo::Postgres(url) => format!("{}:{}", url.host(), url.port()),
-                #[cfg(feature = "mysql")]
+                #[cfg(feature = "mysql-native")]
                 NativeConnectionInfo::Mysql(url) => format!("{}:{}", url.host(), url.port()),
-                #[cfg(feature = "mssql")]
+                #[cfg(feature = "mssql-native")]
                 NativeConnectionInfo::Mssql(url) => format!("{}:{}", url.host(), url.port()),
-                #[cfg(feature = "sqlite")]
+                #[cfg(feature = "sqlite-native")]
                 NativeConnectionInfo::Sqlite { file_path, .. } => file_path.clone(),
-                #[cfg(feature = "sqlite")]
+                #[cfg(feature = "sqlite-native")]
                 NativeConnectionInfo::InMemorySqlite { .. } => "in-memory".into(),
             },
             ConnectionInfo::External(_) => "external".into(),
@@ -272,7 +336,12 @@ impl ConnectionInfo {
     #[allow(unused_variables)]
     pub fn set_version(&mut self, version: Option<String>) {
         match self {
-            #[cfg(not(target_arch = "wasm32"))]
+            #[cfg(any(
+                feature = "sqlite-native",
+                feature = "mysql-native",
+                feature = "postgresql-native",
+                feature = "mssql-native"
+            ))]
             ConnectionInfo::Native(native) => native.set_version(version),
             ConnectionInfo::External(_) => (),
         }
@@ -283,6 +352,53 @@ impl ConnectionInfo {
             #[cfg(feature = "mysql-native")]
             ConnectionInfo::Native(NativeConnectionInfo::Mysql(m)) => m.version(),
             _ => None,
+        }
+    }
+
+    pub fn as_native(&self) -> Option<&NativeConnectionInfo> {
+        match self {
+            #[cfg(any(
+                feature = "sqlite-native",
+                feature = "mysql-native",
+                feature = "postgresql-native",
+                feature = "mssql-native"
+            ))]
+            ConnectionInfo::Native(native) => Some(native),
+            _ => None,
+        }
+    }
+}
+
+/// General information about a SQL connection, provided by native Rust drivers.
+#[derive(Debug, Clone)]
+pub enum NativeConnectionInfo {
+    /// A PostgreSQL connection URL.
+    #[cfg(feature = "postgresql-native")]
+    Postgres(PostgresUrl),
+    /// A MySQL connection URL.
+    #[cfg(feature = "mysql-native")]
+    Mysql(MysqlUrl),
+    /// A SQL Server connection URL.
+    #[cfg(feature = "mssql-native")]
+    Mssql(MssqlUrl),
+    /// A SQLite connection URL.
+    #[cfg(feature = "sqlite-native")]
+    Sqlite {
+        /// The filesystem path of the SQLite database.
+        file_path: String,
+        /// The name the database is bound to - Always "main"
+        db_name: String,
+    },
+    #[cfg(feature = "sqlite-native")]
+    InMemorySqlite { db_name: String },
+}
+
+impl NativeConnectionInfo {
+    #[allow(unused)]
+    pub fn set_version(&mut self, version: Option<String>) {
+        #[cfg(feature = "mysql-native")]
+        if let NativeConnectionInfo::Mysql(c) = self {
+            c.set_version(version);
         }
     }
 }
@@ -344,7 +460,12 @@ impl SqlFamily {
 
     /// Get the max number of bind parameters for a single query, which in targets other
     /// than Wasm can be controlled with the env var QUERY_BATCH_SIZE.
-    #[cfg(not(target_arch = "wasm32"))]
+    #[cfg(any(
+        feature = "sqlite-native",
+        feature = "mysql-native",
+        feature = "postgresql-native",
+        feature = "mssql-native"
+    ))]
     pub fn max_bind_values(&self) -> usize {
         use std::sync::OnceLock;
         static BATCH_SIZE_OVERRIDE: OnceLock<Option<usize>> = OnceLock::new();
@@ -359,7 +480,12 @@ impl SqlFamily {
 
     /// Get the max number of bind parameters for a single query, in Wasm there's no
     /// environment, and we omit that knob.
-    #[cfg(target_arch = "wasm32")]
+    #[cfg(not(any(
+        feature = "sqlite-native",
+        feature = "mysql-native",
+        feature = "postgresql-native",
+        feature = "mssql-native"
+    )))]
     pub fn max_bind_values(&self) -> usize {
         self.default_max_bind_values()
     }
@@ -440,11 +566,11 @@ impl fmt::Display for SqlFamily {
 
 #[cfg(test)]
 mod tests {
-    #[cfg(any(feature = "sqlite", feature = "mysql"))]
+    #[cfg(any(feature = "sqlite-native", feature = "mysql-native"))]
     use super::*;
 
     #[test]
-    #[cfg(feature = "sqlite")]
+    #[cfg(feature = "sqlite-native")]
     fn sqlite_connection_info_from_str_interprets_relative_path_correctly() {
         let conn_info = ConnectionInfo::from_url("file:dev.db").unwrap();
 
@@ -457,7 +583,7 @@ mod tests {
     }
 
     #[test]
-    #[cfg(feature = "mysql")]
+    #[cfg(feature = "mysql-native")]
     fn mysql_connection_info_from_str() {
         let conn_info = ConnectionInfo::from_url("mysql://myuser:my%23pass%23word@lclhst:5432/mydb").unwrap();
 
@@ -466,7 +592,23 @@ mod tests {
             assert_eq!(url.password().unwrap(), "my#pass#word");
             assert_eq!(url.host(), "lclhst");
             assert_eq!(url.username(), "myuser");
-            assert_eq!(url.dbname(), "mydb");
+            assert_eq!(url.dbname(), Some("mydb"));
+        } else {
+            panic!("Wrong type of connection info, should be Mysql");
+        }
+    }
+
+    #[test]
+    #[cfg(feature = "mysql-native")]
+    fn mysql_connection_info_from_str_without_db_name() {
+        let conn_info = ConnectionInfo::from_url("mysql://myuser:my%23pass%23word@lclhst:5432").unwrap();
+
+        #[allow(irrefutable_let_patterns)]
+        if let ConnectionInfo::Native(NativeConnectionInfo::Mysql(url)) = conn_info {
+            assert_eq!(url.password().unwrap(), "my#pass#word");
+            assert_eq!(url.host(), "lclhst");
+            assert_eq!(url.username(), "myuser");
+            assert_eq!(url.dbname(), None);
         } else {
             panic!("Wrong type of connection info, should be Mysql");
         }

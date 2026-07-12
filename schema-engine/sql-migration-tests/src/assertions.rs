@@ -9,14 +9,13 @@ use pretty_assertions::assert_eq;
 use prisma_value::PrismaValue;
 use psl::datamodel_connector::Connector;
 use sql::{
+    ViewWalker,
     postgres::{ExtensionWalker, PostgresSchemaExt},
     walkers::{ForeignKeyWalker, IndexWalker, TableColumnWalker, TableWalker},
-    ViewWalker,
 };
 use sql_schema_describer::{
-    self as sql,
+    self as sql, ColumnTypeFamily, DefaultKind, DefaultValue, ForeignKeyAction, IndexType, SQLSortOrder, SqlSchema,
     postgres::{SQLOperatorClassKind, SqlIndexAlgorithm},
-    ColumnTypeFamily, DefaultKind, DefaultValue, ForeignKeyAction, IndexType, SQLSortOrder, SqlSchema,
 };
 use test_setup::{BitFlags, Tags};
 
@@ -191,13 +190,11 @@ impl SchemaAssertion {
     }
 
     fn print_context(&self) {
-        match &self.context {
-            Some(context) => println!("Test failure with context <{}>", context.red()),
-            None => {}
+        if let Some(context) = &self.context {
+            println!("Test failure with context <{}>", context.red())
         }
-        match &self.description {
-            Some(description) => println!("{}: {}", "Description".bold(), description.italic()),
-            None => {}
+        if let Some(description) = &self.description {
+            println!("{}: {}", "Description".bold(), description.italic())
         }
     }
 
@@ -297,15 +294,16 @@ impl SchemaAssertion {
 
 pub struct EnumAssertion<'a>(sql::EnumWalker<'a>);
 
-impl<'a> EnumAssertion<'a> {
+impl EnumAssertion<'_> {
     pub fn assert_namespace(self, namespace: &'static str) -> Self {
-        assert_eq!(self.0.namespace(), Some(namespace));
+        assert_eq!(self.0.explicit_namespace(), Some(namespace));
         self
     }
 
     pub fn assert_values(self, expected_values: &[&'static str]) -> Self {
         assert!(
-            self.0.values().len() == expected_values.len() && self.0.values().zip(expected_values).all(|(a, b)| a == *b),
+            self.0.values().len() == expected_values.len()
+                && self.0.values().zip(expected_values).all(|(a, b)| a == *b),
             "Assertion failed. The `{}` enum does not contain the expected variants.\nExpected:\n{:#?}\n\nFound:\n{:#?}\n",
             self.0.name(),
             expected_values,
@@ -325,18 +323,16 @@ pub struct TableAssertion<'a> {
 
 impl<'a> TableAssertion<'a> {
     fn print_context(&self) {
-        match &self.context {
-            Some(context) => println!("Test failure with context <{}>", context.red()),
-            None => {}
+        if let Some(context) = &self.context {
+            println!("Test failure with context <{}>", context.red())
         }
-        match &self.description {
-            Some(description) => println!("{}: {}", "Description".bold(), description.italic()),
-            None => {}
+        if let Some(description) = &self.description {
+            println!("{}: {}", "Description".bold(), description.italic())
         }
     }
 
     pub fn assert_namespace(self, namespace: &str) -> Self {
-        if self.table.namespace() != Some(namespace) {
+        if self.table.explicit_namespace() != Some(namespace) {
             self.print_context();
             println!(
                 "\n  {} has failed because table {}.{} {}",
@@ -521,7 +517,7 @@ pub struct ColumnAssertion<'a> {
     column: TableColumnWalker<'a>,
 }
 
-impl<'a> ColumnAssertion<'a> {
+impl ColumnAssertion<'_> {
     pub fn assert_auto_increments(self) -> Self {
         assert!(
             self.column.is_autoincrement(),
@@ -594,7 +590,7 @@ impl<'a> ColumnAssertion<'a> {
         let found = self.column.default();
 
         match found.as_ref().map(|d| d.kind()) {
-            Some(DefaultKind::Value(ref val)) => assert!(
+            Some(DefaultKind::Value(val)) => assert!(
                 val == expected,
                 "Assertion failed. Expected the default value for `{}` to be `{:?}`, got `{:?}`",
                 self.column.name(),
@@ -799,7 +795,7 @@ pub struct PrimaryKeyAssertion<'a> {
     tags: BitFlags<Tags>,
 }
 
-impl<'a> PrimaryKeyAssertion<'a> {
+impl PrimaryKeyAssertion<'_> {
     pub fn assert_columns(self, column_names: &[&str]) -> Self {
         assert_eq!(&self.pk.column_names().collect::<Vec<_>>(), column_names);
 
@@ -879,7 +875,7 @@ pub struct ForeignKeyAssertion<'a> {
     tags: BitFlags<Tags>,
 }
 
-impl<'a> ForeignKeyAssertion<'a> {
+impl ForeignKeyAssertion<'_> {
     #[track_caller]
     pub fn assert_references(self, table: &str, columns: &[&str]) -> Self {
         assert!(
@@ -929,7 +925,7 @@ pub struct IndexAssertion<'a> {
     tags: BitFlags<Tags>,
 }
 
-impl<'a> IndexAssertion<'a> {
+impl IndexAssertion<'_> {
     #[track_caller]
     pub fn assert_name(self, name: &str) -> Self {
         assert_eq!(self.index.name(), name);
@@ -1015,6 +1011,40 @@ impl<'a> IndexAssertion<'a> {
 
         self
     }
+
+    #[track_caller]
+    pub fn assert_predicate(self, expected_predicate: &str) -> Self {
+        assert_eq!(
+            self.index.predicate(),
+            Some(expected_predicate),
+            "Assertion failed. Expected predicate to be `{}`, but was `{:?}`.",
+            expected_predicate,
+            self.index.predicate()
+        );
+
+        self
+    }
+
+    #[track_caller]
+    pub fn assert_no_predicate(self) -> Self {
+        assert!(
+            self.index.predicate().is_none(),
+            "Assertion failed. Expected no predicate, but found `{:?}`.",
+            self.index.predicate()
+        );
+
+        self
+    }
+
+    #[track_caller]
+    pub fn assert_is_partial(self) -> Self {
+        assert!(
+            self.index.is_partial(),
+            "Assertion failed. Expected index to be a partial index, but it was not."
+        );
+
+        self
+    }
 }
 
 #[derive(Clone, Copy)]
@@ -1022,10 +1052,11 @@ pub struct PostgresExtensionAssertion<'a> {
     extension: ExtensionWalker<'a>,
 }
 
-impl<'a> PostgresExtensionAssertion<'a> {
+impl PostgresExtensionAssertion<'_> {
     pub fn assert_schema(self, expected_schema: &str) -> Self {
         assert_eq!(
-            self.extension.schema(), expected_schema,
+            self.extension.schema(),
+            expected_schema,
             "Assertion failed. Expected the extension to be in the {expected_schema} schema, but was in {} schema instead.",
             self.extension.schema()
         );
@@ -1035,7 +1066,8 @@ impl<'a> PostgresExtensionAssertion<'a> {
 
     pub fn assert_version(self, expected_version: &str) -> Self {
         assert_eq!(
-            self.extension.version(), expected_version,
+            self.extension.version(),
+            expected_version,
             "Assertion failed. Expected the extension to be of version {expected_version}, but was of version {} instead.",
             self.extension.version()
         );
@@ -1048,7 +1080,7 @@ fn print_tables(schema: &SqlSchema) {
     println!("\n  {}", "Tables in database:".italic());
     schema
         .table_walkers()
-        .map(|table| (table.name(), table.namespace()))
+        .map(|table| (table.name(), table.explicit_namespace()))
         .for_each(|(t, ns)| {
             println!(
                 "\t - {}",

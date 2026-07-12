@@ -900,7 +900,7 @@ mod many_count_rel {
         // Nullable counts should be COALESCE'd to 0.
         insta::assert_snapshot!(
           run_query!(&runner, r#"{
-          findManyPost {
+          findManyPost(orderBy: {id: "asc"}) {
             _count { comments }
           }
         }

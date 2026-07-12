@@ -68,13 +68,9 @@ pub struct UniqueKeyViolation {
 }
 
 #[derive(Debug, UserFacingError, Serialize)]
-#[user_facing(
-    code = "P2003",
-    message = "Foreign key constraint failed on the field: `{field_name}`"
-)]
+#[user_facing(code = "P2003", message = "Foreign key constraint violated on the {constraint}")]
 pub struct ForeignKeyViolation {
-    /// Field name from one model from Prisma schema
-    pub field_name: String,
+    pub constraint: DatabaseConstraint,
 }
 
 #[derive(Debug, UserFacingError, Serialize)]
@@ -204,7 +200,7 @@ pub struct InputError {
 }
 
 #[derive(Debug, UserFacingError, Serialize)]
-#[user_facing(code = "P2020", message = "Value out of range for the type. {details}")]
+#[user_facing(code = "P2020", message = "Value out of range for the type: {details}")]
 pub struct ValueOutOfRange {
     pub details: String,
 }
@@ -285,9 +281,9 @@ pub struct QueryParameterLimitExceeded {
 #[derive(Debug, UserFacingError, Serialize)]
 #[user_facing(
     code = "P2030",
-    message = "Cannot find a fulltext index to use for the search, try adding a @@fulltext([Fields...]) to your schema"
+    message = "Cannot find a fulltext index to use for the native search, try adding a @@fulltext([Fields...]) to your schema"
 )]
-pub struct MissingFullTextSearchIndex {}
+pub struct MissingNativeFullTextSearchIndex {}
 
 #[derive(Debug, UserFacingError, Serialize)]
 #[user_facing(
@@ -301,7 +297,6 @@ pub struct MongoReplicaSetRequired {}
     code = "P2032",
     message = "Error converting field \"{field}\" of expected non-nullable type \"{expected_type}\", found incompatible value of \"{found}\"."
 )]
-
 pub struct MissingFieldsInModel {
     pub field: String,
     pub expected_type: String,
@@ -310,7 +305,6 @@ pub struct MissingFieldsInModel {
 
 #[derive(Debug, UserFacingError, Serialize)]
 #[user_facing(code = "P2033", message = "{details}")]
-
 pub struct ValueFitError {
     pub details: String,
 }

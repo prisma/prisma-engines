@@ -1,6 +1,5 @@
 datasource db {
   provider = "mongodb"
-  url = "mongodb://"
 }
 
 model Parent {
@@ -17,9 +16,9 @@ model Child {
 }
 
 // [1;93mwarning[0m: [1mWarning validating field `child` in model `Parent`: Field Parent.childId and Child.parentId must have the same native type for MongoDB to join those collections correctly. Consider updating those fields to either use '@db.ObjectId' or '@db.String'. Beware that this will become an error in the future.[0m
-//   [1;94m-->[0m  [4mschema.prisma:9[0m
+//   [1;94m-->[0m  [4mschema.prisma:8[0m
 // [1;94m   | [0m
-// [1;94m 8 | [0m
-// [1;94m 9 | [0m  [1;93mchildId String @unique @db.ObjectId[0m
-// [1;94m10 | [0m  child   Child? @relation(fields: [childId], references: [parentId])
+// [1;94m 7 | [0m
+// [1;94m 8 | [0m  [1;93mchildId String @unique @db.ObjectId[0m
+// [1;94m 9 | [0m  child   Child? @relation(fields: [childId], references: [parentId])
 // [1;94m   | [0m

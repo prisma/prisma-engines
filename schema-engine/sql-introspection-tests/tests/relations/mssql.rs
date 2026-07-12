@@ -518,7 +518,7 @@ async fn a_self_relation(api: &mut TestApi) -> TestResult {
             id INTEGER,
             recruited_by INTEGER,
             direct_report INTEGER,
-            
+
             CONSTRAINT [User_pkey] PRIMARY KEY ([id]),
             CONSTRAINT [recruited_by_fkey] FOREIGN KEY ([recruited_by]) REFERENCES [{schema}].[User]([id]),
             CONSTRAINT [direct_report_fkey] FOREIGN KEY ([direct_report]) REFERENCES [{schema}].[User]([id])
@@ -531,12 +531,11 @@ async fn a_self_relation(api: &mut TestApi) -> TestResult {
 
     let expected = expect![[r#"
         generator client {
-          provider = "prisma-client-js"
+          provider = "prisma-client"
         }
 
         datasource db {
           provider = "sqlserver"
-          url      = "env(TEST_DATABASE_URL)"
         }
 
         model User {

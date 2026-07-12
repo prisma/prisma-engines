@@ -1,8 +1,8 @@
 use lsp_types::{Diagnostic, DiagnosticSeverity};
-use once_cell::sync::Lazy;
-use prisma_fmt::offset_to_position;
-use psl::{diagnostics::Span, SourceFile};
-use std::{fmt::Write as _, io::Write as _, path::PathBuf};
+
+use prisma_fmt::offsets::span_to_range;
+use psl::{SourceFile, diagnostics::Span};
+use std::{fmt::Write as _, io::Write as _, path::PathBuf, sync::LazyLock};
 
 use crate::helpers::load_schema_files;
 
@@ -12,14 +12,14 @@ const SCENARIOS_PATH: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/code_ac
  * we need a way to designate that file somehow.
  */
 const TARGET_SCHEMA_FILE: &str = "_target.prisma";
-static UPDATE_EXPECT: Lazy<bool> = Lazy::new(|| std::env::var("UPDATE_EXPECT").is_ok());
+static UPDATE_EXPECT: LazyLock<bool> = LazyLock::new(|| std::env::var("UPDATE_EXPECT").is_ok());
 
 fn parse_schema_diagnostics(files: &[(String, String)], initiating_file_name: &str) -> Option<Vec<Diagnostic>> {
     let sources: Vec<_> = files
         .iter()
         .map(|(name, content)| (name.to_owned(), SourceFile::from(content)))
         .collect();
-    let schema = psl::validate_multi_file(&sources);
+    let schema = psl::validate_multi_file_without_extensions(&sources);
 
     let file_id = schema.db.file_id(initiating_file_name).unwrap();
     let source = schema.db.source(file_id);
@@ -58,10 +58,7 @@ fn create_diagnostic(severity: DiagnosticSeverity, message: &str, span: Span, so
     Diagnostic {
         severity: Some(severity),
         message: message.to_owned(),
-        range: lsp_types::Range {
-            start: offset_to_position(span.start, source),
-            end: offset_to_position(span.end, source),
-        },
+        range: span_to_range(span, source),
         ..Default::default()
     }
 }
@@ -92,10 +89,7 @@ pub(crate) fn test_scenario(scenario_name: &str) {
             .as_str()
     };
 
-    let diagnostics = match parse_schema_diagnostics(&schema_files, initiating_file_name) {
-        Some(diagnostics) => diagnostics,
-        None => Vec::new(),
-    };
+    let diagnostics = parse_schema_diagnostics(&schema_files, initiating_file_name).unwrap_or_default();
 
     path.clear();
     write!(path, "{SCENARIOS_PATH}/{scenario_name}/result.json").unwrap();

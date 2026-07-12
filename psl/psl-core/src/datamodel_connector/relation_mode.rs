@@ -1,5 +1,5 @@
 use crate::datamodel_connector::ReferentialAction;
-use enumflags2::{bitflags, BitFlags};
+use enumflags2::{BitFlags, bitflags};
 use std::fmt;
 
 /// Defines the part of the stack where referential actions are handled.
@@ -32,6 +32,7 @@ impl RelationMode {
     }
 }
 
+#[allow(clippy::derivable_impls)] // `#[default]` attribute can't be used in bitflags macro
 impl Default for RelationMode {
     fn default() -> Self {
         Self::ForeignKeys

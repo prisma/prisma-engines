@@ -9,7 +9,7 @@ pub fn derive_simple_user_facing_error(input: proc_macro::TokenStream) -> proc_m
         _ => {
             return syn::Error::new_spanned(input, "derive works only on structs")
                 .to_compile_error()
-                .into()
+                .into();
         }
     };
 
@@ -49,7 +49,7 @@ pub fn derive_user_facing_error(input: proc_macro::TokenStream) -> proc_macro::T
         _ => {
             return syn::Error::new_spanned(input, "derive works only on structs")
                 .to_compile_error()
-                .into()
+                .into();
         }
     };
 
@@ -64,7 +64,7 @@ pub fn derive_user_facing_error(input: proc_macro::TokenStream) -> proc_macro::T
         syn::Fields::Unnamed(unnamed) => {
             return syn::Error::new_spanned(unnamed, "The error fields must be named")
                 .to_compile_error()
-                .into()
+                .into();
         }
     };
 
@@ -100,7 +100,7 @@ impl<'a> UserErrorDeriveInput<'a> {
 
         for attr in &input.attrs {
             if !attr
-                .path
+                .path()
                 .get_ident()
                 .map(|ident| ident == "user_facing")
                 .unwrap_or(false)
@@ -111,13 +111,16 @@ impl<'a> UserErrorDeriveInput<'a> {
             for namevalue in attr.parse_args_with(|stream: &'_ syn::parse::ParseBuffer| {
                 syn::punctuated::Punctuated::<syn::MetaNameValue, syn::Token![,]>::parse_terminated(stream)
             })? {
-                let litstr = match namevalue.lit {
-                    syn::Lit::Str(litstr) => litstr,
+                let litstr = match namevalue.value {
+                    syn::Expr::Lit(syn::ExprLit {
+                        lit: syn::Lit::Str(litstr),
+                        ..
+                    }) => litstr,
                     other => {
                         return Err(syn::Error::new_spanned(
                             other,
                             "Expected attribute of the form `#[user_facing(code = \"...\", message = \"...\")]`",
-                        ))
+                        ));
                     }
                 };
 
@@ -132,7 +135,7 @@ impl<'a> UserErrorDeriveInput<'a> {
                         return Err(syn::Error::new_spanned(
                             other,
                             "Expected attribute of the form `#[user_facing(code = \"...\", message = \"...\")]`",
-                        ))
+                        ));
                     }
                 }
             }

@@ -1,17 +1,42 @@
+use crate::offsets::position_to_offset;
 use enumflags2::BitFlags;
 use log::*;
 use lsp_types::*;
 use psl::{
-    datamodel_connector::Connector,
-    diagnostics::{FileId, Span},
+    Diagnostics, PreviewFeature,
+    diagnostics::Span,
     error_tolerant_parse_configuration,
-    parser_database::{ast, ParserDatabase, SourceFile},
-    Configuration, Datasource, Diagnostics, Generator, PreviewFeature,
+    parser_database::{NoExtensionTypes, ParserDatabase, SourceFile, ast},
+    schema_ast::ast::AttributePosition,
 };
 
-use crate::position_to_offset;
+use crate::LSPContext;
 
 mod datasource;
+mod multi_schema;
+mod referential_actions;
+
+pub(super) type CompletionContext<'a> = LSPContext<'a, CompletionParams>;
+
+impl<'a> CompletionContext<'a> {
+    pub(super) fn namespaces(&'a self) -> &'a [(String, Span)] {
+        self.datasource().map(|ds| ds.namespaces.as_slice()).unwrap_or(&[])
+    }
+
+    #[allow(dead_code)]
+    pub(super) fn preview_features(&self) -> BitFlags<PreviewFeature> {
+        self.generator()
+            .and_then(|generator| generator.preview_features)
+            .unwrap_or_default()
+    }
+
+    pub(super) fn position(&self) -> Option<usize> {
+        let pos = self.params.text_document_position.position;
+        let initiating_doc = self.initiating_file_source();
+
+        position_to_offset(&pos, initiating_doc)
+    }
+}
 
 pub(crate) fn empty_completion_list() -> CompletionList {
     CompletionList {
@@ -30,7 +55,7 @@ pub(crate) fn completion(schema_files: Vec<(String, SourceFile)>, params: Comple
 
     let db = {
         let mut diag = Diagnostics::new();
-        ParserDatabase::new(&schema_files, &mut diag)
+        ParserDatabase::new(&schema_files, &mut diag, &NoExtensionTypes)
     };
 
     let Some(initiating_file_id) = db.file_id(params.text_document_position.text_document.uri.as_str()) else {
@@ -38,20 +63,10 @@ pub(crate) fn completion(schema_files: Vec<(String, SourceFile)>, params: Comple
         return empty_completion_list();
     };
 
-    let initiating_doc = db.source(initiating_file_id);
-    let position = if let Some(pos) = super::position_to_offset(&params.text_document_position.position, initiating_doc)
-    {
-        pos
-    } else {
-        warn!("Received a position outside of the document boundaries in CompletionParams");
-        return empty_completion_list();
-    };
-
     let ctx = CompletionContext {
         config: &config,
         params: &params,
         db: &db,
-        position,
         initiating_file_id,
     };
 
@@ -60,134 +75,90 @@ pub(crate) fn completion(schema_files: Vec<(String, SourceFile)>, params: Comple
     list
 }
 
-#[derive(Debug, Clone, Copy)]
-struct CompletionContext<'a> {
-    config: &'a Configuration,
-    params: &'a CompletionParams,
-    db: &'a ParserDatabase,
-    position: usize,
-    initiating_file_id: FileId,
-}
-
-impl<'a> CompletionContext<'a> {
-    pub(crate) fn connector(self) -> &'static dyn Connector {
-        self.datasource()
-            .map(|ds| ds.active_connector)
-            .unwrap_or(&psl::datamodel_connector::EmptyDatamodelConnector)
-    }
-
-    pub(crate) fn namespaces(self) -> &'a [(String, Span)] {
-        self.datasource().map(|ds| ds.namespaces.as_slice()).unwrap_or(&[])
-    }
-
-    pub(crate) fn preview_features(self) -> BitFlags<PreviewFeature> {
-        self.generator()
-            .and_then(|gen| gen.preview_features)
-            .unwrap_or_default()
-    }
-
-    fn datasource(self) -> Option<&'a Datasource> {
-        self.config.datasources.first()
-    }
-
-    fn generator(self) -> Option<&'a Generator> {
-        self.config.generators.first()
-    }
-}
-
 fn push_ast_completions(ctx: CompletionContext<'_>, completion_list: &mut CompletionList) {
+    let position = match ctx.position() {
+        Some(pos) => pos,
+        None => {
+            warn!("Received a position outside of the document boundaries in CompletionParams");
+            completion_list.is_incomplete = true;
+            return;
+        }
+    };
+
     let relation_mode = ctx
         .config
         .relation_mode()
         .unwrap_or_else(|| ctx.connector().default_relation_mode());
 
-    match ctx.db.ast(ctx.initiating_file_id).find_at_position(ctx.position) {
+    let find_at_position = ctx.db.ast(ctx.initiating_file_id).find_at_position(position);
+
+    match find_at_position {
         ast::SchemaPosition::Model(
             _model_id,
-            ast::ModelPosition::Field(_, ast::FieldPosition::Attribute("relation", _, Some(attr_name))),
+            ast::ModelPosition::Field(
+                _,
+                ast::FieldPosition::Attribute("relation", _, AttributePosition::Argument(attr_name)),
+            ),
         ) if attr_name == "onDelete" || attr_name == "onUpdate" => {
             for referential_action in ctx.connector().referential_actions(&relation_mode).iter() {
-                completion_list.items.push(CompletionItem {
-                    label: referential_action.as_str().to_owned(),
-                    kind: Some(CompletionItemKind::ENUM),
-                    // what is the difference between detail and documentation?
-                    detail: Some(referential_action.documentation().to_owned()),
-                    ..Default::default()
-                });
+                referential_actions::referential_action_completion(completion_list, referential_action);
+            }
+        }
+
+        ast::SchemaPosition::Model(
+            _model_id,
+            ast::ModelPosition::Field(
+                _,
+                ast::FieldPosition::Attribute("relation", _, AttributePosition::ArgumentValue(attr_name, value)),
+            ),
+        ) => {
+            if let Some(attr_name) = attr_name
+                && (attr_name == "onDelete" || attr_name == "onUpdate")
+            {
+                ctx.connector()
+                    .referential_actions(&relation_mode)
+                    .iter()
+                    .filter(|ref_action| ref_action.to_string().starts_with(&value))
+                    .for_each(|referential_action| {
+                        referential_actions::referential_action_completion(completion_list, referential_action)
+                    });
             }
         }
 
         ast::SchemaPosition::Model(
             _model_id,
             ast::ModelPosition::ModelAttribute("schema", _, ast::AttributePosition::Attribute),
-        ) if ctx.preview_features().contains(PreviewFeature::MultiSchema) => {
+        ) => {
             push_namespaces(ctx, completion_list);
         }
 
         ast::SchemaPosition::Enum(
             _enum_id,
             ast::EnumPosition::EnumAttribute("schema", _, ast::AttributePosition::Attribute),
-        ) if ctx.preview_features().contains(PreviewFeature::MultiSchema) => {
+        ) => {
             push_namespaces(ctx, completion_list);
         }
 
         ast::SchemaPosition::DataSource(_source_id, ast::SourcePosition::Source) => {
-            if !ds_has_prop(ctx, "provider") {
+            if !ds_has_prop(&ctx, "provider") {
                 datasource::provider_completion(completion_list);
             }
 
-            if !ds_has_prop(ctx, "url") {
-                datasource::url_completion(completion_list);
-            }
-
-            if !ds_has_prop(ctx, "shadowDatabaseUrl") {
-                datasource::shadow_db_completion(completion_list);
-            }
-
-            if !ds_has_prop(ctx, "directUrl") {
-                datasource::direct_url_completion(completion_list);
-            }
-
-            if !ds_has_prop(ctx, "relationMode") {
+            if !ds_has_prop(&ctx, "relationMode") {
                 datasource::relation_mode_completion(completion_list);
             }
 
             ctx.connector().datasource_completions(ctx.config, completion_list);
         }
 
-        ast::SchemaPosition::DataSource(
-            _source_id,
-            ast::SourcePosition::Property("url", ast::PropertyPosition::FunctionValue("env")),
-        ) => datasource::url_env_db_completion(completion_list, "url", ctx),
-
-        ast::SchemaPosition::DataSource(
-            _source_id,
-            ast::SourcePosition::Property("directUrl", ast::PropertyPosition::FunctionValue("env")),
-        ) => datasource::url_env_db_completion(completion_list, "directUrl", ctx),
-
-        ast::SchemaPosition::DataSource(
-            _source_id,
-            ast::SourcePosition::Property("shadowDatabaseUrl", ast::PropertyPosition::FunctionValue("env")),
-        ) => datasource::url_env_db_completion(completion_list, "shadowDatabaseUrl", ctx),
-
-        ast::SchemaPosition::DataSource(_source_id, ast::SourcePosition::Property("url", _))
-        | ast::SchemaPosition::DataSource(_source_id, ast::SourcePosition::Property("directUrl", _))
-        | ast::SchemaPosition::DataSource(_source_id, ast::SourcePosition::Property("shadowDatabaseUrl", _)) => {
-            datasource::url_env_completion(completion_list);
-            datasource::url_quotes_completion(completion_list);
-        }
-
         position => ctx.connector().datamodel_completions(ctx.db, position, completion_list),
     }
 }
 
-fn ds_has_prop(ctx: CompletionContext<'_>, prop: &str) -> bool {
+fn ds_has_prop(ctx: &CompletionContext<'_>, prop: &str) -> bool {
     if let Some(ds) = ctx.datasource() {
         match prop {
             "relationMode" => ds.relation_mode_defined(),
-            "directurl" => ds.direct_url_defined(),
-            "shadowDatabaseUrl" => ds.shadow_url_defined(),
-            "url" => ds.url_defined(),
             "provider" => ds.provider_defined(),
             _ => false,
         }
@@ -204,12 +175,7 @@ fn push_namespaces(ctx: CompletionContext<'_>, completion_list: &mut CompletionL
             namespace.to_string()
         };
 
-        completion_list.items.push(CompletionItem {
-            label: String::from(namespace),
-            insert_text: Some(insert_text),
-            kind: Some(CompletionItemKind::PROPERTY),
-            ..Default::default()
-        })
+        multi_schema::schema_namespace_completion(completion_list, namespace, insert_text);
     }
 }
 

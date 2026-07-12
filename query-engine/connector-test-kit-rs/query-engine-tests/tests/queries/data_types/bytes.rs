@@ -2,7 +2,7 @@ use query_engine_tests::*;
 
 #[test_suite(schema(common_nullable_types))]
 mod bytes {
-    use query_engine_tests::{run_query, EngineProtocol, Runner};
+    use query_engine_tests::{EngineProtocol, Runner, run_query};
 
     #[test_suite]
     mod issue_687 {
@@ -70,7 +70,7 @@ mod bytes {
 
         async fn create_child(runner: &Runner, data: &str) -> TestResult<()> {
             runner
-                .query(format!("mutation {{ createOneChild(data: {}) {{ childId }} }}", data))
+                .query(format!("mutation {{ createOneChild(data: {data}) {{ childId }} }}"))
                 .await?
                 .assert_success();
             Ok(())
@@ -78,7 +78,7 @@ mod bytes {
 
         async fn create_parent(runner: &Runner, data: &str) -> TestResult<()> {
             runner
-                .query(format!("mutation {{ createOneParent(data: {}) {{ id }} }}", data))
+                .query(format!("mutation {{ createOneParent(data: {data}) {{ id }} }}"))
                 .await?
                 .assert_success();
             Ok(())
@@ -174,7 +174,7 @@ mod bytes {
 
     async fn create_row(runner: &Runner, data: &str) -> TestResult<()> {
         runner
-            .query(format!("mutation {{ createOneTestModel(data: {}) {{ id }} }}", data))
+            .query(format!("mutation {{ createOneTestModel(data: {data}) {{ id }} }}"))
             .await?
             .assert_success();
         Ok(())

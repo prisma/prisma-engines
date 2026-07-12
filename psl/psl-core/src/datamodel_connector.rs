@@ -20,20 +20,21 @@ pub use self::{
     completions::format_completion_docs,
     empty_connector::EmptyDatamodelConnector,
     filters::*,
-    native_types::{NativeTypeArguments, NativeTypeConstructor, NativeTypeInstance},
+    native_types::{AllowedType, NativeTypeArguments, NativeTypeConstructor, NativeTypeInstance, NativeTypeParseError},
     relation_mode::RelationMode,
 };
 
-use crate::{configuration::DatasourceConnectorData, Configuration, Datasource, PreviewFeature};
+use crate::{Configuration, Datasource, PreviewFeature, ValidatedSchema, configuration::DatasourceConnectorData};
 use chrono::{DateTime, FixedOffset};
 use diagnostics::{DatamodelError, Diagnostics, NativeTypeErrorFactory, Span};
 use enumflags2::BitFlags;
 use lsp_types::CompletionList;
 use parser_database::{
+    ExtensionTypes, IndexAlgorithm, ParserDatabase, ReferentialAction, ScalarFieldType, ScalarType,
     ast::{self, SchemaPosition},
-    walkers, IndexAlgorithm, ParserDatabase, ReferentialAction, ScalarType,
+    walkers,
 };
-use std::{borrow::Cow, collections::HashMap, str::FromStr};
+use std::{borrow::Cow, collections::HashMap};
 
 pub const EXTENSIONS_KEY: &str = "extensions";
 
@@ -58,6 +59,11 @@ pub trait Connector: Send + Sync {
 
     /// The static list of capabilities for the connector.
     fn capabilities(&self) -> ConnectorCapabilities;
+
+    /// The connector-specific name of the `fullTextSearch` preview feature.
+    fn native_full_text_search_preview_feature(&self) -> Option<PreviewFeature> {
+        None
+    }
 
     /// The maximum length of constraint names in bytes. Connectors without a
     /// limit should return usize::MAX.
@@ -141,7 +147,7 @@ pub trait Connector: Send + Sync {
     fn validate_native_type_arguments(
         &self,
         _native_type: &NativeTypeInstance,
-        _scalar_type: &ScalarType,
+        _scalar_type: Option<ScalarType>,
         _span: Span,
         _: &mut Diagnostics,
     ) {
@@ -149,6 +155,7 @@ pub trait Connector: Send + Sync {
 
     fn validate_enum(&self, _enum: walkers::EnumWalker<'_>, _: &mut Diagnostics) {}
     fn validate_model(&self, _model: walkers::ModelWalker<'_>, _: RelationMode, _: &mut Diagnostics) {}
+    fn validate_view(&self, _view: walkers::ModelWalker<'_>, _: &mut Diagnostics) {}
     fn validate_relation_field(&self, _field: walkers::RelationFieldWalker<'_>, _: &mut Diagnostics) {}
     fn validate_datasource(&self, _: BitFlags<PreviewFeature>, _: &Datasource, _: &mut Diagnostics) {}
 
@@ -171,24 +178,25 @@ pub trait Connector: Send + Sync {
 
     /// Returns all available native type constructors available through this connector.
     /// Powers the auto completion of the VSCode plugin.
-    fn available_native_type_constructors(&self) -> &'static [NativeTypeConstructor];
+    fn available_native_type_constructors(&self) -> &[NativeTypeConstructor];
 
     /// Returns the default scalar type for the given native type
-    fn scalar_type_for_native_type(&self, native_type: &NativeTypeInstance) -> ScalarType;
+    fn scalar_type_for_native_type(
+        &self,
+        native_type: &NativeTypeInstance,
+        extension_types: &dyn ExtensionTypes,
+    ) -> Option<ScalarFieldType>;
 
     /// On each connector, each built-in Prisma scalar type (`Boolean`,
     /// `String`, `Float`, etc.) has a corresponding native type.
-    fn default_native_type_for_scalar_type(&self, scalar_type: &ScalarType) -> Option<NativeTypeInstance>;
-
-    /// Same mapping as `default_native_type_for_scalar_type()`, but in the opposite direction.
-    fn native_type_is_default_for_scalar_type(
+    fn default_native_type_for_scalar_type(
         &self,
-        native_type: &NativeTypeInstance,
-        scalar_type: &ScalarType,
-    ) -> bool;
+        scalar_type: &ScalarFieldType,
+        schema: &ValidatedSchema,
+    ) -> Option<NativeTypeInstance>;
 
     /// Debug/error representation of a native type.
-    fn native_type_to_parts(&self, native_type: &NativeTypeInstance) -> (&'static str, Vec<String>);
+    fn native_type_to_parts<'t>(&self, native_type: &'t NativeTypeInstance) -> (&'t str, Cow<'t, [String]>);
 
     fn find_native_type_constructor(&self, name: &str) -> Option<&NativeTypeConstructor> {
         self.available_native_type_constructors()
@@ -285,6 +293,26 @@ pub trait Connector: Send + Sync {
     ) -> prisma_value::PrismaValueResult<Vec<u8>> {
         unreachable!("This method is only implemented on connectors with lateral join support.")
     }
+
+    fn is_sql(&self) -> bool {
+        self.flavour().is_sql()
+    }
+
+    fn is_mongo(&self) -> bool {
+        self.flavour().is_mongo()
+    }
+
+    fn supports_shard_keys(&self) -> bool {
+        false
+    }
+
+    fn does_manage_udts(&self) -> bool {
+        false
+    }
+
+    fn can_assume_strict_equality_in_joins(&self) -> bool {
+        false
+    }
 }
 
 #[derive(Copy, Clone, Debug, PartialEq)]
@@ -297,17 +325,13 @@ pub enum Flavour {
     Sqlite,
 }
 
-impl FromStr for Flavour {
-    type Err = String;
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s.to_lowercase().as_str() {
-            "mysql" => Ok(Self::Mysql),
-            "postgres" => Ok(Self::Postgres),
-            "cockroachdb" => Ok(Self::Cockroach),
-            "mssql" => Ok(Self::Sqlserver),
-            "sqlite" => Ok(Self::Sqlite),
-            _ => Err(format!("Unknown flavour: {}", s)),
-        }
+impl Flavour {
+    pub fn is_sql(&self) -> bool {
+        !self.is_mongo()
+    }
+
+    pub fn is_mongo(&self) -> bool {
+        matches!(self, Flavour::Mongo)
     }
 }
 

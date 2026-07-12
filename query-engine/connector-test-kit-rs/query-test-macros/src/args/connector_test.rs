@@ -1,10 +1,10 @@
 use std::fmt::Display;
 
 use super::*;
-use darling::{FromMeta, ToTokens};
+use darling::{FromMeta, ToTokens, ast::NestedMeta};
 use proc_macro2::Span;
 use quote::quote;
-use syn::{spanned::Spanned, Ident, Meta, Path};
+use syn::{Ident, Meta, Path, spanned::Spanned};
 
 type ConnectorTag = (String, Option<String>);
 
@@ -24,6 +24,12 @@ pub struct ConnectorTestArgs {
 
     #[darling(default)]
     pub exclude_features: ExcludeFeatures,
+
+    #[darling(default)]
+    pub only_executors: Executors,
+
+    #[darling(default)]
+    pub exclude_executors: Executors,
 
     #[darling(default)]
     pub capabilities: RunOnlyForCapabilities,
@@ -56,7 +62,6 @@ impl ConnectorTestArgs {
     }
 }
 
-#[allow(dead_code)]
 #[derive(Debug)]
 pub enum RelationMode {
     ForeignKeys,
@@ -88,7 +93,7 @@ pub struct SchemaHandler {
 }
 
 impl darling::FromMeta for SchemaHandler {
-    fn from_list(items: &[syn::NestedMeta]) -> Result<Self, darling::Error> {
+    fn from_list(items: &[NestedMeta]) -> Result<Self, darling::Error> {
         if items.len() != 1 {
             return Err(darling::Error::unsupported_shape(
                 "Expected `schema` to contain exactly one function pointer to a schema handler.",
@@ -98,7 +103,7 @@ impl darling::FromMeta for SchemaHandler {
 
         let item = items.first().unwrap();
         match item {
-            syn::NestedMeta::Meta(Meta::Path(p)) => Ok(Self {
+            NestedMeta::Meta(Meta::Path(p)) => Ok(Self {
                 // Todo validate signature somehow
                 handler_path: p.clone(),
             }),
@@ -147,7 +152,7 @@ impl DbSchemas {
 }
 
 impl darling::FromMeta for DbSchemas {
-    fn from_list(items: &[syn::NestedMeta]) -> Result<Self, darling::Error> {
+    fn from_list(items: &[NestedMeta]) -> Result<Self, darling::Error> {
         let db_schemas = strings_to_list("DbSchemas", items)?;
         Ok(DbSchemas { db_schemas })
     }
@@ -165,27 +170,27 @@ impl DBExtensions {
 }
 
 impl darling::FromMeta for DBExtensions {
-    fn from_list(items: &[syn::NestedMeta]) -> Result<Self, darling::Error> {
+    fn from_list(items: &[NestedMeta]) -> Result<Self, darling::Error> {
         let db_extensions = strings_to_list("DbExtensions", items)?;
         Ok(Self { db_extensions })
     }
 }
 
 impl darling::FromMeta for ExcludeFeatures {
-    fn from_list(items: &[syn::NestedMeta]) -> Result<Self, darling::Error> {
+    fn from_list(items: &[NestedMeta]) -> Result<Self, darling::Error> {
         let features = strings_to_list("Preview Features", items)?;
 
         Ok(ExcludeFeatures { features })
     }
 }
 
-fn strings_to_list(name: &str, items: &[syn::NestedMeta]) -> Result<Vec<String>, darling::Error> {
+fn strings_to_list(name: &str, items: &[NestedMeta]) -> Result<Vec<String>, darling::Error> {
     let error = format!("{name} can only be string literals.");
     items
         .iter()
         .map(|i| match i {
-            syn::NestedMeta::Meta(m) => Err(darling::Error::unexpected_type(error.as_str()).with_span(&m.span())),
-            syn::NestedMeta::Lit(l) => match l {
+            NestedMeta::Meta(m) => Err(darling::Error::unexpected_type(error.as_str()).with_span(&m.span())),
+            NestedMeta::Lit(l) => match l {
                 syn::Lit::Str(s) => Ok(s.value()),
                 _ => Err(darling::Error::unexpected_type(&error).with_span(&l.span())),
             },
@@ -194,13 +199,30 @@ fn strings_to_list(name: &str, items: &[syn::NestedMeta]) -> Result<Vec<String>,
 }
 
 impl darling::FromMeta for ConnectorTags {
-    fn from_list(items: &[syn::NestedMeta]) -> Result<Self, darling::Error> {
+    fn from_list(items: &[NestedMeta]) -> Result<Self, darling::Error> {
         let tags = tags_from_list(items)?;
         Ok(ConnectorTags { tags })
     }
 }
 
-fn tags_from_list(items: &[syn::NestedMeta]) -> Result<Vec<ConnectorTag>, darling::Error> {
+#[derive(Debug, Default)]
+pub struct Executors {
+    executors: Vec<String>,
+}
+
+impl AsRef<[String]> for Executors {
+    fn as_ref(&self) -> &[String] {
+        self.executors.as_ref()
+    }
+}
+impl darling::FromMeta for Executors {
+    fn from_list(items: &[NestedMeta]) -> Result<Self, darling::Error> {
+        let executors = strings_to_list("Executors", items)?;
+        Ok(Self { executors })
+    }
+}
+
+fn tags_from_list(items: &[NestedMeta]) -> Result<Vec<ConnectorTag>, darling::Error> {
     if items.is_empty() {
         return Err(darling::Error::custom("At least one connector tag is required."));
     }
@@ -209,7 +231,7 @@ fn tags_from_list(items: &[syn::NestedMeta]) -> Result<Vec<ConnectorTag>, darlin
 
     for item in items {
         match item {
-            syn::NestedMeta::Meta(meta) => {
+            NestedMeta::Meta(meta) => {
                 match meta {
                     // A single variant without version, like `Postgres`.
                     Meta::Path(p) => {
@@ -218,9 +240,10 @@ fn tags_from_list(items: &[syn::NestedMeta]) -> Result<Vec<ConnectorTag>, darlin
                     }
                     Meta::List(l) => {
                         let tag = tag_string_from_path(&l.path)?;
-                        for meta in l.nested.iter() {
+                        let meta_list = NestedMeta::parse_meta_list(l.tokens.clone())?;
+                        for meta in meta_list {
                             match meta {
-                                syn::NestedMeta::Lit(literal) => {
+                                NestedMeta::Lit(literal) => {
                                     let version_str = match literal {
                                         syn::Lit::Str(s) => s.value(),
                                         syn::Lit::Char(c) => c.value().to_string(),
@@ -230,13 +253,13 @@ fn tags_from_list(items: &[syn::NestedMeta]) -> Result<Vec<ConnectorTag>, darlin
                                             return Err(darling::Error::unexpected_type(
                                                 "Versions can be string, char, int and float.",
                                             )
-                                            .with_span(&x.span()))
+                                            .with_span(&x.span()));
                                         }
                                     };
 
                                     tags.push((tag.clone(), Some(version_str)));
                                 }
-                                syn::NestedMeta::Meta(meta) => {
+                                NestedMeta::Meta(meta) => {
                                     return Err(darling::Error::unexpected_type(
                                         "Versions can only be literals (string, char, int and float).",
                                     )
@@ -252,7 +275,7 @@ fn tags_from_list(items: &[syn::NestedMeta]) -> Result<Vec<ConnectorTag>, darlin
                 return Err(
                     darling::Error::custom("Expected `only` or `exclude` to be a list of `ConnectorTag`.")
                         .with_span(&x.span()),
-                )
+                );
             }
         }
     }
@@ -278,7 +301,7 @@ pub struct RunOnlyForCapabilities {
 }
 
 impl darling::FromMeta for RunOnlyForCapabilities {
-    fn from_list(items: &[syn::NestedMeta]) -> Result<Self, darling::Error> {
+    fn from_list(items: &[NestedMeta]) -> Result<Self, darling::Error> {
         if items.is_empty() {
             return Err(darling::Error::custom(
                 "When specifying capabilities to run for, at least one needs to be given.",
@@ -289,13 +312,13 @@ impl darling::FromMeta for RunOnlyForCapabilities {
 
         for item in items {
             match item {
-                syn::NestedMeta::Meta(meta) => {
+                NestedMeta::Meta(meta) => {
                     match meta {
                         // A single variant without version, like `Postgres`.
                         Meta::Path(p) => match p.get_ident() {
                             Some(ident) => idents.push(ident.clone()),
                             None => {
-                                return Err(darling::Error::unexpected_type("Invalid identifier").with_span(&p.span()))
+                                return Err(darling::Error::unexpected_type("Invalid identifier").with_span(&p.span()));
                             }
                         },
                         x => return Err(darling::Error::unexpected_type("Expected identifiers").with_span(&x.span())),
@@ -305,7 +328,7 @@ impl darling::FromMeta for RunOnlyForCapabilities {
                     return Err(
                         darling::Error::custom("Expected `only` or `exclude` to be a list of `ConnectorTag`.")
                             .with_span(&x.span()),
-                    )
+                    );
                 }
             }
         }

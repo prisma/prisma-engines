@@ -1,7 +1,7 @@
 //! Scalar list defaults of the form `'{}'`.
 //! Reference: <https://www.postgresql.org/docs/current/arrays.html>
 
-use super::{tokenize, Parser, Token};
+use super::{Parser, Token, tokenize};
 use crate::{ColumnType, ColumnTypeFamily};
 use prisma_value::PrismaValue;
 
@@ -86,6 +86,7 @@ fn parse_literal(s: &str, tpe: &ColumnType) -> Option<PrismaValue> {
         ColumnTypeFamily::DateTime
         | ColumnTypeFamily::Binary
         | ColumnTypeFamily::Uuid
+        | ColumnTypeFamily::Udt(_)
         | ColumnTypeFamily::Unsupported(_) => None,
     }
 }

@@ -1,10 +1,14 @@
 use crate::{
+    ReferentialAction,
     ast::{self, FieldArity},
     types::{RelationField, RelationFieldId},
     walkers::*,
-    ReferentialAction,
 };
-use std::{borrow::Cow, fmt, hash::Hasher};
+use std::{
+    borrow::Cow,
+    fmt::{self, Debug},
+    hash::Hasher,
+};
 
 /// A relation field on a model in the schema.
 pub type RelationFieldWalker<'db> = Walker<'db, RelationFieldId>;
@@ -97,7 +101,7 @@ impl<'db> RelationFieldWalker<'db> {
         self.db.walk(self.attributes().referenced_model)
     }
 
-    /// The fields in the `@relation(references: ...)` argument.
+    /// The fields in the `@relation(references: [...])` argument.
     pub fn referenced_fields(self) -> Option<impl ExactSizeIterator<Item = ScalarFieldWalker<'db>>> {
         self.attributes()
             .references
@@ -154,7 +158,7 @@ impl<'db> RelationFieldWalker<'db> {
         self.fields()
     }
 
-    /// The fields in the `fields: [...]` argument in the forward relation field.
+    /// The fields in the `@relation(fields: [...])` argument in the forward relation field.
     pub fn fields(self) -> Option<impl ExactSizeIterator<Item = ScalarFieldWalker<'db>> + Clone> {
         let attributes = &self.db.types[self.id];
         attributes
@@ -165,7 +169,7 @@ impl<'db> RelationFieldWalker<'db> {
 }
 
 /// The relation name.
-#[derive(Debug, Clone, PartialOrd)]
+#[derive(Debug, Clone)]
 pub enum RelationName<'db> {
     /// A relation name specified in the AST.
     Explicit(&'db str),
@@ -173,7 +177,7 @@ pub enum RelationName<'db> {
     Generated(String),
 }
 
-impl<'db> PartialEq for RelationName<'db> {
+impl PartialEq for RelationName<'_> {
     fn eq(&self, other: &Self) -> bool {
         match (self, other) {
             (Self::Explicit(l0), Self::Explicit(r0)) => l0 == r0,
@@ -184,9 +188,9 @@ impl<'db> PartialEq for RelationName<'db> {
     }
 }
 
-impl<'db> Eq for RelationName<'db> {}
+impl Eq for RelationName<'_> {}
 
-impl<'db> Ord for RelationName<'db> {
+impl Ord for RelationName<'_> {
     fn cmp(&self, other: &Self) -> std::cmp::Ordering {
         match (self, other) {
             (Self::Explicit(l0), Self::Explicit(r0)) => l0.cmp(r0),
@@ -197,7 +201,13 @@ impl<'db> Ord for RelationName<'db> {
     }
 }
 
-impl<'db> std::hash::Hash for RelationName<'db> {
+impl PartialOrd for RelationName<'_> {
+    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
+        Some(self.cmp(other))
+    }
+}
+
+impl std::hash::Hash for RelationName<'_> {
     fn hash<H: Hasher>(&self, state: &mut H) {
         match self {
             RelationName::Explicit(s) => s.hash(state),
@@ -206,7 +216,7 @@ impl<'db> std::hash::Hash for RelationName<'db> {
     }
 }
 
-impl<'db> RelationName<'db> {
+impl RelationName<'_> {
     pub(crate) fn generated(model_a: &str, model_b: &str) -> Self {
         if model_a < model_b {
             Self::Generated(format!("{model_a}To{model_b}"))
@@ -216,7 +226,7 @@ impl<'db> RelationName<'db> {
     }
 }
 
-impl<'db> fmt::Display for RelationName<'db> {
+impl fmt::Display for RelationName<'_> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             RelationName::Explicit(s) => f.write_str(s),
@@ -225,7 +235,7 @@ impl<'db> fmt::Display for RelationName<'db> {
     }
 }
 
-impl<'db> AsRef<str> for RelationName<'db> {
+impl AsRef<str> for RelationName<'_> {
     fn as_ref(&self) -> &str {
         match self {
             RelationName::Explicit(s) => s,

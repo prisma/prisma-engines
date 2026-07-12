@@ -1,0 +1,6 @@
+{
+    "connector": "mysql",
+    "version": "mariadb.js.wasm",
+    "driver_adapter": "mariadb",
+    "external_test_executor": "Wasm"
+}

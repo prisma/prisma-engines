@@ -1,6 +1,5 @@
 datasource mydb {
     provider = "mongodb"
-    url = env("TEST_DB_URL")
 }
 
 

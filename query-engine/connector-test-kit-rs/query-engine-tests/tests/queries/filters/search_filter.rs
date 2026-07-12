@@ -130,7 +130,7 @@ async fn create_row(runner: &Runner, data: &str) -> TestResult<()> {
     Ok(())
 }
 
-#[test_suite(schema(schema), capabilities(FullTextSearchWithoutIndex))]
+#[test_suite(schema(schema), capabilities(NativeFullTextSearchWithoutIndex))]
 mod search_filter_without_index {
     use indoc::indoc;
 
@@ -178,7 +178,7 @@ mod search_filter_without_index {
     }
 }
 
-#[test_suite(schema(schema), capabilities(FullTextSearchWithIndex))]
+#[test_suite(schema(schema), capabilities(NativeFullTextSearchWithIndex))]
 mod search_filter_with_index {
     use indoc::indoc;
 

@@ -13,22 +13,22 @@ use enumflags2::BitFlags;
 use indexmap::IndexMap;
 use indoc::indoc;
 use psl::{
-    builtin_connectors::{CockroachType, PostgresType},
+    builtin_connectors::{CockroachType, KnownPostgresType, PostgresType},
     datamodel_connector::NativeTypeInstance,
 };
-use quaint::{connector::ResultRow, prelude::Queryable, Value};
+use quaint::{Value, connector::ResultRow, prelude::Queryable};
 use regex::Regex;
 use std::{
     any::type_name,
     collections::{BTreeMap, HashMap},
-    convert::TryInto,
     iter::Peekable,
+    sync::LazyLock,
 };
 use tracing::trace;
 
 /// A PostgreSQL sequence.
 /// <https://www.postgresql.org/docs/current/view-pg-sequences.html>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Sequence {
     /// Sequence name
     pub namespace_id: NamespaceId,
@@ -67,20 +67,15 @@ impl Default for Sequence {
     }
 }
 
-#[derive(PartialEq, Debug, Clone, Copy)]
+#[derive(PartialEq, Debug, Clone, Copy, Default)]
 pub enum SqlIndexAlgorithm {
+    #[default]
     BTree,
     Hash,
     Gist,
     Gin,
     SpGist,
     Brin,
-}
-
-impl Default for SqlIndexAlgorithm {
-    fn default() -> Self {
-        Self::BTree
-    }
 }
 
 impl AsRef<str> for SqlIndexAlgorithm {
@@ -144,7 +139,7 @@ pub enum ConstraintOption {
     Deferrable,
 }
 
-#[derive(Default, Debug)]
+#[derive(Default, Debug, Clone)]
 pub struct PostgresSchemaExt {
     pub opclasses: Vec<(IndexColumnId, SQLOperatorClass)>,
     pub indexes: Vec<(IndexId, SqlIndexAlgorithm)>,
@@ -521,35 +516,13 @@ impl AsRef<str> for SQLOperatorClassKind {
             SQLOperatorClassKind::UuidBloomOps => "uuid_bloom_ops",
             SQLOperatorClassKind::UuidMinMaxOps => "uuid_minmax_ops",
             SQLOperatorClassKind::UuidMinMaxMultiOps => "uuid_minmax_multi_ops",
-            SQLOperatorClassKind::Raw(ref c) => c,
+            SQLOperatorClassKind::Raw(c) => c,
         }
     }
 }
 
 #[async_trait::async_trait]
-impl<'a> super::SqlSchemaDescriberBackend for SqlSchemaDescriber<'a> {
-    async fn list_databases(&self) -> DescriberResult<Vec<String>> {
-        Ok(self.get_databases().await?)
-    }
-
-    // TODO(MultiSchema): this going to provide wrong results with respect to MultiSchema,
-    // but this function does not seem to be called all that much. Should probably look into
-    // either updating or removing it.
-    async fn get_metadata(&self, schema: &str) -> DescriberResult<SqlMetadata> {
-        let mut sql_schema = SqlSchema::default();
-        let mut pg_ext = PostgresSchemaExt::default();
-
-        self.get_namespaces(&mut sql_schema, &[schema]).await?;
-
-        let table_count = self.get_table_names(&mut sql_schema, &mut pg_ext).await?.len();
-        let size_in_bytes = self.get_size(schema).await?;
-
-        Ok(SqlMetadata {
-            table_count,
-            size_in_bytes,
-        })
-    }
-
+impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber<'_> {
     async fn describe(&self, schemas: &[&str]) -> DescriberResult<SqlSchema> {
         let mut sql_schema = SqlSchema::default();
         let mut pg_ext = PostgresSchemaExt::default();
@@ -563,6 +536,7 @@ impl<'a> super::SqlSchemaDescriberBackend for SqlSchemaDescriber<'a> {
         self.get_constraints(&table_names, &mut sql_schema, &mut pg_ext).await?;
         self.get_views(&mut sql_schema).await?;
         self.get_enums(&mut sql_schema).await?;
+        self.get_udts(&mut sql_schema).await?;
         self.get_columns(&mut sql_schema).await?;
         self.get_foreign_keys(&table_names, &mut pg_ext, &mut sql_schema)
             .await?;
@@ -632,19 +606,6 @@ impl<'a> SqlSchemaDescriber<'a> {
         Ok(())
     }
 
-    async fn get_databases(&self) -> DescriberResult<Vec<String>> {
-        let sql = "select schema_name from information_schema.schemata;";
-        let rows = self.conn.query_raw(sql, &[]).await?;
-        let names = rows
-            .into_iter()
-            .map(|row| row.get_expect_string("schema_name"))
-            .collect();
-
-        trace!("Found schema names: {:?}", names);
-
-        Ok(names)
-    }
-
     async fn get_procedures(&self, sql_schema: &mut SqlSchema) -> DescriberResult<()> {
         let namespaces = &sql_schema.namespaces;
 
@@ -683,11 +644,12 @@ impl<'a> SqlSchemaDescriber<'a> {
     }
 
     async fn get_namespaces(&self, sql_schema: &mut SqlSchema, namespaces: &[&str]) -> DescriberResult<()> {
+        // Although we have a list of namespaces we should introspect, we still need to check whether they actually already exist in the database.
         let sql = include_str!("postgres/namespaces_query.sql");
 
         let rows = self.conn.query_raw(sql, &[Value::array(namespaces)]).await?;
 
-        let names = rows.into_iter().map(|row| (row.get_expect_string("namespace_name")));
+        let names = rows.into_iter().map(|row| row.get_expect_string("namespace_name"));
 
         for namespace in names {
             sql_schema.push_namespace(namespace);
@@ -780,23 +742,6 @@ impl<'a> SqlSchemaDescriber<'a> {
         Ok(map)
     }
 
-    async fn get_size(&self, schema: &str) -> DescriberResult<usize> {
-        if self.circumstances.contains(Circumstances::Cockroach) {
-            return Ok(0); // TODO
-        }
-
-        let sql =
-            "SELECT SUM(pg_total_relation_size(quote_ident(schemaname) || '.' || quote_ident(tablename)))::BIGINT as size
-             FROM pg_tables
-             WHERE schemaname = $1::text";
-        let mut result_iter = self.conn.query_raw(sql, &[schema.into()]).await?.into_iter();
-        let size: i64 = result_iter.next().and_then(|row| row.get_i64("size")).unwrap_or(0);
-
-        trace!("Found db size: {:?}", size);
-
-        Ok(size.try_into().expect("size is not a valid usize"))
-    }
-
     async fn get_views(&self, sql_schema: &mut SqlSchema) -> DescriberResult<()> {
         let namespaces = &sql_schema.namespaces;
         let sql = indoc! {r#"
@@ -866,7 +811,7 @@ impl<'a> SqlSchemaDescriber<'a> {
                  JOIN pg_namespace on pg_namespace.oid = pg_class.relnamespace
                  AND pg_namespace.nspname = ANY ( $1 )
                  WHERE reltype > 0
-                ) as oid on oid.oid = att.attrelid 
+                ) as oid on oid.oid = att.attrelid
                   AND relname = info.table_name
                   AND namespace = info.table_schema
             LEFT OUTER JOIN pg_attrdef attdef ON attdef.adrelid = att.attrelid AND attdef.adnum = att.attnum AND table_schema = namespace
@@ -978,7 +923,8 @@ impl<'a> SqlSchemaDescriber<'a> {
         let (character_maximum_length, numeric_precision, numeric_scale, time_precision) =
             if matches!(col.get_expect_string("data_type").as_str(), "ARRAY") {
                 fn get_single(formatted_type: &str) -> Option<u32> {
-                    static SINGLE_REGEX: Lazy<Regex> = Lazy::new(|| Regex::new(r".*\(([0-9]*)\).*\[\]$").unwrap());
+                    static SINGLE_REGEX: LazyLock<Regex> =
+                        LazyLock::new(|| Regex::new(r".*\(([0-9]*)\).*\[\]$").unwrap());
 
                     SINGLE_REGEX
                         .captures(formatted_type)
@@ -987,8 +933,8 @@ impl<'a> SqlSchemaDescriber<'a> {
                 }
 
                 fn get_dual(formatted_type: &str) -> (Option<u32>, Option<u32>) {
-                    static DUAL_REGEX: Lazy<Regex> =
-                        Lazy::new(|| Regex::new(r"numeric\(([0-9]*),([0-9]*)\)\[\]$").unwrap());
+                    static DUAL_REGEX: LazyLock<Regex> =
+                        LazyLock::new(|| Regex::new(r"numeric\(([0-9]*),([0-9]*)\)\[\]$").unwrap());
                     let first = DUAL_REGEX
                         .captures(formatted_type)
                         .and_then(|cap| cap.get(1).and_then(|precision| precision.as_str().parse().ok()));
@@ -1034,6 +980,23 @@ impl<'a> SqlSchemaDescriber<'a> {
         }
     }
 
+    fn get_type_modifiers(col: &ResultRow) -> Option<Vec<i32>> {
+        let fdt = col.get_expect_string("formatted_type");
+
+        static TYPE_MODIFIER_REGEX: LazyLock<Regex> = LazyLock::new(|| Regex::new(r".*\(([-0-9, ]+)\)").unwrap());
+
+        TYPE_MODIFIER_REGEX
+            .captures(&fdt)
+            .and_then(|cap| cap.get(1))
+            .map(|modifiers| {
+                modifiers
+                    .as_str()
+                    .split(',')
+                    .filter_map(|s| s.trim().parse::<i32>().ok())
+                    .collect()
+            })
+    }
+
     /// Returns a map from table name to foreign keys.
     async fn get_foreign_keys(
         &self,
@@ -1056,11 +1019,11 @@ impl<'a> SqlSchemaDescriber<'a> {
                 conname         AS constraint_name,
                 child,
                 parent,
-                table_name, 
+                table_name,
                 namespace,
                 condeferrable,
                 condeferred
-            FROM (SELECT 
+            FROM (SELECT
                         ns.nspname AS "namespace",
                         unnest(con1.conkey)                AS "parent",
                         unnest(con1.confkey)                AS "child",
@@ -1388,6 +1351,33 @@ impl<'a> SqlSchemaDescriber<'a> {
 
         Ok(())
     }
+
+    async fn get_udts(&self, sql_schema: &mut SqlSchema) -> DescriberResult<()> {
+        let namespaces = &sql_schema.namespaces;
+
+        let sql = "
+            SELECT
+                t.typname AS name,
+                n.nspname AS namespace
+            FROM pg_type t
+            JOIN pg_catalog.pg_namespace n ON n.oid = t.typnamespace
+            WHERE n.nspname = ANY ( $1 )
+              AND t.typtype = 'b' -- only base types
+              AND t.typinput::regproc::text <> 'array_in' -- exclude array types
+        ";
+
+        let rows = self.conn.query_raw(sql, &[Value::array(namespaces)]).await?;
+
+        for row in rows.into_iter() {
+            let name = row.get_expect_string("name");
+            let namespace = row.get_expect_string("namespace");
+            let namespace_id = sql_schema.get_namespace_id(&namespace).unwrap();
+
+            sql_schema.push_udt(namespace_id, name, None);
+        }
+
+        Ok(())
+    }
 }
 
 fn group_next_index<T>(result_rows: &mut Vec<ResultRow>, index_rows: &mut Peekable<T>)
@@ -1437,6 +1427,7 @@ fn index_from_row(
         let is_primary_key = row.get_expect_bool("is_primary_key");
         let column_index = row.get_expect_i64("column_index");
         let index_algo = row.get_expect_string("index_algo");
+        let predicate = row.get_string("predicate");
 
         let sort_order = row.get_string("column_order").map(|v| match v.as_ref() {
             "ASC" => SQLSortOrder::Asc,
@@ -1470,9 +1461,15 @@ fn index_from_row(
             let index_id = if is_primary_key {
                 sql_schema.push_primary_key(table_id, index_name)
             } else if is_unique {
-                sql_schema.push_unique_constraint(table_id, index_name)
+                match predicate {
+                    Some(pred) => sql_schema.push_partial_unique_constraint(table_id, index_name, pred),
+                    None => sql_schema.push_unique_constraint(table_id, index_name),
+                }
             } else {
-                sql_schema.push_index(table_id, index_name)
+                match predicate {
+                    Some(pred) => sql_schema.push_partial_index(table_id, index_name, pred),
+                    None => sql_schema.push_index(table_id, index_name),
+                }
             };
 
             if is_primary_key || is_unique {
@@ -1536,7 +1533,6 @@ fn index_from_row(
 }
 
 fn get_column_type_postgresql(row: &ResultRow, schema: &SqlSchema) -> ColumnType {
-    use ColumnTypeFamily::*;
     let data_type = row.get_expect_string("data_type");
     let full_data_type = row.get_expect_string("full_data_type");
     let is_required = match row.get_expect_string("is_nullable").to_lowercase().as_ref() {
@@ -1551,48 +1547,60 @@ fn get_column_type_postgresql(row: &ResultRow, schema: &SqlSchema) -> ColumnType
         false => ColumnArity::Nullable,
     };
 
-    let precision = SqlSchemaDescriber::get_precision(row);
-    let unsupported_type = || (Unsupported(full_data_type.clone()), None);
-    let enum_id: Option<_> = match data_type.as_str() {
-        "ARRAY" if full_data_type.starts_with('_') => {
-            let namespace = row.get_string("type_schema_name");
-            schema.find_enum(full_data_type.trim_start_matches('_'), namespace.as_deref())
-        }
-        _ => {
-            let namespace = row.get_string("type_schema_name");
-            schema.find_enum(&full_data_type, namespace.as_deref())
-        }
-    };
+    let (family, native_type) = get_column_type_family(&data_type, &full_data_type, row, schema);
+    ColumnType {
+        full_data_type,
+        family,
+        arity,
+        native_type: native_type.map(NativeTypeInstance::new::<PostgresType>),
+    }
+}
 
-    let (family, native_type) = match full_data_type.as_str() {
-        _ if (data_type == "USER-DEFINED" || data_type == "ARRAY") && enum_id.is_some() => {
-            (Enum(enum_id.unwrap()), None)
-        }
-        "int2" | "_int2" => (Int, Some(PostgresType::SmallInt)),
-        "int4" | "_int4" => (Int, Some(PostgresType::Integer)),
-        "int8" | "_int8" => (BigInt, Some(PostgresType::BigInt)),
-        "oid" | "_oid" => (Int, Some(PostgresType::Oid)),
-        "float4" | "_float4" => (Float, Some(PostgresType::Real)),
-        "float8" | "_float8" => (Float, Some(PostgresType::DoublePrecision)),
-        "bool" | "_bool" => (Boolean, Some(PostgresType::Boolean)),
-        "text" | "_text" => (String, Some(PostgresType::Text)),
-        "citext" | "_citext" => (String, Some(PostgresType::Citext)),
-        "varchar" | "_varchar" => (String, Some(PostgresType::VarChar(precision.character_maximum_length))),
-        "bpchar" | "_bpchar" => (String, Some(PostgresType::Char(precision.character_maximum_length))),
+fn get_column_type_family(
+    data_type: &str,
+    full_data_type: &str,
+    row: &ResultRow,
+    schema: &SqlSchema,
+) -> (ColumnTypeFamily, Option<PostgresType>) {
+    use ColumnTypeFamily::*;
+
+    let precision = SqlSchemaDescriber::get_precision(row);
+
+    let (t, nt) = match full_data_type {
+        "int2" | "_int2" => (Int, Some(KnownPostgresType::SmallInt)),
+        "int4" | "_int4" => (Int, Some(KnownPostgresType::Integer)),
+        "int8" | "_int8" => (BigInt, Some(KnownPostgresType::BigInt)),
+        "oid" | "_oid" => (Int, Some(KnownPostgresType::Oid)),
+        "float4" | "_float4" => (Float, Some(KnownPostgresType::Real)),
+        "float8" | "_float8" => (Float, Some(KnownPostgresType::DoublePrecision)),
+        "bool" | "_bool" => (Boolean, Some(KnownPostgresType::Boolean)),
+        "text" | "_text" => (String, Some(KnownPostgresType::Text)),
+        "citext" | "_citext" => (String, Some(KnownPostgresType::Citext)),
+        "varchar" | "_varchar" => (
+            String,
+            Some(KnownPostgresType::VarChar(precision.character_maximum_length)),
+        ),
+        "bpchar" | "_bpchar" => (
+            String,
+            Some(KnownPostgresType::Char(precision.character_maximum_length)),
+        ),
         // https://www.cockroachlabs.com/docs/stable/string.html
-        "char" | "_char" => (String, Some(PostgresType::Char(None))),
-        "date" | "_date" => (DateTime, Some(PostgresType::Date)),
-        "bytea" | "_bytea" => (Binary, Some(PostgresType::ByteA)),
-        "json" | "_json" => (Json, Some(PostgresType::Json)),
-        "jsonb" | "_jsonb" => (Json, Some(PostgresType::JsonB)),
-        "uuid" | "_uuid" => (Uuid, Some(PostgresType::Uuid)),
-        "xml" | "_xml" => (String, Some(PostgresType::Xml)),
+        "char" | "_char" => (String, Some(KnownPostgresType::Char(None))),
+        "date" | "_date" => (DateTime, Some(KnownPostgresType::Date)),
+        "bytea" | "_bytea" => (Binary, Some(KnownPostgresType::ByteA)),
+        "json" | "_json" => (Json, Some(KnownPostgresType::Json)),
+        "jsonb" | "_jsonb" => (Json, Some(KnownPostgresType::JsonB)),
+        "uuid" | "_uuid" => (Uuid, Some(KnownPostgresType::Uuid)),
+        "xml" | "_xml" => (String, Some(KnownPostgresType::Xml)),
         // bit and varbit should be binary, but are currently mapped to strings.
-        "bit" | "_bit" => (String, Some(PostgresType::Bit(precision.character_maximum_length))),
-        "varbit" | "_varbit" => (String, Some(PostgresType::VarBit(precision.character_maximum_length))),
+        "bit" | "_bit" => (String, Some(KnownPostgresType::Bit(precision.character_maximum_length))),
+        "varbit" | "_varbit" => (
+            String,
+            Some(KnownPostgresType::VarBit(precision.character_maximum_length)),
+        ),
         "numeric" | "_numeric" => (
             Decimal,
-            Some(PostgresType::Decimal(
+            Some(KnownPostgresType::Decimal(
                 match (precision.numeric_precision, precision.numeric_scale) {
                     (None, None) => None,
                     (Some(prec), Some(scale)) => Some((prec, scale)),
@@ -1600,31 +1608,56 @@ fn get_column_type_postgresql(row: &ResultRow, schema: &SqlSchema) -> ColumnType
                 },
             )),
         ),
-        "money" | "_money" => (Decimal, Some(PostgresType::Money)),
-        "pg_lsn" | "_pg_lsn" => unsupported_type(),
-        "time" | "_time" => (DateTime, Some(PostgresType::Time(precision.time_precision))),
-        "timetz" | "_timetz" => (DateTime, Some(PostgresType::Timetz(precision.time_precision))),
-        "timestamp" | "_timestamp" => (DateTime, Some(PostgresType::Timestamp(precision.time_precision))),
-        "timestamptz" | "_timestamptz" => (DateTime, Some(PostgresType::Timestamptz(precision.time_precision))),
-        "tsquery" | "_tsquery" => unsupported_type(),
-        "tsvector" | "_tsvector" => unsupported_type(),
-        "txid_snapshot" | "_txid_snapshot" => unsupported_type(),
-        "inet" | "_inet" => (String, Some(PostgresType::Inet)),
-        //geometric
-        "box" | "_box" => unsupported_type(),
-        "circle" | "_circle" => unsupported_type(),
-        "line" | "_line" => unsupported_type(),
-        "lseg" | "_lseg" => unsupported_type(),
-        "path" | "_path" => unsupported_type(),
-        "polygon" | "_polygon" => unsupported_type(),
-        _ => enum_id.map(|id| (Enum(id), None)).unwrap_or_else(unsupported_type),
+        "money" | "_money" => (Decimal, Some(KnownPostgresType::Money)),
+        "time" | "_time" => (DateTime, Some(KnownPostgresType::Time(precision.time_precision))),
+        "timetz" | "_timetz" => (DateTime, Some(KnownPostgresType::Timetz(precision.time_precision))),
+        "timestamp" | "_timestamp" => (DateTime, Some(KnownPostgresType::Timestamp(precision.time_precision))),
+        "timestamptz" | "_timestamptz" => (DateTime, Some(KnownPostgresType::Timestamptz(precision.time_precision))),
+        "inet" | "_inet" => (String, Some(KnownPostgresType::Inet)),
+        _ => return get_udt_column_type_family(data_type, full_data_type, row, schema),
     };
+    (t, nt.map(PostgresType::Known))
+}
 
-    ColumnType {
-        full_data_type,
-        family,
-        arity,
-        native_type: native_type.map(NativeTypeInstance::new::<PostgresType>),
+fn get_udt_column_type_family(
+    data_type: &str,
+    full_data_type: &str,
+    row: &ResultRow,
+    schema: &SqlSchema,
+) -> (ColumnTypeFamily, Option<PostgresType>) {
+    let namespace = row.get_string("type_schema_name");
+    if data_type == "USER-DEFINED"
+        && let Some(id) = schema.find_enum(full_data_type, namespace.as_deref())
+    {
+        (ColumnTypeFamily::Enum(id), None)
+    } else if data_type == "USER-DEFINED"
+        && let Some(id) = schema.find_udt(full_data_type, namespace.as_deref())
+    {
+        let modifiers = SqlSchemaDescriber::get_type_modifiers(row).unwrap_or_default();
+        (
+            ColumnTypeFamily::Udt(id),
+            Some(PostgresType::Unknown(
+                full_data_type.to_owned(),
+                modifiers.into_iter().map(|tmod| tmod.to_string()).collect(),
+            )),
+        )
+    } else if data_type == "ARRAY"
+        && let Some(id) = schema.find_enum(&full_data_type[1..], namespace.as_deref())
+    {
+        (ColumnTypeFamily::Enum(id), None)
+    } else if data_type == "ARRAY"
+        && let Some(id) = schema.find_udt(&full_data_type[1..], namespace.as_deref())
+    {
+        let modifiers = SqlSchemaDescriber::get_type_modifiers(row).unwrap_or_default();
+        (
+            ColumnTypeFamily::Udt(id),
+            Some(PostgresType::Unknown(
+                full_data_type.to_owned(),
+                modifiers.into_iter().map(|i| i.to_string()).collect(),
+            )),
+        )
+    } else {
+        (ColumnTypeFamily::Unsupported(full_data_type.to_owned()), None)
     }
 }
 
@@ -1650,7 +1683,7 @@ fn get_column_type_cockroachdb(row: &ResultRow, schema: &SqlSchema) -> ColumnTyp
     let enum_id: Option<_> = match data_type.as_str() {
         "ARRAY" if full_data_type.starts_with('_') => {
             let namespace = row.get_string("type_schema_name");
-            schema.find_enum(full_data_type.trim_start_matches('_'), namespace.as_deref())
+            schema.find_enum(&full_data_type[1..], namespace.as_deref())
         }
         _ => {
             let namespace = row.get_string("type_schema_name");

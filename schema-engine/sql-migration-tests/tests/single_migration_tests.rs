@@ -1,11 +1,12 @@
 use schema_core::{
-    json_rpc::types::SchemasContainer,
+    DatasourceUrls,
+    json_rpc::types::{SchemaFilter, SchemasContainer},
     schema_connector::{ConnectorParams, SchemaConnector},
 };
 use sql_migration_tests::test_api::*;
 use sql_schema_connector::SqlSchemaConnector;
 use std::{fs, io::Write as _, path, sync::Arc};
-use test_setup::{runtime::run_with_thread_local_runtime as tok, TestApiArgs};
+use test_setup::{TestApiArgs, runtime::run_with_thread_local_runtime as tok};
 
 const TESTS_ROOT: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/single_migration_tests");
 
@@ -25,11 +26,7 @@ fn run_single_migration_test(test_file_path: &str, test_function_name: &'static 
                 // ... if there's enough left of the file to look ahead
                 text.get(idx + 1..idx + EXPECTATION_TEXT.len() + 1).and_then(|t| {
                     // ... and that text matches the delimiter
-                    if t == EXPECTATION_TEXT {
-                        Some(idx + 1)
-                    } else {
-                        None
-                    }
+                    if t == EXPECTATION_TEXT { Some(idx + 1) } else { None }
                 })
             })
     };
@@ -83,9 +80,8 @@ fn run_single_migration_test(test_file_path: &str, test_function_name: &'static 
             preview_features: Default::default(),
             shadow_database_connection_string: None,
         };
-        let mut conn = SqlSchemaConnector::new_mysql();
-        conn.set_params(params).unwrap();
-        tok(conn.reset(false, None)).unwrap();
+        let mut conn = SqlSchemaConnector::new_mysql(params).unwrap();
+        tok(conn.reset(false, None, &SchemaFilter::default().into())).unwrap();
         test_api_args.database_url().to_owned()
     } else if tags.contains(Tags::Mysql) {
         let (_, connection_string) = tok(test_api_args.create_mysql_database());
@@ -100,12 +96,16 @@ fn run_single_migration_test(test_file_path: &str, test_function_name: &'static 
     };
 
     let host = Arc::new(sql_migration_tests::test_api::TestConnectorHost::default());
-    let schema_engine = schema_core::schema_api(None, Some(host.clone())).unwrap();
+    let schema_engine = schema_core::schema_api_without_extensions(
+        None,
+        DatasourceUrls::from_url(&connection_string),
+        Some(host.clone()),
+    )
+    .unwrap();
 
     tok(schema_engine.diff(schema_core::json_rpc::types::DiffParams {
         exit_code: None,
         script: true,
-        shadow_database_url: None,
         from: schema_core::json_rpc::types::DiffTarget::Empty,
         to: schema_core::json_rpc::types::DiffTarget::SchemaDatamodel(SchemasContainer {
             files: vec![schema_core::json_rpc::types::SchemaContainer {
@@ -113,6 +113,7 @@ fn run_single_migration_test(test_file_path: &str, test_function_name: &'static 
                 content: text.to_string(),
             }],
         }),
+        filters: SchemaFilter::default(),
     }))
     .unwrap();
 
@@ -131,7 +132,6 @@ fn run_single_migration_test(test_file_path: &str, test_function_name: &'static 
     let second_migration_result = tok(schema_engine.diff(schema_core::json_rpc::types::DiffParams {
         exit_code: Some(true),
         script: true,
-        shadow_database_url: None,
         from: schema_core::json_rpc::types::DiffTarget::Url(schema_core::json_rpc::types::UrlContainer {
             url: connection_string,
         }),
@@ -141,6 +141,7 @@ fn run_single_migration_test(test_file_path: &str, test_function_name: &'static 
                 content: text.to_string(),
             }],
         }),
+        filters: SchemaFilter::default(),
     }))
     .unwrap();
 

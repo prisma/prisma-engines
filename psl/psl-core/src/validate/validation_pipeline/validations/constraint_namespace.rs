@@ -1,4 +1,4 @@
-use crate::datamodel_connector::{walker_ext_traits::*, ConstraintScope};
+use crate::datamodel_connector::{ConstraintScope, walker_ext_traits::*};
 use std::{borrow::Cow, collections::HashMap, ops::Deref};
 
 /// A constraint namespace consists of two kinds of namespaces:
@@ -221,7 +221,7 @@ impl<'db> ConstraintName<'db> {
     }
 }
 
-impl<'db> AsRef<str> for ConstraintName<'db> {
+impl AsRef<str> for ConstraintName<'_> {
     fn as_ref(&self) -> &str {
         match self {
             ConstraintName::Index(x) => x,
@@ -232,7 +232,7 @@ impl<'db> AsRef<str> for ConstraintName<'db> {
     }
 }
 
-impl<'db> Deref for ConstraintName<'db> {
+impl Deref for ConstraintName<'_> {
     type Target = str;
 
     fn deref(&self) -> &Self::Target {

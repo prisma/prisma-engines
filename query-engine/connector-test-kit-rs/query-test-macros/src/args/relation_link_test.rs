@@ -32,6 +32,12 @@ pub(crate) struct RelationLinkTestArgs {
     pub(crate) exclude: ConnectorTags,
 
     #[darling(default)]
+    pub only_executors: Executors,
+
+    #[darling(default)]
+    pub exclude_executors: Executors,
+
+    #[darling(default)]
     pub capabilities: RunOnlyForCapabilities,
 }
 
@@ -54,8 +60,11 @@ pub(crate) struct OnParent {
 impl darling::FromMeta for OnChild {
     fn from_meta(item: &Meta) -> darling::Result<Self> {
         (match *item {
-            Meta::NameValue(ref nv) => match nv.lit {
-                syn::Lit::Str(ref lit_str) => Ok(OnChild {
+            Meta::NameValue(ref nv) => match nv.value {
+                syn::Expr::Lit(syn::ExprLit {
+                    lit: syn::Lit::Str(ref lit_str),
+                    ..
+                }) => Ok(OnChild {
                     relation_field: parse_relation_field(lit_str, true)?,
                 }),
                 _ => Err(darling::Error::custom(
@@ -73,8 +82,11 @@ impl darling::FromMeta for OnChild {
 impl darling::FromMeta for OnParent {
     fn from_meta(item: &Meta) -> darling::Result<Self> {
         (match *item {
-            Meta::NameValue(ref nv) => match nv.lit {
-                syn::Lit::Str(ref lit_str) => Ok(OnParent {
+            Meta::NameValue(ref nv) => match nv.value {
+                syn::Expr::Lit(syn::ExprLit {
+                    lit: syn::Lit::Str(ref lit_str),
+                    ..
+                }) => Ok(OnParent {
                     relation_field: parse_relation_field(lit_str, false)?,
                 }),
                 _ => Err(darling::Error::custom(

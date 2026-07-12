@@ -12,13 +12,13 @@ impl<'a> Documentation<'a> {
                 d.push_str(docs.as_ref());
             }
             Cow::Borrowed(existing) => {
-                self.0 = Cow::Owned(format!("{existing}\n{}", docs));
+                self.0 = Cow::Owned(format!("{existing}\n{docs}"));
             }
         }
     }
 }
 
-impl<'a> fmt::Display for Documentation<'a> {
+impl fmt::Display for Documentation<'_> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         for line in self.0.split('\n') {
             f.write_str("///")?;

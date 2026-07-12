@@ -10,7 +10,7 @@ fn should_not_remove_whitespace() {
         }
     "#};
 
-    psl::parse_schema(dml)
+    psl::parse_schema_without_extensions(dml)
         .unwrap()
         .assert_has_model("User")
         .assert_has_scalar_field("firstName")
@@ -28,7 +28,7 @@ fn should_not_try_to_interpret_comments_in_strings() {
         }
     "#};
 
-    psl::parse_schema(dml)
+    psl::parse_schema_without_extensions(dml)
         .unwrap()
         .assert_has_model("User")
         .assert_has_scalar_field("firstName")

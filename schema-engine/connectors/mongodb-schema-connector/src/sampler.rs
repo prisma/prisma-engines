@@ -4,12 +4,12 @@ mod statistics;
 use datamodel_renderer as render;
 use futures::TryStreamExt;
 use mongodb::{
-    bson::{doc, Document},
-    options::AggregateOptions,
     Database,
+    bson::{Document, doc},
+    options::AggregateOptions,
 };
 use mongodb_schema_describer::MongoSchema;
-use schema_connector::{warnings::Model, IntrospectionContext, IntrospectionResult, Warnings};
+use schema_connector::{IntrospectionContext, IntrospectionResult, Warnings, warnings::Model};
 use statistics::*;
 use std::borrow::Cow;
 
@@ -17,7 +17,7 @@ use std::borrow::Cow;
 /// maximum of SAMPLE_SIZE documents for their fields with the following rules:
 ///
 /// - If the same field differs in types between documents, takes the most
-/// common type or if even, the latest type and adds a warning.
+///   common type or if even, the latest type and adds a warning.
 /// - Missing fields count as null.
 /// - Indices are taken, but not if they are partial.
 pub(super) async fn sample(
@@ -49,7 +49,8 @@ pub(super) async fn sample(
 
         let mut documents = database
             .collection::<Document>(collection.name())
-            .aggregate(vec![doc! { "$sample": { "size": SAMPLE_SIZE } }], Some(options))
+            .aggregate(vec![doc! { "$sample": { "size": SAMPLE_SIZE } }])
+            .with_options(options)
             .await?;
 
         while let Some(document) = documents.try_next().await? {

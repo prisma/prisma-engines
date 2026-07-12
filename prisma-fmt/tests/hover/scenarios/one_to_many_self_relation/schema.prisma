@@ -1,0 +1,6 @@
+model Bee {
+    id  Int  @id
+    bees Be<|>e[]  @relation(name: "bees")
+    B   Bee? @relation(name: "bees", fields: [bId], references: [id])
+    bId Int?
+}

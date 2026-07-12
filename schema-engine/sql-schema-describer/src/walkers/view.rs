@@ -20,7 +20,7 @@ impl<'a> ViewWalker<'a> {
     pub fn namespace(self) -> Option<&'a str> {
         self.schema
             .namespaces
-            .get(self.get().namespace_id.0 as usize)
+            .get_index(self.get().namespace_id.0 as usize)
             .map(|s| s.as_str())
     }
 

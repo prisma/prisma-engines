@@ -1,10 +1,12 @@
 use super::*;
-use crate::bigdecimal::BigDecimal;
+use crate::macros::assert_matching_value_and_column_type;
+use crate::{bigdecimal::BigDecimal, connector::ColumnType};
 use std::str::FromStr;
 
 test_type!(numeric(
     mssql,
     "numeric(10,2)",
+    ColumnType::Numeric,
     Value::null_numeric(),
     Value::numeric(BigDecimal::from_str("3.14")?)
 ));
@@ -12,6 +14,7 @@ test_type!(numeric(
 test_type!(numeric_10_2(
     mssql,
     "numeric(10,2)",
+    ColumnType::Numeric,
     (
         Value::numeric(BigDecimal::from_str("3950.123456")?),
         Value::numeric(BigDecimal::from_str("3950.12")?)
@@ -21,6 +24,7 @@ test_type!(numeric_10_2(
 test_type!(numeric_35_6(
     mssql,
     "numeric(35, 6)",
+    ColumnType::Numeric,
     (
         Value::numeric(BigDecimal::from_str("3950")?),
         Value::numeric(BigDecimal::from_str("3950.000000")?)
@@ -102,6 +106,7 @@ test_type!(numeric_35_6(
 test_type!(numeric_35_2(
     mssql,
     "numeric(35, 2)",
+    ColumnType::Numeric,
     (
         Value::numeric(BigDecimal::from_str("3950.123456")?),
         Value::numeric(BigDecimal::from_str("3950.12")?)
@@ -115,18 +120,21 @@ test_type!(numeric_35_2(
 test_type!(numeric_4_0(
     mssql,
     "numeric(4, 0)",
+    ColumnType::Numeric,
     Value::numeric(BigDecimal::from_str("3950")?)
 ));
 
 test_type!(numeric_35_0(
     mssql,
     "numeric(35, 0)",
+    ColumnType::Numeric,
     Value::numeric(BigDecimal::from_str("79228162514264337593543950335")?),
 ));
 
 test_type!(numeric_35_1(
     mssql,
     "numeric(35, 1)",
+    ColumnType::Numeric,
     (
         Value::numeric(BigDecimal::from_str("79228162514264337593543950335")?),
         Value::numeric(BigDecimal::from_str("79228162514264337593543950335.0")?)
@@ -141,12 +149,14 @@ test_type!(numeric_35_1(
 test_type!(numeric_38_6(
     mssql,
     "numeric(38, 6)",
+    ColumnType::Numeric,
     Value::numeric(BigDecimal::from_str("9343234567898765456789043634999.345678")?),
 ));
 
 test_type!(money(
     mssql,
     "money",
+    ColumnType::Double,
     (Value::null_numeric(), Value::null_double()),
     (Value::numeric(BigDecimal::from_str("3.14")?), Value::double(3.14))
 ));
@@ -154,6 +164,7 @@ test_type!(money(
 test_type!(smallmoney(
     mssql,
     "smallmoney",
+    ColumnType::Double,
     (Value::null_numeric(), Value::null_double()),
     (Value::numeric(BigDecimal::from_str("3.14")?), Value::double(3.14))
 ));
@@ -161,6 +172,7 @@ test_type!(smallmoney(
 test_type!(float_24(
     mssql,
     "float(24)",
+    ColumnType::Float,
     (Value::null_numeric(), Value::null_float()),
     (
         Value::numeric(BigDecimal::from_str("1.123456")?),
@@ -171,6 +183,7 @@ test_type!(float_24(
 test_type!(real(
     mssql,
     "real",
+    ColumnType::Float,
     (Value::null_numeric(), Value::null_float()),
     (
         Value::numeric(BigDecimal::from_str("1.123456")?),
@@ -181,6 +194,7 @@ test_type!(real(
 test_type!(float_53(
     mssql,
     "float(53)",
+    ColumnType::Double,
     (Value::null_numeric(), Value::null_double()),
     (
         Value::numeric(BigDecimal::from_str("1.123456789012345")?),

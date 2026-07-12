@@ -1,0 +1,46 @@
+[package]
+edition = "2024"
+name = "query-compiler"
+version = "0.1.0"
+
+[dependencies]
+psl.workspace = true
+query-structure.workspace = true
+query-builder.workspace = true
+query-core.workspace = true
+serde_json.workspace = true
+sql-query-builder = { workspace = true, features = ["relation_joins"]}
+quaint.workspace = true
+
+thiserror.workspace = true
+serde.workspace = true
+itertools.workspace = true
+bon.workspace = true
+pretty = { workspace = true, features = ["termcolor"] }
+indexmap = { workspace = true, features = ["serde"] }
+
+[dev-dependencies]
+codspeed-criterion-compat.workspace = true
+insta = { workspace = true, features = ["glob"] }
+request-handlers = { workspace = true, features = ["all"] }
+schema.workspace = true
+# pull all connectors for testing
+psl = { workspace = true, features = ["sqlite", "mysql", "postgresql", "mssql", "cockroachdb"] }
+quaint = { workspace = true, features = ["sqlite", "mysql", "postgresql", "mssql"] }
+sql-query-builder = { workspace = true, features = ["relation_joins"] }
+
+[[example]]
+name = "profile_query"
+
+[[bench]]
+name = "compilation_bench"
+harness = false
+
+[features]
+default = ["all"]
+sqlite = ["quaint/sqlite"]
+postgresql = ["quaint/postgresql"]
+mysql = ["quaint/mysql"]
+mssql = ["quaint/mssql"]
+cockroachdb = ["postgresql"]
+all = ["sqlite", "postgresql", "mysql", "mssql", "cockroachdb"]

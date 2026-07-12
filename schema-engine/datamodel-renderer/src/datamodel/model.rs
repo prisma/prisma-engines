@@ -2,7 +2,7 @@ mod relation;
 
 pub use relation::Relation;
 
-use super::{attributes::BlockAttribute, field::Field, IdDefinition, IndexDefinition};
+use super::{IdDefinition, IndexDefinition, attributes::BlockAttribute, field::Field};
 use crate::value::{Constant, Documentation, Function};
 use std::{borrow::Cow, fmt};
 
@@ -192,7 +192,7 @@ impl<'a> Model<'a> {
     }
 }
 
-impl<'a> fmt::Display for Model<'a> {
+impl fmt::Display for Model<'_> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         // Prefix everything with this, so if the model is commented out, so
         // is your line.

@@ -1,0 +1,22 @@
+[package]
+edition.workspace = true
+name = "telemetry"
+version = "0.1.0"
+
+[dependencies]
+ahash.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+tokio = { workspace = true, features = ["macros", "time"] }
+tracing = { workspace = true, features = ["attributes"] }
+tracing-subscriber = { workspace = true, features = ["env-filter"] }
+crosstarget-utils.workspace = true
+enumflags2.workspace = true
+derive_more.workspace = true
+
+[target.'cfg(not(target_arch = "wasm32-unknown-unknown"))'.dependencies]
+rand.workspace = true
+
+[dev-dependencies]
+insta = { workspace = true, features = ["redactions", "ron"] }

@@ -41,7 +41,7 @@ impl TryFrom<&str> for Provider {
         } else if COCKROACH.is_provider(provider) {
             Ok(Provider::Cockroach)
         } else {
-            Err(format!("Connector {} is not supported yet", provider))
+            Err(format!("Connector {provider} is not supported yet"))
         }
     }
 }
@@ -55,6 +55,6 @@ impl From<Provider> for String {
 impl Display for Provider {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         let s: String = (*self).into();
-        write!(f, "{}", s)
+        write!(f, "{s}")
     }
 }

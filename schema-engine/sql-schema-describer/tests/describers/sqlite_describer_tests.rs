@@ -62,7 +62,7 @@ fn sqlite_column_types_must_work(api: TestApi) {
     api.raw_cmd(sql);
     let expectation = expect![[r#"
         SqlSchema {
-            namespaces: [],
+            namespaces: {},
             tables: [
                 Table {
                     namespace_id: NamespaceId(
@@ -186,8 +186,10 @@ fn sqlite_column_types_must_work(api: TestApi) {
                     ),
                     index_name: "",
                     tpe: PrimaryKey,
+                    predicate: None,
                 },
             ],
+            stripped_partial_indexes: <StrippedPartialIndexes>,
             index_columns: [
                 IndexColumn {
                     index_id: IndexId(
@@ -206,6 +208,7 @@ fn sqlite_column_types_must_work(api: TestApi) {
             procedures: [],
             user_defined_types: [],
             connector_data: <ConnectorData>,
+            runtime_namespace: None,
         }
     "#]];
     api.expect_schema(expectation);
@@ -279,7 +282,7 @@ fn escaped_quotes_in_string_defaults_must_be_unescaped(api: TestApi) {
     api.raw_cmd(create_table);
     let expectation = expect![[r#"
         SqlSchema {
-            namespaces: [],
+            namespaces: {},
             tables: [
                 Table {
                     namespace_id: NamespaceId(
@@ -360,6 +363,7 @@ fn escaped_quotes_in_string_defaults_must_be_unescaped(api: TestApi) {
             view_default_values: [],
             foreign_key_columns: [],
             indexes: [],
+            stripped_partial_indexes: <StrippedPartialIndexes>,
             index_columns: [],
             check_constraints: [],
             views: [],
@@ -367,6 +371,7 @@ fn escaped_quotes_in_string_defaults_must_be_unescaped(api: TestApi) {
             procedures: [],
             user_defined_types: [],
             connector_data: <ConnectorData>,
+            runtime_namespace: None,
         }
     "#]];
     api.expect_schema(expectation);
@@ -384,7 +389,7 @@ fn backslashes_in_string_literals(api: TestApi) {
 
     let expectation = expect![[r#"
         SqlSchema {
-            namespaces: [],
+            namespaces: {},
             tables: [
                 Table {
                     namespace_id: NamespaceId(
@@ -436,6 +441,7 @@ fn backslashes_in_string_literals(api: TestApi) {
             view_default_values: [],
             foreign_key_columns: [],
             indexes: [],
+            stripped_partial_indexes: <StrippedPartialIndexes>,
             index_columns: [],
             check_constraints: [],
             views: [],
@@ -443,6 +449,7 @@ fn backslashes_in_string_literals(api: TestApi) {
             procedures: [],
             user_defined_types: [],
             connector_data: <ConnectorData>,
+            runtime_namespace: None,
         }
     "#]];
     api.expect_schema(expectation);
@@ -472,7 +479,7 @@ fn broken_relations_are_filtered_out(api: TestApi) {
     // the relation to platypus should be the only foreign key on dog
     let expectation = expect![[r#"
         SqlSchema {
-            namespaces: [],
+            namespaces: {},
             tables: [
                 Table {
                     namespace_id: NamespaceId(
@@ -614,6 +621,7 @@ fn broken_relations_are_filtered_out(api: TestApi) {
                     ),
                     index_name: "",
                     tpe: PrimaryKey,
+                    predicate: None,
                 },
                 Index {
                     table_id: TableId(
@@ -621,8 +629,10 @@ fn broken_relations_are_filtered_out(api: TestApi) {
                     ),
                     index_name: "",
                     tpe: PrimaryKey,
+                    predicate: None,
                 },
             ],
+            stripped_partial_indexes: <StrippedPartialIndexes>,
             index_columns: [
                 IndexColumn {
                     index_id: IndexId(
@@ -651,6 +661,7 @@ fn broken_relations_are_filtered_out(api: TestApi) {
             procedures: [],
             user_defined_types: [],
             connector_data: <ConnectorData>,
+            runtime_namespace: None,
         }
     "#]];
     api.expect_schema(expectation);
@@ -744,4 +755,159 @@ fn integer_primary_keys_autoincrement(api: TestApi) {
         .collect::<Vec<_>>();
 
     expected.assert_debug_eq(&found);
+}
+
+#[test_connector(tags(Sqlite))]
+fn partial_indexes_are_described(api: TestApi) {
+    let sql = r#"
+        CREATE TABLE "User" (
+            id INTEGER PRIMARY KEY,
+            email TEXT NOT NULL,
+            active INTEGER NOT NULL DEFAULT 1
+        );
+
+        CREATE UNIQUE INDEX "User_email_active_idx" ON "User" (email) WHERE active = 1;
+    "#;
+
+    api.raw_cmd(sql);
+    let expected = expect![[r#"
+        SqlSchema {
+            namespaces: {},
+            tables: [
+                Table {
+                    namespace_id: NamespaceId(
+                        0,
+                    ),
+                    name: "User",
+                    properties: BitFlags<TableProperties> {
+                        bits: 0b0,
+                    },
+                    description: None,
+                },
+            ],
+            enums: [],
+            enum_variants: [],
+            table_columns: [
+                (
+                    TableId(
+                        0,
+                    ),
+                    Column {
+                        name: "id",
+                        tpe: ColumnType {
+                            full_data_type: "integer",
+                            family: Int,
+                            arity: Required,
+                            native_type: None,
+                        },
+                        auto_increment: true,
+                        description: None,
+                    },
+                ),
+                (
+                    TableId(
+                        0,
+                    ),
+                    Column {
+                        name: "email",
+                        tpe: ColumnType {
+                            full_data_type: "text",
+                            family: String,
+                            arity: Required,
+                            native_type: None,
+                        },
+                        auto_increment: false,
+                        description: None,
+                    },
+                ),
+                (
+                    TableId(
+                        0,
+                    ),
+                    Column {
+                        name: "active",
+                        tpe: ColumnType {
+                            full_data_type: "integer",
+                            family: Int,
+                            arity: Required,
+                            native_type: None,
+                        },
+                        auto_increment: false,
+                        description: None,
+                    },
+                ),
+            ],
+            foreign_keys: [],
+            table_default_values: [
+                (
+                    TableColumnId(
+                        2,
+                    ),
+                    DefaultValue {
+                        kind: Value(
+                            Int(
+                                1,
+                            ),
+                        ),
+                        constraint_name: None,
+                    },
+                ),
+            ],
+            view_default_values: [],
+            foreign_key_columns: [],
+            indexes: [
+                Index {
+                    table_id: TableId(
+                        0,
+                    ),
+                    index_name: "",
+                    tpe: PrimaryKey,
+                    predicate: None,
+                },
+                Index {
+                    table_id: TableId(
+                        0,
+                    ),
+                    index_name: "User_email_active_idx",
+                    tpe: Unique,
+                    predicate: Some(
+                        "active = 1",
+                    ),
+                },
+            ],
+            stripped_partial_indexes: <StrippedPartialIndexes>,
+            index_columns: [
+                IndexColumn {
+                    index_id: IndexId(
+                        0,
+                    ),
+                    column_id: TableColumnId(
+                        0,
+                    ),
+                    sort_order: None,
+                    length: None,
+                },
+                IndexColumn {
+                    index_id: IndexId(
+                        1,
+                    ),
+                    column_id: TableColumnId(
+                        1,
+                    ),
+                    sort_order: Some(
+                        Asc,
+                    ),
+                    length: None,
+                },
+            ],
+            check_constraints: [],
+            views: [],
+            view_columns: [],
+            procedures: [],
+            user_defined_types: [],
+            connector_data: <ConnectorData>,
+            runtime_namespace: None,
+        }
+    "#]];
+    expected.assert_debug_eq(&api.describe());
 }

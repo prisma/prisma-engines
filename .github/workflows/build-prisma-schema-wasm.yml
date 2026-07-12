@@ -1,17 +1,16 @@
-name: Prisma Schema (WASM)
+name: Prisma Schema (Wasm)
 on:
   push:
     branches:
       - main
   pull_request:
     paths-ignore:
-      - "!.github/workflows/build-prisma-schema-wasm.yml"
-      - ".github/**"
-      - ".buildkite/**"
-      - "*.md"
-      - "LICENSE"
-      - "CODEOWNERS"
-      - "renovate.json"
+      - '.github/**'
+      - '!.github/workflows/build-prisma-schema-wasm.yml'
+      - '!.github/workflows/include/rust-wasm-setup/action.yml'
+      - '*.md'
+      - 'LICENSE'
+      - 'CODEOWNERS'
 
 jobs:
   build:

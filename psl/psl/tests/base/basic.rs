@@ -11,7 +11,7 @@ fn parse_basic_model() {
         }
     "#};
 
-    let schema = psl::parse_schema(dml).unwrap();
+    let schema = psl::parse_schema_without_extensions(dml).unwrap();
     let user_model = schema.assert_has_model("User");
 
     user_model
@@ -37,7 +37,7 @@ fn parse_basic_enum() {
         }
     "#};
 
-    let schema = psl::parse_schema(dml).unwrap();
+    let schema = psl::parse_schema_without_extensions(dml).unwrap();
     let role_enum = schema.db.find_enum("Roles").unwrap();
     let values: Vec<_> = role_enum.values().map(|v| v.name()).collect();
 
@@ -60,7 +60,7 @@ fn parse_comments() {
         }
     "#};
 
-    let schema = psl::parse_schema(dml).unwrap();
+    let schema = psl::parse_schema_without_extensions(dml).unwrap();
 
     let user_model = schema.assert_has_model("User");
     user_model.assert_with_documentation("The user model.");
@@ -235,6 +235,12 @@ fn type_aliases_must_error() {
         [1;94m   | [0m
         [1;94m 1 | [0m[1;91mtype MyString = String @default("B")[0m
         [1;94m   | [0m
+        [1;91merror[0m: [1mType "MyString" is neither a built-in type, nor refers to another model, composite type, or enum.[0m
+          [1;94m-->[0m  [4mschema.prisma:5[0m
+        [1;94m   | [0m
+        [1;94m 4 | [0m  id  Int      @id
+        [1;94m 5 | [0m  val [1;91mMyString[0m
+        [1;94m   | [0m
     "#]];
 
     expectation.assert_eq(&error);
@@ -256,12 +262,11 @@ fn must_return_good_error_message_for_type_match() {
 
         datasource db {
           provider   = "postgresql"
-          url        = env("TEST_DATABASE_URL")
           extensions = [citext, pg_trgm]
         }
 
         generator js {
-          provider        = "prisma-client-js"
+          provider        = "prisma-client"
           previewFeatures = ["postgresqlExtensions"]
         }
     "#};

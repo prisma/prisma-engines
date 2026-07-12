@@ -1,12 +1,16 @@
+use std::borrow::Cow;
+
 use crate::{
+    ValidatedSchema,
     datamodel_connector::{
         Connector, ConnectorCapabilities, ConnectorCapability, ConstraintScope, Flavour, NativeTypeConstructor,
         NativeTypeInstance,
     },
     diagnostics::{DatamodelError, Diagnostics, Span},
-    parser_database::{ReferentialAction, ScalarType},
+    parser_database::ReferentialAction,
 };
 use enumflags2::BitFlags;
+use parser_database::{ExtensionTypes, ScalarFieldType};
 
 const NATIVE_TYPE_CONSTRUCTORS: &[NativeTypeConstructor] = &[];
 const CONSTRAINT_SCOPES: &[ConstraintScope] = &[ConstraintScope::GlobalKeyIndex];
@@ -14,7 +18,6 @@ pub const CAPABILITIES: ConnectorCapabilities = enumflags2::make_bitflags!(Conne
     AnyId |
     AutoIncrement |
     CompoundIds |
-    SqlQueryRaw |
     RelationFieldsInArbitraryOrder |
     UpdateableId |
     ImplicitManyToManyRelation |
@@ -30,7 +33,13 @@ pub const CAPABILITIES: ConnectorCapabilities = enumflags2::make_bitflags!(Conne
     UpdateReturning |
     SupportsFiltersOnRelationsWithoutJoins |
     CreateMany |
-    CreateManyWriteableAutoIncId
+    CreateManyWriteableAutoIncId |
+    Json |
+    JsonFiltering |
+    JsonFilteringJsonPath |
+    AdvancedJsonNullability |
+    Enums |
+    PartialIndex
 });
 
 pub struct SqliteDatamodelConnector;
@@ -64,23 +73,23 @@ impl Connector for SqliteDatamodelConnector {
         Restrict | SetNull | Cascade
     }
 
-    fn scalar_type_for_native_type(&self, _native_type: &NativeTypeInstance) -> ScalarType {
+    fn scalar_type_for_native_type(
+        &self,
+        _native_type: &NativeTypeInstance,
+        _extension_types: &dyn ExtensionTypes,
+    ) -> Option<ScalarFieldType> {
         unreachable!("No native types on Sqlite");
     }
 
-    fn default_native_type_for_scalar_type(&self, _scalar_type: &ScalarType) -> Option<NativeTypeInstance> {
+    fn default_native_type_for_scalar_type(
+        &self,
+        _scalar_type: &ScalarFieldType,
+        _schema: &ValidatedSchema,
+    ) -> Option<NativeTypeInstance> {
         None
     }
 
-    fn native_type_is_default_for_scalar_type(
-        &self,
-        _native_type: &NativeTypeInstance,
-        _scalar_type: &ScalarType,
-    ) -> bool {
-        false
-    }
-
-    fn native_type_to_parts(&self, _native_type: &NativeTypeInstance) -> (&'static str, Vec<String>) {
+    fn native_type_to_parts<'t>(&self, _native_type: &'t NativeTypeInstance) -> (&'t str, Cow<'t, [String]>) {
         unreachable!()
     }
 
@@ -116,5 +125,9 @@ impl Connector for SqliteDatamodelConnector {
 
     fn flavour(&self) -> Flavour {
         Flavour::Sqlite
+    }
+
+    fn can_assume_strict_equality_in_joins(&self) -> bool {
+        true
     }
 }

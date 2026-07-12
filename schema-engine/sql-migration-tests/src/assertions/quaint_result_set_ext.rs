@@ -1,4 +1,4 @@
-use quaint::{connector::ResultRowRef, prelude::ResultSet, Value, ValueType};
+use quaint::{Value, ValueType, connector::ResultRowRef, prelude::ResultSet};
 
 pub trait ResultSetExt: Sized {
     fn assert_row_count(self, expected_count: usize) -> Self;
@@ -32,7 +32,7 @@ impl ResultSetExt for ResultSet {
 #[derive(Debug)]
 pub struct RowAssertion<'a>(ResultRowRef<'a>);
 
-impl<'a> RowAssertion<'a> {
+impl RowAssertion<'_> {
     pub fn assert_array_value(self, column_name: &str, expected_value: &[Value<'_>]) -> Self {
         let actual_value = self.0.get(column_name).and_then(|col: &Value<'_>| match &col.typed {
             ValueType::Array(x) => x.as_ref(),
@@ -104,6 +104,28 @@ impl<'a> RowAssertion<'a> {
 
     pub fn assert_int_value(self, column_name: &str, expected_value: i64) -> Self {
         let actual_value = self.0.get(column_name).and_then(|col: &Value<'_>| (*col).as_integer());
+
+        assert!(
+            actual_value == Some(expected_value),
+            "Value assertion failed for {column_name}. Expected: {expected_value:?}, got: {actual_value:?}",
+        );
+
+        self
+    }
+
+    pub fn assert_bigint_value(self, column_name: &str, expected_value: i64) -> Self {
+        let actual_value = self.0.get(column_name).and_then(|col: &Value<'_>| (*col).as_i64());
+
+        assert!(
+            actual_value == Some(expected_value),
+            "Value assertion failed for {column_name}. Expected: {expected_value:?}, got: {actual_value:?}",
+        );
+
+        self
+    }
+
+    pub fn assert_bytes_value(self, column_name: &str, expected_value: &[u8]) -> Self {
+        let actual_value = self.0.get(column_name).and_then(|col: &Value<'_>| (*col).as_bytes());
 
         assert!(
             actual_value == Some(expected_value),

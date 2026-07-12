@@ -1,0 +1,25 @@
+datasource db {
+  provider = "postgresql"
+}
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["partialIndexes"]
+}
+
+model User {
+  id        Int       @id
+  email     String
+  deletedAt DateTime?
+
+  @@unique([email], where: { deletedAt: null })
+}
+
+model Post {
+  id        Int       @id
+  title     String
+  authorId  Int
+  deletedAt DateTime?
+
+  @@unique([title, authorId], where: { deletedAt: null })
+}

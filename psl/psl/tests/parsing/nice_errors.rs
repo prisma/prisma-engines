@@ -204,16 +204,20 @@ fn nice_error_in_case_of_literal_type_in_env_var() {
     let source = indoc! {r#"
         datasource ds {
           provider = "postgresql"
-          url = env(DATABASE_URL)
+        }
+
+        generator g {
+          provider = "custom-client"
+          option = env(DATABASE_URL)
         }
     "#};
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mExpected a string value, but received literal value `DATABASE_URL`.[0m
-          [1;94m-->[0m  [4mschema.prisma:3[0m
+          [1;94m-->[0m  [4mschema.prisma:7[0m
         [1;94m   | [0m
-        [1;94m 2 | [0m  provider = "postgresql"
-        [1;94m 3 | [0m  url = env([1;91mDATABASE_URL[0m)
+        [1;94m 6 | [0m  provider = "custom-client"
+        [1;94m 7 | [0m  option = env([1;91mDATABASE_URL[0m)
         [1;94m   | [0m
     "#]];
 
@@ -225,16 +229,20 @@ fn nice_error_in_case_of_bool_type_in_env_var() {
     let source = indoc! {r#"
         datasource ds {
           provider = "postgresql"
-          url = env(true)
+        }
+
+        generator g {
+          provider = "custom-client"
+          option = env(true)
         }
     "#};
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mExpected a string value, but received literal value `true`.[0m
-          [1;94m-->[0m  [4mschema.prisma:3[0m
+          [1;94m-->[0m  [4mschema.prisma:7[0m
         [1;94m   | [0m
-        [1;94m 2 | [0m  provider = "postgresql"
-        [1;94m 3 | [0m  url = env([1;91mtrue[0m)
+        [1;94m 6 | [0m  provider = "custom-client"
+        [1;94m 7 | [0m  option = env([1;91mtrue[0m)
         [1;94m   | [0m
     "#]];
 
@@ -246,16 +254,20 @@ fn nice_error_in_case_of_numeric_type_in_env_var() {
     let source = indoc! {r#"
         datasource ds {
           provider = "postgresql"
-          url = env(4)
+        }
+
+        generator g {
+          provider = "custom-client"
+          option = env(4)
         }
     "#};
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mExpected a string value, but received numeric value `4`.[0m
-          [1;94m-->[0m  [4mschema.prisma:3[0m
+          [1;94m-->[0m  [4mschema.prisma:7[0m
         [1;94m   | [0m
-        [1;94m 2 | [0m  provider = "postgresql"
-        [1;94m 3 | [0m  url = env([1;91m4[0m)
+        [1;94m 6 | [0m  provider = "custom-client"
+        [1;94m 7 | [0m  option = env([1;91m4[0m)
         [1;94m   | [0m
     "#]];
 
@@ -267,16 +279,20 @@ fn nice_error_in_case_of_array_type_in_env_var() {
     let source = indoc! {r#"
         datasource ds {
           provider = "postgresql"
-          url = env([DATABASE_URL])
+        }
+
+        generator g {
+          provider = "custom-client"
+          option = env([DATABASE_URL])
         }
     "#};
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mExpected a string value, but received array value `[DATABASE_URL]`.[0m
-          [1;94m-->[0m  [4mschema.prisma:3[0m
+          [1;94m-->[0m  [4mschema.prisma:7[0m
         [1;94m   | [0m
-        [1;94m 2 | [0m  provider = "postgresql"
-        [1;94m 3 | [0m  url = env([1;91m[DATABASE_URL][0m)
+        [1;94m 6 | [0m  provider = "custom-client"
+        [1;94m 7 | [0m  option = env([1;91m[DATABASE_URL][0m)
         [1;94m   | [0m
     "#]];
 
@@ -336,18 +352,17 @@ fn invalid_lines_in_datasources_must_render_nicely() {
     let dml = indoc! {r#"
         datasource mydb {
           provider = "postgres"
-          url = "postgresql://localhost"
           this is an invalid line
         }
     "#};
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError validating: This line is not a valid definition within a datasource.[0m
-          [1;94m-->[0m  [4mschema.prisma:4[0m
+          [1;94m-->[0m  [4mschema.prisma:3[0m
         [1;94m   | [0m
-        [1;94m 3 | [0m  url = "postgresql://localhost"
-        [1;94m 4 | [0m  [1;91mthis is an invalid line[0m
-        [1;94m 5 | [0m}
+        [1;94m 2 | [0m  provider = "postgres"
+        [1;94m 3 | [0m  [1;91mthis is an invalid line[0m
+        [1;94m 4 | [0m}
         [1;94m   | [0m
     "#]];
 

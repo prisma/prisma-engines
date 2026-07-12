@@ -1,4 +1,4 @@
-use super::{IsolationLevel, ResultSet, Transaction};
+use super::{DescribedQuery, ExternalConnector, IsolationLevel, ResultSet, Transaction};
 use crate::ast::*;
 use async_trait::async_trait;
 
@@ -17,6 +17,11 @@ pub trait ToColumnNames {
 /// Represents a connection or a transaction that can be queried.
 #[async_trait]
 pub trait Queryable: Send + Sync {
+    /// Returns a reference to self as an ExternalConnector if available.
+    fn as_external_connector(&self) -> Option<&dyn ExternalConnector> {
+        None
+    }
+
     /// Execute the given query.
     async fn query(&self, q: Query<'_>) -> crate::Result<ResultSet>;
 
@@ -56,6 +61,9 @@ pub trait Queryable: Send + Sync {
     /// example. The version string is returned directly without any form of
     /// parsing or normalization.
     async fn version(&self) -> crate::Result<Option<String>>;
+
+    /// Prepares a statement and returns type information.
+    async fn describe_query(&self, sql: &str) -> crate::Result<DescribedQuery>;
 
     /// Returns false, if connection is considered to not be in a working state.
     fn is_healthy(&self) -> bool;
@@ -109,6 +117,12 @@ pub trait TransactionCapable: Queryable {
     ) -> crate::Result<Box<dyn Transaction + 'a>>;
 }
 
+#[cfg(any(
+    feature = "sqlite-native",
+    feature = "mssql-native",
+    feature = "postgresql-native",
+    feature = "mysql-native"
+))]
 macro_rules! impl_default_TransactionCapable {
     ($t:ty) => {
         #[async_trait]
@@ -127,4 +141,10 @@ macro_rules! impl_default_TransactionCapable {
     };
 }
 
+#[cfg(any(
+    feature = "sqlite-native",
+    feature = "mssql-native",
+    feature = "postgresql-native",
+    feature = "mysql-native"
+))]
 pub(crate) use impl_default_TransactionCapable;

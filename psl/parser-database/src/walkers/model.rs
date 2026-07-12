@@ -1,23 +1,25 @@
 mod primary_key;
+mod shard_key;
 mod unique_criteria;
 
 pub use primary_key::*;
+pub use shard_key::*;
 
 pub(crate) use unique_criteria::*;
 
 use super::{
     CompleteInlineRelationWalker, FieldWalker, IndexWalker, InlineRelationWalker, RelationFieldWalker, RelationWalker,
-    ScalarFieldWalker,
+    ScalarFieldWalker, newline,
 };
+
 use crate::{
-    ast::{self, WithName},
-    types::ModelAttributes,
     FileId,
+    ast::{self, IndentationType, NewlineType, WithName, WithSpan},
+    types::ModelAttributes,
 };
-use schema_ast::ast::{IndentationType, NewlineType, WithSpan};
 
 /// A `model` declaration in the Prisma schema.
-pub type ModelWalker<'db> = super::Walker<'db, (FileId, ast::ModelId)>;
+pub type ModelWalker<'db> = super::Walker<'db, crate::ModelId>;
 
 impl<'db> ModelWalker<'db> {
     /// The name of the model.
@@ -28,6 +30,11 @@ impl<'db> ModelWalker<'db> {
     /// The ID of the file containing the model.
     pub fn file_id(self) -> FileId {
         self.id.0
+    }
+
+    /// Returns the specific field from the model.
+    pub fn field(&self, field_id: ast::FieldId) -> FieldWalker<'db> {
+        self.walk((self.id, field_id))
     }
 
     /// Traverse the fields of the models in the order they were defined.
@@ -108,6 +115,15 @@ impl<'db> ModelWalker<'db> {
     /// The primary key of the model, if defined.
     pub fn primary_key(self) -> Option<PrimaryKeyWalker<'db>> {
         self.attributes().primary_key.as_ref().map(|pk| PrimaryKeyWalker {
+            model_id: self.id,
+            attribute: pk,
+            db: self.db,
+        })
+    }
+
+    /// The shard key of the model, if defined.
+    pub fn shard_key(self) -> Option<ShardKeyWalker<'db>> {
+        self.attributes().shard_key.as_ref().map(|pk| ShardKeyWalker {
             model_id: self.id,
             attribute: pk,
             db: self.db,
@@ -248,12 +264,9 @@ impl<'db> ModelWalker<'db> {
         };
 
         let src = self.db.source(self.id.0);
-        let start = field.ast_field().span().end - 2;
+        let span = field.ast_field().span();
 
-        match src.chars().nth(start) {
-            Some('\r') => NewlineType::Windows,
-            _ => NewlineType::Unix,
-        }
+        newline(src, span)
     }
 
     /// The name of the schema the model belongs to.

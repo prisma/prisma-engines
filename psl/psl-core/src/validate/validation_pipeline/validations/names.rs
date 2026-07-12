@@ -1,7 +1,7 @@
 use super::constraint_namespace::ConstraintNamespace;
 use parser_database::{
-    walkers::{RelationFieldId, RelationName},
     ModelId,
+    walkers::{RelationFieldId, RelationName},
 };
 use std::collections::{HashMap, HashSet};
 

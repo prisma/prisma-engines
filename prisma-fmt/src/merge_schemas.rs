@@ -47,7 +47,6 @@ mod tests {
                 r#"
                 datasource db {
                     provider = "postgresql"
-                    url = env("DBURL")
                 }
 
                 model A {
@@ -71,7 +70,6 @@ mod tests {
 
             datasource db {
               provider = "postgresql"
-              url      = env("DBURL")
             }
 
             model A {
@@ -102,7 +100,6 @@ mod tests {
                 r#"
                 datasource db {
                     provider = "postgresql"
-                    url = env("DBURL")
                 }
 
                 model A {

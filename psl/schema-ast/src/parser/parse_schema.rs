@@ -1,6 +1,6 @@
 use super::{
-    parse_composite_type::parse_composite_type, parse_enum::parse_enum, parse_model::parse_model,
-    parse_source_and_generator::parse_config_block, parse_view::parse_view, PrismaDatamodelParser, Rule,
+    PrismaDatamodelParser, Rule, parse_composite_type::parse_composite_type, parse_enum::parse_enum,
+    parse_model::parse_model, parse_source_and_generator::parse_config_block, parse_view::parse_view,
 };
 use crate::ast::*;
 use diagnostics::{DatamodelError, Diagnostics, FileId};

@@ -1,0 +1,14 @@
+generator client {
+  provider = "prisma-client"
+  output = "../lib/.generated/prisma"
+}
+
+generator edge {
+  provider = "prisma-client"
+  output = "../lib/.generated/prisma-edge"
+  runtime = "edge-light"
+}
+
+datasource db {
+  provider  = "postgresql"
+}

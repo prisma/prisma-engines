@@ -3,20 +3,23 @@ mod id;
 mod map;
 mod native_types;
 mod schema;
+mod shard_key;
 
 use crate::{
+    DatamodelError, ScalarFieldId, ScalarType, StringId,
     ast::{self, WithName, WithSpan},
     coerce, coerce_array,
     context::Context,
     types::{
         CompositeTypeField, EnumAttributes, FieldWithArgs, IndexAlgorithm, IndexAttribute, IndexFieldPath, IndexType,
-        ModelAttributes, OperatorClassStore, RelationField, ScalarField, ScalarFieldType, SortOrder,
+        ModelAttributes, OperatorClassStore, RelationField, ScalarField, ScalarFieldType, SortOrder, WhereClause,
+        WhereCondition, WhereFieldCondition, WhereValue,
     },
     walkers::RelationFieldId,
-    DatamodelError, ScalarFieldId, StringId,
 };
 use diagnostics::Span;
-use std::borrow::Cow;
+use itertools::Itertools;
+use std::{borrow::Cow, cell::Cell, fmt::Display};
 
 pub(super) fn resolve_attributes(ctx: &mut Context<'_>) {
     for rfid in ctx.types.iter_relation_field_ids() {
@@ -45,7 +48,12 @@ fn resolve_composite_type_attributes<'db>(
     ctx: &mut Context<'db>,
 ) {
     for (field_id, field) in ct.iter_fields() {
-        let CompositeTypeField { r#type, .. } = ctx.types.composite_type_fields[&(ctid, field_id)];
+        let CompositeTypeField { r#type, .. } =
+            if let Some(val) = ctx.types.composite_type_fields.get(&(ctid, field_id)) {
+                val.clone()
+            } else {
+                continue;
+            };
 
         ctx.visit_attributes((ctid.0, (ctid.1, field_id)));
 
@@ -81,14 +89,13 @@ fn resolve_composite_type_attributes<'db>(
 fn resolve_enum_attributes<'db>(enum_id: crate::EnumId, ast_enum: &'db ast::Enum, ctx: &mut Context<'db>) {
     let mut enum_attributes = EnumAttributes::default();
 
-    for value_idx in 0..ast_enum.values.len() {
-        ctx.visit_attributes((enum_id.0, (enum_id.1, value_idx as u32)));
+    for (value_id, _) in ast_enum.iter_values() {
+        ctx.visit_attributes((enum_id.0, (enum_id.1, value_id)));
         // @map
         if ctx.visit_optional_single_attr("map") {
             if let Some(mapped_name) = map::visit_map_attribute(ctx) {
-                enum_attributes.mapped_values.insert(value_idx as u32, mapped_name);
-                ctx.mapped_enum_value_names
-                    .insert((enum_id, mapped_name), value_idx as u32);
+                enum_attributes.mapped_values.insert(value_id, mapped_name);
+                ctx.mapped_enum_value_names.insert((enum_id, mapped_name), value_id);
             }
             ctx.validate_visited_arguments();
         }
@@ -171,8 +178,15 @@ fn resolve_model_attributes(model_id: crate::ModelId, ctx: &mut Context<'_>) {
         ctx.validate_visited_arguments();
     }
 
+    // @@shardKey
+    if ctx.visit_optional_single_attr("shardKey") {
+        shard_key::model(&mut model_attributes, model_id, ctx);
+        ctx.validate_visited_arguments();
+    }
+
     // Model-global validations
     id::validate_id_field_arities(model_id, &model_attributes, ctx);
+    shard_key::validate_shard_key_field_arities(model_id, &model_attributes, ctx);
 
     ctx.types.model_attributes.insert(model_id, model_attributes);
     ctx.validate_visited_attributes();
@@ -241,7 +255,7 @@ fn visit_scalar_field_attributes(
         ctx.validate_visited_arguments();
     }
 
-    if let ScalarFieldType::BuiltInScalar(_scalar_type) = r#type {
+    if let ScalarFieldType::BuiltInScalar(_) | ScalarFieldType::Extension(_) = r#type {
         // native type attributes
         if let Some((datasource_name, type_name, attribute_id)) = ctx.visit_datasource_scoped() {
             let attribute = &ctx.asts[attribute_id];
@@ -257,14 +271,25 @@ fn visit_scalar_field_attributes(
 
     // @unique
     if ctx.visit_optional_single_attr("unique") {
-        visit_field_unique(scalar_field_id, model_data, ctx);
+        visit_field_unique(scalar_field_id, model_id, model_data, ctx);
+        ctx.validate_visited_arguments();
+    }
+
+    // @shardKey
+    if ctx.visit_optional_single_attr("shardKey") {
+        shard_key::field(ast_model, scalar_field_id, field_id, model_data, ctx);
         ctx.validate_visited_arguments();
     }
 
     ctx.validate_visited_attributes();
 }
 
-fn visit_field_unique(scalar_field_id: ScalarFieldId, model_data: &mut ModelAttributes, ctx: &mut Context<'_>) {
+fn visit_field_unique(
+    scalar_field_id: ScalarFieldId,
+    model_id: crate::ModelId,
+    model_data: &mut ModelAttributes,
+    ctx: &mut Context<'_>,
+) {
     let mapped_name = match ctx
         .visit_optional_arg("map")
         .and_then(|arg| coerce::string(arg, ctx.diagnostics))
@@ -298,6 +323,7 @@ fn visit_field_unique(scalar_field_id: ScalarFieldId, model_data: &mut ModelAttr
     };
 
     let clustered = validate_clustering_setting(ctx);
+    let where_clause = parse_where_clause(model_id, ctx);
 
     let attribute_id = ctx.current_attribute_id();
     model_data.ast_indexes.push((
@@ -313,6 +339,7 @@ fn visit_field_unique(scalar_field_id: ScalarFieldId, model_data: &mut ModelAttr
             source_field: Some(scalar_field_id),
             mapped_name,
             clustered,
+            where_clause,
             ..Default::default()
         },
     ))
@@ -517,6 +544,7 @@ fn model_index(data: &mut ModelAttributes, model_id: crate::ModelId, ctx: &mut C
 
     index_attribute.algorithm = algo;
     index_attribute.clustered = validate_clustering_setting(ctx);
+    index_attribute.where_clause = parse_where_clause(model_id, ctx);
 
     data.ast_indexes.push((ctx.current_attribute_id().1, index_attribute));
 }
@@ -573,8 +601,233 @@ fn model_unique(data: &mut ModelAttributes, model_id: crate::ModelId, ctx: &mut 
     index_attribute.name = name;
     index_attribute.mapped_name = mapped_name;
     index_attribute.clustered = validate_clustering_setting(ctx);
+    index_attribute.where_clause = parse_where_clause(model_id, ctx);
 
     data.ast_indexes.push((current_attribute_id.1, index_attribute));
+}
+
+/// Parse the `where` argument for partial indexes.
+fn parse_where_clause(model_id: crate::ModelId, ctx: &mut Context<'_>) -> Option<WhereClause> {
+    let expression = ctx.visit_optional_arg("where")?;
+
+    // Object syntax: { field: value, ... }
+    if let Some((members, _span)) = expression.as_object() {
+        if members.is_empty() {
+            ctx.push_attribute_validation_error("The `where` argument cannot be an empty object.");
+            return None;
+        }
+
+        let mut conditions = Vec::new();
+
+        for member in members {
+            conditions.push(parse_where_object_member(member, model_id, ctx)?);
+        }
+
+        return Some(WhereClause::Object(conditions));
+    }
+
+    // raw("...") function call
+    if let Some(("raw", args)) = coerce::function(expression, ctx.diagnostics) {
+        return parse_raw_where_clause(args, ctx);
+    }
+
+    ctx.push_attribute_validation_error(
+        "The `where` argument must be either a raw() function call or an object literal, e.g. `where: raw(\"status = 'active'\")` or `where: { active: true }`.",
+    );
+
+    None
+}
+
+/// Parse raw("...") where clause.
+fn parse_raw_where_clause(args: &[ast::Argument], ctx: &mut Context<'_>) -> Option<WhereClause> {
+    let Some(first_arg) = args.first() else {
+        ctx.push_attribute_validation_error(
+            "The `where` argument must be a raw() function with a string argument, e.g. `where: raw(\"status = 'active'\")`.",
+        );
+        return None;
+    };
+
+    let Some(predicate) = coerce::string(&first_arg.value, ctx.diagnostics) else {
+        ctx.push_attribute_validation_error(
+            "The `where` argument must be a raw() function with a string argument, e.g. `where: raw(\"status = 'active'\")`.",
+        );
+        return None;
+    };
+
+    if predicate.is_empty() {
+        ctx.push_attribute_validation_error("The `where` argument cannot contain an empty string.");
+        return None;
+    }
+
+    Some(WhereClause::Raw(predicate.to_string()))
+}
+
+fn parse_where_object_member(
+    member: &ast::ObjectMember,
+    model_id: crate::ModelId,
+    ctx: &mut Context<'_>,
+) -> Option<WhereFieldCondition> {
+    let field_name_str = &member.key;
+    let ast_model = &ctx.asts[model_id];
+
+    let field_id = match ctx.find_model_field(model_id, field_name_str) {
+        Some(id) => id,
+        None => {
+            ctx.push_attribute_validation_error(&format!(
+                "Field '{}' does not exist in model '{}'.",
+                field_name_str,
+                ast_model.name()
+            ));
+            return None;
+        }
+    };
+
+    let scalar_field_id = match ctx.types.find_model_scalar_field(model_id, field_id) {
+        Some(id) => id,
+        None => {
+            ctx.push_attribute_validation_error(&format!(
+                "Field '{}' is a relation field. Only scalar fields can be used in the where clause.",
+                field_name_str,
+            ));
+            return None;
+        }
+    };
+
+    let scalar_type = ctx.types[scalar_field_id].r#type;
+
+    let condition = parse_where_value(&member.value, field_name_str, scalar_type, false, ctx)?;
+
+    Some(WhereFieldCondition {
+        scalar_field_id,
+        condition,
+    })
+}
+
+fn parse_where_value(
+    expr: &ast::Expression,
+    field_name: &str,
+    scalar_type: ScalarFieldType,
+    negated: bool,
+    ctx: &mut Context<'_>,
+) -> Option<WhereCondition> {
+    let wrap = |value| {
+        if negated {
+            WhereCondition::NotEquals(value)
+        } else {
+            WhereCondition::Equals(value)
+        }
+    };
+
+    match expr {
+        ast::Expression::ConstantValue(val, _) => match val.as_str() {
+            "true" | "false" => {
+                check_type(field_name, scalar_type, &[ScalarType::Boolean], "Boolean", ctx)?;
+                Some(wrap(WhereValue::Boolean(val == "true")))
+            }
+            "null" => Some(if negated {
+                WhereCondition::IsNotNull
+            } else {
+                WhereCondition::IsNull
+            }),
+            other => {
+                ctx.push_attribute_validation_error(&format!(
+                    "Invalid value '{other}' in where clause. Expected true, false, null, a string, a number, or an object like {{ not: null }}."
+                ));
+                None
+            }
+        },
+        ast::Expression::StringValue(val, _) => {
+            check_type(
+                field_name,
+                scalar_type,
+                &[ScalarType::String, ScalarType::DateTime],
+                "a String",
+                ctx,
+            )?;
+            Some(wrap(WhereValue::String(val.clone())))
+        }
+        ast::Expression::NumericValue(val, _) => {
+            check_type(
+                field_name,
+                scalar_type,
+                &[
+                    ScalarType::Int,
+                    ScalarType::BigInt,
+                    ScalarType::Float,
+                    ScalarType::Decimal,
+                ],
+                "a Number",
+                ctx,
+            )?;
+            Some(wrap(WhereValue::Number(val.clone())))
+        }
+        ast::Expression::Object(inner_members, _) if !negated => {
+            if inner_members.len() != 1 {
+                ctx.push_attribute_validation_error(
+                    "Nested object in where clause must have exactly one key. Use `{ not: null }` or `{ not: \"value\" }`.",
+                );
+                return None;
+            }
+
+            let inner = &inner_members[0];
+            if inner.key != "not" {
+                ctx.push_attribute_validation_error(&format!(
+                    "Unknown key '{}' in nested where clause object. Only 'not' is supported.",
+                    inner.key
+                ));
+                return None;
+            }
+
+            parse_where_value(&inner.value, field_name, scalar_type, true, ctx)
+        }
+        _ => {
+            ctx.push_attribute_validation_error(
+                "Invalid value in where clause. Expected true, false, null, a string, a number, or an object like { not: null }.",
+            );
+            None
+        }
+    }
+}
+
+fn check_type(
+    field_name: &str,
+    scalar_type: ScalarFieldType,
+    accepted: &[ScalarType],
+    value_type: &str,
+    ctx: &mut Context<'_>,
+) -> Option<()> {
+    match scalar_type {
+        ScalarFieldType::BuiltInScalar(t) if accepted.contains(&t) => Some(()),
+        ScalarFieldType::BuiltInScalar(t) => {
+            ctx.push_attribute_validation_error(&format!(
+                "Type mismatch: field '{}' is of type {}, but the value is {}.",
+                field_name,
+                t.as_str(),
+                value_type,
+            ));
+            None
+        }
+        ScalarFieldType::Enum(_) if accepted.contains(&ScalarType::String) => Some(()),
+        ScalarFieldType::Enum(_) => {
+            ctx.push_attribute_validation_error(&format!(
+                "Type mismatch: field '{}' is an Enum and only accepts String values in the where clause.",
+                field_name,
+            ));
+            None
+        }
+        _ => {
+            let type_name = match scalar_type {
+                ScalarFieldType::CompositeType(_) => "a composite type",
+                ScalarFieldType::Unsupported(_) => "an unsupported type",
+                _ => "a non-scalar type",
+            };
+            ctx.push_attribute_validation_error(&format!(
+                "Field '{}' is {} and cannot be used in the object syntax of a where clause. Use raw() instead.",
+                field_name, type_name,
+            ));
+            None
+        }
+    }
 }
 
 fn common_index_validations(
@@ -629,15 +882,16 @@ fn common_index_validations(
                 let mut suggested_fields = Vec::new();
 
                 for (_, field_id) in &relation_fields {
-                    let fields = ctx
+                    let Some(rf) = ctx
                         .types
                         .range_model_relation_fields(model_id)
                         .find(|(_, rf)| rf.field_id == *field_id)
-                        .unwrap()
-                        .1
-                        .fields
-                        .iter()
-                        .flatten();
+                    else {
+                        continue;
+                    };
+
+                    let fields = rf.1.fields.iter().flatten();
+
                     for underlying_field in fields {
                         let ScalarField { model_id, field_id, .. } = ctx.types[*underlying_field];
                         suggested_fields.push(ctx.asts[model_id][field_id].name());
@@ -690,7 +944,9 @@ fn visit_relation(model_id: crate::ModelId, relation_field_id: RelationFieldId, 
                         .collect::<Vec<_>>()
                         .join(", ");
 
-                    let msg = format!("The argument fields must refer only to existing fields. The following fields do not exist in this model: {unresolvable_fields}");
+                    let msg = format!(
+                        "The argument fields must refer only to existing fields. The following fields do not exist in this model: {unresolvable_fields}"
+                    );
 
                     ctx.push_error(DatamodelError::new_validation_error(&msg, fields.span()))
                 }
@@ -702,7 +958,9 @@ fn visit_relation(model_id: crate::ModelId, relation_field_id: RelationFieldId, 
                         .collect::<Vec<_>>()
                         .join(", ");
 
-                    let msg = format!("The argument fields must refer only to scalar fields. But it is referencing the following relation fields: {relation_fields}");
+                    let msg = format!(
+                        "The argument fields must refer only to scalar fields. But it is referencing the following relation fields: {relation_fields}"
+                    );
 
                     ctx.push_error(DatamodelError::new_validation_error(&msg, fields.span()));
                 }
@@ -747,7 +1005,11 @@ fn visit_relation(model_id: crate::ModelId, relation_field_id: RelationFieldId, 
                     let msg = format!(
                         "The argument `references` must refer only to scalar fields in the related model `{}`. But it is referencing the following relation fields: {}",
                         ctx.asts[ctx.types[relation_field_id].referenced_model].name(),
-                        relation_fields.iter().map(|(f, _)| f.name()).collect::<Vec<_>>().join(", "),
+                        relation_fields
+                            .iter()
+                            .map(|(f, _)| f.name())
+                            .collect::<Vec<_>>()
+                            .join(", "),
                     );
                     ctx.push_error(DatamodelError::new_validation_error(&msg, attr.span));
                 }
@@ -774,20 +1036,20 @@ fn visit_relation(model_id: crate::ModelId, relation_field_id: RelationFieldId, 
     }
 
     // Validate referential actions.
-    if let Some(on_delete) = ctx.visit_optional_arg("onDelete") {
-        if let Some(action) = crate::ReferentialAction::try_from_expression(on_delete, ctx.diagnostics) {
-            ctx.types[relation_field_id].on_delete = Some((action, on_delete.span()));
-        }
+    if let Some(on_delete) = ctx.visit_optional_arg("onDelete")
+        && let Some(action) = crate::ReferentialAction::try_from_expression(on_delete, ctx.diagnostics)
+    {
+        ctx.types[relation_field_id].on_delete = Some((action, on_delete.span()));
     }
 
-    if let Some(on_update) = ctx.visit_optional_arg("onUpdate") {
-        if let Some(action) = crate::ReferentialAction::try_from_expression(on_update, ctx.diagnostics) {
-            ctx.types[relation_field_id].on_update = Some((action, on_update.span()));
-        }
+    if let Some(on_update) = ctx.visit_optional_arg("onUpdate")
+        && let Some(action) = crate::ReferentialAction::try_from_expression(on_update, ctx.diagnostics)
+    {
+        ctx.types[relation_field_id].on_update = Some((action, on_update.span()));
     }
 
     let fk_name = {
-        let mapped_name = match ctx
+        match ctx
             .visit_optional_arg("map")
             .and_then(|name| coerce::string(name, ctx.diagnostics))
         {
@@ -797,9 +1059,7 @@ fn visit_relation(model_id: crate::ModelId, relation_field_id: RelationFieldId, 
             }
             Some(name) => Some(ctx.interner.intern(name)),
             None => None,
-        };
-
-        mapped_name
+        }
     };
 
     ctx.types[relation_field_id].mapped_name = fk_name;
@@ -1098,24 +1358,35 @@ fn validate_clustering_setting(ctx: &mut Context<'_>) -> Option<bool> {
         .and_then(|sort| coerce::boolean(sort, ctx.diagnostics))
 }
 
-/// Create the default values of [`ModelAttributes`] and [`EnumAttributes`] for each model and enum
-/// in the AST to ensure [`crate::walkers::ModelWalker`] and [`crate::walkers::EnumWalker`] can
-/// access their corresponding entries in the attributes map in the database even in the presence
-/// of name and type resolution errors. This is useful for the language tools.
-pub(super) fn create_default_attributes(ctx: &mut Context<'_>) {
-    for ((file_id, top), _) in ctx.iter_tops() {
-        match top {
-            ast::TopId::Model(model_id) => {
-                ctx.types
-                    .model_attributes
-                    .insert((file_id, model_id), ModelAttributes::default());
+fn format_fields_in_error_with_leading_word<'a>(
+    fields: impl IntoIterator<IntoIter: ExactSizeIterator<Item = impl Display + 'a> + 'a>,
+) -> impl Display + 'a {
+    struct Format<I>(Cell<Option<I>>);
+
+    impl<F, I> Display for Format<I>
+    where
+        F: Display,
+        I: IntoIterator<IntoIter: ExactSizeIterator<Item = F>>,
+    {
+        fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+            let Some(iter) = self.0.take().map(<_>::into_iter) else {
+                panic!("`format_fields_in_error_with_leading_word` result can only be formatted once")
+            };
+            write!(f, "field")?;
+            if iter.len() > 1 {
+                write!(f, "s")?;
             }
-            ast::TopId::Enum(enum_id) => {
-                ctx.types
-                    .enum_attributes
-                    .insert((file_id, enum_id), EnumAttributes::default());
-            }
-            _ => (),
+            write!(f, " {}", iter.map(Field).format(", "))
         }
     }
+
+    struct Field<D>(D);
+
+    impl<D: Display> Display for Field<D> {
+        fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+            write!(f, "`{}`", self.0)
+        }
+    }
+
+    Format(Cell::new(Some(fields.into_iter())))
 }

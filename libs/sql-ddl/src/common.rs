@@ -41,16 +41,11 @@ where
     }
 }
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, Default)]
 pub enum SortOrder {
+    #[default]
     Asc,
     Desc,
-}
-
-impl Default for SortOrder {
-    fn default() -> Self {
-        Self::Asc
-    }
 }
 
 impl Display for SortOrder {

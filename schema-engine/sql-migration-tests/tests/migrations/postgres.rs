@@ -2,9 +2,9 @@ mod extensions;
 mod introspection;
 mod multi_schema;
 
-use psl::parser_database::SourceFile;
+use psl::parser_database::{NoExtensionTypes, SourceFile};
 use quaint::Value;
-use schema_core::{json_rpc::types::SchemasContainer, schema_connector::DiffTarget};
+use schema_core::{DatasourceUrls, json_rpc::types::SchemasContainer, schema_connector::DiffTarget};
 use sql_migration_tests::test_api::*;
 use std::fmt::Write;
 
@@ -214,8 +214,7 @@ fn postgres_apply_migrations_errors_give_precise_location(api: TestApi) {
             contents.push_str(migration);
         })
         .into_output()
-        .generated_migration_name
-        .unwrap();
+        .generated_migration_name;
 
     let err = api
         .apply_migrations(&migrations_directory)
@@ -247,6 +246,178 @@ fn postgres_apply_migrations_errors_give_precise_location(api: TestApi) {
 }
 
 #[test_connector(tags(Postgres), exclude(CockroachDb))]
+fn postgres_apply_migrations_errors_give_precise_location_without_final_semicolon(api: TestApi) {
+    let dm = "";
+    let migrations_directory = api.create_migrations_directory();
+
+    let migration = r#"
+        CREATE TABLE "Cat" (
+            id INTEGER PRIMARY KEY,
+            name TEXT NOT NULL
+        );
+
+        SELECT id FROM "Dog";
+
+        CREATE TABLE "Emu" (
+            size INTEGER
+        )
+    "#;
+
+    let migration_name = api
+        .create_migration("01init", dm, &migrations_directory)
+        .draft(true)
+        .send_sync()
+        .modify_migration(|contents| {
+            contents.clear();
+            contents.push_str(migration);
+        })
+        .into_output()
+        .generated_migration_name;
+
+    let err = api
+        .apply_migrations(&migrations_directory)
+        .send_unwrap_err()
+        .to_string()
+        .replace(&migration_name, "<migration-name>");
+
+    let expectation = expect![[r#"
+        A migration failed to apply. New migrations cannot be applied before the error is recovered from. Read more about how to resolve migration issues in a production database: https://pris.ly/d/migrate-resolve
+
+        Migration name: <migration-name>
+
+        Database error code: 42P01
+
+        Database error:
+        ERROR: relation "Dog" does not exist
+
+        Position:
+        [1m  2[0m         CREATE TABLE "Cat" (
+        [1m  3[0m             id INTEGER PRIMARY KEY,
+        [1m  4[0m             name TEXT NOT NULL
+        [1m  5[0m         );
+        [1m  6[0m
+        [1m  7[1;31m         SELECT id FROM "Dog";[0m
+
+    "#]];
+    let first_segment = err.split_terminator("DbError {").next().unwrap();
+    expectation.assert_eq(first_segment)
+}
+
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
+fn postgres_apply_migrations_errors_give_precise_location_with_immediate_eof(api: TestApi) {
+    let dm = "";
+    let migrations_directory = api.create_migrations_directory();
+
+    let migration = r#"
+        CREATE TABLE "Cat" (
+            id INTEGER PRIMARY KEY,
+            name TEXT NOT NULL
+        );
+
+        SELECT id FROM "Dog";
+
+        CREATE TABLE "Emu" (
+            size INTEGER
+        )"#;
+
+    let migration_name = api
+        .create_migration("01init", dm, &migrations_directory)
+        .draft(true)
+        .send_sync()
+        .modify_migration(|contents| {
+            contents.clear();
+            contents.push_str(migration);
+        })
+        .into_output()
+        .generated_migration_name;
+
+    let err = api
+        .apply_migrations(&migrations_directory)
+        .send_unwrap_err()
+        .to_string()
+        .replace(&migration_name, "<migration-name>");
+
+    let expectation = expect![[r#"
+        A migration failed to apply. New migrations cannot be applied before the error is recovered from. Read more about how to resolve migration issues in a production database: https://pris.ly/d/migrate-resolve
+
+        Migration name: <migration-name>
+
+        Database error code: 42P01
+
+        Database error:
+        ERROR: relation "Dog" does not exist
+
+        Position:
+        [1m  2[0m         CREATE TABLE "Cat" (
+        [1m  3[0m             id INTEGER PRIMARY KEY,
+        [1m  4[0m             name TEXT NOT NULL
+        [1m  5[0m         );
+        [1m  6[0m
+        [1m  7[1;31m         SELECT id FROM "Dog";[0m
+
+    "#]];
+    let first_segment = err.split_terminator("DbError {").next().unwrap();
+    expectation.assert_eq(first_segment)
+}
+
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
+fn postgres_apply_migrations_errors_give_precise_location_with_invalid_syntax(api: TestApi) {
+    let dm = "";
+    let migrations_directory = api.create_migrations_directory();
+
+    let migration = r#"
+        CREATE TABLE "Cat" (
+            id INTEGER PRIMARY KEY,
+            name TEXT NOT NULL
+        );
+
+        SELECT id FROM "Dog";
+
+        CREATE TABLE "Emu" (
+            size INTEGER
+        )A"#;
+
+    let migration_name = api
+        .create_migration("01init", dm, &migrations_directory)
+        .draft(true)
+        .send_sync()
+        .modify_migration(|contents| {
+            contents.clear();
+            contents.push_str(migration);
+        })
+        .into_output()
+        .generated_migration_name;
+
+    let err = api
+        .apply_migrations(&migrations_directory)
+        .send_unwrap_err()
+        .to_string()
+        .replace(&migration_name, "<migration-name>");
+
+    let expectation = expect![[r#"
+        A migration failed to apply. New migrations cannot be applied before the error is recovered from. Read more about how to resolve migration issues in a production database: https://pris.ly/d/migrate-resolve
+
+        Migration name: <migration-name>
+
+        Database error code: 42601
+
+        Database error:
+        ERROR: syntax error at or near "A"
+
+        Position:
+        [1m  6[0m
+        [1m  7[0m         SELECT id FROM "Dog";
+        [1m  8[0m
+        [1m  9[0m         CREATE TABLE "Emu" (
+        [1m 10[0m             size INTEGER
+        [1m 11[1;31m         )A[0m
+
+    "#]];
+    let first_segment = err.split_terminator("DbError {").next().unwrap();
+    expectation.assert_eq(first_segment)
+}
+
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
 fn postgres_apply_migrations_errors_give_precise_location_at_the_beginning_of_files(api: TestApi) {
     let dm = "";
     let migrations_directory = api.create_migrations_directory();
@@ -270,8 +441,7 @@ fn postgres_apply_migrations_errors_give_precise_location_at_the_beginning_of_fi
             contents.push_str(migration);
         })
         .into_output()
-        .generated_migration_name
-        .unwrap();
+        .generated_migration_name;
 
     let err = api
         .apply_migrations(&migrations_directory)
@@ -367,7 +537,6 @@ fn foreign_key_renaming_to_default_works(api: TestApi) {
     let target_schema = r#"
         datasource db {
             provider = "postgresql"
-            url = env("TEST_DATABASE_URL")
         }
 
         model Dog {
@@ -384,10 +553,10 @@ fn foreign_key_renaming_to_default_works(api: TestApi) {
 
     let migration = api.connector_diff(
         DiffTarget::Database,
-        DiffTarget::Datamodel(vec![(
-            "schema.prisma".to_string(),
-            SourceFile::new_static(target_schema),
-        )]),
+        DiffTarget::Datamodel(
+            vec![("schema.prisma".to_string(), SourceFile::new_static(target_schema))],
+            &NoExtensionTypes,
+        ),
         None,
     );
     let expected = expect![[r#"
@@ -474,15 +643,17 @@ fn failing_enum_migrations_should_not_be_partially_applied(api: TestApi) {
 }
 
 #[test_connector(tags(Postgres), exclude(CockroachDb))]
-fn connecting_to_a_postgres_database_with_the_cockroach_connector_fails(_api: TestApi) {
+fn connecting_to_a_postgres_database_with_the_cockroach_connector_fails(api: TestApi) {
     let dm = r#"
         datasource crdb {
             provider = "cockroachdb"
-            url = env("TEST_DATABASE_URL")
         }
     "#;
 
-    let engine = schema_core::schema_api(None, None).unwrap();
+    let engine =
+        schema_core::schema_api_without_extensions(None, DatasourceUrls::from_url(api.connection_string()), None)
+            .unwrap();
+
     let err = tok(
         engine.ensure_connection_validity(schema_core::json_rpc::types::EnsureConnectionValidityParams {
             datasource: schema_core::json_rpc::types::DatasourceParam::Schema(SchemasContainer {
@@ -507,7 +678,6 @@ fn scalar_list_defaults_work(api: TestApi) {
     let schema = r#"
         datasource db {
           provider = "postgresql"
-          url = "postgres://"
         }
 
         enum Color {
@@ -539,6 +709,9 @@ fn scalar_list_defaults_work(api: TestApi) {
     api.schema_push(schema).send().assert_green().assert_no_steps();
 
     let expected_sql = expect![[r#"
+        -- CreateSchema
+        CREATE SCHEMA IF NOT EXISTS "public";
+
         -- CreateEnum
         CREATE TYPE "Color" AS ENUM ('RED', 'GREEN', 'BLUE');
 
@@ -569,7 +742,6 @@ fn scalar_list_default_diffing(api: TestApi) {
     let schema_1 = r#"
         datasource db {
           provider = "postgresql"
-          url = env("DATABASE_URL")
         }
 
         enum Color {
@@ -597,7 +769,6 @@ fn scalar_list_default_diffing(api: TestApi) {
     let schema_2 = r#"
         datasource db {
           provider = "postgresql"
-          url = env("DATABASE_URL")
         }
 
         enum Color {
@@ -623,8 +794,14 @@ fn scalar_list_default_diffing(api: TestApi) {
     "#;
 
     let migration = api.connector_diff(
-        DiffTarget::Datamodel(vec![("schema.prisma".to_string(), SourceFile::new_static(schema_1))]),
-        DiffTarget::Datamodel(vec![("schema.prisma".to_string(), SourceFile::new_static(schema_2))]),
+        DiffTarget::Datamodel(
+            vec![("schema.prisma".to_string(), SourceFile::new_static(schema_1))],
+            &NoExtensionTypes,
+        ),
+        DiffTarget::Datamodel(
+            vec![("schema.prisma".to_string(), SourceFile::new_static(schema_2))],
+            &NoExtensionTypes,
+        ),
         None,
     );
 
@@ -657,7 +834,6 @@ fn json_defaults_with_escaped_quotes_work(api: TestApi) {
     let schema = r#"
         datasource db {
           provider = "postgresql"
-          url      = env("DATABASE_URL")
         }
 
         model Foo {
@@ -673,6 +849,9 @@ fn json_defaults_with_escaped_quotes_work(api: TestApi) {
     api.schema_push(schema).send().assert_green().assert_no_steps();
 
     let sql = expect![[r#"
+        -- CreateSchema
+        CREATE SCHEMA IF NOT EXISTS "public";
+
         -- CreateTable
         CREATE TABLE "Foo" (
             "id" INTEGER NOT NULL,
@@ -690,7 +869,6 @@ fn bigint_defaults_work(api: TestApi) {
     let schema = r#"
         datasource mypg {
             provider = "postgresql"
-            url = env("TEST_DATABASE_URL")
         }
 
         model foo {
@@ -699,6 +877,9 @@ fn bigint_defaults_work(api: TestApi) {
         }
     "#;
     let sql = expect![[r#"
+        -- CreateSchema
+        CREATE SCHEMA IF NOT EXISTS "public";
+
         -- CreateTable
         CREATE TABLE "foo" (
             "id" TEXT NOT NULL,
@@ -730,7 +911,6 @@ fn dbgenerated_on_generated_columns_is_idempotent(api: TestApi) {
     let schema = r#"
         datasource db {
             provider = "postgresql"
-            url = env("TEST_DATABASE_URL")
         }
 
         model table {
@@ -762,7 +942,6 @@ fn dbgenerated_on_generated_unsupported_columns_is_idempotent(api: TestApi) {
     let schema = r#"
         datasource db {
             provider = "postgresql"
-            url = env("TEST_DATABASE_URL")
         }
 
         model table {
@@ -772,4 +951,216 @@ fn dbgenerated_on_generated_unsupported_columns_is_idempotent(api: TestApi) {
     "#;
 
     api.schema_push(schema).send().assert_green().assert_no_steps();
+}
+
+#[test_connector(tags(Postgres), preview_features("views"))]
+fn default_schema_not_included_when_dropping_items(api: TestApi) {
+    let full_schema = r#"
+        generator client {
+          provider = "prisma-client"
+          previewFeatures = ["views"]
+        }
+
+        datasource db {
+          provider = "postgresql"
+        }
+
+        enum Color {
+            RED
+            GREEN
+            BLUE
+        }
+
+        model Model {
+            id Int @id
+            name String
+            related Related[]
+            @@index([id, name])
+        }
+
+
+        model Related {
+            id Int @id
+            modelId Int
+            model Model @relation(fields: [modelId], references: [id])
+        }
+
+
+        view View {
+            id Int
+        }
+    "#;
+
+    api.raw_cmd(r#"CREATE VIEW "View" AS SELECT 1 AS id"#);
+
+    api.schema_push(full_schema)
+        .send()
+        .assert_green()
+        .assert_has_executed_steps();
+    api.schema_push(full_schema).send().assert_green().assert_no_steps();
+
+    let schema_wo_index = r#"
+        generator client {
+          provider = "prisma-client"
+          previewFeatures = ["views"]
+        }
+
+        datasource db {
+          provider = "postgresql"
+        }
+
+        enum Color {
+            RED
+            GREEN
+            BLUE
+        }
+
+        model Model {
+            id Int @id
+            name String
+            related Related[]
+        }
+
+
+        model Related {
+            id Int @id
+            modelId Int
+            model Model @relation(fields: [modelId], references: [id])
+        }
+
+
+        view View {
+            id Int
+        }
+    "#;
+
+    let migration = api.connector_diff(
+        DiffTarget::Datamodel(
+            vec![("schema.prisma".to_string(), SourceFile::new_static(full_schema))],
+            &NoExtensionTypes,
+        ),
+        DiffTarget::Datamodel(
+            vec![("schema.prisma".to_string(), SourceFile::new_static(schema_wo_index))],
+            &NoExtensionTypes,
+        ),
+        None,
+    );
+
+    let expected_migration = expect![[r#"
+        -- DropIndex
+        DROP INDEX "Model_id_name_idx";
+    "#]];
+
+    expected_migration.assert_eq(&migration);
+
+    let empty_schema = r#"
+        datasource db {
+          provider = "postgresql"
+        }
+    "#;
+
+    let migration = api.connector_diff(
+        DiffTarget::Datamodel(
+            vec![("schema.prisma".to_string(), SourceFile::new_static(full_schema))],
+            &NoExtensionTypes,
+        ),
+        DiffTarget::Datamodel(
+            vec![("schema.prisma".to_string(), SourceFile::new_static(empty_schema))],
+            &NoExtensionTypes,
+        ),
+        None,
+    );
+
+    let expected_migration = expect![[r#"
+        -- DropForeignKey
+        ALTER TABLE "Related" DROP CONSTRAINT "Related_modelId_fkey";
+
+        -- DropTable
+        DROP TABLE "Model";
+
+        -- DropTable
+        DROP TABLE "Related";
+
+        -- DropEnum
+        DROP TYPE "Color";
+    "#]];
+
+    expected_migration.assert_eq(&migration);
+}
+
+#[test_connector(tags(Postgres))]
+fn postgres_create_index_concurrently_works(api: TestApi) {
+    let dm = "";
+    let migrations_directory = api.create_migrations_directory();
+
+    let migration = r#"
+        CREATE TABLE "Cat" (
+            id INTEGER PRIMARY KEY,
+            name TEXT NOT NULL
+        );
+
+        CREATE INDEX CONCURRENTLY "Cat_name_idx" ON "Cat"(name);
+    "#;
+
+    api.create_migration("01init", dm, &migrations_directory)
+        .draft(true)
+        .send_sync()
+        .modify_migration(|contents| {
+            contents.clear();
+            contents.push_str(migration);
+        });
+
+    api.apply_migrations(&migrations_directory)
+        .send_sync()
+        .assert_applied_migrations(&["01init"]);
+}
+
+#[test_connector(tags(Postgres))]
+fn postgres_create_migration_works_with_multiple_create_index_concurrently_statements(api: TestApi) {
+    let migrations_directory = api.create_migrations_directory();
+    let dm = "";
+    let migration = r#"
+        CREATE TABLE "Person" (
+            id TEXT PRIMARY KEY,
+            "firstName" TEXT NOT NULL,
+            "lastName" TEXT NOT NULL
+        );
+
+        CREATE INDEX CONCURRENTLY "Person_firstName_idx" ON "Person"("firstName");
+        CREATE INDEX CONCURRENTLY "Person_lastName_idx" ON "Person"("lastName");
+    "#;
+
+    api.create_migration("01init", dm, &migrations_directory)
+        .draft(true)
+        .send_sync()
+        .modify_migration(|contents| {
+            contents.clear();
+            contents.push_str(migration);
+        });
+
+    let dm2 = api.datamodel_with_provider(
+        r#"
+        model Person {
+            id String @id
+            firstName String
+            lastName String
+            role String?
+
+            @@index([firstName])
+            @@index([lastName])
+        }
+    "#,
+    );
+
+    let added_type = if api.is_cockroach() { "STRING" } else { "TEXT" };
+
+    api.create_migration("02add_role", &dm2, &migrations_directory)
+        .send_sync()
+        .assert_migration("02add_role", |migration| {
+            migration.assert_contents(&format!(
+                r#"-- AlterTable
+ALTER TABLE "Person" ADD COLUMN     "role" {added_type};
+"#
+            ))
+        });
 }

@@ -1,0 +1,9 @@
+datasource db {
+    provider = "sqlserver"
+}
+
+model User {
+    id String @id
+
+    postId String @unique @default("defaul<|>t_value")
+}

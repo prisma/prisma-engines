@@ -1,0 +1,12 @@
+{
+  "modelName": "Post",
+  "action": "deleteOne",
+  "query": {
+    "arguments": {
+      "where": { "id": 1 }
+    },
+    "selection": {
+      "$scalars": true
+    }
+  }
+}

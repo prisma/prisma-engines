@@ -1,10 +1,14 @@
 use crate::ast::*;
 use crate::error::{Error, ErrorKind};
 
+use base64::prelude::*;
 use bigdecimal::{BigDecimal, FromPrimitive, ToPrimitive};
 use chrono::{DateTime, NaiveDate, NaiveTime, Utc};
+
 use serde_json::{Number, Value as JsonValue};
+use std::any::Any;
 use std::fmt::Display;
+use std::sync::Arc;
 use std::{
     borrow::{Borrow, Cow},
     convert::TryFrom,
@@ -35,19 +39,34 @@ where
 
 /// A native-column type, i.e. the connector-specific type of the column.
 #[derive(Debug, Clone, PartialEq)]
-pub struct NativeColumnType<'a>(Cow<'a, str>);
+pub struct NativeColumnType<'a> {
+    pub name: Cow<'a, str>,
+    pub length: Option<TypeDataLength>,
+}
 
-impl<'a> std::ops::Deref for NativeColumnType<'a> {
+impl std::ops::Deref for NativeColumnType<'_> {
     type Target = str;
 
     fn deref(&self) -> &Self::Target {
-        &self.0
+        &self.name
     }
 }
 
-impl<'a> From<&'a str> for NativeColumnType<'a> {
-    fn from(s: &'a str) -> Self {
-        Self(Cow::Owned(s.to_uppercase()))
+impl From<&str> for NativeColumnType<'static> {
+    fn from(s: &str) -> Self {
+        Self {
+            name: Cow::Owned(s.to_uppercase()),
+            length: None,
+        }
+    }
+}
+
+impl From<(&str, Option<TypeDataLength>)> for NativeColumnType<'static> {
+    fn from((name, length): (&str, Option<TypeDataLength>)) -> Self {
+        Self {
+            name: Cow::Owned(name.to_uppercase()),
+            length,
+        }
     }
 }
 
@@ -59,7 +78,7 @@ pub struct Value<'a> {
 
 impl<'a> Value<'a> {
     /// Returns the native column type of the value, if any, in the form
-    /// of an UPCASE string. ex: "VARCHAR, BYTEA, DATE, TIMEZ"  
+    /// of an UPCASE string. ex: "VARCHAR, BYTEA, DATE, TIMEZ"
     pub fn native_column_type_name(&'a self) -> Option<&'a str> {
         self.native_column_type.as_deref()
     }
@@ -209,6 +228,11 @@ impl<'a> Value<'a> {
         ValueType::xml(value).into_value()
     }
 
+    /// Creates a new opaque value.
+    pub fn opaque<V: Opaque>(opaque: V, ty: OpaqueType) -> Self {
+        ValueType::opaque(opaque, ty).into_value()
+    }
+
     /// `true` if the `Value` is null.
     pub fn is_null(&self) -> bool {
         self.typed.is_null()
@@ -296,21 +320,18 @@ impl<'a> Value<'a> {
     }
 
     /// `true` if the `Value` is a numeric value or can be converted to one.
-
     pub fn is_numeric(&self) -> bool {
         self.typed.is_numeric()
     }
 
     /// Returns a bigdecimal, if the value is a numeric, float or double value,
     /// otherwise `None`.
-
     pub fn into_numeric(self) -> Option<BigDecimal> {
         self.typed.into_numeric()
     }
 
     /// Returns a reference to a bigdecimal, if the value is a numeric.
     /// Otherwise `None`.
-
     pub fn as_numeric(&self) -> Option<&BigDecimal> {
         self.typed.as_numeric()
     }
@@ -474,7 +495,7 @@ impl<'a> Value<'a> {
     }
 }
 
-impl<'a> Display for Value<'a> {
+impl Display for Value<'_> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         self.typed.fmt(f)
     }
@@ -540,11 +561,136 @@ pub enum ValueType<'a> {
     Date(Option<NaiveDate>),
     /// A time value.
     Time(Option<NaiveTime>),
+    /// An opaque value.
+    Opaque(OpaqueValue),
+}
+
+/// An opaque value. It can be used to pass query parameters that are not directly representable
+/// by quaint values.
+#[derive(Debug, Clone)]
+pub struct OpaqueValue {
+    value: Arc<dyn Opaque>,
+    typ: OpaqueType,
+}
+
+impl OpaqueValue {
+    /// Creates a new opaque value.
+    pub fn new<V: Opaque>(value: V, typ: OpaqueType) -> Self {
+        Self {
+            value: Arc::new(value),
+            typ,
+        }
+    }
+
+    /// Returns the type of the opaque value.
+    pub fn typ(&self) -> &OpaqueType {
+        &self.typ
+    }
+
+    /// Attempts to downcast the opaque value to a reference of type `T`.
+    pub fn downcast_ref<T: Opaque>(&self) -> Option<&T> {
+        <dyn Any>::downcast_ref(self.value.as_ref())
+    }
+}
+
+impl PartialEq for OpaqueValue {
+    fn eq(&self, other: &OpaqueValue) -> bool {
+        self.value.opaque_eq(other.value.as_ref())
+    }
+}
+
+impl fmt::Display for OpaqueValue {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{} as {}", self.value, self.typ)
+    }
+}
+
+/// A trait for opaque values, it is implemented automatically for any types that implement
+/// [`Any`], [`Send`], [`Sync`], [`fmt::Debug`], and [`fmt::Display`].
+pub trait Opaque: Any + Send + Sync + fmt::Debug + fmt::Display {
+    /// Compares two opaque values for equality.
+    fn opaque_eq(&self, other: &dyn Opaque) -> bool;
+}
+
+impl<T> Opaque for T
+where
+    T: Any + PartialEq + Send + Sync + fmt::Debug + fmt::Display,
+{
+    fn opaque_eq(&self, other: &dyn Opaque) -> bool {
+        <dyn Any>::downcast_ref(other).is_some_and(|a| self.eq(a))
+    }
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub enum OpaqueType {
+    Unknown,
+    Int32,
+    Int64,
+    Float,
+    Double,
+    Text,
+    Enum,
+    Bytes,
+    Boolean,
+    Char,
+    Array(Box<Self>),
+    Numeric,
+    Json,
+    Object,
+    Xml,
+    Uuid,
+    DateTime,
+    Date,
+    Time,
+    Tuple(Vec<(Self, Option<NativeColumnType<'static>>)>),
+}
+
+impl fmt::Display for OpaqueType {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            OpaqueType::Unknown => write!(f, "Unknown"),
+            OpaqueType::Int32 => write!(f, "Int32"),
+            OpaqueType::Int64 => write!(f, "Int64"),
+            OpaqueType::Float => write!(f, "Float"),
+            OpaqueType::Double => write!(f, "Double"),
+            OpaqueType::Text => write!(f, "Text"),
+            OpaqueType::Enum => write!(f, "Enum"),
+            OpaqueType::Bytes => write!(f, "Bytes"),
+            OpaqueType::Boolean => write!(f, "Boolean"),
+            OpaqueType::Char => write!(f, "Char"),
+            OpaqueType::Array(t) => {
+                write!(f, "Array<")?;
+                t.fmt(f)?;
+                write!(f, ">")
+            }
+            OpaqueType::Numeric => write!(f, "Numeric"),
+            OpaqueType::Json => write!(f, "Json"),
+            OpaqueType::Object => write!(f, "Object"),
+            OpaqueType::Xml => write!(f, "Xml"),
+            OpaqueType::Uuid => write!(f, "Uuid"),
+            OpaqueType::DateTime => write!(f, "DateTime"),
+            OpaqueType::Date => write!(f, "Date"),
+            OpaqueType::Time => write!(f, "Time"),
+            OpaqueType::Tuple(types) => {
+                write!(f, "Tuple<")?;
+                let len = types.len();
+
+                for (i, (t, _)) in types.iter().enumerate() {
+                    write!(f, "{t}")?;
+
+                    if i < (len - 1) {
+                        write!(f, ", ")?;
+                    }
+                }
+                write!(f, ">")
+            }
+        }
+    }
 }
 
 pub(crate) struct Params<'a>(pub(crate) &'a [Value<'a>]);
 
-impl<'a> Display for Params<'a> {
+impl Display for Params<'_> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let len = self.0.len();
 
@@ -560,7 +706,7 @@ impl<'a> Display for Params<'a> {
     }
 }
 
-impl<'a> fmt::Display for ValueType<'a> {
+impl fmt::Display for ValueType<'_> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let res = match self {
             ValueType::Int32(val) => val.map(|v| write!(f, "{v}")),
@@ -606,6 +752,7 @@ impl<'a> fmt::Display for ValueType<'a> {
             ValueType::DateTime(val) => val.map(|v| write!(f, "\"{v}\"")),
             ValueType::Date(val) => val.map(|v| write!(f, "\"{v}\"")),
             ValueType::Time(val) => val.map(|v| write!(f, "\"{v}\"")),
+            ValueType::Opaque(opaque) => Some(write!(f, "${opaque}")),
         };
 
         match res {
@@ -635,7 +782,7 @@ impl<'a> From<ValueType<'a>> for serde_json::Value {
                 None => serde_json::Value::Null,
             }),
             ValueType::Text(cow) => cow.map(|cow| serde_json::Value::String(cow.into_owned())),
-            ValueType::Bytes(bytes) => bytes.map(|bytes| serde_json::Value::String(base64::encode(bytes))),
+            ValueType::Bytes(bytes) => bytes.map(|bytes| serde_json::Value::String(BASE64_STANDARD.encode(bytes))),
             ValueType::Enum(cow, _) => cow.map(|cow| serde_json::Value::String(cow.into_owned())),
             ValueType::EnumArray(values, _) => values.map(|values| {
                 serde_json::Value::Array(
@@ -664,6 +811,7 @@ impl<'a> From<ValueType<'a>> for serde_json::Value {
             ValueType::DateTime(dt) => dt.map(|dt| serde_json::Value::String(dt.to_rfc3339())),
             ValueType::Date(date) => date.map(|date| serde_json::Value::String(format!("{date}"))),
             ValueType::Time(time) => time.map(|time| serde_json::Value::String(format!("{time}"))),
+            ValueType::Opaque(_) => todo!(),
         };
 
         match res {
@@ -695,7 +843,6 @@ impl<'a> ValueType<'a> {
     }
 
     /// Creates a new decimal value.
-
     pub(crate) fn numeric(value: BigDecimal) -> Self {
         Self::Numeric(Some(value))
     }
@@ -818,6 +965,11 @@ impl<'a> ValueType<'a> {
         Self::Xml(Some(value.into()))
     }
 
+    /// Creates a new opaque value.
+    pub fn opaque<V: Opaque>(opaque: V, ty: OpaqueType) -> Self {
+        Self::Opaque(OpaqueValue::new(opaque, ty))
+    }
+
     /// `true` if the `Value` is null.
     pub fn is_null(&self) -> bool {
         match self {
@@ -839,6 +991,7 @@ impl<'a> ValueType<'a> {
             Self::Date(d) => d.is_none(),
             Self::Time(t) => t.is_none(),
             Self::Json(json) => json.is_none(),
+            Self::Opaque(_) => false,
         }
     }
 
@@ -963,14 +1116,12 @@ impl<'a> ValueType<'a> {
     }
 
     /// `true` if the `Value` is a numeric value or can be converted to one.
-
     pub(crate) fn is_numeric(&self) -> bool {
         matches!(self, Self::Numeric(_) | Self::Float(_) | Self::Double(_))
     }
 
     /// Returns a bigdecimal, if the value is a numeric, float or double value,
     /// otherwise `None`.
-
     pub(crate) fn into_numeric(self) -> Option<BigDecimal> {
         match self {
             Self::Numeric(d) => d,
@@ -982,7 +1133,6 @@ impl<'a> ValueType<'a> {
 
     /// Returns a reference to a bigdecimal, if the value is a numeric.
     /// Otherwise `None`.
-
     pub(crate) fn as_numeric(&self) -> Option<&BigDecimal> {
         match self {
             Self::Numeric(d) => d.as_ref(),
@@ -1097,13 +1247,7 @@ impl<'a> ValueType<'a> {
         T: TryFrom<Value<'a>>,
     {
         match self {
-            Self::Array(Some(vec)) => {
-                let rslt: Result<Vec<_>, _> = vec.into_iter().map(T::try_from).collect();
-                match rslt {
-                    Err(_) => None,
-                    Ok(values) => Some(values),
-                }
-            }
+            Self::Array(Some(vec)) => vec.into_iter().map(T::try_from).collect::<Result<Vec<_>, _>>().ok(),
             _ => None,
         }
     }
@@ -1114,13 +1258,12 @@ impl<'a> ValueType<'a> {
         T: TryFrom<Value<'a>>,
     {
         match self {
-            Self::Array(Some(vec)) => {
-                let rslt: Result<Vec<_>, _> = vec.clone().into_iter().map(T::try_from).collect();
-                match rslt {
-                    Err(_) => None,
-                    Ok(values) => Some(values),
-                }
-            }
+            Self::Array(Some(vec)) => vec
+                .clone()
+                .into_iter()
+                .map(T::try_from)
+                .collect::<Result<Vec<_>, _>>()
+                .ok(),
             _ => None,
         }
     }

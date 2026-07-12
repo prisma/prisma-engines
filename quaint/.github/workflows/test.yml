@@ -80,12 +80,7 @@ jobs:
           key: ${{ runner.os }}-cargo-${{ matrix.features }}
 
       - name: Start Databases
-        run: docker compose -f docker-compose.yml up -d
-
-      - name: Sleep for 20s
-        uses: juliangruber/sleep-action@v2
-        with:
-          time: 20s
+        run: docker compose -f docker-compose.yml up -d --wait
 
       - name: Run tests
         run: cargo test ${{ matrix.features }}

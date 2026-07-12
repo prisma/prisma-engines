@@ -42,7 +42,11 @@ pub(crate) fn fields_and_references_are_defined(relation: InlineRelationWalker<'
     if is_empty_fields(forward.referencing_fields()) && is_empty_fields(back.referencing_fields()) {
         let message = format!(
             "The relation fields `{}` on Model `{}` and `{}` on Model `{}` do not provide the `fields` argument in the {} attribute. You have to provide it on one of the two fields.",
-            forward.name(), forward.model().name(), back.name(), &back.model().name(), RELATION_ATTRIBUTE_NAME
+            forward.name(),
+            forward.model().name(),
+            back.name(),
+            &back.model().name(),
+            RELATION_ATTRIBUTE_NAME
         );
 
         ctx.push_error(DatamodelError::new_attribute_validation_error(
@@ -54,9 +58,13 @@ pub(crate) fn fields_and_references_are_defined(relation: InlineRelationWalker<'
         // Do the same on the other field.
 
         let message = format!(
-                "The relation fields `{}` on Model `{}` and `{}` on Model `{}` do not provide the `fields` argument in the {} attribute. You have to provide it on one of the two fields.",
-                back.name(), back.model().name(), forward.name(), forward.model().name(), RELATION_ATTRIBUTE_NAME
-            );
+            "The relation fields `{}` on Model `{}` and `{}` on Model `{}` do not provide the `fields` argument in the {} attribute. You have to provide it on one of the two fields.",
+            back.name(),
+            back.model().name(),
+            forward.name(),
+            forward.model().name(),
+            RELATION_ATTRIBUTE_NAME
+        );
 
         ctx.push_error(DatamodelError::new_attribute_validation_error(
             &message,
@@ -68,7 +76,11 @@ pub(crate) fn fields_and_references_are_defined(relation: InlineRelationWalker<'
     if is_empty_fields(forward.referenced_fields()) && is_empty_fields(back.referenced_fields()) {
         let message = format!(
             "The relation fields `{}` on Model `{}` and `{}` on Model `{}` do not provide the `references` argument in the {} attribute. You have to provide it on one of the two fields.",
-            forward.name(), forward.model().name(), back.name(), back.model().name(), RELATION_ATTRIBUTE_NAME
+            forward.name(),
+            forward.model().name(),
+            back.name(),
+            back.model().name(),
+            RELATION_ATTRIBUTE_NAME
         );
 
         ctx.push_error(DatamodelError::new_attribute_validation_error(
@@ -81,7 +93,11 @@ pub(crate) fn fields_and_references_are_defined(relation: InlineRelationWalker<'
 
         let message = format!(
             "The relation fields `{}` on Model `{}` and `{}` on Model `{}` do not provide the `references` argument in the {} attribute. You have to provide it on one of the two fields.",
-            back.name(), back.model().name(), forward.name(), forward.model().name(), RELATION_ATTRIBUTE_NAME
+            back.name(),
+            back.model().name(),
+            forward.name(),
+            forward.model().name(),
+            RELATION_ATTRIBUTE_NAME
         );
 
         ctx.push_error(DatamodelError::new_attribute_validation_error(
@@ -105,7 +121,11 @@ pub(crate) fn fields_and_references_defined_on_one_side_only(
     if !is_empty_fields(forward.referenced_fields()) && !is_empty_fields(back.referenced_fields()) {
         let message = format!(
             "The relation fields `{}` on Model `{}` and `{}` on Model `{}` both provide the `references` argument in the {} attribute. You have to provide it only on one of the two fields.",
-            forward.name(), forward.model().name(), back.name(), back.model().name(), RELATION_ATTRIBUTE_NAME
+            forward.name(),
+            forward.model().name(),
+            back.name(),
+            back.model().name(),
+            RELATION_ATTRIBUTE_NAME
         );
 
         ctx.push_error(DatamodelError::new_attribute_validation_error(
@@ -124,7 +144,11 @@ pub(crate) fn fields_and_references_defined_on_one_side_only(
     if !is_empty_fields(forward.referencing_fields()) && !is_empty_fields(back.referencing_fields()) {
         let message = format!(
             "The relation fields `{}` on Model `{}` and `{}` on Model `{}` both provide the `fields` argument in the {} attribute. You have to provide it only on one of the two fields.",
-            forward.name(), forward.model().name(), back.name(), back.model().name(), RELATION_ATTRIBUTE_NAME
+            forward.name(),
+            forward.model().name(),
+            back.name(),
+            back.model().name(),
+            RELATION_ATTRIBUTE_NAME
         );
 
         ctx.push_error(DatamodelError::new_attribute_validation_error(
@@ -154,7 +178,11 @@ pub(crate) fn referential_actions(relation: InlineRelationWalker<'_>, ctx: &mut 
         // We show the error on both fields
         let message = format!(
             "The relation fields `{}` on Model `{}` and `{}` on Model `{}` both provide the `onDelete` or `onUpdate` argument in the {} attribute. You have to provide it only on one of the two fields.",
-            back.name(), back.model().name(), forward.name(), forward.model().name(), RELATION_ATTRIBUTE_NAME
+            back.name(),
+            back.model().name(),
+            forward.name(),
+            forward.model().name(),
+            RELATION_ATTRIBUTE_NAME
         );
 
         ctx.push_error(DatamodelError::new_attribute_validation_error(
@@ -165,7 +193,11 @@ pub(crate) fn referential_actions(relation: InlineRelationWalker<'_>, ctx: &mut 
 
         let message = format!(
             "The relation fields `{}` on Model `{}` and `{}` on Model `{}` both provide the `onDelete` or `onUpdate` argument in the {} attribute. You have to provide it only on one of the two fields.",
-            forward.name(), forward.model().name(), back.name(), back.model().name(), RELATION_ATTRIBUTE_NAME
+            forward.name(),
+            forward.model().name(),
+            back.name(),
+            back.model().name(),
+            RELATION_ATTRIBUTE_NAME
         );
 
         ctx.push_error(DatamodelError::new_attribute_validation_error(
@@ -176,7 +208,11 @@ pub(crate) fn referential_actions(relation: InlineRelationWalker<'_>, ctx: &mut 
     } else if back.explicit_on_delete().is_some() || back.explicit_on_update().is_some() {
         let message = &format!(
             "The relation field `{}` on Model `{}` must not specify the `onDelete` or `onUpdate` argument in the {} attribute. You must only specify it on the opposite field `{}` on model `{}`.",
-            back.name(), back.model().name(), RELATION_ATTRIBUTE_NAME, forward.name(), forward.model().name()
+            back.name(),
+            back.model().name(),
+            RELATION_ATTRIBUTE_NAME,
+            forward.name(),
+            forward.model().name()
         );
 
         ctx.push_error(DatamodelError::new_attribute_validation_error(
@@ -198,7 +234,11 @@ pub(crate) fn fields_references_mixups(relation: InlineRelationWalker<'_>, ctx: 
     if !is_empty_fields(forward.referencing_fields()) && !is_empty_fields(back.referenced_fields()) {
         let message = format!(
             "The relation field `{}` on Model `{}` provides the `fields` argument in the {} attribute. And the related field `{}` on Model `{}` provides the `references` argument. You must provide both arguments on the same side.",
-            forward.name(), forward.model().name(), RELATION_ATTRIBUTE_NAME, back.name(), back.model().name(),
+            forward.name(),
+            forward.model().name(),
+            RELATION_ATTRIBUTE_NAME,
+            back.name(),
+            back.model().name(),
         );
 
         ctx.push_error(DatamodelError::new_attribute_validation_error(
@@ -217,7 +257,11 @@ pub(crate) fn fields_references_mixups(relation: InlineRelationWalker<'_>, ctx: 
     if !is_empty_fields(forward.referenced_fields()) && !is_empty_fields(back.referencing_fields()) {
         let message = format!(
             "The relation field `{}` on Model `{}` provides the `references` argument in the {} attribute. And the related field `{}` on Model `{}` provides the `fields` argument. You must provide both arguments on the same side.",
-            forward.name(), forward.model().name(), RELATION_ATTRIBUTE_NAME, back.name(), back.model().name(),
+            forward.name(),
+            forward.model().name(),
+            RELATION_ATTRIBUTE_NAME,
+            back.name(),
+            back.model().name(),
         );
 
         ctx.push_error(DatamodelError::new_attribute_validation_error(
@@ -238,7 +282,10 @@ pub(crate) fn back_relation_arity_is_optional(relation: InlineRelationWalker<'_>
     if back.ast_field().arity.is_required() {
         let message = format!(
             "The relation field `{}` on Model `{}` is required. This is not valid because it's not possible to enforce this constraint on the database level. Please change the field type from `{}` to `{}?` to fix this.",
-            back.name(), back.model().name(), forward.model().name(), forward.model().name(),
+            back.name(),
+            back.model().name(),
+            forward.model().name(),
+            forward.model().name(),
         );
 
         ctx.push_error(DatamodelError::new_attribute_validation_error(
@@ -304,9 +351,15 @@ pub(crate) fn fields_must_be_a_unique_constraint(relation: InlineRelationWalker<
     };
 
     let message = if fields.len() == 1 {
-        format!("A one-to-one relation must use unique fields on the defining side. Either add an `@unique` attribute to the field `{}`, or change the relation to one-to-many.", fields.join(", "))
+        format!(
+            "A one-to-one relation must use unique fields on the defining side. Either add an `@unique` attribute to the field `{}`, or change the relation to one-to-many.",
+            fields.join(", ")
+        )
     } else {
-        format!("A one-to-one relation must use unique fields on the defining side. Either add an `@@unique([{}])` attribute to the model, or change the relation to one-to-many.", fields.join(", "))
+        format!(
+            "A one-to-one relation must use unique fields on the defining side. Either add an `@@unique([{}])` attribute to the model, or change the relation to one-to-many.",
+            fields.join(", ")
+        )
     };
 
     ctx.push_error(DatamodelError::new_attribute_validation_error(

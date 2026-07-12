@@ -274,7 +274,7 @@ impl Builder {
     /// pool.
     ///
     /// - Defaults to `false`, meaning connections are never tested on
-    /// `check_out`.
+    ///   `check_out`.
     ///
     /// [`check_out`]: struct.Quaint.html#method.check_out
     pub fn test_on_check_out(&mut self, test_on_check_out: bool) {
@@ -307,12 +307,14 @@ impl Builder {
     /// - Defaults to `PostgresFlavour::Unknown`.
     #[cfg(feature = "postgresql-native")]
     pub fn set_postgres_flavour(&mut self, flavour: crate::connector::PostgresFlavour) {
-        use crate::connector::NativeConnectionInfo;
-        if let ConnectionInfo::Native(NativeConnectionInfo::Postgres(ref mut url)) = self.connection_info {
+        use crate::connector::{NativeConnectionInfo, PostgresUrl};
+        if let ConnectionInfo::Native(NativeConnectionInfo::Postgres(PostgresUrl::Native(ref mut url))) =
+            self.connection_info
+        {
             url.set_flavour(flavour);
         }
 
-        if let QuaintManager::Postgres { ref mut url } = self.manager {
+        if let QuaintManager::Postgres { ref mut url, .. } = self.manager {
             url.set_flavour(flavour);
         }
     }
@@ -354,10 +356,12 @@ impl Builder {
 
 impl Quaint {
     /// Creates a new builder for a Quaint connection pool with the given
-    /// connection string. See the [module level documentation] for details.
-    ///
-    /// [module level documentation]: index.html
-    pub fn builder(url_str: &str) -> crate::Result<Builder> {
+    /// connection string and a tracing flag.
+    /// See the [module level documentation] for details.
+    pub fn builder_with_tracing(
+        url_str: &str,
+        #[allow(unused_variables)] is_tracing_enabled: bool,
+    ) -> crate::Result<Builder> {
         match url_str {
             #[cfg(feature = "sqlite")]
             s if s.starts_with("file") => {
@@ -386,11 +390,15 @@ impl Quaint {
             }
             #[cfg(feature = "mysql")]
             s if s.starts_with("mysql") => {
-                let url = crate::connector::MysqlUrl::new(url::Url::parse(s)?)?;
+                let mut url = crate::connector::MysqlUrl::new(url::Url::parse(s)?)?;
                 let connection_limit = url.connection_limit();
                 let pool_timeout = url.pool_timeout();
                 let max_connection_lifetime = url.max_connection_lifetime();
                 let max_idle_connection_lifetime = url.max_idle_connection_lifetime();
+
+                if is_tracing_enabled {
+                    url.query_params.statement_cache_size = 0;
+                }
 
                 let manager = QuaintManager::Mysql { url };
                 let mut builder = Builder::new(s, manager)?;
@@ -415,13 +423,18 @@ impl Quaint {
             }
             #[cfg(feature = "postgresql")]
             s if s.starts_with("postgres") || s.starts_with("postgresql") => {
-                let url = crate::connector::PostgresUrl::new(url::Url::parse(s)?)?;
+                let url = crate::connector::PostgresNativeUrl::new(url::Url::parse(s)?)?;
                 let connection_limit = url.connection_limit();
                 let pool_timeout = url.pool_timeout();
                 let max_connection_lifetime = url.max_connection_lifetime();
                 let max_idle_connection_lifetime = url.max_idle_connection_lifetime();
 
-                let manager = QuaintManager::Postgres { url };
+                let tls_manager = crate::connector::MakeTlsConnectorManager::new(url.clone()).into();
+                let manager = QuaintManager::Postgres {
+                    url,
+                    tls_manager,
+                    is_tracing_enabled,
+                };
                 let mut builder = Builder::new(s, manager)?;
 
                 if let Some(limit) = connection_limit {
@@ -475,6 +488,14 @@ impl Quaint {
         }
     }
 
+    /// Creates a new builder for a Quaint connection pool with the given
+    /// connection string. See the [module level documentation] for details.
+    ///
+    /// [module level documentation]: index.html
+    pub fn builder(url_str: &str) -> crate::Result<Builder> {
+        Self::builder_with_tracing(url_str, false)
+    }
+
     /// The number of connections in the pool.
     pub async fn capacity(&self) -> u32 {
         self.inner.state().await.max_open as u32
@@ -483,14 +504,14 @@ impl Quaint {
     /// Reserve a connection from the pool.
     pub async fn check_out(&self) -> crate::Result<PooledConnection> {
         let res = match self.pool_timeout {
-            Some(duration) => crate::connector::metrics::check_out(self.inner.get_timeout(duration)).await,
-            None => crate::connector::metrics::check_out(self.inner.get()).await,
+            Some(duration) => crate::connector::trace::check_out(self.inner.get_timeout(duration)).await,
+            None => crate::connector::trace::check_out(self.inner.get()).await,
         };
 
         let inner = match res {
             Ok(conn) => conn,
             Err(mobc::Error::PoolClosed) => {
-                return Err(Error::builder(ErrorKind::Native(NativeErrorKind::PoolClosed {})).build())
+                return Err(Error::builder(ErrorKind::Native(NativeErrorKind::PoolClosed {})).build());
             }
             Err(mobc::Error::Timeout) => {
                 let state = self.inner.state().await;

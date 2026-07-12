@@ -1,8 +1,7 @@
 use crate::{
-    ast,
+    ParserDatabase, ScalarFieldId, ast,
     types::IdAttribute,
     walkers::{ModelWalker, ScalarFieldAttributeWalker, ScalarFieldWalker},
-    ParserDatabase, ScalarFieldId,
 };
 
 /// An `@(@)id` attribute in the schema.
@@ -36,11 +35,7 @@ impl<'db> PrimaryKeyWalker<'db> {
 
     /// If defined on a specific field, returns `@id`. Otherwise `@@id`.
     pub fn attribute_name(self) -> &'static str {
-        if self.is_defined_on_field() {
-            "@id"
-        } else {
-            "@@id"
-        }
+        if self.is_defined_on_field() { "@id" } else { "@@id" }
     }
 
     /// If true, the index defines the storage and ordering of the row. Mostly
@@ -49,7 +44,7 @@ impl<'db> PrimaryKeyWalker<'db> {
         self.attribute.clustered
     }
 
-    /// The model the id is deined on.
+    /// The model the id is defined on.
     pub fn model(self) -> ModelWalker<'db> {
         self.db.walk(self.model_id)
     }

@@ -2,7 +2,7 @@ use query_engine_tests::*;
 
 #[test_suite(capabilities(Json), exclude(MySQL(5.6)))]
 mod json {
-    use query_engine_tests::{assert_error, jNull, run_query, ConnectorCapability};
+    use query_engine_tests::{ConnectorCapability, assert_error, jNull, run_query};
     use query_tests_setup::Runner;
 
     #[connector_test(schema(json_opt))]
@@ -212,10 +212,11 @@ mod json {
     #[connector_test(
         schema(json_opt),
         exclude(
-            Vitess("planetscale.js", "planetscale.js.wasm"),
-            Postgres("neon.js", "pg.js", "neon.js.wasm", "pg.js.wasm"),
-            Sqlite("libsql.js"),
-            MySQL(5.6)
+            Vitess("planetscale.js.wasm"),
+            Postgres("neon.js.wasm", "pg.js.wasm"),
+            Sqlite("libsql.js.wasm", "cfd1", "better-sqlite3.js.wasm"),
+            MySQL(5.6, "mariadb.js.wasm", "mariadb-mysql.js.wasm"),
+            CockroachDb("pg.js.wasm"),
         )
     )]
     async fn nested_not_shorthand(runner: Runner) -> TestResult<()> {

@@ -1,0 +1,7 @@
+datasource db {
+  provider = "mysql"
+}
+
+model Category {
+  id String @id @default(uuid(7))
+}

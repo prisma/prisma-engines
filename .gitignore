@@ -24,11 +24,11 @@ dev.db
 /docker.env
 /docker-compose.tests.yml
 
-# buildkite artifacts
-buildkite-script-*
-
 # VSCode specific
 .vscode/
+
+# Zed editor configuration
+.zed/
 
 # Nix specific
 .direnv/
@@ -48,8 +48,6 @@ graph.dot
 
 prisma-schema-wasm/nodejs
 
-# Ignore pnpm-lock.yaml
-query-engine/driver-adapters/pnpm-lock.yaml
 package-lock.json
 
 # Useful for local wasm32-* development
@@ -60,3 +58,13 @@ package-lock.json
 
 # Folder with GraphViz representation of query graphs.
 .query_graphs
+/query-compiler/query-compiler/tests/graphs
+
+# Python
+*.pyo
+*.pyc
+__pycache__
+.venv
+
+# Performance profiles written by `samply record`
+profile.json.gz

@@ -93,7 +93,7 @@ impl<'a> From<IndexFieldInput<'a>> for Function<'a> {
 #[derive(Debug)]
 pub struct UniqueFieldAttribute<'a>(FieldAttribute<'a>);
 
-impl<'a> Default for UniqueFieldAttribute<'a> {
+impl Default for UniqueFieldAttribute<'_> {
     fn default() -> Self {
         Self(FieldAttribute::new(Function::new("unique")))
     }
@@ -139,9 +139,21 @@ impl<'a> UniqueFieldAttribute<'a> {
     pub fn map(&mut self, value: impl Into<Cow<'a, str>>) {
         self.0.push_param(("map", Text::new(value.into())))
     }
+
+    /// Define the where clause for partial unique indexes.
+    ///
+    /// ```ignore
+    /// @unique(where: raw("status = 'active'"))
+    /// //             ^^^^^^^^^^^^^^^^^^^^^^^^ here
+    /// ```
+    pub fn where_clause(&mut self, predicate: impl Into<Cow<'a, str>>) {
+        let mut raw_fn = Function::new("raw");
+        raw_fn.push_param(predicate.into());
+        self.0.push_param(("where", raw_fn));
+    }
 }
 
-impl<'a> fmt::Display for UniqueFieldAttribute<'a> {
+impl fmt::Display for UniqueFieldAttribute<'_> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         self.0.fmt(f)
     }

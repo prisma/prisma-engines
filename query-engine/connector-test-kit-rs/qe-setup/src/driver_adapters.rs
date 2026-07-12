@@ -17,6 +17,15 @@ pub enum DriverAdapter {
 
     #[serde(rename = "d1")]
     D1,
+
+    #[serde(rename = "better-sqlite3")]
+    BetterSQLite3,
+
+    #[serde(rename = "mssql")]
+    Mssql,
+
+    #[serde(rename = "mariadb")]
+    MariaDb,
 }
 
 impl From<String> for DriverAdapter {
@@ -38,6 +47,6 @@ impl From<DriverAdapter> for String {
 impl Display for DriverAdapter {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         let s: String = (*self).into();
-        write!(f, "{}", s)
+        write!(f, "{s}")
     }
 }

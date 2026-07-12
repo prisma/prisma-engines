@@ -1,4 +1,4 @@
-use crate::{runtime::run_with_thread_local_runtime as tok, AnyError, Tags};
+use crate::{AnyError, Tags, runtime::run_with_thread_local_runtime as tok};
 use enumflags2::BitFlags;
 use quaint::{prelude::Queryable, single::Quaint};
 use url::Url;
@@ -83,13 +83,13 @@ pub async fn create_postgres_database(database_url: &str, db_name: &str) -> Resu
 
     url.query_pairs_mut()
         .append_pair("statement_cache_size", "0")
-        .append_pair("schema", "prisma-tests");
+        .append_pair("schema", "public");
 
     let url_str = url.to_string();
 
     let conn = Quaint::new(&url_str).await?;
 
-    conn.raw_cmd("CREATE SCHEMA \"prisma-tests\"").await?;
+    conn.raw_cmd("CREATE SCHEMA IF NOT EXISTS \"public\"").await?;
 
     Ok((conn, url_str))
 }

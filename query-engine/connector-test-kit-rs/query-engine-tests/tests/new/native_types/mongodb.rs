@@ -3,7 +3,7 @@ use query_engine_tests::*;
 
 #[test_suite(schema(schema), only(MongoDb))]
 mod mongodb {
-    use query_engine_tests::{run_query, Runner};
+    use query_engine_tests::{Runner, run_query};
 
     fn schema() -> String {
         let schema = indoc! {

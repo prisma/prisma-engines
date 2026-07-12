@@ -1,0 +1,42 @@
+---
+source: query-compiler/query-compiler/tests/queries.rs
+expression: pretty
+input_file: query-compiler/query-compiler/tests/data/query-one2m-pagination.json
+---
+dataMap {
+    id: Int (id)
+    title: String (title)
+    userId: Int (userId)
+    categories (from @nested$categories): {
+        id: Int (id)
+        name: String (name)
+    }
+}
+let @parent = query «SELECT "public"."Post"."id", "public"."Post"."title",
+                     "public"."Post"."userId" FROM "public"."Post" WHERE 1=1
+                     OFFSET $1»
+              params [const(BigInt(0))]
+in let @parent$id = mapField id (get @parent)
+   in join (get @parent)
+      with (process {
+               .: {
+                   linkingFields: (CategoryToPost@Post)
+                   distinct: (id)
+                   pagination: {
+                       skip: 1
+                       take: 1
+                       cursor: {
+                           id: const(Int(1))
+                       }
+                   }
+               }
+           } (query «SELECT "public"."Category"."id",
+                     "public"."Category"."name", "t0"."B" AS
+                     "CategoryToPost@Post" FROM "public"."Category" INNER JOIN
+                     "public"."_CategoryToPost" AS "t0" ON "t0"."A" =
+                     "public"."Category"."id" WHERE ("public"."Category"."id" >=
+                     (SELECT "public"."Category"."id" FROM "public"."Category"
+                     WHERE ("public"."Category"."id") = ($1)) AND "t0"."B" IN
+                     [$2,*]) ORDER BY "public"."Category"."id" ASC OFFSET $3»
+              params [const(BigInt(1)), var(@parent$id as Int),
+                      const(BigInt(0))])) on left.(id) = right.(CategoryToPost@Post) as @nested$categories

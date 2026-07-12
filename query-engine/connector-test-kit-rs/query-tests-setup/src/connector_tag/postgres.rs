@@ -1,7 +1,7 @@
 use std::fmt::Display;
 
 use super::*;
-use crate::{datamodel_rendering::SqlDatamodelRenderer, BoxFuture, TestError};
+use crate::{BoxFuture, TestError, datamodel_rendering::SqlDatamodelRenderer};
 use quaint::{prelude::Queryable, single::Quaint};
 
 #[derive(Debug, Default, Clone)]
@@ -16,7 +16,7 @@ impl ConnectorTagInterface for PostgresConnectorTag {
     }
 
     fn datamodel_provider(&self) -> &'static str {
-        "postgres"
+        "postgresql"
     }
 
     fn datamodel_renderer(&self) -> Box<dyn DatamodelRenderer> {
@@ -39,8 +39,6 @@ pub enum PostgresVersion {
     V15,
     V16,
     PgBouncer,
-    NeonJsNapi,
-    PgJsNapi,
     NeonJsWasm,
     PgJsWasm,
 }
@@ -59,8 +57,6 @@ impl TryFrom<&str> for PostgresVersion {
             "15" => Self::V15,
             "16" => Self::V16,
             "pgbouncer" => Self::PgBouncer,
-            "neon.js" => Self::NeonJsNapi,
-            "pg.js" => Self::PgJsNapi,
             "pg.js.wasm" => Self::PgJsWasm,
             "neon.js.wasm" => Self::NeonJsWasm,
             _ => return Err(TestError::parse_error(format!("Unknown Postgres version `{s}`"))),
@@ -82,8 +78,6 @@ impl Display for PostgresVersion {
             PostgresVersion::V15 => f.write_str("15"),
             PostgresVersion::V16 => f.write_str("16"),
             PostgresVersion::PgBouncer => f.write_str("pgbouncer"),
-            PostgresVersion::NeonJsNapi => f.write_str("neon.js"),
-            PostgresVersion::PgJsNapi => f.write_str("pg.js"),
             PostgresVersion::PgJsWasm => f.write_str("pg.js.wasm"),
             PostgresVersion::NeonJsWasm => f.write_str("pg.js.wasm"),
         }

@@ -65,16 +65,8 @@ impl<'a> IndexFieldPair<'a> {
         }
 
         let ext: &PostgresSchemaExt = self.context.sql_schema.downcast_connector_data();
-
-        let next = match self.next {
-            Some(next) => next,
-            None => return None,
-        };
-
-        let opclass = match ext.get_opclass(next.id) {
-            Some(opclass) => opclass,
-            None => return None,
-        };
+        let next = self.next?;
+        let opclass = ext.get_opclass(next.id)?;
 
         match &opclass.kind {
             _ if opclass.is_default => None,
@@ -148,18 +140,13 @@ impl<'a> IndexFieldPair<'a> {
             sql::postgres::SQLOperatorClassKind::UuidBloomOps => Some(IndexOps::Managed("UuidBloomOps")),
             sql::postgres::SQLOperatorClassKind::UuidMinMaxOps => Some(IndexOps::Managed("UuidMinMaxOps")),
             sql::postgres::SQLOperatorClassKind::UuidMinMaxMultiOps => Some(IndexOps::Managed("UuidMinMaxMultiOps")),
-            sql::postgres::SQLOperatorClassKind::Raw(ref c) => Some(IndexOps::Raw(c)),
+            sql::postgres::SQLOperatorClassKind::Raw(c) => Some(IndexOps::Raw(c)),
         }
     }
 
     fn field(self) -> Option<ScalarFieldPair<'a>> {
-        let next = match self.next {
-            Some(next) => next,
-            None => return None,
-        };
-
-        let previous = self.context.existing_table_scalar_field(next.as_column().id);
-        let next = next.as_column();
+        let next = self.next?.as_column();
+        let previous = self.context.existing_table_scalar_field(next.id);
 
         Some(IntrospectionPair::new(self.context, previous, next.coarsen()))
     }

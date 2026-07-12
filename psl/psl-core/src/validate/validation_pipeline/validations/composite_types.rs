@@ -2,9 +2,9 @@ use super::default_value;
 use crate::{datamodel_connector::ConnectorCapability, validate::validation_pipeline::context::Context};
 use diagnostics::DatamodelError;
 use parser_database::{
+    ScalarFieldType,
     ast::WithSpan,
     walkers::{CompositeTypeFieldWalker, CompositeTypeWalker},
-    ScalarFieldType,
 };
 use std::{fmt, rc::Rc};
 
@@ -142,7 +142,7 @@ impl<'db> CompositeTypePath<'db> {
     }
 }
 
-impl<'db> fmt::Display for CompositeTypePath<'db> {
+impl fmt::Display for CompositeTypePath<'_> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let mut traversed = vec![self.current];
         let mut this = self;

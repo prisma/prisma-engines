@@ -60,10 +60,10 @@ mod one2one_req {
         );
 
         assert_error!(
-          &runner,
-          r#"mutation { updateManyParent(data: { uniq: "u1" }) { count }}"#,
-          2014,
-          "The change you are trying to make would violate the required relation 'ChildToParent' between the `Child` and `Parent` models."
+            &runner,
+            r#"mutation { updateManyParent(data: { uniq: "u1" }) { count }}"#,
+            2014,
+            "The change you are trying to make would violate the required relation 'ChildToParent' between the `Child` and `Parent` models."
         );
 
         insta::assert_snapshot!(
@@ -84,10 +84,10 @@ mod one2one_req {
         );
 
         assert_error!(
-          &runner,
-          r#"mutation { upsertOneParent(where: { id: 1 }, update: { uniq: "u1" }, create: { id: 1, uniq: "1", child: { create: { id: 1 }}}) { id }}"#,
-          2014,
-          "The change you are trying to make would violate the required relation 'ChildToParent' between the `Child` and `Parent` models."
+            &runner,
+            r#"mutation { upsertOneParent(where: { id: 1 }, update: { uniq: "u1" }, create: { id: 1, uniq: "1", child: { create: { id: 1 }}}) { id }}"#,
+            2014,
+            "The change you are trying to make would violate the required relation 'ChildToParent' between the `Child` and `Parent` models."
         );
 
         insta::assert_snapshot!(
@@ -201,10 +201,10 @@ mod one2one_opt {
         );
 
         assert_error!(
-          &runner,
-          r#"mutation { updateOneParent(where: { id: 1 }, data: { uniq: "u1" }) { id }}"#,
-          2014,
-          "The change you are trying to make would violate the required relation 'ChildToParent' between the `Child` and `Parent` models."
+            &runner,
+            r#"mutation { updateOneParent(where: { id: 1 }, data: { uniq: "u1" }) { id }}"#,
+            2014,
+            "The change you are trying to make would violate the required relation 'ChildToParent' between the `Child` and `Parent` models."
         );
 
         insta::assert_snapshot!(
@@ -225,10 +225,10 @@ mod one2one_opt {
         );
 
         assert_error!(
-          &runner,
-          r#"mutation { updateManyParent(data: { uniq: "u1" }) { count }}"#,
-          2014,
-          "The change you are trying to make would violate the required relation 'ChildToParent' between the `Child` and `Parent` models."
+            &runner,
+            r#"mutation { updateManyParent(data: { uniq: "u1" }) { count }}"#,
+            2014,
+            "The change you are trying to make would violate the required relation 'ChildToParent' between the `Child` and `Parent` models."
         );
 
         insta::assert_snapshot!(
@@ -249,10 +249,10 @@ mod one2one_opt {
         );
 
         assert_error!(
-          &runner,
-          r#"mutation { upsertOneParent(where: { id: 1 }, update: { uniq: "u1" }, create: { id: 1, uniq: "1", child: { create: { id: 1 }}}) { id }}"#,
-          2014,
-          "The change you are trying to make would violate the required relation 'ChildToParent' between the `Child` and `Parent` models."
+            &runner,
+            r#"mutation { upsertOneParent(where: { id: 1 }, update: { uniq: "u1" }, create: { id: 1, uniq: "1", child: { create: { id: 1 }}}) { id }}"#,
+            2014,
+            "The change you are trying to make would violate the required relation 'ChildToParent' between the `Child` and `Parent` models."
         );
 
         insta::assert_snapshot!(
@@ -324,10 +324,10 @@ mod one2many_req {
         );
 
         assert_error!(
-          &runner,
-          r#"mutation { updateOneParent(where: { id: 1 }, data: { uniq: "u1" }) { id }}"#,
-          2014,
-          "The change you are trying to make would violate the required relation 'ChildToParent' between the `Child` and `Parent` models."
+            &runner,
+            r#"mutation { updateOneParent(where: { id: 1 }, data: { uniq: "u1" }) { id }}"#,
+            2014,
+            "The change you are trying to make would violate the required relation 'ChildToParent' between the `Child` and `Parent` models."
         );
 
         insta::assert_snapshot!(
@@ -348,10 +348,10 @@ mod one2many_req {
         );
 
         assert_error!(
-          &runner,
-          r#"mutation { updateManyParent(data: { uniq: "u1" }) { count }}"#,
-          2014,
-          "The change you are trying to make would violate the required relation 'ChildToParent' between the `Child` and `Parent` models."
+            &runner,
+            r#"mutation { updateManyParent(data: { uniq: "u1" }) { count }}"#,
+            2014,
+            "The change you are trying to make would violate the required relation 'ChildToParent' between the `Child` and `Parent` models."
         );
 
         insta::assert_snapshot!(
@@ -372,10 +372,10 @@ mod one2many_req {
         );
 
         assert_error!(
-          &runner,
-          r#"mutation { upsertOneParent(where: { id: 1 }, update: { uniq: "u1" }, create: { id: 1, uniq: "1", children: { create: { id: 1 }}}) { id }}"#,
-          2014,
-          "The change you are trying to make would violate the required relation 'ChildToParent' between the `Child` and `Parent` models."
+            &runner,
+            r#"mutation { upsertOneParent(where: { id: 1 }, update: { uniq: "u1" }, create: { id: 1, uniq: "1", children: { create: { id: 1 }}}) { id }}"#,
+            2014,
+            "The change you are trying to make would violate the required relation 'ChildToParent' between the `Child` and `Parent` models."
         );
 
         insta::assert_snapshot!(
@@ -421,16 +421,17 @@ mod one2many_opt {
         );
 
         assert_error!(
-          &runner,
-          r#"mutation { updateOneParent(where: { id: 1 }, data: { uniq: "u1" }) { id }}"#,2014,
-          "The change you are trying to make would violate the required relation 'ChildToParent' between the `Child` and `Parent` models."
+            &runner,
+            r#"mutation { updateOneParent(where: { id: 1 }, data: { uniq: "u1" }) { id }}"#,
+            2014,
+            "The change you are trying to make would violate the required relation 'ChildToParent' between the `Child` and `Parent` models."
         );
 
         assert_error!(
-          &runner,
-          r#"mutation { updateManyParent(where: { id: 1 }, data: { uniq: "u1" }) { count }}"#,
-          2014,
-          "The change you are trying to make would violate the required relation 'ChildToParent' between the `Child` and `Parent` models."
+            &runner,
+            r#"mutation { updateManyParent(where: { id: 1 }, data: { uniq: "u1" }) { count }}"#,
+            2014,
+            "The change you are trying to make would violate the required relation 'ChildToParent' between the `Child` and `Parent` models."
         );
 
         Ok(())
@@ -471,10 +472,10 @@ mod one2many_opt {
         );
 
         assert_error!(
-          &runner,
-          r#"mutation { updateOneParent(where: { id: 1 }, data: { uniq: "u1" }) { id }}"#,
-          2014,
-          "The change you are trying to make would violate the required relation 'ChildToParent' between the `Child` and `Parent` models."
+            &runner,
+            r#"mutation { updateOneParent(where: { id: 1 }, data: { uniq: "u1" }) { id }}"#,
+            2014,
+            "The change you are trying to make would violate the required relation 'ChildToParent' between the `Child` and `Parent` models."
         );
 
         insta::assert_snapshot!(
@@ -495,10 +496,10 @@ mod one2many_opt {
         );
 
         assert_error!(
-          &runner,
-          r#"mutation { updateManyParent(data: { uniq: "u1" }) { count }}"#,
-          2014,
-          "The change you are trying to make would violate the required relation 'ChildToParent' between the `Child` and `Parent` models."
+            &runner,
+            r#"mutation { updateManyParent(data: { uniq: "u1" }) { count }}"#,
+            2014,
+            "The change you are trying to make would violate the required relation 'ChildToParent' between the `Child` and `Parent` models."
         );
 
         insta::assert_snapshot!(
@@ -519,10 +520,10 @@ mod one2many_opt {
         );
 
         assert_error!(
-          &runner,
-          r#"mutation { upsertOneParent(where: { id: 1 }, update: { uniq: "u1" }, create: { id: 1, uniq: "1", children: { create: { id: 1 }}}) { id }}"#,
-          2014,
-          "The change you are trying to make would violate the required relation 'ChildToParent' between the `Child` and `Parent` models."
+            &runner,
+            r#"mutation { upsertOneParent(where: { id: 1 }, update: { uniq: "u1" }, create: { id: 1, uniq: "1", children: { create: { id: 1 }}}) { id }}"#,
+            2014,
+            "The change you are trying to make would violate the required relation 'ChildToParent' between the `Child` and `Parent` models."
         );
 
         insta::assert_snapshot!(

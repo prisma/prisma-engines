@@ -20,10 +20,10 @@ pub(crate) use sql_server::*;
 pub(crate) use sqlite::*;
 pub(crate) use vitess::*;
 
-use crate::{datamodel_rendering::DatamodelRenderer, BoxFuture, TestConfig, TestError, CONFIG};
+use crate::{BoxFuture, CONFIG, TestError, datamodel_rendering::DatamodelRenderer};
 use psl::datamodel_connector::ConnectorCapabilities;
 use quaint::prelude::SqlFamily;
-use std::{convert::TryFrom, fmt};
+use std::{convert::TryFrom, fmt, fs};
 
 pub trait ConnectorTagInterface {
     fn raw_execute<'a>(&'a self, query: &'a str, connection_url: &'a str) -> BoxFuture<'a, Result<(), TestError>>;
@@ -49,16 +49,12 @@ pub trait ConnectorTagInterface {
 /// The connection string to use to connect to the test database and version.
 /// - `test_database` is the database to connect to, which is an implementation detail of the
 ///   implementing connector, like a file or a schema.
-/// - `is_ci` signals whether or not the test run is done on CI or not. May be important if local
-///   test run connection strings and CI connection strings differ because of networking.
-pub(crate) fn connection_string(
-    test_config: &TestConfig,
+pub fn connection_string(
     version: &ConnectorVersion,
     database: &str,
     is_multi_schema: bool,
     isolation_level: Option<&'static str>,
 ) -> String {
-    let is_ci = test_config.is_ci;
     match version {
         ConnectorVersion::SqlServer(v) => {
             let database = if is_multi_schema {
@@ -70,17 +66,20 @@ pub(crate) fn connection_string(
             let isolation_level = isolation_level.unwrap_or("READ UNCOMMITTED");
 
             match v {
-            Some(SqlServerVersion::V2017) if is_ci => format!("sqlserver://test-db-sqlserver-2017:1433;{database};user=SA;password=<YourStrong@Passw0rd>;trustServerCertificate=true;isolationLevel={isolation_level}"),
-            Some(SqlServerVersion::V2017) => format!("sqlserver://127.0.0.1:1434;{database};user=SA;password=<YourStrong@Passw0rd>;trustServerCertificate=true;isolationLevel={isolation_level}"),
+                Some(SqlServerVersion::V2017) => format!(
+                    "sqlserver://127.0.0.1:1434;{database};user=SA;password=<YourStrong@Passw0rd>;trustServerCertificate=true;isolationLevel={isolation_level}"
+                ),
 
-            Some(SqlServerVersion::V2019) if is_ci => format!("sqlserver://test-db-sqlserver-2019:1433;{database};user=SA;password=<YourStrong@Passw0rd>;trustServerCertificate=true;isolationLevel={isolation_level}"),
-            Some(SqlServerVersion::V2019) => format!("sqlserver://127.0.0.1:1433;{database};user=SA;password=<YourStrong@Passw0rd>;trustServerCertificate=true;isolationLevel={isolation_level}"),
+                Some(SqlServerVersion::V2019) => format!(
+                    "sqlserver://127.0.0.1:1433;{database};user=SA;password=<YourStrong@Passw0rd>;trustServerCertificate=true;isolationLevel={isolation_level}"
+                ),
 
-            Some(SqlServerVersion::V2022) if is_ci => format!("sqlserver://test-db-sqlserver-2022:1433;{database};user=SA;password=<YourStrong@Passw0rd>;trustServerCertificate=true;isolationLevel={isolation_level}"),
-            Some(SqlServerVersion::V2022) => format!("sqlserver://127.0.0.1:1435;{database};user=SA;password=<YourStrong@Passw0rd>;trustServerCertificate=true;isolationLevel={isolation_level}"),
+                Some(SqlServerVersion::V2022 | SqlServerVersion::MssqlJsWasm) => format!(
+                    "sqlserver://127.0.0.1:1435;{database};user=SA;password=<YourStrong@Passw0rd>;trustServerCertificate=true;isolationLevel={isolation_level}"
+                ),
 
-            None => unreachable!("A versioned connector must have a concrete version to run."),
-        }
+                None => unreachable!("A versioned connector must have a concrete version to run."),
+            }
         }
         ConnectorVersion::Postgres(v) => {
             let database = if is_multi_schema {
@@ -90,42 +89,11 @@ pub(crate) fn connection_string(
             };
 
             match v {
-                Some(PostgresVersion::V9) if is_ci => {
-                    format!("postgresql://postgres:prisma@test-db-postgres-9:5432/{database}")
-                }
-                Some(PostgresVersion::V10) if is_ci => {
-                    format!("postgresql://postgres:prisma@test-db-postgres-10:5432/{database}")
-                }
-                Some(PostgresVersion::V11) if is_ci => {
-                    format!("postgresql://postgres:prisma@test-db-postgres-11:5432/{database}")
-                }
-                Some(PostgresVersion::V12) if is_ci => {
-                    format!("postgresql://postgres:prisma@test-db-postgres-12:5432/{database}")
-                }
-                Some(PostgresVersion::V13) | Some(PostgresVersion::NeonJsNapi) | Some(PostgresVersion::PgJsNapi)
-                    if is_ci =>
-                {
-                    format!("postgresql://postgres:prisma@test-db-postgres-13:5432/{database}")
-                }
-                Some(PostgresVersion::V14) if is_ci => {
-                    format!("postgresql://postgres:prisma@test-db-postgres-14:5432/{database}")
-                }
-                Some(PostgresVersion::V15) if is_ci => {
-                    format!("postgresql://postgres:prisma@test-db-postgres-15:5432/{database}")
-                }
-                Some(PostgresVersion::PgBouncer) if is_ci => {
-                    format!("postgresql://postgres:prisma@test-db-pgbouncer:6432/{database}&pgbouncer=true")
-                }
-
                 Some(PostgresVersion::V9) => format!("postgresql://postgres:prisma@127.0.0.1:5431/{database}"),
                 Some(PostgresVersion::V10) => format!("postgresql://postgres:prisma@127.0.0.1:5432/{database}"),
                 Some(PostgresVersion::V11) => format!("postgresql://postgres:prisma@127.0.0.1:5433/{database}"),
                 Some(PostgresVersion::V12) => format!("postgresql://postgres:prisma@127.0.0.1:5434/{database}"),
-                Some(PostgresVersion::V13)
-                | Some(PostgresVersion::NeonJsNapi)
-                | Some(PostgresVersion::PgJsNapi)
-                | Some(PostgresVersion::PgJsWasm)
-                | Some(PostgresVersion::NeonJsWasm) => {
+                Some(PostgresVersion::V13) | Some(PostgresVersion::PgJsWasm) | Some(PostgresVersion::NeonJsWasm) => {
                     format!("postgresql://postgres:prisma@127.0.0.1:5435/{database}")
                 }
                 Some(PostgresVersion::V14) => format!("postgresql://postgres:prisma@127.0.0.1:5437/{database}"),
@@ -139,36 +107,23 @@ pub(crate) fn connection_string(
             }
         }
         ConnectorVersion::MySql(v) => match v {
-            Some(MySqlVersion::V5_6) if is_ci => format!("mysql://root:prisma@test-db-mysql-5-6:3306/{database}"),
-            Some(MySqlVersion::V5_7) if is_ci => format!("mysql://root:prisma@test-db-mysql-5-7:3306/{database}"),
-            Some(MySqlVersion::V8) if is_ci => format!("mysql://root:prisma@test-db-mysql-8:3306/{database}"),
-            Some(MySqlVersion::MariaDb) if is_ci => {
-                format!("mysql://root:prisma@test-db-mysql-mariadb:3306/{database}")
-            }
             Some(MySqlVersion::V5_6) => format!("mysql://root:prisma@127.0.0.1:3309/{database}"),
             Some(MySqlVersion::V5_7) => format!("mysql://root:prisma@127.0.0.1:3306/{database}"),
-            Some(MySqlVersion::V8) => format!("mysql://root:prisma@127.0.0.1:3307/{database}"),
-            Some(MySqlVersion::MariaDb) => {
+            Some(MySqlVersion::V8 | MySqlVersion::MariaDbMysqlJsWasm) => {
+                format!("mysql://root:prisma@127.0.0.1:3307/{database}")
+            }
+            Some(MySqlVersion::MariaDb | MySqlVersion::MariaDbJsWasm) => {
                 format!("mysql://root:prisma@127.0.0.1:3308/{database}")
             }
 
             None => unreachable!("A versioned connector must have a concrete version to run."),
         },
         ConnectorVersion::MongoDb(v) => match v {
-            Some(MongoDbVersion::V4_2) if is_ci => format!(
-                "mongodb://prisma:prisma@test-db-mongodb-4-2:27016/{database}?authSource=admin&retryWrites=true"
-            ),
             Some(MongoDbVersion::V4_2) => {
                 format!("mongodb://prisma:prisma@127.0.0.1:27016/{database}?authSource=admin&retryWrites=true")
             }
-            Some(MongoDbVersion::V4_4) if is_ci => format!(
-                "mongodb://prisma:prisma@test-db-mongodb-4-4:27017/{database}?authSource=admin&retryWrites=true"
-            ),
             Some(MongoDbVersion::V4_4) => {
                 format!("mongodb://prisma:prisma@127.0.0.1:27017/{database}?authSource=admin&retryWrites=true")
-            }
-            Some(MongoDbVersion::V5) if is_ci => {
-                format!("mongodb://prisma:prisma@test-db-mongodb-5:27018/{database}?authSource=admin&retryWrites=true")
             }
             Some(MongoDbVersion::V5) => {
                 format!("mongodb://prisma:prisma@127.0.0.1:27018/{database}?authSource=admin&retryWrites=true")
@@ -176,33 +131,28 @@ pub(crate) fn connection_string(
             None => unreachable!("A versioned connector must have a concrete version to run."),
         },
         ConnectorVersion::Sqlite(_) => {
-            let workspace_root = std::env::var("WORKSPACE_ROOT")
+            let working_dir = std::env::var("RAMDISK")
+                .or_else(|_| std::env::var("WORKSPACE_ROOT"))
                 .unwrap_or_else(|_| ".".to_owned())
                 .trim_end_matches('/')
                 .to_owned();
 
-            format!("file://{workspace_root}/db/{database}.db")
+            let db_dir = format!("{working_dir}/db");
+            fs::create_dir_all(&db_dir).ok();
+
+            format!("file:{db_dir}/{database}.db")
         }
         ConnectorVersion::CockroachDb(v) => {
             // Use the same database and schema name for CockroachDB - unfortunately CockroachDB
             // can't handle 1 schema per test in a database well at this point in time.
             match v {
-                Some(CockroachDbVersion::V221) if is_ci => {
-                    format!("postgresql://prisma@test-db-cockroachdb-22-1:26257/{database}?schema={database}")
-                }
-                Some(CockroachDbVersion::V222) if is_ci => {
-                    format!("postgresql://prisma@test-db-cockroachdb-22-2:26259/{database}?schema={database}")
-                }
-                Some(CockroachDbVersion::V231) if is_ci => {
-                    format!("postgresql://prisma@test-db-cockroachdb-23-1:26260/{database}?schema={database}")
-                }
                 Some(CockroachDbVersion::V221) => {
                     format!("postgresql://prisma@127.0.0.1:26257/{database}?schema={database}")
                 }
                 Some(CockroachDbVersion::V222) => {
                     format!("postgresql://prisma@127.0.0.1:26259/{database}?schema={database}")
                 }
-                Some(CockroachDbVersion::V231) => {
+                Some(CockroachDbVersion::V231 | CockroachDbVersion::PgJsWasm) => {
                     format!("postgresql://prisma@127.0.0.1:26260/{database}?schema={database}")
                 }
 
@@ -211,7 +161,7 @@ pub(crate) fn connection_string(
         }
 
         ConnectorVersion::Vitess(Some(VitessVersion::V8_0)) => "mysql://root@localhost:33807/test".into(),
-        ConnectorVersion::Vitess(Some(VitessVersion::PlanetscaleJsNapi | VitessVersion::PlanetscaleJsWasm)) => {
+        ConnectorVersion::Vitess(Some(VitessVersion::PlanetscaleJsWasm)) => {
             format!("mysql://root@127.0.0.1:3310/{database}")
         }
 
@@ -282,9 +232,9 @@ impl ConnectorVersion {
 
     /// The maximum number of rows allowed in a single insert query.
     ///
-    /// max_bind_values is overriden by the QUERY_BATCH_SIZE env var in targets other than WASM.
+    /// max_bind_values is overriden by the QUERY_BATCH_SIZE env var in targets other than Wasm.
     ///
-    /// Connectors which underyling implementation is WASM don't have any max_bind_values override
+    /// Connectors which underyling implementation is Wasm don't have any max_bind_values override
     /// as there's no such thing as runtime environment.
     ///
     /// From the PoV of the test binary, the target architecture is that of where the test runs,
@@ -292,13 +242,16 @@ impl ConnectorVersion {
     ///
     /// As a consequence there is a mismatch between the max_bind_values as seen by the test
     /// binary (overriden by the QUERY_BATCH_SIZE env var) and the max_bind_values as seen by the
-    /// WASM engine being exercised in those tests, through the RunnerExecutor::External test runner.
+    /// Wasm engine being exercised in those tests, through the RunnerExecutor::External test runner.
     ///
     /// What we do in here, is returning the number of max_bind_values that the connector under test
-    /// will use. i.e. if it's a WASM connector, the default, not overridable one. Otherwise the one
+    /// will use. i.e. if it's a Wasm connector, the default, not overridable one. Otherwise the one
     /// as seen by the test binary (which will be the same as the engine exercised)
     pub fn max_bind_values(&self) -> Option<usize> {
-        if self.is_wasm() {
+        if matches!(self, Self::Sqlite(Some(SqliteVersion::CloudflareD1))) {
+            // D1 doesn't have the same limit as other SQLite implementations.
+            Some(98)
+        } else if self.is_wasm() {
             self.sql_family().map(|f| f.default_max_bind_values())
         } else {
             self.sql_family().map(|f| f.max_bind_values())
@@ -321,7 +274,7 @@ impl ConnectorVersion {
     /// Determines if the connector uses a driver adapter implemented in Wasm.
     /// Do not delete! This is used because the `#[cfg(target_arch = "wasm32")]` conditional compilation
     /// directive doesn't work in the test runner.
-    fn is_wasm(&self) -> bool {
+    pub fn is_wasm(&self) -> bool {
         matches!(
             self,
             Self::Postgres(Some(PostgresVersion::PgJsWasm))
@@ -329,6 +282,11 @@ impl ConnectorVersion {
                 | Self::Vitess(Some(VitessVersion::PlanetscaleJsWasm))
                 | Self::Sqlite(Some(SqliteVersion::LibsqlJsWasm))
                 | Self::Sqlite(Some(SqliteVersion::CloudflareD1))
+                | Self::Sqlite(Some(SqliteVersion::BetterSQLite3))
+                | Self::SqlServer(Some(SqlServerVersion::MssqlJsWasm))
+                | Self::MySql(Some(MySqlVersion::MariaDbJsWasm))
+                | Self::MySql(Some(MySqlVersion::MariaDbMysqlJsWasm))
+                | Self::CockroachDb(Some(CockroachDbVersion::PgJsWasm))
         )
     }
 }
@@ -394,7 +352,9 @@ pub(crate) fn should_run(
     for exclusion in exclusions.iter() {
         for inclusion in inclusions.iter() {
             if exclusion.is_broader(inclusion) {
-                panic!("Error in connector test execution rules. Version `{exclusion}` in `excluded()` is broader than `{inclusion}` in `only()`");
+                panic!(
+                    "Error in connector test execution rules. Version `{exclusion}` in `excluded()` is broader than `{inclusion}` in `only()`"
+                );
             }
         }
     }
@@ -408,9 +368,7 @@ pub(crate) fn should_run(
         return inclusions.iter().any(|incl| incl.matches_pattern(version));
     }
 
-    // FIXME: This skips vitess unless explicitly opted in. Replace with `true` when fixing
-    // https://github.com/prisma/client-planning/issues/332
-    CONFIG.with_driver_adapter().is_some() || !matches!(version, ConnectorVersion::Vitess(_))
+    true
 }
 
 impl TryFrom<(&str, Option<&str>)> for ConnectorVersion {
@@ -440,10 +398,10 @@ mod tests {
     #[rustfmt::skip]
     fn test_should_run() {
         let only = vec![("postgres", None)];
-        let exclude = vec![("postgres", Some("neon.js"))];
+        let exclude = vec![("postgres", Some("neon.js.wasm"))];
         let postgres = &PostgresConnectorTag as ConnectorTag;
-        let neon = ConnectorVersion::Postgres(Some(PostgresVersion::NeonJsNapi));
-        let pg = ConnectorVersion::Postgres(Some(PostgresVersion::PgJsNapi));
+        let neon = ConnectorVersion::Postgres(Some(PostgresVersion::NeonJsWasm));
+        let pg = ConnectorVersion::Postgres(Some(PostgresVersion::PgJsWasm));
 
         assert!(!super::should_run(&postgres, &neon, &only, &exclude, Default::default()));
         assert!(super::should_run(&postgres, &pg, &only, &exclude, Default::default()));
@@ -455,7 +413,7 @@ mod tests {
         let only = vec![("postgres", None)];
         let exclude = vec![("postgres", None)];
         let postgres = &PostgresConnectorTag as ConnectorTag;
-        let neon = ConnectorVersion::Postgres(Some(PostgresVersion::NeonJsNapi));
+        let neon = ConnectorVersion::Postgres(Some(PostgresVersion::NeonJsWasm));
 
         super::should_run(&postgres, &neon, &only, &exclude, Default::default());
     }
@@ -463,10 +421,10 @@ mod tests {
     #[test]
     #[should_panic]
     fn test_should_run_wrong_definition_wider_exclusion() {
-        let only = vec![("postgres", Some("neon.js"))];
+        let only = vec![("postgres", Some("neon.js.wasm"))];
         let exclude = vec![("postgres", None)];
         let postgres = &PostgresConnectorTag as ConnectorTag;
-        let neon = ConnectorVersion::Postgres(Some(PostgresVersion::NeonJsNapi));
+        let neon = ConnectorVersion::Postgres(Some(PostgresVersion::NeonJsWasm));
 
         super::should_run(&postgres, &neon, &only, &exclude, Default::default());
     }

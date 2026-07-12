@@ -1,7 +1,7 @@
 use query_engine_tests::*;
 
 #[test_suite(capabilities(CreateMany, InsertReturning))]
-mod create_many {
+mod create_many_and_return {
     use indoc::indoc;
     use query_engine_tests::{assert_error, run_query};
 
@@ -122,7 +122,7 @@ mod create_many {
 
     // Covers: AutoIncrement ID working with basic autonincrement functionality.
     #[connector_test(schema(schema_2_cockroachdb), only(CockroachDb))]
-    async fn basic_create_many_autoincrement_cockroachdb(runner: Runner) -> TestResult<()> {
+    async fn basic_create_many_autoinc_cockroachdb(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(&runner, r#"mutation {
             createManyTestAndReturn(data: [
@@ -232,8 +232,7 @@ mod create_many {
     // Covers: Batching by row number.
     // Each DB allows a certain amount of params per single query, and a certain number of rows.
     // Each created row has 1 param and we create 1000 records.
-    // TODO: unexclude d1 once https://github.com/prisma/team-orm/issues/1070 is fixed
-    #[connector_test(schema(schema_4), exclude(Sqlite("cfd1")))]
+    #[connector_test(schema(schema_4))]
     async fn large_num_records_horizontal(runner: Runner) -> TestResult<()> {
         let mut records: Vec<String> = vec![];
 
@@ -277,8 +276,7 @@ mod create_many {
     // Covers: Batching by row number.
     // Each DB allows a certain amount of params per single query, and a certain number of rows.
     // Each created row has 4 params and we create 1000 rows.
-    // TODO: unexclude d1 once https://github.com/prisma/team-orm/issues/1070 is fixed
-    #[connector_test(schema(schema_5), exclude(Sqlite("cfd1")))]
+    #[connector_test(schema(schema_5))]
     async fn large_num_records_vertical(runner: Runner) -> TestResult<()> {
         let mut records: Vec<String> = vec![];
 
@@ -341,13 +339,13 @@ mod create_many {
 
               child Child?
             }
-            
+
             model Child {
               #id(id, Int, @id)
 
               testId Int? @unique
               test Test? @relation(fields: [testId], references: [id])
-            
+
             }"#
         };
 
@@ -405,7 +403,7 @@ mod create_many {
 
               children Child[]
             }
-            
+
             model Child {
               #id(id, Int, @id)
               str1 String?
@@ -414,7 +412,7 @@ mod create_many {
 
               testId Int?
               test Test? @relation(fields: [testId], references: [id])
-            
+
             }"#
         };
 
@@ -470,12 +468,12 @@ mod create_many {
 
             #m2m(children, Child[], id, Int)
           }
-          
+
           model Child {
             #id(id, Int, @id)
 
             #m2m(tests, Test[], id, Int)
-          
+
           }"#
         };
 
@@ -521,7 +519,7 @@ mod create_many {
         let schema = indoc! {
             r#"model Child {
               #id(id, Int, @id)
-            
+
               teacherId Int?
               teacher   Child?  @relation("TeacherStudents", fields: [teacherId], references: [id])
               students  Child[] @relation("TeacherStudents")
@@ -649,11 +647,8 @@ mod create_many {
         Ok(())
     }
 
-    // LibSQL & co are ignored because they don't support metrics
-    #[connector_test(schema(schema_7), only(Sqlite("3")))]
-    async fn create_many_by_shape_counter_1(runner: Runner) -> TestResult<()> {
-        use query_engine_metrics::PRISMA_DATASOURCE_QUERIES_TOTAL;
-
+    #[connector_test(schema(schema_7), only(Sqlite))]
+    async fn create_many_by_shape_counter_1(mut runner: Runner) -> TestResult<()> {
         // Generated queries:
         // INSERT INTO `main`.`Test` (`opt`, `req`) VALUES (null, ?), (?, ?) params=[1,2,2]
         // INSERT INTO `main`.`Test` (`opt_default`, `opt`, `req`) VALUES (?, null, ?), (?, ?, ?) params=[3,3,6,6,6]
@@ -678,24 +673,25 @@ mod create_many {
             }"#
         );
 
-        let json = runner.get_metrics().to_json(Default::default());
-        let counter = metrics::get_counter(&json, PRISMA_DATASOURCE_QUERIES_TOTAL);
+        let count = runner
+            .get_logs()
+            .await
+            .into_iter()
+            .filter(|s| s.contains("INSERT INTO"))
+            .count();
 
         match runner.max_bind_values() {
-            Some(x) if x > 18 => assert_eq!(counter, 6), // 4 queries in total (BEGIN/COMMIT are counted)
+            Some(x) if x > 18 => assert_eq!(count, 4),
             // Some queries are being split because of `QUERY_BATCH_SIZE` being set to `10` in dev.
-            Some(_) => assert_eq!(counter, 7), // 5 queries in total (BEGIN/COMMIT are counted)
+            Some(_) => assert_eq!(count, 5),
             _ => panic!("Expected max bind values to be set"),
         }
 
         Ok(())
     }
 
-    // LibSQL & co are ignored because they don't support metrics
-    #[connector_test(schema(schema_7), only(Sqlite("3")))]
-    async fn create_many_by_shape_counter_2(runner: Runner) -> TestResult<()> {
-        use query_engine_metrics::PRISMA_DATASOURCE_QUERIES_TOTAL;
-
+    #[connector_test(schema(schema_7), only(Sqlite))]
+    async fn create_many_by_shape_counter_2(mut runner: Runner) -> TestResult<()> {
         // Generated queries:
         // INSERT INTO `main`.`Test` ( `opt_default_static`, `req_default_static`, `opt`, `req` ) VALUES (?, ?, null, ?), (?, ?, null, ?), (?, ?, null, ?) params=[1,1,1,2,1,2,1,3,3]
         // INSERT INTO `main`.`Test` ( `opt_default_static`, `req_default_static`, `opt`, `req` ) VALUES (?, ?, ?, ?), (?, ?, ?, ?) params=[1,1,8,4,1,1,null,5]
@@ -717,24 +713,25 @@ mod create_many {
             }"#
         );
 
-        let json = runner.get_metrics().to_json(Default::default());
-        let counter = metrics::get_counter(&json, PRISMA_DATASOURCE_QUERIES_TOTAL);
+        let count = runner
+            .get_logs()
+            .await
+            .into_iter()
+            .filter(|s| s.contains("INSERT INTO"))
+            .count();
 
         match runner.max_bind_values() {
-            Some(x) if x >= 18 => assert_eq!(counter, 3), // 1 createMany queries (BEGIN/COMMIT are counted)
+            Some(x) if x >= 18 => assert_eq!(count, 1),
             // Some queries are being split because of `QUERY_BATCH_SIZE` being set to `10` in dev.
-            Some(_) => assert_eq!(counter, 4), // 2 createMany queries (BEGIN/COMMIT are counted)
+            Some(_) => assert_eq!(count, 2),
             _ => panic!("Expected max bind values to be set"),
         }
 
         Ok(())
     }
 
-    // LibSQL & co are ignored because they don't support metrics
-    #[connector_test(schema(schema_7), only(Sqlite("3")))]
-    async fn create_many_by_shape_counter_3(runner: Runner) -> TestResult<()> {
-        use query_engine_metrics::PRISMA_DATASOURCE_QUERIES_TOTAL;
-
+    #[connector_test(schema(schema_7), only(Sqlite))]
+    async fn create_many_by_shape_counter_3(mut runner: Runner) -> TestResult<()> {
         // Generated queries:
         // INSERT INTO `main`.`Test` ( `req_default_static`, `req`, `opt_default`, `opt_default_static` ) VALUES (?, ?, ?, ?) params=[1,6,3,1]
         // INSERT INTO `main`.`Test` ( `opt`, `req`, `req_default_static`, `opt_default_static` ) VALUES (null, ?, ?, ?), (null, ?, ?, ?), (null, ?, ?, ?) params=[1,1,1,2,1,2,3,3,1]
@@ -758,13 +755,17 @@ mod create_many {
             }"#
         );
 
-        let json = runner.get_metrics().to_json(Default::default());
-        let counter = metrics::get_counter(&json, PRISMA_DATASOURCE_QUERIES_TOTAL);
+        let count = runner
+            .get_logs()
+            .await
+            .into_iter()
+            .filter(|s| s.contains("INSERT INTO"))
+            .count();
 
         match runner.max_bind_values() {
-            Some(x) if x > 21 => assert_eq!(counter, 4), // 3 createMany queries in total (BEGIN/COMMIT are counted)
+            Some(x) if x > 21 => assert_eq!(count, 2),
             // Some queries are being split because of `QUERY_BATCH_SIZE` being set to `10` in dev.
-            Some(_) => assert_eq!(counter, 5), // 3 createMany queries in total (BEGIN/COMMIT are counted)
+            Some(_) => assert_eq!(count, 3),
             _ => panic!("Expected max bind values to be set"),
         }
 
@@ -777,7 +778,7 @@ mod create_many {
     exclude(MySql(5.6)),
     capabilities(Json, AdvancedJsonNullability, CreateMany, InsertReturning)
 )]
-mod json_create_many {
+mod json_create_many_and_return {
     use query_engine_tests::{assert_error, run_query};
 
     #[connector_test]

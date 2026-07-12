@@ -1,6 +1,6 @@
 use query_tests_setup::{
-    query_core::{BatchDocument, QueryDocument},
     GraphqlBody, MultiQuery, Runner, TestResult,
+    query_core::{BatchDocument, QueryDocument},
 };
 
 use crate::run_query;

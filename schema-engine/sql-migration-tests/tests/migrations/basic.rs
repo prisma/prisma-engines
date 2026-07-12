@@ -360,7 +360,6 @@ fn switching_databases_must_work(api: TestApi) {
     let dm1 = r#"
         datasource db {
             provider = "sqlite"
-            url = "file:dev.db"
         }
 
         model Test {
@@ -369,12 +368,12 @@ fn switching_databases_must_work(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm1).send().assert_green();
+    let mut engine = api.new_engine_with_connection_strings("file:dev.db".into(), None);
+    engine.schema_push(dm1).send().assert_green();
 
     let dm2 = r#"
         datasource db {
             provider = "sqlite"
-            url = "file:hiya.db"
         }
 
         model Test {
@@ -383,7 +382,8 @@ fn switching_databases_must_work(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm2).migration_id(Some("mig2")).send().assert_green();
+    let mut engine = api.new_engine_with_connection_strings("file:hiya.db".into(), None);
+    engine.schema_push(dm2).migration_id(Some("mig2")).send().assert_green();
 }
 
 #[test_connector(tags(Sqlite))]
@@ -391,7 +391,6 @@ fn renaming_a_datasource_works(api: TestApi) {
     let dm1 = r#"
         datasource db1 {
             provider = "sqlite"
-            url = "file:///tmp/prisma-test.db"
         }
 
         model User {
@@ -404,7 +403,6 @@ fn renaming_a_datasource_works(api: TestApi) {
     let dm2 = r#"
         datasource db2 {
             provider = "sqlite"
-            url = "file:///tmp/prisma-test.db"
         }
 
         model User {

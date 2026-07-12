@@ -1,5 +1,5 @@
 use lsp_types::{CodeAction, CodeActionKind, CodeActionOrCommand};
-use psl::{parser_database::walkers::ModelWalker, schema_ast::ast::WithSpan, Datasource};
+use psl::{Datasource, parser_database::walkers::ModelWalker, schema_ast::ast::WithSpan};
 
 use super::CodeActionsContext;
 

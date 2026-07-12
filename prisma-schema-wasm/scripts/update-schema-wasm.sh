@@ -14,7 +14,7 @@ language_tools_node="$language_tools_server/node_modules/@prisma/prisma-schema-w
 
 ## Script
 printf '%s\n' "Starting build :: prisma-schema-wasm"
-cargo build --release --target=wasm32-unknown-unknown --manifest-path=$prisma_schema_wasm_dir/Cargo.toml
+cargo build --features wasm-logger --release --target=wasm32-unknown-unknown --manifest-path=$prisma_schema_wasm_dir/Cargo.toml
 
 printf '%s\n' "Generating node module"
 out=$prisma_schema_wasm_dir/nodejs $prisma_schema_wasm_dir/scripts/install.sh

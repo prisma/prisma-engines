@@ -3,7 +3,7 @@ mod tokenize;
 
 use crate::{ColumnType, ColumnTypeFamily, DefaultKind, DefaultValue};
 use prisma_value::PrismaValue;
-use tokenize::{tokenize, Token};
+use tokenize::{Token, tokenize};
 
 #[derive(Debug)]
 struct Parser<'a> {
@@ -101,7 +101,7 @@ fn parser_for_family(family: &ColumnTypeFamily) -> &'static dyn Fn(&mut Parser<'
         ColumnTypeFamily::Boolean => &parse_bool_default,
         ColumnTypeFamily::DateTime => &parse_datetime_default,
         ColumnTypeFamily::Binary => &parse_binary_default,
-        ColumnTypeFamily::Unsupported(_) | ColumnTypeFamily::Uuid => &parse_unsupported,
+        ColumnTypeFamily::Udt(_) | ColumnTypeFamily::Unsupported(_) | ColumnTypeFamily::Uuid => &parse_unsupported,
     }
 }
 
@@ -309,7 +309,23 @@ fn parse_int_default(parser: &mut Parser<'_>) -> Option<DefaultValue> {
                 parser.expect(Token::OpeningBrace)?;
                 parser.expect(Token::ClosingBrace)?;
                 Some(DefaultValue::unique_rowid())
-            } else if s.eq_ignore_ascii_case("nextval") {
+            } else {
+                let is_nextval = if s.eq_ignore_ascii_case("nextval") {
+                    true
+                } else if let Some(Token::Dot) = parser.peek_token() {
+                    // Accept schema-qualified function calls such as pg_catalog.nextval(...)
+                    parser.expect(Token::Dot)?;
+                    parser.expect(Token::Identifier).is_some_and(|name| {
+                        s.eq_ignore_ascii_case("pg_catalog") && name.eq_ignore_ascii_case("nextval")
+                    })
+                } else {
+                    false
+                };
+
+                if !is_nextval {
+                    return None;
+                }
+
                 parser.expect(Token::OpeningBrace)?;
 
                 // Example: nextval(('"third_Sequence"'::text)::regclass)
@@ -351,8 +367,6 @@ fn parse_int_default(parser: &mut Parser<'_>) -> Option<DefaultValue> {
                 eat_cast(parser)?;
 
                 Some(DefaultValue::sequence(sequence_name))
-            } else {
-                None
             }
         }
         _ => None,
@@ -453,6 +467,8 @@ fn parse_array_constructor(parser: &mut Parser<'_>, tpe: &ColumnTypeFamily) -> O
     let mut values = Vec::new();
     let parse_fn = parser_for_family(tpe);
 
+    let _ = parser.expect(Token::OpeningBrace);
+
     let kw = parser.expect(Token::Identifier)?;
     if !kw.eq_ignore_ascii_case("array") {
         return None;
@@ -498,7 +514,7 @@ fn get_list_default_value(parser: &mut Parser<'_>, tpe: &ColumnType) -> DefaultV
         Some(Token::CStyleStringLiteral) | Some(Token::StringLiteral) => {
             parse_string_value(parser).and_then(|value| c_style_scalar_lists::parse_array_literal(&value, tpe))
         }
-        Some(Token::Identifier) => parse_array_constructor(parser, &tpe.family),
+        Some(Token::Identifier) | Some(Token::OpeningBrace) => parse_array_constructor(parser, &tpe.family),
         _ => None,
     };
 
@@ -697,6 +713,23 @@ mod tests {
     }
 
     #[test]
+    fn parse_empty_varchar_array_default() {
+        let input = "(ARRAY[]::character varying[])::character varying(10)[]";
+        let tokens = tokenize(input);
+        let mut parser = Parser::new(input, &tokens);
+
+        let out = parse_array_constructor(&mut parser, &ColumnTypeFamily::String);
+
+        let expected = expect![[r#"
+            Some(
+                [],
+            )
+        "#]];
+
+        expected.assert_debug_eq(&out);
+    }
+
+    #[test]
     fn postgres_is_sequence_works() {
         let assert_is_sequence = |default_str: &str, expected_sequence: &str| {
             let parsed_default = get_default_value(
@@ -708,6 +741,15 @@ mod tests {
         };
 
         assert_is_sequence(r#"nextval('first_sequence'::regclass)"#, "first_sequence");
+        assert_is_sequence(r#"pg_catalog.nextval('first_sequence'::regclass)"#, "first_sequence");
+        assert!(
+            get_default_value(
+                r#"public.nextval('first_sequence'::regclass)"#,
+                &ColumnType::pure(ColumnTypeFamily::Int, crate::ColumnArity::Required)
+            )
+            .unwrap()
+            .is_db_generated()
+        );
 
         assert_is_sequence(r#"nextval('schema_name.second_sequence'::regclass)"#, "second_sequence");
 
@@ -719,11 +761,13 @@ mod tests {
 
         assert_is_sequence(r#"nextval(('fifth_sequence'::text)::regclass)"#, "fifth_sequence");
         let non_autoincrement = r#"string_default_named_seq"#;
-        assert!(get_default_value(
-            non_autoincrement,
-            &ColumnType::pure(ColumnTypeFamily::Int, crate::ColumnArity::Required)
-        )
-        .unwrap()
-        .is_db_generated());
+        assert!(
+            get_default_value(
+                non_autoincrement,
+                &ColumnType::pure(ColumnTypeFamily::Int, crate::ColumnArity::Required)
+            )
+            .unwrap()
+            .is_db_generated()
+        );
     }
 }

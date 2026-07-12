@@ -1,0 +1,32 @@
+[package]
+name = "driver-adapters"
+version = "0.1.0"
+edition.workspace = true
+
+[features]
+default = ["mysql", "sqlite", "postgresql", "mssql"]
+mysql = ["quaint/mysql"]
+sqlite = ["quaint/sqlite"]
+postgresql = ["quaint/postgresql"]
+mssql = ["quaint/mssql"]
+
+[lints]
+workspace = true
+
+[dependencies]
+async-trait.workspace = true
+futures.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+telemetry.workspace = true
+tracing.workspace = true
+uuid.workspace = true
+pin-project.workspace = true
+serde_repr.workspace = true
+quaint.workspace = true
+js-sys.workspace = true
+serde-wasm-bindgen.workspace = true
+shared-wasm.workspace = true
+wasm-bindgen.workspace = true
+wasm-bindgen-futures.workspace = true
+tsify.workspace = true

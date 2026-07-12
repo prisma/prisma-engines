@@ -1,10 +1,10 @@
 use super::MsSqlType;
 use crate::{
-    datamodel_connector::{walker_ext_traits::ScalarFieldWalkerExt, Connector},
+    datamodel_connector::{Connector, walker_ext_traits::ScalarFieldWalkerExt},
     diagnostics::{DatamodelError, Diagnostics},
     parser_database::{
-        walkers::{IndexWalker, PrimaryKeyWalker},
         ScalarType,
+        walkers::{IndexWalker, PrimaryKeyWalker},
     },
 };
 

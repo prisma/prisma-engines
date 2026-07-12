@@ -1,0 +1,99 @@
+generator client {
+  provider        = "prisma-client"
+  previewFeatures = ["relationJoins"]
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  USER  @map("user")
+  ADMIN @map("admin")
+}
+
+model User {
+  id                   Int                   @id @default(autoincrement())
+  email                String                @unique
+  role                 Role                  @default(USER)
+  posts                Post[]
+  activations          Activation[]
+  notificationSettings NotificationSettings?
+  patients             Patient[]
+}
+
+model Employee {
+  id        Int        @id @default(autoincrement())
+  manager   Employee?  @relation(name: "EmployeeManager", fields: [managerId], references: [id])
+  managerId Int?
+  managed   Employee[] @relation(name: "EmployeeManager")
+}
+
+model UserWithGenerators {
+  id        String   @id @default(uuid(7))
+  email     String   @unique
+  createdAt DateTime @default(now())
+}
+
+model Post {
+  id         Int        @id @default(autoincrement())
+  title      String
+  userId     Int
+  user       User       @relation(fields: [userId], references: [id])
+  categories Category[]
+}
+
+model Category {
+  id    Int    @id @default(autoincrement())
+  name  String
+  posts Post[]
+}
+
+model ParentModelWithCompositeId {
+  a        Int
+  b        Int
+  children ChildOfModelWithCompositeId[]
+
+  @@id([a, b])
+}
+
+model ChildOfModelWithCompositeId {
+  id      Int                        @id
+  parent  ParentModelWithCompositeId @relation(fields: [parentA, parentB], references: [a, b])
+  parentA Int
+  parentB Int
+}
+
+model Activation {
+  id     Int      @id @default(autoincrement())
+  issued DateTime @default(now())
+  secret String
+  done   Boolean
+  userId Int
+  user   User     @relation(fields: [userId], references: [id])
+}
+
+model Item {
+  id    String @id @default(cuid())
+  float Float  @map("db_float")
+  int   Int    @map("db_int")
+}
+
+model DataTypes {
+  id        Bytes   @id
+  optString String?
+  intArray  Int[]
+}
+
+model Patient {
+  id     Int  @id @default(autoincrement())
+  userId Int  @unique
+  user   User @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model NotificationSettings {
+  userId         Int     @unique
+  emailMarketing Boolean @default(true)
+  smsMarketing   Boolean @default(true)
+  user           User    @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}

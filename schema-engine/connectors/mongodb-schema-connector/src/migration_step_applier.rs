@@ -1,20 +1,21 @@
 use crate::{
+    MongoDbSchemaConnector,
     client_wrapper::mongo_error_to_connector_error,
     migration::{MongoDbMigration, MongoDbMigrationStep},
-    MongoDbSchemaConnector,
 };
-use mongodb::bson::{self, Bson, Document};
+use bson::{self, Bson, Document};
 use schema_connector::{ConnectorResult, Migration, SchemaConnector};
 
 impl MongoDbSchemaConnector {
     pub(crate) async fn apply_migration_impl(&self, migration: &Migration) -> ConnectorResult<u32> {
         let db = self.client().await?.database();
+        let dialect = self.schema_dialect();
 
-        if !self.migration_is_empty(migration) {
+        if !dialect.migration_is_empty(migration) {
             self.host
                 .print(&format!(
                     "Applying the following changes:\n\n{}\n",
-                    self.migration_summary(migration)
+                    dialect.migration_summary(migration)
                 ))
                 .await?;
         }
@@ -24,7 +25,7 @@ impl MongoDbSchemaConnector {
         for step in migration.steps.iter() {
             match step {
                 MongoDbMigrationStep::CreateCollection(id) => {
-                    db.create_collection(migration.next.walk_collection(*id).name(), None)
+                    db.create_collection(migration.next.walk_collection(*id).name())
                         .await
                         .map_err(mongo_error_to_connector_error)?;
                 }
@@ -44,7 +45,7 @@ impl MongoDbSchemaConnector {
                     index_options.unique = Some(index.is_unique());
                     index_model.options = Some(index_options);
                     collection
-                        .create_index(index_model, None)
+                        .create_index(index_model)
                         .await
                         .map_err(mongo_error_to_connector_error)?;
                 }
@@ -52,7 +53,7 @@ impl MongoDbSchemaConnector {
                     let index = migration.previous.walk_index(*index_id);
                     let collection: mongodb::Collection<bson::Document> = db.collection(index.collection().name());
                     collection
-                        .drop_index(index.name(), None)
+                        .drop_index(index.name())
                         .await
                         .map_err(mongo_error_to_connector_error)?;
                 }

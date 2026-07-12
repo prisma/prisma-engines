@@ -35,7 +35,7 @@ mod aggregation_group_by {
                 runner,
                 "{ groupByA(by: [string], orderBy: { string: asc }) { string _count { string } _sum { float } } }"
             ),
-            @r###"{"data":{"groupByA":[{"string":"group1","_count":{"string":2},"_sum":{"float":15.6}},{"string":"group2","_count":{"string":1},"_sum":{"float":10.0}},{"string":"group3","_count":{"string":1},"_sum":{"float":10.0}}]}}"###
+            @r###"{"data":{"groupByA":[{"string":"group1","_count":{"string":2},"_sum":{"float":15.6}},{"string":"group2","_count":{"string":1},"_sum":{"float":10}},{"string":"group3","_count":{"string":1},"_sum":{"float":10}}]}}"###
         );
 
         Ok(())
@@ -53,7 +53,7 @@ mod aggregation_group_by {
                 runner,
                 "{ groupByA(by: [string], orderBy: { string: desc }) { string _count { string } _sum { float } } }"
             ),
-            @r###"{"data":{"groupByA":[{"string":"group3","_count":{"string":1},"_sum":{"float":10.0}},{"string":"group2","_count":{"string":1},"_sum":{"float":10.0}},{"string":"group1","_count":{"string":2},"_sum":{"float":15.6}}]}}"###
+            @r###"{"data":{"groupByA":[{"string":"group3","_count":{"string":1},"_sum":{"float":10}},{"string":"group2","_count":{"string":1},"_sum":{"float":10}},{"string":"group1","_count":{"string":2},"_sum":{"float":15.6}}]}}"###
         );
 
         Ok(())
@@ -79,7 +79,7 @@ mod aggregation_group_by {
                     }
                 }"
             ),
-            @r###"{"data":{"groupByA":[{"string":"group3","_count":{"string":2},"_sum":{"float":25.0},"_min":{"int":5}},{"string":"group2","_count":{"string":1},"_sum":{"float":10.0},"_min":{"int":5}},{"string":"group1","_count":{"string":1},"_sum":{"float":5.5},"_min":{"int":0}},{"string":"group1","_count":{"string":1},"_sum":{"float":10.1},"_min":{"int":5}}]}}"###
+            @r###"{"data":{"groupByA":[{"string":"group3","_count":{"string":2},"_sum":{"float":25},"_min":{"int":5}},{"string":"group2","_count":{"string":1},"_sum":{"float":10},"_min":{"int":5}},{"string":"group1","_count":{"string":1},"_sum":{"float":5.5},"_min":{"int":0}},{"string":"group1","_count":{"string":1},"_sum":{"float":10.1},"_min":{"int":5}}]}}"###
         );
 
         Ok(())
@@ -106,7 +106,7 @@ mod aggregation_group_by {
             ),
             // group3 is the first one with 2, then group2 with one, then group1 with 1.
             // group2 is returned, because group3 is skipped.
-            @r###"{"data":{"groupByA":[{"string":"group2","_count":{"string":1},"_sum":{"float":10.0},"_min":{"int":5}}]}}"###
+            @r###"{"data":{"groupByA":[{"string":"group2","_count":{"string":1},"_sum":{"float":10},"_min":{"int":5}}]}}"###
         );
 
         insta::assert_snapshot!(
@@ -123,7 +123,7 @@ mod aggregation_group_by {
             ),
             // group3 is the first one with 2, then group2 with one, then group1 with 1.
             // group3 is returned, because group1 and 2 is skipped (reverse order due to negative take).
-            @r###"{"data":{"groupByA":[{"string":"group3","_count":{"string":2},"_sum":{"float":25.0},"_min":{"int":5}}]}}"###
+            @r###"{"data":{"groupByA":[{"string":"group3","_count":{"string":2},"_sum":{"float":25},"_min":{"int":5}}]}}"###
         );
 
         insta::assert_snapshot!(
@@ -140,7 +140,7 @@ mod aggregation_group_by {
             ),
             // group3 is the first one with 2, then group2 with one, then group1 with 1.
             // group2 & 1 are returned, because group3 is skipped.
-            @r###"{"data":{"groupByA":[{"string":"group2","_count":{"string":1},"_sum":{"float":10.0},"_min":{"int":5}},{"string":"group1","_count":{"string":1},"_sum":{"float":10.1},"_min":{"int":5}}]}}"###
+            @r###"{"data":{"groupByA":[{"string":"group2","_count":{"string":1},"_sum":{"float":10},"_min":{"int":5}},{"string":"group1","_count":{"string":1},"_sum":{"float":10.1},"_min":{"int":5}}]}}"###
         );
 
         Ok(())
@@ -175,7 +175,7 @@ mod aggregation_group_by {
             // Group2 has id 3.
             // Group1 id 1, id 2 is filtered.
             // => All groups have count 1
-            @r###"{"data":{"groupByA":[{"string":"group3","_count":{"string":1},"_sum":{"float":10.0},"_min":{"int":5}},{"string":"group2","_count":{"string":1},"_sum":{"float":10.0},"_min":{"int":5}},{"string":"group1","_count":{"string":1},"_sum":{"float":10.1},"_min":{"int":5}}]}}"###
+            @r###"{"data":{"groupByA":[{"string":"group3","_count":{"string":1},"_sum":{"float":10},"_min":{"int":5}},{"string":"group2","_count":{"string":1},"_sum":{"float":10},"_min":{"int":5}},{"string":"group1","_count":{"string":1},"_sum":{"float":10.1},"_min":{"int":5}}]}}"###
         );
 
         Ok(())
@@ -218,7 +218,7 @@ mod aggregation_group_by {
             // Group3 has 2
             // Group2 has 0
             // Group1 has 1
-            @r###"{"data":{"groupByA":[{"string":"group3","_count":{"string":2},"_sum":{"float":25.0},"_min":{"int":5}},{"string":"group1","_count":{"string":1},"_sum":{"float":10.1},"_min":{"int":5}}]}}"###
+            @r###"{"data":{"groupByA":[{"string":"group3","_count":{"string":2},"_sum":{"float":25},"_min":{"int":5}},{"string":"group1","_count":{"string":1},"_sum":{"float":10.1},"_min":{"int":5}}]}}"###
         );
 
         insta::assert_snapshot!(
@@ -238,7 +238,7 @@ mod aggregation_group_by {
             // Group3 has 2 matches
             // Group2 has 0 matches
             // Group1 has 0 matches
-            @r###"{"data":{"groupByA":[{"string":"group3","_count":{"string":2},"_sum":{"float":25.0},"_min":{"int":5}}]}}"###
+            @r###"{"data":{"groupByA":[{"string":"group3","_count":{"string":2},"_sum":{"float":25},"_min":{"int":5}}]}}"###
         );
 
         Ok(())
@@ -263,7 +263,7 @@ mod aggregation_group_by {
                     }
                   }"
             ),
-            @r###"{"data":{"groupByA":[{"float":4.0,"_count":{"float":1}},{"float":1.1,"_count":{"float":3}}]}}"###
+            @r###"{"data":{"groupByA":[{"float":4,"_count":{"float":1}},{"float":1.1,"_count":{"float":3}}]}}"###
         );
 
         insta::assert_snapshot!(
@@ -278,7 +278,7 @@ mod aggregation_group_by {
                     }
                   }"
             ),
-            @r###"{"data":{"groupByA":[{"float":1.1,"_count":{"float":3}},{"float":4.0,"_count":{"float":1}}]}}"###
+            @r###"{"data":{"groupByA":[{"float":1.1,"_count":{"float":3}},{"float":4,"_count":{"float":1}}]}}"###
         );
 
         Ok(())
@@ -291,9 +291,8 @@ mod aggregation_group_by {
         create_row(&runner, r#"{ id: 3, float: 1.1, int: 3, string: "group2" }"#).await?;
         create_row(&runner, r#"{ id: 4, float: 4.0, int: 3, string: "group3" }"#).await?;
 
-        insta::assert_snapshot!(
-            run_query!(
-                runner,
+        let result = runner
+            .query(
                 "{
                     groupByA(by: [float], orderBy: { _sum: { float: asc } }) {
                       float
@@ -301,14 +300,21 @@ mod aggregation_group_by {
                         float
                       }
                     }
-                  }"
-            ),
-            @r###"{"data":{"groupByA":[{"float":1.1,"_sum":{"float":3.3}},{"float":4.0,"_sum":{"float":4.0}}]}}"###
-        );
+                  }",
+            )
+            .await?;
+        result.assert_success();
 
-        insta::assert_snapshot!(
-            run_query!(
-                runner,
+        let rows = &result.into_data().pop().unwrap()["groupByA"];
+
+        assert_eq!(rows[0]["float"].as_f64().unwrap() as f32, 1.1);
+        assert_eq!(rows[0]["_sum"]["float"].as_f64().unwrap() as f32, 3.3);
+
+        assert_eq!(rows[1]["float"].as_f64().unwrap() as f32, 4.0);
+        assert_eq!(rows[1]["_sum"]["float"].as_f64().unwrap() as f32, 4.0);
+
+        let result = runner
+            .query(
                 "{
                     groupByA(by: [float], orderBy: { _sum: { float: desc } }) {
                       float
@@ -316,10 +322,18 @@ mod aggregation_group_by {
                         float
                       }
                     }
-                  }"
-            ),
-            @r###"{"data":{"groupByA":[{"float":4.0,"_sum":{"float":4.0}},{"float":1.1,"_sum":{"float":3.3}}]}}"###
-        );
+                  }",
+            )
+            .await?;
+        result.assert_success();
+
+        let rows = &result.into_data().pop().unwrap()["groupByA"];
+
+        assert_eq!(rows[0]["float"].as_f64().unwrap() as f32, 4.0);
+        assert_eq!(rows[0]["_sum"]["float"].as_f64().unwrap() as f32, 4.0);
+
+        assert_eq!(rows[1]["float"].as_f64().unwrap() as f32, 1.1);
+        assert_eq!(rows[1]["_sum"]["float"].as_f64().unwrap() as f32, 3.3);
 
         Ok(())
     }
@@ -343,7 +357,7 @@ mod aggregation_group_by {
                     }
                   }"
             ),
-            @r###"{"data":{"groupByA":[{"float":1.1,"_avg":{"float":1.1}},{"float":4.0,"_avg":{"float":4.0}}]}}"###
+            @r###"{"data":{"groupByA":[{"float":1.1,"_avg":{"float":1.1}},{"float":4,"_avg":{"float":4}}]}}"###
         );
 
         insta::assert_snapshot!(
@@ -358,7 +372,7 @@ mod aggregation_group_by {
                     }
                   }"
             ),
-            @r###"{"data":{"groupByA":[{"float":4.0,"_avg":{"float":4.0}},{"float":1.1,"_avg":{"float":1.1}}]}}"###
+            @r###"{"data":{"groupByA":[{"float":4,"_avg":{"float":4}},{"float":1.1,"_avg":{"float":1.1}}]}}"###
         );
 
         Ok(())
@@ -383,7 +397,7 @@ mod aggregation_group_by {
                     }
                   }"
             ),
-            @r###"{"data":{"groupByA":[{"float":1.1,"_min":{"float":1.1}},{"float":4.0,"_min":{"float":4.0}}]}}"###
+            @r###"{"data":{"groupByA":[{"float":1.1,"_min":{"float":1.1}},{"float":4,"_min":{"float":4}}]}}"###
         );
 
         insta::assert_snapshot!(
@@ -398,7 +412,7 @@ mod aggregation_group_by {
                     }
                   }"
             ),
-            @r###"{"data":{"groupByA":[{"float":4.0,"_min":{"float":4.0}},{"float":1.1,"_min":{"float":1.1}}]}}"###
+            @r###"{"data":{"groupByA":[{"float":4,"_min":{"float":4}},{"float":1.1,"_min":{"float":1.1}}]}}"###
         );
 
         Ok(())
@@ -423,7 +437,7 @@ mod aggregation_group_by {
                     }
                   }"
             ),
-            @r###"{"data":{"groupByA":[{"float":1.1,"_max":{"float":1.1}},{"float":4.0,"_max":{"float":4.0}}]}}"###
+            @r###"{"data":{"groupByA":[{"float":1.1,"_max":{"float":1.1}},{"float":4,"_max":{"float":4}}]}}"###
         );
 
         insta::assert_snapshot!(
@@ -438,7 +452,7 @@ mod aggregation_group_by {
                     }
                   }"
             ),
-            @r###"{"data":{"groupByA":[{"float":4.0,"_max":{"float":4.0}},{"float":1.1,"_max":{"float":1.1}}]}}"###
+            @r###"{"data":{"groupByA":[{"float":4,"_max":{"float":4}},{"float":1.1,"_max":{"float":1.1}}]}}"###
         );
 
         Ok(())
@@ -463,7 +477,7 @@ mod aggregation_group_by {
                     }
                   }"
             ),
-            @r###"{"data":{"groupByA":[{"float":1.1,"_count":{"float":3},"_sum":{"int":3}},{"float":3.0,"_count":{"float":1},"_sum":{"int":3}},{"float":4.0,"_count":{"float":1},"_sum":{"int":4}}]}}"###
+            @r###"{"data":{"groupByA":[{"float":1.1,"_count":{"float":3},"_sum":{"int":3}},{"float":3,"_count":{"float":1},"_sum":{"int":3}},{"float":4,"_count":{"float":1},"_sum":{"int":4}}]}}"###
         );
 
         Ok(())
@@ -488,7 +502,7 @@ mod aggregation_group_by {
                     }
                   }"
             ),
-            @r###"{"data":{"groupByA":[{"float":1.1,"_count":{"float":3},"_sum":{"int":3}},{"float":3.0,"_count":{"float":1},"_sum":{"int":3}}]}}"###
+            @r###"{"data":{"groupByA":[{"float":1.1,"_count":{"float":3},"_sum":{"int":3}},{"float":3,"_count":{"float":1},"_sum":{"int":3}}]}}"###
         );
 
         Ok(())
@@ -522,7 +536,7 @@ mod aggregation_group_by {
               group Int
               color Color
             }
-            
+
             enum Color {
               blue
               red
@@ -563,6 +577,48 @@ mod aggregation_group_by {
         Ok(())
     }
 
+    fn schema_28084() -> String {
+        let schema = indoc! {
+            r#"model Teacher {
+              #id(id, String, @id)
+              name      String
+              age       Int
+              assistant Assistant?
+            }
+
+            model Assistant {
+              #id(id, String, @id)
+              name      String
+              age       Int?
+              teacher   Teacher @relation(fields: [teacherId], references: [id])
+              teacherId String  @unique
+            }
+            "#
+        };
+
+        schema.to_owned()
+    }
+
+    // regression test for https://github.com/prisma/prisma/issues/28084
+    #[connector_test(schema(schema_28084))]
+    async fn regression_28084(runner: Runner) -> TestResult<()> {
+        run_query!(
+            &runner,
+            r#"mutation { createOneTeacher(data: {
+                id: "a1",
+                name: "Alice",
+                age: 30,
+                assistant: { create: { id: "j1", name: "John" } } }
+            ) { id } }"#
+        );
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"{ groupByTeacher(by: [name], where: { assistant: { name: { contains: "John" } } }) { _sum { age } } }"#),
+          @r###"{"data":{"groupByTeacher":[{"_sum":{"age":30}}]}}"###
+        );
+
+        Ok(())
+    }
     /// Error cases
 
     #[connector_test]

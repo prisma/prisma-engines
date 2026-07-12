@@ -1,8 +1,8 @@
 use crate::{
     diagnostics::{DatamodelError, Diagnostics},
     parser_database::{
-        walkers::{IndexWalker, ModelWalker},
         IndexAlgorithm, ScalarType,
+        walkers::{IndexWalker, ModelWalker},
     },
 };
 

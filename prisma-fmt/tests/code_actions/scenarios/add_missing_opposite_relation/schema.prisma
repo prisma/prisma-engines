@@ -1,0 +1,8 @@
+model Song {
+    id Int @id
+    author Artist
+}
+
+model Artist {
+    id Int @id
+}

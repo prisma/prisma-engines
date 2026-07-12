@@ -3,20 +3,20 @@ use std::convert::TryFrom;
 use crate::{
     ast::{Value, ValueType},
     connector::{
-        queryable::{GetRow, ToColumnNames},
         TypeIdentifier,
+        queryable::{GetRow, ToColumnNames},
     },
     error::{Error, ErrorKind},
 };
 
 use rusqlite::{
-    types::{Null, ToSql, ToSqlOutput, ValueRef},
     Column, Error as RusqlError, Row as SqliteRow, Rows as SqliteRows,
+    types::{Null, ToSql, ToSqlOutput, ValueRef},
 };
 
 use chrono::TimeZone;
 
-impl TypeIdentifier for Column<'_> {
+impl TypeIdentifier for &Column<'_> {
     fn is_real(&self) -> bool {
         match self.decl_type() {
             Some(n) if n.starts_with("DECIMAL") => true,
@@ -82,7 +82,6 @@ impl TypeIdentifier for Column<'_> {
         )
     }
 
-    #[cfg(feature = "mysql")]
     fn is_time(&self) -> bool {
         false
     }
@@ -119,12 +118,10 @@ impl TypeIdentifier for Column<'_> {
         matches!(self.decl_type(), Some("BOOLEAN") | Some("boolean"))
     }
 
-    #[cfg(feature = "mysql")]
     fn is_json(&self) -> bool {
-        false
+        matches!(self.decl_type(), Some("JSONB") | Some("jsonb"))
     }
 
-    #[cfg(feature = "mysql")]
     fn is_enum(&self) -> bool {
         false
     }
@@ -133,7 +130,7 @@ impl TypeIdentifier for Column<'_> {
     }
 }
 
-impl<'a> GetRow for SqliteRow<'a> {
+impl GetRow for SqliteRow<'_> {
     fn get_result_row(&self) -> crate::Result<Vec<Value<'static>>> {
         let statement = self.as_ref();
         let mut row = Vec::with_capacity(statement.columns().len());
@@ -146,12 +143,12 @@ impl<'a> GetRow for SqliteRow<'a> {
                     c if c.is_int64() => Value::null_int64(),
                     c if c.is_text() => Value::null_text(),
                     c if c.is_bytes() => Value::null_bytes(),
-                    c if c.is_float() => Value::null_float(),
-                    c if c.is_double() => Value::null_double(),
+                    c if c.is_float() || c.is_double() => Value::null_double(),
                     c if c.is_real() => Value::null_numeric(),
                     c if c.is_datetime() => Value::null_datetime(),
                     c if c.is_date() => Value::null_date(),
                     c if c.is_bool() => Value::null_boolean(),
+                    c if c.is_json() => Value::null_json(),
                     c => match c.decl_type() {
                         Some(n) => {
                             let msg = format!("Value {n} not supported");
@@ -173,8 +170,8 @@ impl<'a> GetRow for SqliteRow<'a> {
                             }
                         }
                         c if c.is_date() => {
-                            let dt = chrono::NaiveDateTime::from_timestamp_opt(i / 1000, 0).unwrap();
-                            Value::date(dt.date())
+                            let dt = chrono::DateTime::from_timestamp(i / 1000, 0).unwrap();
+                            Value::date(dt.date_naive())
                         }
                         c if c.is_datetime() => {
                             let dt = chrono::Utc.timestamp_millis_opt(i).unwrap();
@@ -184,12 +181,17 @@ impl<'a> GetRow for SqliteRow<'a> {
                             if let Ok(converted) = i32::try_from(i) {
                                 Value::int32(converted)
                             } else {
-                                let msg = format!("Value {} does not fit in an INT column, try migrating the '{}' column type to BIGINT", i, c.name());
+                                let msg = format!(
+                                    "Value {} does not fit in an INT column, try migrating the '{}' column type to BIGINT",
+                                    i,
+                                    c.name()
+                                );
                                 let kind = ErrorKind::conversion(msg);
 
                                 return Err(Error::builder(kind).build());
                             }
                         }
+                        c if c.is_json() => Value::json(serde_json::Value::Number(serde_json::Number::from(i))),
                         // NOTE: When SQLite does not know what type the return is (for example at explicit values and RETURNING statements) we will 'assume' int64
                         _ => Value::int64(i),
                     }
@@ -200,6 +202,9 @@ impl<'a> GetRow for SqliteRow<'a> {
 
                     Value::numeric(BigDecimal::from_str(&f.to_string()).unwrap())
                 }
+                ValueRef::Real(f) if column.is_json() => Value::json(serde_json::Value::Number(
+                    serde_json::Number::from_f64(f).expect("JSON real should always be convertible to serde Number"),
+                )),
                 ValueRef::Real(f) => Value::double(f),
                 ValueRef::Text(bytes) if column.is_datetime() => {
                     let parse_res = std::str::from_utf8(bytes).map_err(|_| {
@@ -211,7 +216,7 @@ impl<'a> GetRow for SqliteRow<'a> {
 
                     parse_res.and_then(|s| {
                         chrono::NaiveDateTime::parse_from_str(s, "%Y-%m-%d %H:%M:%S")
-                            .map(|nd| chrono::DateTime::<chrono::Utc>::from_utc(nd, chrono::Utc))
+                            .map(|nd| chrono::DateTime::<chrono::Utc>::from_naive_utc_and_offset(nd, chrono::Utc))
                             .or_else(|_| {
                                 chrono::DateTime::parse_from_rfc3339(s).map(|dt| dt.with_timezone(&chrono::Utc))
                             })
@@ -226,6 +231,20 @@ impl<'a> GetRow for SqliteRow<'a> {
                             })
                     })?
                 }
+                ValueRef::Text(bytes) if column.is_json() => {
+                    let json_str = std::str::from_utf8(bytes).map_err(|_| {
+                        Error::builder(ErrorKind::ConversionError(
+                            "Failed to read contents of SQLite JSON column as UTF-8".into(),
+                        ))
+                        .build()
+                    })?;
+
+                    let json_value: serde_json::Value = serde_json::from_str(json_str).map_err(|serde_error| {
+                        Error::builder(ErrorKind::ConversionError(serde_error.to_string().into())).build()
+                    })?;
+
+                    Value::json(json_value)
+                }
                 ValueRef::Text(bytes) => Value::text(String::from_utf8(bytes.to_vec())?),
                 ValueRef::Blob(bytes) => Value::bytes(bytes.to_owned()),
             };
@@ -237,7 +256,7 @@ impl<'a> GetRow for SqliteRow<'a> {
     }
 }
 
-impl<'a> ToColumnNames for SqliteRows<'a> {
+impl ToColumnNames for SqliteRows<'_> {
     fn to_column_names(&self) -> Vec<String> {
         match self.as_ref() {
             Some(statement) => statement.column_names().into_iter().map(|c| c.into()).collect(),
@@ -246,12 +265,14 @@ impl<'a> ToColumnNames for SqliteRows<'a> {
     }
 }
 
-impl<'a> ToSql for Value<'a> {
-    fn to_sql(&self) -> Result<ToSqlOutput, RusqlError> {
+impl ToSql for Value<'_> {
+    fn to_sql(&self) -> Result<ToSqlOutput<'_>, RusqlError> {
         let value = match &self.typed {
             ValueType::Int32(integer) => integer.map(ToSqlOutput::from),
             ValueType::Int64(integer) => integer.map(ToSqlOutput::from),
-            ValueType::Float(float) => float.map(|f| f as f64).map(ToSqlOutput::from),
+            ValueType::Float(float) => {
+                float.map(|float| ToSqlOutput::from(float.to_string().parse::<f64>().expect("f32 is not a f64.")))
+            }
             ValueType::Double(double) => double.map(ToSqlOutput::from),
             ValueType::Text(cow) => cow.as_ref().map(|cow| ToSqlOutput::from(cow.as_ref())),
             ValueType::Enum(cow, _) => cow.as_ref().map(|cow| ToSqlOutput::from(cow.as_ref())),
@@ -282,14 +303,18 @@ impl<'a> ToSql for Value<'a> {
             ValueType::DateTime(value) => value.map(|value| ToSqlOutput::from(value.timestamp_millis())),
             ValueType::Date(date) => date
                 .and_then(|date| date.and_hms_opt(0, 0, 0))
-                .map(|dt| ToSqlOutput::from(dt.timestamp_millis())),
+                .map(|dt| ToSqlOutput::from(dt.and_utc().timestamp_millis())),
             ValueType::Time(time) => time
                 .and_then(|time| chrono::NaiveDate::from_ymd_opt(1970, 1, 1).map(|d| (d, time)))
                 .and_then(|(date, time)| {
                     use chrono::Timelike;
                     date.and_hms_opt(time.hour(), time.minute(), time.second())
                 })
-                .map(|dt| ToSqlOutput::from(dt.timestamp_millis())),
+                .map(|dt| ToSqlOutput::from(dt.and_utc().timestamp_millis())),
+
+            ValueType::Opaque(opaque) => Err(RusqlError::ToSqlConversionFailure(Box::new(
+                Error::builder(ErrorKind::RanQueryWithOpaqueParam(opaque.to_string())).build(),
+            )))?,
         };
 
         match value {

@@ -127,7 +127,7 @@ fn render_model(model: ModelPair<'_>, sql_family: SqlFamily) -> renderer::Model<
     }
 
     if model.adds_row_level_security() {
-        let docs= "This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.";
+        let docs = "This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.";
 
         rendered.documentation(docs);
     }

@@ -1,14 +1,13 @@
-name: "QE: WASM Query Engine size"
+name: 'QC: Wasm size'
 on:
   pull_request:
     paths-ignore:
-      - ".github/**"
-      - "!.github/workflows/wasm-size.yml"
-      - ".buildkite/**"
-      - "*.md"
-      - "LICENSE"
-      - "CODEOWNERS"
-      - "renovate.json"
+      - '.github/**'
+      - '!.github/workflows/wasm-size.yml'
+      - '!.github/workflows/include/rust-wasm-setup/action.yml'
+      - '*.md'
+      - 'LICENSE'
+      - 'CODEOWNERS'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -19,34 +18,64 @@ jobs:
     name: calculate module sizes (pr)
     runs-on: ubuntu-latest
     outputs:
-      postgresql_size: ${{ steps.measure.outputs.postgresql_size }}
-      postgresql_size_gz: ${{ steps.measure.outputs.postgresql_size_gz }}
-      mysql_size: ${{ steps.measure.outputs.mysql_size }}
-      mysql_size_gz: ${{ steps.measure.outputs.mysql_size_gz }}
-      sqlite_size: ${{ steps.measure.outputs.sqlite_size }}
-      sqlite_size_gz: ${{ steps.measure.outputs.sqlite_size_gz }}
+      postgresql_fast_qc_size: ${{ steps.measure-qc.outputs.postgresql_fast_qc_size }}
+      postgresql_fast_qc_size_gz: ${{ steps.measure-qc.outputs.postgresql_fast_qc_size_gz }}
+      mysql_fast_qc_size: ${{ steps.measure-qc.outputs.mysql_fast_qc_size }}
+      mysql_fast_qc_size_gz: ${{ steps.measure-qc.outputs.mysql_fast_qc_size_gz }}
+      sqlite_fast_qc_size: ${{ steps.measure-qc.outputs.sqlite_fast_qc_size }}
+      sqlite_fast_qc_size_gz: ${{ steps.measure-qc.outputs.sqlite_fast_qc_size_gz }}
+      sqlserver_fast_qc_size: ${{ steps.measure-qc.outputs.sqlserver_fast_qc_size }}
+      sqlserver_fast_qc_size_gz: ${{ steps.measure-qc.outputs.sqlserver_fast_qc_size_gz }}
+      cockroachdb_fast_qc_size: ${{ steps.measure-qc.outputs.cockroachdb_fast_qc_size }}
+      cockroachdb_fast_qc_size_gz: ${{ steps.measure-qc.outputs.cockroachdb_fast_qc_size_gz }}
+
+      postgresql_small_qc_size: ${{ steps.measure-qc.outputs.postgresql_small_qc_size }}
+      postgresql_small_qc_size_gz: ${{ steps.measure-qc.outputs.postgresql_small_qc_size_gz }}
+      mysql_small_qc_size: ${{ steps.measure-qc.outputs.mysql_small_qc_size }}
+      mysql_small_qc_size_gz: ${{ steps.measure-qc.outputs.mysql_small_qc_size_gz }}
+      sqlite_small_qc_size: ${{ steps.measure-qc.outputs.sqlite_small_qc_size }}
+      sqlite_small_qc_size_gz: ${{ steps.measure-qc.outputs.sqlite_small_qc_size_gz }}
+      sqlserver_small_qc_size: ${{ steps.measure-qc.outputs.sqlserver_small_qc_size }}
+      sqlserver_small_qc_size_gz: ${{ steps.measure-qc.outputs.sqlserver_small_qc_size_gz }}
+      cockroachdb_small_qc_size: ${{ steps.measure-qc.outputs.cockroachdb_small_qc_size }}
+      cockroachdb_small_qc_size_gz: ${{ steps.measure-qc.outputs.cockroachdb_small_qc_size_gz }}
     steps:
       - name: Checkout PR branch
         uses: actions/checkout@v4
 
       - uses: ./.github/workflows/include/rust-wasm-setup
 
-      - name: Build and measure PR branch
-        id: measure
+      - name: Build and measure QC on PR branch
+        id: measure-qc
         run: |
           export ENGINE_SIZE_OUTPUT=$GITHUB_OUTPUT
-          make measure-qe-wasm
+          make measure-qc-wasm
 
   base-wasm-size:
     name: calculate module sizes (base branch)
     runs-on: ubuntu-latest
     outputs:
-      postgresql_size: ${{ steps.measure.outputs.postgresql_size }}
-      postgresql_size_gz: ${{ steps.measure.outputs.postgresql_size_gz }}
-      mysql_size: ${{ steps.measure.outputs.mysql_size }}
-      mysql_size_gz: ${{ steps.measure.outputs.mysql_size_gz }}
-      sqlite_size: ${{ steps.measure.outputs.sqlite_size }}
-      sqlite_size_gz: ${{ steps.measure.outputs.sqlite_size_gz }}
+      postgresql_fast_qc_size: ${{ steps.measure-qc.outputs.postgresql_fast_qc_size }}
+      postgresql_fast_qc_size_gz: ${{ steps.measure-qc.outputs.postgresql_fast_qc_size_gz }}
+      mysql_fast_qc_size: ${{ steps.measure-qc.outputs.mysql_fast_qc_size }}
+      mysql_fast_qc_size_gz: ${{ steps.measure-qc.outputs.mysql_fast_qc_size_gz }}
+      sqlite_fast_qc_size: ${{ steps.measure-qc.outputs.sqlite_fast_qc_size }}
+      sqlite_fast_qc_size_gz: ${{ steps.measure-qc.outputs.sqlite_fast_qc_size_gz }}
+      sqlserver_fast_qc_size: ${{ steps.measure-qc.outputs.sqlserver_fast_qc_size }}
+      sqlserver_fast_qc_size_gz: ${{ steps.measure-qc.outputs.sqlserver_fast_qc_size_gz }}
+      cockroachdb_fast_qc_size: ${{ steps.measure-qc.outputs.cockroachdb_fast_qc_size }}
+      cockroachdb_fast_qc_size_gz: ${{ steps.measure-qc.outputs.cockroachdb_fast_qc_size_gz }}
+
+      postgresql_small_qc_size: ${{ steps.measure-qc.outputs.postgresql_small_qc_size }}
+      postgresql_small_qc_size_gz: ${{ steps.measure-qc.outputs.postgresql_small_qc_size_gz }}
+      mysql_small_qc_size: ${{ steps.measure-qc.outputs.mysql_small_qc_size }}
+      mysql_small_qc_size_gz: ${{ steps.measure-qc.outputs.mysql_small_qc_size_gz }}
+      sqlite_small_qc_size: ${{ steps.measure-qc.outputs.sqlite_small_qc_size }}
+      sqlite_small_qc_size_gz: ${{ steps.measure-qc.outputs.sqlite_small_qc_size_gz }}
+      sqlserver_small_qc_size: ${{ steps.measure-qc.outputs.sqlserver_small_qc_size }}
+      sqlserver_small_qc_size_gz: ${{ steps.measure-qc.outputs.sqlserver_small_qc_size_gz }}
+      cockroachdb_small_qc_size: ${{ steps.measure-qc.outputs.cockroachdb_small_qc_size }}
+      cockroachdb_small_qc_size_gz: ${{ steps.measure-qc.outputs.cockroachdb_small_qc_size_gz }}
     steps:
       - name: Checkout base branch
         uses: actions/checkout@v4
@@ -55,11 +84,11 @@ jobs:
 
       - uses: ./.github/workflows/include/rust-wasm-setup
 
-      - name: Build and measure base branch
-        id: measure
+      - name: Build and measure QC on base branch
+        id: measure-qc
         run: |
           export ENGINE_SIZE_OUTPUT=$GITHUB_OUTPUT
-          make measure-qe-wasm
+          make measure-qc-wasm
 
   report-diff:
     name: report module size
@@ -67,6 +96,8 @@ jobs:
     needs:
       - pr-wasm-size
       - base-wasm-size
+    permissions:
+      pull-requests: write
 
     steps:
       - name: Compute difference
@@ -88,21 +119,37 @@ jobs:
             echo "${provider}_diff=$diff" >> $GITHUB_OUTPUT
           }
 
-          compute_diff "postgresql" "${{ needs.base-wasm-size.outputs.postgresql_size }}" "${{ needs.pr-wasm-size.outputs.postgresql_size }}"
-          compute_diff "postgresql_gz" "${{ needs.base-wasm-size.outputs.postgresql_size_gz }}" "${{ needs.pr-wasm-size.outputs.postgresql_size_gz }}"
+          compute_diff "postgresql_fast_qc" "${{ needs.base-wasm-size.outputs.postgresql_fast_qc_size }}" "${{ needs.pr-wasm-size.outputs.postgresql_fast_qc_size }}"
+          compute_diff "postgresql_fast_qc_gz" "${{ needs.base-wasm-size.outputs.postgresql_fast_qc_size_gz }}" "${{ needs.pr-wasm-size.outputs.postgresql_fast_qc_size_gz }}"
+          compute_diff "postgresql_small_qc" "${{ needs.base-wasm-size.outputs.postgresql_small_qc_size }}" "${{ needs.pr-wasm-size.outputs.postgresql_small_qc_size }}"
+          compute_diff "postgresql_small_qc_gz" "${{ needs.base-wasm-size.outputs.postgresql_small_qc_size_gz }}" "${{ needs.pr-wasm-size.outputs.postgresql_small_qc_size_gz }}"
 
-          compute_diff "mysql" "${{ needs.base-wasm-size.outputs.mysql_size }}" "${{ needs.pr-wasm-size.outputs.mysql_size }}"
-          compute_diff "mysql_gz" "${{ needs.base-wasm-size.outputs.mysql_size_gz }}" "${{ needs.pr-wasm-size.outputs.mysql_size_gz }}"
+          compute_diff "mysql_fast_qc" "${{ needs.base-wasm-size.outputs.mysql_fast_qc_size }}" "${{ needs.pr-wasm-size.outputs.mysql_fast_qc_size }}"
+          compute_diff "mysql_fast_qc_gz" "${{ needs.base-wasm-size.outputs.mysql_fast_qc_size_gz }}" "${{ needs.pr-wasm-size.outputs.mysql_fast_qc_size_gz }}"
+          compute_diff "mysql_small_qc" "${{ needs.base-wasm-size.outputs.mysql_small_qc_size }}" "${{ needs.pr-wasm-size.outputs.mysql_small_qc_size }}"
+          compute_diff "mysql_small_qc_gz" "${{ needs.base-wasm-size.outputs.mysql_small_qc_size_gz }}" "${{ needs.pr-wasm-size.outputs.mysql_small_qc_size_gz }}"
 
-          compute_diff "sqlite" "${{ needs.base-wasm-size.outputs.sqlite_size }}" "${{ needs.pr-wasm-size.outputs.sqlite_size }}"
-          compute_diff "sqlite_gz" "${{ needs.base-wasm-size.outputs.sqlite_size_gz }}" "${{ needs.pr-wasm-size.outputs.sqlite_size_gz }}"
+          compute_diff "sqlite_fast_qc" "${{ needs.base-wasm-size.outputs.sqlite_fast_qc_size }}" "${{ needs.pr-wasm-size.outputs.sqlite_fast_qc_size }}"
+          compute_diff "sqlite_fast_qc_gz" "${{ needs.base-wasm-size.outputs.sqlite_fast_qc_size_gz }}" "${{ needs.pr-wasm-size.outputs.sqlite_fast_qc_size_gz }}"
+          compute_diff "sqlite_small_qc" "${{ needs.base-wasm-size.outputs.sqlite_small_qc_size }}" "${{ needs.pr-wasm-size.outputs.sqlite_small_qc_size }}"
+          compute_diff "sqlite_small_qc_gz" "${{ needs.base-wasm-size.outputs.sqlite_small_qc_size_gz }}" "${{ needs.pr-wasm-size.outputs.sqlite_small_qc_size_gz }}"
+
+          compute_diff "sqlserver_fast_qc" "${{ needs.base-wasm-size.outputs.sqlserver_fast_qc_size }}" "${{ needs.pr-wasm-size.outputs.sqlserver_fast_qc_size }}"
+          compute_diff "sqlserver_fast_qc_gz" "${{ needs.base-wasm-size.outputs.sqlserver_fast_qc_size_gz }}" "${{ needs.pr-wasm-size.outputs.sqlserver_fast_qc_size_gz }}"
+          compute_diff "sqlserver_small_qc" "${{ needs.base-wasm-size.outputs.sqlserver_small_qc_size }}" "${{ needs.pr-wasm-size.outputs.sqlserver_small_qc_size }}"
+          compute_diff "sqlserver_small_qc_gz" "${{ needs.base-wasm-size.outputs.sqlserver_small_qc_size_gz }}" "${{ needs.pr-wasm-size.outputs.sqlserver_small_qc_size_gz }}"
+
+          compute_diff "cockroachdb_fast_qc" "${{ needs.base-wasm-size.outputs.cockroachdb_fast_qc_size }}" "${{ needs.pr-wasm-size.outputs.cockroachdb_fast_qc_size }}"
+          compute_diff "cockroachdb_fast_qc_gz" "${{ needs.base-wasm-size.outputs.cockroachdb_fast_qc_size_gz }}" "${{ needs.pr-wasm-size.outputs.cockroachdb_fast_qc_size_gz }}"
+          compute_diff "cockroachdb_small_qc" "${{ needs.base-wasm-size.outputs.cockroachdb_small_qc_size }}" "${{ needs.pr-wasm-size.outputs.cockroachdb_small_qc_size }}"
+          compute_diff "cockroachdb_small_qc_gz" "${{ needs.base-wasm-size.outputs.cockroachdb_small_qc_size_gz }}" "${{ needs.pr-wasm-size.outputs.cockroachdb_small_qc_size_gz }}"
 
       - name: Find past report comment
         uses: peter-evans/find-comment@v3
         id: findReportComment
         with:
           issue-number: ${{ github.event.pull_request.number }}
-          body-includes: "<!-- wasm-size -->"
+          body-includes: '<!-- wasm-size -->'
 
       - name: Create or update report
         uses: peter-evans/create-or-update-comment@v4
@@ -114,14 +161,28 @@ jobs:
           issue-number: ${{ github.event.pull_request.number }}
           body: |
             <!-- wasm-size -->
-            ### WASM Query Engine file Size
+            ### Wasm Query Compiler File Size
 
-            |Engine            | This PR                                      | Base branch                                      | Diff
-            |------------------|----------------------------------------------|--------------------------------------------------|-----------------------------------------------
-            | Postgres         | ${{ steps.compute.outputs.postgresql_pr}}    |  ${{ steps.compute.outputs.postgresql_base }}    | ${{ steps.compute.outputs.postgresql_diff}}
-            | Postgres (gzip)  | ${{ steps.compute.outputs.postgresql_gz_pr}} |  ${{ steps.compute.outputs.postgresql_gz_base }} | ${{ steps.compute.outputs.postgresql_gz_diff}}
-            | Mysql            | ${{ steps.compute.outputs.mysql_pr}}         |  ${{ steps.compute.outputs.mysql_base}}          | ${{ steps.compute.outputs.mysql_diff}}
-            | Mysql (gzip)     | ${{ steps.compute.outputs.mysql_gz_pr}}      |  ${{ steps.compute.outputs.mysql_gz_base}}       | ${{ steps.compute.outputs.mysql_gz_diff}}
-            | Sqlite           | ${{ steps.compute.outputs.sqlite_pr}}        |  ${{ steps.compute.outputs.sqlite_base}}         | ${{ steps.compute.outputs.sqlite_diff}}
-            | Sqlite (gzip)    | ${{ steps.compute.outputs.sqlite_gz_pr}}     |  ${{ steps.compute.outputs.sqlite_gz_base }}     | ${{ steps.compute.outputs.sqlite_gz_diff}}
+            | Engine                             | This PR                                                 | Base branch                                               | Diff                                                      |
+            |------------------------------------|---------------------------------------------------------|-----------------------------------------------------------|-----------------------------------------------------------|
+            | Postgres                           | ${{ steps.compute.outputs.postgresql_fast_qc_pr }}      | ${{ steps.compute.outputs.postgresql_fast_qc_base }}      | ${{ steps.compute.outputs.postgresql_fast_qc_diff }}      |
+            | Postgres (gzip)                    | ${{ steps.compute.outputs.postgresql_fast_qc_gz_pr }}   | ${{ steps.compute.outputs.postgresql_fast_qc_gz_base }}   | ${{ steps.compute.outputs.postgresql_fast_qc_gz_diff }}   |
+            | Postgres (size-optimized)          | ${{ steps.compute.outputs.postgresql_small_qc_pr }}     | ${{ steps.compute.outputs.postgresql_small_qc_base }}     | ${{ steps.compute.outputs.postgresql_small_qc_diff }}     |
+            | Postgres (size-optimized, gzip)    | ${{ steps.compute.outputs.postgresql_small_qc_gz_pr }}  | ${{ steps.compute.outputs.postgresql_small_qc_gz_base }}  | ${{ steps.compute.outputs.postgresql_small_qc_gz_diff }}  |
+            | Mysql                              | ${{ steps.compute.outputs.mysql_fast_qc_pr }}           | ${{ steps.compute.outputs.mysql_fast_qc_base }}           | ${{ steps.compute.outputs.mysql_fast_qc_diff }}           |
+            | Mysql (gzip)                       | ${{ steps.compute.outputs.mysql_fast_qc_gz_pr }}        | ${{ steps.compute.outputs.mysql_fast_qc_gz_base }}        | ${{ steps.compute.outputs.mysql_fast_qc_gz_diff }}        |
+            | Mysql (size-optimized)             | ${{ steps.compute.outputs.mysql_small_qc_pr }}          | ${{ steps.compute.outputs.mysql_small_qc_base }}          | ${{ steps.compute.outputs.mysql_small_qc_diff }}          |
+            | Mysql (size-optimized, gzip)       | ${{ steps.compute.outputs.mysql_small_qc_gz_pr }}       | ${{ steps.compute.outputs.mysql_small_qc_gz_base }}       | ${{ steps.compute.outputs.mysql_small_qc_gz_diff }}       |
+            | Sqlite                             | ${{ steps.compute.outputs.sqlite_fast_qc_pr }}          | ${{ steps.compute.outputs.sqlite_fast_qc_base }}          | ${{ steps.compute.outputs.sqlite_fast_qc_diff }}          |
+            | Sqlite (gzip)                      | ${{ steps.compute.outputs.sqlite_fast_qc_gz_pr }}       | ${{ steps.compute.outputs.sqlite_fast_qc_gz_base }}       | ${{ steps.compute.outputs.sqlite_fast_qc_gz_diff }}       |
+            | Sqlite (size-optimized)            | ${{ steps.compute.outputs.sqlite_small_qc_pr }}         | ${{ steps.compute.outputs.sqlite_small_qc_base }}         | ${{ steps.compute.outputs.sqlite_small_qc_diff }}         |
+            | Sqlite (size-optimized, gzip)      | ${{ steps.compute.outputs.sqlite_small_qc_gz_pr }}      | ${{ steps.compute.outputs.sqlite_small_qc_gz_base }}      | ${{ steps.compute.outputs.sqlite_small_qc_gz_diff }}      |
+            | SQL Server                         | ${{ steps.compute.outputs.sqlserver_fast_qc_pr }}       | ${{ steps.compute.outputs.sqlserver_fast_qc_base }}       | ${{ steps.compute.outputs.sqlserver_fast_qc_diff }}       |
+            | SQL Server (gzip)                  | ${{ steps.compute.outputs.sqlserver_fast_qc_gz_pr }}    | ${{ steps.compute.outputs.sqlserver_fast_qc_gz_base }}    | ${{ steps.compute.outputs.sqlserver_fast_qc_gz_diff }}    |
+            | SQL Server (size-optimized)        | ${{ steps.compute.outputs.sqlserver_small_qc_pr }}      | ${{ steps.compute.outputs.sqlserver_small_qc_base }}      | ${{ steps.compute.outputs.sqlserver_small_qc_diff }}      |
+            | SQL Server (size-optimized, gzip)  | ${{ steps.compute.outputs.sqlserver_small_qc_gz_pr }}   | ${{ steps.compute.outputs.sqlserver_small_qc_gz_base }}   | ${{ steps.compute.outputs.sqlserver_small_qc_gz_diff }}   |
+            | CockroachDB                        | ${{ steps.compute.outputs.cockroachdb_fast_qc_pr }}     | ${{ steps.compute.outputs.cockroachdb_fast_qc_base }}     | ${{ steps.compute.outputs.cockroachdb_fast_qc_diff }}     |
+            | CockroachDB (gzip)                 | ${{ steps.compute.outputs.cockroachdb_fast_qc_gz_pr }}  | ${{ steps.compute.outputs.cockroachdb_fast_qc_gz_base }}  | ${{ steps.compute.outputs.cockroachdb_fast_qc_gz_diff }}  |
+            | CockroachDB (size-optimized)       | ${{ steps.compute.outputs.cockroachdb_small_qc_pr }}    | ${{ steps.compute.outputs.cockroachdb_small_qc_base }}    | ${{ steps.compute.outputs.cockroachdb_small_qc_diff }}    |
+            | CockroachDB (size-optimized, gzip) | ${{ steps.compute.outputs.cockroachdb_small_qc_gz_pr }} | ${{ steps.compute.outputs.cockroachdb_small_qc_gz_base }} | ${{ steps.compute.outputs.cockroachdb_small_qc_gz_diff }} |
           edit-mode: replace

@@ -1,7 +1,7 @@
-use crate::{logging, mssql, mysql, postgres, Capabilities, Tags};
+use crate::{Capabilities, Tags, logging, mssql, mysql, postgres};
 use enumflags2::BitFlags;
-use once_cell::sync::Lazy;
 use quaint::single::Quaint;
+use std::sync::LazyLock;
 use std::time::Duration;
 use std::{fmt::Display, io::Write as _};
 
@@ -28,7 +28,7 @@ source .test_database_urls/mysql_5_6
 /// How long to wait for a schema change to propagate in Vitess.
 const VITESS_MAX_REFRESH_DELAY_MS: u64 = 1000;
 
-static DB_UNDER_TEST: Lazy<Result<DbUnderTest, String>> = Lazy::new(|| {
+static DB_UNDER_TEST: LazyLock<Result<DbUnderTest, String>> = LazyLock::new(|| {
     let database_url = std::env::var("TEST_DATABASE_URL").map_err(|_| MISSING_TEST_DATABASE_URL_MSG.to_owned())?;
     let shadow_database_url = std::env::var("TEST_SHADOW_DATABASE_URL").ok();
     let prefix = database_url
@@ -42,7 +42,7 @@ static DB_UNDER_TEST: Lazy<Result<DbUnderTest, String>> = Lazy::new(|| {
         "file" | "sqlite" => Ok(DbUnderTest {
             database_url,
             tags: Tags::Sqlite.into(),
-            capabilities: Capabilities::CreateDatabase.into(),
+            capabilities: Capabilities::CreateDatabase | Capabilities::Enums | Capabilities::Json,
             provider: "sqlite",
             shadow_database_url,
             max_ddl_refresh_delay: None,
@@ -185,13 +185,11 @@ impl TestApiArgs {
 
     pub fn datasource_block<'a>(
         &'a self,
-        url: &'a str,
         params: &'a [(&'a str, &'a str)],
         preview_features: &'static [&'static str],
     ) -> DatasourceBlock<'a> {
         DatasourceBlock {
             provider: self.db.provider,
-            url,
             params,
             preview_features,
         }
@@ -201,7 +199,7 @@ impl TestApiArgs {
         self.db.provider
     }
 
-    pub fn shadow_database_url(&self) -> Option<&'static str> {
+    pub fn shadow_database_url(&self) -> Option<&str> {
         self.db.shadow_database_url.as_deref()
     }
 
@@ -216,16 +214,10 @@ impl TestApiArgs {
 
 pub struct DatasourceBlock<'a> {
     provider: &'a str,
-    url: &'a str,
     params: &'a [(&'a str, &'a str)],
     preview_features: &'static [&'static str],
 }
 
-impl<'a> DatasourceBlock<'a> {
-    pub fn url(&self) -> &str {
-        self.url
-    }
-}
 fn generator_block(preview_features: &'static [&'static str]) -> String {
     let preview_features: Vec<String> = preview_features.iter().map(|pf| format!(r#""{pf}""#)).collect();
 
@@ -237,7 +229,7 @@ fn generator_block(preview_features: &'static [&'static str]) -> String {
 
     format!(
         r#"generator generated_test_preview_flags {{
-                 provider = "prisma-client-js"{preview_feature_string}
+                 provider = "prisma-client"{preview_feature_string}
                }}"#
     )
 }
@@ -251,8 +243,6 @@ impl Display for DatasourceBlock<'_> {
 
         f.write_str("datasource db {\n    provider = \"")?;
         f.write_str(self.provider)?;
-        f.write_str("\"\n    url = \"")?;
-        f.write_str(self.url)?;
         f.write_str("\"\n")?;
 
         for (param_name, param_value) in self.params {

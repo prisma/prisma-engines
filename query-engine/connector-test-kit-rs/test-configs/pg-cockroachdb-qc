@@ -1,0 +1,6 @@
+{
+    "connector": "cockroachdb",
+    "version": "pg.js.wasm",
+    "driver_adapter": "pg",
+    "external_test_executor": "QueryCompiler"
+}

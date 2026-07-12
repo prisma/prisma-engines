@@ -1,11 +1,9 @@
 generator js {
-  provider        = "prisma-client-js"
-  previewFeatures = ["fullTextIndex"]
+  provider        = "prisma-client"
 }
 
 datasource db {
   provider = "mysql"
-  url      = env("DATABASE_URL")
 }
 
 model Fulltext {

@@ -15,6 +15,9 @@ mod postgres;
 #[cfg(feature = "sqlite")]
 mod sqlite;
 
+// Generic query writer, used for all SQL flavors
+mod query_writer;
+
 #[cfg(feature = "mssql")]
 pub use self::mssql::Mssql;
 #[cfg(feature = "mysql")]
@@ -25,6 +28,7 @@ pub use self::postgres::Postgres;
 pub use self::sqlite::Sqlite;
 
 use crate::ast::*;
+use query_template::QueryTemplate;
 use std::{borrow::Cow, fmt};
 
 pub type Result = crate::Result<()>;
@@ -63,10 +67,19 @@ pub trait Visitor<'a> {
     /// ```
     fn build<Q>(query: Q) -> crate::Result<(String, Vec<Value<'a>>)>
     where
+        Q: Into<Query<'a>>,
+    {
+        let template = Self::build_template(query)?;
+        let sql = template.to_sql()?;
+        Ok((sql, template.parameters))
+    }
+
+    fn build_template<Q>(query: Q) -> crate::Result<QueryTemplate<Value<'a>>>
+    where
         Q: Into<Query<'a>>;
 
     /// Write to the query.
-    fn write<D: fmt::Display>(&mut self, s: D) -> Result;
+    fn write(&mut self, s: impl fmt::Display) -> Result;
 
     /// A point to modify an incoming query to make it compatible with the
     /// underlying database.
@@ -115,12 +128,23 @@ pub trait Visitor<'a> {
     /// What to use to substitute a parameter in the query.
     fn parameter_substitution(&mut self) -> Result;
 
-    /// What to use to substitute a parameter in the query.
+    /// What to use to substitute a list of parameters of variable length
+    fn visit_parameterized_row(
+        &mut self,
+        value: Value<'a>,
+        item_prefix: impl Into<Cow<'static, str>>,
+        separator: impl Into<Cow<'static, str>>,
+        item_suffix: impl Into<Cow<'static, str>>,
+    ) -> Result;
+
+    /// What to use to aggregate an array of values into a string
     fn visit_aggregate_to_string(&mut self, value: Expression<'a>) -> Result;
 
     /// Visit a non-parameterized value.
     fn visit_raw_value(&mut self, value: Value<'a>) -> Result;
 
+    // TODO: JSON functions such as this one should only be required when
+    // `#[cfg(any(feature = "postgresql", feature = "mysql"))]` or similar filters apply.
     fn visit_json_extract(&mut self, json_extract: JsonExtract<'a>) -> Result;
 
     fn visit_json_extract_last_array_item(&mut self, extract: JsonExtractLastArrayElem<'a>) -> Result;
@@ -137,9 +161,11 @@ pub trait Visitor<'a> {
 
     fn visit_json_build_object(&mut self, build_obj: JsonBuildObject<'a>) -> Result;
 
+    fn visit_stringify(&mut self, stringify: Stringify<'a>) -> Result;
+
     fn visit_text_search(&mut self, text_search: TextSearch<'a>) -> Result;
 
-    fn visit_matches(&mut self, left: Expression<'a>, right: std::borrow::Cow<'a, str>, not: bool) -> Result;
+    fn visit_matches(&mut self, left: Expression<'a>, right: Expression<'a>, not: bool) -> Result;
 
     fn visit_text_search_relevance(&mut self, text_search_relevance: TextSearchRelevance<'a>) -> Result;
 
@@ -165,11 +191,22 @@ pub trait Visitor<'a> {
         Ok(())
     }
 
+    fn visit_parameterized_text(&mut self, txt: Option<Cow<'a, str>>, nt: Option<NativeColumnType<'a>>) -> Result {
+        self.add_parameter(Value {
+            typed: ValueType::Text(txt),
+            native_column_type: nt,
+        });
+        self.parameter_substitution()?;
+
+        Ok(())
+    }
+
     /// A visit to a value we parameterize
     fn visit_parameterized(&mut self, value: Value<'a>) -> Result {
         match value.typed {
             ValueType::Enum(Some(variant), name) => self.visit_parameterized_enum(variant, name),
             ValueType::EnumArray(Some(variants), name) => self.visit_parameterized_enum_array(variants, name),
+            ValueType::Text(txt) => self.visit_parameterized_text(txt, value.native_column_type),
             _ => {
                 self.add_parameter(value);
                 self.parameter_substitution()
@@ -383,12 +420,12 @@ pub trait Visitor<'a> {
             self.visit_conditions(conditions)?;
         }
 
-        if let Some(returning) = update.returning {
-            if !returning.is_empty() {
-                let values = returning.into_iter().map(|r| r.into()).collect();
-                self.write(" RETURNING ")?;
-                self.visit_columns(values)?;
-            }
+        if let Some(returning) = update.returning
+            && !returning.is_empty()
+        {
+            let values = returning.into_iter().map(|r| r.into()).collect();
+            self.write(" RETURNING ")?;
+            self.visit_columns(values)?;
         }
 
         if let Some(comment) = update.comment {
@@ -589,6 +626,7 @@ pub trait Visitor<'a> {
             ExpressionKind::ConditionTree(tree) => self.visit_conditions(tree)?,
             ExpressionKind::Compare(compare) => self.visit_compare(compare)?,
             ExpressionKind::Parameterized(val) => self.visit_parameterized(val)?,
+            ExpressionKind::ParameterizedRow(val) => self.visit_parameterized_row(val, "", ",", "")?,
             ExpressionKind::RawValue(val) => self.visit_raw_value(val.0)?,
             ExpressionKind::Column(column) => self.visit_column(*column)?,
             ExpressionKind::Row(row) => self.visit_row(row)?,
@@ -655,13 +693,11 @@ pub trait Visitor<'a> {
             }
         };
 
-        if include_alias {
-            if let Some(alias) = table.alias {
-                self.write(" AS ")?;
+        if include_alias && let Some(alias) = table.alias {
+            self.write(" AS ")?;
 
-                self.delimited_identifiers(&[&*alias])?;
-            };
-        }
+            self.delimited_identifiers(&[&*alias])?;
+        };
 
         Ok(())
     }
@@ -843,6 +879,63 @@ pub trait Visitor<'a> {
                     self.visit_parameterized(pv)
                 }
 
+                // Flattening out a parameterized row with a single column.
+                (
+                    Expression {
+                        kind: ExpressionKind::Row(mut cols),
+                        ..
+                    },
+                    rhs @ Expression {
+                        kind: ExpressionKind::ParameterizedRow(_),
+                        ..
+                    },
+                ) if cols.len() == 1 => {
+                    let col = cols.pop().unwrap();
+                    self.visit_compare(Compare::In(Box::new(col), Box::new(rhs)))
+                }
+
+                // expr IN (?, ?, ..., ?)
+                (
+                    left,
+                    Expression {
+                        kind: ExpressionKind::ParameterizedRow(value),
+                        ..
+                    },
+                ) => {
+                    self.visit_expression(left)?;
+                    self.write(" IN ")?;
+                    self.visit_parameterized_row(value, "", ",", "")
+                }
+
+                // expr IN (CALL(?), CALL(?), ..., CALL(?))
+                (
+                    left,
+                    Expression {
+                        kind: ExpressionKind::Function(value),
+                        ..
+                    },
+                ) if value.typ_.arguments().len() == 1
+                    && value
+                        .typ_
+                        .arguments()
+                        .iter()
+                        .all(|arg| matches!(arg.kind, ExpressionKind::ParameterizedRow(_))) =>
+                {
+                    self.visit_expression(left)?;
+                    self.write(" IN ")?;
+
+                    let Some(ExpressionKind::ParameterizedRow(val)) =
+                        value.typ_.arguments().first().map(|arg| &arg.kind)
+                    else {
+                        unreachable!()
+                    };
+                    let Some(function_name) = &value.typ_.name() else {
+                        panic!("function call against a row of expressions must have a name")
+                    };
+
+                    self.visit_parameterized_row(val.clone(), format!("{function_name}("), ",", ")")
+                }
+
                 (
                     Expression {
                         kind: ExpressionKind::Row(row),
@@ -915,6 +1008,34 @@ pub trait Visitor<'a> {
                     self.visit_parameterized(pv)
                 }
 
+                // Flattening out a parameterized row with a single column.
+                (
+                    Expression {
+                        kind: ExpressionKind::Row(mut cols),
+                        ..
+                    },
+                    rhs @ Expression {
+                        kind: ExpressionKind::ParameterizedRow(_),
+                        ..
+                    },
+                ) if cols.len() == 1 => {
+                    let col = cols.pop().unwrap();
+                    self.visit_compare(Compare::NotIn(Box::new(col), Box::new(rhs)))
+                }
+
+                // expr NOT IN (?, ?, ..., ?)
+                (
+                    left,
+                    Expression {
+                        kind: ExpressionKind::ParameterizedRow(value),
+                        ..
+                    },
+                ) => {
+                    self.visit_expression(left)?;
+                    self.write(" NOT IN ")?;
+                    self.visit_parameterized_row(value, "", ",", "")
+                }
+
                 (
                     Expression {
                         kind: ExpressionKind::Row(row),
@@ -925,6 +1046,35 @@ pub trait Visitor<'a> {
                         ..
                     },
                 ) => self.visit_multiple_tuple_comparison(row, *values, true),
+
+                // expr NOT IN (CALL(?), CALL(?), ..., CALL(?))
+                (
+                    left,
+                    Expression {
+                        kind: ExpressionKind::Function(value),
+                        ..
+                    },
+                ) if value.typ_.arguments().len() == 1
+                    && value
+                        .typ_
+                        .arguments()
+                        .iter()
+                        .all(|arg| matches!(arg.kind, ExpressionKind::ParameterizedRow(_))) =>
+                {
+                    self.visit_expression(left)?;
+                    self.write(" NOT IN ")?;
+
+                    let Some(ExpressionKind::ParameterizedRow(val)) =
+                        value.typ_.arguments().first().map(|arg| &arg.kind)
+                    else {
+                        unreachable!()
+                    };
+                    let Some(function_name) = &value.typ_.name() else {
+                        panic!("function call against a row of expressions must have a name")
+                    };
+
+                    self.visit_parameterized_row(val.clone(), format!("{function_name}("), ",", ")")
+                }
 
                 // expr IN (..)
                 (left, right) => {
@@ -970,8 +1120,8 @@ pub trait Visitor<'a> {
                 JsonCompare::TypeEquals(left, json_type) => self.visit_json_type_equals(*left, json_type, false),
                 JsonCompare::TypeNotEquals(left, json_type) => self.visit_json_type_equals(*left, json_type, true),
             },
-            Compare::Matches(left, right) => self.visit_matches(*left, right, false),
-            Compare::NotMatches(left, right) => self.visit_matches(*left, right, true),
+            Compare::Matches(left, right) => self.visit_matches(*left, *right, false),
+            Compare::NotMatches(left, right) => self.visit_matches(*left, *right, true),
             Compare::Any(left) => {
                 self.write("ANY")?;
                 self.surround_with("(", ")", |s| s.visit_expression(*left))
@@ -979,6 +1129,14 @@ pub trait Visitor<'a> {
             Compare::All(left) => {
                 self.write("ALL")?;
                 self.surround_with("(", ")", |s| s.visit_expression(*left))
+            }
+            Compare::Exists(query) => {
+                self.write("EXISTS")?;
+                self.surround_with("(", ")", |s| s.visit_sub_selection(*query))
+            }
+            Compare::NotExists(query) => {
+                self.write("NOT EXISTS")?;
+                self.surround_with("(", ")", |s| s.visit_sub_selection(*query))
             }
         }
     }
@@ -1117,6 +1275,9 @@ pub trait Visitor<'a> {
             }
             FunctionType::JsonBuildObject(build_obj) => {
                 self.visit_json_build_object(build_obj)?;
+            }
+            FunctionType::Stringify(stringify) => {
+                self.visit_stringify(stringify)?;
             }
         };
 

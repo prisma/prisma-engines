@@ -1,94 +1,214 @@
 [workspace]
 resolver = "2"
 members = [
-  "schema-engine/cli",
-  "schema-engine/core",
-  "schema-engine/connectors/*",
-  "schema-engine/datamodel-renderer",
-  "schema-engine/json-rpc-api-build",
-  "schema-engine/sql-migration-tests",
-  "schema-engine/sql-introspection-tests",
-  "schema-engine/mongodb-schema-describer",
-  "schema-engine/sql-schema-describer",
-  "query-engine/connectors/*",
-  "query-engine/connector-test-kit-rs/qe-setup",
-  "query-engine/connector-test-kit-rs/query-engine-tests",
-  "query-engine/connector-test-kit-rs/query-test-macros",
-  "query-engine/connector-test-kit-rs/query-tests-setup",
-  "query-engine/core",
-  "query-engine/core-tests",
-  "query-engine/black-box-tests",
-  "query-engine/dmmf",
-  "query-engine/driver-adapters",
-  "query-engine/metrics",
-  "query-engine/query-structure",
-  "query-engine/query-engine",
-  "query-engine/query-engine-node-api",
-  "query-engine/query-engine-wasm",
-  "query-engine/query-engine-c-abi",
-  "query-engine/request-handlers",
-  "query-engine/schema",
-  "libs/*",
-  "prisma-fmt",
-  "prisma-schema-wasm",
-  "psl/*",
-  "quaint",
+    "schema-engine/cli",
+    "schema-engine/commands",
+    "schema-engine/core",
+    "schema-engine/connectors/*",
+    "schema-engine/datamodel-renderer",
+    "schema-engine/json-rpc-api",
+    "schema-engine/mongodb-schema-describer",
+    "schema-engine/sql-migration-tests",
+    "schema-engine/sql-introspection-tests",
+    "schema-engine/schema-engine-wasm",
+    "schema-engine/sql-schema-describer",
+    "query-engine/connectors/*",
+    "query-engine/connector-test-kit-rs/qe-setup",
+    "query-engine/connector-test-kit-rs/query-engine-tests",
+    "query-engine/connector-test-kit-rs/query-test-macros",
+    "query-engine/connector-test-kit-rs/query-tests-setup",
+    "query-compiler/core",
+    "query-compiler/core-tests",
+    "query-compiler/dmmf",
+    "query-compiler/query-builders/*",
+    "query-compiler/query-compiler",
+    "query-compiler/query-compiler-playground",
+    "query-compiler/query-compiler-wasm",
+    "query-compiler/query-structure",
+    "query-compiler/request-handlers",
+    "query-compiler/schema",
+    "libs/*",
+    "prisma-fmt",
+    "prisma-schema-wasm",
+    "psl/*",
+    "quaint",
 ]
 
-[workspace.dependencies]
-async-trait = { version = "0.1.77" }
-enumflags2 = { version = "0.7", features = ["serde"] }
-psl = { path = "./psl/psl" }
-serde_json = { version = "1", features = ["float_roundtrip", "preserve_order"] }
-serde = { version = "1", features = ["derive"] }
-tokio = { version = "1.25", features = [
-  "rt-multi-thread",
-  "macros",
-  "sync",
-  "io-std",
-  "io-util",
-  "parking_lot",
-  "time",
-] }
-chrono = { version = "0.4", features = ["serde"] }
-user-facing-errors = { path = "./libs/user-facing-errors" }
-uuid = { version = "1", features = ["serde", "v4"] }
-indoc = "2.0.1"
-indexmap = { version = "2.2.2", features = ["serde"] }
-itertools = "0.12"
-connection-string = "0.2"
-napi = { version = "2.15.1", default-features = false, features = [
-  "napi8",
-  "tokio_rt",
-  "serde-json",
-] }
-napi-derive = "2.15.0"
-js-sys = { version = "0.3" }
-rand = { version = "0.8" }
-serde_repr = { version = "0.1.17" }
-serde-wasm-bindgen = { version = "0.5" }
-tracing = { version = "0.1" }
-tsify = { version = "0.4.5" }
-wasm-bindgen = { version = "0.2.92" }
-wasm-bindgen-futures = { version = "0.4" }
-wasm-rs-dbg = { version = "0.1.2", default-features = false, features = ["console-error"] }
-wasm-bindgen-test = { version = "0.3.0" }
-url = { version = "2.5.0" }
+[workspace.package]
+edition = "2024"
 
-[workspace.dependencies.quaint]
-path = "quaint"
+[workspace.lints.rust.unexpected_cfgs]
+level = "warn"
+check-cfg = ['cfg(wasm_bindgen_unstable_test_coverage)', 'cfg(debug_assert)']
+
+[workspace.dependencies]
+ahash = "0.8"
+anyhow = "1"
+async-trait = "0.1"
+barrel = { git = "https://github.com/prisma/barrel.git", branch = "mssql-support" }
+base64 = "0.22"
+bigdecimal = "0.3"
+bitflags = "2"
+bit-vec = "0.6"
+bon = "3"
+bson = "2"
+bytes = "1"
+byteorder = { version = "1", default-features = false }
+cfg-if = "1"
+chrono = "0.4"
+colored = "3"
+concat-idents = "1"
+connection-string = "0.2"
+convert_case = "0.11"
+cruet = "0.15"
+cuid = { git = "https://github.com/prisma/cuid-rust", branch = "v1.3.3-wasm32-unknown-unknown" }
+derive_more = { version = "2", features = ["display", "constructor"] }
+either = "1"
+enumflags2 = "0.7"
+env_logger = "0.11"
+futures = "0.3"
+graphql-parser = { git = "https://github.com/prisma/graphql-parser" }
+hashbrown = "0.16"
+hex = "0.4"
+indoc = "2"
+indexmap = { version = "2", features = ["serde"] }
+itertools = "0.14"
+jsonrpc-core = "18"
+log = "0.4"
+lru-cache = "0.1"
+lsp-types = "0.95"
+mobc = "0.9"
+mongodb = { version = "3", features = [
+    "zstd-compression",
+    "zlib-compression",
+    "snappy-compression",
+] }
+mysql_async = { git = "https://github.com/prisma/mysql_async", branch = "vendored-openssl" }
+names = { version = "0.11", default-features = false }
+native-tls = "0.2"
+nom = "7"
+num_cpus = "1"
+parse-hyperlinks = "0.28"
+paste = "1"
+percent-encoding = "2"
+pest = "2"
+pest_derive = "2"
+petgraph = "0.8"
+pin-project = "1"
+postgres-native-tls = { git = "https://github.com/prisma/rust-postgres", branch = "pgbouncer-mode" }
+postgres-types = { git = "https://github.com/prisma/rust-postgres", branch = "pgbouncer-mode" }
+pretty = "0.12"
+rustc-hash = "2"
+rand = "0.8"
+regex = "1"
+rusqlite = "0.32"
+sha2 = "0.10"
+serde = { version = "1", features = ["derive"] }
+serde_json = { version = "1", features = [
+    "float_roundtrip",
+    "preserve_order",
+    "raw_value",
+] }
+serde_repr = "0.1"
+serde-wasm-bindgen = "0.6"
+smallvec = "1"
+strip-ansi-escapes = "0.1"
+structopt = "0.3"
+sqlformat = "0.2"
+sqlparser = { version = "0.61", features = ["visitor"] }
+sqlx-core = "0.8"
+sqlx-sqlite = "0.8"
+tempfile = "3"
+tiberius = { git = "https://github.com/prisma/tiberius", branch = "main", default-features = false }
+tokio = { version = "1", features = ["sync"] }
+tokio-postgres = { git = "https://github.com/prisma/rust-postgres", branch = "pgbouncer-mode" }
+tokio-tungstenite = "0.28"
+tokio-util = "0.7"
+tracing = "0.1"
+tracing-error = "0.2"
+tracing-subscriber = "0.3"
+tracing-futures = "0.2"
+tsify = { version = "0.5", default-features = false, features = ["js"] }
+thiserror = "2"
+url = "2"
+ulid = "1"
+uuid = { version = "1", features = ["v4", "v7", "js"] }
+versions = "7"
+
+js-sys = "0.3"
+wasm-bindgen = "0.2"
+wasm-bindgen-futures = "0.4"
+wasm-logger = "0.2"
+
+# build dependencies
+cfg_aliases = "0.2"
+darling = "0.20"
+proc-macro2 = "1"
+quote = "1"
+syn = "2"
+
+# dev dependencies
+codspeed-criterion-compat = "1"
+dissimilar = "1"
+expect-test = "1"
+flate2 = "1"
+insta = "1"
+pretty_assertions = "1"
+similar = "2"
+tracing-test = "0.2"
+wasm-rs-dbg = { version = "0.1", default-features = false, features = [
+    "console-error",
+] }
+
+# workspace dependencies
+quaint = { path = "./quaint", default-features = false }
+prisma-fmt.path = "./prisma-fmt"
+
+build-utils.path = "./libs/build-utils"
+crosstarget-utils.path = "./libs/crosstarget-utils"
+panic-utils.path = "./libs/panic-utils"
+prisma-value.path = "./libs/prisma-value"
+telemetry.path = "./libs/telemetry"
+user-facing-errors.path = "./libs/user-facing-errors"
+user-facing-error-macros.path = "./libs/user-facing-error-macros"
+mongodb-client.path = "./libs/mongodb-client"
+test-setup.path = "./libs/test-setup"
+test-macros.path = "./libs/test-macros"
+shared-wasm.path = "./libs/shared-wasm"
+driver-adapters.path = "./libs/driver-adapters"
+sql-ddl.path = "./libs/sql-ddl"
+query-template.path = "libs/query-template"
+
+psl.path = "./psl/psl"
+psl-core.path = "./psl/psl-core"
+diagnostics.path = "./psl/diagnostics"
+schema-ast.path = "./psl/schema-ast"
+parser-database.path = "./psl/parser-database"
+
+query-connector.path = "./query-engine/connectors/query-connector"
+mongodb-query-connector = { path = "./query-engine/connectors/mongodb-query-connector", default-features = false }
+
+schema-core.path = "./schema-engine/core"
+datamodel-renderer.path = "./schema-engine/datamodel-renderer"
+schema-connector.path = "./schema-engine/connectors/schema-connector"
+sql-schema-connector.path = "./schema-engine/connectors/sql-schema-connector"
+mongodb-schema-connector.path = "./schema-engine/connectors/mongodb-schema-connector"
+sql-schema-describer.path = "./schema-engine/sql-schema-describer"
+mongodb-schema-describer.path = "./schema-engine/mongodb-schema-describer"
+
+dmmf.path = "./query-compiler/dmmf"
+query-builder.path = "./query-compiler/query-builders/query-builder"
+query-compiler = { path = "./query-compiler/query-compiler", default-features = false }
+query-core.path = "./query-compiler/core"
+query-structure.path = "./query-compiler/query-structure"
+# TODO: rename `request_handlers` to `query-protocol`
+request-handlers = { path = "./query-compiler/request-handlers", default-features = false }
+# TODO: rename `schema` to `query-schema`
+schema.path = "./query-compiler/schema"
+sql-query-builder.path = "./query-compiler/query-builders/sql-query-builder"
 
 [profile.dev.package.backtrace]
 opt-level = 3
-
-[profile.release.package.query-engine-node-api]
-strip = "symbols"
-
-[profile.release.package.query-engine]
-strip = "symbols"
-
-[profile.release.package.query-engine-c-abi]
-strip = "symbols"
 
 [profile.release]
 lto = "fat"

@@ -52,7 +52,7 @@ mod compound_fks {
         // Foreign key violation, which doesn't happen on PlanetScale.
         if !matches!(
             runner.connector_version(),
-            ConnectorVersion::Vitess(Some(PlanetscaleJsNapi)) | ConnectorVersion::Vitess(Some(PlanetscaleJsWasm))
+            ConnectorVersion::Vitess(Some(PlanetscaleJsWasm))
         ) {
             assert_error!(
                 &runner,

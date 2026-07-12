@@ -1,12 +1,16 @@
 use crate::MongoDbSchemaConnector;
-use schema_connector::{BoxFuture, ConnectorResult, MigrationPersistence, Namespaces};
+use schema_connector::{BoxFuture, ConnectorResult, MigrationPersistence, Namespaces, SchemaFilter};
 
 impl MigrationPersistence for MongoDbSchemaConnector {
     fn baseline_initialize(&mut self) -> schema_connector::BoxFuture<'_, ConnectorResult<()>> {
         unsupported_command_error()
     }
 
-    fn initialize(&mut self, _namespaces: Option<Namespaces>) -> BoxFuture<'_, ConnectorResult<()>> {
+    fn initialize(
+        &mut self,
+        _namespaces: Option<Namespaces>,
+        _filters: SchemaFilter,
+    ) -> BoxFuture<'_, ConnectorResult<()>> {
         unsupported_command_error()
     }
 

@@ -1,4 +1,5 @@
 use crate::value::{Array, Documentation, Env, Text, Value};
+use itertools::Itertools;
 use psl::PreviewFeature;
 use std::{borrow::Cow, fmt};
 
@@ -20,7 +21,7 @@ impl<'a> Generator<'a> {
     /// ```ignore
     /// generator js {
     /// //        ^^ name
-    ///   provider = "prisma-client-js"
+    ///   provider = "prisma-client"
     /// //            ^^^^^^^^^^^^^^^^ provider
     /// }
     /// ```
@@ -78,7 +79,7 @@ impl<'a> Generator<'a> {
     /// ```ignore
     /// /// This here is the documentation.
     /// generator js {
-    ///   provider = "prisma-client-js"
+    ///   provider = "prisma-client"
     /// }
     /// ```
     pub fn documentation(&mut self, docs: impl Into<Cow<'a, str>>) {
@@ -89,7 +90,7 @@ impl<'a> Generator<'a> {
     ///
     /// ```ignore
     /// generator js {
-    ///   provider = "prisma-client-js"
+    ///   provider = "prisma-client"
     ///   custom   = "foo"
     /// //           ^^^^^ value
     /// //^^^^^^ key
@@ -122,7 +123,7 @@ impl<'a> Generator<'a> {
     }
 }
 
-impl<'a> fmt::Display for Generator<'a> {
+impl fmt::Display for Generator<'_> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         if let Some(ref doc) = self.documentation {
             doc.fmt(f)?;
@@ -143,7 +144,7 @@ impl<'a> fmt::Display for Generator<'a> {
             writeln!(f, "binaryTargets = {}", self.binary_targets)?;
         }
 
-        for (k, v) in self.config.iter() {
+        for (k, v) in self.config.iter().sorted_by_key(|(k, _)| k) {
             writeln!(f, "{k} = {v}")?;
         }
 
@@ -161,14 +162,13 @@ mod tests {
 
     #[test]
     fn kitchen_sink() {
-        let mut generator = Generator::new("client", Env::value("prisma-client-js"));
+        let mut generator = Generator::new("client", Env::value("prisma-client"));
 
         generator.documentation("Here comes the sun.\n\nAnd I say,\nIt's alright.");
 
         generator.output(Env::value("/dev/null"));
         generator.push_binary_target(Env::variable("BINARY TARGET"));
 
-        generator.push_preview_feature(PreviewFeature::MultiSchema);
         generator.push_preview_feature(PreviewFeature::PostgresqlExtensions);
 
         generator.push_config_value("customValue", "meow");
@@ -188,24 +188,51 @@ mod tests {
             ],
         );
 
+        generator.push_config_value("customEnvValue", Env::variable("var"));
+
         let expected = expect![[r#"
             /// Here comes the sun.
             ///
             /// And I say,
             /// It's alright.
             generator client {
-              provider        = "prisma-client-js"
+              provider        = "prisma-client"
               output          = "/dev/null"
-              previewFeatures = ["multiSchema", "postgresqlExtensions"]
+              previewFeatures = ["postgresqlExtensions"]
               binaryTargets   = [env("BINARY TARGET")]
+              afterGenerate   = ["lambda", [], ["print", ["quote", "done!"]]]
+              customEnvValue  = env("var")
+              customFeatures  = ["enums", "models"]
               customValue     = "meow"
               otherValue      = "purr"
-              customFeatures  = ["enums", "models"]
-              afterGenerate   = ["lambda", [], ["print", ["quote", "done!"]]]
             }
         "#]];
 
         let rendered = psl::reformat(&format!("{generator}"), 2).unwrap();
         expected.assert_eq(&rendered)
+    }
+
+    #[test]
+    fn creates_consistent_ordering() {
+        let mut generator1 = Generator::new("client", Env::value("prisma-client"));
+        generator1.push_config_value("first", "A");
+        generator1.push_config_value("second", "B");
+        let rendered1 = psl::reformat(&format!("{generator1}"), 2).unwrap();
+
+        let mut generator2 = Generator::new("client", Env::value("prisma-client"));
+        generator2.push_config_value("second", "B");
+        generator2.push_config_value("first", "A");
+        let rendered2 = psl::reformat(&format!("{generator2}"), 2).unwrap();
+
+        let expected = expect![[r#"
+            generator client {
+              provider = "prisma-client"
+              first    = "A"
+              second   = "B"
+            }
+        "#]];
+
+        expected.assert_eq(&rendered1);
+        expected.assert_eq(&rendered2)
     }
 }

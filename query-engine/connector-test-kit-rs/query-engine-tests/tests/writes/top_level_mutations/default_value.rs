@@ -5,6 +5,36 @@ mod default_value {
     use indoc::indoc;
     use query_engine_tests::{run_query, run_query_json};
 
+    fn schema_all_default() -> String {
+        let schema = indoc! {
+            r#"model Service {
+              #id(id, String, @id, @default(cuid()))
+            }"#
+        };
+
+        schema.to_owned()
+    }
+
+    #[connector_test(schema(schema_all_default))]
+    async fn default_field_omitted_in_data(runner: Runner) -> TestResult<()> {
+        runner
+            .query(r#"mutation { createOneService(data: {}) { id } }"#)
+            .await?
+            .assert_success();
+
+        Ok(())
+    }
+
+    #[connector_test(schema(schema_all_default))]
+    async fn default_field_omitted_without_data(runner: Runner) -> TestResult<()> {
+        runner
+            .query(r#"mutation { createOneService { id } }"#)
+            .await?
+            .assert_success();
+
+        Ok(())
+    }
+
     fn schema_string() -> String {
         let schema = indoc! {
             r#"model ScalarModel {

@@ -16,10 +16,10 @@ use std::ops::Range;
 
 pub use column::{ColumnWalker, IndexColumnWalker, TableColumnWalker, ViewColumnWalker};
 pub use default::{DefaultValueWalker, TableDefaultValueWalker, ViewDefaultValueWalker};
+pub use r#enum::{EnumVariantWalker, EnumWalker};
 pub use foreign_key::ForeignKeyWalker;
 pub use index::IndexWalker;
 pub use namespace::NamespaceWalker;
-pub use r#enum::{EnumVariantWalker, EnumWalker};
 pub use table::TableWalker;
 pub use user_defined_type::UserDefinedTypeWalker;
 pub use view::ViewWalker;

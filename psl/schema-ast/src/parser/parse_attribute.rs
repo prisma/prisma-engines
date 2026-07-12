@@ -1,6 +1,6 @@
 use super::{
-    helpers::{parsing_catch_all, Pair},
     Rule,
+    helpers::{Pair, parsing_catch_all},
 };
 use crate::{ast::*, parser::parse_arguments::parse_arguments_list};
 use diagnostics::FileId;

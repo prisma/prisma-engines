@@ -3,7 +3,7 @@ use schema_core::TimingsLayer;
 use tracing_error::ErrorLayer;
 
 pub(crate) fn init_logger() {
-    use tracing_subscriber::{prelude::*, EnvFilter, FmtSubscriber};
+    use tracing_subscriber::{EnvFilter, FmtSubscriber, prelude::*};
 
     let subscriber = FmtSubscriber::builder()
         .with_env_filter(EnvFilter::from_default_env())

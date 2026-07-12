@@ -1,4 +1,5 @@
 use pretty_assertions::assert_eq;
+use schema_core::schema_connector::SchemaFilter;
 use sql_migration_tests::test_api::*;
 use user_facing_errors::UserFacingError;
 
@@ -6,14 +7,16 @@ use user_facing_errors::UserFacingError;
 fn mark_migration_rolled_back_on_an_empty_database_errors(api: TestApi) {
     let err = api.mark_migration_rolled_back("anything").send_unwrap_err();
 
-    assert!(err
-        .to_string()
-        .starts_with("Invariant violation: called markMigrationRolledBack on a database without migrations table.\n"));
+    assert!(
+        err.to_string().starts_with(
+            "Invariant violation: called markMigrationRolledBack on a database without migrations table.\n"
+        )
+    );
 }
 
 #[test_connector]
 fn mark_migration_rolled_back_on_a_database_with_migrations_table_errors(api: TestApi) {
-    tok(api.migration_persistence().initialize(None)).unwrap();
+    tok(api.migration_persistence().initialize(None, SchemaFilter::default())).unwrap();
 
     let err = api
         .mark_migration_rolled_back("anything")
@@ -51,7 +54,7 @@ fn mark_migration_rolled_back_with_a_failed_migration_works(api: TestApi) {
             .send_sync()
             .into_output();
 
-        output_initial_migration.generated_migration_name.unwrap()
+        output_initial_migration.generated_migration_name
     };
 
     // Create a second migration
@@ -78,7 +81,7 @@ fn mark_migration_rolled_back_with_a_failed_migration_works(api: TestApi) {
             })
             .into_output();
 
-        output_second_migration.generated_migration_name.unwrap()
+        output_second_migration.generated_migration_name
     };
 
     api.apply_migrations(&migrations_directory).send_unwrap_err();
@@ -132,7 +135,7 @@ fn mark_migration_rolled_back_with_a_successful_migration_errors(api: TestApi) {
             .send_sync()
             .into_output();
 
-        output_initial_migration.generated_migration_name.unwrap()
+        output_initial_migration.generated_migration_name
     };
 
     // Create a second migration
@@ -155,7 +158,7 @@ fn mark_migration_rolled_back_with_a_successful_migration_errors(api: TestApi) {
             .send_sync()
             .into_output();
 
-        output_second_migration.generated_migration_name.unwrap()
+        output_second_migration.generated_migration_name
     };
 
     api.apply_migrations(&migrations_directory).send_sync();
@@ -207,7 +210,7 @@ fn rolling_back_applying_again_then_rolling_back_again_should_error(api: TestApi
             .send_sync()
             .into_output();
 
-        output_initial_migration.generated_migration_name.unwrap()
+        output_initial_migration.generated_migration_name
     };
 
     // Create a second migration
@@ -234,11 +237,7 @@ fn rolling_back_applying_again_then_rolling_back_again_should_error(api: TestApi
             });
 
         (
-            output_second_migration
-                .output()
-                .generated_migration_name
-                .clone()
-                .unwrap(),
+            output_second_migration.output().generated_migration_name.clone(),
             output_second_migration.migration_script_path(),
         )
     };

@@ -2,18 +2,20 @@ mod mongodb_types;
 mod validations;
 
 pub use mongodb_types::MongoDbType;
+use parser_database::{ExtensionTypes, ScalarFieldType};
 
 use crate::{
+    ValidatedSchema,
     datamodel_connector::{
         Connector, ConnectorCapabilities, ConnectorCapability, ConstraintScope, Flavour, NativeTypeConstructor,
         NativeTypeInstance, RelationMode,
     },
     diagnostics::{Diagnostics, Span},
-    parser_database::{walkers::*, ReferentialAction, ScalarType},
+    parser_database::{ReferentialAction, walkers::*},
 };
 use enumflags2::BitFlags;
 use mongodb_types::*;
-use std::result::Result as StdResult;
+use std::{borrow::Cow, result::Result as StdResult};
 
 const CAPABILITIES: ConnectorCapabilities = enumflags2::make_bitflags!(ConnectorCapability::{
     Json |
@@ -27,7 +29,6 @@ const CAPABILITIES: ConnectorCapabilities = enumflags2::make_bitflags!(Connector
     CompositeTypes |
     FullTextIndex |
     SortOrderInFullTextIndex |
-    MongoDbQueryRaw |
     DefaultValueAuto |
     TwoWayEmbeddedManyToManyRelation |
     UndefinedType |
@@ -85,6 +86,12 @@ impl Connector for MongoDbDatamodelConnector {
         }
     }
 
+    fn validate_view(&self, model: ModelWalker<'_>, errors: &mut Diagnostics) {
+        for field in model.scalar_fields() {
+            validations::field_name_uses_valid_characters(field, errors);
+        }
+    }
+
     fn validate_relation_field(
         &self,
         field: crate::parser_database::walkers::RelationFieldWalker<'_>,
@@ -97,20 +104,15 @@ impl Connector for MongoDbDatamodelConnector {
         mongodb_types::CONSTRUCTORS
     }
 
-    fn default_native_type_for_scalar_type(&self, scalar_type: &ScalarType) -> Option<NativeTypeInstance> {
-        let native_type = default_for(scalar_type);
+    fn default_native_type_for_scalar_type(
+        &self,
+        scalar_type: &ScalarFieldType,
+        _schema: &ValidatedSchema,
+    ) -> Option<NativeTypeInstance> {
+        let scalar_type = scalar_type.as_builtin_scalar()?;
+        let native_type = default_for(&scalar_type);
 
         Some(NativeTypeInstance::new::<MongoDbType>(*native_type))
-    }
-
-    fn native_type_is_default_for_scalar_type(
-        &self,
-        native_type: &NativeTypeInstance,
-        scalar_type: &ScalarType,
-    ) -> bool {
-        let default_native_type = default_for(scalar_type);
-        let native_type: &MongoDbType = native_type.downcast_ref();
-        native_type == default_native_type
     }
 
     fn parse_native_type(
@@ -120,15 +122,24 @@ impl Connector for MongoDbDatamodelConnector {
         span: Span,
         diagnostics: &mut Diagnostics,
     ) -> Option<NativeTypeInstance> {
-        let native_type = MongoDbType::from_parts(name, args, span, diagnostics)?;
-        Some(NativeTypeInstance::new::<MongoDbType>(native_type))
+        match MongoDbType::from_parts(name, args) {
+            Ok(res) => Some(NativeTypeInstance::new(res)),
+            Err(err) => {
+                diagnostics.push_error(err.into_datamodel_error(span));
+                None
+            }
+        }
     }
 
-    fn native_type_to_parts(&self, native_type: &NativeTypeInstance) -> (&'static str, Vec<String>) {
+    fn native_type_to_parts<'t>(&self, native_type: &'t NativeTypeInstance) -> (&'t str, Cow<'t, [String]>) {
         native_type.downcast_ref::<MongoDbType>().to_parts()
     }
 
-    fn scalar_type_for_native_type(&self, _native_type: &NativeTypeInstance) -> ScalarType {
+    fn scalar_type_for_native_type(
+        &self,
+        _native_type: &NativeTypeInstance,
+        _extension_types: &dyn ExtensionTypes,
+    ) -> Option<ScalarFieldType> {
         todo!()
     }
 
@@ -155,5 +166,9 @@ impl Connector for MongoDbDatamodelConnector {
 
     fn flavour(&self) -> Flavour {
         Flavour::Mongo
+    }
+
+    fn can_assume_strict_equality_in_joins(&self) -> bool {
+        true
     }
 }

@@ -25,12 +25,11 @@ async fn referential_integrity_prisma(api: &mut TestApi) -> TestResult {
 
     let input = indoc! {r#"
         generator client {
-            provider = "prisma-client-js"
+            provider = "prisma-client"
         }
 
         datasource db {
             provider             = "postgres"
-            url                  = env("TEST_DATABASE_URL")
             referentialIntegrity = "prisma"
         }
 
@@ -48,12 +47,11 @@ async fn referential_integrity_prisma(api: &mut TestApi) -> TestResult {
 
     let expected = expect![[r#"
         generator client {
-          provider = "prisma-client-js"
+          provider = "prisma-client"
         }
 
         datasource db {
           provider     = "postgres"
-          url          = env("TEST_DATABASE_URL")
           relationMode = "prisma"
         }
 
@@ -82,16 +80,16 @@ async fn referential_integrity_foreign_keys(api: &mut TestApi) -> TestResult {
         CREATE TABLE "Foo" (
             "id" INTEGER NOT NULL,
             "bar_id" INTEGER NOT NULL,
-        
+
             CONSTRAINT "Foo_pkey" PRIMARY KEY ("id")
         );
-        
+
         CREATE TABLE "Bar" (
             "id" INTEGER NOT NULL,
-        
+
             CONSTRAINT "Bar_pkey" PRIMARY KEY ("id")
         );
-        
+
         CREATE UNIQUE INDEX "Foo_bar_id_key" ON "Foo"("bar_id");
 
         ALTER TABLE "Foo" ADD CONSTRAINT "Foo_bar_id_fkey" FOREIGN KEY ("bar_id") REFERENCES "Bar"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -101,12 +99,11 @@ async fn referential_integrity_foreign_keys(api: &mut TestApi) -> TestResult {
 
     let input = indoc! {r#"
         generator client {
-            provider = "prisma-client-js"
+            provider = "prisma-client"
         }
 
         datasource db {
             provider             = "postgres"
-            url                  = env("TEST_DATABASE_URL")
             referentialIntegrity = "foreignKeys"
         }
 
@@ -124,12 +121,11 @@ async fn referential_integrity_foreign_keys(api: &mut TestApi) -> TestResult {
 
     let expected = expect![[r#"
         generator client {
-          provider = "prisma-client-js"
+          provider = "prisma-client"
         }
 
         datasource db {
           provider     = "postgres"
-          url          = env("TEST_DATABASE_URL")
           relationMode = "foreignKeys"
         }
 
@@ -158,16 +154,16 @@ async fn relation_mode_prisma(api: &mut TestApi) -> TestResult {
         CREATE TABLE "Foo" (
             "id" INTEGER NOT NULL,
             "bar_id" INTEGER NOT NULL,
-        
+
             CONSTRAINT "Foo_pkey" PRIMARY KEY ("id")
         );
-        
+
         CREATE TABLE "Bar" (
             "id" INTEGER NOT NULL,
-        
+
             CONSTRAINT "Bar_pkey" PRIMARY KEY ("id")
         );
-        
+
         CREATE UNIQUE INDEX "Foo_bar_id_key" ON "Foo"("bar_id");
     "#};
 
@@ -175,12 +171,11 @@ async fn relation_mode_prisma(api: &mut TestApi) -> TestResult {
 
     let input = indoc! {r#"
         generator client {
-            provider = "prisma-client-js"
+            provider = "prisma-client"
         }
 
         datasource db {
             provider     = "postgres"
-            url          = env("TEST_DATABASE_URL")
             relationMode = "prisma"
         }
 
@@ -198,12 +193,11 @@ async fn relation_mode_prisma(api: &mut TestApi) -> TestResult {
 
     let expected = expect![[r#"
         generator client {
-          provider = "prisma-client-js"
+          provider = "prisma-client"
         }
 
         datasource db {
           provider     = "postgres"
-          url          = env("TEST_DATABASE_URL")
           relationMode = "prisma"
         }
 
@@ -232,16 +226,16 @@ async fn relation_mode_foreign_keys(api: &mut TestApi) -> TestResult {
         CREATE TABLE "Foo" (
             "id" INTEGER NOT NULL,
             "bar_id" INTEGER NOT NULL,
-        
+
             CONSTRAINT "Foo_pkey" PRIMARY KEY ("id")
         );
-        
+
         CREATE TABLE "Bar" (
             "id" INTEGER NOT NULL,
-        
+
             CONSTRAINT "Bar_pkey" PRIMARY KEY ("id")
         );
-        
+
         CREATE UNIQUE INDEX "Foo_bar_id_key" ON "Foo"("bar_id");
 
         ALTER TABLE "Foo" ADD CONSTRAINT "Foo_bar_id_fkey" FOREIGN KEY ("bar_id") REFERENCES "Bar"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -251,12 +245,11 @@ async fn relation_mode_foreign_keys(api: &mut TestApi) -> TestResult {
 
     let input = indoc! {r#"
         generator client {
-            provider = "prisma-client-js"
+            provider = "prisma-client"
         }
 
         datasource db {
             provider     = "postgres"
-            url          = env("TEST_DATABASE_URL")
             relationMode = "foreignKeys"
         }
 
@@ -274,12 +267,11 @@ async fn relation_mode_foreign_keys(api: &mut TestApi) -> TestResult {
 
     let expected = expect![[r#"
         generator client {
-          provider = "prisma-client-js"
+          provider = "prisma-client"
         }
 
         datasource db {
           provider     = "postgres"
-          url          = env("TEST_DATABASE_URL")
           relationMode = "foreignKeys"
         }
 
@@ -330,12 +322,11 @@ mod at_at_map {
 
         let input = indoc! {r#"
             generator client {
-                provider = "prisma-client-js"
+                provider = "prisma-client"
             }
 
             datasource db {
                 provider             = "postgres"
-                url                  = env("TEST_DATABASE_URL")
                 referentialIntegrity = "prisma"
             }
 
@@ -357,12 +348,11 @@ mod at_at_map {
 
         let expected = expect![[r#"
             generator client {
-              provider = "prisma-client-js"
+              provider = "prisma-client"
             }
 
             datasource db {
               provider     = "postgres"
-              url          = env("TEST_DATABASE_URL")
               relationMode = "prisma"
             }
 
@@ -414,12 +404,11 @@ mod at_at_map {
 
         let input = indoc! {r#"
             generator client {
-                provider = "prisma-client-js"
+                provider = "prisma-client"
             }
 
             datasource db {
                 provider             = "postgres"
-                url                  = env("TEST_DATABASE_URL")
                 referentialIntegrity = "foreignKeys"
             }
 
@@ -441,12 +430,11 @@ mod at_at_map {
 
         let expected = expect![[r#"
             generator client {
-              provider = "prisma-client-js"
+              provider = "prisma-client"
             }
 
             datasource db {
               provider     = "postgres"
-              url          = env("TEST_DATABASE_URL")
               relationMode = "foreignKeys"
             }
 
@@ -496,12 +484,11 @@ mod at_at_map {
 
         let input = indoc! {r#"
             generator client {
-                provider = "prisma-client-js"
+                provider = "prisma-client"
             }
 
             datasource db {
                 provider     = "postgres"
-                url          = env("TEST_DATABASE_URL")
                 relationMode = "prisma"
             }
 
@@ -523,12 +510,11 @@ mod at_at_map {
 
         let expected = expect![[r#"
             generator client {
-              provider = "prisma-client-js"
+              provider = "prisma-client"
             }
 
             datasource db {
               provider     = "postgres"
-              url          = env("TEST_DATABASE_URL")
               relationMode = "prisma"
             }
 
@@ -580,12 +566,11 @@ mod at_at_map {
 
         let input = indoc! {r#"
             generator client {
-                provider = "prisma-client-js"
+                provider = "prisma-client"
             }
 
             datasource db {
                 provider     = "postgres"
-                url          = env("TEST_DATABASE_URL")
                 relationMode = "foreignKeys"
             }
 
@@ -607,12 +592,11 @@ mod at_at_map {
 
         let expected = expect![[r#"
             generator client {
-              provider = "prisma-client-js"
+              provider = "prisma-client"
             }
 
             datasource db {
               provider     = "postgres"
-              url          = env("TEST_DATABASE_URL")
               relationMode = "foreignKeys"
             }
 

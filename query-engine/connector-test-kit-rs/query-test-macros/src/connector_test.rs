@@ -1,14 +1,18 @@
 use super::*;
-use darling::FromMeta;
+use crate::ensure_db_names::UNIQUE_TEST_DATABASE_NAMES;
+use darling::{FromMeta, ast::NestedMeta};
 use proc_macro::TokenStream;
 use proc_macro2::{Ident, Span};
 use quote::quote;
-use syn::{parse_macro_input, AttributeArgs, ItemFn};
+use syn::{ItemFn, parse_macro_input};
 
 pub fn connector_test_impl(attr: TokenStream, input: TokenStream) -> TokenStream {
-    let attributes_meta: syn::AttributeArgs = parse_macro_input!(attr as AttributeArgs);
-    let args = ConnectorTestArgs::from_list(&attributes_meta);
-    let args = match args {
+    let attributes_meta = match NestedMeta::parse_meta_list(attr.into()) {
+        Ok(meta) => meta,
+        Err(err) => return err.into_compile_error().into(),
+    };
+
+    let args = match ConnectorTestArgs::from_list(&attributes_meta) {
         Ok(args) => args,
         Err(err) => return err.write_errors().into(),
     };
@@ -18,6 +22,8 @@ pub fn connector_test_impl(attr: TokenStream, input: TokenStream) -> TokenStream
     };
 
     let excluded_features = args.exclude_features.features();
+    let only_executors = args.only_executors.as_ref();
+    let excluded_executors = args.exclude_executors.as_ref();
     let db_schemas = args.db_schemas.schemas();
     let db_extensions = args.db_extensions.extensions();
     let only = &args.only;
@@ -43,6 +49,7 @@ pub fn connector_test_impl(attr: TokenStream, input: TokenStream) -> TokenStream
 
     // The shell function retains the name of the original test definition.
     let test_fn_ident = test_function.sig.ident;
+    let test_fn_ident_string = test_fn_ident.to_string();
 
     // Rename original test function to run_<orig_name>.
     let runner_fn_ident = Ident::new(&format!("run_{test_fn_ident}"), Span::call_site());
@@ -54,6 +61,8 @@ pub fn connector_test_impl(attr: TokenStream, input: TokenStream) -> TokenStream
     let suite_name = args.suite.expect("A test must have a test suite.");
     let test_database_name = format!("{suite_name}_{test_name}");
     let capabilities = args.capabilities.idents;
+
+    UNIQUE_TEST_DATABASE_NAMES.ensure_unique(&test_database_name, &suite_name, &test_name);
 
     let referential_override = match args.relation_mode.or(args.referential_integrity) {
         Some(ref_override) => {
@@ -74,11 +83,14 @@ pub fn connector_test_impl(attr: TokenStream, input: TokenStream) -> TokenStream
                 &[#exclude],
                 enumflags2::make_bitflags!(ConnectorCapability::{#(#capabilities)|*}),
                 &[#(#excluded_features),*],
+                &[#(#only_executors),*],
+                &[#(#excluded_executors),*],
                 #handler,
                 &[#(#db_schemas),*],
                 &[#(#db_extensions),*],
                 #referential_override,
                 #runner_fn_ident,
+                #test_fn_ident_string,
             );
         }
 

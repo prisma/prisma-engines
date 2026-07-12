@@ -1,6 +1,5 @@
 datasource mydb {
     provider = "sqlite"
-    url = env("TEST_DB_URL")
 }
 
 model Dog {
@@ -16,8 +15,8 @@ model Cat {
 }
 
 // [1;91merror[0m: [1mThe model with database name "pets" could not be defined because another model or view with this name exists: "Dog"[0m
-//   [1;94m-->[0m  [4mschema.prisma:15[0m
+//   [1;94m-->[0m  [4mschema.prisma:14[0m
 // [1;94m   | [0m
-// [1;94m14 | [0m
-// [1;94m15 | [0m  [1;91m@@map("pets")[0m
+// [1;94m13 | [0m
+// [1;94m14 | [0m  [1;91m@@map("pets")[0m
 // [1;94m   | [0m

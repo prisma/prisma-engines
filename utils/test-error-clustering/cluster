@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+SCRIPT_DIR=$(dirname "$0")
+VENV_DIR="$SCRIPT_DIR/.venv"
+
+if ! [ -d "$VENV_DIR" ]; then
+  echo 'Installing dependencies into a Python virtual environment (venv):'
+
+  if ! which python3; then
+    echo 'This script requires a recent version of Python 3 (tested with 3.12.3)'
+    exit 1
+  fi
+
+  pushd "$SCRIPT_DIR"
+  python3 -m venv .venv
+  # shellcheck source=/dev/null
+  . "$VENV_DIR/bin/activate"
+  pip3 install -r "$SCRIPT_DIR/requirements.txt"
+  popd
+
+  echo 'Done installing dependencies.'
+  echo ''
+fi
+
+# shellcheck source=/dev/null
+. "$VENV_DIR/bin/activate"
+python3 "$SCRIPT_DIR/cluster.py" "$@"

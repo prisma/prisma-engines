@@ -1,0 +1,13 @@
+generator client {
+  provider        = "prisma-client"
+  previewFeatures = ["views"]
+}
+
+datasource db {
+  provider = "mongodb"
+}
+
+type Address {
+  city     String
+  postCode String
+}

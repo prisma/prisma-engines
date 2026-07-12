@@ -1,3 +1,5 @@
+use crosstarget_utils::{RegExpCompat, regex::RegExp};
+use enumflags2::BitFlags;
 use std::fmt::{Display, Formatter};
 
 use crate::error::{DatabaseConstraint, Error, ErrorKind, Name};
@@ -19,13 +21,18 @@ impl Display for PostgresError {
     fn fmt(&self, fmt: &mut Formatter<'_>) -> std::fmt::Result {
         write!(fmt, "{}: {}", self.severity, self.message)?;
         if let Some(detail) = &self.detail {
-            write!(fmt, "\nDETAIL: {}", detail)?;
+            write!(fmt, "\nDETAIL: {detail}")?;
         }
         if let Some(hint) = &self.hint {
-            write!(fmt, "\nHINT: {}", hint)?;
+            write!(fmt, "\nHINT: {hint}")?;
         }
         Ok(())
     }
+}
+
+fn extract_fk_constraint_name(message: &str) -> Option<String> {
+    let re = RegExp::new(r#"foreign key constraint "([^"]+)""#, BitFlags::empty()).unwrap();
+    re.captures(message).and_then(|caps| caps.get(1).cloned())
 }
 
 impl From<PostgresError> for Error {
@@ -46,7 +53,7 @@ impl From<PostgresError> for Error {
                     .detail
                     .as_ref()
                     .and_then(|d| d.split(")=(").next())
-                    .and_then(|d| d.split(" (").nth(1).map(|s| s.replace('\"', "")))
+                    .and_then(|d| d.split_once(" (").map(|(_, rest)| rest.replace('"', "")))
                     .map(|s| DatabaseConstraint::fields(s.split(", ")))
                     .unwrap_or(DatabaseConstraint::CannotParse);
 
@@ -89,12 +96,8 @@ impl From<PostgresError> for Error {
                     builder.build()
                 }
                 None => {
-                    let constraint = value
-                        .message
-                        .split_whitespace()
-                        .nth(10)
-                        .and_then(|s| s.split('"').nth(1))
-                        .map(ToString::to_string)
+                    // `value.message` looks like `update on table "Child" violates foreign key constraint "Child_parent_id_fkey"`
+                    let constraint = extract_fk_constraint_name(value.message.as_str())
                         .map(DatabaseConstraint::Index)
                         .unwrap_or(DatabaseConstraint::CannotParse);
 

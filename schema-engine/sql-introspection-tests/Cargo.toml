@@ -1,32 +1,38 @@
 [package]
 name = "sql-introspection-tests"
 version = "0.1.0"
-edition = "2021"
+edition.workspace = true
 
 [dependencies]
-schema-connector = { path = "../connectors/schema-connector" }
-sql-schema-connector = { path = "../connectors/sql-schema-connector" }
-sql-schema-describer = { path = "../sql-schema-describer" }
-psl = { workspace = true, features = ["all"] }
-test-macros = { path = "../../libs/test-macros" }
-user-facing-errors = { path = "../../libs/user-facing-errors", features = [
+schema-core.workspace = true
+schema-connector = { workspace = true, features = [
     "all-native",
 ] }
-test-setup = { path = "../../libs/test-setup" }
+sql-schema-connector = { workspace = true, features = [
+    "all-native",
+] }
+sql-schema-describer = { workspace = true, features = [
+    "all-native",
+] }
+psl = { workspace = true, features = ["all"] }
+test-macros.workspace = true
+user-facing-errors = { workspace = true, features = [
+    "all-native",
+] }
+test-setup.workspace = true
 itertools.workspace = true
 
 enumflags2.workspace = true
 connection-string.workspace = true
-pretty_assertions = "1"
-tracing-futures = "0.2"
+pretty_assertions.workspace = true
+tracing-futures.workspace = true
 tokio.workspace = true
 tracing.workspace = true
 indoc.workspace = true
-expect-test = "1.1.0"
+expect-test.workspace = true
 url.workspace = true
 quaint = { workspace = true, features = ["all-native"] }
 
 [dependencies.barrel]
-git = "https://github.com/prisma/barrel.git"
+workspace = true
 features = ["sqlite3", "mysql", "pg", "mssql"]
-branch = "mssql-support"

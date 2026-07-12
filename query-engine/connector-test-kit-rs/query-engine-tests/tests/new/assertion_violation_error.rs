@@ -6,15 +6,7 @@ mod raw_params {
     // On other drivers, an error is triggered when `n` is double than 32768.
     // `Message: `ERROR: bind message supplies 0 parameters, but prepared statement requires 65536.`
     // with "error_code": "P2010"
-    #[connector_test(
-        only(Postgres),
-        exclude(
-            Postgres("neon.js"),
-            Postgres("pg.js"),
-            Postgres("neon.js.wasm"),
-            Postgres("pg.js.wasm")
-        )
-    )]
+    #[connector_test(only(Postgres), exclude(Postgres("neon.js.wasm"), Postgres("pg.js.wasm")))]
     async fn value_too_many_bind_variables(runner: Runner) -> TestResult<()> {
         let n = 32768;
 

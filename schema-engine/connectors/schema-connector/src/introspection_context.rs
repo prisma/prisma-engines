@@ -43,7 +43,7 @@ impl IntrospectionContext {
         composite_type_depth: CompositeTypeDepth,
         namespaces: Option<Vec<String>>,
         base_directory_path: PathBuf,
-    ) -> Self {
+    ) -> Result<Self, String> {
         let mut config_blocks = String::new();
 
         for source in previous_schema.db.datasources() {
@@ -57,18 +57,17 @@ impl IntrospectionContext {
             config_blocks.push('\n');
         }
 
-        let previous_schema_config_only = psl::parse_schema_multi(&[(
+        let previous_schema_config_only = psl::parse_schema_multi_without_extensions(&[(
             Self::introspection_file_path_impl(&previous_schema, &base_directory_path).to_string(),
             config_blocks.into(),
-        )])
-        .unwrap();
+        )])?;
 
-        Self::new(
+        Ok(Self::new(
             previous_schema_config_only,
             composite_type_depth,
             namespaces,
             base_directory_path,
-        )
+        ))
     }
 
     /// The PSL file with the previous schema definition.
@@ -109,10 +108,15 @@ impl IntrospectionContext {
     /// The SQL family we're using currently.
     pub fn sql_family(&self) -> SqlFamily {
         match self.datasource().active_provider {
+            #[cfg(feature = "postgresql")]
             "postgresql" => SqlFamily::Postgres,
+            #[cfg(feature = "cockroachdb")]
             "cockroachdb" => SqlFamily::Postgres,
+            #[cfg(feature = "sqlite")]
             "sqlite" => SqlFamily::Sqlite,
+            #[cfg(feature = "mssql")]
             "sqlserver" => SqlFamily::Mssql,
+            #[cfg(feature = "mysql")]
             "mysql" => SqlFamily::Mysql,
             name => unreachable!("The name `{}` for the datamodel connector is not known", name),
         }
@@ -148,13 +152,14 @@ impl IntrospectionContext {
 }
 
 /// Control type for composite type traversal.
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, Default)]
 pub enum CompositeTypeDepth {
     /// Allow maximum of n layers of nested types.
     Level(usize),
     /// Unrestricted traversal.
     Infinite,
     /// No traversal, typing into dynamic Json.
+    #[default]
     None,
 }
 
@@ -165,12 +170,6 @@ impl From<isize> for CompositeTypeDepth {
             0 => Self::None,
             _ => Self::Level(size as usize),
         }
-    }
-}
-
-impl Default for CompositeTypeDepth {
-    fn default() -> Self {
-        Self::None
     }
 }
 

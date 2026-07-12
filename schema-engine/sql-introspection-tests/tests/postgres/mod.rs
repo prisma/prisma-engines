@@ -16,7 +16,7 @@ async fn sequences_should_work(api: &mut TestApi) -> TestResult {
         CREATE SEQUENCE "first_Sequence";
         CREATE SEQUENCE "second_sequence";
         CREATE SEQUENCE "third_Sequence";
- 
+
         CREATE TABLE "Test" (
             id INTEGER PRIMARY KEY,
             serial Serial,
@@ -30,12 +30,11 @@ async fn sequences_should_work(api: &mut TestApi) -> TestResult {
 
     let expectation = expect![[r#"
         generator client {
-          provider = "prisma-client-js"
+          provider = "prisma-client"
         }
 
         datasource db {
           provider = "postgresql"
-          url      = "env(TEST_DATABASE_URL)"
         }
 
         model Test {
@@ -125,12 +124,11 @@ async fn scalar_list_defaults_work(api: &mut TestApi) -> TestResult {
 
     let expectation = expect![[r#"
         generator client {
-          provider = "prisma-client-js"
+          provider = "prisma-client"
         }
 
         datasource db {
           provider = "postgresql"
-          url      = "env(TEST_DATABASE_URL)"
         }
 
         model defaults {
@@ -182,12 +180,11 @@ async fn index_sort_order_stopgap(api: &mut TestApi) -> TestResult {
 
     let expectation = expect![[r#"
         generator client {
-          provider = "prisma-client-js"
+          provider = "prisma-client"
         }
 
         datasource db {
           provider = "postgresql"
-          url      = "env(TEST_DATABASE_URL)"
         }
 
         /// This model contains an index with non-default null sort order and requires additional setup for migrations. Visit https://pris.ly/d/default-index-null-ordering for more info.
@@ -283,12 +280,11 @@ async fn deferrable_stopgap(api: &mut TestApi) -> TestResult {
 
     let expectation = expect![[r#"
         generator client {
-          provider = "prisma-client-js"
+          provider = "prisma-client"
         }
 
         datasource db {
           provider = "postgresql"
-          url      = "env(TEST_DATABASE_URL)"
         }
 
         /// This model has constraints using non-default deferring rules and requires additional setup for migrations. Visit https://pris.ly/d/constraint-deferring for more info.
@@ -378,13 +374,12 @@ async fn commenting_stopgap(api: &mut TestApi) -> TestResult {
 
     let expectation = expect![[r#"
         generator client {
-          provider        = "prisma-client-js"
+          provider        = "prisma-client"
           previewFeatures = ["views"]
         }
 
         datasource db {
           provider = "postgresql"
-          url      = "env(TEST_DATABASE_URL)"
         }
 
         /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
@@ -393,12 +388,9 @@ async fn commenting_stopgap(api: &mut TestApi) -> TestResult {
           val String? @db.VarChar(20)
         }
 
-        /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
         /// This view or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
         view b {
           val String? @db.VarChar(20)
-
-          @@ignore
         }
 
         /// This enum is commented in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
@@ -412,9 +404,6 @@ async fn commenting_stopgap(api: &mut TestApi) -> TestResult {
 
     let expectation = expect![[r#"
         *** WARNING ***
-
-        The following views were ignored as they do not have a valid unique identifier or id. This is currently not supported by Prisma Client. Please refer to the documentation on defining unique identifiers in views: https://pris.ly/d/view-identifiers
-          - "b"
 
         These objects have comments defined in the database, which is not yet fully supported. Read more: https://pris.ly/d/database-comments
           - Type: "enum", name: "c"
@@ -434,20 +423,17 @@ async fn commenting_stopgap(api: &mut TestApi) -> TestResult {
           val String? @db.VarChar(20)
         }
 
-        /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
         /// This view is commented in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
         view b {
           /// This field is commented in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
           val String? @db.VarChar(20)
-
-          @@ignore
         }
 
         /// This enum is commented in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
         enum c {
           a
           b
-        }   
+        }
     "#};
 
     let expectation = expect![[r#"
@@ -458,13 +444,10 @@ async fn commenting_stopgap(api: &mut TestApi) -> TestResult {
           val String? @db.VarChar(20)
         }
 
-        /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
         /// This view is commented in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
         view b {
           /// This field is commented in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
           val String? @db.VarChar(20)
-
-          @@ignore
         }
 
         /// This enum is commented in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments

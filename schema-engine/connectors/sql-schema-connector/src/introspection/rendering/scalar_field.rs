@@ -26,7 +26,7 @@ pub(crate) fn render(field: ScalarFieldPair<'_>) -> renderer::Field<'_> {
     }
 
     if let Some((prefix, r#type, params)) = field.native_type() {
-        rendered.native_type(prefix, r#type, params)
+        rendered.native_type(prefix, r#type, params.iter().cloned())
     }
 
     if let Some(docs) = field.documentation() {
@@ -106,6 +106,10 @@ fn render_unique(unique: IndexPair<'_>) -> renderer::UniqueFieldAttribute<'_> {
 
     if let Some(length) = field.length() {
         opts.length(length);
+    }
+
+    if let Some(predicate) = unique.predicate() {
+        opts.where_clause(predicate);
     }
 
     opts

@@ -1,6 +1,7 @@
 //! The migration connector ConnectorError type.
 
-use crate::migrations_directory::{ListMigrationsError, ReadMigrationScriptError};
+use crate::migrations_directory::ReadMigrationScriptError;
+use js_sys::Reflect;
 use std::{
     error::Error as StdError,
     fmt::{Debug, Display, Write},
@@ -8,8 +9,11 @@ use std::{
 };
 use tracing_error::SpanTrace;
 use user_facing_errors::{
-    common::SchemaParserError, schema_engine::MigrationFileNotFound, KnownError, UserFacingError,
+    KnownError, UserFacingError,
+    common::{InvalidConnectionString, SchemaParserError},
+    schema_engine::MigrationFileNotFound,
 };
+use wasm_bindgen::JsValue;
 
 /// The general error reporting type for migration connectors.
 #[derive(Clone)]
@@ -26,7 +30,7 @@ struct ConnectorErrorImpl {
     /// Additional context.
     message: Option<Box<str>>,
     /// The source of the error.
-    source: Option<Arc<(dyn StdError + Send + Sync + 'static)>>,
+    source: Option<Arc<dyn StdError + Send + Sync + 'static>>,
     /// See the tracing-error docs.
     context: SpanTrace,
 }
@@ -184,6 +188,14 @@ impl ConnectorError {
         ConnectorError::user_facing(SchemaParserError { full_error })
     }
 
+    /// Creates a new P1013 user facing error due to an invalid datasource
+    /// connection string.
+    pub fn new_invalid_datasource_error(details: impl ToString) -> Self {
+        ConnectorError::user_facing(InvalidConnectionString {
+            details: details.to_string(),
+        })
+    }
+
     /// Try to downcast the source to a specific type.
     pub fn source_as<T: StdError + 'static>(&self) -> Option<&T> {
         let source = self.0.source.as_ref()?;
@@ -216,6 +228,44 @@ impl ConnectorError {
     }
 }
 
+impl ConnectorError {
+    /// Convert this error into a `wasm_bindgen::JsError` for use in WebAssembly contexts.
+    ///
+    /// This preserves the error message, error code (if available), and context information
+    /// from the original error.
+    pub fn into_js_error(self) -> JsValue {
+        let error_name = "SchemaConnectorError";
+
+        // Include known error information if available
+        if let Some(known_error) = self.known_error() {
+            let error = js_sys::Error::new(&known_error.message);
+            error.set_name(error_name);
+
+            let obj = JsValue::from(error);
+
+            _ = Reflect::set(
+                &obj,
+                &JsValue::from("code"),
+                &JsValue::from(known_error.error_code.to_string()),
+            );
+            return obj;
+        }
+
+        // Get the full error display representation, and use it as a fallback
+        let error_string = self.to_string();
+        let error = js_sys::Error::new(&error_string);
+        error.set_name(error_name);
+
+        JsValue::from(error)
+    }
+}
+
+impl From<ConnectorError> for JsValue {
+    fn from(err: ConnectorError) -> JsValue {
+        err.into_js_error()
+    }
+}
+
 impl From<KnownError> for ConnectorError {
     fn from(err: KnownError) -> Self {
         ConnectorError(Box::new(ConnectorErrorImpl {
@@ -242,14 +292,8 @@ impl From<ReadMigrationScriptError> for ConnectorError {
     }
 }
 
-impl From<ListMigrationsError> for ConnectorError {
-    fn from(err: ListMigrationsError) -> Self {
-        ConnectorError::from_msg(err.to_string())
-    }
-}
-
 fn invalid_connection_string_description(error_details: impl Display) -> String {
-    let docs = r#"https://www.prisma.io/docs/reference/database-reference/connection-urls"#;
+    let docs = r#"https://pris.ly/d/config-url"#;
 
     format! {r#"{error_details} in database URL. Please refer to the documentation in {docs} for constructing a correct connection string. In some cases, certain characters must be escaped. Please check the string for any illegal characters."#}
 }

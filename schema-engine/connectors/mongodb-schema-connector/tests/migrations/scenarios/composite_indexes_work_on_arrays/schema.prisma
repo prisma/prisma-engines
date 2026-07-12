@@ -1,11 +1,9 @@
 datasource db {
   provider = "mongodb"
-  url      = "mongodb://"
 }
 
 generator js {
-  provider        = "prisma-client-js"
-  previewFeatures = ["fullTextIndex"]
+  provider = "prisma-client"
 }
 
 type Address {

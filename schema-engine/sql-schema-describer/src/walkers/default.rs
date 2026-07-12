@@ -24,7 +24,7 @@ impl<'a> DefaultValueWalker<'a> {
     /// Return a value if a constant.
     pub fn as_value(self) -> Option<&'a PrismaValue> {
         match self.kind() {
-            DefaultKind::Value(ref v) => Some(v),
+            DefaultKind::Value(v) => Some(v),
             _ => None,
         }
     }

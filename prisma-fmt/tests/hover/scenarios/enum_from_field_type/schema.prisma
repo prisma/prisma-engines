@@ -1,0 +1,15 @@
+datasource db {
+    provider = "mongodb"
+}
+
+model User {
+    id String @id @map("_id")
+    pet Ani<|>mal
+}
+
+// Animal Doc
+enum Animal {
+    REDPANDA
+    CAT
+    DOG
+}

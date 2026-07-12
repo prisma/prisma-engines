@@ -1,19 +1,60 @@
 mod actions;
 mod code_actions;
 mod get_config;
+mod get_datamodel;
 mod get_dmmf;
+mod hover;
 mod lint;
 mod merge_schemas;
 mod native;
 mod preview;
+mod references;
 mod schema_file_input;
 mod text_document_completion;
 mod validate;
 
+pub mod offsets;
+
 use log::*;
-use lsp_types::{Position, Range};
-use psl::{diagnostics::FileId, parser_database::ast};
+use psl::{
+    Configuration, Datasource, Generator, datamodel_connector::Connector, diagnostics::FileId,
+    parser_database::ParserDatabase,
+};
 use schema_file_input::SchemaFileInput;
+use serde_json::json;
+
+#[derive(Debug, Clone, Copy)]
+pub(crate) struct LSPContext<'a, T> {
+    pub(crate) db: &'a ParserDatabase,
+    pub(crate) config: &'a Configuration,
+    pub(crate) initiating_file_id: FileId,
+    pub(crate) params: &'a T,
+}
+
+impl<'a, T> LSPContext<'a, T> {
+    pub(crate) fn initiating_file_source(&self) -> &str {
+        self.db.source(self.initiating_file_id)
+    }
+
+    pub(crate) fn initiating_file_uri(&self) -> &str {
+        self.db.file_name(self.initiating_file_id)
+    }
+
+    pub(crate) fn datasource(&self) -> Option<&Datasource> {
+        self.config.datasources.first()
+    }
+
+    pub(crate) fn connector(&self) -> &'static dyn Connector {
+        self.datasource()
+            .map(|ds| ds.active_connector)
+            .unwrap_or(&psl::datamodel_connector::EmptyDatamodelConnector)
+    }
+
+    #[allow(dead_code)]
+    pub(crate) fn generator(&self) -> Option<&'a Generator> {
+        self.config.generators.first()
+    }
+}
 
 /// The API is modelled on an LSP [completion
 /// request](https://github.com/microsoft/language-server-protocol/blob/gh-pages/_specifications/specification-3-16.md#textDocument_completion).
@@ -48,23 +89,63 @@ pub fn code_actions(schema_files: String, params: &str) -> String {
 
     let Ok(input) = serde_json::from_str::<SchemaFileInput>(&schema_files) else {
         warn!("Failed to parse schema file input");
-        return serde_json::to_string(&text_document_completion::empty_completion_list()).unwrap();
+        return serde_json::to_string(&code_actions::empty_code_actions()).unwrap();
     };
 
     let actions = code_actions::available_actions(input.into(), params);
     serde_json::to_string(&actions).unwrap()
 }
 
+pub fn references(schema_files: String, params: &str) -> String {
+    let params: lsp_types::ReferenceParams = if let Ok(params) = serde_json::from_str(params) {
+        params
+    } else {
+        warn!("Failed to parse params to references() as ReferenceParams.");
+        return serde_json::to_string(&references::empty_references()).unwrap();
+    };
+
+    let Ok(input) = serde_json::from_str::<SchemaFileInput>(&schema_files) else {
+        warn!("Failed to parse schema file input");
+        return serde_json::to_string(&references::empty_references()).unwrap();
+    };
+
+    let references = references::references(input.into(), params);
+    serde_json::to_string(&references).unwrap()
+}
+
+pub fn hover(schema_files: String, params: &str) -> String {
+    let schema: SchemaFileInput = match serde_json::from_str(&schema_files) {
+        Ok(schema) => schema,
+        Err(serde_err) => {
+            warn!("Failed to deserialize SchemaFileInput: {serde_err}");
+            return json!(null).to_string();
+        }
+    };
+
+    let params: lsp_types::HoverParams = match serde_json::from_str(params) {
+        Ok(params) => params,
+        Err(_) => {
+            warn!("Failed to deserialize Hover");
+            return json!(null).to_string();
+        }
+    };
+
+    let hover = hover::run(schema.into(), params);
+
+    serde_json::to_string(&hover).unwrap()
+}
+
 /// The two parameters are:
 /// - The [`SchemaFileInput`] to reformat, as a string.
-/// - An LSP
-/// [DocumentFormattingParams](https://github.com/microsoft/language-server-protocol/blob/gh-pages/_specifications/specification-3-16.md#textDocument_formatting) object, as JSON.
+/// - An LSP [`DocumentFormattingParams`][1] object, as JSON.
 ///
 /// The function returns the formatted schema, as a string.
 /// If the schema or any of the provided parameters is invalid, the function returns the original schema.
 /// This function never panics.
 ///
 /// Of the DocumentFormattingParams, we only take into account tabSize, at the moment.
+///
+/// [1]: https://github.com/microsoft/language-server-protocol/blob/gh-pages/_specifications/specification-3-16.md#textDocument_formatting
 pub fn format(datamodel: String, params: &str) -> String {
     let schema: SchemaFileInput = match serde_json::from_str(&datamodel) {
         Ok(params) => params,
@@ -222,131 +303,12 @@ pub fn get_dmmf(get_dmmf_params: String) -> Result<String, String> {
     get_dmmf::get_dmmf(&get_dmmf_params)
 }
 
-/// The LSP position is expressed as a (line, col) tuple, but our pest-based parser works with byte
-/// offsets. This function converts from an LSP position to a pest byte offset. Returns `None` if
-/// the position has a line past the end of the document, or a character position past the end of
-/// the line.
-pub(crate) fn position_to_offset(position: &Position, document: &str) -> Option<usize> {
-    let mut offset = 0;
-    let mut line_offset = position.line;
-    let mut character_offset = position.character;
-    let mut chars = document.chars();
-
-    while line_offset > 0 {
-        loop {
-            match chars.next() {
-                Some('\n') => {
-                    offset += 1;
-                    break;
-                }
-                Some(_) => {
-                    offset += 1;
-                }
-                None => return Some(offset),
-            }
-        }
-
-        line_offset -= 1;
-    }
-
-    while character_offset > 0 {
-        match chars.next() {
-            Some('\n') | None => return Some(offset),
-            Some(_) => {
-                offset += 1;
-                character_offset -= 1;
-            }
-        }
-    }
-
-    Some(offset)
+/// Returns DMMF JSON as bytes instead of String to avoid V8 string length limit.
+/// See: https://github.com/prisma/prisma/issues/29111
+pub fn get_dmmf_bytes(get_dmmf_params: String) -> Result<Vec<u8>, String> {
+    get_dmmf::get_dmmf(&get_dmmf_params).map(String::into_bytes)
 }
 
-#[track_caller]
-/// Converts an LSP range to a span.
-pub(crate) fn range_to_span(range: Range, document: &str, file_id: FileId) -> ast::Span {
-    let start = position_to_offset(&range.start, document).unwrap();
-    let end = position_to_offset(&range.end, document).unwrap();
-
-    ast::Span::new(start, end, file_id)
-}
-
-/// Gives the LSP position right after the given span, skipping any trailing newlines
-pub(crate) fn position_after_span(span: ast::Span, document: &str) -> Position {
-    let end = match (document.chars().nth(span.end - 2), document.chars().nth(span.end - 1)) {
-        (Some('\r'), Some('\n')) => span.end - 2,
-        (_, Some('\n')) => span.end - 1,
-        _ => span.end,
-    };
-
-    offset_to_position(end, document)
-}
-
-/// Converts a byte offset to an LSP position, if the given offset
-/// does not overflow the document.
-pub fn offset_to_position(offset: usize, document: &str) -> Position {
-    let mut position = Position::default();
-
-    for (i, chr) in document.chars().enumerate() {
-        match chr {
-            _ if i == offset => {
-                return position;
-            }
-            '\n' => {
-                position.character = 0;
-                position.line += 1;
-            }
-            _ => {
-                position.character += 1;
-            }
-        }
-    }
-
-    position
-}
-
-#[cfg(test)]
-mod tests {
-    use lsp_types::Position;
-    use psl::diagnostics::{FileId, Span};
-
-    use crate::position_after_span;
-
-    // On Windows, a newline is actually two characters.
-    #[test]
-    fn position_to_offset_with_crlf() {
-        let schema = "\r\nmodel Test {\r\n    id Int @id\r\n}";
-        // Let's put the cursor on the "i" in "id Int".
-        let expected_offset = schema.chars().position(|c| c == 'i').unwrap();
-        let found_offset = super::position_to_offset(&Position { line: 2, character: 4 }, schema).unwrap();
-
-        assert_eq!(found_offset, expected_offset);
-    }
-
-    #[test]
-    fn position_after_span_no_newline() {
-        let str = "some string";
-        let span = Span::new(0, str.len(), FileId::ZERO);
-        let pos = position_after_span(span, str);
-        assert_eq!(pos.line, 0);
-        assert_eq!(pos.character, 11);
-    }
-
-    #[test]
-    fn position_after_span_lf() {
-        let str = "some string\n";
-        let span = Span::new(0, str.len(), FileId::ZERO);
-        let pos = position_after_span(span, str);
-        assert_eq!(pos.line, 0);
-        assert_eq!(pos.character, 11);
-    }
-
-    #[test]
-    fn position_after_span_crlf() {
-        let str = "some string\r\n";
-        let span = Span::new(0, str.len(), FileId::ZERO);
-        let pos = position_after_span(span, str);
-        assert_eq!(pos.line, 0);
-        assert_eq!(pos.character, 11);
-    }
+pub fn get_datamodel(get_datamodel_params: String) -> Result<String, String> {
+    get_datamodel::get_datamodel(&get_datamodel_params)
 }

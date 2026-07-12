@@ -1,7 +1,7 @@
 use indoc::indoc;
 use query_engine_tests::*;
 
-#[test_suite(only(Mysql("8")))]
+#[test_suite(only(Mysql("8", "mariadb-mysql.js.wasm")))]
 mod datetime {
     fn schema_date() -> String {
         let schema = indoc! {
@@ -11,7 +11,7 @@ mod datetime {
               childId Int? @unique
               child Child? @relation(fields: [childId], references: [id])
             }
-            
+
             model Child {
                 #id(id, Int, @id)
                 date       DateTime @test.Date
@@ -63,15 +63,15 @@ mod datetime {
 
     async fn create_row(runner: &Runner, data: &str) -> TestResult<()> {
         runner
-            .query(format!("mutation {{ createOneParent(data: {}) {{ id }} }}", data))
+            .query(format!("mutation {{ createOneParent(data: {data}) {{ id }} }}"))
             .await?
             .assert_success();
         Ok(())
     }
 }
 
-#[test_suite(only(Mysql("8")))]
-mod decimal {
+#[test_suite(only(Mysql("8", "mariadb-mysql.js.wasm")))]
+mod mysql_decimal {
     fn schema_decimal() -> String {
         let schema = indoc! {
             r#"
@@ -113,25 +113,35 @@ mod decimal {
         )
         .await?;
 
-        insta::assert_snapshot!(
-          run_query!(&runner, r#"{ findManyParent { id child { float dfloat decFloat } } }"#),
-          @r###"{"data":{"findManyParent":[{"id":1,"child":{"float":1.1,"dfloat":2.2,"decFloat":"3.1"}}]}}"###
-        );
+        let res = runner
+            .query(r#"{ findManyParent { id child { float dfloat decFloat } } }"#)
+            .await?
+            .into_data();
+
+        let row = &res.first().expect("should have one result")["findManyParent"]
+            .as_array()
+            .expect("should be an array")
+            .first()
+            .expect("should have one result")["child"];
+
+        assert_eq!(row["float"].as_f64().unwrap() as f32, 1.1);
+        assert_eq!(row["dfloat"].as_f64().unwrap(), 2.2);
+        assert_eq!(row["decFloat"].as_str().unwrap(), "3.1");
 
         Ok(())
     }
 
     async fn create_row(runner: &Runner, data: &str) -> TestResult<()> {
         runner
-            .query(format!("mutation {{ createOneParent(data: {}) {{ id }} }}", data))
+            .query(format!("mutation {{ createOneParent(data: {data}) {{ id }} }}"))
             .await?
             .assert_success();
         Ok(())
     }
 }
 
-#[test_suite(only(Mysql("8")))]
-mod string {
+#[test_suite(only(Mysql("8", "mariadb-mysql.js.wasm")))]
+mod mysql_string {
     fn schema_string() -> String {
         let schema = indoc! {
             r#"
@@ -198,15 +208,15 @@ mod string {
 
     async fn create_row(runner: &Runner, data: &str) -> TestResult<()> {
         runner
-            .query(format!("mutation {{ createOneParent(data: {}) {{ id }} }}", data))
+            .query(format!("mutation {{ createOneParent(data: {data}) {{ id }} }}"))
             .await?
             .assert_success();
         Ok(())
     }
 }
 
-#[test_suite(only(MySql("8")))]
-mod bytes {
+#[test_suite(only(MySql("8", "mariadb-mysql.js.wasm")))]
+mod mysql_bytes {
     fn schema_bytes() -> String {
         let schema = indoc! {
             r#"
@@ -276,7 +286,7 @@ mod bytes {
 
     async fn create_row(runner: &Runner, data: &str) -> TestResult<()> {
         runner
-            .query(format!("mutation {{ createOneParent(data: {}) {{ id }} }}", data))
+            .query(format!("mutation {{ createOneParent(data: {data}) {{ id }} }}"))
             .await?
             .assert_success();
         Ok(())

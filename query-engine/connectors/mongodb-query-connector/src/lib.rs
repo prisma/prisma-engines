@@ -14,11 +14,10 @@ mod query_strings;
 mod root_queries;
 mod value;
 
+use bson::Bson;
+use bson::Document;
 use error::MongoError;
-use mongodb::{
-    bson::{Bson, Document},
-    ClientSession, SessionCursor,
-};
+use mongodb::{ClientSession, SessionCursor};
 
 pub use interface::*;
 

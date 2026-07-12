@@ -1,22 +1,21 @@
 mod utils;
 
 use enumflags2::BitFlags;
-pub use expect_test::expect;
 use expect_test::Expect;
+pub use expect_test::expect;
 use itertools::Itertools;
 use mongodb::Database;
 use mongodb_schema_connector::MongoDbSchemaConnector;
-use once_cell::sync::Lazy;
-use psl::PreviewFeature;
+use psl::{FeatureMapWithProvider, PreviewFeature, parser_database::NoExtensionTypes};
 use schema_connector::{
     CompositeTypeDepth, ConnectorParams, IntrospectionContext, IntrospectionResult, SchemaConnector,
 };
-use std::{future::Future, path::PathBuf};
+use std::{future::Future, path::PathBuf, sync::LazyLock};
 use tokio::runtime::Runtime;
 
 pub use utils::*;
 
-pub static RT: Lazy<Runtime> = Lazy::new(|| Runtime::new().unwrap());
+pub static RT: LazyLock<Runtime> = LazyLock::new(|| Runtime::new().unwrap());
 
 pub struct TestResult {
     datamodel: String,
@@ -71,8 +70,6 @@ impl From<IntrospectionResult> for TestMultiResult {
 }
 
 pub struct TestApi {
-    pub connection_string: String,
-    pub database_name: String,
     pub db: Database,
     pub features: BitFlags<PreviewFeature>,
     pub connector: MongoDbSchemaConnector,
@@ -82,16 +79,16 @@ impl TestApi {
     pub async fn re_introspect_multi(&mut self, datamodels: &[(&str, String)], expectation: expect_test::Expect) {
         let schema = parse_datamodels(datamodels);
         let ctx = IntrospectionContext::new(schema, CompositeTypeDepth::Infinite, None, PathBuf::new());
-        let reintrospected = self.connector.introspect(&ctx).await.unwrap();
+        let reintrospected = self.connector.introspect(&ctx, &NoExtensionTypes).await.unwrap();
         let reintrospected = TestMultiResult::from(reintrospected);
 
         expectation.assert_eq(reintrospected.datamodels());
     }
 
     pub async fn expect_warnings(&mut self, expectation: &expect_test::Expect) {
-        let previous_schema = psl::validate(config_block_string(self.features).into());
+        let previous_schema = psl::validate_without_extensions(config_block_string(self.features).into());
         let ctx = IntrospectionContext::new(previous_schema, CompositeTypeDepth::Infinite, None, PathBuf::new());
-        let result = self.connector.introspect(&ctx).await.unwrap();
+        let result = self.connector.introspect(&ctx, &NoExtensionTypes).await.unwrap();
         let result = TestMultiResult::from(result);
 
         expectation.assert_eq(&result.warnings);
@@ -122,8 +119,6 @@ where
         let connector = MongoDbSchemaConnector::new(params);
 
         let api = TestApi {
-            connection_string,
-            database_name,
             db: database.clone(),
             features: preview_features,
             connector,
@@ -131,7 +126,7 @@ where
 
         let res = setup(api).await;
 
-        database.drop(None).await.unwrap();
+        database.drop().await.unwrap();
 
         res
     })
@@ -155,14 +150,14 @@ where
     U: Future<Output = mongodb::error::Result<()>>,
 {
     let datamodel_string = config_block_string(preview_features);
-    let validated_schema = psl::parse_schema(datamodel_string).unwrap();
+    let validated_schema = psl::parse_schema_without_extensions(datamodel_string).unwrap();
     let ctx = IntrospectionContext::new(validated_schema, composite_type_depth, None, PathBuf::new())
         .without_config_rendering();
     let res = with_database_features(
         |mut api| async move {
             init_database(api.db).await.unwrap();
 
-            let res = api.connector.introspect(&ctx).await.unwrap();
+            let res = api.connector.introspect(&ctx, &NoExtensionTypes).await.unwrap();
 
             Ok(res)
         },
@@ -181,7 +176,9 @@ where
     F: FnOnce(Database) -> U,
     U: Future<Output = mongodb::error::Result<()>>,
 {
-    let enabled_preview_features = BitFlags::all();
+    let feature_map_with_provider = FeatureMapWithProvider::new(Some("mongodb"));
+    let enabled_preview_features = feature_map_with_provider.active_features();
+
     introspect_features(composite_type_depth, enabled_preview_features, init_database)
 }
 

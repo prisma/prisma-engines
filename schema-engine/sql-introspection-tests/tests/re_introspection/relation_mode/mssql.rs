@@ -11,7 +11,7 @@ async fn referential_integrity_prisma(api: &mut TestApi) -> TestResult {
             CONSTRAINT [Foo_pkey] PRIMARY KEY CLUSTERED ([id]),
             CONSTRAINT [Foo_bar_id_key] UNIQUE NONCLUSTERED ([bar_id])
         );
-        
+
         CREATE TABLE [dbo].[Bar] (
             [id] INT NOT NULL,
             CONSTRAINT [Bar_pkey] PRIMARY KEY CLUSTERED ([id])
@@ -22,12 +22,11 @@ async fn referential_integrity_prisma(api: &mut TestApi) -> TestResult {
 
     let input = indoc! {r#"
         generator client {
-            provider = "prisma-client-js"
+            provider = "prisma-client"
         }
 
         datasource db {
             provider             = "sqlserver"
-            url                  = env("TEST_DATABASE_URL")
             referentialIntegrity = "prisma"
         }
 
@@ -45,12 +44,11 @@ async fn referential_integrity_prisma(api: &mut TestApi) -> TestResult {
 
     let expected = expect![[r#"
         generator client {
-          provider = "prisma-client-js"
+          provider = "prisma-client"
         }
 
         datasource db {
           provider     = "sqlserver"
-          url          = env("TEST_DATABASE_URL")
           relationMode = "prisma"
         }
 
@@ -82,12 +80,12 @@ async fn referential_integrity_foreign_keys(api: &mut TestApi) -> TestResult {
             CONSTRAINT [Foo_pkey] PRIMARY KEY CLUSTERED ([id]),
             CONSTRAINT [Foo_bar_id_key] UNIQUE NONCLUSTERED ([bar_id])
         );
-        
+
         CREATE TABLE [dbo].[Bar] (
             [id] INT NOT NULL,
             CONSTRAINT [Bar_pkey] PRIMARY KEY CLUSTERED ([id])
         );
-        
+
         ALTER TABLE [dbo].[Foo] ADD CONSTRAINT [Foo_bar_id_fkey] FOREIGN KEY ([bar_id]) REFERENCES [dbo].[Bar]([id]) ON DELETE NO ACTION ON UPDATE CASCADE;
     "#};
 
@@ -95,12 +93,11 @@ async fn referential_integrity_foreign_keys(api: &mut TestApi) -> TestResult {
 
     let input = indoc! {r#"
         generator client {
-            provider = "prisma-client-js"
+            provider = "prisma-client"
         }
 
         datasource db {
             provider             = "sqlserver"
-            url                  = env("TEST_DATABASE_URL")
             referentialIntegrity = "foreignKeys"
         }
 
@@ -118,12 +115,11 @@ async fn referential_integrity_foreign_keys(api: &mut TestApi) -> TestResult {
 
     let expected = expect![[r#"
         generator client {
-          provider = "prisma-client-js"
+          provider = "prisma-client"
         }
 
         datasource db {
           provider     = "sqlserver"
-          url          = env("TEST_DATABASE_URL")
           relationMode = "foreignKeys"
         }
 
@@ -155,7 +151,7 @@ async fn relation_mode_prisma(api: &mut TestApi) -> TestResult {
             CONSTRAINT [Foo_pkey] PRIMARY KEY CLUSTERED ([id]),
             CONSTRAINT [Foo_bar_id_key] UNIQUE NONCLUSTERED ([bar_id])
         );
-        
+
         CREATE TABLE [dbo].[Bar] (
             [id] INT NOT NULL,
             CONSTRAINT [Bar_pkey] PRIMARY KEY CLUSTERED ([id])
@@ -166,12 +162,11 @@ async fn relation_mode_prisma(api: &mut TestApi) -> TestResult {
 
     let input = indoc! {r#"
         generator client {
-            provider = "prisma-client-js"
+            provider = "prisma-client"
         }
 
         datasource db {
             provider     = "sqlserver"
-            url          = env("TEST_DATABASE_URL")
             relationMode = "prisma"
         }
 
@@ -189,12 +184,11 @@ async fn relation_mode_prisma(api: &mut TestApi) -> TestResult {
 
     let expected = expect![[r#"
         generator client {
-          provider = "prisma-client-js"
+          provider = "prisma-client"
         }
 
         datasource db {
           provider     = "sqlserver"
-          url          = env("TEST_DATABASE_URL")
           relationMode = "prisma"
         }
 
@@ -226,12 +220,12 @@ async fn relation_mode_foreign_keys(api: &mut TestApi) -> TestResult {
             CONSTRAINT [Foo_pkey] PRIMARY KEY CLUSTERED ([id]),
             CONSTRAINT [Foo_bar_id_key] UNIQUE NONCLUSTERED ([bar_id])
         );
-        
+
         CREATE TABLE [dbo].[Bar] (
             [id] INT NOT NULL,
             CONSTRAINT [Bar_pkey] PRIMARY KEY CLUSTERED ([id])
         );
-        
+
         ALTER TABLE [dbo].[Foo] ADD CONSTRAINT [Foo_bar_id_fkey] FOREIGN KEY ([bar_id]) REFERENCES [dbo].[Bar]([id]) ON DELETE NO ACTION ON UPDATE CASCADE;
     "#};
 
@@ -239,12 +233,11 @@ async fn relation_mode_foreign_keys(api: &mut TestApi) -> TestResult {
 
     let input = indoc! {r#"
         generator client {
-            provider = "prisma-client-js"
+            provider = "prisma-client"
         }
 
         datasource db {
             provider     = "sqlserver"
-            url          = env("TEST_DATABASE_URL")
             relationMode = "foreignKeys"
         }
 
@@ -262,12 +255,11 @@ async fn relation_mode_foreign_keys(api: &mut TestApi) -> TestResult {
 
     let expected = expect![[r#"
         generator client {
-          provider = "prisma-client-js"
+          provider = "prisma-client"
         }
 
         datasource db {
           provider     = "sqlserver"
-          url          = env("TEST_DATABASE_URL")
           relationMode = "foreignKeys"
         }
 
@@ -304,7 +296,7 @@ mod at_at_map {
                 CONSTRAINT [foo_table_pkey] PRIMARY KEY CLUSTERED ([id]),
                 CONSTRAINT [foo_table_bar_id_key] UNIQUE NONCLUSTERED ([bar_id])
             );
-            
+
             CREATE TABLE [dbo].[bar_table] (
                 [id] INT NOT NULL,
                 CONSTRAINT [bar_table_pkey] PRIMARY KEY CLUSTERED ([id])
@@ -315,12 +307,11 @@ mod at_at_map {
 
         let input = indoc! {r#"
             generator client {
-                provider = "prisma-client-js"
+                provider = "prisma-client"
             }
 
             datasource db {
                 provider             = "sqlserver"
-                url                  = env("TEST_DATABASE_URL")
                 referentialIntegrity = "prisma"
             }
 
@@ -342,12 +333,11 @@ mod at_at_map {
 
         let expected = expect![[r#"
             generator client {
-              provider = "prisma-client-js"
+              provider = "prisma-client"
             }
 
             datasource db {
               provider     = "sqlserver"
-              url          = env("TEST_DATABASE_URL")
               relationMode = "prisma"
             }
 
@@ -383,12 +373,12 @@ mod at_at_map {
                 CONSTRAINT [foo_table_pkey] PRIMARY KEY CLUSTERED ([id]),
                 CONSTRAINT [foo_table_bar_id_key] UNIQUE NONCLUSTERED ([bar_id])
             );
-            
+
             CREATE TABLE [dbo].[bar_table] (
                 [id] INT NOT NULL,
                 CONSTRAINT [bar_table_pkey] PRIMARY KEY CLUSTERED ([id])
             );
-            
+
             ALTER TABLE [dbo].[foo_table] ADD CONSTRAINT [foo_table_bar_id_fkey] FOREIGN KEY ([bar_id]) REFERENCES [dbo].[bar_table]([id]) ON DELETE NO ACTION ON UPDATE CASCADE;
         "#};
 
@@ -396,12 +386,11 @@ mod at_at_map {
 
         let input = indoc! {r#"
             generator client {
-                provider = "prisma-client-js"
+                provider = "prisma-client"
             }
 
             datasource db {
                 provider             = "sqlserver"
-                url                  = env("TEST_DATABASE_URL")
                 referentialIntegrity = "foreignKeys"
             }
 
@@ -423,12 +412,11 @@ mod at_at_map {
 
         let expected = expect![[r#"
             generator client {
-              provider = "prisma-client-js"
+              provider = "prisma-client"
             }
 
             datasource db {
               provider     = "sqlserver"
-              url          = env("TEST_DATABASE_URL")
               relationMode = "foreignKeys"
             }
 
@@ -464,7 +452,7 @@ mod at_at_map {
                 CONSTRAINT [foo_table_pkey] PRIMARY KEY CLUSTERED ([id]),
                 CONSTRAINT [foo_table_bar_id_key] UNIQUE NONCLUSTERED ([bar_id])
             );
-            
+
             CREATE TABLE [dbo].[bar_table] (
                 [id] INT NOT NULL,
                 CONSTRAINT [bar_table_pkey] PRIMARY KEY CLUSTERED ([id])
@@ -475,12 +463,11 @@ mod at_at_map {
 
         let input = indoc! {r#"
             generator client {
-                provider = "prisma-client-js"
+                provider = "prisma-client"
             }
 
             datasource db {
                 provider     = "sqlserver"
-                url          = env("TEST_DATABASE_URL")
                 relationMode = "prisma"
             }
 
@@ -502,12 +489,11 @@ mod at_at_map {
 
         let expected = expect![[r#"
             generator client {
-              provider = "prisma-client-js"
+              provider = "prisma-client"
             }
 
             datasource db {
               provider     = "sqlserver"
-              url          = env("TEST_DATABASE_URL")
               relationMode = "prisma"
             }
 
@@ -543,12 +529,12 @@ mod at_at_map {
                 CONSTRAINT [foo_table_pkey] PRIMARY KEY CLUSTERED ([id]),
                 CONSTRAINT [foo_table_bar_id_key] UNIQUE NONCLUSTERED ([bar_id])
             );
-            
+
             CREATE TABLE [dbo].[bar_table] (
                 [id] INT NOT NULL,
                 CONSTRAINT [bar_table_pkey] PRIMARY KEY CLUSTERED ([id])
             );
-            
+
             ALTER TABLE [dbo].[foo_table] ADD CONSTRAINT [foo_table_bar_id_fkey] FOREIGN KEY ([bar_id]) REFERENCES [dbo].[bar_table]([id]) ON DELETE NO ACTION ON UPDATE CASCADE;
         "#};
 
@@ -556,12 +542,11 @@ mod at_at_map {
 
         let input = indoc! {r#"
             generator client {
-                provider = "prisma-client-js"
+                provider = "prisma-client"
             }
 
             datasource db {
                 provider     = "sqlserver"
-                url          = env("TEST_DATABASE_URL")
                 relationMode = "foreignKeys"
             }
 
@@ -583,12 +568,11 @@ mod at_at_map {
 
         let expected = expect![[r#"
             generator client {
-              provider = "prisma-client-js"
+              provider = "prisma-client"
             }
 
             datasource db {
               provider     = "sqlserver"
-              url          = env("TEST_DATABASE_URL")
               relationMode = "foreignKeys"
             }
 

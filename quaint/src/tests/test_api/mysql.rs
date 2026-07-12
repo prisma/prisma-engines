@@ -1,14 +1,13 @@
 use super::TestApi;
 use crate::{connector::Queryable, single::Quaint};
 use names::Generator;
-use once_cell::sync::Lazy;
 use quaint_test_setup::Tags;
-use std::env;
+use std::{env, sync::LazyLock};
 
-pub static CONN_STR: Lazy<String> = Lazy::new(|| env::var("TEST_MYSQL").expect("TEST_MYSQL env var"));
-pub static CONN_STR8: Lazy<String> = Lazy::new(|| env::var("TEST_MYSQL8").expect("TEST_MYSQL8 env var"));
-pub static CONN_STR_MARIADB: Lazy<String> =
-    Lazy::new(|| env::var("TEST_MYSQL_MARIADB").expect("TEST_MYSQL_MARIADB env var"));
+pub static CONN_STR: LazyLock<String> = LazyLock::new(|| env::var("TEST_MYSQL").expect("TEST_MYSQL env var"));
+pub static CONN_STR8: LazyLock<String> = LazyLock::new(|| env::var("TEST_MYSQL8").expect("TEST_MYSQL8 env var"));
+pub static CONN_STR_MARIADB: LazyLock<String> =
+    LazyLock::new(|| env::var("TEST_MYSQL_MARIADB").expect("TEST_MYSQL_MARIADB env var"));
 
 pub(crate) async fn mysql_test_api<'a>() -> crate::Result<MySql<'a>> {
     MySql::new(CONN_STR.as_str(), Tags::MYSQL5_7).await
@@ -58,7 +57,7 @@ impl<'a> MySql<'a> {
 }
 
 #[async_trait::async_trait]
-impl<'a> TestApi for MySql<'a> {
+impl TestApi for MySql<'_> {
     fn system(&self) -> &'static str {
         "mysql"
     }
@@ -127,6 +126,10 @@ impl<'a> TestApi for MySql<'a> {
 
     async fn create_additional_connection(&self) -> crate::Result<Quaint> {
         Quaint::new(&self.conn_str).await
+    }
+
+    fn create_pool(&self) -> crate::Result<crate::pooled::Quaint> {
+        Ok(crate::pooled::Quaint::builder(&CONN_STR)?.build())
     }
 
     fn unique_constraint(&mut self, column: &str) -> String {

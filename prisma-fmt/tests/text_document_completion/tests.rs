@@ -15,6 +15,7 @@ scenarios! {
     argument_after_trailing_comma
     default_map_end_of_args_list
     default_map_mssql
+    default_map_mssql_in_arg_value
     default_map_mssql_multifile
     empty_schema
     extended_indexes_basic
@@ -45,10 +46,4 @@ scenarios! {
     referential_actions_with_trailing_comma
     datasource_default_completions
     datasource_multischema
-    datasource_url_arguments
-    datasource_direct_url_arguments
-    datasource_shadowdb_url_arguments
-    datasource_env_db_url
-    datasource_env_db_direct_url
-    datasource_env_db_shadowdb_url
 }

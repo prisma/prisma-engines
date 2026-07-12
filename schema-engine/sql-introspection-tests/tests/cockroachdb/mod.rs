@@ -4,6 +4,7 @@ mod gin;
 use std::path::PathBuf;
 
 use indoc::indoc;
+use psl::parser_database::NoExtensionTypes;
 use schema_connector::{CompositeTypeDepth, ConnectorParams, IntrospectionContext, SchemaConnector};
 use sql_introspection_tests::test_api::*;
 use sql_schema_connector::SqlSchemaConnector;
@@ -17,34 +18,36 @@ async fn introspecting_cockroach_db_with_postgres_provider_fails(api: TestApi) {
        );
     "#;
 
-    let schema = format!(
+    let schema = indoc!(
         r#"
-        datasource mypg {{
+        datasource mypg {
             provider = "postgresql"
-            url = "{}"
-        }}
+        }
 
     "#,
-        api.connection_string()
     );
 
     api.raw_cmd(setup).await;
 
-    let schema = psl::parse_schema(schema).unwrap();
-    let ctx = IntrospectionContext::new_config_only(schema, CompositeTypeDepth::Infinite, None, PathBuf::new());
+    let schema = psl::parse_schema_without_extensions(schema).unwrap();
+    let ctx =
+        IntrospectionContext::new_config_only(schema, CompositeTypeDepth::Infinite, None, PathBuf::new()).unwrap();
 
     // Instantiate the schema connector manually for this test because `TestApi`
     // chooses the provider type based on the current database under test and
     // not on the `provider` field in the schema.
-    let mut engine = SqlSchemaConnector::new_postgres();
     let params = ConnectorParams {
         connection_string: api.connection_string().to_owned(),
         preview_features: api.preview_features(),
         shadow_database_connection_string: None,
     };
-    engine.set_params(params).unwrap();
+    let mut engine = SqlSchemaConnector::new_postgres(params).unwrap();
 
-    let err = engine.introspect(&ctx).await.unwrap_err().to_string();
+    let err = engine
+        .introspect(&ctx, &NoExtensionTypes)
+        .await
+        .unwrap_err()
+        .to_string();
 
     let expected_err = expect![[r#"
         You are trying to connect to a CockroachDB database, but the provider in your Prisma schema is `postgresql`. Please change it to `cockroachdb`.
@@ -195,12 +198,11 @@ async fn scalar_list_defaults_work_on_22_1(api: &mut TestApi) -> TestResult {
 
     let expectation = expect![[r#"
         generator client {
-          provider = "prisma-client-js"
+          provider = "prisma-client"
         }
 
         datasource db {
           provider = "cockroachdb"
-          url      = "env(TEST_DATABASE_URL)"
         }
 
         model defaults {
@@ -249,12 +251,11 @@ async fn scalar_list_defaults_work_on_22_2(api: &mut TestApi) -> TestResult {
 
     let expectation = expect![[r#"
         generator client {
-          provider = "prisma-client-js"
+          provider = "prisma-client"
         }
 
         datasource db {
           provider = "cockroachdb"
-          url      = "env(TEST_DATABASE_URL)"
         }
 
         model defaults {
@@ -312,12 +313,11 @@ async fn string_col_with_length(api: &mut TestApi) -> TestResult {
 
     let expectation = expect![[r#"
         generator client {
-          provider = "prisma-client-js"
+          provider = "prisma-client"
         }
 
         datasource db {
           provider = "cockroachdb"
-          url      = "env(TEST_DATABASE_URL)"
         }
 
         model Post {
@@ -367,12 +367,11 @@ async fn row_level_ttl_stopgap(api: &mut TestApi) -> TestResult {
 
     let expectation = expect![[r#"
         generator client {
-          provider = "prisma-client-js"
+          provider = "prisma-client"
         }
 
         datasource db {
           provider = "cockroachdb"
-          url      = "env(TEST_DATABASE_URL)"
         }
 
         /// This model is using a row level TTL in the database, and requires an additional setup in migrations. Read more: https://pris.ly/d/row-level-ttl
@@ -433,13 +432,12 @@ async fn commenting_stopgap(api: &mut TestApi) -> TestResult {
 
     let expectation = expect![[r#"
         generator client {
-          provider        = "prisma-client-js"
+          provider        = "prisma-client"
           previewFeatures = ["views"]
         }
 
         datasource db {
           provider = "cockroachdb"
-          url      = "env(TEST_DATABASE_URL)"
         }
 
         /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments

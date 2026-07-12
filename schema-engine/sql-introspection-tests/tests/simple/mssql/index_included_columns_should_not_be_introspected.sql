@@ -30,12 +30,11 @@ CREATE UNIQUE INDEX bidx ON b (bid) INCLUDE (bcol);
 
 /*
 generator js {
-  provider = "prisma-client-js"
+  provider = "prisma-client"
 }
 
 datasource db {
   provider = "sqlserver"
-  url      = env("DATABASE_URL")
 }
 
 model a {

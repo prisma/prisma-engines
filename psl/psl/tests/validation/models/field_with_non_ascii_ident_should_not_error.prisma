@@ -1,0 +1,13 @@
+generator client {
+    provider = "prisma-client"
+}
+
+datasource db {
+    provider = "postgresql"
+}
+
+model A {
+    id Int @id @map("_id")
+    lööps String[]
+}
+

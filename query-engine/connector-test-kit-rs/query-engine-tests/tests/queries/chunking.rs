@@ -4,11 +4,11 @@ use query_engine_tests::*;
 /// * It should be called QUERY_CHUNK_SIZE instead, because it's a knob to configure query chunking
 ///  which is splitting queries with more arguments than accepted by the database, in multiple
 ///  queries.
-/// * WASM versions of the engine don't allow for runtime configuration of this value so they default
+/// * Wasm versions of the engine don't allow for runtime configuration of this value so they default
 ///  the mininum supported by any database on a SQL family (eg. Postgres, MySQL, SQLite, SQL Server,
 ///  etc.) As such, in order to guarantee chunking happens, a large number of arguments --larger
 ///  than the default-- needs to be used, to have actual coverage of chunking code while exercising
-///  WASM query engines.
+///  Wasm query engines.
 #[test_suite(schema(schema))]
 mod chunking {
     use indoc::indoc;
@@ -46,9 +46,8 @@ mod chunking {
                     runner,
                     &format!(
                         r#"
-                        {{ id: {}, posts: {{ create: [{{ id: {} }}, {{ id: {} }}] }} }}
-                        "#,
-                        i, post_a_id, post_b_id
+                        {{ id: {i}, posts: {{ create: [{{ id: {post_a_id} }}, {{ id: {post_b_id} }}] }} }}
+                        "#
                     ),
                 )
                 .await?;
@@ -110,7 +109,7 @@ mod chunking {
                 .map(|x| x["id"].as_i64().unwrap())
                 .collect::<Vec<i64>>();
 
-            let posts_as_graphql: Vec<String> = ids_vec.into_iter().map(|id| format!("{{ id: {} }}", id)).collect();
+            let posts_as_graphql: Vec<String> = ids_vec.into_iter().map(|id| format!("{{ id: {id} }}")).collect();
             assert_eq!(posts_as_graphql.len(), 400);
 
             let query = format!("{{ id: 201, posts: {{ connect: [{}] }} }}", posts_as_graphql.join(", "));
@@ -209,14 +208,17 @@ mod chunking {
 
         assert_error!(
             runner,
-            with_id_excess!(&runner, "query { findManyA(where: {id: { in: [:id_list:] }}, orderBy: { b: { as: { _count: asc } } } ) { id } }"),
+            with_id_excess!(
+                &runner,
+                "query { findManyA(where: {id: { in: [:id_list:] }}, orderBy: { b: { as: { _count: asc } } } ) { id } }"
+            ),
             2029 // QueryParameterLimitExceeded
         );
 
         Ok(())
     }
 
-    #[connector_test(capabilities(FullTextSearchWithoutIndex), exclude(MongoDb))]
+    #[connector_test(capabilities(NativeFullTextSearchWithoutIndex), exclude(MongoDb))]
     async fn order_by_relevance_should_fail(runner: Runner) -> TestResult<()> {
         create_test_data(&runner).await?;
 

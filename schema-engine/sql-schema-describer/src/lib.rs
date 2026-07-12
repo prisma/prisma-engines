@@ -9,11 +9,15 @@ pub mod postgres;
 pub mod sqlite;
 pub mod walkers;
 
+mod cloneable_any;
 mod connector_data;
 mod error;
 mod getters;
 mod ids;
 mod parsers;
+mod stripped_partial_indexes;
+
+use crate::cloneable_any::CloneableAny;
 
 pub use self::{
     error::{DescriberError, DescriberErrorKind, DescriberResult},
@@ -21,26 +25,17 @@ pub use self::{
     walkers::*,
 };
 pub use either::Either;
+use indexmap::IndexSet;
 pub use prisma_value::PrismaValue;
 
 use enumflags2::{BitFlag, BitFlags};
-use once_cell::sync::Lazy;
 use regex::Regex;
 use serde::{Deserialize, Serialize};
-use std::{
-    any::Any,
-    fmt::{self, Debug},
-};
+use std::fmt::{self, Debug};
 
 /// A database description connector.
 #[async_trait::async_trait]
 pub trait SqlSchemaDescriberBackend: Send + Sync {
-    /// List the database's schemas.
-    async fn list_databases(&self) -> DescriberResult<Vec<String>>;
-
-    /// Get the databases metadata.
-    async fn get_metadata(&self, schema: &str) -> DescriberResult<SqlMetadata>;
-
     /// Describe a database schema.
     async fn describe(&self, schemas: &[&str]) -> DescriberResult<SqlSchema>;
 
@@ -48,17 +43,11 @@ pub trait SqlSchemaDescriberBackend: Send + Sync {
     async fn version(&self) -> DescriberResult<Option<String>>;
 }
 
-/// The return type of get_metadata().
-pub struct SqlMetadata {
-    pub table_count: usize,
-    pub size_in_bytes: usize,
-}
-
 /// The result of describing a database schema.
-#[derive(Serialize, Deserialize, Debug, Default)]
+#[derive(Serialize, Deserialize, Debug, Default, Clone)]
 pub struct SqlSchema {
     /// Namespaces (schemas)
-    namespaces: Vec<String>,
+    namespaces: IndexSet<String>,
     /// The schema's tables.
     tables: Vec<Table>,
     /// The schema's enums.
@@ -76,6 +65,8 @@ pub struct SqlSchema {
     foreign_key_columns: Vec<ForeignKeyColumn>,
     /// All indexes and unique constraints.
     indexes: Vec<Index>,
+    /// Index ids for partial indexes stripped because the feature is disabled.
+    stripped_partial_indexes: stripped_partial_indexes::StrippedPartialIndexes,
     /// All columns of indexes.
     index_columns: Vec<IndexColumn>,
     /// Check constraints for every table.
@@ -90,6 +81,8 @@ pub struct SqlSchema {
     user_defined_types: Vec<UserDefinedType>,
     /// Connector-specific data
     connector_data: connector_data::ConnectorData,
+    /// The default runtime namespace, if one is set.
+    runtime_namespace: Option<String>,
 }
 
 impl SqlSchema {
@@ -128,7 +121,7 @@ impl SqlSchema {
     }
 
     /// Insert connector-specific data into the schema. This will replace existing connector data.
-    pub fn set_connector_data(&mut self, data: Box<dyn Any + Send + Sync>) {
+    pub fn set_connector_data(&mut self, data: Box<dyn CloneableAny>) {
         self.connector_data.data = Some(data);
     }
 
@@ -145,6 +138,16 @@ impl SqlSchema {
             .iter()
             .position(|e| e.name == name && ns_id.map(|id| id == e.namespace_id).unwrap_or(true))
             .map(|i| EnumId(i as u32))
+    }
+
+    /// Try to find a UDT by name.
+    pub fn find_udt(&self, name: &str, namespace: Option<&str>) -> Option<UdtId> {
+        let ns_id = namespace.and_then(|ns| self.get_namespace(ns));
+
+        self.user_defined_types
+            .iter()
+            .position(|u| u.name == name && ns_id.map(|id| id == u.namespace_id).unwrap_or(true))
+            .map(|i| UdtId(i as u32))
     }
 
     fn get_namespace(&self, name: &str) -> Option<NamespaceId> {
@@ -186,10 +189,7 @@ impl SqlSchema {
 
     /// Find a namespace by name.
     pub fn get_namespace_id(&self, name: &str) -> Option<NamespaceId> {
-        self.namespaces
-            .binary_search_by(|ns_name| ns_name.as_str().cmp(name))
-            .ok()
-            .map(|pos| NamespaceId(pos as u32))
+        self.namespaces.get_index_of(name).map(|pos| NamespaceId(pos as u32))
     }
 
     /// The total number of indexes in the schema.
@@ -204,6 +204,20 @@ impl SqlSchema {
                 idx.tpe = IndexType::Normal;
             }
         }
+    }
+
+    /// Strip partial-index predicates when the feature is disabled.
+    pub fn strip_partial_index_predicates(&mut self) {
+        for (idx, index) in self.indexes.iter_mut().enumerate() {
+            if index.predicate.take().is_some() {
+                self.stripped_partial_indexes.insert(IndexId(idx as u32));
+            }
+        }
+    }
+
+    /// Returns whether this index is a stripped partial index.
+    pub fn index_is_stripped_partial(&self, index_id: IndexId) -> bool {
+        self.stripped_partial_indexes.contains(&index_id)
     }
 
     /// Add a table column to the schema.
@@ -240,26 +254,65 @@ impl SqlSchema {
         id
     }
 
-    /// Add a fulltext index to the schema.
-    pub fn push_fulltext_index(&mut self, table_id: TableId, index_name: String) -> IndexId {
+    /// Add a UDT to the schema.
+    pub fn push_udt(&mut self, namespace_id: NamespaceId, name: String, definition: Option<String>) -> UdtId {
+        let id = UdtId(self.user_defined_types.len() as u32);
+
+        self.user_defined_types.push(UserDefinedType {
+            namespace_id,
+            name,
+            definition,
+        });
+
+        id
+    }
+
+    /// Add an index of a certain type to the schema.
+    pub fn push_index_of_type(&mut self, table_id: TableId, index_name: String, tpe: IndexType) -> IndexId {
+        self.push_index_with_predicate(table_id, index_name, tpe, None)
+    }
+
+    /// Add an index of a certain type with an optional predicate (for partial indexes).
+    pub fn push_index_with_predicate(
+        &mut self,
+        table_id: TableId,
+        index_name: String,
+        tpe: IndexType,
+        predicate: Option<String>,
+    ) -> IndexId {
         let id = IndexId(self.indexes.len() as u32);
         self.indexes.push(Index {
             table_id,
             index_name,
-            tpe: IndexType::Fulltext,
+            tpe,
+            predicate,
         });
         id
     }
 
+    /// Add a fulltext index to the schema.
+    pub fn push_fulltext_index(&mut self, table_id: TableId, index_name: String) -> IndexId {
+        self.push_index_of_type(table_id, index_name, IndexType::Fulltext)
+    }
+
     /// Add an index to the schema.
     pub fn push_index(&mut self, table_id: TableId, index_name: String) -> IndexId {
-        let id = IndexId(self.indexes.len() as u32);
-        self.indexes.push(Index {
-            table_id,
-            index_name,
-            tpe: IndexType::Normal,
-        });
-        id
+        self.push_index_of_type(table_id, index_name, IndexType::Normal)
+    }
+
+    /// Add a partial index to the schema (with a WHERE clause predicate).
+    pub fn push_partial_index(&mut self, table_id: TableId, index_name: String, predicate: String) -> IndexId {
+        self.push_index_with_predicate(table_id, index_name, IndexType::Normal, Some(predicate))
+    }
+
+    /// Add a partial unique constraint/index to the schema (with a WHERE clause predicate).
+    pub fn push_partial_unique_constraint(
+        &mut self,
+        table_id: TableId,
+        index_name: String,
+        predicate: String,
+    ) -> IndexId {
+        self.push_index_with_predicate(table_id, index_name, IndexType::Unique, Some(predicate))
     }
 
     /// Add table default value to the schema.
@@ -278,24 +331,12 @@ impl SqlSchema {
 
     /// Add a primary key to the schema.
     pub fn push_primary_key(&mut self, table_id: TableId, index_name: String) -> IndexId {
-        let id = IndexId(self.indexes.len() as u32);
-        self.indexes.push(Index {
-            table_id,
-            index_name,
-            tpe: IndexType::PrimaryKey,
-        });
-        id
+        self.push_index_of_type(table_id, index_name, IndexType::PrimaryKey)
     }
 
     /// Add a unique constraint/index to the schema.
     pub fn push_unique_constraint(&mut self, table_id: TableId, index_name: String) -> IndexId {
-        let id = IndexId(self.indexes.len() as u32);
-        self.indexes.push(Index {
-            table_id,
-            index_name,
-            tpe: IndexType::Unique,
-        });
-        id
+        self.push_index_of_type(table_id, index_name, IndexType::Unique)
     }
 
     pub fn push_index_column(&mut self, column: IndexColumn) -> IndexColumnId {
@@ -334,9 +375,8 @@ impl SqlSchema {
     }
 
     pub fn push_namespace(&mut self, name: String) -> NamespaceId {
-        let id = NamespaceId(self.namespaces.len() as u32);
-        self.namespaces.push(name);
-        id
+        let (id, _) = self.namespaces.insert_full(name);
+        NamespaceId(id as u32)
     }
 
     pub fn push_table(&mut self, name: String, namespace_id: NamespaceId, description: Option<String>) -> TableId {
@@ -486,6 +526,16 @@ impl SqlSchema {
     pub fn is_empty(&self) -> bool {
         self.tables.is_empty() && self.enums.is_empty()
     }
+
+    /// Get the default namespace, if any.
+    pub fn default_namespace(&self) -> Option<&str> {
+        self.runtime_namespace.as_deref()
+    }
+
+    /// Set the default namespace.
+    pub fn set_default_namespace(&mut self, namespace: String) {
+        self.runtime_namespace = Some(namespace);
+    }
 }
 
 #[enumflags2::bitflags]
@@ -498,7 +548,7 @@ pub enum TableProperties {
 }
 
 /// A table found in a schema.
-#[derive(Serialize, Deserialize, PartialEq, Debug, Default)]
+#[derive(Serialize, Deserialize, PartialEq, Debug, Default, Clone)]
 pub struct Table {
     namespace_id: NamespaceId,
     name: String,
@@ -520,16 +570,11 @@ pub enum IndexType {
 }
 
 /// The sort order of an index.
-#[derive(Serialize, Deserialize, PartialEq, Debug, Copy, Clone)]
+#[derive(Serialize, Deserialize, PartialEq, Debug, Copy, Clone, Default)]
 pub enum SQLSortOrder {
+    #[default]
     Asc,
     Desc,
-}
-
-impl Default for SQLSortOrder {
-    fn default() -> Self {
-        Self::Asc
-    }
 }
 
 impl AsRef<str> for SQLSortOrder {
@@ -556,11 +601,12 @@ pub struct IndexColumn {
 }
 
 /// An index on a table.
-#[derive(Serialize, Deserialize, PartialEq, Debug)]
+#[derive(Serialize, Deserialize, PartialEq, Debug, Clone)]
 struct Index {
     table_id: TableId,
     index_name: String,
     tpe: IndexType,
+    predicate: Option<String>,
 }
 
 /// A stored procedure (like, the function inside your database).
@@ -577,15 +623,15 @@ pub struct Procedure {
 /// A user-defined type. Can map to another type, or be declared as assembly.
 #[derive(Serialize, Deserialize, PartialEq, Debug, Clone)]
 pub struct UserDefinedType {
-    ///Namespace of the procedure
-    namespace_id: NamespaceId,
+    /// Namespace of the UDT.
+    pub namespace_id: NamespaceId,
     /// Type name
     pub name: String,
     /// Type mapping
     pub definition: Option<String>,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Column {
     /// Column name.
     pub name: String,
@@ -654,8 +700,10 @@ pub enum ColumnTypeFamily {
     Json,
     /// UUID types.
     Uuid,
-    ///Enum
+    /// Enum
     Enum(EnumId),
+    /// User-defined type
+    Udt(UdtId),
     /// Unsupported
     Unsupported(String),
 }
@@ -756,7 +804,7 @@ impl ForeignKeyAction {
     }
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 struct ForeignKey {
     /// The table the foreign key is defined on.
     constrained_table: TableId,
@@ -768,7 +816,7 @@ struct ForeignKey {
     on_update_action: ForeignKeyAction,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 struct ForeignKeyColumn {
     foreign_key_id: ForeignKeyId,
     constrained_column: TableColumnId,
@@ -776,7 +824,7 @@ struct ForeignKeyColumn {
 }
 
 /// A SQL enum.
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 struct Enum {
     /// The namespace the enum type belongs to, if applicable.
     namespace_id: NamespaceId,
@@ -784,7 +832,7 @@ struct Enum {
     description: Option<String>,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 struct EnumVariant {
     enum_id: EnumId,
     variant_name: String,

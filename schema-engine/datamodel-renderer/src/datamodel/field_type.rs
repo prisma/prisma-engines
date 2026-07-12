@@ -89,7 +89,7 @@ impl<'a> FieldType<'a> {
     }
 }
 
-impl<'a> fmt::Display for FieldType<'a> {
+impl fmt::Display for FieldType<'_> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self.inner {
             FieldKind::Required(ref t) => t.fmt(f),

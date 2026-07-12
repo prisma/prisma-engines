@@ -2,4 +2,5 @@
 
 mod preview_features;
 
-pub use self::preview_features::{FeatureMap, PreviewFeature, PreviewFeatures, ALL_PREVIEW_FEATURES};
+pub(crate) use self::preview_features::RenamedFeature;
+pub use self::preview_features::{ALL_PREVIEW_FEATURES, FeatureMapWithProvider, PreviewFeature, PreviewFeatures};

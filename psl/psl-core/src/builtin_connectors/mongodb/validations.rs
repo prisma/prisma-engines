@@ -234,24 +234,19 @@ pub(crate) fn relation_same_native_type(
                 (Some(a), Some(b)) if a != b => {
                     format!(
                         "Field {a_model_name}.{a_field_name} and {b_model_name}.{b_field_name} must have the same native type for MongoDB to join those collections correctly. Consider updating those fields to either use '@{}.{}' or '@{}.{}'.",
-                        a.0,
-                        a.1,
-                        b.0,
-                        b.1
+                        a.0, a.1, b.0, b.1
                     )
                 }
                 (None, Some(b)) => {
                     format!(
                         "Field {a_model_name}.{a_field_name} and {b_model_name}.{b_field_name} must have the same native type for MongoDB to join those collections correctly. Consider either removing {b_model_name}.{b_field_name}'s native type attribute or adding '@{}.{}' to {a_model_name}.{a_field_name}.",
-                        b.0,
-                        b.1
+                        b.0, b.1
                     )
                 }
                 (Some(a), None) => {
                     format!(
                         "Field {a_model_name}.{a_field_name} and {b_model_name}.{b_field_name} must have the same native type for MongoDB to join those collections correctly. Consider either removing {a_model_name}.{a_field_name}'s native type attribute or adding '@{}.{}' to {b_model_name}.{b_field_name}.",
-                        a.0,
-                        a.1
+                        a.0, a.1
                     )
                 }
                 _ => continue,

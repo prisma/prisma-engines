@@ -3,7 +3,7 @@ use query_engine_tests::*;
 #[test_suite(schema(schemas::json), capabilities(JsonFiltering), exclude(MySql(5.6)))]
 mod json_filters {
     use indoc::indoc;
-    use query_engine_tests::{assert_error, is_one_of, run_query, Runner};
+    use query_engine_tests::{Runner, assert_error, is_one_of, run_query};
 
     fn pg_json() -> String {
         let schema = indoc! {
@@ -242,7 +242,7 @@ mod json_filters {
 
         match runner.connector_version() {
             // MariaDB does not support finding arrays in arrays, unlike MySQL
-            ConnectorVersion::MySql(Some(MySqlVersion::MariaDb)) => {
+            ConnectorVersion::MySql(Some(MySqlVersion::MariaDb | MySqlVersion::MariaDbJsWasm)) => {
                 let res = run_query!(runner, jsonq(&runner, r#"array_contains: "[[1, 2]]" "#, None));
                 insta::allow_duplicates! {
                     insta::assert_snapshot!(
@@ -280,7 +280,7 @@ mod json_filters {
         Ok(())
     }
 
-    #[connector_test(exclude(MySQL(5.6)))]
+    #[connector_test(exclude(MySQL(5.6), Sqlite))]
     async fn array_contains(runner: Runner) -> TestResult<()> {
         array_contains_runner(runner).await?;
 
@@ -516,6 +516,18 @@ mod json_filters {
             );
         }
 
+        // QueryMode::Insensitive
+        let res = run_query!(
+            runner,
+            jsonq(&runner, r#"string_contains: "Oo", mode: "insensitive" "#, None)
+        );
+        insta::allow_duplicates! {
+            insta::assert_snapshot!(
+                res,
+                @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2}]}}"###
+            );
+        }
+
         // NOT
         let res = run_query!(runner, not_jsonq(&runner, r#"string_contains: "ab" "#, None));
         insta::allow_duplicates! {
@@ -556,6 +568,18 @@ mod json_filters {
             );
         }
 
+        // QueryMode::insensitive
+        let res = run_query!(
+            runner,
+            jsonq(&runner, r#"string_starts_with: "FoO", mode: "insensitive" "#, None)
+        );
+        insta::allow_duplicates! {
+            insta::assert_snapshot!(
+                res,
+                @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2}]}}"###
+            );
+        }
+
         // NOT string_starts_with
         let res = run_query!(runner, not_jsonq(&runner, r#"string_starts_with: "ab" "#, None));
         insta::allow_duplicates! {
@@ -588,6 +612,18 @@ mod json_filters {
         create_row(&runner, 3, r#"[\"foo\"]"#, true).await?;
 
         let res = run_query!(runner, jsonq(&runner, r#"string_ends_with: "oo" "#, None));
+        insta::allow_duplicates! {
+            insta::assert_snapshot!(
+                res,
+                @r###"{"data":{"findManyTestModel":[{"id":1}]}}"###
+            );
+        }
+
+        // QueryMode::insensitive
+        let res = run_query!(
+            runner,
+            jsonq(&runner, r#"string_ends_with: "oO", mode: "insensitive" "#, None)
+        );
         insta::allow_duplicates! {
             insta::assert_snapshot!(
                 res,
@@ -941,7 +977,9 @@ mod json_filters {
     fn json_path(runner: &Runner) -> &'static str {
         match runner.connector_version() {
             ConnectorVersion::Postgres(_) | ConnectorVersion::CockroachDb(_) => r#"path: ["a", "b"]"#,
-            ConnectorVersion::MySql(_) | ConnectorVersion::Vitess(_) => r#"path: "$.a.b""#,
+            ConnectorVersion::Sqlite(_) | ConnectorVersion::MySql(_) | ConnectorVersion::Vitess(_) => {
+                r#"path: "$.a.b""#
+            }
             x => unreachable!("JSON filtering is not supported on {:?}", x),
         }
     }

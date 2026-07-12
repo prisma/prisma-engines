@@ -1,0 +1,21 @@
+{
+  "modelName": "Activation",
+  "action": "findMany",
+  "query": {
+    "arguments": {
+      "relationLoadStrategy": "join"
+    },
+    "selection": {
+      "issued": true,
+      "secret": true,
+      "done": true,
+      "user": {
+        "arguments": {},
+        "selection": {
+          "id": true,
+          "email": true
+        }
+      }
+    }
+  }
+}

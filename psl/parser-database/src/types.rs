@@ -1,10 +1,13 @@
 pub(crate) mod index_fields;
 
-use crate::{context::Context, interner::StringId, walkers::IndexFieldWalker, DatamodelError};
+use crate::{
+    DatamodelError, ParserDatabase, context::Context, extension::ExtensionTypeId, interner::StringId,
+    walkers::IndexFieldWalker,
+};
 use either::Either;
 use enumflags2::bitflags;
 use rustc_hash::FxHashMap as HashMap;
-use schema_ast::ast::{self, WithName};
+use schema_ast::ast::{self, EnumValueId, WithName};
 use std::{collections::BTreeMap, fmt};
 
 pub(super) fn resolve_types(ctx: &mut Context<'_>) {
@@ -19,6 +22,12 @@ pub(super) fn resolve_types(ctx: &mut Context<'_>) {
             _ => unreachable!(),
         }
     }
+}
+
+pub enum RefinedFieldVariant {
+    Relation(RelationFieldId),
+    Scalar(ScalarFieldId),
+    Unknown,
 }
 
 #[derive(Debug, Default)]
@@ -74,7 +83,7 @@ impl Types {
     pub(super) fn range_model_scalar_field_ids(
         &self,
         model_id: crate::ModelId,
-    ) -> impl Iterator<Item = ScalarFieldId> + Clone {
+    ) -> impl Iterator<Item = ScalarFieldId> + Clone + use<> {
         let end = self.scalar_fields.partition_point(|sf| sf.model_id <= model_id);
         let start = self.scalar_fields[..end].partition_point(|sf| sf.model_id < model_id);
         (start..end).map(|idx| ScalarFieldId(idx as u32))
@@ -92,16 +101,16 @@ impl Types {
             .map(move |(idx, rf)| (RelationFieldId((first_relation_field_idx + idx) as u32), rf))
     }
 
-    pub(super) fn refine_field(&self, id: (crate::ModelId, ast::FieldId)) -> Either<RelationFieldId, ScalarFieldId> {
+    pub(super) fn refine_field(&self, id: (crate::ModelId, ast::FieldId)) -> RefinedFieldVariant {
         self.relation_fields
             .binary_search_by_key(&id, |rf| (rf.model_id, rf.field_id))
-            .map(|idx| Either::Left(RelationFieldId(idx as u32)))
+            .map(|idx| RefinedFieldVariant::Relation(RelationFieldId(idx as u32)))
             .or_else(|_| {
                 self.scalar_fields
                     .binary_search_by_key(&id, |sf| (sf.model_id, sf.field_id))
-                    .map(|id| Either::Right(ScalarFieldId(id as u32)))
+                    .map(|id| RefinedFieldVariant::Scalar(ScalarFieldId(id as u32)))
             })
-            .expect("expected field to be either scalar or relation field")
+            .unwrap_or(RefinedFieldVariant::Unknown)
     }
 
     pub(super) fn push_relation_field(&mut self, relation_field: RelationField) -> RelationFieldId {
@@ -182,6 +191,8 @@ pub enum ScalarFieldType {
     CompositeType(crate::CompositeTypeId),
     /// An enum
     Enum(crate::EnumId),
+    /// A type defined in an extension
+    Extension(ExtensionTypeId),
     /// A Prisma scalar type
     BuiltInScalar(ScalarType),
     /// An `Unsupported("...")` type
@@ -201,6 +212,14 @@ impl ScalarFieldType {
     pub fn as_composite_type(self) -> Option<crate::CompositeTypeId> {
         match self {
             ScalarFieldType::CompositeType(id) => Some(id),
+            _ => None,
+        }
+    }
+
+    /// Try to interpret this field type as an Extension type.
+    pub fn as_extension_type(self) -> Option<ExtensionTypeId> {
+        match self {
+            ScalarFieldType::Extension(id) => Some(id),
             _ => None,
         }
     }
@@ -256,6 +275,42 @@ impl ScalarFieldType {
     /// True if the field's type is Decimal.
     pub fn is_decimal(self) -> bool {
         matches!(self, Self::BuiltInScalar(ScalarType::Decimal))
+    }
+
+    /// Display the field type as it would appear in the Prisma schema.
+    pub fn display<'a>(&'a self, db: &'a ParserDatabase) -> impl fmt::Display + 'a {
+        DisplayScalarFieldType { field_type: self, db }
+    }
+}
+
+struct DisplayScalarFieldType<'a> {
+    field_type: &'a ScalarFieldType,
+    db: &'a ParserDatabase,
+}
+
+impl fmt::Display for DisplayScalarFieldType<'_> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self.field_type {
+            ScalarFieldType::BuiltInScalar(t) => write!(f, "{t}"),
+            ScalarFieldType::Enum(id) => {
+                write!(f, "{}", self.db.walk(*id).name())
+            }
+            ScalarFieldType::CompositeType(id) => {
+                write!(f, "{}", self.db.walk(*id).name())
+            }
+            ScalarFieldType::Extension(ext_id) => {
+                let name = self
+                    .db
+                    .extension_metadata
+                    .id_to_prisma_name
+                    .get(ext_id)
+                    .expect("extension type id to have a name");
+                write!(f, "{}", self.db.interner.get(*name).unwrap())
+            }
+            ScalarFieldType::Unsupported(ut) => {
+                write!(f, "Unsupported(\"{}\")", self.db.interner.get(ut.name).unwrap())
+            }
+        }
     }
 }
 
@@ -337,6 +392,8 @@ pub(crate) struct ModelAttributes {
     ///          ^^^^^^^^
     /// ```
     pub(crate) schema: Option<(StringId, ast::Span)>,
+    /// @(@)shardKey
+    pub(crate) shard_key: Option<ShardKeyAttribute>,
 }
 
 /// A type of index as defined by the `type: ...` argument on an index attribute.
@@ -347,9 +404,10 @@ pub(crate) struct ModelAttributes {
 /// ```
 #[bitflags]
 #[repr(u8)]
-#[derive(Debug, Clone, Copy, PartialEq)]
+#[derive(Debug, Clone, Copy, PartialEq, Default)]
 pub enum IndexAlgorithm {
     /// Binary tree index (the default in most databases)
+    #[default]
     BTree,
     /// Hash index
     Hash,
@@ -436,19 +494,25 @@ impl IndexAlgorithm {
     /// Documentation for editor autocompletion.
     pub fn documentation(self) -> &'static str {
         match self {
-            IndexAlgorithm::BTree => "Can handle equality and range queries on data that can be sorted into some ordering (default).",
-            IndexAlgorithm::Hash => "Can handle simple equality queries, but no ordering. Faster than BTree, if ordering is not needed.",
-            IndexAlgorithm::Gist => "Generalized Search Tree. A framework for building specialized indices for custom data types.",
-            IndexAlgorithm::Gin => "Generalized Inverted Index. Useful for indexing composite items, such as arrays or text.",
-            IndexAlgorithm::SpGist => "Space-partitioned Generalized Search Tree. For implenting a wide range of different non-balanced data structures.",
-            IndexAlgorithm::Brin => "Block Range Index. If the data has some natural correlation with their physical location within the table, can compress very large amount of data into a small space.",
+            IndexAlgorithm::BTree => {
+                "Can handle equality and range queries on data that can be sorted into some ordering (default)."
+            }
+            IndexAlgorithm::Hash => {
+                "Can handle simple equality queries, but no ordering. Faster than BTree, if ordering is not needed."
+            }
+            IndexAlgorithm::Gist => {
+                "Generalized Search Tree. A framework for building specialized indices for custom data types."
+            }
+            IndexAlgorithm::Gin => {
+                "Generalized Inverted Index. Useful for indexing composite items, such as arrays or text."
+            }
+            IndexAlgorithm::SpGist => {
+                "Space-partitioned Generalized Search Tree. For implenting a wide range of different non-balanced data structures."
+            }
+            IndexAlgorithm::Brin => {
+                "Block Range Index. If the data has some natural correlation with their physical location within the table, can compress very large amount of data into a small space."
+            }
         }
-    }
-}
-
-impl Default for IndexAlgorithm {
-    fn default() -> Self {
-        Self::BTree
     }
 }
 
@@ -464,6 +528,48 @@ pub enum IndexType {
     Fulltext,
 }
 
+/// A condition operator in a partial index WHERE clause.
+#[derive(Debug, Clone, PartialEq)]
+pub enum WhereCondition {
+    /// `IS NULL`
+    IsNull,
+    /// `IS NOT NULL`
+    IsNotNull,
+    /// `= value`
+    Equals(WhereValue),
+    /// `!= value`
+    NotEquals(WhereValue),
+}
+
+/// A literal value in a partial index WHERE condition.
+#[derive(Debug, Clone, PartialEq)]
+pub enum WhereValue {
+    /// A string literal.
+    String(String),
+    /// A numeric literal.
+    Number(String),
+    /// A boolean literal.
+    Boolean(bool),
+}
+
+/// A field condition in an object-syntax WHERE clause.
+#[derive(Debug, Clone)]
+pub struct WhereFieldCondition {
+    /// The scalar field referenced by this condition.
+    pub scalar_field_id: ScalarFieldId,
+    /// The condition to apply.
+    pub condition: WhereCondition,
+}
+
+/// The WHERE clause of a partial index.
+#[derive(Debug, Clone)]
+pub enum WhereClause {
+    /// A raw SQL predicate string.
+    Raw(String),
+    /// Structured conditions from the object syntax.
+    Object(Vec<WhereFieldCondition>),
+}
+
 #[derive(Debug, Default)]
 pub(crate) struct IndexAttribute {
     pub(crate) r#type: IndexType,
@@ -473,6 +579,7 @@ pub(crate) struct IndexAttribute {
     pub(crate) mapped_name: Option<StringId>,
     pub(crate) algorithm: Option<IndexAlgorithm>,
     pub(crate) clustered: Option<bool>,
+    pub(crate) where_clause: Option<WhereClause>,
 }
 
 impl IndexAttribute {
@@ -497,6 +604,13 @@ pub(crate) struct IdAttribute {
     pub(super) name: Option<StringId>,
     pub(super) mapped_name: Option<StringId>,
     pub(super) clustered: Option<bool>,
+}
+
+#[derive(Debug)]
+pub(crate) struct ShardKeyAttribute {
+    pub(crate) fields: Vec<ScalarFieldId>,
+    pub(super) source_field: Option<ast::FieldId>,
+    pub(super) source_attribute: crate::AttributeId,
 }
 
 /// Defines a path to a field that is not directly in the model.
@@ -623,7 +737,7 @@ pub struct FieldWithArgs {
 pub(super) struct EnumAttributes {
     pub(super) mapped_name: Option<StringId>,
     /// @map on enum values.
-    pub(super) mapped_values: HashMap<u32, StringId>,
+    pub(super) mapped_values: HashMap<EnumValueId, StringId>,
     /// ```ignore
     /// @@schema("public")
     ///          ^^^^^^^^
@@ -729,12 +843,12 @@ fn field_type<'db>(field: &'db ast::Field, ctx: &mut Context<'db>) -> Result<Fie
             return Ok(FieldType::Scalar(ScalarFieldType::Unsupported(unsupported)));
         }
     };
-    let supported_string_id = ctx.interner.intern(supported);
 
     if let Some(tpe) = ScalarType::try_from_str(supported, false) {
         return Ok(FieldType::Scalar(ScalarFieldType::BuiltInScalar(tpe)));
     }
 
+    let supported_string_id = ctx.interner.intern(supported);
     match ctx
         .names
         .tops
@@ -749,7 +863,13 @@ fn field_type<'db>(field: &'db ast::Field, ctx: &mut Context<'db>) -> Result<Fie
             Ok(FieldType::Scalar(ScalarFieldType::CompositeType((file_id, ctid))))
         }
         Some((_, _, ast::Top::Generator(_))) | Some((_, _, ast::Top::Source(_))) => unreachable!(),
-        None => Err(supported),
+        None => {
+            if let Some(type_id) = ctx.extension_types().get_by_prisma_name(supported) {
+                Ok(FieldType::Scalar(ScalarFieldType::Extension(type_id)))
+            } else {
+                Err(supported)
+            }
+        }
         _ => unreachable!(),
     }
 }
@@ -1412,18 +1532,13 @@ impl OperatorClassStore {
 }
 
 /// The sort order of an index.
-#[derive(Debug, Clone, Copy, PartialEq)]
+#[derive(Debug, Clone, Copy, PartialEq, Default)]
 pub enum SortOrder {
     /// ASCending
+    #[default]
     Asc,
     /// DESCending
     Desc,
-}
-
-impl Default for SortOrder {
-    fn default() -> Self {
-        Self::Asc
-    }
 }
 
 /// Prisma's builtin scalar types.
@@ -1462,7 +1577,8 @@ impl ScalarType {
         matches!(self, ScalarType::Bytes)
     }
 
-    pub(crate) fn try_from_str(s: &str, ignore_case: bool) -> Option<ScalarType> {
+    /// Tries to parse a scalar type from a string.
+    pub fn try_from_str(s: &str, ignore_case: bool) -> Option<ScalarType> {
         match ignore_case {
             true => match s.to_lowercase().as_str() {
                 "int" => Some(ScalarType::Int),
@@ -1492,10 +1608,16 @@ impl ScalarType {
     }
 }
 
+impl fmt::Display for ScalarType {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.write_str(self.as_str())
+    }
+}
+
 /// An opaque identifier for a model relation field in a schema.
 #[derive(Copy, Clone, PartialEq, Debug, Hash, Eq, PartialOrd, Ord)]
 pub struct RelationFieldId(u32);
 
 /// An opaque identifier for a model scalar field in a schema.
-#[derive(Copy, Clone, PartialEq, Debug, Eq, Hash)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct ScalarFieldId(u32);

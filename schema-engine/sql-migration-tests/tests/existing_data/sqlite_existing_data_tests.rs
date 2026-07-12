@@ -1,4 +1,4 @@
-use quaint::{prelude::Insert, ValueType};
+use quaint::{ValueType, prelude::Insert};
 use sql_migration_tests::test_api::*;
 use sql_schema_describer::DefaultValue;
 

@@ -107,7 +107,7 @@ mod connect_inside_upsert {
             }
           }"#,
             2025,
-            "An operation failed because it depends on one or more records that were required but not found. No 'Child' record(s) (needed to inline the relation on 'Parent' record(s)) was found for a nested connect on one-to-many relation 'ChildToParent'."
+            "An operation failed because it depends on one or more records that were required but not found. No 'Child' record (needed to inline the relation on 'Parent' record(s)) was found for a nested connect on one-to-many relation 'ChildToParent'."
         );
 
         Ok(())

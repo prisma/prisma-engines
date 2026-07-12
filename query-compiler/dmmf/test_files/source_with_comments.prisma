@@ -1,0 +1,11 @@
+/// Super cool postgres source.
+datasource pg1 {
+  provider = "postgresql"
+}
+
+/// My author model.
+model Author {
+  id        Int      @id
+  /// Name of the author.
+  name      String?
+}

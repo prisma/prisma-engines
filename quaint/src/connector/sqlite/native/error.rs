@@ -54,6 +54,10 @@ impl From<rusqlite::Error> for Error {
                 ..
             } => SqliteError::new(extended_code, Some(msg)).into(),
 
+            rusqlite::Error::InvalidParameterCount(actual, expected) => {
+                Error::builder(ErrorKind::IncorrectNumberOfParameters { actual, expected }).build()
+            }
+
             e => Error::builder(ErrorKind::QueryError(e.into())).build(),
         }
     }

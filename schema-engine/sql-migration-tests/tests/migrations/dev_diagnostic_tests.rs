@@ -1,8 +1,9 @@
+use indoc::indoc;
 use pretty_assertions::assert_eq;
-use schema_core::{json_rpc::types::*, schema_api};
-use sql_migration_tests::test_api::*;
+use schema_core::{DatasourceUrls, json_rpc::types::*, schema_api_without_extensions};
+use sql_migration_tests::{test_api::*, utils::list_migrations};
 use std::io::Write;
-use user_facing_errors::{schema_engine::MigrationDoesNotApplyCleanly, UserFacingError};
+use user_facing_errors::{UserFacingError, schema_engine::MigrationDoesNotApplyCleanly};
 
 trait DevActionExt {
     fn is_create_migration(&self) -> bool;
@@ -140,7 +141,7 @@ fn dev_diagnostic_calculates_drift_in_presence_of_failed_migrations(api: TestApi
                 migration.push_str("\nSELECT YOLO;");
             });
         let path = out.migration_script_path();
-        (out.into_output().generated_migration_name.unwrap(), path)
+        (out.into_output().generated_migration_name, path)
     };
 
     let err = api.apply_migrations(&directory).send_unwrap_err().to_string();
@@ -157,6 +158,7 @@ fn dev_diagnostic_calculates_drift_in_presence_of_failed_migrations(api: TestApi
     assert!(action.as_reset().unwrap().starts_with(&expected_message));
 }
 
+// TODO: fix
 #[test_connector]
 fn dev_diagnostic_returns_create_migration_when_the_database_is_behind(api: TestApi) {
     let directory = api.create_migrations_directory();
@@ -222,8 +224,7 @@ fn dev_diagnostic_can_detect_when_the_migrations_directory_is_behind(api: TestAp
         .create_migration("second-migration", &dm2, &directory)
         .send_sync()
         .into_output()
-        .generated_migration_name
-        .unwrap();
+        .generated_migration_name;
 
     api.apply_migrations(&directory)
         .send_sync()
@@ -258,8 +259,7 @@ fn dev_diagnostic_can_detect_when_history_diverges(api: TestApi) {
         .create_migration("1-initial", &dm1, &directory)
         .send_sync()
         .into_output()
-        .generated_migration_name
-        .unwrap();
+        .generated_migration_name;
 
     let dm2 = api.datamodel_with_provider(
         r#"
@@ -275,8 +275,7 @@ fn dev_diagnostic_can_detect_when_history_diverges(api: TestApi) {
         .create_migration("2-second-migration", &dm2, &directory)
         .send_sync()
         .into_output()
-        .generated_migration_name
-        .unwrap();
+        .generated_migration_name;
 
     api.apply_migrations(&directory)
         .send_sync()
@@ -308,6 +307,7 @@ fn dev_diagnostic_can_detect_when_history_diverges(api: TestApi) {
     assert!(message.contains(&format!("- The migrations recorded in the database diverge from the local migrations directory. Last common migration: `{first_migration_name}`. Migrations applied to the database but absent from the migrations directory are: {deleted_migration_name}")));
 }
 
+// TODO: fix
 #[test_connector]
 fn dev_diagnostic_can_detect_edited_migrations(api: TestApi) {
     let directory = api.create_migrations_directory();
@@ -324,7 +324,7 @@ fn dev_diagnostic_can_detect_edited_migrations(api: TestApi) {
     let (initial_migration_name, initial_path) = {
         let out = api.create_migration("initial", &dm1, &directory).send_sync();
         let path = out.migration_script_path();
-        (out.into_output().generated_migration_name.unwrap(), path)
+        (out.into_output().generated_migration_name, path)
     };
 
     let dm2 = api.datamodel_with_provider(
@@ -369,7 +369,7 @@ fn dev_diagnostic_reports_migrations_failing_to_apply_cleanly(api: TestApi) {
     let (initial_migration_name, initial_path) = {
         let out = api.create_migration("initial", &dm1, &directory).send_sync();
         let path = out.migration_script_path();
-        (out.into_output().generated_migration_name.unwrap(), path)
+        (out.into_output().generated_migration_name, path)
     };
 
     let dm2 = api.datamodel_with_provider(
@@ -423,6 +423,7 @@ fn with_a_failed_migration(api: TestApi) {
 
     let CreateMigrationOutput {
         generated_migration_name,
+        ..
     } = api
         .create_migration("01-init", &dm, &migrations_directory)
         .send_sync()
@@ -444,19 +445,16 @@ fn with_a_failed_migration(api: TestApi) {
         assert!(&err.contains("syntax"), "{}", err)
     }
 
-    std::fs::remove_dir_all(
-        migrations_directory
-            .path()
-            .join(generated_migration_name.as_ref().unwrap()),
-    )
-    .unwrap();
+    std::fs::remove_dir_all(migrations_directory.path().join(&generated_migration_name)).unwrap();
 
     let DevDiagnosticOutput { action } = api.dev_diagnostic(&migrations_directory).send().into_output();
 
-    assert!(action.as_reset().unwrap().contains(&format!(
-        "The migration `{}` failed.",
-        generated_migration_name.unwrap()
-    )));
+    assert!(
+        action
+            .as_reset()
+            .unwrap()
+            .contains(&format!("The migration `{generated_migration_name}` failed."))
+    );
 }
 
 #[test_connector]
@@ -490,6 +488,7 @@ fn with_an_invalid_unapplied_migration_should_report_it(api: TestApi) {
 
     let CreateMigrationOutput {
         generated_migration_name,
+        ..
     } = api
         .create_migration("second-migration", &dm2, &directory)
         .send_sync()
@@ -504,10 +503,8 @@ fn with_an_invalid_unapplied_migration_should_report_it(api: TestApi) {
         .to_user_facing()
         .unwrap_known();
 
-    let expected_msg = format!(
-        "Migration `{}` failed to apply cleanly to the shadow database. \nError",
-        generated_migration_name.unwrap()
-    );
+    let expected_msg =
+        format!("Migration `{generated_migration_name}` failed to apply cleanly to the shadow database. \nError");
 
     assert_eq!(err.error_code, MigrationDoesNotApplyCleanly::ERROR_CODE);
     assert!(err.message.starts_with(&expected_msg));
@@ -606,23 +603,29 @@ fn dev_diagnostic_shadow_database_creation_error_is_special_cased_mysql(api: Tes
 
     let db_url: url::Url = api.connection_string().parse().unwrap();
 
-    let datamodel = format!(
+    let datamodel = indoc!(
         r#"
-        datasource db {{
+        datasource db {
             provider = "mysql"
-            url = "mysql://prismashadowdbtestuser:1234batman@{dbhost}:{dbport}/{dbname}"
-        }}
+        }
         "#,
+    );
+
+    let url = format!(
+        "mysql://prismashadowdbtestuser:1234batman@{dbhost}:{dbport}/{dbname}",
         dbhost = db_url.host().unwrap(),
         dbname = api.connection_info().dbname().unwrap(),
         dbport = db_url.port().unwrap_or(3306),
     );
 
+    let migrations_list = list_migrations(&directory.keep()).unwrap();
+
     let err = tok(async {
-        let migration_api = schema_api(Some(datamodel), None).unwrap();
-        migration_api
+        schema_api_without_extensions(Some(datamodel.to_owned()), DatasourceUrls::from_url(url), None)
+            .unwrap()
             .dev_diagnostic(DevDiagnosticInput {
-                migrations_directory_path: directory.path().as_os_str().to_string_lossy().into_owned(),
+                migrations_list,
+                filters: SchemaFilter::default(),
             })
             .await
     })
@@ -654,23 +657,29 @@ fn dev_diagnostic_shadow_database_creation_error_is_special_cased_postgres(api: 
 
     let db_url: url::Url = api.connection_string().parse().unwrap();
 
-    let datamodel = format!(
+    let datamodel = indoc!(
         r#"
-        datasource db {{
+        datasource db {
             provider = "postgresql"
-            url = "postgresql://prismashadowdbtestuser:1234batman@{dbhost}:{dbport}/{dbname}"
-        }}
+        }
         "#,
+    );
+
+    let url = format!(
+        "postgresql://prismashadowdbtestuser:1234batman@{dbhost}:{dbport}/{dbname}",
         dbhost = db_url.host().unwrap(),
         dbname = api.connection_info().dbname().unwrap(),
         dbport = db_url.port().unwrap(),
     );
 
+    let migrations_list = list_migrations(&directory.keep()).unwrap();
+
     let err = tok(async move {
-        let migration_api = schema_api(Some(datamodel), None).unwrap();
-        migration_api
+        schema_api_without_extensions(Some(datamodel.to_owned()), DatasourceUrls::from_url(url), None)
+            .unwrap()
             .dev_diagnostic(DevDiagnosticInput {
-                migrations_directory_path: directory.path().as_os_str().to_string_lossy().into_owned(),
+                migrations_list,
+                filters: SchemaFilter::default(),
             })
             .await
     })
@@ -772,13 +781,12 @@ fn dev_diagnostic_multi_schema_does_not_panic() {
     let schema = format! {r#"
         datasource db {{
             provider = "{provider}"
-            url = "{url}"
-            schemas = ["prisma-tests", "auth"]
+            schemas = ["public", "auth"]
         }}
 
         generator js {{
-            provider = "prisma-client-js"
-            previewFeatures = ["multiSchema"]
+            provider = "prisma-client"
+            previewFeatures = []
         }}
 
         model users {{
@@ -792,7 +800,7 @@ fn dev_diagnostic_multi_schema_does_not_panic() {
           id    String @id @db.Uuid
           users users  @relation(fields: [id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
-          @@schema("prisma-tests")
+          @@schema("public")
         }}
     "#};
 
@@ -807,20 +815,20 @@ CREATE TABLE auth.users (
     CONSTRAINT users_pkey PRIMARY KEY (id)
 );
 
--- "prisma-tests".profiles definition
-CREATE TABLE "prisma-tests".profiles (
+-- "public".profiles definition
+CREATE TABLE "public".profiles (
     id uuid NOT NULL,
     CONSTRAINT profiles_pkey PRIMARY KEY (id)
 );
 
--- "prisma-tests".profiles foreign keys
-ALTER TABLE "prisma-tests".profiles ADD CONSTRAINT profiles_id_fkey FOREIGN KEY (id) REFERENCES auth.users(id);
+-- "public".profiles foreign keys
+ALTER TABLE "public".profiles ADD CONSTRAINT profiles_id_fkey FOREIGN KEY (id) REFERENCES auth.users(id);
     "#;
 
     let tempdir = tempfile::tempdir().unwrap();
     std::fs::write(tempdir.path().join("schema.prisma"), &schema).unwrap();
 
-    let api = schema_core::schema_api(Some(schema), None).unwrap();
+    let api = schema_core::schema_api_without_extensions(Some(schema), DatasourceUrls::from_url(&url), None).unwrap();
 
     tok(api.db_execute(DbExecuteParams {
         datasource_type: DbExecuteDatasourceType::Url(UrlContainer { url }),
@@ -828,8 +836,11 @@ ALTER TABLE "prisma-tests".profiles ADD CONSTRAINT profiles_id_fkey FOREIGN KEY 
     }))
     .unwrap();
 
+    let migrations_list = list_migrations(&tempdir.keep()).unwrap();
+
     tok(api.dev_diagnostic(DevDiagnosticInput {
-        migrations_directory_path: tempdir.path().join("migrations").to_string_lossy().into_owned(),
+        migrations_list,
+        filters: SchemaFilter::default(),
     }))
     .unwrap();
 }

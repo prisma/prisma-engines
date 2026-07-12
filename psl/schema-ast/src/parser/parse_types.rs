@@ -1,4 +1,4 @@
-use super::{helpers::Pair, Rule};
+use super::{Rule, helpers::Pair};
 use crate::{ast::*, parser::parse_expression::parse_expression};
 use diagnostics::{DatamodelError, Diagnostics, FileId};
 

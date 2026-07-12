@@ -1,14 +1,9 @@
-use super::{differ_database::DifferDatabase, ColumnTypeChange};
+use super::{ColumnTypeChange, differ_database::DifferDatabase};
 use crate::{migration_pair::MigrationPair, sql_migration::SqlMigrationStep, sql_schema_differ};
 use sql_schema_describer::{
-    walkers::{IndexWalker, TableColumnWalker, TableWalker},
     TableColumnId,
+    walkers::{IndexWalker, TableColumnWalker, TableWalker},
 };
-
-mod mssql;
-mod mysql;
-mod postgres;
-mod sqlite;
 
 /// Trait to specialize SQL schema diffing (resulting in migration steps) by SQL backend.
 pub(crate) trait SqlSchemaDifferFlavour {
@@ -59,6 +54,11 @@ pub(crate) trait SqlSchemaDifferFlavour {
     /// Connector-specific criterias deciding whether two indexes match.
     fn indexes_match(&self, _a: IndexWalker<'_>, _b: IndexWalker<'_>) -> bool {
         true
+    }
+
+    /// Connector-specific criteria for predicate matching.
+    fn predicates_match(&self, a: Option<&str>, b: Option<&str>) -> bool {
+        a == b
     }
 
     /// Returns whether the underlying database implicitly drops indexes on dropped (and potentially recreated) columns.
@@ -118,8 +118,8 @@ pub(crate) trait SqlSchemaDifferFlavour {
         true
     }
 
-    /// Whether indexes matching a foreign key should be skipped.
-    fn should_skip_fk_indexes(&self) -> bool {
+    /// Whether foreign keys should be recreated when they are covered by deleted indexes.
+    fn should_recreate_fks_covered_by_deleted_indexes(&self) -> bool {
         false
     }
 
@@ -141,6 +141,23 @@ pub(crate) trait SqlSchemaDifferFlavour {
 
     fn table_names_match(&self, names: MigrationPair<&str>) -> bool {
         names.previous == names.next
+    }
+
+    /// Check if the given table name is in the given list of tables names.
+    /// If the user uses multiple schemas the table names has to be fully qualified (e.g. `auth.user`).
+    fn contains_table(&self, tables: &[String], namespace: Option<&str>, table_name: &str) -> bool {
+        let str_eq = if self.lower_cases_table_names() {
+            str::eq_ignore_ascii_case
+        } else {
+            str::eq
+        };
+
+        if let Some(ns) = namespace {
+            let namespaced_table_name = format!("{ns}.{table_name}");
+            tables.iter().any(|t| str_eq(t, &namespaced_table_name))
+        } else {
+            tables.iter().any(|t| str_eq(t, table_name))
+        }
     }
 
     /// Return the tables that cannot be migrated without being redefined. This

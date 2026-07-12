@@ -89,7 +89,7 @@ fn all_mysql_column_types_must_work(api: TestApi) {
     api.raw_cmd(sql);
     let expectation = expect![[r#"
         SqlSchema {
-            namespaces: [],
+            namespaces: {},
             tables: [
                 Table {
                     namespace_id: NamespaceId(
@@ -850,8 +850,10 @@ fn all_mysql_column_types_must_work(api: TestApi) {
                     ),
                     index_name: "",
                     tpe: PrimaryKey,
+                    predicate: None,
                 },
             ],
+            stripped_partial_indexes: <StrippedPartialIndexes>,
             index_columns: [
                 IndexColumn {
                     index_id: IndexId(
@@ -872,6 +874,7 @@ fn all_mysql_column_types_must_work(api: TestApi) {
             procedures: [],
             user_defined_types: [],
             connector_data: <ConnectorData>,
+            runtime_namespace: None,
         }
     "#]];
     api.expect_schema(expectation);
@@ -925,7 +928,7 @@ fn all_mariadb_column_types_must_work(api: TestApi) {
     api.raw_cmd(sql);
     let expectation = expect![[r#"
         SqlSchema {
-            namespaces: [],
+            namespaces: {},
             tables: [
                 Table {
                     namespace_id: NamespaceId(
@@ -1676,8 +1679,10 @@ fn all_mariadb_column_types_must_work(api: TestApi) {
                     ),
                     index_name: "",
                     tpe: PrimaryKey,
+                    predicate: None,
                 },
             ],
+            stripped_partial_indexes: <StrippedPartialIndexes>,
             index_columns: [
                 IndexColumn {
                     index_id: IndexId(
@@ -1698,6 +1703,7 @@ fn all_mariadb_column_types_must_work(api: TestApi) {
             procedures: [],
             user_defined_types: [],
             connector_data: <ConnectorData>,
+            runtime_namespace: None,
         }
     "#]];
     api.expect_schema(expectation);
@@ -1754,7 +1760,7 @@ fn all_mysql_8_column_types_must_work(api: TestApi) {
 
     let expectation = expect![[r#"
         SqlSchema {
-            namespaces: [],
+            namespaces: {},
             tables: [
                 Table {
                     namespace_id: NamespaceId(
@@ -2505,8 +2511,10 @@ fn all_mysql_8_column_types_must_work(api: TestApi) {
                     ),
                     index_name: "",
                     tpe: PrimaryKey,
+                    predicate: None,
                 },
             ],
+            stripped_partial_indexes: <StrippedPartialIndexes>,
             index_columns: [
                 IndexColumn {
                     index_id: IndexId(
@@ -2527,6 +2535,7 @@ fn all_mysql_8_column_types_must_work(api: TestApi) {
             procedures: [],
             user_defined_types: [],
             connector_data: <ConnectorData>,
+            runtime_namespace: None,
         }
     "#]];
     api.expect_schema(expectation);
@@ -2647,7 +2656,7 @@ fn constraints_from_other_databases_should_not_be_introspected(api: TestApi) {
 
     let expectation = expect![[r#"
         SqlSchema {
-            namespaces: [],
+            namespaces: {},
             tables: [
                 Table {
                     namespace_id: NamespaceId(
@@ -2765,6 +2774,7 @@ fn constraints_from_other_databases_should_not_be_introspected(api: TestApi) {
                     ),
                     index_name: "",
                     tpe: PrimaryKey,
+                    predicate: None,
                 },
                 Index {
                     table_id: TableId(
@@ -2772,6 +2782,7 @@ fn constraints_from_other_databases_should_not_be_introspected(api: TestApi) {
                     ),
                     index_name: "user_id",
                     tpe: Normal,
+                    predicate: None,
                 },
                 Index {
                     table_id: TableId(
@@ -2779,8 +2790,10 @@ fn constraints_from_other_databases_should_not_be_introspected(api: TestApi) {
                     ),
                     index_name: "",
                     tpe: PrimaryKey,
+                    predicate: None,
                 },
             ],
+            stripped_partial_indexes: <StrippedPartialIndexes>,
             index_columns: [
                 IndexColumn {
                     index_id: IndexId(
@@ -2825,6 +2838,7 @@ fn constraints_from_other_databases_should_not_be_introspected(api: TestApi) {
             procedures: [],
             user_defined_types: [],
             connector_data: <ConnectorData>,
+            runtime_namespace: None,
         }
     "#]];
     api.expect_schema(expectation);
@@ -2841,7 +2855,7 @@ fn introspected_default_strings_should_be_unescaped(api: TestApi) {
     api.raw_cmd(create_table);
     let expectation = expect![[r#"
         SqlSchema {
-            namespaces: [],
+            namespaces: {},
             tables: [
                 Table {
                     namespace_id: NamespaceId(
@@ -2895,6 +2909,7 @@ fn introspected_default_strings_should_be_unescaped(api: TestApi) {
             view_default_values: [],
             foreign_key_columns: [],
             indexes: [],
+            stripped_partial_indexes: <StrippedPartialIndexes>,
             index_columns: [],
             check_constraints: [],
             views: [],
@@ -2902,6 +2917,7 @@ fn introspected_default_strings_should_be_unescaped(api: TestApi) {
             procedures: [],
             user_defined_types: [],
             connector_data: <ConnectorData>,
+            runtime_namespace: None,
         }
     "#]];
     api.expect_schema(expectation);
@@ -2919,7 +2935,7 @@ fn escaped_quotes_in_string_defaults_must_be_unescaped(api: TestApi) {
 
     let expectation = expect![[r#"
         SqlSchema {
-            namespaces: [],
+            namespaces: {},
             tables: [
                 Table {
                     namespace_id: NamespaceId(
@@ -3004,6 +3020,7 @@ fn escaped_quotes_in_string_defaults_must_be_unescaped(api: TestApi) {
             view_default_values: [],
             foreign_key_columns: [],
             indexes: [],
+            stripped_partial_indexes: <StrippedPartialIndexes>,
             index_columns: [],
             check_constraints: [],
             views: [],
@@ -3011,6 +3028,7 @@ fn escaped_quotes_in_string_defaults_must_be_unescaped(api: TestApi) {
             procedures: [],
             user_defined_types: [],
             connector_data: <ConnectorData>,
+            runtime_namespace: None,
         }
     "#]];
     api.expect_schema(expectation);
@@ -3028,7 +3046,7 @@ fn escaped_backslashes_in_string_literals_must_be_unescaped(api: TestApi) {
 
     let expectation = expect![[r#"
         SqlSchema {
-            namespaces: [],
+            namespaces: {},
             tables: [
                 Table {
                     namespace_id: NamespaceId(
@@ -3082,6 +3100,7 @@ fn escaped_backslashes_in_string_literals_must_be_unescaped(api: TestApi) {
             view_default_values: [],
             foreign_key_columns: [],
             indexes: [],
+            stripped_partial_indexes: <StrippedPartialIndexes>,
             index_columns: [],
             check_constraints: [],
             views: [],
@@ -3089,6 +3108,7 @@ fn escaped_backslashes_in_string_literals_must_be_unescaped(api: TestApi) {
             procedures: [],
             user_defined_types: [],
             connector_data: <ConnectorData>,
+            runtime_namespace: None,
         }
     "#]];
     api.expect_schema(expectation);
@@ -3117,7 +3137,7 @@ fn function_expression_defaults_are_described_as_dbgenerated(api: TestApi) {
 
     let expectation = expect![[r#"
         SqlSchema {
-            namespaces: [],
+            namespaces: {},
             tables: [
                 Table {
                     namespace_id: NamespaceId(
@@ -3523,6 +3543,7 @@ fn function_expression_defaults_are_described_as_dbgenerated(api: TestApi) {
             view_default_values: [],
             foreign_key_columns: [],
             indexes: [],
+            stripped_partial_indexes: <StrippedPartialIndexes>,
             index_columns: [],
             check_constraints: [],
             views: [],
@@ -3530,6 +3551,7 @@ fn function_expression_defaults_are_described_as_dbgenerated(api: TestApi) {
             procedures: [],
             user_defined_types: [],
             connector_data: <ConnectorData>,
+            runtime_namespace: None,
         }
     "#]];
     api.expect_schema(expectation);

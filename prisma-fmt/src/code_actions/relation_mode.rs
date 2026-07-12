@@ -1,5 +1,8 @@
 use lsp_types::{CodeAction, CodeActionKind, CodeActionOrCommand};
-use psl::{parser_database::walkers::CompleteInlineRelationWalker, schema_ast::ast::SourceConfig};
+use psl::{
+    parser_database::walkers::CompleteInlineRelationWalker,
+    schema_ast::ast::{SourceConfig, WithIdentifier, WithName},
+};
 
 use super::CodeActionsContext;
 
@@ -8,7 +11,7 @@ pub(crate) fn edit_referential_integrity(
     context: &CodeActionsContext<'_>,
     source: &SourceConfig,
 ) {
-    let prop = match source.properties.iter().find(|p| p.name.name == "referentialIntegrity") {
+    let prop = match source.properties.iter().find(|p| p.name() == "referentialIntegrity") {
         Some(prop) => prop,
         None => return,
     };
@@ -21,7 +24,7 @@ pub(crate) fn edit_referential_integrity(
         context.initiating_file_source(),
         "relationMode".to_owned(),
         false,
-        prop.name.span,
+        prop.identifier().span,
     ) else {
         return;
     };

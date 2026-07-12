@@ -1,35 +1,14 @@
-use query_core::telemetry::helpers as telemetry_helpers;
-use query_engine_metrics::MetricRegistry;
+use tracing::Subscriber;
 use tracing_error::ErrorLayer;
-use tracing_subscriber::{layer::Layered, prelude::*, Layer, Registry};
+use tracing_subscriber::{Layer, prelude::*};
 
 use crate::LogEmit;
 
-// Pretty ugly. I'm not sure how to make this better
-type Sub = Layered<
-    ErrorLayer<
-        Layered<
-            Box<
-                dyn tracing_subscriber::Layer<
-                        Layered<Box<dyn tracing_subscriber::Layer<Registry> + Send + Sync>, Registry>,
-                    > + Send
-                    + Sync,
-            >,
-            Layered<Box<dyn tracing_subscriber::Layer<Registry> + Send + Sync>, Registry>,
-        >,
-    >,
-    Layered<
-        Box<
-            dyn tracing_subscriber::Layer<Layered<Box<dyn tracing_subscriber::Layer<Registry> + Send + Sync>, Registry>>
-                + Send
-                + Sync,
-        >,
-        Layered<Box<dyn tracing_subscriber::Layer<Registry> + Send + Sync>, Registry>,
-    >,
->;
-
-pub fn test_tracing_subscriber(log_config: String, metrics: MetricRegistry, log_tx: LogEmit) -> Sub {
-    let filter = telemetry_helpers::env_filter(true, telemetry_helpers::QueryEngineLogLevel::Override(log_config));
+pub fn test_tracing_subscriber(log_config: String, log_tx: LogEmit) -> impl Subscriber {
+    let filter = telemetry::filter::EnvFilterBuilder::new()
+        .with_log_level(&log_config)
+        .log_queries(true)
+        .build();
 
     let fmt_layer = tracing_subscriber::fmt::layer()
         .with_writer(PrintWriter::new(log_tx))
@@ -37,7 +16,6 @@ pub fn test_tracing_subscriber(log_config: String, metrics: MetricRegistry, log_
 
     tracing_subscriber::registry()
         .with(fmt_layer.boxed())
-        .with(metrics.boxed())
         .with(ErrorLayer::default())
 }
 

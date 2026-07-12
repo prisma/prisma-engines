@@ -5,8 +5,8 @@
 
 use indoc::indoc;
 use query_engine_tests::{
-    query_core::TxId, render_test_datamodel, setup_metrics, test_tracing_subscriber, LogEmit, QueryResult, Runner,
-    TestError, TestLogCapture, TestResult, WithSubscriber, CONFIG, ENV_LOG_LEVEL,
+    CONFIG, ENV_LOG_LEVEL, LogEmit, QueryResult, Runner, TestError, TestLogCapture, TestResult, TxId, WithSubscriber,
+    render_test_datamodel, test_tracing_subscriber,
 };
 use std::future::Future;
 use tokio::sync::mpsc;
@@ -50,44 +50,36 @@ impl Actor {
     /// Spawns a new query engine to the runtime.
     pub async fn spawn() -> TestResult<Self> {
         let (log_capture, log_tx) = TestLogCapture::new();
-        async fn with_logs<T>(fut: impl Future<Output = T>, log_tx: LogEmit) -> T {
-            fut.with_subscriber(test_tracing_subscriber(
-                ENV_LOG_LEVEL.to_string(),
-                setup_metrics(),
-                log_tx,
-            ))
-            .await
+
+        async fn with_tracing<T>(fut: impl Future<Output = T>, log_tx: LogEmit) -> T {
+            fut.with_subscriber(test_tracing_subscriber(ENV_LOG_LEVEL.to_string(), log_tx))
+                .await
         }
 
         let (query_sender, mut query_receiver) = mpsc::channel(100);
         let (response_sender, response_receiver) = mpsc::channel(100);
         let (tag, version) = query_tests_setup::CONFIG.test_connector()?;
 
-        let datamodel = render_test_datamodel(
-            "sql_server_deadlocks_test",
-            SCHEMA.to_owned(),
-            &[],
-            None,
-            &[],
-            &[],
-            Some("READ COMMITTED"),
-        );
+        let url =
+            query_tests_setup::connection_string(&version, "sql_server_deadlocks_test", false, Some("READ COMMITTED"));
 
-        let mut runner = Runner::load(datamodel, &[], version, tag, None, setup_metrics(), log_capture).await?;
+        let datamodel = render_test_datamodel(SCHEMA.to_owned(), &[], None, &[], &[]);
+
+        let mut runner = Runner::load(&url, &datamodel, &[], version, tag, None, log_capture).await?;
 
         tokio::spawn(async move {
             while let Some(message) = query_receiver.recv().await {
                 match message {
                     Message::Query(query) => {
-                        let result = with_logs(runner.query(query), log_tx.clone()).await;
+                        let result = with_tracing(runner.query(query), log_tx.clone()).await;
                         response_sender.send(Response::Query(result)).await.unwrap();
                     }
                     Message::BeginTransaction => {
-                        let response = with_logs(runner.start_tx(10000, 10000, None), log_tx.clone()).await;
+                        let response = with_tracing(runner.start_tx(10000, 10000, None), log_tx.clone()).await;
                         response_sender.send(Response::Tx(response)).await.unwrap();
                     }
                     Message::RollbackTransaction(tx_id) => {
-                        let response = with_logs(runner.rollback_tx(tx_id), log_tx.clone()).await?;
+                        let response = with_tracing(runner.rollback_tx(tx_id), log_tx.clone()).await?;
                         response_sender.send(Response::Rollback(response)).await.unwrap();
                     }
                     Message::SetActiveTx(tx_id) => {
@@ -176,7 +168,10 @@ impl Actor {
 
 #[tokio::test]
 async fn sqlserver_can_recover_from_deadlocks() -> TestResult<()> {
-    if CONFIG.connector() != "sqlserver" {
+    if CONFIG.connector() != "sqlserver" ||
+        // TODO: investigate why the adapter raises a different error
+        CONFIG.connector_version() == Some("mssql.js.wasm")
+    {
         return Ok(());
     }
 

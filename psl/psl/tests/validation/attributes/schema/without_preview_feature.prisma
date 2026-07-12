@@ -1,6 +1,5 @@
 datasource testds {
     provider = "postgresql"
-    url = env("TEST_DATABASE_URL")
 }
 
 model Test {
@@ -9,9 +8,9 @@ model Test {
     @@schema("public")
 }
 
-// [1;91merror[0m: [1m@@schema is only available with the `multiSchema` preview feature.[0m
-//   [1;94m-->[0m  [4mschema.prisma:9[0m
+// [1;91merror[0m: [1mThis schema is not defined in the datasource. Read more on `@@schema` at https://pris.ly/d/multi-schema[0m
+//   [1;94m-->[0m  [4mschema.prisma:8[0m
 // [1;94m   | [0m
-// [1;94m 8 | [0m
-// [1;94m 9 | [0m    @@schema([1;91m"public"[0m)
+// [1;94m 7 | [0m
+// [1;94m 8 | [0m    @@schema([1;91m"public"[0m)
 // [1;94m   | [0m

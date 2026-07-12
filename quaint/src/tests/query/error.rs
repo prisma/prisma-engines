@@ -15,7 +15,7 @@ async fn table_does_not_exist(api: &mut dyn TestApi) -> crate::Result<()> {
         ErrorKind::TableDoesNotExist { table } => {
             assert_eq!(&Name::available("not_there"), table);
         }
-        e => panic!("Expected error TableDoesNotExist, got {:?}", e),
+        e => panic!("Expected error TableDoesNotExist, got {e:?}"),
     }
 
     Ok(())
@@ -31,7 +31,7 @@ async fn database_already_exists(api: &mut dyn TestApi) -> crate::Result<()> {
         ErrorKind::DatabaseAlreadyExists { db_name } => {
             assert_eq!(&Name::available("master"), db_name);
         }
-        e => panic!("Expected error DatabaseAlreadyExists, got {:?}", e),
+        e => panic!("Expected error DatabaseAlreadyExists, got {e:?}"),
     }
 
     Ok(())
@@ -52,7 +52,7 @@ async fn column_does_not_exist_on_write(api: &mut dyn TestApi) -> crate::Result<
         ErrorKind::ColumnNotFound { column } => {
             assert_eq!(&Name::available("does_not_exist"), column);
         }
-        e => panic!("Expected error ColumnNotFound, got {:?}", e),
+        e => panic!("Expected error ColumnNotFound, got {e:?}"),
     }
 
     Ok(())
@@ -76,7 +76,7 @@ async fn column_does_not_exist_on_read(api: &mut dyn TestApi) -> crate::Result<(
         ErrorKind::ColumnNotFound { column } => {
             assert_eq!(&Name::available("does_not_exist"), column);
         }
-        e => panic!("Expected error ColumnNotFound, got {:?}", e),
+        e => panic!("Expected error ColumnNotFound, got {e:?}"),
     }
 
     Ok(())
@@ -102,6 +102,39 @@ async fn unique_constraint_violation(api: &mut dyn TestApi) -> crate::Result<()>
             DatabaseConstraint::Fields(fields) => {
                 let fields = fields.iter().map(|s| s.as_str()).collect::<Vec<_>>();
                 assert_eq!(vec!["id1", "id2"], fields)
+            }
+            DatabaseConstraint::ForeignKey => panic!("Expecting index or field constraints."),
+            DatabaseConstraint::CannotParse => panic!("Couldn't parse the error message."),
+        },
+        _ => panic!("{}", err),
+    }
+
+    Ok(())
+}
+
+#[test_each_connector(tags("postgresql"))]
+async fn expression_based_unique_index(api: &mut dyn TestApi) -> crate::Result<()> {
+    let table = api.create_temp_table("id1 int, json_data JSONB").await?;
+    let index = api.create_index(&table, "id1, (json_data->>'field')").await?;
+
+    let insert = Insert::single_into(&table)
+        .value("id1", 1)
+        .value("json_data", Value::json(serde_json::json!({"field": "a"})));
+    api.conn().insert(insert.clone().into()).await?;
+
+    let res = api.conn().insert(insert.clone().into()).await;
+
+    assert!(res.is_err());
+
+    let err = res.unwrap_err();
+
+    match &err.kind() {
+        ErrorKind::UniqueConstraintViolation { constraint } => match constraint {
+            DatabaseConstraint::Index(idx) => assert_eq!(&index, idx),
+            DatabaseConstraint::Fields(fields) => {
+                let fields = fields.iter().map(|s| s.as_str()).collect::<Vec<_>>();
+                // PostgreSQL normalizes the expression: json_data->>'field' becomes (json_data ->> 'field'::text)
+                assert_eq!(vec!["id1", "(json_data ->> 'field'::text)"], fields)
             }
             DatabaseConstraint::ForeignKey => panic!("Expecting index or field constraints."),
             DatabaseConstraint::CannotParse => panic!("Couldn't parse the error message."),
@@ -162,7 +195,7 @@ async fn int_unsigned_negative_value_out_of_range(api: &mut dyn TestApi) -> crat
 
     // Value too big
     {
-        let insert = Insert::multi_into(&table, ["big"]).values((std::i64::MAX,));
+        let insert = Insert::multi_into(&table, ["big"]).values((i64::MAX,));
         let result = api.conn().insert(insert.into()).await;
 
         assert!(matches!(result.unwrap_err().kind(), ErrorKind::ValueOutOfRange { .. }));
@@ -283,7 +316,7 @@ async fn garbage_datetime_values(api: &mut dyn TestApi) -> crate::Result<()> {
 
             assert_eq!(&expected_message, message);
         }
-        e => panic!("Expected error ColumnNotFound, got {:?}", e),
+        e => panic!("Expected error ColumnNotFound, got {e:?}"),
     }
 
     Ok(())

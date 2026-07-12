@@ -1,0 +1,14 @@
+{
+  "modelName": "User",
+  "action": "updateOne",
+  "query": {
+    "arguments": {
+      "relationLoadStrategy": "query",
+      "where": { "email": "user.1737556028164@prisma.io" },
+      "data": { "email": "user.2737556028164@prisma.io" }
+    },
+    "selection": {
+      "email": true
+    }
+  }
+}

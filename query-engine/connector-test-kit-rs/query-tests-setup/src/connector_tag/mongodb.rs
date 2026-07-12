@@ -8,7 +8,7 @@ use psl::builtin_connectors::MONGODB;
 pub(crate) struct MongoDbConnectorTag;
 
 impl ConnectorTagInterface for MongoDbConnectorTag {
-    fn raw_execute(&self, _query: &str, _connection_url: &str) -> BoxFuture<Result<(), TestError>> {
+    fn raw_execute(&self, _query: &str, _connection_url: &str) -> BoxFuture<'_, Result<(), TestError>> {
         panic!("raw_execute is not supported for MongoDB yet");
     }
 

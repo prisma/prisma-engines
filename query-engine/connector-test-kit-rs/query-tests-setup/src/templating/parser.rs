@@ -1,5 +1,6 @@
 use super::*;
 use nom::{
+    IResult,
     branch::alt,
     bytes::complete::is_not,
     bytes::complete::{tag, take_till, take_until},
@@ -7,7 +8,6 @@ use nom::{
     error::{Error as NomError, ErrorKind},
     multi::{many0, separated_list0},
     sequence::delimited,
-    IResult,
 };
 use parse_hyperlinks::take_until_unbalanced;
 

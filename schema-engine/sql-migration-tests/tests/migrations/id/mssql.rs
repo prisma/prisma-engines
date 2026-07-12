@@ -162,7 +162,6 @@ fn altering_descending_primary_key(api: TestApi) {
     let dm = indoc! {r#"
         datasource slqserverdb {
             provider = "sqlserver"
-            url = env("TEST_DATABASE_URL")
         }
 
         model A {
@@ -179,7 +178,6 @@ fn altering_descending_primary_key(api: TestApi) {
     let dm = indoc! {r#"
         datasource slqserverdb {
             provider = "sqlserver"
-            url = env("TEST_DATABASE_URL")
         }
 
         model A {

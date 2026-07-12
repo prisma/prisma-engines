@@ -7,16 +7,15 @@ use renderer::{
     value::Function,
 };
 use schema_connector::{
-    warnings::{ModelAndField, ModelAndFieldAndType, TypeAndField, TypeAndFieldAndType},
     CompositeTypeDepth, IntrospectionContext, Warnings,
+    warnings::{ModelAndField, ModelAndFieldAndType, TypeAndField, TypeAndFieldAndType},
 };
 
 use super::field_type::FieldType;
+use bson::{Bson, Document};
 use convert_case::{Case, Casing};
 use datamodel_renderer as renderer;
-use mongodb::bson::{Bson, Document};
 use mongodb_schema_describer::{CollectionWalker, IndexWalker};
-use once_cell::sync::Lazy;
 use psl::datamodel_connector::constraint_names::ConstraintNames;
 use regex::Regex;
 use std::{
@@ -24,6 +23,7 @@ use std::{
     cmp::Ordering,
     collections::{BTreeMap, HashMap, HashSet},
     fmt,
+    sync::LazyLock,
 };
 
 pub(super) const SAMPLE_SIZE: i32 = 1000;
@@ -165,7 +165,7 @@ impl<'a> Statistics<'a> {
                     let mut field = renderer::datamodel::Field::new("id", "String");
 
                     field.map("_id");
-                    field.native_type(&ctx.datasource().name, "ObjectId", Vec::new());
+                    field.native_type(&ctx.datasource().name, "ObjectId", Vec::<String>::new());
                     field.default(renderer::datamodel::DefaultValue::function(Function::new("auto")));
                     field.id(IdFieldDefinition::new());
 
@@ -286,7 +286,7 @@ impl<'a> Statistics<'a> {
             }
 
             if let Some(native_type) = field_type.native_type() {
-                field.native_type(&ctx.datasource().name, native_type.to_string(), Vec::new());
+                field.native_type(&ctx.datasource().name, native_type.to_string(), Vec::<String>::new());
             }
 
             if field_type.is_array() {
@@ -365,7 +365,7 @@ impl<'a> Statistics<'a> {
             }
 
             match container {
-                Name::Model(ref model_name) => {
+                Name::Model(model_name) => {
                     let unique = self.indices.get(model_name).and_then(|indices| {
                         indices.iter().find(|idx| {
                             idx.is_unique() && idx.fields().len() == 1 && idx.fields().any(|f| f.name() == field_name)
@@ -401,7 +401,7 @@ impl<'a> Statistics<'a> {
                         model.push_field(field);
                     }
                 }
-                Name::CompositeType(ref type_name) => {
+                Name::CompositeType(type_name) => {
                     let r#type = types
                         .entry(type_name.as_str())
                         .or_insert_with(|| renderer::datamodel::CompositeType::new(type_name));
@@ -655,8 +655,8 @@ impl FieldPercentages {
 }
 
 fn sanitize_string(s: &str) -> Option<String> {
-    static RE_START: Lazy<Regex> = Lazy::new(|| Regex::new("^[^a-zA-Z]+").unwrap());
-    static RE: Lazy<Regex> = Lazy::new(|| Regex::new("[^_a-zA-Z0-9]").unwrap());
+    static RE_START: LazyLock<Regex> = LazyLock::new(|| Regex::new("^[^a-zA-Z]+").unwrap());
+    static RE: LazyLock<Regex> = LazyLock::new(|| Regex::new("[^_a-zA-Z0-9]").unwrap());
 
     let needs_sanitation = RE_START.is_match(s) || RE.is_match(s);
 

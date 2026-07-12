@@ -1,15 +1,18 @@
+use std::sync::LazyLock;
+
 use super::{
     constraint_namespace::ConstraintName,
     database_name::validate_db_name,
     default_value,
     names::{NameTaken, Names},
 };
-use crate::datamodel_connector::{walker_ext_traits::*, ConnectorCapability};
+use crate::datamodel_connector::{ConnectorCapability, NativeTypeConstructor, walker_ext_traits::*};
 use crate::{diagnostics::DatamodelError, validate::validation_pipeline::context::Context};
+use itertools::Itertools;
 use parser_database::{
+    ScalarFieldType, ScalarType,
     ast::{self, WithSpan},
     walkers::{FieldWalker, PrimaryKeyWalker, ScalarFieldAttributeWalker, ScalarFieldWalker, TypedFieldWalker},
-    ScalarFieldType, ScalarType,
 };
 
 pub(super) fn validate_client_name(field: FieldWalker<'_>, names: &Names<'_>, ctx: &mut Context<'_>) {
@@ -121,10 +124,10 @@ pub(crate) fn validate_length_used_with_correct_types(
         return;
     }
 
-    if let Some(r#type) = attr.as_index_field().scalar_field_type().as_builtin_scalar() {
-        if [ScalarType::String, ScalarType::Bytes].iter().any(|t| t == &r#type) {
-            return;
-        }
+    if let Some(r#type) = attr.as_index_field().scalar_field_type().as_builtin_scalar()
+        && [ScalarType::String, ScalarType::Bytes].iter().any(|t| t == &r#type)
+    {
+        return;
     };
 
     let message = "The length argument is only allowed with field types `String` or `Bytes`.";
@@ -137,28 +140,30 @@ pub(crate) fn validate_length_used_with_correct_types(
 }
 
 pub(super) fn validate_native_type_arguments<'db>(field: impl Into<TypedFieldWalker<'db>>, ctx: &mut Context<'db>) {
-    let field = field.into();
+    let field: TypedFieldWalker<'db> = field.into();
 
     let connector_name = ctx.datasource.map(|ds| ds.active_provider).unwrap_or_else(|| "Default");
-    let (scalar_type, (attr_scope, type_name, args, span)) = match (field.scalar_type(), field.raw_native_type()) {
-        (Some(scalar_type), Some(raw)) => (scalar_type, raw),
-        _ => return,
+    let scalar_type = field.scalar_field_type();
+    let Some((attr_scope, type_name, args, span)) = field.raw_native_type() else {
+        return;
     };
 
     // Validate that the attribute is scoped with the right datasource name.
-    if let Some(datasource) = ctx.datasource {
-        if datasource.name != attr_scope {
-            let suggestion = [datasource.name.as_str(), type_name].join(".");
-            ctx.push_error(DatamodelError::new_invalid_prefix_for_native_types(
-                attr_scope,
-                &datasource.name,
-                &suggestion,
-                span,
-            ));
-        }
+    if let Some(datasource) = ctx.datasource
+        && datasource.name != attr_scope
+    {
+        let suggestion = [datasource.name.as_str(), type_name].join(".");
+        ctx.push_error(DatamodelError::new_invalid_prefix_for_native_types(
+            attr_scope,
+            &datasource.name,
+            &suggestion,
+            span,
+        ));
     }
 
-    let constructor = if let Some(cons) = ctx.connector.find_native_type_constructor(type_name) {
+    let constructor = if let Some(entry) = ctx.extension_types.get_by_db_name_and_modifiers(type_name, Some(args)) {
+        &NativeTypeConstructor::from(&entry)
+    } else if let Some(cons) = ctx.connector.find_native_type_constructor(type_name) {
         cons
     } else {
         return ctx.push_error(DatamodelError::new_native_type_name_unknown(
@@ -195,15 +200,19 @@ pub(super) fn validate_native_type_arguments<'db>(field: impl Into<TypedFieldWal
     }
 
     // check for compatibility with scalar type
-    if !constructor.prisma_types.contains(&scalar_type) {
+    if !constructor
+        .allowed_types
+        .iter()
+        .any(|t| t.field_type == scalar_type && t.expected_arguments.as_deref().is_none_or(|e| e == args))
+    {
         let expected_types = constructor
-            .prisma_types
+            .allowed_types
             .iter()
-            .map(|s| s.as_str())
-            .collect::<Vec<_>>()
-            .join(" or ");
+            .map(|s| s.display(ctx.db))
+            .format(" or ");
 
-        let err = DatamodelError::new_incompatible_native_type(type_name, scalar_type.as_str(), &expected_types, span);
+        let err =
+            DatamodelError::new_incompatible_native_type(type_name, scalar_type.display(ctx.db), &expected_types, span);
 
         ctx.push_error(err);
 
@@ -211,8 +220,12 @@ pub(super) fn validate_native_type_arguments<'db>(field: impl Into<TypedFieldWal
     }
 
     if let Some(native_type) = ctx.connector.parse_native_type(type_name, args, span, ctx.diagnostics) {
-        ctx.connector
-            .validate_native_type_arguments(&native_type, &scalar_type, span, ctx.diagnostics);
+        ctx.connector.validate_native_type_arguments(
+            &native_type,
+            scalar_type.as_builtin_scalar(),
+            span,
+            ctx.diagnostics,
+        );
     }
 }
 
@@ -316,12 +329,11 @@ pub(super) fn validate_scalar_field_connector_specific(field: ScalarFieldWalker<
 }
 
 pub(super) fn validate_unsupported_field_type(field: ScalarFieldWalker<'_>, ctx: &mut Context<'_>) {
-    use once_cell::sync::Lazy;
     use regex::Regex;
 
     let source = if let Some(s) = ctx.datasource { s } else { return };
 
-    static TYPE_REGEX: Lazy<Regex> = Lazy::new(|| {
+    static TYPE_REGEX: LazyLock<Regex> = LazyLock::new(|| {
         Regex::new(r"(?x)
     ^                           # beginning of the string
     (?P<prefix>[^(]+)           # a required prefix that is any character until the first opening brace
@@ -349,13 +361,16 @@ pub(super) fn validate_unsupported_field_type(field: ScalarFieldWalker<'_>, ctx:
 
         if let Some(native_type) =
             connector.parse_native_type(prefix, &args, field.ast_field().span(), &mut Default::default())
+            && let Some(prisma_type) = connector.scalar_type_for_native_type(&native_type, ctx.extension_types)
         {
-            let prisma_type = connector.scalar_type_for_native_type(&native_type);
-
             let msg = format!(
-                        "The type `Unsupported(\"{}\")` you specified in the type definition for the field `{}` is supported as a native type by Prisma. Please use the native type notation `{} @{}.{}` for full support.",
-                        unsupported_lit, field.name(), prisma_type.as_str(), &source.name, connector.native_type_to_string(&native_type)
-                    );
+                "The type `Unsupported(\"{}\")` you specified in the type definition for the field `{}` is supported as a native type by Prisma. Please use the native type notation `{} @{}.{}` for full support.",
+                unsupported_lit,
+                field.name(),
+                prisma_type.display(ctx.db),
+                &source.name,
+                connector.native_type_to_string(&native_type)
+            );
 
             ctx.push_error(DatamodelError::new_validation_error(&msg, field.ast_field().span()));
         }

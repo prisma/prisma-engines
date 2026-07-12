@@ -12,12 +12,11 @@ CREATE VIEW B AS SELECT id, val from A;
 
 /*
 generator js {
-  provider = "prisma-client-js"
+  provider = "prisma-client"
 }
 
 datasource db {
   provider = "mysql"
-  url      = env("DATABASE_URL")
 }
 
 model A {

@@ -1,10 +1,12 @@
 use schema_core::{
-    commands::DiagnoseMigrationHistoryOutput,
-    commands::{diagnose_migration_history, DiagnoseMigrationHistoryInput},
-    schema_connector::SchemaConnector,
     CoreError, CoreResult,
+    commands::{DiagnoseMigrationHistoryInput, DiagnoseMigrationHistoryOutput, diagnose_migration_history_cli},
+    json_rpc::types::SchemaFilter,
+    schema_connector::SchemaConnector,
 };
 use tempfile::TempDir;
+
+use crate::utils;
 
 #[must_use = "This struct does nothing on its own. See DiagnoseMigrationHistory::send()"]
 pub struct DiagnoseMigrationHistory<'a> {
@@ -29,13 +31,17 @@ impl<'a> DiagnoseMigrationHistory<'a> {
     }
 
     pub async fn send(self) -> CoreResult<DiagnoseMigrationHistoryAssertions<'a>> {
-        let output = diagnose_migration_history(
+        let migrations_list = utils::list_migrations(self.migrations_directory.path()).unwrap();
+        let mut migration_schema_cache = Default::default();
+        let output = diagnose_migration_history_cli(
             DiagnoseMigrationHistoryInput {
-                migrations_directory_path: self.migrations_directory.path().to_str().unwrap().to_owned(),
+                migrations_list,
                 opt_in_to_shadow_database: self.opt_in_to_shadow_database,
+                filters: SchemaFilter::default(),
             },
             None,
             self.api,
+            &mut migration_schema_cache,
         )
         .await?;
 
@@ -67,7 +73,7 @@ impl std::fmt::Debug for DiagnoseMigrationHistoryAssertions<'_> {
     }
 }
 
-impl<'a> DiagnoseMigrationHistoryAssertions<'a> {
+impl DiagnoseMigrationHistoryAssertions<'_> {
     pub fn into_output(self) -> DiagnoseMigrationHistoryOutput {
         self.output
     }

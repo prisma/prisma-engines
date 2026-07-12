@@ -52,41 +52,11 @@ services:
     ports:
       - '6432:6432'
 
-  postgres9:
-    image: postgres:9.6
-    restart: unless-stopped
-    command: postgres -c 'max_connections=1000'
-    environment:
-      POSTGRES_PASSWORD: 'prisma'
-    ports:
-      - '5431:5432'
-    networks:
-      - databases
-
-  postgres10:
-    image: postgres:10
-    restart: unless-stopped
-    command: postgres -c 'max_connections=1000'
-    environment:
-      POSTGRES_PASSWORD: 'prisma'
-    ports:
-      - '5432:5432'
-    networks:
-      - databases
-
-  postgres11:
-    image: postgres:11
-    restart: unless-stopped
-    command: postgres -c 'max_connections=1000'
-    environment:
-      POSTGRES_PASSWORD: 'prisma'
-    ports:
-      - '5433:5432'
-    networks:
-      - databases
-
   postgres12:
-    image: postgres:12
+    build:
+      context: ./docker/postgres-ext
+      args:
+        POSTGRES_VERSION: 12
     restart: unless-stopped
     command: postgres -c 'max_connections=1000'
     environment:
@@ -97,7 +67,10 @@ services:
       - databases
 
   postgres13:
-    image: postgres:13
+    build:
+      context: ./docker/postgres-ext
+      args:
+        POSTGRES_VERSION: 13
     restart: unless-stopped
     command: postgres -c 'max_connections=1000'
     environment:
@@ -188,7 +161,10 @@ services:
       retries: 10
 
   postgres14:
-    image: postgres:14
+    build:
+      context: ./docker/postgres-ext
+      args:
+        POSTGRES_VERSION: 14
     restart: unless-stopped
     command: postgres -c 'max_connections=1000'
     environment:
@@ -201,7 +177,10 @@ services:
       - databases
 
   postgres15:
-    image: postgres:15
+    build:
+      context: ./docker/postgres-ext
+      args:
+        POSTGRES_VERSION: 15
     restart: unless-stopped
     command: postgres -c 'max_connections=1000'
     environment:
@@ -214,7 +193,10 @@ services:
       - databases
 
   postgres16:
-    image: postgres:16
+    build:
+      context: ./docker/postgres-ext
+      args:
+        POSTGRES_VERSION: 16
     restart: unless-stopped
     command: postgres -c 'max_connections=1000'
     environment:
@@ -494,22 +476,6 @@ services:
       - 14268:14268
       - 14269:14269
       - 9411:9411
-
-  prometheus:
-    image: prom/prometheus
-    restart: unless-stopped
-    volumes:
-      - ${PWD}/metrics/prometheus:/prometheus-data
-    command: --config.file=/prometheus-data/prometheus.yml
-    ports:
-      - 9090:9090
-  grafana:
-    image: grafana/grafana
-    volumes:
-      - ${PWD}/metrics/grafana/datasources:/etc/grafana/provisioning/datasources/
-      - ${PWD}/metrics/grafana/dashboards:/etc/grafana/provisioning/dashboards/
-    ports:
-      - 3000:3000
 
 networks:
   databases: null

@@ -67,6 +67,7 @@ impl QueryResult {
     }
 
     /// Asserts absence of errors in the result. Panics with assertion error.
+    #[track_caller]
     pub fn assert_success(&self) {
         if self.failed() {
             panic!("{}", self.to_string());
@@ -78,6 +79,7 @@ impl QueryResult {
     /// If more than one error is contained, asserts that at least one error contains the message _and_ code.
     ///
     /// Panics with assertion error on no match.
+    #[track_caller]
     pub fn assert_failure(&self, err_code: impl Into<Option<usize>>, msg_contains: Option<String>) {
         let err_code: Option<usize> = err_code.into();
         if !self.failed() {
@@ -136,6 +138,14 @@ impl QueryResult {
 
     pub fn to_string_pretty(&self) -> String {
         serde_json::to_string_pretty(&self.response).unwrap()
+    }
+
+    pub fn into_data(self) -> Vec<serde_json::Value> {
+        match self.response {
+            Response::Single(res) => vec![res.data],
+            Response::Multi(res) => res.batch_result.into_iter().map(|res| res.data).collect(),
+            Response::Error(_) => vec![],
+        }
     }
 
     /// Transform a JSON protocol response to a GraphQL protocol response, by removing the type
@@ -266,12 +276,12 @@ mod tests {
       {
          "errors":[
             {
-               "error":"An operation failed because it depends on one or more records that were required but not found. Expected a record, found none.",
+               "error":"An operation failed because it depends on one or more records that were required but not found. No record was found for a query.",
                "user_facing_error":{
                   "is_panic":false,
-                  "message":"An operation failed because it depends on one or more records that were required but not found. Expected a record, found none.",
+                  "message":"An operation failed because it depends on one or more records that were required but not found. No record was found for a query.",
                   "meta":{
-                     "cause":"Expected a record, found none."
+                     "cause":"No record was found for a query."
                   },
                   "error_code":"P2025"
                }
@@ -293,8 +303,8 @@ mod tests {
                     SimpleGqlResponse {
                         data: serde_json::Value::Null,
                         errors: vec![GQLError::from_user_facing_error(user_facing_errors::KnownError {
-                            message: "An operation failed because it depends on one or more records that were required but not found. Expected a record, found none.".to_string(),
-                            meta: json!({"cause": "Expected a record, found none."}),
+                            message: "An operation failed because it depends on one or more records that were required but not found. No record was found for a query.".to_string(),
+                            meta: json!({"cause": "No record was found for a query."}),
                             error_code: std::borrow::Cow::from("P2025"),
                         }.into())],
                         extensions: None,

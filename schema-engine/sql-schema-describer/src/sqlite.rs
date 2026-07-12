@@ -1,19 +1,28 @@
 //! SQLite description.
+#![cfg_attr(target_arch = "wasm32", allow(dead_code))]
 
 use crate::{
-    getters::Getter, ids::*, parsers::Parser, Column, ColumnArity, ColumnType, ColumnTypeFamily, DefaultValue,
-    DescriberResult, ForeignKeyAction, Lazy, PrismaValue, Regex, SQLSortOrder, SqlMetadata, SqlSchema,
-    SqlSchemaDescriberBackend,
+    Column, ColumnArity, ColumnType, ColumnTypeFamily, DefaultValue, DescriberResult, ForeignKeyAction, PrismaValue,
+    Regex, SQLSortOrder, SqlSchema, getters::Getter, ids::*, parsers::Parser,
 };
 use either::Either;
 use indexmap::IndexMap;
 use quaint::{
     ast::{Value, ValueType},
-    connector::{GetRow, ToColumnNames},
-    prelude::ResultRow,
+    connector::AdapterName,
+    prelude::{Queryable, ResultRow},
 };
-use std::{any::type_name, borrow::Cow, collections::BTreeMap, convert::TryInto, fmt::Debug, path::Path};
+use std::{
+    any::type_name,
+    borrow::Cow,
+    collections::BTreeMap,
+    fmt::Debug,
+    sync::{Arc, LazyLock, OnceLock},
+};
 use tracing::trace;
+
+#[cfg(feature = "sqlite-native")]
+pub(crate) mod native;
 
 #[async_trait::async_trait]
 pub trait Connection {
@@ -22,25 +31,9 @@ pub trait Connection {
         sql: &'a str,
         params: &'a [quaint::prelude::Value<'a>],
     ) -> quaint::Result<quaint::prelude::ResultSet>;
-}
 
-#[async_trait::async_trait]
-impl Connection for std::sync::Mutex<quaint::connector::rusqlite::Connection> {
-    async fn query_raw<'a>(
-        &'a self,
-        sql: &'a str,
-        params: &'a [quaint::prelude::Value<'a>],
-    ) -> quaint::Result<quaint::prelude::ResultSet> {
-        let conn = self.lock().unwrap();
-        let mut stmt = conn.prepare_cached(sql)?;
-        let mut rows = stmt.query(quaint::connector::rusqlite::params_from_iter(params.iter()))?;
-        let column_names = rows.to_column_names();
-        let mut converted_rows = Vec::new();
-        while let Some(row) = rows.next()? {
-            converted_rows.push(row.get_result_row().unwrap());
-        }
-
-        Ok(quaint::prelude::ResultSet::new(column_names, converted_rows))
+    fn adapter_name(&self) -> Option<AdapterName> {
+        None
     }
 }
 
@@ -55,6 +48,21 @@ impl Connection for quaint::single::Quaint {
     }
 }
 
+#[async_trait::async_trait]
+impl<Q: Queryable + ?Sized> Connection for Arc<Q> {
+    async fn query_raw<'a>(
+        &'a self,
+        sql: &'a str,
+        params: &'a [quaint::prelude::Value<'a>],
+    ) -> quaint::Result<quaint::prelude::ResultSet> {
+        quaint::prelude::Queryable::query_raw(&**self, sql, params).await
+    }
+
+    fn adapter_name(&self) -> Option<AdapterName> {
+        self.as_external_connector().map(|adapter| adapter.adapter_name())
+    }
+}
+
 pub struct SqlSchemaDescriber<'a> {
     conn: &'a (dyn Connection + Send + Sync),
 }
@@ -62,32 +70,6 @@ pub struct SqlSchemaDescriber<'a> {
 impl Debug for SqlSchemaDescriber<'_> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_struct(type_name::<SqlSchemaDescriber<'_>>()).finish()
-    }
-}
-
-#[async_trait::async_trait]
-impl SqlSchemaDescriberBackend for SqlSchemaDescriber<'_> {
-    async fn list_databases(&self) -> DescriberResult<Vec<String>> {
-        Ok(self.get_databases().await?)
-    }
-
-    async fn get_metadata(&self, _schema: &str) -> DescriberResult<SqlMetadata> {
-        let mut sql_schema = SqlSchema::default();
-        let table_count = self.get_table_names(&mut sql_schema).await?.len();
-        let size_in_bytes = self.get_size().await?;
-
-        Ok(SqlMetadata {
-            table_count,
-            size_in_bytes,
-        })
-    }
-
-    async fn describe(&self, _schemas: &[&str]) -> DescriberResult<SqlSchema> {
-        self.describe_impl().await
-    }
-
-    async fn version(&self) -> DescriberResult<Option<String>> {
-        Ok(Some(quaint::connector::sqlite_version().to_owned()))
     }
 }
 
@@ -123,29 +105,7 @@ impl<'a> SqlSchemaDescriber<'a> {
         Ok(schema)
     }
 
-    async fn get_databases(&self) -> DescriberResult<Vec<String>> {
-        let sql = "PRAGMA database_list;";
-        let rows = self.conn.query_raw(sql, &[]).await?;
-        let names = rows
-            .into_iter()
-            .map(|row| {
-                row.get("file")
-                    .and_then(|x| x.to_string())
-                    .and_then(|x| {
-                        Path::new(&x)
-                            .file_name()
-                            .map(|name| name.to_string_lossy().into_owned())
-                    })
-                    .expect("convert schema names")
-            })
-            .collect();
-
-        trace!("Found schema names: {:?}", names);
-
-        Ok(names)
-    }
-
-    async fn get_table_names(
+    pub async fn get_table_names(
         &self,
         schema: &mut SqlSchema,
     ) -> DescriberResult<IndexMap<String, Either<TableId, ViewId>>> {
@@ -162,7 +122,7 @@ impl<'a> SqlSchemaDescriber<'a> {
 
                 (name, r#type, definition)
             })
-            .filter(|(table_name, _, _)| !is_table_ignored(table_name));
+            .filter(|(table_name, _, _)| !is_table_ignored(table_name, self.conn.adapter_name()));
 
         let mut map = IndexMap::default();
 
@@ -183,17 +143,6 @@ impl<'a> SqlSchemaDescriber<'a> {
         }
 
         Ok(map)
-    }
-
-    async fn get_size(&self) -> DescriberResult<usize> {
-        let sql = r#"SELECT page_count * page_size as size FROM pragma_page_count(), pragma_page_size();"#;
-        let result = self.conn.query_raw(sql, &[]).await?;
-        let size: i64 = result
-            .first()
-            .map(|row| row.get("size").and_then(|x| x.as_integer()).unwrap_or(0))
-            .unwrap();
-
-        Ok(size.try_into().unwrap())
     }
 
     async fn push_foreign_keys(
@@ -388,11 +337,13 @@ async fn push_columns(
                             }
                             _ => DefaultValue::db_generated(default_string),
                         },
+                        ColumnTypeFamily::Json => DefaultValue::value(default_string),
                         ColumnTypeFamily::Binary => DefaultValue::db_generated(default_string),
-                        ColumnTypeFamily::Json => DefaultValue::db_generated(default_string),
                         ColumnTypeFamily::Uuid => DefaultValue::db_generated(default_string),
                         ColumnTypeFamily::Enum(_) => DefaultValue::value(PrismaValue::Enum(default_string)),
-                        ColumnTypeFamily::Unsupported(_) => DefaultValue::db_generated(default_string),
+                        ColumnTypeFamily::Udt(_) | ColumnTypeFamily::Unsupported(_) => {
+                            DefaultValue::db_generated(default_string)
+                        }
                     })
                 }
             }
@@ -429,27 +380,27 @@ async fn push_columns(
         }
     }
 
-    if let Either::Left(table_id) = container_id {
-        if !pk_cols.is_empty() {
-            let pk_id = schema.push_primary_key(table_id, String::new());
-            for column_id in pk_cols.values() {
-                schema.push_index_column(crate::IndexColumn {
-                    index_id: pk_id,
-                    column_id: *column_id,
-                    sort_order: None,
-                    length: None,
-                });
-            }
+    if let Either::Left(table_id) = container_id
+        && !pk_cols.is_empty()
+    {
+        let pk_id = schema.push_primary_key(table_id, String::new());
+        for column_id in pk_cols.values() {
+            schema.push_index_column(crate::IndexColumn {
+                index_id: pk_id,
+                column_id: *column_id,
+                sort_order: None,
+                length: None,
+            });
+        }
 
-            // Integer ID columns are always implemented with either row id or autoincrement
-            if pk_cols.len() == 1 {
-                let pk_col_id = *pk_cols.values().next().unwrap();
-                let pk_col = &mut schema.table_columns[pk_col_id.0 as usize];
-                // See https://www.sqlite.org/lang_createtable.html for the exact logic.
-                if pk_col.1.tpe.full_data_type.eq_ignore_ascii_case("INTEGER") {
-                    pk_col.1.auto_increment = true;
-                    pk_col.1.tpe.arity = ColumnArity::Required;
-                }
+        // Integer ID columns are always implemented with either row id or autoincrement
+        if pk_cols.len() == 1 {
+            let pk_col_id = *pk_cols.values().next().unwrap();
+            let pk_col = &mut schema.table_columns[pk_col_id.0 as usize];
+            // See https://www.sqlite.org/lang_createtable.html for the exact logic.
+            if pk_col.1.tpe.full_data_type.eq_ignore_ascii_case("INTEGER") {
+                pk_col.1.auto_increment = true;
+                pk_col.1.tpe.arity = ColumnArity::Required;
             }
         }
     }
@@ -460,6 +411,13 @@ async fn push_columns(
     Ok(())
 }
 
+struct PendingIndex {
+    name: String,
+    is_unique: bool,
+    is_partial: bool,
+    columns: Vec<(TableColumnId, SQLSortOrder)>,
+}
+
 async fn push_indexes(
     table: &str,
     table_id: TableId,
@@ -468,19 +426,21 @@ async fn push_indexes(
 ) -> DescriberResult<()> {
     let sql = format!(r#"PRAGMA index_list("{table}");"#);
     let result_set = conn.query_raw(&sql, &[]).await?;
-    let mut indexes = Vec::new(); // (index_name, is_unique, columns)
+    let mut indexes: Vec<PendingIndex> = Vec::new();
 
     let filtered_rows = result_set
         .into_iter()
         // Exclude primary keys, they are inferred separately.
-        .filter(|row| row.get("origin").and_then(|origin| origin.as_str()).unwrap() != "pk")
-        // Exclude partial indices
-        .filter(|row| !row.get("partial").and_then(|partial| partial.as_bool()).unwrap());
+        .filter(|row| row.get("origin").and_then(|origin| origin.as_str()).unwrap() != "pk");
 
     for row in filtered_rows {
         let mut valid_index = true;
 
         let is_unique = row.get_expect_bool("unique");
+        let is_partial = row
+            .get("partial")
+            .and_then(|partial| partial.as_bool())
+            .unwrap_or(false);
         let index_name = row.get_expect_string("name");
         let mut columns = Vec::new();
 
@@ -521,18 +481,40 @@ async fn push_indexes(
         }
 
         if valid_index {
-            indexes.push((index_name, is_unique, columns))
+            indexes.push(PendingIndex {
+                name: index_name,
+                is_unique,
+                is_partial,
+                columns,
+            });
         }
     }
 
-    for (index_name, unique, columns) in indexes {
-        let index_id = if unique {
-            schema.push_unique_constraint(table_id, index_name)
+    for index in indexes {
+        // For partial indexes, extract the WHERE clause from sqlite_master
+        let predicate = if index.is_partial {
+            let sql = format!(
+                r#"SELECT sql FROM sqlite_master WHERE type = 'index' AND name = "{}";"#,
+                index.name
+            );
+            let result_set = conn.query_raw(&sql, &[]).await?;
+            result_set
+                .into_iter()
+                .next()
+                .and_then(|row| row.get_string("sql"))
+                .and_then(|sql| extract_where_clause(&sql))
         } else {
-            schema.push_index(table_id, index_name)
+            None
         };
 
-        for (column_id, sort_order) in columns {
+        let index_id = match (index.is_unique, predicate) {
+            (true, Some(pred)) => schema.push_partial_unique_constraint(table_id, index.name, pred),
+            (true, None) => schema.push_unique_constraint(table_id, index.name),
+            (false, Some(pred)) => schema.push_partial_index(table_id, index.name, pred),
+            (false, None) => schema.push_index(table_id, index.name),
+        };
+
+        for (column_id, sort_order) in index.columns {
             schema.push_index_column(crate::IndexColumn {
                 index_id,
                 column_id,
@@ -543,6 +525,43 @@ async fn push_indexes(
     }
 
     Ok(())
+}
+
+/// Extract the WHERE clause from a SQLite CREATE INDEX statement,
+/// using the SQL tokenizer to correctly handle quoted/escaped regions.
+fn extract_where_clause(sql: &str) -> Option<String> {
+    use sqlparser::{
+        dialect::SQLiteDialect,
+        keywords::Keyword,
+        tokenizer::{Token, Tokenizer},
+    };
+
+    let dialect = SQLiteDialect {};
+    let tokens = Tokenizer::new(&dialect, sql).tokenize_with_location().ok()?;
+
+    let mut depth: i32 = 0;
+    let mut last_where_char_offset = None;
+
+    for tok in &tokens {
+        match &tok.token {
+            Token::LParen => depth += 1,
+            Token::RParen => depth -= 1,
+            Token::Word(w) if w.keyword == Keyword::WHERE && depth == 0 => {
+                last_where_char_offset = Some(tok.span.start.column as usize - 1);
+            }
+            _ => {}
+        }
+    }
+
+    let char_offset = last_where_char_offset?;
+    let byte_offset = sql.char_indices().nth(char_offset).map(|(i, _)| i)?;
+    let predicate = sql[byte_offset + "WHERE".len()..].trim();
+
+    if predicate.is_empty() {
+        None
+    } else {
+        Some(predicate.to_string())
+    }
 }
 
 fn get_column_type(mut tpe: String, arity: ColumnArity) -> ColumnType {
@@ -576,6 +595,7 @@ fn get_column_type(mut tpe: String, arity: ColumnArity) -> ColumnType {
         "int[]" => ColumnTypeFamily::Int,
         "integer[]" => ColumnTypeFamily::Int,
         "text[]" => ColumnTypeFamily::String,
+        "jsonb" => ColumnTypeFamily::Json,
         // NUMERIC type affinity
         data_type if data_type.starts_with("decimal") => ColumnTypeFamily::Decimal,
         data_type => ColumnTypeFamily::Unsupported(data_type.into()),
@@ -594,8 +614,9 @@ fn get_column_type(mut tpe: String, arity: ColumnArity) -> ColumnType {
 //
 // - https://www.sqlite.org/lang_expr.html
 fn unquote_sqlite_string_default(s: &str) -> Cow<'_, str> {
-    static SQLITE_STRING_DEFAULT_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r#"(?ms)^'(.*)'$|^"(.*)"$"#).unwrap());
-    static SQLITE_ESCAPED_CHARACTER_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r#"''"#).unwrap());
+    static SQLITE_STRING_DEFAULT_RE: LazyLock<Regex> =
+        LazyLock::new(|| Regex::new(r#"(?ms)^'(.*)'$|^"(.*)"$"#).unwrap());
+    static SQLITE_ESCAPED_CHARACTER_RE: LazyLock<Regex> = LazyLock::new(|| Regex::new(r#"''"#).unwrap());
 
     match SQLITE_STRING_DEFAULT_RE.replace(s, "$1$2") {
         Cow::Borrowed(s) => SQLITE_ESCAPED_CHARACTER_RE.replace_all(s, "'"),
@@ -603,9 +624,30 @@ fn unquote_sqlite_string_default(s: &str) -> Cow<'_, str> {
     }
 }
 
+// Create a OnceLock to hold the compiled Regex
+static CLOUDFLARE_D1_IGNORED_TABLES_REGEX: OnceLock<Regex> = OnceLock::new();
+
+// Cloudflare D1 specific tables, excludes `_cf_KV`, `_cf_METADATA`, etc.
+fn get_cloudflare_d1_ignored_tables_regex() -> &'static Regex {
+    CLOUDFLARE_D1_IGNORED_TABLES_REGEX.get_or_init(|| Regex::new(r"^(_cf_[A-Z]+).*$").expect("Failed to compile regex"))
+}
+
 /// Returns whether a table is one of the SQLite system tables or a Cloudflare D1 specific table.
-fn is_table_ignored(table_name: &str) -> bool {
-    SQLITE_IGNORED_TABLES.iter().any(|table| table_name == *table)
+fn is_table_ignored(table_name: &str, _adapter_name: Option<AdapterName>) -> bool {
+    let early_result = SQLITE_IGNORED_TABLES.contains(&table_name);
+
+    // TODO: remove the constant `is_cloudflare_d1 = true` and replace it with the following once we
+    // get rid of `--local-d1`, `--to-local-d1`, `--from-local-d1` flags in the CLI.
+    // ```
+    // let is_cloudflare_d1 = matches!(adapter_name, Some(AdapterName::D1(_)));
+    // ```
+    let is_cloudflare_d1 = true;
+
+    if is_cloudflare_d1 {
+        early_result || get_cloudflare_d1_ignored_tables_regex().is_match(table_name)
+    } else {
+        early_result
+    }
 }
 
 /// See https://www.sqlite.org/fileformat2.html
@@ -617,8 +659,56 @@ const SQLITE_IGNORED_TABLES: &[&str] = &[
     "sqlite_stat2",
     "sqlite_stat3",
     "sqlite_stat4",
-    // Cloudflare D1 specific tables
-    "_cf_KV",
     // This is the default but can be configured by the user
     "d1_migrations",
 ];
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn extract_simple_where_clause() {
+        let sql = r#"CREATE UNIQUE INDEX "idx" ON "User" ("email") WHERE active = 1"#;
+        assert_eq!(extract_where_clause(sql), Some("active = 1".to_string()));
+    }
+
+    #[test]
+    fn extract_where_clause_with_quoted_identifier() {
+        let sql = r#"CREATE UNIQUE INDEX "idx" ON "User" ("email") WHERE "deletedAt" IS NULL"#;
+        assert_eq!(extract_where_clause(sql), Some("\"deletedAt\" IS NULL".to_string()));
+    }
+
+    #[test]
+    fn extract_where_clause_with_where_in_string_literal() {
+        let sql = r#"CREATE INDEX "idx" ON "t" ("col") WHERE my_field = ' WHERE '"#;
+        assert_eq!(extract_where_clause(sql), Some("my_field = ' WHERE '".to_string()));
+    }
+
+    #[test]
+    fn extract_where_clause_with_escaped_quotes_in_string() {
+        let sql = r#"CREATE INDEX "idx" ON "t" ("col") WHERE name = 'it''s WHERE ok'"#;
+        assert_eq!(extract_where_clause(sql), Some("name = 'it''s WHERE ok'".to_string()));
+    }
+
+    #[test]
+    fn no_where_clause() {
+        let sql = r#"CREATE INDEX "idx" ON "User" ("email")"#;
+        assert_eq!(extract_where_clause(sql), None);
+    }
+
+    #[test]
+    fn extract_where_clause_multiple_where_in_strings() {
+        let sql = r#"CREATE INDEX "idx" ON "t" ("col") WHERE a = ' WHERE ' AND b = ' WHERE '"#;
+        assert_eq!(
+            extract_where_clause(sql),
+            Some("a = ' WHERE ' AND b = ' WHERE '".to_string())
+        );
+    }
+
+    #[test]
+    fn extract_where_clause_no_real_where_only_in_string() {
+        let sql = r#"CREATE INDEX "idx" ON "t" ("col WHERE ")"#;
+        assert_eq!(extract_where_clause(sql), None);
+    }
+}

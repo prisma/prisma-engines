@@ -1,9 +1,10 @@
 use crate::{
+    DatamodelError, ScalarFieldId, StringId,
     ast::{self, WithName},
     coerce,
     context::Context,
+    generators::{CUID_SUPPORTED_VERSIONS, UUID_SUPPORTED_VERSIONS},
     types::{DefaultAttribute, ScalarFieldType, ScalarType},
-    DatamodelError, ScalarFieldId, StringId,
 };
 
 /// @default on model scalar fields
@@ -64,6 +65,9 @@ pub(super) fn visit_model_field_default(
             (model_id, field_id),
             ctx,
         ),
+        ScalarFieldType::Extension(_) => {
+            ctx.push_attribute_validation_error("Only @default(dbgenerated(\"...\")) can be used for extension types.");
+        }
         ScalarFieldType::Unsupported(_) => {
             ctx.push_attribute_validation_error(
                 "Only @default(dbgenerated(\"...\")) can be used for Unsupported types.",
@@ -128,6 +132,9 @@ pub(super) fn visit_composite_field_default(
         }
         ScalarFieldType::BuiltInScalar(scalar_type) => {
             validate_composite_builtin_scalar_type_default(scalar_type, value, &mut accept, ast_field.arity, ctx)
+        }
+        ScalarFieldType::Extension(_) => {
+            ctx.push_attribute_validation_error("Composite field with extension type cannot have default values.")
         }
         ScalarFieldType::Unsupported(_) => {
             ctx.push_attribute_validation_error("Composite field of type `Unsupported` cannot have default values.")
@@ -196,10 +203,14 @@ fn validate_model_builtin_scalar_type_default(
         {
             validate_empty_function_args(funcname, &funcargs.arguments, accept, ctx)
         }
-        (ScalarType::String, ast::Expression::Function(funcname, funcargs, _))
-            if funcname == FN_UUID || funcname == FN_CUID =>
-        {
+        (ScalarType::String, ast::Expression::Function(funcname, funcargs, _)) if funcname == FN_ULID => {
             validate_empty_function_args(funcname, &funcargs.arguments, accept, ctx)
+        }
+        (ScalarType::String, ast::Expression::Function(funcname, funcargs, _)) if funcname == FN_CUID => {
+            validate_uid_int_args(funcname, &funcargs.arguments, &CUID_SUPPORTED_VERSIONS, accept, ctx)
+        }
+        (ScalarType::String, ast::Expression::Function(funcname, funcargs, _)) if funcname == FN_UUID => {
+            validate_uid_int_args(funcname, &funcargs.arguments, &UUID_SUPPORTED_VERSIONS, accept, ctx)
         }
         (ScalarType::String, ast::Expression::Function(funcname, funcargs, _)) if funcname == FN_NANOID => {
             validate_nanoid_args(&funcargs.arguments, accept, ctx)
@@ -242,10 +253,14 @@ fn validate_composite_builtin_scalar_type_default(
 ) {
     match (scalar_type, value) {
         // Functions
-        (ScalarType::String, ast::Expression::Function(funcname, funcargs, _))
-            if funcname == FN_UUID || funcname == FN_CUID =>
-        {
+        (ScalarType::String, ast::Expression::Function(funcname, funcargs, _)) if funcname == FN_ULID => {
             validate_empty_function_args(funcname, &funcargs.arguments, accept, ctx)
+        }
+        (ScalarType::String, ast::Expression::Function(funcname, funcargs, _)) if funcname == FN_CUID => {
+            validate_uid_int_args(funcname, &funcargs.arguments, &CUID_SUPPORTED_VERSIONS, accept, ctx)
+        }
+        (ScalarType::String, ast::Expression::Function(funcname, funcargs, _)) if funcname == FN_UUID => {
+            validate_uid_int_args(funcname, &funcargs.arguments, &UUID_SUPPORTED_VERSIONS, accept, ctx)
         }
         (ScalarType::DateTime, ast::Expression::Function(funcname, funcargs, _)) if funcname == FN_NOW => {
             validate_empty_function_args(FN_NOW, &funcargs.arguments, accept, ctx)
@@ -379,6 +394,49 @@ fn validate_dbgenerated_args(args: &[ast::Argument], accept: AcceptFn<'_>, ctx: 
     }
 }
 
+fn format_valid_values<const N: usize>(valid_values: &[u8; N]) -> String {
+    match valid_values.len() {
+        0 => String::new(),
+        1 => valid_values[0].to_string(),
+        2 => format!("{} or {}", valid_values[0], valid_values[1]),
+        _ => {
+            use itertools::Itertools as _;
+
+            let (last, rest) = valid_values.split_last().unwrap();
+            let rest_str = rest.iter().map(|v| v.to_string()).join(", ");
+            format!("{rest_str}, or {last}")
+        }
+    }
+}
+
+fn validate_uid_int_args<const N: usize>(
+    fn_name: &str,
+    args: &[ast::Argument],
+    valid_values: &[u8; N],
+    accept: AcceptFn<'_>,
+    ctx: &mut Context<'_>,
+) {
+    let mut bail = || ctx.push_attribute_validation_error(&format!("`{fn_name}()` takes a single Int argument."));
+
+    if args.len() > 1 {
+        bail()
+    }
+
+    match args.first().map(|arg| &arg.value) {
+        Some(ast::Expression::NumericValue(val, _)) => match val.parse::<u8>().ok() {
+            Some(val) if valid_values.contains(&val) => accept(ctx),
+            _ => {
+                let valid_values_str = format_valid_values(valid_values);
+                ctx.push_attribute_validation_error(&format!(
+                        "`{fn_name}()` takes either no argument, or a single integer argument which is either {valid_values_str}.",
+                    ));
+            }
+        },
+        None => accept(ctx),
+        _ => bail(),
+    }
+}
+
 fn validate_nanoid_args(args: &[ast::Argument], accept: AcceptFn<'_>, ctx: &mut Context<'_>) {
     let mut bail = || ctx.push_attribute_validation_error("`nanoid()` takes a single Int argument.");
 
@@ -387,12 +445,15 @@ fn validate_nanoid_args(args: &[ast::Argument], accept: AcceptFn<'_>, ctx: &mut 
     }
 
     match args.first().map(|arg| &arg.value) {
-        Some(ast::Expression::NumericValue(val, _)) if val.parse::<u8>().unwrap() < 2 => {
-            ctx.push_attribute_validation_error(
-                "`nanoid()` takes either no argument, or a single integer argument >= 2.",
-            );
-        }
-        None | Some(ast::Expression::NumericValue(_, _)) => accept(ctx),
+        Some(ast::Expression::NumericValue(val, _)) => match val.parse::<u8>().ok() {
+            Some(val) if val >= 2 => accept(ctx),
+            _ => {
+                ctx.push_attribute_validation_error(
+                    "`nanoid()` takes either no argument, or a single integer argument between 2 and 255.",
+                );
+            }
+        },
+        None => accept(ctx),
         _ => bail(),
     }
 }
@@ -477,6 +538,7 @@ fn validate_builtin_scalar_list_default(
 
 const FN_AUTOINCREMENT: &str = "autoincrement";
 const FN_CUID: &str = "cuid";
+const FN_ULID: &str = "ulid";
 const FN_DBGENERATED: &str = "dbgenerated";
 const FN_NANOID: &str = "nanoid";
 const FN_NOW: &str = "now";
@@ -485,6 +547,7 @@ const FN_AUTO: &str = "auto";
 
 const KNOWN_FUNCTIONS: &[&str] = &[
     FN_AUTOINCREMENT,
+    FN_ULID,
     FN_CUID,
     FN_DBGENERATED,
     FN_NANOID,

@@ -3,10 +3,11 @@
 //! A TestApi that is initialized without IO or async code and can instantiate
 //! multiple schema engines.
 
+use schema_core::json_rpc::types::SchemaFilter;
 use std::time::Duration;
 pub use test_macros::test_connector;
 pub use test_setup::sqlite_test_url;
-pub use test_setup::{runtime::run_with_thread_local_runtime as tok, BitFlags, Capabilities, Tags};
+pub use test_setup::{BitFlags, Capabilities, Tags, runtime::run_with_thread_local_runtime as tok};
 
 use crate::{
     assertions::SchemaAssertion,
@@ -17,7 +18,7 @@ use quaint::{
     prelude::{ConnectionInfo, NativeConnectionInfo, Queryable, ResultSet},
     single::Quaint,
 };
-use schema_core::schema_connector::{ConnectorParams, SchemaConnector};
+use schema_core::schema_connector::{self, ConnectorParams, ConnectorResult, SchemaConnector};
 use sql_schema_connector::SqlSchemaConnector;
 use tempfile::TempDir;
 use test_setup::{DatasourceBlock, TestApiArgs};
@@ -50,9 +51,8 @@ impl TestApi {
                 preview_features,
                 shadow_database_connection_string: args.shadow_database_url().map(String::from),
             };
-            let mut conn = SqlSchemaConnector::new_mysql();
-            conn.set_params(params).unwrap();
-            tok(conn.reset(false, None)).unwrap();
+            let mut conn = SqlSchemaConnector::new_mysql(params).unwrap();
+            tok(conn.reset(false, None, &schema_connector::SchemaFilter::default())).unwrap();
 
             (
                 tok(Quaint::new(args.database_url())).unwrap(),
@@ -94,6 +94,11 @@ impl TestApi {
         &self.connection_string
     }
 
+    /// The connection string for the shadow database associated with the test.
+    pub fn shadow_database_connection_string(&self) -> Option<&str> {
+        self.args.shadow_database_url()
+    }
+
     /// The ConnectionInfo based on the connection string
     pub fn connection_info(&self) -> ConnectionInfo {
         ConnectionInfo::from_url(self.connection_string()).unwrap()
@@ -106,7 +111,7 @@ impl TestApi {
 
     /// Render a valid datasource block, including database URL.
     pub fn datasource_block(&self) -> DatasourceBlock<'_> {
-        self.args.datasource_block(self.args.database_url(), &[], &[])
+        self.args.datasource_block(&[], &[])
     }
 
     /// Returns true only when testing on MSSQL.
@@ -187,6 +192,16 @@ impl TestApi {
         connection_string: String,
         shadow_database_connection_string: Option<String>,
     ) -> EngineTestApi {
+        self.new_engine_with_connection_strings_or_err(connection_string, shadow_database_connection_string)
+            .unwrap()
+    }
+
+    /// Instantiate a new migration with the provided connection string or return an error.
+    pub fn new_engine_with_connection_strings_or_err(
+        &self,
+        connection_string: String,
+        shadow_database_connection_string: Option<String>,
+    ) -> ConnectorResult<EngineTestApi> {
         let connection_info = ConnectionInfo::from_url(&connection_string).unwrap();
 
         let params = ConnectorParams {
@@ -195,30 +210,31 @@ impl TestApi {
             shadow_database_connection_string,
         };
 
-        let mut connector = match &connection_info {
+        let connector = match &connection_info {
             ConnectionInfo::Native(NativeConnectionInfo::Postgres(_)) => {
                 if self.args.provider() == "cockroachdb" {
-                    SqlSchemaConnector::new_cockroach()
+                    SqlSchemaConnector::new_cockroach(params)?
                 } else {
-                    SqlSchemaConnector::new_postgres()
+                    SqlSchemaConnector::new_postgres(params)?
                 }
             }
-            ConnectionInfo::Native(NativeConnectionInfo::Mysql(_)) => SqlSchemaConnector::new_mysql(),
-            ConnectionInfo::Native(NativeConnectionInfo::Mssql(_)) => SqlSchemaConnector::new_mssql(),
-            ConnectionInfo::Native(NativeConnectionInfo::Sqlite { .. }) => SqlSchemaConnector::new_sqlite(),
+            ConnectionInfo::Native(NativeConnectionInfo::Mysql(_)) => SqlSchemaConnector::new_mysql(params)?,
+            ConnectionInfo::Native(NativeConnectionInfo::Mssql(_)) => SqlSchemaConnector::new_mssql(params)?,
+            ConnectionInfo::Native(NativeConnectionInfo::Sqlite { .. }) => {
+                SqlSchemaConnector::new_sqlite(params).unwrap()
+            }
             ConnectionInfo::Native(NativeConnectionInfo::InMemorySqlite { .. }) | ConnectionInfo::External(_) => {
                 unreachable!()
             }
         };
-        connector.set_params(params).unwrap();
 
-        EngineTestApi {
+        Ok(EngineTestApi {
             connector,
             connection_info,
             tags: self.args.tags(),
             namespaces: self.args.namespaces(),
             max_ddl_refresh_delay: self.args.max_ddl_refresh_delay(),
-        }
+        })
     }
 
     fn tags(&self) -> BitFlags<Tags> {
@@ -248,12 +264,7 @@ impl TestApi {
 
     /// Render a valid datasource block, including database URL.
     pub fn write_datasource_block(&self, out: &mut dyn std::fmt::Write) {
-        write!(
-            out,
-            "{}",
-            self.args.datasource_block(self.args.database_url(), &[], &[])
-        )
-        .unwrap()
+        write!(out, "{}", self.args.datasource_block(&[], &[])).unwrap()
     }
 
     /// Currently enabled preview features.
@@ -277,7 +288,7 @@ impl TestApi {
 
         let generator_block = format!(
             r#"generator client {{
-                 provider = "prisma-client-js"{preview_feature_string}
+                 provider = "prisma-client"{preview_feature_string}
                }}"#
         );
         generator_block
@@ -297,7 +308,7 @@ pub struct EngineTestApi {
 impl EngineTestApi {
     /// Plan an `applyMigrations` command
     pub fn apply_migrations<'a>(&'a mut self, migrations_directory: &'a TempDir) -> ApplyMigrations<'a> {
-        let mut namespaces = vec![self.connection_info.schema_name().to_string()];
+        let mut namespaces = vec![self.connection_info.schema_name().unwrap().to_string()];
 
         for namespace in self.namespaces {
             namespaces.push(namespace.to_string());
@@ -318,6 +329,8 @@ impl EngineTestApi {
             name,
             &[("schema.prisma", schema)],
             migrations_directory,
+            SchemaFilter::default(),
+            Default::default(),
         )
     }
 
@@ -347,12 +360,25 @@ impl EngineTestApi {
             &mut self.connector,
             &[("schema.prisma", &dm)],
             self.max_ddl_refresh_delay,
+            SchemaFilter::default(),
         )
     }
 
     /// The schema name of the current connected database.
     pub fn schema_name(&self) -> &str {
-        self.connection_info.schema_name()
+        self.connection_info.schema_name().unwrap()
+    }
+
+    /// Creates a schema filter for the given tables and prefixes them with the default namespace if applicable.
+    pub fn namespaced_schema_filter(&self, tables: &[&str]) -> SchemaFilter {
+        let default_namespace = self.connector.default_runtime_namespace();
+        SchemaFilter {
+            external_tables: tables
+                .iter()
+                .map(|table| default_namespace.map_or(table.to_string(), |ns| format!("{ns}.{table}")))
+                .collect(),
+            external_enums: vec![],
+        }
     }
 
     /// Execute a raw SQL command and expect it to succeed.

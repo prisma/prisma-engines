@@ -2,7 +2,7 @@ use std::{borrow::Cow, fmt};
 
 use crate::value::{Constant, Documentation, Function};
 
-use super::{attributes::BlockAttribute, model::Commented, Field, IdDefinition, IndexDefinition};
+use super::{Field, IdDefinition, IndexDefinition, attributes::BlockAttribute, model::Commented};
 
 /// Defines a model block.
 #[derive(Debug)]
@@ -137,7 +137,7 @@ impl<'a> View<'a> {
     }
 }
 
-impl<'a> fmt::Display for View<'a> {
+impl fmt::Display for View<'_> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         // Prefix everything with this, so if the model is commented out, so
         // is your line.

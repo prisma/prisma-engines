@@ -1,9 +1,10 @@
 use crate::{
-    pretty_print::{pretty_print, DiagnosticColorer},
     Span,
+    pretty_print::{DiagnosticColorer, pretty_print},
 };
 use colored::{ColoredString, Colorize};
 use indoc::indoc;
+use std::fmt::Display;
 
 /// A non-fatal warning emitted by the schema parser.
 /// For fancy printing, please use the `pretty_print_error` function.
@@ -20,9 +21,40 @@ impl DatamodelWarning {
         DatamodelWarning { message, span }
     }
 
-    pub fn new_feature_deprecated(feature: &str, span: Span) -> DatamodelWarning {
+    pub fn new_preview_feature_deprecated(feature: &str, span: Span) -> DatamodelWarning {
+        let message =
+            format!("Preview feature \"{feature}\" is deprecated. It will be removed in a future version of Prisma.");
+        Self::new(message, span)
+    }
+
+    pub fn new_preview_feature_is_stabilized(feature: &str, span: Span) -> DatamodelWarning {
         let message = format!(
             "Preview feature \"{feature}\" is deprecated. The functionality can be used without specifying it as a preview feature."
+        );
+        Self::new(message, span)
+    }
+
+    pub fn new_preview_feature_renamed(
+        deprecated_feature: &str,
+        renamed_feature: impl Display,
+        prisly_link_endpoint: &str,
+        span: Span,
+    ) -> DatamodelWarning {
+        let message = format!(
+            "Preview feature \"{deprecated_feature}\" has been renamed to \"{renamed_feature}\". Learn more at https://pris.ly/d/{prisly_link_endpoint}."
+        );
+        Self::new(message, span)
+    }
+
+    pub fn new_preview_feature_renamed_for_provider(
+        provider: &str,
+        deprecated_feature: &str,
+        renamed_feature: impl Display,
+        prisly_link_endpoint: &str,
+        span: Span,
+    ) -> DatamodelWarning {
+        let message = format!(
+            "On `provider = \"{provider}\"`, preview feature \"{deprecated_feature}\" has been renamed to \"{renamed_feature}\". Learn more at https://pris.ly/d/{prisly_link_endpoint}."
         );
         Self::new(message, span)
     }
@@ -41,6 +73,11 @@ impl DatamodelWarning {
             "#,
         )
         .replace('\n', " ");
+        Self::new(message, span)
+    }
+
+    pub fn new_named_env_val(span: Span) -> Self {
+        let message = "The env function doesn't expect named arguments".to_owned();
         Self::new(message, span)
     }
 

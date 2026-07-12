@@ -6,25 +6,21 @@ use sql_introspection_tests::test_api::*;
 async fn empty_preview_features_are_kept(api: &mut TestApi) -> TestResult {
     let schema = indoc! {r#"
         generator client {
-          provider        = "prisma-client-js"
-          previewFeatures = []
+          provider = "prisma-client"
         }
 
         datasource db {
           provider   = "mysql"
-          url        = "env(TEST_DATABASE_URL)"
         }
     "#};
 
     let expectation = expect![[r#"
         generator client {
-          provider        = "prisma-client-js"
-          previewFeatures = []
+          provider = "prisma-client"
         }
 
         datasource db {
           provider = "mysql"
-          url      = "env(TEST_DATABASE_URL)"
         }
     "#]];
 

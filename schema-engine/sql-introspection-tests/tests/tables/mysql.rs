@@ -1,6 +1,7 @@
 use std::path::PathBuf;
 
 use indoc::{formatdoc, indoc};
+use psl::parser_database::NoExtensionTypes;
 use schema_connector::{ConnectorParams, IntrospectionContext, SchemaConnector};
 use sql_introspection_tests::test_api::*;
 use sql_schema_connector::SqlSchemaConnector;
@@ -111,7 +112,7 @@ async fn a_table_with_length_prefixed_index(api: &mut TestApi) -> TestResult {
             `a`  TEXT NOT NULL,
             `b`  TEXT NOT NULL
         );
-        
+
         CREATE INDEX A_a_b_idx ON `A` (a(30), b(20));
     "#};
 
@@ -140,7 +141,7 @@ async fn a_table_with_non_length_prefixed_index(api: &mut TestApi) -> TestResult
             `a`  VARCHAR(190) NOT NULL,
             `b`  VARCHAR(192) NOT NULL
         );
-        
+
         CREATE INDEX A_a_idx ON `A` (a);
         CREATE INDEX A_b_idx ON `A` (b(191));
     "#};
@@ -171,7 +172,7 @@ async fn a_table_with_descending_index(api: &mut TestApi) -> TestResult {
             `a`  INT NOT NULL,
             `b`  INT NOT NULL
         );
-        
+
         CREATE INDEX A_a_b_idx ON `A` (a ASC, b DESC);
     "#};
 
@@ -200,7 +201,7 @@ async fn a_table_with_descending_unique(api: &mut TestApi) -> TestResult {
             `a`  INT NOT NULL,
             `b`  INT NOT NULL
         );
-        
+
         CREATE UNIQUE INDEX A_a_b_key ON `A` (a ASC, b DESC);
     "#};
 
@@ -221,7 +222,7 @@ async fn a_table_with_descending_unique(api: &mut TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(tags(Mysql), preview_features("fullTextIndex"))]
+#[test_connector(tags(Mysql))]
 async fn a_table_with_fulltext_index(api: &mut TestApi) -> TestResult {
     let setup = indoc! {r#"
         CREATE TABLE `A` (
@@ -229,7 +230,7 @@ async fn a_table_with_fulltext_index(api: &mut TestApi) -> TestResult {
             `a`  VARCHAR(255) NOT NULL,
             `b`  TEXT         NOT NULL
         );
-        
+
         CREATE FULLTEXT INDEX A_a_b_idx ON `A` (a, b);
     "#};
 
@@ -250,7 +251,7 @@ async fn a_table_with_fulltext_index(api: &mut TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(tags(Mysql), preview_features("fullTextIndex"))]
+#[test_connector(tags(Mysql))]
 async fn a_table_with_fulltext_index_with_custom_name(api: &mut TestApi) -> TestResult {
     let setup = indoc! {r#"
         CREATE TABLE `A` (
@@ -258,7 +259,7 @@ async fn a_table_with_fulltext_index_with_custom_name(api: &mut TestApi) -> Test
             `a`  VARCHAR(255) NOT NULL,
             `b`  TEXT         NOT NULL
         );
-        
+
         CREATE FULLTEXT INDEX custom_name ON `A` (a, b);
     "#};
 
@@ -271,35 +272,6 @@ async fn a_table_with_fulltext_index_with_custom_name(api: &mut TestApi) -> Test
           b  String @db.Text
 
           @@fulltext([a, b], map: "custom_name")
-        }
-    "#]];
-
-    expected.assert_eq(&api.introspect_dml().await?);
-
-    Ok(())
-}
-
-#[test_connector(tags(Mysql))]
-async fn a_table_with_fulltext_index_without_preview_flag(api: &mut TestApi) -> TestResult {
-    let setup = indoc! {r#"
-        CREATE TABLE `A` (
-            `id` INT          PRIMARY KEY,
-            `a`  VARCHAR(255) NOT NULL,
-            `b`  TEXT         NOT NULL
-        );
-
-        CREATE FULLTEXT INDEX A_a_b_idx ON `A` (a, b);
-    "#};
-
-    api.raw_cmd(setup).await;
-
-    let expected = expect![[r#"
-        model A {
-          id Int    @id
-          a  String @db.VarChar(255)
-          b  String @db.Text
-
-          @@index([a, b])
         }
     "#]];
 
@@ -407,23 +379,21 @@ async fn missing_select_rights(api: &mut TestApi) -> TestResult {
         shadow_database_connection_string: None,
     };
 
-    let mut conn = SqlSchemaConnector::new_mysql();
-    conn.set_params(params).unwrap();
+    let mut conn = SqlSchemaConnector::new_mysql(params).unwrap();
 
     let datasource = formatdoc!(
         r#"
         datasource db {{
           provider = "mysql"
-          url      = "{url}"
         }}
     "#
     );
 
-    let config = psl::parse_schema(datasource).unwrap();
+    let config = psl::parse_schema_without_extensions(datasource).unwrap();
 
     let ctx = IntrospectionContext::new(config, Default::default(), None, PathBuf::new());
 
-    let res = conn.introspect(&ctx).await.unwrap();
+    let res = conn.introspect(&ctx, &NoExtensionTypes).await.unwrap();
     assert!(res.is_empty);
 
     Ok(())
@@ -435,12 +405,11 @@ async fn northwind(api: TestApi) {
     api.raw_cmd(setup).await;
     let expectation = expect![[r#"
         generator client {
-          provider = "prisma-client-js"
+          provider = "prisma-client"
         }
 
         datasource db {
           provider = "mysql"
-          url      = "env(TEST_DATABASE_URL)"
         }
 
         model customers {
@@ -826,12 +795,11 @@ async fn commenting_stopgap(api: &mut TestApi) -> TestResult {
 
     let expectation = expect![[r#"
         generator client {
-          provider = "prisma-client-js"
+          provider = "prisma-client"
         }
 
         datasource db {
           provider = "mysql"
-          url      = "env(TEST_DATABASE_URL)"
         }
 
         /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments

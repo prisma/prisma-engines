@@ -2,6 +2,7 @@ use crate::TemplatingError;
 use quaint::error::Error as QuaintError;
 use std::env::VarError;
 use thiserror::Error;
+use user_facing_errors::query_engine::validation::ValidationError;
 
 #[allow(clippy::large_enum_variant)]
 #[derive(Debug, Error)]
@@ -32,6 +33,9 @@ pub enum TestError {
 
     #[error("External process error: {0}")]
     External(#[from] Box<dyn std::error::Error + Send + Sync>),
+
+    #[error("Error converting GraphQL query to JSON: {0}")]
+    QueryConversionError(#[from] ValidationError),
 }
 
 impl TestError {

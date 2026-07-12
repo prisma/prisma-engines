@@ -1,4 +1,6 @@
+use barrel::types;
 use indoc::indoc;
+use schema_core::{ExtensionType, ExtensionTypeConfig};
 use sql_introspection_tests::test_api::*;
 use test_macros::test_connector;
 
@@ -12,14 +14,13 @@ async fn should_work_with_the_preview_feature_enabled(api: &mut TestApi) -> Test
 
     let expectation = expect![[r#"
         generator client {
-          provider        = "prisma-client-js"
+          provider        = "prisma-client"
           previewFeatures = ["postgresqlExtensions"]
         }
 
         datasource db {
           provider   = "postgresql"
-          url        = "env(TEST_DATABASE_URL)"
-          extensions = [citext(schema: "prisma-tests")]
+          extensions = [citext(schema: "public")]
         }
     "#]];
 
@@ -38,14 +39,13 @@ async fn sanitizes_problematic_extension_names(api: &mut TestApi) -> TestResult 
 
     let expectation = expect![[r#"
         generator client {
-          provider        = "prisma-client-js"
+          provider        = "prisma-client"
           previewFeatures = ["postgresqlExtensions"]
         }
 
         datasource db {
           provider   = "postgresql"
-          url        = "env(TEST_DATABASE_URL)"
-          extensions = [uuid_ossp(map: "uuid-ossp", schema: "prisma-tests")]
+          extensions = [uuid_ossp(map: "uuid-ossp", schema: "public")]
         }
     "#]];
 
@@ -68,13 +68,12 @@ async fn should_not_list_any_extensions_outside_of_allow_list(api: &mut TestApi)
 
     let expectation = expect![[r#"
         generator client {
-          provider        = "prisma-client-js"
+          provider        = "prisma-client"
           previewFeatures = ["postgresqlExtensions"]
         }
 
         datasource db {
           provider = "postgresql"
-          url      = "env(TEST_DATABASE_URL)"
         }
     "#]];
 
@@ -97,26 +96,24 @@ async fn should_not_remove_any_extensions_outside_of_allow_list(api: &mut TestAp
 
     let schema = indoc! {r#"
         generator client {
-          provider        = "prisma-client-js"
+          provider        = "prisma-client"
           previewFeatures = ["postgresqlExtensions"]
         }
 
         datasource db {
           provider   = "postgresql"
-          url        = "env(TEST_DATABASE_URL)"
           extensions = [amcheck]
         }
     "#};
 
     let expectation = expect![[r#"
         generator client {
-          provider        = "prisma-client-js"
+          provider        = "prisma-client"
           previewFeatures = ["postgresqlExtensions"]
         }
 
         datasource db {
           provider   = "postgresql"
-          url        = "env(TEST_DATABASE_URL)"
           extensions = [amcheck]
         }
     "#]];
@@ -136,12 +133,11 @@ async fn should_not_list_extensions_without_the_preview_feature(api: &mut TestAp
 
     let expectation = expect![[r#"
         generator client {
-          provider = "prisma-client-js"
+          provider = "prisma-client"
         }
 
         datasource db {
           provider = "postgresql"
-          url      = "env(TEST_DATABASE_URL)"
         }
     "#]];
 
@@ -160,26 +156,24 @@ async fn should_keep_version_attribute_if_same_as_db(api: &mut TestApi) -> TestR
 
     let schema = indoc! {r#"
         generator client {
-          provider        = "prisma-client-js"
+          provider        = "prisma-client"
           previewFeatures = ["postgresqlExtensions"]
         }
 
         datasource db {
           provider   = "postgresql"
-          url        = "env(TEST_DATABASE_URL)"
           extensions = [citext(version: "1.6")]
         }
     "#};
 
     let expectation = expect![[r#"
         generator client {
-          provider        = "prisma-client-js"
+          provider        = "prisma-client"
           previewFeatures = ["postgresqlExtensions"]
         }
 
         datasource db {
           provider   = "postgresql"
-          url        = "env(TEST_DATABASE_URL)"
           extensions = [citext(version: "1.6")]
         }
     "#]];
@@ -199,26 +193,24 @@ async fn should_update_version_attribute_if_different_than_db(api: &mut TestApi)
 
     let schema = indoc! {r#"
         generator client {
-          provider        = "prisma-client-js"
+          provider        = "prisma-client"
           previewFeatures = ["postgresqlExtensions"]
         }
 
         datasource db {
           provider   = "postgresql"
-          url        = "env(TEST_DATABASE_URL)"
           extensions = [citext(version: "1.4")]
         }
     "#};
 
     let expectation = expect![[r#"
         generator client {
-          provider        = "prisma-client-js"
+          provider        = "prisma-client"
           previewFeatures = ["postgresqlExtensions"]
         }
 
         datasource db {
           provider   = "postgresql"
-          url        = "env(TEST_DATABASE_URL)"
           extensions = [citext(version: "1.6")]
         }
     "#]];
@@ -238,27 +230,25 @@ async fn should_keep_schema_attribute_if_same_as_db(api: &mut TestApi) -> TestRe
 
     let schema = indoc! {r#"
         generator client {
-          provider        = "prisma-client-js"
+          provider        = "prisma-client"
           previewFeatures = ["postgresqlExtensions"]
         }
 
         datasource db {
           provider   = "postgresql"
-          url        = "env(TEST_DATABASE_URL)"
-          extensions = [citext(schema: "prisma-tests")]
+          extensions = [citext(schema: "public")]
         }
     "#};
 
     let expectation = expect![[r#"
         generator client {
-          provider        = "prisma-client-js"
+          provider        = "prisma-client"
           previewFeatures = ["postgresqlExtensions"]
         }
 
         datasource db {
           provider   = "postgresql"
-          url        = "env(TEST_DATABASE_URL)"
-          extensions = [citext(schema: "prisma-tests")]
+          extensions = [citext(schema: "public")]
         }
     "#]];
 
@@ -277,27 +267,25 @@ async fn should_update_schema_attribute_if_different_than_db(api: &mut TestApi) 
 
     let schema = indoc! {r#"
         generator client {
-          provider        = "prisma-client-js"
+          provider        = "prisma-client"
           previewFeatures = ["postgresqlExtensions"]
         }
 
         datasource db {
           provider   = "postgresql"
-          url        = "env(TEST_DATABASE_URL)"
           extensions = [citext(schema: "meow")]
         }
     "#};
 
     let expectation = expect![[r#"
         generator client {
-          provider        = "prisma-client-js"
+          provider        = "prisma-client"
           previewFeatures = ["postgresqlExtensions"]
         }
 
         datasource db {
           provider   = "postgresql"
-          url        = "env(TEST_DATABASE_URL)"
-          extensions = [citext(schema: "prisma-tests")]
+          extensions = [citext(schema: "public")]
         }
     "#]];
 
@@ -310,26 +298,24 @@ async fn should_update_schema_attribute_if_different_than_db(api: &mut TestApi) 
 async fn should_remove_missing_extensions(api: &mut TestApi) -> TestResult {
     let schema = indoc! {r#"
         generator client {
-          provider        = "prisma-client-js"
+          provider        = "prisma-client"
           previewFeatures = ["postgresqlExtensions"]
         }
 
         datasource db {
           provider   = "postgresql"
-          url        = "env(TEST_DATABASE_URL)"
           extensions = [citext]
         }
     "#};
 
     let expectation = expect![[r#"
         generator client {
-          provider        = "prisma-client-js"
+          provider        = "prisma-client"
           previewFeatures = ["postgresqlExtensions"]
         }
 
         datasource db {
           provider = "postgresql"
-          url      = "env(TEST_DATABASE_URL)"
         }
     "#]];
 
@@ -342,17 +328,146 @@ async fn should_remove_missing_extensions(api: &mut TestApi) -> TestResult {
 async fn no_extensions_means_no_extensions(api: &mut TestApi) -> TestResult {
     let expectation = expect![[r#"
         generator client {
-          provider        = "prisma-client-js"
+          provider        = "prisma-client"
           previewFeatures = ["postgresqlExtensions"]
         }
 
         datasource db {
           provider = "postgresql"
-          url      = "env(TEST_DATABASE_URL)"
         }
     "#]];
 
     api.expect_datamodel(&expectation).await;
+
+    Ok(())
+}
+
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
+async fn introspect_extension_type(api: &mut TestApi) -> TestResult {
+    api.barrel()
+        .execute(|migration| {
+            migration.inject_custom("CREATE EXTENSION IF NOT EXISTS vector;");
+
+            migration.create_table("A", |t| {
+                t.add_column("id", types::primary());
+                t.add_column("data", types::custom("vector(3)").nullable(false));
+            });
+        })
+        .await?;
+
+    let expectation = expect![[r#"
+        generator client {
+          provider = "prisma-client"
+        }
+
+        datasource db {
+          provider = "postgresql"
+        }
+
+        model A {
+          id   Int     @id @default(autoincrement())
+          data Vector3
+        }
+    "#]];
+
+    let extensions = ExtensionTypeConfig::new(vec![
+        ExtensionType::builder()
+            .prisma_name("Vector3")
+            .db_name("vector")
+            .db_type_modifiers(vec!["3".into()])
+            .number_of_db_type_modifiers(1)
+            .build(),
+    ]);
+
+    expectation.assert_eq(&api.introspect_with_extensions(&extensions).await?);
+
+    Ok(())
+}
+
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
+async fn introspect_specific_extension_type_by_type_modifier(api: &mut TestApi) -> TestResult {
+    api.barrel()
+        .execute(|migration| {
+            migration.inject_custom("CREATE EXTENSION IF NOT EXISTS vector;");
+
+            migration.create_table("A", |t| {
+                t.add_column("id", types::primary());
+                t.add_column("data", types::custom("vector(3)").nullable(false));
+            });
+        })
+        .await?;
+
+    let expectation = expect![[r#"
+        generator client {
+          provider = "prisma-client"
+        }
+
+        datasource db {
+          provider = "postgresql"
+        }
+
+        model A {
+          id   Int     @id @default(autoincrement())
+          data Vector3
+        }
+    "#]];
+
+    let extensions = ExtensionTypeConfig::new(vec![
+        ExtensionType::builder()
+            .prisma_name("Vector3")
+            .db_name("vector")
+            .db_type_modifiers(vec!["3".into()])
+            .number_of_db_type_modifiers(1)
+            .build(),
+        ExtensionType::builder()
+            .prisma_name("VectorN")
+            .db_name("vector")
+            .number_of_db_type_modifiers(1)
+            .build(),
+    ]);
+
+    expectation.assert_eq(&api.introspect_with_extensions(&extensions).await?);
+
+    Ok(())
+}
+
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
+async fn introspect_extension_type_with_modifier(api: &mut TestApi) -> TestResult {
+    api.barrel()
+        .execute(|migration| {
+            migration.inject_custom("CREATE EXTENSION IF NOT EXISTS vector;");
+
+            migration.create_table("A", |t| {
+                t.add_column("id", types::primary());
+                t.add_column("data", types::custom("vector(3)").nullable(false));
+            });
+        })
+        .await?;
+
+    let expectation = expect![[r#"
+        generator client {
+          provider = "prisma-client"
+        }
+
+        datasource db {
+          provider = "postgresql"
+        }
+
+        model A {
+          id   Int     @id @default(autoincrement())
+          data VectorN @db.vector(3)
+        }
+    "#]];
+
+    let extensions = ExtensionTypeConfig::new(vec![
+        ExtensionType::builder()
+            .prisma_name("VectorN")
+            .db_name("vector")
+            .number_of_db_type_modifiers(1)
+            .build(),
+    ]);
+
+    expectation.assert_eq(&api.introspect_with_extensions(&extensions).await?);
 
     Ok(())
 }

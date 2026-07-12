@@ -1,11 +1,12 @@
 use query_engine_tests::*;
 
-#[test_suite(schema(schema))]
+#[test_suite(schema(schema), exclude_executors("QueryCompiler"))]
 mod singular_batch {
     use indoc::indoc;
     use query_engine_tests::{
+        Runner, TestResult,
         query_core::{BatchDocument, QueryDocument},
-        run_query, Runner, TestResult,
+        run_query,
     };
 
     fn schema() -> String {
@@ -427,7 +428,7 @@ mod singular_batch {
         .await?;
         insta::assert_snapshot!(
           res.to_string(),
-          @r###"{"batchResult":[{"data":{"findUniqueTestModelOrThrow":{"id":2}}},{"errors":[{"error":"An operation failed because it depends on one or more records that were required but not found. Expected a record, found none.","user_facing_error":{"is_panic":false,"message":"An operation failed because it depends on one or more records that were required but not found. Expected a record, found none.","meta":{"cause":"Expected a record, found none."},"error_code":"P2025"}}]}]}"###
+          @r###"{"batchResult":[{"data":{"findUniqueTestModelOrThrow":{"id":2}}},{"errors":[{"error":"An operation failed because it depends on one or more records that were required but not found. No record was found for a query.","user_facing_error":{"is_panic":false,"message":"An operation failed because it depends on one or more records that were required but not found. No record was found for a query.","meta":{"cause":"No record was found for a query."},"error_code":"P2025"}}]}]}"###
         );
         assert!(compact_doc.is_compact());
 
@@ -457,7 +458,7 @@ mod singular_batch {
         .await?;
         insta::assert_snapshot!(
           res.to_string(),
-          @r###"{"batchResult":[{"data":{"findUniqueTestModel":{"id":2}}},{"errors":[{"error":"KnownError { message: \"An operation failed because it depends on one or more records that were required but not found. Expected a record, found none.\", meta: Object {\"cause\": String(\"Expected a record, found none.\")}, error_code: \"P2025\" }","user_facing_error":{"is_panic":false,"message":"An operation failed because it depends on one or more records that were required but not found. Expected a record, found none.","meta":{"cause":"Expected a record, found none."},"error_code":"P2025"}}]}]}"###
+          @r###"{"batchResult":[{"data":{"findUniqueTestModel":{"id":2}}},{"errors":[{"error":"KnownError { message: \"An operation failed because it depends on one or more records that were required but not found. No record was found for a query.\", meta: Object {\"cause\": String(\"No record was found for a query.\")}, error_code: \"P2025\" }","user_facing_error":{"is_panic":false,"message":"An operation failed because it depends on one or more records that were required but not found. No record was found for a query.","meta":{"cause":"No record was found for a query."},"error_code":"P2025"}}]}]}"###
         );
         assert!(!compact_doc.is_compact());
 

@@ -1,0 +1,23 @@
+{
+  "modelName": "User",
+  "action": "findMany",
+  "query": {
+    "arguments": {
+      "relationLoadStrategy": "join"
+    },
+    "selection": {
+      "id": true,
+      "posts": {
+        "arguments": {
+          "distinct": ["title"],
+          "skip": 20,
+          "take": 10
+        },
+        "selection": {
+          "id": true,
+          "title": true
+        }
+      }
+    }
+  }
+}

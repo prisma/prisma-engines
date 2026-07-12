@@ -1,8 +1,7 @@
 use crate::constants::*;
 
-use connector_interface::AggregationSelection;
-use mongodb::bson::{doc, Bson, Document};
-use query_structure::{AggregationFilter, Filter, ScalarFieldRef};
+use bson::{Bson, Document, doc};
+use query_structure::{AggregationFilter, AggregationSelection, Filter, ScalarFieldRef};
 use std::collections::HashSet;
 
 /// Represents a `$group` aggregation stage.
@@ -117,7 +116,7 @@ impl GroupByBuilder {
         for selection in selections {
             match selection {
                 AggregationSelection::Count { all, fields } => {
-                    if *all {
+                    if all.is_some() {
                         self.count_all = true;
                     }
 

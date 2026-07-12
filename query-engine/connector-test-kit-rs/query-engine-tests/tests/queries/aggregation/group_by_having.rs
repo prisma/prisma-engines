@@ -8,7 +8,7 @@ use query_engine_tests::*;
 //   operators applied. For a good confidence, we choose `equals`, `in`, `not equals`, `endsWith` (where applicable).
 #[test_suite(schema(schemas::common_text_and_numeric_types_optional))]
 mod aggr_group_by_having {
-    use query_engine_tests::{assert_error, match_connector_result, run_query, Runner};
+    use query_engine_tests::{Runner, assert_error, match_connector_result, run_query};
 
     // This is just basic confirmation that scalar filters are applied correctly.
     // The assumption is that we don't need to test all normal scalar filters as they share the exact same code path
@@ -52,13 +52,7 @@ mod aggr_group_by_having {
         Ok(())
     }
 
-    #[connector_test(exclude(Sqlite("cfd1")))]
-    // On D1, this fails with:
-    //
-    // ```diff
-    // - {"data":{"groupByTestModel":[{"string":"group1","_count":{"int":2}}]}}
-    // + {"data":{"groupByTestModel":[]}}
-    // ```
+    #[connector_test]
     async fn having_count_scalar_filter(runner: Runner) -> TestResult<()> {
         create_row(&runner, r#"{ id: 1, int: 1, string: "group1" }"#).await?;
         create_row(&runner, r#"{ id: 2, int: 2, string: "group1" }"#).await?;
@@ -133,13 +127,7 @@ mod aggr_group_by_having {
         Ok(())
     }
 
-    #[connector_test(exclude(Sqlite("cfd1")))]
-    // On D1, this fails with:
-    //
-    // ```diff
-    // - {"data":{"groupByTestModel":[{"string":"group1","_sum":{"float":16.0,"int":16}}]}}
-    // + {"data":{"groupByTestModel":[]}}
-    // ```
+    #[connector_test]
     async fn having_sum_scalar_filter(runner: Runner) -> TestResult<()> {
         create_row(&runner, r#"{ id: 1, float: 10, int: 10, string: "group1" }"#).await?;
         create_row(&runner, r#"{ id: 2, float: 6, int: 6, string: "group1" }"#).await?;
@@ -164,7 +152,7 @@ mod aggr_group_by_having {
                   }
                 }"#
             ),
-            @r###"{"data":{"groupByTestModel":[{"string":"group1","_sum":{"float":16.0,"int":16}}]}}"###
+            @r###"{"data":{"groupByTestModel":[{"string":"group1","_sum":{"float":16,"int":16}}]}}"###
         );
 
         match_connector_result!(
@@ -182,8 +170,8 @@ mod aggr_group_by_having {
           }"#,
           // On MongoDB, having sum returns 0 where there are inexistant element
           // Contrary to SQL which returns NULL and therefore excludes group3
-          MongoDb(_) => vec![r#"{"data":{"groupByTestModel":[{"string":"group2","_sum":{"float":5.0,"int":5}},{"string":"group3","_sum":{"float":0.0,"int":0}}]}}"#],
-          _ => vec![r#"{"data":{"groupByTestModel":[{"string":"group2","_sum":{"float":5.0,"int":5}}]}}"#]
+          MongoDb(_) => vec![r#"{"data":{"groupByTestModel":[{"string":"group2","_sum":{"float":5,"int":5}},{"string":"group3","_sum":{"float":0,"int":0}}]}}"#],
+          _ => vec![r#"{"data":{"groupByTestModel":[{"string":"group2","_sum":{"float":5,"int":5}}]}}"#]
         );
 
         // Group 1 and 2 returned
@@ -202,19 +190,13 @@ mod aggr_group_by_having {
                   }
                 }"#
             ),
-            @r###"{"data":{"groupByTestModel":[{"string":"group1","_sum":{"float":16.0,"int":16}},{"string":"group2","_sum":{"float":5.0,"int":5}}]}}"###
+            @r###"{"data":{"groupByTestModel":[{"string":"group1","_sum":{"float":16,"int":16}},{"string":"group2","_sum":{"float":5,"int":5}}]}}"###
         );
 
         Ok(())
     }
 
-    #[connector_test(exclude(Sqlite("cfd1")))]
-    // On D1, this fails with:
-    //
-    // ```diff
-    // - {"data":{"groupByTestModel":[{"string":"group1","_min":{"float":0.0,"int":0}},{"string":"group2","_min":{"float":0.0,"int":0}}]}}
-    // + {"data":{"groupByTestModel":[]}}
-    // ```
+    #[connector_test]
     async fn having_min_scalar_filter(runner: Runner) -> TestResult<()> {
         create_row(&runner, r#"{ id: 1, float: 10, int: 10, string: "group1" }"#).await?;
         create_row(&runner, r#"{ id: 2, float: 0, int: 0, string: "group1" }"#).await?;
@@ -239,7 +221,7 @@ mod aggr_group_by_having {
                   }
                 }"#
             ),
-            @r###"{"data":{"groupByTestModel":[{"string":"group1","_min":{"float":0.0,"int":0}},{"string":"group2","_min":{"float":0.0,"int":0}}]}}"###
+            @r###"{"data":{"groupByTestModel":[{"string":"group1","_min":{"float":0,"int":0}},{"string":"group2","_min":{"float":0,"int":0}}]}}"###
         );
 
         match_connector_result!(
@@ -276,19 +258,13 @@ mod aggr_group_by_having {
                   }
                 }"#
             ),
-            @r###"{"data":{"groupByTestModel":[{"string":"group1","_min":{"float":0.0,"int":0}},{"string":"group2","_min":{"float":0.0,"int":0}}]}}"###
+            @r###"{"data":{"groupByTestModel":[{"string":"group1","_min":{"float":0,"int":0}},{"string":"group2","_min":{"float":0,"int":0}}]}}"###
         );
 
         Ok(())
     }
 
-    #[connector_test(exclude(Sqlite("cfd1")))]
-    // On D1, this fails with:
-    //
-    // ```diff
-    // - {"data":{"groupByTestModel":[{"string":"group1","_max":{"float":10.0,"int":10}},{"string":"group2","_max":{"float":10.0,"int":10}}]}}
-    // + {"data":{"groupByTestModel":[]}}
-    // ```
+    #[connector_test]
     async fn having_max_scalar_filter(runner: Runner) -> TestResult<()> {
         create_row(&runner, r#"{ id: 1, float: 10, int: 10, string: "group1" }"#).await?;
         create_row(&runner, r#"{ id: 2, float: 0, int: 0, string: "group1" }"#).await?;
@@ -313,7 +289,7 @@ mod aggr_group_by_having {
                   }
                 }"#
             ),
-            @r###"{"data":{"groupByTestModel":[{"string":"group1","_max":{"float":10.0,"int":10}},{"string":"group2","_max":{"float":10.0,"int":10}}]}}"###
+            @r###"{"data":{"groupByTestModel":[{"string":"group1","_max":{"float":10,"int":10}},{"string":"group2","_max":{"float":10,"int":10}}]}}"###
         );
 
         match_connector_result!(
@@ -350,19 +326,13 @@ mod aggr_group_by_having {
                   }
                 }"#
             ),
-            @r###"{"data":{"groupByTestModel":[{"string":"group1","_max":{"float":10.0,"int":10}},{"string":"group2","_max":{"float":10.0,"int":10}}]}}"###
+            @r###"{"data":{"groupByTestModel":[{"string":"group1","_max":{"float":10,"int":10}},{"string":"group2","_max":{"float":10,"int":10}}]}}"###
         );
 
         Ok(())
     }
 
-    #[connector_test(exclude(Sqlite("cfd1")))]
-    // On D1, this fails with:
-    //
-    // ```diff
-    // - {"data":{"groupByTestModel":[{"string":"group1","_count":{"string":2}}]}}
-    // + {"data":{"groupByTestModel":[]}}
-    // ```
+    #[connector_test]
     async fn having_count_non_numerical_field(runner: Runner) -> TestResult<()> {
         create_row(&runner, r#"{ id: 1, float: 10, int: 10, string: "group1" }"#).await?;
         create_row(&runner, r#"{ id: 2, float: 0, int: 0, string: "group1" }"#).await?;
@@ -380,16 +350,7 @@ mod aggr_group_by_having {
         Ok(())
     }
 
-    #[connector_test(exclude(Sqlite("cfd1")))]
-    // On D1, this panics with:
-    //
-    // ```
-    // assertion `left == right` failed: Query result: {"data":{"groupByTestModel":[]}} is not part of the expected results: ["{\"data\":{\"groupByTestModel\":[{\"string\":\"group1\"},{\"string\":\"group2\"}]}}", "{\"data\":{\"groupByTestModel\":[{\"string\":\"group2\"},{\"string\":\"group1\"}]}}"] for connector SQLite (cfd1)
-    //   left: false
-    //  right: true
-    // note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
-    // FAILED
-    // ```
+    #[connector_test]
     async fn having_without_aggr_sel(runner: Runner) -> TestResult<()> {
         create_row(&runner, r#"{ id: 1, float: 10, int: 10, string: "group1" }"#).await?;
         create_row(&runner, r#"{ id: 2, float: 0, int: 0, string: "group1" }"#).await?;
@@ -460,7 +421,7 @@ mod aggr_group_by_having {
 
 #[test_suite(schema(schema), capabilities(DecimalType))]
 mod decimal_aggregation_group_by_having {
-    use query_engine_tests::{match_connector_result, run_query, Runner};
+    use query_engine_tests::{Runner, match_connector_result, run_query};
 
     fn schema() -> String {
         let schema = indoc! {

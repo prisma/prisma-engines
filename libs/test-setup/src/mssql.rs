@@ -1,4 +1,4 @@
-use crate::{runtime::run_with_thread_local_runtime as tok, Tags};
+use crate::{Tags, runtime::run_with_thread_local_runtime as tok};
 use connection_string::JdbcString;
 use enumflags2::BitFlags;
 use quaint::{error::Error, prelude::Queryable, single::Quaint};

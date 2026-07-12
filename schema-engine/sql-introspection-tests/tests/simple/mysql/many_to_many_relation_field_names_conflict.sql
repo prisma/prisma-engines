@@ -31,12 +31,11 @@ CREATE INDEX `_Frenemyship_B_index` ON `_Frenemyship`(`B`);
 
 /*
 generator js {
-  provider = "prisma-client-js"
+  provider = "prisma-client"
 }
 
 datasource db {
   provider = "mysql"
-  url      = env("DATABASE_URL")
 }
 
 model User {

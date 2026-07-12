@@ -5,6 +5,6 @@ model User {
 }
 
 model Post {
-  id   Int    @id
-  User User[]
+  id    Int    @id
+  users User[]
 }

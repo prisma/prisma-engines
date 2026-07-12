@@ -1,0 +1,106 @@
+[
+  {
+    "title": "Add relation attribute for relation field",
+    "kind": "quickfix",
+    "diagnostics": [
+      {
+        "range": {
+          "start": {
+            "line": 5,
+            "character": 4
+          },
+          "end": {
+            "line": 6,
+            "character": 0
+          }
+        },
+        "severity": 1,
+        "message": "Error parsing attribute \"@relation\": The relation fields `wife` on Model `User` and `husband` on Model `User` do not provide the `fields` argument in the @relation attribute. You have to provide it on one of the two fields."
+      }
+    ],
+    "edit": {
+      "changes": {
+        "file:///path/to/schema.prisma": [
+          {
+            "range": {
+              "start": {
+                "line": 5,
+                "character": 25
+              },
+              "end": {
+                "line": 5,
+                "character": 54
+              }
+            },
+            "newText": "@relation(\"MarriagePartners\", fields: [wifeid], references: [id])"
+          },
+          {
+            "range": {
+              "start": {
+                "line": 5,
+                "character": 54
+              },
+              "end": {
+                "line": 6,
+                "character": 0
+              }
+            },
+            "newText": "\nwifeid Int?\n"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "title": "Add relation attribute for relation field",
+    "kind": "quickfix",
+    "diagnostics": [
+      {
+        "range": {
+          "start": {
+            "line": 7,
+            "character": 4
+          },
+          "end": {
+            "line": 8,
+            "character": 0
+          }
+        },
+        "severity": 1,
+        "message": "Error parsing attribute \"@relation\": The relation field `teacher` on Model `User` must specify the `fields` argument in the @relation attribute. You can run `prisma format` to fix this automatically."
+      }
+    ],
+    "edit": {
+      "changes": {
+        "file:///path/to/schema.prisma": [
+          {
+            "range": {
+              "start": {
+                "line": 7,
+                "character": 25
+              },
+              "end": {
+                "line": 7,
+                "character": 53
+              }
+            },
+            "newText": "@relation(\"TeacherStudents\", fields: [teacherid], references: [id])"
+          },
+          {
+            "range": {
+              "start": {
+                "line": 7,
+                "character": 53
+              },
+              "end": {
+                "line": 8,
+                "character": 0
+              }
+            },
+            "newText": "\nteacherid Int?\n"
+          }
+        ]
+      }
+    }
+  }
+]

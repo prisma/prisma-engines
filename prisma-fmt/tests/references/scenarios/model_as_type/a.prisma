@@ -1,0 +1,15 @@
+generator client {
+  provider        = "prisma-client"
+  previewFeatures = ["views"]
+}
+
+datasource db {
+  provider = "mongodb"
+}
+
+model UserTwo {
+  id String @id @map("_id") @db.String
+
+  posts  Post   @relation(fields: [postId], references: [id])
+  postId String
+}

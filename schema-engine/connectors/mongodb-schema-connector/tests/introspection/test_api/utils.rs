@@ -1,10 +1,9 @@
 use enumflags2::BitFlags;
 use names::Generator;
-use once_cell::sync::Lazy;
 use psl::PreviewFeature;
-use std::io::Write as _;
+use std::{io::Write as _, sync::LazyLock};
 
-pub static CONN_STR: Lazy<String> = Lazy::new(|| match std::env::var("TEST_DATABASE_URL") {
+pub static CONN_STR: LazyLock<String> = LazyLock::new(|| match std::env::var("TEST_DATABASE_URL") {
     Ok(url) => url,
     Err(_) => {
         let stderr = std::io::stderr();
@@ -40,7 +39,6 @@ pub(crate) fn datasource_block_string() -> String {
         r#"
           datasource db {{
             provider = "mongodb"
-            url      = "env(TEST_DATABASE_URL)"
           }}
       "#
     )
@@ -56,11 +54,10 @@ pub(crate) fn generator_block_string(features: BitFlags<PreviewFeature>) -> Stri
     format!(
         r#"
           generator js {{
-            provider        = "prisma-client-js"
-            previewFeatures = [{}]
+            provider        = "prisma-client"
+            previewFeatures = [{features}]
           }}
       "#,
-        features,
     )
 }
 
@@ -75,5 +72,5 @@ pub(crate) fn parse_datamodels(datamodels: &[(&str, String)]) -> psl::ValidatedS
         .map(|(file_name, dm)| (file_name.to_string(), psl::SourceFile::from(dm)))
         .collect();
 
-    psl::validate_multi_file(&datamodels)
+    psl::validate_multi_file_without_extensions(&datamodels)
 }

@@ -3,7 +3,6 @@ fn skipping_of_env_vars() {
     let dml = r#"
         datasource db {
             provider = "postgresql"
-            url      = env("POSTGRES_URL")
         }
 
         model User {
@@ -13,5 +12,5 @@ fn skipping_of_env_vars() {
     "#;
 
     // must not fail without env var
-    psl::parse_schema(dml).unwrap();
+    psl::parse_schema_without_extensions(dml).unwrap();
 }

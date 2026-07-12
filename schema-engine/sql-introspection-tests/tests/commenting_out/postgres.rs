@@ -53,12 +53,11 @@ async fn fields_we_cannot_sanitize_are_commented_out_and_warned(api: &mut TestAp
 
     let expected = expect![[r#"
         generator client {
-          provider = "prisma-client-js"
+          provider = "prisma-client"
         }
 
         datasource db {
           provider = "postgresql"
-          url      = "env(TEST_DATABASE_URL)"
         }
 
         model Test {
@@ -108,12 +107,11 @@ async fn unsupported_type_keeps_its_usages(api: &mut TestApi) -> TestResult {
 
     let dm = expect![[r#"
         generator client {
-          provider = "prisma-client-js"
+          provider = "prisma-client"
         }
 
         datasource db {
           provider = "postgresql"
-          url      = "env(TEST_DATABASE_URL)"
         }
 
         model Test {
@@ -160,12 +158,11 @@ async fn a_table_with_only_an_unsupported_id(api: &mut TestApi) -> TestResult {
 
     let expected = expect![[r#"
         generator client {
-          provider = "prisma-client-js"
+          provider = "prisma-client"
         }
 
         datasource db {
           provider = "postgresql"
-          url      = "env(TEST_DATABASE_URL)"
         }
 
         /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
@@ -232,12 +229,11 @@ async fn dbgenerated_in_unsupported(api: &mut TestApi) -> TestResult {
 
     let expectation = expect![[r#"
         generator client {
-          provider = "prisma-client-js"
+          provider = "prisma-client"
         }
 
         datasource db {
           provider = "postgresql"
-          url      = "env(TEST_DATABASE_URL)"
         }
 
         model Blog {
@@ -268,12 +264,11 @@ async fn commenting_out_a_table_without_columns(api: &mut TestApi) -> TestResult
 
     let expected = expect![[r#"
         generator client {
-          provider = "prisma-client-js"
+          provider = "prisma-client"
         }
 
         datasource db {
           provider = "postgresql"
-          url      = "env(TEST_DATABASE_URL)"
         }
 
         /// We could not retrieve columns for the underlying table. Either it has none or you are missing rights to see them. Please check your privileges.
@@ -367,12 +362,11 @@ ALTER TABLE blocks
 
     let expected = expect![[r#"
         generator client {
-          provider = "prisma-client-js"
+          provider = "prisma-client"
         }
 
         datasource db {
           provider = "postgresql"
-          url      = "env(TEST_DATABASE_URL)"
         }
 
         /// This table is a partition table and requires additional setup for migrations. Visit https://pris.ly/d/partition-tables for more info.
@@ -431,12 +425,11 @@ ALTER TABLE blocks_p2_0 ADD CONSTRAINT b2_unique UNIQUE (id);
 
     let expected = expect![[r#"
         generator client {
-          provider = "prisma-client-js"
+          provider = "prisma-client"
         }
 
         datasource db {
           provider = "postgresql"
-          url      = "env(TEST_DATABASE_URL)"
         }
 
         /// This table is a partition table and requires additional setup for migrations. Visit https://pris.ly/d/partition-tables for more info.
@@ -478,12 +471,11 @@ ALTER TABLE foo ENABLE ROW LEVEL SECURITY; "#,
 
     let expected = expect![[r#"
         generator client {
-          provider = "prisma-client-js"
+          provider = "prisma-client"
         }
 
         datasource db {
           provider = "postgresql"
-          url      = "env(TEST_DATABASE_URL)"
         }
 
         /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.

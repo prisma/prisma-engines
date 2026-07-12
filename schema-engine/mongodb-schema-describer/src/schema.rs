@@ -1,4 +1,4 @@
-use mongodb::bson::Bson;
+use bson::Bson;
 use serde::{Deserialize, Serialize};
 use std::{
     collections::BTreeMap,

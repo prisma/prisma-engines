@@ -1,11 +1,11 @@
-use once_cell::sync::Lazy;
+use std::sync::LazyLock;
 
 pub fn sqlite_test_url(db_name: &str) -> String {
     std::env::var("SQLITE_TEST_URL").unwrap_or_else(|_| format!("file:{}", sqlite_test_file(db_name)))
 }
 
 fn sqlite_test_file(db_name: &str) -> String {
-    static WORKSPACE_ROOT: Lazy<std::path::PathBuf> = Lazy::new(|| {
+    static WORKSPACE_ROOT: LazyLock<std::path::PathBuf> = LazyLock::new(|| {
         std::env::var("WORKSPACE_ROOT")
             .map(|root| std::path::Path::new(&root).join("db"))
             .unwrap_or_else(|_| {

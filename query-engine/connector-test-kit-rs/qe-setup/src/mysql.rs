@@ -1,14 +1,18 @@
-use once_cell::sync::OnceCell;
 use quaint::{prelude::Queryable, single::Quaint};
-use schema_core::schema_connector::{ConnectorError, ConnectorResult};
-use std::{future::Future, pin::Pin, sync::mpsc};
+use schema_core::schema_connector::{ConnectorError, ConnectorParams, ConnectorResult};
+use std::{
+    future::Future,
+    pin::Pin,
+    sync::{OnceLock, mpsc},
+};
 use test_setup::{mysql::mysql_safe_identifier, runtime::run_with_thread_local_runtime as tok};
 use url::Url;
 
 pub(crate) async fn mysql_setup(url: String, prisma_schema: &str) -> ConnectorResult<()> {
     mysql_reset(&url).await?;
-    let mut connector = sql_schema_connector::SqlSchemaConnector::new_mysql();
-    crate::diff_and_apply(prisma_schema, url, &mut connector).await
+    let params = ConnectorParams::new(url, Default::default(), None);
+    let mut connector = sql_schema_connector::SqlSchemaConnector::new_mysql(params)?;
+    crate::diff_and_apply(prisma_schema, &mut connector).await
 }
 
 async fn mysql_reset(original_url: &str) -> ConnectorResult<()> {
@@ -19,7 +23,7 @@ async fn mysql_reset(original_url: &str) -> ConnectorResult<()> {
 
 async fn create_mysql_database(database_url: &str, db_name: &str) -> ConnectorResult<()> {
     type Message = Box<dyn (for<'a> FnOnce(&'a Quaint) -> Pin<Box<dyn Future<Output = ()> + 'a>>) + Send>;
-    static ADMIN_THREAD_HANDLE: OnceCell<mpsc::SyncSender<Message>> = OnceCell::new();
+    static ADMIN_THREAD_HANDLE: OnceLock<mpsc::SyncSender<Message>> = OnceLock::new();
 
     let handle = ADMIN_THREAD_HANDLE.get_or_init(|| {
         let mut mysql_db_url: Url = database_url.parse().unwrap();

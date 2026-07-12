@@ -2,10 +2,10 @@ mod attributes;
 
 use self::attributes::AttributesValidationState;
 use crate::{
-    ast, interner::StringInterner, names::Names, relations::Relations, types::Types, DatamodelError, Diagnostics,
-    InFile, StringId,
+    DatamodelError, Diagnostics, InFile, StringId, ast, extension::ExtensionTypes, interner::StringInterner,
+    names::Names, relations::Relations, types::Types,
 };
-use schema_ast::ast::{Expression, WithName};
+use schema_ast::ast::{EnumValueId, Expression, WithName};
 use std::collections::{HashMap, HashSet};
 
 /// Validation context. This is an implementation detail of ParserDatabase. It
@@ -27,13 +27,14 @@ pub(crate) struct Context<'db> {
     pub(crate) types: &'db mut Types,
     pub(crate) relations: &'db mut Relations,
     pub(crate) diagnostics: &'db mut Diagnostics,
+    extension_types: &'db dyn ExtensionTypes,
     attributes: AttributesValidationState, // state machine for attribute validation
 
     // @map'ed names indexes. These are not in the db because they are only used for validation.
     pub(super) mapped_model_scalar_field_names: HashMap<(crate::ModelId, StringId), ast::FieldId>,
     pub(super) mapped_composite_type_names: HashMap<(crate::CompositeTypeId, StringId), ast::FieldId>,
     pub(super) mapped_enum_names: HashMap<StringId, crate::EnumId>,
-    pub(super) mapped_enum_value_names: HashMap<(crate::EnumId, StringId), u32>,
+    pub(super) mapped_enum_value_names: HashMap<(crate::EnumId, StringId), EnumValueId>,
 }
 
 impl<'db> Context<'db> {
@@ -44,6 +45,7 @@ impl<'db> Context<'db> {
         types: &'db mut Types,
         relations: &'db mut Relations,
         diagnostics: &'db mut Diagnostics,
+        extension_types: &'db dyn ExtensionTypes,
     ) -> Self {
         Context {
             asts,
@@ -52,6 +54,7 @@ impl<'db> Context<'db> {
             types,
             relations,
             diagnostics,
+            extension_types,
             attributes: AttributesValidationState::default(),
 
             mapped_model_scalar_field_names: Default::default(),
@@ -123,8 +126,7 @@ impl<'db> Context<'db> {
         if self.attributes.attributes.is_some() || !self.attributes.unused_attributes.is_empty() {
             panic!(
                 "`ctx.visit_attributes() called with {:?} while the Context is still validating previous attribute set on {:?}`",
-                ast_attributes,
-                self.attributes.attributes
+                ast_attributes, self.attributes.attributes
             );
         }
 
@@ -341,7 +343,10 @@ impl<'db> Context<'db> {
     /// process. Returns whether the attribute is valid enough to be usable.
     fn set_attribute(&mut self, attribute_id: crate::AttributeId, attribute: &'db ast::Attribute) -> bool {
         if self.attributes.attribute.is_some() || !self.attributes.args.is_empty() {
-            panic!("State error: we cannot start validating new arguments before `validate_visited_arguments()` or `discard_arguments()` has been called.\n{:#?}", self.attributes);
+            panic!(
+                "State error: we cannot start validating new arguments before `validate_visited_arguments()` or `discard_arguments()` has been called.\n{:#?}",
+                self.attributes
+            );
         }
 
         let mut is_reasonably_valid = true;
@@ -435,6 +440,10 @@ impl<'db> Context<'db> {
         }
 
         true
+    }
+
+    pub(super) fn extension_types(&self) -> &dyn ExtensionTypes {
+        self.extension_types
     }
 }
 

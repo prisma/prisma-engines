@@ -305,6 +305,38 @@ async fn reintrospect_force_multi_file(api: &mut TestApi) -> TestResult {
     Ok(())
 }
 
+#[test_connector(exclude(CockroachDb))]
+async fn reintrospect_force_invalid_config(api: &mut TestApi) -> TestResult {
+    let invalid_config_dm = indoc! {r#"
+      datasource db {
+        provider = "mysql"
+        schemas  = ["foo"]
+      }
+
+      generator client {
+        provider = "prisma-client"
+        previewFeatures = []
+      }
+    "#};
+
+    let input_dms = [("foo.prisma", invalid_config_dm.to_string())];
+
+    let expected = expect![[r#"
+        [1;91merror[0m: [1mThe `schemas` property is not supported on the current connector.[0m
+          [1;94m-->[0m  [4mfoo.prisma:3[0m
+        [1;94m   | [0m
+        [1;94m 2 | [0m  provider = "mysql"
+        [1;94m 3 | [0m  schemas  = [1;91m["foo"][0m
+        [1;94m   | [0m
+
+    "#]];
+
+    api.expect_re_introspected_force_datamodels_error(&input_dms, expected)
+        .await;
+
+    Ok(())
+}
+
 // ----- Enums -----
 
 #[test_connector(tags(Postgres), exclude(CockroachDb))]
@@ -511,12 +543,11 @@ async fn introspect_multi_view_preview_feature_is_required(api: &mut TestApi) ->
     let expected = expect![[r#"
         // file: schema.prisma
         generator client {
-          provider = "prisma-client-js"
+          provider = "prisma-client"
         }
 
         datasource db {
           provider = "postgresql"
-          url      = "env(TEST_DATABASE_URL)"
         }
 
         model User {
@@ -533,7 +564,7 @@ async fn introspect_multi_view_preview_feature_is_required(api: &mut TestApi) ->
     Ok(())
 }
 
-#[test_connector(tags(Postgres), exclude(Postgres16), exclude(CockroachDb), preview_features("views"))]
+#[test_connector(tags(Postgres), exclude(Postgres16, CockroachDb), preview_features("views"))]
 // the expect_view_definition is slightly different than for Postgres16
 async fn reintrospect_new_view_single_file(api: &mut TestApi) -> TestResult {
     let setup = indoc! {r#"
@@ -567,13 +598,10 @@ async fn reintrospect_new_view_single_file(api: &mut TestApi) -> TestResult {
           last_name  String? @db.VarChar(255)
         }
 
-        /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
         view Schwuser {
           id         Int?
           first_name String? @db.VarChar(255)
           last_name  String? @db.VarChar(255)
-
-          @@ignore
         }
     "#]];
 
@@ -589,18 +617,13 @@ async fn reintrospect_new_view_single_file(api: &mut TestApi) -> TestResult {
 
     api.expect_view_definition("Schwuser", &expected).await;
 
-    let expected = expect![[r#"
-        *** WARNING ***
-
-        The following views were ignored as they do not have a valid unique identifier or id. This is currently not supported by Prisma Client. Please refer to the documentation on defining unique identifiers in views: https://pris.ly/d/view-identifiers
-          - "Schwuser"
-    "#]];
+    let expected = expect![""];
     api.expect_warnings(&expected).await;
 
     Ok(())
 }
 
-#[test_connector(tags(Postgres), exclude(Postgres16), exclude(CockroachDb), preview_features("views"))]
+#[test_connector(tags(Postgres), exclude(Postgres16, CockroachDb), preview_features("views"))]
 // the expect_view_definition is slightly different than for Postgres16
 async fn reintrospect_removed_view_single_file(api: &mut TestApi) -> TestResult {
     let setup = indoc! {r#"
@@ -648,7 +671,7 @@ async fn reintrospect_removed_view_single_file(api: &mut TestApi) -> TestResult 
     Ok(())
 }
 
-#[test_connector(tags(Postgres), exclude(Postgres16), exclude(CockroachDb), preview_features("views"))]
+#[test_connector(tags(Postgres), exclude(Postgres16, CockroachDb), preview_features("views"))]
 // the expect_view_definition is slightly different than for Postgres16
 async fn reintrospect_new_view_multi_file(api: &mut TestApi) -> TestResult {
     let setup = indoc! {r#"
@@ -685,13 +708,10 @@ async fn reintrospect_new_view_multi_file(api: &mut TestApi) -> TestResult {
 
     let expected = expect![[r#"
         // file: introspected.prisma
-        /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
         view Schwuser {
           id         Int?
           first_name String? @db.VarChar(255)
           last_name  String? @db.VarChar(255)
-
-          @@ignore
         }
         ------
         // file: post.prisma
@@ -719,18 +739,13 @@ async fn reintrospect_new_view_multi_file(api: &mut TestApi) -> TestResult {
 
     api.expect_view_definition_multi("Schwuser", &expected).await;
 
-    let expected = expect![[r#"
-        *** WARNING ***
-
-        The following views were ignored as they do not have a valid unique identifier or id. This is currently not supported by Prisma Client. Please refer to the documentation on defining unique identifiers in views: https://pris.ly/d/view-identifiers
-          - "Schwuser"
-    "#]];
+    let expected = expect![""];
     api.expect_warnings(&expected).await;
 
     Ok(())
 }
 
-#[test_connector(tags(Postgres), exclude(Postgres16), exclude(CockroachDb), preview_features("views"))]
+#[test_connector(tags(Postgres), exclude(Postgres16, CockroachDb), preview_features("views"))]
 // the expect_view_definition is slightly different than for Postgres16
 async fn reintrospect_removed_view_multi_file(api: &mut TestApi) -> TestResult {
     let setup = indoc! {r#"
@@ -818,12 +833,11 @@ async fn reintrospect_keep_configuration_in_same_file(api: &mut TestApi) -> Test
         ------
         // file: user.prisma
         generator client {
-          provider = "prisma-client-js"
+          provider = "prisma-client"
         }
 
         datasource db {
           provider = "postgresql"
-          url      = "env(TEST_DATABASE_URL)"
         }
 
         model User {
@@ -843,12 +857,11 @@ async fn reintrospect_keep_configuration_in_same_file(api: &mut TestApi) -> Test
     let expected = expect![[r#"
         // file: post.prisma
         generator client {
-          provider = "prisma-client-js"
+          provider = "prisma-client"
         }
 
         datasource db {
           provider = "postgresql"
-          url      = "env(TEST_DATABASE_URL)"
         }
 
         model Post {
@@ -903,7 +916,7 @@ async fn reintrospect_keep_configuration_when_spread_across_files(api: &mut Test
     let expected = expect![[r#"
         // file: post.prisma
         generator client {
-          provider = "prisma-client-js"
+          provider = "prisma-client"
         }
 
         model Post {
@@ -913,7 +926,6 @@ async fn reintrospect_keep_configuration_when_spread_across_files(api: &mut Test
         // file: user.prisma
         datasource db {
           provider = "postgresql"
-          url      = "env(TEST_DATABASE_URL)"
         }
 
         model User {
@@ -934,7 +946,6 @@ async fn reintrospect_keep_configuration_when_spread_across_files(api: &mut Test
         // file: post.prisma
         datasource db {
           provider = "postgresql"
-          url      = "env(TEST_DATABASE_URL)"
         }
 
         model Post {
@@ -943,7 +954,7 @@ async fn reintrospect_keep_configuration_when_spread_across_files(api: &mut Test
         ------
         // file: user.prisma
         generator client {
-          provider = "prisma-client-js"
+          provider = "prisma-client"
         }
 
         model User {
@@ -988,13 +999,12 @@ async fn reintrospect_keep_configuration_when_no_models(api: &mut TestApi) -> Te
     let expected = expect![[r#"
         // file: post.prisma
         generator client {
-          provider = "prisma-client-js"
+          provider = "prisma-client"
         }
         ------
         // file: user.prisma
         datasource db {
           provider = "postgresql"
-          url      = "env(TEST_DATABASE_URL)"
         }
 
         model User {
@@ -1015,12 +1025,11 @@ async fn reintrospect_keep_configuration_when_no_models(api: &mut TestApi) -> Te
         // file: post.prisma
         datasource db {
           provider = "postgresql"
-          url      = "env(TEST_DATABASE_URL)"
         }
         ------
         // file: user.prisma
         generator client {
-          provider = "prisma-client-js"
+          provider = "prisma-client"
         }
 
         model User {
@@ -1066,12 +1075,11 @@ async fn reintrospect_empty_multi_file(api: &mut TestApi) -> TestResult {
         ------
         // file: user.prisma
         generator client {
-          provider = "prisma-client-js"
+          provider = "prisma-client"
         }
 
         datasource db {
           provider = "postgresql"
-          url      = "env(TEST_DATABASE_URL)"
         }
     "#]];
 

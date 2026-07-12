@@ -1,6 +1,6 @@
 use psl::parser_database::{IndexAlgorithm, OperatorClass};
 
-use crate::{common::*, with_header, Provider};
+use crate::{Provider, common::*, with_header};
 
 #[test]
 fn with_raw_unsupported() {
@@ -13,7 +13,7 @@ fn with_raw_unsupported() {
         }
     "#};
 
-    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+    psl::parse_schema_without_extensions(with_header(dml, Provider::Postgres, &[]))
         .unwrap()
         .assert_has_model("A")
         .assert_index_on_fields(&["a"])
@@ -33,7 +33,7 @@ fn with_unsupported_no_ops() {
         }
     "#};
 
-    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+    psl::parse_schema_without_extensions(with_header(dml, Provider::Postgres, &[]))
         .unwrap()
         .assert_has_model("A")
         .assert_index_on_fields(&["a"])
@@ -53,7 +53,7 @@ fn bit_default_opclass() {
         }
     "#};
 
-    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+    psl::parse_schema_without_extensions(with_header(dml, Provider::Postgres, &[]))
         .unwrap()
         .assert_has_model("A")
         .assert_index_on_fields(&["a"])
@@ -71,7 +71,7 @@ fn bit_minmax_opclass() {
         }
     "#};
 
-    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+    psl::parse_schema_without_extensions(with_header(dml, Provider::Postgres, &[]))
         .unwrap()
         .assert_has_model("A")
         .assert_index_on_fields(&["a"])
@@ -93,7 +93,7 @@ fn varbit_default_opclass() {
         }
     "#};
 
-    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+    psl::parse_schema_without_extensions(with_header(dml, Provider::Postgres, &[]))
         .unwrap()
         .assert_has_model("A")
         .assert_index_on_fields(&["a"])
@@ -111,7 +111,7 @@ fn varbit_minmax_opclass() {
         }
     "#};
 
-    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+    psl::parse_schema_without_extensions(with_header(dml, Provider::Postgres, &[]))
         .unwrap()
         .assert_has_model("A")
         .assert_index_on_fields(&["a"])
@@ -133,7 +133,7 @@ fn date_default_opclass() {
         }
     "#};
 
-    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+    psl::parse_schema_without_extensions(with_header(dml, Provider::Postgres, &[]))
         .unwrap()
         .assert_has_model("A")
         .assert_index_on_fields(&["a"])
@@ -151,7 +151,7 @@ fn date_minmax_opclass() {
         }
     "#};
 
-    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+    psl::parse_schema_without_extensions(with_header(dml, Provider::Postgres, &[]))
         .unwrap()
         .assert_has_model("A")
         .assert_index_on_fields(&["a"])
@@ -171,7 +171,7 @@ fn date_minmaxmulti_opclass() {
         }
     "#};
 
-    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+    psl::parse_schema_without_extensions(with_header(dml, Provider::Postgres, &[]))
         .unwrap()
         .assert_has_model("A")
         .assert_index_on_fields(&["a"])
@@ -191,7 +191,7 @@ fn date_bloom_opclass() {
         }
     "#};
 
-    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+    psl::parse_schema_without_extensions(with_header(dml, Provider::Postgres, &[]))
         .unwrap()
         .assert_has_model("A")
         .assert_index_on_fields(&["a"])
@@ -213,7 +213,7 @@ fn real_default_opclass() {
         }
     "#};
 
-    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+    psl::parse_schema_without_extensions(with_header(dml, Provider::Postgres, &[]))
         .unwrap()
         .assert_has_model("A")
         .assert_index_on_fields(&["a"])
@@ -231,7 +231,7 @@ fn real_minmax_opclass() {
         }
     "#};
 
-    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+    psl::parse_schema_without_extensions(with_header(dml, Provider::Postgres, &[]))
         .unwrap()
         .assert_has_model("A")
         .assert_index_on_fields(&["a"])
@@ -256,10 +256,10 @@ fn real_minmax_wrong_native_type() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@index": The given operator class `Float4MinMaxOps` does not support native type `DoublePrecision` of field `a`.[0m
-          [1;94m-->[0m  [4mschema.prisma:15[0m
+          [1;94m-->[0m  [4mschema.prisma:14[0m
         [1;94m   | [0m
-        [1;94m14 | [0m
-        [1;94m15 | [0m  [1;91m@@index([a(ops: Float4MinMaxOps)], type: Brin)[0m
+        [1;94m13 | [0m
+        [1;94m14 | [0m  [1;91m@@index([a(ops: Float4MinMaxOps)], type: Brin)[0m
         [1;94m   | [0m
     "#]];
 
@@ -277,7 +277,7 @@ fn real_minmaxmulti_opclass() {
         }
     "#};
 
-    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+    psl::parse_schema_without_extensions(with_header(dml, Provider::Postgres, &[]))
         .unwrap()
         .assert_has_model("A")
         .assert_index_on_fields(&["a"])
@@ -302,10 +302,10 @@ fn real_minmaxmulti_wrong_native_type() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@index": The given operator class `Float4MinMaxMultiOps` does not support native type `DoublePrecision` of field `a`.[0m
-          [1;94m-->[0m  [4mschema.prisma:15[0m
+          [1;94m-->[0m  [4mschema.prisma:14[0m
         [1;94m   | [0m
-        [1;94m14 | [0m
-        [1;94m15 | [0m  [1;91m@@index([a(ops: Float4MinMaxMultiOps)], type: Brin)[0m
+        [1;94m13 | [0m
+        [1;94m14 | [0m  [1;91m@@index([a(ops: Float4MinMaxMultiOps)], type: Brin)[0m
         [1;94m   | [0m
     "#]];
 
@@ -323,7 +323,7 @@ fn real_bloom_opclass() {
         }
     "#};
 
-    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+    psl::parse_schema_without_extensions(with_header(dml, Provider::Postgres, &[]))
         .unwrap()
         .assert_has_model("A")
         .assert_index_on_fields(&["a"])
@@ -348,10 +348,10 @@ fn real_bloom_wrong_native_type() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@index": The given operator class `Float4BloomOps` does not support native type `DoublePrecision` of field `a`.[0m
-          [1;94m-->[0m  [4mschema.prisma:15[0m
+          [1;94m-->[0m  [4mschema.prisma:14[0m
         [1;94m   | [0m
-        [1;94m14 | [0m
-        [1;94m15 | [0m  [1;91m@@index([a(ops: Float4BloomOps)], type: Brin)[0m
+        [1;94m13 | [0m
+        [1;94m14 | [0m  [1;91m@@index([a(ops: Float4BloomOps)], type: Brin)[0m
         [1;94m   | [0m
     "#]];
 
@@ -371,7 +371,7 @@ fn prisma_float_all_defaults() {
         }
     "#};
 
-    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+    psl::parse_schema_without_extensions(with_header(dml, Provider::Postgres, &[]))
         .unwrap()
         .assert_has_model("A")
         .assert_index_on_fields(&["a"])
@@ -389,7 +389,7 @@ fn double_default_opclass() {
         }
     "#};
 
-    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+    psl::parse_schema_without_extensions(with_header(dml, Provider::Postgres, &[]))
         .unwrap()
         .assert_has_model("A")
         .assert_index_on_fields(&["a"])
@@ -407,7 +407,7 @@ fn double_minmax_opclass() {
         }
     "#};
 
-    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+    psl::parse_schema_without_extensions(with_header(dml, Provider::Postgres, &[]))
         .unwrap()
         .assert_has_model("A")
         .assert_index_on_fields(&["a"])
@@ -427,7 +427,7 @@ fn double_minmax_no_native_type() {
         }
     "#};
 
-    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+    psl::parse_schema_without_extensions(with_header(dml, Provider::Postgres, &[]))
         .unwrap()
         .assert_has_model("A")
         .assert_index_on_fields(&["a"])
@@ -447,7 +447,7 @@ fn double_minmaxmulti_no_native_type() {
         }
     "#};
 
-    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+    psl::parse_schema_without_extensions(with_header(dml, Provider::Postgres, &[]))
         .unwrap()
         .assert_has_model("A")
         .assert_index_on_fields(&["a"])
@@ -467,7 +467,7 @@ fn double_bloom_no_native_type() {
         }
     "#};
 
-    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+    psl::parse_schema_without_extensions(with_header(dml, Provider::Postgres, &[]))
         .unwrap()
         .assert_has_model("A")
         .assert_index_on_fields(&["a"])
@@ -492,10 +492,10 @@ fn double_minmax_wrong_native_type() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@index": The given operator class `Float8MinMaxOps` does not support native type `Real` of field `a`.[0m
-          [1;94m-->[0m  [4mschema.prisma:15[0m
+          [1;94m-->[0m  [4mschema.prisma:14[0m
         [1;94m   | [0m
-        [1;94m14 | [0m
-        [1;94m15 | [0m  [1;91m@@index([a(ops: Float8MinMaxOps)], type: Brin)[0m
+        [1;94m13 | [0m
+        [1;94m14 | [0m  [1;91m@@index([a(ops: Float8MinMaxOps)], type: Brin)[0m
         [1;94m   | [0m
     "#]];
 
@@ -513,7 +513,7 @@ fn double_minmaxmulti_opclass() {
         }
     "#};
 
-    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+    psl::parse_schema_without_extensions(with_header(dml, Provider::Postgres, &[]))
         .unwrap()
         .assert_has_model("A")
         .assert_index_on_fields(&["a"])
@@ -538,10 +538,10 @@ fn double_minmaxmulti_wrong_native_type() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@index": The given operator class `Float8MinMaxMultiOps` does not support native type `Real` of field `a`.[0m
-          [1;94m-->[0m  [4mschema.prisma:15[0m
+          [1;94m-->[0m  [4mschema.prisma:14[0m
         [1;94m   | [0m
-        [1;94m14 | [0m
-        [1;94m15 | [0m  [1;91m@@index([a(ops: Float8MinMaxMultiOps)], type: Brin)[0m
+        [1;94m13 | [0m
+        [1;94m14 | [0m  [1;91m@@index([a(ops: Float8MinMaxMultiOps)], type: Brin)[0m
         [1;94m   | [0m
     "#]];
 
@@ -559,7 +559,7 @@ fn double_bloom_opclass() {
         }
     "#};
 
-    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+    psl::parse_schema_without_extensions(with_header(dml, Provider::Postgres, &[]))
         .unwrap()
         .assert_has_model("A")
         .assert_index_on_fields(&["a"])
@@ -584,10 +584,10 @@ fn double_bloom_wrong_native_type() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@index": The given operator class `Float8BloomOps` does not support native type `Real` of field `a`.[0m
-          [1;94m-->[0m  [4mschema.prisma:15[0m
+          [1;94m-->[0m  [4mschema.prisma:14[0m
         [1;94m   | [0m
-        [1;94m14 | [0m
-        [1;94m15 | [0m  [1;91m@@index([a(ops: Float8BloomOps)], type: Brin)[0m
+        [1;94m13 | [0m
+        [1;94m14 | [0m  [1;91m@@index([a(ops: Float8BloomOps)], type: Brin)[0m
         [1;94m   | [0m
     "#]];
 
@@ -607,7 +607,7 @@ fn inet_default_opclass() {
         }
     "#};
 
-    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+    psl::parse_schema_without_extensions(with_header(dml, Provider::Postgres, &[]))
         .unwrap()
         .assert_has_model("A")
         .assert_index_on_fields(&["a"])
@@ -625,7 +625,7 @@ fn inet_minmax_opclass() {
         }
     "#};
 
-    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+    psl::parse_schema_without_extensions(with_header(dml, Provider::Postgres, &[]))
         .unwrap()
         .assert_has_model("A")
         .assert_index_on_fields(&["a"])
@@ -650,10 +650,10 @@ fn inet_minmax_wrong_native_type() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@index": The given operator class `InetMinMaxOps` does not support native type `VarChar` of field `a`.[0m
-          [1;94m-->[0m  [4mschema.prisma:15[0m
+          [1;94m-->[0m  [4mschema.prisma:14[0m
         [1;94m   | [0m
-        [1;94m14 | [0m
-        [1;94m15 | [0m  [1;91m@@index([a(ops: InetMinMaxOps)], type: Brin)[0m
+        [1;94m13 | [0m
+        [1;94m14 | [0m  [1;91m@@index([a(ops: InetMinMaxOps)], type: Brin)[0m
         [1;94m   | [0m
     "#]];
 
@@ -676,10 +676,10 @@ fn inet_minmax_no_native_type() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@index": The given operator class `InetMinMaxOps` expects the field `a` to define a valid native type.[0m
-          [1;94m-->[0m  [4mschema.prisma:15[0m
+          [1;94m-->[0m  [4mschema.prisma:14[0m
         [1;94m   | [0m
-        [1;94m14 | [0m
-        [1;94m15 | [0m  [1;91m@@index([a(ops: InetMinMaxOps)], type: Brin)[0m
+        [1;94m13 | [0m
+        [1;94m14 | [0m  [1;91m@@index([a(ops: InetMinMaxOps)], type: Brin)[0m
         [1;94m   | [0m
     "#]];
 
@@ -697,7 +697,7 @@ fn inet_minmaxmulti_opclass() {
         }
     "#};
 
-    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+    psl::parse_schema_without_extensions(with_header(dml, Provider::Postgres, &[]))
         .unwrap()
         .assert_has_model("A")
         .assert_index_on_fields(&["a"])
@@ -722,10 +722,10 @@ fn inet_minmaxmulti_wrong_native_type() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@index": The given operator class `InetMinMaxMultiOps` does not support native type `VarChar` of field `a`.[0m
-          [1;94m-->[0m  [4mschema.prisma:15[0m
+          [1;94m-->[0m  [4mschema.prisma:14[0m
         [1;94m   | [0m
-        [1;94m14 | [0m
-        [1;94m15 | [0m  [1;91m@@index([a(ops: InetMinMaxMultiOps)], type: Brin)[0m
+        [1;94m13 | [0m
+        [1;94m14 | [0m  [1;91m@@index([a(ops: InetMinMaxMultiOps)], type: Brin)[0m
         [1;94m   | [0m
     "#]];
 
@@ -748,10 +748,10 @@ fn inet_minmaxmulti_no_native_type() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@index": The given operator class `InetMinMaxMultiOps` expects the field `a` to define a valid native type.[0m
-          [1;94m-->[0m  [4mschema.prisma:15[0m
+          [1;94m-->[0m  [4mschema.prisma:14[0m
         [1;94m   | [0m
-        [1;94m14 | [0m
-        [1;94m15 | [0m  [1;91m@@index([a(ops: InetMinMaxMultiOps)], type: Brin)[0m
+        [1;94m13 | [0m
+        [1;94m14 | [0m  [1;91m@@index([a(ops: InetMinMaxMultiOps)], type: Brin)[0m
         [1;94m   | [0m
     "#]];
 
@@ -769,7 +769,7 @@ fn inet_bloom_opclass() {
         }
     "#};
 
-    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+    psl::parse_schema_without_extensions(with_header(dml, Provider::Postgres, &[]))
         .unwrap()
         .assert_has_model("A")
         .assert_index_on_fields(&["a"])
@@ -794,10 +794,10 @@ fn inet_bloom_wrong_native_type() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@index": The given operator class `InetBloomOps` does not support native type `VarChar` of field `a`.[0m
-          [1;94m-->[0m  [4mschema.prisma:15[0m
+          [1;94m-->[0m  [4mschema.prisma:14[0m
         [1;94m   | [0m
-        [1;94m14 | [0m
-        [1;94m15 | [0m  [1;91m@@index([a(ops: InetBloomOps)], type: Brin)[0m
+        [1;94m13 | [0m
+        [1;94m14 | [0m  [1;91m@@index([a(ops: InetBloomOps)], type: Brin)[0m
         [1;94m   | [0m
     "#]];
 
@@ -820,10 +820,10 @@ fn inet_bloom_no_native_type() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@index": The given operator class `InetBloomOps` expects the field `a` to define a valid native type.[0m
-          [1;94m-->[0m  [4mschema.prisma:15[0m
+          [1;94m-->[0m  [4mschema.prisma:14[0m
         [1;94m   | [0m
-        [1;94m14 | [0m
-        [1;94m15 | [0m  [1;91m@@index([a(ops: InetBloomOps)], type: Brin)[0m
+        [1;94m13 | [0m
+        [1;94m14 | [0m  [1;91m@@index([a(ops: InetBloomOps)], type: Brin)[0m
         [1;94m   | [0m
     "#]];
 
@@ -841,7 +841,7 @@ fn inet_inclusion_opclass() {
         }
     "#};
 
-    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+    psl::parse_schema_without_extensions(with_header(dml, Provider::Postgres, &[]))
         .unwrap()
         .assert_has_model("A")
         .assert_index_on_fields(&["a"])
@@ -866,10 +866,10 @@ fn inet_inclusion_wrong_native_type() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@index": The given operator class `InetInclusionOps` does not support native type `VarChar` of field `a`.[0m
-          [1;94m-->[0m  [4mschema.prisma:15[0m
+          [1;94m-->[0m  [4mschema.prisma:14[0m
         [1;94m   | [0m
-        [1;94m14 | [0m
-        [1;94m15 | [0m  [1;91m@@index([a(ops: InetInclusionOps)], type: Brin)[0m
+        [1;94m13 | [0m
+        [1;94m14 | [0m  [1;91m@@index([a(ops: InetInclusionOps)], type: Brin)[0m
         [1;94m   | [0m
     "#]];
 
@@ -892,10 +892,10 @@ fn inet_inclusion_no_native_type() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@index": The given operator class `InetInclusionOps` expects the field `a` to define a valid native type.[0m
-          [1;94m-->[0m  [4mschema.prisma:15[0m
+          [1;94m-->[0m  [4mschema.prisma:14[0m
         [1;94m   | [0m
-        [1;94m14 | [0m
-        [1;94m15 | [0m  [1;91m@@index([a(ops: InetInclusionOps)], type: Brin)[0m
+        [1;94m13 | [0m
+        [1;94m14 | [0m  [1;91m@@index([a(ops: InetInclusionOps)], type: Brin)[0m
         [1;94m   | [0m
     "#]];
 
@@ -915,7 +915,7 @@ fn int2_default_opclass() {
         }
     "#};
 
-    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+    psl::parse_schema_without_extensions(with_header(dml, Provider::Postgres, &[]))
         .unwrap()
         .assert_has_model("A")
         .assert_index_on_fields(&["a"])
@@ -933,7 +933,7 @@ fn int2_minmax_opclass() {
         }
     "#};
 
-    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+    psl::parse_schema_without_extensions(with_header(dml, Provider::Postgres, &[]))
         .unwrap()
         .assert_has_model("A")
         .assert_index_on_fields(&["a"])
@@ -958,10 +958,10 @@ fn int2_minmax_wrong_native_type() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@index": The given operator class `Int2MinMaxOps` does not support native type `Integer` of field `a`.[0m
-          [1;94m-->[0m  [4mschema.prisma:15[0m
+          [1;94m-->[0m  [4mschema.prisma:14[0m
         [1;94m   | [0m
-        [1;94m14 | [0m
-        [1;94m15 | [0m  [1;91m@@index([a(ops: Int2MinMaxOps)], type: Brin)[0m
+        [1;94m13 | [0m
+        [1;94m14 | [0m  [1;91m@@index([a(ops: Int2MinMaxOps)], type: Brin)[0m
         [1;94m   | [0m
     "#]];
 
@@ -984,10 +984,10 @@ fn int2_minmax_no_native_type() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@index": The given operator class `Int2MinMaxOps` expects the field `a` to define a valid native type.[0m
-          [1;94m-->[0m  [4mschema.prisma:15[0m
+          [1;94m-->[0m  [4mschema.prisma:14[0m
         [1;94m   | [0m
-        [1;94m14 | [0m
-        [1;94m15 | [0m  [1;91m@@index([a(ops: Int2MinMaxOps)], type: Brin)[0m
+        [1;94m13 | [0m
+        [1;94m14 | [0m  [1;91m@@index([a(ops: Int2MinMaxOps)], type: Brin)[0m
         [1;94m   | [0m
     "#]];
 
@@ -1005,7 +1005,7 @@ fn int2_minmaxmulti_opclass() {
         }
     "#};
 
-    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+    psl::parse_schema_without_extensions(with_header(dml, Provider::Postgres, &[]))
         .unwrap()
         .assert_has_model("A")
         .assert_index_on_fields(&["a"])
@@ -1030,10 +1030,10 @@ fn int2_minmaxmulti_wrong_native_type() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@index": The given operator class `Int2MinMaxMultiOps` does not support native type `Integer` of field `a`.[0m
-          [1;94m-->[0m  [4mschema.prisma:15[0m
+          [1;94m-->[0m  [4mschema.prisma:14[0m
         [1;94m   | [0m
-        [1;94m14 | [0m
-        [1;94m15 | [0m  [1;91m@@index([a(ops: Int2MinMaxMultiOps)], type: Brin)[0m
+        [1;94m13 | [0m
+        [1;94m14 | [0m  [1;91m@@index([a(ops: Int2MinMaxMultiOps)], type: Brin)[0m
         [1;94m   | [0m
     "#]];
 
@@ -1056,10 +1056,10 @@ fn int2_minmaxmulti_no_native_type() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@index": The given operator class `Int2MinMaxMultiOps` expects the field `a` to define a valid native type.[0m
-          [1;94m-->[0m  [4mschema.prisma:15[0m
+          [1;94m-->[0m  [4mschema.prisma:14[0m
         [1;94m   | [0m
-        [1;94m14 | [0m
-        [1;94m15 | [0m  [1;91m@@index([a(ops: Int2MinMaxMultiOps)], type: Brin)[0m
+        [1;94m13 | [0m
+        [1;94m14 | [0m  [1;91m@@index([a(ops: Int2MinMaxMultiOps)], type: Brin)[0m
         [1;94m   | [0m
     "#]];
 
@@ -1077,7 +1077,7 @@ fn int2_bloom_opclass() {
         }
     "#};
 
-    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+    psl::parse_schema_without_extensions(with_header(dml, Provider::Postgres, &[]))
         .unwrap()
         .assert_has_model("A")
         .assert_index_on_fields(&["a"])
@@ -1102,10 +1102,10 @@ fn int2_bloom_wrong_native_type() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@index": The given operator class `Int2BloomOps` does not support native type `Integer` of field `a`.[0m
-          [1;94m-->[0m  [4mschema.prisma:15[0m
+          [1;94m-->[0m  [4mschema.prisma:14[0m
         [1;94m   | [0m
-        [1;94m14 | [0m
-        [1;94m15 | [0m  [1;91m@@index([a(ops: Int2BloomOps)], type: Brin)[0m
+        [1;94m13 | [0m
+        [1;94m14 | [0m  [1;91m@@index([a(ops: Int2BloomOps)], type: Brin)[0m
         [1;94m   | [0m
     "#]];
 
@@ -1128,10 +1128,10 @@ fn int2_bloom_no_native_type() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@index": The given operator class `Int2BloomOps` expects the field `a` to define a valid native type.[0m
-          [1;94m-->[0m  [4mschema.prisma:15[0m
+          [1;94m-->[0m  [4mschema.prisma:14[0m
         [1;94m   | [0m
-        [1;94m14 | [0m
-        [1;94m15 | [0m  [1;91m@@index([a(ops: Int2BloomOps)], type: Brin)[0m
+        [1;94m13 | [0m
+        [1;94m14 | [0m  [1;91m@@index([a(ops: Int2BloomOps)], type: Brin)[0m
         [1;94m   | [0m
     "#]];
 
@@ -1151,7 +1151,7 @@ fn int4_default_opclass() {
         }
     "#};
 
-    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+    psl::parse_schema_without_extensions(with_header(dml, Provider::Postgres, &[]))
         .unwrap()
         .assert_has_model("A")
         .assert_index_on_fields(&["a"])
@@ -1169,7 +1169,7 @@ fn int4_default_no_native_type() {
         }
     "#};
 
-    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+    psl::parse_schema_without_extensions(with_header(dml, Provider::Postgres, &[]))
         .unwrap()
         .assert_has_model("A")
         .assert_index_on_fields(&["a"])
@@ -1187,7 +1187,7 @@ fn int4_minmax_opclass() {
         }
     "#};
 
-    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+    psl::parse_schema_without_extensions(with_header(dml, Provider::Postgres, &[]))
         .unwrap()
         .assert_has_model("A")
         .assert_index_on_fields(&["a"])
@@ -1212,10 +1212,10 @@ fn int4_minmax_wrong_native_type() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@index": The given operator class `Int4MinMaxOps` does not support native type `SmallInt` of field `a`.[0m
-          [1;94m-->[0m  [4mschema.prisma:15[0m
+          [1;94m-->[0m  [4mschema.prisma:14[0m
         [1;94m   | [0m
-        [1;94m14 | [0m
-        [1;94m15 | [0m  [1;91m@@index([a(ops: Int4MinMaxOps)], type: Brin)[0m
+        [1;94m13 | [0m
+        [1;94m14 | [0m  [1;91m@@index([a(ops: Int4MinMaxOps)], type: Brin)[0m
         [1;94m   | [0m
     "#]];
 
@@ -1233,7 +1233,7 @@ fn int4_minmax_no_native_type() {
         }
     "#};
 
-    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+    psl::parse_schema_without_extensions(with_header(dml, Provider::Postgres, &[]))
         .unwrap()
         .assert_has_model("A")
         .assert_index_on_fields(&["a"])
@@ -1253,7 +1253,7 @@ fn int4_minmaxmulti_opclass() {
         }
     "#};
 
-    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+    psl::parse_schema_without_extensions(with_header(dml, Provider::Postgres, &[]))
         .unwrap()
         .assert_has_model("A")
         .assert_index_on_fields(&["a"])
@@ -1278,10 +1278,10 @@ fn int4_minmaxmulti_wrong_native_type() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@index": The given operator class `Int4MinMaxMultiOps` does not support native type `SmallInt` of field `a`.[0m
-          [1;94m-->[0m  [4mschema.prisma:15[0m
+          [1;94m-->[0m  [4mschema.prisma:14[0m
         [1;94m   | [0m
-        [1;94m14 | [0m
-        [1;94m15 | [0m  [1;91m@@index([a(ops: Int4MinMaxMultiOps)], type: Brin)[0m
+        [1;94m13 | [0m
+        [1;94m14 | [0m  [1;91m@@index([a(ops: Int4MinMaxMultiOps)], type: Brin)[0m
         [1;94m   | [0m
     "#]];
 
@@ -1299,7 +1299,7 @@ fn int4_minmaxmulti_no_native_type() {
         }
     "#};
 
-    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+    psl::parse_schema_without_extensions(with_header(dml, Provider::Postgres, &[]))
         .unwrap()
         .assert_has_model("A")
         .assert_index_on_fields(&["a"])
@@ -1319,7 +1319,7 @@ fn int4_bloom_opclass() {
         }
     "#};
 
-    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+    psl::parse_schema_without_extensions(with_header(dml, Provider::Postgres, &[]))
         .unwrap()
         .assert_has_model("A")
         .assert_index_on_fields(&["a"])
@@ -1344,10 +1344,10 @@ fn int4_bloom_wrong_native_type() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@index": The given operator class `Int4BloomOps` does not support native type `SmallInt` of field `a`.[0m
-          [1;94m-->[0m  [4mschema.prisma:15[0m
+          [1;94m-->[0m  [4mschema.prisma:14[0m
         [1;94m   | [0m
-        [1;94m14 | [0m
-        [1;94m15 | [0m  [1;91m@@index([a(ops: Int4BloomOps)], type: Brin)[0m
+        [1;94m13 | [0m
+        [1;94m14 | [0m  [1;91m@@index([a(ops: Int4BloomOps)], type: Brin)[0m
         [1;94m   | [0m
     "#]];
 
@@ -1365,7 +1365,7 @@ fn int4_bloom_no_native_type() {
         }
     "#};
 
-    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+    psl::parse_schema_without_extensions(with_header(dml, Provider::Postgres, &[]))
         .unwrap()
         .assert_has_model("A")
         .assert_index_on_fields(&["a"])
@@ -1387,7 +1387,7 @@ fn int8_default_opclass() {
         }
     "#};
 
-    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+    psl::parse_schema_without_extensions(with_header(dml, Provider::Postgres, &[]))
         .unwrap()
         .assert_has_model("A")
         .assert_index_on_fields(&["a"])
@@ -1405,7 +1405,7 @@ fn int8_default_no_native_type() {
         }
     "#};
 
-    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+    psl::parse_schema_without_extensions(with_header(dml, Provider::Postgres, &[]))
         .unwrap()
         .assert_has_model("A")
         .assert_index_on_fields(&["a"])
@@ -1423,7 +1423,7 @@ fn int8_minmax_opclass() {
         }
     "#};
 
-    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+    psl::parse_schema_without_extensions(with_header(dml, Provider::Postgres, &[]))
         .unwrap()
         .assert_has_model("A")
         .assert_index_on_fields(&["a"])
@@ -1443,7 +1443,7 @@ fn int8_minmax_no_native_type() {
         }
     "#};
 
-    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+    psl::parse_schema_without_extensions(with_header(dml, Provider::Postgres, &[]))
         .unwrap()
         .assert_has_model("A")
         .assert_index_on_fields(&["a"])
@@ -1463,7 +1463,7 @@ fn int8_minmaxmulti_opclass() {
         }
     "#};
 
-    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+    psl::parse_schema_without_extensions(with_header(dml, Provider::Postgres, &[]))
         .unwrap()
         .assert_has_model("A")
         .assert_index_on_fields(&["a"])
@@ -1483,7 +1483,7 @@ fn int8_minmaxmulti_no_native_type() {
         }
     "#};
 
-    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+    psl::parse_schema_without_extensions(with_header(dml, Provider::Postgres, &[]))
         .unwrap()
         .assert_has_model("A")
         .assert_index_on_fields(&["a"])
@@ -1503,7 +1503,7 @@ fn int8_bloom_opclass() {
         }
     "#};
 
-    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+    psl::parse_schema_without_extensions(with_header(dml, Provider::Postgres, &[]))
         .unwrap()
         .assert_has_model("A")
         .assert_index_on_fields(&["a"])
@@ -1523,7 +1523,7 @@ fn int8_bloom_no_native_type() {
         }
     "#};
 
-    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+    psl::parse_schema_without_extensions(with_header(dml, Provider::Postgres, &[]))
         .unwrap()
         .assert_has_model("A")
         .assert_index_on_fields(&["a"])
@@ -1545,7 +1545,7 @@ fn prisma_decimal_all_defaults() {
         }
     "#};
 
-    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+    psl::parse_schema_without_extensions(with_header(dml, Provider::Postgres, &[]))
         .unwrap()
         .assert_has_model("A")
         .assert_index_on_fields(&["a"])
@@ -1563,7 +1563,7 @@ fn decimal_default_opclass() {
         }
     "#};
 
-    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+    psl::parse_schema_without_extensions(with_header(dml, Provider::Postgres, &[]))
         .unwrap()
         .assert_has_model("A")
         .assert_index_on_fields(&["a"])
@@ -1581,7 +1581,7 @@ fn decimal_minmax_opclass() {
         }
     "#};
 
-    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+    psl::parse_schema_without_extensions(with_header(dml, Provider::Postgres, &[]))
         .unwrap()
         .assert_has_model("A")
         .assert_index_on_fields(&["a"])
@@ -1606,10 +1606,10 @@ fn decimal_minmax_wrong_prisma_type() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@index": The given operator class `NumericMinMaxOps` points to the field `a` that is not of Decimal type.[0m
-          [1;94m-->[0m  [4mschema.prisma:15[0m
+          [1;94m-->[0m  [4mschema.prisma:14[0m
         [1;94m   | [0m
-        [1;94m14 | [0m
-        [1;94m15 | [0m  [1;91m@@index([a(ops: NumericMinMaxOps)], type: Brin)[0m
+        [1;94m13 | [0m
+        [1;94m14 | [0m  [1;91m@@index([a(ops: NumericMinMaxOps)], type: Brin)[0m
         [1;94m   | [0m
     "#]];
 
@@ -1627,7 +1627,7 @@ fn decimal_minmax_no_native_type() {
         }
     "#};
 
-    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+    psl::parse_schema_without_extensions(with_header(dml, Provider::Postgres, &[]))
         .unwrap()
         .assert_has_model("A")
         .assert_index_on_fields(&["a"])
@@ -1652,10 +1652,10 @@ fn decimal_minmaxmulti_wrong_prisma_type() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@index": The given operator class `NumericMinMaxMultiOps` points to the field `a` that is not of Decimal type.[0m
-          [1;94m-->[0m  [4mschema.prisma:15[0m
+          [1;94m-->[0m  [4mschema.prisma:14[0m
         [1;94m   | [0m
-        [1;94m14 | [0m
-        [1;94m15 | [0m  [1;91m@@index([a(ops: NumericMinMaxMultiOps)], type: Brin)[0m
+        [1;94m13 | [0m
+        [1;94m14 | [0m  [1;91m@@index([a(ops: NumericMinMaxMultiOps)], type: Brin)[0m
         [1;94m   | [0m
     "#]];
 
@@ -1673,7 +1673,7 @@ fn decimal_minmaxmulti_no_native_type() {
         }
     "#};
 
-    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+    psl::parse_schema_without_extensions(with_header(dml, Provider::Postgres, &[]))
         .unwrap()
         .assert_has_model("A")
         .assert_index_on_fields(&["a"])
@@ -1698,10 +1698,10 @@ fn decimal_bloom_wrong_prisma_type() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@index": The given operator class `NumericBloomOps` points to the field `a` that is not of Decimal type.[0m
-          [1;94m-->[0m  [4mschema.prisma:15[0m
+          [1;94m-->[0m  [4mschema.prisma:14[0m
         [1;94m   | [0m
-        [1;94m14 | [0m
-        [1;94m15 | [0m  [1;91m@@index([a(ops: NumericBloomOps)], type: Brin)[0m
+        [1;94m13 | [0m
+        [1;94m14 | [0m  [1;91m@@index([a(ops: NumericBloomOps)], type: Brin)[0m
         [1;94m   | [0m
     "#]];
 
@@ -1719,7 +1719,7 @@ fn decimal_bloom_no_native_type() {
         }
     "#};
 
-    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+    psl::parse_schema_without_extensions(with_header(dml, Provider::Postgres, &[]))
         .unwrap()
         .assert_has_model("A")
         .assert_index_on_fields(&["a"])
@@ -1739,7 +1739,7 @@ fn decimal_minmaxmulti_opclass() {
         }
     "#};
 
-    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+    psl::parse_schema_without_extensions(with_header(dml, Provider::Postgres, &[]))
         .unwrap()
         .assert_has_model("A")
         .assert_index_on_fields(&["a"])
@@ -1759,7 +1759,7 @@ fn decimal_bloom_opclass() {
         }
     "#};
 
-    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+    psl::parse_schema_without_extensions(with_header(dml, Provider::Postgres, &[]))
         .unwrap()
         .assert_has_model("A")
         .assert_index_on_fields(&["a"])
@@ -1781,7 +1781,7 @@ fn oid_default_opclass() {
         }
     "#};
 
-    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+    psl::parse_schema_without_extensions(with_header(dml, Provider::Postgres, &[]))
         .unwrap()
         .assert_has_model("A")
         .assert_index_on_fields(&["a"])
@@ -1799,7 +1799,7 @@ fn oid_minmax_opclass() {
         }
     "#};
 
-    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+    psl::parse_schema_without_extensions(with_header(dml, Provider::Postgres, &[]))
         .unwrap()
         .assert_has_model("A")
         .assert_index_on_fields(&["a"])
@@ -1824,10 +1824,10 @@ fn oid_minmax_wrong_native_type() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@index": The given operator class `OidMinMaxOps` does not support native type `SmallInt` of field `a`.[0m
-          [1;94m-->[0m  [4mschema.prisma:15[0m
+          [1;94m-->[0m  [4mschema.prisma:14[0m
         [1;94m   | [0m
-        [1;94m14 | [0m
-        [1;94m15 | [0m  [1;91m@@index([a(ops: OidMinMaxOps)], type: Brin)[0m
+        [1;94m13 | [0m
+        [1;94m14 | [0m  [1;91m@@index([a(ops: OidMinMaxOps)], type: Brin)[0m
         [1;94m   | [0m
     "#]];
 
@@ -1845,7 +1845,7 @@ fn oid_minmaxmulti_opclass() {
         }
     "#};
 
-    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+    psl::parse_schema_without_extensions(with_header(dml, Provider::Postgres, &[]))
         .unwrap()
         .assert_has_model("A")
         .assert_index_on_fields(&["a"])
@@ -1870,10 +1870,10 @@ fn oid_minmaxmulti_wrong_native_type() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@index": The given operator class `OidMinMaxMultiOps` does not support native type `SmallInt` of field `a`.[0m
-          [1;94m-->[0m  [4mschema.prisma:15[0m
+          [1;94m-->[0m  [4mschema.prisma:14[0m
         [1;94m   | [0m
-        [1;94m14 | [0m
-        [1;94m15 | [0m  [1;91m@@index([a(ops: OidMinMaxMultiOps)], type: Brin)[0m
+        [1;94m13 | [0m
+        [1;94m14 | [0m  [1;91m@@index([a(ops: OidMinMaxMultiOps)], type: Brin)[0m
         [1;94m   | [0m
     "#]];
 
@@ -1891,7 +1891,7 @@ fn oid_bloom_opclass() {
         }
     "#};
 
-    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+    psl::parse_schema_without_extensions(with_header(dml, Provider::Postgres, &[]))
         .unwrap()
         .assert_has_model("A")
         .assert_index_on_fields(&["a"])
@@ -1916,10 +1916,10 @@ fn oid_bloom_wrong_native_type() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@index": The given operator class `OidBloomOps` does not support native type `SmallInt` of field `a`.[0m
-          [1;94m-->[0m  [4mschema.prisma:15[0m
+          [1;94m-->[0m  [4mschema.prisma:14[0m
         [1;94m   | [0m
-        [1;94m14 | [0m
-        [1;94m15 | [0m  [1;91m@@index([a(ops: OidBloomOps)], type: Brin)[0m
+        [1;94m13 | [0m
+        [1;94m14 | [0m  [1;91m@@index([a(ops: OidBloomOps)], type: Brin)[0m
         [1;94m   | [0m
     "#]];
 
@@ -1939,7 +1939,7 @@ fn char_default_opclass() {
         }
     "#};
 
-    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+    psl::parse_schema_without_extensions(with_header(dml, Provider::Postgres, &[]))
         .unwrap()
         .assert_has_model("A")
         .assert_index_on_fields(&["a"])
@@ -1957,7 +1957,7 @@ fn char_minmax_opclass() {
         }
     "#};
 
-    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+    psl::parse_schema_without_extensions(with_header(dml, Provider::Postgres, &[]))
         .unwrap()
         .assert_has_model("A")
         .assert_index_on_fields(&["a"])
@@ -1982,10 +1982,10 @@ fn char_minmax_wrong_native_type() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@index": The given operator class `BpcharMinMaxOps` does not support native type `Text` of field `a`.[0m
-          [1;94m-->[0m  [4mschema.prisma:15[0m
+          [1;94m-->[0m  [4mschema.prisma:14[0m
         [1;94m   | [0m
-        [1;94m14 | [0m
-        [1;94m15 | [0m  [1;91m@@index([a(ops: BpcharMinMaxOps)], type: Brin)[0m
+        [1;94m13 | [0m
+        [1;94m14 | [0m  [1;91m@@index([a(ops: BpcharMinMaxOps)], type: Brin)[0m
         [1;94m   | [0m
     "#]];
 
@@ -2003,7 +2003,7 @@ fn char_bloom_opclass() {
         }
     "#};
 
-    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+    psl::parse_schema_without_extensions(with_header(dml, Provider::Postgres, &[]))
         .unwrap()
         .assert_has_model("A")
         .assert_index_on_fields(&["a"])
@@ -2028,10 +2028,10 @@ fn char_bloom_wrong_native_type() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@index": The given operator class `BpcharBloomOps` does not support native type `Text` of field `a`.[0m
-          [1;94m-->[0m  [4mschema.prisma:15[0m
+          [1;94m-->[0m  [4mschema.prisma:14[0m
         [1;94m   | [0m
-        [1;94m14 | [0m
-        [1;94m15 | [0m  [1;91m@@index([a(ops: BpcharBloomOps)], type: Brin)[0m
+        [1;94m13 | [0m
+        [1;94m14 | [0m  [1;91m@@index([a(ops: BpcharBloomOps)], type: Brin)[0m
         [1;94m   | [0m
     "#]];
 
@@ -2051,7 +2051,7 @@ fn prisma_text_all_defaults() {
         }
     "#};
 
-    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+    psl::parse_schema_without_extensions(with_header(dml, Provider::Postgres, &[]))
         .unwrap()
         .assert_has_model("A")
         .assert_index_on_fields(&["a"])
@@ -2069,7 +2069,7 @@ fn text_default_opclass() {
         }
     "#};
 
-    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+    psl::parse_schema_without_extensions(with_header(dml, Provider::Postgres, &[]))
         .unwrap()
         .assert_has_model("A")
         .assert_index_on_fields(&["a"])
@@ -2087,7 +2087,7 @@ fn varchar_default_opclass() {
         }
     "#};
 
-    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+    psl::parse_schema_without_extensions(with_header(dml, Provider::Postgres, &[]))
         .unwrap()
         .assert_has_model("A")
         .assert_index_on_fields(&["a"])
@@ -2105,7 +2105,7 @@ fn text_minmax_opclass() {
         }
     "#};
 
-    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+    psl::parse_schema_without_extensions(with_header(dml, Provider::Postgres, &[]))
         .unwrap()
         .assert_has_model("A")
         .assert_index_on_fields(&["a"])
@@ -2125,7 +2125,7 @@ fn varchar_minmax_opclass() {
         }
     "#};
 
-    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+    psl::parse_schema_without_extensions(with_header(dml, Provider::Postgres, &[]))
         .unwrap()
         .assert_has_model("A")
         .assert_index_on_fields(&["a"])
@@ -2150,10 +2150,10 @@ fn text_minmax_wrong_prisma_type() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@index": The given operator class `TextMinMaxOps` points to the field `a` that is not of String type.[0m
-          [1;94m-->[0m  [4mschema.prisma:15[0m
+          [1;94m-->[0m  [4mschema.prisma:14[0m
         [1;94m   | [0m
-        [1;94m14 | [0m
-        [1;94m15 | [0m  [1;91m@@index([a(ops: TextMinMaxOps)], type: Brin)[0m
+        [1;94m13 | [0m
+        [1;94m14 | [0m  [1;91m@@index([a(ops: TextMinMaxOps)], type: Brin)[0m
         [1;94m   | [0m
     "#]];
 
@@ -2171,7 +2171,7 @@ fn text_minmax_no_native_type() {
         }
     "#};
 
-    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+    psl::parse_schema_without_extensions(with_header(dml, Provider::Postgres, &[]))
         .unwrap()
         .assert_has_model("A")
         .assert_index_on_fields(&["a"])
@@ -2196,10 +2196,10 @@ fn text_bloom_wrong_prisma_type() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@index": The given operator class `TextBloomOps` points to the field `a` that is not of String type.[0m
-          [1;94m-->[0m  [4mschema.prisma:15[0m
+          [1;94m-->[0m  [4mschema.prisma:14[0m
         [1;94m   | [0m
-        [1;94m14 | [0m
-        [1;94m15 | [0m  [1;91m@@index([a(ops: TextBloomOps)], type: Brin)[0m
+        [1;94m13 | [0m
+        [1;94m14 | [0m  [1;91m@@index([a(ops: TextBloomOps)], type: Brin)[0m
         [1;94m   | [0m
     "#]];
 
@@ -2217,7 +2217,7 @@ fn text_bloom_no_native_type() {
         }
     "#};
 
-    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+    psl::parse_schema_without_extensions(with_header(dml, Provider::Postgres, &[]))
         .unwrap()
         .assert_has_model("A")
         .assert_index_on_fields(&["a"])
@@ -2237,7 +2237,7 @@ fn text_bloom_opclass() {
         }
     "#};
 
-    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+    psl::parse_schema_without_extensions(with_header(dml, Provider::Postgres, &[]))
         .unwrap()
         .assert_has_model("A")
         .assert_index_on_fields(&["a"])
@@ -2257,7 +2257,7 @@ fn varchar_bloom_opclass() {
         }
     "#};
 
-    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+    psl::parse_schema_without_extensions(with_header(dml, Provider::Postgres, &[]))
         .unwrap()
         .assert_has_model("A")
         .assert_index_on_fields(&["a"])
@@ -2277,7 +2277,7 @@ fn no_native_type_bloom_opclass() {
         }
     "#};
 
-    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+    psl::parse_schema_without_extensions(with_header(dml, Provider::Postgres, &[]))
         .unwrap()
         .assert_has_model("A")
         .assert_index_on_fields(&["a"])
@@ -2299,7 +2299,7 @@ fn prisma_datetime_all_defaults() {
         }
     "#};
 
-    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+    psl::parse_schema_without_extensions(with_header(dml, Provider::Postgres, &[]))
         .unwrap()
         .assert_has_model("A")
         .assert_index_on_fields(&["a"])
@@ -2317,7 +2317,7 @@ fn timestamp_default_opclass() {
         }
     "#};
 
-    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+    psl::parse_schema_without_extensions(with_header(dml, Provider::Postgres, &[]))
         .unwrap()
         .assert_has_model("A")
         .assert_index_on_fields(&["a"])
@@ -2335,7 +2335,7 @@ fn timestamp_minmax_opclass() {
         }
     "#};
 
-    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+    psl::parse_schema_without_extensions(with_header(dml, Provider::Postgres, &[]))
         .unwrap()
         .assert_has_model("A")
         .assert_index_on_fields(&["a"])
@@ -2355,7 +2355,7 @@ fn timestamp_minmax_no_native_type() {
         }
     "#};
 
-    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+    psl::parse_schema_without_extensions(with_header(dml, Provider::Postgres, &[]))
         .unwrap()
         .assert_has_model("A")
         .assert_index_on_fields(&["a"])
@@ -2375,7 +2375,7 @@ fn timestamp_minmaxmulti_no_native_type() {
         }
     "#};
 
-    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+    psl::parse_schema_without_extensions(with_header(dml, Provider::Postgres, &[]))
         .unwrap()
         .assert_has_model("A")
         .assert_index_on_fields(&["a"])
@@ -2395,7 +2395,7 @@ fn timestamp_bloom_no_native_type() {
         }
     "#};
 
-    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+    psl::parse_schema_without_extensions(with_header(dml, Provider::Postgres, &[]))
         .unwrap()
         .assert_has_model("A")
         .assert_index_on_fields(&["a"])
@@ -2420,10 +2420,10 @@ fn timestamp_minmax_wrong_native_type() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@index": The given operator class `TimestampMinMaxOps` does not support native type `Time` of field `a`.[0m
-          [1;94m-->[0m  [4mschema.prisma:15[0m
+          [1;94m-->[0m  [4mschema.prisma:14[0m
         [1;94m   | [0m
-        [1;94m14 | [0m
-        [1;94m15 | [0m  [1;91m@@index([a(ops: TimestampMinMaxOps)], type: Brin)[0m
+        [1;94m13 | [0m
+        [1;94m14 | [0m  [1;91m@@index([a(ops: TimestampMinMaxOps)], type: Brin)[0m
         [1;94m   | [0m
     "#]];
 
@@ -2441,7 +2441,7 @@ fn timestamp_minmaxmulti_opclass() {
         }
     "#};
 
-    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+    psl::parse_schema_without_extensions(with_header(dml, Provider::Postgres, &[]))
         .unwrap()
         .assert_has_model("A")
         .assert_index_on_fields(&["a"])
@@ -2466,10 +2466,10 @@ fn timestamp_minmaxmulti_wrong_native_type() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@index": The given operator class `TimestampMinMaxMultiOps` does not support native type `Time` of field `a`.[0m
-          [1;94m-->[0m  [4mschema.prisma:15[0m
+          [1;94m-->[0m  [4mschema.prisma:14[0m
         [1;94m   | [0m
-        [1;94m14 | [0m
-        [1;94m15 | [0m  [1;91m@@index([a(ops: TimestampMinMaxMultiOps)], type: Brin)[0m
+        [1;94m13 | [0m
+        [1;94m14 | [0m  [1;91m@@index([a(ops: TimestampMinMaxMultiOps)], type: Brin)[0m
         [1;94m   | [0m
     "#]];
 
@@ -2487,7 +2487,7 @@ fn timestamp_bloom_opclass() {
         }
     "#};
 
-    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+    psl::parse_schema_without_extensions(with_header(dml, Provider::Postgres, &[]))
         .unwrap()
         .assert_has_model("A")
         .assert_index_on_fields(&["a"])
@@ -2512,10 +2512,10 @@ fn timestamp_bloom_wrong_native_type() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@index": The given operator class `TimestampBloomOps` does not support native type `Time` of field `a`.[0m
-          [1;94m-->[0m  [4mschema.prisma:15[0m
+          [1;94m-->[0m  [4mschema.prisma:14[0m
         [1;94m   | [0m
-        [1;94m14 | [0m
-        [1;94m15 | [0m  [1;91m@@index([a(ops: TimestampBloomOps)], type: Brin)[0m
+        [1;94m13 | [0m
+        [1;94m14 | [0m  [1;91m@@index([a(ops: TimestampBloomOps)], type: Brin)[0m
         [1;94m   | [0m
     "#]];
 
@@ -2535,7 +2535,7 @@ fn timestamptz_default_opclass() {
         }
     "#};
 
-    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+    psl::parse_schema_without_extensions(with_header(dml, Provider::Postgres, &[]))
         .unwrap()
         .assert_has_model("A")
         .assert_index_on_fields(&["a"])
@@ -2553,7 +2553,7 @@ fn timestamptz_minmax_opclass() {
         }
     "#};
 
-    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+    psl::parse_schema_without_extensions(with_header(dml, Provider::Postgres, &[]))
         .unwrap()
         .assert_has_model("A")
         .assert_index_on_fields(&["a"])
@@ -2578,10 +2578,10 @@ fn timestamptz_minmax_wrong_native_type() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@index": The given operator class `TimestampTzMinMaxOps` does not support native type `Timestamp` of field `a`.[0m
-          [1;94m-->[0m  [4mschema.prisma:15[0m
+          [1;94m-->[0m  [4mschema.prisma:14[0m
         [1;94m   | [0m
-        [1;94m14 | [0m
-        [1;94m15 | [0m  [1;91m@@index([a(ops: TimestampTzMinMaxOps)], type: Brin)[0m
+        [1;94m13 | [0m
+        [1;94m14 | [0m  [1;91m@@index([a(ops: TimestampTzMinMaxOps)], type: Brin)[0m
         [1;94m   | [0m
     "#]];
 
@@ -2599,7 +2599,7 @@ fn timestamptz_minmaxmulti_opclass() {
         }
     "#};
 
-    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+    psl::parse_schema_without_extensions(with_header(dml, Provider::Postgres, &[]))
         .unwrap()
         .assert_has_model("A")
         .assert_index_on_fields(&["a"])
@@ -2624,10 +2624,10 @@ fn timestamptz_minmaxmulti_wrong_native_type() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@index": The given operator class `TimestampTzMinMaxMultiOps` does not support native type `Timestamp` of field `a`.[0m
-          [1;94m-->[0m  [4mschema.prisma:15[0m
+          [1;94m-->[0m  [4mschema.prisma:14[0m
         [1;94m   | [0m
-        [1;94m14 | [0m
-        [1;94m15 | [0m  [1;91m@@index([a(ops: TimestampTzMinMaxMultiOps)], type: Brin)[0m
+        [1;94m13 | [0m
+        [1;94m14 | [0m  [1;91m@@index([a(ops: TimestampTzMinMaxMultiOps)], type: Brin)[0m
         [1;94m   | [0m
     "#]];
 
@@ -2645,7 +2645,7 @@ fn timestamptz_bloom_opclass() {
         }
     "#};
 
-    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+    psl::parse_schema_without_extensions(with_header(dml, Provider::Postgres, &[]))
         .unwrap()
         .assert_has_model("A")
         .assert_index_on_fields(&["a"])
@@ -2670,10 +2670,10 @@ fn timestamptz_bloom_wrong_native_type() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@index": The given operator class `TimestampTzBloomOps` does not support native type `Timestamp` of field `a`.[0m
-          [1;94m-->[0m  [4mschema.prisma:15[0m
+          [1;94m-->[0m  [4mschema.prisma:14[0m
         [1;94m   | [0m
-        [1;94m14 | [0m
-        [1;94m15 | [0m  [1;91m@@index([a(ops: TimestampTzBloomOps)], type: Brin)[0m
+        [1;94m13 | [0m
+        [1;94m14 | [0m  [1;91m@@index([a(ops: TimestampTzBloomOps)], type: Brin)[0m
         [1;94m   | [0m
     "#]];
 
@@ -2693,7 +2693,7 @@ fn time_default_opclass() {
         }
     "#};
 
-    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+    psl::parse_schema_without_extensions(with_header(dml, Provider::Postgres, &[]))
         .unwrap()
         .assert_has_model("A")
         .assert_index_on_fields(&["a"])
@@ -2711,7 +2711,7 @@ fn time_minmax_opclass() {
         }
     "#};
 
-    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+    psl::parse_schema_without_extensions(with_header(dml, Provider::Postgres, &[]))
         .unwrap()
         .assert_has_model("A")
         .assert_index_on_fields(&["a"])
@@ -2736,10 +2736,10 @@ fn time_minmax_wrong_native_type() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@index": The given operator class `TimeMinMaxOps` does not support native type `Timestamp` of field `a`.[0m
-          [1;94m-->[0m  [4mschema.prisma:15[0m
+          [1;94m-->[0m  [4mschema.prisma:14[0m
         [1;94m   | [0m
-        [1;94m14 | [0m
-        [1;94m15 | [0m  [1;91m@@index([a(ops: TimeMinMaxOps)], type: Brin)[0m
+        [1;94m13 | [0m
+        [1;94m14 | [0m  [1;91m@@index([a(ops: TimeMinMaxOps)], type: Brin)[0m
         [1;94m   | [0m
     "#]];
 
@@ -2757,7 +2757,7 @@ fn time_minmaxmulti_opclass() {
         }
     "#};
 
-    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+    psl::parse_schema_without_extensions(with_header(dml, Provider::Postgres, &[]))
         .unwrap()
         .assert_has_model("A")
         .assert_index_on_fields(&["a"])
@@ -2782,10 +2782,10 @@ fn time_minmaxmulti_wrong_native_type() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@index": The given operator class `TimeMinMaxMultiOps` does not support native type `Timestamp` of field `a`.[0m
-          [1;94m-->[0m  [4mschema.prisma:15[0m
+          [1;94m-->[0m  [4mschema.prisma:14[0m
         [1;94m   | [0m
-        [1;94m14 | [0m
-        [1;94m15 | [0m  [1;91m@@index([a(ops: TimeMinMaxMultiOps)], type: Brin)[0m
+        [1;94m13 | [0m
+        [1;94m14 | [0m  [1;91m@@index([a(ops: TimeMinMaxMultiOps)], type: Brin)[0m
         [1;94m   | [0m
     "#]];
 
@@ -2803,7 +2803,7 @@ fn time_bloom_opclass() {
         }
     "#};
 
-    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+    psl::parse_schema_without_extensions(with_header(dml, Provider::Postgres, &[]))
         .unwrap()
         .assert_has_model("A")
         .assert_index_on_fields(&["a"])
@@ -2828,10 +2828,10 @@ fn time_bloom_wrong_native_type() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@index": The given operator class `TimeBloomOps` does not support native type `Timestamp` of field `a`.[0m
-          [1;94m-->[0m  [4mschema.prisma:15[0m
+          [1;94m-->[0m  [4mschema.prisma:14[0m
         [1;94m   | [0m
-        [1;94m14 | [0m
-        [1;94m15 | [0m  [1;91m@@index([a(ops: TimeBloomOps)], type: Brin)[0m
+        [1;94m13 | [0m
+        [1;94m14 | [0m  [1;91m@@index([a(ops: TimeBloomOps)], type: Brin)[0m
         [1;94m   | [0m
     "#]];
 
@@ -2851,7 +2851,7 @@ fn timetz_default_opclass() {
         }
     "#};
 
-    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+    psl::parse_schema_without_extensions(with_header(dml, Provider::Postgres, &[]))
         .unwrap()
         .assert_has_model("A")
         .assert_index_on_fields(&["a"])
@@ -2869,7 +2869,7 @@ fn timetz_minmax_opclass() {
         }
     "#};
 
-    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+    psl::parse_schema_without_extensions(with_header(dml, Provider::Postgres, &[]))
         .unwrap()
         .assert_has_model("A")
         .assert_index_on_fields(&["a"])
@@ -2894,10 +2894,10 @@ fn timetz_minmax_wrong_native_type() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@index": The given operator class `TimeTzMinMaxOps` does not support native type `Timestamp` of field `a`.[0m
-          [1;94m-->[0m  [4mschema.prisma:15[0m
+          [1;94m-->[0m  [4mschema.prisma:14[0m
         [1;94m   | [0m
-        [1;94m14 | [0m
-        [1;94m15 | [0m  [1;91m@@index([a(ops: TimeTzMinMaxOps)], type: Brin)[0m
+        [1;94m13 | [0m
+        [1;94m14 | [0m  [1;91m@@index([a(ops: TimeTzMinMaxOps)], type: Brin)[0m
         [1;94m   | [0m
     "#]];
 
@@ -2915,7 +2915,7 @@ fn timetz_minmaxmulti_opclass() {
         }
     "#};
 
-    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+    psl::parse_schema_without_extensions(with_header(dml, Provider::Postgres, &[]))
         .unwrap()
         .assert_has_model("A")
         .assert_index_on_fields(&["a"])
@@ -2940,10 +2940,10 @@ fn timetz_minmaxmulti_wrong_native_type() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@index": The given operator class `TimeTzMinMaxMultiOps` does not support native type `Timestamp` of field `a`.[0m
-          [1;94m-->[0m  [4mschema.prisma:15[0m
+          [1;94m-->[0m  [4mschema.prisma:14[0m
         [1;94m   | [0m
-        [1;94m14 | [0m
-        [1;94m15 | [0m  [1;91m@@index([a(ops: TimeTzMinMaxMultiOps)], type: Brin)[0m
+        [1;94m13 | [0m
+        [1;94m14 | [0m  [1;91m@@index([a(ops: TimeTzMinMaxMultiOps)], type: Brin)[0m
         [1;94m   | [0m
     "#]];
 
@@ -2961,7 +2961,7 @@ fn timetz_bloom_opclass() {
         }
     "#};
 
-    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+    psl::parse_schema_without_extensions(with_header(dml, Provider::Postgres, &[]))
         .unwrap()
         .assert_has_model("A")
         .assert_index_on_fields(&["a"])
@@ -2986,10 +2986,10 @@ fn timetz_bloom_wrong_native_type() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@index": The given operator class `TimeTzBloomOps` does not support native type `Timestamp` of field `a`.[0m
-          [1;94m-->[0m  [4mschema.prisma:15[0m
+          [1;94m-->[0m  [4mschema.prisma:14[0m
         [1;94m   | [0m
-        [1;94m14 | [0m
-        [1;94m15 | [0m  [1;91m@@index([a(ops: TimeTzBloomOps)], type: Brin)[0m
+        [1;94m13 | [0m
+        [1;94m14 | [0m  [1;91m@@index([a(ops: TimeTzBloomOps)], type: Brin)[0m
         [1;94m   | [0m
     "#]];
 
@@ -3009,7 +3009,7 @@ fn uuid_default_opclass() {
         }
     "#};
 
-    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+    psl::parse_schema_without_extensions(with_header(dml, Provider::Postgres, &[]))
         .unwrap()
         .assert_has_model("A")
         .assert_index_on_fields(&["a"])
@@ -3027,7 +3027,7 @@ fn uuid_minmax_opclass() {
         }
     "#};
 
-    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+    psl::parse_schema_without_extensions(with_header(dml, Provider::Postgres, &[]))
         .unwrap()
         .assert_has_model("A")
         .assert_index_on_fields(&["a"])
@@ -3047,7 +3047,7 @@ fn uuid_minmaxmulti_opclass() {
         }
     "#};
 
-    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+    psl::parse_schema_without_extensions(with_header(dml, Provider::Postgres, &[]))
         .unwrap()
         .assert_has_model("A")
         .assert_index_on_fields(&["a"])
@@ -3067,7 +3067,7 @@ fn uuid_bloom_opclass() {
         }
     "#};
 
-    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+    psl::parse_schema_without_extensions(with_header(dml, Provider::Postgres, &[]))
         .unwrap()
         .assert_has_model("A")
         .assert_index_on_fields(&["a"])

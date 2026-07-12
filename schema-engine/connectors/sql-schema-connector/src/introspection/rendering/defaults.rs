@@ -45,8 +45,25 @@ pub(crate) fn render(default: DefaultValuePair<'_>) -> Option<renderer::DefaultV
                 Some(renderer::DefaultValue::function(fun))
             }
             DefaultKind::Autoincrement => Some(renderer::DefaultValue::function(Function::new("autoincrement"))),
-            DefaultKind::Uuid => Some(renderer::DefaultValue::function(Function::new("uuid"))),
-            DefaultKind::Cuid => Some(renderer::DefaultValue::function(Function::new("cuid"))),
+            DefaultKind::Uuid(version) => {
+                let mut fun = Function::new("uuid");
+
+                if let Some(version) = version {
+                    fun.push_param(Value::from(Constant::from(version)));
+                }
+
+                Some(renderer::DefaultValue::function(fun))
+            }
+            DefaultKind::Cuid(version) => {
+                let mut fun = Function::new("cuid");
+
+                if let Some(version) = version {
+                    fun.push_param(Value::from(Constant::from(version)));
+                }
+
+                Some(renderer::DefaultValue::function(fun))
+            }
+            DefaultKind::Ulid => Some(renderer::DefaultValue::function(Function::new("ulid"))),
             DefaultKind::Nanoid(length) => {
                 let mut fun = Function::new("nanoid");
 
@@ -74,10 +91,10 @@ pub(crate) fn render(default: DefaultValuePair<'_>) -> Option<renderer::DefaultV
         None => None,
     };
 
-    if let Some(res) = rendered.as_mut() {
-        if let Some(mapped_name) = default.mapped_name() {
-            res.map(mapped_name);
-        }
+    if let Some(res) = rendered.as_mut()
+        && let Some(mapped_name) = default.mapped_name()
+    {
+        res.map(mapped_name);
     }
 
     rendered

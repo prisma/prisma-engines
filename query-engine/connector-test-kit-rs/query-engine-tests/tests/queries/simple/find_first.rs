@@ -32,6 +32,30 @@ mod find_first_query {
             r#"{"data":{"findFirstTestModel":{"id":2}}}"#
         );
 
+        assert_query!(
+            runner,
+            "query { findFirstTestModel(where: { field: { not: null }}, orderBy: { id: asc }, take: -1) { id }}",
+            r#"{"data":{"findFirstTestModel":{"id":5}}}"#
+        );
+
+        assert_query!(
+            runner,
+            "query { findFirstTestModel(where: { field: { not: null }}, cursor: { id: 2 }, orderBy: { id: asc }, take: -1, skip: 1) { id }}",
+            r#"{"data":{"findFirstTestModel":{"id":1}}}"#
+        );
+
+        assert_query!(
+            runner,
+            "query { findFirstTestModel(where: { field: { not: null }}, orderBy: { id: desc }, take: -1) { id }}",
+            r#"{"data":{"findFirstTestModel":{"id":1}}}"#
+        );
+
+        assert_query!(
+            runner,
+            "query { findFirstTestModel(where: { field: { not: null }}, cursor: { id: 2 }, orderBy: { id: desc }, take: -1, skip: 1) { id }}",
+            r#"{"data":{"findFirstTestModel":{"id":5}}}"#
+        );
+
         Ok(())
     }
 
@@ -43,6 +67,34 @@ mod find_first_query {
             runner,
             "query { findFirstTestModel(where: { id: 6 }) { id }}",
             r#"{"data":{"findFirstTestModel":null}}"#
+        );
+
+        Ok(())
+    }
+
+    #[connector_test]
+    async fn find_first_with_invalid_take_value(runner: Runner) -> TestResult<()> {
+        test_data(&runner).await?;
+
+        assert_error!(
+            runner,
+            r#"query { findFirstTestModel(orderBy: { id: asc }, take: 0) { id }}"#,
+            2019,
+            "The 'findFirst' operation cannot be used with a 'take' argument that isn't 1 or -1"
+        );
+
+        assert_error!(
+            runner,
+            r#"query { findFirstTestModel(orderBy: { id: asc }, take: 2) { id }}"#,
+            2019,
+            "The 'findFirst' operation cannot be used with a 'take' argument that isn't 1 or -1"
+        );
+
+        assert_error!(
+            runner,
+            r#"query { findFirstTestModel(orderBy: { id: asc }, take: -2) { id }}"#,
+            2019,
+            "The 'findFirst' operation cannot be used with a 'take' argument that isn't 1 or -1"
         );
 
         Ok(())

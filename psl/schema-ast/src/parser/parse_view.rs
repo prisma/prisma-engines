@@ -1,9 +1,9 @@
 use super::{
-    helpers::{parsing_catch_all, Pair},
+    Rule,
+    helpers::{Pair, parsing_catch_all},
     parse_attribute::parse_attribute,
     parse_comments::parse_comment_block,
     parse_field::parse_field,
-    Rule,
 };
 use crate::ast::{self, Attribute};
 use diagnostics::{DatamodelError, Diagnostics, FileId};

@@ -1,12 +1,12 @@
 use super::{constraint_namespace::ConstraintName, database_name::validate_db_name};
 use crate::{
-    datamodel_connector::{walker_ext_traits::*, ConnectorCapability},
+    PreviewFeature,
+    datamodel_connector::{ConnectorCapability, walker_ext_traits::*},
     diagnostics::DatamodelError,
     validate::validation_pipeline::context::Context,
-    PreviewFeature,
 };
 use itertools::Itertools;
-use parser_database::{walkers::IndexWalker, IndexAlgorithm};
+use parser_database::{IndexAlgorithm, walkers::IndexWalker};
 
 /// Different databases validate index and unique constraint names in a certain namespace.
 /// Validates index and unique constraint names against the database requirements.
@@ -49,24 +49,23 @@ pub(super) fn unique_index_has_a_unique_custom_name_per_model(
 ) {
     let model = index.model();
 
-    if let Some(name) = index.name() {
-        if names
+    if let Some(name) = index.name()
+        && names
             .constraint_namespace
             .local_custom_name_scope_violations(model.id, name.as_ref())
-        {
-            let message = format!(
-                "The given custom name `{name}` has to be unique on the model. Please provide a different name for the `name` argument."
-            );
+    {
+        let message = format!(
+            "The given custom name `{name}` has to be unique on the model. Please provide a different name for the `name` argument."
+        );
 
-            let from_arg = index.ast_attribute().span_for_argument("name");
-            let span = from_arg.unwrap_or(index.ast_attribute().span);
+        let from_arg = index.ast_attribute().span_for_argument("name");
+        let span = from_arg.unwrap_or(index.ast_attribute().span);
 
-            ctx.push_error(DatamodelError::new_attribute_validation_error(
-                &message,
-                index.attribute_name(),
-                span,
-            ));
-        }
+        ctx.push_error(DatamodelError::new_attribute_validation_error(
+            &message,
+            index.attribute_name(),
+            span,
+        ));
     }
 }
 
@@ -78,23 +77,6 @@ pub(crate) fn field_length_prefix_supported(index: IndexWalker<'_>, ctx: &mut Co
 
     if index.scalar_field_attributes().any(|f| f.length().is_some()) {
         let message = "The length argument is not supported in an index definition with the current connector";
-
-        ctx.push_error(DatamodelError::new_attribute_validation_error(
-            message,
-            index.attribute_name(),
-            index.ast_attribute().span,
-        ));
-    }
-}
-
-/// `@@fulltext` attribute is not available without `fullTextIndex` preview feature.
-pub(crate) fn fulltext_index_preview_feature_enabled(index: IndexWalker<'_>, ctx: &mut Context<'_>) {
-    if ctx.preview_features.contains(PreviewFeature::FullTextIndex) {
-        return;
-    }
-
-    if index.is_fulltext() {
-        let message = "You must enable `fullTextIndex` preview feature to be able to define a @@fulltext index.";
 
         ctx.push_error(DatamodelError::new_attribute_validation_error(
             message,
@@ -123,10 +105,6 @@ pub(crate) fn fulltext_index_supported(index: IndexWalker<'_>, ctx: &mut Context
 
 /// `@@fulltext` index columns should not define `length` argument.
 pub(crate) fn fulltext_columns_should_not_define_length(index: IndexWalker<'_>, ctx: &mut Context<'_>) {
-    if !ctx.preview_features.contains(PreviewFeature::FullTextIndex) {
-        return;
-    }
-
     if !ctx.has_capability(ConnectorCapability::FullTextIndex) {
         return;
     }
@@ -148,10 +126,6 @@ pub(crate) fn fulltext_columns_should_not_define_length(index: IndexWalker<'_>, 
 
 /// Only MongoDB supports sort order in a fulltext index.
 pub(crate) fn fulltext_column_sort_is_supported(index: IndexWalker<'_>, ctx: &mut Context<'_>) {
-    if !ctx.preview_features.contains(PreviewFeature::FullTextIndex) {
-        return;
-    }
-
     if !ctx.has_capability(ConnectorCapability::FullTextIndex) {
         return;
     }
@@ -181,10 +155,6 @@ pub(crate) fn fulltext_column_sort_is_supported(index: IndexWalker<'_>, ctx: &mu
 /// @@fulltext([a(sort: Asc), b, c(sort: Asc), d])
 /// ```
 pub(crate) fn fulltext_text_columns_should_be_bundled_together(index: IndexWalker<'_>, ctx: &mut Context<'_>) {
-    if !ctx.preview_features.contains(PreviewFeature::FullTextIndex) {
-        return;
-    }
-
     if !ctx.has_capability(ConnectorCapability::FullTextIndex) {
         return;
     }
@@ -300,14 +270,14 @@ pub(crate) fn clustering_can_be_defined_only_once(index: IndexWalker<'_>, ctx: &
         return;
     }
 
-    if let Some(pk) = index.model().primary_key() {
-        if matches!(pk.clustered(), Some(true) | None) {
-            ctx.push_error(DatamodelError::new_attribute_validation_error(
-                "A model can only hold one clustered index or key.",
-                index.attribute_name(),
-                index.ast_attribute().span,
-            ));
-        }
+    if let Some(pk) = index.model().primary_key()
+        && matches!(pk.clustered(), Some(true) | None)
+    {
+        ctx.push_error(DatamodelError::new_attribute_validation_error(
+            "A model can only hold one clustered index or key.",
+            index.attribute_name(),
+            index.ast_attribute().span,
+        ));
     }
 
     for other in index.model().indexes() {
@@ -386,10 +356,12 @@ pub(crate) fn composite_type_in_compound_unique_index(index: IndexWalker<'_>, ct
         .fields()
         .find(|f| f.scalar_field_type().as_composite_type().is_some());
 
-    if index.fields().len() > 1 && composite_type.is_some() {
+    if index.fields().len() > 1
+        && let Some(composite_type) = composite_type
+    {
         let message = format!(
             "Prisma does not currently support composite types in compound unique indices, please remove {:?} from the index. See https://pris.ly/d/mongodb-composite-compound-indices for more details",
-            composite_type.unwrap().name()
+            composite_type.name()
         );
         ctx.push_error(DatamodelError::new_attribute_validation_error(
             &message,
@@ -425,6 +397,35 @@ pub(super) fn unique_client_name_does_not_clash_with_field(index: IndexWalker<'_
             container_type,
             index.model().name(),
             index.ast_attribute().span,
+        ));
+    }
+}
+
+/// The database must support partial indexes for the `where` clause to be allowed.
+pub(crate) fn partial_index_supported(index: IndexWalker<'_>, ctx: &mut Context<'_>) {
+    if !index.is_partial() {
+        return;
+    }
+
+    let span = index
+        .ast_attribute()
+        .span_for_argument("where")
+        .unwrap_or_else(|| index.ast_attribute().span);
+
+    if !ctx.preview_features.contains(PreviewFeature::PartialIndexes) {
+        ctx.push_error(DatamodelError::new_attribute_validation_error(
+            "Partial indexes are a preview feature. Add \"partialIndexes\" to previewFeatures in your generator block.",
+            index.attribute_name(),
+            span,
+        ));
+        return;
+    }
+
+    if !ctx.has_capability(ConnectorCapability::PartialIndex) {
+        ctx.push_error(DatamodelError::new_attribute_validation_error(
+            "Partial indexes (with a `where` clause) are not supported by the current connector.",
+            index.attribute_name(),
+            span,
         ));
     }
 }

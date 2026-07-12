@@ -1,0 +1,6 @@
+model MyModel {
+  pk Int @id
+
+  field1 Int // Comment Field 1
+  field2 Int // Comment Field 2
+}

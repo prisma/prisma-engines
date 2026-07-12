@@ -15,12 +15,11 @@ CREATE INDEX futureproof ON test(big_data);
 
 /*
 generator js {
-  provider = "prisma-client-js"
+  provider = "prisma-client"
 }
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
 }
 
 model test {

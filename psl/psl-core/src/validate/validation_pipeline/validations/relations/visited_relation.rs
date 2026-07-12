@@ -40,7 +40,7 @@ impl<'db> VisitedRelation<'db> {
     }
 }
 
-impl<'db> fmt::Display for VisitedRelation<'db> {
+impl fmt::Display for VisitedRelation<'_> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let mut traversed = self.iter().map(|relation| {
             format!(

@@ -599,7 +599,7 @@ mod upsert {
         );
         insta::assert_snapshot!(
           query_number_operation(&runner, "2", "optFloat", "multiply", "2").await?,
-          @r###"{"data":{"upsertOneTestModel":{"optFloat":11.0}}}"###
+          @r###"{"data":{"upsertOneTestModel":{"optFloat":11}}}"###
         );
 
         // Divide
@@ -667,7 +667,7 @@ mod upsert {
         );
         insta::assert_snapshot!(
           query_number_operation(&runner, "2", "optFloat", "multiply", "2").await?,
-          @r###"{"data":{"upsertOneTestModel":{"optFloat":11.0}}}"###
+          @r###"{"data":{"upsertOneTestModel":{"optFloat":11}}}"###
         );
 
         // Divide

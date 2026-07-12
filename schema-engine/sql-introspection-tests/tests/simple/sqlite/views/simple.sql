@@ -12,13 +12,12 @@ CREATE VIEW B AS SELECT id, first_name, last_name FROM A;
 
 /*
 generator js {
-  provider        = "prisma-client-js"
+  provider        = "prisma-client"
   previewFeatures = ["views"]
 }
 
 datasource db {
   provider = "sqlite"
-  url      = env("DATABASE_URL")
 }
 
 model A {
@@ -27,12 +26,9 @@ model A {
   last_name  String?
 }
 
-/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 view B {
   id         Int?
   first_name String?
   last_name  String?
-
-  @@ignore
 }
 */

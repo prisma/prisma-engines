@@ -12,26 +12,24 @@ pub mod mcf;
 mod common;
 mod configuration;
 mod reformat;
-mod set_config_dir;
 mod validate;
 
 use std::sync::Arc;
 
 pub use crate::{
-    common::{PreviewFeature, PreviewFeatures, ALL_PREVIEW_FEATURES},
+    common::{ALL_PREVIEW_FEATURES, FeatureMapWithProvider, PreviewFeature, PreviewFeatures},
     configuration::{
         Configuration, Datasource, DatasourceConnectorData, Generator, GeneratorConfigValue, StringFromEnvVar,
     },
     reformat::{reformat, reformat_multiple, reformat_validated_schema_into_single},
 };
 pub use diagnostics;
-pub use parser_database::{self, is_reserved_type_name};
+pub use parser_database::{self, coerce, coerce_array, generators, is_reserved_type_name};
 pub use schema_ast;
-pub use set_config_dir::set_config_dir;
 
 use self::validate::{datasource_loader, generator_loader};
 use diagnostics::Diagnostics;
-use parser_database::{ast, Files, ParserDatabase, SourceFile};
+use parser_database::{ExtensionTypes, Files, ParserDatabase, SourceFile, ast};
 
 /// The collection of all available connectors.
 pub type ConnectorRegistry<'a> = &'a [&'static dyn datamodel_connector::Connector];
@@ -62,12 +60,22 @@ impl ValidatedSchema {
 
 /// The most general API for dealing with Prisma schemas. It accumulates what analysis and
 /// validation information it can, and returns it along with any error and warning diagnostics.
-pub fn validate(file: SourceFile, connectors: ConnectorRegistry<'_>) -> ValidatedSchema {
+pub fn validate(
+    file: SourceFile,
+    connectors: ConnectorRegistry<'_>,
+    extension_types: &dyn ExtensionTypes,
+) -> ValidatedSchema {
     let mut diagnostics = Diagnostics::new();
-    let db = ParserDatabase::new_single_file(file, &mut diagnostics);
+    let db = ParserDatabase::new_single_file(file, &mut diagnostics, extension_types);
     let configuration = validate_configuration(db.ast_assert_single(), &mut diagnostics, connectors);
     let datasources = &configuration.datasources;
-    let out = validate::validate(db, datasources, configuration.preview_features(), diagnostics);
+    let out = validate::validate(
+        db,
+        datasources,
+        configuration.preview_features(),
+        diagnostics,
+        extension_types,
+    );
 
     ValidatedSchema {
         diagnostics: out.diagnostics,
@@ -80,13 +88,17 @@ pub fn validate(file: SourceFile, connectors: ConnectorRegistry<'_>) -> Validate
 
 /// The most general API for dealing with Prisma schemas. It accumulates what analysis and
 /// validation information it can, and returns it along with any error and warning diagnostics.
-pub fn validate_multi_file(files: &[(String, SourceFile)], connectors: ConnectorRegistry<'_>) -> ValidatedSchema {
+pub fn validate_multi_file(
+    files: &[(String, SourceFile)],
+    connectors: ConnectorRegistry<'_>,
+    extension_types: &dyn ExtensionTypes,
+) -> ValidatedSchema {
     assert!(
         !files.is_empty(),
         "psl::validate_multi_file() must be called with at least one file"
     );
     let mut diagnostics = Diagnostics::new();
-    let db = ParserDatabase::new(files, &mut diagnostics);
+    let db = ParserDatabase::new(files, &mut diagnostics, extension_types);
 
     // TODO: the bulk of configuration block analysis should be part of ParserDatabase::new().
     let mut configuration = Configuration::default();
@@ -97,7 +109,13 @@ pub fn validate_multi_file(files: &[(String, SourceFile)], connectors: Connector
     }
 
     let datasources = &configuration.datasources;
-    let out = validate::validate(db, datasources, configuration.preview_features(), diagnostics);
+    let out = validate::validate(
+        db,
+        datasources,
+        configuration.preview_features(),
+        diagnostics,
+        extension_types,
+    );
 
     ValidatedSchema {
         diagnostics: out.diagnostics,
@@ -111,9 +129,13 @@ pub fn validate_multi_file(files: &[(String, SourceFile)], connectors: Connector
 /// Retrieves a Prisma schema without validating it.
 /// You should only use this method when actually validating the schema is too expensive
 /// computationally or in terms of bundle size (e.g., for `query-engine-wasm`).
-pub fn parse_without_validation(file: SourceFile, connectors: ConnectorRegistry<'_>) -> ValidatedSchema {
+pub fn parse_without_validation(
+    file: SourceFile,
+    connectors: ConnectorRegistry<'_>,
+    extension_types: &dyn ExtensionTypes,
+) -> ValidatedSchema {
     let mut diagnostics = Diagnostics::new();
-    let db = ParserDatabase::new_single_file(file, &mut diagnostics);
+    let db = ParserDatabase::new_single_file(file, &mut diagnostics, extension_types);
     let configuration = validate_configuration(db.ast_assert_single(), &mut diagnostics, connectors);
     let datasources = &configuration.datasources;
     let out = validate::parse_without_validation(db, datasources);
@@ -171,8 +193,18 @@ fn validate_configuration(
     diagnostics: &mut Diagnostics,
     connectors: ConnectorRegistry<'_>,
 ) -> Configuration {
-    let generators = generator_loader::load_generators_from_ast(schema_ast, diagnostics);
     let datasources = datasource_loader::load_datasources_from_ast(schema_ast, diagnostics, connectors);
+
+    // We need to know the active provider to determine which features are active.
+    // This was originally introduced because the `fullTextSearch` preview feature will hit GA stage
+    // one connector at a time (Prisma 6 GAs it for MySQL, other connectors may follow in future releases).
+    let feature_map_with_provider: FeatureMapWithProvider<'_> = datasources
+        .first()
+        .map(|ds| Some(ds.active_provider))
+        .map(FeatureMapWithProvider::new)
+        .unwrap_or_else(|| (*ALL_PREVIEW_FEATURES).clone());
+
+    let generators = generator_loader::load_generators_from_ast(schema_ast, diagnostics, &feature_map_with_provider);
 
     Configuration::new(generators, datasources, diagnostics.warnings().to_owned())
 }

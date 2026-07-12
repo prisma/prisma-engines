@@ -1,0 +1,21 @@
+datasource db {
+  provider = "mysql"
+}
+
+generator client {
+  provider        = "prisma-client"
+  previewFeatures = ["shardKeys"]
+}
+
+model User {
+  id Int @id
+
+  @@shardKey([foo, bar])
+}
+
+// [1;91merror[0m: [1mError validating model "User": The multi field shard key declaration refers to the unknown fields `foo`, `bar`.[0m
+//   [1;94m-->[0m  [4mschema.prisma:13[0m
+// [1;94m   | [0m
+// [1;94m12 | [0m
+// [1;94m13 | [0m  @@shardKey([1;91m[foo, bar][0m)
+// [1;94m   | [0m

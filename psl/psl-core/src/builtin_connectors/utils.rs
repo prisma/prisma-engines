@@ -4,7 +4,7 @@ pub(crate) mod common {
 
     pub(crate) fn parse_date(str: &str) -> Result<DateTime<FixedOffset>, chrono::ParseError> {
         chrono::NaiveDate::parse_from_str(str, "%Y-%m-%d")
-            .map(|date| DateTime::<Utc>::from_utc(date.and_hms_opt(0, 0, 0).unwrap(), Utc))
+            .map(|date| DateTime::<Utc>::from_naive_utc_and_offset(date.and_hms_opt(0, 0, 0).unwrap(), Utc))
             .map(DateTime::<FixedOffset>::from)
     }
 
@@ -13,14 +13,14 @@ pub(crate) mod common {
             .map(|time| {
                 let base_date = chrono::NaiveDate::from_ymd_opt(1970, 1, 1).unwrap();
 
-                DateTime::<Utc>::from_utc(base_date.and_time(time), Utc)
+                DateTime::<Utc>::from_naive_utc_and_offset(base_date.and_time(time), Utc)
             })
             .map(DateTime::<FixedOffset>::from)
     }
 
     pub(crate) fn parse_timestamp(str: &str, fmt: &str) -> Result<DateTime<FixedOffset>, chrono::ParseError> {
         NaiveDateTime::parse_from_str(str, fmt)
-            .map(|dt| DateTime::from_utc(dt, Utc))
+            .map(|dt| DateTime::from_naive_utc_and_offset(dt, Utc))
             .or_else(|_| DateTime::parse_from_rfc3339(str).map(DateTime::<Utc>::from))
             .map(DateTime::<FixedOffset>::from)
     }

@@ -10,6 +10,7 @@ use crate::{
 };
 use quaint_test_macros::test_each_connector;
 use quaint_test_setup::Tags;
+use tracing_test::traced_test;
 
 #[test_each_connector]
 async fn single_value(api: &mut dyn TestApi) -> crate::Result<()> {
@@ -111,6 +112,40 @@ async fn transactions_with_isolation_works(api: &mut dyn TestApi) -> crate::Resu
         .await?
         .commit()
         .await?;
+
+    Ok(())
+}
+
+#[test_each_connector(tags("mssql"))]
+async fn mssql_transaction_isolation_level(api: &mut dyn TestApi) -> crate::Result<()> {
+    let table = api.create_temp_table("id int, value int").await?;
+
+    let conn_a = api.conn();
+    // Start a transaction with the default isolation level, which in tests is
+    // set to READ UNCOMMITED via the DB url and insert a row, but do not commit the transaction.
+    let tx_a = conn_a.start_transaction(None).await?;
+    let insert = Insert::single_into(&table).value("value", 3).value("id", 4);
+    let rows_affected = tx_a.execute(insert.into()).await?;
+    assert_eq!(1, rows_affected);
+
+    // We want to verify that pooled connection behaves the same way, so we test both cases.
+    let pool = api.create_pool()?;
+    for conn_b in [
+        Box::new(pool.check_out().await?) as Box<dyn TransactionCapable>,
+        Box::new(api.create_additional_connection().await?),
+    ] {
+        // Start a transaction that explicitly sets the isolation level to SNAPSHOT and query the table
+        // expecting to see the old state.
+        let tx_b = conn_b.start_transaction(Some(IsolationLevel::Snapshot)).await?;
+        let res = tx_b.query(Select::from_table(&table).into()).await?;
+        assert_eq!(0, res.len());
+
+        // Start a transaction without an explicit isolation level, it should be run with the default
+        // again, which is set to READ UNCOMMITED here.
+        let tx_c = conn_b.start_transaction(None).await?;
+        let res = tx_c.query(Select::from_table(&table).into()).await?;
+        assert_eq!(1, res.len());
+    }
 
     Ok(())
 }
@@ -736,7 +771,7 @@ async fn returning_update(api: &mut dyn TestApi) -> crate::Result<()> {
     Ok(())
 }
 
-#[cfg(all(feature = "mssql", feature = "bigdecimal"))]
+#[cfg(feature = "mssql")]
 #[test_each_connector(tags("mssql"))]
 async fn returning_decimal_insert_with_type_defs(api: &mut dyn TestApi) -> crate::Result<()> {
     use bigdecimal::BigDecimal;
@@ -1388,15 +1423,13 @@ async fn unsigned_integers_are_handled(api: &mut dyn TestApi) -> crate::Result<(
         .create_temp_table("id int4 auto_increment primary key, big bigint unsigned")
         .await?;
 
-    let insert = Insert::multi_into(&table, ["big"])
-        .values((2,))
-        .values((std::i64::MAX,));
+    let insert = Insert::multi_into(&table, ["big"]).values((2,)).values((i64::MAX,));
     api.conn().insert(insert.into()).await?;
 
     let select = Select::from_table(&table).column("big").order_by("id");
     let roundtripped = api.conn().select(select).await?;
 
-    let expected = &[2, std::i64::MAX];
+    let expected = &[2, i64::MAX];
     let actual: Vec<i64> = roundtripped
         .into_iter()
         .map(|row| row.at(0).unwrap().as_i64().unwrap())
@@ -2077,8 +2110,8 @@ fn value_into_json(value: &Value) -> Option<serde_json::Value> {
     match value.typed.clone() {
         // MariaDB returns JSON as text
         ValueType::Text(Some(text)) => {
-            let json: serde_json::Value = serde_json::from_str(&text)
-                .unwrap_or_else(|_| panic!("expected parsable text to json, found {}", text));
+            let json: serde_json::Value =
+                serde_json::from_str(&text).unwrap_or_else(|_| panic!("expected parsable text to json, found {text}"));
 
             Some(json)
         }
@@ -3568,39 +3601,71 @@ async fn overflowing_int_errors_out(api: &mut dyn TestApi) -> crate::Result<()> 
 
     let insert = Insert::single_into(&table).value("smallint", (i16::MAX as i64) + 1);
     let err = api.conn().insert(insert.into()).await.unwrap_err();
-    assert!(err
-        .to_string()
-        .contains("Unable to fit integer value '32768' into an INT2 (16-bit signed integer)."));
+    assert!(
+        err.to_string()
+            .contains("Unable to fit integer value '32768' into an INT2 (16-bit signed integer).")
+    );
 
     let insert = Insert::single_into(&table).value("smallint", (i16::MIN as i64) - 1);
     let err = api.conn().insert(insert.into()).await.unwrap_err();
-    assert!(err
-        .to_string()
-        .contains("Unable to fit integer value '-32769' into an INT2 (16-bit signed integer)."));
+    assert!(
+        err.to_string()
+            .contains("Unable to fit integer value '-32769' into an INT2 (16-bit signed integer).")
+    );
 
     let insert = Insert::single_into(&table).value("int", (i32::MAX as i64) + 1);
     let err = api.conn().insert(insert.into()).await.unwrap_err();
-    assert!(err
-        .to_string()
-        .contains("Unable to fit integer value '2147483648' into an INT4 (32-bit signed integer)."));
+    assert!(
+        err.to_string()
+            .contains("Unable to fit integer value '2147483648' into an INT4 (32-bit signed integer).")
+    );
 
     let insert = Insert::single_into(&table).value("int", (i32::MIN as i64) - 1);
     let err = api.conn().insert(insert.into()).await.unwrap_err();
-    assert!(err
-        .to_string()
-        .contains("Unable to fit integer value '-2147483649' into an INT4 (32-bit signed integer)."));
+    assert!(
+        err.to_string()
+            .contains("Unable to fit integer value '-2147483649' into an INT4 (32-bit signed integer).")
+    );
 
     let insert = Insert::single_into(&table).value("oid", (u32::MAX as i64) + 1);
     let err = api.conn().insert(insert.into()).await.unwrap_err();
-    assert!(err
-        .to_string()
-        .contains("Unable to fit integer value '4294967296' into an OID (32-bit unsigned integer)."));
+    assert!(
+        err.to_string()
+            .contains("Unable to fit integer value '4294967296' into an OID (32-bit unsigned integer).")
+    );
 
     let insert = Insert::single_into(&table).value("oid", -1);
     let err = api.conn().insert(insert.into()).await.unwrap_err();
-    assert!(err
-        .to_string()
-        .contains("Unable to fit integer value '-1' into an OID (32-bit unsigned integer)."));
+    assert!(
+        err.to_string()
+            .contains("Unable to fit integer value '-1' into an OID (32-bit unsigned integer).")
+    );
+
+    Ok(())
+}
+
+#[test_each_connector]
+#[traced_test]
+async fn traceparent_is_stripped_from_the_log(api: &mut dyn TestApi) -> crate::Result<()> {
+    api.conn()
+        .query_raw("SELECT 1 /* traceparent=1 */", &[])
+        .await?
+        .into_single()?;
+    let expected = r#"db.query.text=SELECT 1 otel.kind="client""#.to_owned();
+    assert!(logs_contain(&expected), "expected logs to contain '{expected}'");
+
+    Ok(())
+}
+
+#[test_each_connector]
+#[traced_test]
+async fn traceparent_inside_of_query_isnt_stripped_from_log(api: &mut dyn TestApi) -> crate::Result<()> {
+    api.conn()
+        .query_raw("SELECT /* traceparent=1 */ 1", &[])
+        .await?
+        .into_single()?;
+    let expected = r#"db.query.text=SELECT /* traceparent=1 */ 1 otel.kind="client""#.to_owned();
+    assert!(logs_contain(&expected), "expected logs to contain '{expected}'");
 
     Ok(())
 }

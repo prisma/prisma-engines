@@ -1,9 +1,9 @@
 use crate::{
+    DatamodelError, ScalarFieldId, StringId,
     ast::{self, WithName, WithSpan},
     coerce,
     context::Context,
     types::ModelAttributes,
-    DatamodelError, ScalarFieldId, StringId,
 };
 
 pub(super) fn model(model_attributes: &mut ModelAttributes, ctx: &mut Context<'_>) {

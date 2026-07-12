@@ -6,17 +6,16 @@ CREATE TABLE a (
      CONSTRAINT [A_pkey] PRIMARY KEY (id)
 );
 
-EXEC('/* This is a comment */' + 
+EXEC('/* This is a comment */' +
      'CREATE DEFAULT NEARLY_NOTHING AS 0');
 EXEC('sp_bindefault ''NEARLY_NOTHING'', ''a.savings''');
 /*
 generator js {
-  provider = "prisma-client-js"
+  provider = "prisma-client"
 }
 
 datasource db {
   provider = "sqlserver"
-  url      = env("DATABASE_URL")
 }
 
 model a {
