@@ -244,7 +244,6 @@ impl SqlRenderer for PostgresRenderer {
     fn render_alter_table(&self, alter_table: &AlterTable, schemas: MigrationPair<&SqlSchema>) -> Vec<String> {
         let AlterTable { changes, table_ids } = alter_table;
         let mut lines = Vec::new();
-        let mut separate_statements = Vec::new();
         let mut before_statements = Vec::new();
         let mut after_statements = Vec::new();
         let tables = schemas.walk(*table_ids);
@@ -255,7 +254,7 @@ impl SqlRenderer for PostgresRenderer {
                     "DROP CONSTRAINT {}",
                     Quoted::postgres_ident(tables.previous.primary_key().unwrap().name())
                 )),
-                TableChange::RenamePrimaryKey => separate_statements.push(format!(
+                TableChange::RenamePrimaryKey => after_statements.push(format!(
                     "ALTER TABLE {} RENAME CONSTRAINT {} TO {}",
                     quoted_alter_table_name(tables),
                     Quoted::postgres_ident(tables.previous.primary_key().unwrap().name()),
@@ -319,11 +318,9 @@ impl SqlRenderer for PostgresRenderer {
             };
         }
 
-        if lines.is_empty() && separate_statements.is_empty() {
-            return Vec::new();
+        if lines.is_empty() {
+            return before_statements.into_iter().chain(after_statements).collect();
         }
-
-        after_statements.extend(separate_statements);
 
         if self.is_cockroach {
             let mut out = Vec::with_capacity(before_statements.len() + after_statements.len() + lines.len());
@@ -334,10 +331,6 @@ impl SqlRenderer for PostgresRenderer {
             out.extend(after_statements);
             out
         } else {
-            if lines.is_empty() {
-                return before_statements.into_iter().chain(after_statements).collect();
-            }
-
             let alter_table = format!("ALTER TABLE {} {}", quoted_alter_table_name(tables), lines.join(",\n"));
             before_statements
                 .into_iter()
