@@ -1,0 +1,17 @@
+{
+  "modelName": "User",
+  "action": "updateMany",
+  "query": {
+    "arguments": {
+      "where": {
+        "email": "user@prisma.io"
+      },
+      "data": {
+        "role": "ADMIN"
+      }
+    },
+    "selection": {
+      "$scalars": true
+    }
+  }
+}
