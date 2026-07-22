@@ -213,7 +213,12 @@ impl Expression {
                 // A chunkable statement may still be split into multiple queries by the client
                 // if its parameters exceed the bind limit; such chunks then run without a
                 // transaction, consistent with how `deleteMany` and read queries, which are
-                // never wrapped in a transaction, are chunked today.
+                // never wrapped in a transaction, are chunked today. Chunkability cannot
+                // refine this decision at compile time: nearly every single-statement write is
+                // marked chunkable (inserts unconditionally, filters unless negated), so
+                // keeping the wrapper for chunkable statements would keep it for essentially
+                // all of them, and whether a statement actually splits depends on the
+                // adapter-specific bind limit that is only known to the client at runtime.
                 // See https://github.com/prisma/prisma/issues/29748.
                 if expr.max_statement_count() <= 1 {
                     *self = std::mem::replace(expr, Expression::Unit);
