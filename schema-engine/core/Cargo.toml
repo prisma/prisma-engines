@@ -1,29 +1,42 @@
 [package]
-edition = "2021"
+edition.workspace = true
 name = "schema-core"
 version = "0.1.0"
 
 [dependencies]
+connection-string.workspace = true
+crosstarget-utils.workspace = true
 psl = { workspace = true, features = ["all"] }
-schema-connector = { path = "../connectors/schema-connector" }
-mongodb-schema-connector = { path = "../connectors/mongodb-schema-connector" }
-sql-schema-connector = { path = "../connectors/sql-schema-connector" }
-user-facing-errors = { path = "../../libs/user-facing-errors" }
+schema-connector = { workspace = true, features = [
+    "all-native",
+] }
+mongodb-schema-connector = { workspace = true }
+sql-schema-connector = { workspace = true, features = [
+    "all-native",
+] }
+user-facing-errors = { workspace = true, features = [
+    "quaint",
+] }
 
+commands = { path = "../commands", package = "schema-commands", features = [
+    "all-native",
+] }
+json-rpc = { path = "../json-rpc-api", package = "json-rpc-api" }
 async-trait.workspace = true
 chrono.workspace = true
 enumflags2.workspace = true
-jsonrpc-core = "17.0"
+futures.workspace = true
+hashbrown.workspace = true
+jsonrpc-core.workspace = true
 serde.workspace = true
 serde_json.workspace = true
+thiserror.workspace = true
 tokio.workspace = true
 tracing.workspace = true
-tracing-subscriber = "0.3"
-tracing-futures = "0.2"
+tracing-subscriber.workspace = true
+tracing-futures.workspace = true
 url.workspace = true
-
-[build-dependencies]
-json-rpc-api-build = { path = "../json-rpc-api-build" }
+bon.workspace = true
 
 [features]
 vendored-openssl = ["sql-schema-connector/vendored-openssl"]

@@ -122,8 +122,67 @@ mod update_many {
         Ok(())
     }
 
+    // "An updateMany mutation" should "update max limit number of items"
+    #[connector_test]
+    async fn update_max_limit_items(runner: Runner) -> TestResult<()> {
+        create_row(&runner, r#"{ id: 1, optStr: "str1" }"#).await?;
+        create_row(&runner, r#"{ id: 2, optStr: "str2" }"#).await?;
+        create_row(&runner, r#"{ id: 3, optStr: "str3" }"#).await?;
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"mutation {
+            updateManyTestModel(
+              where: { }
+              data: { optStr: { set: "updated" } }
+              limit: 2
+            ){
+              count
+            }
+          }"#),
+          @r###"{"data":{"updateManyTestModel":{"count":2}}}"###
+        );
+
+        insta::assert_snapshot!(
+          run_query!(
+            &runner,
+            r#"{
+              findManyTestModel(orderBy: { id: asc }) {
+                optStr
+              }
+            }"#),
+          @r###"{"data":{"findManyTestModel":[{"optStr":"updated"},{"optStr":"updated"},{"optStr":"str3"}]}}"###
+        );
+
+        Ok(())
+    }
+
+    // "An updateMany mutation" should "fail if limit param is negative"
+    #[connector_test]
+    async fn should_fail_with_negative_limit(runner: Runner) -> TestResult<()> {
+        create_row(&runner, r#"{ id: 1, optStr: "str1" }"#).await?;
+        create_row(&runner, r#"{ id: 2, optStr: "str2" }"#).await?;
+        create_row(&runner, r#"{ id: 3, optStr: "str3" }"#).await?;
+
+        assert_error!(
+            &runner,
+            r#"mutation {
+              updateManyTestModel(
+                where: { }
+                data: { optStr: { set: "updated" } }
+                limit: -2
+              ){
+                count
+              }
+            }"#,
+            2019,
+            "Provided limit (-2) must be a positive integer."
+        );
+
+        Ok(())
+    }
+
     // "An updateMany mutation" should "correctly apply all number operations for Int"
-    #[connector_test(exclude(Vitess("planetscale.js", "planetscale.js.wasm"), CockroachDb))]
+    #[connector_test(exclude(CockroachDb))]
     async fn apply_number_ops_for_int(runner: Runner) -> TestResult<()> {
         create_row(&runner, r#"{ id: 1, optStr: "str1" }"#).await?;
         create_row(&runner, r#"{ id: 2, optStr: "str2", optInt: 2 }"#).await?;
@@ -240,7 +299,7 @@ mod update_many {
     }
 
     // "An updateMany mutation" should "correctly apply all number operations for Float"
-    #[connector_test(exclude(Vitess("planetscale.js", "planetscale.js.wasm")))]
+    #[connector_test]
     async fn apply_number_ops_for_float(runner: Runner) -> TestResult<()> {
         create_row(&runner, r#"{ id: 1, optStr: "str1" }"#).await?;
         create_row(&runner, r#"{ id: 2, optStr: "str2", optFloat: 2 }"#).await?;
@@ -253,12 +312,12 @@ mod update_many {
 
         insta::assert_snapshot!(
           query_number_operation(&runner, "optFloat", "decrement", "1.1").await?,
-          @r###"{"data":{"findManyTestModel":[{"optFloat":null},{"optFloat":2.0},{"optFloat":3.1}]}}"###
+          @r###"{"data":{"findManyTestModel":[{"optFloat":null},{"optFloat":2},{"optFloat":3.1}]}}"###
         );
 
         insta::assert_snapshot!(
           query_number_operation(&runner, "optFloat", "multiply", "5.5").await?,
-          @r###"{"data":{"findManyTestModel":[{"optFloat":null},{"optFloat":11.0},{"optFloat":17.05}]}}"###
+          @r###"{"data":{"findManyTestModel":[{"optFloat":null},{"optFloat":11},{"optFloat":17.05}]}}"###
         );
 
         insta::assert_snapshot!(
@@ -268,7 +327,7 @@ mod update_many {
 
         insta::assert_snapshot!(
           query_number_operation(&runner, "optFloat", "set", "5").await?,
-          @r###"{"data":{"findManyTestModel":[{"optFloat":5.0},{"optFloat":5.0},{"optFloat":5.0}]}}"###
+          @r###"{"data":{"findManyTestModel":[{"optFloat":5},{"optFloat":5},{"optFloat":5}]}}"###
         );
 
         insta::assert_snapshot!(
@@ -297,10 +356,10 @@ mod update_many {
         let count = &res["data"]["updateManyTestModel"]["count"];
 
         // MySql does not count incrementing a null so the count is different
-        if !matches!(runner.connector_version(), ConnectorVersion::MySql(_)) {
-            // On PlanetScale, this fails with:
-            //   left: Number(2)
-            //   right: 3
+        if !matches!(
+            runner.connector_version(),
+            ConnectorVersion::MySql(_) | ConnectorVersion::Vitess(_)
+        ) {
             assert_eq!(count, 3);
         }
 

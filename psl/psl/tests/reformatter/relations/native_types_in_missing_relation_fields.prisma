@@ -1,6 +1,5 @@
 datasource pg {
   provider = "postgres"
-  url      = "postgres://meowmeowmeowmeowmeow"
 }
 
 model Blog {

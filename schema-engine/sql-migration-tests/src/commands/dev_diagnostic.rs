@@ -1,29 +1,41 @@
 use schema_core::{
-    commands::dev_diagnostic, json_rpc::types::*, schema_connector::SchemaConnector, CoreError, CoreResult,
+    CoreError, CoreResult, commands::dev_diagnostic_cli, json_rpc::types::*, schema_connector::SchemaConnector,
 };
 use tempfile::TempDir;
+
+use crate::utils;
 
 #[must_use = "This struct does nothing on its own. See DevDiagnostic::send()"]
 pub struct DevDiagnostic<'a> {
     api: &'a mut dyn SchemaConnector,
     migrations_directory: &'a TempDir,
+    filter: SchemaFilter,
 }
 
 impl<'a> DevDiagnostic<'a> {
-    pub(crate) fn new(api: &'a mut dyn SchemaConnector, migrations_directory: &'a TempDir) -> Self {
+    pub(crate) fn new(
+        api: &'a mut dyn SchemaConnector,
+        migrations_directory: &'a TempDir,
+        filter: SchemaFilter,
+    ) -> Self {
         DevDiagnostic {
             api,
             migrations_directory,
+            filter,
         }
     }
 
     fn send_impl(self) -> CoreResult<DevDiagnosticAssertions<'a>> {
-        let fut = dev_diagnostic(
+        let migrations_list = utils::list_migrations(self.migrations_directory.path()).unwrap();
+        let mut migration_schema_cache = Default::default();
+        let fut = dev_diagnostic_cli(
             DevDiagnosticInput {
-                migrations_directory_path: self.migrations_directory.path().to_str().unwrap().to_owned(),
+                migrations_list,
+                filters: self.filter,
             },
             None,
             self.api,
+            &mut migration_schema_cache,
         );
         let output = test_setup::runtime::run_with_thread_local_runtime(fut)?;
         Ok(DevDiagnosticAssertions {
@@ -54,8 +66,14 @@ impl std::fmt::Debug for DevDiagnosticAssertions<'_> {
     }
 }
 
-impl<'a> DevDiagnosticAssertions<'a> {
+impl DevDiagnosticAssertions<'_> {
     pub fn into_output(self) -> DevDiagnosticOutput {
         self.output
+    }
+
+    pub fn assert_is_create_migration(self) -> Self {
+        assert!(matches!(self.output.action, DevAction::CreateMigration));
+
+        self
     }
 }

@@ -7,7 +7,6 @@ fn should_set_default_for_all_scalar_types() {
     let dml = indoc! {r#"
         datasource db {
           provider = "mongodb"
-          url      = "mongodb://"
         }
 
         type Composite {
@@ -21,7 +20,7 @@ fn should_set_default_for_all_scalar_types() {
         }
     "#};
 
-    let schema = psl::parse_schema(dml).unwrap();
+    let schema = psl::parse_schema_without_extensions(dml).unwrap();
     let composite = schema.assert_has_type("Composite");
 
     composite
@@ -68,7 +67,6 @@ fn should_set_default_an_enum_type() {
     let dml = indoc! {r#"
         datasource db {
           provider = "mongodb"
-          url      = "mongodb://"
         }
 
         type Composite {
@@ -83,7 +81,7 @@ fn should_set_default_an_enum_type() {
         }
     "#};
 
-    psl::parse_schema(dml)
+    psl::parse_schema_without_extensions(dml)
         .unwrap()
         .assert_has_type("Composite")
         .assert_has_scalar_field("role")
@@ -96,7 +94,6 @@ fn should_set_default_on_remapped_enum_type() {
     let dml = indoc! {r#"
         datasource db {
           provider = "mongodb"
-          url      = "mongodb://"
         }
 
         type Composite {
@@ -111,7 +108,7 @@ fn should_set_default_on_remapped_enum_type() {
         }
     "#};
 
-    psl::parse_schema(dml)
+    psl::parse_schema_without_extensions(dml)
         .unwrap()
         .assert_has_type("Composite")
         .assert_has_scalar_field("role")
@@ -124,7 +121,6 @@ fn string_literals_with_double_quotes_work() {
     let schema = indoc! {r#"
         datasource db {
           provider = "mongodb"
-          url      = "mongodb://"
         }
 
         type Test {
@@ -134,7 +130,7 @@ fn string_literals_with_double_quotes_work() {
         }
     "#};
 
-    let schema = psl::parse_schema(schema).unwrap();
+    let schema = psl::parse_schema_without_extensions(schema).unwrap();
     let composite = schema.assert_has_type("Test");
 
     composite

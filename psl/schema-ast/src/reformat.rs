@@ -19,6 +19,8 @@ pub fn reformat(input: &str, indent_width: usize) -> Option<String> {
         renderer.stream.push('\n');
     }
 
+    // TODO: why do we need to use a `Some` here?
+    // Also: if we really want to return an `Option<String>`, why do unwrap in `ast.next()`?
     Some(renderer.stream)
 }
 
@@ -302,7 +304,7 @@ fn reformat_field_type(pair: Pair<'_>, target: &mut dyn LineWriteable) {
 }
 
 fn get_identifier(pair: Pair<'_>) -> &str {
-    let ident_token = match pair.as_rule() {
+    match pair.as_rule() {
         Rule::base_type => pair.as_str(),
         Rule::list_type
         | Rule::legacy_list_type
@@ -314,9 +316,7 @@ fn get_identifier(pair: Pair<'_>) -> &str {
             ident_token.as_str()
         }
         _ => unreachable(&pair),
-    };
-
-    ident_token
+    }
 }
 
 fn reformat_arguments_list(pair: Pair<'_>, target: &mut dyn LineWriteable) {
@@ -377,6 +377,40 @@ fn reformat_expression(pair: Pair<'_>, target: &mut dyn LineWriteable) {
             Rule::path => target.write(current.as_str()),
             Rule::function_call => reformat_function_call(current, target),
             Rule::array_expression => reformat_array_expression(current, target),
+            Rule::object_expression => reformat_object_expression(current, target),
+            _ => unreachable(&current),
+        }
+    }
+}
+
+fn reformat_object_expression(pair: Pair<'_>, target: &mut dyn LineWriteable) {
+    target.write("{ ");
+    let mut is_first_member = true;
+
+    for current in pair.into_inner() {
+        match current.as_rule() {
+            Rule::object_member => {
+                if !is_first_member {
+                    target.write(", ");
+                }
+                reformat_object_member(current, target);
+                is_first_member = false;
+            }
+            _ => unreachable(&current),
+        }
+    }
+
+    target.write(" }");
+}
+
+fn reformat_object_member(pair: Pair<'_>, target: &mut dyn LineWriteable) {
+    for current in pair.into_inner() {
+        match current.as_rule() {
+            Rule::identifier => {
+                target.write(current.as_str());
+                target.write(": ");
+            }
+            Rule::expression => reformat_expression(current, target),
             _ => unreachable(&current),
         }
     }
@@ -436,6 +470,32 @@ fn reformat_comment_block(pair: Pair<'_>, table: &mut TableFormat) {
                         _ => unreachable!(),
                     }
                 }
+            }
+            Rule::multi_line_comment => {
+                // Start the canonical multi-line comment block
+                table.start_new_line();
+                table.append_suffix_to_current_row("/**");
+
+                let content = current.as_str();
+                // Strip off `/*` and `*/`
+                let inner = &content[2..content.len() - 2];
+
+                // Normalize lines by removing leading `*` and extra whitespace.
+                for line in inner.lines() {
+                    let line = line.trim();
+                    // Remove a leading `*` if present, along with any following spaces.
+                    let line = line.strip_prefix('*').map(str::trim_start).unwrap_or(line);
+
+                    if !line.is_empty() {
+                        table.start_new_line();
+                        table.append_suffix_to_current_row(" * ");
+                        table.append_suffix_to_current_row(line);
+                    }
+                }
+
+                // Close the multi-line comment block
+                table.start_new_line();
+                table.append_suffix_to_current_row(" */");
             }
             _ => unreachable!(),
         }

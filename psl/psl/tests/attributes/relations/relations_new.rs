@@ -232,7 +232,7 @@ fn required_relation_field_must_error_if_it_is_virtual() {
     "#;
 
     let expect = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@relation": The relation field `address` on Model `User` is required. This is no longer valid because it's not possible to enforce this constraint on the database level. Please change the field type from `Address` to `Address?` to fix this.[0m
+        [1;91merror[0m: [1mError parsing attribute "@relation": The relation field `address` on Model `User` is required. This is not valid because it's not possible to enforce this constraint on the database level. Please change the field type from `Address` to `Address?` to fix this.[0m
           [1;94m-->[0m  [4mschema.prisma:4[0m
         [1;94m   | [0m
         [1;94m 3 | [0m        id      Int     @id
@@ -510,7 +510,6 @@ fn must_error_fields_or_references_argument_is_placed_on_wrong_side_for_one_to_m
     let dml = r#"
         datasource pg {
             provider = "postgres"
-            url = "postgresql://localhost:5432"
         }
 
         model User {
@@ -528,11 +527,11 @@ fn must_error_fields_or_references_argument_is_placed_on_wrong_side_for_one_to_m
 
     let expect = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@relation": The relation field `posts` on Model `User` must not specify the `fields` or `references` argument in the @relation attribute. You must only specify it on the opposite field `user` on model `Post`.[0m
-          [1;94m-->[0m  [4mschema.prisma:10[0m
+          [1;94m-->[0m  [4mschema.prisma:9[0m
         [1;94m   | [0m
-        [1;94m 9 | [0m          postId Int[]
-        [1;94m10 | [0m          [1;91mposts  Post[] @relation(fields: [postId], references: [id])[0m
-        [1;94m11 | [0m        }
+        [1;94m 8 | [0m          postId Int[]
+        [1;94m 9 | [0m          [1;91mposts  Post[] @relation(fields: [postId], references: [id])[0m
+        [1;94m10 | [0m        }
         [1;94m   | [0m
     "#]];
 
@@ -747,7 +746,7 @@ fn must_error_for_required_one_to_one_self_relations() {
     "#;
 
     let expect = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@relation": The relation field `friendOf` on Model `User` is required. This is no longer valid because it's not possible to enforce this constraint on the database level. Please change the field type from `User` to `User?` to fix this.[0m
+        [1;91merror[0m: [1mError parsing attribute "@relation": The relation field `friendOf` on Model `User` is required. This is not valid because it's not possible to enforce this constraint on the database level. Please change the field type from `User` to `User?` to fix this.[0m
           [1;94m-->[0m  [4mschema.prisma:6[0m
         [1;94m   | [0m
         [1;94m 5 | [0m      friend   User @relation("Friends", fields: friendId, references: id)
@@ -823,7 +822,6 @@ fn must_allow_relations_with_default_native_types_with_annotation_on_one_side() 
         r#"
         datasource db {
             provider = "mysql"
-            url      = "mysql://"
         }
 
         model Blog {
@@ -843,7 +841,6 @@ fn must_allow_relations_with_default_native_types_with_annotation_on_one_side() 
         r#"
         datasource db {
             provider = "mysql"
-            url      = "mysql://"
         }
 
         model Blog {
@@ -864,7 +861,6 @@ fn must_allow_relations_with_default_native_types_with_annotation_on_one_side() 
         r#"
         datasource db {
             provider = "mysql"
-            url      = "mysql://"
         }
 
         model Blog {
@@ -890,7 +886,6 @@ fn a_one_on_one_relation_with_fields_on_the_wrong_side_should_not_pass() {
     let dml = r#"
 datasource db {
   provider = "postgresql"
-  url      = env("TEST_DATABASE_URL")
 }
 
 model Boom {
@@ -908,11 +903,11 @@ model Bam {
 
     let expect = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@relation": The relation field `Bam.boom` defines the `fields` and/or `references` argument. You must set them on the required side of the relation (`Boom.bam`) in order for the constraints to be enforced. Alternatively, you can change this field to be required and the opposite optional, or make both sides of the relation optional.[0m
-          [1;94m-->[0m  [4mschema.prisma:16[0m
+          [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
-        [1;94m15 | [0m  boomId    Int?
-        [1;94m16 | [0m  [1;91mboom      Boom? @relation(fields: [boomId], references: [id])[0m
-        [1;94m17 | [0m}
+        [1;94m14 | [0m  boomId    Int?
+        [1;94m15 | [0m  [1;91mboom      Boom? @relation(fields: [boomId], references: [id])[0m
+        [1;94m16 | [0m}
         [1;94m   | [0m
     "#]];
 

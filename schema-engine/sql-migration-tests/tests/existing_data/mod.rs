@@ -36,6 +36,45 @@ fn dropping_a_table_with_rows_should_warn(api: TestApi) {
 }
 
 #[test_connector]
+fn dropping_a_table_with_rows_multi_file_should_warn(api: TestApi) {
+    let schema_a = r#"
+        model Cat {
+            id String @id @default(cuid())
+        }
+    "#;
+    let schema_b = r#"
+        model Dog {
+            id String @id @default(cuid())
+        }
+    "#;
+
+    api.schema_push_w_datasource_multi_file(&[("a.prisma", schema_a), ("b.prisma", schema_b)])
+        .send()
+        .assert_green();
+
+    api.query(
+        Insert::single_into(api.render_table_name("Cat"))
+            .value("id", "test")
+            .into(),
+    );
+    api.query(
+        Insert::single_into(api.render_table_name("Dog"))
+            .value("id", "test")
+            .into(),
+    );
+
+    let warn = format!(
+        "You are about to drop the `{}` table, which is not empty (1 rows).",
+        api.normalize_identifier("Dog")
+    );
+
+    api.schema_push_w_datasource_multi_file(&[("a.prisma", schema_a)])
+        .send()
+        .assert_warnings(&[warn.into()])
+        .assert_no_steps();
+}
+
+#[test_connector]
 fn dropping_a_column_with_non_null_values_should_warn(api: TestApi) {
     let dm = r#"
         model Test {

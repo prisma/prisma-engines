@@ -2,9 +2,8 @@ REPO_ROOT := $(shell git rev-parse --show-toplevel)
 
 CONFIG_PATH = ./query-engine/connector-test-kit-rs/test-configs
 CONFIG_FILE = .test_config
-SCHEMA_EXAMPLES_PATH = ./query-engine/example_schemas
 DEV_SCHEMA_FILE = dev_datamodel.prisma
-DRIVER_ADAPTERS_BRANCH ?= main
+PRISMA_BRANCH ?= main
 ENGINE_SIZE_OUTPUT ?= /dev/stdout
 QE_WASM_VERSION ?= 0.0.0
 SCHEMA_WASM_VERSION ?= 0.0.0
@@ -24,15 +23,19 @@ default: build
 # clean tasks #
 ###############
 
-clean-qe-wasm:
-	@echo "Cleaning query-engine/query-engine-wasm/pkg" && \
-	cd query-engine/query-engine-wasm/pkg && find . ! -name '.' ! -name '..' ! -name 'README.md' -exec rm -rf {} +
+clean-se-wasm:
+	@echo "Cleaning schema-engine/schema-engine-wasm/pkg" && \
+	cd schema-engine/schema-engine-wasm/pkg && find . ! -name '.' ! -name '..' ! -name 'README.md' -exec rm -rf {} +
+
+clean-qc-wasm:
+	@echo "Cleaning query-compiler/query-compiler-wasm/pkg" && \
+	cd query-compiler/query-compiler-wasm/pkg && find . ! -name '.' ! -name '..' ! -name 'README.md' -exec rm -rf {} +
 
 clean-cargo:
 	@echo "Cleaning cargo" && \
 	cargo clean
 
-clean: clean-qe-wasm clean-cargo
+clean: clean-se-wasm clean-qc-wasm clean-cargo
 
 ###################
 # script wrappers #
@@ -51,21 +54,23 @@ profile-shell:
 build:
 	cargo build
 
-build-qe:
-	cargo build --package query-engine
+build-se-wasm:
+	cd schema-engine/schema-engine-wasm && \
+	./build.sh $(SCHEMA_ENGINE_WASM_VERSION) schema-engine/schema-engine-wasm/pkg
 
-build-qe-napi:
-	cargo build --package query-engine-node-api --profile $(PROFILE)
+build-qc-wasm-%:
+	cd query-compiler/query-compiler-wasm && \
+	./build.sh $(QE_WASM_VERSION) query-compiler/query-compiler-wasm/pkg $*
 
-build-qe-wasm:
-	cd query-engine/query-engine-wasm && \
-	./build.sh $(QE_WASM_VERSION) query-engine/query-engine-wasm/pkg
+build-qc-wasm: build-qc-wasm-fast build-qc-wasm-small
 
-build-qe-wasm-gz: build-qe-wasm
-	@cd query-engine/query-engine-wasm/pkg && \
-    for provider in postgresql mysql sqlite; do \
-        gzip -knc $$provider/query_engine_bg.wasm > $$provider.gz; \
+build-qc-gz-%: build-qc-wasm-%
+		@cd query-compiler/query-compiler-wasm/pkg && \
+    for provider in postgresql mysql sqlite sqlserver cockroachdb; do \
+        gzip -knc $$provider/query_compiler_$*_bg.wasm > $${provider}_$*.gz; \
     done;
+
+build-qc-gz: build-qc-gz-fast build-qc-gz-small
 
 build-schema-wasm:
 	@printf '%s\n' "🛠️  Building the Rust crate"
@@ -79,7 +84,14 @@ build-schema-wasm:
 
 # Emulate pedantic CI compilation.
 pedantic:
-	RUSTFLAGS="-D warnings" cargo fmt -- --check && RUSTFLAGS="-D warnings" cargo clippy --all-targets
+	cargo fmt -- --check
+	cargo clippy --all-features --all-targets -- -Dwarnings
+	cargo clippy --all-features --all-targets \
+		-p schema-engine-wasm \
+		-p query-compiler-wasm \
+		-p prisma-schema-build \
+		--target wasm32-unknown-unknown \
+		-- -Dwarnings
 
 release:
 	cargo build --release
@@ -111,15 +123,49 @@ test-qe-st:
 test-qe-verbose-st:
 	cargo test --package query-engine-tests -- --nocapture --test-threads 1
 
-# Black-box tests, exercising the query engine HTTP apis (metrics, tracing, etc)
-test-qe-black-box: build-qe
-	cargo test --package black-box-tests -- --test-threads 1
+test-unit:
+	cargo test --workspace --all-features \
+	    --exclude=quaint \
+	    --exclude=query-engine-tests \
+	    --exclude=sql-migration-tests \
+	    --exclude=schema-engine-cli \
+	    --exclude=sql-schema-describer \
+	    --exclude=sql-introspection-tests \
+	    --exclude=mongodb-schema-connector
 
 check-schema-wasm-package: build-schema-wasm
 	PRISMA_SCHEMA_WASM="$(REPO_ROOT)/target/prisma-schema-wasm" \
 	out=$(shell mktemp -d) \
 	NODE=$(shell which node) \
 	./prisma-schema-wasm/scripts/check.sh
+
+######################
+# Benchmark commands #
+######################
+
+# Run query compiler benchmarks
+bench-qc:
+	cargo bench -p query-compiler --profile profiling
+
+# Run query graph building benchmarks
+bench-qc-graph:
+	cargo bench -p core-tests --profile profiling --bench query_graph_bench
+
+# Run schema building benchmarks
+bench-schema:
+	cargo bench -p schema --profile profiling --bench schema_builder_bench
+
+# Save benchmark baseline (usage: make bench-baseline NAME=main)
+bench-qc-baseline:
+	cargo bench -p query-compiler --profile profiling -- --save-baseline $(NAME)
+
+# Compare against baseline (usage: make bench-compare NAME=main)
+bench-qc-compare:
+	cargo bench -p query-compiler --profile profiling -- --baseline $(NAME)
+
+# Run profile_query example for profiling
+profile-qc:
+	cargo run -p query-compiler --example profile_query --profile profiling
 
 ###########################
 # Database setup commands #
@@ -136,42 +182,20 @@ start-sqlite:
 dev-sqlite:
 	cp $(CONFIG_PATH)/sqlite $(CONFIG_FILE)
 
-dev-libsql-js: build-qe-napi build-driver-adapters-kit
-	cp $(CONFIG_PATH)/libsql-js $(CONFIG_FILE)
+dev-libsql-qc: build-qc-wasm-fast build-driver-adapters-kit-qc
+	cp $(CONFIG_PATH)/libsql-qc $(CONFIG_FILE)
 
-test-libsql-js: dev-libsql-js test-qe-st
+test-libsql-qc: dev-libsql-qc test-qe-st
 
-test-driver-adapter-libsql: test-libsql-js
+dev-better-sqlite3-qc: build-qc-wasm-fast build-driver-adapters-kit-qc
+	cp $(CONFIG_PATH)/better-sqlite3-qc $(CONFIG_FILE)
 
-dev-libsql-wasm: build-qe-wasm build-driver-adapters-kit
-	cp $(CONFIG_PATH)/libsql-wasm $(CONFIG_FILE)
+test-better-sqlite3-qc: dev-better-sqlite3-qc test-qe-st
 
-test-libsql-wasm: dev-libsql-wasm test-qe-st
-test-driver-adapter-libsql-wasm: test-libsql-wasm
+dev-d1-qc: build-qc-wasm-fast build-driver-adapters-kit-qc
+	cp $(CONFIG_PATH)/d1-qc $(CONFIG_FILE)
 
-dev-d1: build-qe-wasm build-driver-adapters-kit
-	cp $(CONFIG_PATH)/cloudflare-d1 $(CONFIG_FILE)
-
-test-d1: dev-d1 test-qe-st
-test-driver-adapter-d1: test-d1
-
-start-postgres9:
-	docker compose -f docker-compose.yml up --wait -d --remove-orphans postgres9
-
-dev-postgres9: start-postgres9
-	cp $(CONFIG_PATH)/postgres9 $(CONFIG_FILE)
-
-start-postgres10:
-	docker compose -f docker-compose.yml up --wait -d --remove-orphans postgres10
-
-dev-postgres10: start-postgres10
-	cp $(CONFIG_PATH)/postgres10 $(CONFIG_FILE)
-
-start-postgres11:
-	docker compose -f docker-compose.yml up --wait -d --remove-orphans postgres11
-
-dev-postgres11: start-postgres11
-	cp $(CONFIG_PATH)/postgres11 $(CONFIG_FILE)
+test-d1-qc: dev-d1-qc test-qe-st
 
 start-postgres12:
 	docker compose -f docker-compose.yml up --wait -d --remove-orphans postgres12
@@ -185,47 +209,64 @@ start-postgres13:
 dev-postgres13: start-postgres13
 	cp $(CONFIG_PATH)/postgres13 $(CONFIG_FILE)
 
-start-pg-js: start-postgres13
+dev-pg-qc: start-postgres13 build-qc-wasm-fast build-driver-adapters-kit-qc
+	cp $(CONFIG_PATH)/pg-qc $(CONFIG_FILE)
 
-dev-pg-js: start-pg-js build-qe-napi build-driver-adapters-kit
-	cp $(CONFIG_PATH)/pg-js $(CONFIG_FILE)
+dev-pg-qc-join:
+	PRISMA_RELATION_LOAD_STRATEGY=join make dev-pg-qc
 
-test-pg-js: dev-pg-js test-qe-st
+dev-pg-qc-query:
+	PRISMA_RELATION_LOAD_STRATEGY=query make dev-pg-qc
 
-dev-pg-wasm: start-pg-js build-qe-wasm build-driver-adapters-kit
-	cp $(CONFIG_PATH)/pg-wasm $(CONFIG_FILE)
+test-pg-qc: dev-pg-qc test-qe
 
-test-pg-wasm: dev-pg-wasm test-qe-st
+test-pg-qc-join:
+	PRISMA_RELATION_LOAD_STRATEGY=join make test-pg-qc
 
-test-driver-adapter-pg: test-pg-js
-test-driver-adapter-pg-wasm: test-pg-wasm
+test-pg-qc-query:
+	PRISMA_RELATION_LOAD_STRATEGY=query make test-pg-qc
 
 start-pg-bench:
-	docker compose -f query-engine/driver-adapters/executor/bench/docker-compose.yml up --wait -d --remove-orphans postgres
+	docker compose -f libs/driver-adapters/executor/bench/docker-compose.yml up --wait -d --remove-orphans postgres
 
-setup-pg-bench: start-pg-bench build-qe-napi build-qe-wasm build-driver-adapters-kit
+dev-pg-cockroachdb-qc: start-cockroach_23_1 build-qc-wasm-fast build-driver-adapters-kit-qc
+	cp $(CONFIG_PATH)/pg-cockroachdb-qc $(CONFIG_FILE)
 
-run-bench:
-	DATABASE_URL="postgresql://postgres:postgres@localhost:5432/bench?schema=imdb_bench&sslmode=disable" \
-	node --experimental-wasm-modules query-engine/driver-adapters/executor/dist/bench.mjs
+dev-pg-cockroachdb-qc-join:
+	PRISMA_RELATION_LOAD_STRATEGY=join make dev-pg-cockroachdb-qc
+
+dev-pg-cockroachdb-qc-query:
+	PRISMA_RELATION_LOAD_STRATEGY=query make dev-pg-cockroachdb-qc
+
+test-pg-cockroachdb-qc: dev-pg-cockroachdb-qc test-qe
+
+test-pg-cockroachdb-qc-join:
+	PRISMA_RELATION_LOAD_STRATEGY=join make test-pg-cockroachdb-qc
+
+test-pg-cockroachdb-qc-query:
+	PRISMA_RELATION_LOAD_STRATEGY=query make test-pg-cockroachdb-qc
 
 bench-pg-js: setup-pg-bench run-bench
 
-start-neon-js:
+start-neon:
 	docker compose -f docker-compose.yml up --wait -d --remove-orphans neon-proxy
 
-dev-neon-js: start-neon-js build-qe-napi build-driver-adapters-kit
-	cp $(CONFIG_PATH)/neon-js $(CONFIG_FILE)
+dev-neon-qc: start-neon build-qc-wasm-fast build-driver-adapters-kit-qc
+	cp $(CONFIG_PATH)/neon-qc $(CONFIG_FILE)
 
-test-neon-js: dev-neon-js test-qe-st
+dev-neon-qc-join:
+	PRISMA_RELATION_LOAD_STRATEGY=join make dev-neon-qc
 
-dev-neon-wasm: start-neon-js build-qe-wasm build-driver-adapters-kit
-	cp $(CONFIG_PATH)/neon-wasm $(CONFIG_FILE)
+dev-neon-qc-query:
+	PRISMA_RELATION_LOAD_STRATEGY=query make dev-neon-qc
 
-test-neon-wasm: dev-neon-wasm test-qe-st
+test-neon-qc: dev-neon-qc test-qe
 
-test-driver-adapter-neon: test-neon-js
-test-driver-adapter-neon-wasm: test-neon-wasm
+test-neon-qc-join:
+	PRISMA_RELATION_LOAD_STRATEGY=join make test-neon-qc
+
+test-neon-qc-query:
+	PRISMA_RELATION_LOAD_STRATEGY=query make test-neon-qc
 
 start-postgres14:
 	docker compose -f docker-compose.yml up --wait -d --remove-orphans postgres14
@@ -320,6 +361,11 @@ start-mssql_edge:
 dev-mssql_edge: start-mssql_edge
 	cp $(CONFIG_PATH)/sqlserver2019 $(CONFIG_FILE)
 
+dev-mssql-qc: start-mssql_2022 build-qc-wasm-fast build-driver-adapters-kit-qc
+	cp $(CONFIG_PATH)/sqlserver-qc $(CONFIG_FILE)
+
+test-mssql-qc: dev-mssql-qc test-qe
+
 start-mssql_2017:
 	docker compose -f docker-compose.yml up --wait -d --remove-orphans mssql-2017
 
@@ -352,6 +398,9 @@ start-mongodb_5:
 dev-mongodb_5: start-mongodb_5
 	cp $(CONFIG_PATH)/mongodb5 $(CONFIG_FILE)
 
+dev-mongodb_5_single: start-mongodb5-single
+	cp $(CONFIG_PATH)/mongodb5 $(CONFIG_FILE)
+
 dev-mongodb_4_2: start-mongodb_4_2
 	cp $(CONFIG_PATH)/mongodb42 $(CONFIG_FILE)
 
@@ -361,39 +410,52 @@ start-vitess_8_0:
 dev-vitess_8_0: start-vitess_8_0
 	cp $(CONFIG_PATH)/vitess_8_0 $(CONFIG_FILE)
 
-start-planetscale-js:
+start-planetscale:
 	docker compose -f docker-compose.yml up -d --remove-orphans planetscale-proxy
 
-dev-planetscale-js: start-planetscale-js build-qe-napi build-driver-adapters-kit
-	cp $(CONFIG_PATH)/planetscale-js $(CONFIG_FILE)
+dev-planetscale-qc: start-planetscale build-qc-wasm-fast build-driver-adapters-kit-qc
+	cp $(CONFIG_PATH)/planetscale-qc $(CONFIG_FILE)
 
-test-planetscale-js: dev-planetscale-js test-qe-st
+test-planetscale-qc: dev-planetscale-qc test-qe-st
 
-dev-planetscale-wasm: start-planetscale-js build-qe-wasm build-driver-adapters-kit
-	cp $(CONFIG_PATH)/planetscale-wasm $(CONFIG_FILE)
+dev-mariadb-mysql-qc: start-mysql_8 build-qc-wasm-fast build-driver-adapters-kit-qc
+	cp $(CONFIG_PATH)/mariadb-mysql-qc $(CONFIG_FILE)
 
-test-planetscale-wasm: dev-planetscale-wasm test-qe-st
+test-mariadb-mysql-qc: dev-mariadb-mysql-qc test-qe-st
 
-test-driver-adapter-planetscale: test-planetscale-js
-test-driver-adapter-planetscale-wasm: test-planetscale-wasm
+dev-mariadb-qc: start-mysql_mariadb build-qc-wasm-fast build-driver-adapters-kit-qc
+	cp $(CONFIG_PATH)/mariadb-qc $(CONFIG_FILE)
+
+test-mariadb-qc: dev-mariadb-qc test-qe-st
 
 ######################
 # Local dev commands #
 ######################
 
-measure-qe-wasm: build-qe-wasm-gz	
-	@cd query-engine/query-engine-wasm/pkg; \
-	for provider in postgresql mysql sqlite; do \
-		echo "$${provider}_size=$$(cat $$provider/query_engine_bg.wasm | wc -c | tr -d ' ')" >> $(ENGINE_SIZE_OUTPUT); \
-		echo "$${provider}_size_gz=$$(cat $$provider.gz | wc -c | tr -d ' ')" >> $(ENGINE_SIZE_OUTPUT); \
+measure-qc-wasm: measure-qc-wasm-fast measure-qc-wasm-small
+
+measure-qc-wasm-%: build-qc-gz-%
+	@cd query-compiler/query-compiler-wasm/pkg; \
+	for provider in postgresql mysql sqlite sqlserver cockroachdb; do \
+		echo "$${provider}_$*_qc_size=$$(cat $$provider/query_compiler_$*_bg.wasm | wc -c | tr -d ' ')" >> $(ENGINE_SIZE_OUTPUT); \
+		echo "$${provider}_$*_qc_size_gz=$$(cat $${provider}_$*.gz | wc -c | tr -d ' ')" >> $(ENGINE_SIZE_OUTPUT); \
 	done;
 
-build-driver-adapters-kit: build-driver-adapters
-	cd query-engine/driver-adapters && pnpm i && pnpm build
+install-driver-adapters-kit-deps: build-driver-adapters
+	cd libs/driver-adapters && pnpm i
+
+build-driver-adapters-kit: install-driver-adapters-kit-deps
+	cd libs/driver-adapters && pnpm build
+
+build-driver-adapters-kit-qe: install-driver-adapters-kit-deps
+	cd libs/driver-adapters && pnpm build:qe
+
+build-driver-adapters-kit-qc: install-driver-adapters-kit-deps
+	cd libs/driver-adapters && pnpm build:qc
 
 build-driver-adapters: ensure-prisma-present
 	@echo "Building driver adapters..."
-	@cd ../prisma && pnpm --filter "*adapter*" i
+	@cd ../prisma && pnpm i
 	@echo "Driver adapters build completed.";
 
 ensure-prisma-present:
@@ -404,59 +466,10 @@ ensure-prisma-present:
 		  echo "⚠️ ../prisma diverges from prisma/prisma main branch. Test results might diverge from those in CI ⚠️ "; \
 		fi \
 	else \
-		echo "git clone --depth=1 https://github.com/prisma/prisma.git --branch=$(DRIVER_ADAPTERS_BRANCH) ../prisma"; \
-		git clone --depth=1 https://github.com/prisma/prisma.git --branch=$(DRIVER_ADAPTERS_BRANCH) "../prisma" && echo "Prisma repository has been cloned to ../prisma"; \
+		echo "git clone --depth=1 https://github.com/prisma/prisma.git --branch=$(PRISMA_BRANCH) ../prisma"; \
+		git clone --depth=1 https://github.com/prisma/prisma.git --branch=$(PRISMA_BRANCH) "../prisma" && echo "Prisma repository has been cloned to ../prisma"; \
 	fi;
-
-# Quick schema validation of whatever you have in the dev_datamodel.prisma file.
-validate:
-	cargo run --bin test-cli -- validate-datamodel dev_datamodel.prisma
-
-qe:
-	cargo run --bin query-engine -- --engine-protocol json --enable-raw-queries --enable-metrics --enable-open-telemetry --enable-telemetry-in-response
-
-qe-graphql:
-	cargo run --bin query-engine -- --engine-protocol graphql --enable-playground --enable-raw-queries --enable-metrics --enable-open-telemetry --enable-telemetry-in-response
-
-qe-dmmf:
-	cargo run --bin query-engine -- cli dmmf > dmmf.json
-
-push-schema:
-	cargo run --bin test-cli -- schema-push $(DEV_SCHEMA_FILE) --force
-
-qe-dev-chinook-sqlite:
-	cp $(SCHEMA_EXAMPLES_PATH)/chinook_sqlite.prisma $(DEV_SCHEMA_FILE)
-
-qe-dev-chinook-postgres10: start-postgres10
-	cp $(SCHEMA_EXAMPLES_PATH)/chinook_postgres10.prisma $(DEV_SCHEMA_FILE)
-	sleep 5
-	make push-schema
-
-qe-dev-mongo_4_4: start-mongodb_4_4
-	cp $(SCHEMA_EXAMPLES_PATH)/generic_mongo4.prisma $(DEV_SCHEMA_FILE)
-
-use-local-schema-engine:
-	cargo build --release
-	cp target/release/schema-engine $(PRISMA2_BINARY_PATH)/
-
-use-local-query-engine:
-	cargo build --release
-	cp target/release/query-engine $(PRISMA2_BINARY_PATH)/runtime/
-	cp target/release/query-engine $(PRISMA2_BINARY_PATH)/query-engine-darwin
-
-show-metrics:
-	docker compose -f docker-compose.yml up --wait -d --remove-orphans grafana prometheus
 
 ## OpenTelemetry
 otel:
 	docker compose up --remove-orphans -d otel
-
-# Build the debug version of Query Engine Node-API library ready to be consumed by Node.js
-.PHONY: qe-node-api
-qe-node-api: build target/debug/libquery_engine.node --profile=$(PROFILE)
-
-%.node: %.$(LIBRARY_EXT)
-# Remove the file first to work around a macOS bug: https://openradar.appspot.com/FB8914243
-# otherwise macOS gatekeeper may kill the Node.js process when it tries to load the library
-	if [[ "$$(uname -sm)" == "Darwin arm64" ]]; then rm -f $@; fi
-	cp $< $@

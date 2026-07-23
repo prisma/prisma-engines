@@ -1,6 +1,7 @@
 use colored::Colorize;
+use psl::parser_database::{ExtensionTypes, NoExtensionTypes};
 use schema_core::{
-    commands::schema_push, json_rpc::types::*, schema_connector::SchemaConnector, CoreError, CoreResult,
+    CoreError, CoreResult, commands::schema_push, json_rpc::types::*, schema_connector::SchemaConnector,
 };
 use std::time::Duration;
 use std::{borrow::Cow, fmt::Debug};
@@ -8,22 +9,37 @@ use tracing_futures::Instrument;
 
 pub struct SchemaPush<'a> {
     api: &'a mut dyn SchemaConnector,
-    schema: String,
+    files: Vec<SchemaContainer>,
     force: bool,
     /// Purely for logging diagnostics.
     migration_id: Option<&'a str>,
     // In eventually-consistent systems, we might need to wait for a while before the system refreshes
     max_ddl_refresh_delay: Option<Duration>,
+    schema_filter: SchemaFilter,
+    extensions: &'a dyn ExtensionTypes,
 }
 
 impl<'a> SchemaPush<'a> {
-    pub fn new(api: &'a mut dyn SchemaConnector, schema: String, max_refresh_delay: Option<Duration>) -> Self {
+    pub fn new(
+        api: &'a mut dyn SchemaConnector,
+        files: &[(&str, &str)],
+        max_refresh_delay: Option<Duration>,
+        schema_filter: SchemaFilter,
+    ) -> Self {
         SchemaPush {
             api,
-            schema,
+            files: files
+                .iter()
+                .map(|(path, content)| SchemaContainer {
+                    path: path.to_string(),
+                    content: content.to_string(),
+                })
+                .collect(),
             force: false,
             migration_id: None,
             max_ddl_refresh_delay: max_refresh_delay,
+            schema_filter,
+            extensions: &NoExtensionTypes,
         }
     }
 
@@ -37,13 +53,19 @@ impl<'a> SchemaPush<'a> {
         self
     }
 
+    pub fn extensions(mut self, extensions: &'a dyn ExtensionTypes) -> Self {
+        self.extensions = extensions;
+        self
+    }
+
     fn send_impl(self) -> CoreResult<SchemaPushAssertion> {
         let input = SchemaPushInput {
-            schema: self.schema,
+            schema: SchemasContainer { files: self.files },
             force: self.force,
+            filters: self.schema_filter,
         };
 
-        let fut = schema_push(input, self.api)
+        let fut = schema_push(input, self.api, self.extensions)
             .instrument(tracing::info_span!("SchemaPush", migration_id = ?self.migration_id));
 
         let output = test_setup::runtime::run_with_thread_local_runtime(fut)?;
@@ -96,13 +118,11 @@ impl SchemaPushAssertion {
     }
 
     pub fn print_context(&self) {
-        match &self.context {
-            Some(context) => println!("Test failure with context <{}>", context.red()),
-            None => {}
+        if let Some(context) = &self.context {
+            println!("Test failure with context <{}>", context.red())
         }
-        match &self.description {
-            Some(description) => println!("{}: {}", "Description".bold(), description.italic()),
-            None => {}
+        if let Some(description) = &self.description {
+            println!("{}: {}", "Description".bold(), description.italic())
         }
     }
 

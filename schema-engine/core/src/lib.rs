@@ -4,35 +4,39 @@
 
 //! The top-level library crate for the schema engine.
 
-include!(concat!(env!("OUT_DIR"), "/methods.rs"));
-
 // exposed for tests
 #[doc(hidden)]
 pub mod commands;
 
-mod api;
+pub use ::commands::{CoreError, CoreResult, GenericApi};
+pub use json_rpc;
+use user_facing_errors::schema_engine::MissingConfigDatasourceUrl;
+
 mod core_error;
+mod extensions;
 mod rpc;
 mod state;
 mod timings;
+mod url;
 
-pub use self::{api::GenericApi, core_error::*, rpc::rpc_api, timings::TimingsLayer};
+pub use self::{
+    rpc::RpcApi,
+    timings::TimingsLayer,
+    url::{DatasourceUrls, ValidatedDatasourceUrls},
+};
+pub use extensions::{ExtensionType, ExtensionTypeConfig};
+use json_rpc::types::{SchemaContainer, SchemasContainer, SchemasWithConfigDir};
 pub use schema_connector;
 
+use ::commands::dialect_for_provider;
 use enumflags2::BitFlags;
 use mongodb_schema_connector::MongoDbSchemaConnector;
 use psl::{
-    builtin_connectors::*, datamodel_connector::Flavour, parser_database::SourceFile, Datasource, PreviewFeature,
-    ValidatedSchema,
+    Datasource, PreviewFeature, builtin_connectors::*, datamodel_connector::Flavour, parser_database::SourceFile,
 };
 use schema_connector::ConnectorParams;
 use sql_schema_connector::SqlSchemaConnector;
-use std::{env, path::Path};
-use user_facing_errors::common::InvalidConnectionString;
-
-fn parse_schema(schema: SourceFile) -> CoreResult<ValidatedSchema> {
-    psl::parse_schema(schema).map_err(CoreError::new_schema_parser_error)
-}
+use std::{path::Path, sync::Arc};
 
 fn connector_for_connection_string(
     connection_string: String,
@@ -40,15 +44,13 @@ fn connector_for_connection_string(
     preview_features: BitFlags<PreviewFeature>,
 ) -> CoreResult<Box<dyn schema_connector::SchemaConnector>> {
     match connection_string.split(':').next() {
-        Some("postgres") | Some("postgresql") => {
+        Some("postgres") | Some("postgresql") | Some("prisma+postgres") => {
             let params = ConnectorParams {
                 connection_string,
                 preview_features,
                 shadow_database_connection_string,
             };
-            let mut connector = SqlSchemaConnector::new_postgres_like();
-            connector.set_params(params)?;
-            Ok(Box::new(connector))
+            Ok(Box::new(SqlSchemaConnector::new_postgres_like(params)?))
         }
         Some("file") => {
             let params = ConnectorParams {
@@ -56,9 +58,7 @@ fn connector_for_connection_string(
                 preview_features,
                 shadow_database_connection_string,
             };
-            let mut connector = SqlSchemaConnector::new_sqlite();
-            connector.set_params(params)?;
-            Ok(Box::new(connector))
+            Ok(Box::new(SqlSchemaConnector::new_sqlite(params)?))
         }
         Some("mysql") => {
             let params = ConnectorParams {
@@ -66,9 +66,7 @@ fn connector_for_connection_string(
                 preview_features,
                 shadow_database_connection_string,
             };
-            let mut connector = SqlSchemaConnector::new_mysql();
-            connector.set_params(params)?;
-            Ok(Box::new(connector))
+            Ok(Box::new(SqlSchemaConnector::new_mysql(params)?))
         }
         Some("sqlserver") => {
             let params = ConnectorParams {
@@ -76,9 +74,7 @@ fn connector_for_connection_string(
                 preview_features,
                 shadow_database_connection_string,
             };
-            let mut connector = SqlSchemaConnector::new_mssql();
-            connector.set_params(params)?;
-            Ok(Box::new(connector))
+            Ok(Box::new(SqlSchemaConnector::new_mssql(params)?))
         }
         Some("mongodb+srv") | Some("mongodb") => {
             let params = ConnectorParams {
@@ -89,73 +85,90 @@ fn connector_for_connection_string(
             let connector = MongoDbSchemaConnector::new(params);
             Ok(Box::new(connector))
         }
-        Some(_other) => Err(CoreError::url_parse_error("The scheme is not recognized")),
-        None => Err(CoreError::user_facing(InvalidConnectionString {
-            details: String::new(),
-        })),
+        Some(_) => Err(CoreError::url_parse_error("The scheme is not recognized")),
+        None => Err(CoreError::url_parse_error("Missing URL scheme")),
     }
 }
 
 /// Same as schema_to_connector, but it will only read the provider, not the connector params.
-fn schema_to_connector_unchecked(schema: &str) -> CoreResult<Box<dyn schema_connector::SchemaConnector>> {
-    let config = psl::parse_configuration(schema)
-        .map_err(|err| CoreError::new_schema_parser_error(err.to_pretty_string("schema.prisma", schema)))?;
+/// This uses `schema_files` to read the `datasource` block.
+fn schema_to_dialect(schema_files: &[(String, SourceFile)]) -> CoreResult<Box<dyn schema_connector::SchemaDialect>> {
+    let (_, config) = psl::parse_configuration_multi_file(schema_files)
+        .map_err(|(files, err)| CoreError::new_schema_parser_error(files.render_diagnostics(&err)))?;
 
-    let preview_features = config.preview_features();
-    let source = config
+    let datasource = config
         .datasources
         .into_iter()
         .next()
         .ok_or_else(|| CoreError::from_msg("There is no datasource in the schema.".into()))?;
 
-    let mut connector = connector_for_provider(source.active_provider)?;
-
-    if let Ok(connection_string) = source.load_direct_url(|key| env::var(key).ok()) {
-        connector.set_params(ConnectorParams {
-            connection_string,
-            preview_features,
-            shadow_database_connection_string: source.load_shadow_database_url().ok().flatten(),
-        })?;
-    }
-
-    Ok(connector)
+    dialect_for_provider(datasource.active_provider)
 }
 
-/// Go from a schema to a connector
+/// Go from a schema to a connector.
 fn schema_to_connector(
-    schema: &str,
+    files: &[(String, SourceFile)],
+    datasource_urls: &DatasourceUrls,
     config_dir: Option<&Path>,
 ) -> CoreResult<Box<dyn schema_connector::SchemaConnector>> {
-    let (source, url, preview_features, shadow_database_url) = parse_configuration(schema)?;
+    let (datasource, preview_features) = parse_configuration_multi(files)?;
+    let datasource_urls = datasource_urls.validate(datasource.active_connector)?;
 
-    let url = config_dir
-        .map(|config_dir| psl::set_config_dir(source.active_connector.flavour(), config_dir, &url).into_owned())
-        .unwrap_or(url);
-
-    let params = ConnectorParams {
-        connection_string: url,
-        preview_features,
-        shadow_database_connection_string: shadow_database_url,
+    let (connection_string, shadow_database_connection_string) = if let Some(config_dir) = config_dir {
+        let urls = datasource_urls.with_config_dir(datasource.active_connector.flavour(), config_dir);
+        (
+            urls.url().map(<_>::to_owned),
+            urls.shadow_database_url().map(<_>::to_owned),
+        )
+    } else {
+        (
+            datasource_urls.url().map(<_>::to_owned),
+            datasource_urls.shadow_database_url().map(<_>::to_owned),
+        )
     };
 
-    let mut connector = connector_for_provider(source.active_provider)?;
-    connector.set_params(params)?;
-    Ok(connector)
+    let connection_string = connection_string.ok_or_else(|| CoreError::user_facing(MissingConfigDatasourceUrl))?;
+
+    let params = ConnectorParams {
+        connection_string,
+        preview_features,
+        shadow_database_connection_string,
+    };
+
+    connector_for_provider(datasource.active_provider, params)
 }
 
-fn connector_for_provider(provider: &str) -> CoreResult<Box<dyn schema_connector::SchemaConnector>> {
+fn initial_datamodel_to_connector(
+    initial_datamodel: &psl::ValidatedSchema,
+    datasource_urls: &ValidatedDatasourceUrls,
+) -> CoreResult<Box<dyn schema_connector::SchemaConnector>> {
+    let configuration = &initial_datamodel.configuration;
+    let (datasource, preview_features) = extract_configuration_ref(configuration)?;
+
+    let params = ConnectorParams {
+        connection_string: datasource_urls
+            .url()
+            .ok_or_else(|| CoreError::user_facing(MissingConfigDatasourceUrl))?
+            .to_owned(),
+        preview_features,
+        shadow_database_connection_string: datasource_urls.shadow_database_url().map(<_>::to_owned),
+    };
+
+    connector_for_provider(datasource.active_provider, params)
+}
+
+fn connector_for_provider(
+    provider: &str,
+    params: ConnectorParams,
+) -> CoreResult<Box<dyn schema_connector::SchemaConnector>> {
     if let Some(connector) = BUILTIN_CONNECTORS.iter().find(|c| c.is_provider(provider)) {
         match connector.flavour() {
-            Flavour::Cockroach => Ok(Box::new(SqlSchemaConnector::new_cockroach())),
-            Flavour::Mongo => Ok(Box::new(MongoDbSchemaConnector::new(ConnectorParams {
-                connection_string: String::new(),
-                preview_features: Default::default(),
-                shadow_database_connection_string: None,
-            }))),
-            Flavour::Sqlserver => Ok(Box::new(SqlSchemaConnector::new_mssql())),
-            Flavour::Mysql => Ok(Box::new(SqlSchemaConnector::new_mysql())),
-            Flavour::Postgres => Ok(Box::new(SqlSchemaConnector::new_postgres())),
-            Flavour::Sqlite => Ok(Box::new(SqlSchemaConnector::new_sqlite())),
+            Flavour::Cockroach => Ok(Box::new(SqlSchemaConnector::new_cockroach(params)?)),
+            Flavour::Mongo => Ok(Box::new(MongoDbSchemaConnector::new(params))),
+            Flavour::Sqlserver => Ok(Box::new(SqlSchemaConnector::new_mssql(params)?)),
+            Flavour::Mysql => Ok(Box::new(SqlSchemaConnector::new_mysql(params)?)),
+            Flavour::Postgres => Ok(Box::new(SqlSchemaConnector::new_postgres(params)?)),
+            Flavour::Sqlite => Ok(Box::new(SqlSchemaConnector::new_sqlite(params)?)),
         }
     } else {
         Err(CoreError::from_msg(format!(
@@ -165,23 +178,53 @@ fn connector_for_provider(provider: &str) -> CoreResult<Box<dyn schema_connector
 }
 
 /// Top-level constructor for the schema engine API.
+/// This variant does not support extensions.
+pub fn schema_api_without_extensions(
+    datamodel: Option<String>,
+    datasource_urls: DatasourceUrls,
+    host: Option<std::sync::Arc<dyn schema_connector::ConnectorHost>>,
+) -> CoreResult<Box<dyn GenericApi>> {
+    schema_api(
+        datamodel,
+        datasource_urls,
+        host,
+        Arc::new(ExtensionTypeConfig::default()),
+    )
+}
+
+/// Top-level constructor for the schema engine API.
 pub fn schema_api(
     datamodel: Option<String>,
+    datasource_urls: DatasourceUrls,
     host: Option<std::sync::Arc<dyn schema_connector::ConnectorHost>>,
-) -> CoreResult<Box<dyn api::GenericApi>> {
+    extension_config: Arc<ExtensionTypeConfig>,
+) -> CoreResult<Box<dyn GenericApi>> {
     // Eagerly load the default schema, for validation errors.
     if let Some(datamodel) = &datamodel {
         parse_configuration(datamodel)?;
     }
 
-    let state = state::EngineState::new(datamodel, host);
+    let datamodel = datamodel.map(|datamodel| vec![("schema.prisma".to_owned(), SourceFile::from(datamodel))]);
+
+    let state = state::EngineState::new(datamodel, datasource_urls, host, extension_config);
     Ok(Box::new(state))
 }
 
-fn parse_configuration(datamodel: &str) -> CoreResult<(Datasource, String, BitFlags<PreviewFeature>, Option<String>)> {
+fn parse_configuration(datamodel: &str) -> CoreResult<(Datasource, BitFlags<PreviewFeature>)> {
     let config = psl::parse_configuration(datamodel)
         .map_err(|err| CoreError::new_schema_parser_error(err.to_pretty_string("schema.prisma", datamodel)))?;
 
+    extract_configuration(config)
+}
+
+fn parse_configuration_multi(files: &[(String, SourceFile)]) -> CoreResult<(Datasource, BitFlags<PreviewFeature>)> {
+    let (_, config) = psl::parse_configuration_multi_file(files)
+        .map_err(|(files, err)| CoreError::new_schema_parser_error(files.render_diagnostics(&err)))?;
+
+    extract_configuration(config)
+}
+
+fn extract_configuration(config: psl::Configuration) -> CoreResult<(Datasource, BitFlags<PreviewFeature>)> {
     let preview_features = config.preview_features();
 
     let source = config
@@ -190,13 +233,62 @@ fn parse_configuration(datamodel: &str) -> CoreResult<(Datasource, String, BitFl
         .next()
         .ok_or_else(|| CoreError::from_msg("There is no datasource in the schema.".into()))?;
 
-    let url = source
-        .load_direct_url(|key| env::var(key).ok())
-        .map_err(|err| CoreError::new_schema_parser_error(err.to_pretty_string("schema.prisma", datamodel)))?;
+    Ok((source, preview_features))
+}
 
-    let shadow_database_url = source
-        .load_shadow_database_url()
-        .map_err(|err| CoreError::new_schema_parser_error(err.to_pretty_string("schema.prisma", datamodel)))?;
+fn extract_configuration_ref(config: &psl::Configuration) -> CoreResult<(&Datasource, BitFlags<PreviewFeature>)> {
+    let preview_features = config.preview_features();
 
-    Ok((source, url, preview_features, shadow_database_url))
+    let source = config
+        .datasources
+        .first()
+        .ok_or_else(|| CoreError::from_msg("There is no datasource in the schema.".into()))?;
+
+    Ok((source, preview_features))
+}
+
+trait SchemaContainerExt {
+    fn to_psl_input(self) -> Vec<(String, SourceFile)>;
+}
+
+impl SchemaContainerExt for SchemasContainer {
+    fn to_psl_input(self) -> Vec<(String, SourceFile)> {
+        self.files.to_psl_input()
+    }
+}
+
+impl SchemaContainerExt for &SchemasContainer {
+    fn to_psl_input(self) -> Vec<(String, SourceFile)> {
+        (&self.files).to_psl_input()
+    }
+}
+
+impl SchemaContainerExt for Vec<SchemaContainer> {
+    fn to_psl_input(self) -> Vec<(String, SourceFile)> {
+        self.into_iter()
+            .map(|container| (container.path, SourceFile::from(container.content)))
+            .collect()
+    }
+}
+
+impl SchemaContainerExt for Vec<&SchemaContainer> {
+    fn to_psl_input(self) -> Vec<(String, SourceFile)> {
+        self.into_iter()
+            .map(|container| (container.path.clone(), SourceFile::from(&container.content)))
+            .collect()
+    }
+}
+
+impl SchemaContainerExt for &Vec<SchemaContainer> {
+    fn to_psl_input(self) -> Vec<(String, SourceFile)> {
+        self.iter()
+            .map(|container| (container.path.clone(), SourceFile::from(&container.content)))
+            .collect()
+    }
+}
+
+impl SchemaContainerExt for &SchemasWithConfigDir {
+    fn to_psl_input(self) -> Vec<(String, SourceFile)> {
+        (&self.files).to_psl_input()
+    }
 }

@@ -24,7 +24,7 @@ mod aggregation_sum {
                 runner,
                 "query { aggregateTestModel { _sum { int bInt float } } }"
             ),
-            @r###"{"data":{"aggregateTestModel":{"_sum":{"int":15,"bInt":"15","float":10.0}}}}"###
+            @r###"{"data":{"aggregateTestModel":{"_sum":{"int":15,"bInt":"15","float":10}}}}"###
         );
 
         Ok(())
@@ -39,7 +39,7 @@ mod aggregation_sum {
 
         insta::assert_snapshot!(
             run_query!(&runner, "query { aggregateTestModel(take: 2) { _sum { int bInt float } } }"),
-            @r###"{"data":{"aggregateTestModel":{"_sum":{"int":15,"bInt":"15","float":10.0}}}}"###
+            @r###"{"data":{"aggregateTestModel":{"_sum":{"int":15,"bInt":"15","float":10}}}}"###
         );
 
         insta::assert_snapshot!(

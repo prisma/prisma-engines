@@ -1,0 +1,13 @@
+datasource db {
+  provider = "mysql"
+}
+
+model Category {
+  id Int @id @default(uuid())
+}
+// [1;91merror[0m: [1mError parsing attribute "@default": The function `uuid()` cannot be used on fields of type `Int`.[0m
+//   [1;94m-->[0m  [4mschema.prisma:6[0m
+// [1;94m   | [0m
+// [1;94m 5 | [0mmodel Category {
+// [1;94m 6 | [0m  id Int @id [1;91m@default(uuid())[0m
+// [1;94m   | [0m

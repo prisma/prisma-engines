@@ -1,0 +1,14 @@
+generator client {
+  provider        = "prisma-client"
+  previewFeatures = ["views"]
+}
+
+datasource d<|>b {
+provider = "mongodb"
+}
+
+enum Pet {
+  Cat
+  Dog
+  Redpanda
+}

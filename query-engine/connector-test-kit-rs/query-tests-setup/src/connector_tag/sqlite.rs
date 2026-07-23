@@ -1,3 +1,5 @@
+use std::fmt::Display;
+
 use super::*;
 use crate::{BoxFuture, SqlDatamodelRenderer};
 use quaint::{prelude::Queryable, single::Quaint};
@@ -29,18 +31,18 @@ impl ConnectorTagInterface for SqliteConnectorTag {
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub enum SqliteVersion {
     V3,
-    LibsqlJsNapi,
     LibsqlJsWasm,
     CloudflareD1,
+    BetterSQLite3,
 }
 
-impl ToString for SqliteVersion {
-    fn to_string(&self) -> String {
+impl Display for SqliteVersion {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            SqliteVersion::V3 => "3".to_string(),
-            SqliteVersion::LibsqlJsNapi => "libsql.js".to_string(),
-            SqliteVersion::LibsqlJsWasm => "libsql.js.wasm".to_string(),
-            SqliteVersion::CloudflareD1 => "cfd1".to_owned(),
+            SqliteVersion::V3 => f.write_str("3"),
+            SqliteVersion::LibsqlJsWasm => f.write_str("libsql.js.wasm"),
+            SqliteVersion::CloudflareD1 => f.write_str("cfd1"),
+            SqliteVersion::BetterSQLite3 => f.write_str("better-sqlite3.js.wasm"),
         }
     }
 }
@@ -51,9 +53,9 @@ impl TryFrom<&str> for SqliteVersion {
     fn try_from(s: &str) -> Result<Self, Self::Error> {
         let version = match s {
             "3" => Self::V3,
-            "libsql.js" => Self::LibsqlJsNapi,
             "libsql.js.wasm" => Self::LibsqlJsWasm,
             "cfd1" => Self::CloudflareD1,
+            "better-sqlite3.js.wasm" => Self::BetterSQLite3,
             _ => return Err(TestError::parse_error(format!("Unknown SQLite version `{s}`"))),
         };
         Ok(version)

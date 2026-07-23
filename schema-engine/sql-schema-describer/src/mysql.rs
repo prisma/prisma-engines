@@ -1,15 +1,14 @@
 //! MySQL schema description.
 
 use crate::{getters::Getter, parsers::Parser, *};
-use bigdecimal::ToPrimitive;
 use indexmap::IndexMap;
 use indoc::indoc;
 use psl::{builtin_connectors::MySqlType, datamodel_connector::NativeTypeInstance};
 use quaint::{
-    prelude::{Queryable, ResultRow},
     Value,
+    prelude::{Queryable, ResultRow},
 };
-use std::borrow::Cow;
+use std::{borrow::Cow, sync::LazyLock};
 use tracing::trace;
 
 /// Matches a default value in the schema, wrapped single quotes.
@@ -19,7 +18,7 @@ use tracing::trace;
 /// ```ignore
 /// 'this is a test'
 /// ```
-static DEFAULT_QUOTES: Lazy<Regex> = Lazy::new(|| Regex::new(r"'(.*)'").unwrap());
+static DEFAULT_QUOTES: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"'(.*)'").unwrap());
 
 fn is_mariadb(version: &str) -> bool {
     version.contains("MariaDB")
@@ -57,21 +56,6 @@ pub struct SqlSchemaDescriber<'a> {
 
 #[async_trait::async_trait]
 impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber<'_> {
-    async fn list_databases(&self) -> DescriberResult<Vec<String>> {
-        self.get_databases().await
-    }
-
-    async fn get_metadata(&self, schema: &str) -> DescriberResult<SqlMetadata> {
-        let mut sql_schema = SqlSchema::default();
-        let table_count = self.get_table_names(schema, &mut sql_schema).await?.len();
-        let size_in_bytes = self.get_size(schema).await?;
-
-        Ok(SqlMetadata {
-            table_count,
-            size_in_bytes,
-        })
-    }
-
     #[tracing::instrument(skip(self))]
     async fn describe(&self, schemas: &[&str]) -> DescriberResult<SqlSchema> {
         let schema = schemas[0];
@@ -220,20 +204,6 @@ impl<'a> SqlSchemaDescriber<'a> {
     }
 
     #[tracing::instrument(skip(self))]
-    async fn get_databases(&self) -> DescriberResult<Vec<String>> {
-        let sql = "select schema_name as schema_name from information_schema.schemata;";
-        let rows = self.conn.query_raw(sql, &[]).await?;
-        let names = rows
-            .into_iter()
-            .map(|row| row.get_expect_string("schema_name"))
-            .collect();
-
-        trace!("Found schema names: {names:?}");
-
-        Ok(names)
-    }
-
-    #[tracing::instrument(skip(self))]
     async fn get_views(&self, schema: &str) -> DescriberResult<Vec<View>> {
         let sql = indoc! {r#"
             SELECT TABLE_NAME AS view_name, VIEW_DEFINITION AS view_sql
@@ -332,30 +302,6 @@ impl<'a> SqlSchemaDescriber<'a> {
         trace!("Found table names: {map:?}");
 
         Ok(map)
-    }
-
-    #[tracing::instrument(skip(self))]
-    async fn get_size(&self, schema: &str) -> DescriberResult<usize> {
-        let sql = r#"
-            SELECT
-            SUM(data_length + index_length) as size
-            FROM information_schema.TABLES
-            WHERE table_schema = ?
-        "#;
-
-        let result = self.conn.query_raw(sql, &[schema.into()]).await?;
-        let size = result
-            .first()
-            .and_then(|row| {
-                row.get("size")
-                    .and_then(|x| x.as_numeric())
-                    .and_then(|decimal| decimal.round(0).to_usize())
-            })
-            .unwrap_or(0);
-
-        trace!("Found db size: {size:?}");
-
-        Ok(size)
     }
 
     async fn get_all_columns(
@@ -532,7 +478,7 @@ impl<'a> SqlSchemaDescriber<'a> {
                                     )))
                                 }
                             }
-                            ColumnTypeFamily::Unsupported(_) => match default_expression {
+                            ColumnTypeFamily::Udt(_) | ColumnTypeFamily::Unsupported(_) => match default_expression {
                                 true => Self::dbgenerated_expression(&default_string),
                                 false => DefaultValue::db_generated(default_string),
                             },
@@ -611,7 +557,7 @@ impl<'a> SqlSchemaDescriber<'a> {
         default: Option<&Value<'_>>,
         sql_schema: &mut SqlSchema,
     ) -> ColumnType {
-        static UNSIGNEDNESS_RE: Lazy<Regex> = Lazy::new(|| Regex::new("(?i)unsigned$").unwrap());
+        static UNSIGNEDNESS_RE: LazyLock<Regex> = LazyLock::new(|| Regex::new("(?i)unsigned$").unwrap());
         let is_tinyint1 = || Self::extract_precision(full_data_type) == Some(1);
         let invalid_bool_default = || {
             default
@@ -769,7 +715,7 @@ impl<'a> SqlSchemaDescriber<'a> {
     }
 
     fn extract_precision(input: &str) -> Option<u32> {
-        static RE: Lazy<Regex> = Lazy::new(|| Regex::new(r".*\(([1-9])\)").unwrap());
+        static RE: LazyLock<Regex> = LazyLock::new(|| Regex::new(r".*\(([1-9])\)").unwrap());
         RE.captures(input)
             .and_then(|cap| cap.get(1).map(|precision| precision.as_str().parse::<u32>().unwrap()))
     }
@@ -779,9 +725,9 @@ impl<'a> SqlSchemaDescriber<'a> {
     // In addition, MariaDB will return string literals with the quotes and extra backslashes around
     // control characters like `\n`.
     fn unescape_and_unquote_default_string(default: String, flavour: &Flavour) -> String {
-        static MYSQL_ESCAPING_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r"\\('|\\[^\\])|'(')").unwrap());
-        static MARIADB_NEWLINE_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r"\\n").unwrap());
-        static MARIADB_DEFAULT_QUOTE_UNESCAPE_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r#"'(.*)'"#).unwrap());
+        static MYSQL_ESCAPING_RE: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"\\('|\\[^\\])|'(')").unwrap());
+        static MARIADB_NEWLINE_RE: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"\\n").unwrap());
+        static MARIADB_DEFAULT_QUOTE_UNESCAPE_RE: LazyLock<Regex> = LazyLock::new(|| Regex::new(r#"'(.*)'"#).unwrap());
 
         let maybe_unquoted: Cow<'_, str> = if matches!(flavour, Flavour::MariaDb) {
             let unquoted = MARIADB_DEFAULT_QUOTE_UNESCAPE_RE
@@ -799,8 +745,8 @@ impl<'a> SqlSchemaDescriber<'a> {
 
     /// Tests whether an introspected default value should be categorized as current_timestamp.
     fn default_is_current_timestamp(default_str: &str) -> bool {
-        static MYSQL_CURRENT_TIMESTAMP_RE: Lazy<Regex> =
-            Lazy::new(|| Regex::new(r"(?i)^current_timestamp(\([0-9]*\))?$").unwrap());
+        static MYSQL_CURRENT_TIMESTAMP_RE: LazyLock<Regex> =
+            LazyLock::new(|| Regex::new(r"(?i)^current_timestamp(\([0-9]*\))?$").unwrap());
 
         MYSQL_CURRENT_TIMESTAMP_RE.is_match(default_str)
     }

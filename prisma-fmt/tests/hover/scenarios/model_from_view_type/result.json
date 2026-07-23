@@ -1,0 +1,6 @@
+{
+  "contents": {
+    "kind": "markdown",
+    "value": "```prisma\nmodel ModelNameA {\n\t...\n\tval ModelNameB @relation(name: \"ModelNameAToModelNameB\", fields: [bId], references: [id])\n}\n```\n___\none-to-many\n___\nThis is doc for A"
+  }
+}

@@ -106,21 +106,26 @@ async fn run_with_io(
     loop {
         tokio::select! {
             next_line = input_lines.next_line() => {
-                handle_stdin_next_line(next_line, stdout_sender.clone(), handler, &mut in_flight).await?;
+                match next_line? {
+                    Some(next_line) => handle_stdin_next_line(next_line, stdout_sender.clone(), handler, &mut in_flight).await?,
+                    None => client_adapter.request_receiver.close()
+                }
             }
             next_request = client_adapter.request_receiver.recv() => {
-                handle_next_client_request(next_request, &mut stdout_sender, &mut in_flight).await?;
+                match next_request {
+                    Some(next_request) => handle_next_client_request(next_request, &mut stdout_sender, &mut in_flight).await?,
+                    None => break Ok(())
+                }
             }
         }
     }
 }
 
 async fn handle_next_client_request(
-    next_request: Option<(jsonrpc_core::MethodCall, oneshot::Sender<jsonrpc_core::Output>)>,
+    (next_request, channel): (jsonrpc_core::MethodCall, oneshot::Sender<jsonrpc_core::Output>),
     stdout_sender: &mut mpsc::Sender<Vec<u8>>,
     in_flight: &mut HashMap<jsonrpc_core::Id, oneshot::Sender<jsonrpc_core::Output>>,
 ) -> io::Result<()> {
-    let (next_request, channel) = next_request.unwrap();
     in_flight.insert(next_request.id.clone(), channel);
     let request_json = serde_json::to_vec(&next_request)?;
     stdout_sender.send(request_json).await.unwrap();
@@ -128,17 +133,11 @@ async fn handle_next_client_request(
 }
 
 async fn handle_stdin_next_line(
-    next_line: io::Result<Option<String>>,
+    next_line: String,
     stdout_sender: mpsc::Sender<Vec<u8>>,
     handler: &IoHandler,
     in_flight: &mut HashMap<jsonrpc_core::Id, oneshot::Sender<jsonrpc_core::Output>>,
 ) -> io::Result<()> {
-    let next_line = if let Some(next_line) = next_line? {
-        next_line
-    } else {
-        return Ok(());
-    };
-
     match serde_json::from_str::<Message>(&next_line)? {
         Message::Request(request) => {
             let handler = handler.clone();

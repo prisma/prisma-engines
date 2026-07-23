@@ -1,9 +1,11 @@
-use super::{column, enums::EnumDiffer, table::TableDiffer};
-use crate::{flavour::SqlFlavour, migration_pair::MigrationPair, SqlDatabaseSchema};
+use super::{SqlSchemaDifferFlavour, column, enums::EnumDiffer, table::TableDiffer};
+use crate::{SqlDatabaseSchema, migration_pair::MigrationPair};
+use indexmap::IndexMap;
+use schema_connector::SchemaFilter;
 use sql_schema_describer::{
+    NamespaceId, NamespaceWalker, TableColumnId, TableId,
     postgres::{ExtensionId, ExtensionWalker, PostgresSchemaExt},
     walkers::{EnumWalker, TableColumnWalker, TableWalker},
-    NamespaceId, NamespaceWalker, TableColumnId, TableId,
 };
 use std::{
     borrow::Cow,
@@ -14,27 +16,33 @@ use std::{
 type Table<'a> = (Option<Cow<'a, str>>, Cow<'a, str>);
 
 pub(crate) struct DifferDatabase<'a> {
-    pub(super) flavour: &'a dyn SqlFlavour,
+    pub(super) flavour: &'a dyn SqlSchemaDifferFlavour,
     /// The schemas being diffed
     pub(crate) schemas: MigrationPair<&'a SqlDatabaseSchema>,
+    /// The filter used to diff the schemas
+    pub(crate) filter: &'a SchemaFilter,
     /// Namespace name -> namespace indexes.
-    namespaces: HashMap<Cow<'a, str>, MigrationPair<Option<NamespaceId>>>,
+    namespaces: IndexMap<Cow<'a, str>, MigrationPair<Option<NamespaceId>>>,
     /// Table name -> table indexes.
-    tables: HashMap<Table<'a>, MigrationPair<Option<TableId>>>,
+    tables: IndexMap<Table<'a>, MigrationPair<Option<TableId>>>,
     /// (table_idxs, column_name) -> column_idxs. BTreeMap because we want range
     /// queries (-> all the columns in a table).
     columns: BTreeMap<(MigrationPair<TableId>, &'a str), MigrationPair<Option<TableColumnId>>>,
     /// (table_idx, column_idx) -> ColumnChanges
     column_changes: HashMap<MigrationPair<TableColumnId>, column::ColumnChanges>,
     /// Postgres extension name -> extension indexes.
-    pub(super) extensions: HashMap<&'a str, MigrationPair<Option<ExtensionId>>>,
+    pub(crate) extensions: HashMap<&'a str, MigrationPair<Option<ExtensionId>>>,
     /// Tables that will need to be completely redefined (dropped and recreated) for the migration
     /// to succeed. It needs to be crate public because it is set from the flavour.
     pub(crate) tables_to_redefine: BTreeSet<MigrationPair<TableId>>,
 }
 
 impl<'a> DifferDatabase<'a> {
-    pub(crate) fn new(schemas: MigrationPair<&'a SqlDatabaseSchema>, flavour: &'a dyn SqlFlavour) -> Self {
+    pub(crate) fn new(
+        schemas: MigrationPair<&'a SqlDatabaseSchema>,
+        flavour: &'a dyn SqlSchemaDifferFlavour,
+        filter: &'a SchemaFilter,
+    ) -> Self {
         let namespace_count_lb = std::cmp::max(
             schemas.previous.describer_schema.namespaces_count(),
             schemas.next.describer_schema.namespaces_count(),
@@ -47,8 +55,9 @@ impl<'a> DifferDatabase<'a> {
         let mut db = DifferDatabase {
             flavour,
             schemas,
-            namespaces: HashMap::with_capacity(namespace_count_lb),
-            tables: HashMap::with_capacity(table_count_lb),
+            filter,
+            namespaces: IndexMap::with_capacity(namespace_count_lb),
+            tables: IndexMap::with_capacity(table_count_lb),
             columns: BTreeMap::new(),
             column_changes: Default::default(),
             extensions: Default::default(),
@@ -190,6 +199,7 @@ impl<'a> DifferDatabase<'a> {
             .filter(|p| p.previous.is_none())
             .filter_map(|p| p.next)
             .map(move |table_id| self.schemas.next.walk(table_id))
+            .filter(|table| !self.is_table_external(table))
     }
 
     pub(crate) fn created_namespaces(&self) -> impl Iterator<Item = NamespaceWalker<'_>> + '_ {
@@ -198,6 +208,7 @@ impl<'a> DifferDatabase<'a> {
             .filter(|p| p.previous.is_none())
             .filter_map(|p| p.next)
             .map(move |namespace_id| self.schemas.next.walk(namespace_id))
+            .filter(|namespace| !self.is_namespace_external(namespace))
     }
 
     pub(crate) fn dropped_columns(&self, table: MigrationPair<TableId>) -> impl Iterator<Item = TableColumnId> + '_ {
@@ -212,6 +223,7 @@ impl<'a> DifferDatabase<'a> {
             .filter(|p| p.next.is_none())
             .filter_map(|p| p.previous)
             .map(move |table_id| self.schemas.previous.walk(table_id))
+            .filter(|table| !self.is_table_external(table))
     }
 
     fn range_columns(
@@ -237,12 +249,14 @@ impl<'a> DifferDatabase<'a> {
                 tables: self.schemas.walk(table_ids),
                 db: self,
             })
+            .filter(|tables| !self.is_table_pair_external(tables.tables))
     }
 
     /// Same as `table_pairs()`, but with the redefined tables filtered out.
     pub(crate) fn non_redefined_table_pairs<'db>(&'db self) -> impl Iterator<Item = TableDiffer<'a, 'db>> + 'db {
         self.table_pairs()
             .filter(move |differ| !self.tables_to_redefine.contains(&differ.table_ids()))
+            .filter(|differ| !self.is_table_pair_external(differ.tables))
     }
 
     pub(crate) fn table_is_redefined(&self, namespace: Option<Cow<'_, str>>, table_name: Cow<'_, str>) -> bool {
@@ -311,12 +325,53 @@ impl<'a> DifferDatabase<'a> {
         })
     }
 
+    fn is_table_external(&self, table: &TableWalker<'_>) -> bool {
+        // TODO:(schema-filter) optimize for speed to avoid recomputing the underlying contains?
+        self.flavour
+            .contains_table(&self.filter.external_tables, table.namespace(), table.name())
+    }
+
+    fn is_table_pair_external(&self, tables: MigrationPair<TableWalker<'_>>) -> bool {
+        if self.is_table_external(&tables.next) ^ self.is_table_external(&tables.previous) {
+            unreachable!("Table is external in one schema but not in the other");
+        }
+        self.is_table_external(&tables.previous) && self.is_table_external(&tables.next)
+    }
+
+    /// A namespace is external if it contains only external tables.
+    /// If a a namespace is fully external we don't want to create `CREATE SCHEMA` statements for it.
+    fn is_namespace_external(&self, namespace: &NamespaceWalker<'_>) -> bool {
+        let all_tables_are_external = self
+            .tables
+            .iter()
+            .filter(|(k, _)| k.0.as_deref() == Some(namespace.name()))
+            .all(|(k, _)| {
+                self.flavour
+                    .contains_table(&self.filter.external_tables, k.0.as_deref(), k.1.as_ref())
+            });
+        let has_enums = self.created_enums().any(|e| e.namespace() == Some(namespace.name()));
+        all_tables_are_external && !has_enums
+    }
+
+    fn is_enum_external(&self, enum_walker: &EnumWalker<'_>) -> bool {
+        self.flavour
+            .contains_table(&self.filter.external_enums, enum_walker.namespace(), enum_walker.name())
+    }
+
     fn previous_enums(&self) -> impl Iterator<Item = EnumWalker<'a>> {
-        self.schemas.previous.describer_schema.enum_walkers()
+        self.schemas
+            .previous
+            .describer_schema
+            .enum_walkers()
+            .filter(|e| !self.is_enum_external(e))
     }
 
     fn next_enums(&self) -> impl Iterator<Item = EnumWalker<'a>> {
-        self.schemas.next.describer_schema.enum_walkers()
+        self.schemas
+            .next
+            .describer_schema
+            .enum_walkers()
+            .filter(|e| !self.is_enum_external(e))
     }
 
     fn previous_extensions(&self) -> impl Iterator<Item = ExtensionWalker<'a>> {

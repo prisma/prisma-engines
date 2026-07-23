@@ -25,6 +25,7 @@ mod postgres;
 mod relation_mode;
 mod relations;
 mod reset_tests;
+mod schema_filter;
 mod shadow_database_url_configuration;
 mod soft_resets;
 mod sql;

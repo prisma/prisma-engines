@@ -1,4 +1,5 @@
 use super::{Span, WithSpan};
+use diagnostics::FileId;
 
 /// An identifier.
 #[derive(Debug, Clone, PartialEq)]
@@ -9,17 +10,17 @@ pub struct Identifier {
     pub span: Span,
 }
 
-impl WithSpan for Identifier {
-    fn span(&self) -> Span {
-        self.span
+impl Identifier {
+    pub(crate) fn new<T: pest::RuleType>(pair: pest::iterators::Pair<'_, T>, file_id: FileId) -> Self {
+        Identifier {
+            name: pair.as_str().to_owned(),
+            span: (file_id, pair.as_span()).into(),
+        }
     }
 }
 
-impl<T: pest::RuleType> From<pest::iterators::Pair<'_, T>> for Identifier {
-    fn from(pair: pest::iterators::Pair<'_, T>) -> Self {
-        Identifier {
-            name: pair.as_str().to_owned(),
-            span: pair.as_span().into(),
-        }
+impl WithSpan for Identifier {
+    fn span(&self) -> Span {
+        self.span
     }
 }

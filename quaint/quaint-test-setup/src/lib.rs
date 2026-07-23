@@ -1,6 +1,7 @@
 mod tags;
 
-pub use once_cell::sync::Lazy;
+use std::sync::LazyLock;
+
 pub use tags::*;
 
 pub fn run_with_tokio<O, F: std::future::Future<Output = O>>(fut: F) -> O {
@@ -22,13 +23,13 @@ fn connector_names() -> Vec<(&'static str, &'static str, Tags)> {
     ]
 }
 
-pub static CONNECTORS: Lazy<Connectors> = Lazy::new(|| {
+pub static CONNECTORS: LazyLock<Connectors> = LazyLock::new(|| {
     let connectors: Vec<ConnectorDefinition> = connector_names()
         .iter()
         .map(|(name, feature_name, tags)| ConnectorDefinition {
             name: (*name).to_owned(),
             feature_name: (*feature_name).to_owned(),
-            test_api_factory_name: format!("{}_test_api", name),
+            test_api_factory_name: format!("{name}_test_api"),
             tags: *tags,
         })
         .collect();

@@ -2,7 +2,7 @@ use indoc::indoc;
 use query_engine_tests::*;
 
 #[test_suite(only(Postgres, CockroachDb))]
-mod datetime {
+mod postgres_datetime {
     fn schema_date() -> String {
         let schema = indoc! {
             r#"model Parent {
@@ -65,7 +65,7 @@ mod datetime {
 
     async fn create_row(runner: &Runner, data: &str) -> TestResult<()> {
         runner
-            .query(format!("mutation {{ createOneParent(data: {}) {{ id }} }}", data))
+            .query(format!("mutation {{ createOneParent(data: {data}) {{ id }} }}"))
             .await?
             .assert_success();
         Ok(())
@@ -73,7 +73,7 @@ mod datetime {
 }
 
 #[test_suite(only(Postgres))]
-mod decimal {
+mod postgres_decimal {
     fn schema_decimal() -> String {
         let schema = indoc! {
             r#"
@@ -127,7 +127,7 @@ mod decimal {
 
     async fn create_row(runner: &Runner, data: &str) -> TestResult<()> {
         runner
-            .query(format!("mutation {{ createOneParent(data: {}) {{ id }} }}", data))
+            .query(format!("mutation {{ createOneParent(data: {data}) {{ id }} }}"))
             .await?
             .assert_success();
         Ok(())
@@ -135,7 +135,38 @@ mod decimal {
 }
 
 #[test_suite(only(Postgres))]
-mod string {
+mod postgres_money {
+    fn schema_decimal() -> String {
+        let schema = indoc! {
+            r#"
+            model Table {
+              #id(id, Int, @id)
+
+              money     Decimal   @test.Money
+              moneyList Decimal[] @test.Money
+            }"#
+        };
+
+        schema.to_owned()
+    }
+
+    #[connector_test(schema(schema_decimal))]
+    async fn native_money_type(runner: Runner) -> TestResult<()> {
+        runner.raw_execute(
+            r#"INSERT INTO "Table" ("id", "money", "moneyList") VALUES (1, '$300,000.52', array['$100,000.00', '$200.25']::money[]);"#,
+        ).await?;
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"{ findManyTable { id money moneyList } }"#),
+          @r###"{"data":{"findManyTable":[{"id":1,"money":"300000.52","moneyList":["100000","200.25"]}]}}"###
+        );
+
+        Ok(())
+    }
+}
+
+#[test_suite(only(Postgres))]
+mod postgres_string {
     fn schema_string() -> String {
         let schema = indoc! {
             r#"
@@ -205,7 +236,7 @@ mod string {
 
     async fn create_row(runner: &Runner, data: &str) -> TestResult<()> {
         runner
-            .query(format!("mutation {{ createOneParent(data: {}) {{ id }} }}", data))
+            .query(format!("mutation {{ createOneParent(data: {data}) {{ id }} }}"))
             .await?
             .assert_success();
         Ok(())
@@ -214,21 +245,9 @@ mod string {
 
 #[test_suite(
     schema(schema),
-    only(Postgres(
-        "9",
-        "10",
-        "11",
-        "12",
-        "13",
-        "14",
-        "15",
-        "pg.js",
-        "pg.js.wasm",
-        "neon.js",
-        "neon.js.wasm"
-    ))
+    only(Postgres("9", "10", "11", "12", "13", "14", "15", "pg.js.wasm", "neon.js.wasm"))
 )]
-mod others {
+mod postgres_others {
     fn schema_other_types() -> String {
         let schema = indoc! {
             r#"
@@ -328,7 +347,7 @@ mod others {
 
     async fn create_row(runner: &Runner, data: &str) -> TestResult<()> {
         runner
-            .query(format!("mutation {{ createOneParent(data: {}) {{ id }} }}", data))
+            .query(format!("mutation {{ createOneParent(data: {data}) {{ id }} }}"))
             .await?
             .assert_success();
         Ok(())

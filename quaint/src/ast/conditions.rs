@@ -111,11 +111,7 @@ impl<'a> ConditionTree<'a> {
 
     /// Inverts the entire condition tree if condition is met.
     pub fn invert_if(self, invert: bool) -> ConditionTree<'a> {
-        if invert {
-            self.not()
-        } else {
-            self
-        }
+        if invert { self.not() } else { self }
     }
 }
 

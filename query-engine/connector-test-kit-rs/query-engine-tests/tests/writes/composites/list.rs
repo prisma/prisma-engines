@@ -1,7 +1,7 @@
 use query_engine_tests::*;
 
 #[test_suite(schema(to_many_composites), only(MongoDb))]
-mod create {
+mod create_list {
     use query_engine_tests::run_query;
 
     /// Using explicit `set` operators, create (deeply nested) composite lists.
@@ -334,7 +334,7 @@ mod create {
 }
 
 #[test_suite(schema(to_many_composites), only(MongoDb))]
-mod update {
+mod update_list {
     use indoc::indoc;
     use query_engine_tests::{assert_error, run_query};
 

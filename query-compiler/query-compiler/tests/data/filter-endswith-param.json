@@ -1,0 +1,22 @@
+{
+  "modelName": "User",
+  "action": "findMany",
+  "query": {
+    "arguments": {
+      "where": {
+        "email": {
+          "endsWith": {
+            "$type": "Param",
+            "value": {
+              "name": "suffix",
+              "type": "String"
+            }
+          }
+        }
+      }
+    },
+    "selection": {
+      "$scalars": true
+    }
+  }
+}

@@ -1,0 +1,32 @@
+---
+source: query-compiler/query-compiler/tests/queries.rs
+expression: pretty
+input_file: query-compiler/query-compiler/tests/data/query-many-one2m.json
+---
+dataMap {
+    id: Int (id)
+    title: String (title)
+    userId: Int (userId)
+    user (from @nested$user): {
+        id: Int (id)
+        email: String (email)
+        role: Enum<Role> (role)
+    }
+}
+enums {
+    Role: {
+        admin: ADMIN
+        user: USER
+    }
+}
+let @parent = query «SELECT "public"."Post"."id", "public"."Post"."title",
+                     "public"."Post"."userId" FROM "public"."Post" WHERE 1=1
+                     OFFSET $1»
+              params [const(BigInt(0))]
+in let @parent$userId = mapField userId (get @parent)
+   in join (get @parent)
+      with (query «SELECT "public"."User"."id", "public"."User"."email",
+                   "public"."User"."role"::text FROM "public"."User" WHERE
+                   "public"."User"."id" IN [$1,*] OFFSET $2»
+            params [var(@parent$userId as Int),
+                    const(BigInt(0))]) on unique left.(userId) = right.(id) as @nested$user

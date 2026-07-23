@@ -1,5 +1,29 @@
+use std::borrow::Cow;
+
+#[derive(Debug, Clone, PartialEq)]
+pub enum PostgresType {
+    Known(KnownPostgresType),
+    Unknown(String, Vec<String>),
+}
+
+impl PostgresType {
+    pub fn to_parts(&self) -> (&str, Cow<'_, [String]>) {
+        match self {
+            Self::Known(known) => known.to_parts(),
+            Self::Unknown(name, args) => (name.as_str(), Cow::Borrowed(args)),
+        }
+    }
+
+    pub fn as_known(&self) -> Option<&KnownPostgresType> {
+        match self {
+            Self::Known(known) => Some(known),
+            Self::Unknown(_, _) => None,
+        }
+    }
+}
+
 crate::native_type_definition! {
-    PostgresType;
+    KnownPostgresType;
     SmallInt -> Int,
     Integer -> Int,
     BigInt -> BigInt,

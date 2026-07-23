@@ -1,25 +1,45 @@
-use expect_test::{expect, Expect};
+use expect_test::{Expect, expect};
+use schema_core::{
+    DatasourceUrls,
+    json_rpc::types::{SchemaFilter, SchemasContainer},
+};
 use sql_migration_tests::test_api::*;
 use std::sync::Arc;
 
-fn check(from: &str, to: &str, expectation: Expect) {
+fn check(provider: &str, from: &str, to: &str, expectation: Expect) {
     let tmpdir = tempfile::tempdir().unwrap();
     let from_schema = write_file_to_tmp(from, &tmpdir, "from.prisma");
     let to_schema = write_file_to_tmp(to, &tmpdir, "to.prisma");
+
     let params = DiffParams {
         exit_code: None,
-        from: schema_core::json_rpc::types::DiffTarget::SchemaDatamodel(SchemaContainer {
-            schema: from_schema.to_str().unwrap().to_owned(),
+        from: schema_core::json_rpc::types::DiffTarget::SchemaDatamodel(SchemasContainer {
+            files: vec![SchemaContainer {
+                path: from_schema.to_str().unwrap().to_owned(),
+                content: from.to_string(),
+            }],
         }),
         script: false,
-        shadow_database_url: None,
-        to: schema_core::json_rpc::types::DiffTarget::SchemaDatamodel(SchemaContainer {
-            schema: to_schema.to_str().unwrap().to_owned(),
+        to: schema_core::json_rpc::types::DiffTarget::SchemaDatamodel(SchemasContainer {
+            files: vec![SchemaContainer {
+                path: to_schema.to_str().unwrap().to_owned(),
+                content: to.to_string(),
+            }],
         }),
+        filters: SchemaFilter::default(),
     };
 
     let host = Arc::new(TestConnectorHost::default());
-    let api = schema_core::schema_api(None, Some(host.clone())).unwrap();
+    let api = schema_core::schema_api_without_extensions(
+        None,
+        DatasourceUrls::from_url(match provider {
+            "sqlite" => "file:unused".into(),
+            _ => format!("{provider}://unused"),
+        }),
+        Some(host.clone()),
+    )
+    .unwrap();
+
     test_setup::runtime::run_with_thread_local_runtime(api.diff(params)).unwrap();
     let printed_messages = host.printed_messages.lock().unwrap();
     assert!(printed_messages.len() == 1, "{printed_messages:?}");
@@ -35,16 +55,15 @@ fn write_file_to_tmp(contents: &str, tempdir: &tempfile::TempDir, name: &str) ->
 #[test]
 fn empty_schemas() {
     check(
+        "sqlite",
         r#"
         datasource db {
             provider = "sqlite"
-            url = "file:test.db"
         }
         "#,
         r#"
         datasource db {
-            provider = "postgresql"
-            url = env("TEST_DATABASE_URL")
+            provider = "sqlite"
         }
         "#,
         expect![[r#"
@@ -54,18 +73,57 @@ fn empty_schemas() {
 }
 
 #[test]
+fn additions_schemas() {
+    check(
+        "postgres",
+        r#"
+        datasource db {
+            provider = "postgres"
+        }
+        "#,
+        r#"
+        datasource db {
+            provider = "postgres"
+            schemas = ["one", "two"]
+        }
+
+        model Cat {
+            id Int @id
+
+            @@schema("one")
+        }
+
+        model Dog {
+            id Int @id
+
+            @@schema("two")
+        }
+        "#,
+        expect![[r#"
+
+            [+] Added Schemas
+              - one
+              - two
+
+            [+] Added tables
+              - Cat
+              - Dog
+        "#]],
+    );
+}
+
+#[test]
 fn additions_table() {
     check(
+        "sqlite",
         r#"
         datasource db {
             provider = "sqlite"
-            url = "file:test.db"
         }
         "#,
         r#"
         datasource db {
             provider = "sqlite"
-            url = "file:test.db"
         }
 
         model Cat {
@@ -83,10 +141,10 @@ fn additions_table() {
 #[test]
 fn additions_column() {
     check(
+        "sqlite",
         r#"
         datasource db {
             provider = "sqlite"
-            url = "file:test.db"
         }
 
         model Cat {
@@ -96,7 +154,6 @@ fn additions_column() {
         r#"
         datasource db {
             provider = "sqlite"
-            url = "file:test.db"
         }
 
         model Cat {
@@ -115,16 +172,15 @@ fn additions_column() {
 #[test]
 fn additions_enum() {
     check(
+        "postgres",
         r#"
         datasource db {
             provider = "postgres"
-            url = "postgres://localhost:5432/testdb"
         }
         "#,
         r#"
         datasource db {
             provider = "postgres"
-            url = "postgres://localhost:5432/testdb"
         }
 
         enum Color {
@@ -144,16 +200,15 @@ fn additions_enum() {
 #[test]
 fn additions_mixed() {
     check(
+        "postgres",
         r#"
         datasource db {
             provider = "postgres"
-            url = "postgres://localhost:5432/testdb"
         }
         "#,
         r#"
         datasource db {
             provider = "postgres"
-            url = "postgres://localhost:5432/testdb"
         }
 
         model Cat {
@@ -181,10 +236,10 @@ fn additions_mixed() {
 #[test]
 fn deletions_table() {
     check(
+        "sqlite",
         r#"
         datasource db {
             provider = "sqlite"
-            url = "file:test.db"
         }
 
         model Cat {
@@ -194,7 +249,6 @@ fn deletions_table() {
         r#"
         datasource db {
             provider = "sqlite"
-            url = "file:test.db"
         }
         "#,
         expect![[r#"
@@ -208,10 +262,10 @@ fn deletions_table() {
 #[test]
 fn deletions_enum() {
     check(
+        "postgres",
         r#"
         datasource db {
             provider = "postgres"
-            url = "postgres://localhost:5432/testdb"
         }
 
         enum Color {
@@ -223,7 +277,6 @@ fn deletions_enum() {
         r#"
         datasource db {
             provider = "postgres"
-            url = "postgres://localhost:5432/testdb"
         }
         "#,
         expect![[r#"
@@ -237,10 +290,10 @@ fn deletions_enum() {
 #[test]
 fn deletions_mixed() {
     check(
+        "postgres",
         r#"
         datasource db {
             provider = "postgres"
-            url = "postgres://localhost:5432/testdb"
         }
 
         model Cat {
@@ -257,7 +310,6 @@ fn deletions_mixed() {
         r#"
         datasource db {
             provider = "postgres"
-            url = "postgres://localhost:5432/testdb"
         }
         "#,
         expect![[r#"
@@ -274,10 +326,10 @@ fn deletions_mixed() {
 #[test]
 fn deletions_column() {
     check(
+        "mysql",
         r#"
         datasource db {
             provider = "mysql"
-            url = "mysql://localhost/testdb"
         }
 
         model Cat {
@@ -288,7 +340,6 @@ fn deletions_column() {
         r#"
         datasource db {
             provider = "mysql"
-            url = "mysql://localhost/testdb"
         }
 
         model Cat {
@@ -306,10 +357,10 @@ fn deletions_column() {
 #[test]
 fn additions_and_deletions_mixed() {
     check(
+        "postgres",
         r#"
         datasource db {
             provider = "postgres"
-            url = "postgres://localhost:5432/testdb"
         }
 
         model Cat {
@@ -326,7 +377,6 @@ fn additions_and_deletions_mixed() {
         r#"
         datasource db {
             provider = "postgres"
-            url = "postgres://localhost:5432/testdb"
         }
 
         model Dog {
@@ -351,10 +401,10 @@ fn additions_and_deletions_mixed() {
 #[test]
 fn multiple_changed_tables_and_enums() {
     check(
+        "postgres",
         r#"
         datasource db {
             provider = "postgres"
-            url = "postgres://localhost:5432/testdb"
         }
 
         model Cat {
@@ -377,7 +427,6 @@ fn multiple_changed_tables_and_enums() {
         r#"
         datasource db {
             provider = "postgres"
-            url = "postgres://localhost:5432/testdb"
         }
 
         model Dog {

@@ -15,25 +15,29 @@ pub struct DatabaseCreationFailed {
     code = "P3001",
     message = "Migration possible with destructive changes and possible data loss: {destructive_details}"
 )]
+#[allow(dead_code)]
 pub struct DestructiveMigrationDetected {
     pub destructive_details: String,
 }
 
+/// No longer used.
 #[derive(Debug, UserFacingError, Serialize)]
 #[user_facing(
     code = "P3002",
     message = "The attempted migration was rolled back: {database_error}"
 )]
+#[allow(dead_code)]
 struct MigrationRollback {
     pub database_error: String,
 }
 
-// No longer used.
+/// No longer used.
 #[derive(Debug, SimpleUserFacingError)]
 #[user_facing(
     code = "P3003",
     message = "The format of migrations changed, the saved migrations are no longer valid. To solve this problem, please follow the steps at: https://pris.ly/d/migrate"
 )]
+#[allow(dead_code)]
 pub struct DatabaseMigrationFormatChanged;
 
 #[derive(Debug, UserFacingError, Serialize)]
@@ -251,8 +255,12 @@ impl crate::UserFacingError for ProviderSwitchedError {
         let expected_provider = &self.expected_provider;
 
         match (provider.as_str(), expected_provider.as_str()) {
-            ("cockroachdb", "postgresql") => format!("The datasource provider `{provider}` specified in your schema does not match the one specified in the migration_lock.toml, `{expected_provider}`. Check out the following documentation for how to resolve this: https://pris.ly/d/cockroachdb-postgresql-provider"),
-            _ => format!("The datasource provider `{provider}` specified in your schema does not match the one specified in the migration_lock.toml, `{expected_provider}`. Please remove your current migration directory and start a new migration history with prisma migrate dev. Read more: https://pris.ly/d/migrate-provider-switch")
+            ("cockroachdb", "postgresql") => format!(
+                "The datasource provider `{provider}` specified in your schema does not match the one specified in the migration_lock.toml, `{expected_provider}`. Check out the following documentation for how to resolve this: https://pris.ly/d/cockroachdb-postgresql-provider"
+            ),
+            _ => format!(
+                "The datasource provider `{provider}` specified in your schema does not match the one specified in the migration_lock.toml, `{expected_provider}`. Please remove your current migration directory and start a new migration history with prisma migrate dev. Read more: https://pris.ly/d/migrate-provider-switch"
+            ),
         }
     }
 }
@@ -279,6 +287,20 @@ pub struct ForeignKeyCreationNotAllowed;
 pub struct DirectDdlNotAllowed;
 
 #[derive(Debug, SimpleUserFacingError)]
+#[user_facing(
+    code = "P3023",
+    message = "For the current database, `externalTables` & `externalEnums` in your prisma config must contain only fully qualified identifiers (e.g. `schema_name.table_name`)."
+)]
+pub struct MissingNamespaceInExternalTables;
+
+#[derive(Debug, SimpleUserFacingError)]
+#[user_facing(
+    code = "P3024",
+    message = "For the current database, `externalTables` & `externalEnums` in your prisma config must contain only simple identifiers without a schema name."
+)]
+pub struct UnexpectedNamespaceInExternalTables;
+
+#[derive(Debug, SimpleUserFacingError)]
 #[user_facing(code = "P4001", message = "The introspected database was empty.")]
 pub struct IntrospectionResultEmpty;
 
@@ -291,6 +313,10 @@ pub struct DatabaseSchemaInconsistent {
     /// The schema was inconsistent and therefore introspection failed.
     pub explanation: String,
 }
+
+#[derive(Debug, SimpleUserFacingError)]
+#[user_facing(code = "P4003", message = "No URL defined in the configured datasource")]
+pub struct MissingConfigDatasourceUrl;
 
 #[cfg(test)]
 mod tests {

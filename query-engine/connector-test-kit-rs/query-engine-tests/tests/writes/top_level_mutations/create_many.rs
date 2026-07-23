@@ -1,7 +1,6 @@
 use query_engine_tests::*;
 
-// TODO: create many returns the wrong count for CFD1
-#[test_suite(capabilities(CreateMany), exclude(Sqlite("cfd1")))]
+#[test_suite(capabilities(CreateMany))]
 mod create_many {
     use indoc::indoc;
     use query_engine_tests::{assert_error, run_query};
@@ -102,7 +101,7 @@ mod create_many {
 
     // Covers: AutoIncrement ID working with basic autonincrement functionality.
     #[connector_test(schema(schema_2_cockroachdb), only(CockroachDb))]
-    async fn basic_create_many_autoincrement_cockroachdb(runner: Runner) -> TestResult<()> {
+    async fn basic_create_many_autoinc_cockroachdb(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(&runner, r#"mutation {
             createManyTest(data: [
@@ -353,11 +352,8 @@ mod create_many {
         Ok(())
     }
 
-    // LibSQL & co are ignored because they don't support metrics
-    #[connector_test(schema(schema_7), only(Sqlite("3")))]
-    async fn create_many_by_shape_counter_1(runner: Runner) -> TestResult<()> {
-        use query_engine_metrics::PRISMA_DATASOURCE_QUERIES_TOTAL;
-
+    #[connector_test(schema(schema_7), only(Sqlite))]
+    async fn create_many_by_shape_counter_1(mut runner: Runner) -> TestResult<()> {
         // Generated queries:
         // INSERT INTO `main`.`Test` (`opt`, `req`) VALUES (null, ?), (?, ?) params=[1,2,2]
         // INSERT INTO `main`.`Test` (`opt_default`, `opt`, `req`) VALUES (?, null, ?), (?, ?, ?) params=[3,3,6,6,6]
@@ -382,24 +378,25 @@ mod create_many {
             }"#
         );
 
-        let json = runner.get_metrics().to_json(Default::default());
-        let counter = metrics::get_counter(&json, PRISMA_DATASOURCE_QUERIES_TOTAL);
+        let count = runner
+            .get_logs()
+            .await
+            .into_iter()
+            .filter(|s| s.contains("INSERT INTO"))
+            .count();
 
         match runner.max_bind_values() {
-            Some(x) if x > 18 => assert_eq!(counter, 6), // 4 queries in total (BEGIN/COMMIT are counted)
+            Some(x) if x > 18 => assert_eq!(count, 4),
             // Some queries are being split because of `QUERY_BATCH_SIZE` being set to `10` in dev.
-            Some(_) => assert_eq!(counter, 7), // 5 queries in total (BEGIN/COMMIT are counted)
+            Some(_) => assert_eq!(count, 5),
             _ => panic!("Expected max bind values to be set"),
         }
 
         Ok(())
     }
 
-    // LibSQL & co are ignored because they don't support metrics
-    #[connector_test(schema(schema_7), only(Sqlite("3")))]
-    async fn create_many_by_shape_counter_2(runner: Runner) -> TestResult<()> {
-        use query_engine_metrics::PRISMA_DATASOURCE_QUERIES_TOTAL;
-
+    #[connector_test(schema(schema_7), only(Sqlite))]
+    async fn create_many_by_shape_counter_2(mut runner: Runner) -> TestResult<()> {
         // Generated queries:
         // INSERT INTO `main`.`Test` ( `opt_default_static`, `req_default_static`, `opt`, `req` ) VALUES (?, ?, null, ?), (?, ?, null, ?), (?, ?, null, ?) params=[1,1,1,2,1,2,1,3,3]
         // INSERT INTO `main`.`Test` ( `opt_default_static`, `req_default_static`, `opt`, `req` ) VALUES (?, ?, ?, ?), (?, ?, ?, ?) params=[1,1,8,4,1,1,null,5]
@@ -421,24 +418,25 @@ mod create_many {
             }"#
         );
 
-        let json = runner.get_metrics().to_json(Default::default());
-        let counter = metrics::get_counter(&json, PRISMA_DATASOURCE_QUERIES_TOTAL);
+        let count = runner
+            .get_logs()
+            .await
+            .into_iter()
+            .filter(|s| s.contains("INSERT INTO"))
+            .count();
 
         match runner.max_bind_values() {
-            Some(x) if x >= 18 => assert_eq!(counter, 3), // 1 createMany queries (BEGIN/COMMIT are counted)
+            Some(x) if x >= 18 => assert_eq!(count, 1),
             // Some queries are being split because of `QUERY_BATCH_SIZE` being set to `10` in dev.
-            Some(_) => assert_eq!(counter, 4), // 2 createMany queries (BEGIN/COMMIT are counted)
+            Some(_) => assert_eq!(count, 2),
             _ => panic!("Expected max bind values to be set"),
         }
 
         Ok(())
     }
 
-    // LibSQL & co are ignored because they don't support metrics
-    #[connector_test(schema(schema_7), only(Sqlite("3")))]
-    async fn create_many_by_shape_counter_3(runner: Runner) -> TestResult<()> {
-        use query_engine_metrics::PRISMA_DATASOURCE_QUERIES_TOTAL;
-
+    #[connector_test(schema(schema_7), only(Sqlite))]
+    async fn create_many_by_shape_counter_3(mut runner: Runner) -> TestResult<()> {
         // Generated queries:
         // INSERT INTO `main`.`Test` ( `req_default_static`, `req`, `opt_default`, `opt_default_static` ) VALUES (?, ?, ?, ?) params=[1,6,3,1]
         // INSERT INTO `main`.`Test` ( `opt`, `req`, `req_default_static`, `opt_default_static` ) VALUES (null, ?, ?, ?), (null, ?, ?, ?), (null, ?, ?, ?) params=[1,1,1,2,1,2,3,3,1]
@@ -462,15 +460,74 @@ mod create_many {
             }"#
         );
 
-        let json = runner.get_metrics().to_json(Default::default());
-        let counter = metrics::get_counter(&json, PRISMA_DATASOURCE_QUERIES_TOTAL);
+        let count = runner
+            .get_logs()
+            .await
+            .into_iter()
+            .filter(|log| log.contains("INSERT INTO"))
+            .count();
 
         match runner.max_bind_values() {
-            Some(x) if x > 21 => assert_eq!(counter, 4), // 3 createMany queries in total (BEGIN/COMMIT are counted)
+            Some(x) if x > 21 => assert_eq!(count, 2),
             // Some queries are being split because of `QUERY_BATCH_SIZE` being set to `10` in dev.
-            Some(_) => assert_eq!(counter, 5), // 3 createMany queries in total (BEGIN/COMMIT are counted)
+            Some(_) => assert_eq!(count, 3),
             _ => panic!("Expected max bind values to be set"),
         }
+
+        Ok(())
+    }
+
+    fn schema_8() -> String {
+        indoc! {
+            r#"
+                model TestModel {
+                    #id(id, Int, @id)
+                    field1  Int
+                    field2  Int
+                    field3  Int
+                    field4  Int
+                    field5  Int
+                    field6  Int
+                    field7  Int
+                    field8  Int
+                    field9  Int
+                    field10 Int
+                    field11 Int
+                    field12 Int
+                }
+            "#
+        }
+        .to_owned()
+    }
+
+    #[connector_test(schema(schema_8))]
+    async fn create_many_with_many_fields(runner: Runner) -> TestResult<()> {
+        const FIELDS_IN_TEST_MODEL: usize = 12;
+
+        if let Some(max_bind_values) = runner.max_bind_values()
+            && !runner.connector_version().is_wasm()
+        {
+            assert!(
+                max_bind_values < FIELDS_IN_TEST_MODEL,
+                "When QUERY_BATCH_SIZE is set, its value must be less than {FIELDS_IN_TEST_MODEL}, otherwise the test will not be testing what it's supposed to; instead got {max_bind_values}. Either update this test, or the QUERY_BATCH_SIZE env var value in .envrc and GitHub Actions pipelines"
+            );
+        }
+
+        let result = run_query!(
+            runner,
+            r#"mutation {
+                createManyTestModel(data: [
+                    { id: 1, field1: 1, field2: 2, field3: 3, field4: 4, field5: 5, field6: 6, field7: 7, field8: 8, field9: 9, field10: 10, field11: 11, field12: 12 },
+                    { id: 2, field1: 1, field2: 2, field3: 3, field4: 4, field5: 5, field6: 6, field7: 7, field8: 8, field9: 9, field10: 10, field11: 11, field12: 12 },
+                    { id: 3, field1: 1, field2: 2, field3: 3, field4: 4, field5: 5, field6: 6, field7: 7, field8: 8, field9: 9, field10: 10, field11: 11, field12: 12 },
+                    { id: 4, field1: 1, field2: 2, field3: 3, field4: 4, field5: 5, field6: 6, field7: 7, field8: 8, field9: 9, field10: 10, field11: 11, field12: 12 },
+                ]) {
+                    count
+                }
+            }"#
+        );
+
+        insta::assert_snapshot!(result, @r#"{"data":{"createManyTestModel":{"count":4}}}"#);
 
         Ok(())
     }

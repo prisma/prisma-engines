@@ -1,0 +1,22 @@
+{
+  "modelName": "User",
+  "action": "findMany",
+  "query": {
+    "arguments": {
+      "where": {
+        "email": {
+          "contains": {
+            "$type": "Param",
+            "value": {
+              "name": "searchTerm",
+              "type": "String"
+            }
+          }
+        }
+      }
+    },
+    "selection": {
+      "$scalars": true
+    }
+  }
+}

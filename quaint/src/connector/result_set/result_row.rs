@@ -1,5 +1,6 @@
 use crate::{
     ast::Value,
+    connector::ColumnType,
     error::{Error, ErrorKind},
 };
 use std::sync::Arc;
@@ -9,6 +10,7 @@ use std::sync::Arc;
 #[derive(Debug, PartialEq)]
 pub struct ResultRow {
     pub(crate) columns: Arc<Vec<String>>,
+    pub(crate) types: Vec<ColumnType>,
     pub(crate) values: Vec<Value<'static>>,
 }
 
@@ -26,10 +28,12 @@ impl IntoIterator for ResultRow {
 ///
 /// ```
 /// # use quaint::connector::*;
-/// let names = vec!["id".to_string(), "name".to_string()];
+/// let names = vec!["id".to_string(), "name".to_string()];    /// # let column_types = vec![ColumnType::Text, ColumnType::Text];
+/// let column_types = vec![ColumnType::Text, ColumnType::Text];
 /// let rows = vec![vec!["1234".into(), "Musti".into()]];
 ///
-/// let result_set = ResultSet::new(names, rows);
+/// let result_set = ResultSet::new(names, column_types, rows);
+///
 /// let row = result_set.first().unwrap();
 ///
 /// assert_eq!(row[0], row["id"]);
@@ -38,7 +42,14 @@ impl IntoIterator for ResultRow {
 #[derive(Debug, PartialEq)]
 pub struct ResultRowRef<'a> {
     pub(crate) columns: Arc<Vec<String>>,
+    pub(crate) types: Vec<ColumnType>,
     pub(crate) values: &'a Vec<Value<'static>>,
+}
+
+impl<'a> ResultRowRef<'a> {
+    pub fn iter(&self) -> impl Iterator<Item = &'a Value<'a>> {
+        self.values.iter()
+    }
 }
 
 impl ResultRow {
@@ -53,17 +64,26 @@ impl ResultRow {
         }
     }
 
-    /// Take a value with the given column name from the row. Usage
+    /// Get a value with the given column name from the row. Usage
     /// documentation in [ResultRowRef](struct.ResultRowRef.html).
     pub fn get(&self, name: &str) -> Option<&Value<'static>> {
         self.columns.iter().position(|c| c == name).map(|idx| &self.values[idx])
     }
 
+    /// Take a value with the given column name from the row.
+    pub fn take(mut self, name: &str) -> Option<Value<'static>> {
+        self.columns
+            .iter()
+            .position(|c| c == name)
+            .map(|idx| self.values.remove(idx))
+    }
+
     /// Make a referring [ResultRowRef](struct.ResultRowRef.html).
-    pub fn as_ref(&self) -> ResultRowRef {
+    pub fn as_ref(&self) -> ResultRowRef<'_> {
         ResultRowRef {
             columns: Arc::clone(&self.columns),
             values: &self.values,
+            types: self.types.clone(),
         }
     }
 
@@ -82,8 +102,9 @@ impl<'a> ResultRowRef<'a> {
     /// ```
     /// # use quaint::connector::*;
     /// # let names = vec!["id".to_string(), "name".to_string()];
+    /// # let column_types = vec![ColumnType::Text, ColumnType::Text];
     /// # let rows = vec![vec!["1234".into(), "Musti".into()]];
-    /// # let result_set = ResultSet::new(names, rows);
+    /// # let result_set = ResultSet::new(names, column_types, rows);
     /// # let row = result_set.first().unwrap();
     /// assert_eq!(Some(&row[0]), row.at(0));
     /// ```
@@ -100,12 +121,27 @@ impl<'a> ResultRowRef<'a> {
     /// ```
     /// # use quaint::connector::*;
     /// # let names = vec!["id".to_string(), "name".to_string()];
+    /// # let column_types = vec![ColumnType::Text, ColumnType::Text];
     /// # let rows = vec![vec!["1234".into(), "Musti".into()]];
-    /// # let result_set = ResultSet::new(names, rows);
+    /// # let result_set = ResultSet::new(names, column_types, rows);
     /// # let row = result_set.first().unwrap();
     /// assert_eq!(Some(&row["id"]), row.get("id"));
     /// ```
     pub fn get(&self, name: &str) -> Option<&'a Value<'static>> {
         self.columns.iter().position(|c| c == name).map(|idx| &self.values[idx])
+    }
+
+    /// Returns the length of the row.
+    pub fn len(&self) -> usize {
+        self.values.len()
+    }
+
+    /// Returns whether the rows are empty.
+    pub fn is_empty(&self) -> bool {
+        self.values.is_empty()
+    }
+
+    pub fn values(&self) -> impl Iterator<Item = &'a Value<'static>> {
+        self.values.iter()
     }
 }

@@ -4,33 +4,39 @@ use crate::{
     visitor::{self, Visitor},
 };
 
-use std::fmt::{self, Write};
+use crate::visitor::query_writer::QueryWriter;
+use query_template::{PlaceholderFormat, QueryTemplate};
+use std::{borrow::Cow, fmt};
 
 /// A visitor to generate queries for the SQLite database.
 ///
 /// The returned parameter values implement the `ToSql` trait from rusqlite and
 /// can be used directly with the database.
 pub struct Sqlite<'a> {
-    query: String,
-    parameters: Vec<Value<'a>>,
+    query_template: QueryTemplate<Value<'a>>,
 }
 
 impl<'a> Sqlite<'a> {
-    fn returning(&mut self, returning: Option<Vec<Column<'a>>>) -> visitor::Result {
-        if let Some(returning) = returning {
-            if !returning.is_empty() {
-                let values_len = returning.len();
-                self.write(" RETURNING ")?;
+    /// Expression that evaluates to the SQLite version.
+    pub const fn version_expr() -> &'static str {
+        "sqlite_version()"
+    }
 
-                for (i, column) in returning.into_iter().enumerate() {
-                    // Workaround for SQLite parsing bug
-                    // https://sqlite.org/forum/info/6c141f151fa5c444db257eb4d95c302b70bfe5515901cf987e83ed8ebd434c49?t=h
-                    self.surround_with_backticks(&column.name)?;
-                    self.write(" AS ")?;
-                    self.surround_with_backticks(&column.name)?;
-                    if i < (values_len - 1) {
-                        self.write(", ")?;
-                    }
+    fn returning(&mut self, returning: Option<Vec<Column<'a>>>) -> visitor::Result {
+        if let Some(returning) = returning
+            && !returning.is_empty()
+        {
+            let values_len = returning.len();
+            self.write(" RETURNING ")?;
+
+            for (i, column) in returning.into_iter().enumerate() {
+                // Workaround for SQLite parsing bug
+                // https://sqlite.org/forum/info/6c141f151fa5c444db257eb4d95c302b70bfe5515901cf987e83ed8ebd434c49?t=h
+                self.surround_with_backticks(&column.name)?;
+                self.write(" AS ")?;
+                self.surround_with_backticks(&column.name)?;
+                if i < (values_len - 1) {
+                    self.write(", ")?;
                 }
             }
         }
@@ -76,22 +82,24 @@ impl<'a> Visitor<'a> for Sqlite<'a> {
     const C_BACKTICK_CLOSE: &'static str = "`";
     const C_WILDCARD: &'static str = "%";
 
-    fn build<Q>(query: Q) -> crate::Result<(String, Vec<Value<'a>>)>
+    fn build_template<Q>(query: Q) -> crate::Result<QueryTemplate<Value<'a>>>
     where
         Q: Into<Query<'a>>,
     {
-        let mut sqlite = Sqlite {
-            query: String::with_capacity(4096),
-            parameters: Vec::with_capacity(128),
+        let mut this = Sqlite {
+            query_template: QueryTemplate::new(PlaceholderFormat {
+                prefix: "?",
+                has_numbering: false,
+            }),
         };
 
-        Sqlite::visit_query(&mut sqlite, query.into())?;
+        Sqlite::visit_query(&mut this, query.into())?;
 
-        Ok((sqlite.query, sqlite.parameters))
+        Ok(this.query_template)
     }
 
-    fn write<D: fmt::Display>(&mut self, s: D) -> visitor::Result {
-        write!(&mut self.query, "{s}")?;
+    fn write(&mut self, value: impl fmt::Display) -> visitor::Result {
+        self.query_template.write_string_chunk(value.to_string());
         Ok(())
     }
 
@@ -127,7 +135,7 @@ impl<'a> Visitor<'a> for Sqlite<'a> {
             }
 
             ValueType::Json(j) => match j {
-                Some(ref j) => {
+                Some(j) => {
                     let s = serde_json::to_string(j)?;
                     Some(self.write(format!("'{s}'")))
                 }
@@ -140,6 +148,10 @@ impl<'a> Visitor<'a> for Sqlite<'a> {
             ValueType::Date(date) => date.map(|date| self.write(format!("'{date}'"))),
             ValueType::Time(time) => time.map(|time| self.write(format!("'{time}'"))),
             ValueType::Xml(cow) => cow.as_ref().map(|cow| self.write(format!("'{cow}'"))),
+
+            ValueType::Opaque(opaque) => Some(Err(
+                Error::builder(ErrorKind::OpaqueAsRawValue(opaque.to_string())).build()
+            )),
         };
 
         match res {
@@ -160,6 +172,26 @@ impl<'a> Visitor<'a> for Sqlite<'a> {
         }
 
         match insert.values {
+            Expression {
+                kind: ExpressionKind::Parameterized(row),
+                ..
+            } => {
+                let columns = insert.columns.len();
+
+                self.write(" (")?;
+                for (i, c) in insert.columns.into_iter().enumerate() {
+                    self.visit_column(c.name.into_owned().into())?;
+
+                    if i < (columns - 1) {
+                        self.write(", ")?;
+                    }
+                }
+
+                self.write(")")?;
+                self.write(" VALUES ")?;
+                self.query_template.write_parameter_tuple_list("(", ",", ")", ",");
+                self.query_template.parameters.push(row);
+            }
             Expression {
                 kind: ExpressionKind::Row(row),
                 ..
@@ -224,19 +256,33 @@ impl<'a> Visitor<'a> for Sqlite<'a> {
         self.returning(insert.returning)?;
 
         if let Some(comment) = insert.comment {
-            self.write("; ")?;
+            self.write(" ")?;
             self.visit_comment(comment)?;
         }
 
         Ok(())
     }
 
-    fn parameter_substitution(&mut self) -> visitor::Result {
-        self.write("?")
+    fn add_parameter(&mut self, value: Value<'a>) {
+        self.query_template.parameters.push(value);
     }
 
-    fn add_parameter(&mut self, value: Value<'a>) {
-        self.parameters.push(value);
+    fn parameter_substitution(&mut self) -> visitor::Result {
+        self.query_template.write_parameter();
+        Ok(())
+    }
+
+    fn visit_parameterized_row(
+        &mut self,
+        value: Value<'a>,
+        item_prefix: impl Into<Cow<'static, str>>,
+        separator: impl Into<Cow<'static, str>>,
+        item_suffix: impl Into<Cow<'static, str>>,
+    ) -> visitor::Result {
+        self.query_template
+            .write_parameter_tuple(item_prefix, separator, item_suffix);
+        self.query_template.parameters.push(value);
+        Ok(())
     }
 
     fn visit_limit_and_offset(&mut self, limit: Option<Value<'a>>, offset: Option<Value<'a>>) -> visitor::Result {
@@ -282,8 +328,22 @@ impl<'a> Visitor<'a> for Sqlite<'a> {
         })
     }
 
-    fn visit_json_extract(&mut self, _json_extract: JsonExtract<'a>) -> visitor::Result {
-        unimplemented!("JSON filtering is not yet supported on SQLite")
+    #[cfg(any(feature = "postgresql", feature = "mysql", feature = "sqlite"))]
+    fn visit_json_extract(&mut self, json_extract: JsonExtract<'a>) -> visitor::Result {
+        self.visit_expression(*json_extract.column)?;
+
+        if json_extract.extract_as_string {
+            self.write("->>")?;
+        } else {
+            self.write("->")?;
+        }
+
+        match json_extract.path {
+            JsonPath::Array(_) => panic!("JSON path array notation is not supported for SQlite"),
+            JsonPath::String(path) => self.visit_parameterized(Value::text(path))?,
+        }
+
+        Ok(())
     }
 
     fn visit_json_array_contains(
@@ -292,23 +352,54 @@ impl<'a> Visitor<'a> for Sqlite<'a> {
         _right: Expression<'a>,
         _not: bool,
     ) -> visitor::Result {
-        unimplemented!("JSON filtering is not yet supported on SQLite")
+        unimplemented!("JSON contains is not supported on SQLite")
     }
 
-    fn visit_json_type_equals(&mut self, _left: Expression<'a>, _json_type: JsonType, _not: bool) -> visitor::Result {
-        unimplemented!("JSON_TYPE is not yet supported on SQLite")
+    #[cfg(any(feature = "postgresql", feature = "mysql", feature = "sqlite"))]
+    fn visit_json_type_equals(&mut self, left: Expression<'a>, json_type: JsonType<'a>, not: bool) -> visitor::Result {
+        self.write("(")?;
+        self.write("JSON_TYPE")?;
+        self.surround_with("(", ")", |s| s.visit_expression(left.clone()))?;
+
+        if not {
+            self.write(" != ")?;
+        } else {
+            self.write(" = ")?;
+        }
+
+        match json_type {
+            JsonType::Array => self.visit_expression(Expression::from(Value::text("array")))?,
+            JsonType::Boolean => {
+                self.visit_expression(Expression::from(Value::text("true")))?;
+                self.write(" OR JSON_TYPE")?;
+                self.surround_with("(", ")", |s| s.visit_expression(left))?;
+                self.write(" = ")?;
+                self.visit_expression(Expression::from(Value::text("false")))?;
+            }
+            JsonType::Number => {
+                self.visit_expression(Expression::from(Value::text("integer")))?;
+                self.write(" OR JSON_TYPE")?;
+                self.surround_with("(", ")", |s| s.visit_expression(left))?;
+                self.write(" = ")?;
+                self.visit_expression(Expression::from(Value::text("real")))?;
+            }
+            JsonType::Object => self.visit_expression(Expression::from(Value::text("object")))?,
+            JsonType::String => self.visit_expression(Expression::from(Value::text("text")))?,
+            JsonType::Null => self.visit_expression(Expression::from(Value::text("null")))?,
+            JsonType::ColumnRef(column) => {
+                self.write("JSON_TYPE")?;
+                self.surround_with("(", ")", |s| s.visit_column(*column))?;
+            }
+        }
+
+        self.write(")")
     }
 
     fn visit_text_search(&mut self, _text_search: crate::prelude::TextSearch<'a>) -> visitor::Result {
         unimplemented!("Full-text search is not yet supported on SQLite")
     }
 
-    fn visit_matches(
-        &mut self,
-        _left: Expression<'a>,
-        _right: std::borrow::Cow<'a, str>,
-        _not: bool,
-    ) -> visitor::Result {
+    fn visit_matches(&mut self, _left: Expression<'a>, _right: Expression<'a>, _not: bool) -> visitor::Result {
         unimplemented!("Full-text search is not yet supported on SQLite")
     }
 
@@ -316,24 +407,62 @@ impl<'a> Visitor<'a> for Sqlite<'a> {
         unimplemented!("Full-text search is not yet supported on SQLite")
     }
 
-    fn visit_json_extract_last_array_item(&mut self, _extract: JsonExtractLastArrayElem<'a>) -> visitor::Result {
-        unimplemented!("JSON filtering is not yet supported on SQLite")
+    #[cfg(any(feature = "postgresql", feature = "mysql", feature = "sqlite"))]
+    fn visit_json_extract_last_array_item(&mut self, extract: JsonExtractLastArrayElem<'a>) -> visitor::Result {
+        self.visit_expression(*extract.expr)?;
+        self.write("->")?;
+        self.visit_parameterized(Value::text("$[#-1]"))
     }
 
-    fn visit_json_extract_first_array_item(&mut self, _extract: JsonExtractFirstArrayElem<'a>) -> visitor::Result {
-        unimplemented!("JSON filtering is not yet supported on SQLite")
+    #[cfg(any(feature = "postgresql", feature = "mysql", feature = "sqlite"))]
+    fn visit_json_extract_first_array_item(&mut self, extract: JsonExtractFirstArrayElem<'a>) -> visitor::Result {
+        self.visit_expression(*extract.expr)?;
+        self.write("->")?;
+        self.visit_parameterized(Value::text("$[0]"))
     }
 
-    fn visit_json_unquote(&mut self, _json_unquote: JsonUnquote<'a>) -> visitor::Result {
-        unimplemented!("JSON filtering is not yet supported on SQLite")
+    #[cfg(any(feature = "postgresql", feature = "mysql", feature = "sqlite"))]
+    fn visit_json_unquote(&mut self, json_unquote: JsonUnquote<'a>) -> visitor::Result {
+        self.write("JSONB_EXTRACT")?;
+        self.surround_with("(", ")", |s| {
+            s.visit_expression(*json_unquote.expr)?;
+            s.write(", ")?;
+            s.visit_parameterized(Value::text("$"))
+        })
     }
 
-    fn visit_json_array_agg(&mut self, _array_agg: JsonArrayAgg<'a>) -> visitor::Result {
-        unimplemented!("JSON_AGG is not yet supported on SQLite")
+    #[cfg(feature = "sqlite")]
+    fn visit_json_array_agg(&mut self, array_agg: JsonArrayAgg<'a>) -> visitor::Result {
+        self.write("JSONB_GROUP_ARRAY")?;
+        self.surround_with("(", ")", |s| s.visit_expression(*array_agg.expr))?;
+
+        Ok(())
     }
 
-    fn visit_json_build_object(&mut self, _build_obj: JsonBuildObject<'a>) -> visitor::Result {
-        unimplemented!("JSON_BUILD_OBJECT is not yet supported on SQLite")
+    #[cfg(feature = "sqlite")]
+    fn visit_json_build_object(&mut self, build_obj: JsonBuildObject<'a>) -> visitor::Result {
+        let len = build_obj.exprs.len();
+
+        self.write("JSONB_OBJECT")?;
+        self.surround_with("(", ")", |s| {
+            for (i, (name, expr)) in build_obj.exprs.into_iter().enumerate() {
+                s.visit_raw_value(Value::text(name))?;
+                s.write(", ")?;
+                s.visit_expression(expr)?;
+
+                if i < (len - 1) {
+                    s.write(", ")?;
+                }
+            }
+
+            Ok(())
+        })?;
+
+        Ok(())
+    }
+
+    fn visit_stringify(&mut self, _stringify: Stringify<'a>) -> visitor::Result {
+        unimplemented!("string conversion is not yet supported on SQLite")
     }
 
     fn visit_ordering(&mut self, ordering: Ordering<'a>) -> visitor::Result {
@@ -447,7 +576,7 @@ impl<'a> Visitor<'a> for Sqlite<'a> {
 
 #[cfg(test)]
 mod tests {
-    use crate::{val, visitor::*};
+    use crate::visitor::*;
 
     fn expected_values<'a, T>(sql: &'static str, params: Vec<T>) -> (String, Vec<Value<'a>>)
     where
@@ -510,8 +639,6 @@ mod tests {
 
     #[test]
     fn test_select_from_values() {
-        use crate::values;
-
         let expected_sql = "SELECT `vals`.* FROM (VALUES (?,?),(?,?)) AS `vals`";
         let values = Table::from(values!((1, 2), (3, 4))).alias("vals");
         let query = Select::from_table(values);
@@ -526,8 +653,6 @@ mod tests {
 
     #[test]
     fn test_in_values() {
-        use crate::{col, values};
-
         let expected_sql = "SELECT `test`.* FROM `test` WHERE (`id1`,`id2`) IN (VALUES (?,?),(?,?))";
         let query = Select::from_table("test")
             .so_that(Row::from((col!("id1"), col!("id2"))).in_selection(values!((1, 2), (3, 4))));
@@ -766,8 +891,7 @@ mod tests {
 
     #[test]
     fn test_additional_condition_inner_join() {
-        let expected_sql =
-            "SELECT `users`.* FROM `users` INNER JOIN `posts` ON (`users`.`id` = `posts`.`user_id` AND `posts`.`published` = ?)";
+        let expected_sql = "SELECT `users`.* FROM `users` INNER JOIN `posts` ON (`users`.`id` = `posts`.`user_id` AND `posts`.`published` = ?)";
 
         let query = Select::from_table("users").inner_join(
             "posts".on(("users", "id")
@@ -794,8 +918,7 @@ mod tests {
 
     #[test]
     fn test_additional_condition_left_join() {
-        let expected_sql =
-            "SELECT `users`.* FROM `users` LEFT JOIN `posts` ON (`users`.`id` = `posts`.`user_id` AND `posts`.`published` = ?)";
+        let expected_sql = "SELECT `users`.* FROM `users` LEFT JOIN `posts` ON (`users`.`id` = `posts`.`user_id` AND `posts`.`published` = ?)";
 
         let query = Select::from_table("users").left_join(
             "posts".on(("users", "id")
@@ -855,7 +978,7 @@ mod tests {
 
     #[test]
     fn test_comment_insert() {
-        let expected_sql = "INSERT INTO `users` DEFAULT VALUES; /* trace_id='5bd66ef5095369c7b0d1f8f4bd33716a', parent_id='c532cb4098ac3dd2' */";
+        let expected_sql = "INSERT INTO `users` DEFAULT VALUES /* trace_id='5bd66ef5095369c7b0d1f8f4bd33716a', parent_id='c532cb4098ac3dd2' */";
         let query = Insert::single_into("users");
         let insert =
             Insert::from(query).comment("trace_id='5bd66ef5095369c7b0d1f8f4bd33716a', parent_id='c532cb4098ac3dd2'");

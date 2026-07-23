@@ -35,6 +35,28 @@ macro_rules! match_connector_result {
 }
 
 #[macro_export]
+macro_rules! assert_connector_error {
+    ($runner:expr, $q:expr, $code:expr, $( $($matcher:pat_param)|+ $( if $pred:expr )? => $msg:expr ),*) => {
+        use query_tests_setup::*;
+        use query_tests_setup::ConnectorVersion::*;
+
+        let connector = $runner.connector_version();
+
+        let mut results = match &connector {
+            $(
+                $( $matcher )|+ $( if $pred )? => $msg.to_string()
+            ),*
+        };
+
+        if results.len() == 0 {
+            panic!("No assertion failure defined for connector {connector}.");
+        }
+
+        $runner.query($q).await?.assert_failure($code, Some(results));
+    };
+}
+
+#[macro_export]
 macro_rules! is_one_of {
     ($result:expr, $potential_results:expr) => {
         assert_eq!(

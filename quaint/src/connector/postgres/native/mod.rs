@@ -1,41 +1,61 @@
 //! Definitions for the Postgres connector.
 //! This module is not compatible with wasm32-* targets.
 //! This module is only available with the `postgresql-native` feature.
+mod cache;
+pub(crate) mod column_type;
 mod conversion;
 mod error;
+mod explain;
+mod query;
+mod websocket;
 
-pub(crate) use crate::connector::postgres::url::PostgresUrl;
+pub(crate) use crate::connector::postgres::url::PostgresNativeUrl;
 use crate::connector::postgres::url::{Hidden, SslAcceptMode, SslParams};
-use crate::connector::{timeout, IsolationLevel, Transaction};
+use crate::connector::{
+    ColumnType, DescribedColumn, DescribedParameter, DescribedQuery, IsolationLevel, Transaction, TransactionOptions,
+    timeout,
+};
 use crate::error::NativeErrorKind;
 
+use crate::ValueType;
+use crate::prelude::DefaultTransaction;
 use crate::{
     ast::{Query, Value},
-    connector::{metrics, queryable::*, ResultSet},
+    connector::{ResultSet, queryable::*, trace},
     error::{Error, ErrorKind},
     visitor::{self, Visitor},
 };
 use async_trait::async_trait;
-use futures::{future::FutureExt, lock::Mutex};
-use lru_cache::LruCache;
+pub use cache::QueryCache;
+use cache::{CacheSettings, NoOpCache, PreparedStatementLruCache, TracingLruCache};
+use column_type::PGColumnType;
+use futures::StreamExt;
+use futures::future::FutureExt;
 use native_tls::{Certificate, Identity, TlsConnector};
 use postgres_native_tls::MakeTlsConnector;
+use postgres_types::{Kind as PostgresKind, Type as PostgresType};
+use query::PreparedQuery;
 use std::{
-    borrow::Borrow,
     fmt::{Debug, Display},
     fs,
     future::Future,
     sync::atomic::{AtomicBool, Ordering},
     time::Duration,
 };
-use tokio_postgres::{config::ChannelBinding, Client, Config, Statement};
+use tokio::sync::OnceCell;
+use tokio::task::JoinHandle;
+use tokio_postgres::{Client, Config, Statement, config::ChannelBinding};
+use tracing_futures::WithSubscriber;
+use websocket::connect_via_websocket;
 
 /// The underlying postgres driver. Only available with the `expose-drivers`
 /// Cargo feature.
 #[cfg(feature = "expose-drivers")]
 pub use tokio_postgres;
 
-struct PostgresClient(Client);
+use super::PostgresWebSocketUrl;
+
+pub(super) struct PostgresClient(Client);
 
 impl Debug for PostgresClient {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -43,15 +63,39 @@ impl Debug for PostgresClient {
     }
 }
 
+const DB_SYSTEM_NAME_POSTGRESQL: &str = "postgresql";
+const DB_SYSTEM_NAME_COCKROACHDB: &str = "cockroachdb";
+
 /// A connector interface for the PostgreSQL database.
+///
+/// # Type parameters
+/// - `Cache`: The cache used for prepared queries.
 #[derive(Debug)]
-pub struct PostgreSql {
+pub struct PostgreSql<Cache> {
     client: PostgresClient,
+    handle: JoinHandle<()>,
     pg_bouncer: bool,
+    single_use_connection: bool,
     socket_timeout: Option<Duration>,
-    statement_cache: Mutex<LruCache<String, Statement>>,
+    cache: Cache,
     is_healthy: AtomicBool,
+    is_cockroachdb: bool,
+    is_materialize: bool,
+    db_system_name: &'static str,
 }
+
+/// A [`PostgreSql`] interface with the default caching strategy, which involves storing all
+/// queries as prepared statements in an LRU cache.
+pub type PostgreSqlWithDefaultCache = PostgreSql<PreparedStatementLruCache>;
+
+/// A [`PostgreSql`] interface which executes all queries as prepared statements without caching
+/// them.
+pub type PostgreSqlWithNoCache = PostgreSql<NoOpCache>;
+
+/// A [`PostgreSql`] interface with the tracing caching strategy, which involves storing query
+/// type information in a dedicated LRU cache for applicable queries and not re-using any prepared
+/// statements.
+pub type PostgreSqlWithTracingCache = PostgreSql<TracingLruCache>;
 
 #[derive(Debug)]
 struct SslAuth {
@@ -120,12 +164,14 @@ impl SslParams {
     }
 }
 
-impl PostgresUrl {
-    pub(crate) fn cache(&self) -> LruCache<String, Statement> {
+impl PostgresNativeUrl {
+    pub(crate) fn cache_settings(&self) -> CacheSettings {
         if self.query_params.pg_bouncer {
-            LruCache::new(0)
+            CacheSettings { capacity: 0 }
         } else {
-            LruCache::new(self.query_params.statement_cache_size)
+            CacheSettings {
+                capacity: self.query_params.statement_cache_size,
+            }
         }
     }
 
@@ -157,11 +203,11 @@ impl PostgresUrl {
     pub(crate) fn to_config(&self) -> Config {
         let mut config = Config::new();
 
-        config.user(self.username().borrow());
-        config.password(self.password().borrow() as &str);
+        config.user(self.username().as_ref());
+        config.password(self.password().as_ref());
         config.host(self.host());
         config.port(self.port());
-        config.dbname(self.dbname());
+        config.dbname(self.dbname().as_ref());
         config.pgbouncer_mode(self.query_params.pg_bouncer);
 
         if let Some(options) = self.options() {
@@ -186,37 +232,45 @@ impl PostgresUrl {
     }
 }
 
-impl PostgreSql {
+impl PostgreSqlWithNoCache {
+    /// Create a new websocket connection to managed database
+    pub async fn new_with_websocket(url: PostgresWebSocketUrl) -> crate::Result<Self> {
+        let (client, handle) = connect_via_websocket(url).await?;
+
+        Ok(Self {
+            client: PostgresClient(client),
+            handle,
+            socket_timeout: None,
+            pg_bouncer: false,
+            single_use_connection: false,
+            cache: NoOpCache,
+            is_healthy: AtomicBool::new(true),
+            is_cockroachdb: false,
+            is_materialize: false,
+            db_system_name: DB_SYSTEM_NAME_POSTGRESQL,
+        })
+    }
+}
+
+impl<Cache: QueryCache> PostgreSql<Cache> {
     /// Create a new connection to the database.
-    pub async fn new(url: PostgresUrl) -> crate::Result<Self> {
+    pub async fn new(url: PostgresNativeUrl, tls_manager: &MakeTlsConnectorManager) -> crate::Result<Self> {
         let config = url.to_config();
 
-        let mut tls_builder = TlsConnector::builder();
-
-        {
-            let ssl_params = url.ssl_params();
-            let auth = ssl_params.to_owned().into_auth().await?;
-
-            if let Some(certificate) = auth.certificate.0 {
-                tls_builder.add_root_certificate(certificate);
-            }
-
-            tls_builder.danger_accept_invalid_certs(auth.ssl_accept_mode == SslAcceptMode::AcceptInvalidCerts);
-
-            if let Some(identity) = auth.identity.0 {
-                tls_builder.identity(identity);
-            }
-        }
-
-        let tls = MakeTlsConnector::new(tls_builder.build()?);
+        let tls = tls_manager.get_connector().await?;
         let (client, conn) = timeout::connect(url.connect_timeout(), config.connect(tls)).await?;
 
-        tokio::spawn(conn.map(|r| match r {
-            Ok(_) => (),
-            Err(e) => {
-                tracing::error!("Error in PostgreSQL connection: {:?}", e);
-            }
-        }));
+        let is_cockroachdb = conn.parameter("crdb_version").is_some();
+        let is_materialize = conn.parameter("mz_version").is_some();
+
+        let handle = tokio::spawn(
+            conn.map(|r| {
+                if let Err(e) = r {
+                    tracing::error!("Error in PostgreSQL connection: {e:?}");
+                }
+            })
+            .with_current_subscriber(),
+        );
 
         // On Postgres, we set the SEARCH_PATH and client-encoding through client connection parameters to save a network roundtrip on connection.
         // We can't always do it for CockroachDB because it does not expect quotes for unsafe identifiers (https://github.com/cockroachdb/cockroach/issues/101328), which might change once the issue is fixed.
@@ -238,12 +292,23 @@ impl PostgreSql {
             }
         }
 
+        let db_system_name = if is_cockroachdb {
+            DB_SYSTEM_NAME_COCKROACHDB
+        } else {
+            DB_SYSTEM_NAME_POSTGRESQL
+        };
+
         Ok(Self {
             client: PostgresClient(client),
-            socket_timeout: url.query_params.socket_timeout,
-            pg_bouncer: url.query_params.pg_bouncer,
-            statement_cache: Mutex::new(url.cache()),
+            handle,
+            socket_timeout: url.socket_timeout(),
+            pg_bouncer: url.pg_bouncer(),
+            single_use_connection: url.single_use_connections(),
+            cache: url.cache_settings().into(),
             is_healthy: AtomicBool::new(true),
+            is_cockroachdb,
+            is_materialize,
+            db_system_name,
         })
     }
 
@@ -253,40 +318,6 @@ impl PostgreSql {
     #[cfg(feature = "expose-drivers")]
     pub fn client(&self) -> &tokio_postgres::Client {
         &self.client.0
-    }
-
-    async fn fetch_cached(&self, sql: &str, params: &[Value<'_>]) -> crate::Result<Statement> {
-        let mut cache = self.statement_cache.lock().await;
-        let capacity = cache.capacity();
-        let stored = cache.len();
-
-        match cache.get_mut(sql) {
-            Some(stmt) => {
-                tracing::trace!(
-                    message = "CACHE HIT!",
-                    query = sql,
-                    capacity = capacity,
-                    stored = stored,
-                );
-
-                Ok(stmt.clone()) // arc'd
-            }
-            None => {
-                tracing::trace!(
-                    message = "CACHE MISS!",
-                    query = sql,
-                    capacity = capacity,
-                    stored = stored,
-                );
-
-                let param_types = conversion::params_to_types(params);
-                let stmt = self.perform_io(self.client.0.prepare_typed(sql, &param_types)).await?;
-
-                cache.insert(sql.to_string(), stmt.clone());
-
-                Ok(stmt)
-            }
-        }
     }
 
     async fn perform_io<F, T>(&self, fut: F) -> crate::Result<T>
@@ -315,6 +346,158 @@ impl PostgreSql {
         } else {
             Ok(())
         }
+    }
+
+    // All credits go to sqlx: https://github.com/launchbadge/sqlx/blob/a892ebc6e283f443145f92bbc7fce4ae44547331/sqlx-postgres/src/connection/describe.rs#L417
+    pub(crate) async fn get_nullable_for_columns(&self, stmt: &Statement) -> crate::Result<Vec<Option<bool>>> {
+        let columns = stmt.columns();
+
+        if columns.is_empty() {
+            return Ok(vec![]);
+        }
+
+        let mut nullable_query = String::from("SELECT NOT pg_attribute.attnotnull as nullable FROM (VALUES ");
+        let mut args = Vec::with_capacity(columns.len() * 3);
+
+        for (i, (column, bind)) in columns.iter().zip((1..).step_by(3)).enumerate() {
+            if !args.is_empty() {
+                nullable_query += ", ";
+            }
+
+            nullable_query.push_str(&format!("(${}::int4, ${}::int8, ${}::int4)", bind, bind + 1, bind + 2));
+
+            args.push(Value::from(i as i32));
+            args.push(ValueType::Int64(column.table_oid().map(i64::from)).into());
+            args.push(ValueType::Int32(column.column_id().map(i32::from)).into());
+        }
+
+        nullable_query.push_str(
+            ") as col(idx, table_id, col_idx) \
+            LEFT JOIN pg_catalog.pg_attribute \
+                ON table_id IS NOT NULL \
+               AND attrelid = table_id \
+               AND attnum = col_idx \
+            ORDER BY col.idx",
+        );
+
+        let nullable_query_result = self.query_raw(&nullable_query, &args).await?;
+        let mut nullables = Vec::with_capacity(nullable_query_result.len());
+
+        for row in nullable_query_result {
+            let nullable = row.at(0).and_then(|v| v.as_bool());
+
+            nullables.push(nullable)
+        }
+
+        // If the server is CockroachDB or Materialize, skip this step (#1248).
+        if !self.is_cockroachdb && !self.is_materialize {
+            // patch up our null inference with data from EXPLAIN
+            let nullable_patch = self.nullables_from_explain(stmt).await?;
+
+            for (nullable, patch) in nullables.iter_mut().zip(nullable_patch) {
+                *nullable = patch.or(*nullable);
+            }
+        }
+
+        Ok(nullables)
+    }
+
+    /// Infer nullability for columns of this statement using EXPLAIN VERBOSE.
+    ///
+    /// This currently only marks columns that are on the inner half of an outer join
+    /// and returns `None` for all others.
+    /// All credits go to sqlx: https://github.com/launchbadge/sqlx/blob/a892ebc6e283f443145f92bbc7fce4ae44547331/sqlx-postgres/src/connection/describe.rs#L482
+    async fn nullables_from_explain(&self, stmt: &Statement) -> Result<Vec<Option<bool>>, Error> {
+        use explain::{Explain, Plan, visit_plan};
+
+        let mut explain = format!("EXPLAIN (VERBOSE, FORMAT JSON) EXECUTE {}", stmt.name());
+        let params_len = stmt.params().len();
+        let mut comma = false;
+
+        if params_len > 0 {
+            explain += "(";
+
+            // fill the arguments list with NULL, which should theoretically be valid
+            for _ in 0..params_len {
+                if comma {
+                    explain += ", ";
+                }
+
+                explain += "NULL";
+                comma = true;
+            }
+
+            explain += ")";
+        }
+
+        let explain_result = self.query_raw(&explain, &[]).await?.into_single()?;
+        let explains = explain_result
+            .into_single()?
+            .into_json()
+            .map(serde_json::from_value::<[Explain; 1]>)
+            .transpose()?;
+        let explain = explains.as_ref().and_then(|x| x.first());
+
+        let mut nullables = Vec::new();
+
+        if let Some(Explain::Plan {
+            plan: plan @ Plan {
+                output: Some(outputs), ..
+            },
+        }) = explain
+        {
+            nullables.resize(outputs.len(), None);
+            visit_plan(plan, outputs, &mut nullables);
+        }
+
+        Ok(nullables)
+    }
+
+    async fn query_raw_impl(
+        &self,
+        sql: &str,
+        params: &[Value<'_>],
+        types: &[PostgresType],
+    ) -> crate::Result<ResultSet> {
+        self.check_bind_variables_len(params)?;
+
+        trace::query(self.db_system_name, sql, params, move || async move {
+            let query = self.cache.get_query(&self.client.0, sql, types).await?;
+
+            if query.param_types().len() != params.len() {
+                let kind = ErrorKind::IncorrectNumberOfParameters {
+                    expected: query.param_types().len(),
+                    actual: params.len(),
+                };
+
+                return Err(Error::builder(kind).build());
+            }
+
+            let mut rows = Box::pin(
+                self.perform_io(query.dispatch(&self.client.0, conversion::conv_params(params)))
+                    .await?,
+            );
+
+            let types = query
+                .column_types()
+                .map(PGColumnType::from_pg_type)
+                .map(ColumnType::from)
+                .collect::<Vec<_>>();
+            let names = query.column_names().map(|name| name.to_string()).collect::<Vec<_>>();
+            let mut result = ResultSet::new(names, types, Vec::new());
+
+            while let Some(row) = rows.next().await {
+                result.rows.push(row?.get_result_row()?);
+            }
+            Ok(result)
+        })
+        .await
+    }
+
+    /// Closes the connection and waits for the connection task to complete.
+    pub async fn close(self) {
+        drop(self.client);
+        self.handle.await.expect("connection task panicked")
     }
 }
 
@@ -355,10 +538,22 @@ impl Display for SetSearchPath<'_> {
     }
 }
 
-impl_default_TransactionCapable!(PostgreSql);
+#[async_trait]
+impl<Cache: QueryCache> TransactionCapable for PostgreSql<Cache> {
+    async fn start_transaction<'a>(
+        &'a self,
+        isolation: Option<IsolationLevel>,
+    ) -> crate::Result<Box<dyn Transaction + 'a>> {
+        let opts = TransactionOptions::new(isolation, self.requires_isolation_first());
+
+        Ok(Box::new(
+            DefaultTransaction::new(self, self.begin_statement(), opts).await?,
+        ))
+    }
+}
 
 #[async_trait]
-impl Queryable for PostgreSql {
+impl<Cache: QueryCache> Queryable for PostgreSql<Cache> {
     async fn query(&self, q: Query<'_>) -> crate::Result<ResultSet> {
         let (sql, params) = visitor::Postgres::build(q)?;
 
@@ -366,63 +561,89 @@ impl Queryable for PostgreSql {
     }
 
     async fn query_raw(&self, sql: &str, params: &[Value<'_>]) -> crate::Result<ResultSet> {
-        self.check_bind_variables_len(params)?;
-
-        metrics::query("postgres.query_raw", sql, params, move || async move {
-            let stmt = self.fetch_cached(sql, &[]).await?;
-
-            if stmt.params().len() != params.len() {
-                let kind = ErrorKind::IncorrectNumberOfParameters {
-                    expected: stmt.params().len(),
-                    actual: params.len(),
-                };
-
-                return Err(Error::builder(kind).build());
-            }
-
-            let rows = self
-                .perform_io(self.client.0.query(&stmt, conversion::conv_params(params).as_slice()))
-                .await?;
-
-            let mut result = ResultSet::new(stmt.to_column_names(), Vec::new());
-
-            for row in rows {
-                result.rows.push(row.get_result_row()?);
-            }
-
-            Ok(result)
-        })
-        .await
+        self.query_raw_impl(sql, params, &[]).await
     }
 
     async fn query_raw_typed(&self, sql: &str, params: &[Value<'_>]) -> crate::Result<ResultSet> {
-        self.check_bind_variables_len(params)?;
+        self.query_raw_impl(sql, params, &conversion::params_to_types(params))
+            .await
+    }
 
-        metrics::query("postgres.query_raw", sql, params, move || async move {
-            let stmt = self.fetch_cached(sql, params).await?;
+    async fn describe_query(&self, sql: &str) -> crate::Result<DescribedQuery> {
+        let stmt = self.cache.get_statement(&self.client.0, sql, &[]).await?;
 
-            if stmt.params().len() != params.len() {
-                let kind = ErrorKind::IncorrectNumberOfParameters {
-                    expected: stmt.params().len(),
-                    actual: params.len(),
-                };
+        let mut columns: Vec<DescribedColumn> = Vec::with_capacity(stmt.columns().len());
+        let mut parameters: Vec<DescribedParameter> = Vec::with_capacity(stmt.params().len());
+
+        let enums_results = self
+            .query_raw("SELECT oid, typname FROM pg_type WHERE typtype = 'e';", &[])
+            .await?;
+
+        fn find_enum_by_oid(enums: &ResultSet, enum_oid: u32) -> Option<&str> {
+            enums.iter().find_map(|row| {
+                let oid = row.get("oid")?.as_i64()?;
+                let name = row.get("typname")?.as_str()?;
+
+                if enum_oid == u32::try_from(oid).unwrap() {
+                    Some(name)
+                } else {
+                    None
+                }
+            })
+        }
+
+        fn resolve_type(ty: &PostgresType, enums: &ResultSet) -> (ColumnType, Option<String>) {
+            let column_type = ColumnType::from(ty);
+
+            match ty.kind() {
+                PostgresKind::Enum => {
+                    let enum_name = find_enum_by_oid(enums, ty.oid())
+                        .unwrap_or_else(|| panic!("Could not find enum with oid {}", ty.oid()));
+
+                    (column_type, Some(enum_name.to_string()))
+                }
+                _ => (column_type, None),
+            }
+        }
+
+        let nullables = self.get_nullable_for_columns(&stmt).await?;
+
+        for (idx, (col, nullable)) in stmt.columns().iter().zip(nullables).enumerate() {
+            let (typ, enum_name) = resolve_type(col.type_(), &enums_results);
+
+            if col.name() == "?column?" {
+                let kind = ErrorKind::QueryInvalidInput(format!(
+                    "Invalid column name '?column?' for index {idx}. Your SQL query must explicitly alias that column name."
+                ));
 
                 return Err(Error::builder(kind).build());
             }
 
-            let rows = self
-                .perform_io(self.client.0.query(&stmt, conversion::conv_params(params).as_slice()))
-                .await?;
+            columns.push(
+                DescribedColumn::new_named(col.name(), typ)
+                    .with_enum_name(enum_name)
+                    // Make fields nullable by default if we can't infer nullability.
+                    .is_nullable(nullable.unwrap_or(true)),
+            );
+        }
 
-            let mut result = ResultSet::new(stmt.to_column_names(), Vec::new());
+        for param in stmt.params() {
+            let (typ, enum_name) = resolve_type(param, &enums_results);
 
-            for row in rows {
-                result.rows.push(row.get_result_row()?);
-            }
+            parameters.push(DescribedParameter::new_named(param.name(), typ).with_enum_name(enum_name));
+        }
 
-            Ok(result)
+        let enum_names = enums_results
+            .into_iter()
+            .filter_map(|row| row.take("typname"))
+            .filter_map(|v| v.to_string())
+            .collect::<Vec<_>>();
+
+        Ok(DescribedQuery {
+            columns,
+            parameters,
+            enum_names: Some(enum_names),
         })
-        .await
     }
 
     async fn execute(&self, q: Query<'_>) -> crate::Result<u64> {
@@ -434,8 +655,8 @@ impl Queryable for PostgreSql {
     async fn execute_raw(&self, sql: &str, params: &[Value<'_>]) -> crate::Result<u64> {
         self.check_bind_variables_len(params)?;
 
-        metrics::query("postgres.execute_raw", sql, params, move || async move {
-            let stmt = self.fetch_cached(sql, &[]).await?;
+        trace::query(self.db_system_name, sql, params, move || async move {
+            let stmt = self.cache.get_statement(&self.client.0, sql, &[]).await?;
 
             if stmt.params().len() != params.len() {
                 let kind = ErrorKind::IncorrectNumberOfParameters {
@@ -458,8 +679,9 @@ impl Queryable for PostgreSql {
     async fn execute_raw_typed(&self, sql: &str, params: &[Value<'_>]) -> crate::Result<u64> {
         self.check_bind_variables_len(params)?;
 
-        metrics::query("postgres.execute_raw", sql, params, move || async move {
-            let stmt = self.fetch_cached(sql, params).await?;
+        trace::query(self.db_system_name, sql, params, move || async move {
+            let types = conversion::params_to_types(params);
+            let stmt = self.cache.get_statement(&self.client.0, sql, &types).await?;
 
             if stmt.params().len() != params.len() {
                 let kind = ErrorKind::IncorrectNumberOfParameters {
@@ -480,7 +702,7 @@ impl Queryable for PostgreSql {
     }
 
     async fn raw_cmd(&self, cmd: &str) -> crate::Result<()> {
-        metrics::query("postgres.raw_cmd", cmd, &[], move || async move {
+        trace::query(self.db_system_name, cmd, &[], move || async move {
             self.perform_io(self.client.0.simple_query(cmd)).await?;
             Ok(())
         })
@@ -668,13 +890,55 @@ fn is_safe_identifier(ident: &str) -> bool {
     true
 }
 
+pub struct MakeTlsConnectorManager {
+    url: PostgresNativeUrl,
+    connector: OnceCell<MakeTlsConnector>,
+}
+
+impl MakeTlsConnectorManager {
+    pub fn new(url: PostgresNativeUrl) -> Self {
+        MakeTlsConnectorManager {
+            url,
+            connector: OnceCell::new(),
+        }
+    }
+
+    pub async fn get_connector(&self) -> crate::Result<MakeTlsConnector> {
+        self.connector
+            .get_or_try_init(|| async {
+                let mut tls_builder = TlsConnector::builder();
+
+                {
+                    let ssl_params = self.url.ssl_params();
+                    let auth = ssl_params.to_owned().into_auth().await?;
+
+                    if let Some(certificate) = auth.certificate.0 {
+                        tls_builder.add_root_certificate(certificate);
+                    }
+
+                    tls_builder.danger_accept_invalid_certs(auth.ssl_accept_mode == SslAcceptMode::AcceptInvalidCerts);
+
+                    if let Some(identity) = auth.identity.0 {
+                        tls_builder.identity(identity);
+                    }
+                }
+
+                let tls_connector = MakeTlsConnector::new(tls_builder.build()?);
+
+                Ok(tls_connector)
+            })
+            .await
+            .cloned()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
-    pub(crate) use crate::connector::postgres::url::PostgresFlavour;
     use crate::connector::Queryable;
-    use crate::tests::test_api::postgres::CONN_STR;
+    pub(crate) use crate::connector::postgres::url::PostgresFlavour;
     use crate::tests::test_api::CRDB_CONN_STR;
+    use crate::tests::test_api::postgres::CONN_STR;
     use url::Url;
 
     #[tokio::test]
@@ -683,10 +947,12 @@ mod tests {
             let mut url = Url::parse(&CONN_STR).unwrap();
             url.query_pairs_mut().append_pair("schema", schema_name);
 
-            let mut pg_url = PostgresUrl::new(url).unwrap();
+            let mut pg_url = PostgresNativeUrl::new(url).unwrap();
             pg_url.set_flavour(PostgresFlavour::Postgres);
 
-            let client = PostgreSql::new(pg_url).await.unwrap();
+            let tls_manager = MakeTlsConnectorManager::new(pg_url.clone());
+
+            let client = PostgreSqlWithDefaultCache::new(pg_url, &tls_manager).await.unwrap();
 
             let result_set = client.query_raw("SHOW search_path", &[]).await.unwrap();
             let row = result_set.first().unwrap();
@@ -735,10 +1001,12 @@ mod tests {
             url.query_pairs_mut().append_pair("schema", schema_name);
             url.query_pairs_mut().append_pair("pbbouncer", "true");
 
-            let mut pg_url = PostgresUrl::new(url).unwrap();
+            let mut pg_url = PostgresNativeUrl::new(url).unwrap();
             pg_url.set_flavour(PostgresFlavour::Postgres);
 
-            let client = PostgreSql::new(pg_url).await.unwrap();
+            let tls_manager = MakeTlsConnectorManager::new(pg_url.clone());
+
+            let client = PostgreSqlWithDefaultCache::new(pg_url, &tls_manager).await.unwrap();
 
             let result_set = client.query_raw("SHOW search_path", &[]).await.unwrap();
             let row = result_set.first().unwrap();
@@ -786,10 +1054,12 @@ mod tests {
             let mut url = Url::parse(&CRDB_CONN_STR).unwrap();
             url.query_pairs_mut().append_pair("schema", schema_name);
 
-            let mut pg_url = PostgresUrl::new(url).unwrap();
+            let mut pg_url = PostgresNativeUrl::new(url).unwrap();
             pg_url.set_flavour(PostgresFlavour::Cockroach);
 
-            let client = PostgreSql::new(pg_url).await.unwrap();
+            let tls_manager = MakeTlsConnectorManager::new(pg_url.clone());
+
+            let client = PostgreSqlWithDefaultCache::new(pg_url, &tls_manager).await.unwrap();
 
             let result_set = client.query_raw("SHOW search_path", &[]).await.unwrap();
             let row = result_set.first().unwrap();
@@ -837,10 +1107,12 @@ mod tests {
             let mut url = Url::parse(&CONN_STR).unwrap();
             url.query_pairs_mut().append_pair("schema", schema_name);
 
-            let mut pg_url = PostgresUrl::new(url).unwrap();
+            let mut pg_url = PostgresNativeUrl::new(url).unwrap();
             pg_url.set_flavour(PostgresFlavour::Unknown);
 
-            let client = PostgreSql::new(pg_url).await.unwrap();
+            let tls_manager = MakeTlsConnectorManager::new(pg_url.clone());
+
+            let client = PostgreSqlWithDefaultCache::new(pg_url, &tls_manager).await.unwrap();
 
             let result_set = client.query_raw("SHOW search_path", &[]).await.unwrap();
             let row = result_set.first().unwrap();
@@ -888,10 +1160,12 @@ mod tests {
             let mut url = Url::parse(&CONN_STR).unwrap();
             url.query_pairs_mut().append_pair("schema", schema_name);
 
-            let mut pg_url = PostgresUrl::new(url).unwrap();
+            let mut pg_url = PostgresNativeUrl::new(url).unwrap();
             pg_url.set_flavour(PostgresFlavour::Unknown);
 
-            let client = PostgreSql::new(pg_url).await.unwrap();
+            let tls_manager = MakeTlsConnectorManager::new(pg_url.clone());
+
+            let client = PostgreSqlWithDefaultCache::new(pg_url, &tls_manager).await.unwrap();
 
             let result_set = client.query_raw("SHOW search_path", &[]).await.unwrap();
             let row = result_set.first().unwrap();

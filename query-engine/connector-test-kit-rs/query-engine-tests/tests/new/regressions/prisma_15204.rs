@@ -1,6 +1,7 @@
 use query_engine_tests::*;
 
-#[test_suite(only(Sqlite))]
+// TODO: Remove the exclude: https://linear.app/prisma-company/issue/ORM-1362/fix-issues15204-conversion-error
+#[test_suite(only(Sqlite), exclude_executors("QueryCompiler"))]
 mod conversion_error {
     fn schema_int() -> String {
         let schema = indoc! {
@@ -27,7 +28,7 @@ mod conversion_error {
     #[connector_test(
         schema(schema_int),
         only(Sqlite),
-        exclude(Sqlite("libsql.js"), Sqlite("libsql.js.wasm"))
+        exclude(Sqlite("libsql.js.wasm", "better-sqlite3.js.wasm"))
     )]
     async fn convert_to_int_sqlite_quaint(runner: Runner) -> TestResult<()> {
         create_test_data(&runner).await?;
@@ -42,7 +43,7 @@ mod conversion_error {
         Ok(())
     }
 
-    #[connector_test(schema(schema_int), only(Sqlite("libsql.js"), Sqlite("libsql.js.wasm")))]
+    #[connector_test(schema(schema_int), only(Sqlite("libsql.js.wasm")))]
     async fn convert_to_int_sqlite_js(runner: Runner) -> TestResult<()> {
         create_test_data(&runner).await?;
 
@@ -59,7 +60,7 @@ mod conversion_error {
     #[connector_test(
         schema(schema_bigint),
         only(Sqlite),
-        exclude(Sqlite("libsql.js"), Sqlite("libsql.js.wasm"))
+        exclude(Sqlite("libsql.js.wasm", "better-sqlite3.js.wasm"))
     )]
     async fn convert_to_bigint_sqlite_quaint(runner: Runner) -> TestResult<()> {
         create_test_data(&runner).await?;
@@ -74,7 +75,7 @@ mod conversion_error {
         Ok(())
     }
 
-    #[connector_test(schema(schema_bigint), only(Sqlite("libsql.js"), Sqlite("libsql.js.wasm")))]
+    #[connector_test(schema(schema_bigint), only(Sqlite("libsql.js.wasm")))]
     async fn convert_to_bigint_sqlite_js(runner: Runner) -> TestResult<()> {
         create_test_data(&runner).await?;
 

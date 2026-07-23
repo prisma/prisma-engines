@@ -1,6 +1,10 @@
+use std::path::{Path, PathBuf};
+
 use enumflags2::BitFlags;
 use psl::{Datasource, PreviewFeature};
 use quaint::prelude::SqlFamily;
+
+const INTROSPECTION_FILE_NAME: &str = "introspected.prisma";
 
 /// Input parameters for a database introspection.
 pub struct IntrospectionContext {
@@ -12,6 +16,7 @@ pub struct IntrospectionContext {
     pub composite_type_depth: CompositeTypeDepth,
     previous_schema: psl::ValidatedSchema,
     namespaces: Option<Vec<String>>,
+    base_directory_path: PathBuf,
 }
 
 impl IntrospectionContext {
@@ -20,12 +25,14 @@ impl IntrospectionContext {
         previous_schema: psl::ValidatedSchema,
         composite_type_depth: CompositeTypeDepth,
         namespaces: Option<Vec<String>>,
+        base_directory_path: PathBuf,
     ) -> Self {
         IntrospectionContext {
             previous_schema,
             composite_type_depth,
             render_config: true,
             namespaces,
+            base_directory_path,
         }
     }
 
@@ -35,22 +42,32 @@ impl IntrospectionContext {
         previous_schema: psl::ValidatedSchema,
         composite_type_depth: CompositeTypeDepth,
         namespaces: Option<Vec<String>>,
-    ) -> Self {
+        base_directory_path: PathBuf,
+    ) -> Result<Self, String> {
         let mut config_blocks = String::new();
 
-        for source in previous_schema.db.ast().sources() {
-            config_blocks.push_str(&previous_schema.db.source()[source.span.start..source.span.end]);
+        for source in previous_schema.db.datasources() {
+            config_blocks.push_str(&previous_schema.db.source(source.span.file_id)[source.span.start..source.span.end]);
             config_blocks.push('\n');
         }
 
-        for generator in previous_schema.db.ast().generators() {
-            config_blocks.push_str(&previous_schema.db.source()[generator.span.start..generator.span.end]);
+        for generator in previous_schema.db.generators() {
+            config_blocks
+                .push_str(&previous_schema.db.source(generator.span.file_id)[generator.span.start..generator.span.end]);
             config_blocks.push('\n');
         }
 
-        let previous_schema_config_only = psl::parse_schema(config_blocks).unwrap();
+        let previous_schema_config_only = psl::parse_schema_multi_without_extensions(&[(
+            Self::introspection_file_path_impl(&previous_schema, &base_directory_path).to_string(),
+            config_blocks.into(),
+        )])?;
 
-        Self::new(previous_schema_config_only, composite_type_depth, namespaces)
+        Ok(Self::new(
+            previous_schema_config_only,
+            composite_type_depth,
+            namespaces,
+            base_directory_path,
+        ))
     }
 
     /// The PSL file with the previous schema definition.
@@ -70,7 +87,7 @@ impl IntrospectionContext {
 
     /// The string source of the PSL schema file.
     pub fn schema_string(&self) -> &str {
-        self.previous_schema.db.source()
+        self.previous_schema.db.source_assert_single()
     }
 
     /// The configuration block of the PSL schema file.
@@ -91,24 +108,58 @@ impl IntrospectionContext {
     /// The SQL family we're using currently.
     pub fn sql_family(&self) -> SqlFamily {
         match self.datasource().active_provider {
+            #[cfg(feature = "postgresql")]
             "postgresql" => SqlFamily::Postgres,
+            #[cfg(feature = "cockroachdb")]
             "cockroachdb" => SqlFamily::Postgres,
+            #[cfg(feature = "sqlite")]
             "sqlite" => SqlFamily::Sqlite,
+            #[cfg(feature = "mssql")]
             "sqlserver" => SqlFamily::Mssql,
+            #[cfg(feature = "mysql")]
             "mysql" => SqlFamily::Mysql,
             name => unreachable!("The name `{}` for the datamodel connector is not known", name),
         }
     }
+
+    /// Returns the file name into which new introspection data should be written.
+    pub fn introspection_file_path(&self) -> std::borrow::Cow<'_, str> {
+        Self::introspection_file_path_impl(&self.previous_schema, &self.base_directory_path)
+    }
+
+    fn introspection_file_path_impl<'a>(
+        previous_schema: &'a psl::ValidatedSchema,
+        base_directory_path: &Path,
+    ) -> std::borrow::Cow<'a, str> {
+        if previous_schema.db.files_count() == 1 {
+            let file_id = previous_schema.db.iter_file_ids().next().unwrap();
+
+            previous_schema.db.file_name(file_id).into()
+        } else {
+            base_directory_path
+                .join(INTROSPECTION_FILE_NAME)
+                .to_string_lossy()
+                .to_string()
+                .into()
+        }
+    }
+
+    /// Removes the rendering of the configuration.
+    pub fn without_config_rendering(mut self) -> Self {
+        self.render_config = false;
+        self
+    }
 }
 
 /// Control type for composite type traversal.
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, Default)]
 pub enum CompositeTypeDepth {
     /// Allow maximum of n layers of nested types.
     Level(usize),
     /// Unrestricted traversal.
     Infinite,
     /// No traversal, typing into dynamic Json.
+    #[default]
     None,
 }
 
@@ -119,12 +170,6 @@ impl From<isize> for CompositeTypeDepth {
             0 => Self::None,
             _ => Self::Level(size as usize),
         }
-    }
-}
-
-impl Default for CompositeTypeDepth {
-    fn default() -> Self {
-        Self::None
     }
 }
 

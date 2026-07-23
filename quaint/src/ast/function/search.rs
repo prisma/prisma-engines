@@ -1,5 +1,4 @@
 use crate::prelude::*;
-use std::borrow::Cow;
 
 #[derive(Debug, Clone, PartialEq)]
 /// Holds the expressions on which to perform a full-text search
@@ -22,12 +21,12 @@ pub struct TextSearch<'a> {
 /// );
 ///
 /// assert_eq!(params, vec![Value::from("chicken")]);
-/// # Ok(())    
+/// # Ok(())
 /// # }
 /// ```
-pub fn text_search<'a, T: Clone>(exprs: &[T]) -> super::Function<'a>
+pub fn text_search<'a, T>(exprs: &[T]) -> super::Function<'a>
 where
-    T: Into<Expression<'a>>,
+    T: Clone + Into<Expression<'a>>,
 {
     let exprs: Vec<Expression> = exprs.iter().map(|c| c.clone().into()).collect();
     let fun = TextSearch { exprs };
@@ -39,7 +38,7 @@ where
 /// Holds the expressions & query on which to perform a text-search ranking compute
 pub struct TextSearchRelevance<'a> {
     pub(crate) exprs: Vec<Expression<'a>>,
-    pub(crate) query: Cow<'a, str>,
+    pub(crate) query: Expression<'a>,
 }
 
 /// Computes the relevance score of a full-text search query against some expressions.
@@ -57,13 +56,13 @@ pub struct TextSearchRelevance<'a> {
 /// );
 ///
 /// assert_eq!(params, vec![Value::from("chicken"), Value::from(0.1)]);
-/// # Ok(())    
+/// # Ok(())
 /// # }
 /// ```
-pub fn text_search_relevance<'a, E: Clone, Q>(exprs: &[E], query: Q) -> super::Function<'a>
+pub fn text_search_relevance<'a, E, Q>(exprs: &[E], query: Q) -> super::Function<'a>
 where
-    E: Into<Expression<'a>>,
-    Q: Into<Cow<'a, str>>,
+    E: Clone + Into<Expression<'a>>,
+    Q: Into<Expression<'a>>,
 {
     let exprs: Vec<Expression> = exprs.iter().map(|c| c.clone().into()).collect();
     let fun = TextSearchRelevance {

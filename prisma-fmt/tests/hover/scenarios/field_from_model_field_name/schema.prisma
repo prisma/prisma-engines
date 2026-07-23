@@ -1,0 +1,14 @@
+generator js {
+    provider = "prisma-client"
+}
+
+datasource db {
+    provider = "mongodb"
+}
+
+model ModelNameA {
+    id String @id @map("_id")
+
+    /// very important documentation
+    veryImpor<|>tantField DateTime
+}

@@ -2,7 +2,7 @@ use indoc::{formatdoc, indoc};
 use pretty_assertions::assert_eq;
 use sql_migration_tests::test_api::*;
 use std::io::Write;
-use user_facing_errors::{schema_engine::ApplyMigrationError, UserFacingError};
+use user_facing_errors::{UserFacingError, schema_engine::ApplyMigrationError};
 
 #[test_connector]
 fn apply_migrations_with_an_empty_migrations_folder_works(api: TestApi) {
@@ -33,7 +33,7 @@ fn applying_a_single_migration_should_work(api: TestApi) {
     api.apply_migrations(&dir).send_sync().assert_applied_migrations(&[]);
 }
 
-#[test_connector(tags(Mssql, Postgres), preview_features("multiSchema"), namespaces("one", "two"))]
+#[test_connector(tags(Mssql, Postgres), namespaces("one", "two"))]
 fn multi_schema_applying_two_migrations_works(api: TestApi) {
     let dm1 = api.datamodel_with_provider_and_features(
         r#"
@@ -44,7 +44,7 @@ fn multi_schema_applying_two_migrations_works(api: TestApi) {
         }
     "#,
         &[("schemas", "[\"one\", \"two\"]")],
-        &["multiSchema"],
+        &[],
     );
 
     let migrations_directory = api.create_migrations_directory();
@@ -60,7 +60,7 @@ fn multi_schema_applying_two_migrations_works(api: TestApi) {
         }
     "#,
         &[("schemas", "[\"one\", \"two\"]")],
-        &["multiSchema"],
+        &[],
     );
 
     api.create_migration("second-migration", &dm2, &migrations_directory)
@@ -75,7 +75,7 @@ fn multi_schema_applying_two_migrations_works(api: TestApi) {
         .assert_applied_migrations(&[]);
 }
 
-#[test_connector(tags(Mssql), preview_features("multiSchema"), namespaces("one", "two"))]
+#[test_connector(tags(Mssql), namespaces("one", "two"))]
 fn multi_schema_two_migrations_drop_fks(api: TestApi) {
     let dm1 = api.datamodel_with_provider_and_features(
         r#"
@@ -103,7 +103,7 @@ fn multi_schema_two_migrations_drop_fks(api: TestApi) {
         }
     "#,
         &[("schemas", "[\"one\", \"two\"]")],
-        &["multiSchema"],
+        &[],
     );
 
     let migrations_directory = api.create_migrations_directory();
@@ -141,7 +141,7 @@ fn multi_schema_two_migrations_drop_fks(api: TestApi) {
 
             @@schema("one")
         }
-      "#, &[("schemas", "[\"one\", \"two\"]")], &["multiSchema"]);
+      "#, &[("schemas", "[\"one\", \"two\"]")], &[]);
 
     api.create_migration("second-migration", &dm2, &migrations_directory)
         .send_sync();
@@ -155,7 +155,7 @@ fn multi_schema_two_migrations_drop_fks(api: TestApi) {
         .assert_applied_migrations(&[]);
 }
 
-#[test_connector(tags(Mssql), preview_features("multiSchema"), namespaces("one", "two"))]
+#[test_connector(tags(Mssql), namespaces("one", "two"))]
 fn multi_schema_two_migrations_reset(api: TestApi) {
     let dm1 = api.datamodel_with_provider_and_features(
         r#"
@@ -183,7 +183,7 @@ fn multi_schema_two_migrations_reset(api: TestApi) {
         }
     "#,
         &[("schemas", "[\"one\", \"two\"]")],
-        &["multiSchema"],
+        &[],
     );
 
     let migrations_directory = api.create_migrations_directory();
@@ -221,7 +221,7 @@ fn multi_schema_two_migrations_reset(api: TestApi) {
 
             @@schema("one")
         }
-      "#, &[("schemas", "[\"one\", \"two\"]")], &["multiSchema"]);
+      "#, &[("schemas", "[\"one\", \"two\"]")], &[]);
 
     api.create_migration("second-migration", &dm2, &migrations_directory)
         .send_sync();
@@ -310,8 +310,7 @@ fn migrations_should_fail_when_the_script_is_invalid(api: TestApi) {
         .send_sync()
         .modify_migration(|contents| contents.push_str("\nSELECT (^.^)_n;\n"))
         .into_output()
-        .generated_migration_name
-        .unwrap();
+        .generated_migration_name;
 
     let error = api
         .apply_migrations(&migrations_directory)
@@ -350,8 +349,10 @@ fn migrations_should_fail_when_the_script_is_invalid(api: TestApi) {
                     HINT: try \h SELECT
                 "#},
                 t if t.contains(Tags::Vitess) => "syntax error at position 10",
-                t if t.contains(Tags::Mariadb) => "You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near \'^.^)_n\' at line 1",
-                t if t.contains(Tags::Mysql) => "You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near \'^.^)_n\' at line 1",
+                t if t.contains(Tags::Mariadb) =>
+                    "You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near \'^.^)_n\' at line 1",
+                t if t.contains(Tags::Mysql) =>
+                    "You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near \'^.^)_n\' at line 1",
                 t if t.contains(Tags::Mssql) => "Incorrect syntax near \'^\'.",
                 t if t.contains(Tags::Postgres) => "ERROR: syntax error at or near \"^\"",
                 t if t.contains(Tags::Sqlite) => "unrecognized token: \"^\" in \n\nSELECT (^.^)_n;\n at offset 10",
@@ -487,4 +488,37 @@ fn migrations_should_succeed_on_an_uninitialized_nonempty_database_with_postgis_
     api.apply_migrations(&directory)
         .send_sync()
         .assert_applied_migrations(&["01-init"]);
+}
+
+#[test_connector]
+fn applying_a_single_migration_multi_file_should_work(api: TestApi) {
+    let schema_a = api.datamodel_with_provider(
+        r#"
+        model Cat {
+            id Int @id
+            name String
+        }
+    "#,
+    );
+    let schema_b = indoc::indoc! {r#"
+        model Dog {
+            id Int @id
+            name String
+        }
+    "#};
+
+    let dir = api.create_migrations_directory();
+
+    api.create_migration_multi_file(
+        "init",
+        &[("schema_a.prisma", schema_a.as_str()), ("schema_b.prisma", schema_b)],
+        &dir,
+    )
+    .send_sync();
+
+    api.apply_migrations(&dir)
+        .send_sync()
+        .assert_applied_migrations(&["init"]);
+
+    api.apply_migrations(&dir).send_sync().assert_applied_migrations(&[]);
 }

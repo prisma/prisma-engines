@@ -1,30 +1,58 @@
-use schema_core::{commands::evaluate_data_loss, json_rpc::types::*, schema_connector::SchemaConnector, CoreResult};
+use psl::parser_database::{ExtensionTypes, NoExtensionTypes};
+use schema_core::{CoreResult, commands::evaluate_data_loss, json_rpc::types::*, schema_connector::SchemaConnector};
 use std::borrow::Cow;
 use tempfile::TempDir;
+
+use crate::utils;
 
 #[must_use = "This struct does nothing on its own. See EvaluateDataLoss::send()"]
 pub struct EvaluateDataLoss<'a> {
     api: &'a mut dyn SchemaConnector,
     migrations_directory: &'a TempDir,
-    prisma_schema: String,
+    files: Vec<SchemaContainer>,
+    filter: SchemaFilter,
+    extension_types: &'a dyn ExtensionTypes,
 }
 
 impl<'a> EvaluateDataLoss<'a> {
-    pub fn new(api: &'a mut dyn SchemaConnector, migrations_directory: &'a TempDir, prisma_schema: String) -> Self {
+    pub fn new<'b>(
+        api: &'a mut dyn SchemaConnector,
+        migrations_directory: &'a TempDir,
+        files: &[(&'b str, &'b str)],
+        filter: SchemaFilter,
+    ) -> Self {
         EvaluateDataLoss {
             api,
             migrations_directory,
-            prisma_schema,
+            files: files
+                .iter()
+                .map(|(path, content)| SchemaContainer {
+                    path: path.to_string(),
+                    content: content.to_string(),
+                })
+                .collect(),
+            filter,
+            extension_types: &NoExtensionTypes,
         }
     }
 
+    pub fn extension_types(mut self, extension_types: &'a dyn ExtensionTypes) -> Self {
+        self.extension_types = extension_types;
+        self
+    }
+
     fn send_impl(self) -> CoreResult<EvaluateDataLossAssertion<'a>> {
+        let migrations_list = utils::list_migrations(self.migrations_directory.path()).unwrap();
+        let mut migration_schema_cache = Default::default();
         let fut = evaluate_data_loss(
             EvaluateDataLossInput {
-                migrations_directory_path: self.migrations_directory.path().to_str().unwrap().to_owned(),
-                prisma_schema: self.prisma_schema,
+                migrations_list,
+                schema: SchemasContainer { files: self.files },
+                filters: self.filter,
             },
             self.api,
+            &mut migration_schema_cache,
+            self.extension_types,
         );
         let output = test_setup::runtime::run_with_thread_local_runtime(fut)?;
 
@@ -51,7 +79,7 @@ impl std::fmt::Debug for EvaluateDataLossAssertion<'_> {
     }
 }
 
-impl<'a> EvaluateDataLossAssertion<'a> {
+impl EvaluateDataLossAssertion<'_> {
     #[track_caller]
     pub fn assert_steps_count(self, count: u32) -> Self {
         assert!(

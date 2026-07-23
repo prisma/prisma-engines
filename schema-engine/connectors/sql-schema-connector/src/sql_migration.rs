@@ -5,9 +5,9 @@ use crate::{
 };
 use enumflags2::BitFlags;
 use sql_schema_describer::{
+    EnumId, ForeignKeyId, IndexId, SqlSchema, TableColumnId, TableId, UdtId, ViewId,
     postgres::{self, PostgresSchemaExt},
     walkers::{TableColumnWalker, TableWalker},
-    EnumId, ForeignKeyId, IndexId, SqlSchema, TableColumnId, TableId, UdtId, ViewId,
 };
 use std::{collections::BTreeSet, fmt::Write as _};
 
@@ -46,6 +46,7 @@ impl SqlMigration {
             AlteredExtension,
             DroppedExtension,
             CreatedExtension,
+            AddedSchema,
             AddedEnum,
             AddedTable,
             RemovedEnum,
@@ -64,7 +65,9 @@ impl SqlMigration {
             let idx = idx as u32;
             match step {
                 SqlMigrationStep::AlterSequence(_, _) => (),
-                SqlMigrationStep::CreateSchema(_) => (), // todo
+                SqlMigrationStep::CreateSchema(_) => {
+                    drift_items.insert((DriftType::AddedSchema, "", idx));
+                }
                 SqlMigrationStep::DropView(drop_view) => {
                     drift_items.insert((
                         DriftType::RemovedView,
@@ -185,6 +188,9 @@ impl SqlMigration {
         for (line_idx, (new_state, item_name, step_idx)) in drift_items.iter().enumerate() {
             if render_state != (*new_state, item_name) || line_idx == 0 {
                 match new_state {
+                    DriftType::AddedSchema => {
+                        out.push_str("\n[+] Added Schemas\n");
+                    }
                     DriftType::AddedEnum => {
                         out.push_str("\n[+] Added enums\n");
                     }
@@ -235,7 +241,11 @@ impl SqlMigration {
                     out.push_str(self.schemas().next.walk(*enum_id).name());
                     out.push('\n');
                 }
-                SqlMigrationStep::CreateSchema(_) => {} // todo
+                SqlMigrationStep::CreateSchema(namespace) => {
+                    out.push_str("  - ");
+                    out.push_str(self.schemas().next.walk(*namespace).name());
+                    out.push('\n');
+                }
                 SqlMigrationStep::AlterEnum(alter_enum) => {
                     for added in &alter_enum.created_variants {
                         out.push_str("  [+] Added variant `");
@@ -651,7 +661,7 @@ pub(crate) struct SequenceChanges(pub(crate) BitFlags<SequenceChange>);
 
 impl PartialOrd for SequenceChanges {
     fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
-        Some(self.0.bits().cmp(&other.0.bits()))
+        Some(self.cmp(other))
     }
 }
 

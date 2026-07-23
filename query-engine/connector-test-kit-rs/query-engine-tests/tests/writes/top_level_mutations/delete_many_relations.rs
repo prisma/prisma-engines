@@ -1,9 +1,9 @@
 use query_engine_tests::*;
 
-#[test_suite]
+#[test_suite(exclude(CockroachDb))]
 mod delete_many_rels {
     use indoc::indoc;
-    use query_engine_tests::{run_query, Runner};
+    use query_engine_tests::{Runner, run_query};
     use query_test_macros::relation_link_test;
 
     #[relation_link_test(
@@ -16,7 +16,7 @@ mod delete_many_rels {
     // On D1, this fails with:
     //
     // ```diff
-    // - {"data":{"deleteManyParent":{"count":1}}}
+    // - {"data":{"deleteManyParent":{"count":2}}}
     // + {"data":{"deleteManyParent":{"count":3}}}
     // ```
     async fn p1_c1(runner: &Runner, _t: &DatamodelWithParams) -> TestResult<()> {

@@ -1,6 +1,6 @@
 use crate::{
-    walkers::{ModelWalker, RelationFieldId, RelationFieldWalker, ScalarFieldWalker},
     ParserDatabase, ReferentialAction,
+    walkers::{ModelWalker, RelationFieldId, RelationFieldWalker, ScalarFieldWalker},
 };
 use diagnostics::Span;
 use schema_ast::ast;
@@ -11,7 +11,8 @@ use schema_ast::ast;
 pub struct CompleteInlineRelationWalker<'db> {
     pub(crate) side_a: RelationFieldId,
     pub(crate) side_b: RelationFieldId,
-    pub(crate) db: &'db ParserDatabase,
+    /// The parser database being traversed.
+    pub db: &'db ParserDatabase,
 }
 
 #[allow(missing_docs)]

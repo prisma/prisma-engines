@@ -9,12 +9,11 @@ CREATE TABLE "Category" (
 
 /*
 generator js {
-  provider = "prisma-client-js"
+  provider = "prisma-client"
 }
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
 }
 
 model Category {

@@ -1,21 +1,28 @@
+use crate::visitor::query_writer::QueryWriter;
 use crate::{
     ast::*,
     error::{Error, ErrorKind},
     visitor::{self, Visitor},
 };
-use std::fmt::{self, Write};
+use query_template::{PlaceholderFormat, QueryTemplate};
+use std::borrow::Cow;
+use std::fmt;
 
 /// A visitor to generate queries for the MySQL database.
 ///
 /// The returned parameter values can be used directly with the mysql crate.
 pub struct Mysql<'a> {
-    query: String,
-    parameters: Vec<Value<'a>>,
+    query_template: QueryTemplate<Value<'a>>,
     /// The table a deleting or updating query is acting on.
     target_table: Option<Table<'a>>,
 }
 
 impl<'a> Mysql<'a> {
+    /// Expression that evaluates to the current MySQL version.
+    pub const fn version_expr() -> &'static str {
+        "version()"
+    }
+
     fn visit_regular_equality_comparison(&mut self, left: Expression<'a>, right: Expression<'a>) -> visitor::Result {
         self.visit_expression(left)?;
         self.write(" = ")?;
@@ -59,7 +66,7 @@ impl<'a> Mysql<'a> {
         }
 
         match (left, right) {
-            (left, right) if left.is_json_value() && right.is_fun_retuning_json() => {
+            (left, right) if left.is_extractable_json_value() && right.is_fun_retuning_json() => {
                 let quaint_value = json_to_quaint_value(left.into_json_value().unwrap())?;
 
                 self.visit_parameterized(quaint_value)?;
@@ -67,7 +74,7 @@ impl<'a> Mysql<'a> {
                 self.visit_expression(right)?;
             }
 
-            (left, right) if left.is_fun_retuning_json() && right.is_json_value() => {
+            (left, right) if left.is_fun_retuning_json() && right.is_extractable_json_value() => {
                 let quaint_value = json_to_quaint_value(right.into_json_value().unwrap())?;
 
                 self.visit_expression(left)?;
@@ -115,6 +122,16 @@ impl<'a> Mysql<'a> {
                     })?;
                     Ok(())
                 }
+                // Convert BigInt to string to preserve precision when parsed by JavaScript.
+                (Some(TypeFamily::Int), Some("BIGINT" | "UNSIGNEDBIGINT")) => {
+                    self.write("CONVERT")?;
+                    self.surround_with("(", ")", |s| {
+                        s.visit_expression(expr)?;
+                        s.write(", ")?;
+                        s.write("CHAR")
+                    })?;
+                    Ok(())
+                }
                 _ => self.visit_expression(expr),
             },
             _ => self.visit_expression(expr),
@@ -127,24 +144,27 @@ impl<'a> Visitor<'a> for Mysql<'a> {
     const C_BACKTICK_CLOSE: &'static str = "`";
     const C_WILDCARD: &'static str = "%";
 
-    fn build<Q>(query: Q) -> crate::Result<(String, Vec<Value<'a>>)>
+    fn build_template<Q>(query: Q) -> crate::Result<QueryTemplate<Value<'a>>>
     where
         Q: Into<Query<'a>>,
     {
         let query = query.into();
-        let mut mysql = Mysql {
-            query: String::with_capacity(4096),
-            parameters: Vec::with_capacity(128),
+
+        let mut this = Mysql {
+            query_template: QueryTemplate::new(PlaceholderFormat {
+                prefix: "?",
+                has_numbering: false,
+            }),
             target_table: get_target_table(&query),
         };
 
-        Mysql::visit_query(&mut mysql, query)?;
+        Mysql::visit_query(&mut this, query)?;
 
-        Ok((mysql.query, mysql.parameters))
+        Ok(this.query_template)
     }
 
-    fn write<D: fmt::Display>(&mut self, s: D) -> visitor::Result {
-        write!(&mut self.query, "{s}")?;
+    fn write(&mut self, value: impl fmt::Display) -> visitor::Result {
+        self.query_template.write_string_chunk(value.to_string());
         Ok(())
     }
 
@@ -182,7 +202,7 @@ impl<'a> Visitor<'a> for Mysql<'a> {
             ValueType::Numeric(r) => r.as_ref().map(|r| self.write(r)),
 
             ValueType::Json(j) => match j {
-                Some(ref j) => {
+                Some(j) => {
                     let s = serde_json::to_string(&j)?;
                     Some(self.write(format!("CONVERT('{s}', JSON)")))
                 }
@@ -193,6 +213,10 @@ impl<'a> Visitor<'a> for Mysql<'a> {
             ValueType::Date(date) => date.map(|date| self.write(format!("'{date}'"))),
             ValueType::Time(time) => time.map(|time| self.write(format!("'{time}'"))),
             ValueType::Xml(cow) => cow.as_ref().map(|cow| self.write(format!("'{cow}'"))),
+
+            ValueType::Opaque(opaque) => Some(Err(
+                Error::builder(ErrorKind::OpaqueAsRawValue(opaque.to_string())).build()
+            )),
         };
 
         match res {
@@ -213,6 +237,26 @@ impl<'a> Visitor<'a> for Mysql<'a> {
         }
 
         match insert.values {
+            Expression {
+                kind: ExpressionKind::Parameterized(row),
+                ..
+            } => {
+                let columns = insert.columns.len();
+
+                self.write(" (")?;
+                for (i, c) in insert.columns.into_iter().enumerate() {
+                    self.visit_column(c.into_bare())?;
+
+                    if i < (columns - 1) {
+                        self.write(",")?;
+                    }
+                }
+
+                self.write(")")?;
+                self.write(" VALUES ")?;
+                self.query_template.write_parameter_tuple_list("(", ",", ")", ",");
+                self.query_template.parameters.push(row);
+            }
             Expression {
                 kind: ExpressionKind::Row(row),
                 ..
@@ -288,14 +332,14 @@ impl<'a> Visitor<'a> for Mysql<'a> {
     fn visit_sub_selection(&mut self, query: SelectQuery<'a>) -> visitor::Result {
         match query {
             SelectQuery::Select(select) => {
-                if let Some(table) = &self.target_table {
-                    if select.tables.contains(table) {
-                        let tmp_name = "tmp_subselect_table";
-                        let tmp_table = Table::from(*select).alias(tmp_name);
-                        let sub_select = Select::from_table(tmp_table).value(Table::from(tmp_name).asterisk());
+                if let Some(table) = &self.target_table
+                    && select.tables.contains(table)
+                {
+                    let tmp_name = "tmp_subselect_table";
+                    let tmp_table = Table::from(*select).alias(tmp_name);
+                    let sub_select = Select::from_table(tmp_table).value(Table::from(tmp_name).asterisk());
 
-                        return self.visit_select(sub_select);
-                    }
+                    return self.visit_select(sub_select);
                 }
 
                 self.visit_select(*select)
@@ -304,12 +348,26 @@ impl<'a> Visitor<'a> for Mysql<'a> {
         }
     }
 
-    fn parameter_substitution(&mut self) -> visitor::Result {
-        self.write("?")
+    fn add_parameter(&mut self, value: Value<'a>) {
+        self.query_template.parameters.push(value);
     }
 
-    fn add_parameter(&mut self, value: Value<'a>) {
-        self.parameters.push(value);
+    fn parameter_substitution(&mut self) -> visitor::Result {
+        self.query_template.write_parameter();
+        Ok(())
+    }
+
+    fn visit_parameterized_row(
+        &mut self,
+        value: Value<'a>,
+        item_prefix: impl Into<Cow<'static, str>>,
+        separator: impl Into<Cow<'static, str>>,
+        item_suffix: impl Into<Cow<'static, str>>,
+    ) -> visitor::Result {
+        self.query_template
+            .write_parameter_tuple(item_prefix, separator, item_suffix);
+        self.query_template.parameters.push(value);
+        Ok(())
     }
 
     fn visit_limit_and_offset(&mut self, limit: Option<Value<'a>>, offset: Option<Value<'a>>) -> visitor::Result {
@@ -407,7 +465,7 @@ impl<'a> Visitor<'a> for Mysql<'a> {
         }
     }
 
-    #[cfg(any(feature = "postgresql", feature = "mysql"))]
+    #[cfg(any(feature = "postgresql", feature = "mysql", feature = "sqlite"))]
     fn visit_json_extract(&mut self, json_extract: JsonExtract<'a>) -> visitor::Result {
         if json_extract.extract_as_string {
             self.write("JSON_UNQUOTE(")?;
@@ -431,7 +489,7 @@ impl<'a> Visitor<'a> for Mysql<'a> {
         Ok(())
     }
 
-    #[cfg(any(feature = "postgresql", feature = "mysql"))]
+    #[cfg(any(feature = "postgresql", feature = "mysql", feature = "sqlite"))]
     fn visit_json_array_contains(&mut self, left: Expression<'a>, right: Expression<'a>, not: bool) -> visitor::Result {
         self.write("JSON_CONTAINS(")?;
         self.visit_expression(left)?;
@@ -446,7 +504,7 @@ impl<'a> Visitor<'a> for Mysql<'a> {
         Ok(())
     }
 
-    #[cfg(any(feature = "postgresql", feature = "mysql"))]
+    #[cfg(any(feature = "postgresql", feature = "mysql", feature = "sqlite"))]
     fn visit_json_type_equals(&mut self, left: Expression<'a>, json_type: JsonType<'a>, not: bool) -> visitor::Result {
         self.write("(")?;
         self.write("JSON_TYPE")?;
@@ -530,15 +588,13 @@ impl<'a> Visitor<'a> for Mysql<'a> {
         })
     }
 
-    fn visit_matches(&mut self, left: Expression<'a>, right: std::borrow::Cow<'a, str>, not: bool) -> visitor::Result {
+    fn visit_matches(&mut self, left: Expression<'a>, right: Expression<'a>, not: bool) -> visitor::Result {
         if not {
             self.write("(NOT ")?;
         }
 
         self.visit_expression(left)?;
-        self.surround_with("AGAINST (", " IN BOOLEAN MODE)", |s| {
-            s.visit_parameterized(Value::text(right))
-        })?;
+        self.surround_with("AGAINST (", " IN BOOLEAN MODE)", |s| s.visit_expression(right))?;
 
         if not {
             self.write(")")?;
@@ -553,12 +609,13 @@ impl<'a> Visitor<'a> for Mysql<'a> {
 
         let text_search = TextSearch { exprs };
 
-        self.visit_matches(text_search.into(), query, false)?;
+        self.visit_expression(text_search.into())?;
+        self.surround_with("AGAINST (", " IN BOOLEAN MODE)", |s| s.visit_expression(query))?;
 
         Ok(())
     }
 
-    #[cfg(any(feature = "postgresql", feature = "mysql"))]
+    #[cfg(any(feature = "postgresql", feature = "mysql", feature = "sqlite"))]
     fn visit_json_extract_last_array_item(&mut self, extract: JsonExtractLastArrayElem<'a>) -> visitor::Result {
         self.write("JSON_EXTRACT(")?;
         self.visit_expression(*extract.expr.clone())?;
@@ -571,7 +628,7 @@ impl<'a> Visitor<'a> for Mysql<'a> {
         Ok(())
     }
 
-    #[cfg(any(feature = "postgresql", feature = "mysql"))]
+    #[cfg(any(feature = "postgresql", feature = "mysql", feature = "sqlite"))]
     fn visit_json_extract_first_array_item(&mut self, extract: JsonExtractFirstArrayElem<'a>) -> visitor::Result {
         self.write("JSON_EXTRACT(")?;
         self.visit_expression(*extract.expr)?;
@@ -582,7 +639,7 @@ impl<'a> Visitor<'a> for Mysql<'a> {
         Ok(())
     }
 
-    #[cfg(any(feature = "postgresql", feature = "mysql"))]
+    #[cfg(any(feature = "postgresql", feature = "mysql", feature = "sqlite"))]
     fn visit_json_unquote(&mut self, json_unquote: JsonUnquote<'a>) -> visitor::Result {
         self.write("JSON_UNQUOTE(")?;
         self.visit_expression(*json_unquote.expr)?;
@@ -619,6 +676,12 @@ impl<'a> Visitor<'a> for Mysql<'a> {
         })?;
 
         Ok(())
+    }
+
+    #[cfg(feature = "mysql")]
+    fn visit_stringify(&mut self, stringify: Stringify<'a>) -> visitor::Result {
+        self.write("CAST")?;
+        self.surround_with("(", " AS CHAR)", |s| s.visit_expression(*stringify.expression))
     }
 
     fn visit_ordering(&mut self, ordering: Ordering<'a>) -> visitor::Result {
@@ -678,6 +741,7 @@ fn get_target_table<'a>(query: &Query<'a>) -> Option<Table<'a>> {
 
 #[cfg(test)]
 mod tests {
+    use crate::ast::*;
     use crate::visitor::*;
 
     fn expected_values<'a, T>(sql: &'static str, params: Vec<T>) -> (String, Vec<Value<'a>>)
@@ -764,8 +828,6 @@ mod tests {
 
     #[test]
     fn test_in_values_2_tuple() {
-        use crate::{col, values};
-
         let expected_sql = "SELECT `test`.* FROM `test` WHERE (`id1`,`id2`) IN ((?,?),(?,?))";
         let query = Select::from_table("test")
             .so_that(Row::from((col!("id1"), col!("id2"))).in_selection(values!((1, 2), (3, 4))));
@@ -777,6 +839,36 @@ mod tests {
             vec![Value::int32(1), Value::int32(2), Value::int32(3), Value::int32(4),],
             params
         );
+    }
+
+    #[test]
+    fn json_build_object_casts_bigint_to_string() {
+        let build_json = json_build_object(vec![(
+            "id".into(),
+            Column::from("id")
+                .native_column_type(Some("BIGINT"))
+                .type_family(TypeFamily::Int)
+                .into(),
+        )]);
+        let query = Select::default().value(build_json);
+        let (sql, _) = Mysql::build(query).unwrap();
+
+        assert_eq!("SELECT JSON_OBJECT('id', CONVERT(`id`, CHAR))", sql);
+    }
+
+    #[test]
+    fn json_build_object_casts_unsigned_bigint_to_string() {
+        let build_json = json_build_object(vec![(
+            "id".into(),
+            Column::from("id")
+                .native_column_type(Some("UNSIGNEDBIGINT"))
+                .type_family(TypeFamily::Int)
+                .into(),
+        )]);
+        let query = Select::default().value(build_json);
+        let (sql, _) = Mysql::build(query).unwrap();
+
+        assert_eq!("SELECT JSON_OBJECT('id', CONVERT(`id`, CHAR))", sql);
     }
 
     #[test]

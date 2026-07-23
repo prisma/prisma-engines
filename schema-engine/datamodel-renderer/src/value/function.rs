@@ -55,7 +55,7 @@ where
     }
 }
 
-impl<'a> fmt::Display for FunctionParam<'a> {
+impl fmt::Display for FunctionParam<'_> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             FunctionParam::KeyValue(k, v) => {
@@ -105,7 +105,7 @@ impl<'a> Function<'a> {
     }
 }
 
-impl<'a> fmt::Display for Function<'a> {
+impl fmt::Display for Function<'_> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         self.name.fmt(f)?;
 

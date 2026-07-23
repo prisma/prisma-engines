@@ -1,10 +1,10 @@
 use query_engine_tests::*;
 
-#[test_suite(schema(autoinc_id), capabilities(CreateMany, AutoIncrement), exclude(CockroachDb))]
+#[test_suite(schema(autoinc_id), capabilities(AutoIncrement), exclude(CockroachDb))]
 mod not_in_chunking {
     use query_engine_tests::Runner;
 
-    #[connector_test(exclude(CockroachDb, Sqlite("cfd1")))]
+    #[connector_test]
     async fn not_in_batch_filter(runner: Runner) -> TestResult<()> {
         assert_error!(
             runner,

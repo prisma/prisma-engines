@@ -1,6 +1,5 @@
 datasource db {
   provider = "mongodb"
-  url      = "mongodb://"
 }
 
 type Address {

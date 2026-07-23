@@ -4,7 +4,7 @@ use query_engine_tests::*;
 
 #[test_suite(
     suite = "setdefault_onD_1to1_req",
-    exclude(MongoDb, MySQL, Vitess("planetscale.js", "planetscale.js.wasm"))
+    exclude(MongoDb, MySQL, Vitess("planetscale.js.wasm"))
 )]
 mod one2one_req {
     fn required_with_default() -> String {
@@ -80,7 +80,7 @@ mod one2one_req {
             runner,
             "mutation { deleteOneParent(where: { id: 1 }) { id }}",
             2003,
-            "Foreign key constraint failed on the field"
+            "Foreign key constraint violated"
         );
 
         Ok(())
@@ -99,7 +99,7 @@ mod one2one_req {
             runner,
             "mutation { deleteOneParent(where: { id: 1 }) { id }}",
             2011,
-            "Null constraint violation on the fields"
+            "Null constraint violation on the"
         );
 
         Ok(())
@@ -108,7 +108,7 @@ mod one2one_req {
 
 #[test_suite(
     suite = "setdefault_onD_1to1_opt",
-    exclude(MongoDb, MySQL, Vitess("planetscale.js", "planetscale.js.wasm"))
+    exclude(MongoDb, MySQL, Vitess("planetscale.js.wasm"))
 )]
 mod one2one_opt {
     fn optional_with_default() -> String {
@@ -175,7 +175,7 @@ mod one2one_opt {
     /// Deleting the parent reconnects the child to the default and fails (the default doesn't exist).
     #[connector_test(
         schema(optional_with_default),
-        exclude(MongoDb, MySQL, Vitess("planetscale.js", "planetscale.js.wasm"))
+        exclude(MongoDb, MySQL, Vitess("planetscale.js.wasm"))
     )]
     async fn delete_parent_no_exist_fail(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
@@ -187,7 +187,7 @@ mod one2one_opt {
             runner,
             "mutation { deleteOneParent(where: { id: 1 }) { id }}",
             2003,
-            "Foreign key constraint failed on the field"
+            "Foreign key constraint violated"
         );
 
         Ok(())
@@ -217,7 +217,7 @@ mod one2one_opt {
 
 #[test_suite(
     suite = "setdefault_onD_1toM_req",
-    exclude(MongoDb, MySQL, Vitess("planetscale.js", "planetscale.js.wasm"))
+    exclude(MongoDb, MySQL, Vitess("planetscale.js.wasm"))
 )]
 mod one2many_req {
     fn required_with_default() -> String {
@@ -293,7 +293,7 @@ mod one2many_req {
             runner,
             "mutation { deleteOneParent(where: { id: 1 }) { id }}",
             2003,
-            "Foreign key constraint failed on the field"
+            "Foreign key constraint violated"
         );
 
         Ok(())
@@ -312,7 +312,7 @@ mod one2many_req {
             runner,
             "mutation { deleteOneParent(where: { id: 1 }) { id }}",
             2011,
-            "Null constraint violation on the fields"
+            "Null constraint violation on the"
         );
 
         Ok(())
@@ -321,7 +321,7 @@ mod one2many_req {
 
 #[test_suite(
     suite = "setdefault_onD_1toM_opt",
-    exclude(MongoDb, MySQL, Vitess("planetscale.js", "planetscale.js.wasm"))
+    exclude(MongoDb, MySQL, Vitess("planetscale.js.wasm"))
 )]
 mod one2many_opt {
     fn optional_with_default() -> String {
@@ -397,7 +397,7 @@ mod one2many_opt {
             runner,
             "mutation { deleteOneParent(where: { id: 1 }) { id }}",
             2003,
-            "Foreign key constraint failed on the field"
+            "Foreign key constraint violated"
         );
 
         Ok(())

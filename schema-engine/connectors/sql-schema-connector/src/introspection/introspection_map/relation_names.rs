@@ -74,7 +74,7 @@ pub(super) fn introspect<'a>(ctx: &DatamodelCalculatorContext<'a>, map: &mut sup
     let ambiguous_relations = find_ambiguous_relations(ctx);
 
     for table in ctx.sql_schema.table_walkers() {
-        if is_prisma_m_to_n_relation(table) {
+        if is_prisma_m_to_n_relation(table, ctx.flavour.uses_pk_in_m2m_join_tables(ctx)) {
             let name = prisma_m2m_relation_name(table, &ambiguous_relations, ctx);
             names.m2m_relation_names.insert(table.id, name);
         } else {
@@ -175,8 +175,8 @@ fn find_ambiguous_relations(ctx: &DatamodelCalculatorContext<'_>) -> HashSet<[sq
     let mut ambiguous_relations = HashSet::new();
 
     for table in ctx.sql_schema.table_walkers() {
-        if is_prisma_m_to_n_relation(table) {
-            m2m_relation_ambiguousness(table, &mut ambiguous_relations)
+        if is_prisma_m_to_n_relation(table, ctx.flavour.uses_pk_in_m2m_join_tables(ctx)) {
+            m2m_relation_ambiguousness(table, ctx, &mut ambiguous_relations)
         } else {
             for fk in table.foreign_keys() {
                 inline_relation_ambiguousness(fk, &mut ambiguous_relations, ctx)
@@ -187,7 +187,11 @@ fn find_ambiguous_relations(ctx: &DatamodelCalculatorContext<'_>) -> HashSet<[sq
     ambiguous_relations
 }
 
-fn m2m_relation_ambiguousness(table: sql::TableWalker<'_>, ambiguous_relations: &mut HashSet<[sql::TableId; 2]>) {
+fn m2m_relation_ambiguousness(
+    table: sql::TableWalker<'_>,
+    ctx: &DatamodelCalculatorContext<'_>,
+    ambiguous_relations: &mut HashSet<[sql::TableId; 2]>,
+) {
     let tables = table_ids_for_m2m_relation_table(table);
 
     if ambiguous_relations.contains(&tables) {
@@ -205,7 +209,11 @@ fn m2m_relation_ambiguousness(table: sql::TableWalker<'_>, ambiguous_relations: 
     }
 
     // Check for conflicts with another m2m relation.
-    for other_m2m in table.schema.table_walkers().filter(|t| is_prisma_m_to_n_relation(*t)) {
+    for other_m2m in table
+        .schema
+        .table_walkers()
+        .filter(|t| is_prisma_m_to_n_relation(*t, ctx.flavour.uses_pk_in_m2m_join_tables(ctx)))
+    {
         if other_m2m.id != table.id && table_ids_for_m2m_relation_table(other_m2m) == tables {
             ambiguous_relations.insert(tables);
         }

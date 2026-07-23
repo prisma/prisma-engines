@@ -20,12 +20,11 @@ $$
 
     let expected = expect![[r#"
         generator client {
-          provider = "prisma-client-js"
+          provider = "prisma-client"
         }
 
         datasource db {
           provider = "postgresql"
-          url      = "env(TEST_DATABASE_URL)"
         }
 
         model stringstest {
@@ -154,32 +153,6 @@ async fn a_table_with_a_hash_index(api: &mut TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Postgres))]
-async fn ignoring_of_partial_indices(api: &mut TestApi) -> TestResult {
-    let setup = indoc! {r#"
-       CREATE TABLE "A" (
-           id INTEGER NOT NULL,
-           a  INTEGER,
-           CONSTRAINT A_pkey PRIMARY KEY (id)
-       );
-
-       CREATE INDEX "A_a_idx" ON "A" Using Btree (a) Where (a is not null);
-   "#};
-
-    api.raw_cmd(setup).await;
-
-    let expectation = expect![[r#"
-        model A {
-          id Int  @id(map: "a_pkey")
-          a  Int?
-        }
-    "#]];
-
-    expectation.assert_eq(&api.introspect_dml().await?);
-
-    Ok(())
-}
-
-#[test_connector(tags(Postgres))]
 async fn introspecting_now_functions(api: &mut TestApi) -> TestResult {
     let setup = indoc! {r#"
        CREATE TABLE "A" (
@@ -228,12 +201,11 @@ async fn a_table_with_json_columns(api: &mut TestApi) -> TestResult {
 
     let expected = expect![[r#"
         generator client {
-          provider = "prisma-client-js"
+          provider = "prisma-client"
         }
 
         datasource db {
           provider = "postgresql"
-          url      = "env(TEST_DATABASE_URL)"
         }
 
         model Foo {
@@ -261,12 +233,11 @@ async fn datetime_default_expressions_are_not_truncated(api: &mut TestApi) -> Te
 
     let expected = expect![[r#"
         generator client {
-          provider = "prisma-client-js"
+          provider = "prisma-client"
         }
 
         datasource db {
           provider = "postgresql"
-          url      = "env(TEST_DATABASE_URL)"
         }
 
         model Foo {
@@ -285,12 +256,11 @@ async fn northwind(api: TestApi) {
     api.raw_cmd(setup).await;
     let expectation = expect![[r#"
         generator client {
-          provider = "prisma-client-js"
+          provider = "prisma-client"
         }
 
         datasource db {
           provider = "postgresql"
-          url      = "env(TEST_DATABASE_URL)"
         }
 
         model categories {

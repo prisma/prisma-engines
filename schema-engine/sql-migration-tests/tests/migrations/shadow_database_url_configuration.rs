@@ -44,7 +44,7 @@ fn shadow_db_url_can_be_configured_on_postgres(api: TestApi) {
         let create_user = r#"
             DROP USER IF EXISTS shadowdbconfigtestuser;
             CREATE USER shadowdbconfigtestuser PASSWORD '1234batman' LOGIN;
-            GRANT USAGE, CREATE ON SCHEMA "prisma-tests" TO shadowdbconfigtestuser;
+            GRANT USAGE, CREATE ON SCHEMA "public" TO shadowdbconfigtestuser;
             GRANT ALL PRIVILEGES ON DATABASE "testshadowdb0001" TO shadowdbconfigtestuser;
         "#;
 
@@ -55,9 +55,8 @@ fn shadow_db_url_can_be_configured_on_postgres(api: TestApi) {
 
         let shadow_db_connection = tok(Quaint::new(shadow_db_url.as_ref())).unwrap();
 
-        tok(shadow_db_connection.raw_cmd(
-            "CREATE SCHEMA \"prisma-tests\"; GRANT USAGE, CREATE ON SCHEMA \"prisma-tests\" TO shadowdbconfigtestuser",
-        ))
+        tok(shadow_db_connection
+            .raw_cmd("CREATE SCHEMA IF NOT EXISTS \"public\"; GRANT USAGE, CREATE ON SCHEMA \"public\" TO shadowdbconfigtestuser"))
         .unwrap();
     }
 
@@ -121,14 +120,13 @@ fn shadow_db_url_must_not_match_main_url(api: TestApi) {
 
     // URLs match -> error
     {
-        let mut engine = api.new_engine_with_connection_strings(
-            api.connection_string().to_owned(),
-            Some(api.connection_string().to_owned()),
-        );
-
-        let err = engine
-            .create_migration("01init", schema, &migrations_directory)
-            .send_unwrap_err()
+        let err = api
+            .new_engine_with_connection_strings_or_err(
+                api.connection_string().to_owned(),
+                Some(api.connection_string().to_owned()),
+            )
+            .err()
+            .unwrap()
             .to_string();
 
         assert!(err.contains("The shadow database you configured appears to be the same as the main database. Please specify another shadow database."));
@@ -174,9 +172,9 @@ fn shadow_db_not_reachable_error_must_have_the_right_connection_info(api: TestAp
         .to_user_facing();
 
     let assertion = expect![[r#"
-        Can't reach database server at `localhost`:`39824`
+        Can't reach database server at `localhost:39824`
 
-        Please make sure your database server is running at `localhost`:`39824`."#]];
+        Please make sure your database server is running at `localhost:39824`."#]];
 
     assertion.assert_eq(err.message());
 

@@ -1,51 +1,31 @@
-name: "All crates: linting"
+name: 'All crates: linting'
 on:
   push:
     branches:
       - main
   pull_request:
     paths-ignore:
-      - ".github/**"
-      - "!.github/workflows/formatting.yml"
-      - ".buildkite/**"
-      - "*.md"
-      - "LICENSE"
-      - "CODEOWNERS"
-      - "renovate.json"
+      - '.github/**'
+      - '!.github/workflows/formatting.yml'
+      - '*.md'
+      - 'LICENSE'
+      - 'CODEOWNERS'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  clippy:
-    name: clippy linting
+  checks:
+    name: run lints and formatting checks
     runs-on: ubuntu-latest
-    env:
-      RUSTFLAGS: "-Dwarnings"
     steps:
       - uses: actions/checkout@v4
-      - uses: dtolnay/rust-toolchain@stable
+      - uses: actions-rust-lang/setup-rust-toolchain@v1
         with:
           components: clippy
           targets: wasm32-unknown-unknown
-      # Check the whole workspace with clippy for the native compilation
-      # target, and query-engine-wasm and dependencies for wasm32-unknown-unknown.
-      # Note that `--all-targets` is unrelated to `--target` as in target platform,
-      # it is a shortcut for `--lib --bins --tests --benches --examples`.
-      - run: |
-          cargo clippy --workspace --all-features --all-targets
-          cargo clippy --all-features --all-targets -p query-engine-wasm --target wasm32-unknown-unknown
-
-  rustfmt:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: dtolnay/rust-toolchain@stable
-        with:
-          components: rustfmt
-      - name: Check formatting
-        run: cargo fmt -- --check
+      - run: make pedantic
 
   shellcheck:
     runs-on: ubuntu-latest
@@ -53,3 +33,13 @@ jobs:
       - uses: actions/checkout@v4
       - name: Run ShellCheck
         uses: ludeeus/action-shellcheck@master
+
+  prettier-typescript:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '22'
+      - run: npx prettier@3 --check '**/*.ts'

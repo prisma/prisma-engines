@@ -3,7 +3,7 @@ use query_engine_tests::*;
 #[test_suite(schema(schema), capabilities(ScalarLists, Json, JsonLists))]
 mod json {
     use indoc::indoc;
-    use query_engine_tests::{run_query, Runner};
+    use query_engine_tests::{Runner, run_query};
 
     fn schema() -> String {
         let schema = indoc! {
@@ -66,26 +66,6 @@ mod json {
           MongoDb(_) => vec![r#"{"data":{"updateOneScalarModel":{"jsons":["{\"a\":\"b\"}","{}","2","[]","{}"]}}}"#],
           _ => vec![r#"{"data":{"updateOneScalarModel":{"jsons":["{\"a\":\"b\"}","{}","2","[[],{}]"]}}}"#]
         );
-
-        // TODO: This specific query currently cannot be sent from the JS client.
-        // The client _always_ sends an array as plain json and never as an array of json.
-        // We're temporarily ignoring it for the JSON protocol because we can't differentiate a list of json values from a json array.
-        // Similarly, this does not currently work with driver adapters.
-        // https://github.com/prisma/prisma/issues/18019
-        if runner.protocol().is_graphql() && !runner.is_external_executor() {
-            match_connector_result!(
-              &runner,
-              r#"mutation {
-                updateOneScalarModel(where: { id: 1 }, data: {
-                  jsons:  { push: ["[]", "{}"] }
-                }) {
-                  jsons
-                }
-              }"#,
-              MongoDb(_) => vec![r#"{"data":{"updateOneScalarModel":{"jsons":["{\"a\":\"b\"}","{}","2","[]","{}","[]","{}"]}}}"#],
-              _ => vec![r#"{"data":{"updateOneScalarModel":{"jsons":["{\"a\":\"b\"}","{}","2","[[],{}]","[]","{}"]}}}"#]
-            );
-        }
 
         Ok(())
     }
@@ -158,26 +138,6 @@ mod json {
           MongoDb(_) => vec![r#"{"data":{"updateOneScalarModel":{"jsons":["\"1\"","\"2\""]}}}"#],
           _ => vec![r#"{"data":{"updateOneScalarModel":{"jsons":["[\"1\",\"2\"]"]}}}"#]
         );
-
-        // TODO: This specific query currently cannot be sent from the JS client.
-        // The client _always_ sends an array as plain json and never as an array of json.
-        // We're temporarily ignoring it for the JSON protocol because we can't differentiate a list of json values from a json array.
-        // Similarly, this does not currently work with driver adapters.
-        // https://github.com/prisma/prisma/issues/18019
-        if runner.protocol().is_graphql() && !runner.is_external_executor() {
-            match_connector_result!(
-              &runner,
-              r#"mutation {
-                updateOneScalarModel(where: { id: 2 }, data: {
-                  jsons:  { push: ["1", "2"] }
-                }) {
-                  jsons
-                }
-              }"#,
-              MongoDb(_) => vec![r#"{"data":{"updateOneScalarModel":{"jsons":["\"1\"","\"2\"","1","2"]}}}"#],
-              _ => vec![r#"{"data":{"updateOneScalarModel":{"jsons":["[\"1\",\"2\"]","1","2"]}}}"#]
-            );
-        }
 
         Ok(())
     }

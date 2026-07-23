@@ -1,0 +1,14 @@
+datasource test {
+  provider = "postgresql"
+}
+
+model TestModel {
+  id         Int @id
+  unique1    Int @unique
+  unique2    Int @unique
+  unique3    Int
+  unique4    Int
+  non_unique Int
+
+  @@unique([unique3, unique4])
+}

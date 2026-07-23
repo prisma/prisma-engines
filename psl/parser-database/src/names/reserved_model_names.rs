@@ -1,6 +1,6 @@
 use crate::{
-    ast::{self, WithName, WithSpan},
     DatamodelError, Diagnostics,
+    ast::{self, WithName, WithSpan},
 };
 
 /// Is this a valid type name for the Prisma Client API?
@@ -25,7 +25,7 @@ pub(crate) fn validate_model_name(ast_model: &ast::Model, block_type: &'static s
 }
 
 pub(crate) fn validate_enum_name(ast_enum: &ast::Enum, diagnostics: &mut Diagnostics) {
-    if !is_reserved_type_name(&ast_enum.name.name) {
+    if !is_reserved_type_name(ast_enum.name()) {
         return;
     }
 
@@ -39,11 +39,13 @@ pub(crate) fn validate_enum_name(ast_enum: &ast::Enum, diagnostics: &mut Diagnos
 ));
 }
 
-// The source of the following list is from prisma-client-js. Any edit should be done in both places.
+// The source of the following list is from prisma-client. Any edit should be done in both places.
 // https://github.com/prisma/prisma/blob/master/src/packages/client/src/generation/generateClient.ts#L443
 const RESERVED_NAMES: &[&str] = &[
     "PrismaClient",
     // JavaScript keywords
+    "async",
+    "await",
     "break",
     "case",
     "catch",
@@ -83,6 +85,7 @@ const RESERVED_NAMES: &[&str] = &[
     "true",
     "try",
     "typeof",
+    "using",
     "var",
     "void",
     "while",

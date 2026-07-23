@@ -1,27 +1,40 @@
 mod primary_key;
+mod shard_key;
 mod unique_criteria;
 
 pub use primary_key::*;
+pub use shard_key::*;
 
 pub(crate) use unique_criteria::*;
 
 use super::{
     CompleteInlineRelationWalker, FieldWalker, IndexWalker, InlineRelationWalker, RelationFieldWalker, RelationWalker,
-    ScalarFieldWalker,
+    ScalarFieldWalker, newline,
 };
+
 use crate::{
-    ast::{self, WithName},
+    FileId,
+    ast::{self, IndentationType, NewlineType, WithName, WithSpan},
     types::ModelAttributes,
 };
-use schema_ast::ast::{IndentationType, NewlineType, WithSpan};
 
 /// A `model` declaration in the Prisma schema.
-pub type ModelWalker<'db> = super::Walker<'db, ast::ModelId>;
+pub type ModelWalker<'db> = super::Walker<'db, crate::ModelId>;
 
 impl<'db> ModelWalker<'db> {
     /// The name of the model.
     pub fn name(self) -> &'db str {
         self.ast_model().name()
+    }
+
+    /// The ID of the file containing the model.
+    pub fn file_id(self) -> FileId {
+        self.id.0
+    }
+
+    /// Returns the specific field from the model.
+    pub fn field(&self, field_id: ast::FieldId) -> FieldWalker<'db> {
+        self.walk((self.id, field_id))
     }
 
     /// Traverse the fields of the models in the order they were defined.
@@ -59,14 +72,14 @@ impl<'db> ModelWalker<'db> {
             .is_some()
     }
 
-    /// The ID of the model in the db
-    pub fn model_id(self) -> ast::ModelId {
-        self.id
+    /// Is the model defined in a specific file?
+    pub fn is_defined_in_file(self, file_id: FileId) -> bool {
+        self.ast_model().span().file_id == file_id
     }
 
     /// The AST node.
     pub fn ast_model(self) -> &'db ast::Model {
-        &self.db.ast[self.id]
+        &self.db.asts[self.id]
     }
 
     /// The parsed attributes.
@@ -86,7 +99,7 @@ impl<'db> ModelWalker<'db> {
         self.attributes()
             .mapped_name
             .map(|id| &self.db[id])
-            .unwrap_or_else(|| self.db.ast[self.id].name())
+            .unwrap_or_else(|| self.ast_model().name())
     }
 
     /// Used in validation. True only if the model has a single field id.
@@ -102,6 +115,15 @@ impl<'db> ModelWalker<'db> {
     /// The primary key of the model, if defined.
     pub fn primary_key(self) -> Option<PrimaryKeyWalker<'db>> {
         self.attributes().primary_key.as_ref().map(|pk| PrimaryKeyWalker {
+            model_id: self.id,
+            attribute: pk,
+            db: self.db,
+        })
+    }
+
+    /// The shard key of the model, if defined.
+    pub fn shard_key(self) -> Option<ShardKeyWalker<'db>> {
+        self.attributes().shard_key.as_ref().map(|pk| ShardKeyWalker {
             model_id: self.id,
             attribute: pk,
             db: self.db,
@@ -216,7 +238,7 @@ impl<'db> ModelWalker<'db> {
             None => return IndentationType::default(),
         };
 
-        let src = self.db.source();
+        let src = self.db.source(self.id.0);
         let start = field.ast_field().span().start;
 
         let mut spaces = 0;
@@ -241,13 +263,10 @@ impl<'db> ModelWalker<'db> {
             None => return NewlineType::default(),
         };
 
-        let src = self.db.source();
-        let start = field.ast_field().span().end - 2;
+        let src = self.db.source(self.id.0);
+        let span = field.ast_field().span();
 
-        match src.chars().nth(start) {
-            Some('\r') => NewlineType::Windows,
-            _ => NewlineType::Unix,
-        }
+        newline(src, span)
     }
 
     /// The name of the schema the model belongs to.

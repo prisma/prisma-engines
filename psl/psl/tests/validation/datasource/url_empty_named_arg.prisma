@@ -1,0 +1,4 @@
+datasource testds {
+    provider = "mysql"
+}
+

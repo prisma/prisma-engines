@@ -1,0 +1,18 @@
+{
+  "modelName": "Post",
+  "action": "findMany",
+  "query": {
+    "arguments": {
+      "relationLoadStrategy": "query",
+      "where": {}
+    },
+    "selection": {
+      "$composites": true,
+      "$scalars": true,
+      "user": {
+        "arguments": {},
+        "selection": { "$composites": true, "$scalars": true }
+      }
+    }
+  }
+}

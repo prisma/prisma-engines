@@ -1,16 +1,21 @@
-use super::Visitor;
-#[cfg(any(feature = "postgresql", feature = "mysql"))]
-use crate::prelude::{JsonArrayAgg, JsonBuildObject, JsonExtract, JsonType, JsonUnquote};
+use super::{NativeColumnType, Visitor};
+use crate::ast::Update;
+use crate::prelude::{JsonArrayAgg, JsonBuildObject, JsonExtract, JsonType, JsonUnquote, Stringify};
+use crate::visitor::query_writer::QueryWriter;
 use crate::{
+    Value, ValueType,
     ast::{
         Column, Comparable, Expression, ExpressionKind, Insert, IntoRaw, Join, JoinData, Joinable, Merge, OnConflict,
         Order, Ordering, Row, Table, TypeDataLength, TypeFamily, Values,
     },
     error::{Error, ErrorKind},
     prelude::{Aliasable, Average, Query},
-    visitor, Value, ValueType,
+    visitor,
 };
-use std::{convert::TryFrom, fmt::Write, iter};
+use either::Either;
+use itertools::Itertools;
+use query_template::{PlaceholderFormat, QueryTemplate};
+use std::{borrow::Cow, convert::TryFrom, iter};
 
 static GENERATED_KEYS: &str = "@generated_keys";
 
@@ -18,12 +23,16 @@ static GENERATED_KEYS: &str = "@generated_keys";
 ///
 /// The returned parameter values can be used directly with the tiberius crate.
 pub struct Mssql<'a> {
-    query: String,
-    parameters: Vec<Value<'a>>,
+    query_template: QueryTemplate<Value<'a>>,
     order_by_set: bool,
 }
 
 impl<'a> Mssql<'a> {
+    /// Expression that evaluates to the current MSSQL server version.
+    pub const fn version_expr() -> &'static str {
+        "@@VERSION"
+    }
+
     // TODO: figure out that merge shit
     fn visit_returning(&mut self, columns: Vec<Column<'a>>) -> visitor::Result {
         let cols: Vec<_> = columns.into_iter().map(|c| c.table("Inserted")).collect();
@@ -176,6 +185,14 @@ impl<'a> Mssql<'a> {
 
         Ok(())
     }
+
+    fn visit_text(&mut self, txt: Option<Cow<'a, str>>, nt: Option<NativeColumnType<'a>>) -> visitor::Result {
+        self.add_parameter(Value {
+            typed: ValueType::Text(txt),
+            native_column_type: nt,
+        });
+        self.parameter_substitution()
+    }
 }
 
 impl<'a> Visitor<'a> for Mssql<'a> {
@@ -183,28 +200,114 @@ impl<'a> Visitor<'a> for Mssql<'a> {
     const C_BACKTICK_CLOSE: &'static str = "]";
     const C_WILDCARD: &'static str = "%";
 
-    fn build<Q>(query: Q) -> crate::Result<(String, Vec<Value<'a>>)>
+    fn build_template<Q>(query: Q) -> crate::Result<QueryTemplate<Value<'a>>>
     where
-        Q: Into<crate::ast::Query<'a>>,
+        Q: Into<Query<'a>>,
     {
         let mut this = Mssql {
-            query: String::with_capacity(4096),
-            parameters: Vec::with_capacity(128),
+            query_template: QueryTemplate::new(PlaceholderFormat {
+                prefix: "@P",
+                has_numbering: true,
+            }),
             order_by_set: false,
         };
 
         Mssql::visit_query(&mut this, query.into())?;
 
-        Ok((this.query, this.parameters))
+        Ok(this.query_template)
     }
 
-    fn write<D: std::fmt::Display>(&mut self, s: D) -> visitor::Result {
-        write!(&mut self.query, "{s}")?;
+    fn write(&mut self, value: impl std::fmt::Display) -> visitor::Result {
+        self.query_template.write_string_chunk(value.to_string());
         Ok(())
     }
 
     fn add_parameter(&mut self, value: Value<'a>) {
-        self.parameters.push(value)
+        self.query_template.parameters.push(value)
+    }
+
+    fn parameter_substitution(&mut self) -> visitor::Result {
+        self.query_template.write_parameter();
+        Ok(())
+    }
+
+    fn visit_parameterized_row(
+        &mut self,
+        value: Value<'a>,
+        item_prefix: impl Into<Cow<'static, str>>,
+        separator: impl Into<Cow<'static, str>>,
+        item_suffix: impl Into<Cow<'static, str>>,
+    ) -> visitor::Result {
+        self.query_template
+            .write_parameter_tuple(item_prefix, separator, item_suffix);
+        self.query_template.parameters.push(value);
+        Ok(())
+    }
+
+    fn visit_columns(&mut self, columns: Vec<Expression<'a>>) -> visitor::Result {
+        let len = columns.len();
+
+        let columns = match columns.into_iter().exactly_one() {
+            Ok(Expression {
+                kind: ExpressionKind::ParameterizedRow(row),
+                ..
+            }) => {
+                // If we have a parameterized SELECT <rows>, we want the client to dynamically
+                // generate a list of rows, separated by `UNION ALL`, e.g.:
+                // `SELECT 1, 2 UNION ALL SELECT 3, 4 UNION ALL SELECT 5, 6`
+                self.query_template
+                    .write_parameter_tuple_list("", ",", "", " UNION ALL SELECT ");
+                self.query_template.parameters.push(row);
+                return Ok(());
+            }
+            Ok(other) => Either::Left(iter::once(other)),
+            Err(columns) => Either::Right(columns),
+        };
+
+        for (i, column) in columns.enumerate() {
+            self.visit_expression(column)?;
+
+            if i < (len - 1) {
+                self.write(", ")?;
+            }
+        }
+
+        Ok(())
+    }
+
+    /// A visit to a value we parameterize
+    fn visit_parameterized(&mut self, value: Value<'a>) -> visitor::Result {
+        match value
+            .native_column_type
+            .as_ref()
+            .map(|nt| (nt.name.as_ref(), nt.length))
+        {
+            // Tiberius encodes strings as NVARCHAR by default. This causes implicit coercions which avoids using indexes.
+            // This cast ensures that VARCHAR instead.
+            Some(("VARCHAR", length)) => self.surround_with("CAST(", ")", |this| {
+                this.add_parameter(value);
+                this.parameter_substitution()?;
+                this.write(" AS VARCHAR")?;
+
+                match length {
+                    Some(TypeDataLength::Constant(length)) => {
+                        this.write("(")?;
+                        this.write(length)?;
+                        this.write(")")?;
+                    }
+                    Some(TypeDataLength::Maximum) => {
+                        this.write("(MAX)")?;
+                    }
+                    None => (),
+                }
+
+                Ok(())
+            }),
+            _ => {
+                self.add_parameter(value);
+                self.parameter_substitution()
+            }
+        }
     }
 
     /// A point to modify an incoming query to make it compatible with the
@@ -361,6 +464,10 @@ impl<'a> Visitor<'a> for Mssql<'a> {
             // Style 3 is keep all whitespace + internal DTD processing:
             // https://docs.microsoft.com/en-us/sql/t-sql/functions/cast-and-convert-transact-sql?redirectedfrom=MSDN&view=sql-server-ver15#xml-styles
             ValueType::Xml(cow) => cow.map(|cow| self.write(format!("CONVERT(XML, N'{cow}', 3)"))),
+
+            ValueType::Opaque(opaque) => Some(Err(
+                Error::builder(ErrorKind::OpaqueAsRawValue(opaque.to_string())).build()
+            )),
         };
 
         match res {
@@ -424,6 +531,21 @@ impl<'a> Visitor<'a> for Mssql<'a> {
 
         match insert.values {
             Expression {
+                kind: ExpressionKind::Parameterized(row),
+                ..
+            } => {
+                self.write(" ")?;
+                self.visit_row(Row::from(insert.columns))?;
+
+                if let Some(ref returning) = insert.returning {
+                    self.visit_returning(returning.clone())?;
+                }
+
+                self.write(" VALUES ")?;
+                self.query_template.write_parameter_tuple_list("(", ",", ")", ",");
+                self.query_template.parameters.push(row);
+            }
+            Expression {
                 kind: ExpressionKind::Row(row),
                 ..
             } => {
@@ -484,6 +606,55 @@ impl<'a> Visitor<'a> for Mssql<'a> {
         Ok(())
     }
 
+    // Implements `RETURNING` using the `OUTPUT` clause in SQL Server.
+    fn visit_update(&mut self, update: Update<'a>) -> visitor::Result {
+        if let Some(returning) = update.returning.as_ref().cloned() {
+            self.create_generated_keys(returning)?;
+            self.write(" ")?;
+        }
+
+        self.write("UPDATE ")?;
+        self.visit_table(update.table.clone(), true)?;
+
+        {
+            self.write(" SET ")?;
+            let pairs = update.columns.into_iter().zip(update.values);
+            let len = pairs.len();
+
+            for (i, (key, value)) in pairs.enumerate() {
+                self.visit_column(key)?;
+                self.write(" = ")?;
+                self.visit_expression(value)?;
+
+                if i < (len - 1) {
+                    self.write(", ")?;
+                }
+            }
+
+            if let Some(returning) = update.returning.as_ref().cloned() {
+                self.visit_returning(returning)?;
+            }
+        }
+
+        if let Some(conditions) = update.conditions {
+            self.write(" WHERE ")?;
+            self.visit_conditions(conditions)?;
+        }
+
+        if let Some(returning) = update.returning {
+            let table = update.table;
+            self.write(" ")?;
+            self.select_generated_keys(returning, table)?;
+        }
+
+        if let Some(comment) = update.comment {
+            self.write(" ")?;
+            self.visit_comment(comment)?;
+        }
+
+        Ok(())
+    }
+
     fn visit_merge(&mut self, merge: Merge<'a>) -> visitor::Result {
         if let Some(returning) = merge.returning.as_ref().cloned() {
             self.create_generated_keys(returning)?;
@@ -524,11 +695,6 @@ impl<'a> Visitor<'a> for Mssql<'a> {
 
     fn visit_upsert(&mut self, _update: crate::ast::Update<'a>) -> visitor::Result {
         unimplemented!("Upsert not supported for the underlying database.")
-    }
-
-    fn parameter_substitution(&mut self) -> visitor::Result {
-        self.write("@P")?;
-        self.write(self.parameters.len())
     }
 
     fn visit_aggregate_to_string(&mut self, value: crate::ast::Expression<'a>) -> visitor::Result {
@@ -631,12 +797,10 @@ impl<'a> Visitor<'a> for Mssql<'a> {
         Ok(())
     }
 
-    #[cfg(any(feature = "postgresql", feature = "mysql"))]
     fn visit_json_extract(&mut self, _json_extract: JsonExtract<'a>) -> visitor::Result {
         unimplemented!("JSON filtering is not yet supported on MSSQL")
     }
 
-    #[cfg(any(feature = "postgresql", feature = "mysql"))]
     fn visit_json_array_contains(
         &mut self,
         _left: Expression<'a>,
@@ -646,42 +810,34 @@ impl<'a> Visitor<'a> for Mssql<'a> {
         unimplemented!("JSON filtering is not yet supported on MSSQL")
     }
 
-    #[cfg(any(feature = "postgresql", feature = "mysql"))]
     fn visit_json_type_equals(&mut self, _left: Expression<'a>, _json_type: JsonType, _not: bool) -> visitor::Result {
         unimplemented!("JSON_TYPE is not yet supported on MSSQL")
     }
 
-    #[cfg(any(feature = "postgresql", feature = "mysql"))]
     fn visit_json_unquote(&mut self, _json_unquote: JsonUnquote<'a>) -> visitor::Result {
         unimplemented!("JSON filtering is not yet supported on MSSQL")
     }
 
-    #[cfg(feature = "postgresql")]
     fn visit_json_array_agg(&mut self, _array_agg: JsonArrayAgg<'a>) -> visitor::Result {
         unimplemented!("JSON_AGG is not yet supported on MSSQL")
     }
 
-    #[cfg(feature = "postgresql")]
     fn visit_json_build_object(&mut self, _build_obj: JsonBuildObject<'a>) -> visitor::Result {
         unimplemented!("JSON_BUILD_OBJECT is not yet supported on MSSQL")
     }
 
-    #[cfg(feature = "postgresql")]
+    fn visit_stringify(&mut self, _stringify: Stringify<'a>) -> visitor::Result {
+        unimplemented!("string conversion is not yet supported on MSSQL")
+    }
+
     fn visit_text_search(&mut self, _text_search: crate::prelude::TextSearch<'a>) -> visitor::Result {
         unimplemented!("Full-text search is not yet supported on MSSQL")
     }
 
-    #[cfg(feature = "postgresql")]
-    fn visit_matches(
-        &mut self,
-        _left: Expression<'a>,
-        _right: std::borrow::Cow<'a, str>,
-        _not: bool,
-    ) -> visitor::Result {
+    fn visit_matches(&mut self, _left: Expression<'a>, _right: Expression<'a>, _not: bool) -> visitor::Result {
         unimplemented!("Full-text search is not yet supported on MSSQL")
     }
 
-    #[cfg(feature = "postgresql")]
     fn visit_text_search_relevance(
         &mut self,
         _text_search_relevance: crate::prelude::TextSearchRelevance<'a>,
@@ -689,7 +845,6 @@ impl<'a> Visitor<'a> for Mssql<'a> {
         unimplemented!("Full-text search is not yet supported on MSSQL")
     }
 
-    #[cfg(any(feature = "postgresql", feature = "mysql"))]
     fn visit_json_extract_last_array_item(
         &mut self,
         _extract: crate::prelude::JsonExtractLastArrayElem<'a>,
@@ -697,7 +852,6 @@ impl<'a> Visitor<'a> for Mssql<'a> {
         unimplemented!("JSON filtering is not yet supported on MSSQL")
     }
 
-    #[cfg(any(feature = "postgresql", feature = "mysql"))]
     fn visit_json_extract_first_array_item(
         &mut self,
         _extract: crate::prelude::JsonExtractFirstArrayElem<'a>,
@@ -710,7 +864,6 @@ impl<'a> Visitor<'a> for Mssql<'a> {
 mod tests {
     use crate::{
         ast::*,
-        val,
         visitor::{Mssql, Visitor},
     };
     use indoc::indoc;
@@ -776,8 +929,6 @@ mod tests {
 
     #[test]
     fn test_in_values() {
-        use crate::{col, values};
-
         let expected_sql =
             "SELECT [test].* FROM [test] WHERE (([id1] = @P1 AND [id2] = @P2) OR ([id1] = @P3 AND [id2] = @P4))";
 
@@ -795,8 +946,6 @@ mod tests {
 
     #[test]
     fn test_not_in_values() {
-        use crate::{col, values};
-
         let expected_sql =
             "SELECT [test].* FROM [test] WHERE NOT (([id1] = @P1 AND [id2] = @P2) OR ([id1] = @P3 AND [id2] = @P4))";
 
@@ -1100,8 +1249,7 @@ mod tests {
 
     #[test]
     fn test_additional_condition_inner_join() {
-        let expected_sql =
-            "SELECT [users].* FROM [users] INNER JOIN [posts] ON ([users].[id] = [posts].[user_id] AND [posts].[published] = @P1)";
+        let expected_sql = "SELECT [users].* FROM [users] INNER JOIN [posts] ON ([users].[id] = [posts].[user_id] AND [posts].[published] = @P1)";
 
         let query = Select::from_table("users").inner_join(
             "posts".on(("users", "id")
@@ -1128,8 +1276,7 @@ mod tests {
 
     #[test]
     fn test_additional_condition_left_join() {
-        let expected_sql =
-            "SELECT [users].* FROM [users] LEFT JOIN [posts] ON ([users].[id] = [posts].[user_id] AND [posts].[published] = @P1)";
+        let expected_sql = "SELECT [users].* FROM [users] LEFT JOIN [posts] ON ([users].[id] = [posts].[user_id] AND [posts].[published] = @P1)";
 
         let query = Select::from_table("users").left_join(
             "posts".on(("users", "id")
@@ -1306,7 +1453,10 @@ mod tests {
         let insert = Insert::single_into("foo").value("bar", "lol");
         let (sql, params) = Mssql::build(Insert::from(insert).returning(vec!["bar"])).unwrap();
 
-        assert_eq!("DECLARE @generated_keys table([bar] NVARCHAR(255)) INSERT INTO [foo] ([bar]) OUTPUT [Inserted].[bar] INTO @generated_keys VALUES (@P1) SELECT [t].[bar] FROM @generated_keys AS g INNER JOIN [foo] AS [t] ON [t].[bar] = [g].[bar] WHERE @@ROWCOUNT > 0", sql);
+        assert_eq!(
+            "DECLARE @generated_keys table([bar] NVARCHAR(255)) INSERT INTO [foo] ([bar]) OUTPUT [Inserted].[bar] INTO @generated_keys VALUES (@P1) SELECT [t].[bar] FROM @generated_keys AS g INNER JOIN [foo] AS [t] ON [t].[bar] = [g].[bar] WHERE @@ROWCOUNT > 0",
+            sql
+        );
 
         assert_eq!(vec![Value::from("lol")], params);
     }

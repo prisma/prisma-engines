@@ -10,7 +10,7 @@ async fn aragon_test_cockroachdb(api: &mut TestApi) -> TestResult {
         CREATE TABLE users (
             user_id INT8 PRIMARY KEY
         );
-        
+
         CREATE TABLE tokens (
             token_id INT8 PRIMARY KEY,
             token_scope STRING NULL,
@@ -22,12 +22,11 @@ async fn aragon_test_cockroachdb(api: &mut TestApi) -> TestResult {
 
     let schema = expect![[r#"
         generator client {
-          provider = "prisma-client-js"
+          provider = "prisma-client"
         }
 
         datasource db {
           provider = "cockroachdb"
-          url      = "env(TEST_DATABASE_URL)"
         }
 
         /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
@@ -89,12 +88,11 @@ async fn noalyss_folder_test_cockroachdb(api: &mut TestApi) -> TestResult {
 
     let schema = expect![[r#"
         generator client {
-          provider = "prisma-client-js"
+          provider = "prisma-client"
         }
 
         datasource db {
           provider = "cockroachdb"
-          url      = "env(TEST_DATABASE_URL)"
         }
 
         /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.

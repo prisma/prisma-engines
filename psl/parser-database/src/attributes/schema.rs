@@ -1,4 +1,4 @@
-use crate::{ast, coerce, context::*, types::*, StringId};
+use crate::{StringId, ast, coerce, context::*, types::*};
 
 pub(super) fn model(model_attributes: &mut ModelAttributes, ctx: &mut Context<'_>) {
     model_attributes.schema = visit_schema_attribute(ctx);

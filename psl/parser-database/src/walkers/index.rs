@@ -2,16 +2,15 @@ use either::Either;
 
 use super::CompositeTypeFieldWalker;
 use crate::{
-    ast,
-    types::{IndexAlgorithm, IndexAttribute},
+    ParserDatabase, ScalarFieldType, ast,
+    types::{IndexAlgorithm, IndexAttribute, WhereClause},
     walkers::{ModelWalker, ScalarFieldAttributeWalker, ScalarFieldWalker},
-    ParserDatabase, ScalarFieldType,
 };
 
 /// An index, unique or fulltext attribute.
 #[derive(Copy, Clone)]
 pub struct IndexWalker<'db> {
-    pub(crate) model_id: ast::ModelId,
+    pub(crate) model_id: crate::ModelId,
     pub(crate) index: ast::AttributeId,
     pub(crate) db: &'db ParserDatabase,
     pub(crate) index_attribute: &'db IndexAttribute,
@@ -69,7 +68,7 @@ impl<'db> IndexWalker<'db> {
 
     /// The AST node of the index/unique attribute.
     pub fn ast_attribute(self) -> &'db ast::Attribute {
-        &self.db.ast[self.index]
+        &self.db.asts[(self.model_id.0, self.index)]
     }
 
     pub(crate) fn attribute(self) -> &'db IndexAttribute {
@@ -176,6 +175,24 @@ impl<'db> IndexWalker<'db> {
     /// matters on SQL Server where one can change the clustering.
     pub fn clustered(self) -> Option<bool> {
         self.index_attribute.clustered
+    }
+
+    /// The raw SQL predicate for partial indexes.
+    pub fn where_clause(self) -> Option<&'db str> {
+        match &self.index_attribute.where_clause {
+            Some(WhereClause::Raw(s)) => Some(s),
+            _ => None,
+        }
+    }
+
+    /// Returns true if this is a partial index (has a WHERE clause).
+    pub fn is_partial(self) -> bool {
+        self.index_attribute.where_clause.is_some()
+    }
+
+    /// The structured WHERE clause for this index, if any.
+    pub fn where_clause_attribute(self) -> Option<&'db WhereClause> {
+        self.index_attribute.where_clause.as_ref()
     }
 
     /// The model the index is defined on.

@@ -1,0 +1,77 @@
+{
+  "enums": [],
+  "models": [
+    {
+      "name": "User",
+      "dbName": null,
+      "schema": null,
+      "fields": [
+        {
+          "name": "id",
+          "kind": "scalar",
+          "isList": false,
+          "isRequired": true,
+          "isUnique": false,
+          "isId": true,
+          "isReadOnly": false,
+          "hasDefaultValue": true,
+          "type": "Int",
+          "nativeType": null,
+          "default": {
+            "name": "autoincrement",
+            "args": []
+          },
+          "isGenerated": false,
+          "isUpdatedAt": false
+        },
+        {
+          "name": "ip",
+          "kind": "scalar",
+          "isList": false,
+          "isRequired": true,
+          "isUnique": true,
+          "isId": false,
+          "isReadOnly": false,
+          "hasDefaultValue": true,
+          "type": "Int",
+          "nativeType": null,
+          "default": {
+            "name": "dbgenerated",
+            "args": [
+              "sqrt(4)"
+            ]
+          },
+          "isGenerated": false,
+          "isUpdatedAt": false
+        }
+      ],
+      "primaryKey": null,
+      "uniqueFields": [],
+      "uniqueIndexes": [],
+      "isGenerated": false
+    }
+  ],
+  "types": [],
+  "indexes": [
+    {
+      "model": "User",
+      "type": "id",
+      "isDefinedOnField": true,
+      "fields": [
+        {
+          "name": "id"
+        }
+      ]
+    },
+    {
+      "model": "User",
+      "type": "unique",
+      "isDefinedOnField": true,
+      "fields": [
+        {
+          "name": "ip"
+        }
+      ]
+    }
+  ]
+}

@@ -3,7 +3,7 @@ use query_engine_tests::*;
 #[test_suite]
 mod insert_null {
     use indoc::indoc;
-    use query_engine_tests::{assert_error, run_query, Runner};
+    use query_engine_tests::{Runner, assert_error, run_query};
 
     fn schema_1() -> String {
         let schema = indoc! {

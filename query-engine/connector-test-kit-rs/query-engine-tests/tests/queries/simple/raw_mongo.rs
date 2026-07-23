@@ -3,7 +3,7 @@ use query_engine_tests::*;
 #[test_suite(schema(schema), only(MongoDb))]
 mod raw_mongo {
     use indoc::indoc;
-    use query_engine_tests::{run_query, Runner};
+    use query_engine_tests::{Runner, run_query};
     use serde_json::json;
 
     fn schema() -> String {

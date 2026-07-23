@@ -4,9 +4,11 @@ use crate::introspection::{
 };
 use datamodel_renderer::datamodel as renderer;
 use schema_connector::ViewDefinition;
+use std::borrow::Cow;
 
 /// Render all view blocks to the PSL.
 pub(super) fn render<'a>(
+    introspection_file_name: Cow<'a, str>,
     ctx: &'a DatamodelCalculatorContext<'a>,
     rendered: &mut renderer::Datamodel<'a>,
 ) -> Vec<ViewDefinition> {
@@ -32,8 +34,13 @@ pub(super) fn render<'a>(
 
     views_with_idx.sort_by(|(a, _), (b, _)| helpers::compare_options_none_last(*a, *b));
 
-    for (_, render) in views_with_idx.into_iter() {
-        rendered.push_view(render);
+    for (previous_view, render) in views_with_idx.into_iter() {
+        let file_name = match previous_view {
+            Some((previous_file_id, _)) => Cow::Borrowed(ctx.previous_schema.db.file_name(previous_file_id)),
+            None => introspection_file_name.clone(),
+        };
+
+        rendered.push_view(file_name, render);
     }
 
     definitions
@@ -71,11 +78,6 @@ fn render_view(view: ViewPair<'_>) -> renderer::View<'_> {
 
     if let Some(id) = view.id() {
         rendered.id(id::render(id));
-    }
-
-    if !view.has_usable_identifier() && !view.ignored_in_psl() {
-        let docs = "The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.";
-        rendered.documentation(docs);
     }
 
     if view.adds_a_description() {

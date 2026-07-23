@@ -1,0 +1,6 @@
+model B {
+  id   Int @id
+  bId1 Int
+  bId2 Int
+  A    A   @relation(fields: [bId1, bId2], references: [field1, field2])
+}

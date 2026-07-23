@@ -1,33 +1,41 @@
 [package]
 name = "sql-migration-tests"
 version = "0.1.0"
-edition = "2021"
+edition.workspace = true
 
 [dependencies]
 psl = { workspace = true, features = ["all"] }
-schema-core = { path = "../core" }
-sql-schema-connector = { path = "../connectors/sql-schema-connector" }
-sql-schema-describer = { path = "../sql-schema-describer" }
-user-facing-errors = { path = "../../libs/user-facing-errors" }
-test-macros = { path = "../../libs/test-macros" }
-test-setup = { path = "../../libs/test-setup" }
-prisma-value = { path = "../../libs/prisma-value" }
+schema-core.workspace = true
+sql-schema-connector = { workspace = true, features = [
+    "all-native",
+] }
+sql-schema-describer = { workspace = true, features = [
+    "all-native",
+] }
+user-facing-errors = { workspace = true, features = [
+    "all-native",
+] }
+test-macros.workspace = true
+test-setup.workspace = true
+prisma-value.workspace = true
 
-bigdecimal = "0.3"
+bigdecimal.workspace = true
 chrono.workspace = true
-colored = "2"
+colored.workspace = true
 connection-string.workspace = true
 enumflags2.workspace = true
-expect-test = "1.1.0"
+expect-test.workspace = true
 indoc.workspace = true
-jsonrpc-core = "17.0.0"
-once_cell = "1.8.0"
-pretty_assertions = "1"
+jsonrpc-core.workspace = true
+pretty_assertions.workspace = true
 serde.workspace = true
 serde_json.workspace = true
-tempfile = "3.1.0"
+tempfile.workspace = true
 tokio.workspace = true
 tracing.workspace = true
-tracing-futures = "0.2"
+tracing-futures.workspace = true
 url.workspace = true
-quaint = { workspace = true, features = ["native"] }
+quaint = { workspace = true, features = ["all-native"] }
+
+[dev-dependencies]
+paste.workspace = true

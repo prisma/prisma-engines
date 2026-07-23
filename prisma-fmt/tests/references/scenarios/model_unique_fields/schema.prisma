@@ -1,0 +1,15 @@
+generator client {
+    provider        = "prisma-client"
+}
+
+datasource db {
+    provider = "postgres"
+}
+
+model Compound {
+    id      String
+    name    String
+
+    @@unique([id, n<|>ame])
+}
+

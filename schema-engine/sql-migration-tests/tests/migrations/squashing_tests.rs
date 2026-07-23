@@ -48,8 +48,7 @@ fn squashing_whole_migration_history_works(api: TestApi) {
                 .create_migration(&format!("migration{count}"), schema, &directory)
                 .send_sync()
                 .into_output()
-                .generated_migration_name
-                .unwrap();
+                .generated_migration_name;
 
             initial_migration_names.push(name);
         }
@@ -242,8 +241,7 @@ fn squashing_migrations_history_at_the_start_works(api: TestApi) {
                 .create_migration(&format!("migration{count}"), schema, &directory)
                 .send_sync()
                 .into_output()
-                .generated_migration_name
-                .unwrap();
+                .generated_migration_name;
 
             initial_migration_names.push(name);
         }
@@ -392,8 +390,7 @@ fn squashing_migrations_history_at_the_end_works(api: TestApi) {
                 .create_migration(&format!("migration{count}"), schema, &directory)
                 .send_sync()
                 .into_output()
-                .generated_migration_name
-                .unwrap();
+                .generated_migration_name;
 
             initial_migration_names.push(name);
         }

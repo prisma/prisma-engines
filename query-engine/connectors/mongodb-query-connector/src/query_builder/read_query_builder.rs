@@ -1,6 +1,7 @@
 use super::group_by_builder::*;
 
 use crate::{
+    BsonTransform, IntoBson,
     constants::*,
     cursor::{CursorBuilder, CursorData},
     filter::{FilterPrefix, MongoFilterVisitor},
@@ -8,17 +9,16 @@ use crate::{
     orderby::OrderByBuilder,
     query_strings::Aggregate,
     root_queries::observing,
-    vacuum_cursor, BsonTransform, IntoBson,
+    vacuum_cursor,
 };
-use connector_interface::AggregationSelection;
+use bson::{Document, doc};
 use itertools::Itertools;
-use mongodb::{
-    bson::{doc, Document},
-    options::AggregateOptions,
-    ClientSession, Collection,
+use mongodb::{ClientSession, Collection, options::AggregateOptions};
+use query_structure::{
+    AggregationSelection, FieldSelection, Filter, Model, QueryArguments, ScalarFieldRef, Take, VirtualSelection,
 };
-use query_structure::{FieldSelection, Filter, Model, QueryArguments, ScalarFieldRef, VirtualSelection};
 use std::convert::TryFrom;
+use std::future::IntoFuture;
 
 // Mongo Driver broke usage of the simple API, can't be used by us anymore.
 // As such the read query will always be based on aggregation pipeline
@@ -37,7 +37,11 @@ impl ReadQuery {
         let opts = AggregateOptions::builder().allow_disk_use(true).build();
         let query_string_builder = Aggregate::new(&self.stages, on_collection.name());
         let cursor = observing(&query_string_builder, || {
-            on_collection.aggregate_with_session(self.stages.clone(), opts, with_session)
+            on_collection
+                .aggregate(self.stages.clone())
+                .with_options(opts)
+                .session(&mut *with_session)
+                .into_future()
         })
         .await?;
 
@@ -124,7 +128,7 @@ impl MongoReadQueryBuilder {
     }
 
     pub(crate) fn from_args(args: QueryArguments) -> crate::Result<MongoReadQueryBuilder> {
-        let reverse_order = args.take.map(|t| t < 0).unwrap_or(false);
+        let reverse_order = args.take.is_reversed();
         let order_by = args.order_by;
 
         let order_builder = Some(OrderByBuilder::new(order_by.clone(), reverse_order));
@@ -450,17 +454,17 @@ impl MongoReadQueryBuilder {
 }
 
 fn skip(skip: Option<u64>, ignore: bool) -> Option<u64> {
-    if ignore {
-        None
-    } else {
-        skip
-    }
+    if ignore { None } else { skip }
 }
 
-fn take(take: Option<i64>, ignore: bool) -> Option<i64> {
+fn take(take: Take, ignore: bool) -> Option<i64> {
     if ignore {
         None
     } else {
-        take.map(|t| if t < 0 { -t } else { t })
+        match take {
+            Take::All => None,
+            Take::One | Take::NegativeOne => Some(1),
+            Take::Some(n) => Some(n.abs()),
+        }
     }
 }

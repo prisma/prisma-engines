@@ -1,0 +1,6 @@
+{
+  "contents": {
+    "kind": "markdown",
+    "value": "```prisma\nmodel Animals {\n\t...\n\tfamily Humans[] @relation(name: \"AnimalsToHumans\", fields: [humanIds], references: [id])\n}\n```\n___\nimplicit many-to-many\n___\n"
+  }
+}

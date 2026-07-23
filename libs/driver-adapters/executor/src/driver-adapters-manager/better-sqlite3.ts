@@ -1,0 +1,47 @@
+import { PrismaBetterSqlite3 } from '@prisma/adapter-better-sqlite3'
+import type {
+  SqlDriverAdapter,
+  SqlMigrationAwareDriverAdapterFactory,
+} from '@prisma/driver-adapter-utils'
+import type {
+  DriverAdaptersManager,
+  SetupDriverAdaptersInput,
+} from './index.js'
+import type { DriverAdapterTag, EnvForAdapter } from '../types/index.js'
+
+const TAG = 'better-sqlite3' as const satisfies DriverAdapterTag
+type TAG = typeof TAG
+
+export class BetterSQLite3Manager implements DriverAdaptersManager {
+  #factory: SqlMigrationAwareDriverAdapterFactory
+  #adapter?: SqlDriverAdapter
+
+  private constructor(
+    private env: EnvForAdapter<TAG>,
+    { url }: SetupDriverAdaptersInput,
+  ) {
+    this.#factory = new PrismaBetterSqlite3({
+      url,
+    })
+  }
+
+  static async setup(env: EnvForAdapter<TAG>, input: SetupDriverAdaptersInput) {
+    return new BetterSQLite3Manager(env, input)
+  }
+
+  factory() {
+    return this.#factory
+  }
+
+  async connect() {
+    return (this.#adapter ??= await this.#factory.connect())
+  }
+
+  async teardown() {
+    await this.#adapter?.dispose()
+  }
+
+  connector(): 'sqlite' {
+    return 'sqlite'
+  }
+}

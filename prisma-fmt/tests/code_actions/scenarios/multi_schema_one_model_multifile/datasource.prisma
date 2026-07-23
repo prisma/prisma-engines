@@ -1,0 +1,4 @@
+datasource db {
+    provider = "postgresql"
+    schemas  = ["one", "two"]
+}

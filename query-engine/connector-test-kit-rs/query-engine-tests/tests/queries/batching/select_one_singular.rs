@@ -1,11 +1,12 @@
 use query_engine_tests::*;
 
-#[test_suite(schema(schema))]
+#[test_suite(schema(schema), exclude_executors("QueryCompiler"))]
 mod singular_batch {
     use indoc::indoc;
     use query_engine_tests::{
+        Runner, TestResult,
         query_core::{BatchDocument, QueryDocument},
-        run_query, Runner, TestResult,
+        run_query,
     };
 
     fn schema() -> String {
@@ -427,7 +428,7 @@ mod singular_batch {
         .await?;
         insta::assert_snapshot!(
           res.to_string(),
-          @r###"{"batchResult":[{"data":{"findUniqueTestModelOrThrow":{"id":2}}},{"errors":[{"error":"An operation failed because it depends on one or more records that were required but not found. Expected a record, found none.","user_facing_error":{"is_panic":false,"message":"An operation failed because it depends on one or more records that were required but not found. Expected a record, found none.","meta":{"cause":"Expected a record, found none."},"error_code":"P2025"}}]}]}"###
+          @r###"{"batchResult":[{"data":{"findUniqueTestModelOrThrow":{"id":2}}},{"errors":[{"error":"An operation failed because it depends on one or more records that were required but not found. No record was found for a query.","user_facing_error":{"is_panic":false,"message":"An operation failed because it depends on one or more records that were required but not found. No record was found for a query.","meta":{"cause":"No record was found for a query."},"error_code":"P2025"}}]}]}"###
         );
         assert!(compact_doc.is_compact());
 
@@ -457,7 +458,7 @@ mod singular_batch {
         .await?;
         insta::assert_snapshot!(
           res.to_string(),
-          @r###"{"batchResult":[{"data":{"findUniqueTestModel":{"id":2}}},{"errors":[{"error":"KnownError { message: \"An operation failed because it depends on one or more records that were required but not found. Expected a record, found none.\", meta: Object {\"cause\": String(\"Expected a record, found none.\")}, error_code: \"P2025\" }","user_facing_error":{"is_panic":false,"message":"An operation failed because it depends on one or more records that were required but not found. Expected a record, found none.","meta":{"cause":"Expected a record, found none."},"error_code":"P2025"}}]}]}"###
+          @r###"{"batchResult":[{"data":{"findUniqueTestModel":{"id":2}}},{"errors":[{"error":"KnownError { message: \"An operation failed because it depends on one or more records that were required but not found. No record was found for a query.\", meta: Object {\"cause\": String(\"No record was found for a query.\")}, error_code: \"P2025\" }","user_facing_error":{"is_panic":false,"message":"An operation failed because it depends on one or more records that were required but not found. No record was found for a query.","meta":{"cause":"No record was found for a query."},"error_code":"P2025"}}]}]}"###
         );
         assert!(!compact_doc.is_compact());
 
@@ -475,6 +476,50 @@ mod singular_batch {
           @r###"{"batchResult":[{"data":{"findUniqueTestModelOrThrow":{"id":2}}},{"data":{"findUniqueTestModel":null}}]}"###
         );
         assert!(!compact_doc.is_compact());
+
+        Ok(())
+    }
+
+    fn citext_unique() -> String {
+        let schema = indoc! { r#"
+            model User {
+                #id(id, String, @id)
+                caseInsensitiveField String @unique @test.Citext
+            }"#
+        };
+
+        schema.to_owned()
+    }
+
+    // Regression test for https://github.com/prisma/prisma/issues/13534
+    #[connector_test(only(Postgres), schema(citext_unique), db_extensions("citext"))]
+    async fn repro_13534(runner: Runner) -> TestResult<()> {
+        run_query!(
+            &runner,
+            r#"mutation {
+            createOneUser(data: { id: "9df0f936-51d6-4c55-8e01-5144e588a8a1", caseInsensitiveField: "hello world" }) { id }
+        }"#
+        );
+
+        let queries = vec![
+            r#"{ findUniqueUser(
+                where: { caseInsensitiveField: "HELLO WORLD" }
+            ) { id, caseInsensitiveField } }"#
+                .to_string(),
+            r#"{ findUniqueUser(
+                where: { caseInsensitiveField: "HELLO WORLD" }
+            ) { id, caseInsensitiveField } }"#
+                .to_string(),
+        ];
+
+        let (res, compact_doc) = compact_batch(&runner, queries.clone()).await?;
+
+        assert!(!compact_doc.is_compact());
+
+        insta::assert_snapshot!(
+            res.to_string(),
+            @r###"{"batchResult":[{"data":{"findUniqueUser":{"id":"9df0f936-51d6-4c55-8e01-5144e588a8a1","caseInsensitiveField":"hello world"}}},{"data":{"findUniqueUser":{"id":"9df0f936-51d6-4c55-8e01-5144e588a8a1","caseInsensitiveField":"hello world"}}}]}"###
+        );
 
         Ok(())
     }

@@ -1,0 +1,10 @@
+{
+  "action": "executeRaw",
+  "query": {
+    "arguments": {
+      "query": "INSERT INTO User (email) VALUES ($1)",
+      "parameters": "[\"user.1737556027349@prisma.io\"]"
+    },
+    "selection": {}
+  }
+}

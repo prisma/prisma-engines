@@ -1,18 +1,17 @@
 datasource db {
   provider = "sqlite"
-  url = "sqlite"
   relationMode = "prisma"
   referentialIntegrity = "foreignKeys"
 }
 // [1;93mwarning[0m: [1mThe `referentialIntegrity` attribute is deprecated. Please use `relationMode` instead. Learn more at https://pris.ly/d/relation-mode[0m
-//   [1;94m-->[0m  [4mschema.prisma:5[0m
+//   [1;94m-->[0m  [4mschema.prisma:4[0m
 // [1;94m   | [0m
-// [1;94m 4 | [0m  relationMode = "prisma"
-// [1;94m 5 | [0m  [1;93mreferentialIntegrity = "foreignKeys"[0m
+// [1;94m 3 | [0m  relationMode = "prisma"
+// [1;94m 4 | [0m  [1;93mreferentialIntegrity = "foreignKeys"[0m
 // [1;94m   | [0m
 // [1;91merror[0m: [1mThe `referentialIntegrity` and `relationMode` attributes cannot be used together. Please use only `relationMode` instead.[0m
-//   [1;94m-->[0m  [4mschema.prisma:5[0m
+//   [1;94m-->[0m  [4mschema.prisma:4[0m
 // [1;94m   | [0m
-// [1;94m 4 | [0m  relationMode = "prisma"
-// [1;94m 5 | [0m  [1;91mreferentialIntegrity = "foreignKeys"[0m
+// [1;94m 3 | [0m  relationMode = "prisma"
+// [1;94m 4 | [0m  [1;91mreferentialIntegrity = "foreignKeys"[0m
 // [1;94m   | [0m

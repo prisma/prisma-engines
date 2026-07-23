@@ -1,0 +1,30 @@
+{
+  "modelName": "Post",
+  "action": "createOne",
+  "query": {
+    "arguments": {
+      "relationLoadStrategy": "query",
+      "data": {
+        "title": "How to wakesurf on crude oil",
+        "user": {
+          "connectOrCreate": {
+            "where": {
+              "email": "john@example.com"
+            },
+            "create": {
+              "email": "john@example.com"
+            }
+          }
+        }
+      }
+    },
+    "selection": {
+      "$composites": true,
+      "$scalars": true,
+      "user": {
+        "arguments": {},
+        "selection": { "$composites": true, "$scalars": true }
+      }
+    }
+  }
+}

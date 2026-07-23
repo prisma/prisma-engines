@@ -1,9 +1,8 @@
 use super::operation::*;
 use crate::*;
 
-use connector_interface::{CompositeWriteOperation, FieldPath, ScalarWriteOperation, WriteOperation};
-use mongodb::bson::doc;
-use query_structure::{Field, PrismaValue};
+use bson::doc;
+use query_structure::{CompositeWriteOperation, Field, FieldPath, PrismaValue, ScalarWriteOperation, WriteOperation};
 
 pub(crate) trait IntoUpdateOperation {
     fn into_update_operations(self, field: &Field, path: FieldPath) -> crate::Result<Vec<UpdateOperation>>;
@@ -33,7 +32,7 @@ impl IntoUpdateOperation for ScalarWriteOperation {
                 field_path,
                 doc! { "$add": [dollar_field_path, (field, rhs).into_bson()?] },
             )),
-            ScalarWriteOperation::Substract(rhs) => Some(UpdateOperation::generic(
+            ScalarWriteOperation::Subtract(rhs) => Some(UpdateOperation::generic(
                 field_path,
                 doc! { "$subtract": [dollar_field_path, (field, rhs).into_bson()?] },
             )),
@@ -50,11 +49,7 @@ impl IntoUpdateOperation for ScalarWriteOperation {
             ScalarWriteOperation::Field(_) => unimplemented!(),
         };
 
-        if let Some(doc) = doc {
-            Ok(vec![doc])
-        } else {
-            Ok(vec![])
-        }
+        if let Some(doc) = doc { Ok(vec![doc]) } else { Ok(vec![]) }
     }
 }
 

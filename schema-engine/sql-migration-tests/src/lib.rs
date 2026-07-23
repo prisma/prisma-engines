@@ -2,6 +2,7 @@
 
 pub mod multi_engine_test_api;
 pub mod test_api;
+pub mod utils;
 
 mod assertions;
 mod commands;

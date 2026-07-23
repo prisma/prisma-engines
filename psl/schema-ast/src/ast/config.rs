@@ -1,11 +1,13 @@
 use crate::ast::{Expression, Identifier, Span, WithSpan};
 
+use super::WithIdentifier;
+
 /// A named property in a config block.
 ///
 /// ```ignore
 /// datasource db {
-///     url = env("URL")
-///     ^^^^^^^^^^^^^^^^
+///     provider = env("PROVIDER")
+///     ^^^^^^^^^^^^^^^^^^^^^^^^^^
 /// }
 /// ```
 #[derive(Debug, Clone)]
@@ -14,17 +16,17 @@ pub struct ConfigBlockProperty {
     ///
     /// ```ignore
     /// datasource db {
-    ///     url = env("URL")
-    ///     ^^^
+    ///     provider = env("PROVIDER")
+    ///     ^^^^^^^^
     /// }
     /// ```
-    pub name: Identifier,
+    pub(crate) name: Identifier,
     /// The property value.
     ///
     /// ```ignore
     /// datasource db {
-    ///     url = env("URL")
-    ///           ^^^^^^^^^^
+    ///     provider = env("PROVIDER")
+    ///                ^^^^^^^^^^^^^^^
     /// }
     /// ```
     pub value: Option<Expression>,
@@ -35,5 +37,11 @@ pub struct ConfigBlockProperty {
 impl WithSpan for ConfigBlockProperty {
     fn span(&self) -> Span {
         self.span
+    }
+}
+
+impl WithIdentifier for ConfigBlockProperty {
+    fn identifier(&self) -> &Identifier {
+        &self.name
     }
 }

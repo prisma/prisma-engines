@@ -1,5 +1,5 @@
 use crate::SqlDatabaseSchema;
-use sql_schema_describer::{walkers::Walker, SqlSchema};
+use sql_schema_describer::{SqlSchema, walkers::Walker};
 
 /// A pair of items that can exist in two schemas: previous is the item in the previous / old
 /// schema, next is the item in the next / new schema.

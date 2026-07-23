@@ -39,6 +39,11 @@ impl<'a> IndexWalker<'a> {
         matches!(self.get().tpe, IndexType::Unique)
     }
 
+    /// Is this index a normal index?
+    pub fn is_normal(self) -> bool {
+        matches!(self.get().tpe, IndexType::Normal)
+    }
+
     /// The name of the index.
     pub fn name(self) -> &'a str {
         &self.get().index_name
@@ -47,5 +52,21 @@ impl<'a> IndexWalker<'a> {
     /// Traverse to the table of the index.
     pub fn table(self) -> TableWalker<'a> {
         self.walk(self.get().table_id)
+    }
+
+    /// The predicate for partial indexes (WHERE clause).
+    /// Returns `None` for non-partial indexes.
+    pub fn predicate(self) -> Option<&'a str> {
+        self.get().predicate.as_deref()
+    }
+
+    /// Returns true if this is a partial index (has a WHERE clause predicate).
+    pub fn is_partial(self) -> bool {
+        self.get().predicate.is_some()
+    }
+
+    /// Returns true if this is a stripped partial index.
+    pub fn is_stripped_partial(self) -> bool {
+        self.schema.index_is_stripped_partial(self.id)
     }
 }

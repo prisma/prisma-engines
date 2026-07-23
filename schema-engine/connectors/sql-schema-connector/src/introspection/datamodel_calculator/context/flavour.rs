@@ -1,3 +1,5 @@
+#![cfg_attr(target_arch = "wasm32", allow(unused_imports))]
+
 mod mysql;
 mod postgresql;
 mod sqlite;
@@ -59,6 +61,10 @@ pub(crate) trait IntrospectionFlavour {
     }
 
     fn uses_exclude_constraint(&self, _ctx: &DatamodelCalculatorContext<'_>, _table: TableWalker<'_>) -> bool {
+        false
+    }
+
+    fn uses_pk_in_m2m_join_tables(&self, _ctx: &DatamodelCalculatorContext<'_>) -> bool {
         false
     }
 }

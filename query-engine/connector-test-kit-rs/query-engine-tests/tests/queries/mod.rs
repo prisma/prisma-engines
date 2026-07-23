@@ -1,6 +1,7 @@
 mod aggregation;
 mod batching;
 mod chunking;
+mod chunking_qc;
 mod data_types;
 mod distinct;
 mod filters;

@@ -1,10 +1,6 @@
 #![cfg_attr(target_arch = "wasm32", allow(dead_code))]
 
-use std::{
-    borrow::Cow,
-    fmt::{Debug, Display},
-    time::Duration,
-};
+use std::{borrow::Cow, fmt::Debug, time::Duration};
 
 use percent_encoding::percent_decode;
 use url::{Host, Url};
@@ -67,16 +63,81 @@ impl PostgresFlavour {
     }
 }
 
+#[derive(Debug, Clone)]
+pub enum PostgresUrl {
+    Native(Box<PostgresNativeUrl>),
+    WebSocket(PostgresWebSocketUrl),
+}
+
+impl PostgresUrl {
+    pub fn new_native(url: Url) -> Result<Self, Error> {
+        Ok(Self::Native(Box::new(PostgresNativeUrl::new(url)?)))
+    }
+
+    pub fn new_websocket(url: Url, api_key: String) -> Result<Self, Error> {
+        Ok(Self::WebSocket(PostgresWebSocketUrl::new(url, api_key)))
+    }
+
+    pub fn dbname(&self) -> Cow<'_, str> {
+        match self {
+            Self::Native(url) => url.dbname(),
+            Self::WebSocket(url) => Cow::Borrowed(url.dbname()),
+        }
+    }
+
+    pub fn host(&self) -> &str {
+        match self {
+            Self::Native(native_url) => native_url.host(),
+            Self::WebSocket(ws_url) => ws_url.host(),
+        }
+    }
+
+    pub fn is_localhost(&self) -> bool {
+        match self {
+            Self::Native(native_url) => native_url.is_localhost(),
+            Self::WebSocket(ws_url) => ws_url.is_localhost(),
+        }
+    }
+
+    pub fn port(&self) -> u16 {
+        match self {
+            Self::Native(native_url) => native_url.port(),
+            Self::WebSocket(ws_url) => ws_url.port(),
+        }
+    }
+
+    pub fn username(&self) -> Cow<'_, str> {
+        match self {
+            Self::Native(native_url) => native_url.username(),
+            Self::WebSocket(_) => Cow::Borrowed(""),
+        }
+    }
+
+    pub fn schema(&self) -> &str {
+        match self {
+            Self::Native(native_url) => native_url.schema(),
+            Self::WebSocket(_) => "public",
+        }
+    }
+
+    pub fn socket_timeout(&self) -> Option<Duration> {
+        match self {
+            Self::Native(native_url) => native_url.socket_timeout(),
+            Self::WebSocket(_) => None,
+        }
+    }
+}
+
 /// Wraps a connection url and exposes the parsing logic used by Quaint,
 /// including default values.
 #[derive(Debug, Clone)]
-pub struct PostgresUrl {
+pub struct PostgresNativeUrl {
     pub(crate) url: Url,
     pub(crate) query_params: PostgresUrlQueryParams,
     pub(crate) flavour: PostgresFlavour,
 }
 
-impl PostgresUrl {
+impl PostgresNativeUrl {
     /// Parse `Url` to `PostgresUrl`. Returns error for mistyped connection
     /// parameters.
     pub fn new(url: Url) -> Result<Self, Error> {
@@ -95,7 +156,7 @@ impl PostgresUrl {
     }
 
     /// The percent-decoded database username.
-    pub fn username(&self) -> Cow<str> {
+    pub fn username(&self) -> Cow<'_, str> {
         match percent_decode(self.url.username().as_bytes()).decode_utf8() {
             Ok(username) => username,
             Err(_) => {
@@ -128,16 +189,29 @@ impl PostgresUrl {
         }
     }
 
-    /// Name of the database connected. Defaults to `postgres`.
-    pub fn dbname(&self) -> &str {
+    pub fn is_localhost(&self) -> bool {
+        is_url_localhost(&self.url)
+    }
+
+    /// decoded database name. Defaults to `postgres`.
+    pub fn dbname(&self) -> Cow<'_, str> {
         match self.url.path_segments() {
-            Some(mut segments) => segments.next().unwrap_or("postgres"),
-            None => "postgres",
+            Some(mut segments) => {
+                let segment = segments.next().unwrap_or("postgres");
+                match percent_decode(segment.as_bytes()).decode_utf8() {
+                    Ok(dbname) => dbname,
+                    Err(_) => {
+                        tracing::warn!("Couldn't decode dbname to UTF-8, using the non-decoded version.");
+                        segment.into()
+                    }
+                }
+            }
+            None => Cow::Borrowed("postgres"),
         }
     }
 
     /// The percent-decoded database password.
-    pub fn password(&self) -> Cow<str> {
+    pub fn password(&self) -> Cow<'_, str> {
         match self
             .url
             .password()
@@ -200,6 +274,11 @@ impl PostgresUrl {
         self.query_params.options.as_deref()
     }
 
+    /// If true, the connections are not reusable and must be closed after every transaction.
+    pub(crate) fn single_use_connections(&self) -> bool {
+        self.query_params.single_use_connections
+    }
+
     /// Sets whether the URL points to a Postgres, Cockroach or Unknown database.
     /// This is used to avoid a network roundtrip at connection to set the search path.
     ///
@@ -233,6 +312,7 @@ impl PostgresUrl {
         let mut max_connection_lifetime = None;
         let mut max_idle_connection_lifetime = Some(Duration::from_secs(300));
         let mut options = None;
+        let mut single_use_connections = false;
 
         for (k, v) in url.query_pairs() {
             match k.as_ref() {
@@ -300,7 +380,12 @@ impl PostgresUrl {
                     let as_int = v
                         .parse()
                         .map_err(|_| Error::builder(ErrorKind::InvalidConnectionArguments).build())?;
-                    socket_timeout = Some(Duration::from_secs(as_int));
+
+                    if as_int == 0 {
+                        socket_timeout = None;
+                    } else {
+                        socket_timeout = Some(Duration::from_secs(as_int));
+                    }
                 }
                 "connect_timeout" => {
                     let as_int = v
@@ -366,6 +451,11 @@ impl PostgresUrl {
                 "options" => {
                     options = Some(v.to_string());
                 }
+                "single_use_connections" => {
+                    single_use_connections = v
+                        .parse()
+                        .map_err(|_| Error::builder(ErrorKind::InvalidConnectionArguments).build())?;
+                }
                 _ => {
                     tracing::trace!(message = "Discarding connection string param", param = &*k);
                 }
@@ -395,6 +485,7 @@ impl PostgresUrl {
             channel_binding,
             #[cfg(feature = "postgresql-native")]
             ssl_mode,
+            single_use_connections,
         })
     }
 
@@ -427,6 +518,7 @@ pub(crate) struct PostgresUrlQueryParams {
     pub(crate) max_idle_connection_lifetime: Option<Duration>,
     pub(crate) application_name: Option<String>,
     pub(crate) options: Option<String>,
+    pub(crate) single_use_connections: bool,
 
     #[cfg(feature = "postgresql-native")]
     pub(crate) channel_binding: ChannelBinding,
@@ -435,43 +527,59 @@ pub(crate) struct PostgresUrlQueryParams {
     pub(crate) ssl_mode: SslMode,
 }
 
-// A SearchPath connection parameter (Display-impl) for connection initialization.
-struct CockroachSearchPath<'a>(&'a str);
-
-impl Display for CockroachSearchPath<'_> {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.write_str(self.0)
-    }
+#[derive(Debug, Clone)]
+pub struct PostgresWebSocketUrl {
+    pub(crate) url: Url,
+    pub(crate) api_key: String,
+    pub(crate) db_name: Option<String>,
 }
 
-// A SearchPath connection parameter (Display-impl) for connection initialization.
-struct PostgresSearchPath<'a>(&'a str);
-
-impl Display for PostgresSearchPath<'_> {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.write_str("\"")?;
-        f.write_str(self.0)?;
-        f.write_str("\"")?;
-
-        Ok(())
-    }
-}
-
-// A SetSearchPath statement (Display-impl) for connection initialization.
-struct SetSearchPath<'a>(Option<&'a str>);
-
-impl Display for SetSearchPath<'_> {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        if let Some(schema) = self.0 {
-            f.write_str("SET search_path = \"")?;
-            f.write_str(schema)?;
-            f.write_str("\";\n")?;
+impl PostgresWebSocketUrl {
+    pub fn new(url: Url, api_key: String) -> Self {
+        Self {
+            url,
+            api_key,
+            db_name: None,
         }
+    }
 
-        Ok(())
+    pub fn override_db_name(&mut self, name: String) {
+        self.db_name = Some(name)
+    }
+
+    pub fn api_key(&self) -> &str {
+        &self.api_key
+    }
+
+    pub fn dbname(&self) -> &str {
+        self.overriden_db_name().unwrap_or("postgres")
+    }
+
+    pub fn overriden_db_name(&self) -> Option<&str> {
+        self.db_name.as_deref()
+    }
+
+    pub fn host(&self) -> &str {
+        self.url.host_str().unwrap_or("localhost")
+    }
+
+    pub fn is_localhost(&self) -> bool {
+        is_url_localhost(&self.url)
+    }
+
+    pub fn port(&self) -> u16 {
+        self.url.port().unwrap_or(80)
     }
 }
 
+pub fn is_url_localhost(url: &Url) -> bool {
+    match url.host() {
+        Some(Host::Domain(host)) => host == "localhost",
+        Some(Host::Ipv4(ipv4_addr)) => ipv4_addr.is_loopback(),
+        Some(Host::Ipv6(ipv6_addr)) => ipv6_addr.is_loopback(),
+        _ => false,
+    }
+}
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -483,80 +591,128 @@ mod tests {
 
     #[test]
     fn should_parse_socket_url() {
-        let url = PostgresUrl::new(Url::parse("postgresql:///dbname?host=/var/run/psql.sock").unwrap()).unwrap();
+        let url = PostgresNativeUrl::new(Url::parse("postgresql:///dbname?host=/var/run/psql.sock").unwrap()).unwrap();
         assert_eq!("dbname", url.dbname());
         assert_eq!("/var/run/psql.sock", url.host());
     }
 
     #[test]
     fn should_parse_escaped_url() {
-        let url = PostgresUrl::new(Url::parse("postgresql:///dbname?host=%2Fvar%2Frun%2Fpostgresql").unwrap()).unwrap();
+        let url =
+            PostgresNativeUrl::new(Url::parse("postgresql:///dbname?host=%2Fvar%2Frun%2Fpostgresql").unwrap()).unwrap();
         assert_eq!("dbname", url.dbname());
         assert_eq!("/var/run/postgresql", url.host());
     }
 
     #[test]
+    fn should_decode_percent_encoded_dbname() {
+        // Chinese characters: 测试库 (test database)
+        let url = PostgresNativeUrl::new(
+            Url::parse("postgresql://user:pass@localhost:5432/%E6%B5%8B%E8%AF%95%E5%BA%93").unwrap(),
+        )
+        .unwrap();
+        assert_eq!("测试库", url.dbname());
+    }
+
+    #[test]
+    fn should_decode_dbname_with_spaces() {
+        let url =
+            PostgresNativeUrl::new(Url::parse("postgresql://user:pass@localhost:5432/my%20database").unwrap()).unwrap();
+        assert_eq!("my database", url.dbname());
+    }
+
+    #[test]
+    fn should_decode_dbname_with_special_characters() {
+        // test-db_name
+        let url = PostgresNativeUrl::new(Url::parse("postgresql://user:pass@localhost:5432/test%2Ddb%5Fname").unwrap())
+            .unwrap();
+        assert_eq!("test-db_name", url.dbname());
+    }
+
+    #[test]
     fn should_allow_changing_of_cache_size() {
         let url =
-            PostgresUrl::new(Url::parse("postgresql:///localhost:5432/foo?statement_cache_size=420").unwrap()).unwrap();
-        assert_eq!(420, url.cache().capacity());
+            PostgresNativeUrl::new(Url::parse("postgresql:///localhost:5432/foo?statement_cache_size=420").unwrap())
+                .unwrap();
+        assert_eq!(420, url.cache_settings().capacity);
     }
 
     #[test]
     fn should_have_default_cache_size() {
-        let url = PostgresUrl::new(Url::parse("postgresql:///localhost:5432/foo").unwrap()).unwrap();
-        assert_eq!(100, url.cache().capacity());
+        let url = PostgresNativeUrl::new(Url::parse("postgresql:///localhost:5432/foo").unwrap()).unwrap();
+        assert_eq!(100, url.cache_settings().capacity);
     }
 
     #[test]
     fn should_have_application_name() {
-        let url =
-            PostgresUrl::new(Url::parse("postgresql:///localhost:5432/foo?application_name=test").unwrap()).unwrap();
+        let url = PostgresNativeUrl::new(Url::parse("postgresql:///localhost:5432/foo?application_name=test").unwrap())
+            .unwrap();
         assert_eq!(Some("test"), url.application_name());
     }
 
     #[test]
     fn should_have_channel_binding() {
         let url =
-            PostgresUrl::new(Url::parse("postgresql:///localhost:5432/foo?channel_binding=require").unwrap()).unwrap();
+            PostgresNativeUrl::new(Url::parse("postgresql:///localhost:5432/foo?channel_binding=require").unwrap())
+                .unwrap();
         assert_eq!(ChannelBinding::Require, url.channel_binding());
     }
 
     #[test]
     fn should_have_default_channel_binding() {
         let url =
-            PostgresUrl::new(Url::parse("postgresql:///localhost:5432/foo?channel_binding=invalid").unwrap()).unwrap();
+            PostgresNativeUrl::new(Url::parse("postgresql:///localhost:5432/foo?channel_binding=invalid").unwrap())
+                .unwrap();
         assert_eq!(ChannelBinding::Prefer, url.channel_binding());
 
-        let url = PostgresUrl::new(Url::parse("postgresql:///localhost:5432/foo").unwrap()).unwrap();
+        let url = PostgresNativeUrl::new(Url::parse("postgresql:///localhost:5432/foo").unwrap()).unwrap();
         assert_eq!(ChannelBinding::Prefer, url.channel_binding());
     }
 
     #[test]
     fn should_not_enable_caching_with_pgbouncer() {
-        let url = PostgresUrl::new(Url::parse("postgresql:///localhost:5432/foo?pgbouncer=true").unwrap()).unwrap();
-        assert_eq!(0, url.cache().capacity());
+        let url =
+            PostgresNativeUrl::new(Url::parse("postgresql:///localhost:5432/foo?pgbouncer=true").unwrap()).unwrap();
+        assert_eq!(0, url.cache_settings().capacity);
     }
 
     #[test]
     fn should_parse_default_host() {
-        let url = PostgresUrl::new(Url::parse("postgresql:///dbname").unwrap()).unwrap();
+        let url = PostgresNativeUrl::new(Url::parse("postgresql:///dbname").unwrap()).unwrap();
         assert_eq!("dbname", url.dbname());
         assert_eq!("localhost", url.host());
     }
 
     #[test]
     fn should_parse_ipv6_host() {
-        let url = PostgresUrl::new(Url::parse("postgresql://[2001:db8:1234::ffff]:5432/dbname").unwrap()).unwrap();
+        let url =
+            PostgresNativeUrl::new(Url::parse("postgresql://[2001:db8:1234::ffff]:5432/dbname").unwrap()).unwrap();
         assert_eq!("2001:db8:1234::ffff", url.host());
     }
 
     #[test]
     fn should_handle_options_field() {
-        let url = PostgresUrl::new(Url::parse("postgresql:///localhost:5432?options=--cluster%3Dmy_cluster").unwrap())
-            .unwrap();
+        let url =
+            PostgresNativeUrl::new(Url::parse("postgresql:///localhost:5432?options=--cluster%3Dmy_cluster").unwrap())
+                .unwrap();
 
         assert_eq!("--cluster=my_cluster", url.options().unwrap());
+    }
+
+    #[test]
+    fn should_handle_single_use_connections() {
+        let url = PostgresNativeUrl::new(Url::parse("postgresql:///localhost:5432").unwrap()).unwrap();
+        assert!(!url.single_use_connections());
+
+        let url =
+            PostgresNativeUrl::new(Url::parse("postgresql:///localhost:5432?single_use_connections=true").unwrap())
+                .unwrap();
+        assert!(url.single_use_connections());
+
+        let url =
+            PostgresNativeUrl::new(Url::parse("postgresql:///localhost:5432?single_use_connections=false").unwrap())
+                .unwrap();
+        assert!(!url.single_use_connections());
     }
 
     #[tokio::test]
@@ -579,7 +735,7 @@ mod tests {
                     );
                     assert_eq!(&Name::available("this_does_not_exist"), db_name)
                 }
-                kind => panic!("Expected `DatabaseDoesNotExist`, got {:?}", kind),
+                kind => panic!("Expected `DatabaseDoesNotExist`, got {kind:?}"),
             },
         }
     }
@@ -609,7 +765,7 @@ mod tests {
             Ok(_) => unreachable!(),
             Err(e) => match e.kind() {
                 ErrorKind::Native(NativeErrorKind::TlsError { .. }) => (),
-                other => panic!("{:#?}", other),
+                other => panic!("{other:#?}"),
             },
         }
     }
@@ -630,7 +786,7 @@ mod tests {
                     assert_eq!(1, *expected);
                     assert_eq!(2, *actual);
                 }
-                other => panic!("{:#?}", other),
+                other => panic!("{other:#?}"),
             },
         }
     }
@@ -641,7 +797,7 @@ mod tests {
         url.query_pairs_mut().append_pair("schema", "hello");
         url.query_pairs_mut().append_pair("pgbouncer", "true");
 
-        let mut pg_url = PostgresUrl::new(url).unwrap();
+        let mut pg_url = PostgresNativeUrl::new(url).unwrap();
         pg_url.set_flavour(PostgresFlavour::Postgres);
 
         let config = pg_url.to_config();
@@ -657,7 +813,7 @@ mod tests {
         let mut url = Url::parse(&CONN_STR).unwrap();
         url.query_pairs_mut().append_pair("schema", "hello");
 
-        let mut pg_url = PostgresUrl::new(url).unwrap();
+        let mut pg_url = PostgresNativeUrl::new(url).unwrap();
         pg_url.set_flavour(PostgresFlavour::Postgres);
 
         let config = pg_url.to_config();
@@ -671,7 +827,7 @@ mod tests {
         let mut url = Url::parse(&CONN_STR).unwrap();
         url.query_pairs_mut().append_pair("schema", "hello");
 
-        let mut pg_url = PostgresUrl::new(url).unwrap();
+        let mut pg_url = PostgresNativeUrl::new(url).unwrap();
         pg_url.set_flavour(PostgresFlavour::Cockroach);
 
         let config = pg_url.to_config();
@@ -685,12 +841,56 @@ mod tests {
         let mut url = Url::parse(&CONN_STR).unwrap();
         url.query_pairs_mut().append_pair("schema", "HeLLo");
 
-        let mut pg_url = PostgresUrl::new(url).unwrap();
+        let mut pg_url = PostgresNativeUrl::new(url).unwrap();
         pg_url.set_flavour(PostgresFlavour::Cockroach);
 
         let config = pg_url.to_config();
 
         // CRDB does NOT support setting the search_path via a connection parameter if the identifier is unsafe.
         assert_eq!(config.get_search_path(), None);
+    }
+
+    /// Tests that connecting to a database with a percent-encoded name works correctly.
+    ///
+    /// This test verifies:
+    /// 1. A database with Chinese characters (测试库) can be created
+    /// 2. The percent-encoded URL correctly connects to the database
+    /// 3. The `dbname()` function returns the decoded database name
+    #[tokio::test]
+    async fn should_connect_to_db_with_percent_encoded_name() {
+        use percent_encoding::{NON_ALPHANUMERIC, utf8_percent_encode};
+
+        let base_url = Url::parse(&CONN_STR).unwrap();
+        let conn = Quaint::new(base_url.as_str()).await.unwrap();
+
+        // Create a database with Chinese characters: 测试库 (meaning "test database")
+        let test_db_name = "测试库";
+        let _ = conn
+            .raw_cmd(&format!(r#"DROP DATABASE IF EXISTS "{test_db_name}""#))
+            .await;
+        conn.raw_cmd(&format!(r#"CREATE DATABASE "{test_db_name}""#))
+            .await
+            .unwrap();
+
+        // Build URL with percent-encoded database name
+        // 测试库 -> %E6%B5%8B%E8%AF%95%E5%BA%93
+        let encoded_db_name = utf8_percent_encode(test_db_name, NON_ALPHANUMERIC).to_string();
+        let mut test_url = base_url.clone();
+        test_url.set_path(&format!("/{encoded_db_name}"));
+
+        // Connect using percent-encoded URL and verify dbname() returns decoded value
+        let test_conn = Quaint::new(test_url.as_str()).await.unwrap();
+        let pg_url = PostgresNativeUrl::new(test_url).unwrap();
+        assert_eq!(test_db_name, pg_url.dbname());
+
+        // Verify the connection actually works by executing a simple query
+        let result = test_conn.query_raw("SELECT 1 as test", &[]).await.unwrap();
+        assert_eq!(1, result.len());
+
+        // Cleanup: drop the test database
+        drop(test_conn);
+        conn.raw_cmd(&format!(r#"DROP DATABASE IF EXISTS "{test_db_name}""#))
+            .await
+            .unwrap();
     }
 }

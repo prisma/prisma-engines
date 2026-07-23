@@ -1,8 +1,10 @@
+use std::fmt;
+
 use crate::{
+    ExtensionTypeId, OperatorClass, ParserDatabase, ScalarFieldId, ScalarFieldType,
     ast::{self, WithName},
     types::{DefaultAttribute, FieldWithArgs, OperatorClassStore, ScalarField, ScalarType, SortOrder},
     walkers::*,
-    OperatorClass, ParserDatabase, ScalarFieldId, ScalarFieldType,
 };
 use diagnostics::Span;
 use either::Either;
@@ -19,7 +21,7 @@ impl<'db> ScalarFieldWalker<'db> {
     /// The field node in the AST.
     pub fn ast_field(self) -> &'db ast::Field {
         let ScalarField { model_id, field_id, .. } = self.attributes();
-        &self.db.ast[*model_id][*field_id]
+        &self.db.asts[*model_id][*field_id]
     }
 
     /// Is this field unique? This method will return true if:
@@ -42,6 +44,20 @@ impl<'db> ScalarFieldWalker<'db> {
         })
     }
 
+    /// Is this field's unique constraint partial? This method will return true if:
+    ///
+    /// - The field has an `@unique` attribute with a `where` clause.
+    /// - There is a `@@unique` on the model that contains __only__ this field and has a `where` clause.
+    pub fn is_partial_unique(self) -> bool {
+        self.model().indexes().any(|idx| {
+            let mut fields = idx.fields();
+            idx.is_unique()
+                && idx.is_partial()
+                && fields.len() == 1
+                && fields.next().map(|f| f.field_id()) == Some(self.field_id())
+        })
+    }
+
     /// The name of the field.
     pub fn name(self) -> &'db str {
         self.ast_field().name()
@@ -53,7 +69,7 @@ impl<'db> ScalarFieldWalker<'db> {
             .default
             .as_ref()
             .map(|d| d.default_attribute)
-            .map(|id| &self.db.ast[id])
+            .map(|id| &self.db.asts[id])
     }
 
     /// The final database name of the field. See crate docs for explanations on database names.
@@ -108,6 +124,16 @@ impl<'db> ScalarFieldWalker<'db> {
         self.scalar_field_type().as_enum().map(|id| self.db.walk(id))
     }
 
+    /// Is this field's type a composite type? If yes, walk the composite type.
+    pub fn field_type_as_composite_type(self) -> Option<CompositeTypeWalker<'db>> {
+        self.scalar_field_type().as_composite_type().map(|id| self.db.walk(id))
+    }
+
+    /// Is this field's type an extension type? If yes, return its ID.
+    pub fn field_type_as_extension_type(self) -> Option<ExtensionTypeId> {
+        self.scalar_field_type().as_extension_type()
+    }
+
     /// The name in the `@map(<name>)` attribute.
     pub fn mapped_name(self) -> Option<&'db str> {
         self.attributes().mapped_name.map(|id| &self.db[id])
@@ -158,6 +184,12 @@ impl<'db> ScalarFieldWalker<'db> {
     }
 }
 
+impl fmt::Display for ScalarFieldWalker<'_> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", self.name())
+    }
+}
+
 /// An `@default()` attribute on a field.
 #[derive(Clone, Copy)]
 pub struct DefaultValueWalker<'db> {
@@ -169,7 +201,7 @@ pub struct DefaultValueWalker<'db> {
 impl<'db> DefaultValueWalker<'db> {
     /// The AST node of the attribute.
     pub fn ast_attribute(self) -> &'db ast::Attribute {
-        &self.db.ast[self.default.default_attribute]
+        &self.db.asts[self.default.default_attribute]
     }
 
     /// The value expression in the `@default` attribute.
@@ -185,6 +217,11 @@ impl<'db> DefaultValueWalker<'db> {
     /// Is this an `@default(autoincrement())`?
     pub fn is_autoincrement(self) -> bool {
         matches!(self.value(), ast::Expression::Function(name, _, _) if name == "autoincrement")
+    }
+
+    /// Is this an `@default(ulid())`?
+    pub fn is_ulid(self) -> bool {
+        matches!(self.value(), ast::Expression::Function(name, _, _) if name == "ulid")
     }
 
     /// Is this an `@default(cuid())`?
@@ -374,7 +411,7 @@ impl<'db> ScalarFieldAttributeWalker<'db> {
         let mut result = vec![(root_name, None)];
 
         for (ctid, field_id) in path.path() {
-            let ct = &self.db.ast[*ctid];
+            let ct = &self.db.asts[*ctid];
             let field = ct[*field_id].name();
 
             result.push((field, Some(ct.name())));
@@ -400,7 +437,7 @@ impl<'db> ScalarFieldAttributeWalker<'db> {
         let mut result = vec![(root, None)];
 
         for (ctid, field_id) in path.path() {
-            let ct = &self.db.ast[*ctid];
+            let ct = &self.db.asts[*ctid];
 
             let field = &self.db.types.composite_type_fields[&(*ctid, *field_id)]
                 .mapped_name

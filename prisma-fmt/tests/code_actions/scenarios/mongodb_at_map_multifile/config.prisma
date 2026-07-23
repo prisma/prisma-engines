@@ -1,0 +1,7 @@
+generator client {
+    provider        = "prisma-client"
+}
+
+datasource db {
+    provider = "mongodb"
+}

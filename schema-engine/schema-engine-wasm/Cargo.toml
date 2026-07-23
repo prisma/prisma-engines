@@ -1,0 +1,56 @@
+[package]
+name = "schema-engine-wasm"
+version = "0.1.0"
+edition.workspace = true
+
+[lib]
+doc = false
+crate-type = ["cdylib"]
+name = "schema_engine_wasm"
+
+[lints]
+workspace = true
+
+[features]
+# useful for local intellisense, as long as `all-native` is disabled in `schema-engine-cli`
+# default = ["sqlite"]
+sqlite = [
+    "driver-adapters/sqlite",
+    "psl/sqlite",
+    "sql-schema-connector/sqlite",
+    "commands/sqlite",
+]
+postgresql = [
+    "driver-adapters/postgresql",
+    "psl/postgresql",
+    "sql-schema-connector/postgresql",
+    "commands/postgresql",
+]
+
+[dependencies]
+crosstarget-utils.workspace = true
+psl.workspace = true
+quaint.workspace = true
+tracing.workspace = true
+tracing-futures.workspace = true
+tracing-subscriber = { workspace = true, features = ["fmt", "json", "time"] }
+tracing-error.workspace = true
+sql-schema-connector = { workspace = true }
+json-rpc = { path = "../json-rpc-api", package = "json-rpc-api" }
+commands = { path = "../commands", package = "schema-commands" }
+
+js-sys.workspace = true
+serde.workspace = true
+tsify.workspace = true
+wasm-bindgen.workspace = true
+wasm-bindgen-futures.workspace = true
+driver-adapters.workspace = true
+
+[build-dependencies]
+build-utils.workspace = true
+
+[package.metadata.wasm-pack.profile.release]
+wasm-opt = false # use wasm-opt explicitly in `./build.sh`
+
+[package.metadata.wasm-pack.profile.profiling]
+wasm-opt = false # use wasm-opt explicitly in `./build.sh`

@@ -1,0 +1,78 @@
+{
+  "enums": [],
+  "models": [
+    {
+      "name": "A",
+      "dbName": null,
+      "schema": "public",
+      "fields": [
+        {
+          "name": "id",
+          "kind": "scalar",
+          "isList": false,
+          "isRequired": true,
+          "isUnique": false,
+          "isId": true,
+          "isReadOnly": false,
+          "hasDefaultValue": false,
+          "type": "Int",
+          "nativeType": null,
+          "isGenerated": false,
+          "isUpdatedAt": false
+        }
+      ],
+      "primaryKey": null,
+      "uniqueFields": [],
+      "uniqueIndexes": [],
+      "isGenerated": false
+    },
+    {
+      "name": "B",
+      "dbName": null,
+      "schema": "test",
+      "fields": [
+        {
+          "name": "id",
+          "kind": "scalar",
+          "isList": false,
+          "isRequired": true,
+          "isUnique": false,
+          "isId": true,
+          "isReadOnly": false,
+          "hasDefaultValue": false,
+          "type": "Int",
+          "nativeType": null,
+          "isGenerated": false,
+          "isUpdatedAt": false
+        }
+      ],
+      "primaryKey": null,
+      "uniqueFields": [],
+      "uniqueIndexes": [],
+      "isGenerated": false
+    }
+  ],
+  "types": [],
+  "indexes": [
+    {
+      "model": "A",
+      "type": "id",
+      "isDefinedOnField": true,
+      "fields": [
+        {
+          "name": "id"
+        }
+      ]
+    },
+    {
+      "model": "B",
+      "type": "id",
+      "isDefinedOnField": true,
+      "fields": [
+        {
+          "name": "id"
+        }
+      ]
+    }
+  ]
+}

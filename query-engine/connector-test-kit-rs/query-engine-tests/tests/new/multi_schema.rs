@@ -1,10 +1,6 @@
 use query_engine_tests::test_suite;
 
-// "multiSchema migrations and introspection are not implemented on MySQL yet"
-#[test_suite(
-    capabilities(MultiSchema),
-    exclude(Mysql, Vitess("planetscale.js", "planetscale.js.wasm"))
-)]
+#[test_suite(capabilities(MultiSchema))]
 mod multi_schema {
     use query_engine_tests::*;
 

@@ -1,0 +1,13 @@
+{
+  "action": "findMany",
+  "modelName": "User",
+  "query": {
+    "selection": {
+      "notAField": {
+        "selection": {
+          "$scalars": true
+        }
+      }
+    }
+  }
+}

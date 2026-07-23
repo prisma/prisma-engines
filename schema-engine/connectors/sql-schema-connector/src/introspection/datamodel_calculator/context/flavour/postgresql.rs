@@ -1,9 +1,9 @@
 use crate::introspection::datamodel_calculator::DatamodelCalculatorContext;
 use schema_connector::{
-    warnings::{IndexedColumn, Model, ModelAndConstraint},
     Warnings,
+    warnings::{IndexedColumn, Model, ModelAndConstraint},
 };
-use sql::{postgres::PostgresSchemaExt, ForeignKeyWalker, IndexWalker, TableWalker};
+use sql::{ForeignKeyWalker, IndexWalker, TableWalker, postgres::PostgresSchemaExt};
 use sql_schema_describer as sql;
 
 pub(crate) struct PostgresIntrospectionFlavour;
@@ -95,5 +95,9 @@ impl super::IntrospectionFlavour for PostgresIntrospectionFlavour {
     fn uses_exclude_constraint(&self, ctx: &DatamodelCalculatorContext<'_>, table: TableWalker<'_>) -> bool {
         let pg_ext: &PostgresSchemaExt = ctx.sql_schema.downcast_connector_data();
         pg_ext.uses_exclude_constraint(table.id)
+    }
+
+    fn uses_pk_in_m2m_join_tables(&self, ctx: &DatamodelCalculatorContext<'_>) -> bool {
+        !ctx.is_cockroach()
     }
 }

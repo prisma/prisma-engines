@@ -1,0 +1,14 @@
+generator client {
+  provider        = "prisma-client"
+  previewFeatures = ["schemaEngineDriverAdapters"]
+}
+
+datasource db {
+  provider = "postgres"
+}
+
+model Blog {
+  id      Int    @unique
+  content String
+  title   String
+}

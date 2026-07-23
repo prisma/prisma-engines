@@ -43,12 +43,11 @@ async fn a_table_enums_array(api: &mut TestApi) -> TestResult {
 
     let expected = expect![[r#"
         generator client {
-          provider = "prisma-client-js"
+          provider = "prisma-client"
         }
 
         datasource db {
           provider = "postgresql"
-          url      = "env(TEST_DATABASE_URL)"
         }
 
         model Book {
@@ -73,12 +72,11 @@ async fn an_enum_with_invalid_value_names_should_have_them_commented_out(api: &m
     api.raw_cmd(sql).await;
     let expected = expect![[r#"
         generator client {
-          provider = "prisma-client-js"
+          provider = "prisma-client"
         }
 
         datasource db {
           provider = "postgresql"
-          url      = "env(TEST_DATABASE_URL)"
         }
 
         enum threechars {
@@ -106,12 +104,11 @@ async fn a_table_with_an_enum_default_value_that_is_an_empty_string(api: &mut Te
 
     let expectation = expect![[r#"
         generator client {
-          provider = "prisma-client-js"
+          provider = "prisma-client"
         }
 
         datasource db {
           provider = "postgresql"
-          url      = "env(TEST_DATABASE_URL)"
         }
 
         model Book {
@@ -145,12 +142,11 @@ async fn a_table_with_enum_default_values_that_look_like_booleans(api: &mut Test
 
     let expectation = expect![[r#"
         generator client {
-          provider = "prisma-client-js"
+          provider = "prisma-client"
         }
 
         datasource db {
           provider = "postgresql"
-          url      = "env(TEST_DATABASE_URL)"
         }
 
         model News {
@@ -185,12 +181,11 @@ async fn invalid_enum_variants_regression(api: &mut TestApi) -> TestResult {
 
     let expectation = expect![[r#"
         generator client {
-          provider = "prisma-client-js"
+          provider = "prisma-client"
         }
 
         datasource db {
           provider = "postgresql"
-          url      = "env(TEST_DATABASE_URL)"
         }
 
         model invalid_enum_value_name {
@@ -236,12 +231,11 @@ async fn a_variant_that_cannot_be_sanitized_triggers_dbgenerated_in_defaults(api
 
     let expectation = expect![[r#"
         generator client {
-          provider = "prisma-client-js"
+          provider = "prisma-client"
         }
 
         datasource db {
           provider = "postgresql"
-          url      = "env(TEST_DATABASE_URL)"
         }
 
         model B {
@@ -275,12 +269,11 @@ async fn a_mapped_variant_will_not_warn(api: &mut TestApi) -> TestResult {
 
     let expectation = expect![[r#"
         generator client {
-          provider = "prisma-client-js"
+          provider = "prisma-client"
         }
 
         datasource db {
           provider = "postgresql"
-          url      = "env(TEST_DATABASE_URL)"
         }
 
         model B {
@@ -315,12 +308,11 @@ async fn a_mapped_enum_will_not_warn(api: &mut TestApi) -> TestResult {
 
     let expectation = expect![[r#"
         generator client {
-          provider = "prisma-client-js"
+          provider = "prisma-client"
         }
 
         datasource db {
           provider = "postgresql"
-          url      = "env(TEST_DATABASE_URL)"
         }
 
         model B {
@@ -333,6 +325,49 @@ async fn a_mapped_enum_will_not_warn(api: &mut TestApi) -> TestResult {
           second
 
           @@map("1A")
+        }
+    "#]];
+
+    api.expect_datamodel(&expectation).await;
+    api.expect_no_warnings().await;
+
+    Ok(())
+}
+
+// Regression: https://github.com/prisma/prisma/issues/22456
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
+async fn enum_array_type(api: &mut TestApi) -> TestResult {
+    let setup = indoc! {r#"
+        CREATE TYPE "_foo" AS ENUM ('FIRST', 'SECOND');
+
+        CREATE TABLE "Post" (
+            "id" TEXT NOT NULL,
+            "contentFilters" "_foo"[],
+            CONSTRAINT "Post_pkey" PRIMARY KEY ("id")
+        );
+    "#};
+
+    api.raw_cmd(setup).await;
+
+    let expectation = expect![[r#"
+        generator client {
+          provider = "prisma-client"
+        }
+
+        datasource db {
+          provider = "postgresql"
+        }
+
+        model Post {
+          id             String @id
+          contentFilters foo[]
+        }
+
+        enum foo {
+          FIRST
+          SECOND
+
+          @@map("_foo")
         }
     "#]];
 

@@ -1,0 +1,18 @@
+generator js {
+    provider = "prisma-client"
+}
+
+datasource db {
+    provider = "mongodb"
+}
+
+model ModelNameA {
+    id  String @id @map("_id")
+    bId Int
+    val TypeA
+}
+
+/// This is doc for TypeA
+type Typ<|>eA {
+id String
+}

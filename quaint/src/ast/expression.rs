@@ -50,6 +50,21 @@ impl<'a> Expression<'a> {
                 ..
             }) => true,
 
+            ExpressionKind::Parameterized(Value {
+                typed: ValueType::Opaque(opaque),
+                ..
+            }) => matches!(opaque.typ(), OpaqueType::Json),
+
+            ExpressionKind::ParameterizedRow(Value {
+                typed: ValueType::Json(_),
+                ..
+            }) => true,
+
+            ExpressionKind::ParameterizedRow(Value {
+                typed: ValueType::Opaque(opaque),
+                ..
+            }) => matches!(opaque.typ(), OpaqueType::Json),
+
             ExpressionKind::Value(expr) => expr.is_json_value(),
 
             ExpressionKind::Function(fun) => fun.returns_json(),
@@ -58,7 +73,6 @@ impl<'a> Expression<'a> {
     }
 
     #[allow(dead_code)]
-
     pub(crate) fn is_json_value(&self) -> bool {
         match &self.kind {
             ExpressionKind::Parameterized(Value {
@@ -66,16 +80,57 @@ impl<'a> Expression<'a> {
                 ..
             }) => true,
 
+            ExpressionKind::Parameterized(Value {
+                typed: ValueType::Opaque(opaque),
+                ..
+            }) => matches!(opaque.typ(), OpaqueType::Json),
+
+            ExpressionKind::ParameterizedRow(Value {
+                typed: ValueType::Json(_),
+                ..
+            }) => true,
+
+            ExpressionKind::ParameterizedRow(Value {
+                typed: ValueType::Opaque(opaque),
+                ..
+            }) => matches!(opaque.typ(), OpaqueType::Json),
+
             ExpressionKind::Value(expr) => expr.is_json_value(),
             _ => false,
         }
     }
 
+    /// Returns true if this expression contains an extractable JSON value.
+    /// Unlike `is_json_value()`, this returns false for opaque JSON placeholders
+    /// which are typed as JSON but don't contain actual JSON data to extract.
     #[allow(dead_code)]
+    #[cfg(feature = "mysql")]
+    pub(crate) fn is_extractable_json_value(&self) -> bool {
+        match &self.kind {
+            ExpressionKind::Parameterized(Value {
+                typed: ValueType::Json(_),
+                ..
+            }) => true,
 
+            ExpressionKind::ParameterizedRow(Value {
+                typed: ValueType::Json(_),
+                ..
+            }) => true,
+
+            ExpressionKind::Value(expr) => expr.is_extractable_json_value(),
+            _ => false,
+        }
+    }
+
+    #[allow(dead_code)]
     pub(crate) fn into_json_value(self) -> Option<serde_json::Value> {
         match self.kind {
             ExpressionKind::Parameterized(Value {
+                typed: ValueType::Json(json_val),
+                ..
+            }) => json_val,
+
+            ExpressionKind::ParameterizedRow(Value {
                 typed: ValueType::Json(json_val),
                 ..
             }) => json_val,
@@ -120,6 +175,14 @@ impl<'a> Expression<'a> {
     pub(crate) fn into_selection(self) -> Option<SelectQuery<'a>> {
         match self.kind {
             ExpressionKind::Selection(selection) => Some(selection),
+            _ => None,
+        }
+    }
+
+    #[allow(dead_code)]
+    pub(crate) fn as_column(&self) -> Option<&Column<'a>> {
+        match &self.kind {
+            ExpressionKind::Column(column) => Some(column),
             _ => None,
         }
     }
@@ -190,6 +253,16 @@ impl<'a> Expression<'a> {
             _ => (self, Vec::new()),
         }
     }
+
+    pub fn into_parameterized_row(self) -> Self {
+        match self.kind {
+            ExpressionKind::Parameterized(value) => Expression {
+                kind: ExpressionKind::ParameterizedRow(value),
+                alias: self.alias,
+            },
+            _ => self,
+        }
+    }
 }
 
 /// An expression we can compare and use in database queries.
@@ -197,11 +270,13 @@ impl<'a> Expression<'a> {
 pub enum ExpressionKind<'a> {
     /// Anything that we must parameterize before querying
     Parameterized(Value<'a>),
+    /// List of parameters with an unknown length, e.g. `(?, ?, ..., ?)`
+    ParameterizedRow(Value<'a>),
     /// A user-provided value we do not parameterize.
     RawValue(Raw<'a>),
     /// A database column
     Column(Box<Column<'a>>),
-    /// Data in a row form, e.g. (1, 2, 3)
+    /// Data in a row form, e.g. `(1, 2, 3)`
     Row(Row<'a>),
     /// A nested `SELECT` or `SELECT .. UNION` statement
     Selection(SelectQuery<'a>),
@@ -223,13 +298,19 @@ pub enum ExpressionKind<'a> {
     Default,
 }
 
-impl<'a> ExpressionKind<'a> {
+impl ExpressionKind<'_> {
     pub(crate) fn is_xml_value(&self) -> bool {
         match self {
             Self::Parameterized(Value {
                 typed: ValueType::Xml(_),
                 ..
             }) => true,
+
+            Self::ParameterizedRow(Value {
+                typed: ValueType::Xml(_),
+                ..
+            }) => true,
+
             Self::Value(expr) => expr.is_xml_value(),
             _ => false,
         }
@@ -501,16 +582,16 @@ impl<'a> Comparable<'a> for Expression<'a> {
 
     fn matches<T>(self, query: T) -> Compare<'a>
     where
-        T: Into<Cow<'a, str>>,
+        T: Into<Expression<'a>>,
     {
-        Compare::Matches(Box::new(self), query.into())
+        Compare::Matches(Box::new(self), Box::new(query.into()))
     }
 
     fn not_matches<T>(self, query: T) -> Compare<'a>
     where
-        T: Into<Cow<'a, str>>,
+        T: Into<Expression<'a>>,
     {
-        Compare::NotMatches(Box::new(self), query.into())
+        Compare::NotMatches(Box::new(self), Box::new(query.into()))
     }
 
     fn any(self) -> Compare<'a> {

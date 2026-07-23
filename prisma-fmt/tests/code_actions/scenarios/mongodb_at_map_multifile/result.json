@@ -1,0 +1,41 @@
+[
+  {
+    "title": "Add @map(\"_id\")",
+    "kind": "quickfix",
+    "diagnostics": [
+      {
+        "range": {
+          "start": {
+            "line": 1,
+            "character": 4
+          },
+          "end": {
+            "line": 2,
+            "character": 0
+          }
+        },
+        "severity": 1,
+        "message": "Error validating field `id` in model `Kattbjorn`: MongoDB model IDs must have an @map(\"_id\") annotation."
+      }
+    ],
+    "edit": {
+      "changes": {
+        "file:///path/to/_target.prisma": [
+          {
+            "range": {
+              "start": {
+                "line": 1,
+                "character": 17
+              },
+              "end": {
+                "line": 2,
+                "character": 0
+              }
+            },
+            "newText": " @map(\"_id\")\n"
+          }
+        ]
+      }
+    }
+  }
+]

@@ -5,18 +5,21 @@ mod context;
 pub(crate) use context::DatamodelCalculatorContext;
 
 use crate::introspection::{rendering, warnings};
-use psl::PreviewFeature;
+use psl::{PreviewFeature, parser_database::ExtensionTypes};
 use schema_connector::{IntrospectionContext, IntrospectionResult};
 use sql_schema_describer as sql;
 
-/// Calculate a data model from a database schema.
-pub fn calculate(schema: &sql::SqlSchema, ctx: &IntrospectionContext, search_path: &str) -> IntrospectionResult {
-    let ctx = DatamodelCalculatorContext::new(ctx, schema, search_path);
+/// Calculate datamodels from a database schema.
+pub fn calculate(
+    schema: &sql::SqlSchema,
+    ctx: &IntrospectionContext,
+    search_path: &str,
+    extension_types: &dyn ExtensionTypes,
+) -> IntrospectionResult {
+    let introspection_file_name = ctx.introspection_file_path();
+    let ctx = DatamodelCalculatorContext::new(ctx, schema, search_path, extension_types);
 
-    let (schema_string, is_empty, views) = rendering::to_psl_string(&ctx);
-    let warnings = warnings::generate(&ctx);
-
-    let empty_warnings = warnings.is_empty();
+    let (datamodels, is_empty, views) = rendering::to_psl_string(introspection_file_name, &ctx);
 
     let views = if ctx.config.preview_features().contains(PreviewFeature::Views) {
         Some(views)
@@ -24,14 +27,14 @@ pub fn calculate(schema: &sql::SqlSchema, ctx: &IntrospectionContext, search_pat
         None
     };
 
-    let warnings = if empty_warnings {
-        None
-    } else {
-        Some(warnings.to_string())
+    let warnings = warnings::generate(&ctx);
+    let warnings = match warnings.is_empty() {
+        true => None,
+        false => Some(warnings.to_string()),
     };
 
     IntrospectionResult {
-        data_model: schema_string,
+        datamodels,
         is_empty,
         warnings,
         views,

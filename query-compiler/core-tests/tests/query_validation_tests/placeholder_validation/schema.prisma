@@ -1,0 +1,23 @@
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id    Int     @id
+  email String  @unique
+  name  String?
+  age   Int?
+
+  posts Post[]
+}
+
+model Post {
+  id        Int      @id
+  title     String
+  content   String?
+  published Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  authorId Int?
+  author   User? @relation(fields: [authorId], references: [id])
+}

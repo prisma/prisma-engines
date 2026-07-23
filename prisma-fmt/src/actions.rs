@@ -8,7 +8,7 @@ pub(crate) fn run(schema: &str) -> String {
             } else if let Some(datasource) = validated_configuration.datasources.first() {
                 let available_referential_actions = datasource
                     .active_connector
-                    .referential_actions()
+                    .referential_actions(&datasource.relation_mode())
                     .iter()
                     .map(|act| format!("{act:?}"))
                     .collect::<Vec<_>>();

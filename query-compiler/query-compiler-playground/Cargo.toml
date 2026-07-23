@@ -1,0 +1,15 @@
+[package]
+name = "query-compiler-playground"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+anyhow.workspace = true
+serde_json.workspace = true
+
+psl = { workspace = true, features = ["all"] }
+query-compiler = { workspace = true, features = ["all"] }
+request-handlers.workspace = true
+query-core.workspace = true
+quaint = { workspace = true, features = ["all-native"] }
+sql-query-builder.workspace = true

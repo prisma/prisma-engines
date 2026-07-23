@@ -1,23 +1,35 @@
 use connection_string::JdbcString;
 use expect_test::expect;
 use indoc::*;
+use schema_core::{DatasourceUrls, json_rpc::types::*};
 use std::{
+    cell::OnceCell,
     fs,
     io::{BufRead, BufReader, Write as _},
-    panic::{self, AssertUnwindSafe},
     process::{Child, Command, Output},
 };
 use test_macros::test_connector;
-use test_setup::{runtime::run_with_thread_local_runtime as tok, BitFlags, Tags, TestApiArgs};
-use url::Url;
-use user_facing_errors::{common::DatabaseDoesNotExist, UserFacingError};
+use test_setup::{BitFlags, Tags, TestApiArgs, runtime::run_with_thread_local_runtime as tok};
+use user_facing_errors::{UserFacingError, common::DatabaseDoesNotExist};
 
 fn schema_engine_bin_path() -> &'static str {
     env!("CARGO_BIN_EXE_schema-engine")
 }
 
-fn run(args: &[&str]) -> Output {
+trait CommandExt {
+    fn datasource_url(&mut self, url: impl Into<String>) -> &mut Self;
+}
+
+impl CommandExt for Command {
+    fn datasource_url(&mut self, url: impl Into<String>) -> &mut Self {
+        self.arg("--datasource")
+            .arg(serde_json::to_string(&DatasourceUrls::from_url(url)).unwrap())
+    }
+}
+
+fn run_with_datasource_url(url: impl Into<String>, args: &[&str]) -> Output {
     Command::new(schema_engine_bin_path())
+        .datasource_url(url)
         .arg("cli")
         .args(args)
         .env("RUST_LOG", "INFO")
@@ -25,59 +37,115 @@ fn run(args: &[&str]) -> Output {
         .unwrap()
 }
 
+struct DropChild(Child);
+
+impl DropChild {
+    fn get_mut(&mut self) -> &mut Child {
+        &mut self.0
+    }
+}
+
+impl Drop for DropChild {
+    fn drop(&mut self) {
+        _ = self.0.kill();
+    }
+}
+
 fn with_child_process<F>(mut command: Command, f: F)
 where
     F: FnOnce(&mut Child),
 {
-    let mut child = command
+    let child = command
         .stdin(std::process::Stdio::piped())
         .stdout(std::process::Stdio::piped())
         .stderr(std::process::Stdio::null())
         .spawn()
         .unwrap();
 
-    let res = panic::catch_unwind(AssertUnwindSafe(|| {
-        f(&mut child);
-    }));
+    let mut child = DropChild(child);
 
-    child.kill().unwrap();
-    res.unwrap();
+    f(child.get_mut());
 }
 
 struct TestApi {
     args: TestApiArgs,
+    url: OnceCell<String>,
 }
 
 impl TestApi {
     fn new(args: TestApiArgs) -> Self {
-        TestApi { args }
-    }
-
-    fn connection_string(&self) -> String {
-        let args = &self.args;
-
-        if args.tags().contains(Tags::Postgres) {
-            tok(args.create_postgres_database()).2
-        } else if args.tags().contains(Tags::Mysql) {
-            tok(args.create_mysql_database()).1
-        } else if args.tags().contains(Tags::Mssql) {
-            tok(args.create_mssql_database()).1
-        } else if args.tags().contains(Tags::Sqlite) {
-            args.database_url().to_owned()
-        } else {
-            unreachable!()
+        TestApi {
+            args,
+            url: OnceCell::new(),
         }
     }
 
+    fn connection_string(&self) -> &str {
+        self.url.get_or_init(|| {
+            let args = &self.args;
+
+            if args.tags().contains(Tags::Postgres) {
+                tok(args.create_postgres_database()).2
+            } else if args.tags().contains(Tags::Mysql) {
+                tok(args.create_mysql_database()).1
+            } else if args.tags().contains(Tags::Mssql) {
+                tok(args.create_mssql_database()).1
+            } else if args.tags().contains(Tags::Sqlite) {
+                args.database_url().to_owned()
+            } else {
+                panic!("invalid test tags")
+            }
+        })
+    }
+
+    fn with_datasource_url(self, datasource_url: impl Into<String> + std::fmt::Debug) -> Self {
+        let url = OnceCell::new();
+        url.set(datasource_url.into()).unwrap();
+        Self { url, ..self }
+    }
+
     fn run(&self, args: &[&str]) -> Output {
-        run(args)
+        run_with_datasource_url(self.connection_string(), args)
     }
 }
 
+macro_rules! write_multi_file_vec {
+    // Match multiple pairs of filename and content
+    ( $( $filename:expr => $content:expr ),* $(,)? ) => {
+        {
+            use std::fs::File;
+            use std::io::Write;
+
+            // Create a result vector to collect errors
+            let mut results = Vec::new();
+            let tmpdir = tempfile::tempdir().unwrap();
+
+            fs::create_dir_all(&tmpdir).unwrap();
+
+            $(
+                let file_path = tmpdir.path().join($filename);
+                // Attempt to create or open the file
+                let result = (|| -> std::io::Result<()> {
+                    let mut file = File::create(&file_path)?;
+                    file.write_all($content.as_bytes())?;
+                    Ok(())
+                })();
+
+                result.unwrap();
+
+                // Push the result of the operation to the results vector
+                results.push((file_path.to_string_lossy().into_owned(), $content));
+            )*
+
+            // Return the results vector for further inspection if needed
+            (tmpdir, results)
+        }
+    };
+  }
+
 #[test_connector(tags(Mysql))]
 fn test_connecting_with_a_working_mysql_connection_string(api: TestApi) {
-    let connection_string = api.connection_string();
-    let output = api.run(&["--datasource", &connection_string, "can-connect-to-database"]);
+    let output = api.run(&["can-connect-to-database"]);
 
     assert!(output.status.success(), "{output:?}");
     let stderr = String::from_utf8_lossy(&output.stderr);
@@ -90,7 +158,10 @@ fn test_connecting_with_a_non_working_mysql_connection_string(api: TestApi) {
 
     non_existing_url.set_path("this_does_not_exist");
 
-    let output = api.run(&["--datasource", non_existing_url.as_ref(), "can-connect-to-database"]);
+    let output = api
+        .with_datasource_url(non_existing_url)
+        .run(&["can-connect-to-database"]);
+
     assert_eq!(output.status.code(), Some(1));
     let stderr = String::from_utf8_lossy(&output.stderr);
     assert!(stderr.contains(r#""error_code":"P1003""#), "{}", stderr);
@@ -104,7 +175,7 @@ fn test_connecting_with_a_working_postgres_connection_string(api: TestApi) {
         api.args.database_url().to_owned()
     };
 
-    let output = api.run(&["--datasource", &conn_string, "can-connect-to-database"]);
+    let output = api.with_datasource_url(conn_string).run(&["can-connect-to-database"]);
 
     assert!(output.status.success(), "{output:?}");
     let stderr = String::from_utf8_lossy(&output.stderr);
@@ -120,7 +191,7 @@ fn test_connecting_with_a_working_postgresql_connection_string(api: TestApi) {
         api.args.database_url().to_owned()
     };
 
-    let output = api.run(&["--datasource", &conn_string, "can-connect-to-database"]);
+    let output = api.with_datasource_url(conn_string).run(&["can-connect-to-database"]);
 
     assert!(output.status.success(), "{output:?}");
     let stderr = String::from_utf8_lossy(&output.stderr);
@@ -132,7 +203,7 @@ fn test_connecting_with_a_non_working_psql_connection_string(api: TestApi) {
     let mut url: url::Url = api.args.database_url().parse().unwrap();
     url.set_path("this_does_not_exist");
 
-    let output = api.run(&["--datasource", url.as_ref(), "can-connect-to-database"]);
+    let output = api.with_datasource_url(url).run(&["can-connect-to-database"]);
     assert_eq!(output.status.code(), Some(1));
     let stderr = String::from_utf8_lossy(&output.stderr);
     assert!(stderr.contains(r#""error_code":"P1003""#), "{}", stderr);
@@ -140,9 +211,7 @@ fn test_connecting_with_a_non_working_psql_connection_string(api: TestApi) {
 
 #[test_connector(tags(Mssql))]
 fn test_connecting_with_a_working_mssql_connection_string(api: TestApi) {
-    let connection_string = api.connection_string();
-
-    let output = api.run(&["--datasource", &connection_string, "can-connect-to-database"]);
+    let output = api.run(&["can-connect-to-database"]);
 
     assert!(output.status.success(), "{output:?}");
     let stderr = String::from_utf8_lossy(&output.stderr);
@@ -151,16 +220,15 @@ fn test_connecting_with_a_working_mssql_connection_string(api: TestApi) {
 
 #[test_connector(tags(Postgres, Mysql))]
 fn test_create_database(api: TestApi) {
-    let connection_string = api.connection_string();
-    let output = api.run(&["--datasource", &connection_string, "drop-database"]);
+    let output = api.run(&["drop-database"]);
     assert!(output.status.success(), "{output:#?}");
 
-    let output = api.run(&["--datasource", &connection_string, "create-database"]);
+    let output = api.run(&["create-database"]);
     assert!(output.status.success());
     let stderr = String::from_utf8_lossy(&output.stderr);
     assert!(stderr.contains("Database 'test_create_database\' was successfully created."));
 
-    let output = api.run(&["--datasource", &connection_string, "can-connect-to-database"]);
+    let output = api.run(&["can-connect-to-database"]);
     assert!(output.status.success());
 }
 
@@ -170,16 +238,18 @@ fn test_create_database_mssql(api: TestApi) {
         .connection_string()
         .replace("test_create_database_mssql", "test_create_database_NEW");
 
-    let output = api.run(&["--datasource", &connection_string, "drop-database"]);
+    let api = api.with_datasource_url(connection_string);
+
+    let output = api.run(&["drop-database"]);
     assert!(output.status.success());
 
-    let output = api.run(&["--datasource", &connection_string, "create-database"]);
+    let output = api.run(&["create-database"]);
     assert!(output.status.success());
 
     let stderr = String::from_utf8_lossy(&output.stderr);
     assert!(stderr.contains("Database 'test_create_database_NEW\' was successfully created."));
 
-    let output = api.run(&["--datasource", &connection_string, "can-connect-to-database"]);
+    let output = api.run(&["can-connect-to-database"]);
     assert!(output.status.success());
 }
 
@@ -188,7 +258,7 @@ fn test_sqlite_url(api: TestApi) {
     let base_dir = tempfile::tempdir().unwrap();
     let sqlite_path = base_dir.path().join("test.db");
     let url = format!("{}", sqlite_path.to_string_lossy());
-    let output = api.run(&["--datasource", &url, "can-connect-to-database"]);
+    let output = api.with_datasource_url(url).run(&["can-connect-to-database"]);
     assert!(!output.status.success());
     let message = String::from_utf8(output.stderr).unwrap();
     assert!(message.contains("The provided database string is invalid. The scheme is not recognized in database URL."));
@@ -206,7 +276,7 @@ fn test_create_sqlite_database(api: TestApi) {
     assert!(!sqlite_path.exists());
 
     let url = format!("file:{}", sqlite_path.to_string_lossy());
-    let output = api.run(&["--datasource", &url, "create-database"]);
+    let output = api.with_datasource_url(url).run(&["create-database"]);
     let stderr = String::from_utf8_lossy(&output.stderr);
     assert!(output.status.success(), "{stderr:?}");
     assert!(stderr.contains("success"));
@@ -220,23 +290,23 @@ fn test_drop_sqlite_database(api: TestApi) {
     let base_dir = tempfile::tempdir().unwrap();
     let sqlite_path = base_dir.path().join("test.db");
     let url = format!("file:{}", sqlite_path.to_string_lossy());
+    let api = api.with_datasource_url(url);
 
-    let output = api.run(&["--datasource", &url, "create-database"]);
+    let output = api.run(&["create-database"]);
     assert!(output.status.success());
-    let output = api.run(&["--datasource", &url, "can-connect-to-database"]);
+    let output = api.run(&["can-connect-to-database"]);
     assert!(output.status.success());
-    let output = api.run(&["--datasource", &url, "drop-database"]);
+    let output = api.run(&["drop-database"]);
     assert!(output.status.success());
     assert!(!sqlite_path.exists());
 }
 
 #[test_connector(tags(Postgres, Mysql))]
 fn test_drop_database(api: TestApi) {
-    let connection_string = api.connection_string();
-    let output = run(&["--datasource", &connection_string, "drop-database"]);
+    let output = api.run(&["drop-database"]);
     assert!(output.status.success(), "{output:#?}");
 
-    let output = run(&["--datasource", &connection_string, "can-connect-to-database"]);
+    let output = api.run(&["can-connect-to-database"]);
     assert_eq!(output.status.code(), Some(1));
 
     let stderr = String::from_utf8_lossy(&output.stderr);
@@ -252,14 +322,15 @@ fn test_drop_sqlserver_database(api: TestApi) {
         .insert(String::from("database"), String::from("NEWDATABASE"));
 
     let connection_string = connection_string.to_string().replace("jdbc:", "");
+    let api = api.with_datasource_url(connection_string);
 
-    let output = api.run(&["--datasource", &connection_string, "create-database"]);
+    let output = api.run(&["create-database"]);
     assert!(output.status.success());
 
-    let output = api.run(&["--datasource", &connection_string, "drop-database"]);
+    let output = api.run(&["drop-database"]);
     assert!(output.status.success());
 
-    let output = api.run(&["--datasource", &connection_string, "can-connect-to-database"]);
+    let output = api.run(&["can-connect-to-database"]);
     assert_eq!(output.status.code(), Some(1));
 
     let stderr = String::from_utf8_lossy(&output.stderr);
@@ -270,7 +341,7 @@ fn test_drop_sqlserver_database(api: TestApi) {
 fn bad_postgres_url_must_return_a_good_error(api: TestApi) {
     let url = "postgresql://postgres:prisma@localhost:543`/mydb?schema=public";
 
-    let output = api.run(&["--datasource", url, "create-database"]);
+    let output = api.with_datasource_url(url).run(&["create-database"]);
     assert_eq!(output.status.code(), Some(1));
 
     let stderr = String::from_utf8_lossy(&output.stderr);
@@ -280,25 +351,21 @@ fn bad_postgres_url_must_return_a_good_error(api: TestApi) {
 
 #[test_connector(tags(Postgres))]
 fn database_already_exists_must_return_a_proper_error(api: TestApi) {
-    let connection_string = api.connection_string();
-    let output = api.run(&["--datasource", &connection_string, "create-database"]);
+    let output = api.run(&["create-database"]);
     assert_eq!(output.status.code(), Some(1));
-
-    let (host, port) = {
-        let url = Url::parse(&connection_string).unwrap();
-        (url.host().unwrap().to_string(), url.port().unwrap())
-    };
 
     let stderr = String::from_utf8_lossy(&output.stderr);
     assert!(stderr.contains(r#""error_code":"P1009""#));
-    assert!(stderr.contains(&format!("Database `database_already_exists_must_return_a_proper_error` already exists on the database server at `{host}:{port}`")));
+    assert!(stderr.contains(
+        "Database `database_already_exists_must_return_a_proper_error` already exists on the database server"
+    ));
 }
 
 #[test_connector(tags(Postgres))]
 fn tls_errors_must_be_mapped_in_the_cli(api: TestApi) {
     let connection_string = api.connection_string();
     let url = format!("{connection_string}&sslmode=require&sslaccept=strict");
-    let output = api.run(&["--datasource", &url, "can-connect-to-database"]);
+    let output = api.with_datasource_url(url).run(&["can-connect-to-database"]);
 
     assert_eq!(output.status.code(), Some(1));
     let stderr = String::from_utf8_lossy(&output.stderr);
@@ -316,7 +383,6 @@ fn basic_jsonrpc_roundtrip_works_with_no_params(_api: TestApi) {
     let datamodel = r#"
         datasource db {
             provider = "postgres"
-            url = env("TEST_DATABASE_URL")
         }
     "#;
 
@@ -324,7 +390,8 @@ fn basic_jsonrpc_roundtrip_works_with_no_params(_api: TestApi) {
     fs::write(&tmpfile, datamodel).unwrap();
 
     let mut command = Command::new(schema_engine_bin_path());
-    command.arg("--datamodel").arg(&tmpfile).env("RUST_LOG", "info");
+    command.datasource_url(std::env::var("TEST_DATABASE_URL").unwrap());
+    command.arg("--datamodels").arg(&tmpfile).env("RUST_LOG", "info");
 
     with_child_process(command, |process| {
         let stdin = process.stdin.as_mut().unwrap();
@@ -350,23 +417,32 @@ fn basic_jsonrpc_roundtrip_works_with_params(_api: TestApi) {
     let tmpdir = tempfile::tempdir().unwrap();
     let tmpfile = tmpdir.path().join("datamodel");
 
-    let datamodel = r#"
+    let datamodel = indoc! {r#"
         datasource db {
             provider = "postgres"
-            url = env("TEST_DATABASE_URL")
         }
-    "#;
+    "#};
 
     fs::create_dir_all(&tmpdir).unwrap();
     fs::write(&tmpfile, datamodel).unwrap();
 
-    let command = Command::new(schema_engine_bin_path());
+    let mut command = Command::new(schema_engine_bin_path());
+    command.datasource_url(std::env::var("TEST_DATABASE_URL").unwrap());
 
     let path = tmpfile.to_str().unwrap();
-    let schema_path_params = format!(r#"{{ "datasource": {{ "tag": "SchemaPath", "path": "{path}" }} }}"#);
+    let schema_path_params = serde_json::json!({
+        "datasource": {
+            "tag": "Schema",
+            "files": [{ "path": path, "content": datamodel }]
+        }
+    });
 
-    let url = std::env::var("TEST_DATABASE_URL").unwrap();
-    let connection_string_params = format!(r#"{{ "datasource": {{ "tag": "ConnectionString", "url": "{url}" }} }}"#);
+    let connection_string_params = serde_json::json!({
+        "datasource": {
+            "tag": "ConnectionString",
+            "url": std::env::var("TEST_DATABASE_URL").unwrap()
+        }
+    });
 
     with_child_process(command, |process| {
         let stdin = process.stdin.as_mut().unwrap();
@@ -374,8 +450,13 @@ fn basic_jsonrpc_roundtrip_works_with_params(_api: TestApi) {
 
         for _ in 0..2 {
             for params in [&schema_path_params, &connection_string_params] {
-                let params_template =
-                    format!(r#"{{ "jsonrpc": "2.0", "method": "getDatabaseVersion", "params": {params}, "id": 1 }}"#);
+                let params_template = serde_json::json!({
+                    "jsonrpc": "2.0",
+                    "method": "getDatabaseVersion",
+                    "params": params,
+                    "id": 1
+                })
+                .to_string();
 
                 writeln!(stdin, "{}", &params_template).unwrap();
 
@@ -394,7 +475,6 @@ fn introspect_sqlite_empty_database() {
     let schema = r#"
         datasource db {
             provider = "sqlite"
-            url = env("TEST_DATABASE_URL")
         }
 
     "#;
@@ -402,10 +482,7 @@ fn introspect_sqlite_empty_database() {
     fs::File::create(tmpdir.path().join("dev.db")).unwrap();
 
     let mut command = Command::new(schema_engine_bin_path());
-    command.env(
-        "TEST_DATABASE_URL",
-        format!("file:{}/dev.db", tmpdir.path().to_string_lossy()),
-    );
+    command.datasource_url(format!("file:{}/dev.db", tmpdir.path().to_string_lossy()));
 
     with_child_process(command, |process| {
         let stdin = process.stdin.as_mut().unwrap();
@@ -416,9 +493,10 @@ fn introspect_sqlite_empty_database() {
             "method": "introspect",
             "id": 1,
             "params": {
-                "schema": schema,
+                "schema": { "files": [{ "path": "schema.prisma", "content": schema }] },
                 "force": true,
                 "compositeTypeDepth": 5,
+                "baseDirectoryPath": "./base_directory_path/"
             }
         }))
         .unwrap();
@@ -438,7 +516,6 @@ fn introspect_sqlite_invalid_empty_database() {
     let schema = r#"
         datasource db {
             provider = "sqlite"
-            url = env("TEST_DATABASE_URL")
         }
 
         model something {
@@ -449,10 +526,7 @@ fn introspect_sqlite_invalid_empty_database() {
     fs::File::create(tmpdir.path().join("dev.db")).unwrap();
 
     let mut command = Command::new(schema_engine_bin_path());
-    command.env(
-        "TEST_DATABASE_URL",
-        format!("file:{}/dev.db", tmpdir.path().to_string_lossy()),
-    );
+    command.datasource_url(format!("file:{}/dev.db", tmpdir.path().to_string_lossy()));
 
     with_child_process(command, |process| {
         let stdin = process.stdin.as_mut().unwrap();
@@ -463,9 +537,10 @@ fn introspect_sqlite_invalid_empty_database() {
             "method": "introspect",
             "id": 1,
             "params": {
-                "schema": schema,
+                "schema": { "files": [{ "path": "schema.prisma", "content": schema }] },
                 "force": true,
                 "compositeTypeDepth": -1,
+                "baseDirectoryPath": "./base_directory_path/"
             }
         }))
         .unwrap();
@@ -486,24 +561,23 @@ fn introspect_sqlite_invalid_empty_database() {
 fn execute_postgres(api: TestApi) {
     /* Drop and create database via `drop-database` and `create-database` */
 
-    let connection_string = api.connection_string();
-    let output = api.run(&["--datasource", &connection_string, "drop-database"]);
+    let output = api.run(&["drop-database"]);
     assert!(output.status.success(), "{output:#?}");
-    let output = api.run(&["--datasource", &connection_string, "create-database"]);
+    let output = api.run(&["create-database"]);
     assert!(output.status.success(), "{output:#?}");
 
     let tmpdir = tempfile::tempdir().unwrap();
     let schema = r#"
         datasource db {
             provider = "postgres"
-            url = env("TEST_DATABASE_URL")
         }
     "#;
 
     let schema_path = tmpdir.path().join("prisma.schema");
     fs::write(&schema_path, schema).unwrap();
 
-    let command = Command::new(schema_engine_bin_path());
+    let mut command = Command::new(schema_engine_bin_path());
+    command.datasource_url(std::env::var("TEST_DATABASE_URL").unwrap());
 
     with_child_process(command, |process| {
         let stdin = process.stdin.as_mut().unwrap();
@@ -517,7 +591,8 @@ fn execute_postgres(api: TestApi) {
             "params": {
                 "datasourceType": {
                     "tag": "schema",
-                    "schema": &schema_path,
+                    "files": [{ "path": &schema_path, "content": &schema }],
+                    "configDir": schema_path.parent().unwrap().to_string_lossy(),
                 },
                 "script": "SELECT 1;",
             }
@@ -539,34 +614,32 @@ fn execute_postgres(api: TestApi) {
 }
 
 #[test_connector(tags(Postgres), exclude(CockroachDb), preview_features("views"))]
-fn introspect_postgres(api: TestApi) {
+fn introspect_single_postgres_force(api: TestApi) {
     /* Drop and create database via `drop-database` and `create-database` */
 
-    let connection_string = api.connection_string();
-
-    let output = api.run(&["--datasource", &connection_string, "drop-database"]);
+    let output = api.run(&["drop-database"]);
     assert!(output.status.success(), "{output:#?}");
 
-    let output = api.run(&["--datasource", &connection_string, "create-database"]);
+    let output = api.run(&["create-database"]);
     assert!(output.status.success(), "{output:#?}");
 
     let tmpdir = tempfile::tempdir().unwrap();
     let schema = indoc! {r#"
         datasource db {
           provider = "postgres"
-          url = env("TEST_DATABASE_URL")
         }
 
         generator js {
-          provider = "prisma-client-js"
+          provider        = "prisma-client"
           previewFeatures = ["views"]
         }
     "#};
 
-    let schema_path = tmpdir.path().join("prisma.schema");
+    let schema_path = tmpdir.path().join("schema.prisma");
     fs::write(&schema_path, schema).unwrap();
 
-    let command = Command::new(schema_engine_bin_path());
+    let mut command = Command::new(schema_engine_bin_path());
+    command.datasource_url(std::env::var("TEST_DATABASE_URL").unwrap());
 
     with_child_process(command, |process| {
         let stdin = process.stdin.as_mut().unwrap();
@@ -593,7 +666,8 @@ fn introspect_postgres(api: TestApi) {
             "params": {
                 "datasourceType": {
                     "tag": "schema",
-                    "schema": &schema_path,
+                    "files": [{ "path": &schema_path, "content": &schema }],
+                    "configDir": schema_path.parent().unwrap().to_string_lossy(),
                 },
                 "script": script,
             }
@@ -617,9 +691,10 @@ fn introspect_postgres(api: TestApi) {
             "method": "introspect",
             "id": 1,
             "params": {
-                "schema": &schema,
+                "schema": { "files": [{ "path": "./prisma/schema.prisma", "content": &schema }] },
                 "force": true,
                 "compositeTypeDepth": 5,
+                "baseDirectoryPath": "./base_directory_path/"
             }
         }))
         .unwrap();
@@ -631,7 +706,117 @@ fn introspect_postgres(api: TestApi) {
         stdout.read_line(&mut response).unwrap();
 
         let expected = expect![[r#"
-            {"jsonrpc":"2.0","result":{"datamodel":"generator js {\n  provider        = \"prisma-client-js\"\n  previewFeatures = [\"views\"]\n}\n\ndatasource db {\n  provider = \"postgres\"\n  url      = env(\"TEST_DATABASE_URL\")\n}\n\nmodel A {\n  id   Int     @id @default(autoincrement())\n  data String?\n}\n\n/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.\nview B {\n  col Int?\n\n  @@ignore\n}\n","views":[{"definition":"SELECT\n  1 AS col;","name":"B","schema":"public"}],"warnings":"*** WARNING ***\n\nThe following views were ignored as they do not have a valid unique identifier or id. This is currently not supported by Prisma Client. Please refer to the documentation on defining unique identifiers in views: https://pris.ly/d/view-identifiers\n  - \"B\"\n"},"id":1}
+            {"jsonrpc":"2.0","result":{"schema":{"files":[{"content":"generator js {\n  provider        = \"prisma-client\"\n  previewFeatures = [\"views\"]\n}\n\ndatasource db {\n  provider = \"postgres\"\n}\n\nmodel A {\n  id   Int     @id @default(autoincrement())\n  data String?\n}\n\nview B {\n  col Int?\n}\n","path":"./prisma/schema.prisma"}]},"views":[{"definition":"SELECT\n  1 AS col;","name":"B","schema":"public"}],"warnings":null},"id":1}
+        "#]];
+
+        expected.assert_eq(&response);
+    });
+}
+
+#[test_connector(tags(Postgres), exclude(CockroachDb), preview_features("views"))]
+fn introspect_multi_postgres_force(api: TestApi) {
+    /* Drop and create database via `drop-database` and `create-database` */
+
+    let output = api.run(&["drop-database"]);
+    assert!(output.status.success(), "{output:#?}");
+
+    let output = api.run(&["create-database"]);
+    assert!(output.status.success(), "{output:#?}");
+
+    let (tmpdir, files) = write_multi_file_vec! {
+        "a.prisma" => r#"
+            datasource db {
+                provider = "postgres"
+            }
+        "#,
+        "b.prisma" => r#"
+            model User {
+                id Int @id
+            }
+        "#,
+    };
+
+    let files = files
+        .into_iter()
+        .map(|(schema_path, content)| SchemaContainer {
+            path: schema_path,
+            content: content.to_string(),
+        })
+        .collect::<Vec<_>>();
+
+    for file in &files {
+        fs::write(&file.path, &file.content).unwrap();
+    }
+
+    let mut command = Command::new(schema_engine_bin_path());
+    command.datasource_url(std::env::var("TEST_DATABASE_URL").unwrap());
+
+    with_child_process(command, |process| {
+        let stdin = process.stdin.as_mut().unwrap();
+        let mut stdout = BufReader::new(process.stdout.as_mut().unwrap());
+
+        /* Create table via `dbExecute` */
+
+        let script = indoc! {r#"
+            DROP TABLE IF EXISTS "public"."A";
+            DROP VIEW IF EXISTS "public"."B";
+
+            CREATE TABLE "public"."A" (
+                id SERIAL PRIMARY KEY,
+                data TEXT
+            );
+
+            CREATE VIEW "public"."B" AS SELECT 1 AS col;
+        "#};
+
+        let msg = serde_json::to_string(&serde_json::json!({
+            "jsonrpc": "2.0",
+            "method": "dbExecute",
+            "id": 1,
+            "params": {
+                "datasourceType": {
+                    "tag": "schema",
+                    "files": files,
+                    "configDir": tmpdir.path().to_string_lossy().to_string(),
+                },
+                "script": script,
+            }
+        }))
+        .unwrap();
+        stdin.write_all(msg.as_bytes()).unwrap();
+        stdin.write_all(b"\n").unwrap();
+
+        let mut response = String::new();
+        stdout.read_line(&mut response).unwrap();
+
+        let expected = expect![[r#"
+            {"jsonrpc":"2.0","result":null,"id":1}
+        "#]];
+
+        expected.assert_eq(&response);
+
+        /* Introspect via `introspect` */
+        let msg = serde_json::to_string(&serde_json::json!({
+            "jsonrpc": "2.0",
+            "method": "introspect",
+            "id": 1,
+            "params": {
+                "schema": { "files": files },
+                "force": true,
+                "compositeTypeDepth": 5,
+                "baseDirectoryPath": "./base_directory_path/"
+            }
+        }))
+        .unwrap();
+
+        stdin.write_all(msg.as_bytes()).unwrap();
+        stdin.write_all(b"\n").unwrap();
+
+        let mut response = String::new();
+        stdout.read_line(&mut response).unwrap();
+
+        let expected = expect![[r#"
+            {"jsonrpc":"2.0","result":{"schema":{"files":[{"content":"datasource db {\n  provider = \"postgres\"\n}\n\nmodel A {\n  id   Int     @id @default(autoincrement())\n  data String?\n}\n","path":"./base_directory_path/introspected.prisma"}]},"views":null,"warnings":null},"id":1}
         "#]];
 
         expected.assert_eq(&response);
@@ -647,7 +832,6 @@ fn introspect_e2e() {
     let schema = r#"
         datasource db {
             provider = "sqlite"
-            url = env("TEST_DATABASE_URL")
         }
 
     "#;
@@ -655,10 +839,7 @@ fn introspect_e2e() {
 
     let mut command = Command::new(schema_engine_bin_path());
 
-    command.env(
-        "TEST_DATABASE_URL",
-        format!("file:{}/dev.db", tmpdir.path().to_string_lossy()),
-    );
+    command.datasource_url(format!("file:{}/dev.db", tmpdir.path().to_string_lossy()));
 
     with_child_process(command, |process| {
         let stdin = process.stdin.as_mut().unwrap();
@@ -672,6 +853,7 @@ fn introspect_e2e() {
                 "schema": schema,
                 "force": true,
                 "compositeTypeDepth": 5,
+                "baseDirectoryPath": "./base_directory_path/",
             }
         }))
         .unwrap();
@@ -683,6 +865,100 @@ fn introspect_e2e() {
 
         dbg!("response: {:?}", &response);
 
-        assert!(response.starts_with(r#"{"jsonrpc":"2.0","result":{"datamodel":"datasource db {\n  provider = \"sqlite\"\n  url      = env(\"TEST_DATABASE_URL\")\n}\n","warnings":[]},"#));
+        assert!(response.starts_with(
+            r#"{"jsonrpc":"2.0","result":{"datamodel":"datasource db {\n  provider = \"sqlite\"\n}\n","warnings":[]},"#
+        ));
     });
+}
+
+fn to_schema_containers(files: Vec<(String, &str)>) -> Vec<SchemaContainer> {
+    files
+        .into_iter()
+        .map(|(path, content)| SchemaContainer {
+            path: path.to_string(),
+            content: content.to_string(),
+        })
+        .collect()
+}
+
+fn to_schemas_container(files: Vec<(String, &str)>) -> SchemasContainer {
+    SchemasContainer {
+        files: to_schema_containers(files),
+    }
+}
+
+#[test_connector(tags(Postgres))]
+fn get_database_version_multi_file(_api: TestApi) {
+    let (_, files) = write_multi_file_vec! {
+        "a.prisma" => r#"
+            datasource db {
+                provider = "postgres"
+            }
+        "#,
+        "b.prisma" => r#"
+            model User {
+                id Int @id
+            }
+        "#,
+    };
+
+    let url = std::env::var("TEST_DATABASE_URL").unwrap();
+    let mut command = Command::new(schema_engine_bin_path());
+    command.datasource_url(&url);
+
+    let schema_path_params = GetDatabaseVersionInput {
+        datasource: DatasourceParam::Schema(to_schemas_container(files)),
+    };
+
+    let connection_string_params = GetDatabaseVersionInput {
+        datasource: DatasourceParam::ConnectionString(UrlContainer { url }),
+    };
+
+    with_child_process(command, |process| {
+        let stdin = process.stdin.as_mut().unwrap();
+        let mut stdout = BufReader::new(process.stdout.as_mut().unwrap());
+
+        for _ in 0..2 {
+            for params in [&schema_path_params, &connection_string_params] {
+                let params_template = serde_json::json!({
+                    "jsonrpc": "2.0",
+                    "method": "getDatabaseVersion",
+                    "params": params,
+                    "id": 1
+                })
+                .to_string();
+
+                writeln!(stdin, "{}", &params_template).unwrap();
+
+                let mut response = String::new();
+                stdout.read_line(&mut response).unwrap();
+
+                assert!(response.contains("PostgreSQL") || response.contains("CockroachDB"));
+            }
+        }
+    });
+}
+
+#[tokio::test]
+async fn test_missing_datasource_url_gives_proper_error() {
+    let datasource_urls = DatasourceUrls {
+        url: None,
+        shadow_database_url: None,
+    };
+
+    let output = Command::new(schema_engine_bin_path())
+        .arg("--datasource")
+        .arg(serde_json::to_string(&datasource_urls).unwrap())
+        .arg("cli")
+        .arg("can-connect-to-database")
+        .output()
+        .unwrap();
+
+    assert_eq!(output.status.code(), Some(1));
+    let stderr = String::from_utf8_lossy(&output.stderr);
+    assert!(
+        stderr.contains("No URL defined in the configured datasource"),
+        "Expected error message about missing URL, got: {}",
+        stderr
+    );
 }

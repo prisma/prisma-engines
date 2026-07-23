@@ -1,0 +1,948 @@
+{
+  "enums": [
+    {
+      "name": "CategoryEnum",
+      "values": [
+        {
+          "name": "A",
+          "dbName": null
+        },
+        {
+          "name": "B",
+          "dbName": null
+        },
+        {
+          "name": "C",
+          "dbName": null
+        }
+      ],
+      "dbName": null
+    }
+  ],
+  "models": [
+    {
+      "name": "User",
+      "dbName": "user",
+      "schema": null,
+      "fields": [
+        {
+          "name": "id",
+          "kind": "scalar",
+          "isList": false,
+          "isRequired": true,
+          "isUnique": false,
+          "isId": true,
+          "isReadOnly": false,
+          "hasDefaultValue": false,
+          "type": "Int",
+          "nativeType": null,
+          "isGenerated": false,
+          "isUpdatedAt": false
+        },
+        {
+          "name": "createdAt",
+          "kind": "scalar",
+          "isList": false,
+          "isRequired": true,
+          "isUnique": false,
+          "isId": false,
+          "isReadOnly": false,
+          "hasDefaultValue": false,
+          "type": "DateTime",
+          "nativeType": null,
+          "isGenerated": false,
+          "isUpdatedAt": false
+        },
+        {
+          "name": "email",
+          "kind": "scalar",
+          "isList": false,
+          "isRequired": true,
+          "isUnique": true,
+          "isId": false,
+          "isReadOnly": false,
+          "hasDefaultValue": false,
+          "type": "String",
+          "nativeType": null,
+          "isGenerated": false,
+          "isUpdatedAt": false
+        },
+        {
+          "name": "name",
+          "dbName": "NAME",
+          "kind": "scalar",
+          "isList": false,
+          "isRequired": false,
+          "isUnique": false,
+          "isId": false,
+          "isReadOnly": false,
+          "hasDefaultValue": false,
+          "type": "String",
+          "nativeType": null,
+          "isGenerated": false,
+          "isUpdatedAt": false
+        },
+        {
+          "name": "posts",
+          "kind": "object",
+          "isList": true,
+          "isRequired": true,
+          "isUnique": false,
+          "isId": false,
+          "isReadOnly": false,
+          "hasDefaultValue": false,
+          "type": "Post",
+          "nativeType": null,
+          "relationName": "author",
+          "relationFromFields": [],
+          "relationToFields": [],
+          "isGenerated": false,
+          "isUpdatedAt": false
+        },
+        {
+          "name": "profile",
+          "kind": "object",
+          "isList": false,
+          "isRequired": false,
+          "isUnique": false,
+          "isId": false,
+          "isReadOnly": false,
+          "hasDefaultValue": false,
+          "type": "Profile",
+          "nativeType": null,
+          "relationName": "ProfileToUser",
+          "relationFromFields": [],
+          "relationToFields": [],
+          "isGenerated": false,
+          "isUpdatedAt": false
+        }
+      ],
+      "primaryKey": null,
+      "uniqueFields": [],
+      "uniqueIndexes": [],
+      "isGenerated": false
+    },
+    {
+      "name": "Profile",
+      "dbName": "profile",
+      "schema": null,
+      "fields": [
+        {
+          "name": "id",
+          "kind": "scalar",
+          "isList": false,
+          "isRequired": true,
+          "isUnique": false,
+          "isId": true,
+          "isReadOnly": false,
+          "hasDefaultValue": false,
+          "type": "Int",
+          "nativeType": null,
+          "isGenerated": false,
+          "isUpdatedAt": false
+        },
+        {
+          "name": "userId",
+          "kind": "scalar",
+          "isList": false,
+          "isRequired": true,
+          "isUnique": true,
+          "isId": false,
+          "isReadOnly": true,
+          "hasDefaultValue": false,
+          "type": "Int",
+          "nativeType": null,
+          "isGenerated": false,
+          "isUpdatedAt": false
+        },
+        {
+          "name": "user",
+          "kind": "object",
+          "isList": false,
+          "isRequired": true,
+          "isUnique": false,
+          "isId": false,
+          "isReadOnly": false,
+          "hasDefaultValue": false,
+          "type": "User",
+          "nativeType": null,
+          "relationName": "ProfileToUser",
+          "relationFromFields": [
+            "userId"
+          ],
+          "relationToFields": [
+            "id"
+          ],
+          "isGenerated": false,
+          "isUpdatedAt": false
+        },
+        {
+          "name": "bio",
+          "kind": "scalar",
+          "isList": false,
+          "isRequired": true,
+          "isUnique": false,
+          "isId": false,
+          "isReadOnly": false,
+          "hasDefaultValue": false,
+          "type": "String",
+          "nativeType": null,
+          "isGenerated": false,
+          "isUpdatedAt": false
+        }
+      ],
+      "primaryKey": null,
+      "uniqueFields": [],
+      "uniqueIndexes": [],
+      "isGenerated": false
+    },
+    {
+      "name": "Post",
+      "dbName": "post",
+      "schema": null,
+      "fields": [
+        {
+          "name": "id",
+          "kind": "scalar",
+          "isList": false,
+          "isRequired": true,
+          "isUnique": false,
+          "isId": false,
+          "isReadOnly": false,
+          "hasDefaultValue": false,
+          "type": "Int",
+          "nativeType": null,
+          "isGenerated": false,
+          "isUpdatedAt": false
+        },
+        {
+          "name": "createdAt",
+          "kind": "scalar",
+          "isList": false,
+          "isRequired": true,
+          "isUnique": false,
+          "isId": false,
+          "isReadOnly": false,
+          "hasDefaultValue": false,
+          "type": "DateTime",
+          "nativeType": null,
+          "isGenerated": false,
+          "isUpdatedAt": false
+        },
+        {
+          "name": "updatedAt",
+          "kind": "scalar",
+          "isList": false,
+          "isRequired": true,
+          "isUnique": false,
+          "isId": false,
+          "isReadOnly": false,
+          "hasDefaultValue": false,
+          "type": "DateTime",
+          "nativeType": null,
+          "isGenerated": false,
+          "isUpdatedAt": false
+        },
+        {
+          "name": "title",
+          "kind": "scalar",
+          "isList": false,
+          "isRequired": true,
+          "isUnique": false,
+          "isId": false,
+          "isReadOnly": false,
+          "hasDefaultValue": true,
+          "type": "String",
+          "nativeType": null,
+          "default": "Default-Title",
+          "isGenerated": false,
+          "isUpdatedAt": false
+        },
+        {
+          "name": "wasLiked",
+          "kind": "scalar",
+          "isList": false,
+          "isRequired": true,
+          "isUnique": false,
+          "isId": false,
+          "isReadOnly": false,
+          "hasDefaultValue": true,
+          "type": "Boolean",
+          "nativeType": null,
+          "default": false,
+          "isGenerated": false,
+          "isUpdatedAt": false
+        },
+        {
+          "name": "published",
+          "kind": "scalar",
+          "isList": false,
+          "isRequired": true,
+          "isUnique": false,
+          "isId": false,
+          "isReadOnly": false,
+          "hasDefaultValue": true,
+          "type": "Boolean",
+          "nativeType": null,
+          "default": false,
+          "isGenerated": false,
+          "isUpdatedAt": false
+        },
+        {
+          "name": "authorId",
+          "kind": "scalar",
+          "isList": false,
+          "isRequired": true,
+          "isUnique": false,
+          "isId": false,
+          "isReadOnly": true,
+          "hasDefaultValue": false,
+          "type": "Int",
+          "nativeType": null,
+          "isGenerated": false,
+          "isUpdatedAt": false
+        },
+        {
+          "name": "author",
+          "kind": "object",
+          "isList": false,
+          "isRequired": true,
+          "isUnique": false,
+          "isId": false,
+          "isReadOnly": false,
+          "hasDefaultValue": false,
+          "type": "User",
+          "nativeType": null,
+          "relationName": "author",
+          "relationFromFields": [
+            "authorId"
+          ],
+          "relationToFields": [
+            "id"
+          ],
+          "isGenerated": false,
+          "isUpdatedAt": false
+        },
+        {
+          "name": "categories",
+          "kind": "object",
+          "isList": true,
+          "isRequired": true,
+          "isUnique": false,
+          "isId": false,
+          "isReadOnly": false,
+          "hasDefaultValue": false,
+          "type": "PostToCategory",
+          "nativeType": null,
+          "relationName": "PostToPostToCategory",
+          "relationFromFields": [],
+          "relationToFields": [],
+          "isGenerated": false,
+          "isUpdatedAt": false
+        }
+      ],
+      "primaryKey": {
+        "name": null,
+        "fields": [
+          "title",
+          "createdAt"
+        ]
+      },
+      "uniqueFields": [],
+      "uniqueIndexes": [],
+      "isGenerated": false
+    },
+    {
+      "name": "Category",
+      "dbName": "category",
+      "schema": null,
+      "fields": [
+        {
+          "name": "id",
+          "kind": "scalar",
+          "isList": false,
+          "isRequired": true,
+          "isUnique": false,
+          "isId": true,
+          "isReadOnly": false,
+          "hasDefaultValue": false,
+          "type": "Int",
+          "nativeType": null,
+          "isGenerated": false,
+          "isUpdatedAt": false
+        },
+        {
+          "name": "name",
+          "kind": "scalar",
+          "isList": false,
+          "isRequired": true,
+          "isUnique": false,
+          "isId": false,
+          "isReadOnly": false,
+          "hasDefaultValue": false,
+          "type": "String",
+          "nativeType": null,
+          "isGenerated": false,
+          "isUpdatedAt": false
+        },
+        {
+          "name": "posts",
+          "kind": "object",
+          "isList": true,
+          "isRequired": true,
+          "isUnique": false,
+          "isId": false,
+          "isReadOnly": false,
+          "hasDefaultValue": false,
+          "type": "PostToCategory",
+          "nativeType": null,
+          "relationName": "CategoryToPostToCategory",
+          "relationFromFields": [],
+          "relationToFields": [],
+          "isGenerated": false,
+          "isUpdatedAt": false
+        },
+        {
+          "name": "cat",
+          "kind": "enum",
+          "isList": false,
+          "isRequired": true,
+          "isUnique": false,
+          "isId": false,
+          "isReadOnly": false,
+          "hasDefaultValue": false,
+          "type": "CategoryEnum",
+          "nativeType": null,
+          "isGenerated": false,
+          "isUpdatedAt": false
+        }
+      ],
+      "primaryKey": null,
+      "uniqueFields": [],
+      "uniqueIndexes": [],
+      "isGenerated": false
+    },
+    {
+      "name": "PostToCategory",
+      "dbName": "post_to_category",
+      "schema": null,
+      "fields": [
+        {
+          "name": "id",
+          "kind": "scalar",
+          "isList": false,
+          "isRequired": true,
+          "isUnique": false,
+          "isId": true,
+          "isReadOnly": false,
+          "hasDefaultValue": false,
+          "type": "Int",
+          "nativeType": null,
+          "isGenerated": false,
+          "isUpdatedAt": false
+        },
+        {
+          "name": "postTitle",
+          "kind": "scalar",
+          "isList": false,
+          "isRequired": true,
+          "isUnique": false,
+          "isId": false,
+          "isReadOnly": true,
+          "hasDefaultValue": false,
+          "type": "String",
+          "nativeType": null,
+          "isGenerated": false,
+          "isUpdatedAt": false
+        },
+        {
+          "name": "postCreatedAt",
+          "kind": "scalar",
+          "isList": false,
+          "isRequired": true,
+          "isUnique": false,
+          "isId": false,
+          "isReadOnly": true,
+          "hasDefaultValue": false,
+          "type": "DateTime",
+          "nativeType": null,
+          "isGenerated": false,
+          "isUpdatedAt": false
+        },
+        {
+          "name": "categoryId",
+          "kind": "scalar",
+          "isList": false,
+          "isRequired": true,
+          "isUnique": false,
+          "isId": false,
+          "isReadOnly": true,
+          "hasDefaultValue": false,
+          "type": "Int",
+          "nativeType": null,
+          "isGenerated": false,
+          "isUpdatedAt": false
+        },
+        {
+          "name": "post",
+          "kind": "object",
+          "isList": false,
+          "isRequired": true,
+          "isUnique": false,
+          "isId": false,
+          "isReadOnly": false,
+          "hasDefaultValue": false,
+          "type": "Post",
+          "nativeType": null,
+          "relationName": "PostToPostToCategory",
+          "relationFromFields": [
+            "postTitle",
+            "postCreatedAt"
+          ],
+          "relationToFields": [
+            "title",
+            "createdAt"
+          ],
+          "isGenerated": false,
+          "isUpdatedAt": false
+        },
+        {
+          "name": "category",
+          "kind": "object",
+          "isList": false,
+          "isRequired": true,
+          "isUnique": false,
+          "isId": false,
+          "isReadOnly": false,
+          "hasDefaultValue": false,
+          "type": "Category",
+          "nativeType": null,
+          "relationName": "CategoryToPostToCategory",
+          "relationFromFields": [
+            "categoryId"
+          ],
+          "relationToFields": [
+            "id"
+          ],
+          "isGenerated": false,
+          "isUpdatedAt": false
+        }
+      ],
+      "primaryKey": null,
+      "uniqueFields": [
+        [
+          "postTitle",
+          "categoryId"
+        ]
+      ],
+      "uniqueIndexes": [
+        {
+          "name": null,
+          "fields": [
+            "postTitle",
+            "categoryId"
+          ]
+        }
+      ],
+      "isGenerated": false
+    },
+    {
+      "name": "A",
+      "dbName": null,
+      "schema": null,
+      "fields": [
+        {
+          "name": "id",
+          "kind": "scalar",
+          "isList": false,
+          "isRequired": true,
+          "isUnique": false,
+          "isId": true,
+          "isReadOnly": false,
+          "hasDefaultValue": false,
+          "type": "Int",
+          "nativeType": null,
+          "isGenerated": false,
+          "isUpdatedAt": false
+        },
+        {
+          "name": "bId",
+          "kind": "scalar",
+          "isList": false,
+          "isRequired": true,
+          "isUnique": true,
+          "isId": false,
+          "isReadOnly": true,
+          "hasDefaultValue": false,
+          "type": "Int",
+          "nativeType": null,
+          "isGenerated": false,
+          "isUpdatedAt": false
+        },
+        {
+          "name": "b",
+          "kind": "object",
+          "isList": false,
+          "isRequired": true,
+          "isUnique": false,
+          "isId": false,
+          "isReadOnly": false,
+          "hasDefaultValue": false,
+          "type": "B",
+          "nativeType": null,
+          "relationName": "AToB",
+          "relationFromFields": [
+            "bId"
+          ],
+          "relationToFields": [
+            "id"
+          ],
+          "isGenerated": false,
+          "isUpdatedAt": false
+        }
+      ],
+      "primaryKey": null,
+      "uniqueFields": [],
+      "uniqueIndexes": [],
+      "isGenerated": false
+    },
+    {
+      "name": "B",
+      "dbName": null,
+      "schema": null,
+      "fields": [
+        {
+          "name": "id",
+          "kind": "scalar",
+          "isList": false,
+          "isRequired": true,
+          "isUnique": false,
+          "isId": true,
+          "isReadOnly": false,
+          "hasDefaultValue": false,
+          "type": "Int",
+          "nativeType": null,
+          "isGenerated": false,
+          "isUpdatedAt": false
+        },
+        {
+          "name": "a",
+          "kind": "object",
+          "isList": false,
+          "isRequired": false,
+          "isUnique": false,
+          "isId": false,
+          "isReadOnly": false,
+          "hasDefaultValue": false,
+          "type": "A",
+          "nativeType": null,
+          "relationName": "AToB",
+          "relationFromFields": [],
+          "relationToFields": [],
+          "isGenerated": false,
+          "isUpdatedAt": false
+        }
+      ],
+      "primaryKey": null,
+      "uniqueFields": [],
+      "uniqueIndexes": [],
+      "isGenerated": false
+    },
+    {
+      "name": "NamedCompounds",
+      "dbName": null,
+      "schema": null,
+      "fields": [
+        {
+          "name": "a",
+          "kind": "scalar",
+          "isList": false,
+          "isRequired": true,
+          "isUnique": false,
+          "isId": false,
+          "isReadOnly": false,
+          "hasDefaultValue": false,
+          "type": "Int",
+          "nativeType": null,
+          "isGenerated": false,
+          "isUpdatedAt": false
+        },
+        {
+          "name": "b",
+          "kind": "scalar",
+          "isList": false,
+          "isRequired": true,
+          "isUnique": false,
+          "isId": false,
+          "isReadOnly": false,
+          "hasDefaultValue": false,
+          "type": "Int",
+          "nativeType": null,
+          "isGenerated": false,
+          "isUpdatedAt": false
+        },
+        {
+          "name": "c",
+          "kind": "scalar",
+          "isList": false,
+          "isRequired": true,
+          "isUnique": false,
+          "isId": false,
+          "isReadOnly": false,
+          "hasDefaultValue": false,
+          "type": "Int",
+          "nativeType": null,
+          "isGenerated": false,
+          "isUpdatedAt": false
+        },
+        {
+          "name": "d",
+          "kind": "scalar",
+          "isList": false,
+          "isRequired": true,
+          "isUnique": false,
+          "isId": false,
+          "isReadOnly": false,
+          "hasDefaultValue": false,
+          "type": "Int",
+          "nativeType": null,
+          "isGenerated": false,
+          "isUpdatedAt": false
+        }
+      ],
+      "primaryKey": {
+        "name": "MyPrimary",
+        "fields": [
+          "a",
+          "b"
+        ]
+      },
+      "uniqueFields": [
+        [
+          "c",
+          "d"
+        ]
+      ],
+      "uniqueIndexes": [
+        {
+          "name": "MyUnique",
+          "fields": [
+            "c",
+            "d"
+          ]
+        }
+      ],
+      "isGenerated": false
+    },
+    {
+      "name": "MappedSingles",
+      "dbName": null,
+      "schema": null,
+      "fields": [
+        {
+          "name": "a",
+          "kind": "scalar",
+          "isList": false,
+          "isRequired": true,
+          "isUnique": false,
+          "isId": true,
+          "isReadOnly": false,
+          "hasDefaultValue": false,
+          "type": "Int",
+          "nativeType": null,
+          "isGenerated": false,
+          "isUpdatedAt": false
+        },
+        {
+          "name": "b",
+          "kind": "scalar",
+          "isList": false,
+          "isRequired": true,
+          "isUnique": true,
+          "isId": false,
+          "isReadOnly": false,
+          "hasDefaultValue": false,
+          "type": "Int",
+          "nativeType": null,
+          "isGenerated": false,
+          "isUpdatedAt": false
+        }
+      ],
+      "primaryKey": null,
+      "uniqueFields": [],
+      "uniqueIndexes": [],
+      "isGenerated": false
+    }
+  ],
+  "types": [],
+  "indexes": [
+    {
+      "model": "User",
+      "type": "id",
+      "isDefinedOnField": true,
+      "fields": [
+        {
+          "name": "id"
+        }
+      ]
+    },
+    {
+      "model": "User",
+      "type": "unique",
+      "isDefinedOnField": true,
+      "fields": [
+        {
+          "name": "email"
+        }
+      ]
+    },
+    {
+      "model": "Profile",
+      "type": "id",
+      "isDefinedOnField": true,
+      "fields": [
+        {
+          "name": "id"
+        }
+      ]
+    },
+    {
+      "model": "Profile",
+      "type": "unique",
+      "isDefinedOnField": true,
+      "fields": [
+        {
+          "name": "userId"
+        }
+      ]
+    },
+    {
+      "model": "Post",
+      "type": "id",
+      "isDefinedOnField": false,
+      "fields": [
+        {
+          "name": "title"
+        },
+        {
+          "name": "createdAt"
+        }
+      ]
+    },
+    {
+      "model": "Category",
+      "type": "id",
+      "isDefinedOnField": true,
+      "fields": [
+        {
+          "name": "id"
+        }
+      ]
+    },
+    {
+      "model": "PostToCategory",
+      "type": "id",
+      "isDefinedOnField": true,
+      "fields": [
+        {
+          "name": "id"
+        }
+      ]
+    },
+    {
+      "model": "PostToCategory",
+      "type": "unique",
+      "isDefinedOnField": false,
+      "fields": [
+        {
+          "name": "postTitle"
+        },
+        {
+          "name": "categoryId"
+        }
+      ]
+    },
+    {
+      "model": "A",
+      "type": "id",
+      "isDefinedOnField": true,
+      "fields": [
+        {
+          "name": "id"
+        }
+      ]
+    },
+    {
+      "model": "A",
+      "type": "unique",
+      "isDefinedOnField": true,
+      "fields": [
+        {
+          "name": "bId"
+        }
+      ]
+    },
+    {
+      "model": "B",
+      "type": "id",
+      "isDefinedOnField": true,
+      "fields": [
+        {
+          "name": "id"
+        }
+      ]
+    },
+    {
+      "model": "NamedCompounds",
+      "type": "id",
+      "isDefinedOnField": false,
+      "name": "MyPrimary",
+      "dbName": "DbPrimary",
+      "fields": [
+        {
+          "name": "a"
+        },
+        {
+          "name": "b"
+        }
+      ]
+    },
+    {
+      "model": "NamedCompounds",
+      "type": "unique",
+      "isDefinedOnField": false,
+      "name": "MyUnique",
+      "dbName": "DbUnique",
+      "fields": [
+        {
+          "name": "c"
+        },
+        {
+          "name": "d"
+        }
+      ]
+    },
+    {
+      "model": "MappedSingles",
+      "type": "id",
+      "isDefinedOnField": true,
+      "dbName": "Primary",
+      "fields": [
+        {
+          "name": "a"
+        }
+      ]
+    },
+    {
+      "model": "MappedSingles",
+      "type": "unique",
+      "isDefinedOnField": true,
+      "dbName": "Unique",
+      "fields": [
+        {
+          "name": "b"
+        }
+      ]
+    }
+  ]
+}

@@ -1,20 +1,22 @@
 //! Definitions for the MySQL connector.
 //! This module is not compatible with wasm32-* targets.
 //! This module is only available with the `mysql-native` feature.
+mod column_type;
 mod conversion;
 mod error;
 
 pub(crate) use crate::connector::mysql::MysqlUrl;
-use crate::connector::{timeout, IsolationLevel};
+use crate::connector::{ColumnType, DescribedColumn, DescribedParameter, DescribedQuery, IsolationLevel, timeout};
 
 use crate::{
     ast::{Query, Value},
-    connector::{metrics, queryable::*, ResultSet},
+    connector::{ResultSet, queryable::*, trace},
     error::{Error, ErrorKind},
     visitor::{self, Visitor},
 };
 use async_trait::async_trait;
 use lru_cache::LruCache;
+use mysql_async::consts::ColumnFlags;
 use mysql_async::{
     self as my,
     prelude::{Query as _, Queryable as _},
@@ -41,10 +43,10 @@ impl MysqlUrl {
             .stmt_cache_size(Some(0))
             .user(Some(self.username()))
             .pass(self.password())
-            .db_name(Some(self.dbname()));
+            .db_name(self.dbname());
 
         match self.socket() {
-            Some(ref socket) => {
+            Some(socket) => {
                 config = config.socket(Some(socket));
             }
             None => {
@@ -65,6 +67,8 @@ impl MysqlUrl {
         config
     }
 }
+
+const DB_SYSTEM_NAME: &str = "mysql";
 
 /// A connector interface for the MySQL database.
 #[derive(Debug)]
@@ -168,10 +172,10 @@ impl Mysql {
                 );
 
                 let mut conn = self.conn.lock().await;
-                if cache.capacity() == cache.len() {
-                    if let Some((_, stmt)) = cache.remove_lru() {
-                        conn.close(stmt).await?;
-                    }
+                if cache.capacity() == cache.len()
+                    && let Some((_, stmt)) = cache.remove_lru()
+                {
+                    conn.close(stmt).await?;
                 }
 
                 let stmt = conn.prep(sql).await?;
@@ -193,18 +197,43 @@ impl Queryable for Mysql {
     }
 
     async fn query_raw(&self, sql: &str, params: &[Value<'_>]) -> crate::Result<ResultSet> {
-        metrics::query("mysql.query_raw", sql, params, move || async move {
+        trace::query(DB_SYSTEM_NAME, sql, params, move || async move {
             self.prepared(sql, |stmt| async move {
                 let mut conn = self.conn.lock().await;
                 let rows: Vec<my::Row> = conn.exec(&stmt, conversion::conv_params(params)?).await?;
-                let columns = stmt.columns().iter().map(|s| s.name_str().into_owned()).collect();
 
                 let last_id = conn.last_insert_id();
-                let mut result_set = ResultSet::new(columns, Vec::new());
+
+                let mut result_rows = Vec::with_capacity(rows.len());
+                let mut columns: Vec<String> = Vec::new();
+                let mut column_types: Vec<ColumnType> = Vec::new();
+
+                let mut columns_set = false;
 
                 for mut row in rows {
-                    result_set.rows.push(row.take_result_row()?);
+                    let row = row.take_result_row()?;
+
+                    if !columns_set {
+                        for (idx, _) in row.iter().enumerate() {
+                            let maybe_column = stmt.columns().get(idx);
+                            // `mysql_async` does not return columns in `ResultSet` when a call to a stored procedure is done
+                            // See https://github.com/prisma/prisma/issues/6173
+                            let column = maybe_column
+                                .map(|col| col.name_str().into_owned())
+                                .unwrap_or_else(|| format!("f{idx}"));
+                            let column_type = maybe_column.map(ColumnType::from).unwrap_or(ColumnType::Unknown);
+
+                            columns.push(column);
+                            column_types.push(column_type);
+                        }
+
+                        columns_set = true;
+                    }
+
+                    result_rows.push(row);
                 }
+
+                let mut result_set = ResultSet::new(columns, column_types, result_rows);
 
                 if let Some(id) = last_id {
                     result_set.set_last_insert_id(id);
@@ -221,13 +250,39 @@ impl Queryable for Mysql {
         self.query_raw(sql, params).await
     }
 
+    async fn describe_query(&self, sql: &str) -> crate::Result<DescribedQuery> {
+        self.prepared(sql, |stmt| async move {
+            let columns = stmt
+                .columns()
+                .iter()
+                .map(|col| {
+                    DescribedColumn::new_named(col.name_str(), col)
+                        .is_nullable(!col.flags().contains(ColumnFlags::NOT_NULL_FLAG))
+                })
+                .collect();
+            let parameters = stmt
+                .params()
+                .iter()
+                .enumerate()
+                .map(|(idx, col)| DescribedParameter::new_unnamed(idx, col))
+                .collect();
+
+            Ok(DescribedQuery {
+                columns,
+                parameters,
+                enum_names: None,
+            })
+        })
+        .await
+    }
+
     async fn execute(&self, q: Query<'_>) -> crate::Result<u64> {
         let (sql, params) = visitor::Mysql::build(q)?;
         self.execute_raw(&sql, &params).await
     }
 
     async fn execute_raw(&self, sql: &str, params: &[Value<'_>]) -> crate::Result<u64> {
-        metrics::query("mysql.execute_raw", sql, params, move || async move {
+        trace::query(DB_SYSTEM_NAME, sql, params, move || async move {
             self.prepared(sql, |stmt| async move {
                 let mut conn = self.conn.lock().await;
                 conn.exec_drop(stmt, conversion::conv_params(params)?).await?;
@@ -244,7 +299,7 @@ impl Queryable for Mysql {
     }
 
     async fn raw_cmd(&self, cmd: &str) -> crate::Result<()> {
-        metrics::query("mysql.raw_cmd", cmd, &[], move || async move {
+        trace::query(DB_SYSTEM_NAME, cmd, &[], move || async move {
             self.perform_io(|| async move {
                 let mut conn = self.conn.lock().await;
                 let mut result = cmd.run(&mut *conn).await?;
@@ -268,7 +323,13 @@ impl Queryable for Mysql {
     async fn version(&self) -> crate::Result<Option<String>> {
         let guard = self.conn.lock().await;
         let (major, minor, patch) = guard.server_version();
-        let flavour = if guard.is_mariadb() { "MariaDB" } else { "MySQL" };
+        let flavour = if guard.is_mariadb() {
+            "MariaDB"
+        } else if guard.is_vitess() {
+            "Vitess"
+        } else {
+            "MySQL"
+        };
         drop(guard);
 
         Ok(Some(format!("{major}.{minor}.{patch}-{flavour}")))

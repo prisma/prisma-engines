@@ -1,0 +1,11 @@
+{
+  "modelName": "DataTypes",
+  "action": "findMany",
+  "query": {
+    "arguments": {},
+    "selection": {
+      "$composites": true,
+      "$scalars": true
+    }
+  }
+}

@@ -1,8 +1,10 @@
 use crate::parser_database::{ast, coerce};
-use diagnostics::{DatamodelError, Diagnostics};
+use diagnostics::{DatamodelError, DatamodelWarning, Diagnostics};
+use schema_ast::ast::WithSpan;
 use serde::Serialize;
 
 /// Either an env var or a string literal.
+/// TODO: From Prisma 7 onwards, this struct will not be needed, as the value will always be a plain String.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct StringFromEnvVar {
@@ -15,16 +17,8 @@ pub struct StringFromEnvVar {
 impl StringFromEnvVar {
     pub(crate) fn coerce(expr: &ast::Expression, diagnostics: &mut Diagnostics) -> Option<Self> {
         match expr {
-            ast::Expression::Function(name, _, _) if name == "env" => {
-                let mut errs = Diagnostics::new();
-                match EnvFunction::from_ast(expr, &mut errs) {
-                    Some(env_function) => Some(StringFromEnvVar::new_from_env_var(env_function.var_name().to_owned())),
-                    None => {
-                        diagnostics.push_error(errs.errors()[0].clone());
-                        None
-                    }
-                }
-            }
+            ast::Expression::Function(name, _, _) if name == "env" => EnvFunction::from_ast(expr, diagnostics)
+                .map(|env_function| StringFromEnvVar::new_from_env_var(env_function.var_name().to_owned())),
             ast::Expression::StringValue(value, _) => Some(StringFromEnvVar::new_literal(value.clone())),
             _ => {
                 diagnostics.push_error(DatamodelError::new_type_mismatch_error(
@@ -63,14 +57,24 @@ impl StringFromEnvVar {
     }
 }
 
-struct EnvFunction {
+pub(crate) struct EnvFunction {
     var_name: String,
 }
 
 impl EnvFunction {
-    fn from_ast(expr: &ast::Expression, diagnostics: &mut Diagnostics) -> Option<EnvFunction> {
+    pub(crate) fn from_ast(expr: &ast::Expression, diagnostics: &mut Diagnostics) -> Option<EnvFunction> {
         let args = if let ast::Expression::Function(name, args, _) = &expr {
             if name == "env" {
+                args.arguments
+                    .iter()
+                    .filter(|arg| !arg.is_unnamed())
+                    .for_each(|arg| diagnostics.push_warning(DatamodelWarning::new_named_env_val(arg.span())));
+
+                if args.arguments.is_empty() && !args.empty_arguments.is_empty() {
+                    diagnostics.push_error(DatamodelError::new_named_env_val(expr.span()));
+                    return None;
+                }
+
                 args
             } else {
                 diagnostics.push_error(DatamodelError::new_functional_evaluation_error(
@@ -87,7 +91,15 @@ impl EnvFunction {
             return None;
         };
 
-        if args.arguments.len() != 1 {
+        if args.arguments.len() + args.empty_arguments.len() != 1 {
+            diagnostics.push_error(DatamodelError::new_functional_evaluation_error(
+                "Exactly one string parameter must be passed to the env function.",
+                expr.span(),
+            ));
+            return None;
+        }
+
+        if args.trailing_comma.is_some() {
             diagnostics.push_error(DatamodelError::new_functional_evaluation_error(
                 "Exactly one string parameter must be passed to the env function.",
                 expr.span(),
@@ -101,7 +113,7 @@ impl EnvFunction {
         Some(Self { var_name })
     }
 
-    fn var_name(&self) -> &str {
+    pub(crate) fn var_name(&self) -> &str {
         &self.var_name
     }
 }

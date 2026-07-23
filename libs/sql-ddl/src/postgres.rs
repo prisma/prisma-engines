@@ -324,7 +324,7 @@ pub struct CreateEnum<'a> {
     pub variants: Vec<Cow<'a, str>>,
 }
 
-impl<'a> Display for CreateEnum<'a> {
+impl Display for CreateEnum<'_> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "CREATE TYPE {enum_name} AS ENUM (", enum_name = self.enum_name)?;
         self.variants.iter().map(|s| StrLit(s)).join(", ", f)?;
@@ -347,9 +347,10 @@ pub struct CreateIndex<'a> {
     pub table_reference: &'a dyn Display,
     pub columns: Vec<IndexColumn<'a>>,
     pub using: Option<IndexAlgorithm>,
+    pub where_clause: Option<Cow<'a, str>>,
 }
 
-impl<'a> Display for CreateIndex<'a> {
+impl Display for CreateIndex<'_> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let using = match self.using {
             Some(IndexAlgorithm::Hash) => " USING HASH ",
@@ -388,7 +389,13 @@ impl<'a> Display for CreateIndex<'a> {
             })
             .join(", ", f)?;
 
-        f.write_str(")")
+        f.write_str(")")?;
+
+        if let Some(predicate) = &self.where_clause {
+            write!(f, " WHERE {}", predicate)?;
+        }
+
+        Ok(())
     }
 }
 
@@ -432,6 +439,7 @@ mod tests {
             table_reference: &PostgresIdentifier::Simple(Cow::Borrowed("Cat")),
             columns,
             using: None,
+            where_clause: None,
         };
 
         assert_eq!(
@@ -450,6 +458,7 @@ mod tests {
             table_reference: &PostgresIdentifier::Simple(Cow::Borrowed("Cat")),
             columns,
             using: Some(IndexAlgorithm::Hash),
+            where_clause: None,
         };
 
         assert_eq!(
@@ -479,11 +488,31 @@ mod tests {
             table_reference: &PostgresIdentifier::Simple("Cat".into()),
             columns,
             using: None,
+            where_clause: None,
         };
 
         assert_eq!(
             create_index.to_string(),
             "CREATE UNIQUE INDEX \"meow_idx\" ON \"Cat\"(\"name\" ASC, \"age\" DESC)"
+        )
+    }
+
+    #[test]
+    fn create_partial_unique_index() {
+        let columns = vec![IndexColumn::new("name")];
+
+        let create_index = CreateIndex {
+            is_unique: true,
+            index_name: "meow_idx".into(),
+            table_reference: &PostgresIdentifier::Simple(Cow::Borrowed("Cat")),
+            columns,
+            using: None,
+            where_clause: Some("status = 'active'".into()),
+        };
+
+        assert_eq!(
+            create_index.to_string(),
+            "CREATE UNIQUE INDEX \"meow_idx\" ON \"Cat\"(\"name\") WHERE status = 'active'"
         )
     }
 
@@ -501,8 +530,7 @@ mod tests {
             })],
         };
 
-        let expected =
-            "ALTER TABLE \"public\".\"Cat\" ADD CONSTRAINT \"cat_friend\" FOREIGN KEY (\"friendName\", \"friendTemperament\") REFERENCES Dog(\"name\", \"temperament\")";
+        let expected = "ALTER TABLE \"public\".\"Cat\" ADD CONSTRAINT \"cat_friend\" FOREIGN KEY (\"friendName\", \"friendTemperament\") REFERENCES Dog(\"name\", \"temperament\")";
 
         assert_eq!(alter_table.to_string(), expected);
     }

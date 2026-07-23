@@ -2,6 +2,7 @@ mod config;
 mod connector_tag;
 mod datamodel_rendering;
 mod error;
+mod ignore_lists;
 mod logging;
 mod query_result;
 mod runner;
@@ -21,35 +22,37 @@ pub use schema_gen::*;
 pub use templating::*;
 
 use colored::Colorize;
-use once_cell::sync::Lazy;
 use psl::datamodel_connector::ConnectorCapabilities;
-use query_engine_metrics::MetricRegistry;
 use std::future::Future;
-use std::sync::Once;
+use std::sync::LazyLock;
 use tokio::runtime::Builder;
-use tokio::sync::mpsc::{unbounded_channel, UnboundedReceiver, UnboundedSender};
+use tokio::sync::mpsc::{UnboundedReceiver, UnboundedSender, unbounded_channel};
 use tracing_futures::WithSubscriber;
 
 pub type TestResult<T> = Result<T, TestError>;
 
 /// Test configuration, loaded once at runtime.
-pub static CONFIG: Lazy<TestConfig> = Lazy::new(TestConfig::load);
+pub static CONFIG: LazyLock<TestConfig> = LazyLock::new(TestConfig::load);
 
 /// The log level from the environment.
-pub static ENV_LOG_LEVEL: Lazy<String> = Lazy::new(|| std::env::var("LOG_LEVEL").unwrap_or_else(|_| "info".to_owned()));
+pub static ENV_LOG_LEVEL: LazyLock<String> =
+    LazyLock::new(|| std::env::var("LOG_LEVEL").unwrap_or_else(|_| "info".to_owned()));
 
 /// Engine protocol used to run tests. Either 'graphql' or 'json'.
-pub static ENGINE_PROTOCOL: Lazy<String> =
-    Lazy::new(|| std::env::var("PRISMA_ENGINE_PROTOCOL").unwrap_or_else(|_| "graphql".to_owned()));
+pub static ENGINE_PROTOCOL: LazyLock<String> =
+    LazyLock::new(|| std::env::var("PRISMA_ENGINE_PROTOCOL").unwrap_or_else(|_| "graphql".to_owned()));
 
 /// Teardown of a test setup.
-async fn teardown_project(datamodel: &str, db_schemas: &[&str], schema_id: Option<usize>) -> TestResult<()> {
-    if let Some(schema_id) = schema_id {
-        let params = serde_json::json!({ "schemaId": schema_id });
-        executor_process_request::<serde_json::Value>("teardown", params).await?;
-    }
+async fn teardown_project(
+    url: &str,
+    datamodel: &RenderedDatamodel,
+    db_schemas: &[&str],
+    schema_id: usize,
+) -> TestResult<()> {
+    let params = serde_json::json!({ "schemaId": schema_id });
+    executor_process_request::<serde_json::Value>("teardown", params).await?;
 
-    Ok(qe_setup::teardown(datamodel, db_schemas).await?)
+    Ok(qe_setup::teardown(url, &datamodel.schema, db_schemas).await?)
 }
 
 /// Helper method to allow a sync shell function to run the async test blocks.
@@ -61,16 +64,6 @@ fn run_with_tokio<O, F: std::future::Future<Output = O>>(fut: F) -> O {
         .block_on(fut)
 }
 
-static METRIC_RECORDER: Once = Once::new();
-
-pub fn setup_metrics() -> MetricRegistry {
-    let metrics = MetricRegistry::new();
-    METRIC_RECORDER.call_once(|| {
-        query_engine_metrics::setup();
-    });
-    metrics
-}
-
 /// Taken from Reddit. Enables taking an async function pointer which takes references as param
 /// https://www.reddit.com/r/rust/comments/jvqorj/hrtb_with_async_functions/
 pub trait AsyncFn<'a, A: 'a, B: 'a, T>: Copy + 'static {
@@ -79,8 +72,12 @@ pub trait AsyncFn<'a, A: 'a, B: 'a, T>: Copy + 'static {
     fn call(self, a: &'a A, b: &'a B) -> Self::Fut;
 }
 
-impl<'a, A: 'a, B: 'a, Fut: Future + 'a, F: Fn(&'a A, &'a B) -> Fut + Copy + 'static> AsyncFn<'a, A, B, Fut::Output>
-    for F
+impl<'a, A, B, Fut, F> AsyncFn<'a, A, B, Fut::Output> for F
+where
+    A: 'a,
+    B: 'a,
+    Fut: Future + 'a,
+    F: Fn(&'a A, &'a B) -> Fut + Copy + 'static,
 {
     type Fut = Fut;
 
@@ -98,9 +95,12 @@ pub fn run_relation_link_test<F>(
     id_only: bool,
     only: &[(&str, Option<&str>)],
     exclude: &[(&str, Option<&str>)],
+    only_executors: &[&str],
+    excluded_executors: &[&str],
     required_capabilities: ConnectorCapabilities,
     (suite_name, test_name): (&str, &str),
     test_fn: F,
+    test_function_name: &'static str,
 ) where
     F: (for<'a> AsyncFn<'a, Runner, DatamodelWithParams, TestResult<()>>) + 'static,
 {
@@ -121,9 +121,13 @@ pub fn run_relation_link_test<F>(
         id_only,
         only,
         exclude,
+        only_executors,
+        excluded_executors,
         required_capabilities,
         (suite_name, test_name),
         &boxify(test_fn),
+        std::any::type_name::<F>(),
+        test_function_name,
     )
 }
 
@@ -135,12 +139,30 @@ fn run_relation_link_test_impl(
     id_only: bool,
     only: &[(&str, Option<&str>)],
     exclude: &[(&str, Option<&str>)],
+    only_executors: &[&str],
+    excluded_executors: &[&str],
     required_capabilities: ConnectorCapabilities,
     (suite_name, test_name): (&str, &str),
     test_fn: &dyn for<'a> Fn(&'a Runner, &'a DatamodelWithParams) -> BoxFuture<'a, TestResult<()>>,
+    test_fn_full_name: &'static str,
+    original_test_function_name: &'static str,
 ) {
-    static RELATION_TEST_IDX: Lazy<Option<usize>> =
-        Lazy::new(|| std::env::var("RELATION_TEST_IDX").ok().and_then(|s| s.parse().ok()));
+    if !excluded_executors.is_empty() && excluded_executors.contains(&"QueryCompiler") {
+        return;
+    }
+
+    if !only_executors.is_empty() && !only_executors.contains(&"QueryCompiler") {
+        return;
+    }
+
+    let full_test_name = build_full_test_name(test_fn_full_name, original_test_function_name);
+
+    if ignore_lists::is_ignored(&full_test_name) {
+        return;
+    }
+
+    static RELATION_TEST_IDX: LazyLock<Option<usize>> =
+        LazyLock::new(|| std::env::var("RELATION_TEST_IDX").ok().and_then(|s| s.parse().ok()));
 
     let (dms, capabilities) = schema_with_relation(on_parent, on_child, id_only);
 
@@ -159,30 +181,29 @@ fn run_relation_link_test_impl(
                 continue;
             }
 
-            let datamodel = render_test_datamodel(&test_db_name, template, &[], None, Default::default(), None);
-            let (connector_tag, version) = CONFIG.test_connector().unwrap();
-            let metrics = setup_metrics();
-            let metrics_for_subscriber = metrics.clone();
+            let url = connection_string(&version, &test_db_name, false, None);
+            let datamodel = render_test_datamodel(template, &[], None, &[], &[]);
             let (log_capture, log_tx) = TestLogCapture::new();
 
             run_with_tokio(
                 async move {
-                    println!("Used datamodel:\n {}", datamodel.yellow());
-                    let runner = Runner::load(datamodel.clone(), &[], version, connector_tag, metrics, log_capture)
+                    println!("Used datamodel:\n {}", datamodel.schema.yellow());
+                    let override_local_max_bind_values = None;
+                    let runner = Runner::load(&url, &datamodel, &[], version, connector, override_local_max_bind_values, log_capture)
                         .await
                         .unwrap();
 
-                    test_fn(&runner, &dm).await.unwrap();
+                    test_fn(&runner, &dm).with_subscriber(test_tracing_subscriber(
+                        ENV_LOG_LEVEL.to_string(),
+                        log_tx,
+                    ))
+                    .await.unwrap();
 
-                    teardown_project(&datamodel, Default::default(), runner.schema_id())
+                    teardown_project(&url, &datamodel, &[], runner.schema_id())
                         .await
                         .unwrap();
+
                 }
-                .with_subscriber(test_tracing_subscriber(
-                    ENV_LOG_LEVEL.to_string(),
-                    metrics_for_subscriber,
-                    log_tx,
-                )),
             );
         }
     }
@@ -213,10 +234,14 @@ pub fn run_connector_test<T>(
     exclude: &[(&str, Option<&str>)],
     capabilities: ConnectorCapabilities,
     excluded_features: &[&str],
+    only_executors: &[&str],
+    excluded_executors: &[&str],
     handler: fn() -> String,
     db_schemas: &[&str],
+    db_extensions: &[&str],
     referential_override: Option<String>,
     test_fn: T,
+    test_function_name: &'static str,
 ) where
     T: ConnectorTestFn,
 {
@@ -233,10 +258,15 @@ pub fn run_connector_test<T>(
         exclude,
         capabilities,
         excluded_features,
+        only_executors,
+        excluded_executors,
         handler,
         db_schemas,
+        db_extensions,
         referential_override,
         &boxify(test_fn),
+        std::any::type_name::<T>(),
+        test_function_name,
     )
 }
 
@@ -248,61 +278,89 @@ fn run_connector_test_impl(
     exclude: &[(&str, Option<&str>)],
     capabilities: ConnectorCapabilities,
     excluded_features: &[&str],
+    only_executors: &[&str],
+    excluded_executors: &[&str],
     handler: fn() -> String,
     db_schemas: &[&str],
+    db_extensions: &[&str],
     referential_override: Option<String>,
     test_fn: &dyn Fn(Runner) -> BoxFuture<'static, TestResult<()>>,
+    test_fn_full_name: &'static str,
+    original_test_function_name: &'static str,
 ) {
+    if !excluded_executors.is_empty() && excluded_executors.contains(&"QueryCompiler") {
+        return;
+    }
+
+    if !only_executors.is_empty() && !only_executors.contains(&"QueryCompiler") {
+        return;
+    }
+
     let (connector, version) = CONFIG.test_connector().unwrap();
+
+    let full_test_name = build_full_test_name(test_fn_full_name, original_test_function_name);
+
+    if ignore_lists::is_ignored(&full_test_name) {
+        return;
+    }
 
     if !should_run(&connector, &version, only, exclude, capabilities) {
         return;
     }
 
+    let url = connection_string(&version, test_database_name, !db_schemas.is_empty(), None);
+
     let template = handler();
     let datamodel = crate::render_test_datamodel(
-        test_database_name,
         template,
         excluded_features,
         referential_override,
         db_schemas,
-        None,
+        db_extensions,
     );
     let (connector_tag, version) = CONFIG.test_connector().unwrap();
-    let metrics = crate::setup_metrics();
-    let metrics_for_subscriber = metrics.clone();
 
     let (log_capture, log_tx) = TestLogCapture::new();
 
-    crate::run_with_tokio(
-        async {
-            println!("Used datamodel:\n {}", datamodel.yellow());
-            let runner = Runner::load(
-                datamodel.clone(),
-                db_schemas,
-                version,
-                connector_tag,
-                metrics,
-                log_capture,
-            )
+    crate::run_with_tokio(async {
+        println!("Used datamodel:\n {}", datamodel.schema.yellow());
+        let override_local_max_bind_values = None;
+        let runner = Runner::load(
+            &url,
+            &datamodel,
+            db_schemas,
+            version,
+            connector_tag,
+            override_local_max_bind_values,
+            log_capture,
+        )
+        .await
+        .unwrap();
+        let schema_id = runner.schema_id();
+
+        if let Err(err) = test_fn(runner)
+            .with_subscriber(test_tracing_subscriber(ENV_LOG_LEVEL.to_string(), log_tx))
+            .await
+        {
+            // Print any traceback directly to stdout, so it remains readable
+            eprintln!("Test failed due to an error:");
+            eprintln!("=====");
+            eprintln!("{err}");
+            eprintln!("=====");
+            panic!("💥 Test failed due to an error (see above)");
+        }
+
+        crate::teardown_project(&url, &datamodel, db_schemas, schema_id)
             .await
             .unwrap();
-            let schema_id = runner.schema_id();
+    });
+}
 
-            if let Err(err) = test_fn(runner).await {
-                panic!("💥 Test failed due to an error: {err:?}");
-            }
-
-            crate::teardown_project(&datamodel, db_schemas, schema_id)
-                .await
-                .unwrap();
-        }
-        .with_subscriber(test_tracing_subscriber(
-            ENV_LOG_LEVEL.to_string(),
-            metrics_for_subscriber,
-            log_tx,
-        )),
-    );
+fn build_full_test_name(test_fn_full_name: &'static str, original_test_function_name: &'static str) -> String {
+    let mut parts = test_fn_full_name.split("::").skip(1).collect::<Vec<_>>();
+    parts.pop();
+    parts.push(original_test_function_name);
+    parts.join("::")
 }
 
 pub type LogEmit = UnboundedSender<String>;
@@ -323,5 +381,9 @@ impl TestLogCapture {
         }
 
         logs
+    }
+
+    pub async fn clear_logs(&mut self) {
+        while self.rx.try_recv().is_ok() {}
     }
 }

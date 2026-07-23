@@ -1,4 +1,4 @@
-use schema_core::schema_api;
+use schema_core::{DatasourceUrls, json_rpc::types::SchemasContainer, schema_api_without_extensions};
 use sql_migration_tests::{multi_engine_test_api::*, test_api::SchemaContainer};
 use test_macros::test_connector;
 use url::Url;
@@ -50,15 +50,19 @@ fn connecting_to_a_postgres_database_with_missing_schema_creates_it(api: TestApi
             r#"
                 datasource db {{
                     provider = "{provider}"
-                    url = "{url}"
                 }}
                 "#
         );
 
-        let me = schema_api(Some(schema.clone()), None).unwrap();
+        let me = schema_api_without_extensions(Some(schema.clone()), DatasourceUrls::from_url(url), None).unwrap();
         tok(
             me.ensure_connection_validity(schema_core::json_rpc::types::EnsureConnectionValidityParams {
-                datasource: schema_core::json_rpc::types::DatasourceParam::SchemaString(SchemaContainer { schema }),
+                datasource: schema_core::json_rpc::types::DatasourceParam::Schema(SchemasContainer {
+                    files: vec![SchemaContainer {
+                        path: "schema.prisma".to_string(),
+                        content: schema,
+                    }],
+                }),
             }),
         )
         .unwrap();
@@ -96,15 +100,19 @@ fn ipv6_addresses_are_supported_in_connection_strings(api: TestApi) {
         r#"
         datasource db {{
             provider = "{provider}"
-            url = "{url}"
         }}
         "#
     );
 
-    let engine = schema_api(Some(schema.clone()), None).unwrap();
+    let engine = schema_api_without_extensions(Some(schema.clone()), DatasourceUrls::from_url(url), None).unwrap();
     tok(
         engine.ensure_connection_validity(schema_core::json_rpc::types::EnsureConnectionValidityParams {
-            datasource: schema_core::json_rpc::types::DatasourceParam::SchemaString(SchemaContainer { schema }),
+            datasource: schema_core::json_rpc::types::DatasourceParam::Schema(SchemasContainer {
+                files: vec![SchemaContainer {
+                    path: "schema.prisma".to_string(),
+                    content: schema,
+                }],
+            }),
         }),
     )
     .unwrap();

@@ -1,5 +1,5 @@
-use crate::{constants::group_by, error::MongoError, join::JoinStage, query_builder::AggregationType, IntoBson};
-use mongodb::bson::{doc, Bson, Document};
+use crate::{IntoBson, constants::group_by, error::MongoError, join::JoinStage, query_builder::AggregationType};
+use bson::{Bson, Document, doc};
 use query_structure::*;
 
 #[derive(Debug, Clone)]
@@ -188,43 +188,68 @@ impl MongoFilterVisitor {
             // Todo: The nested list unpack looks like a bug somewhere.
             //       Likely join code mistakenly repacks a list into a list of PrismaValue somewhere in the core.
             ScalarCondition::In(vals) => match vals {
-                ConditionListValue::List(vals) => match vals.split_first() {
-                    // List is list of lists, we need to flatten.
-                    Some((PrismaValue::List(_), _)) => {
-                        let mut bson_values = Vec::with_capacity(vals.len());
+                ConditionListValue::List(values) => {
+                    let mut equalities = Vec::with_capacity(values.len());
 
-                        for pv in vals {
-                            if let PrismaValue::List(inner) = pv {
-                                bson_values.extend(
-                                    inner
-                                        .into_iter()
-                                        .map(|val| self.coerce_to_bson_for_filter(field, val))
-                                        .collect::<crate::Result<Vec<_>>>()?,
-                                )
-                            }
+                    for value in values {
+                        // List is list of lists, we need to flatten.
+                        // This flattening behaviour does not affect user queries because Prisma does
+                        // not support storing arrays as values inside a field. It is possible to have
+                        // a 1-dimensional array field, but not 2 dimensional. Thus, we never have
+                        // user queries which have arrays in the argument of `in` operator. If we
+                        // encounter such case, then this query was produced internally and we can
+                        // safely flatten it.
+                        if let PrismaValue::List(list) = value {
+                            equalities.extend(
+                                list.into_iter()
+                                    .map(|value| {
+                                        let value = self.coerce_to_bson_for_filter(field, value)?;
+                                        Ok(doc! { "$eq": [&field_name, value] })
+                                    })
+                                    .collect::<crate::Result<Vec<_>>>()?,
+                            );
+                        } else {
+                            let value = self.coerce_to_bson_for_filter(field, value)?;
+                            equalities.push(doc! { "$eq": [&field_name, value] })
                         }
+                    }
 
-                        doc! { "$in": [&field_name, bson_values] }
-                    }
-                    _ => {
-                        doc! { "$in": [&field_name, self.coerce_to_bson_for_filter(field, PrismaValue::List(vals))?] }
-                    }
-                },
+                    // Previously, `$in` operator was used instead of a tree of `$or` + `$eq` operators.
+                    // At the moment of writing, MongoDB does not optimise aggregation version of `$in`
+                    // operator to use indexes, leading to significant performance problems. Until this
+                    // is fixed, we rely on `$eq` operator which does have index optimisation implemented.
+                    doc! { "$or": equalities }
+                }
                 ConditionListValue::FieldRef(field_ref) => {
+                    // In this context, `field_ref` refers to an array field, so we actually need an `$in` operator.
                     doc! { "$in": [&field_name, coerce_as_array(self.prefixed_field_ref(&field_ref)?)] }
+                }
+                ConditionListValue::Placeholder(_) => {
+                    unimplemented!("query compiler not supported with mongodb yet")
                 }
             },
             ScalarCondition::NotIn(vals) => match vals {
                 ConditionListValue::List(vals) => {
-                    let bson_values = vals
+                    let equalities = vals
                         .into_iter()
-                        .map(|val| self.coerce_to_bson_for_filter(field, val))
+                        .map(|value| {
+                            let value = self.coerce_to_bson_for_filter(field, value)?;
+                            Ok(doc! { "$ne": [&field_name, value] })
+                        })
                         .collect::<crate::Result<Vec<_>>>()?;
 
-                    doc! { "$not": { "$in": [&field_name, bson_values] } }
+                    // Previously, `$not` + `$in` operators were used instead of a tree of `$and` + `$ne` operators.
+                    // At the moment of writing, MongoDB does not optimise aggregation version of `$in`
+                    // operator to use indexes, leading to significant performance problems. Until this
+                    // is fixed, we rely on `$ne` operator which does have index optimisation implemented.
+                    doc! { "$and": equalities }
                 }
                 ConditionListValue::FieldRef(field_ref) => {
+                    // In this context, `field_ref` refers to an array field, so we actually need an `$in` operator.
                     doc! { "$not": { "$in": [&field_name, coerce_as_array(self.prefixed_field_ref(&field_ref)?)] } }
+                }
+                ConditionListValue::Placeholder(_) => {
+                    unimplemented!("query compiler not supported with mongodb yet")
                 }
             },
             ScalarCondition::JsonCompare(jc) => match *jc.condition {
@@ -360,6 +385,9 @@ impl MongoFilterVisitor {
                     self.regex_match(&Bson::from("$$elem"), field, "^", field, "$", true)?,
                     true,
                 )),
+                ConditionListValue::Placeholder(_) => {
+                    unimplemented!("query compiler not supported with mongodb yet")
+                }
             },
             ScalarCondition::NotIn(vals) => match vals {
                 ConditionListValue::List(vals) => {
@@ -380,6 +408,9 @@ impl MongoFilterVisitor {
                         .map(|rgx_doc| doc! { "$not": rgx_doc })?,
                     true,
                 )),
+                ConditionListValue::Placeholder(_) => {
+                    unimplemented!("query compiler not supported with mongodb yet")
+                }
             },
             ScalarCondition::IsSet(is_set) => Ok(render_is_set(&field_name, is_set)),
             ScalarCondition::JsonCompare(_) => Err(MongoError::Unsupported(
@@ -447,6 +478,9 @@ impl MongoFilterVisitor {
                 doc! { "$in": ["$$elem", coerce_as_array((self.prefix(), &field_ref).into_bson()?)] },
                 true,
             ),
+            ScalarListCondition::ContainsEvery(ConditionListValue::Placeholder(_)) => {
+                unimplemented!("query compiler not supported with mongodb yet")
+            }
 
             ScalarListCondition::ContainsSome(vals) if vals.is_empty() => {
                 // Empty hasSome: Return no records.
@@ -470,6 +504,9 @@ impl MongoFilterVisitor {
                 doc! { "$in": ["$$elem", coerce_as_array((self.prefix(), &field_ref).into_bson()?)] },
                 true,
             ),
+            ScalarListCondition::ContainsSome(ConditionListValue::Placeholder(_)) => {
+                unimplemented!("query compiler not supported with mongodb yet")
+            }
 
             ScalarListCondition::IsEmpty(true) => {
                 doc! { "$eq": [render_size(&field_name, true), 0] }

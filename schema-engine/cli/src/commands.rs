@@ -1,21 +1,29 @@
+use std::sync::Arc;
+
 use crate::logger::log_error_and_exit;
 use schema_connector::ConnectorError;
-use schema_core::json_rpc::types::{DatasourceParam, UrlContainer};
+use schema_core::{
+    DatasourceUrls, ExtensionTypeConfig,
+    json_rpc::types::{DatasourceParam, UrlContainer},
+};
 use structopt::StructOpt;
-use user_facing_errors::common::SchemaParserError;
+use tokio_util::sync::CancellationToken;
+use user_facing_errors::schema_engine::MissingConfigDatasourceUrl;
 
 #[derive(Debug, StructOpt)]
 pub(crate) struct Cli {
-    /// The connection string to the database
-    #[structopt(long, short = "d", parse(try_from_str = parse_base64_string))]
-    datasource: String,
     #[structopt(subcommand)]
     command: CliCommand,
 }
 
 impl Cli {
-    pub(crate) async fn run(self) {
-        match self.run_inner().await {
+    pub(crate) async fn run(
+        self,
+        datasource_urls: DatasourceUrls,
+        shutdown_token: CancellationToken,
+        extensions: Arc<ExtensionTypeConfig>,
+    ) {
+        match self.run_inner(datasource_urls, shutdown_token, extensions).await {
             Ok(msg) => {
                 tracing::info!("{}", msg);
             }
@@ -23,33 +31,49 @@ impl Cli {
         }
     }
 
-    pub(crate) async fn run_inner(self) -> Result<String, ConnectorError> {
-        let api = schema_core::schema_api(None, None)?;
-        match self.command {
-            CliCommand::CreateDatabase => {
-                let schema_core::json_rpc::types::CreateDatabaseResult { database_name } = api
+    pub(crate) async fn run_inner(
+        self,
+        datasource_urls: DatasourceUrls,
+        shutdown_token: CancellationToken,
+        extensions: Arc<ExtensionTypeConfig>,
+    ) -> Result<String, ConnectorError> {
+        let mut api = schema_core::schema_api(None, datasource_urls.clone(), None, extensions)?;
+
+        let url = datasource_urls
+            .url
+            .ok_or_else(|| ConnectorError::user_facing(MissingConfigDatasourceUrl))?;
+
+        let work = async {
+            match self.command {
+                CliCommand::CreateDatabase => api
                     .create_database(schema_core::json_rpc::types::CreateDatabaseParams {
-                        datasource: DatasourceParam::ConnectionString(UrlContainer {
-                            url: self.datasource.clone(),
-                        }),
+                        datasource: DatasourceParam::ConnectionString(UrlContainer { url }),
                     })
-                    .await?;
-                Ok(format!("Database '{database_name}' was successfully created."))
-            }
-            CliCommand::CanConnectToDatabase => {
-                api.ensure_connection_validity(schema_core::json_rpc::types::EnsureConnectionValidityParams {
-                    datasource: DatasourceParam::ConnectionString(UrlContainer {
-                        url: self.datasource.clone(),
+                    .await
+                    .map(|schema_core::json_rpc::types::CreateDatabaseResult { database_name }| {
+                        format!("Database '{database_name}' was successfully created.")
                     }),
-                })
-                .await?;
-                Ok("Connection successful".to_owned())
+                CliCommand::CanConnectToDatabase => api
+                    .ensure_connection_validity(schema_core::json_rpc::types::EnsureConnectionValidityParams {
+                        datasource: DatasourceParam::ConnectionString(UrlContainer { url }),
+                    })
+                    .await
+                    .map(|_| "Connection successful".to_owned()),
+                CliCommand::DropDatabase => api
+                    .drop_database(url)
+                    .await
+                    .map(|_| "The database was successfully dropped.".to_owned()),
             }
-            CliCommand::DropDatabase => {
-                api.drop_database(self.datasource.clone()).await?;
-                Ok("The database was successfully dropped.".to_owned())
-            }
-        }
+        };
+
+        let result = tokio::select! {
+            result = work => result,
+            _ = shutdown_token.cancelled() => Err(ConnectorError::from_msg("Operation was cancelled".to_owned())),
+        };
+
+        api.dispose().await?;
+
+        result
     }
 }
 
@@ -62,16 +86,4 @@ enum CliCommand {
     CanConnectToDatabase,
     /// Drop the database.
     DropDatabase,
-}
-
-fn parse_base64_string(s: &str) -> Result<String, ConnectorError> {
-    match base64::decode(s) {
-        Ok(bytes) => match String::from_utf8(bytes) {
-            Ok(s) => Ok(s),
-            Err(e) => Err(ConnectorError::user_facing(SchemaParserError {
-                full_error: e.to_string(),
-            })),
-        },
-        Err(_) => Ok(String::from(s)),
-    }
 }

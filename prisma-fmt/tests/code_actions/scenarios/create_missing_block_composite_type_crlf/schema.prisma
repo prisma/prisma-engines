@@ -1,0 +1,12 @@
+generator client {
+    provider = "prisma-client"
+}
+
+datasource db {
+    provider = "mongodb"
+}
+
+type Kattbjorn {
+    name   String
+    friend Animal
+}

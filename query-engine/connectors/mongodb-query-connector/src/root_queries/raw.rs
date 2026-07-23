@@ -1,7 +1,7 @@
-use crate::{error::MongoError, vacuum_cursor, BsonTransform};
+use crate::{BsonTransform, error::MongoError, vacuum_cursor};
 use itertools::Itertools;
 use mongodb::{
-    bson::{from_bson, Bson, Document},
+    bson::{Bson, Document, from_bson},
     options::*,
 };
 use query_structure::{Model, PrismaValue};

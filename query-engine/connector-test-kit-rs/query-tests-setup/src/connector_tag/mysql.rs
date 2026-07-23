@@ -1,5 +1,7 @@
+use std::fmt::Display;
+
 use super::*;
-use crate::{datamodel_rendering::SqlDatamodelRenderer, BoxFuture, TestError};
+use crate::{BoxFuture, TestError, datamodel_rendering::SqlDatamodelRenderer};
 use quaint::{prelude::Queryable, single::Quaint};
 
 #[derive(Debug, Default, Clone)]
@@ -32,6 +34,9 @@ pub enum MySqlVersion {
     V5_7,
     V8,
     MariaDb,
+    MariaDbJsWasm,
+    // Used for testing the MariaDB driver with a MySQL server.
+    MariaDbMysqlJsWasm,
 }
 
 impl TryFrom<&str> for MySqlVersion {
@@ -43,6 +48,8 @@ impl TryFrom<&str> for MySqlVersion {
             "5.7" => Self::V5_7,
             "8" => Self::V8,
             "mariadb" => Self::MariaDb,
+            "mariadb.js.wasm" => Self::MariaDbJsWasm,
+            "mariadb-mysql.js.wasm" => Self::MariaDbMysqlJsWasm,
             _ => return Err(TestError::parse_error(format!("Unknown MySQL version `{s}`"))),
         };
 
@@ -50,14 +57,15 @@ impl TryFrom<&str> for MySqlVersion {
     }
 }
 
-impl ToString for MySqlVersion {
-    fn to_string(&self) -> String {
+impl Display for MySqlVersion {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            MySqlVersion::V5_6 => "5.6",
-            MySqlVersion::V5_7 => "5.7",
-            MySqlVersion::V8 => "8",
-            MySqlVersion::MariaDb => "mariadb",
+            MySqlVersion::V5_6 => f.write_str("5.6"),
+            MySqlVersion::V5_7 => f.write_str("5.7"),
+            MySqlVersion::V8 => f.write_str("8"),
+            MySqlVersion::MariaDb => f.write_str("mariadb"),
+            MySqlVersion::MariaDbJsWasm => f.write_str("mariadb.js.wasm"),
+            MySqlVersion::MariaDbMysqlJsWasm => f.write_str("mariadb-mysql.js.wasm"),
         }
-        .to_owned()
     }
 }

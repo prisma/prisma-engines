@@ -18,12 +18,11 @@ async fn remapping_enum_names(api: &mut TestApi) -> TestResult {
 
     let expectation = expect![[r#"
         generator client {
-          provider = "prisma-client-js"
+          provider = "prisma-client"
         }
 
         datasource db {
           provider = "postgresql"
-          url      = "env(TEST_DATABASE_URL)"
         }
 
         model Book {

@@ -1,10 +1,10 @@
 use colored::{ColoredString, Colorize};
 
 use crate::{
-    pretty_print::{pretty_print, DiagnosticColorer},
     Span,
+    pretty_print::{DiagnosticColorer, pretty_print},
 };
-use std::borrow::Cow;
+use std::{borrow::Cow, fmt};
 
 #[derive(Debug, Clone)]
 pub struct DatamodelError {
@@ -25,6 +25,13 @@ impl DatamodelError {
     pub fn new_literal_parser_error(literal_type: &str, raw_value: &str, span: Span) -> DatamodelError {
         Self::new(
             format!("\"{raw_value}\" is not a valid value for {literal_type}."),
+            span,
+        )
+    }
+
+    pub fn new_named_env_val(span: Span) -> Self {
+        Self::new(
+            "The env function expects a singular, unnamed, string argument.".to_owned(),
             span,
         )
     }
@@ -83,8 +90,8 @@ impl DatamodelError {
 
     pub fn new_incompatible_native_type(
         native_type: &str,
-        field_type: &str,
-        expected_types: &str,
+        field_type: impl fmt::Display,
+        expected_types: impl fmt::Display,
         span: Span,
     ) -> DatamodelError {
         let msg = format!(
@@ -109,7 +116,9 @@ impl DatamodelError {
         suggestion: &str,
         span: Span,
     ) -> DatamodelError {
-        let msg =  format!("The prefix {given_prefix} is invalid. It must be equal to the name of an existing datasource e.g. {expected_prefix}. Did you mean to use {suggestion}?");
+        let msg = format!(
+            "The prefix {given_prefix} is invalid. It must be equal to the name of an existing datasource e.g. {expected_prefix}. Did you mean to use {suggestion}?"
+        );
         DatamodelError::new(msg, span)
     }
 
@@ -133,7 +142,9 @@ impl DatamodelError {
         existing_model_name: &str,
         span: Span,
     ) -> DatamodelError {
-        let msg = format!("The model with database name \"{model_database_name}\" could not be defined because another model or view with this name exists: \"{existing_model_name}\"");
+        let msg = format!(
+            "The model with database name \"{model_database_name}\" could not be defined because another model or view with this name exists: \"{existing_model_name}\""
+        );
         Self::new(msg, span)
     }
 
@@ -142,7 +153,9 @@ impl DatamodelError {
         existing_model_name: &str,
         span: Span,
     ) -> DatamodelError {
-        let msg = format!("The view with database name \"{model_database_name}\" could not be defined because another model or view with this name exists: \"{existing_model_name}\"");
+        let msg = format!(
+            "The view with database name \"{model_database_name}\" could not be defined because another model or view with this name exists: \"{existing_model_name}\""
+        );
         Self::new(msg, span)
     }
 
@@ -200,7 +213,9 @@ impl DatamodelError {
         field_name: &str,
         span: Span,
     ) -> DatamodelError {
-        let msg = format!("Field \"{field_name}\" in {container} \"{container_name}\" can't be a list. The current connector does not support lists of primitive types.");
+        let msg = format!(
+            "Field \"{field_name}\" in {container} \"{container_name}\" can't be a list. The current connector does not support lists of primitive types."
+        );
         Self::new(msg, span)
     }
 
@@ -288,7 +303,14 @@ impl DatamodelError {
 
     pub fn new_type_not_found_error(type_name: &str, span: Span) -> DatamodelError {
         let msg = format!(
-            "Type \"{type_name}\" is neither a built-in type, nor refers to another model, custom type, or enum."
+            "Type \"{type_name}\" is neither a built-in type, nor refers to another model, composite type, or enum."
+        );
+        Self::new(msg, span)
+    }
+
+    pub fn new_type_for_case_not_found_error(type_name: &str, suggestion: &str, span: Span) -> DatamodelError {
+        let msg = format!(
+            "Type \"{type_name}\" is neither a built-in type, nor refers to another model, composite type, or enum. Did you mean \"{suggestion}\"?"
         );
         Self::new(msg, span)
     }
@@ -310,10 +332,11 @@ impl DatamodelError {
     }
 
     pub fn new_default_unknown_function(function_name: &str, span: Span) -> DatamodelError {
-        DatamodelError::new(format!(
+        DatamodelError::new(
+            format!(
                 "Unknown function in @default(): `{function_name}` is not known. You can read about the available functions here: https://pris.ly/d/attribute-functions"
             ),
-            span
+            span,
         )
     }
 
@@ -325,9 +348,19 @@ impl DatamodelError {
         Self::new(format!("Datasource provider not known: \"{provider}\"."), span)
     }
 
-    pub fn new_shadow_database_is_same_as_main_url_error(source_name: String, span: Span) -> DatamodelError {
-        let msg = format!("shadowDatabaseUrl is the same as url for datasource \"{source_name}\". Please specify a different database as shadow database.");
-        Self::new(msg, span)
+    pub fn new_datasource_url_removed_error(span: Span) -> DatamodelError {
+        let msg = "The datasource property `url` is no longer supported in schema files. Move connection URLs for Migrate to `prisma.config.ts` and pass either `adapter` for a direct database connection or `accelerateUrl` for Accelerate to the `PrismaClient` constructor. See https://pris.ly/d/config-datasource and https://pris.ly/d/prisma7-client-config";
+        Self::new(msg.to_string(), span)
+    }
+
+    pub fn new_datasource_direct_url_removed_error(span: Span) -> DatamodelError {
+        let msg = "The datasource property `directUrl` is no longer supported in schema files. Move connection URLs to `prisma.config.ts`. See https://pris.ly/d/config-datasource";
+        Self::new(msg.to_string(), span)
+    }
+
+    pub fn new_datasource_shadow_database_url_removed_error(span: Span) -> DatamodelError {
+        let msg = "The datasource property `shadowDatabaseUrl` is no longer supported in schema files. Move connection URLs to `prisma.config.ts`. See https://pris.ly/d/config-datasource";
+        Self::new(msg.to_string(), span)
     }
 
     pub fn new_preview_feature_not_known_error(

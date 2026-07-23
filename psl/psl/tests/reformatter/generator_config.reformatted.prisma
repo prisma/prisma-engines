@@ -11,4 +11,5 @@ generator custom {
   customVersion  = 1
   customFeatures = ["gc", "timers"]
   customProgram  = ["defn", "handler", [], ["ring-bell"]]
+  customEnv      = env("var")
 }

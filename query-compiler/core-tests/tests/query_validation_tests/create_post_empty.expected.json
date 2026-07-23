@@ -1,0 +1,42 @@
+{
+  "is_panic": false,
+  "message": "Unable to match input value to any allowed input type for the field. Parse errors: [`data.published`: A value is required but not set, `data.published`: A value is required but not set]",
+  "meta": {
+    "kind": "Union",
+    "errors": [
+      {
+        "kind": "RequiredArgumentMissing",
+        "inputTypes": [
+          {
+            "kind": "scalar",
+            "name": "Boolean"
+          }
+        ],
+        "argumentPath": [
+          "data",
+          "published"
+        ],
+        "selectionPath": [
+          "createOnePost"
+        ]
+      },
+      {
+        "kind": "RequiredArgumentMissing",
+        "inputTypes": [
+          {
+            "kind": "scalar",
+            "name": "Boolean"
+          }
+        ],
+        "argumentPath": [
+          "data",
+          "published"
+        ],
+        "selectionPath": [
+          "createOnePost"
+        ]
+      }
+    ]
+  },
+  "error_code": "P2009"
+}

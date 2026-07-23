@@ -5,8 +5,8 @@
 //! There is a struct for each different type of query to generate. Each of them implement the
 //! QueryStringBuilder trait, which is dynamically dispatched to a specific query string builder by
 //! `root_queries::observing`
+use bson::{Bson, Document};
 use derive_more::Constructor;
-use mongodb::bson::{Bson, Document};
 use std::fmt::Write;
 
 pub(crate) trait QueryString: Sync + Send {

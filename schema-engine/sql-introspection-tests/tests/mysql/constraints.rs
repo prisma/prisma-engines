@@ -27,12 +27,11 @@ async fn check_constraints_stopgap(api: &mut TestApi) -> TestResult {
 
     let schema = expect![[r#"
         generator client {
-          provider = "prisma-client-js"
+          provider = "prisma-client"
         }
 
         datasource db {
           provider = "mysql"
-          url      = "env(TEST_DATABASE_URL)"
         }
 
         model some_user {
@@ -51,7 +50,7 @@ async fn check_constraints_stopgap(api: &mut TestApi) -> TestResult {
     api.expect_datamodel(&schema).await;
 
     // ensure the introspected schema is valid
-    psl::parse_schema(schema.data()).unwrap();
+    psl::parse_schema_without_extensions(schema.data()).unwrap();
 
     let expectation = expect![[r#"
         *** WARNING ***

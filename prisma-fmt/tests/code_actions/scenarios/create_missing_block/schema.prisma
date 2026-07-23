@@ -1,0 +1,12 @@
+generator client {
+    provider = "prisma-client"
+}
+
+datasource db {
+    provider = "postgres"
+}
+
+model Kattbjorn {
+    id     String @id
+    friend Animal
+}

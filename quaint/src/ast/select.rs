@@ -713,7 +713,9 @@ impl<'a> Select<'a> {
                     .map(|a| a.to_string())
                     .or_else(|| expr.alias.as_ref().map(|a| a.to_string()))
                     .or_else(|| Some(c.name.to_string())),
-                ExpressionKind::Parameterized(_) => expr.alias.as_ref().map(|a| a.to_string()),
+                ExpressionKind::Parameterized(_) | ExpressionKind::ParameterizedRow(_) => {
+                    expr.alias.as_ref().map(|a| a.to_string())
+                }
                 _ => None,
             })
             .collect()
@@ -721,3 +723,9 @@ impl<'a> Select<'a> {
 }
 
 impl<'a> IntoCommonTableExpression<'a> for Select<'a> {}
+
+impl<'a> Extend<Expression<'a>> for Select<'a> {
+    fn extend<T: IntoIterator<Item = Expression<'a>>>(&mut self, iter: T) {
+        self.columns.extend(iter);
+    }
+}

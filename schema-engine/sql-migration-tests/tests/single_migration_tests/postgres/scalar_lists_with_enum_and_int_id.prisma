@@ -3,7 +3,6 @@
 
 datasource testds {
     provider = "postgresql"
-    url = env("TEST_DATABASE_URL")
 }
 
 model A {
@@ -17,6 +16,9 @@ enum Status {
     ERROR
 }
 // Expected Migration:
+// -- CreateSchema
+// CREATE SCHEMA IF NOT EXISTS "public";
+// 
 // -- CreateEnum
 // CREATE TYPE "Status" AS ENUM ('OK', 'ERROR');
 // 

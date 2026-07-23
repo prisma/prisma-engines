@@ -1,5 +1,5 @@
 use super::compare::JsonType;
-use crate::ast::{Comparable, Compare, Expression};
+use crate::ast::{Comparable, Compare, Expression, ExpressionKind};
 use std::borrow::Cow;
 
 /// A collection of values surrounded by parentheses.
@@ -52,6 +52,22 @@ impl<'a> Row<'a> {
         }
 
         columns
+    }
+
+    pub fn to_parameterized_row(self) -> Expression<'a> {
+        let item = self
+            .values
+            .first()
+            .expect("The Row must have a single Parameterized item");
+
+        match item.kind() {
+            ExpressionKind::Parameterized(value) => Expression {
+                kind: ExpressionKind::ParameterizedRow(value.clone()),
+                alias: item.alias.clone(),
+            },
+
+            _ => unreachable!("The Row must have a single Parameterized item"),
+        }
     }
 }
 
@@ -159,6 +175,19 @@ where
         row.push(vals.4);
 
         row
+    }
+}
+
+impl<'a, A> FromIterator<A> for Row<'a>
+where
+    A: Into<Expression<'a>>,
+{
+    fn from_iter<T>(iter: T) -> Self
+    where
+        T: IntoIterator<Item = A>,
+    {
+        let inner = iter.into_iter().map(Into::into).collect::<Vec<_>>();
+        Self { values: inner }
     }
 }
 
@@ -356,7 +385,7 @@ impl<'a> Comparable<'a> for Row<'a> {
 
     fn matches<T>(self, query: T) -> Compare<'a>
     where
-        T: Into<Cow<'a, str>>,
+        T: Into<Expression<'a>>,
     {
         let value: Expression<'a> = self.into();
 
@@ -365,7 +394,7 @@ impl<'a> Comparable<'a> for Row<'a> {
 
     fn not_matches<T>(self, query: T) -> Compare<'a>
     where
-        T: Into<Cow<'a, str>>,
+        T: Into<Expression<'a>>,
     {
         let value: Expression<'a> = self.into();
 

@@ -1,0 +1,21 @@
+---
+source: query-compiler/query-compiler/tests/queries.rs
+expression: pretty
+input_file: query-compiler/query-compiler/tests/data/in-mem-distinct-mapped-field-query.json
+---
+dataMap {
+    int: Int (db_int)
+    float: Float (db_float)
+}
+process {
+    .: {
+        distinct: (db_float)
+        pagination: {
+            skip: 20
+            take: 10
+        }
+    }
+} (query «SELECT "public"."Item"."id", "public"."Item"."db_int",
+          "public"."Item"."db_float" FROM "public"."Item" WHERE 1=1 ORDER BY
+          "public"."Item"."id" ASC OFFSET $1»
+   params [const(BigInt(0))])

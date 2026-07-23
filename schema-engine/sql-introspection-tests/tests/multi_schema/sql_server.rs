@@ -1,4 +1,4 @@
-use sql_introspection_tests::{test_api::*, TestResult};
+use sql_introspection_tests::{TestResult, test_api::*};
 
 #[test_connector(tags(Mssql))]
 async fn multiple_schemas_without_schema_property_are_not_introspected(api: &mut TestApi) -> TestResult {
@@ -21,12 +21,11 @@ async fn multiple_schemas_without_schema_property_are_not_introspected(api: &mut
 
     let expected = expect![[r#"
         generator client {
-          provider = "prisma-client-js"
+          provider = "prisma-client"
         }
 
         datasource db {
           provider = "sqlserver"
-          url      = "env(TEST_DATABASE_URL)"
         }
 
         model A {
@@ -42,7 +41,7 @@ async fn multiple_schemas_without_schema_property_are_not_introspected(api: &mut
     Ok(())
 }
 
-#[test_connector(tags(Mssql), preview_features("multiSchema"), namespaces("first", "second"))]
+#[test_connector(tags(Mssql), namespaces("first", "second"))]
 async fn multiple_schemas_w_tables_are_introspected(api: &mut TestApi) -> TestResult {
     let schema_name = "first";
     let other_name = "second";
@@ -91,13 +90,11 @@ async fn multiple_schemas_w_tables_are_introspected(api: &mut TestApi) -> TestRe
 
     let expected = expect![[r#"
         generator client {
-          provider        = "prisma-client-js"
-          previewFeatures = ["multiSchema"]
+          provider = "prisma-client"
         }
 
         datasource db {
           provider = "sqlserver"
-          url      = "env(TEST_DATABASE_URL)"
           schemas  = ["first", "second"]
         }
 
@@ -121,7 +118,7 @@ async fn multiple_schemas_w_tables_are_introspected(api: &mut TestApi) -> TestRe
     Ok(())
 }
 
-#[test_connector(tags(Mssql), preview_features("multiSchema"), namespaces("first", "second"))]
+#[test_connector(tags(Mssql), namespaces("first", "second"))]
 async fn multiple_schemas_w_tables_are_reintrospected(api: &mut TestApi) -> TestResult {
     let schema_name = "first";
     let other_name = "second";
@@ -203,7 +200,7 @@ async fn multiple_schemas_w_tables_are_reintrospected(api: &mut TestApi) -> Test
     Ok(())
 }
 
-#[test_connector(tags(Mssql), preview_features("multiSchema"), namespaces("first", "second"))]
+#[test_connector(tags(Mssql), namespaces("first", "second"))]
 async fn multiple_schemas_w_duplicate_table_names_are_introspected(api: &mut TestApi) -> TestResult {
     let schema_name = "first";
     let other_name = "second";
@@ -220,13 +217,11 @@ async fn multiple_schemas_w_duplicate_table_names_are_introspected(api: &mut Tes
 
     let expected = expect![[r#"
         generator client {
-          provider        = "prisma-client-js"
-          previewFeatures = ["multiSchema"]
+          provider = "prisma-client"
         }
 
         datasource db {
           provider = "sqlserver"
-          url      = "env(TEST_DATABASE_URL)"
           schemas  = ["first", "second"]
         }
 
@@ -250,7 +245,7 @@ async fn multiple_schemas_w_duplicate_table_names_are_introspected(api: &mut Tes
     Ok(())
 }
 
-#[test_connector(tags(Mssql), preview_features("multiSchema"), namespaces("first", "second"))]
+#[test_connector(tags(Mssql), namespaces("first", "second"))]
 async fn multiple_schemas_w_cross_schema_are_introspected(api: &mut TestApi) -> TestResult {
     let schema_name = "first";
     let other_name = "second";
@@ -275,13 +270,11 @@ async fn multiple_schemas_w_cross_schema_are_introspected(api: &mut TestApi) -> 
 
     let expected = expect![[r#"
         generator client {
-          provider        = "prisma-client-js"
-          previewFeatures = ["multiSchema"]
+          provider = "prisma-client"
         }
 
         datasource db {
           provider = "sqlserver"
-          url      = "env(TEST_DATABASE_URL)"
           schemas  = ["first", "second"]
         }
 
@@ -306,7 +299,7 @@ async fn multiple_schemas_w_cross_schema_are_introspected(api: &mut TestApi) -> 
     Ok(())
 }
 
-#[test_connector(tags(Mssql), preview_features("multiSchema"), namespaces("first", "second"))]
+#[test_connector(tags(Mssql), namespaces("first", "second"))]
 async fn multiple_schemas_w_cross_schema_are_reintrospected(api: &mut TestApi) -> TestResult {
     let schema_name = "first";
     let other_name = "second";
@@ -368,7 +361,7 @@ async fn multiple_schemas_w_cross_schema_are_reintrospected(api: &mut TestApi) -
     Ok(())
 }
 
-#[test_connector(tags(Mssql), preview_features("multiSchema"), namespaces("first", "second"))]
+#[test_connector(tags(Mssql), namespaces("first", "second"))]
 async fn multiple_schemas_w_cross_schema_fks_w_duplicate_names_are_introspected(api: &mut TestApi) -> TestResult {
     let schema_name = "first";
     let other_name = "second";
@@ -393,13 +386,11 @@ async fn multiple_schemas_w_cross_schema_fks_w_duplicate_names_are_introspected(
 
     let expected = expect![[r#"
         generator client {
-          provider        = "prisma-client-js"
-          previewFeatures = ["multiSchema"]
+          provider = "prisma-client"
         }
 
         datasource db {
           provider = "sqlserver"
-          url      = "env(TEST_DATABASE_URL)"
           schemas  = ["first", "second"]
         }
 
@@ -426,7 +417,146 @@ async fn multiple_schemas_w_cross_schema_fks_w_duplicate_names_are_introspected(
     Ok(())
 }
 
-#[test_connector(tags(Mssql), preview_features("multiSchema"), namespaces("first", "second"))]
+#[test_connector(tags(Mssql), namespaces("Appointments", "Trips", "core"))]
+async fn schemas_with_varying_case(api: &mut TestApi) -> TestResult {
+    for schema in ["Appointments", "Trips", "core"] {
+        api.raw_cmd(&format!("CREATE SCHEMA {schema}")).await;
+    }
+
+    let setup = formatdoc! {r#"
+        CREATE TABLE [Appointments].[Associations] (
+            [AppointmentID] BIGINT NOT NULL,
+            [AssociatedAppointmentID] BIGINT NOT NULL,
+            CONSTRAINT [PK_Associations] PRIMARY KEY CLUSTERED ([AppointmentID],[AssociatedAppointmentID])
+        );
+
+        CREATE TABLE [Appointments].[AssociationTypes] (
+            [ID] SMALLINT NOT NULL IDENTITY(1,1),
+            CONSTRAINT [PK_AssociationTypes] PRIMARY KEY CLUSTERED ([ID])
+        );
+
+        CREATE TABLE [Appointments].[billCodes] (
+            [Id] BIGINT NOT NULL IDENTITY(1,1),
+            CONSTRAINT [PK_AppointmentBillCode] PRIMARY KEY CLUSTERED ([Id])
+        );
+
+        CREATE TABLE [core].[Clusters] (
+            [ID] INT NOT NULL IDENTITY(1,1),
+            CONSTRAINT [PK_Clusters] PRIMARY KEY CLUSTERED ([ID])
+        );
+
+        CREATE TABLE [core].[Containers] (
+            [ID] SMALLINT NOT NULL IDENTITY(1,1),
+            CONSTRAINT [PK_Containers] PRIMARY KEY CLUSTERED ([ID])
+        );
+
+        CREATE TABLE [Appointments].[Documents] (
+            [ID] BIGINT NOT NULL IDENTITY(1,1),
+            CONSTRAINT [PK_AppointmentBOLs] PRIMARY KEY CLUSTERED ([ID])
+        );
+
+        CREATE TABLE [core].[Sites] (
+            [ID] BIGINT NOT NULL IDENTITY(1,1),
+            CONSTRAINT [PK_Sites] PRIMARY KEY CLUSTERED ([ID])
+        );
+
+        CREATE TABLE [Appointments].[statuses] (
+            [ID] SMALLINT NOT NULL IDENTITY(1,1),
+            CONSTRAINT [PK_AppointmentStatuses] PRIMARY KEY CLUSTERED ([ID])
+        );
+
+        CREATE TABLE [Trips].[Trips] (
+            [ID] BIGINT NOT NULL IDENTITY(1,1),
+            CONSTRAINT [PK_Trips] PRIMARY KEY CLUSTERED ([ID])
+        );
+
+        CREATE TABLE [Trips].[TripTypes] (
+            [ID] INT NOT NULL IDENTITY(1,1),
+            CONSTRAINT [PK_TripTypes] PRIMARY KEY CLUSTERED ([ID])
+        );
+    "#};
+
+    api.raw_cmd(&setup).await;
+
+    let expected = expect![[r#"
+        generator client {
+          provider = "prisma-client"
+        }
+
+        datasource db {
+          provider = "sqlserver"
+          schemas  = ["Appointments", "Trips", "core"]
+        }
+
+        model Associations {
+          AppointmentID           BigInt
+          AssociatedAppointmentID BigInt
+
+          @@id([AppointmentID, AssociatedAppointmentID], map: "PK_Associations")
+          @@schema("Appointments")
+        }
+
+        model AssociationTypes {
+          ID Int @id(map: "PK_AssociationTypes") @default(autoincrement()) @db.SmallInt
+
+          @@schema("Appointments")
+        }
+
+        model billCodes {
+          Id BigInt @id(map: "PK_AppointmentBillCode") @default(autoincrement())
+
+          @@schema("Appointments")
+        }
+
+        model Clusters {
+          ID Int @id(map: "PK_Clusters") @default(autoincrement())
+
+          @@schema("core")
+        }
+
+        model Containers {
+          ID Int @id(map: "PK_Containers") @default(autoincrement()) @db.SmallInt
+
+          @@schema("core")
+        }
+
+        model Documents {
+          ID BigInt @id(map: "PK_AppointmentBOLs") @default(autoincrement())
+
+          @@schema("Appointments")
+        }
+
+        model Sites {
+          ID BigInt @id(map: "PK_Sites") @default(autoincrement())
+
+          @@schema("core")
+        }
+
+        model statuses {
+          ID Int @id(map: "PK_AppointmentStatuses") @default(autoincrement()) @db.SmallInt
+
+          @@schema("Appointments")
+        }
+
+        model Trips {
+          ID BigInt @id(map: "PK_Trips") @default(autoincrement())
+
+          @@schema("Trips")
+        }
+
+        model TripTypes {
+          ID Int @id(map: "PK_TripTypes") @default(autoincrement())
+
+          @@schema("Trips")
+        }
+    "#]];
+
+    api.expect_datamodel(&expected).await;
+
+    Ok(())
+}
+
+#[test_connector(tags(Mssql), namespaces("first", "second"))]
 async fn defaults_are_introspected(api: &mut TestApi) -> TestResult {
     let schema_name = "first";
     let other_name = "second";
@@ -452,13 +582,11 @@ async fn defaults_are_introspected(api: &mut TestApi) -> TestResult {
 
     let expected = expect![[r#"
         generator client {
-          provider        = "prisma-client-js"
-          previewFeatures = ["multiSchema"]
+          provider = "prisma-client"
         }
 
         datasource db {
           provider = "sqlserver"
-          url      = "env(TEST_DATABASE_URL)"
           schemas  = ["first", "second"]
         }
 

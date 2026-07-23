@@ -3,13 +3,12 @@
 
 datasource testds {
     provider = "postgresql"
-    url = env("TEST_DATABASE_URL")
     schemas = ["public", "security", "users", "unused"]
 }
 
 generator js {
-    provider = "prisma-client-js"
-    previewFeatures = ["multiSchema"]
+    provider = "prisma-client"
+    previewFeatures = []
 }
 
 model Test {
@@ -58,9 +57,6 @@ model Test5 {
 // CREATE SCHEMA IF NOT EXISTS "security";
 // 
 // -- CreateSchema
-// CREATE SCHEMA IF NOT EXISTS "unused";
-// 
-// -- CreateSchema
 // CREATE SCHEMA IF NOT EXISTS "users";
 // 
 // -- CreateEnum
@@ -75,7 +71,7 @@ model Test5 {
 // );
 // 
 // -- CreateTable
-// CREATE TABLE "public"."Test2" (
+// CREATE TABLE "Test2" (
 //     "id" INTEGER NOT NULL,
 // 
 //     CONSTRAINT "Test2_pkey" PRIMARY KEY ("id")
@@ -90,7 +86,7 @@ model Test5 {
 // );
 // 
 // -- CreateTable
-// CREATE TABLE "public"."Test4" (
+// CREATE TABLE "Test4" (
 //     "id" INTEGER NOT NULL,
 // 
 //     CONSTRAINT "Test4_pkey" PRIMARY KEY ("id")
@@ -107,4 +103,4 @@ model Test5 {
 // CREATE UNIQUE INDEX "Test_name_key" ON "users"."Test"("name");
 // 
 // -- AddForeignKey
-// ALTER TABLE "public"."Test4" ADD CONSTRAINT "Test4_id_fkey" FOREIGN KEY ("id") REFERENCES "security"."Test5"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+// ALTER TABLE "Test4" ADD CONSTRAINT "Test4_id_fkey" FOREIGN KEY ("id") REFERENCES "security"."Test5"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

@@ -1,29 +1,42 @@
+use crate::visitor::query_writer::QueryWriter;
 use crate::{
     ast::*,
+    error::{Error, ErrorKind},
     visitor::{self, Visitor},
 };
 use itertools::Itertools;
-use std::{
-    fmt::{self, Write},
-    ops::Deref,
-};
+use query_template::{PlaceholderFormat, QueryTemplate};
+use std::borrow::Cow;
+use std::{fmt, ops::Deref};
 
 /// A visitor to generate queries for the PostgreSQL database.
 ///
 /// The returned parameter values implement the `ToSql` trait from postgres and
 /// can be used directly with the database.
 pub struct Postgres<'a> {
-    query: String,
-    parameters: Vec<Value<'a>>,
+    query_template: QueryTemplate<Value<'a>>,
 }
 
 impl<'a> Postgres<'a> {
+    /// Expression that evaluates to the current PostgreSQL version.
+    pub const fn version_expr() -> &'static str {
+        "version()"
+    }
+
     fn visit_json_build_obj_expr(&mut self, expr: Expression<'a>) -> crate::Result<()> {
         match expr.kind() {
             ExpressionKind::Column(col) => match (col.type_family.as_ref(), col.native_type.as_deref()) {
                 (Some(TypeFamily::Decimal(_)), Some("MONEY")) => {
                     self.visit_expression(expr)?;
                     self.write("::numeric")?;
+
+                    Ok(())
+                }
+                // Cast BigInt to text to preserve precision when parsed by JavaScript.
+                // JavaScript's JSON.parse loses precision for integers > 2^53-1.
+                (Some(TypeFamily::Int), Some("BIGINT" | "INT8")) => {
+                    self.visit_expression(expr)?;
+                    self.write("::text")?;
 
                     Ok(())
                 }
@@ -34,12 +47,12 @@ impl<'a> Postgres<'a> {
     }
 
     fn visit_returning(&mut self, returning: Option<Vec<Column<'a>>>) -> visitor::Result {
-        if let Some(returning) = returning {
-            if !returning.is_empty() {
-                let values = returning.into_iter().map(|r| r.into()).collect();
-                self.write(" RETURNING ")?;
-                self.visit_columns(values)?;
-            }
+        if let Some(returning) = returning
+            && !returning.is_empty()
+        {
+            let values = returning.into_iter().map(|r| r.into()).collect();
+            self.write(" RETURNING ")?;
+            self.visit_columns(values)?;
         }
         Ok(())
     }
@@ -50,32 +63,47 @@ impl<'a> Visitor<'a> for Postgres<'a> {
     const C_BACKTICK_CLOSE: &'static str = "\"";
     const C_WILDCARD: &'static str = "%";
 
-    fn build<Q>(query: Q) -> crate::Result<(String, Vec<Value<'a>>)>
+    fn build_template<Q>(query: Q) -> crate::Result<QueryTemplate<Value<'a>>>
     where
         Q: Into<Query<'a>>,
     {
-        let mut postgres = Postgres {
-            query: String::with_capacity(4096),
-            parameters: Vec::with_capacity(128),
+        let mut this = Postgres {
+            query_template: QueryTemplate::new(PlaceholderFormat {
+                prefix: "$",
+                has_numbering: true,
+            }),
         };
 
-        Postgres::visit_query(&mut postgres, query.into())?;
+        Postgres::visit_query(&mut this, query.into())?;
 
-        Ok((postgres.query, postgres.parameters))
+        Ok(this.query_template)
     }
 
-    fn write<D: fmt::Display>(&mut self, s: D) -> visitor::Result {
-        write!(&mut self.query, "{s}")?;
+    fn write(&mut self, value: impl fmt::Display) -> visitor::Result {
+        self.query_template.write_string_chunk(value.to_string());
         Ok(())
     }
 
     fn add_parameter(&mut self, value: Value<'a>) {
-        self.parameters.push(value);
+        self.query_template.parameters.push(value);
     }
 
     fn parameter_substitution(&mut self) -> visitor::Result {
-        self.write("$")?;
-        self.write(self.parameters.len())
+        self.query_template.write_parameter();
+        Ok(())
+    }
+
+    fn visit_parameterized_row(
+        &mut self,
+        value: Value<'a>,
+        item_prefix: impl Into<Cow<'static, str>>,
+        separator: impl Into<Cow<'static, str>>,
+        item_suffix: impl Into<Cow<'static, str>>,
+    ) -> visitor::Result {
+        self.query_template
+            .write_parameter_tuple(item_prefix, separator, item_suffix);
+        self.query_template.parameters.push(value);
+        Ok(())
     }
 
     fn visit_parameterized_enum(&mut self, variant: EnumVariant<'a>, name: Option<EnumName<'a>>) -> visitor::Result {
@@ -139,6 +167,8 @@ impl<'a> Visitor<'a> for Postgres<'a> {
 
     /// A database column identifier
     fn visit_column(&mut self, column: Column<'a>) -> visitor::Result {
+        let cast_target = get_column_cast_target(&column);
+
         match column.table {
             Some(table) => {
                 self.visit_table(table, false)?;
@@ -148,11 +178,11 @@ impl<'a> Visitor<'a> for Postgres<'a> {
             _ => self.delimited_identifiers(&[&*column.name])?,
         };
 
-        if column.is_enum && column.is_selected {
+        if let Some(cast) = cast_target {
+            self.write("::")?;
+            self.write(cast)?;
             if column.is_list {
-                self.write("::text[]")?;
-            } else {
-                self.write("::text")?;
+                self.write("[]")?;
             }
         }
 
@@ -257,6 +287,10 @@ impl<'a> Visitor<'a> for Postgres<'a> {
             ValueType::DateTime(dt) => dt.map(|dt| self.write(format!("'{}'", dt.to_rfc3339(),))),
             ValueType::Date(date) => date.map(|date| self.write(format!("'{date}'"))),
             ValueType::Time(time) => time.map(|time| self.write(format!("'{time}'"))),
+
+            ValueType::Opaque(opaque) => Some(Err(
+                Error::builder(ErrorKind::OpaqueAsRawValue(opaque.to_string())).build()
+            )),
         };
 
         match res {
@@ -274,6 +308,26 @@ impl<'a> Visitor<'a> for Postgres<'a> {
         }
 
         match insert.values {
+            Expression {
+                kind: ExpressionKind::Parameterized(row),
+                ..
+            } => {
+                let columns = insert.columns.len();
+
+                self.write(" (")?;
+                for (i, c) in insert.columns.into_iter().enumerate() {
+                    self.visit_column(c.name.into_owned().into())?;
+
+                    if i < (columns - 1) {
+                        self.write(",")?;
+                    }
+                }
+
+                self.write(")")?;
+                self.write(" VALUES ")?;
+                self.query_template.write_parameter_tuple_list("(", ",", ")", ",");
+                self.query_template.parameters.push(row);
+            }
             Expression {
                 kind: ExpressionKind::Row(row),
                 ..
@@ -361,52 +415,28 @@ impl<'a> Visitor<'a> for Postgres<'a> {
     }
 
     fn visit_equals(&mut self, left: Expression<'a>, right: Expression<'a>) -> visitor::Result {
-        // LHS must be cast to json/xml-text if the right is a json/xml-text value and vice versa.
-        let right_cast = match left {
-            _ if left.is_json_value() => "::jsonb",
-            _ if left.is_xml_value() => "::text",
-            _ => "",
-        };
+        let lhs_conv = EqualsOperandConversion::infer(&left, &right);
+        let rhs_conv = EqualsOperandConversion::infer(&right, &left);
 
-        let left_cast = match right {
-            _ if right.is_json_value() => "::jsonb",
-            _ if right.is_xml_value() => "::text",
-            _ => "",
-        };
-
-        self.visit_expression(left)?;
-        self.write(left_cast)?;
+        lhs_conv.write(left, self)?;
         self.write(" = ")?;
-        self.visit_expression(right)?;
-        self.write(right_cast)?;
+        rhs_conv.write(right, self)?;
 
         Ok(())
     }
 
     fn visit_not_equals(&mut self, left: Expression<'a>, right: Expression<'a>) -> visitor::Result {
-        // LHS must be cast to json/xml-text if the right is a json/xml-text value and vice versa.
-        let right_cast = match left {
-            _ if left.is_json_value() => "::jsonb",
-            _ if left.is_xml_value() => "::text",
-            _ => "",
-        };
+        let lhs_conv = EqualsOperandConversion::infer(&left, &right);
+        let rhs_conv = EqualsOperandConversion::infer(&right, &left);
 
-        let left_cast = match right {
-            _ if right.is_json_value() => "::jsonb",
-            _ if right.is_xml_value() => "::text",
-            _ => "",
-        };
-
-        self.visit_expression(left)?;
-        self.write(left_cast)?;
+        lhs_conv.write(left, self)?;
         self.write(" <> ")?;
-        self.visit_expression(right)?;
-        self.write(right_cast)?;
+        rhs_conv.write(right, self)?;
 
         Ok(())
     }
 
-    #[cfg(any(feature = "postgresql", feature = "mysql"))]
+    #[cfg(any(feature = "postgresql", feature = "mysql", feature = "sqlite"))]
     fn visit_json_extract(&mut self, json_extract: JsonExtract<'a>) -> visitor::Result {
         match json_extract.path {
             JsonPath::String(_) => panic!("JSON path string notation is not supported for Postgres"),
@@ -445,7 +475,7 @@ impl<'a> Visitor<'a> for Postgres<'a> {
         Ok(())
     }
 
-    #[cfg(any(feature = "postgresql", feature = "mysql"))]
+    #[cfg(any(feature = "postgresql", feature = "mysql", feature = "sqlite"))]
     fn visit_json_unquote(&mut self, json_unquote: JsonUnquote<'a>) -> visitor::Result {
         self.write("(")?;
         self.visit_expression(*json_unquote.expr)?;
@@ -472,7 +502,7 @@ impl<'a> Visitor<'a> for Postgres<'a> {
         Ok(())
     }
 
-    #[cfg(any(feature = "postgresql", feature = "mysql"))]
+    #[cfg(any(feature = "postgresql", feature = "mysql", feature = "sqlite"))]
     fn visit_json_extract_last_array_item(&mut self, extract: JsonExtractLastArrayElem<'a>) -> visitor::Result {
         self.write("(")?;
         self.visit_expression(*extract.expr)?;
@@ -482,7 +512,7 @@ impl<'a> Visitor<'a> for Postgres<'a> {
         Ok(())
     }
 
-    #[cfg(any(feature = "postgresql", feature = "mysql"))]
+    #[cfg(any(feature = "postgresql", feature = "mysql", feature = "sqlite"))]
     fn visit_json_extract_first_array_item(&mut self, extract: JsonExtractFirstArrayElem<'a>) -> visitor::Result {
         self.write("(")?;
         self.visit_expression(*extract.expr)?;
@@ -492,7 +522,7 @@ impl<'a> Visitor<'a> for Postgres<'a> {
         Ok(())
     }
 
-    #[cfg(any(feature = "postgresql", feature = "mysql"))]
+    #[cfg(any(feature = "postgresql", feature = "mysql", feature = "sqlite"))]
     fn visit_json_type_equals(&mut self, left: Expression<'a>, json_type: JsonType<'a>, not: bool) -> visitor::Result {
         self.write("JSONB_TYPEOF")?;
         self.write("(")?;
@@ -572,6 +602,12 @@ impl<'a> Visitor<'a> for Postgres<'a> {
         Ok(())
     }
 
+    #[cfg(feature = "postgresql")]
+    fn visit_stringify(&mut self, stringify: Stringify<'a>) -> visitor::Result {
+        self.visit_expression(*stringify.expression)?;
+        self.write("::text")
+    }
+
     fn visit_text_search(&mut self, text_search: crate::prelude::TextSearch<'a>) -> visitor::Result {
         let len = text_search.exprs.len();
         self.surround_with("to_tsvector(concat_ws(' ', ", "))", |s| {
@@ -587,14 +623,14 @@ impl<'a> Visitor<'a> for Postgres<'a> {
         })
     }
 
-    fn visit_matches(&mut self, left: Expression<'a>, right: std::borrow::Cow<'a, str>, not: bool) -> visitor::Result {
+    fn visit_matches(&mut self, left: Expression<'a>, right: Expression<'a>, not: bool) -> visitor::Result {
         if not {
             self.write("(NOT ")?;
         }
 
         self.visit_expression(left)?;
         self.write(" @@ ")?;
-        self.surround_with("to_tsquery(", ")", |s| s.visit_parameterized(Value::text(right)))?;
+        self.surround_with("to_tsquery(", ")", |s| s.visit_expression(right))?;
 
         if not {
             self.write(")")?;
@@ -621,7 +657,7 @@ impl<'a> Visitor<'a> for Postgres<'a> {
             Ok(())
         })?;
         self.write(", ")?;
-        self.surround_with("to_tsquery(", ")", |s| s.visit_parameterized(Value::text(query)))?;
+        self.surround_with("to_tsquery(", ")", |s| s.visit_expression(query))?;
         self.write(")")?;
 
         Ok(())
@@ -703,13 +739,14 @@ impl<'a> Visitor<'a> for Postgres<'a> {
 
     fn visit_min(&mut self, min: Minimum<'a>) -> visitor::Result {
         // If the inner column is a selected enum, then we cast the result of MIN(enum)::text instead of casting the inner enum column, which changes the behavior of MIN.
-        let should_cast = min.column.is_enum && min.column.is_selected;
+        let cast_target = get_column_cast_target(&min.column);
 
         self.write("MIN")?;
         self.surround_with("(", ")", |ref mut s| s.visit_column(min.column.set_is_selected(false)))?;
 
-        if should_cast {
-            self.write("::text")?;
+        if let Some(cast_target) = cast_target {
+            self.write("::")?;
+            self.write(cast_target)?;
         }
 
         Ok(())
@@ -717,13 +754,14 @@ impl<'a> Visitor<'a> for Postgres<'a> {
 
     fn visit_max(&mut self, max: Maximum<'a>) -> visitor::Result {
         // If the inner column is a selected enum, then we cast the result of MAX(enum)::text instead of casting the inner enum column, which changes the behavior of MAX.
-        let should_cast = max.column.is_enum && max.column.is_selected;
+        let cast_target = get_column_cast_target(&max.column);
 
         self.write("MAX")?;
         self.surround_with("(", ")", |ref mut s| s.visit_column(max.column.set_is_selected(false)))?;
 
-        if should_cast {
-            self.write("::text")?;
+        if let Some(cast_target) = cast_target {
+            self.write("::")?;
+            self.write(cast_target)?;
         }
 
         Ok(())
@@ -746,6 +784,62 @@ impl<'a> Visitor<'a> for Postgres<'a> {
         }
 
         Ok(())
+    }
+}
+
+fn get_column_cast_target(column: &Column<'_>) -> Option<&'static str> {
+    if !column.is_selected {
+        return None;
+    }
+
+    if column.is_enum {
+        Some("text")
+    } else if column.native_type.as_deref() == Some("MONEY") || column.native_type.as_deref() == Some("MONEY[]") {
+        Some("numeric")
+    } else {
+        None
+    }
+}
+
+/// Utility type for equality and inequality expressions to determine if and how operands should
+/// be converted before comparison.
+#[derive(Debug, Clone, Copy)]
+enum EqualsOperandConversion {
+    JsonbCast,
+    TextCast,
+    ToJsonb,
+    Identity,
+}
+
+impl EqualsOperandConversion {
+    fn infer(this: &Expression<'_>, other: &Expression<'_>) -> Self {
+        // If we reference a JSON list column, we have to convert it to a JSON array
+        // (rather than a PostgreSQL list) before comparing it to a JSON value,
+        // otherwise the comparison would fail with a type error.
+        if other.is_json_value() && this.as_column().is_some_and(|c| c.is_list) {
+            Self::ToJsonb
+        } else if other.is_json_value() {
+            Self::JsonbCast
+        } else if other.is_xml_value() {
+            Self::TextCast
+        } else {
+            Self::Identity
+        }
+    }
+
+    fn write<'a>(self, expr: Expression<'a>, v: &mut Postgres<'a>) -> visitor::Result {
+        match self {
+            Self::JsonbCast => {
+                v.visit_expression(expr)?;
+                v.write("::jsonb")
+            }
+            Self::TextCast => {
+                v.visit_expression(expr)?;
+                v.write("::text")
+            }
+            Self::ToJsonb => v.surround_with("TO_JSONB(", ")", |v| v.visit_expression(expr)),
+            Self::Identity => v.visit_expression(expr),
+        }
     }
 }
 
@@ -1288,7 +1382,10 @@ mod tests {
         let q = Select::from_table(joined_table).and_from("Toto");
         let (sql, _) = Postgres::build(q).unwrap();
 
-        assert_eq!("SELECT \"User\".*, \"Toto\".* FROM \"User\" LEFT JOIN \"Post\" AS \"p\" ON \"p\".\"userId\" = \"User\".\"id\", \"Toto\"", sql);
+        assert_eq!(
+            "SELECT \"User\".*, \"Toto\".* FROM \"User\" LEFT JOIN \"Post\" AS \"p\" ON \"p\".\"userId\" = \"User\".\"id\", \"Toto\"",
+            sql
+        );
     }
 
     #[test]
@@ -1345,6 +1442,35 @@ mod tests {
             assert_eq!(sql, "SELECT JSONB_BUILD_OBJECT('money', \"money\"::numeric)");
         }
 
+        #[test]
+        fn bigint() {
+            let build_json = json_build_object(vec![(
+                "id".into(),
+                Column::from("id")
+                    .native_column_type(Some("BigInt"))
+                    .type_family(TypeFamily::Int)
+                    .into(),
+            )]);
+            let query = Select::default().value(build_json);
+            let (sql, _) = Postgres::build(query).unwrap();
+
+            assert_eq!(sql, "SELECT JSONB_BUILD_OBJECT('id', \"id\"::text)");
+        }
+
+        #[test]
+        fn int8() {
+            let build_json = json_build_object(vec![(
+                "id".into(),
+                Column::from("id")
+                    .native_column_type(Some("INT8"))
+                    .type_family(TypeFamily::Int)
+                    .into(),
+            )]);
+            let query = Select::default().value(build_json);
+            let (sql, _) = Postgres::build(query).unwrap();
+
+            assert_eq!(sql, "SELECT JSONB_BUILD_OBJECT('id', \"id\"::text)");
+        }
         fn build_json_object(num_fields: u32) -> JsonBuildObject<'static> {
             let fields = (1..=num_fields)
                 .map(|i| (format!("f{i}").into(), Expression::from(i as i64)))

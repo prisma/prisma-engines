@@ -104,7 +104,11 @@ pub(crate) fn referential_actions(relation: InlineRelationWalker<'_>, ctx: &mut 
     if back.explicit_on_delete().is_some() || back.explicit_on_update().is_some() {
         let message = &format!(
             "The relation field `{}` on Model `{}` must not specify the `onDelete` or `onUpdate` argument in the {} attribute. You must only specify it on the opposite field `{}` on model `{}`, or in case of a many to many relation, in an explicit join table.",
-            back.name(), back.model().name(), RELATION_ATTRIBUTE_NAME, forward.name(), forward.model().name(),
+            back.name(),
+            back.model().name(),
+            RELATION_ATTRIBUTE_NAME,
+            forward.name(),
+            forward.model().name(),
         );
 
         ctx.push_error(DatamodelError::new_attribute_validation_error(

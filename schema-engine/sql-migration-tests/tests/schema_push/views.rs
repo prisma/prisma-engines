@@ -5,7 +5,7 @@ use sql_migration_tests::test_api::*;
 fn views_are_ignored(api: TestApi) {
     let dm = indoc! {r#"
         view Dog {
-          val Int @unique
+          val Int
         }
     "#};
 
@@ -18,7 +18,7 @@ fn relations_from_view_are_ignored(api: TestApi) {
     let dm = indoc! {r#"
         model Leash {
           id   Int   @id
-          dogs Dog[]        
+          dogs Dog[]
         }
 
         view Dog {

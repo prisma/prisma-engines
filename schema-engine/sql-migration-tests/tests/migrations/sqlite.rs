@@ -1,4 +1,5 @@
 use quaint::prelude::Insert;
+use schema_core::{DatasourceUrls, json_rpc::types::SchemasContainer};
 use sql_migration_tests::test_api::*;
 
 #[test_connector(tags(Sqlite))]
@@ -103,7 +104,6 @@ fn bigint_defaults_work(api: TestApi) {
     let schema = r#"
         datasource mypg {
             provider = "sqlite"
-            url = env("TEST_DATABASE_URL")
         }
 
         model foo {
@@ -129,7 +129,6 @@ fn default_string_with_escaped_unicode(api: TestApi) {
     let dm = r#"
         datasource mypg {
             provider = "sqlite"
-            url = env("TEST_DATABASE_URL")
         }
 
         model test {
@@ -182,9 +181,11 @@ fn unique_constraint_errors_in_migrations(api: TestApi) {
         .send_unwrap_err()
         .to_user_facing();
 
-    assert!(serde_json::to_string_pretty(&res)
-        .unwrap()
-        .contains("UNIQUE constraint failed: Fruit.name"));
+    assert!(
+        serde_json::to_string_pretty(&res)
+            .unwrap()
+            .contains("UNIQUE constraint failed: Fruit.name")
+    );
 }
 
 #[test]
@@ -194,21 +195,32 @@ fn introspecting_a_non_existing_db_fails() {
     let dm = r#"
         datasource db {
             provider = "sqlite"
-            url = "file:/tmp/definitelies-does-not-exist.sqlite"
         }
     "#;
 
-    let api = schema_core::schema_api(None, None).unwrap();
+    let api = schema_core::schema_api_without_extensions(
+        None,
+        DatasourceUrls::from_url("file:/tmp/definitelies-does-not-exist.sqlite"),
+        None,
+    )
+    .unwrap();
+
     let err = tok(api.introspect(schema_core::json_rpc::types::IntrospectParams {
         composite_type_depth: -1,
         force: false,
-        schema: dm.to_owned(),
-        schemas: None,
+        schema: SchemasContainer {
+            files: vec![SchemaContainer {
+                path: "schema.prisma".to_string(),
+                content: dm.to_string(),
+            }],
+        },
+        base_directory_path: "/".to_string(),
+        namespaces: None,
     }))
     .unwrap_err();
 
     let expected = expect![[r#"
-        Database definitelies-does-not-exist.sqlite does not exist at /tmp/definitelies-does-not-exist.sqlite
+        Database `definitelies-does-not-exist.sqlite` does not exist
     "#]];
     expected.assert_eq(&err.to_string());
 }

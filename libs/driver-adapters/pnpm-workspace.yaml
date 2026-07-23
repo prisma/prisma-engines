@@ -1,0 +1,26 @@
+packages:
+  - '../../../prisma/packages/adapter-d1'
+  - '../../../prisma/packages/adapter-better-sqlite3'
+  - '../../../prisma/packages/adapter-libsql'
+  - '../../../prisma/packages/adapter-mssql'
+  - '../../../prisma/packages/adapter-neon'
+  - '../../../prisma/packages/adapter-pg'
+  - '../../../prisma/packages/adapter-planetscale'
+  - '../../../prisma/packages/adapter-mariadb'
+  - '../../../prisma/packages/bundled-js-drivers'
+  - '../../../prisma/packages/client-engine-runtime'
+  - '../../../prisma/packages/client-runtime-utils'
+  - '../../../prisma/packages/debug'
+  - '../../../prisma/packages/dmmf'
+  - '../../../prisma/packages/driver-adapter-utils'
+  - '../../../prisma/packages/get-dmmf'
+  - '../../../prisma/packages/param-graph'
+  - '../../../prisma/packages/param-graph-builder'
+  - '../../../prisma/packages/sqlcommenter'
+  - '../../../prisma/packages/json-protocol'
+  - './executor'
+
+onlyBuiltDependencies:
+  - better-sqlite3
+  - esbuild
+  - workerd

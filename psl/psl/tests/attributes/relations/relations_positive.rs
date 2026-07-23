@@ -1,4 +1,4 @@
-use crate::{common::*, with_header, Provider};
+use crate::{Provider, common::*, with_header};
 use psl::parser_database::ScalarType;
 
 #[test]

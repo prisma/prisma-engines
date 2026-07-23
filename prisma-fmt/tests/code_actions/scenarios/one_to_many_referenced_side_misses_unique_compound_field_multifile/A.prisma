@@ -1,0 +1,6 @@
+model A {
+    id     Int @id
+    field1 Int
+    field2 Int
+    B      B[]
+}

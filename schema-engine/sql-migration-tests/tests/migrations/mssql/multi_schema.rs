@@ -1,36 +1,22 @@
 use crate::migrations::multi_schema::*;
 use connection_string::JdbcString;
 use indoc::{formatdoc, indoc};
-use psl::PreviewFeature;
-use schema_core::{
-    commands::apply_migrations,
-    commands::create_migration,
-    json_rpc::types::{ApplyMigrationsInput, CreateMigrationInput},
-    schema_connector::{ConnectorParams, SchemaConnector},
-};
 use sql_migration_tests::test_api::*;
-use sql_schema_connector::SqlSchemaConnector;
 use sql_schema_describer::DefaultValue;
 
 // This is the only "top" level test in this module. It defines a list of tests and executes them.
 // If you want to look at the tests, see the `tests` variable below.
-#[test_connector(
-    tags(Mssql, Mssql2019, Mssql2017),
-    preview_features("multiSchema"),
-    namespaces("one", "two")
-)]
+#[test_connector(tags(Mssql, Mssql2019, Mssql2017), namespaces("one", "two"))]
 fn multi_schema_tests(_api: TestApi) {
     let namespaces: &'static [&'static str] = &["one", "two"];
     let base_schema = indoc! {r#"
         datasource db {
           provider   = "sqlserver"
-          url        = env("TEST_DATABASE_URL")
           schemas    = ["one", "two"]
         }
 
         generator js {
-          provider        = "prisma-client-js"
-          previewFeatures = ["multiSchema"]
+          provider = "prisma-client"
         }
     "#};
 
@@ -1068,6 +1054,11 @@ fn multi_schema_tests(_api: TestApi) {
                       id Int @id
                       name String
                       @@schema("one")
+                    }
+                    model Second {
+                      id Int @id
+                      name String
+                      @@schema("two")
                     }"#
                 }),
                 first: indoc! {r#""#}.into(),
@@ -1083,26 +1074,61 @@ fn multi_schema_tests(_api: TestApi) {
             }),
             skip: None,
         },
+        TestData {
+            name: "issue prisma/prisma#24068",
+            description: "Modify the primary key of a table in a namespace",
+            schema: Schema {
+                common: base_schema.into(),
+                first: indoc! {r#"
+                    model Report {
+                      id String @id
+
+                      @@schema("two")
+                    }"#}
+                .into(),
+                second: Some(indoc! {r#"
+                    model Report {
+                      id String @id @unique @db.NVarChar(450)
+
+                      @@schema("two")
+                    }"#}
+                .into())
+            },
+            namespaces,
+            schema_push: SchemaPush::PushAnd(WithSchema::First, &SchemaPush::PushCustomAnd(CustomPushStep {
+                warnings: &["A unique constraint covering the columns `[id]` on the table `Report` will be added. If there are existing duplicate values, this will fail."],
+                errors: &[],
+                with_schema: WithSchema::Second,
+                executed_steps: ExecutedSteps::NonZero,
+            }, &SchemaPush::Done)),
+            assertion: Box::new(|assert| {
+                assert
+                    .assert_has_table_with_ns("two", "Report")
+                    .assert_table_with_ns("two", "Report", |table| {
+                        table.assert_column("id", |column| column.assert_is_required().assert_type_is_string())
+                    });
+            }),
+            skip: None,
+        },
     ];
 
     // traverse_ is always the answer
     tests.iter_mut().filter(|t| t.skip.is_none()).for_each(|t| {
+        println!("Running test: {}", t.name);
         run_test(t);
     });
 }
 
-#[test_connector(tags(Mssql), preview_features("multiSchema"), namespaces("one", "two"))]
+#[test_connector(tags(Mssql), namespaces("one", "two"))]
 fn multi_schema_migration(api: TestApi) {
     let dm = indoc! {r#"
         datasource db {
           provider = "sqlserver"
-          url      = env("TEST_DATABASE_URL")
           schemas  = ["one", "two"]
         }
 
         generator js {
-          provider        = "prisma-client-js"
-          previewFeatures = ["multiSchema"]
+          provider = "prisma-client"
         }
 
         model A {
@@ -1135,63 +1161,36 @@ fn multi_schema_migration(api: TestApi) {
     api.apply_migrations(&dir).send_sync().assert_applied_migrations(&[]);
 }
 
-#[tokio::test]
-async fn migration_with_shadow_database() {
+#[test_connector(tags(Mssql), namespaces("one", "two"))]
+fn migration_with_shadow_database(api: TestApi) {
     let conn_str = std::env::var("TEST_DATABASE_URL").unwrap();
 
-    if !conn_str.starts_with("sqlserver") {
-        return;
-    }
+    let mut shadow_str: JdbcString = format!("jdbc:{conn_str}").parse().unwrap();
 
-    let (params, datasource) = {
-        let mut shadow_str: JdbcString = format!("jdbc:{conn_str}").parse().unwrap();
+    shadow_str
+        .properties_mut()
+        .insert("database".to_string(), "shadow".to_string());
 
-        shadow_str
-            .properties_mut()
-            .insert("database".to_string(), "shadow".to_string());
+    let shadow_str = shadow_str.to_string().replace("jdbc:", "");
 
-        let shadow_str = shadow_str.to_string().replace("jdbc:", "");
+    let datasource = indoc! {r#"
+        datasource db {
+          provider          = "sqlserver"
+          schemas           = ["one", "two"]
+        }
 
-        let datasource = formatdoc! {r#"
-            datasource db {{
-              provider          = "sqlserver"
-              url               = "{conn_str}"
-              shadowDatabaseUrl = "{shadow_str}"
-              schemas           = ["one", "two"]
-            }}
+        generator js {
+          provider        = "prisma-client-javascript"
+        }
+    "#};
 
-            generator js {{
-              provider        = "prisma-client-javascript"
-              previewFeatures = ["multiSchema"]
-            }}
-        "#};
-
-        let params = ConnectorParams {
-            connection_string: conn_str,
-            preview_features: PreviewFeature::MultiSchema.into(),
-            shadow_database_connection_string: Some(shadow_str),
-        };
-
-        (params, datasource)
-    };
+    let mut engine = api.new_engine_with_connection_strings(conn_str.clone(), Some(shadow_str.clone()));
 
     let namespaces = Namespaces::from_vec(&mut vec![String::from("dbo"), String::from("one"), String::from("two")]);
 
-    let mut conn = {
-        let mut conn = SqlSchemaConnector::new_mssql();
-
-        conn.set_params(params).unwrap();
-        let _ = conn.raw_cmd("DROP DATABASE shadow").await;
-
-        conn.raw_cmd("CREATE DATABASE shadow").await.unwrap();
-        conn.reset(true, namespaces.clone()).await.unwrap();
-
-        let _ = conn.raw_cmd("DROP SCHEMA one").await;
-        let _ = conn.raw_cmd("DROP SCHEMA two").await;
-        let _ = conn.raw_cmd("DROP SCHEMA dbo").await;
-
-        conn
-    };
+    api.raw_cmd("DROP DATABASE IF EXISTS shadow");
+    api.raw_cmd("CREATE DATABASE shadow");
+    api.reset().send_sync(namespaces.clone());
 
     let dm = formatdoc! {r#"
         {datasource}
@@ -1215,85 +1214,63 @@ async fn migration_with_shadow_database() {
         }}
     "#};
 
-    let migrations_directory = tempfile::tempdir().unwrap();
+    let dir = api.create_migrations_directory();
 
-    let migration = CreateMigrationInput {
-        migrations_directory_path: migrations_directory.path().to_str().unwrap().to_owned(),
-        prisma_schema: dm.clone(),
-        draft: false,
-        migration_name: "init".to_string(),
-    };
+    engine
+        .create_migration("init", &dm, &dir)
+        .send_sync()
+        .assert_migration_directories_count(1)
+        .assert_migration("init", move |migration| {
+            let expected_script = expect![[r#"
+                BEGIN TRY
 
-    create_migration(migration, &mut conn).await.unwrap();
+                BEGIN TRAN;
 
-    let path = std::fs::read_dir(migrations_directory.path())
-        .expect("Reading migrations directory for named migration.")
-        .find_map(|entry| {
-            let entry = entry.unwrap();
-            let name = entry.file_name();
+                -- CreateSchema
+                IF NOT EXISTS (SELECT * FROM sys.schemas WHERE name = N'one') EXEC sp_executesql N'CREATE SCHEMA [one];';
 
-            if name.to_str().unwrap().contains("init") {
-                Some(entry)
-            } else {
-                None
-            }
-        })
-        .unwrap()
-        .path()
-        .join("migration.sql");
+                -- CreateSchema
+                IF NOT EXISTS (SELECT * FROM sys.schemas WHERE name = N'two') EXEC sp_executesql N'CREATE SCHEMA [two];';
 
-    let sql = std::fs::read_to_string(path).unwrap();
+                -- CreateTable
+                CREATE TABLE [one].[A] (
+                    [id] INT NOT NULL,
+                    [bId] INT NOT NULL,
+                    CONSTRAINT [A_pkey] PRIMARY KEY CLUSTERED ([id])
+                );
 
-    let expected = expect![[r#"
-        BEGIN TRY
+                -- CreateTable
+                CREATE TABLE [two].[B] (
+                    [id] INT NOT NULL,
+                    [aId] INT NOT NULL,
+                    CONSTRAINT [B_pkey] PRIMARY KEY CLUSTERED ([id])
+                );
 
-        BEGIN TRAN;
+                -- AddForeignKey
+                ALTER TABLE [one].[A] ADD CONSTRAINT [A_bId_fkey] FOREIGN KEY ([bId]) REFERENCES [two].[B]([id]) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
-        -- CreateSchema
-        EXEC sp_executesql N'CREATE SCHEMA [one];';;
+                -- AddForeignKey
+                ALTER TABLE [two].[B] ADD CONSTRAINT [B_aId_fkey] FOREIGN KEY ([aId]) REFERENCES [one].[A]([id]) ON DELETE NO ACTION ON UPDATE CASCADE;
 
-        -- CreateSchema
-        EXEC sp_executesql N'CREATE SCHEMA [two];';;
+                COMMIT TRAN;
 
-        -- CreateTable
-        CREATE TABLE [one].[A] (
-            [id] INT NOT NULL,
-            [bId] INT NOT NULL,
-            CONSTRAINT [A_pkey] PRIMARY KEY CLUSTERED ([id])
-        );
+                END TRY
+                BEGIN CATCH
 
-        -- CreateTable
-        CREATE TABLE [two].[B] (
-            [id] INT NOT NULL,
-            [aId] INT NOT NULL,
-            CONSTRAINT [B_pkey] PRIMARY KEY CLUSTERED ([id])
-        );
+                IF @@TRANCOUNT > 0
+                BEGIN
+                    ROLLBACK TRAN;
+                END;
+                THROW
 
-        -- AddForeignKey
-        ALTER TABLE [one].[A] ADD CONSTRAINT [A_bId_fkey] FOREIGN KEY ([bId]) REFERENCES [two].[B]([id]) ON DELETE NO ACTION ON UPDATE NO ACTION;
+                END CATCH
+            "#]];
 
-        -- AddForeignKey
-        ALTER TABLE [two].[B] ADD CONSTRAINT [B_aId_fkey] FOREIGN KEY ([aId]) REFERENCES [one].[A]([id]) ON DELETE NO ACTION ON UPDATE CASCADE;
+            migration.expect_contents(expected_script)
+        });
 
-        COMMIT TRAN;
-
-        END TRY
-        BEGIN CATCH
-
-        IF @@TRANCOUNT > 0
-        BEGIN
-            ROLLBACK TRAN;
-        END;
-        THROW
-
-        END CATCH
-    "#]];
-
-    expected.assert_eq(&sql);
-
-    let input = ApplyMigrationsInput {
-        migrations_directory_path: migrations_directory.path().to_str().unwrap().to_owned(),
-    };
-
-    apply_migrations(input, &mut conn, namespaces).await.unwrap();
+    engine
+        .apply_migrations(&dir)
+        .send_sync()
+        .assert_applied_migrations(&["init"]);
 }

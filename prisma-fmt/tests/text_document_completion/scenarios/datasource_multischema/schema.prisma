@@ -1,10 +1,9 @@
 generator client {
-    provider        = "prisma-client-js"
-    previewFeatures = ["multischema"]
+    provider        = "prisma-client"
+    previewFeatures = []
 }
 
 datasource db {
     provider = "postgresql"
-    url      = env("DATABASE_URL")
     <|>
 }

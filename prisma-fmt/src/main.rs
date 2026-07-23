@@ -1,8 +1,8 @@
 mod actions;
 mod format;
-mod lint;
 mod native;
 mod preview;
+mod schema_file_input;
 
 use std::{
     io::{self, Read},
@@ -30,7 +30,7 @@ pub struct FormatOpts {
 /// Prisma Datamodel v2 formatter
 pub enum FmtOpts {
     /// Specifies linter mode
-    Lint,
+    // Lint,
     /// Specifies format mode
     Format(FormatOpts),
     /// Specifies Native Types mode
@@ -46,7 +46,7 @@ pub enum FmtOpts {
 fn main() {
     match FmtOpts::from_args() {
         FmtOpts::DebugPanic => panic!("This is the debugPanic artificial panic"),
-        FmtOpts::Lint => plug(lint::run),
+        // FmtOpts::Lint => plug(lint::run),
         FmtOpts::Format(opts) => format::run(opts),
         FmtOpts::NativeTypes => plug(native::run),
         FmtOpts::ReferentialActions => plug(actions::run),

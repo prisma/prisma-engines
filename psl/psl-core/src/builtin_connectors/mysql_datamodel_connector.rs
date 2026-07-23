@@ -1,23 +1,24 @@
 mod native_types;
 mod validations;
 
+use std::borrow::Cow;
+
 use chrono::FixedOffset;
 pub use native_types::MySqlType;
-use prisma_value::{decode_bytes, PrismaValueResult};
+use parser_database::{ExtensionTypes, ScalarFieldType};
+use prisma_value::{PrismaValueResult, decode_bytes};
 
-use super::completions;
 use crate::{
+    ValidatedSchema,
     datamodel_connector::{
         Connector, ConnectorCapabilities, ConnectorCapability, ConstraintScope, Flavour, JoinStrategySupport,
         NativeTypeConstructor, NativeTypeInstance, RelationMode,
     },
-    diagnostics::{DatamodelError, Diagnostics, Span},
-    parser_database::{walkers, ReferentialAction, ScalarType},
-    PreviewFeature,
+    diagnostics::{Diagnostics, Span},
+    parser_database::{ReferentialAction, ScalarType, walkers},
 };
-use enumflags2::BitFlags;
-use lsp_types::CompletionList;
 use MySqlType::*;
+use enumflags2::BitFlags;
 
 const TINY_BLOB_TYPE_NAME: &str = "TinyBlob";
 const BLOB_TYPE_NAME: &str = "Blob";
@@ -41,22 +42,17 @@ pub const CAPABILITIES: ConnectorCapabilities = enumflags2::make_bitflags!(Conne
     JsonFiltering |
     JsonFilteringJsonPath |
     JsonFilteringAlphanumeric |
+    JsonArrayContains |
     CreateManyWriteableAutoIncId |
     AutoIncrement |
     CompoundIds |
     AnyId |
-    SqlQueryRaw |
     NamedForeignKeys |
     AdvancedJsonNullability |
     IndexColumnLengthPrefixing |
-
-    // why is this here, considering that using multiple schemas in MySQL leads to the
-    // "multiSchema migrations and introspection are not implemented on MySQL yet" error?
-    MultiSchema |
-
     FullTextIndex |
-    FullTextSearch |
-    FullTextSearchWithIndex |
+    NativeFullTextSearch |
+    NativeFullTextSearchWithIndex |
     MultipleFullTextAttributesPerModel |
     ImplicitManyToManyRelation |
     DecimalType |
@@ -76,6 +72,7 @@ const CONSTRAINT_SCOPES: &[ConstraintScope] = &[ConstraintScope::GlobalForeignKe
 
 pub struct MySqlDatamodelConnector;
 
+const DATE_TIME_DEFAULT: MySqlType = MySqlType::DateTime(Some(3));
 const SCALAR_TYPE_DEFAULTS: &[(ScalarType, MySqlType)] = &[
     (ScalarType::Int, MySqlType::Int),
     (ScalarType::BigInt, MySqlType::BigInt),
@@ -83,7 +80,7 @@ const SCALAR_TYPE_DEFAULTS: &[(ScalarType, MySqlType)] = &[
     (ScalarType::Decimal, MySqlType::Decimal(Some((65, 30)))),
     (ScalarType::Boolean, MySqlType::TinyInt),
     (ScalarType::String, MySqlType::VarChar(191)),
-    (ScalarType::DateTime, MySqlType::DateTime(Some(3))),
+    (ScalarType::DateTime, DATE_TIME_DEFAULT),
     (ScalarType::Bytes, MySqlType::LongBlob),
     (ScalarType::Json, MySqlType::Json),
 ];
@@ -109,17 +106,20 @@ impl Connector for MySqlDatamodelConnector {
         64
     }
 
-    fn referential_actions(&self) -> BitFlags<ReferentialAction> {
+    fn foreign_key_referential_actions(&self) -> BitFlags<ReferentialAction> {
         use ReferentialAction::*;
 
         Restrict | Cascade | SetNull | NoAction | SetDefault
     }
 
-    fn scalar_type_for_native_type(&self, native_type: &NativeTypeInstance) -> ScalarType {
+    fn scalar_type_for_native_type(
+        &self,
+        native_type: &NativeTypeInstance,
+        _extension_types: &dyn ExtensionTypes,
+    ) -> Option<ScalarFieldType> {
         let native_type: &MySqlType = native_type.downcast_ref();
 
-        match native_type {
-            //String
+        let res = match native_type {
             VarChar(_) => ScalarType::String,
             Text => ScalarType::String,
             Char(_) => ScalarType::String,
@@ -162,13 +162,20 @@ impl Connector for MySqlDatamodelConnector {
             UnsignedTinyInt => ScalarType::Int,
             UnsignedMediumInt => ScalarType::Int,
             UnsignedBigInt => ScalarType::BigInt,
-        }
+        };
+        Some(ScalarFieldType::BuiltInScalar(res))
     }
 
-    fn default_native_type_for_scalar_type(&self, scalar_type: &ScalarType) -> Option<NativeTypeInstance> {
+    fn default_native_type_for_scalar_type(
+        &self,
+        scalar_type: &ScalarFieldType,
+        _schema: &ValidatedSchema,
+    ) -> Option<NativeTypeInstance> {
+        let scalar_type = scalar_type.as_builtin_scalar()?;
+
         let native_type = SCALAR_TYPE_DEFAULTS
             .iter()
-            .find(|(st, _)| st == scalar_type)
+            .find(|(st, _)| st == &scalar_type)
             .map(|(_, native_type)| native_type)
             .ok_or_else(|| format!("Could not find scalar type {scalar_type:?} in SCALAR_TYPE_DEFAULTS"))
             .unwrap();
@@ -176,22 +183,10 @@ impl Connector for MySqlDatamodelConnector {
         Some(NativeTypeInstance::new::<MySqlType>(*native_type))
     }
 
-    fn native_type_is_default_for_scalar_type(
-        &self,
-        native_type: &NativeTypeInstance,
-        scalar_type: &ScalarType,
-    ) -> bool {
-        let native_type: &MySqlType = native_type.downcast_ref();
-
-        SCALAR_TYPE_DEFAULTS
-            .iter()
-            .any(|(st, nt)| scalar_type == st && native_type == nt)
-    }
-
     fn validate_native_type_arguments(
         &self,
         native_type_instance: &NativeTypeInstance,
-        scalar_type: &ScalarType,
+        scalar_type: Option<ScalarType>,
         span: Span,
         errors: &mut Diagnostics,
     ) {
@@ -217,19 +212,10 @@ impl Connector for MySqlDatamodelConnector {
             VarChar(length) if *length > 65535 => {
                 errors.push_error(error.new_argument_m_out_of_range_error("M can range from 0 to 65,535.", span))
             }
-            Bit(n) if *n > 1 && matches!(scalar_type, ScalarType::Boolean) => {
+            Bit(n) if *n > 1 && matches!(scalar_type, Some(ScalarType::Boolean)) => {
                 errors.push_error(error.new_argument_m_out_of_range_error("only Bit(1) can be used as Boolean.", span))
             }
             _ => (),
-        }
-    }
-
-    fn validate_enum(&self, r#enum: walkers::EnumWalker<'_>, diagnostics: &mut Diagnostics) {
-        if let Some((_, span)) = r#enum.schema() {
-            diagnostics.push_error(DatamodelError::new_static(
-                "MySQL enums do not belong to a schema.",
-                span,
-            ));
         }
     }
 
@@ -264,11 +250,16 @@ impl Connector for MySqlDatamodelConnector {
         span: Span,
         diagnostics: &mut Diagnostics,
     ) -> Option<NativeTypeInstance> {
-        let native_type = MySqlType::from_parts(name, args, span, diagnostics)?;
-        Some(NativeTypeInstance::new::<MySqlType>(native_type))
+        match MySqlType::from_parts(name, args) {
+            Ok(res) => Some(NativeTypeInstance::new(res)),
+            Err(err) => {
+                diagnostics.push_error(err.into_datamodel_error(span));
+                None
+            }
+        }
     }
 
-    fn native_type_to_parts(&self, native_type: &NativeTypeInstance) -> (&'static str, Vec<String>) {
+    fn native_type_to_parts<'t>(&self, native_type: &'t NativeTypeInstance) -> (&'t str, Cow<'t, [String]>) {
         native_type.downcast_ref::<MySqlType>().to_parts()
     }
 
@@ -278,17 +269,6 @@ impl Connector for MySqlDatamodelConnector {
         }
 
         Ok(())
-    }
-
-    fn datasource_completions(&self, config: &crate::Configuration, completion_list: &mut CompletionList) {
-        let ds = match config.datasources.first() {
-            Some(ds) => ds,
-            None => return,
-        };
-
-        if config.preview_features().contains(PreviewFeature::MultiSchema) && !ds.schemas_defined() {
-            completions::schemas_completion(completion_list);
-        }
     }
 
     fn flavour(&self) -> Flavour {
@@ -310,13 +290,16 @@ impl Connector for MySqlDatamodelConnector {
                 Timestamp(_) => super::utils::mysql::parse_timestamp(str),
                 _ => unreachable!(),
             },
-            None => self.parse_json_datetime(str, self.default_native_type_for_scalar_type(&ScalarType::DateTime)),
+            None => self.parse_json_datetime(str, Some(NativeTypeInstance::new::<MySqlType>(DATE_TIME_DEFAULT))),
         }
     }
 
     // On MySQL, bytes are encoded as base64 in the database directly.
     fn parse_json_bytes(&self, str: &str, _nt: Option<NativeTypeInstance>) -> PrismaValueResult<Vec<u8>> {
-        decode_bytes(str)
+        let mut buf = vec![0; str.len()];
+
+        // MySQL base64 encodes bytes with newlines every 76 characters.
+        decode_bytes(sanitize_base64(str, &mut buf))
     }
 
     fn runtime_join_strategy_support(&self) -> JoinStrategySupport {
@@ -327,4 +310,23 @@ impl Connector for MySqlDatamodelConnector {
             false => JoinStrategySupport::No,
         }
     }
+
+    fn supports_shard_keys(&self) -> bool {
+        true
+    }
+}
+
+/// Removes newlines from a base64 string.
+fn sanitize_base64<'a>(mut s: &str, buf: &'a mut [u8]) -> &'a [u8] {
+    let mut pos = 0;
+
+    while !s.is_empty() && pos < buf.len() {
+        let nl = s.find('\n').unwrap_or(s.len());
+        let len = nl.min(buf.len() - pos);
+        buf[pos..pos + len].copy_from_slice(&s.as_bytes()[..len]);
+        pos += len;
+        s = &s[(nl + 1).min(s.len())..];
+    }
+
+    &buf[0..pos]
 }

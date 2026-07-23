@@ -1,16 +1,10 @@
 use crate::introspection::introspection_pair::ViewPair;
-use schema_connector::{warnings as generators, Warnings};
+use schema_connector::{Warnings, warnings as generators};
 
 /// Analyze and generate warnigs from a view.
 pub(super) fn generate_warnings(view: ViewPair<'_>, warnings: &mut Warnings) {
     if view.id().and_then(|id| id.name()).is_some() {
         warnings.reintrospected_id_names_in_view.push(generators::View {
-            view: view.name().to_string(),
-        });
-    }
-
-    if !view.has_usable_identifier() && !view.ignored_in_psl() {
-        warnings.views_without_identifiers.push(generators::View {
             view: view.name().to_string(),
         });
     }

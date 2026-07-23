@@ -1,6 +1,10 @@
-use psl::parser_database::SourceFile;
-use schema_core::schema_connector::DiffTarget;
+use psl::{
+    PreviewFeatures,
+    parser_database::{NoExtensionTypes, SourceFile},
+};
+use schema_core::schema_connector::{ConnectorParams, DiffTarget};
 use sql_migration_tests::test_api::*;
+use sql_schema_connector::SqlSchemaConnector;
 
 mod multi_schema;
 
@@ -58,6 +62,43 @@ fn shared_default_constraints_are_ignored_issue_5423(api: TestApi) {
 }
 
 #[test_connector(tags(Mssql))]
+fn shared_default_constraints_with_multilines_are_ignored_issue_24275(api: TestApi) {
+    let schema = api.schema_name();
+
+    api.raw_cmd(&format!(
+        r#"
+        /* This is a comment */
+        CREATE DEFAULT [{schema}].dogdog AS 'mugi'
+        "#
+    ));
+
+    api.raw_cmd(&format!(
+        r#"
+            CREATE TABLE [{schema}].dogs (
+                id INT IDENTITY,
+                name NVARCHAR(255) NOT NULL,
+                CONSTRAINT [dogs_pkey] PRIMARY KEY CLUSTERED ([id] ASC)
+            )
+        "#
+    ));
+
+    api.raw_cmd(&format!("sp_bindefault '{schema}.dogdog', '{schema}.dogs.name'"));
+
+    let dm = r#"
+        model dogs {
+            id Int @id @default(autoincrement())
+            name String @db.NVarChar(255)
+        }
+    "#;
+
+    api.schema_push_w_datasource(dm)
+        .migration_id(Some("first"))
+        .send()
+        .assert_green()
+        .assert_no_steps();
+}
+
+#[test_connector(tags(Mssql))]
 fn mssql_apply_migrations_error_output(api: TestApi) {
     let dm = "";
     let migrations_directory = api.create_migrations_directory();
@@ -98,8 +139,7 @@ fn mssql_apply_migrations_error_output(api: TestApi) {
             contents.push_str(&migration);
         })
         .into_output()
-        .generated_migration_name
-        .unwrap();
+        .generated_migration_name;
 
     let err = api
         .apply_migrations(&migrations_directory)
@@ -121,7 +161,7 @@ fn mssql_apply_migrations_error_output(api: TestApi) {
         .split_terminator("   0: ")
         .next()
         .unwrap()
-        .trim_end_matches(|c| c == '\n' || c == ' ');
+        .trim_end_matches(['\n', ' ']);
 
     expectation.assert_eq(first_segment)
 }
@@ -153,7 +193,6 @@ fn foreign_key_renaming_to_default_works(api: TestApi) {
     let target_schema = r#"
         datasource db {
             provider = "sqlserver"
-            url = env("TEST_DATABASE_URL")
         }
 
         model Dog {
@@ -170,7 +209,10 @@ fn foreign_key_renaming_to_default_works(api: TestApi) {
 
     let migration = api.connector_diff(
         DiffTarget::Database,
-        DiffTarget::Datamodel(SourceFile::new_static(target_schema)),
+        DiffTarget::Datamodel(
+            vec![("schema.prisma".to_string(), SourceFile::new_static(target_schema))],
+            &NoExtensionTypes,
+        ),
         None,
     );
     let expected = expect![[r#"
@@ -212,7 +254,6 @@ fn prisma_9537(api: TestApi) {
     let schema = r#"
         datasource db {
             provider = "sqlserver"
-            url = env("DBURL")
         }
 
         model User {
@@ -229,7 +270,6 @@ fn prisma_9537(api: TestApi) {
     let schema = r#"
         datasource db {
             provider = "sqlserver"
-            url = env("DBURL")
         }
 
         model User {
@@ -260,7 +300,6 @@ fn bigint_defaults_work(api: TestApi) {
     let schema = r#"
         datasource mypg {
             provider = "sqlserver"
-            url = env("TEST_DATABASE_URL")
         }
 
         model foo {
@@ -272,6 +311,9 @@ fn bigint_defaults_work(api: TestApi) {
         BEGIN TRY
 
         BEGIN TRAN;
+
+        -- CreateSchema
+        IF NOT EXISTS (SELECT * FROM sys.schemas WHERE name = N'dbo') EXEC sp_executesql N'CREATE SCHEMA [dbo];';
 
         -- CreateTable
         CREATE TABLE [dbo].[foo] (
@@ -304,7 +346,6 @@ fn float_columns(api: TestApi) {
     let schema = r#"
         datasource mypg {
             provider = "sqlserver"
-            url = env("TEST_DATABASE_URL")
         }
 
         model foo {
@@ -318,6 +359,9 @@ fn float_columns(api: TestApi) {
         BEGIN TRY
 
         BEGIN TRAN;
+
+        -- CreateSchema
+        IF NOT EXISTS (SELECT * FROM sys.schemas WHERE name = N'dbo') EXEC sp_executesql N'CREATE SCHEMA [dbo];';
 
         -- CreateTable
         CREATE TABLE [dbo].[foo] (
@@ -345,4 +389,75 @@ fn float_columns(api: TestApi) {
 
     api.schema_push(schema).send().assert_green();
     api.schema_push(schema).send().assert_green().assert_no_steps();
+}
+
+#[test_connector(tags(Mssql))]
+fn apply_migrations_with_a_schema_in_url(mut api: TestApi) {
+    api.raw_cmd("CREATE SCHEMA myschema;");
+    api.connector = SqlSchemaConnector::new_mssql(ConnectorParams {
+        connection_string: format!("{};schema=myschema", api.connection_string()),
+        preview_features: PreviewFeatures::empty(),
+        shadow_database_connection_string: None,
+    })
+    .unwrap();
+
+    let schema = r#"
+        datasource mypg {
+            provider = "sqlserver"
+        }
+
+        model foo {
+          id  String @id
+        }
+    "#;
+
+    let migrations_directory = api.create_migrations_directory();
+    let migration = r#"
+        BEGIN TRY
+
+        BEGIN TRAN;
+        CREATE TABLE [myschema].[foo] (
+            [id] NVARCHAR(1000) NOT NULL,
+            CONSTRAINT [foo_pkey] PRIMARY KEY CLUSTERED ([id])
+        );
+        COMMIT TRAN;
+
+        END TRY
+
+        BEGIN CATCH
+
+        IF @@TRANCOUNT > 0
+        BEGIN
+            ROLLBACK TRAN;
+        END;
+        THROW
+
+        END CATCH
+    "#;
+
+    api.create_migration("01init", schema, &migrations_directory)
+        .draft(true)
+        .send_sync()
+        .modify_migration(|contents| {
+            contents.clear();
+            contents.push_str(migration);
+        })
+        .into_output();
+
+    api.apply_migrations(&migrations_directory)
+        .send_sync()
+        .assert_applied_migrations(&["01init"])
+        .into_output();
+
+    let output = api
+        .diagnose_migration_history(&migrations_directory)
+        .opt_in_to_shadow_database(true)
+        .send_sync()
+        .into_output();
+    assert!(output.drift.is_none(), "Found drift: {:?}", output.drift);
+
+    api.schema_push(schema).send().assert_green().assert_no_steps();
+    api.assert_schema().assert_table("foo", |table| {
+        table.assert_column("id", |col| col.assert_type_is_string().assert_is_required())
+    });
 }

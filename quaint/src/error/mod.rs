@@ -15,6 +15,8 @@ use std::time::Duration;
 #[cfg(not(target_arch = "wasm32"))]
 pub use native::NativeErrorKind;
 
+#[cfg(feature = "mssql")]
+pub use crate::connector::mssql::MssqlError;
 #[cfg(feature = "mysql")]
 pub use crate::connector::mysql::MysqlError;
 #[cfg(feature = "postgresql")]
@@ -54,6 +56,23 @@ impl fmt::Display for DatabaseConstraint {
     }
 }
 
+#[derive(Debug)]
+pub struct DatabaseNotReachableLocation {
+    pub host: Option<String>,
+    pub port: Option<u16>,
+}
+
+impl fmt::Display for DatabaseNotReachableLocation {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match (&self.host, &self.port) {
+            (Some(host), Some(port)) => write!(f, "{host}:{port}"),
+            (Some(host), None) => write!(f, "{host}"),
+            (None, Some(port)) => write!(f, "<unknown host>:{port}"),
+            (None, None) => write!(f, "<unknown host>"),
+        }
+    }
+}
+
 #[derive(Debug, Error)]
 /// The error types for database I/O, connection and query parameter
 /// construction.
@@ -70,12 +89,12 @@ pub struct ErrorBuilder {
 }
 
 impl ErrorBuilder {
-    pub(crate) fn set_original_code(&mut self, code: impl Into<String>) -> &mut Self {
+    pub fn set_original_code(&mut self, code: impl Into<String>) -> &mut Self {
         self.original_code = Some(code.into());
         self
     }
 
-    pub(crate) fn set_original_message(&mut self, message: impl Into<String>) -> &mut Self {
+    pub fn set_original_message(&mut self, message: impl Into<String>) -> &mut Self {
         self.original_message = Some(message.into());
         self
     }
@@ -154,6 +173,11 @@ pub enum ErrorKind {
     #[error("Invalid input provided to query: {}", _0)]
     QueryInvalidInput(String),
 
+    #[error("Database not reachable: {database_location}")]
+    DatabaseNotReachable {
+        database_location: DatabaseNotReachableLocation,
+    },
+
     #[error("Database does not exist: {}", db_name)]
     DatabaseDoesNotExist { db_name: Name },
 
@@ -162,6 +186,12 @@ pub enum ErrorKind {
 
     #[error("Database already exists {}", db_name)]
     DatabaseAlreadyExists { db_name: Name },
+
+    #[error("Error opening a TLS connection: {}", message)]
+    TlsConnectionError { message: String },
+
+    #[error("Server has closed the connection.")]
+    ConnectionClosed,
 
     #[error("Authentication failed for user {}", user)]
     AuthenticationFailed { user: Name },
@@ -241,6 +271,12 @@ pub enum ErrorKind {
 
     #[error("External error id#{}", _0)]
     ExternalError(i32),
+
+    #[error("Opaque parameter '{0}' used as raw value in query.")]
+    OpaqueAsRawValue(String),
+
+    #[error("Attempted to execute a query that contains an opaque parameter '{0}'.")]
+    RanQueryWithOpaqueParam(String),
 }
 
 #[cfg(not(target_arch = "wasm32"))]
@@ -251,7 +287,6 @@ impl From<std::io::Error> for Error {
 }
 
 impl ErrorKind {
-    #[cfg(feature = "mysql-native")]
     pub(crate) fn value_out_of_range(msg: impl Into<String>) -> Self {
         Self::ValueOutOfRange { message: msg.into() }
     }

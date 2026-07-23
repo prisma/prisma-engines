@@ -12,10 +12,20 @@ impl<'a> EnumWalker<'a> {
     }
 
     /// The namespace the enum belongs to, if defined.
+    pub fn explicit_namespace(self) -> Option<&'a str> {
+        self.schema
+            .namespaces
+            .get_index(self.get().namespace_id.0 as usize)
+            .map(|s| s.as_str())
+            .filter(|s| Some(*s) != self.schema.runtime_namespace.as_deref())
+    }
+
+    /// The namespace the enum belongs to, if defined.
+    /// If not, falls back to the default runtime namespace, if one is set.
     pub fn namespace(self) -> Option<&'a str> {
         self.schema
             .namespaces
-            .get(self.get().namespace_id.0 as usize)
+            .get_index(self.get().namespace_id.0 as usize)
             .map(|s| s.as_str())
     }
 

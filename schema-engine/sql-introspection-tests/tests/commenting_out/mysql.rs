@@ -1,5 +1,5 @@
 use barrel::types;
-use sql_introspection_tests::{test_api::*, TestResult};
+use sql_introspection_tests::{TestResult, test_api::*};
 
 #[test_connector(tags(Mysql))]
 async fn a_table_without_required_uniques(api: &mut TestApi) -> TestResult {
@@ -83,12 +83,11 @@ async fn remapping_field_names_to_empty_mysql(api: &mut TestApi) -> TestResult {
 
     let dm = expect![[r#"
         generator client {
-          provider = "prisma-client-js"
+          provider = "prisma-client"
         }
 
         datasource db {
           provider = "mysql"
-          url      = "env(TEST_DATABASE_URL)"
         }
 
         model User {
@@ -129,12 +128,11 @@ PARTITIONS 2; "#,
 
     let expected = expect![[r#"
         generator client {
-          provider = "prisma-client-js"
+          provider = "prisma-client"
         }
 
         datasource db {
           provider = "mysql"
-          url      = "env(TEST_DATABASE_URL)"
         }
 
         /// This table is a partition table and requires additional setup for migrations. Visit https://pris.ly/d/partition-tables for more info.

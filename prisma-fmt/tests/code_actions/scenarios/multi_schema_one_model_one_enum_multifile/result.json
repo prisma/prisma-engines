@@ -1,0 +1,80 @@
+[
+  {
+    "title": "Add `@@schema` attribute",
+    "kind": "quickfix",
+    "diagnostics": [
+      {
+        "range": {
+          "start": {
+            "line": 0,
+            "character": 0
+          },
+          "end": {
+            "line": 2,
+            "character": 1
+          }
+        },
+        "severity": 1,
+        "message": "Error validating model \"User\": This model is missing an `@@schema` attribute."
+      }
+    ],
+    "edit": {
+      "changes": {
+        "file:///path/to/_target.prisma": [
+          {
+            "range": {
+              "start": {
+                "line": 2,
+                "character": 0
+              },
+              "end": {
+                "line": 2,
+                "character": 1
+              }
+            },
+            "newText": "\n    @@schema()\n}"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "title": "Add `@@schema` attribute",
+    "kind": "quickfix",
+    "diagnostics": [
+      {
+        "range": {
+          "start": {
+            "line": 4,
+            "character": 0
+          },
+          "end": {
+            "line": 6,
+            "character": 1
+          }
+        },
+        "severity": 1,
+        "message": "This enum is missing an `@@schema` attribute."
+      }
+    ],
+    "edit": {
+      "changes": {
+        "file:///path/to/_target.prisma": [
+          {
+            "range": {
+              "start": {
+                "line": 6,
+                "character": 0
+              },
+              "end": {
+                "line": 6,
+                "character": 1
+              }
+            },
+            "newText": "\n  @@schema()\n}"
+          }
+        ]
+      }
+    }
+  }
+]

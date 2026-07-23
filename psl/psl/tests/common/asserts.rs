@@ -1,21 +1,20 @@
 use std::fmt::Debug;
 
+use base64::prelude::*;
 use either::Either::{Left, Right};
+use psl::Diagnostics;
 use psl::datamodel_connector::Connector;
 use psl::diagnostics::DatamodelWarning;
-use psl::parser_database::{walkers, IndexAlgorithm, OperatorClass, ReferentialAction, ScalarType, SortOrder};
+use psl::parser_database::{
+    IndexAlgorithm, ModelId, OperatorClass, ReferentialAction, ScalarFieldType, ScalarType, SortOrder, WhereClause,
+    WhereCondition, walkers,
+};
 use psl::schema_ast::ast::WithDocumentation;
 use psl::schema_ast::ast::{self, FieldArity};
-use psl::{Diagnostics, StringFromEnvVar};
 
 pub(crate) trait DatamodelAssert<'a> {
     fn assert_has_model(&'a self, name: &str) -> walkers::ModelWalker<'a>;
     fn assert_has_type(&'a self, name: &str) -> walkers::CompositeTypeWalker<'a>;
-}
-
-pub(crate) trait DatasourceAsserts {
-    fn assert_name(&self, name: &str) -> &Self;
-    fn assert_url(&self, url: StringFromEnvVar) -> &Self;
 }
 
 pub(crate) trait WarningAsserts {
@@ -41,6 +40,7 @@ pub(crate) trait TypeAssert<'a> {
 }
 
 pub(crate) trait ScalarFieldAssert {
+    fn assert_scalar_field_type(&self, t: ScalarFieldType) -> &Self;
     fn assert_scalar_type(&self, t: ScalarType) -> &Self;
     fn assert_is_single_field_id(&self) -> walkers::PrimaryKeyWalker<'_>;
     fn assert_is_single_field_unique(&self) -> walkers::IndexWalker<'_>;
@@ -67,7 +67,7 @@ pub(crate) trait CompositeFieldAssert {
 
 pub(crate) trait RelationFieldAssert {
     fn assert_ignored(&self, ignored: bool) -> &Self;
-    fn assert_relation_to(&self, model_id: ast::ModelId) -> &Self;
+    fn assert_relation_to(&self, model_id: ModelId) -> &Self;
     fn assert_relation_delete_strategy(&self, action: ReferentialAction) -> &Self;
     fn assert_relation_update_strategy(&self, action: ReferentialAction) -> &Self;
 }
@@ -82,8 +82,11 @@ pub(crate) trait DefaultValueAssert {
     fn assert_constant(&self, val: &str) -> &Self;
     fn assert_bytes(&self, val: &[u8]) -> &Self;
     fn assert_now(&self) -> &Self;
+    fn assert_ulid(&self) -> &Self;
     fn assert_cuid(&self) -> &Self;
+    fn assert_cuid_version(&self, version: u8) -> &Self;
     fn assert_uuid(&self) -> &Self;
+    fn assert_uuid_version(&self, version: u8) -> &Self;
     fn assert_dbgenerated(&self, val: &str) -> &Self;
     fn assert_mapped_name(&self, val: &str) -> &Self;
 }
@@ -94,6 +97,9 @@ pub(crate) trait IndexAssert {
     fn assert_mapped_name(&self, name: &str) -> &Self;
     fn assert_clustered(&self, clustered: bool) -> &Self;
     fn assert_type(&self, r#type: IndexAlgorithm) -> &Self;
+    fn assert_raw_where_clause(&self, predicate: &str) -> &Self;
+    fn assert_where_object(&self, expected: &[(&str, WhereCondition)]) -> &Self;
+    fn assert_no_where_clause(&self) -> &Self;
 }
 
 pub(crate) trait IndexFieldAssert {
@@ -101,20 +107,6 @@ pub(crate) trait IndexFieldAssert {
     fn assert_length(&self, length: u32) -> &Self;
     fn assert_ops(&self, ops: OperatorClass) -> &Self;
     fn assert_raw_ops(&self, ops: &str) -> &Self;
-}
-
-impl DatasourceAsserts for psl::Datasource {
-    #[track_caller]
-    fn assert_name(&self, name: &str) -> &Self {
-        assert_eq!(&self.name, name);
-        self
-    }
-
-    #[track_caller]
-    fn assert_url(&self, url: StringFromEnvVar) -> &Self {
-        assert_eq!(self.url, url);
-        self
-    }
 }
 
 impl WarningAsserts for Vec<DatamodelWarning> {
@@ -149,9 +141,9 @@ impl<'a> DatamodelAssert<'a> for psl::ValidatedSchema {
     }
 }
 
-impl<'a> RelationFieldAssert for walkers::RelationFieldWalker<'a> {
+impl RelationFieldAssert for walkers::RelationFieldWalker<'_> {
     #[track_caller]
-    fn assert_relation_to(&self, model_id: ast::ModelId) -> &Self {
+    fn assert_relation_to(&self, model_id: ModelId) -> &Self {
         assert!(self.references_model(model_id));
         self
     }
@@ -261,7 +253,7 @@ impl<'a> ModelAssert<'a> for walkers::ModelWalker<'a> {
     }
 }
 
-impl<'a> ScalarFieldAssert for walkers::ScalarFieldWalker<'a> {
+impl ScalarFieldAssert for walkers::ScalarFieldWalker<'_> {
     #[track_caller]
     fn assert_ignored(&self, ignored: bool) -> &Self {
         assert_eq!(self.is_ignored(), ignored);
@@ -275,9 +267,14 @@ impl<'a> ScalarFieldAssert for walkers::ScalarFieldWalker<'a> {
     }
 
     #[track_caller]
-    fn assert_scalar_type(&self, t: ScalarType) -> &Self {
-        assert_eq!(self.scalar_type(), Some(t));
+    fn assert_scalar_field_type(&self, t: ScalarFieldType) -> &Self {
+        assert_eq!(self.scalar_field_type(), t);
         self
+    }
+
+    #[track_caller]
+    fn assert_scalar_type(&self, t: ScalarType) -> &Self {
+        self.assert_scalar_field_type(ScalarFieldType::BuiltInScalar(t))
     }
 
     #[track_caller]
@@ -351,7 +348,7 @@ impl<'a> ScalarFieldAssert for walkers::ScalarFieldWalker<'a> {
 
         let nt = match connector.parse_native_type(r#type, params, span, &mut diagnostics) {
             Some(nt) => nt,
-            None => panic!("Invalid native type {}", r#type),
+            None => panic!("Invalid native type {type}"),
         };
 
         diagnostics.to_result().unwrap();
@@ -372,7 +369,7 @@ impl<'a> ScalarFieldAssert for walkers::ScalarFieldWalker<'a> {
     }
 }
 
-impl<'a> DefaultValueAssert for walkers::DefaultValueWalker<'a> {
+impl DefaultValueAssert for walkers::DefaultValueWalker<'_> {
     #[track_caller]
     fn assert_autoincrement(&self) -> &Self {
         self.value().assert_autoincrement();
@@ -428,14 +425,32 @@ impl<'a> DefaultValueAssert for walkers::DefaultValueWalker<'a> {
     }
 
     #[track_caller]
+    fn assert_ulid(&self) -> &Self {
+        self.value().assert_ulid();
+        self
+    }
+
+    #[track_caller]
     fn assert_cuid(&self) -> &Self {
         self.value().assert_cuid();
         self
     }
 
     #[track_caller]
+    fn assert_cuid_version(&self, version: u8) -> &Self {
+        self.value().assert_cuid_version(version);
+        self
+    }
+
+    #[track_caller]
     fn assert_uuid(&self) -> &Self {
         self.value().assert_uuid();
+        self
+    }
+
+    #[track_caller]
+    fn assert_uuid_version(&self, version: u8) -> &Self {
+        self.value().assert_uuid_version(version);
         self
     }
 
@@ -452,7 +467,7 @@ impl<'a> DefaultValueAssert for walkers::DefaultValueWalker<'a> {
     }
 }
 
-impl<'a> IndexAssert for walkers::IndexWalker<'a> {
+impl IndexAssert for walkers::IndexWalker<'_> {
     #[track_caller]
     fn assert_field(&self, name: &str) -> walkers::ScalarFieldAttributeWalker<'_> {
         self.scalar_field_attributes()
@@ -488,9 +503,45 @@ impl<'a> IndexAssert for walkers::IndexWalker<'a> {
         assert_eq!(Some(r#type), self.algorithm());
         self
     }
+
+    #[track_caller]
+    fn assert_raw_where_clause(&self, predicate: &str) -> &Self {
+        assert_eq!(self.where_clause(), Some(predicate));
+        self
+    }
+
+    #[track_caller]
+    fn assert_where_object(&self, expected: &[(&str, WhereCondition)]) -> &Self {
+        match self.where_clause_attribute() {
+            Some(WhereClause::Object(conditions)) => {
+                assert_eq!(
+                    conditions.len(),
+                    expected.len(),
+                    "Wrong number of conditions in where clause"
+                );
+                let model = self.model();
+                for (cond, (exp_name, exp_condition)) in conditions.iter().zip(expected) {
+                    let db_name = model.walk(cond.scalar_field_id).database_name();
+                    assert_eq!(db_name, *exp_name, "Field name mismatch");
+                    assert_eq!(
+                        &cond.condition, exp_condition,
+                        "Condition mismatch for field '{exp_name}'"
+                    );
+                }
+            }
+            other => panic!("Expected Object where clause, got: {other:?}"),
+        }
+        self
+    }
+
+    #[track_caller]
+    fn assert_no_where_clause(&self) -> &Self {
+        assert!(self.where_clause_attribute().is_none());
+        self
+    }
 }
 
-impl<'a> IndexFieldAssert for walkers::ScalarFieldAttributeWalker<'a> {
+impl IndexFieldAssert for walkers::ScalarFieldAttributeWalker<'_> {
     #[track_caller]
     fn assert_descending(&self) -> &Self {
         assert_eq!(Some(SortOrder::Desc), self.sort_order());
@@ -525,7 +576,7 @@ impl<'a> TypeAssert<'a> for walkers::CompositeTypeWalker<'a> {
     }
 }
 
-impl<'a> CompositeFieldAssert for walkers::CompositeTypeFieldWalker<'a> {
+impl CompositeFieldAssert for walkers::CompositeTypeFieldWalker<'_> {
     #[track_caller]
     fn assert_scalar_type(&self, t: ScalarType) -> &Self {
         assert_eq!(Some(t), self.scalar_type());
@@ -606,7 +657,7 @@ impl DefaultValueAssert for ast::Expression {
     #[track_caller]
     fn assert_bytes(&self, expected: &[u8]) -> &Self {
         match self {
-            ast::Expression::StringValue(actual, _) => assert_eq!(base64::decode(actual).unwrap(), expected),
+            ast::Expression::StringValue(actual, _) => assert_eq!(BASE64_STANDARD.decode(actual).unwrap(), expected),
             _ => panic!("Not a bytes value"),
         }
 
@@ -621,19 +672,56 @@ impl DefaultValueAssert for ast::Expression {
     }
 
     #[track_caller]
+    fn assert_ulid(&self) -> &Self {
+        assert!(matches!(self, ast::Expression::Function(name, _, _) if name == "ulid"));
+
+        self
+    }
+
+    #[track_caller]
     fn assert_cuid(&self) -> &Self {
-        assert!(
-            matches!(self, ast::Expression::Function(name, args, _) if name == "cuid" && args.arguments.is_empty())
-        );
+        assert!(matches!(self, ast::Expression::Function(name, _, _) if name == "cuid"));
+
+        self
+    }
+
+    #[track_caller]
+    fn assert_cuid_version(&self, version: u8) -> &Self {
+        self.assert_cuid();
+
+        if let ast::Expression::Function(_, args, _) = self {
+            if let ast::Expression::NumericValue(actual, _) = &args.arguments[0].value {
+                assert_eq!(actual, &format!("{version}"));
+            } else {
+                panic!("Expected a numeric value for the `cuid()` version.");
+            }
+        } else {
+            panic!("Expected `cuid()` to be a function, got {}", &self);
+        }
 
         self
     }
 
     #[track_caller]
     fn assert_uuid(&self) -> &Self {
-        assert!(
-            matches!(self, ast::Expression::Function(name, args, _) if name == "uuid" && args.arguments.is_empty())
-        );
+        assert!(matches!(self, ast::Expression::Function(name, _, _) if name == "uuid"));
+
+        self
+    }
+
+    #[track_caller]
+    fn assert_uuid_version(&self, version: u8) -> &Self {
+        self.assert_uuid();
+
+        if let ast::Expression::Function(_, args, _) = self {
+            if let ast::Expression::NumericValue(actual, _) = &args.arguments[0].value {
+                assert_eq!(actual, &version.to_string());
+            } else {
+                panic!("Expected a numeric value for the `uuid()` version.");
+            }
+        } else {
+            panic!("Expected `cuid()` to be a function, got {}", &self);
+        }
 
         self
     }
@@ -657,7 +745,7 @@ impl DefaultValueAssert for ast::Expression {
     }
 }
 
-impl<'a> IndexAssert for walkers::PrimaryKeyWalker<'a> {
+impl IndexAssert for walkers::PrimaryKeyWalker<'_> {
     #[track_caller]
     fn assert_field(&self, name: &str) -> walkers::ScalarFieldAttributeWalker<'_> {
         self.scalar_field_attributes()
@@ -686,5 +774,21 @@ impl<'a> IndexAssert for walkers::PrimaryKeyWalker<'a> {
     #[track_caller]
     fn assert_type(&self, _type: IndexAlgorithm) -> &Self {
         unreachable!("Primary key cannot define the index type.");
+    }
+
+    #[track_caller]
+    fn assert_raw_where_clause(&self, _predicate: &str) -> &Self {
+        unreachable!("Primary key cannot define a where clause.");
+    }
+
+    #[track_caller]
+    fn assert_where_object(&self, _expected: &[(&str, WhereCondition)]) -> &Self {
+        unreachable!("Primary key cannot define a where clause.");
+    }
+
+    #[track_caller]
+    fn assert_no_where_clause(&self) -> &Self {
+        // Primary keys never have a where clause
+        self
     }
 }

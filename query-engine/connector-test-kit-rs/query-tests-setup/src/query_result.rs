@@ -1,3 +1,5 @@
+use std::fmt::Display;
+
 use query_core::constants::custom_types;
 use request_handlers::{GQLError, PrismaResponse};
 use serde::{Deserialize, Serialize};
@@ -65,6 +67,7 @@ impl QueryResult {
     }
 
     /// Asserts absence of errors in the result. Panics with assertion error.
+    #[track_caller]
     pub fn assert_success(&self) {
         if self.failed() {
             panic!("{}", self.to_string());
@@ -76,13 +79,11 @@ impl QueryResult {
     /// If more than one error is contained, asserts that at least one error contains the message _and_ code.
     ///
     /// Panics with assertion error on no match.
+    #[track_caller]
     pub fn assert_failure(&self, err_code: impl Into<Option<usize>>, msg_contains: Option<String>) {
         let err_code: Option<usize> = err_code.into();
         if !self.failed() {
-            panic!(
-                "Expected result to return an error, but found success: {}",
-                self.to_string()
-            );
+            panic!("Expected result to return an error, but found success: {self}");
         }
 
         // 0 is the "do nothing marker"
@@ -107,13 +108,13 @@ impl QueryResult {
                     "Expected error with code `{}` and message `{}`, got: `{}`",
                     err_code.unwrap_or_else(|| "None".to_owned()),
                     msg,
-                    self.to_string()
+                    self
                 );
             } else {
                 panic!(
                     "Expected error with code `{}`, got: `{}`",
                     err_code.unwrap_or_else(|| "None".to_owned()),
-                    self.to_string()
+                    self
                 );
             }
         }
@@ -139,6 +140,14 @@ impl QueryResult {
         serde_json::to_string_pretty(&self.response).unwrap()
     }
 
+    pub fn into_data(self) -> Vec<serde_json::Value> {
+        match self.response {
+            Response::Single(res) => vec![res.data],
+            Response::Multi(res) => res.batch_result.into_iter().map(|res| res.data).collect(),
+            Response::Error(_) => vec![],
+        }
+    }
+
     /// Transform a JSON protocol response to a GraphQL protocol response, by removing the type
     /// tags.
     pub(crate) fn detag(&mut self) {
@@ -154,9 +163,9 @@ impl QueryResult {
     }
 }
 
-impl ToString for QueryResult {
-    fn to_string(&self) -> String {
-        serde_json::to_value(&self.response).unwrap().to_string()
+impl Display for QueryResult {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str(&serde_json::to_value(&self.response).unwrap().to_string())
     }
 }
 
@@ -267,12 +276,12 @@ mod tests {
       {
          "errors":[
             {
-               "error":"An operation failed because it depends on one or more records that were required but not found. Expected a record, found none.",
+               "error":"An operation failed because it depends on one or more records that were required but not found. No record was found for a query.",
                "user_facing_error":{
                   "is_panic":false,
-                  "message":"An operation failed because it depends on one or more records that were required but not found. Expected a record, found none.",
+                  "message":"An operation failed because it depends on one or more records that were required but not found. No record was found for a query.",
                   "meta":{
-                     "cause":"Expected a record, found none."
+                     "cause":"No record was found for a query."
                   },
                   "error_code":"P2025"
                }
@@ -294,8 +303,8 @@ mod tests {
                     SimpleGqlResponse {
                         data: serde_json::Value::Null,
                         errors: vec![GQLError::from_user_facing_error(user_facing_errors::KnownError {
-                            message: "An operation failed because it depends on one or more records that were required but not found. Expected a record, found none.".to_string(),
-                            meta: json!({"cause": "Expected a record, found none."}),
+                            message: "An operation failed because it depends on one or more records that were required but not found. No record was found for a query.".to_string(),
+                            meta: json!({"cause": "No record was found for a query."}),
                             error_code: std::borrow::Cow::from("P2025"),
                         }.into())],
                         extensions: None,

@@ -1,0 +1,19 @@
+generator js {
+    provider = "prisma-client"
+}
+
+datasource db {
+    provider = "postgres"
+}
+
+model ModelNameA {
+    id Int @id
+
+    poly Poly
+}
+
+/// This is doc for B
+enum Po<|>ly {
+Am
+Nesia
+}

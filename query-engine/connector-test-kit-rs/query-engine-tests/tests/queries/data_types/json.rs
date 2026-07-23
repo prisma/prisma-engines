@@ -2,7 +2,7 @@ use query_engine_tests::*;
 
 #[test_suite(schema(json_opt), capabilities(Json), exclude(MySql(5.6)))]
 mod json {
-    use query_engine_tests::{run_query, EngineProtocol, Runner};
+    use query_engine_tests::{EngineProtocol, Runner, run_query};
 
     #[connector_test]
     async fn read_one(runner: Runner) -> TestResult<()> {
@@ -54,8 +54,8 @@ mod json {
                 let res = run_query!(runner, r#"{ findManyTestModel { json } }"#);
 
                 insta::assert_snapshot!(
-                  res,
-                  @r###"{"data":{"findManyTestModel":[{"json":"{}"},{"json":"{\"a\":\"b\"}"},{"json":"1"},{"json":"\"hello\""},{"json":"[1,\"a\",{\"b\":true}]"}]}}"###
+                  res.replace(" ", ""), // ignore whitespace in the JSON string
+                  @r###"{"data":{"findManyTestModel":[{"json":"{}"},{"json":"{\"a\":\"b\"}"},{"json":"1"},{"json":"1.5"},{"json":"\"hello\""},{"json":"[1,\"a\",{\"b\":true}]"},{"json":"true"}]}}"###
                 );
             }
             query_engine_tests::EngineProtocol::Json => {
@@ -74,8 +74,131 @@ mod json {
                     .await?;
 
                 insta::assert_snapshot!(
+                  res.to_string().replace(" ", ""), // ignore whitespace in the JSON string
+                  @r###"{"data":{"findManyTestModel":[{"json":{"$type":"Json","value":"{}"}},{"json":{"$type":"Json","value":"{\"a\":\"b\"}"}},{"json":{"$type":"Json","value":"1"}},{"json":{"$type":"Json","value":"1.5"}},{"json":{"$type":"Json","value":"\"hello\""}},{"json":{"$type":"Json","value":"[1,\"a\",{\"b\":true}]"}},{"json":{"$type":"Json","value":"true"}}]}}"###
+                );
+            }
+        }
+
+        Ok(())
+    }
+
+    #[connector_test]
+    async fn read_plain_float(runner: Runner) -> TestResult<()> {
+        create_test_data(&runner).await?;
+
+        match runner.protocol() {
+            query_engine_tests::EngineProtocol::Graphql => {
+                let res = run_query!(runner, r#"{ findUniqueTestModel(where: { id: 4 }) { json } }"#);
+
+                insta::assert_snapshot!(
+                  res,
+                  @r###"{"data":{"findUniqueTestModel":{"json":"1.5"}}}"###
+                );
+            }
+            query_engine_tests::EngineProtocol::Json => {
+                let res = runner
+                    .query_json(
+                        r#"{
+                    "modelName": "TestModel",
+                    "action": "findUnique",
+                    "query": {
+                        "arguments": {
+                            "where": { "id": 4 }
+                        },
+                        "selection": {
+                            "json": true
+                        }
+                    }
+                }"#,
+                    )
+                    .await?;
+
+                insta::assert_snapshot!(
                   res.to_string(),
-                  @r###"{"data":{"findManyTestModel":[{"json":{"$type":"Json","value":"{}"}},{"json":{"$type":"Json","value":"{\"a\":\"b\"}"}},{"json":{"$type":"Json","value":"1"}},{"json":{"$type":"Json","value":"\"hello\""}},{"json":{"$type":"Json","value":"[1,\"a\",{\"b\":true}]"}}]}}"###
+                  @r###"{"data":{"findUniqueTestModel":{"json":{"$type":"Json","value":"1.5"}}}}"###
+                );
+            }
+        }
+
+        Ok(())
+    }
+
+    #[connector_test]
+    async fn read_plain_int(runner: Runner) -> TestResult<()> {
+        create_test_data(&runner).await?;
+
+        match runner.protocol() {
+            query_engine_tests::EngineProtocol::Graphql => {
+                let res = run_query!(runner, r#"{ findUniqueTestModel(where: { id: 3 }) { json } }"#);
+
+                insta::assert_snapshot!(
+                  res,
+                  @r###"{"data":{"findUniqueTestModel":{"json":"1"}}}"###
+                );
+            }
+            query_engine_tests::EngineProtocol::Json => {
+                let res = runner
+                    .query_json(
+                        r#"{
+                    "modelName": "TestModel",
+                    "action": "findUnique",
+                    "query": {
+                        "arguments": {
+                            "where": { "id": 3 }
+                        },
+                        "selection": {
+                            "json": true
+                        }
+                    }
+                }"#,
+                    )
+                    .await?;
+
+                insta::assert_snapshot!(
+                  res.to_string(),
+                  @r###"{"data":{"findUniqueTestModel":{"json":{"$type":"Json","value":"1"}}}}"###
+                );
+            }
+        }
+
+        Ok(())
+    }
+
+    #[connector_test]
+    async fn read_plain_bool(runner: Runner) -> TestResult<()> {
+        create_test_data(&runner).await?;
+
+        match runner.protocol() {
+            query_engine_tests::EngineProtocol::Graphql => {
+                let res = run_query!(runner, r#"{ findUniqueTestModel(where: { id: 7 }) { json } }"#);
+
+                insta::assert_snapshot!(
+                  res,
+                  @r###"{"data":{"findUniqueTestModel":{"json":"true"}}}"###
+                );
+            }
+            query_engine_tests::EngineProtocol::Json => {
+                let res = runner
+                    .query_json(
+                        r#"{
+                    "modelName": "TestModel",
+                    "action": "findUnique",
+                    "query": {
+                        "arguments": {
+                            "where": { "id": 7 }
+                        },
+                        "selection": {
+                            "json": true
+                        }
+                    }
+                }"#,
+                    )
+                    .await?;
+
+                insta::assert_snapshot!(
+                  res.to_string(),
+                  @r###"{"data":{"findUniqueTestModel":{"json":{"$type":"Json","value":"true"}}}}"###
                 );
             }
         }
@@ -216,19 +339,68 @@ mod json {
         Ok(())
     }
 
+    fn schema_json_list() -> String {
+        let schema = indoc! {
+            r#"model TestModel {
+                #id(id, Int, @id)
+
+                child Child?
+            }
+
+            model Child {
+                #id(id, Int, @id)
+                json_list Json[]
+
+                testId Int? @unique
+                test   TestModel? @relation(fields: [testId], references: [id])
+            }"#
+        };
+
+        schema.to_owned()
+    }
+
+    #[connector_test(
+        schema(schema_json_list),
+        capabilities(Json, ScalarLists),
+        exclude(Mysql(5.6), CockroachDb)
+    )]
+    async fn json_list(runner: Runner) -> TestResult<()> {
+        create_row(
+            &runner,
+            r#"{ id: 1, child: { create: { id: 1, json_list: ["1", "2"] } } }"#,
+        )
+        .await?;
+        create_row(&runner, r#"{ id: 2, child: { create: { id: 2, json_list: ["{}"] } } }"#).await?;
+        create_row(
+            &runner,
+            r#"{ id: 3, child: { create: { id: 3, json_list: ["\"hello\"", "\"world\""] } } }"#,
+        )
+        .await?;
+        create_row(&runner, r#"{ id: 4, child: { create: { id: 4 } } }"#).await?;
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"{ findManyTestModel { child { json_list } } }"#),
+          @r###"{"data":{"findManyTestModel":[{"child":{"json_list":["1","2"]}},{"child":{"json_list":["{}"]}},{"child":{"json_list":["\"hello\"","\"world\""]}},{"child":{"json_list":[]}}]}}"###
+        );
+
+        Ok(())
+    }
+
     async fn create_test_data(runner: &Runner) -> TestResult<()> {
         create_row(runner, r#"{ id: 1, json: "{}" }"#).await?;
         create_row(runner, r#"{ id: 2, json: "{\"a\":\"b\"}" }"#).await?;
         create_row(runner, r#"{ id: 3, json: "1" }"#).await?;
-        create_row(runner, r#"{ id: 4, json: "\"hello\"" }"#).await?;
-        create_row(runner, r#"{ id: 5, json: "[1, \"a\", {\"b\": true}]" }"#).await?;
+        create_row(runner, r#"{ id: 4, json: "1.5" }"#).await?;
+        create_row(runner, r#"{ id: 5, json: "\"hello\"" }"#).await?;
+        create_row(runner, r#"{ id: 6, json: "[1, \"a\", {\"b\": true}]" }"#).await?;
+        create_row(runner, r#"{ id: 7, json: "true" }"#).await?;
 
         Ok(())
     }
 
     async fn create_row(runner: &Runner, data: &str) -> TestResult<()> {
         runner
-            .query(format!("mutation {{ createOneTestModel(data: {}) {{ id }} }}", data))
+            .query(format!("mutation {{ createOneTestModel(data: {data}) {{ id }} }}"))
             .await?
             .assert_success();
         Ok(())

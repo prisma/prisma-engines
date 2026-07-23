@@ -1,11 +1,11 @@
-use crate::{ast, coerce, types::SortOrder, DatamodelError};
+use crate::{DatamodelError, ast, coerce, types::SortOrder};
 
 pub(crate) enum OperatorClass<'a> {
     Constant(crate::OperatorClass),
     Raw(&'a str),
 }
 
-impl<'a> From<crate::OperatorClass> for OperatorClass<'a> {
+impl From<crate::OperatorClass> for OperatorClass<'_> {
     fn from(inner: crate::OperatorClass) -> Self {
         Self::Constant(inner)
     }

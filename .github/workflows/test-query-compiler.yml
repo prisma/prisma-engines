@@ -1,0 +1,78 @@
+name: 'QC'
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    paths-ignore:
+      - '.github/**'
+      - '!.github/workflows/test-query-compiler.yml'
+      - '!.github/workflows/test-query-compiler-template.yml'
+      - '!.github/workflows/include/rust-wasm-setup/action.yml'
+      - '*.md'
+      - 'LICENSE'
+      - 'CODEOWNERS'
+      - 'renovate.json'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  qe-tests-with-qc:
+    strategy:
+      fail-fast: false
+
+      matrix:
+        adapter:
+          - name: pg
+            setup_task: dev-pg-qc
+            relation_load_strategy: '["join", "query"]'
+
+          - name: libsql
+            setup_task: dev-libsql-qc
+            relation_load_strategy: '["query"]'
+
+          - name: sqlite
+            setup_task: dev-better-sqlite3-qc
+            relation_load_strategy: '["query"]'
+
+          - name: planetscale
+            setup_task: dev-planetscale-qc
+            relation_load_strategy: '["query"]'
+
+          - name: d1
+            setup_task: dev-d1-qc
+            relation_load_strategy: '["query"]'
+            test_threads: 1
+
+          - name: mssql
+            setup_task: dev-mssql-qc
+            relation_load_strategy: '["query"]'
+
+          - name: neon
+            setup_task: dev-neon-qc
+            relation_load_strategy: '["join", "query"]'
+
+          - name: mariadb
+            setup_task: dev-mariadb-qc
+            relation_load_strategy: '["query"]'
+
+          - name: mariadb-mysql
+            setup_task: dev-mariadb-mysql-qc
+            relation_load_strategy: '["join", "query"]'
+
+          - name: pg-cockroachdb
+            setup_task: dev-pg-cockroachdb-qc
+            ignored_tests_list: query-compiler/query-engine-tests-todo/pg-cockroachdb/skip
+            relation_load_strategy: '["join", "query"]'
+
+    name: ${{ matrix.adapter.name }}
+
+    uses: ./.github/workflows/test-query-compiler-template.yml
+
+    with:
+      setup_task: ${{ matrix.adapter.setup_task }}
+      ignored_tests_list: ${{ matrix.adapter.ignored_tests_list }}
+      relation_load_strategy: ${{ matrix.adapter.relation_load_strategy }}
+      test_threads: ${{ matrix.adapter.test_threads || 4 }}

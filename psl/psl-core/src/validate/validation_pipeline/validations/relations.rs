@@ -5,17 +5,17 @@ pub(super) mod one_to_one;
 mod visited_relation;
 
 use super::constraint_namespace::ConstraintName;
-use crate::datamodel_connector::{walker_ext_traits::*, Connector, ConnectorCapability, RelationMode};
+use crate::datamodel_connector::{Connector, ConnectorCapability, RelationMode, walker_ext_traits::*};
 use crate::{diagnostics::DatamodelError, validate::validation_pipeline::context::Context};
 use diagnostics::DatamodelWarning;
 use indoc::formatdoc;
 use itertools::Itertools;
-use parser_database::walkers::RelationFieldId;
 use parser_database::ReferentialAction;
+use parser_database::walkers::RelationFieldId;
 use parser_database::{
+    ScalarFieldType,
     ast::WithSpan,
     walkers::{CompleteInlineRelationWalker, InlineRelationWalker},
-    ScalarFieldType,
 };
 use std::{
     collections::{BTreeSet, HashMap, HashSet},
@@ -38,7 +38,7 @@ pub(super) fn has_a_unique_constraint_name(
     let model = relation.referencing_model();
 
     for violation in names.constraint_namespace.constraint_name_scope_violations(
-        model.model_id(),
+        model.id,
         ConstraintName::Relation(name.as_ref()),
         ctx,
     ) {
@@ -147,9 +147,17 @@ pub(super) fn references_unique_fields(relation: InlineRelationWalker<'_>, ctx: 
     let model = relation.referenced_model().name();
 
     let message = if fields.len() == 1 {
-        format!("The argument `references` must refer to a unique criterion in the related model. Consider adding an `@unique` attribute to the field `{}` in the model `{}`.", fields.join(", "), model)
+        format!(
+            "The argument `references` must refer to a unique criterion in the related model. Consider adding an `@unique` attribute to the field `{}` in the model `{}`.",
+            fields.join(", "),
+            model
+        )
     } else {
-        format!("The argument `references` must refer to a unique criterion in the related model. Consider adding an `@@unique([{}])` attribute to the model `{}`.", fields.join(", "), model)
+        format!(
+            "The argument `references` must refer to a unique criterion in the related model. Consider adding an `@@unique([{}])` attribute to the model `{}`.",
+            fields.join(", "),
+            model
+        )
     };
 
     ctx.push_error(DatamodelError::new_attribute_validation_error(

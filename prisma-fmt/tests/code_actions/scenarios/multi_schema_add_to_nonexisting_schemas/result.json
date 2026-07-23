@@ -6,11 +6,11 @@
       {
         "range": {
           "start": {
-            "line": 14,
+            "line": 13,
             "character": 13
           },
           "end": {
-            "line": 14,
+            "line": 13,
             "character": 19
           }
         },
@@ -24,12 +24,12 @@
           {
             "range": {
               "start": {
-                "line": 7,
-                "character": 37
+                "line": 6,
+                "character": 30
               },
               "end": {
-                "line": 7,
-                "character": 38
+                "line": 6,
+                "character": 31
               }
             },
             "newText": ")\n    schemas = [\"base\"]"

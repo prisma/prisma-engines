@@ -113,7 +113,7 @@ impl<'a> DefaultValue<'a> {
     }
 }
 
-impl<'a> fmt::Display for DefaultValue<'a> {
+impl fmt::Display for DefaultValue<'_> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         self.0.fmt(f)
     }

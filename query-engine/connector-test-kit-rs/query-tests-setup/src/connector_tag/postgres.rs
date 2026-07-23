@@ -1,5 +1,7 @@
+use std::fmt::Display;
+
 use super::*;
-use crate::{datamodel_rendering::SqlDatamodelRenderer, BoxFuture, TestError};
+use crate::{BoxFuture, TestError, datamodel_rendering::SqlDatamodelRenderer};
 use quaint::{prelude::Queryable, single::Quaint};
 
 #[derive(Debug, Default, Clone)]
@@ -14,7 +16,7 @@ impl ConnectorTagInterface for PostgresConnectorTag {
     }
 
     fn datamodel_provider(&self) -> &'static str {
-        "postgres"
+        "postgresql"
     }
 
     fn datamodel_renderer(&self) -> Box<dyn DatamodelRenderer> {
@@ -37,8 +39,6 @@ pub enum PostgresVersion {
     V15,
     V16,
     PgBouncer,
-    NeonJsNapi,
-    PgJsNapi,
     NeonJsWasm,
     PgJsWasm,
 }
@@ -57,8 +57,6 @@ impl TryFrom<&str> for PostgresVersion {
             "15" => Self::V15,
             "16" => Self::V16,
             "pgbouncer" => Self::PgBouncer,
-            "neon.js" => Self::NeonJsNapi,
-            "pg.js" => Self::PgJsNapi,
             "pg.js.wasm" => Self::PgJsWasm,
             "neon.js.wasm" => Self::NeonJsWasm,
             _ => return Err(TestError::parse_error(format!("Unknown Postgres version `{s}`"))),
@@ -68,23 +66,20 @@ impl TryFrom<&str> for PostgresVersion {
     }
 }
 
-impl ToString for PostgresVersion {
-    fn to_string(&self) -> String {
+impl Display for PostgresVersion {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            PostgresVersion::V9 => "9",
-            PostgresVersion::V10 => "10",
-            PostgresVersion::V11 => "11",
-            PostgresVersion::V12 => "12",
-            PostgresVersion::V13 => "13",
-            PostgresVersion::V14 => "14",
-            PostgresVersion::V15 => "15",
-            PostgresVersion::V16 => "16",
-            PostgresVersion::PgBouncer => "pgbouncer",
-            PostgresVersion::NeonJsNapi => "neon.js",
-            PostgresVersion::PgJsNapi => "pg.js",
-            PostgresVersion::PgJsWasm => "pg.js.wasm",
-            PostgresVersion::NeonJsWasm => "pg.js.wasm",
+            PostgresVersion::V9 => f.write_str("9"),
+            PostgresVersion::V10 => f.write_str("10"),
+            PostgresVersion::V11 => f.write_str("11"),
+            PostgresVersion::V12 => f.write_str("12"),
+            PostgresVersion::V13 => f.write_str("13"),
+            PostgresVersion::V14 => f.write_str("14"),
+            PostgresVersion::V15 => f.write_str("15"),
+            PostgresVersion::V16 => f.write_str("16"),
+            PostgresVersion::PgBouncer => f.write_str("pgbouncer"),
+            PostgresVersion::PgJsWasm => f.write_str("pg.js.wasm"),
+            PostgresVersion::NeonJsWasm => f.write_str("pg.js.wasm"),
         }
-        .to_owned()
     }
 }

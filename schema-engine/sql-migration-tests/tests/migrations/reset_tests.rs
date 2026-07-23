@@ -94,20 +94,15 @@ fn reset_then_diagnostics_with_migrations_directory_works(api: TestApi) {
         .assert_has_table("_prisma_migrations");
 }
 
-#[test_connector(
-    tags(Postgres),
-    exclude(CockroachDb),
-    namespaces("felines", "rodents"),
-    preview_features("multiSchema")
-)]
+#[test_connector(tags(Postgres), exclude(CockroachDb), namespaces("felines", "rodents"))]
 fn multi_schema_reset(mut api: TestApi) {
     let prisma_schema = format! {
         r#"
             {}
 
             generator js {{
-                provider = "prisma-client-js"
-                previewFeatures = ["multiSchema"]
+                provider = "prisma-client"
+                previewFeatures = []
             }}
 
             model Manul {{

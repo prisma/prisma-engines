@@ -1,7 +1,7 @@
 use query_engine_tests::*;
 
 #[test_suite(schema(to_one_composites), only(MongoDb))]
-mod create {
+mod create_single {
     use query_engine_tests::{assert_error, run_query};
 
     /// Using explicit `set` operator, create (deeply nested) composites.
@@ -263,7 +263,7 @@ mod create {
 }
 
 #[test_suite(schema(to_one_composites), only(MongoDb))]
-mod update {
+mod update_single {
     use query_engine_tests::{assert_error, run_query};
 
     #[connector_test]

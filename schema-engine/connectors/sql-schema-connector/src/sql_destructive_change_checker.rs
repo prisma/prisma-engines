@@ -14,22 +14,22 @@
 //! - Render the final user-facing messages based on the plan and the gathered
 //!   information.
 
-mod check;
+pub(crate) mod check;
 mod database_inspection_results;
-mod destructive_change_checker_flavour;
-mod destructive_check_plan;
-mod unexecutable_step_check;
-mod warning_check;
+pub mod destructive_change_checker_flavour;
+pub(crate) mod destructive_check_plan;
+pub(crate) mod unexecutable_step_check;
+pub(crate) mod warning_check;
 
 pub(crate) use destructive_change_checker_flavour::DestructiveChangeCheckerFlavour;
 
 use crate::{
-    sql_migration::{AlterEnum, AlterTable, ColumnTypeChange, SqlMigrationStep, TableChange},
     SqlMigration, SqlSchemaConnector,
+    sql_migration::{AlterEnum, AlterTable, ColumnTypeChange, SqlMigrationStep, TableChange},
 };
 use destructive_check_plan::DestructiveCheckPlan;
 use schema_connector::{BoxFuture, ConnectorResult, DestructiveChangeChecker, DestructiveChangeDiagnostics, Migration};
-use sql_schema_describer::{walkers::TableColumnWalker, ColumnArity};
+use sql_schema_describer::{ColumnArity, walkers::TableColumnWalker};
 use unexecutable_step_check::UnexecutableStepCheck;
 use warning_check::SqlMigrationWarningCheck;
 
@@ -57,7 +57,7 @@ impl SqlSchemaConnector {
         plan.push_warning(
             SqlMigrationWarningCheck::NonEmptyColumnDrop {
                 table: column.table().name().to_owned(),
-                namespace: column.table().namespace().map(str::to_owned),
+                namespace: column.table().explicit_namespace().map(str::to_owned),
                 column: column.name().to_owned(),
             },
             step_index,
@@ -86,13 +86,13 @@ impl SqlSchemaConnector {
         let typed_unexecutable = if has_virtual_default {
             UnexecutableStepCheck::AddedRequiredFieldToTableWithPrismaLevelDefault(Column {
                 table: column.table().name().to_owned(),
-                namespace: column.table().namespace().map(str::to_owned),
+                namespace: column.table().explicit_namespace().map(str::to_owned),
                 column: column.name().to_owned(),
             })
         } else {
             UnexecutableStepCheck::AddedRequiredFieldToTable(Column {
                 table: column.table().name().to_owned(),
-                namespace: column.table().namespace().map(str::to_owned),
+                namespace: column.table().explicit_namespace().map(str::to_owned),
                 column: column.name().to_owned(),
             })
         };
@@ -104,6 +104,7 @@ impl SqlSchemaConnector {
         let steps = &migration.steps;
         let schemas = migration.schemas();
         let mut plan = DestructiveCheckPlan::new();
+        let checker = self.sql_dialect().destructive_change_checker();
 
         for (step_index, step) in steps.iter().enumerate() {
             match step {
@@ -125,8 +126,7 @@ impl SqlSchemaConnector {
                             TableChange::AlterColumn(alter_column) => {
                                 let columns = schemas.walk(alter_column.column_id);
 
-                                self.flavour()
-                                    .check_alter_column(alter_column, &columns, &mut plan, step_index)
+                                checker.check_alter_column(alter_column, &columns, &mut plan, step_index)
                             }
                             TableChange::AddColumn {
                                 column_id,
@@ -136,21 +136,20 @@ impl SqlSchemaConnector {
 
                                 self.check_add_column(&column, *has_virtual_default, &mut plan, step_index)
                             }
-                            TableChange::DropPrimaryKey { .. } => plan.push_warning(
+                            TableChange::DropPrimaryKey => plan.push_warning(
                                 SqlMigrationWarningCheck::PrimaryKeyChange {
                                     table: tables.previous.name().to_owned(),
-                                    namespace: tables.previous.namespace().map(str::to_owned),
+                                    namespace: tables.previous.explicit_namespace().map(str::to_owned),
                                 },
                                 step_index,
                             ),
                             TableChange::DropAndRecreateColumn { column_id, changes } => {
                                 let columns = schemas.walk(*column_id);
 
-                                self.flavour
-                                    .check_drop_and_recreate_column(&columns, changes, &mut plan, step_index)
+                                checker.check_drop_and_recreate_column(&columns, changes, &mut plan, step_index)
                             }
-                            TableChange::AddPrimaryKey { .. } => (),
-                            TableChange::RenamePrimaryKey { .. } => (),
+                            TableChange::AddPrimaryKey => (),
+                            TableChange::RenamePrimaryKey => (),
                         }
                     }
                 }
@@ -162,7 +161,7 @@ impl SqlSchemaConnector {
                             plan.push_warning(
                                 SqlMigrationWarningCheck::PrimaryKeyChange {
                                     table: tables.previous.name().to_owned(),
-                                    namespace: tables.previous.namespace().map(str::to_owned),
+                                    namespace: tables.previous.explicit_namespace().map(str::to_owned),
                                 },
                                 step_index,
                             )
@@ -208,7 +207,7 @@ impl SqlSchemaConnector {
                                 plan.push_unexecutable(
                                     UnexecutableStepCheck::MadeOptionalFieldRequired(Column {
                                         table: columns.previous.table().name().to_owned(),
-                                        namespace: columns.previous.table().namespace().map(str::to_owned),
+                                        namespace: columns.previous.table().explicit_namespace().map(str::to_owned),
                                         column: columns.previous.name().to_owned(),
                                     }),
                                     step_index,
@@ -221,7 +220,7 @@ impl SqlSchemaConnector {
                                     plan.push_warning(
                                         SqlMigrationWarningCheck::RiskyCast {
                                             table: columns.previous.table().name().to_owned(),
-                                            namespace: columns.previous.table().namespace().map(str::to_owned),
+                                            namespace: columns.previous.table().explicit_namespace().map(str::to_owned),
                                             column: columns.previous.name().to_owned(),
                                             previous_type: format!("{:?}", columns.previous.column_type_family()),
                                             next_type: format!("{:?}", columns.next.column_type_family()),
@@ -232,7 +231,7 @@ impl SqlSchemaConnector {
                                 Some(ColumnTypeChange::NotCastable) => plan.push_warning(
                                     SqlMigrationWarningCheck::NotCastable {
                                         table: columns.previous.table().name().to_owned(),
-                                        namespace: columns.previous.table().namespace().map(str::to_owned),
+                                        namespace: columns.previous.table().explicit_namespace().map(str::to_owned),
                                         column: columns.previous.name().to_owned(),
                                         previous_type: format!("{:?}", columns.previous.column_type_family()),
                                         next_type: format!("{:?}", columns.next.column_type_family()),
@@ -245,7 +244,7 @@ impl SqlSchemaConnector {
                 }
                 SqlMigrationStep::DropTable { table_id } => {
                     let table = schemas.previous.walk(*table_id);
-                    self.check_table_drop(table.name(), table.namespace(), &mut plan, step_index);
+                    self.check_table_drop(table.name(), table.explicit_namespace(), &mut plan, step_index);
                 }
                 SqlMigrationStep::CreateIndex {
                     table_id: (Some(_), _),
@@ -289,7 +288,7 @@ impl DestructiveChangeChecker for SqlSchemaConnector {
         migration: &'a Migration,
     ) -> BoxFuture<'a, ConnectorResult<DestructiveChangeDiagnostics>> {
         let plan = self.plan(migration.downcast_ref());
-        Box::pin(async move { plan.execute(self.flavour.as_mut()).await })
+        Box::pin(async move { plan.execute(self.inner.as_mut()).await })
     }
 
     fn pure_check(&self, migration: &Migration) -> DestructiveChangeDiagnostics {

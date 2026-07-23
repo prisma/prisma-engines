@@ -1,0 +1,6 @@
+{
+  "contents": {
+    "kind": "markdown",
+    "value": "```prisma\nmodel Bee {\n\t...\n\tB Bee? @relation(name: \"bees\", fields: [bId], references: [id])\n}\n```\n___\none-to-many on self\n___\n"
+  }
+}

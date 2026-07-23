@@ -76,7 +76,7 @@ mod decimal {
         schema.to_owned()
     }
 
-    #[connector_test(schema(deicmal_id), capabilities(DecimalType))]
+    #[connector_test(schema(deicmal_id), capabilities(DecimalType), exclude(Sqlserver("mssql.js.wasm")))]
     async fn using_decimal_as_id(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(&runner, r#"mutation { createOneModel( data: { id: "1000000000" } ) { id } }"#),

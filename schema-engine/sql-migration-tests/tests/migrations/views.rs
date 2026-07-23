@@ -10,7 +10,7 @@ fn nothing_gets_written_in_migrations(api: TestApi) {
         }
 
         view Mountain {
-          id   Int    @unique
+          id   Int
           name String
         }
     "#};

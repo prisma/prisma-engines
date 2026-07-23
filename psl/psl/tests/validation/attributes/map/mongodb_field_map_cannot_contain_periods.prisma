@@ -1,6 +1,5 @@
 datasource mydb {
     provider = "mongodb"
-    url = env("TEST_DB_URL")
 }
 
 model Foo {
@@ -9,8 +8,8 @@ model Foo {
 }
 
 // [1;91merror[0m: [1mError parsing attribute "@map": The field name cannot contain a `.` character[0m
-//   [1;94m-->[0m  [4mschema.prisma:8[0m
+//   [1;94m-->[0m  [4mschema.prisma:7[0m
 // [1;94m   | [0m
-// [1;94m 7 | [0m  id    Int    @id @map("_id")
-// [1;94m 8 | [0m  field String [1;91m@map("field.schwield")[0m
+// [1;94m 6 | [0m  id    Int    @id @map("_id")
+// [1;94m 7 | [0m  field String [1;91m@map("field.schwield")[0m
 // [1;94m   | [0m

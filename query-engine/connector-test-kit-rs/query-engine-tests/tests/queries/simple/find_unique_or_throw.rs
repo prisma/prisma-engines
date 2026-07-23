@@ -37,7 +37,7 @@ mod find_unique_or_throw {
             &runner,
             "query { findUniqueUserOrThrow(where: { id: 2 }) { id } }",
             2025,
-            "An operation failed because it depends on one or more records that were required but not found. Expected a record, found none."
+            "An operation failed because it depends on one or more records that were required but not found. No record was found for a query."
         );
 
         Ok(())
@@ -48,10 +48,10 @@ mod find_unique_or_throw {
         test_user(&runner).await?;
 
         assert_error!(
-          &runner,
-          r#"query { findUniqueUserOrThrow(where: { email: "b@a.com" }) { id } }"#,
-          2025,
-          "An operation failed because it depends on one or more records that were required but not found. Expected a record, found none."
+            &runner,
+            r#"query { findUniqueUserOrThrow(where: { email: "b@a.com" }) { id } }"#,
+            2025,
+            "An operation failed because it depends on one or more records that were required but not found. No record was found for a query."
         );
 
         Ok(())
@@ -62,10 +62,10 @@ mod find_unique_or_throw {
         test_user(&runner).await?;
 
         assert_error!(
-          &runner,
-          r#"query { findUniqueUserOrThrow(where: { first_name_last_name: { first_name: "Doesn't", last_name: "Exist" } }) { id } }"#,
-          2025,
-          "An operation failed because it depends on one or more records that were required but not found. Expected a record, found none."
+            &runner,
+            r#"query { findUniqueUserOrThrow(where: { first_name_last_name: { first_name: "Doesn't", last_name: "Exist" } }) { id } }"#,
+            2025,
+            "An operation failed because it depends on one or more records that were required but not found. No record was found for a query."
         );
 
         Ok(())

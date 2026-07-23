@@ -1,15 +1,15 @@
 use crate::{
-    ast::{self, SourceConfig, Span},
-    configuration::StringFromEnvVar,
-    datamodel_connector::RelationMode,
-    diagnostics::{DatamodelError, Diagnostics},
     Datasource,
+    ast::{self, SourceConfig, Span, WithName},
+    datamodel_connector::{ConnectorCapability, RelationMode},
+    diagnostics::{DatamodelError, Diagnostics},
 };
 use diagnostics::DatamodelWarning;
 use parser_database::{
     ast::{Expression, WithDocumentation},
     coerce, coerce_array, coerce_opt,
 };
+use schema_ast::ast::WithSpan;
 use std::{borrow::Cow, collections::HashMap};
 
 const PREVIEW_FEATURES_KEY: &str = "previewFeatures";
@@ -31,7 +31,7 @@ pub(crate) fn load_datasources_from_ast(
 
     for src in ast_schema.sources() {
         if let Some(source) = lift_datasource(src, diagnostics, connectors) {
-            sources.push(source)
+            sources.push(source);
         }
     }
 
@@ -39,7 +39,7 @@ pub(crate) fn load_datasources_from_ast(
         for src in ast_schema.sources() {
             diagnostics.push_error(DatamodelError::new_source_validation_error(
                 "You defined more than one datasource. This is not allowed yet because support for multiple databases has not been implemented yet.",
-                &src.name.name,
+                src.name(),
                 src.span,
             ));
         }
@@ -53,15 +53,15 @@ fn lift_datasource(
     diagnostics: &mut Diagnostics,
     connectors: crate::ConnectorRegistry<'_>,
 ) -> Option<Datasource> {
-    let source_name = ast_source.name.name.as_str();
+    let source_name = ast_source.name();
     let mut args: HashMap<_, (_, &Expression)> = ast_source
         .properties
         .iter()
         .map(|arg| match &arg.value {
-            Some(expr) => Some((arg.name.name.as_str(), (arg.span, expr))),
+            Some(expr) => Some((arg.name(), (arg.span, expr))),
             None => {
                 diagnostics.push_error(DatamodelError::new_config_property_missing_value_error(
-                    &arg.name.name,
+                    arg.name(),
                     source_name,
                     "datasource",
                     ast_source.span,
@@ -71,8 +71,8 @@ fn lift_datasource(
         })
         .collect::<Option<HashMap<_, (_, _)>>>()?;
 
-    let (provider, provider_arg) = match args.remove(PROVIDER_KEY) {
-        Some((_span, provider_arg)) => {
+    let (provider, provider_span, provider_arg) = match args.remove(PROVIDER_KEY) {
+        Some((span, provider_arg)) => {
             if provider_arg.is_env_expression() {
                 let msg = Cow::Borrowed("A datasource must not use the env() function in the provider argument.");
                 diagnostics.push_error(DatamodelError::new_functional_evaluation_error(msg, ast_source.span));
@@ -99,7 +99,7 @@ fn lift_datasource(
                 Some(provider) => provider,
             };
 
-            (provider, provider_arg)
+            (provider, span, provider_arg)
         }
 
         None => {
@@ -129,39 +129,17 @@ fn lift_datasource(
 
     let connector_data = active_connector.parse_datasource_properties(&mut args, diagnostics);
 
-    let (url, url_span) = match args.remove(URL_KEY) {
-        Some((_span, url_arg)) => (StringFromEnvVar::coerce(url_arg, diagnostics)?, url_arg.span()),
+    if let Some((span, _)) = args.remove(URL_KEY) {
+        diagnostics.push_error(DatamodelError::new_datasource_url_removed_error(span));
+    }
 
-        None => {
-            diagnostics.push_error(DatamodelError::new_source_argument_not_found_error(
-                URL_KEY,
-                source_name,
-                ast_source.span,
-            ));
+    if let Some((span, _)) = args.remove(SHADOW_DATABASE_URL_KEY) {
+        diagnostics.push_error(DatamodelError::new_datasource_shadow_database_url_removed_error(span));
+    }
 
-            return None;
-        }
-    };
-
-    let shadow_database_url = match args.remove(SHADOW_DATABASE_URL_KEY) {
-        Some((_span, shadow_db_url_arg)) => match StringFromEnvVar::coerce(shadow_db_url_arg, diagnostics) {
-            Some(shadow_db_url) => Some(shadow_db_url)
-                .filter(|s| !s.as_literal().map(|literal| literal.is_empty()).unwrap_or(false))
-                .map(|url| (url, shadow_db_url_arg.span())),
-            None => None,
-        },
-
-        _ => None,
-    };
-
-    let (direct_url, direct_url_span) = match args.remove(DIRECT_URL_KEY) {
-        Some((_, direct_url)) => (
-            StringFromEnvVar::coerce(direct_url, diagnostics),
-            Some(direct_url.span()),
-        ),
-
-        None => (None, None),
-    };
+    if let Some((span, _)) = args.remove(DIRECT_URL_KEY) {
+        diagnostics.push_error(DatamodelError::new_datasource_direct_url_removed_error(span));
+    }
 
     preview_features_guardrail(&mut args, diagnostics);
 
@@ -171,6 +149,17 @@ fn lift_datasource(
         Some((_span, schemas)) => coerce_array(schemas, &coerce::string_with_span, diagnostics)
             .map(|b| (b, schemas.span()))
             .and_then(|(mut schemas, span)| {
+                if !active_connector
+                    .capabilities()
+                    .contains(ConnectorCapability::MultiSchema)
+                {
+                    diagnostics.push_error(DatamodelError::new_static(
+                        "The `schemas` property is not supported on the current connector.",
+                        span,
+                    ));
+                    return None;
+                }
+
                 if schemas.is_empty() {
                     diagnostics.push_error(DatamodelError::new_schemas_array_empty_error(span));
 
@@ -201,17 +190,14 @@ fn lift_datasource(
 
     Some(Datasource {
         namespaces: schemas.into_iter().map(|(s, span)| (s.to_owned(), span)).collect(),
+        span: ast_source.span(),
         schemas_span,
         name: source_name.to_owned(),
         provider: provider.to_owned(),
+        provider_span,
         active_provider: active_connector.provider_name(),
-        url,
-        url_span,
-        direct_url,
-        direct_url_span,
         documentation,
         active_connector,
-        shadow_database_url,
         relation_mode,
         connector_data,
     })

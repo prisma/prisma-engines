@@ -2,7 +2,7 @@ use query_engine_tests::*;
 
 #[test_suite(schema(common_nullable_types))]
 mod bool {
-    use query_engine_tests::{run_query, EngineProtocol, Runner};
+    use query_engine_tests::{EngineProtocol, Runner, run_query};
 
     #[connector_test]
     async fn read_one(runner: Runner) -> TestResult<()> {
@@ -93,7 +93,7 @@ mod bool {
 
     async fn create_row(runner: &Runner, data: &str) -> TestResult<()> {
         runner
-            .query(format!("mutation {{ createOneTestModel(data: {}) {{ id }} }}", data))
+            .query(format!("mutation {{ createOneTestModel(data: {data}) {{ id }} }}"))
             .await?
             .assert_success();
         Ok(())

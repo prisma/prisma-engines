@@ -1,0 +1,32 @@
+---
+source: query-compiler/query-compiler/tests/queries.rs
+expression: pretty
+input_file: query-compiler/query-compiler/tests/data/nested-distinct-pagination-join.json
+---
+dataMap {
+    id: Int (id)
+    posts (from posts): {
+        id: Int (id)
+        title: String (title)
+    }
+}
+process {
+    posts: {
+        .: {
+            distinct: (title)
+            pagination: {
+                skip: 20
+                take: 10
+            }
+        }
+    }
+} (query «SELECT "t0"."id", "User_posts"."__prisma_data__" AS "posts" FROM
+          "public"."User" AS "t0" LEFT JOIN LATERAL (SELECT
+          COALESCE(JSONB_AGG("__prisma_data__"), '[]') AS "__prisma_data__" FROM
+          (SELECT "t3"."__prisma_data__" FROM (SELECT JSONB_BUILD_OBJECT('id',
+          "t2"."id", 'title', "t2"."title") AS "__prisma_data__", "t2"."id",
+          "t2"."title" FROM (SELECT "t1".* FROM "public"."Post" AS "t1" WHERE
+          "t0"."id" = "t1"."userId" /* root select */) AS "t2" /* inner select
+          */) AS "t3" ORDER BY "t3"."id" ASC /* middle select */) AS "t4" /*
+          outer select */) AS "User_posts" ON true»
+   params [])

@@ -1,14 +1,13 @@
 use crate::{
-    ast,
+    ParserDatabase, ScalarFieldId, ast,
     types::IdAttribute,
     walkers::{ModelWalker, ScalarFieldAttributeWalker, ScalarFieldWalker},
-    ParserDatabase, ScalarFieldId,
 };
 
 /// An `@(@)id` attribute in the schema.
 #[derive(Copy, Clone)]
 pub struct PrimaryKeyWalker<'db> {
-    pub(crate) model_id: ast::ModelId,
+    pub(crate) model_id: crate::ModelId,
     pub(crate) attribute: &'db IdAttribute,
     pub(crate) db: &'db ParserDatabase,
 }
@@ -16,7 +15,7 @@ pub struct PrimaryKeyWalker<'db> {
 impl<'db> PrimaryKeyWalker<'db> {
     /// The `@(@)id` AST node.
     pub fn ast_attribute(self) -> &'db ast::Attribute {
-        &self.db.ast[self.attribute.source_attribute]
+        &self.db.asts[(self.model_id.0, self.attribute.source_attribute.1)]
     }
 
     /// The mapped name of the id.
@@ -36,11 +35,7 @@ impl<'db> PrimaryKeyWalker<'db> {
 
     /// If defined on a specific field, returns `@id`. Otherwise `@@id`.
     pub fn attribute_name(self) -> &'static str {
-        if self.is_defined_on_field() {
-            "@id"
-        } else {
-            "@@id"
-        }
+        if self.is_defined_on_field() { "@id" } else { "@@id" }
     }
 
     /// If true, the index defines the storage and ordering of the row. Mostly
@@ -49,7 +44,7 @@ impl<'db> PrimaryKeyWalker<'db> {
         self.attribute.clustered
     }
 
-    /// The model the id is deined on.
+    /// The model the id is defined on.
     pub fn model(self) -> ModelWalker<'db> {
         self.db.walk(self.model_id)
     }

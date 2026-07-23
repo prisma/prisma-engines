@@ -1,0 +1,20 @@
+model Post {
+    id        Int     @id @default(autoincrement())
+    content   String?
+    published Boolean @default(false)
+    author    User?   @relation(fields: [authorId], references: [id])
+    a<|>uthorId  Int?
+
+    @@unique([authorId])
+    @@index([authorId])
+}
+
+// Documentation for this model.
+model User {
+    id    Int     @id @default(autoincrement())
+    email String  @unique
+    name  String?
+    posts Post[]
+
+    @@index([id])
+}

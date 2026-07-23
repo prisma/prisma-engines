@@ -1,0 +1,14 @@
+[package]
+edition.workspace = true
+name = "query-structure"
+version = "0.0.0"
+
+[dependencies]
+psl.workspace = true
+itertools.workspace = true
+prisma-value.workspace = true
+bigdecimal.workspace = true
+thiserror.workspace = true
+
+chrono.workspace = true
+indexmap.workspace = true

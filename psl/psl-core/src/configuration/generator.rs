@@ -1,7 +1,12 @@
-use crate::{configuration::StringFromEnvVar, PreviewFeature};
+use crate::{
+    PreviewFeature,
+    configuration::{EnvFunction, StringFromEnvVar},
+};
+use diagnostics::{Diagnostics, Span};
 use enumflags2::BitFlags;
 use parser_database::ast::Expression;
-use serde::{ser::SerializeSeq, Serialize, Serializer};
+use schema_ast::ast::WithSpan;
+use serde::{Serialize, Serializer, ser::SerializeSeq};
 use std::collections::HashMap;
 
 #[derive(Debug, Serialize, Clone)]
@@ -9,6 +14,7 @@ use std::collections::HashMap;
 pub enum GeneratorConfigValue {
     String(String),
     Array(Vec<GeneratorConfigValue>),
+    Env(String),
 }
 
 impl From<String> for GeneratorConfigValue {
@@ -17,15 +23,25 @@ impl From<String> for GeneratorConfigValue {
     }
 }
 
-impl From<&Expression> for GeneratorConfigValue {
-    fn from(expr: &Expression) -> Self {
-        match expr {
+impl GeneratorConfigValue {
+    pub(crate) fn try_from_expression(expr: &Expression, diagnostics: &mut Diagnostics) -> Option<Self> {
+        Some(match expr {
             Expression::NumericValue(val, _) => val.clone().into(),
             Expression::StringValue(val, _) => val.clone().into(),
             Expression::ConstantValue(val, _) => val.clone().into(),
-            Expression::Function(_, _, _) => "(function)".to_owned().into(),
-            Expression::Array(elements, _) => Self::Array(elements.iter().map(From::from).collect()),
-        }
+            Expression::Function(name, _, _) if name == "env" => {
+                let env_fn = EnvFunction::from_ast(expr, diagnostics)?;
+                Self::Env(env_fn.var_name().to_owned())
+            }
+            Expression::Function(_, _, _) => Self::String(expr.to_string()),
+            Expression::Array(elements, _) => Self::Array(
+                elements
+                    .iter()
+                    .map(|element| Self::try_from_expression(element, diagnostics))
+                    .collect::<Option<Vec<_>>>()?,
+            ),
+            Expression::Object(_, _) => return None,
+        })
     }
 }
 
@@ -45,6 +61,15 @@ pub struct Generator {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub documentation: Option<String>,
+
+    #[serde(skip)]
+    pub span: Span,
+}
+
+impl WithSpan for Generator {
+    fn span(&self) -> Span {
+        self.span
+    }
 }
 
 pub fn mcf_preview_features<S>(feats: &Option<BitFlags<PreviewFeature>>, s: S) -> Result<S::Ok, S::Error>

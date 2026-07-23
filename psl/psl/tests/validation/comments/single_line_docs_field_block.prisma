@@ -1,0 +1,9 @@
+/// Example Doc Comment
+model MyModel {
+  // Example Comment
+  pk Int @id
+
+  field1 Int // Comment Field 1
+  field2 Int // Comment Field 2
+  field3 Int // Comment Field 3
+}

@@ -3,7 +3,9 @@ use query_engine_tests::*;
 #[test_suite(schema(schema))]
 mod mongodb {
     use indoc::indoc;
-    use query_engine_tests::{run_query_json, Runner};
+    use query_engine_tests::{Runner, run_query_json};
+    use std::time::Duration;
+    use tokio::time::sleep;
 
     fn schema() -> String {
         let schema = indoc! {
@@ -43,7 +45,9 @@ mod mongodb {
         );
 
         let updated_at = &resp["data"]["createOneOrder"]["order_lines"][0]["updated_at"];
-        std::thread::sleep(std::time::Duration::from_millis(1000));
+
+        // We have to wait a bit to avoid test flakiness due to the finite precision of the clock
+        sleep(Duration::from_millis(50)).await;
 
         let updated = run_query_json!(
             runner,

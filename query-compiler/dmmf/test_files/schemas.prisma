@@ -1,0 +1,21 @@
+datasource pg {
+  provider = "postgresql"
+  schemas  = ["public", "test"]
+}
+
+generator client {
+  provider        = "prisma-client"
+  previewFeatures = []
+}
+
+model A {
+  id Int @id
+
+  @@schema("public")
+}
+
+model B {
+  id Int @id
+
+  @@schema("test")
+}

@@ -7,11 +7,10 @@ fn should_set_default_for_all_scalar_types() {
     let dml = indoc! {r#"
         datasource test {
           provider = "postgresql"
-          url = "postgresql://"
         }
 
         generator js {
-          provider = "prisma-client-js"
+          provider = "prisma-client"
         }
 
         model Model {
@@ -27,7 +26,7 @@ fn should_set_default_for_all_scalar_types() {
         }
     "#};
 
-    let datamodel = psl::parse_schema(dml).unwrap();
+    let datamodel = psl::parse_schema_without_extensions(dml).unwrap();
     let model = datamodel.assert_has_model("Model");
 
     model
@@ -90,7 +89,7 @@ fn should_set_default_an_enum_type() {
         }
     "#};
 
-    psl::parse_schema(dml)
+    psl::parse_schema_without_extensions(dml)
         .unwrap()
         .assert_has_model("Model")
         .assert_has_scalar_field("role")
@@ -113,7 +112,7 @@ fn should_set_default_on_remapped_enum_type() {
         }
     "#};
 
-    psl::parse_schema(dml)
+    psl::parse_schema_without_extensions(dml)
         .unwrap()
         .assert_has_model("Model")
         .assert_has_scalar_field("role")
@@ -135,7 +134,7 @@ fn db_generated_function_must_work_for_enum_fields() {
         }
     "#};
 
-    psl::parse_schema(dml)
+    psl::parse_schema_without_extensions(dml)
         .unwrap()
         .assert_has_model("Model")
         .assert_has_scalar_field("role")
@@ -148,11 +147,10 @@ fn named_default_constraints_should_work_on_sql_server() {
     let dml = indoc! { r#"
         datasource test {
           provider = "sqlserver"
-          url = "sqlserver://"
         }
 
         generator js {
-          provider = "prisma-client-js"
+          provider = "prisma-client"
         }
 
         model A {
@@ -161,7 +159,7 @@ fn named_default_constraints_should_work_on_sql_server() {
         }
     "#};
 
-    psl::parse_schema(dml)
+    psl::parse_schema_without_extensions(dml)
         .unwrap()
         .assert_has_model("A")
         .assert_has_scalar_field("data")
@@ -180,7 +178,7 @@ fn string_literals_with_double_quotes_work() {
         }
     "#};
 
-    let schema = psl::parse_schema(schema).unwrap();
+    let schema = psl::parse_schema_without_extensions(schema).unwrap();
     let test_model = schema.assert_has_model("Test");
 
     test_model
@@ -207,7 +205,6 @@ fn mongodb_auto_id() {
     let dml = indoc! {r#"
         datasource db {
           provider = "mongodb"
-          url = env("DATABASE_URL")
         }
 
         model a {
@@ -215,7 +212,7 @@ fn mongodb_auto_id() {
         }
     "#};
 
-    psl::parse_schema(dml)
+    psl::parse_schema_without_extensions(dml)
         .unwrap()
         .assert_has_model("a")
         .assert_has_scalar_field("id")
@@ -228,7 +225,6 @@ fn scalar_list_defaults_with_decimal() {
     let dml = indoc! {r#"
         datasource db {
           provider = "postgresql"
-          url = "postgres://"
         }
 
         enum Color {
@@ -261,7 +257,6 @@ fn scalar_list_defaults_with_composite_types() {
     let dml = indoc! {r#"
         datasource db {
           provider = "mongodb"
-          url = "mongodb://"
         }
 
         enum Color {

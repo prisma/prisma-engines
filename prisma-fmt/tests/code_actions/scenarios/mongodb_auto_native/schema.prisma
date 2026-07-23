@@ -1,10 +1,9 @@
 generator client {
-    provider = "prisma-client-js"
+    provider = "prisma-client"
 }
 
 datasource RedPanda {
     provider = "mongodb"
-    url      = env("DATABASE_URL")
 }
 
 model Kattbjorn {

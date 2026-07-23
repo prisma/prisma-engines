@@ -88,7 +88,7 @@ impl<'a> Delete<'a> {
     /// let query = Delete::from_table("users").returning(vec!["id"]);
     /// let (sql, _) = Sqlite::build(query)?;
     ///
-    /// assert_eq!("DELETE FROM `users` RETURNING \"id\"", sql);
+    /// assert_eq!("DELETE FROM `users` RETURNING `id` AS `id`", sql);
     /// # Ok(())
     /// # }
     pub fn returning<K, I>(mut self, columns: I) -> Self

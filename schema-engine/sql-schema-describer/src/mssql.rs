@@ -1,15 +1,14 @@
 //! SQL server schema description.
 
 use crate::{
-    getters::Getter, ids::*, parsers::Parser, Column, ColumnArity, ColumnType, ColumnTypeFamily, DefaultValue,
-    DescriberError, DescriberErrorKind, DescriberResult, ForeignKeyAction, IndexColumn, Procedure, SQLSortOrder,
-    SqlMetadata, SqlSchema, UserDefinedType, View,
+    Column, ColumnArity, ColumnType, ColumnTypeFamily, DefaultValue, DescriberError, DescriberErrorKind,
+    DescriberResult, ForeignKeyAction, IndexColumn, Procedure, SQLSortOrder, SqlSchema, UserDefinedType, View,
+    getters::Getter, ids::*, parsers::Parser,
 };
 use either::Either;
 use enumflags2::BitFlags;
 use indexmap::IndexMap;
 use indoc::indoc;
-use once_cell::sync::Lazy;
 use prisma_value::PrismaValue;
 use psl::{
     builtin_connectors::{MsSqlType, MsSqlTypeParameter},
@@ -17,7 +16,7 @@ use psl::{
 };
 use quaint::prelude::Queryable;
 use regex::Regex;
-use std::{any::type_name, borrow::Cow, collections::HashMap, convert::TryInto};
+use std::{any::type_name, borrow::Cow, collections::HashMap, sync::LazyLock};
 
 /// Matches a default value in the schema, that is not a string.
 ///
@@ -34,7 +33,7 @@ use std::{any::type_name, borrow::Cow, collections::HashMap, convert::TryInto};
 /// ```ignore
 /// ((true))
 /// ```
-static DEFAULT_NON_STRING: Lazy<Regex> = Lazy::new(|| Regex::new(r"\(\((.*)\)\)").unwrap());
+static DEFAULT_NON_STRING: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"\(\((.*)\)\)").unwrap());
 
 /// Matches a default value in the schema, that is a string.
 ///
@@ -43,7 +42,7 @@ static DEFAULT_NON_STRING: Lazy<Regex> = Lazy::new(|| Regex::new(r"\(\((.*)\)\)"
 /// ```ignore
 /// ('this is a test')
 /// ```
-static DEFAULT_STRING: Lazy<Regex> = Lazy::new(|| Regex::new(r"\('([\S\s]*)'\)").unwrap());
+static DEFAULT_STRING: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"\('([\S\s]*)'\)").unwrap());
 
 /// Matches a database-generated value in the schema.
 ///
@@ -52,7 +51,7 @@ static DEFAULT_STRING: Lazy<Regex> = Lazy::new(|| Regex::new(r"\('([\S\s]*)'\)")
 /// ```ignore
 /// (current_timestamp)
 /// ```
-static DEFAULT_DB_GEN: Lazy<Regex> = Lazy::new(|| Regex::new(r"\((.*)\)").unwrap());
+static DEFAULT_DB_GEN: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"\((.*)\)").unwrap());
 
 /// Matches a shared default constraint (which we will skip).
 ///
@@ -61,13 +60,13 @@ static DEFAULT_DB_GEN: Lazy<Regex> = Lazy::new(|| Regex::new(r"\((.*)\)").unwrap
 /// ```ignore
 /// CREATE DEFAULT catcat AS 'musti';
 /// ```
-static DEFAULT_SHARED_CONSTRAINT: Lazy<Regex> = Lazy::new(|| Regex::new(r"^CREATE DEFAULT (.*)").unwrap());
+static DEFAULT_SHARED_CONSTRAINT: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"CREATE DEFAULT (.*)").unwrap());
 
 pub struct SqlSchemaDescriber<'a> {
     conn: &'a dyn Queryable,
 }
 
-#[derive(Default)]
+#[derive(Default, Clone)]
 pub struct MssqlSchemaExt {
     pub index_bits: HashMap<IndexId, BitFlags<IndexBits>>,
 }
@@ -104,24 +103,6 @@ impl std::fmt::Debug for SqlSchemaDescriber<'_> {
 
 #[async_trait::async_trait]
 impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber<'_> {
-    async fn list_databases(&self) -> DescriberResult<Vec<String>> {
-        Ok(self.get_databases().await?)
-    }
-
-    async fn get_metadata(&self, schema: &str) -> DescriberResult<SqlMetadata> {
-        let mut sql_schema = SqlSchema::default();
-
-        self.get_namespaces(&mut sql_schema, &[schema]).await?;
-
-        let table_count = self.get_table_names(&mut sql_schema).await?.len();
-        let size_in_bytes = self.get_size(schema).await?;
-
-        Ok(SqlMetadata {
-            table_count,
-            size_in_bytes,
-        })
-    }
-
     async fn describe(&self, schemas: &[&str]) -> DescriberResult<SqlSchema> {
         let mut sql_schema = SqlSchema::default();
         let mut mssql_ext = MssqlSchemaExt::default();
@@ -156,12 +137,6 @@ impl Parser for SqlSchemaDescriber<'_> {}
 impl<'a> SqlSchemaDescriber<'a> {
     pub fn new(conn: &'a dyn Queryable) -> Self {
         Self { conn }
-    }
-
-    async fn get_databases(&self) -> DescriberResult<Vec<String>> {
-        let sql = "SELECT name FROM sys.schemas";
-        let rows = self.conn.query_raw(sql, &[]).await?;
-        Ok(rows.into_iter().map(|row| row.get_expect_string("name")).collect())
     }
 
     async fn get_procedures(&self, sql_schema: &mut SqlSchema) -> DescriberResult<()> {
@@ -231,36 +206,6 @@ impl<'a> SqlSchemaDescriber<'a> {
         }
 
         Ok(map)
-    }
-
-    async fn get_size(&self, schema: &str) -> DescriberResult<usize> {
-        let sql = indoc! {r#"
-            SELECT
-                SUM(a.total_pages) * 8000 AS size
-            FROM
-                sys.tables t
-            INNER JOIN
-                sys.partitions p ON t.object_id = p.object_id
-            INNER JOIN
-                sys.allocation_units a ON p.partition_id = a.container_id
-            WHERE SCHEMA_NAME(t.schema_id) = @P1
-                AND t.is_ms_shipped = 0
-            GROUP BY
-                t.schema_id
-            ORDER BY
-                size DESC;
-        "#};
-
-        let rows = self.conn.query_raw(sql, &[schema.into()]).await?;
-
-        let size: i64 = rows
-            .into_single()
-            .map(|row| row.get("size").and_then(|x| x.as_integer()).unwrap_or(0))
-            .unwrap_or(0);
-
-        Ok(size
-            .try_into()
-            .expect("Invariant violation: size is not a valid usize value."))
     }
 
     async fn get_columns(&self, sql_schema: &mut SqlSchema) -> DescriberResult<()> {
@@ -378,7 +323,9 @@ impl<'a> SqlSchemaDescriber<'a> {
                             ColumnTypeFamily::Binary => DefaultValue::db_generated(default_string),
                             ColumnTypeFamily::Json => DefaultValue::db_generated(default_string),
                             ColumnTypeFamily::Uuid => DefaultValue::db_generated(default_string),
-                            ColumnTypeFamily::Unsupported(_) => DefaultValue::db_generated(default_string),
+                            ColumnTypeFamily::Udt(_) | ColumnTypeFamily::Unsupported(_) => {
+                                DefaultValue::db_generated(default_string)
+                            }
                             ColumnTypeFamily::Enum(_) => unreachable!("No enums in MSSQL"),
                         };
 
@@ -444,6 +391,7 @@ impl<'a> SqlSchemaDescriber<'a> {
                 ind.is_unique_constraint AS is_unique_constraint,
                 ind.is_primary_key AS is_primary_key,
                 ind.type_desc AS clustering,
+                ind.filter_definition AS predicate,
                 col.name AS column_name,
                 ic.key_ordinal AS seq_in_index,
                 ic.is_descending_key AS is_descending,
@@ -460,7 +408,6 @@ impl<'a> SqlSchemaDescriber<'a> {
             WHERE t.is_ms_shipped = 0
                 -- https://docs.microsoft.com/en-us/sql/relational-databases/system-catalog-views/sys-index-columns-transact-sql?view=sql-server-ver16
                 AND ic.key_ordinal != 0
-                AND ind.filter_definition IS NULL
                 AND ind.name IS NOT NULL
                 AND ind.type_desc IN (
                     'CLUSTERED',
@@ -504,15 +451,22 @@ impl<'a> SqlSchemaDescriber<'a> {
             let is_unique = row.get_expect_bool("is_unique");
             let is_unique_constraint = row.get_expect_bool("is_unique_constraint");
             let is_pk = row.get_expect_bool("is_primary_key");
+            let predicate = row.get_string("predicate");
 
             if seq_in_index == 1 {
                 // new index!
                 let id = if is_pk {
                     sql_schema.push_primary_key(table_id, index_name)
                 } else if is_unique {
-                    sql_schema.push_unique_constraint(table_id, index_name)
+                    match predicate {
+                        Some(pred) => sql_schema.push_partial_unique_constraint(table_id, index_name, pred),
+                        None => sql_schema.push_unique_constraint(table_id, index_name),
+                    }
                 } else {
-                    sql_schema.push_index(table_id, index_name)
+                    match predicate {
+                        Some(pred) => sql_schema.push_partial_index(table_id, index_name, pred),
+                        None => sql_schema.push_index(table_id, index_name),
+                    }
                 };
 
                 let mut bits = BitFlags::empty();
@@ -640,7 +594,7 @@ impl<'a> SqlSchemaDescriber<'a> {
                 let definition = row
                     .get_string("system_type_name")
                     .map(|name| match (max_length, precision, scale) {
-                        (Some(len), _, _) if len == -1 => format!("{name}(max)"),
+                        (Some(-1), _, _) => format!("{name}(max)"),
                         (Some(len), _, _) => format!("{name}({len})"),
                         (_, Some(p), Some(s)) => format!("{name}({p},{s})"),
                         _ => name,

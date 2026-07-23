@@ -130,9 +130,9 @@ fn all_postgres_column_types_must_work(api: TestApi) {
     api.raw_cmd(sql);
     let expectation = expect![[r#"
         SqlSchema {
-            namespaces: [
-                "prisma-tests",
-            ],
+            namespaces: {
+                "public",
+            },
             tables: [
                 Table {
                     namespace_id: NamespaceId(
@@ -979,8 +979,10 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                     ),
                     index_name: "User_pkey",
                     tpe: PrimaryKey,
+                    predicate: None,
                 },
             ],
+            stripped_partial_indexes: <StrippedPartialIndexes>,
             index_columns: [
                 IndexColumn {
                     index_id: IndexId(
@@ -1001,6 +1003,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
             procedures: [],
             user_defined_types: [],
             connector_data: <ConnectorData>,
+            runtime_namespace: None,
         }
     "#]];
     api.expect_schema(expectation);
@@ -1123,7 +1126,9 @@ fn cross_schema_references_are_not_allowed(api: TestApi) {
 
     let err = api.describe_error();
 
-    let expected = expect!["The schema of the introspected database was inconsistent: Cross schema references are only allowed when the target schema is listed in the schemas property of your datasource. `prisma-tests.User` points to `prisma-tests_2.City` in constraint `User_city_fkey`. Please add `prisma-tests_2` to your `schemas` property and run this command again."];
+    let expected = expect![
+        "The schema of the introspected database was inconsistent: Cross schema references are only allowed when the target schema is listed in the schemas property of your datasource. `public.User` points to `public_2.City` in constraint `User_city_fkey`. Please add `public_2` to your `schemas` property and run this command again."
+    ];
 
     expected.assert_eq(&err.to_string());
 }
@@ -1307,9 +1312,9 @@ fn escaped_quotes_in_string_defaults_must_be_unescaped(api: TestApi) {
     api.raw_cmd(create_table);
     let expectation = expect![[r#"
         SqlSchema {
-            namespaces: [
-                "prisma-tests",
-            ],
+            namespaces: {
+                "public",
+            },
             tables: [
                 Table {
                     namespace_id: NamespaceId(
@@ -1449,8 +1454,10 @@ fn escaped_quotes_in_string_defaults_must_be_unescaped(api: TestApi) {
                     ),
                     index_name: "string_defaults_test_pkey",
                     tpe: PrimaryKey,
+                    predicate: None,
                 },
             ],
+            stripped_partial_indexes: <StrippedPartialIndexes>,
             index_columns: [
                 IndexColumn {
                     index_id: IndexId(
@@ -1471,6 +1478,7 @@ fn escaped_quotes_in_string_defaults_must_be_unescaped(api: TestApi) {
             procedures: [],
             user_defined_types: [],
             connector_data: <ConnectorData>,
+            runtime_namespace: None,
         }
     "#]];
     api.expect_schema(expectation);
@@ -1488,9 +1496,9 @@ fn seemingly_escaped_backslashes_in_string_literals_must_not_be_unescaped(api: T
     api.raw_cmd(create_table);
     let expectation = expect![[r#"
         SqlSchema {
-            namespaces: [
-                "prisma-tests",
-            ],
+            namespaces: {
+                "public",
+            },
             tables: [
                 Table {
                     namespace_id: NamespaceId(
@@ -1544,6 +1552,7 @@ fn seemingly_escaped_backslashes_in_string_literals_must_not_be_unescaped(api: T
             view_default_values: [],
             foreign_key_columns: [],
             indexes: [],
+            stripped_partial_indexes: <StrippedPartialIndexes>,
             index_columns: [],
             check_constraints: [],
             views: [],
@@ -1551,6 +1560,7 @@ fn seemingly_escaped_backslashes_in_string_literals_must_not_be_unescaped(api: T
             procedures: [],
             user_defined_types: [],
             connector_data: <ConnectorData>,
+            runtime_namespace: None,
         }
     "#]];
     api.expect_schema(expectation);
@@ -1719,6 +1729,7 @@ fn array_column_defaults_with_array_constructor_syntax(api: TestApi) {
             text_empty TEXT[] NOT NULL DEFAULT ARRAY[]::TEXT[],
             text TEXT[] NOT NULL DEFAULT ARRAY['abc']::TEXT[],
             text_c_escape TEXT[] NOT NULL DEFAULT ARRAY[E'abc', E'def']::TEXT[],
+            varchar_empty VARCHAR(255)[] NOT NULL DEFAULT ARRAY[]::VARCHAR(255)[],
             colors COLOR[] NOT NULL DEFAULT ARRAY['RED', 'GREEN']::COLOR[],
             int_defaults INT4[] NOT NULL DEFAULT ARRAY[9, 12999, -4, 0, 1249849]::INT4[],
             float_defaults DOUBLE PRECISION[] NOT NULL DEFAULT ARRAY[0, 9.12, 3.14, 0.1242, 124949.124949]::DOUBLE PRECISION[],
@@ -1740,6 +1751,7 @@ fn array_column_defaults_with_array_constructor_syntax(api: TestApi) {
     assert_default("text_empty", vec![]);
     assert_default("text", vec!["abc".into()]);
     assert_default("text_c_escape", vec!["abc".into(), "def".into()]);
+    assert_default("varchar_empty", vec![]);
     assert_default(
         "colors",
         vec![
@@ -1815,7 +1827,7 @@ fn extensions_are_described_correctly(api: TestApi) {
             extensions: [
                 DatabaseExtension {
                     name: "citext",
-                    schema: "prisma-tests",
+                    schema: "public",
                     version: "1.6",
                     relocatable: true,
                 },
@@ -1849,10 +1861,10 @@ fn multiple_schemas_with_same_table_names_are_described(api: TestApi) {
 
     let expected_schema = expect![[r#"
         SqlSchema {
-            namespaces: [
+            namespaces: {
                 "schema_0",
                 "schema_1",
-            ],
+            },
             tables: [
                 Table {
                     namespace_id: NamespaceId(
@@ -2011,6 +2023,7 @@ fn multiple_schemas_with_same_table_names_are_described(api: TestApi) {
                     ),
                     index_name: "Table_0_pkey",
                     tpe: PrimaryKey,
+                    predicate: None,
                 },
                 Index {
                     table_id: TableId(
@@ -2018,8 +2031,10 @@ fn multiple_schemas_with_same_table_names_are_described(api: TestApi) {
                     ),
                     index_name: "Table_0_pkey",
                     tpe: PrimaryKey,
+                    predicate: None,
                 },
             ],
+            stripped_partial_indexes: <StrippedPartialIndexes>,
             index_columns: [
                 IndexColumn {
                     index_id: IndexId(
@@ -2052,6 +2067,7 @@ fn multiple_schemas_with_same_table_names_are_described(api: TestApi) {
             procedures: [],
             user_defined_types: [],
             connector_data: <ConnectorData>,
+            runtime_namespace: None,
         }
     "#]];
 
@@ -2070,7 +2086,7 @@ fn multiple_schemas_with_same_foreign_key_are_described(api: TestApi) {
            CREATE TABLE "schema_1"."Table_0" ("id_2" SERIAL PRIMARY KEY);
            CREATE TABLE "schema_1"."Table_1" ("id_3" SERIAL PRIMARY KEY, o_id_0 Integer);
            ALTER TABLE "schema_1"."Table_1" ADD CONSTRAINT "fk_0" FOREIGN KEY ("o_id_0") REFERENCES "schema_1"."Table_0" ("id_2");
-           
+
            CREATE TABLE "schema_1"."Table_2" ("id_4" SERIAL PRIMARY KEY, o_id_0 Integer);
            ALTER TABLE "schema_1"."Table_2" ADD CONSTRAINT "fk_1" FOREIGN KEY ("o_id_0") REFERENCES "schema_0"."Table_0" ("id_0");
     "#;
@@ -2080,10 +2096,10 @@ fn multiple_schemas_with_same_foreign_key_are_described(api: TestApi) {
 
     let expected_schema = expect![[r#"
         SqlSchema {
-            namespaces: [
+            namespaces: {
                 "schema_0",
                 "schema_1",
-            ],
+            },
             tables: [
                 Table {
                     namespace_id: NamespaceId(
@@ -2443,6 +2459,7 @@ fn multiple_schemas_with_same_foreign_key_are_described(api: TestApi) {
                     ),
                     index_name: "Table_0_pkey",
                     tpe: PrimaryKey,
+                    predicate: None,
                 },
                 Index {
                     table_id: TableId(
@@ -2450,6 +2467,7 @@ fn multiple_schemas_with_same_foreign_key_are_described(api: TestApi) {
                     ),
                     index_name: "Table_1_pkey",
                     tpe: PrimaryKey,
+                    predicate: None,
                 },
                 Index {
                     table_id: TableId(
@@ -2457,6 +2475,7 @@ fn multiple_schemas_with_same_foreign_key_are_described(api: TestApi) {
                     ),
                     index_name: "Table_0_pkey",
                     tpe: PrimaryKey,
+                    predicate: None,
                 },
                 Index {
                     table_id: TableId(
@@ -2464,6 +2483,7 @@ fn multiple_schemas_with_same_foreign_key_are_described(api: TestApi) {
                     ),
                     index_name: "Table_1_pkey",
                     tpe: PrimaryKey,
+                    predicate: None,
                 },
                 Index {
                     table_id: TableId(
@@ -2471,8 +2491,10 @@ fn multiple_schemas_with_same_foreign_key_are_described(api: TestApi) {
                     ),
                     index_name: "Table_2_pkey",
                     tpe: PrimaryKey,
+                    predicate: None,
                 },
             ],
+            stripped_partial_indexes: <StrippedPartialIndexes>,
             index_columns: [
                 IndexColumn {
                     index_id: IndexId(
@@ -2541,6 +2563,7 @@ fn multiple_schemas_with_same_foreign_key_are_described(api: TestApi) {
             procedures: [],
             user_defined_types: [],
             connector_data: <ConnectorData>,
+            runtime_namespace: None,
         }
     "#]];
 
@@ -2562,7 +2585,7 @@ fn multiple_schemas_are_described(api: TestApi) {
             AS $$
             Select 0;
             $$;
-           
+
            CREATE Schema "schema_1";
            CREATE TABLE "schema_1"."Table_2" ("id_2" SERIAL PRIMARY KEY);
            CREATE TABLE "schema_1"."Table_3" ("id_3" SERIAL PRIMARY KEY, o_id_2 Integer References "schema_1"."Table_2"("id_2"));
@@ -2582,10 +2605,10 @@ fn multiple_schemas_are_described(api: TestApi) {
 
     let expected_schema = expect![[r#"
         SqlSchema {
-            namespaces: [
+            namespaces: {
                 "schema_0",
                 "schema_1",
-            ],
+            },
             tables: [
                 Table {
                     namespace_id: NamespaceId(
@@ -2829,6 +2852,7 @@ fn multiple_schemas_are_described(api: TestApi) {
                     ),
                     index_name: "Table_0_pkey",
                     tpe: PrimaryKey,
+                    predicate: None,
                 },
                 Index {
                     table_id: TableId(
@@ -2843,6 +2867,7 @@ fn multiple_schemas_are_described(api: TestApi) {
                     ),
                     index_name: "Table_1_pkey",
                     tpe: PrimaryKey,
+                    predicate: None,
                 },
                 Index {
                     table_id: TableId(
@@ -2850,6 +2875,7 @@ fn multiple_schemas_are_described(api: TestApi) {
                     ),
                     index_name: "Table_2_pkey",
                     tpe: PrimaryKey,
+                    predicate: None,
                 },
                 Index {
                     table_id: TableId(
@@ -2864,8 +2890,10 @@ fn multiple_schemas_are_described(api: TestApi) {
                     ),
                     index_name: "Table_3_pkey",
                     tpe: PrimaryKey,
+                    predicate: None,
                 },
             ],
+            stripped_partial_indexes: <StrippedPartialIndexes>,
             index_columns: [
                 IndexColumn {
                     index_id: IndexId(
@@ -2982,6 +3010,7 @@ fn multiple_schemas_are_described(api: TestApi) {
             ],
             user_defined_types: [],
             connector_data: <ConnectorData>,
+            runtime_namespace: None,
         }
     "#]];
 
@@ -2990,4 +3019,169 @@ fn multiple_schemas_are_described(api: TestApi) {
 
 fn extract_ext(schema: &SqlSchema) -> &PostgresSchemaExt {
     schema.downcast_connector_data()
+}
+
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
+fn partial_indexes_are_described(api: TestApi) {
+    let sql = r#"
+        CREATE TABLE "User" (
+            id INTEGER PRIMARY KEY,
+            email VARCHAR(255) NOT NULL,
+            active BOOLEAN NOT NULL DEFAULT true
+        );
+
+        CREATE UNIQUE INDEX "User_email_active_idx" ON "User" (email) WHERE active = true;
+    "#;
+
+    api.raw_cmd(sql);
+    let expected = expect![[r#"
+        SqlSchema {
+            namespaces: {
+                "public",
+            },
+            tables: [
+                Table {
+                    namespace_id: NamespaceId(
+                        0,
+                    ),
+                    name: "User",
+                    properties: BitFlags<TableProperties> {
+                        bits: 0b0,
+                    },
+                    description: None,
+                },
+            ],
+            enums: [],
+            enum_variants: [],
+            table_columns: [
+                (
+                    TableId(
+                        0,
+                    ),
+                    Column {
+                        name: "id",
+                        tpe: ColumnType {
+                            full_data_type: "int4",
+                            family: Int,
+                            arity: Required,
+                            native_type: Some(
+                                NativeTypeInstance(..),
+                            ),
+                        },
+                        auto_increment: false,
+                        description: None,
+                    },
+                ),
+                (
+                    TableId(
+                        0,
+                    ),
+                    Column {
+                        name: "email",
+                        tpe: ColumnType {
+                            full_data_type: "varchar",
+                            family: String,
+                            arity: Required,
+                            native_type: Some(
+                                NativeTypeInstance(..),
+                            ),
+                        },
+                        auto_increment: false,
+                        description: None,
+                    },
+                ),
+                (
+                    TableId(
+                        0,
+                    ),
+                    Column {
+                        name: "active",
+                        tpe: ColumnType {
+                            full_data_type: "bool",
+                            family: Boolean,
+                            arity: Required,
+                            native_type: Some(
+                                NativeTypeInstance(..),
+                            ),
+                        },
+                        auto_increment: false,
+                        description: None,
+                    },
+                ),
+            ],
+            foreign_keys: [],
+            table_default_values: [
+                (
+                    TableColumnId(
+                        2,
+                    ),
+                    DefaultValue {
+                        kind: Value(
+                            Boolean(
+                                true,
+                            ),
+                        ),
+                        constraint_name: None,
+                    },
+                ),
+            ],
+            view_default_values: [],
+            foreign_key_columns: [],
+            indexes: [
+                Index {
+                    table_id: TableId(
+                        0,
+                    ),
+                    index_name: "User_email_active_idx",
+                    tpe: Unique,
+                    predicate: Some(
+                        "(active = true)",
+                    ),
+                },
+                Index {
+                    table_id: TableId(
+                        0,
+                    ),
+                    index_name: "User_pkey",
+                    tpe: PrimaryKey,
+                    predicate: None,
+                },
+            ],
+            stripped_partial_indexes: <StrippedPartialIndexes>,
+            index_columns: [
+                IndexColumn {
+                    index_id: IndexId(
+                        0,
+                    ),
+                    column_id: TableColumnId(
+                        1,
+                    ),
+                    sort_order: Some(
+                        Asc,
+                    ),
+                    length: None,
+                },
+                IndexColumn {
+                    index_id: IndexId(
+                        1,
+                    ),
+                    column_id: TableColumnId(
+                        0,
+                    ),
+                    sort_order: Some(
+                        Asc,
+                    ),
+                    length: None,
+                },
+            ],
+            check_constraints: [],
+            views: [],
+            view_columns: [],
+            procedures: [],
+            user_defined_types: [],
+            connector_data: <ConnectorData>,
+            runtime_namespace: None,
+        }
+    "#]];
+    expected.assert_debug_eq(&api.describe());
 }

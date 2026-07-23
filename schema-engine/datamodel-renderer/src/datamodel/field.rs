@@ -1,6 +1,6 @@
 use crate::{
     datamodel::{
-        attributes::FieldAttribute, index::UniqueFieldAttribute, DefaultValue, FieldType, IdFieldDefinition, Relation,
+        DefaultValue, FieldType, IdFieldDefinition, Relation, attributes::FieldAttribute, index::UniqueFieldAttribute,
     },
     value::{Constant, Documentation, Function},
 };
@@ -146,12 +146,12 @@ impl<'a> Field<'a> {
         &mut self,
         prefix: impl Into<Cow<'a, str>>,
         r#type: impl Into<Cow<'a, str>>,
-        params: Vec<String>,
+        params: impl IntoIterator<Item = impl Into<String>>,
     ) {
         let mut native_type = FieldAttribute::new(Function::new(r#type));
 
         for param in params {
-            native_type.push_param(Constant::new_no_validate(param));
+            native_type.push_param(Constant::new_no_validate(param.into()));
         }
 
         native_type.prefix(prefix);
@@ -225,7 +225,7 @@ impl<'a> Field<'a> {
     }
 }
 
-impl<'a> fmt::Display for Field<'a> {
+impl fmt::Display for Field<'_> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         if let Some(ref docs) = self.documentation {
             docs.fmt(f)?;

@@ -1,0 +1,17 @@
+datasource db {
+    provider = "mongodb"
+}
+
+model interm {
+    id Int @id
+
+    forumId Int
+    forum   Forum
+}
+
+model Forum {
+    id   Int      @id
+    name String
+
+    interm interm[]
+}

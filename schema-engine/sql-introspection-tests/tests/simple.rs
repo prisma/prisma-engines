@@ -1,12 +1,16 @@
 use connection_string::JdbcString;
 use enumflags2::BitFlags;
 use indoc::formatdoc;
-use psl::PreviewFeature;
+use psl::{PreviewFeature, parser_database::NoExtensionTypes};
 use quaint::single::Quaint;
 use schema_connector::{CompositeTypeDepth, ConnectorParams, IntrospectionContext, SchemaConnector};
-use sql_introspection_tests::test_api::Queryable;
+use sql_introspection_tests::test_api::{Queryable, ToIntrospectionTestResult};
 use sql_schema_connector::SqlSchemaConnector;
-use std::{fs, io::Write as _, path};
+use std::{
+    fs,
+    io::Write as _,
+    path::{self, PathBuf},
+};
 use test_setup::{
     mssql::init_mssql_database, mysql::create_mysql_database, postgres::create_postgres_database,
     runtime::run_with_thread_local_runtime as tok, sqlite_test_url,
@@ -73,7 +77,7 @@ fn run_simple_test(test_file_path: &str, test_function_name: &'static str) {
     let mut database_url = std::env::var("TEST_DATABASE_URL").expect(r#"
 Missing TEST_DATABASE_URL from environment.
 
-If you are developing with the docker-compose based setup, you can find the environment variables under .test_database_urls at the project root.
+If you are developing with the docker compose based setup, you can find the environment variables under .test_database_urls at the project root.
 
 Example usage:
 
@@ -98,11 +102,7 @@ source .test_database_urls/mysql_5_6
             .map(|prefix_end| &database_url[..prefix_end])
             .unwrap_or_else(|| database_url.as_str());
 
-        if provider == "file" {
-            "sqlite"
-        } else {
-            provider
-        }
+        if provider == "file" { "sqlite" } else { provider }
     };
 
     match provider {
@@ -142,31 +142,11 @@ source .test_database_urls/mysql_5_6
     };
 
     let mut api = match provider {
-        "cockroachdb" => {
-            let mut api = SqlSchemaConnector::new_cockroach();
-            api.set_params(params).unwrap();
-            api
-        }
-        "postgres" | "postgresql" => {
-            let mut api = SqlSchemaConnector::new_postgres();
-            api.set_params(params).unwrap();
-            api
-        }
-        "mysql" => {
-            let mut api = SqlSchemaConnector::new_mysql();
-            api.set_params(params).unwrap();
-            api
-        }
-        "sqlserver" => {
-            let mut api = SqlSchemaConnector::new_mssql();
-            api.set_params(params).unwrap();
-            api
-        }
-        "sqlite" => {
-            let mut api = SqlSchemaConnector::new_sqlite();
-            api.set_params(params).unwrap();
-            api
-        }
+        "cockroachdb" => SqlSchemaConnector::new_cockroach(params).unwrap(),
+        "postgres" | "postgresql" => SqlSchemaConnector::new_postgres(params).unwrap(),
+        "mysql" => SqlSchemaConnector::new_mysql(params).unwrap(),
+        "sqlserver" => SqlSchemaConnector::new_mssql(params).unwrap(),
+        "sqlite" => SqlSchemaConnector::new_sqlite(params).unwrap(),
         _ => unreachable!(),
     };
 
@@ -174,7 +154,6 @@ source .test_database_urls/mysql_5_6
         r#"
         datasource db {{
             provider = "{provider}"
-            url = env("DATABASE_URL")
         }}
     "#
     );
@@ -182,7 +161,7 @@ source .test_database_urls/mysql_5_6
     let generator = if preview_features.is_empty() {
         r#"
             generator js {
-                provider = "prisma-client-js"
+                provider = "prisma-client"
             }
         "#
         .to_string()
@@ -196,7 +175,7 @@ source .test_database_urls/mysql_5_6
         formatdoc!(
             r#"
             generator js {{
-                provider = "prisma-client-js"
+                provider = "prisma-client"
                 previewFeatures = [{features}]
             }}
         "#
@@ -205,13 +184,14 @@ source .test_database_urls/mysql_5_6
 
     let config = format!("{datasource}\n\n{generator}");
 
-    let psl = psl::validate(config.into());
+    let psl = psl::validate_without_extensions(config.into());
 
-    let ctx = IntrospectionContext::new(psl, CompositeTypeDepth::Infinite, namespaces.clone());
+    let ctx = IntrospectionContext::new(psl, CompositeTypeDepth::Infinite, namespaces.clone(), PathBuf::new());
 
-    let introspected = tok(api.introspect(&ctx))
+    let introspected = tok(api.introspect(&ctx, &NoExtensionTypes))
+        .map(ToIntrospectionTestResult::to_single_test_result)
         .unwrap_or_else(|err| panic!("{}", err))
-        .data_model;
+        .datamodel;
 
     let last_comment_idx = text
         .match_indices("/*")
@@ -225,7 +205,7 @@ source .test_database_urls/mysql_5_6
         .trim_end_matches("*/\n");
 
     if last_comment == introspected {
-        let introspected_schema = match psl::parse_schema(&introspected) {
+        let introspected_schema = match psl::parse_schema_without_extensions(&introspected) {
             Ok(s) => s,
             Err(_err) => {
                 eprintln!("The introspected schema is invalid.");
@@ -234,11 +214,17 @@ source .test_database_urls/mysql_5_6
         };
 
         let re_introspected = {
-            let ctx = IntrospectionContext::new(introspected_schema, CompositeTypeDepth::Infinite, namespaces);
+            let ctx = IntrospectionContext::new(
+                introspected_schema,
+                CompositeTypeDepth::Infinite,
+                namespaces,
+                PathBuf::new(),
+            );
 
-            tok(api.introspect(&ctx))
+            tok(api.introspect(&ctx, &NoExtensionTypes))
+                .map(ToIntrospectionTestResult::to_single_test_result)
                 .unwrap_or_else(|err| panic!("{}", err))
-                .data_model
+                .datamodel
         };
 
         if introspected == re_introspected {

@@ -134,6 +134,8 @@ pub struct Warnings {
     pub json_schema_defined: Vec<Model>,
     /// Warning about JSONSchema on a model.
     pub capped_collection: Vec<Model>,
+    /// Warning about broken m2m relations.
+    pub broken_m2m_relations: BTreeSet<(Model, Model)>,
 }
 
 impl Warnings {
@@ -186,19 +188,19 @@ impl fmt::Display for Warnings {
         render_warnings_grouped(
             "These fields were commented out because their names are currently not supported by Prisma. Please provide valid ones that match [a-zA-Z][a-zA-Z0-9_]* using the `@map` attribute:",
             &self.fields_with_empty_names_in_model,
-            f
+            f,
         )?;
 
         render_warnings_grouped(
             "These fields were commented out because their names are currently not supported by Prisma. Please provide valid ones that match [a-zA-Z][a-zA-Z0-9_]* using the `@map` attribute:",
             &self.fields_with_empty_names_in_view,
-            f
+            f,
         )?;
 
         render_warnings_grouped(
             "These fields were commented out because their names are currently not supported by Prisma. Please provide valid ones that match [a-zA-Z][a-zA-Z0-9_]* using the `@map` attribute:",
             &self.fields_with_empty_names_in_type,
-            f
+            f,
         )?;
 
         render_warnings(
@@ -216,25 +218,25 @@ impl fmt::Display for Warnings {
         render_warnings(
             "These enum values were commented out because their names are currently not supported by Prisma. Please provide valid ones that match [a-zA-Z][a-zA-Z0-9_]* using the `@map` attribute:",
             &self.enum_values_with_empty_names,
-            f
+            f,
         )?;
 
         render_warnings(
             "The following models were commented out as we could not retrieve columns for them. Please check your privileges:",
             &self.models_without_columns,
-            f
+            f,
         )?;
 
         render_warnings(
             "The following models were ignored as they do not have a valid unique identifier or id. This is currently not supported by Prisma Client:",
             &self.models_without_identifiers,
-            f
+            f,
         )?;
 
         render_warnings(
             "The following views were ignored as they do not have a valid unique identifier or id. This is currently not supported by Prisma Client. Please refer to the documentation on defining unique identifiers in views: https://pris.ly/d/view-identifiers",
             &self.views_without_identifiers,
-            f
+            f,
         )?;
 
         render_warnings(
@@ -298,7 +300,7 @@ impl fmt::Display for Warnings {
         )?;
 
         render_warnings(
-            "These items were renamed due to their names being duplicates in the Prisma Schema Language:",
+            "These items were renamed due to their names being duplicates in the Prisma schema:",
             &self.duplicate_names,
             f,
         )?;
@@ -396,30 +398,46 @@ impl fmt::Display for Warnings {
         render_warnings(
             "The following models have a JSON Schema defined in the database, which is not yet fully supported. Read more: https://pris.ly/d/mongodb-json-schema",
             &self.json_schema_defined,
-            f
+            f,
         )?;
 
         render_warnings(
             "The following models are capped collections, which are not yet fully supported. Read more: https://pris.ly/d/mongodb-capped-collections",
             &self.capped_collection,
-            f
+            f,
         )?;
 
         render_warnings(
             "These indexes are not supported by Prisma Client, because Prisma currently does not fully support expression indexes. Read more: https://pris.ly/d/expression-indexes",
             &self.expression_indexes,
-            f
+            f,
         )?;
+
+        if !self.broken_m2m_relations.is_empty() {
+            for (model_a, model_b) in self.broken_m2m_relations.iter() {
+                write!(
+                    f,
+                    "The many-to-many relation between {model_a} and {model_b} is broken due to the naming of the models. Prisma creates many-to-many relations based on the alphabetical ordering of the names of the models and these two models now produce the reverse of the expected ordering.",
+                )?;
+            }
+        }
 
         Ok(())
     }
 }
 
 /// A model that triggered a warning.
-#[derive(PartialEq, Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub struct Model {
     /// The name of the model
     pub model: String,
+}
+
+impl Model {
+    /// Creates a new model with the given name.
+    pub fn new(model: impl Into<String>) -> Self {
+        Self { model: model.into() }
+    }
 }
 
 impl fmt::Display for Model {

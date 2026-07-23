@@ -104,17 +104,17 @@
 //! # }
 //! ```
 
+// TODO: remove once `quaint` is no longer a transitive dependency of `mongodb-schema-connector`.
+#![allow(dead_code)]
+
 #[cfg(not(any(feature = "sqlite", feature = "postgresql", feature = "mysql", feature = "mssql")))]
 compile_error!("one of 'sqlite', 'postgresql', 'mysql' or 'mssql' features must be enabled");
 
 #[macro_use]
 mod macros;
 
-#[macro_use]
-extern crate metrics;
-
-pub extern crate bigdecimal;
-pub extern crate chrono;
+pub use bigdecimal;
+pub use chrono;
 
 pub mod ast;
 pub mod connector;
@@ -123,10 +123,11 @@ pub mod error;
 pub mod pooled;
 pub mod prelude;
 pub mod single;
-#[cfg(test)]
-mod tests;
 pub mod visitor;
 
 pub use ast::{Value, ValueType};
 
 pub type Result<T> = std::result::Result<T, error::Error>;
+
+#[cfg(test)]
+mod tests;

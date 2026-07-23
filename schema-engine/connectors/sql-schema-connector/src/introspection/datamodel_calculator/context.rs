@@ -8,11 +8,12 @@ use crate::introspection::{
     introspection_pair::{EnumPair, ModelPair, RelationFieldDirection, ViewPair},
     sanitize_datamodel_names::{EnumVariantName, IntrospectedName, ModelName},
 };
+use either::Either;
 use psl::{
+    Configuration, PreviewFeature,
     builtin_connectors::*,
     datamodel_connector::Connector,
-    parser_database::{ast, walkers},
-    Configuration, PreviewFeature,
+    parser_database::{self as db, ExtensionTypes, walkers},
 };
 use quaint::prelude::SqlFamily;
 use schema_connector::IntrospectionContext;
@@ -31,15 +32,27 @@ pub(crate) struct DatamodelCalculatorContext<'a> {
     pub(crate) force_namespaces: Option<&'a [String]>,
     pub(crate) flavour: Box<dyn IntrospectionFlavour>,
     pub(crate) search_path: &'a str,
+    pub(crate) extension_types: &'a dyn ExtensionTypes,
 }
 
 impl<'a> DatamodelCalculatorContext<'a> {
-    pub(crate) fn new(ctx: &'a IntrospectionContext, sql_schema: &'a sql::SqlSchema, search_path: &'a str) -> Self {
+    pub(crate) fn new(
+        ctx: &'a IntrospectionContext,
+        sql_schema: &'a sql::SqlSchema,
+        search_path: &'a str,
+        extension_types: &'a dyn ExtensionTypes,
+    ) -> Self {
         let flavour: Box<dyn IntrospectionFlavour> = match ctx.sql_family() {
+            #[cfg(any(feature = "postgresql", feature = "cockroachdb"))]
             SqlFamily::Postgres => Box::new(flavour::PostgresIntrospectionFlavour),
+            #[cfg(feature = "mysql")]
             SqlFamily::Mysql => Box::new(flavour::MysqlIntrospectionFlavour),
+            #[cfg(feature = "sqlite")]
             SqlFamily::Sqlite => Box::new(flavour::SqliteIntrospectionFlavour),
+            #[cfg(feature = "mssql")]
             SqlFamily::Mssql => Box::new(flavour::SqlServerIntrospectionFlavour),
+            #[allow(unreachable_patterns)]
+            _ => unimplemented!("Unsupported SQL family: {:?}", ctx.sql_family()),
         };
 
         let mut ctx = DatamodelCalculatorContext {
@@ -52,6 +65,7 @@ impl<'a> DatamodelCalculatorContext<'a> {
             force_namespaces: ctx.namespaces(),
             flavour,
             search_path,
+            extension_types,
         };
 
         ctx.introspection_map = IntrospectionMap::new(&ctx);
@@ -75,7 +89,19 @@ impl<'a> DatamodelCalculatorContext<'a> {
         self.config.datasources.first().unwrap().active_connector
     }
 
+    // Note: when this method returns true, we use it to add `@@schema` attributes to the
+    // introspected models, enums, views.
     pub(crate) fn uses_namespaces(&self) -> bool {
+        // Note: you may be tempted to return true when
+        // ```
+        // self
+        //     .active_connector()
+        //     .capabilities()
+        //     .contains(ConnectorCapability::MultiSchema)
+        // ```
+        // but that would not be correct in all cases.
+        // Why? Because we should only add `@@schema` attributes when the user has specified
+        // an explicit list of `schemas`.
         let schemas_in_datasource = matches!(self.config.datasources.first(), Some(ds) if !ds.namespaces.is_empty());
         let schemas_in_parameters = self.force_namespaces.is_some();
 
@@ -85,16 +111,33 @@ impl<'a> DatamodelCalculatorContext<'a> {
     /// Iterate over the database enums, combined together with a
     /// possible existing enum in the PSL.
     pub(crate) fn enum_pairs(&'a self) -> impl Iterator<Item = EnumPair<'a>> + 'a {
-        let uses_views = self.config.preview_features().contains(PreviewFeature::Views);
-        let is_mysql = self.sql_family.is_mysql();
+        if self.sql_family.is_sqlite() {
+            Either::Left(
+                self.previous_schema
+                    .db
+                    .walk_enums()
+                    .map(|id| EnumPair::from_model(id, self)),
+            )
+        } else {
+            let uses_views = self.config.preview_features().contains(PreviewFeature::Views);
+            let is_mysql = self.sql_family.is_mysql();
 
-        self.sql_schema
-            .enum_walkers()
-            // MySQL enums are taken from the columns, which means a rogue enum might appear
-            // for users not using the views preview feature, but having views with enums
-            // in their database.
-            .filter(move |e| !is_mysql || uses_views || self.sql_schema.enum_used_in_tables(e.id))
-            .map(|next| EnumPair::new(self, self.existing_enum(next.id), next))
+            Either::Right(
+                self.sql_schema
+                    .enum_walkers()
+                    // MySQL enums are taken from the columns, which means a rogue enum might appear
+                    // for users not using the views preview feature, but having views with enums
+                    // in their database.
+                    .filter(move |e| !is_mysql || uses_views || self.sql_schema.enum_used_in_tables(e.id))
+                    .map(|next| {
+                        let mut pair = EnumPair::from_db(next, self);
+                        if let Some(model_enum) = self.existing_enum(next.id) {
+                            pair.insert_model(model_enum);
+                        }
+                        pair
+                    }),
+            )
+        }
     }
 
     pub(crate) fn sql_family(&self) -> SqlFamily {
@@ -108,7 +151,7 @@ impl<'a> DatamodelCalculatorContext<'a> {
             .table_walkers()
             .filter(|table| !is_old_migration_table(*table))
             .filter(|table| !is_new_migration_table(*table))
-            .filter(|table| !is_prisma_m_to_n_relation(*table))
+            .filter(|table| !is_prisma_m_to_n_relation(*table, self.flavour.uses_pk_in_m2m_join_tables(self)))
             .filter(|table| !is_relay_table(*table))
             .map(move |next| {
                 let previous = self.existing_model(next.id);
@@ -154,7 +197,7 @@ impl<'a> DatamodelCalculatorContext<'a> {
         }
 
         let r#enum = self.sql_schema.walk(id);
-        ModelName::new_from_sql(r#enum.name(), r#enum.namespace(), self)
+        ModelName::new_from_sql(r#enum.name(), r#enum.explicit_namespace(), self)
     }
 
     /// Given a SQL enum variant from the database catalog, this method returns the name it will be
@@ -258,7 +301,7 @@ impl<'a> DatamodelCalculatorContext<'a> {
         }
 
         let table = self.sql_schema.walk(id);
-        ModelName::new_from_sql(table.name(), table.namespace(), self)
+        ModelName::new_from_sql(table.name(), table.explicit_namespace(), self)
     }
 
     // Use the existing view name when available.
@@ -363,11 +406,11 @@ impl<'a> DatamodelCalculatorContext<'a> {
         self.introspection_map.relation_names.m2m_relation_name(id)
     }
 
-    pub(crate) fn table_missing_for_model(&self, id: &ast::ModelId) -> bool {
+    pub(crate) fn table_missing_for_model(&self, id: &db::ModelId) -> bool {
         self.introspection_map.missing_tables_for_previous_models.contains(id)
     }
 
-    pub(crate) fn view_missing_for_model(&self, id: &ast::ModelId) -> bool {
+    pub(crate) fn view_missing_for_model(&self, id: &db::ModelId) -> bool {
         self.introspection_map.missing_views_for_previous_models.contains(id)
     }
 
@@ -398,6 +441,22 @@ impl<'a> DatamodelCalculatorContext<'a> {
             .m2m_relation_positions
             .iter()
             .filter(move |(table_id, _, _)| *table_id == table_id_filter)
+            .map(|(_, fk_id, direction)| {
+                let next = sql::Walker {
+                    id: *fk_id,
+                    schema: self.sql_schema,
+                };
+
+                (*direction, next)
+            })
+    }
+
+    pub(crate) fn m2m_relations(
+        &'a self,
+    ) -> impl Iterator<Item = (RelationFieldDirection, sql::ForeignKeyWalker<'a>)> + 'a {
+        self.introspection_map
+            .m2m_relation_positions
+            .iter()
             .map(|(_, fk_id, direction)| {
                 let next = sql::Walker {
                     id: *fk_id,

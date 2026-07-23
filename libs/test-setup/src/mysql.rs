@@ -1,4 +1,4 @@
-use crate::{runtime::run_with_thread_local_runtime as tok, AnyError, Tags};
+use crate::{AnyError, Tags, runtime::run_with_thread_local_runtime as tok};
 use enumflags2::BitFlags;
 use quaint::{prelude::Queryable, single::Quaint};
 use url::Url;

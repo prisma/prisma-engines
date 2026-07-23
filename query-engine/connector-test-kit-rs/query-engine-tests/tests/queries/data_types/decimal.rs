@@ -2,7 +2,7 @@ use query_engine_tests::*;
 
 #[test_suite(schema(schema), capabilities(DecimalType))]
 mod decimal {
-    use query_engine_tests::{run_query, EngineProtocol, Runner};
+    use query_engine_tests::{EngineProtocol, Runner, run_query};
 
     fn schema() -> String {
         let schema = indoc! {
@@ -104,7 +104,7 @@ mod decimal {
 
     async fn create_row(runner: &Runner, data: &str) -> TestResult<()> {
         runner
-            .query(format!("mutation {{ createOneTestModel(data: {}) {{ id }} }}", data))
+            .query(format!("mutation {{ createOneTestModel(data: {data}) {{ id }} }}"))
             .await?
             .assert_success();
         Ok(())

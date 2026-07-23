@@ -3,7 +3,7 @@ use query_engine_tests::*;
 #[test_suite(schema(schema), capabilities(Enums))]
 mod create {
     use indoc::indoc;
-    use query_engine_tests::{assert_error, run_query, TROUBLE_CHARS};
+    use query_engine_tests::{TROUBLE_CHARS, assert_error, run_query};
 
     fn schema() -> String {
         let schema = indoc! {
@@ -158,7 +158,9 @@ mod create {
     // "A Create Mutation" should "fail when a DateTime is invalid"
     #[connector_test]
     async fn fail_when_datetime_invalid(runner: Runner) -> TestResult<()> {
-        assert_error!(runner, r#"mutation {
+        assert_error!(
+            runner,
+            r#"mutation {
           createOneScalarModel(data:{
             id: "1",
             optString: "test",
@@ -171,8 +173,8 @@ mod create {
               optString, optInt, optFloat, optBoolean, optEnum, optDateTime
             }
           }"#,
-          2009,
-          "2016-0B-31T23:59:01.000Z` is not a valid `ISO-8601 DateTime`. Underlying error: input contains invalid characters"
+            2009,
+            "2016-0B-31T23:59:01.000Z` is not a valid `ISO-8601 DateTime`. Underlying error: input contains invalid characters"
         );
 
         Ok(())

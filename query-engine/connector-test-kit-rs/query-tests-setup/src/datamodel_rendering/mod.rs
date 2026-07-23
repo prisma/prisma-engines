@@ -1,18 +1,22 @@
+mod datasource;
 mod mongodb_renderer;
 mod sql_renderer;
+
+use std::sync::LazyLock;
 
 pub use mongodb_renderer::*;
 pub use sql_renderer::*;
 
-use crate::{connection_string, templating, DatamodelFragment, IdFragment, M2mFragment, CONFIG};
+use crate::{
+    CONFIG, DatamodelFragment, IdFragment, M2mFragment, datamodel_rendering::datasource::DatasourceBuilder, templating,
+};
 use indoc::indoc;
 use itertools::Itertools;
-use once_cell::sync::Lazy;
-use psl::ALL_PREVIEW_FEATURES;
+use psl::FeatureMapWithProvider;
 use regex::Regex;
 
 /// Test configuration, loaded once at runtime.
-static FRAGMENT_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r"#.*").unwrap());
+static FRAGMENT_RE: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"#.*").unwrap());
 
 /// The main trait a datamodel renderer for a connector has to implement.
 pub trait DatamodelRenderer {
@@ -29,49 +33,39 @@ pub trait DatamodelRenderer {
 
 /// Render the complete datamodel with all bells and whistles.
 pub fn render_test_datamodel(
-    test_database: &str,
     template: String,
     excluded_features: &[&str],
     relation_mode_override: Option<String>,
     db_schemas: &[&str],
-    isolation_level: Option<&'static str>,
-) -> String {
-    let (tag, version) = CONFIG.test_connector().unwrap();
-    let preview_features = render_preview_features(excluded_features);
+    db_extensions: &[&str],
+) -> RenderedDatamodel {
+    let (tag, _) = CONFIG.test_connector().unwrap();
+    let preview_features = render_preview_features(tag.datamodel_provider(), excluded_features);
 
-    let is_multi_schema = !db_schemas.is_empty();
-
-    let schema_def = if is_multi_schema {
-        format!("schemas = {db_schemas:?}")
-    } else {
-        String::default()
-    };
+    let datasource = DatasourceBuilder::new("test")
+        .provider(tag.datamodel_provider())
+        .relation_mode(relation_mode_override.unwrap_or_else(|| tag.relation_mode().to_string()))
+        .schemas_if_not_empty(db_schemas)
+        .extensions_if_not_empty(db_extensions)
+        .render();
 
     let datasource_with_generator = format!(
         indoc! {r#"
-            datasource test {{
-                provider = "{}"
-                url = "{}"
-                relationMode = "{}"
-                {}
-            }}
+            {}
 
             generator client {{
-                provider = "prisma-client-js"
+                provider = "prisma-client"
                 previewFeatures = [{}]
             }}
         "#},
-        tag.datamodel_provider(),
-        connection_string(&CONFIG, &version, test_database, is_multi_schema, isolation_level),
-        relation_mode_override.unwrap_or_else(|| tag.relation_mode().to_string()),
-        schema_def,
-        preview_features
+        datasource, preview_features
     );
 
     let renderer = tag.datamodel_renderer();
     let models = process_template(template, renderer);
 
-    format!("{datasource_with_generator}\n\n{models}")
+    let schema = format!("{datasource_with_generator}\n\n{models}");
+    RenderedDatamodel { schema }
 }
 
 fn process_template(template: String, renderer: Box<dyn DatamodelRenderer>) -> String {
@@ -89,14 +83,20 @@ fn process_template(template: String, renderer: Box<dyn DatamodelRenderer>) -> S
     })
 }
 
-fn render_preview_features(excluded_features: &[&str]) -> String {
+fn render_preview_features(provider: &str, excluded_features: &[&str]) -> String {
     let excluded_features: Vec<_> = excluded_features.iter().map(|f| format!(r#""{f}""#)).collect();
+    let feature_map_with_provider = FeatureMapWithProvider::new(Some(provider));
 
-    ALL_PREVIEW_FEATURES
+    feature_map_with_provider
         .active_features()
         .iter()
-        .chain(ALL_PREVIEW_FEATURES.hidden_features())
+        .chain(feature_map_with_provider.hidden_features())
         .map(|f| format!(r#""{f}""#))
         .filter(|f| !excluded_features.contains(f))
         .join(", ")
+}
+
+#[derive(Debug)]
+pub struct RenderedDatamodel {
+    pub schema: String,
 }

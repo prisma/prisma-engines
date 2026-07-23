@@ -10,7 +10,7 @@ mod scalar_relations {
 
               children Child[]
             }
-            
+
             model Child {
               #id(childId, Int, @id)
 
@@ -31,24 +31,18 @@ mod scalar_relations {
         schema.to_owned()
     }
 
-    // TODO: fix https://github.com/prisma/team-orm/issues/684 and unexclude DAs.
-    // On napi, this currently fails with "P2023":
-    // `Inconsistent column data: Unexpected conversion failure for field Child.bInt from Number(14324324234324.0) to BigInt`.
-    #[connector_test(
-        schema(schema_common),
-        exclude(Postgres("pg.js", "neon.js"), Vitess("planetscale.js"))
-    )]
+    #[connector_test(schema(schema_common))]
     async fn common_types(runner: Runner) -> TestResult<()> {
         create_common_children(&runner).await?;
 
         insta::assert_snapshot!(
           run_query!(&runner, r#"{ findManyParent { id children { childId string int bInt float bytes bool dt } } }"#),
-          @r###"{"data":{"findManyParent":[{"id":1,"children":[{"childId":1,"string":"abc","int":1,"bInt":"1","float":1.5,"bytes":"AQID","bool":false,"dt":"1900-10-10T01:10:10.001Z"},{"childId":2,"string":"def","int":-4234234,"bInt":"14324324234324","float":-2.54367,"bytes":"FDSF","bool":true,"dt":"1999-12-12T21:12:12.121Z"}]}]}}"###
+          @r###"{"data":{"findManyParent":[{"id":1,"children":[{"childId":1,"string":"abc","int":1,"bInt":"1","float":1.5,"bytes":"VGhpcyBpcyBhIGxhcmdlIGJhc2U2NCBzdHJpbmcgdGhhdCBlbnN1cmVzIHdlIHNhbml0aXplIHRoZSBvdXRwdXQgb2YgTXlTUUwgYmFzZTY0IHN0cmluZy4=","bool":false,"dt":"1900-10-10T01:10:10.001Z"},{"childId":2,"string":"def","int":-4234234,"bInt":"14324324234324","float":-2.54367,"bytes":"FDSF","bool":true,"dt":"1999-12-12T21:12:12.121Z"}]}]}}"###
         );
 
         insta::assert_snapshot!(
           run_query!(&runner, r#"{ findUniqueParent(where: { id: 1 }) { id children { childId string int bInt float bytes bool dt } } }"#),
-          @r###"{"data":{"findUniqueParent":{"id":1,"children":[{"childId":1,"string":"abc","int":1,"bInt":"1","float":1.5,"bytes":"AQID","bool":false,"dt":"1900-10-10T01:10:10.001Z"},{"childId":2,"string":"def","int":-4234234,"bInt":"14324324234324","float":-2.54367,"bytes":"FDSF","bool":true,"dt":"1999-12-12T21:12:12.121Z"}]}}}"###
+          @r###"{"data":{"findUniqueParent":{"id":1,"children":[{"childId":1,"string":"abc","int":1,"bInt":"1","float":1.5,"bytes":"VGhpcyBpcyBhIGxhcmdlIGJhc2U2NCBzdHJpbmcgdGhhdCBlbnN1cmVzIHdlIHNhbml0aXplIHRoZSBvdXRwdXQgb2YgTXlTUUwgYmFzZTY0IHN0cmluZy4=","bool":false,"dt":"1900-10-10T01:10:10.001Z"},{"childId":2,"string":"def","int":-4234234,"bInt":"14324324234324","float":-2.54367,"bytes":"FDSF","bool":true,"dt":"1999-12-12T21:12:12.121Z"}]}}}"###
         );
 
         insta::assert_snapshot!(
@@ -66,7 +60,7 @@ mod scalar_relations {
 
             children Child[]
           }
-          
+
           model Child {
             #id(childId, Int, @id)
 
@@ -95,12 +89,14 @@ mod scalar_relations {
         .await?;
 
         insta::assert_snapshot!(
-          run_query!(&runner, r#"{ findManyParent(orderBy: { id: asc }) { id children { childId json } } }"#),
+          runner.query(r#"{ findManyParent(orderBy: { id: asc }) { id children { childId json } } }"#)
+            .await?.to_string().replace(" ", ""), // ignore whitespace in the JSON string
           @r###"{"data":{"findManyParent":[{"id":1,"children":[{"childId":1,"json":"1"},{"childId":2,"json":"{}"},{"childId":3,"json":"{\"a\":\"b\"}"},{"childId":4,"json":"[]"},{"childId":5,"json":"[1,-1,true,{\"a\":\"b\"}]"}]}]}}"###
         );
 
         insta::assert_snapshot!(
-          run_query!(&runner, r#"{ findUniqueParent(where: { id: 1 }) { id children { childId json } } }"#),
+          runner.query(r#"{ findUniqueParent(where: { id: 1 }) { id children { childId json } } }"#)
+            .await?.to_string().replace(" ", ""), // ignore whitespace in the JSON string
           @r###"{"data":{"findUniqueParent":{"id":1,"children":[{"childId":1,"json":"1"},{"childId":2,"json":"{}"},{"childId":3,"json":"{\"a\":\"b\"}"},{"childId":4,"json":"[]"},{"childId":5,"json":"[1,-1,true,{\"a\":\"b\"}]"}]}}}"###
         );
 
@@ -114,7 +110,7 @@ mod scalar_relations {
 
                 children Child[]
               }
-              
+
               model Child {
                 #id(childId, Int, @id)
 
@@ -166,7 +162,7 @@ mod scalar_relations {
 
               children Child[]
             }
-            
+
             model Child {
               #id(childId, Int, @id)
 
@@ -221,7 +217,7 @@ mod scalar_relations {
 
             children Child[]
           }
-          
+
           model Child {
             #id(childId, Int, @id)
 
@@ -249,7 +245,7 @@ mod scalar_relations {
     #[connector_test(
         schema(schema_scalar_lists),
         capabilities(ScalarLists),
-        exclude(Postgres("pg.js", "neon.js", "pg.js.wasm", "neon.js.wasm"))
+        exclude(Postgres("pg.js.wasm", "neon.js.wasm"), CockroachDb("pg.js.wasm"))
     )]
     async fn scalar_lists(runner: Runner) -> TestResult<()> {
         create_child(
@@ -282,6 +278,48 @@ mod scalar_relations {
         Ok(())
     }
 
+    fn schema_oid() -> String {
+        let schema = indoc! {
+            r#"model Parent {
+            #id(id, Int, @id)
+
+            children Child[]
+          }
+
+          model Child {
+            #id(childId, Int, @id)
+
+            parentId Int?
+            parent Parent? @relation(fields: [parentId], references: [id])
+
+            oid Int @test.Oid
+          }
+          "#
+        };
+
+        schema.to_owned()
+    }
+
+    #[connector_test(schema(schema_oid), only(Postgres, CockroachDb))]
+    async fn oid_type(runner: Runner) -> TestResult<()> {
+        create_child(&runner, r#"{ childId: 1, oid: 0 }"#).await?;
+        create_child(&runner, r#"{ childId: 2, oid: 1 }"#).await?;
+        create_child(&runner, r#"{ childId: 3, oid: 65587 }"#).await?;
+        create_child(&runner, &format!(r#"{{ childId: 4, oid: {} }}"#, u32::MAX)).await?;
+        create_parent(
+            &runner,
+            r#"{ id: 1, children: { connect: [{ childId: 1 }, { childId: 2 }, { childId: 3 }, { childId: 4 }] } }"#,
+        )
+        .await?;
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"{ findManyParent { id children(orderBy: { oid: asc }) { oid } } }"#),
+          @r###"{"data":{"findManyParent":[{"id":1,"children":[{"oid":0},{"oid":1},{"oid":65587},{"oid":4294967295}]}]}}"###
+        );
+
+        Ok(())
+    }
+
     async fn create_common_children(runner: &Runner) -> TestResult<()> {
         create_child(
             runner,
@@ -291,7 +329,7 @@ mod scalar_relations {
           int: 1,
           bInt: 1,
           float: 1.5,
-          bytes: "AQID",
+          bytes: "VGhpcyBpcyBhIGxhcmdlIGJhc2U2NCBzdHJpbmcgdGhhdCBlbnN1cmVzIHdlIHNhbml0aXplIHRoZSBvdXRwdXQgb2YgTXlTUUwgYmFzZTY0IHN0cmluZy4=",
           bool: false,
           dt: "1900-10-10T01:10:10.001Z",
       }"#,
@@ -324,7 +362,7 @@ mod scalar_relations {
 
     async fn create_child(runner: &Runner, data: &str) -> TestResult<()> {
         runner
-            .query(format!("mutation {{ createOneChild(data: {}) {{ childId }} }}", data))
+            .query(format!("mutation {{ createOneChild(data: {data}) {{ childId }} }}"))
             .await?
             .assert_success();
         Ok(())
@@ -332,7 +370,7 @@ mod scalar_relations {
 
     async fn create_parent(runner: &Runner, data: &str) -> TestResult<()> {
         runner
-            .query(format!("mutation {{ createOneParent(data: {}) {{ id }} }}", data))
+            .query(format!("mutation {{ createOneParent(data: {data}) {{ id }} }}"))
             .await?
             .assert_success();
         Ok(())

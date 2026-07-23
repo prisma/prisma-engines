@@ -1,6 +1,7 @@
 mod views;
 
 use indoc::indoc;
+use schema_core::json_rpc::types::SchemaFilter;
 use sql_migration_tests::test_api::*;
 use sql_schema_describer::ColumnTypeFamily;
 
@@ -241,6 +242,33 @@ fn alter_constraint_name_push(api: TestApi) {
     });
 }
 
+#[test_connector(exclude(Sqlite, Mysql))]
+fn alter_constraint_name_and_alter_columns_at_same_time_push(api: TestApi) {
+    let dm1 = r#"
+         model A {
+           id   Int     @id
+           name String?
+         }
+     "#;
+
+    api.schema_push_w_datasource(dm1).send().assert_green();
+
+    let dm2 = r#"
+         model A {
+           id       Int     @id(map: "CustomId")
+           name     String?
+           lastName String?
+         }
+     "#;
+
+    api.schema_push_w_datasource(dm2).send().assert_green();
+
+    api.assert_schema().assert_table("A", |table| {
+        table.assert_pk(|pk| pk.assert_constraint_name("CustomId"));
+        table.assert_columns_count(3).assert_has_column("lastName")
+    });
+}
+
 #[test_connector(tags(Sqlite))]
 fn sqlite_reserved_name_space_can_be_used(api: TestApi) {
     let plain_dm = r#"
@@ -456,41 +484,55 @@ fn issue_repro_extended_indexes(api: TestApi) {
     api.schema_push_w_datasource(dm).send().assert_green().assert_no_steps();
 }
 
-#[test]
-fn multi_schema_not_implemented_on_mysql() {
-    test_setup::only!(Mysql ; exclude: Vitess);
-
-    if cfg!(windows) {
-        return;
+#[test_connector]
+fn schema_push_with_schema_filters(api: TestApi) {
+    let dm = r#"
+    model Cat {
+        id Int @id
     }
 
-    let schema = r#"
-generator client {
-    provider = "prisma-client-js"
-    previewFeatures = ["multiSchema"]
-}
-
-datasource db {
-    provider = "mysql"
-    url = env("TEST_DATABASE_URL")
-    schemas = ["s1", "s2"]
-}
-
-model m1 {
-  id Int @id
-  @@schema("s2")
-}
+    model ExternalTable {
+        id Int @id        
+    }
     "#;
 
-    let api = schema_core::schema_api(Some(schema.to_owned()), None).unwrap();
-    let err = tok(api.schema_push(schema_core::json_rpc::types::SchemaPushInput {
-        force: false,
-        schema: schema.to_owned(),
-    }))
-    .unwrap_err();
+    api.schema_push_with_filter(dm, api.namespaced_schema_filter(&["ExternalTable"]))
+        .send()
+        .assert_green()
+        .assert_has_executed_steps();
 
-    let err_msg = err.message().unwrap();
-    let expected = expect!["multiSchema migrations and introspection are not implemented on MySQL yet"];
+    api.assert_schema()
+        .assert_has_table("Cat")
+        .assert_has_no_table("ExternalTable");
+}
 
-    expected.assert_eq(err_msg);
+#[test_connector]
+fn schema_push_with_invalid_schema_filters(api: TestApi) {
+    let dm = r#"
+    model Cat {
+        id Int @id
+    }
+
+    model ExternalTable {
+        id Int @id        
+    }
+    "#;
+
+    let (expected_error_code, table_name) = if api.is_postgres() || api.is_mssql() {
+        ("P3023", "ExternalTable")
+    } else {
+        ("P3024", "public.ExternalTable")
+    };
+
+    let err = api
+        .schema_push_with_filter(
+            dm,
+            SchemaFilter {
+                external_tables: vec![table_name.to_string()],
+                external_enums: vec![],
+            },
+        )
+        .send_unwrap_err();
+
+    assert_eq!(err.error_code(), Some(expected_error_code));
 }

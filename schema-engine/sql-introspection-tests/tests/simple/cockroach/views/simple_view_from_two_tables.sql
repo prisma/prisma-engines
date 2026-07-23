@@ -24,15 +24,15 @@ CREATE VIEW "Schwuser" AS
 
 
 
+
 /*
 generator js {
-  provider        = "prisma-client-js"
+  provider        = "prisma-client"
   previewFeatures = ["views"]
 }
 
 datasource db {
   provider = "cockroachdb"
-  url      = env("DATABASE_URL")
 }
 
 model Profile {
@@ -48,12 +48,9 @@ model User {
   Profile    Profile?
 }
 
-/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 view Schwuser {
   id           BigInt?
   name         String?
   introduction String?
-
-  @@ignore
 }
 */

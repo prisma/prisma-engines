@@ -1,17 +1,18 @@
 use super::{
-    helpers::{parsing_catch_all, Pair},
+    Rule,
+    helpers::{Pair, parsing_catch_all},
     parse_attribute::parse_attribute,
     parse_comments::parse_comment_block,
     parse_field::parse_field,
-    Rule,
 };
 use crate::ast;
-use diagnostics::{DatamodelError, Diagnostics, Span};
+use diagnostics::{DatamodelError, Diagnostics, FileId, Span};
 
 pub(crate) fn parse_composite_type(
     pair: Pair<'_>,
     doc_comment: Option<Pair<'_>>,
     diagnostics: &mut Diagnostics,
+    file_id: FileId,
 ) -> ast::CompositeType {
     let pair_span = pair.as_span();
     let mut name: Option<ast::Identifier> = None;
@@ -22,55 +23,43 @@ pub(crate) fn parse_composite_type(
         match current.as_rule() {
             Rule::BLOCK_OPEN | Rule::BLOCK_CLOSE => {}
             Rule::TYPE_KEYWORD => (),
-            Rule::identifier => name = Some(current.into()),
+            Rule::identifier => name = Some(ast::Identifier::new(current, file_id)),
             Rule::model_contents => {
                 let mut pending_field_comment: Option<Pair<'_>> = None;
-                inner_span = Some(current.as_span().into());
+                inner_span = Some((file_id, current.as_span()).into());
 
                 for item in current.into_inner() {
                     let current_span = item.as_span();
 
                     match item.as_rule() {
                         Rule::block_attribute => {
-                            let attr = parse_attribute(item, diagnostics);
+                            let attr = parse_attribute(item, diagnostics, file_id);
 
                             let err = match attr.name.name.as_str() {
-                                "map" => {
-                                    DatamodelError::new_validation_error(
-                                        "The name of a composite type is not persisted in the database, therefore it does not need a mapped database name.",
-                                        current_span.into(),
-                                    )
-                                }
-                                "unique" => {
-                                    DatamodelError::new_validation_error(
-                                        "A unique constraint should be defined in the model containing the embed.",
-                                        current_span.into(),
-                                    )
-                                }
-                                "index" => {
-                                    DatamodelError::new_validation_error(
-                                        "An index should be defined in the model containing the embed.",
-                                        current_span.into(),
-                                    )
-                                }
-                                "fulltext" => {
-                                    DatamodelError::new_validation_error(
-                                        "A fulltext index should be defined in the model containing the embed.",
-                                        current_span.into(),
-                                    )
-                                }
-                                "id" => {
-                                    DatamodelError::new_validation_error(
-                                        "A composite type cannot define an id.",
-                                        current_span.into(),
-                                    )
-                                }
-                                _ => {
-                                    DatamodelError::new_validation_error(
-                                        "A composite type cannot have block-level attributes.",
-                                        current_span.into(),
-                                    )
-                                }
+                                "map" => DatamodelError::new_validation_error(
+                                    "The name of a composite type is not persisted in the database, therefore it does not need a mapped database name.",
+                                    (file_id, current_span).into(),
+                                ),
+                                "unique" => DatamodelError::new_validation_error(
+                                    "A unique constraint should be defined in the model containing the embed.",
+                                    (file_id, current_span).into(),
+                                ),
+                                "index" => DatamodelError::new_validation_error(
+                                    "An index should be defined in the model containing the embed.",
+                                    (file_id, current_span).into(),
+                                ),
+                                "fulltext" => DatamodelError::new_validation_error(
+                                    "A fulltext index should be defined in the model containing the embed.",
+                                    (file_id, current_span).into(),
+                                ),
+                                "id" => DatamodelError::new_validation_error(
+                                    "A composite type cannot define an id.",
+                                    (file_id, current_span).into(),
+                                ),
+                                _ => DatamodelError::new_validation_error(
+                                    "A composite type cannot have block-level attributes.",
+                                    (file_id, current_span).into(),
+                                ),
                             };
 
                             diagnostics.push_error(err);
@@ -81,6 +70,7 @@ pub(crate) fn parse_composite_type(
                             item,
                             pending_field_comment.take(),
                             diagnostics,
+                            file_id,
                         ) {
                             Ok(field) => {
                                 for attr in field.attributes.iter() {
@@ -92,7 +82,7 @@ pub(crate) fn parse_composite_type(
                                                 "Defining `@{name}` attribute for a field in a composite type is not allowed."
                                             );
 
-                                            DatamodelError::new_validation_error(&msg, current_span.into())
+                                            DatamodelError::new_validation_error(&msg, (file_id, current_span).into())
                                         }
                                         _ => continue,
                                     };
@@ -107,7 +97,7 @@ pub(crate) fn parse_composite_type(
                         Rule::comment_block => pending_field_comment = Some(item),
                         Rule::BLOCK_LEVEL_CATCH_ALL => diagnostics.push_error(DatamodelError::new_validation_error(
                             "This line is not a valid field or attribute definition.",
-                            item.as_span().into(),
+                            (file_id, item.as_span()).into(),
                         )),
                         _ => parsing_catch_all(&item, "composite type"),
                     }
@@ -122,7 +112,7 @@ pub(crate) fn parse_composite_type(
             name,
             fields,
             documentation: doc_comment.and_then(parse_comment_block),
-            span: ast::Span::from(pair_span),
+            span: ast::Span::from((file_id, pair_span)),
             inner_span: inner_span.unwrap(),
         },
         _ => panic!("Encountered impossible model declaration during parsing",),

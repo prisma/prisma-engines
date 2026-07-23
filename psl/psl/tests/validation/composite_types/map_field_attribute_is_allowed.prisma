@@ -1,6 +1,5 @@
 datasource mdb {
   provider = "mongodb"
-  url = env("TESTDBURL")
 }
 
 type A {

@@ -69,6 +69,7 @@ capabilities!(
     SortOrderInFullTextIndex,
     MultipleFullTextAttributesPerModel,
     ClusteringSetting,
+    PartialIndex, // Connector supports partial indexes with WHERE clause.
     // Start of query-engine-only Capabilities
     EnumArrayPush, // implies the ScalarList capability. Necessary, as CockroachDB supports pushing to a list of scalars, but not to the particular case of an enum list. See https://github.com/cockroachdb/cockroach/issues/71388
     InsensitiveFilters,
@@ -83,13 +84,12 @@ capabilities!(
     JsonFilteringArrayPath, // Connector supports filtering json fields using array path (eg: postgres).
     JsonFilteringAlphanumeric, // Connector supports alphanumeric json filters (gt, gte, lt, lte...).
     JsonFilteringAlphanumericFieldRef, // Connector supports alphanumeric json filters against a json field reference.
+    JsonArrayContains, // Connector supports the contains operator for json fields.
     CompoundIds,
     AnyId, // Any (or combination of) uniques and not only id fields can constitute an id for a model.
-    SqlQueryRaw,
-    MongoDbQueryRaw,
-    FullTextSearch,
-    FullTextSearchWithoutIndex,
-    FullTextSearchWithIndex,
+    NativeFullTextSearch,
+    NativeFullTextSearchWithoutIndex,
+    NativeFullTextSearchWithIndex,
     AdvancedJsonNullability,    // Connector distinguishes between their null type and JSON null.
     UndefinedType,              // Connector distinguishes `null` and `undefined`
     DecimalType,                // Connector supports Prisma Decimal type.

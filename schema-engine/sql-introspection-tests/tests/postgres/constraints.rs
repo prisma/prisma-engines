@@ -22,12 +22,11 @@ async fn aragon_test_postgres(api: &mut TestApi) -> TestResult {
 
     let schema = expect![[r#"
         generator client {
-          provider = "prisma-client-js"
+          provider = "prisma-client"
         }
 
         datasource db {
           provider = "postgresql"
-          url      = "env(TEST_DATABASE_URL)"
         }
 
         /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
@@ -87,12 +86,11 @@ async fn noalyss_folder_test_postgres(api: &mut TestApi) -> TestResult {
 
     let schema = expect![[r#"
         generator client {
-          provider = "prisma-client-js"
+          provider = "prisma-client"
         }
 
         datasource db {
           provider = "postgresql"
-          url      = "env(TEST_DATABASE_URL)"
         }
 
         /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
@@ -143,7 +141,7 @@ async fn noalyss_folder_test_postgres(api: &mut TestApi) -> TestResult {
 async fn check_and_exclusion_constraints_stopgap(api: &mut TestApi) -> TestResult {
     let raw_sql = indoc! {r#"
         CREATE EXTENSION btree_gist;
-    
+
         CREATE TABLE room_reservation (
             room_reservation_id serial PRIMARY KEY,
             room_id integer NOT NULL, -- this could e.g. be a foreign key to a `room` table
@@ -161,12 +159,11 @@ async fn check_and_exclusion_constraints_stopgap(api: &mut TestApi) -> TestResul
 
     let schema = expect![[r#"
         generator client {
-          provider = "prisma-client-js"
+          provider = "prisma-client"
         }
 
         datasource db {
           provider = "postgresql"
-          url      = "env(TEST_DATABASE_URL)"
         }
 
         /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
@@ -184,7 +181,7 @@ async fn check_and_exclusion_constraints_stopgap(api: &mut TestApi) -> TestResul
     api.expect_datamodel(&schema).await;
 
     // ensure the introspected schema is valid
-    psl::parse_schema(schema.data()).unwrap();
+    psl::parse_schema_without_extensions(schema.data()).unwrap();
 
     let expectation = expect![[r#"
         *** WARNING ***
@@ -233,7 +230,7 @@ async fn check_and_exclusion_constraints_stopgap(api: &mut TestApi) -> TestResul
 async fn exclusion_constraints_stopgap(api: &mut TestApi) -> TestResult {
     let raw_sql = indoc! {r#"
         CREATE EXTENSION btree_gist;
-  
+
         CREATE TABLE room_reservation (
             room_reservation_id serial PRIMARY KEY,
             room_id integer NOT NULL, -- this could e.g. be a foreign key to a `room` table
@@ -250,12 +247,11 @@ async fn exclusion_constraints_stopgap(api: &mut TestApi) -> TestResult {
 
     let schema = expect![[r#"
         generator client {
-          provider = "prisma-client-js"
+          provider = "prisma-client"
         }
 
         datasource db {
           provider = "postgresql"
-          url      = "env(TEST_DATABASE_URL)"
         }
 
         /// This table contains exclusion constraints and requires additional setup for migrations. Visit https://pris.ly/d/exclusion-constraints for more info.
@@ -271,7 +267,7 @@ async fn exclusion_constraints_stopgap(api: &mut TestApi) -> TestResult {
     api.expect_datamodel(&schema).await;
 
     // ensure the introspected schema is valid
-    psl::parse_schema(schema.data()).unwrap();
+    psl::parse_schema_without_extensions(schema.data()).unwrap();
 
     let expectation = expect![[r#"
         *** WARNING ***
@@ -313,7 +309,7 @@ async fn exclusion_constraints_stopgap(api: &mut TestApi) -> TestResult {
 async fn exclusion_constraints_without_where_stopgap(api: &mut TestApi) -> TestResult {
     let raw_sql = indoc! {r#"
         CREATE EXTENSION btree_gist;
-  
+
         CREATE TABLE room_reservation (
             room_reservation_id serial PRIMARY KEY,
             room_id integer NOT NULL, -- this could e.g. be a foreign key to a `room` table
@@ -329,12 +325,11 @@ async fn exclusion_constraints_without_where_stopgap(api: &mut TestApi) -> TestR
 
     let schema = expect![[r#"
         generator client {
-          provider = "prisma-client-js"
+          provider = "prisma-client"
         }
 
         datasource db {
           provider = "postgresql"
-          url      = "env(TEST_DATABASE_URL)"
         }
 
         /// This table contains exclusion constraints and requires additional setup for migrations. Visit https://pris.ly/d/exclusion-constraints for more info.
@@ -349,7 +344,7 @@ async fn exclusion_constraints_without_where_stopgap(api: &mut TestApi) -> TestR
     api.expect_datamodel(&schema).await;
 
     // ensure the introspected schema is valid
-    psl::parse_schema(schema.data()).unwrap();
+    psl::parse_schema_without_extensions(schema.data()).unwrap();
 
     let expectation = expect![[r#"
         *** WARNING ***
@@ -389,7 +384,7 @@ async fn exclusion_constraints_without_where_stopgap(api: &mut TestApi) -> TestR
 async fn exclusion_constraints_without_where_and_expressions_stopgap(api: &mut TestApi) -> TestResult {
     let raw_sql = indoc! {r#"
         CREATE EXTENSION btree_gist;
-    
+
         CREATE TABLE room_reservation (
             room_reservation_id serial PRIMARY KEY,
             room_id integer NOT NULL, -- this could e.g. be a foreign key to a `room` table
@@ -403,12 +398,11 @@ async fn exclusion_constraints_without_where_and_expressions_stopgap(api: &mut T
 
     let schema = expect![[r#"
         generator client {
-          provider = "prisma-client-js"
+          provider = "prisma-client"
         }
 
         datasource db {
           provider = "postgresql"
-          url      = "env(TEST_DATABASE_URL)"
         }
 
         /// This table contains exclusion constraints and requires additional setup for migrations. Visit https://pris.ly/d/exclusion-constraints for more info.
@@ -421,7 +415,7 @@ async fn exclusion_constraints_without_where_and_expressions_stopgap(api: &mut T
     api.expect_datamodel(&schema).await;
 
     // ensure the introspected schema is valid
-    psl::parse_schema(schema.data()).unwrap();
+    psl::parse_schema_without_extensions(schema.data()).unwrap();
 
     let expectation = expect![[r#"
         *** WARNING ***
@@ -467,27 +461,26 @@ async fn check_constraints_stopgap(api: &mut TestApi) -> TestResult {
     api.raw_cmd(raw_sql).await;
 
     let schema = expect![[r#"
-          generator client {
-            provider = "prisma-client-js"
-          }
+        generator client {
+          provider = "prisma-client"
+        }
 
-          datasource db {
-            provider = "postgresql"
-            url      = "env(TEST_DATABASE_URL)"
-          }
+        datasource db {
+          provider = "postgresql"
+        }
 
-          /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
-          model products {
-            product_id Int      @id @default(autoincrement())
-            name       String?
-            price      Decimal? @db.Decimal
-          }
-      "#]];
+        /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+        model products {
+          product_id Int      @id @default(autoincrement())
+          name       String?
+          price      Decimal? @db.Decimal
+        }
+    "#]];
 
     api.expect_datamodel(&schema).await;
 
     // ensure the introspected schema is valid
-    psl::parse_schema(schema.data()).unwrap();
+    psl::parse_schema_without_extensions(schema.data()).unwrap();
 
     let expectation = expect![[r#"
         *** WARNING ***
@@ -509,13 +502,13 @@ async fn check_constraints_stopgap(api: &mut TestApi) -> TestResult {
     };
 
     let expectation = expect![[r#"
-          /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
-          model products {
-            product_id Int      @id @default(autoincrement())
-            name       String?
-            price      Decimal? @db.Decimal
-          }
-      "#]];
+        /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+        model products {
+          product_id Int      @id @default(autoincrement())
+          name       String?
+          price      Decimal? @db.Decimal
+        }
+    "#]];
     api.expect_re_introspected_datamodel(input, expectation).await;
 
     Ok(())

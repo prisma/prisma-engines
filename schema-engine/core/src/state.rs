@@ -3,13 +3,28 @@
 //! Why this rather than using connectors directly? We must be able to use the schema engine
 //! without a valid schema or database connection for commands like createDatabase and diff.
 
-use crate::{api::GenericApi, commands, json_rpc::types::*, CoreError, CoreResult};
+use crate::{
+    CoreError, CoreResult, GenericApi, SchemaContainerExt, commands,
+    extensions::ExtensionTypeConfig,
+    parse_configuration_multi,
+    url::{DatasourceUrls, ValidatedDatasourceUrls},
+};
+use ::commands::MigrationSchemaCache;
 use enumflags2::BitFlags;
-use psl::{parser_database::SourceFile, PreviewFeature};
-use schema_connector::{ConnectorError, ConnectorHost, Namespaces, SchemaConnector};
-use std::{collections::HashMap, future::Future, path::Path, pin::Pin, sync::Arc};
-use tokio::sync::{mpsc, Mutex};
-use tracing_futures::Instrument;
+use futures::stream::{FuturesUnordered, StreamExt};
+use json_rpc::types::*;
+use psl::parser_database::SourceFile;
+use schema_connector::{ConnectorError, ConnectorHost, IntrospectionResult, Namespaces, SchemaConnector};
+use std::{
+    collections::HashMap,
+    future::Future,
+    path::{Path, PathBuf},
+    pin::Pin,
+    sync::Arc,
+};
+use tokio::sync::{Mutex, mpsc, oneshot};
+use tracing_futures::{Instrument, WithSubscriber};
+use user_facing_errors::schema_engine::MissingConfigDatasourceUrl;
 
 /// The container for the state of the schema engine. It can contain one or more connectors
 /// corresponding to a database to be reached or that we are already connected to.
@@ -19,15 +34,53 @@ use tracing_futures::Instrument;
 /// channels. That ensures that each connector is handling requests one at a time to avoid
 /// synchronization issues. You can think of it in terms of the actor model.
 pub(crate) struct EngineState {
+    /// The initial Prisma schema for the engine state.
     initial_datamodel: Option<psl::ValidatedSchema>,
+    /// Direct URL and shadow database URL associated with the schemas (either
+    /// the initial datamodel or the schemas passed later via RPC requests).
+    datasource_urls: DatasourceUrls,
     host: Arc<dyn ConnectorHost>,
-    // A map from either:
-    //
-    // - a connection string / url
-    // - a full schema
-    //
-    // To a channel leading to a spawned MigrationConnector.
-    connectors: Mutex<HashMap<String, mpsc::Sender<ErasedConnectorRequest>>>,
+    extensions: Arc<ExtensionTypeConfig>,
+    /// A map from either:
+    ///
+    /// - a connection string / url
+    /// - a full schema
+    ///
+    /// to a channel leading to a spawned MigrationConnector.
+    connectors: Mutex<HashMap<ConnectorRequestType, mpsc::Sender<ErasedConnectorRequest>>>,
+    /// The cache for DatabaseSchemas based of migration directories to avoid redundant work during `prisma migrate dev`.
+    migration_schema_cache: Arc<Mutex<MigrationSchemaCache>>,
+}
+
+#[derive(Clone, Debug, Eq, Hash, PartialEq)]
+enum ConnectorRequestType {
+    Schema(Vec<(String, SourceFile)>),
+    Url(String),
+    InitialDatamodel,
+}
+
+impl ConnectorRequestType {
+    pub fn into_connector(
+        self,
+        initial_datamodel: Option<&psl::ValidatedSchema>,
+        datasource_urls: &DatasourceUrls,
+        config_dir: Option<&Path>,
+    ) -> CoreResult<Box<dyn SchemaConnector>> {
+        match self {
+            Self::Schema(schemas) => crate::schema_to_connector(&schemas, datasource_urls, config_dir),
+            Self::Url(url) => crate::connector_for_connection_string(url, None, BitFlags::default()),
+            Self::InitialDatamodel => {
+                if let Some(initial_datamodel) = initial_datamodel {
+                    Ok(crate::initial_datamodel_to_connector(
+                        initial_datamodel,
+                        &datasource_urls.validate(initial_datamodel.connector)?,
+                    )?)
+                } else {
+                    Err(ConnectorError::from_msg("Missing --datamodels".to_owned()))
+                }
+            }
+        }
+    }
 }
 
 /// A request from the core to a connector, in the form of an async closure.
@@ -41,11 +94,23 @@ type ErasedConnectorRequest = Box<
 >;
 
 impl EngineState {
-    pub(crate) fn new(initial_datamodel: Option<String>, host: Option<Arc<dyn ConnectorHost>>) -> Self {
+    pub(crate) fn new(
+        initial_datamodels: Option<Vec<(String, SourceFile)>>,
+        datasource_urls: DatasourceUrls,
+        host: Option<Arc<dyn ConnectorHost>>,
+        extensions: Arc<ExtensionTypeConfig>,
+    ) -> Self {
+        let initial_datamodel = initial_datamodels
+            .as_deref()
+            .map(|dm| psl::validate_multi_file(dm, &*extensions));
+
         EngineState {
-            initial_datamodel: initial_datamodel.map(|s| psl::validate(s.into())),
+            initial_datamodel,
+            datasource_urls,
             host: host.unwrap_or_else(|| Arc::new(schema_connector::EmptyHost)),
+            extensions,
             connectors: Default::default(),
+            migration_schema_cache: Arc::new(Mutex::new(Default::default())),
         }
     }
 
@@ -59,20 +124,16 @@ impl EngineState {
             })
     }
 
-    async fn with_connector_from_schema_path<O: Send + 'static>(
-        &self,
-        path: &str,
-        f: ConnectorRequest<O>,
-    ) -> CoreResult<O> {
-        let config_dir = std::path::Path::new(path).parent();
-        let schema = std::fs::read_to_string(path)
-            .map_err(|err| ConnectorError::from_source(err, "Falied to read Prisma schema."))?;
-        self.with_connector_for_schema(&schema, config_dir, f).await
+    fn preview_features(&self) -> psl::PreviewFeatures {
+        self.initial_datamodel
+            .as_ref()
+            .map(|schema| schema.configuration.preview_features())
+            .unwrap_or_default()
     }
 
-    async fn with_connector_for_schema<O: Send + 'static>(
+    async fn with_connector_for_request<O: Send + 'static>(
         &self,
-        schema: &str,
+        request: ConnectorRequestType,
         config_dir: Option<&Path>,
         f: ConnectorRequest<O>,
     ) -> CoreResult<O> {
@@ -88,96 +149,89 @@ impl EngineState {
         });
 
         let mut connectors = self.connectors.lock().await;
-        match connectors.get(schema) {
+
+        match connectors.get(&request) {
             Some(request_sender) => match request_sender.send(erased).await {
                 Ok(()) => (),
                 Err(_) => return Err(ConnectorError::from_msg("tokio mpsc send error".to_owned())),
             },
             None => {
-                let mut connector = crate::schema_to_connector(schema, config_dir)?;
+                let request_key = request.clone();
+                let mut connector =
+                    request.into_connector(self.initial_datamodel.as_ref(), &self.datasource_urls, config_dir)?;
+
                 connector.set_host(self.host.clone());
                 let (erased_sender, mut erased_receiver) = mpsc::channel::<ErasedConnectorRequest>(12);
-                tokio::spawn(async move {
-                    while let Some(req) = erased_receiver.recv().await {
-                        req(connector.as_mut()).await;
+                tokio::spawn(
+                    async move {
+                        while let Some(req) = erased_receiver.recv().await {
+                            req(connector.as_mut()).await;
+                        }
                     }
-                });
+                    .with_current_subscriber(),
+                );
                 match erased_sender.send(erased).await {
                     Ok(()) => (),
                     Err(_) => return Err(ConnectorError::from_msg("erased sender send error".to_owned())),
                 };
-                connectors.insert(schema.to_owned(), erased_sender);
+                connectors.insert(request_key, erased_sender);
             }
         }
 
         response_receiver.await.expect("receiver boomed")
     }
 
+    async fn with_connector_for_schema<O: Send + 'static>(
+        &self,
+        schemas: Vec<(String, SourceFile)>,
+        config_dir: Option<&Path>,
+        f: ConnectorRequest<O>,
+    ) -> CoreResult<O> {
+        self.with_connector_for_request::<O>(ConnectorRequestType::Schema(schemas.clone()), config_dir, f)
+            .await
+    }
+
+    // Note: this method is used by:
+    // - `prisma db pull` via `EngineState::introspect_sql`
+    // - `prisma db execute` via `EngineState::db_execute`
+    // - `prisma/prisma tests` via `EngineState::drop_database`
     async fn with_connector_for_url<O: Send + 'static>(&self, url: String, f: ConnectorRequest<O>) -> CoreResult<O> {
-        let (response_sender, response_receiver) = tokio::sync::oneshot::channel::<CoreResult<O>>();
-        let erased: ErasedConnectorRequest = Box::new(move |connector| {
-            Box::pin(async move {
-                let output = f(connector).await;
-                response_sender
-                    .send(output)
-                    .map_err(|_| ())
-                    .expect("failed to send back response in schema-engine state");
-            })
-        });
-
-        let mut connectors = self.connectors.lock().await;
-        match connectors.get(&url) {
-            Some(request_sender) => match request_sender.send(erased).await {
-                Ok(()) => (),
-                Err(_) => return Err(ConnectorError::from_msg("tokio mpsc send error".to_owned())),
-            },
-            None => {
-                let mut connector = crate::connector_for_connection_string(url.clone(), None, BitFlags::default())?;
-                connector.set_host(self.host.clone());
-                let (erased_sender, mut erased_receiver) = mpsc::channel::<ErasedConnectorRequest>(12);
-                tokio::spawn(async move {
-                    while let Some(req) = erased_receiver.recv().await {
-                        req(connector.as_mut()).await;
-                    }
-                });
-                match erased_sender.send(erased).await {
-                    Ok(()) => (),
-                    Err(_) => return Err(ConnectorError::from_msg("erased sender send error".to_owned())),
-                };
-                connectors.insert(url, erased_sender);
-            }
-        }
-
-        response_receiver.await.expect("receiver boomed")
+        self.with_connector_for_request::<O>(ConnectorRequestType::Url(url.clone()), None, f)
+            .await
     }
 
     async fn with_connector_from_datasource_param<O: Send + 'static>(
         &self,
-        param: &DatasourceParam,
+        param: DatasourceParam,
         f: ConnectorRequest<O>,
     ) -> CoreResult<O> {
         match param {
-            DatasourceParam::ConnectionString(UrlContainer { url }) => {
-                self.with_connector_for_url(url.clone(), f).await
-            }
-            DatasourceParam::SchemaPath(PathContainer { path }) => self.with_connector_from_schema_path(path, f).await,
-            DatasourceParam::SchemaString(SchemaContainer { schema }) => {
-                self.with_connector_for_schema(schema, None, f).await
-            }
+            DatasourceParam::ConnectionString(UrlContainer { url }) => self.with_connector_for_url(url, f).await,
+            DatasourceParam::Schema(schemas) => self.with_connector_for_schema(schemas.to_psl_input(), None, f).await,
         }
     }
 
-    async fn with_default_connector<O: Send + 'static>(&self, f: ConnectorRequest<O>) -> CoreResult<O>
+    async fn with_default_connector<O>(&self, f: ConnectorRequest<O>) -> CoreResult<O>
     where
         O: Sized + Send + 'static,
     {
-        let schema = if let Some(initial_datamodel) = &self.initial_datamodel {
-            initial_datamodel
-        } else {
-            return Err(ConnectorError::from_msg("Missing --datamodel".to_owned()));
-        };
+        self.with_connector_for_request::<O>(ConnectorRequestType::InitialDatamodel, None, f)
+            .await
+    }
 
-        self.with_connector_for_schema(schema.db.source(), None, f).await
+    fn get_url_from_schemas(&self, container: &SchemasWithConfigDir) -> CoreResult<String> {
+        let sources = container.to_psl_input();
+        let (datasource, _) = parse_configuration_multi(&sources)?;
+
+        Ok(self
+            .validate_datasource_urls(&datasource)?
+            .url_with_config_dir(datasource.active_connector.flavour(), Path::new(&container.config_dir))
+            .ok_or_else(|| CoreError::user_facing(MissingConfigDatasourceUrl))?
+            .into_owned())
+    }
+
+    fn validate_datasource_urls(&self, datasource: &psl::Datasource) -> CoreResult<ValidatedDatasourceUrls> {
+        Ok(self.datasource_urls.validate(datasource.active_connector)?)
     }
 }
 
@@ -187,7 +241,7 @@ impl GenericApi for EngineState {
         let f: ConnectorRequest<String> = Box::new(|connector| connector.version());
 
         match params {
-            Some(params) => self.with_connector_from_datasource_param(&params.datasource, f).await,
+            Some(params) => self.with_connector_from_datasource_param(params.datasource, f).await,
             None => self.with_default_connector(f).await,
         }
     }
@@ -197,7 +251,7 @@ impl GenericApi for EngineState {
 
         self.with_default_connector(Box::new(move |connector| {
             Box::pin(
-                commands::apply_migrations(input, connector, namespaces)
+                ::commands::apply_migrations(input, connector, namespaces)
                     .instrument(tracing::info_span!("ApplyMigrations")),
             )
         }))
@@ -206,7 +260,7 @@ impl GenericApi for EngineState {
 
     async fn create_database(&self, params: CreateDatabaseParams) -> CoreResult<CreateDatabaseResult> {
         self.with_connector_from_datasource_param(
-            &params.datasource,
+            params.datasource,
             Box::new(|connector| {
                 Box::pin(async move {
                     let database_name = SchemaConnector::create_database(connector).await?;
@@ -218,37 +272,28 @@ impl GenericApi for EngineState {
     }
 
     async fn create_migration(&self, input: CreateMigrationInput) -> CoreResult<CreateMigrationOutput> {
+        let migration_schema_cache: Arc<Mutex<MigrationSchemaCache>> = self.migration_schema_cache.clone();
+        let extensions = Arc::clone(&self.extensions);
         self.with_default_connector(Box::new(move |connector| {
             let span = tracing::info_span!(
                 "CreateMigration",
                 migration_name = input.migration_name.as_str(),
                 draft = input.draft,
             );
-            Box::pin(commands::create_migration(input, connector).instrument(span))
+            Box::pin(async move {
+                let mut migration_schema_cache = migration_schema_cache.lock().await;
+                commands::create_migration(input, connector, &mut migration_schema_cache, &*extensions)
+                    .instrument(span)
+                    .await
+            })
         }))
         .await
     }
 
     async fn db_execute(&self, params: DbExecuteParams) -> CoreResult<()> {
-        use std::io::Read;
-
         let url: String = match &params.datasource_type {
             DbExecuteDatasourceType::Url(UrlContainer { url }) => url.clone(),
-            DbExecuteDatasourceType::Schema(SchemaContainer { schema: file_path }) => {
-                let mut schema_file = std::fs::File::open(file_path)
-                    .map_err(|err| ConnectorError::from_source(err, "Opening Prisma schema file."))?;
-                let mut schema_string = String::new();
-                schema_file
-                    .read_to_string(&mut schema_string)
-                    .map_err(|err| ConnectorError::from_source(err, "Reading Prisma schema file."))?;
-                let (datasource, url, _, _) = crate::parse_configuration(&schema_string)?;
-                std::path::Path::new(file_path)
-                    .parent()
-                    .map(|config_dir| {
-                        psl::set_config_dir(datasource.active_connector.flavour(), config_dir, &url).into_owned()
-                    })
-                    .unwrap_or(url)
-            }
+            DbExecuteDatasourceType::Schema(schemas) => self.get_url_from_schemas(schemas)?,
         };
 
         self.with_connector_for_url(url, Box::new(move |connector| connector.db_execute(params.script)))
@@ -261,9 +306,11 @@ impl GenericApi for EngineState {
 
     async fn dev_diagnostic(&self, input: DevDiagnosticInput) -> CoreResult<DevDiagnosticOutput> {
         let namespaces = self.namespaces();
+        let migration_schema_cache: Arc<Mutex<MigrationSchemaCache>> = self.migration_schema_cache.clone();
         self.with_default_connector(Box::new(move |connector| {
             Box::pin(async move {
-                commands::dev_diagnostic(input, namespaces, connector)
+                let mut migration_schema_cache = migration_schema_cache.lock().await;
+                commands::dev_diagnostic_cli(input, namespaces, connector, &mut migration_schema_cache)
                     .instrument(tracing::info_span!("DevDiagnostic"))
                     .await
             })
@@ -272,7 +319,14 @@ impl GenericApi for EngineState {
     }
 
     async fn diff(&self, params: DiffParams) -> CoreResult<DiffResult> {
-        crate::commands::diff(params, self.host.clone()).await
+        commands::diff_cli(
+            params,
+            &self.datasource_urls,
+            self.host.clone(),
+            self.preview_features(),
+            &*self.extensions,
+        )
+        .await
     }
 
     async fn drop_database(&self, url: String) -> CoreResult<()> {
@@ -285,9 +339,11 @@ impl GenericApi for EngineState {
         input: commands::DiagnoseMigrationHistoryInput,
     ) -> CoreResult<commands::DiagnoseMigrationHistoryOutput> {
         let namespaces = self.namespaces();
+        let migration_schema_cache: Arc<Mutex<MigrationSchemaCache>> = self.migration_schema_cache.clone();
         self.with_default_connector(Box::new(move |connector| {
             Box::pin(async move {
-                commands::diagnose_migration_history(input, namespaces, connector)
+                let mut migration_schema_cache = migration_schema_cache.lock().await;
+                commands::diagnose_migration_history_cli(input, namespaces, connector, &mut migration_schema_cache)
                     .instrument(tracing::info_span!("DiagnoseMigrationHistory"))
                     .await
             })
@@ -299,8 +355,15 @@ impl GenericApi for EngineState {
         &self,
         params: EnsureConnectionValidityParams,
     ) -> CoreResult<EnsureConnectionValidityResult> {
+        // checking connection validity is currently not supported with local PGLite because PGLite
+        // only supports a single connection at a time and this creates a new connector instance
+        if matches!(&params.datasource, DatasourceParam::ConnectionString(str) if str.url.starts_with("prisma+postgres://localhost"))
+        {
+            return Ok(EnsureConnectionValidityResult {});
+        }
+
         self.with_connector_from_datasource_param(
-            &params.datasource,
+            params.datasource,
             Box::new(|connector| {
                 Box::pin(async move {
                     SchemaConnector::ensure_connection_validity(connector).await?;
@@ -312,54 +375,64 @@ impl GenericApi for EngineState {
     }
 
     async fn evaluate_data_loss(&self, input: EvaluateDataLossInput) -> CoreResult<EvaluateDataLossOutput> {
+        let migration_schema_cache: Arc<Mutex<MigrationSchemaCache>> = self.migration_schema_cache.clone();
+        let extensions = Arc::clone(&self.extensions);
         self.with_default_connector(Box::new(|connector| {
-            Box::pin(commands::evaluate_data_loss(input, connector).instrument(tracing::info_span!("EvaluateDataLoss")))
+            Box::pin(async move {
+                let mut migration_schema_cache = migration_schema_cache.lock().await;
+                commands::evaluate_data_loss(input, connector, &mut migration_schema_cache, &*extensions)
+                    .instrument(tracing::info_span!("EvaluateDataLoss"))
+                    .await
+            })
         }))
         .await
     }
 
+    // TODO: move to `schema-commands`?
     async fn introspect(&self, params: IntrospectParams) -> CoreResult<IntrospectResult> {
         tracing::info!("{:?}", params.schema);
-        let source_file = SourceFile::new_allocated(Arc::from(params.schema.clone().into_boxed_str()));
+        let source_files = params.schema.to_psl_input();
 
-        let has_some_namespaces = params.schemas.is_some();
         let composite_type_depth = From::from(params.composite_type_depth);
 
         let ctx = if params.force {
-            let previous_schema = psl::validate(source_file);
+            let previous_schema = psl::validate_multi_file(&source_files, &*self.extensions);
+
             schema_connector::IntrospectionContext::new_config_only(
                 previous_schema,
                 composite_type_depth,
-                params.schemas,
+                params.namespaces,
+                PathBuf::new().join(&params.base_directory_path),
             )
         } else {
-            let previous_schema = psl::parse_schema(source_file).map_err(ConnectorError::new_schema_parser_error)?;
-            schema_connector::IntrospectionContext::new(previous_schema, composite_type_depth, params.schemas)
-        };
-
-        if !ctx
-            .configuration()
-            .preview_features()
-            .contains(PreviewFeature::MultiSchema)
-            && has_some_namespaces
-        {
-            let msg =
-                "The preview feature `multiSchema` must be enabled before using --schemas command line parameter.";
-
-            return Err(CoreError::from_msg(msg.to_string()));
+            psl::parse_schema_multi(&source_files, &*self.extensions).map(|previous_schema| {
+                schema_connector::IntrospectionContext::new(
+                    previous_schema,
+                    composite_type_depth,
+                    params.namespaces,
+                    PathBuf::new().join(&params.base_directory_path),
+                )
+            })
         }
+        .map_err(ConnectorError::new_schema_parser_error)?;
 
+        let extensions = Arc::clone(&self.extensions);
         self.with_connector_for_schema(
-            &params.schema,
+            source_files,
             None,
             Box::new(move |connector| {
                 Box::pin(async move {
-                    let result = connector.introspect(&ctx).await?;
+                    let IntrospectionResult {
+                        datamodels,
+                        views,
+                        warnings,
+                        is_empty,
+                    } = connector.introspect(&ctx, &*extensions).await?;
 
-                    if result.is_empty {
+                    if is_empty {
                         Err(ConnectorError::into_introspection_result_empty_error())
                     } else {
-                        let views = result.views.map(|v| {
+                        let views = views.map(|v| {
                             v.into_iter()
                                 .map(|view| IntrospectionView {
                                     schema: view.schema,
@@ -370,9 +443,14 @@ impl GenericApi for EngineState {
                         });
 
                         Ok(IntrospectResult {
-                            datamodel: result.data_model,
+                            schema: SchemasContainer {
+                                files: datamodels
+                                    .into_iter()
+                                    .map(|(path, content)| SchemaContainer { path, content })
+                                    .collect(),
+                            },
                             views,
-                            warnings: result.warnings,
+                            warnings,
                         })
                     }
                 })
@@ -381,19 +459,47 @@ impl GenericApi for EngineState {
         .await
     }
 
-    async fn list_migration_directories(
-        &self,
-        input: ListMigrationDirectoriesInput,
-    ) -> CoreResult<ListMigrationDirectoriesOutput> {
-        let migrations_from_filesystem =
-            schema_connector::migrations_directory::list_migrations(Path::new(&input.migrations_directory_path))?;
+    async fn introspect_sql(&self, params: IntrospectSqlParams) -> CoreResult<IntrospectSqlResult> {
+        self.with_connector_for_url(
+            params.url.clone(),
+            Box::new(move |conn| {
+                Box::pin(async move {
+                    let res = crate::commands::introspect_sql(params, conn).await?;
 
-        let migrations = migrations_from_filesystem
-            .iter()
-            .map(|migration| migration.migration_name().to_string())
-            .collect();
-
-        Ok(ListMigrationDirectoriesOutput { migrations })
+                    Ok(IntrospectSqlResult {
+                        queries: res
+                            .queries
+                            .into_iter()
+                            .map(|q| SqlQueryOutput {
+                                name: q.name,
+                                source: q.source,
+                                documentation: q.documentation,
+                                parameters: q
+                                    .parameters
+                                    .into_iter()
+                                    .map(|p| SqlQueryParameterOutput {
+                                        name: p.name,
+                                        typ: p.typ,
+                                        documentation: p.documentation,
+                                        nullable: p.nullable,
+                                    })
+                                    .collect(),
+                                result_columns: q
+                                    .result_columns
+                                    .into_iter()
+                                    .map(|c| SqlQueryColumnOutput {
+                                        name: c.name,
+                                        typ: c.typ,
+                                        nullable: c.nullable,
+                                    })
+                                    .collect(),
+                            })
+                            .collect(),
+                    })
+                })
+            }),
+        )
+        .await
     }
 
     async fn mark_migration_applied(&self, input: MarkMigrationAppliedInput) -> CoreResult<MarkMigrationAppliedOutput> {
@@ -418,20 +524,57 @@ impl GenericApi for EngineState {
         .await
     }
 
-    async fn reset(&self) -> CoreResult<()> {
+    async fn reset(&self, input: ResetInput) -> CoreResult<()> {
         tracing::debug!("Resetting the database.");
         let namespaces = self.namespaces();
         self.with_default_connector(Box::new(move |connector| {
-            Box::pin(SchemaConnector::reset(connector, false, namespaces).instrument(tracing::info_span!("Reset")))
+            Box::pin(async move {
+                let filter: schema_connector::SchemaFilter = input.filter.into();
+                SchemaConnector::reset(connector, false, namespaces, &filter)
+                    .instrument(tracing::info_span!("Reset"))
+                    .await
+            })
         }))
         .await?;
         Ok(())
     }
 
     async fn schema_push(&self, input: SchemaPushInput) -> CoreResult<SchemaPushOutput> {
+        let extensions = Arc::clone(&self.extensions);
         self.with_default_connector(Box::new(move |connector| {
-            Box::pin(commands::schema_push(input, connector).instrument(tracing::info_span!("SchemaPush")))
+            Box::pin(async move {
+                commands::schema_push(input, connector, &*extensions)
+                    .instrument(tracing::info_span!("SchemaPush"))
+                    .await
+            })
         }))
         .await
+    }
+
+    async fn dispose(&mut self) -> CoreResult<()> {
+        self.connectors
+            .lock()
+            .await
+            .drain()
+            .map(|(_, snd)| async move {
+                let (tx, rx) = oneshot::channel();
+
+                snd.send({
+                    Box::new(move |conn| {
+                        Box::pin(async move {
+                            _ = tx.send(conn.dispose().await);
+                        })
+                    })
+                })
+                .await
+                .map_err(|err| CoreError::from_msg(format!("Failed to send dispose command to connector: {err}")))?;
+
+                rx.await.map_err(|err| {
+                    CoreError::from_msg(format!("Connector did not respond to dispose command: {err}"))
+                })?
+            })
+            .collect::<FuturesUnordered<_>>()
+            .fold(Ok(()), async |acc, result| acc.and(result))
+            .await
     }
 }

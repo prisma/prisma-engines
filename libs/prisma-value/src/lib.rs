@@ -1,16 +1,21 @@
 pub mod arithmetic;
 
 mod error;
+mod raw_json;
 
+use base64::prelude::*;
 use bigdecimal::{BigDecimal, FromPrimitive, ToPrimitive};
 use chrono::prelude::*;
 use serde::de::Unexpected;
 use serde::ser::SerializeMap;
-use serde::{ser::Serializer, Deserialize, Deserializer, Serialize};
-use std::{convert::TryFrom, fmt, str::FromStr};
+use serde::{Deserialize, Deserializer, Serialize, ser::Serializer};
+use serde_json::json;
+use std::{borrow::Cow, convert::TryFrom, fmt, str::FromStr};
 use uuid::Uuid;
 
 pub use error::ConversionFailure;
+pub use raw_json::RawJson;
+
 pub type PrismaValueResult<T> = std::result::Result<T, ConversionFailure>;
 pub type PrismaListValue = Vec<PrismaValue>;
 
@@ -43,6 +48,105 @@ pub enum PrismaValue {
 
     #[serde(serialize_with = "serialize_bytes")]
     Bytes(Vec<u8>),
+
+    #[serde(serialize_with = "serialize_placeholder")]
+    Placeholder(Placeholder),
+
+    #[serde(serialize_with = "serialize_generator_call")]
+    GeneratorCall {
+        name: Cow<'static, str>,
+        args: Vec<Self>,
+        return_type: PrismaValueType,
+    },
+}
+
+impl PrismaValue {
+    pub fn r#type(&self) -> PrismaValueType {
+        match self {
+            PrismaValue::String(_) => PrismaValueType::String,
+            PrismaValue::Boolean(_) => PrismaValueType::Boolean,
+            PrismaValue::Int(_) => PrismaValueType::Int,
+            PrismaValue::Uuid(_) => PrismaValueType::String,
+            PrismaValue::List(list) => PrismaValueType::List(
+                list.iter()
+                    .map(|elem| elem.r#type())
+                    .find(|typ| !matches!(typ, PrismaValueType::Any))
+                    .unwrap_or(PrismaValueType::Any)
+                    .into(),
+            ),
+            PrismaValue::Json(_) => PrismaValueType::Json,
+            PrismaValue::Object(_) => PrismaValueType::Object,
+            PrismaValue::DateTime(_) => PrismaValueType::DateTime,
+            PrismaValue::Float(_) => PrismaValueType::Float,
+            PrismaValue::BigInt(_) => PrismaValueType::BigInt,
+            PrismaValue::Bytes(_) => PrismaValueType::Bytes,
+            PrismaValue::Placeholder(placeholder) => placeholder.r#type.clone(),
+            PrismaValue::GeneratorCall { return_type, .. } => return_type.clone(),
+            PrismaValue::Enum(_) => PrismaValueType::Any, // we don't know the enum type at this point
+            PrismaValue::Null => PrismaValueType::Any,
+        }
+    }
+}
+
+#[derive(Debug, Clone, Eq, PartialEq, Hash, Serialize, Deserialize, PartialOrd, Ord)]
+#[serde(tag = "type", content = "inner")]
+pub enum PrismaValueType {
+    String,
+    Boolean,
+    Enum,
+    Int,
+    Uuid,
+    List(Box<PrismaValueType>),
+    Json,
+    Object,
+    DateTime,
+    Float,
+    BigInt,
+    Bytes,
+    Any,
+}
+
+impl std::fmt::Display for PrismaValueType {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            PrismaValueType::String => "String".fmt(f),
+            PrismaValueType::Boolean => "Boolean".fmt(f),
+            PrismaValueType::Enum => "Enum".fmt(f),
+            PrismaValueType::Int => "Int".fmt(f),
+            PrismaValueType::Uuid => "Uuid".fmt(f),
+            PrismaValueType::List(inner) => write!(f, "List<{}>", inner),
+            PrismaValueType::Json => "Json".fmt(f),
+            PrismaValueType::Object => "Object".fmt(f),
+            PrismaValueType::DateTime => "DateTime".fmt(f),
+            PrismaValueType::Float => "Float".fmt(f),
+            PrismaValueType::BigInt => "BigInt".fmt(f),
+            PrismaValueType::Bytes => "Bytes".fmt(f),
+            PrismaValueType::Any => "Any".fmt(f),
+        }
+    }
+}
+
+#[derive(Debug, Clone, Eq, PartialEq, Hash, Deserialize, PartialOrd, Ord)]
+pub struct Placeholder {
+    pub name: Cow<'static, str>,
+    #[serde(flatten)]
+    pub r#type: PrismaValueType,
+}
+
+impl Placeholder {
+    pub fn new(name: impl Into<Cow<'static, str>>, r#type: PrismaValueType) -> Self {
+        Self {
+            name: name.into(),
+            r#type,
+        }
+    }
+
+    pub fn with_type(self, r#type: PrismaValueType) -> Self {
+        Self {
+            name: self.name,
+            r#type,
+        }
+    }
 }
 
 /// Stringify a date to the following format
@@ -62,11 +166,13 @@ pub fn parse_datetime(datetime: &str) -> chrono::ParseResult<DateTime<FixedOffse
 }
 
 pub fn encode_bytes(bytes: &[u8]) -> String {
-    base64::encode(bytes)
+    BASE64_STANDARD.encode(bytes)
 }
 
-pub fn decode_bytes(s: &str) -> PrismaValueResult<Vec<u8>> {
-    base64::decode(s).map_err(|_| ConversionFailure::new("base64 encoded bytes", "PrismaValue::Bytes"))
+pub fn decode_bytes(s: impl AsRef<[u8]>) -> PrismaValueResult<Vec<u8>> {
+    BASE64_STANDARD
+        .decode(s)
+        .map_err(|_| ConversionFailure::new("base64 encoded bytes", "PrismaValue::Bytes"))
 }
 
 impl TryFrom<serde_json::Value> for PrismaValue {
@@ -103,6 +209,7 @@ impl TryFrom<serde_json::Value> for PrismaValue {
 
                     Ok(PrismaValue::DateTime(date))
                 }
+
                 Some("bigint") => {
                     let value = obj
                         .get("prisma__value")
@@ -113,6 +220,7 @@ impl TryFrom<serde_json::Value> for PrismaValue {
                         .map(PrismaValue::BigInt)
                         .map_err(|_| ConversionFailure::new("JSON bigint value", "PrismaValue"))
                 }
+
                 Some("decimal") => {
                     let value = obj
                         .get("prisma__value")
@@ -123,6 +231,7 @@ impl TryFrom<serde_json::Value> for PrismaValue {
                         .map(PrismaValue::Float)
                         .map_err(|_| ConversionFailure::new("JSON decimal value", "PrismaValue"))
                 }
+
                 Some("bytes") => {
                     let value = obj
                         .get("prisma__value")
@@ -130,6 +239,21 @@ impl TryFrom<serde_json::Value> for PrismaValue {
                         .ok_or_else(|| ConversionFailure::new("JSON bytes value", "PrismaValue"))?;
 
                     decode_bytes(value).map(PrismaValue::Bytes)
+                }
+
+                Some("param") => {
+                    let obj = obj
+                        .get("prisma__value")
+                        .and_then(|v| v.as_object())
+                        .ok_or_else(|| ConversionFailure::new("JSON param value", "PrismaValue"))?;
+
+                    let name = obj
+                        .get("name")
+                        .and_then(|v| v.as_str())
+                        .ok_or_else(|| ConversionFailure::new("param name", "JSON param value"))?
+                        .to_owned();
+
+                    Ok(PrismaValue::Placeholder(Placeholder::new(name, PrismaValueType::Any)))
                 }
 
                 _ => Ok(PrismaValue::Json(serde_json::to_string(&obj).unwrap())),
@@ -170,7 +294,19 @@ fn serialize_decimal<S>(decimal: &BigDecimal, serializer: S) -> Result<S::Ok, S:
 where
     S: Serializer,
 {
-    decimal.to_string().parse::<f64>().unwrap().serialize(serializer)
+    const JS_MAX_SAFE_INTEGER: u64 = (1u64 << 53) - 1;
+
+    // convert decimals to integers when possible to avoid '.0' formatting
+    if let Some(d) = decimal
+        .is_integer()
+        .then(|| decimal.to_u64())
+        .flatten()
+        .filter(|&n| n <= JS_MAX_SAFE_INTEGER)
+    {
+        d.serialize(serializer)
+    } else {
+        decimal.to_string().parse::<f64>().unwrap().serialize(serializer)
+    }
 }
 
 fn deserialize_decimal<'de, D>(deserializer: D) -> Result<BigDecimal, D::Error>
@@ -180,22 +316,58 @@ where
     deserializer.deserialize_f64(BigDecimalVisitor)
 }
 
-fn serialize_object<S>(obj: &Vec<(String, PrismaValue)>, serializer: S) -> Result<S::Ok, S::Error>
+fn serialize_object<S>(obj: &[(String, PrismaValue)], serializer: S) -> Result<S::Ok, S::Error>
 where
     S: Serializer,
 {
-    let mut map = serializer.serialize_map(Some(obj.len()))?;
+    serializer.collect_map(obj.iter().map(|(k, v)| (k, v)))
+}
 
-    for (k, v) in obj {
-        map.serialize_entry(k, v)?;
-    }
+fn serialize_placeholder<S>(Placeholder { name, r#type }: &Placeholder, serializer: S) -> Result<S::Ok, S::Error>
+where
+    S: Serializer,
+{
+    let mut map = serializer.serialize_map(Some(2))?;
+
+    map.serialize_entry("prisma__type", "param")?;
+    map.serialize_entry(
+        "prisma__value",
+        &json!({
+            "name": name,
+            "type": r#type.to_string(),
+        }),
+    )?;
+
+    map.end()
+}
+
+fn serialize_generator_call<S>(
+    name: &str,
+    args: &[PrismaValue],
+    return_type: &PrismaValueType,
+    serializer: S,
+) -> Result<S::Ok, S::Error>
+where
+    S: Serializer,
+{
+    let mut map = serializer.serialize_map(Some(2))?;
+
+    map.serialize_entry("prisma__type", "generatorCall")?;
+    map.serialize_entry(
+        "prisma__value",
+        &json!({
+            "name": name,
+            "args": args,
+            "returnType": return_type,
+        }),
+    )?;
 
     map.end()
 }
 
 struct BigDecimalVisitor;
 
-impl<'de> serde::de::Visitor<'de> for BigDecimalVisitor {
+impl serde::de::Visitor<'_> for BigDecimalVisitor {
     type Value = BigDecimal;
 
     fn expecting(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
@@ -290,12 +462,31 @@ impl PrismaValue {
         }
     }
 
+    pub fn into_placeholder(self) -> Option<Placeholder> {
+        match self {
+            PrismaValue::Placeholder(p) => Some(p),
+            _ => None,
+        }
+    }
+
     pub fn new_float(float: f64) -> PrismaValue {
         PrismaValue::Float(BigDecimal::from_f64(float).unwrap())
     }
 
     pub fn new_datetime(datetime: &str) -> PrismaValue {
         PrismaValue::DateTime(parse_datetime(datetime).unwrap())
+    }
+
+    pub fn placeholder(name: impl Into<Cow<'static, str>>, r#type: PrismaValueType) -> PrismaValue {
+        PrismaValue::Placeholder(Placeholder::new(name, r#type))
+    }
+
+    pub fn generator_now() -> PrismaValue {
+        PrismaValue::GeneratorCall {
+            name: "now".into(),
+            args: vec![],
+            return_type: PrismaValueType::DateTime,
+        }
     }
 
     pub fn as_boolean(&self) -> Option<&bool> {
@@ -306,11 +497,7 @@ impl PrismaValue {
     }
 
     pub fn as_json(&self) -> Option<&String> {
-        if let Self::Json(v) = self {
-            Some(v)
-        } else {
-            None
-        }
+        if let Self::Json(v) = self { Some(v) } else { None }
     }
 }
 
@@ -340,6 +527,17 @@ impl fmt::Display for PrismaValue {
                     .join(", ");
 
                 write!(f, "{{ {joined} }}")
+            }
+            PrismaValue::Placeholder(Placeholder { name, r#type }) => write!(f, "var({name}: {type})"),
+            PrismaValue::GeneratorCall { name, args, .. } => {
+                write!(f, "{name}(")?;
+                for (i, arg) in args.iter().enumerate() {
+                    if i > 0 {
+                        write!(f, ", ")?;
+                    }
+                    write!(f, "{arg}")?;
+                }
+                write!(f, ")")
             }
         }
     }
@@ -400,6 +598,12 @@ impl From<Uuid> for PrismaValue {
 impl From<PrismaListValue> for PrismaValue {
     fn from(s: PrismaListValue) -> Self {
         PrismaValue::List(s)
+    }
+}
+
+impl From<Placeholder> for PrismaValue {
+    fn from(p: Placeholder) -> Self {
+        PrismaValue::Placeholder(p)
     }
 }
 

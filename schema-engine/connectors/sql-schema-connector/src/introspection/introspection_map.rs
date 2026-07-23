@@ -7,8 +7,8 @@ use crate::introspection::{
     introspection_pair::RelationFieldDirection, sanitize_datamodel_names,
 };
 use psl::{
-    parser_database::{self, ast, ScalarFieldId},
     PreviewFeature,
+    parser_database::{self as db, ScalarFieldId},
 };
 use relation_names::RelationNames;
 use sql_schema_describer as sql;
@@ -24,15 +24,15 @@ pub(crate) use relation_names::RelationName;
 /// schema.
 #[derive(Default)]
 pub(crate) struct IntrospectionMap<'a> {
-    pub(crate) existing_enums: HashMap<sql::EnumId, ast::EnumId>,
-    pub(crate) existing_models: HashMap<sql::TableId, ast::ModelId>,
-    pub(crate) existing_views: HashMap<sql::ViewId, ast::ModelId>,
-    pub(crate) missing_tables_for_previous_models: HashSet<ast::ModelId>,
-    pub(crate) missing_views_for_previous_models: HashSet<ast::ModelId>,
+    pub(crate) existing_enums: HashMap<sql::EnumId, db::EnumId>,
+    pub(crate) existing_models: HashMap<sql::TableId, db::ModelId>,
+    pub(crate) existing_views: HashMap<sql::ViewId, db::ModelId>,
+    pub(crate) missing_tables_for_previous_models: HashSet<db::ModelId>,
+    pub(crate) missing_views_for_previous_models: HashSet<db::ModelId>,
     pub(crate) existing_model_scalar_fields: HashMap<sql::TableColumnId, ScalarFieldId>,
     pub(crate) existing_view_scalar_fields: HashMap<sql::ViewColumnId, ScalarFieldId>,
-    pub(crate) existing_inline_relations: HashMap<sql::ForeignKeyId, parser_database::RelationId>,
-    pub(crate) existing_m2m_relations: HashMap<sql::TableId, parser_database::ManyToManyRelationId>,
+    pub(crate) existing_inline_relations: HashMap<sql::ForeignKeyId, db::RelationId>,
+    pub(crate) existing_m2m_relations: HashMap<sql::TableId, db::ManyToManyRelationId>,
     pub(crate) relation_names: RelationNames<'a>,
     pub(crate) inline_relation_positions: Vec<(sql::TableId, sql::ForeignKeyId, RelationFieldDirection)>,
     pub(crate) m2m_relation_positions: Vec<(sql::TableId, sql::ForeignKeyId, RelationFieldDirection)>,
@@ -50,11 +50,11 @@ impl<'a> IntrospectionMap<'a> {
         match_enums(sql_schema, prisma_schema, &mut map);
         match_existing_scalar_fields(sql_schema, prisma_schema, &mut map);
         match_existing_inline_relations(sql_schema, prisma_schema, &mut map);
-        match_existing_m2m_relations(sql_schema, prisma_schema, &mut map);
+        match_existing_m2m_relations(sql_schema, prisma_schema, ctx, &mut map);
         relation_names::introspect(ctx, &mut map);
-        position_inline_relation_fields(sql_schema, &mut map);
-        position_m2m_relation_fields(sql_schema, &mut map);
-        populate_top_level_names(sql_schema, prisma_schema, &mut map);
+        position_inline_relation_fields(sql_schema, ctx, &mut map);
+        position_m2m_relation_fields(sql_schema, ctx, &mut map);
+        populate_top_level_names(sql_schema, prisma_schema, ctx, &mut map);
 
         map
     }
@@ -63,11 +63,12 @@ impl<'a> IntrospectionMap<'a> {
 fn populate_top_level_names<'a>(
     sql_schema: &'a sql::SqlSchema,
     prisma_schema: &'a psl::ValidatedSchema,
+    ctx: &DatamodelCalculatorContext<'_>,
     map: &mut IntrospectionMap<'a>,
 ) {
     for table in sql_schema
         .table_walkers()
-        .filter(|t| !helpers::is_prisma_m_to_n_relation(*t))
+        .filter(|t| !helpers::is_prisma_m_to_n_relation(*t, ctx.flavour.uses_pk_in_m2m_join_tables(ctx)))
     {
         let name = map
             .existing_models
@@ -115,10 +116,14 @@ fn populate_top_level_names<'a>(
 
 /// Inlined relation fields (foreign key is defined in a model) are
 /// sorted in a specific way. We handle the sorting here.
-fn position_inline_relation_fields(sql_schema: &sql::SqlSchema, map: &mut IntrospectionMap<'_>) {
+fn position_inline_relation_fields(
+    sql_schema: &sql::SqlSchema,
+    ctx: &DatamodelCalculatorContext<'_>,
+    map: &mut IntrospectionMap<'_>,
+) {
     for table in sql_schema
         .table_walkers()
-        .filter(|t| !helpers::is_prisma_m_to_n_relation(*t))
+        .filter(|t| !helpers::is_prisma_m_to_n_relation(*t, ctx.flavour.uses_pk_in_m2m_join_tables(ctx)))
     {
         for fk in table.foreign_keys() {
             map.inline_relation_positions
@@ -133,10 +138,14 @@ fn position_inline_relation_fields(sql_schema: &sql::SqlSchema, map: &mut Intros
 /// Many to many relation fields (foreign keys are defined in a hidden
 /// join table) are sorted in a specific way. We handle the sorting
 /// here.
-fn position_m2m_relation_fields(sql_schema: &sql::SqlSchema, map: &mut IntrospectionMap<'_>) {
+fn position_m2m_relation_fields(
+    sql_schema: &sql::SqlSchema,
+    ctx: &DatamodelCalculatorContext<'_>,
+    map: &mut IntrospectionMap<'_>,
+) {
     for table in sql_schema
         .table_walkers()
-        .filter(|t| helpers::is_prisma_m_to_n_relation(*t))
+        .filter(|t| helpers::is_prisma_m_to_n_relation(*t, ctx.flavour.uses_pk_in_m2m_join_tables(ctx)))
     {
         let mut fks = table.foreign_keys();
 
@@ -313,11 +322,12 @@ fn match_existing_inline_relations<'a>(
 fn match_existing_m2m_relations(
     sql_schema: &sql::SqlSchema,
     prisma_schema: &psl::ValidatedSchema,
+    ctx: &DatamodelCalculatorContext<'_>,
     map: &mut IntrospectionMap<'_>,
 ) {
     map.existing_m2m_relations = sql_schema
         .table_walkers()
-        .filter(|t| helpers::is_prisma_m_to_n_relation(*t))
+        .filter(|t| helpers::is_prisma_m_to_n_relation(*t, ctx.flavour.uses_pk_in_m2m_join_tables(ctx)))
         .filter_map(|table| {
             prisma_schema
                 .db

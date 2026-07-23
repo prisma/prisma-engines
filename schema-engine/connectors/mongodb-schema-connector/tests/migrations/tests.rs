@@ -5,7 +5,7 @@
 //! Each test scenario folder must contain two files:
 //!
 //! - `state.json` must contain the initial state of the database. See examples and `State` in
-//! `test_api.rs` for details.
+//!   `test_api.rs` for details.
 //! - `schema.prisma` must be the Prisma schema.
 //!
 //! On the first run, a `result` file will also be created. It is a snapshot test, do not edit it
@@ -40,7 +40,6 @@ scenarios! {
   multi_column_fulltext_indexes_can_be_created
   multi_column_mixed_fulltext_indexes_can_be_created
   multi_column_mixed_fulltext_indexes_can_be_changed
-  pushing_without_preview_flag_should_not_touch_fts_indexes
   unique_to_index
   composite_indexes_can_be_created
   composite_indexes_can_be_created_descending

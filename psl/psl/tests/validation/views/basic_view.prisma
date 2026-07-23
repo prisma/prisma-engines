@@ -1,14 +1,13 @@
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
 }
 
 generator js {
-  provider = "prisma-client-js"
+  provider = "prisma-client"
   previewFeatures = ["views"]
 }
 
 view Mountain {
-  id Int @unique
+  id Int
   val String
 }

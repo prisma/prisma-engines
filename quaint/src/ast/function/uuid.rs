@@ -5,7 +5,7 @@ use crate::ast::Expression;
 /// ```rust
 /// # use quaint::{ast::*, visitor::{Visitor, Mysql}};
 /// # fn main() -> Result<(), quaint::error::Error> {
-
+///
 /// let query = Select::default().value(uuid_to_bin());
 /// let (sql, _) = Mysql::build(query)?;
 ///
@@ -47,7 +47,7 @@ pub fn uuid_to_bin_swapped() -> Expression<'static> {
 /// ```rust
 /// # use quaint::{ast::*, visitor::{Visitor, Mysql}};
 /// # fn main() -> Result<(), quaint::error::Error> {
-
+///
 /// let query = Select::default().value(native_uuid());
 /// let (sql, _) = Mysql::build(query)?;
 ///

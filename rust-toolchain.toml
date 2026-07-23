@@ -1,0 +1,13 @@
+[toolchain]
+channel = "1.92.0"
+components = ["clippy", "rustfmt", "rust-src"]
+targets = [
+    # Wasm target for serverless and edge environments.
+    "wasm32-unknown-unknown",
+
+    # Server targets we support.
+    "x86_64-unknown-linux-musl",
+    "aarch64-unknown-linux-gnu",
+    "aarch64-unknown-linux-musl",
+    "aarch64-apple-darwin",
+]

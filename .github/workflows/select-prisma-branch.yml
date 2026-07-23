@@ -1,0 +1,41 @@
+name: Select Prisma branch
+on:
+  workflow_call:
+    outputs:
+      prismaBranch:
+        description: Name of the Prisma branch
+        value: ${{ jobs.selectPrismaBranch.outputs.prismaBranch }}
+
+jobs:
+  selectPrismaBranch:
+    name: Select Prisma branch
+    runs-on: ubuntu-latest
+    outputs:
+      prismaBranch: ${{ steps.setPrismaBranch.outputs.prismaBranch }}
+    steps:
+      - name: Default to the main branch
+        run: echo "PRISMA_BRANCH=main" >> "$GITHUB_ENV"
+
+      - name: Extract Prisma branch name from PR description
+        env:
+          PR_BODY: ${{ github.event.pull_request.body }}
+        if: |
+          github.event_name == 'pull_request' &&
+          contains(env.PR_BODY, '/prisma-branch') &&
+          (
+            github.event.pull_request.author_association == 'OWNER' ||
+            github.event.pull_request.author_association == 'MEMBER' ||
+            github.event.pull_request.author_association == 'COLLABORATOR' ||
+            github.event.pull_request.author_association == 'CONTRIBUTOR'
+          )
+        run: |
+          BRANCH_NAME=$(echo "$PR_BODY" | sed -n 's|.*\/prisma-branch \([^[:space:]]\+\).*|\1|p' | head -n 1)
+          if [ -n "$BRANCH_NAME" ] && [ "$BRANCH_NAME" != "main" ]; then
+            echo "PRISMA_BRANCH=$BRANCH_NAME" >> "$GITHUB_ENV"
+          fi
+
+      - name: Store Prisma branch name
+        id: setPrismaBranch
+        run: |
+          echo "Prisma branch requested: $PRISMA_BRANCH"
+          echo "prismaBranch=$PRISMA_BRANCH" >> "$GITHUB_OUTPUT"

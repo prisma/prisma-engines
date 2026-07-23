@@ -1,16 +1,19 @@
 mod native_types;
 mod validations;
 
+use std::borrow::Cow;
+
 pub use native_types::{MsSqlType, MsSqlTypeParameter};
+use parser_database::{ExtensionTypes, ScalarFieldType};
 
 use crate::{
+    ValidatedSchema,
     datamodel_connector::{
         Connector, ConnectorCapabilities, ConnectorCapability, ConstraintScope, Flavour, NativeTypeConstructor,
         NativeTypeInstance, RelationMode,
     },
     diagnostics::{Diagnostics, Span},
-    parser_database::{self, ast, ParserDatabase, ReferentialAction, ScalarType},
-    PreviewFeature,
+    parser_database::{self, ParserDatabase, ReferentialAction, ScalarType, ast},
 };
 use enumflags2::BitFlags;
 use lsp_types::{CompletionItem, CompletionItemKind, CompletionList};
@@ -37,7 +40,6 @@ const CAPABILITIES: ConnectorCapabilities = enumflags2::make_bitflags!(Connector
     NamedDefaultValues |
     NamedForeignKeys |
     NamedPrimaryKeys |
-    SqlQueryRaw |
     ReferenceCycleDetection |
     UpdateableId |
     PrimaryKeySortOrderDefinition |
@@ -52,7 +54,8 @@ const CAPABILITIES: ConnectorCapabilities = enumflags2::make_bitflags!(Connector
     SupportsTxIsolationSerializable |
     SupportsTxIsolationSnapshot |
     SupportsFiltersOnRelationsWithoutJoins |
-    SupportsDefaultInInsert
+    SupportsDefaultInInsert |
+    PartialIndex
     // InsertReturning | DeleteReturning - unimplemented.
 });
 
@@ -93,16 +96,20 @@ impl Connector for MsSqlDatamodelConnector {
         128
     }
 
-    fn referential_actions(&self) -> BitFlags<ReferentialAction> {
+    fn foreign_key_referential_actions(&self) -> BitFlags<ReferentialAction> {
         use ReferentialAction::*;
 
         NoAction | Cascade | SetNull | SetDefault
     }
 
-    fn scalar_type_for_native_type(&self, native_type: &NativeTypeInstance) -> ScalarType {
+    fn scalar_type_for_native_type(
+        &self,
+        native_type: &NativeTypeInstance,
+        _extension_types: &dyn ExtensionTypes,
+    ) -> Option<ScalarFieldType> {
         let native_type: &MsSqlType = native_type.downcast_ref();
 
-        match native_type {
+        let res = match native_type {
             //String
             Char(_) => ScalarType::String,
             NChar(_) => ScalarType::String,
@@ -139,13 +146,19 @@ impl Connector for MsSqlDatamodelConnector {
             VarBinary(_) => ScalarType::Bytes,
             Image => ScalarType::Bytes,
             Bit => ScalarType::Bytes,
-        }
+        };
+        Some(ScalarFieldType::BuiltInScalar(res))
     }
 
-    fn default_native_type_for_scalar_type(&self, scalar_type: &ScalarType) -> Option<NativeTypeInstance> {
+    fn default_native_type_for_scalar_type(
+        &self,
+        scalar_type: &ScalarFieldType,
+        _schema: &ValidatedSchema,
+    ) -> Option<NativeTypeInstance> {
+        let scalar_type = scalar_type.as_builtin_scalar()?;
         let nt = SCALAR_TYPE_DEFAULTS
             .iter()
-            .find(|(st, _)| st == scalar_type)
+            .find(|(st, _)| st == &scalar_type)
             .map(|(_, native_type)| native_type)
             .ok_or_else(|| format!("Could not find scalar type {scalar_type:?} in SCALAR_TYPE_DEFAULTS"))
             .unwrap();
@@ -153,22 +166,10 @@ impl Connector for MsSqlDatamodelConnector {
         Some(NativeTypeInstance::new::<MsSqlType>(*nt))
     }
 
-    fn native_type_is_default_for_scalar_type(
-        &self,
-        native_type: &NativeTypeInstance,
-        scalar_type: &ScalarType,
-    ) -> bool {
-        let native_type: &MsSqlType = native_type.downcast_ref();
-
-        SCALAR_TYPE_DEFAULTS
-            .iter()
-            .any(|(st, nt)| scalar_type == st && native_type == nt)
-    }
-
     fn validate_native_type_arguments(
         &self,
         native_type: &NativeTypeInstance,
-        _scalar_type: &ScalarType,
+        _scalar_type: Option<ScalarType>,
         span: Span,
         errors: &mut Diagnostics,
     ) {
@@ -238,11 +239,16 @@ impl Connector for MsSqlDatamodelConnector {
         span: Span,
         diagnostics: &mut Diagnostics,
     ) -> Option<NativeTypeInstance> {
-        let native_type = MsSqlType::from_parts(name, args, span, diagnostics)?;
-        Some(NativeTypeInstance::new::<MsSqlType>(native_type))
+        match MsSqlType::from_parts(name, args) {
+            Ok(res) => Some(NativeTypeInstance::new(res)),
+            Err(err) => {
+                diagnostics.push_error(err.into_datamodel_error(span));
+                None
+            }
+        }
     }
 
-    fn native_type_to_parts(&self, native_type: &NativeTypeInstance) -> (&'static str, Vec<String>) {
+    fn native_type_to_parts<'t>(&self, native_type: &'t NativeTypeInstance) -> (&'t str, Cow<'t, [String]>) {
         native_type.downcast_ref::<MsSqlType>().to_parts()
     }
 
@@ -262,7 +268,10 @@ impl Connector for MsSqlDatamodelConnector {
     ) {
         if let ast::SchemaPosition::Model(
             _model_id,
-            ast::ModelPosition::Field(_, ast::FieldPosition::Attribute("default", _, None)),
+            ast::ModelPosition::Field(
+                _,
+                ast::FieldPosition::Attribute("default", _, ast::AttributePosition::Attribute),
+            ),
         ) = position
         {
             completions.items.push(CompletionItem {
@@ -279,13 +288,21 @@ impl Connector for MsSqlDatamodelConnector {
             None => return,
         };
 
-        if config.preview_features().contains(PreviewFeature::MultiSchema) && !ds.schemas_defined() {
+        if !ds.schemas_defined() {
             completions::schemas_completion(completion_list);
         }
     }
 
     fn flavour(&self) -> Flavour {
         Flavour::Sqlserver
+    }
+
+    fn does_manage_udts(&self) -> bool {
+        true
+    }
+
+    fn can_assume_strict_equality_in_joins(&self) -> bool {
+        true
     }
 }
 

@@ -6,12 +6,11 @@ async fn an_enum_with_invalid_value_names_should_have_them_commented_out(api: &m
     api.raw_cmd(sql).await;
     let expected = expect![[r#"
         generator client {
-          provider = "prisma-client-js"
+          provider = "prisma-client"
         }
 
         datasource db {
           provider = "mysql"
-          url      = "env(TEST_DATABASE_URL)"
         }
 
         /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
@@ -45,12 +44,11 @@ async fn a_table_with_an_enum_default_value_that_is_an_empty_string(api: &mut Te
 
     let expectation = expect![[r#"
         generator client {
-          provider = "prisma-client-js"
+          provider = "prisma-client"
         }
 
         datasource db {
           provider = "mysql"
-          url      = "env(TEST_DATABASE_URL)"
         }
 
         model Book {
@@ -83,12 +81,11 @@ async fn a_table_with_enum_default_values_that_look_like_booleans(api: &mut Test
 
     let expectation = expect![[r#"
         generator client {
-          provider = "prisma-client-js"
+          provider = "prisma-client"
         }
 
         datasource db {
           provider = "mysql"
-          url      = "env(TEST_DATABASE_URL)"
         }
 
         model News {

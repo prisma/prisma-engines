@@ -2,17 +2,17 @@ use super::default_value;
 use crate::{datamodel_connector::ConnectorCapability, validate::validation_pipeline::context::Context};
 use diagnostics::DatamodelError;
 use parser_database::{
-    ast::{self, WithSpan},
-    walkers::{CompositeTypeFieldWalker, CompositeTypeWalker},
     ScalarFieldType,
+    ast::WithSpan,
+    walkers::{CompositeTypeFieldWalker, CompositeTypeWalker},
 };
 use std::{fmt, rc::Rc};
 
 /// Detect compound type chains that form a cycle, that is not broken with either an optional or an
 /// array type.
 pub(super) fn detect_composite_cycles(ctx: &mut Context<'_>) {
-    let mut visited: Vec<ast::CompositeTypeId> = Vec::new();
-    let mut errors: Vec<(ast::CompositeTypeId, DatamodelError)> = Vec::new();
+    let mut visited: Vec<parser_database::CompositeTypeId> = Vec::new();
+    let mut errors: Vec<(parser_database::CompositeTypeId, DatamodelError)> = Vec::new();
 
     let mut fields_to_traverse: Vec<(CompositeTypeFieldWalker<'_>, Option<Rc<CompositeTypePath<'_>>>)> = ctx
         .db
@@ -142,7 +142,7 @@ impl<'db> CompositeTypePath<'db> {
     }
 }
 
-impl<'db> fmt::Display for CompositeTypePath<'db> {
+impl fmt::Display for CompositeTypePath<'_> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let mut traversed = vec![self.current];
         let mut this = self;
