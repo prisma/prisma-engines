@@ -50,8 +50,7 @@ mod byoid {
             | ConnectorVersion::Vitess(Some(query_tests_setup::VitessVersion::PlanetscaleJsWasm)) => {
                 "constraint: `PRIMARY`".to_owned()
             }
-            ConnectorVersion::Postgres(Some(query_tests_setup::PostgresVersion::PgJsWasm))
-            | ConnectorVersion::CockroachDb(Some(query_tests_setup::CockroachDbVersion::PgJsWasm)) => {
+            connector_version if connector_version.is_pg_driver_adapter() => {
                 std::format!("constraint: `{model}_pkey`")
             }
             ConnectorVersion::Vitess(_) => "(not available)".to_owned(),
