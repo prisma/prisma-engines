@@ -1,6 +1,6 @@
 use query_engine_tests::*;
 
-#[test_suite(only(MySql, Postgres, Sqlite, Vitess))]
+#[test_suite(only(MySql, Postgres, Sqlite, Vitess, CockroachDb))]
 //  bring_your_own_id
 mod byoid {
     use indoc::indoc;
@@ -44,8 +44,22 @@ mod byoid {
         schema.to_owned()
     }
 
+    fn id_unique_constraint_target(runner: &Runner, model: &str) -> String {
+        match runner.connector_version() {
+            ConnectorVersion::MySql(_)
+            | ConnectorVersion::Vitess(Some(query_tests_setup::VitessVersion::PlanetscaleJsWasm)) => {
+                "constraint: `PRIMARY`".to_owned()
+            }
+            connector_version if connector_version.is_pg_driver_adapter() => {
+                std::format!("constraint: `{model}_pkey`")
+            }
+            ConnectorVersion::Vitess(_) => "(not available)".to_owned(),
+            _ => "fields: (`id`)".to_owned(),
+        }
+    }
+
     // "A Create Mutation" should "create and return item with own Id"
-    #[connector_test(schema(schema_1), only(MySql, Postgres, Sqlite, Vitess))]
+    #[connector_test(schema(schema_1), only(MySql, Postgres, Sqlite, Vitess, CockroachDb))]
     async fn create_and_return_item_woi_1(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(&runner, r#"mutation {
@@ -54,14 +68,7 @@ mod byoid {
           @r###"{"data":{"createOneParent":{"p":"Parent","id":"Own Id"}}}"###
         );
 
-        let error_target = match runner.connector_version() {
-            query_engine_tests::ConnectorVersion::MySql(_)
-            | query_engine_tests::ConnectorVersion::Vitess(Some(query_tests_setup::VitessVersion::PlanetscaleJsWasm)) => {
-                "constraint: `PRIMARY`"
-            }
-            query_engine_tests::ConnectorVersion::Vitess(_) => "(not available)",
-            _ => "fields: (`id`)",
-        };
+        let error_target = id_unique_constraint_target(&runner, "Parent");
 
         assert_error!(
             &runner,
@@ -76,7 +83,7 @@ mod byoid {
     }
 
     // "A Create Mutation" should "create and return item with own Id"
-    #[connector_test(schema(schema_2), only(MySql, Postgres, Sqlite, Vitess))]
+    #[connector_test(schema(schema_2), only(MySql, Postgres, Sqlite, Vitess, CockroachDb))]
     async fn create_and_return_item_woi_2(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(&runner, r#"mutation {
@@ -85,14 +92,7 @@ mod byoid {
           @r###"{"data":{"createOneParent":{"p":"Parent","id":"Own Id"}}}"###
         );
 
-        let error_target = match runner.connector_version() {
-            query_engine_tests::ConnectorVersion::MySql(_)
-            | query_engine_tests::ConnectorVersion::Vitess(Some(query_tests_setup::VitessVersion::PlanetscaleJsWasm)) => {
-                "constraint: `PRIMARY`"
-            }
-            ConnectorVersion::Vitess(_) => "(not available)",
-            _ => "fields: (`id`)",
-        };
+        let error_target = id_unique_constraint_target(&runner, "Parent");
 
         assert_error!(
             &runner,
@@ -137,7 +137,7 @@ mod byoid {
     }
 
     // "A Nested Create Mutation" should "create and return item with own Id"
-    #[connector_test(schema(schema_1), only(MySql, Postgres, Sqlite, Vitess))]
+    #[connector_test(schema(schema_1), only(MySql, Postgres, Sqlite, Vitess, CockroachDb))]
     async fn nested_create_return_item_woi_1(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(&runner, r#"mutation {
@@ -146,14 +146,7 @@ mod byoid {
           @r###"{"data":{"createOneParent":{"p":"Parent","id":"Own Id","childOpt":{"c":"Child","id":"Own Child Id"}}}}"###
         );
 
-        let error_target = match runner.connector_version() {
-            query_engine_tests::ConnectorVersion::MySql(_)
-            | query_engine_tests::ConnectorVersion::Vitess(Some(query_tests_setup::VitessVersion::PlanetscaleJsWasm)) => {
-                "constraint: `PRIMARY`"
-            }
-            ConnectorVersion::Vitess(_) => "(not available)",
-            _ => "fields: (`id`)",
-        };
+        let error_target = id_unique_constraint_target(&runner, "Child");
 
         assert_error!(
             &runner,
@@ -168,7 +161,7 @@ mod byoid {
     }
 
     // "A Nested Create Mutation" should "create and return item with own Id"
-    #[connector_test(schema(schema_2), only(MySql, Postgres, Sqlite, Vitess))]
+    #[connector_test(schema(schema_2), only(MySql, Postgres, Sqlite, Vitess, CockroachDb))]
     async fn nested_create_return_item_woi_2(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(&runner, r#"mutation {
@@ -177,14 +170,7 @@ mod byoid {
           @r###"{"data":{"createOneParent":{"p":"Parent","id":"Own Id","childOpt":{"c":"Child","id":"Own Child Id"}}}}"###
         );
 
-        let error_target = match runner.connector_version() {
-            query_engine_tests::ConnectorVersion::MySql(_)
-            | query_engine_tests::ConnectorVersion::Vitess(Some(query_tests_setup::VitessVersion::PlanetscaleJsWasm)) => {
-                "constraint: `PRIMARY`"
-            }
-            ConnectorVersion::Vitess(_) => "(not available)",
-            _ => "fields: (`id`)",
-        };
+        let error_target = id_unique_constraint_target(&runner, "Child");
 
         assert_error!(
             &runner,
