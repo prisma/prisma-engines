@@ -640,16 +640,16 @@ fn parse_where_clause(model_id: crate::ModelId, ctx: &mut Context<'_>) -> Option
 
 /// Parse raw("...") where clause.
 fn parse_raw_where_clause(args: &[ast::Argument], ctx: &mut Context<'_>) -> Option<WhereClause> {
-    let Some(first_arg) = args.first() else {
+    let [arg] = args else {
         ctx.push_attribute_validation_error(
-            "The `where` argument must be a raw() function with a string argument, e.g. `where: raw(\"status = 'active'\")`.",
+            "The `where` argument must be a raw() function with exactly one string argument, e.g. `where: raw(\"status = 'active'\")`.",
         );
         return None;
     };
 
-    let Some(predicate) = coerce::string(&first_arg.value, ctx.diagnostics) else {
+    let Some(predicate) = coerce::string(&arg.value, ctx.diagnostics) else {
         ctx.push_attribute_validation_error(
-            "The `where` argument must be a raw() function with a string argument, e.g. `where: raw(\"status = 'active'\")`.",
+            "The `where` argument must be a raw() function with exactly one string argument, e.g. `where: raw(\"status = 'active'\")`.",
         );
         return None;
     };
