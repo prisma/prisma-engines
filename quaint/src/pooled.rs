@@ -25,6 +25,16 @@
 //!
 //! - `connection_limit` defines the maximum number of connections opened to the
 //!   database.
+//! - `test_on_check_out` either `true` or `false` (default: `false`). When
+//!   enabled, the health of a connection is verified with a lightweight
+//!   `SELECT 1` query before handing it out of the pool. A connection that was
+//!   silently closed by the server or a network device while sitting idle in
+//!   the pool is then discarded and replaced with a fresh one, instead of
+//!   failing the query with a connection error. Not supported for SQLite.
+//! - `health_check_interval` defined in seconds. Only effective together with
+//!   `test_on_check_out=true`: a connection is health-checked at most once per
+//!   given interval, avoiding the extra round-trip on every checkout. If set
+//!   to zero or omitted, every checkout is verified.
 //!
 //! ## SQLite
 //!
@@ -395,6 +405,8 @@ impl Quaint {
                 let pool_timeout = url.pool_timeout();
                 let max_connection_lifetime = url.max_connection_lifetime();
                 let max_idle_connection_lifetime = url.max_idle_connection_lifetime();
+                let test_on_check_out = url.test_on_check_out();
+                let health_check_interval = url.health_check_interval();
 
                 if is_tracing_enabled {
                     url.query_params.statement_cache_size = 0;
@@ -419,6 +431,14 @@ impl Quaint {
                     builder.max_idle_lifetime(max_idle_lifetime);
                 }
 
+                if test_on_check_out {
+                    builder.test_on_check_out(true);
+                }
+
+                if let Some(interval) = health_check_interval {
+                    builder.health_check_interval(interval);
+                }
+
                 Ok(builder)
             }
             #[cfg(feature = "postgresql")]
@@ -428,6 +448,8 @@ impl Quaint {
                 let pool_timeout = url.pool_timeout();
                 let max_connection_lifetime = url.max_connection_lifetime();
                 let max_idle_connection_lifetime = url.max_idle_connection_lifetime();
+                let test_on_check_out = url.test_on_check_out();
+                let health_check_interval = url.health_check_interval();
 
                 let tls_manager = crate::connector::MakeTlsConnectorManager::new(url.clone()).into();
                 let manager = QuaintManager::Postgres {
@@ -453,6 +475,14 @@ impl Quaint {
                     builder.max_idle_lifetime(max_idle_lifetime);
                 }
 
+                if test_on_check_out {
+                    builder.test_on_check_out(true);
+                }
+
+                if let Some(interval) = health_check_interval {
+                    builder.health_check_interval(interval);
+                }
+
                 Ok(builder)
             }
             #[cfg(feature = "mssql")]
@@ -462,6 +492,8 @@ impl Quaint {
                 let pool_timeout = url.pool_timeout();
                 let max_connection_lifetime = url.max_connection_lifetime();
                 let max_idle_connection_lifetime = url.max_idle_connection_lifetime();
+                let test_on_check_out = url.test_on_check_out();
+                let health_check_interval = url.health_check_interval();
 
                 let manager = QuaintManager::Mssql { url };
                 let mut builder = Builder::new(s, manager)?;
@@ -480,6 +512,14 @@ impl Quaint {
 
                 if let Some(max_idle_lifetime) = max_idle_connection_lifetime {
                     builder.max_idle_lifetime(max_idle_lifetime);
+                }
+
+                if test_on_check_out {
+                    builder.test_on_check_out(true);
+                }
+
+                if let Some(interval) = health_check_interval {
+                    builder.health_check_interval(interval);
                 }
 
                 Ok(builder)

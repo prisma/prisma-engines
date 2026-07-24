@@ -68,6 +68,8 @@ pub(crate) struct MssqlQueryParams {
     pub(crate) transaction_isolation_level: Option<IsolationLevel>,
     pub(crate) max_connection_lifetime: Option<Duration>,
     pub(crate) max_idle_connection_lifetime: Option<Duration>,
+    pub(crate) test_on_check_out: bool,
+    pub(crate) health_check_interval: Option<Duration>,
 }
 
 impl MssqlUrl {
@@ -158,6 +160,16 @@ impl MssqlUrl {
     pub fn max_idle_connection_lifetime(&self) -> Option<Duration> {
         self.query_params.max_idle_connection_lifetime()
     }
+
+    /// Whether the health of a connection is verified before handing it out of the pool
+    pub fn test_on_check_out(&self) -> bool {
+        self.query_params.test_on_check_out()
+    }
+
+    /// Interval of how often a connection's health is checked when handed out of the pool
+    pub fn health_check_interval(&self) -> Option<Duration> {
+        self.query_params.health_check_interval()
+    }
 }
 
 impl MssqlQueryParams {
@@ -219,6 +231,14 @@ impl MssqlQueryParams {
 
     fn max_idle_connection_lifetime(&self) -> Option<Duration> {
         self.max_idle_connection_lifetime
+    }
+
+    fn test_on_check_out(&self) -> bool {
+        self.test_on_check_out
+    }
+
+    fn health_check_interval(&self) -> Option<Duration> {
+        self.health_check_interval
     }
 }
 
@@ -345,6 +365,23 @@ impl MssqlUrl {
             _ => (),
         }
 
+        let test_on_check_out = props
+            .remove("testoncheckout")
+            .or_else(|| props.remove("test_on_check_out"))
+            .map(|param| param.parse())
+            .transpose()?
+            .unwrap_or(false);
+
+        let mut health_check_interval = props
+            .remove("healthcheckinterval")
+            .or_else(|| props.remove("health_check_interval"))
+            .map(|param| param.parse().map(Duration::from_secs))
+            .transpose()?;
+
+        if health_check_interval.is_some_and(|dur| dur.as_secs() == 0) {
+            health_check_interval = None;
+        }
+
         Ok(MssqlQueryParams {
             encrypt,
             port,
@@ -362,14 +399,59 @@ impl MssqlUrl {
             transaction_isolation_level,
             max_connection_lifetime,
             max_idle_connection_lifetime,
+            test_on_check_out,
+            health_check_interval,
         })
     }
 }
 
 #[cfg(test)]
 mod tests {
+    use super::MssqlUrl;
     use crate::tests::test_api::mssql::CONN_STR;
     use crate::{error::*, single::Quaint};
+    use std::time::Duration;
+
+    #[test]
+    fn should_parse_pool_health_check_params() {
+        let url = MssqlUrl::new(
+            "jdbc:sqlserver://localhost:1433;database=master;user=SA;password=pw;testOnCheckOut=true;healthCheckInterval=30",
+        )
+        .unwrap();
+
+        assert!(url.test_on_check_out());
+        assert_eq!(Some(Duration::from_secs(30)), url.health_check_interval());
+    }
+
+    #[test]
+    fn should_parse_pool_health_check_params_snake_case() {
+        let url = MssqlUrl::new(
+            "jdbc:sqlserver://localhost:1433;database=master;user=SA;password=pw;test_on_check_out=true;health_check_interval=30",
+        )
+        .unwrap();
+
+        assert!(url.test_on_check_out());
+        assert_eq!(Some(Duration::from_secs(30)), url.health_check_interval());
+    }
+
+    #[test]
+    fn health_check_should_be_disabled_by_default() {
+        let url = MssqlUrl::new("jdbc:sqlserver://localhost:1433;database=master;user=SA;password=pw").unwrap();
+
+        assert!(!url.test_on_check_out());
+        assert_eq!(None, url.health_check_interval());
+    }
+
+    #[test]
+    fn zero_health_check_interval_should_check_every_checkout() {
+        let url = MssqlUrl::new(
+            "jdbc:sqlserver://localhost:1433;database=master;user=SA;password=pw;testOnCheckOut=true;healthCheckInterval=0",
+        )
+        .unwrap();
+
+        assert!(url.test_on_check_out());
+        assert_eq!(None, url.health_check_interval());
+    }
 
     #[tokio::test]
     async fn should_map_wrong_credentials_error() {
