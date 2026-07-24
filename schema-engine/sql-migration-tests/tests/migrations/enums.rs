@@ -542,6 +542,8 @@ fn enum_array_modification_should_work(api: TestApi) {
         .send_sync()
         .assert_applied_migrations(&["01init"]);
 
+    api.raw_cmd(r#"INSERT INTO "Test" ("positions") VALUES (ARRAY['First', 'Second']::"Position"[])"#);
+
     let dm = r#"
         datasource test {
             provider = "postgres"
@@ -623,8 +625,9 @@ fn alter_enum_and_change_default_must_work(api: TestApi) {
             provider = "postgres"
         }
         model Cat {
-            id      Int    @id
-            moods   Mood[] @default([])
+            id    Int    @id
+            mood  Mood
+            moods Mood[] @default([])
         }
         enum Mood {
             SLEEPY
@@ -639,8 +642,9 @@ fn alter_enum_and_change_default_must_work(api: TestApi) {
             provider = "postgres"
         }
         model Cat {
-            id      Int    @id
-            moods   Mood[] @default([SLEEPY])
+            id    Int    @id
+            mood  Mood
+            moods Mood[] @default([SLEEPY])
         }
         enum Mood {
             HUNGRY
@@ -682,7 +686,8 @@ fn alter_enum_and_change_default_must_work(api: TestApi) {
                 BEGIN;
                 CREATE TYPE "Mood_new" AS ENUM ('HUNGRY', 'SLEEPY');
                 ALTER TABLE "public"."Cat" ALTER COLUMN "moods" DROP DEFAULT;
-                ALTER TABLE "Cat" ALTER COLUMN "moods" TYPE "Mood_new"[] USING ("moods"::text::"Mood_new"[]);
+                ALTER TABLE "Cat" ALTER COLUMN "mood" TYPE "Mood_new" USING ("mood"::text::"Mood_new");
+                ALTER TABLE "Cat" ALTER COLUMN "moods" TYPE "Mood_new"[] USING ("moods"::text[]::"Mood_new"[]);
                 ALTER TYPE "Mood" RENAME TO "Mood_old";
                 ALTER TYPE "Mood_new" RENAME TO "Mood";
                 DROP TYPE "public"."Mood_old";
