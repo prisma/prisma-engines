@@ -1,7 +1,7 @@
 use super::{write_args_parser::WriteArgsParser, *};
 use crate::{
     DataExpectation, ParsedField, ParsedInputMap, ParsedInputValue, ParsedObject, RowSink,
-    inputs::{IfInput, RecordQueryFilterInput, UpdateRecordSelectorsInput},
+    inputs::{IfInput, RecordQueryFilterInput, ReturnInput, UpdateRecordSelectorsInput},
     query_ast::*,
     query_graph::{Flow, QueryGraph, QueryGraphDependency},
 };
@@ -99,29 +99,69 @@ pub(crate) fn upsert_record(
     let read_parent_records = utils::read_ids_infallible(model.clone(), model_id.clone(), filter.clone());
     let read_parent_records_node = graph.create_node(read_parent_records);
 
+    let update_args = WriteArgsParser::from(&model, update_argument)?;
+    let is_noop_update = update_args.args.is_empty();
+    let update_nested_count = update_args.nested.len();
+    let update_has_nested = update_nested_count != 0;
+    let create_has_nested = WriteArgsParser::has_nested_operation(&model, &create_argument);
+    let can_preserve_update_result = update_nested_count == 1;
+    let can_share_result_read =
+        is_noop_update && !create_has_nested && (!update_has_nested || can_preserve_update_result);
+
     let create_node = create::create_record_node(graph, query_schema, model.clone(), create_argument)?;
+    let update_node = if is_noop_update {
+        let return_node = if update_has_nested && can_share_result_read {
+            graph.create_node(Flow::return_preserving_result())
+        } else {
+            graph.create_node(Flow::Return(None))
+        };
 
-    let update_node = update::update_record_node(
-        graph,
-        query_schema,
-        filter,
-        model.clone(),
-        update_argument,
-        Some(&field),
-    )?;
+        graph.create_edge(
+            &read_parent_records_node,
+            &return_node,
+            QueryGraphDependency::ProjectedDataDependency(
+                model_id.clone(),
+                RowSink::ProjectedPlaceholder(&ReturnInput),
+                None,
+            ),
+        )?;
 
-    let read_node_create = graph.create_node(Query::Read(read_query.clone()));
-    let read_node_update = graph.create_node(Query::Read(read_query));
+        for (relation_field, data_map) in update_args.nested {
+            nested::connect_nested_query(graph, query_schema, return_node, relation_field, data_map)?;
+        }
 
-    graph.add_result_node(&read_node_create);
-    graph.add_result_node(&read_node_update);
+        return_node
+    } else {
+        update::update_record_node_from_args(graph, query_schema, filter, model.clone(), update_args, Some(&field))?
+    };
+
+    let mut read_query = Some(read_query);
+    let read_node_shared = if can_share_result_read {
+        let read_node = graph.create_node(Query::Read(read_query.take().unwrap()));
+        graph.add_result_node(&read_node);
+        Some(read_node)
+    } else {
+        None
+    };
+    let branch_read_nodes = if can_share_result_read {
+        None
+    } else {
+        let read_query = read_query.take().unwrap();
+        let read_node_create = graph.create_node(Query::Read(read_query.clone()));
+        let read_node_update = graph.create_node(Query::Read(read_query));
+
+        graph.add_result_node(&read_node_create);
+        graph.add_result_node(&read_node_update);
+
+        Some((read_node_create, read_node_update))
+    };
 
     let if_node = graph.create_node(Flow::if_non_empty());
 
     graph.create_edge(
         &read_parent_records_node,
         &if_node,
-        QueryGraphDependency::ProjectedDataDependency(model_id.clone(), RowSink::All(&IfInput), None),
+        QueryGraphDependency::ProjectedDataDependency(model_id.clone(), RowSink::ProjectedPlaceholder(&IfInput), None),
     )?;
 
     // In case the connector doesn't support referential integrity, we add a subtree to the graph that emulates the ON_UPDATE referential action.
@@ -130,7 +170,9 @@ pub(crate) fn upsert_record(
     // the update path (if the children already exists and goes to the THEN node).
     // It's only after we've executed the emulation that it'll traverse the update node, hence the ExecutionOrder between
     // the emulation node and the update node.
-    if let Some(emulation_node) = utils::insert_emulated_on_update_with_intermediary_node(
+    if is_noop_update {
+        graph.create_edge(&if_node, &update_node, QueryGraphDependency::Then)?;
+    } else if let Some(emulation_node) = utils::insert_emulated_on_update_with_intermediary_node(
         graph,
         query_schema,
         &model,
@@ -145,40 +187,56 @@ pub(crate) fn upsert_record(
 
     graph.create_edge(&if_node, &create_node, QueryGraphDependency::Else)?;
 
-    // Pass-in the read parent record result to the update node RecordFilter to avoid a redundant read.
-    graph.create_edge(
-        &read_parent_records_node,
-        &update_node,
-        QueryGraphDependency::ProjectedDataDependency(
-            model_id.clone(),
-            RowSink::ExactlyOne(&UpdateRecordSelectorsInput),
-            None,
-        ),
-    )?;
+    if !is_noop_update {
+        // Pass-in the read parent record result to the update node RecordFilter to avoid a redundant read.
+        graph.create_edge(
+            &read_parent_records_node,
+            &update_node,
+            QueryGraphDependency::ProjectedDataDependency(
+                model_id.clone(),
+                RowSink::ExactlyOne(&UpdateRecordSelectorsInput),
+                None,
+            ),
+        )?;
+    }
 
-    graph.create_edge(
-        &update_node,
-        &read_node_update,
-        QueryGraphDependency::ProjectedDataDependency(
-            model_id.clone(),
-            RowSink::ExactlyOneFilter(&RecordQueryFilterInput),
-            Some(DataExpectation::non_empty_rows(
-                MissingRecord::builder().operation(DataOperation::Upsert).build(),
-            )),
-        ),
-    )?;
+    if let Some(read_node) = read_node_shared {
+        graph.create_edge(
+            &if_node,
+            &read_node,
+            QueryGraphDependency::ProjectedDataDependency(
+                model_id,
+                RowSink::ExactlyOneFilter(&RecordQueryFilterInput),
+                Some(DataExpectation::non_empty_rows(
+                    MissingRecord::builder().operation(DataOperation::Upsert).build(),
+                )),
+            ),
+        )?;
+    } else if let Some((read_node_create, read_node_update)) = branch_read_nodes {
+        graph.create_edge(
+            &update_node,
+            &read_node_update,
+            QueryGraphDependency::ProjectedDataDependency(
+                model_id.clone(),
+                RowSink::ExactlyOneFilter(&RecordQueryFilterInput),
+                Some(DataExpectation::non_empty_rows(
+                    MissingRecord::builder().operation(DataOperation::Upsert).build(),
+                )),
+            ),
+        )?;
 
-    graph.create_edge(
-        &create_node,
-        &read_node_create,
-        QueryGraphDependency::ProjectedDataDependency(
-            model_id,
-            RowSink::ExactlyOneFilter(&RecordQueryFilterInput),
-            Some(DataExpectation::non_empty_rows(
-                MissingRecord::builder().operation(DataOperation::Upsert).build(),
-            )),
-        ),
-    )?;
+        graph.create_edge(
+            &create_node,
+            &read_node_create,
+            QueryGraphDependency::ProjectedDataDependency(
+                model_id,
+                RowSink::ExactlyOneFilter(&RecordQueryFilterInput),
+                Some(DataExpectation::non_empty_rows(
+                    MissingRecord::builder().operation(DataOperation::Upsert).build(),
+                )),
+            ),
+        )?;
+    }
 
     Ok(())
 }
@@ -232,7 +290,7 @@ fn can_use_connector_native_upsert<'a>(
 fn is_unique_field(field_name: &str, model: &Model) -> bool {
     match model.fields().find_from_scalar(field_name) {
         Ok(field) => field.unique(),
-        Err(_) => resolve_compound_field(field_name, model).is_some(),
+        Err(_) => is_compound_field(field_name, model),
     }
 }
 

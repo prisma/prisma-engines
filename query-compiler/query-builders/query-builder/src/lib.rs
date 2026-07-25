@@ -2,7 +2,7 @@ use query_structure::{
     AggregationSelection, FieldSelection, Filter, Model, Placeholder, PrismaValue, QueryArguments, RecordFilter,
     RelationField, RelationLoadStrategy, ScalarCondition, ScalarField, SelectedField, SelectionResult, WriteArgs,
 };
-use serde::Serialize;
+use serde::{Serialize, Serializer, ser::SerializeSeq, ser::SerializeStruct, ser::SerializeTuple};
 use std::collections::BTreeMap;
 use std::fmt::Formatter;
 use std::{collections::HashMap, fmt};
@@ -93,6 +93,12 @@ pub trait QueryBuilder {
         field: RelationField,
         parent_id: &SelectionResult,
         child_ids: &[SelectionResult],
+    ) -> Result<DbQuery, Box<dyn std::error::Error + Send + Sync>>;
+
+    fn build_m2m_disconnect_all(
+        &self,
+        field: RelationField,
+        parent_id: &SelectionResult,
     ) -> Result<DbQuery, Box<dyn std::error::Error + Send + Sync>>;
 
     fn build_delete(
@@ -216,16 +222,13 @@ impl fmt::Display for RelationLinkage {
     }
 }
 
-#[derive(Debug, Serialize)]
-#[serde(tag = "type", rename_all = "camelCase")]
+#[derive(Debug)]
 pub enum DbQuery {
-    #[serde(rename_all = "camelCase")]
     RawSql {
         sql: String,
         args: Vec<PrismaValue>,
         arg_types: Vec<ArgType>,
     },
-    #[serde(rename_all = "camelCase")]
     TemplateSql {
         fragments: Vec<Fragment>,
         args: Vec<PrismaValue>,
@@ -233,6 +236,39 @@ pub enum DbQuery {
         placeholder_format: PlaceholderFormat,
         chunkable: Chunkable,
     },
+}
+
+impl Serialize for DbQuery {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        match self {
+            Self::RawSql { sql, args, arg_types } => {
+                let mut state = serializer.serialize_struct("DbQuery", 4)?;
+                state.serialize_field("type", "rawSql")?;
+                state.serialize_field("sql", sql)?;
+                state.serialize_field("args", args)?;
+                state.serialize_field("argTypes", arg_types)?;
+                state.end()
+            }
+            Self::TemplateSql {
+                fragments,
+                args,
+                arg_types,
+                placeholder_format,
+                chunkable,
+            } => {
+                let mut tuple = serializer.serialize_tuple(5)?;
+                tuple.serialize_element(&SerializedFragments(fragments))?;
+                tuple.serialize_element(&SerializedPlaceholderFormat(placeholder_format))?;
+                tuple.serialize_element(args)?;
+                tuple.serialize_element(arg_types)?;
+                tuple.serialize_element(chunkable)?;
+                tuple.end()
+            }
+        }
+    }
 }
 
 impl DbQuery {
@@ -293,25 +329,116 @@ impl fmt::Display for DbQuery {
     }
 }
 
-#[derive(Debug, Serialize)]
-#[serde(tag = "arity", rename_all = "camelCase")]
-pub enum DynamicArgType {
-    Tuple {
-        elements: Vec<ArgType>,
-    },
-    #[serde(untagged)]
-    Single {
-        #[serde(flatten)]
-        r#type: ArgType,
-    },
+struct SerializedFragments<'a>(&'a Vec<Fragment>);
+
+impl Serialize for SerializedFragments<'_> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        let mut seq = serializer.serialize_seq(Some(self.0.len()))?;
+        for fragment in self.0 {
+            match fragment {
+                Fragment::StringChunk { chunk } => seq.serialize_element(chunk)?,
+                Fragment::Parameter => seq.serialize_element(&ParameterFragment)?,
+                Fragment::ParameterTuple {
+                    item_prefix,
+                    item_separator,
+                    item_suffix,
+                } => seq.serialize_element(&("T", item_prefix, item_separator, item_suffix))?,
+                Fragment::ParameterTupleList {
+                    item_prefix,
+                    item_separator,
+                    item_suffix,
+                    group_separator,
+                } => seq.serialize_element(&("L", item_prefix, item_separator, item_suffix, group_separator))?,
+            }
+        }
+        seq.end()
+    }
 }
 
-#[derive(Debug, Serialize)]
-#[serde(rename_all = "camelCase")]
+struct ParameterFragment;
+
+impl Serialize for ParameterFragment {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        serializer.serialize_none()
+    }
+}
+
+struct SerializedPlaceholderFormat<'a>(&'a PlaceholderFormat);
+
+impl Serialize for SerializedPlaceholderFormat<'_> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        let mut tuple = serializer.serialize_tuple(2)?;
+        tuple.serialize_element(self.0.prefix)?;
+        tuple.serialize_element(&self.0.has_numbering)?;
+        tuple.end()
+    }
+}
+
+#[derive(Debug)]
+pub enum DynamicArgType {
+    Tuple { elements: Vec<ArgType> },
+    Single { r#type: ArgType },
+}
+
+impl Serialize for DynamicArgType {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        match self {
+            Self::Tuple { elements } => {
+                let mut state = serializer.serialize_struct("DynamicArgType", 2)?;
+                state.serialize_field("arity", "tuple")?;
+                state.serialize_field("elements", elements)?;
+                state.end()
+            }
+            Self::Single { r#type } => r#type.serialize(serializer),
+        }
+    }
+}
+
+#[derive(Debug)]
 pub struct ArgType {
     pub arity: Arity,
     pub scalar_type: ArgScalarType,
     pub db_type: Option<String>,
+}
+
+impl Serialize for ArgType {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        if self.arity == Arity::Scalar && self.db_type.is_none() {
+            return serializer.serialize_str(self.scalar_type.compact_str());
+        }
+
+        if self.arity == Arity::Scalar {
+            if let Some(db_type) = &self.db_type {
+                let mut tuple = serializer.serialize_tuple(2)?;
+                tuple.serialize_element(self.scalar_type.compact_str())?;
+                tuple.serialize_element(db_type)?;
+                return tuple.end();
+            }
+        }
+
+        let mut state = serializer.serialize_struct("ArgType", 3)?;
+        state.serialize_field("arity", &self.arity)?;
+        state.serialize_field("scalarType", self.scalar_type.as_str())?;
+        if let Some(db_type) = &self.db_type {
+            state.serialize_field("dbType", db_type)?;
+        }
+        state.end()
+    }
 }
 
 impl ArgType {
@@ -348,6 +475,42 @@ pub enum ArgScalarType {
     DateTime,
     Bytes,
     Unknown,
+}
+
+impl ArgScalarType {
+    fn as_str(&self) -> &'static str {
+        match self {
+            Self::String => "string",
+            Self::Int => "int",
+            Self::BigInt => "bigint",
+            Self::Float => "float",
+            Self::Decimal => "decimal",
+            Self::Boolean => "boolean",
+            Self::Enum => "enum",
+            Self::Uuid => "uuid",
+            Self::Json => "json",
+            Self::DateTime => "datetime",
+            Self::Bytes => "bytes",
+            Self::Unknown => "unknown",
+        }
+    }
+
+    fn compact_str(&self) -> &'static str {
+        match self {
+            Self::String => "s",
+            Self::Int => "i",
+            Self::BigInt => "I",
+            Self::Float => "f",
+            Self::Decimal => "d",
+            Self::Boolean => "b",
+            Self::Enum => "e",
+            Self::Uuid => "u",
+            Self::Json => "j",
+            Self::DateTime => "D",
+            Self::Bytes => "B",
+            Self::Unknown => "?",
+        }
+    }
 }
 
 /// Indicates whether the parameters of this query can be chunked into smaller queries.

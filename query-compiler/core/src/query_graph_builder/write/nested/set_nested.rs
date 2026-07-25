@@ -2,13 +2,11 @@ use super::*;
 use crate::{
     ParsedInputValue,
     inputs::{
-        DisconnectChildrenInput, DisconnectParentInput, IfInput, LeftSideDiffInput, RightSideDiffInput,
+        IfInput, LeftSideDiffInput, RequiredOneToManySetNewInput, RequiredOneToManySetOldInput, RightSideDiffInput,
         UpdateManyRecordsSelectorsInput, UpdateOrCreateArgsInput,
     },
-    query_ast::*,
     query_graph::*,
 };
-use itertools::Itertools;
 use query_structure::{Filter, Model, RelationFieldRef, SelectionResult, WriteArgs};
 use std::convert::TryInto;
 
@@ -26,17 +24,17 @@ pub fn nested_set(
 ) -> QueryGraphBuilderResult<()> {
     let relation = parent_relation_field.relation();
 
-    // Build all filters upfront.
-    let filters: Vec<Filter> = utils::coerce_vec(value)
-        .into_iter()
-        .map(|value: ParsedInputValue<'_>| {
-            let value: ParsedInputMap<'_> = value.try_into()?;
-            extract_unique_filter(value, child_model)
-        })
-        .collect::<QueryGraphBuilderResult<Vec<Filter>>>()?
-        .into_iter()
-        .unique()
-        .collect();
+    let values = utils::coerce_values(value);
+    let mut filters = Vec::with_capacity(values.len());
+
+    for value in values {
+        let value: ParsedInputMap<'_> = value.try_into()?;
+        let filter = extract_unique_filter(value, child_model)?;
+
+        if !filters.iter().any(|existing| existing == &filter) {
+            filters.push(filter);
+        }
+    }
 
     let filter = Filter::or(filters);
 
@@ -60,16 +58,9 @@ pub fn nested_set(
 /// │           │           │
 /// │           │           │         │
 /// │           ▼           │         ▼
-/// │  ┌─────────────────┐  │  ┌ ─ ─ ─ ─ ─ ─ ┐
-/// │  │Read old children│  │      Result
-/// │  └─────────────────┘  │  └ ─ ─ ─ ─ ─ ─ ┘
-/// │           │           │
-/// │           │           │
-/// │           │           │
-/// │           ▼           │
-/// │  ┌─────────────────┐  │
-/// │  │   Disconnect    │◀─┘
-/// │  └─────────────────┘
+/// │  ┌─────────────────┐     ┌ ─ ─ ─ ─ ─ ─ ┐
+/// │  │ Disconnect all  │        Result
+/// │  └─────────────────┘     └ ─ ─ ─ ─ ─ ─ ┘
 /// │           │
 /// │           │
 /// │           │
@@ -94,64 +85,28 @@ fn handle_many_to_many(
     parent_relation_field: &RelationFieldRef,
     filter: Filter,
 ) -> QueryGraphBuilderResult<()> {
-    let parent_model_identifier = parent_relation_field.model().shard_aware_primary_identifier();
     let child_model = parent_relation_field.related_model();
-    let child_model_identifier = child_model.shard_aware_primary_identifier();
-    let read_old_node =
-        utils::insert_find_children_by_parent_node(graph, parent_node, parent_relation_field, Filter::empty())?;
 
-    let disconnect = WriteQuery::DisconnectRecords(DisconnectRecords {
-        parent_id: None,
-        child_ids: vec![],
-        relation_field: parent_relation_field.clone(),
-    });
+    let disconnect_node = disconnect::disconnect_all_records_node(graph, parent_node, parent_relation_field)?;
 
-    let disconnect_node = graph.create_node(Query::Write(disconnect));
-
-    // Edge from parent to disconnect
-    graph.create_edge(
-        parent_node,
-        &disconnect_node,
-        QueryGraphDependency::ProjectedDataDependency(
-            parent_model_identifier,
-            RowSink::Single(&DisconnectParentInput),
-            Some(DataExpectation::non_empty_rows(
-                MissingRelatedRecord::builder()
-                    .model(&parent_relation_field.model())
-                    .relation(&parent_relation_field.relation())
-                    .needed_for(DependentOperation::disconnect_records())
-                    .operation(DataOperation::NestedSet)
-                    .build(),
-            )),
-        ),
-    )?;
-
-    // Edge from read to disconnect.
-    graph.create_edge(
-        &read_old_node,
-        &disconnect_node,
-        QueryGraphDependency::ProjectedDataDependency(
-            child_model_identifier.clone(),
-            RowSink::All(&DisconnectChildrenInput),
-            None,
-        ),
-    )?;
-
-    if filter.size() > 0 {
-        let expected_connects = filter.size();
-        let read_new_query = utils::read_ids_infallible(child_model, child_model_identifier, filter);
-        let read_new_node = graph.create_node(read_new_query);
-
-        graph.create_edge(&disconnect_node, &read_new_node, QueryGraphDependency::ExecutionOrder)?;
-
-        connect::connect_records_node(
-            graph,
-            parent_node,
-            &read_new_node,
-            parent_relation_field,
-            expected_connects,
-        )?;
+    if filter.size() == 0 {
+        return Ok(());
     }
+
+    let child_model_identifier = child_model.shard_aware_primary_identifier();
+    let expected_connects = filter.size();
+    let read_new_query = utils::read_ids_infallible(child_model, child_model_identifier, filter);
+    let read_new_node = graph.create_node(read_new_query);
+
+    graph.create_edge(&disconnect_node, &read_new_node, QueryGraphDependency::ExecutionOrder)?;
+
+    connect::connect_records_node(
+        graph,
+        parent_node,
+        &read_new_node,
+        parent_relation_field,
+        expected_connects,
+    )?;
 
     Ok(())
 }
@@ -210,14 +165,97 @@ fn handle_one_to_many(
     let child_model_identifier = parent_relation_field.related_model().shard_aware_primary_identifier();
     let child_link = parent_relation_field.related_field().linking_fields();
     let parent_link = parent_relation_field.linking_fields();
-    let empty_child_link = SelectionResult::from(&child_link);
+    let child_side_required = parent_relation_field.related_field().is_required();
 
     let child_model = parent_relation_field.related_model();
     let read_old_node =
         utils::insert_find_children_by_parent_node(graph, parent_node, parent_relation_field, Filter::empty())?;
 
+    if filter.size() == 0 {
+        if child_side_required {
+            insert_required_relation_disconnect_check(graph, &read_old_node, parent_relation_field)?;
+            return Ok(());
+        }
+
+        let disconnect_if_node = graph.create_node(Node::Flow(Flow::if_non_empty()));
+        let empty_child_link = SelectionResult::from(&child_link);
+        let write_args = WriteArgs::from_result(empty_child_link, crate::request_context::get_request_now());
+        let update_disconnect_node =
+            utils::update_records_node_placeholder_with_args(graph, Filter::empty(), child_model, write_args);
+
+        graph.create_edge(
+            &read_old_node,
+            &disconnect_if_node,
+            QueryGraphDependency::ProjectedDataDependency(
+                child_model_identifier.clone(),
+                RowSink::ProjectedPlaceholder(&IfInput),
+                None,
+            ),
+        )?;
+
+        graph.create_edge(&disconnect_if_node, &update_disconnect_node, QueryGraphDependency::Then)?;
+        graph.create_edge(
+            &read_old_node,
+            &update_disconnect_node,
+            QueryGraphDependency::ProjectedDataDependency(
+                child_model_identifier,
+                RowSink::All(&UpdateManyRecordsSelectorsInput),
+                None,
+            ),
+        )?;
+
+        return Ok(());
+    }
+
     let read_new_query = utils::read_ids_infallible(child_model.clone(), child_model_identifier.clone(), filter);
     let read_new_node = graph.create_node(read_new_query);
+
+    if child_side_required
+        && child_model_identifier.selections().len() == 1
+        && parent_link.selections().len() == 1
+        && child_link.selections().len() == 1
+    {
+        let set_node = graph.create_node(Node::Computation(Computation::required_one_to_many_set(
+            child_model_identifier.clone(),
+            *parent_node,
+            parent_link,
+            child_link,
+            child_model,
+            DataExpectation::non_empty_rows(
+                MissingRelatedRecord::builder()
+                    .model(&parent_relation_field.model())
+                    .relation(&parent_relation_field.relation())
+                    .operation(DataOperation::NestedSet)
+                    .build(),
+            ),
+            DataExpectation::empty_rows(RelationViolation::from(parent_relation_field.clone())),
+            crate::request_context::get_request_now(),
+        )));
+
+        graph.create_edge(&read_old_node, &read_new_node, QueryGraphDependency::ExecutionOrder)?;
+
+        graph.create_edge(
+            &read_old_node,
+            &set_node,
+            QueryGraphDependency::ProjectedDataDependency(
+                child_model_identifier.clone(),
+                RowSink::ProjectedPlaceholder(&RequiredOneToManySetOldInput),
+                None,
+            ),
+        )?;
+        graph.create_edge(
+            &read_new_node,
+            &set_node,
+            QueryGraphDependency::ProjectedDataDependency(
+                child_model_identifier,
+                RowSink::ProjectedPlaceholder(&RequiredOneToManySetNewInput),
+                None,
+            ),
+        )?;
+
+        return Ok(());
+    }
+
     let diff_left_to_right_node = graph.create_node(Node::Computation(Computation::empty_diff_left_to_right(
         child_model_identifier.clone(),
     )));
@@ -233,7 +271,7 @@ fn handle_one_to_many(
         &diff_left_to_right_node,
         QueryGraphDependency::ProjectedDataDependency(
             child_model_identifier.clone(),
-            RowSink::All(&LeftSideDiffInput),
+            RowSink::ProjectedPlaceholder(&LeftSideDiffInput),
             None,
         ),
     )?;
@@ -242,7 +280,7 @@ fn handle_one_to_many(
         &diff_right_to_left_node,
         QueryGraphDependency::ProjectedDataDependency(
             child_model_identifier.clone(),
-            RowSink::All(&LeftSideDiffInput),
+            RowSink::ProjectedPlaceholder(&LeftSideDiffInput),
             None,
         ),
     )?;
@@ -253,7 +291,7 @@ fn handle_one_to_many(
         &diff_left_to_right_node,
         QueryGraphDependency::ProjectedDataDependency(
             child_model_identifier.clone(),
-            RowSink::All(&RightSideDiffInput),
+            RowSink::ProjectedPlaceholder(&RightSideDiffInput),
             None,
         ),
     )?;
@@ -262,7 +300,7 @@ fn handle_one_to_many(
         &diff_right_to_left_node,
         QueryGraphDependency::ProjectedDataDependency(
             child_model_identifier.clone(),
-            RowSink::All(&RightSideDiffInput),
+            RowSink::ProjectedPlaceholder(&RightSideDiffInput),
             None,
         ),
     )?;
@@ -270,11 +308,16 @@ fn handle_one_to_many(
     // Update (connect) case: Check left diff IDs
     let connect_if_node = graph.create_node(Node::Flow(Flow::if_non_empty()));
     let update_connect_node = utils::update_records_node_placeholder(graph, Filter::empty(), child_model.clone());
+    let empty_child_link = (!child_side_required).then(|| SelectionResult::from(&child_link));
 
     graph.create_edge(
         &diff_left_to_right_node,
         &connect_if_node,
-        QueryGraphDependency::ProjectedDataDependency(child_model_identifier.clone(), RowSink::All(&IfInput), None),
+        QueryGraphDependency::ProjectedDataDependency(
+            child_model_identifier.clone(),
+            RowSink::ProjectedPlaceholder(&IfInput),
+            None,
+        ),
     )?;
 
     // Connect to the if node, the parent node (for the inlining ID) and the diff node (to get the IDs to update)
@@ -306,21 +349,26 @@ fn handle_one_to_many(
     )?;
 
     // Update (disconnect) case: Check right diff IDs.
+    if child_side_required {
+        insert_required_relation_disconnect_check(graph, &diff_right_to_left_node, parent_relation_field)?;
+        return Ok(());
+    }
+
     let disconnect_if_node = graph.create_node(Node::Flow(Flow::if_non_empty()));
-    let write_args = WriteArgs::from_result(empty_child_link, crate::request_context::get_request_now());
+    let write_args = WriteArgs::from_result(
+        empty_child_link.expect("optional child side needs null write args"),
+        crate::request_context::get_request_now(),
+    );
     let update_disconnect_node =
         utils::update_records_node_placeholder_with_args(graph, Filter::empty(), child_model, write_args);
-
-    let child_side_required = parent_relation_field.related_field().is_required();
-    let rf = parent_relation_field.clone();
 
     graph.create_edge(
         &diff_right_to_left_node,
         &disconnect_if_node,
         QueryGraphDependency::ProjectedDataDependency(
             child_model_identifier.clone(),
-            RowSink::All(&IfInput),
-            child_side_required.then(|| DataExpectation::empty_rows(RelationViolation::from(rf))),
+            RowSink::ProjectedPlaceholder(&IfInput),
+            None,
         ),
     )?;
 
@@ -333,6 +381,27 @@ fn handle_one_to_many(
             child_model_identifier,
             RowSink::All(&UpdateManyRecordsSelectorsInput),
             None,
+        ),
+    )?;
+
+    Ok(())
+}
+
+fn insert_required_relation_disconnect_check(
+    graph: &mut QueryGraph,
+    node_providing_ids: &NodeRef,
+    parent_relation_field: &RelationFieldRef,
+) -> QueryGraphBuilderResult<()> {
+    let check_node = graph.create_node(Node::Empty);
+
+    graph.create_edge(
+        node_providing_ids,
+        &check_node,
+        QueryGraphDependency::DataDependency(
+            RowCountSink::Discard,
+            Some(DataExpectation::empty_rows(RelationViolation::from(
+                parent_relation_field.clone(),
+            ))),
         ),
     )?;
 

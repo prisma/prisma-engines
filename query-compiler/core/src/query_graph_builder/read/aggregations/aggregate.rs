@@ -7,7 +7,6 @@ pub(crate) fn aggregate(field: ParsedField<'_>, model: Model) -> QueryGraphBuild
     let alias = field.alias;
     let model = model;
     let nested_fields = field.nested_fields.unwrap().fields;
-    let selection_order = collect_selection_tree(&nested_fields);
     let args = extractors::extract_query_args(field.arguments, &model)?;
 
     // Reject any inmemory-requiring operation for aggregations, we don't have an in-memory aggregator yet.
@@ -20,10 +19,7 @@ pub(crate) fn aggregate(field: ParsedField<'_>, model: Model) -> QueryGraphBuild
         ));
     }
 
-    let selectors: Vec<_> = nested_fields
-        .into_iter()
-        .map(|field| resolve_query(field, &model, true))
-        .collect::<QueryGraphBuilderResult<_>>()?;
+    let (selection_order, selectors) = collect_selection_tree_and_selectors(nested_fields, &model, true)?;
 
     Ok(ReadQuery::AggregateRecordsQuery(AggregateRecordsQuery {
         name,

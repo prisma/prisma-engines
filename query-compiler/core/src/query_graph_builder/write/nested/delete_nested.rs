@@ -31,7 +31,7 @@ pub fn nested_delete(
     let child_model_identifier = parent_relation_field.related_model().shard_aware_primary_identifier();
 
     if parent_relation_field.is_list() {
-        let filters: Vec<Filter> = utils::coerce_vec(value)
+        let filters: Vec<Filter> = utils::coerce_values(value)
             .into_iter()
             .map(|value: ParsedInputValue<'_>| {
                 let value: ParsedInputMap<'_> = value.try_into()?;
@@ -129,7 +129,7 @@ pub fn nested_delete_many(
 ) -> QueryGraphBuilderResult<()> {
     let child_model_identifier = parent_relation_field.related_model().shard_aware_primary_identifier();
 
-    for value in utils::coerce_vec(value) {
+    for value in utils::coerce_values(value) {
         let as_map: ParsedInputMap<'_> = value.try_into()?;
         let filter = extract_filter(as_map, child_model)?;
 

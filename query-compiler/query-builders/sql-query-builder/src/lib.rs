@@ -453,6 +453,17 @@ impl<'a, V: Visitor<'a>> QueryBuilder for SqlQueryBuilder<'a, V> {
         self.convert_query(query, chunkable)
     }
 
+    fn build_m2m_disconnect_all(
+        &self,
+        field: RelationField,
+        parent_id: &SelectionResult,
+    ) -> Result<DbQuery, Box<dyn std::error::Error + Send + Sync>> {
+        // Delete by parent id is always chunkable.
+        let chunkable = Chunkable::Yes;
+        let query = write::delete_relation_table_records_for_parent(&field, parent_id, &self.context);
+        self.convert_query(query, chunkable)
+    }
+
     fn build_delete(
         &self,
         model: &Model,

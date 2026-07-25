@@ -26,7 +26,7 @@ pub(crate) fn delete_record(
         // Database supports returning the deleted row, so just the delete node will suffice.
         let nested_fields = field.nested_fields.unwrap().fields;
         let selected_fields = read::utils::collect_selected_scalars(&nested_fields, &model);
-        let selection_order = read::utils::collect_selection_order(&nested_fields);
+        let selection_order = read::utils::collect_selection_order_owned(nested_fields);
 
         let delete_query = Query::Write(WriteQuery::DeleteRecord(DeleteRecord {
             name: field.name,

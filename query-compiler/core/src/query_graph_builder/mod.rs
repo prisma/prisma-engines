@@ -8,6 +8,7 @@ pub(crate) mod inputs;
 pub(crate) mod read;
 pub(crate) mod write;
 pub(crate) use extractors::*;
+pub(crate) use crate::{DataOperation, DependentOperation};
 
 pub use builder::QueryGraphBuilder;
 pub use error::*;

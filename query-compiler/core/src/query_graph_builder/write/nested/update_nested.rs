@@ -1,12 +1,13 @@
 use super::*;
-use crate::inputs::{UpdateManyRecordsSelectorsInput, UpdateRecordSelectorsInput};
+use crate::inputs::{ReturnInput, UpdateManyRecordsSelectorsInput, UpdateRecordSelectorsInput};
 use crate::query_graph_builder::write::update::UpdateManyRecordNodeOptionals;
+use crate::query_graph_builder::write::write_args_parser::WriteArgsParser;
 use crate::{DataExpectation, RowSink};
 use crate::{
     ParsedInputValue,
-    query_graph::{NodeRef, QueryGraph, QueryGraphDependency},
+    query_graph::{Flow, NodeRef, QueryGraph, QueryGraphDependency},
 };
-use query_structure::{Filter, Model, RelationFieldRef};
+use query_structure::{FieldSelection, Filter, Model, RelationFieldRef, SelectedField};
 use schema::constants::args;
 use std::convert::TryInto;
 
@@ -46,7 +47,7 @@ pub fn nested_update(
     value: ParsedInputValue<'_>,
     child_model: &Model,
 ) -> QueryGraphBuilderResult<()> {
-    for value in utils::coerce_vec(value) {
+    for value in utils::coerce_values(value) {
         let (data, filter) = if parent_relation_field.is_list() {
             // We have to have a single record filter in "where".
             // This is used to read the children first, to make sure they're actually connected.
@@ -86,11 +87,56 @@ pub fn nested_update(
             return Ok(());
         }
 
+        let child_model_identifier = parent_relation_field.related_model().shard_aware_primary_identifier();
+        let update_args = WriteArgsParser::from(child_model, data_map)?;
+
+        if update_args.args.is_empty() && !update_args.nested.is_empty() {
+            if let Some(return_node) = insert_parent_link_return_node(
+                graph,
+                query_schema,
+                parent,
+                parent_relation_field,
+                &filter,
+                &child_model_identifier,
+            )? {
+                for (relation_field, data_map) in update_args.nested {
+                    connect_nested_query(graph, query_schema, return_node, relation_field, data_map)?;
+                }
+
+                continue;
+            }
+
+            let find_child_records_node =
+                utils::insert_find_children_by_parent_node(graph, parent, parent_relation_field, filter)?;
+            let return_node = graph.create_node(Flow::Return(None));
+
+            graph.create_edge(
+                &find_child_records_node,
+                &return_node,
+                QueryGraphDependency::ProjectedDataDependency(
+                    child_model_identifier,
+                    RowSink::ProjectedPlaceholder(&ReturnInput),
+                    Some(DataExpectation::non_empty_rows(
+                        MissingRelatedRecord::builder()
+                            .model(child_model)
+                            .relation(&parent_relation_field.relation())
+                            .operation(DataOperation::NestedUpdate)
+                            .build(),
+                    )),
+                ),
+            )?;
+
+            for (relation_field, data_map) in update_args.nested {
+                connect_nested_query(graph, query_schema, return_node, relation_field, data_map)?;
+            }
+
+            continue;
+        }
+
         let find_child_records_node =
             utils::insert_find_children_by_parent_node(graph, parent, parent_relation_field, filter.clone())?;
-
-        let update_node = update::update_record_node(graph, query_schema, filter, child_model.clone(), data_map, None)?;
-        let child_model_identifier = parent_relation_field.related_model().shard_aware_primary_identifier();
+        let update_node =
+            update::update_record_node_from_args(graph, query_schema, filter, child_model.clone(), update_args, None)?;
 
         graph.create_edge(
             &find_child_records_node,
@@ -114,6 +160,47 @@ pub fn nested_update(
     Ok(())
 }
 
+fn insert_parent_link_return_node(
+    graph: &mut QueryGraph,
+    query_schema: &QuerySchema,
+    parent: &NodeRef,
+    parent_relation_field: &RelationFieldRef,
+    filter: &Filter,
+    child_model_identifier: &FieldSelection,
+) -> QueryGraphBuilderResult<Option<NodeRef>> {
+    if query_schema.relation_mode().is_prisma()
+        || parent_relation_field.is_list()
+        || !parent_relation_field.is_required()
+        || !parent_relation_field.is_inlined_on_enclosing_model()
+        || !filter.is_empty()
+    {
+        return Ok(None);
+    }
+
+    let parent_scalars = parent_relation_field.scalar_fields();
+    let child_link = parent_relation_field.related_field().linking_fields();
+
+    if parent_scalars.len() != 1 || child_link.selections().len() != 1 || child_link != *child_model_identifier {
+        return Ok(None);
+    }
+
+    let parent_link = FieldSelection::new(vec![SelectedField::Scalar(parent_scalars[0].clone())]);
+
+    let return_node = graph.create_node(Flow::Return(None));
+
+    graph.create_edge(
+        parent,
+        &return_node,
+        QueryGraphDependency::ProjectedDataDependency(
+            parent_link,
+            RowSink::ProjectedFieldPlaceholder(&ReturnInput),
+            None,
+        ),
+    )?;
+
+    Ok(Some(return_node))
+}
+
 pub fn nested_update_many(
     graph: &mut QueryGraph,
     query_schema: &QuerySchema,
@@ -122,7 +209,7 @@ pub fn nested_update_many(
     value: ParsedInputValue<'_>,
     child_model: &Model,
 ) -> QueryGraphBuilderResult<()> {
-    for value in utils::coerce_vec(value) {
+    for value in utils::coerce_values(value) {
         let mut map: ParsedInputMap<'_> = value.try_into()?;
         let where_arg = map.swap_remove(args::WHERE).unwrap();
         let data_value = map.swap_remove(args::DATA).unwrap();

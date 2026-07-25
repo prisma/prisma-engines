@@ -1,0 +1,91 @@
+---
+source: query-compiler/query-compiler/tests/queries.rs
+expression: pretty
+input_file: query-compiler/query-compiler/tests/data/update-m2m-set.json
+snapshot_kind: text
+---
+transaction
+   dataMap {
+       id: Int (id)
+       title: String (title)
+       userId: Int (userId)
+       categories (from @nested$categories): {
+           id: Int (id)
+           name: String (name)
+       }
+   }
+   let 0 = unique (query «SELECT "public"."Post"."id" FROM "public"."Post" WHERE
+                          "public"."Post"."id" = $1 LIMIT $2 OFFSET $3»
+                   params [const(BigInt(1)), const(BigInt(1)),
+                           const(BigInt(0))])
+   in let 0 = unique (validate (get 0)
+          [ rowCountNeq 0
+          ] orRaise "MISSING_RELATED_RECORD");
+          0$id = mapField id (get 0)
+      in let 1 = execute «DELETE FROM "public"."_CategoryToPost" WHERE
+                          "public"."_CategoryToPost"."B" = ($1)»
+                 params [var(0$id as Int)]
+         in let 2 = query «SELECT "public"."Category"."id" FROM
+                           "public"."Category" WHERE ("public"."Category"."id" =
+                           $1 OR "public"."Category"."id" = $2) OFFSET $3»
+                    params [const(BigInt(1)), const(BigInt(2)),
+                            const(BigInt(0))]
+            in let 0 = unique (validate (get 0)
+                   [ rowCountNeq 0
+                   ] orRaise "MISSING_RELATED_RECORD");
+                   0$id = mapField id (get 0);
+                   2 = validate (get 2)
+                   [ rowCountEq 2
+                   ] orRaise "INCOMPLETE_CONNECT_INPUT";
+                   2$id = mapField id (get 2)
+               in execute «INSERT INTO "public"."_CategoryToPost" ("B","A")
+                           VALUES [($1),*],* ON CONFLICT DO NOTHING»
+                  params [product(var(0$id as Int[]), var(2$id as Int[]))];
+      let 0 = unique (validate (get 0)
+          [ rowCountNeq 0
+          ] orRaise "MISSING_RECORD");
+          0$id = mapField id (get 0)
+      in rawNestedReadUnique (query «SELECT "public"."Post"."id",
+                                     "public"."Post"."title",
+                                     "public"."Post"."userId" FROM
+                                     "public"."Post" WHERE "public"."Post"."id"
+                                     = $1 LIMIT $2 OFFSET $3»
+                              params [var(0$id as Int), const(BigInt(1)),
+                                      const(BigInt(0))]
+                              fields {
+                                  id: 0
+                                  title: 1
+                                  userId: 2
+                              }
+                              relations [categories on left.0 = right.2 many (query
+                                                                              «SELECT
+                                                                               "public"."Category"."id",
+                                                                               "public"."Category"."name",
+                                                                               "t0"."B"
+                                                                               AS
+                                                                               "CategoryToPost@Post"
+                                                                               FROM
+                                                                               "public"."Category"
+                                                                               INNER
+                                                                               JOIN
+                                                                               "public"."_CategoryToPost"
+                                                                               AS
+                                                                               "t0"
+                                                                               ON
+                                                                               "t0"."A"
+                                                                               =
+                                                                               "public"."Category"."id"
+                                                                               WHERE
+                                                                               (1=1
+                                                                               AND
+                                                                               "t0"."B"
+                                                                               =
+                                                                               $1)
+                                                                               OFFSET
+                                                                               $2»
+                                                                              params [var(@parent$id as Int),
+                                                                                      const(BigInt(0))]
+                                                                              fields {
+                                                                                  id: 0
+                                                                                  name: 1
+                                                                              })])

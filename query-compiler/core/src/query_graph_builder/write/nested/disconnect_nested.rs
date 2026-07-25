@@ -5,7 +5,9 @@ use crate::{
     query_graph::{NodeRef, QueryGraph, QueryGraphDependency},
 };
 use itertools::Itertools;
-use query_structure::{Filter, Model, PrismaValue, RelationCompare, RelationFieldRef, SelectionResult, WriteArgs};
+use query_structure::{
+    Filter, Model, PrismaValue, RelationCompare, RelationFieldRef, ScalarFieldRef, SelectionResult, WriteArgs,
+};
 use std::convert::TryInto;
 
 /// Handles nested disconnect cases.
@@ -22,13 +24,34 @@ pub fn nested_disconnect(
     let relation = parent_relation_field.relation();
 
     if relation.is_many_to_many() {
-        // Build all filters upfront.
-        let filters: Vec<Filter> = utils::coerce_vec(value)
+        let values = utils::coerce_values(value);
+        let mut selectors = Vec::with_capacity(values.len());
+
+        for value in values {
+            selectors.push(value.try_into()?);
+        }
+
+        if let Some(child_id_field) = child_model.single_primary_identifier_scalar() {
+            let mut child_ids = Vec::with_capacity(selectors.len());
+
+            for selector in &selectors {
+                let Some(child_id) = try_extract_child_primary_identifier(selector, &child_id_field)? else {
+                    child_ids.clear();
+                    break;
+                };
+
+                child_ids.push(child_id);
+            }
+
+            if child_ids.len() == selectors.len() {
+                let child_ids = child_ids.into_iter().unique().collect();
+                return handle_many_to_many_with_child_ids(graph, &parent_node, parent_relation_field, child_ids);
+            }
+        }
+
+        let filters: Vec<Filter> = selectors
             .into_iter()
-            .map(|value: ParsedInputValue<'_>| {
-                let value: ParsedInputMap<'_> = value.try_into()?;
-                extract_unique_filter(value, child_model)
-            })
+            .map(|value| extract_unique_filter(value, child_model))
             .collect::<QueryGraphBuilderResult<Vec<Filter>>>()?
             .into_iter()
             .unique()
@@ -53,7 +76,7 @@ pub fn nested_disconnect(
             // One-to-many specify a number of finders if the parent side is the to-one.
             // todo check if this if else is really still required.
             if parent_relation_field.is_list() {
-                let filters = utils::coerce_vec(value)
+                let filters = utils::coerce_values(value)
                     .into_iter()
                     .map(|value: ParsedInputValue<'_>| {
                         let value: ParsedInputMap<'_> = value.try_into()?;
@@ -72,6 +95,27 @@ pub fn nested_disconnect(
 
         handle_one_to_x(graph, &parent_node, parent_relation_field, filter)
     }
+}
+
+fn try_extract_child_primary_identifier(
+    selector: &ParsedInputMap<'_>,
+    child_id_field: &ScalarFieldRef,
+) -> QueryGraphBuilderResult<Option<SelectionResult>> {
+    if selector.len() != 1 {
+        return Ok(None);
+    }
+
+    let Some((field_name, value)) = selector.iter().next() else {
+        return Ok(None);
+    };
+
+    if field_name.as_ref() != child_id_field.name() {
+        return Ok(None);
+    }
+
+    let value: PrismaValue = value.clone().try_into()?;
+
+    Ok(Some(SelectionResult::new(vec![(child_id_field.clone(), value)])))
 }
 
 /// Handles a nested many-to-many disconnect.
@@ -115,6 +159,20 @@ fn handle_many_to_many(
         utils::insert_find_children_by_parent_node(graph, parent_node, parent_relation_field, filter)?;
 
     disconnect::disconnect_records_node(graph, parent_node, &find_child_records_node, parent_relation_field)?;
+    Ok(())
+}
+
+fn handle_many_to_many_with_child_ids(
+    graph: &mut QueryGraph,
+    parent_node: &NodeRef,
+    parent_relation_field: &RelationFieldRef,
+    child_ids: Vec<SelectionResult>,
+) -> QueryGraphBuilderResult<()> {
+    if child_ids.is_empty() {
+        return Ok(());
+    }
+
+    disconnect::disconnect_records_node_with_child_ids(graph, parent_node, parent_relation_field, child_ids)?;
     Ok(())
 }
 

@@ -1,0 +1,48 @@
+---
+source: query-compiler/query-compiler/tests/queries.rs
+expression: pretty
+input_file: query-compiler/query-compiler/tests/data/query-m2m-pagination-mapped-distinct.json
+snapshot_kind: text
+---
+rawNestedRead (query «SELECT "public"."MappedPost"."post_id" FROM
+                      "public"."MappedPost" WHERE 1=1 OFFSET $1»
+               params [const(BigInt(0))]
+               fields {
+                   id: 0
+               }
+               relations [categories on left.0 = right.2 many (query «SELECT
+                                                                      "public"."MappedCategory"."cat_id",
+                                                                      "public"."MappedCategory"."name",
+                                                                      "t0"."B"
+                                                                      AS
+                                                                      "MappedCategoryToMappedPost@MappedPost"
+                                                                      FROM
+                                                                      "public"."MappedCategory"
+                                                                      INNER JOIN
+                                                                      "public"."_MappedCategoryToMappedPost"
+                                                                      AS "t0" ON
+                                                                      "t0"."A" =
+                                                                      "public"."MappedCategory"."cat_id"
+                                                                      WHERE
+                                                                      ("public"."MappedCategory"."cat_id"
+                                                                      >= (SELECT
+                                                                      "public"."MappedCategory"."cat_id"
+                                                                      FROM
+                                                                      "public"."MappedCategory"
+                                                                      WHERE
+                                                                      ("public"."MappedCategory"."cat_id")
+                                                                      = ($1))
+                                                                      AND
+                                                                      "t0"."B"
+                                                                      IN [$2,*])
+                                                                      ORDER BY
+                                                                      "public"."MappedCategory"."cat_id"
+                                                                      ASC OFFSET
+                                                                      $3»
+                                                               params [const(BigInt(1)),
+                                                                       var(@parent$id as Int),
+                                                                       const(BigInt(0))]
+                                                               fields {
+                                                                   id: 0
+                                                                   name: 1
+                                                               })])

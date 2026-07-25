@@ -1,0 +1,15 @@
+{
+  "modelName": "User",
+  "action": "upsertOne",
+  "query": {
+    "arguments": {
+      "relationLoadStrategy": "query",
+      "where": { "email": "user.1@prisma.io" },
+      "update": {},
+      "create": { "email": "user.1@prisma.io" }
+    },
+    "selection": {
+      "$scalars": true
+    }
+  }
+}

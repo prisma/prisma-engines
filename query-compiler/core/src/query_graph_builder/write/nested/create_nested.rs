@@ -1,6 +1,6 @@
 use super::*;
 use crate::{
-    DataExpectation, ParsedInputList, ParsedInputValue, RowSink,
+    DataExpectation, ParsedInputValue, RowSink,
     inputs::{UpdateManyRecordsSelectorsInput, UpdateOrCreateArgsInput},
     query_ast::*,
     query_graph::{NodeRef, QueryGraph, QueryGraphDependency},
@@ -24,7 +24,7 @@ pub fn nested_create(
 ) -> QueryGraphBuilderResult<()> {
     let relation = parent_relation_field.relation();
 
-    let data_maps = utils::coerce_vec(value)
+    let data_maps = utils::coerce_values(value)
         .into_iter()
         .map(|value| {
             let mut parser = WriteArgsParser::from(child_model, value.try_into()?)?;
@@ -297,16 +297,16 @@ fn handle_one_to_many(
             ),
         )?;
     } else {
-        for create_node in create_nodes {
-            let parent_link = parent_relation_field.linking_fields();
-            let child_link = parent_relation_field.related_field().linking_fields();
+        let parent_link = parent_relation_field.linking_fields();
+        let child_link = parent_relation_field.related_field().linking_fields();
 
+        for create_node in create_nodes {
             graph.create_edge(
                 &parent_node,
                 &create_node,
                 QueryGraphDependency::ProjectedDataDependency(
-                    parent_link,
-                    RowSink::ExactlyOneWriteArgs(child_link, &UpdateOrCreateArgsInput),
+                    parent_link.clone(),
+                    RowSink::ExactlyOneWriteArgs(child_link.clone(), &UpdateOrCreateArgsInput),
                     Some(DataExpectation::non_empty_rows(
                         MissingRelatedRecord::builder()
                             .model(&parent_relation_field.model())
@@ -537,7 +537,7 @@ pub fn nested_create_many(
     // Nested input is an object of { data: [...], skipDuplicates: bool }
     let mut obj: ParsedInputMap<'_> = value.try_into()?;
 
-    let data_list: ParsedInputList<'_> = utils::coerce_vec(obj.swap_remove(args::DATA).unwrap());
+    let data_list = utils::coerce_values(obj.swap_remove(args::DATA).unwrap());
     let skip_duplicates: bool = match obj.swap_remove(args::SKIP_DUPLICATES) {
         Some(val) => val.try_into()?,
         None => false,

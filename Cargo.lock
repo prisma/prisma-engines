@@ -3678,6 +3678,7 @@ dependencies = [
  "schema",
  "serde",
  "serde_json",
+ "smallvec",
  "sql-query-builder",
  "thiserror 2.0.17",
 ]

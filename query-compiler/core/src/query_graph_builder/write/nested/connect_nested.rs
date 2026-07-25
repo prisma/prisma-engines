@@ -22,7 +22,7 @@ pub fn nested_connect(
     let relation = parent_relation_field.relation();
 
     // Build all filters upfront.
-    let filters: Vec<Filter> = utils::coerce_vec(value)
+    let filters: Vec<Filter> = utils::coerce_values(value)
         .into_iter()
         .map(|value: ParsedInputValue<'_>| {
             let value: ParsedInputMap<'_> = value.try_into()?;

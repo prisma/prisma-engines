@@ -57,6 +57,7 @@ impl Display for Flow {
         match self {
             Self::If { rule, .. } => write!(f, "If {rule:?}"),
             Self::Return(_) => write!(f, "Return"),
+            Self::ReturnPreservingResult(_) => write!(f, "ReturnPreservingResult"),
         }
     }
 }
@@ -66,6 +67,7 @@ impl Display for Computation {
         match self {
             Self::DiffLeftToRight(_) => write!(f, "DiffLeftToRight"),
             Self::DiffRightToLeft(_) => write!(f, "DiffRightToLeft"),
+            Self::RequiredOneToManySet(_) => write!(f, "RequiredOneToManySet"),
         }
     }
 }

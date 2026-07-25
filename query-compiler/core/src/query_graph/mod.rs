@@ -7,7 +7,7 @@ use std::fmt;
 
 pub use error::*;
 use psl::datamodel_connector::{ConnectorCapabilities, ConnectorCapability};
-use serde::Serialize;
+use serde::{Serialize, Serializer, ser::SerializeTuple};
 use smallvec::{SmallVec, smallvec};
 use tracing::trace;
 
@@ -21,7 +21,9 @@ use petgraph::{
     visit::{EdgeRef as PEdgeRef, NodeIndexable},
     *,
 };
-use query_structure::{FieldSelection, Filter, QueryArguments, SelectionResult, WriteArgs};
+use query_structure::{
+    FieldSelection, Filter, Model, Placeholder, PrismaValue, QueryArguments, Relation, SelectionResult, WriteArgs,
+};
 
 pub type QueryGraphResult<T> = std::result::Result<T, QueryGraphError>;
 
@@ -66,26 +68,48 @@ impl From<Flow> for Node {
 
 pub enum Flow {
     /// Expresses a conditional control flow in the graph.
-    /// Possible outgoing edges are `then` and `else`, each at most once, with `then` required to be present.
-    If { rule: DataRule, data: Vec<SelectionResult> },
+    /// Possible outgoing edges are `then` and `else`, each at most once.
+    /// `then` is required unless `then_returns_condition` is set, in which case the condition input is also the then-branch result.
+    If {
+        rule: DataRule,
+        data: Option<Placeholder>,
+        then_returns_condition: bool,
+    },
 
     /// Returns a fixed set of results at runtime.
-    Return(Vec<SelectionResult>),
+    Return(Option<Placeholder>),
+
+    /// Runs child nodes, then returns the same fixed set of results.
+    ReturnPreservingResult(Option<Placeholder>),
 }
 
 impl Flow {
     pub fn if_non_empty() -> Self {
         Self::If {
             rule: DataRule::RowCountNeq(0),
-            data: Vec::new(),
+            data: None,
+            then_returns_condition: false,
+        }
+    }
+
+    pub fn if_non_empty_returning_condition() -> Self {
+        Self::If {
+            rule: DataRule::RowCountNeq(0),
+            data: None,
+            then_returns_condition: true,
         }
     }
 
     pub fn if_false() -> Self {
         Self::If {
             rule: DataRule::Never,
-            data: Vec::new(),
+            data: None,
+            then_returns_condition: false,
         }
+    }
+
+    pub fn return_preserving_result() -> Self {
+        Self::ReturnPreservingResult(None)
     }
 }
 
@@ -93,6 +117,7 @@ impl Flow {
 pub enum Computation {
     DiffLeftToRight(DiffNode),
     DiffRightToLeft(DiffNode),
+    RequiredOneToManySet(RequiredOneToManySetNode),
 }
 
 impl Computation {
@@ -103,20 +128,81 @@ impl Computation {
     pub fn empty_diff_right_to_left(fields: FieldSelection) -> Self {
         Self::DiffRightToLeft(DiffNode::new_empty(fields))
     }
+
+    pub fn required_one_to_many_set(
+        fields: FieldSelection,
+        parent_node: NodeRef,
+        parent_link: FieldSelection,
+        child_link: FieldSelection,
+        child_model: Model,
+        parent_expectation: DataExpectation,
+        relation_expectation: DataExpectation,
+        request_now: PrismaValue,
+    ) -> Self {
+        Self::RequiredOneToManySet(RequiredOneToManySetNode::new(
+            fields,
+            parent_node,
+            parent_link,
+            child_link,
+            child_model,
+            parent_expectation,
+            relation_expectation,
+            request_now,
+        ))
+    }
 }
 
 pub struct DiffNode {
-    pub left: Vec<SelectionResult>,
-    pub right: Vec<SelectionResult>,
+    pub left: Option<Placeholder>,
+    pub right: Option<Placeholder>,
     pub fields: FieldSelection,
 }
 
 impl DiffNode {
     pub fn new_empty(fields: FieldSelection) -> Self {
         Self {
-            left: Vec::new(),
-            right: Vec::new(),
+            left: None,
+            right: None,
             fields,
+        }
+    }
+}
+
+pub struct RequiredOneToManySetNode {
+    pub old_children: Option<Placeholder>,
+    pub new_children: Option<Placeholder>,
+    pub fields: FieldSelection,
+    pub parent_node: NodeRef,
+    pub parent_link: FieldSelection,
+    pub child_link: FieldSelection,
+    pub child_model: Model,
+    pub parent_expectation: DataExpectation,
+    pub relation_expectation: DataExpectation,
+    pub request_now: PrismaValue,
+}
+
+impl RequiredOneToManySetNode {
+    pub fn new(
+        fields: FieldSelection,
+        parent_node: NodeRef,
+        parent_link: FieldSelection,
+        child_link: FieldSelection,
+        child_model: Model,
+        parent_expectation: DataExpectation,
+        relation_expectation: DataExpectation,
+        request_now: PrismaValue,
+    ) -> Self {
+        Self {
+            old_children: None,
+            new_children: None,
+            fields,
+            parent_node,
+            parent_link,
+            child_link,
+            child_model,
+            parent_expectation,
+            relation_expectation,
+            request_now,
         }
     }
 }
@@ -130,6 +216,11 @@ impl NodeRef {
     /// Returns the unique identifier of the Node.
     pub fn id(&self) -> String {
         self.node_ix.index().to_string()
+    }
+
+    /// Returns the raw index of the Node.
+    pub fn index(&self) -> usize {
+        self.node_ix.index()
     }
 }
 
@@ -182,6 +273,10 @@ pub enum RowSink {
     AtMostOne(&'static dyn NodeInputField<Vec<SelectionResult>>),
     /// Store an array of exactly one row to the node input field.
     ExactlyOne(&'static dyn NodeInputField<Vec<SelectionResult>>),
+    /// Store a projected placeholder directly to the node input field.
+    ProjectedPlaceholder(&'static dyn NodeInputField<Option<Placeholder>>),
+    /// Store a single source-field placeholder directly to the node input field.
+    ProjectedFieldPlaceholder(&'static dyn NodeInputField<Option<Placeholder>>),
     /// Store a filter representing all rows to the node input field.
     AllFilter(&'static dyn NodeInputField<Filter>),
     /// Store a filter representing exactly one row to the node input field.
@@ -218,35 +313,35 @@ pub trait NodeInputField<R: ?Sized>: Send + Sync + fmt::Debug {
 /// An expectation for a data dependency.
 pub struct DataExpectation {
     rules: SmallVec<[DataRule; 1]>,
-    error: Box<dyn DataDependencyError>,
+    error: DataDependencyError,
 }
 
 impl DataExpectation {
-    pub fn non_empty_rows(error: impl DataDependencyError + 'static) -> Self {
+    pub fn non_empty_rows(error: impl Into<DataDependencyError>) -> Self {
         Self {
             rules: smallvec![DataRule::RowCountNeq(0)],
-            error: Box::new(error),
+            error: error.into(),
         }
     }
 
-    pub fn empty_rows(error: impl DataDependencyError + 'static) -> Self {
+    pub fn empty_rows(error: impl Into<DataDependencyError>) -> Self {
         Self {
             rules: smallvec![DataRule::RowCountEq(0)],
-            error: Box::new(error),
+            error: error.into(),
         }
     }
 
-    pub fn exact_row_count(expected: usize, error: impl DataDependencyError + 'static) -> Self {
+    pub fn exact_row_count(expected: usize, error: impl Into<DataDependencyError>) -> Self {
         Self {
             rules: smallvec![DataRule::RowCountEq(expected)],
-            error: Box::new(error),
+            error: error.into(),
         }
     }
 
-    pub fn affected_row_count(expected: usize, error: impl DataDependencyError + 'static) -> Self {
+    pub fn affected_row_count(expected: usize, error: impl Into<DataDependencyError>) -> Self {
         Self {
             rules: smallvec![DataRule::AffectedRowCountEq(expected)],
-            error: Box::new(error),
+            error: error.into(),
         }
     }
 
@@ -254,14 +349,13 @@ impl DataExpectation {
         &self.rules
     }
 
-    pub fn error(&self) -> &dyn DataDependencyError {
-        &*self.error
+    pub fn error(&self) -> &DataDependencyError {
+        &self.error
     }
 }
 
 /// A rule a data dependency needs to fulfill to be considered valid.
-#[derive(Debug, Clone, Serialize)]
-#[serde(tag = "type", content = "args", rename_all = "camelCase")]
+#[derive(Debug, Clone)]
 pub enum DataRule {
     /// Expect the data dependency to contain an exact number of rows.
     RowCountEq(usize),
@@ -271,6 +365,30 @@ pub enum DataRule {
     AffectedRowCountEq(usize),
     /// Expect the edge to not be taken and never match any data.
     Never,
+}
+
+impl Serialize for DataRule {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        match self {
+            Self::RowCountEq(count) => serialize_rule_tuple("=", count, serializer),
+            Self::RowCountNeq(count) => serialize_rule_tuple("!", count, serializer),
+            Self::AffectedRowCountEq(count) => serialize_rule_tuple("a", count, serializer),
+            Self::Never => serializer.serialize_str("n"),
+        }
+    }
+}
+
+fn serialize_rule_tuple<S>(tag: &'static str, count: &usize, serializer: S) -> Result<S::Ok, S::Error>
+where
+    S: Serializer,
+{
+    let mut tuple = serializer.serialize_tuple(2)?;
+    tuple.serialize_element(tag)?;
+    tuple.serialize_element(count)?;
+    tuple.end()
 }
 
 impl fmt::Display for DataRule {
@@ -284,12 +402,306 @@ impl fmt::Display for DataRule {
     }
 }
 
+#[derive(Debug, Clone, Serialize)]
+#[serde(into = "String")]
+pub enum DataOperation {
+    Query,
+    Update,
+    Upsert,
+    Delete,
+    Disconnect,
+    Connect,
+    NestedCreate,
+    NestedUpdate,
+    NestedUpsert,
+    NestedDelete,
+    NestedSet,
+    NestedConnect,
+    NestedConnectOrCreate,
+}
+
+impl fmt::Display for DataOperation {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.write_str(self.as_str())
+    }
+}
+
+impl DataOperation {
+    pub fn as_str(&self) -> &'static str {
+        let str = match self {
+            Self::Query => "a query",
+            Self::Update => "an update",
+            Self::Upsert => "an upsert",
+            Self::Delete => "a delete",
+            Self::Disconnect => "a disconnect",
+            Self::Connect => "a connect",
+            Self::NestedCreate => "a nested create",
+            Self::NestedUpdate => "a nested update",
+            Self::NestedUpsert => "a nested upsert",
+            Self::NestedDelete => "a nested delete",
+            Self::NestedSet => "a nested set",
+            Self::NestedConnect => "a nested connect",
+            Self::NestedConnectOrCreate => "a nested connect or create",
+        };
+        str
+    }
+}
+
+impl From<DataOperation> for String {
+    fn from(operation: DataOperation) -> Self {
+        operation.to_string()
+    }
+}
+
+#[derive(Debug, Clone, Serialize)]
+#[serde(into = "String")]
+pub enum DependentOperation {
+    NestedUpdate,
+    DisconnectRecords,
+    FindRecords { model: String },
+    InlineRelation { model: String },
+    UpdateInlinedRelation { model: String },
+    CreateInlinedRelation { model: String },
+    ConnectOrCreateInlinedRelation { model: String },
+}
+
+impl DependentOperation {
+    pub fn nested_update() -> Self {
+        Self::NestedUpdate
+    }
+
+    pub fn disconnect_records() -> Self {
+        Self::DisconnectRecords
+    }
+
+    pub fn find_records(model: &Model) -> Self {
+        Self::FindRecords {
+            model: model.name().to_owned(),
+        }
+    }
+
+    pub fn inline_relation(model: &Model) -> Self {
+        Self::InlineRelation {
+            model: model.name().to_owned(),
+        }
+    }
+
+    pub fn update_inlined_relation(model: &Model) -> Self {
+        Self::UpdateInlinedRelation {
+            model: model.name().to_owned(),
+        }
+    }
+
+    pub fn create_inlined_relation(model: &Model) -> Self {
+        Self::CreateInlinedRelation {
+            model: model.name().to_owned(),
+        }
+    }
+
+    pub fn connect_or_create_inlined_relation(model: &Model) -> Self {
+        Self::ConnectOrCreateInlinedRelation {
+            model: model.name().to_owned(),
+        }
+    }
+}
+
+impl fmt::Display for DependentOperation {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Self::NestedUpdate => write!(f, "perform a nested update"),
+            Self::DisconnectRecords => write!(f, "disconnect existing child records"),
+            Self::FindRecords { model } => write!(f, "find '{model}' record(s)"),
+            Self::InlineRelation { model } => write!(f, "inline the relation on '{model}' record(s)"),
+            Self::UpdateInlinedRelation { model } => {
+                write!(f, "update inlined relation for '{model}' record(s)")
+            }
+            Self::CreateInlinedRelation { model } => {
+                write!(f, "create inlined relation for '{model}' record(s)")
+            }
+            Self::ConnectOrCreateInlinedRelation { model } => {
+                write!(f, "create or connect inlined relation for '{model}' record(s)")
+            }
+        }
+    }
+}
+
+impl From<DependentOperation> for String {
+    fn from(operation: DependentOperation) -> Self {
+        operation.to_string()
+    }
+}
+
+#[derive(Debug, Clone, Serialize)]
+#[serde(into = "String")]
+pub enum RelationType {
+    OneToOne,
+    OneToMany,
+    ManyToMany,
+}
+
+impl From<&Relation> for RelationType {
+    fn from(relation: &Relation) -> Self {
+        if relation.is_one_to_one() {
+            Self::OneToOne
+        } else if relation.is_one_to_many() {
+            Self::OneToMany
+        } else {
+            Self::ManyToMany
+        }
+    }
+}
+
+impl fmt::Display for RelationType {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.write_str(self.as_str())
+    }
+}
+
+impl RelationType {
+    pub fn as_str(&self) -> &'static str {
+        match self {
+            RelationType::OneToOne => "one-to-one",
+            RelationType::OneToMany => "one-to-many",
+            RelationType::ManyToMany => "many-to-many",
+        }
+    }
+}
+
+impl From<RelationType> for String {
+    fn from(relation_type: RelationType) -> Self {
+        relation_type.to_string()
+    }
+}
+
 /// An error that can occur during data dependency validation.
-pub trait DataDependencyError: Send + Sync {
-    /// A unique identifier for the error.
-    fn id(&self) -> &'static str;
-    /// Context with additional information used to provide more context for the error.
-    fn context(&self) -> serde_json::Value;
+#[derive(Debug, Clone)]
+pub enum DataDependencyError {
+    RelationViolation {
+        relation: String,
+        model_a: String,
+        model_b: String,
+    },
+    MissingRecord {
+        operation: DataOperation,
+    },
+    MissingRelatedRecord {
+        model: String,
+        relation: String,
+        relation_type: RelationType,
+        operation: DataOperation,
+        needed_for: Option<DependentOperation>,
+    },
+    IncompleteConnectInput {
+        expected_rows: usize,
+    },
+    IncompleteConnectOutput {
+        expected_rows: usize,
+        relation: String,
+        relation_type: RelationType,
+    },
+    RecordsNotConnected {
+        relation: String,
+        parent: String,
+        child: String,
+    },
+}
+
+impl DataDependencyError {
+    pub fn id(&self) -> &'static str {
+        match self {
+            Self::RelationViolation { .. } => "RELATION_VIOLATION",
+            Self::MissingRecord { .. } => "MISSING_RECORD",
+            Self::MissingRelatedRecord { .. } => "MISSING_RELATED_RECORD",
+            Self::IncompleteConnectInput { .. } => "INCOMPLETE_CONNECT_INPUT",
+            Self::IncompleteConnectOutput { .. } => "INCOMPLETE_CONNECT_OUTPUT",
+            Self::RecordsNotConnected { .. } => "RECORDS_NOT_CONNECTED",
+        }
+    }
+
+    pub fn compact_id(&self) -> &'static str {
+        match self {
+            Self::RelationViolation { .. } => "r",
+            Self::MissingRelatedRecord { .. } => "m",
+            Self::MissingRecord { .. } => "M",
+            Self::IncompleteConnectInput { .. } => "i",
+            Self::IncompleteConnectOutput { .. } => "o",
+            Self::RecordsNotConnected { .. } => "n",
+        }
+    }
+
+    pub fn serialize_compact_context<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        match self {
+            Self::RelationViolation {
+                relation,
+                model_a,
+                model_b,
+            } => {
+                let mut tuple = serializer.serialize_tuple(3)?;
+                tuple.serialize_element(relation)?;
+                tuple.serialize_element(model_a)?;
+                tuple.serialize_element(model_b)?;
+                tuple.end()
+            }
+            Self::MissingRelatedRecord {
+                model,
+                relation,
+                relation_type,
+                operation,
+                needed_for,
+            } => {
+                let mut tuple = serializer.serialize_tuple(if needed_for.is_some() { 5 } else { 4 })?;
+                tuple.serialize_element(model)?;
+                tuple.serialize_element(relation)?;
+                tuple.serialize_element(relation_type.as_str())?;
+                tuple.serialize_element(operation.as_str())?;
+                if let Some(needed_for) = needed_for {
+                    tuple.serialize_element(&DisplayValue(needed_for))?;
+                }
+                tuple.end()
+            }
+            Self::MissingRecord { operation } => serializer.serialize_str(operation.as_str()),
+            Self::IncompleteConnectInput { expected_rows } => expected_rows.serialize(serializer),
+            Self::IncompleteConnectOutput {
+                expected_rows,
+                relation,
+                relation_type,
+            } => {
+                let mut tuple = serializer.serialize_tuple(3)?;
+                tuple.serialize_element(expected_rows)?;
+                tuple.serialize_element(relation)?;
+                tuple.serialize_element(relation_type.as_str())?;
+                tuple.end()
+            }
+            Self::RecordsNotConnected {
+                relation,
+                parent,
+                child,
+            } => {
+                let mut tuple = serializer.serialize_tuple(3)?;
+                tuple.serialize_element(relation)?;
+                tuple.serialize_element(parent)?;
+                tuple.serialize_element(child)?;
+                tuple.end()
+            }
+        }
+    }
+}
+
+struct DisplayValue<'a, T>(&'a T);
+
+impl<T> Serialize for DisplayValue<'_, T>
+where
+    T: fmt::Display,
+{
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        serializer.collect_str(self.0)
+    }
 }
 
 /// A graph representing an abstract view of queries and their execution dependencies.
@@ -373,8 +785,8 @@ impl QueryGraph {
         if !self.finalized {
             self.swap_marked()?;
             self.ensure_return_nodes_have_parent_dependency()?;
-            self.normalize_data_dependencies(capabilities)?;
-            self.insert_reloads()?;
+            let reloads = self.normalize_data_dependencies(capabilities)?;
+            self.insert_reloads(reloads)?;
             self.normalize_if_nodes()?;
             self.finalized = true;
         }
@@ -396,6 +808,11 @@ impl QueryGraph {
             trace!("Visited: {}", node.id());
             self.visited.push(node.node_ix);
         }
+    }
+
+    pub fn reserve_visited_capacity(&mut self) {
+        self.visited
+            .reserve_exact(self.graph.node_count().saturating_sub(self.visited.len()));
     }
 
     /// Checks if the given node is marked as one of the result nodes in the graph.
@@ -511,6 +928,36 @@ impl QueryGraph {
     /// Returns all edges pointing to `node` (e.g. incoming edges).
     pub fn incoming_edges(&self, node: &NodeRef) -> Vec<EdgeRef> {
         self.collect_edges(node, Direction::Incoming)
+    }
+
+    /// Returns parent nodes without allocating or sorting edge refs.
+    pub fn parent_nodes(&self, node: &NodeRef) -> impl Iterator<Item = NodeRef> + '_ {
+        self.graph
+            .edges_directed(node.node_ix, Direction::Incoming)
+            .map(|edge| NodeRef { node_ix: edge.source() })
+    }
+
+    fn outgoing_projected_data_dependencies(&self, node: &NodeRef) -> impl Iterator<Item = &FieldSelection> {
+        self.graph
+            .edges_directed(node.node_ix, Direction::Outgoing)
+            .filter_map(|edge| match edge.weight().borrow() {
+                Some(QueryGraphDependency::ProjectedDataDependency(requested_selection, _, _)) => {
+                    Some(requested_selection)
+                }
+                _ => None,
+            })
+    }
+
+    fn incoming_projected_data_dependency_edge(&self, node: &NodeRef) -> Option<EdgeRef> {
+        self.graph
+            .edges_directed(node.node_ix, Direction::Incoming)
+            .find(|edge| {
+                matches!(
+                    edge.weight().borrow(),
+                    Some(QueryGraphDependency::ProjectedDataDependency(_, _, _))
+                )
+            })
+            .map(|edge| EdgeRef { edge_ix: edge.id() })
     }
 
     /// Removes the edge from the graph but leaves the graph intact by keeping the empty
@@ -779,10 +1226,7 @@ impl QueryGraph {
 
                     for (_, sibling) in siblings {
                         let possible_edge = self.graph.find_edge(node.node_ix, sibling.node_ix);
-                        let is_if_node_child = self.incoming_edges(&sibling).into_iter().any(|edge| {
-                            let content = self.edge_content(&edge).unwrap();
-                            matches!(content, QueryGraphDependency::Then | QueryGraphDependency::Else)
-                        });
+                        let is_if_node_child = self.has_incoming_then_or_else_edge(&sibling);
 
                         if sibling != node
                             && possible_edge.is_none()
@@ -797,6 +1241,17 @@ impl QueryGraph {
         }
 
         Ok(())
+    }
+
+    fn has_incoming_then_or_else_edge(&self, node: &NodeRef) -> bool {
+        self.graph
+            .edges_directed(node.node_ix, Direction::Incoming)
+            .any(|edge| {
+                matches!(
+                    edge.weight().borrow(),
+                    Some(QueryGraphDependency::Then | QueryGraphDependency::Else)
+                )
+            })
     }
 
     /// Traverses the graph and ensures that return nodes have correct `ProjectedDataDependency`s on their incoming edges.
@@ -816,37 +1271,19 @@ impl QueryGraph {
                 let node = NodeRef { node_ix: ix };
 
                 match self.node_content(&node).unwrap() {
-                    Node::Flow(Flow::Return(_)) => Some(node),
+                    Node::Flow(Flow::Return(_) | Flow::ReturnPreservingResult(_)) => Some(node),
                     _ => None,
                 }
             })
             .collect();
 
         for return_node in return_nodes {
-            let out_edges = self.outgoing_edges(&return_node);
-            let dependencies: Vec<FieldSelection> = out_edges
-                .into_iter()
-                .filter_map(|edge| {
-                    if let QueryGraphDependency::ProjectedDataDependency(requested_selection, _, _) =
-                        self.edge_content(&edge).unwrap()
-                    {
-                        Some(requested_selection.clone())
-                    } else {
-                        None
-                    }
-                })
-                .collect();
-            let dependencies = FieldSelection::union(dependencies);
+            let dependencies =
+                FieldSelection::union_iter(self.outgoing_projected_data_dependencies(&return_node).cloned());
 
             // Assumption: We currently always have at most one single incoming ProjectedDataDependency edge
             // connected to return nodes. This will break if we ever have more.
-            let in_edges = self.incoming_edges(&return_node);
-            let incoming_dep_edge = in_edges.into_iter().find(|edge| {
-                matches!(
-                    self.edge_content(edge),
-                    Some(QueryGraphDependency::ProjectedDataDependency(_, _, _))
-                )
-            });
+            let incoming_dep_edge = self.incoming_projected_data_dependency_edge(&return_node);
 
             if let Some(incoming_edge) = incoming_dep_edge {
                 let source = self.edge_source(&incoming_edge);
@@ -921,9 +1358,7 @@ impl QueryGraph {
     ///
     /// The `Reload` node is always a "find many" query.
     /// Unwraps are safe because we're operating on the unprocessed state of the graph (`Expressionista` changes that).
-    fn insert_reloads(&mut self) -> QueryGraphResult<()> {
-        let reloads = self.find_unsatisfied_dependencies();
-
+    fn insert_reloads(&mut self, reloads: Vec<(NodeRef, FieldSelection)>) -> QueryGraphResult<()> {
         for (node, identifiers) in reloads {
             let query = self.node_content(&node).and_then(|node| node.as_query()).unwrap();
 
@@ -938,7 +1373,7 @@ impl QueryGraph {
             let primary_model_id = model.shard_aware_primary_identifier();
 
             let read_query = ReadQuery::ManyRecordsQuery(ManyRecordsQuery {
-                name: "reload".into(),
+                name: String::new(),
                 alias: None,
                 model: model.clone(),
                 args: QueryArguments::new(model),
@@ -1012,8 +1447,12 @@ impl QueryGraph {
     /// This is only possible when the parent node _can_ fulfill the selection set.
     /// In the case of updates and inserts, for instance, only connectors supporting `InsertReturning` and `UpdateReturning` can do it,
     /// or else they're only able to return the primary identifier of the model inserted or updated.
-    fn normalize_data_dependencies(&mut self, capabilities: ConnectorCapabilities) -> QueryGraphResult<()> {
+    fn normalize_data_dependencies(
+        &mut self,
+        capabilities: ConnectorCapabilities,
+    ) -> QueryGraphResult<Vec<(NodeRef, FieldSelection)>> {
         let unsatisfied_deps = self.find_unsatisfied_dependencies();
+        let mut reloads = Vec::new();
 
         for (node, identifiers) in unsatisfied_deps {
             let query = self
@@ -1024,18 +1463,21 @@ impl QueryGraph {
             // If the connector does not support returning more than the primary identifier for an update,
             // do not update the selection set.
             if query.is_update_one() && !capabilities.contains(ConnectorCapability::UpdateReturning) {
+                reloads.push((node, identifiers));
                 continue;
             }
 
             // If the connector does not support returning more than the primary identifier for a create,
             // do not update the selection set.
             if query.is_create_one() && !capabilities.contains(ConnectorCapability::InsertReturning) {
+                reloads.push((node, identifiers));
                 continue;
             }
 
             // If the connector does not support returning more than the primary identifier for a delete,
             // do not update the selection set.
             if query.is_delete_one() && !capabilities.contains(ConnectorCapability::DeleteReturning) {
+                reloads.push((node, identifiers));
                 continue;
             }
 
@@ -1048,7 +1490,7 @@ impl QueryGraph {
             query.satisfy_dependency(identifiers);
         }
 
-        Ok(())
+        Ok(reloads)
     }
 
     /// Traverses the query graph and finds the query nodes that don't fulfill their children data dependencies.
@@ -1061,24 +1503,16 @@ impl QueryGraph {
                 let node = NodeRef { node_ix: ix };
 
                 if let Node::Query(q) = self.node_content(&node).unwrap() {
-                    let edges = self.outgoing_edges(&node);
-                    let unsatisfied_dependencies: Vec<_> = edges
-                        .into_iter()
-                        .filter_map(|edge| match self.edge_content(&edge).unwrap() {
-                            QueryGraphDependency::ProjectedDataDependency(requested_selection, _, _)
-                                if !q.satisfies(requested_selection) =>
-                            {
-                                Some(requested_selection.clone())
-                            }
-                            _ => None,
-                        })
-                        .collect();
+                    let mut unsatisfied_dependencies = self
+                        .outgoing_projected_data_dependencies(&node)
+                        .filter(|requested_selection| !q.satisfies(requested_selection))
+                        .cloned();
 
-                    if unsatisfied_dependencies.is_empty() {
-                        None
-                    } else {
-                        Some((node, FieldSelection::union(unsatisfied_dependencies)))
-                    }
+                    let first = unsatisfied_dependencies.next()?;
+                    Some((
+                        node,
+                        FieldSelection::union_iter(std::iter::once(first).chain(unsatisfied_dependencies)),
+                    ))
                 } else {
                     None
                 }

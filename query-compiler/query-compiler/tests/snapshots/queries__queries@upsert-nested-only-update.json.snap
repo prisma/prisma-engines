@@ -1,0 +1,86 @@
+---
+source: query-compiler/query-compiler/tests/queries.rs
+expression: pretty
+input_file: query-compiler/query-compiler/tests/data/upsert-nested-only-update.json
+snapshot_kind: text
+---
+transaction
+   dataMap {
+       id: Int (id)
+       email: String (email)
+       role: Enum<Role> (role)
+       posts (from @nested$posts): {
+           id: Int (id)
+           title: String (title)
+           userId: Int (userId)
+       }
+   }
+   enums {
+       Role: {
+           admin: ADMIN
+           user: USER
+       }
+   }
+   let 0 = query «SELECT "public"."User"."id" FROM "public"."User" WHERE
+                  "public"."User"."email" = $1 OFFSET $2»
+           params [const(String("user.1@prisma.io")), const(BigInt(0))]
+   in let 5 = if (rowCountNeq 0 (get 0))
+          then let 2 = get 0
+               in let 2 = unique (validate (get 2)
+                      [ rowCountNeq 0
+                      ] orRaise "MISSING_RELATED_RECORD");
+                      2$id = mapField id (get 2)
+                  in unique (query «INSERT INTO "public"."Post"
+                                    ("title","userId") VALUES ($1,$2) RETURNING
+                                    "public"."Post"."id"»
+                             params [const(String("Nested upsert update post")),
+                                     var(2$id as Int)]);
+                  get 2
+          else unique (query «INSERT INTO "public"."User" ("email","role")
+                              VALUES ($1,CAST($2::text AS "public"."Role"))
+                              RETURNING "public"."User"."id"»
+                       params [const(String("user.1@prisma.io")),
+                               const(String("user"))])
+      in let 5 = unique (validate (get 5)
+             [ rowCountNeq 0
+             ] orRaise "MISSING_RECORD");
+             5$id = mapField id (get 5)
+         in rawNestedReadUnique (query «SELECT "public"."User"."id",
+                                        "public"."User"."email",
+                                        "public"."User"."role"::text FROM
+                                        "public"."User" WHERE
+                                        "public"."User"."id" = $1 LIMIT $2
+                                        OFFSET $3»
+                                 params [var(5$id as Int), const(BigInt(1)),
+                                         const(BigInt(0))]
+                                 fields {
+                                     id: 0
+                                     email: 1
+                                     role: 2
+                                 }
+                                 relations [posts on left.0 = right.2 many (query
+                                                                            «SELECT
+                                                                             "public"."Post"."id",
+                                                                             "public"."Post"."title",
+                                                                             "public"."Post"."userId"
+                                                                             FROM
+                                                                             "public"."Post"
+                                                                             WHERE
+                                                                             "public"."Post"."userId"
+                                                                             =
+                                                                             $1
+                                                                             OFFSET
+                                                                             $2»
+                                                                            params [var(@parent$id as Int),
+                                                                                    const(BigInt(0))]
+                                                                            fields {
+                                                                                id: 0
+                                                                                title: 1
+                                                                                userId: 2
+                                                                            })])
+            enums {
+                Role: {
+                    admin: ADMIN
+                    user: USER
+                }
+            }

@@ -1,19 +1,24 @@
 use crate::{
     TranslateError, binding,
-    expression::{Binding, Expression, JoinExpression},
+    data_mapper::FieldType,
+    expression::{
+        Binding, EnumsMap, Expression, InMemoryOps, JoinExpression, RawNestedFinalOwnerNestedRelation,
+        RawNestedFinalOwnerSchedule, RawNestedReadDirectRelation, RawNestedReadQuery, RawNestedReadRelation,
+        RawResultColumnMapping, RawResultColumnRef, RawResultFieldName,
+    },
     translate::TranslateResult,
 };
 use itertools::Itertools;
-use query_builder::{ConditionalLink, QueryBuilder, RelationLinkage};
+use query_builder::{ConditionalLink, DbQuery, QueryArgumentsExt, QueryBuilder, RelationLinkage};
 use query_core::{
     AggregateRecordsQuery, DataExpectation, DataOperation, MissingRecord, QueryGraphBuilderError, QueryOption,
     QueryOptions, ReadQuery, RelatedRecordsQuery,
 };
 use query_structure::{
     ConditionValue, FieldSelection, Filter, Model, Placeholder, PrismaValue, QueryArguments, QueryMode, RelationField,
-    RelationLoadStrategy, ScalarCondition, ScalarField, ScalarFilter, ScalarProjection, Take,
+    RelationLoadStrategy, ScalarCondition, ScalarField, ScalarFilter, ScalarProjection, SelectedField, Take,
 };
-use std::slice;
+use std::{borrow::Cow, slice};
 
 mod in_memory_processing;
 
@@ -22,7 +27,7 @@ pub(crate) fn translate_read_query(query: ReadQuery, builder: &dyn QueryBuilder)
         ReadQuery::RecordQuery(mut rq) => {
             let selected_fields = match rq.relation_load_strategy {
                 RelationLoadStrategy::Join => rq.selected_fields.into_virtuals_last(),
-                RelationLoadStrategy::Query => rq.selected_fields.without_relations().into_virtuals_last(),
+                RelationLoadStrategy::Query => rq.selected_fields.into_without_relations().into_virtuals_last(),
             };
 
             let mut args = QueryArguments::from((
@@ -33,6 +38,24 @@ pub(crate) fn translate_read_query(query: ReadQuery, builder: &dyn QueryBuilder)
 
             let in_memory_ops =
                 in_memory_processing::extract_in_memory_ops(&mut args, rq.relation_load_strategy, &mut rq.nested);
+
+            if rq.relation_load_strategy == RelationLoadStrategy::Query
+                && !rq.nested.is_empty()
+                && in_memory_ops.is_empty()
+                && !rq.options.contains(QueryOption::ThrowOnEmpty)
+            {
+                if let Some(expr) = build_raw_nested_read_root(
+                    builder,
+                    &rq.model,
+                    args.clone(),
+                    &selected_fields,
+                    &rq.selection_order,
+                    &rq.nested,
+                    true,
+                )? {
+                    return Ok(expr);
+                }
+            }
 
             let expr = build_get_records(builder, &rq.model, args, &selected_fields, rq.relation_load_strategy)?;
             let expr = in_memory_ops.into_expression(expr);
@@ -53,13 +76,32 @@ pub(crate) fn translate_read_query(query: ReadQuery, builder: &dyn QueryBuilder)
 
             let selected_fields = match mrq.relation_load_strategy {
                 RelationLoadStrategy::Join => mrq.selected_fields.into_virtuals_last(),
-                RelationLoadStrategy::Query => mrq.selected_fields.without_relations().into_virtuals_last(),
+                RelationLoadStrategy::Query => mrq.selected_fields.into_without_relations().into_virtuals_last(),
             };
 
             let take = mrq.args.take;
 
             let in_memory_ops =
                 in_memory_processing::extract_in_memory_ops(&mut mrq.args, mrq.relation_load_strategy, &mut mrq.nested);
+
+            if mrq.relation_load_strategy == RelationLoadStrategy::Query
+                && !mrq.nested.is_empty()
+                && in_memory_ops.is_empty()
+                && !mrq.options.contains(QueryOption::ThrowOnEmpty)
+            {
+                let unique = matches!(take, Take::One | Take::NegativeOne);
+                if let Some(expr) = build_raw_nested_read_root(
+                    builder,
+                    &mrq.model,
+                    mrq.args.clone(),
+                    &selected_fields,
+                    &mrq.selection_order,
+                    &mrq.nested,
+                    unique,
+                )? {
+                    return Ok(expr);
+                }
+            }
 
             let expr = build_get_records(
                 builder,
@@ -117,23 +159,256 @@ pub(crate) fn translate_read_query(query: ReadQuery, builder: &dyn QueryBuilder)
     })
 }
 
+pub(crate) fn guarantees_raw_nested_read_root(query: &ReadQuery) -> bool {
+    match query {
+        ReadQuery::RecordQuery(rq) => {
+            rq.relation_load_strategy == RelationLoadStrategy::Query
+                && !rq.nested.is_empty()
+                && !rq.options.contains(QueryOption::ThrowOnEmpty)
+                && rq.filter.as_ref().is_some_and(filter_cannot_chunk)
+                && raw_result_mapping_supported(&rq.selected_fields, &rq.selection_order)
+                && raw_nested_relations_supported(&rq.nested, &rq.selected_fields, true)
+        }
+        ReadQuery::ManyRecordsQuery(mrq) => {
+            if mrq.args.take == Take::Some(0) {
+                return false;
+            }
+
+            mrq.relation_load_strategy == RelationLoadStrategy::Query
+                && !mrq.nested.is_empty()
+                && root_in_memory_ops_empty(&mrq.args)
+                && !mrq.options.contains(QueryOption::ThrowOnEmpty)
+                && args_cannot_chunk(&mrq.args)
+                && raw_result_mapping_supported(&mrq.selected_fields, &mrq.selection_order)
+                && raw_nested_relations_supported(
+                    &mrq.nested,
+                    &mrq.selected_fields,
+                    matches!(mrq.args.take, Take::One | Take::NegativeOne),
+                )
+        }
+        ReadQuery::RelatedRecordsQuery(_) | ReadQuery::AggregateRecordsQuery(_) => false,
+    }
+}
+
+fn root_in_memory_ops_empty(args: &QueryArguments) -> bool {
+    !args.needs_reversed_order()
+        && !args.requires_inmemory_pagination(RelationLoadStrategy::Query)
+        && !args.requires_inmemory_distinct(RelationLoadStrategy::Query)
+}
+
+fn raw_nested_relations_supported(
+    nested: &[ReadQuery],
+    parent_selected_fields: &FieldSelection,
+    has_unique_parent: bool,
+) -> bool {
+    nested.iter().all(|nested| {
+        let ReadQuery::RelatedRecordsQuery(rrq) = nested else {
+            return false;
+        };
+
+        let Some(parent_scalar) = rrq.parent_field.single_left_scalar() else {
+            return false;
+        };
+
+        selected_fields_contain_db_name(parent_selected_fields, parent_scalar.db_name())
+            && get_single_relation_scalar_for_filters(&rrq.parent_field).is_some()
+            && raw_related_records_supported(rrq, has_unique_parent)
+    })
+}
+
+fn raw_related_records_supported(rrq: &RelatedRecordsQuery, has_unique_parent: bool) -> bool {
+    let is_many_to_many = rrq.parent_field.relation().is_many_to_many();
+    let supports_parent_grouped_ops = raw_nested_relation_supports_parent_grouped_ops(rrq, is_many_to_many);
+
+    if rrq.args.take == Take::Some(0)
+        || rrq.parent_results.is_some()
+        || !args_cannot_chunk(&rrq.args)
+        || !raw_nested_relation_operations_may_be_supported(&rrq.args, has_unique_parent, supports_parent_grouped_ops)
+        || (supports_parent_grouped_ops
+            && !raw_nested_relation_operation_result_fields_supported(
+                &rrq.args,
+                &rrq.selected_fields,
+                &rrq.selection_order,
+                has_unique_parent,
+            ))
+        || !raw_result_mapping_supported(&rrq.selected_fields, &rrq.selection_order)
+    {
+        return false;
+    }
+
+    let Some(child_scalar) = get_single_relation_scalar_for_filters(&rrq.parent_field) else {
+        return false;
+    };
+
+    if !is_many_to_many && !selected_fields_contain_db_name(&rrq.selected_fields, child_scalar.db_name()) {
+        return false;
+    }
+
+    let child_has_unique_parent = has_unique_parent && !is_many_to_many && !rrq.parent_field.arity().is_list();
+    raw_nested_relations_supported(&rrq.nested, &rrq.selected_fields, child_has_unique_parent)
+}
+
+fn raw_nested_relation_supports_parent_grouped_ops(rrq: &RelatedRecordsQuery, is_many_to_many: bool) -> bool {
+    is_many_to_many || rrq.parent_field.arity().is_list()
+}
+
+fn raw_nested_relation_operations_may_be_supported(
+    args: &QueryArguments,
+    has_unique_parent: bool,
+    supports_parent_grouped_ops: bool,
+) -> bool {
+    if args.needs_reversed_order() {
+        return false;
+    }
+
+    let needs_pagination = args.take.is_some() || args.skip.is_some() || args.cursor.is_some();
+    let must_paginate_in_memory =
+        needs_pagination && (!has_unique_parent || args.requires_inmemory_processing(RelationLoadStrategy::Query));
+    if must_paginate_in_memory && args.cursor.is_some() && !supports_parent_grouped_ops {
+        return false;
+    }
+    let needs_distinct = args.distinct.is_some();
+    let must_distinct_in_memory =
+        needs_distinct && (!has_unique_parent || args.requires_inmemory_distinct(RelationLoadStrategy::Query));
+
+    if must_distinct_in_memory && !supports_parent_grouped_ops {
+        return false;
+    }
+
+    true
+}
+
+fn raw_nested_relation_operation_result_fields_supported(
+    args: &QueryArguments,
+    selected_fields: &FieldSelection,
+    selection_order: &[String],
+    has_unique_parent: bool,
+) -> bool {
+    let needs_pagination = args.take.is_some() || args.skip.is_some() || args.cursor.is_some();
+    let must_paginate_in_memory =
+        needs_pagination && (!has_unique_parent || args.requires_inmemory_processing(RelationLoadStrategy::Query));
+    let must_match_cursor_fields = must_paginate_in_memory && args.cursor.is_some();
+    let needs_distinct = args.distinct.is_some();
+    let must_distinct_in_memory =
+        needs_distinct && (!has_unique_parent || args.requires_inmemory_distinct(RelationLoadStrategy::Query));
+
+    if !must_match_cursor_fields && !must_distinct_in_memory {
+        return true;
+    }
+
+    let Some(result_fields) = raw_nested_operation_field_name_mappings(selected_fields, selection_order) else {
+        return false;
+    };
+
+    if must_match_cursor_fields
+        && !args.cursor.as_ref().is_none_or(|cursor| {
+            cursor
+                .db_names()
+                .all(|field| raw_nested_operation_field_name(&result_fields, field.as_ref()).is_some())
+        })
+    {
+        return false;
+    }
+
+    if must_distinct_in_memory
+        && !args.distinct.as_ref().is_none_or(|distinct| {
+            distinct
+                .db_names()
+                .all(|field| raw_nested_operation_field_name(&result_fields, &field).is_some())
+        })
+    {
+        return false;
+    }
+
+    true
+}
+
+fn raw_nested_operation_field_name_mappings(
+    selected_fields: &FieldSelection,
+    selection_order: &[String],
+) -> Option<Vec<(String, String)>> {
+    let mut result_fields = Vec::new();
+
+    for prisma_name in selection_order {
+        let Some(selection) = selected_fields
+            .selections()
+            .find(|field| field.prisma_name_grouping_virtuals() == prisma_name.as_str())
+        else {
+            continue;
+        };
+
+        match selection {
+            SelectedField::Scalar(field) => result_fields.push((field.db_name().to_owned(), field.name().to_owned())),
+            SelectedField::Virtual(_) => {}
+            SelectedField::Relation(_) => {}
+            SelectedField::Composite(_) => return None,
+        }
+    }
+
+    Some(result_fields)
+}
+
+fn raw_nested_operation_field_name<'a>(mappings: &'a [(String, String)], field_name: &str) -> Option<&'a str> {
+    mappings
+        .iter()
+        .find_map(|(db_name, result_name)| (db_name == field_name).then_some(result_name.as_str()))
+}
+
+fn args_cannot_chunk(args: &QueryArguments) -> bool {
+    args.filter.as_ref().is_none_or(filter_cannot_chunk)
+}
+
+fn filter_cannot_chunk(filter: &Filter) -> bool {
+    !filter.should_batch(1)
+}
+
+fn raw_result_mapping_supported(selected_fields: &FieldSelection, selection_order: &[String]) -> bool {
+    if selected_fields
+        .selections()
+        .any(|field| matches!(field, SelectedField::Composite(_)))
+    {
+        return false;
+    }
+
+    selection_order.iter().all(|prisma_name| {
+        let Some(selection) = selected_fields
+            .selections()
+            .filter(|field| !matches!(field, SelectedField::Relation(_)))
+            .find(|field| field.prisma_name_grouping_virtuals() == prisma_name.as_str())
+        else {
+            return true;
+        };
+
+        selection.type_info().is_some()
+    })
+}
+
+fn selected_fields_contain_db_name(selected_fields: &FieldSelection, db_name: &str) -> bool {
+    selected_fields
+        .selections()
+        .filter(|field| !matches!(field, SelectedField::Relation(_)))
+        .any(|field| field.db_name().as_ref() == db_name)
+}
+
 pub(super) fn add_inmemory_join(
     parent: Expression,
     nested: Vec<ReadQuery>,
     builder: &dyn QueryBuilder,
 ) -> TranslateResult<Expression> {
-    let all_linking_fields = nested
+    let mut all_linking_fields = nested
         .iter()
         .flat_map(|nested| match nested {
             ReadQuery::RelatedRecordsQuery(rrq) => rrq.parent_field.left_scalars(),
             _ => unreachable!(),
         })
-        .unique()
-        .sorted_by(|a, b| a.name().cmp(b.name()));
+        .collect::<Vec<_>>();
+    all_linking_fields.sort_by(|a, b| a.name().cmp(b.name()));
+    all_linking_fields.dedup_by(|a, b| a.name() == b.name());
 
     let linking_fields_bindings = all_linking_fields
+        .iter()
         .map(|sf| Binding {
-            name: binding::join_parent_field(&sf),
+            name: binding::join_parent_field(sf),
             expr: Expression::MapField {
                 field: sf.db_name().into(),
                 records: Box::new(Expression::Get {
@@ -206,6 +481,573 @@ pub(super) fn add_inmemory_join(
     })
 }
 
+struct BuiltRawNestedReadQuery {
+    query: RawNestedReadQuery,
+}
+
+struct RawColumnIndexes<'a> {
+    indexes: Vec<(Cow<'a, str>, usize)>,
+}
+
+impl RawColumnIndexes<'_> {
+    fn get(&self, name: &str) -> Option<usize> {
+        self.indexes
+            .iter()
+            .find_map(|(column, index)| (column.as_ref() == name).then_some(*index))
+    }
+}
+
+fn build_raw_nested_read_root(
+    builder: &dyn QueryBuilder,
+    model: &Model,
+    args: QueryArguments,
+    selected_fields: &FieldSelection,
+    selection_order: &[String],
+    nested: &[ReadQuery],
+    unique: bool,
+) -> TranslateResult<Option<Expression>> {
+    let mut enums = EnumsMap::new();
+    let Some(mut query) = build_raw_nested_read_query(
+        builder,
+        model,
+        args,
+        selected_fields,
+        selection_order,
+        nested,
+        unique,
+        &mut enums,
+    )?
+    else {
+        return Ok(None);
+    };
+    query.query.schedule = try_build_raw_nested_final_owner_schedule(&query.query, unique, &enums);
+
+    Ok(Some(Expression::RawNestedRead {
+        query: query.query,
+        unique,
+        enums,
+    }))
+}
+
+fn build_raw_nested_read_query(
+    builder: &dyn QueryBuilder,
+    model: &Model,
+    args: QueryArguments,
+    selected_fields: &FieldSelection,
+    selection_order: &[String],
+    nested: &[ReadQuery],
+    has_unique_parent: bool,
+    enums: &mut EnumsMap,
+) -> TranslateResult<Option<BuiltRawNestedReadQuery>> {
+    let Some(db_query) = build_get_records_query(builder, model, args, selected_fields, RelationLoadStrategy::Query)?
+    else {
+        return Ok(None);
+    };
+    let column_indexes = raw_column_indexes(selected_fields);
+    let Some(fields) = raw_result_column_mappings(selected_fields, selection_order, &column_indexes, enums) else {
+        return Ok(None);
+    };
+    let Some(relations) = build_raw_nested_read_relations(nested, &column_indexes, has_unique_parent, builder, enums)?
+    else {
+        return Ok(None);
+    };
+
+    Ok(Some(BuiltRawNestedReadQuery {
+        query: RawNestedReadQuery {
+            query: db_query,
+            fields,
+            relations,
+            schedule: None,
+        },
+    }))
+}
+
+fn try_build_raw_nested_final_owner_schedule(
+    query: &RawNestedReadQuery,
+    _unique: bool,
+    enums: &EnumsMap,
+) -> Option<RawNestedFinalOwnerSchedule> {
+    if !enums.is_empty() || query.relations.len() != 4 {
+        return None;
+    }
+
+    let mut unique_relations = Vec::with_capacity(2);
+    let mut wrapper_list = None;
+    let mut child_list = None;
+
+    for (relation_index, relation) in query.relations.iter().enumerate() {
+        let RawNestedReadRelation::Direct(relation) = relation;
+
+        if relation.is_relation_unique {
+            if !raw_nested_final_owner_ops_are_empty(&relation.operations) || !relation.child.relations.is_empty() {
+                return None;
+            }
+            unique_relations.push(relation_index);
+            continue;
+        }
+
+        if let Some(child_relation_index) = raw_nested_final_owner_wrapper_relation_child_index(relation) {
+            if wrapper_list.is_some() {
+                return None;
+            }
+            wrapper_list = Some(RawNestedFinalOwnerNestedRelation {
+                relation_index,
+                child_relation_index,
+            });
+            continue;
+        }
+
+        if let Some(child_relation_index) = raw_nested_final_owner_child_list_relation_child_index(relation) {
+            if child_list.is_some() {
+                return None;
+            }
+            child_list = Some(RawNestedFinalOwnerNestedRelation {
+                relation_index,
+                child_relation_index,
+            });
+            continue;
+        }
+
+        return None;
+    }
+
+    let wrapper_list = wrapper_list?;
+    let child_list = child_list?;
+    let [unique0, unique1] = unique_relations.try_into().ok()?;
+    let root_key_column =
+        raw_nested_direct_relation(&query.relations[wrapper_list.relation_index])?.parent_column_index()?;
+    if root_key_column
+        != raw_nested_direct_relation(&query.relations[child_list.relation_index])?.parent_column_index()?
+    {
+        return None;
+    }
+
+    Some(RawNestedFinalOwnerSchedule {
+        root_key_column: RawResultColumnRef::Index(root_key_column),
+        unique_relations: [unique0, unique1],
+        wrapper_list,
+        child_list,
+    })
+}
+
+fn raw_nested_final_owner_wrapper_relation_child_index(relation: &RawNestedReadDirectRelation) -> Option<usize> {
+    if !raw_nested_final_owner_ops_are_empty(&relation.operations) || !relation.child.fields.is_empty() {
+        return None;
+    }
+
+    let child_relation_index = raw_nested_final_owner_single_child_relation_index(&relation.child)?;
+    let child_relation = raw_nested_direct_relation(&relation.child.relations[child_relation_index])?;
+    if child_relation.is_relation_unique
+        && raw_nested_final_owner_ops_are_empty(&child_relation.operations)
+        && child_relation.child.relations.is_empty()
+    {
+        Some(child_relation_index)
+    } else {
+        None
+    }
+}
+
+fn raw_nested_final_owner_child_list_relation_child_index(relation: &RawNestedReadDirectRelation) -> Option<usize> {
+    if !raw_nested_final_owner_row_ops_supported(&relation.operations) || relation.child.fields.is_empty() {
+        return None;
+    }
+
+    let child_relation_index = raw_nested_final_owner_single_child_relation_index(&relation.child)?;
+    let child_relation = raw_nested_direct_relation(&relation.child.relations[child_relation_index])?;
+    if child_relation.is_relation_unique
+        && raw_nested_final_owner_ops_are_empty(&child_relation.operations)
+        && child_relation.child.relations.is_empty()
+    {
+        Some(child_relation_index)
+    } else {
+        None
+    }
+}
+
+fn raw_nested_final_owner_single_child_relation_index(query: &RawNestedReadQuery) -> Option<usize> {
+    (query.relations.len() == 1).then_some(0)
+}
+
+fn raw_nested_direct_relation(relation: &RawNestedReadRelation) -> Option<&RawNestedReadDirectRelation> {
+    match relation {
+        RawNestedReadRelation::Direct(relation) => Some(relation),
+    }
+}
+
+trait RawNestedFinalOwnerColumnIndex {
+    fn parent_column_index(&self) -> Option<usize>;
+}
+
+impl RawNestedFinalOwnerColumnIndex for RawNestedReadDirectRelation {
+    fn parent_column_index(&self) -> Option<usize> {
+        match self.parent_column {
+            RawResultColumnRef::Index(index) => Some(index),
+            RawResultColumnRef::Name(_) => None,
+        }
+    }
+}
+
+fn raw_nested_final_owner_ops_are_empty(ops: &InMemoryOps) -> bool {
+    ops.pagination.is_none()
+        && ops.distinct.is_none()
+        && !ops.reverse
+        && ops.nested.is_empty()
+        && ops.linking_fields.is_none()
+}
+
+fn raw_nested_final_owner_row_ops_supported(ops: &InMemoryOps) -> bool {
+    ops.distinct.is_none()
+        && ops.linking_fields.is_none()
+        && !ops.reverse
+        && ops.nested.is_empty()
+        && ops
+            .pagination
+            .as_ref()
+            .is_none_or(|pagination| pagination.cursor().is_none())
+}
+
+fn build_get_records_query(
+    builder: &dyn QueryBuilder,
+    model: &Model,
+    args: QueryArguments,
+    selected_fields: &FieldSelection,
+    relation_load_strategy: RelationLoadStrategy,
+) -> TranslateResult<Option<DbQuery>> {
+    match build_get_records(builder, model, args, selected_fields, relation_load_strategy)? {
+        Expression::Query(query) => Ok(Some(query)),
+        _ => Ok(None),
+    }
+}
+
+fn raw_column_indexes(selected_fields: &FieldSelection) -> RawColumnIndexes<'_> {
+    RawColumnIndexes {
+        indexes: selected_fields
+            .selections()
+            .enumerate()
+            .map(|(index, field)| (field.db_name(), index))
+            .collect(),
+    }
+}
+
+fn raw_result_column_mappings(
+    selected_fields: &FieldSelection,
+    selection_order: &[String],
+    column_indexes: &RawColumnIndexes<'_>,
+    enums: &mut EnumsMap,
+) -> Option<Vec<RawResultColumnMapping>> {
+    let mut mappings = Vec::new();
+
+    for prisma_name in selection_order {
+        let Some(selection) = selected_fields
+            .selections()
+            .find(|field| field.prisma_name_grouping_virtuals() == prisma_name.as_str())
+        else {
+            continue;
+        };
+
+        match selection {
+            SelectedField::Scalar(field) => {
+                let column_index = column_indexes.get(field.db_name().as_ref())?;
+                mappings.push(RawResultColumnMapping {
+                    field_name: RawResultFieldName::Field(field.name().to_owned()),
+                    column: RawResultColumnRef::Index(column_index),
+                    field_type: Some(raw_field_type(selection, enums)?),
+                });
+            }
+            SelectedField::Virtual(virtual_selection) => {
+                for virtual_selection in selected_fields
+                    .virtuals()
+                    .filter(|field| field.serialized_group_name() == virtual_selection.serialized_group_name())
+                {
+                    let column_index = column_indexes.get(&virtual_selection.db_alias())?;
+                    let (group_name, field_name) = virtual_selection.serialized_name();
+                    mappings.push(RawResultColumnMapping {
+                        field_name: RawResultFieldName::Path(vec![group_name.to_owned(), field_name.to_owned()]),
+                        column: RawResultColumnRef::Index(column_index),
+                        field_type: Some(raw_field_type(
+                            &SelectedField::Virtual(virtual_selection.clone()),
+                            enums,
+                        )?),
+                    });
+                }
+            }
+            SelectedField::Relation(_) => {}
+            SelectedField::Composite(_) => return None,
+        }
+    }
+
+    Some(mappings)
+}
+
+fn raw_field_type(selection: &SelectedField, enums: &mut EnumsMap) -> Option<FieldType> {
+    let type_info = selection.type_info()?;
+    if let query_structure::TypeIdentifier::Enum(id) = type_info.typ.id {
+        enums.add(type_info.typ.dm.clone().zip(id));
+    }
+    Some(FieldType::from(&type_info))
+}
+
+fn build_raw_nested_read_relations(
+    nested: &[ReadQuery],
+    parent_column_indexes: &RawColumnIndexes<'_>,
+    has_unique_parent: bool,
+    builder: &dyn QueryBuilder,
+    enums: &mut EnumsMap,
+) -> TranslateResult<Option<Vec<RawNestedReadRelation>>> {
+    let mut relations = Vec::with_capacity(nested.len());
+
+    for nested in nested {
+        let ReadQuery::RelatedRecordsQuery(rrq) = nested else {
+            return Ok(None);
+        };
+
+        let Some(parent_scalar) = rrq.parent_field.single_left_scalar() else {
+            return Ok(None);
+        };
+        let Some(child_scalar) = get_single_relation_scalar_for_filters(&rrq.parent_field) else {
+            return Ok(None);
+        };
+        let placeholder = Placeholder {
+            name: binding::join_parent_field(&parent_scalar),
+            r#type: parent_scalar.type_info().to_prisma_type(),
+        };
+        let condition = if has_unique_parent {
+            ScalarCondition::Equals(ConditionValue::value(PrismaValue::from(placeholder)))
+        } else {
+            ScalarCondition::In(placeholder.into())
+        };
+        let links = vec![ConditionalLink::new(child_scalar, vec![condition])];
+
+        let Some((child, join, child_column_index, operations)) =
+            build_raw_read_related_records(rrq, links, has_unique_parent, builder, enums)?
+        else {
+            return Ok(None);
+        };
+
+        let Some(parent_column_index) = parent_column_indexes.get(parent_scalar.db_name().as_ref()) else {
+            return Ok(None);
+        };
+
+        relations.push(RawNestedReadRelation::Direct(RawNestedReadDirectRelation {
+            field_name: rrq.alias.as_deref().unwrap_or(&rrq.name).to_owned(),
+            child: child.query,
+            parent_column: RawResultColumnRef::Index(parent_column_index),
+            child_column: RawResultColumnRef::Index(child_column_index),
+            scope_name: binding::join_parent_field(&parent_scalar),
+            is_relation_unique: join.is_relation_unique,
+            operations,
+        }));
+    }
+
+    Ok(Some(relations))
+}
+
+fn build_raw_read_related_records(
+    rrq: &RelatedRecordsQuery,
+    links: Vec<ConditionalLink>,
+    has_unique_parent: bool,
+    builder: &dyn QueryBuilder,
+    enums: &mut EnumsMap,
+) -> TranslateResult<Option<(BuiltRawNestedReadQuery, JoinMetadata, usize, InMemoryOps)>> {
+    if rrq.args.take == Take::Some(0) {
+        return Ok(None);
+    }
+
+    let is_many_to_many = rrq.parent_field.relation().is_many_to_many();
+    let supports_parent_grouped_ops = raw_nested_relation_supports_parent_grouped_ops(rrq, is_many_to_many);
+    let mut linkage = RelationLinkage::new(rrq.parent_field.clone(), links);
+
+    if let Some(results) = rrq.parent_results.clone() {
+        let parent_link_id = rrq.parent_field.linking_fields();
+        let selection = results
+            .into_iter()
+            .exactly_one()
+            .expect("parent results should be exactly one in the query compiler")
+            .split_into(slice::from_ref(&parent_link_id))
+            .pop()
+            .unwrap();
+
+        for (field, val) in FieldSelection::from(get_relation_scalars_for_filters(&rrq.parent_field))
+            .assimilate(selection)
+            .map_err(QueryGraphBuilderError::from)?
+            .pairs
+            .into_iter()
+        {
+            let Some(sf) = field.as_scalar() else { continue };
+            let p = val.into_placeholder().expect("expected placeholder in parent results");
+            linkage.add_condition(sf.clone(), ScalarCondition::In(p.into()));
+        }
+    }
+
+    let selected_fields = rrq
+        .selected_fields
+        .clone()
+        .into_without_relations()
+        .into_virtuals_last();
+    let mut args = rrq.args.clone();
+    let mut in_memory_ops = in_memory_processing::extract_in_memory_ops_for_nested_query(&mut args, has_unique_parent);
+    if !raw_nested_relation_operations_supported(&in_memory_ops, supports_parent_grouped_ops) {
+        return Ok(None);
+    }
+
+    let (child_query, join) = if is_many_to_many {
+        build_read_m2m_query(linkage, args, &selected_fields, builder)?
+    } else {
+        build_read_one2m_query(linkage, args, &selected_fields, builder)?
+    };
+    if is_many_to_many && !in_memory_ops.is_empty_toplevel() {
+        in_memory_ops.linking_fields = Some(join.fields.clone());
+    } else if supports_parent_grouped_ops && raw_nested_relation_operations_need_record_fields(&in_memory_ops) {
+        in_memory_ops.linking_fields = Some(join.fields.clone());
+    }
+    if !raw_nested_relation_operations_supported(&in_memory_ops, supports_parent_grouped_ops) {
+        return Ok(None);
+    }
+
+    let Expression::Query(db_query) = child_query else {
+        return Ok(None);
+    };
+    let column_indexes = if is_many_to_many {
+        let [linking_field_alias] = &join.fields[..] else {
+            return Ok(None);
+        };
+        raw_many_to_many_child_column_indexes(&selected_fields, linking_field_alias.clone())
+    } else {
+        raw_column_indexes(&selected_fields)
+    };
+    let Some(fields) = raw_result_column_mappings(&selected_fields, &rrq.selection_order, &column_indexes, enums)
+    else {
+        return Ok(None);
+    };
+    if supports_parent_grouped_ops && raw_nested_relation_operations_need_record_fields(&in_memory_ops) {
+        let Some(field_name_mappings) =
+            raw_nested_operation_field_name_mappings(&selected_fields, &rrq.selection_order)
+        else {
+            return Ok(None);
+        };
+        let Some(mapped_ops) = in_memory_ops.remap_operation_field_names(|field| {
+            raw_nested_operation_field_name(&field_name_mappings, field).map(ToOwned::to_owned)
+        }) else {
+            return Ok(None);
+        };
+        in_memory_ops = mapped_ops;
+    }
+    if !raw_nested_relation_operation_mappings_supported(&in_memory_ops, &fields) {
+        return Ok(None);
+    }
+    let [child_field] = &join.fields[..] else {
+        return Ok(None);
+    };
+    let Some(child_column_index) = column_indexes.get(child_field) else {
+        return Ok(None);
+    };
+    let child_has_unique_parent = has_unique_parent && join.is_relation_unique;
+    let Some(relations) =
+        build_raw_nested_read_relations(&rrq.nested, &column_indexes, child_has_unique_parent, builder, enums)?
+    else {
+        return Ok(None);
+    };
+
+    Ok(Some((
+        BuiltRawNestedReadQuery {
+            query: RawNestedReadQuery {
+                query: db_query,
+                fields,
+                relations,
+                schedule: None,
+            },
+        },
+        join,
+        child_column_index,
+        in_memory_ops,
+    )))
+}
+
+fn raw_nested_relation_operations_supported(ops: &InMemoryOps, supports_parent_grouped_ops: bool) -> bool {
+    if ops.reverse || !ops.nested.is_empty() {
+        return false;
+    }
+
+    if supports_parent_grouped_ops {
+        return true;
+    }
+
+    ops.distinct.is_none()
+        && ops.linking_fields.is_none()
+        && ops
+            .pagination
+            .as_ref()
+            .is_none_or(|pagination| pagination.cursor().is_none())
+}
+
+fn raw_nested_relation_operation_mappings_supported(ops: &InMemoryOps, mappings: &[RawResultColumnMapping]) -> bool {
+    if !raw_nested_relation_operations_need_record_fields(ops) {
+        return true;
+    }
+
+    let has_record_field = |name: &str| {
+        mappings
+            .iter()
+            .any(|mapping| matches!(&mapping.field_name, RawResultFieldName::Field(field) if field == name))
+    };
+
+    if let Some(pagination) = &ops.pagination
+        && let Some(cursor) = pagination.cursor()
+        && !cursor.keys().all(|field| has_record_field(field))
+    {
+        return false;
+    }
+
+    if let Some(distinct) = &ops.distinct
+        && !distinct.iter().all(|field| has_record_field(field))
+    {
+        return false;
+    }
+
+    true
+}
+
+fn raw_nested_relation_operations_need_record_fields(ops: &InMemoryOps) -> bool {
+    ops.distinct.is_some()
+        || ops
+            .pagination
+            .as_ref()
+            .is_some_and(|pagination| pagination.cursor().is_some())
+}
+
+fn raw_many_to_many_child_column_indexes(
+    selected_fields: &FieldSelection,
+    linking_field_alias: String,
+) -> RawColumnIndexes<'_> {
+    let mut column_indexes = RawColumnIndexes {
+        indexes: Vec::with_capacity(selected_fields.selections().len() + 1),
+    };
+    let mut next_index = 0;
+
+    for field in selected_fields.selections() {
+        if matches!(field, SelectedField::Scalar(_)) {
+            column_indexes.indexes.push((field.db_name(), next_index));
+            next_index += 1;
+        }
+    }
+
+    // `build_get_related_records()` selects scalar model columns, then the hidden m2m linking alias,
+    // then any additional virtual selections.
+    column_indexes
+        .indexes
+        .push((Cow::Owned(linking_field_alias), next_index));
+    next_index += 1;
+
+    for field in selected_fields.selections() {
+        if matches!(field, SelectedField::Virtual(_)) {
+            column_indexes.indexes.push((field.db_name(), next_index));
+            next_index += 1;
+        }
+    }
+
+    column_indexes
+}
+
 fn build_read_related_records(
     mut rrq: RelatedRecordsQuery,
     links: Vec<ConditionalLink>,
@@ -241,7 +1083,7 @@ fn build_read_related_records(
         }
     }
 
-    let selected_fields = rrq.selected_fields.without_relations().into_virtuals_last();
+    let selected_fields = rrq.selected_fields.into_without_relations().into_virtuals_last();
 
     let mut in_memory_ops =
         in_memory_processing::extract_in_memory_ops_for_nested_query(&mut rrq.args, has_unique_parent);
@@ -281,6 +1123,14 @@ fn get_relation_scalars_for_filters(rf: &RelationField) -> Vec<ScalarField> {
     }
 }
 
+fn get_single_relation_scalar_for_filters(rf: &RelationField) -> Option<ScalarField> {
+    if rf.relation().is_many_to_many() {
+        rf.single_left_scalar()
+    } else {
+        rf.related_field().single_left_scalar()
+    }
+}
+
 fn build_read_m2m_query(
     linkage: RelationLinkage,
     args: QueryArguments,
@@ -308,7 +1158,7 @@ fn build_read_one2m_query(
 ) -> TranslateResult<(Expression, JoinMetadata)> {
     let (field, conditions_per_field) = linkage.into_parent_field_and_conditions();
 
-    let filters = args
+    let mut filters = args
         .filter
         .take()
         .into_iter()
@@ -320,10 +1170,21 @@ fn build_read_one2m_query(
                     mode: QueryMode::Default,
                 })
             })
-        }))
-        .collect_vec();
+        }));
 
-    args.filter = Some(Filter::And(filters));
+    let filter = match (filters.next(), filters.next()) {
+        (None, _) => Filter::And(Vec::new()),
+        (Some(filter), None) => filter,
+        (Some(first), Some(second)) => {
+            let mut all_filters = Vec::with_capacity(2 + filters.size_hint().0);
+            all_filters.push(first);
+            all_filters.push(second);
+            all_filters.extend(filters);
+            Filter::And(all_filters)
+        }
+    };
+
+    args.filter = Some(filter);
 
     let expr = build_get_records(
         builder,

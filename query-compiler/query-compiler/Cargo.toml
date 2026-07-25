@@ -18,6 +18,7 @@ itertools.workspace = true
 bon.workspace = true
 pretty = { workspace = true, features = ["termcolor"] }
 indexmap = { workspace = true, features = ["serde"] }
+smallvec.workspace = true
 
 [dev-dependencies]
 codspeed-criterion-compat.workspace = true

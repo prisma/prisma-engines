@@ -1,6 +1,6 @@
 use std::slice;
 
-use query_structure::{Filter, SelectionResult, WriteArgs};
+use query_structure::{Filter, Placeholder, SelectionResult, WriteArgs};
 
 use crate::{Computation, Flow, Node, NodeInputField, Query, ReadQuery, WriteQuery};
 
@@ -84,26 +84,38 @@ node_input_field!(
 
 node_input_field!(
     LeftSideDiffInput,
-    Vec<SelectionResult>,
+    Option<Placeholder>,
     Node::Computation(Computation::DiffLeftToRight(diff_node) | Computation::DiffRightToLeft(diff_node)) => &mut diff_node.left
 );
 
 node_input_field!(
     RightSideDiffInput,
-    Vec<SelectionResult>,
+    Option<Placeholder>,
     Node::Computation(Computation::DiffLeftToRight(diff_node) | Computation::DiffRightToLeft(diff_node)) => &mut diff_node.right
 );
 
 node_input_field!(
+    RequiredOneToManySetOldInput,
+    Option<Placeholder>,
+    Node::Computation(Computation::RequiredOneToManySet(set_node)) => &mut set_node.old_children
+);
+
+node_input_field!(
+    RequiredOneToManySetNewInput,
+    Option<Placeholder>,
+    Node::Computation(Computation::RequiredOneToManySet(set_node)) => &mut set_node.new_children
+);
+
+node_input_field!(
     IfInput,
-    Vec<SelectionResult>,
+    Option<Placeholder>,
     Node::Flow(Flow::If { data, .. }) => data
 );
 
 node_input_field!(
     ReturnInput,
-    Vec<SelectionResult>,
-    Node::Flow(Flow::Return(data)) => data
+    Option<Placeholder>,
+    Node::Flow(Flow::Return(data) | Flow::ReturnPreservingResult(data)) => data
 );
 
 node_input_field!(
@@ -128,6 +140,12 @@ node_input_field!(
     DisconnectParentInput,
     Option<SelectionResult>,
     Node::Query(Query::Write(WriteQuery::DisconnectRecords(dr))) => &mut dr.parent_id
+);
+
+node_input_field!(
+    DisconnectAllParentInput,
+    Option<SelectionResult>,
+    Node::Query(Query::Write(WriteQuery::DisconnectAllRecords(dr))) => &mut dr.parent_id
 );
 
 node_input_field!(

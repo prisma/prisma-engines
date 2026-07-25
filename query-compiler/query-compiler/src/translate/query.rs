@@ -7,7 +7,7 @@ use itertools::Itertools;
 use query_builder::QueryBuilder;
 use query_core::Query;
 use query_structure::{PrismaValue, ScalarWriteOperation, WriteOperation};
-use read::translate_read_query;
+use read::{guarantees_raw_nested_read_root, translate_read_query};
 use write::translate_write_query;
 
 use crate::{
@@ -50,5 +50,12 @@ pub(crate) fn translate_query(query: Query, builder: &dyn QueryBuilder) -> Trans
                 translate_write_query(wq, builder)
             }
         }
+    }
+}
+
+pub(super) fn query_guarantees_raw_nested_read_root(query: &Query) -> bool {
+    match query {
+        Query::Read(read_query) => guarantees_raw_nested_read_root(read_query),
+        Query::Write(_) => false,
     }
 }

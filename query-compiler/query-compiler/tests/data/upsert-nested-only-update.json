@@ -1,0 +1,23 @@
+{
+  "modelName": "User",
+  "action": "upsertOne",
+  "query": {
+    "arguments": {
+      "relationLoadStrategy": "query",
+      "where": { "email": "user.1@prisma.io" },
+      "update": {
+        "posts": {
+          "create": { "title": "Nested upsert update post" }
+        }
+      },
+      "create": { "email": "user.1@prisma.io" }
+    },
+    "selection": {
+      "$scalars": true,
+      "posts": {
+        "arguments": {},
+        "selection": { "$scalars": true }
+      }
+    }
+  }
+}

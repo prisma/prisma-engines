@@ -23,6 +23,10 @@ impl FieldSelection {
         self.selections
     }
 
+    pub fn as_slice(&self) -> &[SelectedField] {
+        &self.selections
+    }
+
     /// Returns `true` if self contains (at least) all fields specified in `other`. `false` otherwise.
     /// Recurses into composite selections and ensures that composite selections are supersets as well.
     pub fn is_superset_of(&self, other: &Self) -> bool {
@@ -64,12 +68,39 @@ impl FieldSelection {
         )
     }
 
-    pub fn into_virtuals_last(self) -> Self {
-        let (virtuals, non_virtuals): (Vec<_>, Vec<_>) = self
-            .into_iter()
-            .partition(|field| matches!(field, SelectedField::Virtual(_)));
+    pub fn into_without_relations(self) -> Self {
+        FieldSelection::new(
+            self.selections
+                .into_iter()
+                .filter(|field| !matches!(field, SelectedField::Relation(_)))
+                .collect(),
+        )
+    }
 
-        FieldSelection::new(non_virtuals.into_iter().chain(virtuals).collect())
+    pub fn into_virtuals_last(self) -> Self {
+        let virtual_count = self
+            .selections
+            .iter()
+            .filter(|field| matches!(field, SelectedField::Virtual(_)))
+            .count();
+
+        if virtual_count == 0 {
+            return self;
+        }
+
+        let mut non_virtuals = Vec::with_capacity(self.selections.len());
+        let mut virtuals = Vec::with_capacity(virtual_count);
+
+        for field in self.selections {
+            if matches!(field, SelectedField::Virtual(_)) {
+                virtuals.push(field);
+            } else {
+                non_virtuals.push(field);
+            }
+        }
+
+        non_virtuals.extend(virtuals);
+        FieldSelection::new(non_virtuals)
     }
 
     pub fn to_virtuals_last(&self) -> Self {
@@ -188,10 +219,29 @@ impl FieldSelection {
     ///
     /// /!\ Important assumption: All selections are on the same model.
     pub fn union(selections: Vec<Self>) -> Self {
-        let chained = selections.into_iter().flatten();
+        Self::union_iter(selections)
+    }
+
+    /// Merges all given `FieldSelection` a set union of all.
+    ///
+    /// /!\ Important assumption: All selections are on the same model.
+    pub fn union_iter(selections: impl IntoIterator<Item = Self>) -> Self {
+        let mut selections = selections.into_iter();
+        let Some(first) = selections.next() else {
+            return Self::default();
+        };
+
+        let Some(second) = selections.next() else {
+            return first;
+        };
 
         FieldSelection {
-            selections: chained.unique().collect(),
+            selections: first
+                .into_iter()
+                .chain(second)
+                .chain(selections.flatten())
+                .unique()
+                .collect(),
         }
     }
 
@@ -200,6 +250,22 @@ impl FieldSelection {
     /// occurrence of the first field in order from left (`self`) to right (`other`)
     /// is retained. Assumes that both selections reason over the same model.
     pub fn merge(self, other: FieldSelection) -> FieldSelection {
+        if other.selections.is_empty() {
+            return self;
+        }
+
+        if self.selections.is_empty() {
+            return other;
+        }
+
+        if other
+            .selections
+            .iter()
+            .all(|selection| self.selections.contains(selection))
+        {
+            return self;
+        }
+
         let selections = self.selections.into_iter().chain(other.selections).unique().collect();
 
         FieldSelection { selections }

@@ -5,107 +5,137 @@ pub(crate) use aggregate::*;
 pub(crate) use group_by::*;
 
 use super::*;
-use crate::FieldPair;
-use itertools::Itertools;
+use crate::{FieldPair, ParsedObject};
 use query_structure::{AggregationSelection, Model, ScalarFieldRef};
 use schema::constants::aggregations::*;
 
-/// Resolves the given field as a aggregation query.
-fn resolve_query(
+fn collect_selection_tree_and_selectors(
+    fields: Vec<FieldPair<'_>>,
+    model: &Model,
+    allow_deprecated: bool,
+) -> QueryGraphBuilderResult<(Vec<(String, Option<Vec<String>>)>, Vec<AggregationSelection>)> {
+    let mut selection_order = Vec::with_capacity(fields.len());
+    let mut selectors = Vec::with_capacity(fields.len());
+
+    for field in fields {
+        let (selection, selector) = resolve_query_and_selection(field, model, allow_deprecated)?;
+        selection_order.push(selection);
+        selectors.push(selector);
+    }
+
+    Ok((selection_order, selectors))
+}
+
+/// Resolves the given field as an aggregation query.
+fn resolve_query_and_selection(
     field: FieldPair<'_>,
     model: &Model,
     allow_deprecated: bool,
-) -> QueryGraphBuilderResult<AggregationSelection> {
-    let count_resolver = |mut field: FieldPair<'_>, model: &Model| {
-        let nested_fields = field
-            .parsed_field
-            .nested_fields
-            .as_mut()
-            .expect("Expected at least one selection for aggregate");
+) -> QueryGraphBuilderResult<((String, Option<Vec<String>>), AggregationSelection)> {
+    let name = field.parsed_field.name;
+    let nested_fields = field.parsed_field.nested_fields;
 
-        let all_position = nested_fields
-            .fields
-            .iter()
-            .find_position(|f| f.parsed_field.name == "_all");
-
-        match all_position {
-            Some((pos, _)) => {
-                nested_fields.fields.remove(pos);
-
+    let (nested_selection, query) = match name.as_str() {
+        COUNT if allow_deprecated => {
+            let (nested_selection, has_count_all, fields) = resolve_fields(model, nested_fields);
+            (
+                nested_selection,
                 AggregationSelection::Count {
-                    all: Some(model.into()),
-                    fields: resolve_fields(model, field),
-                }
-            }
-            None => AggregationSelection::Count {
-                all: None,
-                fields: resolve_fields(model, field),
-            },
+                    all: has_count_all.then(|| model.into()),
+                    fields,
+                },
+            )
         }
+        AVG if allow_deprecated => {
+            let (nested_selection, _, fields) = resolve_fields(model, nested_fields);
+            (nested_selection, AggregationSelection::Average(fields))
+        }
+        SUM if allow_deprecated => {
+            let (nested_selection, _, fields) = resolve_fields(model, nested_fields);
+            (nested_selection, AggregationSelection::Sum(fields))
+        }
+        MIN if allow_deprecated => {
+            let (nested_selection, _, fields) = resolve_fields(model, nested_fields);
+            (nested_selection, AggregationSelection::Min(fields))
+        }
+        MAX if allow_deprecated => {
+            let (nested_selection, _, fields) = resolve_fields(model, nested_fields);
+            (nested_selection, AggregationSelection::Max(fields))
+        }
+
+        UNDERSCORE_COUNT => {
+            let (nested_selection, has_count_all, fields) = resolve_fields(model, nested_fields);
+            (
+                nested_selection,
+                AggregationSelection::Count {
+                    all: has_count_all.then(|| model.into()),
+                    fields,
+                },
+            )
+        }
+        UNDERSCORE_AVG => {
+            let (nested_selection, _, fields) = resolve_fields(model, nested_fields);
+            (nested_selection, AggregationSelection::Average(fields))
+        }
+        UNDERSCORE_SUM => {
+            let (nested_selection, _, fields) = resolve_fields(model, nested_fields);
+            (nested_selection, AggregationSelection::Sum(fields))
+        }
+        UNDERSCORE_MIN => {
+            let (nested_selection, _, fields) = resolve_fields(model, nested_fields);
+            (nested_selection, AggregationSelection::Min(fields))
+        }
+        UNDERSCORE_MAX => {
+            let (nested_selection, _, fields) = resolve_fields(model, nested_fields);
+            (nested_selection, AggregationSelection::Max(fields))
+        }
+
+        name => (
+            None,
+            AggregationSelection::Field(model.fields().find_from_scalar(name).unwrap()),
+        ),
     };
 
-    let query = match field.parsed_field.name.as_str() {
-        COUNT if allow_deprecated => count_resolver(field, model),
-        AVG if allow_deprecated => AggregationSelection::Average(resolve_fields(model, field)),
-        SUM if allow_deprecated => AggregationSelection::Sum(resolve_fields(model, field)),
-        MIN if allow_deprecated => AggregationSelection::Min(resolve_fields(model, field)),
-        MAX if allow_deprecated => AggregationSelection::Max(resolve_fields(model, field)),
-
-        UNDERSCORE_COUNT => count_resolver(field, model),
-        UNDERSCORE_AVG => AggregationSelection::Average(resolve_fields(model, field)),
-        UNDERSCORE_SUM => AggregationSelection::Sum(resolve_fields(model, field)),
-        UNDERSCORE_MIN => AggregationSelection::Min(resolve_fields(model, field)),
-        UNDERSCORE_MAX => AggregationSelection::Max(resolve_fields(model, field)),
-
-        name => AggregationSelection::Field(model.fields().find_from_scalar(name).unwrap()),
-    };
-
-    Ok(query)
+    Ok(((name, nested_selection), query))
 }
 
-fn resolve_fields(model: &Model, field: FieldPair<'_>) -> Vec<ScalarFieldRef> {
+fn resolve_fields(
+    model: &Model,
+    nested_fields: Option<ParsedObject<'_>>,
+) -> (Option<Vec<String>>, bool, Vec<ScalarFieldRef>) {
     let scalars = model.fields().scalar();
-    let fields = field
-        .parsed_field
-        .nested_fields
+    let fields = nested_fields
         .expect("Expected at least one selection for aggregate")
         .fields;
+    let mut selection_order = Vec::with_capacity(fields.len());
+    let mut has_count_all = false;
+    let mut selected_fields = Vec::with_capacity(fields.len());
 
-    fields
-        .into_iter()
-        .filter_map(|f| {
-            if f.parsed_field.name == "_all" {
-                None
-            } else {
-                scalars.clone().find_map(|sf| {
-                    if sf.name() == f.parsed_field.name {
-                        Some(sf)
-                    } else {
-                        None
-                    }
-                })
-            }
-        })
-        .collect()
-}
+    for field in fields {
+        let name = field.parsed_field.name;
 
-fn collect_selection_tree(fields: &[FieldPair<'_>]) -> Vec<(String, Option<Vec<String>>)> {
-    fields
-        .iter()
-        .map(|field| {
-            let field = &field.parsed_field;
-            (
-                field.name.clone(),
-                field.nested_fields.as_ref().and_then(|nested_object| {
-                    let nested: Vec<_> = nested_object
-                        .fields
-                        .iter()
-                        .map(|f| f.parsed_field.name.clone())
-                        .collect();
+        if name == "_all" {
+            has_count_all = true;
+            selection_order.push(name);
+            continue;
+        }
 
-                    if nested.is_empty() { None } else { Some(nested) }
-                }),
-            )
-        })
-        .collect()
+        let scalar = scalars
+            .clone()
+            .find_map(|sf| if sf.name() == name.as_str() { Some(sf) } else { None });
+
+        selection_order.push(name);
+
+        if let Some(scalar) = scalar {
+            selected_fields.push(scalar);
+        }
+    }
+
+    let selection_order = if selection_order.is_empty() {
+        None
+    } else {
+        Some(selection_order)
+    };
+
+    (selection_order, has_count_all, selected_fields)
 }

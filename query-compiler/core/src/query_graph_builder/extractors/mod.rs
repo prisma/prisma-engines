@@ -6,6 +6,6 @@ mod utils;
 pub(crate) use filters::*;
 pub(crate) use query_arguments::*;
 pub(crate) use rel_aggregations::*;
-pub(crate) use utils::resolve_compound_field;
+pub(crate) use utils::is_compound_field;
 
 use crate::query_document::*;

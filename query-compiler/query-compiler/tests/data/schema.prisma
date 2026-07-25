@@ -49,6 +49,17 @@ model Category {
   posts Post[]
 }
 
+model MappedPost {
+  id         Int              @id @default(autoincrement()) @map("post_id")
+  categories MappedCategory[]
+}
+
+model MappedCategory {
+  id    Int          @id @default(autoincrement()) @map("cat_id")
+  name  String
+  posts MappedPost[]
+}
+
 model ParentModelWithCompositeId {
   a        Int
   b        Int

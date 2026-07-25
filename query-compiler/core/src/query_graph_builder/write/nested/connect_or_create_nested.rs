@@ -24,7 +24,7 @@ pub(crate) fn nested_connect_or_create(
     child_model: &Model,
 ) -> QueryGraphBuilderResult<()> {
     let relation = parent_relation_field.relation();
-    let values = utils::coerce_vec(value);
+    let values = utils::coerce_values(value);
 
     if relation.is_many_to_many() {
         handle_many_to_many(
@@ -95,7 +95,7 @@ fn handle_many_to_many(
     query_schema: &QuerySchema,
     parent_node: NodeRef,
     parent_relation_field: &RelationFieldRef,
-    values: Vec<ParsedInputValue<'_>>,
+    values: utils::CoercedParsedInputValues<'_>,
     child_model: &Model,
 ) -> QueryGraphBuilderResult<()> {
     for value in values {
@@ -108,34 +108,30 @@ fn handle_many_to_many(
         let create_map: ParsedInputMap<'_> = create_arg.try_into()?;
 
         let filter = extract_unique_filter(where_map, child_model)?;
+        let child_model_identifier = child_model.shard_aware_primary_identifier();
         let read_node = graph.create_node(utils::read_id_infallible(
             child_model.clone(),
-            child_model.shard_aware_primary_identifier(),
+            child_model_identifier.clone(),
             filter,
         ));
 
         let create_node = create::create_record_node(graph, query_schema, child_model.clone(), create_map)?;
-        let if_node = graph.create_node(Flow::if_non_empty());
-
-        let connect_exists_node =
-            connect::connect_records_node(graph, &parent_node, &read_node, parent_relation_field, 1)?;
-
-        let _connect_create_node =
-            connect::connect_records_node(graph, &parent_node, &create_node, parent_relation_field, 1)?;
+        let if_node = graph.create_node(Flow::if_non_empty_returning_condition());
 
         graph.create_edge(&parent_node, &read_node, QueryGraphDependency::ExecutionOrder)?;
         graph.create_edge(
             &read_node,
             &if_node,
             QueryGraphDependency::ProjectedDataDependency(
-                child_model.shard_aware_primary_identifier(),
-                RowSink::All(&IfInput),
+                child_model_identifier.clone(),
+                RowSink::ProjectedPlaceholder(&IfInput),
                 None,
             ),
         )?;
 
-        graph.create_edge(&if_node, &connect_exists_node, QueryGraphDependency::Then)?;
         graph.create_edge(&if_node, &create_node, QueryGraphDependency::Else)?;
+
+        connect::connect_records_node(graph, &parent_node, &if_node, parent_relation_field, 1)?;
     }
 
     Ok(())
@@ -147,7 +143,7 @@ fn handle_one_to_many(
     query_schema: &QuerySchema,
     parent_node: NodeRef,
     parent_relation_field: &RelationFieldRef,
-    values: Vec<ParsedInputValue<'_>>,
+    values: utils::CoercedParsedInputValues<'_>,
     child_model: &Model,
 ) -> QueryGraphBuilderResult<()> {
     if parent_relation_field.is_inlined_on_enclosing_model() {
@@ -177,7 +173,7 @@ fn handle_one_to_one(
     query_schema: &QuerySchema,
     parent_node: NodeRef,
     parent_relation_field: &RelationFieldRef,
-    mut values: Vec<ParsedInputValue<'_>>,
+    mut values: utils::CoercedParsedInputValues<'_>,
     child_model: &Model,
 ) -> QueryGraphBuilderResult<()> {
     let value = values.pop().unwrap();
@@ -248,7 +244,7 @@ fn one_to_many_inlined_child(
     query_schema: &QuerySchema,
     parent_node: NodeRef,
     parent_relation_field: &RelationFieldRef,
-    values: Vec<ParsedInputValue<'_>>,
+    values: utils::CoercedParsedInputValues<'_>,
     child_model: &Model,
 ) -> QueryGraphBuilderResult<()> {
     for value in values {
@@ -281,8 +277,8 @@ fn one_to_many_inlined_child(
             &read_node,
             &if_node,
             QueryGraphDependency::ProjectedDataDependency(
-                child_model.shard_aware_primary_identifier(),
-                RowSink::All(&IfInput),
+                child_link.clone(),
+                RowSink::ProjectedPlaceholder(&IfInput),
                 None,
             ),
         )?;
@@ -369,7 +365,7 @@ fn one_to_many_inlined_parent(
     query_schema: &QuerySchema,
     parent_node: NodeRef,
     parent_relation_field: &RelationFieldRef,
-    mut values: Vec<ParsedInputValue<'_>>,
+    mut values: utils::CoercedParsedInputValues<'_>,
     child_model: &Model,
 ) -> QueryGraphBuilderResult<()> {
     let parent_link = parent_relation_field.linking_fields();
@@ -394,22 +390,19 @@ fn one_to_many_inlined_parent(
     graph.mark_nodes(&parent_node, &read_node);
     graph.create_edge(&parent_node, &read_node, QueryGraphDependency::ExecutionOrder)?;
 
-    let if_node = graph.create_node(Flow::if_non_empty());
+    let if_node = graph.create_node(Flow::if_non_empty_returning_condition());
     let create_node = create::create_record_node(graph, query_schema, child_model.clone(), create_map)?;
-    let return_existing = graph.create_node(Flow::Return(Vec::new()));
-    let return_create = graph.create_node(Flow::Return(Vec::new()));
 
     graph.create_edge(
         &read_node,
         &if_node,
         QueryGraphDependency::ProjectedDataDependency(
-            child_model.shard_aware_primary_identifier(),
-            RowSink::All(&IfInput),
+            child_link.clone(),
+            RowSink::ProjectedPlaceholder(&IfInput),
             None,
         ),
     )?;
 
-    graph.create_edge(&if_node, &return_existing, QueryGraphDependency::Then)?;
     graph.create_edge(&if_node, &create_node, QueryGraphDependency::Else)?;
 
     graph.create_edge(
@@ -420,18 +413,6 @@ fn one_to_many_inlined_parent(
             RowSink::ExactlyOneWriteArgs(parent_link, &UpdateOrCreateArgsInput),
             None,
         ),
-    )?;
-
-    graph.create_edge(
-        &read_node,
-        &return_existing,
-        QueryGraphDependency::ProjectedDataDependency(child_link.clone(), RowSink::All(&ReturnInput), None),
-    )?;
-
-    graph.create_edge(
-        &create_node,
-        &return_create,
-        QueryGraphDependency::ProjectedDataDependency(child_link, RowSink::All(&ReturnInput), None),
     )?;
 
     Ok(())
@@ -529,15 +510,14 @@ fn one_to_one_inlined_parent(
 
     let if_node = graph.create_node(Flow::if_non_empty());
     let create_node = create::create_record_node(graph, query_schema, child_model.clone(), create_data)?;
-    let return_existing = graph.create_node(Flow::Return(Vec::new()));
-    let return_create = graph.create_node(Flow::Return(Vec::new()));
+    let return_existing = graph.create_node(Flow::Return(None));
 
     graph.create_edge(
         &read_node,
         &if_node,
         QueryGraphDependency::ProjectedDataDependency(
-            child_model.shard_aware_primary_identifier(),
-            RowSink::All(&IfInput),
+            child_link.clone(),
+            RowSink::ProjectedPlaceholder(&IfInput),
             None,
         ),
     )?;
@@ -556,17 +536,15 @@ fn one_to_one_inlined_parent(
     graph.create_edge(
         &read_node,
         &return_existing,
-        QueryGraphDependency::ProjectedDataDependency(child_link.clone(), RowSink::All(&ReturnInput), None),
+        QueryGraphDependency::ProjectedDataDependency(
+            child_link.clone(),
+            RowSink::ProjectedPlaceholder(&ReturnInput),
+            None,
+        ),
     )?;
 
     // Else branch handling
     graph.create_edge(&if_node, &create_node, QueryGraphDependency::Else)?;
-    graph.create_edge(
-        &create_node,
-        &return_create,
-        QueryGraphDependency::ProjectedDataDependency(child_link.clone(), RowSink::All(&ReturnInput), None),
-    )?;
-
     if utils::node_is_create(graph, &parent_node) {
         // No need to perform checks, a child can't exist if the parent is just getting created. Simply inject.
         graph.create_edge(
@@ -714,8 +692,8 @@ fn one_to_one_inlined_child(
         &read_new_child_node,
         &if_node,
         QueryGraphDependency::ProjectedDataDependency(
-            child_model.shard_aware_primary_identifier(),
-            RowSink::All(&IfInput),
+            child_link.clone(),
+            RowSink::ProjectedPlaceholder(&IfInput),
             None,
         ),
     )?;
@@ -809,7 +787,7 @@ fn one_to_one_inlined_child(
             &diff_node,
             QueryGraphDependency::ProjectedDataDependency(
                 child_model_identifier.clone(),
-                RowSink::All(&LeftSideDiffInput),
+                RowSink::ProjectedPlaceholder(&LeftSideDiffInput),
                 None,
             ),
         )?;
@@ -820,7 +798,7 @@ fn one_to_one_inlined_child(
             &diff_node,
             QueryGraphDependency::ProjectedDataDependency(
                 child_model_identifier.clone(),
-                RowSink::All(&RightSideDiffInput),
+                RowSink::ProjectedPlaceholder(&RightSideDiffInput),
                 None,
             ),
         )?;
@@ -829,7 +807,11 @@ fn one_to_one_inlined_child(
         graph.create_edge(
             &diff_node,
             &if_node,
-            QueryGraphDependency::ProjectedDataDependency(child_model_identifier.clone(), RowSink::All(&IfInput), None),
+            QueryGraphDependency::ProjectedDataDependency(
+                child_model_identifier.clone(),
+                RowSink::ProjectedPlaceholder(&IfInput),
+                None,
+            ),
         )?;
 
         // update old child, set link to null

@@ -1,32 +1,39 @@
 ---
 source: query-compiler/query-compiler/tests/queries.rs
+assertion_line: 76
 expression: pretty
 input_file: query-compiler/query-compiler/tests/data/query-many-one2m.json
+snapshot_kind: text
 ---
-dataMap {
-    id: Int (id)
-    title: String (title)
-    userId: Int (userId)
-    user (from @nested$user): {
-        id: Int (id)
-        email: String (email)
-        role: Enum<Role> (role)
-    }
-}
+rawNestedRead (query «SELECT "public"."Post"."id", "public"."Post"."title",
+                      "public"."Post"."userId" FROM "public"."Post" WHERE 1=1
+                      OFFSET $1»
+               params [const(BigInt(0))]
+               fields {
+                   id: 0
+                   title: 1
+                   userId: 2
+               }
+               relations [user on left.2 = right.0 unique (query «SELECT
+                                                                  "public"."User"."id",
+                                                                  "public"."User"."email",
+                                                                  "public"."User"."role"::text
+                                                                  FROM
+                                                                  "public"."User"
+                                                                  WHERE
+                                                                  "public"."User"."id"
+                                                                  IN [$1,*]
+                                                                  OFFSET $2»
+                                                           params [var(@parent$userId as Int),
+                                                                   const(BigInt(0))]
+                                                           fields {
+                                                               id: 0
+                                                               email: 1
+                                                               role: 2
+                                                           })])
 enums {
     Role: {
         admin: ADMIN
         user: USER
     }
 }
-let @parent = query «SELECT "public"."Post"."id", "public"."Post"."title",
-                     "public"."Post"."userId" FROM "public"."Post" WHERE 1=1
-                     OFFSET $1»
-              params [const(BigInt(0))]
-in let @parent$userId = mapField userId (get @parent)
-   in join (get @parent)
-      with (query «SELECT "public"."User"."id", "public"."User"."email",
-                   "public"."User"."role"::text FROM "public"."User" WHERE
-                   "public"."User"."id" IN [$1,*] OFFSET $2»
-            params [var(@parent$userId as Int),
-                    const(BigInt(0))]) on unique left.(userId) = right.(id) as @nested$user
