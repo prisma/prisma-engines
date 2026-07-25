@@ -237,8 +237,28 @@ impl Connection {
 /// If the script cannot be parsed, returns an iterator with the original script as the only item.
 fn split_script_into_statements(script: &str) -> impl Iterator<Item = &str> {
     use sqlparser::dialect::PostgreSqlDialect;
+    use sqlparser::keywords::Keyword;
     use sqlparser::parser::{Parser, ParserError};
     use sqlparser::tokenizer::{Location, Token};
+
+    /// Consumes statements that are valid PostgreSQL syntax but that sqlparser cannot parse
+    /// yet, returning whether one was consumed. It is important not to bail out of splitting
+    /// the script when encountering them: `DROP INDEX CONCURRENTLY` cannot run inside a
+    /// transaction block, so submitting the whole script as a single implicitly transactional
+    /// batch would make it fail on the database side.
+    ///
+    /// The statements handled here cannot contain a semicolon anywhere except at the very end
+    /// (quoted identifiers and string literals are single tokens), so skipping to the next
+    /// semicolon token consumes exactly one statement.
+    fn consume_statement_unsupported_by_parser(parser: &mut Parser<'_>) -> bool {
+        if !parser.parse_keywords(&[Keyword::DROP, Keyword::INDEX, Keyword::CONCURRENTLY]) {
+            return false;
+        }
+        while !matches!(parser.peek_token_ref().token, Token::SemiColon | Token::EOF) {
+            parser.advance_token();
+        }
+        true
+    }
 
     fn detect_statement_terminators(mut parser: Parser<'_>) -> Result<Vec<Location>, ParserError> {
         let mut terminators = vec![];
@@ -247,7 +267,9 @@ fn split_script_into_statements(script: &str) -> impl Iterator<Item = &str> {
             // because the `span` in the returned AST does not actually represent the entire
             // statement. It only accounts for a union of the spans of all user-provided
             // identifiers and constants, excluding keywords and some other tokens.
-            parser.parse_statement()?;
+            if !consume_statement_unsupported_by_parser(&mut parser) {
+                parser.parse_statement()?;
+            }
             terminators.push(parser.peek_token_ref().span.start);
             let _ = parser.consume_token(&Token::SemiColon);
         }
@@ -594,6 +616,65 @@ mod tests {
                 "-- This is a comment\nCREATE TABLE test (id INT);",
                 " /* block comment */\nINSERT INTO test VALUES (1);"
             ]
+        );
+    }
+
+    #[test]
+    fn split_script_into_statements_multiple_drop_index_concurrently() {
+        let script = "DROP INDEX CONCURRENTLY \"idx_one\";\nDROP INDEX CONCURRENTLY IF EXISTS \"idx_two\";";
+        let statements: Vec<&str> = split_script_into_statements(script).collect();
+        assert_eq!(
+            statements,
+            vec![
+                "DROP INDEX CONCURRENTLY \"idx_one\";",
+                "\nDROP INDEX CONCURRENTLY IF EXISTS \"idx_two\";"
+            ]
+        );
+    }
+
+    #[test]
+    fn split_script_into_statements_drop_index_concurrently_mixed_with_other_statements() {
+        let script = indoc! {r#"
+            -- DropIndex
+            DROP INDEX CONCURRENTLY "users_name_idx";
+
+            CREATE INDEX CONCURRENTLY "users_email_idx" ON "users"("email");
+
+            DROP INDEX CONCURRENTLY "public"."users_age_idx" RESTRICT;
+        "#};
+        let statements: Vec<&str> = split_script_into_statements(script).collect();
+        assert_eq!(
+            statements,
+            vec![
+                indoc! {r#"
+                    -- DropIndex
+                    DROP INDEX CONCURRENTLY "users_name_idx";"#},
+                "\n\nCREATE INDEX CONCURRENTLY \"users_email_idx\" ON \"users\"(\"email\");",
+                "\n\nDROP INDEX CONCURRENTLY \"public\".\"users_age_idx\" RESTRICT;"
+            ]
+        );
+    }
+
+    #[test]
+    fn split_script_into_statements_drop_index_concurrently_without_trailing_semicolon() {
+        let script = "DROP INDEX CONCURRENTLY \"idx_one\";\nDROP INDEX CONCURRENTLY \"idx_two\"";
+        let statements: Vec<&str> = split_script_into_statements(script).collect();
+        assert_eq!(
+            statements,
+            vec![
+                "DROP INDEX CONCURRENTLY \"idx_one\";",
+                "\nDROP INDEX CONCURRENTLY \"idx_two\""
+            ]
+        );
+    }
+
+    #[test]
+    fn split_script_into_statements_drop_index_without_concurrently_is_unaffected() {
+        let script = "DROP INDEX \"idx_one\";\nDROP INDEX IF EXISTS \"idx_two\";";
+        let statements: Vec<&str> = split_script_into_statements(script).collect();
+        assert_eq!(
+            statements,
+            vec!["DROP INDEX \"idx_one\";", "\nDROP INDEX IF EXISTS \"idx_two\";"]
         );
     }
 }

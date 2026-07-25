@@ -1164,3 +1164,35 @@ ALTER TABLE "Person" ADD COLUMN     "role" {added_type};
             ))
         });
 }
+
+#[test_connector(tags(Postgres))]
+fn postgres_apply_migrations_works_with_multiple_drop_index_concurrently_statements(api: TestApi) {
+    let dm = "";
+    let migrations_directory = api.create_migrations_directory();
+
+    let migration = r#"
+        CREATE TABLE "Person" (
+            id TEXT PRIMARY KEY,
+            "firstName" TEXT NOT NULL,
+            "lastName" TEXT NOT NULL
+        );
+
+        CREATE INDEX CONCURRENTLY "Person_firstName_idx" ON "Person"("firstName");
+        CREATE INDEX CONCURRENTLY "Person_lastName_idx" ON "Person"("lastName");
+
+        DROP INDEX CONCURRENTLY "Person_firstName_idx";
+        DROP INDEX CONCURRENTLY "Person_lastName_idx";
+    "#;
+
+    api.create_migration("01init", dm, &migrations_directory)
+        .draft(true)
+        .send_sync()
+        .modify_migration(|contents| {
+            contents.clear();
+            contents.push_str(migration);
+        });
+
+    api.apply_migrations(&migrations_directory)
+        .send_sync()
+        .assert_applied_migrations(&["01init"]);
+}
