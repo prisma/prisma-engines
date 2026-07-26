@@ -921,6 +921,14 @@ impl MakeTlsConnectorManager {
                     if let Some(identity) = auth.identity.0 {
                         tls_builder.identity(identity);
                     }
+
+                    // Configure TLS minimum version for macOS (Security framework defaults to TLS 1.0)
+                    // This prevents "bad protocol version" errors when connecting to PostgreSQL
+                    // servers that require TLS 1.2+ (e.g., managed cloud databases like Ubicloud)
+                    #[cfg(target_os = "macos")]
+                    {
+                        tls_builder.min_protocol_version(Some(native_tls::Protocol::Tlsv12));
+                    }
                 }
 
                 let tls_connector = MakeTlsConnector::new(tls_builder.build()?);
