@@ -71,7 +71,7 @@ impl crate::UserFacingError for MigrationDoesNotApplyCleanly {
                 message: _,
                 meta: _,
                 error_code,
-            }) => format!("Error code: {}\n", error_code),
+            }) => format!("Error code: {error_code}\n"),
             crate::ErrorType::Unknown(_) => String::new(),
         };
 
@@ -170,7 +170,7 @@ impl crate::UserFacingError for ShadowDbCreationError {
                 message: _,
                 meta: _,
                 error_code,
-            }) => format!("Error code: {}\n", error_code),
+            }) => format!("Error code: {error_code}\n"),
             crate::ErrorType::Unknown(_) => String::new(),
         };
 
@@ -205,7 +205,7 @@ impl crate::UserFacingError for SoftResetFailed {
                 message: _,
                 meta: _,
                 error_code,
-            }) => format!("Error code: {}\n", error_code),
+            }) => format!("Error code: {error_code}\n"),
             crate::ErrorType::Unknown(_) => String::new(),
         };
 

@@ -240,7 +240,7 @@ impl Record {
             Err(DomainError::FieldNotFound {
                 name: field.to_string(),
                 container_type: "field",
-                container_name: format!("Record values: {:?}. Field names: {:?}.", self, field_names),
+                container_name: format!("Record values: {self:?}. Field names: {field_names:?}."),
             })
         })?;
 

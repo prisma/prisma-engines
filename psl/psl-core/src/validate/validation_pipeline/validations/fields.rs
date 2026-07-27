@@ -364,8 +364,7 @@ pub(super) fn validate_unsupported_field_type(field: ScalarFieldWalker<'_>, ctx:
             && let Some(prisma_type) = connector.scalar_type_for_native_type(&native_type, ctx.extension_types)
         {
             let msg = format!(
-                "The type `Unsupported(\"{}\")` you specified in the type definition for the field `{}` is supported as a native type by Prisma. Please use the native type notation `{} @{}.{}` for full support.",
-                unsupported_lit,
+                "The type `Unsupported(\"{unsupported_lit}\")` you specified in the type definition for the field `{}` is supported as a native type by Prisma. Please use the native type notation `{} @{}.{}` for full support.",
                 field.name(),
                 prisma_type.display(ctx.db),
                 source.name,

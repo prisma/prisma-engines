@@ -716,7 +716,7 @@ fn render_alter_column(
     for step in steps {
         match step {
             PostgresAlterColumn::DropDefault => {
-                clauses.push(format!("{} DROP DEFAULT", alter_column_prefix));
+                clauses.push(format!("{alter_column_prefix} DROP DEFAULT"));
 
                 // We also need to drop the sequence, in case it isn't used by any other column.
                 if let Some(DefaultKind::Sequence(sequence_name)) = columns.previous.default().map(|d| d.kind()) {
@@ -728,15 +728,13 @@ fn render_alter_column(
                 }
             }
             PostgresAlterColumn::SetDefault(new_default) => clauses.push(format!(
-                "{} SET DEFAULT {}",
-                alter_column_prefix,
+                "{alter_column_prefix} SET DEFAULT {}",
                 render_default(&new_default, &render_column_type(columns.next, renderer))
             )),
-            PostgresAlterColumn::DropNotNull => clauses.push(format!("{} DROP NOT NULL", alter_column_prefix)),
-            PostgresAlterColumn::SetNotNull => clauses.push(format!("{} SET NOT NULL", alter_column_prefix)),
+            PostgresAlterColumn::DropNotNull => clauses.push(format!("{alter_column_prefix} DROP NOT NULL")),
+            PostgresAlterColumn::SetNotNull => clauses.push(format!("{alter_column_prefix} SET NOT NULL")),
             PostgresAlterColumn::SetType => clauses.push(format!(
-                "{} SET DATA TYPE {}",
-                alter_column_prefix,
+                "{alter_column_prefix} SET DATA TYPE {}",
                 render_column_type(columns.next, renderer)
             )),
             PostgresAlterColumn::AddSequence => {

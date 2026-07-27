@@ -489,9 +489,8 @@ impl<'a> ScalarFilterParser<'a> {
                         "Expected a referenced scalar field {field_ref} but found a composite field."
                     ))),
                     None => Err(QueryGraphBuilderError::InputError(format!(
-                        "The referenced scalar field {}.{} does not exist.",
-                        field.container().name(),
-                        field_ref_name
+                        "The referenced scalar field {}.{field_ref_name} does not exist.",
+                        field.container().name()
                     ))),
                 }
             }
@@ -529,9 +528,8 @@ impl<'a> ScalarFilterParser<'a> {
                         "Expected a referenced scalar list field {cf} but found a composite field."
                     ))),
                     _ => Err(QueryGraphBuilderError::InputError(format!(
-                        "The referenced scalar list field {}.{} does not exist.",
-                        field.container().name(),
-                        field_ref_name
+                        "The referenced scalar list field {}.{field_ref_name} does not exist.",
+                        field.container().name()
                     ))),
                 }
             }
