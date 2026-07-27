@@ -295,20 +295,20 @@ pub(super) fn validate_scalar_field_connector_specific(field: ScalarFieldWalker<
             }
         }
 
-        ScalarFieldType::BuiltInScalar(ScalarType::Decimal) => {
-            if !ctx.has_capability(ConnectorCapability::DecimalType) {
-                ctx.push_error(DatamodelError::new_field_validation_error(
-                    &format!(
-                        "Field `{}` in {container} `{}` can't be of type Decimal. The current connector does not support the Decimal type.",
-                        field.name(),
-                        field.model().name(),
-                    ),
-                    container,
-                    field.model().name(),
+        ScalarFieldType::BuiltInScalar(ScalarType::Decimal)
+            if !ctx.has_capability(ConnectorCapability::DecimalType) =>
+        {
+            ctx.push_error(DatamodelError::new_field_validation_error(
+                &format!(
+                    "Field `{}` in {container} `{}` can't be of type Decimal. The current connector does not support the Decimal type.",
                     field.name(),
-                    field.ast_field().span(),
-                ));
-            }
+                    field.model().name(),
+                ),
+                container,
+                field.model().name(),
+                field.name(),
+                field.ast_field().span(),
+            ));
         }
 
         _ => (),
@@ -368,7 +368,7 @@ pub(super) fn validate_unsupported_field_type(field: ScalarFieldWalker<'_>, ctx:
                 unsupported_lit,
                 field.name(),
                 prisma_type.display(ctx.db),
-                &source.name,
+                source.name,
                 connector.native_type_to_string(&native_type)
             );
 

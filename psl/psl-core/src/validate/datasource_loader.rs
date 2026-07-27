@@ -166,7 +166,7 @@ fn lift_datasource(
                     return None;
                 }
 
-                schemas.sort_by(|(a, _), (b, _)| a.cmp(b));
+                schemas.sort_by_key(|(a, _)| *a);
 
                 for pair in schemas.windows(2) {
                     if pair[0].0 == pair[1].0 {

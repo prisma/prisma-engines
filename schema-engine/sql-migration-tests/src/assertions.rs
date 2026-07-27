@@ -286,7 +286,7 @@ impl SchemaAssertion {
     }
 
     pub fn debug_print(self) -> Self {
-        println!("{:?}", &self.schema);
+        println!("{:?}", self.schema);
 
         self
     }

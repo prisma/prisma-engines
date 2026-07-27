@@ -202,7 +202,7 @@ impl SqlRenderer for SqliteRenderer {
 
         for redefine_table in tables {
             let tables = schemas.walk(redefine_table.table_ids);
-            let temporary_table_name = format!("new_{}", &tables.next.name());
+            let temporary_table_name = format!("new_{}", tables.next.name());
 
             // maybe use render_create_table_for_migration?
             result.push(self.render_create_table_as(

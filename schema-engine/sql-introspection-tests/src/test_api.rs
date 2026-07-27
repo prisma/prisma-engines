@@ -399,11 +399,7 @@ impl TestApi {
     }
 
     pub fn pure_config(&self) -> String {
-        format!(
-            "{}\n{}",
-            &self.datasource_block_string(),
-            &self.generator_block_string()
-        )
+        format!("{}\n{}", self.datasource_block_string(), self.generator_block_string())
     }
 
     pub fn configuration(&self) -> Configuration {

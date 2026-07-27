@@ -166,7 +166,7 @@ impl<'a> DifferDatabase<'a> {
     }
 
     pub(crate) fn all_column_pairs(&self) -> impl Iterator<Item = MigrationPair<TableColumnId>> + '_ {
-        self.columns.iter().filter_map(|(_, cols)| cols.transpose())
+        self.columns.values().filter_map(|cols| cols.transpose())
     }
 
     pub(crate) fn column_pairs(

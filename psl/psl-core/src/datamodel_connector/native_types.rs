@@ -164,7 +164,7 @@ impl NativeTypeArguments for (u32, u32) {
 
     fn from_parts(parts: &[String]) -> Option<Self> {
         match parts {
-            [a, b] => a.parse().ok().and_then(|a| b.parse().ok().map(|b| (a, b))),
+            [a, b] => a.parse().ok().zip(b.parse().ok()),
             _ => None,
         }
     }

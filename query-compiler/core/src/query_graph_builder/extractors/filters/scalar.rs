@@ -491,7 +491,7 @@ impl<'a> ScalarFilterParser<'a> {
                     None => Err(QueryGraphBuilderError::InputError(format!(
                         "The referenced scalar field {}.{} does not exist.",
                         field.container().name(),
-                        &field_ref_name
+                        field_ref_name
                     ))),
                 }
             }
@@ -531,7 +531,7 @@ impl<'a> ScalarFilterParser<'a> {
                     _ => Err(QueryGraphBuilderError::InputError(format!(
                         "The referenced scalar list field {}.{} does not exist.",
                         field.container().name(),
-                        &field_ref_name
+                        field_ref_name
                     ))),
                 }
             }

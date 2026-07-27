@@ -204,7 +204,7 @@ impl ValidationError {
             let err_msg = err.to_string();
             let message = format!(
                 "Invalid argument value. `{}` is not a valid `{}`. Underlying error: {}",
-                value, expected_argument_type, &err_msg
+                value, expected_argument_type, err_msg
             );
             let argument = ArgumentDescription::new(*argument_name, vec![Cow::Borrowed(expected_argument_type)]);
             let meta = json!({"argumentPath": argument_path, "argument": argument, "selectionPath": selection_path, "underlyingError": &err_msg});
@@ -212,7 +212,7 @@ impl ValidationError {
         } else {
             let message = format!(
                 "Invalid argument value. `{}` is not a valid `{}`",
-                value, &expected_argument_type
+                value, expected_argument_type
             );
             let argument = ArgumentDescription::new(*argument_name, vec![Cow::Borrowed(expected_argument_type)]);
             let meta = json!({"argumentPath": argument_path, "argument": argument, "selectionPath": selection_path, "underlyingError": serde_json::Value::Null});
@@ -469,7 +469,7 @@ impl ValidationError {
     ///     }
     /// }
     pub fn selection_set_on_scalar(field_name: String, selection_path: Vec<&str>) -> Self {
-        let message = format!("Cannot select over scalar field '{}'", &field_name);
+        let message = format!("Cannot select over scalar field '{}'", field_name);
         ValidationError {
             kind: ValidationErrorKind::SelectionSetOnScalar,
             message,

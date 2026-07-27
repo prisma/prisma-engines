@@ -178,8 +178,8 @@ impl<'a> Statistics<'a> {
 
         let mut types: BTreeMap<&str, renderer::datamodel::CompositeType<'_>> = self
             .models
-            .iter()
-            .flat_map(|(name, _)| name.as_type_name())
+            .keys()
+            .flat_map(|name| name.as_type_name())
             .filter(|name| self.types_with_fields.contains(*name))
             .map(|name| (name, renderer::datamodel::CompositeType::new(name)))
             .collect();

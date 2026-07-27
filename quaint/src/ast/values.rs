@@ -1476,10 +1476,7 @@ impl<'a> Values<'a> {
         let mut result = Row::with_capacity(self.len());
 
         for mut row in self.rows.into_iter() {
-            match row.pop() {
-                Some(value) => result.push(value),
-                None => return None,
-            }
+            result.push(row.pop()?);
         }
 
         Some(result)

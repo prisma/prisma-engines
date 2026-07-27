@@ -220,11 +220,7 @@ impl QuerySingle {
         let mut result = QuerySingle(key.clone(), vec![value.clone()]);
 
         for filters in query_filters.iter().skip(1) {
-            if let Some(single) = QuerySingle::push(result, filters) {
-                result = single;
-            } else {
-                return None;
-            }
+            result = QuerySingle::push(result, filters)?;
         }
 
         Some(result)

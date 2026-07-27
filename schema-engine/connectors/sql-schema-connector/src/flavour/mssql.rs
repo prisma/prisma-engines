@@ -315,7 +315,7 @@ impl SqlConnector for MssqlConnector {
                     let ns = row.get("namespace").and_then(|s| s.to_string());
                     let table_name = row.get("table_name").and_then(|s| s.to_string());
 
-                    ns.and_then(|ns| table_name.map(|table_name| (ns, table_name)))
+                    ns.zip(table_name)
                 })
                 .filter(|(ns, table_name)| {
                     namespaces.contains(ns)

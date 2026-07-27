@@ -361,7 +361,7 @@ fn visit_relation_field_attributes(rfid: RelationFieldId, ctx: &mut Context<'_>)
     if ctx.visit_optional_single_attr("id") {
         let msg = format!(
             "The field `{}` is a relation field and cannot be marked with `@id`. Only scalar fields can be declared as id.",
-            &ast_field.name(),
+            ast_field.name(),
         );
         ctx.push_attribute_validation_error(&msg);
         ctx.discard_arguments();

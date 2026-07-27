@@ -17,9 +17,9 @@ pub(crate) fn both_sides_are_defined(relation: InlineRelationWalker<'_>, ctx: &m
 
         let message = format!(
             "The relation field `{}` on {container} `{}` is missing an opposite relation field on the model `{}`. Either run `prisma format` or add it manually.",
-            &relation_field.name(),
-            &relation_field.model().name(),
-            &relation_field.related_model().name(),
+            relation_field.name(),
+            relation_field.model().name(),
+            relation_field.related_model().name(),
         );
 
         ctx.push_error(DatamodelError::new_field_validation_error(

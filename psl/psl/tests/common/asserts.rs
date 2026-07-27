@@ -116,7 +116,7 @@ impl WarningAsserts for Vec<DatamodelWarning> {
             self.len(),
             1,
             "Expected exactly one validation warning. Warnings are: {:?}",
-            &self
+            self
         );
         assert_eq!(self[0], warning);
         self
@@ -696,7 +696,7 @@ impl DefaultValueAssert for ast::Expression {
                 panic!("Expected a numeric value for the `cuid()` version.");
             }
         } else {
-            panic!("Expected `cuid()` to be a function, got {}", &self);
+            panic!("Expected `cuid()` to be a function, got {}", self);
         }
 
         self
@@ -720,7 +720,7 @@ impl DefaultValueAssert for ast::Expression {
                 panic!("Expected a numeric value for the `uuid()` version.");
             }
         } else {
-            panic!("Expected `cuid()` to be a function, got {}", &self);
+            panic!("Expected `cuid()` to be a function, got {}", self);
         }
 
         self

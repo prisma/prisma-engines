@@ -45,7 +45,7 @@ pub(crate) fn fields_and_references_are_defined(relation: InlineRelationWalker<'
             forward.name(),
             forward.model().name(),
             back.name(),
-            &back.model().name(),
+            back.model().name(),
             RELATION_ATTRIBUTE_NAME
         );
 

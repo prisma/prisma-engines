@@ -141,7 +141,7 @@ impl TestApi for MySql<'_> {
 
         format!(
             "CONSTRAINT {} FOREIGN KEY ({}) REFERENCES {}({})",
-            &name, child_column, parent_table, parent_column
+            name, child_column, parent_table, parent_column
         )
     }
 

@@ -293,7 +293,7 @@ impl SqlRenderer for MssqlRenderer {
         for redefine_table in tables {
             let tables = schemas.walk(redefine_table.table_ids);
             // This is a copy of our new modified table.
-            let temporary_table_name = format!("_prisma_new_{}", &tables.next.name());
+            let temporary_table_name = format!("_prisma_new_{}", tables.next.name());
 
             // If any of the columns is an identity, we should know about it.
             let needs_autoincrement = redefine_table
