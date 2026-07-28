@@ -239,7 +239,7 @@ PRs in `prisma/prisma` and `prisma/prisma-engines`. Locally, each time you run
 clone.
 
 In CI we need to denote which branch of `prisma/prisma` should be consumed. By default CI clones the
-`main` branch, which will not include your local adapter changes. To test in integration, add the
+`v7` branch, which will not include your local adapter changes. To test in integration, add the
 following tag to your PR description on a separate line:
 
 ```
@@ -250,7 +250,7 @@ Replace `your/branch` with the name of your branch in the `prisma` repository.
 
 GitHub actions will then pick up the branch name and use it to clone that branch's code of prisma/prisma, and build the driver adapters code from there.
 
-When it's time to merge the sibling PRs, you'll need to merge the prisma/prisma PR first, so when merging the engines PR you have the code of the adapters ready in prisma/prisma `main` branch.
+When it's time to merge the sibling PRs, you'll need to merge the prisma/prisma PR first, so when merging the engines PR you have the code of the adapters ready in prisma/prisma `v7` branch.
 
 ### Testing engines in `prisma/prisma`
 

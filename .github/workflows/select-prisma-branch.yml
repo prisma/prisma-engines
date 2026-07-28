@@ -13,8 +13,8 @@ jobs:
     outputs:
       prismaBranch: ${{ steps.setPrismaBranch.outputs.prismaBranch }}
     steps:
-      - name: Default to the main branch
-        run: echo "PRISMA_BRANCH=main" >> "$GITHUB_ENV"
+      - name: Default to the v7 branch
+        run: echo "PRISMA_BRANCH=v7" >> "$GITHUB_ENV"
 
       - name: Extract Prisma branch name from PR description
         env:
@@ -30,7 +30,7 @@ jobs:
           )
         run: |
           BRANCH_NAME=$(echo "$PR_BODY" | sed -n 's|.*\/prisma-branch \([^[:space:]]\+\).*|\1|p' | head -n 1)
-          if [ -n "$BRANCH_NAME" ] && [ "$BRANCH_NAME" != "main" ]; then
+          if [ -n "$BRANCH_NAME" ] && [ "$BRANCH_NAME" != "v7" ]; then
             echo "PRISMA_BRANCH=$BRANCH_NAME" >> "$GITHUB_ENV"
           fi
 
