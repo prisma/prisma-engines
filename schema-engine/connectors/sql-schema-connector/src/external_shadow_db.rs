@@ -19,36 +19,53 @@ use user_facing_errors::schema_engine::ShadowDbNotEmpty;
 ///
 /// Disposing of `shadow_db` is the caller's business, on this function's success and failure alike.
 pub(crate) async fn replay_migration_history(
-    shadow_db: &mut dyn SqlConnector,
+    shadow_db: &mut (dyn SqlConnector + Send + Sync),
     migrations: &Migrations,
     namespaces: Option<Namespaces>,
     filter: &SchemaFilter,
     reset_allowed: bool,
     location: &str,
 ) -> ConnectorResult<SqlSchema> {
-    ensure_shadow_db_may_be_reset(shadow_db, namespaces.clone(), reset_allowed, location).await?;
+    if reset_allowed {
+        // Consent is exercised here rather than left to the flavour: SQLite and the Wasm PostgreSQL
+        // connector replay a migration history into an external shadow database without resetting
+        // it first, and the contents the user agreed to part with would collide with the replay.
+        reset(shadow_db, namespaces.clone(), filter).await?;
+    } else {
+        ensure_shadow_db_is_empty(shadow_db, namespaces.clone(), location).await?;
+    }
 
     let schema = shadow_db
         .sql_schema_from_migration_history(migrations, namespaces.clone(), filter, UsingExternalShadowDb::Yes)
         .await?;
 
-    shadow_db.reset(namespaces).await?;
+    reset(shadow_db, namespaces, filter).await?;
 
     Ok(schema)
 }
 
-/// A failed replay leaves the shadow database as it was when it failed: the next run finding it
-/// dirty, and asking about it, is the signal that something went wrong here.
-async fn ensure_shadow_db_may_be_reset(
-    shadow_db: &mut dyn SqlConnector,
+/// Empties the shadow database. A user may well have granted the engine the right to create and to
+/// drop tables in it without making it the owner of anything, which is not enough to drop and
+/// recreate the schema itself, so the objects are dropped one by one when that fails.
+async fn reset(
+    shadow_db: &mut (dyn SqlConnector + Send + Sync),
     namespaces: Option<Namespaces>,
-    reset_allowed: bool,
-    location: &str,
+    filter: &SchemaFilter,
 ) -> ConnectorResult<()> {
-    if reset_allowed {
-        return Ok(());
+    if shadow_db.reset(namespaces.clone()).await.is_err() {
+        crate::best_effort_reset(shadow_db, namespaces, filter).await?;
     }
 
+    Ok(())
+}
+
+/// A failed replay leaves the shadow database as it was when it failed: the next run finding it
+/// dirty, and asking about it, is the signal that something went wrong here.
+async fn ensure_shadow_db_is_empty(
+    shadow_db: &mut (dyn SqlConnector + Send + Sync),
+    namespaces: Option<Namespaces>,
+    location: &str,
+) -> ConnectorResult<()> {
     let schema = shadow_db.describe_schema(namespaces).await?;
 
     if holds_no_objects(&schema) {
