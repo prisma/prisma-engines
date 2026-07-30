@@ -377,6 +377,7 @@ fn from_empty_to_migrations_directory(mut api: TestApi) {
         &DatasourceUrls {
             url: Some("postgres://not-used".to_string()),
             shadow_database_url: Some(api.connection_string().to_owned()),
+            reset_shadow_database: false,
         },
         host.clone(),
         BitFlags::empty(),
@@ -427,6 +428,7 @@ fn from_empty_to_migrations_folder_without_shadow_db_url_must_error(mut api: Tes
             &DatasourceUrls {
                 url: Some(api.connection_string().to_owned()),
                 shadow_database_url: None,
+                reset_shadow_database: false,
             },
             params,
         )
@@ -457,6 +459,7 @@ fn from_migrations_with_the_datasource_database_as_shadow_db_must_error(mut api:
                 &DatasourceUrls {
                     url: Some(main_url.clone()),
                     shadow_database_url: Some(shadow_database_url.clone()),
+                    reset_shadow_database: false,
                 },
                 DiffParams {
                     exit_code: None,
@@ -491,6 +494,7 @@ fn from_url_to_migrations_with_that_url_as_shadow_db_must_error(mut api: TestApi
             &DatasourceUrls {
                 url: None,
                 shadow_database_url: Some(main_url.clone()),
+                reset_shadow_database: false,
             },
             DiffParams {
                 exit_code: None,
@@ -514,6 +518,7 @@ fn from_migrations_with_a_separate_shadow_db_on_the_same_server_works(mut api: T
         DatasourceUrls {
             url: Some(api.connection_string().to_owned()),
             shadow_database_url: Some(api.create_external_shadow_database()),
+            reset_shadow_database: false,
         },
         DiffParams {
             exit_code: Some(true),
@@ -1040,6 +1045,7 @@ fn from_migrations_to_schema_datamodel_ignores_manual_partial_indexes_without_pr
         DatasourceUrls {
             url: Some(api.connection_string().to_owned()),
             shadow_database_url: Some(api.create_external_shadow_database()),
+            reset_shadow_database: false,
         },
         DiffParams {
             exit_code: Some(true),
@@ -1104,6 +1110,7 @@ fn from_schema_datamodel_to_migrations_ignores_manual_partial_indexes_without_pr
         DatasourceUrls {
             url: Some(api.connection_string().to_owned()),
             shadow_database_url: Some(api.create_external_shadow_database()),
+            reset_shadow_database: false,
         },
         DiffParams {
             exit_code: Some(true),
@@ -1179,6 +1186,7 @@ fn from_migrations_to_url_ignores_manual_partial_indexes_with_engine_seeded_sche
         DatasourceUrls {
             url: Some(api.connection_string().to_owned()),
             shadow_database_url: Some(api.create_external_shadow_database()),
+            reset_shadow_database: false,
         },
         DiffParams {
             exit_code: Some(true),

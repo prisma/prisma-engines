@@ -50,6 +50,7 @@ impl TestApi {
                 connection_string: args.database_url().to_owned(),
                 preview_features,
                 shadow_database_connection_string: args.shadow_database_url().map(String::from),
+                reset_shadow_database: false,
             };
             let mut conn = SqlSchemaConnector::new_mysql(params).unwrap();
             tok(conn.reset(false, None, &schema_connector::SchemaFilter::default())).unwrap();
@@ -214,6 +215,7 @@ impl TestApi {
             connection_string,
             preview_features: self.preview_features,
             shadow_database_connection_string,
+            reset_shadow_database: false,
         };
 
         let connector = match &connection_info {

@@ -165,6 +165,9 @@ pub(crate) trait SqlConnector: Send + Sync + Debug {
 
     fn shadow_db_url(&self) -> Option<&str>;
 
+    /// Whether the user consented to the shadow database being reset even when it is not empty.
+    fn reset_shadow_database(&self) -> bool;
+
     fn acquire_lock(&mut self) -> BoxFuture<'_, ConnectorResult<()>>;
 
     fn apply_migration_script<'a>(

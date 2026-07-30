@@ -377,6 +377,7 @@ async fn missing_select_rights(api: &mut TestApi) -> TestResult {
         connection_string: url.to_string(),
         preview_features: Default::default(),
         shadow_database_connection_string: None,
+        reset_shadow_database: false,
     };
 
     let mut conn = SqlSchemaConnector::new_mysql(params).unwrap();

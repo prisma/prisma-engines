@@ -263,6 +263,7 @@ async fn json_rpc_diff_target_to_dialect(
                             ExternalShadowDatabase::ConnectionString {
                                 connection_string: shadow_database_url.to_owned(),
                                 preview_features,
+                                reset_allowed: datasource_urls.reset_shadow_database,
                             },
                         )
                         .await?;
@@ -344,6 +345,7 @@ mod tests {
             DatasourceUrls {
                 url: Some(MAIN_URL.to_owned()),
                 shadow_database_url: Some(MAIN_URL.to_owned()),
+                reset_shadow_database: false,
             },
         ));
     }
@@ -356,6 +358,7 @@ mod tests {
             DatasourceUrls {
                 url: Some(MAIN_URL.to_owned()),
                 shadow_database_url: Some("postgres://user:password@LOCALHOST/maindb?schema=shadow".to_owned()),
+                reset_shadow_database: false,
             },
         ));
     }
@@ -368,6 +371,7 @@ mod tests {
             DatasourceUrls {
                 url: None,
                 shadow_database_url: Some(MAIN_URL.to_owned()),
+                reset_shadow_database: false,
             },
         ));
     }
@@ -380,6 +384,7 @@ mod tests {
             DatasourceUrls {
                 url: Some(MAIN_URL.to_owned()),
                 shadow_database_url: Some("postgresql://user:password@localhost:5432/shadowdb".to_owned()),
+                reset_shadow_database: false,
             },
         )
         .unwrap();
@@ -393,6 +398,7 @@ mod tests {
             DatasourceUrls {
                 url: Some(MAIN_URL.to_owned()),
                 shadow_database_url: Some(MAIN_URL.to_owned()),
+                reset_shadow_database: false,
             },
         )
         .unwrap();
@@ -406,6 +412,7 @@ mod tests {
             DatasourceUrls {
                 url: Some(MAIN_URL.to_owned()),
                 shadow_database_url: None,
+                reset_shadow_database: false,
             },
         )
         .unwrap();
@@ -421,6 +428,7 @@ mod tests {
             DatasourceUrls {
                 url: Some(MAIN_URL.to_owned()),
                 shadow_database_url: Some("postgres://user:password@LOCALHOST/maindb".to_owned()),
+                reset_shadow_database: false,
             },
         )
         .unwrap();

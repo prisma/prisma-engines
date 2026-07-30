@@ -40,6 +40,7 @@ async fn introspecting_cockroach_db_with_postgres_provider_fails(api: TestApi) {
         connection_string: api.connection_string().to_owned(),
         preview_features: api.preview_features(),
         shadow_database_connection_string: None,
+        reset_shadow_database: false,
     };
     let mut engine = SqlSchemaConnector::new_postgres(params).unwrap();
 

@@ -516,6 +516,7 @@ async fn missing_datasource_url_gives_proper_error() {
     let datasource_urls = DatasourceUrls {
         url: None,
         shadow_database_url: None,
+        reset_shadow_database: false,
     };
 
     let mut api = schema_core::schema_api_without_extensions(Some(dm.to_owned()), datasource_urls, None).unwrap();
@@ -563,6 +564,7 @@ async fn diff_from_empty_schema_to_datamodel_should_not_require_url() {
     let datasource_urls = DatasourceUrls {
         url: None,
         shadow_database_url: None,
+        reset_shadow_database: false,
     };
 
     let mut api = schema_core::schema_api_without_extensions(Some(dm.to_owned()), datasource_urls, None).unwrap();

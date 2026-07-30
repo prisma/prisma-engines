@@ -15,6 +15,10 @@ pub struct DatasourceUrls {
     pub url: Option<String>,
     /// The URL to a live shadow database, if Prisma should use it instead of creating one.
     pub shadow_database_url: Option<String>,
+    /// Whether the user consented to the shadow database being reset even when it is not empty.
+    /// Absent means no consent was given.
+    #[serde(default)]
+    pub reset_shadow_database: bool,
 }
 
 /// Datasource URLs that have passed validation and are safe to consume by the schema engine.
@@ -22,6 +26,7 @@ pub struct DatasourceUrls {
 pub struct ValidatedDatasourceUrls {
     url: Option<String>,
     shadow_database_url: Option<String>,
+    reset_shadow_database: bool,
 }
 
 /// Errors produced while validating datasource URLs supplied from configuration.
@@ -45,6 +50,7 @@ impl DatasourceUrls {
         Self {
             url: Some(url.into()),
             shadow_database_url: None,
+            reset_shadow_database: false,
         }
     }
 
@@ -64,6 +70,7 @@ impl DatasourceUrls {
         Ok(ValidatedDatasourceUrls {
             url: self.url.clone(),
             shadow_database_url: self.shadow_database_url.clone(),
+            reset_shadow_database: self.reset_shadow_database,
         })
     }
 }
@@ -91,6 +98,7 @@ impl From<ValidatedDatasourceUrls> for DatasourceUrls {
         Self {
             url: urls.url,
             shadow_database_url: urls.shadow_database_url,
+            reset_shadow_database: urls.reset_shadow_database,
         }
     }
 }
@@ -116,6 +124,11 @@ impl ValidatedDatasourceUrls {
     /// Returns the validated shadow database URL, if any.
     pub fn shadow_database_url(&self) -> Option<&str> {
         self.shadow_database_url.as_deref()
+    }
+
+    /// Whether the user consented to the shadow database being reset even when it is not empty.
+    pub fn reset_shadow_database(&self) -> bool {
+        self.reset_shadow_database
     }
 
     /// Resolves relative paths in the URL against the provided configuration directory.
@@ -249,4 +262,46 @@ fn set_config_dir_sqlite<'a>(config_dir: &Path, url: &'a str) -> Cow<'a, str> {
     };
 
     Cow::Borrowed(url)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn datasource_urls_without_reset_shadow_database_parse_as_before() {
+        let urls: DatasourceUrls = serde_json::from_str(
+            r#"{ "url": "postgresql://localhost:5432/main", "shadowDatabaseUrl": "postgresql://localhost:5432/shadow" }"#,
+        )
+        .unwrap();
+
+        assert_eq!(urls.url.as_deref(), Some("postgresql://localhost:5432/main"));
+        assert_eq!(
+            urls.shadow_database_url.as_deref(),
+            Some("postgresql://localhost:5432/shadow")
+        );
+        assert!(!urls.reset_shadow_database);
+    }
+
+    #[test]
+    fn reset_shadow_database_is_read_from_the_wire() {
+        let urls: DatasourceUrls =
+            serde_json::from_str(r#"{ "url": "postgresql://localhost:5432/main", "resetShadowDatabase": true }"#)
+                .unwrap();
+
+        assert!(urls.reset_shadow_database);
+    }
+
+    #[test]
+    fn reset_shadow_database_survives_validation() {
+        let urls = DatasourceUrls {
+            url: Some("postgresql://localhost:5432/main".to_owned()),
+            shadow_database_url: Some("postgresql://localhost:5432/shadow".to_owned()),
+            reset_shadow_database: true,
+        };
+
+        let validated = urls.validate(psl::builtin_connectors::POSTGRES).unwrap();
+
+        assert!(validated.reset_shadow_database());
+    }
 }

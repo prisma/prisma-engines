@@ -49,6 +49,7 @@ fn connector_for_connection_string(
                 connection_string,
                 preview_features,
                 shadow_database_connection_string,
+                reset_shadow_database: false,
             };
             Ok(Box::new(SqlSchemaConnector::new_postgres_like(params)?))
         }
@@ -57,6 +58,7 @@ fn connector_for_connection_string(
                 connection_string,
                 preview_features,
                 shadow_database_connection_string,
+                reset_shadow_database: false,
             };
             Ok(Box::new(SqlSchemaConnector::new_sqlite(params)?))
         }
@@ -65,6 +67,7 @@ fn connector_for_connection_string(
                 connection_string,
                 preview_features,
                 shadow_database_connection_string,
+                reset_shadow_database: false,
             };
             Ok(Box::new(SqlSchemaConnector::new_mysql(params)?))
         }
@@ -73,6 +76,7 @@ fn connector_for_connection_string(
                 connection_string,
                 preview_features,
                 shadow_database_connection_string,
+                reset_shadow_database: false,
             };
             Ok(Box::new(SqlSchemaConnector::new_mssql(params)?))
         }
@@ -81,6 +85,7 @@ fn connector_for_connection_string(
                 connection_string,
                 preview_features,
                 shadow_database_connection_string,
+                reset_shadow_database: false,
             };
             let connector = MongoDbSchemaConnector::new(params);
             Ok(Box::new(connector))
@@ -133,6 +138,7 @@ fn schema_to_connector(
         connection_string,
         preview_features,
         shadow_database_connection_string,
+        reset_shadow_database: datasource_urls.reset_shadow_database(),
     };
 
     connector_for_provider(datasource.active_provider, params)
@@ -152,6 +158,7 @@ fn initial_datamodel_to_connector(
             .to_owned(),
         preview_features,
         shadow_database_connection_string: datasource_urls.shadow_database_url().map(<_>::to_owned),
+        reset_shadow_database: datasource_urls.reset_shadow_database(),
     };
 
     connector_for_provider(datasource.active_provider, params)

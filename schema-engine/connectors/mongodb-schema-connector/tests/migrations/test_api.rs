@@ -82,6 +82,7 @@ fn new_connector(preview_features: BitFlags<PreviewFeature>) -> (String, MongoDb
         connection_string: url.to_string(),
         preview_features,
         shadow_database_connection_string: None,
+        reset_shadow_database: false,
     };
     (db_name, MongoDbSchemaConnector::new(params))
 }

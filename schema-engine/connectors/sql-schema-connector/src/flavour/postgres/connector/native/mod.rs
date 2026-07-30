@@ -421,6 +421,12 @@ pub fn get_shadow_db_url(state: &State) -> Option<&str> {
         .as_deref()
 }
 
+pub fn get_reset_shadow_database(state: &State) -> bool {
+    state
+        .params()
+        .is_some_and(|params| params.connector_params.reset_shadow_database)
+}
+
 pub async fn dispose(state: &mut State) -> ConnectorResult<()> {
     if let State::Connected(_, (_, conn)) = std::mem::replace(state, State::Initial) {
         conn.close().await;

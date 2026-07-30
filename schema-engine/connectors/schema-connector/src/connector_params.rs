@@ -10,10 +10,12 @@ pub struct ConnectorParams {
     pub preview_features: BitFlags<PreviewFeature>,
     /// The shadow database connection string.
     pub shadow_database_connection_string: Option<String>,
+    /// Whether the user consented to the shadow database being reset even when it is not empty.
+    pub reset_shadow_database: bool,
 }
 
 impl ConnectorParams {
-    /// Creates new [`ConnectorParams`].
+    /// Creates new [`ConnectorParams`], without consent to reset a non-empty shadow database.
     pub fn new(
         connection_string: String,
         preview_features: BitFlags<PreviewFeature>,
@@ -23,6 +25,7 @@ impl ConnectorParams {
             connection_string,
             preview_features,
             shadow_database_connection_string,
+            reset_shadow_database: false,
         }
     }
 }

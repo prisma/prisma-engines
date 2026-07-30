@@ -19,6 +19,7 @@ impl TestApi {
                 DatasourceUrls {
                     url: Some(args.database_url().to_owned()),
                     shadow_database_url: args.shadow_database_url().map(ToOwned::to_owned),
+                    reset_shadow_database: false,
                 },
                 host,
                 Arc::new(ExtensionTypeConfig::default()),

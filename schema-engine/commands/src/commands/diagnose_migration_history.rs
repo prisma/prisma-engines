@@ -73,6 +73,7 @@ pub async fn diagnose_migration_history(
     namespaces: Option<Namespaces>,
     connector: &mut dyn SchemaConnector,
     adapter_factory: Arc<dyn ExternalConnectorFactory>,
+    reset_shadow_database: bool,
     migration_schema_cache: &mut MigrationSchemaCache,
 ) -> CoreResult<DiagnoseMigrationHistoryOutput> {
     tracing::debug!("Diagnosing migration history");
@@ -149,6 +150,7 @@ pub async fn diagnose_migration_history(
             let target = ExternalShadowDatabase::DriverAdapter {
                 factory: adapter_factory,
                 preview_features: connector.preview_features(),
+                reset_allowed: reset_shadow_database,
             };
             let from = migration_schema_cache
                 .get_or_insert(&applied_migrations.migration_directories, || async {

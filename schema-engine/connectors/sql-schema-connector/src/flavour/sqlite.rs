@@ -139,6 +139,10 @@ impl SqlConnector for SqliteConnector {
         imp::get_shadow_db_url(&self.state)
     }
 
+    fn reset_shadow_database(&self) -> bool {
+        imp::get_reset_shadow_database(&self.state)
+    }
+
     fn acquire_lock(&mut self) -> BoxFuture<'_, ConnectorResult<()>> {
         self.with_connection(|conn, _| acquire_lock(conn))
     }

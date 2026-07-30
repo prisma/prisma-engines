@@ -53,6 +53,7 @@ impl TestApi {
                 connection_string: connection_string.to_owned(),
                 preview_features,
                 shadow_database_connection_string: None,
+                reset_shadow_database: false,
             };
             let mut me = SqlSchemaConnector::new_mysql(params).unwrap();
 
@@ -75,6 +76,7 @@ impl TestApi {
                 connection_string: cs.to_owned(),
                 preview_features,
                 shadow_database_connection_string: None,
+                reset_shadow_database: false,
             };
             let me = SqlSchemaConnector::new_mysql(params).unwrap();
 
@@ -85,6 +87,7 @@ impl TestApi {
                 connection_string: cs.to_owned(),
                 preview_features,
                 shadow_database_connection_string: None,
+                reset_shadow_database: false,
             };
             let me = SqlSchemaConnector::new_postgres(params).unwrap();
 
@@ -104,6 +107,7 @@ impl TestApi {
                 connection_string: cs.to_owned(),
                 preview_features,
                 shadow_database_connection_string: None,
+                reset_shadow_database: false,
             };
             let me = SqlSchemaConnector::new_cockroach(params).unwrap();
 
@@ -115,6 +119,7 @@ impl TestApi {
                 connection_string: cs.to_owned(),
                 preview_features,
                 shadow_database_connection_string: None,
+                reset_shadow_database: false,
             };
             let me = SqlSchemaConnector::new_mssql(params).unwrap();
 
@@ -126,6 +131,7 @@ impl TestApi {
                 connection_string: url.to_owned(),
                 preview_features,
                 shadow_database_connection_string: None,
+                reset_shadow_database: false,
             };
             let me = SqlSchemaConnector::new_sqlite(params).unwrap();
 
