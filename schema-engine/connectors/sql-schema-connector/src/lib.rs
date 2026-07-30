@@ -10,6 +10,7 @@ mod flavour;
 mod introspection;
 mod migration_pair;
 mod same_database;
+mod sanitize;
 mod sql_destructive_change_checker;
 mod sql_doc_parser;
 mod sql_migration;
@@ -35,6 +36,7 @@ use sql_schema_describer as sql;
 use std::{future, sync::Arc};
 
 pub use same_database::urls_denote_same_database;
+pub use sanitize::{DRIVER_ADAPTER_SHADOW_DATABASE, sanitize_connection_string};
 
 const MIGRATIONS_TABLE_NAME: &str = "_prisma_migrations";
 
@@ -188,10 +190,9 @@ impl SchemaDialect for SqlSchemaDialect {
                     feature = "postgresql-native",
                     feature = "sqlite-native"
                 )))]
-                ExternalShadowDatabase::DriverAdapter {
-                    factory,
-                    preview_features: _,
-                } => self.dialect.connect_to_shadow_db(factory).await?,
+                ExternalShadowDatabase::DriverAdapter { factory, .. } => {
+                    self.dialect.connect_to_shadow_db(factory).await?
+                }
                 #[cfg(any(
                     feature = "mssql-native",
                     feature = "mysql-native",
@@ -201,6 +202,7 @@ impl SchemaDialect for SqlSchemaDialect {
                 ExternalShadowDatabase::ConnectionString {
                     connection_string,
                     preview_features,
+                    ..
                 } => {
                     self.dialect
                         .connect_to_shadow_db(connection_string, preview_features)
@@ -494,6 +496,7 @@ impl SchemaConnector for SqlSchemaConnector {
                     let target = ExternalShadowDatabase::ConnectionString {
                         connection_string: connection_string.to_owned(),
                         preview_features: self.inner.preview_features(),
+                        reset_allowed: self.inner.reset_shadow_database(),
                     };
                     self.schema_dialect()
                         .schema_from_migrations_with_target(migrations, namespaces, filter, target)
