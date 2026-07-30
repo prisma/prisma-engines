@@ -30,7 +30,7 @@ use crate::{
     sql_destructive_change_checker::DestructiveChangeCheckerFlavour, sql_renderer::SqlRenderer,
     sql_schema_calculator::SqlSchemaCalculatorFlavour, sql_schema_differ::SqlSchemaDifferFlavour,
 };
-use psl::{PreviewFeatures, ValidatedSchema};
+use psl::{PreviewFeatures, ValidatedSchema, datamodel_connector::Flavour};
 use quaint::prelude::{NativeConnectionInfo, Table};
 use schema_connector::{
     BoxFuture, ConnectorError, ConnectorResult, IntrospectionContext, MigrationRecord, Namespaces,
@@ -340,10 +340,17 @@ pub(crate) trait SqlConnector: Send + Sync + Debug {
     fn dispose(&mut self) -> BoxFuture<'_, ConnectorResult<()>>;
 }
 
-// Utility function shared by multiple dialects to compare shadow database and main connection.
-fn validate_connection_infos_do_not_match(previous: &str, next: &str) -> ConnectorResult<()> {
-    if previous == next {
-        Err(ConnectorError::from_msg("The shadow database you configured appears to be the same as the main database. Please specify another shadow database.".into()))
+/// Refuses a shadow database that is the same database as the main one. Writing the migration
+/// history to the main database would destroy the data it holds.
+fn validate_connection_infos_do_not_match(
+    flavour: Flavour,
+    main_url: &str,
+    shadow_db_url: &str,
+) -> ConnectorResult<()> {
+    if crate::same_database::urls_denote_same_database(flavour, main_url, shadow_db_url) {
+        Err(ConnectorError::user_facing(
+            user_facing_errors::schema_engine::ShadowDbSameAsMainDb,
+        ))
     } else {
         Ok(())
     }
