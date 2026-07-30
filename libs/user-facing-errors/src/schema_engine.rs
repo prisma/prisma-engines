@@ -301,6 +301,13 @@ pub struct MissingNamespaceInExternalTables;
 pub struct UnexpectedNamespaceInExternalTables;
 
 #[derive(Debug, SimpleUserFacingError)]
+#[user_facing(
+    code = "P3025",
+    message = "The shadow database you configured appears to be the same as the main database. Please specify another shadow database."
+)]
+pub struct ShadowDbSameAsMainDb;
+
+#[derive(Debug, SimpleUserFacingError)]
 #[user_facing(code = "P4001", message = "The introspected database was empty.")]
 pub struct IntrospectionResultEmpty;
 
