@@ -290,3 +290,139 @@ async fn json_rpc_diff_target_to_dialect(
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::json_rpc::types::{MigrationList, MigrationLockfile, SchemaFilter};
+
+    const MAIN_URL: &str = "postgresql://user:password@localhost:5432/maindb";
+
+    fn migrations_target(provider: &str) -> DiffTarget {
+        DiffTarget::Migrations(MigrationList {
+            base_dir: "/tmp/migrations".to_owned(),
+            lockfile: MigrationLockfile {
+                path: "migration_lock.toml".to_owned(),
+                content: Some(format!("provider = \"{provider}\"")),
+            },
+            shadow_db_init_script: String::new(),
+            migration_directories: Vec::new(),
+        })
+    }
+
+    fn url_target(url: &str) -> DiffTarget {
+        DiffTarget::Url(UrlContainer { url: url.to_owned() })
+    }
+
+    #[track_caller]
+    fn validate(from: DiffTarget, to: DiffTarget, urls: DatasourceUrls) -> CoreResult<()> {
+        let params = DiffParams {
+            from,
+            to,
+            script: false,
+            exit_code: None,
+            filters: SchemaFilter::default(),
+        };
+
+        validate_shadow_database_is_not_diffed(&params, &urls)
+    }
+
+    #[track_caller]
+    fn assert_refused(result: CoreResult<()>) {
+        let err = result.unwrap_err();
+        assert!(
+            err.is_user_facing_error::<ShadowDbSameAsMainDb>(),
+            "expected the shadow database error, got {err:?}"
+        );
+    }
+
+    #[test]
+    fn a_shadow_database_that_is_the_datasource_database_is_refused() {
+        assert_refused(validate(
+            migrations_target("postgresql"),
+            DiffTarget::Empty,
+            DatasourceUrls {
+                url: Some(MAIN_URL.to_owned()),
+                shadow_database_url: Some(MAIN_URL.to_owned()),
+            },
+        ));
+    }
+
+    #[test]
+    fn a_differently_spelled_shadow_database_url_is_refused() {
+        assert_refused(validate(
+            migrations_target("postgresql"),
+            DiffTarget::Empty,
+            DatasourceUrls {
+                url: Some(MAIN_URL.to_owned()),
+                shadow_database_url: Some("postgres://user:password@LOCALHOST/maindb?schema=shadow".to_owned()),
+            },
+        ));
+    }
+
+    #[test]
+    fn a_shadow_database_that_is_a_url_target_is_refused() {
+        assert_refused(validate(
+            url_target(MAIN_URL),
+            migrations_target("postgresql"),
+            DatasourceUrls {
+                url: None,
+                shadow_database_url: Some(MAIN_URL.to_owned()),
+            },
+        ));
+    }
+
+    #[test]
+    fn a_separate_shadow_database_is_allowed() {
+        validate(
+            migrations_target("postgresql"),
+            url_target(MAIN_URL),
+            DatasourceUrls {
+                url: Some(MAIN_URL.to_owned()),
+                shadow_database_url: Some("postgresql://user:password@localhost:5432/shadowdb".to_owned()),
+            },
+        )
+        .unwrap();
+    }
+
+    #[test]
+    fn without_a_migrations_target_the_shadow_database_url_is_not_checked() {
+        validate(
+            url_target(MAIN_URL),
+            DiffTarget::Empty,
+            DatasourceUrls {
+                url: Some(MAIN_URL.to_owned()),
+                shadow_database_url: Some(MAIN_URL.to_owned()),
+            },
+        )
+        .unwrap();
+    }
+
+    #[test]
+    fn without_a_shadow_database_url_nothing_is_checked() {
+        validate(
+            migrations_target("postgresql"),
+            DiffTarget::Empty,
+            DatasourceUrls {
+                url: Some(MAIN_URL.to_owned()),
+                shadow_database_url: None,
+            },
+        )
+        .unwrap();
+    }
+
+    #[test]
+    fn an_unresolvable_provider_leaves_the_connection_strings_uncompared() {
+        // A migration history whose provider is not a connector we know gives no flavour to compare
+        // the connection strings with. Reporting that is the diff command's own job, further down.
+        validate(
+            migrations_target("not-a-provider"),
+            DiffTarget::Empty,
+            DatasourceUrls {
+                url: Some(MAIN_URL.to_owned()),
+                shadow_database_url: Some("postgres://user:password@LOCALHOST/maindb".to_owned()),
+            },
+        )
+        .unwrap();
+    }
+}

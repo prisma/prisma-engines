@@ -2,7 +2,7 @@ use expect_test::expect;
 use quaint::{prelude::Queryable, single::Quaint};
 use sql_migration_tests::multi_engine_test_api::*;
 use test_macros::test_connector;
-use user_facing_errors::UserFacingError;
+use user_facing_errors::{UserFacingError, schema_engine::ShadowDbSameAsMainDb};
 
 // exclude: auth works differently in single-node insecure cockroach
 #[test_connector(tags(Postgres), exclude(CockroachDb))]
@@ -126,10 +126,10 @@ fn shadow_db_url_must_not_match_main_url(api: TestApi) {
                 Some(api.connection_string().to_owned()),
             )
             .err()
-            .unwrap()
-            .to_string();
+            .unwrap();
 
-        assert!(err.contains("The shadow database you configured appears to be the same as the main database. Please specify another shadow database."));
+        assert!(err.is_user_facing_error::<ShadowDbSameAsMainDb>(), "{err:?}");
+        assert!(err.to_string().contains("The shadow database you configured appears to be the same as the main database. Please specify another shadow database."));
     }
 
     // Database name is different -> fine
@@ -182,4 +182,113 @@ fn shadow_db_not_reachable_error_must_have_the_right_connection_info(api: TestAp
         err.unwrap_known().error_code,
         user_facing_errors::common::DatabaseNotReachable::ERROR_CODE
     );
+}
+
+/// A shadow database URL that reaches the main database is refused however it is spelled: what
+/// counts is the database it denotes, not the string it is written as.
+#[track_caller]
+fn assert_shadow_db_url_is_refused(api: &TestApi, shadow_db_url: &str) {
+    let err = api
+        .new_engine_with_connection_strings_or_err(api.connection_string().to_owned(), Some(shadow_db_url.to_owned()))
+        .err()
+        .unwrap();
+
+    assert!(
+        err.is_user_facing_error::<ShadowDbSameAsMainDb>(),
+        "shadow database url {shadow_db_url}: {err:?}"
+    );
+}
+
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
+fn differently_spelled_shadow_db_url_must_not_match_main_url_on_postgres(api: TestApi) {
+    let main_url = api.connection_string();
+
+    let scheme_alias = main_url.replacen("postgresql://", "postgres://", 1);
+    let upper_case_host = main_url.replace("localhost", "LOCALHOST");
+    let other_schema = main_url.replace("schema=public", "schema=shadow");
+    let extra_parameter = format!("{main_url}&connection_limit=1");
+
+    for spelling in [scheme_alias, upper_case_host, other_schema, extra_parameter] {
+        assert_ne!(spelling, main_url);
+        assert_shadow_db_url_is_refused(&api, &spelling);
+    }
+}
+
+#[test_connector(tags(Mysql), exclude(Vitess))]
+fn differently_spelled_shadow_db_url_must_not_match_main_url_on_mysql(api: TestApi) {
+    let main_url = api.connection_string();
+
+    let upper_case_host = main_url.replace("localhost", "LOCALHOST");
+    let extra_parameter = format!("{main_url}?connection_limit=1");
+
+    for spelling in [upper_case_host, extra_parameter] {
+        assert_ne!(spelling, main_url);
+        assert_shadow_db_url_is_refused(&api, &spelling);
+    }
+}
+
+#[test_connector(tags(Mssql))]
+fn differently_spelled_shadow_db_url_must_not_match_main_url_on_mssql(api: TestApi) {
+    let main_url = api.connection_string();
+
+    let upper_case_host = main_url.replace("localhost", "LOCALHOST");
+    let other_schema = format!("{main_url};schema=shadow");
+
+    for spelling in [upper_case_host, other_schema] {
+        assert_ne!(spelling, main_url);
+        assert_shadow_db_url_is_refused(&api, &spelling);
+    }
+}
+
+#[test_connector(tags(Sqlite))]
+fn differently_spelled_shadow_db_path_must_not_match_main_db_path_on_sqlite(api: TestApi) {
+    let main_url = api.connection_string();
+    let file_path = main_url.trim_start_matches("file:");
+    let (directory, file_name) = file_path.rsplit_once('/').unwrap();
+
+    let without_scheme = file_path.to_owned();
+    let redundant_current_directory = format!("file:{directory}/./{file_name}");
+
+    for spelling in [without_scheme, redundant_current_directory] {
+        assert_ne!(spelling, main_url);
+        assert_shadow_db_url_is_refused(&api, &spelling);
+    }
+}
+
+#[test_connector(tags(Sqlite))]
+fn a_relative_shadow_db_path_is_resolved_against_the_working_directory_on_sqlite(api: TestApi) {
+    // Connection strings are compared as they are given, and a relative SQLite path in them is
+    // resolved against the process's working directory. The bare file name of the main database
+    // therefore denotes a different database, unless the main database happens to live in the
+    // working directory.
+    let file_name = api.connection_string().rsplit_once('/').unwrap().1.to_owned();
+    assert!(
+        !std::path::Path::new(&file_name).exists(),
+        "the test database must not live in the working directory for this test to mean anything"
+    );
+
+    api.new_engine_with_connection_strings_or_err(api.connection_string().to_owned(), Some(file_name))
+        .map(drop)
+        .unwrap();
+}
+
+#[test_connector(tags(Postgres, Mysql, Mssql, Sqlite), exclude(CockroachDb, Vitess))]
+fn a_separate_shadow_db_on_the_same_server_is_accepted(api: TestApi) {
+    let migrations_directory = api.create_migrations_directory();
+    let schema = r#"
+        model Cat {
+            id Int @id
+            litterConsumption Int
+        }
+    "#;
+
+    let mut engine = api.new_engine_with_connection_strings(
+        api.connection_string().to_owned(),
+        Some(api.create_external_shadow_database()),
+    );
+
+    engine
+        .create_migration("01init", schema, &migrations_directory)
+        .send_sync()
+        .assert_migration_directories_count(1);
 }
