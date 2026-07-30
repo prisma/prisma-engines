@@ -95,6 +95,12 @@ impl TestApi {
         self.root.shadow_database_connection_string()
     }
 
+    /// Creates a second database on the same server as the test database, and returns a connection
+    /// string for it. See [`crate::utils::create_external_shadow_database`].
+    pub fn create_external_shadow_database(&self) -> String {
+        crate::utils::create_external_shadow_database(self.args())
+    }
+
     pub fn preview_features(&self) -> BitFlags<PreviewFeature> {
         self.root.preview_features()
     }
