@@ -6,6 +6,7 @@
 mod apply_migration;
 mod database_schema;
 mod error;
+mod external_shadow_db;
 mod flavour;
 mod introspection;
 mod migration_pair;
@@ -183,6 +184,20 @@ impl SchemaDialect for SqlSchemaDialect {
                 | ExternalShadowDatabase::ConnectionString { preview_features, .. } => *preview_features,
             };
 
+            let (reset_allowed, location) = match &target {
+                ExternalShadowDatabase::DriverAdapter { reset_allowed, .. } => {
+                    (*reset_allowed, DRIVER_ADAPTER_SHADOW_DATABASE.to_owned())
+                }
+                ExternalShadowDatabase::ConnectionString {
+                    connection_string,
+                    reset_allowed,
+                    ..
+                } => (
+                    *reset_allowed,
+                    sanitize_connection_string(self.dialect.datamodel_connector().flavour(), connection_string),
+                ),
+            };
+
             let mut connector = match target {
                 #[cfg(not(any(
                     feature = "mssql-native",
@@ -214,9 +229,15 @@ impl SchemaDialect for SqlSchemaDialect {
                     ));
                 }
             };
-            let schema = connector
-                .sql_schema_from_migration_history(migrations, namespaces, filter, UsingExternalShadowDb::Yes)
-                .await;
+            let schema = external_shadow_db::replay_migration_history(
+                connector.as_mut(),
+                migrations,
+                namespaces,
+                filter,
+                reset_allowed,
+                &location,
+            )
+            .await;
             // dispose of the connector regardless of the result
             connector.dispose().await?;
             let schema = DatabaseSchema::new(SqlDatabaseSchema::from(schema?));
