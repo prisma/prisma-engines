@@ -2,16 +2,17 @@ use std::sync::Arc;
 
 use crate::{
     DatasourceUrls, SchemaContainerExt,
-    core_error::CoreResult,
-    json_rpc::types::{DiffParams, DiffResult, DiffTarget, UrlContainer},
+    core_error::{CoreError, CoreResult},
+    json_rpc::types::{DiffParams, DiffResult, DiffTarget, MigrationList, UrlContainer},
 };
 use enumflags2::BitFlags;
-use psl::parser_database::ExtensionTypes;
+use psl::{builtin_connectors::BUILTIN_CONNECTORS, datamodel_connector::Flavour, parser_database::ExtensionTypes};
 use schema_connector::{
     ConnectorError, ConnectorHost, DatabaseSchema, ExternalShadowDatabase, Namespaces, SchemaConnector, SchemaDialect,
     SchemaFilter, migrations_directory::Migrations,
 };
 use sql_schema_connector::SqlSchemaConnector;
+use user_facing_errors::schema_engine::ShadowDbSameAsMainDb;
 
 pub async fn diff_cli(
     params: DiffParams,
@@ -20,6 +21,8 @@ pub async fn diff_cli(
     initial_preview_features: BitFlags<psl::PreviewFeature>,
     extension_types: &dyn ExtensionTypes,
 ) -> CoreResult<DiffResult> {
+    validate_shadow_database_is_not_diffed(&params, datasource_urls)?;
+
     // In order to properly handle MultiSchema, we need to make sure the preview feature is
     // correctly set, and we need to grab the namespaces from the Schema, if any.
     // Note that currently, we union all namespaces and preview features. This may not be correct.
@@ -95,6 +98,59 @@ pub async fn diff_cli(
         exit_code,
         stdout: None,
     })
+}
+
+/// Refuses a shadow database that is one of the databases the diff looks at.
+///
+/// A migrations target replays the migration history into the shadow database, which is reset
+/// first. When the shadow database is in fact the datasource's own database, or the database on the
+/// other end of the diff, replaying the history destroys the data that the diff was meant to
+/// describe — and it does so silently, since diffing a database against a copy of the migration
+/// history that was just written into it yields no difference at all.
+///
+/// Resolving a diff target is what opens the connection that does the damage, so the check has to
+/// happen before any target is resolved.
+fn validate_shadow_database_is_not_diffed(params: &DiffParams, datasource_urls: &DatasourceUrls) -> CoreResult<()> {
+    let Some(shadow_database_url) = datasource_urls.shadow_database_url.as_deref() else {
+        return Ok(());
+    };
+
+    let targets = [&params.from, &params.to];
+
+    // Only a migrations target writes to the external shadow database, and its `migration_lock.toml`
+    // is what says how the connection strings are to be interpreted.
+    let Some(flavour) = targets.iter().find_map(|target| match target {
+        DiffTarget::Migrations(migrations) => flavour_from_lock_file(migrations),
+        _ => None,
+    }) else {
+        return Ok(());
+    };
+
+    let diffed_urls = datasource_urls
+        .url
+        .as_deref()
+        .into_iter()
+        .chain(targets.iter().filter_map(|target| match target {
+            DiffTarget::Url(UrlContainer { url }) => Some(url.as_str()),
+            _ => None,
+        }));
+
+    for url in diffed_urls {
+        if sql_schema_connector::urls_denote_same_database(flavour, url, shadow_database_url) {
+            return Err(CoreError::user_facing(ShadowDbSameAsMainDb));
+        }
+    }
+
+    Ok(())
+}
+
+fn flavour_from_lock_file(migrations: &MigrationList) -> Option<Flavour> {
+    let provider = schema_connector::migrations_directory::read_provider_from_lock_file(&migrations.lockfile)?;
+
+    BUILTIN_CONNECTORS
+        .iter()
+        .find(|connector| connector.is_provider(&provider))
+        .map(|connector| connector.flavour())
 }
 
 // Grab the preview features and namespaces. Normally, we can only grab these from Schema files,
