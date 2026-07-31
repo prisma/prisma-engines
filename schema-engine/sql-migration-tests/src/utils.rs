@@ -187,3 +187,12 @@ pub fn raw_cmd_on(connection_string: &str, sql: &str) {
         connection.raw_cmd(sql).await.unwrap();
     })
 }
+
+/// Runs a SQL query against an arbitrary database, on a connection of its own, and returns what it
+/// answered. The counterpart of [`raw_cmd_on`] for the cases where the answer is the point.
+pub fn query_on(connection_string: &str, sql: &str) -> quaint::prelude::ResultSet {
+    tok(async {
+        let connection = Quaint::new(connection_string).await.unwrap();
+        connection.query_raw(sql, &[]).await.unwrap()
+    })
+}
