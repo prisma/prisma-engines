@@ -156,14 +156,25 @@ async fn count_rows_up_to(
         .query(count_rows_query(namespace, table, limit).into())
         .await?;
 
-    let rows = result
-        .into_iter()
-        .next()
-        .and_then(|row| row.into_iter().next())
-        .and_then(|value| value.as_integer())
-        .unwrap_or_default();
+    row_count_from(result).ok_or_else(|| {
+        let table = match namespace {
+            Some(namespace) => format!("{namespace}.{table}"),
+            None => table.to_owned(),
+        };
 
-    Ok(rows.max(0) as u64)
+        ConnectorError::from_msg(format!(
+            "Failed to read the number of rows in `{table}` from the shadow database."
+        ))
+    })
+}
+
+/// The count in the first column of the first row, when it is there and is a number of rows.
+/// `None` stands for an answer that cannot be read, which is not the same as an answer of zero:
+/// a table that cannot be counted is not a table that is known to be empty.
+fn row_count_from(result: quaint::prelude::ResultSet) -> Option<u64> {
+    let count = result.into_iter().next()?.into_iter().next()?.as_integer()?;
+
+    u64::try_from(count).ok()
 }
 
 /// `SELECT COUNT(*) FROM (SELECT 1 FROM <table> LIMIT <limit>)`, rendered for whichever database
@@ -207,6 +218,7 @@ impl RowBudget {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use quaint::prelude::Value;
 
     fn schema_with_a_namespace() -> SqlSchema {
         let mut schema = SqlSchema::default();
@@ -301,6 +313,27 @@ mod tests {
         assert_eq!(budget.query_limit(), None);
     }
 
+    fn count_result(values: Vec<quaint::prelude::Value<'static>>) -> quaint::prelude::ResultSet {
+        let rows = if values.is_empty() { Vec::new() } else { vec![values] };
+
+        quaint::prelude::ResultSet::new(vec!["count".to_owned()], vec![quaint::prelude::ColumnType::Int64], rows)
+    }
+
+    #[test]
+    fn a_count_is_read_however_the_database_sizes_it() {
+        // PostgreSQL, MySQL and SQLite answer with a 64-bit integer, SQL Server with a 32-bit one.
+        assert_eq!(row_count_from(count_result(vec![Value::int64(7)])), Some(7));
+        assert_eq!(row_count_from(count_result(vec![Value::int32(7)])), Some(7));
+    }
+
+    #[test]
+    fn a_count_that_cannot_be_read_is_not_a_count_of_zero() {
+        assert_eq!(row_count_from(count_result(vec![])), None);
+        assert_eq!(row_count_from(count_result(vec![Value::null_int64()])), None);
+        assert_eq!(row_count_from(count_result(vec![Value::text("seven")])), None);
+        assert_eq!(row_count_from(count_result(vec![Value::int64(-1)])), None);
+    }
+
     #[test]
     fn a_table_of_its_own_cannot_overflow_the_total() {
         let mut budget = RowBudget::new(1000);
@@ -333,6 +366,19 @@ mod tests {
         assert_eq!(
             sql,
             "SELECT COUNT(*) FROM (SELECT $1 FROM \"public\".\"Cat\" LIMIT $2) AS \"limited_rows\""
+        );
+    }
+
+    #[cfg(feature = "mysql")]
+    #[test]
+    fn mysql_gets_its_own_quoting_and_limit() {
+        use quaint::visitor::Visitor;
+
+        let (sql, _) = quaint::visitor::Mysql::build(count_rows_query(None, "Cat", 1001)).unwrap();
+
+        assert_eq!(
+            sql,
+            "SELECT COUNT(*) FROM (SELECT ? FROM `Cat` LIMIT ?) AS `limited_rows`"
         );
     }
 
