@@ -8,7 +8,7 @@
 //! so does the command after it.
 
 use crate::flavour::{SqlConnector, UsingExternalShadowDb};
-use quaint::ast::{Aliasable, Select, Table, asterisk, count};
+use quaint::ast::{Aliasable, Expression, Select, Table, asterisk, count};
 use schema_connector::{ConnectorError, ConnectorResult, Namespaces, SchemaFilter, migrations_directory::Migrations};
 use sql_schema_describer::SqlSchema;
 use user_facing_errors::schema_engine::{ShadowDbNotEmpty, ShadowDbTooMuchData};
@@ -185,7 +185,9 @@ fn count_rows_query<'a>(namespace: Option<&str>, table: &str, limit: u64) -> Sel
         None => Table::from(table.to_owned()),
     };
 
-    let limited_rows = Select::from_table(table).value(1).limit(limit as usize);
+    // SQL Server refuses a derived table with an unnamed column, so the constant is named.
+    let counted_row = Expression::from(1).alias("counted_row");
+    let limited_rows = Select::from_table(table).value(counted_row).limit(limit as usize);
 
     Select::from_table(Table::from(limited_rows).alias("limited_rows")).value(count(asterisk()))
 }
@@ -352,7 +354,7 @@ mod tests {
 
         assert_eq!(
             sql,
-            "SELECT COUNT(*) FROM (SELECT ? FROM `Cat` LIMIT ?) AS `limited_rows`"
+            "SELECT COUNT(*) FROM (SELECT ? AS `counted_row` FROM `Cat` LIMIT ?) AS `limited_rows`"
         );
     }
 
@@ -365,7 +367,7 @@ mod tests {
 
         assert_eq!(
             sql,
-            "SELECT COUNT(*) FROM (SELECT $1 FROM \"public\".\"Cat\" LIMIT $2) AS \"limited_rows\""
+            "SELECT COUNT(*) FROM (SELECT $1 AS \"counted_row\" FROM \"public\".\"Cat\" LIMIT $2) AS \"limited_rows\""
         );
     }
 
@@ -378,7 +380,7 @@ mod tests {
 
         assert_eq!(
             sql,
-            "SELECT COUNT(*) FROM (SELECT ? FROM `Cat` LIMIT ?) AS `limited_rows`"
+            "SELECT COUNT(*) FROM (SELECT ? AS `counted_row` FROM `Cat` LIMIT ?) AS `limited_rows`"
         );
     }
 
