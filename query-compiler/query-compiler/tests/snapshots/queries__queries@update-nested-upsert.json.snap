@@ -1,0 +1,61 @@
+---
+source: query-compiler/query-compiler/tests/queries.rs
+expression: pretty
+input_file: query-compiler/query-compiler/tests/data/update-nested-upsert.json
+snapshot_kind: text
+---
+transaction
+   dataMap {
+       id: Int (id)
+       userId: Int (userId)
+   }
+   let 0 = unique (query «SELECT "public"."Patient"."id",
+                          "public"."Patient"."userId" FROM "public"."Patient"
+                          WHERE ("public"."Patient"."id" = $1 AND 1=1) LIMIT $2
+                          OFFSET $3»
+                   params [const(BigInt(1)), const(BigInt(1)),
+                           const(BigInt(0))])
+   in let 0$id = mapField id (get 0);
+          0$userId = mapField userId (get 0)
+      in let 1 = unique (query «SELECT "public"."User"."id" FROM "public"."User"
+                                WHERE ("public"."User"."email" = $1 AND
+                                "public"."User"."id" IN [$2,*]) OFFSET $3»
+                         params [const(String("user.1@prisma.io")),
+                                 var(0$userId as Int), const(BigInt(0))])
+         in if (rowCountNeq 0 (get 1))
+            then let 1 = unique (validate (get 1)
+                     [ rowCountNeq 0
+                     ] orRaise "MISSING_RELATED_RECORD");
+                     1$id = mapField id (get 1)
+                 in unique (query «UPDATE "public"."User" SET "email" = $1 WHERE
+                                   ("public"."User"."id" IN [$2,*] AND
+                                   "public"."User"."email" = $3) RETURNING
+                                   "public"."User"."id"»
+                            params [const(String("user.2@prisma.io")),
+                                    var(1$id as Int),
+                                    const(String("user.1@prisma.io"))])
+            else let 3 = unique (query «INSERT INTO "public"."User"
+                                        ("email","role") VALUES
+                                        ($1,CAST($2::text AS "public"."Role"))
+                                        RETURNING "public"."User"."id"»
+                                 params [const(String("user.1@prisma.io")),
+                                         const(String("user"))])
+                 in let 0 = unique (validate (get 0)
+                        [ rowCountNeq 0
+                        ] orRaise "MISSING_RELATED_RECORD");
+                        0$id = mapField id (get 0);
+                        3 = unique (validate (get 3)
+                        [ rowCountNeq 0
+                        ] orRaise "MISSING_RELATED_RECORD");
+                        3$id = mapField id (get 3)
+                    in execute «UPDATE "public"."Patient" SET "userId" = $1
+                                WHERE ("public"."Patient"."id" IN [$2,*] AND
+                                1=1)»
+                       params [var(3$id as Int), var(0$id as Int)];
+      let 0 = unique (validate (get 0)
+          [ rowCountNeq 0
+          ] orRaise "MISSING_RECORD");
+          0$id = mapField id (get 0)
+      in unique (query «SELECT "t0"."id", "t0"."userId" FROM "public"."Patient"
+                        AS "t0" WHERE "t0"."id" = $1 LIMIT $2»
+                 params [var(0$id as Int), const(BigInt(1))])
