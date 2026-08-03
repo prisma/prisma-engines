@@ -319,6 +319,18 @@ pub struct ShadowDbNotEmpty {
     pub shadow_database_location: String,
 }
 
+#[derive(Debug, UserFacingError, Serialize)]
+#[user_facing(
+    code = "P3027",
+    message = "The shadow database at `{shadow_database_location}` holds more than {row_count_limit} rows of data. Prisma Migrate does not reset a database that holds this much, even when you allow it to: a database this size is unlikely to be the throwaway one this command expects.\n\nIf you are certain that this data can be destroyed, empty the database yourself and run the command again."
+)]
+pub struct ShadowDbTooMuchData {
+    /// The shadow database, with credentials removed.
+    pub shadow_database_location: String,
+    /// The number of rows up to which a shadow database is still reset.
+    pub row_count_limit: u64,
+}
+
 #[derive(Debug, SimpleUserFacingError)]
 #[user_facing(code = "P4001", message = "The introspected database was empty.")]
 pub struct IntrospectionResultEmpty;
