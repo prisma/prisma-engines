@@ -1,8 +1,15 @@
-use std::{error::Error, fmt::Display, io, path::Path};
+use std::{
+    error::Error,
+    fmt::Display,
+    hash::{DefaultHasher, Hash, Hasher},
+    io,
+    path::Path,
+};
 
 use schema_core::json_rpc::types::{
     MigrationDirectory, MigrationFile, MigrationList, MigrationLockfile, SchemaContainer,
 };
+use test_setup::{Tags, TestApiArgs, runtime::run_with_thread_local_runtime as tok};
 
 #[macro_export]
 macro_rules! write_multi_file {
@@ -128,4 +135,45 @@ impl From<io::Error> for ListMigrationsError {
     fn from(err: io::Error) -> Self {
         ListMigrationsError(err)
     }
+}
+
+/// Creates a database on the same server as the test database, and returns a connection string for
+/// it. Commands that replay a migration history need a shadow database that is not the database
+/// they are looking at, and this is the second database on the server that satisfies them.
+pub fn create_external_shadow_database(args: &TestApiArgs) -> String {
+    let name = shadow_database_name(args.test_function_name());
+    let tags = args.tags();
+
+    if tags.contains(Tags::Postgres) {
+        tok(test_setup::postgres::create_postgres_database(
+            args.database_url(),
+            &name,
+        ))
+        .unwrap()
+        .1
+    } else if tags.contains(Tags::Mysql) {
+        tok(test_setup::mysql::create_mysql_database(args.database_url(), &name))
+            .unwrap()
+            .1
+    } else if tags.contains(Tags::Mssql) {
+        tok(test_setup::mssql::init_mssql_database(args.database_url(), &name))
+            .unwrap()
+            .1
+    } else if tags.contains(Tags::Sqlite) {
+        test_setup::sqlite_test_url(&name)
+    } else {
+        panic!("No external shadow database for the database under test.")
+    }
+}
+
+/// Database names are limited to 63 bytes on PostgreSQL and to 64 on MySQL, while test function
+/// names alone can be longer than that, and truncation alone makes the names of tests that share a
+/// long prefix or suffix collide. A hash of the full name keeps them apart.
+fn shadow_database_name(test_function_name: &str) -> String {
+    let mut hasher = DefaultHasher::new();
+    test_function_name.hash(&mut hasher);
+    let hash = hasher.finish() as u32;
+    let prefix: String = test_function_name.chars().take(40).collect();
+
+    format!("{prefix}_{hash:x}_shadow")
 }

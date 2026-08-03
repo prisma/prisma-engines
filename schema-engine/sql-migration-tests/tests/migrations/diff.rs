@@ -12,6 +12,7 @@ use sql_migration_tests::{
     utils::{list_migrations, to_schema_containers},
 };
 use std::sync::Arc;
+use user_facing_errors::schema_engine::ShadowDbSameAsMainDb;
 
 #[test_connector(tags(Sqlite, Mysql, Postgres, CockroachDb, Mssql))]
 fn from_unique_index_to_without(mut api: TestApi) {
@@ -435,6 +436,123 @@ fn from_empty_to_migrations_folder_without_shadow_db_url_must_error(mut api: Tes
         You must set `datasource.shadowDatabaseUrl` in your `prisma.config.ts` if you want to diff a migrations directory.
     "#]];
     expected_error.assert_eq(&err.to_string());
+}
+
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
+fn from_migrations_with_the_datasource_database_as_shadow_db_must_error(mut api: TestApi) {
+    let migrations_dir = migrations_directory_with_one_migration(&api);
+    let main_url = api.connection_string().to_owned();
+
+    api.raw_cmd("CREATE TABLE precious_data (id INTEGER PRIMARY KEY)");
+
+    // The same database, spelled the way it is configured and spelled differently.
+    let differently_spelled = main_url
+        .replacen("postgresql://", "postgres://", 1)
+        .replace("localhost", "LOCALHOST");
+    assert_ne!(differently_spelled, main_url);
+
+    for shadow_database_url in [main_url.clone(), differently_spelled] {
+        let err = api
+            .diff_with_datasource(
+                &DatasourceUrls {
+                    url: Some(main_url.clone()),
+                    shadow_database_url: Some(shadow_database_url.clone()),
+                },
+                DiffParams {
+                    exit_code: None,
+                    from: DiffTarget::Migrations(list_migrations(migrations_dir.path()).unwrap()),
+                    to: DiffTarget::Empty,
+                    script: false,
+                    filters: SchemaFilter::default(),
+                },
+            )
+            .unwrap_err();
+
+        assert!(
+            err.is_user_facing_error::<ShadowDbSameAsMainDb>(),
+            "shadow database url {shadow_database_url}: {err:?}"
+        );
+    }
+
+    // The migration history is replayed into the shadow database after wiping it, so the diff must
+    // not have run at all.
+    api.assert_schema().assert_has_table("precious_data");
+}
+
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
+fn from_url_to_migrations_with_that_url_as_shadow_db_must_error(mut api: TestApi) {
+    let migrations_dir = migrations_directory_with_one_migration(&api);
+    let main_url = api.connection_string().to_owned();
+
+    api.raw_cmd("CREATE TABLE precious_data (id INTEGER PRIMARY KEY)");
+
+    let err = api
+        .diff_with_datasource(
+            &DatasourceUrls {
+                url: None,
+                shadow_database_url: Some(main_url.clone()),
+            },
+            DiffParams {
+                exit_code: None,
+                from: DiffTarget::Url(UrlContainer { url: main_url }),
+                to: DiffTarget::Migrations(list_migrations(migrations_dir.path()).unwrap()),
+                script: false,
+                filters: SchemaFilter::default(),
+            },
+        )
+        .unwrap_err();
+
+    assert!(err.is_user_facing_error::<ShadowDbSameAsMainDb>(), "{err:?}");
+    api.assert_schema().assert_has_table("precious_data");
+}
+
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
+fn from_migrations_with_a_separate_shadow_db_on_the_same_server_works(mut api: TestApi) {
+    let migrations_dir = migrations_directory_with_one_migration(&api);
+
+    let (result, diff) = diff_result(
+        DatasourceUrls {
+            url: Some(api.connection_string().to_owned()),
+            shadow_database_url: Some(api.create_external_shadow_database()),
+        },
+        DiffParams {
+            exit_code: Some(true),
+            from: DiffTarget::Empty,
+            to: DiffTarget::Migrations(list_migrations(migrations_dir.path()).unwrap()),
+            script: false,
+            filters: SchemaFilter::default(),
+        },
+    );
+
+    assert_eq!(result.exit_code, 2);
+    let expected_diff = expect![[r#"
+
+        [+] Added Schemas
+          - public
+
+        [+] Added tables
+          - cats
+    "#]];
+    expected_diff.assert_eq(&diff);
+}
+
+fn migrations_directory_with_one_migration(api: &TestApi) -> tempfile::TempDir {
+    let migrations_dir = tempfile::tempdir().unwrap();
+    std::fs::write(
+        migrations_dir.path().join("migration_lock.toml"),
+        format!("provider = \"{}\"", api.args().provider()),
+    )
+    .unwrap();
+
+    let migration_dir = migrations_dir.path().join("01init");
+    std::fs::create_dir_all(&migration_dir).unwrap();
+    std::fs::write(
+        migration_dir.join("migration.sql"),
+        "CREATE TABLE cats ( id INTEGER PRIMARY KEY );",
+    )
+    .unwrap();
+
+    migrations_dir
 }
 
 #[test_connector(tags(Sqlite))]
@@ -921,7 +1039,7 @@ fn from_migrations_to_schema_datamodel_ignores_manual_partial_indexes_without_pr
     let (result, diff) = diff_result(
         DatasourceUrls {
             url: Some(api.connection_string().to_owned()),
-            shadow_database_url: Some(api.connection_string().to_owned()),
+            shadow_database_url: Some(api.create_external_shadow_database()),
         },
         DiffParams {
             exit_code: Some(true),
@@ -985,7 +1103,7 @@ fn from_schema_datamodel_to_migrations_ignores_manual_partial_indexes_without_pr
     let (result, diff) = diff_result(
         DatasourceUrls {
             url: Some(api.connection_string().to_owned()),
-            shadow_database_url: Some(api.connection_string().to_owned()),
+            shadow_database_url: Some(api.create_external_shadow_database()),
         },
         DiffParams {
             exit_code: Some(true),
@@ -1060,7 +1178,7 @@ fn from_migrations_to_url_ignores_manual_partial_indexes_with_engine_seeded_sche
         Some(initial_datamodel),
         DatasourceUrls {
             url: Some(api.connection_string().to_owned()),
-            shadow_database_url: Some(api.connection_string().to_owned()),
+            shadow_database_url: Some(api.create_external_shadow_database()),
         },
         DiffParams {
             exit_code: Some(true),

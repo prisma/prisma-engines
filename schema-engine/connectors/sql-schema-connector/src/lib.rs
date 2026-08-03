@@ -9,6 +9,7 @@ mod error;
 mod flavour;
 mod introspection;
 mod migration_pair;
+mod same_database;
 mod sql_destructive_change_checker;
 mod sql_doc_parser;
 mod sql_migration;
@@ -32,6 +33,8 @@ use sql_doc_parser::{parse_sql_doc, sanitize_sql};
 use sql_migration::{DropUserDefinedType, DropView, SqlMigration, SqlMigrationStep};
 use sql_schema_describer as sql;
 use std::{future, sync::Arc};
+
+pub use same_database::urls_denote_same_database;
 
 const MIGRATIONS_TABLE_NAME: &str = "_prisma_migrations";
 
