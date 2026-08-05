@@ -232,7 +232,7 @@ fn can_use_connector_native_upsert<'a>(
 fn is_unique_field(field_name: &str, model: &Model) -> bool {
     match model.fields().find_from_scalar(field_name) {
         Ok(field) => field.unique(),
-        Err(_) => resolve_compound_field(field_name, model).is_some(),
+        Err(_) => is_compound_field(field_name, model),
     }
 }
 

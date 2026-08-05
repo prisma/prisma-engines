@@ -20,8 +20,7 @@ enums {
 let @parent = unique (query «SELECT "public"."User"."id",
                              "public"."User"."email",
                              "public"."User"."role"::text FROM "public"."User"
-                             WHERE ("public"."User"."id" = $1 AND 1=1) LIMIT $2
-                             OFFSET $3»
+                             WHERE "public"."User"."id" = $1 LIMIT $2 OFFSET $3»
                       params [const(BigInt(1)), const(BigInt(1)),
                               const(BigInt(0))])
 in let @parent$id = mapField id (get @parent)
