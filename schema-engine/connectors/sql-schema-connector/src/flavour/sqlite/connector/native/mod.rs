@@ -2,6 +2,7 @@
 
 pub(crate) use quaint::connector::rusqlite;
 
+use psl::datamodel_connector::Flavour;
 use quaint::connector::{AdapterName, ColumnType, DescribedColumn, DescribedParameter, GetRow, ToColumnNames};
 use schema_connector::{BoxFuture, ConnectorError, ConnectorParams, ConnectorResult};
 use sql_schema_describer::SqlSchema;
@@ -22,7 +23,11 @@ pub struct Params {
 impl Params {
     pub fn new(connector_params: ConnectorParams) -> ConnectorResult<Self> {
         if let Some(shadow_db_url) = &connector_params.shadow_database_connection_string {
-            validate_connection_infos_do_not_match(&connector_params.connection_string, shadow_db_url)?;
+            validate_connection_infos_do_not_match(
+                Flavour::Sqlite,
+                &connector_params.connection_string,
+                shadow_db_url,
+            )?;
         }
 
         let quaint::connector::SqliteParams { file_path, .. } =

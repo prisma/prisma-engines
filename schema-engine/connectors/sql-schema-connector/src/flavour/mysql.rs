@@ -10,7 +10,7 @@ use connector::{Connection, shadow_db};
 use destructive_change_checker::MysqlDestructiveChangeCheckerFlavour;
 use enumflags2::BitFlags;
 use indoc::indoc;
-use psl::{ValidatedSchema, datamodel_connector, parser_database::ScalarType};
+use psl::{ValidatedSchema, datamodel_connector, datamodel_connector::Flavour, parser_database::ScalarType};
 use quaint::connector::MysqlUrl;
 use regex::{Regex, RegexSet};
 use renderer::MysqlRenderer;
@@ -38,7 +38,11 @@ struct Params {
 impl Params {
     fn new(connector_params: ConnectorParams) -> ConnectorResult<Self> {
         if let Some(shadow_db_url) = &connector_params.shadow_database_connection_string {
-            super::validate_connection_infos_do_not_match(&connector_params.connection_string, shadow_db_url)?;
+            super::validate_connection_infos_do_not_match(
+                Flavour::Mysql,
+                &connector_params.connection_string,
+                shadow_db_url,
+            )?;
         }
 
         let url = connector_params

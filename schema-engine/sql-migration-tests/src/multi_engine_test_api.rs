@@ -99,6 +99,12 @@ impl TestApi {
         self.args.shadow_database_url()
     }
 
+    /// Creates a second database on the same server as the test database, and returns a connection
+    /// string for it. See [`crate::utils::create_external_shadow_database`].
+    pub fn create_external_shadow_database(&self) -> String {
+        crate::utils::create_external_shadow_database(&self.args)
+    }
+
     /// The ConnectionInfo based on the connection string
     pub fn connection_info(&self) -> ConnectionInfo {
         ConnectionInfo::from_url(self.connection_string()).unwrap()
@@ -220,9 +226,7 @@ impl TestApi {
             }
             ConnectionInfo::Native(NativeConnectionInfo::Mysql(_)) => SqlSchemaConnector::new_mysql(params)?,
             ConnectionInfo::Native(NativeConnectionInfo::Mssql(_)) => SqlSchemaConnector::new_mssql(params)?,
-            ConnectionInfo::Native(NativeConnectionInfo::Sqlite { .. }) => {
-                SqlSchemaConnector::new_sqlite(params).unwrap()
-            }
+            ConnectionInfo::Native(NativeConnectionInfo::Sqlite { .. }) => SqlSchemaConnector::new_sqlite(params)?,
             ConnectionInfo::Native(NativeConnectionInfo::InMemorySqlite { .. }) | ConnectionInfo::External(_) => {
                 unreachable!()
             }

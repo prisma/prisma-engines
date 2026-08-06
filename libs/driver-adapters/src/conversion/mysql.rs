@@ -98,7 +98,7 @@ mod test {
         for (val, expected) in test_cases {
             let actual = value_to_js_arg(&val.clone().into_value()).unwrap();
             if actual != expected {
-                errors.push(format!("transforming: {:?}, expected: {:?}, actual: {:?}", &val, expected, actual));
+                errors.push(format!("transforming: {val:?}, expected: {expected:?}, actual: {actual:?}"));
             }
         }
         assert_eq!(errors.len(), 0, "{}", errors.join("\n"));

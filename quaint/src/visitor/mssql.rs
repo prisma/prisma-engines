@@ -718,7 +718,7 @@ impl<'a> Visitor<'a> for Mssql<'a> {
         self.surround_with("(", ")", |this| {
             for (i, row) in right.into_iter().enumerate() {
                 this.surround_with("(", ")", |se| {
-                    let row_and_vals = left.values.clone().into_iter().zip(row.values.into_iter());
+                    let row_and_vals = left.values.clone().into_iter().zip(row.values);
 
                     for (j, (expr, val)) in row_and_vals.enumerate() {
                         se.visit_expression(expr)?;

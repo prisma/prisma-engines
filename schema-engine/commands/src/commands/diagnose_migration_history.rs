@@ -90,9 +90,9 @@ pub async fn diagnose_migration_history(
 
     // Check filesystem history against database history.
     for (index, fs_migration) in migrations_from_filesystem.migration_directories.iter().enumerate() {
-        let corresponding_db_migration = migrations_from_database
-            .iter()
-            .find(|db_migration| db_migration.migration_name == fs_migration.migration_name());
+        let corresponding_db_migration = migrations_from_database.iter().find(|db_migration| {
+            db_migration.migration_name == fs_migration.migration_name() && db_migration.rolled_back_at.is_none()
+        });
 
         match corresponding_db_migration {
             Some(db_migration)
@@ -107,13 +107,17 @@ pub async fn diagnose_migration_history(
         }
     }
 
-    for (index, db_migration) in migrations_from_database.iter().enumerate() {
+    let active_migrations_from_database = migrations_from_database
+        .iter()
+        .filter(|migration| migration.rolled_back_at.is_none());
+
+    for (index, db_migration) in active_migrations_from_database.enumerate() {
         let corresponding_fs_migration = migrations_from_filesystem
             .migration_directories
             .iter()
             .find(|fs_migration| db_migration.migration_name == fs_migration.migration_name());
 
-        if db_migration.finished_at.is_none() && db_migration.rolled_back_at.is_none() {
+        if db_migration.finished_at.is_none() {
             diagnostics.failed_migrations.push(db_migration);
         }
 

@@ -126,7 +126,7 @@ async fn test_type_text_datetime_rfc3339(api: &mut dyn TestApi) -> crate::Result
 
     api.conn()
         .execute_raw(
-            &format!("INSERT INTO {} (value) VALUES (?)", &table),
+            &format!("INSERT INTO {table} (value) VALUES (?)"),
             &[Value::text(dt.to_rfc3339())],
         )
         .await?;
@@ -149,7 +149,7 @@ async fn test_type_text_datetime_rfc2822(api: &mut dyn TestApi) -> crate::Result
 
     api.conn()
         .execute_raw(
-            &format!("INSERT INTO {} (value) VALUES (?)", &table),
+            &format!("INSERT INTO {table} (value) VALUES (?)"),
             &[Value::text(dt.to_rfc2822())],
         )
         .await?;
@@ -170,7 +170,7 @@ async fn test_type_text_datetime_custom(api: &mut dyn TestApi) -> crate::Result<
 
     api.conn()
         .execute_raw(
-            &format!("INSERT INTO {} (value) VALUES (?)", &table),
+            &format!("INSERT INTO {table} (value) VALUES (?)"),
             &[Value::text("2020-04-20 16:20:00")],
         )
         .await?;
@@ -194,7 +194,7 @@ async fn test_get_int64_from_int32_field_fails(api: &mut dyn TestApi) -> crate::
 
     api.conn()
         .execute_raw(
-            &format!("INSERT INTO {} (value) VALUES (9223372036854775807)", &table),
+            &format!("INSERT INTO {table} (value) VALUES (9223372036854775807)"),
             &[],
         )
         .await?;

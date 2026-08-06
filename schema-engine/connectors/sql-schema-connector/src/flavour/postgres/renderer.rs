@@ -254,8 +254,9 @@ impl SqlRenderer for PostgresRenderer {
                     "DROP CONSTRAINT {}",
                     Quoted::postgres_ident(tables.previous.primary_key().unwrap().name())
                 )),
-                TableChange::RenamePrimaryKey => lines.push(format!(
-                    "RENAME CONSTRAINT {} TO {}",
+                TableChange::RenamePrimaryKey => after_statements.push(format!(
+                    "ALTER TABLE {} RENAME CONSTRAINT {} TO {}",
+                    quoted_alter_table_name(tables),
                     Quoted::postgres_ident(tables.previous.primary_key().unwrap().name()),
                     Quoted::postgres_ident(tables.next.primary_key().unwrap().name())
                 )),
@@ -318,7 +319,7 @@ impl SqlRenderer for PostgresRenderer {
         }
 
         if lines.is_empty() {
-            return Vec::new();
+            return before_statements.into_iter().chain(after_statements).collect();
         }
 
         if self.is_cockroach {
@@ -331,7 +332,6 @@ impl SqlRenderer for PostgresRenderer {
             out
         } else {
             let alter_table = format!("ALTER TABLE {} {}", quoted_alter_table_name(tables), lines.join(",\n"));
-
             before_statements
                 .into_iter()
                 .chain(std::iter::once(alter_table))
@@ -468,7 +468,7 @@ impl SqlRenderer for PostgresRenderer {
 
         for redefine_table in tables {
             let tables = schemas.walk(redefine_table.table_ids);
-            let temporary_table_name = format!("_prisma_new_{}", &tables.next.name());
+            let temporary_table_name = format!("_prisma_new_{}", tables.next.name());
             let quoted_temporary_table = QuotedWithPrefix(
                 tables.next.explicit_namespace().map(Quoted::postgres_ident),
                 Quoted::postgres_ident(&temporary_table_name),
@@ -732,7 +732,7 @@ fn render_alter_column(
     for step in steps {
         match step {
             PostgresAlterColumn::DropDefault => {
-                clauses.push(format!("{} DROP DEFAULT", &alter_column_prefix));
+                clauses.push(format!("{alter_column_prefix} DROP DEFAULT"));
 
                 // We also need to drop the sequence, in case it isn't used by any other column.
                 if let Some(DefaultKind::Sequence(sequence_name)) = columns.previous.default().map(|d| d.kind()) {
@@ -744,15 +744,13 @@ fn render_alter_column(
                 }
             }
             PostgresAlterColumn::SetDefault(new_default) => clauses.push(format!(
-                "{} SET DEFAULT {}",
-                &alter_column_prefix,
+                "{alter_column_prefix} SET DEFAULT {}",
                 render_default(&new_default, &render_column_type(columns.next, renderer))
             )),
-            PostgresAlterColumn::DropNotNull => clauses.push(format!("{} DROP NOT NULL", &alter_column_prefix)),
-            PostgresAlterColumn::SetNotNull => clauses.push(format!("{} SET NOT NULL", &alter_column_prefix)),
+            PostgresAlterColumn::DropNotNull => clauses.push(format!("{alter_column_prefix} DROP NOT NULL")),
+            PostgresAlterColumn::SetNotNull => clauses.push(format!("{alter_column_prefix} SET NOT NULL")),
             PostgresAlterColumn::SetType => clauses.push(format!(
-                "{} SET DATA TYPE {}",
-                &alter_column_prefix,
+                "{alter_column_prefix} SET DATA TYPE {}",
                 render_column_type(columns.next, renderer)
             )),
             PostgresAlterColumn::AddSequence => {
@@ -946,9 +944,9 @@ fn render_postgres_alter_enum(
 
     let mut stmts = Vec::with_capacity(10);
 
-    let temporary_enum_name = format!("{}_new", &enums.next.name());
+    let temporary_enum_name = format!("{}_new", enums.next.name());
     let tmp_name = QuotedWithPrefix::pg_new(enums.next.explicit_namespace(), temporary_enum_name.as_str());
-    let tmp_old_name = format!("{}_old", &enums.previous.name());
+    let tmp_old_name = format!("{}_old", enums.previous.name());
 
     stmts.push("BEGIN".to_string());
 

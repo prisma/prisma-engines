@@ -146,7 +146,7 @@ impl<'a> JsonProtocolAdapter<'a> {
     }
 
     fn convert_argument(value: JsonValue) -> crate::Result<ArgumentValue> {
-        let err_message = format!("Could not convert argument value {:?} to ArgumentValue.", &value);
+        let err_message = format!("Could not convert argument value {value:?} to ArgumentValue.");
         let build_err = || HandlerError::query_conversion(err_message.clone());
 
         match value {

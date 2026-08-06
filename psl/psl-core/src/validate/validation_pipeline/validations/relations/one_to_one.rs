@@ -41,12 +41,11 @@ pub(crate) fn fields_and_references_are_defined(relation: InlineRelationWalker<'
 
     if is_empty_fields(forward.referencing_fields()) && is_empty_fields(back.referencing_fields()) {
         let message = format!(
-            "The relation fields `{}` on Model `{}` and `{}` on Model `{}` do not provide the `fields` argument in the {} attribute. You have to provide it on one of the two fields.",
+            "The relation fields `{}` on Model `{}` and `{}` on Model `{}` do not provide the `fields` argument in the {RELATION_ATTRIBUTE_NAME} attribute. You have to provide it on one of the two fields.",
             forward.name(),
             forward.model().name(),
             back.name(),
-            &back.model().name(),
-            RELATION_ATTRIBUTE_NAME
+            back.model().name(),
         );
 
         ctx.push_error(DatamodelError::new_attribute_validation_error(

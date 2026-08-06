@@ -31,7 +31,7 @@ pub enum DriverAdapter {
 impl From<String> for DriverAdapter {
     fn from(s: String) -> Self {
         let s = s.as_str();
-        serde_json::from_str(s).unwrap_or_else(|_| panic!("Unknown driver adapter: {}", &s))
+        serde_json::from_str(s).unwrap_or_else(|_| panic!("Unknown driver adapter: {s}"))
     }
 }
 

@@ -24,7 +24,7 @@ pub(crate) fn compute_aggr_join(
     previous_join: Option<&str>,
     ctx: &Context<'_>,
 ) -> AliasedJoin {
-    let join_alias = format!("{}_{}", join_alias, &rf.related_model().name());
+    let join_alias = format!("{join_alias}_{}", rf.related_model().name());
 
     if rf.relation().is_many_to_many() {
         compute_aggr_join_m2m(

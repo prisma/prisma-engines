@@ -240,7 +240,7 @@ async fn foreign_key_constraint_violation(api: &mut dyn TestApi) -> crate::Resul
     let parent = api.create_temp_table("id smallint not null primary key").await?;
     let foreign_key = api.foreign_key(&parent, "id", "parent_id");
     let child = api
-        .create_temp_table(&format!("parent_id smallint not null, {}", &foreign_key))
+        .create_temp_table(&format!("parent_id smallint not null, {foreign_key}"))
         .await?;
 
     let insert = Insert::single_into(&child).value("parent_id", 10);
@@ -267,11 +267,10 @@ async fn ms_my_foreign_key_constraint_violation(api: &mut dyn TestApi) -> crate:
 
     let create_table = format!(
         r#"
-        CREATE TABLE {} (
+        CREATE TABLE {child_table} (
             parent_id smallint not null,
-            CONSTRAINT {} FOREIGN KEY (parent_id) REFERENCES {}(id))
-        "#,
-        &child_table, &constraint, &parent_table
+            CONSTRAINT {constraint} FOREIGN KEY (parent_id) REFERENCES {parent_table}(id))
+        "#
     );
 
     api.conn().raw_cmd(&create_table).await?;
@@ -284,8 +283,8 @@ async fn ms_my_foreign_key_constraint_violation(api: &mut dyn TestApi) -> crate:
     let err = result.unwrap_err();
     assert!(matches!(err.kind(), ErrorKind::ForeignKeyConstraintViolation { .. }));
 
-    api.conn().raw_cmd(&format!("DROP TABLE {}", &child_table)).await?;
-    api.conn().raw_cmd(&format!("DROP TABLE {}", &parent_table)).await?;
+    api.conn().raw_cmd(&format!("DROP TABLE {child_table}")).await?;
+    api.conn().raw_cmd(&format!("DROP TABLE {parent_table}")).await?;
 
     Ok(())
 }
@@ -405,10 +404,7 @@ async fn unsupported_column_type(api: &mut dyn TestApi) -> crate::Result<()> {
     let table = api.create_temp_table("point point, points point[]").await?;
     api.conn()
         .query_raw(
-            &format!(
-                r#"INSERT INTO {} ("point", "points") VALUES (Point(1,2), '{{"(1, 2)", "(2, 3)"}}')"#,
-                &table
-            ),
+            &format!(r#"INSERT INTO {table} ("point", "points") VALUES (Point(1,2), '{{"(1, 2)", "(2, 3)"}}')"#),
             &[],
         )
         .await?;

@@ -7,7 +7,7 @@ use std::{collections::HashMap, iter};
 use either::Either;
 use enumflags2::BitFlags;
 use indoc::indoc;
-use psl::PreviewFeature;
+use psl::{PreviewFeature, datamodel_connector::Flavour};
 use quaint::{
     connector::{self, MakeTlsConnectorManager, PostgresUrl, tokio_postgres::error::ErrorPosition},
     prelude::{NativeConnectionInfo, Queryable},
@@ -38,7 +38,11 @@ pub struct Params {
 impl Params {
     pub fn new(connector_params: ConnectorParams) -> ConnectorResult<Self> {
         if let Some(shadow_db_url) = &connector_params.shadow_database_connection_string {
-            validate_connection_infos_do_not_match(&connector_params.connection_string, shadow_db_url)?;
+            validate_connection_infos_do_not_match(
+                Flavour::Postgres,
+                &connector_params.connection_string,
+                shadow_db_url,
+            )?;
         }
 
         let url = connection_string::parse(&connector_params.connection_string)?;

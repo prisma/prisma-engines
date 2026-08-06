@@ -139,10 +139,7 @@ impl TestApi for MySql<'_> {
     fn foreign_key(&mut self, parent_table: &str, parent_column: &str, child_column: &str) -> String {
         let name = self.get_name();
 
-        format!(
-            "CONSTRAINT {} FOREIGN KEY ({}) REFERENCES {}({})",
-            &name, child_column, parent_table, parent_column
-        )
+        format!("CONSTRAINT {name} FOREIGN KEY ({child_column}) REFERENCES {parent_table}({parent_column})")
     }
 
     fn autogen_id(&self, name: &str) -> String {

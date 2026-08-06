@@ -14,9 +14,9 @@ pub(crate) fn validate_singular_id(relation: ImplicitManyToManyRelationWalker<'_
 
             let message = format!(
                 "The relation field `{}` on {container} `{}` references `{}` which does not have an `@id` field. Models without `@id` cannot be part of a many to many relation. Use an explicit intermediate Model to represent this relationship.",
-                &relation_field.name(),
-                &relation_field.model().name(),
-                &relation_field.related_model().name(),
+                relation_field.name(),
+                relation_field.model().name(),
+                relation_field.related_model().name(),
             );
 
             ctx.push_error(DatamodelError::new_field_validation_error(
@@ -34,7 +34,7 @@ pub(crate) fn validate_singular_id(relation: ImplicitManyToManyRelationWalker<'_
             ctx.push_error(DatamodelError::new_validation_error(
             &format!(
                 "Implicit many-to-many relations must always reference the id field of the related model. Change the argument `references` to use the id field of the related model `{}`. But it is referencing the following fields that are not the id: {}",
-                &relation_field.related_model().name(),
+                relation_field.related_model().name(),
                 relation_field.referenced_fields().into_iter().flatten().map(|f| f.name()).collect::<Vec<_>>().join(", ")
             ),
             relation_field.ast_field().span())

@@ -206,6 +206,23 @@ impl Expression {
             }
             Expression::Transaction(expr) => {
                 expr.simplify();
+                // A plan that executes at most one statement is atomic on its own and doesn't
+                // need a transaction. Skipping it avoids BEGIN/COMMIT round-trips and keeps
+                // single-statement operations like `updateMany` and `createMany` working on
+                // driver adapters without transaction support (e.g. Neon over HTTP).
+                // A chunkable statement may still be split into multiple queries by the client
+                // if its parameters exceed the bind limit; such chunks then run without a
+                // transaction, consistent with how `deleteMany` and read queries, which are
+                // never wrapped in a transaction, are chunked today. Chunkability cannot
+                // refine this decision at compile time: nearly every single-statement write is
+                // marked chunkable (inserts unconditionally, filters unless negated), so
+                // keeping the wrapper for chunkable statements would keep it for essentially
+                // all of them, and whether a statement actually splits depends on the
+                // adapter-specific bind limit that is only known to the client at runtime.
+                // See https://github.com/prisma/prisma/issues/29748.
+                if expr.max_statement_count() <= 1 {
+                    *self = std::mem::replace(expr, Expression::Unit);
+                }
             }
             Expression::DataMap { expr, .. } => {
                 expr.simplify();
@@ -234,6 +251,55 @@ impl Expression {
             Expression::Process { expr, .. } => {
                 expr.simplify();
             }
+        }
+    }
+
+    /// Returns an upper bound on the number of database statements (`Query` or `Execute`
+    /// nodes) that evaluating this expression can execute, assuming each statement node
+    /// renders to a single query.
+    ///
+    /// Nested `Transaction` expressions are treated as unbounded since they manage their own
+    /// lifecycle.
+    fn max_statement_count(&self) -> usize {
+        match self {
+            Expression::Value(_) | Expression::Get { .. } | Expression::GetFirstNonEmpty { .. } | Expression::Unit => 0,
+
+            Expression::Query(_) | Expression::Execute(_) => 1,
+
+            Expression::Seq(exprs) | Expression::Concat(exprs) | Expression::Sum(exprs) => exprs
+                .iter()
+                .map(Self::max_statement_count)
+                .fold(0, usize::saturating_add),
+
+            Expression::Let { bindings, expr } => bindings
+                .iter()
+                .map(|binding| binding.expr.max_statement_count())
+                .fold(expr.max_statement_count(), usize::saturating_add),
+
+            Expression::Unique(expr)
+            | Expression::Required(expr)
+            | Expression::MapField { records: expr, .. }
+            | Expression::DataMap { expr, .. }
+            | Expression::Validate { expr, .. }
+            | Expression::InitializeRecord { expr, .. }
+            | Expression::MapRecord { expr, .. }
+            | Expression::Process { expr, .. } => expr.max_statement_count(),
+
+            Expression::Join { parent, children, .. } => children
+                .iter()
+                .map(|child| child.child.max_statement_count())
+                .fold(parent.max_statement_count(), usize::saturating_add),
+
+            // Only one of the branches is evaluated, so the bound is the larger of the two.
+            Expression::If {
+                value, then, r#else, ..
+            } => value
+                .max_statement_count()
+                .saturating_add(then.max_statement_count().max(r#else.max_statement_count())),
+
+            Expression::Diff { from, to, .. } => from.max_statement_count().saturating_add(to.max_statement_count()),
+
+            Expression::Transaction(_) => usize::MAX,
         }
     }
 }

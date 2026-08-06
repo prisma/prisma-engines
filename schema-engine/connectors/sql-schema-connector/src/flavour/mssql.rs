@@ -12,6 +12,7 @@ use connector::{Connection, generic_apply_migration_script, shadow_db};
 use connector::{Connection, generic_apply_migration_script, shadow_db};
 use destructive_change_checker::MssqlDestructiveChangeCheckerFlavour;
 use indoc::formatdoc;
+use psl::datamodel_connector::Flavour;
 use quaint::{
     connector::{DEFAULT_MSSQL_SCHEMA, MssqlUrl},
     prelude::Table,
@@ -40,7 +41,11 @@ struct Params {
 impl Params {
     fn new(connector_params: ConnectorParams) -> ConnectorResult<Self> {
         if let Some(shadow_db_url) = &connector_params.shadow_database_connection_string {
-            super::validate_connection_infos_do_not_match(&connector_params.connection_string, shadow_db_url)?;
+            super::validate_connection_infos_do_not_match(
+                Flavour::Sqlserver,
+                &connector_params.connection_string,
+                shadow_db_url,
+            )?;
         }
 
         let url = MssqlUrl::new(&connector_params.connection_string).map_err(ConnectorError::url_parse_error)?;
@@ -315,7 +320,7 @@ impl SqlConnector for MssqlConnector {
                     let ns = row.get("namespace").and_then(|s| s.to_string());
                     let table_name = row.get("table_name").and_then(|s| s.to_string());
 
-                    ns.and_then(|ns| table_name.map(|table_name| (ns, table_name)))
+                    ns.zip(table_name)
                 })
                 .filter(|(ns, table_name)| {
                     namespaces.contains(ns)

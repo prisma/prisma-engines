@@ -164,6 +164,7 @@ impl<'a> FeatureMapWithProvider<'a> {
                  | SchemaEngineDriverAdapters
                  | ShardKeys
                  | StrictUndefinedChecks
+                 | TypedSql
                  | Views
             }),
             native: HashMap::from([
@@ -231,7 +232,7 @@ impl<'a> FeatureMapWithProvider<'a> {
                 | TransactionApi
                 | UncheckedScalarInputs
             }),
-            hidden: enumflags2::make_bitflags!(PreviewFeature::{ReactNative | TypedSql}),
+            hidden: enumflags2::make_bitflags!(PreviewFeature::ReactNative),
         };
 
         Self {

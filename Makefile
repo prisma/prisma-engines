@@ -3,7 +3,9 @@ REPO_ROOT := $(shell git rev-parse --show-toplevel)
 CONFIG_PATH = ./query-engine/connector-test-kit-rs/test-configs
 CONFIG_FILE = .test_config
 DEV_SCHEMA_FILE = dev_datamodel.prisma
-PRISMA_BRANCH ?= main
+# Exported rather than interpolated into recipes: in CI the value can come from
+# the per-PR branch override, so it must reach the shell as data, not as source.
+export PRISMA_BRANCH ?= v7
 ENGINE_SIZE_OUTPUT ?= /dev/stdout
 QE_WASM_VERSION ?= 0.0.0
 SCHEMA_WASM_VERSION ?= 0.0.0
@@ -460,14 +462,14 @@ build-driver-adapters: ensure-prisma-present
 
 ensure-prisma-present:
 	@if [ -d ../prisma ]; then \
-		cd "$(realpath ../prisma)" && git fetch origin main; \
-		LOCAL_CHANGES=$$(git diff --name-only HEAD origin/main -- 'packages/*adapter*'); \
+		cd "$(realpath ../prisma)" && git fetch origin "$${PRISMA_BRANCH}"; \
+		LOCAL_CHANGES=$$(git diff --name-only HEAD "origin/$${PRISMA_BRANCH}" -- 'packages/*adapter*'); \
 		if [ -n "$$LOCAL_CHANGES" ]; then \
-		  echo "⚠️ ../prisma diverges from prisma/prisma main branch. Test results might diverge from those in CI ⚠️ "; \
+		  echo "⚠️ ../prisma diverges from prisma/prisma $${PRISMA_BRANCH} branch. Test results might diverge from those in CI ⚠️ "; \
 		fi \
 	else \
-		echo "git clone --depth=1 https://github.com/prisma/prisma.git --branch=$(PRISMA_BRANCH) ../prisma"; \
-		git clone --depth=1 https://github.com/prisma/prisma.git --branch=$(PRISMA_BRANCH) "../prisma" && echo "Prisma repository has been cloned to ../prisma"; \
+		echo "git clone --depth=1 https://github.com/prisma/prisma.git --branch=$${PRISMA_BRANCH} ../prisma"; \
+		git clone --depth=1 https://github.com/prisma/prisma.git --branch="$${PRISMA_BRANCH}" "../prisma" && echo "Prisma repository has been cloned to ../prisma"; \
 	fi;
 
 ## OpenTelemetry

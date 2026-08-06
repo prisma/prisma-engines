@@ -1683,11 +1683,11 @@ async fn op_test_div_one_level(api: &mut dyn TestApi) -> crate::Result<()> {
 #[test_each_connector(tags("postgresql"))]
 async fn enum_values(api: &mut dyn TestApi) -> crate::Result<()> {
     let type_name = api.get_name();
-    let create_type = format!("CREATE TYPE {} AS ENUM ('A', 'B')", &type_name);
+    let create_type = format!("CREATE TYPE {type_name} AS ENUM ('A', 'B')");
     api.conn().raw_cmd(&create_type).await?;
 
     let table = api
-        .create_temp_table(&format!("id SERIAL PRIMARY KEY, value {}", &type_name))
+        .create_temp_table(&format!("id SERIAL PRIMARY KEY, value {type_name}"))
         .await?;
 
     api.conn()

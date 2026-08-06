@@ -458,7 +458,7 @@ fn basic_jsonrpc_roundtrip_works_with_params(_api: TestApi) {
                 })
                 .to_string();
 
-                writeln!(stdin, "{}", &params_template).unwrap();
+                writeln!(stdin, "{params_template}").unwrap();
 
                 let mut response = String::new();
                 stdout.read_line(&mut response).unwrap();
@@ -928,7 +928,7 @@ fn get_database_version_multi_file(_api: TestApi) {
                 })
                 .to_string();
 
-                writeln!(stdin, "{}", &params_template).unwrap();
+                writeln!(stdin, "{params_template}").unwrap();
 
                 let mut response = String::new();
                 stdout.read_line(&mut response).unwrap();

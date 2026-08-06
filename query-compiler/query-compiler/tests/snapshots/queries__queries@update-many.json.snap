@@ -1,0 +1,9 @@
+---
+source: query-compiler/query-compiler/tests/queries.rs
+expression: pretty
+input_file: query-compiler/query-compiler/tests/data/update-many.json
+---
+dataMap affectedRows
+execute «UPDATE "public"."User" SET "role" = CAST($1::text AS "public"."Role")
+         WHERE "public"."User"."email" = $2»
+params [const(String("admin")), const(String("user@prisma.io"))]

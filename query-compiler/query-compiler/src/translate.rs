@@ -47,7 +47,7 @@ pub fn translate(mut graph: QueryGraph, builder: &dyn QueryBuilder) -> Translate
         .collect::<TranslateResult<Vec<_>>>()
         .map(Expression::Seq)?;
 
-    let mut root = if let Some(structure) = structure {
+    let root = if let Some(structure) = structure {
         Expression::DataMap {
             expr: Box::new(root),
             structure,
@@ -57,10 +57,13 @@ pub fn translate(mut graph: QueryGraph, builder: &dyn QueryBuilder) -> Translate
         root
     };
 
+    let mut root = if graph.needs_transaction() {
+        Transaction(Box::new(root))
+    } else {
+        root
+    };
+
     root.simplify();
-    if graph.needs_transaction() {
-        return Ok(Transaction(Box::new(root)));
-    }
     Ok(root)
 }
 

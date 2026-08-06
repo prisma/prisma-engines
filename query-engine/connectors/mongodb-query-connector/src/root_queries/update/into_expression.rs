@@ -31,8 +31,8 @@ impl IntoUpdateExpression for GenericOperation {
 
 impl IntoUpdateExpressions for Upsert {
     fn into_update_expressions(self) -> crate::Result<Vec<UpdateExpression>> {
-        let should_set_id = format!("__prisma_should_set__{}", &self.field_path.identifier());
-        let should_set_ref_id = format!("${}", &should_set_id);
+        let should_set_id = format!("__prisma_should_set__{}", self.field_path.identifier());
+        let should_set_ref_id = format!("${should_set_id}");
 
         let mut expressions: Vec<UpdateExpression> = vec![];
 
@@ -94,9 +94,9 @@ impl IntoUpdateExpression for UpdateMany {
         // The alias that will be used in the `$map` operation
         let elem_alias = self.elem_alias.clone();
         // A reference to that alias
-        let ref_elem_alias = format!("$${}", &elem_alias);
+        let ref_elem_alias = format!("$${elem_alias}");
 
-        let (filter_doc, _) = filter::MongoFilterVisitor::new(format!("${}", &elem_alias), false)
+        let (filter_doc, _) = filter::MongoFilterVisitor::new(format!("${elem_alias}"), false)
             .visit(self.filter.clone())?
             .render();
 

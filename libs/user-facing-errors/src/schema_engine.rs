@@ -71,7 +71,7 @@ impl crate::UserFacingError for MigrationDoesNotApplyCleanly {
                 message: _,
                 meta: _,
                 error_code,
-            }) => format!("Error code: {}\n", &error_code),
+            }) => format!("Error code: {error_code}\n"),
             crate::ErrorType::Unknown(_) => String::new(),
         };
 
@@ -170,7 +170,7 @@ impl crate::UserFacingError for ShadowDbCreationError {
                 message: _,
                 meta: _,
                 error_code,
-            }) => format!("Error code: {}\n", &error_code),
+            }) => format!("Error code: {error_code}\n"),
             crate::ErrorType::Unknown(_) => String::new(),
         };
 
@@ -205,7 +205,7 @@ impl crate::UserFacingError for SoftResetFailed {
                 message: _,
                 meta: _,
                 error_code,
-            }) => format!("Error code: {}\n", &error_code),
+            }) => format!("Error code: {error_code}\n"),
             crate::ErrorType::Unknown(_) => String::new(),
         };
 
@@ -299,6 +299,13 @@ pub struct MissingNamespaceInExternalTables;
     message = "For the current database, `externalTables` & `externalEnums` in your prisma config must contain only simple identifiers without a schema name."
 )]
 pub struct UnexpectedNamespaceInExternalTables;
+
+#[derive(Debug, SimpleUserFacingError)]
+#[user_facing(
+    code = "P3025",
+    message = "The shadow database you configured appears to be the same as the main database. Please specify another shadow database."
+)]
+pub struct ShadowDbSameAsMainDb;
 
 #[derive(Debug, SimpleUserFacingError)]
 #[user_facing(code = "P4001", message = "The introspected database was empty.")]
