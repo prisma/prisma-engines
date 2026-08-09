@@ -3,7 +3,6 @@ use crate::{
     result_node::{ResultNode, ResultNodeBuilder},
 };
 use bon::builder;
-use indexmap::IndexSet;
 use itertools::Itertools;
 use psl::datamodel_connector::Flavour;
 use query_core::{
@@ -11,7 +10,8 @@ use query_core::{
     UpdateRecord, WriteQuery,
 };
 use query_structure::{
-    AggregationSelection, FieldArity, FieldSelection, FieldTypeInformation, ScalarField, SelectedField, Type,
+    AggregationSelection, FieldArity, FieldSelection, FieldTypeInformation, ScalarField, SelectedField,
+    SelectionIdentifier, Type,
     TypeIdentifier,
 };
 use serde::Serialize;
@@ -278,41 +278,41 @@ fn get_result_node_for_aggregation(
     builder: &mut ResultNodeBuilder,
     object_name: Option<Cow<'static, str>>,
 ) -> Option<ResultNode> {
-    let mut ordered_set = IndexSet::new();
-
-    for (key, nested) in selection_order {
-        if let Some(nested) = nested {
-            for nested_key in nested {
-                ordered_set.insert((Some(key.as_str()), nested_key.as_str()));
-            }
-        } else {
-            ordered_set.insert((None, key.as_str()));
-        }
-    }
-
     let mut node = ResultNodeBuilder::new_object(object_name);
 
-    for (name, prefix, db_alias, typ) in selectors
-        .iter()
-        .flat_map(|sel| {
-            sel.identifiers().map(move |ident| {
-                let db_alias = ident.db_alias();
-                let type_info = FieldTypeInformation::new(ident.typ, ident.arity, None);
-                (ident.field.name(), sel.aggregation_name(), db_alias, type_info)
-            })
-        })
-        .sorted_by_key(|(name, prefix, _, _)| ordered_set.get_index_of(&(*prefix, *name)))
-    {
-        let value = builder.new_value(db_alias.into_owned(), typ);
-        if let Some(prefix) = prefix {
-            node.entry_or_insert(prefix, None::<&str>)
-                .add_field(name.to_owned(), value);
+    for ((key, nested), selector) in selection_order.iter().zip(selectors) {
+        if let Some(nested) = nested {
+            for nested_key in nested {
+                if let Some(ident) = selector.identifiers().find(|ident| ident.field.name() == nested_key) {
+                    add_aggregation_result_field(&mut node, builder, ident);
+                }
+            }
         } else {
-            node.add_field(name.to_owned(), value);
+            for ident in selector.identifiers().filter(|ident| ident.field.name() == key) {
+                add_aggregation_result_field(&mut node, builder, ident);
+            }
         }
     }
 
     Some(node.build())
+}
+
+fn add_aggregation_result_field(
+    node: &mut crate::result_node::ObjectBuilder,
+    builder: &mut ResultNodeBuilder,
+    ident: SelectionIdentifier<'_>,
+) {
+    let name = ident.field.name().to_owned();
+    let prefix = ident.aggregation_name;
+    let db_alias = ident.db_alias().into_owned();
+    let type_info = FieldTypeInformation::new(ident.typ, ident.arity, None);
+    let value = builder.new_value(db_alias, type_info);
+
+    if let Some(prefix) = prefix {
+        node.entry_or_insert(prefix, None::<&str>).add_field(name, value);
+    } else {
+        node.add_field(name, value);
+    }
 }
 
 fn get_result_node_for_create_many(
