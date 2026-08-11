@@ -27,16 +27,24 @@ impl<'a> Postgres<'a> {
         match expr.kind() {
             ExpressionKind::Column(col) => match (col.type_family.as_ref(), col.native_type.as_deref()) {
                 (Some(TypeFamily::Decimal(_)), Some("MONEY")) => {
+                    let is_list = col.is_list;
                     self.visit_expression(expr)?;
                     self.write("::numeric")?;
+                    if is_list {
+                        self.write("[]")?;
+                    }
 
                     Ok(())
                 }
                 // Cast BigInt to text to preserve precision when parsed by JavaScript.
                 // JavaScript's JSON.parse loses precision for integers > 2^53-1.
                 (Some(TypeFamily::Int), Some("BIGINT" | "INT8")) => {
+                    let is_list = col.is_list;
                     self.visit_expression(expr)?;
                     self.write("::text")?;
+                    if is_list {
+                        self.write("[]")?;
+                    }
 
                     Ok(())
                 }
@@ -1443,6 +1451,22 @@ mod tests {
         }
 
         #[test]
+        fn money_array() {
+            let build_json = json_build_object(vec![(
+                "money".into(),
+                Column::from("money")
+                    .native_column_type(Some("money"))
+                    .type_family(TypeFamily::Decimal(None))
+                    .set_is_list(true)
+                    .into(),
+            )]);
+            let query = Select::default().value(build_json);
+            let (sql, _) = Postgres::build(query).unwrap();
+
+            assert_eq!(sql, "SELECT JSONB_BUILD_OBJECT('money', \"money\"::numeric[])");
+        }
+
+        #[test]
         fn bigint() {
             let build_json = json_build_object(vec![(
                 "id".into(),
@@ -1455,6 +1479,22 @@ mod tests {
             let (sql, _) = Postgres::build(query).unwrap();
 
             assert_eq!(sql, "SELECT JSONB_BUILD_OBJECT('id', \"id\"::text)");
+        }
+
+        #[test]
+        fn bigint_array() {
+            let build_json = json_build_object(vec![(
+                "id".into(),
+                Column::from("id")
+                    .native_column_type(Some("BigInt"))
+                    .type_family(TypeFamily::Int)
+                    .set_is_list(true)
+                    .into(),
+            )]);
+            let query = Select::default().value(build_json);
+            let (sql, _) = Postgres::build(query).unwrap();
+
+            assert_eq!(sql, "SELECT JSONB_BUILD_OBJECT('id', \"id\"::text[])");
         }
 
         #[test]

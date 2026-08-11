@@ -972,7 +972,7 @@ fn render_postgres_alter_enum(
             let sql = format!(
                 "ALTER TABLE {table_name} \
                             ALTER COLUMN {column_name} TYPE {tmp_name}{array} \
-                                USING ({column_name}::text::{tmp_name}{array})",
+                                USING ({column_name}::text{array}::{tmp_name}{array})",
                 table_name = QuotedWithPrefix::pg_from_table_walker(column.table()),
                 column_name = Quoted::postgres_ident(column.name()),
                 array = array,
