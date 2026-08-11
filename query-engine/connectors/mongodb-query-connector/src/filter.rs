@@ -276,18 +276,23 @@ impl MongoFilterVisitor {
             ScalarCondition::NotSearch(_, _) => unimplemented!("Full-text search is not supported yet on MongoDB"),
         };
 
-        let filter_doc = if !is_set_cond {
-            exclude_undefineds(&field_name, self.invert_undefined_exclusion(), filter_doc)
-        } else {
-            filter_doc
-        };
+        let filter_doc =
+            if !is_set_cond && should_exclude_undefineds(field.is_required(), self.invert_undefined_exclusion()) {
+                exclude_undefineds(&field_name, self.invert_undefined_exclusion(), filter_doc)
+            } else {
+                filter_doc
+            };
 
         let filter_doc = if let Some(field_ref) = &field_ref {
-            exclude_undefineds(
-                self.prefixed_field_ref(field_ref)?,
-                self.invert_undefined_exclusion(),
-                filter_doc,
-            )
+            if should_exclude_undefineds(field_ref.is_required(), self.invert_undefined_exclusion()) {
+                exclude_undefineds(
+                    self.prefixed_field_ref(field_ref)?,
+                    self.invert_undefined_exclusion(),
+                    filter_doc,
+                )
+            } else {
+                filter_doc
+            }
         } else {
             filter_doc
         };
@@ -421,18 +426,23 @@ impl MongoFilterVisitor {
             )),
         }?;
 
-        let filter_doc = if !is_set_cond {
-            exclude_undefineds(&field_name, self.invert_undefined_exclusion(), filter_doc)
-        } else {
-            filter_doc
-        };
+        let filter_doc =
+            if !is_set_cond && should_exclude_undefineds(field.is_required(), self.invert_undefined_exclusion()) {
+                exclude_undefineds(&field_name, self.invert_undefined_exclusion(), filter_doc)
+            } else {
+                filter_doc
+            };
 
         let filter_doc = if let Some(field_ref) = &field_ref {
-            exclude_undefineds(
-                self.prefixed_field_ref(field_ref)?,
-                self.invert_undefined_exclusion(),
-                filter_doc,
-            )
+            if should_exclude_undefineds(field_ref.is_required(), self.invert_undefined_exclusion()) {
+                exclude_undefineds(
+                    self.prefixed_field_ref(field_ref)?,
+                    self.invert_undefined_exclusion(),
+                    filter_doc,
+                )
+            } else {
+                filter_doc
+            }
         } else {
             filter_doc
         };
@@ -522,14 +532,22 @@ impl MongoFilterVisitor {
             filter_doc
         };
 
-        let filter_doc = exclude_undefineds(&field_name, self.invert_undefined_exclusion(), filter_doc);
+        let filter_doc = if should_exclude_undefineds(field.is_required(), self.invert_undefined_exclusion()) {
+            exclude_undefineds(&field_name, self.invert_undefined_exclusion(), filter_doc)
+        } else {
+            filter_doc
+        };
 
         let filter_doc = if let Some(field_ref) = field_ref.as_ref() {
-            exclude_undefineds(
-                self.prefixed_field_ref(field_ref)?,
-                self.invert_undefined_exclusion(),
-                filter_doc,
-            )
+            if should_exclude_undefineds(field_ref.is_required(), self.invert_undefined_exclusion()) {
+                exclude_undefineds(
+                    self.prefixed_field_ref(field_ref)?,
+                    self.invert_undefined_exclusion(),
+                    filter_doc,
+                )
+            } else {
+                filter_doc
+            }
         } else {
             filter_doc
         };
@@ -649,11 +667,12 @@ impl MongoFilterVisitor {
             filter_doc
         };
 
-        let filter_doc = if !is_set_cond {
-            exclude_undefineds(&field_name, self.invert_undefined_exclusion(), filter_doc)
-        } else {
-            filter_doc
-        };
+        let filter_doc =
+            if !is_set_cond && should_exclude_undefineds(field.is_required(), self.invert_undefined_exclusion()) {
+                exclude_undefineds(&field_name, self.invert_undefined_exclusion(), filter_doc)
+            } else {
+                filter_doc
+            };
 
         Ok(MongoFilter::Composite(filter_doc))
     }
@@ -1077,6 +1096,21 @@ fn exclude_undefineds(field_name: impl Into<Bson>, invert: bool, filter: Documen
     }
 }
 
+/// Whether the `$$REMOVE` guard should be added to a filter for a field.
+///
+/// Required fields are always present in documents written by Prisma, so the guard is
+/// unnecessary for them and, worse, forces `$expr` evaluation that bypasses indexes
+/// (see <https://github.com/prisma/prisma/issues/29000>).
+///
+/// MongoDB does not enforce schema, so documents created before a field was added (e.g. via
+/// `db push`) may lack it even though it is required in the Prisma schema. Missing fields never
+/// equal a concrete value, so positive filters are unaffected by dropping the guard. In inverted
+/// contexts (`invert_undefined_exclusion`), however, a missing field must keep matching negated
+/// filters (`not:` queries), so we conservatively keep the guard there.
+fn should_exclude_undefineds(field_is_required: bool, invert: bool) -> bool {
+    !(field_is_required && !invert)
+}
+
 #[derive(Debug, Clone, Default)]
 pub(crate) struct FilterPrefix {
     parts: Vec<String>,
@@ -1151,5 +1185,222 @@ impl From<&str> for FilterPrefix {
             parts: vec![alias.to_owned()],
             ignore_target: false,
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use indoc::indoc;
+    use query_structure::{CompositeFieldRef, InternalDataModel, ScalarFieldRef};
+    use std::sync::Arc;
+
+    fn mongo_schema() -> InternalDataModel {
+        let schema = psl::validate_without_extensions(
+            indoc! {r#"
+                datasource db {
+                  provider = "mongodb"
+                }
+
+                model User {
+                  id      String   @id @map("_id")
+                  uid     String   @unique
+                  name    String
+                  country String?
+                  tags    String[]
+                  address Address?
+                }
+
+                type Address {
+                  city String
+                }
+            "#}
+            .into(),
+        );
+
+        assert!(!schema.diagnostics.has_errors(), "{:?}", schema.diagnostics);
+
+        InternalDataModel {
+            schema: Arc::new(schema),
+        }
+    }
+
+    fn scalar_field(dm: &InternalDataModel, name: &str) -> ScalarFieldRef {
+        dm.find_model("User").unwrap().fields().find_from_scalar(name).unwrap()
+    }
+
+    fn composite_field(dm: &InternalDataModel, name: &str) -> CompositeFieldRef {
+        dm.find_model("User")
+            .unwrap()
+            .fields()
+            .composite()
+            .into_iter()
+            .find(|cf| cf.name() == name)
+            .unwrap()
+    }
+
+    fn render(filter: Filter) -> Document {
+        MongoFilterVisitor::new(FilterPrefix::default(), false)
+            .visit(filter)
+            .unwrap()
+            .render()
+            .0
+    }
+
+    /// `_id`, `@unique` and plain required fields must be reported as required.
+    #[test]
+    fn requiredness_of_id_unique_and_required_fields() {
+        let dm = mongo_schema();
+
+        assert!(scalar_field(&dm, "id").is_required());
+        assert!(scalar_field(&dm, "uid").is_required());
+        assert!(scalar_field(&dm, "name").is_required());
+        assert!(!scalar_field(&dm, "country").is_required());
+        assert!(!scalar_field(&dm, "tags").is_required());
+    }
+
+    /// Positive filters on required fields must not carry the `$$REMOVE` guard: the guard
+    /// forces `$expr` evaluation that bypasses indexes (see prisma/prisma#29000).
+    #[test]
+    fn required_fields_skip_undefined_exclusion() {
+        let dm = mongo_schema();
+        let id = scalar_field(&dm, "id");
+        let uid = scalar_field(&dm, "uid");
+        let name = scalar_field(&dm, "name");
+
+        assert_eq!(
+            render(id.equals(PrismaValue::String("abc".into()))),
+            doc! { "$eq": ["$_id", { "$literal": "abc" }] }
+        );
+        assert_eq!(
+            render(uid.equals(PrismaValue::String("abc".into()))),
+            doc! { "$eq": ["$uid", { "$literal": "abc" }] }
+        );
+        assert_eq!(
+            render(name.equals(PrismaValue::String("abc".into()))),
+            doc! { "$eq": ["$name", { "$literal": "abc" }] }
+        );
+        assert_eq!(
+            render(name.is_in(ConditionListValue::list(vec![
+                PrismaValue::String("a".into()),
+                PrismaValue::String("b".into())
+            ]))),
+            doc! {
+                "$or": [
+                    { "$eq": ["$name", { "$literal": "a" }] },
+                    { "$eq": ["$name", { "$literal": "b" }] }
+                ]
+            }
+        );
+    }
+
+    /// Optional fields must keep the `$$REMOVE` guard: a missing field must never match a
+    /// value filter.
+    #[test]
+    fn optional_fields_keep_undefined_exclusion() {
+        let dm = mongo_schema();
+        let country = scalar_field(&dm, "country");
+
+        assert_eq!(
+            render(country.equals(PrismaValue::String("abc".into()))),
+            doc! {
+                "$and": [
+                    { "$eq": ["$country", { "$literal": "abc" }] },
+                    { "$ne": ["$country", "$$REMOVE"] }
+                ]
+            }
+        );
+        assert_eq!(
+            render(country.not_equals(PrismaValue::String("abc".into()))),
+            doc! {
+                "$and": [
+                    { "$ne": ["$country", { "$literal": "abc" }] },
+                    { "$ne": ["$country", "$$REMOVE"] }
+                ]
+            }
+        );
+    }
+
+    /// NOT filters on optional fields must keep the `$$REMOVE` guard so that documents
+    /// missing the field still match.
+    #[test]
+    fn not_filters_on_optional_fields_keep_undefined_exclusion() {
+        let dm = mongo_schema();
+        let country = scalar_field(&dm, "country");
+
+        assert_eq!(
+            render(Filter::not(vec![country.equals(PrismaValue::String("abc".into()))])),
+            doc! {
+                "$and": [
+                    {
+                        "$and": [
+                            { "$ne": ["$country", { "$literal": "abc" }] },
+                            { "$ne": ["$country", "$$REMOVE"] }
+                        ]
+                    }
+                ]
+            }
+        );
+    }
+
+    /// `isSet` filters are rendered directly and must not be wrapped in an additional
+    /// undefined exclusion.
+    #[test]
+    fn is_set_filters_are_untouched() {
+        let dm = mongo_schema();
+        let name = scalar_field(&dm, "name");
+        let country = scalar_field(&dm, "country");
+
+        assert_eq!(render(name.is_set(true)), doc! { "$ne": ["$name", "$$REMOVE"] });
+        assert_eq!(render(name.is_set(false)), doc! { "$eq": ["$name", "$$REMOVE"] });
+        assert_eq!(render(country.is_set(true)), doc! { "$ne": ["$country", "$$REMOVE"] });
+    }
+
+    /// List fields are never required: the guard must be kept even though the field is not
+    /// optional.
+    #[test]
+    fn list_filters_keep_undefined_exclusion() {
+        let dm = mongo_schema();
+        let tags = scalar_field(&dm, "tags");
+
+        assert_eq!(
+            render(tags.contains_some_element(ConditionListValue::list(vec![PrismaValue::String("a".into())]))),
+            doc! {
+                "$and": [
+                    { "$or": [ { "$in": ["a", { "$ifNull": ["$tags", []] }] } ] },
+                    { "$ne": ["$tags", "$$REMOVE"] }
+                ]
+            }
+        );
+    }
+
+    /// Composite filters on optional composite fields must keep the guard.
+    #[test]
+    fn composite_filters_keep_undefined_exclusion_for_optional_fields() {
+        let dm = mongo_schema();
+        let address = composite_field(&dm, "address");
+
+        assert_eq!(
+            render(address.equals(PrismaValue::Object(vec![(
+                "city".to_owned(),
+                PrismaValue::String("Berlin".to_owned())
+            )]))),
+            doc! {
+                "$and": [
+                    { "$eq": ["$address", { "city": "Berlin" }] },
+                    { "$ne": ["$address", "$$REMOVE"] }
+                ]
+            }
+        );
+    }
+
+    /// The `should_exclude_undefineds` decision table: keep the guard unless the field is
+    /// required and the context is not inverted.
+    #[test]
+    fn should_exclude_undefineds_decision_table() {
+        assert!(should_exclude_undefineds(false, false));
+        assert!(should_exclude_undefineds(false, true));
+        assert!(should_exclude_undefineds(true, true));
+        assert!(!should_exclude_undefineds(true, false));
     }
 }
