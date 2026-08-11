@@ -34,6 +34,7 @@ pub use column::{Column, DefaultValue, TypeDataLength, TypeFamily};
 pub use compare::{Comparable, Compare, JsonCompare, JsonType};
 pub use conditions::ConditionTree;
 pub use conjunctive::Conjunctive;
+pub(crate) use cte::CommonTableExpressionBody;
 pub use cte::{CommonTableExpression, IntoCommonTableExpression};
 pub use delete::Delete;
 pub use enums::{EnumName, EnumVariant};
