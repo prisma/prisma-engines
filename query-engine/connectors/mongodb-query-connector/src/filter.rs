@@ -153,6 +153,7 @@ impl MongoFilterVisitor {
         let field_name = (self.prefix(), field).into_bson()?;
         let field_ref = condition.as_field_ref().cloned();
         let is_set_cond = matches!(&condition, ScalarCondition::IsSet(_));
+        let safe_to_skip_undefineds = is_positive_concrete_non_null_equality(&condition) && !self.invert();
 
         let filter_doc = match condition {
             ScalarCondition::Equals(val) => {
@@ -276,15 +277,19 @@ impl MongoFilterVisitor {
             ScalarCondition::NotSearch(_, _) => unimplemented!("Full-text search is not supported yet on MongoDB"),
         };
 
-        let filter_doc =
-            if !is_set_cond && should_exclude_undefineds(field.is_required(), self.invert_undefined_exclusion()) {
-                exclude_undefineds(&field_name, self.invert_undefined_exclusion(), filter_doc)
-            } else {
-                filter_doc
-            };
+        let filter_doc = if !is_set_cond
+            && should_exclude_undefineds(
+                field.is_required(),
+                self.invert_undefined_exclusion(),
+                safe_to_skip_undefineds,
+            ) {
+            exclude_undefineds(&field_name, self.invert_undefined_exclusion(), filter_doc)
+        } else {
+            filter_doc
+        };
 
         let filter_doc = if let Some(field_ref) = &field_ref {
-            if should_exclude_undefineds(field_ref.is_required(), self.invert_undefined_exclusion()) {
+            if should_exclude_undefineds(field_ref.is_required(), self.invert_undefined_exclusion(), false) {
                 exclude_undefineds(
                     self.prefixed_field_ref(field_ref)?,
                     self.invert_undefined_exclusion(),
@@ -305,6 +310,7 @@ impl MongoFilterVisitor {
         let field_name = (self.prefix(), field).into_bson()?;
         let field_ref = condition.as_field_ref().cloned();
         let is_set_cond = matches!(&condition, ScalarCondition::IsSet(_));
+        let safe_to_skip_undefineds = is_positive_concrete_non_null_equality(&condition) && !self.invert();
 
         let filter_doc = match condition {
             ScalarCondition::Equals(val) => self.regex_match(&field_name, field, "^", val, "$", true),
@@ -426,15 +432,19 @@ impl MongoFilterVisitor {
             )),
         }?;
 
-        let filter_doc =
-            if !is_set_cond && should_exclude_undefineds(field.is_required(), self.invert_undefined_exclusion()) {
-                exclude_undefineds(&field_name, self.invert_undefined_exclusion(), filter_doc)
-            } else {
-                filter_doc
-            };
+        let filter_doc = if !is_set_cond
+            && should_exclude_undefineds(
+                field.is_required(),
+                self.invert_undefined_exclusion(),
+                safe_to_skip_undefineds,
+            ) {
+            exclude_undefineds(&field_name, self.invert_undefined_exclusion(), filter_doc)
+        } else {
+            filter_doc
+        };
 
         let filter_doc = if let Some(field_ref) = &field_ref {
-            if should_exclude_undefineds(field_ref.is_required(), self.invert_undefined_exclusion()) {
+            if should_exclude_undefineds(field_ref.is_required(), self.invert_undefined_exclusion(), false) {
                 exclude_undefineds(
                     self.prefixed_field_ref(field_ref)?,
                     self.invert_undefined_exclusion(),
@@ -532,14 +542,14 @@ impl MongoFilterVisitor {
             filter_doc
         };
 
-        let filter_doc = if should_exclude_undefineds(field.is_required(), self.invert_undefined_exclusion()) {
+        let filter_doc = if should_exclude_undefineds(field.is_required(), self.invert_undefined_exclusion(), false) {
             exclude_undefineds(&field_name, self.invert_undefined_exclusion(), filter_doc)
         } else {
             filter_doc
         };
 
         let filter_doc = if let Some(field_ref) = field_ref.as_ref() {
-            if should_exclude_undefineds(field_ref.is_required(), self.invert_undefined_exclusion()) {
+            if should_exclude_undefineds(field_ref.is_required(), self.invert_undefined_exclusion(), false) {
                 exclude_undefineds(
                     self.prefixed_field_ref(field_ref)?,
                     self.invert_undefined_exclusion(),
@@ -667,12 +677,13 @@ impl MongoFilterVisitor {
             filter_doc
         };
 
-        let filter_doc =
-            if !is_set_cond && should_exclude_undefineds(field.is_required(), self.invert_undefined_exclusion()) {
-                exclude_undefineds(&field_name, self.invert_undefined_exclusion(), filter_doc)
-            } else {
-                filter_doc
-            };
+        let filter_doc = if !is_set_cond
+            && should_exclude_undefineds(field.is_required(), self.invert_undefined_exclusion(), false)
+        {
+            exclude_undefineds(&field_name, self.invert_undefined_exclusion(), filter_doc)
+        } else {
+            filter_doc
+        };
 
         Ok(MongoFilter::Composite(filter_doc))
     }
@@ -1104,11 +1115,16 @@ fn exclude_undefineds(field_name: impl Into<Bson>, invert: bool, filter: Documen
 ///
 /// MongoDB does not enforce schema, so documents created before a field was added (e.g. via
 /// `db push`) may lack it even though it is required in the Prisma schema. Missing fields never
-/// equal a concrete value, so positive filters are unaffected by dropping the guard. In inverted
-/// contexts (`invert_undefined_exclusion`), however, a missing field must keep matching negated
-/// filters (`not:` queries), so we conservatively keep the guard there.
-fn should_exclude_undefineds(field_is_required: bool, invert: bool) -> bool {
-    !(field_is_required && !invert)
+/// equal a concrete value, so only positive concrete non-null equality can safely drop the guard.
+fn should_exclude_undefineds(field_is_required: bool, invert_undefined_exclusion: bool, safe_to_skip: bool) -> bool {
+    !(field_is_required && !invert_undefined_exclusion && safe_to_skip)
+}
+
+fn is_positive_concrete_non_null_equality(condition: &ScalarCondition) -> bool {
+    matches!(
+        condition,
+        ScalarCondition::Equals(ConditionValue::Value(value)) if !value.is_null()
+    )
 }
 
 #[derive(Debug, Clone, Default)]
@@ -1286,11 +1302,21 @@ mod tests {
                 PrismaValue::String("b".into())
             ]))),
             doc! {
-                "$or": [
-                    { "$eq": ["$name", { "$literal": "a" }] },
-                    { "$eq": ["$name", { "$literal": "b" }] }
+                "$and": [
+                    {
+                        "$or": [
+                            { "$eq": ["$name", { "$literal": "a" }] },
+                            { "$eq": ["$name", { "$literal": "b" }] }
+                        ]
+                    },
+                    { "$ne": ["$name", "$$REMOVE"] }
                 ]
             }
+        );
+        assert!(
+            render(name.not_equals(PrismaValue::String("abc".into())))
+                .get_array("$and")
+                .is_ok()
         );
     }
 
@@ -1398,9 +1424,9 @@ mod tests {
     /// required and the context is not inverted.
     #[test]
     fn should_exclude_undefineds_decision_table() {
-        assert!(should_exclude_undefineds(false, false));
-        assert!(should_exclude_undefineds(false, true));
-        assert!(should_exclude_undefineds(true, true));
-        assert!(!should_exclude_undefineds(true, false));
+        assert!(should_exclude_undefineds(false, false, false));
+        assert!(should_exclude_undefineds(false, true, false));
+        assert!(should_exclude_undefineds(true, true, false));
+        assert!(!should_exclude_undefineds(true, false, true));
     }
 }
