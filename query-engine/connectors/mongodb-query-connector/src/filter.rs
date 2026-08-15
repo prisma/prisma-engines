@@ -310,7 +310,7 @@ impl MongoFilterVisitor {
         let field_name = (self.prefix(), field).into_bson()?;
         let field_ref = condition.as_field_ref().cloned();
         let is_set_cond = matches!(&condition, ScalarCondition::IsSet(_));
-        let safe_to_skip_undefineds = is_positive_concrete_non_null_equality(&condition) && !self.invert();
+        let safe_to_skip_undefineds = false;
 
         let filter_doc = match condition {
             ScalarCondition::Equals(val) => self.regex_match(&field_name, field, "^", val, "$", true),
@@ -1327,6 +1327,30 @@ mod tests {
             render(name.not_equals(PrismaValue::String("abc".into())))
                 .get_array("$and")
                 .is_ok()
+        );
+    }
+
+    #[test]
+    fn insensitive_required_equality_keeps_undefined_exclusion() {
+        let dm = mongo_schema();
+        let name = scalar_field(&dm, "name");
+        let mut filter = name.equals(PrismaValue::String("abc".into()));
+        filter.set_mode(QueryMode::Insensitive);
+
+        assert_eq!(
+            render(filter),
+            doc! {
+                "$and": [
+                    {
+                        "$regexMatch": {
+                            "input": "$name",
+                            "regex": "^abc$",
+                            "options": "i"
+                        }
+                    },
+                    { "$ne": ["$name", "$$REMOVE"] }
+                ]
+            }
         );
     }
 
