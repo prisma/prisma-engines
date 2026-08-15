@@ -600,7 +600,8 @@ impl MongoFilterVisitor {
         let field = filter.field;
         let field_name = (&self.prefix.clone(), &field).into_bson()?;
         let is_set_cond = matches!(*filter.condition, CompositeCondition::IsSet(_));
-        let safe_to_skip_undefineds = is_positive_concrete_non_null_composite_equality(&filter.condition) && !self.invert();
+        let safe_to_skip_undefineds =
+            is_positive_concrete_non_null_composite_equality(&filter.condition) && !self.invert();
 
         let filter_doc = match *filter.condition {
             CompositeCondition::Every(filter) => {
@@ -683,8 +684,7 @@ impl MongoFilterVisitor {
                 field.is_required(),
                 self.invert_undefined_exclusion(),
                 safe_to_skip_undefineds,
-            )
-        {
+            ) {
             exclude_undefineds(&field_name, self.invert_undefined_exclusion(), filter_doc)
         } else {
             filter_doc
