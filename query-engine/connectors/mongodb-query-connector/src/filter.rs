@@ -600,6 +600,7 @@ impl MongoFilterVisitor {
         let field = filter.field;
         let field_name = (&self.prefix.clone(), &field).into_bson()?;
         let is_set_cond = matches!(*filter.condition, CompositeCondition::IsSet(_));
+        let safe_to_skip_undefineds = is_positive_concrete_non_null_composite_equality(&filter.condition) && !self.invert();
 
         let filter_doc = match *filter.condition {
             CompositeCondition::Every(filter) => {
@@ -678,7 +679,11 @@ impl MongoFilterVisitor {
         };
 
         let filter_doc = if !is_set_cond
-            && should_exclude_undefineds(field.is_required(), self.invert_undefined_exclusion(), false)
+            && should_exclude_undefineds(
+                field.is_required(),
+                self.invert_undefined_exclusion(),
+                safe_to_skip_undefineds,
+            )
         {
             exclude_undefineds(&field_name, self.invert_undefined_exclusion(), filter_doc)
         } else {
@@ -1127,6 +1132,10 @@ fn is_positive_concrete_non_null_equality(condition: &ScalarCondition) -> bool {
     )
 }
 
+fn is_positive_concrete_non_null_composite_equality(condition: &CompositeCondition) -> bool {
+    matches!(condition, CompositeCondition::Equals(value) if !value.is_null())
+}
+
 #[derive(Debug, Clone, Default)]
 pub(crate) struct FilterPrefix {
     parts: Vec<String>,
@@ -1219,12 +1228,13 @@ mod tests {
                 }
 
                 model User {
-                  id      String   @id @map("_id")
-                  uid     String   @unique
-                  name    String
-                  country String?
-                  tags    String[]
-                  address Address?
+                  id             String   @id @map("_id")
+                  uid            String   @unique
+                  name           String
+                  country        String?
+                  tags           String[]
+                  address        Address?
+                  requiredAddress Address
                 }
 
                 type Address {
@@ -1397,6 +1407,21 @@ mod tests {
                     { "$ne": ["$tags", "$$REMOVE"] }
                 ]
             }
+        );
+    }
+
+    /// Positive equality filters on required composite fields can omit the guard.
+    #[test]
+    fn required_composite_equality_skips_undefined_exclusion() {
+        let dm = mongo_schema();
+        let address = composite_field(&dm, "requiredAddress");
+
+        assert_eq!(
+            render(address.equals(PrismaValue::Object(vec![(
+                "city".to_owned(),
+                PrismaValue::String("Berlin".to_owned())
+            )]))),
+            doc! { "$eq": ["$requiredAddress", { "city": "Berlin" }] }
         );
     }
 
