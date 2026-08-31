@@ -229,16 +229,16 @@ section in the connector-test-kit-rs README.
 
 **ℹ️ Important note on developing features that require changes to both the query compiler and driver adapter code**
 
-`make test-qe` (optionally with `DRIVER_ADAPTER=...`) ensures you have `prisma/prisma` checked out
+`make test-qe` (optionally with `DRIVER_ADAPTER=...`) ensures you have `prisma/orm` checked out
 next to this repository. The driver adapter sources are symlinked from there so that engines and
 client stay in lockstep.
 
 When working on a feature or bugfix spanning adapters and query-compiler code, you will need sibling
-PRs in `prisma/prisma` and `prisma/prisma-engines`. Locally, each time you run
+PRs in `prisma/orm` and `prisma/prisma-engines`. Locally, each time you run
 `DRIVER_ADAPTER=$adapter make test-qe`, tests use the adapters built from your local `../prisma`
 clone.
 
-In CI we need to denote which branch of `prisma/prisma` should be consumed. By default CI clones the
+In CI we need to denote which branch of `prisma/orm` should be consumed. By default CI clones the
 `v7` branch, which will not include your local adapter changes. To test in integration, add the
 following tag to your PR description on a separate line:
 
@@ -246,15 +246,15 @@ following tag to your PR description on a separate line:
 /prisma-branch your/branch
 ```
 
-Replace `your/branch` with the name of your branch in the `prisma` repository.
+Replace `your/branch` with the name of your branch in the `prisma/orm` repository.
 
-GitHub actions will then pick up the branch name and use it to clone that branch's code of prisma/prisma, and build the driver adapters code from there.
+GitHub actions will then pick up the branch name and use it to clone that branch's code of prisma/orm, and build the driver adapters code from there.
 
-When it's time to merge the sibling PRs, you'll need to merge the prisma/prisma PR first, so when merging the engines PR you have the code of the adapters ready in prisma/prisma `v7` branch.
+When it's time to merge the sibling PRs, you'll need to merge the prisma/orm PR first, so when merging the engines PR you have the code of the adapters ready in prisma/orm `v7` branch.
 
-### Testing engines in `prisma/prisma`
+### Testing engines in `prisma/orm`
 
-You can trigger releases from this repository to npm that can be used for testing the engines in `prisma/prisma` either automatically or manually:
+You can trigger releases from this repository to npm that can be used for testing the engines in `prisma/orm` either automatically or manually:
 
 #### Automated integration releases from this repository to npm
 
@@ -267,15 +267,15 @@ To trigger the release on any other branch, you have two options:
 The journey through the pipeline is the same as a commit on the `main` branch.
 
 - It will trigger [`prisma/engines-wrapper`](https://github.com/prisma/engines-wrapper) and publish a new [`@prisma/engines-version`](https://www.npmjs.com/package/@prisma/engines-version) npm package but on the `integration` tag.
-- Which triggers [`prisma/prisma`](https://github.com/prisma/prisma) to create a `chore(Automated Integration PR): [...]` PR with a branch name also starting with `integration/`
-- Since in `prisma/prisma` we also trigger the publish pipeline when a branch name starts with `integration/`, this will publish all `prisma/prisma` monorepo packages to npm on the `integration` tag.
+- Which triggers [`prisma/orm`](https://github.com/prisma/orm) to create a `chore(Automated Integration PR): [...]` PR with a branch name also starting with `integration/`
+- Since in `prisma/orm` we also trigger the publish pipeline when a branch name starts with `integration/`, this will publish all `prisma/orm` monorepo packages to npm on the `integration` tag.
 - Our [ecosystem-tests](https://github.com/prisma/ecosystem-tests/) tests will automatically pick up this new version and run tests, results will show in [GitHub Actions](https://github.com/prisma/ecosystem-tests/actions?query=branch%3Aintegration)
 
 This end to end will take minimum ~1h20 to complete, but is completely automated :robot:
 
 Notes:
 
-- tests and publishing workflows are run in parallel in both `prisma/prisma-engines` and `prisma/prisma` repositories. So, it is possible that the engines would be published and only then test suite will
+- tests and publishing workflows are run in parallel in both `prisma/prisma-engines` and `prisma/orm` repositories. So, it is possible that the engines would be published and only then test suite will
   discover a defect. It is advised that to keep an eye on both test and publishing workflows.
 
 #### Manual integration releases from this repository to npm
