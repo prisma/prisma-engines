@@ -73,7 +73,15 @@ pub(crate) fn upsert_record(
     let filter = extract_unique_filter(where_argument, &model)?;
     let read_query = read::find_unique(field.clone(), model.clone(), query_schema)?;
 
-    if can_use_native_upsert && let ReadQuery::RecordQuery(read) = read_query {
+    // The native upsert additionally needs a conflict target the database can
+    // infer from the `where` filter, which a partial unique index cannot supply.
+    let conflict_columns = can_use_native_upsert
+        .then(|| conflict_target(&model, &filter))
+        .flatten();
+
+    if let Some(conflict_columns) = conflict_columns
+        && let ReadQuery::RecordQuery(read) = read_query
+    {
         let mut create_write_args = WriteArgsParser::from(&model, create_argument)?.args;
         let mut update_write_args = WriteArgsParser::from(&model, update_argument)?.args;
 
@@ -86,6 +94,7 @@ pub(crate) fn upsert_record(
             filter.into(),
             create_write_args,
             update_write_args,
+            conflict_columns,
             read,
         ));
 
@@ -189,6 +198,10 @@ pub(crate) fn upsert_record(
 // 2. The create and update arguments do not have any nested queries
 // 3. There is only 1 unique field in the where clause
 // 4. The unique field defined in where clause has the same value as defined in the create arguments
+//
+// The caller checks one further condition that needs the extracted filter rather
+// than the raw arguments: the model must have a conflict target the database can
+// infer. See `conflict_target`.
 fn can_use_connector_native_upsert<'a>(
     model: &Model,
     where_field: &ParsedInputMap<'a>,

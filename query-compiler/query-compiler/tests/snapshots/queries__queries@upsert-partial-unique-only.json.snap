@@ -1,0 +1,72 @@
+---
+source: query-compiler/query-compiler/tests/queries.rs
+expression: pretty
+input_file: query-compiler/query-compiler/tests/data/upsert-partial-unique-only.json
+snapshot_kind: text
+---
+transaction
+   dataMap {
+       id: Int (id)
+       email: String (email)
+       status: String (status)
+       name: String (name)
+   }
+   let 0 = query «SELECT "public"."PartialUniqueOnly"."id" FROM
+                  "public"."PartialUniqueOnly" WHERE
+                  ("public"."PartialUniqueOnly"."email" = $1 AND 1=1) OFFSET $2»
+           params [const(String("user@example.com")), const(BigInt(0))]
+   in let 5 = if (rowCountNeq 0 (get 0))
+          then let 0 = unique (get 0);
+                   0$id = mapField id (get 0)
+               in let 2 = unique (query «UPDATE "public"."PartialUniqueOnly" SET
+                                         "name" = $1 WHERE
+                                         ("public"."PartialUniqueOnly"."id" IN
+                                         [$2,*] AND
+                                         ("public"."PartialUniqueOnly"."email" =
+                                         $3 AND 1=1)) RETURNING
+                                         "public"."PartialUniqueOnly"."id",
+                                         "public"."PartialUniqueOnly"."email",
+                                         "public"."PartialUniqueOnly"."status",
+                                         "public"."PartialUniqueOnly"."name"»
+                                  params [const(String("updated")),
+                                          var(0$id as Int),
+                                          const(String("user@example.com"))])
+                  in let 4 = let 2 = unique (validate (get 2)
+                                 [ rowCountNeq 0
+                                 ] orRaise "MISSING_RECORD");
+                                 2$id = mapField id (get 2)
+                         in unique (query «SELECT
+                                           "public"."PartialUniqueOnly"."id",
+                                           "public"."PartialUniqueOnly"."email",
+                                           "public"."PartialUniqueOnly"."status",
+                                           "public"."PartialUniqueOnly"."name"
+                                           FROM "public"."PartialUniqueOnly"
+                                           WHERE
+                                           "public"."PartialUniqueOnly"."id" =
+                                           $1 LIMIT $2 OFFSET $3»
+                                    params [var(2$id as Int), const(BigInt(1)),
+                                            const(BigInt(0))])
+                     in getFirstNonEmpty4
+          else let 1 = unique (query «INSERT INTO "public"."PartialUniqueOnly"
+                                      ("email","status","name") VALUES
+                                      ($1,$2,$3) RETURNING
+                                      "public"."PartialUniqueOnly"."id"»
+                               params [const(String("user@example.com")),
+                                       const(String("active")),
+                                       const(String("created"))])
+               in let 3 = let 1 = unique (validate (get 1)
+                              [ rowCountNeq 0
+                              ] orRaise "MISSING_RECORD");
+                              1$id = mapField id (get 1)
+                      in unique (query «SELECT
+                                        "public"."PartialUniqueOnly"."id",
+                                        "public"."PartialUniqueOnly"."email",
+                                        "public"."PartialUniqueOnly"."status",
+                                        "public"."PartialUniqueOnly"."name" FROM
+                                        "public"."PartialUniqueOnly" WHERE
+                                        "public"."PartialUniqueOnly"."id" = $1
+                                        LIMIT $2 OFFSET $3»
+                                 params [var(1$id as Int), const(BigInt(1)),
+                                         const(BigInt(0))])
+                  in getFirstNonEmpty3
+      in getFirstNonEmpty5

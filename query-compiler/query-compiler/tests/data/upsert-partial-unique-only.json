@@ -1,0 +1,15 @@
+{
+  "modelName": "PartialUniqueOnly",
+  "action": "upsertOne",
+  "query": {
+    "arguments": {
+      "relationLoadStrategy": "query",
+      "where": { "email": "user@example.com" },
+      "update": { "name": "updated" },
+      "create": { "email": "user@example.com", "status": "active", "name": "created" }
+    },
+    "selection": {
+      "$scalars": true
+    }
+  }
+}

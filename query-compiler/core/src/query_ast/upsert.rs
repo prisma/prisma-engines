@@ -7,17 +7,25 @@ pub struct NativeUpsert {
     record_filter: RecordFilter,
     create: WriteArgs,
     update: WriteArgs,
+    conflict_target: Vec<ScalarFieldRef>,
     pub selected_fields: FieldSelection,
     pub selection_order: Vec<String>,
 }
 
 impl NativeUpsert {
+    /// `conflict_target` is the non-empty column list the statement arbitrates on,
+    /// as chosen by [`conflict_target`]. It is taken rather than recomputed here so
+    /// that the check deciding this query is buildable and the columns it emits
+    /// cannot drift apart: an empty list renders as `ON CONFLICT ()`, which is a
+    /// syntax error rather than a planning failure.
+    #[allow(clippy::too_many_arguments)]
     pub fn new(
         name: String,
         model: Model,
         record_filter: RecordFilter,
         create: WriteArgs,
         update: WriteArgs,
+        conflict_target: Vec<ScalarFieldRef>,
         selected_fields: FieldSelection,
         selection_order: Vec<String>,
     ) -> Self {
@@ -27,6 +35,7 @@ impl NativeUpsert {
             record_filter,
             create,
             update,
+            conflict_target,
             selected_fields,
             selection_order,
         }
@@ -56,29 +65,8 @@ impl NativeUpsert {
         &mut self.create
     }
 
-    pub fn unique_constraints(&self) -> Vec<ScalarFieldRef> {
-        let compound_indexes = self.model.unique_indexes();
-        let scalars = self.record_filter.filter.scalars();
-        let unique_index = compound_indexes.into_iter().find(|index| {
-            index
-                .fields()
-                .all(|f| scalars.contains(&ScalarFieldRef::from((self.model.dm.clone(), f))))
-        });
-
-        if let Some(index) = unique_index {
-            return index
-                .fields()
-                .map(|f| ScalarFieldRef::from((self.model.dm.clone(), f)))
-                .collect();
-        }
-
-        if let Some(ids) = self.model.fields().compound_id()
-            && ids.clone().all(|f| scalars.contains(&f))
-        {
-            return ids.collect();
-        }
-
-        self.record_filter.filter.unique_scalars()
+    pub fn conflict_target(&self) -> &[ScalarFieldRef] {
+        &self.conflict_target
     }
 
     pub fn filter(&self) -> &Filter {
@@ -96,4 +84,43 @@ impl NativeUpsert {
     pub fn record_filter(&self) -> &RecordFilter {
         &self.record_filter
     }
+}
+
+/// The columns an `INSERT ... ON CONFLICT` can name as its conflict target for
+/// `filter`, or `None` when the model carries no constraint the database could
+/// infer from them.
+///
+/// Partial (`WHERE`-filtered) unique indexes are never candidates. Inferring one
+/// requires repeating its predicate in the statement, which the generated SQL
+/// does not carry, so PostgreSQL rejects it with 42P10 ("there is no unique or
+/// exclusion constraint matching the ON CONFLICT specification") on every call,
+/// whatever the data. `None` therefore means "the connector-native upsert is not
+/// usable here"; callers fall back to the read-then-write graph, which handles
+/// those models correctly.
+pub fn conflict_target(model: &Model, filter: &Filter) -> Option<Vec<ScalarFieldRef>> {
+    let scalars = filter.scalars();
+
+    let unique_index = model
+        .unique_indexes()
+        .filter(|index| !index.is_partial())
+        .find(|index| {
+            index
+                .fields()
+                .all(|f| scalars.contains(&ScalarFieldRef::from((model.dm.clone(), f))))
+        });
+
+    if let Some(index) = unique_index {
+        return Some(
+            index
+                .fields()
+                .map(|f| ScalarFieldRef::from((model.dm.clone(), f)))
+                .collect(),
+        );
+    }
+
+    // The primary key, which is never partial. This also covers the single-field
+    // case that used to fall through to `Filter::unique_scalars`, whose notion of
+    // uniqueness counts partial indexes too.
+    let ids: Vec<ScalarFieldRef> = model.fields().id_fields()?.collect();
+    ids.iter().all(|f| scalars.contains(f)).then_some(ids)
 }

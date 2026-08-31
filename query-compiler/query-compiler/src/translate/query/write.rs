@@ -262,7 +262,7 @@ pub(crate) fn translate_write_query(query: WriteQuery, builder: &dyn QueryBuilde
                     upsert.create().clone(),
                     upsert.update().clone(),
                     upsert.selected_fields(),
-                    &upsert.unique_constraints(),
+                    upsert.conflict_target(),
                 )
                 .map_err(TranslateError::QueryBuildFailure)?;
             Expression::Unique(Box::new(Expression::Query(query)))
