@@ -5,7 +5,8 @@ use crate::{
     error::{Error, ErrorKind},
 };
 use connection_string::JdbcString;
-use std::{fmt, str::FromStr, time::Duration};
+use percent_encoding::percent_decode;
+use std::{borrow::Cow, fmt, str::FromStr, time::Duration};
 
 /// Wraps a connection url and exposes the parsing logic used by Quaint,
 /// including default values.
@@ -97,9 +98,16 @@ impl MssqlUrl {
         self.query_params.transaction_isolation_level
     }
 
-    /// Name of the database.
-    pub fn dbname(&self) -> &str {
-        self.query_params.database()
+    /// Decoded database name. Defaults to `master`.
+    pub fn dbname(&self) -> Cow<'_, str> {
+        let db = self.query_params.database();
+        match percent_decode(db.as_bytes()).decode_utf8() {
+            Ok(decoded) => decoded,
+            Err(_) => {
+                tracing::warn!("Couldn't decode dbname to UTF-8, using the non-decoded version.");
+                Cow::Borrowed(db)
+            }
+        }
     }
 
     /// The prefix which to use when querying database.
@@ -368,6 +376,7 @@ impl MssqlUrl {
 
 #[cfg(test)]
 mod tests {
+    use super::*;
     use crate::tests::test_api::mssql::CONN_STR;
     use crate::{error::*, single::Quaint};
 
@@ -380,5 +389,38 @@ mod tests {
 
         let err = res.unwrap_err();
         assert!(matches!(err.kind(), ErrorKind::AuthenticationFailed { user } if user == &Name::available("WRONG")));
+    }
+
+    #[test]
+    fn should_decode_percent_encoded_dbname() {
+        // Chinese characters: 测试库 (test database)
+        let url = MssqlUrl::new("sqlserver://localhost:1433;database=%E6%B5%8B%E8%AF%95%E5%BA%93;user=SA;password=pass;trustServerCertificate=true").unwrap();
+        assert_eq!("测试库", url.dbname());
+    }
+
+    #[test]
+    fn should_decode_dbname_with_spaces() {
+        let url = MssqlUrl::new(
+            "sqlserver://localhost:1433;database=my%20database;user=SA;password=pass;trustServerCertificate=true",
+        )
+        .unwrap();
+        assert_eq!("my database", url.dbname());
+    }
+
+    #[test]
+    fn should_decode_dbname_with_special_characters() {
+        // test-db_name
+        let url = MssqlUrl::new(
+            "sqlserver://localhost:1433;database=test%2Ddb%5Fname;user=SA;password=pass;trustServerCertificate=true",
+        )
+        .unwrap();
+        assert_eq!("test-db_name", url.dbname());
+    }
+
+    #[test]
+    fn should_return_master_as_default_dbname() {
+        let url =
+            MssqlUrl::new("sqlserver://localhost:1433;user=SA;password=pass;trustServerCertificate=true").unwrap();
+        assert_eq!("master", url.dbname());
     }
 }

@@ -125,7 +125,7 @@ impl ConnectionInfo {
                 #[cfg(feature = "mysql-native")]
                 NativeConnectionInfo::Mysql(url) => url.dbname().map(Cow::Borrowed),
                 #[cfg(feature = "mssql-native")]
-                NativeConnectionInfo::Mssql(url) => Some(Cow::Borrowed(url.dbname())),
+                NativeConnectionInfo::Mssql(url) => Some(url.dbname()),
                 #[cfg(feature = "sqlite-native")]
                 NativeConnectionInfo::Sqlite { .. } | NativeConnectionInfo::InMemorySqlite { .. } => None,
             },
