@@ -141,7 +141,7 @@ pub fn nested_upsert(
         let update_node = update::update_record_node(
             graph,
             query_schema,
-            filter.clone(),
+            filter,
             child_model.clone(),
             update_input.try_into()?,
             None,
@@ -200,7 +200,9 @@ pub fn nested_upsert(
         } else if parent_relation_field.is_inlined_on_enclosing_model() {
             let parent_model = parent_relation_field.model();
             let parent_model_id = parent_model.shard_aware_primary_identifier();
-            let update_node = utils::update_records_node_placeholder(graph, filter, parent_model.clone());
+            // The upsert `where` filter belongs to the child model, so it must not be applied to the update on the parent table
+            // (it would reference child columns without a join). The parent rows are already pinned by the selectors injected below.
+            let update_node = utils::update_records_node_placeholder(graph, Filter::empty(), parent_model.clone());
 
             // Edge to retrieve the finder
             graph.create_edge(

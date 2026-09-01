@@ -1,0 +1,21 @@
+{
+  "modelName": "Patient",
+  "action": "updateOne",
+  "query": {
+    "arguments": {
+      "where": { "id": 1 },
+      "data": {
+        "user": {
+          "upsert": {
+            "where": { "email": "user.1@prisma.io" },
+            "create": { "email": "user.1@prisma.io" },
+            "update": { "email": "user.2@prisma.io" }
+          }
+        }
+      }
+    },
+    "selection": {
+      "$scalars": true
+    }
+  }
+}
