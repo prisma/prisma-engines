@@ -398,6 +398,35 @@ fn empty_migrations_should_not_be_created(api: TestApi) {
         .assert_migration_directories_count(1);
 }
 
+#[test_connector(tags(Postgres), exclude(CockroachDb), preview_features("partialIndexes"))]
+fn partial_unique_index_on_varchar_object_predicate_is_not_recreated(mut api: TestApi) {
+    let dm = api.datamodel_with_provider_and_features(
+        r#"
+        model ExternalMappingData {
+            tenantId    String @db.VarChar(255)
+            mappingType String @db.VarChar(255)
+            externalId  String @db.VarChar(4096)
+            caralegalId String @db.VarChar(4096)
+
+            @@id([tenantId, mappingType, externalId, caralegalId])
+            @@unique([tenantId, externalId], map: "ExternalMappingData_userId_tenantId_externalId_key", where: { mappingType: "userId", externalId: { not: "" } })
+        }
+    "#,
+        &[],
+        &["partialIndexes"],
+    );
+
+    let dir = api.create_migrations_directory();
+
+    api.create_migration("initial", &dm, &dir)
+        .send_sync()
+        .assert_migration_directories_count(1);
+
+    api.create_migration("no-op", &dm, &dir)
+        .send_sync()
+        .assert_migration_directories_count(1);
+}
+
 #[test_connector]
 fn migration_name_length_is_validated(api: TestApi) {
     let dm = api.datamodel_with_provider(

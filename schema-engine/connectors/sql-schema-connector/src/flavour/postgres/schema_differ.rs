@@ -808,7 +808,7 @@ fn idents_semantically_eq(a: &Ident, b: &Ident) -> bool {
 
 // Compares two expressions that have already been normalized by `StripPgNormalization`.
 fn exprs_semantically_eq(a: &Expr, b: &Expr) -> bool {
-    use sqlparser::ast::CastKind;
+    use sqlparser::ast::{CastKind, DataType};
 
     if a == b {
         return true;
@@ -838,6 +838,29 @@ fn exprs_semantically_eq(a: &Expr, b: &Expr) -> bool {
             },
             Expr::Value(va),
         ) if matches!(expr.as_ref(), Expr::Value(vb) if vb == va) => true,
+
+        // PG normalizes varchar column references with an implicit ::text cast.
+        (
+            inner,
+            Expr::Cast {
+                kind: CastKind::DoubleColon,
+                expr,
+                data_type: DataType::Text,
+                ..
+            },
+        )
+        | (
+            Expr::Cast {
+                kind: CastKind::DoubleColon,
+                expr,
+                data_type: DataType::Text,
+                ..
+            },
+            inner,
+        ) if matches!(
+            expr.as_ref(),
+            Expr::Identifier(_) | Expr::CompoundIdentifier(_)
+        ) => exprs_semantically_eq(inner, expr),
 
         // Unwrap outer :: cast when inner is also a :: cast (PG annotation wrapping user cast).
         (
