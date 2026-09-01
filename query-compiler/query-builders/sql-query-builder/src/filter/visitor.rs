@@ -721,6 +721,7 @@ fn convert_json_filter(
         condition,
         target_type,
     } = json_condition;
+    let path_returns_array = path_returns_array(path.as_ref());
     let (expr_json, expr_string): (Expression, Expression) = match path {
         Some(JsonFilterPath::String(path)) => (
             json_extract(comparable.clone(), JsonPath::string(path.clone()), false).into(),
@@ -734,21 +735,36 @@ fn convert_json_filter(
     };
 
     let condition: Expression = match *condition {
-        ScalarCondition::Contains(value) => {
-            (expr_json, expr_string).json_contains(field, value, target_type.unwrap(), query_mode, reverse, alias, ctx)
-        }
-        ScalarCondition::StartsWith(value) => (expr_json, expr_string).json_starts_with(
+        ScalarCondition::Contains(value) => (expr_json, expr_string).json_contains(
             field,
             value,
             target_type.unwrap(),
+            path_returns_array,
             query_mode,
             reverse,
             alias,
             ctx,
         ),
-        ScalarCondition::EndsWith(value) => {
-            (expr_json, expr_string).json_ends_with(field, value, target_type.unwrap(), query_mode, reverse, alias, ctx)
-        }
+        ScalarCondition::StartsWith(value) => (expr_json, expr_string).json_starts_with(
+            field,
+            value,
+            target_type.unwrap(),
+            path_returns_array,
+            query_mode,
+            reverse,
+            alias,
+            ctx,
+        ),
+        ScalarCondition::EndsWith(value) => (expr_json, expr_string).json_ends_with(
+            field,
+            value,
+            target_type.unwrap(),
+            path_returns_array,
+            query_mode,
+            reverse,
+            alias,
+            ctx,
+        ),
         ScalarCondition::GreaterThan(value) => {
             let gt = expr_json
                 .clone()
@@ -799,6 +815,31 @@ fn convert_json_filter(
     };
 
     ConditionTree::single(condition)
+}
+
+/// True when `JSON_EXTRACT` against `path` can return a JSON array of matched
+/// values rather than a single scalar. MySQL JSON path expressions support
+/// three wildcard constructs that turn a per-row extract into an array even
+/// when each matched value is itself a string: `[*]` (array element wildcard),
+/// `.*` (object member wildcard), and `**` (recursive descent). When any of
+/// these is present the `JSON_TYPE = 'STRING'` gate around `string_contains`,
+/// `string_starts_with`, and `string_ends_with` would otherwise always fail
+/// because the extract result is `ARRAY`. Postgres' array-form path
+/// (`JsonFilterPath::Array`) carries literal segments only and cannot express
+/// a wildcard, so it always returns scalars.
+fn path_returns_array(path: Option<&JsonFilterPath>) -> bool {
+    match path {
+        Some(JsonFilterPath::String(p)) => p.contains("[*]") || p.contains(".*") || p.contains("**"),
+        _ => false,
+    }
+}
+
+fn string_target_expected_type(path_returns_array: bool) -> JsonType<'static> {
+    if path_returns_array {
+        JsonType::Array
+    } else {
+        JsonType::String
+    }
 }
 
 fn with_json_type_filter(
@@ -1288,6 +1329,7 @@ trait JsonFilterExt {
         field: &ScalarFieldRef,
         value: ConditionValue,
         target_type: JsonTargetType,
+        path_returns_array: bool,
         query_mode: QueryMode,
         reverse: bool,
         alias: Option<Alias>,
@@ -1300,6 +1342,7 @@ trait JsonFilterExt {
         field: &ScalarFieldRef,
         value: ConditionValue,
         target_type: JsonTargetType,
+        path_returns_array: bool,
         query_mode: QueryMode,
         reverse: bool,
         alias: Option<Alias>,
@@ -1312,6 +1355,7 @@ trait JsonFilterExt {
         field: &ScalarFieldRef,
         value: ConditionValue,
         target_type: JsonTargetType,
+        path_returns_array: bool,
         query_mode: QueryMode,
         reverse: bool,
         alias: Option<Alias>,
@@ -1325,12 +1369,14 @@ impl JsonFilterExt for (Expression<'static>, Expression<'static>) {
         field: &ScalarFieldRef,
         value: ConditionValue,
         target_type: JsonTargetType,
+        path_returns_array: bool,
         query_mode: QueryMode,
         reverse: bool,
         alias: Option<Alias>,
         ctx: &Context<'_>,
     ) -> Expression<'static> {
         let (expr_json, expr_string) = self;
+        let string_expected_type = string_target_expected_type(path_returns_array);
 
         match (value, target_type) {
             // string_contains (value)
@@ -1343,9 +1389,9 @@ impl JsonFilterExt for (Expression<'static>, Expression<'static>) {
                 };
 
                 if reverse {
-                    contains.or(expr_json.json_type_not_equals(JsonType::String)).into()
+                    contains.or(expr_json.json_type_not_equals(string_expected_type)).into()
                 } else {
-                    contains.and(expr_json.json_type_equals(JsonType::String)).into()
+                    contains.and(expr_json.json_type_equals(string_expected_type)).into()
                 }
             }
             // array_contains (value)
@@ -1379,9 +1425,9 @@ impl JsonFilterExt for (Expression<'static>, Expression<'static>) {
                     };
 
                 if reverse {
-                    contains.or(expr_json.json_type_not_equals(JsonType::String)).into()
+                    contains.or(expr_json.json_type_not_equals(string_expected_type)).into()
                 } else {
-                    contains.and(expr_json.json_type_equals(JsonType::String)).into()
+                    contains.and(expr_json.json_type_equals(string_expected_type)).into()
                 }
             }
             // array_contains (ref)
@@ -1404,12 +1450,15 @@ impl JsonFilterExt for (Expression<'static>, Expression<'static>) {
         field: &ScalarFieldRef,
         value: ConditionValue,
         target_type: JsonTargetType,
+        path_returns_array: bool,
         query_mode: QueryMode,
         reverse: bool,
         alias: Option<Alias>,
         ctx: &Context<'_>,
     ) -> Expression<'static> {
         let (expr_json, expr_string) = self;
+        let string_expected_type = string_target_expected_type(path_returns_array);
+
         match (value, target_type) {
             // string_starts_with (value)
             (ConditionValue::Value(value), JsonTargetType::String) => {
@@ -1421,9 +1470,11 @@ impl JsonFilterExt for (Expression<'static>, Expression<'static>) {
                 };
 
                 if reverse {
-                    starts_with.or(expr_json.json_type_not_equals(JsonType::String)).into()
+                    starts_with
+                        .or(expr_json.json_type_not_equals(string_expected_type))
+                        .into()
                 } else {
-                    starts_with.and(expr_json.json_type_equals(JsonType::String)).into()
+                    starts_with.and(expr_json.json_type_equals(string_expected_type)).into()
                 }
             }
             // array_starts_with (value)
@@ -1451,9 +1502,11 @@ impl JsonFilterExt for (Expression<'static>, Expression<'static>) {
                 };
 
                 if reverse {
-                    starts_with.or(expr_json.json_type_not_equals(JsonType::String)).into()
+                    starts_with
+                        .or(expr_json.json_type_not_equals(string_expected_type))
+                        .into()
                 } else {
-                    starts_with.and(expr_json.json_type_equals(JsonType::String)).into()
+                    starts_with.and(expr_json.json_type_equals(string_expected_type)).into()
                 }
             }
             // array_starts_with (ref)
@@ -1476,12 +1529,14 @@ impl JsonFilterExt for (Expression<'static>, Expression<'static>) {
         field: &ScalarFieldRef,
         value: ConditionValue,
         target_type: JsonTargetType,
+        path_returns_array: bool,
         query_mode: QueryMode,
         reverse: bool,
         alias: Option<Alias>,
         ctx: &Context<'_>,
     ) -> Expression<'static> {
         let (expr_json, expr_string) = self;
+        let string_expected_type = string_target_expected_type(path_returns_array);
 
         match (value, target_type) {
             // string_ends_with (value)
@@ -1494,9 +1549,11 @@ impl JsonFilterExt for (Expression<'static>, Expression<'static>) {
                 };
 
                 if reverse {
-                    ends_with.or(expr_json.json_type_not_equals(JsonType::String)).into()
+                    ends_with
+                        .or(expr_json.json_type_not_equals(string_expected_type))
+                        .into()
                 } else {
-                    ends_with.and(expr_json.json_type_equals(JsonType::String)).into()
+                    ends_with.and(expr_json.json_type_equals(string_expected_type)).into()
                 }
             }
             // array_ends_with (value)
@@ -1524,9 +1581,11 @@ impl JsonFilterExt for (Expression<'static>, Expression<'static>) {
                 };
 
                 if reverse {
-                    ends_with.or(expr_json.json_type_not_equals(JsonType::String)).into()
+                    ends_with
+                        .or(expr_json.json_type_not_equals(string_expected_type))
+                        .into()
                 } else {
-                    ends_with.and(expr_json.json_type_equals(JsonType::String)).into()
+                    ends_with.and(expr_json.json_type_equals(string_expected_type)).into()
                 }
             }
             // array_ends_with (ref)

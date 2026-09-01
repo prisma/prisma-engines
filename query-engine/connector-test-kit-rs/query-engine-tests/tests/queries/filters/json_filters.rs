@@ -554,6 +554,48 @@ mod json_filters {
         Ok(())
     }
 
+    // Regression for https://github.com/prisma/prisma/issues/29571.
+    //
+    // MySQL JSON path wildcards (`[*]`, `.*`, `**`) make JSON_EXTRACT return an
+    // array even when each matched value is a scalar string, so the
+    // `JSON_TYPE = 'STRING'` gate around `string_contains` always evaluated to
+    // false and the filter returned 0 rows. With the fix, wildcard-path filters
+    // expect `JSON_TYPE = 'ARRAY'` and `LIKE` matches against the JSON-serialized
+    // array text.
+    #[connector_test(capabilities(JsonFilteringJsonPath), only(MySql(5.7), MySql(8)))]
+    async fn string_contains_wildcard_path(runner: Runner) -> TestResult<()> {
+        create_row(
+            &runner,
+            1,
+            r#"{ \"items\": [{ \"name\": \"Widget A\" }, { \"name\": \"Gadget B\" }] }"#,
+            false,
+        )
+        .await?;
+        create_row(
+            &runner,
+            2,
+            r#"{ \"items\": [{ \"name\": \"Gadget X\" }, { \"name\": \"Gadget Y\" }] }"#,
+            false,
+        )
+        .await?;
+        create_row(&runner, 3, r#"{ \"items\": [] }"#, false).await?;
+
+        let res = run_query!(
+            runner,
+            jsonq(
+                &runner,
+                r#"path: "$.items[*].name", string_contains: "Widget" "#,
+                Some("")
+            )
+        );
+        insta::assert_snapshot!(
+            res,
+            @r###"{"data":{"findManyTestModel":[{"id":1}]}}"###
+        );
+
+        Ok(())
+    }
+
     async fn string_starts_with_runner(runner: Runner) -> TestResult<()> {
         create_row(&runner, 1, r#"\"foo\""#, true).await?;
         create_row(&runner, 2, r#"\"fool\""#, true).await?;
