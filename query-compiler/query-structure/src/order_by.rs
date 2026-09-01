@@ -28,6 +28,10 @@ pub enum OrderBy {
     Scalar(OrderByScalar),
     ScalarAggregation(OrderByScalarAggregation),
     ToManyAggregation(OrderByToManyAggregation),
+    /// Order by the value of a scalar field on a to-many related model, using a correlated
+    /// subquery with LIMIT 1. The selected value is the first one when the relation rows are
+    /// sorted by the same field in the same direction.
+    ToManyField(OrderByToManyField),
     Relevance(OrderByRelevance),
 }
 
@@ -36,6 +40,7 @@ impl OrderBy {
         match self {
             OrderBy::Scalar(o) => Some(&o.path),
             OrderBy::ToManyAggregation(o) => Some(&o.path),
+            OrderBy::ToManyField(o) => Some(&o.path),
             OrderBy::ScalarAggregation(_) => None,
             OrderBy::Relevance(_) => None,
         }
@@ -46,6 +51,7 @@ impl OrderBy {
             OrderBy::Scalar(o) => o.sort_order,
             OrderBy::ScalarAggregation(o) => o.sort_order,
             OrderBy::ToManyAggregation(o) => o.sort_order,
+            OrderBy::ToManyField(o) => o.sort_order,
             OrderBy::Relevance(o) => o.sort_order,
         }
     }
@@ -54,6 +60,7 @@ impl OrderBy {
         match self {
             OrderBy::Scalar(o) => Some(o.field.clone()),
             OrderBy::ScalarAggregation(o) => Some(o.field.clone()),
+            OrderBy::ToManyField(o) => Some(o.field.clone()),
             OrderBy::ToManyAggregation(_) => None,
             OrderBy::Relevance(_) => None,
         }
@@ -97,6 +104,20 @@ impl OrderBy {
             path,
             sort_order,
             sort_aggregation,
+        })
+    }
+
+    pub fn to_many_field(
+        field: ScalarFieldRef,
+        path: Vec<OrderByHop>,
+        sort_order: SortOrder,
+        nulls_order: Option<NullsOrder>,
+    ) -> Self {
+        Self::ToManyField(OrderByToManyField {
+            path,
+            field,
+            sort_order,
+            nulls_order,
         })
     }
 
@@ -200,6 +221,33 @@ impl OrderByToManyAggregation {
         self.path
             .last()
             .expect("An order by relation aggregation has to have at least one hop")
+    }
+}
+
+/// Orders by a scalar field on a to-many related model via a correlated subquery (LIMIT 1).
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct OrderByToManyField {
+    pub path: Vec<OrderByHop>,
+    pub field: ScalarFieldRef,
+    pub sort_order: SortOrder,
+    pub nulls_order: Option<NullsOrder>,
+}
+
+impl OrderByToManyField {
+    /// All path hops except the last one (the actual to-many relation hop).
+    pub fn intermediary_hops(&self) -> &[OrderByHop] {
+        let (_, rest) = self
+            .path
+            .split_last()
+            .expect("An order by to-many field has to have at least one hop");
+        rest
+    }
+
+    /// The last hop in the path: the to-many relation being ordered by.
+    pub fn to_many_hop(&self) -> &OrderByHop {
+        self.path
+            .last()
+            .expect("An order by to-many field has to have at least one hop")
     }
 }
 

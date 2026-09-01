@@ -1,0 +1,16 @@
+---
+source: query-compiler/query-compiler/tests/queries.rs
+expression: pretty
+input_file: query-compiler/query-compiler/tests/data/order-by-to-many-m2m-field.json
+---
+dataMap {
+    id: Int (id)
+    title: String (title)
+    userId: Int (userId)
+}
+query «SELECT "t0"."id", "t0"."title", "t0"."userId" FROM "public"."Post" AS
+       "t0" ORDER BY (SELECT "orderby_1"."name" FROM "public"."Category" AS
+       "orderby_1" INNER JOIN "public"."_CategoryToPost" ON ("orderby_1"."id" =
+       "public"."_CategoryToPost"."A") WHERE ("public"."_CategoryToPost"."B" =
+       "t0"."id") ORDER BY "orderby_1"."name" DESC LIMIT $1) DESC»
+params [const(BigInt(1))]

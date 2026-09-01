@@ -119,15 +119,34 @@ fn process_order_object(
             match field {
                 Field::Relation(rf) if rf.is_list() => {
                     let object: ParsedInputMap<'_> = field_value.try_into()?;
+                    debug_assert!(object.len() <= 1, "to-many relation orderBy object must have at most one field");
 
-                    path.push(rf.into());
+                    path.push(rf.clone().into());
 
                     let (inner_field_name, inner_field_value) = object.into_iter().next().unwrap();
-                    let sort_aggregation = extract_sort_aggregation(inner_field_name.as_ref())
-                        .expect("To-many relation orderBy must be an aggregation ordering.");
 
-                    let (sort_order, _) = extract_order_by_args(inner_field_value)?;
-                    Ok(Some(OrderBy::to_many_aggregation(path, sort_order, sort_aggregation)))
+                    if let Some(sort_aggregation) = extract_sort_aggregation(inner_field_name.as_ref()) {
+                        let (sort_order, _) = extract_order_by_args(inner_field_value)?;
+                        Ok(Some(OrderBy::to_many_aggregation(path, sort_order, sort_aggregation)))
+                    } else {
+                        // The field name refers to a scalar field on the related model; order by
+                        // its value via a correlated subquery (LIMIT 1).
+                        let related_model: ParentContainer = rf.related_model().into();
+                        let related_field = related_model
+                            .find_field(&inner_field_name)
+                            .expect("Fields must be valid after validation passed.");
+
+                        match related_field {
+                            Field::Scalar(sf) => {
+                                let (sort_order, nulls_order) = extract_order_by_args(inner_field_value)?;
+                                Ok(Some(OrderBy::to_many_field(sf, path, sort_order, nulls_order)))
+                            }
+                            _ => Err(QueryGraphBuilderError::InputError(format!(
+                                "Field '{}' on '{}' used in a to-many relation orderBy must be a scalar field or an aggregation function.",
+                                inner_field_name, rf.name()
+                            ))),
+                        }
+                    }
                 }
 
                 Field::Relation(rf) => {

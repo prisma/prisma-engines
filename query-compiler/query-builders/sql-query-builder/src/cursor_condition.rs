@@ -19,6 +19,9 @@ struct CursorOrderDefinition {
     pub(crate) order_fks: Option<Vec<CursorOrderForeignKey>>,
     /// Indicates whether the ordering is performed on nullable field(s)
     pub(crate) on_nullable_fields: bool,
+    /// Explicit nulls placement (NULLS FIRST / LAST). When set, cursor NULL
+    /// predicates are only emitted when NULLs fall on the paginated side.
+    pub(crate) nulls_order: Option<NullsOrder>,
 }
 
 #[derive(Debug)]
@@ -358,29 +361,103 @@ fn map_orderby_condition(
     // If we have null values in the ordering or comparison row, those are automatically included because we can't make a
     // statement over their order relative to the cursor.
     let order_expr = if order_definition.on_nullable_fields {
-        order_expr
-            .or(cloned_order_column.is_null())
-            .or(Expression::from(cloned_cmp_column).is_null())
-            .into()
+        match order_definition.nulls_order {
+            Some(ref nulls_order) => {
+                let include_nulls = match nulls_order {
+                    NullsOrder::First => reverse,
+                    NullsOrder::Last => !reverse,
+                };
+
+                // Handle row-null and cursor-null cases separately to avoid
+                // a NULL cursor value matching every candidate row:
+                // 1. row NULL, cursor non-NULL → include when NULLs are on the paginated side
+                // 2. row non-NULL, cursor NULL → include when non-NULLs are on the paginated side
+                // 3. both NULL → treat as equal (include for lenient comparisons)
+                let mut result: Expression<'static> = order_expr;
+                if include_nulls {
+                    let row_null_cursor_not: Expression<'static> = cloned_order_column
+                        .clone()
+                        .is_null()
+                        .and(Expression::from(cloned_cmp_column.clone()).is_not_null())
+                        .into();
+                    result = result.or(row_null_cursor_not).into();
+                }
+                if !include_nulls {
+                    let row_not_cursor_null: Expression<'static> = cloned_order_column
+                        .clone()
+                        .is_not_null()
+                        .and(Expression::from(cloned_cmp_column.clone()).is_null())
+                        .into();
+                    result = result.or(row_not_cursor_null).into();
+                }
+                if include_eq {
+                    let both_null: Expression<'static> = cloned_order_column
+                        .is_null()
+                        .and(Expression::from(cloned_cmp_column).is_null())
+                        .into();
+                    result = result.or(both_null).into();
+                }
+                result
+            }
+            None => {
+                // No explicit placement → conservative: include rows where
+                // either side is NULL, but use the split-case pattern to avoid
+                // a NULL cursor value universally matching all candidate rows.
+                let mut result: Expression<'static> = order_expr;
+                // row NULL, cursor non-NULL
+                let row_null_cursor_not: Expression<'static> = cloned_order_column
+                    .clone()
+                    .is_null()
+                    .and(Expression::from(cloned_cmp_column.clone()).is_not_null())
+                    .into();
+                result = result.or(row_null_cursor_not).into();
+                // row non-NULL, cursor NULL
+                let row_not_cursor_null: Expression<'static> = cloned_order_column
+                    .clone()
+                    .is_not_null()
+                    .and(Expression::from(cloned_cmp_column.clone()).is_null())
+                    .into();
+                result = result.or(row_not_cursor_null).into();
+                // both NULL → treat as equal
+                let both_null: Expression<'static> = cloned_order_column
+                    .is_null()
+                    .and(Expression::from(cloned_cmp_column).is_null())
+                    .into();
+                result = result.or(both_null).into();
+                result
+            }
+        }
     } else {
         order_expr
     };
 
-    // Add OR statements for the foreign key fields too if they are nullable
+    // Add OR statements for the foreign key fields too if they are nullable.
+    // When an explicit nulls_order is set, only include FK IS NULL when NULLs
+    // fall on the paginated side; otherwise, skip the predicate.
 
     if let Some(fks) = &order_definition.order_fks {
-        fks.iter()
-            .filter(|fk| !fk.field.is_required())
-            .fold(order_expr, |acc, fk| {
-                let col = if let Some(alias) = &fk.alias {
-                    Column::from((alias.to_owned(), fk.field.db_name().to_owned()))
-                } else {
-                    fk.field.as_column(ctx)
-                }
-                .is_null();
+        let include_fk_nulls = match order_definition.nulls_order {
+            Some(NullsOrder::First) => reverse,
+            Some(NullsOrder::Last) => !reverse,
+            None => true,
+        };
 
-                acc.or(col).into()
-            })
+        if include_fk_nulls {
+            fks.iter()
+                .filter(|fk| !fk.field.is_required())
+                .fold(order_expr, |acc, fk| {
+                    let col = if let Some(alias) = &fk.alias {
+                        Column::from((alias.to_owned(), fk.field.db_name().to_owned()))
+                    } else {
+                        fk.field.as_column(ctx)
+                    }
+                    .is_null();
+
+                    acc.or(col).into()
+                })
+        } else {
+            order_expr
+        }
     } else {
         order_expr
     }
@@ -396,12 +473,27 @@ fn map_equality_condition(
     // If we have null values in the ordering or comparison row, those are automatically included because we can't make a
     // statement over their order relative to the cursor.
     if order_definition.on_nullable_fields {
-        order_column
-            .clone()
-            .equals(cmp_column.clone())
-            .or(Expression::from(cmp_column).is_null())
-            .or(order_column.is_null())
-            .into()
+        match order_definition.nulls_order {
+            Some(_) => {
+                // For prefix equality with explicit nulls placement, NULL = NULL
+                // must match so multi-field cursor pagination works inside the
+                // NULL group.
+                order_column
+                    .clone()
+                    .equals(cmp_column.clone())
+                    .or(order_column.is_null().and(Expression::from(cmp_column).is_null()))
+                    .into()
+            }
+            None => {
+                // No explicit placement → NULL = NULL must match for prefix
+                // equality (same as Some branch), but avoid blanket cmp IS NULL.
+                order_column
+                    .clone()
+                    .equals(cmp_column.clone())
+                    .or(order_column.is_null().and(Expression::from(cmp_column).is_null()))
+                    .into()
+            }
+        }
     } else {
         order_column.equals(cmp_column).into()
     }
@@ -428,6 +520,7 @@ fn order_definitions(
                 order_column: f.as_column(ctx).into(),
                 order_fks: None,
                 on_nullable_fields: !f.is_required(),
+                nulls_order: None,
             })
             .collect();
     }
@@ -442,6 +535,7 @@ fn order_definitions(
             OrderBy::ScalarAggregation(order_by) => cursor_order_def_aggregation_scalar(order_by, order_by_def),
             OrderBy::ToManyAggregation(order_by) => cursor_order_def_aggregation_rel(order_by, order_by_def),
             OrderBy::Relevance(order_by) => cursor_order_def_relevance(order_by, order_by_def),
+            OrderBy::ToManyField(order_by) => cursor_order_def_to_many_field(order_by, order_by_def),
         })
         .collect_vec()
 }
@@ -453,11 +547,18 @@ fn cursor_order_def_scalar(order_by: &OrderByScalar, order_by_def: &OrderByDefin
     // cf: part #2 of the SQL query above, when a field is nullable.
     let fks = foreign_keys_from_order_path(&order_by.path, &order_by_def.joins);
 
+    // The ordering column can be NULL either because the leaf field itself is nullable,
+    // or because an optional relation hop makes the subquery return NULL.
+    let has_nullable_fks = fks
+        .as_ref()
+        .is_some_and(|fks| fks.iter().any(|fk| !fk.field.is_required()));
+
     CursorOrderDefinition {
         sort_order: order_by.sort_order,
         order_column: order_by_def.order_column.clone(),
         order_fks: fks,
-        on_nullable_fields: !order_by.field.is_required(),
+        on_nullable_fields: !order_by.field.is_required() || has_nullable_fks,
+        nulls_order: order_by.nulls_order.clone(),
     }
 }
 
@@ -477,6 +578,7 @@ fn cursor_order_def_aggregation_scalar(
         order_column: order_column.clone(),
         order_fks: None,
         on_nullable_fields: false,
+        nulls_order: None,
     }
 }
 
@@ -500,6 +602,7 @@ fn cursor_order_def_aggregation_rel(
         order_column: order_column.clone(),
         order_fks: fks,
         on_nullable_fields: false,
+        nulls_order: None,
     }
 }
 
@@ -512,6 +615,28 @@ fn cursor_order_def_relevance(order_by: &OrderByRelevance, order_by_def: &OrderB
         order_column: order_column.clone(),
         order_fks: None,
         on_nullable_fields: false,
+        nulls_order: None,
+    }
+}
+
+/// Build a CursorOrderDefinition for ordering by a scalar field on a to-many relation.
+/// The subquery expression may return NULL when no related records exist, so cursors treat
+/// this as a nullable ordering.
+fn cursor_order_def_to_many_field(
+    order_by: &OrderByToManyField,
+    order_by_def: &OrderByDefinition,
+) -> CursorOrderDefinition {
+    // The OrderByDefinition.joins for ToManyField only covers intermediary hops, not the
+    // final to-many hop itself, so calling foreign_keys_from_order_path would produce
+    // length mismatches and cause panics or incorrect alias references. The correlated
+    // subquery built in ordering.rs handles nullability, so we simply mark this as
+    // nullable with no extra FK predicates.
+    CursorOrderDefinition {
+        sort_order: order_by.sort_order,
+        order_column: order_by_def.order_column.clone(),
+        order_fks: None,
+        on_nullable_fields: true,
+        nulls_order: order_by.nulls_order.clone(),
     }
 }
 

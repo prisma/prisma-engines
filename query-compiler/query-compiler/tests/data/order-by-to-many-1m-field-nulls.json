@@ -1,0 +1,19 @@
+{
+  "modelName": "User",
+  "action": "findMany",
+  "query": {
+    "arguments": {
+      "orderBy": {
+        "posts": {
+          "title": {
+            "sort": "asc",
+            "nulls": "first"
+          }
+        }
+      }
+    },
+    "selection": {
+      "$scalars": true
+    }
+  }
+}

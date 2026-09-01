@@ -17,8 +17,8 @@ query «SELECT "t0"."id", "t0"."email", "User_activations"."__prisma_data__" AS
        COALESCE(JSONB_AGG("__prisma_data__"), '[]') AS "__prisma_data__" FROM
        (SELECT "t3"."__prisma_data__" FROM (SELECT JSONB_BUILD_OBJECT('issued',
        "t2"."issued", 'secret', "t2"."secret", 'done', "t2"."done") AS
-       "__prisma_data__" FROM (SELECT "t1".* FROM "public"."Activation" AS "t1"
-       WHERE "t0"."id" = "t1"."userId" /* root select */) AS "t2" /* inner
-       select */) AS "t3" /* middle select */) AS "t4" /* outer select */) AS
-       "User_activations" ON true»
+       "__prisma_data__", "t2"."userId" FROM (SELECT "t1".* FROM
+       "public"."Activation" AS "t1" WHERE "t0"."id" = "t1"."userId" /* root
+       select */) AS "t2" /* inner select */) AS "t3" /* middle select */) AS
+       "t4" /* outer select */) AS "User_activations" ON true»
 params []
