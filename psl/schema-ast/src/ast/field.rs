@@ -52,7 +52,7 @@ impl Display for Field {
             ""
         };
 
-        write!(f, "{} {}{}", self.name(), self.field_type.name(), extension)
+        write!(f, "{} {}{}", self.name(), self.field_type, extension)
     }
 }
 
@@ -172,6 +172,15 @@ impl FieldType {
         match self {
             FieldType::Unsupported(name, span) => Some((name, span)),
             FieldType::Supported(_) => None,
+        }
+    }
+}
+
+impl Display for FieldType {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            FieldType::Supported(ident) => f.write_str(&ident.name),
+            FieldType::Unsupported(name, _) => write!(f, "Unsupported({})", crate::string_literal(name)),
         }
     }
 }

@@ -1,0 +1,22 @@
+{
+  "modelName": "Location",
+  "action": "findMany",
+  "query": {
+    "arguments": {
+      "where": {
+        "NOT": {
+          "position": {
+            "near": {
+              "point": [0, 0],
+              "maxDistance": 10000
+            }
+          }
+        }
+      }
+    },
+    "selection": {
+      "id": true,
+      "position": true
+    }
+  }
+}

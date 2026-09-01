@@ -56,8 +56,8 @@ pub use relations::{ManyToManyRelationId, ReferentialAction, RelationId};
 use schema_ast::ast::{GeneratorConfig, SourceConfig};
 pub use schema_ast::{SourceFile, ast};
 pub use types::{
-    IndexAlgorithm, IndexFieldPath, IndexType, OperatorClass, RelationFieldId, ScalarFieldId, ScalarFieldType,
-    ScalarType, SortOrder, WhereClause, WhereCondition, WhereValue,
+    GeometrySpec, GeometrySubtype, IndexAlgorithm, IndexFieldPath, IndexType, OperatorClass, PostgisSpatialKind,
+    RelationFieldId, ScalarFieldId, ScalarFieldType, ScalarType, SortOrder, WhereClause, WhereCondition, WhereValue,
 };
 
 /// ParserDatabase is a container for a Schema AST, together with information

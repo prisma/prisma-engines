@@ -1279,6 +1279,21 @@ pub trait Visitor<'a> {
             FunctionType::Stringify(stringify) => {
                 self.visit_stringify(stringify)?;
             }
+            FunctionType::Postgis(postgis) => {
+                let name = postgis.name;
+                let args = postgis.args;
+                self.write(name)?;
+                self.surround_with("(", ")", |this| {
+                    let last = args.len().saturating_sub(1);
+                    for (i, arg) in args.into_iter().enumerate() {
+                        this.visit_expression(arg)?;
+                        if i < last {
+                            this.write(", ")?;
+                        }
+                    }
+                    Ok(())
+                })?;
+            }
         };
 
         if let Some(alias) = fun.alias {

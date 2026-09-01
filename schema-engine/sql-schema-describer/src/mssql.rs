@@ -326,6 +326,7 @@ impl<'a> SqlSchemaDescriber<'a> {
                             ColumnTypeFamily::Udt(_) | ColumnTypeFamily::Unsupported(_) => {
                                 DefaultValue::db_generated(default_string)
                             }
+                            ColumnTypeFamily::Geometry(_) => DefaultValue::db_generated(default_string),
                             ColumnTypeFamily::Enum(_) => unreachable!("No enums in MSSQL"),
                         };
 

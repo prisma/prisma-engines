@@ -54,6 +54,7 @@ impl OrderByBuilder {
                     reachable_only_with_capability!(ConnectorCapability::NativeFullTextSearch);
                     self.build_order_relevance(order_by, needs_reversed_order, ctx)
                 }
+                OrderBy::Geometry(order_by) => self.build_order_geometry(order_by, needs_reversed_order, ctx),
             })
             .collect_vec()
     }
@@ -278,6 +279,47 @@ impl OrderByBuilder {
         self.join_counter += 1;
 
         format!("{}{}", ORDER_JOIN_PREFIX, self.join_counter)
+    }
+
+    fn build_order_geometry(
+        &mut self,
+        order_by: &OrderByGeometry,
+        needs_reversed_order: bool,
+        ctx: &Context<'_>,
+    ) -> OrderByDefinition {
+        let parent_alias = self.parent_alias.clone();
+        let joins: Vec<AliasedJoin> = self.compute_one2m_join(&order_by.path, parent_alias.as_ref(), ctx);
+
+        let parent_table = joins
+            .last()
+            .map(|j| j.alias.to_owned())
+            .or_else(|| self.parent_alias.clone());
+        let field_column = order_by.field.as_column(ctx).opt_table(parent_table);
+        let field_expr: Expression<'static> = field_column.into();
+
+        // SRID chain: explicit override on the orderBy node > field's declared SRID > 4326.
+        // We default to 4326 (rather than 0) here because geography casting requires a known
+        // geographic CRS for ST_Distance to return meters.
+        let field_srid = order_by.field.geometry_spec().and_then(|s| s.srid);
+        let srid = order_by.srid.or(field_srid).unwrap_or(4326);
+        let (lon, lat) = order_by.point;
+
+        // Cast both sides to geography so ST_Distance is reported in meters regardless of the
+        // input CRS, matching the legacy behaviour but produced through the parameterised
+        // Function AST rather than string concatenation.
+        let point_geom = st_set_srid(st_make_point(lon, lat), srid as i64);
+        let lhs: Expression<'static> = geography_cast(field_expr).into();
+        let rhs: Expression<'static> = geography_cast(point_geom).into();
+        let distance_expr: Expression<'static> = st_distance(lhs, rhs).into();
+
+        let order = Some(into_order(&order_by.sort_order, None, needs_reversed_order));
+        let order_definition: OrderDefinition = (distance_expr.clone(), order);
+
+        OrderByDefinition {
+            order_column: distance_expr.clone(),
+            order_definition,
+            joins,
+        }
     }
 }
 

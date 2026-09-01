@@ -187,6 +187,35 @@ impl<'a> ScalarFilterParser<'a> {
             aggregations::UNDERSCORE_MIN => self.aggregation_filter(input, Filter::min, false),
             aggregations::UNDERSCORE_MAX => self.aggregation_filter(input, Filter::max, false),
 
+            // Geometry filters
+            filters::NEAR => {
+                if self.reverse() {
+                    return Err(QueryGraphBuilderError::InputError(
+                        "Negation (NOT) is not supported for geometry 'near' filters".to_string(),
+                    ));
+                }
+                let input_map: ParsedInputMap<'_> = input.try_into()?;
+                Ok(vec![parse_geometry_near(field, input_map)?])
+            }
+            filters::WITHIN => {
+                if self.reverse() {
+                    return Err(QueryGraphBuilderError::InputError(
+                        "Negation (NOT) is not supported for geometry 'within' filters".to_string(),
+                    ));
+                }
+                let input_map: ParsedInputMap<'_> = input.try_into()?;
+                Ok(vec![parse_geometry_within(field, input_map)?])
+            }
+            filters::INTERSECTS => {
+                if self.reverse() {
+                    return Err(QueryGraphBuilderError::InputError(
+                        "Negation (NOT) is not supported for geometry 'intersects' filters".to_string(),
+                    ));
+                }
+                let input_map: ParsedInputMap<'_> = input.try_into()?;
+                Ok(vec![parse_geometry_intersects(field, input_map)?])
+            }
+
             _ => Err(QueryGraphBuilderError::InputError(format!(
                 "{filter_name} is not a valid scalar filter operation"
             ))),
@@ -620,4 +649,182 @@ fn coerce_json_null(value: ConditionValue) -> ConditionValue {
         ConditionValue::Value(PrismaValue::Null) => ConditionValue::value(PrismaValue::Json("null".to_owned())),
         _ => value,
     }
+}
+
+fn parse_geometry_near(field: &ScalarFieldRef, mut input_map: ParsedInputMap<'_>) -> QueryGraphBuilderResult<Filter> {
+    let point_value = input_map
+        .swap_remove(filters::POINT)
+        .ok_or_else(|| QueryGraphBuilderError::InputError("near filter requires 'point' field".to_owned()))?;
+    let max_distance_value = input_map
+        .swap_remove(filters::MAX_DISTANCE)
+        .ok_or_else(|| QueryGraphBuilderError::InputError("near filter requires 'maxDistance' field".to_owned()))?;
+    let srid_value = input_map.swap_remove(filters::SRID);
+
+    let point_list: Vec<PrismaValue> = point_value.try_into()?;
+    if point_list.len() != 2 {
+        return Err(QueryGraphBuilderError::InputError(
+            "near filter point must have exactly 2 coordinates".to_owned(),
+        ));
+    }
+
+    let lon = extract_float(&point_list[0])?;
+    let lat = extract_float(&point_list[1])?;
+    let max_distance = extract_float(&max_distance_value.try_into()?)?;
+    if max_distance < 0.0 {
+        return Err(QueryGraphBuilderError::InputError(
+            "near filter `maxDistance` must be a non-negative number".to_owned(),
+        ));
+    }
+    let point = GeoCoord::new(lon, lat).map_err(|e| QueryGraphBuilderError::InputError(e.to_string()))?;
+    let srid = srid_value.map(|v| extract_int(&v.try_into()?)).transpose()?;
+
+    Ok(Filter::Geometry(GeometryFilter {
+        field: field.clone(),
+        condition: GeometryFilterCondition::Near {
+            point,
+            max_distance,
+            srid,
+        },
+    }))
+}
+
+fn parse_geometry_within(field: &ScalarFieldRef, mut input_map: ParsedInputMap<'_>) -> QueryGraphBuilderResult<Filter> {
+    let polygon_value = input_map
+        .swap_remove(filters::POLYGON)
+        .ok_or_else(|| QueryGraphBuilderError::InputError("within filter requires 'polygon' field".to_owned()))?;
+    let srid_value = input_map.swap_remove(filters::SRID);
+
+    let polygon_outer: Vec<PrismaValue> = polygon_value.try_into()?;
+    let mut polygon = Vec::with_capacity(polygon_outer.len() + 1);
+
+    for coord in polygon_outer {
+        if let PrismaValue::List(pair) = coord {
+            if pair.len() != 2 {
+                return Err(QueryGraphBuilderError::InputError(
+                    "polygon coordinates must be [lon, lat] pairs".to_owned(),
+                ));
+            }
+            let lon = extract_float(&pair[0])?;
+            let lat = extract_float(&pair[1])?;
+            let position = GeoCoord::new(lon, lat).map_err(|e| QueryGraphBuilderError::InputError(e.to_string()))?;
+            polygon.push(position);
+        } else {
+            return Err(QueryGraphBuilderError::InputError(
+                "polygon must be an array of coordinate pairs".to_owned(),
+            ));
+        }
+    }
+
+    // Match PostGIS leniency: auto-close a ring whose user-supplied first and last positions
+    // differ. Rings shorter than 3 distinct positions are rejected because they cannot define
+    // any area.
+    if polygon.len() < 3 {
+        return Err(QueryGraphBuilderError::InputError(format!(
+            "within filter polygon must contain at least 3 distinct positions, got {}",
+            polygon.len()
+        )));
+    }
+    if polygon.first() != polygon.last() {
+        let first = *polygon.first().expect("polygon was just validated to be non-empty");
+        polygon.push(first);
+    }
+    debug_assert!(polygon.len() >= 4);
+
+    let srid = srid_value.map(|v| extract_int(&v.try_into()?)).transpose()?;
+
+    Ok(Filter::Geometry(GeometryFilter {
+        field: field.clone(),
+        condition: GeometryFilterCondition::Within { polygon, srid },
+    }))
+}
+
+fn parse_geometry_intersects(
+    field: &ScalarFieldRef,
+    mut input_map: ParsedInputMap<'_>,
+) -> QueryGraphBuilderResult<Filter> {
+    let geometry_value = input_map
+        .swap_remove(filters::GEOMETRY)
+        .ok_or_else(|| QueryGraphBuilderError::InputError("intersects filter requires 'geometry' field".to_owned()))?;
+    let srid_value = input_map.swap_remove(filters::SRID);
+
+    let geometry_json: PrismaValue = geometry_value.try_into()?;
+    let raw_value: serde_json::Value = match geometry_json {
+        PrismaValue::Json(json_str) => serde_json::from_str(&json_str)
+            .map_err(|e| QueryGraphBuilderError::InputError(format!("Invalid GeoJSON: {}", e)))?,
+        PrismaValue::Object(obj) => serde_json::to_value(obj)
+            .map_err(|e| QueryGraphBuilderError::InputError(format!("Invalid GeoJSON object: {}", e)))?,
+        _ => {
+            return Err(QueryGraphBuilderError::InputError(
+                "intersects geometry must be a JSON value".to_owned(),
+            ));
+        }
+    };
+
+    let geometry =
+        GeoJsonGeometry::from_serde_value(&raw_value).map_err(|e| QueryGraphBuilderError::InputError(e.to_string()))?;
+
+    // Reject GeoJSON shapes the SQL builder cannot lower to a single WKT (`Multi*` /
+    // `GeometryCollection`). `to_wkt()` returning `None` is the canonical signal: instead of
+    // letting the visitor silently emit a `false` predicate (which used to be the behaviour),
+    // surface a clear input error so callers can distinguish "no rows match" from "we never
+    // executed the requested filter".
+    if geometry.to_wkt().is_none() {
+        return Err(QueryGraphBuilderError::InputError(format!(
+            "intersects filter does not yet support GeoJSON `{}` geometries; use Point, LineString or Polygon.",
+            geometry.type_tag()
+        )));
+    }
+
+    let srid = srid_value.map(|v| extract_int(&v.try_into()?)).transpose()?;
+
+    Ok(Filter::Geometry(GeometryFilter {
+        field: field.clone(),
+        condition: GeometryFilterCondition::Intersects { geometry, srid },
+    }))
+}
+
+fn extract_float(value: &PrismaValue) -> QueryGraphBuilderResult<f64> {
+    let result = match value {
+        PrismaValue::Int(i) => *i as f64,
+        PrismaValue::BigInt(i) => *i as f64,
+        PrismaValue::Float(d) => d
+            .to_string()
+            .parse::<f64>()
+            .map_err(|e| QueryGraphBuilderError::InputError(format!("Invalid float value: {}", e)))?,
+        _ => {
+            return Err(QueryGraphBuilderError::InputError(format!(
+                "Expected numeric value, got {:?}",
+                value
+            )));
+        }
+    };
+
+    if !result.is_finite() {
+        return Err(QueryGraphBuilderError::InputError(format!(
+            "Expected finite numeric value, got {}",
+            result
+        )));
+    }
+
+    Ok(result)
+}
+
+fn extract_int(value: &PrismaValue) -> QueryGraphBuilderResult<i32> {
+    let i64_value = match value {
+        PrismaValue::Int(i) => *i,
+        PrismaValue::BigInt(i) => *i,
+        _ => {
+            return Err(QueryGraphBuilderError::InputError(format!(
+                "Expected integer value, got {:?}",
+                value
+            )));
+        }
+    };
+
+    i32::try_from(i64_value).map_err(|_| {
+        QueryGraphBuilderError::InputError(format!(
+            "Integer value {} is out of range for a 32-bit signed integer",
+            i64_value
+        ))
+    })
 }

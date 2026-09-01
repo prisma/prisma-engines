@@ -1,0 +1,11 @@
+{
+  "modelName": "Location",
+  "action": "findMany",
+  "query": {
+    "arguments": {},
+    "selection": {
+      "id": true,
+      "position": true
+    }
+  }
+}

@@ -76,6 +76,10 @@ impl<'a> OutputType<'a> {
         InnerOutputType::Scalar(ScalarType::Bytes)
     }
 
+    pub(crate) fn geometry(spec: db::GeometrySpec) -> InnerOutputType<'a> {
+        InnerOutputType::Scalar(ScalarType::Geometry(spec))
+    }
+
     /// Attempts to recurse through the type until an object type is found.
     /// Returns Some(ObjectTypeStrongRef) if ab object type is found, None otherwise.
     pub fn as_object_type<'b>(&'b self) -> Option<&'b ObjectType<'a>> {

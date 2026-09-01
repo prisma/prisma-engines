@@ -1,6 +1,87 @@
 use crate::{dmmf_from_schema, tests::setup::*};
 
 #[test]
+fn geometry_fields_in_datamodel_and_schema_dmmf() {
+    let schema = r#"
+        datasource db {
+            provider = "postgresql"
+        }
+
+        generator client {
+            provider = "prisma-client"
+        }
+
+        model Location {
+            id        Int        @id
+            position  Geometry   @db.Geometry(Point, 4326)
+            path      Geometry?  @db.Geometry(LineString)
+            footprint Geography  @db.Geography(Polygon, 4326)
+        }
+    "#;
+
+    let dmmf = dmmf_from_schema(schema);
+    let location = dmmf
+        .data_model
+        .models
+        .iter()
+        .find(|m| m.name == "Location")
+        .expect("Location model");
+
+    // SevInf #8: DMMF `field_type` mirrors the PSL keyword (matches built-in scalar emission)
+    // and the structured native attribute arguments live in `native_type` instead of being
+    // baked into the type string.
+    let pos = location.fields.iter().find(|f| f.name == "position").unwrap();
+    assert_eq!(pos.kind, "scalar");
+    assert_eq!(pos.field_type, "Geometry");
+    assert_eq!(
+        pos.native_type,
+        Some(("Geometry".to_owned(), vec!["Point".to_owned(), "4326".to_owned()]))
+    );
+
+    let path = location.fields.iter().find(|f| f.name == "path").unwrap();
+    assert_eq!(path.field_type, "Geometry");
+    assert_eq!(
+        path.native_type,
+        Some(("Geometry".to_owned(), vec!["LineString".to_owned()]))
+    );
+
+    // SevInf #1/#4: `Geography` is now a first-class PSL type rendered separately from
+    // `Geometry`, with its own native attribute pairing.
+    let footprint = location.fields.iter().find(|f| f.name == "footprint").unwrap();
+    assert_eq!(footprint.field_type, "Geography");
+    assert_eq!(
+        footprint.native_type,
+        Some(("Geography".to_owned(), vec!["Polygon".to_owned(), "4326".to_owned()]))
+    );
+
+    let schema_json = serde_json::to_value(&dmmf.schema).unwrap();
+    let models = schema_json
+        .get("outputObjectTypes")
+        .and_then(|v| v.get("model"))
+        .and_then(|v| v.as_array())
+        .expect("model output types");
+    let location_out = models
+        .iter()
+        .find(|m| m.get("name").and_then(|n| n.as_str()) == Some("Location"))
+        .expect("Location output type");
+    let fields = location_out.get("fields").and_then(|f| f.as_array()).unwrap();
+
+    let pos_out = fields
+        .iter()
+        .find(|f| f.get("name").and_then(|n| n.as_str()) == Some("position"))
+        .and_then(|f| f.get("outputType"))
+        .expect("position output");
+    assert_eq!(pos_out.get("type").and_then(|t| t.as_str()), Some("Geometry"));
+
+    let footprint_out = fields
+        .iter()
+        .find(|f| f.get("name").and_then(|n| n.as_str()) == Some("footprint"))
+        .and_then(|f| f.get("outputType"))
+        .expect("footprint output");
+    assert_eq!(footprint_out.get("type").and_then(|t| t.as_str()), Some("Geography"));
+}
+
+#[test]
 fn sqlite_ignore() {
     let dmmf = dmmf_from_schema(include_str!("./test-schemas/sqlite_ignore.prisma"));
 

@@ -12,7 +12,10 @@ use itertools::Itertools;
 use parser_database::{
     ScalarFieldType, ScalarType,
     ast::{self, WithSpan},
-    walkers::{FieldWalker, PrimaryKeyWalker, ScalarFieldAttributeWalker, ScalarFieldWalker, TypedFieldWalker},
+    walkers::{
+        CompositeTypeFieldWalker, FieldWalker, PrimaryKeyWalker, ScalarFieldAttributeWalker, ScalarFieldWalker,
+        TypedFieldWalker,
+    },
 };
 
 pub(super) fn validate_client_name(field: FieldWalker<'_>, names: &Names<'_>, ctx: &mut Context<'_>) {
@@ -326,6 +329,73 @@ pub(super) fn validate_scalar_field_connector_specific(field: ScalarFieldWalker<
             field.ast_field().span(),
         ));
     }
+}
+
+fn require_postgis_capability(
+    ctx: &mut Context<'_>,
+    container: &str,
+    container_name: &str,
+    field_name: &str,
+    field_span: ast::Span,
+) {
+    if ctx.has_capability(ConnectorCapability::PostgisGeometry) {
+        return;
+    }
+
+    let msg = format!(
+        "Field `{field_name}` in {container} `{container_name}` uses type Geometry, which is only supported on PostgreSQL with PostGIS.",
+    );
+    if container == "composite type" {
+        ctx.push_error(DatamodelError::new_composite_type_validation_error(
+            &msg,
+            container_name,
+            field_span,
+        ));
+    } else {
+        ctx.push_error(DatamodelError::new_field_validation_error(
+            &msg,
+            container,
+            container_name,
+            field_name,
+            field_span,
+        ));
+    }
+}
+
+pub(super) fn validate_geometry_field(field: ScalarFieldWalker<'_>, ctx: &mut Context<'_>) {
+    if !field.scalar_field_type().is_geometry() {
+        return;
+    }
+
+    let container = if field.model().ast_model().is_view() {
+        "view"
+    } else {
+        "model"
+    };
+
+    require_postgis_capability(
+        ctx,
+        container,
+        field.model().name(),
+        field.name(),
+        field.ast_field().span(),
+    );
+    // SRID range is enforced by `validate_native_type_arguments` on `PostgresType::Postgis(...)`
+    // (the only place a structured SRID exists). Nothing else to check at this layer.
+}
+
+pub(super) fn validate_geometry_on_composite_field(field: CompositeTypeFieldWalker<'_>, ctx: &mut Context<'_>) {
+    if !field.r#type().is_geometry() {
+        return;
+    }
+
+    require_postgis_capability(
+        ctx,
+        "composite type",
+        field.composite_type().name(),
+        field.name(),
+        field.ast_field().span(),
+    );
 }
 
 pub(super) fn validate_unsupported_field_type(field: ScalarFieldWalker<'_>, ctx: &mut Context<'_>) {

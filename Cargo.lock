@@ -3122,6 +3122,7 @@ dependencies = [
  "itertools 0.14.0",
  "rustc-hash 2.1.1",
  "schema-ast",
+ "serde",
 ]
 
 [[package]]
@@ -3801,6 +3802,7 @@ dependencies = [
  "itertools 0.14.0",
  "prisma-value",
  "psl",
+ "serde_json",
  "thiserror 2.0.17",
 ]
 

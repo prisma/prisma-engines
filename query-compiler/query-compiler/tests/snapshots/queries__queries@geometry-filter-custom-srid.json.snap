@@ -1,0 +1,15 @@
+---
+source: query-compiler/query-compiler/tests/queries.rs
+expression: pretty
+input_file: query-compiler/query-compiler/tests/data/geometry-filter-custom-srid.json
+snapshot_kind: text
+---
+dataMap {
+    id: Int (id)
+    position: Geometry(point)? (position)
+}
+query «SELECT "t0"."id", "t0"."position" FROM "public"."Location" AS "t0" WHERE
+       ST_DWithin("t0"."position", ST_SetSRID(ST_MakePoint($1, $2), $3), $4)»
+params [const(Float(BigDecimal("1000000"))),
+        const(Float(BigDecimal("6000000"))), const(BigInt(3857)),
+        const(Float(BigDecimal("5000")))]

@@ -211,16 +211,21 @@ fn parse_typ_opt<'a>(
             }
 
             let parsed_typ = ScalarType::try_from_str(typ.inner(), false)
-                .map(|st| match st {
-                    ScalarType::Int => ColumnType::Int32,
-                    ScalarType::BigInt => ColumnType::Int64,
-                    ScalarType::Float => ColumnType::Float,
-                    ScalarType::Boolean => ColumnType::Boolean,
-                    ScalarType::String => ColumnType::Text,
-                    ScalarType::DateTime => ColumnType::DateTime,
-                    ScalarType::Json => ColumnType::Json,
-                    ScalarType::Bytes => ColumnType::Bytes,
-                    ScalarType::Decimal => ColumnType::Numeric,
+                .and_then(|st| match st {
+                    ScalarType::Int => Some(ColumnType::Int32),
+                    ScalarType::BigInt => Some(ColumnType::Int64),
+                    ScalarType::Float => Some(ColumnType::Float),
+                    ScalarType::Boolean => Some(ColumnType::Boolean),
+                    ScalarType::String => Some(ColumnType::Text),
+                    ScalarType::DateTime => Some(ColumnType::DateTime),
+                    ScalarType::Json => Some(ColumnType::Json),
+                    ScalarType::Bytes => Some(ColumnType::Bytes),
+                    ScalarType::Decimal => Some(ColumnType::Numeric),
+                    // PostGIS spatial scalars aren't bindable as raw-SQL parameter placeholders
+                    // through this doc-comment syntax (callers should pass WKB via `{Bytes}` /
+                    // `{String}` instead). Surface as "unknown" so the caller-side error message
+                    // below applies uniformly.
+                    ScalarType::Geometry | ScalarType::Geography => None,
                 })
                 .map(ParsedParamType::ColumnType)
                 .or_else(|| {

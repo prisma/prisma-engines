@@ -2,7 +2,7 @@ use crate::{DefaultKind, NativeTypeInstance, ValueGenerator, ast, parent_contain
 use chrono::{DateTime, FixedOffset};
 use psl::{
     generators::{DEFAULT_CUID_VERSION, DEFAULT_UUID_VERSION},
-    parser_database::{self as db, ScalarFieldType, ScalarType, walkers},
+    parser_database::{self as db, GeometrySpec, GeometrySubtype, ScalarFieldType, ScalarType, walkers},
     schema_ast::ast::FieldArity,
 };
 use std::fmt::{Debug, Display};
@@ -97,9 +97,35 @@ impl ScalarField {
             }
             ScalarFieldType::Enum(x) => TypeIdentifier::Enum(x),
             ScalarFieldType::Extension(udt) => TypeIdentifier::Extension(udt),
+            ScalarFieldType::BuiltInScalar(scalar @ (ScalarType::Geometry | ScalarType::Geography)) => {
+                // Subtype/SRID live in the native attribute (`@db.Geometry(Point, 4326)` etc.).
+                // The bare `Geometry` / `Geography` keyword maps to the unconstrained default
+                // spec (`spec.spatial` = variant, no subtype/SRID), preserving the previous
+                // behaviour without needing a `GeometrySpec` payload on the PSL scalar.
+                let resolved = self.geometry_spec().unwrap_or_else(|| GeometrySpec {
+                    subtype: GeometrySubtype::Geometry,
+                    srid: None,
+                    spatial: scalar
+                        .postgis_spatial_kind()
+                        .expect("matched only Geometry|Geography above"),
+                });
+                TypeIdentifier::Geometry(resolved)
+            }
             ScalarFieldType::BuiltInScalar(scalar) => scalar.into(),
             ScalarFieldType::Unsupported(_) => TypeIdentifier::Unsupported,
         }
+    }
+
+    /// Returns the `GeometrySpec` of the field when its scalar type is `Geometry` / `Geography`.
+    ///
+    /// The native attribute (`@db.Geometry(...)` / `@db.Geography(...)`) is the single source of
+    /// truth for subtype/SRID/spatial kind. Bare `Geometry` / `Geography` keywords without an
+    /// explicit native attribute use the connector's default native type (see
+    /// `default_native_type_for_scalar_type`), so this method consistently returns a populated
+    /// spec whenever the field is a PostGIS scalar.
+    pub fn geometry_spec(&self) -> Option<GeometrySpec> {
+        let nt = self.native_type()?;
+        nt.connector.geometry_spec_for_native_type(&nt.native_type)
     }
 
     pub fn arity(&self) -> FieldArity {

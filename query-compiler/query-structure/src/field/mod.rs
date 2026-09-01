@@ -9,7 +9,7 @@ pub use scalar::*;
 
 use crate::{Model, NativeTypeInstance, Zipper, parent_container::ParentContainer};
 use psl::{
-    parser_database::{EnumId, ExtensionTypeId, ScalarType, walkers},
+    parser_database::{EnumId, ExtensionTypeId, GeometrySpec, GeometrySubtype, ScalarType, walkers},
     schema_ast::ast::FieldArity,
 };
 use std::{borrow::Cow, hash::Hash};
@@ -130,7 +130,7 @@ impl Field {
     }
 }
 
-#[derive(Clone, Debug, PartialEq, Eq, Hash, Copy)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
 #[allow(clippy::upper_case_acronyms)]
 pub enum TypeIdentifier {
     String,
@@ -145,6 +145,10 @@ pub enum TypeIdentifier {
     Json,
     DateTime,
     Bytes,
+    /// PostGIS spatial type. The carried `GeometrySpec` records the OGC subtype, optional SRID
+    /// and whether the column is `geometry` or `geography`; the user-facing PSL type name
+    /// (`Geometry` or `Geography`) is derived via [`GeometrySpec::psl_type_name`].
+    Geometry(GeometrySpec),
     Unsupported,
 }
 
@@ -171,7 +175,7 @@ pub type Type = Zipper<TypeIdentifier>;
 
 impl Type {
     pub fn type_name(&self) -> Cow<'static, str> {
-        match self.id {
+        match &self.id {
             TypeIdentifier::String => "String".into(),
             TypeIdentifier::Int => "Int".into(),
             TypeIdentifier::BigInt => "BigInt".into(),
@@ -179,14 +183,14 @@ impl Type {
             TypeIdentifier::Decimal => "Decimal".into(),
             TypeIdentifier::Boolean => "Bool".into(),
             TypeIdentifier::Enum(enum_id) => {
-                let enum_name = self.dm.walk(enum_id).name();
+                let enum_name = self.dm.walk(*enum_id).name();
                 format!("Enum{enum_name}").into()
             }
             TypeIdentifier::Extension(ext_id) => self
                 .dm
                 .schema
                 .db
-                .get_extension_type_prisma_name(ext_id)
+                .get_extension_type_prisma_name(*ext_id)
                 .expect("extension type name should be present")
                 .to_owned()
                 .into(),
@@ -194,12 +198,13 @@ impl Type {
             TypeIdentifier::Json => "Json".into(),
             TypeIdentifier::DateTime => "DateTime".into(),
             TypeIdentifier::Bytes => "Bytes".into(),
+            TypeIdentifier::Geometry(spec) => spec.psl_type_name().into(),
             TypeIdentifier::Unsupported => "Unsupported".into(),
         }
     }
 
     pub fn to_prisma_type(&self) -> PrismaValueType {
-        match self.id {
+        match &self.id {
             TypeIdentifier::String => PrismaValueType::String,
             TypeIdentifier::Int => PrismaValueType::Int,
             TypeIdentifier::BigInt => PrismaValueType::BigInt,
@@ -211,6 +216,7 @@ impl Type {
             TypeIdentifier::Json => PrismaValueType::Json,
             TypeIdentifier::DateTime => PrismaValueType::DateTime,
             TypeIdentifier::Bytes => PrismaValueType::Bytes,
+            TypeIdentifier::Geometry(_) => PrismaValueType::Bytes,
             TypeIdentifier::Extension(_) | TypeIdentifier::Unsupported => PrismaValueType::Any,
         }
     }
@@ -287,6 +293,19 @@ impl From<ScalarType> for TypeIdentifier {
             ScalarType::Json => Self::Json,
             ScalarType::Decimal => Self::Decimal,
             ScalarType::Bytes => Self::Bytes,
+            ScalarType::Geometry | ScalarType::Geography => {
+                // PostGIS scalars need the full `GeometrySpec` (subtype/SRID/spatial). Use
+                // `ScalarFieldRef::type_identifier()` directly so the native attribute is
+                // consulted; calling this `From` impl drops the spec by construction.
+                let spatial = st
+                    .postgis_spatial_kind()
+                    .expect("Geometry/Geography have a postgis_spatial_kind");
+                Self::Geometry(GeometrySpec {
+                    subtype: GeometrySubtype::Geometry,
+                    srid: None,
+                    spatial,
+                })
+            }
         }
     }
 }

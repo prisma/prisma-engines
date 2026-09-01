@@ -5,6 +5,7 @@ use crate::{Context, model_extensions::*};
 
 use prisma_value::Placeholder as PrismaValuePlaceholder;
 use psl::datamodel_connector::ConnectorCapability;
+use psl::parser_database::PostgisSpatialKind;
 use psl::reachable_only_with_capability;
 use quaint::ast::concat;
 use quaint::ast::*;
@@ -22,6 +23,7 @@ pub(crate) trait FilterVisitorExt {
     ) -> (ConditionTree<'static>, Option<Vec<AliasedJoin>>);
     fn visit_scalar_filter(&mut self, filter: ScalarFilter, ctx: &Context<'_>) -> ConditionTree<'static>;
     fn visit_scalar_list_filter(&mut self, filter: ScalarListFilter, ctx: &Context<'_>) -> ConditionTree<'static>;
+    fn visit_geometry_filter(&mut self, filter: GeometryFilter, ctx: &Context<'_>) -> ConditionTree<'static>;
     fn visit_one_relation_is_null_filter(
         &mut self,
         filter: OneRelationIsNullFilter,
@@ -316,6 +318,7 @@ impl FilterVisitorExt for FilterVisitor {
                 }
             },
             Filter::Scalar(filter) => (self.visit_scalar_filter(filter, ctx), None),
+            Filter::Geometry(filter) => (self.visit_geometry_filter(filter, ctx), None),
             Filter::OneRelationIsNull(filter) => self.visit_one_relation_is_null_filter(filter, ctx),
             Filter::Relation(filter) => self.visit_relation_filter(filter, ctx),
             Filter::BoolFilter(b) => {
@@ -615,6 +618,86 @@ impl FilterVisitorExt for FilterVisitor {
 
         ConditionTree::single(condition)
     }
+
+    fn visit_geometry_filter(&mut self, filter: GeometryFilter, ctx: &Context<'_>) -> ConditionTree<'static> {
+        // Resolve the column with the parent alias so that filters nested inside relation
+        // sub-queries stay qualified, matching every other `visit_*_filter` path in this file.
+        let field_column: Column<'static> = filter.field.aliased_col(self.parent_alias(), ctx);
+        let field_expr: Expression<'static> = field_column.into();
+
+        // Determine PostGIS spatial kind (geometry vs geography) and the field's declared SRID
+        // directly from the schema instead of guessing from the SRID value.
+        let field_spec = filter.field.geometry_spec();
+        let use_geography = field_spec
+            .map(|spec| matches!(spec.spatial, PostgisSpatialKind::Geography))
+            .unwrap_or(false);
+        let field_srid = field_spec.and_then(|spec| spec.srid);
+
+        // SRID chain: explicit override (filter arg) takes precedence over the field's
+        // declared SRID; fall back to 0 (PostGIS "unknown") only when neither is set.
+        let resolved_srid = match &filter.condition {
+            GeometryFilterCondition::Near { srid, .. }
+            | GeometryFilterCondition::Within { srid, .. }
+            | GeometryFilterCondition::Intersects { srid, .. } => srid.or(field_srid).unwrap_or(0),
+        };
+
+        let condition_expr = match filter.condition {
+            GeometryFilterCondition::Near {
+                point, max_distance, ..
+            } => geometry_near_condition(field_expr, point, max_distance, resolved_srid, use_geography),
+            GeometryFilterCondition::Within { polygon, .. } => {
+                let wkt = format_polygon_ring_wkt(&polygon);
+                geometry_within_condition(field_expr, wkt, resolved_srid)
+            }
+            GeometryFilterCondition::Intersects { geometry, .. } => {
+                // `parse_geometry_intersects` already rejected GeoJSON shapes that the SQL
+                // builder cannot lower to a single WKT (`Multi*` / `GeometryCollection`), so
+                // every value reaching this point is guaranteed to produce a `Some(wkt)`.
+                let wkt = geometry.to_wkt().unwrap_or_else(|| {
+                    unreachable!(
+                        "intersects filter received unsupported GeoJSON geometry `{}`; the extractor must reject it before reaching the SQL builder",
+                        geometry.type_tag()
+                    )
+                });
+                geometry_intersects_condition(field_expr, wkt, resolved_srid)
+            }
+        };
+
+        ConditionTree::single(condition_expr)
+    }
+}
+
+fn geometry_near_condition(
+    field: Expression<'static>,
+    point: GeoCoord,
+    max_distance: f64,
+    srid: i32,
+    use_geography: bool,
+) -> Expression<'static> {
+    let point_geom = st_set_srid(st_make_point(point.x, point.y), srid as i64);
+    let (lhs, rhs) = if use_geography {
+        let lhs: Expression<'static> = geography_cast(field).into();
+        let rhs: Expression<'static> = geography_cast(point_geom).into();
+        (lhs, rhs)
+    } else {
+        (field, point_geom.into())
+    };
+    st_dwithin(lhs, rhs, max_distance).into()
+}
+
+fn geometry_within_condition(field: Expression<'static>, wkt: String, srid: i32) -> Expression<'static> {
+    let geom = st_geom_from_text(wkt, srid as i64);
+    st_within(field, geom).into()
+}
+
+fn geometry_intersects_condition(field: Expression<'static>, wkt: String, srid: i32) -> Expression<'static> {
+    let geom = st_geom_from_text(wkt, srid as i64);
+    st_intersects(field, geom).into()
+}
+
+fn format_polygon_ring_wkt(positions: &[GeoCoord]) -> String {
+    let parts: Vec<_> = positions.iter().map(|c| format!("{} {}", c.x, c.y)).collect();
+    format!("POLYGON(({}))", parts.join(", "))
 }
 
 fn scalar_filter_aliased_cond(

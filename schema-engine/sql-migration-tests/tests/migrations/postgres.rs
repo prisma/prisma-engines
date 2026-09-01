@@ -1,6 +1,7 @@
 mod extensions;
 mod introspection;
 mod multi_schema;
+mod postgis_geometry;
 
 use psl::parser_database::{NoExtensionTypes, SourceFile};
 use quaint::Value;

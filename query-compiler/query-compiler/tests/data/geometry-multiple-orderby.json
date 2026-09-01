@@ -1,0 +1,25 @@
+{
+  "modelName": "Location",
+  "action": "findMany",
+  "query": {
+    "arguments": {
+      "orderBy": [
+        {
+          "position": {
+            "distanceFrom": {
+              "point": [0, 0],
+              "direction": "asc"
+            }
+          }
+        },
+        {
+          "id": "desc"
+        }
+      ]
+    },
+    "selection": {
+      "id": true,
+      "position": true
+    }
+  }
+}

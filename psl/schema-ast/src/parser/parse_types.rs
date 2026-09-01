@@ -12,12 +12,12 @@ pub fn parse_field_type(
     match current.as_rule() {
         Rule::optional_type => Ok((
             FieldArity::Optional,
-            parse_base_type(current.into_inner().next().unwrap(), diagnostics, file_id),
+            parse_base_type(current.into_inner().next().unwrap(), diagnostics, file_id)?,
         )),
-        Rule::base_type => Ok((FieldArity::Required, parse_base_type(current, diagnostics, file_id))),
+        Rule::base_type => Ok((FieldArity::Required, parse_base_type(current, diagnostics, file_id)?)),
         Rule::list_type => Ok((
             FieldArity::List,
-            parse_base_type(current.into_inner().next().unwrap(), diagnostics, file_id),
+            parse_base_type(current.into_inner().next().unwrap(), diagnostics, file_id)?,
         )),
         Rule::legacy_required_type => Err(DatamodelError::new_legacy_parser_error(
             "Fields are required by default, `!` is no longer required.",
@@ -35,15 +35,19 @@ pub fn parse_field_type(
     }
 }
 
-fn parse_base_type(pair: Pair<'_>, diagnostics: &mut Diagnostics, file_id: FileId) -> FieldType {
+fn parse_base_type(
+    pair: Pair<'_>,
+    diagnostics: &mut Diagnostics,
+    file_id: FileId,
+) -> Result<FieldType, DatamodelError> {
     let current = pair.into_inner().next().unwrap();
     match current.as_rule() {
-        Rule::identifier => FieldType::Supported(Identifier {
+        Rule::identifier => Ok(FieldType::Supported(Identifier {
             name: current.as_str().to_string(),
             span: Span::from((file_id, current.as_span())),
-        }),
+        })),
         Rule::unsupported_type => match parse_expression(current, diagnostics, file_id) {
-            Expression::StringValue(lit, span) => FieldType::Unsupported(lit, span),
+            Expression::StringValue(lit, span) => Ok(FieldType::Unsupported(lit, span)),
             _ => unreachable!("Encountered impossible type during parsing"),
         },
         _ => unreachable!("Encountered impossible type during parsing: {:?}", current.tokens()),

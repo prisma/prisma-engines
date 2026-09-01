@@ -11,3 +11,4 @@ enumflags2.workspace = true
 itertools.workspace = true
 either.workspace = true
 rustc-hash.workspace = true
+serde = { workspace = true, features = ["derive"] }

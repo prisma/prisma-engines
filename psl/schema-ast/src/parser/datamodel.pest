@@ -55,6 +55,7 @@ model_contents = {
 field_type = { unsupported_optional_list_type | list_type | optional_type | legacy_required_type | legacy_list_type | base_type  }
 
 unsupported_type = { "Unsupported(" ~ string_literal ~ ")" }
+
 base_type = { unsupported_type | identifier } // Called base type to not conflict with type rust keyword
 unsupported_optional_list_type = { base_type ~ "[]" ~ "?" }
 list_type = { base_type ~ "[]" }

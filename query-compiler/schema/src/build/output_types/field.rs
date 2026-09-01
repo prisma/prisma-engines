@@ -40,6 +40,7 @@ pub(crate) fn map_scalar_output_type<'a>(ctx: &'a QuerySchema, typ: &TypeIdentif
         TypeIdentifier::Int => OutputType::int(),
         TypeIdentifier::Bytes => OutputType::bytes(),
         TypeIdentifier::BigInt => OutputType::bigint(),
+        TypeIdentifier::Geometry(spec) => OutputType::geometry(*spec),
         TypeIdentifier::Unsupported => unreachable!("No unsupported field should reach this path"),
     };
 

@@ -191,6 +191,13 @@ fn validate_model_builtin_scalar_type_default(
     field_id: (crate::ModelId, ast::FieldId),
     ctx: &mut Context<'_>,
 ) {
+    // PostGIS spatial scalars only accept `@default(dbgenerated(...))` (already handled by the
+    // caller above). Reject everything else with a stable error matching the previous behaviour.
+    if matches!(scalar_type, ScalarType::Geometry | ScalarType::Geography) {
+        ctx.push_attribute_validation_error("Only @default(dbgenerated(\"...\")) can be used for Geometry types.");
+        return;
+    }
+
     let arity = ctx.asts[field_id.0][field_id.1].arity;
     match (scalar_type, value) {
         // Functions
@@ -251,6 +258,13 @@ fn validate_composite_builtin_scalar_type_default(
     field_arity: ast::FieldArity,
     ctx: &mut Context<'_>,
 ) {
+    // PostGIS spatial scalars cannot have defaults on composite fields (mirrors the previous
+    // top-level rejection arm that lived on `ScalarFieldType::Geometry`).
+    if matches!(scalar_type, ScalarType::Geometry | ScalarType::Geography) {
+        ctx.push_attribute_validation_error("Composite field of type `Geometry` cannot have default values.");
+        return;
+    }
+
     match (scalar_type, value) {
         // Functions
         (ScalarType::String, ast::Expression::Function(funcname, funcargs, _)) if funcname == FN_ULID => {

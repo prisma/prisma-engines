@@ -621,7 +621,12 @@ fn diff_changed_unsupported_type(api: TestApi) {
         None,
     );
 
-    // TODO: this should produce 'ALTER TABLE "A" ALTER COLUMN "data" SET DATA TYPE geometry;',
-    // but unsupported column diffing is currently broken.
-    expect!["-- This is an empty migration."].assert_eq(&diff);
+    // The database column is `geometry`, which is now introspected as a first-class PostGIS
+    // type rather than `Unsupported`, so diffing it against the `Unsupported("vector")` datamodel
+    // emits a real `SET DATA TYPE` alter instead of the previous empty migration.
+    expect![[r#"
+        -- AlterTable
+        ALTER TABLE "A" ALTER COLUMN "data" SET DATA TYPE vector;
+    "#]]
+    .assert_eq(&diff);
 }
