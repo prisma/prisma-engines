@@ -25,6 +25,8 @@ mod native_type_definition;
 mod postgres_datamodel_connector;
 #[cfg(feature = "sqlite")]
 mod sqlite_datamodel_connector;
+#[cfg(feature = "surrealdb")]
+mod surrealdb_datamodel_connector;
 mod utils;
 pub use capabilities_support::{can_have_capability, can_support_relation_load_strategy, has_capability};
 
@@ -47,6 +49,9 @@ pub const MSSQL: &'static dyn crate::datamodel_connector::Connector =
     &mssql_datamodel_connector::MsSqlDatamodelConnector;
 #[cfg(feature = "mongodb")]
 pub const MONGODB: &'static dyn crate::datamodel_connector::Connector = &mongodb::MongoDbDatamodelConnector;
+#[cfg(feature = "surrealdb")]
+pub const SURREALDB: &'static dyn crate::datamodel_connector::Connector =
+    &surrealdb_datamodel_connector::SurrealDbDatamodelConnector;
 
 pub static BUILTIN_CONNECTORS: ConnectorRegistry<'static> = &[
     #[cfg(feature = "postgresql")]
@@ -61,4 +66,6 @@ pub static BUILTIN_CONNECTORS: ConnectorRegistry<'static> = &[
     COCKROACH,
     #[cfg(feature = "mongodb")]
     MONGODB,
+    #[cfg(feature = "surrealdb")]
+    SURREALDB,
 ];

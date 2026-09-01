@@ -4,6 +4,8 @@ mod mysql;
 mod postgresql;
 mod sqlite;
 mod sqlserver;
+#[cfg(feature = "surrealdb")]
+mod surrealdb;
 
 use sql::{ForeignKeyWalker, IndexColumnWalker, IndexWalker, TableWalker};
 use sql_schema_describer as sql;
@@ -12,6 +14,8 @@ pub(super) use mysql::MysqlIntrospectionFlavour;
 pub(super) use postgresql::PostgresIntrospectionFlavour;
 pub(super) use sqlite::SqliteIntrospectionFlavour;
 pub(super) use sqlserver::SqlServerIntrospectionFlavour;
+#[cfg(feature = "surrealdb")]
+pub(super) use surrealdb::SurrealDbIntrospectionFlavour;
 
 use schema_connector::Warnings;
 

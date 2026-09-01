@@ -38,6 +38,7 @@ postgresql = ["psl/postgresql", "query-compiler/postgresql"]
 mysql = ["psl/mysql", "query-compiler/mysql"]
 mssql = ["psl/mssql", "query-compiler/mssql"]
 cockroachdb = ["psl/cockroachdb", "query-compiler/cockroachdb", "postgresql"]
+surrealdb = ["psl/surrealdb", "query-compiler/surrealdb"]
 
 [package.metadata.wasm-pack.profile.release]
 wasm-opt = false # use wasm-opt explicitly in `./build.sh`

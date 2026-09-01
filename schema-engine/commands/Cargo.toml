@@ -14,6 +14,7 @@ mssql = ["sql-schema-connector/mssql"]
 mssql-native = ["mssql"]
 cockroachdb = ["sql-schema-connector/cockroachdb"]
 cockroachdb-native = ["cockroachdb"]
+surrealdb = ["sql-schema-connector/surrealdb"]
 mongodb = ["mongodb-schema-connector"]
 mongodb-native = ["mongodb"]
 all-native = [

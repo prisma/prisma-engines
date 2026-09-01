@@ -39,6 +39,8 @@ impl JsConnectionInfo {
             AdapterProvider::Sqlite => Some(quaint::connector::DEFAULT_SQLITE_DATABASE),
             #[cfg(feature = "mssql")]
             AdapterProvider::SqlServer => Some(quaint::connector::DEFAULT_MSSQL_SCHEMA),
+            #[cfg(feature = "surrealdb")]
+            AdapterProvider::SurrealDb => None,
         }
     }
 }
@@ -55,6 +57,9 @@ pub enum AdapterProvider {
     #[cfg(feature = "mssql")]
     #[serde(rename = "sqlserver")]
     SqlServer,
+    #[cfg(feature = "surrealdb")]
+    #[serde(rename = "surrealdb")]
+    SurrealDb,
 }
 
 impl From<AdapterProvider> for SqlFamily {
@@ -68,6 +73,8 @@ impl From<AdapterProvider> for SqlFamily {
             AdapterProvider::Sqlite => SqlFamily::Sqlite,
             #[cfg(feature = "mssql")]
             AdapterProvider::SqlServer => SqlFamily::Mssql,
+            #[cfg(feature = "surrealdb")]
+            AdapterProvider::SurrealDb => SqlFamily::SurrealDb,
         }
     }
 }
