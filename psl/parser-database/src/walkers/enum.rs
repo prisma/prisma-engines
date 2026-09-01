@@ -122,4 +122,11 @@ impl<'db> EnumValueWalker<'db> {
             .get(&(self.id.1))
             .map(|id| &self.db[*id])
     }
+
+    /// True if the enum value is ignored.
+    pub fn is_ignored(self) -> bool {
+        self.db.types.enum_attributes[&self.id.0]
+            .ignored_values
+            .contains(&self.id.1)
+    }
 }

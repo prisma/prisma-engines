@@ -302,3 +302,21 @@ fn allow_ignore_on_relation_fields_on_valid_models() {
         .assert_has_relation_field("rel_e")
         .assert_ignored(true);
 }
+
+#[test]
+fn allow_ignore_on_enum_values() {
+    let dml = r#"
+    enum SupportedCarTypes {
+      COUPE @ignore
+      SEDAN
+      VAN
+    }
+    "#;
+
+    let datamodel = parse_schema(dml);
+    let enum_walker = datamodel.assert_has_enum("SupportedCarTypes");
+
+    enum_walker.assert_has_value("COUPE").assert_ignored(true);
+    enum_walker.assert_has_value("SEDAN").assert_ignored(false);
+    enum_walker.assert_has_value("VAN").assert_ignored(false);
+}

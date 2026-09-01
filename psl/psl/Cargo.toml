@@ -16,6 +16,7 @@ all = ["postgresql", "sqlite", "mysql", "cockroachdb", "mssql", "mongodb"]
 psl-core.workspace = true
 
 [dev-dependencies]
+psl-core = { workspace = true, features = ["postgresql", "sqlite", "mysql", "cockroachdb", "mssql", "mongodb"] }
 base64.workspace = true
 dissimilar.workspace = true
 expect-test.workspace = true
