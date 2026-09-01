@@ -3,7 +3,11 @@
 #![deny(rust_2018_idioms, unsafe_code)]
 #![allow(clippy::derive_partial_eq_without_eq)]
 
-pub use self::{parser::parse_schema, reformat::reformat, source_file::SourceFile};
+pub use self::{
+    parser::parse_schema,
+    reformat::{reformat, reformat_with_line_ending},
+    source_file::SourceFile,
+};
 
 /// The AST data structure. It aims to faithfully represent the syntax of a Prisma Schema, with
 /// source span information.

@@ -1,4 +1,5 @@
 use crate::{
+    ast::NewlineType,
     parser::{PrismaDatamodelParser, Rule},
     renderer::{LineWriteable, Renderer, TableFormat},
 };
@@ -8,15 +9,29 @@ use std::iter::Peekable;
 type Pair<'a> = pest::iterators::Pair<'a, Rule>;
 
 /// Reformat a PSL string.
+///
+/// The output preserves the line-ending style detected from `input` (LF or
+/// CRLF). Mixed-ending inputs fall back to LF. See `NewlineType::detect`.
 pub fn reformat(input: &str, indent_width: usize) -> Option<String> {
+    reformat_with_line_ending(input, indent_width, NewlineType::detect(input))
+}
+
+/// Reformat a PSL string, emitting `line_ending` as the line separator for
+/// every line of output (including the trailing newline).
+pub fn reformat_with_line_ending(
+    input: &str,
+    indent_width: usize,
+    line_ending: NewlineType,
+) -> Option<String> {
     let mut ast = PrismaDatamodelParser::parse(Rule::schema, input).ok()?;
-    let mut renderer = Renderer::new(indent_width);
+    let mut renderer = Renderer::new(indent_width, line_ending);
     renderer.stream.reserve(input.len() / 2);
     reformat_top(&mut renderer, ast.next().unwrap());
 
     // all schemas must end with a newline
-    if !renderer.stream.ends_with('\n') {
-        renderer.stream.push('\n');
+    let ending = line_ending.as_ref();
+    if !renderer.stream.ends_with(ending) {
+        renderer.stream.push_str(ending);
     }
 
     // TODO: why do we need to use a `Some` here?

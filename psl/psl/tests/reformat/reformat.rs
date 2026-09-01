@@ -1231,3 +1231,91 @@ fn attribute_arguments_reformatting_is_idempotent() {
     expected.assert_eq(&reformatted);
     assert_eq!(reformatted, reformat(&reformatted)); // it's idempotent
 }
+
+// Regression: https://github.com/prisma/prisma/issues/8548
+//
+// `prisma format` used to emit LF for every line but reach the end of file
+// with a CRLF on the last line when the original input used CRLF anywhere.
+// The reformatter must now preserve the input's line-ending style natively
+// (instead of post-processing the output) so the output is internally
+// consistent.
+mod line_endings {
+    fn reformat(input: &str) -> String {
+        psl::reformat(input, 2).unwrap_or_else(|| input.to_owned())
+    }
+
+    const SCHEMA_LINES: &[&str] = &[
+        "model User {",
+        "  id   Int    @id",
+        "  name String",
+        "}",
+        "",
+    ];
+
+    fn join(sep: &str) -> String {
+        SCHEMA_LINES.join(sep)
+    }
+
+    #[test]
+    fn lf_input_stays_lf() {
+        let input = join("\n");
+        let out = reformat(&input);
+        assert!(!out.contains('\r'), "LF input must not gain any CR: {out:?}");
+        assert!(out.ends_with('\n'));
+    }
+
+    #[test]
+    fn crlf_input_stays_crlf() {
+        let input = join("\r\n");
+        let out = reformat(&input);
+        assert!(out.ends_with("\r\n"), "CRLF input must end with CRLF: {out:?}");
+        // Every LF in the output must be preceded by a CR.
+        let bytes = out.as_bytes();
+        for (i, &b) in bytes.iter().enumerate() {
+            if b == b'\n' {
+                assert!(
+                    i > 0 && bytes[i - 1] == b'\r',
+                    "found a bare LF at byte {i} in CRLF output: {out:?}",
+                );
+            }
+        }
+    }
+
+    #[test]
+    fn mixed_input_defaults_to_lf() {
+        // First line uses LF, later lines use CRLF: any bare LF in the input
+        // forces the reformatter to fall back to LF for the whole output.
+        let input = format!(
+            "{}\n{}\r\n{}\r\n{}\r\n",
+            SCHEMA_LINES[0], SCHEMA_LINES[1], SCHEMA_LINES[2], SCHEMA_LINES[3]
+        );
+        let out = reformat(&input);
+        assert!(!out.contains('\r'), "LF-first mixed input should normalize to LF: {out:?}");
+    }
+
+    #[test]
+    fn mixed_input_crlf_first_then_lf_defaults_to_lf() {
+        // First line uses CRLF, later line uses bare LF: the bare LF still
+        // forces the LF fallback so the contract is symmetric.
+        let input = format!(
+            "{}\r\n{}\n{}\r\n{}\r\n",
+            SCHEMA_LINES[0], SCHEMA_LINES[1], SCHEMA_LINES[2], SCHEMA_LINES[3]
+        );
+        let out = reformat(&input);
+        assert!(
+            !out.contains('\r'),
+            "CRLF-first mixed input should still normalize to LF: {out:?}"
+        );
+    }
+
+    #[test]
+    fn no_trailing_crlf_after_lf_body() {
+        // Specifically the bug from issue #8548: the body was LF but the file
+        // ended with CRLF. Make sure a pure-LF input does NOT terminate with
+        // CRLF.
+        let input = "model A {\n  id Int @id\n}\n";
+        let out = reformat(input);
+        assert!(out.ends_with('\n') && !out.ends_with("\r\n"));
+        assert!(!out.contains('\r'));
+    }
+}
