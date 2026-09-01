@@ -20,6 +20,17 @@ pub fn urls_denote_same_database(flavour: Flavour, first: &str, second: &str) ->
 }
 
 /// `None` means "cannot tell", which leaves the decision to the caller of the comparison.
+// With no flavour enabled there is no arm left to compare anything in.
+#[cfg_attr(
+    not(any(
+        feature = "postgresql",
+        feature = "cockroachdb",
+        feature = "mysql",
+        feature = "mssql",
+        feature = "sqlite"
+    )),
+    allow(unused_variables)
+)]
 fn compare_urls(flavour: Flavour, first: &str, second: &str) -> Option<bool> {
     match flavour {
         #[cfg(any(feature = "postgresql", feature = "cockroachdb"))]

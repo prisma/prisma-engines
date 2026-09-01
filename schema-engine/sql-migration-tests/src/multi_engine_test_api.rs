@@ -50,6 +50,7 @@ impl TestApi {
                 connection_string: args.database_url().to_owned(),
                 preview_features,
                 shadow_database_connection_string: args.shadow_database_url().map(String::from),
+                reset_shadow_database: false,
             };
             let mut conn = SqlSchemaConnector::new_mysql(params).unwrap();
             tok(conn.reset(false, None, &schema_connector::SchemaFilter::default())).unwrap();
@@ -208,12 +209,33 @@ impl TestApi {
         connection_string: String,
         shadow_database_connection_string: Option<String>,
     ) -> ConnectorResult<EngineTestApi> {
+        self.new_engine_with_shadow_db_consent_or_err(connection_string, shadow_database_connection_string, false)
+    }
+
+    /// Instantiate a new migration with the provided connection strings, consenting to the shadow
+    /// database being reset even when it is not empty.
+    pub fn new_engine_with_shadow_db_consent(
+        &self,
+        connection_string: String,
+        shadow_database_connection_string: Option<String>,
+    ) -> EngineTestApi {
+        self.new_engine_with_shadow_db_consent_or_err(connection_string, shadow_database_connection_string, true)
+            .unwrap()
+    }
+
+    fn new_engine_with_shadow_db_consent_or_err(
+        &self,
+        connection_string: String,
+        shadow_database_connection_string: Option<String>,
+        reset_shadow_database: bool,
+    ) -> ConnectorResult<EngineTestApi> {
         let connection_info = ConnectionInfo::from_url(&connection_string).unwrap();
 
         let params = ConnectorParams {
             connection_string,
             preview_features: self.preview_features,
             shadow_database_connection_string,
+            reset_shadow_database,
         };
 
         let connector = match &connection_info {

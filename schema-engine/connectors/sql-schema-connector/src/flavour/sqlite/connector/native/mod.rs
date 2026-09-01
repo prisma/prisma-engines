@@ -315,6 +315,12 @@ pub fn get_shadow_db_url(state: &State) -> Option<&str> {
         .as_deref()
 }
 
+pub fn get_reset_shadow_database(state: &State) -> bool {
+    state
+        .params()
+        .is_some_and(|params| params.connector_params.reset_shadow_database)
+}
+
 pub async fn dispose(_state: &State) -> ConnectorResult<()> {
     // Nothing to on dispose, the connection is disposed in Drop
     Ok(())

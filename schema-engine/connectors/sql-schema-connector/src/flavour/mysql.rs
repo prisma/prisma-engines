@@ -160,6 +160,12 @@ impl SqlConnector for MysqlConnector {
             .as_deref()
     }
 
+    fn reset_shadow_database(&self) -> bool {
+        self.state
+            .params()
+            .is_some_and(|params| params.connector_params.reset_shadow_database)
+    }
+
     fn acquire_lock(&mut self) -> BoxFuture<'_, ConnectorResult<()>> {
         with_connection(&mut self.state, |params, _, connection| async move {
             // We do not acquire advisory locks on PlanetScale instances.

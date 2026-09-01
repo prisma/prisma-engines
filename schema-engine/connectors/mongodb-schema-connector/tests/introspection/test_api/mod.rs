@@ -114,6 +114,7 @@ where
             connection_string: connection_string.clone(),
             preview_features,
             shadow_database_connection_string: None,
+            reset_shadow_database: false,
         };
 
         let connector = MongoDbSchemaConnector::new(params);

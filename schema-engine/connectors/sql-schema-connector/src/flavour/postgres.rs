@@ -360,6 +360,10 @@ impl SqlConnector for PostgresConnector {
         imp::get_shadow_db_url(&self.state)
     }
 
+    fn reset_shadow_database(&self) -> bool {
+        imp::get_reset_shadow_database(&self.state)
+    }
+
     fn acquire_lock(&mut self) -> BoxFuture<'_, ConnectorResult<()>> {
         // They do not support advisory locking:
         // https://github.com/cockroachdb/cockroach/issues/13546

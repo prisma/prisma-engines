@@ -180,6 +180,12 @@ impl SqlConnector for MssqlConnector {
             .as_deref()
     }
 
+    fn reset_shadow_database(&self) -> bool {
+        self.state
+            .params()
+            .is_some_and(|params| params.connector_params.reset_shadow_database)
+    }
+
     fn acquire_lock(&mut self) -> BoxFuture<'_, ConnectorResult<()>> {
         // see
         // https://docs.microsoft.com/en-us/sql/relational-databases/system-stored-procedures/sp-getapplock-transact-sql?view=sql-server-ver15

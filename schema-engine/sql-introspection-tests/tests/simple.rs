@@ -139,6 +139,7 @@ source .test_database_urls/mysql_5_6
         connection_string: database_url,
         preview_features,
         shadow_database_connection_string: None,
+        reset_shadow_database: false,
     };
 
     let mut api = match provider {

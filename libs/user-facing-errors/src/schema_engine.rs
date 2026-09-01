@@ -307,6 +307,18 @@ pub struct UnexpectedNamespaceInExternalTables;
 )]
 pub struct ShadowDbSameAsMainDb;
 
+#[derive(Debug, UserFacingError, Serialize)]
+#[user_facing(
+    code = "P3026",
+    message = "The shadow database at `{shadow_database_location}` is not empty. Prisma Migrate resets the shadow database before it replays your migration history into it, which would destroy the data it currently holds.\n\nPoint `datasource.shadowDatabaseUrl` in your `prisma.config.ts` at an empty database, or, if you are certain that the data in this one can be destroyed, run the command again with `--reset-shadow-database`."
+)]
+pub struct ShadowDbNotEmpty {
+    /// The shadow database, with credentials removed. Reads
+    /// `(driver adapter shadow database)` when the shadow database is reached through a driver
+    /// adapter and has no connection string of its own.
+    pub shadow_database_location: String,
+}
+
 #[derive(Debug, SimpleUserFacingError)]
 #[user_facing(code = "P4001", message = "The introspected database was empty.")]
 pub struct IntrospectionResultEmpty;

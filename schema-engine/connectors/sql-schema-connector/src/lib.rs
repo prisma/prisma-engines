@@ -6,10 +6,12 @@
 mod apply_migration;
 mod database_schema;
 mod error;
+mod external_shadow_db;
 mod flavour;
 mod introspection;
 mod migration_pair;
 mod same_database;
+mod sanitize;
 mod sql_destructive_change_checker;
 mod sql_doc_parser;
 mod sql_migration;
@@ -35,6 +37,7 @@ use sql_schema_describer as sql;
 use std::{future, sync::Arc};
 
 pub use same_database::urls_denote_same_database;
+pub use sanitize::{DRIVER_ADAPTER_SHADOW_DATABASE, sanitize_connection_string};
 
 const MIGRATIONS_TABLE_NAME: &str = "_prisma_migrations";
 
@@ -181,6 +184,20 @@ impl SchemaDialect for SqlSchemaDialect {
                 | ExternalShadowDatabase::ConnectionString { preview_features, .. } => *preview_features,
             };
 
+            let (reset_allowed, location) = match &target {
+                ExternalShadowDatabase::DriverAdapter { reset_allowed, .. } => {
+                    (*reset_allowed, DRIVER_ADAPTER_SHADOW_DATABASE.to_owned())
+                }
+                ExternalShadowDatabase::ConnectionString {
+                    connection_string,
+                    reset_allowed,
+                    ..
+                } => (
+                    *reset_allowed,
+                    sanitize_connection_string(self.dialect.datamodel_connector().flavour(), connection_string),
+                ),
+            };
+
             let mut connector = match target {
                 #[cfg(not(any(
                     feature = "mssql-native",
@@ -188,10 +205,9 @@ impl SchemaDialect for SqlSchemaDialect {
                     feature = "postgresql-native",
                     feature = "sqlite-native"
                 )))]
-                ExternalShadowDatabase::DriverAdapter {
-                    factory,
-                    preview_features: _,
-                } => self.dialect.connect_to_shadow_db(factory).await?,
+                ExternalShadowDatabase::DriverAdapter { factory, .. } => {
+                    self.dialect.connect_to_shadow_db(factory).await?
+                }
                 #[cfg(any(
                     feature = "mssql-native",
                     feature = "mysql-native",
@@ -201,6 +217,7 @@ impl SchemaDialect for SqlSchemaDialect {
                 ExternalShadowDatabase::ConnectionString {
                     connection_string,
                     preview_features,
+                    ..
                 } => {
                     self.dialect
                         .connect_to_shadow_db(connection_string, preview_features)
@@ -212,9 +229,15 @@ impl SchemaDialect for SqlSchemaDialect {
                     ));
                 }
             };
-            let schema = connector
-                .sql_schema_from_migration_history(migrations, namespaces, filter, UsingExternalShadowDb::Yes)
-                .await;
+            let schema = external_shadow_db::replay_migration_history(
+                connector.as_mut(),
+                migrations,
+                namespaces,
+                filter,
+                reset_allowed,
+                &location,
+            )
+            .await;
             // dispose of the connector regardless of the result
             connector.dispose().await?;
             let schema = DatabaseSchema::new(SqlDatabaseSchema::from(schema?));
@@ -494,6 +517,7 @@ impl SchemaConnector for SqlSchemaConnector {
                     let target = ExternalShadowDatabase::ConnectionString {
                         connection_string: connection_string.to_owned(),
                         preview_features: self.inner.preview_features(),
+                        reset_allowed: self.inner.reset_shadow_database(),
                     };
                     self.schema_dialect()
                         .schema_from_migrations_with_target(migrations, namespaces, filter, target)

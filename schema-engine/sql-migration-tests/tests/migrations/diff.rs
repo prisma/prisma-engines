@@ -9,10 +9,10 @@ use schema_core::{
 };
 use sql_migration_tests::{
     test_api::*,
-    utils::{list_migrations, to_schema_containers},
+    utils::{list_migrations, raw_cmd_on, to_schema_containers},
 };
 use std::sync::Arc;
-use user_facing_errors::schema_engine::ShadowDbSameAsMainDb;
+use user_facing_errors::schema_engine::{ShadowDbNotEmpty, ShadowDbSameAsMainDb};
 
 #[test_connector(tags(Sqlite, Mysql, Postgres, CockroachDb, Mssql))]
 fn from_unique_index_to_without(mut api: TestApi) {
@@ -377,6 +377,7 @@ fn from_empty_to_migrations_directory(mut api: TestApi) {
         &DatasourceUrls {
             url: Some("postgres://not-used".to_string()),
             shadow_database_url: Some(api.connection_string().to_owned()),
+            reset_shadow_database: false,
         },
         host.clone(),
         BitFlags::empty(),
@@ -427,6 +428,7 @@ fn from_empty_to_migrations_folder_without_shadow_db_url_must_error(mut api: Tes
             &DatasourceUrls {
                 url: Some(api.connection_string().to_owned()),
                 shadow_database_url: None,
+                reset_shadow_database: false,
             },
             params,
         )
@@ -457,6 +459,7 @@ fn from_migrations_with_the_datasource_database_as_shadow_db_must_error(mut api:
                 &DatasourceUrls {
                     url: Some(main_url.clone()),
                     shadow_database_url: Some(shadow_database_url.clone()),
+                    reset_shadow_database: false,
                 },
                 DiffParams {
                     exit_code: None,
@@ -491,6 +494,7 @@ fn from_url_to_migrations_with_that_url_as_shadow_db_must_error(mut api: TestApi
             &DatasourceUrls {
                 url: None,
                 shadow_database_url: Some(main_url.clone()),
+                reset_shadow_database: false,
             },
             DiffParams {
                 exit_code: None,
@@ -514,6 +518,7 @@ fn from_migrations_with_a_separate_shadow_db_on_the_same_server_works(mut api: T
         DatasourceUrls {
             url: Some(api.connection_string().to_owned()),
             shadow_database_url: Some(api.create_external_shadow_database()),
+            reset_shadow_database: false,
         },
         DiffParams {
             exit_code: Some(true),
@@ -534,6 +539,95 @@ fn from_migrations_with_a_separate_shadow_db_on_the_same_server_works(mut api: T
           - cats
     "#]];
     expected_diff.assert_eq(&diff);
+}
+
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
+fn diff_from_migrations_must_not_reset_a_shadow_db_that_is_not_empty(mut api: TestApi) {
+    // A shadow database with a login of its own: the refusal names the database, and must not carry
+    // the password that reaches it.
+    const SHADOW_DB_USER: &str = "shadowdbconsenttestuser";
+    const SHADOW_DB_PASSWORD: &str = "sh4d0w-p4ssw0rd";
+
+    let migrations_dir = migrations_directory_with_one_migration(&api);
+    let shadow_db_url = api.create_external_shadow_database();
+    raw_cmd_on(&shadow_db_url, "CREATE TABLE dirty_marker (id INTEGER PRIMARY KEY)");
+
+    api.raw_cmd(&format!("DROP USER IF EXISTS {SHADOW_DB_USER}"));
+    api.raw_cmd(&format!(
+        "CREATE USER {SHADOW_DB_USER} PASSWORD '{SHADOW_DB_PASSWORD}' LOGIN"
+    ));
+
+    let shadow_db_url = {
+        let mut url: url::Url = shadow_db_url.parse().unwrap();
+        url.set_username(SHADOW_DB_USER).unwrap();
+        url.set_password(Some(SHADOW_DB_PASSWORD)).unwrap();
+        url.to_string()
+    };
+    let shadow_db_name = url::Url::parse(&shadow_db_url)
+        .unwrap()
+        .path()
+        .trim_start_matches('/')
+        .to_owned();
+
+    let err = api
+        .diff_with_datasource(
+            &DatasourceUrls {
+                url: Some(api.connection_string().to_owned()),
+                shadow_database_url: Some(shadow_db_url.clone()),
+                reset_shadow_database: false,
+            },
+            DiffParams {
+                exit_code: None,
+                from: DiffTarget::Migrations(list_migrations(migrations_dir.path()).unwrap()),
+                to: DiffTarget::Empty,
+                script: false,
+                filters: SchemaFilter::default(),
+            },
+        )
+        .unwrap_err();
+
+    assert!(err.is_user_facing_error::<ShadowDbNotEmpty>(), "{err:?}");
+
+    let message = err.to_string();
+    assert!(message.contains(&shadow_db_name), "{message}");
+    assert!(message.contains("localhost"), "{message}");
+    assert!(!message.contains(SHADOW_DB_PASSWORD), "{message}");
+    assert!(!message.contains(SHADOW_DB_USER), "{message}");
+
+    api.new_engine_with_connection_strings(shadow_db_url, None)
+        .assert_schema()
+        .assert_has_table("dirty_marker");
+}
+
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
+fn diff_from_migrations_resets_a_shadow_db_that_is_not_empty_with_consent(mut api: TestApi) {
+    let migrations_dir = migrations_directory_with_one_migration(&api);
+    let shadow_db_url = api.create_external_shadow_database();
+    raw_cmd_on(&shadow_db_url, "CREATE TABLE dirty_marker (id INTEGER PRIMARY KEY)");
+
+    let result = api
+        .diff_with_datasource(
+            &DatasourceUrls {
+                url: Some(api.connection_string().to_owned()),
+                shadow_database_url: Some(shadow_db_url.clone()),
+                reset_shadow_database: true,
+            },
+            DiffParams {
+                exit_code: Some(true),
+                from: DiffTarget::Empty,
+                to: DiffTarget::Migrations(list_migrations(migrations_dir.path()).unwrap()),
+                script: false,
+                filters: SchemaFilter::default(),
+            },
+        )
+        .unwrap();
+
+    // The migration history was replayed, so the diff against an empty schema is not empty.
+    assert_eq!(result.exit_code, 2);
+
+    api.new_engine_with_connection_strings(shadow_db_url, None)
+        .assert_schema()
+        .assert_tables_count(0);
 }
 
 fn migrations_directory_with_one_migration(api: &TestApi) -> tempfile::TempDir {
@@ -1040,6 +1134,7 @@ fn from_migrations_to_schema_datamodel_ignores_manual_partial_indexes_without_pr
         DatasourceUrls {
             url: Some(api.connection_string().to_owned()),
             shadow_database_url: Some(api.create_external_shadow_database()),
+            reset_shadow_database: false,
         },
         DiffParams {
             exit_code: Some(true),
@@ -1104,6 +1199,7 @@ fn from_schema_datamodel_to_migrations_ignores_manual_partial_indexes_without_pr
         DatasourceUrls {
             url: Some(api.connection_string().to_owned()),
             shadow_database_url: Some(api.create_external_shadow_database()),
+            reset_shadow_database: false,
         },
         DiffParams {
             exit_code: Some(true),
@@ -1179,6 +1275,7 @@ fn from_migrations_to_url_ignores_manual_partial_indexes_with_engine_seeded_sche
         DatasourceUrls {
             url: Some(api.connection_string().to_owned()),
             shadow_database_url: Some(api.create_external_shadow_database()),
+            reset_shadow_database: false,
         },
         DiffParams {
             exit_code: Some(true),

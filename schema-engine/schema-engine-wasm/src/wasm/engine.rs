@@ -56,6 +56,11 @@ pub fn version() -> String {
 pub struct ConstructorOptions {
     /// The initial datamodels to use.
     datamodels: Option<Vec<(String, String)>>,
+
+    /// Whether the user consented to the shadow database being reset even when it is not empty.
+    /// Absent means no consent was given.
+    #[serde(default)]
+    reset_shadow_database: bool,
 }
 
 /// The main query engine used by JS
@@ -69,6 +74,9 @@ pub struct SchemaEngine {
 
     /// The inferred database namespaces (used for the `multiSchema` preview feature).
     namespaces: Option<Namespaces>,
+
+    /// Whether the user consented to the shadow database being reset even when it is not empty.
+    reset_shadow_database: bool,
 
     /// The dispatcher for tracing.
     dispatch: Dispatch,
@@ -95,6 +103,7 @@ impl SchemaEngine {
         async move {
             let ConstructorOptions {
                 datamodels: initial_datamodels,
+                reset_shadow_database,
             } = options;
 
             let adapter_factory = Arc::new(adapter_factory_from_js(adapter));
@@ -125,6 +134,7 @@ impl SchemaEngine {
                 adapter_factory,
                 connector,
                 namespaces,
+                reset_shadow_database,
                 dispatch,
                 migration_schema_cache: MigrationSchemaCache::new(),
             })
@@ -218,6 +228,7 @@ impl SchemaEngine {
                 namespaces,
                 &mut self.connector,
                 self.adapter_factory.clone(),
+                self.reset_shadow_database,
                 &mut self.migration_schema_cache,
             )
             .instrument(tracing::info_span!("DevDiagnostic"))
@@ -237,6 +248,7 @@ impl SchemaEngine {
                 params,
                 &mut self.connector,
                 self.adapter_factory.clone(),
+                self.reset_shadow_database,
                 &NoExtensionTypes,
             )
             .instrument(tracing::info_span!("Diff"))
@@ -261,6 +273,7 @@ impl SchemaEngine {
                 namespaces,
                 &mut self.connector,
                 self.adapter_factory.clone(),
+                self.reset_shadow_database,
                 &mut self.migration_schema_cache,
             )
             .instrument(tracing::info_span!("DiagnoseMigrationHistory"))

@@ -1,8 +1,12 @@
 use expect_test::expect;
 use quaint::{prelude::Queryable, single::Quaint};
-use sql_migration_tests::multi_engine_test_api::*;
+use sql_migration_tests::{multi_engine_test_api::*, utils::raw_cmd_on};
+use tempfile::TempDir;
 use test_macros::test_connector;
-use user_facing_errors::{UserFacingError, schema_engine::ShadowDbSameAsMainDb};
+use user_facing_errors::{
+    UserFacingError,
+    schema_engine::{ShadowDbNotEmpty, ShadowDbSameAsMainDb},
+};
 
 // exclude: auth works differently in single-node insecure cockroach
 #[test_connector(tags(Postgres), exclude(CockroachDb))]
@@ -291,4 +295,117 @@ fn a_separate_shadow_db_on_the_same_server_is_accepted(api: TestApi) {
         .create_migration("01init", schema, &migrations_directory)
         .send_sync()
         .assert_migration_directories_count(1);
+}
+
+const DIRTY_MARKER_TABLE: &str = "CREATE TABLE dirty_marker (id INTEGER PRIMARY KEY)";
+const MIGRATIONS_TABLE_ONLY: &str = "CREATE TABLE _prisma_migrations (id VARCHAR(36) PRIMARY KEY)";
+
+/// A shadow database holding something of its own, as a database somebody else uses would.
+fn dirty_shadow_database(api: &TestApi, setup_sql: &str) -> String {
+    let shadow_db_url = api.create_external_shadow_database();
+    raw_cmd_on(&shadow_db_url, setup_sql);
+    shadow_db_url
+}
+
+/// Plans the second migration of a history, which is the point at which the engine replays the
+/// first one into the shadow database.
+fn migrations_directory_with_one_migration(api: &TestApi) -> TempDir {
+    let migrations_directory = api.create_migrations_directory();
+
+    api.new_engine()
+        .create_migration("01init", CAT_SCHEMA, &migrations_directory)
+        .send_sync();
+
+    migrations_directory
+}
+
+const CAT_SCHEMA: &str = r#"
+    model Cat {
+        id Int @id
+        litterConsumption Int
+    }
+"#;
+
+const CAT_SCHEMA_WITH_ONE_MORE_FIELD: &str = r#"
+    model Cat {
+        id Int @id
+        litterConsumption Int
+        hungry Boolean @default(true)
+    }
+"#;
+
+#[test_connector(tags(Postgres, Mysql, Mssql, Sqlite), exclude(CockroachDb, Vitess))]
+fn a_shadow_db_that_is_not_empty_must_not_be_reset_without_consent(api: TestApi) {
+    let migrations_directory = migrations_directory_with_one_migration(&api);
+    let shadow_db_url = dirty_shadow_database(&api, DIRTY_MARKER_TABLE);
+
+    let err = api
+        .new_engine_with_connection_strings(api.connection_string().to_owned(), Some(shadow_db_url.clone()))
+        .create_migration("02hungry", CAT_SCHEMA_WITH_ONE_MORE_FIELD, &migrations_directory)
+        .send_unwrap_err();
+
+    assert!(err.is_user_facing_error::<ShadowDbNotEmpty>(), "{err:?}");
+
+    // The whole point of refusing: whatever was in there is still in there.
+    api.new_engine_with_connection_strings(shadow_db_url, None)
+        .assert_schema()
+        .assert_has_table("dirty_marker");
+}
+
+#[test_connector(tags(Postgres, Mysql, Mssql, Sqlite), exclude(CockroachDb, Vitess))]
+fn a_shadow_db_holding_only_a_migrations_table_must_not_be_reset_without_consent(api: TestApi) {
+    let migrations_directory = migrations_directory_with_one_migration(&api);
+    let shadow_db_url = dirty_shadow_database(&api, MIGRATIONS_TABLE_ONLY);
+
+    let err = api
+        .new_engine_with_connection_strings(api.connection_string().to_owned(), Some(shadow_db_url))
+        .create_migration("02hungry", CAT_SCHEMA_WITH_ONE_MORE_FIELD, &migrations_directory)
+        .send_unwrap_err();
+
+    assert!(err.is_user_facing_error::<ShadowDbNotEmpty>(), "{err:?}");
+}
+
+#[test_connector(tags(Postgres, Mysql, Mssql, Sqlite), exclude(CockroachDb, Vitess))]
+fn a_shadow_db_that_is_not_empty_is_reset_with_consent_and_left_empty(api: TestApi) {
+    let migrations_directory = migrations_directory_with_one_migration(&api);
+    let shadow_db_url = dirty_shadow_database(&api, DIRTY_MARKER_TABLE);
+
+    api.new_engine_with_shadow_db_consent(api.connection_string().to_owned(), Some(shadow_db_url.clone()))
+        .create_migration("02hungry", CAT_SCHEMA_WITH_ONE_MORE_FIELD, &migrations_directory)
+        .send_sync()
+        .assert_migration_directories_count(2);
+
+    // The shadow database is left as an empty database, so the next command finds nothing to ask
+    // about.
+    api.new_engine_with_connection_strings(shadow_db_url, None)
+        .assert_schema()
+        .assert_tables_count(0);
+}
+
+#[test_connector(tags(Sqlite))]
+fn a_dirty_sqlite_shadow_db_file_is_refused_and_a_consented_one_is_reset(api: TestApi) {
+    let migrations_directory = migrations_directory_with_one_migration(&api);
+
+    // A table the migration history creates too: replaying the history into a file that already
+    // holds it fails, because nothing resets an external SQLite shadow database on the way in.
+    let shadow_db_url = dirty_shadow_database(&api, "CREATE TABLE Cat (id INTEGER PRIMARY KEY)");
+
+    let err = api
+        .new_engine_with_connection_strings(api.connection_string().to_owned(), Some(shadow_db_url.clone()))
+        .create_migration("02hungry", CAT_SCHEMA_WITH_ONE_MORE_FIELD, &migrations_directory)
+        .send_unwrap_err();
+
+    assert!(err.is_user_facing_error::<ShadowDbNotEmpty>(), "{err:?}");
+    api.new_engine_with_connection_strings(shadow_db_url.clone(), None)
+        .assert_schema()
+        .assert_has_table("Cat");
+
+    api.new_engine_with_shadow_db_consent(api.connection_string().to_owned(), Some(shadow_db_url.clone()))
+        .create_migration("02hungry", CAT_SCHEMA_WITH_ONE_MORE_FIELD, &migrations_directory)
+        .send_sync()
+        .assert_migration_directories_count(2);
+
+    api.new_engine_with_connection_strings(shadow_db_url, None)
+        .assert_schema()
+        .assert_tables_count(0);
 }

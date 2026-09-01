@@ -17,6 +17,7 @@ pub async fn dev_diagnostic(
     namespaces: Option<Namespaces>,
     connector: &mut dyn SchemaConnector,
     adapter_factory: Arc<dyn ExternalConnectorFactory>,
+    reset_shadow_database: bool,
     migration_schema_cache: &mut MigrationSchemaCache,
 ) -> ConnectorResult<DevDiagnosticOutput> {
     migrations_directory::error_on_changed_provider(&input.migrations_list.lockfile, connector.connector_type())?;
@@ -32,6 +33,7 @@ pub async fn dev_diagnostic(
         namespaces,
         connector,
         adapter_factory,
+        reset_shadow_database,
         migration_schema_cache,
     )
     .await?;

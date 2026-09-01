@@ -398,6 +398,7 @@ fn apply_migrations_with_a_schema_in_url(mut api: TestApi) {
         connection_string: format!("{};schema=myschema", api.connection_string()),
         preview_features: PreviewFeatures::empty(),
         shadow_database_connection_string: None,
+        reset_shadow_database: false,
     })
     .unwrap();
 

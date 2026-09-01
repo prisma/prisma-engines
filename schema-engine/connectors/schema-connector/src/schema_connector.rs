@@ -231,6 +231,8 @@ pub enum ExternalShadowDatabase {
         factory: Arc<dyn ExternalConnectorFactory>,
         /// The preview features to use while building the shadow schema.
         preview_features: PreviewFeatures,
+        /// Whether the user consented to the shadow database being reset even when it is not empty.
+        reset_allowed: bool,
     },
     /// A shadow database connection string and preview features.
     ConnectionString {
@@ -238,5 +240,7 @@ pub enum ExternalShadowDatabase {
         connection_string: String,
         /// The preview features.
         preview_features: PreviewFeatures,
+        /// Whether the user consented to the shadow database being reset even when it is not empty.
+        reset_allowed: bool,
     },
 }

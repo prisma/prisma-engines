@@ -447,6 +447,10 @@ impl SqlSchema {
         self.views.len()
     }
 
+    pub fn procedures_count(&self) -> usize {
+        self.procedures.len()
+    }
+
     pub fn table_walker<'a>(&'a self, name: &str) -> Option<TableWalker<'a>> {
         let table_idx = self.tables.iter().position(|table| table.name == name)?;
         Some(self.walk(TableId(table_idx as u32)))

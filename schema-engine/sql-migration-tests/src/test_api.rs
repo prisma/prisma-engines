@@ -219,6 +219,7 @@ impl TestApi {
             &DatasourceUrls {
                 url: Some(self.connection_string().to_owned()),
                 shadow_database_url: self.shadow_database_connection_string().map(<_>::to_owned),
+                reset_shadow_database: false,
             },
             params,
         )

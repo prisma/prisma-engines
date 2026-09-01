@@ -6,6 +6,7 @@ use std::{
     path::Path,
 };
 
+use quaint::{prelude::Queryable, single::Quaint};
 use schema_core::json_rpc::types::{
     MigrationDirectory, MigrationFile, MigrationList, MigrationLockfile, SchemaContainer,
 };
@@ -176,4 +177,13 @@ fn shadow_database_name(test_function_name: &str) -> String {
     let prefix: String = test_function_name.chars().take(40).collect();
 
     format!("{prefix}_{hash:x}_shadow")
+}
+
+/// Runs a SQL command against an arbitrary database, on a connection of its own. Used to set up and
+/// to inspect databases the engine under test is not connected to, such as a shadow database.
+pub fn raw_cmd_on(connection_string: &str, sql: &str) {
+    tok(async {
+        let connection = Quaint::new(connection_string).await.unwrap();
+        connection.raw_cmd(sql).await.unwrap();
+    })
 }

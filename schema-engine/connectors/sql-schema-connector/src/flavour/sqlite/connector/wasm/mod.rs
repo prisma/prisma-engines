@@ -174,6 +174,10 @@ pub fn get_shadow_db_url(_state: &State) -> Option<&str> {
     None
 }
 
+pub fn get_reset_shadow_database(_state: &State) -> bool {
+    false
+}
+
 pub async fn dispose(state: &State) -> ConnectorResult<()> {
     state.connection.dispose().await
 }

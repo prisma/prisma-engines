@@ -944,6 +944,7 @@ async fn test_missing_datasource_url_gives_proper_error() {
     let datasource_urls = DatasourceUrls {
         url: None,
         shadow_database_url: None,
+        reset_shadow_database: false,
     };
 
     let output = Command::new(schema_engine_bin_path())

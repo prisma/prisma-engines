@@ -18,6 +18,7 @@ pub async fn diff(
     params: DiffParams,
     connector: &mut dyn SchemaConnector,
     adapter_factory: Arc<dyn ExternalConnectorFactory>,
+    reset_shadow_database: bool,
     extension_types: &dyn ExtensionTypes,
 ) -> CoreResult<DiffResult> {
     // In order to properly handle MultiSchema, we need to make sure the preview feature is
@@ -30,10 +31,16 @@ pub async fn diff(
     let filter: SchemaFilter = params.filters.into();
     filter.validate(&*connector.schema_dialect())?;
 
+    let shadow_database = ExternalShadowDatabase::DriverAdapter {
+        factory: adapter_factory,
+        preview_features,
+        reset_allowed: reset_shadow_database,
+    };
+
     let (conn_from, schema_from) = diff_target_to_dialect(
         &params.from,
         connector,
-        adapter_factory.clone(),
+        shadow_database.clone(),
         namespaces.clone(),
         &filter,
         preview_features,
@@ -45,7 +52,7 @@ pub async fn diff(
     let (conn_to, schema_to) = diff_target_to_dialect(
         &params.to,
         connector,
-        adapter_factory,
+        shadow_database,
         namespaces,
         &filter,
         preview_features,
@@ -118,7 +125,7 @@ fn namespaces_and_preview_features_from_diff_targets(
 async fn diff_target_to_dialect(
     target: &DiffTarget,
     connector: &mut dyn SchemaConnector,
-    adapter_factory: Arc<dyn ExternalConnectorFactory>,
+    shadow_database: ExternalShadowDatabase,
     namespaces: Option<Namespaces>,
     filter: &SchemaFilter,
     preview_features: BitFlags<psl::PreviewFeature>,
@@ -160,15 +167,7 @@ async fn diff_target_to_dialect(
 
                     // TODO: enable Driver Adapter for shadow database, using the AdapterFactory.
                     let schema = dialect
-                        .schema_from_migrations_with_target(
-                            &migrations,
-                            namespaces,
-                            filter,
-                            ExternalShadowDatabase::DriverAdapter {
-                                factory: adapter_factory,
-                                preview_features,
-                            },
-                        )
+                        .schema_from_migrations_with_target(&migrations, namespaces, filter, shadow_database)
                         .await?;
                     Ok(Some((dialect, schema)))
                 }

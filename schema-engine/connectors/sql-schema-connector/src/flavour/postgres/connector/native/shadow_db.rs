@@ -1,6 +1,6 @@
 use crate::flavour::postgres::{MigratePostgresUrl, PpgParams, sql_schema_from_migrations_and_db};
 use crate::flavour::{PostgresConnector, SqlConnector, UsingExternalShadowDb};
-use psl::PreviewFeatures;
+use psl::{PreviewFeatures, datamodel_connector::Flavour};
 use quaint::connector::is_url_localhost;
 use schema_connector::{
     ConnectorError, ConnectorParams, ConnectorResult, Namespaces, SchemaFilter, migrations_directory::Migrations,
@@ -43,6 +43,7 @@ pub async fn sql_schema_from_migration_history(
                 return sql_schema_from_migration_history_for_local_ppg(
                     &shadow_database_url,
                     params.connector_params.preview_features,
+                    params.connector_params.reset_shadow_database,
                     migrations,
                     namespaces,
                     filter,
@@ -143,21 +144,34 @@ async fn sql_schema_from_migration_history_for_external_db(
         .await
 }
 
+/// The shadow database of a local Prisma Postgres comes with the main database rather than from the
+/// user, but it is still a database that is reset and replayed into, so it goes through the same
+/// gate as any other shadow database the engine did not create itself.
 async fn sql_schema_from_migration_history_for_local_ppg(
     url: &Url,
     preview_features: PreviewFeatures,
+    reset_allowed: bool,
     migrations: &Migrations,
     namespaces: Option<Namespaces>,
     filter: &SchemaFilter,
 ) -> Result<SqlSchema, ConnectorError> {
     let ppg_params = PpgParams::parse_from(url)?;
     let shadow_db_url = ppg_params.local_shadow_database_url()?;
+    let location = crate::sanitize_connection_string(Flavour::Postgres, shadow_db_url.as_str());
 
-    let connector_params = ConnectorParams::new(shadow_db_url.to_string(), preview_features, None);
+    let mut connector_params = ConnectorParams::new(shadow_db_url.to_string(), preview_features, None);
+    connector_params.reset_shadow_database = reset_allowed;
     let mut shadow_database = PostgresConnector::new_with_params(connector_params)?;
 
-    let result =
-        sql_schema_from_migration_history_for_external_db(&mut shadow_database, migrations, namespaces, filter).await;
+    let result = crate::external_shadow_db::replay_migration_history(
+        &mut shadow_database,
+        migrations,
+        namespaces,
+        filter,
+        reset_allowed,
+        &location,
+    )
+    .await;
 
     shadow_database.dispose().await?;
 
