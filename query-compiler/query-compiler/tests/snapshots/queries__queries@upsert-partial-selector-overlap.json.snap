@@ -1,0 +1,82 @@
+---
+source: query-compiler/query-compiler/tests/queries.rs
+expression: pretty
+input_file: query-compiler/query-compiler/tests/data/upsert-partial-selector-overlap.json
+snapshot_kind: text
+---
+transaction
+   dataMap {
+       id: Int (id)
+       email: String (email)
+       status: String (status)
+       name: String (name)
+   }
+   let 0 = query «SELECT "public"."PartialSelectorOverlap"."id" FROM
+                  "public"."PartialSelectorOverlap" WHERE
+                  (("public"."PartialSelectorOverlap"."email" = $1 AND
+                  "public"."PartialSelectorOverlap"."status" = $2) AND 1=1)
+                  OFFSET $3»
+           params [const(String("user@example.com")), const(String("active")),
+                   const(BigInt(0))]
+   in let 5 = if (rowCountNeq 0 (get 0))
+          then let 0 = unique (get 0);
+                   0$id = mapField id (get 0)
+               in let 2 = unique (query «UPDATE
+                                         "public"."PartialSelectorOverlap" SET
+                                         "name" = $1 WHERE
+                                         ("public"."PartialSelectorOverlap"."id"
+                                         IN [$2,*] AND
+                                         (("public"."PartialSelectorOverlap"."email"
+                                         = $3 AND
+                                         "public"."PartialSelectorOverlap"."status"
+                                         = $4) AND 1=1)) RETURNING
+                                         "public"."PartialSelectorOverlap"."id",
+                                         "public"."PartialSelectorOverlap"."email",
+                                         "public"."PartialSelectorOverlap"."status",
+                                         "public"."PartialSelectorOverlap"."name"»
+                                  params [const(String("updated")),
+                                          var(0$id as Int),
+                                          const(String("user@example.com")),
+                                          const(String("active"))])
+                  in let 4 = let 2 = unique (validate (get 2)
+                                 [ rowCountNeq 0
+                                 ] orRaise "MISSING_RECORD");
+                                 2$id = mapField id (get 2)
+                         in unique (query «SELECT
+                                           "public"."PartialSelectorOverlap"."id",
+                                           "public"."PartialSelectorOverlap"."email",
+                                           "public"."PartialSelectorOverlap"."status",
+                                           "public"."PartialSelectorOverlap"."name"
+                                           FROM
+                                           "public"."PartialSelectorOverlap"
+                                           WHERE
+                                           "public"."PartialSelectorOverlap"."id"
+                                           = $1 LIMIT $2 OFFSET $3»
+                                    params [var(2$id as Int), const(BigInt(1)),
+                                            const(BigInt(0))])
+                     in getFirstNonEmpty4
+          else let 1 = unique (query «INSERT INTO
+                                      "public"."PartialSelectorOverlap"
+                                      ("email","status","name") VALUES
+                                      ($1,$2,$3) RETURNING
+                                      "public"."PartialSelectorOverlap"."id"»
+                               params [const(String("user@example.com")),
+                                       const(String("active")),
+                                       const(String("created"))])
+               in let 3 = let 1 = unique (validate (get 1)
+                              [ rowCountNeq 0
+                              ] orRaise "MISSING_RECORD");
+                              1$id = mapField id (get 1)
+                      in unique (query «SELECT
+                                        "public"."PartialSelectorOverlap"."id",
+                                        "public"."PartialSelectorOverlap"."email",
+                                        "public"."PartialSelectorOverlap"."status",
+                                        "public"."PartialSelectorOverlap"."name"
+                                        FROM "public"."PartialSelectorOverlap"
+                                        WHERE
+                                        "public"."PartialSelectorOverlap"."id" =
+                                        $1 LIMIT $2 OFFSET $3»
+                                 params [var(1$id as Int), const(BigInt(1)),
+                                         const(BigInt(0))])
+                  in getFirstNonEmpty3
+      in getFirstNonEmpty5

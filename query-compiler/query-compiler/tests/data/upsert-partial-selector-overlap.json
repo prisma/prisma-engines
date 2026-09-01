@@ -1,0 +1,15 @@
+{
+  "modelName": "PartialSelectorOverlap",
+  "action": "upsertOne",
+  "query": {
+    "arguments": {
+      "relationLoadStrategy": "query",
+      "where": { "email_status": { "email": "user@example.com", "status": "active" } },
+      "update": { "name": "updated" },
+      "create": { "email": "user@example.com", "status": "active", "name": "created" }
+    },
+    "selection": {
+      "$scalars": true
+    }
+  }
+}

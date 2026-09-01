@@ -119,3 +119,12 @@ model PartialUniqueOnly {
   status String
   name   String
 }
+
+model PartialSelectorOverlap {
+  id     Int    @id @default(autoincrement())
+  email  String @unique
+  status String
+  name   String
+
+  @@unique([email, status], map: "partial_email_status", where: raw("status = 'active'"))
+}
