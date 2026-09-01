@@ -86,6 +86,9 @@ async function migrateDiff(D1_DATABASE: D1Database, migrationScript: string) {
   await runBatch(D1_DATABASE, preparedStatements)
 }
 
+// Rows returned by `PRAGMA foreign_key_list`; `table` is the referenced parent.
+const D1ForeignKeys = S.array(S.struct({ table: S.string }))
+
 async function migrateReset(D1_DATABASE: D1Database) {
   let { results: rawTables } = (await D1_DATABASE.prepare(
     `PRAGMA main.table_list;`,
@@ -116,13 +119,68 @@ async function migrateReset(D1_DATABASE: D1Database) {
     )
   }
 
+  // Map each table to the tables its foreign keys reference (its parents).
+  // Self-references don't constrain the drop order.
+  const parentsOf = new Map<string, Set<string>>()
+  for (const table of tables) {
+    if (table.type !== 'table') {
+      continue
+    }
+    const { results: rawForeignKeys } = (await D1_DATABASE.prepare(
+      `PRAGMA foreign_key_list("${table.name}");`,
+    ).run()) as D1Result
+    const foreignKeys = S.decodeUnknownSync(D1ForeignKeys, {
+      onExcessProperty: 'preserve',
+    })(rawForeignKeys)
+    parentsOf.set(
+      table.name,
+      new Set(
+        foreignKeys.map((fk) => fk.table).filter((name) => name !== table.name),
+      ),
+    )
+  }
+
+  // Drop a table only after every table referencing it is gone: in a batch, a
+  // child's DROP no longer compiles once its FK parent is dropped
+  // (`no such table: main.<parent>`, wrangler >= 4.126), and
+  // `defer_foreign_keys` doesn't help because it defers enforcement, not name
+  // resolution. Views are never FK parents, so they drop right away. Tables in
+  // a reference cycle can't be ordered and keep their original order.
+  const remaining = new Set(tables.map((table) => table.name))
+  const ordered = [] as typeof tables
+  let progress = true
+  while (remaining.size > 0 && progress) {
+    progress = false
+    for (const table of tables) {
+      if (!remaining.has(table.name)) {
+        continue
+      }
+      const isReferenced = tables.some(
+        (other) =>
+          other.name !== table.name &&
+          remaining.has(other.name) &&
+          parentsOf.get(other.name)?.has(table.name),
+      )
+      if (!isReferenced) {
+        ordered.push(table)
+        remaining.delete(table.name)
+        progress = true
+      }
+    }
+  }
+  for (const table of tables) {
+    if (remaining.has(table.name)) {
+      ordered.push(table)
+    }
+  }
+
   const batch = [] as string[]
 
   // Allow violating foreign key constraints on the batch transaction.
   // The foreign key constraints are automatically re-enabled at the end of the transaction, regardless of it succeeding.
   batch.push(`PRAGMA defer_foreign_keys = ${1};`)
 
-  for (const table of tables) {
+  for (const table of ordered) {
     if (table.type === 'view') {
       batch.push(`DROP VIEW IF EXISTS "${table.name}";`)
     } else {
