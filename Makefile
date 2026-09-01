@@ -465,11 +465,11 @@ ensure-prisma-present:
 		cd "$(realpath ../prisma)" && git fetch origin "$${PRISMA_BRANCH}"; \
 		LOCAL_CHANGES=$$(git diff --name-only HEAD "origin/$${PRISMA_BRANCH}" -- 'packages/*adapter*'); \
 		if [ -n "$$LOCAL_CHANGES" ]; then \
-		  echo "⚠️ ../prisma diverges from prisma/prisma $${PRISMA_BRANCH} branch. Test results might diverge from those in CI ⚠️ "; \
+		  echo "⚠️ ../prisma diverges from prisma/orm $${PRISMA_BRANCH} branch. Test results might diverge from those in CI ⚠️ "; \
 		fi \
 	else \
-		echo "git clone --depth=1 https://github.com/prisma/prisma.git --branch=$${PRISMA_BRANCH} ../prisma"; \
-		git clone --depth=1 https://github.com/prisma/prisma.git --branch="$${PRISMA_BRANCH}" "../prisma" && echo "Prisma repository has been cloned to ../prisma"; \
+		echo "git clone --depth=1 https://github.com/prisma/orm.git --branch=$${PRISMA_BRANCH} ../prisma"; \
+		git clone --depth=1 https://github.com/prisma/orm.git --branch="$${PRISMA_BRANCH}" "../prisma" && echo "Prisma repository has been cloned to ../prisma"; \
 	fi;
 
 ## OpenTelemetry
