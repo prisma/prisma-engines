@@ -7,17 +7,26 @@ pub struct NativeUpsert {
     record_filter: RecordFilter,
     create: WriteArgs,
     update: WriteArgs,
+    conflict_target: Vec<ScalarFieldRef>,
     pub selected_fields: FieldSelection,
     pub selection_order: Vec<String>,
 }
 
 impl NativeUpsert {
+    /// `conflict_target` is the non-empty column list the statement arbitrates on:
+    /// the columns of the very constraint the `where` clause named, as resolved by
+    /// the query graph builder. It is taken rather than recomputed here so that the
+    /// check deciding this query is buildable and the columns it emits cannot drift
+    /// apart; an empty list renders as `ON CONFLICT ()`, a syntax error rather than
+    /// a planning failure.
+    #[allow(clippy::too_many_arguments)]
     pub fn new(
         name: String,
         model: Model,
         record_filter: RecordFilter,
         create: WriteArgs,
         update: WriteArgs,
+        conflict_target: Vec<ScalarFieldRef>,
         selected_fields: FieldSelection,
         selection_order: Vec<String>,
     ) -> Self {
@@ -27,6 +36,7 @@ impl NativeUpsert {
             record_filter,
             create,
             update,
+            conflict_target,
             selected_fields,
             selection_order,
         }
@@ -56,29 +66,8 @@ impl NativeUpsert {
         &mut self.create
     }
 
-    pub fn unique_constraints(&self) -> Vec<ScalarFieldRef> {
-        let compound_indexes = self.model.unique_indexes();
-        let scalars = self.record_filter.filter.scalars();
-        let unique_index = compound_indexes.into_iter().find(|index| {
-            index
-                .fields()
-                .all(|f| scalars.contains(&ScalarFieldRef::from((self.model.dm.clone(), f))))
-        });
-
-        if let Some(index) = unique_index {
-            return index
-                .fields()
-                .map(|f| ScalarFieldRef::from((self.model.dm.clone(), f)))
-                .collect();
-        }
-
-        if let Some(ids) = self.model.fields().compound_id()
-            && ids.clone().all(|f| scalars.contains(&f))
-        {
-            return ids.collect();
-        }
-
-        self.record_filter.filter.unique_scalars()
+    pub fn conflict_target(&self) -> &[ScalarFieldRef] {
+        &self.conflict_target
     }
 
     pub fn filter(&self) -> &Filter {

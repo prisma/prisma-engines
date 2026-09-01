@@ -363,6 +363,123 @@ mod native_upsert {
         Ok(())
     }
 
+    pub fn partial_and_total_unique() -> String {
+        let schema = indoc! {
+            r#"model TestModel {
+              id     Int    @id
+              email  String
+              status String
+              name   String
+
+              @@unique([email], map: "partial_email", where: raw("status = 'active'"))
+              @@unique([email, status], map: "email_status")
+          }"#
+        };
+
+        schema.to_owned()
+    }
+
+    // The conflict target must be the total unique the `where` clause names, even
+    // when a partial unique covers a subset of the same columns and is declared
+    // first. A partial index cannot be inferred from a bare column list, so
+    // picking it makes the database reject every call (Postgres: 42P10).
+    #[connector_test(schema(partial_and_total_unique), capabilities(NativeUpsert, PartialIndex))]
+    async fn should_upsert_on_total_unique_over_partial(mut runner: Runner) -> TestResult<()> {
+        let upsert = r#"
+          mutation {
+            upsertOneTestModel(
+              where: {email_status: {
+                email: "hello@example.com",
+                status: "active"
+              }},
+              create: {
+                id: 1,
+                email: "hello@example.com",
+                status: "active",
+                name: "hello",
+              },
+              update: {
+                name: "hello-updated",
+              }
+            ) {
+              id,
+              name
+            }
+          }
+        "#;
+
+        insta::assert_snapshot!(
+          run_query!(&runner, upsert),
+          @r###"{"data":{"upsertOneTestModel":{"id":1,"name":"hello"}}}"###
+        );
+
+        assert_used_native_upsert(&mut runner).await;
+
+        insta::assert_snapshot!(
+          run_query!(&runner, upsert),
+          @r###"{"data":{"upsertOneTestModel":{"id":1,"name":"hello-updated"}}}"###
+        );
+
+        assert_used_native_upsert(&mut runner).await;
+
+        Ok(())
+    }
+
+    pub fn partial_unique_only() -> String {
+        let schema = indoc! {
+            r#"model TestModel {
+              id     Int    @id
+              email  String @unique(map: "partial_email", where: raw("status = 'active'"))
+              status String
+              name   String
+          }"#
+        };
+
+        schema.to_owned()
+    }
+
+    // The `where` clause names the model's only unique, and it is partial. There
+    // is no conflict target the database could infer, so the upsert falls back to
+    // the read-then-write graph instead of emitting a statement that always fails.
+    #[connector_test(schema(partial_unique_only), capabilities(NativeUpsert, PartialIndex))]
+    async fn should_not_upsert_on_partial_unique(mut runner: Runner) -> TestResult<()> {
+        let upsert = r#"
+          mutation {
+            upsertOneTestModel(
+              where: {email: "hello@example.com"},
+              create: {
+                id: 1,
+                email: "hello@example.com",
+                status: "active",
+                name: "hello",
+              },
+              update: {
+                name: "hello-updated",
+              }
+            ) {
+              id,
+              name
+            }
+          }
+        "#;
+
+        insta::assert_snapshot!(
+          run_query!(&runner, upsert),
+          @r###"{"data":{"upsertOneTestModel":{"id":1,"name":"hello"}}}"###
+        );
+
+        assert_not_used_native_upsert(&mut runner).await;
+
+        insta::assert_snapshot!(
+          run_query!(&runner, upsert),
+          @r###"{"data":{"upsertOneTestModel":{"id":1,"name":"hello-updated"}}}"###
+        );
+
+        assert_not_used_native_upsert(&mut runner).await;
+
+        Ok(())
+    }
+
     async fn assert_used_native_upsert(runner: &mut Runner) {
         let logs = runner.get_logs().await;
         let did_upsert = logs.iter().any(|l| l.contains("ON CONFLICT"));

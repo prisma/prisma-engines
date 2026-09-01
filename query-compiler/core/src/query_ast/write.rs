@@ -138,6 +138,7 @@ impl WriteQuery {
         record_filter: RecordFilter,
         create: WriteArgs,
         update: WriteArgs,
+        conflict_target: Vec<ScalarFieldRef>,
         read: RecordQuery,
     ) -> crate::Query {
         crate::Query::Write(WriteQuery::Upsert(NativeUpsert::new(
@@ -146,6 +147,7 @@ impl WriteQuery {
             record_filter,
             create,
             update,
+            conflict_target,
             read.selected_fields,
             read.selection_order,
         )))

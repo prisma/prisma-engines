@@ -5,8 +5,8 @@ use crate::{
     query_ast::*,
     query_graph::{Flow, QueryGraph, QueryGraphDependency},
 };
-use query_structure::Model;
-use schema::QuerySchema;
+use query_structure::{Model, ScalarFieldRef};
+use schema::{QuerySchema, compound_index_field_name};
 
 /// Handles a top-level upsert
 ///
@@ -70,10 +70,20 @@ pub(crate) fn upsert_record(
         query_schema,
     );
 
+    // The native upsert must additionally arbitrate on a constraint the database
+    // can infer, and it has to be the very one the `where` clause named — see
+    // `conflict_target`.
+    let conflict_columns = can_use_native_upsert
+        .then(|| unique_selector(&where_argument, &model))
+        .flatten()
+        .and_then(|selector| conflict_target(&model, selector));
+
     let filter = extract_unique_filter(where_argument, &model)?;
     let read_query = read::find_unique(field.clone(), model.clone(), query_schema)?;
 
-    if can_use_native_upsert && let ReadQuery::RecordQuery(read) = read_query {
+    if let Some(conflict_columns) = conflict_columns
+        && let ReadQuery::RecordQuery(read) = read_query
+    {
         let mut create_write_args = WriteArgsParser::from(&model, create_argument)?.args;
         let mut update_write_args = WriteArgsParser::from(&model, update_argument)?.args;
 
@@ -86,6 +96,7 @@ pub(crate) fn upsert_record(
             filter.into(),
             create_write_args,
             update_write_args,
+            conflict_columns,
             read,
         ));
 
@@ -189,6 +200,9 @@ pub(crate) fn upsert_record(
 // 2. The create and update arguments do not have any nested queries
 // 3. There is only 1 unique field in the where clause
 // 4. The unique field defined in where clause has the same value as defined in the create arguments
+//
+// The caller checks one further condition: the unique named in the where clause
+// must be usable as an `ON CONFLICT` target. See `conflict_target`.
 fn can_use_connector_native_upsert<'a>(
     model: &Model,
     where_field: &ParsedInputMap<'a>,
@@ -227,6 +241,74 @@ fn can_use_connector_native_upsert<'a>(
         && !has_nested_selects
         && where_values_same_as_create
         && !query_schema.relation_mode().is_prisma()
+}
+
+/// The single `where` key that names a unique constraint.
+///
+/// `can_use_connector_native_upsert` separately requires that there be exactly
+/// one; the remaining keys are non-unique filters that narrow the update.
+fn unique_selector<'a>(where_field: &'a ParsedInputMap<'_>, model: &Model) -> Option<&'a str> {
+    where_field
+        .iter()
+        .map(|(field_name, _)| field_name.as_ref())
+        .find(|field_name| is_unique_field(field_name, model))
+}
+
+/// The columns an `INSERT ... ON CONFLICT` can arbitrate on for the unique that
+/// `where` names, or `None` when that unique cannot be a conflict target.
+///
+/// The arbiter has to be the constraint the `where` clause actually named, not
+/// merely one the filter happens to cover. Picking a narrower unique makes the
+/// statement conflict on rows the `where` clause does not select: with a
+/// `@@unique([email, status])` selector and a total `@unique` on `email` alone,
+/// `ON CONFLICT ("email")` collides with a row holding a different `status`,
+/// whose `DO UPDATE ... WHERE` then matches nothing, so the upsert quietly
+/// returns no row instead of creating one or reporting the unique violation.
+///
+/// Partial (`WHERE`-filtered) uniques are never usable either. Inferring one
+/// requires repeating its predicate in the statement, which the generated SQL
+/// does not carry, so PostgreSQL rejects it with 42P10 ("there is no unique or
+/// exclusion constraint matching the ON CONFLICT specification") on every call,
+/// whatever the data.
+///
+/// `None` means the connector-native upsert is not usable, and the caller falls
+/// back to the read-then-write graph, which handles both cases correctly.
+fn conflict_target(model: &Model, selector: &str) -> Option<Vec<ScalarFieldRef>> {
+    // A compound selector names the primary key, which is never partial...
+    if let Some(primary_key) = resolve_compound_id(selector, model) {
+        return Some(primary_key);
+    }
+
+    // ...or exactly one `@@unique` index.
+    if let Some(index) = model
+        .unique_indexes()
+        .filter(|index| index.fields().len() > 1)
+        .find(|index| compound_index_field_name(*index) == selector)
+    {
+        return (!index.is_partial()).then(|| {
+            index
+                .fields()
+                .map(|f| ScalarFieldRef::from((model.dm.clone(), f)))
+                .collect()
+        });
+    }
+
+    // A single-column selector is usable when the primary key or a non-partial
+    // unique index covers exactly that column.
+    let field = model.fields().find_from_scalar(selector).ok()?;
+    let is_single_column_id = model.fields().id_fields().is_some_and(|ids| {
+        let ids: Vec<_> = ids.collect();
+        ids.len() == 1 && ids[0] == field
+    });
+    let has_total_unique = model.unique_indexes().filter(|index| !index.is_partial()).any(|index| {
+        let mut fields = index.fields();
+        fields.len() == 1
+            && fields
+                .next()
+                .is_some_and(|f| ScalarFieldRef::from((model.dm.clone(), f)) == field)
+    });
+
+    (is_single_column_id || has_total_unique).then(|| vec![field])
 }
 
 fn is_unique_field(field_name: &str, model: &Model) -> bool {
