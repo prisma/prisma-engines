@@ -265,6 +265,16 @@ impl PostgresNativeUrl {
         self.query_params.max_idle_connection_lifetime
     }
 
+    /// Whether the health of a connection is verified before handing it out of the pool
+    pub fn test_on_check_out(&self) -> bool {
+        self.query_params.test_on_check_out
+    }
+
+    /// Interval of how often a connection's health is checked when handed out of the pool
+    pub fn health_check_interval(&self) -> Option<Duration> {
+        self.query_params.health_check_interval
+    }
+
     /// The custom application name
     pub fn application_name(&self) -> Option<&str> {
         self.query_params.application_name.as_deref()
@@ -311,6 +321,8 @@ impl PostgresNativeUrl {
         let mut statement_cache_size = 100;
         let mut max_connection_lifetime = None;
         let mut max_idle_connection_lifetime = Some(Duration::from_secs(300));
+        let mut test_on_check_out = false;
+        let mut health_check_interval = None;
         let mut options = None;
         let mut single_use_connections = false;
 
@@ -431,6 +443,22 @@ impl PostgresNativeUrl {
                         max_idle_connection_lifetime = Some(Duration::from_secs(as_int));
                     }
                 }
+                "test_on_check_out" => {
+                    test_on_check_out = v
+                        .parse()
+                        .map_err(|_| Error::builder(ErrorKind::InvalidConnectionArguments).build())?;
+                }
+                "health_check_interval" => {
+                    let as_int = v
+                        .parse()
+                        .map_err(|_| Error::builder(ErrorKind::InvalidConnectionArguments).build())?;
+
+                    if as_int == 0 {
+                        health_check_interval = None;
+                    } else {
+                        health_check_interval = Some(Duration::from_secs(as_int));
+                    }
+                }
                 "application_name" => {
                     application_name = Some(v.to_string());
                 }
@@ -479,6 +507,8 @@ impl PostgresNativeUrl {
             statement_cache_size,
             max_connection_lifetime,
             max_idle_connection_lifetime,
+            test_on_check_out,
+            health_check_interval,
             application_name,
             options,
             #[cfg(feature = "postgresql-native")]
@@ -516,6 +546,8 @@ pub(crate) struct PostgresUrlQueryParams {
     pub(crate) statement_cache_size: usize,
     pub(crate) max_connection_lifetime: Option<Duration>,
     pub(crate) max_idle_connection_lifetime: Option<Duration>,
+    pub(crate) test_on_check_out: bool,
+    pub(crate) health_check_interval: Option<Duration>,
     pub(crate) application_name: Option<String>,
     pub(crate) options: Option<String>,
     pub(crate) single_use_connections: bool,
@@ -594,6 +626,38 @@ mod tests {
         let url = PostgresNativeUrl::new(Url::parse("postgresql:///dbname?host=/var/run/psql.sock").unwrap()).unwrap();
         assert_eq!("dbname", url.dbname());
         assert_eq!("/var/run/psql.sock", url.host());
+    }
+
+    #[test]
+    fn should_parse_pool_health_check_params() {
+        let url = PostgresNativeUrl::new(
+            Url::parse("postgresql://user:pass@localhost:5432/db?test_on_check_out=true&health_check_interval=30")
+                .unwrap(),
+        )
+        .unwrap();
+
+        assert!(url.test_on_check_out());
+        assert_eq!(Some(Duration::from_secs(30)), url.health_check_interval());
+    }
+
+    #[test]
+    fn health_check_should_be_disabled_by_default() {
+        let url = PostgresNativeUrl::new(Url::parse("postgresql://user:pass@localhost:5432/db").unwrap()).unwrap();
+
+        assert!(!url.test_on_check_out());
+        assert_eq!(None, url.health_check_interval());
+    }
+
+    #[test]
+    fn zero_health_check_interval_should_check_every_checkout() {
+        let url = PostgresNativeUrl::new(
+            Url::parse("postgresql://user:pass@localhost:5432/db?test_on_check_out=true&health_check_interval=0")
+                .unwrap(),
+        )
+        .unwrap();
+
+        assert!(url.test_on_check_out());
+        assert_eq!(None, url.health_check_interval());
     }
 
     #[test]
