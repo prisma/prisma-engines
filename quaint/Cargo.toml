@@ -52,6 +52,8 @@ postgresql-native = [
   "dep:lru-cache",
   "dep:byteorder",
   "dep:tokio-tungstenite",
+  "tokio-util/compat",
+  "tokio-util/io-util",
 ]
 postgresql = []
 
