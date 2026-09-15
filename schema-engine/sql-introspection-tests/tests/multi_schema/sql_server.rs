@@ -246,6 +246,93 @@ async fn multiple_schemas_w_duplicate_table_names_are_introspected(api: &mut Tes
 }
 
 #[test_connector(tags(Mssql), namespaces("first", "second"))]
+async fn duplicate_table_index_and_foreign_key_names_are_introspected_per_schema(api: &mut TestApi) -> TestResult {
+    api.raw_cmd("CREATE SCHEMA first").await;
+    api.raw_cmd("CREATE SCHEMA second").await;
+
+    let setup = indoc! {r#"
+        CREATE TABLE first.Table_0 (
+            other INT,
+            id_0 INT,
+            CONSTRAINT Table_0_pkey PRIMARY KEY (id_0)
+        );
+        CREATE TABLE first.Table_1 (
+            id_1 INT IDENTITY,
+            o_id_0 INT,
+            CONSTRAINT Table_1_pkey PRIMARY KEY (id_1),
+            CONSTRAINT fk_0 FOREIGN KEY (o_id_0) REFERENCES first.Table_0 (id_0)
+        );
+        CREATE INDEX Table_1_other_idx ON first.Table_1 (o_id_0);
+
+        CREATE TABLE second.Table_0 (
+            id_2 INT IDENTITY,
+            CONSTRAINT Table_0_pkey PRIMARY KEY (id_2)
+        );
+        CREATE TABLE second.Table_1 (
+            id_3 INT IDENTITY,
+            o_id_0 INT,
+            CONSTRAINT Table_1_pkey PRIMARY KEY (id_3),
+            CONSTRAINT fk_0 FOREIGN KEY (o_id_0) REFERENCES second.Table_0 (id_2)
+        );
+        CREATE INDEX Table_1_other_idx ON second.Table_1 (o_id_0);
+    "#};
+
+    api.raw_cmd(setup).await;
+
+    let expected = expect![[r#"
+        generator client {
+          provider = "prisma-client"
+        }
+
+        datasource db {
+          provider = "sqlserver"
+          schemas  = ["first", "second"]
+        }
+
+        model first_Table_0 {
+          other   Int?
+          id_0    Int             @id
+          Table_1 first_Table_1[]
+
+          @@map("Table_0")
+          @@schema("first")
+        }
+
+        model second_Table_0 {
+          id_2    Int              @id @default(autoincrement())
+          Table_1 second_Table_1[]
+
+          @@map("Table_0")
+          @@schema("second")
+        }
+
+        model first_Table_1 {
+          id_1    Int            @id @default(autoincrement())
+          o_id_0  Int?
+          Table_0 first_Table_0? @relation(fields: [o_id_0], references: [id_0], onDelete: NoAction, onUpdate: NoAction, map: "fk_0")
+
+          @@index([o_id_0], map: "Table_1_other_idx")
+          @@map("Table_1")
+          @@schema("first")
+        }
+
+        model second_Table_1 {
+          id_3    Int             @id @default(autoincrement())
+          o_id_0  Int?
+          Table_0 second_Table_0? @relation(fields: [o_id_0], references: [id_2], onDelete: NoAction, onUpdate: NoAction, map: "fk_0")
+
+          @@index([o_id_0], map: "Table_1_other_idx")
+          @@map("Table_1")
+          @@schema("second")
+        }
+    "#]];
+
+    api.expect_datamodel(&expected).await;
+
+    Ok(())
+}
+
+#[test_connector(tags(Mssql), namespaces("first", "second"))]
 async fn multiple_schemas_w_cross_schema_are_introspected(api: &mut TestApi) -> TestResult {
     let schema_name = "first";
     let other_name = "second";
