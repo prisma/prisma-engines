@@ -1057,7 +1057,7 @@ fn multiple_schemas_with_same_foreign_key_are_described(api: TestApi) {
                 },
                 Table {
                     namespace_id: NamespaceId(
-                        1,
+                        0,
                     ),
                     name: "Table_1",
                     properties: BitFlags<TableProperties> {
@@ -1067,7 +1067,7 @@ fn multiple_schemas_with_same_foreign_key_are_described(api: TestApi) {
                 },
                 Table {
                     namespace_id: NamespaceId(
-                        0,
+                        1,
                     ),
                     name: "Table_1",
                     properties: BitFlags<TableProperties> {
@@ -1148,7 +1148,7 @@ fn multiple_schemas_with_same_foreign_key_are_described(api: TestApi) {
                         2,
                     ),
                     Column {
-                        name: "id_3",
+                        name: "id_1",
                         tpe: ColumnType {
                             full_data_type: "int",
                             family: Int,
@@ -1184,7 +1184,7 @@ fn multiple_schemas_with_same_foreign_key_are_described(api: TestApi) {
                         3,
                     ),
                     Column {
-                        name: "id_1",
+                        name: "id_3",
                         tpe: ColumnType {
                             full_data_type: "int",
                             family: Int,
@@ -1255,10 +1255,23 @@ fn multiple_schemas_with_same_foreign_key_are_described(api: TestApi) {
             foreign_keys: [
                 ForeignKey {
                     constrained_table: TableId(
-                        3,
+                        2,
                     ),
                     referenced_table: TableId(
                         0,
+                    ),
+                    constraint_name: Some(
+                        "fk_0",
+                    ),
+                    on_delete_action: NoAction,
+                    on_update_action: NoAction,
+                },
+                ForeignKey {
+                    constrained_table: TableId(
+                        3,
+                    ),
+                    referenced_table: TableId(
+                        1,
                     ),
                     constraint_name: Some(
                         "fk_0",
@@ -1288,7 +1301,7 @@ fn multiple_schemas_with_same_foreign_key_are_described(api: TestApi) {
                         0,
                     ),
                     constrained_column: TableColumnId(
-                        6,
+                        4,
                     ),
                     referenced_column: TableColumnId(
                         1,
@@ -1296,10 +1309,10 @@ fn multiple_schemas_with_same_foreign_key_are_described(api: TestApi) {
                 },
                 ForeignKeyColumn {
                     foreign_key_id: ForeignKeyId(
-                        0,
+                        1,
                     ),
                     constrained_column: TableColumnId(
-                        4,
+                        6,
                     ),
                     referenced_column: TableColumnId(
                         2,
@@ -1307,7 +1320,7 @@ fn multiple_schemas_with_same_foreign_key_are_described(api: TestApi) {
                 },
                 ForeignKeyColumn {
                     foreign_key_id: ForeignKeyId(
-                        1,
+                        2,
                     ),
                     constrained_column: TableColumnId(
                         8,
@@ -1336,7 +1349,7 @@ fn multiple_schemas_with_same_foreign_key_are_described(api: TestApi) {
                 },
                 Index {
                     table_id: TableId(
-                        3,
+                        2,
                     ),
                     index_name: "Table_1_pkey",
                     tpe: PrimaryKey,
@@ -1344,7 +1357,7 @@ fn multiple_schemas_with_same_foreign_key_are_described(api: TestApi) {
                 },
                 Index {
                     table_id: TableId(
-                        2,
+                        3,
                     ),
                     index_name: "Table_1_pkey",
                     tpe: PrimaryKey,
@@ -1390,7 +1403,7 @@ fn multiple_schemas_with_same_foreign_key_are_described(api: TestApi) {
                         2,
                     ),
                     column_id: TableColumnId(
-                        5,
+                        3,
                     ),
                     sort_order: Some(
                         Asc,
@@ -1402,7 +1415,7 @@ fn multiple_schemas_with_same_foreign_key_are_described(api: TestApi) {
                         3,
                     ),
                     column_id: TableColumnId(
-                        3,
+                        5,
                     ),
                     sort_order: Some(
                         Asc,

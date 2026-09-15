@@ -181,7 +181,7 @@ impl<'a> SqlSchemaDescriber<'a> {
                 SCHEMA_NAME(tbl.schema_id) AS namespace
             FROM sys.tables tbl
             WHERE tbl.is_ms_shipped = 0 AND tbl.type = 'U'
-            ORDER BY tbl.name;
+            ORDER BY table_name, namespace;
         "#;
 
         let rows = self.conn.query_raw(select, &[]).await?;
@@ -415,7 +415,7 @@ impl<'a> SqlSchemaDescriber<'a> {
                     'CLUSTERED COLUMNSTORE',
                     'NONCLUSTERED COLUMNSTORE'
                 )
-            ORDER BY table_name, index_name, seq_in_index
+            ORDER BY table_name, namespace, index_name, seq_in_index
         "#};
 
         let rows = self.conn.query_raw(sql, &[]).await?;
@@ -643,7 +643,7 @@ impl<'a> SqlSchemaDescriber<'a> {
                                     AND fkc.parent_object_id = fk.parent_object_id
             WHERE parent_table.is_ms_shipped = 0
             AND referenced_table.is_ms_shipped = 0
-            ORDER BY table_name, constraint_name, ordinal_position
+            ORDER BY table_name, schema_name, constraint_name, ordinal_position
         "#};
 
         #[allow(clippy::too_many_arguments)]
@@ -666,7 +666,7 @@ impl<'a> SqlSchemaDescriber<'a> {
         }
 
         let result_set = self.conn.query_raw(sql, &[]).await?;
-        let mut current_fk: Option<(String, ForeignKeyId)> = None;
+        let mut current_fk: Option<(TableId, String, ForeignKeyId)> = None;
 
         for row in result_set.into_iter() {
             let namespace = row.get_expect_string("schema_name");
@@ -723,7 +723,8 @@ impl<'a> SqlSchemaDescriber<'a> {
             };
 
             match &current_fk {
-                Some((current_constraint_name, _)) if *current_constraint_name == constraint_name => (),
+                Some((current_table_id, current_constraint_name, _))
+                    if *current_table_id == table_id && *current_constraint_name == constraint_name => {}
                 None | Some(_) => {
                     let fkid = sql_schema.push_foreign_key(
                         Some(constraint_name.clone()),
@@ -731,11 +732,11 @@ impl<'a> SqlSchemaDescriber<'a> {
                         [on_delete_action, on_update_action],
                     );
 
-                    current_fk = Some((constraint_name, fkid));
+                    current_fk = Some((table_id, constraint_name, fkid));
                 }
             }
 
-            if let Some((_, fkid)) = current_fk {
+            if let Some((_, _, fkid)) = current_fk {
                 sql_schema.push_foreign_key_column(fkid, [column_id, referenced_column_id]);
             }
         }
