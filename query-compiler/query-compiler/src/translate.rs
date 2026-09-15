@@ -34,18 +34,44 @@ pub enum TranslateError {
 pub type TranslateResult<T> = Result<T, TranslateError>;
 
 pub fn translate(mut graph: QueryGraph, builder: &dyn QueryBuilder) -> TranslateResult<Expression> {
+    enum RootNodes {
+        None,
+        One(NodeRef),
+        Many(Vec<NodeRef>),
+    }
+
     let mut enums = EnumsMap::new();
     let mut result_node_builder = ResultNodeBuilder::new(&mut enums);
     let structure = map_result_structure(&graph, &mut result_node_builder);
+    let result_reachability = ResultReachability::new(&graph);
 
     // Must collect the root nodes first, because the following iteration is mutating the graph
-    let root_nodes: Vec<NodeRef> = graph.root_nodes().collect();
+    let root_nodes = {
+        let mut nodes = graph.root_nodes();
+        match (nodes.next(), nodes.next()) {
+            (None, _) => RootNodes::None,
+            (Some(node), None) => RootNodes::One(node),
+            (Some(first), Some(second)) => {
+                let mut roots = Vec::with_capacity(2 + nodes.size_hint().0);
+                roots.push(first);
+                roots.push(second);
+                roots.extend(nodes);
+                RootNodes::Many(roots)
+            }
+        }
+    };
 
-    let root = root_nodes
-        .into_iter()
-        .map(|node| NodeTranslator::new(&mut graph, node, &[], builder).translate())
-        .collect::<TranslateResult<Vec<_>>>()
-        .map(Expression::Seq)?;
+    let root = match root_nodes {
+        RootNodes::None => Expression::Seq(Vec::new()),
+        RootNodes::One(node) => {
+            NodeTranslator::new(&mut graph, node, &[], builder, &result_reachability).translate()?
+        }
+        RootNodes::Many(nodes) => nodes
+            .into_iter()
+            .map(|node| NodeTranslator::new(&mut graph, node, &[], builder, &result_reachability).translate())
+            .collect::<TranslateResult<Vec<_>>>()
+            .map(Expression::Seq)?,
+    };
 
     let root = if let Some(structure) = structure {
         Expression::DataMap {
@@ -67,11 +93,55 @@ pub fn translate(mut graph: QueryGraph, builder: &dyn QueryBuilder) -> Translate
     Ok(root)
 }
 
+struct ResultReachability {
+    can_reach_result: Vec<bool>,
+}
+
+impl ResultReachability {
+    fn new(graph: &QueryGraph) -> Self {
+        let mut can_reach_result = Vec::new();
+        let mut pending = graph.result_nodes().collect::<Vec<_>>();
+
+        for node in &pending {
+            Self::mark_reachable(&mut can_reach_result, *node);
+        }
+
+        while let Some(node) = pending.pop() {
+            for parent in graph.parent_nodes(&node) {
+                if Self::mark_reachable(&mut can_reach_result, parent) {
+                    pending.push(parent);
+                }
+            }
+        }
+
+        Self { can_reach_result }
+    }
+
+    fn contains(&self, node: &NodeRef) -> bool {
+        self.can_reach_result.get(node.index()).copied().unwrap_or(false)
+    }
+
+    fn mark_reachable(can_reach_result: &mut Vec<bool>, node: NodeRef) -> bool {
+        let index = node.index();
+        if index >= can_reach_result.len() {
+            can_reach_result.resize(index + 1, false);
+        }
+
+        if can_reach_result[index] {
+            false
+        } else {
+            can_reach_result[index] = true;
+            true
+        }
+    }
+}
+
 struct NodeTranslator<'a, 'b> {
     graph: &'a mut QueryGraph,
     node: NodeRef,
     parent_edges: &'b [EdgeRef],
     query_builder: &'b dyn QueryBuilder,
+    result_reachability: &'b ResultReachability,
 }
 
 impl<'a, 'b> NodeTranslator<'a, 'b> {
@@ -80,12 +150,14 @@ impl<'a, 'b> NodeTranslator<'a, 'b> {
         node: NodeRef,
         parent_edges: &'b [EdgeRef],
         query_builder: &'b dyn QueryBuilder,
+        result_reachability: &'b ResultReachability,
     ) -> Self {
         Self {
             graph,
             node,
             parent_edges,
             query_builder,
+            result_reachability,
         }
     }
 
@@ -339,7 +411,7 @@ impl<'a, 'b> NodeTranslator<'a, 'b> {
             .iter()
             .enumerate()
             .filter_map(|(idx, (_, child_node))| {
-                if self.graph.subgraph_contains_result(child_node) {
+                if self.result_reachability.contains(child_node) {
                     Some(idx)
                 } else {
                     None
@@ -373,6 +445,10 @@ impl<'a, 'b> NodeTranslator<'a, 'b> {
     }
 
     fn fold_result_scopes(&mut self, result_subgraphs: Vec<(EdgeRef, NodeRef)>) -> TranslateResult<Expression> {
+        if let [(_, node)] = &result_subgraphs[..] {
+            return self.process_child_with_dependencies(*node);
+        }
+
         // if the subgraphs all point to the same result node, we fold them in sequence
         // if not, we can separate them with a getfirstnonempty
         let bindings = result_subgraphs
@@ -408,19 +484,18 @@ impl<'a, 'b> NodeTranslator<'a, 'b> {
 
     fn process_child_with_dependencies(&mut self, node: NodeRef) -> TranslateResult<Expression> {
         let create_field_bindings = matches!(self.graph.node_content(&node), Some(Node::Query(_)));
+        let incoming_edges = self.graph.incoming_edges(&node);
 
-        let validations = self
-            .graph
-            .incoming_edges(&node)
-            .into_iter()
+        let validations = incoming_edges
+            .iter()
             .filter_map(|edge| {
                 let Some(QueryGraphDependency::DataDependency(RowCountSink::Discard, expectation)) =
-                    self.graph.edge_content(&edge)
+                    self.graph.edge_content(edge)
                 else {
                     return None;
                 };
                 let mut expr = Expression::Get {
-                    name: binding::node_result(self.graph.edge_source(&edge)),
+                    name: binding::node_result(self.graph.edge_source(edge)),
                 };
                 if let Some(expectation) = expectation {
                     expr = Expression::validate_expectation(expectation, expr);
@@ -429,12 +504,10 @@ impl<'a, 'b> NodeTranslator<'a, 'b> {
             })
             .collect_vec();
 
-        let bindings = self
-            .graph
-            .incoming_edges(&node)
-            .into_iter()
+        let bindings = incoming_edges
+            .iter()
             .flat_map(|edge| {
-                let edge_content = self.graph.edge_content(&edge);
+                let edge_content = self.graph.edge_content(edge);
                 let Some(QueryGraphDependency::ProjectedDataDependency(selection, _, expectation)) = edge_content
                 else {
                     return Either::Left(std::iter::empty());
@@ -446,7 +519,7 @@ impl<'a, 'b> NodeTranslator<'a, 'b> {
                         if sink.is_unique()
                 );
 
-                let source = self.graph.edge_source(&edge);
+                let source = self.graph.edge_source(edge);
 
                 let expr = Expression::Get {
                     name: binding::node_result(source),
@@ -489,8 +562,14 @@ impl<'a, 'b> NodeTranslator<'a, 'b> {
             .collect::<Vec<_>>();
 
         // translate plucks the edges coming into node, we need to avoid accessing it afterwards
-        let edges = self.graph.incoming_edges(&node);
-        let expr = NodeTranslator::new(self.graph, node, &edges, self.query_builder).translate()?;
+        let expr = NodeTranslator::new(
+            self.graph,
+            node,
+            &incoming_edges,
+            self.query_builder,
+            self.result_reachability,
+        )
+        .translate()?;
 
         if bindings.is_empty() && validations.is_empty() {
             return Ok(expr);

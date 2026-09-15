@@ -131,6 +131,11 @@ impl NodeRef {
     pub fn id(&self) -> String {
         self.node_ix.index().to_string()
     }
+
+    /// Returns the raw index of the Node.
+    pub fn index(&self) -> usize {
+        self.node_ix.index()
+    }
 }
 
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
@@ -373,8 +378,8 @@ impl QueryGraph {
         if !self.finalized {
             self.swap_marked()?;
             self.ensure_return_nodes_have_parent_dependency()?;
-            self.normalize_data_dependencies(capabilities)?;
-            self.insert_reloads()?;
+            let reloads = self.normalize_data_dependencies(capabilities)?;
+            self.insert_reloads(reloads)?;
             self.normalize_if_nodes()?;
             self.finalized = true;
         }
@@ -511,6 +516,13 @@ impl QueryGraph {
     /// Returns all edges pointing to `node` (e.g. incoming edges).
     pub fn incoming_edges(&self, node: &NodeRef) -> Vec<EdgeRef> {
         self.collect_edges(node, Direction::Incoming)
+    }
+
+    /// Returns parent nodes without allocating or sorting edge refs.
+    pub fn parent_nodes(&self, node: &NodeRef) -> impl Iterator<Item = NodeRef> + '_ {
+        self.graph
+            .edges_directed(node.node_ix, Direction::Incoming)
+            .map(|edge| NodeRef { node_ix: edge.source() })
     }
 
     /// Removes the edge from the graph but leaves the graph intact by keeping the empty
@@ -779,10 +791,7 @@ impl QueryGraph {
 
                     for (_, sibling) in siblings {
                         let possible_edge = self.graph.find_edge(node.node_ix, sibling.node_ix);
-                        let is_if_node_child = self.incoming_edges(&sibling).into_iter().any(|edge| {
-                            let content = self.edge_content(&edge).unwrap();
-                            matches!(content, QueryGraphDependency::Then | QueryGraphDependency::Else)
-                        });
+                        let is_if_node_child = self.has_incoming_then_or_else_edge(&sibling);
 
                         if sibling != node
                             && possible_edge.is_none()
@@ -797,6 +806,15 @@ impl QueryGraph {
         }
 
         Ok(())
+    }
+
+    fn has_incoming_then_or_else_edge(&self, node: &NodeRef) -> bool {
+        self.graph.edges_directed(node.node_ix, Direction::Incoming).any(|edge| {
+            matches!(
+                edge.weight().borrow(),
+                Some(QueryGraphDependency::Then | QueryGraphDependency::Else)
+            )
+        })
     }
 
     /// Traverses the graph and ensures that return nodes have correct `ProjectedDataDependency`s on their incoming edges.
@@ -921,9 +939,7 @@ impl QueryGraph {
     ///
     /// The `Reload` node is always a "find many" query.
     /// Unwraps are safe because we're operating on the unprocessed state of the graph (`Expressionista` changes that).
-    fn insert_reloads(&mut self) -> QueryGraphResult<()> {
-        let reloads = self.find_unsatisfied_dependencies();
-
+    fn insert_reloads(&mut self, reloads: Vec<(NodeRef, FieldSelection)>) -> QueryGraphResult<()> {
         for (node, identifiers) in reloads {
             let query = self.node_content(&node).and_then(|node| node.as_query()).unwrap();
 
@@ -938,7 +954,7 @@ impl QueryGraph {
             let primary_model_id = model.shard_aware_primary_identifier();
 
             let read_query = ReadQuery::ManyRecordsQuery(ManyRecordsQuery {
-                name: "reload".into(),
+                name: String::new(),
                 alias: None,
                 model: model.clone(),
                 args: QueryArguments::new(model),
@@ -1012,8 +1028,12 @@ impl QueryGraph {
     /// This is only possible when the parent node _can_ fulfill the selection set.
     /// In the case of updates and inserts, for instance, only connectors supporting `InsertReturning` and `UpdateReturning` can do it,
     /// or else they're only able to return the primary identifier of the model inserted or updated.
-    fn normalize_data_dependencies(&mut self, capabilities: ConnectorCapabilities) -> QueryGraphResult<()> {
+    fn normalize_data_dependencies(
+        &mut self,
+        capabilities: ConnectorCapabilities,
+    ) -> QueryGraphResult<Vec<(NodeRef, FieldSelection)>> {
         let unsatisfied_deps = self.find_unsatisfied_dependencies();
+        let mut reloads = Vec::new();
 
         for (node, identifiers) in unsatisfied_deps {
             let query = self
@@ -1024,18 +1044,21 @@ impl QueryGraph {
             // If the connector does not support returning more than the primary identifier for an update,
             // do not update the selection set.
             if query.is_update_one() && !capabilities.contains(ConnectorCapability::UpdateReturning) {
+                reloads.push((node, identifiers));
                 continue;
             }
 
             // If the connector does not support returning more than the primary identifier for a create,
             // do not update the selection set.
             if query.is_create_one() && !capabilities.contains(ConnectorCapability::InsertReturning) {
+                reloads.push((node, identifiers));
                 continue;
             }
 
             // If the connector does not support returning more than the primary identifier for a delete,
             // do not update the selection set.
             if query.is_delete_one() && !capabilities.contains(ConnectorCapability::DeleteReturning) {
+                reloads.push((node, identifiers));
                 continue;
             }
 
@@ -1048,7 +1071,7 @@ impl QueryGraph {
             query.satisfy_dependency(identifiers);
         }
 
-        Ok(())
+        Ok(reloads)
     }
 
     /// Traverses the query graph and finds the query nodes that don't fulfill their children data dependencies.
