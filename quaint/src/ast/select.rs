@@ -603,6 +603,12 @@ impl<'a> Select<'a> {
         self
     }
 
+    /// Removes the comment from the select.
+    pub fn without_comment(mut self) -> Self {
+        self.comment = None;
+        self
+    }
+
     /// Adds a common table expression to the select.
     ///
     /// ```rust
