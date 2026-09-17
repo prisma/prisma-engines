@@ -180,7 +180,9 @@ pub fn aggregate(
     ctx: &Context<'_>,
 ) -> Select<'static> {
     let columns = extract_columns(model, selections, ctx);
-    let sub_query = get_records(model, columns.into_iter(), &[], args, ctx);
+    // Only the outer query should carry the traceparent: the PostgreSQL tracing
+    // cache strips a trailing comment, but cannot strip one inside a subquery.
+    let sub_query = get_records(model, columns.into_iter(), &[], args, ctx).without_comment();
     let sub_table = Table::from(sub_query).alias("sub");
     selections.iter().fold(
         Select::from_table(sub_table).add_traceparent(ctx.traceparent),
@@ -310,4 +312,70 @@ fn extract_columns(model: &Model, selections: &[AggregationSelection], ctx: &Con
         .collect();
 
     fields.as_columns(ctx).collect()
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use quaint::{
+        connector::ExternalConnectionInfo,
+        prelude::{ConnectionInfo, SqlFamily},
+        visitor::{Postgres, Visitor},
+    };
+    use std::sync::Arc;
+    use telemetry::{formatting::strip_query_traceparent, TraceParent};
+
+    #[test]
+    fn aggregate_traceparent_does_not_change_cache_key() {
+        let schema = psl::parse_schema_without_extensions(
+            r#"
+            datasource db {
+                provider = "postgresql"
+                url = "postgresql://localhost/test"
+            }
+            model Item {
+                id Int @id
+            }
+        "#,
+        )
+        .unwrap();
+        let dm = query_structure::convert(Arc::new(schema));
+        let model = dm.find_model("Item").unwrap();
+        let info = ConnectionInfo::External(ExternalConnectionInfo::new(
+            SqlFamily::Postgres,
+            Some("public".into()),
+            None,
+            false,
+        ));
+        let selections = [AggregationSelection::Count {
+            all: Some(CountAllAggregationSelection::new(dm)),
+            fields: vec![],
+        }];
+        let build = |traceparent: Option<TraceParent>| {
+            Postgres::build(aggregate(
+                &model,
+                &selections,
+                QueryArguments::new(model.clone()),
+                &Context::new(&info, traceparent),
+            ))
+            .unwrap()
+        };
+        let (untraced, untraced_params) = build(None);
+        for traceparent in [
+            "00-0af7651916cd43dd8448eb211c80319c-b7ad6b7169203331-01",
+            "00-0af7651916cd43dd8448eb211c80319d-b7ad6b7169203332-01",
+        ] {
+            let (sql, params) = build(Some(traceparent.parse().unwrap()));
+            assert_eq!(sql.as_str().matches("/* traceparent=").count(), 1, "{sql}");
+            assert!(sql.ends_with(&format!("/* traceparent='{traceparent}' */")), "{sql}");
+            assert_eq!(strip_query_traceparent(&sql), untraced);
+            assert_eq!(params, untraced_params);
+        }
+        let (unsampled, _) = build(Some(
+            "00-0af7651916cd43dd8448eb211c80319c-b7ad6b7169203331-00"
+                .parse()
+                .unwrap(),
+        ));
+        assert_eq!(unsampled, untraced);
+    }
 }
