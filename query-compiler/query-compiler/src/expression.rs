@@ -8,15 +8,28 @@ use bon::{Builder, bon};
 use query_builder::DbQuery;
 use query_core::{DataExpectation, DataRule};
 use query_structure::{InternalEnum, PrismaValue, PrismaValueType, ScalarWriteOperation};
-use serde::Serialize;
+use serde::{Serialize, Serializer, ser::SerializeMap, ser::SerializeTuple};
+use serde_json::Value;
 use thiserror::Error;
 
 mod format;
 
-#[derive(Debug, Serialize)]
+#[derive(Debug)]
 pub struct Binding {
     pub name: Cow<'static, str>,
     pub expr: Expression,
+}
+
+impl Serialize for Binding {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        let mut tuple = serializer.serialize_tuple(2)?;
+        tuple.serialize_element(&self.name)?;
+        tuple.serialize_element(&self.expr)?;
+        tuple.end()
+    }
 }
 
 impl Binding {
@@ -34,8 +47,7 @@ impl std::fmt::Display for Binding {
     }
 }
 
-#[derive(Debug, Serialize)]
-#[serde(rename_all = "camelCase")]
+#[derive(Debug)]
 pub struct JoinExpression {
     pub child: Expression,
     pub on: Vec<(String, String)>,
@@ -43,8 +55,21 @@ pub struct JoinExpression {
     pub is_relation_unique: bool,
 }
 
-#[derive(Debug, Serialize)]
-#[serde(tag = "type", content = "args", rename_all = "camelCase")]
+impl Serialize for JoinExpression {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        let mut tuple = serializer.serialize_tuple(4)?;
+        tuple.serialize_element(&self.child)?;
+        tuple.serialize_element(&self.on)?;
+        tuple.serialize_element(&self.parent_field)?;
+        tuple.serialize_element(&self.is_relation_unique)?;
+        tuple.end()
+    }
+}
+
+#[derive(Debug)]
 pub enum Expression {
     /// Expression that evaluates to a plain value.
     Value(PrismaValue),
@@ -83,7 +108,6 @@ pub enum Expression {
     Required(Box<Expression>),
 
     /// Application-level join.
-    #[serde(rename_all = "camelCase")]
     Join {
         parent: Box<Expression>,
         children: Vec<JoinExpression>,
@@ -105,7 +129,6 @@ pub enum Expression {
     },
 
     /// Validates the expression according to the data rule and throws an error if it doesn't match.
-    #[serde(rename_all = "camelCase")]
     Validate {
         expr: Box<Expression>,
         rules: Vec<DataRule>,
@@ -149,6 +172,243 @@ pub enum Expression {
         expr: Box<Expression>,
         operations: InMemoryOps,
     },
+}
+
+impl Serialize for Expression {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        match self {
+            Self::Value(value) => serialize_unary("v", value, serializer),
+            Self::Seq(expressions) => serialize_unary("s", expressions, serializer),
+            Self::Get { name } => serialize_unary("g", name, serializer),
+            Self::Let { bindings, expr } => {
+                let mut tuple = serializer.serialize_tuple(3)?;
+                tuple.serialize_element("l")?;
+                tuple.serialize_element(bindings)?;
+                tuple.serialize_element(expr)?;
+                tuple.end()
+            }
+            Self::GetFirstNonEmpty { names } => serialize_unary("e", names, serializer),
+            Self::Query(query) => serialize_unary("q", query, serializer),
+            Self::Execute(query) => serialize_unary("x", query, serializer),
+            Self::Sum(expressions) => serialize_unary("+", expressions, serializer),
+            Self::Concat(expressions) => serialize_unary("c", expressions, serializer),
+            Self::Unique(expr) => serialize_unary("u", expr, serializer),
+            Self::Required(expr) => serialize_unary("r", expr, serializer),
+            Self::Join {
+                parent,
+                children,
+                can_assume_strict_equality,
+            } => {
+                let mut tuple = serializer.serialize_tuple(4)?;
+                tuple.serialize_element("j")?;
+                tuple.serialize_element(parent)?;
+                tuple.serialize_element(children)?;
+                tuple.serialize_element(can_assume_strict_equality)?;
+                tuple.end()
+            }
+            Self::MapField { field, records } => {
+                let mut tuple = serializer.serialize_tuple(3)?;
+                tuple.serialize_element("m")?;
+                tuple.serialize_element(field)?;
+                tuple.serialize_element(records)?;
+                tuple.end()
+            }
+            Self::Transaction(expr) => serialize_unary("t", expr, serializer),
+            Self::DataMap { expr, structure, enums } => {
+                let mut tuple = serializer.serialize_tuple(if enums.is_empty() { 3 } else { 4 })?;
+                tuple.serialize_element("d")?;
+                tuple.serialize_element(expr)?;
+                tuple.serialize_element(structure)?;
+                if !enums.is_empty() {
+                    tuple.serialize_element(enums)?;
+                }
+                tuple.end()
+            }
+            Self::Validate {
+                expr,
+                rules,
+                error_identifier,
+                context,
+            } => {
+                let mut tuple = serializer.serialize_tuple(5)?;
+                tuple.serialize_element("V")?;
+                tuple.serialize_element(expr)?;
+                tuple.serialize_element(rules)?;
+                tuple.serialize_element(compact_validation_error_identifier(error_identifier))?;
+                tuple.serialize_element(&CompactValidationContext {
+                    error_identifier,
+                    context,
+                })?;
+                tuple.end()
+            }
+            Self::If {
+                value,
+                rule,
+                then,
+                r#else,
+            } => {
+                let mut tuple = serializer.serialize_tuple(5)?;
+                tuple.serialize_element("?")?;
+                tuple.serialize_element(value)?;
+                tuple.serialize_element(rule)?;
+                tuple.serialize_element(then)?;
+                tuple.serialize_element(r#else)?;
+                tuple.end()
+            }
+            Self::Unit => {
+                let mut tuple = serializer.serialize_tuple(1)?;
+                tuple.serialize_element("0")?;
+                tuple.end()
+            }
+            Self::Diff { from, to, fields } => {
+                let mut tuple = serializer.serialize_tuple(4)?;
+                tuple.serialize_element("-")?;
+                tuple.serialize_element(from)?;
+                tuple.serialize_element(to)?;
+                tuple.serialize_element(fields)?;
+                tuple.end()
+            }
+            Self::InitializeRecord { expr, fields } => {
+                let mut tuple = serializer.serialize_tuple(3)?;
+                tuple.serialize_element("i")?;
+                tuple.serialize_element(expr)?;
+                tuple.serialize_element(fields)?;
+                tuple.end()
+            }
+            Self::MapRecord { expr, fields } => {
+                let mut tuple = serializer.serialize_tuple(3)?;
+                tuple.serialize_element("M")?;
+                tuple.serialize_element(expr)?;
+                tuple.serialize_element(fields)?;
+                tuple.end()
+            }
+            Self::Process { expr, operations } => {
+                let mut tuple = serializer.serialize_tuple(3)?;
+                tuple.serialize_element("p")?;
+                tuple.serialize_element(expr)?;
+                tuple.serialize_element(operations)?;
+                tuple.end()
+            }
+        }
+    }
+}
+
+fn serialize_unary<S, T>(tag: &'static str, value: &T, serializer: S) -> Result<S::Ok, S::Error>
+where
+    S: Serializer,
+    T: Serialize,
+{
+    let mut tuple = serializer.serialize_tuple(2)?;
+    tuple.serialize_element(tag)?;
+    tuple.serialize_element(value)?;
+    tuple.end()
+}
+
+fn compact_validation_error_identifier(error_identifier: &'static str) -> &'static str {
+    match error_identifier {
+        "RELATION_VIOLATION" => "r",
+        "MISSING_RELATED_RECORD" => "m",
+        "MISSING_RECORD" => "M",
+        "INCOMPLETE_CONNECT_INPUT" => "i",
+        "INCOMPLETE_CONNECT_OUTPUT" => "o",
+        "RECORDS_NOT_CONNECTED" => "n",
+        _ => error_identifier,
+    }
+}
+
+struct CompactValidationContext<'a> {
+    error_identifier: &'static str,
+    context: &'a Value,
+}
+
+impl Serialize for CompactValidationContext<'_> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        let Value::Object(context) = self.context else {
+            return self.context.serialize(serializer);
+        };
+
+        match self.error_identifier {
+            "RELATION_VIOLATION" => {
+                if let (Some(relation), Some(model_a), Some(model_b)) =
+                    (context.get("relation"), context.get("modelA"), context.get("modelB"))
+                {
+                    let mut tuple = serializer.serialize_tuple(3)?;
+                    tuple.serialize_element(relation)?;
+                    tuple.serialize_element(model_a)?;
+                    tuple.serialize_element(model_b)?;
+                    return tuple.end();
+                }
+            }
+            "MISSING_RELATED_RECORD" => {
+                if let (Some(model), Some(relation), Some(relation_type), Some(operation)) = (
+                    context.get("model"),
+                    context.get("relation"),
+                    context.get("relationType"),
+                    context.get("operation"),
+                ) {
+                    if let Some(needed_for) = context.get("neededFor") {
+                        let mut tuple = serializer.serialize_tuple(5)?;
+                        tuple.serialize_element(model)?;
+                        tuple.serialize_element(relation)?;
+                        tuple.serialize_element(relation_type)?;
+                        tuple.serialize_element(operation)?;
+                        tuple.serialize_element(needed_for)?;
+                        return tuple.end();
+                    }
+
+                    let mut tuple = serializer.serialize_tuple(4)?;
+                    tuple.serialize_element(model)?;
+                    tuple.serialize_element(relation)?;
+                    tuple.serialize_element(relation_type)?;
+                    tuple.serialize_element(operation)?;
+                    return tuple.end();
+                }
+            }
+            "MISSING_RECORD" => {
+                if let Some(operation) = context.get("operation") {
+                    return operation.serialize(serializer);
+                }
+            }
+            "INCOMPLETE_CONNECT_INPUT" => {
+                if let Some(expected_rows) = context.get("expectedRows") {
+                    return expected_rows.serialize(serializer);
+                }
+            }
+            "INCOMPLETE_CONNECT_OUTPUT" => {
+                if let (Some(expected_rows), Some(relation), Some(relation_type)) = (
+                    context.get("expectedRows"),
+                    context.get("relation"),
+                    context.get("relationType"),
+                ) {
+                    let mut tuple = serializer.serialize_tuple(3)?;
+                    tuple.serialize_element(expected_rows)?;
+                    tuple.serialize_element(relation)?;
+                    tuple.serialize_element(relation_type)?;
+                    return tuple.end();
+                }
+            }
+            "RECORDS_NOT_CONNECTED" => {
+                if let (Some(relation), Some(parent), Some(child)) =
+                    (context.get("relation"), context.get("parent"), context.get("child"))
+                {
+                    let mut tuple = serializer.serialize_tuple(3)?;
+                    tuple.serialize_element(relation)?;
+                    tuple.serialize_element(parent)?;
+                    tuple.serialize_element(child)?;
+                    return tuple.end();
+                }
+            }
+            _ => {}
+        }
+
+        self.context.serialize(serializer)
+    }
 }
 
 impl Expression {
@@ -340,12 +600,32 @@ impl TryFrom<ScalarWriteOperation> for FieldOperation {
 #[error("unsupported scalar write operation: {0:?}")]
 pub struct UnsupportedScalarWriteOperation(ScalarWriteOperation);
 
-#[derive(Debug, Serialize)]
-#[serde(rename_all = "camelCase")]
+#[derive(Debug)]
 pub struct Pagination {
     cursor: Option<HashMap<String, PrismaValue>>,
     take: Option<i64>,
     skip: Option<i64>,
+}
+
+impl Serialize for Pagination {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        let len =
+            usize::from(self.cursor.is_some()) + usize::from(self.take.is_some()) + usize::from(self.skip.is_some());
+        let mut map = serializer.serialize_map(Some(len))?;
+        if let Some(cursor) = &self.cursor {
+            map.serialize_entry("cursor", cursor)?;
+        }
+        if let Some(take) = self.take {
+            map.serialize_entry("take", &take)?;
+        }
+        if let Some(skip) = self.skip {
+            map.serialize_entry("skip", &skip)?;
+        }
+        map.end()
+    }
 }
 
 #[bon]
@@ -368,8 +648,7 @@ impl Pagination {
     }
 }
 
-#[derive(Debug, Default, Serialize, Builder)]
-#[serde(rename_all = "camelCase")]
+#[derive(Debug, Default, Builder)]
 pub struct InMemoryOps {
     pub(crate) pagination: Option<Pagination>,
     pub(crate) distinct: Option<Vec<String>>,
@@ -378,6 +657,36 @@ pub struct InMemoryOps {
     #[builder(default)]
     pub(crate) nested: BTreeMap<String, InMemoryOps>,
     pub(crate) linking_fields: Option<Vec<String>>,
+}
+
+impl Serialize for InMemoryOps {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        let len = usize::from(self.pagination.is_some())
+            + usize::from(self.distinct.is_some())
+            + usize::from(self.reverse)
+            + usize::from(!self.nested.is_empty())
+            + usize::from(self.linking_fields.is_some());
+        let mut map = serializer.serialize_map(Some(len))?;
+        if let Some(pagination) = &self.pagination {
+            map.serialize_entry("pagination", pagination)?;
+        }
+        if let Some(distinct) = &self.distinct {
+            map.serialize_entry("distinct", distinct)?;
+        }
+        if self.reverse {
+            map.serialize_entry("reverse", &self.reverse)?;
+        }
+        if !self.nested.is_empty() {
+            map.serialize_entry("nested", &self.nested)?;
+        }
+        if let Some(linking_fields) = &self.linking_fields {
+            map.serialize_entry("linkingFields", linking_fields)?;
+        }
+        map.end()
+    }
 }
 
 impl InMemoryOps {
@@ -413,6 +722,10 @@ pub struct EnumsMap(BTreeMap<String, BTreeMap<String, String>>);
 impl EnumsMap {
     pub fn new() -> Self {
         Default::default()
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.0.is_empty()
     }
 
     pub fn add(&mut self, r#enum: InternalEnum) {

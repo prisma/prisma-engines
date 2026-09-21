@@ -7,7 +7,7 @@ use std::fmt;
 
 pub use error::*;
 use psl::datamodel_connector::{ConnectorCapabilities, ConnectorCapability};
-use serde::Serialize;
+use serde::{Serialize, Serializer, ser::SerializeTuple};
 use smallvec::{SmallVec, smallvec};
 use tracing::trace;
 
@@ -260,8 +260,7 @@ impl DataExpectation {
 }
 
 /// A rule a data dependency needs to fulfill to be considered valid.
-#[derive(Debug, Clone, Serialize)]
-#[serde(tag = "type", content = "args", rename_all = "camelCase")]
+#[derive(Debug, Clone)]
 pub enum DataRule {
     /// Expect the data dependency to contain an exact number of rows.
     RowCountEq(usize),
@@ -271,6 +270,30 @@ pub enum DataRule {
     AffectedRowCountEq(usize),
     /// Expect the edge to not be taken and never match any data.
     Never,
+}
+
+impl Serialize for DataRule {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        match self {
+            Self::RowCountEq(count) => serialize_rule_tuple("=", count, serializer),
+            Self::RowCountNeq(count) => serialize_rule_tuple("!", count, serializer),
+            Self::AffectedRowCountEq(count) => serialize_rule_tuple("a", count, serializer),
+            Self::Never => serializer.serialize_str("n"),
+        }
+    }
+}
+
+fn serialize_rule_tuple<S>(tag: &'static str, count: &usize, serializer: S) -> Result<S::Ok, S::Error>
+where
+    S: Serializer,
+{
+    let mut tuple = serializer.serialize_tuple(2)?;
+    tuple.serialize_element(tag)?;
+    tuple.serialize_element(count)?;
+    tuple.end()
 }
 
 impl fmt::Display for DataRule {

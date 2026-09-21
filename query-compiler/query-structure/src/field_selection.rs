@@ -23,6 +23,10 @@ impl FieldSelection {
         self.selections
     }
 
+    pub fn as_slice(&self) -> &[SelectedField] {
+        &self.selections
+    }
+
     /// Returns `true` if self contains (at least) all fields specified in `other`. `false` otherwise.
     /// Recurses into composite selections and ensures that composite selections are supersets as well.
     pub fn is_superset_of(&self, other: &Self) -> bool {

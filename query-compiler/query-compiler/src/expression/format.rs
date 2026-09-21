@@ -302,7 +302,7 @@ where
     fn data_map_node(&'a self, node: &'a ResultNode) -> PrettyDoc<'a, D> {
         match node {
             ResultNode::AffectedRows => self.keyword("affectedRows"),
-            ResultNode::Object(object) => self.object(object.fields().iter().map(|(name, field)| {
+            ResultNode::Object(object) => self.object(object.fields().map(|(name, field)| {
                 let mut key = self.field_name(name);
                 if let ResultNode::Object(nested_object) = field {
                     let source = match nested_object.serialized_name() {

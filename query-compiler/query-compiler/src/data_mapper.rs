@@ -11,11 +11,10 @@ use query_core::{
     UpdateRecord, WriteQuery,
 };
 use query_structure::{
-    AggregationSelection, FieldArity, FieldSelection, FieldTypeInformation, ScalarField, SelectedField, Type,
-    TypeIdentifier,
+    AggregationSelection, FieldArity, FieldTypeInformation, ScalarField, SelectedField, Type, TypeIdentifier,
 };
-use serde::Serialize;
-use std::{borrow::Cow, collections::HashMap, fmt};
+use serde::{Serialize, Serializer, ser::SerializeStruct};
+use std::{borrow::Cow, fmt};
 
 pub fn map_result_structure(graph: &QueryGraph, builder: &mut ResultNodeBuilder) -> Option<ResultNode> {
     graph
@@ -55,7 +54,7 @@ fn map_read_query(
 ) -> Option<ResultNode> {
     match query {
         ReadQuery::RecordQuery(q) => get_result_node()
-            .field_selection(&q.selected_fields)
+            .field_selection(q.selected_fields.as_slice())
             .selection_order(&q.selection_order)
             .nested_queries(&q.nested)
             .builder(builder)
@@ -63,7 +62,7 @@ fn map_read_query(
             .uses_relation_joins(q.relation_load_strategy.is_join())
             .call(),
         ReadQuery::ManyRecordsQuery(q) => get_result_node()
-            .field_selection(&q.selected_fields)
+            .field_selection(q.selected_fields.as_slice())
             .selection_order(&q.selection_order)
             .nested_queries(&q.nested)
             .builder(builder)
@@ -71,7 +70,7 @@ fn map_read_query(
             .uses_relation_joins(q.relation_load_strategy.is_join())
             .call(),
         ReadQuery::RelatedRecordsQuery(q) => get_result_node()
-            .field_selection(&q.selected_fields)
+            .field_selection(q.selected_fields.as_slice())
             .selection_order(&q.selection_order)
             .nested_queries(&q.nested)
             .builder(builder)
@@ -86,7 +85,7 @@ fn map_read_query(
 fn map_write_query(query: &WriteQuery, builder: &mut ResultNodeBuilder) -> Option<ResultNode> {
     match query {
         WriteQuery::CreateRecord(q) => get_result_node()
-            .field_selection(&q.selected_fields)
+            .field_selection(q.selected_fields.as_slice())
             .selection_order(&q.selection_order)
             .builder(builder)
             .call(),
@@ -94,7 +93,7 @@ fn map_write_query(query: &WriteQuery, builder: &mut ResultNodeBuilder) -> Optio
         WriteQuery::UpdateRecord(u) => {
             match u {
                 UpdateRecord::WithSelection(w) => get_result_node()
-                    .field_selection(&w.selected_fields)
+                    .field_selection(w.selected_fields.as_slice())
                     .selection_order(&w.selection_order)
                     .builder(builder)
                     .call(),
@@ -109,7 +108,7 @@ fn map_write_query(query: &WriteQuery, builder: &mut ResultNodeBuilder) -> Optio
         WriteQuery::ExecuteRaw(_) => None,        // No data mapping
         WriteQuery::QueryRaw(_) => None,          // No data mapping
         WriteQuery::Upsert(q) => get_result_node()
-            .field_selection(&q.selected_fields)
+            .field_selection(q.selected_fields.as_slice())
             .selection_order(&q.selection_order)
             .builder(builder)
             .call(),
@@ -118,7 +117,7 @@ fn map_write_query(query: &WriteQuery, builder: &mut ResultNodeBuilder) -> Optio
 
 #[builder]
 fn get_result_node(
-    field_selection: &FieldSelection,
+    field_selection: &[SelectedField],
     selection_order: &[String],
     #[builder(default = &[])] nested_queries: &[ReadQuery],
     /// Indicates whether the query uses `relationJoins`. When true, the data mapper uses prisma names
@@ -134,23 +133,11 @@ fn get_result_node(
     builder: &mut ResultNodeBuilder<'_>,
     original_name: Option<Cow<'static, str>>,
 ) -> Option<ResultNode> {
-    let field_map = field_selection
-        .selections()
-        .map(|fs| (fs.prisma_name_grouping_virtuals(), fs))
-        .collect::<HashMap<_, _>>();
-    let grouped_virtuals = field_selection
-        .virtuals()
-        .into_group_map_by(|vs| vs.serialized_group_name());
-    let nested_map = nested_queries
-        .iter()
-        .map(|q| (q.get_alias_or_name(), q))
-        .collect::<HashMap<_, _>>();
-
-    let mut node = ResultNodeBuilder::new_object(original_name);
+    let mut node = ResultNodeBuilder::new_object_with_capacity(original_name, selection_order.len());
     node.set_skip_nulls(skip_nulls);
 
     for prisma_name in selection_order {
-        match field_map.get(prisma_name.as_str()) {
+        match find_selection(field_selection, prisma_name) {
             Some(SelectedField::Scalar(field)) => {
                 node.add_field(
                     field.name().to_owned(),
@@ -159,14 +146,13 @@ fn get_result_node(
             }
             Some(SelectedField::Composite(_)) => todo!("MongoDB specific"),
             Some(SelectedField::Relation(f)) => {
-                let nested_selection = FieldSelection::new(f.selections.to_vec());
                 let original_name = if uses_relation_joins {
                     f.field.name().to_owned().into()
                 } else {
                     binding::nested_relation_field(&f.field)
                 };
                 let nested_node = get_result_node()
-                    .field_selection(&nested_selection)
+                    .field_selection(&f.selections)
                     .selection_order(&f.result_fields)
                     .builder(builder)
                     .original_name(original_name)
@@ -179,10 +165,10 @@ fn get_result_node(
                 }
             }
             Some(SelectedField::Virtual(f)) => {
-                for vs in grouped_virtuals
-                    .get(f.serialized_group_name())
-                    .map(Vec::as_slice)
-                    .unwrap_or_default()
+                for vs in field_selection
+                    .iter()
+                    .filter_map(SelectedField::as_virtual)
+                    .filter(|vs| vs.serialized_group_name() == f.serialized_group_name())
                 {
                     let (group_name, field_name) = vs.serialized_name();
                     let db_name = if uses_relation_joins {
@@ -196,7 +182,7 @@ fn get_result_node(
                 }
             }
             None => {
-                if let Some(q) = nested_map.get(prisma_name.as_str()) {
+                if let Some(q) = nested_queries.iter().find(|q| q.get_alias_or_name() == prisma_name) {
                     let nested_node = map_read_query(
                         q,
                         builder,
@@ -215,6 +201,12 @@ fn get_result_node(
     }
 
     Some(node.build())
+}
+
+fn find_selection<'a>(field_selection: &'a [SelectedField], prisma_name: &str) -> Option<&'a SelectedField> {
+    field_selection
+        .iter()
+        .find(|field| field.prisma_name_grouping_virtuals() == prisma_name)
 }
 
 fn get_scalar_field_result_node(
@@ -290,7 +282,7 @@ fn get_result_node_for_aggregation(
         }
     }
 
-    let mut node = ResultNodeBuilder::new_object(object_name);
+    let mut node = ResultNodeBuilder::new_object_with_capacity(object_name, ordered_set.len());
 
     for (name, prefix, db_alias, typ) in selectors
         .iter()
@@ -319,10 +311,12 @@ fn get_result_node_for_create_many(
     selected_fields: Option<&CreateManyRecordsFields>,
     builder: &mut ResultNodeBuilder,
 ) -> Option<ResultNode> {
+    let selected_fields = selected_fields?;
+
     get_result_node()
-        .field_selection(&selected_fields?.fields)
-        .selection_order(&selected_fields?.order)
-        .nested_queries(&selected_fields?.nested)
+        .field_selection(selected_fields.fields.as_slice())
+        .selection_order(&selected_fields.order)
+        .nested_queries(&selected_fields.nested)
         .builder(builder)
         .call()
 }
@@ -331,9 +325,11 @@ fn get_result_node_for_delete(
     selected_fields: Option<&DeleteRecordFields>,
     builder: &mut ResultNodeBuilder,
 ) -> Option<ResultNode> {
+    let selected_fields = selected_fields?;
+
     get_result_node()
-        .field_selection(&selected_fields?.fields)
-        .selection_order(&selected_fields?.order)
+        .field_selection(selected_fields.fields.as_slice())
+        .selection_order(&selected_fields.order)
         .builder(builder)
         .call()
 }
@@ -342,20 +338,40 @@ fn get_result_node_for_update_many(
     selected_fields: Option<&UpdateManyRecordsFields>,
     builder: &mut ResultNodeBuilder,
 ) -> Option<ResultNode> {
+    let selected_fields = selected_fields?;
+
     get_result_node()
-        .field_selection(&selected_fields?.fields)
-        .selection_order(&selected_fields?.order)
-        .nested_queries(&selected_fields?.nested)
+        .field_selection(selected_fields.fields.as_slice())
+        .selection_order(&selected_fields.order)
+        .nested_queries(&selected_fields.nested)
         .builder(builder)
         .call()
 }
 
-#[derive(Debug, Serialize)]
-#[serde(rename_all = "camelCase")]
+#[derive(Debug)]
 pub struct FieldType {
     arity: Arity,
-    #[serde(flatten)]
     r#type: FieldScalarType,
+}
+
+impl Serialize for FieldType {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        if self.arity.is_not_list() {
+            if let Some(name) = self.r#type.compact_name() {
+                return serializer.serialize_str(name);
+            }
+        }
+
+        let mut state = serializer.serialize_struct("FieldType", 3)?;
+        if !self.arity.is_not_list() {
+            state.serialize_field("arity", &self.arity)?;
+        }
+        self.r#type.serialize_fields(&mut state)?;
+        state.end()
+    }
 }
 
 impl FieldType {
@@ -363,6 +379,14 @@ impl FieldType {
         Self {
             arity: arity.into(),
             r#type: r#type.into(),
+        }
+    }
+
+    pub fn compact_name(&self) -> Option<&'static str> {
+        if self.arity.is_not_list() {
+            self.r#type.compact_name()
+        } else {
+            None
         }
     }
 }
@@ -432,6 +456,54 @@ impl fmt::Display for FieldScalarType {
     }
 }
 
+impl FieldScalarType {
+    fn compact_name(&self) -> Option<&'static str> {
+        match self {
+            Self::String => Some("s"),
+            Self::Int => Some("i"),
+            Self::BigInt => Some("I"),
+            Self::Float => Some("f"),
+            Self::Decimal => Some("d"),
+            Self::Boolean => Some("b"),
+            Self::Json => Some("j"),
+            Self::Object => Some("o"),
+            Self::DateTime => Some("D"),
+            Self::Unsupported => Some("x"),
+            Self::Enum { .. } | Self::Extension { .. } | Self::Bytes { .. } => None,
+        }
+    }
+
+    fn serialize_fields<S>(&self, state: &mut S) -> Result<(), S::Error>
+    where
+        S: SerializeStruct,
+    {
+        match self {
+            Self::String => state.serialize_field("type", "s"),
+            Self::Int => state.serialize_field("type", "i"),
+            Self::BigInt => state.serialize_field("type", "I"),
+            Self::Float => state.serialize_field("type", "f"),
+            Self::Decimal => state.serialize_field("type", "d"),
+            Self::Boolean => state.serialize_field("type", "b"),
+            Self::Enum { name } => {
+                state.serialize_field("type", "enum")?;
+                state.serialize_field("name", name)
+            }
+            Self::Extension { name } => {
+                state.serialize_field("type", "extension")?;
+                state.serialize_field("name", name)
+            }
+            Self::Json => state.serialize_field("type", "j"),
+            Self::Object => state.serialize_field("type", "o"),
+            Self::DateTime => state.serialize_field("type", "D"),
+            Self::Bytes { encoding } => {
+                state.serialize_field("type", "bytes")?;
+                state.serialize_field("encoding", encoding)
+            }
+            Self::Unsupported => state.serialize_field("type", "x"),
+        }
+    }
+}
+
 impl From<&Type> for FieldScalarType {
     fn from(typ: &Type) -> Self {
         match typ.id {
@@ -479,6 +551,12 @@ pub enum Arity {
     Required,
     Optional,
     List,
+}
+
+impl Arity {
+    fn is_not_list(&self) -> bool {
+        !matches!(self, Self::List)
+    }
 }
 
 impl From<FieldArity> for Arity {
