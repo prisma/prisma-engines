@@ -163,6 +163,24 @@ mod postgres_money {
 
         Ok(())
     }
+
+    #[connector_test(schema(schema_decimal))]
+    async fn native_money_aggregates(runner: Runner) -> TestResult<()> {
+        runner
+            .raw_execute(
+                r#"INSERT INTO "Table" ("id", "money", "moneyList") VALUES
+                    (1, '$10.25', ARRAY[]::money[]),
+                    (2, '$20.75', ARRAY[]::money[]);"#,
+            )
+            .await?;
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"{ aggregateTable { _sum { money } _avg { money } } }"#),
+          @r###"{"data":{"aggregateTable":{"_sum":{"money":"31"},"_avg":{"money":"15.5"}}}}"###
+        );
+
+        Ok(())
+    }
 }
 
 #[test_suite(only(Postgres))]

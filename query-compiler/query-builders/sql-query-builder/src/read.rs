@@ -242,7 +242,8 @@ fn apply_aggregate_selections(
                     .field
                     .as_scalar()
                     .unwrap()
-                    .as_column_with_style(ctx, col_style))
+                    .as_column_with_style(ctx, col_style)
+                    .set_is_selected(true))
                 .alias(next_field.db_alias().into_owned()),
             )
         }),
@@ -253,7 +254,8 @@ fn apply_aggregate_selections(
                     .field
                     .as_scalar()
                     .unwrap()
-                    .as_column_with_style(ctx, col_style))
+                    .as_column_with_style(ctx, col_style)
+                    .set_is_selected(true))
                 .alias(next_field.db_alias().into_owned()),
             )
         }),
