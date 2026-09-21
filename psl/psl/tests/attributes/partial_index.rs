@@ -166,11 +166,35 @@ fn partial_index_raw_requires_string_argument() {
 
     let err = parse_unwrap_err(&with_header(dml, Provider::Postgres, &["partialIndexes"]));
     let expected = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@unique": The `where` argument must be a raw() function with a string argument, e.g. `where: raw("status = 'active'")`.[0m
+        [1;91merror[0m: [1mError parsing attribute "@unique": The `where` argument must be a raw() function with exactly one string argument, e.g. `where: raw("status = 'active'")`.[0m
           [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
         [1;94m14 | [0m
         [1;94m15 | [0m    [1;91m@@unique([email], where: raw())[0m
+        [1;94m   | [0m
+    "#]];
+    expected.assert_eq(&err);
+}
+
+#[test]
+fn partial_index_raw_rejects_multiple_arguments() {
+    let dml = indoc! {r#"
+        model User {
+            id        Int    @id
+            email     String
+            status    String
+
+            @@unique([email], where: raw("status = 'active'", "email IS NOT NULL"))
+        }
+    "#};
+
+    let err = parse_unwrap_err(&with_header(dml, Provider::Postgres, &["partialIndexes"]));
+    let expected = expect![[r#"
+        [1;91merror[0m: [1mError parsing attribute "@unique": The `where` argument must be a raw() function with exactly one string argument, e.g. `where: raw("status = 'active'")`.[0m
+          [1;94m-->[0m  [4mschema.prisma:15[0m
+        [1;94m   | [0m
+        [1;94m14 | [0m
+        [1;94m15 | [0m    [1;91m@@unique([email], where: raw("status = 'active'", "email IS NOT NULL"))[0m
         [1;94m   | [0m
     "#]];
     expected.assert_eq(&err);
