@@ -65,11 +65,29 @@ impl FieldSelection {
     }
 
     pub fn into_virtuals_last(self) -> Self {
-        let (virtuals, non_virtuals): (Vec<_>, Vec<_>) = self
-            .into_iter()
-            .partition(|field| matches!(field, SelectedField::Virtual(_)));
+        let virtual_count = self
+            .selections
+            .iter()
+            .filter(|field| matches!(field, SelectedField::Virtual(_)))
+            .count();
 
-        FieldSelection::new(non_virtuals.into_iter().chain(virtuals).collect())
+        if virtual_count == 0 {
+            return self;
+        }
+
+        let mut non_virtuals = Vec::with_capacity(self.selections.len());
+        let mut virtuals = Vec::with_capacity(virtual_count);
+
+        for field in self.selections {
+            if matches!(field, SelectedField::Virtual(_)) {
+                virtuals.push(field);
+            } else {
+                non_virtuals.push(field);
+            }
+        }
+
+        non_virtuals.extend(virtuals);
+        FieldSelection::new(non_virtuals)
     }
 
     pub fn to_virtuals_last(&self) -> Self {
