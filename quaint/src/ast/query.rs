@@ -1,8 +1,6 @@
 use crate::ast::{Delete, Insert, Merge, Select, Union, Update};
 use std::borrow::Cow;
 
-use super::IntoCommonTableExpression;
-
 /// A database query
 #[derive(Debug, PartialEq)]
 pub enum Query<'a> {
@@ -107,5 +105,3 @@ impl<'a> From<SelectQuery<'a>> for Query<'a> {
         }
     }
 }
-
-impl<'a> IntoCommonTableExpression<'a> for SelectQuery<'a> {}

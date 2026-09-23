@@ -1,6 +1,6 @@
 use std::borrow::Cow;
 
-use super::SelectQuery;
+use super::{Insert, Select, SelectQuery, Union};
 
 /// A builder for a common table expression (CTE) statement, to be used in the
 /// `WITH` block of a `SELECT` statement.
@@ -12,7 +12,13 @@ use super::SelectQuery;
 pub struct CommonTableExpression<'a> {
     pub(crate) identifier: Cow<'a, str>,
     pub(crate) columns: Vec<Cow<'a, str>>,
-    pub(crate) selection: SelectQuery<'a>,
+    pub(crate) body: CommonTableExpressionBody<'a>,
+}
+
+#[derive(Debug, PartialEq, Clone)]
+pub(crate) enum CommonTableExpressionBody<'a> {
+    Selection(SelectQuery<'a>),
+    Insert(Insert<'a>),
 }
 
 impl<'a> CommonTableExpression<'a> {
@@ -30,14 +36,40 @@ impl<'a> CommonTableExpression<'a> {
 ///
 /// [`Select#with`]: struct.Select.html#method.with
 pub trait IntoCommonTableExpression<'a> {
-    fn into_cte(self, identifier: impl Into<Cow<'a, str>>) -> CommonTableExpression<'a>
-    where
-        Self: Into<SelectQuery<'a>>,
-    {
-        CommonTableExpression {
-            identifier: identifier.into(),
-            columns: Vec::new(),
-            selection: self.into(),
-        }
+    fn into_cte(self, identifier: impl Into<Cow<'a, str>>) -> CommonTableExpression<'a>;
+}
+
+fn common_table_expression<'a>(
+    identifier: impl Into<Cow<'a, str>>,
+    body: CommonTableExpressionBody<'a>,
+) -> CommonTableExpression<'a> {
+    CommonTableExpression {
+        identifier: identifier.into(),
+        columns: Vec::new(),
+        body,
+    }
+}
+
+impl<'a> IntoCommonTableExpression<'a> for Select<'a> {
+    fn into_cte(self, identifier: impl Into<Cow<'a, str>>) -> CommonTableExpression<'a> {
+        common_table_expression(identifier, CommonTableExpressionBody::Selection(self.into()))
+    }
+}
+
+impl<'a> IntoCommonTableExpression<'a> for Union<'a> {
+    fn into_cte(self, identifier: impl Into<Cow<'a, str>>) -> CommonTableExpression<'a> {
+        common_table_expression(identifier, CommonTableExpressionBody::Selection(self.into()))
+    }
+}
+
+impl<'a> IntoCommonTableExpression<'a> for SelectQuery<'a> {
+    fn into_cte(self, identifier: impl Into<Cow<'a, str>>) -> CommonTableExpression<'a> {
+        common_table_expression(identifier, CommonTableExpressionBody::Selection(self))
+    }
+}
+
+impl<'a> IntoCommonTableExpression<'a> for Insert<'a> {
+    fn into_cte(self, identifier: impl Into<Cow<'a, str>>) -> CommonTableExpression<'a> {
+        common_table_expression(identifier, CommonTableExpressionBody::Insert(self))
     }
 }
