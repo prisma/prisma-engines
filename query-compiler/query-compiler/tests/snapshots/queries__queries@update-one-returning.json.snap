@@ -7,7 +7,7 @@ dataMap {
     email: String (email)
 }
 let 0 = unique (query «UPDATE "public"."User" SET "email" = $1 WHERE
-                       ("public"."User"."email" = $2 AND 1=1) RETURNING
+                       "public"."User"."email" = $2 RETURNING
                        "public"."User"."id", "public"."User"."email"»
                 params [const(String("user.2737556028164@prisma.io")),
                         const(String("user.1737556028164@prisma.io"))])

@@ -16,8 +16,8 @@ enums {
 }
 unique (query «INSERT INTO "public"."User" ("email","role") VALUES
                ($1,CAST($2::text AS "public"."Role")) ON CONFLICT ("email") DO
-               UPDATE SET "email" = $3 WHERE ("public"."User"."email" = $4 AND
-               1=1) RETURNING "public"."User"."id", "public"."User"."email",
+               UPDATE SET "email" = $3 WHERE "public"."User"."email" = $4
+               RETURNING "public"."User"."id", "public"."User"."email",
                "public"."User"."role"::text»
         params [const(String("user.1@prisma.io")), const(String("user")),
                 const(String("user.2@prisma.io")),

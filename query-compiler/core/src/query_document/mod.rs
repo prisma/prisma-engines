@@ -30,7 +30,7 @@ pub(crate) use parser::*;
 
 use crate::{
     query_ast::{QueryOption, QueryOptions},
-    query_graph_builder::resolve_compound_field,
+    query_graph_builder::is_compound_field,
 };
 use itertools::Itertools;
 use query_structure::Model;
@@ -91,7 +91,7 @@ impl BatchDocument {
 
         where_obj.iter().any(|(key, val)| match val {
             // If it's a compound, then it's still considered as scalar
-            ArgumentValue::Object(_) if resolve_compound_field(key, &model).is_some() => false,
+            ArgumentValue::Object(_) if is_compound_field(key, &model) => false,
             // Otherwise, we just look for a scalar field inside the model. If it's not one, then we break.
             val => match model.fields().find_from_scalar(key) {
                 Ok(sf) => match val {
@@ -319,7 +319,7 @@ fn extract_filter(where_obj: ArgumentValueObject, model: &Model) -> Vec<Selectio
         .into_iter()
         .flat_map(|(key, val)| match val {
             // This means our query has a compound field in the form of: {co1_col2: { col1_col2: { col1: <val>, col2: <val> } }}
-            ArgumentValue::Object(obj) if resolve_compound_field(&key, model).is_some() => obj.into_iter().collect(),
+            ArgumentValue::Object(obj) if is_compound_field(&key, model) => obj.into_iter().collect(),
             // This means our query has a scalar filter in the form of {col1: { equals: <val> }}
             ArgumentValue::Object(obj) => {
                 // This is safe because it's been validated before in the `.can_compact` method.

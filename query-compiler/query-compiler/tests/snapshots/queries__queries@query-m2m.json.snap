@@ -14,8 +14,8 @@ dataMap {
 }
 let @parent = unique (query «SELECT "public"."Post"."id",
                              "public"."Post"."title", "public"."Post"."userId"
-                             FROM "public"."Post" WHERE ("public"."Post"."id" =
-                             $1 AND 1=1) LIMIT $2 OFFSET $3»
+                             FROM "public"."Post" WHERE "public"."Post"."id" =
+                             $1 LIMIT $2 OFFSET $3»
                       params [const(BigInt(1)), const(BigInt(1)),
                               const(BigInt(0))])
 in let @parent$id = mapField id (get @parent)

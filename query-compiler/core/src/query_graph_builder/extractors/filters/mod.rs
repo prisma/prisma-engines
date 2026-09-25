@@ -18,6 +18,16 @@ use std::{borrow::Cow, collections::HashMap, convert::TryInto, str::FromStr};
 
 /// Extracts a filter for a unique selector, i.e. a filter that selects exactly one record.
 pub fn extract_unique_filter(value_map: ParsedInputMap<'_>, model: &Model) -> QueryGraphBuilderResult<Filter> {
+    if value_map.iter().all(|(field_name, _)| {
+        model
+            .fields()
+            .find_from_scalar(field_name)
+            .is_ok_and(|field| field.unique())
+            || utils::is_compound_field(field_name, model)
+    }) {
+        return internal_extract_unique_filter(value_map, model);
+    }
+
     let tag = value_map.tag.clone();
     // Partition the input into a map containing only the unique fields and one containing all the other filters
     // so that we can parse them separately and ensure we AND both filters
@@ -26,7 +36,7 @@ pub fn extract_unique_filter(value_map: ParsedInputMap<'_>, model: &Model) -> Qu
             .into_iter()
             .partition(|(field_name, _)| match model.fields().find_from_scalar(field_name) {
                 Ok(field) => field.unique(),
-                Err(_) => utils::resolve_compound_field(field_name, model).is_some(),
+                Err(_) => utils::is_compound_field(field_name, model),
             });
     let mut unique_map = ParsedInputMap::from(unique_map);
     let mut rest_map = ParsedInputMap::from(rest_map);
@@ -42,29 +52,48 @@ pub fn extract_unique_filter(value_map: ParsedInputMap<'_>, model: &Model) -> Qu
 /// Extracts a filter for a unique selector, i.e. a filter that selects exactly one record.
 /// The input map must only contain unique & compound unique fields.
 fn internal_extract_unique_filter(value_map: ParsedInputMap<'_>, model: &Model) -> QueryGraphBuilderResult<Filter> {
-    let filters = value_map
-        .into_iter()
-        .map(|(field_name, value): (Cow<'_, str>, ParsedInputValue<'_>)| {
-            // Always try to resolve regular fields first. If that fails, try to resolve compound fields.
-            match model.fields().find_from_scalar(&field_name) {
-                Ok(field) => {
-                    let value: PrismaValue = value.try_into()?;
-                    Ok(field.equals(value))
-                }
-                Err(_) => utils::resolve_compound_field(&field_name, model)
-                    .ok_or_else(|| {
-                        QueryGraphBuilderError::AssertionError(format!(
-                            "Unable to resolve field {} to a field or set of scalar fields on model {}",
-                            field_name,
-                            model.name()
-                        ))
-                    })
-                    .and_then(|fields| handle_compound_field(fields, value)),
-            }
-        })
-        .collect::<QueryGraphBuilderResult<Vec<Filter>>>()?;
+    let mut input = value_map.into_iter();
+    let Some((field_name, value)) = input.next() else {
+        return Ok(Filter::And(Vec::new()));
+    };
+
+    let first = extract_unique_filter_field(field_name, value, model)?;
+
+    if input.len() == 0 {
+        return Ok(first);
+    }
+
+    let mut filters = Vec::with_capacity(input.len() + 1);
+    filters.push(first);
+
+    for (field_name, value) in input {
+        filters.push(extract_unique_filter_field(field_name, value, model)?);
+    }
 
     Ok(Filter::and(filters))
+}
+
+fn extract_unique_filter_field(
+    field_name: Cow<'_, str>,
+    value: ParsedInputValue<'_>,
+    model: &Model,
+) -> QueryGraphBuilderResult<Filter> {
+    // Always try to resolve regular fields first. If that fails, try to resolve compound fields.
+    match model.fields().find_from_scalar(&field_name) {
+        Ok(field) => {
+            let value: PrismaValue = value.try_into()?;
+            Ok(field.equals(value))
+        }
+        Err(_) => utils::resolve_compound_field(&field_name, model)
+            .ok_or_else(|| {
+                QueryGraphBuilderError::AssertionError(format!(
+                    "Unable to resolve field {} to a field or set of scalar fields on model {}",
+                    field_name,
+                    model.name()
+                ))
+            })
+            .and_then(|fields| handle_compound_field(fields, value)),
+    }
 }
 
 fn handle_compound_field(fields: Vec<ScalarFieldRef>, value: ParsedInputValue<'_>) -> QueryGraphBuilderResult<Filter> {
@@ -199,6 +228,10 @@ where
 /// 3. We reconstruct the filter tree and merge the search filters that have the same query along the way
 ///    eg: `Filter(And([SearchFilter("query", [FieldA]), SearchFilter("query", [FieldB])]))` -> `Filter(And([SearchFilter("query", [FieldA, FieldB])]))`
 fn merge_search_filters(filter: Filter) -> Filter {
+    if matches!(filter, Filter::And(_) | Filter::Or(_) | Filter::Not(_)) && !contains_search_filter(&filter) {
+        return filter;
+    }
+
     // The filter tree _needs_ to be flattened for the merge to work properly
     let flattened = fold_filter(filter);
 
@@ -210,10 +243,23 @@ fn merge_search_filters(filter: Filter) -> Filter {
     }
 }
 
+fn contains_search_filter(filter: &Filter) -> bool {
+    match filter {
+        Filter::Scalar(sf) => matches!(
+            sf.condition,
+            ScalarCondition::Search(..) | ScalarCondition::NotSearch(..)
+        ),
+        Filter::And(filters) | Filter::Or(filters) | Filter::Not(filters) => {
+            filters.iter().any(contains_search_filter)
+        }
+        _ => false,
+    }
+}
+
 fn fold_search_filters(filters: &[Filter]) -> Vec<Filter> {
     let mut filters_by_val: HashMap<PrismaValue, &Filter> = HashMap::new();
     let mut projections_by_val: HashMap<PrismaValue, Vec<ScalarProjection>> = HashMap::new();
-    let mut output: Vec<Filter> = vec![];
+    let mut output: Vec<Filter> = Vec::with_capacity(filters.len());
 
     // Gather search filters that have the same condition
     for filter in filters.iter() {

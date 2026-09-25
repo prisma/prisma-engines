@@ -22,8 +22,7 @@ transaction
    }
    let 0 = unique (query «SELECT "public"."User"."id", "public"."User"."email",
                           "public"."User"."role"::text FROM "public"."User"
-                          WHERE ("public"."User"."email" = $1 AND 1=1) LIMIT $2
-                          OFFSET $3»
+                          WHERE "public"."User"."email" = $1 LIMIT $2 OFFSET $3»
                    params [const(String("user.1737556028164@prisma.io")),
                            const(BigInt(1)), const(BigInt(0))])
    in let 0$id = mapField id (get 0)
@@ -32,8 +31,8 @@ transaction
                         "public"."Post"."userId" IN [$1,*]) OFFSET $2»
                  params [var(0$id as Int), const(BigInt(0))]
          in let 2 = query «SELECT "public"."Post"."id" FROM "public"."Post"
-                           WHERE (("public"."Post"."id" = $1 AND 1=1) OR
-                           ("public"."Post"."id" = $2 AND 1=1)) OFFSET $3»
+                           WHERE ("public"."Post"."id" = $1 OR
+                           "public"."Post"."id" = $2) OFFSET $3»
                     params [const(BigInt(11)), const(BigInt(12)),
                             const(BigInt(0))]
             in let 3 = diff (get 2) (get 1)

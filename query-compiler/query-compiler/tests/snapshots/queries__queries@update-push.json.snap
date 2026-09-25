@@ -10,7 +10,7 @@ dataMap {
 }
 let 0 = unique (query «UPDATE "public"."DataTypes" SET "intArray" =
                        "public"."DataTypes"."intArray" || $1 WHERE
-                       ("public"."DataTypes"."id" = $2 AND 1=1) RETURNING
+                       "public"."DataTypes"."id" = $2 RETURNING
                        "public"."DataTypes"."id",
                        "public"."DataTypes"."optString",
                        "public"."DataTypes"."intArray"»

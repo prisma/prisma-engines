@@ -30,9 +30,8 @@ transaction
           ] orRaise "MISSING_RELATED_RECORD");
           0$id = mapField id (get 0)
       in let 1 = execute «UPDATE "public"."Post" SET "userId" = $1 WHERE
-                          (("public"."Post"."id" = $2 AND 1=1) OR
-                          ("public"."Post"."id" = $3 AND 1=1) OR
-                          ("public"."Post"."id" = $4 AND 1=1))»
+                          ("public"."Post"."id" = $2 OR "public"."Post"."id" =
+                          $3 OR "public"."Post"."id" = $4)»
                  params [var(0$id as Int), const(BigInt(8)), const(BigInt(9)),
                          const(BigInt(10))]
          in validate (get 1)
