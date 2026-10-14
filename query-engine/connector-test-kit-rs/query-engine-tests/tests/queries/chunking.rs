@@ -202,6 +202,59 @@ mod chunking {
         Ok(())
     }
 
+    // Chunked IN queries are ordered in memory, so fields that are only used for ordering must be
+    // fetched as well, even when they are not part of the selection.
+    // see https://github.com/prisma/prisma/issues/24152
+    // TODO(joins): Excluded because we have no support for chunked queries with joins.
+    #[connector_test(exclude_features("relationJoins"))]
+    async fn in_ordering_by_unselected_field(runner: Runner) -> TestResult<()> {
+        create_test_data(&runner).await?;
+
+        insta::assert_snapshot!(
+          run_query!(&runner, indoc! { r#"
+            query {
+              findManyA(where: { id: { in: [5,4,3,2,1,1,1,2,3,4,5,6,7,6,5,4,3,2,1,2,3,4,5,6] }}, orderBy: [{ b_id: desc }, { id: asc }]) { id }
+            }"# }),
+          @r###"{"data":{"findManyA":[{"id":5},{"id":4},{"id":3},{"id":1},{"id":2}]}}"###
+        );
+
+        Ok(())
+    }
+
+    // Same as above, for a relation whose `WHERE IN (parent_ids)` query gets chunked.
+    // see https://github.com/prisma/prisma/issues/24152
+    // TODO(joins): Excluded because we have no support for chunked queries with joins.
+    #[connector_test(exclude_features("relationJoins"))]
+    async fn nested_ordering_by_unselected_field(runner: Runner) -> TestResult<()> {
+        // 12 Bs, so that fetching their As exceeds the chunk size. Each B has two As, and the
+        // A with the higher id also has the higher c_id.
+        for b_id in 1..=12 {
+            let (a_low, a_high) = (b_id * 2 - 1, b_id * 2);
+            create_a(
+                &runner,
+                &format!(
+                    r#"{{ id: {a_low}, text: "", b: {{ create: {{ id: {b_id} }}}} c: {{ create: {{ id: {a_low} }}}} }}"#
+                ),
+            )
+            .await?;
+            create_a(
+                &runner,
+                &format!(r#"{{ id: {a_high}, text: "", b: {{ connect: {{ id: {b_id} }}}} c: {{ create: {{ id: {a_high} }}}} }}"#),
+            )
+            .await?;
+        }
+
+        insta::assert_snapshot!(
+          run_query!(&runner, indoc! { r#"
+            query {
+              findManyB(orderBy: { id: asc }) { id, as(orderBy: { c_id: desc }, take: 1) { id } }
+            }"# }),
+          @r###"{"data":{"findManyB":[{"id":1,"as":[{"id":2}]},{"id":2,"as":[{"id":4}]},{"id":3,"as":[{"id":6}]},{"id":4,"as":[{"id":8}]},{"id":5,"as":[{"id":10}]},{"id":6,"as":[{"id":12}]},{"id":7,"as":[{"id":14}]},{"id":8,"as":[{"id":16}]},{"id":9,"as":[{"id":18}]},{"id":10,"as":[{"id":20}]},{"id":11,"as":[{"id":22}]},{"id":12,"as":[{"id":24}]}]}}"###
+        );
+
+        Ok(())
+    }
+
     #[connector_test(exclude(MongoDb, Sqlite("cfd1")))]
     async fn order_by_aggregation_should_fail(runner: Runner) -> TestResult<()> {
         create_test_data(&runner).await?;
