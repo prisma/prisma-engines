@@ -232,32 +232,58 @@ async fn get_many_records_wo_joins(
             // We don't need to order in the database due to us ordering in this function.
             let order = std::mem::take(&mut query_arguments.order_by);
 
+            // Since the ordering happens in memory, the fetched rows must also contain the fields
+            // that are only used for ordering. They are removed again after ordering.
+            // See https://github.com/prisma/prisma/issues/24152
+            let order_only_fields: Vec<SelectedField> = order
+                .iter()
+                .filter_map(|order_by| match order_by {
+                    OrderBy::Scalar(by_scalar)
+                        if by_scalar.path.is_empty() && !selected_fields.contains(by_scalar.field.name()) =>
+                    {
+                        Some(SelectedField::from(by_scalar.field.clone()))
+                    }
+                    _ => None,
+                })
+                .collect();
+
+            let fetched_fields = selected_fields
+                .clone()
+                .merge(FieldSelection::new(order_only_fields))
+                .into_virtuals_last();
+            let fetched_field_names: Vec<_> = fetched_fields.db_names().collect();
+            let fetched_idents = fetched_fields.type_identifiers_with_arities();
+            let fetched_meta = column_metadata::create(fetched_field_names.as_slice(), fetched_idents.as_slice());
+            let mut fetched_records = ManyRecords::new(fetched_field_names.clone());
+
             let batches = query_arguments.batched(chunk_size);
             let mut futures = FuturesUnordered::new();
 
             for args in batches.into_iter() {
                 let query = read::get_records(
                     model,
-                    ModelProjection::from(&selected_fields)
+                    ModelProjection::from(&fetched_fields)
                         .as_columns(ctx)
                         .mark_all_selected(),
-                    selected_fields.virtuals(),
+                    fetched_fields.virtuals(),
                     args,
                     ctx,
                 );
 
-                futures.push(conn.filter(query.into(), meta.as_slice(), ctx));
+                futures.push(conn.filter(query.into(), fetched_meta.as_slice(), ctx));
             }
 
             while let Some(result) = futures.next().await {
                 for item in result?.into_iter() {
-                    records.push(Record::from(item))
+                    fetched_records.push(Record::from(item))
                 }
             }
 
             if !order.is_empty() {
-                records.order_by(&order, reversed)
+                fetched_records.order_by(&order, reversed)
             }
+
+            records.records = project_records(fetched_records, &records.field_names);
         }
         _ => {
             let query = read::get_records(
@@ -281,6 +307,33 @@ async fn get_many_records_wo_joins(
     }
 
     Ok(records)
+}
+
+/// Keeps only the values of `field_names` (in that order) from each of the given records.
+fn project_records(records: ManyRecords, field_names: &[String]) -> Vec<Record> {
+    if records.field_names == field_names {
+        return records.records;
+    }
+
+    let indices: Vec<usize> = field_names
+        .iter()
+        .map(|name| {
+            records
+                .field_names
+                .iter()
+                .position(|fetched| fetched == name)
+                .expect("every selected field is fetched")
+        })
+        .collect();
+
+    records
+        .records
+        .into_iter()
+        .map(|record| Record {
+            values: indices.iter().map(|&i| record.values[i].clone()).collect(),
+            parent_id: record.parent_id,
+        })
+        .collect()
 }
 
 pub(crate) async fn get_related_m2m_record_ids(
