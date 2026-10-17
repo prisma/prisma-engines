@@ -1,0 +1,27 @@
+---
+source: query-compiler/query-compiler/tests/queries.rs
+expression: pretty
+input_file: query-compiler/query-compiler/tests/data/relation-mode-prisma/update-many-restrict.json
+---
+transaction
+   dataMap affectedRows
+   let 0 = query «SELECT "public"."Warehouse"."id", "public"."Warehouse"."code"
+                  FROM "public"."Warehouse" WHERE "public"."Warehouse"."code" =
+                  $1 OFFSET $2»
+           params [const(String("old")), const(BigInt(0))]
+   in let 0$id = mapField id (get 0);
+          0$code = mapField code (get 0)
+      in let 3 = query «SELECT "public"."Bin"."id",
+                        "public"."Bin"."warehouseCode" FROM "public"."Bin" WHERE
+                        (1=1 AND "public"."Bin"."warehouseCode" IN [$1,*])
+                        OFFSET $2»
+                 params [var(0$code as String), const(BigInt(0))]
+         in let 3 = validate (get 3)
+                [ rowCountEq 0
+                ] orRaise "RELATION_VIOLATION"
+            in let 0$id = mapField id (get 0)
+               in execute «UPDATE "public"."Warehouse" SET "code" = $1 WHERE
+                           ("public"."Warehouse"."id" IN [$2,*] AND
+                           "public"."Warehouse"."code" = $3)»
+                  params [const(String("new")), var(0$id as Int),
+                          const(String("old"))]

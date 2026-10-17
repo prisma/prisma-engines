@@ -1,0 +1,51 @@
+generator client {
+  provider = "prisma-client"
+}
+
+datasource db {
+  provider     = "postgresql"
+  relationMode = "prisma"
+}
+
+model Product {
+  id     Int     @id @default(autoincrement())
+  sku    String  @unique
+  stock  Int
+  orders Order[]
+}
+
+model Order {
+  id         Int     @id @default(autoincrement())
+  productSku String
+  product    Product @relation(fields: [productSku], references: [sku], onUpdate: Cascade)
+
+  @@index([productSku])
+}
+
+model Warehouse {
+  id   Int    @id @default(autoincrement())
+  code String @unique
+  bins Bin[]
+}
+
+model Bin {
+  id            Int       @id @default(autoincrement())
+  warehouseCode String
+  warehouse     Warehouse @relation(fields: [warehouseCode], references: [code], onUpdate: Restrict)
+
+  @@index([warehouseCode])
+}
+
+model Supplier {
+  id       Int       @id @default(autoincrement())
+  code     String    @unique
+  contacts Contact[]
+}
+
+model Contact {
+  id           Int       @id @default(autoincrement())
+  supplierCode String?
+  supplier     Supplier? @relation(fields: [supplierCode], references: [code], onUpdate: SetNull)
+
+  @@index([supplierCode])
+}

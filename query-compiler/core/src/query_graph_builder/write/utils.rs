@@ -980,6 +980,21 @@ pub fn insert_emulated_on_update(
     Ok(())
 }
 
+/// Returns `true` if the emulated `onUpdate` actions for an update with `update_args` write to related
+/// records, i.e. the update changes fields referenced by a relation with `Cascade` or `SetNull`.
+/// This has to match the checks in `emulate_on_update_cascade` and `emulate_on_update_set_null`.
+pub(crate) fn emulated_on_update_writes(model: &Model, update_args: &WriteArgs) -> bool {
+    model.dm.fields_pointing_to_model(model).any(|rf| {
+        matches!(
+            rf.relation().on_update(),
+            ReferentialAction::Cascade | ReferentialAction::SetNull
+        ) && rf
+            .referenced_fields()
+            .into_iter()
+            .any(|field| update_args.get_field_value(field.db_name()).is_some())
+    })
+}
+
 fn extract_update_args(parent_node: &Node) -> &WriteArgs {
     if let Node::Query(Query::Write(q)) = parent_node {
         match q {

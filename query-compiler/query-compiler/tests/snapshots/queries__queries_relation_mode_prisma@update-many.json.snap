@@ -1,0 +1,19 @@
+---
+source: query-compiler/query-compiler/tests/queries.rs
+expression: pretty
+input_file: query-compiler/query-compiler/tests/data/relation-mode-prisma/update-many.json
+---
+transaction
+   dataMap affectedRows
+   let 0 = query «SELECT "public"."Product"."id" FROM "public"."Product" WHERE
+                  ("public"."Product"."id" = $1 AND "public"."Product"."stock" >
+                  $2) OFFSET $3»
+           params [const(BigInt(1)), const(BigInt(0)), const(BigInt(0))]
+   in let 0$id = mapField id (get 0)
+      in execute «UPDATE "public"."Product" SET "stock" =
+                  ("public"."Product"."stock" - $1) WHERE
+                  ("public"."Product"."id" IN [$2,*] AND
+                  ("public"."Product"."id" = $3 AND "public"."Product"."stock" >
+                  $4))»
+         params [const(BigInt(1)), var(0$id as Int), const(BigInt(1)),
+                 const(BigInt(0))]

@@ -112,24 +112,29 @@ mod occ {
         assert_eq!(booked_user_id, found_booked_user_id);
     }
 
-    // On PlanetScale, this fails with:
-    // ```
-    // assertion `left == right` failed
-    // left: 6
-    // right: 1
-    // ```
-    //
     // On D1, this fails with:
     // ```
     // assertion `left == right` failed
     // left: 3
     // right: 1
     // ```
+    #[connector_test(schema(occ_simple), exclude(MongoDB, CockroachDb, Sqlite("cfd1")))]
+    async fn occ_update_many_test(runner: Runner) -> TestResult<()> {
+        repeat_occ_reproduce_test(runner).await
+    }
+
+    // With emulated relations, `updateMany` reads the matching ids before the UPDATE, so the UPDATE
+    // has to apply the filter again. D1 is excluded as above.
     #[connector_test(
         schema(occ_simple),
-        exclude(MongoDB, CockroachDb, Vitess("planetscale.js.wasm"), Sqlite("cfd1"))
+        relation_mode = "prisma",
+        exclude(MongoDB, CockroachDb, Sqlite("cfd1"))
     )]
-    async fn occ_update_many_test(runner: Runner) -> TestResult<()> {
+    async fn occ_update_many_relation_mode_prisma_test(runner: Runner) -> TestResult<()> {
+        repeat_occ_reproduce_test(runner).await
+    }
+
+    async fn repeat_occ_reproduce_test(runner: Runner) -> TestResult<()> {
         let runner = Arc::new(runner);
 
         // This test can give false positives so we run it a few times

@@ -1,0 +1,13 @@
+{
+  "modelName": "Product",
+  "action": "updateMany",
+  "query": {
+    "arguments": {
+      "where": { "id": 1, "stock": { "gt": 0 } },
+      "data": { "stock": { "decrement": 1 } }
+    },
+    "selection": {
+      "$scalars": true
+    }
+  }
+}

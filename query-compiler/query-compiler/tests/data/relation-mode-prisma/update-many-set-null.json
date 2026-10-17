@@ -1,0 +1,13 @@
+{
+  "modelName": "Supplier",
+  "action": "updateMany",
+  "query": {
+    "arguments": {
+      "where": { "code": "old" },
+      "data": { "code": "new" }
+    },
+    "selection": {
+      "$scalars": true
+    }
+  }
+}
