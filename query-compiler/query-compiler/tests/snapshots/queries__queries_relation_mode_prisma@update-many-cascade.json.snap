@@ -1,0 +1,26 @@
+---
+source: query-compiler/query-compiler/tests/queries.rs
+expression: pretty
+input_file: query-compiler/query-compiler/tests/data/relation-mode-prisma/update-many-cascade.json
+---
+transaction
+   dataMap affectedRows
+   let 0 = query «SELECT "public"."Product"."id", "public"."Product"."sku" FROM
+                  "public"."Product" WHERE "public"."Product"."stock" = $1
+                  OFFSET $2»
+           params [const(BigInt(0)), const(BigInt(0))]
+   in let 0$id = mapField id (get 0);
+          0$sku = mapField sku (get 0)
+      in let 2 = query «SELECT "public"."Order"."id",
+                        "public"."Order"."productSku" FROM "public"."Order"
+                        WHERE (1=1 AND "public"."Order"."productSku" IN [$1,*])
+                        OFFSET $2»
+                 params [var(0$sku as String), const(BigInt(0))]
+         in let 2$id = mapField id (get 2)
+            in let 3 = execute «UPDATE "public"."Order" SET "productSku" = $1
+                                WHERE ("public"."Order"."id" IN [$2,*] AND 1=1)»
+                       params [const(String("discontinued")), var(2$id as Int)]
+               in let 0$id = mapField id (get 0)
+                  in execute «UPDATE "public"."Product" SET "sku" = $1 WHERE
+                              ("public"."Product"."id" IN [$2,*] AND 1=1)»
+                     params [const(String("discontinued")), var(0$id as Int)]

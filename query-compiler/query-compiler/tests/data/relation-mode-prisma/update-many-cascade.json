@@ -1,0 +1,13 @@
+{
+  "modelName": "Product",
+  "action": "updateMany",
+  "query": {
+    "arguments": {
+      "where": { "stock": 0 },
+      "data": { "sku": "discontinued" }
+    },
+    "selection": {
+      "$scalars": true
+    }
+  }
+}

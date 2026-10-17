@@ -1,0 +1,26 @@
+---
+source: query-compiler/query-compiler/tests/queries.rs
+expression: pretty
+input_file: query-compiler/query-compiler/tests/data/relation-mode-prisma/delete-many.json
+---
+transaction
+   dataMap affectedRows
+   let 1 = query «SELECT "public"."Product"."id", "public"."Product"."sku" FROM
+                  "public"."Product" WHERE "public"."Product"."stock" = $1
+                  OFFSET $2»
+           params [const(BigInt(0)), const(BigInt(0))]
+   in let 1$id = mapField id (get 1);
+          1$sku = mapField sku (get 1)
+      in let 3 = query «SELECT "public"."Order"."id",
+                        "public"."Order"."productSku" FROM "public"."Order"
+                        WHERE (1=1 AND "public"."Order"."productSku" IN [$1,*])
+                        OFFSET $2»
+                 params [var(1$sku as String), const(BigInt(0))]
+         in let 3 = validate (get 3)
+                [ rowCountEq 0
+                ] orRaise "RELATION_VIOLATION"
+            in let 1$id = mapField id (get 1)
+               in execute «DELETE FROM "public"."Product" WHERE
+                           ("public"."Product"."id" IN [$1,*] AND
+                           "public"."Product"."stock" = $2)»
+                  params [var(1$id as Int), const(BigInt(0))]

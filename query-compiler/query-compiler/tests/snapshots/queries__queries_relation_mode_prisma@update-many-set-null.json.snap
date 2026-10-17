@@ -1,0 +1,27 @@
+---
+source: query-compiler/query-compiler/tests/queries.rs
+expression: pretty
+input_file: query-compiler/query-compiler/tests/data/relation-mode-prisma/update-many-set-null.json
+---
+transaction
+   dataMap affectedRows
+   let 0 = query «SELECT "public"."Supplier"."id", "public"."Supplier"."code"
+                  FROM "public"."Supplier" WHERE "public"."Supplier"."code" = $1
+                  OFFSET $2»
+           params [const(String("old")), const(BigInt(0))]
+   in let 0$id = mapField id (get 0);
+          0$code = mapField code (get 0)
+      in let 2 = query «SELECT "public"."Contact"."id",
+                        "public"."Contact"."supplierCode" FROM
+                        "public"."Contact" WHERE (1=1 AND
+                        "public"."Contact"."supplierCode" IN [$1,*]) OFFSET $2»
+                 params [var(0$code as String), const(BigInt(0))]
+         in let 2$id = mapField id (get 2)
+            in let 3 = execute «UPDATE "public"."Contact" SET "supplierCode" =
+                                $1 WHERE ("public"."Contact"."id" IN [$2,*] AND
+                                1=1)»
+                       params [const(Null), var(2$id as Int)]
+               in let 0$id = mapField id (get 0)
+                  in execute «UPDATE "public"."Supplier" SET "code" = $1 WHERE
+                              ("public"."Supplier"."id" IN [$2,*] AND 1=1)»
+                     params [const(String("new")), var(0$id as Int)]

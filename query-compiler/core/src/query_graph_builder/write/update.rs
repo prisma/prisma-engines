@@ -146,7 +146,7 @@ pub fn update_many_records(
         let pre_read_node = graph.create_node(utils::read_ids_infallible(
             model.clone(),
             model.shard_aware_primary_identifier(),
-            filter,
+            filter.clone(),
         ));
         let update_many_node = update_many_record_node(
             graph,
@@ -160,6 +160,20 @@ pub fn update_many_records(
                 limit,
             },
         )?;
+
+        let Some(Node::Query(Query::Write(WriteQuery::UpdateManyRecords(update_many)))) =
+            graph.node_content_mut(&update_many_node)
+        else {
+            unreachable!("update_many_record_node creates an UpdateManyRecords node");
+        };
+
+        // The pre-read selects the ids with `filter`, but a row can stop matching before the UPDATE
+        // runs. Apply `filter` to the UPDATE as well, so that such rows are neither updated nor
+        // counted, unless the emulated `onUpdate` actions inserted below write to related records:
+        // they do that for every pre-read id, so the UPDATE has to cover the same rows.
+        if !utils::emulated_on_update_writes(&model, &update_many.args) {
+            update_many.set_filter(filter);
+        }
 
         utils::insert_emulated_on_update(graph, query_schema, &model, &pre_read_node, &update_many_node)?;
 

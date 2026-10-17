@@ -1,0 +1,12 @@
+{
+  "modelName": "Product",
+  "action": "deleteMany",
+  "query": {
+    "arguments": {
+      "where": { "stock": 0 }
+    },
+    "selection": {
+      "$scalars": true
+    }
+  }
+}
