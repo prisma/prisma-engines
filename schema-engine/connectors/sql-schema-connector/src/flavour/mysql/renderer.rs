@@ -396,7 +396,11 @@ fn render_mysql_modify(
 
 fn render_column_type(column: TableColumnWalker<'_>) -> Cow<'static, str> {
     if let ColumnTypeFamily::Enum(enum_id) = column.column_type_family() {
-        let variants: String = column.walk(*enum_id).values().map(Quoted::mysql_string).join(", ");
+        let variants: String = column
+            .walk(*enum_id)
+            .values()
+            .map(|value| Quoted::mysql_string(escape_string_literal(value)))
+            .join(", ");
 
         return format!("ENUM({variants})").into();
     }
