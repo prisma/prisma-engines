@@ -695,3 +695,79 @@ fn alter_enum_and_change_default_must_work(api: TestApi) {
             migration.expect_contents(expected_script)
         });
 }
+
+#[test_connector(capabilities(Enums))]
+fn enum_values_with_single_quotes_can_be_created_added_and_removed(api: TestApi) {
+    let dm1 = r#"
+        model Cat {
+            id Int @id
+            mood CatMood
+        }
+
+        enum CatMood {
+            HAPPY @map("it's fine")
+            HUNGRY
+        }
+    "#;
+
+    api.schema_push_w_datasource(dm1).send().assert_green();
+
+    let enum_name = if api.lower_cases_table_names() {
+        "cat_mood"
+    } else if api.is_mysql() {
+        "Cat_mood"
+    } else {
+        "CatMood"
+    };
+
+    if !api.is_sqlite() {
+        api.assert_schema()
+            .assert_enum(enum_name, |enm| enm.assert_values(&["it's fine", "HUNGRY"]));
+    }
+
+    api.insert("Cat").value("id", 1).value("mood", "it's fine").result_raw();
+
+    let dm2 = r#"
+        model Cat {
+            id Int @id
+            mood CatMood
+        }
+
+        enum CatMood {
+            HAPPY @map("it's fine")
+            HUNGRY
+            SLEEPY @map("o'clock")
+        }
+    "#;
+
+    api.schema_push_w_datasource(dm2).send().assert_green();
+
+    if !api.is_sqlite() {
+        api.assert_schema()
+            .assert_enum(enum_name, |enm| enm.assert_values(&["it's fine", "HUNGRY", "o'clock"]));
+    }
+
+    let dm3 = r#"
+        model Cat {
+            id Int @id
+            mood CatMood
+        }
+
+        enum CatMood {
+            HAPPY @map("it's fine")
+            SLEEPY @map("o'clock")
+        }
+    "#;
+
+    api.schema_push_w_datasource(dm3).force(true).send().assert_executable();
+
+    if !api.is_sqlite() {
+        api.assert_schema()
+            .assert_enum(enum_name, |enm| enm.assert_values(&["it's fine", "o'clock"]));
+    }
+
+    api.schema_push_w_datasource(dm3)
+        .send()
+        .assert_green()
+        .assert_no_steps();
+}

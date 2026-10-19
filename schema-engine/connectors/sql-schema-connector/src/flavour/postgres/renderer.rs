@@ -348,7 +348,7 @@ impl SqlRenderer for PostgresRenderer {
                 stmt.push_str(" AS ENUM (");
                 let mut values = enm.values().peekable();
                 while let Some(value) = values.next() {
-                    stmt.push_display(&Quoted::postgres_string(value));
+                    stmt.push_display(&Quoted::postgres_string(escape_string_literal(value)));
                     if values.peek().is_some() {
                         stmt.push_str(", ");
                     }
@@ -902,7 +902,7 @@ fn render_postgres_alter_enum(
                 format!(
                     "ALTER TYPE {enum_name} ADD VALUE {value}",
                     enum_name = quoted_alter_enum_name(schemas.walk(alter_enum.id)),
-                    value = Quoted::postgres_string(created_value)
+                    value = Quoted::postgres_string(escape_string_literal(created_value))
                 )
             })
             .collect();
@@ -939,7 +939,11 @@ fn render_postgres_alter_enum(
         let create_new_enum = format!(
             "CREATE TYPE {enum_name} AS ENUM ({variants})",
             enum_name = tmp_name,
-            variants = enums.next.values().map(Quoted::postgres_string).join(", ")
+            variants = enums
+                .next
+                .values()
+                .map(|value| Quoted::postgres_string(escape_string_literal(value)))
+                .join(", ")
         );
 
         stmts.push(create_new_enum);
@@ -1078,18 +1082,16 @@ fn render_cockroach_alter_enum(
     for variant in &alter_enum.created_variants {
         renderer.render_statement(&mut |stmt| {
             stmt.push_str(&prefix);
-            stmt.push_str(" ADD VALUE '");
-            stmt.push_str(variant);
-            stmt.push_str("'");
+            stmt.push_str(" ADD VALUE ");
+            stmt.push_display(&Quoted::postgres_string(escape_string_literal(variant)));
         });
     }
 
     for variant in &alter_enum.dropped_variants {
         renderer.render_statement(&mut |stmt| {
             stmt.push_str(&prefix);
-            stmt.push_str("DROP VALUE '");
-            stmt.push_str(variant);
-            stmt.push_str("'");
+            stmt.push_str("DROP VALUE ");
+            stmt.push_display(&Quoted::postgres_string(escape_string_literal(variant)));
         });
     }
 }
