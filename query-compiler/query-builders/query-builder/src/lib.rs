@@ -77,7 +77,7 @@ pub trait QueryBuilder {
         filter: Filter,
         create_args: WriteArgs,
         update_args: WriteArgs,
-        selected_fields: &FieldSelection,
+        selected_fields: Option<&FieldSelection>,
         unique_constraints: &[ScalarField],
     ) -> Result<DbQuery, Box<dyn std::error::Error + Send + Sync>>;
 

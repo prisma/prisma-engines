@@ -7,7 +7,7 @@ pub struct NativeUpsert {
     record_filter: RecordFilter,
     create: WriteArgs,
     update: WriteArgs,
-    pub selected_fields: FieldSelection,
+    pub selected_fields: Option<FieldSelection>,
     pub selection_order: Vec<String>,
 }
 
@@ -18,7 +18,7 @@ impl NativeUpsert {
         record_filter: RecordFilter,
         create: WriteArgs,
         update: WriteArgs,
-        selected_fields: FieldSelection,
+        selected_fields: Option<FieldSelection>,
         selection_order: Vec<String>,
     ) -> Self {
         Self {
@@ -85,8 +85,8 @@ impl NativeUpsert {
         &self.record_filter.filter
     }
 
-    pub fn selected_fields(&self) -> &FieldSelection {
-        &self.selected_fields
+    pub fn selected_fields(&self) -> Option<&FieldSelection> {
+        self.selected_fields.as_ref()
     }
 
     pub fn selection_order(&self) -> &[String] {

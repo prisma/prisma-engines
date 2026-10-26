@@ -1,0 +1,41 @@
+---
+source: query-compiler/query-compiler/tests/mysql_upsert.rs
+expression: plan
+snapshot_kind: text
+---
+transaction
+   dataMap {
+       id: String (counter_id)
+       clicks: Int (clicks)
+   }
+   let 0 = query «SELECT `counters`.`counter_id` FROM `counters` WHERE (`counters`.`counter_id` = $1 AND 1=1)»
+           params [const(String("counter"))]
+   in let 5 = if (rowCountNeq 0 (get 0))
+          then let 0 = unique (get 0);
+                   0$id = mapField counter_id (get 0)
+               in let 2 = initRecord {
+                          counter_id: var(0$id as String)
+                      } execute «UPDATE `counters` SET `clicks` = (`counters`.`clicks` + $1) WHERE
+                                 (`counters`.`counter_id` IN [$2,*] AND (`counters`.`counter_id` = $3 AND 1=1))»
+                        params [const(BigInt(1)), var(0$id as String), const(String("counter"))]
+                  in let 4 = let 2 = unique (validate (get 2)
+                                 [ rowCountNeq 0
+                                 ] orRaise "MISSING_RECORD");
+                                 2$id = mapField counter_id (get 2)
+                         in unique (query «SELECT `counters`.`counter_id`, `counters`.`clicks` FROM `counters` WHERE
+                                           `counters`.`counter_id` = $1 LIMIT $2 OFFSET $3»
+                                    params [var(2$id as String), const(BigInt(1)), const(BigInt(0))])
+                     in getFirstNonEmpty4
+          else let 1 = initRecord {
+                       counter_id: const(String("counter"))
+                   } unique (query «INSERT INTO `counters` (`counter_id`,`clicks`) VALUES ($1,$2)»
+                             params [const(String("counter")), const(BigInt(1))])
+               in let 3 = let 1 = unique (validate (get 1)
+                              [ rowCountNeq 0
+                              ] orRaise "MISSING_RECORD");
+                              1$id = mapField counter_id (get 1)
+                      in unique (query «SELECT `counters`.`counter_id`, `counters`.`clicks` FROM `counters` WHERE
+                                        `counters`.`counter_id` = $1 LIMIT $2 OFFSET $3»
+                                 params [var(1$id as String), const(BigInt(1)), const(BigInt(0))])
+                  in getFirstNonEmpty3
+      in getFirstNonEmpty5

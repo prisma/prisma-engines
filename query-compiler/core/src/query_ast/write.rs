@@ -81,7 +81,7 @@ impl WriteQuery {
             Self::DisconnectRecords(_) => None,
             Self::ExecuteRaw(_) => None,
             Self::QueryRaw(_) => None,
-            Self::Upsert(upsert) => Some(&upsert.selected_fields),
+            Self::Upsert(upsert) => upsert.selected_fields.as_ref(),
         };
         borrowed_fs.map(Cow::Borrowed)
     }
@@ -138,16 +138,20 @@ impl WriteQuery {
         record_filter: RecordFilter,
         create: WriteArgs,
         update: WriteArgs,
-        read: RecordQuery,
+        read: Option<RecordQuery>,
     ) -> crate::Query {
+        let (selected_fields, selection_order) = read
+            .map(|read| (Some(read.selected_fields), read.selection_order))
+            .unwrap_or_default();
+
         crate::Query::Write(WriteQuery::Upsert(NativeUpsert::new(
             name,
             model,
             record_filter,
             create,
             update,
-            read.selected_fields,
-            read.selection_order,
+            selected_fields,
+            selection_order,
         )))
     }
 }

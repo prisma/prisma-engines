@@ -108,11 +108,13 @@ fn map_write_query(query: &WriteQuery, builder: &mut ResultNodeBuilder) -> Optio
         WriteQuery::DisconnectRecords(_) => None, // No result data
         WriteQuery::ExecuteRaw(_) => None,        // No data mapping
         WriteQuery::QueryRaw(_) => None,          // No data mapping
-        WriteQuery::Upsert(q) => get_result_node()
-            .field_selection(&q.selected_fields)
-            .selection_order(&q.selection_order)
-            .builder(builder)
-            .call(),
+        WriteQuery::Upsert(q) => q.selected_fields.as_ref().and_then(|selected_fields| {
+            get_result_node()
+                .field_selection(selected_fields)
+                .selection_order(&q.selection_order)
+                .builder(builder)
+                .call()
+        }),
     }
 }
 

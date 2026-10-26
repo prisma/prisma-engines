@@ -3,8 +3,10 @@ use crate::{
     DataExpectation, ParsedField, ParsedInputMap, ParsedInputValue, ParsedObject, RowSink,
     inputs::{IfInput, RecordQueryFilterInput, UpdateRecordSelectorsInput},
     query_ast::*,
-    query_graph::{Flow, QueryGraph, QueryGraphDependency},
+    query_graph::{Flow, Node, QueryGraph, QueryGraphDependency},
 };
+use itertools::Itertools;
+use psl::datamodel_connector::ConnectorCapability;
 use query_structure::Model;
 use schema::QuerySchema;
 
@@ -73,21 +75,52 @@ pub(crate) fn upsert_record(
     let filter = extract_unique_filter(where_argument, &model)?;
     let read_query = read::find_unique(field.clone(), model.clone(), query_schema)?;
 
-    if can_use_native_upsert && let ReadQuery::RecordQuery(read) = read_query {
+    if can_use_native_upsert && let ReadQuery::RecordQuery(mut read) = read_query {
         let mut create_write_args = WriteArgsParser::from(&model, create_argument)?.args;
         let mut update_write_args = WriteArgsParser::from(&model, update_argument)?.args;
 
         create_write_args.add_datetimes(&model);
         update_write_args.add_datetimes(&model);
 
-        graph.create_node(WriteQuery::native_upsert(
-            field.name,
-            model,
-            filter.into(),
-            create_write_args,
-            update_write_args,
-            read,
-        ));
+        if query_schema.has_capability(ConnectorCapability::InsertReturning) {
+            graph.create_node(WriteQuery::native_upsert(
+                field.name,
+                model,
+                filter.into(),
+                create_write_args,
+                update_write_args,
+                Some(read),
+            ));
+        } else {
+            // Keep the inserted or updated row locked until the read after the write.
+            graph.flag_transactional();
+            read.filter = Some(filter.clone());
+
+            let upsert_node = graph.create_node(WriteQuery::native_upsert(
+                field.name,
+                model.clone(),
+                filter.into(),
+                create_write_args,
+                update_write_args,
+                None,
+            ));
+            let read_node = graph.create_node(Query::Read(ReadQuery::RecordQuery(read)));
+            graph.add_result_node(&read_node);
+            graph.create_edge(&upsert_node, &read_node, QueryGraphDependency::ExecutionOrder)?;
+
+            let check_node = graph.create_node(Node::Empty);
+            graph.create_edge(
+                &read_node,
+                &check_node,
+                QueryGraphDependency::ProjectedDataDependency(
+                    model.shard_aware_primary_identifier(),
+                    RowSink::Discard,
+                    Some(DataExpectation::non_empty_rows(
+                        MissingRecord::builder().operation(DataOperation::Upsert).build(),
+                    )),
+                ),
+            )?;
+        }
 
         return Ok(());
     }
@@ -183,12 +216,15 @@ pub(crate) fn upsert_record(
     Ok(())
 }
 
-// This optimisation on our upserts allows us to use the `INSERT ... ON CONFLICT SET ..`
+// This optimisation allows a database-native upsert
 // when the query matches the following conditions:
 // 1. The data connector supports it
-// 2. The create and update arguments do not have any nested queries
+// 2. The create and update arguments and the selection have no nested queries
 // 3. There is only 1 unique field in the where clause
 // 4. The unique field defined in where clause has the same value as defined in the create arguments
+// 5. Relation emulation is not needed
+// Without RETURNING, the model must also have a single, strict, non-prefix unique
+// criterion, no extra predicates or shard key, and an unchanged lookup key (including @updatedAt).
 fn can_use_connector_native_upsert<'a>(
     model: &Model,
     where_field: &ParsedInputMap<'a>,
@@ -226,7 +262,47 @@ fn can_use_connector_native_upsert<'a>(
         && !empty_update
         && !has_nested_selects
         && where_values_same_as_create
-        && !query_schema.relation_mode().is_prisma()
+        && if query_schema.has_capability(ConnectorCapability::InsertReturning) {
+            !query_schema.relation_mode().is_prisma()
+        } else {
+            // Models with relations still need Prisma's referential-action emulation.
+            (!query_schema.relation_mode().is_prisma() || model.walker().relation_fields().next().is_none())
+                && can_use_native_upsert_without_returning(model, where_field, update_argument)
+        }
+}
+
+fn can_use_native_upsert_without_returning(
+    model: &Model,
+    where_field: &ParsedInputMap<'_>,
+    update_argument: &ParsedInputMap<'_>,
+) -> bool {
+    let Ok(key) = model.walker().unique_criterias().exactly_one() else {
+        return false;
+    };
+
+    let has_prefix_key = model
+        .walker()
+        .primary_key()
+        .is_some_and(|key| key.scalar_field_attributes().any(|field| field.length().is_some()))
+        || model
+            .walker()
+            .indexes()
+            .filter(|index| index.is_unique())
+            .any(|index| index.scalar_field_attributes().any(|field| field.length().is_some()));
+
+    // MySQL cannot choose which unique constraint triggers the update. The same
+    // unchanged key must also identify the row for the read after the write.
+    // Prefix keys can conflict even when the full lookup value is different.
+    where_field.len() == 1
+        && key.is_strict_criteria()
+        && !has_prefix_key
+        // The read-back filter must identify the same row without additional shard routing.
+        && model.walker().shard_key().is_none()
+        && key.fields().all(|field| {
+            field
+                .as_scalar_field()
+                .is_some_and(|field| !update_argument.contains_key(field.name()) && !field.is_updated_at())
+        })
 }
 
 fn is_unique_field(field_name: &str, model: &Model) -> bool {

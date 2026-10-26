@@ -1,0 +1,21 @@
+---
+source: query-compiler/query-compiler/tests/mysql_upsert.rs
+expression: plan
+snapshot_kind: text
+---
+transaction
+   dataMap {
+       id: String (counter_id)
+       clicks: Int (clicks)
+   }
+   let 0 = execute «INSERT INTO `counters` (`counter_id`,`clicks`) VALUES ($1,$2) ON DUPLICATE KEY UPDATE `clicks` =
+                    (`counters`.`clicks` + $3)»
+           params [const(String("counter")), const(BigInt(1)), const(BigInt(1))]
+   in let 1 = unique (query «SELECT `counters`.`counter_id`, `counters`.`clicks` FROM `counters` WHERE
+                             (`counters`.`counter_id` = $1 AND 1=1) LIMIT $2 OFFSET $3»
+                      params [const(String("counter")), const(BigInt(1)), const(BigInt(0))])
+      in let 1 = validate (get 1)
+             [ rowCountNeq 0
+             ] orRaise "MISSING_RECORD"
+         in ();
+         get 1

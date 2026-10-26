@@ -265,7 +265,11 @@ pub(crate) fn translate_write_query(query: WriteQuery, builder: &dyn QueryBuilde
                     &upsert.unique_constraints(),
                 )
                 .map_err(TranslateError::QueryBuildFailure)?;
-            Expression::Unique(Box::new(Expression::Query(query)))
+            if upsert.selected_fields().is_some() {
+                Expression::Unique(Box::new(Expression::Query(query)))
+            } else {
+                Expression::Execute(query)
+            }
         }
 
         WriteQuery::QueryRaw(RawQuery {

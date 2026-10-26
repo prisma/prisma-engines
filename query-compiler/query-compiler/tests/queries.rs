@@ -2,11 +2,12 @@ use quaint::{
     prelude::{ConnectionInfo, ExternalConnectionInfo, SqlFamily},
     visitor::Postgres,
 };
-use query_core::{QueryDocument, QueryGraphBuilder, ToGraphviz};
-use query_structure::psl;
-use request_handlers::{JsonBody, JsonSingleQuery, RequestBody};
+use query_core::ToGraphviz;
+use request_handlers::JsonSingleQuery;
 use sql_query_builder::{Context, SqlQueryBuilder};
-use std::{fs, process::Command, sync::Arc};
+use std::{fs, process::Command};
+
+mod common;
 
 #[test]
 fn queries() {
@@ -15,13 +16,6 @@ fn queries() {
         println!("running: {test_name}");
 
         let schema_string = include_str!("data/schema.prisma");
-        let schema = psl::validate_without_extensions(schema_string.into());
-
-        assert!(!schema.diagnostics.has_errors(), "{:?}", schema.diagnostics);
-
-        let schema = Arc::new(schema);
-        let query_schema = Arc::new(query_core::schema::build(schema, true));
-
         let connection_info = ConnectionInfo::External(ExternalConnectionInfo::new(
             SqlFamily::Postgres,
             Some("public".to_owned()),
@@ -32,17 +26,7 @@ fn queries() {
         let query = fs::read_to_string(path).unwrap();
         let query: JsonSingleQuery = serde_json::from_str(&query).unwrap();
 
-        let request = RequestBody::Json(JsonBody::Single(query));
-        let doc = request.into_doc(&query_schema).unwrap();
-
-        let QueryDocument::Single(query) = doc else {
-            panic!("expected single query");
-        };
-
-        let graph = QueryGraphBuilder::new(&query_schema)
-            .build(query)
-            .map_err(|err| format!("{test_name} failed: {err}"))
-            .unwrap();
+        let graph = common::query_graph(schema_string, query);
 
         let dot = graph.to_graphviz();
         let tests_path = path.parent().unwrap().parent().unwrap();

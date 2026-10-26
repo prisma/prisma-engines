@@ -383,7 +383,7 @@ impl<'a, V: Visitor<'a>> QueryBuilder for SqlQueryBuilder<'a, V> {
         filter: Filter,
         create_args: WriteArgs,
         update_args: WriteArgs,
-        selected_fields: &FieldSelection,
+        selected_fields: Option<&FieldSelection>,
         unique_constraints: &[ScalarField],
     ) -> Result<DbQuery, Box<dyn std::error::Error + Send + Sync>> {
         let chunkable = Chunkable::from(&filter);
@@ -392,7 +392,7 @@ impl<'a, V: Visitor<'a>> QueryBuilder for SqlQueryBuilder<'a, V> {
             filter,
             create_args,
             update_args,
-            &selected_fields.into(),
+            selected_fields.map(ModelProjection::from).as_ref(),
             unique_constraints,
             &self.context,
         );

@@ -1,0 +1,44 @@
+---
+source: query-compiler/query-compiler/tests/mysql_upsert.rs
+expression: plan
+snapshot_kind: text
+---
+transaction
+   dataMap {
+       id: DateTime (id)
+       clicks: Int (clicks)
+   }
+   let 0 = query «SELECT `Counter`.`id` FROM `Counter` WHERE (`Counter`.`id` = $1 AND 1=1)»
+           params [const(DateTime(2020-01-01T00:00:00+00:00))]
+   in let 5 = if (rowCountNeq 0 (get 0))
+          then let 0 = unique (get 0);
+                   0$id = mapField id (get 0)
+               in let 2 = mapRecord {
+                          id: set now()
+                      } initRecord {
+                          id: var(0$id as DateTime)
+                      } execute «UPDATE `Counter` SET `clicks` = (`Counter`.`clicks` + $1), `id` = $2 WHERE
+                                 (`Counter`.`id` IN [$3,*] AND (`Counter`.`id` = $4 AND 1=1))»
+                        params [const(BigInt(1)), now(), var(0$id as DateTime),
+                                const(DateTime(2020-01-01T00:00:00+00:00))]
+                  in let 4 = let 2 = unique (validate (get 2)
+                                 [ rowCountNeq 0
+                                 ] orRaise "MISSING_RECORD");
+                                 2$id = mapField id (get 2)
+                         in unique (query «SELECT `Counter`.`id`, `Counter`.`clicks` FROM `Counter` WHERE `Counter`.`id`
+                                           = $1 LIMIT $2 OFFSET $3»
+                                    params [var(2$id as DateTime), const(BigInt(1)), const(BigInt(0))])
+                     in getFirstNonEmpty4
+          else let 1 = initRecord {
+                       id: const(DateTime(2020-01-01T00:00:00+00:00))
+                   } unique (query «INSERT INTO `Counter` (`id`,`clicks`) VALUES ($1,$2)»
+                             params [const(DateTime(2020-01-01T00:00:00+00:00)), const(BigInt(1))])
+               in let 3 = let 1 = unique (validate (get 1)
+                              [ rowCountNeq 0
+                              ] orRaise "MISSING_RECORD");
+                              1$id = mapField id (get 1)
+                      in unique (query «SELECT `Counter`.`id`, `Counter`.`clicks` FROM `Counter` WHERE `Counter`.`id` =
+                                        $1 LIMIT $2 OFFSET $3»
+                                 params [var(1$id as DateTime), const(BigInt(1)), const(BigInt(0))])
+                  in getFirstNonEmpty3
+      in getFirstNonEmpty5

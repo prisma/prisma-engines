@@ -2,6 +2,7 @@ use crate::limit::wrap_with_limit_subquery_if_needed;
 use crate::{Context, model_extensions::*, sql_trace::SqlTraceComment};
 use crate::{FilterBuilder, update};
 use itertools::Itertools;
+use psl::{datamodel_connector::ConnectorCapability, has_capability};
 use quaint::ast::*;
 use query_structure::*;
 use std::collections::HashMap;
@@ -101,19 +102,22 @@ pub fn create_records_nonempty(
     insert
 }
 
-/// `INSERT` with `ON CONFLICT DO UPDATE` statement.
+/// `INSERT` with `ON CONFLICT DO UPDATE` or `ON DUPLICATE KEY UPDATE`.
 pub fn native_upsert(
     model: &Model,
     filter: Filter,
     create_args: WriteArgs,
     update_args: WriteArgs,
-    selected_fields: &ModelProjection,
+    selected_fields: Option<&ModelProjection>,
     unique_constraints: &[ScalarFieldRef],
     ctx: &Context<'_>,
 ) -> Insert<'static> {
-    let where_condition = FilterBuilder::without_top_level_joins().visit_filter(filter, ctx);
-    let update = build_update_and_set_query(model, update_args, None, ctx).so_that(where_condition);
-    let insert = create_record(model, create_args, selected_fields, ctx);
+    let mut update = build_update_and_set_query(model, update_args, None, ctx);
+    if has_capability(model.dm.schema.connector, ConnectorCapability::InsertReturning) {
+        let where_condition = FilterBuilder::without_top_level_joins().visit_filter(filter, ctx);
+        update = update.so_that(where_condition);
+    }
+    let insert = create_record(model, create_args, &selected_fields.cloned().unwrap_or_default(), ctx);
 
     let constraints: Vec<_> = unique_constraints.as_columns(ctx).collect();
     insert.on_conflict(OnConflict::Update(update, constraints))

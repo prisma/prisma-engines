@@ -1,6 +1,133 @@
 use query_engine_tests::*;
 
-#[test_suite(capabilities(NativeUpsert))]
+#[test_suite(only(MySql), schema(schema))]
+mod native_upsert_mysql {
+    fn schema() -> String {
+        indoc! {r#"
+            model Counter {
+                id     String @id @map("counter_id")
+                clicks Int
+
+                @@map("counters")
+            }
+
+            model CompoundCounter {
+                scope  String
+                name   String
+                clicks Int
+
+                @@id([scope, name])
+            }
+
+            model MultipleKeys {
+                id     Int @id
+                name   String @unique
+                clicks Int
+            }
+        "#}
+        .to_owned()
+    }
+
+    #[connector_test]
+    async fn should_read_back_native_upsert(mut runner: Runner) -> TestResult<()> {
+        let upsert = r#"mutation {
+            upsertOneCounter(
+                where: { id: "counter" }
+                create: { id: "counter", clicks: 1 }
+                update: { clicks: { increment: 1 } }
+            ) { id clicks }
+        }"#;
+
+        insta::assert_snapshot!(
+            run_query!(&runner, upsert),
+            @r###"{"data":{"upsertOneCounter":{"id":"counter","clicks":1}}}"###
+        );
+        assert_used_native_upsert(&mut runner).await;
+
+        insta::assert_snapshot!(
+            run_query!(&runner, upsert),
+            @r###"{"data":{"upsertOneCounter":{"id":"counter","clicks":2}}}"###
+        );
+        assert_used_native_upsert(&mut runner).await;
+
+        Ok(())
+    }
+
+    #[connector_test]
+    async fn should_read_back_compound_key(mut runner: Runner) -> TestResult<()> {
+        let upsert = r#"mutation {
+            upsertOneCompoundCounter(
+                where: { scope_name: { scope: "scope", name: "counter" } }
+                create: { scope: "scope", name: "counter", clicks: 1 }
+                update: { clicks: { increment: 1 } }
+            ) { scope name clicks }
+        }"#;
+
+        insta::assert_snapshot!(
+            run_query!(&runner, upsert),
+            @r###"{"data":{"upsertOneCompoundCounter":{"scope":"scope","name":"counter","clicks":1}}}"###
+        );
+        assert_used_native_upsert(&mut runner).await;
+
+        insta::assert_snapshot!(
+            run_query!(&runner, upsert),
+            @r###"{"data":{"upsertOneCompoundCounter":{"scope":"scope","name":"counter","clicks":2}}}"###
+        );
+        assert_used_native_upsert(&mut runner).await;
+
+        Ok(())
+    }
+
+    #[connector_test]
+    async fn should_not_update_on_another_unique_key(mut runner: Runner) -> TestResult<()> {
+        run_query!(
+            &runner,
+            r#"mutation {
+            createOneMultipleKeys(data: { id: 1, name: "existing", clicks: 1 }) { id }
+        }"#
+        );
+
+        assert_error!(
+            &runner,
+            r#"mutation {
+            upsertOneMultipleKeys(
+                where: { id: 2 }
+                create: { id: 2, name: "existing", clicks: 1 }
+                update: { clicks: { increment: 1 } }
+            ) { id clicks }
+        }"#,
+            2002
+        );
+
+        insta::assert_snapshot!(
+            run_query!(&runner, "query { findManyMultipleKeys { id name clicks } }"),
+            @r###"{"data":{"findManyMultipleKeys":[{"id":1,"name":"existing","clicks":1}]}}"###
+        );
+        assert!(
+            !runner
+                .get_logs()
+                .await
+                .iter()
+                .any(|log| log.contains("ON DUPLICATE KEY UPDATE"))
+        );
+
+        Ok(())
+    }
+
+    async fn assert_used_native_upsert(runner: &mut Runner) {
+        assert!(
+            runner
+                .get_logs()
+                .await
+                .iter()
+                .any(|log| log.contains("ON DUPLICATE KEY UPDATE"))
+        );
+    }
+}
+
+// These cases rely on ON CONFLICT choosing a particular unique constraint.
+// MySQL only uses native upsert for models with a single, unchanged unique key.
+#[test_suite(capabilities(NativeUpsert), exclude(MySql, Vitess))]
 mod native_upsert {
 
     #[connector_test(schema(user))]

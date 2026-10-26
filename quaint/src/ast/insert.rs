@@ -88,7 +88,9 @@ pub enum OnConflict<'a> {
     /// [`DefaultValue::Generated`]: enum.DefaultValue.html#variant.Generated
     /// [column has a default value]: struct.Column.html#method.default
     DoNothing,
-    /// ON CONFLICT UPDATE is supported for Sqlite and Postgres
+    /// ON CONFLICT UPDATE is supported for Sqlite and Postgres.
+    /// MySQL uses ON DUPLICATE KEY UPDATE and ignores the conflict target columns.
+    /// Conditional updates are not supported on MySQL.
     Update(Update<'a>, Vec<Column<'a>>),
 }
 
