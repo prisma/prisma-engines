@@ -1766,15 +1766,18 @@ async fn op_test_div_one_level(api: &mut dyn TestApi) -> crate::Result<()> {
     Ok(())
 }
 
-#[test_each_connector(tags("postgresql"))]
+#[test_each_connector(tags("postgresql", "kingbase-oracle"))]
 async fn enum_values(api: &mut dyn TestApi) -> crate::Result<()> {
     let type_name = api.get_name();
     let create_type = format!("CREATE TYPE {type_name} AS ENUM ('A', 'B')");
     api.conn().raw_cmd(&create_type).await?;
 
-    let table = api
-        .create_temp_table(&format!("id SERIAL PRIMARY KEY, value {type_name}"))
-        .await?;
+    let id = if api.connector_tag().contains(Tags::KINGBASE_ORACLE) {
+        api.autogen_id("id")
+    } else {
+        "id SERIAL PRIMARY KEY".to_owned()
+    };
+    let table = api.create_temp_table(&format!("{id}, value {type_name}")).await?;
 
     api.conn()
         .insert(
@@ -1813,6 +1816,9 @@ async fn enum_values(api: &mut dyn TestApi) -> crate::Result<()> {
 
     let row = res.get(2).unwrap();
     assert_eq!(Some(&Value::null_enum()), row.at(0));
+
+    api.delete_table(&table).await?;
+    api.conn().raw_cmd(&format!("DROP TYPE {type_name}")).await?;
 
     Ok(())
 }
@@ -3776,8 +3782,8 @@ async fn json_unquote_fun(api: &mut dyn TestApi) -> crate::Result<()> {
     Ok(())
 }
 
-#[cfg(any(feature = "postgresql", feature = "mysql"))]
-#[test_each_connector(tags("postgresql", "mysql"))]
+#[cfg(any(feature = "postgresql", feature = "mysql", feature = "kingbase-oracle-native"))]
+#[test_each_connector(tags("postgresql", "mysql", "kingbase-oracle"))]
 async fn json_col_equal_json_col(api: &mut dyn TestApi) -> crate::Result<()> {
     let json_type = match api.system() {
         "postgres" => "jsonb",
@@ -3806,9 +3812,14 @@ async fn json_col_equal_json_col(api: &mut dyn TestApi) -> crate::Result<()> {
 
     api.conn().insert(insert.into()).await?;
 
+    // Model queries carry native column types. Oracle needs that metadata
+    // to compare JSON columns through its JSONB operator implementation.
+    let native_type = api.connector_tag().contains(Tags::KINGBASE_ORACLE).then_some("JSON");
+    let left = Column::from("json_1").native_column_type(native_type);
+    let right = Column::from("json_2").native_column_type(native_type);
     let query = Select::from_table(&table)
         .column("id")
-        .so_that(col!("json_1").equals(col!("json_2")));
+        .so_that(left.clone().equals(right.clone()));
     let mut res = api.conn().select(query.clone()).await?.into_iter();
 
     assert_eq!(res.next().unwrap()["id"], Value::int32(1));
@@ -3819,14 +3830,14 @@ async fn json_col_equal_json_col(api: &mut dyn TestApi) -> crate::Result<()> {
         "postgres" => JsonPath::array(["a", "b"]),
         #[cfg(feature = "mysql")]
         "mysql" => JsonPath::string("$.a.b"),
+        #[cfg(feature = "kingbase-oracle-native")]
+        "kingbase_oracle" => JsonPath::array(["a", "b"]),
         _ => unreachable!(),
     };
 
     // Ensures that using JSON_EXTRACT(`json_col`) = `json_col` works to prevents regressions on MySQL flavoured connectors.
-    let expr: Expression<'_> = json_extract(col!("json_1"), path, false).into();
-    let query = Select::from_table(&table)
-        .column("id")
-        .so_that(expr.equals(col!("json_2")));
+    let expr: Expression<'_> = json_extract(left, path, false).into();
+    let query = Select::from_table(&table).column("id").so_that(expr.equals(right));
 
     let mut res = api.conn().select(query.clone()).await?.into_iter();
 

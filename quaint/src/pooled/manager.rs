@@ -246,6 +246,42 @@ mod tests {
     }
 
     #[tokio::test]
+    #[cfg(feature = "kingbase-mysql-native")]
+    async fn kingbase_mysql_default_connection_limit() {
+        let pool = Quaint::builder("kingbase-mysql://localhost/testdb").unwrap().build();
+
+        assert_eq!(num_cpus::get_physical() * 2 + 1, pool.capacity().await as usize);
+    }
+
+    #[tokio::test]
+    #[cfg(feature = "kingbase-mysql-native")]
+    async fn kingbase_mysql_custom_connection_limit() {
+        let pool = Quaint::builder("kingbase-mysql://localhost/testdb?connection_limit=10")
+            .unwrap()
+            .build();
+
+        assert_eq!(10, pool.capacity().await as usize);
+    }
+
+    #[tokio::test]
+    #[cfg(feature = "kingbase-oracle-native")]
+    async fn kingbase_oracle_default_connection_limit() {
+        let pool = Quaint::builder("kingbase-oracle://localhost/testdb").unwrap().build();
+
+        assert_eq!(num_cpus::get_physical() * 2 + 1, pool.capacity().await as usize);
+    }
+
+    #[tokio::test]
+    #[cfg(feature = "kingbase-oracle-native")]
+    async fn kingbase_oracle_custom_connection_limit() {
+        let pool = Quaint::builder("kingbase-oracle://localhost/testdb?connection_limit=10")
+            .unwrap()
+            .build();
+
+        assert_eq!(10, pool.capacity().await as usize);
+    }
+
+    #[tokio::test]
     #[cfg(feature = "postgresql-native")]
     async fn psql_default_connection_limit() {
         let conn_string = std::env::var("TEST_PSQL").expect("TEST_PSQL connection string not set.");

@@ -229,13 +229,18 @@ async fn bigint_unsigned_positive_value_out_of_range(api: &mut dyn TestApi) -> c
     Ok(())
 }
 
-#[test_each_connector(tags("mysql", "mssql", "postgresql"))]
+#[test_each_connector(tags("mysql", "mssql", "postgresql", "kingbase-oracle"))]
 async fn length_mismatch(api: &mut dyn TestApi) -> crate::Result<()> {
     if api.connector_tag().intersects(Tags::KINGBASE_MYSQL) {
         api.conn().raw_cmd("SET SQL_MODE = 'STRICT_ALL_TABLES'").await?;
     }
 
-    let table = api.create_temp_table("value varchar(3)").await?;
+    let column = if api.connector_tag().contains(Tags::KINGBASE_ORACLE) {
+        "value varchar2(3)"
+    } else {
+        "value varchar(3)"
+    };
+    let table = api.create_temp_table(column).await?;
     let insert = Insert::single_into(&table).value("value", "fooo");
 
     let result = api.conn().insert(insert.into()).await;
@@ -247,7 +252,7 @@ async fn length_mismatch(api: &mut dyn TestApi) -> crate::Result<()> {
     Ok(())
 }
 
-#[test_each_connector(tags("postgresql", "sqlite"))]
+#[test_each_connector(tags("postgresql", "sqlite", "kingbase-oracle"))]
 async fn foreign_key_constraint_violation(api: &mut dyn TestApi) -> crate::Result<()> {
     let parent = api.create_temp_table("id smallint not null primary key").await?;
     let foreign_key = api.foreign_key(&parent, "id", "parent_id");
