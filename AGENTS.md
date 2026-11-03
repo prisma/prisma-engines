@@ -32,7 +32,7 @@
 
 - 共享 `SqlFamily::Mysql` 不等于原生 MySQL连接。自己的visitor先复用Mysql模板，再做必要金仓适配；参数上限按金仓协议限制为32767。不要将协议 OID当MySQL字段代码。
 - `schema-engine` 的测试Tag为 `KingbaseMysql`，不冒充 `Mysql`。`libs/test-setup/src/test_api_args.rs` 当前能力为 `Enums | Json`；Oracle为 `CreateDatabase | Enums | Json`。这是测试harness能力，不能混同PSL生产能力或Quaint注册。
-- MySQL原生元数据/类型转换在 `quaint/src/connector/kingbase_mysql/native`；Oracle使用自己的目录。端口缺省54321必须在驱动URL解析前明确处理，不能在已解析Config上追加第二个端口。
+- MySQL原生元数据/类型转换在 `quaint/src/connector/kingbase_mysql/native`；Oracle使用自己的目录。两模式参照PG由各自 `url.rs` 解析连接信息，在 `native/mod.rs` 的 `to_config()` 中用 `Config::new()` 逐项构造驱动配置，保留已有连接选项、编码及默认值，不借结构整理增加查询缓存或改变查询描述行为。缺省端口54321必须在空Config上明确设置，不能在已解析Config上追加第二个默认端口。
 - native目录SQL使用已验证的sys接口。`sys_class` 是view，其regclass OID不能直接替换关系依赖classid；通过 `sys_get_object_address` 取得正确classid，不硬编码OID。底层驱动PG/sys目录分派独立核对，不能从SQL长得像PG就断定失败。
 - 索引保留逻辑名称、实际物理名称和约束ownership。使用稳定物理名与 `prisma:logical-index:` 注释恢复逻辑名；PK逻辑名保持MySQL合同，删除时使用catalog保存的实际constraint名，不猜 `<table>_pkey`。
 - 内联unique约束与独立unique索引不能混同；INCLUDE列不是键列，按 `indnkeyatts` 截断；按ownership选择DROP CONSTRAINT或DROP INDEX。排序unique/fulltext需独立创建时，让calculator、differ、renderer保持一致。
@@ -46,7 +46,7 @@
 
 - 使用独立Oracle visitor、describer、renderer、calculator及 `KingbaseOracleSchemaExt`。catalog参数绑定规范名称，计算schema与目录过滤保持相同大小写映射；保留用户datasource写法及 `@@schema`/schemas一致性，不无条件转大小写。
 - 本机C010全大写引号schema折叠与混合大小写保留的实测不能扩大到全部版本或全部标识符规则；不要仅用ALL_OBJECTS显示名称推断sys内部存储。
-- 保留 `kingbase-oracle://` 公共scheme，只在driver边界转换为kingbase。URL Debug不能泄露连接/TLS密码；Oracle默认严格TLS，环境端口54325是本机配置，不是产品默认值。
+- 保留 `kingbase-oracle://` 公共scheme；逐项构造驱动Config不需要重写URL协议。URL Debug不能泄露连接/TLS密码；Oracle默认严格TLS，环境端口54325是本机配置，不是产品默认值。
 - Prisma Int/BigInt默认NUMBER(10,0)/NUMBER(19,0)，自增通过schema限定的owned sequence及nextval实现，不改成SERIAL/BIGSERIAL以掩盖外键类型不兼容。保留generation来源、实际序列名和共享依赖信息。
 - Oracle DATE包含日期与时间；带时区绑定保留offset，连接设置UTC。NUMBER原始结果是Numeric，不为满足测试截断为整数；ROWID二进制codec与Node文本结果是不同合同。
 - 原生类型范围遵循当前校验：FLOAT精度1..53、TIMESTAMP最多6；NUMBER合法scale>precision归一化，负scale不能假装与Oracle完全等价。不要宣称未安装的RAW/LONG RAW扩展已支持。

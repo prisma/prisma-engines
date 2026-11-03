@@ -27,7 +27,12 @@ use kingbase_tokio_postgres::{
     Client, Row,
     types::{Kind, Type},
 };
+use kingbase_tokio_postgres::{
+    Config,
+    config::{ChannelBinding, LoadBalanceHosts, SslMode, SslNegotiation, TargetSessionAttrs},
+};
 use native_tls::{Certificate, Identity, TlsConnector};
+use percent_encoding::percent_decode;
 use std::{
     borrow::Cow,
     fs,
@@ -51,6 +56,156 @@ pub struct KingbaseOracle {
     socket_timeout: Option<Duration>,
     pg_bouncer: bool,
     is_healthy: AtomicBool,
+}
+
+impl KingbaseOracleUrl {
+    /// Build the native driver's configuration explicitly, as the PostgreSQL connector does.
+    pub(crate) fn to_config(&self) -> crate::Result<Config> {
+        // Hostless URLs could not receive the Kingbase default port in the
+        // previous implementation; keep rejecting them instead of changing routing.
+        if !self.url.has_host() {
+            return Err(Error::builder(ErrorKind::DatabaseUrlIsInvalid("missing Kingbase URL host".into())).build());
+        }
+        let mut config = Config::new();
+        let decode = |value: &str| {
+            percent_decode(value.as_bytes())
+                .decode_utf8()
+                .map(|value| value.into_owned())
+                .map_err(|_| {
+                    Error::builder(ErrorKind::DatabaseUrlIsInvalid(
+                        "invalid UTF-8 in connection URL".into(),
+                    ))
+                    .build()
+                })
+        };
+
+        if !self.url.username().is_empty() || self.url.password().is_some() {
+            config.user(decode(self.url.username())?);
+        }
+        if let Some(password) = self.url.password() {
+            config.password(percent_decode(password.as_bytes()).collect::<Vec<_>>());
+        }
+        if let Some(host) = self.url.host_str().filter(|host| !host.is_empty()) {
+            let hosts = host.split(',').collect::<Vec<_>>();
+            for (index, host) in hosts.iter().enumerate() {
+                let host = host
+                    .strip_prefix('[')
+                    .and_then(|host| host.strip_suffix(']'))
+                    .unwrap_or(host);
+                let host = percent_decode(host.as_bytes()).collect::<Vec<_>>();
+                #[cfg(unix)]
+                if host.first() == Some(&b'/') {
+                    use std::os::unix::ffi::OsStrExt;
+                    config.host_path(std::ffi::OsStr::from_bytes(&host));
+                } else {
+                    config.host(std::str::from_utf8(host.as_slice()).map_err(|_| {
+                        Error::builder(ErrorKind::DatabaseUrlIsInvalid("invalid UTF-8 in host".into())).build()
+                    })?);
+                }
+                #[cfg(not(unix))]
+                {
+                    let host = std::str::from_utf8(&host).map_err(|_| {
+                        Error::builder(ErrorKind::DatabaseUrlIsInvalid("invalid UTF-8 in host".into())).build()
+                    })?;
+                    // The driver's non-Unix host parser also splits decoded commas.
+                    for host in host.split(',') {
+                        config.host(host);
+                    }
+                }
+                // Preserve the driver's ordering for comma-separated authority hosts.
+                config.port(if index + 1 == hosts.len() { self.port() } else { 5432 });
+            }
+        }
+        if let Some(database) = self.dbname() {
+            config.dbname(decode(database)?);
+        }
+
+        let params = &self.query_params;
+        if let Some(user) = &params.user {
+            config.user(user);
+        }
+        if let Some(password) = &params.password.0 {
+            config.password(password);
+        }
+        if let Some(database) = &params.dbname {
+            config.dbname(database);
+        }
+        if let Some(options) = &params.options {
+            config.options(options);
+        }
+        if let Some(application_name) = &params.application_name {
+            config.application_name(application_name);
+        }
+        for host in &params.hosts {
+            #[cfg(unix)]
+            config.host(host);
+            #[cfg(not(unix))]
+            for host in host.split(',') {
+                config.host(host);
+            }
+        }
+        for address in &params.hostaddrs {
+            config.hostaddr(*address);
+        }
+        for port in &params.ports {
+            config.port(*port);
+        }
+        if let Some(timeout) = params.driver_connect_timeout {
+            config.connect_timeout(timeout);
+        }
+        if let Some(timeout) = params.tcp_user_timeout {
+            config.tcp_user_timeout(timeout);
+        }
+        if let Some(keepalives) = params.keepalives {
+            config.keepalives(keepalives);
+        }
+        if let Some(timeout) = params.keepalives_idle {
+            config.keepalives_idle(timeout);
+        }
+        if let Some(timeout) = params.keepalives_interval {
+            config.keepalives_interval(timeout);
+        }
+        if let Some(retries) = params.keepalives_retries {
+            config.keepalives_retries(retries);
+        }
+        if let Some(value) = &params.ssl_mode {
+            config.ssl_mode(match value.as_str() {
+                "disable" => SslMode::Disable,
+                "require" => SslMode::Require,
+                _ => SslMode::Prefer,
+            });
+        }
+        if let Some(value) = &params.ssl_negotiation {
+            config.ssl_negotiation(match value.as_str() {
+                "direct" => SslNegotiation::Direct,
+                _ => SslNegotiation::Postgres,
+            });
+        }
+        if let Some(value) = &params.target_session_attrs {
+            config.target_session_attrs(match value.as_str() {
+                "read-write" => TargetSessionAttrs::ReadWrite,
+                "read-only" => TargetSessionAttrs::ReadOnly,
+                _ => TargetSessionAttrs::Any,
+            });
+        }
+        if let Some(value) = &params.channel_binding {
+            config.channel_binding(match value.as_str() {
+                "disable" => ChannelBinding::Disable,
+                "require" => ChannelBinding::Require,
+                _ => ChannelBinding::Prefer,
+            });
+        }
+        if let Some(value) = &params.load_balance_hosts {
+            config.load_balance_hosts(match value.as_str() {
+                "random" => LoadBalanceHosts::Random,
+                _ => LoadBalanceHosts::Disable,
+            });
+        }
+        config.pgbouncer_mode(self.pg_bouncer());
+        let schema = self.schema().unwrap_or(super::DEFAULT_KINGBASE_ORACLE_SCHEMA);
+        config.search_path(format!("\"{}\"", schema.replace('"', "\"\"")));
+        Ok(config)
+    }
 }
 
 impl KingbaseOracle {
