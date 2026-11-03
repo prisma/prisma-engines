@@ -71,7 +71,7 @@ impl<'a> Parser<'a> {
     }
 }
 
-pub(crate) fn get_default_value(default_string: &str, tpe: &ColumnType) -> Option<DefaultValue> {
+pub(super) fn get_default_value(default_string: &str, tpe: &ColumnType) -> Option<DefaultValue> {
     if default_string.trim().starts_with("NULL") {
         return None;
     }

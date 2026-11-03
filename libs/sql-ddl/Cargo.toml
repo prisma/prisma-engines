@@ -5,10 +5,11 @@ edition.workspace = true
 
 [features]
 postgres = []
+kingbase-oracle = []
 mysql = []
 sqlite = []
 mssql = []
-default = ["postgres", "mysql", "sqlite", "mssql"]
+default = ["postgres", "mysql", "sqlite", "mssql", "kingbase-oracle"]
 
 [dependencies]
 

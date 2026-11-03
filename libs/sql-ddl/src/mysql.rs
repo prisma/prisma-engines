@@ -9,7 +9,7 @@ struct Ident<'a>(&'a str);
 impl Display for Ident<'_> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.write_str("`")?;
-        f.write_str(&self.0.replace('`', "``"))?;
+        f.write_str(self.0)?;
         f.write_str("`")
     }
 }
@@ -58,15 +58,13 @@ pub enum AlterTableClause<'a> {
 impl Display for AlterTableClause<'_> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            AlterTableClause::RenameTo { next_name } => write!(f, "RENAME TO {}", Ident(next_name)),
+            AlterTableClause::RenameTo { next_name } => write!(f, "RENAME TO {next_name}"),
             AlterTableClause::RenameIndex {
                 previous_name,
                 next_name,
-            } => write!(f, "RENAME INDEX {} TO {}", Ident(previous_name), Ident(next_name)),
-            AlterTableClause::DropColumn { column_name } => write!(f, "DROP COLUMN {}", Ident(column_name)),
-            AlterTableClause::DropForeignKey { constraint_name } => {
-                write!(f, "DROP FOREIGN KEY {}", Ident(constraint_name))
-            }
+            } => write!(f, "RENAME INDEX `{previous_name}` TO `{next_name}`"),
+            AlterTableClause::DropColumn { column_name } => write!(f, "DROP COLUMN `{column_name}`"),
+            AlterTableClause::DropForeignKey { constraint_name } => write!(f, "DROP FOREIGN KEY `{constraint_name}`"),
             AlterTableClause::DropPrimaryKey => f.write_str("DROP PRIMARY KEY"),
             AlterTableClause::AddForeignKey(fk) => write!(f, "ADD {fk}"),
         }
@@ -86,14 +84,14 @@ pub struct ForeignKey<'a> {
 impl Display for ForeignKey<'_> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         if let Some(constraint_name) = &self.constraint_name {
-            write!(f, "CONSTRAINT {} ", Ident(constraint_name))?;
+            write!(f, "CONSTRAINT `{constraint_name}` ")?;
         }
 
         f.write_str("FOREIGN KEY (")?;
 
         self.constrained_columns.iter().map(|s| Ident(s)).join(", ", f)?;
 
-        write!(f, ") REFERENCES {}(", Ident(&self.referenced_table))?;
+        write!(f, ") REFERENCES `{}`(", self.referenced_table)?;
 
         self.referenced_columns.iter().map(|s| Ident(s)).join(", ", f)?;
 
@@ -198,7 +196,11 @@ impl Display for CreateIndex<'_> {
             IndexType::Fulltext => f.write_str("FULLTEXT ")?,
         }
 
-        write!(f, "INDEX {} ON {}(", Ident(&self.index_name), Ident(&self.on.0))?;
+        f.write_str("INDEX `")?;
+        f.write_str(&self.index_name)?;
+        f.write_str("` ON `")?;
+        f.write_str(&self.on.0)?;
+        f.write_str("`(")?;
 
         self.on
             .1
@@ -296,7 +298,7 @@ pub struct DropTable<'a> {
 
 impl Display for DropTable<'_> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "DROP TABLE {}", Ident(&self.table_name))
+        write!(f, "DROP TABLE `{}`", self.table_name)
     }
 }
 
@@ -308,12 +310,7 @@ pub struct DropIndex<'a> {
 
 impl Display for DropIndex<'_> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(
-            f,
-            "DROP INDEX {} ON {}",
-            Ident(&self.index_name),
-            Ident(&self.table_name)
-        )
+        write!(f, "DROP INDEX `{}` ON `{}`", self.index_name, self.table_name)
     }
 }
 
@@ -374,52 +371,6 @@ impl Display for IndexClause<'_> {
 mod tests {
     use super::*;
     use indoc::indoc;
-
-    #[test]
-    fn identifiers_escape_literal_backticks_in_ddl() {
-        assert_eq!(Ident("a`b").to_string(), "`a``b`");
-        assert_eq!(
-            DropTable {
-                table_name: "a`b".into()
-            }
-            .to_string(),
-            "DROP TABLE `a``b`"
-        );
-        assert_eq!(
-            DropIndex {
-                index_name: "i`x".into(),
-                table_name: "a`b".into()
-            }
-            .to_string(),
-            "DROP INDEX `i``x` ON `a``b`"
-        );
-        let fk = ForeignKey {
-            constraint_name: Some("f`k".into()),
-            constrained_columns: vec!["c`x".into()],
-            referenced_table: "t`y".into(),
-            referenced_columns: vec!["i`d".into()],
-            ..Default::default()
-        };
-        assert_eq!(
-            fk.to_string(),
-            "CONSTRAINT `f``k` FOREIGN KEY (`c``x`) REFERENCES `t``y`(`i``d`)"
-        );
-        assert_eq!(
-            AlterTableClause::RenameIndex {
-                previous_name: "a`b".into(),
-                next_name: "c`d".into()
-            }
-            .to_string(),
-            "RENAME INDEX `a``b` TO `c``d`"
-        );
-        assert_eq!(
-            AlterTableClause::DropColumn {
-                column_name: "a`b".into()
-            }
-            .to_string(),
-            "DROP COLUMN `a``b`"
-        );
-    }
 
     #[test]
     fn alter_table_add_foreign_key() {

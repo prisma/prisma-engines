@@ -5,6 +5,7 @@ use crate::{
 };
 use itertools::Itertools;
 use psl::builtin_connectors::{KingbaseOracleNumberArguments, KingbaseOracleType};
+use sql_ddl::{IndexColumn, SortOrder, kingbase_oracle as ddl};
 use sql_schema_describer::{
     self as sql, ColumnTypeFamily, DefaultKind, DefaultValue, ForeignKeyAction, PrismaValue, SQLSortOrder, SqlSchema,
     walkers::{
@@ -26,26 +27,24 @@ impl SqlRenderer for KingbaseOracleRenderer {
     }
 
     fn render_add_foreign_key(&self, foreign_key: ForeignKeyWalker<'_>) -> String {
-        let constraint = foreign_key
-            .constraint_name()
-            .map(|name| format!("CONSTRAINT {} ", self.quote(name)))
-            .unwrap_or_default();
-        let constrained_columns = foreign_key
-            .constrained_columns()
-            .map(|column| self.quote(column.name()))
-            .join(", ");
-        let referenced_columns = foreign_key
-            .referenced_columns()
-            .map(|column| self.quote(column.name()))
-            .join(", ");
-
-        format!(
-            "ALTER TABLE {table} ADD {constraint}FOREIGN KEY ({constrained_columns}) REFERENCES {referenced_table} ({referenced_columns}) ON DELETE {on_delete} ON UPDATE {on_update}",
-            table = quoted_table(foreign_key.table()),
-            referenced_table = quoted_table(foreign_key.referenced_table()),
-            on_delete = render_foreign_key_action(foreign_key.on_delete_action()),
-            on_update = render_foreign_key_action(foreign_key.on_update_action()),
-        )
+        ddl::AlterTable {
+            table_name: &quoted_table(foreign_key.table()),
+            clauses: vec![ddl::AlterTableClause::AddForeignKey(ddl::ForeignKey {
+                constraint_name: foreign_key.constraint_name().map(Into::into),
+                constrained_columns: foreign_key
+                    .constrained_columns()
+                    .map(|column| column.name().into())
+                    .collect(),
+                referenced_table: &quoted_table(foreign_key.referenced_table()),
+                referenced_columns: foreign_key
+                    .referenced_columns()
+                    .map(|column| column.name().into())
+                    .collect(),
+                on_delete: render_foreign_key_action(foreign_key.on_delete_action()),
+                on_update: render_foreign_key_action(foreign_key.on_update_action()),
+            })],
+        }
+        .to_string()
     }
 
     fn render_alter_enum(&self, alter_enum: &AlterEnum, schemas: MigrationPair<&SqlSchema>) -> Vec<String> {
@@ -109,7 +108,13 @@ impl SqlRenderer for KingbaseOracleRenderer {
                 }
                 TableChange::DropColumn { column_id } => {
                     let column = tables.previous.walk(*column_id);
-                    statements.push(format!("ALTER TABLE {table} DROP COLUMN {}", self.quote(column.name())));
+                    statements.push(
+                        ddl::AlterTable {
+                            table_name: &table,
+                            clauses: vec![ddl::AlterTableClause::DropColumn(column.name().into())],
+                        }
+                        .to_string(),
+                    );
                 }
                 TableChange::AlterColumn(AlterColumn { column_id, changes, .. }) => {
                     let columns = schemas.walk(*column_id);
@@ -117,10 +122,13 @@ impl SqlRenderer for KingbaseOracleRenderer {
                 }
                 TableChange::DropAndRecreateColumn { column_id, .. } => {
                     let columns = schemas.walk(*column_id);
-                    statements.push(format!(
-                        "ALTER TABLE {table} DROP COLUMN {}",
-                        self.quote(columns.previous.name())
-                    ));
+                    statements.push(
+                        ddl::AlterTable {
+                            table_name: &table,
+                            clauses: vec![ddl::AlterTableClause::DropColumn(columns.previous.name().into())],
+                        }
+                        .to_string(),
+                    );
                     statements.extend(render_add_column(&table, columns.next));
                 }
             }
@@ -143,7 +151,6 @@ impl SqlRenderer for KingbaseOracleRenderer {
             "Kingbase Oracle does not support Prisma full-text indexes"
         );
 
-        let unique = if index.is_unique() { "UNIQUE " } else { "" };
         // Oracle foreign keys may reference UNIQUE constraints, but not a
         // standalone unique index. Descending indexes cannot back constraints.
         if index.is_unique()
@@ -151,33 +158,33 @@ impl SqlRenderer for KingbaseOracleRenderer {
                 .columns()
                 .any(|column| column.sort_order() == Some(SQLSortOrder::Desc))
         {
-            let columns = index.column_names().map(|name| self.quote(name)).join(", ");
-            return format!(
-                "ALTER TABLE {} ADD CONSTRAINT {} UNIQUE ({columns})",
-                quoted_table(index.table()),
-                self.quote(index.name()),
-            );
+            return ddl::AlterTable {
+                table_name: &quoted_table(index.table()),
+                clauses: vec![ddl::AlterTableClause::AddUnique {
+                    constraint_name: index.name().into(),
+                    columns: index.column_names().map(Into::into).collect(),
+                }],
+            }
+            .to_string();
         }
-        let columns = index
-            .columns()
-            .map(|column| {
-                let mut output = self.quote(column.as_column().name()).to_string();
-                if let Some(sort_order) = column.sort_order() {
-                    output.push(' ');
-                    output.push_str(match sort_order {
-                        SQLSortOrder::Asc => "ASC",
-                        SQLSortOrder::Desc => "DESC",
-                    });
-                }
-                output
-            })
-            .join(", ");
-
-        format!(
-            "CREATE {unique}INDEX {} ON {} ({columns})",
-            self.quote(index.name()),
-            quoted_table(index.table())
-        )
+        ddl::CreateIndex {
+            index_name: index.name().into(),
+            table_name: &quoted_table(index.table()),
+            columns: index
+                .columns()
+                .map(|column| IndexColumn {
+                    name: column.as_column().name().into(),
+                    length: None,
+                    sort_order: column.sort_order().map(|order| match order {
+                        SQLSortOrder::Asc => SortOrder::Asc,
+                        SQLSortOrder::Desc => SortOrder::Desc,
+                    }),
+                    operator_class: None,
+                })
+                .collect(),
+            is_unique: index.is_unique(),
+        }
+        .to_string()
     }
 
     fn render_create_table(&self, table: TableWalker<'_>) -> String {
@@ -186,6 +193,8 @@ impl SqlRenderer for KingbaseOracleRenderer {
 
     fn render_create_table_as(&self, table: TableWalker<'_>, table_name: QuotedWithPrefix<&str>) -> String {
         let escape = |quoted| match quoted {
+            #[cfg(feature = "kingbase-mysql")]
+            Quoted::KingbaseMysqlIdentifier(name) => Quoted::OracleIdentifier(name),
             Quoted::Double(name)
             | Quoted::Single(name)
             | Quoted::Backticks(name)
@@ -275,11 +284,11 @@ impl SqlRenderer for KingbaseOracleRenderer {
     }
 
     fn render_rename_table(&self, namespace: Option<&str>, name: &str, new_name: &str) -> String {
-        format!(
-            "ALTER TABLE {} RENAME TO {}",
-            quoted_name(namespace, name),
-            self.quote(new_name)
-        )
+        ddl::AlterTable {
+            table_name: &quoted_name(namespace, name),
+            clauses: vec![ddl::AlterTableClause::RenameTo(new_name.into())],
+        }
+        .to_string()
     }
 
     fn render_drop_view(&self, namespace: Option<&str>, view: ViewWalker<'_>) -> String {
@@ -305,10 +314,11 @@ impl SqlRenderer for KingbaseOracleRenderer {
 }
 
 fn create_enum_statement<'a>(name: &str, values: impl Iterator<Item = &'a str>) -> String {
-    format!(
-        "CREATE TYPE {name} AS ENUM ({})",
-        values.map(Quoted::OracleString).join(", ")
-    )
+    ddl::CreateEnum {
+        enum_name: &name,
+        variants: values.map(Into::into).collect(),
+    }
+    .to_string()
 }
 
 /// Oracle 19c has no schema enum type. Use the documented KES enum interface,
@@ -632,23 +642,18 @@ fn render_create_table_with_sequences(
     table_name: QuotedWithPrefix<&str>,
     sequence_table_name: &str,
 ) -> String {
-    let mut definitions = table
-        .columns()
-        .map(|column| render_column(column, sequence_table_name))
-        .collect::<Vec<_>>();
-
-    if let Some(primary_key) = table.primary_key() {
-        let columns = primary_key
+    let create_table = ddl::CreateTable {
+        table_name: &table_name,
+        columns: table
             .columns()
-            .map(|column| Quoted::OracleIdentifier(column.name()))
-            .join(", ");
-        definitions.push(format!(
-            "CONSTRAINT {} PRIMARY KEY ({columns})",
-            Quoted::OracleIdentifier(primary_key.name())
-        ));
+            .map(|column| render_column(column, sequence_table_name))
+            .collect(),
+        primary_key: table.primary_key().map(|primary_key| ddl::PrimaryKey {
+            constraint_name: primary_key.name().into(),
+            columns: primary_key.columns().map(|column| column.name().into()).collect(),
+        }),
     }
-
-    let create_table = format!("CREATE TABLE {table_name} (\n    {}\n)", definitions.join(",\n    "));
+    .to_string();
     let mut statements = table
         .columns()
         .filter(|column| column.is_autoincrement())
@@ -673,10 +678,16 @@ fn render_add_column(table: &QuotedWithPrefix<&str>, column: TableColumnWalker<'
         statements.push(render_create_sequence(column, column.table().name()));
     }
 
-    statements.push(format!(
-        "ALTER TABLE {table} ADD ({})",
-        render_column(column, column.table().name())
-    ));
+    statements.push(
+        ddl::AlterTable {
+            table_name: table,
+            clauses: vec![ddl::AlterTableClause::AddColumn(render_column(
+                column,
+                column.table().name(),
+            ))],
+        }
+        .to_string(),
+    );
 
     if column.is_autoincrement() {
         statements.push(render_own_sequence(column, table, column.table().name()));
@@ -685,30 +696,27 @@ fn render_add_column(table: &QuotedWithPrefix<&str>, column: TableColumnWalker<'
     statements
 }
 
-fn render_column(column: TableColumnWalker<'_>, sequence_table_name: &str) -> String {
-    let mut output = format!(
-        "{} {}",
-        Quoted::OracleIdentifier(column.name()),
-        render_column_type(column)
-    );
-
-    if column.arity().is_required() {
-        output.push_str(" NOT NULL");
-    }
-
-    if column.is_autoincrement() {
+fn render_column<'a>(column: TableColumnWalker<'a>, sequence_table_name: &str) -> ddl::Column<'a> {
+    let default = if column.is_autoincrement() {
         let sequence = quoted_sequence(column, sequence_table_name);
-        write!(output, " DEFAULT nextval({})", Quoted::OracleString(&sequence)).unwrap();
-    } else if let Some(default) = column
-        .default()
-        .filter(|default| !matches!(default.kind(), DefaultKind::DbGenerated(None)))
-        && !matches!(default.kind(), DefaultKind::Sequence(_))
-    {
-        output.push_str(" DEFAULT ");
-        output.push_str(&render_default(default.inner()));
+        Some(format!("nextval({})", ddl::OracleString(&sequence)).into())
+    } else {
+        column
+            .default()
+            .filter(|default| {
+                !matches!(
+                    default.kind(),
+                    DefaultKind::DbGenerated(None) | DefaultKind::Sequence(_)
+                )
+            })
+            .map(|default| render_default(default.inner()))
+    };
+    ddl::Column {
+        name: column.name().into(),
+        r#type: render_column_type(column),
+        not_null: column.arity().is_required(),
+        default,
     }
-
-    output
 }
 
 fn render_column_type(column: TableColumnWalker<'_>) -> Cow<'static, str> {
@@ -792,13 +800,13 @@ fn render_default(default: &DefaultValue) -> Cow<'_, str> {
     }
 }
 
-fn render_foreign_key_action(action: ForeignKeyAction) -> &'static str {
+fn render_foreign_key_action(action: ForeignKeyAction) -> ddl::ForeignKeyAction {
     match action {
-        ForeignKeyAction::Cascade => "CASCADE",
-        ForeignKeyAction::NoAction => "NO ACTION",
-        ForeignKeyAction::Restrict => "RESTRICT",
-        ForeignKeyAction::SetDefault => "SET DEFAULT",
-        ForeignKeyAction::SetNull => "SET NULL",
+        ForeignKeyAction::Cascade => ddl::ForeignKeyAction::Cascade,
+        ForeignKeyAction::NoAction => ddl::ForeignKeyAction::NoAction,
+        ForeignKeyAction::Restrict => ddl::ForeignKeyAction::Restrict,
+        ForeignKeyAction::SetDefault => ddl::ForeignKeyAction::SetDefault,
+        ForeignKeyAction::SetNull => ddl::ForeignKeyAction::SetNull,
     }
 }
 
@@ -861,6 +869,96 @@ fn render_own_sequence(
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn ddl_layout_preserves_migration_scripts() {
+        use psl::parser_database::NoExtensionTypes;
+        use schema_connector::SchemaDialect;
+
+        let dialect = crate::SqlSchemaDialect::kingbase_oracle();
+        let datasource = "datasource db {\n provider = \"kingbase-oracle\"\n}\n";
+        let models = r#"
+enum Status {
+  READY
+  DONE
+}
+model Parent {
+  id Int @id @default(autoincrement())
+  name String @default("O'Reilly\\path") @map("na\"me")
+  state Status @default(READY)
+  children Child[]
+  @@map("Pa\"rent")
+  @@index([name(sort: Desc)], map: "name\"index")
+}
+model Child {
+  id Int @id
+  parentId Int
+  parent Parent @relation(fields: [parentId], references: [id], onDelete: Cascade, map: "fk\"parent")
+  code String? @unique(map: "code\"unique")
+}
+"#;
+        let source = format!("{datasource}{models}");
+        let calculate = |source: String| {
+            dialect
+                .schema_from_datamodel(
+                    vec![("schema.prisma".into(), source.into())],
+                    Some("public"),
+                    &NoExtensionTypes,
+                )
+                .unwrap()
+        };
+        let target = source
+            .replace("@default(\"O'Reilly\\\\path\")", "@default(\"changed\")")
+            .replace("code String?", "code String");
+        let create = dialect.diff(
+            calculate(datasource.into()),
+            calculate(source.clone()),
+            &Default::default(),
+        );
+        let alter = dialect.diff(calculate(source), calculate(target), &Default::default());
+        let create =
+            crate::apply_migration::render_script(&create, &Default::default(), &KingbaseOracleRenderer).unwrap();
+        let alter =
+            crate::apply_migration::render_script(&alter, &Default::default(), &KingbaseOracleRenderer).unwrap();
+        let scripts = format!("{create}\n{alter}");
+        expect_test::expect![[r#"
+-- CreateEnum
+CREATE TYPE "Status" AS ENUM ('READY', 'DONE');
+
+-- CreateTable
+CREATE SEQUENCE "pa""rent_id_seq_16d279fb84efd911";
+CREATE TABLE "Pa""rent" (
+    "id" NUMBER(10,0) NOT NULL DEFAULT nextval('"pa""rent_id_seq_16d279fb84efd911"'),
+    "na""me" VARCHAR2(4000) NOT NULL DEFAULT 'O''Reilly\path',
+    "state" "Status" NOT NULL DEFAULT 'READY',
+    CONSTRAINT "Pa""rent_pkey" PRIMARY KEY ("id")
+);
+ALTER SEQUENCE "pa""rent_id_seq_16d279fb84efd911" OWNED BY "Pa""rent"."id";
+
+-- CreateTable
+CREATE TABLE "Child" (
+    "id" NUMBER(10,0) NOT NULL,
+    "parentId" NUMBER(10,0) NOT NULL,
+    "code" VARCHAR2(4000),
+    CONSTRAINT "Child_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateIndex
+CREATE INDEX "name""index" ON "Pa""rent" ("na""me" DESC);
+
+-- CreateIndex
+ALTER TABLE "Child" ADD CONSTRAINT "code""unique" UNIQUE ("code");
+
+-- AddForeignKey
+ALTER TABLE "Child" ADD CONSTRAINT "fk""parent" FOREIGN KEY ("parentId") REFERENCES "Pa""rent" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AlterTable
+ALTER TABLE "Pa""rent" ALTER COLUMN "na""me" SET DEFAULT 'changed';
+
+-- AlterTable
+ALTER TABLE "Child" ALTER COLUMN "code" SET NOT NULL;
+"#]].assert_eq(&scripts);
+    }
 
     #[test]
     fn drops_the_actual_owning_constraint_instead_of_the_index_name() {

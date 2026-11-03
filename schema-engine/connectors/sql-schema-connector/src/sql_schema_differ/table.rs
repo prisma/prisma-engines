@@ -157,10 +157,7 @@ impl<'schema> TableDiffer<'schema, '_> {
                     .columns()
                     .any(|pk_col| pk_col.name() == columns.previous.name())
             })
-            .any(|columns| {
-                self.db.column_changes_for_walkers(columns).type_changed()
-                    && self.db.flavour.primary_key_column_change_requires_recreation(columns)
-            })
+            .any(|columns| self.db.column_changes_for_walkers(columns).type_changed())
     }
 
     fn previous_foreign_keys<'a>(&'a self) -> impl Iterator<Item = ForeignKeyWalker<'schema>> + 'a {

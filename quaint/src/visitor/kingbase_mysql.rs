@@ -1,7 +1,7 @@
 use crate::{
     ast::{NativeColumnType, OpaqueType, Query, Value, ValueType},
     error::{Error, ErrorKind},
-    visitor::{Mysql, Visitor},
+    visitor::Mysql,
 };
 use query_template::{Fragment, PlaceholderFormat, QueryTemplate};
 use std::borrow::Cow;
@@ -17,7 +17,7 @@ impl KingbaseMysql {
     where
         Q: Into<Query<'a>>,
     {
-        let template = Mysql::build_template(query)?;
+        let template = Mysql::build_template_for_kingbase(query)?;
         let QueryTemplate {
             fragments,
             mut parameters,
@@ -862,9 +862,34 @@ mod tests {
     use super::KingbaseMysql;
     use crate::Value;
     use crate::ast::{
-        Column, Comparable, Expression, JsonPath, OpaqueType, Select, ValueType, json_extract, json_unquote,
-        native_uuid, text_search, text_search_relevance,
+        Aliasable, Column, Comparable, Expression, JsonPath, OpaqueType, Select, Table, ValueType, json_extract,
+        json_unquote, native_uuid, text_search, text_search_relevance,
     };
+    use crate::visitor::{Mysql, Visitor};
+
+    #[test]
+    fn identifier_escaping_is_scoped_to_kingbase_without_changing_values() {
+        let value = "a`b 'literal'";
+        let query = Select::from_table(Table::from("ta`ble").alias("al`ias"))
+            .column(Column::from(("al`ias", "co`l")).alias("out`put"))
+            .so_that(Column::from(("al`ias", "co`l")).equals(value));
+
+        let (kingbase, parameters) = KingbaseMysql::build(query.clone()).unwrap();
+        assert_eq!(
+            kingbase,
+            "SELECT `al``ias`.`co``l` AS `out``put` FROM `ta``ble` AS `al``ias` WHERE `al``ias`.`co``l` = ?"
+        );
+        assert_eq!(parameters, vec![Value::text(value)]);
+
+        // Preserve the upstream MySQL visitor's output even for embedded quote
+        // characters: Kingbase fixes must not silently change native MySQL.
+        let (mysql, native_parameters) = Mysql::build(query).unwrap();
+        assert_eq!(
+            mysql,
+            "SELECT `al`ias`.`co`l` AS `out`put` FROM `ta`ble` AS `al`ias` WHERE `al`ias`.`co`l` = ?"
+        );
+        assert_eq!(native_parameters, parameters);
+    }
 
     #[test]
     fn sum_parameters_keep_their_original_types() {

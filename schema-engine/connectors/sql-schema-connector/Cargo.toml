@@ -20,7 +20,7 @@ kingbase-mysql-native = [
     "quaint/expose-drivers",
     "user-facing-errors/kingbase-mysql-native",
 ]
-kingbase-oracle = ["psl/kingbase-oracle", "quaint/kingbase-oracle", "schema-connector/kingbase-oracle", "sql-schema-describer/kingbase-oracle"]
+kingbase-oracle = ["psl/kingbase-oracle", "quaint/kingbase-oracle", "schema-connector/kingbase-oracle", "sql-schema-describer/kingbase-oracle", "sql-ddl/kingbase-oracle"]
 kingbase-oracle-native = [
     "kingbase-oracle",
     "quaint/kingbase-oracle-native",

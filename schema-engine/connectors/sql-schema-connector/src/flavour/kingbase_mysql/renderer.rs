@@ -20,18 +20,35 @@ use std::{borrow::Cow, fmt::Write as _, sync::LazyLock};
 
 /// Kingbase MySQL migration renderer.
 ///
-/// This starts with the exact MySQL renderer behavior. Kingbase-specific DDL
-/// differences can be overridden here without changing standard MySQL output.
+/// Reuses MySQL DDL builders while keeping Kingbase-specific syntax and
+/// identifier escaping separate from standard MySQL output.
 #[derive(Debug, Default)]
 pub(crate) struct KingbaseMysqlRenderer;
 
 impl SqlRenderer for KingbaseMysqlRenderer {
     fn quote<'a>(&self, name: &'a str) -> Quoted<&'a str> {
-        MysqlRenderer.quote(name)
+        Quoted::KingbaseMysqlIdentifier(name)
     }
 
     fn render_add_foreign_key(&self, foreign_key: ForeignKeyWalker<'_>) -> String {
-        MysqlRenderer.render_add_foreign_key(foreign_key)
+        ddl::AlterTable {
+            table_name: escape_identifier(foreign_key.table().name()),
+            changes: vec![ddl::AlterTableClause::AddForeignKey(ddl::ForeignKey {
+                constraint_name: foreign_key.constraint_name().map(escape_identifier),
+                constrained_columns: foreign_key
+                    .constrained_columns()
+                    .map(|column| escape_identifier(column.name()))
+                    .collect(),
+                referenced_table: escape_identifier(foreign_key.referenced_table().name()),
+                referenced_columns: foreign_key
+                    .referenced_columns()
+                    .map(|column| escape_identifier(column.name()))
+                    .collect(),
+                on_delete: Some(render_foreign_key_action(foreign_key.on_delete_action())),
+                on_update: Some(render_foreign_key_action(foreign_key.on_update_action())),
+            })],
+        }
+        .to_string()
     }
 
     fn render_alter_enum(&self, alter_enum: &AlterEnum, schemas: MigrationPair<&SqlSchema>) -> Vec<String> {
@@ -101,7 +118,7 @@ impl SqlRenderer for KingbaseMysqlRenderer {
                     let column = tables.previous.walk(*column_id);
                     lines.push(
                         sql_ddl::mysql::AlterTableClause::DropColumn {
-                            column_name: column.name().into(),
+                            column_name: escape_identifier(column.name()),
                         }
                         .to_string(),
                     );
@@ -115,7 +132,7 @@ impl SqlRenderer for KingbaseMysqlRenderer {
                     if changes.only_default_changed() && columns.next.default().is_none() {
                         lines.push(format!(
                             "ALTER COLUMN {} DROP DEFAULT",
-                            Quoted::mysql_ident(columns.previous.name())
+                            Quoted::KingbaseMysqlIdentifier(columns.previous.name())
                         ));
                     } else {
                         let defaults = (
@@ -176,9 +193,9 @@ impl SqlRenderer for KingbaseMysqlRenderer {
                 } else {
                     ddl::IndexType::Normal
                 },
-                index_name: physical_index_name(index).into(),
+                index_name: escape_identifier(physical_index_name(index)),
                 on: (
-                    index.table().name().into(),
+                    escape_identifier(index.table().name()),
                     index.columns().map(render_index_column).collect(),
                 ),
             }
@@ -191,10 +208,18 @@ impl SqlRenderer for KingbaseMysqlRenderer {
     }
 
     fn render_create_table(&self, table: TableWalker<'_>) -> String {
-        self.render_create_table_as(table, QuotedWithPrefix(None, Quoted::mysql_ident(table.name())))
+        self.render_create_table_as(
+            table,
+            QuotedWithPrefix(None, Quoted::KingbaseMysqlIdentifier(table.name())),
+        )
     }
 
     fn render_create_table_as(&self, table: TableWalker<'_>, table_name: QuotedWithPrefix<&str>) -> String {
+        let kingbase_quote = |quoted| match quoted {
+            Quoted::Backticks(name) => self.quote(name),
+            quoted => quoted,
+        };
+        let table_name = QuotedWithPrefix(table_name.0.map(kingbase_quote), kingbase_quote(table_name.1));
         // Kingbase accepts the MySQL column and index syntax, but does not
         // accept MySQL's table-level character-set/collation options.
         let mut rendered = ddl::CreateTable {
@@ -206,7 +231,7 @@ impl SqlRenderer for KingbaseMysqlRenderer {
                 .indexes()
                 .filter(|index| !index.is_primary_key() && !super::index_is_created_separately(*index))
                 .map(|index| ddl::IndexClause {
-                    index_name: Some(Cow::from(physical_index_name(index))),
+                    index_name: Some(escape_identifier(physical_index_name(index))),
                     r#type: match index.index_type() {
                         sql::IndexType::Unique => ddl::IndexType::Unique,
                         sql::IndexType::Normal => ddl::IndexType::Normal,
@@ -264,7 +289,7 @@ impl SqlRenderer for KingbaseMysqlRenderer {
         format!(
             "ALTER TABLE {table} DROP CONSTRAINT {constraint_name}",
             table = self.quote(foreign_key.table().name()),
-            constraint_name = Quoted::mysql_ident(foreign_key.constraint_name().unwrap()),
+            constraint_name = Quoted::KingbaseMysqlIdentifier(foreign_key.constraint_name().unwrap()),
         )
     }
 
@@ -283,7 +308,13 @@ impl SqlRenderer for KingbaseMysqlRenderer {
     }
 
     fn render_drop_table(&self, namespace: Option<&str>, table_name: &str) -> Vec<String> {
-        MysqlRenderer.render_drop_table(namespace, table_name)
+        let _ = namespace;
+        vec![
+            ddl::DropTable {
+                table_name: escape_identifier(table_name),
+            }
+            .to_string(),
+        ]
     }
 
     fn render_redefine_tables(&self, tables: &[RedefineTable], schemas: MigrationPair<&SqlSchema>) -> Vec<String> {
@@ -291,11 +322,13 @@ impl SqlRenderer for KingbaseMysqlRenderer {
     }
 
     fn render_rename_table(&self, namespace: Option<&str>, name: &str, new_name: &str) -> String {
-        MysqlRenderer.render_rename_table(namespace, name, new_name)
+        let _ = namespace;
+        format!("ALTER TABLE {} RENAME TO {}", self.quote(name), self.quote(new_name))
     }
 
     fn render_drop_view(&self, namespace: Option<&str>, view: ViewWalker<'_>) -> String {
-        MysqlRenderer.render_drop_view(namespace, view)
+        let _ = namespace;
+        format!("DROP VIEW {}", self.quote(view.name()))
     }
 
     fn render_drop_user_defined_type(&self, namespace: Option<&str>, udt: &UserDefinedTypeWalker<'_>) -> String {
@@ -311,6 +344,26 @@ impl SqlRenderer for KingbaseMysqlRenderer {
     }
 }
 
+// sql-ddl::mysql deliberately retains upstream identifier handling. Escape only
+// the raw identifier fields passed to its builders by the Kingbase renderer.
+fn escape_identifier(name: &str) -> Cow<'_, str> {
+    if name.contains('`') {
+        Cow::Owned(name.replace('`', "``"))
+    } else {
+        Cow::Borrowed(name)
+    }
+}
+
+fn render_foreign_key_action(action: sql::ForeignKeyAction) -> ddl::ForeignKeyAction {
+    match action {
+        sql::ForeignKeyAction::Cascade => ddl::ForeignKeyAction::Cascade,
+        sql::ForeignKeyAction::NoAction => ddl::ForeignKeyAction::NoAction,
+        sql::ForeignKeyAction::Restrict => ddl::ForeignKeyAction::Restrict,
+        sql::ForeignKeyAction::SetDefault => ddl::ForeignKeyAction::SetDefault,
+        sql::ForeignKeyAction::SetNull => ddl::ForeignKeyAction::SetNull,
+    }
+}
+
 fn physical_index_name(index: IndexWalker<'_>) -> &str {
     let ext: &sql::kingbase_mysql::KingbaseMysqlSchemaExt = index.schema.downcast_connector_data();
     ext.physical_index_names
@@ -323,7 +376,7 @@ fn index_logical_name_comment(index: IndexWalker<'_>) -> Option<String> {
     (physical_index_name(index) != index.name()).then(|| {
         format!(
             "COMMENT ON INDEX {} IS '{}'",
-            Quoted::mysql_ident(physical_index_name(index)),
+            Quoted::KingbaseMysqlIdentifier(physical_index_name(index)),
             format!("{}{}", sql::kingbase_mysql::INDEX_LOGICAL_NAME_PREFIX, index.name()).replace('\'', "''"),
         )
     })
@@ -332,14 +385,19 @@ fn index_logical_name_comment(index: IndexWalker<'_>) -> Option<String> {
 fn render_fulltext_index(index: IndexWalker<'_>) -> String {
     let document = index
         .columns()
-        .map(|column| format!("COALESCE({}, '')", Quoted::mysql_ident(column.as_column().name())))
+        .map(|column| {
+            format!(
+                "COALESCE({}, '')",
+                Quoted::KingbaseMysqlIdentifier(column.as_column().name())
+            )
+        })
         .reduce(|document, column| format!("textcat({document}, textcat(' ', {column}))"))
         .expect("a full-text index must contain at least one column");
 
     format!(
         "CREATE INDEX {index_name} ON {table_name} USING GIN (to_tsvector('simple', {document}))",
-        index_name = Quoted::mysql_ident(physical_index_name(index)),
-        table_name = Quoted::mysql_ident(index.table().name()),
+        index_name = Quoted::KingbaseMysqlIdentifier(physical_index_name(index)),
+        table_name = Quoted::KingbaseMysqlIdentifier(index.table().name()),
     )
 }
 
@@ -356,7 +414,7 @@ fn render_column(col: TableColumnWalker<'_>) -> ddl::Column<'_> {
         .map(|default| render_default(col, default.inner()));
 
     ddl::Column {
-        column_name: col.name().into(),
+        column_name: escape_identifier(col.name()),
         not_null: col.arity().is_required(),
         column_type: render_column_type(col),
         default,
@@ -377,7 +435,7 @@ fn render_primary_key_column(column: sql::walkers::IndexColumnWalker<'_>) -> Ind
 
 fn render_index_column(column: sql::walkers::IndexColumnWalker<'_>) -> IndexColumn<'_> {
     IndexColumn {
-        name: column.as_column().name().into(),
+        name: escape_identifier(column.as_column().name()),
         length: column.length(),
         sort_order: column.sort_order().map(|sort_order| match sort_order {
             SQLSortOrder::Asc => SortOrder::Asc,
@@ -476,7 +534,7 @@ fn render_modify_column(
 
     format!(
         "MODIFY {column_name} {column_type}{nullability}{default}{sequence}",
-        column_name = Quoted::mysql_ident(next_column.name()),
+        column_name = Quoted::KingbaseMysqlIdentifier(next_column.name()),
         nullability = if next_column.arity().is_required() {
             " NOT NULL"
         } else {
@@ -495,7 +553,7 @@ fn render_alter_column_with_using(
     new_default: Option<&DefaultValue>,
     columns: MigrationPair<TableColumnWalker<'_>>,
 ) -> Vec<String> {
-    let column_name = Quoted::mysql_ident(columns.previous.name());
+    let column_name = Quoted::KingbaseMysqlIdentifier(columns.previous.name());
     let target_type = render_column_type(columns.next);
     let using = render_using_expression(columns).expect("explicit cast support must have a USING expression");
     let mut clauses = vec![format!("ALTER COLUMN {column_name} TYPE {target_type} USING ({using})",)];
@@ -524,7 +582,7 @@ fn render_alter_column_with_using(
 fn render_using_expression(columns: MigrationPair<TableColumnWalker<'_>>) -> Option<String> {
     let previous = columns.previous.column_native_type::<KingbaseMySqlType>()?;
     let next = columns.next.column_native_type::<KingbaseMySqlType>()?;
-    let column = Quoted::mysql_ident(columns.previous.name()).to_string();
+    let column = Quoted::KingbaseMysqlIdentifier(columns.previous.name()).to_string();
     let target_type = render_column_type(columns.next);
 
     render_using_expression_for_types(previous, next, &column, &target_type)
@@ -938,6 +996,76 @@ mod tests {
         assert_eq!(KingbaseMysqlRenderer.quote("users").to_string(), "`users`");
         assert_eq!(KingbaseMysqlRenderer.quote("old`name").to_string(), "`old``name`");
         assert_eq!(quote_identifier("old`name"), "`old``name`");
+        assert_eq!(MysqlRenderer.quote("old`name").to_string(), "`old`name`");
+        assert_eq!(Quoted::postgres_ident("old\"name").to_string(), "\"old\"name\"");
+    }
+
+    #[test]
+    fn shared_mysql_ddl_builders_escape_only_kingbase_identifier_inputs() {
+        let mut schema = SqlSchema::default();
+        let namespace = schema.push_namespace("public".into());
+        let table = schema.push_table("ta`ble".into(), namespace, None);
+        let mut tpe = sql::ColumnType::pure(ColumnTypeFamily::Int, sql::ColumnArity::Required);
+        tpe.native_type = Some(psl::datamodel_connector::NativeTypeInstance::new(
+            KingbaseMySqlType::Int,
+        ));
+        let column = schema.push_table_column(
+            table,
+            sql::Column {
+                name: "co`l".into(),
+                tpe,
+                auto_increment: false,
+                description: None,
+            },
+        );
+        let index = schema.push_index_of_type(table, "i`x".into(), sql::IndexType::Normal);
+        schema.push_index_column(sql::IndexColumn {
+            index_id: index,
+            column_id: column,
+            sort_order: None,
+            length: None,
+        });
+        let foreign_key = schema.push_foreign_key(
+            Some("f`k".into()),
+            [table, table],
+            [sql::ForeignKeyAction::Cascade, sql::ForeignKeyAction::Restrict],
+        );
+        schema.push_foreign_key_column(foreign_key, [column, column]);
+        schema.set_connector_data(Box::<sql::kingbase_mysql::KingbaseMysqlSchemaExt>::default());
+        let renderer = KingbaseMysqlRenderer;
+        assert_eq!(
+            renderer.render_create_table(schema.walk(table)),
+            "CREATE TABLE `ta``ble` (\n    `co``l` INTEGER NOT NULL,\n\n    INDEX `i``x`(`co``l`)\n)"
+        );
+        assert_eq!(
+            renderer.render_create_index(schema.walk(index)),
+            "CREATE INDEX `i``x` ON `ta``ble`(`co``l`)"
+        );
+        assert_eq!(
+            renderer.render_add_foreign_key(schema.walk(foreign_key)),
+            "ALTER TABLE `ta``ble` ADD CONSTRAINT `f``k` FOREIGN KEY (`co``l`) REFERENCES `ta``ble`(`co``l`) ON DELETE CASCADE ON UPDATE RESTRICT"
+        );
+        assert_eq!(renderer.render_drop_table(None, "ta`ble"), vec!["DROP TABLE `ta``ble`"]);
+        assert_eq!(
+            renderer.render_rename_table(None, "ta`ble", "new`name"),
+            "ALTER TABLE `ta``ble` RENAME TO `new``name`"
+        );
+        let alter = AlterTable {
+            table_ids: MigrationPair::new(table, table),
+            changes: vec![TableChange::DropColumn { column_id: column }],
+        };
+        assert_eq!(
+            renderer.render_alter_table(&alter, MigrationPair::new(&schema, &schema)),
+            vec!["ALTER TABLE `ta``ble` DROP COLUMN `co``l`"]
+        );
+
+        assert_eq!(
+            ddl::DropTable {
+                table_name: "ta`ble".into()
+            }
+            .to_string(),
+            "DROP TABLE `ta`ble`"
+        );
     }
 
     #[test]

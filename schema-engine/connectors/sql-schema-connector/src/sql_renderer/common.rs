@@ -36,10 +36,14 @@ where
 #[derive(Debug, Clone, Copy)]
 pub(crate) enum Quoted<T> {
     Double(T),
+    #[cfg(feature = "kingbase-oracle")]
     OracleIdentifier(T),
+    #[cfg(feature = "kingbase-oracle")]
     OracleString(T),
     Single(T),
     Backticks(T),
+    #[cfg(feature = "kingbase-mysql")]
+    KingbaseMysqlIdentifier(T),
     SquareBrackets(T),
 }
 
@@ -83,11 +87,17 @@ where
 {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Quoted::OracleIdentifier(inner) => write!(f, "\"{}\"", inner.to_string().replace('"', "\"\"")),
-            Quoted::OracleString(inner) => write!(f, "'{}'", inner.to_string().replace('\'', "''")),
+            #[cfg(feature = "kingbase-oracle")]
+            Quoted::OracleIdentifier(inner) => {
+                Display::fmt(&sql_ddl::kingbase_oracle::OracleIdentifier(&inner.to_string()), f)
+            }
+            #[cfg(feature = "kingbase-oracle")]
+            Quoted::OracleString(inner) => Display::fmt(&sql_ddl::kingbase_oracle::OracleString(&inner.to_string()), f),
             Quoted::Double(inner) => write!(f, "\"{inner}\""),
             Quoted::Single(inner) => write!(f, "'{inner}'"),
-            Quoted::Backticks(inner) => write!(f, "`{}`", inner.to_string().replace('`', "``")),
+            Quoted::Backticks(inner) => write!(f, "`{inner}`"),
+            #[cfg(feature = "kingbase-mysql")]
+            Quoted::KingbaseMysqlIdentifier(inner) => write!(f, "`{}`", inner.to_string().replace('`', "``")),
             Quoted::SquareBrackets(inner) => write!(f, "[{inner}]"),
         }
     }

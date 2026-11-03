@@ -15,7 +15,7 @@ use quaint::{
     Value,
     connector::{DEFAULT_POSTGRES_SCHEMA, PostgresUrl, PostgresWebSocketUrl, is_url_localhost},
 };
-pub(crate) use renderer::PostgresRenderer;
+use renderer::PostgresRenderer;
 use schema_calculator::PostgresSchemaCalculatorFlavour;
 use schema_connector::{
     BoxFuture, ConnectorError, ConnectorResult, Namespaces, SchemaFilter, migrations_directory::Migrations,
