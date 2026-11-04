@@ -7,11 +7,11 @@ mod column_type;
 mod conversion;
 mod error;
 
-use column_type::{column_type_from_type, is_catalog_text_array, is_oracle_text_type};
+use column_type::column_type_from_type;
 use error::convert_driver_error;
 
 use crate::{
-    ast::{Query, Value, ValueType},
+    ast::{Query, Value},
     connector::{
         DescribedColumn, DescribedParameter, DescribedQuery, IsolationLevel, ResultSet, Transaction, queryable::*,
         trace,
@@ -20,13 +20,9 @@ use crate::{
     visitor::{KingbaseOracle as KingbaseOracleVisitor, Visitor},
 };
 use async_trait::async_trait;
-use chrono::{DateTime, NaiveDate, NaiveDateTime, NaiveTime, Utc};
 use futures::{Future, StreamExt, future::FutureExt};
 use kingbase_postgres_native_tls::MakeTlsConnector;
-use kingbase_tokio_postgres::{
-    Client, Row,
-    types::{Kind, Type},
-};
+use kingbase_tokio_postgres::{Client, types::Type};
 use kingbase_tokio_postgres::{
     Config,
     config::{ChannelBinding, LoadBalanceHosts, SslMode, SslNegotiation, TargetSessionAttrs},
@@ -34,7 +30,6 @@ use kingbase_tokio_postgres::{
 use native_tls::{Certificate, Identity, TlsConnector};
 use percent_encoding::percent_decode;
 use std::{
-    borrow::Cow,
     fs,
     sync::atomic::{AtomicBool, Ordering},
     time::Duration,
@@ -316,7 +311,7 @@ impl KingbaseOracle {
         let mut result = ResultSet::new(names, types, Vec::new());
 
         while let Some(row) = rows.next().await {
-            result.rows.push(convert_row(&driver_result(row)?)?);
+            result.rows.push(conversion::convert_row(&driver_result(row)?)?);
         }
 
         Ok(result)
@@ -348,80 +343,6 @@ impl KingbaseOracle {
 
 fn driver_result<T>(result: Result<T, kingbase_tokio_postgres::Error>) -> crate::Result<T> {
     result.map_err(convert_driver_error)
-}
-
-fn convert_row(row: &Row) -> crate::Result<Vec<Value<'static>>> {
-    let mut values = Vec::with_capacity(row.columns().len());
-
-    for (index, column) in row.columns().iter().enumerate() {
-        let typ = column.type_();
-        let value = if matches!(typ.kind(), Kind::Enum(_)) {
-            let value: Option<conversion::EnumString> = driver_result(row.try_get(index))?;
-            ValueType::Enum(value.map(|value| crate::prelude::EnumVariant::new(value.0)), None).into()
-        } else if typ == &Type::BOOL {
-            ValueType::Boolean(driver_result(row.try_get(index))?).into()
-        } else if typ == &Type::INT2 {
-            let value: Option<i16> = driver_result(row.try_get(index))?;
-            ValueType::Int32(value.map(i32::from)).into()
-        } else if typ == &Type::INT4 {
-            ValueType::Int32(driver_result(row.try_get(index))?).into()
-        } else if typ == &Type::INT8 {
-            ValueType::Int64(driver_result(row.try_get(index))?).into()
-        } else if typ == &Type::OID {
-            let value: Option<u32> = driver_result(row.try_get(index))?;
-            ValueType::Int64(value.map(i64::from)).into()
-        } else if typ == &Type::FLOAT4 {
-            ValueType::Float(driver_result(row.try_get(index))?).into()
-        } else if typ == &Type::FLOAT8 {
-            ValueType::Double(driver_result(row.try_get(index))?).into()
-        } else if typ == &Type::NUMERIC {
-            let value: Option<conversion::DecimalWrapper> = driver_result(row.try_get(index))?;
-            ValueType::Numeric(value.map(|value| value.0)).into()
-        } else if is_oracle_text_type(typ) {
-            let value: Option<String> = driver_result(row.try_get(index))?;
-            ValueType::Text(value.map(Cow::Owned)).into()
-        } else if typ == &Type::XML {
-            let value: Option<String> = driver_result(row.try_get(index))?;
-            ValueType::Xml(value.map(Cow::Owned)).into()
-        } else if matches!(typ, &Type::BYTEA | &Type::ORACLE_BLOB) {
-            let value: Option<Vec<u8>> = driver_result(row.try_get(index))?;
-            ValueType::Bytes(value.map(Cow::Owned)).into()
-        } else if matches!(typ, &Type::JSON | &Type::JSONB) {
-            ValueType::Json(driver_result(row.try_get(index))?).into()
-        } else if typ == &Type::UUID {
-            ValueType::Uuid(driver_result(row.try_get(index))?).into()
-        } else if typ == &Type::CHAR {
-            let value: Option<i8> = driver_result(row.try_get(index))?;
-            ValueType::Char(value.map(|value| (value as u8) as char)).into()
-        } else if matches!(typ, &Type::TIMESTAMP | &Type::ORACLE_SYS_DATE) {
-            let value: Option<NaiveDateTime> = driver_result(row.try_get(index))?;
-            ValueType::DateTime(value.map(|value| DateTime::<Utc>::from_naive_utc_and_offset(value, Utc))).into()
-        } else if typ == &Type::TIMESTAMPTZ {
-            ValueType::DateTime(driver_result(row.try_get::<_, Option<DateTime<Utc>>>(index))?).into()
-        } else if typ == &Type::DATE {
-            ValueType::Date(driver_result(row.try_get::<_, Option<NaiveDate>>(index))?).into()
-        } else if typ == &Type::TIME {
-            ValueType::Time(driver_result(row.try_get::<_, Option<NaiveTime>>(index))?).into()
-        } else if is_catalog_text_array(typ) {
-            let values: Option<Vec<Option<&str>>> = driver_result(row.try_get(index))?;
-            ValueType::Array(values.map(|values| {
-                values
-                    .into_iter()
-                    .map(|value| ValueType::Text(value.map(ToOwned::to_owned).map(Cow::Owned)).into())
-                    .collect()
-            }))
-            .into()
-        } else {
-            return Err(Error::builder(ErrorKind::UnsupportedColumnType {
-                column_type: typ.to_string(),
-            })
-            .build());
-        };
-
-        values.push(value);
-    }
-
-    Ok(values)
 }
 
 fn make_tls_connector(ssl_params: &SslParams) -> crate::Result<MakeTlsConnector> {

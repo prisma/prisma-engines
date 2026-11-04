@@ -6,10 +6,143 @@ use crate::{
 };
 use bigdecimal::{BigDecimal, FromPrimitive};
 use bytes::BytesMut;
+use chrono::{DateTime, NaiveDateTime, Utc};
 use kingbase_postgres_types::{FromSql, IsNull, ToSql};
-use kingbase_tokio_postgres::types::{Kind, Type};
+use kingbase_tokio_postgres::{
+    Row,
+    types::{Kind, Type},
+};
+use std::borrow::Cow;
+
+use super::{column_type::*, driver_result};
 
 pub(crate) use decimal::DecimalWrapper;
+
+pub(super) fn convert_row(row: &Row) -> crate::Result<Vec<Value<'static>>> {
+    let mut values = Vec::with_capacity(row.columns().len());
+
+    for (index, column) in row.columns().iter().enumerate() {
+        let typ = column.type_();
+        let value = match KingbaseColumnType::from_pg_type(typ) {
+            KingbaseColumnType::Boolean(ty, v) => match ty {
+                KingbaseColumnTypeBoolean::BOOL => ValueType::Boolean(v.read(driver_result(row.try_get(index))?)),
+            },
+            KingbaseColumnType::Int32(ty, v) => match ty {
+                KingbaseColumnTypeInt32::INT2 => {
+                    let value: Option<i16> = driver_result(row.try_get(index))?;
+                    ValueType::Int32(v.read(value.map(i32::from)))
+                }
+                KingbaseColumnTypeInt32::INT4 => ValueType::Int32(v.read(driver_result(row.try_get(index))?)),
+            },
+            KingbaseColumnType::Int64(ty, v) => match ty {
+                KingbaseColumnTypeInt64::INT8 => ValueType::Int64(v.read(driver_result(row.try_get(index))?)),
+                KingbaseColumnTypeInt64::OID => {
+                    let value: Option<u32> = driver_result(row.try_get(index))?;
+                    ValueType::Int64(v.read(value.map(i64::from)))
+                }
+            },
+            KingbaseColumnType::Float(ty, v) => match ty {
+                KingbaseColumnTypeFloat::FLOAT4 => ValueType::Float(v.read(driver_result(row.try_get(index))?)),
+            },
+            KingbaseColumnType::Double(ty, v) => match ty {
+                KingbaseColumnTypeDouble::FLOAT8 => ValueType::Double(v.read(driver_result(row.try_get(index))?)),
+            },
+            KingbaseColumnType::Numeric(ty, v) => match ty {
+                KingbaseColumnTypeNumeric::NUMERIC => {
+                    let value: Option<DecimalWrapper> = driver_result(row.try_get(index))?;
+                    ValueType::Numeric(v.read(value.map(|value| value.0)))
+                }
+            },
+            KingbaseColumnType::Text(ty, v) => match ty {
+                KingbaseColumnTypeText::TEXT
+                | KingbaseColumnTypeText::VARCHAR
+                | KingbaseColumnTypeText::BPCHAR
+                | KingbaseColumnTypeText::NAME
+                | KingbaseColumnTypeText::UNKNOWN
+                | KingbaseColumnTypeText::ORACLE_UROWID
+                | KingbaseColumnTypeText::ORACLE_CLOB
+                | KingbaseColumnTypeText::ORACLE_NCLOB
+                | KingbaseColumnTypeText::ORACLE_BPCHARBYTE
+                | KingbaseColumnTypeText::ORACLE_VARCHARBYTE
+                | KingbaseColumnTypeText::ORACLE_BFILE => {
+                    let value: Option<String> = driver_result(row.try_get(index))?;
+                    ValueType::Text(v.read(value.map(Cow::Owned)))
+                }
+            },
+            KingbaseColumnType::Bytes(ty, v) => match ty {
+                KingbaseColumnTypeBytes::BYTEA | KingbaseColumnTypeBytes::ORACLE_BLOB => {
+                    let value: Option<Vec<u8>> = driver_result(row.try_get(index))?;
+                    ValueType::Bytes(v.read(value.map(Cow::Owned)))
+                }
+            },
+            KingbaseColumnType::Json(ty, v) => match ty {
+                KingbaseColumnTypeJson::JSON | KingbaseColumnTypeJson::JSONB => {
+                    ValueType::Json(v.read(driver_result(row.try_get(index))?))
+                }
+            },
+            KingbaseColumnType::Xml(ty, v) => match ty {
+                KingbaseColumnTypeXml::XML => {
+                    let value: Option<String> = driver_result(row.try_get(index))?;
+                    ValueType::Xml(v.read(value.map(Cow::Owned)))
+                }
+            },
+            KingbaseColumnType::Uuid(ty, v) => match ty {
+                KingbaseColumnTypeUuid::UUID => ValueType::Uuid(v.read(driver_result(row.try_get(index))?)),
+            },
+            KingbaseColumnType::Char(ty, v) => match ty {
+                KingbaseColumnTypeChar::CHAR => {
+                    let value: Option<i8> = driver_result(row.try_get(index))?;
+                    ValueType::Char(v.read(value.map(|value| (value as u8) as char)))
+                }
+            },
+            KingbaseColumnType::DateTime(ty, v) => match ty {
+                KingbaseColumnTypeDateTime::TIMESTAMP | KingbaseColumnTypeDateTime::ORACLE_SYS_DATE => {
+                    let value: Option<NaiveDateTime> = driver_result(row.try_get(index))?;
+                    ValueType::DateTime(
+                        v.read(value.map(|value| DateTime::<Utc>::from_naive_utc_and_offset(value, Utc))),
+                    )
+                }
+                KingbaseColumnTypeDateTime::TIMESTAMPTZ => {
+                    ValueType::DateTime(v.read(driver_result(row.try_get(index))?))
+                }
+            },
+            KingbaseColumnType::Date(ty, v) => match ty {
+                KingbaseColumnTypeDate::DATE => ValueType::Date(v.read(driver_result(row.try_get(index))?)),
+            },
+            KingbaseColumnType::Time(ty, v) => match ty {
+                KingbaseColumnTypeTime::TIME => ValueType::Time(v.read(driver_result(row.try_get(index))?)),
+            },
+            KingbaseColumnType::TextArray(ty, v) => match ty {
+                KingbaseColumnTypeTextArray::TEXT_ARRAY
+                | KingbaseColumnTypeTextArray::NAME_ARRAY
+                | KingbaseColumnTypeTextArray::VARCHAR_ARRAY => {
+                    let values: Option<Vec<Option<&str>>> = driver_result(row.try_get(index))?;
+                    ValueType::Array(v.read(values.map(|values| {
+                        values
+                            .into_iter()
+                            .map(|value| ValueType::Text(value.map(ToOwned::to_owned).map(Cow::Owned)).into())
+                            .collect()
+                    })))
+                }
+            },
+            KingbaseColumnType::Enum(v) => {
+                let value: Option<EnumString> = driver_result(row.try_get(index))?;
+                let value = v.read(value.map(|value| Cow::Owned(value.0)));
+                ValueType::Enum(value.map(crate::prelude::EnumVariant::new), None)
+            }
+            KingbaseColumnType::Unsupported(_) => {
+                return Err(Error::builder(ErrorKind::UnsupportedColumnType {
+                    column_type: typ.to_string(),
+                })
+                .build());
+            }
+        };
+
+        values.push(value.into());
+    }
+
+    Ok(values)
+}
 
 /// PostgreSQL-wire enum binary values contain the UTF-8 variant label.
 pub(crate) struct EnumString(pub String);
